@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( bw12_io, AS_IO, 8, bw12_state )
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_DEVREADWRITE_LEGACY(MC6845_TAG, mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0e) AM_DEVREAD_LEGACY(UPD765_TAG, upd765_status_r)
 	AM_RANGE(0x21, 0x21) AM_MIRROR(0x0e) AM_DEVREADWRITE_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w)
-	AM_RANGE(0x30, 0x33) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(PIA6821_TAG, pia6821_r, pia6821_w)
+	AM_RANGE(0x30, 0x33) AM_MIRROR(0x0c) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_d_r, z80dart_d_w)
 	AM_RANGE(0x41, 0x41) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_c_r, z80dart_c_w)
 	AM_RANGE(0x42, 0x42) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_d_r, z80dart_d_w)
@@ -521,7 +521,7 @@ static const pia6821_interface pia_intf =
 static const centronics_interface bw12_centronics_intf =
 {
 	0,													/* is IBM PC? */
-	DEVCB_DEVICE_LINE(PIA6821_TAG, pia6821_ca1_w),		/* ACK output */
+	DEVCB_DEVICE_LINE_MEMBER(PIA6821_TAG, pia6821_device, ca1_w),		/* ACK output */
 	DEVCB_NULL,											/* BUSY output */
 	DEVCB_NULL											/* NOT BUSY output */
 };
@@ -599,7 +599,7 @@ WRITE_LINE_MEMBER( bw12_state::ay3600_data_ready_w )
 {
 	m_key_stb = state;
 
-	pia6821_cb1_w(m_pia, state);
+	m_pia->cb1_w(state);
 
 	if (state)
 	{

@@ -284,7 +284,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	int port, bit;
 	int key_pressed;
 	UINT32 shiftkeys, ctrlkeys;
-	device_t *pia = machine.device( "pia" );
+	pia6821_device *pia = machine.device<pia6821_device>("pia");
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	/* This holds the values of all the input ports for ordinary keys
@@ -332,7 +332,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	key_pressed = 0;
 
 	/* The keyboard strobe line should always be low when a scan starts. */
-	pia6821_ca1_w(pia, 0);
+	pia->ca1_w(0);
 
 	shiftkeys = input_port_read(machine, "KEY4") & 0x0003;
 	ctrlkeys = input_port_read(machine, "KEY4") & 0x000c;
@@ -366,17 +366,17 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	{
 		/* The keyboard will pulse its strobe line when a key is
            pressed.  A 10-usec pulse is typical. */
-		pia6821_ca1_w(pia, 1);
+		pia->ca1_w(1);
 		machine.scheduler().timer_set(attotime::from_usec(10), FUNC(apple1_kbd_strobe_end));
 	}
 }
 
 static TIMER_CALLBACK(apple1_kbd_strobe_end)
 {
-	device_t *pia = machine.device( "pia" );
+	pia6821_device *pia = machine.device<pia6821_device>("pia");
 
 	/* End of the keyboard strobe pulse. */
-	pia6821_ca1_w(pia, 0);
+	pia->ca1_w(0);
 }
 
 
@@ -405,7 +405,8 @@ static WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal )
 	/* DA is directly connected to PIA input PB7, so the processor can
        read bit 7 of port B to test whether the display has completed
        a write. */
-	pia6821_portb_w(device, 0, (!data) << 7);
+    pia6821_device *pia = downcast<pia6821_device *>(device);
+	pia->portb_w((!data) << 7);
 
 	/* Once DA is asserted, the display will wait until it can perform
        the write, when the cursor position is about to be refreshed.
@@ -418,23 +419,23 @@ static WRITE8_DEVICE_HANDLER( apple1_pia0_dsp_write_signal )
 
 static TIMER_CALLBACK(apple1_dsp_ready_start)
 {
-	device_t *pia = machine.device( "pia" );
+	pia6821_device *pia = machine.device<pia6821_device>("pia");
 
 	/* When the display asserts \RDA to signal it is ready, it
        triggers a 74123 one-shot to send a 3.5-usec low pulse to PIA
        input CB1.  The end of this pulse will tell the PIA that the
        display is ready for another write. */
-	pia6821_cb1_w(pia, 0);
+	pia->cb1_w(0);
 	machine.scheduler().timer_set(attotime::from_nsec(3500), FUNC(apple1_dsp_ready_end));
 }
 
 static TIMER_CALLBACK(apple1_dsp_ready_end)
 {
-	device_t *pia = machine.device( "pia" );
+	pia6821_device *pia = machine.device<pia6821_device>("pia");
 
 	/* The one-shot pulse has ended; return CB1 to high, so we can do
        another display write. */
-	pia6821_cb1_w(pia, 1);
+	pia->cb1_w(1);
 }
 
 

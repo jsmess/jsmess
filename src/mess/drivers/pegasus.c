@@ -171,8 +171,8 @@ static ADDRESS_MAP_START(pegasus_mem, AS_PROGRAM, 8, pegasus_state)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
 	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
-	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE_LEGACY("pia_u", pia6821_r, pia6821_w)
-	AM_RANGE(0xe600, 0xe603) AM_MIRROR(0x1fc) AM_DEVREADWRITE_LEGACY("pia_s", pia6821_r, pia6821_w)
+	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pia_u", pia6821_device, read, write)
+	AM_RANGE(0xe600, 0xe603) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pia_s", pia6821_device, read, write)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -184,8 +184,8 @@ static ADDRESS_MAP_START(pegasusm_mem, AS_PROGRAM, 8, pegasus_state)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
 	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
-	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE_LEGACY("pia_u", pia6821_r, pia6821_w)
-	AM_RANGE(0xe600, 0xe603) AM_MIRROR(0x1fc) AM_DEVREADWRITE_LEGACY("pia_s", pia6821_r, pia6821_w)
+	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pia_u", pia6821_device, read, write)
+	AM_RANGE(0xe600, 0xe603) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pia_s", pia6821_device, read, write)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

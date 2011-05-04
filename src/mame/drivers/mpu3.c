@@ -195,18 +195,18 @@ static MACHINE_RESET( mpu3 )
 /* 6808 IRQ handler */
 static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 {
-	device_t *pia3 = device->machine().device("pia_ic3");
-	device_t *pia4 = device->machine().device("pia_ic4");
-	device_t *pia5 = device->machine().device("pia_ic5");
-	device_t *pia6 = device->machine().device("pia_ic6");
-	device_t *ptm2 = device->machine().device("ptm_ic2");
+	pia6821_device *pia3 = device->machine().device<pia6821_device>("pia_ic3");
+	pia6821_device *pia4 = device->machine().device<pia6821_device>("pia_ic4");
+	pia6821_device *pia5 = device->machine().device<pia6821_device>("pia_ic5");
+	pia6821_device *pia6 = device->machine().device<pia6821_device>("pia_ic6");
+	ptm6840_device *ptm2 = device->machine().device<ptm6840_device>("ptm_ic2");
 
 	/* The PIA and PTM IRQ lines are all connected to a common PCB track, leading directly to the 6809 IRQ line. */
-	int combined_state = pia6821_get_irq_a(pia3) | pia6821_get_irq_b(pia3) |
-						 pia6821_get_irq_a(pia4) | pia6821_get_irq_b(pia4) |
-						 pia6821_get_irq_a(pia5) | pia6821_get_irq_b(pia5) |
-						 pia6821_get_irq_a(pia6) | pia6821_get_irq_b(pia6) |
-						 ptm6840_get_irq(ptm2);
+	int combined_state = pia3->irq_a_state() | pia3->irq_b_state() |
+						 pia4->irq_a_state() | pia4->irq_b_state() |
+						 pia5->irq_a_state() | pia5->irq_b_state() |
+						 pia6->irq_a_state() | pia6->irq_b_state() |
+						 ptm2->irq_state();
 
 		cputag_set_input_line(device->machine(), "maincpu", M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6808 int%d \n", combined_state));
@@ -831,8 +831,8 @@ static TIMER_DEVICE_CALLBACK( gen_50hz )
     falling edges of the pulse are used means the timer actually gives a 100Hz
     oscillating signal.*/
 	state->m_signal_50hz = state->m_signal_50hz?0:1;
-	ptm6840_set_c1(timer.machine().device("ptm_ic2"), 0, state->m_signal_50hz);
-	pia6821_cb1_w(timer.machine().device("pia_ic3"), ~state->m_signal_50hz);
+	timer.machine().device<ptm6840_device>("ptm_ic2")->set_c1(state->m_signal_50hz);
+	timer.machine().device<pia6821_device>("pia_ic3")->cb1_w(~state->m_signal_50hz);
 	update_triacs(timer.machine());
 }
 
@@ -842,31 +842,31 @@ static TIMER_DEVICE_CALLBACK( ic10_callback )
 	// TODO: Use discrete handler for 555, this is far too simplistic
 
 	state->m_ic10_output = state->m_ic10_output?0:1;
-	ptm6840_set_c2(timer.machine().device("ptm_ic2"), 0, state->m_ic10_output);
-	pia6821_ca1_w(timer.machine().device("pia_ic4"), state->m_ic10_output);
+	timer.machine().device<ptm6840_device>("ptm_ic2")->set_c2(state->m_ic10_output);
+	timer.machine().device<pia6821_device>("pia_ic4")->ca1_w(state->m_ic10_output);
 
 }
 static WRITE8_HANDLER( mpu3ptm_w )
 {
-	device_t *ptm2 = space->machine().device("ptm_ic2");
+	ptm6840_device *ptm2 = space->machine().device<ptm6840_device>("ptm_ic2");
 
-	ptm6840_write(ptm2,offset >>2,data);//((offset & 0x1f) >>2),data);
+	ptm2->write(offset >>2,data);//((offset & 0x1f) >>2),data);
 }
 
 static READ8_HANDLER( mpu3ptm_r )
 {
-	device_t *ptm2 = space->machine().device("ptm_ic2");
+	ptm6840_device *ptm2 = space->machine().device<ptm6840_device>("ptm_ic2");
 
-	return ptm6840_read(ptm2,offset >>2);
+	return ptm2->read(offset >>2);
 }
 
 static ADDRESS_MAP_START( mpu3_basemap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x881f) AM_READWRITE(mpu3ptm_r, mpu3ptm_w)/* PTM6840 IC2 */
-	AM_RANGE(0x9000, 0x9003) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
-	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("pia_ic5", pia6821_r, pia6821_w)		/* PIA6821 IC5 */
-	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE("pia_ic6", pia6821_r, pia6821_w)		/* PIA6821 IC6 */
+	AM_RANGE(0x9000, 0x9003) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
+	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE_MODERN("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_MODERN("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
+	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE_MODERN("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
 
 	AM_RANGE(0x1000, 0xffff) AM_ROM
 ADDRESS_MAP_END

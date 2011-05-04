@@ -26,7 +26,7 @@
 #include "sound/aica.h"
 #include "includes/dc.h"
 #include "imagedev/chd_cd.h"
-
+#include "machine/maple-dc.h"
 #define CPU_CLOCK (200000000)
 
 #ifdef MESS
@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM	AM_WRITENOP				// BIOS
 	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("maincpu", 0x200000)	// flash
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
-	AM_RANGE(0x005f6c00, 0x005f6cff) AM_READWRITE( dc_maple_r, dc_maple_w )
+	AM_RANGE(0x005f6c00, 0x005f6cff) AM_DEVREADWRITE32_MODERN( "maple_dc", maple_dc_device, sb_mdstar_r, sb_mdstar_w, U64(0xffffffff00000000) )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE( dc_mess_gdrom_r, dc_mess_gdrom_w )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE( dc_mess_g1_ctrl_r, dc_mess_g1_ctrl_w )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE( dc_g2_ctrl_r, dc_g2_ctrl_w )
@@ -238,6 +238,8 @@ static MACHINE_CONFIG_START( dc, driver_device )
 
 	MCFG_MACHINE_START( dc )
 	MCFG_MACHINE_RESET( dc_console )
+
+	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu" )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

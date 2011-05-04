@@ -604,24 +604,24 @@ static void pak_load_trailer(running_machine &machine, const pak_decodedtrailer 
      * startup. I wish I had a better solution
      */
 
-	pia6821_w(state->m_pia_0, 1, 0x00);
-	pia6821_w(state->m_pia_0, 3, 0x00);
-	pia6821_w(state->m_pia_0, 0, 0x00);
-	pia6821_w(state->m_pia_0, 2, 0xff);
-	pia6821_w(state->m_pia_1, 1, 0x00);
-	pia6821_w(state->m_pia_1, 3, 0x00);
-	pia6821_w(state->m_pia_1, 0, 0xfe);
-	pia6821_w(state->m_pia_1, 2, 0xf8);
-
-	pia6821_w(state->m_pia_0, 1, trailer->pia[1]);
-	pia6821_w(state->m_pia_0, 0, trailer->pia[0]);
-	pia6821_w(state->m_pia_0, 3, trailer->pia[3]);
-	pia6821_w(state->m_pia_0, 2, trailer->pia[2]);
-
-	pia6821_w(state->m_pia_1, 1, trailer->pia[5]);
-	pia6821_w(state->m_pia_1, 0, trailer->pia[4]);
-	pia6821_w(state->m_pia_1, 3, trailer->pia[7]);
-	pia6821_w(state->m_pia_1, 2, trailer->pia[6]);
+	state->m_pia_0->write(*memory_nonspecific_space(machine), 1, 0x00);
+	state->m_pia_0->write(*memory_nonspecific_space(machine), 3, 0x00);
+	state->m_pia_0->write(*memory_nonspecific_space(machine), 0, 0x00);
+	state->m_pia_0->write(*memory_nonspecific_space(machine), 2, 0xff);
+	state->m_pia_1->write(*memory_nonspecific_space(machine), 1, 0x00);
+	state->m_pia_1->write(*memory_nonspecific_space(machine), 3, 0x00);
+	state->m_pia_1->write(*memory_nonspecific_space(machine), 0, 0xfe);
+	state->m_pia_1->write(*memory_nonspecific_space(machine), 2, 0xf8);
+                  
+	state->m_pia_0->write(*memory_nonspecific_space(machine), 1, trailer->pia[1]);
+	state->m_pia_0->write(*memory_nonspecific_space(machine), 0, trailer->pia[0]);
+	state->m_pia_0->write(*memory_nonspecific_space(machine), 3, trailer->pia[3]);
+	state->m_pia_0->write(*memory_nonspecific_space(machine), 2, trailer->pia[2]);
+                  
+	state->m_pia_1->write(*memory_nonspecific_space(machine), 1, trailer->pia[5]);
+	state->m_pia_1->write(*memory_nonspecific_space(machine), 0, trailer->pia[4]);
+	state->m_pia_1->write(*memory_nonspecific_space(machine), 3, trailer->pia[7]);
+	state->m_pia_1->write(*memory_nonspecific_space(machine), 2, trailer->pia[6]);
 
 	/* For some reason, specifying use of high ram seems to screw things up;
      * I'm not sure whether it is because I'm using the wrong method to get
@@ -896,8 +896,8 @@ enum
 static void d_recalc_irq(running_machine &machine)
 {
 	coco_state *state = machine.driver_data<coco_state>();
-	UINT8 pia0_irq_a = pia6821_get_irq_a(state->m_pia_0);
-	UINT8 pia0_irq_b = pia6821_get_irq_b(state->m_pia_0);
+	UINT8 pia0_irq_a = state->m_pia_0->irq_a_state();
+	UINT8 pia0_irq_b = state->m_pia_0->irq_b_state();
 
 	if (pia0_irq_a || pia0_irq_b)
 		cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
@@ -908,10 +908,10 @@ static void d_recalc_irq(running_machine &machine)
 static void d_recalc_firq(running_machine &machine)
 {
 	coco_state *state = machine.driver_data<coco_state>();
-	UINT8 pia1_firq_a = pia6821_get_irq_a(state->m_pia_1);
-	UINT8 pia1_firq_b = pia6821_get_irq_b(state->m_pia_1);
-	UINT8 pia2_firq_a = (state->m_pia_2 != NULL) ? pia6821_get_irq_a(state->m_pia_2) : 0x00;
-	UINT8 pia2_firq_b = (state->m_pia_2 != NULL) ? pia6821_get_irq_b(state->m_pia_2) : 0x00;
+	UINT8 pia1_firq_a = state->m_pia_1->irq_a_state();
+	UINT8 pia1_firq_b = state->m_pia_1->irq_b_state();
+	UINT8 pia2_firq_a = (state->m_pia_2 != NULL) ? state->m_pia_2->irq_a_state() : 0x00;
+	UINT8 pia2_firq_b = (state->m_pia_2 != NULL) ? state->m_pia_2->irq_b_state() : 0x00;
 
 	if (pia1_firq_a || pia1_firq_b || pia2_firq_a || pia2_firq_b)
 		cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
@@ -1026,7 +1026,7 @@ static void coco3_raise_interrupt(running_machine &machine, UINT8 mask, int stat
 void coco3_horizontal_sync_callback(running_machine &machine,int data)
 {
 	coco_state *state = machine.driver_data<coco_state>();
-	pia6821_ca1_w(state->m_pia_0, data);
+	state->m_pia_0->ca1_w(data);
 	coco3_raise_interrupt(machine, COCO3_INT_HBORD, data);
 }
 
@@ -1035,7 +1035,7 @@ void coco3_horizontal_sync_callback(running_machine &machine,int data)
 void coco3_field_sync_callback(running_machine &machine,int data)
 {
 	coco_state *state = machine.driver_data<coco_state>();
-	pia6821_cb1_w(state->m_pia_0, data);
+	state->m_pia_0->cb1_w(data);
 }
 
 void coco3_gime_field_sync_callback(running_machine &machine)
@@ -1191,7 +1191,7 @@ static int get_soundmux_status(running_machine &machine)
 	coco_state *state = machine.driver_data<coco_state>();
 
 	int soundmux_status = 0;
-	if (pia6821_get_output_cb2(state->m_pia_1))
+	if (state->m_pia_1->cb2_output())
 		soundmux_status |= SOUNDMUX_STATUS_ENABLE;
 	if (state->m_mux_sel1)
 		soundmux_status |= SOUNDMUX_STATUS_SEL1;
@@ -1236,8 +1236,8 @@ static void coco_sound_update(running_machine &machine)
 	/* Call this function whenever you need to update the sound. It will
      * automatically mute any devices that are switched out.
      */
-	UINT8 dac = pia6821_get_output_a(state->m_pia_1) & 0xFC;
-	UINT8 pia1_pb1 = (pia6821_get_output_b(state->m_pia_1) & 0x02) ? 0x80 : 0x00;
+	UINT8 dac = state->m_pia_1->a_output() & 0xFC;
+	UINT8 pia1_pb1 = (state->m_pia_1->b_output() & 0x02) ? 0x80 : 0x00;
 	int soundmux_status = get_soundmux_status(machine);
 
 	switch(soundmux_status)
@@ -1356,7 +1356,7 @@ static UINT8 coco_update_keyboard( running_machine &machine )
 	static const int dclg_table[] = {0, 14, 30, 49 };
 	attotime dclg_time = attotime::zero;
 	UINT8 pia0_pb;
-	UINT8 dac = pia6821_get_output_a(state->m_pia_1) & 0xfc;
+	UINT8 dac = state->m_pia_1->a_output() & 0xfc;
 	UINT8 hires = input_port_read_safe(machine, "hires_intf", 0x00);
 	int joystick_axis, joystick, joy_mask, joy_shift, ctrl, hires_val, cc3m_val;
 
@@ -1369,7 +1369,7 @@ static UINT8 coco_update_keyboard( running_machine &machine )
 
 
 
-	pia0_pb = pia6821_get_output_b(state->m_pia_0);
+	pia0_pb = state->m_pia_0->b_output();
 	joystick_axis = state->m_mux_sel1;
 	joystick = state->m_mux_sel2;
 
@@ -1391,13 +1391,13 @@ static UINT8 coco_update_keyboard( running_machine &machine )
 	if ((input_port_read(machine, "row5") | pia0_pb) != 0xff) porta &= ~0x20;
 	if ((input_port_read(machine, "row6") | pia0_pb) != 0xff) porta &= ~0x40;
 
-	if ((input_port_read(machine, "row0") | pia6821_get_port_b_z_mask(state->m_pia_0)) != 0xff) port_za &= ~0x01;
-	if ((input_port_read(machine, "row1") | pia6821_get_port_b_z_mask(state->m_pia_0)) != 0xff) port_za &= ~0x02;
-	if ((input_port_read(machine, "row2") | pia6821_get_port_b_z_mask(state->m_pia_0)) != 0xff) port_za &= ~0x04;
-	if ((input_port_read(machine, "row3") | pia6821_get_port_b_z_mask(state->m_pia_0)) != 0xff) port_za &= ~0x08;
-	if ((input_port_read(machine, "row4") | pia6821_get_port_b_z_mask(state->m_pia_0)) != 0xff) port_za &= ~0x10;
-	if ((input_port_read(machine, "row5") | pia6821_get_port_b_z_mask(state->m_pia_0)) != 0xff) port_za &= ~0x20;
-	if ((input_port_read(machine, "row6") | pia6821_get_port_b_z_mask(state->m_pia_0)) != 0xff) port_za &= ~0x40;
+	if ((input_port_read(machine, "row0") | state->m_pia_0->port_b_z_mask()) != 0xff) port_za &= ~0x01;
+	if ((input_port_read(machine, "row1") | state->m_pia_0->port_b_z_mask()) != 0xff) port_za &= ~0x02;
+	if ((input_port_read(machine, "row2") | state->m_pia_0->port_b_z_mask()) != 0xff) port_za &= ~0x04;
+	if ((input_port_read(machine, "row3") | state->m_pia_0->port_b_z_mask()) != 0xff) port_za &= ~0x08;
+	if ((input_port_read(machine, "row4") | state->m_pia_0->port_b_z_mask()) != 0xff) port_za &= ~0x10;
+	if ((input_port_read(machine, "row5") | state->m_pia_0->port_b_z_mask()) != 0xff) port_za &= ~0x20;
+	if ((input_port_read(machine, "row6") | state->m_pia_0->port_b_z_mask()) != 0xff) port_za &= ~0x40;
 
 	switch (ctrl)
 	{
@@ -1464,7 +1464,7 @@ static UINT8 coco_update_keyboard( running_machine &machine )
 	porta &= ~input_port_read_safe(machine, button_names[ctrl], 0);
 	port_za &= ~input_port_read_safe(machine, button_names[ctrl], 0);
 
-	pia6821_set_input_a(state->m_pia_0, porta, port_za);
+	state->m_pia_0->set_a_input(porta, port_za);
 	return porta;
 }
 
@@ -1555,7 +1555,7 @@ static void printer_out_dragon(running_machine &machine, int data)
 	/* If strobe bit is high send data from pia0 port b to dragon parallel printer */
 	if (data & 0x02)
 	{
-		printer_output(printer_image(machine), pia6821_get_output_b(state->m_pia_0));
+		printer_output(printer_image(machine), state->m_pia_0->b_output());
 	}
 }
 
@@ -1569,7 +1569,7 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
      *  7-2:    DAC to speaker or cassette
      *    1:    Serial out (CoCo), Printer strobe (Dragon)
      */
-	UINT8 dac = pia6821_get_output_a(device) & 0xfc;
+	UINT8 dac = downcast<pia6821_device *>(device)->a_output() & 0xfc;
 	UINT8 ctrl = input_port_read_safe(device->machine(), "ctrl_sel", 0x00);
 	UINT8 hires = input_port_read_safe(device->machine(), "hires_intf", 0x00);
 	state->m_dac_value = dac >> 2;
@@ -1662,7 +1662,7 @@ static WRITE8_DEVICE_HANDLER( dragon64_pia1_pb_w )
 
 	d_pia1_pb_w(device, 0, data);
 
-	ddr = ~pia6821_get_port_b_z_mask(device);
+	ddr = ~downcast<pia6821_device *>(device)->port_b_z_mask();
 
 	/* If bit 2 of the pia1 ddrb is 1 then this pin is an output so use it */
 	/* to control the paging of the 32k and 64k basic roms */
@@ -1708,13 +1708,13 @@ static WRITE8_DEVICE_HANDLER( dgnalpha_pia2_pa_w )
 		case 0x00	:		/* Inactive, do nothing */
 			break;
 		case 0x01	:		/* Write to selected port */
-			ay8910_data_w(ay8912, 0, pia6821_get_output_b(device));
+			ay8910_data_w(ay8912, 0, downcast<pia6821_device *>(device)->b_output());
 			break;
 		case 0x02	:		/* Read from selected port */
-			pia6821_portb_w(device, 0, ay8910_r(ay8912, 0));
+			downcast<pia6821_device *>(device)->portb_w(ay8910_r(ay8912, 0));
 			break;
 		case 0x03	:		/* Select port to write to */
-			ay8910_address_w(ay8912, 0, pia6821_get_output_b(device));
+			ay8910_address_w(ay8912, 0, downcast<pia6821_device *>(device)->b_output());
 			break;
 	}
 }
@@ -1755,7 +1755,7 @@ static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_intrq_w )
 		}
 		else
 		{
-			if (pia6821_get_output_ca2_z(cstate->m_pia_2))
+			if (cstate->m_pia_2->ca2_output_z())
 				cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
         }
 	}
@@ -1768,7 +1768,7 @@ static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_intrq_w )
 static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_drq_w )
 {
 	coco_state *cstate = device->machine().driver_data<coco_state>();
-	pia6821_cb1_w(cstate->m_pia_2, state ? CARTLINE_ASSERTED : CARTLINE_CLEAR);
+	cstate->m_pia_2->cb1_w(state ? CARTLINE_ASSERTED : CARTLINE_CLEAR);
 }
 
 /* The Dragon Alpha hardware reverses the order of the WD2797 registers */
@@ -1891,7 +1891,7 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco )
        the full 64K, as this uses Color Basic 1.2, which can configure 64K rams */
 
 	if (ram_get_size(device->machine().device(RAM_TAG)) > 0x8000)		/* 1 bank of 64K rams */
-		result = (pia6821_get_output_b(state->m_pia_0) & 0x80) >> 5;
+		result = (state->m_pia_0->b_output() & 0x80) >> 5;
 	else if (ram_get_size(device->machine().device(RAM_TAG)) >= 0x4000)	/* 1 or 2 banks of 16K rams */
 		result = 0x04;
 	else
@@ -1935,7 +1935,7 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco2 )
 	else if (ram_get_size(device->machine().device(RAM_TAG)) <= 0x4000)
 		result = 0x04;					/* 16K: wire pia1_pb2 high */
 	else
-		result = (pia6821_get_output_b(state->m_pia_0) & 0x40) >> 4;		/* 32/64K: wire output of pia0_pb6 to input pia1_pb2  */
+		result = (state->m_pia_0->b_output() & 0x40) >> 4;		/* 32/64K: wire output of pia0_pb6 to input pia1_pb2  */
 
    result += state->m_bitbanger_input_value;
 
@@ -2765,7 +2765,7 @@ static SAM6883_SET_MAP_TYPE( coco3_sam_set_maptype )
 void coco_cart_w(device_t *device, int data)
 {
 	coco_state *state = device->machine().driver_data<coco_state>();
-	pia6821_cb1_w(state->m_pia_1, data ? ASSERT_LINE : CLEAR_LINE);
+	state->m_pia_1->cb1_w(data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2811,7 +2811,7 @@ void coco_nmi_w(device_t *device, int data)
 
 WRITE8_DEVICE_HANDLER(coco_pia_1_w)
 {
-	pia6821_w(device, offset, data);
+	downcast<pia6821_device *>(device)->write(*memory_nonspecific_space(device->machine()), offset, data);
 	coco_cartridge_twiddle_q_lines(cococart_device(device->machine()));
 }
 
@@ -2845,9 +2845,9 @@ static void generic_init_machine(running_machine &machine, const machine_init_in
 	state->m_printer_device	= machine.device("printer");
 	state->m_dac				= machine.device("dac");
 	state->m_sam				= machine.device("sam");
-	state->m_pia_0			= machine.device("pia_0");
-	state->m_pia_1			= machine.device("pia_1");
-	state->m_pia_2			= machine.device("pia_2");
+	state->m_pia_0			= machine.device<pia6821_device>("pia_0");
+	state->m_pia_1			= machine.device<pia6821_device>("pia_1");
+	state->m_pia_2			= machine.device<pia6821_device>("pia_2");
 
 	/* clear static variables */
 	state->m_hiresjoy_ca = 1;

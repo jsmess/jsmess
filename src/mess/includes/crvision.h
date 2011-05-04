@@ -43,7 +43,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_pia;
+	required_device<pia6821_device> m_pia;
 	required_device<device_t> m_psg;
 	required_device<device_t> m_cassette;
 	required_device<device_t> m_centronics;

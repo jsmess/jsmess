@@ -406,8 +406,8 @@ normal keyboards?
 static ADDRESS_MAP_START(pet_mem , AS_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM AM_BASE_MEMBER(pet_state, m_videoram)
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
-	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
-	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
+	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
+	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE_MODERN("pia_1", pia6821_device, read, write)
 	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 /*  AM_RANGE(0xe900, 0xe91f) AM_DEVREAD("ieee_bus", cbm_ieee_state)    // for debugging */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -416,8 +416,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pet40_mem , AS_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM AM_BASE_MEMBER(pet_state, m_videoram)
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
-	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
-	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
+	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
+	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE_MODERN("pia_1", pia6821_device, read, write)
 	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
@@ -464,8 +464,8 @@ static ADDRESS_MAP_START( superpet_mem , AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(pet_state, m_memory)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2") AM_BASE_MEMBER(pet_state, m_videoram)
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
-	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
-	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
+	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
+	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE_MODERN("pia_1", pia6821_device, read, write)
 	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
@@ -480,8 +480,8 @@ static ADDRESS_MAP_START( superpet_m6809_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2")	/* same memory as m6502 */
     AM_RANGE(0x9000, 0x9fff) AM_RAMBANK("bank1")	/* 64 kbyte ram turned in */
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
-	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
-	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
+	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
+	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE_MODERN("pia_1", pia6821_device, read, write)
 	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
@@ -659,8 +659,8 @@ static IEEE488_INTERFACE( ieee488_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE("pia_1", pia6821_cb1_w),
-	DEVCB_DEVICE_LINE("pia_1", pia6821_ca1_w),
+	DEVCB_DEVICE_LINE_MEMBER("pia_1", pia6821_device, cb1_w),
+	DEVCB_DEVICE_LINE_MEMBER("pia_1", pia6821_device, ca1_w),
 	DEVCB_NULL
 };
 

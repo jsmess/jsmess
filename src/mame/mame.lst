@@ -2537,6 +2537,10 @@ korokoro		// (c) 1999 Takumi
 crusherm		// (c) 1999 Takumi
 tjumpman		// (c) 1999 Namco
 
+mushisam
+mushitam
+futari15
+
 // Kyugo games
 // Kyugo only made four games: Repulse, Flash Gal, SRD Mission and Air Wolf.
 // Gyrodine was made by Crux. Crux was antecedent of Toa Plan, and spin-off from Orca.
@@ -4818,7 +4822,7 @@ quizqgd			// 2003.01 Quiz Keitai Q mode
 ggxxrl			// 2003.03 Guilty Gear XX # Reload
 shikgam2		// 2003.04 Shikigami no Shiro 2
 bdrdown			// 2003.04 Border Down
-usagui			// 2003.06 Usagi Yamashiro Mahjong Hen
+usagiym			// 2003.06 Usagi Yamashiro Mahjong Hen
 				// 2003.07 Yonin Uchi Mahjong MJ Network Taisen ver. NEW
 oinori			// 2003.08 Oinori-daimyoujin Matsuri
 psyvar2			// 2003.11 Psyvariar 2
@@ -10465,6 +10469,8 @@ lhaunt_8		// (c) 2003
 // Rollfruit
 //rollfr		// (c) 2003
 rollfr_2		// (c) 2003
+rollfr_3		// (c) 2003
+rollfr_4		// (c) 2003 (bootleg?)
 
 // Garage
 //garage		// (c) 2004
@@ -10518,9 +10524,11 @@ keks_3			// (c) 2006
 // Gnome
 gnome			// (c) 2007
 gnome_2			// (c) 2007
+gnome_3			// (c) 2007
 
 // Sweet Life 2
 sweetl2			// (c) 2007
+sweetl2_2		// (c) 2007
 
 // Igrosoft bootleg sets
 
@@ -10616,6 +10624,13 @@ gnomec			// bootleg
 gnomed			// bootleg
 gnomee			// bootleg
 gnome_2a		// bootleg
+gnome_3a		// bootleg
+gnome_3b		// bootleg
+gnome_3c		// bootleg
+sweetl2_2a		// bootleg - Sweet Life 2
+sweetl2_2b		// bootleg
+sweetl2_2c		// bootleg
+sweetl2_2d		// bootleg
 
 // TAB Austria
 //cdimono1		// Base unit (enabled below, see MESS drivers)

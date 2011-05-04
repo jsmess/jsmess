@@ -435,9 +435,9 @@ static READ8_HANDLER(apf_wd179x_data_r)
 
 static ADDRESS_MAP_START(apf_imagination_map, AS_PROGRAM, 8)
 	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE_MEMBER(apf_state,m_videoram) AM_MIRROR(0x1c00)
-	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
+	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
-	AM_RANGE( 0x06000, 0x063ff) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
+	AM_RANGE( 0x06000, 0x063ff) AM_DEVREADWRITE_MODERN("pia_1", pia6821_device, read, write)
 	AM_RANGE( 0x06400, 0x064ff) AM_READWRITE(serial_r, serial_w)
 	AM_RANGE( 0x06500, 0x06500) AM_READWRITE(apf_wd179x_status_r, apf_wd179x_command_w)
 	AM_RANGE( 0x06501, 0x06501) AM_READWRITE(apf_wd179x_track_r, apf_wd179x_track_w)
@@ -453,7 +453,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(apf_m1000_map, AS_PROGRAM, 8)
 	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE_MEMBER(apf_state,m_videoram)  AM_MIRROR(0x1c00)
-	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
+	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 	AM_RANGE( 0x06800, 0x077ff) AM_ROM
 	AM_RANGE( 0x08000, 0x09fff) AM_ROM AM_REGION("maincpu", 0x8000)

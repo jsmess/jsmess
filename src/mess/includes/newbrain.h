@@ -173,7 +173,7 @@ public:
 
 	required_device<cpu_device> m_fdccpu;
 	required_device<z80ctc_device> m_ctc;
-	required_device<device_t> m_acia;
+	required_device<acia6850_device> m_acia;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_floppy;
 

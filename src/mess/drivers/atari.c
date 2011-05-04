@@ -244,7 +244,7 @@ static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_alt_r, pia6821_alt_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM
@@ -259,7 +259,7 @@ static ADDRESS_MAP_START(a800_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_alt_r, pia6821_alt_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM
@@ -274,7 +274,7 @@ static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_alt_r, pia6821_alt_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM /* OS */
@@ -290,7 +290,7 @@ static ADDRESS_MAP_START(a800xl_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_alt_r, pia6821_alt_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_RAMBANK("bank4")
@@ -306,7 +306,7 @@ static ADDRESS_MAP_START(xegs_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_alt_r, pia6821_alt_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_RAMBANK("bank4")
@@ -903,13 +903,13 @@ static void xegs_mmu(running_machine &machine, UINT8 new_mmu)
 static WRITE8_DEVICE_HANDLER(a1200xl_pia_pb_w) { a1200xl_mmu(device->machine(), data); }
 static WRITE8_DEVICE_HANDLER(a800xl_pia_pb_w)
 {
-	if (pia6821_get_port_b_z_mask(device) != 0xff)
+	if (downcast<pia6821_device *>(device)->port_b_z_mask() != 0xff)
 		a800xl_mmu(device->machine(), data);
 }
 
 static WRITE8_DEVICE_HANDLER(xegs_pia_pb_w)
 {
-	if (pia6821_get_port_b_z_mask(device) != 0xff)
+	if (downcast<pia6821_device *>(device)->port_b_z_mask() != 0xff)
 		xegs_mmu(device->machine(), data);
 }
 

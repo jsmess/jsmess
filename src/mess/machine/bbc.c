@@ -622,12 +622,12 @@ long myo;
 		if ((myo>=0x00) && (myo<=0x07)) return bbc_6845_r(space, myo-0x00);		/* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
 		{
-			device_t *acia = space->machine().device("acia6850");
+			acia6850_device *acia = space->machine().device<acia6850_device>("acia6850");
 
 			if ((myo - 0x08) & 1)
-				return acia6850_stat_r(acia, 0);
+				return acia->status_read(*space,0);
 			else
-				return acia6850_data_r(acia, 0);
+				return acia->data_read(*space,0);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;						/* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r(space->machine().device("upd7002"), myo-0x18);			/* A to D converter */
@@ -662,12 +662,12 @@ long myo;
 		if ((myo>=0x00) && (myo<=0x07)) bbc_6845_w(space, myo-0x00,data);			/* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
 		{
-			device_t *acia = space->machine().device("acia6850");
+			acia6850_device *acia = space->machine().device<acia6850_device>("acia6850");
 
 			if ((myo - 0x08) & 1)
-				acia6850_ctrl_w(acia, 0, data);
+				acia->control_write(*space, 0, data);
 			else
-				acia6850_data_w(acia, 0, data);
+				acia->data_write(*space, 0, data);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) bbc_SerialULA_w(space, myo-0x10,data);		/* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(space->machine().device("upd7002"),myo-0x18,data);			/* A to D converter */
@@ -1369,8 +1369,8 @@ static void MC6850_Receive_Clock(running_machine &machine, int new_clock)
 	bbc_state *state = machine.driver_data<bbc_state>();
 	if (!state->m_mc6850_clock && new_clock)
 	{
-		device_t *acia = machine.device("acia6850");
-		acia6850_tx_clock_in(acia);
+		acia6850_device *acia = machine.device<acia6850_device>("acia6850");
+		acia->tx_clock_in();
 	}
 	state->m_mc6850_clock = new_clock;
 }

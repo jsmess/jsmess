@@ -163,7 +163,7 @@ WRITE8_MEMBER( crvision_state::centronics_ctrl_w )
 
 static ADDRESS_MAP_START( crvision_map, AS_PROGRAM, 8, crvision_state )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE_LEGACY(PIA6821_TAG, pia6821_r, pia6821_w)
+	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_READ_LEGACY(TMS9928A_vram_r)
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_READ_LEGACY(TMS9928A_register_r)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_WRITE_LEGACY(TMS9928A_vram_w)
@@ -183,7 +183,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lasr2001_map, AS_PROGRAM, 8, laser2001_state )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE_LEGACY(PIA6821_TAG, pia6821_r, pia6821_w)
+	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_READ_LEGACY(TMS9928A_vram_r)
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_READ_LEGACY(TMS9928A_register_r)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_WRITE_LEGACY(TMS9928A_vram_w)
@@ -755,12 +755,12 @@ WRITE_LINE_MEMBER( laser2001_state::pia_ca2_w )
 READ_LINE_MEMBER( laser2001_state::pia_cb1_r )
 {
 	/* actually this is a diode-AND (READY & _BUSY), but ctronics.c returns busy status if printer image is not mounted -> Manager won't boot */
-	return sn76496_ready_r(m_psg) & (centronics_not_busy_r(m_centronics) | pia6821_get_output_ca2_z(m_pia));
+	return sn76496_ready_r(m_psg) & (centronics_not_busy_r(m_centronics) | m_pia->ca2_output_z());
 }
 
 WRITE_LINE_MEMBER( laser2001_state::pia_cb2_w )
 {
-	if (pia6821_get_output_ca2_z(m_pia))
+	if (m_pia->ca2_output_z())
 	{
 		if (!state) sn76496_w(m_psg, 0, m_keylatch);
 	}
@@ -835,7 +835,7 @@ static const centronics_interface lasr2001_centronics_intf =
 	FALSE,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(PIA6821_TAG, pia6821_cb1_w)
+	DEVCB_DEVICE_LINE_MEMBER(PIA6821_TAG, pia6821_device, cb1_w)
 };
 
 /***************************************************************************

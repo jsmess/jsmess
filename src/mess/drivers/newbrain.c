@@ -1013,8 +1013,8 @@ static ADDRESS_MAP_START( newbrain_ei_io_map, AS_IO, 8, newbrain_eim_state )
 	AM_RANGE(0x15, 0x15) AM_MIRROR(0xff00) AM_READ(st1_r)
 	AM_RANGE(0x16, 0x16) AM_MIRROR(0xff00) AM_READ(st2_r)
 	AM_RANGE(0x17, 0x17) AM_MIRROR(0xff00) AM_READWRITE(usbs_r, usbs_w)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(MC6850_TAG, acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(MC6850_TAG, acia6850_data_r, acia6850_data_w)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, status_read, control_write)
+	AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, data_read, data_write)
 	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE(paging_w)
 ADDRESS_MAP_END
@@ -1202,13 +1202,13 @@ static const upd765_interface fdc_intf =
 WRITE_LINE_MEMBER( newbrain_eim_state::ctc_z0_w )
 {
 	/* connected to the ACIA receive clock */
-	if (state) acia6850_rx_clock_in(m_acia);
+	if (state) m_acia->rx_clock_in();
 }
 
 WRITE_LINE_MEMBER( newbrain_eim_state::ctc_z1_w )
 {
 	/* connected to the ACIA transmit clock */
-	if (state) acia6850_tx_clock_in(m_acia);
+	if (state) m_acia->tx_clock_in();
 }
 
 WRITE_LINE_MEMBER( newbrain_eim_state::ctc_z2_w )

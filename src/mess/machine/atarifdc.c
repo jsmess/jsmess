@@ -731,7 +731,7 @@ READ8_DEVICE_HANDLER ( atari_serin_r )
 
 WRITE8_DEVICE_HANDLER ( atari_serout_w )
 {
-	device_t *pia = device->machine().device( "pia" );
+	pia6821_device *pia = device->machine().device<pia6821_device>( "pia" );
 	atari_fdc_t *fdc = get_safe_token(device);
 
 	/* ignore serial commands if no floppy image is specified */
@@ -751,7 +751,7 @@ WRITE8_DEVICE_HANDLER ( atari_serout_w )
 			/* exclusive or written checksum with calculated */
 			fdc->serout_chksum ^= data;
 			/* if the attention line is high, this should be data */
-			if (pia6821_get_irq_b(pia))
+			if (pia->irq_b_state())
 				a800_serial_write(device);
 		}
 		else

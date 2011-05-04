@@ -123,8 +123,8 @@ const rom_entry *interpod_device::device_rom_region() const
 static ADDRESS_MAP_START( interpod_mem, AS_PROGRAM, 8, interpod_device )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x3b80) AM_RAM // 6532
 	AM_RANGE(0x0400, 0x041f) AM_MIRROR(0x3be0) AM_DEVREADWRITE_LEGACY(R6532_TAG, riot6532_r, riot6532_w)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x9ffe) AM_DEVREADWRITE_LEGACY(MC6850_TAG, acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x9ffe) AM_DEVREADWRITE_LEGACY(MC6850_TAG, acia6850_data_r, acia6850_data_w)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x9ffe) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, status_read, control_write)
+	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x9ffe) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, data_read, data_write)
 	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0xb800) AM_ROM AM_REGION("interpod:u1", 0)
 	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x5ff0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
 ADDRESS_MAP_END

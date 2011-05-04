@@ -93,7 +93,11 @@ WRITE8_MEMBER( ob68k1a_state::com8116_w )
 
 READ8_MEMBER( ob68k1a_state::pia_r )
 {
-	return pia6821_r(offset ? m_pia1 : m_pia0, 0);
+	if (offset) {
+		return m_pia1->read(space,0);
+	} else {
+		return m_pia0->read(space,0);
+	}
 }
 
 
@@ -103,7 +107,11 @@ READ8_MEMBER( ob68k1a_state::pia_r )
 
 WRITE8_MEMBER( ob68k1a_state::pia_w )
 {
-	pia6821_w(offset ? m_pia1 : m_pia0, 0, data);
+	if (offset) {
+		m_pia1->write(space,0,data);
+	} else {
+		m_pia0->write(space,0,data);
+	}
 }
 
 
@@ -120,15 +128,15 @@ static ADDRESS_MAP_START( ob68k1a_mem, AS_PROGRAM, 16, ob68k1a_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM
 	AM_RANGE(0xfe0000, 0xfeffff) AM_ROM AM_REGION(MC68000L10_TAG, 0)
-	AM_RANGE(0xffff00, 0xffff01) AM_DEVREADWRITE8_LEGACY(MC6850_0_TAG, acia6850_stat_r, acia6850_ctrl_w, 0x00ff)
-	AM_RANGE(0xffff02, 0xffff03) AM_DEVREADWRITE8_LEGACY(MC6850_0_TAG, acia6850_data_r, acia6850_data_w, 0x00ff)
+	AM_RANGE(0xffff00, 0xffff01) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, status_read, control_write, 0x00ff)
+	AM_RANGE(0xffff02, 0xffff03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, data_read, data_write, 0x00ff)
 	AM_RANGE(0xffff10, 0xffff11) AM_WRITE8(com8116_w, 0xff00)
-	AM_RANGE(0xffff20, 0xffff21) AM_DEVREADWRITE8_LEGACY(MC6850_1_TAG, acia6850_stat_r, acia6850_ctrl_w, 0x00ff)
-	AM_RANGE(0xffff22, 0xffff23) AM_DEVREADWRITE8_LEGACY(MC6850_1_TAG, acia6850_data_r, acia6850_data_w, 0x00ff)
-//  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8_LEGACY(MC6821_0_TAG, pia6821_r, pia6821_w, 0x00ff)
-//  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8_LEGACY(MC6821_1_TAG, pia6821_r, pia6821_w, 0xff00)
+	AM_RANGE(0xffff20, 0xffff21) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, status_read, control_write, 0x00ff)
+	AM_RANGE(0xffff22, 0xffff23) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, data_read, data_write, 0x00ff)
+//  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_0_TAG, pia6821_device, read, write, 0x00ff)
+//  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_1_TAG, pia6821_device, read, write, 0xff00)
 	AM_RANGE(0xffff40, 0xffff47) AM_READWRITE8(pia_r, pia_w, 0xffff)
-	AM_RANGE(0xffff60, 0xffff6f) AM_DEVREADWRITE8_LEGACY(MC6840_TAG, ptm6840_read, ptm6840_write, 0x00ff)
+	AM_RANGE(0xffff60, 0xffff6f) AM_DEVREADWRITE8(MC6840_TAG, ptm6840_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -247,8 +255,8 @@ static ACIA6850_INTERFACE( acia1_intf )
 
 static WRITE_LINE_DEVICE_HANDLER( rx_tx_w )
 {
-	acia6850_rx_clock_in(device);
-	acia6850_tx_clock_in(device);
+	downcast<acia6850_device *>(device)->rx_clock_in();
+	downcast<acia6850_device *>(device)->tx_clock_in();
 }
 
 static COM8116_INTERFACE( dbrg_intf )

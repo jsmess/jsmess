@@ -83,9 +83,9 @@ public:
 	device_t *m_printer_device;
 	device_t *m_dac;
 	device_t *m_sam;
-	device_t *m_pia_0;
-	device_t *m_pia_1;
-	device_t *m_pia_2;
+	pia6821_device *m_pia_0;
+	pia6821_device *m_pia_1;
+	pia6821_device *m_pia_2;
 	UINT8 *m_rom;
 	int m_dclg_state;
 	int m_dclg_output_h;

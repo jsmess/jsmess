@@ -861,14 +861,14 @@ static WRITE_LINE_DEVICE_HANDLER( d_pia2_irq_b )
 /* CPU 0 */
 static void cpu0_recalc_irq(running_machine &machine, int state)
 {
-	device_t *pia_0 = machine.device( PIA_0_TAG );
-	device_t *pia_1 = machine.device( PIA_1_TAG );
-	device_t *pia_2 = machine.device( PIA_2_TAG );
-	UINT8 pia0_irq_a = pia6821_get_irq_a(pia_0);
-	UINT8 pia1_irq_a = pia6821_get_irq_a(pia_1);
-	UINT8 pia1_irq_b = pia6821_get_irq_b(pia_1);
-	UINT8 pia2_irq_a = pia6821_get_irq_a(pia_2);
-	UINT8 pia2_irq_b = pia6821_get_irq_b(pia_2);
+	pia6821_device *pia_0 = machine.device<pia6821_device>( PIA_0_TAG );
+	pia6821_device *pia_1 = machine.device<pia6821_device>( PIA_1_TAG );
+	pia6821_device *pia_2 = machine.device<pia6821_device>( PIA_2_TAG );
+	UINT8 pia0_irq_a = pia_0->irq_a_state();
+	UINT8 pia1_irq_a = pia_1->irq_a_state();
+	UINT8 pia1_irq_b = pia_1->irq_b_state();
+	UINT8 pia2_irq_a = pia_2->irq_a_state();
+	UINT8 pia2_irq_b = pia_2->irq_b_state();
 	UINT8 IRQ;
 
 	if (pia0_irq_a || pia1_irq_a || pia1_irq_b || pia2_irq_a || pia2_irq_b)
@@ -882,8 +882,8 @@ static void cpu0_recalc_irq(running_machine &machine, int state)
 
 static void cpu0_recalc_firq(running_machine &machine, int state)
 {
-	device_t *pia_0 = machine.device( PIA_0_TAG );
-	UINT8 pia0_irq_b = pia6821_get_irq_b(pia_0);
+	pia6821_device *pia_0 = machine.device<pia6821_device>( PIA_0_TAG );
+	UINT8 pia0_irq_b = pia_0->irq_b_state();
 	UINT8 FIRQ;
 
 	if (pia0_irq_b)
@@ -914,7 +914,7 @@ static WRITE_LINE_DEVICE_HANDLER( dgnbeta_fdc_intrq_w )
 	dgn_beta_state *drvstate = device->machine().driver_data<dgn_beta_state>();
 	LOG_DISK(("dgnbeta_fdc_intrq_w(%d)\n", state));
     if(drvstate->m_wd2797_written)
-        pia6821_ca1_w(device, state);
+       downcast<pia6821_device *>(device)->ca1_w(state);
 }
 
 /* DRQ is routed through various logic to the FIRQ inturrupt line on *BOTH* CPUs */
@@ -1025,13 +1025,13 @@ static void ScanInKeyboard(void)
 /* VBlank inturrupt */
 void dgn_beta_frame_interrupt (running_machine &machine, int data)
 {
-	device_t *pia_2 = machine.device( PIA_2_TAG );
+	pia6821_device *pia_2 = machine.device<pia6821_device>( PIA_2_TAG );
 
     /* Set PIA line, so it recognises inturrupt */
     if (!data)
-        pia6821_cb2_w(pia_2, ASSERT_LINE);
+        pia_2->cb2_w(ASSERT_LINE);
     else
-        pia6821_cb2_w(pia_2, CLEAR_LINE);
+        pia_2->cb2_w(CLEAR_LINE);
 
 //    LOG_VIDEO(("Vblank\n"));
 	ScanInKeyboard();
@@ -1058,9 +1058,9 @@ static void dgnbeta_reset(running_machine &machine)
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	device_t *fdc = machine.device(FDC_TAG);
-	device_t *pia_0 = machine.device( PIA_0_TAG );
-	device_t *pia_1 = machine.device( PIA_1_TAG );
-	device_t *pia_2 = machine.device( PIA_2_TAG );
+	pia6821_device *pia_0 = machine.device<pia6821_device>( PIA_0_TAG );
+	pia6821_device *pia_1 = machine.device<pia6821_device>( PIA_1_TAG );
+	pia6821_device *pia_2 = machine.device<pia6821_device>( PIA_2_TAG );
 
     logerror("MACHINE_RESET( dgnbeta )\n");
 
@@ -1079,9 +1079,9 @@ static void dgnbeta_reset(running_machine &machine)
 	SetDefaultTask(machine);
 
 	/* Set pullups on all PIA port A, to match what hardware does */
-	pia6821_set_port_a_z_mask(pia_0, 0xFF);
-	pia6821_set_port_a_z_mask(pia_1, 0xFF);
-	pia6821_set_port_a_z_mask(pia_2, 0xFF);
+	pia_0->set_port_a_z_mask(0xFF);
+	pia_1->set_port_a_z_mask(0xFF);
+	pia_2->set_port_a_z_mask(0xFF);
 
 	state->m_d_pia1_pa_last = 0x00;
 	state->m_d_pia1_pb_last = 0x00;

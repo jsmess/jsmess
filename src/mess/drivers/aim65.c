@@ -1,5 +1,5 @@
 /******************************************************************************
- PeT mess@utanet.at Nov 2000
+ PeT mess@utanet.at Nov 2000pia6821_device
 Updated by Dan Boris, 3/4/2007
 Rewrite in progress, Dirk Best, 2007-07-31
 
@@ -36,7 +36,7 @@ static ADDRESS_MAP_START( aim65_mem, AS_PROGRAM, 8 )
 	AM_RANGE( 0xa480, 0xa497 ) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
 	AM_RANGE( 0xa498, 0xa7ff ) AM_NOP /* Not available */
 	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0)  AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
-	AM_RANGE( 0xac00, 0xac03 ) AM_DEVREADWRITE("pia6821", pia6821_r, pia6821_w)
+	AM_RANGE( 0xac00, 0xac03 ) AM_DEVREADWRITE_MODERN("pia6821", pia6821_device, read, write)
 	AM_RANGE( 0xac04, 0xac43 ) AM_RAM /* PIA RAM */
 	AM_RANGE( 0xac44, 0xafff ) AM_NOP /* Not available */
 	AM_RANGE( 0xb000, 0xffff ) AM_ROM /* 5 ROM sockets */

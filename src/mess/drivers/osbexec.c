@@ -195,11 +195,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( osbexec_io, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_0", pia6821_r, pia6821_w )				/* 6821 PIA @ UD12 */
+	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE_MODERN( "pia_0", pia6821_device, read, write)				/* 6821 PIA @ UD12 */
 	/* 0x04 - 0x07 - 8253 @UD1 */
 	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "mb8877", wd17xx_r, wd17xx_w )				/* MB8877 @ UB17 input clock = 1MHz */
 	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "sio", z80dart_ba_cd_r, z80dart_ba_cd_w )	/* SIO @ UD4 */
-	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_1", pia6821_r, pia6821_w )				/* 6821 PIA @ UD8 */
+	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE_MODERN( "pia_1", pia6821_device, read, write)				/* 6821 PIA @ UD8 */
 	AM_RANGE( 0x14, 0x17 ) AM_MIRROR( 0xff00 ) AM_MASK( 0xff00 ) AM_READ( osbexec_kbd_r )					/* KBD */
 	AM_RANGE( 0x18, 0x1b ) AM_MIRROR( 0xff00 ) AM_READ( osbexec_rtc_r )										/* "RTC" @ UE13/UF13 */
 	/* ?? - vid ? */
@@ -468,7 +468,7 @@ static Z80DART_INTERFACE( osbexec_sio_config )
 static const wd17xx_interface osbexec_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE( "pia1", pia6821_cb1_w ),
+	DEVCB_DEVICE_LINE_MEMBER( "pia1", pia6821_device, cb1_w ),
 	DEVCB_NULL,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
@@ -539,12 +539,12 @@ static TIMER_CALLBACK( osbexec_video_callback )
 	if ( y == 0 )
 	{
 		/* Clear CB1 on PIA @ UD12 */
-		pia6821_cb1_w( state->m_pia_0, 0 );
+		state->m_pia_0->cb1_w(0);
 	}
 	else if ( y == 240 )
 	{
 		/* Set CB1 on PIA @ UD12 */
-		pia6821_cb1_w( state->m_pia_0, 1 );
+		state->m_pia_0->cb1_w(1);
 		state->m_rtc++;
 	}
 	if ( y < 240 )

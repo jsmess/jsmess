@@ -1174,6 +1174,8 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/model2.o $(VIDEO)/model2.o \
 	$(DRIVERS)/model3.o $(VIDEO)/model3.o $(MACHINE)/model3.o \
 	$(DRIVERS)/naomi.o $(MACHINE)/dc.o $(VIDEO)/dc.o $(MACHINE)/gdcrypt.o $(MACHINE)/naomibd.o $(MACHINE)/naomi.o \
+	$(MACHINE)/mie.o $(MACHINE)/maple-dc.o $(MACHINE)/mapledev.o $(MACHINE)/dc-ctrl.o \
+	$(MACHINE)/jvs13551.o \
 	$(DRIVERS)/triforce.o \
 	$(DRIVERS)/puckpkmn.o \
 	$(DRIVERS)/segac2.o \
@@ -1258,6 +1260,7 @@ $(MAMEOBJ)/seta.a: \
 	$(DRIVERS)/srmp6.o \
 	$(DRIVERS)/ssv.o $(VIDEO)/ssv.o \
 	$(DRIVERS)/st0016.o $(VIDEO)/st0016.o \
+	$(VIDEO)/seta001.o \
 
 $(MAMEOBJ)/sigma.a: \
 	$(DRIVERS)/nyny.o \
@@ -1632,6 +1635,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
 	$(DRIVERS)/cave.o $(VIDEO)/cave.o \
+	$(DRIVERS)/cavesh3.o \
 	$(DRIVERS)/cb2001.o \
 	$(DRIVERS)/cdi.o $(VIDEO)/mcd212.o $(MACHINE)/cdi070.o $(MACHINE)/cdislave.o $(MACHINE)/cdicdic.o \
 	$(DRIVERS)/cesclass.o \

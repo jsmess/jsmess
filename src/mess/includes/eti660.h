@@ -38,7 +38,7 @@ public:
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
-	required_device<device_t> m_pia;
+	required_device<pia6821_device> m_pia;
 	required_device<device_t> m_cassette;
 
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);

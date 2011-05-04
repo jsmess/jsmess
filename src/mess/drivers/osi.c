@@ -439,8 +439,8 @@ static ADDRESS_MAP_START( osi600_mem, AS_PROGRAM, 8, sb2m600_state )
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(keyboard_r, keyboard_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE_LEGACY("acia_0", acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE_LEGACY("acia_0", acia6850_data_r, acia6850_data_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_read, control_write)
+	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, data_read, data_write)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -449,23 +449,23 @@ static ADDRESS_MAP_START( uk101_mem, AS_PROGRAM, 8, uk101_state )
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0xdf00, 0xdf00) AM_MIRROR(0x03ff) AM_READ_BASE(sb2m600_state, keyboard_r) AM_WRITE(keyboard_w)
-	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0x00fe) AM_DEVREADWRITE_LEGACY("acia_0", acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0x00fe) AM_DEVREADWRITE_LEGACY("acia_0", acia6850_data_r, acia6850_data_w)
+	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_device, status_read, control_write)
+	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_device, data_read, data_write)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c1p_mem, AS_PROGRAM, 8, c1p_state )
 	AM_RANGE(0x0000, 0x4fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xc704, 0xc707) AM_DEVREADWRITE_LEGACY("pia_1", pia6821_r, pia6821_w)
-	AM_RANGE(0xc708, 0xc70b) AM_DEVREADWRITE_LEGACY("pia_2", pia6821_r, pia6821_w)
-	AM_RANGE(0xc70c, 0xc70f) AM_DEVREADWRITE_LEGACY("pia_3", pia6821_r, pia6821_w)
+	AM_RANGE(0xc704, 0xc707) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
+	AM_RANGE(0xc708, 0xc70b) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
+	AM_RANGE(0xc70c, 0xc70f) AM_DEVREADWRITE("pia_3", pia6821_device, read, write)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE(m_color_ram)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE_BASE(sb2m600_state, ctrl_w)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE_BASE(sb2m600_state, keyboard_r, keyboard_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE_LEGACY("acia_0", acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE_LEGACY("acia_0", acia6850_data_r, acia6850_data_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_read, control_write)
+	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, data_read, data_write)
 	AM_RANGE(0xf7c0, 0xf7c0) AM_WRITE(osi630_sound_w)
 	AM_RANGE(0xf7e0, 0xf7e0) AM_WRITE(osi630_ctrl_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
@@ -474,18 +474,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( c1pmf_mem, AS_PROGRAM, 8, c1pmf_state )
 	AM_RANGE(0x0000, 0x4fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE_LEGACY("pia_0", pia6821_r, pia6821_w) // FDC
-	AM_RANGE(0xc010, 0xc010) AM_DEVREADWRITE_LEGACY("acia_1", acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0xc011, 0xc011) AM_DEVREADWRITE_LEGACY("acia_1", acia6850_data_r, acia6850_data_w)
-	AM_RANGE(0xc704, 0xc707) AM_DEVREADWRITE_LEGACY("pia_1", pia6821_r, pia6821_w)
-	AM_RANGE(0xc708, 0xc70b) AM_DEVREADWRITE_LEGACY("pia_2", pia6821_r, pia6821_w)
-	AM_RANGE(0xc70c, 0xc70f) AM_DEVREADWRITE_LEGACY("pia_3", pia6821_r, pia6821_w)
+	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("pia_0", pia6821_device, read, write) // FDC
+	AM_RANGE(0xc010, 0xc010) AM_DEVREADWRITE("acia_1", acia6850_device, status_read, control_write)
+	AM_RANGE(0xc011, 0xc011) AM_DEVREADWRITE("acia_1", acia6850_device, data_read, data_write)
+	AM_RANGE(0xc704, 0xc707) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
+	AM_RANGE(0xc708, 0xc70b) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
+	AM_RANGE(0xc70c, 0xc70f) AM_DEVREADWRITE("pia_3", pia6821_device, read, write)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE(m_color_ram)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE_BASE(sb2m600_state, ctrl_w)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE_BASE(sb2m600_state, keyboard_r, keyboard_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE_LEGACY("acia_0", acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE_LEGACY("acia_0", acia6850_data_r, acia6850_data_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_read, control_write)
+	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, data_read, data_write)
 	AM_RANGE(0xf7c0, 0xf7c0) AM_WRITE_BASE(c1p_state, osi630_sound_w)
 	AM_RANGE(0xf7e0, 0xf7e0) AM_WRITE_BASE(c1p_state, osi630_ctrl_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM

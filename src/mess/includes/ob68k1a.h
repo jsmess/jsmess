@@ -30,8 +30,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
 	required_device<device_t> m_acia0;
-	required_device<device_t> m_pia0;
-	required_device<device_t> m_pia1;
+	required_device<pia6821_device> m_pia0;
+	required_device<pia6821_device> m_pia1;
 	required_device<device_t> m_terminal;
 	required_device<device_t> m_ram;
 

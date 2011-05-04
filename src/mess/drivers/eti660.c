@@ -21,14 +21,14 @@ READ8_MEMBER( eti660_state::pia_r )
 {
 	int pia_offset = RX & 0x03;
 
-	return pia6821_r(m_pia, pia_offset);
+	return m_pia->read(space, pia_offset);
 }
 
 WRITE8_MEMBER( eti660_state::pia_w )
 {
 	int pia_offset = RX & 0x03;
 
-	pia6821_w(m_pia, pia_offset, data);
+	m_pia->write(space, pia_offset, data);
 }
 
 WRITE8_MEMBER( eti660_state::colorram_w )

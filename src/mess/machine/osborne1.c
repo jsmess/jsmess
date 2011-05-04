@@ -55,8 +55,8 @@ READ8_HANDLER( osborne1_2000_r )
 	osborne1_state *state = space->machine().driver_data<osborne1_state>();
 	UINT8	data = 0xFF;
 	device_t *fdc = space->machine().device("mb8877");
-	device_t *pia_0 = space->machine().device("pia_0" );
-	device_t *pia_1 = space->machine().device("pia_1" );
+	pia6821_device *pia_0 = space->machine().device<pia6821_device>("pia_0" );
+	pia6821_device *pia_1 = space->machine().device<pia6821_device>("pia_1" );
 
 	/* Check whether regular RAM is enabled */
 	if ( ! state->m_bank2_enabled )
@@ -89,12 +89,12 @@ READ8_HANDLER( osborne1_2000_r )
 			if ( offset & 0x80 )	data &= input_port_read(space->machine(), "ROW7");
 			break;
 		case 0x900:	/* IEEE488 PIA */
-			data = pia6821_r( pia_0, offset & 0x03 );
+			data = pia_0->read(*space, offset & 0x03 );
 			break;
 		case 0xA00:	/* Serial */
 			break;
 		case 0xC00:	/* Video PIA */
-			data = pia6821_r( pia_1, offset & 0x03 );
+			data = pia_1->read(*space, offset & 0x03 );
 			break;
 		}
 	}
@@ -106,8 +106,8 @@ WRITE8_HANDLER( osborne1_2000_w )
 {
 	osborne1_state *state = space->machine().driver_data<osborne1_state>();
 	device_t *fdc = space->machine().device("mb8877");
-	device_t *pia_0 = space->machine().device("pia_0" );
-	device_t *pia_1 = space->machine().device("pia_1" );
+	pia6821_device *pia_0 = space->machine().device<pia6821_device>("pia_0" );
+	pia6821_device *pia_1 = space->machine().device<pia6821_device>("pia_1" );
 
 	/* Check whether regular RAM is enabled */
 	if ( ! state->m_bank2_enabled )
@@ -127,12 +127,12 @@ WRITE8_HANDLER( osborne1_2000_w )
 			wd17xx_w( fdc, offset, data );
 			break;
 		case 0x900:	/* IEEE488 PIA */
-			pia6821_w( pia_0, offset & 0x03, data );
+			pia_0->write(*space, offset & 0x03, data );
 			break;
 		case 0xA00:	/* Serial */
 			break;
 		case 0xC00:	/* Video PIA */
-			pia6821_w( pia_1, offset & 0x03, data );
+			pia_1->write(*space, offset & 0x03, data );
 			break;
 		}
 	}
@@ -338,7 +338,7 @@ static TIMER_CALLBACK(osborne1_video_callback)
 	osborne1_state *state = machine.driver_data<osborne1_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *speaker = space->machine().device("beep");
-	device_t *pia_1 = space->machine().device("pia_1");
+	pia6821_device *pia_1 = space->machine().device<pia6821_device>("pia_1");
 	int y = machine.primary_screen->vpos();
 
 	/* Check for start of frame */
@@ -347,12 +347,12 @@ static TIMER_CALLBACK(osborne1_video_callback)
 		/* Clear CA1 on video PIA */
 		state->m_start_y = ( state->m_new_start_y - 1 ) & 0x1F;
 		state->m_charline = 0;
-		pia6821_ca1_w( pia_1, 0 );
+		pia_1->ca1_w(0);
 	}
 	if ( y == 240 )
 	{
 		/* Set CA1 on video PIA */
-		pia6821_ca1_w( pia_1, 1 );
+		pia_1->ca1_w(1);
 	}
 	if ( y < 240 )
 	{
@@ -403,11 +403,11 @@ static TIMER_CALLBACK(osborne1_video_callback)
 static TIMER_CALLBACK( setup_osborne1 )
 {
 	device_t *speaker = machine.device("beep");
-	device_t *pia_1 = machine.device("pia_1");
+	pia6821_device *pia_1 = machine.device<pia6821_device>("pia_1");
 
 	beep_set_state( speaker, 0 );
 	beep_set_frequency( speaker, 300 /* 60 * 240 / 2 */ );
-	pia6821_ca1_w( pia_1, 0 );
+	pia_1->ca1_w(0);
 }
 
 static void osborne1_load_proc(device_image_interface &image)

@@ -406,14 +406,14 @@ const via6522_interface pet_via =
 static WRITE8_HANDLER( cbm8096_io_w )
 {
 	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");;
-	device_t *pia_0 = space->machine().device("pia_0");
-	device_t *pia_1 = space->machine().device("pia_1");
+	pia6821_device *pia_0 = space->machine().device<pia6821_device>("pia_0");
+	pia6821_device *pia_1 = space->machine().device<pia6821_device>("pia_1");
 	device_t *mc6845 = space->machine().device("crtc");
 
 	if (offset < 0x10) ;
-	else if (offset < 0x14) pia6821_w(pia_0, offset & 3, data);
+	else if (offset < 0x14) pia_0->write(*space, offset & 3, data);
 	else if (offset < 0x20) ;
-	else if (offset < 0x24) pia6821_w(pia_1, offset & 3, data);
+	else if (offset < 0x24) pia_1->write(*space, offset & 3, data);
 	else if (offset < 0x40) ;
 	else if (offset < 0x50) via_0->write(*space, offset & 0xf, data);
 	else if (offset < 0x80) ;
@@ -424,15 +424,15 @@ static WRITE8_HANDLER( cbm8096_io_w )
 static READ8_HANDLER( cbm8096_io_r )
 {
 	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");;
-	device_t *pia_0 = space->machine().device("pia_0");
-	device_t *pia_1 = space->machine().device("pia_1");
+	pia6821_device *pia_0 = space->machine().device<pia6821_device>("pia_0");
+	pia6821_device *pia_1 = space->machine().device<pia6821_device>("pia_1");
 	device_t *mc6845 = space->machine().device("crtc");
 
 	int data = 0xff;
 	if (offset < 0x10) ;
-	else if (offset < 0x14) data = pia6821_r(pia_0, offset & 3);
+	else if (offset < 0x14) data = pia_0->read(*space, offset & 3);
 	else if (offset < 0x20) ;
-	else if (offset < 0x24) data = pia6821_r(pia_1, offset & 3);
+	else if (offset < 0x24) data = pia_1->read(*space, offset & 3);
 	else if (offset < 0x40) ;
 	else if (offset < 0x50) data = via_0->read(*space, offset & 0xf);
 	else if (offset < 0x80) ;
@@ -621,19 +621,19 @@ WRITE8_HANDLER( superpet_w )
 static TIMER_CALLBACK( pet_interrupt )
 {
 	pet_state *state = machine.driver_data<pet_state>();
-	device_t *pia_0 = machine.device("pia_0");
+	pia6821_device *pia_0 = machine.device<pia6821_device>("pia_0");
 
-	pia6821_cb1_w(pia_0, state->m_pia_level);
+	pia_0->cb1_w(state->m_pia_level);
 	state->m_pia_level = !state->m_pia_level;
 }
 
 
 static TIMER_CALLBACK( pet_tape1_timer )
 {
-	device_t *pia_0 = machine.device("pia_0");
+	pia6821_device *pia_0 = machine.device<pia6821_device>("pia_0");
 //  cassette 1
 	UINT8 data = (cassette_input(machine.device("cassette1")) > +0.0) ? 1 : 0;
-	pia6821_ca1_w(pia_0, data);
+	pia_0->ca1_w(data);
 }
 
 static TIMER_CALLBACK( pet_tape2_timer )
