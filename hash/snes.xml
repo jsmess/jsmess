@@ -959,7 +959,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="cart_revision" value="none" />
-			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1572864">
 				<rom name="sns-ni-0.p0.u1" size="1048576" crc="7857661c" sha1="3ad4eea78a6cd0031a58294245dbcb7ff4167650" offset="0x000000" />
@@ -1654,7 +1654,7 @@ The software list will be divided in four categories:
 
 	<software name="sf2tj" cloneof="sf2t">
 		<!-- Serial: SHVC-TI - Release Date: 1993-07-10 - Alt. Title: ストリートファイターII ターボ - Notes: Also re-released through Nintendo Power -->
-		<description>Street Fighter II Turbo (Jpn)</description>
+		<description>Street Fighter II Turbo - Hyper Fighting (Jpn)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
