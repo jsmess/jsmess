@@ -32,7 +32,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
     23 Basic
     24 Dragon Slayer
     25 Professional Wrestling
-    26 Monster Land
+    26 Wai Wai Monster Land
     27 Dragon Ball
     28 Mappy
     29 Sky Kid
@@ -230,7 +230,8 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 	</software>
 
 	<software name="y2mnstld">
-		<description>Y2 Monster Land</description>
+	<!-- Alt. Title: Wai Wai Monster Land -->
+		<description>Y² Monster Land</description>
 		<year>1986</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
