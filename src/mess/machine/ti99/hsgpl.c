@@ -82,7 +82,14 @@
         FEEPROMs, you must used the algorithm specified by their respective
         manufacturer.
 
-    FIXME: Crashes when a cartridge is plugged in
+    CRDENA: This flag is used to turn on and off the HSGPL. It is used in
+    particular at start-up when the DSR detects a cartridge in the
+    cartridge slot. In that case the memory locations 6000-7fff must be
+    deactivated on the HSGPL, or it would cause a collision with the
+    cartridge. However, CRDENA must not completely turn off the HSGPL, or the
+    console will not start up at all. At least GROMs 0, 1, and 2 must remain
+    active.
+    The technical specifications are not clear enough at this point.
 */
 
 #define CRU_BASE 0x1B00
@@ -232,7 +239,9 @@ static READ8Z_DEVICE_HANDLER ( hsgpl_grom_rz )
 	}
 	else
 	{	/* read GPL data */
-		if (card->card_enabled)
+		// It is not clear what effect a CRDENA=0 really has.
+		// At least GROMs 0-2 must remain visible, or the console will lock up.
+		if (card->card_enabled || card->grom_address < 0x6000)
 		{
 			if ((port < 2) && (card->gram_enabled))
 			{
@@ -327,7 +336,9 @@ static WRITE8_DEVICE_HANDLER ( hsgpl_grom_w )
 	}
 	else
 	{
-		if (card->card_enabled)
+		// It is not clear what effect a CRDENA=0 really has.
+		// At least GROMs 0-2 must remain visible, or the console will lock up.
+		if (card->card_enabled || card->grom_address < 0x6000)
 		{
 			/* write GPL data */
 			if (card->write_enabled)

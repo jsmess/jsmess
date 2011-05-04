@@ -27,6 +27,8 @@ System Driver Changes:
 - apple2gs: handle another ADB command, Pirates! works now [R. Belmont]
 - a7800: fixed bug #2039 [Fabio Priuli]
 - apple2: don't crash on $C060 access on IIgs, fixes Rastan [R. Belmont]
+- ti99: fixed SAMS memory expansion, HSGPL flash mode, HSGPL does not crash
+         anymore with plugged-in cartridge [Michael Zapf]
 
 Software Lists:
 ----------------
