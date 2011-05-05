@@ -1019,7 +1019,7 @@ $(MAMEOBJ)/neogeo.a: \
 	$(MACHINE)/neoprot.o \
 
 $(MAMEOBJ)/nichibut.a: \
-	$(DRIVERS)/armedf.o $(VIDEO)/armedf.o $(MACHINE)/armedf.o \
+	$(DRIVERS)/armedf.o $(VIDEO)/armedf.o \
 	$(DRIVERS)/cclimber.o $(MACHINE)/cclimber.o $(AUDIO)/cclimber.o $(VIDEO)/cclimber.o \
 	$(DRIVERS)/clshroad.o $(VIDEO)/clshroad.o \
 	$(DRIVERS)/csplayh5.o \
@@ -1043,6 +1043,7 @@ $(MAMEOBJ)/nichibut.a: \
 	$(DRIVERS)/tubep.o $(VIDEO)/tubep.o \
 	$(DRIVERS)/wiping.o $(AUDIO)/wiping.o $(VIDEO)/wiping.o \
 	$(MACHINE)/nb1413m3.o \
+	$(MACHINE)/nb1414m4.o \
 
 $(MAMEOBJ)/nintendo.a: \
 	$(DRIVERS)/cham24.o \
@@ -1613,8 +1614,9 @@ $(MAMEOBJ)/pinball.a: \
 #-------------------------------------------------
 
 $(MAMEOBJ)/misc.a: \
-	$(DRIVERS)/39in1.o \
 	$(DRIVERS)/1945kiii.o \
+	$(DRIVERS)/39in1.o \
+	$(DRIVERS)/3do.o $(MACHINE)/3do.o \
 	$(DRIVERS)/4enraya.o $(VIDEO)/4enraya.o \
 	$(DRIVERS)/5clown.o \
 	$(DRIVERS)/acefruit.o \
@@ -1790,6 +1792,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
 	$(DRIVERS)/vamphalf.o \
 	$(DRIVERS)/vcombat.o \
+	$(DRIVERS)/vectrex.o $(VIDEO)/vectrex.o $(MACHINE)/vectrex.o \
 	$(DRIVERS)/videopkr.o \
 	$(DRIVERS)/vp101.o \
 	$(DRIVERS)/vpoker.o \

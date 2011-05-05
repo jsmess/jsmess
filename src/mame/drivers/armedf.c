@@ -291,6 +291,7 @@ Notes:
 #include "sound/dac.h"
 #include "sound/3812intf.h"
 #include "includes/armedf.h"
+#include "includes/nb1414m4.h"
 
 #define LEGION_HACK	0
 
@@ -317,7 +318,8 @@ static WRITE16_HANDLER( terraf_io_w )
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 
 	if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
-		nb_1414m4_exec(space,(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff));
+		nb_1414m4_exec(space,(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff),state->m_text_videoram,state->m_fg_scrollx,state->m_fg_scrolly,state->m_tx_tilemap);
+
 
 	COMBINE_DATA(&state->m_vreg);
 
@@ -394,7 +396,7 @@ static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x0603ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x060400, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, m_text_videoram)
+	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(nb1414m4_text_videoram_r,nb1414m4_text_videoram_w,0x00ff)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06cfff) AM_RAM AM_BASE_MEMBER(armedf_state, m_spr_pal_clut)
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, m_fg_videoram)
@@ -425,7 +427,7 @@ static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, m_text_videoram)
+	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(nb1414m4_text_videoram_r,nb1414m4_text_videoram_w,0x00ff)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06cfff) AM_RAM AM_BASE_MEMBER(armedf_state, m_spr_pal_clut)
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, m_fg_videoram)
@@ -447,7 +449,7 @@ static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, m_text_videoram)
+	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(nb1414m4_text_videoram_r,nb1414m4_text_videoram_w,0x00ff)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06cfff) AM_RAM AM_BASE_MEMBER(armedf_state, m_spr_pal_clut)
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, m_fg_videoram)
@@ -481,7 +483,7 @@ static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, m_text_videoram)
+	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(nb1414m4_text_videoram_r,nb1414m4_text_videoram_w,0x00ff)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06cfff) AM_RAM AM_BASE_MEMBER(armedf_state, m_spr_pal_clut)
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, m_fg_videoram)
@@ -504,7 +506,7 @@ static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x061000, 0x065fff) AM_RAM
 	AM_RANGE(0x066000, 0x066fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, m_bg_videoram)
 	AM_RANGE(0x067000, 0x067fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, m_fg_videoram)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, m_text_videoram)
+	AM_RANGE(0x068000, 0x069fff) AM_READWRITE8(armedf_text_videoram_r,armedf_text_videoram_w,0x00ff)
 	AM_RANGE(0x06a000, 0x06afff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x06b000, 0x06bfff) AM_RAM AM_BASE_MEMBER(armedf_state, m_spr_pal_clut)
 	AM_RANGE(0x06c000, 0x06c001) AM_READ_PORT("P1")
@@ -682,7 +684,7 @@ static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x084000, 0x085fff) AM_RAM //work ram
 	AM_RANGE(0x086000, 0x086fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, m_bg_videoram)
 	AM_RANGE(0x087000, 0x087fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, m_fg_videoram)
-	AM_RANGE(0x088000, 0x089fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, m_text_videoram)
+	AM_RANGE(0x088000, 0x089fff) AM_READWRITE8(armedf_text_videoram_r,armedf_text_videoram_w,0x00ff)
 	AM_RANGE(0x08a000, 0x08afff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE_MEMBER(armedf_state, m_spr_pal_clut)
 	AM_RANGE(0x08c000, 0x08c001) AM_READ_PORT("P1")
@@ -1210,14 +1212,14 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
+
+	MCFG_VIDEO_START(terraf)
 	MCFG_SCREEN_UPDATE(armedf)
 	MCFG_SCREEN_EOF(armedf)
 
 	MCFG_GFXDECODE(armedf)
 
 	MCFG_PALETTE_LENGTH(2048)
-
-	MCFG_VIDEO_START(armedf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1260,13 +1262,13 @@ static MACHINE_CONFIG_START( terrafb, armedf_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
+
+	MCFG_VIDEO_START(terraf)
 	MCFG_SCREEN_UPDATE(armedf)
 	MCFG_SCREEN_EOF(armedf)
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
-
-	MCFG_VIDEO_START(armedf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1305,13 +1307,13 @@ static MACHINE_CONFIG_START( kozure, armedf_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 ) // 320 x 240, trusted
+
+	MCFG_VIDEO_START(terraf)
 	MCFG_SCREEN_UPDATE(armedf)
 	MCFG_SCREEN_EOF(armedf)
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
-
-	MCFG_VIDEO_START(armedf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1350,13 +1352,13 @@ static MACHINE_CONFIG_START( armedf, armedf_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
+
+	MCFG_VIDEO_START(armedf)
 	MCFG_SCREEN_UPDATE(armedf)
 	MCFG_SCREEN_EOF(armedf)
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
-
-	MCFG_VIDEO_START(armedf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1395,13 +1397,13 @@ static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+
+	MCFG_VIDEO_START(terraf)
 	MCFG_SCREEN_UPDATE(armedf)
 	MCFG_SCREEN_EOF(armedf)
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
-
-	MCFG_VIDEO_START(armedf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1440,13 +1442,13 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+
+	MCFG_VIDEO_START(terraf)
 	MCFG_SCREEN_UPDATE(armedf)
 	MCFG_SCREEN_EOF(armedf)
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
-
-	MCFG_VIDEO_START(armedf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1485,13 +1487,13 @@ static MACHINE_CONFIG_START( legiono, armedf_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+
+	MCFG_VIDEO_START(terraf)
 	MCFG_SCREEN_UPDATE(armedf)
 	MCFG_SCREEN_EOF(armedf)
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
-
-	MCFG_VIDEO_START(armedf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1545,13 +1547,13 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
+
+	MCFG_VIDEO_START(armedf)
 	MCFG_SCREEN_UPDATE(armedf)
 	MCFG_SCREEN_EOF(armedf)
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
-
-	MCFG_VIDEO_START(armedf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("x1snd", seta_sound_r, seta_sound_w)
 	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
 	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8_champbwl) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(champbwl_state, m_bg_flag)	/* enable / disable background transparency */
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
 
 	AM_RANGE(0xf000, 0xf000) AM_READ(trackball_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0")
@@ -358,6 +358,23 @@ static MACHINE_RESET( champbwl )
 
 }
 
+SCREEN_UPDATE( champbwl )
+{
+	bitmap_fill(bitmap, cliprect, 0x1f0);
+
+	screen->machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
+	screen->machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );
+
+	screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(), bitmap, cliprect, 0x800, 1 );
+	return 0;
+}
+
+SCREEN_EOF( champbwl )
+{
+	machine.device<seta001_device>("spritegen")->tnzs_eof();
+}
+
+
 static MACHINE_CONFIG_START( champbwl, champbwl_state )
 
 	/* basic machine hardware */
@@ -379,8 +396,8 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(tnzs)
-	MCFG_SCREEN_EOF(tnzs)
+	MCFG_SCREEN_UPDATE(champbwl)
+	MCFG_SCREEN_EOF(champbwl)
 
 	MCFG_GFXDECODE(champbwl)
 	MCFG_PALETTE_LENGTH(512)

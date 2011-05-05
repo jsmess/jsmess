@@ -259,7 +259,6 @@ SOUNDS += LMC1992
 #-------------------------------------------------
 
 DRVLIBS += \
-	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/act.a \
 	$(MESSOBJ)/amiga.a \
@@ -316,7 +315,6 @@ DRVLIBS += \
 	$(MESSOBJ)/funtech.a \
 	$(MESSOBJ)/galaxy.a \
 	$(MESSOBJ)/gamepark.a \
-	$(MESSOBJ)/gce.a \
 	$(MESSOBJ)/grundy.a \
 	$(MESSOBJ)/hartung.a \
 	$(MESSOBJ)/heathkit.a \
@@ -491,7 +489,12 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/cdicdic.o	\
 	$(MAME_MACHINE)/cdislave.o	\
 	$(MAME_VIDEO)/mcd212.o		\
-	$(MAME_DRIVERS)/cd32.o  \
+	$(MAME_DRIVERS)/cd32.o  	\
+	$(MAME_DRIVERS)/3do.o		\
+	$(MAME_MACHINE)/3do.o		\
+	$(MAME_DRIVERS)/vectrex.o	\
+	$(MAME_VIDEO)/vectrex.o		\
+	$(MAME_MACHINE)/vectrex.o	\
 
 #-------------------------------------------------
 # the following files are general components and
@@ -556,7 +559,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_VIDEO)/dl1416.o		\
 	$(MESS_VIDEO)/hd44780.o		\
 	$(MESS_VIDEO)/hd66421.o		\
-	$(MESS_VIDEO)/i8275.o		\
 	$(MESS_VIDEO)/m6845.o		\
 	$(MESS_VIDEO)/m6847.o		\
 	$(MESS_VIDEO)/saa505x.o		\
@@ -576,10 +578,6 @@ $(MESSOBJ)/shared.a: \
 #-------------------------------------------------
 # manufacturer-specific groupings for drivers
 #-------------------------------------------------
-
-$(MESSOBJ)/3do.a:				\
-	$(MESS_DRIVERS)/3do.o		\
-	$(MESS_MACHINE)/3do.o		\
 
 $(MESSOBJ)/acorn.a:				\
 	$(MESS_DRIVERS)/a310.o		\
@@ -1001,11 +999,6 @@ $(MESSOBJ)/galaxy.a:			\
 $(MESSOBJ)/gamepark.a:			\
 	$(MESS_DRIVERS)/gp32.o		\
 	$(MESS_DRIVERS)/gp2x.o		\
-
-$(MESSOBJ)/gce.a:	        	\
-	$(MESS_DRIVERS)/vectrex.o	\
-	$(MESS_VIDEO)/vectrex.o		\
-	$(MESS_MACHINE)/vectrex.o	\
 
 $(MESSOBJ)/grundy.a:			\
 	$(MESS_DRIVERS)/newbrain.o	\
