@@ -256,7 +256,7 @@
 
 	<software name="ahharima">
 		<!-- Serial: DMG-A7J - Release Date: 1993-07-23 - Alt. Title: ああ播磨灘 -->
-		<description>Ah Harimanada (Jpn)</description>
+		<description>Aa Harimanada (Jpn)</description>
 		<year>1993</year>
 		<publisher>ASK Kodansha</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -520,7 +520,7 @@
 
 	<software name="spiderm3">
 		<!-- Serial: DMG-LQ - Release Date:  -->
-		<description>The Amazing Spider-Man 3 - Invasion of the Spider-Slayers (Euro, USA)</description>
+		<description>Spider-Man 3 - Invasion of the Spider-Slayers (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -2272,7 +2272,7 @@
 
 	<software name="btimedx">
 		<!-- Serial: DMG-GMA / DMG-GM? - Release Date: 1991-02-15 (JPN) - Alt. Title: バーガータイム・デラックス -->
-		<description>Burger Time Deluxe (World)</description>
+		<description>BurgerTime Deluxe (World)</description>
 		<year>1991</year>
 		<publisher>Data East</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -2871,7 +2871,7 @@
 	</software>
 
 	<software name="mazemonb" cloneof="mazemon">
-		<description>Chou Mashin Eiyuuden Wataru - Mazekko Monster (Jpn, Prototype)</description>
+		<description>Chou Mashin Eiyuu Den Wataru - Mazekko Monster (Jpn, Prototype)</description>
 		<year>1997</year>
 		<publisher>Banpresto</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -2883,7 +2883,7 @@
 
 	<software name="mazemon">
 		<!-- Serial: DMG-AWAJ - Release Date: 1997-12-12 - Alt. Title: 超魔神英雄伝ワタル まぜっこモンスター - Notes: SGB enhanced -->
-		<description>Chou Mashin Eiyuuden Wataru - Mazekko Monster (Jpn)</description>
+		<description>Chou Mashin Eiyuu Den Wataru - Mazekko Monster (Jpn)</description>
 		<year>1997</year>
 		<publisher>Banpresto</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -2895,7 +2895,7 @@
 
 	<software name="mazemon2">
 		<!-- Serial: DMG-AWMJ - Release Date: 1998-08-07 - Alt. Title: 超魔神英雄伝ワタル まぜっこモンスター2 - Notes: SGB enhanced, also released by NP in 2000-08 -->
-		<description>Chou Mashin Eiyuuden Wataru - Mazekko Monster 2 (Jpn)</description>
+		<description>Chou Mashin Eiyuu Den Wataru - Mazekko Monster 2 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Banpresto</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -6266,7 +6266,7 @@
 
 	<software name="hitoride">
 		<!-- Serial: DMG-H7J - Release Date: 1992-12-18 - Alt. Title: ひとりでできるもん 〜クッキング伝説〜 -->
-		<description>Hitori de Dekirumon - Cooking Densetsu (Jpn)</description>
+		<description>Hitori de Dekirumon! - Cooking Densetsu (Jpn)</description>
 		<year>1992</year>
 		<publisher>Vap</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -8497,13 +8497,13 @@
 	</software>
 
 	<software name="lockncha">
-		<!-- Serial: DMG-LCA / DMG-LC? - Release Date: 1990-05-11 - Alt. Title: ロックンチェイス -->
-		<description>Lock'n Chase (Jpn, USA)</description>
+		<!-- Serial: DMG-LCA / DMG-LC? - Release Date: 1990-05-11 (Jpn) - Alt. Title: ロックンチェイス (Jpn) -->
+		<description>Lock'n Chase (World)</description>
 		<year>1990</year>
 		<publisher>Data East</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="lock'n chase (japan, usa).bin" size="65536" crc="dab91c7a" sha1="643cbd566d35ce8dbe0f24627e4862c09805a04c" offset="000000" />
+				<rom name="lock'n chase (world).bin" size="65536" crc="dab91c7a" sha1="643cbd566d35ce8dbe0f24627e4862c09805a04c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9566,7 +9566,7 @@
 
 	<software name="miniyonk">
 		<!-- Serial: DMG-AM4J - Release Date: 1997-05-23 - Alt. Title: ミニ四駆GB レッツ＆ゴー - Notes: SGB enhanced -->
-		<description>Miniyonku GB Let's &amp; Go!! (Jpn)</description>
+		<description>Mini Yonku GB Let's &amp; Go!! (Jpn)</description>
 		<year>1997</year>
 		<publisher>ASCII</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -9578,7 +9578,7 @@
 
 	<software name="miniyoas">
 		<!-- Serial: DMG-AAMJ - Release Date: 1998-06-19 - Alt. Title: ミニ四駆GB Let's & Go!! オールスターバトルMAX - Notes: SGB enhanced -->
-		<description>Miniyonku GB Let's &amp; Go!! - All-Star Battle Max (Jpn)</description>
+		<description>Mini Yonku GB Let's &amp; Go!! - All-Star Battle Max (Jpn)</description>
 		<year>1998</year>
 		<publisher>ASCII</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -11727,12 +11727,12 @@
 
 	<software name="pang">
 		<!-- Serial: DMG-AG? - Release Date:  -->
-		<description>Pang (USA)</description>
+		<description>Pang (Euro)</description>
 		<year>1993</year>
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="pang (usa).bin" size="131072" crc="9ae199df" sha1="ae97143e51b6f031efb83b245b1b2558e6cb9026" offset="000000" />
+				<rom name="pang (euro).bin" size="131072" crc="9ae199df" sha1="ae97143e51b6f031efb83b245b1b2558e6cb9026" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -13839,7 +13839,7 @@
 
 	<software name="rodland">
 		<!-- Serial: DMG-RL - Release Date:  -->
-		<description>Rodland (Euro)</description>
+		<description>Rod Land (Euro)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -13851,7 +13851,7 @@
 
 	<software name="rodlandj" cloneof="rodland">
 		<!-- Serial: DMG-RLJ - Release Date: 1993-05-21 - Alt. Title: 妖精物語 ロッド・ランド -->
-		<description>Rodland (Jpn)</description>
+		<description>Rod Land (Jpn)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -17020,12 +17020,12 @@
 
 	<software name="tomjerfa">
 		<!-- Serial: DMG-J8? - Release Date:  -->
-		<description>Tom and Jerry - Frantic Antics! (USA)</description>
+		<description>Tom and Jerry - Frantic Antics! (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="tom and jerry - frantic antics! (usa).bin" size="131072" crc="c2dbd1aa" sha1="9f8adf286e5ce5868c758b1c2f195ef596a3df2b" offset="000000" />
+				<rom name="tom and jerry - frantic antics! (euro, usa).bin" size="131072" crc="c2dbd1aa" sha1="9f8adf286e5ce5868c758b1c2f195ef596a3df2b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17427,12 +17427,12 @@
 
 	<software name="tumblep">
 		<!-- Serial: DMG-T6? - Release Date:  -->
-		<description>Tumble Pop (USA)</description>
+		<description>Tumble Pop (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="tumble pop (usa).bin" size="131072" crc="8a3aab31" sha1="1b5a9b71bc14f9725b37fa0a166253f1047943b1" offset="000000" />
+				<rom name="tumble pop (euro, usa).bin" size="131072" crc="8a3aab31" sha1="1b5a9b71bc14f9725b37fa0a166253f1047943b1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

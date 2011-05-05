@@ -837,7 +837,7 @@
 
 	<software name="balubalo">
 		<!-- Serial: VIC-AY - Release Date: 1986-11-21 - Alternative Title: アイギーナの予言 バルバルークの伝説より -->
-		<description>Aigiina no Yogen: From the Legend of Balubalouk (Jpn)</description>
+		<description>Aigiina no Yogen: from "The Legend of Balubalouk" (Jpn)</description>
 		<year>1986</year>
 		<publisher>VIC Tokai</publisher>
 		<part name="cart" interface="nes_cart">
@@ -18125,7 +18125,7 @@
 
 	<software name="watarug">
 		<!-- Serial: HFC-V2 - Release Date: 1990-03-23 - Alternative Title: 魔神英雄伝ワタル外伝 -->
-		<description>Majin Eiyuuden Wataru Gaiden (Jpn)</description>
+		<description>Majin Eiyuu Den Wataru Gaiden (Jpn)</description>
 		<year>1990</year>
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="nes_cart">
@@ -24720,7 +24720,7 @@
 
 	<software name="rodland">
 		<!-- Serial: NES-R8-ESP - Release Date: 1993-05-09 -->
-		<description>Rodland (Euro)</description>
+		<description>Rod Land (Euro)</description>
 		<year>1993</year>
 		<publisher>Storm</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44866,19 +44866,19 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 <!-- nointro -->
-	<software name="dungdung">
+	<software name="dongdong">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Dung Dung no 1 (Asia)</description>
+		<description>Dong Dong Nao 1 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
-				<rom name="dung dung no 1 (asia) (unl).chr" size="8192" crc="6bd749f5" sha1="25c2c8ed044c0b282ef3a6555baab76e380f0fac" offset="00000" status="baddump" />
+				<rom name="dong dong no 1 (asia) (unl).chr" size="8192" crc="6bd749f5" sha1="25c2c8ed044c0b282ef3a6555baab76e380f0fac" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="dung dung no 1 (asia) (unl).prg" size="16384" crc="e732a4bc" sha1="af9cb94b091405bb432019bff2ab4c4179316030" offset="00000" status="baddump" />
+				<rom name="dong dong no 1 (asia) (unl).prg" size="16384" crc="e732a4bc" sha1="af9cb94b091405bb432019bff2ab4c4179316030" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>

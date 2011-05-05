@@ -8928,7 +8928,7 @@ Undumped Pirates:
 
 	<software name="msep">
 		<!-- Serial: CGB-BMZP - Release Date:  - Notes: GBC only -->
-		<description>Microsoft Entertainment Pack (Euro)</description>
+		<description>Microsoft - The Best of Entertainment Pack (Euro)</description>
 		<year>2001</year>
 		<publisher>Cryo</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -8940,7 +8940,7 @@ Undumped Pirates:
 
 	<software name="msepu" cloneof="msep">
 		<!-- Serial: CGB-BMEE - Release Date:  - Notes: GBC only -->
-		<description>Microsoft Entertainment Pack (USA)</description>
+		<description>Microsoft - The Best of Entertainment Pack (USA)</description>
 		<year>2001</year>
 		<publisher>Classified Games</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -8963,7 +8963,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="mspuzzle">
-		<!-- Serial: CGB-AZWP? - Release Date:  - Notes: GBC only -->
+		<!-- Serial: CGB-AZWP? - Release Date:  - Alt. Title: Microsoft - The 6 in 1 Puzzle Collection Entertainment Pack (Box) - Notes: GBC only -->
 		<description>Microsoft Puzzle Collection (Euro)</description>
 		<year>2000</year>
 		<publisher>Swing! Entertainment Media</publisher>
@@ -8975,7 +8975,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="mspuzzleu" cloneof="mspuzzle">
-		<!-- Serial: CGB-AZWE - Release Date:  - Notes: GBC only -->
+		<!-- Serial: CGB-AZWE - Release Date:  - Alt. Title: Microsoft - The 6 in 1 Puzzle Collection Entertainment Pack (Box) - Notes: GBC only -->
 		<description>Microsoft Puzzle Collection (USA)</description>
 		<year>2000</year>
 		<publisher>Classified Games</publisher>
@@ -13607,13 +13607,13 @@ Undumped Pirates:
 	</software>
 
 	<software name="speedy">
-		<!-- Serial: DMG-ALZE - Release Date:  -->
-		<description>Speedy Gonzales - Aztec Adventure (USA)</description>
+		<!-- Serial: DMG-ALZE / ?? - Release Date:  -->
+		<description>Speedy Gonzales - Aztec Adventure (Euro, USA)</description>
 		<year>1999</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="speedy gonzales - aztec adventure (usa).bin" size="1048576" crc="ae82afa4" sha1="95f868358979c5bbdfa70920fb35b7d4e00bf8cc" offset="000000" />
+				<rom name="speedy gonzales - aztec adventure (euro, usa).bin" size="1048576" crc="ae82afa4" sha1="95f868358979c5bbdfa70920fb35b7d4e00bf8cc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -14412,7 +14412,7 @@ Undumped Pirates:
 
 	<software name="td6a" cloneof="td6">
 		<!-- Serial: DMG-AW6E - Release Date:  -->
-		<description>Test Drive 6 (Euro, Destinations Toutes Sensations)</description>
+		<description>Test Drive 6 (Euro, Sample 'Destinations Toutes Sensations')</description>
 		<year>1999</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gameboy_cart">

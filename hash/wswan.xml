@@ -846,7 +846,7 @@
 
 	<software name="mjtetsu">
         <!-- Alt title: 日本プロ麻雀連盟公認 徹萬 -->
-		<description>Nippon Pro Mahjong Renmei Kounin Tetsuman</description>
+		<description>Nihon Pro Mahjong Renmei Kounin Tetsuman</description>
 		<!--<release_date>1999-07-15</release_date>-->
 		<year>1999</year>
 		<publisher>Kaga Tech</publisher>
@@ -1282,7 +1282,7 @@
 
 	<software name="shinpwre">
         <!-- Alt title: 新日本プロレスリング 闘魂烈伝 -->
-		<description>Shin Nippon Pro Wrestling Toukon Retsuden</description>
+		<description>Shin Nihon Pro Wrestling Toukon Retsuden</description>
 		<!--<release_date>1999-03-04</release_date>-->
 		<year>1999</year>
 		<publisher>Tomy</publisher>

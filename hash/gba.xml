@@ -14751,13 +14751,13 @@
 	</software>
 
 	<software name="jazzjack">
-		<description>Jazz Jackrabbit (USA)</description>
+		<description>Jazz Jackrabbit (Euro, USA)</description>
 		<year>2002</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="4194304">
-				<rom name="jazz jackrabbit (usa).bin" size="4194304" crc="948531d4" sha1="9fb012b46350615cfa4dd0fc7d11fc21903d39e0" offset="000000" />
+				<rom name="jazz jackrabbit (euro, usa).bin" size="4194304" crc="948531d4" sha1="9fb012b46350615cfa4dd0fc7d11fc21903d39e0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -15522,7 +15522,7 @@
 	</software>
 
 	<software name="kikikai" cloneof="pockyroc">
-		<description>Kiki Kaikai Advance (Jpn)</description>
+		<description>Kiki KaiKai Advance (Jpn)</description>
 		<year>2001</year>
 		<publisher>Altron</publisher>
 		<part name="cart" interface="gba_cart">
@@ -25322,8 +25322,8 @@
 		</part>
 	</software>
 
-	<software name="sansaran">
-		<description>Sansara Naga 1x2 (Jpn)</description>
+	<software name="samsaran">
+		<description>Samsara Naga 1x2 (Jpn)</description>
 		<year>2001</year>
 		<publisher>Victor Interactive Software</publisher>
 		<part name="cart" interface="gba_cart">
@@ -30761,7 +30761,7 @@
 	</software>
 
 	<software name="tootuff">
-		<description>Tootuff - The Gagmachine (Euro)</description>
+		<description>Tootuff - The Gagmachine (Euro, Prototype)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gba_cart">

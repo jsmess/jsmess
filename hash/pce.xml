@@ -1573,7 +1573,7 @@
 
 	<software name="kikikai">
 		<!-- Release Date: 1990-03-27 -->
-		<description>Kiki Kaikai</description>
+		<description>Kiki KaiKai</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
 		<part name="cart" interface="pce_cart">
@@ -1737,9 +1737,9 @@
 		</part>
 	</software>
 
-	<software name="mercmaze">
+	<software name="marchen">
 		<!-- Release Date: 1990-12-11 -->
-		<description>Maerchen Maze</description>
+		<description>Märchen Maze</description>
 		<year>1990</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="pce_cart">
@@ -2493,10 +2493,10 @@
 	</software>
 
 	<software name="pcpachi">
-		<!-- Release Date:  -->
+		<!-- Alt. Title: PC Pachi-Slot Idol Gambler (Box) -->
 		<description>PC Pachi-slot</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Game Express</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="pc pachi-slot (japan).pce" size="524288" crc="0aa88f33" sha1="6d0c8ffc7071d5a25ed6f3ee1325fe021ead6f89" offset="000000" />

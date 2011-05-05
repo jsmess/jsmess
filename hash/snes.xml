@@ -41,21 +41,21 @@ Undumped
   - Pro Yakyuu Nettou Puzzle Stadium (Japan) (Sample)
   - Super Street Fighter II (Japan) (Sample)
   - Wild Trax (Japan) (Sample)
-  
+
   USA
-  
+
   - Fighter's History (USA) - Initial release/Rev 0
   - Ignition Factor, The (USA) (Sample)
   - Star Fox (USA) (Rev A)
   - Super Mario World/Pilot Wings/F-Zero Competition Cartridge (USA)
-  
+
   Europe
-  
+
   - Biker Mice From Mars (Europe) (Sample)
   - Donkey Kong Country 2 - Diddy's Kong Quest (Europe) - Initial release/Rev 0
-  
+
   Multi-region
-  
+
   - X-Terminator (Unlicensed)
   - X-Terminator 2 (Unlicensed)
 
@@ -164,7 +164,7 @@ The software list will be divided in four categories:
 <softwarelist name="snes" description="Nintendo SNES cartridges">
 
 <!-- List of perfect dumps -->
-	
+
 	<software name="alcahest">
 		<!-- Serial: SHVC-LX - Release Date: 1993-12-17 - Alt. Title: アルカエスト -->
 		<description>Alcahest (Jpn)</description>
@@ -590,8 +590,8 @@ The software list will be divided in four categories:
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
- 		</part>
- 	</software>
+		</part>
+	</software>
 
 	<software name="ff6ja" cloneof="ff3">
 		<!-- Serial: SHVC-F6 - Release Date: 1994-04-02 - Alt. Title: ファイナルファンタジーVI -->
@@ -611,7 +611,7 @@ The software list will be divided in four categories:
 			<feature name="cart_revision" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
-			<dataarea name="rom" size="3145728 ">		
+			<dataarea name="rom" size="3145728 ">
 				<rom name="shvc-f6-0.p1.u1" size="1048576" crc="bfc35e36" sha1="579cca6fd6c0b4f8d3489ba115d6bd51a745a16a" offset="0x000000" />
 				<rom name="shvc-f6-0.p2.u2" size="1048576" crc="82736bb1" sha1="1931269554c4aebbd4d250c881cd15906347062d" offset="0x100000" />
 				<rom name="shvc-f6-0.p3.u3" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="0x200000" />
@@ -1424,7 +1424,7 @@ The software list will be divided in four categories:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="manaua" cloneof="mana">
 		<!-- Serial: SNS-K2-USA - Release Date: 1993-10 -->
 		<description>Secret of Mana (USA, Alt)</description>
@@ -15947,7 +15947,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="jbsuperb">	
+	<software name="jbsuperb">
 		<!-- Serial: SHVC-A94J - Release Date: 1995-12-15 - Alt. Title: JBザ・スーパーバス -->
 		<description>JB The Super Bass (Jpn)</description>
 		<year>1995</year>
@@ -19690,9 +19690,9 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="maerchen">
+	<software name="cotton">
 		<!-- Serial: SHVC-C9 - Release Date: 1994-04-22 - Alt. Title: MARCHEN ADVENTURE コットン100% -->
-		<description>Maerchen Adventure Cotton 100% (Jpn)</description>
+		<description>Märchen Adventure Cotton 100% (Jpn)</description>
 		<year>1994</year>
 		<publisher>Datam Polystar</publisher>
 		<part name="cart" interface="snes_cart">
@@ -28928,7 +28928,7 @@ The software list will be divided in four categories:
 
 	<software name="jinryu">
 		<!-- Serial: SHVC-AAUJ - Release Date: 1995-07-07 - Alt. Title: 史記英雄伝 ~人竜伝説~ -->
-		<description>Shiki Eiyuuden - Jinryuu Densetsu (Jpn)</description>
+		<description>Shiki Eiyuu Den - Jinryuu Densetsu (Jpn)</description>
 		<year>1995</year>
 		<publisher>Outrigger</publisher>
 		<part name="cart" interface="snes_cart">
@@ -42303,7 +42303,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	
+
 <!-- BS-X Satellaview Memory packs -->
 
 	<software name="bsdragon" supported="no">
