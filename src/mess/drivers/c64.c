@@ -554,6 +554,11 @@ static const m6502_interface c64_m6510_interface =
 	DEVCB_HANDLER(c64_m6510_port_write)
 };
 
+static CBM_IEC_DAISY( cbm_iec_null_daisy )
+{
+	{ NULL }
+};
+
 static CBM_IEC_DAISY( cbm_iec_daisy )
 {
 	{ C1541_TAG },
@@ -817,8 +822,9 @@ static MACHINE_CONFIG_DERIVED( c64gs, c64pal )
 	MCFG_DEVICE_REMOVE( "dac" )
 	MCFG_DEVICE_REMOVE( "cassette" )
 	MCFG_DEVICE_REMOVE( "quickload" )
-	//MCFG_CBM_IEC_REMOVE()
-	//MCFG_DEVICE_REMOVE(C1541_TAG)
+	MCFG_CBM_IEC_REMOVE()
+	MCFG_DEVICE_REMOVE(C1541_TAG)
+	MCFG_CBM_IEC_ADD(cbm_iec_null_daisy)
 MACHINE_CONFIG_END
 
 
