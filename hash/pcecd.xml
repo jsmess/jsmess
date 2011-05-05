@@ -9,7 +9,7 @@
     are considered replaceable.
        
     Missing CDs (to be confirmed):
-       - Akiyamajin no Suugaku Misuteri- Hihou Indo no Honoo wo Sisyu Seyo   NHK            NHCD4001    12/10/94
+       - Akiyama Jin no Suugaku Mystery - Hihou Indo no Honoo wo Shishu Seyo NHK            NHCD4001    12/10/94
        - Gakuraito TDF 2                                                     Pack-In-Video  PVCD-0002   01/25/91
        - Kabuki Ittou Ryoudan                                                Hudson         HCD5070     02/24/95
        - Super CD-ROM2 Taiken Soft-shuu                                      Hudson         HCD1027     12/13/91
@@ -1319,14 +1319,14 @@
 	</software>
 
 	<software name="fireproj">
-		<description>Wrestling Universe - Fire Pro Jyoshi - Dome Chojyo Taisen - WOWOW vs. JWP (ACD)(Jpn)</description>
+		<description>Wrestling Universe - Fire Pro Joshi - Dome Choujo Taisen - WOWOW vs. JWP (ACD)(Jpn)</description>
 		<!-- Serial: HMCD4008 - Release Date: 1995-02-03 -->
 		<year>1995</year>
 		<publisher>Human Entertainment</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="fire pro jyoshi - dome chojyo taisen (acd)(jpn)" sha1="a2a2e4108eed453e95f080b746b0797117b886e9"/>
+				<disk name="fire pro joshi - dome choujo taisen (acd)(jpn)" sha1="a2a2e4108eed453e95f080b746b0797117b886e9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1630,14 +1630,14 @@
 	</software>
 
 	<software name="godpanic">
-		<description>God Panic - Shijyou Saikyo Gundan (SCD)(Jpn)</description>
+		<description>God Panic - Shijou Saikyou Gundan (SCD)(Jpn)</description>
 		<!-- Serial: TMCD2001 - Release Date: 1992-11-27 -->
 		<year>1992</year>
 		<publisher>Teichiku Records</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="god panic - shijyou saikyo gundan (scd)(jpn)" sha1="84deacbf6283b2bd96b151cd341550a2881cecbe"/>
+				<disk name="god panic - shijou saikyou gundan (scd)(jpn)" sha1="84deacbf6283b2bd96b151cd341550a2881cecbe"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4919,66 +4919,66 @@
 	</software>
 
 	<software name="tengaims">
-		<description>Tengai Makyo - Fuun Kabuki Den Shutsugeki no Sho (SCD)(Jpn)</description>
+		<description>Tengai Makyou - Fuu'un Kabuki Den Shutsugeki no Sho (SCD)(Jpn)</description>
 		<!-- Serial: HCD3046 - Release Date: 1993-07-10 -->
 		<year>1993</year>
 		<publisher>Hudson</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tengai makyo - fuun kabuki den shutsugeki no sho (scd)(jpn)" sha1="0512da6b6cf4773bd8fada01fee1de4492f3709a"/>
+				<disk name="tengai makyou - fuuun kabuki den shutsugeki no sho (scd)(jpn)" sha1="0512da6b6cf4773bd8fada01fee1de4492f3709a"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="tengaima">
-		<description>Tengai Makyo - Kabuki Itouryodan (ACD)(Jpn)</description>
+		<description>Tengai Makyou - Kabuki Ittou Ryoudan (ACD)(Jpn)</description>
 		<!-- Serial: HCD5070 - Release Date: 1995-02-24 -->
 		<year>1995</year>
 		<publisher>Hudson</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tengai makyo - kabuki itouryodan (acd)(jpn)" sha1="0ebc331c4d7d963f4a6553e6f2020fa5a1031753"/>
+				<disk name="tengai makyou - kabuki ittou ryoudan (acd)(jpn)" sha1="0ebc331c4d7d963f4a6553e6f2020fa5a1031753"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="tengaimz">
-		<description>Tengai Makyo - Ziria (CD)(Jpn)</description>
+		<description>Tengai Makyou - Ziria (CD)(Jpn)</description>
 		<!-- Serial: HCD9005 - Release Date: 1989-06-30 -->
 		<year>1989</year>
 		<publisher>Hudson</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tengai makyo - ziria (cd)(jpn)" sha1="6d4e3cb113dacf158d9392a18daa413c0f5a0360"/>
+				<disk name="tengai makyou - ziria (cd)(jpn)" sha1="6d4e3cb113dacf158d9392a18daa413c0f5a0360"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="tengaimzh" cloneof="tengaimz">
-		<description>Tengai Makyo - Ziria [Hibaihin] (SCD)(Jpn)</description>
+		<description>Tengai Makyou - Ziria [Hibaihin] (SCD)(Jpn)</description>
 		<!-- Serial: HDC2037 - Notes: Promotional item in SCD format -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tengai makyo - ziria [hibaihin] (scd)(jpn)" sha1="0f7569be19837774a8b49c86230555ffad4cd637"/>
+				<disk name="tengai makyou - ziria [hibaihin] (scd)(jpn)" sha1="0f7569be19837774a8b49c86230555ffad4cd637"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="tengaim2">
-		<description>Tengai Makyo II - Manji Maru (SCD)(Jpn)</description>
+		<description>Tengai Makyou II - Manji Maru (SCD)(Jpn)</description>
 		<!-- Serial: HCD1022 - Release Date: 1992-03-26 -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tengai makyo ii - manji maru (scd)(jpn)" sha1="c43ca00cb46a5300da6dbb8533ff52caa92bdcbc"/>
+				<disk name="tengai makyou ii - manji maru (scd)(jpn)" sha1="c43ca00cb46a5300da6dbb8533ff52caa92bdcbc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -5570,14 +5570,14 @@
 	</software>
 
 	<software name="yamamura">
-		<description>Yamamura Misa Suspense - Kinsen Ka Kyo E Zara Satsu Jin Ji Ken (SCD)(Jpn)</description>
+		<description>Yamamura Misa Suspense - Kinsenka Kyou Ezara Satsujin Jiken (SCD)(Jpn)</description>
 		<!-- Serial: NXCD2006 - Release Date: 1992-03-06 -->
 		<year>1992</year>
 		<publisher>Naxat Soft</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="yamamura misa suspense - kinsen ka kyo e zara satsu jin ji ken (scd)(jpn)" sha1="e05f900c7135de67b4523fcd425ec75cac5f1cf8"/>
+				<disk name="yamamura misa suspense - kinsenka kyou ezara satsujin jiken (scd)(jpn)" sha1="e05f900c7135de67b4523fcd425ec75cac5f1cf8"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6426,14 +6426,14 @@
 	</software>
 
 	<software name="idolpai" supported="no">
-		<description>Bishoujo Jyanshi Idol Pai (GECD)(Jpn)</description>
+		<description>Bishoujo Janshi Idol Pai (GECD)(Jpn)</description>
 		<!-- Serial: GED-1016 - Release Date: 1995-11-10 -->
 		<year>1995</year>
 		<publisher>Game Express</publisher>
 		<info name="usage" value="Game Express CD Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="bishoujo jyanshi idol pai (gecd)(jpn)" sha1="65344719bb02fe8dfc5b1f72034a011a5414c412"/>
+				<disk name="bishoujo janshi idol pai (gecd)(jpn)" sha1="65344719bb02fe8dfc5b1f72034a011a5414c412"/>
 			</diskarea>
 		</part>
 	</software>
