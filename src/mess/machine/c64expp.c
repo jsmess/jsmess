@@ -218,7 +218,7 @@ WRITE8_MEMBER( c64_expansion_port_device::romh_w )
 //  game_r - GAME read
 //-------------------------------------------------
 
-DECLARE_READ_LINE_MEMBER( c64_expansion_port_device::game_r )
+READ_LINE_MEMBER( c64_expansion_port_device::game_r )
 {
 	if (m_interface) 
 		return m_interface->c64_game_r();
@@ -231,7 +231,7 @@ DECLARE_READ_LINE_MEMBER( c64_expansion_port_device::game_r )
 //  game_w - GAME write
 //-------------------------------------------------
 
-DECLARE_WRITE_LINE_MEMBER( c64_expansion_port_device::game_w )
+WRITE_LINE_MEMBER( c64_expansion_port_device::game_w )
 {
 	m_out_game_func(state);
 }
@@ -241,7 +241,7 @@ DECLARE_WRITE_LINE_MEMBER( c64_expansion_port_device::game_w )
 //  exrom_r - EXROM read
 //-------------------------------------------------
 
-DECLARE_READ_LINE_MEMBER( c64_expansion_port_device::exrom_r )
+READ_LINE_MEMBER( c64_expansion_port_device::exrom_r )
 {
 	if (m_interface) 
 		return m_interface->c64_exrom_r();
@@ -254,7 +254,7 @@ DECLARE_READ_LINE_MEMBER( c64_expansion_port_device::exrom_r )
 //  exrom_w - EXROM write
 //-------------------------------------------------
 
-DECLARE_WRITE_LINE_MEMBER( c64_expansion_port_device::exrom_w )
+WRITE_LINE_MEMBER( c64_expansion_port_device::exrom_w )
 {
 	m_out_exrom_func(state);
 }
