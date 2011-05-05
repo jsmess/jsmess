@@ -220,7 +220,7 @@
 			<dataarea name="roml" size="0x2000">
 				<rom name="calc_rom1.bin" size="0x2000" crc="f617bec4" sha1="c5ef2418cf9dba3e14f586d5d6997f271b521a24" offset="0x0000" />
 			</dataarea>
-			
+
 			<dataarea name="rom" size="0x4000">
 				<rom name="calc_rom2.bin" size="0x4000" crc="4997dd31" sha1="9820b1e6b90d72f095a2b74438dac3cfc33e80b8" offset="0x0000" />
 			</dataarea>
@@ -297,24 +297,24 @@
 		<publisher>Multiscreen Pty</publisher>
 		<!--
 						|===================|
-						|			ROM6	|
-						|	MC14066			|
-						|					|
-		|===============|			ROM5	|
-		|=|                         		|
-		|=|                         		|
-		|=|    RAM         BAT      ROM4   	|
-		|=|                         		|
-		|=|                         		|
-		|=|    ROM0                 ROM3	|
-		|=|                         		|
-		|=|                         		|
-		|===============|	LS138	ROM2	|
-						|	LS138			|
-						|	LS174			|
-						|	LS133	ROM1	|
+						|           ROM6    |
+						|  MC14066          |
+						|                   |
+		|===============|           ROM5    |
+		|=|                                 |
+		|=|                                 |
+		|=|    RAM         BAT      ROM4    |
+		|=|                                 |
+		|=|                                 |
+		|=|    ROM0                 ROM3    |
+		|=|                                 |
+		|=|                                 |
+		|===============|  LS138    ROM2    |
+						|  LS138            |
+						|  LS174            |
+						|  LS133    ROM1    |
 						|===================|
-		
+
 		BAT   - BR2325 lithium battery
 		RAM   - ? 8Kx8 RAM
 		ROM0  - ? 16Kx8 EPROM
@@ -339,12 +339,12 @@
 				<rom name="cart-3.bin" size="0x8000" crc="ecddbbfc" sha1="70c72b77dc3981be8bcbec9ba0cc38d9aa5936fd" offset="0x4000" />
 				<rom name="cart-4.bin" size="0x8000" crc="042678ef" sha1="ff2582c617f72bf57be7d76bcf8270665144f924" offset="0x8000" />
 			</dataarea>
-			
+
 			<dataarea name="ram" size="0x2000" />
 		</part>
 		<!--
 		-->
-		<part name="driver_board">
+		<part name="driver_board" interface="device">
 			<feature name="pcb" value="RDL77" />
 			<feature name="xtal" value="4000000" />
 			<feature name="cpu" value="MC6802P" />
@@ -352,12 +352,12 @@
 			<feature name="pia2" value="MC6821P" />
 			<feature name="ram1" value="MC6810P" />
 			<feature name="ram2" value="MC6810P" />
-			
+
 			<dataarea name="rom" size="0x2000">
 				<rom name="1" size="0x1000" crc="35be02a8" sha1="5912bc3d8e0c0949c1e66c19116d6b71c7574e46" offset="0x0000" />
 				<rom name="1 2cr" size="0x1000" crc="76a9ac6d" sha1="87e7335e626bdb73498b46c28c7baab72df38d1f" offset="0x1000" />
 			</dataarea>
-			
+
 			<dataarea name="ram" size="0x100" />
 		</part>
 	</software>
@@ -390,6 +390,43 @@
 			<dataarea name="rom" size="0x4000">
 				<rom name="4040.bin" size="0x2000" crc="bab8bb5f" sha1="e1b602f476bf7baddd3b7f6964a5db4b44e7c7c1" offset="0x0000" />
 				<rom name="hackem.bin" size="0x2000" crc="8edd53a5" sha1="ac1a159e27060aa1c95669eb510c3864032968e8" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hugo" supported="no">
+		<description>Skærmtrolden Hugo</description>
+		<year>1990</year>
+		<publisher>SilverRock Productions</publisher>
+		<!--
+		e9048
+		|=============|
+		|=| LS00      |
+		|=|      LS273|
+		|=|           |
+		|=|           |
+		|=| ROM       |
+		|=|           |
+		|=|           |
+		|=|           |
+		|=============|
+
+		ROM     - Atmel AT27C010-25PC 128Kx8 OTP EPROM "HUGO 2012"
+
+		data and address lines are scrambled:
+		data = BITSWAP8(7,6,5,4,0,1,2,3)
+		address = BITSWAP17(D6,D5,D4,D7,12,7,6,5,4,3,2,1,0,8,9,11,10)
+
+		bankswitching latch at I/O1 ($DE00..$DEFF): D6=A16, D5=A15, D4=A14, D7=A13
+		latch is cleared to 0 on computer reset
+		-->
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<feature name="pcb" value="e9048" />
+
+			<dataarea name="rom" size="0x20000">
+				<rom name="hugo 2012" size="0x20000" offset="0x0000" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
