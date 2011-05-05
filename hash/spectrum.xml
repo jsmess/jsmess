@@ -3,9 +3,9 @@
 
 <!--
   Only 10 cartridge titles were released to be used with the ZX Spectrum "Interface 2" peripheral.
-  
+
   7 unreleased prototypes are included in this collection.
-  
+
 -->
 <softwarelist name="spectrum" description="Sinclair ZX Spectrum cartridges">
 
@@ -109,9 +109,9 @@
 			</dataarea>
 		</part>
 	</software>
-    
+
     <!-- Prototypes -->
-    
+
 	<software name="gyruss">
 		<description>Gyruss (Prototype)</description>
 		<year>1984</year>
@@ -141,7 +141,7 @@
 				<rom name="montezuma&apos;s revenge.rom" size="16384" crc="ff8d7dc3" sha1="b700e37f7e24adea6ba12cf0e935307bd006b9c9" offset="000000" />
 			</dataarea>
 		</part>
-	</software>			
+	</software>
 	<software name="montezum1" cloneof="montezum">
 		<description>Montezuma's Revenge (Prototype, Alt)</description>
 		<year>1984</year>
@@ -151,7 +151,7 @@
 				<rom name="montezuma&apos;s revenge (prot).rom" size="16384" crc="5d73082e" sha1="e8f1b6e6b8c8eb6de6a0c6d271351ca7056a39af" offset="000000" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 	<software name="popeye">
 		<description>Popeye (Prototype)</description>
 		<year>1984</year>
@@ -161,7 +161,7 @@
 				<rom name="popeye.rom" size="16384" crc="85c189c1" sha1="5c185c7e3eed2c3379bf74bf522f95c32a730278" offset="000000" />
 			</dataarea>
 		</part>
-	</software>				
+	</software>
 	<software name="qbert">
 		<description>QBert (Prototype)</description>
 		<year>1984</year>
@@ -171,7 +171,7 @@
 				<rom name="qbert.rom" size="16384" crc="5de868db" sha1="777872a80411fd9c9653cc9c6dea1506b833d6b2" offset="000000" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 	<software name="jedi">
 		<description>Return Of The Jedi - Death Star Battle (Prototype)</description>
 		<year>1984</year>
@@ -181,7 +181,7 @@
 				<rom name="return of the jedi - death star battle.rom" size="16384" crc="5f5bf622" sha1="71e55eecb5f38338af8826ae743509d35250f20e" offset="000000" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 	<software name="starwars">
 		<description>Star Wars (Prototype)</description>
 		<year>1984</year>
@@ -191,7 +191,7 @@
 				<rom name="star wars.rom" size="16384" crc="732c6f5d" sha1="0ade16899c2e815ddfea6782618b0cdf760e6d54" offset="000000" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 	<software name="starwars1" cloneof="starwars">
 		<description>Star Wars (Prototype, Alt)</description>
 		<year>1984</year>
@@ -201,6 +201,6 @@
 				<rom name="star wars[a].rom" size="16384" crc="90b61858" sha1="29cbda204ea20d42429a723afe2d00b9edd0a04d" offset="000000" />
 			</dataarea>
 		</part>
-	</software>			
+	</software>
 
 </softwarelist>

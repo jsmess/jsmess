@@ -94,7 +94,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="druaga">
 		<description>The Tower of Druaga</description>
 		<year>19??</year>
@@ -116,7 +116,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ganjiko">
 	<!-- Keys listed in readme are as follows:
 キー操作/ リターン：チー　F1:リーチ　F2:ポン　F3:カン F4:和了　F10:九種九牌
@@ -131,7 +131,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ishtar">
 		<description>The Return of Ishtar</description>
 		<year>1986</year>
@@ -190,7 +190,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mm1">
 		<description>Might and Magic I</description>
 		<year>19??</year>
@@ -232,7 +232,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="probbfan">
 <!-- Keys listed in readme:
 キー操作/ 1P/ テンキー：方向　"_"キー:Aボタン　"："キー：Bボタン
@@ -338,5 +338,5 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

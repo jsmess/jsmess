@@ -36,14 +36,14 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 				<rom name="assembler.imd" size="381579" crc="05926cfa" sha1="feaa2f0a9833aae96882d8b880dcd4cc8bbf871c" offset="0x0000" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop4" interface="floppy_5_25">
 		<!-- Disk Content: C Language/Linker -->
 			<dataarea name="flop" size="302891">
 				<rom name="clanguage.imd" size="302891" crc="2e6505af" sha1="8f2296b3e852600aa77d96bd5b66f8ca52e2a24e" offset="0x0000" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop5" interface="floppy_5_25">
 		<!-- Disk Content: Apple ][+, Kaypro II, Z80, and IBM emulators  -->
 			<dataarea name="flop" size="398409">
@@ -51,7 +51,7 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cpm102">
 		<description>CP/M-68K Release 1.02</description>
 		<!-- Serial Number: 1509-1004-654321 -->
@@ -65,8 +65,8 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 			</dataarea>
 		</part>
 	</software>
-	
- 	<software name="cpm103">
+
+	<software name="cpm103">
 		<description>CP/M-68K Release 1.03</description>
 		<year>1984</year>
 		<publisher>Micro Craft Corporation</publisher>
@@ -78,8 +78,8 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 			</dataarea>
 		</part>
 	</software>
-	
- 	<software name="ibmcopy">
+
+	<software name="ibmcopy">
 		<description>IBM Program Copy for CP/M-68K</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -90,8 +90,8 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 			</dataarea>
 		</part>
 	</software>
-	
- 	<software name="ibmemu">
+
+	<software name="ibmemu">
 		<description>IBM Emulator</description>
 		<!-- Serial Number: 1015-1004-000000-->
 		<year>198?</year>
@@ -103,8 +103,8 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 			</dataarea>
 		</part>
 	</software>
-	
- 	<software name="cpm104">
+
+	<software name="cpm104">
 		<description>CP/M-68K Release 1.04</description>
 		<!-- Serial Number: 1015-1004-000000-->
 		<!-- Hardware needed: 8086 Emulation Card, Z80 Emulator Card, APPLE Emulator Card -->

@@ -5,8 +5,8 @@
 <!--
 
 -->
-  
-  
+
+
 <!--- Images below are from the REDUMP set (unless otherwise noted) -->
 	<software name="aburner3">
 		<!-- Serial: T-68014 - Release Date: 1992-12-18 - Alt. Title: アフターバーナーⅢ -->
@@ -247,7 +247,7 @@
 			</diskarea>
 		</part>
 	</software>
- 
+
 	<software name="heavenly">
 		<!-- Serial: G-6034 - Release Date: 1994-04-23 - Alt. Title: ヘブンリー　シンフォニー　フォームラワン　ワールド　チャンピオンシップ　1993 -->
 		<description>Heavenly Symphony (Jpn)</description>
@@ -845,7 +845,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="aburner3">
 		<description>After Burner III (Jpn)</description>
@@ -930,7 +930,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="ax101">
 		<description>AX-101 (Jpn)</description>
@@ -955,7 +955,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="bariarm">
 		<description>Bari-Arm (Jpn)</description>
@@ -1004,7 +1004,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="burai">
 		<description>Burai - Hachigyoku no Yuushi Densetsu (Jpn)</description>
@@ -1017,7 +1017,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="quiztono">
 		<description>Capcom no Quiz - Tono-sama no Yabou (Jpn)</description>
@@ -1042,7 +1042,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="cfstory">
 		<description>Cosmic Fantasy Stories (Jpn)</description>
@@ -1055,7 +1055,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="cyb009">
 		<description>Cyborg 009 (Jpn)</description>
@@ -1116,7 +1116,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="dennin">
 		<description>Dennin-Aleste - Nobunaga and his Ninja Force (Jpn)</description>
@@ -1129,7 +1129,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="detonat">
 		<description>Detonator Orgun (Jpn)</description>
@@ -1142,7 +1142,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="devastat">
 		<description>Devastator (Jpn)</description>
@@ -1167,7 +1167,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="dlair">
 		<description>Dragon's Lair (Jpn)</description>
@@ -1192,7 +1192,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="dynamicc">
 		<description>Dynamic Country Club - 3D Golf Simulation (Jpn)</description>
@@ -1205,7 +1205,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="earnest">
 		<description>Earnest Evans (Jpn)</description>
@@ -1242,7 +1242,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="supleges">
 		<description>Egawa Sugoru no Super League CD (Jpn)</description>
@@ -1267,7 +1267,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="f1circus">
 		<description>F1 Circus CD (Jpn)</description>
@@ -1292,7 +1292,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!-- Ringcode: G-6013P-00059-R1M -->
 <!--
 	<software name="ffightcd">
@@ -1306,7 +1306,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="gamjik2">
 		<description>Gambler Jiko Chuushinha 2 - Gekitou! Tokyo Mahjongland Hen (Jpn)</description>
@@ -1320,7 +1320,7 @@
 	</software>
 -->
 
-  
+
 <!--
 	<software name="gameno1">
 		<description>Game no Kanzume - Sega Games Can Vol.1 (Jpn)</description>
@@ -1333,7 +1333,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="gameno2">
 		<description>Game no Kanzume - Sega Games Can Vol.2 (Jpn)</description>
@@ -1346,7 +1346,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="garoudsp">
 		<description>Garou Densetsu Special (Jpn)</description>
@@ -1359,7 +1359,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="heavenly">
 		<description>Heavenly Symphony - Formula One World Championship 1993 (Jpn)</description>
@@ -1372,7 +1372,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="hvynova">
 		<description>Heavy Nova (Jpn)</description>
@@ -1385,7 +1385,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="heimdall">
 		<description>Heimdall (Jpn)</description>
@@ -1422,7 +1422,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="xj220">
 		<description>Jaguar XJ220 (Jpn)</description>
@@ -1435,7 +1435,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="jangwc">
 		<description>Jangou World Cup (Jpn)</description>
@@ -1460,7 +1460,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="kamenrid">
 		<description>Kamen Rider ZO (Jpn)</description>
@@ -1473,7 +1473,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="keiou">
 		<description>Keiou Yuugekitai (Jpn)</description>
@@ -1510,7 +1510,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="lodoss">
 		<description>Lodoss Tou Senki - Eiyuu Sensou - Record of Lodoss War (Jpn)</description>
@@ -1609,7 +1609,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="micro">
 		<description>Microcosm (Jpn)</description>
@@ -1658,7 +1658,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="nstriker">
 		<description>Night Striker (Jpn)</description>
@@ -1671,7 +1671,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="ntrap">
 		<description>Night Trap (Jpn)</description>
@@ -1714,7 +1714,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="nos1907">
 		<description>Nostalgia 1907 in North Atlantic Sea (Jpn)</description>
@@ -1727,7 +1727,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="popmail">
 		<description>Popful Mail (Jpn)</description>
@@ -1740,7 +1740,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="princep">
 		<description>Prince of Persia (Jpn)</description>
@@ -1771,8 +1771,8 @@
 			</diskarea>
 		</part>
 	</software>
-  
-  
+
+
 <!--
 	<software name="suplegpy">
 		<description>Pro Yakyuu Super League CD (Jpn)</description>
@@ -1834,7 +1834,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="ranma">
 		<description>Ranma Nibun no Ichi 1/2 - Byakuran Aika (Jpn)</description>
@@ -1847,7 +1847,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="risedrag">
 		<description>Rise of the Dragon - A Blade Hunter Mystery (Jpn)</description>
@@ -1872,7 +1872,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="sangok3">
 		<description>Sangokushi III (Jpn)</description>
@@ -1922,7 +1922,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="3x3eyes">
 		<description>Seima Densetsu 3x3 Eyes (Jpn)</description>
@@ -1948,8 +1948,8 @@
 			</diskarea>
 		</part>
 	</software>
-  
- 	<software name="fheyareab" cloneof="fheyarea">
+
+	<software name="fheyareab" cloneof="fheyarea">
 		<!-- Serial: T-32034 - Diskring: T-32034P-00009-R2K - Release Date: 1992-02-18 - Alt. Title: 精霊神世紀フェイエリア -->
 		<description>Seirei Shinseiki - Fhey Area (Jpn, R2K)</description>
 		<year>1992</year>
@@ -1972,7 +1972,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="beast2">
 		<description>Shadow of the Beast II - Juushin no Jubaku (Jpn)</description>
@@ -1997,7 +1997,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="shinmega">
 		<description>Shin Megami Tensei (Jpn)</description>
@@ -2010,7 +2010,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="sforce">
 		<description>Shining Force CD (Jpn)</description>
@@ -2023,7 +2023,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="silpheed">
 		<description>Silpheed (Jpn)</description>
@@ -2048,7 +2048,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="solfeace">
 		<description>Sol-Feace (Jpn)</description>
@@ -2061,7 +2061,7 @@
 		</part>
 	</software>
  -->
-  
+
 <!--
 	<software name="soniccd">
 		<description>Sonic The Hedgehog CD (Jpn)</description>
@@ -2086,7 +2086,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="swra">
 		<description>Star Wars - Rebel Assault (Jpn)</description>
@@ -2099,7 +2099,7 @@
 		</part>
 	</software>
  -->
-  
+
 <!--
 	<software name="starblad">
 		<description>StarBlade (Jpn)</description>
@@ -2112,7 +2112,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="switch">
 		<description>Switch (Jpn)</description>
@@ -2125,7 +2125,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="tenbu">
 		<description>Tenbu Mega CD Special (Jpn)</description>
@@ -2138,7 +2138,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="tenkafub">
 		<description>Tenkafubu - Eiyuutachi no Houkou (Jpn)</description>
@@ -2176,7 +2176,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="thawk">
 		<description>Thunderhawk (Jpn)</description>
@@ -2189,7 +2189,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="timegal">
 		<description>Time Gal (Jpn)</description>
@@ -2214,7 +2214,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="dearfrnd">
 		<description>Uresei Yatsura - Dear My Friends (Jpn)</description>
@@ -2227,7 +2227,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="vay">
 		<description>Vay - Ryuusei no Yoroi (Jpn)</description>
@@ -2240,7 +2240,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="funkband">
 		<description>Wakusei Woodstock - F.H.B - Funky Horror Band (Jpn)</description>
@@ -2265,7 +2265,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 <!--
 	<software name="wingcomm">
 		<description>Wing Commander (Jpn)</description>
@@ -2278,7 +2278,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="winningp">
 		<description>Winning Post (Jpn)</description>
@@ -2291,7 +2291,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="wolfchld">
 		<description>Wolfchild (Jpn)</description>
@@ -2304,7 +2304,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="wonderdo">
 		<description>Wonder Dog (Jpn)</description>
@@ -2317,7 +2317,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="yumemi">
 		<description>Yumemi Yakata no Monogatari (Jpn)</description>
@@ -2330,7 +2330,7 @@
 		</part>
 	</software>
 -->
-  
+
 <!--
 	<software name="yumimimx">
 		<description>Yumimi Mix (Jpn)</description>

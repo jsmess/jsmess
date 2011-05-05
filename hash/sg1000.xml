@@ -8,7 +8,7 @@ Canceled titles (possibly exist in prototype form)
   OM-G010 Great Escape 2 (by Tsukuda)
  -->
 <!--
-The following games were available both as Golden Carts and as MyCards. 
+The following games were available both as Golden Carts and as MyCards.
 I'm not sure from what version the dumps below come (or it they have been
 verified to contain the same data)
 
@@ -40,7 +40,7 @@ B-012 天方夜譚 / Tiānfāng yè tán -> G-1012 Sindbad Mystery [dumped]
 W-013 三人麻雀 / Sān rén máquè -> OM-G004 San-nin Mahjong [dumped]
 B-014 哥爾哥13 / Gē ěr gē 13 -> G-1014 Golgo 13 [WANTED]
 B-015 太空怪獸 / Tàikōng guàishòu -> G-1015 Orguss [WANTED, a Tw cart with no product number has been dumped and matched the Jpn cart, but a B-015 cart might exist!]
-W-016 帝國大反擊 / Dìguó dà fǎnjí -> OM-G007 Space Armor [dumped, same as Jpn v0 dump). 
+W-016 帝國大反擊 / Dìguó dà fǎnjí -> OM-G007 Space Armor [dumped, same as Jpn v0 dump).
 B-017 摩納哥賽車 / Mónàgē sàichē -> G-1017 Monaco GP [dumped]
 W-018 霹靂彈 / Pīlì dàn -> G-1018 Sega Flipper [dumped]
 W-019 精靈鼠 / Jīnglíng shǔ -> G-1019 Pop Flamer [dumped]
@@ -75,9 +75,9 @@ R-051 救難小英雄 / Jiùnàn xiǎo yīngxióng -> C-51 Drol [dumped]
 R-052 ?? maybe 賽馬 / Sàimǎ -> OM-G005 Challenge Derby [WANTED]
 R-052 ?? maybe 打漁 -> C-52 Chack'n Pop
 R-053 比利大盜 / Bǐ lì dà dào -> C-53 Bank Panic [dumped]
-R-054 摩天大樓 / Mótiān dàlóu -> C-54 Rock n' Bolt [dumped]	
-R-055 諜對諜 / Dié duì dié -> C-55 Elevator Action [dumped]	
-R-056 倉庫番 -> C-56 Sokoban	
+R-054 摩天大樓 / Mótiān dàlóu -> C-54 Rock n' Bolt [dumped]
+R-055 諜對諜 / Dié duì dié -> C-55 Elevator Action [dumped]
+R-056 倉庫番 -> C-56 Sokoban
 R-062 摩托飛車 -> ?? maybe is the same as B-026 (i.e. Zippy Race)
 R-065 忍者公主 -> C-65 Ninja Princess
 R-066 超級坦克 -> C-66 Super Tank
@@ -222,7 +222,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 <!-- This has been hacked to work in emus, by mirroring the first 8K up to 32K and then adding the second 8K. This can be removed when the emulation
-  of this kind of carts have been fixed (running the 16K image results in missing graphics, among other things, see the title screen) --> 
+  of this kind of carts have been fixed (running the 16K image results in missing graphics, among other things, see the title screen) -->
 	<software name="chaldrbya" cloneof="chaldrby">
 		<!-- Serial: OM-G005 - Release Date: 1984 - Alt Title: チャレンジダービー -->
 		<description>Challenge Derby (Jpn, Hacked, OMV)</description>
@@ -492,7 +492,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="congo1" cloneof="congo">
 		<description>Congo Bongo (Euro, Jpn, v0)</description>
- 		<year>1983</year>
+		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="24576">
@@ -504,7 +504,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	<software name="congot" cloneof="congo"> <!-- based on Jpn v0 release -->
 		<!-- Serial: A103 - Alt Title: Dà jīn gāng ~ 大金鋼 -->
 		<description>Congo Bongo (Tw)</description>
- 		<year>19??</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="24576">
@@ -1021,7 +1021,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="monacogpb" cloneof="monacogp">
 		<description>Monaco GP (Jpn, v0)</description>
-        <!-- 16kb of data + 16kb of trash + 8kb of data, Bock verified that this only came in the earlier Big Boxed carts 
+        <!-- 16kb of data + 16kb of trash + 8kb of data, Bock verified that this only came in the earlier Big Boxed carts
         (afterwards only the 32k was used, even in carts with "24k" advertise on the box) -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -1473,7 +1473,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 			</dataarea>
 		</part>
 	</software>
-    
+
 	<software name="shinnyus">
 		<!-- Serial: G-1041 - Alt Title: Konami no Shinnyushain Tooru Kun ~ コナミの新入社員とおるくん (on the game box) -->
 		<description>Shinnyushain Tooru Kun (Jpn)</description>
@@ -1903,15 +1903,15 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="musicj" cloneof="music">
 		<description>Sega Music Editor (Jpn)</description>
- 		<year>198?</year>
- 		<publisher>Sega</publisher>
- 		<part name="cart" interface="sg1000_cart">
- 			<dataarea name="rom" size="32768">
+		<year>198?</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
 				<rom name="musicj.bin" size="32768" crc="2ec28526" sha1="a2137e818242e8b361d5d5677797034c55fb1a2d" offset="000000" />
- 			</dataarea>
- 		</part>
- 	</software>
- 
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="music">
 		<description>Sega Music Editor (Euro?)</description>
 		<year>198?</year>

@@ -2,11 +2,11 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
     Undumped:
-    
+
     18V402  Fun With Numbers            TV Arcade II
             Bingo                       TV Casino
             Math and Social Studies     TV School House I
-            
+
 -->
 
 <softwarelist name="studio2" description="RCA Studio II cartridges">
@@ -22,7 +22,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tennis">
     <!-- 18V402 -->
     <description>TV Arcade III: Tennis/Squash</description>
@@ -35,7 +35,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="baseball">
     <!-- 18V403 -->
     <description>TV Arcade IV: Baseball </description>
@@ -106,7 +106,7 @@
     <description>TV Casino I: Blackjack </description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
-		
+
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom" size="0x400">
 				<rom name="blackjack.bin" size="0x400" crc="b30af7a9" sha1="e328791d6aa8292d1b68abe03c7ebfefa9282ced" offset="0x0000" />

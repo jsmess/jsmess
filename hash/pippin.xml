@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pippin" description="Pippin CD-ROM list">
-  
-<!-- Todo: Some (maybe all?) Pippin discs are compatible with macs 
-       
+
+<!-- Todo: Some (maybe all?) Pippin discs are compatible with macs
+
     Undumped (to be confirmed):
     Name                                              Publisher         Serial        Date
     @World Registration                               ?                 01348C        ?
@@ -62,7 +62,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="atworldb">
 		<description>@World Basics (USA)</description>
 		<!-- Serial: 01338C -->
@@ -74,7 +74,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="browserb">
 		<description>@World Browser (USA, Prototype)</description>
 		<!-- Serial: 41458 -->
@@ -86,7 +86,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="atworldo">
 		<description>@World Online Suite Browser (USA)</description>
 		<!-- Serial: 41588 -->
@@ -98,7 +98,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="hanshind">
 		<description>1995.1.17 Hanshin Daishinsai (Jpn)</description>
 		<!-- Serial: BDS-20005 -->
@@ -110,7 +110,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="actdesu">
 		<description>ActionDesigner Ultraman Tiga (Jpn)</description>
 		<!-- Serial: BDE-70018 -->
@@ -122,7 +122,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="aishogi">
 		<description>AI Shogi (Jpn)</description>
 		<!-- Serial: BDS-20032 -->
@@ -134,7 +134,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="animedbz">
 		<description>AnimeDesigner - DragonBall Z (Jpn)</description>
 		<!-- Serial: BDE-10019 -->
@@ -158,7 +158,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="asobou1">
 		<description>Anpanman to asobou! 1 (Jpn)</description>
 		<!-- Serial: BDE-10009 -->
@@ -170,7 +170,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="asobou2">
 		<description>Anpanman to asobou! 2 (Jpn)</description>
 		<!-- Serial: BDE-70016 -->
@@ -194,7 +194,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="atmtowna" cloneof="atmtown">
 		<description>Atmark Town (Jpn, Ver. 1.0, Alt)</description>
 		<!-- Serial: BDB-005 (Disk 6 vol.1.1) -->
@@ -206,7 +206,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="atmtown2">
 		<description>Atmark Town (Jpn, Ver. 2.0)</description>
 		<!-- Serial: BDB-022 -->
@@ -218,7 +218,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="chisatom">
 		<description>Chisato Moritaka CD-Rom Watarase Bashi (Jpn)</description>
 		<!-- Serial: BDE-10007 -->
@@ -230,7 +230,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="circus">
 		<description>Circus! (Jpn)</description>
 		<!-- Serial: BDS-20031 -->
@@ -242,7 +242,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="compton">
 		<description>Compton's Interactive Encyclopedia (USA)</description>
 		<!-- Serial: 71278C -->
@@ -254,7 +254,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="dazzloid">
 		<description>Dazzeloids (Jpn)</description>
 		<!-- Serial: BDS-20030 -->
@@ -266,7 +266,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="egworldp">
 		<description>EGWord Pure (Jpn, Ver. 1.0)</description>
 		<!-- Serial: BDE-10021 -->
@@ -290,7 +290,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="frankya" cloneof="franky">
 		<description>Franky Online (Jpn, Alt)</description>
 		<!-- Serial: BDB-006 (Disk 6 vol.1.1) -->
@@ -302,7 +302,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="fortllia">
 		<description>Fortullia (Jpn)</description>
 		<!-- Serial: BDE-10003 -->
@@ -314,7 +314,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ffaliens">
 		<description>Funky Funny Aliens (Jpn)</description>
 		<!-- Serial: BDS-20014 -->
@@ -326,7 +326,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gadget">
 		<description>Gadget (Jpn)</description>
 		<!-- Serial: BDS-20033 -->
@@ -350,7 +350,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gundamwe">
 		<description>Gundam 0079 - The War for Earth (Jpn)</description>
 		<!-- Serial: BDE-10030 -->
@@ -374,7 +374,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gundamta" cloneof="gundamt">
 		<description>Gundam Tactics: Mobility Fleet0079 (Jpn, Alt)</description>
 		<!-- Serial: BDE-10008 -->
@@ -386,7 +386,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="gundamv">
 		<description>Gundam Virtual Modeler Light (Jpn)</description>
 		<!-- Serial: BDE-10029 -->
@@ -398,7 +398,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="kidsbox">
 		<description>Kids Box (Jpn)</description>
 		<!-- Serial: BDS-20003 -->
@@ -434,7 +434,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="interkt2">
 		<description>Internet Kit (Jpn, Ver. 2.0)</description>
 		<!-- Serial: BDB-012 (Disk 6 vol.1.1) -->
@@ -446,7 +446,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="lzone">
 		<description>L-Zone (Jpn)</description>
 		<!-- Serial: BDS-20017 -->
@@ -458,7 +458,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="macbin38">
 		<description>Mac Bin 38 (Jpn)</description>
 		<!-- Serial: MUJ-9701 -->
@@ -470,7 +470,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="macbin40">
 		<description>Mac Bin 40 A (Jpn)</description>
 		<!-- Serial: MUJ-9703-1 -->
@@ -482,7 +482,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="macbin4b">
 		<description>Mac Bin 40 B (Jpn)</description>
 		<!-- Serial: MUJ-9703-2 -->
@@ -494,7 +494,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="maconpip">
 		<description>Macintosh on Pippin (USA)</description>
 		<!-- Serial: ? -->
@@ -507,7 +507,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="msgundam">
 		<description>Mobile Suit Gundam: Zion Dukedom Military-File (Jpn)</description>
 		<!-- Serial: BDE-10038 -->
@@ -519,7 +519,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="msgunwb">
 		<description>Mobile Suit Gundam: White Base (Jpn)</description>
 		<!-- Serial: BDE-10031 -->
@@ -531,7 +531,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="music1">
 		<description>Music Island: Vol. 1 (Prokofiev Peter &amp; the Wolf) (Jpn)</description>
 		<!-- Serial: BDS-20007 -->
@@ -543,7 +543,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="music2">
 		<description>Music Island: Vol. 2 (Tchaikovsky The Nutcracker) (Jpn)</description>
 		<!-- Serial: BDS-20027 -->
@@ -555,7 +555,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="music3">
 		<description>Music Island: Vol. 3 (Vivaldi The Four Seasons) (Jpn)</description>
 		<!-- Serial: BDS-20028 -->
@@ -567,7 +567,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="music4">
 		<description>Music Island: Vol. 4 (Saint-Saens Carnival of the Animals) (Jpn)</description>
 		<!-- Serial: BDS-20029 -->
@@ -579,7 +579,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="nemurenu">
 		<description>Nemurenu Yoru no Chiisana Ohanashi (Jpn)</description>
 		<!-- Serial: BDS-20015 -->
@@ -591,7 +591,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="pease">
 		<description>Pease (Jpn)</description>
 		<!-- Serial: PEASE002 -->
@@ -603,7 +603,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="peasetur">
 		<description>Pease Turbo (Jpn)</description>
 		<!-- Serial: PEASE 2001 -->
@@ -627,7 +627,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="navcd11">
 		<description>Pippin Navigator CD (Jpn, Ver. 1.1)</description>
 		<!-- Serial: BDB-008 (Disk 4 vol.1) -->
@@ -651,7 +651,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="netcd2">
 		<description>Pippin Network CD (Jpn, Ver. 2.0)</description>
 		<!-- Serial: BDB-011 (Disk 4 vol.1) -->
@@ -663,7 +663,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="netcd21">
 		<description>Pippin Network CD (Jpn, Ver. 2.1)</description>
 		<!-- Serial: BDB-014 (Disk 6 vol.1.1) -->
@@ -687,7 +687,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="sdk">
 		<description>Pippin Software Develepment Kit (1996.11)</description>
 		<!-- Serial: ? -->
@@ -699,7 +699,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="cataloga" cloneof="catalog">
 		<description>Pippin Title CD-ROM Catalog: Vol. I: 1996.3 (Jpn, Alt)</description>
 		<!-- Serial: BDB-007 (Disk 4 vol.1) -->
@@ -723,7 +723,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="powerran">
 		<description>Power Rangers Zeo Vs. The Machine Empire (USA)</description>
 		<!-- Serial: 41018F -->
@@ -735,7 +735,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="racingd">
 		<description>Racing Days (Jpn)</description>
 		<!-- Serial: BDE-20008 -->
@@ -747,7 +747,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="sdgumdam">
 		<description>SD Gundam Wars (Jpn)</description>
 		<!-- Serial: BDE-10017 -->
@@ -759,7 +759,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="sdultram">
 		<description>SD Ultraman no Chyousen! Meiro Island (Jpn)</description>
 		<!-- Serial: BDE-10010 -->
@@ -771,7 +771,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="seesawc1">
 		<description>SeesawC 1 - My favorite things - Sukinamonodake Eitango 120 (Jpn)</description>
 		<!-- Serial: BDE-10006 -->
@@ -783,7 +783,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="seesawc2">
 		<description>SeesawC 2 - My favorite places - Sukinatokorode Eitango 400 (Jpn)</description>
 		<!-- Serial: BDE-10023 -->
@@ -795,7 +795,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="shichiso">
 		<description>Shichisokusen (Jpn)</description>
 		<!-- Serial: BDS-20019 -->
@@ -807,7 +807,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="shockwav">
 		<description>Shockwave: Invasion Earth 2019 (Jpn)</description>
 		<!-- Serial: BDS-20024 -->
@@ -831,7 +831,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="supermara" cloneof="supermar">
 		<description>Super Marathon (USA, Alt)</description>
 		<!-- Serial: 41028C -->
@@ -843,7 +843,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="tbreak">
 		<description>T-Break (Jpn)</description>
 		<!-- Serial: BDS-20026 -->
@@ -855,7 +855,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="tamagotc">
 		<description>Tamagotchi CD-ROM (Jpn)</description>
 		<!-- Serial: BDE-10033 -->
@@ -867,7 +867,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="tropicis">
 		<description>Tropic Island (Jpn)</description>
 		<!-- Serial: BDS-20011 -->
@@ -903,7 +903,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="tvwrks2">
 		<description>TV Works (Jpn, Ver. 2.0)</description>
 		<!-- Serial: BDB-009 (Disk 4 vol.1) -->
@@ -915,7 +915,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="tvwrks21">
 		<description>TV Works (Jpn, Ver. 2.1)</description>
 		<!-- Serial: BDB-013 (Disk 6 vol.1.1) -->
@@ -927,7 +927,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="tvwrks3">
 		<description>TV Works (USA, Ver. 3.0)</description>
 		<!-- Serial: 61528 -->
@@ -939,7 +939,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="tvwrksp">
 		<description>TV Works (Jpn, Ver. POP)</description>
 		<!-- Serial: BDB-020 -->
@@ -963,7 +963,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ultramana" cloneof="ultraman">
 		<description>Ultraman: The Digital Board Game (Jpn, Alt)</description>
 		<!-- Serial: BDE-70002 -->
@@ -975,7 +975,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ultramaq">
 		<description>Ultraman Quiz King (Jpn)</description>
 		<!-- Serial: BDE-70020 -->
@@ -987,7 +987,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="victorp">
 		<description>Victorian Park (Jpn)</description>
 		<!-- Serial: BDE-10004-1 -->
@@ -1007,7 +1007,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="webview">
 		<description>WebViewer With Microsoft Internet Explorer 3.0 for Macintosh (Jpn)</description>
 		<!-- Serial: BDB-026 -->
@@ -1019,7 +1019,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="yellow1">
 		<description>Yellow Brick Road I (Jpn)</description>
 		<!-- Serial: BDS-20022 -->
@@ -1031,7 +1031,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="yellow2">
 		<description>Yellow Brick Road II CD1 (Jpn)</description>
 		<!-- Serial: BDS-20023 -->
@@ -1050,7 +1050,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="yellows">
 		<description>Yellows - Akira Gomi Photographs (Jpn)</description>
 		<!-- Serial: BDS-20001 -->
@@ -1062,7 +1062,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="yellws2">
 		<description>Yellows 2.0 - Tokyo 1993 Akira Gomi Photographs (Jpn)</description>
 		<!-- Serial: BDS-20002 -->
@@ -1074,7 +1074,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="yokumite">
 		<description>Yoku Mite Goran (Jpn)</description>
 		<!-- Serial: BDS-20018 -->
@@ -1086,7 +1086,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="zukkoke">
 		<description>Zukkoke Sanningumi: Drama Satsujinjiken (Jpn</description>
 		<!-- Serial: BDE-10032 -->

@@ -50,7 +50,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Cassette 5 -->
 	<software name="mathema1">
 		<description>Mathematik I / Mathematics I / Mathematique I</description>
@@ -269,7 +269,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Cassette 23 -->
 	<software name="pinball">
 		<description>Flipper / Pinball</description>
@@ -444,7 +444,7 @@
 	</software>
 
 	<!-- Cassette 39 (unreleased) -->
-	
+
 	<!-- Cassette 40 -->
 	<software name="suprspac">
 		<description>Super-Space</description>

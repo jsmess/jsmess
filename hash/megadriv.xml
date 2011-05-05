@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
     UNDUMPED / TO BE REDUMPED LIST
-   
+
     2IN1 (COSMIC SPACEHEAD FANTASTIC DIZZY)	PAL
     2IN1 (PSYCHIC PINBALL MICRO MACHINES)	PAL
     ADVANCED DAISENRYAKU					JAPAN		we have Rev A, Rev 0 needed
@@ -53,7 +53,7 @@
     WORLD OF ILLUSION						JAPAN		we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
 -->
 
-<!-- 
+<!--
 
 Known undumped protos
 
@@ -75,7 +75,7 @@ Known undumped protos
   * Jack Nicklaus Power Challenge
   * Danny Sullivan's Indy Heat
   * Star Trek Starfleet Academy
-  
+
 Known undumped pirates
 
   * Tec Toy Mega Drive 3 (with 86 built in games)
@@ -83,7 +83,7 @@ Known undumped pirates
   * Shizen Mahjong / Competition Mahjong (by Sachen, apparently dumped but hoarded)
   * Thunderbolt II - 雷電伝説II
   * Magic 7 Block - 百変七巧板
-  * Chinese Battle Chess (?) - 戦　棊 
+  * Chinese Battle Chess (?) - 戦　棊
   * Bomboy (by Gamtek)
   * 16 Tile Mahjong II (by Gamtek)
 
@@ -103,7 +103,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="f-22_intercept_f-202-4.u1" size="524288" crc="649771f8" sha1="6daeca39841f06549373f3a4fd746f3e1c95c328" offset="000000" /> 
+				<rom name="f-22_intercept_f-202-4.u1" size="524288" crc="649771f8" sha1="6daeca39841f06549373f3a4fd746f3e1c95c328" offset="000000" />
 				<rom name="f-22_intercept_f-202-1.u2" size="131072" crc="d3d7cbb8" sha1="72e56f858bfe88c2529939304ba49eee3fe14353" offset="0x080000" loadflag="load16_byte" />
 			</dataarea>
 		</part>
@@ -16303,7 +16303,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		On the Quackshot PCB there is a 512Kb rom.
 		Normally all the address lines from A1 to A19 (the whole 512Kb range) tied to the chip in the right order.
 		But here we have the megadrive A18 line tied to the A20 pin of the rom.
-		This means that the Megadrive sees the first 256Kb of the rom followed by 0xc0000 lenght range of mirrored/zero-ed data 
+		This means that the Megadrive sees the first 256Kb of the rom followed by 0xc0000 lenght range of mirrored/zero-ed data
 		then again the last 256Kb of the game.
 		I think they did that for a crappy (really crappy) copy protection.
 	-->
@@ -25307,8 +25307,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	
-    
+
+
 <!-- dumps which need ad hoc handlers to be installed in the emulator -->
 
 	<software name="12in1">
@@ -26060,11 +26060,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 	</software>
-    
-    
+
+
     <!-- The next development tools have been dumped by Tiido: all of them would require PC connection with Sega Loader Board and LPT cable.
     We still need to find the PC-side software for these dumps... -->
-    
+
 	<software name="gems">
 		<description>GEMS v2.8</description>
 		<year>199?</year>
@@ -26075,7 +26075,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 	</software>
-    
+
 	<software name="sndtool">
 		<description>Sound Tool v2.2?</description>
 		<year>1991</year>
@@ -26086,7 +26086,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 	</software>
-    
+
 	<software name="arttool">
 		<description>Art Tool</description>
 		<year>199?</year>
@@ -26097,7 +26097,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 	</software>
-    
+
 
 <!--
 	<software name="debugc">
@@ -26124,7 +26124,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 -->
 
 <!-- This is here for documentation purposes, but it's not available.
-	
+
 	<software name="indy">
 		<description>Indiana Jones' Greatest Adventures (Release Candidate)</description>
 		<year>199?</year>

@@ -40,8 +40,8 @@ TODO: split the content of the various chips
 		</part>
 	</software>
 
-    <!-- astrop1 differs from astropin only in the 1st byte. 
-        This image came from FunnyMu < 0.43, and it might be 
+    <!-- astrop1 differs from astropin only in the 1st byte.
+        This image came from FunnyMu < 0.43, and it might be
         a bad dump (astropin has been confirmed good) -->
 	<software name="astropin1" cloneof="astropin">
 		<description>Astro Pinball (Bad?)</description>
@@ -418,8 +418,8 @@ TODO: split the content of the various chips
 		</part>
 	</software>
 
-    <!-- hapmon is a homebrew hex editor created in the 80s and perfectly working 
-        on the real machine. It was dumped and released to the public in ~2002, 
+    <!-- hapmon is a homebrew hex editor created in the 80s and perfectly working
+        on the real machine. It was dumped and released to the public in ~2002,
         when FunnyMu emulator (written by Paul Hayter) was released -->
 	<software name="hapmon">
 		<description>Hapmon</description>

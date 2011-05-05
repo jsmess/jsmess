@@ -16,7 +16,7 @@
 				<rom name="disk a.d88" size="697008" crc="9cf82887" sha1="ba201051640682588124335d5c08a9a38c408061" offset="0" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
 				<rom name="disk b.d88" size="697008" crc="897257a1" sha1="916332d226a7e2fe60613b46d003c5de196bb8e4" offset="0" />
@@ -24,7 +24,7 @@
 		</part>
 	</software>
 
-	<software name="arion">  
+	<software name="arion">
         <!-- Alt. Title: ネオ・ヒロイック・ファンタジア・アリオン -->
 		<description>Neo Heroic Fantasia Arion</description>
 		<year>198?</year>
@@ -61,7 +61,7 @@
 		</part>
 	</software>
 
-	<software name="eiyuuden">  
+	<software name="eiyuuden">
         <!-- Alt. Title: 英雄伝説サーガ -->
 		<description>Eiyuu Densetsu Saga</description>
 		<year>198?</year>
@@ -139,7 +139,7 @@
 				<rom name="disk1.d88" size="697008" crc="777158c0" sha1="35b991cd69a11e0ec22470f1bd9807c65c53a4e3" offset="0" />
 			</dataarea>
 		</part>
-    
+
         <!-- original disk 2 filename: ﾃｩ-ﾃｼ`ﾃｩﾃ榲ｩﾃｭﾃｩﾃ凝ｩﾂｺﾃｩ-ﾃｩﾂ｡ﾃｩﾃ.D88 -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -238,7 +238,7 @@
 		</part>
 	</software>
 
-	<software name="mugen">  
+	<software name="mugen">
         <!-- Alt. Title: 夢幻の心臓 -->
 		<description>Mugen no Shinzou</description>
 		<year>198?</year>
@@ -251,7 +251,7 @@
 		</part>
 	</software>
 
-	<software name="mugen2">  
+	<software name="mugen2">
         <!-- Alt. Title: 夢幻の心臓Ⅱ -->
 		<description>Mugen no Shinzou II</description>
 		<year>198?</year>

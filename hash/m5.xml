@@ -65,7 +65,7 @@ Programming Languages:
  - DISK BASIC
 
 
-what about European carts? 
+what about European carts?
 and why some of the dumps below have weird size?
 
 
@@ -402,7 +402,7 @@ and why some of the dumps below have weird size?
 <!-- these come from TOSEC: they do not work and it's not clear where they
 come from... they might be eventually removed -->
 
-<!-- the first contains Czech text strings so it might be a real Czech cart, 
+<!-- the first contains Czech text strings so it might be a real Czech cart,
 but we need more info -->
 	<software name="unk_maze" supported="no">
 		<description>Unknown CSMAZE</description>

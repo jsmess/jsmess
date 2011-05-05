@@ -9,7 +9,7 @@
 	At the F-Basic Ready prompt, type run"" and press Return.
 	If a Bad File Mode error occurs, then you must type loadm"",r and press Return.  Once the loader has loaded,
 	type exec and press Return, and the application will run, or continue to load.
-	
+
 	If you are using a disk version of F-Basic, then put CAS0: in the quotes.  Note that this is case-sensitive.
 -->
 
@@ -863,7 +863,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 <!-- カムイの剣 -->
 	<software name="kami">
 		<description>カムイの剣</description>

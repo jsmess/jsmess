@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- 
+<!--
 
 Known Undumped protos: -
 
-  - Behind Jaggi Lines 			Atari 				 CX5254  (Released as "Rescue on Fractalus")
+  - Behind Jaggi Lines			Atari				 CX5254  (Released as "Rescue on Fractalus")
   - Fail Safe                   Atari                CX5210  (Released as "Countermeasure")
   - Jungle River Cruise         Atari                        (Created to work with the unreleased "Puffer" Exercise Bicycle)
   - Muppets Go-Round            Atari                CX5234  (Released on the Atari 8bit as "Sesame Street Letter Go Round")
@@ -54,7 +54,7 @@ Possible Undumped protos: -
   - Moonsweeper                 Imagic
   - Ms. Pac-Man                 Atari                           (Created to work with the unreleased "Puffer" Exercise Bicycle)
   - Omega Race                  CBS                   80093
-  - Orbiter                     Atari                 CX5250    (Possibly released as "Last Starfighter") 
+  - Orbiter                     Atari                 CX5250    (Possibly released as "Last Starfighter")
   - Party Mix                   Starpath
   - Polaris                     Tigervision           700752
   - Pole Position               Atari                           (Created to work with the unreleased "Puffer" Exercise Bicycle)

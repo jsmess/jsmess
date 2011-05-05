@@ -703,7 +703,7 @@
 			</dataarea>
 		</part>
 	</software>
-    
+
     <software name="capflag" supported="partial">
 		<description>Capture the Flag (NTSC)</description>
 		<year>1983</year>
@@ -1069,8 +1069,8 @@
 				<rom name="d&apos;fuse (tymac)(1984)(v2cdf).a0" size="8192" crc="f9abf6c0" sha1="8b92be771e4a74923ae6cf5a866ff678996afff8" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="dncgbear">
 		<description>Dancing Bear (NTSC)</description>
 		<year>1983</year>
@@ -1083,8 +1083,8 @@
 				<rom name="dancing bear (koala)(1983)(ju).a0" size="8192" crc="70655ec0" sha1="b2c640e8c3b1d89f3bfaede6690343d7f08c605c" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="deadduck">
 		<description>Deadly Duck (PAL)</description>
 		<year>1982</year>
@@ -1095,8 +1095,8 @@
 				<rom name="deadly duck (sirius)(1982)(220--)(e).a0" size="4096" crc="bc0cf5d8" sha1="9a14eebc56a16a0cbb6edb54fc626347dbf6e2d4" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
      <software name="deadskys">
 		<description>Deadly Skies (PAL)</description>
 		<year>1983</year>
@@ -1106,8 +1106,8 @@
 				<rom name="deadly skies (tronix)(1983)(e).a0" size="4096" crc="6ea53c70" sha1="e85c5b2a41c10d30bf64001b10506e201a49a068" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="defender">
 		<description>Defender</description>
 		<year>1983</year>
@@ -1121,8 +1121,8 @@
 				<rom name="defender (atarisoft)(1983)(rx8507)(jue).a0" size="8192" crc="be501a8a" sha1="314c449a075788d7f40213fbbda40b788c1fa648" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="demonatk">
 		<description>Demon Attack (NTSC)</description>
 		<year>1983</year>
@@ -1133,8 +1133,8 @@
 				<rom name="demon attack (imagic)(1983)(720050-1a)(ju).a0" size="4096" crc="a8ee03a2" sha1="4dccf54de3e0d3e0578640f585a23b2851593bac" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="demonatp" cloneof="demonatk">
 		<description>Demon Attack (PAL)</description>
 		<year>1983</year>
@@ -1145,8 +1145,8 @@
 				<rom name="demon attack (imagic)(1983)(720050-1a)(e).a0" size="4096" crc="fd031042" sha1="99277547d3aa48417374e43ad4b1da2c95472199" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="digdug">
 		<description>Dig Dug (NTSC)</description>
 		<year>1983</year>
@@ -1160,8 +1160,8 @@
 				<rom name="dig dug (atarisoft)(1983)(rx8510)(ju).a0" size="8192" crc="fb8d109a" sha1="a1bca2d6167b954e38f3ceb21948f3c54ec15299" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="dkong">
 		<description>Donkey Kong (NTSC)</description>
 		<year>1983</year>
@@ -1175,8 +1175,8 @@
 				<rom name="donkey kong (atarisoft)(1983)(rx8513)(ju).a0" size="8192" crc="982523cc" sha1="b41cb541bb722547b527bf4be29ea3eb0ff15a1d" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="dgobbler">
 		<description>Dot Gobbler (NTSC)</description>
 		<year>198?</year>
@@ -1186,8 +1186,8 @@
 				<rom name="dot gobbler (machine language games)(198-)(ju).a0" size="4096" crc="c7c7b768" sha1="728b321bde8b3b48fca0d205ba5c5a336b1358d4" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="dgobblra" cloneof="dgobbler">
 		<description>Dot Gobbler (NTSC) (Patched)</description>
 		<!-- Patched to run in RAM. -->
@@ -1198,8 +1198,8 @@
 				<rom name="dot gobbler (machine language games)(198-)(ju) (patched).a0" size="4096" crc="98322c81" sha1="1f87735c07c9d4231c1b0949c752cf9a8a70f09b" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="drgnfire">
 		<description>Dragonfire</description>
 		<year>1983</year>
@@ -1210,8 +1210,8 @@
 				<rom name="dragonfire (imagic)(1983)(720052-1a).a0" size="8192" crc="3a0b13ab" sha1="431487b8a822412024bfc8c252b23452450d3c93" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="droids">
 		<description>Droids</description>
 		<year>1983</year>
@@ -1221,8 +1221,8 @@
 				<rom name="droids (tg software)(1983)(jue).a0" size="8192" crc="42bf39be" sha1="3ac9668259e4abbf98d4f6d98c28044e1f4a3b8d" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="et">
 		<description>E.T. - The Extra Terrestrial (PAL)</description>
 		<year>1983</year>
@@ -1232,8 +1232,8 @@
 				<rom name="e.t. - the extra terrestrial (h. jans)(1983)(e).a0" size="8192" crc="c238527c" sha1="45c483e2e2eba1f422325429f3a7247cef3462e3" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="et1" cloneof="et">
 		<description>E.T. - The Extra Terrestrial (PAL, Alt)</description>
 		<year>1983</year>
@@ -1246,8 +1246,8 @@
 				<!-- 0x1ffe : 0xc0 0x00 ('et') - 0x00 0xff ('et1') -->
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="exbasic">
 		<description>ExBasic Level II</description>
 		<year>1982</year>
@@ -1257,8 +1257,8 @@
 				<rom name="exbasic level ii (andreas dipke &amp; michael krause)(1982)(jue).a0" size="8192" crc="3f3a0e1b" sha1="7e1bc9ebc42e812afde4ca834c517df5510656f2" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="facemakr">
 		<description>Face Maker</description>
 		<year>1983</year>
@@ -1269,8 +1269,8 @@
 				<rom name="face maker (hes)(1983)(c324)(jue).a0" size="8192" crc="965f0448" sha1="289000ca65c21cb2ed73fe6afe8c3e6b5f18b533" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
     <software name="facemakrp" cloneof="facemakr">
 		<description>Face Maker (Patched)</description>
 		<!-- Patched to run in RAM. -->
@@ -1282,7 +1282,7 @@
 				<rom name="face maker (hes)(1983)(c324)(jue) (patched).a0" size="8192" crc="5dd159ff" sha1="04ce8e475781b9ba81457dea60d575c5b864c58f" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
     <software name="fasteddy">
 		<description>Fast Eddie</description>
@@ -1294,7 +1294,7 @@
 				<rom name="fast eddie (sirius)(1982)(220--).a0" size="8192" crc="59323c50" sha1="14e2e9c9c560764e9425896a9186a6a14cd1e6f2" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="finalorb">
 		<description>Final Orbit + Bumper Bash (NTSC)</description>
@@ -1306,7 +1306,7 @@
 				<rom name="final orbit + bumper bash (sirius)(1983)(220--)(ju).a0" size="8192" crc="18d872de" sha1="c3cdd958e7ccc0daeb7d7467ee8444766325ab1e" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="flipper">
 		<description>Flipper 1.0</description>
@@ -1317,7 +1317,7 @@
 				<rom name="flipper 1.0 (micro digital)(198-).a0" size="8192" crc="24c56b66" sha1="1e715264fa9a505c792348052a35ce40073ab4eb" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="4encntr">
 		<description>The Fourth Encounter</description>
@@ -1329,7 +1329,7 @@
 				<rom name="fourth encounter, the (thorn emi)(1983)(thc22005)(jue).a0" size="8192" crc="da4a0922" sha1="0655948ea8d48060ce7acd43da4fbc82741d8ce8" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="frogger">
 		<description>Frogger</description>
@@ -1341,7 +1341,7 @@
 				<rom name="frogger (parker brothers)(1983)(pb1410).a0" size="8192" crc="f8bd8024" sha1="7e41246cca49929f7237eab8ca0622af6d8bc009" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="frogman">
 		<description>Frogman</description>
@@ -1352,7 +1352,7 @@
 				<rom name="frogman (198-).a0" size="8192" crc="83d11d1a" sha1="af16b7f5e7f7c31e1a3e24fb33aa474fef722243" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="funmusic">
 		<description>Fun with Music</description>
@@ -1363,7 +1363,7 @@
 				<rom name="fun with music (epyx)(1983)(jue).a0" size="8192" crc="fff7e3d2" sha1="f02ccfa0b793e984a0bced6460a7844861d62d8e" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="galaxian">
 		<description>Galaxian</description>
@@ -1375,7 +1375,7 @@
 				<rom name="galaxian (atarisoft)(1984)(rx8541)(jue).a0" size="8192" crc="bde05533" sha1="f9b179da71893813e9a70494dea9babc85595e18" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="grdnwars">
 		<description>Garden Wars (NTSC)</description>
@@ -1387,7 +1387,7 @@
 				<rom name="garden wars (commodore)(1982)(vic-1932)(ju).a0" size="8192" crc="e5117308" sha1="79d33b7f3cdd0fce5a1a80134f828f344d55cc1a" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="gstmanor">
 		<description>Ghost Manor (NTSC)</description>
@@ -1400,7 +1400,7 @@
 				<rom name="ghost manor (xonox)(1983)(6215-a)(ju).a0" size="8192" crc="144daf5a" sha1="b9c986e820b4e95a55b64cf0e3117564c718ffea" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="goldfvr">
 		<description>Gold Fever</description>
@@ -1411,7 +1411,7 @@
 				<rom name="gold fever (tronix)(1983)(jue).a0" size="4096" crc="90c65375" sha1="a689b2efb42e2b3db90af64f288a2a1f13e28e9d" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="gorf">
 		<description>Gorf</description>
@@ -1423,7 +1423,7 @@
 				<rom name="gorf (commodore)(1982)(vic-1923)(jue).a0" size="8192" crc="3f06ac97" sha1="3b3969e33f46960d401ad6a677add9fd5e9dd108" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="gridrunr">
 		<description>Gridrunner (NTSC)</description>
@@ -1435,7 +1435,7 @@
 				<rom name="gridrunner (hes)(1982)(c312) (ju).a0" size="4096" crc="2b190aea" sha1="1f985ceb947b336f8600348e2d0636f64fb90873" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="gridrunp" cloneof="gridrunr">
 		<description>Gridrunner (PAL)</description>
@@ -1447,7 +1447,7 @@
 				<rom name="gridrunner (hes)(1982)(c312)(e).a0" size="4096" crc="c1b3e1ca" sha1="878f5adda944a9bc2852c13952d40fca971964d2" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="handykit">
 		<description>Handy Toolkit (NL)</description>
@@ -1458,7 +1458,7 @@
 				<rom name="handy toolkit (198-)(nl).a0" size="8192" crc="486eea49" sha1="3f9988391c9475939224a8b42f8fb686220e2152" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="hesmon">
 		<description>HesMon v1.1</description>
@@ -1470,7 +1470,7 @@
 				<rom name="hesmon v1.1 (hes)(1982)(c302)(jue).a0" size="4096" crc="e6c5b849" sha1="7802ba9bd3787cf9b7883659cf82c6200248bc59" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="hesmona" cloneof="hesmon">
 		<description>HesMon v1.1 (Alt)</description>
@@ -1485,7 +1485,7 @@
 				<!-- 0x0d98 : 0x91 ('hesmon') - 0xd1 ('hesmona') -->
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="heswritr">
 		<description>HesWriter v1.1</description>
@@ -1497,7 +1497,7 @@
 				<rom name="heswriter v1.1 (hes)(1982)(c304)(jue).a0" size="8192" crc="d60a9372" sha1="d53bb228bb72c5725ec6e33caf37f759361eaa92" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="hireskit">
 		<description>HiRes Toolkit</description>
@@ -1521,7 +1521,7 @@
 				<rom name="home babysitter ii (commodore)(1982)(vic-1928)(jue).a0" size="8192" crc="dea14651" sha1="6af39698f9056e31cae185076dd11b6a7647ab81" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="hfinance">
 		<description>Household Finance</description>
@@ -1533,7 +1533,7 @@
 				<rom name="household finance (creative)(1983)(vi hf c)(jue).a0" size="8192" crc="a2a3dc00" sha1="ec36c91f0de9f94c762ab4e492e9f84715bee36c" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="fltsim">
 		<description>IFR - Flight Simulator</description>
@@ -1544,7 +1544,7 @@
 				<rom name="ifr - flight simulator (academy)(1983)(jue).a0" size="8192" crc="9770700a" sha1="bff917be0ba3067639787b03ece0beb6af39d15a" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="fltsima" cloneof="fltsim">
 		<description>IFR - Flight Simulator (Alt)</description>
@@ -1557,7 +1557,7 @@
 				<!-- 0x0094 : 0xad ('fltsim') - 0x8d ('fltsima') -->
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="inchip">
 		<description>In The Chip (NTSC)</description>
@@ -1572,7 +1572,7 @@
 				<rom name="in the chip (creative)(1983)(vi ch c)(ju).a0" size="8192" crc="f43976c1" sha1="3bce8177b5447dadebd3f4ae192e27fbc4bbe609" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="jawbrk2">
 		<description>Jawbreaker II (NTSC)</description>
@@ -1584,7 +1584,7 @@
 				<rom name="jawbreaker ii (sierra)(1981)(jbl-401)(ju).a0" size="8192" crc="d58f2df6" sha1="4acdb8b76dd585202a1a34ed812f70d048b623a9" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="jawbrk2p" cloneof="jawbrk2">
 		<description>Jawbreaker II (PAL)</description>
@@ -1596,7 +1596,7 @@
 				<rom name="jawbreaker ii (sierra)(1981)(jbl-401)(e).a0" size="8192" crc="a92bfff2" sha1="cc63a501df4d4199ef2fcbe00dc34ec44150e4ea" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="jellym2">
 		<description>Jelly Monster v.2</description>
@@ -1608,7 +1608,7 @@
 				<rom name="jelly monsters v2.0 (commodore)(1981)(vic-1905).a0" size="8192" crc="9cce34e3" sha1="2af73eb9680f8c3d001b819ce6de54f6d1e75321" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="jellym2f" cloneof="jellym2">
 		<description>Jelly Monster v.2 (Fixed)</description>
@@ -1621,7 +1621,7 @@
 				<rom name="jelly monsters v2.0 (commodore)(1981)(vic-1905) [fixed].a0" size="8192" crc="cc514ae5" sha1="9bf55e1da16ae31e7f12020270d595550c4a5d16" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="jellym1" cloneof="jellym2">
 		<description>Jelly Monster v.1</description>
@@ -1633,7 +1633,7 @@
 				<rom name="jelly monsters v1.0 (commodore)(1981)(vic-1905).a0" size="8192" crc="d8af8fe3" sha1="e46f91b0e9355bf260e4cd85ab4b10fa89c24a20" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="jellym1f" cloneof="jellym2">
 		<description>Jelly Monster v.1 (Fixed)</description>
@@ -1646,7 +1646,7 @@
 				<rom name="jelly monsters v1.0 (commodore)(1981)(vic-1905) [fixed].a0" size="8192" crc="d0d4b510" sha1="75e7f350199fd27e08cd04fe14fa59cc1f05a32e" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="jnglhunt">
 		<description>Jungle Hunt (NTSC)</description>
@@ -1661,7 +1661,7 @@
 				<rom name="jungle hunt (atarisoft)(1984)(rx8529)(ju).a0" size="8192" crc="c1114c57" sha1="935601aca11db74d68c5f2b75bd038294afc7cf4" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="keyquest">
 		<description>Key-Quest</description>
@@ -1672,7 +1672,7 @@
 				<rom name="key-quest (microware)(1983).a0" size="8192" crc="c10c8596" sha1="663bb204211b932648223a483dc174e27b3fae87" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="kidskeys">
 		<description>Kids on Keys</description>
@@ -1684,7 +1684,7 @@
 				<rom name="kids on keys (hes)(1983)(c325).a0" size="8192" crc="e695bd44" sha1="e970e6f979607fbd92f3836cdfe309cc77979805" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="kindcomp">
 		<description>Kindercomp</description>
@@ -1699,7 +1699,7 @@
 				<rom name="kindercomp (hes)(1983)(c322)(jue).a0" size="8192" crc="d898e77a" sha1="61f17c509ccca51487ffe4e6612c6576f84e8554" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="kantiks">
 		<description>K-Razy Antiks (NTSC)</description>
@@ -1714,7 +1714,7 @@
 				<rom name="k-razy antiks (cbs software)(1982)(22107)(ju).a0" size="8192" crc="70ae4daa" sha1="55a9e44d24a8ae63d73bfc7f9a6667b7fa3ed8de" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="kantikp" cloneof="kantiks">
 		<description>K-Razy Antiks (PAL)</description>
@@ -1729,7 +1729,7 @@
 				<rom name="k-razy antiks (cbs software)(1982)(22107)(e).a0" size="8192" crc="324e2a30" sha1="887eaa98420655628997d7c89622e9b285955649" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="kpatrol">
 		<description>K-Star Patrol (PAL)</description>
@@ -1744,7 +1744,7 @@
 				<rom name="k-star patrol (cbs software)(1982)(22108)(e).a0" size="8192" crc="2fe93f44" sha1="329bb057e30b53098c19259d09c9bda7111a503e" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="laserzne">
 		<description>Laser Zone</description>
@@ -1756,7 +1756,7 @@
 				<rom name="lazer zone (hes)(1983)(c319)(jue).a0" size="8192" crc="019d102b" sha1="d816fae84d86928cdd2a3fe9bd5903f15378c154" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="loderunr">
 		<description>Lode Runner</description>
@@ -1770,7 +1770,7 @@
 				<rom name="lode runner (br0derbund)(1983)(jue).a0" size="8192" crc="38b757cd" sha1="5473d18b324a6a9b5255c545b12133ec009a607a" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="lleeper">
 		<description>Lunar Leeper (NTSC)</description>
@@ -1785,7 +1785,7 @@
 				<rom name="lunar leeper (sierra)(1981)(lll-401)(ju).a0" size="8192" crc="af98ff32" sha1="c9c24e54cc62d33cb897e0198b8f82fc1d9f2323" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="monitor">
 		<description>Machine Language Monitor</description>
@@ -1813,7 +1813,7 @@
 				<rom name="mastertype (br0derbund)(1983)(viccart-221)(jue).a0" size="8192" crc="4c9adb5f" sha1="196397225031b2e943f3f4ba299014364ec9f633" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="maze">
 		<description>Maze (NTSC)</description>
@@ -1825,7 +1825,7 @@
 				<rom name="maze (hes)(1983)(c3??)(ju).a0" size="8192" crc="003f5d8d" sha1="127feec36e5a57f84722aa3e8ce1aac0b5dd7d42" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="mjoust">
 		<description>Medieval Joust</description>
@@ -1837,7 +1837,7 @@
 				<rom name="medieval joust (thorn emi)(1983)(thc22007)(jue).a0" size="8192" crc="8bcd8c00" sha1="1f0f22f19bb9e47af76b08e2dd480ce448e08053" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="mjousta" cloneof="mjoust">
 		<description>Medieval Joust (Alt)</description>
@@ -1852,7 +1852,7 @@
 				<!-- 0x0829 : 0x8d 0x2c 0xa8 ('mjoust') - 0x60 0xea 0xea ('mjousta') -->
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="menag">
 		<description>VIC Menagerie</description>
@@ -1864,7 +1864,7 @@
 				<rom name="menagerie  (commodore)(1982)(vic-1926)(jue).a0" size="8192" crc="a3c74629" sha1="aec46a3e6f9797b116cbe6a8792e00530234ae80" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="meteorun">
 		<description>Meteor Run (PAL)</description>
@@ -1876,7 +1876,7 @@
 				<rom name="meteor run (umi)(1982)(1613)(e).a0" size="8192" crc="96c440a8" sha1="e1aecc110d506190eb2eca4d640966ac1cacb741" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="minemad">
 		<description>Mine Madness (NTSC)</description>
@@ -1888,7 +1888,7 @@
 				<rom name="mine madness (thorn emi)(1983)(thc22008)(ju).a0" size="8192" crc="5d22791c" sha1="b44ddde457654cf48a97d4cf90345030bc4243ba" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="mine2049">
 		<description>Miner 2049'er (PAL)</description>
@@ -1899,7 +1899,7 @@
 				<rom name="miner 2049&apos;er (reston)(1983)(e).a0" size="8192" crc="80439200" sha1="32af135822d95ffec61cc11a6ba336897fdf867c" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 <software name="min2049a" cloneof="mine2049">
 		<description>Miner 2049'er (PAL, Alt)</description>
@@ -1912,7 +1912,7 @@
 				<!-- 0x1888 : 0x20 ('mine2049') - 0x5c ('min2049a') -->
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="mobilatk">
 		<description>Mobile Attack</description>
@@ -1923,7 +1923,7 @@
 				<rom name="mobile attack (msd)(1982).a0" size="8192" crc="b6148c28" sha1="ea140363d708e5ec956f2bf59f8a66d633e81af0" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="mobilatp" cloneof="mobilatk">
 		<description>Mobile Attack (Patched)</description>
@@ -1935,7 +1935,7 @@
 				<rom name="mobile attack (msd)(1982) [patched].a0" size="8192" crc="c97c1dca" sha1="c5863e6d5b5326c5dcc19d87144a080b59f2c433" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="moleatak">
 		<description>Mole Attack (NTSC)</description>
@@ -1947,7 +1947,7 @@
 				<rom name="mole attack (commodore)(1981)(vic-1912) (ju).a0" size="8192" crc="9c2d1185" sha1="8f0d31c8f08b4f516ade9ffac1a41c150764aa17" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="moneywar">
 		<description>Money Wars (NTSC)</description>
@@ -1959,7 +1959,7 @@
 				<rom name="money wars (commodore)(1982)(vic-1925)(ju).a0" size="8192" crc="2c20505c" sha1="be17447953d0ac80dd04937dc2b02e025359a4f1" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="monywar1" cloneof="moneywar">
 		<description>Money Wars (NTSC, Alt)</description>
@@ -1973,7 +1973,7 @@
 				<!-- 0x1fff : 0x23 ('moneywar') - 0x44 ('monywar1') -->
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="monywar2" cloneof="moneywar">
 		<description>Money Wars (NTSC, Alt 2)</description>
@@ -1984,11 +1984,11 @@
 			<dataarea name="a000" size="8192">
 				<rom name="money wars (commodore)(1982)(vic-1925)(ju) [a2].a0" size="8192" crc="97ddc091" sha1="383b950bb6eecfa620adc1e2e4a5633af1aa0f3e" offset="0x0000" />
 				<!-- File Difference -->
-				<!-- 0x0765 : 0x0d ('moneywar') - 0x0c ('monywar2') -->	
-				<!-- 0x1fff : 0x23 ('moneywar') - 0x03 ('monywar2') -->				
+				<!-- 0x0765 : 0x0d ('moneywar') - 0x0c ('monywar2') -->
+				<!-- 0x1fff : 0x23 ('moneywar') - 0x03 ('monywar2') -->
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="monstrmz">
 		<description>Monster Maze</description>
@@ -1999,7 +1999,7 @@
 				<rom name="monster maze (epyx)(1982).a0" size="8192" crc="3dd2f438" sha1="5ca560e1621746adba4a9e9ce82c745b997bb52c" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="moonptrl">
 		<description>Moon Patrol (NTSC)</description>
@@ -2014,7 +2014,7 @@
 				<rom name="moon patrol (atarisoft)(1983)(rx8532)(ju).a0" size="8192" crc="b47f9971" sha1="4caa1e1d073b71f6286427755b3925c4bd9d9eb0" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="mosquito">
 		<description>Mosquito Infestation</description>
@@ -2026,7 +2026,7 @@
 				<rom name="mosquito infestation (hes)(1982)(c3??).a0" size="4096" crc="ab89be36" sha1="575fc5d44c90b46b07e7ba22adfcf713042f025d" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="motoracr">
 		<description>Motocross Racer (NTSC)</description>
@@ -2039,7 +2039,7 @@
 				<rom name="motocross racer (xonox)(1984)(6245-b)(ju).a0" size="8192" crc="1858a122" sha1="08bd25248d1b5a28ae7946286c9ce31c102f4ee8" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="mntnking">
 		<description>Mountain King (NTSC)</description>
@@ -2053,7 +2053,7 @@
 				<rom name="mountain king (beyond)(1983)(ju).a0" size="8192" crc="ad3ff0a4" sha1="b5a9a13aefd438129fd3cb51847ae290756a3778" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="mspacman">
 		<description>Ms. Pac-Man (NTSC)</description>
@@ -2068,7 +2068,7 @@
 				<rom name="ms. pac-man (atarisoft)(1983)(rx8544)(ju).a0" size="8192" crc="ffd1ab54" sha1="bfca84006d52ea61f04b2062208c1ea329eb96e7" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="mutnthrd">
 		<description>Mutant Herd (PAL)</description>
@@ -2080,6 +2080,6 @@
 				<rom name="mutant herd (thorn emi)(1982)(thc22004)(e).a0" size="8192" crc="ef92c07e" sha1="0346916eec6e82b5a4145dbfde87f98db1cd2944" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 </softwarelist>

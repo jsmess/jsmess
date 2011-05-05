@@ -47,7 +47,7 @@
 
 -->
 
-<!-- Missing from this list 
+<!-- Missing from this list
 	Rock Paintings - a CD+G disc, it's in A120% format... needs subdata etc.
 -->
 
@@ -381,7 +381,7 @@
 		<description>Night Trap (USA, 32X)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
-  
+
 		<part name="cdrom1" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 1" />
 			<diskarea name="cdrom">
@@ -683,8 +683,8 @@
 
 
 	<!--- Images below are from the TOSEC set -->
- 	<!-- ones believed to be duplicates of those found in the REDUMP set are commented out
- 
+	<!-- ones believed to be duplicates of those found in the REDUMP set are commented out
+
      HOWEVER, this is not confirmed, they should eventually be checked on a case-by-case basis
  -->
 
@@ -699,7 +699,7 @@
 			</diskarea>
 		</part>
 	</software>
- 
+
 <!--
 	<software name="advbatr">
 		<description>The Adventures of Batman and Robin (USA)</description>
@@ -1162,7 +1162,7 @@
 				<disk name="fahrenheit (1995)(sega)(ntsc)(us)(disc 2 of 2)[!][32x, req. key disc]" sha1="537890db94845bb6661eb6f6a3dddd4b4a99926a"/>
 			</diskarea>
 		</part>
- 	</software>
+	</software>
 
 	<software name="fifa">
 		<!-- Serial: T-50055 -->
@@ -1339,7 +1339,7 @@
 			</diskarea>
 		</part>
 	</software>
-  
+
 	<software name="joemont">
 		<!-- Serial: 4201 - Ringcode: SEGA4201RE R2C -->
 		<description>Joe Montana's NFL Football (USA, R2C)</description>
@@ -1854,7 +1854,7 @@
 	</software>
 
 	<!-- probably duplicates -->
-<!-- Serial: T-93015 - Ringcode: CDRM-1033200 2 --> 
+<!-- Serial: T-93015 - Ringcode: CDRM-1033200 2 -->
 <!--
 	<software name="sshrkc" cloneof="sshrk">
 		<description>Sewer Shark (USA, Alt)</description>
@@ -1868,7 +1868,7 @@
 	</software>
 -->
 
-<!-- Serial: T-93015 - Ringcode: CDRM-1095270 1 --> 
+<!-- Serial: T-93015 - Ringcode: CDRM-1095270 1 -->
 <!--
 	<software name="sshrkd" cloneof="sshrk">
 		<description>Sewer Shark (USA, Alt 2)</description>
@@ -1882,7 +1882,7 @@
 	</software>
 -->
 
-<!-- Serial: T-93015 - Ringcode: CDRM-1095270 2 --> 
+<!-- Serial: T-93015 - Ringcode: CDRM-1095270 2 -->
 <!--
 	<software name="sshrkd" cloneof="sshrk">
 		<description>Sewer Shark (USA, Alt 3)</description>
@@ -1919,10 +1919,10 @@
 				<disk name="sherlock holmes - consulting detective vol. ii (1992)(sega)(ntsc)(us)(disc 1 of 2)[!]" sha1="9f7523c2c3b6b2cfdcbd112388e64128c778fc05"/>
 			</diskarea>
 		</part>
- 
- 		<part name="cdrom2" interface="scd_cdrom">
- 			<feature name="part_id" value="Disc 2" />
- 			<diskarea name="cdrom">
+
+		<part name="cdrom2" interface="scd_cdrom">
+			<feature name="part_id" value="Disc 2" />
+			<diskarea name="cdrom">
 				<disk name="sherlock holmes - consulting detective vol. ii (1992)(sega)(ntsc)(us)(disc 2 of 2)[!]" sha1="2ef4f618519f16d885b638d5514b5f0f2ee7c456"/>
 			</diskarea>
 		</part>
@@ -2818,7 +2818,7 @@
 	</software>
 
 	<software name="nfltriv">
-		<!-- Serial: T-135015 - Ringcode: SEGAT135015 R1H --> 
+		<!-- Serial: T-135015 - Ringcode: SEGAT135015 R1H -->
 		<description>NFL Football Trivia Challenge (USA)</description>
 		<year>1994</year>
 		<publisher>CapDisc</publisher>
@@ -2857,7 +2857,7 @@
 				<disk name="pennsmoke2 (mp3-sourced)" sha1="f7c989041a9775f525287981ed6eae778c5bd5b6" status="baddump"/>
 			</diskarea>
 		</part>
- 	</software>
+	</software>
 
 	<software name="popmail">
 		<!-- Serial: T-127035 -->

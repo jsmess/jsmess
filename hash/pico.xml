@@ -1439,7 +1439,7 @@ Notice that most of these will become parent, when the dumps surface
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
-				<rom name="Hello Kitty to McDonald de Asobo! (J) [!p].bin" size="????" crc="d81acb46" sha1="e4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />	
+				<rom name="Hello Kitty to McDonald de Asobo! (J) [!p].bin" size="????" crc="d81acb46" sha1="e4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

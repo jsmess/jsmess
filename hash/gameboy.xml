@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- 
+<!--
 
   To investigate:
   - Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GBC version?
@@ -18819,7 +18819,7 @@
 		</part>
 	</software>
 
-	<!-- Below we list the ripped games from Sachen multicarts (I assumed they come from a 4-in-1 cart, but they could come as well from a 8-in-1 cart). 
+	<!-- Below we list the ripped games from Sachen multicarts (I assumed they come from a 4-in-1 cart, but they could come as well from a 8-in-1 cart).
 		They should be removed as soon as the carts are properly dumped and emulated -->
 	<software name="srider">
 		<description>Street Rider (ripped from 4-in-1 4B-001)</description>

@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pcecd" description="PCE CD-ROM list">
-  
-<!-- The JPN CHDs have all been converted from the 'PD PC-Engine V2' collection, dated 2007 
-       
+
+<!-- The JPN CHDs have all been converted from the 'PD PC-Engine V2' collection, dated 2007
+
     Apparently many of these have extra data tracks appended on the end, so shouldn't be considered
-    perfect 1:1 dumps.  Therefore, assuming better reads are made (maybe some already exist), these 
+    perfect 1:1 dumps.  Therefore, assuming better reads are made (maybe some already exist), these
     are considered replaceable.
-       
+
     Missing CDs (to be confirmed):
        - Akiyama Jin no Suugaku Mystery - Hihou Indo no Honoo wo Shishu Seyo NHK            NHCD4001    12/10/94
        - Gakuraito TDF 2                                                     Pack-In-Video  PVCD-0002   01/25/91
@@ -19,15 +19,15 @@
 
     The USA CHDs are converted from the "Retro ISO Gaming Guild" (RIGG) which is the most complete and accurate
     currently known for Turbo Duo CDs, and therefore are included until better reads are available.
-    
-    
+
+
     NOTE: there appears to be a problem with the either the 'REDUMP.ORG' images, or the emulation / cuesheet
     handling.  The REDUMP.ORG images appear to have each data track as 2 seconds longer causing an additional
     2 second offset in the cuesheet for each data track, furthermore they refuse to boot simply throwing a
     'read error' in MESS/MAME.  Is this some kind of protection on the original discs, or just errors in the way
     various PC software and/or emulators handle them?  There are multiple second audio offset issues with
     several games in MESS/MAME which could be related.
-       
+
 -->
 
 	<!-- JPN releases -->
@@ -2164,7 +2164,7 @@
 		</part>
 	</software>
   -->
-  
+
 	<software name="xanadu2">
 		<description>Kaze no Densetsu Xanadu II (SCD)(Jpn)</description>
 		<!-- Serial: NFCD5001 - Release Date: 1995-06-30 -->
@@ -5154,7 +5154,7 @@
 		</part>
 	</software>
   -->
-  
+
 	<software name="tokimekib" cloneof="tokimeki">
 		<description>Tokimeki Memorial {HRKM70701-2FAAT} (SCD)(Jpn)</description>
 		<!-- Serial: KMCD4007 - Release Date: 1994-05-27 -->

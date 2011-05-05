@@ -5,11 +5,11 @@
   Undumped games
 
   - Game de check! Koutsuu Anzen
-  - Great Ice Hockey Jpn ? (Only 1000 copies were distributed through a 
+  - Great Ice Hockey Jpn ? (Only 1000 copies were distributed through a
   BEEP! magazine contest in 1987, to celebrate the release of Phantasy Star)
-  - Tec Toy SMS 3 with built-in games (74 game, 112 games, 120 games or 
+  - Tec Toy SMS 3 with built-in games (74 game, 112 games, 120 games or
   131 games)
-  - a few other pirate multigame carts (4 Pak All Action + two versions of 
+  - a few other pirate multigame carts (4 Pak All Action + two versions of
   4 in 1 carts)
 
 -->
@@ -1950,7 +1950,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Serial: GB-4001 -->
 	<software name="gaegujan">
 		<description>Gaegujangi Ggachi (Kor)</description>
@@ -5615,7 +5615,7 @@
 		</part>
 	</software>
 
-    <!-- From Bock: "This hack does two things: force the game to run in Japanese mode (with an harder difficulty level), and allows to 
+    <!-- From Bock: "This hack does two things: force the game to run in Japanese mode (with an harder difficulty level), and allows to
     Pause the game by pressing LEFT+RIGHT+Button 2 on joypad 1 (a combination that cannot be done on a normal SMS joypad). -->
 	<software name="wboymlnda" cloneof="wboymlnd">
 		<description>Wonder Boy in Monster Land (Euro, USA, Hacked?)</description>
@@ -6020,7 +6020,7 @@
 	</software>
 
 
-<!-- The next items have been compiled from original source code written by Jeroen Tel. 
+<!-- The next items have been compiled from original source code written by Jeroen Tel.
   It is unsure if Probe has ever written any game code for these licensed titles -->
 
 	<software name="sn_ateam">

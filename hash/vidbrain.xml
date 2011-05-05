@@ -15,21 +15,21 @@
   VB-1000 Money Manager
   VB-1100 Budget System
   VB-1200 Information Manager
-  
+
   Communication Series
   CM01    Timeshare
-  
+
   Education Series
   ED07    Musicianship 1
   ED08    Number Cross
   ED09    Historical Simulation - France in the Old Regime
-  
+
   Entertainment Series
   EN07    Challenge Racer
   EN08    Music Programmer
   EN09    Programmable Football
   EN10    Computer Life
-  
+
   Demonstration Series
   ST01    Demonstration
 
@@ -37,7 +37,7 @@
 <softwarelist name="vidbrain" description="VideoBrain Family Computer cartridges">
 
   <!-- Education Series -->
-  
+
   <software name="musictch">
     <description>Music Teacher 1</description>
     <year>1978</year>
@@ -106,7 +106,7 @@
   </software>
 
   <!-- Entertainment Series -->
-  
+
   <software name="gladiatr">
     <description>Gladiator</description>
     <year>1978</year>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- 
+<!--
 
 Unlicensed Undumped Releases
 
@@ -10,10 +10,10 @@ Unlicensed Undumped Releases
   - Combat 1990
   - Kessel Attack
   - Super Pacman
-  
+
 
 -->
-	<softwarelist name="a7800" description="Atari 7800 cartridges">		
+	<softwarelist name="a7800" description="Atari 7800 cartridges">
 	<software name="32in1" supported="no">
 		<description>32 in 1 (PAL)</description>
 		<!-- Serial: N/A -->
@@ -771,7 +771,7 @@ Unlicensed Undumped Releases
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hanglymn">
 		<description>Hangly-Man (NTSC, Homebrew)</description>
 		<!-- Serial:  -->
@@ -783,7 +783,7 @@ Unlicensed Undumped Releases
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hattricku" cloneof="hattrick">
 		<description>Hat Trick (NTSC, Prototype)</description>
 		<!-- Serial: CX7829 -->
@@ -911,7 +911,7 @@ Unlicensed Undumped Releases
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="joustu" cloneof="joust">
 		<description>Joust (NTSC)</description>
 		<!-- Serial: CX7806 -->
@@ -938,7 +938,7 @@ Unlicensed Undumped Releases
 		</part>
 	</software>
 
-	
+
 	<software name="karatekau" cloneof="karateka">
 		<description>Karateka (NTSC, Prototype)</description>
 		<!-- Serial: CX7822 -->
@@ -1212,7 +1212,7 @@ Unlicensed Undumped Releases
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ninjaglfu" cloneof="ninjaglf">
 		<description>Ninja Golf (NTSC)</description>
 		<!-- Serial: CX7870 -->

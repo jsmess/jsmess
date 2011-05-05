@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="supracan" description="Funtech Super A'Can cartridges">
 	<!-- F001 - Fomosa Duel -->
-	
+
 	<!-- F002 -->
 	<software name="sangofgt">
 		<description>Sango Fighter ~ Wu Jiang Zheng Ba - San Guo Zhi</description>

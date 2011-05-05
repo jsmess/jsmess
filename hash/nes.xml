@@ -33,7 +33,7 @@
 		<publisher>Irem</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="IREM-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="d3d248c9" sha1="64185edc4fd64b5f5e565b90b0ddc241592d899c" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -51,7 +51,7 @@
 		<publisher>Irem</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="IREM-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="1.prg" size="16384" crc="b7e8deca" sha1="3108d4540449ea0a48daaa2644acf16a5de87f08" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -76,7 +76,7 @@
 			<dataarea name="chr" size="8192">
 				<rom name="nes-ty-0 chr" size="8192" crc="2b8336ee" sha1="6b40a3b7ad6214abf9c35bcbf89d9c1da06f47a0" offset="00000" />
 			</dataarea>
- 		</part>
+		</part>
 	</software>
 
 	<software name="1942">
@@ -93,7 +93,7 @@
 			<dataarea name="chr" size="8192">
 				<rom name="cap-19-0 chr" size="8192" crc="03379b76" sha1="d2a6ca1cdd8935525f59f1d38806b2296cb12a12" offset="00000" />
 			</dataarea>
- 		</part>
+		</part>
 	</software>
 
 	<software name="1943">
@@ -110,7 +110,7 @@
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
- 		</part>
+		</part>
 	</software>
 
 	<software name="1943j" cloneof="1943">
@@ -127,7 +127,7 @@
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
- 		</part>
+		</part>
 	</software>
 
 	<software name="sf2010j" cloneof="sf2010">
@@ -154,8 +154,8 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
- 			<feature name="mirroring" value="vertical" />
- 			<feature name="peripheral" value="3dglasses" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="3dglasses" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-wo-0 prg" size="131072" crc="e6a477b2" sha1="ce70e57475f4058ac5a05dfed92163d42f0b8b96" offset="00000" />
 			</dataarea>
@@ -180,7 +180,7 @@
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="425cc61f" sha1="c4ba502c4b2ca5d594b822c1134e997a553077d1" offset="00000" />
 			</dataarea>
- 		</part>
+		</part>
 	</software>
 
 	<software name="4num">
@@ -198,7 +198,7 @@
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="425cc61f" sha1="c4ba502c4b2ca5d594b822c1134e997a553077d1" offset="00000" />
 			</dataarea>
- 		</part>
+		</part>
 	</software>
 
 	<software name="6in1cal" cloneof="6in1hes" supported="partial">
@@ -415,7 +415,7 @@
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-tb-0 prg" size="32768" crc="34a8bd90" sha1="6c335742144e192450e1833cc113241486d57e81" offset="00000" />
 			</dataarea>
@@ -432,7 +432,7 @@
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-tb-0 prg" size="32768" crc="bfd53541" sha1="3c5b9356f4695d2560bd6ed53a7629c8e8f7bf0a" offset="00000" />
 			</dataarea>
@@ -535,7 +535,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
- 			<feature name="peripheral" value="zapper" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="131072">
 				<rom name="rd013n0p" size="131072" crc="cb275051" sha1="022d789897aa1d7e89151e344a2feef40115a4d4" offset="00000" />
 			</dataarea>
@@ -553,7 +553,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
- 			<feature name="peripheral" value="zapper" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-mu-0 prg" size="131072" crc="fbfc6a6c" sha1="a59d7dd528180f1f7af6e4f08c16578eeeb44e25" offset="00000" />
 			</dataarea>
@@ -570,7 +570,7 @@
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-sg-0 prg" size="32768" crc="6f605522" sha1="397900ada05666f54dc379309a3d35178ffbbbd9" offset="00000" />
 			</dataarea>
@@ -587,7 +587,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-2l-0 prg" size="131072" crc="55773880" sha1="493caebaf648dce5f585bece276c73b7015e77ce" offset="00000" />
 			</dataarea>
@@ -842,7 +842,7 @@
 		<publisher>VIC Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="vic-ay-0 prg" size="131072" crc="37f59450" sha1="1ba180792cd1560dbac295a7a0292b52f458ea0e" offset="00000" />
 			</dataarea>
@@ -1021,7 +1021,7 @@
 		<publisher>Konami</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="rv 003 j00p" size="131072" crc="a0f99bb8" sha1="1c1c8cb0bc821ea9f795b609596280741ab2bc73" offset="00000" />
 			</dataarea>
@@ -1092,7 +1092,7 @@
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-ac-0 prg" size="131072" crc="63e992ac" sha1="aadca8dc793cd310fa0d1fe78ff1c8efd3dde843" offset="00000" />
 			</dataarea>
@@ -1175,7 +1175,7 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-am-0 prg" size="32768" crc="8a9586f5" sha1="afaa9b2af6f159d906544ccf88f24332fc45bf21" offset="00000" />
 			</dataarea>
@@ -1192,7 +1192,7 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-am-0 prg" size="32768" crc="3f8fccf9" sha1="1293d08a7a5690aeb08f15b5e4ecec7703b9668b" offset="00000" />
 			</dataarea>
@@ -1209,7 +1209,7 @@
 		<publisher>American Sammy</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-m5-0 prg" size="131072" crc="e2b43a68" sha1="69d7c4bab3b678d7527ce85a5cb29bb36481b924" offset="00000" />
 			</dataarea>
@@ -1311,7 +1311,7 @@
 		<publisher>Konami</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="80401p" size="16384" crc="df189d34" sha1="3cad6d52c0c2f5b78091806c25a9909156acdb20" offset="00000" /> <!-- alt labels exist, e.g. 80403p, but it's the same revision -->
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -1329,7 +1329,7 @@
 		<publisher>Konami</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="804k01p" size="16384" crc="96900967" sha1="1cf703dcbfffff4b93b8d1c6e5f12f9f57367c9d" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -1453,7 +1453,7 @@
 		<publisher>Activision</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-on-0 prg" size="131072" crc="f304f1b9" sha1="4befbeb81265aef234b031aaf86695fd69fd41ac" offset="00000" />
 			</dataarea>
@@ -1470,7 +1470,7 @@
 		<publisher>Tecmo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="tcf-ah-0 prg" size="131072" crc="e1b260da" sha1="f110ae847049723db4ac9213a8ec5bfd23e644f2" offset="00000" />
 			</dataarea>
@@ -1487,7 +1487,7 @@
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-07" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="32768" crc="c9c2a1ec" sha1="5f58aaca377794f9ce9971aea8cc8223fa2a64ab" offset="00000" />
 			</dataarea>
@@ -1504,8 +1504,8 @@
 		<publisher>Taito</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TAITO-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
- 			<feature name="peripheral" value="vaus" />
+			<feature name="mirroring" value="horizontal" />
+			<feature name="peripheral" value="vaus" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="32768" crc="35893b67" sha1="7bb46bd1070f09dbbba3aa9a05e6265fcf9a3376" offset="00000" />
 			</dataarea>
@@ -1522,8 +1522,8 @@
 		<publisher>Taito</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
- 			<feature name="peripheral" value="vaus" />
+			<feature name="mirroring" value="horizontal" />
+			<feature name="peripheral" value="vaus" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-ar-0 prg" size="32768" crc="b8bb48d3" sha1="4cb24e72fa59db0cb1f2e947c73a29f1d35772a0" offset="00000" />
 			</dataarea>
@@ -1556,7 +1556,7 @@
 		<publisher>American Sammy</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-a5-0 prg" size="32768" crc="a8aa7994" sha1="881572735aaacdb4ce0423c8f2837c53cd7e2559" offset="00000" />
 			</dataarea>
@@ -1574,7 +1574,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLSROM" />
 			<feature name="mmc3_type" value="MMC3B" />
- 			<feature name="peripheral" value="battlebox" />
+			<feature name="peripheral" value="battlebox" />
 			<dataarea name="prg" size="262144">
 				<rom name="igs-9t-0 prg" size="262144" crc="cf3b904c" sha1="6ad31c2000c804cb2b80b284eef0696f954fc664" offset="00000" />
 			</dataarea>
@@ -1628,7 +1628,7 @@
 		<publisher>ASCII</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-256" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="32768" crc="c6acceea" sha1="35ef37d9458e5b6776e3e481e4860b785b50b932" offset="00000" />
 			</dataarea>
@@ -1679,7 +1679,7 @@
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-ax-0 prg" size="131072" crc="ed77b453" sha1="7b0b8d19bd56aa255501852136828300ee2d2457" offset="00000" />
 			</dataarea>
@@ -1696,7 +1696,7 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-an-0 prg" size="131072" crc="27ddf227" sha1="64687d063ccbcf7b4c49604e0612a4d331d2aa88" offset="00000" />
 			</dataarea>
@@ -1730,8 +1730,8 @@
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="vertical" />
- 			<feature name="peripheral" value="powerpad" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="powerpad" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-aw-0 prg" size="32768" crc="bc5f6c94" sha1="c3cd4ad3d5b4549ac8495a181988005b1db17c25" offset="00000" />
 			</dataarea>
@@ -1748,8 +1748,8 @@
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="vertical" />
- 			<feature name="peripheral" value="fffitness" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="fffitness" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-aw-0 prg" size="32768" crc="552fb544" sha1="dec198c52fea50cf0a69e8f9f6dacd3f8ab87377" offset="00000" />
 			</dataarea>
@@ -1766,7 +1766,7 @@
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SUNSOFT-1" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="sunsoft p" size="32768" crc="7af3afb7" sha1="0838819d5cffe39ea6314ecb2bd2c298cb6cc530" offset="00000" />
 			</dataarea>
@@ -1782,7 +1782,7 @@
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SUNSOFT-1" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="32768" crc="436a2ea6" sha1="2ce9968bd719444d0038ee3e4773d4748a8700fd" offset="00000" />
 			</dataarea>
@@ -1799,8 +1799,8 @@
 		<publisher>Pony Canyon</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
- 			<feature name="mirroring" value="vertical" />
- 			<feature name="peripheral" value="3dglasses" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="3dglasses" />
 			<dataarea name="prg" size="131072">
 				<rom name="pnf-aa-0 prg" size="131072" crc="7d55cf29" sha1="02a4f14f2e697c6bb1b42acfc1f4a9d28efb3d7c" offset="00000" />
 			</dataarea>
@@ -1868,7 +1868,7 @@
 		<publisher>Data East</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<feature name="chr-pin26" value="CE" />
 			<feature name="chr-pin27" value="CE" />
 			<dataarea name="prg" size="32768">
@@ -1887,7 +1887,7 @@
 		<publisher>Namco</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-3401" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="namcotblpr" size="32768" crc="899a0067" sha1="475c9d51065518599eb2368ae4efcf46373e4cec" offset="00000" />
 			</dataarea>
@@ -1905,14 +1905,14 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="COLORDREAMS-74*377" />
 			<feature name="mirroring" value="vertical" />
- 			<feature name="peripheral" value="zapper" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="65536">
 				<rom name="0.prg" size="65536" crc="fb69c131" sha1="0e80f67e83df532b09b75a4c91935b5ea092a387" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="16384">
 				<rom name="0.chr" size="16384" crc="45fe3114" sha1="baa3d240f1acd3a364530ae6f6dc6f8506d8b9c6" offset="00000" />
 			</dataarea>
- 		</part>
+		</part>
 	</software>
 
 	<software name="backtof">
@@ -1922,7 +1922,7 @@
 		<publisher>LJN</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-fu-0 prg" size="32768" crc="7a424c07" sha1="c8606b016d5479e383d3aa5420086ddff59d61b1" offset="00000" />
 			</dataarea>
@@ -2008,7 +2008,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SGROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
- 			<feature name="peripheral" value="powerglove" />
+			<feature name="peripheral" value="powerglove" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-bv-0 prg" size="131072" crc="1ae7b933" sha1="76d29c013cc6b09aa71875b9a458ffe92ff885f1" offset="00000" />
 			</dataarea>
@@ -2090,7 +2090,7 @@
 		<publisher>Pony Canyon</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="pnf-bz-0 prg" size="131072" crc="484a60db" sha1="decb7197aafbedce23f3c9da0f51bc27df06c399" offset="00000" />
 			</dataarea>
@@ -2107,7 +2107,7 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-RROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-bf-0 prg" size="16384" crc="575ed2fe" sha1="63527ea590aa79a6b09896c35021de785fd40851" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -2125,7 +2125,7 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-bf-0 prg" size="16384" crc="bd2e9025" sha1="6742fa2ea498e5b73dc2024ad3888a64e6b894e4" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -2143,7 +2143,7 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-bf-0 prg" size="16384" crc="5e137c5b" sha1="53583ef3c8a9eadd5cab927492ca12de8d4acdd1" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -2161,7 +2161,7 @@
 		<publisher>Toei Animation</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-256" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="tdf-bt-0 prg" size="32768" crc="16342ad0" sha1="9044e9c60c5944ae126d72f17a0c0f982099f09e" offset="00000" />
 			</dataarea>
@@ -2178,7 +2178,7 @@
 		<publisher>Victor Ongaku Sangyou</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="vfr-b1-0 prg" size="32768" crc="9cf17fab" sha1="73f05a931ad15639979907bc3ac4300138a7000e" offset="00000" />
 			</dataarea>
@@ -2212,7 +2212,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-pg-0 prg" size="32768" crc="9fd0f213" sha1="8a8dc1907d4c4be83255541eca7b399da2ad5742" offset="00000" />
 			</dataarea>
@@ -2305,7 +2305,7 @@
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SUNSOFT-FME-7" />
- 			<feature name="peripheral" value="barcode" />
+			<feature name="peripheral" value="barcode" />
 			<dataarea name="prg" size="131072">
 				<rom name="bbw prg" size="131072" crc="67898319" sha1="92f055653d33b8e31ec91b458357e75ad2336c33" offset="00000" />
 			</dataarea>
@@ -2386,7 +2386,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SCROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
- 			<feature name="peripheral" value="zapper" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="65536">
 				<rom name="nes-zt-0 prg" size="65536" crc="f2641ad0" sha1="1ab5cbd2036640d27b22c458218b6dc6366d3290" offset="00000" />
 			</dataarea>
@@ -2404,7 +2404,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SCROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
- 			<feature name="peripheral" value="zapper" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="65536">
 				<rom name="pal-zt-0 prg" size="65536" crc="2970d05b" sha1="e0bb71d086fce8836555aafb8f2ef4a26b5c4bf0" offset="00000" />
 			</dataarea>
@@ -2441,7 +2441,7 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-128" /> <!-- also found with HVC-RROM pcb -->
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-ba-0 prg" size="16384" crc="d18a3dde" sha1="91f7d3e4c9d18c1969ca1fffdc811b763508a0a2" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -2459,7 +2459,7 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-ba-0 prg" size="16384" crc="39d1fa03" sha1="28d84cfefa81bbfd3d26e0f70f1b9f53383e54ad" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -2781,7 +2781,7 @@
 		<publisher>Use</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="use-bc-0 prg" size="131072" crc="f989296c" sha1="60c90f38178381cf7c1b1934e9510494950c6a2b" offset="00000" />
 			</dataarea>
@@ -2815,7 +2815,7 @@
 		<publisher>Namco</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-3301" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="namcot bc prg" size="16384" crc="912d82c5" sha1="fa99d71aecaebc407ff67ae64695f69924b0769d" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -2870,7 +2870,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
- 			<feature name="peripheral" value="battlebox" />
+			<feature name="peripheral" value="battlebox" />
 			<dataarea name="prg" size="131072">
 				<rom name="igs-x8-0 prg" size="131072" crc="f18180cb" sha1="65b3a8ad275c81455813e9a21537301d98e40a74" offset="00000" />
 			</dataarea>
@@ -2890,7 +2890,7 @@
 		<publisher>Absolute</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-9b-0 prg" size="32768" crc="554b51d8" sha1="58c318ed3687736d01c3140307a1bad184ad8876" offset="00000" />
 			</dataarea>
@@ -2941,7 +2941,7 @@
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-bh-0 prg" size="32768" crc="288c9271" sha1="e45a6ddf4ae2a4de482563dd78024a4a955c26d1" offset="00000" />
 			</dataarea>
@@ -2958,7 +2958,7 @@
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-bh-0 prg" size="32768" crc="0c946a76" sha1="62f5f4dc9c8c1e0dfadcb2469e1d20c272406656" offset="00000" />
 			</dataarea>
@@ -3059,7 +3059,7 @@
 		<publisher>Camerica</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="CAMERICA-BF9093" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="65536">
 				<rom name="cobic be-v1" size="65536" crc="6c93377c" sha1="ce2a5ef736adc5edf7417609b0446e10b6e61c1f" offset="00000" />
 			</dataarea>
@@ -3113,7 +3113,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SJROM" />
 			<feature name="mmc1_type" value="MMC1A" />
- 			<feature name="peripheral" value="turbofile" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="131072">
 				<rom name="hsp-11-0 prg" size="131072" crc="f79d684a" sha1="ef9264fe6ae3f4aa53961e2cf6795d0fcfa606e7" offset="00000" />
 			</dataarea>
@@ -3134,7 +3134,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SJROM" />
 			<feature name="mmc1_type" value="MMC1A" />
- 			<feature name="peripheral" value="turbofile" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="131072">
 				<rom name="hsp-11-1 prg" size="131072" crc="e792de94" sha1="8ae3712827e01a2bb264a0817ac24a49d73685e0" offset="00000" />
 			</dataarea>
@@ -3214,7 +3214,7 @@
 		<publisher>Electro Brain</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UOROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="262144">
 				<rom name="nes-bb-0 prg" size="262144" crc="a6a725b8" sha1="3b01a043eb47aa2503a28a861eb686f1505e9a76" offset="00000" />
 			</dataarea>
@@ -3231,7 +3231,7 @@
 		<publisher>Loriciel</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UOROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="262144">
 				<rom name="pal-bb-0 prg" size="262144" crc="bd339e75" sha1="380774901336f90c2a136084801b89b7f2256729" offset="00000" />
 			</dataarea>
@@ -3248,7 +3248,7 @@
 		<publisher>Wisdom Tree</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="COLORDREAMS-74*377" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="65536">
 				<rom name="0.prg" size="65536" crc="07016ad0" sha1="8251357e11869aa0df512a58be690d31062d0278" offset="00000" />
 			</dataarea>
@@ -3265,7 +3265,7 @@
 		<publisher>Wisdom Tree</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="COLORDREAMS-74*377" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="65536">
 				<rom name="1.prg" size="65536" crc="306554e5" sha1="e4772cabbbf3cb24f3c14c56d4c735d016261004" offset="00000" />
 			</dataarea>
@@ -3282,7 +3282,7 @@
 		<publisher>Wisdom Tree</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="COLORDREAMS-74*377" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="65536">
 				<rom name="b-adventures prg 512k" size="65536" crc="3b73c254" sha1="d2e9796040302f37651548387620826a996d0f91" offset="00000" />
 			</dataarea>
@@ -3299,7 +3299,7 @@
 		<publisher>Wisdom Tree</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="COLORDREAMS-74*377" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="65536">
 				<rom name="br-003 prg 512k 1.3" size="65536" crc="9b8e02c0" sha1="5d4b2130fdf32d87043e8d71c0013537c5891108" offset="00000" />
 			</dataarea>
@@ -3316,7 +3316,7 @@
 		<publisher>Wisdom Tree</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="COLORDREAMS-74*377" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="65536">
 				<rom name="d-adventures prg 512 14" size="65536" crc="e571615d" sha1="1e8baf59dae9182a7f5a66b0b745032f70f2f229" offset="00000" />
 			</dataarea>
@@ -3333,7 +3333,7 @@
 		<publisher>Wisdom Tree</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="COLORDREAMS-74*377" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="bible buffet ver 6.0 prg" size="131072" crc="a8a4a48b" sha1="3d9f191e2c7df6dd22e5b28c41ad4a0699f61c6b" offset="00000" />
 			</dataarea>
@@ -3350,7 +3350,7 @@
 		<publisher>Camerica</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="CAMERICA-ALGN" /> <!-- also found with CAMERICA-BF9093 pcb -->
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="aladdin" />
 			<dataarea name="prg" size="262144">
 				<rom name="icros7413bfo" size="262144" crc="ccdcbfc6" sha1="00dfb78ac0e10f46bede9850636e2f3c6a305858" offset="00000" />
@@ -3368,7 +3368,7 @@
 		<publisher>Camerica</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="CAMERICA-BF9093" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="262144">
 				<rom name="cobic 7406-bn" size="262144" crc="bd154c3e" sha1="f31824d16504b44948de2ce53fd10c0cfad3d41c" offset="00000" />
 			</dataarea>
@@ -3493,7 +3493,7 @@
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="hfc-bi-0 prg" size="16384" crc="0c5c353a" sha1="3b35d81a7978ba71a2b269ef0726febf0f23407b" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -3529,7 +3529,7 @@
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-14" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="fa6580e6" sha1="c2169c9d8847339fa14ff8b96806eedfabdaf53e" offset="00000" />
 			</dataarea>
@@ -3580,7 +3580,7 @@
 		<publisher>Toemiland</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<feature name="chr-pin26" value="CE" />
 			<feature name="chr-pin27" value="CE" />
 			<dataarea name="prg" size="32768">
@@ -3600,7 +3600,7 @@
 		<publisher>Hot-B</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="gam-bo-0 prg" size="131072" crc="b04ba659" sha1="127c038c25aec70ca1822c92af6e45169ba3310b" offset="00000" />
 			</dataarea>
@@ -3617,7 +3617,7 @@
 		<publisher>Hot-B</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-bo-0 prg" size="131072" crc="1d0f4d6b" sha1="9c3bcd2bf8224b158b6ff2e47b67cda66cb4ac39" offset="00000" />
 			</dataarea>
@@ -3634,7 +3634,7 @@
 		<publisher>American Video Entertainment</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="AVE-NINA-06" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="bjak 1005 prg 6f43" size="32768" crc="33cd1506" sha1="045f4a47d00533ece07081d3f12b50bb830e5207" offset="00000" />
 			</dataarea>
@@ -3651,7 +3651,7 @@
 		<publisher>Konami</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-vs-0 prg" size="131072" crc="8ab52a24" sha1="6519882612ba8d69dc6f580c9db4dc0df7fd8c56" offset="00000" />
 			</dataarea>
@@ -3668,7 +3668,7 @@
 		<publisher>Konami</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-vs-0 prg" size="131072" crc="c0ededd0" sha1="72aef6054bf5e8b3301fea396187c71454c2465d" offset="00000" />
 			</dataarea>
@@ -3719,8 +3719,8 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-256" />
- 			<feature name="mirroring" value="horizontal" />
- 			<feature name="peripheral" value="rob" />
+			<feature name="mirroring" value="horizontal" />
+			<feature name="peripheral" value="rob" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-bl-0 prg" size="32768" crc="4ee735c1" sha1="36b6b30f451c3b4a48464bee9a144c873ae04cc7" offset="00000" />
 			</dataarea>
@@ -3808,7 +3808,7 @@
 		<publisher>Titus</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-4z-0 prg" size="131072" crc="9f2eef20" sha1="ac3f180c7ccb6ea35d24658b315e5afa72904f74" offset="00000" />
 			</dataarea>
@@ -3845,7 +3845,7 @@
 		<publisher>ASCII</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-256" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hsp-04-0 prg" size="32768" crc="f2d03ada" sha1="9f16dd99285282f12004328840479d1b9ae98de5" offset="00000" />
 			</dataarea>
@@ -3862,7 +3862,7 @@
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="hfc-bx-0 prg" size="131072" crc="bd9d0e85" sha1="f82654be44e4b01b3f9627d81232a086b1cf7599" offset="00000" />
 			</dataarea>
@@ -3879,7 +3879,7 @@
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-128" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="hfc-bm-0 prg" size="16384" crc="9684657f" sha1="055db2dc8cec0448f3845da1626e108c7692cfc6" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -3897,7 +3897,7 @@
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-bm-0 prg" size="16384" crc="a913a222" sha1="10478e542c2a0632472480b72935df21ea9ea1f1" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -3972,7 +3972,7 @@
 		<publisher>Nihon Bussan</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="131072">
 				<rom name="nbf-bb-0 prg" size="131072" crc="4178497a" sha1="f1b35efdecc98f52a560b32acb75ebd719cbc9de" offset="00000" />
 			</dataarea>
@@ -4232,7 +4232,7 @@
 		<publisher>Data East</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="32768" crc="7df65e2c" sha1="4ffad40f848a750b9351940dda8301bd3972660b" offset="00000" />
 			</dataarea>
@@ -4306,7 +4306,7 @@
 		<publisher>VIC Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-bp-0 prg" size="32768" crc="8b56faeb" sha1="d3ba4ed783d5879a02043bd21b2ff9545b200813" offset="00000" />
 			</dataarea>
@@ -5205,7 +5205,7 @@
 	</software>
 
 	<!-- Bootgod has still to find a US Chiller cart with a good CHR. Each cart has so far resulted
-	in different dumps for the CHR. By comparing the dumps and taking (for each byte which differs 
+	in different dumps for the CHR. By comparing the dumps and taking (for each byte which differs
 	across the dumps) the most common value, you get the Australian CHR. Hence, we include
 	this CHR in the US set, while waiting for a cart which has intact CHR... -->
 	<!-- We list here for reference the checksums of the file dumped by bootgod from his carts
@@ -5221,7 +5221,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="COLORDREAMS-74*377" />
 			<feature name="mirroring" value="vertical" />
- 			<feature name="peripheral" value="zapper" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="32768">
 				<rom name="chilprg" size="32768" crc="98e3b8bb" sha1="6bd003927954fe577e9c4f38fe796d2ef5fb23e4" offset="00000" />
 			</dataarea>
@@ -5850,7 +5850,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3A" />
- 			<feature name="peripheral" value="3dglasses" />
+			<feature name="peripheral" value="3dglasses" />
 			<dataarea name="prg" size="131072">
 				<rom name="asm-eo-0 prg" size="131072" crc="ab4ac985" sha1="d919915eef14f9769aee6f3a6d48e949c83ee77d" offset="00000" />
 			</dataarea>
@@ -6233,7 +6233,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SBROM" />
 			<feature name="mmc1_type" value="MMC1A" />
- 			<feature name="peripheral" value="powerpad" />
+			<feature name="peripheral" value="powerpad" />
 			<dataarea name="prg" size="65536">
 				<rom name="nes-ae-0 prg" size="65536" crc="d836a90b" sha1="edbfd05c39a624105a67cbc7c8827cca9c6aacbf" offset="00000" />
 			</dataarea>
@@ -6668,7 +6668,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1B3" />
- 			<feature name="peripheral" value="turbofile" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="131072">
 				<rom name="hsp-47-0 prg" size="131072" crc="0b0d4d1b" sha1="de9b62f065d86a26482c4abf19b5eb0413d5fe7e" offset="00000" />
 			</dataarea>
@@ -8309,7 +8309,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-RROM" /> <!-- also found with NES-NROM-128 pcb -->
 			<feature name="mirroring" value="vertical" />
- 			<feature name="peripheral" value="zapper" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-dh-0 prg" size="16384" crc="90ca616d" sha1="b742576317cd6a04caac25252d5593844c9a0bb6" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -8464,7 +8464,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
- 			<feature name="peripheral" value="turbofile" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="131072">
 				<rom name="btc-7d-0 prg" size="131072" crc="d68a6f33" sha1="34ee4d5913cd3d868a121aeb195dbf7c628ab359" offset="00000" />
 			</dataarea>
@@ -9277,7 +9277,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-FAMILYBASIC" />
 			<feature name="mirroring" value="vertical" />
- 			<feature name="peripheral" value="fc_keyboard" />
+			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-fb1-1 a" size="16384" crc="12b97208" sha1="2fc97bdb035d308f0ecd7b58e44fa1571b99fe27" offset="00000" />
 				<rom name="hvc-fb1-1 b" size="16384" crc="b099376c" sha1="17fb9644dc23173d77d288c1428e560ea8a7a9ef" offset="0x04000" />
@@ -9299,7 +9299,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-FAMILYBASIC" />
 			<feature name="mirroring" value="vertical" />
- 			<feature name="peripheral" value="fc_keyboard" />
+			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-fb1-2 a" size="16384" crc="1048e43d" sha1="d50b0352a358e73e29199b981456f33f6cc78131" offset="00000" />
 				<rom name="hvc-fb1-2 b" size="16384" crc="9fbfb6ba" sha1="39e7d7ede468036d04db0bf40f34a07c958f874a" offset="0x04000" />
@@ -9321,7 +9321,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-FAMILYBASIC" />
 			<feature name="mirroring" value="vertical" />
- 			<feature name="peripheral" value="fc_keyboard" />
+			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-vt-0w" size="32768" crc="3aaeed3f" sha1="dcb8e7d48afcc0f5b4b7e98874f9c79da419cf04" offset="00000" />
 			</dataarea>
@@ -9535,7 +9535,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="vertical" />
- 			<feature name="peripheral" value="ftrainer" />
+			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="bandai 86 sp p" size="32768" crc="8c8fa83b" sha1="0ab64ab0a5629f60aebe7fe32910a4136e99e6b0" offset="00000" />
 			</dataarea>
@@ -9553,7 +9553,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="vertical" />
- 			<feature name="peripheral" value="ftrainer" />
+			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="sp p" size="32768" crc="87738f85" sha1="5c8a3081990e6a9ef127e70e05b38c5c37cd58c6" offset="00000" />
 			</dataarea>
@@ -9571,7 +9571,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="horizontal" />
- 			<feature name="peripheral" value="ftrainer" />
+			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="runp" size="32768" crc="8a5b72c0" sha1="796122db71ecf4cc639d5c45b6b824b1f8b02957" offset="00000" />
 			</dataarea>
@@ -9589,7 +9589,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-PT-554" />
 			<feature name="mirroring" value="horizontal" />
- 			<feature name="peripheral" value="ftrainer" />
+			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="aerob pr" size="32768" crc="f8da2506" sha1="c14075b1b7c98b684870e8d85b7ff2b462e3cd10" offset="00000" />
 			</dataarea>
@@ -9665,7 +9665,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-GNROM" />
 			<feature name="mirroring" value="vertical" />
- 			<feature name="peripheral" value="ftrainer" />
+			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="131072">
 				<rom name="ba-takeshi 2 pro" size="131072" crc="ee11fe78" sha1="e95b3a144d6e43f7f7d583339e1ef244f1eb08c8" offset="00000" />
 			</dataarea>
@@ -10467,7 +10467,7 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="horizontal" />
- 			<feature name="peripheral" value="turbofile" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="32768" crc="3a51eb04" sha1="968251491571aae23dd99c40166ae53c55e7a778" offset="00000" />
 			</dataarea>
@@ -18150,7 +18150,7 @@
 		<publisher>Irem</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="IREM-G101" />
- 			<feature name="mirroring" value="high" />
+			<feature name="mirroring" value="high" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="c0fed437" sha1="31a87d67d66bb28d2b8e4134173b5e264737635f" offset="00000" />
 			</dataarea>
@@ -25730,7 +25730,7 @@
 		<publisher>Tokyo Shoseki</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
-   			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<feature name="chr-pin26" value="/CE" />
 			<feature name="chr-pin27" value="CE" />
 			<dataarea name="prg" size="32768">
@@ -25891,7 +25891,7 @@
 		<publisher>Nihon Bussan</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-256" />
-  			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="32768" crc="f7b2dbc7" sha1="7851cc8438547398ce075b9dcbb35462dd05d0b0" offset="00000" />
 			</dataarea>
@@ -25908,7 +25908,7 @@
 		<publisher>Nihon Bussan</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
-   			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<feature name="chr-pin26" value="/CE" />
 			<feature name="chr-pin27" value="/CE" />
 			<dataarea name="prg" size="32768">
@@ -27795,7 +27795,7 @@
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<feature name="chr-pin26" value="CE" />
 			<feature name="chr-pin27" value="/CE" />
 			<dataarea name="prg" size="32768">
@@ -35691,7 +35691,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<publisher>Toemiland</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<feature name="chr-pin26" value="CE" />
 			<feature name="chr-pin27" value="CE" />
 			<dataarea name="prg" size="32768">
@@ -38045,7 +38045,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="prg" size="131072">
 				<rom name="home alone 2 - lost in new york (europe).prg" size="131072" crc="1bc65714" sha1="88226bed22293ffefd486b3fe236b1a828d8f683" offset="00000" status="baddump" />
- 			</dataarea>
+			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-hm-0 chr" size="131072" crc="91ad1577" sha1="b4ba1b5aa2299b3a7ec6a54e3731a71eb13420fc" offset="00000" />
 			</dataarea>
@@ -38110,7 +38110,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<dataarea name="prg" size="131072">
 				<rom name="hoops (europe).prg" size="131072" crc="67392913" sha1="fd3648b4ba162b665d6aa28a0bc12af8860ce488" offset="00000" status="baddump" />
 			</dataarea>
- 			<dataarea name="chr" size="131072">
+			<dataarea name="chr" size="131072">
 				<rom name="nes-2b-0 chr" size="131072" crc="4ba913d0" sha1="2724a1eed2a995337e974e40d7b140795df0ea7c" offset="00000" />
 			</dataarea>
 		</part>
@@ -39513,7 +39513,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="mightybjj" cloneof="mightybj"> 
+	<software name="mightybjj" cloneof="mightybj">
 		<!-- Serial: TCF-MB - Release Date: 1986-04-24 - Alternative Title: マイティボンジャック -->
 		<description>Mighty Bomb Jack (Jpn, Rev. A)</description>
 		<year>1986</year>
@@ -42128,7 +42128,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>1988</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="HVC-CNROM" /> 
+			<feature name="pcb" value="HVC-CNROM" />
 			<!-- CHECK CHR SIZE! -->
 			<dataarea name="chr" size="32768">
 				<rom name="tetris (bulletproof) (japan).chr" size="32768" crc="c046d6b4" sha1="d2e4ba1b15c055f0cd66b43eb150f5a63c9c1053" offset="00000" status="baddump" />
@@ -44847,7 +44847,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="chinkngf">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Chinese KungFu (Asia)</description>
@@ -45012,7 +45012,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<publisher>Gluk Video</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NTDEC-N715062" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="0d7ea169" sha1="f78f6589e4b209cc0e5a61c7dea45f73fdcadc5e" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -45064,7 +45064,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<publisher>Gluk Video</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NTDEC-N715062" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="32768" crc="626238f8" sha1="7e757c3f67849330066da6984d97a377bb910f21" offset="00000" />
 			</dataarea>
@@ -45394,9 +45394,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 <!-- info on missing Nanjing games from tszone_fc and http://bootleggames.wiki-site.com/index.php/Main_Page -->
 
-<!-- [NJ001] 口袋宝石-蓝 ~ Pocket Monster Red (same as Waixing game?) --> 
-<!-- [NJ002] 口袋宝石-红 ~ Pocket Monster Blue (same as Red?) --> 
-<!-- [NJ003] 口袋宝石-金 ~ Pocket Monster Gold (same as Mars game?) --> 
+<!-- [NJ001] 口袋宝石-蓝 ~ Pocket Monster Red (same as Waixing game?) -->
+<!-- [NJ002] 口袋宝石-红 ~ Pocket Monster Blue (same as Red?) -->
+<!-- [NJ003] 口袋宝石-金 ~ Pocket Monster Gold (same as Mars game?) -->
 
 	<software name="kdbs" supported="partial">
 		<!-- Serial: NJ004 - Release Date:  - Alternative Title: 口袋宝石-银 ~ Pocket Monster Silver -->
@@ -45415,7 +45415,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ005] 数码暴龙III ~ Shu Ma Bao Long III --> 
+<!-- [NJ005] 数码暴龙III ~ Shu Ma Bao Long III -->
 
 	<software name="smzd2">
 		<!-- Serial: NJ006 - Release Date:  - Alternative Title: 数码战队2 - this is a remake of Digital Dragon by Waixing? -->
@@ -45434,10 +45434,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ007] 傲视三国志 ~ Ao Shi San Guo Zhi --> 
-<!-- [NJ008] 三国志-傲视天地 ~ San Guo Zhi - Ao Shi Tian Di --> 
-<!-- [NJ009] 口袋水晶 ~ Kou Dai Shou Jing (Pokémon Crystal) --> 
-<!-- [NJ010] 口袋钻石 ~ Kou Dai Zuan Shi (Pokémon Diamond) --> 
+<!-- [NJ007] 傲视三国志 ~ Ao Shi San Guo Zhi -->
+<!-- [NJ008] 三国志-傲视天地 ~ San Guo Zhi - Ao Shi Tian Di -->
+<!-- [NJ009] 口袋水晶 ~ Kou Dai Shou Jing (Pokémon Crystal) -->
+<!-- [NJ010] 口袋钻石 ~ Kou Dai Zuan Shi (Pokémon Diamond) -->
 
 	<software name="mcwy">
 		<!-- Serial: NJ011 - Release Date:  - Alternative Title: 牧场物语 ~ Harvest Moon -->
@@ -45490,8 +45490,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ014] 圣剑传说 ~ Sheng Jian Chuan Shuo (Sword of Mana) --> 
-<!-- [NJ015] 楚汉风云 ~ Chu Han Fengyun --> 
+<!-- [NJ014] 圣剑传说 ~ Sheng Jian Chuan Shuo (Sword of Mana) -->
+<!-- [NJ015] 楚汉风云 ~ Chu Han Fengyun -->
 
 	<software name="tkhx">
 		<!-- Serial: NJ016 - Release Date:  - Alternative Title: 太空幻想 -->
@@ -45578,7 +45578,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ021] 大话西游 ~ Da Hua Xi You (A Chinese Oddysey) --> 
+<!-- [NJ021] 大话西游 ~ Da Hua Xi You (A Chinese Oddysey) -->
 
 	<software name="sseiyac">
 		<!-- Serial: NJ022 - Release Date:  - Alternative Title: 圣斗士星矢-天马之幻想 -->
@@ -45614,11 +45614,11 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ024] 圣斗士之时空斗士 ~ Sheng Dou Shi Zhi Shikong Dou Shi (Saint Saiya - Time Warrior) --> 
-<!-- [NJ025] 农场小精灵 ~ Nong Chang Xiao Jing Ling --> 
-<!-- [NJ026] 倚天屠龙记 ~ Yi Tian Tu Long Ji (Heavenly Sword &amp; Dragon Saber) --> 
-<!-- [NJ027] 逐鹿三国 ~ Zhu Lu San Guo --> 
-<!-- [NJ028] 水浒3 ~ Shuihu 3 --> 
+<!-- [NJ024] 圣斗士之时空斗士 ~ Sheng Dou Shi Zhi Shikong Dou Shi (Saint Saiya - Time Warrior) -->
+<!-- [NJ025] 农场小精灵 ~ Nong Chang Xiao Jing Ling -->
+<!-- [NJ026] 倚天屠龙记 ~ Yi Tian Tu Long Ji (Heavenly Sword &amp; Dragon Saber) -->
+<!-- [NJ027] 逐鹿三国 ~ Zhu Lu San Guo -->
+<!-- [NJ028] 水浒3 ~ Shuihu 3 -->
 
 	<software name="qgdz">
 		<!-- Serial: NJ029 - Release Date:  - Alternative Title: 七国大战 -->
@@ -45688,7 +45688,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ033] 真侍魂-武士道烈传 ~ Zhen Shi Hun - Wushidao Lie Chuan (Samurai Spirits – Bushido Retsuden) --> 
+<!-- [NJ033] 真侍魂-武士道烈传 ~ Zhen Shi Hun - Wushidao Lie Chuan (Samurai Spirits – Bushido Retsuden) -->
 <!-- is this correct or is it a sequel of NJ033? and what is the relation with NJ042 below? they seem the same game... -->
 	<software name="ssamsho2a" cloneof="ssamsho2">
 		<!-- Serial: NJ033 - Release Date:  - Alternative Title: 真侍魂－武士道列传 -->
@@ -45810,8 +45810,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ040] 三国志-吕布传 ~ San Guo Zhi - Lu Bu Chuan --> 
-<!-- [NJ041] 倚天剑传奇 ~ Yi Tian Jian Chuan Qi --> 
+<!-- [NJ040] 三国志-吕布传 ~ San Guo Zhi - Lu Bu Chuan -->
+<!-- [NJ041] 倚天剑传奇 ~ Yi Tian Jian Chuan Qi -->
 
 	<software name="zshhzlr">
 		<!-- Serial: NJ042 - Release Date:  - Alternative Title: 真侍魂-魂之利刃 -->
@@ -45830,9 +45830,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ043] 三国群侠传 ~ San Guo Qun Xia Chuan --> 
-<!-- [NJ044] 剑侠情缘 ~ Jian Xia Qing Yuan --> 
-<!-- [NJ045] 轩辕剑 ~ Xuanyuan Jian --> 
+<!-- [NJ043] 三国群侠传 ~ San Guo Qun Xia Chuan -->
+<!-- [NJ044] 剑侠情缘 ~ Jian Xia Qing Yuan -->
+<!-- [NJ045] 轩辕剑 ~ Xuanyuan Jian -->
 
 	<software name="ldhbkqcs">
 		<!-- Serial: NJ046 - Release Date:  - Alternative Title: 雷电皇-比卡丘传说 ~ Pokémon Yellow -->
@@ -45903,12 +45903,12 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ050] 红楼梦 ~ Hong Lou Meng (Dream of Red House?) --> 
-<!-- [NJ051] 乱世三国 ~ Luan Shi San Guo --> 
-<!-- [NJ052] 宠物宝宝 ~ Chong Wu Bao Bao (Pet Baby?)--> 
-<!-- [NJ053] 换装人 ~ Huan Zhuang Ren [or NJ040?] --> 
-<!-- [NJ054] 原始人 ~ Yuan Shi Ren [or NJ038?] --> 
-<!-- [NJ055] 原始人2 ~ Yuan Shi Ren 2 [or NJ039?] --> 
+<!-- [NJ050] 红楼梦 ~ Hong Lou Meng (Dream of Red House?) -->
+<!-- [NJ051] 乱世三国 ~ Luan Shi San Guo -->
+<!-- [NJ052] 宠物宝宝 ~ Chong Wu Bao Bao (Pet Baby?)-->
+<!-- [NJ053] 换装人 ~ Huan Zhuang Ren [or NJ040?] -->
+<!-- [NJ054] 原始人 ~ Yuan Shi Ren [or NJ038?] -->
+<!-- [NJ055] 原始人2 ~ Yuan Shi Ren 2 [or NJ039?] -->
 
 	<software name="zeldac">
 		<!-- Serial: NJ056 - Release Date:  - Alternative Title: 塞尔达-神奇的帽子 ~ The Legend Of Zelda: The Minish Cap -->
@@ -45961,7 +45961,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ059] 射雕英雄传 ~ She Diao Ying Xiong Chuan --> 
+<!-- [NJ059] 射雕英雄传 ~ She Diao Ying Xiong Chuan -->
 
 	<software name="juedai">
 		<!-- Serial: NJ060 - Release Date:  - Alternative Title: 绝代双骄 -->
@@ -45980,8 +45980,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ061] 黄飞鸿 ~ Huang Fei Hong --> 
-<!-- [NJ062] 石器时代 ~ Shi Qui Shi Dai --> 
+<!-- [NJ061] 黄飞鸿 ~ Huang Fei Hong -->
+<!-- [NJ062] 石器时代 ~ Shi Qui Shi Dai -->
 
 	<software name="ffant7">
 		<!-- Serial: NJ063 - Release Date:  - Alternative Title: 最终幻想Ⅶ ~ Final Fantasy VII -->
@@ -46003,7 +46003,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ064] 数独 ~ Shu Du (Sudoku?) --> 
+<!-- [NJ064] 数独 ~ Shu Du (Sudoku?) -->
 
 	<software name="zyjztsz">
 		<!-- Serial: NJ065 - Release Date:  - Alternative Title: 最游记之唐三藏 -->
@@ -46037,7 +46037,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ067] 霍元甲 ~ Huo Yuan Jia --> 
+<!-- [NJ067] 霍元甲 ~ Huo Yuan Jia -->
 
 	<software name="xunqinji">
 		<!-- Serial: NJ068 - Release Date:  - Alternative Title: 寻秦记 -->
@@ -46073,8 +46073,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ070] 傲剑江湖 ~ Ao Jian Jiang Hu --> 
-<!-- [NJ071] 新月剑痕 ~ Xin Yue Jian Hen --> 
+<!-- [NJ070] 傲剑江湖 ~ Ao Jian Jiang Hu -->
+<!-- [NJ071] 新月剑痕 ~ Xin Yue Jian Hen -->
 
 	<software name="fengyind" supported="no">
 		<!-- Serial: NJ072 - Release Date:  - Alternative Title: (塞尔达) 封印岛 ~ (Zelda) Link's Awakening -->
@@ -46175,7 +46175,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- [NJ078] 毁灭之神 ~ Hui Mie Zhi Shen --> 
+<!-- [NJ078] 毁灭之神 ~ Hui Mie Zhi Shen -->
 
 	<software name="mojiebz">
 		<!-- Serial: NJ079 - Release Date:  - Alternative Title: 魔界霸主 (title screen hack of NJ0??) -->
@@ -46225,11 +46225,11 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
- 		</part>
+		</part>
 	</software>
 
-<!-- [NJ082] (大话西游2) 齐天大圣 ~ (Da Hua Xi You 2) Qi Tian Da Sheng --> 
-<!-- [NJ083] 三国志-刘备传 ~ San Guo Zhi - Liu Bei Chuan --> 
+<!-- [NJ082] (大话西游2) 齐天大圣 ~ (Da Hua Xi You 2) Qi Tian Da Sheng -->
+<!-- [NJ083] 三国志-刘备传 ~ San Guo Zhi - Liu Bei Chuan -->
 
 	<software name="sseiyac2">
 		<!-- Serial: NJ084 - Release Date: - Alternative Title: 圣斗士星矢2-北欧突击篇 ~ Sheng Dou Shi Xing Shi 2 - Beiou Tuji Pian (Saint Seiya 2 - Nordic chapter) -->
@@ -46244,20 +46244,20 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k WRAM on cartridge-->
 			<dataarea name="vram" size="8192">
-			</dataarea> 
- 		</part>
+			</dataarea>
+		</part>
 	</software>
 
-<!-- [NJ085] 闪闪的红星! ~ Shan Shan de Hong Xing! --> 
-<!-- [NJ086] 拳皇R1-最强格斗王 ~ Quan Huang R1 - Zui Qiang Gedou Wang (KOF R1) --> 
-<!-- [NJ087] 拳皇R2-大蛇四天王 ~ Quan Huang R2 - Dashe Sitian Wang (KOF R2) --> 
-<!-- [NJ088] 宠物高达战记 ~ Chong Wu Gao Da Zhan Ji --> 
-<!-- [NJ089] 笑傲江湖群侠记 ~ Xiao Ao Jian Ghu Xia Ji --> 
-<!-- [NJ090] 勇者传说 ~ Yong Zhe Chuan Shuo --> 
-<!-- [NJ091] 仙剑问情 ~ Xian Jian Wen Qing --> 
-<!-- [NJ092] 游戏宝贝 ~ You Xi Bao Bei --> 
-<!-- [NJ093] 鹿鼎记 ~ Lu Ding Ji --> 
-<!-- [NJ094] 王者无双 ~ Whang Zhe Wu Shuang --> 
+<!-- [NJ085] 闪闪的红星! ~ Shan Shan de Hong Xing! -->
+<!-- [NJ086] 拳皇R1-最强格斗王 ~ Quan Huang R1 - Zui Qiang Gedou Wang (KOF R1) -->
+<!-- [NJ087] 拳皇R2-大蛇四天王 ~ Quan Huang R2 - Dashe Sitian Wang (KOF R2) -->
+<!-- [NJ088] 宠物高达战记 ~ Chong Wu Gao Da Zhan Ji -->
+<!-- [NJ089] 笑傲江湖群侠记 ~ Xiao Ao Jian Ghu Xia Ji -->
+<!-- [NJ090] 勇者传说 ~ Yong Zhe Chuan Shuo -->
+<!-- [NJ091] 仙剑问情 ~ Xian Jian Wen Qing -->
+<!-- [NJ092] 游戏宝贝 ~ You Xi Bao Bei -->
+<!-- [NJ093] 鹿鼎记 ~ Lu Ding Ji -->
+<!-- [NJ094] 王者无双 ~ Whang Zhe Wu Shuang -->
 
 	<software name="dballc">
 		<!-- Serial: NJ095 - Release Date: - Alternative Title: 七龙珠大冒险 ~ Qi Long Zhu Da Mao Xian (Dragon Ball Adventure) -->
@@ -46273,11 +46273,11 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
- 		</part>
+		</part>
 	</software>
-	
-<!-- [NJ096] 武侠天地 ~ Wu Xia Tian Di --> 
-<!-- [NJ097] 魔兽世界-恶魔猎人 ~ Mo Shou Shi Jie - Emo Lie Ren (World of Warcraft - Demon Hunter) --> 
+
+<!-- [NJ096] 武侠天地 ~ Wu Xia Tian Di -->
+<!-- [NJ097] 魔兽世界-恶魔猎人 ~ Mo Shou Shi Jie - Emo Lie Ren (World of Warcraft - Demon Hunter) -->
 
 	<software name="zzhx4">
 		<!-- Serial: NJ098 - Release Date:  - Alternative Title: 最终幻想IV-光与暗水晶纷争 ~ Final Fantasy IV -->
@@ -46791,7 +46791,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<publisher>Panesian</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="AVE-74*161" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="32768" crc="71547d94" sha1="72181a45f81b4007ca5bf91f8a0e06b47930f0d5" offset="00000" />
 			</dataarea>
@@ -47732,7 +47732,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 		</part>
 	</software>
-	
+
 
 	<software name="srobot2c1" cloneof="srobot2">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
@@ -49543,7 +49543,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jinghy">
 		<!-- Serial: ES-1033 - Release Date:  -->
 		<description>Jing Hua Yuan (Chi)</description>
@@ -49558,7 +49558,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<dataarea name="prg" size="131072">
 				<rom name="jing hua yuan (china) (unl).prg" size="131072" crc="4748f002" sha1="5bb4f3f42bf3378d84360e48066f6e493b114d15" offset="00000"/>
 			</dataarea>
- 		</part>
+		</part>
 	</software>
 
 <!-- nointro -->
@@ -50091,7 +50091,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="saiwqxz">
 		<!-- Serial:  - Release Date:  -->
 		<description>Sai Wai Qi Xia Zhuan (Chi)</description>
@@ -50104,8 +50104,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k WRAM on cartridge-->
 			<dataarea name="vram" size="8192">
-			</dataarea> 
- 		</part>
+			</dataarea>
+		</part>
 	</software>
 
 <!-- nointro -->
@@ -50797,11 +50797,11 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 
 
-<!-- The images below have to be carefully double checked: among alt dumps there might well be bad 
+<!-- The images below have to be carefully double checked: among alt dumps there might well be bad
 dumps, or hacked images. Not all the games are pirate originals, so a few of them should be moved below.
-Also, more info on the real pcb used by these carts would be welcome: e.g. Mapper 4 compatible boards 
-have been all tagged as NES-TLROM at the moment, but it would be nice to add the exact pcb type 
-(similarly, for Mapper 1, 2 & 3 compatible boards). Finally, VRAM and WRAM have been mostly deduced 
+Also, more info on the real pcb used by these carts would be welcome: e.g. Mapper 4 compatible boards
+have been all tagged as NES-TLROM at the moment, but it would be nice to add the exact pcb type
+(similarly, for Mapper 1, 2 & 3 compatible boards). Finally, VRAM and WRAM have been mostly deduced
 from the NEStopia source, hence they would require confirmation. -->
 
 	<software name="3dblockb" cloneof="3dblock" supported="no">
@@ -52529,8 +52529,8 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 
-<!-- The following dumps come from various sources (dumpers, old ROM collections, etc.) and are completely unverified: they have been obtained by splitting 
-PRG/CHR from the available iNES/UNIF images and by using as PCB the ones corresponding to the mapper present in the iNES header. 
+<!-- The following dumps come from various sources (dumpers, old ROM collections, etc.) and are completely unverified: they have been obtained by splitting
+PRG/CHR from the available iNES/UNIF images and by using as PCB the ones corresponding to the mapper present in the iNES header.
 They might well be bad dumps, or hacked imaged. It would be nice to verify these dumps as well, but verification is unlikely to happen in the short future.
 
 If you can help us with any of these, please contact us (at the MESS boards) or directly bootgod.
@@ -53000,7 +53000,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="10 yard fight (1987)(fmg)(jp)[p].chr" size="8192" crc="21e321c7" sha1="cf6f5f66bea686db9483700b83bad2953e0b47fc" offset="00000" status="baddump" />
 			</dataarea>
@@ -53017,7 +53017,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="1942 (1987)(fmg)(jp)[p].chr" size="8192" crc="911df369" sha1="734d48b2ab361b642da5a04ef785430d52e7988e" offset="00000" status="baddump" />
 			</dataarea>
@@ -53033,7 +53033,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
 				<rom name="4 nin uchi mahjong (1987)(fmg)(jp)[p].chr" size="8192" crc="7e206391" sha1="e44afe6ae4da11a7d9175a93134d2eb9b545627d" offset="00000" status="baddump" />
 			</dataarea>
@@ -53050,7 +53050,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="argos no senshi (1987)(fmg)(jp)[p].prg" size="131072" crc="138f0bb0" sha1="777913358c5e5245dba90d80a57e0cc6a30fc195" offset="00000" status="baddump" />
 			</dataarea>
@@ -53066,7 +53066,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="16384">
 				<rom name="arkanoid (1987)(fmg)(jp)[p].chr" size="16384" crc="5e827ee7" sha1="3e558db1b37702048e1c6069e0b18ba51cb9fa97" offset="00000" />
 			</dataarea>
@@ -53098,7 +53098,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="astro robo sasa (1987)(fmg)(jp)[p].prg" size="32768" crc="d811a71d" sha1="ddc7dbbe09ade9698fb3ba4a9ad1551848b541c2" offset="00000" />
 			</dataarea>
@@ -53114,7 +53114,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" /> <!-- check this! -->
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="b-wings (1987)(fmg)(jp)[p].prg" size="32768" crc="1178237d" sha1="7b1689acf69d70c5d028e5989d1beebfb121efef" offset="00000" status="baddump" />
 			</dataarea>
@@ -53130,7 +53130,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="balloon fight (1987)(fmg)(jp)[p].prg" size="16384" crc="294f2608" sha1="7d6df0267638ad9cd7e8e3dd7966a531274c4d23" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -53147,7 +53147,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="baltron (1987)(fmg)(jp)[p].prg" size="32768" crc="be0cb878" sha1="5a13c0fb3ac8c7746e0fa2f6f101327366297741" offset="00000" status="baddump" />
 			</dataarea>
@@ -53164,7 +53164,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="16384">
 				<rom name="banana (1987)(fmg)(jp)[h][p][mapper 3].chr" size="16384" crc="940018f3" sha1="036243540ff9b992d0b056fdd10eeb864a91f482" offset="00000" status="baddump" />
 			</dataarea>
@@ -53180,7 +53180,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="baseball (1987)(fmg)(jp)[p].prg" size="16384" crc="ca172682" sha1="9729e6c848c45232b3349851dd29bed3495d71bb" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -53197,7 +53197,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
 				<rom name="battle city (1987)(fmg)(jp)[p].prg" size="16384" crc="c2d4ac96" sha1="bf625cbc357cbeccbd0110f45500292910014e59" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -53215,7 +53215,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="binary land (1987)(fmg)(jp)[p].chr" size="8192" crc="05bcd061" sha1="ad080727d314f1578ef3f81c7ad5541be2869958" offset="00000" status="baddump" />
 			</dataarea>
@@ -53232,7 +53232,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="bird week (1987)(fmg)(jp)[p][h][mapper 0].prg" size="16384" crc="55d745ff" sha1="a23169cb3bd8bcf2254165321ef81ec93d2c0095" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -53249,7 +53249,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="bokosuka wars (1987)(fmg)(jp)[p].prg" size="32768" crc="388f2305" sha1="409d28b1ac18255f114b4d082c06ebf7c97fc151" offset="00000" status="baddump" />
 			</dataarea>
@@ -53265,7 +53265,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="bomberman (1987)(fmg)(jp)[p].prg" size="16384" crc="46f066b6" sha1="997016dec4d50b1261de035d9dfb7ad366dce943" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -53283,7 +53283,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
 				<rom name="buggy popper (1987)(fmg)(jp)[p].chr" size="32768" crc="20cdd0de" sha1="4cc991f1ccd339e153efc5b28bffe72c1c38d0ca" offset="00000" status="baddump" />
 			</dataarea>
@@ -54397,7 +54397,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="mightybjh" cloneof="mightybj"> 
+	<software name="mightybjh" cloneof="mightybj">
 		<description>Mighty Bomb Jack (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
@@ -54715,14 +54715,14 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="seicross (1987)(fmg)(jp)[p][h][mapper 3].prg" size="32768" crc="9cfcfabc" sha1="cd88188215c9969945852025a04e500754b1e0e6" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="chr" size="16384">
 				<rom name="seicross (1987)(fmg)(jp)[p][h][mapper 3].chr" size="16384" crc="28da528d" sha1="4700b5bfceb9d1b5de4eb3312f68af9d11706b93" offset="00000" status="baddump" />
 			</dataarea>
- 		</part>
+		</part>
 	</software>
 
 	<software name="sjinruih" cloneof="dinoriki">
@@ -55785,7 +55785,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="subor3">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Subor v3.0 (Chi)</description>
@@ -56041,7 +56041,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<!-- This was dumped by Cah4e3, but the repeated attempts always produced a dump with bad bits. 
+	<!-- This was dumped by Cah4e3, but the repeated attempts always produced a dump with bad bits.
 	Comparison with the US dump allowed to fix the dump, but confirmation against another cart would be necessary -->
 	<software name="narcr" cloneof="narc">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
@@ -56110,7 +56110,7 @@ Games by A.Tchudov (from Ulyanovsk)
     * 1997 Балда (Balda / Word Game)
     * 1997 Путешествие по Европе (Puteshestvie po Evrope / Travel Around Europe)
     * 1997 Поле Чудес 2 (Pole Chudes 2 / Wheel of Fortune 2)
-    * 1997 Склад Номер 18 (Sklad Nomer 18 / Warehouse No. 18) 
+    * 1997 Склад Номер 18 (Sklad Nomer 18 / Warehouse No. 18)
 
 -->
 
@@ -56262,7 +56262,7 @@ Games by A.Tchudov (from Ulyanovsk)
 	</software>
 
 
-<!-- 
+<!--
 
 Other
 
@@ -56698,7 +56698,7 @@ Other
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
- 			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="65536">
 				<rom name="bmx simulator (2 joys).prg" size="65536" crc="40e1f09e" sha1="2b44e45c621d52c882c50bef7a2f9b4c93ddf908" offset="00000" status="baddump" />
 			</dataarea>
@@ -58162,7 +58162,7 @@ Other
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-7" />
-			<feature name="vrc7-pin17" value="PRG A3" /> <!-- unconfirmed, based on Tiny Toon 2 --> 
+			<feature name="vrc7-pin17" value="PRG A3" /> <!-- unconfirmed, based on Tiny Toon 2 -->
 			<dataarea name="chr" size="131072">
 				<rom name="super mario bros 14 (unl).chr" size="131072" crc="24e491ea" sha1="324f922f8f7cdecb948a5348d79e37428654c1bc" offset="00000" status="baddump" />
 			</dataarea>
@@ -58634,7 +58634,7 @@ We include them here as reference if they should coincide with later revisions o
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="balloon fight (200x)(nintendo)(us)[h][ripped from gba e-reader].chr" size="8192" crc="ab5d40da" sha1="782da9fb557b3b2ce6442627875125b7914f8ac0" offset="00000" status="baddump" />
 			</dataarea>
@@ -58651,7 +58651,7 @@ We include them here as reference if they should coincide with later revisions o
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="baseball (200x)(nintendo)(us)[h][ripped from gba e-reader].chr" size="8192" crc="3cac66b4" sha1="46df56bf44954ee6d87efb6ee4b0dd2f629b5b81" offset="00000" status="baddump" />
 			</dataarea>
@@ -58668,7 +58668,7 @@ We include them here as reference if they should coincide with later revisions o
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="clu clu land (200x)(nintendo)(us)[h][ripped from gba e-reader].chr" size="8192" crc="b4e4bc19" sha1="80ed3bea4d536714a8883e82b23d7248824843ac" offset="00000" status="baddump" />
 			</dataarea>
@@ -58872,7 +58872,7 @@ We include them here as reference if they should coincide with later revisions o
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="balloon fight (200x)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].chr" size="8192" crc="8511096a" sha1="33d70fb4aafae1b3f9d7bd8f5e97ecac647f1f2c" offset="00000" status="baddump" />
 			</dataarea>
@@ -58888,7 +58888,7 @@ We include them here as reference if they should coincide with later revisions o
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="clu clu land (2002)(nintendo)(jp)[h][ripped from animal crossing jap for gamecube].chr" size="8192" crc="a63b8b98" sha1="8ddf97dcc8e28f2218c4a4c8b3d9d527fa0525fb" offset="00000" status="baddump" />
 			</dataarea>
@@ -59016,7 +59016,7 @@ We include them here as reference if they should coincide with later revisions o
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
- 			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="baseball (2002)(nintendo)(en)[h][ripped from animal crossing for gamecube].chr" size="8192" crc="cde71b82" sha1="296ccef8a1fd9209f414ce0c788ab0dc95058242" offset="00000" status="baddump" />
 			</dataarea>
@@ -59249,8 +59249,8 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 
-<!-- The following games were included as encrypted in various SmyNES builds. 
-These have been ripped from SmyNES and decrypted (by CaH4e3?), but it would 
+<!-- The following games were included as encrypted in various SmyNES builds.
+These have been ripped from SmyNES and decrypted (by CaH4e3?), but it would
 be better to redump them properly. -->
 
 	<software name="bingkuan">
@@ -59482,7 +59482,7 @@ be better to redump them properly. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 <!-- Pirate fighting games -->
 
 	<software name="garousp">
@@ -62590,7 +62590,7 @@ be better to redump them properly. -->
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BMC-VT5201" />
- 			<feature name="mirroring" value="hi" />
+			<feature name="mirroring" value="hi" />
 			<dataarea name="chr" size="65536">
 				<rom name="super 35 in 1 (6 in 1 vt5201).chr" size="65536" crc="a3d8d9dd" sha1="34703a76b76c7244a21237e41b8aed7a1ef95cae" offset="00000" status="baddump" />
 			</dataarea>
