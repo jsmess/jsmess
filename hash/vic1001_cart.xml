@@ -229,18 +229,6 @@
 		</part>
 	</software>
 
-    <software name="amazmaze1" cloneof="amazmaze">
-		<description>Amazing Maze (Patched)</description>
-		<!-- Patched to run in RAM. -->
-		<year>198?</year>
-		<publisher>Machine Language Games</publisher>
-		<part name="cart" interface="vic1001_cart">
-			<dataarea name="a000" size="4096">
-				<rom name="amazing maze (machine language games)(198-)(jue) (patched).a0" size="4096" crc="d77c00f7" sha1="2e248c8758aa9d9077702ea59f84bcdb36d372f3" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
     <software name="amidar">
 		<description>Amidar (PAL)</description>
 		<year>198?</year>
@@ -665,18 +653,6 @@
 		</part>
 	</software>
 
-    <software name="bugcrush1" cloneof="bugcrush">
-		<description>Bug Crusher (Patched)</description>
-		<!-- Patched to run in RAM. -->
-		<year>1983</year>
-		<publisher>OEM</publisher>
-		<part name="cart" interface="vic1001_cart">
-			<dataarea name="a000" size="4096">
-				<rom name="bug crusher (oem)(1983)(jue) (patched).a0" size="4096" crc="e8ce753c" sha1="294cafc069e47093f1032f4ef5d66d1704f14fac" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
     <software name="buti">
 		<description>BUTI - Basic UTIlity</description>
 		<year>198?</year>
@@ -798,19 +774,6 @@
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
 				<rom name="choplifter (creative)(1982)(vi-cl-c)(ju).a0" size="8192" crc="b0f2b6bc" sha1="3d8331eaac92cdc42cb2e3d4ebe021329fb26eb2" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-    <software name="choplift1" cloneof="choplift">
-		<description>Choplifter (NTSC, Patched)</description>
-		<!-- Patched to run in RAM. -->
-		<year>1982</year>
-		<publisher>Creative</publisher>
-		<info name="serial" value="VI-CL-C" />
-		<part name="cart" interface="vic1001_cart">
-			<dataarea name="a000" size="8192">
-				<rom name="choplifter (creative)(1982)(vi-cl-c)(ju) (patched).a0" size="8192" crc="29668ad9" sha1="8de17fe3b1ab04726a23b9e39eb32e564813e11d" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1188,18 +1151,6 @@
 		</part>
 	</software>
 
-    <software name="dgobblra" cloneof="dgobbler">
-		<description>Dot Gobbler (NTSC) (Patched)</description>
-		<!-- Patched to run in RAM. -->
-		<year>198?</year>
-		<publisher>Machine Language Games</publisher>
-		<part name="cart" interface="vic1001_cart">
-			<dataarea name="a000" size="4096">
-				<rom name="dot gobbler (machine language games)(198-)(ju) (patched).a0" size="4096" crc="98322c81" sha1="1f87735c07c9d4231c1b0949c752cf9a8a70f09b" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
     <software name="drgnfire">
 		<description>Dragonfire</description>
 		<year>1983</year>
@@ -1267,19 +1218,6 @@
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
 				<rom name="face maker (hes)(1983)(c324)(jue).a0" size="8192" crc="965f0448" sha1="289000ca65c21cb2ed73fe6afe8c3e6b5f18b533" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-    <software name="facemakrp" cloneof="facemakr">
-		<description>Face Maker (Patched)</description>
-		<!-- Patched to run in RAM. -->
-		<year>1983</year>
-		<publisher>HES</publisher>
-		<info name="serial" value="C324" />
-		<part name="cart" interface="vic1001_cart">
-			<dataarea name="a000" size="8192">
-				<rom name="face maker (hes)(1983)(c324)(jue) (patched).a0" size="8192" crc="5dd159ff" sha1="04ce8e475781b9ba81457dea60d575c5b864c58f" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1925,18 +1863,6 @@
 		</part>
 	</software>
 
-	<software name="mobilatp" cloneof="mobilatk">
-		<description>Mobile Attack (Patched)</description>
-		<!-- Patched to run in RAM. -->
-		<year>1982</year>
-		<publisher>MSD</publisher>
-		<part name="cart" interface="vic1001_cart">
-			<dataarea name="a000" size="8192">
-				<rom name="mobile attack (msd)(1982) [patched].a0" size="8192" crc="c97c1dca" sha1="c5863e6d5b5326c5dcc19d87144a080b59f2c433" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="moleatak">
 		<description>Mole Attack (NTSC)</description>
 		<year>1981</year>
@@ -2078,6 +2004,81 @@
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="4096">
 				<rom name="mutant herd (thorn emi)(1982)(thc22004)(e).a0" size="8192" crc="ef92c07e" sha1="0346916eec6e82b5a4145dbfde87f98db1cd2944" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nmbrcrnc">
+		<description>Number Crunch (NTSC)</description>
+		<year>1982</year>
+		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SC-208" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="number crunch (spectravideo)(1982)(sc-208)(ju).a0" size="8192" crc="d769ab2e" sha1="001374d81d2325c5caa9c89edf6cd0ce2d70c187" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nmbrnab">
+		<description>Number Nabber &amp; Shape Grabber (NTSC)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1941" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="number nabber &amp; shape grabber (commodore)(1982)(vic-1941)(ju).a0" size="8192" crc="9c66cc84" sha1="31199944b3e3bccfd35f6f6b835248adc624ca70" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="omegrace">
+		<description>Omega Race</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1924" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="omega race (commodore)(1982)(vic-1924).a0" size="8192" crc="59581bf3" sha1="cc0bfc09237f51ffe8eaf7c189acf50ccfdc4fde" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="omegract" cloneof="omegrace">
+		<description>Omega Race (Trained)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1924" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="omega race (commodore)(1982)(vic-1924)[trained].a0" size="8192" crc="79ceb70e" sha1="9eac887da51d6923a7829f56e1682020accec930" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outworld">
+		<description>Outworld (PAL)</description>
+		<year>1982</year>
+		<publisher>UMI</publisher>
+		<info name="serial" value="1635" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="outworld (umi)(1981)(1635)(e).a0" size="8192" crc="b9c82a34" sha1="515c95f3fca57c3439e9636052d2c7b4e89d1099" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outworldn" cloneof="outworld">
+		<description>Outworld (NTSC)</description>
+		<year>1982</year>
+		<publisher>UMI</publisher>
+		<info name="serial" value="1635" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="4096">
+				<rom name="outworld (umi)(1981)(1635)(ju).60" size="4096" crc="6dd5da16" sha1="91899c4769880277e16cb63e825e2e2b5e2b0071" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="4096">
+				<rom name="outworld (umi)(1981)(1635)(ju).a0" size="4096" crc="f67a2b0f" sha1="71cb6c1cfd4eab706c58c47e7ac5b666db60c890" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

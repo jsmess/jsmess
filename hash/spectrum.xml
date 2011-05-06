@@ -203,4 +203,17 @@
 		</part>
 	</software>
 
+	<!-- Test cartridge -->
+
+	<software name="zxtest">
+		<description>ZX Spectrum Test Cartridge</description>
+		<year>1983</year>
+		<publisher>Sinclair Research</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="system test rom.rom" size="8192" crc="730bba9e" sha1="9e162a027e64ab57ccbedb7da86c2afc7ee44749" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
