@@ -555,7 +555,7 @@ void kermit_receive_byte( device_t *device, UINT8 data )
 							/* get conf & send file name */
 							kermit_get_conf( state );
 							kermit_send_string_packet( state, KERMIT_FILE, state->image->basename() );
-							state->state = KERMIT_SEND_DATA;;
+							state->state = KERMIT_SEND_DATA;
 							break;
 
 						case KERMIT_SEND_DATA:

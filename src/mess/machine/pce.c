@@ -761,7 +761,7 @@ static void pce_cd_nec_get_subq( running_machine &machine )
 	pce_cd.data_buffer[3] = 1;							/* index */
 	pce_cd.data_buffer[4] = ( msf_rel >> 16 ) & 0xFF;	/* M (relative) */
 	pce_cd.data_buffer[5] = ( msf_rel >> 8 ) & 0xFF;	/* S (relative) */
-	pce_cd.data_buffer[6] = msf_rel & 0xFF;;			/* F (relative) */
+	pce_cd.data_buffer[6] = msf_rel & 0xFF;				/* F (relative) */
 	pce_cd.data_buffer[7] = ( msf_abs >> 16 ) & 0xFF;	/* M (absolute) */
 	pce_cd.data_buffer[8] = ( msf_abs >> 8 ) & 0xFF;	/* S (absolute) */
 	pce_cd.data_buffer[9] = msf_abs & 0xFF;				/* F (absolute) */

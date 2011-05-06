@@ -531,7 +531,7 @@ INLINE void k2ge_k1ge_draw_scroll_plane( k1ge_t *k1ge, UINT16 *p, UINT16 base, i
 		if ( col )
 		{
 			UINT16 col2 = 16 * pcode + ( k1ge->vram[ pal_lut_base + 4 * pcode + col ] * 2 );
-			p[ i ]  = k1ge->vram[ k2ge_lut_base + col2 ] | ( k1ge->vram[ k2ge_lut_base + col2 + 1 ] << 8 );;
+			p[ i ]  = k1ge->vram[ k2ge_lut_base + col2 ] | ( k1ge->vram[ k2ge_lut_base + col2 + 1 ] << 8 );
 		}
 
 		px++;

@@ -2017,7 +2017,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 	UINT32 key1 = input_port_read(timer.machine(),"key1");
 	UINT32 key2 = input_port_read(timer.machine(),"key2");
 	UINT32 key3 = input_port_read(timer.machine(),"key3");
-//  UINT8 p1_key = input_port_read(timer.machine(), "P1");;
+//  UINT8 p1_key = input_port_read(timer.machine(), "P1");
 
 	if(state->m_cas_switch == 0)
 	{

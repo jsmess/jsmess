@@ -840,7 +840,7 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
 				if ((m_registers[7] & 0x80) == 0x00)
 				{
 					m_registers[7] |= 0x80;
-					break;;
+					break;
 				}
 				m_registers[7] &= 0x80;
 				inc_x(7);

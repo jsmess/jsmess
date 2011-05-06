@@ -207,7 +207,7 @@ static TIMER_CALLBACK( setup_machine_state )
 DRIVER_INIT ( poly88 )
 {
 	poly88_state *state = machine.driver_data<poly88_state>();
-	state->m_previous_level = 0;;
+	state->m_previous_level = 0;
 	state->m_clk_level = state->m_clk_level_tape = 1;
 	state->m_cassette_timer = machine.scheduler().timer_alloc(FUNC(poly88_cassette_timer_callback));
 	state->m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(600));

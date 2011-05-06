@@ -628,7 +628,7 @@ static int scan_keyboard(running_machine &machine)
 								if (! (mac->m_key_matrix[3] & 0x0100))
 								{
 									/* shift key is really up */
-									mac->m_keycode_buf[0] = keycode | 0x80;;
+									mac->m_keycode_buf[0] = keycode | 0x80;
 									mac->m_keycode_buf[1] = 0x79;
 									mac->m_keycode_buf_index = 2;
 									return 0xF1;	/* "releases" shift */

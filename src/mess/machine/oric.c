@@ -744,7 +744,7 @@ static READ8_HANDLER (oric_jasmin_r)
 static WRITE8_HANDLER(oric_jasmin_w)
 {
 	oric_state *state = space->machine().driver_data<oric_state>();
-	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");;
+	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
 	device_t *fdc = space->machine().device("wd179x");
 	switch (offset & 0x0f)
 	{
@@ -962,7 +962,7 @@ READ8_HANDLER (oric_microdisc_r)
 
 		default:
 			{
-				via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");;
+				via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
 				data = via_0->read(*space, offset & 0x0f);
 			}
 			break;
@@ -1012,7 +1012,7 @@ WRITE8_HANDLER(oric_microdisc_w)
 
 		default:
 			{
-				via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");;
+				via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
 				via_0->write(*space, offset & 0x0f, data);
 			}
 			break;
@@ -1161,7 +1161,7 @@ MACHINE_RESET( oric )
 
 READ8_HANDLER ( oric_IO_r )
 {
-	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");;
+	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
 	switch (input_port_read(space->machine(), "FLOPPY") & 0x07)
 	{
 		default:
@@ -1199,7 +1199,7 @@ READ8_HANDLER ( oric_IO_r )
 
 WRITE8_HANDLER ( oric_IO_w )
 {
-	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");;
+	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
 	switch (input_port_read(space->machine(), "FLOPPY") & 0x07)
 	{
 		default:

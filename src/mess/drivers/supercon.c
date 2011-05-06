@@ -352,7 +352,7 @@ static READ8_HANDLER( supercon_port4_r )
 {
 	supercon_state *state = space->machine().driver_data<supercon_state>();
 	int i_18, i_AH;
-	UINT8 key_data = 0x00;;
+	UINT8 key_data = 0x00;
 
 	static const char *const board_lines[8] =
 			{ "BOARD_1", "BOARD_2", "BOARD_3", "BOARD_4", "BOARD_5", "BOARD_6", "BOARD_7", "BOARD_8" };

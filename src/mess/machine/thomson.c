@@ -639,7 +639,7 @@ static UINT8 to7_lightpen;
 
 static void to7_lightpen_cb ( running_machine &machine, int step )
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 
 	if ( ! to7_lightpen )
 		return;
@@ -658,7 +658,7 @@ static void to7_lightpen_cb ( running_machine &machine, int step )
 
 static void to7_set_init ( running_machine &machine, int init )
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 	/* INIT signal wired to system PIA 6821 */
 
 	LOG_VIDEO(( "%f to7_set_init: init=%i\n", machine.time().as_double(), init ));
@@ -1524,7 +1524,7 @@ static void to7_midi_init( running_machine &machine )
 
 MACHINE_RESET ( to7 )
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 
 	LOG (( "to7: machine reset called\n" ));
 
@@ -1638,7 +1638,7 @@ static READ8_DEVICE_HANDLER ( to770_sys_porta_in )
 
 static void to770_update_ram_bank(running_machine &machine)
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 portb = sys_pia->port_b_z_mask();
 	int bank;
@@ -1781,7 +1781,7 @@ WRITE8_HANDLER ( to770_gatearray_w )
 
 MACHINE_RESET( to770 )
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 
 	LOG (( "to770: machine reset called\n" ));
 
@@ -1863,7 +1863,7 @@ MACHINE_START ( to770 )
 
 static void mo5_lightpen_cb ( running_machine &machine, int step )
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 
 	/* MO5 signals ca1 (TO7 signals cb1) */
 	if ( ! to7_lightpen )
@@ -1889,7 +1889,7 @@ static emu_timer* mo5_periodic_timer;
 
 static TIMER_CALLBACK(mo5_periodic_cb)
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 
 	/* pulse */
 	sys_pia->cb1_w( 1 );
@@ -2155,7 +2155,7 @@ WRITE8_HANDLER ( mo5_ext_w )
 
 MACHINE_RESET( mo5 )
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 
 	LOG (( "mo5: machine reset called\n" ));
 
@@ -2513,7 +2513,7 @@ READ8_HANDLER ( to9_cartridge_r )
 
 static void to9_update_ram_bank (running_machine &machine)
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 port = mc6846_get_output_port(machine.device("mc6846"));
 	UINT8 portb = sys_pia->port_b_z_mask();
@@ -3119,7 +3119,7 @@ const mc6846_interface to9_timer =
 
 MACHINE_RESET ( to9 )
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 
 	LOG (( "to9: machine reset called\n" ));
 
@@ -3572,7 +3572,7 @@ static void to8_update_floppy_bank_postload(running_machine *machine)
 
 static void to8_update_ram_bank (running_machine &machine)
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 bank = 0;
 
@@ -4102,7 +4102,7 @@ static void to8_lightpen_cb ( running_machine &machine, int step )
 
 MACHINE_RESET ( to8 )
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 	LOG (( "to8: machine reset called\n" ));
 
 	/* subsystems */
@@ -4273,7 +4273,7 @@ const mc6846_interface to9p_timer =
 
 MACHINE_RESET ( to9p )
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 	LOG (( "to9p: machine reset called\n" ));
 
 	/* subsystems */
@@ -4410,7 +4410,7 @@ static void mo6_update_ram_bank_postload(running_machine *machine)
 
 static void mo6_update_cart_bank (running_machine &machine)
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int b = (sys_pia->a_output() >> 5) & 1;
 	int bank = 0;
@@ -4902,7 +4902,7 @@ WRITE8_HANDLER ( mo6_vreg_w )
 
 MACHINE_RESET ( mo6 )
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 	LOG (( "mo6: machine reset called\n" ));
 
 	/* subsystems */
@@ -5163,7 +5163,7 @@ static void mo5nr_game_reset ( running_machine &machine )
 
 MACHINE_RESET ( mo5nr )
 {
-	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );;
+	pia6821_device *sys_pia = machine.device<pia6821_device>(THOM_PIA_SYS );
 	LOG (( "mo5nr: machine reset called\n" ));
 
 	/* subsystems */

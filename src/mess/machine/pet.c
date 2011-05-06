@@ -405,7 +405,7 @@ const via6522_interface pet_via =
 
 static WRITE8_HANDLER( cbm8096_io_w )
 {
-	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");;
+	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
 	pia6821_device *pia_0 = space->machine().device<pia6821_device>("pia_0");
 	pia6821_device *pia_1 = space->machine().device<pia6821_device>("pia_1");
 	device_t *mc6845 = space->machine().device("crtc");
@@ -423,7 +423,7 @@ static WRITE8_HANDLER( cbm8096_io_w )
 
 static READ8_HANDLER( cbm8096_io_r )
 {
-	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");;
+	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
 	pia6821_device *pia_0 = space->machine().device<pia6821_device>("pia_0");
 	pia6821_device *pia_1 = space->machine().device<pia6821_device>("pia_1");
 	device_t *mc6845 = space->machine().device("crtc");

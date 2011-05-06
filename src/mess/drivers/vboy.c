@@ -527,7 +527,7 @@ static VIDEO_START( vboy )
 	state->m_screen_output = auto_bitmap_alloc(machine, 384, 224, BITMAP_FORMAT_INDEXED16);
 
 	state->m_font  = auto_alloc_array(machine, UINT16, 2048 * 8);
-	state->m_bgmap = auto_alloc_array(machine, UINT16, 0x20000 >> 1);;
+	state->m_bgmap = auto_alloc_array(machine, UINT16, 0x20000 >> 1);
 	state->m_objects = state->m_bgmap + (0x1E000 >> 1);
 	state->m_columntab1 = state->m_bgmap + (0x1dc00 >> 1);
 	state->m_columntab2 = state->m_bgmap + (0x1de00 >> 1);
