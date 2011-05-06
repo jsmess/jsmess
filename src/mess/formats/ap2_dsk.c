@@ -11,7 +11,7 @@
 #include <assert.h>
 
 #include "ap2_dsk.h"
-#include "basicdsk.h"
+#include "formats/basicdsk.h"
 
 
 #define APPLE2_IMAGE_DO		0
