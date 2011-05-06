@@ -235,7 +235,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 	/* sound */
     MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* uart */
 	MCFG_MSM8251_ADD("uart", default_msm8251_interface)
