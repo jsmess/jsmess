@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <softwarelist name="c64_cart" description="Commodore 64 Cartridge">
-	<software name="vw64" supported="no">
+	<software name="vw64">
 		<description>VizaWrite 64</description>
 		<year>1984</year>
 		<publisher>Viza Software</publisher>
@@ -12,32 +12,36 @@
 		|=|                  R      |
 		|=|                         |
 		|=|                         |
-		|=|      ROM0  ROM1  ROM2   |
+		|=|      ROM0  ROM2  ROM1   |
 		|=|                         |
 		|=|                         |
 		|=|                         |
 		|===========================|
 
 		ROM0    - Mitsubishi M5L2764K 8Kx8 EPROM "U"
-		ROM1    - Mitsubishi M5L2764K 8Kx8 EPROM "2" (located on solder side)
-		ROM2    - Mitsubishi M5L2764K 8Kx8 EPROM "3"
+		ROM1    - Mitsubishi M5L2764K 8Kx8 EPROM "3"
+		ROM2    - Mitsubishi M5L2764K 8Kx8 EPROM "2" (located on solder side)
 		R       - 56K
 		C       - 47uF
 
 		data and address lines are scrambled:
 		data = BITSWAP8(7,6,0,5,1,4,2,3)
 		address = BITSWAP16(15,14,13,12,7,8,6,9,5,11,4,3,2,10,1,0)
-		EXROM:GND
 		GAME:after reset GND for 1.1844s (74LS122 tW=0.45*R*C) then goes to Vcc
+		EXROM:GND
 		-->
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="vizawrite" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 
-			<dataarea name="rom" size="0x6000">
+			<dataarea name="roml" size="0x4000">
 				<rom name="u" size="0x2000" crc="b0cc7564" sha1="59f7b3a9df26053fdcb720fe07a22f437a7a2241" offset="0x0000" />
-				<rom name="2" size="0x2000" crc="32f2a5df" sha1="5f3e5d416eab59a75ba64131588861991fa571a5" offset="0x2000" />
-				<rom name="3" size="0x2000" crc="ef80b1e7" sha1="80392a04bc9ca2fea006653a507f6f5338a10beb" offset="0x4000" />
+				<rom name="3" size="0x2000" crc="ef80b1e7" sha1="80392a04bc9ca2fea006653a507f6f5338a10beb" offset="0x2000" />
+			</dataarea>
+
+			<dataarea name="romh" size="0x2000">
+				<rom name="2" size="0x2000" crc="32f2a5df" sha1="5f3e5d416eab59a75ba64131588861991fa571a5" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -49,6 +53,7 @@
 		<!--
 		-->
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="tdos" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -79,6 +84,7 @@
 		SP0256 - General Instruments SP0256A-AL2 Speech Synthesizer
 		-->
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="currah_speech_64" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<feature name="vlsi" value="LA05-164" />
@@ -132,6 +138,7 @@
 		<!--
 		-->
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="epyx_fast_load" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -164,6 +171,7 @@
 		CN1   - connector to C64 video/audio port
 		-->
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ps64" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<feature name="speech" value="SSI-263AP" />
@@ -195,6 +203,7 @@
 		ROM1  - National Instruments NMC27C256Q 32Kx8 EPROM
 		-->
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="pagefox" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -214,6 +223,7 @@
 		<!--
 		-->
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="calc_result_easy" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -221,7 +231,7 @@
 				<rom name="calc_rom1.bin" size="0x2000" crc="f617bec4" sha1="c5ef2418cf9dba3e14f586d5d6997f271b521a24" offset="0x0000" />
 			</dataarea>
 
-			<dataarea name="rom" size="0x4000">
+			<dataarea name="romh" size="0x4000">
 				<rom name="calc_rom2.bin" size="0x4000" crc="4997dd31" sha1="9820b1e6b90d72f095a2b74438dac3cfc33e80b8" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -282,6 +292,7 @@
 		<!--
 		-->
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="game_saver_card" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -326,6 +337,7 @@
 		ROM6  - not populated
 		-->
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="multiscreen" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<feature name="battery" value="CR2325" />
@@ -384,6 +396,7 @@
 		GAME:Vcc
 		-->
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="4040_fast_hack_em" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -421,6 +434,7 @@
 		latch is cleared to 0 on computer reset
 		-->
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="hugo" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 			<feature name="pcb" value="e9048" />

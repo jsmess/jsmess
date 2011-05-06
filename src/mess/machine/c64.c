@@ -1263,6 +1263,107 @@ static int c64_crt_load( device_image_interface &image )
 	return IMAGE_INIT_PASS;
 }
 
+void load_standard_c64_cartridge(device_image_interface &image)
+{
+	c64_state *state = image.device().machine().driver_data<c64_state>();
+	UINT32 size;
+
+	// is there anything to load at 0x8000?
+	size = image.get_software_region_length("roml");
+
+	if (size)
+	{
+		memcpy(state->m_roml, image.get_software_region("roml"), MIN(0x2000, size));
+		
+		if (size == 0x4000)
+		{
+			// continue loading to ROMH region
+			memcpy(state->m_romh, image.get_software_region("roml") + 0x2000, 0x2000);
+		}
+	}
+
+	// is there anything to load at 0xa000?
+	size = image.get_software_region_length("romh");
+	if (size)
+		memcpy(state->m_romh, image.get_software_region("romh"), size);
+}
+
+TIMER_CALLBACK( vizawrite_timer )
+{
+	c64_state *state = machine.driver_data<c64_state>();
+	UINT8 *decrypted = machine.region("user1")->base();
+
+	// map cartridge ROMs
+	memcpy(state->m_roml, decrypted + 0x2000, 0x2000);
+	memset(state->m_romh, 0, 0x2000);
+
+	// set GAME line
+	state->m_game = 1;
+	c64_bankswitch(machine, 0);
+}
+
+void load_vizawrite_cartridge(device_image_interface &image)
+{
+	#define DECRYPT_ADDRESS(_offset) \
+		BITSWAP16(_offset,15,14,13,12,7,8,6,9,5,11,4,3,2,10,1,0)
+	
+	#define DECRYPT_DATA(_data) \
+		BITSWAP8(_data,7,6,0,5,1,4,2,3)
+
+	c64_state *state = image.device().machine().driver_data<c64_state>();
+
+	UINT8 *roml = image.get_software_region("roml");
+	UINT8 *romh = image.get_software_region("romh");
+	UINT8 *decrypted = image.device().machine().region("user1")->base();
+
+	// decrypt ROMs
+	for (offs_t offset = 0; offset < 0x2000; offset++)
+	{
+		offs_t address = DECRYPT_ADDRESS(offset);
+		decrypted[address] = DECRYPT_DATA(roml[offset]);
+		decrypted[address + 0x2000] = DECRYPT_DATA(roml[offset + 0x2000]);
+		decrypted[address + 0x4000] = DECRYPT_DATA(romh[offset]);
+	}
+
+	// map cartridge ROMs
+	memcpy(state->m_roml, decrypted, 0x2000);
+	memcpy(state->m_romh, decrypted + 0x4000, 0x2000);
+
+	// allocate GAME changing timer
+	state->m_cartridge_timer = image.device().machine().scheduler().timer_alloc(FUNC(vizawrite_timer));
+	state->m_cartridge_timer->adjust(attotime::from_msec(1184), 0);
+}
+
+void c64_software_list_cartridge_load(device_image_interface &image)
+{
+	c64_state *state = image.device().machine().driver_data<c64_state>();
+
+	// initialize ROML and ROMH pointers
+	state->m_roml = state->m_c64_roml;
+	state->m_romh = state->m_c64_romh;
+
+	// clear ROML and ROMH areas
+	memset(state->m_roml, 0, 0x2000);
+	memset(state->m_romh, 0, 0x2000);
+
+	// set GAME and EXROM
+	state->m_game = atol(image.get_feature("game"));
+	state->m_exrom = atol(image.get_feature("exrom"));
+
+	// determine cartridge type
+	const char *cart_type = image.get_feature("cart_type");
+
+	if (cart_type == NULL)
+	{
+		load_standard_c64_cartridge(image);
+	}
+	else
+	{
+		if (!strcmp(cart_type, "vizawrite")) 
+			load_vizawrite_cartridge(image);
+	}
+}
+
 static DEVICE_IMAGE_LOAD( c64_cart )
 {
 	c64_state *state = image.device().machine().driver_data<c64_state>();
@@ -1270,35 +1371,7 @@ static DEVICE_IMAGE_LOAD( c64_cart )
 
 	if (image.software_entry() != NULL)
 	{
-		UINT32 size;
-
-		state->m_exrom = atol(image.get_feature("exrom"));
-		state->m_game = atol(image.get_feature("game"));
-		
-		state->m_roml = state->m_c64_roml;
-		state->m_romh = state->m_c64_romh;
-
-		memset(state->m_roml, 0, 0x2000);
-		memset(state->m_romh, 0, 0x2000);
-
-		// is there anything to load at 0x8000?
-		size = image.get_software_region_length("roml");
-
-		if (size)
-		{
-			memcpy(state->m_roml, image.get_software_region("roml"), MIN(0x2000, size));
-			
-			if (size == 0x4000)
-			{
-				// continue loading to ROMH region
-				memcpy(state->m_romh, image.get_software_region("roml") + 0x2000, 0x2000);
-			}
-		}
-
-		// is there anything to load at 0xa000?
-		size = image.get_software_region_length("romh");
-		if (size)
-			memcpy(state->m_romh, image.get_software_region("romh"), size);
+		c64_software_list_cartridge_load(image);
 	}
 	else
 		result = c64_crt_load(image);

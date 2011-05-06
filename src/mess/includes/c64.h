@@ -48,6 +48,7 @@ public:
 	int m_old_game;
 	UINT8 m_vicirq;
 	emu_timer *m_datasette_timer;
+	emu_timer *m_cartridge_timer;
 	UINT8 *m_colorram;
 	UINT8 *m_basic;
 	UINT8 *m_kernal;
