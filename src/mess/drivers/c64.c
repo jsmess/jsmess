@@ -334,7 +334,6 @@ C64DTV TODO:
 #include "machine/6526cia.h"
 
 #include "machine/cbmipt.h"
-#include "machine/c64expp.h"
 #include "video/vic6567.h"
 
 /* devices config */
@@ -682,16 +681,6 @@ static const vic2_interface ultimax_vic2_intf = {
 	c64_rdy_cb
 };
 
-static C64_EXPANSION_PORT_INTERFACE( expansion_intf )
-{
-	DEVCB_NULL, // GAME
-	DEVCB_NULL, // EXROM
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL, // DMA
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET)
-};
-
 
 /*************************************
  *
@@ -748,9 +737,6 @@ static MACHINE_CONFIG_START( c64, c64_state )
 	MCFG_C1541_ADD(C1541_TAG, 8)
 
 	MCFG_FRAGMENT_ADD(c64_cartslot)
-
-	// expansion port
-	MCFG_C64_EXPANSION_PORT_ADD(expansion_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( c64pal, c64_state )
@@ -805,9 +791,6 @@ static MACHINE_CONFIG_START( c64pal, c64_state )
 #endif
 
 	MCFG_FRAGMENT_ADD(c64_cartslot)
-
-	// expansion port
-	MCFG_C64_EXPANSION_PORT_ADD(expansion_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ultimax, c64 )
