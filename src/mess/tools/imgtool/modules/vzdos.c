@@ -13,7 +13,7 @@
 #include "osdepend.h"
 #include "imgtool.h"
 #include "imgtoolx.h"
-#include "imageutl.h"
+#include "formats/imageutl.h"
 #include "formats/vt_dsk.h"
 #include "iflopimg.h"
 

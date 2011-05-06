@@ -10,7 +10,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
-#include "imagedev/flopimg.h"
+#include "formats/flopimg.h"
 #include "machine/abcbus.h"
 #include "machine/devhelpr.h"
 #include "machine/wd17xx.h"

@@ -18,7 +18,6 @@ DRIVERS = $(MAMEOBJ)/drivers
 LAYOUT = $(MAMEOBJ)/layout
 MACHINE = $(MAMEOBJ)/machine
 VIDEO = $(MAMEOBJ)/video
-FORMATS = $(MAMEOBJ)/formats
 
 OBJDIRS += \
 	$(AUDIO) \
@@ -26,7 +25,6 @@ OBJDIRS += \
 	$(LAYOUT) \
 	$(MACHINE) \
 	$(VIDEO) \
-	$(FORMATS) \
 
 
 
@@ -354,13 +352,6 @@ $(MAMEOBJ)/shared.a: \
 	$(MACHINE)/segacrp2.o \
 	$(MACHINE)/ticket.o \
 	$(VIDEO)/avgdvg.o \
-
-#-------------------------------------------------
-# file formats, mostly used for MESS software
-#-------------------------------------------------
-
-$(MAMEOBJ)/formats.a: \
-	$(FORMATS)/basicdsk.o	\
 
 #-------------------------------------------------
 # manufacturer-specific groupings for drivers

@@ -26,7 +26,7 @@
 
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
-#include "imagedev/flopimg.h"
+#include "formats/flopimg.h"
 #include "formats/basicdsk.h"
 
 

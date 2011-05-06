@@ -145,10 +145,10 @@
 
 
 #include "emu.h"
-#include "imageutl.h"
+#include "formats/imageutl.h"
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
-#include "imagedev/flopimg.h"
+#include "formats/flopimg.h"
 
 /***************************************************************************
     CONSTANTS

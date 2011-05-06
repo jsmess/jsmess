@@ -36,23 +36,6 @@ IMGTOOL_LIB_OBJS =					\
 	$(EMUOBJ)/emucore.o				\
 	$(EMUOBJ)/emuopts.o 				\
 	$(EMUOBJ)/memory.o				\
-	$(EMUOBJ)/ioprocs.o			\
-	$(EMUOBJ)/imagedev/flopimg.o			\
-	$(EMUOBJ)/imagedev/cassimg.o			\
-	$(MESS_FORMATS)/basicdsk.o			\
-	$(MESS_FORMATS)/coco_dsk.o			\
-	$(MESS_FORMATS)/coco_cas.o			\
-	$(MESS_FORMATS)/imd_dsk.o			\
-	$(MESS_FORMATS)/td0_dsk.o			\
-	$(MESS_FORMATS)/cqm_dsk.o			\
-	$(MESS_FORMATS)/dsk_dsk.o			\
-	$(MESS_FORMATS)/d88_dsk.o			\
-	$(MESS_FORMATS)/pc_dsk.o			\
-	$(MESS_FORMATS)/ap2_dsk.o			\
-	$(MESS_FORMATS)/ap_dsk35.o			\
-	$(EMUOBJ)/imagedev/wavfile.o			\
-	$(MESS_FORMATS)/vt_dsk.o			\
-	$(MESS_FORMATS)/fdi_dsk.o			\
 	$(IMGTOOLOBJ)/stream.o				\
 	$(IMGTOOLOBJ)/library.o				\
 	$(IMGTOOLOBJ)/modules.o				\
@@ -115,6 +98,6 @@ IMGTOOL_OBJS = \
 # rules to build the imgtool executable
 #-------------------------------------------------
 
-$(IMGTOOL): $(IMGTOOL_OBJS) $(LIBIMGTOOL) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE)
+$(IMGTOOL): $(IMGTOOL_OBJS) $(LIBIMGTOOL) $(LIBUTIL) $(EXPAT) $(ZLIB) $(FORMATS_LIB) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@

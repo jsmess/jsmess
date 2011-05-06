@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "imagedev/flopimg.h"
+#include "formats/flopimg.h"
 #include "imgtoolx.h"
 #include "library.h"
 #include "iflopimg.h"

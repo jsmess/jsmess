@@ -10,6 +10,7 @@
 #define THOMFLOP_H_
 
 #include "image.h"
+#include "imagedev/flopdrv.h"
 #include "machine/mc6843.h"
 #include "machine/mc6854.h"
 

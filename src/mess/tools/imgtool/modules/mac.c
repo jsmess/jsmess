@@ -94,7 +94,7 @@
 #include <stddef.h>
 
 #include "emu.h"
-#include "imageutl.h"
+#include "formats/imageutl.h"
 #include "osdepend.h"
 #include "imgtoolx.h"
 #include "macutil.h"

@@ -17,7 +17,7 @@
 #include "wimgres.h"
 #include "strconv.h"
 #include "../imgtool.h"
-#include "imageutl.h"
+#include "formats/imageutl.h"
 
 //============================================================
 //  PARAMETERS

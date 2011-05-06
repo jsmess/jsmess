@@ -8,7 +8,7 @@
 #include "emu.h"
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
-#include "imagedev/flopimg.h"
+#include "formats/flopimg.h"
 #include "machine/lux10828.h"
 #include "machine/lux21046.h"
 

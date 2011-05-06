@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #include "testimgt.h"
-#include "imageutl.h"
+#include "formats/imageutl.h"
 #include "../imgtool/imgtool.h"
 #include "../imgtool/modules.h"
 

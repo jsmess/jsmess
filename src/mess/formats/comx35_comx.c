@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "imageutl.h"
+#include "formats/imageutl.h"
 #include "formats/comx35_comx.h"
 #include "machine/ram.h"
 

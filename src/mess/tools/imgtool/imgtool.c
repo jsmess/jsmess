@@ -12,7 +12,7 @@
 
 #include "osdepend.h"
 #include "imgtoolx.h"
-#include "imageutl.h"
+#include "formats/imageutl.h"
 #include "library.h"
 #include "modules.h"
 #include "pool.h"

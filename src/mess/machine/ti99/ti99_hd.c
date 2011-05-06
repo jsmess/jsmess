@@ -12,7 +12,7 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "imageutl.h"
+#include "formats/imageutl.h"
 #include "harddisk.h"
 #include "imagedev/harddriv.h"
 #include "machine/smc92x4.h"
