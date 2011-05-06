@@ -261,17 +261,14 @@ SOUNDS += LMC1992
 DRVLIBS += \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/act.a \
-	$(MESSOBJ)/amiga.a \
 	$(MESSOBJ)/amstrad.a \
 	$(MESSOBJ)/apf.a \
 	$(MESSOBJ)/apple.a \
 	$(MESSOBJ)/applied.a \
 	$(MESSOBJ)/arcadia.a \
-	$(MESSOBJ)/ascii.a \
 	$(MESSOBJ)/at.a \
 	$(MESSOBJ)/atari.a \
 	$(MESSOBJ)/att.a \
-	$(MESSOBJ)/bally.a \
 	$(MESSOBJ)/bandai.a \
 	$(MESSOBJ)/be.a \
 	$(MESSOBJ)/bnpo.a \
@@ -502,6 +499,37 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_DRIVERS)/dc.o 		\
 	$(MAME_MACHINE)/dccons.o 	\
 	$(MAME_MACHINE)/gdrom.o 	\
+	$(MAME_DRIVERS)/a310.o		\
+	$(MAME_DRIVERS)/a7000.o		\
+	$(MAME_MACHINE)/amigafdc.o	\
+	$(MAME_MACHINE)/amigacrt.o	\
+	$(MAME_MACHINE)/amigacd.o	\
+	$(MAME_MACHINE)/amigakbd.o	\
+	$(MAME_DRIVERS)/amiga.o		\
+	$(MAME_DRIVERS)/a3000.o		\
+	$(MAME_DRIVERS)/ami1200.o	\
+	$(MAME_DRIVERS)/msx.o		\
+	$(MAME_MACHINE)/msx_slot.o	\
+	$(MAME_MACHINE)/msx.o		\
+	$(MAME_MACHINE)/ataricrt.o	\
+	$(MAME_MACHINE)/atarifdc.o	\
+	$(MAME_DRIVERS)/atari400.o	\
+	$(MAME_DRIVERS)/astrocdh.o	\
+	$(MAME_MACHINE)/pce.o		\
+	$(MAME_DRIVERS)/pce.o		\
+	$(MAME_MACHINE)/nes_mmc.o	\
+	$(MAME_VIDEO)/nes.o			\
+	$(MAME_MACHINE)/nes.o		\
+	$(MAME_DRIVERS)/nes.o		\
+	$(MAME_MACHINE)/snescart.o	\
+	$(MAME_DRIVERS)/snes.o		\
+	$(MAME_DRIVERS)/n64.o		\
+	$(MAME_MACHINE)/aescart.o	\
+	$(MAME_DRIVERS)/ng_aes.o	\
+	$(MAME_DRIVERS)/psx.o		\
+	$(MAME_MACHINE)/psxcd.o		\
+	$(MAME_MACHINE)/psxcddrv.o	\
+	$(MAME_MACHINE)/psxcard.o	\
 
 #-------------------------------------------------
 # the following files are general components and
@@ -545,7 +573,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/terminal.o	\
 	$(MESS_MACHINE)/teleprinter.o	\
 	$(MESS_MACHINE)/upd7002.o	\
-	$(MESS_MACHINE)/wd17xx.o	\
 	$(MESS_VIDEO)/crtc6845.o	\
 	$(MESS_VIDEO)/dl1416.o		\
 	$(MESS_VIDEO)/hd44780.o		\
@@ -566,9 +593,7 @@ $(MESSOBJ)/shared.a: \
 #-------------------------------------------------
 
 $(MESSOBJ)/acorn.a:				\
-	$(MESS_DRIVERS)/a310.o		\
 	$(MESS_DRIVERS)/a6809.o		\
-	$(MESS_DRIVERS)/a7000.o		\
 	$(MESS_DRIVERS)/acrnsys1.o	\
 	$(MESS_DRIVERS)/atom.o		\
 	$(MESS_FORMATS)/atom_atm.o	\
@@ -587,16 +612,6 @@ $(MESSOBJ)/act.a:				\
 	$(MESS_DRIVERS)/apricot.o	\
 	$(MESS_DRIVERS)/apricotf.o	\
 	$(MESS_DRIVERS)/victor9k.o	\
-
-$(MESSOBJ)/amiga.a:				\
-	$(MESS_MACHINE)/amigafdc.o	\
-	$(MESS_MACHINE)/amigacrt.o	\
-	$(MESS_MACHINE)/amigacd.o	\
-	$(MESS_MACHINE)/matsucd.o	\
-	$(MESS_MACHINE)/amigakbd.o	\
-	$(MESS_DRIVERS)/amiga.o		\
-	$(MESS_DRIVERS)/a3000.o		\
-	$(MESS_DRIVERS)/ami1200.o	\
 
 $(MESSOBJ)/amstrad.a:			\
 	$(MESS_DRIVERS)/amstrad.o	\
@@ -648,11 +663,6 @@ $(MESSOBJ)/arcadia.a:			\
 	$(MESS_AUDIO)/arcadia.o		\
 	$(MESS_VIDEO)/arcadia.o		\
 
-$(MESSOBJ)/ascii.a:				\
-	$(MESS_DRIVERS)/msx.o		\
-	$(MESS_MACHINE)/msx_slot.o	\
-	$(MESS_MACHINE)/msx.o		\
-
 $(MESSOBJ)/at.a:				\
 	$(MESS_MACHINE)/at_keybc.o	\
 	$(MESS_MACHINE)/ps2.o		\
@@ -661,9 +671,6 @@ $(MESSOBJ)/at.a:				\
 	$(MESS_DRIVERS)/at.o		\
 
 $(MESSOBJ)/atari.a:				\
-	$(MESS_MACHINE)/ataricrt.o	\
-	$(MESS_MACHINE)/atarifdc.o	\
-	$(MESS_DRIVERS)/atari.o		\
 	$(MESS_MACHINE)/a7800.o		\
 	$(MESS_DRIVERS)/a7800.o		\
 	$(MESS_VIDEO)/a7800.o		\
@@ -678,9 +685,6 @@ $(MESSOBJ)/atari.a:				\
 
 $(MESSOBJ)/att.a:				\
 	$(MESS_DRIVERS)/unixpc.o	\
-
-$(MESSOBJ)/bally.a:				\
-	$(MESS_DRIVERS)/astrocde.o	\
 
 $(MESSOBJ)/bandai.a:			\
 	$(MESS_DRIVERS)/pippin.o	\
@@ -758,7 +762,6 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c8280.o		\
 	$(MESS_MACHINE)/c9060.o		\
 	$(MESS_DRIVERS)/clcd.o		\
-	$(MESS_MACHINE)/6525tpi.o	\
 	$(MESS_MACHINE)/cbm.o		\
 	$(MESS_MACHINE)/cbmipt.o	\
 	$(MESS_MACHINE)/c64.o   	\
@@ -1147,8 +1150,6 @@ $(MESSOBJ)/ne.a:				\
 	$(MESS_MACHINE)/z80ne.o     \
 
 $(MESSOBJ)/nec.a:				\
-	$(MESS_MACHINE)/pce.o		\
-	$(MESS_DRIVERS)/pce.o		\
 	$(MESS_DRIVERS)/pcfx.o		\
 	$(MESS_DRIVERS)/pc6001.o	\
 	$(MESS_DRIVERS)/pc8401a.o	\
@@ -1171,13 +1172,6 @@ $(MESSOBJ)/nintendo.a:			\
 	$(MESS_VIDEO)/gb.o			\
 	$(MESS_MACHINE)/gb.o		\
 	$(MESS_DRIVERS)/gb.o		\
-	$(MESS_MACHINE)/nes_mmc.o	\
-	$(MESS_VIDEO)/nes.o			\
-	$(MESS_MACHINE)/nes.o		\
-	$(MESS_DRIVERS)/nes.o		\
-	$(MESS_MACHINE)/snescart.o	\
-	$(MESS_DRIVERS)/snes.o		\
-	$(MESS_DRIVERS)/n64.o		\
 	$(MESS_MACHINE)/pokemini.o	\
 	$(MESS_DRIVERS)/pokemini.o	\
 	$(MESS_DRIVERS)/vboy.o		\
@@ -1410,14 +1404,8 @@ $(MESSOBJ)/neocd.a:				\
 $(MESSOBJ)/snk.a:				\
 	$(MESS_DRIVERS)/ngp.o		\
 	$(MESS_VIDEO)/k1ge.o		\
-	$(MESS_DEVICES)/aescart.o	\
-	$(MESS_DRIVERS)/ng_aes.o	\
 
 $(MESSOBJ)/sony.a:				\
-	$(MESS_DRIVERS)/psx.o		\
-	$(MESS_MACHINE)/psxcd.o		\
-	$(MESS_MACHINE)/psxcddrv.o	\
-	$(MESS_MACHINE)/psxcard.o	\
 	$(MESS_DRIVERS)/pockstat.o	\
 	$(MESS_DRIVERS)/smc777.o	\
 
@@ -1806,7 +1794,7 @@ $(MESS_DRIVERS)/mpf1.o:		$(MESS_LAYOUT)/mpf1.lh \
 $(MESS_DRIVERS)/mmd1.o:		$(MESS_LAYOUT)/mmd1.lh \
 					$(MESS_LAYOUT)/mmd2.lh
 $(MESS_VIDEO)/newbrain.o:	$(MESS_LAYOUT)/newbrain.lh
-$(MESS_DRIVERS)/ng_aes.o:	$(MESS_LAYOUT)/neogeo.lh
+$(MAME_DRIVERS)/ng_aes.o:	$(MESS_LAYOUT)/neogeo.lh
 $(MESS_DRIVERS)/poly880.o:	$(MESS_LAYOUT)/poly880.lh
 $(MESS_DRIVERS)/pc1500.o:	$(MESS_LAYOUT)/pc1500.lh
 $(MESS_VIDEO)/pc8401a.o:	$(MESS_LAYOUT)/pc8500.lh

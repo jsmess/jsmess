@@ -16,7 +16,7 @@ DMAC controller.
 #include "machine/6526cia.h"
 #include "machine/wd33c93.h"
 #include "imagedev/chd_cd.h"
-#include "matsucd.h"
+#include "machine/matsucd.h"
 
 
 #define VERBOSE_DMAC 0
