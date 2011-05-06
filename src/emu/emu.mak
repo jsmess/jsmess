@@ -44,6 +44,7 @@ OBJDIRS += \
 #-------------------------------------------------
 
 EMUOBJS = \
+	$(EMUOBJ)/hashfile.o \
 	$(EMUOBJ)/addrmap.o \
 	$(EMUOBJ)/attotime.o \
 	$(EMUOBJ)/audit.o \
@@ -163,6 +164,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/cdp1871.o		\
 	$(EMUMACHINE)/com8116.o		\
 	$(EMUMACHINE)/cr589.o		\
+	$(EMUMACHINE)/ctronics.o	\
 	$(EMUMACHINE)/ds1302.o		\
 	$(EMUMACHINE)/ds2401.o		\
 	$(EMUMACHINE)/ds2404.o		\
@@ -204,6 +206,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/msm5832.o	\
 	$(EMUMACHINE)/msm58321.o	\
 	$(EMUMACHINE)/msm6242.o		\
+	$(EMUMACHINE)/msm8251.o		\
 	$(EMUMACHINE)/nmc9306.o		\
 	$(EMUMACHINE)/nvram.o		\
 	$(EMUMACHINE)/pc16552d.o	\
@@ -225,6 +228,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/scsidev.o		\
 	$(EMUMACHINE)/scsihd.o		\
 	$(EMUMACHINE)/secflash.o	\
+	$(EMUMACHINE)/serial.o	\
 	$(EMUMACHINE)/smc91c9x.o	\
 	$(EMUMACHINE)/timekpr.o		\
 	$(EMUMACHINE)/tmp68301.o	\
@@ -232,6 +236,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/upd1990a.o	\
 	$(EMUMACHINE)/upd4701.o		\
 	$(EMUMACHINE)/upd7201.o		\
+	$(EMUMACHINE)/upd765.o		\
 	$(EMUMACHINE)/wd33c93.o		\
 	$(EMUMACHINE)/x2212.o		\
 	$(EMUMACHINE)/x76f041.o		\

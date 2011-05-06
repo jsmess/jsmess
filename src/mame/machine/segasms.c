@@ -1,7 +1,7 @@
 #include "emu.h"
 #include "crsshair.h"
 #include "image.h"
-#include "includes/sms.h"
+#include "includes/segasms.h"
 #include "video/smsvdp.h"
 #include "sound/2413intf.h"
 #include "imagedev/cartslot.h"

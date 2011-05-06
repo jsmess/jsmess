@@ -495,6 +495,14 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_DRIVERS)/vectrex.o	\
 	$(MAME_VIDEO)/vectrex.o		\
 	$(MAME_MACHINE)/vectrex.o	\
+	$(MAME_VIDEO)/smsvdp.o 		\
+	$(MAME_MACHINE)/segasms.o 	\
+	$(MAME_DRIVERS)/segasms.o 	\
+	$(MAME_DRIVERS)/sg1000.o 	\
+	$(MAME_DRIVERS)/dc.o 		\
+	$(MAME_MACHINE)/dccons.o 	\
+	$(MAME_MACHINE)/gdrom.o 	\
+	$(MAME_FORMATS)/basicdsk.o 	\
 
 #-------------------------------------------------
 # the following files are general components and
@@ -512,7 +520,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_FORMATS)/d88_dsk.o	\
 	$(MESS_FORMATS)/fdi_dsk.o	\
 	$(MESS_DEVICES)/microdrv.o	\
-	$(MESS_FORMATS)/basicdsk.o	\
 	$(MESS_FORMATS)/coco_cas.o	\
 	$(MESS_FORMATS)/coco_dsk.o	\
 	$(MESS_FORMATS)/pc_dsk.o	\
@@ -522,7 +529,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/8530scc.o	\
 	$(MESS_MACHINE)/at45dbxx.o	\
 	$(MESS_MACHINE)/ay31015.o	\
-	$(MESS_MACHINE)/ctronics.o	\
 	$(MESS_MACHINE)/er59256.o	\
 	$(MESS_MACHINE)/hd63450.o	\
 	$(MESS_MACHINE)/i82371ab.o	\
@@ -538,16 +544,13 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/mc6854.o	\
 	$(MESS_MACHINE)/mm58274c.o	\
 	$(MESS_MACHINE)/mpc105.o	\
-	$(MESS_MACHINE)/msm8251.o	\
 	$(MESS_MACHINE)/mos6530.o	\
-	$(MESS_MACHINE)/upd765.o	\
 	$(MESS_MACHINE)/ncr5380.o	\
 	$(MESS_MACHINE)/pc_lpt.o	\
 	$(MESS_MACHINE)/pc_mouse.o	\
 	$(MESS_MACHINE)/pcf8593.o	\
 	$(MESS_MACHINE)/rs232.o		\
 	$(MESS_MACHINE)/scsibus.o	\
-	$(MESS_MACHINE)/serial.o	\
 	$(MESS_MACHINE)/smartmed.o	\
 	$(MESS_MACHINE)/smc92x4.o	\
 	$(MESS_MACHINE)/sst39vfx.o	\
@@ -1385,13 +1388,6 @@ $(MESSOBJ)/sanyo.a:				\
 
 $(MESSOBJ)/sega.a:				\
 	$(MAME_DRIVERS)/saturn.o	\
-	$(MESS_VIDEO)/smsvdp.o		\
-	$(MESS_MACHINE)/sms.o		\
-	$(MESS_DRIVERS)/sms.o		\
-	$(MESS_DRIVERS)/sg1000.o	\
-	$(MESS_DRIVERS)/dc.o		\
-	$(MESS_MACHINE)/dc.o		\
-	$(MESS_MACHINE)/gdrom.o		\
 
 $(MESSOBJ)/sgi.a:				\
 	$(MESS_MACHINE)/sgi.o		\
@@ -1886,7 +1882,7 @@ $(MESS_DRIVERS)/px8.o:		$(MESS_LAYOUT)/px8.lh
 $(MESS_DRIVERS)/sc2.o:		$(MESS_LAYOUT)/sc2.lh
 $(MESS_DRIVERS)/savia84.o:	$(MESS_LAYOUT)/savia84.lh
 $(MESS_DRIVERS)/selz80.o:	$(MESS_LAYOUT)/selz80.lh
-$(MESS_DRIVERS)/sms.o:		$(MESS_LAYOUT)/sms1.lh
+$(MAME_DRIVERS)/segasms.o:  $(MAME_LAYOUT)/sms1.lh
 $(MESS_DRIVERS)/stopthie.o:	$(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:	$(MESS_LAYOUT)/super80.lh
 $(MESS_DRIVERS)/supercon.o:	$(MESS_LAYOUT)/supercon.lh
