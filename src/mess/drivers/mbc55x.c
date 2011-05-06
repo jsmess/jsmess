@@ -12,7 +12,6 @@
 #include "cpu/i86/i86.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
-#include "formats/flopimg.h"
 #include "formats/pc_dsk.h"
 #include "includes/mbc55x.h"
 #include "machine/ctronics.h"

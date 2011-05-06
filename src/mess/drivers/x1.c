@@ -222,7 +222,6 @@
 #include "machine/wd17xx.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
-#include "formats/flopimg.h"
 #include "formats/basicdsk.h"
 #include "formats/x1_tap.h"
 #include "imagedev/cartslot.h"

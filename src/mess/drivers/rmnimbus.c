@@ -14,7 +14,6 @@
 #include "imagedev/flopdrv.h"
 #include "imagedev/harddriv.h"
 #include "machine/ram.h"
-#include "formats/flopimg.h"
 #include "formats/pc_dsk.h"
 #include "includes/rmnimbus.h"
 #include "machine/er59256.h"

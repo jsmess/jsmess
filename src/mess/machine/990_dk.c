@@ -10,9 +10,9 @@
 
 #include "emu.h"
 
-#include "990_dk.h"
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
+#include "990_dk.h"
 
 #define MAX_FLOPPIES 4
 
