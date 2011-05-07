@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <assert.h>
-#include "osdepend.h"
 #include "imgtoolx.h"
 #include "d64.h"
 
@@ -466,7 +464,7 @@ static D64_ENTRY *d64_image_findfile (d64_image *image, const unsigned char *nam
 		{
 			if (dir->entry[i].type & 0x80)
 			{
-				if (mame_stricmp ((char *) name, (char *) "*") == 0)
+				if (core_stricmp ((char *) name, (char *) "*") == 0)
 					return dir->entry + i;
 				if (cbm_compareNames (name, dir->entry[i].name))
 					return dir->entry + i;

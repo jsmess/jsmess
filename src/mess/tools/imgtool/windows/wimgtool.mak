@@ -24,10 +24,8 @@ OBJDIRS += $(WIMGTOOLOBJ)
 
 WIMGTOOL_OBJS = \
 	$(MESS_TOOLS)/pile.o					\
-	$(MESS_TOOLS)/toolerr.o				\
 	$(MESS_TOOLS)/imgtool/windows/opcntrl.o	\
 	$(MESS_TOOLS)/imgtool/windows/winutils.o	\
-	$(MESS_TOOLS)/imgtool/stubs.o			\
 	$(MESS_TOOLS)/imgtool/windows/wmain.o		\
 	$(MESS_TOOLS)/imgtool/windows/wimgtool.o	\
 	$(MESS_TOOLS)/imgtool/windows/attrdlg.o	\
@@ -59,6 +57,6 @@ $(WIMGTOOLOBJ)/%.res: $(WIMGTOOLSRC)/%.rc | $(OSPREBUILD)
 	@echo Compiling resources $<...
 	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir $(WIMGTOOLSRC) -o $@ -i $<
 
-$(WIMGTOOL): $(WIMGTOOL_OBJS) $(LIBIMGTOOL) $(LIBUTIL) $(EXPAT) $(ZLIB) $(FORMATS_LIB) $(LIBOCORE_NOMAIN)
+$(WIMGTOOL): $(VERSIONOBJ) $(WIMGTOOL_OBJS) $(LIBIMGTOOL) $(LIBUTIL) $(EXPAT) $(ZLIB) $(FORMATS_LIB) $(LIBOCORE_NOMAIN)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS_WIN) -municode -mwindows $^ $(LIBS_WIN) -o $@

@@ -21,8 +21,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
-#include <assert.h>
-#include "osdepend.h"
 #include "imgtoolx.h"
 #include "harddisk.h"
 #include "imghd.h"

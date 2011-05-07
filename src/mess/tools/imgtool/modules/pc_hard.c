@@ -47,7 +47,6 @@
       12       4  Total sectors in partition
 
 ****************************************************************************/
-
 #include "imgtool.h"
 #include "formats/imageutl.h"
 #include "imghd.h"

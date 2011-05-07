@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "osdepend.h"
 #include "library.h"
 
 typedef struct _imgtool_filter imgtool_filter;
@@ -44,7 +43,7 @@ filter_getinfoproc filter_lookup(const char *name);
 
 INT64 filter_get_info_int(filter_getinfoproc get_info, UINT32 state);
 void *filter_get_info_ptr(filter_getinfoproc get_info, UINT32 state);
-genf *filter_get_info_fct(filter_getinfoproc get_info, UINT32 state);
+void *filter_get_info_fct(filter_getinfoproc get_info, UINT32 state);
 const char *filter_get_info_string(filter_getinfoproc get_info, UINT32 state);
 
 /* ----------------------------------------------------------------------- */

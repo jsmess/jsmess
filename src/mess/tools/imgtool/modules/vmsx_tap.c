@@ -43,7 +43,6 @@
     Sean Young
 */
 
-#include "osdepend.h"
 #include "imgtoolx.h"
 
 typedef struct

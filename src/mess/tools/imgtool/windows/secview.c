@@ -23,6 +23,12 @@
 #define ANCHOR_RIGHT	0x04
 #define ANCHOR_BOTTOM	0x08
 
+#ifdef PTR64
+typedef UINT64 FPTR;
+#else
+typedef UINT32 FPTR;
+#endif
+
 struct anchor_entry
 {
 	UINT16 control;
@@ -89,7 +95,7 @@ static void size_dialog(HWND dialog, const struct anchor_entry *anchor_entries,
 	RECT dialog_rect, adjusted_dialog_rect, dlgitem_rect;
 	LONG dialog_left, dialog_top;
 	LONG left, top;
-	FPTR width, height;
+	UINT32 width, height;
 	UINT8 anchor;
 	HANDLE width_prop, height_prop;
 	static const TCHAR winprop_negwidth[] = TEXT("winprop_negwidth");

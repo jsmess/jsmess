@@ -93,9 +93,7 @@
 #include <limits.h>
 #include <stddef.h>
 
-#include "emu.h"
 #include "formats/imageutl.h"
-#include "osdepend.h"
 #include "imgtoolx.h"
 #include "macutil.h"
 #include "iflopimg.h"

@@ -89,7 +89,7 @@ int cmd_testsuite(struct command *c, int argc, char *argv[])
 				s++;
 			directive_value = s;
 
-			if (!mame_stricmp(directive, "imagefile"))
+			if (!core_stricmp(directive, "imagefile"))
 			{
 				/* imagefile directive */
 				if (img)
@@ -101,7 +101,7 @@ int cmd_testsuite(struct command *c, int argc, char *argv[])
 
 				fprintf(stdout, "%s\n", filename);
 			}
-			else if (!mame_stricmp(directive, "files"))
+			else if (!core_stricmp(directive, "files"))
 			{
 				/* files directive */
 				if (!img)

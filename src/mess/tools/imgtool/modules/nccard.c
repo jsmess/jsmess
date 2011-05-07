@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "osdepend.h"
 #include "imgtoolx.h"
 
 /* NC Card image handling code by Kevin Thacker. February 2001 */

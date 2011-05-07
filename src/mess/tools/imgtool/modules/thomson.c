@@ -1040,14 +1040,14 @@ static imgtoolerr_t thom_write_file(imgtool_partition *part,
   switch ( option_resolution_lookup_int( opts, 'T' ) ) {
   case 0:
     if ( ! is_new ) break;
-    if ( ! mame_stricmp( ext, "BAS" ) ) d.ftype = 0;
-    else if ( ! mame_stricmp( ext, "BAT" ) ) d.ftype = 0;
-    else if ( ! mame_stricmp( ext, "DAT" ) ) d.ftype = 1;
-    else if ( ! mame_stricmp( ext, "ASC" ) ) d.ftype = 1;
-    else if ( ! mame_stricmp( ext, "BIN" ) ) d.ftype = 2;
-    else if ( ! mame_stricmp( ext, "MAP" ) ) d.ftype = 2;
-    else if ( ! mame_stricmp( ext, "CFG" ) ) d.ftype = 2;
-    else if ( ! mame_stricmp( ext, "ASM" ) ) d.ftype = 3;
+    if ( ! core_stricmp( ext, "BAS" ) ) d.ftype = 0;
+    else if ( ! core_stricmp( ext, "BAT" ) ) d.ftype = 0;
+    else if ( ! core_stricmp( ext, "DAT" ) ) d.ftype = 1;
+    else if ( ! core_stricmp( ext, "ASC" ) ) d.ftype = 1;
+    else if ( ! core_stricmp( ext, "BIN" ) ) d.ftype = 2;
+    else if ( ! core_stricmp( ext, "MAP" ) ) d.ftype = 2;
+    else if ( ! core_stricmp( ext, "CFG" ) ) d.ftype = 2;
+    else if ( ! core_stricmp( ext, "ASM" ) ) d.ftype = 3;
     else d.ftype = 2;
     break;
   case 1: d.ftype = 0; break;
@@ -1060,9 +1060,9 @@ static imgtoolerr_t thom_write_file(imgtool_partition *part,
  switch ( option_resolution_lookup_int( opts, 'F' ) ) {
   case 0:
     if ( ! is_new ) break;
-    if ( ! mame_stricmp( ext, "DAT" ) ) d.format = 0xff;
-    else if ( ! mame_stricmp( ext, "ASC" ) ) d.format = 0xff;
-    else if ( ! mame_stricmp( ext, "ASM" ) ) d.format = 0xff;
+    if ( ! core_stricmp( ext, "DAT" ) ) d.format = 0xff;
+    else if ( ! core_stricmp( ext, "ASC" ) ) d.format = 0xff;
+    else if ( ! core_stricmp( ext, "ASM" ) ) d.format = 0xff;
     else d.format = 0;
     break;
   case 1: d.format = 0; break;

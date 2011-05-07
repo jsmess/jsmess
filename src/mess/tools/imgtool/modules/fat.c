@@ -134,7 +134,6 @@
 
 #include <time.h>
 #include <ctype.h>
-
 #include "imgtool.h"
 #include "formats/imageutl.h"
 #include "unicode.h"
@@ -1715,7 +1714,7 @@ static imgtoolerr_t fat_lookup_path(imgtool_partition *partition, const char *pa
 
 			LOG(("fat_lookup_path(): %s/%s: %d\n", ent.short_filename, ent.long_filename, ent.dirent_sector_offset));
 		}
-		while(!ent.eof && mame_stricmp(path, ent.short_filename) && mame_stricmp(path, ent.long_filename));
+		while(!ent.eof && core_stricmp(path, ent.short_filename) && core_stricmp(path, ent.long_filename));
 
 		parent_first_cluster = file->first_cluster;
 
@@ -1747,7 +1746,7 @@ static imgtoolerr_t fat_lookup_path(imgtool_partition *partition, const char *pa
 						if (err)
 							goto done;
 
-						if (!mame_stricmp(sfn, ent.short_filename))
+						if (!core_stricmp(sfn, ent.short_filename))
 						{
 							bumped_sfn = TRUE;
 							fat_bump_dirent(partition, created_entry, created_entry_len);

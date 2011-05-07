@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "osdepend.h"
 #include "imgtoolx.h"
 
 /* commodore 64 lynx format
@@ -247,7 +246,7 @@ static LYNX_ENTRY* lynx_image_findfile(lynx_image *image, const char *fname)
 	int i;
 
 	for (i=0; i<image->count; i++) {
-		if (!mame_stricmp(fname, image->entries[i].name) ) return image->entries+i;
+		if (!core_stricmp(fname, image->entries[i].name) ) return image->entries+i;
 	}
 	return NULL;
 }

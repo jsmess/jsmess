@@ -9,11 +9,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "osdepend.h"
 #include "imgtoolx.h"
 #include "formats/coco_dsk.h"
 #include "iflopimg.h"
-
 
 /* this structure mirrors the structure of an RS-DOS directory entry on disk */
 struct rsdos_dirent
@@ -103,7 +101,7 @@ static imgtoolerr_t lookup_rsdos_file(imgtool_image *f, const char *fname, struc
 		if (ent->fname[0] != -1)
 			get_dirent_fname(fnamebuf, ent);
 	}
-	while((ent->fname[0] != -1) && mame_stricmp(fnamebuf, fname));
+	while((ent->fname[0] != -1) && core_stricmp(fnamebuf, fname));
 
 	if (ent->fname[0] == -1)
 		return IMGTOOLERR_FILENOTFOUND;

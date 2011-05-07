@@ -9,9 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <zlib.h>
-#include <assert.h>
 
-#include "emu.h"
 #include "unzip.h"
 #include "osdcore.h"
 #include "imgtool.h"
@@ -120,7 +118,7 @@ imgtool_stream *stream_open(const char *fname, int read_or_write)
 
 	/* maybe we are just a ZIP? */
 	ext = strrchr(fname, '.');
-	if (ext && !mame_stricmp(ext, ".zip"))
+	if (ext && !core_stricmp(ext, ".zip"))
 		return stream_open_zip(fname, NULL, read_or_write);
 
 	filerr = core_fopen(fname, write_modes[read_or_write], &f);

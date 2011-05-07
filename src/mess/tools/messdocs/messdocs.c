@@ -8,7 +8,7 @@
 
 #include "pool.h"
 #include "sys/stat.h"
-#include "osdcore.h"
+#include "corestr.h"
 #include "strconv.h"
 #include "winutf8.h"
 #include "expat.h"

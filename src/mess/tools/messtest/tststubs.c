@@ -4,8 +4,6 @@
 #endif
 
 #include <stdlib.h>
-#include "emu.h"
-#include "osdepend.h"
 void osd_set_mastervolume(int attenuation)
 {
 }

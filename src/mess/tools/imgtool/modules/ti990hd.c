@@ -10,8 +10,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <assert.h>
-#include "osdepend.h"
 #include "imgtoolx.h"
 
 /* Max sector lenght is bytes.  Generally 256, except for a few older disk

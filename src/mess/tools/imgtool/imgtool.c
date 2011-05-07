@@ -8,15 +8,12 @@
 
 #include <string.h>
 #include <ctype.h>
-#include <assert.h>
 
-#include "osdepend.h"
 #include "imgtoolx.h"
 #include "formats/imageutl.h"
 #include "library.h"
 #include "modules.h"
 #include "pool.h"
-
 
 
 /***************************************************************************
@@ -1452,7 +1449,7 @@ imgtoolerr_t imgtool_partition_get_file_size(imgtool_partition *partition, const
 		if (err)
 			goto done;
 
-		if (!mame_stricmp(fname, ent.filename))
+		if (!core_stricmp(fname, ent.filename))
 		{
 			*filesize = ent.filesize;
 			goto done;

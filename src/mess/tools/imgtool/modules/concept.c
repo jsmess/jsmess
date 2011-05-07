@@ -10,8 +10,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <assert.h>
-#include "osdepend.h"
 #include "imgtoolx.h"
 
 typedef struct UINT16xE

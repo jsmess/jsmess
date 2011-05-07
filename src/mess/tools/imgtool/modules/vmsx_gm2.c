@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "osdepend.h"
 #include "imgtoolx.h"
 
 /*
@@ -148,7 +147,7 @@ static int vmsx_gm2_image_readfile(imgtool_image *img, const char *fname, imgtoo
 	{
 	GM2_IMAGE *image=(GM2_IMAGE*)img;
 
-	if (mame_stricmp (fname, NewName) )
+	if (core_stricmp (fname, NewName) )
 		return IMGTOOLERR_MODULENOTFOUND;
 
 	if (stream_write(destf, image->data + 0x1000, 0x1000)!=0x1000)

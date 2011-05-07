@@ -10,7 +10,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include "osdepend.h"
 #include "imgtool.h"
 #include "imgtoolx.h"
 #include "formats/imageutl.h"
@@ -259,7 +258,7 @@ static imgtoolerr_t vzdos_searchentry(imgtool_image *image, const char *fname, i
 		memset(filename, 0x00, sizeof(filename));
 		memcpy(filename, ent.fname, len);
 
-		if (!mame_stricmp(fname, filename)) {
+		if (!core_stricmp(fname, filename)) {
 			*entry = i;
 			break;
 		}

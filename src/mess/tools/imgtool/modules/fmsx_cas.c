@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "osdepend.h"
 #include "formats/fmsx_cas.h"
 #include "imgtoolx.h"
 
@@ -181,7 +180,7 @@ static int fmsx_cas_image_readfile(imgtool_image *img, const char *fname, imgtoo
 	UINT32	temp32;
 	int wavlen, offset, rc;
 
-	if (mame_stricmp (fname, image->file_name) )
+	if (core_stricmp (fname, image->file_name) )
 		return IMGTOOLERR_MODULENOTFOUND;
 
 	rc = fmsx_cas_to_wav(image->data, image->size, &wavdata, &wavlen);

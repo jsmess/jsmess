@@ -39,8 +39,6 @@
  * sided 3.5" disks (720kB), simply appended to one another.
  */
 
-#include <assert.h>
-#include "osdepend.h"
 #include "imgtoolx.h"
 
 
@@ -327,7 +325,7 @@ static int msx_dsk_image_readfile(imgtool_image *img, const char *fname, imgtool
 			while ( (fname[offset] >= '0') || (fname[offset] <= '9') )
 				disks = disks * 10 + (fname[offset++] - '0');
 
-			if (mame_stricmp (fname + offset, ".dsk") )
+			if (core_stricmp (fname + offset, ".dsk") )
 				return IMGTOOLERR_MODULENOTFOUND;
 
 			if ( (disks < 1) || (disks > image->disks) )

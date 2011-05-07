@@ -6,7 +6,6 @@
 
 ***************************************************************************/
 
-#include <assert.h>
 #include <string.h>
 
 #include "imgtool.h"
@@ -29,7 +28,7 @@ void *filter_get_info_ptr(filter_getinfoproc get_info, UINT32 state)
 	return info.p;
 }
 
-genf *filter_get_info_fct(filter_getinfoproc get_info, UINT32 state)
+void *filter_get_info_fct(filter_getinfoproc get_info, UINT32 state)
 {
 	union filterinfo info;
 	info.f = NULL;

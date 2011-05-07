@@ -12,7 +12,6 @@
 #include "winutils.h"
 #include <stdio.h>
 #include <tchar.h>
-#include "emu.h"
 #include "hexview.h"
 
 const TCHAR hexview_class[] = TEXT("hexview_class");

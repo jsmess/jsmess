@@ -16,7 +16,9 @@
 #define LIBRARY_H
 
 #include <time.h>
+#include <assert.h>
 
+#include "corestr.h"
 #include "opresolv.h"
 #include "stream.h"
 #include "unicode.h"
@@ -39,7 +41,7 @@ union filterinfo
 {
 	INT64	i;											/* generic integers */
 	void *	p;											/* generic pointers */
-	genf *  f;											/* generic function pointers */
+	void *  f;											/* generic function pointers */
 	const char *s;										/* generic strings */
 
 	imgtoolerr_t (*read_file)(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf);
@@ -253,7 +255,7 @@ union imgtoolinfo
 {
 	INT64	i;											/* generic integers */
 	void *	p;											/* generic pointers */
-	genf *  f;											/* generic function pointers */
+	void *  f;											/* generic function pointers */
 	char *	s;											/* generic strings */
 
 	imgtoolerr_t	(*open)				(imgtool_image *image, imgtool_stream *stream);
@@ -311,7 +313,7 @@ INLINE void *imgtool_get_info_ptr(const imgtool_class *imgclass, UINT32 state)
 	return info.p;
 }
 
-INLINE genf *imgtool_get_info_fct(const imgtool_class *imgclass, UINT32 state)
+INLINE void *imgtool_get_info_fct(const imgtool_class *imgclass, UINT32 state)
 {
 	union imgtoolinfo info;
 	info.f = NULL;

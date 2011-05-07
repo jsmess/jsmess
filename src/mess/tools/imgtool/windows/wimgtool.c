@@ -24,7 +24,6 @@
 #include <time.h>
 #include <tchar.h>
 
-#include "emu.h"
 #include "wimgtool.h"
 #include "wimgres.h"
 #include "pile.h"
@@ -437,7 +436,7 @@ static imgtoolerr_t append_dirent(HWND window, int index, const imgtool_dirent *
 				memcpy(&icon_index, &ptr[i], sizeof(icon_index));
 				i += sizeof(icon_index);
 
-				if (!mame_stricmp(s, extension))
+				if (!core_stricmp(s, extension))
 					break;
 			}
 
@@ -635,7 +634,8 @@ static imgtoolerr_t full_refresh_image(HWND window)
 	const char *statusbar_text[2];
 	TCHAR *t_filename;
 	imgtool_partition_features features;
-
+	extern const char build_version[];
+	
 	info = get_wimgtool_info(window);
 
 	// get the modules and features
@@ -1097,7 +1097,7 @@ imgtoolerr_t wimgtool_open_image(HWND window, const imgtool_module *module,
 
 	if (info->filename)
 		osd_free(info->filename);
-	info->filename = mame_strdup(filename);
+	info->filename = core_strdup(filename);
 	if (!info->filename)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;
@@ -1138,7 +1138,7 @@ imgtoolerr_t wimgtool_open_image(HWND window, const imgtool_module *module,
 	if (imgtool_partition_get_features(info->partition).supports_directories)
 	{
 		root_path = imgtool_partition_get_root_path(partition);
-		info->current_directory = mame_strdup(root_path);
+		info->current_directory = core_strdup(root_path);
 		if (!info->current_directory)
 		{
 			err = IMGTOOLERR_OUTOFMEMORY;
@@ -1560,7 +1560,7 @@ static void menu_createdir(HWND window)
 	{
 		s = (char *) imgtool_partition_path_concatenate(info->partition, info->current_directory, utf8_dirname);
 		osd_free(utf8_dirname);
-		utf8_dirname = mame_strdup(s);
+		utf8_dirname = core_strdup(s);
 	}
 
 	err = imgtool_partition_create_directory(info->partition, utf8_dirname);
@@ -1757,7 +1757,7 @@ static imgtoolerr_t change_directory(HWND window, const char *dir)
 
 	info = get_wimgtool_info(window);
 
-	new_current_dir = mame_strdup(imgtool_partition_path_concatenate(info->partition, info->current_directory, dir));
+	new_current_dir = core_strdup(imgtool_partition_path_concatenate(info->partition, info->current_directory, dir));
 	if (!new_current_dir)
 		return IMGTOOLERR_OUTOFMEMORY;
 	info->current_directory = new_current_dir;

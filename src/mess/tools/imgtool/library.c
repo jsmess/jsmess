@@ -7,11 +7,8 @@
 
 ****************************************************************************/
 
-#include <assert.h>
 #include <string.h>
 
-#include "emu.h"
-#include "osdepend.h"
 #include "library.h"
 #include "pool.h"
 
@@ -156,7 +153,7 @@ const imgtool_module *imgtool_library_unlink(imgtool_library *library,
 
 	for (m = library->first; m; m = m->next)
 	{
-		if (!mame_stricmp(m->name, module))
+		if (!core_stricmp(m->name, module))
 		{
 			previous = m->previous ? &m->previous->next : &library->first;
 			next = m->next ? &m->next->previous : &library->last;
@@ -182,7 +179,7 @@ static int module_compare(const imgtool_module *m1,
 			rc = strcmp(m1->name, m2->name);
 			break;
 		case ITLS_DESCRIPTION:
-			rc = mame_stricmp(m1->name, m2->name);
+			rc = core_stricmp(m1->name, m2->name);
 			break;
 	}
 	return rc;

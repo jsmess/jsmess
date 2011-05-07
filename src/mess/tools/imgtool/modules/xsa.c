@@ -4,7 +4,6 @@
  * Sean Young
  */
 
-#include "osdepend.h"
 #include "imgtoolx.h"
 
 
@@ -166,7 +165,7 @@ static int xsa_image_readfile(imgtool_image *img, const char *fname, imgtool_str
 	XSA_IMAGE *image=(XSA_IMAGE*)img;
 
 	/*  check file name */
-	if (mame_stricmp (fname, image->file_name) )
+	if (core_stricmp (fname, image->file_name) )
 		return IMGTOOLERR_MODULENOTFOUND;
 
 	return xsa_extract (image->file_handle, destf);

@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "osdepend.h"
 #include "formats/svi_cas.h"
 #include "imgtoolx.h"
 
@@ -185,7 +184,7 @@ static int svi_cas_image_readfile(imgtool_image *img, const char *fname, imgtool
 	UINT32	temp32;
 	int /*wavlen,*/ offset;
 
-	if (mame_stricmp (fname, image->file_name) )
+	if (core_stricmp (fname, image->file_name) )
 		return IMGTOOLERR_MODULENOTFOUND;
 
 	wavdata = image->wavdata;

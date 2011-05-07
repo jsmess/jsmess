@@ -31,11 +31,6 @@ LIBIMGTOOL = $(OBJ)/libimgtool.a
 
 # imgtool lib objects
 IMGTOOL_LIB_OBJS =					\
-	$(OBJ)/version.o				\
-	$(EMUOBJ)/emualloc.o				\
-	$(EMUOBJ)/emucore.o				\
-	$(EMUOBJ)/emuopts.o 				\
-	$(EMUOBJ)/memory.o				\
 	$(IMGTOOLOBJ)/stream.o				\
 	$(IMGTOOLOBJ)/library.o				\
 	$(IMGTOOLOBJ)/modules.o				\
@@ -89,8 +84,6 @@ $(LIBIMGTOOL): $(IMGTOOL_LIB_OBJS)
 
 IMGTOOL_OBJS = \
 	$(IMGTOOLOBJ)/main.o \
-	$(IMGTOOLOBJ)/stubs.o \
-	$(MESS_TOOLS)/toolerr.o
 
 
 
