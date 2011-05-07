@@ -11,6 +11,7 @@
 #include <commdlg.h>
 #include "winutils.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <tchar.h>
 #include "hexview.h"
 
