@@ -1304,10 +1304,10 @@ static TIMER_CALLBACK( vizawrite_timer )
 
 static void load_vizawrite_cartridge(device_image_interface &image)
 {
-	#define DECRYPT_ADDRESS(_offset) \
+	#define VW64_DECRYPT_ADDRESS(_offset) \
 		BITSWAP16(_offset,15,14,13,12,7,8,6,9,5,11,4,3,2,10,1,0)
 	
-	#define DECRYPT_DATA(_data) \
+	#define VW64_DECRYPT_DATA(_data) \
 		BITSWAP8(_data,7,6,0,5,1,4,2,3)
 
 	c64_state *state = image.device().machine().driver_data<c64_state>();
@@ -1319,10 +1319,10 @@ static void load_vizawrite_cartridge(device_image_interface &image)
 	// decrypt ROMs
 	for (offs_t offset = 0; offset < 0x2000; offset++)
 	{
-		offs_t address = DECRYPT_ADDRESS(offset);
-		decrypted[address] = DECRYPT_DATA(roml[offset]);
-		decrypted[address + 0x2000] = DECRYPT_DATA(roml[offset + 0x2000]);
-		decrypted[address + 0x4000] = DECRYPT_DATA(romh[offset]);
+		offs_t address = VW64_DECRYPT_ADDRESS(offset);
+		decrypted[address] = VW64_DECRYPT_DATA(roml[offset]);
+		decrypted[address + 0x2000] = VW64_DECRYPT_DATA(roml[offset + 0x2000]);
+		decrypted[address + 0x4000] = VW64_DECRYPT_DATA(romh[offset]);
 	}
 
 	// map cartridge ROMs
@@ -1332,6 +1332,59 @@ static void load_vizawrite_cartridge(device_image_interface &image)
 	// allocate GAME changing timer
 	state->m_cartridge_timer = image.device().machine().scheduler().timer_alloc(FUNC(vizawrite_timer));
 	state->m_cartridge_timer->adjust(attotime::from_msec(1184), 0);
+}
+
+static WRITE8_HANDLER( hugo_bank_w )
+{
+	/*
+
+		bit		description
+
+		0
+		1
+		2
+		3
+		4		A14
+		5		A15
+		6		A16
+		7		A13
+
+	*/
+
+	c64_state *state = space->machine().driver_data<c64_state>();
+
+	int bank = ((data >> 3) & 0x0e) | BIT(data, 7);
+
+	UINT8 *decrypted = space->machine().region("user1")->base();
+	memcpy(state->m_roml, decrypted + (bank * 0x2000), 0x2000);
+}
+
+static void load_hugo_cartridge(device_image_interface &image)
+{
+	#define HUGO_DECRYPT_ADDRESS(_offset) \
+		BITSWAP16(_offset,15,14,13,12,7,6,5,4,3,2,1,0,8,9,11,10)
+	
+	#define HUGO_DECRYPT_DATA(_data) \
+		BITSWAP8(_data,7,6,5,4,0,1,2,3)
+
+	c64_state *state = image.device().machine().driver_data<c64_state>();
+
+	UINT8 *roml = image.get_software_region("roml");
+	UINT8 *decrypted = image.device().machine().region("user1")->base();
+
+	// decrypt ROMs
+	for (offs_t offset = 0; offset < 0x20000; offset++)
+	{
+		offs_t address = (offset & 0x10000) | HUGO_DECRYPT_ADDRESS(offset);
+		decrypted[address] = HUGO_DECRYPT_DATA(roml[offset]);
+	}
+
+	// map cartridge ROMs
+	memcpy(state->m_roml, decrypted, 0x2000);
+
+	// install bankswitch handler
+	address_space *space = image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
+	space->install_legacy_write_handler( 0xde00, 0xdeff, FUNC(hugo_bank_w) );
 }
 
 static void c64_software_list_cartridge_load(device_image_interface &image)
@@ -1361,6 +1414,9 @@ static void c64_software_list_cartridge_load(device_image_interface &image)
 	{
 		if (!strcmp(cart_type, "vizawrite")) 
 			load_vizawrite_cartridge(image);
+		
+		if (!strcmp(cart_type, "hugo")) 
+			load_hugo_cartridge(image);
 	}
 }
 

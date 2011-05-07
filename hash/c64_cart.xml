@@ -408,7 +408,7 @@
 	</software>
 
 	<software name="hugo" supported="no">
-		<description>Skærmtrolden Hugo</description>
+		<description>Skærmtrolden Hugo (Denmark)</description>
 		<year>1990</year>
 		<publisher>SilverRock Productions</publisher>
 		<!--
@@ -439,8 +439,8 @@
 			<feature name="exrom" value="0" />
 			<feature name="pcb" value="e9048" />
 
-			<dataarea name="rom" size="0x20000">
-				<rom name="hugo 2012" size="0x20000" offset="0x0000" status="nodump"/>
+			<dataarea name="roml" size="0x20000">
+				<rom name="hugo 2012" size="0x20000" crc="7059dfc6" sha1="7cc9ac838f1eb02c7e1bab3b3b4da1d791409dea" offset="0x0000"/>
 			</dataarea>
 		</part>
 	</software>
