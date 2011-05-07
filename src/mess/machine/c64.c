@@ -1263,7 +1263,7 @@ static int c64_crt_load( device_image_interface &image )
 	return IMAGE_INIT_PASS;
 }
 
-void load_standard_c64_cartridge(device_image_interface &image)
+static void load_standard_c64_cartridge(device_image_interface &image)
 {
 	c64_state *state = image.device().machine().driver_data<c64_state>();
 	UINT32 size;
@@ -1288,7 +1288,7 @@ void load_standard_c64_cartridge(device_image_interface &image)
 		memcpy(state->m_romh, image.get_software_region("romh"), size);
 }
 
-TIMER_CALLBACK( vizawrite_timer )
+static TIMER_CALLBACK( vizawrite_timer )
 {
 	c64_state *state = machine.driver_data<c64_state>();
 	UINT8 *decrypted = machine.region("user1")->base();
@@ -1302,7 +1302,7 @@ TIMER_CALLBACK( vizawrite_timer )
 	c64_bankswitch(machine, 0);
 }
 
-void load_vizawrite_cartridge(device_image_interface &image)
+static void load_vizawrite_cartridge(device_image_interface &image)
 {
 	#define DECRYPT_ADDRESS(_offset) \
 		BITSWAP16(_offset,15,14,13,12,7,8,6,9,5,11,4,3,2,10,1,0)
@@ -1334,7 +1334,7 @@ void load_vizawrite_cartridge(device_image_interface &image)
 	state->m_cartridge_timer->adjust(attotime::from_msec(1184), 0);
 }
 
-void c64_software_list_cartridge_load(device_image_interface &image)
+static void c64_software_list_cartridge_load(device_image_interface &image)
 {
 	c64_state *state = image.device().machine().driver_data<c64_state>();
 
