@@ -277,7 +277,6 @@ DRVLIBS += \
 	$(MESSOBJ)/camputers.a \
 	$(MESSOBJ)/canon.a \
 	$(MESSOBJ)/cantab.a \
-	$(MESSOBJ)/capcom.a \
 	$(MESSOBJ)/casio.a \
 	$(MESSOBJ)/cbm.a \
 	$(MESSOBJ)/cccp.a \
@@ -441,6 +440,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/atari.o		\
 	$(MAME_VIDEO)/antic.o		\
 	$(MAME_VIDEO)/gtia.o		\
+	$(MAME_DRIVERS)/jaguar.o	\
 	$(MAME_AUDIO)/jaguar.o		\
 	$(MAME_VIDEO)/jaguar.o		\
 	$(MAME_VIDEO)/astrocde.o	\
@@ -530,6 +530,9 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/psxcd.o		\
 	$(MAME_MACHINE)/psxcddrv.o	\
 	$(MAME_MACHINE)/psxcard.o	\
+	$(MAME_DRIVERS)/saturn.o	\
+	$(MAME_DRIVERS)/cps1.o	\
+	$(MAME_VIDEO)/cps1.o	\
 
 #-------------------------------------------------
 # the following files are general components and
@@ -561,6 +564,9 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/mm58274c.o	\
 	$(MESS_MACHINE)/mpc105.o	\
 	$(MESS_MACHINE)/mos6530.o	\
+	$(MESS_MACHINE)/msm8251.o	\
+	$(MESS_MACHINE)/serial.o	\
+	$(MESS_MACHINE)/upd765.o	\
 	$(MESS_MACHINE)/ncr5380.o	\
 	$(MESS_MACHINE)/pc_lpt.o	\
 	$(MESS_MACHINE)/pc_mouse.o	\
@@ -675,7 +681,6 @@ $(MESSOBJ)/atari.a:				\
 	$(MESS_DRIVERS)/a7800.o		\
 	$(MESS_VIDEO)/a7800.o		\
 	$(MESS_DRIVERS)/a2600.o		\
-	$(MAME_DRIVERS)/jaguar.o	\
 	$(MESS_DRIVERS)/atarist.o	\
 	$(MESS_VIDEO)/atarist.o 	\
 	$(MESS_DRIVERS)/lynx.o		\
@@ -721,10 +726,6 @@ $(MESSOBJ)/canon.a:				\
 $(MESSOBJ)/cantab.a:			\
 	$(MESS_DRIVERS)/ace.o		\
 	$(MESS_FORMATS)/ace_ace.o	\
-
-$(MESSOBJ)/capcom.a:			\
-	$(MAME_DRIVERS)/cps1.o	\
-	$(MAME_VIDEO)/cps1.o	\
 
 $(MESSOBJ)/casio.a:				\
 	$(MESS_DRIVERS)/casloopy.o	\
@@ -1336,7 +1337,7 @@ $(MESSOBJ)/sanyo.a:				\
 	$(MESS_VIDEO)/mbc55x.o  	\
 
 $(MESSOBJ)/sega.a:				\
-	$(MAME_DRIVERS)/saturn.o	\
+	$(MESS_DRIVERS)/sg1000.o 	\
 
 $(MESSOBJ)/sgi.a:				\
 	$(MESS_MACHINE)/sgi.o		\
