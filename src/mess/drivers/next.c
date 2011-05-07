@@ -267,6 +267,9 @@ ROM_START( next ) // 68030
 	ROMX_LOAD( "rev_1.0_v41.bin", 0x0000, 0x10000, CRC(54df32b9) SHA1(06e3ecf09ab67a571186efd870e6b44028612371), ROM_BIOS(2)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", underlabel: "MYF // 1.0.41 // 0D5C" */
 	ROM_SYSTEM_BIOS( 2, "v10p", "v1.0 prototype?" ) // version? word at 0xC: 23D9
 	ROMX_LOAD( "rev_1.0_proto.bin", 0x0000, 0x10000, CRC(F44974F9) SHA1(09EAF9F5D47E379CFA0E4DC377758A97D2869DDC), ROM_BIOS(3)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", no underlabel */
+
+	ROM_REGION( 0x20, MCCS1850_TAG, 0 )
+	ROM_LOAD( "nvram.bin", 0x00, 0x20, BAD_DUMP CRC(7cb74196) SHA1(faa2177c2a08a6b76a6242761a9c0a8b64c4da6e) )
 ROM_END
 
 ROM_START( nextnt ) // 68040 non-turbo
@@ -281,6 +284,9 @@ ROM_START( nextnt ) // 68040 non-turbo
 	ROMX_LOAD( "rev_2.1_v59.bin", 0x0000, 0x20000, CRC(f20ef956) SHA1(09586c6de1ca73995f8c9b99870ee3cc9990933a), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS( 4, "v12", "v1.2 v58" ) // version? word at 0xC: 6372
 	ROMX_LOAD( "rev_1.2_v58.bin", 0x0000, 0x20000, CRC(B815B6A4) SHA1(97D8B09D03616E1487E69D26609487486DB28090), ROM_BIOS(5)) /* Label: "V58 // (C) 1990 NeXT, Inc. // All Rights Reserved // Release 1.2 // 1142.02" */
+
+	ROM_REGION( 0x20, MCCS1850_TAG, 0 )
+	ROM_LOAD( "nvram.bin", 0x00, 0x20, BAD_DUMP CRC(7cb74196) SHA1(faa2177c2a08a6b76a6242761a9c0a8b64c4da6e) )
 ROM_END
 
 ROM_START( nexttrb ) // 68040 turbo
@@ -291,6 +297,9 @@ ROM_START( nexttrb ) // 68040 turbo
 	ROMX_LOAD( "rev_3.2_v72.bin", 0x0000, 0x20000, CRC(e750184f) SHA1(ccebf03ed090a79c36f761265ead6cd66fb04329), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "v30", "v3.0 v70" ) // version? word at 0xC: (01)06e8
 	ROMX_LOAD( "rev_3.0_v70.bin", 0x0000, 0x20000, CRC(37250453) SHA1(a7e42bd6a25c61903c8ca113d0b9a624325ee6cf), ROM_BIOS(3))
+
+	ROM_REGION( 0x20, MCCS1850_TAG, 0 )
+	ROM_LOAD( "nvram.bin", 0x00, 0x20, BAD_DUMP CRC(7cb74196) SHA1(faa2177c2a08a6b76a6242761a9c0a8b64c4da6e) )
 ROM_END
 
 static DRIVER_INIT( next )
