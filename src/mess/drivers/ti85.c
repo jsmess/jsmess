@@ -190,7 +190,7 @@ TI-86 ports:
 #include "sound/speaker.h"
 #include "includes/ti85.h"
 #include "imagedev/snapquik.h"
-#include "formats/ti85_ser.h"
+#include "machine/ti85_ser.h"
 #include "machine/nvram.h"
 
 /* port i/o functions */
