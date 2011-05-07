@@ -1366,7 +1366,6 @@ void c64_software_list_cartridge_load(device_image_interface &image)
 
 static DEVICE_IMAGE_LOAD( c64_cart )
 {
-	c64_state *state = image.device().machine().driver_data<c64_state>();
 	int result = IMAGE_INIT_PASS;
 
 	if (image.software_entry() != NULL)
