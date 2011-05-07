@@ -1387,6 +1387,33 @@ static void load_hugo_cartridge(device_image_interface &image)
 	space->install_legacy_write_handler( 0xde00, 0xdeff, FUNC(hugo_bank_w) );
 }
 
+static WRITE8_HANDLER( easy_calc_result_bank_w )
+{
+	c64_state *state = space->machine().driver_data<c64_state>();
+
+	UINT8 *cart = space->machine().region("user1")->base();
+	memcpy(state->m_romh, cart + 0x2000 + (!offset * 0x2000), 0x2000);
+}
+
+static void load_easy_calc_result_cartridge(device_image_interface &image)
+{
+	c64_state *state = image.device().machine().driver_data<c64_state>();
+
+	UINT8 *roml = image.get_software_region("roml");
+	UINT8 *romh = image.get_software_region("romh");
+	UINT8 *cart = image.device().machine().region("user1")->base();
+	memcpy(cart, roml, 0x2000);
+	memcpy(cart + 0x2000, romh, 0x4000);
+
+	// map cartridge ROMs
+	memcpy(state->m_roml, cart, 0x2000);
+	memcpy(state->m_romh, cart + 0x2000, 0x2000);
+
+	// install bankswitch handler
+	address_space *space = image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
+	space->install_legacy_write_handler( 0xde00, 0xde01, FUNC(easy_calc_result_bank_w) );
+}
+
 static void c64_software_list_cartridge_load(device_image_interface &image)
 {
 	c64_state *state = image.device().machine().driver_data<c64_state>();
@@ -1417,6 +1444,9 @@ static void c64_software_list_cartridge_load(device_image_interface &image)
 		
 		if (!strcmp(cart_type, "hugo")) 
 			load_hugo_cartridge(image);
+		
+		if (!strcmp(cart_type, "easy_calc_result")) 
+			load_easy_calc_result_cartridge(image);
 	}
 }
 

@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
+<!--
+List of mostly undumped cartridges:
+http://www.retroport.de/C64_C128_Hardware.html
+-->
 <softwarelist name="c64_cart" description="Commodore 64 Cartridge">
 	<software name="vw64">
 		<description>VizaWrite 64</description>
@@ -132,7 +135,7 @@
 	</software>
 
 	<software name="epyxfast" supported="no">
-		<description>FastLoad</description>
+		<description>Fast Load Cartridge</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
 		<!--
@@ -216,23 +219,36 @@
 		</part>
 	</software>
 
-	<software name="easycalc" supported="no">
+	<software name="easycalc">
 		<description>Easy Calc Result</description>
 		<year>1985</year>
 		<publisher>Handic Software</publisher>
 		<!--
+		|===========================|
+		|=|                         |
+		|=|     ROM0        LS73    |
+		|=|                         |
+		|=|                         |
+		|=|                         |
+		|=|                         |
+		|=|     ROM1        LS00    |
+		|=|                         |
+		|===========================|
+
+		ROM0  - Hitachi HN61364P 8Kx8 EPROM "CR2001"
+		ROM1  - Hitachi HN613128P 16Kx8 EPROM "CR3001"
 		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="cart_type" value="easy_calc_result" />
-			<feature name="game" value="1" />
+			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
-				<rom name="calc_rom1.bin" size="0x2000" crc="f617bec4" sha1="c5ef2418cf9dba3e14f586d5d6997f271b521a24" offset="0x0000" />
+				<rom name="cr2001" size="0x2000" crc="f617bec4" sha1="c5ef2418cf9dba3e14f586d5d6997f271b521a24" offset="0x0000" />
 			</dataarea>
 
 			<dataarea name="romh" size="0x4000">
-				<rom name="calc_rom2.bin" size="0x4000" crc="4997dd31" sha1="9820b1e6b90d72f095a2b74438dac3cfc33e80b8" offset="0x0000" />
+				<rom name="cr3001" size="0x4000" crc="4997dd31" sha1="9820b1e6b90d72f095a2b74438dac3cfc33e80b8" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -407,7 +423,7 @@
 		</part>
 	</software>
 
-	<software name="hugo" supported="no">
+	<software name="hugo">
 		<description>Skærmtrolden Hugo (Denmark)</description>
 		<year>1990</year>
 		<publisher>SilverRock Productions</publisher>
