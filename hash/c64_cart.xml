@@ -216,14 +216,14 @@
 		</part>
 	</software>
 
-	<software name="calceasy" supported="no">
-		<description>Calc Result Easy</description>
+	<software name="easycalc" supported="no">
+		<description>Easy Calc Result</description>
 		<year>1985</year>
 		<publisher>Handic Software</publisher>
 		<!--
 		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="cart_type" value="calc_result_easy" />
+			<feature name="cart_type" value="easy_calc_result" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
