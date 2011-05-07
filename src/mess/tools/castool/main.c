@@ -15,10 +15,7 @@
 #include <time.h>
 #include <assert.h>
 
-#include "emu.h"
-#include "fileio.h"
-
-#include "imagedev/cassette.h"
+#include "corestr.h"
 
 #include "formats/a26_cas.h"
 #include "formats/apf_apt.h"
@@ -133,7 +130,7 @@ int CLIB_DECL main(int argc, char *argv[])
 
 	if (argc > 1)
 	{
-		if (!mame_stricmp("convert", argv[1]))
+		if (!core_stricmp("convert", argv[1]))
 		{
 			// convert command
 			if (argc!=5) {
@@ -142,7 +139,7 @@ int CLIB_DECL main(int argc, char *argv[])
 				return -1;
 			} else {
 				for (i = 0; formats[i].name; i++) {
-					if (mame_stricmp(formats[i].name,argv[2])==0) {
+					if (core_stricmp(formats[i].name,argv[2])==0) {
 						selected_formats = formats[i].formats;
 						found = 1;
 					}

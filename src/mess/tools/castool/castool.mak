@@ -17,7 +17,6 @@ CFLAGS += -I$(SRC)/$(TARGET)/tools/castool
 CASTOOLOBJ = $(MESS_TOOLS)/castool
 
 
-
 #-------------------------------------------------
 # castool objects
 #-------------------------------------------------
@@ -25,23 +24,8 @@ CASTOOLOBJ = $(MESS_TOOLS)/castool
 OBJDIRS += \
 	$(CASTOOLOBJ)
 
-LIBCASTOOL = $(OBJ)/libcastool.a
-
-# castool lib objects
-CASTOOL_LIB_OBJS =						\
-	$(OBJ)/version.o					\
-	$(EMUOBJ)/emualloc.o				\
-	$(EMUOBJ)/emucore.o					\
-	$(EMUOBJ)/emuopts.o 				\
-	$(EMUOBJ)/memory.o					\
-
-
-$(LIBCASTOOL): $(CASTOOL_LIB_OBJS)
-
 CASTOOL_OBJS = \
 	$(CASTOOLOBJ)/main.o \
-	$(CASTOOLOBJ)/stubs.o \
-	$(MESS_TOOLS)/toolerr.o
 
 
 
@@ -49,6 +33,6 @@ CASTOOL_OBJS = \
 # rules to build the castool executable
 #-------------------------------------------------
 
-$(CASTOOL): $(CASTOOL_OBJS) $(LIBCASTOOL) $(LIBUTIL) $(EXPAT) $(FORMATS_LIB) $(ZLIB) $(LIBOCORE)
+$(CASTOOL): $(CASTOOL_OBJS) $(FORMATS_LIB) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
