@@ -180,7 +180,7 @@ char *imgtool_basename(char *filename)
 static void internal_error(const imgtool_module *module, const char *message)
 {
 #ifdef MAME_DEBUG
-	logerror("%s: %s\n", module->name, message);
+	printf("%s: %s\n", module->name, message);
 #endif
 }
 
