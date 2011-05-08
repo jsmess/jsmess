@@ -348,6 +348,7 @@ int isa8_hdc_device::pc_hdc_dack_r()
 	if (!no_dma())
 	{
 		m_isa->drq3_w((hdcdma_read || hdcdma_size ) ? 1 : 0);
+		if(!(hdcdma_read || hdcdma_size)) pc_hdc_result(0);
 	}
 
 	return result;
@@ -388,7 +389,8 @@ void isa8_hdc_device::pc_hdc_dack_w(int data)
 
 	if (!no_dma())
 	{
-		m_isa->drq3_w((hdcdma_write || hdcdma_size ) ? 1 : 0);
+		m_isa->drq3_w(hdcdma_size ? 1 : 0);
+		if(!hdcdma_size) pc_hdc_result(1);
 	}
 }
 
@@ -583,7 +585,7 @@ void isa8_hdc_device::hdc_command()
 			break;
 
 	}
-	pc_hdc_result(set_error_info);
+	if(no_dma()) pc_hdc_result(set_error_info);
 }
 
 TIMER_CALLBACK(isa8_hdc_device::pc_hdc_command)
