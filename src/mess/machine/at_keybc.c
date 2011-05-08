@@ -3,6 +3,7 @@
     IBM PC AT compatibles 8042 keyboard controller
 
 ***************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "at_keybc.h"
@@ -16,13 +17,12 @@
 const device_type AT_KEYBOARD_CONTROLLER = &device_creator<at_keyboard_controller_device>;
 
 // i/o map for the 8042
-static ADDRESS_MAP_START( at_keybc_io, AS_IO, 8 )
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVREAD_MODERN(DEVICE_SELF_OWNER, at_keyboard_controller_device, t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_DEVREAD_MODERN(DEVICE_SELF_OWNER, at_keyboard_controller_device, t1_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVREAD_MODERN(DEVICE_SELF_OWNER, at_keyboard_controller_device, p1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVREADWRITE_MODERN(DEVICE_SELF_OWNER, at_keyboard_controller_device, p2_r, p2_w)
+static ADDRESS_MAP_START( at_keybc_io, AS_IO, 8, at_keyboard_controller_device)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ( p1_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
 ADDRESS_MAP_END
-
 // machine fragment
 static MACHINE_CONFIG_FRAGMENT( at_keybc )
 	MCFG_CPU_ADD("at_keybc", I8042, DERIVED_CLOCK(1,1))
