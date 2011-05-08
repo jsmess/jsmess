@@ -207,7 +207,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="cart_type" value="pagefox" />
-			<feature name="game" value="1" />
+			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 
 			<dataarea name="rom" size="0x10000">

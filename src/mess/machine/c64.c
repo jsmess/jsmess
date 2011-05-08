@@ -1414,6 +1414,87 @@ static void load_easy_calc_result_cartridge(device_image_interface &image)
 	space->install_legacy_write_handler( 0xde00, 0xde01, FUNC(easy_calc_result_bank_w) );
 }
 
+static WRITE8_HANDLER( pagefox_bank_w )
+{
+	/*
+
+		Die 96KB des Moduls belegen in 6 16K-Banken den Modulbereich von $8000- $c000. 
+		Die Umschaltung erfolgt mit einem Register in $DE80 (-$DEFF, nicht voll decodiert),
+		welches nur beschrieben und nicht gelesen werden kann. Durch Schreiben der Werte 
+		$08 oder $0A selektiert man eine der beiden RAM-Banke, $FF deselektiert das Modul. 
+		
+		Zusatzlich muss Adresse 1 entsprechend belegt werden :$37 fur Lesezugriffe auf das 
+		Modul, $35 oder $34 fur Lesezugriffe auf das Ram des C64. Schreibzugriffe lenkt 
+		der C64 grundsatzlich ins eigene RAM, weshalb zum Beschreiben des Modulrams ein 
+		Trick notwendig ist: Man schaltet das Ram-Modul parallel zum C64-Ram, rettet vor 
+		dem Schreiben den C64-Ram-Inhalt und stellt ihn nachher wieder her...
+	
+		Ldy#0
+		Lda#$35
+		Sta 1
+		Loop Lda (Ptr),y
+		Pha
+		Lda#$08
+		Sta $DE80
+		Lda (Quell),y
+		Sta (Ptr),y
+		Lda#$FF
+		Sta $DE80
+		Pla
+		Sta (Ptr),y
+		Iny
+		Bne Loop
+
+	*/
+
+	c64_state *state = space->machine().driver_data<c64_state>();
+	UINT8 *cart = space->machine().region("user1")->base();
+
+	if (data == 0xff)
+	{
+		// hide cartridge
+		state->m_game = 1;
+		state->m_exrom = 1;
+		c64_bankswitch(space->machine(), 0);
+	}
+	else
+	{
+		int bank = (data >> 1) & 0x03;
+		int ram = BIT(data, 3);
+
+		offs_t offset = ram ? 0x10000 : (bank * 0x4000);
+
+		// map cartridge ROMs
+		memcpy(state->m_roml, cart + offset, 0x2000);
+		memcpy(state->m_romh, cart + offset + 0x2000, 0x2000);
+
+		if (state->m_game) 
+		{
+			// enable cartridge
+			state->m_game = 0;
+			state->m_exrom = 0;
+			c64_bankswitch(space->machine(), 0);
+		}
+	}
+}
+
+static void load_pagefox_cartridge(device_image_interface &image)
+{
+	c64_state *state = image.device().machine().driver_data<c64_state>();
+
+	UINT8 *rom = image.get_software_region("rom");
+	UINT8 *cart = image.device().machine().region("user1")->base();
+	memcpy(cart, rom, 0x10000);
+
+	// map cartridge ROMs
+	memcpy(state->m_roml, cart, 0x2000);
+	memcpy(state->m_romh, cart + 0x2000, 0x2000);
+
+	// install bankswitch handler
+	address_space *space = image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
+	space->install_legacy_write_handler( 0xde80, 0xdeff, FUNC(pagefox_bank_w) );
+}
+
 static void c64_software_list_cartridge_load(device_image_interface &image)
 {
 	c64_state *state = image.device().machine().driver_data<c64_state>();
@@ -1447,6 +1528,9 @@ static void c64_software_list_cartridge_load(device_image_interface &image)
 		
 		if (!strcmp(cart_type, "easy_calc_result")) 
 			load_easy_calc_result_cartridge(image);
+		
+		if (!strcmp(cart_type, "pagefox")) 
+			load_pagefox_cartridge(image); // TODO writing to the expanded 32KB RAM is not supported!
 	}
 }
 
