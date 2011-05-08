@@ -180,7 +180,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<part name="cart" interface="c64_cart">
 			<feature name="cart_type" value="epyx_fast_load" />
 			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
+			<feature name="exrom" value="1" />
 
 			<dataarea name="rom" size="0x2000">
 				<rom name="fastload.bin" size="0x2000" crc="dbe0a98c" sha1="83f296bb4d49781ac369469e3b5e862d2e57c303" offset="0x0000" />
@@ -371,10 +371,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		ROM4  - not populated
 		ROM5  - not populated
 		ROM6  - not populated
+		
+		bankswitching latch at I/O2 ($DF00..$DEFF) (write $0D -> RAM @8000)
 		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="cart_type" value="multiscreen" />
-			<feature name="game" value="1" />
+			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 			<feature name="battery" value="CR2325" />
 
@@ -382,7 +384,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 				<rom name="cart-1.bin" size="0x4000" crc="a0dc670c" sha1="bbee117340477a7416bba2e9abc2b8debd940cd4" offset="0x0000" />
 			</dataarea>
 
-			<dataarea name="rom" size="0x18000">
+			<dataarea name="rom" size="0x30000">
 				<rom name="cart-2.bin" size="0x8000" crc="2abaad8e" sha1="897f98e954418e2e9313f219cd64b100c60c68b1" offset="0x0000" />
 				<rom name="cart-3.bin" size="0x8000" crc="ecddbbfc" sha1="70c72b77dc3981be8bcbec9ba0cc38d9aa5936fd" offset="0x4000" />
 				<rom name="cart-4.bin" size="0x8000" crc="042678ef" sha1="ff2582c617f72bf57be7d76bcf8270665144f924" offset="0x8000" />

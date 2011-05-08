@@ -1462,11 +1462,11 @@ static WRITE8_HANDLER( pagefox_bank_w )
 		int bank = (data >> 1) & 0x03;
 		int ram = BIT(data, 3);
 
-		offs_t offset = ram ? 0x10000 : (bank * 0x4000);
+		offs_t address = ram ? 0x10000 + ((bank & 0x01) * 0x4000) : (bank * 0x4000);
 
 		// map cartridge ROMs
-		memcpy(state->m_roml, cart + offset, 0x2000);
-		memcpy(state->m_romh, cart + offset + 0x2000, 0x2000);
+		memcpy(state->m_roml, cart + address, 0x2000);
+		memcpy(state->m_romh, cart + address + 0x2000, 0x2000);
 
 		if (state->m_game) 
 		{
@@ -1493,6 +1493,48 @@ static void load_pagefox_cartridge(device_image_interface &image)
 	// install bankswitch handler
 	address_space *space = image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
 	space->install_legacy_write_handler( 0xde80, 0xdeff, FUNC(pagefox_bank_w) );
+}
+
+static WRITE8_HANDLER( multiscreen_bank_w )
+{
+	c64_state *state = space->machine().driver_data<c64_state>();
+
+	UINT8 *cart = space->machine().region("user1")->base();
+
+	int bank = data & 0x0f;
+	offs_t address = bank * 0x4000;
+
+	if (bank == 0x0d)
+	{
+		// RAM
+		memcpy(state->m_roml, cart + address, 0x2000);
+		memcpy(state->m_romh, cart + 0x2000, 0x2000);
+	}
+	else
+	{	
+		// ROM
+		memcpy(state->m_roml, cart + address, 0x2000);
+		memcpy(state->m_romh, cart + address + 0x2000, 0x2000);
+	}
+}
+
+static void load_multiscreen_cartridge(device_image_interface &image)
+{
+	c64_state *state = image.device().machine().driver_data<c64_state>();
+	UINT8 *cart = image.device().machine().region("user1")->base();
+	UINT8 *roml = image.get_software_region("roml");
+	memcpy(cart, roml, 0x4000);
+
+	UINT8 *rom = image.get_software_region("rom");
+	memcpy(cart + 0x4000, rom, 0x30000);
+
+	// map cartridge ROMs
+	memcpy(state->m_roml, cart, 0x2000);
+	memcpy(state->m_romh, cart + 0x2000, 0x2000);
+
+	// install bankswitch handler
+	address_space *space = image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
+	space->install_legacy_write_handler( 0xdfff, 0xdfff, FUNC(multiscreen_bank_w) );
 }
 
 static void c64_software_list_cartridge_load(device_image_interface &image)
@@ -1523,14 +1565,20 @@ static void c64_software_list_cartridge_load(device_image_interface &image)
 		if (!strcmp(cart_type, "vizawrite")) 
 			load_vizawrite_cartridge(image);
 		
-		if (!strcmp(cart_type, "hugo")) 
+		else if (!strcmp(cart_type, "hugo")) 
 			load_hugo_cartridge(image);
 		
-		if (!strcmp(cart_type, "easy_calc_result")) 
+		else if (!strcmp(cart_type, "easy_calc_result")) 
 			load_easy_calc_result_cartridge(image);
 		
-		if (!strcmp(cart_type, "pagefox")) 
+		else if (!strcmp(cart_type, "pagefox")) 
 			load_pagefox_cartridge(image); // TODO writing to the expanded 32KB RAM is not supported!
+		
+		else if (!strcmp(cart_type, "multiscreen")) 
+			load_multiscreen_cartridge(image); // TODO 8K RAM expansion test fails on boot
+
+		else
+			load_standard_c64_cartridge(image);
 	}
 }
 
