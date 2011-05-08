@@ -13,7 +13,14 @@
 			<color red="0.0" green="0.2" blue="0.0" />
 		</disk>
 	</element>
-
+	<element name="schach">
+		<text string="SCHACH">
+		<color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="matt">
+		<text string="MATT">
+		<color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
 	<element name="background">
 		<rect>
 			<bounds left="0" top="0" right="1" bottom="1" />
@@ -45,6 +52,11 @@
 		<bezel name="led1" element="led">
 			<bounds x="220" y="95" width="10" height="10" />
 		</bezel>
-
+		<bezel name="schach_str" element="schach">
+			<bounds x="20" y="95" width="40" height="10" />
+		</bezel>
+		<bezel name="matt_str" element="matt">
+			<bounds x="185" y="95" width="40" height="10" />
+		</bezel>
 	</view>
 </mamelayout>

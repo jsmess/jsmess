@@ -13,6 +13,14 @@
 			<color red="0.09375" green="0.0" blue="0.0" />
 		</disk>
 	</element>
+	<element name="check">
+		<text string="CHECK">
+		<color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="lose">
+		<text string="I LOSE">
+		<color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
 	<element name="background">
 		<rect>
 			<bounds left="0" top="0" right="1" bottom="1" />
@@ -44,6 +52,11 @@
 		<bezel name="led1" element="led">
 			<bounds x="130" y="00" width="10" height="10" />
 		</bezel>
-
+		<bezel name="check_str" element="check">
+			<bounds x="20" y="00" width="40" height="10" />
+		</bezel>
+		<bezel name="lose_str" element="lose">
+			<bounds x="140" y="00" width="40" height="10" />
+		</bezel>
 	</view>
 </mamelayout>
