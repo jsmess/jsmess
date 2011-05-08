@@ -1288,43 +1288,51 @@ static void prepare_menus(HWND wnd)
 		}
 	}
 
-	set_command_state(menu_bar, ID_FILE_SAVESTATE,			state_filename[0] != '\0'					? MFS_ENABLED : MFS_GRAYED);
+	if (window->machine().system().flags & GAME_SUPPORTS_SAVE)
+	{
+		set_command_state(menu_bar, ID_FILE_LOADSTATE_NEWUI, MFS_ENABLED);
+		set_command_state(menu_bar, ID_FILE_SAVESTATE_AS, MFS_ENABLED);
+		set_command_state(menu_bar, ID_FILE_SAVESTATE, state_filename[0] != '\0' ? MFS_ENABLED : MFS_GRAYED);
+	}
+	else
+	{
+		set_command_state(menu_bar, ID_FILE_LOADSTATE_NEWUI, MFS_GRAYED);
+		set_command_state(menu_bar, ID_FILE_SAVESTATE_AS, MFS_GRAYED);
+		set_command_state(menu_bar, ID_FILE_SAVESTATE, MFS_GRAYED);
+	}
 
-	set_command_state(menu_bar, ID_EDIT_PASTE,				inputx_can_post(window->machine())			? MFS_ENABLED : MFS_GRAYED);
+	set_command_state(menu_bar, ID_EDIT_PASTE, inputx_can_post(window->machine()) ? MFS_ENABLED : MFS_GRAYED);
 
-	set_command_state(menu_bar, ID_OPTIONS_PAUSE,			winwindow_ui_is_paused(window->machine())		? MFS_CHECKED : MFS_ENABLED);
-	set_command_state(menu_bar, ID_OPTIONS_CONFIGURATION,	has_config									? MFS_ENABLED : MFS_GRAYED);
-	set_command_state(menu_bar, ID_OPTIONS_DIPSWITCHES,		has_dipswitch								? MFS_ENABLED : MFS_GRAYED);
-	set_command_state(menu_bar, ID_OPTIONS_MISCINPUT,		has_misc									? MFS_ENABLED : MFS_GRAYED);
-	set_command_state(menu_bar, ID_OPTIONS_ANALOGCONTROLS,	has_analog									? MFS_ENABLED : MFS_GRAYED);
-	set_command_state(menu_bar, ID_OPTIONS_FULLSCREEN,		!is_windowed()								? MFS_CHECKED : MFS_ENABLED);
-	set_command_state(menu_bar, ID_OPTIONS_TOGGLEFPS,		ui_get_show_fps()							? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_OPTIONS_PAUSE, winwindow_ui_is_paused(window->machine()) ? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_OPTIONS_CONFIGURATION, has_config ? MFS_ENABLED : MFS_GRAYED);
+	set_command_state(menu_bar, ID_OPTIONS_DIPSWITCHES, has_dipswitch ? MFS_ENABLED : MFS_GRAYED);
+	set_command_state(menu_bar, ID_OPTIONS_MISCINPUT, has_misc ? MFS_ENABLED : MFS_GRAYED);
+	set_command_state(menu_bar, ID_OPTIONS_ANALOGCONTROLS, has_analog ? MFS_ENABLED : MFS_GRAYED);
+	set_command_state(menu_bar, ID_OPTIONS_FULLSCREEN, !is_windowed() ? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_OPTIONS_TOGGLEFPS, ui_get_show_fps() ? MFS_CHECKED : MFS_ENABLED);
 #if HAS_PROFILER
-	set_command_state(menu_bar, ID_OPTIONS_PROFILER,		ui_get_show_profiler()						? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_OPTIONS_PROFILER, ui_get_show_profiler() ? MFS_CHECKED : MFS_ENABLED);
 #endif
 
-	set_command_state(menu_bar, ID_KEYBOARD_EMULATED,		(has_keyboard) ?
-																(!ui_get_use_natural_keyboard(window->machine())					? MFS_CHECKED : MFS_ENABLED)
-																												: MFS_GRAYED);
-	set_command_state(menu_bar, ID_KEYBOARD_NATURAL,		(has_keyboard && inputx_can_post(window->machine())) ?																(ui_get_use_natural_keyboard(window->machine())					? MFS_CHECKED : MFS_ENABLED)
-																												: MFS_GRAYED);
-	set_command_state(menu_bar, ID_KEYBOARD_CUSTOMIZE,		has_keyboard								? MFS_ENABLED : MFS_GRAYED);
+	set_command_state(menu_bar, ID_KEYBOARD_EMULATED, (has_keyboard) ? (!ui_get_use_natural_keyboard(window->machine()) ? MFS_CHECKED : MFS_ENABLED): MFS_GRAYED);
+	set_command_state(menu_bar, ID_KEYBOARD_NATURAL, (has_keyboard && inputx_can_post(window->machine())) ? (ui_get_use_natural_keyboard(window->machine()) ? MFS_CHECKED : MFS_ENABLED): MFS_GRAYED);
+	set_command_state(menu_bar, ID_KEYBOARD_CUSTOMIZE, has_keyboard ? MFS_ENABLED : MFS_GRAYED);
 
-	set_command_state(menu_bar, ID_VIDEO_ROTATE_0,			(orientation == ROT0)						? MFS_CHECKED : MFS_ENABLED);
-	set_command_state(menu_bar, ID_VIDEO_ROTATE_90,			(orientation == ROT90)						? MFS_CHECKED : MFS_ENABLED);
-	set_command_state(menu_bar, ID_VIDEO_ROTATE_180,		(orientation == ROT180)						? MFS_CHECKED : MFS_ENABLED);
-	set_command_state(menu_bar, ID_VIDEO_ROTATE_270,		(orientation == ROT270)						? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_VIDEO_ROTATE_0, (orientation == ROT0) ? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_VIDEO_ROTATE_90, (orientation == ROT90) ? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_VIDEO_ROTATE_180, (orientation == ROT180) ? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_VIDEO_ROTATE_270, (orientation == ROT270) ? MFS_CHECKED : MFS_ENABLED);
 
-	set_command_state(menu_bar, ID_THROTTLE_50,				(speed == 50)								? MFS_CHECKED : MFS_ENABLED);
-	set_command_state(menu_bar, ID_THROTTLE_100,			(speed == 100)								? MFS_CHECKED : MFS_ENABLED);
-	set_command_state(menu_bar, ID_THROTTLE_200,			(speed == 200)								? MFS_CHECKED : MFS_ENABLED);
-	set_command_state(menu_bar, ID_THROTTLE_500,			(speed == 500)								? MFS_CHECKED : MFS_ENABLED);
-	set_command_state(menu_bar, ID_THROTTLE_1000,			(speed == 1000)								? MFS_CHECKED : MFS_ENABLED);
-	set_command_state(menu_bar, ID_THROTTLE_UNTHROTTLED,	(speed == 0)								? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_THROTTLE_50, (speed == 50) ? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_THROTTLE_100, (speed == 100) ? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_THROTTLE_200, (speed == 200) ? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_THROTTLE_500, (speed == 500) ? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_THROTTLE_1000, (speed == 1000) ? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_THROTTLE_UNTHROTTLED, (speed == 0) ? MFS_CHECKED : MFS_ENABLED);
 
-	set_command_state(menu_bar, ID_FRAMESKIP_AUTO,			(frameskip < 0)								? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_FRAMESKIP_AUTO, (frameskip < 0) ? MFS_CHECKED : MFS_ENABLED);
 	for (i = 0; i < frameskip_level_count(window->machine()); i++)
-		set_command_state(menu_bar, ID_FRAMESKIP_0 + i,		(frameskip == i)							? MFS_CHECKED : MFS_ENABLED);
+		set_command_state(menu_bar, ID_FRAMESKIP_0 + i, (frameskip == i) ? MFS_CHECKED : MFS_ENABLED);
 
 	// if we are using categorized input, we need to properly checkmark the categories
 	if (use_input_categories)
@@ -1385,23 +1393,23 @@ static void prepare_menus(HWND wnd)
 			flags_for_writing |= MF_GRAYED;
 
 		sub_menu = CreateMenu();
-		win_append_menu_utf8(sub_menu, MF_STRING,		new_item + DEVOPTION_OPEN,		"Mount...");
+		win_append_menu_utf8(sub_menu, MF_STRING, new_item + DEVOPTION_OPEN, "Mount...");
 
 		if (img->is_creatable())
-			win_append_menu_utf8(sub_menu, MF_STRING,	new_item + DEVOPTION_CREATE,	"Create...");
+			win_append_menu_utf8(sub_menu, MF_STRING, new_item + DEVOPTION_CREATE, "Create...");
 
-		win_append_menu_utf8(sub_menu, flags_for_exists,	new_item + DEVOPTION_CLOSE,	"Unmount");
+		win_append_menu_utf8(sub_menu, flags_for_exists, new_item + DEVOPTION_CLOSE, "Unmount");
 
 		if (img->device().type() == CASSETTE)
 		{
 			cassette_state state;
 			state = (cassette_state)(img->exists() ? (cassette_get_state(&img->device()) & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
 			win_append_menu_utf8(sub_menu, MF_SEPARATOR, 0, NULL);
-			win_append_menu_utf8(sub_menu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_STOPPAUSE,	"Pause/Stop");
-			win_append_menu_utf8(sub_menu, flags_for_exists	| ((state == CASSETTE_PLAY)		? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_PLAY,			"Play");
-			win_append_menu_utf8(sub_menu, flags_for_writing	| ((state == CASSETTE_RECORD)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_RECORD,		"Record");
-			win_append_menu_utf8(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_REWIND,		"Rewind");
-			win_append_menu_utf8(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_FASTFORWARD,	"Fast Forward");
+			win_append_menu_utf8(sub_menu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_STOPPAUSE, "Pause/Stop");
+			win_append_menu_utf8(sub_menu, flags_for_exists	| ((state == CASSETTE_PLAY) ? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_PLAY, "Play");
+			win_append_menu_utf8(sub_menu, flags_for_writing | ((state == CASSETTE_RECORD)	? MF_CHECKED : 0), new_item + DEVOPTION_CASSETTE_RECORD, "Record");
+			win_append_menu_utf8(sub_menu, flags_for_exists, new_item + DEVOPTION_CASSETTE_REWIND, "Rewind");
+			win_append_menu_utf8(sub_menu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, "Fast Forward");
 		}
 		s = img->exists() ? img->filename() : "[empty slot]";
 
