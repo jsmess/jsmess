@@ -241,6 +241,15 @@ const mos6526_interface c64_pal_cia1 =
 
 ***********************************************/
 
+WRITE8_HANDLER( c64_roml_w )
+{
+	c64_state *state = space->machine().driver_data<c64_state>();
+
+	state->m_memory[offset + 0x8000] = data;
+	
+	if (state->m_roml_writable)
+		state->m_roml[offset] = data;
+}
 
 WRITE8_HANDLER( c64_write_io )
 {
@@ -443,10 +452,6 @@ static void c64_bankswitch( running_machine &machine, int reset )
 	int ultimax_mode = 0;
 	int data = m6510_get_port(machine.device<legacy_cpu_device>("maincpu")) & 0x07;
 
-	/* If nothing has changed or reset = 0, don't do anything */
-	if ((state->m_old_data == data) && (state->m_old_exrom == state->m_exrom) && (state->m_old_game == state->m_game) && !reset)
-		return;
-
 	/* Are we in Ultimax mode? */
 	if (!state->m_game && state->m_exrom)
 		ultimax_mode = 1;
@@ -463,7 +468,6 @@ static void c64_bankswitch( running_machine &machine, int reset )
 			state->m_io_enabled = 1;		// charen has no effect in ultimax_mode
 
 			memory_set_bankptr(machine, "bank1", state->m_roml);
-			memory_set_bankptr(machine, "bank2", state->m_memory + 0x8000);
 			memory_set_bankptr(machine, "bank3", state->m_memory + 0xa000);
 			memory_set_bankptr(machine, "bank4", state->m_romh);
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xe000, 0xffff);
@@ -474,12 +478,10 @@ static void c64_bankswitch( running_machine &machine, int reset )
 		if (loram && hiram && !state->m_exrom)
 		{
 			memory_set_bankptr(machine, "bank1", state->m_roml);
-			memory_set_bankptr(machine, "bank2", state->m_memory + 0x8000);
 		}
 		else
 		{
 			memory_set_bankptr(machine, "bank1", state->m_memory + 0x8000);
-			memory_set_bankptr(machine, "bank2", state->m_memory + 0x8000);
 		}
 
 		/* 0xa000 */
@@ -1459,22 +1461,31 @@ static WRITE8_HANDLER( pagefox_bank_w )
 	}
 	else
 	{
-		int bank = (data >> 1) & 0x03;
-		int ram = BIT(data, 3);
-
-		offs_t address = ram ? 0x10000 + ((bank & 0x01) * 0x4000) : (bank * 0x4000);
-
-		// map cartridge ROMs
-		memcpy(state->m_roml, cart + address, 0x2000);
-		memcpy(state->m_romh, cart + address + 0x2000, 0x2000);
-
 		if (state->m_game)
 		{
 			// enable cartridge
 			state->m_game = 0;
 			state->m_exrom = 0;
-			c64_bankswitch(space->machine(), 0);
 		}
+		
+		int bank = (data >> 1) & 0x07;
+		int ram = BIT(data, 3);
+		offs_t address = bank * 0x4000;
+		
+		state->m_roml_writable = ram;
+		
+		if (ram)
+		{
+			state->m_roml = cart + address;
+		}
+		else
+		{
+			state->m_roml = state->m_c64_roml;
+			memcpy(state->m_roml, cart + address, 0x2000);
+			memcpy(state->m_romh, cart + address + 0x2000, 0x2000);
+		}
+
+		c64_bankswitch(space->machine(), 0);
 	}
 }
 
@@ -1498,24 +1509,27 @@ static void load_pagefox_cartridge(device_image_interface &image)
 static WRITE8_HANDLER( multiscreen_bank_w )
 {
 	c64_state *state = space->machine().driver_data<c64_state>();
-
 	UINT8 *cart = space->machine().region("user1")->base();
-
 	int bank = data & 0x0f;
 	offs_t address = bank * 0x4000;
 
 	if (bank == 0x0d)
 	{
 		// RAM
-		memcpy(state->m_roml, cart + address, 0x2000);
+		state->m_roml = cart + address;
+		state->m_roml_writable = 1;
 		memcpy(state->m_romh, cart + 0x2000, 0x2000);
 	}
 	else
 	{
 		// ROM
+		state->m_roml = state->m_c64_roml;
+		state->m_roml_writable = 0;
 		memcpy(state->m_roml, cart + address, 0x2000);
 		memcpy(state->m_romh, cart + address + 0x2000, 0x2000);
 	}
+
+	c64_bankswitch(space->machine(), 0);
 }
 
 static void load_multiscreen_cartridge(device_image_interface &image)
@@ -1572,10 +1586,20 @@ static void c64_software_list_cartridge_load(device_image_interface &image)
 			load_easy_calc_result_cartridge(image);
 
 		else if (!strcmp(cart_type, "pagefox"))
-			load_pagefox_cartridge(image); // TODO writing to the expanded 32KB RAM is not supported!
+			load_pagefox_cartridge(image);
 
 		else if (!strcmp(cart_type, "multiscreen"))
-			load_multiscreen_cartridge(image); // TODO 8K RAM expansion test fails on boot
+			/*
+			
+				TODO: crashes after cartridge RAM test
+			
+				805A: lda  $01
+				805C: and  #$FE
+				805E: sta  $01
+				8060: m6502_brk#$00 <-- BOOM!
+
+			*/
+			load_multiscreen_cartridge(image);
 
 		else
 			load_standard_c64_cartridge(image);

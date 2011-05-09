@@ -37,7 +37,8 @@ class c64_state : public driver_device
 public:
 	c64_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_iec(*this, CBM_IEC_TAG)
+		  m_iec(*this, CBM_IEC_TAG),
+		  m_roml_writable(0)
     { }
 
 	optional_device<cbm_iec_device> m_iec;
@@ -66,6 +67,7 @@ public:
 	UINT8 m_port_data;
 	UINT8 *m_roml;
 	UINT8 *m_romh;
+	int m_roml_writable;
 	int m_ultimax;
 	int m_cia1_on;
 	int m_io_enabled;
@@ -99,6 +101,8 @@ INTERRUPT_GEN( c64_frame_interrupt );
 TIMER_CALLBACK( c64_tape_timer );
 
 /* private area */
+WRITE8_HANDLER(c64_roml_w);
+
 READ8_HANDLER(c64_ioarea_r);
 WRITE8_HANDLER(c64_ioarea_w);
 

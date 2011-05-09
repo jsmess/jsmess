@@ -412,7 +412,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(c64_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(c64_state, m_memory)
-	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")		/* ram or external roml */
+	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank1") AM_WRITE(c64_roml_w)		/* ram or external roml */
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3") AM_WRITEONLY				/* ram or basic rom or external romh */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(c64_ioarea_r, c64_ioarea_w)
