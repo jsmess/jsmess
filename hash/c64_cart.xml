@@ -482,4 +482,55 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="btx" supported="no">
+		<description>Btx Decoder Modul (Germany)</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<!--
+		-->
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="btx" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="roml" size="0x4000">
+				<rom name="325221-02" size="0x4000" crc="bfcb5db8" sha1="423564293a25f7fdbfb36df6ab97a7f26959eecf" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="btx2" supported="no">
+		<description>Btx Decoder Modul II v3.1 (Germany)</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<!--
+		-->
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="btx" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x8000">
+				<rom name="v301113-c375-81-1" size="0x8000" crc="daad690a" sha1="913ec59d4959e532ebf7e8d02c2acf0ce4f9b7da" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="btx2v33" supported="no">
+		<description>Btx Decoder Modul II v3.3 (Germany)</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<!--
+		-->
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="btx" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x8000">
+				<rom name="v3.3" size="0x8000" crc="75283654" sha1="a5980bfe34300564069ca57eac8ae0e14a406891" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
