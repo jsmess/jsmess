@@ -42,6 +42,7 @@
 #define ID_DEVICES                      3138
 #define ID_HELP_ABOUT_NEWUI             3139
 #define ID_HELP_ABOUTSYSTEM             3140
+#define ID_OPTIONS_OLDUI                3141
 #define IDI_ICON_CART                   3200
 #define IDI_ICON_HARD                   3201
 #define IDI_ICON_CASS                   3202

@@ -1779,6 +1779,10 @@ static int invoke_command(HWND wnd, UINT command)
 			customize_analogcontrols(window->machine(), wnd);
 			break;
 
+		case ID_OPTIONS_OLDUI:
+			ui_show_menu();
+			break;
+
 		case ID_OPTIONS_FULLSCREEN:
 			winwindow_toggle_full_screen();
 			break;
