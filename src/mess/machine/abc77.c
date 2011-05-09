@@ -8,10 +8,10 @@ Keyboard PCB Layout
 KTC A65-02486-232
 
 |-----------------------------------------------------------------------|
-|	SW1		  CN1		LS393											|
-|	4020	7406	LS132		7407  LS02  7407		NE556	 LS1	|
+|   SW1       CN1       LS393                                           |
+|   4020    7406    LS132       7407  LS02  7407        NE556    LS1    |
 |                                                                       |
-|	22-950-3B	XTAL	CPU		ROM0	ROM1	LS373  LS240  22-908-03	|
+|   22-950-3B   XTAL    CPU     ROM0    ROM1    LS373  LS240  22-908-03 |
 |                                                                       |
 |                                                                       |
 |                                                                       |
@@ -24,14 +24,14 @@ KTC A65-02486-232
 Notes:
     All IC's shown.
 
-    CPU			- Signetics SCN8035A 8035 CPU
-    ROM0		- NEC D2716D 2Kx8 ROM "-78"
-    ROM1		- not populated
-	22-950-3B	- Exar Semiconductor XR22-950-3B keyboard matrix row driver with 4 to 12 decoder/demultiplexer
-	22-908-03	- Exar Semiconductor XR22-908-03 keyboard matrix capacitive readout latch
-    CN1			- 1x12 PCB header
-	LS1			- loudspeaker
-    SW1			- reset switch
+    CPU         - Signetics SCN8035A 8035 CPU
+    ROM0        - NEC D2716D 2Kx8 ROM "-78"
+    ROM1        - not populated
+    22-950-3B   - Exar Semiconductor XR22-950-3B keyboard matrix row driver with 4 to 12 decoder/demultiplexer
+    22-908-03   - Exar Semiconductor XR22-908-03 keyboard matrix capacitive readout latch
+    CN1         - 1x12 PCB header
+    LS1         - loudspeaker
+    SW1         - reset switch
 
 */
 
@@ -87,7 +87,7 @@ void abc77_device::device_config_complete()
 ROM_START( abc77 )
 	ROM_REGION( 0x1000, I8035_TAG, 0 )
 	ROM_LOAD( "-78.z10", 0x000, 0x800, CRC(635986ce) SHA1(04a30141ac611d0544bbb786061515040c23480c) )
-//	ROM_LOAD( "keyboard.z14", 0x0800, 0x0800, NO_DUMP ) // non-Swedish keyboard encoding ROM
+//  ROM_LOAD( "keyboard.z14", 0x0800, 0x0800, NO_DUMP ) // non-Swedish keyboard encoding ROM
 ROM_END
 
 
@@ -492,7 +492,7 @@ READ8_MEMBER( abc77_device::p1_r )
 
 	static const char *const keynames[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11" };
 	UINT8 data = 0xff;
-	
+
 	if (m_stb && m_keylatch < 12)
 	{
 		data = input_port_read(this, keynames[m_keylatch]);

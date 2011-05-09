@@ -68,7 +68,7 @@
 
 class isa8_device;
 
-class isa8_slot_device : public device_t,                    
+class isa8_slot_device : public device_t,
 						 public device_slot_interface
 {
 public:
@@ -79,11 +79,11 @@ public:
 
     // inline configuration
     static void static_set_isa8_slot(device_t &device, const char *tag, int num);
-private:	
+private:
 	// configuration
 	const char *m_isa_tag;
 	int m_isa_num;
-	isa8_device  *m_isa;		
+	isa8_device  *m_isa;
 };
 
 // device type definition
@@ -114,7 +114,7 @@ public:
 	isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
-	
+
 	void add_isa_card(device_isa8_card_interface *card,int pos);
 	void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name);
 	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
@@ -158,7 +158,7 @@ private:
 	devcb_resolved_write_line	m_out_drq3_func;
 
 	device_isa8_card_interface *m_isa_device[8];
-	const char *m_cputag;		
+	const char *m_cputag;
 };
 
 
@@ -184,8 +184,8 @@ public:
 
     // inline configuration
     static void static_set_isa8_tag(device_t &device, const char *tag);
-public:	
-	isa8_device  *m_isa;	
+public:
+	isa8_device  *m_isa;
 };
 
 #endif  /* __ISA_H__ */

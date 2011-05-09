@@ -1,11 +1,11 @@
 /***************************************************************************
-   
+
         CM-1800
-		(note name is in cyrilic letters)
-		
-		more info at http://ru.wikipedia.org/wiki/%D0%A1%D0%9C_%D0%AD%D0%92%D0%9C
-			and http://sapr.lti-gti.ru/index.php?id=66
-			
+        (note name is in cyrilic letters)
+
+        more info at http://ru.wikipedia.org/wiki/%D0%A1%D0%9C_%D0%AD%D0%92%D0%9C
+            and http://sapr.lti-gti.ru/index.php?id=66
+
         26/04/2011 Skeleton driver.
 
 ****************************************************************************/
@@ -26,7 +26,7 @@ public:
 	DECLARE_READ8_MEMBER( term_r );
 	DECLARE_WRITE8_MEMBER( term_ready_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	
+
 	UINT8 m_key_ready;
 	UINT8 m_term_data;
 };
@@ -71,8 +71,8 @@ static INPUT_PORTS_START( cm1800 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(cm1800) 
-{	
+static MACHINE_RESET(cm1800)
+{
 }
 
 static GENERIC_TERMINAL_INTERFACE( cm1800_terminal_intf )
@@ -84,10 +84,10 @@ static MACHINE_CONFIG_START( cm1800, cm1800_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(cm1800_mem)
-	MCFG_CPU_IO_MAP(cm1800_io)	
+	MCFG_CPU_IO_MAP(cm1800_io)
 
 	MCFG_MACHINE_RESET(cm1800)
-	
+
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,cm1800_terminal_intf)

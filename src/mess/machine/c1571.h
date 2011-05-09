@@ -107,7 +107,7 @@ protected:
     virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete();
-	
+
 	// device_cbm_iec_interface overrides
 	void cbm_iec_srq(int state);
 	void cbm_iec_atn(int state);

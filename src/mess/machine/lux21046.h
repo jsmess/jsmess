@@ -82,7 +82,7 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const input_port_token *device_input_ports() const;
-	
+
 	DECLARE_READ8_MEMBER( _3d_r );
 	DECLARE_WRITE8_MEMBER( _4d_w );
 	DECLARE_WRITE8_MEMBER( _4b_w );
@@ -98,7 +98,7 @@ protected:
     virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete();
-	
+
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(UINT8 data);
 	virtual void abcbus_rst(int state);

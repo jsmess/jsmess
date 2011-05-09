@@ -120,7 +120,7 @@ protected:
     virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
-	
+
 	inline void trigger_interrupt(UINT8 line);
 	inline void transmit_ipc_data();
 	inline void transmit_bit(int state);

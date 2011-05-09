@@ -612,12 +612,12 @@ static void pak_load_trailer(running_machine &machine, const pak_decodedtrailer 
 	state->m_pia_1->write(*memory_nonspecific_space(machine), 3, 0x00);
 	state->m_pia_1->write(*memory_nonspecific_space(machine), 0, 0xfe);
 	state->m_pia_1->write(*memory_nonspecific_space(machine), 2, 0xf8);
-                  
+
 	state->m_pia_0->write(*memory_nonspecific_space(machine), 1, trailer->pia[1]);
 	state->m_pia_0->write(*memory_nonspecific_space(machine), 0, trailer->pia[0]);
 	state->m_pia_0->write(*memory_nonspecific_space(machine), 3, trailer->pia[3]);
 	state->m_pia_0->write(*memory_nonspecific_space(machine), 2, trailer->pia[2]);
-                  
+
 	state->m_pia_1->write(*memory_nonspecific_space(machine), 1, trailer->pia[5]);
 	state->m_pia_1->write(*memory_nonspecific_space(machine), 0, trailer->pia[4]);
 	state->m_pia_1->write(*memory_nonspecific_space(machine), 3, trailer->pia[7]);

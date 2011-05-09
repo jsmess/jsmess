@@ -52,7 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
-	
+
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 	static void static_set_isatag(device_t &device, const char *tag);
@@ -82,7 +82,7 @@ private:
 	const char *m_cputag;
 	const char *m_isatag;
 	const char *m_biostag;
-	
+
 
 	UINT8 m_registers[0x20];
 };

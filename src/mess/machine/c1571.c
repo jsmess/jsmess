@@ -49,7 +49,7 @@ const device_type C1570 = &device_creator<c1570_device>;
 const device_type C1571 = &device_creator<c1571_device>;
 const device_type C1571CR = &device_creator<c1571cr_device>;
 
-	
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
@@ -737,7 +737,7 @@ c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, d
 void base_c1571_device::device_start()
 {
 	m_bus = machine().device<cbm_iec_device>(CBM_IEC_TAG);
-	
+
 	// map ROM
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	program->install_rom(0x8000, 0xffff, subregion(M6502_TAG)->base());

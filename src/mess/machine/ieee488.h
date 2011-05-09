@@ -177,7 +177,7 @@ private:
 
 	required_device<ieee488_stub_device> m_stub;
 
-   	const ieee488_config *m_daisy;
+	const ieee488_config *m_daisy;
 };
 
 
@@ -204,7 +204,7 @@ class ieee488_stub_device :  public device_t,
 							 public ieee488_stub_interface,
 							 public device_ieee488_interface
 {
-public:    
+public:
 	// construction/destruction
     ieee488_stub_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 

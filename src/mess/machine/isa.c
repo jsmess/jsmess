@@ -40,10 +40,10 @@ void isa8_slot_device::static_set_isa8_slot(device_t &device, const char *tag, i
 //-------------------------------------------------
 
 void isa8_slot_device::device_start()
-{	
+{
 	m_isa = machine().device<isa8_device>(m_isa_tag);
 	device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
-	if (dev) m_isa->add_isa_card(dev, m_isa_num);	
+	if (dev) m_isa->add_isa_card(dev, m_isa_num);
 }
 
 

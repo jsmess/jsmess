@@ -59,7 +59,7 @@ public:
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	void bankswitch();
-	
+
 	DECLARE_READ8_MEMBER( eprom_r );
 	DECLARE_WRITE8_MEMBER( eprom_w );
 	DECLARE_WRITE8_MEMBER( ppi_pa_w );

@@ -368,7 +368,7 @@ cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, d
 void cbm_iec_device::device_start()
 {
 	m_stub = machine().device<cbm_iec_stub_device>(CBM_IEC_STUB_TAG);
-	const cbm_iec_config *daisy = m_daisy;  
+	const cbm_iec_config *daisy = m_daisy;
 	// create a linked list of devices
 	daisy_entry **tailptr = &m_daisy_list;
 	for ( ; daisy->m_tag != NULL; daisy++)

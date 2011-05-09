@@ -45,7 +45,7 @@ struct FMSCSIinterface
     MCFG_DEVICE_ADD(_tag, FMSCSI, 0) \
     MCFG_DEVICE_CONFIG(_intrf)
 
-class fmscsi_device : public device_t, 
+class fmscsi_device : public device_t,
 					  public FMSCSIinterface
 {
 public:
@@ -74,7 +74,7 @@ protected:
     virtual void device_stop();
     virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
-	
+
 private:
     // internal device state goes here
     static const device_timer_id TIMER_TRANSFER = 0;

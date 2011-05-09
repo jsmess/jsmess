@@ -65,7 +65,7 @@ const device_type C8050 = &device_creator<c8050_device>;
 const device_type C8250 = &device_creator<c8250_device>;
 const device_type SFD1001 = &device_creator<sfd1001_device>;
 
-	
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
@@ -1532,9 +1532,9 @@ void base_c2040_device::device_start()
 {
 	address_space *main = m_maincpu->memory().space(AS_PROGRAM);
 	address_space *fdc = m_fdccpu->memory().space(AS_PROGRAM);
-	
+
 	m_bit_timer = timer_alloc();
-	
+
 	switch (m_variant)
 	{
 	default:

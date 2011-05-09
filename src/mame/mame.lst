@@ -607,7 +607,11 @@ niyanpai		// (c) 1996
 
 jyunai			// (c) 1998
 csplayh5		// (c) 1998
+mjmania			// (c) 1999
 bikiniko		// (c) 1999
+thenanpa		// (c) 1999
+cspureh7		// (c) 1999
+fudol			// (c) 2000
 
 // "Phoenix hardware" (and variations) games
 safarir			// Shin Nihon Kikaku (SNK)
@@ -10062,6 +10066,7 @@ ronjan
 pinkiri8
 
 // Wing
+superwng		// (c) 1985 Wing Co. Ltd
 slotcarn		// (c) 1985 Wing Co. Ltd
 lucky74			// (c) 1988 Wing Co. Ltd
 lucky74a		// (c) 1988 Wing Co. Ltd
@@ -10417,18 +10422,18 @@ cmkenospa		// (c) 2000 Coinmaster-Gaming, Ltd.
 // Multifish
 //mfish 		// (c) 2002
 //mfish_2		// (c) 2002
+mfish_3			// (c) 2002
 //mfish_4		// (c) 2002
 //mfish_5		// (c) 2002
+mfish_6			// (c) 2002
 //mfish_7		// (c) 2002
-//mfish_8		// (c) 2002
+mfish_8		// (c) 2002
 //mfish_9		// (c) 2002
 //mfish_10  	// (c) 2002
-//mfish_13  	// (c) 2002
-mfish_3			// (c) 2002
-mfish_6			// (c) 2002
 mfish_11		// (c) 2002
 mfish_12		// (c) 2002
 mfish_13		// (c) 2002
+mfish_14	// (c) 2002
 
 // Crazy Monkey
 //crzmon		// (c) 2003
@@ -10625,10 +10630,10 @@ gnomed			// bootleg
 gnomee			// bootleg
 gnome_2a		// bootleg
 gnome_3a		// bootleg
-//gnome_3b		// bootleg
-//gnome_3c		// bootleg
-//sweetl2_2a		// bootleg - Sweet Life 2
-//sweetl2_2b		// bootleg
+gnome_3b		// bootleg
+gnome_3c		// bootleg
+sweetl2_2a		// bootleg - Sweet Life 2
+sweetl2_2b		// bootleg
 sweetl2_2c		// bootleg
 sweetl2_2d		// bootleg
 

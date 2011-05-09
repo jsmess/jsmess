@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( d64_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK("bank16")
 	AM_RANGE(0xff00, 0xff03) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write) AM_MIRROR(0x0018)
 	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE("acia", acia_6551_r,			acia_6551_w)	AM_MIRROR(0x0018)
-	AM_RANGE(0xff20, 0xff3f) AM_DEVREAD_MODERN("pia_1", pia6821_device, read) AM_DEVWRITE("pia_1", coco_pia_1_w)	
+	AM_RANGE(0xff20, 0xff3f) AM_DEVREAD_MODERN("pia_1", pia6821_device, read) AM_DEVWRITE("pia_1", coco_pia_1_w)
 	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("coco_cartslot", coco_cartridge_r, coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE("sam", sam6883_w)
@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( d64_plus_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK("bank16")
 	AM_RANGE(0xff00, 0xff03) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write) AM_MIRROR(0x0018)
 	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE("acia", acia_6551_r,			acia_6551_w)	AM_MIRROR(0x0018)
-	AM_RANGE(0xff20, 0xff3f) AM_DEVREAD_MODERN("pia_1", pia6821_device, read) AM_DEVWRITE("pia_1", coco_pia_1_w)	
+	AM_RANGE(0xff20, 0xff3f) AM_DEVREAD_MODERN("pia_1", pia6821_device, read) AM_DEVWRITE("pia_1", coco_pia_1_w)
 	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("coco_cartslot", coco_cartridge_r, coco_cartridge_w)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE("sam", sam6883_w)
@@ -269,8 +269,8 @@ static ADDRESS_MAP_START( dgnalpha_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK("bank16")
 	AM_RANGE(0xff00, 0xff03) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
 	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE("acia", acia_6551_r, acia_6551_w)
-	AM_RANGE(0xff20, 0xff23) AM_DEVREAD_MODERN("pia_1", pia6821_device, read) AM_DEVWRITE("pia_1", coco_pia_1_w)		
-	AM_RANGE(0xff24, 0xff27) AM_DEVREADWRITE_MODERN("pia_2", pia6821_device, read, write) 	    /* Third PIA on Dragon Alpha */
+	AM_RANGE(0xff20, 0xff23) AM_DEVREAD_MODERN("pia_1", pia6821_device, read) AM_DEVWRITE("pia_1", coco_pia_1_w)
+	AM_RANGE(0xff24, 0xff27) AM_DEVREADWRITE_MODERN("pia_2", pia6821_device, read, write)	    /* Third PIA on Dragon Alpha */
 	AM_RANGE(0Xff28, 0xff2b) AM_READWRITE(dgnalpha_modem_r, dgnalpha_modem_w)		/* Modem, dummy to stop eror log ! */
 	AM_RANGE(0xff2c, 0xff2f) AM_READWRITE(dgnalpha_wd2797_r, dgnalpha_wd2797_w)	/* Alpha onboard disk interface */
 	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("coco_cartslot", coco_cartridge_r, coco_cartridge_w)

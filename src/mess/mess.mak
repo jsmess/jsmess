@@ -492,12 +492,12 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_DRIVERS)/vectrex.o	\
 	$(MAME_VIDEO)/vectrex.o		\
 	$(MAME_MACHINE)/vectrex.o	\
-	$(MAME_VIDEO)/smsvdp.o 		\
-	$(MAME_MACHINE)/segasms.o 	\
-	$(MAME_DRIVERS)/segasms.o 	\
-	$(MAME_DRIVERS)/sg1000.o 	\
-	$(MAME_DRIVERS)/dc.o 		\
-	$(MAME_MACHINE)/dccons.o 	\
+	$(MAME_VIDEO)/smsvdp.o		\
+	$(MAME_MACHINE)/segasms.o	\
+	$(MAME_DRIVERS)/segasms.o	\
+	$(MAME_DRIVERS)/sg1000.o	\
+	$(MAME_DRIVERS)/dc.o		\
+	$(MAME_MACHINE)/dccons.o	\
 	$(MAME_MACHINE)/gdrom.o 	\
 	$(MAME_DRIVERS)/a310.o		\
 	$(MAME_DRIVERS)/a7000.o		\
@@ -776,7 +776,7 @@ $(MESSOBJ)/cbm.a:				\
 
 $(MESSOBJ)/cccp.a:				\
 	$(MESS_DRIVERS)/argo.o		\
-	$(MESS_DRIVERS)/cm1800.o 	\
+	$(MESS_DRIVERS)/cm1800.o	\
 	$(MESS_VIDEO)/lviv.o		\
 	$(MESS_DRIVERS)/lviv.o		\
 	$(MESS_MACHINE)/lviv.o		\
@@ -812,7 +812,7 @@ $(MESSOBJ)/coleco.a:			\
 	$(MESS_DRIVERS)/coleco.o	\
 	$(MESS_MACHINE)/coleco.o	\
 	$(MESS_DRIVERS)/adam.o		\
-	
+
 $(MESSOBJ)/cromemco.a:			\
 	$(MESS_DRIVERS)/c10.o		\
 
@@ -1164,7 +1164,7 @@ $(MESSOBJ)/nec.a:				\
 $(MESSOBJ)/netronic.a:			\
 	$(MESS_DRIVERS)/elf.o		\
 	$(MESS_DRIVERS)/exp85.o		\
-	
+
 $(MESSOBJ)/next.a:				\
 	$(MESS_DRIVERS)/next.o		\
 
@@ -1337,7 +1337,7 @@ $(MESSOBJ)/sanyo.a:				\
 	$(MESS_VIDEO)/mbc55x.o  	\
 
 $(MESSOBJ)/sega.a:				\
-	$(MESS_DRIVERS)/sg1000.o 	\
+	$(MESS_DRIVERS)/sg1000.o	\
 
 $(MESSOBJ)/sgi.a:				\
 	$(MESS_MACHINE)/sgi.o		\

@@ -129,7 +129,7 @@ private:
 	int m_sel0;				// drive select 0
 	int m_sel1;				// drive select 1
 
-   	UINT8 m_sw1;				// single/double sided/density
+	UINT8 m_sw1;				// single/double sided/density
 	UINT8 m_drive_type;			// drive type
 	UINT8 m_s1;					// ABC bus address
 };

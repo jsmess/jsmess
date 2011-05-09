@@ -52,7 +52,7 @@ class c8280_device :  public device_t,
 public:
     // construction/destruction
     c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// inline configuration helpers
 	static void static_set_config(device_t &device, int address);
 

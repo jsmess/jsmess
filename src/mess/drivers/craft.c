@@ -55,7 +55,7 @@ public:
 	}
 
 	virtual void machine_start();
-	
+
 	UINT8 m_regs[0x100];
 
 	emu_timer* m_timer0_timer;

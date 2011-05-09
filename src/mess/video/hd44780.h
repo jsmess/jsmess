@@ -36,7 +36,7 @@ class hd44780_device :	public device_t,
 public:
 	// construction/destruction
 	hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device interface
 	DECLARE_WRITE8_MEMBER(control_write);
 	DECLARE_READ8_MEMBER(control_read);

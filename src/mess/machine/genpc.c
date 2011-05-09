@@ -613,7 +613,7 @@ void ibm5160_mb_device::device_start()
 	install_device(m_pic8259, 0x0020, 0x0021, 0, 0, FUNC(pic8259_r), FUNC(pic8259_w) );
 	install_device(m_pit8253, 0x0040, 0x0043, 0, 0, FUNC(pit8253_r), FUNC(pit8253_w) );
 
-	//	install_device(m_ppi8255, 0x0060, 0x0063, 0, 0, FUNC(i8255a_r), FUNC(i8255a_w) );
+	//  install_device(m_ppi8255, 0x0060, 0x0063, 0, 0, FUNC(i8255a_r), FUNC(i8255a_w) );
 	int buswidth = machine().firstcpu->memory().space_config(AS_IO)->m_databus_width;
 	switch(buswidth)
 	{
@@ -712,7 +712,7 @@ machine_config_constructor ibm5150_mb_device::device_mconfig_additions() const
 //  ibm5150_mb_device - constructor
 //-------------------------------------------------
 
-ibm5150_mb_device::ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) 
+ibm5150_mb_device::ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ibm5160_mb_device(mconfig, tag, owner, clock),
 	  m_cassette(*this, "cassette")
 {

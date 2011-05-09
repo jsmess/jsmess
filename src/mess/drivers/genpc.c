@@ -127,7 +127,7 @@ static MACHINE_CONFIG_START( pcmda, genpc_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", 4, "isa4", pc_isa8_cards, "hdc")
 	MCFG_ISA8_SLOT_ADD("mb:isa", 5, "isa5", pc_isa8_cards, "adlib")
 	MCFG_ISA8_SLOT_ADD("mb:isa", 6, "isa6", pc_isa8_cards, NULL)
-	
+
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
 

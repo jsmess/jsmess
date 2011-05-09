@@ -31,7 +31,7 @@ protected:
         // device-level overrides
         virtual void device_start();
         virtual void device_reset();
-public:		
+public:
 		int  framecnt;
 
 		UINT8 mode_control;

@@ -101,18 +101,18 @@ READ8_MEMBER( amico2k_state::ppi_pa_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		keyboard data 0
-		PA1		keyboard data 1
-		PA2		keyboard data 2
-		PA3		keyboard data 3
-		PA4		keyboard data 4
-		PA5		keyboard data 5
-		PA6		keyboard data 6
-		PA7		reg out
+        PA0     keyboard data 0
+        PA1     keyboard data 1
+        PA2     keyboard data 2
+        PA3     keyboard data 3
+        PA4     keyboard data 4
+        PA5     keyboard data 5
+        PA6     keyboard data 6
+        PA7     reg out
 
-	*/
+    */
 
 	switch (m_ls145_p)
 	{
@@ -127,19 +127,19 @@ WRITE8_MEMBER( amico2k_state::ppi_pa_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		LED segment A
-		PA1		LED segment B
-		PA2		LED segment C
-		PA3		LED segment D
-		PA4		LED segment E
-		PA5		LED segment F
-		PA6		LED segment G
-		PA7		
+        PA0     LED segment A
+        PA1     LED segment B
+        PA2     LED segment C
+        PA3     LED segment D
+        PA4     LED segment E
+        PA5     LED segment F
+        PA6     LED segment G
+        PA7
 
-	*/
-	
+    */
+
 	m_segment = data;
 	m_led_refresh_timer->adjust(attotime::from_usec(70));
 }
@@ -148,18 +148,18 @@ READ8_MEMBER( amico2k_state::ppi_pb_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		reg out
-		PB1		
-		PB2		
-		PB3		
-		PB4		
-		PB5		
-		PB6		
-		PB7		
+        PB0     reg out
+        PB1
+        PB2
+        PB3
+        PB4
+        PB5
+        PB6
+        PB7
 
-	*/
+    */
 
 	return 0;
 }
@@ -168,18 +168,18 @@ WRITE8_MEMBER( amico2k_state::ppi_pb_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		
-		PB1		LS145 P0
-		PB2		LS145 P1
-		PB3		LS145 P2
-		PB4		LS145 P3
-		PB5		reg in
-		PB6		reg in
-		PB7		led output enable
+        PB0
+        PB1     LS145 P0
+        PB2     LS145 P1
+        PB3     LS145 P2
+        PB4     LS145 P3
+        PB5     reg in
+        PB6     reg in
+        PB7     led output enable
 
-	*/
+    */
 
 	m_ls145_p = (data >> 1) & 0x0f;
 }

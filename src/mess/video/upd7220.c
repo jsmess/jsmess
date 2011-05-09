@@ -692,7 +692,7 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	  m_gchr(0),
 	  m_vram_bank(0),
 	  m_bitmap_mod(0),
-  	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(upd7220_vram))
+	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(upd7220_vram))
 {
 	m_shortname = "upd7220";
 	for (int i = 0; i < 16; i++)

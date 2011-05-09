@@ -27,7 +27,7 @@ HHC = @-hhc
 #-------------------------------------------------
 
 MESSDOCS_OBJS = \
-	$(MESSOBJ)/tools/messdocs/messdocs.o	
+	$(MESSOBJ)/tools/messdocs/messdocs.o
 
 
 

@@ -54,7 +54,7 @@ struct mb89352_interface
     MCFG_DEVICE_ADD(_tag, MB89352A, 0) \
     MCFG_DEVICE_CONFIG(_intrf)
 
-class mb89352_device : public device_t, 
+class mb89352_device : public device_t,
 					   public mb89352_interface
 {
 public:

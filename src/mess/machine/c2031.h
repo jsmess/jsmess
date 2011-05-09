@@ -103,7 +103,7 @@ protected:
 	// interrupts
 	int m_via0_irq;							// VIA #0 interrupt request
 	int m_via1_irq;							// VIA #1 interrupt request
-    
+
 	int m_address;
 };
 

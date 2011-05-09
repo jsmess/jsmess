@@ -86,15 +86,15 @@ Hardware:   PPIA 8255
 
     - ERROR repeats forever after entering incorrect command
 
-		C26D: bcs  $C2AA
-		C26F: sta  $53
-		C271: lda  $C0EE,x
-		C274: bcc  $C29F
-		C29F: sta  $52
-		C2A1: sty  $03
-		C2A3: ldx  $04
-		C2A5: jmp  ($0052)
-		F251: ora  $0C0D		<---- Table of Base Address Value for Mnemonics, should not jump here!!
+        C26D: bcs  $C2AA
+        C26F: sta  $53
+        C271: lda  $C0EE,x
+        C274: bcc  $C29F
+        C29F: sta  $52
+        C2A1: sty  $03
+        C2A3: ldx  $04
+        C2A5: jmp  ($0052)
+        F251: ora  $0C0D        <---- Table of Base Address Value for Mnemonics, should not jump here!!
 
     - connect to softwarelist
     - e000 EPROM switching

@@ -1274,7 +1274,7 @@ static void load_standard_c64_cartridge(device_image_interface &image)
 	if (size)
 	{
 		memcpy(state->m_roml, image.get_software_region("roml"), MIN(0x2000, size));
-		
+
 		if (size == 0x4000)
 		{
 			// continue loading to ROMH region
@@ -1306,7 +1306,7 @@ static void load_vizawrite_cartridge(device_image_interface &image)
 {
 	#define VW64_DECRYPT_ADDRESS(_offset) \
 		BITSWAP16(_offset,15,14,13,12,7,8,6,9,5,11,4,3,2,10,1,0)
-	
+
 	#define VW64_DECRYPT_DATA(_data) \
 		BITSWAP8(_data,7,6,0,5,1,4,2,3)
 
@@ -1338,18 +1338,18 @@ static WRITE8_HANDLER( hugo_bank_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0
-		1
-		2
-		3
-		4		A14
-		5		A15
-		6		A16
-		7		A13
+        0
+        1
+        2
+        3
+        4       A14
+        5       A15
+        6       A16
+        7       A13
 
-	*/
+    */
 
 	c64_state *state = space->machine().driver_data<c64_state>();
 
@@ -1363,7 +1363,7 @@ static void load_hugo_cartridge(device_image_interface &image)
 {
 	#define HUGO_DECRYPT_ADDRESS(_offset) \
 		BITSWAP16(_offset,15,14,13,12,7,6,5,4,3,2,1,0,8,9,11,10)
-	
+
 	#define HUGO_DECRYPT_DATA(_data) \
 		BITSWAP8(_data,7,6,5,4,0,1,2,3)
 
@@ -1418,34 +1418,34 @@ static WRITE8_HANDLER( pagefox_bank_w )
 {
 	/*
 
-		Die 96KB des Moduls belegen in 6 16K-Banken den Modulbereich von $8000- $c000. 
-		Die Umschaltung erfolgt mit einem Register in $DE80 (-$DEFF, nicht voll decodiert),
-		welches nur beschrieben und nicht gelesen werden kann. Durch Schreiben der Werte 
-		$08 oder $0A selektiert man eine der beiden RAM-Banke, $FF deselektiert das Modul. 
-		
-		Zusatzlich muss Adresse 1 entsprechend belegt werden :$37 fur Lesezugriffe auf das 
-		Modul, $35 oder $34 fur Lesezugriffe auf das Ram des C64. Schreibzugriffe lenkt 
-		der C64 grundsatzlich ins eigene RAM, weshalb zum Beschreiben des Modulrams ein 
-		Trick notwendig ist: Man schaltet das Ram-Modul parallel zum C64-Ram, rettet vor 
-		dem Schreiben den C64-Ram-Inhalt und stellt ihn nachher wieder her...
-	
-		Ldy#0
-		Lda#$35
-		Sta 1
-		Loop Lda (Ptr),y
-		Pha
-		Lda#$08
-		Sta $DE80
-		Lda (Quell),y
-		Sta (Ptr),y
-		Lda#$FF
-		Sta $DE80
-		Pla
-		Sta (Ptr),y
-		Iny
-		Bne Loop
+        Die 96KB des Moduls belegen in 6 16K-Banken den Modulbereich von $8000- $c000.
+        Die Umschaltung erfolgt mit einem Register in $DE80 (-$DEFF, nicht voll decodiert),
+        welches nur beschrieben und nicht gelesen werden kann. Durch Schreiben der Werte
+        $08 oder $0A selektiert man eine der beiden RAM-Banke, $FF deselektiert das Modul.
 
-	*/
+        Zusatzlich muss Adresse 1 entsprechend belegt werden :$37 fur Lesezugriffe auf das
+        Modul, $35 oder $34 fur Lesezugriffe auf das Ram des C64. Schreibzugriffe lenkt
+        der C64 grundsatzlich ins eigene RAM, weshalb zum Beschreiben des Modulrams ein
+        Trick notwendig ist: Man schaltet das Ram-Modul parallel zum C64-Ram, rettet vor
+        dem Schreiben den C64-Ram-Inhalt und stellt ihn nachher wieder her...
+
+        Ldy#0
+        Lda#$35
+        Sta 1
+        Loop Lda (Ptr),y
+        Pha
+        Lda#$08
+        Sta $DE80
+        Lda (Quell),y
+        Sta (Ptr),y
+        Lda#$FF
+        Sta $DE80
+        Pla
+        Sta (Ptr),y
+        Iny
+        Bne Loop
+
+    */
 
 	c64_state *state = space->machine().driver_data<c64_state>();
 	UINT8 *cart = space->machine().region("user1")->base();
@@ -1468,7 +1468,7 @@ static WRITE8_HANDLER( pagefox_bank_w )
 		memcpy(state->m_roml, cart + address, 0x2000);
 		memcpy(state->m_romh, cart + address + 0x2000, 0x2000);
 
-		if (state->m_game) 
+		if (state->m_game)
 		{
 			// enable cartridge
 			state->m_game = 0;
@@ -1511,7 +1511,7 @@ static WRITE8_HANDLER( multiscreen_bank_w )
 		memcpy(state->m_romh, cart + 0x2000, 0x2000);
 	}
 	else
-	{	
+	{
 		// ROM
 		memcpy(state->m_roml, cart + address, 0x2000);
 		memcpy(state->m_romh, cart + address + 0x2000, 0x2000);
@@ -1562,19 +1562,19 @@ static void c64_software_list_cartridge_load(device_image_interface &image)
 	}
 	else
 	{
-		if (!strcmp(cart_type, "vizawrite")) 
+		if (!strcmp(cart_type, "vizawrite"))
 			load_vizawrite_cartridge(image);
-		
-		else if (!strcmp(cart_type, "hugo")) 
+
+		else if (!strcmp(cart_type, "hugo"))
 			load_hugo_cartridge(image);
-		
-		else if (!strcmp(cart_type, "easy_calc_result")) 
+
+		else if (!strcmp(cart_type, "easy_calc_result"))
 			load_easy_calc_result_cartridge(image);
-		
-		else if (!strcmp(cart_type, "pagefox")) 
+
+		else if (!strcmp(cart_type, "pagefox"))
 			load_pagefox_cartridge(image); // TODO writing to the expanded 32KB RAM is not supported!
-		
-		else if (!strcmp(cart_type, "multiscreen")) 
+
+		else if (!strcmp(cart_type, "multiscreen"))
 			load_multiscreen_cartridge(image); // TODO 8K RAM expansion test fails on boot
 
 		else

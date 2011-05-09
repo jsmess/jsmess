@@ -635,7 +635,7 @@ static imgtoolerr_t full_refresh_image(HWND window)
 	TCHAR *t_filename;
 	imgtool_partition_features features;
 	extern const char build_version[];
-	
+
 	info = get_wimgtool_info(window);
 
 	// get the modules and features

@@ -155,7 +155,7 @@ private:
 
 	cbm_iec_stub_device *m_stub;
 
-   	const cbm_iec_config *m_daisy;
+	const cbm_iec_config *m_daisy;
 };
 
 

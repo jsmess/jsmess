@@ -95,7 +95,7 @@ private:
 	int m_via0_irq;
 	int m_via1_irq;
 
-   	const char *m_bus_tag;
+	const char *m_bus_tag;
 };
 
 

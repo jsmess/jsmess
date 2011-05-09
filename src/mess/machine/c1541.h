@@ -100,7 +100,7 @@ public:
 	DECLARE_WRITE8_MEMBER( via1_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( atn_w );
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
-	
+
 	// inline configuration helpers
 	static void static_set_config(device_t &device, int address, int variant);
 
@@ -113,7 +113,7 @@ protected:
     virtual void device_start();
 	virtual void device_reset();
     virtual void device_config_complete();
-	
+
 	// device_cbm_iec_interface overrides
 	void cbm_iec_atn(int state);
 	void cbm_iec_reset(int state);

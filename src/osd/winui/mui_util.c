@@ -439,7 +439,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 				for (device_t *cfg = config.devicelist().first(); cfg != NULL; cfg = cfg->next())
 				{
 					if (cfg->input_ports()!=NULL) {
-		// workaround for r11433				input_port_list_init(portlist, cfg->input_ports(), NULL, 0, FALSE, cfg);
+		// workaround for r11433                input_port_list_init(portlist, cfg->input_ports(), NULL, 0, FALSE, cfg);
 					}
 				}
 
