@@ -1,4 +1,62 @@
-﻿0.142u2
+﻿0.142u3
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+System Driver Changes:
+----------------------
+- amico2k: Implemented keyboard and display. [Curt Coder]
+- amico2k: Fixed LED flickering. [Curt Coder]
+- bbc: Started cleaning up the code as it has been neglected 
+	for a long time. [GordonJ]
+- psx: Most FMVs now have fluent video, again [R. Belmont]
+- psx: Fix register readback of DMA completion, FMVs work
+	way better, SOTN gets into game [Fabio Priuli]
+- prof80: Fixed display corruption. [Curt Coder]
+- prof80: Added GripS 1.15 ROM. [Curt Coder]
+- apple2e, apple2ee: Added keyboard ROMs. [Curt Coder]
+- next: Added softlist and floppy device. [Curt Coder]
+- atom: Fixed 2400Hz timer, CPU type, and added a comment 
+	about the ERROR bug. [Curt Coder]
+- abc802, abc806: Added ROM dump for ABC55/77 keyboard. [robcfg, Curt Coder]
+- psx: fix FMV colors [Angelo Salese]
+- next: Modernized driver and connected MCCS1850 RTC. [Curt Coder]
+- c64: Connected to cartridge software list and implemented 
+	loading of simple 8K/16K cartridges. [Curt Coder]
+- ti99: Locked HSGPL mode to on for ti99_4p; HSGPL does not 
+	lock up anymore when cartridge is plugged in; SAMS 
+	address decoding fixed [Michael Zapf]
+- at: Pentium drivers boots from HDD [Miodrag Milanovic]
+- c64: Added mapper for the "VizaWrite 64" cartridge. [Curt Coder]
+- next: Added default EEPROM, system boots to ROM monitor now. [Curt Coder]
+- c64: Added mapper for the "Skaermtrolden Hugo" cartridge. [Curt Coder]
+- c64: Added mapper for the "Easy Calc Result" cartridge. [Curt Coder]
+- c64: Added mapper for the "Pagefox" cartridge. The 32KB RAM 
+	expansion is not fully supported. [Curt Coder]
+- pc: Fixed issues with XT HDC [Carl]
+
+
+Software Lists:
+----------------
+- snes.xml: verified a lot of dumps and added a few more alt dumps [MESSfan]
+- a800.xml/xegs.xml: updated to take advantage of <info> and confirmed some dumps [k1w1]
+- external contributions to lists from k1w1 (and mvrh)
+
+Source Changes:
+----------------
+- sonydriv: fix crashes when accessing drive after a 
+	software-initiated disk eject (e.g. zzcopy on apple2gs) [R. Belmont]
+
+0.142u2
 
 New System Drivers Supported:
 -----------------------------
@@ -27,8 +85,6 @@ System Driver Changes:
 - apple2gs: handle another ADB command, Pirates! works now [R. Belmont]
 - a7800: fixed bug #2039 [Fabio Priuli]
 - apple2: don't crash on $C060 access on IIgs, fixes Rastan [R. Belmont]
-- ti99: fixed SAMS memory expansion, HSGPL flash mode, HSGPL does not crash
-         anymore with plugged-in cartridge [Michael Zapf]
 
 Software Lists:
 ----------------
