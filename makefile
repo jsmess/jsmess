@@ -453,21 +453,13 @@ endif
 CCOMFLAGS += -O$(OPTIMIZE)
 
 # if we are optimizing, include optimization options
-# and make all errors into warnings
 ifneq ($(OPTIMIZE),0)
-ifneq ($(TARGETOS),os2)
-ifndef NOWERROR
-CCOMFLAGS += -Werror -fno-strict-aliasing $(ARCHOPTS)
-else
 CCOMFLAGS += -fno-strict-aliasing $(ARCHOPTS)
-endif
-else
-CCOMFLAGS += -fno-strict-aliasing $(ARCHOPTS)
-endif
 endif
 
 # add a basic set of warnings
 CCOMFLAGS += \
+	-Werror \
 	-Wall \
 	-Wcast-align \
 	-Wundef \
