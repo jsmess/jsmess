@@ -1308,10 +1308,11 @@ static void prepare_menus(HWND wnd)
 	set_command_state(menu_bar, ID_OPTIONS_DIPSWITCHES, has_dipswitch ? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_OPTIONS_MISCINPUT, has_misc ? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_OPTIONS_ANALOGCONTROLS, has_analog ? MFS_ENABLED : MFS_GRAYED);
-	set_command_state(menu_bar, ID_OPTIONS_FULLSCREEN, !is_windowed() ? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_FILE_FULLSCREEN, !is_windowed() ? MFS_CHECKED : MFS_ENABLED);
 	set_command_state(menu_bar, ID_OPTIONS_TOGGLEFPS, ui_get_show_fps() ? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_FILE_UIACTIVE, window->machine().ui_active() ? MFS_CHECKED : MFS_ENABLED);
 #if HAS_PROFILER
-	set_command_state(menu_bar, ID_OPTIONS_PROFILER, ui_get_show_profiler() ? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_FILE_PROFILER, ui_get_show_profiler() ? MFS_CHECKED : MFS_ENABLED);
 #endif
 
 	set_command_state(menu_bar, ID_KEYBOARD_EMULATED, (has_keyboard) ? (!ui_get_use_natural_keyboard(window->machine()) ? MFS_CHECKED : MFS_ENABLED): MFS_GRAYED);
@@ -1705,6 +1706,10 @@ static int invoke_command(HWND wnd, UINT command)
 			window->machine().video().save_active_screen_snapshots();
 			break;
 
+		case ID_FILE_UIACTIVE:
+			window->machine().set_ui_active(!window->machine().ui_active());
+			break;
+
 		case ID_FILE_EXIT_NEWUI:
 			window->machine().schedule_exit();
 			break;
@@ -1754,12 +1759,12 @@ static int invoke_command(HWND wnd, UINT command)
 			break;
 
 #if HAS_PROFILER
-		case ID_OPTIONS_PROFILER:
+		case ID_FILE_PROFILER:
 			ui_set_show_profiler(!ui_get_show_profiler());
 			break;
 #endif // HAS_PROFILER
 
-		case ID_OPTIONS_DEBUGGER:
+		case ID_FILE_DEBUGGER:
 			debug_cpu_get_visible_cpu(window->machine())->debug()->halt_on_next_instruction("User-initiated break\n");
 			break;
 
@@ -1779,11 +1784,11 @@ static int invoke_command(HWND wnd, UINT command)
 			customize_analogcontrols(window->machine(), wnd);
 			break;
 
-		case ID_OPTIONS_OLDUI:
+		case ID_FILE_OLDUI:
 			ui_show_menu();
 			break;
 
-		case ID_OPTIONS_FULLSCREEN:
+		case ID_FILE_FULLSCREEN:
 			winwindow_toggle_full_screen();
 			break;
 
@@ -1799,7 +1804,7 @@ static int invoke_command(HWND wnd, UINT command)
 			}
 			break;
 
-		case ID_OPTIONS_TOGGLEMENUBAR:
+		case ID_FILE_TOGGLEMENUBAR:
 			win_toggle_menubar();
 			break;
 
@@ -1957,11 +1962,11 @@ int win_setup_menus(running_machine &machine, HMODULE module, HMENU menu_bar)
 #if HAS_PROFILER
 	ui_set_show_profiler(0);
 #else
-	DeleteMenu(menu_bar, ID_OPTIONS_PROFILER, MF_BYCOMMAND);
+	DeleteMenu(menu_bar, ID_FILE_PROFILER, MF_BYCOMMAND);
 #endif
 
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0)
-		DeleteMenu(menu_bar, ID_OPTIONS_DEBUGGER, MF_BYCOMMAND);
+		DeleteMenu(menu_bar, ID_FILE_DEBUGGER, MF_BYCOMMAND);
 
 	// set up frameskip menu
 	frameskip_menu = find_sub_menu(menu_bar, "&Options\0&Frameskip\0", FALSE);

@@ -275,6 +275,13 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Save Sc&reenshot",            ID_FILE_SAVESCREENSHOT
         MENUITEM SEPARATOR
+        MENUITEM "&Hide Menubar",               ID_FILE_TOGGLEMENUBAR
+        MENUITEM "&Full Screen\tAlt+Enter",     ID_FILE_FULLSCREEN
+        MENUITEM "Partial Keyboard Emulation",  ID_FILE_UIACTIVE
+        MENUITEM "Show Tab Menu",               ID_FILE_OLDUI
+        MENUITEM "&Debugger...",                ID_FILE_DEBUGGER
+        MENUITEM "Show P&rofiler",              ID_FILE_PROFILER, GRAYED
+        MENUITEM SEPARATOR
         MENUITEM "&Exit",                       ID_FILE_EXIT_NEWUI
     END
     POPUP "&Edit"
@@ -322,12 +329,6 @@ BEGIN
             MENUITEM "Unlimited",                   ID_THROTTLE_UNTHROTTLED
         END
         MENUITEM "Show &FPS",                   ID_OPTIONS_TOGGLEFPS
-        MENUITEM SEPARATOR
-        MENUITEM "&Hide Menubar",        ID_OPTIONS_TOGGLEMENUBAR
-        MENUITEM "&Full Screen\tAlt+Enter",     ID_OPTIONS_FULLSCREEN
-        MENUITEM "Show P&rofiler",              ID_OPTIONS_PROFILER, GRAYED
-        MENUITEM "Show Tab Menu",               ID_OPTIONS_OLDUI
-        MENUITEM "&Debugger...",                ID_OPTIONS_DEBUGGER
     END
     POPUP "&Devices"
     BEGIN
