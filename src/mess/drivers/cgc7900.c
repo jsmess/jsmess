@@ -225,7 +225,8 @@ WRITE16_MEMBER( cgc7900_state::disk_command_w )
 
 static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16, cgc7900_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(m_chrom_ram)
+	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(M68000_TAG, 0)
+	AM_RANGE(0x000008, 0x1fffff) AM_RAM AM_BASE(m_chrom_ram)
 	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(z_mode_r, z_mode_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_RAM AM_BASE(m_plane_ram)
@@ -406,13 +407,6 @@ void cgc7900_state::machine_start()
 
 void cgc7900_state::machine_reset()
 {
-	UINT8* user1 = machine().region(M68000_TAG)->base();
-
-	memcpy((UINT8*)m_chrom_ram,user1,8);
-
-	m_maincpu->reset();
-
-	memset((UINT8*)m_chrom_ram,0,8);
 }
 
 /***************************************************************************
