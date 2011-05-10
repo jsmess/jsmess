@@ -657,15 +657,14 @@ static void psx_sio0( running_machine &machine, int n_data )
 
 /* ----------------------------------------------------------------------- */
 
-static void cd_dma_read( running_machine &machine, UINT32 n_address, INT32 n_size )
+static void cd_dma_read( psxcd_device *psxcd, UINT32 n_address, INT32 n_size )
 {
-	psxcd_device *psxcd = machine.device<psxcd_device>("psxcd");
-	UINT8 *psxram = (UINT8 *)memory_get_shared(machine, "share1");
+	UINT8 *psxram = (UINT8 *)memory_get_shared(psxcd->machine(), "share1");
 
 	psxcd->start_dma(psxram + n_address, n_size*4);
 }
 
-static void cd_dma_write( running_machine &machine, UINT32 n_address, INT32 n_size )
+static void cd_dma_write( psxcd_device *psxcd, UINT32 n_address, INT32 n_size )
 {
 	printf("cd_dma_write?!: addr %x, size %x\n", n_address, n_size);
 }
@@ -702,8 +701,8 @@ static MACHINE_RESET( psx )
 	psx_machine_init(machine);
 	psx_sio_install_handler( machine, 0, psx_sio0 );
 
-	psx_dma_install_read_handler(machine, 3, cd_dma_read);
-	psx_dma_install_write_handler(machine, 3, cd_dma_write);
+	psx_dma_install_read_handler(machine, 3, psx_dma_read_delegate(FUNC(cd_dma_read),machine.device<psxcd_device>("psxcd")));
+	psx_dma_install_write_handler(machine, 3, psx_dma_write_delegate(FUNC(cd_dma_write),machine.device<psxcd_device>("psxcd")));
 }
 
 static DRIVER_INIT( psx )

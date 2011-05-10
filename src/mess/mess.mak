@@ -526,10 +526,10 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_DRIVERS)/n64.o		\
 	$(MAME_MACHINE)/aescart.o	\
 	$(MAME_DRIVERS)/ng_aes.o	\
-	$(MAME_DRIVERS)/psx.o		\
-	$(MAME_MACHINE)/psxcd.o		\
-	$(MAME_MACHINE)/psxcddrv.o	\
-	$(MAME_MACHINE)/psxcard.o	\
+	$(MESS_DRIVERS)/psx.o		\
+	$(MESS_MACHINE)/psxcd.o		\
+	$(MESS_MACHINE)/psxcddrv.o	\
+	$(MESS_MACHINE)/psxcard.o	\
 	$(MAME_DRIVERS)/saturn.o	\
 	$(MAME_DRIVERS)/cps1.o	\
 	$(MAME_VIDEO)/cps1.o	\
