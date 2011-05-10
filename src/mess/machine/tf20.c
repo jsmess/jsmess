@@ -340,7 +340,7 @@ static DEVICE_START( tf20 )
 
 	/* locate child devices */
 	tf20->upd765a = device->subdevice("5a");
-	tf20->upd7201 = device->subdevice<upd7201_device>("3a");
+	tf20->upd7201 = downcast<upd7201_device *>(device->subdevice("3a"));
 	tf20->floppy_0 = device->subdevice(FLOPPY_0);
 	tf20->floppy_1 = device->subdevice(FLOPPY_1);
 
