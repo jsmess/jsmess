@@ -373,7 +373,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		ROM5  - not populated
 		ROM6  - not populated
 		
-		bankswitching latch at I/O2 ($DF00..$DEFF) (write $0D -> RAM @8000)
+		bankswitching latch at I/O2 ($DF00..$DFFF) (write $0D -> RAM @8000)
 		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="cart_type" value="multiscreen" />
@@ -486,7 +486,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	
 	<software name="btx" supported="no">
 		<description>Btx Decoder Modul (Germany)</description>
-		<year>1984</year>
+		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<!--
 		-->
@@ -503,7 +503,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	
 	<software name="btx2" supported="no">
 		<description>Btx Decoder Modul II v3.1 (Germany)</description>
-		<year>1984</year>
+		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<!--
 		-->
@@ -520,7 +520,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	
 	<software name="btx2v33" supported="no">
 		<description>Btx Decoder Modul II v3.3 (Germany)</description>
-		<year>1984</year>
+		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<!--
 		-->
@@ -552,7 +552,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="vikingr">
-		<description>Action Adventure Series - Viking Raider</description>
+		<description>Action Adventure Series: Viking Raider</description>
 		<year>1984</year>
 		<publisher>Interphase</publisher>
 		<part name="cart" interface="c64_cart">
@@ -600,7 +600,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Mr. Computer</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="alien sidestep (19xx)(mr. computer).80" size="0x2000" crc="66dc8008" sha1="ba9ddcf0cdeca1335227a790fa086a64d77529bd" offset="0x0000" />
 			</dataarea>
@@ -615,7 +615,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="ALP-C6" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="alpha build (1984)(fisher price).80" size="0x2000" crc="a8b0c429" sha1="729c0670f97cb2d0514c4be0ad78b1cf680142e2" offset="0x0000" />
 			</dataarea>
@@ -655,7 +655,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Creative Software</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="astroblitz (1983)(creative software).80" size="0x2000" crc="a5e4f18e" sha1="3967977ccf53742e132c8e238f2e5596f949d9d1" offset="0x0000" />
 			</dataarea>
@@ -789,7 +789,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="buckrog" supported="no">
-		<description>Buck Rogers : Planet of Zoom</description>
+		<description>Buck Rogers: Planet of Zoom</description>
 		<year>1983</year>
 		<publisher>SEGA</publisher>
 		<info name="serial" value="005-05" />
@@ -808,7 +808,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Mr. Computer</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="bug crusher (1983)(mr. computer).80" size="0x2000" crc="869e95ee" sha1="1a25a1b729e78773b49bf2d6b04cb0bcfc4ae67d" offset="0x0000" />
 			</dataarea>
@@ -875,7 +875,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Mr. Computer</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="close encounters of the worst kind (1994)(mr. computer).80" size="0x2000" crc="0c4a4426" sha1="f28e65a47e9d9ece3a2347afadfd37b047048df4" offset="0x0000" />
 			</dataarea>
@@ -883,7 +883,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="coccinel">
-		<description>Coccinelle Cherche Dessinateur</description>
+		<description>Coccinelle cherche dessinateur (France)</description>
 		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -931,7 +931,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="COS-C6" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="cosmic life (1983)(spinnaker software).80" size="0x2000" crc="4eb150c9" sha1="30d4fa3f93b3ffaae3c8bdc9c9b02a325cb663f1" offset="0x0000" />
 			</dataarea>
@@ -971,7 +971,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="DCF-C6" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="dance fantasy (1984)(cbs software).80" size="0x2000" crc="0add70d0" sha1="92a686f4cc8cde367648c1f9decc40866d0aa613" offset="0x0000" />
 			</dataarea>
@@ -1077,7 +1077,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Mr. Computer</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="dot gobbler v2 (1983)(mr. computer).80" size="0x2000" crc="cde79a43" sha1="3b1dec6049be3101ebfb422b557e5b2fcd2175bc" offset="0x0000" />
 			</dataarea>
@@ -1090,7 +1090,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Mr. Computer</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="dot gobbler (1983)(mr. computer).80" size="0x2000" crc="87e0c2b6" sha1="22c913970a4224785070ca11a818100e98c3c777" offset="0x0000" />
 			</dataarea>
@@ -1160,7 +1160,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="MAF-C6" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="facemaker (1983)(spinnaker software).80" size="0x2000" crc="7f6f21d0" sha1="fc60d78f8b5ef436c6375a7119ebcb9acc86d180" offset="0x0000" />
 			</dataarea>
@@ -1182,7 +1182,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="4thsarc">
-		<description>Fourth Sarcophagus, The</description>
+		<description>The Fourth Sarcophagus</description>
 		<year>1983</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -1201,7 +1201,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="FRF-C6" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="fraction fever (1983)(spinnaker software).80" size="0x2000" crc="88af6a05" sha1="2a64735b4ee63740202db0b8cf2c15a4cf6f4ab4" offset="0x0000" />
 			</dataarea>
@@ -1236,7 +1236,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="frogger2">
-		<description>Frogger II : Threedeep!</description>
+		<description>Frogger II: Threedeep!</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="c64_cart">
@@ -1309,7 +1309,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="C512" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="gridrunner (1983)(hesware).80" size="0x2000" crc="12f36a09" sha1="218625325984ebdef88a5b56bc81bcff229d61db" offset="0x0000" />
 			</dataarea>
@@ -1330,7 +1330,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="hero">
-		<description>H.E.R.O.</description>
+		<description>H.E.R.O.: Helicopter Emergency Rescue Operation</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-003-04" />
@@ -1365,7 +1365,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="HAC-C6" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="hop along counting (1984)(fisher price).80" size="0x2000" crc="14d446b8" sha1="40cc4d384a44baf301e0337246b624dffe267a2f" offset="0x0000" />
 			</dataarea>
@@ -1432,7 +1432,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Sierra On-Line</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="jaw breaker (1983)(sierra online).80" size="0x2000" crc="c5ea2b53" sha1="c92bd2c0bd0dd67f2deb4856b20fe1d76986e641" offset="0x0000" />
 			</dataarea>
@@ -1460,7 +1460,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="JUK-C6" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="juke box (1984)(spinnaker software).80" size="0x2000" crc="d71551a8" sha1="ecfeeb111c95ca8b0ef105e29b22411ca071dde8" offset="0x0000" />
 			</dataarea>
@@ -1500,7 +1500,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="KOK-C6" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="kids on keys (1983)(spinnaker software).80" size="0x2000" crc="11e656d0" sha1="63e46798a6e481ad554027847bd4ae9e0d333c85" offset="0x0000" />
 			</dataarea>
@@ -1514,7 +1514,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="KDC-C6" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="kindercomp (1983)(spinnaker software).80" size="0x2000" crc="866e5934" sha1="4dc54fa35630073108f7225f9b444a9c358a9ca3" offset="0x0000" />
 			</dataarea>
@@ -1542,7 +1542,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="C519" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="lazer zone (1983)(hesware).80" size="0x2000" crc="bfa69d6d" sha1="d4aa23205f71d205fb7e4e7cbba0693e2cc20ef3" offset="0x0000" />
 			</dataarea>
@@ -1570,7 +1570,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="LNL-C6" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="linking logic (1984)(fisher price).80" size="0x2000" crc="6554f9d6" sha1="d47ed3b07eae329a45a150ea3b249015b6dc13ae" offset="0x0000" />
 			</dataarea>
@@ -1598,7 +1598,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="LLV-C6" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="logic levels (1984)(fisher price).80" size="0x2000" crc="23889a3e" sha1="02802875d6126ec0badad53e67acece7a8de7e40" offset="0x0000" />
 			</dataarea>
@@ -1624,7 +1624,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Mr. Computer</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="mario&apos;s brewery (1983)(mr. computer).80" size="0x2000" crc="250942d0" sha1="3d2773247aa9b82a634cbf0cfa7dca5f127522a7" offset="0x0000" />
 			</dataarea>
@@ -1664,7 +1664,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Turbo Software</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="maze man (1983)(turbo software).80" size="0x2000" crc="7d939a7f" sha1="7d225481319f75c4649a72330d22b9bbfc1b9b80" offset="0x0000" />
 			</dataarea>
@@ -1691,7 +1691,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="MEM-C6" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="memory manor (1984)(fisher price).80" size="0x2000" crc="aa9ee63b" sha1="ea6a98fbb34d1aca11bbc23880ae942aa8c6e761" offset="0x0000" />
 			</dataarea>
@@ -1717,7 +1717,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>HesWare</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="minnesota fat&apos;s pool challenger (1983)(hesware).80" size="0x2000" crc="7f2d8a46" sha1="44f8f8ee6238829bca8ca2d412b3f238159377a4" offset="0x0000" />
 			</dataarea>
@@ -1798,7 +1798,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Sierra On-Line</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="mr. cool (1983)(sierra online).80" size="0x2000" crc="0609655c" sha1="29ff6f733083b5ac6372700ab6bfc660a85297cf" offset="0x0000" />
 			</dataarea>
@@ -1812,7 +1812,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="C350" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="mr. tnt (1984)(hesware).80" size="0x2000" crc="ea5c0043" sha1="8d7097859b3e67cfb616297ecf94c7ffddf9aa48" offset="0x0000" />
 			</dataarea>
@@ -1833,7 +1833,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="mspiders">
-		<description>Mutant Spiders, The</description>
+		<description>The Mutant Spiders</description>
 		<year>1983</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -1880,7 +1880,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="developer" value="Childware" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="number tumbler (1984)(fisher price).80" size="0x2000" crc="5fcff459" sha1="2cd75cd711bed42814937d8e6ce6c9a1b9106a7e" offset="0x0000" />
 			</dataarea>
@@ -1998,12 +1998,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="thepit">
-		<description>Pit, The</description>
+		<description>The Pit</description>
 		<year>1983</year>
 		<publisher>HesWare</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="pit, the (1983)(hesware).80" size="0x2000" crc="4ce5a0a7" sha1="12214f05fd7d37d4e3f26591e52789dd4fc6f258" offset="0x0000" />
 			</dataarea>
@@ -2011,7 +2011,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="pitfall2">
-		<description>Pitfall II : The Lost Caverns</description>
+		<description>Pitfall II: The Lost Caverns</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-007-04" />
@@ -2025,7 +2025,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="pitfal2a" Cloneof="pitfall2">
-		<description>Pitfall II : The Lost Caverns (Alt)</description>
+		<description>Pitfall II: The Lost Caverns (Alt)</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-007-04" />
@@ -2187,12 +2187,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="addsub23">
-		<description>Rechenlowe, Der - Fit in Addition und Subtraktion - 2.-3. Schuljahr</description>
-		<!-- Requires "Westerman Learning" cartridge hardware. -->
+	<software name="addsub23" supported="no">
+		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 2.-3. Schuljahr (Germany)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="westermann_learning" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -2201,12 +2201,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="addsub34">
-		<description>Rechenlowe, Der - Fit in Addition und Subtraktion - 3.-4. Schuljahr</description>
-		<!-- Requires "Westerman Learning" cartridge hardware. -->
+	<software name="addsub34" supported="no">
+		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 3.-4. Schuljahr (Germany)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="westermann_learning" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -2215,12 +2215,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="geomet34">
-		<description>Rechenlowe, Der - Fit in Geometrie - 3.-4. Schuljahr</description>
-		<!-- Requires "Westerman Learning" cartridge hardware. -->
+	<software name="geomet34" supported="no">
+		<description>Der Rechenlöwe: Fit in Geometrie - 3.-4. Schuljahr (Germany)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="westermann_learning" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -2229,12 +2229,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="math1">
-		<description>Rechenlowe, Der - Fit in Mathematik - 1. Schuljahr</description>
-		<!-- Requires "Westerman Learning" cartridge hardware. -->
+	<software name="math1" supported="no">
+		<description>Der Rechenlöwe: Fit in Mathematik - 1. Schuljahr (Germany)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="westermann_learning" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -2243,12 +2243,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="muldiv23">
-		<description>Rechenlowe, Der - Fit in Multiplikation und Division - 2.-3. Schuljahr</description>
-		<!-- Requires "Westerman Learning" cartridge hardware. -->
+	<software name="muldiv23" supported="no">
+		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 2.-3. Schuljahr (Germany)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="westermann_learning" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -2257,12 +2257,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="muldiv34">
-		<description>Rechenlowe, Der - Fit in Multiplikation und Division - 3.-4. Schuljahr</description>
-		<!-- Requires "Westerman Learning" cartridge hardware. -->
+	<software name="muldiv34" supported="no">
+		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 3.-4. Schuljahr (Germany)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="westermann_learning" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -2271,12 +2271,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="recht34">
-		<description>Rechtschreiblowe, Der - Fit in Rechtschreibung - 3.-4. Schuljahr</description>
-		<!-- Requires "Westerman Learning" cartridge hardware. -->
+	<software name="recht34" supported="no">
+		<description>Rechtschreiblowe, Der - Fit in Rechtschreibung - 3.-4. Schuljahr (Germany)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="westermann_learning" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -2370,7 +2370,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Creative Software</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="save new york (1983)(creative software).80" size="0x2000" crc="bfaa0d5f" sha1="9e555c8fd0e71e30730bbbd7b4bc694c8f1c1386" offset="0x0000" />
 			</dataarea>
@@ -2384,7 +2384,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="serial" value="SSP-C6" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="sea speller (1984)(fisher price).80" size="0x2000" crc="e7858752" sha1="4aa0de7eebf46d3ead0441cb4b08d3521b7ca20e" offset="0x0000" />
 			</dataarea>
@@ -2467,7 +2467,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<info name="developer" value="Carousel Software" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="song maker (1985)(fisher price).80" size="0x2000" crc="29e8e748" sha1="d7124d576e035119d1a2c7d36e19170ba4790d4a" offset="0x0000" />
 			</dataarea>
@@ -2493,7 +2493,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Mr. Computer</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="space ric-o-shay (1983)(mr. computer).80" size="0x2000" crc="6ce1de20" sha1="0f86121dc91dcaf2b0d7ed9c89232b2856a041cf" offset="0x0000" />
 			</dataarea>
@@ -2501,7 +2501,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="shuttle">
-		<description>Space Shuttle : A Journey Into Space</description>
+		<description>Space Shuttle: A Journey into Space</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2569,7 +2569,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="startrek">
-		<description>Star Trek : Strategic Operations Simulator</description>
+		<description>Star Trek: Strategic Operations Simulator</description>
 		<year>1983</year>
 		<publisher>SEGA</publisher>
 		<info name="serial" value="004-05" />
@@ -2583,7 +2583,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="swarcade">
-		<description>Star Wars : The Arcade Game</description>
+		<description>Star Wars: The Arcade Game</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2614,7 +2614,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Supersoft</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="stix (1983)(supersoft).80" size="0x2000" crc="5fbe5c3a" sha1="9872ebf0183f2d5fa1f9d3cf970ba5547b0f1291" offset="0x0000" />
 			</dataarea>
@@ -2655,7 +2655,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Mr. Computer</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="tank wars (1983)(mr. computer).80" size="0x2000" crc="7d6f3603" sha1="de21f955e58bea6c363e1a9f27097ffc4e330727" offset="0x0000" />
 			</dataarea>
@@ -2694,7 +2694,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Sierra On-Line</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="threshold (1983)(sierra online).80" size="0x2000" crc="f66076b8" sha1="8f577f3174c67b69dc74402bdd52f43fd7ef8f86" offset="0x0000" />
 			</dataarea>
@@ -2748,7 +2748,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Creative Software</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="trashman (1983)(creative software).80" size="0x2000" crc="a4dba36a" sha1="d30cc143c0101a836f0e1f34376f305da494d2da" offset="0x0000" />
 			</dataarea>
@@ -2761,7 +2761,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Turbo Software</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="tsi cycles (1983)(turbo software).80" size="0x2000" crc="424637ec" sha1="d168a81e36da5f1d0e05f0a5cf69c59e67b252fc" offset="0x0000" />
 			</dataarea>
@@ -2774,7 +2774,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Turbo Software</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="turbo maze man (1983)(turbo software).80" size="0x2000" crc="e64df519" sha1="eeeebb1128fafb848c12bfc3aed5fba53ef84d0a" offset="0x0000" />
 			</dataarea>
@@ -2787,7 +2787,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Turbo Software</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="tyler&apos;s dungeon (1984)(turbo software).80" size="0x2000" crc="002d1ff6" sha1="1f005dca57a8004a45eb797e49dde0740ef8ed16" offset="0x0000" />
 			</dataarea>
@@ -2842,7 +2842,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<publisher>Spinnaker Software</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="up for grabs (1983)(spinnaker software).80" size="0x2000" crc="a9051f96" sha1="27b3a532fdc3b164c0e577a61d31186acf01500e" offset="0x0000" />
 			</dataarea>
@@ -2863,7 +2863,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="viduzzle">
-		<description>Viduzzles : Computerized Jigsaw Puzzles</description>
+		<description>Viduzzles: Computerized Jigsaw Puzzles</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="developer" value="Camelot" />
@@ -2878,7 +2878,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="webster">
-		<description>Webster : The Word Game</description>
+		<description>Webster: The Word Game</description>
 		<year>1983</year>
 		<publisher>CBS Software</publisher>
 		<info name="developer" value="Heuristic Software" />
@@ -2892,7 +2892,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="wiztype">
-		<description>Wizard of Id's Wiztype, The</description>
+		<description>The Wizard of Id's Wiztype</description>
 		<year>1984</year>
 		<publisher>Sierra On-Line</publisher>1
 		<info name="developer" value="Sydney Development Corp." />
@@ -3079,12 +3079,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="c64warp2">
+	<software name="c64warp2" supported="no">
 		<description>C-64 Warpspeed v2.0</description>
-		<!-- Requires "Warpspeed" cartridge hardware -->
 		<year>1987</year>
 		<publisher>Alien Technology</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="warpspeed" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
@@ -3093,12 +3093,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="c64warp1" cloneof="c64warp2">
-	<!-- Requires "Warpspeed" cartridge hardware -->
+	<software name="c64warp1" cloneof="c64warp2" supported="no">
 		<description>C-64 Warpspeed v1.0</description>
 		<year>1987</year>
 		<publisher>Alien Technology</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="warpspeed" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
@@ -3160,7 +3160,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="c64statg" cloneof="c64stat">
-		<description>CBM 64 Stat (Ger)</description>
+		<description>CBM 64 Stat (Germany)</description>
 		<year>1982</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3172,8 +3172,8 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="c64muist">
-		<description>CBM 64 Muistio (Fin)</description>
+	<software name="muistio">
+		<description>Muistio 64 (Finland)</description>
 		<year>19??</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3186,7 +3186,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="conraddb">
-		<description>Conrad Disk Booster (Ger)</description>
+		<description>Conrad Disk Booster (Germany)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3198,12 +3198,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="copycard">
+	<software name="copycard" supported="no">
 		<description>Copy Card</description>
-		<!-- Requires "Rex Utility" cartridge hardware -->
 		<year>1988</year>
 		<publisher>Puma-Sharks</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="rex_utility" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -3239,7 +3239,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="designer" supported="partial">
-		<description>Designer's Pencil, The</description>
+		<description>The Designer's Pencil</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3290,12 +3290,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="emon23">
-	<!-- Requires "Rex Utility" cartridge hardware -->
+	<software name="emon23" supported="no">
 		<description>Emon v2.3</description>
 		<year>1988</year>
 		<publisher>CIA</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="rex_utility" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -3317,12 +3317,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="finalcdr">
-	<!-- Requires "Rex Utility" cartridge hardware -->
-		<description>Final Coder, The</description>
+	<software name="finalcdr" supported="no">
+		<description>The Final Coder</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="rex_utility" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -3344,12 +3344,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="formatm">
-	<!-- Requires "Rex Utility" cartridge hardware -->
-		<description>Format und Hardcopy Module (Ger)</description>
+	<software name="formatm" supported="no">
+		<description>Format und Hardcopy Module (Germany)</description>
 		<year>19??</year>
 		<publisher>Rex Datentechnik</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="rex_utility" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -3371,12 +3371,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="happypac">
-	<!-- Requires "Rex Utility" cartridge hardware -->
-		<description>Happy-Packer (Ger)</description>
+	<software name="happypac" supported="no">
+		<description>Happy-Packer (Germany)</description>
 		<year>1987</year>
 		<publisher>Peter Arndt</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="rex_utility" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -3438,7 +3438,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="hsback3">
-		<description>High Speed Sektor Backup v3.0 (Ger)</description>
+		<description>High Speed Sektor Backup v3.0 (Germany)</description>
 		<year>1987</year>
 		<publisher>Rossmoeller</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3450,12 +3450,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="ripper11">
-	<!-- Requires "Rex Utility" cartridge hardware -->
+	<software name="ripper11" supported="no">
 		<description>Hires Ripper v1.1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="rex_utility" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -3465,7 +3465,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="hypra3">
-		<description>Hypra Disk II Modul v3.0 (Ger)</description>
+		<description>Hypra Disk II Modul v3.0 (Germany)</description>
 		<year>19??</year>
 		<publisher>Rex Datentechnik</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3490,12 +3490,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="pwrcart">
-	<!-- Requires "KCS Power Cartridge" hardware -->
+	<software name="pwrcart" supported="no">
 		<description>Power Cartridge</description>
 		<year>1985</year>
 		<publisher>KCS</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="kcs_power_cartridge" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x2000">
@@ -3521,13 +3521,13 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="simonbas">
-	<!-- Requires "Simons Basic" cartridge hardware -->
-		<description>Simon's BASIC</description>
+		<description>Simons' BASIC</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="exrom" value="0" />
+			<feature name="cart_type" value="simons_basic" />
 			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="simons&apos; basic (198x)(commodore).80" size="0x2000" crc="3117d4ee" sha1="9a67cc6d01939eae6f9fd141a6d963259820335d" offset="0x0000" />
 			</dataarea>
@@ -3551,7 +3551,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="superhcm">
-		<description>Super Hard-Copy-Modul, Das (Ger)</description>
+		<description>Das Super Hard-Copy-Modul (Germany)</description>
 		<year>1987</year>
 		<publisher>Schlumph</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3577,7 +3577,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="systemm1">
-		<description>System-M1.0 (Ger)</description>
+		<description>System-M1.0 (Germany)</description>
 		<year>1983</year>
 		<publisher>Mousesoft</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3602,12 +3602,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="tfgmodul">
-	<!-- Requires "Rex Utility" cartridge hardware -->
+	<software name="tfgmodul" supported="no">
 		<description>TFG Module</description>
 		<year>1986</year>
 		<publisher>T.F.G. Software</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="rex_utility" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -3629,12 +3629,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="tsieprom">
-	<!-- Requires "Rex Utility" cartridge hardware -->
+	<software name="tsieprom" supported="no">
 		<description>TSI-Eprom Module</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="rex_utility" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -3644,7 +3644,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="tysim64">
-		<description>Tysim 64 (Ger)</description>
+		<description>Tysim 64 (Germany)</description>
 		<year>1987</year>
 		<publisher>Kaudelka O.</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3657,7 +3657,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="victxt64">
-		<description>Vic-Text 64 (Swe)</description>
+		<description>Vic-Text 64 (Sweden)</description>
 		<year>1983</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">

@@ -1265,6 +1265,49 @@ static int c64_crt_load( device_image_interface &image )
 	return IMAGE_INIT_PASS;
 }
 
+/***************************************************************************
+    SOFTWARE LIST CARTRIDGE HANDLING
+***************************************************************************/
+
+#define install_write_handler(_start, _end, _handler) \
+	image.device().machine().firstcpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(_start, _end, FUNC(_handler));
+
+#define install_io1_handler(_handler) \
+	image.device().machine().firstcpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xde00, 0xde00, 0, 0xff, FUNC(_handler));
+
+#define install_io2_handler(_handler) \
+	image.device().machine().firstcpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xdf00, 0xdf00, 0, 0xff, FUNC(_handler));
+	
+#define allocate_cartridge_timer(_period, _func) \
+	c64_state *state = image.device().machine().driver_data<c64_state>(); \
+	state->m_cartridge_timer = image.device().machine().scheduler().timer_alloc(FUNC(_func)); \
+	state->m_cartridge_timer->adjust(_period, 0);
+	
+#define set_game_line(_machine, _state) \
+	_machine.driver_data<c64_state>()->m_game = _state; \
+	c64_bankswitch(_machine, 0);
+
+INLINE void load_cartridge_region(device_image_interface &image, const char *name, offs_t offset, size_t size)
+{
+	UINT8 *cart = image.device().machine().region("user1")->base();
+	UINT8 *rom = image.get_software_region(name);
+	memcpy(cart + offset, rom, size);
+}
+
+INLINE void map_cartridge_roml(running_machine &machine, offs_t offset)
+{
+	c64_state *state = machine.driver_data<c64_state>();
+	UINT8 *cart = machine.region("user1")->base();
+	memcpy(state->m_roml, cart + offset, 0x2000);
+}
+
+INLINE void map_cartridge_romh(running_machine &machine, offs_t offset)
+{
+	c64_state *state = machine.driver_data<c64_state>();
+	UINT8 *cart = machine.region("user1")->base();
+	memcpy(state->m_romh, cart + offset, 0x2000);
+}
+
 static void load_standard_c64_cartridge(device_image_interface &image)
 {
 	c64_state *state = image.device().machine().driver_data<c64_state>();
@@ -1292,16 +1335,8 @@ static void load_standard_c64_cartridge(device_image_interface &image)
 
 static TIMER_CALLBACK( vizawrite_timer )
 {
-	c64_state *state = machine.driver_data<c64_state>();
-	UINT8 *decrypted = machine.region("user1")->base();
-
-	// map cartridge ROMs
-	memcpy(state->m_roml, decrypted + 0x2000, 0x2000);
-	memset(state->m_romh, 0, 0x2000);
-
-	// set GAME line
-	state->m_game = 1;
-	c64_bankswitch(machine, 0);
+	map_cartridge_roml(machine, 0x2000);
+	set_game_line(machine, 1);
 }
 
 static void load_vizawrite_cartridge(device_image_interface &image)
@@ -1311,8 +1346,6 @@ static void load_vizawrite_cartridge(device_image_interface &image)
 
 	#define VW64_DECRYPT_DATA(_data) \
 		BITSWAP8(_data,7,6,0,5,1,4,2,3)
-
-	c64_state *state = image.device().machine().driver_data<c64_state>();
 
 	UINT8 *roml = image.get_software_region("roml");
 	UINT8 *romh = image.get_software_region("romh");
@@ -1328,12 +1361,11 @@ static void load_vizawrite_cartridge(device_image_interface &image)
 	}
 
 	// map cartridge ROMs
-	memcpy(state->m_roml, decrypted, 0x2000);
-	memcpy(state->m_romh, decrypted + 0x4000, 0x2000);
+	map_cartridge_roml(image.device().machine(), 0x0000);
+	map_cartridge_romh(image.device().machine(), 0x4000);
 
 	// allocate GAME changing timer
-	state->m_cartridge_timer = image.device().machine().scheduler().timer_alloc(FUNC(vizawrite_timer));
-	state->m_cartridge_timer->adjust(attotime::from_msec(1184), 0);
+	allocate_cartridge_timer(attotime::from_msec(1184), vizawrite_timer);
 }
 
 static WRITE8_HANDLER( hugo_bank_w )
@@ -1353,12 +1385,9 @@ static WRITE8_HANDLER( hugo_bank_w )
 
     */
 
-	c64_state *state = space->machine().driver_data<c64_state>();
-
 	int bank = ((data >> 3) & 0x0e) | BIT(data, 7);
 
-	UINT8 *decrypted = space->machine().region("user1")->base();
-	memcpy(state->m_roml, decrypted + (bank * 0x2000), 0x2000);
+	map_cartridge_roml(space->machine(), bank * 0x2000);
 }
 
 static void load_hugo_cartridge(device_image_interface &image)
@@ -1368,8 +1397,6 @@ static void load_hugo_cartridge(device_image_interface &image)
 
 	#define HUGO_DECRYPT_DATA(_data) \
 		BITSWAP8(_data,7,6,5,4,0,1,2,3)
-
-	c64_state *state = image.device().machine().driver_data<c64_state>();
 
 	UINT8 *roml = image.get_software_region("roml");
 	UINT8 *decrypted = image.device().machine().region("user1")->base();
@@ -1382,38 +1409,26 @@ static void load_hugo_cartridge(device_image_interface &image)
 	}
 
 	// map cartridge ROMs
-	memcpy(state->m_roml, decrypted, 0x2000);
+	map_cartridge_roml(image.device().machine(), 0x0000);
 
 	// install bankswitch handler
-	address_space *space = image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
-	space->install_legacy_write_handler( 0xde00, 0xdeff, FUNC(hugo_bank_w) );
+	install_io1_handler(hugo_bank_w);
 }
 
 static WRITE8_HANDLER( easy_calc_result_bank_w )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
-
-	UINT8 *cart = space->machine().region("user1")->base();
-	memcpy(state->m_romh, cart + 0x2000 + (!offset * 0x2000), 0x2000);
+	map_cartridge_romh(space->machine(), 0x2000 + (!offset * 0x2000));
 }
 
 static void load_easy_calc_result_cartridge(device_image_interface &image)
 {
-	c64_state *state = image.device().machine().driver_data<c64_state>();
+	load_cartridge_region(image, "roml", 0x0000, 0x2000);
+	load_cartridge_region(image, "romh", 0x2000, 0x4000);
 
-	UINT8 *roml = image.get_software_region("roml");
-	UINT8 *romh = image.get_software_region("romh");
-	UINT8 *cart = image.device().machine().region("user1")->base();
-	memcpy(cart, roml, 0x2000);
-	memcpy(cart + 0x2000, romh, 0x4000);
+	map_cartridge_roml(image.device().machine(), 0x0000);
+	map_cartridge_romh(image.device().machine(), 0x2000);
 
-	// map cartridge ROMs
-	memcpy(state->m_roml, cart, 0x2000);
-	memcpy(state->m_romh, cart + 0x2000, 0x2000);
-
-	// install bankswitch handler
-	address_space *space = image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
-	space->install_legacy_write_handler( 0xde00, 0xde01, FUNC(easy_calc_result_bank_w) );
+	install_write_handler(0xde00, 0xde01, easy_calc_result_bank_w);
 }
 
 static WRITE8_HANDLER( pagefox_bank_w )
@@ -1457,7 +1472,6 @@ static WRITE8_HANDLER( pagefox_bank_w )
 		// hide cartridge
 		state->m_game = 1;
 		state->m_exrom = 1;
-		c64_bankswitch(space->machine(), 0);
 	}
 	else
 	{
@@ -1481,29 +1495,23 @@ static WRITE8_HANDLER( pagefox_bank_w )
 		else
 		{
 			state->m_roml = state->m_c64_roml;
-			memcpy(state->m_roml, cart + address, 0x2000);
-			memcpy(state->m_romh, cart + address + 0x2000, 0x2000);
+
+			map_cartridge_roml(space->machine(), address);
+			map_cartridge_romh(space->machine(), address + 0x2000);
 		}
-
-		c64_bankswitch(space->machine(), 0);
 	}
-}
 
+	c64_bankswitch(space->machine(), 0);
+}
+	
 static void load_pagefox_cartridge(device_image_interface &image)
 {
-	c64_state *state = image.device().machine().driver_data<c64_state>();
+	load_cartridge_region(image, "rom", 0x0000, 0x10000);
 
-	UINT8 *rom = image.get_software_region("rom");
-	UINT8 *cart = image.device().machine().region("user1")->base();
-	memcpy(cart, rom, 0x10000);
+	map_cartridge_roml(image.device().machine(), 0x0000);
+	map_cartridge_romh(image.device().machine(), 0x2000);
 
-	// map cartridge ROMs
-	memcpy(state->m_roml, cart, 0x2000);
-	memcpy(state->m_romh, cart + 0x2000, 0x2000);
-
-	// install bankswitch handler
-	address_space *space = image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
-	space->install_legacy_write_handler( 0xde80, 0xdeff, FUNC(pagefox_bank_w) );
+	install_write_handler(0xde80, 0xdeff, pagefox_bank_w);
 }
 
 static WRITE8_HANDLER( multiscreen_bank_w )
@@ -1518,15 +1526,17 @@ static WRITE8_HANDLER( multiscreen_bank_w )
 		// RAM
 		state->m_roml = cart + address;
 		state->m_roml_writable = 1;
-		memcpy(state->m_romh, cart + 0x2000, 0x2000);
+
+		map_cartridge_romh(space->machine(), 0x2000);
 	}
 	else
 	{
 		// ROM
 		state->m_roml = state->m_c64_roml;
 		state->m_roml_writable = 0;
-		memcpy(state->m_roml, cart + address, 0x2000);
-		memcpy(state->m_romh, cart + address + 0x2000, 0x2000);
+
+		map_cartridge_roml(space->machine(), address);
+		map_cartridge_romh(space->machine(), address + 0x2000);
 	}
 
 	c64_bankswitch(space->machine(), 0);
@@ -1534,21 +1544,29 @@ static WRITE8_HANDLER( multiscreen_bank_w )
 
 static void load_multiscreen_cartridge(device_image_interface &image)
 {
-	c64_state *state = image.device().machine().driver_data<c64_state>();
-	UINT8 *cart = image.device().machine().region("user1")->base();
-	UINT8 *roml = image.get_software_region("roml");
-	memcpy(cart, roml, 0x4000);
+	load_cartridge_region(image, "roml", 0x0000, 0x4000);
+	load_cartridge_region(image, "rom", 0x4000, 0x30000);
 
-	UINT8 *rom = image.get_software_region("rom");
-	memcpy(cart + 0x4000, rom, 0x30000);
+	map_cartridge_roml(image.device().machine(), 0x0000);
+	map_cartridge_romh(image.device().machine(), 0x2000);
 
-	// map cartridge ROMs
-	memcpy(state->m_roml, cart, 0x2000);
-	memcpy(state->m_romh, cart + 0x2000, 0x2000);
+	install_write_handler(0xdfff, 0xdfff, multiscreen_bank_w);
+}
 
-	// install bankswitch handler
-	address_space *space = image.device().machine().device( "maincpu")->memory().space( AS_PROGRAM );
-	space->install_legacy_write_handler( 0xdfff, 0xdfff, FUNC(multiscreen_bank_w) );
+static WRITE8_HANDLER( simons_basic_bank_w )
+{
+	set_game_line(space->machine(), !BIT(data, 0));
+}
+
+static void load_simons_basic_cartridge(device_image_interface &image)
+{
+	load_cartridge_region(image, "roml", 0x0000, 0x2000);
+	load_cartridge_region(image, "romh", 0x2000, 0x2000);
+
+	map_cartridge_roml(image.device().machine(), 0x0000);
+	map_cartridge_romh(image.device().machine(), 0x2000);
+
+	install_io1_handler(simons_basic_bank_w);
 }
 
 static void c64_software_list_cartridge_load(device_image_interface &image)
@@ -1591,7 +1609,7 @@ static void c64_software_list_cartridge_load(device_image_interface &image)
 		else if (!strcmp(cart_type, "multiscreen"))
 			/*
 			
-				TODO: crashes after cartridge RAM test
+				TODO: crashes on protection check after cartridge RAM test
 			
 				805A: lda  $01
 				805C: and  #$FE
@@ -1600,6 +1618,9 @@ static void c64_software_list_cartridge_load(device_image_interface &image)
 
 			*/
 			load_multiscreen_cartridge(image);
+
+		else if (!strcmp(cart_type, "simons_basic"))
+			load_simons_basic_cartridge(image);
 
 		else
 			load_standard_c64_cartridge(image);
@@ -1655,6 +1676,10 @@ static DEVICE_IMAGE_LOAD( max_cart )
 	return result;
 }
 
+
+/***************************************************************************
+    *.CRT CARTRIDGE HANDLING
+***************************************************************************/
 
 static WRITE8_HANDLER( fc3_bank_w )
 {
