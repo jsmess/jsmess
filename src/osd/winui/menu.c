@@ -86,31 +86,29 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 //============================================================
 
 static int input_item_from_serial_number(running_machine &machine, int serial_number,
-	const input_port_config **port, const input_field_config **field, const input_setting_config **setting)
+	input_port_config **port, input_field_config **field, input_setting_config **setting)
 {
 	int i;
-	const input_port_config *this_port = NULL;
-	const input_field_config *this_field = NULL;
-	const input_setting_config *this_setting = NULL;
+	input_port_config *this_port = NULL;
+	input_field_config *this_field = NULL;
+	input_setting_config *this_setting = NULL;
 
 	i = 0;
 	for (this_port = machine.m_portlist.first(); (i != serial_number) && (this_port != NULL); this_port = this_port->next())
 	{
 		i++;
-		for (this_field = this_port->fieldlist; (i != serial_number) && (this_field != NULL); this_field = this_field->next)
+		for (this_field = this_port->fieldlist().first(); (i != serial_number) && (this_field != NULL); this_field = this_field->next())
 		{
 			i++;
-			for (this_setting = this_field->settinglist; (i != serial_number) && (this_setting != NULL); this_setting = this_setting->next)
+			for (this_setting = this_field->settinglist().first(); (i != serial_number) && (this_setting != NULL); this_setting = this_setting->next())
 			{
 				i++;
 			}
 		}
 	}
 
-	if (this_setting != NULL)
-		this_field = this_setting->field;
 	if (this_field != NULL)
-		this_port = this_field->port;
+		this_port = &this_field->port();
 
 	if (port != NULL)
 		*port = this_port;
@@ -127,13 +125,13 @@ static int input_item_from_serial_number(running_machine &machine, int serial_nu
 //  serial_number_from_input_item
 //============================================================
 
-static int serial_number_from_input_item(running_machine &machine, const input_port_config *port,
-	const input_field_config *field, const input_setting_config *setting)
+static int serial_number_from_input_item(running_machine &machine, input_port_config *port,
+	input_field_config *field, input_setting_config *setting)
 {
 	int i;
-	const input_port_config *this_port;
-	const input_field_config *this_field;
-	const input_setting_config *this_setting;
+	input_port_config *this_port;
+	input_field_config *this_field;
+	input_setting_config *this_setting;
 
 	i = 0;
 	for (this_port = machine.m_portlist.first(); this_port != NULL; this_port = this_port->next())
@@ -142,13 +140,13 @@ static int serial_number_from_input_item(running_machine &machine, const input_p
 			return i;
 
 		i++;
-		for (this_field = this_port->fieldlist; this_field != NULL; this_field = this_field->next)
+		for (this_field = this_port->fieldlist().first(); this_field != NULL; this_field = this_field->next())
 		{
 			if ((port == this_port) && (field == this_field) && (setting == NULL))
 				return i;
 
 			i++;
-			for (this_setting = this_field->settinglist; this_setting != NULL; this_setting = this_setting->next)
+			for (this_setting = this_field->settinglist().first(); this_setting != NULL; this_setting = this_setting->next())
 			{
 				if ((port == this_port) && (field == this_field) && (setting == this_setting))
 					return i;
@@ -169,8 +167,8 @@ static int serial_number_from_input_item(running_machine &machine, const input_p
 static void customize_input(running_machine &machine, HWND wnd, const char *title, int player, int inputclass)
 {
 	dialog_box *dlg;
-	const input_port_config *port;
-	const input_field_config *field;
+	input_port_config *port;
+	input_field_config *field;
 	int this_inputclass, this_player, portslot_count = 0, i;
 
 	struct
@@ -185,7 +183,7 @@ static void customize_input(running_machine &machine, HWND wnd, const char *titl
 
 	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
 	{
-		for (field = port->fieldlist; field != NULL; field = field->next)
+		for (field = port->fieldlist().first(); field != NULL; field = field->next())
 		{
 			this_inputclass = input_classify_port(field);
 			if (input_field_name(field) && (this_inputclass == inputclass))
@@ -307,9 +305,9 @@ static void storeval_inputport(void *param, int val)
 static void customize_switches(running_machine &machine, HWND wnd, const char* title_string, UINT32 ipt_name)
 {
 	dialog_box *dlg;
-	const input_port_config *port;
-	const input_field_config *field;
-	const input_setting_config *setting;
+	input_port_config *port;
+	input_field_config *field;
+	input_setting_config *setting;
 	const char *switch_name = NULL;
 	input_field_user_settings settings;
 
@@ -321,7 +319,7 @@ static void customize_switches(running_machine &machine, HWND wnd, const char* t
 
 	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
 	{
-		for (field = port->fieldlist; field != NULL; field = field->next)
+		for (field = port->fieldlist().first(); field != NULL; field = field->next())
 		{
 			type = field->type;
 
@@ -334,7 +332,7 @@ static void customize_switches(running_machine &machine, HWND wnd, const char* t
 				if (win_dialog_add_combobox(dlg, switch_name, settings.value, storeval_inputport, (void *) field))
 					goto done;
 
-				for (setting = field->settinglist; setting != NULL; setting = setting->next)
+				for (setting = field->settinglist().first(); setting != NULL; setting = setting->next())
 				{
 					if (win_dialog_add_combobox_item(dlg, setting->name, setting->value))
 						goto done;
@@ -448,8 +446,8 @@ static int port_type_is_analog(int type)
 static void customize_analogcontrols(running_machine &machine, HWND wnd)
 {
 	dialog_box *dlg;
-	const input_port_config *port;
-	const input_field_config *field;
+	input_port_config *port;
+	input_field_config *field;
 	input_field_user_settings settings;
 	const char *name;
 	char buf[255];
@@ -461,7 +459,7 @@ static void customize_analogcontrols(running_machine &machine, HWND wnd)
 
 	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
 	{
-		for (field = port->fieldlist; field != NULL; field = field->next)
+		for (field = port->fieldlist().first(); field != NULL; field = field->next())
 		{
 			if (port_type_is_analog(field->type))
 			{
@@ -1117,16 +1115,16 @@ static void setup_joystick_menu(running_machine &machine, HMENU menu_bar)
 	int i;
 	UINT command;
 	HMENU submenu = NULL;
-	const input_port_config *port;
-	const input_field_config *field;
-	const input_setting_config *setting;
+	input_port_config *port;
+	input_field_config *field;
+	input_setting_config *setting;
 	char buf[256];
 	int child_count = 0;
 
 	use_input_categories = 0;
 	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
 	{
-		for (field = port->fieldlist; field != NULL; field = field->next)
+		for (field = port->fieldlist().first(); field != NULL; field = field->next())
 		{
 			if (field->type == IPT_CATEGORY)
 			{
@@ -1145,7 +1143,7 @@ static void setup_joystick_menu(running_machine &machine, HMENU menu_bar)
 		// using input categories
 		for (port = machine.m_portlist.first(); port != NULL; port = port->next())
 		{
-			for (field = port->fieldlist; field != NULL; field = field->next)
+			for (field = port->fieldlist().first(); field != NULL; field = field->next())
 			{
 				if (field->type == IPT_CATEGORY)
 				{
@@ -1154,7 +1152,7 @@ static void setup_joystick_menu(running_machine &machine, HMENU menu_bar)
 						return;
 
 					// append all of the category settings
-					for (setting = field->settinglist; setting != NULL; setting = setting->next)
+					for (setting = field->settinglist().first(); setting != NULL; setting = setting->next())
 					{
 						command = ID_INPUT_0 + serial_number_from_input_item(machine, port, field, setting);
 						win_append_menu_utf8(submenu, MF_STRING, command, setting->name);
@@ -1241,9 +1239,9 @@ static void prepare_menus(HWND wnd)
 	UINT flags_for_writing;
 	device_image_interface *img = NULL;
 	int has_config, has_dipswitch, has_keyboard, has_analog, has_misc;
-	const input_port_config *port;
-	const input_field_config *field;
-	const input_setting_config *setting;
+	input_port_config *port;
+	input_field_config *field;
+	input_setting_config *setting;
 	int frameskip;
 	int orientation;
 	int speed;
@@ -1278,7 +1276,7 @@ static void prepare_menus(HWND wnd)
 	has_analog = 0;
 	for (port = window->machine().m_portlist.first(); port != NULL; port = port->next())
 	{
-		for (field = port->fieldlist; field != NULL; field = field->next)
+		for (field = port->fieldlist().first(); field != NULL; field = field->next())
 		{
 			if (port_type_is_analog(field->type))
 			{
@@ -1340,12 +1338,12 @@ static void prepare_menus(HWND wnd)
 	{
 		for (port = window->machine().m_portlist.first(); port != NULL; port = port->next())
 		{
-			for (field = port->fieldlist; field != NULL; field = field->next)
+			for (field = port->fieldlist().first(); field != NULL; field = field->next())
 			{
 				if (field->type == IPT_CATEGORY)
 				{
 					input_field_get_user_settings(field, &settings);
-					for (setting = field->settinglist; setting != NULL; setting = setting->next)
+					for (setting = field->settinglist().first(); setting != NULL; setting = setting->next())
 					{
 						command = ID_INPUT_0 + serial_number_from_input_item(window->machine(), port, field, setting);
 						set_command_state(menu_bar, command, (setting->value == settings.value) ? MFS_CHECKED : MFS_ENABLED);
@@ -1678,8 +1676,8 @@ static int invoke_command(HWND wnd, UINT command)
 	int dev_command;
 	device_image_interface *img;
 	UINT16 category;
-	const input_field_config *field;
-	const input_setting_config *setting;
+	input_field_config *field;
+	input_setting_config *setting;
 	LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
 	win_window_info *window = (win_window_info *)ptr;
 	input_field_user_settings settings;
@@ -1884,7 +1882,7 @@ static int invoke_command(HWND wnd, UINT command)
 					input_field_get_user_settings(field, &settings);
 					category = 0;
 
-					for (setting = field->settinglist; setting != NULL; setting = setting->next)
+					for (setting = field->settinglist().first(); setting != NULL; setting = setting->next())
 					{
 						if (settings.value == setting->value)
 						{

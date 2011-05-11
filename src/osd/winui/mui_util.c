@@ -432,21 +432,20 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			gameinfo->usesLightGun = FALSE;
 			if (gamedrv->ipt != NULL)
 			{
-				const input_port_config *port;
+				input_port_config *port;
 				ioport_list portlist;
-
-				input_port_list_init(portlist, gamedrv->ipt, NULL, 0, FALSE, NULL);
+				astring errors;
 				for (device_t *cfg = config.devicelist().first(); cfg != NULL; cfg = cfg->next())
 				{
 					if (cfg->input_ports()!=NULL) {
-		// workaround for r11433                input_port_list_init(portlist, cfg->input_ports(), NULL, 0, FALSE, cfg);
+						input_port_list_init(*cfg, portlist, errors);
 					}
 				}
 
 				for (port = portlist.first(); port != NULL; port = port->next())
 				{
-					const input_field_config *field;
-					for (field = port->fieldlist; field != NULL; field = field->next)
+					input_field_config *field;
+					for (field = port->fieldlist().first(); field != NULL; field = field->next())
 					{
 						UINT32 type;
 						type = field->type;
