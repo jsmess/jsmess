@@ -1308,7 +1308,7 @@ static void prepare_menus(HWND wnd)
 	set_command_state(menu_bar, ID_OPTIONS_ANALOGCONTROLS, has_analog ? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_FILE_FULLSCREEN, !is_windowed() ? MFS_CHECKED : MFS_ENABLED);
 	set_command_state(menu_bar, ID_OPTIONS_TOGGLEFPS, ui_get_show_fps() ? MFS_CHECKED : MFS_ENABLED);
-	set_command_state(menu_bar, ID_FILE_UIACTIVE, window->machine().ui_active() ? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_FILE_UIACTIVE, input_machine_has_keyboard(window->machine()) ? (window->machine().ui_active() ? MFS_CHECKED : MFS_ENABLED): MFS_CHECKED | MFS_GRAYED);
 #if HAS_PROFILER
 	set_command_state(menu_bar, ID_FILE_PROFILER, ui_get_show_profiler() ? MFS_CHECKED : MFS_ENABLED);
 #endif
