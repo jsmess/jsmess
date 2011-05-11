@@ -1945,13 +1945,13 @@ static BOOL DefaultInputReadControl(datamap *map, HWND dialog, HWND control, win
 {
 	TCHAR *input_option_value;
 	int input_option_index;
-	char *op_val;
+	char *op_val = NULL;
 	astring error_string;
 
 	input_option_index = ComboBox_GetCurSel(control);
 	input_option_value = (TCHAR*) ComboBox_GetItemData(control, input_option_index);
 	op_val = utf8_from_tstring(input_option_value);
-	opts->set_value(OPTION_CTRLR, op_val, OPTION_PRIORITY_CMDLINE,error_string);
+	opts->set_value(OPTION_CTRLR, input_option_index ? op_val : "", OPTION_PRIORITY_CMDLINE,error_string);
 	assert(!error_string);
 	osd_free(op_val);
 	return FALSE;
@@ -1987,7 +1987,7 @@ static BOOL DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 
 	// reset the controllers dropdown
 	(void)ComboBox_ResetContent(control);
-	(void)ComboBox_InsertString(control, index, TEXT("Standard"));
+	(void)ComboBox_InsertString(control, index, TEXT("Default"));
 	(void)ComboBox_SetItemData(control, index, "");
 	index++;
 
