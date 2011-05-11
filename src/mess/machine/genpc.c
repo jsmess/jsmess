@@ -509,7 +509,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-const input_port_token *ibm5160_mb_device::device_input_ports() const
+ioport_constructor ibm5160_mb_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( ibm5160_mb );
 }

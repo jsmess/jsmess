@@ -159,8 +159,8 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( data )
 {
-	cosmicos_state *state = field->port->machine().driver_data<cosmicos_state>();
-	UINT8 data = input_port_read(field->port->machine(), "DATA");
+	cosmicos_state *state = field->machine().driver_data<cosmicos_state>();
+	UINT8 data = input_port_read(field->machine(), "DATA");
 	int i;
 
 	for (i = 0; i < 8; i++)
@@ -175,11 +175,11 @@ static INPUT_CHANGED( data )
 
 static INPUT_CHANGED( enter )
 {
-	cosmicos_state *state = field->port->machine().driver_data<cosmicos_state>();
+	cosmicos_state *state = field->machine().driver_data<cosmicos_state>();
 
 	if (!newval && !state->m_wait && !state->m_clear)
 	{
-		cputag_set_input_line(field->port->machine(), CDP1802_TAG, COSMAC_INPUT_LINE_DMAIN, ASSERT_LINE);
+		cputag_set_input_line(field->machine(), CDP1802_TAG, COSMAC_INPUT_LINE_DMAIN, ASSERT_LINE);
 	}
 }
 
@@ -231,10 +231,10 @@ void cosmicos_state::set_cdp1802_mode(int mode)
 	}
 }
 
-static INPUT_CHANGED( run )				{ cosmicos_state *state = field->port->machine().driver_data<cosmicos_state>(); if (!newval) state->set_cdp1802_mode(MODE_RUN); }
-static INPUT_CHANGED( load )			{ cosmicos_state *state = field->port->machine().driver_data<cosmicos_state>(); if (!newval) state->set_cdp1802_mode(MODE_LOAD); }
-static INPUT_CHANGED( cosmicos_pause )	{ cosmicos_state *state = field->port->machine().driver_data<cosmicos_state>(); if (!newval) state->set_cdp1802_mode(MODE_PAUSE); }
-static INPUT_CHANGED( reset )			{ cosmicos_state *state = field->port->machine().driver_data<cosmicos_state>(); if (!newval) state->set_cdp1802_mode(MODE_RESET); }
+static INPUT_CHANGED( run )				{ cosmicos_state *state = field->machine().driver_data<cosmicos_state>(); if (!newval) state->set_cdp1802_mode(MODE_RUN); }
+static INPUT_CHANGED( load )			{ cosmicos_state *state = field->machine().driver_data<cosmicos_state>(); if (!newval) state->set_cdp1802_mode(MODE_LOAD); }
+static INPUT_CHANGED( cosmicos_pause )	{ cosmicos_state *state = field->machine().driver_data<cosmicos_state>(); if (!newval) state->set_cdp1802_mode(MODE_PAUSE); }
+static INPUT_CHANGED( reset )			{ cosmicos_state *state = field->machine().driver_data<cosmicos_state>(); if (!newval) state->set_cdp1802_mode(MODE_RESET); }
 
 void cosmicos_state::clear_input_data()
 {
@@ -250,7 +250,7 @@ void cosmicos_state::clear_input_data()
 
 static INPUT_CHANGED( clear_data )
 {
-	cosmicos_state *state = field->port->machine().driver_data<cosmicos_state>();
+	cosmicos_state *state = field->machine().driver_data<cosmicos_state>();
 
 	state->clear_input_data();
 }
@@ -279,7 +279,7 @@ void cosmicos_state::set_ram_mode()
 
 static INPUT_CHANGED( memory_protect )
 {
-	cosmicos_state *state = field->port->machine().driver_data<cosmicos_state>();
+	cosmicos_state *state = field->machine().driver_data<cosmicos_state>();
 
 	state->m_ram_protect = newval;
 
@@ -288,7 +288,7 @@ static INPUT_CHANGED( memory_protect )
 
 static INPUT_CHANGED( memory_disable )
 {
-	cosmicos_state *state = field->port->machine().driver_data<cosmicos_state>();
+	cosmicos_state *state = field->machine().driver_data<cosmicos_state>();
 
 	state->m_ram_disable = newval;
 

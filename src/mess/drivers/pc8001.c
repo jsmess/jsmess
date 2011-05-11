@@ -156,49 +156,49 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-static WRITE_LINE_DEVICE_HANDLER( upd1990a_c0_w )
+WRITE_LINE_DEVICE_HANDLER( upd1990a_c0_w )
 {
 	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
 	driver_state->m_rtc->c0_w(state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( upd1990a_c1_w )
+WRITE_LINE_DEVICE_HANDLER( upd1990a_c1_w )
 {
 	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
 	driver_state->m_rtc->c1_w(state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( upd1990a_c2_w )
+WRITE_LINE_DEVICE_HANDLER( upd1990a_c2_w )
 {
 	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
 	driver_state->m_rtc->c2_w(state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( upd1990a_data_in_w )
+WRITE_LINE_DEVICE_HANDLER( upd1990a_data_in_w )
 {
 	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
 	driver_state->m_rtc->data_in_w(state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
+WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
 {
 	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
 	driver_state->m_rtc->stb_w(state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( upd1990a_clk_w )
+WRITE_LINE_DEVICE_HANDLER( upd1990a_clk_w )
 {
 	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
 	driver_state->m_rtc->clk_w(state);
 }
 
-static READ_LINE_DEVICE_HANDLER( upd1990a_data_out_r )
+READ_LINE_DEVICE_HANDLER( upd1990a_data_out_r )
 {
 	pc8001_state *state = device->machine().driver_data<pc8001_state>();
 	return state->m_rtc->data_out_r();
 }
 
-static READ_LINE_DEVICE_HANDLER( upd3301_vrtc_r )
+READ_LINE_DEVICE_HANDLER( upd3301_vrtc_r )
 {
 	pc8001_state *state = device->machine().driver_data<pc8001_state>();
 	return state->m_crtc->vrtc_r();

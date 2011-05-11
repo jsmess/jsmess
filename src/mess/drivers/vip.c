@@ -303,7 +303,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( reset_w )
 {
-	vip_state *state = field->port->machine().driver_data<vip_state>();
+	vip_state *state = field->machine().driver_data<vip_state>();
 
 	if (oldval && !newval)
 	{

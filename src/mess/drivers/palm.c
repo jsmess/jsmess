@@ -36,8 +36,8 @@ static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, cons
 
 static INPUT_CHANGED( pen_check )
 {
-    UINT8 button = input_port_read(field->port->machine(), "PENB");
-    device_t *mc68328_device = field->port->machine().device("dragonball");
+    UINT8 button = input_port_read(field->machine(), "PENB");
+    device_t *mc68328_device = field->machine().device("dragonball");
     if(button)
     {
         mc68328_set_penirq_line(mc68328_device, 1);
@@ -50,8 +50,8 @@ static INPUT_CHANGED( pen_check )
 
 static INPUT_CHANGED( button_check )
 {
-    UINT8 button_state = input_port_read(field->port->machine(), "PORTD");
-    device_t *mc68328_device = field->port->machine().device("dragonball");
+    UINT8 button_state = input_port_read(field->machine(), "PORTD");
+    device_t *mc68328_device = field->machine().device("dragonball");
 
     mc68328_set_port_d_lines(mc68328_device, button_state, (int)(FPTR)param);
 }

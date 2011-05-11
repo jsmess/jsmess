@@ -116,7 +116,7 @@ static void s3c2440_gpio_port_w( device_t *device, int port, UINT32 data)
 
 static INPUT_CHANGED( port_changed )
 {
-	gizmondo_state *gizmondo = field->port->machine().driver_data<gizmondo_state>();
+	gizmondo_state *gizmondo = field->machine().driver_data<gizmondo_state>();
 	s3c2440_request_eint( gizmondo->m_s3c2440, 4);
 	//s3c2440_request_irq( device, S3C2440_INT_EINT1);
 }

@@ -411,7 +411,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-const input_port_token *luxor_55_10828_device::device_input_ports() const
+ioport_constructor luxor_55_10828_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( luxor_55_10828 );
 }

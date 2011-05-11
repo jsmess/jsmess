@@ -965,14 +965,14 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( fidelz80_trigger_reset )
 {
-	fidelz80_state *state = field->port->machine().driver_data<fidelz80_state>();
+	fidelz80_state *state = field->machine().driver_data<fidelz80_state>();
 
 	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_CHANGED( abc_trigger_reset )
 {
-	fidelz80_state *state = field->port->machine().driver_data<fidelz80_state>();
+	fidelz80_state *state = field->machine().driver_data<fidelz80_state>();
 
 	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 	device_set_input_line(state->m_i8041, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);

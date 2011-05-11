@@ -411,7 +411,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_irq )
 {
-	rex6000_state *state = field->port->machine().driver_data<rex6000_state>();
+	rex6000_state *state = field->machine().driver_data<rex6000_state>();
 
 	if (!(state->m_irq_mask & IRQ_FLAG_KEYCHANGE))
 	{

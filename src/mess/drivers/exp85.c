@@ -49,12 +49,12 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_reset )
 {
-	cputag_set_input_line(field->port->machine(), I8085A_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->machine(), I8085A_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_CHANGED( trigger_rst75 )
 {
-	cputag_set_input_line(field->port->machine(), I8085A_TAG, I8085_RST75_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->machine(), I8085A_TAG, I8085_RST75_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( exp85 )

@@ -918,7 +918,7 @@ static TIMER_DEVICE_CALLBACK( upd7508_1sec_callback )
 
 static INPUT_CHANGED( key_callback )
 {
-	px4_state *px4 = field->port->machine().driver_data<px4_state>();
+	px4_state *px4 = field->machine().driver_data<px4_state>();
 	UINT32 oldvalue = oldval * field->mask, newvalue = newval * field->mask;
 	UINT32 delta = oldvalue ^ newvalue;
 	int i, scancode = 0xff, down = 0;
@@ -951,7 +951,7 @@ static INPUT_CHANGED( key_callback )
 				logerror("upd7508: key interrupt\n");
 
 			px4->m_isr |= INT0_7508;
-			gapnit_interrupt(field->port->machine());
+			gapnit_interrupt(field->machine());
 		}
 	}
 }
@@ -1320,11 +1320,11 @@ static INPUT_PORTS_START( px4_h450a )
 INPUT_PORTS_END
 
 /* item keyboard */
-static INPUT_PORTS_START( px4_h421a )
+/*static INPUT_PORTS_START( px4_h421a )
 	PORT_INCLUDE(px4_dips)
 	PORT_INCLUDE(tf20)
 INPUT_PORTS_END
-
+*/
 
 /***************************************************************************
     PALETTE

@@ -262,7 +262,7 @@ ADDRESS_MAP_END
 /* the 'reset' key is directly tied to the reset line of the cpu */
 static INPUT_CHANGED( aquarius_reset )
 {
-	cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->machine(), "maincpu", INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( aquarius )

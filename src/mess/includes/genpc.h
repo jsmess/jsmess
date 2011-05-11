@@ -37,7 +37,7 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const input_port_token *device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const;
 protected:
 	// device-level overrides
 	virtual void device_start();

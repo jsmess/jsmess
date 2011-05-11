@@ -118,7 +118,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( kim1_reset )
 {
 	if (newval == 0)
-		field->port->machine().firstcpu->reset();
+		field->machine().firstcpu->reset();
 }
 
 

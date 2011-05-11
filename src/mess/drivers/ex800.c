@@ -179,10 +179,10 @@ public:
 /* The ON LINE switch is directly connected to the INT1 input of the CPU */
 static INPUT_CHANGED( online_switch )
 {
-	ex800_state *state = field->port->machine().driver_data<ex800_state>();
+	ex800_state *state = field->machine().driver_data<ex800_state>();
 	if (newval)
 	{
-		cputag_set_input_line(field->port->machine(), "maincpu", UPD7810_INTF1, state->m_irq_state);
+		cputag_set_input_line(field->machine(), "maincpu", UPD7810_INTF1, state->m_irq_state);
 		state->m_irq_state = (state->m_irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 	}
 }

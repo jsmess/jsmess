@@ -399,13 +399,46 @@ static TIMER_DEVICE_CALLBACK( abc80_keyboard_tick )
 //  vco_voltage_w - CSG VCO voltage select
 //-------------------------------------------------
 
-static WRITE_LINE_DEVICE_HANDLER( vco_voltage_w )
+WRITE_LINE_DEVICE_HANDLER( vco_voltage_w )
 {
 	sn76477_vco_voltage_w(device, state ? 2.5 : 0);
 }
 
+WRITE_LINE_DEVICE_HANDLER(port_sn76477_enable_w)
+{
+	sn76477_enable_w(device,state);
+}
 
+WRITE_LINE_DEVICE_HANDLER(port_sn76477_vco_w)
+{
+	sn76477_vco_w(device,state);
+}
 
+WRITE_LINE_DEVICE_HANDLER(port_sn76477_mixer_b_w)
+{
+	sn76477_mixer_b_w(device,state);
+}
+
+WRITE_LINE_DEVICE_HANDLER(port_sn76477_mixer_a_w)
+{
+	sn76477_mixer_a_w(device,state);
+}
+
+WRITE_LINE_DEVICE_HANDLER(port_sn76477_mixer_c_w)
+{
+	sn76477_mixer_c_w(device,state);
+}
+
+WRITE_LINE_DEVICE_HANDLER(port_sn76477_envelope_2_w)
+{
+	sn76477_envelope_2_w(device,state);
+}
+
+WRITE_LINE_DEVICE_HANDLER(port_sn76477_envelope_1_w)
+{
+	sn76477_envelope_1_w(device,state);
+}
+	
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
@@ -458,14 +491,14 @@ static INPUT_PORTS_START( abc80 )
 	PORT_INCLUDE(fake_keyboard)
 
 	PORT_START("SN76477")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_enable_w)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, port_sn76477_enable_w)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, vco_voltage_w)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_vco_w)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_mixer_b_w)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_mixer_a_w)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_mixer_c_w)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_envelope_2_w)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_envelope_1_w)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, port_sn76477_vco_w)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, port_sn76477_mixer_b_w)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, port_sn76477_mixer_a_w)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, port_sn76477_mixer_c_w)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, port_sn76477_envelope_2_w)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, port_sn76477_envelope_1_w)
 INPUT_PORTS_END
 
 

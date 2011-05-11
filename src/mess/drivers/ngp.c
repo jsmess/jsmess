@@ -554,12 +554,12 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( power_callback )
 {
-	ngp_state *state = field->port->machine().driver_data<ngp_state>();
+	ngp_state *state = field->machine().driver_data<ngp_state>();
 
 	if ( state->m_io_reg[0x33] & 0x04 )
 	{
 		device_set_input_line( state->m_tlcs900, TLCS900_NMI,
-			(input_port_read(field->port->machine(), "Power") & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
+			(input_port_read(field->machine(), "Power") & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 	}
 }
 

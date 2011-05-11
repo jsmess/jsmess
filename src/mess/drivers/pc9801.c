@@ -1547,12 +1547,12 @@ ADDRESS_MAP_END
 /* TODO: key repeat, remove port impulse! */
 static INPUT_CHANGED( key_stroke )
 {
-	pc9801_state *state = field->port->machine().driver_data<pc9801_state>();
+	pc9801_state *state = field->machine().driver_data<pc9801_state>();
 
 	if(newval && !oldval)
 	{
 		state->m_keyb_press = (UINT8)(FPTR)(param) & 0x7f;
-		pic8259_ir1_w(field->port->machine().device("pic8259_master"), 1);
+		pic8259_ir1_w(field->machine().device("pic8259_master"), 1);
 	}
 
 	if(oldval && !newval)
@@ -1562,18 +1562,18 @@ static INPUT_CHANGED( key_stroke )
 /* for key modifiers */
 static INPUT_CHANGED( shift_stroke )
 {
-	pc9801_state *state = field->port->machine().driver_data<pc9801_state>();
+	pc9801_state *state = field->machine().driver_data<pc9801_state>();
 
 	if((newval && !oldval) || (oldval && !newval))
 	{
 		state->m_keyb_press = (UINT8)(FPTR)(param) & 0x7f;
-		pic8259_ir1_w(field->port->machine().device("pic8259_master"), 1);
+		pic8259_ir1_w(field->machine().device("pic8259_master"), 1);
 	}
 	else
 		state->m_keyb_press = 0;
 }
 
-static READ_LINE_DEVICE_HANDLER( upd1990a_data_out_r )
+READ_LINE_DEVICE_HANDLER( upd1990a_data_out_pc9801_r )
 {
 	pc9801_state *state = device->machine().driver_data<pc9801_state>();
 
@@ -1742,7 +1742,7 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(" un 7-8") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x7f) //PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 
 	PORT_START("DSW1")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH,IPT_SPECIAL) PORT_READ_LINE_DEVICE("upd1990a", upd1990a_data_out_r)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH,IPT_SPECIAL) PORT_READ_LINE_DEVICE("upd1990a", upd1990a_data_out_pc9801_r)
 	PORT_DIPNAME( 0x0002, 0x0000, "DSW1" ) // error beep if OFF
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

@@ -2007,10 +2007,10 @@ static Z80DMA_INTERFACE( x1_dma )
 
 static INPUT_CHANGED( ipl_reset )
 {
-	//address_space *space = field->port->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	x1_state *state = field->port->machine().driver_data<x1_state>();
+	//address_space *space = field->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	x1_state *state = field->machine().driver_data<x1_state>();
 
-	cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->machine(), "maincpu", INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 
 	state->m_ram_bank = 0x00;
 	if(state->m_is_turbo) { state->m_ex_bank = 0x10; }
@@ -2020,7 +2020,7 @@ static INPUT_CHANGED( ipl_reset )
 /* Apparently most games doesn't support this (not even the Konami ones!), one that does is...177 :o */
 static INPUT_CHANGED( nmi_reset )
 {
-	cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( x1 )

@@ -240,7 +240,7 @@ machine_config_constructor abc99_device::device_mconfig_additions() const
 
 INPUT_CHANGED( abc99_device::keyboard_reset )
 {
-    abc99_device *keyboard = static_cast<abc99_device *>(field->port->machine().device(ABC99_TAG));
+    abc99_device *keyboard = static_cast<abc99_device *>(field->machine().device(ABC99_TAG));
 
 	device_set_input_line(keyboard->m_mousecpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -445,7 +445,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-const input_port_token *abc99_device::device_input_ports() const
+ioport_constructor abc99_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( abc99 );
 }

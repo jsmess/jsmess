@@ -376,11 +376,11 @@ MACHINE_RESET(z80netf)
 INPUT_CHANGED( z80ne_reset )
 {
 	UINT8 rst;
-	rst = input_port_read(field->port->machine(), "RST");
+	rst = input_port_read(field->machine(), "RST");
 
 	if ( ! BIT(rst, 0))
 	{
-		running_machine &machine = field->port->machine();
+		running_machine &machine = field->machine();
 		machine.schedule_soft_reset();
 	}
 }
@@ -388,11 +388,11 @@ INPUT_CHANGED( z80ne_reset )
 INPUT_CHANGED( z80ne_nmi )
 {
 	UINT8 nmi;
-	nmi = input_port_read(field->port->machine(), "LX388_BRK");
+	nmi = input_port_read(field->machine(), "LX388_BRK");
 
 	if ( ! BIT(nmi, 0))
 	{
-		cputag_set_input_line(field->port->machine(), "z80ne", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(field->machine(), "z80ne", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

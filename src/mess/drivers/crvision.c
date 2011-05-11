@@ -203,7 +203,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_nmi )
 {
-	crvision_state *state = field->port->machine().driver_data<crvision_state>();
+	crvision_state *state = field->machine().driver_data<crvision_state>();
 
 	state->m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

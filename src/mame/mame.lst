@@ -1924,6 +1924,7 @@ arktayt2		// bootleg
 arkatour		// ??? (c) 1987 Taito America Corporation + Romstar license (US)
 tetrsark		// ??? (c) D.R.Korea
 hexa			// D. R. Korea
+brixian			// (c) 1993 Cheil Computer System
 sqix			// B03 1987
 sqixr1			// B03 1987
 sqixu			// B03 1987
@@ -8628,6 +8629,7 @@ spk115it		// (c) 199? IGS
 spk116it		// (c) 199? IGS
 jackie			// (c) 1993 IGS
 pktet346		// (c) 199? IGS
+cpokerx			// (c) 1993 IGS
 chleague		// (c) 199? IGS
 chleagul		// (c) 199? IGS
 number10		// (c) IGS (Board labeled Playmark Srl)
@@ -9504,6 +9506,7 @@ turbosub6		// (c) 1985 Entertainment Sciences
 pipeline		// (c) 1990 Daehyun Electronics
 ttchamp
 ttchampa
+baryon			// (c) 1997 SemiCom
 dreamwld		// (c) 2000 SemiCom
 cybertnk		// (c) 1990 Coreland
 cubeqst			// (c) 1983 Simutrek Inc.
@@ -10720,7 +10723,7 @@ m_ccelbr
 m_gmball
 m_grtecp		// 199?
 m_blsbys		// BwB
-//m_frkstn
+m_frkstn
 
 // MPU5
 m_honmon

@@ -1114,30 +1114,30 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( update_udk )
 {
-	x07_state *state = field->port->machine().driver_data<x07_state>();
+	x07_state *state = field->machine().driver_data<x07_state>();
 
-	state->draw_udk(field->port->machine());
+	state->draw_udk(field->machine());
 }
 
 static INPUT_CHANGED( kb_keys )
 {
-	x07_state *state = field->port->machine().driver_data<x07_state>();
+	x07_state *state = field->machine().driver_data<x07_state>();
 
 	if (!newval)
-		state->kb_scan_keys(field->port->machine(), (UINT8)(FPTR)param);
+		state->kb_scan_keys(field->machine(), (UINT8)(FPTR)param);
 }
 
 static INPUT_CHANGED( kb_func_keys )
 {
-	x07_state *state = field->port->machine().driver_data<x07_state>();
+	x07_state *state = field->machine().driver_data<x07_state>();
 
 	if (newval)
-		state->kb_fun_keys(field->port->machine(), (UINT8)(FPTR)param);
+		state->kb_fun_keys(field->machine(), (UINT8)(FPTR)param);
 }
 
 static INPUT_CHANGED( kb_break )
 {
-	x07_state *state = field->port->machine().driver_data<x07_state>();
+	x07_state *state = field->machine().driver_data<x07_state>();
 
 	if (newval)
 	{

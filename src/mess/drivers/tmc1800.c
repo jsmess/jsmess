@@ -324,7 +324,7 @@ INPUT_PORTS_END
 
 static INPUT_CHANGED( tmc2000_run_pressed )
 {
-	running_machine &machine = field->port->machine();
+	running_machine &machine = field->machine();
 	tmc2000_state *state = machine.driver_data<tmc2000_state>();
 
 	if (oldval && !newval)
@@ -420,7 +420,7 @@ INPUT_PORTS_END
 
 static INPUT_CHANGED( run_pressed )
 {
-	running_machine &machine = field->port->machine();
+	running_machine &machine = field->machine();
 	nano_state *state = machine.driver_data<nano_state>();
 
 	if (oldval && !newval)
@@ -431,7 +431,7 @@ static INPUT_CHANGED( run_pressed )
 
 static INPUT_CHANGED( monitor_pressed )
 {
-	running_machine &machine = field->port->machine();
+	running_machine &machine = field->machine();
 	nano_state *state = machine.driver_data<nano_state>();
 
 	if (oldval && !newval)

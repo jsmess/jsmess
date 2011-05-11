@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( gk_changed )
 {
-	device_t *cartsys = field->port->machine().device("gromport");
+	device_t *cartsys = field->machine().device("gromport");
 	set_gk_switches(cartsys, (UINT8)((UINT64)param&0x07), newval);
 }
 

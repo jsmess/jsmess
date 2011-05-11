@@ -236,7 +236,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( ti68k_on_key )
 {
-	ti68k_state *state = field->port->machine().driver_data<ti68k_state>();
+	ti68k_state *state = field->machine().driver_data<ti68k_state>();
 
 	state->m_on_key = newval;
 
