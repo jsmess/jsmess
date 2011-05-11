@@ -27,7 +27,7 @@ public:
 	optional_device<cpu_device> m_i8041;
 	optional_device<i8243_device> m_i8243;
 
-	UINT8 m_kp_matrix;			// keypad matrix
+	UINT16 m_kp_matrix;			// keypad/leds matrix
 	UINT8 m_led_data;			// data for the two individual leds, in 0bxxxx12xx format
 	UINT8 m_led_selected;		// 5 bit selects for 7 seg leds and for common other leds, bits are (7seg leds are 0 1 2 3, common other leds are C) 0bxx3210xc
 	UINT16 m_digit_data;		// data for seg leds
@@ -35,14 +35,16 @@ public:
 
 	virtual void machine_reset();
 
+	//model VCC/UVC
 	void update_display(running_machine &machine);
 	DECLARE_READ8_MEMBER( fidelz80_portc_r );
 	DECLARE_WRITE8_MEMBER( fidelz80_portb_w );
 	DECLARE_WRITE8_MEMBER( fidelz80_portc_w );
-	DECLARE_READ8_MEMBER( cc10_portb_r );
 	DECLARE_WRITE8_MEMBER( cc10_porta_w );
 	DECLARE_READ8_MEMBER( vcc_portb_r );
 	DECLARE_WRITE8_MEMBER( vcc_porta_w );
+
+	//model ABC/VBC
 	DECLARE_WRITE8_MEMBER( abc_speech_w );
 	DECLARE_WRITE8_MEMBER(kp_matrix_w);
 	DECLARE_READ8_MEMBER(unknown_r);
@@ -53,6 +55,14 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_command_w);
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_READ8_MEMBER(mcu_status_r);
+
+	//model VSC
+	DECLARE_WRITE8_MEMBER(vsc_porta_w);
+	DECLARE_WRITE8_MEMBER(vsc_portb_w);
+	DECLARE_WRITE8_MEMBER(vsc_portc_w);
+	DECLARE_READ8_MEMBER(vsc_pio_porta_r);
+	DECLARE_READ8_MEMBER(vsc_pio_portb_r);
+	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
 };
 
 

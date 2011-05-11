@@ -10,6 +10,7 @@
 *  * Get rom locations from pcb (done for UVC, VCC is probably similar)
 *  * Add sensory chess challenger roms/memmap to driver, similar hardware.
 *  * correctly hook up VBC/ABC speech so that the z80 is halted while words are being spoken
+*  * VSC doesn't accept input from row 9 (the buttons beside the display)
 *
 ***********************************************************************
 
@@ -579,13 +580,15 @@ expect that the software reads these once on startup only.
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8255.h"
 #include "machine/i8243.h"
+#include "machine/z80pio.h"
 #include "sound/beep.h"
 #include "sound/s14001a.h"
 #include "includes/fidelz80.h"
 #include "fidelz80.lh"
+#include "vsc.lh"
 #include "abc.lh"
 
-#include "debugger.h"
+//#include "debugger.h"
 
 /* Devices */
 
@@ -663,16 +666,6 @@ WRITE8_MEMBER( fidelz80_state::fidelz80_portc_w )
 	m_kp_matrix = data;
 };
 
-READ8_MEMBER( fidelz80_state::cc10_portb_r )
-{
-	/*
-    x--- ---- level select
-    -xxx xxxx ??
-    */
-
-	return input_port_read(machine(), "LEVEL");
-}
-
 WRITE8_MEMBER( fidelz80_state::cc10_porta_w )
 {
 	beep_set_state(m_beep, (data & 0x80) ? 0 : 1);
@@ -716,7 +709,7 @@ static I8255_INTERFACE( cc10_ppi8255_intf )
 {
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(fidelz80_state, cc10_porta_w),
-	DEVCB_DRIVER_MEMBER(fidelz80_state, cc10_portb_r),
+	DEVCB_INPUT_PORT("LEVEL"),
 	DEVCB_DRIVER_MEMBER(fidelz80_state, fidelz80_portb_w),
 	DEVCB_DRIVER_MEMBER(fidelz80_state, fidelz80_portc_r),
 	DEVCB_DRIVER_MEMBER(fidelz80_state, fidelz80_portc_w)
@@ -730,6 +723,137 @@ static I8255_INTERFACE( vcc_ppi8255_intf )
 	DEVCB_DRIVER_MEMBER(fidelz80_state, fidelz80_portb_w), // display digits and led dots
 	DEVCB_DRIVER_MEMBER(fidelz80_state, fidelz80_portc_r), // bits 0,1,2,3 are readable, have to do with input
 	DEVCB_DRIVER_MEMBER(fidelz80_state, fidelz80_portc_w), // bits 4,5,6,7 are writable, have to do with input
+};
+
+/******************************************************************************
+    I8255 Device, for VSC
+******************************************************************************/
+
+WRITE8_MEMBER( fidelz80_state::vsc_porta_w )
+{
+	UINT8 out_digit = BITSWAP8( data,7,6,2,1,0,5,4,3 );
+
+	if (m_kp_matrix & 0x01)
+	{
+		output_set_digit_value(0, out_digit & 0x7f);
+		output_set_value("pm_led", BIT(out_digit, 7));
+	}
+	if (m_kp_matrix & 0x02)
+	{
+		output_set_digit_value(1, out_digit & 0x7f);
+	}
+	if (m_kp_matrix & 0x04)
+	{
+		output_set_digit_value(2, out_digit & 0x7f);
+		output_set_value("up_dot", BIT(out_digit, 7));
+	}
+	if (m_kp_matrix & 0x08)
+	{
+		output_set_digit_value(3, out_digit & 0x7f);
+		output_set_value("low_dot", BIT(out_digit, 7));
+	}
+
+	s14001a_reg_w(m_speech, data & 0x3f);
+}
+
+WRITE8_MEMBER( fidelz80_state::vsc_portb_w )
+{
+	for (int row=1; row<=8; row++)
+	{
+		if (m_kp_matrix & 0x01)
+			output_set_indexed_value("led_a", row, BIT(data, 8-row));
+		if (m_kp_matrix & 0x02)
+			output_set_indexed_value("led_b", row, BIT(data, 8-row));
+		if (m_kp_matrix & 0x04)
+			output_set_indexed_value("led_c", row, BIT(data, 8-row));
+		if (m_kp_matrix & 0x08)
+			output_set_indexed_value("led_d", row, BIT(data, 8-row));
+		if (m_kp_matrix & 0x10)
+			output_set_indexed_value("led_e", row, BIT(data, 8-row));
+		if (m_kp_matrix & 0x20)
+			output_set_indexed_value("led_f", row, BIT(data, 8-row));
+		if (m_kp_matrix & 0x40)
+			output_set_indexed_value("led_g", row, BIT(data, 8-row));
+		if (m_kp_matrix & 0x80)
+			output_set_indexed_value("led_h", row, BIT(data, 8-row));
+	}
+}
+
+WRITE8_MEMBER( fidelz80_state::vsc_portc_w )
+{
+	m_kp_matrix = data;
+}
+
+static I8255_INTERFACE( vsc_ppi8255_intf )
+{
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_porta_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_portb_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_portc_w)
+};
+
+/******************************************************************************
+    PIO Device, for VSC
+******************************************************************************/
+
+READ8_MEMBER( fidelz80_state::vsc_pio_porta_r )
+{
+	UINT8 data = 0;
+
+	if (m_kp_matrix & 0x01)
+		data |= (input_port_read(machine(), "COL_A"));
+	if (m_kp_matrix & 0x02)
+		data |= (input_port_read(machine(), "COL_B"));
+	if (m_kp_matrix & 0x04)
+		data |= (input_port_read(machine(), "COL_C"));
+	if (m_kp_matrix & 0x08)
+		data |= (input_port_read(machine(), "COL_D"));
+	if (m_kp_matrix & 0x10)
+		data |= (input_port_read(machine(), "COL_E"));
+	if (m_kp_matrix & 0x20)
+		data |= (input_port_read(machine(), "COL_F"));
+	if (m_kp_matrix & 0x40)
+		data |= (input_port_read(machine(), "COL_G"));
+	if (m_kp_matrix & 0x80)
+		data |= (input_port_read(machine(), "COL_H"));
+	if (m_kp_matrix & 0x100)
+		data |= (input_port_read(machine(), "COL_I"));
+
+	return data & 0xff;
+}
+
+READ8_MEMBER( fidelz80_state::vsc_pio_portb_r )
+{
+	UINT8 data = 0x00;
+
+	if (input_port_read(machine(), "ROW_9") & m_kp_matrix)
+		data |= 0x02;
+
+	if (s14001a_bsy_r(m_speech) == 0)
+		data |= 0x10;
+
+	return data;
+}
+
+WRITE8_MEMBER( fidelz80_state::vsc_pio_portb_w )
+{
+	m_kp_matrix = (m_kp_matrix & 0xff) | (BIT(data, 0)<<8);
+
+	s14001a_set_volume(m_speech, 15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
+	s14001a_rst_w(m_speech, BIT(data, 6));
+}
+
+static Z80PIO_INTERFACE( vsc_z80pio_intf )
+{
+	DEVCB_NULL,												/* callback when change interrupt status */
+	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_pio_porta_r),	/* port A read callback */
+	DEVCB_NULL,												/* port A write callback */
+	DEVCB_NULL,												/* portA ready active callback */
+	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_pio_portb_r),	/* port B read callback */
+	DEVCB_DRIVER_MEMBER(fidelz80_state, vsc_pio_portb_w),	/* port B write callback */
+	DEVCB_NULL												/* portB ready active callback */
 };
 
 /******************************************************************************
@@ -908,6 +1032,11 @@ void fidelz80_state::machine_reset()
 	memset(m_digit_line_status, 0, ARRAY_LENGTH(m_digit_line_status));
 }
 
+static TIMER_DEVICE_CALLBACK( nmi_timer )
+{
+	cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+}
+
 /******************************************************************************
     Address Maps
 ******************************************************************************/
@@ -926,6 +1055,14 @@ static ADDRESS_MAP_START(vcc_z80_mem, AS_PROGRAM, 8, fidelz80_state)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_MIRROR(0x1c00) // 1k ram (2114*2) mirrored 8 times
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(vsc_mem, AS_PROGRAM, 8, fidelz80_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x1fff) AM_ROM // 8k rom
+	AM_RANGE(0x2000, 0x3fff) AM_ROM // 8k rom
+	AM_RANGE(0x4000, 0x5fff) AM_ROM // 4k rom
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_MIRROR(0x1c00) // 1k ram (2114*2) mirrored 8 times
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START(abc_z80_mem, AS_PROGRAM, 8, fidelz80_state)
     ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x0000, 0x1fff) AM_ROM // 8k rom
@@ -939,6 +1076,13 @@ static ADDRESS_MAP_START(fidel_z80_io, AS_IO, 8, fidelz80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0xFC) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // 8255 i/o chip
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(vsc_io, AS_IO, 8, fidelz80_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x04, 0x07) AM_MIRROR(0xf0) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xf0) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(abc_z80_io, AS_IO, 8, fidelz80_state)
@@ -1007,6 +1151,102 @@ static INPUT_PORTS_START( fidelz80 )
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_O)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vsc )
+	//chessboard buttons
+	PORT_START("COL_A")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_START("COL_B")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_START("COL_C")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_START("COL_D")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_START("COL_E")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_START("COL_F")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_START("COL_G")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+	PORT_START("COL_H")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+
+	//buttons on the right
+	PORT_START("COL_I")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Pawn")	PORT_CODE(KEYCODE_1)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Rook")	PORT_CODE(KEYCODE_2)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Knight")	PORT_CODE(KEYCODE_3)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Bishop")	PORT_CODE(KEYCODE_4)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Queen")	PORT_CODE(KEYCODE_5)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("King")	PORT_CODE(KEYCODE_6)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL")		PORT_CODE(KEYCODE_DEL)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE")		PORT_CODE(KEYCODE_R)
+
+	//buttons beside the display
+	PORT_START("ROW_9")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Speak")	PORT_CODE(KEYCODE_1_PAD)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RV")		PORT_CODE(KEYCODE_2_PAD)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("TM")		PORT_CODE(KEYCODE_3_PAD)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV")		PORT_CODE(KEYCODE_4_PAD)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM")		PORT_CODE(KEYCODE_5_PAD)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ST")		PORT_CODE(KEYCODE_6_PAD)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc )
@@ -1109,6 +1349,27 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( vsc, fidelz80_state )
+    /* basic machine hardware */
+    MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+    MCFG_CPU_PROGRAM_MAP(vsc_mem)
+    MCFG_CPU_IO_MAP(vsc_io)
+
+	MCFG_DEFAULT_LAYOUT(layout_vsc)
+
+	/* other hardware */
+	MCFG_I8255_ADD("ppi8255", vsc_ppi8255_intf)
+	MCFG_Z80PIO_ADD("z80pio", XTAL_4MHz, vsc_z80pio_intf)
+
+	MCFG_TIMER_ADD_PERIODIC("nmi_timer", nmi_timer, attotime::from_hz(600))
+	MCFG_TIMER_START_DELAY(attotime::from_hz(600));
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speech", S14001A, 25000) // around 25khz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( abc, fidelz80_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2) // 2.5MHz
@@ -1161,6 +1422,16 @@ ROM_START(uvc)
     ROM_LOAD("101-32107.c4", 0x0000, 0x1000, CRC(F35784F9) SHA1(348E54A7FA1E8091F89AC656B4DA22F28CA2E44D)) // "NEC P9Y019 // D2332C 229 // 101-32107", == vcc-engl.bin on vcc
 ROM_END
 
+ROM_START(vsc)
+    ROM_REGION(0x10000, "maincpu", 0)
+    ROM_LOAD("101-64108.bin", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626))
+    ROM_LOAD("101-64109.bin", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341))
+	ROM_LOAD("101-32024.bin", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb))
+
+    ROM_REGION(0x2000, "speech", 0)
+    ROM_LOAD("101-32107.bin", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d))
+ROM_END
+
 ROM_START(vbc)
     ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("101-64108.bin", 0x0000, 0x2000, CRC(08472223) SHA1(859865B13C908DBB474333263DC60F6A32461141))
@@ -1197,4 +1468,5 @@ COMP( 1979, vcc,        0,          0,      vcc,   fidelz80, 0,      "Fidelity E
 COMP( 1979, vbc,        0,          0,      abc,   abc,      0,      "Fidelity Electronics",   "Bridge Challenger (model VBC)",	GAME_NOT_WORKING )
 COMP( 1980, uvc,        vcc,        0,      vcc,   fidelz80, 0,      "Fidelity Electronics",   "Advanced Talking Chess Challenger (model UVC)", GAME_NOT_WORKING )
 COMP( 1980, abc,        vbc,        0,      abc,   abc,      0,      "Fidelity Electronics",   "Advanced Bridge Challenger (model ABC)", GAME_NOT_WORKING )
+COMP( 1980, vsc,        0,          0,      vsc,   vsc,      0,      "Fidelity Electronics",   "Sensory Chess Challenger (model VSC)", GAME_NOT_WORKING )
 
