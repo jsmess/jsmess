@@ -23,30 +23,6 @@
 #include "machine/ctronics.h"
 #include "imagedev/cassette.h"
 
-/* BBC Memory Size */
-/* this stores the DIP switch setting for the DFS type being used */
-/* this stores the DIP switch setting for the SWRAM type being used */
-
-/* if 0 then we are emulating a BBC B style machine
-   if 1 then we are emulating a BBC Master style machine */
-
-
-/****************************
- IRQ inputs
-*****************************/
-
-
-/************************
-Sideways RAM/ROM code
-*************************/
-
-//This is the latch that holds the sideways ROM bank to read
-
-//This stores the sideways RAM latch type.
-//Acorn and others use the bbc_rombank latch to select the write bank to be used.(type 0)
-//Solidisc use the BBC's userport to select the write bank to be used (type 1)
-
-
 
 /*************************
 Model A memory handling functions
@@ -63,9 +39,6 @@ WRITE8_HANDLER ( bbc_memorya1_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
 	space->machine().region("maincpu")->base()[offset]=data;
-
-	// this array is set so that the video emulator know which addresses to redraw
-	state->m_vidmem[offset]=1;
 }
 
 /*************************
@@ -95,13 +68,10 @@ WRITE8_HANDLER ( bbc_memoryb3_w )
 	if (state->m_RAMSize)
 	{
 		space->machine().region("maincpu")->base()[offset + 0x4000] = data;
-		// this array is set so that the video emulator know which addresses to redraw
-		state->m_vidmem[offset + 0x4000] = 1;
 	}
 	else
 	{
 		space->machine().region("maincpu")->base()[offset] = data;
-		state->m_vidmem[offset] = 1;
 	}
 
 }
@@ -197,13 +167,7 @@ WRITE8_HANDLER ( bbc_memorybp1_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
 	space->machine().region("maincpu")->base()[offset]=data;
-
-	// this array is set so that the video emulator know which addresses to redraw
-	state->m_vidmem[offset]=1;
 }
-
-
-
 
 
 /* the next two function handle reads and write to the shadow video ram area
@@ -250,7 +214,6 @@ WRITE8_HANDLER ( bbc_memorybp2_w )
 	{
 		// not in shadow ram mode so just write to normal ram
 		ram[offset + 0x3000] = data;
-		state->m_vidmem[offset + 0x3000] = 1;
 	}
 	else
 	{
@@ -258,13 +221,11 @@ WRITE8_HANDLER ( bbc_memorybp2_w )
 		{
 			// if VDUDriver set then write to shadow ram
 			ram[offset + 0xb000] = data;
-			state->m_vidmem[offset + 0xb000] = 1;
 		}
 		else
 		{
 			// else write to normal ram
 			ram[offset + 0x3000] = data;
-			state->m_vidmem[offset + 0x3000] = 1;
 		}
 	}
 }
@@ -371,7 +332,6 @@ if the program counter is anywhere else main ram is accessed.
 
 */
 
-//static int ACCCON_IRR=0; This is defined at the top in the IRQ code
 
 READ8_HANDLER ( bbcm_ACCCON_read )
 {
@@ -389,8 +349,9 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 	logerror("ACCCON write  %d %d \n",offset,data);
 
 	tempIRR=state->m_ACCCON_IRR;
-	state->m_ACCCON_IRR=(data>>7)&1;
 
+
+	state->m_ACCCON_IRR=(data>>7)&1;
 	state->m_ACCCON_TST=(data>>6)&1;
 	state->m_ACCCON_IFJ=(data>>5)&1;
 	state->m_ACCCON_ITU=(data>>4)&1;
@@ -473,7 +434,6 @@ WRITE8_HANDLER ( bbc_memorybm1_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
 	space->machine().region("maincpu")->base()[offset] = data;
-	state->m_vidmem[offset] = 1;
 }
 
 
@@ -508,19 +468,16 @@ WRITE8_HANDLER ( bbc_memorybm2_w )
 	if (state->m_ACCCON_X)
 	{
 		ram[offset + 0xb000] = data;
-		state->m_vidmem[offset + 0xb000] = 1;
 	}
 	else
 	{
 		if (state->m_ACCCON_E && bbcm_vdudriverset(space->machine()))
 		{
 			ram[offset + 0xb000] = data;
-			state->m_vidmem[offset + 0xb000] = 1;
 		}
 		else
 		{
 			ram[offset + 0x3000] = data;
-			state->m_vidmem[offset + 0x3000] = 1;
 		}
 	}
 }
@@ -786,17 +743,8 @@ Mode    Size    Start of screen  Number to add  B5      B4
 6       8K  &6000 (or &2000) 24K        0   1
 B6 - Operates the CAPS lock LED  (Pin 17 keyboard connector)
 B7 - Operates the SHIFT lock LED (Pin 16 keyboard connector)
-
-
 ******************************************************************************/
 
-
-
-
-
-
-
-// this is a counter on the keyboard
 
 
 INTERRUPT_GEN( bbcb_keyscan )
@@ -1064,14 +1012,12 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 			if (state->m_b4_video0 == 0)
 			{
 				state->m_b4_video0 = 1;
-				bbc_setscreenstart(device->machine(), state->m_b4_video0, state->m_b5_video1);
 			}
 			break;
 		case 5:
 			if (state->m_b5_video1 == 0)
 			{
 				state->m_b5_video1 = 1;
-				bbc_setscreenstart(device->machine(), state->m_b4_video0, state->m_b5_video1);
 			}
 			break;
 		case 6:
@@ -1151,14 +1097,12 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 			if (state->m_b4_video0 == 1)
 			{
 				state->m_b4_video0 = 0;
-				bbc_setscreenstart(device->machine(), state->m_b4_video0, state->m_b5_video1);
 			}
 			break;
 		case 5:
 			if (state->m_b5_video1 == 1)
 			{
 				state->m_b5_video1 = 0;
-				bbc_setscreenstart(device->machine(), state->m_b4_video0, state->m_b5_video1);
 			}
 			break;
 		case 6:
@@ -1358,9 +1302,6 @@ const uPD7002_interface bbc_uPD7002 =
 /***************************************
   BBC 2C199 Serial Interface Cassette
 ****************************************/
-
-//static int longbit=0;
-//static int shortbit = 0;
 
 
 
@@ -2116,13 +2057,13 @@ MACHINE_RESET( bbcb )
 	{
 		/* 32K Model B */
 		memory_set_bankptr(machine, "bank3", ram + 0x4000);
-		bbc_set_video_memory_lookups(machine, 32);
+		state->m_memorySize=32;
 	}
 	else
 	{
 		/* 16K just repeat the lower 16K*/
 		memory_set_bankptr(machine, "bank3", ram);
-		bbc_set_video_memory_lookups(machine, 16);
+		state->m_memorySize=16;
 	}
 
 	memory_set_bankptr(machine, "bank4", machine.region("user1")->base());          /* bank 4 is the paged ROMs     from 8000 to bfff */

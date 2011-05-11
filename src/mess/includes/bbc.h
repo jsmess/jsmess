@@ -23,17 +23,44 @@ class bbc_state : public driver_device
 public:
 	bbc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+	int m_RAMSize;			// BBC Memory Size
+	int m_DFSType;			// this stores the DIP switch setting for the DFS type being used
+	int m_SWRAMtype;		// this stores the DIP switch setting for the SWRAM type being used
+	int m_Master;			// if 0 then we are emulating a BBC B style machine
+							// if 1 then we are emulating a BBC Master style machine
 
-	unsigned char m_vidmem[0x10000];
-	int m_RAMSize;
-	int m_DFSType;
-	int m_SWRAMtype;
-	int m_Master;
-	int m_ACCCON_IRR;
-	int m_rombank;
-	int m_userport;
-	int m_pagedRAM;
-	int m_vdusel;
+	int m_ACCCON_IRR;		//  IRQ inputs
+
+	int m_rombank;			// This is the latch that holds the sideways ROM bank to read
+
+	int m_userport;			// This stores the sideways RAM latch type.
+							// Acorn and others use the bbc_rombank latch to select the write bank to be used.(type 0)
+							// Solidisc use the BBC's userport to select the write bank to be used (type 1)
+
+	int m_pagedRAM;			// BBC B+ memory handling
+	int m_vdusel;			// BBC B+ memory handling
+
+							/*
+							ACCCON
+
+							b7 IRR  1=Causes an IRQ to the processor
+							b6 TST  1=Selects &FC00-&FEFF read from OS-ROM
+							b5 IFJ  1=Internal 1 MHz bus
+									0=External 1MHz bus
+							b4 ITU  1=Internal Tube
+									0=External Tube
+							b3 Y    1=Read/Write HAZEL &C000-&DFFF RAM
+									0=Read/Write ROM &C000-&DFFF OS-ROM
+							b2 X    1=Read/Write LYNNE
+									0=Read/WRITE main memory &3000-&8000
+							b1 E    1=Causes shadow if VDU code
+									0=Main all the time
+							b0 D    1=Display LYNNE as screen
+									0=Display main RAM screen
+
+							ACCCON is a read/write register
+							*/
+
 	int m_ACCCON;
 	int m_ACCCON_TST;
 	int m_ACCCON_IFJ;
@@ -42,6 +69,30 @@ public:
 	int m_ACCCON_X;
 	int m_ACCCON_E;
 	int m_ACCCON_D;
+
+
+							/*
+							The addressable latch
+							This 8 bit addressable latch is operated from port B lines 0-3.
+							PB0-PB2 are set to the required address of the output bit to be set.
+							PB3 is set to the value which should be programmed at that bit.
+							The function of the 8 output bits from this latch are:-
+
+							B0 - Write Enable to the sound generator IC
+							B1 - READ select on the speech processor
+							B2 - WRITE select on the speech processor
+							B3 - Keyboard write enable
+							B4,B5 - these two outputs define the number to be added to the
+							start of screen address in hardware to control hardware scrolling:-
+							Mode    Size    Start of screen  Number to add  B5      B4
+							0,1,2   20K &3000        12K        1       1
+							3       16K &4000        16K        0   0
+							4,5     10K &5800 (or &1800) 22K        1   0
+							6       8K  &6000 (or &2000) 24K        0   1
+							B6 - Operates the CAPS lock LED  (Pin 17 keyboard connector)
+							B7 - Operates the SHIFT lock LED (Pin 16 keyboard connector)
+							*/
+
 	int m_b0_sound;
 	int m_b1_speech_read;
 	int m_b2_speech_write;
@@ -50,12 +101,21 @@ public:
 	int m_b5_video1;
 	int m_b6_caps_lock_led;
 	int m_b7_shift_lock_led;
-	int m_MC146818_WR;
-	int m_MC146818_DS;
-	int m_MC146818_AS;
-	int m_MC146818_CE;
+
+	int m_MC146818_WR;		// FE30 bit 1 replaces  b1_speech_read
+	int m_MC146818_DS;		// FE30 bit 2 replaces  b2_speech_write
+	int m_MC146818_AS;		// 6522 port b bit 7
+	int m_MC146818_CE;		// 6522 port b bit 6
+
 	int m_via_system_porta;
-	int m_column;
+
+	int m_column;			// this is a counter in the keyboard circuit
+	
+
+							/***************************************
+							  BBC 2C199 Serial Interface Cassette
+							****************************************/
+
 	double m_last_dev_val;
 	int m_wav_len;
 	int m_len0;
@@ -64,26 +124,55 @@ public:
 	int m_len3;
 	int m_mc6850_clock;
 	emu_timer *m_tape_timer;
-	int m_previous_i8271_int_state;
+
+
+							/**************************************
+							   i8271 disc control 
+							***************************************/
+
+	int m_previous_i8271_int_state;	// 8271 interupt status
+
+
+
+							/**************************************
+							   WD1770 disc control
+							***************************************/
 	int m_drive_control;
 	int m_wd177x_irq_state;
 	int m_wd177x_drq_state;
 	int m_previous_wd177x_int_state;
 	int m_1770_IntEnabled;
+
+							/**************************************
+							   Opus Challenger Disc control
+							***************************************/						
 	int m_opusbank;
-	int m_video_refresh;
+
+
+
+							/**************************************
+							   Video Code
+							***************************************/						
+
+	int m_memorySize;
+
+
+// this is the real location of the start of the BBC's ram in the emulation
+// it can be changed if shadow ram is being used to point at the upper 32K of RAM
+
+// this is the screen memory location of the next pixels to be drawn
+
+// this is a more global variable to store the bitmap variable passed in in the bbc_vh_screenrefresh function
+
+// this is the X and Y screen location in emulation pixels of the next pixels to be drawn
+
+
 	unsigned char *m_BBC_Video_RAM;
-	unsigned char *m_vidmem_RAM;
 	UINT16 *m_BBC_display;
 	UINT16 *m_BBC_display_left;
 	UINT16 *m_BBC_display_right;
 	bitmap_t *m_BBC_bitmap;
 	int m_y_screen_pos;
-	unsigned int m_video_ram_lookup0[0x4000];
-	unsigned int m_video_ram_lookup1[0x4000];
-	unsigned int m_video_ram_lookup2[0x4000];
-	unsigned int m_video_ram_lookup3[0x4000];
-	unsigned int *m_video_ram_lookup;
 	unsigned char m_pixel_bits[256];
 	int m_BBC_HSync;
 	int m_BBC_VSync;
@@ -203,11 +292,15 @@ VIDEO_START( bbcbp );
 VIDEO_START( bbcm );
 SCREEN_UPDATE( bbc );
 
+static void BBC_draw_hi_res(running_machine &machine);
+static void BBC_draw_teletext(running_machine &machine);
+
 void bbc_draw_RGB_in(device_t *device, int offset, int data);
 void bbc_set_video_memory_lookups(running_machine &machine, int ramsize);
 void bbc_frameclock(running_machine &machine);
 void bbc_setscreenstart(running_machine &machine, int b4, int b5);
 void bbcbp_setvideoshadow(running_machine &machine, int vdusel);
+
 
 WRITE8_HANDLER ( bbc_videoULA_w );
 
