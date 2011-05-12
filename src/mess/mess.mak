@@ -464,7 +464,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/stvprot.o	\
 	$(MAME_VIDEO)/stvvdp1.o		\
 	$(MAME_VIDEO)/stvvdp2.o		\
-	$(MAME_DRIVERS)/megadriv.o  \
 	$(MAME_MACHINE)/megadriv.o  \
 	$(MAME_MACHINE)/md_cart.o	\
 	$(MAME_MACHINE)/dc.o		\
@@ -1338,6 +1337,7 @@ $(MESSOBJ)/sanyo.a:				\
 
 $(MESSOBJ)/sega.a:				\
 	$(MESS_DRIVERS)/sg1000.o	\
+	$(MESS_DRIVERS)/megadriv.o      \
 
 $(MESSOBJ)/sgi.a:				\
 	$(MESS_MACHINE)/sgi.o		\
