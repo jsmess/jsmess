@@ -495,8 +495,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/segasms.o	\
 	$(MAME_DRIVERS)/segasms.o	\
 	$(MAME_DRIVERS)/sg1000.o	\
-	$(MAME_DRIVERS)/dc.o		\
-	$(MAME_MACHINE)/dccons.o	\
 	$(MAME_MACHINE)/gdrom.o 	\
 	$(MAME_DRIVERS)/a310.o		\
 	$(MAME_DRIVERS)/a7000.o		\
@@ -1342,6 +1340,8 @@ $(MESSOBJ)/sanyo.a:				\
 $(MESSOBJ)/sega.a:				\
 	$(MESS_DRIVERS)/sg1000.o	\
 	$(MESS_DRIVERS)/megadriv.o      \
+	$(MESS_DRIVERS)/dc.o		\
+	$(MESS_MACHINE)/dccons.o	\
 
 $(MESSOBJ)/sgi.a:				\
 	$(MESS_MACHINE)/sgi.o		\
