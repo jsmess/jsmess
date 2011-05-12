@@ -498,33 +498,33 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_DRIVERS)/segasms.o	\
 	$(MAME_DRIVERS)/sg1000.o	\
 	$(MAME_MACHINE)/gdrom.o 	\
-	$(MAME_DRIVERS)/a310.o		\
-	$(MAME_DRIVERS)/a7000.o		\
-	$(MAME_MACHINE)/amigafdc.o	\
-	$(MAME_MACHINE)/amigacrt.o	\
-	$(MAME_MACHINE)/amigacd.o	\
-	$(MAME_MACHINE)/amigakbd.o	\
-	$(MAME_DRIVERS)/amiga.o		\
-	$(MAME_DRIVERS)/a3000.o		\
-	$(MAME_DRIVERS)/ami1200.o	\
-	$(MAME_MACHINE)/ataricrt.o	\
-	$(MAME_MACHINE)/atarifdc.o	\
-	$(MAME_DRIVERS)/atari400.o	\
-	$(MAME_MACHINE)/pce.o		\
-	$(MAME_DRIVERS)/pce.o		\
-	$(MAME_MACHINE)/nes_mmc.o	\
-	$(MAME_VIDEO)/nes.o			\
-	$(MAME_MACHINE)/nes.o		\
-	$(MAME_DRIVERS)/nes.o		\
-	$(MAME_MACHINE)/snescart.o	\
-	$(MAME_DRIVERS)/snes.o		\
-	$(MAME_DRIVERS)/n64.o		\
-	$(MAME_MACHINE)/aescart.o	\
-	$(MAME_DRIVERS)/ng_aes.o	\
+	$(MESS_DRIVERS)/a310.o		\
+	$(MESS_DRIVERS)/a7000.o		\
+	$(MESS_MACHINE)/amigafdc.o	\
+	$(MESS_MACHINE)/amigacrt.o	\
+	$(MESS_MACHINE)/amigacd.o	\
+	$(MESS_MACHINE)/amigakbd.o	\
+	$(MESS_DRIVERS)/amiga.o		\
+	$(MESS_DRIVERS)/a3000.o		\
+	$(MESS_DRIVERS)/ami1200.o	\
+	$(MESS_MACHINE)/ataricrt.o	\
+	$(MESS_MACHINE)/atarifdc.o	\
+	$(MESS_DRIVERS)/atari400.o	\
+	$(MESS_MACHINE)/pce.o		\
+	$(MESS_DRIVERS)/pce.o		\
+	$(MESS_MACHINE)/nes_mmc.o	\
+	$(MESS_VIDEO)/nes.o			\
+	$(MESS_MACHINE)/nes.o		\
+	$(MESS_DRIVERS)/nes.o		\
+	$(MESS_MACHINE)/snescart.o	\
+	$(MESS_DRIVERS)/snes.o		\
+	$(MESS_DRIVERS)/n64.o		\
+	$(MESS_DRIVERS)/ng_aes.o	\
 	$(MESS_DRIVERS)/psx.o		\
 	$(MESS_MACHINE)/psxcd.o		\
 	$(MESS_MACHINE)/psxcddrv.o	\
 	$(MESS_MACHINE)/psxcard.o	\
+	$(MESS_DEVICES)/aescart.o       \
 	$(MAME_DRIVERS)/saturn.o	\
 	$(MAME_DRIVERS)/cps1.o	\
 	$(MAME_VIDEO)/cps1.o	\
@@ -1802,7 +1802,7 @@ $(MESS_DRIVERS)/mpf1.o:		$(MESS_LAYOUT)/mpf1.lh \
 $(MESS_DRIVERS)/mmd1.o:		$(MESS_LAYOUT)/mmd1.lh \
 					$(MESS_LAYOUT)/mmd2.lh
 $(MESS_VIDEO)/newbrain.o:	$(MESS_LAYOUT)/newbrain.lh
-$(MAME_DRIVERS)/ng_aes.o:	$(MESS_LAYOUT)/neogeo.lh
+$(MESS_DRIVERS)/ng_aes.o:	$(MESS_LAYOUT)/neogeo.lh
 $(MESS_DRIVERS)/poly880.o:	$(MESS_LAYOUT)/poly880.lh
 $(MESS_DRIVERS)/pc1500.o:	$(MESS_LAYOUT)/pc1500.lh
 $(MESS_VIDEO)/pc8401a.o:	$(MESS_LAYOUT)/pc8500.lh
