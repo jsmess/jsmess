@@ -292,9 +292,6 @@ VIDEO_START( bbcbp );
 VIDEO_START( bbcm );
 SCREEN_UPDATE( bbc );
 
-static void BBC_draw_hi_res(running_machine &machine);
-static void BBC_draw_teletext(running_machine &machine);
-
 void bbc_draw_RGB_in(device_t *device, int offset, int data);
 void bbc_set_video_memory_lookups(running_machine &machine, int ramsize);
 void bbc_frameclock(running_machine &machine);

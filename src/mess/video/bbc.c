@@ -14,6 +14,9 @@
 #include "saa505x.h"
 
 
+static void BBC_draw_hi_res(running_machine &machine);
+static void BBC_draw_teletext(running_machine &machine);
+
 
 
 /************************************************************************
@@ -430,7 +433,6 @@ static const struct m6845_interface BBC6845 =
 
 WRITE8_HANDLER ( bbc_6845_w )
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
 	switch (offset&1)
 	{
 		case 0:

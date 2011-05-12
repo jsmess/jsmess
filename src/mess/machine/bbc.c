@@ -37,7 +37,6 @@ WRITE8_HANDLER ( bbc_page_selecta_w )
 
 WRITE8_HANDLER ( bbc_memorya1_w )
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
 	space->machine().region("maincpu")->base()[offset]=data;
 }
 
@@ -165,7 +164,6 @@ WRITE8_HANDLER ( bbc_page_selectbp_w )
 
 WRITE8_HANDLER ( bbc_memorybp1_w )
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
 	space->machine().region("maincpu")->base()[offset]=data;
 }
 
@@ -432,7 +430,6 @@ static WRITE8_HANDLER ( page_selectbm_w )
 
 WRITE8_HANDLER ( bbc_memorybm1_w )
 {
-	bbc_state *state = space->machine().driver_data<bbc_state>();
 	space->machine().region("maincpu")->base()[offset] = data;
 }
 
