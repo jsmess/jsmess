@@ -190,7 +190,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="ps64" supported="no">
-		<description>PS-64 puhemoduli v2.0 (Finland)</description>
+		<description>PS-64 puhemoduli v2.0 (Fin)</description>
 		<year>1988</year>
 		<publisher>Koulun erityispalvelu</publisher>
 		<!--
@@ -224,7 +224,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="pgfox_fi">
-		<description>Pagefox (Finland)</description>
+		<description>Pagefox (Fin)</description>
 		<year>1987</year>
 		<publisher>Scanntronik</publisher>
 		<!--
@@ -362,7 +362,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="multiscr" supported="no">
-		<description>Multiscreen (Australia)</description>
+		<description>Multiscreen (Aus)</description>
 		<year>1987</year>
 		<publisher>Multiscreen Pty</publisher>
 		<!--
@@ -469,7 +469,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="hugo">
-		<description>Skærmtrolden Hugo (Denmark)</description>
+		<description>Skærmtrolden Hugo (Den)</description>
 		<year>1990</year>
 		<publisher>SilverRock Productions</publisher>
 		<!--
@@ -505,9 +505,43 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="chasehq2" supported="no">
+		<description>Chase H.Q. 2: Special Criminal Investigation</description>
+		<year>1990</year>
+		<publisher>Ocean</publisher>
+		<!--
+		|===========================|
+		|=|                   LS02  |
+		|=|                         |
+		|=|                         |
+		|=|    ROM0   ROM1          |
+		|=|                   LS273 |
+		|=|                         |
+		|=|                         |
+		|=|                         |
+		|===========================|
+
+		ROM0,1 - 28-pin ROM (markings scratched off)
+		-->
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+			<feature name="pcb" value="T-40" />
+
+			<dataarea name="roml" size="0x20000">
+				<rom name="l.u3" size="0x20000" status="nodump" offset="0x0000" />
+			</dataarea>
+
+			<dataarea name="romh" size="0x20000">
+				<rom name="h.u2" size="0x20000" status="nodump" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
 	
 	<software name="btx" supported="no">
-		<description>Btx Decoder Modul (Germany)</description>
+		<description>Btx Decoder Modul (Ger)</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<!--
@@ -524,7 +558,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="btx2" supported="no">
-		<description>Btx Decoder Modul II v3.1 (Germany)</description>
+		<description>Btx Decoder Modul II v3.1 (Ger)</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<!--
@@ -541,7 +575,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="btx2v33" supported="no">
-		<description>Btx Decoder Modul II v3.3 (Germany)</description>
+		<description>Btx Decoder Modul II v3.3 (Ger)</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<!--
@@ -663,7 +697,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="spdsaver" supported="no">
-		<description>Speedsaver $C000 (Netherlands)</description>
+		<description>Speedsaver $C000 (Nld)</description>
 		<year>1984</year>
 		<publisher>KCS Dordrecht</publisher>
 		<part name="cart" interface="c64_cart">
@@ -1097,7 +1131,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="coccinel">
-		<description>Coccinelle cherche dessinateur (France)</description>
+		<description>Coccinelle cherche dessinateur (Fra)</description>
 		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2158,7 +2192,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="pancho">
-		<description>Pancho (France)</description>
+		<description>Pancho (Fra)</description>
 		<year>1984</year>
 		<publisher>Romox</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2402,7 +2436,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="addsub23" supported="no">
-		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 2.-3. Schuljahr (Germany)</description>
+		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 2.-3. Schuljahr (Ger)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2416,7 +2450,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="addsub34" supported="no">
-		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 3.-4. Schuljahr (Germany)</description>
+		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 3.-4. Schuljahr (Ger)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2430,7 +2464,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="geomet34" supported="no">
-		<description>Der Rechenlöwe: Fit in Geometrie - 3.-4. Schuljahr (Germany)</description>
+		<description>Der Rechenlöwe: Fit in Geometrie - 3.-4. Schuljahr (Ger)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2444,7 +2478,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="math1" supported="no">
-		<description>Der Rechenlöwe: Fit in Mathematik - 1. Schuljahr (Germany)</description>
+		<description>Der Rechenlöwe: Fit in Mathematik - 1. Schuljahr (Ger)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2458,7 +2492,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="muldiv23" supported="no">
-		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 2.-3. Schuljahr (Germany)</description>
+		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 2.-3. Schuljahr (Ger)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2472,7 +2506,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="muldiv34" supported="no">
-		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 3.-4. Schuljahr (Germany)</description>
+		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 3.-4. Schuljahr (Ger)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2486,7 +2520,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="recht34" supported="no">
-		<description>Rechtschreiblowe, Der - Fit in Rechtschreibung - 3.-4. Schuljahr (Germany)</description>
+		<description>Der Rechtschreiblöwe: Fit in Rechtschreibung - 3.-4. Schuljahr (Ger)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3394,7 +3428,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="c64statg" cloneof="c64stat">
-		<description>CBM 64 Stat (Germany)</description>
+		<description>CBM 64 Stat (Ger)</description>
 		<year>1982</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3407,7 +3441,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="muistio">
-		<description>Muistio 64 (Finland)</description>
+		<description>Muistio 64 (Fin)</description>
 		<year>19??</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3420,7 +3454,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="conraddb">
-		<description>Conrad Disk Booster (Germany)</description>
+		<description>Conrad Disk Booster (Ger)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3579,7 +3613,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="formatm" supported="no">
-		<description>Format- und Hardcopymodul (Germany)</description>
+		<description>Format- und Hardcopymodul (Ger)</description>
 		<year>19??</year>
 		<publisher>Rex Datentechnik</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3606,7 +3640,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="happypac" supported="no">
-		<description>Happy-Packer (Germany)</description>
+		<description>Happy-Packer (Ger)</description>
 		<year>1987</year>
 		<publisher>Peter Arndt</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3672,7 +3706,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="hsback3">
-		<description>High Speed Sektor Backup v3.0 (Germany)</description>
+		<description>High Speed Sektor Backup v3.0 (Ger)</description>
 		<year>1987</year>
 		<publisher>Rossmoeller</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3699,7 +3733,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="hypra3">
-		<description>Hypra-Disk-Modul II v3.0 (Germany)</description>
+		<description>Hypra-Disk-Modul II v3.0 (Ger)</description>
 		<year>19??</year>
 		<publisher>Rex Datentechnik</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3785,7 +3819,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="superhcm">
-		<description>Das Super Hard-Copy-Modul (Germany)</description>
+		<description>Das Super Hard-Copy-Modul (Ger)</description>
 		<year>1987</year>
 		<publisher>Schlumph</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3811,7 +3845,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="systemm1">
-		<description>System-M1.0 (Germany)</description>
+		<description>System-M1.0 (Ger)</description>
 		<year>1983</year>
 		<publisher>Mousesoft</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3824,7 +3858,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="teledata">
-		<description>Teledata (Sweden)</description>
+		<description>Teledata (Swe)</description>
 		<year>1983</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3878,7 +3912,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="tysim64">
-		<description>Tysim 64 (Germany)</description>
+		<description>Tysim 64 (Ger)</description>
 		<year>1987</year>
 		<publisher>Kaudelka O.</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3891,7 +3925,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="victxt64">
-		<description>Vic-Text 64 (Sweden)</description>
+		<description>Vic-Text 64 (Swe)</description>
 		<year>1983</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
