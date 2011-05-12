@@ -266,9 +266,11 @@ DRVLIBS += \
 	$(MESSOBJ)/apple.a \
 	$(MESSOBJ)/applied.a \
 	$(MESSOBJ)/arcadia.a \
+	$(MESSOBJ)/ascii.a \
 	$(MESSOBJ)/at.a \
 	$(MESSOBJ)/atari.a \
 	$(MESSOBJ)/att.a \
+	$(MESSOBJ)/bally.a \
 	$(MESSOBJ)/bandai.a \
 	$(MESSOBJ)/be.a \
 	$(MESSOBJ)/bnpo.a \
@@ -505,7 +507,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_DRIVERS)/amiga.o		\
 	$(MAME_DRIVERS)/a3000.o		\
 	$(MAME_DRIVERS)/ami1200.o	\
-	$(MAME_MACHINE)/msx.o		\
 	$(MAME_MACHINE)/ataricrt.o	\
 	$(MAME_MACHINE)/atarifdc.o	\
 	$(MAME_DRIVERS)/atari400.o	\
@@ -665,6 +666,7 @@ $(MESSOBJ)/arcadia.a:			\
 
 $(MESSOBJ)/ascii.a:                     \
 	$(MESS_DRIVERS)/msx.o		\
+	$(MESS_MACHINE)/msx.o		\
 	$(MESS_MACHINE)/msx_slot.o	\
 
 $(MESSOBJ)/at.a:				\
