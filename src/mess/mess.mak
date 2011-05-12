@@ -511,7 +511,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/ataricrt.o	\
 	$(MAME_MACHINE)/atarifdc.o	\
 	$(MAME_DRIVERS)/atari400.o	\
-	$(MAME_DRIVERS)/astrocdh.o	\
 	$(MAME_MACHINE)/pce.o		\
 	$(MAME_DRIVERS)/pce.o		\
 	$(MAME_MACHINE)/nes_mmc.o	\
@@ -689,8 +688,11 @@ $(MESSOBJ)/atari.a:				\
 	$(MESS_MACHINE)/lynx.o		\
 	$(MESS_DRIVERS)/portfoli.o	\
 
-$(MESSOBJ)/att.a:				\
+$(MESSOBJ)/att.a:			\
 	$(MESS_DRIVERS)/unixpc.o	\
+
+$(MESSOBJ)/bally.a:                     \
+	$(MESS_DRIVERS)/astrocde.o	\
 
 $(MESSOBJ)/bandai.a:			\
 	$(MESS_DRIVERS)/pippin.o	\
