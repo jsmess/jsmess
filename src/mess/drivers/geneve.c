@@ -237,7 +237,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( gm_changed )
 {
-	device_t *board = field->machine().device("geneve_board");
+	device_t *board = field.machine().device("geneve_board");
 	set_gm_switches(board, (UINT8)((UINT64)param&0x03), newval);
 }
 

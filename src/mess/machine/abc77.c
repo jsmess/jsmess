@@ -181,7 +181,7 @@ machine_config_constructor abc77_device::device_mconfig_additions() const
 
 INPUT_CHANGED( abc77_device::keyboard_reset )
 {
-    abc77_device *keyboard = static_cast<abc77_device *>(field->machine().device(ABC77_TAG));
+    abc77_device *keyboard = static_cast<abc77_device *>(field.machine().device(ABC77_TAG));
 
 	if (oldval && !newval)
 	{

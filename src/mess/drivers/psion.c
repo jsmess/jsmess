@@ -461,7 +461,7 @@ READ8_MEMBER( psion_state::io_r )
 
 static INPUT_CHANGED( psion_on )
 {
-	cpu_device *cpu = field->machine().device<cpu_device>("maincpu");
+	cpu_device *cpu = field.machine().device<cpu_device>("maincpu");
 
 	/* reset the CPU for resume from standby */
 	if (cpu->suspended(SUSPEND_REASON_HALT))

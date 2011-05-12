@@ -79,13 +79,13 @@ enum
 
 static INPUT_CHANGED( panel_check )
 {
-	ssem_state *state = field->machine().driver_data<ssem_state>();
-    UINT8 edit0_state = input_port_read(field->machine(), "EDIT0");
-    UINT8 edit1_state = input_port_read(field->machine(), "EDIT1");
-    UINT8 edit2_state = input_port_read(field->machine(), "EDIT2");
-    UINT8 edit3_state = input_port_read(field->machine(), "EDIT3");
-    UINT8 misc_state = input_port_read(field->machine(), "MISC");
-    device_t *ssem_cpu = field->machine().device("maincpu");
+	ssem_state *state = field.machine().driver_data<ssem_state>();
+    UINT8 edit0_state = input_port_read(field.machine(), "EDIT0");
+    UINT8 edit1_state = input_port_read(field.machine(), "EDIT1");
+    UINT8 edit2_state = input_port_read(field.machine(), "EDIT2");
+    UINT8 edit3_state = input_port_read(field.machine(), "EDIT3");
+    UINT8 misc_state = input_port_read(field.machine(), "MISC");
+    device_t *ssem_cpu = field.machine().device("maincpu");
 
     switch( (int)(FPTR)param )
     {

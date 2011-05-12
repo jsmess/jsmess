@@ -1547,12 +1547,12 @@ ADDRESS_MAP_END
 /* TODO: key repeat, remove port impulse! */
 static INPUT_CHANGED( key_stroke )
 {
-	pc9801_state *state = field->machine().driver_data<pc9801_state>();
+	pc9801_state *state = field.machine().driver_data<pc9801_state>();
 
 	if(newval && !oldval)
 	{
 		state->m_keyb_press = (UINT8)(FPTR)(param) & 0x7f;
-		pic8259_ir1_w(field->machine().device("pic8259_master"), 1);
+		pic8259_ir1_w(field.machine().device("pic8259_master"), 1);
 	}
 
 	if(oldval && !newval)
@@ -1562,12 +1562,12 @@ static INPUT_CHANGED( key_stroke )
 /* for key modifiers */
 static INPUT_CHANGED( shift_stroke )
 {
-	pc9801_state *state = field->machine().driver_data<pc9801_state>();
+	pc9801_state *state = field.machine().driver_data<pc9801_state>();
 
 	if((newval && !oldval) || (oldval && !newval))
 	{
 		state->m_keyb_press = (UINT8)(FPTR)(param) & 0x7f;
-		pic8259_ir1_w(field->machine().device("pic8259_master"), 1);
+		pic8259_ir1_w(field.machine().device("pic8259_master"), 1);
 	}
 	else
 		state->m_keyb_press = 0;

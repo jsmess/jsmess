@@ -424,11 +424,11 @@ static WRITE32_HANDLER( ctrl0_w )
 	model2_state *state = space->machine().driver_data<model2_state>();
 	if(ACCESSING_BITS_0_7)
 	{
-		eeprom_device *device = space->machine().device<eeprom_device>("eeprom");
+		eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
 		state->m_ctrlmode = data & 0x01;
-		eeprom_write_bit(device, data & 0x20);
-		eeprom_set_clock_line(device, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom->write_bit(data & 0x20);
+		eeprom->set_clock_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -460,8 +460,8 @@ static READ32_HANDLER( videoctl_r )
 
 static CUSTOM_INPUT( _1c00000_r )
 {
-	model2_state *state = field->machine().driver_data<model2_state>();
-	UINT32 ret = input_port_read(field->machine(), "IN0");
+	model2_state *state = field.machine().driver_data<model2_state>();
+	UINT32 ret = input_port_read(field.machine(), "IN0");
 
 	if(state->m_ctrlmode == 0)
 	{
@@ -470,18 +470,18 @@ static CUSTOM_INPUT( _1c00000_r )
 	else
 	{
 		ret &= ~0x0030;
-		return ret | 0x00d0 | (eeprom_read_bit(field->machine().device("eeprom")) << 5);
+		return ret | 0x00d0 | (field.machine().device<eeprom_device>("eeprom")->read_bit() << 5);
 	}
 }
 
 static CUSTOM_INPUT( _1c0001c_r )
 {
-	model2_state *state = field->machine().driver_data<model2_state>();
+	model2_state *state = field.machine().driver_data<model2_state>();
 	UINT32 iptval = 0x00ff;
 	if(state->m_analog_channel < 4)
 	{
 		static const char *const ports[] = { "ANA0", "ANA1", "ANA2", "ANA3" };
-		iptval = input_port_read_safe(field->machine(), ports[state->m_analog_channel], 0);
+		iptval = input_port_read_safe(field.machine(), ports[state->m_analog_channel], 0);
 		++state->m_analog_channel;
 	}
 	return iptval;

@@ -310,11 +310,11 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_irq )
 {
-	nakajies_state *state = field->machine().driver_data<nakajies_state>();
-	UINT8 irqs = input_port_read( field->machine(), "debug" );
+	nakajies_state *state = field.machine().driver_data<nakajies_state>();
+	UINT8 irqs = input_port_read( field.machine(), "debug" );
 
 	state->m_irq_active |= irqs;
-	nakajies_update_irqs(field->machine());
+	nakajies_update_irqs(field.machine());
 }
 
 

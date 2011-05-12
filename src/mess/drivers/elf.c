@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( input_w )
 {
-	elf2_state *state = field->machine().driver_data<elf2_state>();
+	elf2_state *state = field.machine().driver_data<elf2_state>();
 
 	if (newval)
 	{

@@ -259,7 +259,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( reset_w )
 {
-	studio2_state *state = field->machine().driver_data<studio2_state>();
+	studio2_state *state = field.machine().driver_data<studio2_state>();
 
 	if (oldval && !newval)
 	{

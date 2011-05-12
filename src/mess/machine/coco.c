@@ -1489,8 +1489,8 @@ static WRITE8_DEVICE_HANDLER( d_pia0_pb_w )
 
 INPUT_CHANGED( coco_keyboard_changed )
 {
-	coco_state *state = field->machine().driver_data<coco_state>();
-	(*state->update_keyboard)(field->machine());
+	coco_state *state = field.machine().driver_data<coco_state>();
+	(*state->update_keyboard)(field.machine());
 }
 
 static TIMER_CALLBACK( coco_m_update_keyboard_timerproc )
@@ -2913,7 +2913,7 @@ static void update_lightgun( running_machine &machine )
 
 INPUT_CHANGED( coco_joystick_mode_changed )
 {
-	update_lightgun(field->machine());
+	update_lightgun(field.machine());
 }
 
 static TIMER_CALLBACK( update_lightgun_timer_callback )

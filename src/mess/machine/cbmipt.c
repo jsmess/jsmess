@@ -1056,11 +1056,11 @@ static CUSTOM_INPUT( vic_custom_inputs )
 	int bit_mask = (FPTR)param;
 	UINT8 port = 0;
 
-	if ((input_port_read(field->machine(), "CTRLSEL") & 0xf0) == 0x10)
-		port |= (input_port_read(field->machine(), "FAKE0") & bit_mask) ? 1 : 0;
+	if ((input_port_read(field.machine(), "CTRLSEL") & 0xf0) == 0x10)
+		port |= (input_port_read(field.machine(), "FAKE0") & bit_mask) ? 1 : 0;
 
-	if ((input_port_read(field->machine(), "CTRLSEL") & 0xf0) == 0x00)
-		port |= (input_port_read(field->machine(), "FAKE1") & bit_mask) ? 1 : 0;
+	if ((input_port_read(field.machine(), "CTRLSEL") & 0xf0) == 0x00)
+		port |= (input_port_read(field.machine(), "FAKE1") & bit_mask) ? 1 : 0;
 
 	return port;
 }

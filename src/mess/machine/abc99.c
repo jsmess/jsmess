@@ -240,7 +240,7 @@ machine_config_constructor abc99_device::device_mconfig_additions() const
 
 INPUT_CHANGED( abc99_device::keyboard_reset )
 {
-    abc99_device *keyboard = static_cast<abc99_device *>(field->machine().device(ABC99_TAG));
+    abc99_device *keyboard = static_cast<abc99_device *>(field.machine().device(ABC99_TAG));
 
 	device_set_input_line(keyboard->m_mousecpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }

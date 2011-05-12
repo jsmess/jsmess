@@ -878,9 +878,11 @@ static WRITE32_DEVICE_HANDLER( eeprom_w )
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
 		rf2_set_layer_banks(device->machine(), data >> 16);
-		eeprom_write_bit(device, (data & 0x800000) ? 1 : 0);
-		eeprom_set_clock_line(device, (data & 0x400000) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_set_cs_line(device, (data & 0x200000) ? CLEAR_LINE : ASSERT_LINE);
+
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->write_bit((data & 0x800000) ? 1 : 0);
+		eeprom->set_clock_line((data & 0x400000) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom->set_cs_line((data & 0x200000) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	// oki banking
@@ -936,21 +938,21 @@ static READ32_HANDLER( spi_controls2_r )
 
 static CUSTOM_INPUT( ejsakura_keyboard_r )
 {
-	seibuspi_state *state = field->machine().driver_data<seibuspi_state>();
+	seibuspi_state *state = field.machine().driver_data<seibuspi_state>();
 	switch(state->m_ejsakura_input_port)
 	{
 		case 0x01:
-			return input_port_read(field->machine(), "INPUT01");
+			return input_port_read(field.machine(), "INPUT01");
 		case 0x02:
-			return input_port_read(field->machine(), "INPUT02");
+			return input_port_read(field.machine(), "INPUT02");
 		case 0x04:
-			return input_port_read(field->machine(), "INPUT04");
+			return input_port_read(field.machine(), "INPUT04");
 		case 0x08:
-			return input_port_read(field->machine(), "INPUT08");
+			return input_port_read(field.machine(), "INPUT08");
 		case 0x10:
-			return input_port_read(field->machine(), "INPUT10");
+			return input_port_read(field.machine(), "INPUT10");
 		default:
-			return input_port_read(field->machine(), "SYSTEM");
+			return input_port_read(field.machine(), "SYSTEM");
 	}
 	return 0xffffffff;
 }
@@ -1113,9 +1115,10 @@ static void irqhandler(device_t *device, int state)
 
 static WRITE32_DEVICE_HANDLER(sys386f2_eeprom_w)
 {
-	eeprom_write_bit(device, (data & 0x80) ? 1 : 0);
-	eeprom_set_clock_line(device, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	eeprom_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->write_bit((data & 0x80) ? 1 : 0);
+	eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static const ymf271_interface ymf271_config =
@@ -1204,7 +1207,7 @@ static INPUT_PORTS_START( spi_2button )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000004, IP_ACTIVE_LOW) /* Test Button */
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Coin") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x000000b0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1256,7 +1259,7 @@ static INPUT_PORTS_START( seibu386_2button )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Coin") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1295,7 +1298,7 @@ INPUT_PORTS_END
 static CUSTOM_INPUT( ejanhs_encode )
 {
 	static const UINT8 encoding[] = { 0x02, 0x10, 0x03, 0x18, 0x04, 0x20, 0x05, 0x28, 0x06, 0x30, 0x07 };
-	input_port_value state = input_port_read(field->machine(), (const char *)param);
+	input_port_value state = input_port_read(field.machine(), (const char *)param);
 	int bit;
 
 	for (bit = 0; bit < ARRAY_LENGTH(encoding); bit++)
@@ -1405,7 +1408,7 @@ static INPUT_PORTS_START( spi_ejsakura )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0xffffbf3f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 INPUT_PORTS_END

@@ -39,7 +39,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( junior_reset )
 {
 	if (newval == 0)
-		field->machine().firstcpu->reset();
+		field.machine().firstcpu->reset();
 }
 
 

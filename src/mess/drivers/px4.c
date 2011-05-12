@@ -918,8 +918,8 @@ static TIMER_DEVICE_CALLBACK( upd7508_1sec_callback )
 
 static INPUT_CHANGED( key_callback )
 {
-	px4_state *px4 = field->machine().driver_data<px4_state>();
-	UINT32 oldvalue = oldval * field->mask, newvalue = newval * field->mask;
+	px4_state *px4 = field.machine().driver_data<px4_state>();
+	UINT32 oldvalue = oldval * field.mask, newvalue = newval * field.mask;
 	UINT32 delta = oldvalue ^ newvalue;
 	int i, scancode = 0xff, down = 0;
 
@@ -951,7 +951,7 @@ static INPUT_CHANGED( key_callback )
 				logerror("upd7508: key interrupt\n");
 
 			px4->m_isr |= INT0_7508;
-			gapnit_interrupt(field->machine());
+			gapnit_interrupt(field.machine());
 		}
 	}
 }

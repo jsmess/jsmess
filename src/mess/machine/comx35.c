@@ -627,9 +627,9 @@ void comx35_state::machine_reset()
 
 INPUT_CHANGED( comx35_reset )
 {
-	comx35_state *state = field->machine().driver_data<comx35_state>();
+	comx35_state *state = field.machine().driver_data<comx35_state>();
 
-	if (BIT(input_port_read(field->machine(), "RESET"), 0) && BIT(input_port_read(field->machine(), "D6"), 7))
+	if (BIT(input_port_read(field.machine(), "RESET"), 0) && BIT(input_port_read(field.machine(), "D6"), 7))
 	{
 		state->machine_reset();
 	}

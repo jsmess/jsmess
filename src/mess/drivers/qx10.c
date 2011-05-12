@@ -668,12 +668,12 @@ ADDRESS_MAP_END
 /* TODO: shift break */
 static INPUT_CHANGED( key_stroke )
 {
-	qx10_state *state = field->machine().driver_data<qx10_state>();
+	qx10_state *state = field.machine().driver_data<qx10_state>();
 
 	if(newval && !oldval)
 	{
 		state->m_keyb.rx = (UINT8)(FPTR)(param) & 0x7f;
-		pic8259_ir4_w(field->machine().device("pic8259_master"), 1);
+		pic8259_ir4_w(field.machine().device("pic8259_master"), 1);
 	}
 
 	if(oldval && !newval)

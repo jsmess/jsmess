@@ -149,7 +149,7 @@ static READ32_HANDLER( hpc_r )
 		return state->m_HPC.nMiscStatus;
 	case 0x01bc:
 //      verboselog(machine, 2, "HPC CPU Serial EEPROM Read\n" );
-		return ( ( eeprom_read_bit(space->machine().device("eeprom")) << 4 ) );
+		return ( (space->machine().device<eeprom_device>("eeprom")->read_bit() << 4 ) );
 	case 0x01c4:
 		verboselog(machine, 2, "HPC Local IO Register 0 Mask Read: %08x (%08x)\n", state->m_HPC.nLocalIOReg0Mask, mem_mask );
 		return state->m_HPC.nLocalIOReg0Mask;
@@ -225,10 +225,10 @@ static WRITE32_HANDLER( hpc_w )
 {
 	ip20_state *state = space->machine().driver_data<ip20_state>();
 	device_t *scc;
-	device_t *eeprom;
+	eeprom_device *eeprom;
 	running_machine &machine = space->machine();
 
-	eeprom = space->machine().device("eeprom");
+	eeprom = space->machine().device<eeprom_device>("eeprom");
 	offset <<= 2;
 	if( offset >= 0x0e00 && offset <= 0x0e7c )
 	{
@@ -341,9 +341,9 @@ static WRITE32_HANDLER( hpc_w )
 		{
 			verboselog(machine, 2, "    CPU board LED on\n" );
 		}
-		eeprom_write_bit(eeprom, (data & 0x00000008) ? 1 : 0 );
-		eeprom_set_cs_line(eeprom,(data & 0x00000002) ? ASSERT_LINE : CLEAR_LINE );
-		eeprom_set_clock_line(eeprom,(data & 0x00000004) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom->write_bit((data & 0x00000008) ? 1 : 0 );
+		eeprom->set_cs_line((data & 0x00000002) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom->set_clock_line((data & 0x00000004) ? CLEAR_LINE : ASSERT_LINE );
 		break;
 	case 0x01c4:
 		verboselog(machine, 2, "HPC Local IO Register 0 Mask Write: %08x (%08x)\n", data, mem_mask );
