@@ -10,7 +10,6 @@
 
     TODO:
 
-    - print time$/date$ stalls
     - uPD3301 attributes
     - PCG1000
     - Intel 8251
@@ -25,6 +24,33 @@
 #include "includes/pc8001.h"
 
 /* Read/Write Handlers */
+
+WRITE8_MEMBER( pc8001_state::port10_w )
+{
+	/*
+
+        bit     description
+
+        0       RTC C0
+        1       RTC C1
+        2       RTC C2
+        3       RTC DATA IN
+        4       
+        5       
+        6       
+        7       
+
+    */
+
+	// RTC
+	m_rtc->c0_w(BIT(data, 0));
+	m_rtc->c1_w(BIT(data, 1));
+	m_rtc->c2_w(BIT(data, 2));
+	m_rtc->data_in_w(BIT(data, 3));
+	
+	// centronics
+	centronics_data_w(m_centronics, 0, data);
+}
 
 WRITE8_MEMBER( pc8001_state::port30_w )
 {
@@ -92,7 +118,7 @@ static ADDRESS_MAP_START( pc8001_io, AS_IO, 8, pc8001_state )
 	AM_RANGE(0x07, 0x07) AM_READ_PORT("KEY7")
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("KEY8")
 	AM_RANGE(0x09, 0x09) AM_READ_PORT("KEY9")
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0f) AM_WRITE_PORT("W10") /* also AM_DEVWRITE(CENTRONICS_TAG, centronics_data_w)*/
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0f) AM_WRITE(port10_w)
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0e) AM_DEVREADWRITE_LEGACY(I8251_TAG, msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0x21, 0x21) AM_MIRROR(0x0e) AM_DEVREADWRITE_LEGACY(I8251_TAG, msm8251_status_r, msm8251_control_w)
 	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE(port30_w)
@@ -155,54 +181,6 @@ static ADDRESS_MAP_START( pc8001mk2_io, AS_IO, 8, pc8001mk2_state )
 ADDRESS_MAP_END
 
 /* Input Ports */
-
-WRITE_LINE_DEVICE_HANDLER( upd1990a_c0_w )
-{
-	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
-	driver_state->m_rtc->c0_w(state);
-}
-
-WRITE_LINE_DEVICE_HANDLER( upd1990a_c1_w )
-{
-	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
-	driver_state->m_rtc->c1_w(state);
-}
-
-WRITE_LINE_DEVICE_HANDLER( upd1990a_c2_w )
-{
-	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
-	driver_state->m_rtc->c2_w(state);
-}
-
-WRITE_LINE_DEVICE_HANDLER( upd1990a_data_in_w )
-{
-	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
-	driver_state->m_rtc->data_in_w(state);
-}
-
-WRITE_LINE_DEVICE_HANDLER( upd1990a_stb_w )
-{
-	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
-	driver_state->m_rtc->stb_w(state);
-}
-
-WRITE_LINE_DEVICE_HANDLER( upd1990a_clk_w )
-{
-	pc8001_state *driver_state = device->machine().driver_data<pc8001_state>();
-	driver_state->m_rtc->clk_w(state);
-}
-
-READ_LINE_DEVICE_HANDLER( upd1990a_data_out_r )
-{
-	pc8001_state *state = device->machine().driver_data<pc8001_state>();
-	return state->m_rtc->data_out_r();
-}
-
-READ_LINE_DEVICE_HANDLER( upd3301_vrtc_r )
-{
-	pc8001_state *state = device->machine().driver_data<pc8001_state>();
-	return state->m_crtc->vrtc_r();
-}
 
 static INPUT_PORTS_START( pc8001 )
 	PORT_START("KEY0")
@@ -307,27 +285,20 @@ static INPUT_PORTS_START( pc8001 )
 
 	PORT_START("DSW1")
 
-	PORT_START("W10")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE(UPD1990A_TAG, upd1990a_c0_w)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE(UPD1990A_TAG, upd1990a_c1_w)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE(UPD1990A_TAG, upd1990a_c2_w)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE(UPD1990A_TAG, upd1990a_data_in_w)
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
 	PORT_START("R40")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(CENTRONICS_TAG, centronics_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(CENTRONICS_TAG, centronics_ack_r)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) // CMT CDIN
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) // EXP /EXTON
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(UPD1990A_TAG, upd1990a_data_out_r)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(UPD3301_TAG, upd3301_vrtc_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(UPD1990A_TAG, upd1990a_device, data_out_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(UPD3301_TAG, upd3301_device, vrtc_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("W40")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE(CENTRONICS_TAG, centronics_strobe_w)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE(UPD1990A_TAG, upd1990a_stb_w)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE(UPD1990A_TAG, upd1990a_clk_w)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER(UPD1990A_TAG, upd1990a_device, stb_w)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER(UPD1990A_TAG, upd1990a_device, clk_w)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) // CRT /CLDS CLK
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE(SPEAKER_TAG, speaker_level_w)

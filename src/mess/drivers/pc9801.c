@@ -1573,13 +1573,6 @@ static INPUT_CHANGED( shift_stroke )
 		state->m_keyb_press = 0;
 }
 
-READ_LINE_DEVICE_HANDLER( upd1990a_data_out_pc9801_r )
-{
-	pc9801_state *state = device->machine().driver_data<pc9801_state>();
-
-	return state->m_rtc->data_out_r();
-}
-
 static INPUT_PORTS_START( pc9801 )
 	PORT_START("KEY0") // 0x00 - 0x07
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_UNUSED)
@@ -1742,7 +1735,7 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(" un 7-8") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x7f) //PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 
 	PORT_START("DSW1")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH,IPT_SPECIAL) PORT_READ_LINE_DEVICE("upd1990a", upd1990a_data_out_pc9801_r)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH,IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("upd1990a", upd1990a_device, data_out_r)
 	PORT_DIPNAME( 0x0002, 0x0000, "DSW1" ) // error beep if OFF
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
