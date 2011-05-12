@@ -291,6 +291,28 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 
+	<software name="easycalca" cloneof="easycalc">
+		<description>Easy Calc Result (Alt)</description>
+		<year>1985</year>
+		<publisher>Handic Software</publisher>
+		<!--
+		-->
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="easy_calc_result" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="ecrblk" size="0x2000" crc="f617bec4" sha1="c5ef2418cf9dba3e14f586d5d6997f271b521a24" offset="0x0000" />
+			</dataarea>
+			
+			<dataarea name="romh" size="0x4000">
+				<rom name="ecrblu" size="0x2000" crc="db0b4295" sha1="557769a9b8b6d6f71d8450d55d669b8cbf499c4b" offset="0x0000" />
+				<rom name="ecrgrn" size="0x2000" crc="ca7917c0" sha1="2b54658dcec78e365ace3d61cac26b82568fa03a" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="sshelp64">
 		<description>Stack Super Help 64</description>
 		<year>19??</year>
@@ -535,6 +557,193 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
+	<software name="capture2" supported="no">
+		<description>Capture 2</description>
+		<year>1987</year>
+		<publisher>J. Ranheim</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="capture2" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+			
+			<dataarea name="roml" size="0x2000">
+				<rom name="capture 2 (usa, europe) (program).bin" size="0x2000" crc="f25640c4" sha1="ebfa440401aebf3d09a43995dd87999d2982cb6a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+		
+	<software name="expert" supported="no">
+		<description>The Expert Cartridge</description>
+		<year>198?</year>
+		<publisher>Trilogic</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="expert" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="1" />
+			
+			<dataarea name="roml" size="0x2000">
+				<rom name="expert.bin" size="0x2000" crc="f4162c86" sha1="5d0efb42aaa9002ea70facc1b3050ce6041455b7" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="utility.d64" size="174848" crc="72d827a9" sha1="96cb8fc0f5c7f3fbfbcece2a09c08c6a751617c2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="expert21.d64" size="174848" crc="3281c3bb" sha1="cd34b8a2e6980f6e7ea068b37a5c0e32a7920610" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="expert27.d64" size="174848" crc="e49c6a5b" sha1="7eaf7c0399221f7c7628310b351f06a1db79ed9e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="expert29.d64" size="174848" crc="df734252" sha1="9f0c95692a4b8d0ec39aadd754a175be2803a4fc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="euc29.d64" size="174848" crc="0068933c" sha1="7cdc43f7fca6ad02f67f169c05d961bde5e5d4ed" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="expert32.d64" size="174848" crc="460b6c0d" sha1="414f37425a328f48b842ad48b7159cdd5b509379" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="ex32.d64" size="174848" crc="5c4526ba" sha1="43f69cfc6f6f31cfc5bd56886e40d598ab98e87e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="ex32u.d64" size="174848" crc="495d0046" sha1="71dfdd8bdd56a2ab2e4207fe654935909c4402fb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass" interface="cass">
+			<dataarea name="side1" size="91001">
+				<rom name="demo.t64" size="91001" crc="cdea83a9" sha1="6a6ca1916ae9082e47ab364dcabc1d17cb7f3041" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ieee488" supported="no">
+		<description>IEEE-488</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ieee488" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+			
+			<dataarea name="roml" size="0x2000">
+				<rom name="ieee488.bin" size="0x1000" crc="e894e448" sha1="c62b88b73d79b485ebb250d56065dfa54b8baf4c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="magicvce" supported="no">
+		<description>Magic Voice</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="magic_voice" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="1" />
+			
+			<dataarea name="roml" size="0x4000">
+				<rom name="251476" size="0x4000" crc="c741fa77" sha1="2044028d42def60df79b8ab57d005721b41190fa" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="spdsaver" supported="no">
+		<description>Speedsaver $C000 (Netherlands)</description>
+		<year>1984</year>
+		<publisher>KCS Dordrecht</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="speedsaver_c000" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+			
+			<dataarea name="roml" size="0x2000">
+				<rom name="speedsaver.c000.bin" size="0x1000" crc="a4dfd70d" sha1="5ec699e70dc8aa3c52f8167f1d22f9be61d78f44" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="spdsavrc" supported="no">
+		<description>Speedsaver Combi</description>
+		<year>1984</year>
+		<publisher>KCS Dordrecht</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="speedsaver_combi" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+			
+			<dataarea name="roml" size="0x2000">
+				<rom name="speedsaver.combi.bin" size="0x2000" crc="74567cd6" sha1="8ac3899514307ff469a0f117d6017fa84a9346c0" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="superexp" supported="no">
+		<description>Super Expander 64</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="super_expander_64" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+			
+			<dataarea name="roml" size="0x2000">
+				<rom name="superexpander64.bin" size="0x2000" crc="41aa1b1e" sha1="67c36dec74154838f0a029785fbaa5ee22d4a1f1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="sprexp50">
+		<description>Super Explode! v5.0</description>
+		<year>1989</year>
+		<publisher>The Soft Group</publisher>
+		<!--
+		Bankswitch register at $DF00, then executes code from the I/O2 area:
+		
+		0193: lda  #$80
+		0195: sta  $DF00
+		0198: jsr  $DF15
+		-->
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="super_explode" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+			
+			<dataarea name="roml" size="0x4000">
+				<rom name="superexplode.bin" size="0x4000" crc="365cca2c" sha1="79b3a5b44978bfb4c1a2cae9083db770b0beffa7" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="vidmate" supported="no">
+		<description>Video Mate</description>
+		<year>1992</year>
+		<publisher>The Soft Group</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="video_mate" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+			
+			<dataarea name="roml" size="0x4000">
+				<rom name="videomate.bin" size="0x4000" crc="f7a18c23" sha1="08784738026ec1525d45d5c9b4ee029fbcf6bc37" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<!-- Games Added by k1w1 -->
 	
 	<software name="advcrtor">
@@ -560,6 +769,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
 				<rom name="adventure series - viking raider (1984)(interphase).80" size="0x4000" crc="ed963ee9" sha1="d47a46efa1210ae503e16dd711b5235dccd4f70f" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="vikingraider.d64" size="174848" crc="f3489d8f" sha1="1b85f123d9bab8c2cb7168f5d019427e79073530" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -662,8 +876,8 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="mtntcmls">
-		<description>Attack of the Mutant Camels</description>
+	<software name="aotmc">
+		<description>Gridrunner II: Attack of the Mutant Camels</description>
 		<year>1983</year>
 		<publisher>HesWare</publisher>
 		<info name="serial" value="C518" />
@@ -993,7 +1207,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="decathln">
-		<description>Decathlon</description>
+		<description>The Activision Decathlon</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-004-04" />
@@ -1182,7 +1396,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="4thsarc">
-		<description>The Fourth Sarcophagus</description>
+		<description>Adventure 3: The Fourth Sarcophagus</description>
 		<year>1983</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -1344,7 +1558,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="batlband">
-		<description>Halftime Battlin' Bands</description>
+		<description>Halftime Battlin' Bands featuring... the Jazz Scats!</description>
 		<year>1984</year>
 		<publisher>CBS Software</publisher>
 		<info name="developer" value="The Dovetail Group" />
@@ -1778,7 +1992,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="madness">
-		<description>Movie Musical Madness</description>
+		<description>Movie Musical Madness starring the Jazz Scats</description>
 		<year>1984</year>
 		<publisher>CBS Software</publisher>		
 		<info name="developer" value="The Dovetail Group" />
@@ -1793,7 +2007,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="mrcool">
-		<description>Mr Cool</description>
+		<description>Mr. Cool</description>
 		<year>1983</year>
 		<publisher>Sierra On-Line</publisher>
 		<part name="cart" interface="c64_cart">
@@ -1806,7 +2020,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="mrtnt">
-		<description>Mr TNT</description>
+		<description>Mr. TNT</description>
 		<year>1984</year>
 		<publisher>HesWare</publisher>
 		<info name="serial" value="C350" />
@@ -1820,7 +2034,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="mspacman">
-		<description>Ms Pac-Man</description>
+		<description>Ms. Pac-Man</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<part name="cart" interface="c64_cart">
@@ -1833,7 +2047,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="mspiders">
-		<description>The Mutant Spiders</description>
+		<description>Adventure 1: The Mutant Spiders</description>
 		<year>1983</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -1873,7 +2087,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="nbrtmblr">
-		<description>Number Tumbler</description>
+		<description>Number Tumblers</description>
 		<year>1984</year>
 		<publisher>Fisher-Price</publisher>
 		<info name="serial" value="NTB-C6" />
@@ -1944,7 +2158,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="pancho">
-		<description>Pancho</description>
+		<description>Pancho (France)</description>
 		<year>1984</year>
 		<publisher>Romox</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2283,6 +2497,21 @@ http://www.retroport.de/C64_C128_Hardware.html
 				<rom name="rechtschreiblowe, der - fit in rechtschreibung - 3.-4. schuljahr (1983)(commodore)(ger).80" size="0x4000" crc="8cda713b" sha1="ea28884bf4965a7fabc8b965e1ef6b75a85ea7cd" offset="0x0000" />
 			</dataarea>
 		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="teil1.d64" size="174848" crc="cb06a7dd" sha1="76ee0ed5b25cd0a0c9e98f12171da1a3eb7c6208" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="teil2.d64" size="174848" crc="3e279184" sha1="6857c1570baf89fd76c29ab6533969ffd2768c64" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="teil3.d64" size="174848" crc="41a40ecb" sha1="18266141101dacb2f3a41b9daf834d854efe4084" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 	
 	<software name="retrobal">
@@ -2406,7 +2635,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="seahorse">
-		<description>Seahorse Hide 'n Seek</description>
+		<description>Seahorse Hide'n Seek</description>
 		<year>1984</year>
 		<publisher>CBS Software</publisher>
 		<info name="developer" value="Joyce Hakansson Associates" />
@@ -2434,7 +2663,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="letter">
-		<description>Sesame Street Letter-Go-Round</description>
+		<description>Sesame Street: Letter-Go-Round</description>
 		<year>1984</year>
 		<publisher>CBS Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2782,7 +3011,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="tylrdngn">
-		<description>Tyler's Dungeon</description>
+		<description>Tyler's Dungeons</description>
 		<year>1984</year>
 		<publisher>Turbo Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -2808,7 +3037,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="upnaddem">
-		<description>Up 'n Add'em</description>
+		<description>Up'n Add'em</description>
 		<year>1984</year>
 		<publisher>Fisher-Price</publisher>
 		<info name="developer" value="Childware" />
@@ -3144,6 +3373,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 				<rom name="calc result (1983)(handic software).80" size="0x2000" crc="18fb50c0" sha1="d5a1c81357d4867e5179dec617a8eaff8f8dc38b" offset="0x0000" />
 			</dataarea>
 		</part>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="calc_result.d64" size="174848" crc="ed84c27b" sha1="b5d6169e4e42701ee4ddef17dbc1049754642a19" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 	
 	<software name="c64stat">
@@ -3213,7 +3447,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="delas4">
-		<description>Dela S4 Modul</description>
+		<description>Dela S-4-Modul</description>
 		<year>19??</year>
 		<publisher>Dela Elektronik</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3332,7 +3566,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="finadv">
-		<description>Financial Adviser</description>
+		<description>The Financial Advisor</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3345,7 +3579,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="formatm" supported="no">
-		<description>Format und Hardcopy Module (Germany)</description>
+		<description>Format- und Hardcopymodul (Germany)</description>
 		<year>19??</year>
 		<publisher>Rex Datentechnik</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3465,7 +3699,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="hypra3">
-		<description>Hypra Disk II Modul v3.0 (Germany)</description>
+		<description>Hypra-Disk-Modul II v3.0 (Germany)</description>
 		<year>19??</year>
 		<publisher>Rex Datentechnik</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3590,7 +3824,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="teledata">
-		<description>Teledata (Swe)</description>
+		<description>Teledata (Sweden)</description>
 		<year>1983</year>
 		<publisher>Handic Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3617,7 +3851,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="tool64">
-		<description>Tool-64</description>
+		<description>The Tool-64</description>
 		<year>1983</year>
 		<publisher>Micro Application</publisher>
 		<part name="cart" interface="c64_cart">

@@ -1569,6 +1569,30 @@ static void load_simons_basic_cartridge(device_image_interface &image)
 	install_io1_handler(simons_basic_bank_w);
 }
 
+static READ8_HANDLER( super_explode_r )
+{
+	c64_state *state = space->machine().driver_data<c64_state>();
+
+	return state->m_roml[0x1f00 | offset];
+}
+
+static WRITE8_HANDLER( super_explode_bank_w )
+{
+	map_cartridge_roml(space->machine(), BIT(data, 7) * 0x2000);
+}
+
+static void load_super_explode_cartridge(device_image_interface &image)
+{
+	load_cartridge_region(image, "roml", 0x0000, 0x4000);
+
+	map_cartridge_roml(image.device().machine(), 0x0000);
+
+	address_space *space = image.device().machine().firstcpu->memory().space(AS_PROGRAM);
+	space->install_legacy_read_handler(0xdf00, 0xdfff, FUNC(super_explode_r));
+
+	install_io2_handler(super_explode_bank_w);
+}
+
 static void c64_software_list_cartridge_load(device_image_interface &image)
 {
 	c64_state *state = image.device().machine().driver_data<c64_state>();
@@ -1621,6 +1645,9 @@ static void c64_software_list_cartridge_load(device_image_interface &image)
 
 		else if (!strcmp(cart_type, "simons_basic"))
 			load_simons_basic_cartridge(image);
+
+		else if (!strcmp(cart_type, "super_explode"))
+			load_super_explode_cartridge(image);
 
 		else
 			load_standard_c64_cartridge(image);
