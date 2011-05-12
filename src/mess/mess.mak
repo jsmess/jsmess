@@ -507,8 +507,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_DRIVERS)/amiga.o		\
 	$(MAME_DRIVERS)/a3000.o		\
 	$(MAME_DRIVERS)/ami1200.o	\
-	$(MAME_DRIVERS)/msx.o		\
-	$(MAME_MACHINE)/msx_slot.o	\
 	$(MAME_MACHINE)/msx.o		\
 	$(MAME_MACHINE)/ataricrt.o	\
 	$(MAME_MACHINE)/atarifdc.o	\
@@ -667,6 +665,10 @@ $(MESSOBJ)/arcadia.a:			\
 	$(MESS_DRIVERS)/arcadia.o	\
 	$(MESS_AUDIO)/arcadia.o		\
 	$(MESS_VIDEO)/arcadia.o		\
+
+$(MESSOBJ)/ascii.a:                     \
+	$(MESS_DRIVERS)/msx.o		\
+	$(MESS_MACHINE)/msx_slot.o	\
 
 $(MESSOBJ)/at.a:				\
 	$(MESS_MACHINE)/at_keybc.o	\
