@@ -4,7 +4,7 @@
     MESS Driver By:
 
     Gordon Jefferyes
-    mess_bbc@gjeffery.dircon.co.uk
+    mess_bbc@romvault.com
 
 ******************************************************************************/
 

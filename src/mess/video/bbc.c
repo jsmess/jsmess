@@ -4,7 +4,7 @@
     MESS Driver By:
 
     Gordon Jefferyes
-    mess_bbc@gjeffery.dircon.co.uk
+    mess_bbc@romvault.com
 
 ******************************************************************************/
 
@@ -12,18 +12,51 @@
 #include "includes/bbc.h"
 #include "video/m6845.h"
 #include "saa505x.h"
+#include "video/mc6845.h"
 
+static MC6845_UPDATE_ROW( vid_update_row );
+static WRITE_LINE_DEVICE_HANDLER( vid_hsync_changed );
+static WRITE_LINE_DEVICE_HANDLER( vid_vsync_changed );
 
 static void BBC_draw_hi_res(running_machine &machine);
 static void BBC_draw_teletext(running_machine &machine);
 
+const mc6845_interface bbc_mc6845_intf =
+{
+	"screen",						/* screen number */
+	8,								/* numbers of pixels per video memory address */
+	NULL,							/* begin_update */
+	vid_update_row,					/* update_row */
+	NULL,							/* end_update */
+	DEVCB_NULL,						/* on_de_changed */
+	DEVCB_NULL,						/* on_cur_changed */
+	DEVCB_LINE(vid_hsync_changed),	/* on_hsync_changed */
+	DEVCB_LINE(vid_vsync_changed),	/* on_vsync_changed */
+	NULL
+};
+
+static MC6845_UPDATE_ROW( vid_update_row )
+{
+	int x_pos;
+	int pixelno;
+	for(x_pos=0; x_pos<x_count; x_pos++)
+	{
+		for(pixelno=0; pixelno<8; pixelno++)
+		{
+			*BITMAP_ADDR16(bitmap, y, (x_pos*8)+pixelno)=2;
+		}
+	}
+}
+static WRITE_LINE_DEVICE_HANDLER( vid_hsync_changed )
+{
+}
+
+static WRITE_LINE_DEVICE_HANDLER( vid_vsync_changed )
+{
+}
 
 
 /************************************************************************
- * video memory lookup arrays.
- * this is a set of quick lookup arrays that stores the logic for the following:
- * the array to be used is selected by the output from bits 4 and 5 (C0 and C1) on IC32 74LS259
- * which is controlled by the system VIA.
  * C0 and C1 along with MA12 output from the 6845 drive 4 NAND gates in ICs 27,36 and 40
  * the outputs from these NAND gates (B1 to B4) along with MA8 to MA11 from the 6845 (A1 to B4) are added together
  * in IC39 74LS283 4 bit adder to form (S1 to S4) the logic is used to loop the screen memory for hardware scrolling.
@@ -42,7 +75,6 @@ unsigned int calculate_video_address(bbc_state *state,int ma)
 {
 	// ma = output from IC2 6845 MA address
 
-
 	int c0=state->m_b4_video0; // output from IC32 74LS259 bits 4 and 5
 	int c1=state->m_b5_video1;
 
@@ -55,32 +87,34 @@ unsigned int calculate_video_address(bbc_state *state,int ma)
 
     // 4 bit input B on IC39 74LS283 (4 bit adder)
 	/* 3 input NAND part of IC 36 */
-	int b1=(~(c1&c0&ma12))&1;
+	int b1=(~(c1 & c0 & ma12)) & 1;
 	/* 2 input NAND part of IC40 (b3 is calculated before b2 and b4 because b3 feed back into b2 and b4) */
-	int b3=(~(c0&ma12))&1;
+	int b3=(~(c0 & ma12)) & 1;
 	/* 3 input NAND part of IC 36 */
-	int b2=(~(c1&b3&ma12))&1;
+	int b2=(~(c1 & b3 & ma12)) & 1;
 	/* 2 input NAND part of IC 27 */
-	int b4=(~(b3&ma12))&1;
+	int b4=(~(b3 & ma12)) & 1;
+
+	/* inputs port b to IC39 are taken from the NAND gates b1 to b4 */
+	int b=(b1<<0)|(b2<<1)|(b3<<2)|(b4<<3);
 
 	/* inputs port a to IC39 are MA8 to MA11 from the 6845 */
 	int a=(ma>>8)&0xf;
-	/* inputs port b to IC39 are taken from the NAND gates b1 to b4 */
-	int b=(b1<<0)|(b2<<1)|(b3<<2)|(b4<<3);
 
 	/* IC39 performs the 4 bit add with the carry input set high */
 	int s=(a+b+1)&0xf;
 
 	/* if MA13 (TTXVDU) is low then IC8 and IC9 are used to calculate
        the memory location required for the hi res video.
-       if MA13 is hight then IC10 and IC11 are used to calculate the memory location for the teletext chip
-       Note: the RA0,RA1,RA2 inputs to IC8 in high res modes will need to be added else where */
+       if MA13 is hight then IC10 and IC11 are used to calculate the memory location for the teletext chip*/
 	unsigned int m;
 	if ((ma>>13)&1)
 	{
+		// IC 10 and IC 11
 		m=((ma&0x3ff)|0x3c00)|((s&0x8)<<11);
 	} else {
-		m=((ma&0xff)<<3)|(s<<11);
+		// IC 8 and IC 9
+		m=((ma&0xff)<<3)|(s<<11)|(m6845_row_address_r(0)&0x7);
 	}
 	if (state->m_memorySize==16)
 		return  m & 0x3fff;
@@ -90,9 +124,47 @@ unsigned int calculate_video_address(bbc_state *state,int ma)
 
 
 
+
+
+/************************************************************************
+ * Teletext Interface circuits
+ ************************************************************************/
+static void BBC_draw_teletext(running_machine &machine)
+{
+	bbc_state *state = machine.driver_data<bbc_state>();
+
+	//Teletext Latch bits 0 to 5 go to bits 0 to 5 on the Teletext chip
+	//Teletext Latch bit 6 is only passed onto bits 6 on the Teletext chip if DE is true
+	//Teletext Latch bit 7 goes to LOSE on the Teletext chip
+
+	teletext_LOSE_w(state->m_saa505x, 0, (state->m_Teletext_Latch>>7)&1);
+
+	teletext_F1(state->m_saa505x);
+
+	teletext_data_w(state->m_saa505x, 0, (state->m_Teletext_Latch&0x3f)|((state->m_Teletext_Latch&0x40)|(m6845_display_enabled_r(0)?0:0x40)));
+
+	int meml=m6845_memory_address_r(0);
+
+	if (((meml>>13)&1)==0)
+	{
+		state->m_Teletext_Latch=0;
+	} else {
+		state->m_Teletext_Latch=(state->m_BBC_Video_RAM[calculate_video_address(state,meml)]&0x7f)|(m6845_display_enabled_r(0)?0x80:0);
+	}
+
+}
+/************************************************************************
+ * VideoULA
+ ************************************************************************/
+
+static const int pixels_per_byte_set[8]={ 2,4,8,16,1,2,4,8 };
+
+static const int emulation_pixels_per_real_pixel_set[4]={ 8,4,2,1 };
+
+static const int width_of_cursor_set[8]={ 0,0,1,2,1,0,2,4 };
+
 /* this is a quick lookup array that puts bits 0,2,4,6 into bits 0,1,2,3
    this is used by the pallette lookup in the video ULA */
-
 static void set_pixel_lookup(bbc_state *state)
 {
 	int i;
@@ -102,80 +174,18 @@ static void set_pixel_lookup(bbc_state *state)
 	}
 }
 
-/************************************************************************
- * Outputs from the 6845
- ************************************************************************/
-
-
-
-
-/************************************************************************
- * Teletext Interface circuits
- ************************************************************************/
-
-
-
-static void BBC_draw_teletext(running_machine &machine)
-{
-	bbc_state *state = machine.driver_data<bbc_state>();
-
-	//Teletext Latch bits 0 to 5 go to bits 0 to 5 on the Teletext chip
-	//Teletext Latch bit 6 is only passed onto bits 6 on the Teletext chip if DE is true
-	//Teletext Latch bit 7 goes to LOSE on the Teletext chip
-
-	int meml;
-
-	teletext_LOSE_w(state->m_saa505x, 0, (state->m_Teletext_Latch>>7)&1);
-
-	teletext_F1(state->m_saa505x);
-
-	teletext_data_w(state->m_saa505x, 0, (state->m_Teletext_Latch&0x3f)|((state->m_Teletext_Latch&0x40)|(state->m_BBC_DE?0:0x40)));
-
-	meml=m6845_memory_address_r(0);
-
-	if (((meml>>13)&1)==0)
-	{
-		state->m_Teletext_Latch=0;
-	} else {
-		state->m_Teletext_Latch=(state->m_BBC_Video_RAM[calculate_video_address(state,meml)]&0x7f)|state->m_Teletext_Latch_Input_D7;
-	}
-
-}
-/************************************************************************
- * VideoULA
- ************************************************************************/
-
-
-
-
-static const int pixels_per_byte_set[8]={ 2,4,8,16,1,2,4,8 };
-
-static const int emulation_pixels_per_real_pixel_set[4]={ 8,4,2,1 };
-
-
-static const int width_of_cursor_set[8]={ 0,0,1,2,1,0,2,4 };
-
-
-// this is the pixel position of the start of a scanline
-// -96 sets the screen display to the middle of emulated screen.
-
-
-
 
 WRITE8_HANDLER ( bbc_videoULA_w )
 {
 	bbc_state *state = space->machine().driver_data<bbc_state>();
 
-	int tpal,tcol,vpos;
-
 	// Make sure vpos is never <0 2008-10-11 PHS.
-	vpos=space->machine().primary_screen->vpos();
+	int vpos=space->machine().primary_screen->vpos();
 	if(vpos==0)
 	  space->machine().primary_screen->update_partial(vpos);
 	else
 	  space->machine().primary_screen->update_partial(vpos -1 );
 
-//  logerror("setting videoULA %s at %.4x size:%.4x\n",image_filename(image), addr, size);
 	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,space->machine().primary_screen->vpos() );
 
 
@@ -218,8 +228,8 @@ WRITE8_HANDLER ( bbc_videoULA_w )
 		break;
 	// Set a pallet register in the Video ULA
 	case 1:
-		tpal=(data>>4)&0x0f;
-		tcol=data&0x0f;
+		int tpal=(data>>4)&0x0f;
+		int tcol=data&0x0f;
 		state->m_videoULA_pallet0[tpal]=tcol^7;
 		state->m_videoULA_pallet1[tpal]=tcol<8?tcol^7:tcol;
 		break;
@@ -278,12 +288,13 @@ static void BBC_draw_hi_res(running_machine &machine)
 	unsigned char i=0;
 	int sc1;
 
-	if (state->m_VideoULA_DE)
+	// this is IC38 and IC41 takes 6845 DisplayEnabled and 6845 RA3
+	int DE=m6845_display_enabled_r(0) && (!(m6845_row_address_r(0)&8));
+
+	if (DE)
 	{
-
 		// read the memory location for the next screen location.
-
-		meml=calculate_video_address(state,m6845_memory_address_r(0))|(state->m_BBC_Character_Row&0x7);
+		meml=calculate_video_address(state,m6845_memory_address_r(0));
 
 		i=state->m_BBC_Video_RAM[meml];
 
@@ -311,30 +322,10 @@ void bbc_draw_RGB_in(device_t *device, int offset,int data)
 
 
 
-
-
-
 /************************************************************************
  * BBC circuits controlled by 6845 Outputs
  ************************************************************************/
 
-static void BBC_Set_VideoULA_DE(bbc_state *state)
-{
-	state->m_VideoULA_DE=(state->m_BBC_DE) && (!(state->m_BBC_Character_Row&8));
-}
-
-static void BBC_Set_Teletext_DE(bbc_state *state)
-{
-	state->m_Teletext_Latch_Input_D7=state->m_BBC_DE?0x80:0;
-}
-
-// called when the 6845 changes the character row
-static void BBC_Set_Character_Row(running_machine &machine, int offset, int data)
-{
-	bbc_state *state = machine.driver_data<bbc_state>();
-	state->m_BBC_Character_Row=data;
-	BBC_Set_VideoULA_DE(state);
-}
 
 // called when the 6845 changes the HSync
 static void BBC_Set_HSync(running_machine &machine, int offset, int data)
@@ -388,17 +379,6 @@ static void BBC_Set_VSync(running_machine &machine, int offset, int data)
 
 }
 
-// called when the 6845 changes the Display Enabled
-static void BBC_Set_DE(running_machine &machine, int offset, int data)
-{
-	bbc_state *state = machine.driver_data<bbc_state>();
-	state->m_BBC_DE=data;
-	BBC_Set_VideoULA_DE(state);
-	BBC_Set_Teletext_DE(state);
-
-}
-
-
 // called when the 6845 changes the Cursor Enabled
 static void BBC_Set_CRE(running_machine &machine, int offset, int data)
 {
@@ -415,10 +395,10 @@ static void BBC_Set_CRE(running_machine &machine, int offset, int data)
 static const struct m6845_interface BBC6845 =
 {
 	0,// Memory Address register
-	BBC_Set_Character_Row,// Row Address register
+	0,// Row Address register
 	BBC_Set_HSync,// Horizontal status
 	BBC_Set_VSync,// Vertical status
-	BBC_Set_DE,// Display Enabled status
+	0,// Display Enabled status
 	0,// Cursor status
 	BBC_Set_CRE, // Cursor status Emulation
 };
@@ -433,6 +413,18 @@ static const struct m6845_interface BBC6845 =
 
 WRITE8_HANDLER ( bbc_6845_w )
 {
+	/*device_t *mc6845 = space->machine().device("mc6845");
+	switch(offset & 1)
+	{
+		case 0 :
+			mc6845_address_w(mc6845,0,data);
+			break;
+		case 1 :
+			mc6845_register_w(mc6845,0,data);
+			break;
+	}
+	return;*/
+
 	switch (offset&1)
 	{
 		case 0:
@@ -447,6 +439,16 @@ WRITE8_HANDLER ( bbc_6845_w )
 
  READ8_HANDLER (bbc_6845_r)
 {
+
+	/*device_t *mc6845 = space->machine().device("mc6845");
+
+	switch (offset&1)
+	{
+		case 0: return mc6845_status_r(mc6845,0); break;
+		case 1: return mc6845_register_r(mc6845,0); break;
+	}
+	return 0;*/
+
 	int retval=0;
 
 	switch (offset&1)
@@ -471,6 +473,14 @@ WRITE8_HANDLER ( bbc_6845_w )
 
 SCREEN_UPDATE( bbc )
 {
+
+	//device_t *devconf = screen->machine().device("mc6845");
+	//mc6845_update( devconf, bitmap, cliprect);
+
+ //   return 0;
+
+
+
 	bbc_state *state = screen->machine().driver_data<bbc_state>();
 	long c;
 
@@ -542,7 +552,6 @@ static void common_init(running_machine &machine, int memorySize)
 	state->m_x_screen_offset = -96;
 	state->m_y_screen_offset = -8;
 
-	state->m_VideoULA_DE = 0;
 	state->m_VideoULA_CR = 7;
 	state->m_VideoULA_CR_counter = 0;
 

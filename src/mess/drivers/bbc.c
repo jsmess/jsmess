@@ -6,7 +6,7 @@
     MESS Driver By:
 
     Gordon Jefferyes
-    mess_bbc@gjeffery.dircon.co.uk
+	mess_bbc@romvault.com
 
 ******************************************************************************/
 
@@ -809,6 +809,8 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(bbc)
 	MCFG_SAA505X_VIDEO_ADD("saa505x", bbc_saa505x_intf)
+
+//    MCFG_MC6845_ADD("mc6845",MC6845,2000000, bbc_mc6845_intf)
 
 	MCFG_VIDEO_START(bbca)
 

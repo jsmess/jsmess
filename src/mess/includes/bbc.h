@@ -4,7 +4,7 @@
  *
  * BBC Model B
  *
- * Driver by Gordon Jefferyes <mess_bbc@gjeffery.dircon.co.uk>
+ * Driver by Gordon Jefferyes <mess_bbc@romvault.com>
  *
  ****************************************************************************/
 
@@ -16,7 +16,7 @@
 #include "machine/i8271.h"
 #include "machine/wd17xx.h"
 #include "machine/upd7002.h"
-
+#include "video/mc6845.h"
 
 class bbc_state : public driver_device
 {
@@ -176,12 +176,11 @@ public:
 	unsigned char m_pixel_bits[256];
 	int m_BBC_HSync;
 	int m_BBC_VSync;
-	int m_BBC_Character_Row;
-	int m_BBC_DE;
 	device_t *m_saa505x;
-	int m_Teletext_Latch_Input_D7;
+
+
+
 	int m_Teletext_Latch;
-	int m_VideoULA_DE;
 	int m_VideoULA_CR;
 	int m_VideoULA_CR_counter;
 	int m_videoULA_Reg;
@@ -191,21 +190,34 @@ public:
 	int m_videoULA_characters_per_line;
 	int m_videoULA_teletext_normal_select;
 	int m_videoULA_flash_colour_select;
+	
+	
+	
 	int m_pixels_per_byte;
 	int m_emulation_pixels_per_real_pixel;
 	int m_emulation_pixels_per_byte;
+	
 	int m_emulation_cursor_size;
 	int m_cursor_state;
+	
 	int m_videoULA_pallet0[16];
 	int m_videoULA_pallet1[16];
 	int *m_videoULA_pallet_lookup;
+
+	// this is the pixel position of the start of a scanline
+	// -96 sets the screen display to the middle of emulated screen.
 	int m_x_screen_offset;
 	int m_y_screen_offset;
+	
 	void (*m_draw_function)(running_machine &machine);
 };
 
 
 /*----------- defined in machine/bbc.c -----------*/
+
+
+extern const mc6845_interface bbc_mc6845_intf;
+
 
 extern const via6522_interface bbcb_system_via;
 extern const via6522_interface bbcb_user_via;
@@ -235,7 +247,6 @@ WRITE8_HANDLER ( bbc_page_selectb_w );
 
 
 WRITE8_HANDLER ( bbc_memorybp1_w );
-//READ8_HANDLER  ( bbc_memorybp2_r );
 WRITE8_HANDLER ( bbc_memorybp2_w );
 WRITE8_HANDLER ( bbc_memorybp4_w );
 WRITE8_HANDLER ( bbc_memorybp4_128_w );
@@ -244,7 +255,6 @@ WRITE8_HANDLER ( bbc_page_selectbp_w );
 
 
 WRITE8_HANDLER ( bbc_memorybm1_w );
-//READ8_HANDLER  ( bbc_memorybm2_r );
 WRITE8_HANDLER ( bbc_memorybm2_w );
 WRITE8_HANDLER ( bbc_memorybm4_w );
 WRITE8_HANDLER ( bbc_memorybm5_w );
@@ -254,8 +264,6 @@ WRITE8_HANDLER ( bbcm_w );
 READ8_HANDLER  ( bbcm_ACCCON_read );
 WRITE8_HANDLER ( bbcm_ACCCON_write );
 
-
-//WRITE8_HANDLER ( bbc_bank4_w );
 
 /* disc support */
 
