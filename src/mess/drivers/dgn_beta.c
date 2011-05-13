@@ -47,6 +47,8 @@ documentation still exists.
 #include "imagedev/flopdrv.h"
 #include "devices/coco_vhd.h"
 #include "machine/ram.h"
+#include "video/mc6845.h"
+
 
 /*
  Colour codes are as below acording to os-9 headers, however the presise values
@@ -154,7 +156,8 @@ static ADDRESS_MAP_START( dgnbeta_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xFC20, 0xFC23)	AM_DEVREADWRITE_MODERN(PIA_0_TAG, pia6821_device, read, write)
 	AM_RANGE(0xFC24, 0xFC27)	AM_DEVREADWRITE_MODERN(PIA_1_TAG, pia6821_device, read, write)
 	AM_RANGE(0xFC28, 0xfC7F)	AM_NOP
-	AM_RANGE(0xfc80, 0xfc81)	AM_READWRITE(dgnbeta_6845_r	,dgnbeta_6845_w)
+	AM_RANGE(0xfc80, 0xfc80)    AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0xfc81, 0xfc81)    AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)	
 	AM_RANGE(0xfc82, 0xfC9F)	AM_NOP
 	AM_RANGE(0xFCA0, 0xFCA3)	AM_READNOP AM_WRITE(dgnbeta_colour_ram_w)		    /* 4x4bit colour ram for graphics modes */
 	AM_RANGE(0xFCC0, 0xFCC3)	AM_DEVREADWRITE_MODERN(PIA_2_TAG, pia6821_device, read, write)
@@ -347,6 +350,8 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	MCFG_WD179X_ADD(FDC_TAG, dgnbeta_wd17xx_interface )
 
 	MCFG_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_config)
+	
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, dgnbeta_crtc6845_interface) 	
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

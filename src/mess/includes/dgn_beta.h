@@ -7,6 +7,7 @@
 #ifndef DGN_BETA_H_
 #define DGN_BETA_H_
 
+#include "video/mc6845.h"
 #include "machine/wd17xx.h"
 #include "machine/6821pia.h"
 
@@ -84,7 +85,9 @@ class dgn_beta_state : public driver_device
 {
 public:
 	dgn_beta_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_mc6845(*this, "crtc")
+		{ }
 
 	UINT8 *m_videoram;
 	UINT8 *m_system_rom;
@@ -137,6 +140,8 @@ public:
 	int m_ColourRAM[4];
 	int m_Field;
 	int m_DrawInterlace;
+	
+	required_device<device_t> m_mc6845;
 };
 
 
@@ -162,16 +167,12 @@ void dgn_beta_frame_interrupt (running_machine &machine, int data);
 /*----------- defined in video/dgn_beta.c -----------*/
 
 /* mc6845 video display generator */
-void dgnbeta_init_video(running_machine &machine);
-void dgnbeta_video_reset(running_machine &machine);
 extern SCREEN_UPDATE( dgnbeta );
 void dgnbeta_vid_set_gctrl(running_machine &machine, int data);
 
 /* 74HC670 4x4bit colour ram */
 WRITE8_HANDLER(dgnbeta_colour_ram_w);
 
-READ8_HANDLER(dgnbeta_6845_r);
-WRITE8_HANDLER(dgnbeta_6845_w);
-
+extern const mc6845_interface dgnbeta_crtc6845_interface;
 
 #endif /* DGN_BETA_H_ */

@@ -1101,7 +1101,6 @@ static void dgnbeta_reset(running_machine &machine)
 
 	state->m_videoram = ram_get_ptr(machine.device(RAM_TAG));		/* Point video ram at the start of physical ram */
 
-    dgnbeta_video_reset(machine);
     wd17xx_reset(fdc);
     state->m_wd2797_written=0;
 }
@@ -1110,8 +1109,6 @@ MACHINE_START( dgnbeta )
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	logerror("MACHINE_START( dgnbeta )\n");
-
-    dgnbeta_init_video(machine);
 
 	if (machine.device<cpu_device>(MAINCPU_TAG)->debug()) {
 		machine.device<cpu_device>(MAINCPU_TAG)->debug()->set_dasm_override(dgnbeta_dasm_override);
