@@ -884,6 +884,19 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
+	<software name="amaze">
+		<description>Amazing Maze</description>
+		<year>1983</year>
+		<publisher>Mr. Computer</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="amazing maze (1983)(mr. computer).80" size="0x2000" crc="0115017e" sha1="7671aaae276e50c537f3ccf8ea91bfed71692452" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="acricket">
 		<description>Arnie Armchairs Howzat Cricket Game</description>
 		<year>1984</year>
@@ -990,6 +1003,19 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
 				<rom name="big bird&apos;s special delivery (1984)(cbs software).80" size="0x4000" crc="d2fcb282" sha1="5ba4be39f46004beec0b65a2f2128b5bc0d4ecf2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="blockhop">
+		<description>Block Hopper</description>
+		<year>1983</year>
+		<publisher>Fantasy Soft</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="block hopper (1983)(fantasy soft).80" size="0x4000" crc="78a39290" sha1="ec68464dd01498317ca14c80c4139b6ceec492b7" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1215,13 +1241,14 @@ http://www.retroport.de/C64_C128_Hardware.html
 	<software name="dncfntsy">
 		<description>Dance Fantasy</description>
 		<year>1984</year>
-		<publisher>CBS Software</publisher>
+		<publisher>Fisher-Price</publisher>
+		<info name="developer" value="WCI Labs" />
 		<info name="serial" value="DCF-C6" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="dance fantasy (1984)(cbs software).80" size="0x2000" crc="0add70d0" sha1="92a686f4cc8cde367648c1f9decc40866d0aa613" offset="0x0000" />
+				<rom name="dance fantasy (1984)(fisher price).80" size="0x2000" crc="0add70d0" sha1="92a686f4cc8cde367648c1f9decc40866d0aa613" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1230,7 +1257,6 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<description>Dancing Feats</description>
 		<year>1983</year>
 		<publisher>Romox</publisher>
-		<info name="developer" value="WCI Labs" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -1309,12 +1335,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 	<software name="dnkykong">
 		<description>Donkey Kong</description>
 		<year>1983</year>
-		<publisher>Nintendo</publisher>
+		<publisher>Atarisoft</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="donkey kong (1983)(nintendo).80" size="0x4000" crc="0f10ee9f" sha1="9392ec70548a73c9e027591eb0fe5358618eeb1b" offset="0x0000" />
+				<rom name="donkey kong (1983)(atarisoft).80" size="0x4000" crc="0f10ee9f" sha1="9392ec70548a73c9e027591eb0fe5358618eeb1b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3209,6 +3235,497 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>		
+	
+	<software name="afterwar">
+	<!-- Requires "Dinamic" cartridge hardware -->
+		<description>After The War</description>
+		<year>1990</year>
+		<publisher>Dinamic Software</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="after the war (1990)(dinamic).80" size="0x20000" crc="2f060e57" sha1="a43d134afcdf323b8508fb6cbd976f79626a1f1c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aspargp">
+	<!-- Requires "Dinamic" cartridge hardware -->
+		<description>Aspar GTP Master</description>
+		<year>1989</year>
+		<publisher>Dinamic Software</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="aspar gp master (1989)(dinamic software) .80" size="0x20000" crc="95791415" sha1="4ad046b9e89c58d5e28c8f6a9fced2f2ff098443" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcade">
+	<!-- Requires "Magic Desk, Domark, HES Australia" cartridge hardware -->
+		<description>Arcade Classic Pak</description>
+		<year>1984</year>
+		<publisher>HES Australia</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="arcade classic pak (1984) (hes australia).80" size="0x10000" crc="6ca49853" sha1="a666a60cd420c5a92eedcd5f2033eb80b839e88d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="badlands">
+		<description>Badlands</description>
+		<year>1990</year>
+		<publisher>Domark</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="badlands (1990)(domark).80" size="0x10000" crc="9a925fa1" sha1="f245d21afd77f9ed8175d5de9126f5ba1528ba87" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batman">
+		<description>Batman: The Movie</description>
+		<year>1989</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="batman - the movie (1989)(ocean).80" size="0x20000" crc="6dbd768d" sha1="c74aaeb5b7f92eee7a8e8e2bb6091516d62adf21" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="battlcmd">
+		<description>Battle Command</description>
+		<year>1991</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="battle command (1991)(ocean).80" size="0x20000" crc="17755bb7" sha1="e3bbfc7b6759d749d9731e88ff2e6f844ab58aa0" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+		
+	<software name="c64gscrt">
+	<!-- Requires "C64 Game System, System 3" cartridge hardware -->
+		<description>Commodore 64 Game System Cartridge</description>
+		<!-- This cartridge came packaged with the C64 Game System. -->
+		<year>1990</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x80000">
+				<rom name="commodore 64 game system (1990)(commodore).80" size="0x80000" crc="7f018fd9" sha1="9b8481051c067fa028f81fd6a79e2edd30ca0371" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="cybrball">
+		<description>Cyberball: Football in the 21st Century</description>
+		<year>1990</year>
+		<publisher>Domark</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="cyberball - football in the 21st century (1990)(domark).80" size="0x20000" crc="3b395125" sha1="dedaa36c9524b46340b2dd496f9267f4623a17e7" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="dbldrgn">
+		<description>Double Dragon</description>
+		<year>1991</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="double dragon (1991)(ocean).80" size="0x20000" crc="8a6f28de" sha1="4004f4f7e27d4c54590fc5c0b404936914507c78" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="dbldrgm" cloneof="dbldrgn">
+	<!-- Requires "Magic Desk, Domark, HES Australia" cartridge hardware -->
+		<description>Double Dragon (Alt)</description>
+		<year>1989</year>
+		<publisher>Melbourne House</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="double dragon (1989)(melbourne house).80" size="0x20000" crc="c6768215" sha1="28a71db9115a342c5853df499d25dd5a7a0cf6c2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="fortapoc">
+		<description>Fort Apocalypse (Pirate)</description>
+		<year>1982</year>
+		<publisher>Synapse</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="fort apocalypse (1982)(synapse)[pirate].80" size="0x4000" crc="72699f23" sha1="dd83317c27d57354cffde40fea3002064684ca98" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="funplay">
+	<!-- Requires "Fun Play, Power Play" cartridge hardware -->
+		<description>Fun Play 3-in-1</description>
+		<year>1990</year>
+		<publisher>The Disc Company &amp; Codemasters</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="fun play - 3-in-1 (1990)(the disc company &amp; codemasters).80" size="0x20000" crc="e64a6bb3" sha1="ac5f224fc8ec602632ac8b26670c5fe044a9728d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghostb">
+		<description>Ghostbusters</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="ghostbusters (1984)(activision).80" size="0x8000" crc="f56b3baf" sha1="d7f03289d8a81025aa3f3d9d72fe3ebc849dcdbf" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="kungfu">
+		<description>Kung-Fu Master</description>
+		<year>1985</year>
+		<publisher>Data East</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="kung-fu master (1985)(data east).80" size="0x8000" crc="49244d56" sha1="762e1876bf277e09be80b5a3b648560c4f029a8d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="lstninja">
+	<!-- Requires "C64 Game System, System 3" cartridge hardware -->
+		<description>The Last Ninja Remix</description>
+		<year>1990</year>
+		<publisher>System 3</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x80000">
+				<rom name="last ninja remix, the (1990)(system 3).80" size="0x80000" crc="9e0be015" sha1="dc83c6228e287ae7d7320762c9898da0059fb84a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ldrboard">
+		<description>Leaderboard Golf</description>
+		<year>1986</year>
+		<publisher>Access</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="leaderboard golf (1986)(access).80" size="0x8000" crc="c7b78d7c" sha1="a4d699cfae124817c3fcc51a2578eb2ea380ac7d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="megafun">
+	<!-- Requires "Magic Desk, Domark, HES Australia" cartridge hardware -->
+		<description>Megafun</description>
+		<year>2004</year>
+		<publisher>Entertainment Software</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x80000">
+				<rom name="megafun (2004)(entertainment software).80" size="32768" crc="51836cca" sha1="3d763d4a9bd4b366a411ec797bfda1bb77214147" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="myth">
+	<!-- Requires "C64 Game System, System 3" cartridge hardware -->
+		<description>Myth: History in the Making</description>
+		<year>1990</year>
+		<publisher>System 3</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x80000">
+				<rom name="myth - history in the making (1990)(system 3).80" size="0x80000" crc="15197217" sha1="9a621b0c76d32765387fca990924be73b98bedea" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="narco">
+	<!-- Requires "Dinamic" cartridge hardware -->
+		<description>Narco Police</description>
+		<year>19??</year>
+		<publisher>Dinamic Software</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="narco police (19xx)(dinamic software).80" size="0x20000" crc="2913e971" sha1="f2fdfa3fae140dd88d8505aa9467d42921345bcc" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="navyseal">
+		<description>Navy SEALs</description>
+		<year>1990</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="navy seals (1990)(ocean).80" size="0x20000" crc="e9b35896" sha1="0ccab1900df683d7f467fed49f92e98f03c3e393" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="pang">
+		<description>Pang</description>
+		<year>1991</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="pang (1991)(ocean).80" size="0x20000" crc="2c06b009" sha1="879f85bdcfd115599f18ee7e4718aae9d1e4ba8b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="parkptrl">
+	<!-- Requires "Magic Desk, Domark, HES Australia" cartridge hardware -->
+		<description>Park Patrol</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="park patrol (1984)(activision).80" size="0x8000" crc="25ba6582" sha1="35f5c4dbdc01f6ebfd438009ee7d607be3af86cd" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwrplay">
+	<!-- Requires "Fun Play, Power Play" cartridge hardware -->
+		<description>PowerPlay</description>
+		<year>1990</year>
+		<publisher>The Disc Company &amp; Codemasters</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="power play (1990)(the disc company &amp; microprose).80" size="0x20000" crc="0fb42a34" sha1="48a8112b575e9b267af96d1157d3274317dc4049" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robocop2">
+		<description>Robocop 2</description>
+		<year>1990</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x40000">
+				<rom name="robocop 2 (1990)(ocean).80" size="0x40000" crc="e1e8b732" sha1="0f356283b8e4372e0e81474ba658ca229a18d99e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robocop3">
+		<description>Robocop 3</description>
+		<year>1992</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="robocop 3 (1992)(ocean software).80" size="0x20000" crc="ed9a36df" sha1="a15178958bd8c0503edd6caa631feb7b4b386fda" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="satan">
+	<!-- Requires "Dinamic" cartridge hardware -->
+		<description>Satan</description>
+		<year>1990</year>
+		<publisher>Dinamic Software</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="satan (1990)(dinamic software).80" size="0x20000" crc="2412a3bc" sha1="32f269247413dd73a4dc9efa29c21a2d5c910020" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beast">
+		<description>Shadow of the Beast</description>
+		<year>1990</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x40000">
+				<rom name="shadow of the beast (1990)(ocean).80" size="0x40000" crc="a68dff98" sha1="86eb8c113adc2a13d236c738c4ac44d9a2f1de68" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacegun">
+		<description>Space Gun</description>
+		<year>1992</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x40000">
+				<rom name="space gun (1992)(ocean).80" size="0x40000" crc="1a815540" sha1="b9d41f4d2b0d94f53a809d4177a1dbb662a25aac" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="szaxxon">
+	<!-- Requires "Zaxxon, Super Zaxxon (SEGA)" cartridge hardware -->
+		<description>Super Zaxxon</description>
+		<year>1984</year>
+		<publisher>HesWare</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x5000">
+				<rom name="super zaxxon (1984)(hesware).80" size="0x5000" crc="376296d6" sha1="6435bca29b333ed90b0a2a6b7d92b6bc565863f1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="term2">
+		<description>Terminator 2 (Multicart)</description>
+		<year>1991</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x80000">
+				<rom name="terminator 2 multicart (1991)(-).80" size="0x80000" crc="c0114678" sha1="bde34a5aa004b66cab4be9d770629f795c1d5644" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toki">
+		<description>Toki</description>
+		<year>1991</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="toki (1991)(ocean).80" size="0x20000" crc="1f148c97" sha1="123cd6768de4c4406e1026c41c9ba441d42fe966" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennis">
+	<!-- Requires "Magic Desk, Domark, HES Australia" cartridge hardware -->
+		<description>Tournament Tennis</description>
+		<year>1984</year>
+		<publisher>Imagic</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="tournament tennis (1984)(imagic).80" size="0x8000" crc="ff4bed62" sha1="5d03f693ef82e067324dcf23d446fff83868d043" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vindicat">
+		<description>Vindicators</description>
+		<year>1990</year>
+		<publisher>Domark</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="vindicators (1990)(domark).80" size="0x10000" crc="86f69114" sha1="455c43cfba50af7ecf277cd77dbdd9d11fad72d2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wondrboy">
+		<description>Wonderboy</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ocean" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="wonderboy (1987)(activision).80" size="0x10000" crc="9de80450" sha1="5e5599a7fde0e290ab1f9f2e28e11103570833f1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaxxon">
+	<!-- Requires "Zaxxon, Super Zaxxon (SEGA)" cartridge hardware -->
+		<description>Zaxxon</description>
+		<year>1984</year>
+		<publisher>Synapse</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x5000">
+				<rom name="zaxxon (1984)(synapse).80" size="0x5000" crc="bf43637f" sha1="1685d49a535e3f9f38a2a769b9cfd3aff98d6cfa" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
 		
 	<!-- Applications Added by k1w1 -->
 	
@@ -3761,16 +4278,16 @@ http://www.retroport.de/C64_C128_Hardware.html
 	<software name="pwrcart" supported="no">
 		<description>Power Cartridge</description>
 		<year>1985</year>
-		<publisher>KCS</publisher>
+		<publisher>KCS Dordecht</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="cart_type" value="kcs_power_cartridge" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="power cartridge (1985)(kcs).80" size="0x2000" crc="614df199" sha1="95cb3a44a686210e3c267fc7bcd91e4d85a7a1b7" offset="0x0000" />
+				<rom name="power cartridge (1985)(kcs dordecht).80" size="0x2000" crc="614df199" sha1="95cb3a44a686210e3c267fc7bcd91e4d85a7a1b7" offset="0x0000" />
 			</dataarea>
 			<dataarea name="romh" size="0x2000">
-				<rom name="power cartridge (1985)(kcs).a0" size="0x2000" crc="4cfdd91d" sha1="ea4b8da879ff3f97b3c4a4ffecfe0a26d257ccad" offset="0x0000" />
+				<rom name="power cartridge (1985)(kcs dordecht).a0" size="0x2000" crc="4cfdd91d" sha1="ea4b8da879ff3f97b3c4a4ffecfe0a26d257ccad" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
