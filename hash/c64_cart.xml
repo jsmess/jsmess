@@ -522,7 +522,8 @@ http://www.retroport.de/C64_C128_Hardware.html
 		|=|                         |
 		|===========================|
 
-		ROM0,1 - 28-pin ROM (markings scratched off)
+		ROM0,1 - 28-pin ROM (Toshiba TC531000 pinout, markings scratched off)
+		bankswitch latch @ I/O1: D3-D0 = A16-A13
 		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="cart_type" value="ocean" />
