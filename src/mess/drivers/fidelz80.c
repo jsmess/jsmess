@@ -8,7 +8,6 @@
 *  TODO:
 *  * Figure out why it says the first speech line twice; it shouldn't. (It sometimes does this on the sensory chess challenger real hardware)
 *  * Get rom locations from pcb (done for UVC, VCC is probably similar)
-*  * Add sensory chess challenger roms/memmap to driver, similar hardware.
 *  * correctly hook up VBC/ABC speech so that the z80 is halted while words are being spoken
 *  * VSC doesn't accept input from row 9 (the buttons beside the display)
 *
@@ -427,7 +426,7 @@ All three of the above are called "segment H".
 
 
 ***********************************************************************
-Sensory Chess Challenger (needs adding to driver)
+Sensory Chess Challenger
 ------------------------
 
 The display/button/LED/speech technology is identical to the above product.
@@ -593,7 +592,7 @@ expect that the software reads these once on startup only.
 /* Devices */
 
 /******************************************************************************
-    I8255 Device
+    I8255 Device, for VCC/UVC
 ******************************************************************************/
 
 void fidelz80_state::update_display(running_machine &machine)
@@ -605,13 +604,13 @@ void fidelz80_state::update_display(running_machine &machine)
 	{
 		output_set_digit_value(0, out_digit);
 
-		output_set_led_value(1, m_led_selected & 0x01);
+		output_set_led_value(1, m_led_data & 0x01);
 	}
 	if (m_led_selected&0x08)
 	{
 		output_set_digit_value(1, out_digit);
 
-		output_set_led_value(0, m_led_selected & 0x01);
+		output_set_led_value(0, m_led_data & 0x01);
 	}
 	if (m_led_selected&0x10)
 	{
@@ -627,20 +626,21 @@ READ8_MEMBER( fidelz80_state::fidelz80_portc_r )
 {
 	UINT8 data = 0xff;
 
-	switch (m_kp_matrix & 0xf0)
+	if (!(m_kp_matrix&0x10))
 	{
-		case 0xe0:
-			data = input_port_read(machine(), "LINE1");
-			break;
-		case 0xd0:
-			data = input_port_read(machine(), "LINE2");
-			break;
-		case 0xb0:
-			data = input_port_read(machine(), "LINE3");
-			break;
-		case 0x70:
-			data = input_port_read(machine(), "LINE4");
-			break;
+		data &= input_port_read(machine(), "LINE1");
+	}
+	if (!(m_kp_matrix&0x20))
+	{
+		data &= input_port_read(machine(), "LINE2");
+	}
+	if (!(m_kp_matrix&0x40))
+	{
+		data &= input_port_read(machine(), "LINE3");
+	}
+	if (!(m_kp_matrix&0x80))
+	{
+		data &= input_port_read(machine(), "LINE4");
 	}
 
 	return data;
@@ -650,8 +650,7 @@ WRITE8_MEMBER( fidelz80_state::fidelz80_portb_w )
 {
 	if (!(data & 0x80))
 	{
-		if (data&0x1) // common for two leds
-			m_led_data = (data&0xc);
+		m_led_data = (data&0x01);	// common for two leds
 
 		m_led_selected = data;
 
@@ -677,32 +676,18 @@ WRITE8_MEMBER( fidelz80_state::cc10_porta_w )
 
 READ8_MEMBER( fidelz80_state::vcc_portb_r )
 {
-	if (s14001a_bsy_r(m_speech) != 0)
-		return 0x80;
-	else
-		return 0x00;
+	return (s14001a_bsy_r(m_speech) != 0) ? 0x80 : 0x00;
 }
 
 WRITE8_MEMBER( fidelz80_state::vcc_porta_w )
 {
 	s14001a_set_volume(m_speech, 15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
 	s14001a_reg_w(m_speech, data & 0x3f);
-	s14001a_rst_w(m_speech, (data & 0x80)>>7);
+	s14001a_rst_w(m_speech, BIT(data, 7));
 
-	if (!(data & 0x80))
-	{
-		m_digit_data = data;
+	m_digit_data = data;
 
-		update_display(machine());
-	}
-}
-
-WRITE8_MEMBER( fidelz80_state::abc_speech_w )
-{
-	// todo: HALT THE z80 here, and set up a callback to poll the s14001a DONE line to resume z80
-	s14001a_set_volume(m_speech, 15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
-	s14001a_reg_w(m_speech, data & 0x3f);
-	s14001a_rst_w(m_speech, (data & 0x80)>>7);
+	update_display(machine());
 }
 
 static I8255_INTERFACE( cc10_ppi8255_intf )
@@ -781,7 +766,7 @@ WRITE8_MEMBER( fidelz80_state::vsc_portb_w )
 
 WRITE8_MEMBER( fidelz80_state::vsc_portc_w )
 {
-	m_kp_matrix = data;
+	m_kp_matrix = (m_kp_matrix & 0x100) | data;
 }
 
 static I8255_INTERFACE( vsc_ppi8255_intf )
@@ -1024,11 +1009,20 @@ READ8_MEMBER(fidelz80_state::mcu_status_r)
 	return upi41_master_r(m_i8041, 1);
 }
 
+WRITE8_MEMBER( fidelz80_state::abc_speech_w )
+{
+	// todo: HALT THE z80 here, and set up a callback to poll the s14001a DONE line to resume z80
+	s14001a_set_volume(m_speech, 15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
+	s14001a_reg_w(m_speech, data & 0x3f);
+	s14001a_rst_w(m_speech, BIT(data, 7));
+}
+
 void fidelz80_state::machine_reset()
 {
 	m_led_selected = 0;
 	m_kp_matrix = 0;
 	m_digit_data = 0;
+	m_led_data = 0;
 	memset(m_digit_line_status, 0, ARRAY_LENGTH(m_digit_line_status));
 }
 
@@ -1131,26 +1125,26 @@ static INPUT_PORTS_START( fidelz80 )
 	PORT_START("LINE1")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED(fidelz80_trigger_reset, 0)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_V)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_A)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_E)
 
 	PORT_START("LINE2")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CB") PORT_CODE(KEYCODE_C)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("DM") PORT_CODE(KEYCODE_D)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("B2") PORT_CODE(KEYCODE_2)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CB") PORT_CODE(KEYCODE_Z)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("DM") PORT_CODE(KEYCODE_M)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("B2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_B)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F)
 
 	PORT_START("LINE3")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_L)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_B)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("C3") PORT_CODE(KEYCODE_3)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("G7") PORT_CODE(KEYCODE_7)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL)
+		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_P)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("C3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_C)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("G7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_G)
 
 	PORT_START("LINE4")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_E)
+		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_ENTER)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_O)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8)
+		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_D)
+		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_H)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vsc )
