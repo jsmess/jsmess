@@ -351,7 +351,7 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 
 	MCFG_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_config)
 	
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, dgnbeta_crtc6845_interface) 	
+	MCFG_MC6845_ADD("crtc", HD6845, XTAL_12_288MHz / 16, dgnbeta_crtc6845_interface) 	//XTAL is guessed
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

@@ -107,8 +107,7 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 		UINT8 *chr_gen = device->machine().region("gfx1")->base();
 		for ( i = 0; i < x_count; i++ )
 		{
-			UINT16 offset = ( (( ma + i ) << 1 ) | ((state->m_GCtrl & GCtrlAddrLines)<<8));
-
+			UINT32 offset = ( ( ma + i ) | ((state->m_GCtrl & GCtrlAddrLines)<<8)) << 1;
 			UINT8 chr = videoram[ offset ];
 			UINT8 attr = videoram[ offset +1 ];
 
@@ -174,7 +173,7 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 	{
 		for ( i = 0; i < x_count; i++ )
 		{
-			UINT16 offset = ((((ma + i ) & 0x1FFF) << 3) | (ra & 0x07)) << 1;
+			UINT32 offset = ((((ma + i ) & 0x1FFF) << 3) | (ra & 0x07)) << 1;
 		
 			UINT8 Lo = videoram[ offset ];
 			UINT8 Hi = videoram[ offset +1 ];
