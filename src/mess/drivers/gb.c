@@ -364,6 +364,11 @@ Status: not supported yet.
 
 Momotarou Collection 2:
 
+MOMOTARODENGEKI2, 0x00000, blocks 0x00 - 0x1F
+0x147: 01 04 00 00 33 00
+MOMOTAROU GAIDEN, 0x80000, blocks 0x20 - 0x3F
+0x147: 06 03 00 00 18 00
+
 When picking top option:
 3FFF <- 20
 5FFF <- 40
