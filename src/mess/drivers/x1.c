@@ -1377,9 +1377,6 @@ static WRITE8_HANDLER( x1_6845_w )
 	{
 		state->m_crtc_vreg[state->m_crtc_index] = data;
 		mc6845_register_w(space->machine().device("crtc"), 0,data);
-
-		/* double pump the pixel clock if we are in 640 x 200 mode */
-		mc6845_set_clock(space->machine().device("crtc"), (space->machine().primary_screen->width() < 640) ? VDP_CLOCK/48 : VDP_CLOCK/24);
 	}
 }
 
@@ -1929,7 +1926,7 @@ static READ8_DEVICE_HANDLER( x1_portc_r )
 	//printf("PPI Port C read\n");
 	/*
     x--- ---- Printer port output
-    -x-- ---- 320 mode (r/w)
+    -x-- ---- 320 mode (r/w), divider for the pixel clock
     --x- ---- i/o mode (r/w)
     ---x ---- smooth scroll enabled (?)
     ---- ---x cassette output data
@@ -1951,6 +1948,9 @@ static WRITE8_DEVICE_HANDLER( x1_portc_w )
 {
 	x1_state *state = device->machine().driver_data<x1_state>();
 	state->m_hres_320 = data & 0x40;
+
+	/* set up the pixel clock according to the above divider */
+	mc6845_set_clock(device->machine().device("crtc"), VDP_CLOCK/((state->m_hres_320) ? 48 : 24));
 
 	if(((data & 0x20) == 0) && (state->m_io_switch & 0x20))
 		state->m_io_bank_mode = 1;
