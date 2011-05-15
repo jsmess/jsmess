@@ -2012,8 +2012,9 @@ ROM_START( ibmpcjr )
 ROM_END
 
 ROM_START( ibmpcjx )
-	ROM_REGION(0x100000,"maincpu", 0)
+	ROM_REGION(0x100000,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("5601jda.bin", 0xf0000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6))
+    ROM_LOAD("basic.rom",   0xe8000, 0x08000, NO_DUMP ) // boot fails due of this.
 
 	ROM_REGION(0x08100,"gfx1", 0) //TODO: needs a different charset
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card
