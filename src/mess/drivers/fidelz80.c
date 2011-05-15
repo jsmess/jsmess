@@ -9,7 +9,6 @@
 *  * Figure out why it says the first speech line twice; it shouldn't. (It sometimes does this on the sensory chess challenger real hardware)
 *  * Get rom locations from pcb (done for UVC, VCC is probably similar)
 *  * correctly hook up VBC/ABC speech so that the z80 is halted while words are being spoken
-*  * VSC doesn't accept input from row 9 (the buttons beside the display)
 *
 ***********************************************************************
 
@@ -766,7 +765,7 @@ WRITE8_MEMBER( fidelz80_state::vsc_portb_w )
 
 WRITE8_MEMBER( fidelz80_state::vsc_portc_w )
 {
-	m_kp_matrix = (m_kp_matrix & 0x100) | data;
+	m_kp_matrix = (m_kp_matrix & 0x300) | data;
 }
 
 static I8255_INTERFACE( vsc_ppi8255_intf )
@@ -805,6 +804,8 @@ READ8_MEMBER( fidelz80_state::vsc_pio_porta_r )
 		data |= (input_port_read(machine(), "COL_H"));
 	if (m_kp_matrix & 0x100)
 		data |= (input_port_read(machine(), "COL_I"));
+	if (m_kp_matrix & 0x200)
+		data |= (input_port_read(machine(), "COL_L"));
 
 	return data & 0xff;
 }
@@ -812,9 +813,6 @@ READ8_MEMBER( fidelz80_state::vsc_pio_porta_r )
 READ8_MEMBER( fidelz80_state::vsc_pio_portb_r )
 {
 	UINT8 data = 0x00;
-
-	if (input_port_read(machine(), "ROW_9") & m_kp_matrix)
-		data |= 0x02;
 
 	if (s14001a_bsy_r(m_speech) == 0)
 		data |= 0x10;
@@ -824,7 +822,7 @@ READ8_MEMBER( fidelz80_state::vsc_pio_portb_r )
 
 WRITE8_MEMBER( fidelz80_state::vsc_pio_portb_w )
 {
-	m_kp_matrix = (m_kp_matrix & 0xff) | (BIT(data, 0)<<8);
+	m_kp_matrix = (m_kp_matrix & 0xff) | ((data & 0x03)<<8);
 
 	s14001a_set_volume(m_speech, 15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
 	s14001a_rst_w(m_speech, BIT(data, 6));
@@ -1234,13 +1232,13 @@ static INPUT_PORTS_START( vsc )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE")		PORT_CODE(KEYCODE_R)
 
 	//buttons beside the display
-	PORT_START("ROW_9")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Speak")	PORT_CODE(KEYCODE_1_PAD)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RV")		PORT_CODE(KEYCODE_2_PAD)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("TM")		PORT_CODE(KEYCODE_3_PAD)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV")		PORT_CODE(KEYCODE_4_PAD)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM")		PORT_CODE(KEYCODE_5_PAD)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ST")		PORT_CODE(KEYCODE_6_PAD)
+	PORT_START("COL_L")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("TM")		PORT_CODE(KEYCODE_T)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RV")		PORT_CODE(KEYCODE_V)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Speak")	PORT_CODE(KEYCODE_SPACE)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV")		PORT_CODE(KEYCODE_L)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM")		PORT_CODE(KEYCODE_M)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ST")		PORT_CODE(KEYCODE_S)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( abc )
