@@ -340,6 +340,16 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(ibmpcjx_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x80000, 0x9ffff) AM_ROM AM_REGION("kanji",0)
+	AM_IMPORT_FROM( ibmpcjr_map )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(ibmpcjx_io, AS_IO, 8 )
+	AM_IMPORT_FROM( ibmpcjr_io )
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( ppc512_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x80000, 0xbffff) AM_NOP
@@ -1066,6 +1076,19 @@ static const gfx_layout pc_8_charlayout =
 	8*8					/* every char takes 8 bytes */
 };
 
+static const gfx_layout kanji_layout =
+{
+	16, 16,					/* 8 x 8 characters */
+	RGN_FRAC(1,1),					/* 512 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ STEP16(0,1) },
+	/* y offsets */
+	{ STEP16(0,16) },
+	16*16					/* every char takes 8 bytes */
+};
+
 static GFXDECODE_START( ibm5150 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 3, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout, 3, 1 )
@@ -1686,6 +1709,21 @@ static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
 MACHINE_CONFIG_END
 
+static GFXDECODE_START( ibmpcjx )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_8_charlayout, 3, 1 )
+	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 3, 1 )
+GFXDECODE_END
+
+
+static MACHINE_CONFIG_DERIVED( ibmpcjx, ibmpcjr )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ibmpcjx_map)
+	MCFG_CPU_IO_MAP(ibmpcjx_io)
+
+	MCFG_GFXDECODE(ibmpcjx)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_START( iskr1031, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, pc16, I8086, 4772720, pc_frame_interrupt)
@@ -1976,8 +2014,12 @@ ROM_END
 ROM_START( ibmpcjx )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("5601jda.bin", 0xf0000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6))
-	ROM_REGION(0x08100,"gfx1", 0)
-	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card
+
+	ROM_REGION(0x08100,"gfx1", 0) //TODO: needs a different charset
+	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card
+
+	ROM_REGION(0x20000,"kanji", 0)
+	ROM_LOAD("kanji.rom",     0x00000, 0x20000, BAD_DUMP CRC(a313f241) SHA1(c2a4ea7eb38c5ad51e6482abca8f836a2c06e17a)) // hand-made rom
 ROM_END
 
 #ifdef UNUSED_DEFINITION
@@ -2413,7 +2455,7 @@ COMP(  1988,	europc,     ibm5150,	0,	europc, 	europc,		europc,     "Schneider Rd
 
 // pcjr (better graphics, better sound)
 COMP(  1983,	ibmpcjr,    ibm5150,	0,	ibmpcjr,	tandy1t,	pcjr,       "International Business Machines",  "IBM PC Jr", GAME_IMPERFECT_COLORS )
-COMP(  1985,	ibmpcjx,    ibm5150,	0,	ibmpcjr,    tandy1t,	pcjr,       "International Business Machines",  "IBM PC JX", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING)
+COMP(  1985,	ibmpcjx,    ibm5150,	0,	ibmpcjx,    tandy1t,	pcjr,       "International Business Machines",  "IBM PC JX", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING)
 
 // tandy 1000
 COMP(  1987,	t1000hx,    ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000 HX", 0)
