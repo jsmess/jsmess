@@ -47,8 +47,9 @@ SOUNDS += SN76496
 #-------------------------------------------------
 
 DRVLIBS = \
-	$(MESSOBJ)/tiny.o \
+	$(EMUOBJ)/drivers/emudummy.o \
 	$(MESS_DRIVERS)/coleco.o \
+	$(MESS_MACHINE)/coleco.o \
 	$(EMU_VIDEO)/tms9928a.o \
 
 
