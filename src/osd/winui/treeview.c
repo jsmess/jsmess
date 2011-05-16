@@ -338,6 +338,8 @@ BOOL GameFiltered(int nGame, DWORD dwMask)
 	{
 //      if( !( (driver_list::driver(nGame).flags & GAME_IS_BIOS_ROOT ) == 0) )
 //          return TRUE;
+	if( driver_list::driver(nGame).name[0] == '_' )
+		return TRUE;
 	}
 	// Filter games--return TRUE if the game should be HIDDEN in this view
 	if( GetFilterInherit() )
@@ -389,7 +391,7 @@ BOOL GameFiltered(int nGame, DWORD dwMask)
 }
 
 /* Get the parent of game in this view */
-BOOL GetParentFound(int nGame)
+BOOL GetParentFound(int nGame) // not used
 {
 	int nParentIndex = -1;
 	LPTREEFOLDER lpFolder = GetCurrentFolder();
