@@ -799,6 +799,8 @@ static MACHINE_CONFIG_START( c128, c128_state )
 	MCFG_C1571_ADD(C1571_TAG, 8)
 
 	MCFG_FRAGMENT_ADD(c64_cartslot)
+	MCFG_SOFTWARE_LIST_ADD("c64_disk_list", "c64_flop")
+	MCFG_SOFTWARE_LIST_ADD("c128_disk_list", "c128_flop")
 MACHINE_CONFIG_END
 
 

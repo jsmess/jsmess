@@ -737,6 +737,7 @@ static MACHINE_CONFIG_START( c64, c64_state )
 	MCFG_C1541_ADD(C1541_TAG, 8)
 
 	MCFG_FRAGMENT_ADD(c64_cartslot)
+	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( c64pal, c64_state )
@@ -791,6 +792,7 @@ static MACHINE_CONFIG_START( c64pal, c64_state )
 #endif
 
 	MCFG_FRAGMENT_ADD(c64_cartslot)
+	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ultimax, c64 )

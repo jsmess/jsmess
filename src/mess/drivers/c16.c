@@ -496,6 +496,7 @@ static MACHINE_CONFIG_START( c16, c16_state )
 	MCFG_CASSETTE_ADD( "cassette", cbm_cassette_config )
 
 	MCFG_FRAGMENT_ADD(c16_cartslot)
+	MCFG_SOFTWARE_LIST_ADD("disk_list", "plus4_flop")
 
 	/* IEC serial bus */
 	MCFG_CBM_IEC_ADD(c16_iec_no_drives)
