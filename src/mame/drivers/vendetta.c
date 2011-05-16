@@ -89,6 +89,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/konicdev.h"
+#include "machine/k053252.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "machine/eeprom.h"
 #include "sound/2151intf.h"
@@ -452,6 +453,16 @@ static const k053247_interface esckids_k053246_intf =
 	vendetta_sprite_callback
 };
 
+static const k053252_interface esckids_k053252_intf =
+{
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	12*8, 1*8
+};
+
 static MACHINE_START( vendetta )
 {
 	vendetta_state *state = machine.driver_data<vendetta_state>();
@@ -560,7 +571,7 @@ static MACHINE_CONFIG_DERIVED( esckids, vendetta )
 	MCFG_K052109_ADD("k052109", esckids_k052109_intf)
 	MCFG_DEVICE_REMOVE("k053246")
 	MCFG_K053246_ADD("k053246", esckids_k053246_intf)
-	MCFG_K053252_ADD("k053252")
+	MCFG_K053252_ADD("k053252", 6000000, esckids_k053252_intf)
 MACHINE_CONFIG_END
 
 

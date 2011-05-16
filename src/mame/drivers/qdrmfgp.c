@@ -25,6 +25,7 @@ GP1 HDD data contents:
 #include "machine/idectrl.h"
 #include "sound/k054539.h"
 #include "video/konicdev.h"
+#include "machine/k053252.h"
 #include "machine/nvram.h"
 #include "includes/qdrmfgp.h"
 
@@ -280,7 +281,7 @@ static INTERRUPT_GEN(qdrmfgp_interrupt)
 		case 1:
 			/* trigger V-blank interrupt */
 			if (state->m_control & 0x0004)
-				device_set_input_line(device, 3, HOLD_LINE);
+				device_set_input_line(device, 3, ASSERT_LINE);
 			break;
 	}
 }
@@ -303,7 +304,7 @@ static TIMER_CALLBACK( gp2_timer_callback )
 {
 	qdrmfgp_state *state = machine.driver_data<qdrmfgp_state>();
 	if (state->m_control & 0x0004)
-		cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN(qdrmfgp2_interrupt)
@@ -311,7 +312,7 @@ static INTERRUPT_GEN(qdrmfgp2_interrupt)
 	qdrmfgp_state *state = device->machine().driver_data<qdrmfgp_state>();
 	/* trigger V-blank interrupt */
 	if (state->m_control & 0x0008)
-		device_set_input_line(device, 4, HOLD_LINE);
+		device_set_input_line(device, 4, ASSERT_LINE);
 }
 
 static void gp2_ide_interrupt(device_t *device, int state)
@@ -369,7 +370,7 @@ static ADDRESS_MAP_START( qdrmfgp2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")	/* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k056832", k056832_word_w)										/* video reg */
-	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252", k053252_r, k053252_w,0x00ff)					/* ccu */
+	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252", k053252_r, k053252_w,0xff00)					/* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")											/* battery power & service */
 	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("340000")											/* inputport */
 	AM_RANGE(0x350000, 0x350001) AM_WRITENOP													/* unknown */
@@ -611,6 +612,36 @@ static const k056832_interface qdrmfgp2_k056832_intf =
 	qdrmfgp2_tile_callback, "none"
 };
 
+static WRITE_LINE_DEVICE_HANDLER( qdrmfgp_irq3_ack_w )
+{
+	cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_3, CLEAR_LINE);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( qdrmfgp_irq4_ack_w )
+{
+	cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE);
+}
+
+static const k053252_interface qdrmfgp_k053252_intf =
+{
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(qdrmfgp_irq3_ack_w),
+	DEVCB_NULL,
+	40, 16
+};
+
+static const k053252_interface qdrmfgp2_k053252_intf =
+{
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(qdrmfgp_irq4_ack_w),
+	DEVCB_LINE(qdrmfgp_irq3_ack_w),
+	40, 16
+};
+
 static MACHINE_START( qdrmfgp )
 {
 	qdrmfgp_state *state = machine.driver_data<qdrmfgp_state>();
@@ -671,7 +702,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_VIDEO_START(qdrmfgp)
 
 	MCFG_K056832_ADD("k056832", qdrmfgp_k056832_intf)
-	MCFG_K053252_ADD("k053252")
+	MCFG_K053252_ADD("k053252", 32000000/4, qdrmfgp_k053252_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -709,7 +740,7 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	MCFG_VIDEO_START(qdrmfgp2)
 
 	MCFG_K056832_ADD("k056832", qdrmfgp2_k056832_intf)
-	MCFG_K053252_ADD("k053252")
+	MCFG_K053252_ADD("k053252", 32000000/4, qdrmfgp2_k053252_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

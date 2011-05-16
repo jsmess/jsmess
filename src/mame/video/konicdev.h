@@ -185,7 +185,6 @@ DECLARE_LEGACY_DEVICE(K056832, k056832);
 DECLARE_LEGACY_DEVICE(K055555, k055555);
 DECLARE_LEGACY_DEVICE(K054338, k054338);
 DECLARE_LEGACY_DEVICE(K053250, k053250);
-DECLARE_LEGACY_DEVICE(K053252, k053252);
 DECLARE_LEGACY_DEVICE(K001006, k001006);
 DECLARE_LEGACY_DEVICE(K001005, k001005);
 DECLARE_LEGACY_DEVICE(K001604, k001604);
@@ -266,9 +265,6 @@ DECLARE_LEGACY_DEVICE(K037122, k037122);
 #define MCFG_K053250_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K053250, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
-
-#define MCFG_K053252_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, K053252, 0)
 
 
 #define MCFG_K001006_ADD(_tag, _interface) \
@@ -745,13 +741,6 @@ READ16_DEVICE_HANDLER( k053250_rom_r );
 
 void k053250_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int colorbase, int flags, int pri);
 void k053250_dma(device_t *device, int limiter);
-
-
-/**  Konami 053252  **/
-/* CRT and interrupt control unit */
-READ8_DEVICE_HANDLER( k053252_r );	// CCU registers
-WRITE8_DEVICE_HANDLER( k053252_w );
-
 
 /**  Konami 001006  **/
 UINT32 k001006_get_palette(device_t *device, int index);

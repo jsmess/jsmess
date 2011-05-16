@@ -22,6 +22,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/konicdev.h"
+#include "machine/k053252.h"
 #include "machine/eeprom.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
@@ -345,6 +346,17 @@ static const k053250_interface overdriv_k053250_intf_2 =
 	0, 0 //TODO
 };
 
+static const k053252_interface overdriv_k053252_intf =
+{
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	13*8, 2*8
+};
+
+
 static MACHINE_CONFIG_START( overdriv, overdriv_state )
 
 	/* basic machine hardware */
@@ -390,7 +402,7 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	MCFG_K053251_ADD("k053251")
 	MCFG_K053250_ADD("k053250_1", overdriv_k053250_intf_1)
 	MCFG_K053250_ADD("k053250_2", overdriv_k053250_intf_2)
-	MCFG_K053252_ADD("k053252")
+	MCFG_K053252_ADD("k053252", 24000000/4, overdriv_k053252_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

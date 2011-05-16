@@ -13,6 +13,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/konicdev.h"
+#include "machine/k053252.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "sound/3812intf.h"
 #include "sound/k053260.h"
@@ -234,6 +235,21 @@ static const k051316_interface rollerg_k051316_intf =
 	rollerg_zoom_callback
 };
 
+static WRITE_LINE_DEVICE_HANDLER( rollerg_irq_ack_w )
+{
+	cputag_set_input_line(device->machine(), "maincpu", 0, CLEAR_LINE);
+}
+
+static const k053252_interface rollerg_k053252_intf =
+{
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(rollerg_irq_ack_w),
+	DEVCB_NULL,
+	14*8, 2*8
+};
+
 static MACHINE_START( rollerg )
 {
 	rollerg_state *state = machine.driver_data<rollerg_state>();
@@ -266,7 +282,7 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)		/* ? */
 	MCFG_CPU_PROGRAM_MAP(rollerg_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(rollerg_sound_map)
@@ -291,7 +307,7 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 
 	MCFG_K053244_ADD("k053244", rollerg_k05324x_intf)
 	MCFG_K051316_ADD("k051316", rollerg_k051316_intf)
-	MCFG_K053252_ADD("k053252")
+	MCFG_K053252_ADD("k053252", 3000000*2, rollerg_k053252_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

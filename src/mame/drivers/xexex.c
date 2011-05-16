@@ -61,6 +61,7 @@ Unresolved Issues:
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "video/konicdev.h"
+#include "machine/k053252.h"
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
 #include "sound/k054539.h"
@@ -338,7 +339,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0c8000, 0x0c800f) AM_DEVREADWRITE("k053250", k053250_r, k053250_w)
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE("k054338", k054338_word_w)				// CLTC
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("k053251", k053251_lsb_w)				// priority encoder
-	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_r,k053252_w,0x00ff)				// CCU
+//	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_r,k053252_w,0x00ff)				// CCU
 	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
@@ -362,7 +363,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVREAD("k053246", k053246_reg_word_r)
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVREAD("k054338", k054338_word_r)
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVREAD("k053251", k053251_lsb_r)
-	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREAD("k053252", k053252_word_r)
 	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVREAD("k056832", k056832_b_word_r)
 #endif
 
@@ -455,6 +455,16 @@ static const k053247_interface xexex_k053246_intf =
 	xexex_sprite_callback
 };
 
+static const k053252_interface xexex_k053252_intf =
+{
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	0, 0
+};
+
 static void xexex_postload(running_machine &machine)
 {
 	parse_control2(machine);
@@ -522,7 +532,7 @@ static MACHINE_RESET( xexex )
 static MACHINE_CONFIG_START( xexex, xexex_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)	// 16MHz (32MHz xtal)
+	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)	// 16MHz (32MHz xtal)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_HACK(xexex_interrupt,2)
 
@@ -558,7 +568,7 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_K053246_ADD("k053246", xexex_k053246_intf)
 	MCFG_K053250_ADD("k053250", xexex_k053250_intf)
 	MCFG_K053251_ADD("k053251")
-	MCFG_K053252_ADD("k053252")
+	MCFG_K053252_ADD("k053252", 32000000/4, xexex_k053252_intf)
 	MCFG_K054338_ADD("k054338", xexex_k054338_intf)
 
 	/* sound hardware */
