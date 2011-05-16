@@ -1665,11 +1665,34 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64???" />
+		<!--
+		ASSY 250423
+		FAB 251463
+		A/W 251464 REVA
+		|===========================|
+		|=|                         |
+		|=|                         |
+		|=|       ROM1              |
+		|=|                         |
+		|=|                         |
+		|=|       ROM0              |
+		|=|                         |
+		|=|                         |
+		|===========================|
+
+		ROM0  - MOS 2532 8Kx8 ROM "317017-01 (C) 1983 CBM" @ U1
+		ROM1  - GI 9464C-0837 8Kx8 ROM "317018-01 (C) 1983 CBM" @ U2
+		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
-			<dataarea name="roml" size="0x4000">
-				<rom name="international soccer (1983)(commodore).80" size="0x4000" crc="a26355f9" sha1="44ea6e08a044eeda556512fcab0bb6a4ab123862" offset="0x0000" />
+			<feature name="exrom" value="0" />
+			
+			<dataarea name="roml" size="0x2000">
+				<rom name="317017-01.u1" size="0x2000" crc="4639431d" sha1="983c91a88dea4d0f05b6ff69ed7692b2651cb3fa" offset="0x0000" />
+			</dataarea>
+			
+			<dataarea name="romh" size="0x2000">
+				<rom name="317018-01.u2" size="0x2000" crc="c98d99bf" sha1="aeb865b3e8bcd76b5526c847c77278f94232d380" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1679,11 +1702,34 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64???" />
+		<!--
+		ASSY 250423
+		FAB 251463
+		A/W 251464 REVA
+		|===========================|
+		|=|                         |
+		|=|                         |
+		|=|       ROM1              |
+		|=|                         |
+		|=|                         |
+		|=|       ROM0              |
+		|=|                         |
+		|=|                         |
+		|===========================|
+
+		ROM0  - MOS 2532 8Kx8 ROM "317038-01 (C) 1983 CBM" @ U1
+		ROM1  - MOS 2532 8Kx8 ROM "317039-01 (C) 1983 CBM" @ U2
+		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
-			<dataarea name="roml" size="0x4000">
-				<rom name="jack attack (1983)(commodore).80" size="0x4000" crc="2f526b59" sha1="e0f8f23b6d9943d915d7e52e29e96fc6df529b9b" offset="0x0000" />
+			<feature name="exrom" value="0" />
+			
+			<dataarea name="roml" size="0x2000">
+				<rom name="317038-01.u1" size="0x2000" crc="63e6daf6" sha1="deff113bed94119880643ba34966527d9fc55909" offset="0x0000" />
+			</dataarea>
+			
+			<dataarea name="romh" size="0x2000">
+				<rom name="317039-01.u2" size="0x2000" crc="50797bbd" sha1="2c2c9eb4fed9b7df2f8c21198f2f3db0cef526a1" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2098,11 +2144,33 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<description>Ms. Pac-Man</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
+		<!--
+		GI-633-1
+		KB145B/2
+		|=============|
+		|=|           |
+		|=|           |
+		|=|   ROM1    |
+		|=|           |
+		|=|           |
+		|=|   ROM0    |
+		|=|           |
+		|=|           |
+		|=============|
+
+		ROM0    - GI 9464C-0846 8Kx8 ROM "MSPACMNAU2 (C) ATARI 1983"
+		ROM1    - GI 9464C-0847 8Kx8 ROM "MSPACMNBU1 (C) ATARI 1983"
+		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
-			<dataarea name="roml" size="0x4000">
-				<rom name="ms. pac-man (1983)(atarisoft).80" size="0x4000" crc="a0c98111" sha1="20f299be28e46fd787c158eca1473c608213286a" offset="0x0000" />
+			<feature name="exrom" value="0" />
+			
+			<dataarea name="roml" size="0x2000">
+				<rom name="mspacmnau2" size="0x2000" crc="d43eba17" sha1="28f8fc76197f0043536b008ac480e3bfafb26c00" offset="0x0000" />
+			</dataarea>
+			
+			<dataarea name="romh" size="0x2000">
+				<rom name="mspacmnbu1" size="0x2000" crc="d126526e" sha1="fb1198e97f0a1b84a1e0ebf968c3288f57e9c4ba" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
