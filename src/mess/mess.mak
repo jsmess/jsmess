@@ -496,7 +496,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/smsvdp.o		\
 	$(MAME_MACHINE)/segasms.o	\
 	$(MAME_DRIVERS)/segasms.o	\
-	$(MAME_DRIVERS)/sg1000.o	\
+	$(MESS_DRIVERS)/sg1000.o	\
 	$(MAME_DRIVERS)/saturn.o	\
 	$(MAME_DRIVERS)/cps1.o	\
 	$(MAME_VIDEO)/cps1.o	\

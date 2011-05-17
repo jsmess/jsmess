@@ -81,4 +81,30 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 };
 
+class sf7000_state : public sc3000_state
+{
+public:
+	sf7000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sc3000_state(mconfig, type, tag),
+		  m_fdc(*this, UPD765_TAG),
+		  m_centronics(*this, CENTRONICS_TAG),
+		  m_floppy0(*this, FLOPPY_0)
+	{ }
+
+	required_device<device_t> m_fdc;
+	required_device<device_t> m_centronics;
+	required_device<device_t> m_floppy0;
+
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	DECLARE_READ8_MEMBER( ppi_pa_r );
+	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+
+	/* floppy state */
+	int m_fdc_irq;
+	int m_fdc_index;
+};
+
 #endif
