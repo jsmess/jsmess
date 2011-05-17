@@ -56,10 +56,114 @@
 		</part>
 	</software>
 
+	<software name="viduzzle">
+		<description>Viduzzles</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T116001" />
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="viduzzles-lo" size="0x2000" crc="c9460f9c" sha1="e4929a6880c4e324b6551a5b31ceebf8a7fc4d60" offset="0x0000" />
+				<rom name="viduzzles-hi" size="0x2000" crc="f51a493e" sha1="407f2ed9f1ad91d24c06227899d43e310e8b149d" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<!-- Applications -->
 	
-	<software name="speedfrz" supported="no">
-		<description>Speedy Freeze</description>
+	<software name="calcplus">
+		<description>Calc/Plus</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T112003" />
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="calc-lo" size="0x4000" crc="8a085df6" sha1="2b8c748d7be725a1e4106b9cca167bd85786b809" offset="0x0000" />
+			</dataarea>
+			<dataarea name="c1h" size="0x4000">
+				<rom name="calc-hi" size="0x4000" crc="772803a9" sha1="49810afc29476cc2b2750d96beabd003cffbd5a6" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="c16kbtut">
+		<description>Commodore 16 Keyboard Tutorial</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T113016" />
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="kb-lo" size="0x4000" crc="c999369c" sha1="fea0b7df5ccec5ce05390c650ff5f4ea878bd468" offset="0x0000" />
+			</dataarea>
+			<dataarea name="c1h" size="0x4000">
+				<rom name="kb-hi" size="0x4000" crc="a617e188" sha1="8754ecc8b6ce2652eea4b997fb1f3ff9d3d7c9cb" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="finadvis">
+		<description>Financial Advisor</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T232001" />
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="fa-lo" size="0x2000" crc="e731ad79" sha1="c27048283f6ce2831ded2055eb05316d2842a787" offset="0x0000" />
+				<rom name="fa-hi" size="0x2000" crc="14025361" sha1="053a8d7980c6c5d83c60c69858b77e5e2e0de3be" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="logo">
+		<description>LOGO: A Language for Learning</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T263001" />
+		<info name="video" value="NTSC" />
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="logo-lo" size="0x4000" crc="216fc5a8" sha1="6e22c082ef2659af4eb10f8acb14175941c9edc9" offset="0x0000" />
+			</dataarea>
+			<dataarea name="c1h" size="0x4000">
+				<rom name="logo-hi" size="0x4000" crc="4b7e5c5a" sha1="f2d4fdafef12762c96b88f06bb5d91644f54e5c7" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="utility.d64" size="174848" crc="f4d84692" sha1="2850fb13b27b400167d80f2d755481835e3033b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="basic7">
+		<description>Octasoft BASIC 7.0 (Hun)</description>
+		<year>198</year>
+		<publisher>Novotrade</publisher>
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="basic7-lo" size="0x2000" crc="5ccfd018" sha1="172bd3605321c199b5e91be8ad8db4380514b195" offset="0x0000" />
+				<rom name="basic7-hi" size="0x2000" crc="c4c48a83" sha1="4cf3ac8a4f883c33b5ec5c7d0cef3264a9cdef9e" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="scriptpl">
+		<description>Script/Plus</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="T112001" />
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="script-lo" size="0x4000" crc="d1679eea" sha1="d6d0d8f7feb16cdba650696683c02fcf62422f4a" offset="0x0000" />
+			</dataarea>
+			<dataarea name="c1h" size="0x4000">
+				<rom name="script-hi" size="0x4000" crc="ad0696d9" sha1="5d7c6d0f2c732c92ca8f8f98486e08137824a4a4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="speedy" supported="no">
+		<description>Speedy</description>
 		<year>1988</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="plus4_cart">
