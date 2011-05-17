@@ -2,6 +2,76 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="c64_flop" description="Commodore 64 diskettes">
 
+	<!-- Games -->
+	
+	<software name="aztecchl">
+		<description>Aztec Challenge</description>
+		<year>1983</year>
+		<publisher>Cosmi</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="aztec_challenge[cosmi_1983](!).g64" size="333744" crc="2268d7ae" sha1="b63aa4f59b7d43e37c3633199457b511d394f19c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="basilgrt">
+		<description>Basil: The Great Mouse Detective</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="basil_the_great_mouse_detective[gremlin_1987](cyan-early).g64" size="333744" crc="bbf79c1f" sha1="984df9a8d9ed08408bc93de1265771309b5f1367" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="jacknpr">
+		<description>Jack the Nipper</description>
+		<year>1986</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="jack_the_nipper[gremlin_1986](cyan1)(pal).g64" size="333744" crc="14c6f53d" sha1="6427cc16ed360890034f84182a9db02b2e568f0a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="miamivic">
+		<description>Miami Vice</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="miami_vice[ocean_1986](cyan1)(pal).g64" size="333744" crc="b3556e0c" sha1="ed1d290baf83f0ad31424a4e11f4f2aef8515dbb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mule">
+		<description>M.U.L.E.</description>
+		<year>1983</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="mule[ea_1983](!).g64" size="333744" crc="9c5adfdd" sha1="8b894a5be8ef2e0cfded4e20cf0c7e6c9c68e369" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="rambo3">
+		<description>Rambo III</description>
+		<year>1989</year>
+		<publisher>Taito</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="rambo_iii[taito_1989](vmax3)(!).g64" size="333744" crc="8e34cbc7" sha1="a83030d9a46a5a7a33b9cfedf6adf0b778f7262b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="sthassle">
 		<description>Street Hassle</description>
 		<year>1987</year>
@@ -10,6 +80,75 @@
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="street_hassle[melbourne_house_1987](pal).g64" size="333744" crc="92c15c93" sha1="a1bc536294ae1d36ffde644798dc25cd1d514c93" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="toutrun">
+		<description>Turbo Out Run</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="turbo_out_run_s1[us_gold_1989](pal)(!).g64" size="333744" crc="3ab79f79" sha1="47ac893f0c53f10c455fb10b4221fc1c51b0f3c5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="turbo_out_run_s2[us_gold_1989](pal)(!).g64" size="333744" crc="fda9e331" sha1="56da1a1a2d88bf63fda41096fc9d839e0cc5877b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- Compilations -->
+		
+	<software name="gameset">
+		<description>Game Set and Match</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="game_set_and_match_s1[ocean_1987].g64" size="333744" crc="ca84a09e" sha1="fdd4246db837d74ef136d2c72895c04915384146" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="game_set_and_match_s2[ocean_1987].g64" size="333744" crc="85ba1688" sha1="b41e55eca81067d4499e0201454ccbaaec70b672" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="game_set_and_match_s3[ocean_1987].g64" size="333744" crc="c8053e01" sha1="7ae5d1225a8613ea70e8dd2c8d5a3008e3ea4c13" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="game_set_and_match_s4[ocean_1987].g64" size="333744" crc="d775e8bb" sha1="6df6c56ff5202544a1075d7966e52b046da2dcaf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- Applications -->
+	
+	<software name="basickaa">
+		<description>BASIC-kääntäjä (Fin)</description>
+		<year>1984</year>
+		<publisher>Amersoft</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="basic-kaantaja[amersoft_1984].nbz" size="333744" crc="68ffade3" sha1="951e63d05c0911abcc247ff8327b7239fc0c9e86" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="sprbas64">
+		<description>SuperBase 64 (Fin)</description>
+		<year>1983</year>
+		<publisher>Precision</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="superbase_64[precision_1983](finnish).nbz" size="333744" crc="83eb8f50" sha1="2cff03d08f15f8d66fad9d20233fc4d87f71395c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
