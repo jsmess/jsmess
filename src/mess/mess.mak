@@ -493,9 +493,9 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_DRIVERS)/vectrex.o	\
 	$(MAME_VIDEO)/vectrex.o		\
 	$(MAME_MACHINE)/vectrex.o	\
-	$(MAME_VIDEO)/smsvdp.o		\
-	$(MAME_MACHINE)/segasms.o	\
-	$(MAME_DRIVERS)/segasms.o	\
+	$(MESS_VIDEO)/smsvdp.o		\
+	$(MESS_MACHINE)/segasms.o	\
+	$(MESS_DRIVERS)/segasms.o	\
 	$(MESS_DRIVERS)/sg1000.o	\
 	$(MAME_DRIVERS)/saturn.o	\
 	$(MAME_DRIVERS)/cps1.o	\
