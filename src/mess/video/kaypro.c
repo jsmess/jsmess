@@ -121,7 +121,7 @@ SCREEN_UPDATE( kaypro2x )
 	state->m_speed = state->m_mc6845_reg[10]&0x20;
 	state->m_flash = state->m_mc6845_reg[10]&0x40;				// cursor modes
 	state->m_cursor = (state->m_mc6845_reg[14]<<8) | state->m_mc6845_reg[15];					// get cursor position
-	mc6845_update(state->m_crtc, bitmap, cliprect);
+	state->m_crtc->update(bitmap, cliprect);
 	return 0;
 }
 
@@ -269,13 +269,13 @@ READ8_MEMBER( kaypro_state::kaypro2x_status_r )
 {
 /* Need bit 7 high or computer hangs */
 
-	return 0x80 | mc6845_register_r( m_crtc, 0);
+	return 0x80 | m_crtc->register_r(space, 0);
 }
 
 WRITE8_MEMBER( kaypro_state::kaypro2x_index_w )
 {
 	m_mc6845_ind = data & 0x1f;
-	mc6845_address_w( m_crtc, 0, data );
+	m_crtc->address_w( space, 0, data );
 }
 
 WRITE8_MEMBER( kaypro_state::kaypro2x_register_w )
@@ -287,7 +287,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_register_w )
 	else
 		m_mc6845_reg[m_mc6845_ind] = data;
 
-	mc6845_register_w( m_crtc, 0, data );
+	m_crtc->register_w( space, 0, data );
 
 	if ((m_mc6845_ind == 1) || (m_mc6845_ind == 6) || (m_mc6845_ind == 9))
 		mc6845_screen_configure();			/* adjust screen size */

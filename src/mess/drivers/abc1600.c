@@ -208,9 +208,9 @@ UINT8 abc1600_state::read_io(offs_t offset)
 
 			case CRT:
 				if (A0)
-					data = mc6845_register_r(m_crtc, 0);
+					data = m_crtc->register_r( *program, offset );
 				else
-					data = mc6845_status_r(m_crtc, 0);
+					data = m_crtc->status_r( *program, offset );
 				break;
 
 			case DRT:
@@ -311,9 +311,9 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 
 			case CRT:
 				if (A0)
-					mc6845_register_w(m_crtc, 0, data);
+					m_crtc->register_w(*program, offset, data);
 				else
-					mc6845_address_w(m_crtc, 0, data);
+					m_crtc->address_w(*program, offset, data);
 				break;
 
 			case DRT:
@@ -1004,8 +1004,8 @@ ADDRESS_MAP_END
     AM_RANGE(0x000000, 0x0fffff) AM_RAM
     AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_MEMBER(m_video_ram)
     AM_RANGE(0x1ff000, 0x1ff007) AM_DEVREADWRITE_LEGACY(SAB1797_02P_TAG, wd17xx_r, wd17xx_w) // A2,A1
-    AM_RANGE(0x1ff100, 0x1ff100) AM_DEVWRITE_LEGACY(SY6845E_TAG, mc6845_address_w)
-    AM_RANGE(0x1ff101, 0x1ff101) AM_DEVREADWRITE_LEGACY(SY6845E_TAG, mc6845_register_r, mc6845_register_w)
+    AM_RANGE(0x1ff100, 0x1ff100) AM_DEVWRITE(SY6845E_TAG, mc6845_device, address_w)
+    AM_RANGE(0x1ff101, 0x1ff101) AM_DEVREADWRITE(SY6845E_TAG, mc6845_device, register_r, register_w)
     AM_RANGE(0x1ff200, 0x1ff207) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w) // A2,A1
     AM_RANGE(0x1ff300, 0x1ff300) AM_DEVREADWRITE_LEGACY(Z8410AB1_0_TAG, z80dma_r, z80dma_w)
     AM_RANGE(0x1ff400, 0x1ff400) AM_DEVREADWRITE_LEGACY(Z8410AB1_1_TAG, z80dma_r, z80dma_w)

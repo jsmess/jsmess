@@ -548,8 +548,8 @@ static VIDEO_START( pc_cga32k )
 static SCREEN_UPDATE( mc6845_cga )
 {
 	UINT8 *gfx = screen->machine().region("gfx1")->base();
-	device_t *devconf = screen->machine().device(CGA_MC6845_NAME);
-	mc6845_update( devconf, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(CGA_MC6845_NAME);
+	mc6845->update( bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
 	switch ( CGA_FONT & 0x01 )
@@ -574,8 +574,8 @@ static VIDEO_START( cga_poisk2 )
 static SCREEN_UPDATE( cga_poisk2 )
 {
 	UINT8 *gfx = screen->machine().region("gfx1")->base();
-	device_t *devconf = screen->machine().device(CGA_MC6845_NAME);
-	mc6845_update( devconf, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(CGA_MC6845_NAME);
+	mc6845->update( bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
 	switch ( CGA_FONT & 0x01 )
@@ -1124,7 +1124,7 @@ static void pc_cga_set_palette_luts(void)
  */
 static void pc_cga_mode_control_w(running_machine &machine, int data)
 {
-	device_t *devconf = machine.device(CGA_MC6845_NAME);
+	mc6845_device *mc6845 = machine.device<mc6845_device>(CGA_MC6845_NAME);
 
 	CGA_LOG(1,"CGA_mode_control_w",("$%02x: columns %d, gfx %d, hires %d, blink %d\n",
 		data, (data&1)?80:40, (data>>1)&1, (data>>4)&1, (data>>5)&1));
@@ -1135,7 +1135,7 @@ static void pc_cga_mode_control_w(running_machine &machine, int data)
 	switch ( cga.mode_control & 0x3F )
 	{
 	case 0x08: case 0x09: case 0x0C: case 0x0D:
-		mc6845_set_hpixels_per_column( devconf, 8 );
+		mc6845->set_hpixels_per_column( 8 );
 		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE )
 		{
 			if ( cga.mode_control & 0x04 )
@@ -1156,7 +1156,7 @@ static void pc_cga_mode_control_w(running_machine &machine, int data)
 		}
 		break;
 	case 0x0A: case 0x0B: case 0x2A: case 0x2B:
-		mc6845_set_hpixels_per_column( devconf, 8 );
+		mc6845->set_hpixels_per_column( 8 );
 		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE )
 		{
 			cga.update_row = cga_gfx_4bppl_update_row;
@@ -1167,15 +1167,15 @@ static void pc_cga_mode_control_w(running_machine &machine, int data)
 		}
 		break;
 	case 0x0E: case 0x0F: case 0x2E: case 0x2F:
-		mc6845_set_hpixels_per_column( devconf, 8 );
+		mc6845->set_hpixels_per_column( 8 );
 		cga.update_row = cga_gfx_2bpp_update_row;
 		break;
 	case 0x18: case 0x19: case 0x1C: case 0x1D:
-		mc6845_set_hpixels_per_column( devconf, 8 );
+		mc6845->set_hpixels_per_column( 8 );
 		cga.update_row = cga_text_inten_alt_update_row;
 		break;
 	case 0x1A: case 0x1B: case 0x3A: case 0x3B:
-		mc6845_set_hpixels_per_column( devconf, 16 );
+		mc6845->set_hpixels_per_column( 16 );
 		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE )
 		{
 			cga.update_row = cga_gfx_4bpph_update_row;
@@ -1186,11 +1186,11 @@ static void pc_cga_mode_control_w(running_machine &machine, int data)
 		}
 		break;
 	case 0x1E: case 0x1F: case 0x3E: case 0x3F:
-		mc6845_set_hpixels_per_column( devconf, 16 );
+		mc6845->set_hpixels_per_column( 16 );
 		cga.update_row = cga_gfx_1bpp_update_row;
 		break;
 	case 0x28: case 0x29: case 0x2C: case 0x2D:
-		mc6845_set_hpixels_per_column( devconf, 8 );
+		mc6845->set_hpixels_per_column( 8 );
 		if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE )
 		{
 			if ( cga.mode_control & 0x04 )
@@ -1211,7 +1211,7 @@ static void pc_cga_mode_control_w(running_machine &machine, int data)
 		}
 		break;
 	case 0x38: case 0x39: case 0x3C: case 0x3D:
-		mc6845_set_hpixels_per_column( devconf, 8 );
+		mc6845->set_hpixels_per_column( 8 );
 		cga.update_row = cga_text_blink_alt_update_row;
 		break;
 	default:
@@ -1284,7 +1284,7 @@ static READ32_HANDLER( char_ram_32_r )   { return read32le_with_read8_handler(ch
 
 static READ8_HANDLER( pc_cga8_r )
 {
-	device_t *devconf = space->machine().device(CGA_MC6845_NAME);
+	mc6845_device *mc6845 = space->machine().device<mc6845_device>(CGA_MC6845_NAME);
 	int data = 0xff;
 	switch( offset )
 	{
@@ -1292,7 +1292,7 @@ static READ8_HANDLER( pc_cga8_r )
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = mc6845_register_r( devconf, offset );
+			data = mc6845->register_r( *space, offset );
 			break;
 		case 10:
 			data = cga.vsync | ( ( data & 0x40 ) >> 4 ) | cga.hsync;
@@ -1308,16 +1308,16 @@ static READ8_HANDLER( pc_cga8_r )
 
 static WRITE8_HANDLER( pc_cga8_w )
 {
-	device_t *devconf;
+	mc6845_device *mc6845;
 
 	switch(offset) {
 	case 0: case 2: case 4: case 6:
-		devconf = space->machine().device(CGA_MC6845_NAME);
-		mc6845_address_w( devconf, offset, data );
+		mc6845 = space->machine().device<mc6845_device>(CGA_MC6845_NAME);
+		mc6845->address_w( *space, offset, data );
 		break;
 	case 1: case 3: case 5: case 7:
-		devconf = space->machine().device(CGA_MC6845_NAME);
-		mc6845_register_w( devconf, offset, data );
+		mc6845 = space->machine().device<mc6845_device>(CGA_MC6845_NAME);
+		mc6845->register_w( *space, offset, data );
 		break;
 	case 8:
 		pc_cga_mode_control_w(space->machine(), data);
@@ -1613,20 +1613,20 @@ static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 static WRITE8_HANDLER ( pc1512_w )
 {
 	UINT8 *videoram = cga.videoram;
-	device_t *devconf = space->machine().device(CGA_MC6845_NAME);
+	mc6845_device *mc6845 = space->machine().device<mc6845_device>(CGA_MC6845_NAME);
 
 	switch (offset)
 	{
 	case 0: case 2: case 4: case 6:
 		data &= 0x1F;
-		mc6845_address_w( devconf, offset, data );
+		mc6845->address_w( *space, offset, data );
 		pc1512.mc6845_address = data;
 		break;
 
 	case 1: case 3: case 5: case 7:
 		if ( ! pc1512.mc6845_locked_register[pc1512.mc6845_address] )
 		{
-			mc6845_register_w( devconf, offset, data );
+			mc6845->register_w( *space, offset, data );
 			if ( mc6845_writeonce_register[pc1512.mc6845_address] )
 			{
 				pc1512.mc6845_locked_register[pc1512.mc6845_address] = 1;
@@ -1648,11 +1648,11 @@ static WRITE8_HANDLER ( pc1512_w )
 		switch( cga.mode_control & 0x3F )
 		{
 		case 0x08: case 0x09: case 0x0C: case 0x0D:
-			mc6845_set_hpixels_per_column( devconf, 8 );
+			mc6845->set_hpixels_per_column( 8 );
 			cga.update_row = cga_text_inten_update_row;
 			break;
 		case 0x0A: case 0x0B: case 0x2A: case 0x2B:
-			mc6845_set_hpixels_per_column( devconf, 8 );
+			mc6845->set_hpixels_per_column( 8 );
 			if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE )
 			{
 				cga.update_row = cga_gfx_4bppl_update_row;
@@ -1663,27 +1663,27 @@ static WRITE8_HANDLER ( pc1512_w )
 			}
 			break;
 		case 0x0E: case 0x0F: case 0x2E: case 0x2F:
-			mc6845_set_hpixels_per_column( devconf, 8 );
+			mc6845->set_hpixels_per_column( 8 );
 			cga.update_row = cga_gfx_2bpp_update_row;
 			break;
 		case 0x18: case 0x19: case 0x1C: case 0x1D:
-			mc6845_set_hpixels_per_column( devconf, 8 );
+			mc6845->set_hpixels_per_column( 8 );
 			cga.update_row = cga_text_inten_alt_update_row;
 			break;
 		case 0x1A: case 0x1B: case 0x3A: case 0x3B:
-			mc6845_set_hpixels_per_column( devconf, 8 );
+			mc6845->set_hpixels_per_column( 8 );
 			cga.update_row = pc1512_gfx_4bpp_update_row;
 			break;
 		case 0x1E: case 0x1F: case 0x3E: case 0x3F:
-			mc6845_set_hpixels_per_column( devconf, 16 );
+			mc6845->set_hpixels_per_column( 16 );
 			cga.update_row = cga_gfx_1bpp_update_row;
 			break;
 		case 0x28: case 0x29: case 0x2C: case 0x2D:
-			mc6845_set_hpixels_per_column( devconf, 8 );
+			mc6845->set_hpixels_per_column( 8 );
 			cga.update_row = cga_text_blink_update_row;
 			break;
 		case 0x38: case 0x39: case 0x3C: case 0x3D:
-			mc6845_set_hpixels_per_column( devconf, 8 );
+			mc6845->set_hpixels_per_column( 8 );
 			cga.update_row = cga_text_blink_alt_update_row;
 			break;
 		default:
@@ -1787,8 +1787,8 @@ static VIDEO_START( pc1512 )
 static SCREEN_UPDATE( mc6845_pc1512 )
 {
 	UINT8 *gfx = screen->machine().region("gfx1")->base();
-	device_t *devconf = screen->machine().device(CGA_MC6845_NAME);
-	mc6845_update( devconf, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(CGA_MC6845_NAME);
+	mc6845->update(bitmap, cliprect);
 
 	/* Check for changes in font dipsetting */
 	switch ( CGA_FONT & 0x03 )

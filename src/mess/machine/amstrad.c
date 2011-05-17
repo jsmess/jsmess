@@ -992,10 +992,10 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_de_changed )
 	if ( ! drvstate->m_gate_array.de && state )
 	{
 		/* DE became active, store the starting MA and RA signals */
-		device_t *mc6845 = device->machine().device("mc6845" );
+		mc6845_device *mc6845 = device->machine().device<mc6845_device>("mc6845" );
 
-		drvstate->m_gate_array.ma = mc6845_get_ma( mc6845 );
-		drvstate->m_gate_array.ra = mc6845_get_ra( mc6845 );
+		drvstate->m_gate_array.ma = mc6845->get_ma();
+		drvstate->m_gate_array.ra = mc6845->get_ra();
 logerror("y = %d; ma = %02x; ra = %02x, address = %04x\n", drvstate->m_gate_array.y, drvstate->m_gate_array.ma, drvstate->m_gate_array.ra, ( ( drvstate->m_gate_array.ma & 0x3000 ) << 2 ) | ( ( drvstate->m_gate_array.ra & 0x07 ) << 11 ) | ( ( drvstate->m_gate_array.ma & 0x3ff ) << 1 ) );
 		amstrad_gate_array_get_video_data(device->machine());
 		drvstate->m_asic.de_start = 1;
@@ -1013,10 +1013,10 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_de_changed )
 	if ( ! drvstate->m_gate_array.de && state )
 	{
 		/* DE became active, store the starting MA and RA signals */
-		device_t *mc6845 = device->machine().device("mc6845" );
+		mc6845_device *mc6845 = device->machine().device<mc6845_device>("mc6845" );
 
-		drvstate->m_gate_array.ma = mc6845_get_ma( mc6845 );
-		drvstate->m_gate_array.ra = mc6845_get_ra( mc6845 );
+		drvstate->m_gate_array.ma = mc6845->get_ma();
+		drvstate->m_gate_array.ra = mc6845->get_ra();
 		drvstate->m_asic.h_start = drvstate->m_gate_array.line_ticks;
 		drvstate->m_asic.de_start = 1;
 
@@ -2069,7 +2069,7 @@ READ8_HANDLER ( amstrad_cpc_io_r )
 {
 	amstrad_state *state = space->machine().driver_data<amstrad_state>();
 	device_t *fdc = space->machine().device("upd765");
-	device_t *mc6845 = space->machine().device("mc6845" );
+	mc6845_device *mc6845 = space->machine().device<mc6845_device>("mc6845" );
 
 	unsigned char data = 0xFF;
 	unsigned int r1r0 = (unsigned int)((offset & 0x0300) >> 8);
@@ -2095,7 +2095,7 @@ READ8_HANDLER ( amstrad_cpc_io_r )
 		switch(r1r0)
 		{
 		case 0x02:
-			data = mc6845_status_r( mc6845, 0 );
+			data = mc6845->status_r( *space, 0 );
 #if 0
 			/* CRTC Type 1 : Read Status Register
                CRTC Type 3 or 4 : Read from selected internal 6845 register */
@@ -2114,7 +2114,7 @@ READ8_HANDLER ( amstrad_cpc_io_r )
 			break;
 		case 0x03:
 			/* All CRTC type : Read from selected internal 6845 register Read only */
-			data = mc6845_register_r( mc6845, 0 );
+			data = mc6845->register_r( *space, (offs_t)0 );
 			break;
 		}
 	}
@@ -2207,7 +2207,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 {
 	amstrad_state *state = space->machine().driver_data<amstrad_state>();
 	device_t *fdc = space->machine().device("upd765");
-	device_t *mc6845 = space->machine().device("mc6845");
+	mc6845_device *mc6845 = space->machine().device<mc6845_device>("mc6845");
 
 	if ((offset & (1<<15)) == 0)
 	{
@@ -2233,7 +2233,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 		switch ((offset & 0x0300) >> 8) // r1r0
 		{
 		case 0x00:		/* Select internal 6845 register Write Only */
-			mc6845_address_w( mc6845, 0, data );
+			mc6845->address_w( *space, 0, data );
 			if ( state->m_system_type == SYSTEM_PLUS || state->m_system_type == SYSTEM_GX4000 )
 				amstrad_plus_seqcheck(state, data);
 
@@ -2248,7 +2248,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 				amstrad_plus_update_video(space->machine());
 			else
 				amstrad_update_video(space->machine());
-			mc6845_register_w( mc6845, 0, data );
+			mc6845->register_w( *space, 0, data );
 
 			/* printer port bit 8 */
 			if (state->m_printer_bit8_selected && state->m_system_type == SYSTEM_PLUS)
@@ -2362,7 +2362,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 	{
 		state->m_aleste_mode = data;
 		logerror("EXTEND: Port &FABF write 0x%02x\n",data);
-		mc6845_set_clock( mc6845, ( state->m_aleste_mode & 0x02 ) ? ( XTAL_16MHz / 8 ) : ( XTAL_16MHz / 16 ) );
+		mc6845->set_clock( ( state->m_aleste_mode & 0x02 ) ? ( XTAL_16MHz / 8 ) : ( XTAL_16MHz / 16 ) );
 	}
 
 	multiface_io_write(space, offset, data);
@@ -2374,7 +2374,7 @@ static void amstrad_handle_snapshot(running_machine &machine, unsigned char *pSn
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *mc6845 = space->machine().device("mc6845" );
+	mc6845_device *mc6845 = space->machine().device<mc6845_device>("mc6845");
 	device_t *ay8910 = machine.device("ay");
 	int RegData;
 	int i;
@@ -2463,11 +2463,11 @@ static void amstrad_handle_snapshot(running_machine &machine, unsigned char *pSn
 	/* init CRTC */
 	for (i=0; i<18; i++)
 	{
-		mc6845_address_w( mc6845, 0, i );
-		mc6845_register_w( mc6845, 0, pSnapshot[0x043+i] & 0xff );
+		mc6845->address_w( *space, 0, i );
+		mc6845->register_w( *space, 0, pSnapshot[0x043+i] & 0xff );
 	}
 
-	mc6845_address_w( mc6845, 0, i );
+	mc6845->address_w( *space, 0, i );
 
 	/* upper rom selection */
 	state->m_gate_array.upper_bank = pSnapshot[0x055];
@@ -2769,6 +2769,7 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 			data |= 0x02;
 	}
 
+logerror("amstrad_ppi_portb_r\n");
 	/* Schedule a write to PC2 */
 	device->machine().scheduler().timer_set( attotime::zero, FUNC(amstrad_pc2_low));
 

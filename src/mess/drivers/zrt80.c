@@ -40,7 +40,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_terminal;
-	required_device<device_t> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_8250;
 	required_device<device_t> m_beep;
 	DECLARE_READ8_MEMBER( zrt80_10_r );
@@ -94,8 +94,8 @@ static ADDRESS_MAP_START( zrt80_io, AS_IO, 8, zrt80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE_LEGACY("ins8250", ins8250_r, ins8250_w )
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("crtc", mc6845_address_w)
-	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE_LEGACY("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x10, 0x17) AM_READ(zrt80_10_r)
 	AM_RANGE(0x18, 0x1F) AM_READ_PORT("DIPSW2")
 	AM_RANGE(0x20, 0x27) AM_READ_PORT("DIPSW3")
@@ -198,7 +198,7 @@ VIDEO_START_MEMBER( zrt80_state )
 
 SCREEN_UPDATE_MEMBER( zrt80_state )
 {
-	mc6845_update(m_crtc, &bitmap, &cliprect);
+	m_crtc->update(&bitmap, &cliprect);
 	return 0;
 }
 

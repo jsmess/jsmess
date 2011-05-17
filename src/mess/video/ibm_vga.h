@@ -9,6 +9,7 @@
 #ifndef IBM_VGA_H
 #define IBM_VGA_H
 
+#include "video/mc6845.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -39,8 +40,8 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	UINT8 vga_crtc_r(int offset);
-	void vga_crtc_w(int offset, UINT8 data);
+	DECLARE_READ8_MEMBER( vga_crtc_r );
+	DECLARE_WRITE8_MEMBER( vga_crtc_w );
 
 	DECLARE_READ8_MEMBER( vga_port_03b0_r );
 	DECLARE_WRITE8_MEMBER( vga_port_03b0_w );
@@ -71,7 +72,7 @@ private:
 	UINT8 m_dac_state;
 	UINT8 m_dac_color[3][0x100];
 	UINT8 *m_videoram;
-	required_device<device_t> m_crtc;
+	required_device<mc6845_device> m_crtc;
 };
 
 

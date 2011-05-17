@@ -52,7 +52,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_speaker;
 	DECLARE_READ16_MEMBER( dim68k_duart_r );
 	DECLARE_READ16_MEMBER( dim68k_fdc_r );
@@ -131,18 +131,18 @@ WRITE16_MEMBER( dim68k_state::dim68k_video_control_w )
    D1 0 = Standard Chars & LoRes; 1 = Alternate Chars & HiRes [not emulated yet]
    D0 0 = Non-Mixed (all text or all Graphics); 1 = Mixed (Colour Graphics and Monochrome Text) [not emulated yet]
  */
-	mc6845_set_hpixels_per_column(m_crtc, (data & 0x40) ? 7 : 8);
+	m_crtc->set_hpixels_per_column((data & 0x40) ? 7 : 8);
 	m_video_control = data;
 
 	switch (data & 0x18)
 	{
-		case 0x00: mc6845_set_clock(m_crtc, XTAL_14MHz);
+		case 0x00: m_crtc->set_clock(XTAL_14MHz);
 		           break;
-		case 0x08: mc6845_set_clock(m_crtc, XTAL_3_579545MHz);
+		case 0x08: m_crtc->set_clock(XTAL_3_579545MHz);
 		           break;
-		case 0x10: mc6845_set_clock(m_crtc, XTAL_14MHz / 2);
+		case 0x10: m_crtc->set_clock(XTAL_14MHz / 2);
 		           break;
-		case 0x18: mc6845_set_clock(m_crtc, XTAL_3_579545MHz / 2);
+		case 0x18: m_crtc->set_clock(XTAL_3_579545MHz / 2);
 		           break;
 	}
 }
@@ -175,8 +175,8 @@ static ADDRESS_MAP_START(dim68k_mem, AS_PROGRAM, 16, dim68k_state)
 	AM_RANGE(0x00000000, 0x00feffff) AM_RAM AM_BASE(m_ram) // 16MB RAM / ROM at boot
 	AM_RANGE(0x00ff0000, 0x00ff1fff) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0x00ff2000, 0x00ff7fff) AM_RAM // Graphics Video RAM
-	AM_RANGE(0x00ff8000, 0x00ff8001) AM_DEVREADWRITE8_LEGACY("crtc", mc6845_status_r, mc6845_address_w, 0xff)
-	AM_RANGE(0x00ff8002, 0x00ff8003) AM_DEVREADWRITE8_LEGACY("crtc", mc6845_register_r, mc6845_register_w, 0xff)
+	AM_RANGE(0x00ff8000, 0x00ff8001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0xff)
+	AM_RANGE(0x00ff8002, 0x00ff8003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff)
 	AM_RANGE(0x00ff8004, 0x00ff8005) AM_WRITE(dim68k_video_high_w)
 	AM_RANGE(0x00ff8008, 0x00ff8009) AM_WRITE(dim68k_video_control_w)
 	AM_RANGE(0x00ff800a, 0x00ff800b) AM_WRITE(dim68k_video_reset_w)
@@ -218,7 +218,7 @@ VIDEO_START_MEMBER( dim68k_state )
 
 SCREEN_UPDATE_MEMBER( dim68k_state )
 {
-	mc6845_update(m_crtc, &bitmap, &cliprect);
+	m_crtc->update( &bitmap, &cliprect);
 	return 0;
 }
 

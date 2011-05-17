@@ -516,7 +516,7 @@ bool abc806_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 	if (!m_txoff)
 	{
 		// draw text
-		mc6845_update(m_crtc, &bitmap, &cliprect);
+		m_crtc->update(&bitmap, &cliprect);
 	}
 
 	// draw HR graphics

@@ -26,6 +26,8 @@ public:
 	multi8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	mc6845_device *m_mc6845;
+
 	UINT8 m_mcu_init;
 	UINT8 m_keyb_press;
 	UINT8 m_keyb_press_flag;
@@ -186,12 +188,12 @@ static WRITE8_HANDLER( multi8_6845_w )
 	if(offset == 0)
 	{
 		state->m_crtc_index = data;
-		mc6845_address_w(space->machine().device("crtc"), 0,data);
+		state->m_mc6845->address_w(*space, offset, data);
 	}
 	else
 	{
 		state->m_crtc_vreg[state->m_crtc_index] = data;
-		mc6845_register_w(space->machine().device("crtc"), 0,data);
+		state->m_mc6845->register_w(*space, offset, data);
 	}
 }
 
@@ -600,6 +602,8 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START(multi8)
 {
+	multi8_state *state = machine.driver_data<multi8_state>();
+	state->m_mc6845 = machine.device<mc6845_device>("crtc");
 }
 
 static MACHINE_RESET(multi8)

@@ -147,7 +147,7 @@ static WRITE8_HANDLER( bml3_6845_w )
 	if(offset == 0)
 	{
 		state->m_addr_latch = data;
-		mc6845_address_w(space->machine().device("crtc"), 0,data);
+		space->machine().device<mc6845_device>("crtc")->address_w(*space, 0, data);
 	}
 	else
 	{
@@ -158,7 +158,7 @@ static WRITE8_HANDLER( bml3_6845_w )
 		else if(state->m_addr_latch == 0x0f)
 			state->m_cursor_addr = (state->m_cursor_addr & 0x3f00) | (data & 0xff);
 
-		mc6845_register_w(space->machine().device("crtc"), 0,data);
+		space->machine().device<mc6845_device>("crtc")->register_w(*space, 0, data);
 	}
 }
 
@@ -225,7 +225,7 @@ static void m6845_change_clock(running_machine &machine, UINT8 setting)
 		case 0x88: m6845_clock = XTAL_3_579545MHz/1; break; //640 x 375
 	}
 
-	mc6845_set_clock(machine.device("crtc"), m6845_clock);
+	machine.device<mc6845_device>("crtc")->set_clock(m6845_clock);
 }
 
 static WRITE8_HANDLER( bml3_hres_reg_w )

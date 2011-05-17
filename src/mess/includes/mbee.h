@@ -45,7 +45,7 @@ public:
 	required_device<device_t> m_wave;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_printer;
-	required_device<device_t> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	optional_device<device_t> m_fdc;
 	optional_device<device_t> m_rtc;
 	DECLARE_WRITE8_MEMBER( mbee_04_w );

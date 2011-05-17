@@ -15,7 +15,7 @@
 
 #define CRTC_PORT_ADDR ((m_misc_out_reg & 1) ? 0x3d0 : 0x3b0 )
 
-UINT8 ibm_vga_device::vga_crtc_r(int offset)
+READ8_MEMBER(ibm_vga_device::vga_crtc_r)
 {
 	int data = 0xff;
 	switch( offset )
@@ -24,22 +24,22 @@ UINT8 ibm_vga_device::vga_crtc_r(int offset)
 			/* return last written mc6845 address value here? */
 			break;
 		case 5:
-			data = mc6845_register_r( m_crtc, offset );
+			data = m_crtc->register_r( space, offset );
 			break;
     }
 	return data;
 
 }
 
-void ibm_vga_device::vga_crtc_w(int offset, UINT8 data)
+WRITE8_MEMBER(ibm_vga_device::vga_crtc_w)
 {
 	switch(offset)
 	{
 		case 4:
-			mc6845_address_w( m_crtc, offset, data );
+			m_crtc->address_w( space, offset, data );
 			break;
 		case 5:
-			mc6845_register_w( m_crtc, offset, data );
+			m_crtc->register_w( space, offset, data );
 			break;
 	}
 }
@@ -48,7 +48,7 @@ READ8_MEMBER(ibm_vga_device::vga_port_03b0_r)
 {
 	UINT8 retVal = 0xff;
 	if (CRTC_PORT_ADDR == 0x3b0)
-		retVal = vga_crtc_r(offset);
+		retVal = vga_crtc_r(space, offset);
 	//if (LOG_ACCESSES)
 		//logerror("vga_port_03b0_r(): port=0x%04x data=0x%02x\n", offset + 0x3b0, retVal);
 	return retVal;
@@ -59,7 +59,7 @@ WRITE8_MEMBER( ibm_vga_device::vga_port_03b0_w )
 	//if (LOG_ACCESSES)
 		//logerror("vga_port_03b0_w(): port=0x%04x data=0x%02x\n", offset + 0x3b0, data);
 	if (CRTC_PORT_ADDR == 0x3b0)
-		vga_crtc_w(offset, data);
+		vga_crtc_w(space, offset, data);
 }
 
 READ8_MEMBER( ibm_vga_device::vga_port_03c0_r)
@@ -186,7 +186,7 @@ READ8_MEMBER( ibm_vga_device::vga_port_03d0_r)
 {
 	UINT8 retVal = 0xff;
 	if (CRTC_PORT_ADDR == 0x3d0)
-		retVal = vga_crtc_r(offset);
+		retVal = vga_crtc_r(space, offset);
 	//if (LOG_ACCESSES)
 //      logerror("vga_port_03d0_r(): port=0x%04x data=0x%02x\n", offset + 0x3d0, retVal);
 	return retVal;
@@ -197,7 +197,7 @@ WRITE8_MEMBER( ibm_vga_device::vga_port_03d0_w )
 //  if (LOG_ACCESSES)
 		//logerror("vga_port_03d0_w(): port=0x%04x data=0x%02x\n", offset + 0x3d0, data);
 	if (CRTC_PORT_ADDR == 0x3d0)
-		vga_crtc_w(offset, data);
+		vga_crtc_w(space, offset, data);
 }
 
 
@@ -221,8 +221,8 @@ static const mc6845_interface mc6845_vga_intf =
 
 static SCREEN_UPDATE( mc6845_vga )
 {
-	device_t *devconf = screen->owner()->subdevice(VGA_MC6845_NAME);
-	mc6845_update( devconf, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->owner()->subdevice<mc6845_device>(VGA_MC6845_NAME);
+	mc6845->update(bitmap, cliprect);
 	return 0;
 }
 

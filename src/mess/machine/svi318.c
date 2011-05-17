@@ -400,8 +400,8 @@ SCREEN_UPDATE( svi328_806 )
 	}
 	else if (!strcmp(screen->tag(), "svi806"))
 	{
-		device_t *mc6845 = screen->machine().device("crtc");
-		mc6845_update(mc6845, bitmap, cliprect);
+		mc6845_device *mc6845 = screen->machine().device<mc6845_device>("crtc");
+		mc6845->update(bitmap, cliprect);
 	}
 	else
 	{
@@ -880,7 +880,7 @@ READ8_HANDLER( svi318_io_ext_r )
 		break;
 	case 0x51:
 		device = space->machine().device("crtc");
-		data = mc6845_register_r(device, 0);
+		data = downcast<mc6845_device *>(device)->register_r( *space, offset );
 		break;
 	}
 
@@ -958,11 +958,11 @@ WRITE8_HANDLER( svi318_io_ext_w )
 
 	case 0x50:
 		device = space->machine().device("crtc");
-		mc6845_address_w(device, 0, data);
+		downcast<mc6845_device *>(device)->address_w(*space, offset, data);
 		break;
 	case 0x51:
 		device = space->machine().device("crtc");
-		mc6845_register_w(device, 0, data);
+		downcast<mc6845_device *>(device)->register_w(*space, offset, data);
 		break;
 
 	case 0x58:

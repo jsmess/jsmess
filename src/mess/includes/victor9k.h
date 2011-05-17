@@ -64,7 +64,7 @@ public:
 	required_device<mc6852_device> m_ssda;
 	required_device<device_t> m_via1;
 	required_device<device_t> m_cvsd;
-	required_device<device_t> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;

@@ -30,7 +30,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	DECLARE_READ16_MEMBER(applix_inputs_r);
 	DECLARE_WRITE16_MEMBER(applix_index_w);
 	DECLARE_WRITE16_MEMBER(applix_register_w);
@@ -39,12 +39,12 @@ public:
 
 WRITE16_MEMBER( applix_state::applix_index_w )
 {
-	mc6845_address_w( m_crtc, 0, data >> 8 );
+	m_crtc->address_w( space, offset, data >> 8 );
 }
 
 WRITE16_MEMBER( applix_state::applix_register_w )
 {
-	mc6845_register_w( m_crtc, 0, data >> 8 );
+	m_crtc->register_w( space, offset, data >> 8 );
 }
 
 READ16_MEMBER( applix_state::applix_inputs_r )
@@ -142,7 +142,7 @@ static VIDEO_START( applix )
 static SCREEN_UPDATE( applix )
 {
 	applix_state *state = screen->machine().driver_data<applix_state>();
-	mc6845_update(state->m_crtc, bitmap, cliprect);
+	state->m_crtc->update( bitmap, cliprect);
 	return 0;
 }
 

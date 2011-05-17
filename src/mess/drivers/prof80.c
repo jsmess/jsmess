@@ -622,9 +622,9 @@ static ADDRESS_MAP_START( grip_io, AS_IO, 8, grip_state )
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE_LEGACY(Z80STI_TAG, z80sti_r, z80sti_w)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
 	AM_RANGE(0x40, 0x40) AM_READ(stat_r)
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE_LEGACY(MC6845_TAG, mc6845_address_w)
-	AM_RANGE(0x52, 0x52) AM_DEVWRITE_LEGACY(MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x53, 0x53) AM_DEVREAD_LEGACY(MC6845_TAG, mc6845_register_r)
+	AM_RANGE(0x50, 0x50) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
+	AM_RANGE(0x52, 0x52) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_w)
+	AM_RANGE(0x53, 0x53) AM_DEVREAD(MC6845_TAG, mc6845_device, register_r)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 //  AM_RANGE(0x80, 0x80) AM_WRITE(bl2out_w)
@@ -651,9 +651,9 @@ static ADDRESS_MAP_START( grip5_io, AS_IO, 8, grip_state )
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE_LEGACY(Z80STI_TAG, z80sti_r, z80sti_w)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
 	AM_RANGE(0x40, 0x40) AM_READ(stat_r)
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE_LEGACY(MC6845_TAG, mc6845_address_w)
-	AM_RANGE(0x52, 0x52) AM_DEVWRITE_LEGACY(MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x53, 0x53) AM_DEVREAD_LEGACY(MC6845_TAG, mc6845_register_r)
+	AM_RANGE(0x50, 0x50) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
+	AM_RANGE(0x52, 0x52) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_w)
+	AM_RANGE(0x53, 0x53) AM_DEVREAD(MC6845_TAG, mc6845_device, register_r)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 
@@ -959,7 +959,7 @@ static const mc6845_interface crtc_intf =
 
 bool grip_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	mc6845_update(m_crtc, &bitmap, &cliprect);
+	m_crtc->update( &bitmap, &cliprect);
 
 	return 0;
 }

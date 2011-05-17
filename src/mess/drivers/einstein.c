@@ -460,7 +460,7 @@ static MACHINE_RESET( einstein2 )
 	MACHINE_RESET_CALL(einstein);
 
 	/* get 80 column specific devices */
-	einstein->m_mc6845 = machine.device("crtc");
+	einstein->m_mc6845 = machine.device<mc6845_device>("crtc");
 	einstein->m_crtc_screen = machine.device<screen_device>("80column");
 
 	/* 80 column card palette */
@@ -487,7 +487,7 @@ static SCREEN_UPDATE( einstein2 )
 	if (screen == einstein->m_color_screen)
 		SCREEN_UPDATE_CALL(tms9928a);
 	else if (screen == einstein->m_crtc_screen)
-		mc6845_update(einstein->m_mc6845, bitmap, cliprect);
+		einstein->m_mc6845->update( bitmap, cliprect);
 	else
 		fatalerror("Unknown screen '%s'", screen->tag());
 
@@ -536,8 +536,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( einstein2_io, AS_IO, 8 )
 	AM_IMPORT_FROM(einstein_io)
 	AM_RANGE(0x40, 0x47) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(einstein_80col_ram_r, einstein_80col_ram_w)
-	AM_RANGE(0x48, 0x48) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0x49, 0x49) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_register_w)
+	AM_RANGE(0x48, 0x48) AM_MIRROR(0xff00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0x49, 0x49) AM_MIRROR(0xff00) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
 	AM_RANGE(0x4c, 0x4c) AM_MIRROR(0xff00) AM_READ(einstein_80col_state_r)
 ADDRESS_MAP_END
 

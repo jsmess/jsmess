@@ -29,8 +29,8 @@ static ADDRESS_MAP_START(a6809_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x03ff) AM_RAM
 	AM_RANGE(0x0400,0x07ff) AM_DEVREADWRITE("saa5050", saa5050_videoram_r, saa5050_videoram_w)
-	AM_RANGE(0x0800,0x0800) AM_DEVWRITE("mc6845", mc6845_address_w)
-	AM_RANGE(0x0801,0x0801) AM_DEVREADWRITE("mc6845", mc6845_register_r , mc6845_register_w)
+	AM_RANGE(0x0800,0x0800) AM_DEVWRITE_MODERN("mc6845", mc6845_device, address_w)
+	AM_RANGE(0x0801,0x0801) AM_DEVREADWRITE_MODERN("mc6845", mc6845_device, register_r, register_w)
 	AM_RANGE(0x0900,0x090f) AM_MIRROR(0xf0) AM_DEVREADWRITE_MODERN("via", via6522_device, read, write)
 	AM_RANGE(0xf000,0xf7ff) AM_ROM // optional ROM
 	AM_RANGE(0xf800,0xffff) AM_ROM

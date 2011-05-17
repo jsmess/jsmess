@@ -192,12 +192,12 @@ static WRITE_LINE_DEVICE_HANDLER( vid_vsync_changed )
 
 READ8_HANDLER( mbc55x_video_io_r)
 {
-	device_t *mc6845 = space->machine().device(VID_MC6845_NAME);
+	mc6845_device *mc6845 = space->machine().device<mc6845_device>(VID_MC6845_NAME);
 
 	switch(offset & 0x03)
 	{
-		case 0 : return mc6845_status_r(mc6845, 0); break;
-		case 2 : return mc6845_register_r(mc6845, 1); break;
+		case 0 : return mc6845->status_r( *space, offset ); break;
+		case 2 : return mc6845->register_r( *space, offset ); break;
 		default :
 			return 0;
 	}
@@ -205,15 +205,15 @@ READ8_HANDLER( mbc55x_video_io_r)
 
 WRITE8_HANDLER( mbc55x_video_io_w )
 {
-	device_t		*mc6845 = space->machine().device(VID_MC6845_NAME);
+	mc6845_device		*mc6845 = space->machine().device<mc6845_device>(VID_MC6845_NAME);
 
 	switch(offset & 0x03)
 	{
 		case 0 :
-			mc6845_address_w(mc6845,0,data);
+			mc6845->address_w( *space, offset, data );
 			break;
 		case 2 :
-			mc6845_register_w(mc6845,0,data);
+			mc6845->register_w( *space, offset, data );
 			break;
 	}
 }
@@ -247,8 +247,8 @@ SCREEN_EOF( mbc55x )
 
 SCREEN_UPDATE( mbc55x )
 {
-	device_t *devconf = screen->machine().device(VID_MC6845_NAME);
-	mc6845_update( devconf, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(VID_MC6845_NAME);
+	mc6845->update(bitmap, cliprect);
 
     return 0;
 }

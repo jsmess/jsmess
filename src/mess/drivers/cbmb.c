@@ -135,8 +135,8 @@ static ADDRESS_MAP_START(cbmb_mem , AS_PROGRAM, 8)
 	AM_RANGE(0xf6000, 0xf7fff) AM_ROM
 	AM_RANGE(0xf8000, 0xfbfff) AM_ROM AM_BASE_MEMBER(cbmb_state, m_basic)
 	AM_RANGE(0xfd000, 0xfd7ff) AM_RAM AM_BASE_MEMBER(cbmb_state, m_videoram) /* VIDEORAM */
-	AM_RANGE(0xfd800, 0xfd800) AM_MIRROR(0xfe) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR(0xfe) AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)
+	AM_RANGE(0xfd800, 0xfd800) AM_MIRROR(0xfe) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR(0xfe) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
 	/* disk units */
 	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
 	/* db00 coprocessor */

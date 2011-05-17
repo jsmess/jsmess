@@ -33,7 +33,7 @@ public:
 
 	device_t *m_pic8259;
 	device_t *m_wd2793;
-	device_t *m_mc6845;
+	mc6845_device *m_mc6845;
 
 	int m_video_mode;
 	int m_display_on;
@@ -65,8 +65,8 @@ static WRITE8_DEVICE_HANDLER( apricot_sysctrl_w )
 	if (!BIT(data, 5)) wd17xx_set_drive(state->m_wd2793, BIT(data, 6));
 
 	/* switch video modes */
-	mc6845_set_clock(state->m_mc6845, state->m_video_mode ? XTAL_15MHz / 10 : XTAL_15MHz / 16);
-	mc6845_set_hpixels_per_column(state->m_mc6845, state->m_video_mode ? 10 : 16);
+	state->m_mc6845->set_clock( state->m_video_mode ? XTAL_15MHz / 10 : XTAL_15MHz / 16);
+	state->m_mc6845->set_hpixels_per_column( state->m_video_mode ? 10 : 16);
 }
 
 static const i8255_interface apricot_i8255a_intf =
@@ -168,7 +168,7 @@ static SCREEN_UPDATE( apricot )
 	apricot_state *state = screen->machine().driver_data<apricot_state>();
 
 	if (!state->m_display_on)
-		mc6845_update(state->m_mc6845, bitmap, cliprect);
+		state->m_mc6845->update( bitmap, cliprect);
 	else
 		bitmap_fill(bitmap, cliprect, 0);
 
@@ -251,7 +251,7 @@ static DRIVER_INIT( apricot )
 
 	state->m_pic8259 = machine.device("ic31");
 	state->m_wd2793 = machine.device("ic68");
-	state->m_mc6845 = machine.device("ic30");
+	state->m_mc6845 = machine.device<mc6845_device>("ic30");
 
 	state->m_video_mode = 0;
 	state->m_display_on = 1;
@@ -276,8 +276,8 @@ static ADDRESS_MAP_START( apricot_io, AS_IO, 16 )
 	AM_RANGE(0x50, 0x51) AM_MIRROR(0x06) AM_DEVWRITE8("ic7", sn76496_w, 0x00ff)
 	AM_RANGE(0x58, 0x5f) AM_DEVREADWRITE8("ic16", pit8253_r, pit8253_w, 0x00ff)
 	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE8("ic15", z80sio_ba_cd_r, z80sio_ba_cd_w, 0x00ff)
-	AM_RANGE(0x68, 0x69) AM_MIRROR(0x04) AM_DEVWRITE8("ic30", mc6845_address_w, 0x00ff)
-	AM_RANGE(0x6a, 0x6b) AM_MIRROR(0x04) AM_DEVREADWRITE8("ic30", mc6845_register_r, mc6845_register_w, 0x00ff)
+	AM_RANGE(0x68, 0x69) AM_MIRROR(0x04) AM_DEVWRITE8_MODERN("ic30", mc6845_device, address_w, 0x00ff)
+	AM_RANGE(0x6a, 0x6b) AM_MIRROR(0x04) AM_DEVREADWRITE8_MODERN("ic30", mc6845_device, register_r, register_w, 0x00ff)
 //  AM_RANGE(0x70, 0x71) AM_MIRROR(0x04) 8089 channel attention 1
 //  AM_RANGE(0x72, 0x73) AM_MIRROR(0x04) 8089 channel attention 2
 	AM_RANGE(0x78, 0x7f) AM_NOP /* unavailable */

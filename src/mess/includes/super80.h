@@ -37,7 +37,7 @@ public:
 	required_device<device_t> m_wave;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_printer;
-	optional_device<device_t> m_6845;
+	optional_device<mc6845_device> m_6845;
 	READ8_MEMBER( super80v_low_r );
 	READ8_MEMBER( super80v_high_r );
 	WRITE8_MEMBER( super80v_low_w );

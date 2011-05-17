@@ -408,7 +408,7 @@ static WRITE8_HANDLER( cbm8096_io_w )
 	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
 	pia6821_device *pia_0 = space->machine().device<pia6821_device>("pia_0");
 	pia6821_device *pia_1 = space->machine().device<pia6821_device>("pia_1");
-	device_t *mc6845 = space->machine().device("crtc");
+	mc6845_device *mc6845 = space->machine().device<mc6845_device>("crtc");
 
 	if (offset < 0x10) ;
 	else if (offset < 0x14) pia_0->write(*space, offset & 3, data);
@@ -417,8 +417,8 @@ static WRITE8_HANDLER( cbm8096_io_w )
 	else if (offset < 0x40) ;
 	else if (offset < 0x50) via_0->write(*space, offset & 0xf, data);
 	else if (offset < 0x80) ;
-	else if (offset == 0x80) mc6845_address_w(mc6845, 0, data);
-	else if (offset == 0x81) mc6845_register_w(mc6845, 0, data);
+	else if (offset == 0x80) mc6845->address_w(*space, 0, data);
+	else if (offset == 0x81) mc6845->register_w(*space, 0, data);
 }
 
 static READ8_HANDLER( cbm8096_io_r )
@@ -426,7 +426,7 @@ static READ8_HANDLER( cbm8096_io_r )
 	via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");
 	pia6821_device *pia_0 = space->machine().device<pia6821_device>("pia_0");
 	pia6821_device *pia_1 = space->machine().device<pia6821_device>("pia_1");
-	device_t *mc6845 = space->machine().device("crtc");
+	mc6845_device *mc6845 = space->machine().device<mc6845_device>("crtc");
 
 	int data = 0xff;
 	if (offset < 0x10) ;
@@ -436,7 +436,7 @@ static READ8_HANDLER( cbm8096_io_r )
 	else if (offset < 0x40) ;
 	else if (offset < 0x50) data = via_0->read(*space, offset & 0xf);
 	else if (offset < 0x80) ;
-	else if (offset == 0x81) data = mc6845_register_r(mc6845, 0);
+	else if (offset == 0x81) data = mc6845->register_r(*space, 0);
 	return data;
 }
 

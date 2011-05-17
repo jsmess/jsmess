@@ -134,7 +134,7 @@ void v1050_state::video_start()
 
 bool v1050_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	mc6845_update(m_crtc, &bitmap, &cliprect);
+	m_crtc->update(&bitmap, &cliprect);
 
 	return 0;
 }

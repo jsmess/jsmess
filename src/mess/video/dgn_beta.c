@@ -297,7 +297,7 @@ void dgnbeta_vid_set_gctrl(running_machine &machine, int data)
 SCREEN_UPDATE( dgnbeta )
 {
 	dgn_beta_state *state = screen->machine().driver_data<dgn_beta_state>();
-	mc6845_update(state->m_mc6845, bitmap, cliprect);
+	state->m_mc6845->update(bitmap, cliprect);
 	return 0;
 }
 

@@ -154,8 +154,8 @@ static ADDRESS_MAP_START( tvc_io , AS_IO, 8)
 	AM_RANGE(0x59, 0x59) AM_READ(tvc_flipflop_r)
 	AM_RANGE(0x5a, 0x5a) AM_READ(tvc_port59_r)
 	AM_RANGE(0x60, 0x64) AM_WRITE(tvc_palette_w)
-	AM_RANGE(0x70, 0x70) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0x71, 0x71) AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)
+	AM_RANGE(0x70, 0x70) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0x71, 0x71) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -276,8 +276,8 @@ static VIDEO_START( tvc )
 
 static SCREEN_UPDATE( tvc )
 {
-	device_t *mc6845 = screen->machine().device("crtc");
-	mc6845_update(mc6845, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>("crtc");
+	mc6845->update(bitmap, cliprect);
 	return 0;
 }
 

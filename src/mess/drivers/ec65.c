@@ -40,8 +40,8 @@ static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xe100, 0xe10f) AM_DEVREADWRITE_MODERN(VIA6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0xe110, 0xe11f) AM_DEVREADWRITE_MODERN(VIA6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0xe130, 0xe133) AM_DEVREADWRITE(ACIA6551_TAG,  acia_6551_r, acia_6551_w )
-	AM_RANGE(0xe140, 0xe140) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
-	AM_RANGE(0xe141, 0xe141) AM_DEVREADWRITE(MC6845_TAG, mc6845_register_r , mc6845_register_w)
+	AM_RANGE(0xe140, 0xe140) AM_DEVWRITE_MODERN(MC6845_TAG, mc6845_device, address_w)
+	AM_RANGE(0xe141, 0xe141) AM_DEVREADWRITE_MODERN(MC6845_TAG, mc6845_device, register_r , register_w)
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM // 1KB on-board RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(ec65_state,m_video_ram)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -150,8 +150,8 @@ static VIDEO_START( ec65 )
 
 static SCREEN_UPDATE( ec65 )
 {
-	device_t *mc6845 = screen->machine().device(MC6845_TAG);
-	mc6845_update(mc6845, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(MC6845_TAG);
+	mc6845->update( bitmap, cliprect);
 	return 0;
 }
 

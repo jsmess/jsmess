@@ -524,7 +524,7 @@ static WRITE8_HANDLER( pasopia7_6845_w )
 	if(offset == 0)
 	{
 		state->m_addr_latch = data;
-		mc6845_address_w(space->machine().device("crtc"), 0,data);
+		space->machine().device<mc6845_device>("crtc")->address_w(*space, offset, data);
 	}
 	else
 	{
@@ -536,10 +536,10 @@ static WRITE8_HANDLER( pasopia7_6845_w )
 		else if(state->m_addr_latch == 0x0f)
 			state->m_cursor_addr = (state->m_cursor_addr & 0x3f00) | (data & 0xff);
 
-		mc6845_register_w(space->machine().device("crtc"), 0,data);
+		space->machine().device<mc6845_device>("crtc")->register_w(*space, offset, data);
 
 		/* double pump the pixel clock if we are in 640 x 200 mode */
-		mc6845_set_clock(space->machine().device("crtc"), (state->m_x_width) ? VDP_CLOCK*2 : VDP_CLOCK);
+		space->machine().device<mc6845_device>("crtc")->set_clock( (state->m_x_width) ? VDP_CLOCK*2 : VDP_CLOCK);
 	}
 }
 

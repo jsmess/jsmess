@@ -205,8 +205,8 @@ void isa8_mda_device::device_reset()
 
 static SCREEN_UPDATE( mc6845_mda )
 {
-	device_t *devconf = screen->owner()->subdevice(MDA_MC6845_NAME);
-	mc6845_update( devconf, bitmap, cliprect );
+	mc6845_device *mc6845 = screen->owner()->subdevice<mc6845_device>(MDA_MC6845_NAME);
+	mc6845->update( bitmap, cliprect );
 	return 0;
 }
 
@@ -444,15 +444,16 @@ static READ8_DEVICE_HANDLER(mda_status_r)
  *************************************************************************/
 WRITE8_DEVICE_HANDLER ( pc_MDA_w )
 {
-	device_t *devconf = device->subdevice(MDA_MC6845_NAME);
+	mc6845_device *mc6845 = device->subdevice<mc6845_device>(MDA_MC6845_NAME);
+	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *lpt = device->subdevice("lpt");
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			mc6845_address_w( devconf, offset, data );
+			mc6845->address_w( *space, offset, data );
 			break;
 		case 1: case 3: case 5: case 7:
-			mc6845_register_w( devconf, offset, data );
+			mc6845->register_w( *space, offset, data );
 			break;
 		case 8:
 			mda_mode_control_w(device, offset, data);
@@ -466,7 +467,8 @@ WRITE8_DEVICE_HANDLER ( pc_MDA_w )
  READ8_DEVICE_HANDLER ( pc_MDA_r )
 {
 	int data = 0xff;
-	device_t *devconf = device->subdevice(MDA_MC6845_NAME);
+	mc6845_device *mc6845 = device->subdevice<mc6845_device>(MDA_MC6845_NAME);
+	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *lpt = device->subdevice("lpt");
 	switch( offset )
 	{
@@ -474,7 +476,7 @@ WRITE8_DEVICE_HANDLER ( pc_MDA_w )
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = mc6845_register_r( devconf, offset );
+			data = mc6845->register_r( *space, offset );
 			break;
 		case 10:
 			data = mda_status_r(device, offset);
@@ -653,9 +655,9 @@ static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 
 static SCREEN_UPDATE( mc6845_hercules )
 {
-	device_t *devconf = screen->owner()->subdevice(HERCULES_MC6845_NAME);
+	mc6845_device *mc6845 = screen->owner()->subdevice<mc6845_device>(HERCULES_MC6845_NAME);
 
-	mc6845_update( devconf, bitmap, cliprect );
+	mc6845->update( bitmap, cliprect );
 	return 0;
 }
 
@@ -684,8 +686,8 @@ static WRITE8_DEVICE_HANDLER(hercules_mode_control_w)
 		herc->update_row = NULL;
 	}
 
-	mc6845_set_clock( device, herc->mode_control & 0x02 ? MDA_CLOCK / 16 : MDA_CLOCK / 9 );
-	mc6845_set_hpixels_per_column( device, herc->mode_control & 0x02 ? 16 : 9 );
+	downcast<mc6845_device *>(device)->set_clock( herc->mode_control & 0x02 ? MDA_CLOCK / 16 : MDA_CLOCK / 9 );
+	downcast<mc6845_device *>(device)->set_hpixels_per_column( herc->mode_control & 0x02 ? 16 : 9 );
 }
 
 
@@ -699,18 +701,19 @@ static WRITE8_DEVICE_HANDLER(hercules_config_w)
 
 static WRITE8_DEVICE_HANDLER ( hercules_w )
 {
-	device_t *devconf = device->subdevice(HERCULES_MC6845_NAME);
+	mc6845_device *mc6845 = device->subdevice<mc6845_device>(HERCULES_MC6845_NAME);
+	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *lpt = device->subdevice("lpt");
 	switch( offset )
 	{
 	case 0: case 2: case 4: case 6:
-		mc6845_address_w( devconf, offset, data );
+		mc6845->address_w( *space, offset, data );
 		break;
 	case 1: case 3: case 5: case 7:
-		mc6845_register_w( devconf, offset, data );
+		mc6845->register_w( *space, offset, data );
 		break;
 	case 8:
-		hercules_mode_control_w(devconf, offset, data);
+		hercules_mode_control_w(mc6845, offset, data);
 		break;
 	case 12: case 13:  case 14:
 		pc_lpt_w(lpt, offset - 12, data);
@@ -743,7 +746,8 @@ static READ8_DEVICE_HANDLER(hercules_status_r)
 static READ8_DEVICE_HANDLER ( hercules_r )
 {
 	int data = 0xff;
-	device_t *devconf = device->subdevice(HERCULES_MC6845_NAME);
+	mc6845_device *mc6845 = device->subdevice<mc6845_device>(HERCULES_MC6845_NAME);
+	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *lpt = device->subdevice("lpt");
 	switch( offset )
 	{
@@ -751,7 +755,7 @@ static READ8_DEVICE_HANDLER ( hercules_r )
 		/* return last written mc6845 address value here? */
 		break;
 	case 1: case 3: case 5: case 7:
-		data = mc6845_register_r( devconf, offset );
+		data = mc6845->register_r( *space, offset );
 		break;
 	case 10:
 		data = hercules_status_r(device, offset);

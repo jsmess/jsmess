@@ -366,7 +366,7 @@ SCREEN_UPDATE( super80v )
 	state->m_cursor = (state->m_mc6845_reg[14]<<8) | state->m_mc6845_reg[15]; // get cursor position
 	state->m_s_options=input_port_read(screen->machine(), "CONFIG");
 	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
-	mc6845_update(state->m_6845, bitmap, cliprect);
+	state->m_6845->update(bitmap, cliprect);
 	return 0;
 }
 
@@ -424,12 +424,12 @@ WRITE8_MEMBER( super80_state::super80v_10_w )
 {
 	data &= 0x1f;
 	m_mc6845_ind = data;
-	mc6845_address_w( m_6845, 0, data );
+	m_6845->address_w( space, 0, data );
 }
 
 WRITE8_MEMBER( super80_state::super80v_11_w )
 {
 	m_mc6845_reg[m_mc6845_ind] = data & mc6845_mask[m_mc6845_ind];	/* save data in register */
-	mc6845_register_w( m_6845, 0, data );
+	m_6845->register_w( space, 0, data );
 	if ((m_mc6845_ind > 8) && (m_mc6845_ind < 12)) mc6845_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
 }

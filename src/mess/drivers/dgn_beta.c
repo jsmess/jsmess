@@ -156,8 +156,8 @@ static ADDRESS_MAP_START( dgnbeta_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xFC20, 0xFC23)	AM_DEVREADWRITE_MODERN(PIA_0_TAG, pia6821_device, read, write)
 	AM_RANGE(0xFC24, 0xFC27)	AM_DEVREADWRITE_MODERN(PIA_1_TAG, pia6821_device, read, write)
 	AM_RANGE(0xFC28, 0xfC7F)	AM_NOP
-	AM_RANGE(0xfc80, 0xfc80)    AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0xfc81, 0xfc81)    AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)	
+	AM_RANGE(0xfc80, 0xfc80)    AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0xfc81, 0xfc81)    AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)	
 	AM_RANGE(0xfc82, 0xfC9F)	AM_NOP
 	AM_RANGE(0xFCA0, 0xFCA3)	AM_READNOP AM_WRITE(dgnbeta_colour_ram_w)		    /* 4x4bit colour ram for graphics modes */
 	AM_RANGE(0xFCC0, 0xFCC3)	AM_DEVREADWRITE_MODERN(PIA_2_TAG, pia6821_device, read, write)

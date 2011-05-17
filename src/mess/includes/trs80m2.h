@@ -50,7 +50,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t>m_ctc;
 	required_device<device_t> m_pio;
-	required_device<device_t> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_floppy;

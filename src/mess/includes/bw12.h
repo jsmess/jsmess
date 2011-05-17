@@ -39,7 +39,7 @@ public:
 	required_device<pia6821_device> m_pia;
 	required_device<device_t> m_fdc;
 	required_device<ay3600_device> m_kbc;
-	required_device<device_t> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_ram;
 	required_device<device_t> m_floppy0;

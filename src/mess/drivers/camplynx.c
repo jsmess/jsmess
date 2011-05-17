@@ -87,7 +87,7 @@ public:
 	camplynx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	device_t *m_mc6845;
+	mc6845_device *m_mc6845;
 };
 
 /* These bankswitch handlers are very incomplete, just enough to get the
@@ -198,8 +198,8 @@ static ADDRESS_MAP_START( lynx48k_io , AS_IO, 8)
 	AM_RANGE(0x0880,0x0880) AM_READ_PORT("LINE8")
 	AM_RANGE(0x0980,0x0980) AM_READ_PORT("LINE9")
 	AM_RANGE(0x0084,0x0084) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_w)	/* 6-bit dac */
-	AM_RANGE(0x0086,0x0086) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0x0087,0x0087) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_register_r,mc6845_register_w)
+	AM_RANGE(0x0086,0x0086) AM_MIRROR(0xff00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0087,0x0087) AM_MIRROR(0xff00) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lynx128k_io , AS_IO, 8)
@@ -224,8 +224,8 @@ static ADDRESS_MAP_START( lynx128k_io , AS_IO, 8)
 	AM_RANGE(0x0980,0x0980) AM_READ_PORT("LINE9")
 	AM_RANGE(0x0082,0x0082) AM_MIRROR(0xff00) AM_WRITE(lynx128k_bank_w)	// read=serial buffer
 	AM_RANGE(0x0084,0x0084) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_w)	/* 6-bit dac. Read="single-step", causes a NMI */
-	AM_RANGE(0x0086,0x0086) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_status_r,mc6845_address_w)
-	AM_RANGE(0x0087,0x0087) AM_MIRROR(0xff00) AM_DEVREADWRITE("crtc", mc6845_register_r,mc6845_register_w)
+	AM_RANGE(0x0086,0x0086) AM_MIRROR(0xff00) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, status_r, address_w)
+	AM_RANGE(0x0087,0x0087) AM_MIRROR(0xff00) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -411,14 +411,14 @@ static VIDEO_START( lynx48k )
 {
 	camplynx_state *state = machine.driver_data<camplynx_state>();
 
-	state->m_mc6845 = machine.device("crtc");
+	state->m_mc6845 = machine.device<mc6845_device>("crtc");
 }
 
 static SCREEN_UPDATE( lynx48k )
 {
 	camplynx_state *state = screen->machine().driver_data<camplynx_state>();
 
-	mc6845_update(state->m_mc6845, bitmap, cliprect);
+	state->m_mc6845->update( bitmap, cliprect);
 	return 0;
 }
 

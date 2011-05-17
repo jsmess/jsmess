@@ -1371,12 +1371,12 @@ static WRITE8_HANDLER( x1_6845_w )
 	if(offset == 0)
 	{
 		state->m_crtc_index = data;
-		mc6845_address_w(space->machine().device("crtc"), 0,data);
+		space->machine().device<mc6845_device>("crtc")->address_w(*space, offset, data);
 	}
 	else
 	{
 		state->m_crtc_vreg[state->m_crtc_index] = data;
-		mc6845_register_w(space->machine().device("crtc"), 0,data);
+		space->machine().device<mc6845_device>("crtc")->register_w(*space, offset, data);
 	}
 }
 
@@ -1950,7 +1950,7 @@ static WRITE8_DEVICE_HANDLER( x1_portc_w )
 	state->m_hres_320 = data & 0x40;
 
 	/* set up the pixel clock according to the above divider */
-	mc6845_set_clock(device->machine().device("crtc"), VDP_CLOCK/((state->m_hres_320) ? 48 : 24));
+	device->machine().device<mc6845_device>("crtc")->set_clock(VDP_CLOCK/((state->m_hres_320) ? 48 : 24));
 
 	if(((data & 0x20) == 0) && (state->m_io_switch & 0x20))
 		state->m_io_bank_mode = 1;

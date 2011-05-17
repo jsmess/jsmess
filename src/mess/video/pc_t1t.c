@@ -157,8 +157,8 @@ static struct
 
 static SCREEN_UPDATE( mc6845_t1000 )
 {
-	device_t *devconf = screen->machine().device(T1000_MC6845_NAME);
-	mc6845_update( devconf, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(T1000_MC6845_NAME);
+	mc6845->update( bitmap, cliprect);
 	return 0;
 }
 
@@ -474,7 +474,7 @@ static void pc_t1t_mode_switch( void )
 
 static void pc_pcjr_mode_switch( running_machine &machine )
 {
-	device_t *mc6845 = machine.device(T1000_MC6845_NAME);
+	mc6845_device *mc6845 = machine.device<mc6845_device>(T1000_MC6845_NAME);
 
 	switch( pcjr.reg.data[0] & 0x1A )
 	{
@@ -516,11 +516,11 @@ static void pc_pcjr_mode_switch( running_machine &machine )
 	/* Determine mc6845 input clock */
 	if ( pcjr.reg.data[0] & 0x01 )
 	{
-		mc6845_set_clock( mc6845, XTAL_14_31818MHz/8 );
+		mc6845->set_clock( XTAL_14_31818MHz/8 );
 	}
 	else
 	{
-		mc6845_set_clock( mc6845, XTAL_14_31818MHz/16 );
+		mc6845->set_clock( XTAL_14_31818MHz/16 );
 	}
 
 	/* color or b/w? */
@@ -771,17 +771,17 @@ static int pc_t1t_bank_r(void)
 
 WRITE8_HANDLER ( pc_T1T_w )
 {
-	device_t *devconf;
+	mc6845_device *mc6845;
 
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			devconf = space->machine().device(T1000_MC6845_NAME);
-			mc6845_address_w( devconf, offset, data );
+			mc6845 = space->machine().device<mc6845_device>(T1000_MC6845_NAME);
+			mc6845->address_w( *space, offset, data );
 			break;
 		case 1: case 3: case 5: case 7:
-			devconf = space->machine().device(T1000_MC6845_NAME);
-			mc6845_register_w( devconf, offset, data );
+			mc6845 = space->machine().device<mc6845_device>(T1000_MC6845_NAME);
+			mc6845->register_w( *space, offset, data );
 			break;
 		case 8:
 			pc_t1t_mode_control_w(data);
@@ -811,17 +811,17 @@ WRITE8_HANDLER ( pc_T1T_w )
 
 WRITE8_HANDLER( pc_pcjr_w )
 {
-	device_t *devconf;
+	mc6845_device *mc6845;
 
 	switch( offset )
 	{
 		case 0: case 4:
-			devconf = space->machine().device(T1000_MC6845_NAME);
-			mc6845_address_w( devconf, offset, data );
+			mc6845 = space->machine().device<mc6845_device>(T1000_MC6845_NAME);
+			mc6845->address_w( *space, offset, data );
 			break;
 		case 1: case 5:
-			devconf = space->machine().device(T1000_MC6845_NAME);
-			mc6845_register_w( devconf, offset, data );
+			mc6845 = space->machine().device<mc6845_device>(T1000_MC6845_NAME);
+			mc6845->register_w( *space, offset, data );
 			break;
 		case 10:
 			if ( pcjr.address_data_ff & 0x01 )
@@ -851,7 +851,7 @@ WRITE8_HANDLER( pc_pcjr_w )
 
  READ8_HANDLER ( pc_T1T_r )
 {
-	device_t *devconf;
+	mc6845_device *mc6845;
 	int				data = 0xff;
 
 	switch( offset )
@@ -861,8 +861,8 @@ WRITE8_HANDLER( pc_pcjr_w )
 			break;
 
 		case 1: case 3: case 5: case 7:
-			devconf = space->machine().device(T1000_MC6845_NAME);
-			data = mc6845_register_r( devconf, offset );
+			mc6845 = space->machine().device<mc6845_device>(T1000_MC6845_NAME);
+			data = mc6845->register_r( *space, offset );
 			break;
 
 		case 8:

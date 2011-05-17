@@ -7,6 +7,7 @@
 #ifndef EINSTEIN_H_
 #define EINSTEIN_H_
 
+#include "video/mc6845.h"
 #include "cpu/z80/z80daisy.h"
 
 /***************************************************************************
@@ -32,7 +33,7 @@ public:
 	UINT8 m_keyboard_data;
 
 	/* 80 column device */
-	device_t *m_mc6845;
+	mc6845_device *m_mc6845;
 	screen_device *m_crtc_screen;
 	UINT8 *m_crtc_ram;
 	UINT8	m_de;

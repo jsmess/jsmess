@@ -141,7 +141,7 @@ public:
 	int m_Field;
 	int m_DrawInterlace;
 	
-	required_device<device_t> m_mc6845;
+	required_device<mc6845_device> m_mc6845;
 };
 
 

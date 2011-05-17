@@ -295,7 +295,7 @@ READ8_MEMBER( mbee_state::m6545_status_r )
 READ8_MEMBER( mbee_state::m6545_data_r )
 {
 	UINT16 addr;
-	UINT8 data = mc6845_register_r(m_crtc, 0);
+	UINT8 data = m_crtc->register_r( space, 0 );
 
 	switch( m_sy6545_ind )
 	{
@@ -320,7 +320,7 @@ WRITE8_MEMBER ( mbee_state::m6545_index_w )
 {
 	data &= 0x1f;
 	m_sy6545_ind = data;
-	mc6845_address_w( m_crtc, 0, data );
+	m_crtc->address_w( space, 0, data );
 }
 
 WRITE8_MEMBER ( mbee_state::m6545_data_w )
@@ -346,7 +346,7 @@ WRITE8_MEMBER ( mbee_state::m6545_data_w )
 		break;
 	}
 	m_sy6545_reg[m_sy6545_ind] = data & sy6545_mask[m_sy6545_ind];	/* save data in register */
-	mc6845_register_w( m_crtc, 0, data );
+	m_crtc->register_w( space, 0, data );
 	if ((m_sy6545_ind > 8) && (m_sy6545_ind < 12)) sy6545_cursor_configure();		/* adjust cursor shape - remove when mame fixed */
 }
 
@@ -392,7 +392,7 @@ SCREEN_UPDATE( mbee )
 	state->m_framecnt++;
 	state->m_speed = state->m_sy6545_reg[10]&0x20, state->m_flash = state->m_sy6545_reg[10]&0x40;			// cursor modes
 	state->m_cursor = (state->m_sy6545_reg[14]<<8) | state->m_sy6545_reg[15];					// get cursor position
-	mc6845_update(state->m_crtc, bitmap, cliprect);
+	state->m_crtc->update( bitmap, cliprect);
 	return 0;
 }
 

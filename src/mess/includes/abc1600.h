@@ -78,7 +78,7 @@ public:
 	required_device<device_t> m_fdc;
 	required_device<e0516_device> m_rtc;
 	required_device<nmc9306_device> m_nvram;
-	required_device<device_t> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_ram;
 	required_device<device_t> m_floppy;
 

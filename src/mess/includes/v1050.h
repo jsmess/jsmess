@@ -82,7 +82,7 @@ public:
 	required_device<device_t> m_uart_kb;
 	required_device<device_t> m_uart_sio;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_ram;
 	required_device<device_t> m_discrete;

@@ -218,10 +218,10 @@ static ADDRESS_MAP_START(pyl601_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0xbfff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0xc000, 0xdfff ) AM_RAMBANK("bank2")
 	AM_RANGE( 0xe000, 0xe5ff ) AM_RAMBANK("bank3")
-	AM_RANGE( 0xe600, 0xe600 ) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE( 0xe601, 0xe601 ) AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)
-	AM_RANGE( 0xe604, 0xe604 ) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE( 0xe605, 0xe605 ) AM_DEVREADWRITE("crtc", mc6845_register_r , mc6845_register_w)
+	AM_RANGE( 0xe600, 0xe600 ) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE( 0xe601, 0xe601 ) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE( 0xe604, 0xe604 ) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE( 0xe605, 0xe605 ) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE( 0xe628, 0xe628 ) AM_READ(keyboard_r)
 	AM_RANGE( 0xe629, 0xe629 ) AM_READWRITE(video_mode_r,video_mode_w)
 	AM_RANGE( 0xe62a, 0xe62a ) AM_READWRITE(keycheck_r,led_w)
@@ -361,8 +361,8 @@ static VIDEO_START( pyl601 )
 
 static SCREEN_UPDATE( pyl601 )
 {
-	device_t *mc6845 = screen->machine().device("crtc");
-	mc6845_update(mc6845, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>("crtc");
+	mc6845->update( bitmap, cliprect);
 	return 0;
 }
 

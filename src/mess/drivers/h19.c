@@ -58,7 +58,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_ace;
 	required_device<device_t> m_term;
 	required_device<device_t> m_beep;
@@ -121,8 +121,8 @@ static ADDRESS_MAP_START( h19_io, AS_IO, 8, h19_state)
 	AM_RANGE(0x00, 0x1F) AM_READ_PORT("S401")
 	AM_RANGE(0x20, 0x3F) AM_READ_PORT("S402")
 	AM_RANGE(0x40, 0x47) AM_MIRROR(0x18) AM_DEVREADWRITE_LEGACY("ins8250", ins8250_r, ins8250_w )
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE_LEGACY("crtc", mc6845_address_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE_LEGACY("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x80, 0x9F) AM_READ(h19_80_r)
 	AM_RANGE(0xA0, 0xBF) AM_READ(h19_a0_r)
 	AM_RANGE(0xC0, 0xFF) AM_WRITE(h19_c0_w)
@@ -307,7 +307,7 @@ VIDEO_START_MEMBER( h19_state )
 
 SCREEN_UPDATE_MEMBER( h19_state )
 {
-	mc6845_update(m_crtc, &bitmap, &cliprect);
+	m_crtc->update( &bitmap, &cliprect);
 	return 0;
 }
 

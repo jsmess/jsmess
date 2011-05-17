@@ -69,7 +69,7 @@ public:
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1869_device> m_vis;
-	required_device<device_t> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_fdc;
 	required_device<cdp1871_device> m_kbe;
 	required_device<device_t> m_cassette;

@@ -419,8 +419,8 @@ static ADDRESS_MAP_START( pet40_mem , AS_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
 	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE_MODERN("pia_1", pia6821_device, read, write)
 	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
-	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -436,8 +436,8 @@ static ADDRESS_MAP_START( pet80_mem , AS_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
 	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE("pia_1", pia6821_r, pia6821_w)
 	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
-	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
 #endif
 	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank8")
 	AM_RANGE(0xf000, 0xffef) AM_WRITE_BANK("bank8")
@@ -467,8 +467,8 @@ static ADDRESS_MAP_START( superpet_mem , AS_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
 	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE_MODERN("pia_1", pia6821_device, read, write)
 	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
-	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
 	/* 0xefe0, 0xefe3, mos 6702 */
 	/* 0xeff0, 0xeff3, acia6551 */
 	AM_RANGE(0xeff8, 0xefff) AM_READWRITE(superpet_r, superpet_w)
@@ -483,8 +483,8 @@ static ADDRESS_MAP_START( superpet_m6809_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
 	AM_RANGE(0xe820, 0xe823) AM_DEVREADWRITE_MODERN("pia_1", pia6821_device, read, write)
 	AM_RANGE(0xe840, 0xe84f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
-	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0xe880, 0xe880) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0xe881, 0xe881) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0xeff8, 0xefff) AM_READWRITE(superpet_r, superpet_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -641,8 +641,8 @@ static VIDEO_START( pet_crtc )
 
 static SCREEN_UPDATE( pet_crtc )
 {
-	device_t *mc6845 = screen->machine().device("crtc");
-	mc6845_update(mc6845, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>("crtc");
+	mc6845->update( bitmap, cliprect);
 	return 0;
 }
 

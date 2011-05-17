@@ -71,7 +71,7 @@ public:
 	//virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_6845;
+	required_device<mc6845_device> m_6845;
 	required_device<device_t> m_ctc_84;
 	required_device<device_t> m_ctc_88;
 	required_device<device_t> m_fdc;
@@ -270,8 +270,8 @@ static ADDRESS_MAP_START( bigbord2_io, AS_IO, 8, bigbord2_state )
 	AM_RANGE(0xC4, 0xC7) AM_READ(bigbord2_c4_r)
 	AM_RANGE(0xD0, 0xD3) AM_READ(bigbord2_d0_r)
 	AM_RANGE(0xD4, 0xD7) AM_DEVREADWRITE_LEGACY(WD1771_TAG, wd17xx_r, wd17xx_w)
-	AM_RANGE(0xDC, 0xDC) AM_MIRROR(2) AM_DEVWRITE_LEGACY("crtc", mc6845_address_w)
-	AM_RANGE(0xDD, 0xDD) AM_MIRROR(2) AM_DEVREADWRITE_LEGACY("crtc",mc6845_register_r,mc6845_register_w)
+	AM_RANGE(0xDC, 0xDC) AM_MIRROR(2) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0xDD, 0xDD) AM_MIRROR(2) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
 
 
@@ -567,7 +567,7 @@ static SCREEN_UPDATE( bigbord2 )
 {
 	bigbord2_state *state = screen->machine().driver_data<bigbord2_state>();
 	state->m_framecnt++;
-	mc6845_update(state->m_6845, bitmap, cliprect);
+	state->m_6845->update( bitmap, cliprect);
 	return 0;
 }
 

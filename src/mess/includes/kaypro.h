@@ -35,7 +35,7 @@ public:
 	optional_device<device_t> m_sio2x;
 	required_device<device_t> m_printer;
 	required_device<device_t> m_fdc;
-	optional_device<device_t> m_crtc;
+	optional_device<mc6845_device> m_crtc;
 	required_device<device_t> m_beep;
 	DECLARE_READ8_MEMBER( kaypro2x_87_r );
 	DECLARE_READ8_MEMBER( kaypro2x_system_port_r );
