@@ -137,10 +137,10 @@
 	
 	<software name="basic7">
 		<description>Octasoft BASIC 7.0 (Hun)</description>
-		<year>198</year>
+		<year>1988</year>
 		<publisher>Novotrade</publisher>
 		<part name="cart" interface="plus4_cart">
-			<dataarea name="c1l" size="0x4000">
+			<dataarea name="c2l" size="0x4000">
 				<rom name="basic7-lo" size="0x2000" crc="5ccfd018" sha1="172bd3605321c199b5e91be8ad8db4380514b195" offset="0x0000" />
 				<rom name="basic7-hi" size="0x2000" crc="c4c48a83" sha1="4cf3ac8a4f883c33b5ec5c7d0cef3264a9cdef9e" offset="0x2000" />
 			</dataarea>
@@ -162,13 +162,27 @@
 		</part>
 	</software>
 	
-	<software name="speedy" supported="no">
+	<software name="speedy">
 		<description>Speedy</description>
 		<year>1988</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
 				<rom name="speedy.u1" size="0x2000" crc="74f180bc" sha1="79a4b19c50bc9a85c0356a3d2d7453b2d1d8266f" offset="0x0000" />
+				<rom size="0x2000" offset="0x2000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="turbopls">
+		<description>TurboPlus</description>
+		<year>1987</year>
+		<publisher>Kingsoft</publisher>
+		<info name="author" value="Andreas Arens" />
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="turboplus.u1" size="0x2000" crc="88b40daf" sha1="bb02e863193b9f7731e9bf5b554bb1e743a0a573" offset="0x0000" />
+				<rom size="0x2000" offset="0x2000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
