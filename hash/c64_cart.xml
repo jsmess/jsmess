@@ -1706,7 +1706,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		|=|                         |
 		|===========================|
 
-		ROM0  - MOS 2532 8Kx8 ROM "317017-01 (C) 1983 CBM" @ U1
+		ROM0  - MOS 2564 8Kx8 ROM "317017-01 (C) 1983 CBM" @ U1
 		ROM1  - GI 9464C-0837 8Kx8 ROM "317018-01 (C) 1983 CBM" @ U2
 		-->
 		<part name="cart" interface="c64_cart">
@@ -1743,8 +1743,8 @@ http://www.retroport.de/C64_C128_Hardware.html
 		|=|                         |
 		|===========================|
 
-		ROM0  - MOS 2532 8Kx8 ROM "317038-01 (C) 1983 CBM" @ U1
-		ROM1  - MOS 2532 8Kx8 ROM "317039-01 (C) 1983 CBM" @ U2
+		ROM0  - MOS 2564 8Kx8 ROM "317038-01 (C) 1983 CBM" @ U1
+		ROM1  - MOS 2564 8Kx8 ROM "317039-01 (C) 1983 CBM" @ U2
 		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="0" />

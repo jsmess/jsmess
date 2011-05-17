@@ -1,5 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+	Missing dumps:
+	
+	325201-01 	C16/C116/plus4 Burn In
+	325057-01	C16/C116/plus4 DIAGNOSE
+	325062-01	C16/C116/plus4 Diagnostic Test
+-->
 <softwarelist name="plus4_cart" description="Commodore Plus/4 cartridges">
 	
 	<!-- Games -->
@@ -11,8 +18,7 @@
 		<info name="serial" value="T116005" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="atomic-lo" size="0x2000" crc="8ee859ce" sha1="dac80035aa9c15c81d0ae7d80392d2be691dd55c" offset="0x0000" />
-				<rom name="atomic-hi" size="0x2000" crc="f3ebd401" sha1="011b7fd7c7990c4189ac107f7da0f3df474007d1" offset="0x2000" />
+				<rom name="317042-01.u1" size="0x4000" crc="a059fccb" sha1="e919531d016596ec1a2fd349bbe6691716297f35" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -24,8 +30,7 @@
 		<info name="serial" value="T116002" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="jack-lo" size="0x2000" crc="c4201b23" sha1="dfba1151dc477d1096d5e4747fe07c104454d9ad" offset="0x0000" />
-				<rom name="jack-hi" size="0x2000" crc="f67be343" sha1="c6ef59735d11a85538538c868dfc09c970070ab5" offset="0x2000" />
+				<rom name="317040-01.u1" size="0x4000" crc="6b624fec" sha1="ba54810ef1089fdf56b74536f9d679a80ace2dc1" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -37,8 +42,7 @@
 		<info name="serial" value="T116004" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="pirate-lo" size="0x2000" crc="636ac403" sha1="45e3fa723bc58b1c2c0ff4ac428556629fc384bf" offset="0x0000" />
-				<rom name="pirate-hi" size="0x2000" crc="d66c86e9" sha1="44d56f6fd32b5ba8202f674444a5bc4e7481ceb4" offset="0x2000" />
+				<rom name="317041-01.u1" size="0x4000" crc="a903dc53" sha1="410ccb6b304ca30e852fdc6ec33d9dacd7de3493" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50,8 +54,7 @@
 		<info name="serial" value="T116006" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="odyssey-lo" size="0x2000" crc="2a55241b" sha1="0fe437bae5b07a81aa8abf7496a685ba5bbf0e41" offset="0x0000" />
-				<rom name="odyssey-hi" size="0x2000" crc="ca728068" sha1="78a087b731051b688ad572f80d0af15c01a44193" offset="0x2000" />
+				<rom name="317043-01.u1" size="0x4000" crc="994c9b98" sha1="30a0707efe24f58525bffc228085f412d574fa3b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -63,8 +66,7 @@
 		<info name="serial" value="T116001" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="viduzzles-lo" size="0x2000" crc="c9460f9c" sha1="e4929a6880c4e324b6551a5b31ceebf8a7fc4d60" offset="0x0000" />
-				<rom name="viduzzles-hi" size="0x2000" crc="f51a493e" sha1="407f2ed9f1ad91d24c06227899d43e310e8b149d" offset="0x2000" />
+				<rom name="unknown.u1" size="0x4000" crc="eaaa44ed" sha1="97c269ab7b57a5ddfe65a06c29986c6ccb3aeb2b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -108,8 +110,7 @@
 		<info name="serial" value="T232001" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="fa-lo" size="0x2000" crc="e731ad79" sha1="c27048283f6ce2831ded2055eb05316d2842a787" offset="0x0000" />
-				<rom name="fa-hi" size="0x2000" crc="14025361" sha1="053a8d7980c6c5d83c60c69858b77e5e2e0de3be" offset="0x2000" />
+				<rom name="317048-01.u1" size="0x4000" crc="5b0e82ae" sha1="0f1b8b20331c8c502fed507eca5d66683667757b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -122,10 +123,10 @@
 		<info name="video" value="NTSC" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="logo-lo" size="0x4000" crc="216fc5a8" sha1="6e22c082ef2659af4eb10f8acb14175941c9edc9" offset="0x0000" />
+				<rom name="317046-01.u1" size="0x4000" crc="216fc5a8" sha1="6e22c082ef2659af4eb10f8acb14175941c9edc9" offset="0x0000" />
 			</dataarea>
 			<dataarea name="c1h" size="0x4000">
-				<rom name="logo-hi" size="0x4000" crc="4b7e5c5a" sha1="f2d4fdafef12762c96b88f06bb5d91644f54e5c7" offset="0x0000" />
+				<rom name="317047-01.u2" size="0x4000" crc="4b7e5c5a" sha1="f2d4fdafef12762c96b88f06bb5d91644f54e5c7" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop" interface="floppy_5_25">
@@ -154,10 +155,10 @@
 		<info name="serial" value="T112001" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="script-lo" size="0x4000" crc="d1679eea" sha1="d6d0d8f7feb16cdba650696683c02fcf62422f4a" offset="0x0000" />
+				<rom name="317051-01.u1" size="0x4000" crc="d1679eea" sha1="d6d0d8f7feb16cdba650696683c02fcf62422f4a" offset="0x0000" />
 			</dataarea>
 			<dataarea name="c1h" size="0x4000">
-				<rom name="script-hi" size="0x4000" crc="ad0696d9" sha1="5d7c6d0f2c732c92ca8f8f98486e08137824a4a4" offset="0x0000" />
+				<rom name="317052-01.u2" size="0x4000" crc="ad0696d9" sha1="5d7c6d0f2c732c92ca8f8f98486e08137824a4a4" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
