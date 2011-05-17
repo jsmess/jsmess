@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="c128_flop" description="Commodore 128 Floppy">
+<softwarelist name="c128_flop" description="Commodore 128 diskettes">
 
 	<software name="thaibxng">
 		<description>Thai Boxing</description>
 		<year>1986</year>
 		<publisher>Anco</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="thai_boxing[anco_1986](c128)(fat).g64" size="333744" crc="6a29ef3a" sha1="ca317c6f44e940c38e1f537d88e66c52c6968885" offset="0" />
 			</dataarea>

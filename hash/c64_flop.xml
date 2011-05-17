@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="c64_flop" description="Commodore 64 Floppy">
+<softwarelist name="c64_flop" description="Commodore 64 diskettes">
 
 	<software name="sthassle">
 		<description>Street Hassle</description>
 		<year>1987</year>
 		<publisher>Melbourne House</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<info name="video" value="PAL" />
+		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="street_hassle[melbourne_house_1987](pal).g64" size="333744" crc="92c15c93" sha1="a1bc536294ae1d36ffde644798dc25cd1d514c93" offset="0" />
 			</dataarea>

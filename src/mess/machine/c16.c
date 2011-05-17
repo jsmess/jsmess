@@ -621,7 +621,28 @@ INTERRUPT_GEN( c16_frame_interrupt )
 
 ***********************************************/
 
-static DEVICE_IMAGE_LOAD( c16_cart )
+static void plus4_software_list_cartridge_load(device_image_interface &image)
+{
+	UINT8 *mem = image.device().machine().region("maincpu")->base();
+
+	size_t size = image.get_software_region_length("c1l");
+	if (size)
+		memcpy(mem + 0x20000, image.get_software_region("c1l"), size);
+
+	size = image.get_software_region_length("c1h");
+	if (size)
+		memcpy(mem + 0x24000, image.get_software_region("c1h"), size);
+
+	size = image.get_software_region_length("c2l");
+	if (size)
+		memcpy(mem + 0x28000, image.get_software_region("c2l"), size);
+
+	size = image.get_software_region_length("c2h");
+	if (size)
+		memcpy(mem + 0x2c000, image.get_software_region("c2h"), size);
+}
+
+static int plus4_crt_load( device_image_interface &image )
 {
 	UINT8 *mem = image.device().machine().region("maincpu")->base();
 	int size = image.length(), test;
@@ -673,9 +694,27 @@ static DEVICE_IMAGE_LOAD( c16_cart )
 	return IMAGE_INIT_PASS;
 }
 
+static DEVICE_IMAGE_LOAD( c16_cart )
+{
+	int result = IMAGE_INIT_PASS;
+
+	if (image.software_entry() != NULL)
+	{
+		plus4_software_list_cartridge_load(image);
+	}
+	else
+	{
+		result = plus4_crt_load(image);
+	}
+	
+	return result;
+}
+
 MACHINE_CONFIG_FRAGMENT( c16_cartslot )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom,hi,lo")
 	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("plus4_cart")
 	MCFG_CARTSLOT_LOAD(c16_cart)
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "plus4_cart")
 MACHINE_CONFIG_END
