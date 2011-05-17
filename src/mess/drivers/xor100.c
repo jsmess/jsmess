@@ -13,7 +13,7 @@
         L xxxx         = edit memory (. to exit)
         M xxxx yyyy zzzz = Move (copy) memory
         V xxxx           = unknown
-    X n     = Select a bank (0 works, others freeze)
+        X n     = Select a bank (0 works, others freeze)
 
         Note some of the commands are a bit buggy, eg F doesn't fill the last byte
 
