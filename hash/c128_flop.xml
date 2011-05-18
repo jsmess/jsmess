@@ -2,6 +2,30 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="c128_flop" description="Commodore 128 diskettes">
 
+	<!-- Games -->
+
+	<software name="lastv8">
+		<description>The Last V-8</description>
+		<year>1985</year>
+		<publisher>Mastertronic</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="the_last_v8[mastertronic_1985](c128).g64" size="333744" crc="34EE8B20" sha1="3d752a5f4924cf48689270f5f9464cc9529d7aa7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="rockyhor">
+		<description>The Rocky Horror Show</description>
+		<year>1987</year>
+		<publisher>CRL</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="rocky_horror_show[crl_1987](c128).g64" size="333744" crc="cd1915f9" sha1="792756c0ae514b55ab4e06a2f4601f9cd1edf7c7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="thaibxng">
 		<description>Thai Boxing</description>
 		<year>1986</year>
@@ -13,4 +37,17 @@
 		</part>
 	</software>
 	
+	<!-- Applications -->
+	
+	<software name="basic128">
+		<description>BASIC-128 v1.03</description>
+		<year>1985</year>
+		<publisher>Abacus</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="basic-128[abacus_1985](v1_03).g64" size="333744" crc="94047950" sha1="a1cd6e8302699684e0eaa8bccc0de6ad70918397" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
