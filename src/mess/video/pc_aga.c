@@ -489,14 +489,14 @@ static READ8_HANDLER ( pc_aga_mda_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_MONO ) {
-		device_t *devconf = space->machine().device(AGA_MC6845_NAME);
+		mc6845_device *mc6845 = space->machine().device<mc6845_device>(AGA_MC6845_NAME);
 		switch( offset )
 		{
 		case 0: case 2: case 4: case 6:
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = mc6845_register_r( devconf, offset );
+			data = mc6845->register_r(*space, offset);
 			break;
 		case 10:
 			data = (input_port_read(space->machine(), "IN0") & 0x80 ) | 0x08 | aga.mda_status;
@@ -511,14 +511,14 @@ static READ8_HANDLER ( pc_aga_mda_r )
 static WRITE8_HANDLER ( pc_aga_mda_w )
 {
 	if ( aga.mode == AGA_MONO ) {
-		device_t *devconf = space->machine().device(AGA_MC6845_NAME);
+		mc6845_device *mc6845 = space->machine().device<mc6845_device>(AGA_MC6845_NAME);
 		switch( offset )
 		{
 			case 0: case 2: case 4: case 6:
-				mc6845_address_w( devconf, offset, data );
+				mc6845->address_w( *space, offset, data );
 				break;
 			case 1: case 3: case 5: case 7:
-				mc6845_register_w( devconf, offset, data );
+				mc6845->register_w( *space, offset, data );
 				break;
 			case 8:
 				aga.mda_mode_control = data;
@@ -544,13 +544,13 @@ static READ8_HANDLER ( pc_aga_cga_r )
 	UINT8 data = 0xFF;
 
 	if ( aga.mode == AGA_COLOR ) {
-		device_t *devconf = space->machine().device(AGA_MC6845_NAME);
+		mc6845_device *mc6845 = space->machine().device<mc6845_device>(AGA_MC6845_NAME);
 		switch( offset ) {
 		case 0: case 2: case 4: case 6:
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = mc6845_register_r( devconf, offset );
+			data = mc6845->register_r( *space, offset);
 			break;
 		case 10:
 			data = aga.vsync | ( ( data & 0x40 ) >> 4 ) | aga.hsync;
@@ -590,14 +590,14 @@ static void pc_aga_set_palette_luts(void) {
 static WRITE8_HANDLER ( pc_aga_cga_w )
 {
 	if ( aga.mode == AGA_COLOR ) {
-		device_t *devconf = space->machine().device(AGA_MC6845_NAME);
+		mc6845_device *mc6845 = space->machine().device<mc6845_device>(AGA_MC6845_NAME);
 
 		switch(offset) {
 		case 0: case 2: case 4: case 6:
-			mc6845_address_w( devconf, offset, data );
+			mc6845->address_w( *space, offset, data );
 			break;
 		case 1: case 3: case 5: case 7:
-			mc6845_register_w( devconf, offset, data );
+			mc6845->register_w( *space, offset, data );
 			break;
 		case 8:
 			aga.cga_mode_control = data;
@@ -605,11 +605,11 @@ static WRITE8_HANDLER ( pc_aga_cga_w )
 			//logerror("mode set to %02X\n", aga.cga_mode_control & 0x3F );
 			switch ( aga.cga_mode_control & 0x3F ) {
 			case 0x08: case 0x09: case 0x0C: case 0x0D:
-				mc6845_set_hpixels_per_column( devconf, 8 );
+				mc6845->set_hpixels_per_column( 8 );
 				aga.update_row = cga_text_inten_update_row;
 				break;
 			case 0x0A: case 0x0B: case 0x2A: case 0x2B:
-				mc6845_set_hpixels_per_column( devconf, 8 );
+				mc6845->set_hpixels_per_column( 8 );
 				if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE ) {
 					aga.update_row = cga_gfx_4bppl_update_row;
 				} else {
@@ -617,15 +617,15 @@ static WRITE8_HANDLER ( pc_aga_cga_w )
 				}
 				break;
 			case 0x0E: case 0x0F: case 0x2E: case 0x2F:
-				mc6845_set_hpixels_per_column( devconf, 8 );
+				mc6845->set_hpixels_per_column( 8 );
 				aga.update_row = cga_gfx_2bpp_update_row;
 				break;
 			case 0x18: case 0x19: case 0x1C: case 0x1D:
-				mc6845_set_hpixels_per_column( devconf, 8 );
+				mc6845->set_hpixels_per_column( 8 );
 				aga.update_row = cga_text_inten_alt_update_row;
 				break;
 			case 0x1A: case 0x1B: case 0x3A: case 0x3B:
-				mc6845_set_hpixels_per_column( devconf, 8 );
+				mc6845->set_hpixels_per_column( 8 );
 				if ( CGA_MONITOR == CGA_MONITOR_COMPOSITE ) {
 					aga.update_row = cga_gfx_4bpph_update_row;
 				} else {
@@ -633,15 +633,15 @@ static WRITE8_HANDLER ( pc_aga_cga_w )
 				}
 				break;
 			case 0x1E: case 0x1F: case 0x3E: case 0x3F:
-				mc6845_set_hpixels_per_column( devconf, 16 );
+				mc6845->set_hpixels_per_column( 16 );
 				aga.update_row = cga_gfx_1bpp_update_row;
 				break;
 			case 0x28: case 0x29: case 0x2C: case 0x2D:
-				mc6845_set_hpixels_per_column( devconf, 8 );
+				mc6845->set_hpixels_per_column( 8 );
 				aga.update_row = cga_text_blink_update_row;
 				break;
 			case 0x38: case 0x39: case 0x3C: case 0x3D:
-				mc6845_set_hpixels_per_column( devconf, 8 );
+				mc6845->set_hpixels_per_column( 8 );
 				aga.update_row = cga_text_blink_alt_update_row;
 				break;
 			default:
@@ -671,16 +671,16 @@ static WRITE16_HANDLER ( pc16le_aga_cga_w ) { write16le_with_write8_handler(pc_a
 
 void pc_aga_set_mode(running_machine &machine, AGA_MODE mode)
 {
-	device_t *devconf = machine.device(AGA_MC6845_NAME);
+	mc6845_device *mc6845 = machine.device<mc6845_device>(AGA_MC6845_NAME);
 
 	aga.mode = mode;
 
 	switch (aga.mode) {
 	case AGA_COLOR:
-		mc6845_set_clock( devconf, XTAL_14_31818MHz/8 );
+		mc6845->set_clock( XTAL_14_31818MHz/8 );
 		break;
 	case AGA_MONO:
-		mc6845_set_clock( devconf, 16257000/9 );
+		mc6845->set_clock( 16257000/9 );
 		break;
 	case AGA_OFF:
 		break;
@@ -756,8 +756,8 @@ VIDEO_START( pc200 )
 
 static SCREEN_UPDATE( mc6845_aga )
 {
-	device_t *devconf = screen->machine().device(AGA_MC6845_NAME);
-	mc6845_update( devconf, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(AGA_MC6845_NAME);
+	mc6845->update(bitmap, cliprect);
 
 	return 0;
 }
