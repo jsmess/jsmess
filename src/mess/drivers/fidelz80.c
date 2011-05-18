@@ -279,6 +279,8 @@ E*  *  *  *  *C
 The digits of the display are numbered left to right, 0 through 7 and are controlled
 by the grids.  hi = grid on, hi = segment on.
 
+A detailed description of the hardware can be found also in the patent 4,373,719.
+
 ******************************************************************************
 
 Sensory Chess Challenger champion (6502 based, needs its own driver .c file)
@@ -845,83 +847,78 @@ static Z80PIO_INTERFACE( vsc_z80pio_intf )
 
 WRITE8_MEMBER(fidelz80_state::kp_matrix_w)
 {
-	if (m_kp_matrix)
+	UINT16 out_data = BITSWAP16(m_digit_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
+	UINT16 out_digit = out_data & 0x3fff;
+	UINT8 out_led = BIT(out_data, 15) ? 0 : 1;
+
+	// output the digit before update the matrix
+	if (m_kp_matrix & 0x01)
 	{
-		UINT16 out_data = BITSWAP16(m_digit_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
-		UINT16 out_digit = out_data & 0x3fff;
-		//UINT8 out_led = BIT(out_data, 15);
-
-		beep_set_state(m_beep, BIT(out_data, 14));
-
-		// output the digit before update the matrix
-		switch (m_kp_matrix)
-		{
-			case 0x01:
-				output_set_digit_value(1, out_digit);
-				break;
-			case 0x02:
-				output_set_digit_value(2, out_digit);
-				break;
-			case 0x04:
-				output_set_digit_value(3, out_digit);
-				break;
-			case 0x08:
-				output_set_digit_value(4, out_digit);
-				break;
-			case 0x10:
-				output_set_digit_value(5, out_digit);
-				break;
-			case 0x20:
-				output_set_digit_value(6, out_digit);
-				break;
-			case 0x40:
-				output_set_digit_value(7, out_digit);
-				break;
-			case 0x80:
-				output_set_digit_value(8, out_digit);
-				break;
-		}
+		output_set_digit_value(1, out_digit);
+		output_set_led_value(8, out_led);
+	}
+	if (m_kp_matrix & 0x02)
+	{
+		output_set_digit_value(2, out_digit);
+		output_set_led_value(7, out_led);
+	}
+	if (m_kp_matrix & 0x04)
+	{
+		output_set_digit_value(3, out_digit);
+		output_set_led_value(6, out_led);
+	}
+	if (m_kp_matrix & 0x08)
+	{
+		output_set_digit_value(4, out_digit);
+		output_set_led_value(5, out_led);
+	}
+	if (m_kp_matrix & 0x10)
+	{
+		output_set_digit_value(5, out_digit);
+		output_set_led_value(4, out_led);
+	}
+	if (m_kp_matrix & 0x20)
+	{
+		output_set_digit_value(6, out_digit);
+		output_set_led_value(3, out_led);
+	}
+	if (m_kp_matrix & 0x40)
+	{
+		output_set_digit_value(7, out_digit);
+		output_set_led_value(2, out_led);
+	}
+	if (m_kp_matrix & 0x80)
+	{
+		output_set_digit_value(8, out_digit);
+		output_set_led_value(1, out_led);
 	}
 
-	m_digit_data = 0;
-	memset(m_digit_line_status, 0, ARRAY_LENGTH(m_digit_line_status));
+	memset(m_digit_line_status, 0, sizeof(m_digit_line_status));
 
 	m_kp_matrix = data;
 }
 
 READ8_MEMBER(fidelz80_state::exp_i8243_p2_r)
 {
-	UINT8 data = 0;
+	UINT8 data = 0xff;
 
-	switch (m_kp_matrix)
-	{
-		case 0x01:
-			data = input_port_read(machine(), "LINE1");
-			break;
-		case 0x02:
-			data = input_port_read(machine(), "LINE2");
-			break;
-		case 0x04:
-			data = input_port_read(machine(), "LINE3");
-			break;
-		case 0x08:
-			data = input_port_read(machine(), "LINE4");
-			break;
-		case 0x10:
-			data = input_port_read(machine(), "LINE5");
-			break;
-		case 0x20:
-			data = input_port_read(machine(), "LINE6");
-			break;
-		case 0x40:
-			data = input_port_read(machine(), "LINE7");
-			break;
-		case 0x80:
-			data = input_port_read(machine(), "LINE8");
-			break;
-		default:
-			data = 0xf0;
-	}
+	if (m_kp_matrix & 0x01)
+		data &= input_port_read(machine(), "LINE1");
+	if (m_kp_matrix & 0x02)
+		data &= input_port_read(machine(), "LINE2");
+	if (m_kp_matrix & 0x04)
+		data &= input_port_read(machine(), "LINE3");
+	if (m_kp_matrix & 0x08)
+		data &= input_port_read(machine(), "LINE4");
+	if (m_kp_matrix & 0x10)
+		data &= input_port_read(machine(), "LINE5");
+	if (m_kp_matrix & 0x20)
+		data &= input_port_read(machine(), "LINE6");
+	if (m_kp_matrix & 0x40)
+		data &= input_port_read(machine(), "LINE7");
+	if (m_kp_matrix & 0x80)
+		data &= input_port_read(machine(), "LINE8");
+
 	return (m_i8243->i8243_p2_r(offset)&0x0f) | (data&0xf0);
 }
 
@@ -938,7 +935,7 @@ READ8_MEMBER(fidelz80_state::unknown_r)
 
 READ8_MEMBER(fidelz80_state::rand_r)
 {
-	return space.machine().rand();
+	return machine().rand();
 }
 
 /******************************************************************************
@@ -949,38 +946,26 @@ static WRITE8_DEVICE_HANDLER( digit_w )
 {
 	fidelz80_state *state = device->machine().driver_data<fidelz80_state>();
 
-	if (state->m_kp_matrix)
-		switch (offset)
-		{
-			case 0:
-				if (state->m_digit_line_status[0] == 0)
-				{
-					state->m_digit_line_status[0] = 1;
-					state->m_digit_data = (state->m_digit_data&(~0x000f)) | ((data<<0)&0x000f);
-				}
-				break;
-			case 1:
-				if (state->m_digit_line_status[1] == 0)
-				{
-					state->m_digit_line_status[1] = 1;
-					state->m_digit_data = (state->m_digit_data&(~0x00f0)) | ((data<<4)&0x00f0);
-				}
-				break;
-			case 2:
-				if (state->m_digit_line_status[2] == 0)
-				{
-					state->m_digit_line_status[2] = 1;
-					state->m_digit_data = (state->m_digit_data&(~0x0f00)) | ((data<<8)&0x0f00);
-				}
-				break;
-			case 3:
-				if (state->m_digit_line_status[3] == 0)
-				{
-					state->m_digit_line_status[3] = 1;
-					state->m_digit_data = (state->m_digit_data&(~0xf000)) | ((data<<12)&0xf000);
-				}
-				break;
-		}
+	if (state->m_digit_line_status[offset])
+		return;
+
+	state->m_digit_line_status[offset&3] = 1;
+
+	switch (offset)
+	{
+	case 0:
+		state->m_digit_data = (state->m_digit_data&(~0x000f)) | ((data<<0)&0x000f);
+		break;
+	case 1:
+		state->m_digit_data = (state->m_digit_data&(~0x00f0)) | ((data<<4)&0x00f0);
+		break;
+	case 2:
+		state->m_digit_data = (state->m_digit_data&(~0x0f00)) | ((data<<8)&0x0f00);
+		break;
+	case 3:
+		state->m_digit_data = (state->m_digit_data&(~0xf000)) | ((data<<12)&0xf000);
+		break;
+	}
 }
 
 /******************************************************************************
@@ -1021,7 +1006,7 @@ void fidelz80_state::machine_reset()
 	m_kp_matrix = 0;
 	m_digit_data = 0;
 	m_led_data = 0;
-	memset(m_digit_line_status, 0, ARRAY_LENGTH(m_digit_line_status));
+	memset(m_digit_line_status, 0, sizeof(m_digit_line_status));
 }
 
 static TIMER_DEVICE_CALLBACK( nmi_timer )
@@ -1250,7 +1235,7 @@ static INPUT_PORTS_START( abc )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
 
 	PORT_START("LINE2")
-		PORT_BIT(0x0f,  IP_ACTIVE_LOW, IPT_UNUSED) PORT_UNUSED
+		PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED) PORT_UNUSED
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
@@ -1261,7 +1246,7 @@ static INPUT_PORTS_START( abc )
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("P") PORT_CODE(KEYCODE_P)
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("P") PORT_CODE(KEYCODE_Z)
 
 	PORT_START("LINE4")
 		PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED) PORT_UNUSED
@@ -1274,11 +1259,11 @@ static INPUT_PORTS_START( abc )
 		PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED) PORT_UNUSED
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_E)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("SC") PORT_CODE(KEYCODE_S)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PL") PORT_CODE(KEYCODE_P)
+		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PL") PORT_CODE(KEYCODE_X)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Spades") PORT_CODE(KEYCODE_1_PAD)
 
 	PORT_START("LINE6")
-		PORT_BIT(0x0f,  IP_ACTIVE_LOW, IPT_UNUSED) PORT_UNUSED
+		PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED) PORT_UNUSED
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_C)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("DB") PORT_CODE(KEYCODE_D)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("VL") PORT_CODE(KEYCODE_V)
@@ -1380,7 +1365,6 @@ static MACHINE_CONFIG_START( abc, fidelz80_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beep", BEEP, 0 )
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // around 25khz
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
