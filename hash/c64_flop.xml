@@ -112,7 +112,7 @@
 		</part>
 	</software>
 	
-	<software name="rambo3n" supported="no" cloneof="rambo3">
+	<software name="rambo3n" cloneof="rambo3" supported="no">
 		<description>Rambo III (NTSC)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>

@@ -142,8 +142,7 @@
 		<publisher>Novotrade</publisher>
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c2l" size="0x4000">
-				<rom name="basic7-lo" size="0x2000" crc="5ccfd018" sha1="172bd3605321c199b5e91be8ad8db4380514b195" offset="0x0000" />
-				<rom name="basic7-hi" size="0x2000" crc="c4c48a83" sha1="4cf3ac8a4f883c33b5ec5c7d0cef3264a9cdef9e" offset="0x2000" />
+				<rom name="basic7" size="0x4000" crc="e900a1d5" sha1="5f96bdeffa42c18e869d9d045df65d98a4e561eb" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
