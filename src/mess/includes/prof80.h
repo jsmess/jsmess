@@ -119,7 +119,7 @@ public:
 		  m_speaker(*this, SPEAKER_TAG)
 	{ }
 
-	required_device<device_t> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	required_device<z80sti_device> m_sti;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_speaker;
