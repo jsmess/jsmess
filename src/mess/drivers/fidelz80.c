@@ -1339,7 +1339,7 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_Z80PIO_ADD("z80pio", XTAL_4MHz, vsc_z80pio_intf)
 
 	MCFG_TIMER_ADD_PERIODIC("nmi_timer", nmi_timer, attotime::from_hz(600))
-	MCFG_TIMER_START_DELAY(attotime::from_hz(600));
+	MCFG_TIMER_START_DELAY(attotime::from_hz(600))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

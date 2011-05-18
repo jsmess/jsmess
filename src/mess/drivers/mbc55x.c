@@ -276,7 +276,7 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 
     /* Peripheral chips */
 
-	MCFG_MSM8251_ADD(MSM8251A_KB_TAG,mbc55x_msm8251a_interface);
+	MCFG_MSM8251_ADD(MSM8251A_KB_TAG,mbc55x_msm8251a_interface)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO(MONO_TAG)
