@@ -14,7 +14,7 @@ Undumped
   - 1992 Nintendo Challenge (Japan)
   - Dai-3-Ji Super Robot Taisen (Japan) (Rev C) C2941881
   - Doraemon - Nobita to Yousei no Kuni (Japan) (Rev A) 55E44983
-  - Eiga Shoukai Soft - Mizu no Tabinin (Japan) unconfirmed
+  - Eiga Shoukai Soft - Mizu no Tabinin (Japan) - Unconfirmed
   - GAMARS Genuine Taiwan Mahjong 16 (Japan) (Unlicensed)
   - GAMARS Taiwan Chess (Japan) (Unlicensed)
   - Ganbare Goemon - Yuki Hime Kyuushutsu Emaki (Japan) (Rev A)
@@ -25,13 +25,14 @@ Undumped
   - Naughts &amp; Crosses (Japan) (Prototype)
   - Pro Action Replay - High Tech Option Series (Japan) (Unlicensed)
   - Saikyou - Takada Nobuhiko - Ucchan Nanchan Version (Japan)
-  - Satellaview BS-X (Japan) (Rev 0)
+  - Satellaview BS-X (Japan) - Initial release prior to Rev A
   - Shin Chou Kouki (Japan) (Rev A) 1A77CF3B
-  - Shin Megami Tensai if... (Rev A) 77D02030
-  - Shin Megami Tensei II (J) (Rev A) 84268A75
-  - Shin Megami Tensei II (J) (Rev B) E38228A7
+  - Shin Megami Tensai if... (Japan) (Rev A) 77D02030
+  - Shin Megami Tensei II (Japan) (Rev A) 84268A75
+  - Shin Megami Tensei II (Japan) (Rev B) E38228A7
   - Shodai Nekketsu Kouha Kunio-kun (Japan) (Rev A) 5DF55465
-  - Super Jinsei Game 2 (Rev A)
+  - Star Fox (Japan) (v1.1) - Found on a Super Famicom Box, to be confirmed on retail cart
+  - Super Jinsei Game 2 (Japan) (Rev A)
   - Super Mahjong Taikai (Japan) (Rev B)
   - Tsukikomori (Japan) (v1.1) (NP) F37C6726
 
@@ -44,7 +45,7 @@ Undumped
 
   USA
 
-  - Fighter's History (USA) - Initial release/Rev 0
+  - Fighter's History (USA) - Initial release prior to Rev A
   - Ignition Factor, The (USA) (Sample)
   - Star Fox (USA) (Rev A)
   - Super Mario World/Pilot Wings/F-Zero Competition Cartridge (USA)
@@ -52,7 +53,7 @@ Undumped
   Europe
 
   - Biker Mice From Mars (Europe) (Sample)
-  - Donkey Kong Country 2 - Diddy's Kong Quest (Europe) - Initial release/Rev 0
+  - Donkey Kong Country 2 - Diddy's Kong Quest (Europe) - Initial release prior to Rev A
 
   Multi-region
 
@@ -3064,6 +3065,23 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="sgossuns" cloneof="sgossun">
+		<description>Super Gussun Oyoyo (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Banpresto</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV3B-01" /> <!-- confirmation needed -->
+			<!-- u1-u4: 4 rom slots, the forth is empty | u5: sram -->
+			<dataarea name="rom" size="1572864">
+				<rom name="eprom.u1" size="524288" crc="dc30dbbf" sha1="8b29b80cca07dddc73d1d839a88d1c5158ff41b9" offset="0x000000" />
+				<rom name="eprom.u2" size="524288" crc="aa37fb03" sha1="768e070f4fd1fad29d50fbb3ee5912cfbe14cf14" offset="0x080000" />
+				<rom name="eprom.u3" size="524288" crc="c9f83c46" sha1="790d1a949c5cd25d4aa4c25ed11fb710b352b4c6" offset="0x100000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sjinsei2">
 		<!-- Serial: SHVC-AL2J-JPN - Release Date: 1995-09-08 - Alt. Title: スーパー人生ゲーム２ -->
 		<description>Super Jinsei Game 2 (Jpn, Rev. B)</description>
@@ -3191,6 +3209,22 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="seiken densetsu 3 (japan) (sample).sfc" size="4194304" crc="4801e76a" sha1="7078dbcf0b2941af59c8187eeb3b8dd392407b46" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sgossunsa" cloneof="sgossun">
+		<description>Super Gussun Oyoyo (Jpn, Prototype, Alt)</description>
+		<!-- Unknown source, no visible difference with the retail version,
+		unlike the confirmed prototype the word 'sample' doesn't appear in the title screen,
+		a confirmation is highly needed -->
+		<year>1995</year>
+		<publisher>Banpresto</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1572864">
+				<rom name="super gussun oyoyo (japan) (sample).sfc" size="1572864" crc="8477c613" sha1="96728a8427edaa5700e5e79093fc2a5d00382610" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -33877,19 +33911,6 @@ The software list will be divided in four categories:
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="super gomoku shougi - jouseki kenkyuu hen (japan).sfc" size="1048576" crc="54833287" sha1="351f293d1c58eb85534ab05896245475ff009cef" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sgossuns" cloneof="sgossun">
-		<description>Super Gussun Oyoyo (Jpn, Sample)</description>
-		<year>1995</year>
-		<publisher>Banpresto</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="super gussun oyoyo (japan) (sample).sfc" size="1572864" crc="8477c613" sha1="96728a8427edaa5700e5e79093fc2a5d00382610" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
