@@ -493,10 +493,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_DRIVERS)/vectrex.o	\
 	$(MAME_VIDEO)/vectrex.o		\
 	$(MAME_MACHINE)/vectrex.o	\
-	$(MESS_VIDEO)/smsvdp.o		\
-	$(MESS_MACHINE)/segasms.o	\
-	$(MESS_DRIVERS)/segasms.o	\
-	$(MESS_DRIVERS)/sg1000.o	\
 	$(MAME_DRIVERS)/saturn.o	\
 	$(MAME_DRIVERS)/cps1.o	\
 	$(MAME_VIDEO)/cps1.o	\
@@ -1340,6 +1336,10 @@ $(MESSOBJ)/sega.a:				\
 	$(MESS_DRIVERS)/dc.o		\
 	$(MAME_MACHINE)/gdrom.o 	\
 	$(MESS_MACHINE)/dccons.o	\
+	$(MESS_VIDEO)/smsvdp.o		\
+	$(MESS_MACHINE)/segasms.o	\
+	$(MESS_DRIVERS)/segasms.o	\
+	$(MESS_DRIVERS)/sg1000.o	\
 
 $(MESSOBJ)/sgi.a:				\
 	$(MESS_MACHINE)/sgi.o		\
