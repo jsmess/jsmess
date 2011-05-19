@@ -55,6 +55,8 @@ uniform float RawHeight;
 uniform float WidthRatio;
 uniform float HeightRatio;
 
+uniform float YIQEnable;
+
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
@@ -69,7 +71,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Color = Input.Color;
 	float2 InvTexSize = float2(1.0f / TargetWidth, 1.0f / TargetHeight);
 	float2 TexCoord = (Input.Position.xy * InvTexSize) / float2(WidthRatio, HeightRatio);
-	Output.TexCoord = TexCoord;//(Input.TexCoord - float2(0.5f, 0.5f)) / 8.0f + float2(0.25f, 0.25f);
+	Output.TexCoord = lerp(Input.TexCoord, TexCoord, YIQEnable);
 	Output.ExtraInfo = Input.ExtraInfo;
 
 	return Output;

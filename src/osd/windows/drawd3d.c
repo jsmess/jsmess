@@ -2216,6 +2216,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", yiq_enable ? 1.0f : (poly->texture != NULL ? (1.0f / (poly->texture->vstop - poly->texture->vstart)) : 0.0f));
 				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+				(*d3dintf->effect.set_float)(curr_effect, "YIQEnable", yiq_enable ? 1.0f : 0.0f);
 				(*d3dintf->effect.set_float)(curr_effect, "RedFromRed", (float)options.screen_red_from_red());
 				(*d3dintf->effect.set_float)(curr_effect, "RedFromGrn", (float)options.screen_red_from_green());
 				(*d3dintf->effect.set_float)(curr_effect, "RedFromBlu", (float)options.screen_red_from_blue());
