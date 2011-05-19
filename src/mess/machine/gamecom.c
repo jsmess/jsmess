@@ -1,8 +1,6 @@
 
 #include "emu.h"
 #include "includes/gamecom.h"
-#include "cpu/sm8500/sm8500.h"
-#include "image.h"
 
 
 
@@ -28,48 +26,46 @@ MACHINE_RESET( gamecom )
 	state->m_cartridge = NULL;
 }
 
-static void gamecom_set_mmu( running_machine &machine, int mmu, UINT8 data )
+void gamecom_state::gamecom_set_mmu(UINT8 mmu, UINT8 data )
 {
-	gamecom_state *state = machine.driver_data<gamecom_state>();
-	char bank[6];
+	char bank[8];
 	sprintf(bank,"bank%d",mmu);
 	if ( data < 0x20 )
 	{
 		/* select internal ROM bank */
-		memory_set_bankptr( machine, bank, machine.region("kernel")->base() + (data << 13) );
+		memory_set_bankptr( machine(), bank, machine().region("kernel")->base() + (data << 13) );
 	}
 	else
 	{
 		/* select cartridge bank */
-		if ( state->m_cartridge )
-			memory_set_bankptr( machine, bank, state->m_cartridge + ( data << 13 ) );
+		if ( m_cartridge )
+			memory_set_bankptr( machine(), bank, m_cartridge + ( data << 13 ) );
 	}
 }
 
-static void handle_stylus_press( running_machine &machine, UINT8 column )
+void gamecom_state::handle_stylus_press( int column )
 {
-	gamecom_state *state = machine.driver_data<gamecom_state>();
-	UINT8 * RAM = machine.region("maincpu")->base();
+	UINT8 * RAM = machine().region("maincpu")->base();
 	static const UINT16 row_data[10] = { 0x3FE, 0x3FD, 0x3FB, 0x3F7, 0x3EF, 0x3DF, 0x3BF, 0x37F, 0x2FF, 0x1FF };
 
 	if ( column == 0 )
 	{
-		if ( ! ( input_port_read(machine, "IN2") & 0x04 ) )
+		if ( !BIT( input_port_read(machine(), "IN2"), 2) )
 		{
-			state->m_stylus_x = input_port_read(machine, "STYX") >> 4;
-			state->m_stylus_y = input_port_read(machine, "STYY") >> 4;
+			m_stylus_x = input_port_read(machine(), "STYX") >> 4;
+			m_stylus_y = input_port_read(machine(), "STYY") >> 4;
 		}
 		else
 		{
-			state->m_stylus_x = 16;
-			state->m_stylus_y = 16;
+			m_stylus_x = 16;
+			m_stylus_y = 16;
 		}
 	}
 
-	if ( state->m_stylus_x == column )
+	if ( m_stylus_x == column )
 	{
-		RAM[SM8521_P0] = row_data[state->m_stylus_y];
-		RAM[SM8521_P1] = ( RAM[SM8521_P1] & 0xFC ) | ( ( row_data[state->m_stylus_y] >> 8 ) & 3 );
+		RAM[SM8521_P0] = row_data[m_stylus_y>>1];
+		RAM[SM8521_P1] = ( RAM[SM8521_P1] & 0xFC ) | ( ( row_data[m_stylus_y>>1] >> 8 ) & 3 );
 	}
 	else
 	{
@@ -78,10 +74,9 @@ static void handle_stylus_press( running_machine &machine, UINT8 column )
 	}
 }
 
-WRITE8_HANDLER( gamecom_pio_w )
+WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 {
-	gamecom_state *state = space->machine().driver_data<gamecom_state>();
-	UINT8 * RAM = space->machine().region("maincpu")->base();
+	UINT8 * RAM = machine().region("maincpu")->base();
 	offset += 0x14;
 	RAM[offset] = data;
 	switch( offset )
@@ -99,43 +94,43 @@ WRITE8_HANDLER( gamecom_pio_w )
 						/* P0 bit 7 cleared => */
 						/* P1 bit 0 cleared => */
 						/* P1 bit 1 cleared => */
-					handle_stylus_press( space->machine(), 0 );
+					handle_stylus_press(0);
 					break;
 				case 0xF7FF:	/* column #1 */
-					handle_stylus_press( space->machine(), 1 );
+					handle_stylus_press(1);
 					break;
 				case 0xEFFF:	/* column #2 */
-					handle_stylus_press( space->machine(), 2 );
+					handle_stylus_press(2);
 					break;
 				case 0xDFFF:	/* column #3 */
-					handle_stylus_press( space->machine(), 3 );
+					handle_stylus_press(3);
 					break;
 				case 0xBFFF:	/* column #4 */
-					handle_stylus_press( space->machine(), 4 );
+					handle_stylus_press(4);
 					break;
 				case 0x7FFF:	/* column #5 */
-					handle_stylus_press( space->machine(), 5 );
+					handle_stylus_press(5);
 					break;
 				case 0xFFFE:	/* column #6 */
-					handle_stylus_press( space->machine(), 6 );
+					handle_stylus_press(6);
 					break;
 				case 0xFFFD:	/* column #7 */
-					handle_stylus_press( space->machine(), 7 );
+					handle_stylus_press(7);
 					break;
 				case 0xFFFB:	/* column #8 */
-					handle_stylus_press( space->machine(), 8 );
+					handle_stylus_press(8);
 					break;
 				case 0xFFF7:	/* column #9 */
-					handle_stylus_press( space->machine(), 9 );
+					handle_stylus_press(9);
 					break;
 				case 0xFFEF:	/* column #10 */
-					handle_stylus_press( space->machine(), 10 );
+					handle_stylus_press(10);
 					break;
 				case 0xFFDF:	/* column #11 */
-					handle_stylus_press( space->machine(), 11 );
+					handle_stylus_press(11);
 					break;
 				case 0xFFBF:	/* column #12 */
-					handle_stylus_press( space->machine(), 12 );
+					handle_stylus_press(12);
 					break;
 				case 0xFF7F:	/* keys #1 */
 						/* P0 bit 0 cleared => 83 (up) */
@@ -148,8 +143,8 @@ WRITE8_HANDLER( gamecom_pio_w )
 						/* P0 bit 7 cleared => 8B (button A) */
 						/* P1 bit 0 cleared => 8C (button B) */
 						/* P1 bit 1 cleared => 8D (button C) */
-					RAM[SM8521_P0] = input_port_read(space->machine(), "IN0");
-					RAM[SM8521_P1] = (RAM[SM8521_P1] & 0xFC) | ( input_port_read(space->machine(), "IN1") & 3 );
+					RAM[SM8521_P0] = input_port_read(machine(), "IN0");
+					RAM[SM8521_P1] = (RAM[SM8521_P1] & 0xFC) | ( input_port_read(machine(), "IN1") & 3 );
 					break;
 				case 0xFFFF:	/* keys #2 */
 						/* P0 bit 0 cleared => 88 (power) */
@@ -162,7 +157,7 @@ WRITE8_HANDLER( gamecom_pio_w )
 						/* P0 bit 7 cleared => A0 */
 						/* P1 bit 0 cleared => A0 */
 						/* P1 bit 1 cleared => A0 */
-					RAM[SM8521_P0] = (RAM[SM8521_P0] & 0xFC) | ( input_port_read(space->machine(), "IN2") & 3 );
+					RAM[SM8521_P0] = (RAM[SM8521_P0] & 0xFC) | ( input_port_read(machine(), "IN2") & 3 );
 					RAM[SM8521_P1] = 0xFF;
 					break;
 				}
@@ -172,30 +167,29 @@ WRITE8_HANDLER( gamecom_pio_w )
 				/* P3 bit6 clear, bit7 set -> enable cartridge port #1? */
 				switch( data & 0xc0 )
 				{
-				case 0x40: state->m_cartridge = state->m_cartridge1; break;
-				case 0x80: state->m_cartridge = state->m_cartridge2; break;
-				default:   state->m_cartridge = NULL;       break;
+				case 0x40: m_cartridge = m_cartridge1; break;
+				case 0x80: m_cartridge = m_cartridge2; break;
+				default:   m_cartridge = NULL;       break;
 				}
 				return;
 	}
 }
 
-READ8_HANDLER( gamecom_pio_r )
+READ8_MEMBER( gamecom_state::gamecom_pio_r )
 {
-	UINT8 * RAM = space->machine().region("maincpu")->base();
+	UINT8 * RAM = machine().region("maincpu")->base();
 	return RAM[offset + 0x14];
 }
 
-READ8_HANDLER( gamecom_internal_r )
+READ8_MEMBER( gamecom_state::gamecom_internal_r )
 {
-	UINT8 * RAM = space->machine().region("maincpu")->base();
+	UINT8 * RAM = machine().region("maincpu")->base();
 	return RAM[offset + 0x20];
 }
 
-WRITE8_HANDLER( gamecom_internal_w )
+WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 {
-	gamecom_state *state = space->machine().driver_data<gamecom_state>();
-	UINT8 * RAM = space->machine().region("maincpu")->base();
+	UINT8 * RAM = machine().region("maincpu")->base();
 	offset += 0x20;
 	switch( offset )
 	{
@@ -203,16 +197,16 @@ WRITE8_HANDLER( gamecom_internal_w )
 		logerror( "Write to MMU0\n" );
 		break;
 	case SM8521_MMU1:
-		gamecom_set_mmu( space->machine(), 1, data );
+		gamecom_set_mmu(1, data);
 		break;
 	case SM8521_MMU2:
-		gamecom_set_mmu( space->machine(), 2, data );
+		gamecom_set_mmu(2, data);
 		break;
 	case SM8521_MMU3:
-		gamecom_set_mmu( space->machine(), 3, data );
+		gamecom_set_mmu(3, data);
 		break;
 	case SM8521_MMU4:
-		gamecom_set_mmu( space->machine(), 4, data );
+		gamecom_set_mmu(4, data);
 		break;
 
 	/* Video hardware and DMA */
@@ -220,21 +214,21 @@ WRITE8_HANDLER( gamecom_internal_w )
 		data &= 0x7f;
 		break;
 	case SM8521_TM0D:
-		state->m_timer[0].check_value = data;
+		m_timer[0].check_value = data;
 		return;
 	case SM8521_TM0C:
-		state->m_timer[0].enabled = data & 0x80;
-		state->m_timer[0].state_limit = gamecom_timer_limit[data & 0x07];
-		state->m_timer[0].state_count = 0;
+		m_timer[0].enabled = data & 0x80;
+		m_timer[0].state_limit = gamecom_timer_limit[data & 0x07];
+		m_timer[0].state_count = 0;
 		RAM[SM8521_TM0D] = 0;
 		break;
 	case SM8521_TM1D:
-		state->m_timer[1].check_value = data;
+		m_timer[1].check_value = data;
 		return;
 	case SM8521_TM1C:
-		state->m_timer[1].enabled = data & 0x80;
-		state->m_timer[1].state_limit = gamecom_timer_limit[data & 0x07];
-		state->m_timer[1].state_count = 0;
+		m_timer[1].enabled = data & 0x80;
+		m_timer[1].state_limit = gamecom_timer_limit[data & 0x07];
+		m_timer[1].state_count = 0;
 		RAM[SM8521_TM1D] = 0;
 		break;
 	case SM8521_CLKT:	/* bit 6-7 */
@@ -244,55 +238,55 @@ WRITE8_HANDLER( gamecom_internal_w )
 			if ( data & 0x40 )
 			{
 				/* timer resolution 1 minute */
-				state->m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(60));
+				m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(60));
 			}
 			else
 			{
 				/* TImer resolution 1 second */
-				state->m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+				m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 			}
 		}
 		else
 		{
 			/* disable timer reset */
-			state->m_clock_timer->enable( 0 );
+			m_clock_timer->enable( 0 );
 			data &= 0xC0;
 		}
 		break;
 
 	/* Sound */
 	case SM8521_SGC:
-		state->m_sound.sgc = data;
+		m_sound.sgc = data;
 		break;
 	case SM8521_SG0L:
-		state->m_sound.sg0l = data;
+		m_sound.sg0l = data;
 		break;
 	case SM8521_SG1L:
-		state->m_sound.sg1l = data;
+		m_sound.sg1l = data;
 		break;
 	case SM8521_SG0TH:
-		state->m_sound.sg0t = ( state->m_sound.sg0t & 0xFF ) | ( data << 8 );
+		m_sound.sg0t = ( m_sound.sg0t & 0xFF ) | ( data << 8 );
 		break;
 	case SM8521_SG0TL:
-		state->m_sound.sg0t = ( state->m_sound.sg0t & 0xFF00 ) | data;
+		m_sound.sg0t = ( m_sound.sg0t & 0xFF00 ) | data;
 		break;
 	case SM8521_SG1TH:
-		state->m_sound.sg1t = ( state->m_sound.sg1t & 0xFF ) | ( data << 8 );
+		m_sound.sg1t = ( m_sound.sg1t & 0xFF ) | ( data << 8 );
 		break;
 	case SM8521_SG1TL:
-		state->m_sound.sg1t = ( state->m_sound.sg1t & 0xFF00 ) | data;
+		m_sound.sg1t = ( m_sound.sg1t & 0xFF00 ) | data;
 		break;
 	case SM8521_SG2L:
-		state->m_sound.sg2l = data;
+		m_sound.sg2l = data;
 		break;
 	case SM8521_SG2TH:
-		state->m_sound.sg2t = ( state->m_sound.sg2t & 0xFF ) | ( data << 8 );
+		m_sound.sg2t = ( m_sound.sg2t & 0xFF ) | ( data << 8 );
 		break;
 	case SM8521_SG2TL:
-		state->m_sound.sg2t = ( state->m_sound.sg2t & 0xFF00 ) | data;
+		m_sound.sg2t = ( m_sound.sg2t & 0xFF00 ) | data;
 		break;
 	case SM8521_SGDA:
-		state->m_sound.sgda = data;
+		m_sound.sgda = data;
 		break;
 
 	case SM8521_SG0W0:
@@ -311,7 +305,7 @@ WRITE8_HANDLER( gamecom_internal_w )
 	case SM8521_SG0W13:
 	case SM8521_SG0W14:
 	case SM8521_SG0W15:
-		state->m_sound.sg0w[offset - SM8521_SG0W0] = data;
+		m_sound.sg0w[offset - SM8521_SG0W0] = data;
 		break;
 	case SM8521_SG1W0:
 	case SM8521_SG1W1:
@@ -329,7 +323,7 @@ WRITE8_HANDLER( gamecom_internal_w )
 	case SM8521_SG1W13:
 	case SM8521_SG1W14:
 	case SM8521_SG1W15:
-		state->m_sound.sg1w[offset - SM8521_SG1W0] = data;
+		m_sound.sg1w[offset - SM8521_SG1W0] = data;
 		break;
 
 	/* Reserved addresses */
@@ -341,7 +335,7 @@ WRITE8_HANDLER( gamecom_internal_w )
 	case SM8521_55: case SM8521_56: case SM8521_57: case SM8521_58:
 	case SM8521_59: case SM8521_5A: case SM8521_5B: case SM8521_5C:
 	case SM8521_5D:
-		logerror( "%X: Write to reserved address (0x%02X). Value written: 0x%02X\n", cpu_get_pc(&space->device()), offset, data );
+		logerror( "%X: Write to reserved address (0x%02X). Value written: 0x%02X\n", cpu_get_pc(m_maincpu), offset, data );
 		break;
 	}
 	RAM[offset] = data;
@@ -395,8 +389,8 @@ void gamecom_handle_dma( device_t *device, int cycles )
 	{
 	case 0x00:
 		/* VRAM->VRAM */
-		state->m_dma.source_bank = &state->m_vram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
-		state->m_dma.dest_bank = &state->m_vram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
+		state->m_dma.source_bank = &state->m_p_videoram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
+		state->m_dma.dest_bank = &state->m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x02:
 		/* ROM->VRAM */
@@ -412,19 +406,19 @@ void gamecom_handle_dma( device_t *device, int cycles )
 			if (state->m_cartridge)
 				state->m_dma.source_bank = state->m_cartridge + (RAM[SM8521_DMBR] << 14);
 		}
-		state->m_dma.dest_bank = &state->m_vram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
+		state->m_dma.dest_bank = &state->m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x04:
 		/* Extend RAM->VRAM */
 		state->m_dma.source_width = 64;
-		state->m_dma.source_bank = &state->m_vram[0x4000];
-		state->m_dma.dest_bank = &state->m_vram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
+		state->m_dma.source_bank = &state->m_p_videoram[0x4000];
+		state->m_dma.dest_bank = &state->m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x06:
 		/* VRAM->Extend RAM */
-		state->m_dma.source_bank = &state->m_vram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
+		state->m_dma.source_bank = &state->m_p_videoram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
 		state->m_dma.dest_width = 64;
-		state->m_dma.dest_bank = &state->m_vram[0x4000];
+		state->m_dma.dest_bank = &state->m_p_videoram[0x4000];
 		break;
 	}
 	state->m_dma.source_current = state->m_dma.source_width * state->m_dma.source_y;

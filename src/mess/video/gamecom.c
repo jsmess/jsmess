@@ -19,7 +19,7 @@ static TIMER_CALLBACK( gamecom_scanline ) {
 		bitmap_fill( machine.generic.tmpbitmap, &rec , 0);
 		return;
 	} else {
-		UINT8 *line = &state->m_vram[ state->m_base_address + 40 * state->m_scanline ];
+		UINT8 *line = &state->m_p_videoram[ state->m_base_address + 40 * state->m_scanline ];
 		int	pal[4];
 		int	i;
 

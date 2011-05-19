@@ -14,14 +14,12 @@ Todo:
 
 
 ***************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "includes/gamecom.h"
-#include "cpu/sm8500/sm8500.h"
-#include "imagedev/cartslot.h"
-#include "rendlay.h"
 
-static ADDRESS_MAP_START(gamecom_mem_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(gamecom_mem_map, AS_PROGRAM, 8, gamecom_state)
 	AM_RANGE( 0x0000, 0x0013 )  AM_RAM
 	AM_RANGE( 0x0014, 0x0017 )  AM_READWRITE( gamecom_pio_r, gamecom_pio_w )        // buttons
 	AM_RANGE( 0x0018, 0x001F )  AM_RAM
@@ -33,7 +31,7 @@ static ADDRESS_MAP_START(gamecom_mem_map, AS_PROGRAM, 8)
 	AM_RANGE( 0x4000, 0x5FFF )  AM_ROMBANK("bank2")                                       /* External ROM/Flash. Controlled by MMU2 */
 	AM_RANGE( 0x6000, 0x7FFF )  AM_ROMBANK("bank3")                                       /* External ROM/Flash. Controlled by MMU3 */
 	AM_RANGE( 0x8000, 0x9FFF )  AM_ROMBANK("bank4")                                       /* External ROM/Flash. Controlled by MMU4 */
-	AM_RANGE( 0xA000, 0xDFFF )  AM_RAM AM_BASE_MEMBER(gamecom_state, m_vram)			/* VRAM */
+	AM_RANGE( 0xA000, 0xDFFF )  AM_RAM AM_BASE(m_p_videoram)			/* VRAM */
 	AM_RANGE( 0xE000, 0xFFFF )  AM_RAM AM_SHARE("nvram")                  /* Extended I/O, Extended RAM */
 ADDRESS_MAP_END
 
@@ -69,8 +67,6 @@ static INPUT_PORTS_START( gamecom )
 	PORT_BIT( 0xff, 80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1, 0, 0) PORT_MINMAX(0,159) PORT_SENSITIVITY(50) PORT_KEYDELTA(8)
 INPUT_PORTS_END
 
-#define GAMECOM_PALETTE_LENGTH	5
-
 static const unsigned char palette[] =
 {
 	0xDF, 0xFF, 0x8F,	/* White */
@@ -83,7 +79,7 @@ static const unsigned char palette[] =
 static PALETTE_INIT( gamecom )
 {
 	int index;
-	for ( index = 0; index < GAMECOM_PALETTE_LENGTH; index++ )
+	for ( index = 0; index < 5; index++ )
 	{
 		palette_set_color_rgb(machine,  4-index, palette[index*3+0], palette[index*3+1], palette[index*3+2] );
 	}
@@ -119,8 +115,8 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 	MCFG_SCREEN_UPDATE( generic_bitmapped )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_LENGTH( GAMECOM_PALETTE_LENGTH )
-	MCFG_PALETTE_INIT( gamecom )
+	MCFG_PALETTE_LENGTH(5)
+	MCFG_PALETTE_INIT(gamecom)
 
 	/* sound hardware */
 #if 0
@@ -146,8 +142,10 @@ MACHINE_CONFIG_END
 ROM_START( gamecom )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "internal.bin", 0x1000,  0x1000, CRC(a0cec361) SHA1(03368237e8fed4a8724f3b4a1596cf4b17c96d33) )
+
 	ROM_REGION( 0x40000, "kernel", 0 )
 	ROM_LOAD( "external.bin", 0x00000, 0x40000, CRC(e235a589) SHA1(97f782e72d738f4d7b861363266bf46b438d9b50) )
+
 	ROM_REGION( 0x200000, "cart1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x200000, "cart2", ROMREGION_ERASEFF )
 ROM_END
