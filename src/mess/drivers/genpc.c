@@ -269,8 +269,6 @@ ROM_START( pcega )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("xtbios.bin",  0xfe000, 0x02000, CRC(1d7bd86c) SHA1(33a500f599b4dad2fe6d7a5c3e89b13bd5dd2987))
 	
-	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
-
 	/* This region holds the original EGA Video bios */
 	ROM_REGION(0x4000, "user1", 0)
 	ROM_LOAD("6277356.u44", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b))	
