@@ -584,19 +584,19 @@ static void pc_ega_install_banks( running_machine &machine )
 		ega.videoram_b8000 = ega.videoram;
 		break;
 	}
-	if (ega.videoram_a0000) {
+	if (ega.videoram_a0000 && (ega.misc_output & 0x02)) {
 		space->install_readwrite_bank(0xa0000, 0xaffff, "bank11" );
 		memory_set_bankptr(machine,  "bank11", ega.videoram_a0000);
 	} else {
 		space->unmap_readwrite(0xa0000, 0xaffff);
 	}
-	if (ega.videoram_b0000) {
+	if (ega.videoram_b0000 && (ega.misc_output & 0x02)) {
 		space->install_readwrite_bank(0xb0000, 0xb7fff, "bank12" );
 		memory_set_bankptr(machine,  "bank12", ega.videoram_b0000);
 	} else {
 		space->unmap_readwrite(0xb0000, 0xb7fff);
 	}
-	if (ega.videoram_b8000) {
+	if (ega.videoram_b8000 && (ega.misc_output & 0x02)) {
 		space->install_readwrite_bank(0xb8000, 0xbffff, "bank13" );
 		memory_set_bankptr(machine,  "bank13", ega.videoram_b8000);
 	} else {
@@ -1036,7 +1036,8 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 	/* Misccellaneous Output */
 	case 2:
 		ega.misc_output = data;
-		pc_ega_change_mode( ega.crtc_ega );
+		pc_ega_install_banks(space->machine());
+		pc_ega_change_mode( ega.crtc_ega );		
 		break;
 
 	/* Sequencer */
