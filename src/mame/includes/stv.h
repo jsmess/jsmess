@@ -1,16 +1,37 @@
 /*----------- defined in drivers/stv.c -----------*/
 
-extern UINT32 *stv_workram_h;
-extern UINT32 *stv_workram_l;
+class saturn_state : public driver_device
+{
+public:
+	saturn_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
-extern int stv_enable_slave_sh2;
+	UINT32 *m_workram_l;
+	UINT32 *m_workram_h;
+	UINT8  *m_smpc_ram;
+	UINT32 *m_backupram;
+	UINT32 *m_scu_regs;
+	UINT8  m_NMI_reset;
+	UINT8  m_en_68k;
+	UINT16 *m_sound_ram;
+
+	UINT32 m_scu_src[3];		/* Source DMA lv n address*/
+	UINT32 m_scu_dst[3];		/* Destination DMA lv n address*/
+	UINT32 m_scu_src_add[3];	/* Source Addition for DMA lv n*/
+	UINT32 m_scu_dst_add[3];	/* Destination Addition for DMA lv n*/
+    INT32  m_scu_size[3];		/* Transfer DMA size lv n*/
+    UINT32 m_scu_index[3];
+	UINT8  m_stv_multi_bank;
+	UINT8  m_prev_bankswitch;
+
+	legacy_cpu_device* m_maincpu;
+	legacy_cpu_device* m_slave;
+	legacy_cpu_device* m_audiocpu;
+};
+
 
 extern int minit_boost,sinit_boost;
 extern attotime minit_boost_timeslice, sinit_boost_timeslice;
-
-extern cpu_device *stv_maincpu;
-extern cpu_device *stv_slave;
-extern cpu_device *stv_audiocpu;
 
 DRIVER_INIT ( stv );
 
