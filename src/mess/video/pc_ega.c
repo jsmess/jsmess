@@ -920,29 +920,26 @@ static WRITE8_HANDLER( pc_ega8_3d0_w )
 
 static READ8_HANDLER( pc_ega8_3c0_r )
 {
-	UINT8	dips = 0x00;	/* 0x01 - EGA only, 80x25 color(?) */
+	UINT8	dips = 0x0e; // bits in reverse order 0111 == > 1110
 /*
-0000 - 40x25
-       CRTC_EGA config screen: HTOTAL: 0x1e0  VTOTAL: 0x105  MAX_X: 0x13f  MAX_Y: 0xc7  HSYNC: 0x188-0x1af  VSYNC: 0xe1-0xe3  Freq: 61.226464fps
-0001 - no display (text at a0000) and writes to 0c00xx (?), graphics mode?
-       CRTC_EGA config screen: HTOTAL: 0x3a8  VTOTAL: 0x105  MAX_X: 0x27f  MAX_Y: 0xc7  HSYNC: 0x2f0-0x2b7  VSYNC: 0xe1-0xe2  Freq: 60.684637fps
-0010 - 40x25
-       CRTC_EGA config screen: HTOTAL: 0x1e0  VTOTAL: 0x105  MAX_X: 0x13f  MAX_Y: 0xc7  HSYNC: 0x188-0x1af  VSYNC: 0xe1-0xe3  Freq: 61.226464fps
-0011 - no display (text at a0000) and writes to 0c00xx (?), graphics mode?
-       CRTC_EGA config screen: HTOTAL: 0x3a8  VTOTAL: 0x105  MAX_X: 0x27f  MAX_Y: 0xc7  HSYNC: 0x2f0-0x2b7  VSYNC: 0xe1-0xe2  Freq: 60.684637fps
-0100 - 40x25
-       CRTC_EGA config screen: HTOTAL: 0x1e0  VTOTAL: 0x105  MAX_X: 0x13f  MAX_Y: 0xc7  HSYNC: 0x188-0x1af  VSYNC: 0xe1-0xe3  Freq: 61.226464fps
-0101 - no display
-0110 - 40x25
-0111 - no display
-1000 - 40x25
-1001 - no diplsay (text at a0000)
-1010 - 40x25
-1011 -
-1100 - 40x25
-1101 -
-1110 - 40x25
-1111 -
+0000 - MONOC PRIMARY, EGA COLOR, 40x25
+0001 - MONOC PRIMARY, EGA COLOR, 80x25
+0010 - MONOC PRIMARY, EGA HI RES EMULATE (SAME AS 0001)
+0011 - MONOC PRIMARY, EGA HI RES ENHANCED
+0100 - COLOR 40 PRIMARY, EGA MONOCHROME
+0101 - COLOR 80 PRIMARY, EGA MONOCHROME
+
+0110 - MONOC SECONDARY, EGA COLOR, 40x24
+0111 - MONOC SECONDARY, EGA COLOR, 80x25
+1000 - MONOC SECONDARY, EGA HI RES EMULATE (SAME AS 0111)
+1001 - MONOC SECONDARY, EGA HI RES ENHANCED
+1010 - COLOR 40 SECONDARY, EGA
+1011 - COLOR 80 SECONDARY, EGA
+
+1100 - RESERVED
+1101 - RESERVED
+1110 - RESERVED
+1111 - RESERVED
 */
 	int data = 0xff;
 
