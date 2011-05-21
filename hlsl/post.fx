@@ -83,8 +83,8 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.TexCoord = Input.TexCoord;
 	Output.ExtraInfo = Input.ExtraInfo;
 
-	//Output.TexCoord /= 16.0f;
-	//Output.TexCoord += 0.4875f;
+	//Output.TexCoord /= 3.0f;
+	//Output.TexCoord += float2(0.3f, 0.25f);
 	return Output;
 }
 

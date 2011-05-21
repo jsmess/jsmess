@@ -91,10 +91,11 @@ uniform float WValue;
 uniform float AValue;
 uniform float BValue;
 
+uniform float FscScale;
+
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 InvRatios = float2(1.0f / WidthRatio, 1.0f / HeightRatio);
-	float2 Offset = float2(0.5f / RawWidth, 0.5f / RawHeight);
 	float3 Texel0 = tex2D(DiffuseSampler, Input.Coord0).rgb;
 	float3 Texel1 = tex2D(DiffuseSampler, Input.Coord1).rgb;
 	float3 Texel2 = tex2D(DiffuseSampler, Input.Coord2).rgb;

@@ -2212,6 +2212,8 @@ static void primitive_flush_pending(d3d_info *d3d)
 					(*d3dintf->effect.set_float)(curr_effect, "WValue", options.screen_yiq_w());
 					(*d3dintf->effect.set_float)(curr_effect, "AValue", options.screen_yiq_a());
 					(*d3dintf->effect.set_float)(curr_effect, "BValue", (float)poly->texture->cur_frame * options.screen_yiq_b());
+					(*d3dintf->effect.set_float)(curr_effect, "FscScale", options.screen_yiq_fsc_scale());
+					(*d3dintf->effect.set_float)(curr_effect, "FscValue", options.screen_yiq_fsc());
 
 					result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget4);
 
@@ -2245,6 +2247,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 					(*d3dintf->effect.set_float)(curr_effect, "WValue", options.screen_yiq_w());
 					(*d3dintf->effect.set_float)(curr_effect, "AValue", options.screen_yiq_a());
 					(*d3dintf->effect.set_float)(curr_effect, "BValue", (float)poly->texture->cur_frame * options.screen_yiq_b());
+					(*d3dintf->effect.set_float)(curr_effect, "FscValue", options.screen_yiq_fsc());
 
 					result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget3);
 

@@ -143,6 +143,8 @@
 #define WINOPTION_YIQ_WVALUE				"yiq_w"
 #define WINOPTION_YIQ_AVALUE				"yiq_a"
 #define WINOPTION_YIQ_BVALUE				"yiq_b"
+#define WINOPTION_YIQ_FSCVALUE				"yiq_fsc"
+#define WINOPTION_YIQ_FSCSCALE				"yiq_fsc_scale"
 #define WINOPTION_YIQ_PHASE_COUNT			"yiq_phase_count"
 
 // per-window options
@@ -256,6 +258,8 @@ public:
 	float screen_yiq_w() const { return float_value(WINOPTION_YIQ_WVALUE); }
 	float screen_yiq_a() const { return float_value(WINOPTION_YIQ_AVALUE); }
 	float screen_yiq_b() const { return float_value(WINOPTION_YIQ_BVALUE); }
+	float screen_yiq_fsc() const { return float_value(WINOPTION_YIQ_FSCVALUE); }
+	float screen_yiq_fsc_scale() const { return float_value(WINOPTION_YIQ_FSCSCALE); }
 	int screen_yiq_phase_count() const { return int_value(WINOPTION_YIQ_PHASE_COUNT); }
 	float screen_red_offset() const { return float_value(WINOPTION_RED_OFFSET); }
 	float screen_green_offset() const { return float_value(WINOPTION_GREEN_OFFSET); }

@@ -399,9 +399,11 @@ const options_entry windows_options::s_option_entries[] =
 	/* NTSC simulation below this line */
 	{ WINOPTION_YIQ_ENABLE";yiq",            					"0",       	 OPTION_BOOLEAN,    "enable YIQ-space HLSL post-processing" },
 	{ WINOPTION_YIQ_WVALUE";yiqw",								"4.1187867", OPTION_FLOAT,		"W value for YIQ signal processing" },
-	{ WINOPTION_YIQ_AVALUE";yiqa",								"0.5", 		 OPTION_FLOAT,		"A value for YIQ signal processing (usually 0.5)" },
-	{ WINOPTION_YIQ_BVALUE";yiqb",								"0.5",  	 OPTION_FLOAT,		"B value for YIQ signal processing (usually 0.5)" },
-	{ WINOPTION_YIQ_PHASE_COUNT";yiqp",							"3",		 OPTION_INTEGER,	"Phase Count value for YIQ signal processing (usually 2)" },
+	{ WINOPTION_YIQ_AVALUE";yiqa",								"0.5", 		 OPTION_FLOAT,		"A value for YIQ signal processing" },
+	{ WINOPTION_YIQ_BVALUE";yiqb",								"0.5",  	 OPTION_FLOAT,		"B value for YIQ signal processing" },
+	{ WINOPTION_YIQ_FSCVALUE";yiqfsc",							"1.5", 	     OPTION_FLOAT,		"Fsc value for YIQ signal processing" },
+	{ WINOPTION_YIQ_FSCSCALE";yiqfscs",							"1.0", 		 OPTION_FLOAT,		"Incoming Fsc scaling value for YIQ signal processing" },
+	{ WINOPTION_YIQ_PHASE_COUNT";yiqp",							"2",		 OPTION_INTEGER,	"Phase Count value for YIQ signal processing" },
 
 	// per-window options
 	{ NULL,                                           NULL,       OPTION_HEADER,     "PER-WINDOW VIDEO OPTIONS" },
