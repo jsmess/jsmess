@@ -4575,4 +4575,387 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 
+	<software name="backup13">
+	<!-- Requires "Action Replay" cartridge hardware -->
+		<description>One-Pass Backup v1.3</description>
+		<year>19??</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="one-pass backup v1.3 (19xx)(datel electronics).80" size="0x8000" crc="db145c61" sha1="e6f30726271d80754966b4a9ea241554faef06f4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ar42pro">
+	<!-- Requires "Action Replay" cartridge hardware -->
+		<description>Action Replay v4.2 Professional </description>
+		<year>1988</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action replay v4.2 professional (1988)(datel electronics).80" size="0x8000" crc="8a314329" sha1="5cd20a8cd30074da68d29df4a04ddd3add16a17a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ar42proa" cloneof="ar42pro">
+	<!-- Requires "Action Replay" cartridge hardware -->
+		<description>Action Replay v4.2 Professional  (Alt)</description>
+		<year>1988</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action replay v4.2 professional (1988)(datel electronics)[a].80" size="0x8000" crc="4b2e7d3a" sha1="6c384308290febf5ca4eedaf326d646f15a13c51" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ar42prob" cloneof="ar42pro">
+	<!-- Requires "Action Replay" cartridge hardware -->
+		<description>Action Replay v4.2 Professional (Alt 2)</description>
+		<year>1988</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action replay v4.2 professional (1988)(datel electronics)[a2].80" size="0x8000" crc="befdaf75" sha1="477f5eebe4f3313256649bfc20c5cd52e5c6b059" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ar50pro">
+	<!-- Requires "Action Replay" cartridge hardware -->
+		<description>Action Replay v5.0 Professional</description>
+		<year>1988</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action replay v5.0 professional (1988)(datel electronics).80" size="0x8000" crc="b08bed2a" sha1="894ab49f13e70203987e54b87f60b047ef910845" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ar50proa" cloneof="ar50pro">
+	<!-- Requires "Action Replay" cartridge hardware -->
+		<description>Action Replay v5.0 Professional (Alt)</description>
+		<year>1988</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action replay v5.0 professional (1988)(datel electronics)[a].80" size="0x8000" crc="6c916f80" sha1="7ef39f320987d4bfddb499708795dfe8aebbce3b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ar60plus">
+	<!-- Requires "Action Replay" cartridge hardware -->
+		<description>Action Replay v6.0 Plus (Ger)</description>
+		<year>1988</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action replay v6.0 plus (1988)(datel electronics)(de).80" size="0x8000" crc="5a0d146d" sha1="c9c037f630b7ec74f2b36c1e23396b0e1e14ecd4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arpro60">
+	<!-- Requires "Action Replay" cartridge hardware -->
+		<description>Action Replay Professional v6.0</description>
+		<year>1989</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action replay professional v6.0 (1989)(datel electronics).80" size="0x8000" crc="44a30413" sha1="fca6f0c4c164c67a01abc4a58fc83814a9b15e96" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arpro60a" cloneof="arpro60>
+	<!-- Requires "Action Replay" cartridge hardware -->
+		<description>Action Replay Professional v6.0 (Alt)</description>
+		<year>1989</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action replay v6.0 professional (1989)(datel electronics)[a].80" size="0x8000" crc="ef954e54" sha1="912dd6102d320f0b55589aead594554a80e7ae99" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acplus70">
+	<!-- Requires "Action Replay" cartridge hardware -->
+		<description>Action Cartridge Plus MK v7.0</description>
+		<year>1990</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action cartridge plus mk v7.0 (1990-04)(datel electronics).80" size="0x8000" crc="2939b479" sha1="81a939c6e26e07fc6dd65080415d91fb9017bc6e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ar73pro">
+	<!-- Requires "Action Replay" cartridge hardware -->
+		<description>Action Replay v7.3 Professional</description>
+		<year>1991</year>
+		<publisher>Datel Electronics, Atrax</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action replay v7.3 (1991)(datel)[h atrax].80" size="0x8000" crc="4d59d964" sha1="662c4d579907b0ebc4123910537be600ad50dc08" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ar75pro">
+	<!-- Requires "Action Replay" cartridge hardware -->
+		<description>Action Replay v7.5 Professional</description>
+		<year>1989</year>
+		<publisher>Datel Electronics</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action replay v7.5 professional (1989)(datel).80" size="0x8000" crc="2fdc011f" sha1="564952475b92f0a452c5b58acd6a03ae85342297" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="comal80">
+	<!-- Requires "Comal 80" cartridge hardware -->
+		<description>Comal 80</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="comal 80 (1985)(commodore).80" size="0x10000" crc="60f5b3c7" sha1="e51df2b88445b2a33bf77a021c9fb7d8872254ce" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comal80a" cloneof="comal80">
+	<!-- Requires "Comal 80" cartridge hardware -->
+		<description>Comal 80 (Alt)</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="comal 80 (1985)(commodore)[a].80" size="0x10000" crc="5b198f00" sha1="afb9ee78bb07444cdfd58eef75a33ec4026e3be1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fairlite">
+	<!-- Requires "Action Replay" cartridge hardware -->
+		<description>The Fairlight Cracking Cartridge</description>
+		<year>198?</year>
+		<publisher>Fairlight</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="fairlight cracking cartridge, the (198x)(fairlight).80" size="0x8000" crc="c37e1781" sha1="6b8b02eef0cfca2b1b470355b5614cceb9632cff" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="final">
+	<!-- Requires "Final Cartridge III" cartridge hardware -->
+		<description>The Final Cartridge III v.1988-12</description>
+		<year>1988</year>
+		<publisher>Riska H&P</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="final cartridge iii (1988-12)(riska h&amp;p).80" size="0x10000" crc="83e54062" sha1="f1ee8d32ad5deeb3c3ebb516382a6c94090353e6" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="final2" cloneof="final>
+	<!-- Requires "Final Cartridge III" cartridge hardware -->
+		<description>The Final Cartridge III v.1988-05</description>
+		<year>1988</year>
+		<publisher>Riska H&P</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x10000">
+					<rom name="final cartridge iii (1988-05)(riska h&amp;p).80" size="0x10000" crc="0d54e680" sha1="85870c1608538169fbae0563e8a3ac8d3ead12a1"/> offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="final3" cloneof="final>
+	<!-- Requires "Final Cartridge III" cartridge hardware -->
+		<description>The Final Cartridge III v.1987-11</description>
+		<year>1987</year>
+		<publisher>Riska H&P</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x10000">
+					<rom name="final cartridge iii (1987-11)(riska h&amp;p).80" size="0x10000" crc="e3257fd5" sha1="be832850972f909a204f633011898a5ddab0b8f0"/> offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="final4" cloneof="final>
+	<!-- Requires "Final Cartridge III" cartridge hardware -->
+		<description>The Final Cartridge III v.1987-09</description>
+		<year>1987</year>
+		<publisher>Riska H&P</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x10000">
+					<rom name="final cartridge iii (1987-09)(riska h&amp;p).80" size="0x10000" crc="eeab7bc3" sha1="a1f40b46df36161419092b7b8d7a085e821070d5"/> offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="magicdsk">
+	<!-- Requires "Magic Desk, Domark, HES Australia" cartridge hardware -->
+		<description>Magic Desk I</description>
+		<year>1983</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="magic desk i (1983)(commodore).80" size="0x8000" crc="a34d0f87" sha1="e9dd758c03c288a1cbfa6cadbcc6f2943c27ff20" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="magicf">
+	<!-- Requires "Magic Formel" cartridge hardware -->
+		<description>Magic Formel</description>
+		<year>1984</year>
+		<publisher>LS</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="magic formel (1984)(ls).80" size="0x10000" crc="dfc8b7f3" sha1="7c2e12ee2836157af9f811e1c9017bff542c8cfa" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="nordic72">
+	<!-- Requires "Atomic Power" cartridge hardware -->
+		<description>Nordic Power - Action Cartridge v7.2</description>
+		<year>1991</year>
+		<publisher>Gameworks</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="nordic power - action cartridge v7.2 (1991)(gameworks ltd).80" size="0x8000" crc="2056575f" sha1="ad6a924f8d163f3a506aa49cc8d4e3de3267e6d9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="atomic" cloneof="nordic72">
+	<!-- Requires "Atomic Power" cartridge hardware -->
+		<description>Atomic Power Cartridge v1.1</description>
+		<year>1990</year>
+		<publisher>Frank & Joe</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="atomic power cartridge v1.1 (1990)(frank &amp; joe).80" size="0x8000" crc="174c7c48" sha1="2c6f5d22e279f1f197d4cc9607a1f9fca3223774" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="nordic10" cloneof="nordic72">
+	<!-- Requires "Atomic Power" cartridge hardware -->
+		<description>Nordic Power v1.0</description>
+		<year>1989</year>
+		<publisher>D&E, Venlo</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="nordic power v1.0 (1989)(d&amp;e, venlo).80" size="0x8000" crc="cefb038d" sha1="da6af5c52db7c8d2d5ca86b5d3939b5603d289cc" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="sprsnap5">
+	<!-- Requires "Super Snapshot 5" cartridge hardware -->
+		<description>Super Snapshot 5 (NTSC)</description>
+		<year>1989</year>
+		<publisher>LMS Tech</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="super snapshot 5 ntsc (1989)(lms tech).80" size="0x10000" crc="8d281cf8" sha1="2420ad183577371d323fb9efa81adc513acbd682" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="sprsnp5p" cloneof="sprsnap5>
+	<!-- Requires "Super Snapshot 5" cartridge hardware -->
+		<description>Super Snapshot 5 (PAL)</description>
+		<year>1989</year>
+		<publisher>LMS Tech</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="super snapshot 5 pal (1989)(lms tech).80" size="0x10000" crc="ed5cb065" sha1="10c34bd6d4651c2549e62cc448412e6d2b193609" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="sprsn5pa" cloneof="sprsnap5>
+	<!-- Requires "Super Snapshot 5" cartridge hardware -->
+		<description>Super Snapshot 5 (PAL) (Alt)</description>
+		<year>1989</year>
+		<publisher>LMS Tech</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="super snapshot 5 pal (1989)(lms tech)[a].80" size="0x10000" crc="58b404e8" sha1="0eae11f615090fd38c049865f494a0cd2922679f" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	
+
+
+
+
 </softwarelist>
