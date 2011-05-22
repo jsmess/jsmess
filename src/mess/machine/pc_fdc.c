@@ -451,7 +451,7 @@ READ8_HANDLER ( pc_fdc_r )
 		case 6: /* FDC reserved */
 			break;
 		case 7:
-			data = fdc->digital_input_register;
+			data = fdc->digital_input_register | (!floppy_dskchg_r(floppy_get_device(space->machine(), fdc->digital_output_register & 0x03))<<7);
 			break;
     }
 
