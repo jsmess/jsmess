@@ -221,7 +221,7 @@ static const mc6845_interface mc6845_vga_intf =
 
 static SCREEN_UPDATE( mc6845_vga )
 {
-	mc6845_device *mc6845 = screen->owner()->subdevice<mc6845_device>(VGA_MC6845_NAME);
+	mc6845_device *mc6845 = downcast<mc6845_device *>(screen->owner()->subdevice(VGA_MC6845_NAME));
 	mc6845->update(bitmap, cliprect);
 	return 0;
 }

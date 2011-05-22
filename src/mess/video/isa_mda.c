@@ -205,7 +205,7 @@ void isa8_mda_device::device_reset()
 
 static SCREEN_UPDATE( mc6845_mda )
 {
-	mc6845_device *mc6845 = screen->owner()->subdevice<mc6845_device>(MDA_MC6845_NAME);
+	mc6845_device *mc6845 = downcast<mc6845_device *>(screen->owner()->subdevice(MDA_MC6845_NAME));
 	mc6845->update( bitmap, cliprect );
 	return 0;
 }
@@ -444,7 +444,7 @@ static READ8_DEVICE_HANDLER(mda_status_r)
  *************************************************************************/
 WRITE8_DEVICE_HANDLER ( pc_MDA_w )
 {
-	mc6845_device *mc6845 = device->subdevice<mc6845_device>(MDA_MC6845_NAME);
+	mc6845_device *mc6845 = downcast<mc6845_device *>(device->subdevice(MDA_MC6845_NAME));
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *lpt = device->subdevice("lpt");
 	switch( offset )
@@ -467,7 +467,7 @@ WRITE8_DEVICE_HANDLER ( pc_MDA_w )
  READ8_DEVICE_HANDLER ( pc_MDA_r )
 {
 	int data = 0xff;
-	mc6845_device *mc6845 = device->subdevice<mc6845_device>(MDA_MC6845_NAME);
+	mc6845_device *mc6845 = downcast<mc6845_device *>(device->subdevice(MDA_MC6845_NAME));
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *lpt = device->subdevice("lpt");
 	switch( offset )
@@ -655,7 +655,7 @@ static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 
 static SCREEN_UPDATE( mc6845_hercules )
 {
-	mc6845_device *mc6845 = screen->owner()->subdevice<mc6845_device>(HERCULES_MC6845_NAME);
+	mc6845_device *mc6845 = downcast<mc6845_device *>(screen->owner()->subdevice(HERCULES_MC6845_NAME));
 
 	mc6845->update( bitmap, cliprect );
 	return 0;
@@ -701,7 +701,7 @@ static WRITE8_DEVICE_HANDLER(hercules_config_w)
 
 static WRITE8_DEVICE_HANDLER ( hercules_w )
 {
-	mc6845_device *mc6845 = device->subdevice<mc6845_device>(HERCULES_MC6845_NAME);
+	mc6845_device *mc6845 = downcast<mc6845_device *>(device->subdevice(HERCULES_MC6845_NAME));
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *lpt = device->subdevice("lpt");
 	switch( offset )
@@ -746,7 +746,7 @@ static READ8_DEVICE_HANDLER(hercules_status_r)
 static READ8_DEVICE_HANDLER ( hercules_r )
 {
 	int data = 0xff;
-	mc6845_device *mc6845 = device->subdevice<mc6845_device>(HERCULES_MC6845_NAME);
+	mc6845_device *mc6845 = downcast<mc6845_device *>(device->subdevice(HERCULES_MC6845_NAME));
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *lpt = device->subdevice("lpt");
 	switch( offset )
