@@ -2,9 +2,22 @@
 // YIQ Decode Effect
 //-----------------------------------------------------------------------------
 
-texture Diffuse;
+texture Composite;
 
 sampler CompositeSampler = sampler_state
+{
+	Texture   = <Composite>;
+	MipFilter = POINT;
+	MinFilter = POINT;
+	MagFilter = POINT;
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+	AddressW = CLAMP;
+};
+
+texture Diffuse;
+
+sampler DiffuseSampler = sampler_state
 {
 	Texture   = <Diffuse>;
 	MipFilter = POINT;
@@ -110,6 +123,7 @@ uniform float BValue;
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 RawDims = float2(RawWidth, RawHeight);
+	float4 BaseTexel = tex2D(DiffuseSampler, Input.Coord0.xy);
 	float4 OrigC = tex2D(CompositeSampler, Input.Coord0.xy);
 	float4 OrigC2 = tex2D(CompositeSampler, Input.Coord4.xy);
 	float4 C = OrigC;
@@ -152,10 +166,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	}
 	float Yavg = Ytotal / (FscValue * 4.0f);
 
-	float4 I = (C - Yavg) * sin(W * Tc);
-	float4 Q = (C - Yavg) * cos(W * Tc);
-	float4 I2 = (C2 - Yavg) * sin(W * Tc2);
-	float4 Q2 = (C2 - Yavg) * cos(W * Tc2);
+	float4 I = C * sin(W * Tc);
+	float4 Q = C * cos(W * Tc);
+	float4 I2 = C2 * sin(W * Tc2);
+	float4 Q2 = C2 * cos(W * Tc2);
 	
 	float Itotal = 0.0f;
 	float Qtotal = 0.0f;
@@ -176,7 +190,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	
 	float3 OutRGB = float3(dot(YIQ, float3(1.0f, 0.9563f, 0.6210f)), dot(YIQ, float3(1.0f, -0.2721f, -0.6474f)), dot(YIQ, float3(1.0f, -1.1070f, 1.7046f)));	
 	
-	return float4(OutRGB, 1.0f);
+	return float4(OutRGB, BaseTexel.a);
 }
 
 //-----------------------------------------------------------------------------
