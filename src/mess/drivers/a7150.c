@@ -7,6 +7,7 @@
     http://www.robotrontechnik.de/index.htm?/html/computer/a7150.htm
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -21,7 +22,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START(a7150_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(a7150_mem, AS_PROGRAM, 16, a7150_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xeffff) AM_RAM
 	AM_RANGE(0xf8000,0xfffff) AM_ROM AM_REGION("user1", 0)
@@ -76,4 +77,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1986, a7150,  0,      0,       a7150,     a7150,    0,     "VEB Robotron",   "A7150",       GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, a7150,  0,      0,       a7150,     a7150,    0,     "VEB Robotron",   "A7150", GAME_NOT_WORKING | GAME_NO_SOUND)

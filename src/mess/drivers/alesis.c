@@ -8,6 +8,7 @@
     http://www.vintagesynth.com/misc/sr16.php
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
@@ -22,22 +23,22 @@ public:
 };
 
 
-static ADDRESS_MAP_START(hr16_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(hr16_mem, AS_PROGRAM, 8, alesis_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hr16_io , AS_IO, 8)
+static ADDRESS_MAP_START(hr16_io, AS_IO, 8, alesis_state)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sr16_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(sr16_mem, AS_PROGRAM, 8, alesis_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sr16_io , AS_IO, 8)
+static ADDRESS_MAP_START(sr16_io, AS_IO, 8, alesis_state)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

@@ -8,6 +8,7 @@
     http://acorn.chriswhy.co.uk/8bit_Upgrades/Acorn_6809_CPU.html
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
@@ -25,18 +26,18 @@ public:
 };
 
 
-static ADDRESS_MAP_START(a6809_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(a6809_mem, AS_PROGRAM, 8, a6809_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x03ff) AM_RAM
-	AM_RANGE(0x0400,0x07ff) AM_DEVREADWRITE("saa5050", saa5050_videoram_r, saa5050_videoram_w)
-	AM_RANGE(0x0800,0x0800) AM_DEVWRITE_MODERN("mc6845", mc6845_device, address_w)
-	AM_RANGE(0x0801,0x0801) AM_DEVREADWRITE_MODERN("mc6845", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0900,0x090f) AM_MIRROR(0xf0) AM_DEVREADWRITE_MODERN("via", via6522_device, read, write)
+	AM_RANGE(0x0400,0x07ff) AM_DEVREADWRITE_LEGACY("saa5050", saa5050_videoram_r, saa5050_videoram_w)
+	AM_RANGE(0x0800,0x0800) AM_DEVWRITE("mc6845", mc6845_device, address_w)
+	AM_RANGE(0x0801,0x0801) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, register_w)
+	AM_RANGE(0x0900,0x090f) AM_MIRROR(0xf0) AM_DEVREADWRITE("via", via6522_device, read, write)
 	AM_RANGE(0xf000,0xf7ff) AM_ROM // optional ROM
 	AM_RANGE(0xf800,0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( a6809_io , AS_IO, 8)
+static ADDRESS_MAP_START( a6809_io, AS_IO, 8, a6809_state)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
@@ -145,4 +146,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR   NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1980?, a6809,  0,      0,       a6809,     a6809,   0,      "Acorn",  "6809",        GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1980?, a6809,  0,      0,       a6809,     a6809,   0,      "Acorn",  "6809", GAME_NOT_WORKING | GAME_NO_SOUND )

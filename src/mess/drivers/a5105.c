@@ -9,6 +9,7 @@
     - this looks like "somehow" inspired by the MSX1 machine?
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -17,31 +18,41 @@
 #include "sound/wave.h"
 #include "sound/beep.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 class a5105_state : public driver_device
 {
 public:
 	a5105_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_hgdc(*this, "upd7220"),
-		m_cass(*this, "cassette"),
-		m_beep(*this, "beep")
-		{ }
+	m_maincpu(*this, "maincpu"),
+	m_hgdc(*this, "upd7220"),
+	m_cass(*this, "cassette"),
+	m_beep(*this, "beep")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<upd7220_device> m_hgdc;
 	required_device<device_t> m_cass;
 	required_device<device_t> m_beep;
-
-	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-	device_t *m_cassette;
+	DECLARE_READ8_MEMBER(a5105_memsel_r);
+	DECLARE_READ8_MEMBER(key_r);
+	DECLARE_READ8_MEMBER(key_mux_r);
+	DECLARE_WRITE8_MEMBER(key_mux_w);
+	DECLARE_WRITE8_MEMBER(a5105_ab_w);
+	DECLARE_WRITE8_MEMBER(a5105_memsel_w);
+	DECLARE_WRITE8_MEMBER(pcg_addr_w);
+	DECLARE_WRITE8_MEMBER(pcg_val_w);
 	UINT8 *m_char_rom;
-
-
 	UINT16 m_pcg_addr;
 	UINT16 m_pcg_internal_addr;
 	UINT8 m_key_mux;
 	UINT8 m_memsel[4];
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 /* TODO */
@@ -99,7 +110,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	}
 }
 
-static ADDRESS_MAP_START(a5105_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(a5105_mem, AS_PROGRAM, 8, a5105_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM //ROM bank
@@ -107,59 +118,49 @@ static ADDRESS_MAP_START(a5105_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( pcg_addr_w )
+WRITE8_MEMBER( a5105_state::pcg_addr_w )
 {
-	a5105_state *state = space->machine().driver_data<a5105_state>();
-
-	state->m_pcg_addr = data << 3;
-	state->m_pcg_internal_addr = 0;
+	m_pcg_addr = data << 3;
+	m_pcg_internal_addr = 0;
 }
 
-static WRITE8_HANDLER( pcg_val_w )
+WRITE8_MEMBER( a5105_state::pcg_val_w )
 {
-	UINT8 *gfx_data = space->machine().region("pcg")->base();
-	a5105_state *state = space->machine().driver_data<a5105_state>();
+	m_char_rom[m_pcg_addr | m_pcg_internal_addr] = data;
 
-	gfx_data[state->m_pcg_addr|state->m_pcg_internal_addr] = data;
+	gfx_element_mark_dirty(machine().gfx[0], m_pcg_addr >> 3);
 
-	gfx_element_mark_dirty(space->machine().gfx[0], state->m_pcg_addr >> 3);
-
-	state->m_pcg_internal_addr++;
-	state->m_pcg_internal_addr&=7;
+	m_pcg_internal_addr++;
+	m_pcg_internal_addr&=7;
 }
 
-static READ8_HANDLER( key_r )
+READ8_MEMBER( a5105_state::key_r )
 {
-	a5105_state *state = space->machine().driver_data<a5105_state>();
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 	                                        "KEY4", "KEY5", "KEY6", "KEY7",
 	                                        "KEY8", "KEY9", "KEYA", "UNUSED",
 	                                        "UNUSED", "UNUSED", "UNUSED", "UNUSED" };
 
-	return input_port_read(space->machine(), keynames[state->m_key_mux & 0x0f]);
+	return input_port_read(machine(), keynames[m_key_mux & 0x0f]);
 }
 
-static READ8_HANDLER( key_mux_r )
+READ8_MEMBER( a5105_state::key_mux_r )
 {
-	a5105_state *state = space->machine().driver_data<a5105_state>();
-
-	return state->m_key_mux;
+	return m_key_mux;
 }
 
-static WRITE8_HANDLER( key_mux_w )
+WRITE8_MEMBER( a5105_state::key_mux_w )
 {
-	a5105_state *state = space->machine().driver_data<a5105_state>();
 	/*
         xxxx ---- unknown
         ---- xxxx keyboard mux
     */
 
-	state->m_key_mux = data;
+	m_key_mux = data;
 }
 
-static WRITE8_HANDLER( a5105_ab_w )
+WRITE8_MEMBER( a5105_state::a5105_ab_w )
 {
-	a5105_state *state = space->machine().driver_data<a5105_state>();
 /*port $ab
         ---- 100x tape motor, active low
         ---- 101x tape data
@@ -170,13 +171,13 @@ static WRITE8_HANDLER( a5105_ab_w )
 	{
 	case 0:
 		if (BIT(data, 0))
-			cassette_change_state(state->m_cass, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+			cassette_change_state(m_cass, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		else
-			cassette_change_state(state->m_cass, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+			cassette_change_state(m_cass, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		break;
 
 	case 2:
-		cassette_output(state->m_cass, BIT(data, 0) ? -1.0 : +1.0);
+		cassette_output(m_cass, BIT(data, 0) ? -1.0 : +1.0);
 		break;
 
 	case 4:
@@ -184,43 +185,40 @@ static WRITE8_HANDLER( a5105_ab_w )
 		break;
 
 	case 6:
-		beep_set_state(state->m_beep, BIT(data, 0));
+		beep_set_state(m_beep, BIT(data, 0));
 		break;
 	}
 }
 
-static READ8_HANDLER( a5105_memsel_r )
+READ8_MEMBER( a5105_state::a5105_memsel_r )
 {
-	a5105_state *state = space->machine().driver_data<a5105_state>();
 	UINT8 res;
 
-	res = (state->m_memsel[0] & 3) << 0;
-	res|= (state->m_memsel[1] & 3) << 2;
-	res|= (state->m_memsel[2] & 3) << 4;
-	res|= (state->m_memsel[3] & 3) << 6;
+	res = (m_memsel[0] & 3) << 0;
+	res|= (m_memsel[1] & 3) << 2;
+	res|= (m_memsel[2] & 3) << 4;
+	res|= (m_memsel[3] & 3) << 6;
 
 	return res;
 }
 
-static WRITE8_HANDLER( a5105_memsel_w )
+WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 {
-	a5105_state *state = space->machine().driver_data<a5105_state>();
+	m_memsel[0] = (data & 0x03) >> 0;
+	m_memsel[1] = (data & 0x0c) >> 2;
+	m_memsel[2] = (data & 0x30) >> 4;
+	m_memsel[3] = (data & 0xc0) >> 6;
 
-	state->m_memsel[0] = (data & 0x03) >> 0;
-	state->m_memsel[1] = (data & 0x0c) >> 2;
-	state->m_memsel[2] = (data & 0x30) >> 4;
-	state->m_memsel[3] = (data & 0xc0) >> 6;
-
-	//printf("Memsel change to %02x %02x %02x %02x\n",state->m_memsel[0],state->m_memsel[1],state->m_memsel[2],state->m_memsel[3]);
+	//printf("Memsel change to %02x %02x %02x %02x\n",m_memsel[0],m_memsel[1],m_memsel[2],m_memsel[3]);
 }
 
-static ADDRESS_MAP_START( a5105_io , AS_IO, 8)
+static ADDRESS_MAP_START(a5105_io, AS_IO, 8, a5105_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x40, 0x4b) fdc, upd765?
 //  AM_RANGE(0x80, 0x83) z80ctc
 //  AM_RANGE(0x90, 0x93) ppi8255?
-	AM_RANGE(0x98, 0x99) AM_DEVREADWRITE_MODERN("upd7220", upd7220_device, read, write)
+	AM_RANGE(0x98, 0x99) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
 
 	AM_RANGE(0x9c, 0x9c) AM_WRITE(pcg_val_w)
 //  AM_RANGE(0x9d, 0x9d) crtc area (ff-based), palette routes here
@@ -246,8 +244,8 @@ static INPUT_PORTS_START( a5105 )
 	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 
 	PORT_START("KEY1")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)				PORT_CHAR('8') PORT_CHAR('*')
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)				PORT_CHAR('9') PORT_CHAR('(')
+	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
+	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("<") //PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("+") //PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	/* TODO: following three aren't marked correctly */
@@ -297,34 +295,34 @@ static INPUT_PORTS_START( a5105 )
 	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 
 	PORT_START("KEY6")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)						PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)						PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_PGUP)		PORT_CHAR(UCHAR_MAMEKEY(F6))
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK)	PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CODE") PORT_CODE(KEYCODE_PGDN)		PORT_CHAR(UCHAR_MAMEKEY(F7))
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F5)		PORT_CHAR(UCHAR_MAMEKEY(F5))
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F4)		PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)		PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)		PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)	PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(F6))
+	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CODE") PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(F7))
+	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
 
 	PORT_START("KEY7")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F2)		PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F1)		PORT_CHAR(UCHAR_MAMEKEY(F1))
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)							PORT_CHAR(UCHAR_MAMEKEY(ESC))
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)							PORT_CHAR('\t')
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("STOP") PORT_CODE(KEYCODE_RCONTROL)	PORT_CHAR(UCHAR_MAMEKEY(F8))
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)					PORT_CHAR(8)
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SELECT") PORT_CODE(KEYCODE_END)		PORT_CHAR(UCHAR_MAMEKEY(F9))
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)						PORT_CHAR(13)
+	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)		PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)		PORT_CHAR(9)
+	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("STOP") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(F8))
+	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)	PORT_CHAR(8)
+	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SELECT") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(F9))
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)		PORT_CHAR(13)
 
 	PORT_START("KEY8")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)					PORT_CHAR(' ')
-	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME)					PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_INSERT)				PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)	PORT_CHAR(UCHAR_MAMEKEY(DEL))
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)					PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)					PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)					PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)					PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)		PORT_CHAR(' ')
+	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME)		PORT_CHAR(UCHAR_MAMEKEY(HOME))
+	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_INSERT)		PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
+	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)		PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)		PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)		PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)		PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("KEY9")
 	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)	PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
@@ -343,8 +341,8 @@ static INPUT_PORTS_START( a5105 )
 	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)		PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)		PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)	PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
-	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad ,") PORT_CODE(KEYCODE_ENTER_PAD)
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)	PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad ,")		PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)		PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 
 	PORT_START("UNUSED")
 	PORT_BIT (0xff, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -354,12 +352,11 @@ static INPUT_PORTS_START( a5105 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(a5105)
+MACHINE_RESET_MEMBER(a5105_state)
 {
-	a5105_state *state = machine.driver_data<a5105_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	a5105_ab_w(space, 0, 9); // turn motor off
-	beep_set_frequency(state->m_beep, 500);
+	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
+	a5105_ab_w(*space, 0, 9); // turn motor off
+	beep_set_frequency(m_beep, 500);
 }
 
 
@@ -374,9 +371,8 @@ static const gfx_layout x1_chars_8x8 =
 	8*8
 };
 
-/* decoded for debugging purpose, this will be nuked in the end... */
 static GFXDECODE_START( a5105 )
-	GFXDECODE_ENTRY( "pcg",   0x00000, x1_chars_8x8,    0, 1 )
+	GFXDECODE_ENTRY( "pcg", 0x0000, x1_chars_8x8, 0, 8 )
 GFXDECODE_END
 
 static INTERRUPT_GEN( a5105_vblank_irq )
@@ -399,7 +395,7 @@ static PALETTE_INIT( gdc )
 	}
 }
 
-void a5105_state::video_start()
+VIDEO_START_MEMBER( a5105_state )
 {
 	// find memory regions
 	m_char_rom = machine().region("pcg")->base();
@@ -407,7 +403,7 @@ void a5105_state::video_start()
 	VIDEO_START_NAME(generic_bitmapped)(machine());
 }
 
-bool a5105_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+SCREEN_UPDATE_MEMBER( a5105_state )
 {
 	/* graphics */
 	m_hgdc->update_screen(&bitmap, &cliprect);
@@ -425,8 +421,8 @@ static UPD7220_INTERFACE( hgdc_intf )
 	DEVCB_NULL
 };
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 8 )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_MODERN("upd7220", upd7220_device, vram_r, vram_w)
+static ADDRESS_MAP_START( upd7220_map, AS_0, 8, a5105_state)
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220", upd7220_device, vram_r, vram_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( a5105, a5105_state )
@@ -435,8 +431,6 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_CPU_PROGRAM_MAP(a5105_mem)
 	MCFG_CPU_IO_MAP(a5105_io)
 	MCFG_CPU_VBLANK_INT("screen",a5105_vblank_irq)
-
-	MCFG_MACHINE_RESET(a5105)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -479,4 +473,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME           FLAGS */
-COMP( 1989, a5105,  0,      0,       a5105,     a5105,   0,      "VEB Robotron",   "BIC A5105",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1989, a5105,  0,      0,       a5105,     a5105,   0,      "VEB Robotron",   "BIC A5105", GAME_NOT_WORKING | GAME_NO_SOUND)

@@ -5,6 +5,7 @@
         03/12/2009 Skeleton driver.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
@@ -21,7 +22,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START(basic52_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(basic52_mem, AS_PROGRAM, 8, basic52_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_RAM
@@ -30,11 +31,11 @@ static ADDRESS_MAP_START(basic52_mem, AS_PROGRAM, 8)
 	//AM_RANGE(0xe000, 0xffff) // Expansion block
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( basic52_io , AS_IO, 8)
+static ADDRESS_MAP_START(basic52_io, AS_IO, 8, basic52_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)  // PPI-8255
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)  // PPI-8255
 	//AM_RANGE(0xc000, 0xdfff) // Expansion block
 	//AM_RANGE(0xe000, 0xffff) // Expansion block
 ADDRESS_MAP_END
@@ -69,30 +70,30 @@ static I8255_INTERFACE( ppi8255_intf )
 };
 
 static MACHINE_CONFIG_START( basic31, basic52_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
-    MCFG_CPU_PROGRAM_MAP(basic52_mem)
-    MCFG_CPU_IO_MAP(basic52_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
+	MCFG_CPU_PROGRAM_MAP(basic52_mem)
+	MCFG_CPU_IO_MAP(basic52_io)
 
-    MCFG_MACHINE_RESET(basic52)
+	MCFG_MACHINE_RESET(basic52)
 
-    /* video hardware */
-    MCFG_FRAGMENT_ADD( generic_terminal )
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)
 
 	MCFG_I8255_ADD("ppi8255", ppi8255_intf )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( basic52, basic52_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", I8052, XTAL_11_0592MHz)
-    MCFG_CPU_PROGRAM_MAP(basic52_mem)
-    MCFG_CPU_IO_MAP(basic52_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I8052, XTAL_11_0592MHz)
+	MCFG_CPU_PROGRAM_MAP(basic52_mem)
+	MCFG_CPU_IO_MAP(basic52_io)
 
-    MCFG_MACHINE_RESET(basic52)
+	MCFG_MACHINE_RESET(basic52)
 
-    /* video hardware */
-    MCFG_FRAGMENT_ADD( generic_terminal )
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)
 
 	MCFG_I8255_ADD("ppi8255", ppi8255_intf )
@@ -119,6 +120,6 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1985, basic52,  0,       0,	basic52,	basic52,	 0,  "Intel",   "MCS BASIC 52",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1985, basic31,  basic52, 0,	basic31,	basic52,	 0,  "Intel",   "MCS BASIC 31",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, basic52,  0,       0,	basic52,	basic52,	 0,  "Intel",   "MCS BASIC 52", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, basic31,  basic52, 0,	basic31,	basic52,	 0,  "Intel",   "MCS BASIC 31", GAME_NOT_WORKING | GAME_NO_SOUND)
 
