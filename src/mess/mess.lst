@@ -1542,6 +1542,7 @@ z80netf	   // 1980 - Z80NE + LX.388 Video Interface + LX.390 FD Controller
 
 // Talking Electronics Magazine
 tec1	  // Talking Electronics Computer
+tecjmon	  // Talking Electronics Computer
 
 // Kyocera (and clones)
 kc85
