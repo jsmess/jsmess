@@ -2163,8 +2163,6 @@ static void primitive_flush_pending(d3d_info *d3d)
 					(*d3dintf->effect.set_float)(curr_effect, "UseShadow", d3d->shadow_texture == NULL ? 0.0f : 1.0f);
 					(*d3dintf->effect.set_texture)(curr_effect, "Shadow", d3d->shadow_texture == NULL ? NULL : d3d->shadow_texture->d3dfinaltex);
 					(*d3dintf->effect.set_float)(curr_effect, "ShadowBrightness", (float)options.screen_shadow_mask_alpha());
-					(*d3dintf->effect.set_float)(curr_effect, "ShadowPixelSizeX", (float)options.screen_shadow_mask_ratio_x());
-					(*d3dintf->effect.set_float)(curr_effect, "ShadowPixelSizeY", (float)options.screen_shadow_mask_ratio_y());
 					(*d3dintf->effect.set_float)(curr_effect, "ShadowMaskSizeX", (float)options.screen_shadow_mask_count_x());
 					(*d3dintf->effect.set_float)(curr_effect, "ShadowMaskSizeY", (float)options.screen_shadow_mask_count_y());
 					(*d3dintf->effect.set_float)(curr_effect, "ShadowU", (float)options.screen_shadow_mask_u_size());
@@ -2651,42 +2649,46 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 				{
 					texture->d3dfinaltex = texture->d3dtex;
 					texture->type = d3d->dynamic_supported ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
-					result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture0);
-					if (result != D3D_OK)
-						goto error;
-					(*d3dintf->texture.get_surface_level)(texture->d3dtexture0, 0, &texture->d3dtarget0);
 
-					result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->last_d3dtexture[d3d->registered_targets]);
-					if (result != D3D_OK)
-						goto error;
-					(*d3dintf->texture.get_surface_level)(d3d->last_d3dtexture[d3d->registered_targets], 0, &d3d->last_d3dtarget[d3d->registered_targets]);
+					if(d3d->hlsl_enable && d3dintf->post_fx_available)
+					{
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture0);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(texture->d3dtexture0, 0, &texture->d3dtarget0);
 
-					result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture1);
-					if (result != D3D_OK)
-						goto error;
-					(*d3dintf->texture.get_surface_level)(texture->d3dtexture1, 0, &texture->d3dtarget1);
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->last_d3dtexture[d3d->registered_targets]);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(d3d->last_d3dtexture[d3d->registered_targets], 0, &d3d->last_d3dtarget[d3d->registered_targets]);
 
-					result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture2);
-					if (result != D3D_OK)
-						goto error;
-					(*d3dintf->texture.get_surface_level)(texture->d3dtexture2, 0, &texture->d3dtarget2);
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture1);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(texture->d3dtexture1, 0, &texture->d3dtarget1);
 
-					result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture3);
-					if (result != D3D_OK)
-						goto error;
-					(*d3dintf->texture.get_surface_level)(texture->d3dtexture3, 0, &texture->d3dtarget3);
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture2);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(texture->d3dtexture2, 0, &texture->d3dtarget2);
 
-					result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture4);
-					if (result != D3D_OK)
-						goto error;
-					(*d3dintf->texture.get_surface_level)(texture->d3dtexture4, 0, &texture->d3dtarget4);
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture3);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(texture->d3dtexture3, 0, &texture->d3dtarget3);
 
-					result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dsmalltexture0);
-					if (result != D3D_OK)
-						goto error;
-					(*d3dintf->texture.get_surface_level)(texture->d3dsmalltexture0, 0, &texture->d3dsmalltarget0);
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture4);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(texture->d3dtexture4, 0, &texture->d3dtarget4);
 
-					d3d->registered_targets++;
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dsmalltexture0);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(texture->d3dsmalltexture0, 0, &texture->d3dsmalltarget0);
+
+						d3d->registered_targets++;
+					}
 
 					break;
 				}
@@ -2726,42 +2728,44 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 				result = (*d3dintf->device.create_texture)(d3d->device, scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, finalfmt, D3DPOOL_DEFAULT, &texture->d3dfinaltex);
 				if (result == D3D_OK)
 				{
-					result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture0);
-					if (result != D3D_OK)
-						goto error;
-					(*d3dintf->texture.get_surface_level)(texture->d3dtexture0, 0, &texture->d3dtarget0);
+					if(d3d->hlsl_enable && d3dintf->post_fx_available)
+					{
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture0);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(texture->d3dtexture0, 0, &texture->d3dtarget0);
 
-					result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->last_d3dtexture[d3d->registered_targets]);
-					if (result != D3D_OK)
-						goto error;
-					(*d3dintf->texture.get_surface_level)(d3d->last_d3dtexture[d3d->registered_targets], 0, &d3d->last_d3dtarget[d3d->registered_targets]);
-					d3d->registered_targets++;
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->last_d3dtexture[d3d->registered_targets]);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(d3d->last_d3dtexture[d3d->registered_targets], 0, &d3d->last_d3dtarget[d3d->registered_targets]);
+						d3d->registered_targets++;
 
-					result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture1);
-					if (result != D3D_OK)
-						goto error;
-					(*d3dintf->texture.get_surface_level)(texture->d3dtexture1, 0, &texture->d3dtarget1);
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture1);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(texture->d3dtexture1, 0, &texture->d3dtarget1);
 
-					result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture2);
-					if (result != D3D_OK)
-						goto error;
-					(*d3dintf->texture.get_surface_level)(texture->d3dtexture2, 0, &texture->d3dtarget2);
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture2);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(texture->d3dtexture2, 0, &texture->d3dtarget2);
 
-					result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture3);
-					if (result != D3D_OK)
-						goto error;
-					(*d3dintf->texture.get_surface_level)(texture->d3dtexture3, 0, &texture->d3dtarget3);
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture3);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(texture->d3dtexture3, 0, &texture->d3dtarget3);
 
-					result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture4);
-					if (result != D3D_OK)
-						goto error;
-					(*d3dintf->texture.get_surface_level)(texture->d3dtexture4, 0, &texture->d3dtarget4);
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture4);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(texture->d3dtexture4, 0, &texture->d3dtarget4);
 
-					result = (*d3dintf->device.create_texture)(d3d->device, scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dsmalltexture0);
-					if (result != D3D_OK)
-						goto error;
-					(*d3dintf->texture.get_surface_level)(texture->d3dsmalltexture0, 0, &texture->d3dsmalltarget0);
-
+						result = (*d3dintf->device.create_texture)(d3d->device, scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dsmalltexture0);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(texture->d3dsmalltexture0, 0, &texture->d3dsmalltarget0);
+					}
 					break;
 				}
 				(*d3dintf->texture.release)(texture->d3dtex);
@@ -2779,6 +2783,8 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 	return texture;
 
 error:
+	d3dintf->post_fx_available = false;
+	mame_printf_verbose("Direct3D: Critical warning: A texture failed to allocate. Expect things to get bad quickly.\n");
 	if (texture->d3dsurface != NULL)
 		(*d3dintf->surface.release)(texture->d3dsurface);
 	if (texture->d3dtex != NULL)

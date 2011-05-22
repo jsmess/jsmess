@@ -332,8 +332,6 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_HLSLPATH,                                    	"hlsl",   	 OPTION_STRING,     "path to hlsl files" },
 	{ WINOPTION_SHADOW_MASK_ALPHA";fs_shadwa(0.0-1.0)",         "0.0",     	 OPTION_FLOAT,    	"shadow mask alpha-blend value (1.0 is fully blended, 0.0 is no mask)" },
 	{ WINOPTION_SHADOW_MASK_TEXTURE";fs_shadwt(0.0-1.0)",       "aperture.png", OPTION_STRING,  "shadow mask texture name" },
-	{ WINOPTION_SHADOW_MASK_RATIO_X";fs_shadwx",				"3.0",		 OPTION_FLOAT,		"shadow mask texels per dot mask pixel in screen-relative X direction" },
-	{ WINOPTION_SHADOW_MASK_RATIO_Y";fs_shadwy",				"3.0",		 OPTION_FLOAT,		"shadow mask texels per dot mask pixel in screen-relative Y direction" },
 	{ WINOPTION_SHADOW_MASK_COUNT_X";fs_shadww",				"640",	 	 OPTION_INTEGER,	"shadow mask width, in phosphor dots" },
 	{ WINOPTION_SHADOW_MASK_COUNT_Y";fs_shadwh",				"480",		 OPTION_INTEGER,	"shadow mask height, in phosphor dots" },
 	{ WINOPTION_SHADOW_MASK_USIZE";fs_shadwu(0.0-1.0)",			"0.1875",	 OPTION_FLOAT,		"shadow mask texture size in U direction" },

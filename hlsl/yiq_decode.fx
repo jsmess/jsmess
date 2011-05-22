@@ -143,28 +143,32 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 Tc = float4(T0, T1, T2, T3);
 	float4 Tc2 = float4(T4, T5, T6, T7);
 	
-	float4 I = C * sin(W * Tc);
-	float4 Q = C * cos(W * Tc);
-	float4 I2 = C2 * sin(W * Tc2);
-	float4 Q2 = C2 * cos(W * Tc2);
+	float Yvals[8];
+	Yvals[0] = C.r; Yvals[1] = C.g; Yvals[2] = C.b; Yvals[3] = C.a; Yvals[4] = C2.r; Yvals[5] = C2.g; Yvals[6] = C2.b; Yvals[7] = C2.a;
+	float Ytotal = 0.0f;
+	for(uint idx = 0; idx < FscValue * 4.0f; idx++ )
+	{
+		Ytotal = Ytotal + Yvals[idx];
+	}
+	float Yavg = Ytotal / (FscValue * 4.0f);
+
+	float4 I = (C - Yavg) * sin(W * Tc);
+	float4 Q = (C - Yavg) * cos(W * Tc);
+	float4 I2 = (C2 - Yavg) * sin(W * Tc2);
+	float4 Q2 = (C2 - Yavg) * cos(W * Tc2);
 	
 	float Itotal = 0.0f;
 	float Qtotal = 0.0f;
-	float Ytotal = 0.0f;
 	
-	float Yvals[8];
 	float Ivals[8];
 	float Qvals[8];
-	Yvals[0] = C.r; Yvals[1] = C.g; Yvals[2] = C.b; Yvals[3] = C.a; Yvals[4] = C2.r; Yvals[5] = C2.g; Yvals[6] = C2.b; Yvals[7] = C2.a;
 	Ivals[0] = I.r; Ivals[1] = I.g; Ivals[2] = I.b; Ivals[3] = I.a; Ivals[4] = I2.r; Ivals[5] = I2.g; Ivals[6] = I2.b; Ivals[7] = I2.a;
 	Qvals[0] = Q.r; Qvals[1] = Q.g; Qvals[2] = Q.b; Qvals[3] = Q.a; Qvals[4] = Q2.r; Qvals[5] = Q2.g; Qvals[6] = Q2.b; Qvals[7] = Q2.a;
 	for(uint idx = 0; idx < FscValue * 4.0f; idx++ )
 	{
-		Ytotal = Ytotal + Yvals[idx];
 		Itotal = Itotal + Ivals[idx];
 		Qtotal = Qtotal + Qvals[idx];
 	}
-	float Yavg = Ytotal / (FscValue * 4.0f);
 	float Iavg = Itotal / (FscValue * 4.0f);
 	float Qavg = Qtotal / (FscValue * 4.0f);
 

@@ -96,10 +96,10 @@ uniform float FscScale;
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 InvRatios = float2(1.0f / WidthRatio, 1.0f / HeightRatio);
-	float3 Texel0 = tex2D(DiffuseSampler, Input.Coord0).rgb;
-	float3 Texel1 = tex2D(DiffuseSampler, Input.Coord1).rgb;
-	float3 Texel2 = tex2D(DiffuseSampler, Input.Coord2).rgb;
-	float3 Texel3 = tex2D(DiffuseSampler, Input.Coord3).rgb;
+	float3 Texel0 = tex2D(DiffuseSampler, Input.Coord0 - float2(0.0f, 0.5f / RawHeight)).rgb;
+	float3 Texel1 = tex2D(DiffuseSampler, Input.Coord1 - float2(0.0f, 0.5f / RawHeight)).rgb;
+	float3 Texel2 = tex2D(DiffuseSampler, Input.Coord2 - float2(0.0f, 0.5f / RawHeight)).rgb;
+	float3 Texel3 = tex2D(DiffuseSampler, Input.Coord3 - float2(0.0f, 0.5f / RawHeight)).rgb;
 	
 	float2 Scaler = float2(RawWidth, RawHeight);
 	float2 Coord0 = Input.Coord0.xy * Scaler;

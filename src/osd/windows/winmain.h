@@ -83,8 +83,6 @@
 #define WINOPTION_HLSLPATH					"hlslpath"
 #define WINOPTION_SHADOW_MASK_ALPHA			"shadow_mask_alpha"
 #define WINOPTION_SHADOW_MASK_TEXTURE		"shadow_mask_texture"
-#define WINOPTION_SHADOW_MASK_RATIO_X		"shadow_mask_pix_width"
-#define WINOPTION_SHADOW_MASK_RATIO_Y		"shadow_mask_pix_height"
 #define WINOPTION_SHADOW_MASK_COUNT_X		"shadow_mask_x_count"
 #define WINOPTION_SHADOW_MASK_COUNT_Y		"shadow_mask_y_count"
 #define WINOPTION_SHADOW_MASK_USIZE			"shadow_mask_usize"
@@ -214,8 +212,6 @@ public:
 	bool d3d_hlsl_enable() const { return bool_value(WINOPTION_HLSL_ENABLE); }
 	float screen_shadow_mask_alpha() const { return float_value(WINOPTION_SHADOW_MASK_ALPHA); }
 	const char *screen_shadow_mask_texture() const { return value(WINOPTION_SHADOW_MASK_TEXTURE); }
-	float screen_shadow_mask_ratio_x() const { return float_value(WINOPTION_SHADOW_MASK_RATIO_X); }
-	float screen_shadow_mask_ratio_y() const { return float_value(WINOPTION_SHADOW_MASK_RATIO_Y); }
 	float screen_shadow_mask_count_x() const { return float_value(WINOPTION_SHADOW_MASK_COUNT_X); }
 	float screen_shadow_mask_count_y() const { return float_value(WINOPTION_SHADOW_MASK_COUNT_Y); }
 	float screen_shadow_mask_u_size() const { return float_value(WINOPTION_SHADOW_MASK_USIZE); }
