@@ -4687,7 +4687,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 
-	<software name="arpro60a" cloneof="arpro60>
+	<software name="arpro60a" cloneof="arpro60">
 	<!-- Requires "Action Replay" cartridge hardware -->
 		<description>Action Replay Professional v6.0 (Alt)</description>
 		<year>1989</year>
@@ -4789,7 +4789,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	<!-- Requires "Final Cartridge III" cartridge hardware -->
 		<description>The Final Cartridge III v.1988-12</description>
 		<year>1988</year>
-		<publisher>Riska H&P</publisher>
+		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
@@ -4799,11 +4799,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="final2" cloneof="final>
+	<software name="final2" cloneof="final">
 	<!-- Requires "Final Cartridge III" cartridge hardware -->
 		<description>The Final Cartridge III v.1988-05</description>
 		<year>1988</year>
-		<publisher>Riska H&P</publisher>
+		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
@@ -4813,11 +4813,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="final3" cloneof="final>
+	<software name="final3" cloneof="final">
 	<!-- Requires "Final Cartridge III" cartridge hardware -->
 		<description>The Final Cartridge III v.1987-11</description>
 		<year>1987</year>
-		<publisher>Riska H&P</publisher>
+		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
@@ -4827,11 +4827,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="final4" cloneof="final>
+	<software name="final4" cloneof="final">
 	<!-- Requires "Final Cartridge III" cartridge hardware -->
 		<description>The Final Cartridge III v.1987-09</description>
 		<year>1987</year>
-		<publisher>Riska H&P</publisher>
+		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
@@ -4887,7 +4887,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	<!-- Requires "Atomic Power" cartridge hardware -->
 		<description>Atomic Power Cartridge v1.1</description>
 		<year>1990</year>
-		<publisher>Frank & Joe</publisher>
+		<publisher>Frank &amp; Joe</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -4901,7 +4901,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	<!-- Requires "Atomic Power" cartridge hardware -->
 		<description>Nordic Power v1.0</description>
 		<year>1989</year>
-		<publisher>D&E, Venlo</publisher>
+		<publisher>D&amp;E, Venlo</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -4925,7 +4925,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="sprsnp5p" cloneof="sprsnap5>
+	<software name="sprsnp5p" cloneof="sprsnap5">
 	<!-- Requires "Super Snapshot 5" cartridge hardware -->
 		<description>Super Snapshot 5 (PAL)</description>
 		<year>1989</year>
@@ -4939,7 +4939,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="sprsn5pa" cloneof="sprsnap5>
+	<software name="sprsn5pa" cloneof="sprsnap5">
 	<!-- Requires "Super Snapshot 5" cartridge hardware -->
 		<description>Super Snapshot 5 (PAL) (Alt)</description>
 		<year>1989</year>
@@ -4953,9 +4953,4 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	
-
-
-
-
 </softwarelist>
