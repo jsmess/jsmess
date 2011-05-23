@@ -97,10 +97,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 Scaler = float2(RawWidth, RawHeight);
 	float2 InvRatios = float2(1.0f / WidthRatio, 1.0f / HeightRatio);
-	float3 Texel0 = tex2D(DiffuseSampler, Input.Coord0 - float2(-FscScale * 0.00f, 0.5f) / Scaler).rgb;
-	float3 Texel1 = tex2D(DiffuseSampler, Input.Coord1 - float2(-FscScale * 0.25f, 0.5f) / Scaler).rgb;
-	float3 Texel2 = tex2D(DiffuseSampler, Input.Coord2 - float2(-FscScale * 0.50f, 0.5f) / Scaler).rgb;
-	float3 Texel3 = tex2D(DiffuseSampler, Input.Coord3 - float2(-FscScale * 0.75f, 0.5f) / Scaler).rgb;
+	float3 Texel0 = tex2D(DiffuseSampler, Input.Coord0 + float2(FscScale * 0.00f + 0.5f, 0.5f) / Scaler).rgb;
+	float3 Texel1 = tex2D(DiffuseSampler, Input.Coord1 + float2(FscScale * 0.25f + 0.5f, 0.5f) / Scaler).rgb;
+	float3 Texel2 = tex2D(DiffuseSampler, Input.Coord2 + float2(FscScale * 0.50f + 0.5f, 0.5f) / Scaler).rgb;
+	float3 Texel3 = tex2D(DiffuseSampler, Input.Coord3 + float2(FscScale * 0.75f + 0.5f, 0.5f) / Scaler).rgb;
 	
 	float2 Coord0 = (Input.Coord0.xy + float2(0.00f / RawWidth, 0.0f)) * Scaler;
 	float2 Coord1 = (Input.Coord1.xy + float2(0.25f / RawWidth, 0.0f)) * Scaler;
