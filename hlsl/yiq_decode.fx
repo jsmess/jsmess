@@ -127,10 +127,10 @@ uniform float BValue;
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 RawDims = float2(RawWidth, RawHeight);
-	float4 BaseTexel = tex2D(DiffuseSampler, Input.Coord0.xy + 0.5f / RawDims);
-	float4 OrigC = tex2D(CompositeSampler, Input.Coord0.xy + 0.5f / RawDims);
-	float4 OrigC2 = tex2D(CompositeSampler, Input.Coord4.xy + 0.5f / RawDims);
-	float4 OrigC3 = tex2D(CompositeSampler, Input.Coord0.zw + 0.5f / RawDims);
+	float4 BaseTexel = tex2D(DiffuseSampler, Input.Coord0.xy + float2(0.5f, 0.5f) / RawDims);
+	float4 OrigC = tex2D(CompositeSampler, Input.Coord0.xy + float2(0.5f, 0.5f) / RawDims);
+	float4 OrigC2 = tex2D(CompositeSampler, Input.Coord4.xy + float2(0.5f, 0.5f) / RawDims);
+	float4 OrigC3 = tex2D(CompositeSampler, Input.Coord0.zw + float2(0.5f, 0.5f) / RawDims);
 	float4 C = OrigC;
 	float4 C2 = OrigC2;
 	float4 C3 = OrigC3;
@@ -175,11 +175,11 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float Yvals[8];
 	Yvals[0] = C.r; Yvals[1] = C.g; Yvals[2] = C.b; Yvals[3] = C.a; Yvals[4] = C2.r; Yvals[5] = C2.g; Yvals[6] = C2.b; Yvals[7] = C2.a;
 	float Ytotal = 0.0f;
-	for(uint idx = 2; idx < FscValue * 4.0f - 2; idx++ )
+	for(uint idx = 0; idx < FscValue * 4.0f; idx++ )
 	{
 		Ytotal = Ytotal + Yvals[idx];
 	}
-	float Yavg = Ytotal / (FscValue * 2.0f);
+	float Yavg = Ytotal / (FscValue * 4.0f);
 
 	float4 I = (C - Yavg) * sin(W * Tc);
 	float4 Q = (C - Yavg) * cos(W * Tc);
