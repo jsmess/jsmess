@@ -42,8 +42,8 @@ public:
 	sorcerer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_cass1(*this, "cassette1"),
-		  m_cass2(*this, "cassette2"),
+		  m_cass1(*this, CASSETTE_TAG),
+		  m_cass2(*this, CASSETTE2_TAG),
 		  m_wave1(*this, "wave.1"),
 		  m_wave2(*this, "wave.2"),
 		  m_dac(*this, "dac"),

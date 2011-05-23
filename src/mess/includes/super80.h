@@ -24,7 +24,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_pio(*this, "z80pio"),
-		  m_cass(*this, "cassette"),
+		  m_cass(*this, CASSETTE_TAG),
 		  m_wave(*this, "wave"),
 		  m_speaker(*this, "speaker"),
 		  m_printer(*this, "centronics"),

@@ -10,7 +10,8 @@
 
 
 ToDo:
-- Fix hang when it should scroll (crtc isn't fully emulated)
+- Fix hang when it should scroll
+- Cassette Load (bit 7 of port 91)
 
 
 ****************************************************************************/
@@ -34,7 +35,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_hgdc(*this, "upd7220"),
-	m_cass(*this, "cassette"),
+	m_cass(*this, CASSETTE_TAG),
 	m_beep(*this, "beep")
 	{ }
 
@@ -450,14 +451,14 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("beep", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
 	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, upd7220_map) //unknown clock
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
 MACHINE_CONFIG_END
 
 /* ROM definition */

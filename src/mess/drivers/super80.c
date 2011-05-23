@@ -665,7 +665,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -677,7 +677,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", default, 3)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", super80_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, super80_cassette_config )
 
 	/* cartridge */
 	MCFG_FRAGMENT_ADD(super80_cartslot)
@@ -738,7 +738,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -750,7 +750,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", default, 3)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", super80_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, super80_cassette_config )
 
 	/* cartridge */
 	MCFG_FRAGMENT_ADD(super80_cartslot)
