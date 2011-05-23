@@ -804,6 +804,21 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="gamekilr" supported="no">
+		<description>Game Killer</description>
+		<year>1986</year>
+		<publisher>Robtek</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="game_killer" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="1" />
+			
+			<dataarea name="roml" size="0x2000">
+				<rom name="gamekiller.bin" size="0x2000" crc="bdee8a63" sha1="75e44ed5fa34921af924d2b8ee27585bfdb331c4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- Games Added by k1w1 -->
 	
