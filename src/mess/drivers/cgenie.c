@@ -551,7 +551,7 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	MCFG_SOUND_CONFIG(cgenie_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_CASSETTE_ADD( "cassette", cgenie_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, cgenie_cassette_config )
 
 	MCFG_WD179X_ADD("wd179x", cgenie_wd17xx_interface )
 

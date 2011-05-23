@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( electron, electron_state )
 	MCFG_SOUND_ADD( "beep", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_CASSETTE_ADD( "cassette", electron_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, electron_cassette_config )
 MACHINE_CONFIG_END
 
 

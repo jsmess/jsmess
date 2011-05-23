@@ -307,7 +307,7 @@ WRITE8_HANDLER( hector_color_b_w )
 
 static device_t *cassette_device_image(running_machine &machine)
 {
-	return machine.device("cassette");
+	return machine.device(CASSETTE_TAG);
 }
 
 

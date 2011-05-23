@@ -15,7 +15,7 @@
 
 static device_t *cassette_device_image( running_machine &machine )
 {
-	return machine.device("cassette");
+	return machine.device(CASSETTE_TAG);
 }
 
 static void electron_tape_start( electron_state *state )

@@ -640,7 +640,7 @@ static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
 	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
-	MCFG_CASSETTE_ADD( "cassette", apple2_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, apple2_cassette_config )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
@@ -654,7 +654,7 @@ static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
 	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
-	MCFG_CASSETTE_ADD( "cassette", apple2_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, apple2_cassette_config )
 MACHINE_CONFIG_END
 
 ROM_START(las3000)
@@ -673,7 +673,7 @@ static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
-	MCFG_CASSETTE_ADD( "cassette", apple2_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, apple2_cassette_config )
 MACHINE_CONFIG_END
 #if 0
 MACHINE_CONFIG_DERIVED( apple2e_z80, apple2_common )

@@ -2744,7 +2744,7 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 /* Set b7 with cassette tape input */
 	if(state->m_system_type != SYSTEM_GX4000)
 	{
-		if (cassette_input(device->machine().device("cassette" )) > 0.03)
+		if (cassette_input(device->machine().device(CASSETTE_TAG)) > 0.03)
 		{
 			data |= (1<<7);
 		}
@@ -2816,7 +2816,7 @@ WRITE8_DEVICE_HANDLER ( amstrad_ppi_portc_w )
 	{
 		if ((changed_data & 0x20) != 0)
 		{
-			cassette_output(device->machine().device("cassette" ),
+			cassette_output(device->machine().device(CASSETTE_TAG),
 				((data & 0x20) ? -1.0 : +1.0));
 		}
 	}
@@ -2826,7 +2826,7 @@ WRITE8_DEVICE_HANDLER ( amstrad_ppi_portc_w )
 	{
 		if ((changed_data & 0x10) != 0)
 		{
-			cassette_change_state(device->machine().device("cassette" ),
+			cassette_change_state(device->machine().device(CASSETTE_TAG),
 				((data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED),
 				CASSETTE_MASK_MOTOR);
 		}

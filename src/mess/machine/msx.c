@@ -522,7 +522,7 @@ INTERRUPT_GEN( msx_interrupt )
 
 static device_t *cassette_device_image(running_machine &machine)
 {
-	return machine.device("cassette");
+	return machine.device(CASSETTE_TAG);
 }
 
 READ8_HANDLER ( msx_psg_port_a_r )

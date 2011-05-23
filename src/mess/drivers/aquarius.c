@@ -61,7 +61,7 @@
 */
 static READ8_HANDLER( cassette_r )
 {
-	device_t *cassette = space->machine().device("cassette");
+	device_t *cassette = space->machine().device(CASSETTE_TAG);
 	return (cassette_input(cassette) < +0.0) ? 0 : 1;
 }
 
@@ -74,7 +74,7 @@ static READ8_HANDLER( cassette_r )
 static WRITE8_HANDLER( cassette_w )
 {
 	device_t *speaker = space->machine().device("speaker");
-	device_t *cassette = space->machine().device("cassette");
+	device_t *cassette = space->machine().device(CASSETTE_TAG);
 
 	speaker_level_w(speaker, BIT(data, 0));
 	cassette_output(cassette, BIT(data, 0) ? +1.0 : -1.0);
@@ -428,7 +428,7 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 	MCFG_PRINTER_ADD("printer")
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", aquarius_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, aquarius_cassette_config )
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

@@ -155,7 +155,7 @@ static void microtan_set_irq_line(running_machine &machine)
 
 static device_t *cassette_device_image(running_machine &machine)
 {
-	return machine.device("cassette");
+	return machine.device(CASSETTE_TAG);
 }
 
 /**************************************************************

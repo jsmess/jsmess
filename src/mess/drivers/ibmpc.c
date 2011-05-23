@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START( ibm5150, ibmpc_state )
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
 
-	//MCFG_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
+	//MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_config )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

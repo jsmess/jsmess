@@ -221,7 +221,7 @@ static WRITE8_DEVICE_HANDLER( kim1_u2_write_b )
 	if ( data & 0x20 )
 	{
 		/* cassette write/speaker update */
-		cassette_output( device->machine().device("cassette"), ( data & 0x80 ) ? -1.0 : 1.0 );
+		cassette_output( device->machine().device(CASSETTE_TAG), ( data & 0x80 ) ? -1.0 : 1.0 );
 	}
 
 	/* Set IRQ when bit 7 is cleared */
@@ -248,7 +248,7 @@ static MOS6530_INTERFACE( kim1_u3_mos6530_interface )
 static TIMER_DEVICE_CALLBACK( kim1_cassette_input )
 {
 	kim1_state *state = timer.machine().driver_data<kim1_state>();
-	double tap_val = cassette_input( timer.machine().device("cassette") );
+	double tap_val = cassette_input( timer.machine().device(CASSETTE_TAG) );
 
 	if ( tap_val <= 0 )
 	{
@@ -333,7 +333,7 @@ static MACHINE_CONFIG_START( kim1, kim1_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD( "cassette", kim1_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, kim1_cassette_config )
 
 	/* video */
 	MCFG_DEFAULT_LAYOUT( layout_kim1 )

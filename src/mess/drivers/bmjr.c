@@ -329,7 +329,7 @@ static MACHINE_RESET(bmjr)
 {
 	bmjr_state *state = machine.driver_data<bmjr_state>();
 	state->m_tape_switch = 0;
-	state->m_cassette = machine.device("cassette");
+	state->m_cassette = machine.device(CASSETTE_TAG);
 	cassette_change_state(state->m_cassette,CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
@@ -358,14 +358,14 @@ static MACHINE_CONFIG_START( bmjr, bmjr_state )
 
     MCFG_VIDEO_START(bmjr)
 
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 

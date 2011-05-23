@@ -212,7 +212,7 @@ static WRITE8_HANDLER( samcoupe_midi_w )
 
 static READ8_HANDLER( samcoupe_keyboard_r )
 {
-	device_t *cassette = space->machine().device("cassette");
+	device_t *cassette = space->machine().device(CASSETTE_TAG);
 	UINT8 data = 0x1f;
 
 	/* bit 0-4, keyboard input */
@@ -248,7 +248,7 @@ static READ8_HANDLER( samcoupe_keyboard_r )
 
 static WRITE8_HANDLER( samcoupe_border_w )
 {
-	device_t *cassette = space->machine().device("cassette");
+	device_t *cassette = space->machine().device(CASSETTE_TAG);
 	device_t *speaker = space->machine().device("speaker");
 	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 
@@ -580,7 +580,7 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_CENTRONICS_ADD("lpt2", standard_centronics)
 	MCFG_MSM6242_ADD("sambus_clock")
 	MCFG_WD1772_ADD("wd1772", samcoupe_wd17xx_intf)
-	MCFG_CASSETTE_ADD("cassette", samcoupe_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, samcoupe_cassette_config)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

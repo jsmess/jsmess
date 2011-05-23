@@ -242,7 +242,7 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8910.1", AY8910, 1000000)
 	MCFG_SOUND_CONFIG(microtan_ay8910_interface)
@@ -256,7 +256,7 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_QUICKLOAD_ADD("quickload", microtan, "hex", 0.5)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
 
 	/* acia */
 	MCFG_ACIA6551_ADD("acia")

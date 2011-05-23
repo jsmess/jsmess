@@ -1683,7 +1683,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", ibm5150_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_config )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 

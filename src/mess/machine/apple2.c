@@ -1362,7 +1362,7 @@ WRITE8_HANDLER ( apple2_c05x_w )
 
 static device_t *cassette_device_image(running_machine &machine)
 {
-	return machine.device("cassette");
+	return machine.device(CASSETTE_TAG);
 }
 
 READ8_HANDLER ( apple2_c06x_r )

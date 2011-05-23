@@ -393,7 +393,7 @@ static TIMER_CALLBACK(kc_cassette_timer_callback)
 	bit = 0;
 
 	/* get data from cassette */
-	if (cassette_input(machine.device("cassette")) > 0.0038)
+	if (cassette_input(machine.device(CASSETTE_TAG)) > 0.0038)
 		bit = 1;
 
 	/* update astb with bit */
@@ -413,7 +413,7 @@ static void	kc_cassette_set_motor(running_machine &machine, int motor_state)
 	if (((state->m_cassette_motor_state^motor_state)&0x01)!=0)
 	{
 		/* set new motor state in cassette device */
-		cassette_change_state(machine.device("cassette"),
+		cassette_change_state(machine.device(CASSETTE_TAG),
 			motor_state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 			CASSETTE_MASK_MOTOR);
 
