@@ -479,7 +479,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
  */
 static READ8_DEVICE_HANDLER( pio_port_c_r )
 {
-	device_t *cas = device->machine().device("cassette");
+	device_t *cas = device->machine().device(CASSETTE_TAG);
 	mz_state *mz = device->machine().driver_data<mz_state>();
 	UINT8 data = 0;
 
@@ -522,7 +522,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
      * bit 0 out    unused
      */
 
-//  UINT8 state = cassette_get_state(device->machine().device("cassette"));
+//  UINT8 state = cassette_get_state(device->machine().device(CASSETTE_TAG));
 //  UINT8 action = ((~pio_port_c_output & 8) & (data & 8));     /* detect low-to-high transition */
 
 	/* The motor control circuit consists of a resistor, capacitor, invertor, nand-gate, and D flip-flop.
@@ -535,7 +535,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
         If you load from the command-line or the software-picker, type in L <enter> immediately. */
 #if 0
 	cassette_change_state(
-		device->machine().device("cassette"),
+		device->machine().device(CASSETTE_TAG),
 		((data & 0x08) && mz700_motor_on) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);
 
@@ -543,7 +543,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
 
 	LOG(2,"mz700_pio_port_c_w",("%02X\n", data),device->machine());
 
-	cassette_output(device->machine().device("cassette"), (data & 0x02) ? +1.0 : -1.0);
+	cassette_output(device->machine().device(CASSETTE_TAG), (data & 0x02) ? +1.0 : -1.0);
 }
 
 

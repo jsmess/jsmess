@@ -47,7 +47,7 @@ static int old_floppy_bank;
 /********************* common cassette code ***************************/
 
 INLINE device_t* thom_cassette_img( running_machine &machine )
-{ return machine.device("cassette"); }
+{ return machine.device(CASSETTE_TAG); }
 
 /*-------------- TO7 ------------*/
 

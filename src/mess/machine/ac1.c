@@ -117,5 +117,5 @@ DRIVER_INIT(ac1)
 MACHINE_RESET( ac1 )
 {
 	ac1_state *state = machine.driver_data<ac1_state>();
-	state->m_cassette = machine.device("cassette");
+	state->m_cassette = machine.device(CASSETTE_TAG);
 }

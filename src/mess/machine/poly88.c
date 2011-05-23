@@ -150,16 +150,16 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 //  if (!(input_port_read(machine, "DSW0") & 0x02)) /* V.24 / Tape Switch */
 	//{
 		/* tape reading */
-		if (cassette_get_state(machine.device("cassette"))&CASSETTE_PLAY)
+		if (cassette_get_state(machine.device(CASSETTE_TAG))&CASSETTE_PLAY)
 		{
 					if (state->m_clk_level_tape)
 					{
-						state->m_previous_level = (cassette_input(machine.device("cassette")) > 0.038) ? 1 : 0;
+						state->m_previous_level = (cassette_input(machine.device(CASSETTE_TAG)) > 0.038) ? 1 : 0;
 						state->m_clk_level_tape = 0;
 					}
 					else
 					{
-						current_level = (cassette_input(machine.device("cassette")) > 0.038) ? 1 : 0;
+						current_level = (cassette_input(machine.device(CASSETTE_TAG)) > 0.038) ? 1 : 0;
 
 						if (state->m_previous_level!=current_level)
 						{
@@ -175,11 +175,11 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 		}
 
 		/* tape writing */
-		if (cassette_get_state(machine.device("cassette"))&CASSETTE_RECORD)
+		if (cassette_get_state(machine.device(CASSETTE_TAG))&CASSETTE_RECORD)
 		{
 			data = get_in_data_bit(state->m_cassette_serial_connection.input_state);
 			data ^= state->m_clk_level_tape;
-			cassette_output(machine.device("cassette"), data&0x01 ? 1 : -1);
+			cassette_output(machine.device(CASSETTE_TAG), data&0x01 ? 1 : -1);
 
 			if (!state->m_clk_level_tape)
 				msm8251_transmit_clock(machine.device("uart"));

@@ -190,10 +190,10 @@ static MACHINE_CONFIG_START( mikro80, mikro80_state )
 	MCFG_VIDEO_START(mikro80)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD( "cassette", mikro80_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, mikro80_cassette_config )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( radio99, mikro80 )

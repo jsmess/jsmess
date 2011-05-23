@@ -67,7 +67,7 @@ static READ8_DEVICE_HANDLER ( lviv_ppi_0_portc_r )
 {
 	lviv_state *state = device->machine().driver_data<lviv_state>();
 	UINT8 data = state->m_ppi_port_outputs[0][2] & 0x0f;
-	if (cassette_input(device->machine().device("cassette")) > 0.038)
+	if (cassette_input(device->machine().device(CASSETTE_TAG)) > 0.038)
 		data |= 0x10;
 	if (state->m_ppi_port_outputs[0][0] & input_port_read(device->machine(), "JOY"))
 		data |= 0x80;
@@ -94,7 +94,7 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_0_portc_w )	/* tape in/out, video memory
 	state->m_ppi_port_outputs[0][2] = data;
 	if (state->m_ppi_port_outputs[0][1]&0x80)
 		speaker_level_w(speaker, data&0x01);
-	cassette_output(device->machine().device("cassette"), (data & 0x01) ? -1.0 : 1.0);
+	cassette_output(device->machine().device(CASSETTE_TAG), (data & 0x01) ? -1.0 : 1.0);
 	lviv_update_memory(device->machine());
 }
 

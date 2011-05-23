@@ -777,45 +777,45 @@ static void cmt_command( running_machine &machine, UINT8 cmd )
     */
 	state->m_cmt_current_cmd = cmd;
 
-	if(cassette_get_image(machine.device("cass")) == NULL) //avoid a crash if a disk game tries to access this
+	if(cassette_get_image(machine.device(CASSETTE_TAG)) == NULL) //avoid a crash if a disk game tries to access this
 		return;
 
 	switch(cmd)
 	{
 		case 0x01:  // Stop
-			cassette_change_state(machine.device("cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-			cassette_change_state(machine.device("cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+			cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 			state->m_cmt_test = 1;
 			popmessage("CMT: Stop");
 			break;
 		case 0x02:  // Play
-			cassette_change_state(machine.device("cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-			cassette_change_state(machine.device("cass" ),CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+			cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+			cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 			popmessage("CMT: Play");
 			break;
 		case 0x03:  // Fast Forward
-			cassette_change_state(machine.device("cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-			cassette_change_state(machine.device("cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+			cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 			popmessage("CMT: Fast Forward");
 			break;
 		case 0x04:  // Rewind
-			cassette_change_state(machine.device("cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-			cassette_change_state(machine.device("cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+			cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 			popmessage("CMT: Rewind");
 			break;
 		case 0x05:  // APSS Fast Forward
-			cassette_change_state(machine.device("cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-			cassette_change_state(machine.device("cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+			cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 			popmessage("CMT: APSS Fast Forward");
 			break;
 		case 0x06:  // APSS Rewind
-			cassette_change_state(machine.device("cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-			cassette_change_state(machine.device("cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+			cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 			popmessage("CMT: APSS Rewind");
 			break;
 		case 0x0a:  // Record
-			cassette_change_state(machine.device("cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-			cassette_change_state(machine.device("cass" ),CASSETTE_RECORD,CASSETTE_MASK_UISTATE);
+			cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+			cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_RECORD,CASSETTE_MASK_UISTATE);
 			popmessage("CMT: Record");
 			break;
 		default:
@@ -827,9 +827,9 @@ static void cmt_command( running_machine &machine, UINT8 cmd )
 static TIMER_DEVICE_CALLBACK( cmt_wind_timer )
 {
 	x1_state *state = timer.machine().driver_data<x1_state>();
-	device_t* cmt = timer.machine().device("cass");
+	device_t* cmt = timer.machine().device(CASSETTE_TAG);
 
-	if(cassette_get_image(timer.machine().device("cass")) == NULL) //avoid a crash if a disk game tries to access this
+	if(cassette_get_image(timer.machine().device(CASSETTE_TAG)) == NULL) //avoid a crash if a disk game tries to access this
 		return;
 
 	switch(state->m_cmt_current_cmd)
@@ -942,7 +942,7 @@ static WRITE8_HANDLER( sub_io_w )
 					// bit 1 = tape inserted
 					// bit 2 = record status (1=OK, 0=write protect)
 			state->m_sub_val[0] = 0x05;
-			if(cassette_get_image(space->machine().device("cass")) != NULL)
+			if(cassette_get_image(space->machine().device(CASSETTE_TAG)) != NULL)
 				state->m_sub_val[0] |= 0x02;
 			state->m_sub_cmd_length = 1;
 			logerror("CMT: Command 0xEB received, returning 0x%02x.\n",state->m_sub_val[0]);
@@ -1901,10 +1901,10 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 
 	res = state->m_ram_bank | state->m_sub_obf | state->m_vsync | state->m_vdisp;
 
-	if(cassette_input(device->machine().device("cass")) > 0.03)
+	if(cassette_input(device->machine().device(CASSETTE_TAG)) > 0.03)
 		res |= 0x02;
 
-//  if(cassette_get_state(device->machine().device("cass")) & CASSETTE_MOTOR_DISABLED)
+//  if(cassette_get_state(device->machine().device(CASSETTE_TAG)) & CASSETTE_MOTOR_DISABLED)
 //      res &= ~0x02;  // is zero if not playing
 
 	// CMT test bit is set low when the CMT Stop command is issued, and becomes
@@ -1958,7 +1958,7 @@ static WRITE8_DEVICE_HANDLER( x1_portc_w )
 	state->m_io_switch = data & 0x20;
 	state->m_io_sys = data & 0xff;
 
-	cassette_output(device->machine().device("cass"),(data & 0x01) ? +1.0 : -1.0);
+	cassette_output(device->machine().device(CASSETTE_TAG),(data & 0x01) ? +1.0 : -1.0);
 }
 
 static I8255A_INTERFACE( ppi8255_intf )
@@ -2553,7 +2553,7 @@ static MACHINE_RESET( x1 )
 
 	state->m_cmt_current_cmd = 0;
 	state->m_cmt_test = 0;
-	cassette_change_state(machine.device("cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+	cassette_change_state(machine.device(CASSETTE_TAG ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 
 	state->m_key_irq_flag = state->m_ctc_irq_flag = 0;
 	state->m_sub_cmd = 0;
@@ -2684,11 +2684,11 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.5)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.5)
-	MCFG_SOUND_WAVE_ADD("wave","cass")
+	MCFG_SOUND_WAVE_ADD("wave",CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_CASSETTE_ADD("cass",x1_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG,x1_cassette_config)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
 
 	MCFG_FLOPPY_4_DRIVES_ADD(x1_floppy_config)

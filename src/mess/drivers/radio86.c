@@ -371,12 +371,12 @@ static MACHINE_CONFIG_START( radio86, radio86_state )
 	MCFG_VIDEO_START(generic_bitmapped)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
-	MCFG_CASSETTE_ADD( "cassette", radio86_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, radio86_cassette_config )
 MACHINE_CONFIG_END
 
 

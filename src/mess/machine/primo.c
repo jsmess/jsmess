@@ -91,7 +91,7 @@ READ8_HANDLER( primo_be_1_r )
 	// bit 3 - I3 (external bus)
 
 	// bit 2 - cassette
-	data |= (cassette_input(space->machine().device("cassette")) < 0.1) ? 0x04 : 0x00;
+	data |= (cassette_input(space->machine().device(CASSETTE_TAG)) < 0.1) ? 0x04 : 0x00;
 
 	// bit 1 - reset button
 	data |= (input_port_read(space->machine(), "RESET")) ? 0x02 : 0x00;
@@ -159,14 +159,14 @@ WRITE8_HANDLER( primo_ki_1_w )
 	switch (data & 0x03)
 	{
 		case 0:
-			cassette_output(space->machine().device("cassette"), -1.0);
+			cassette_output(space->machine().device(CASSETTE_TAG), -1.0);
 			break;
 		case 1:
 		case 2:
-			cassette_output(space->machine().device("cassette"), 0.0);
+			cassette_output(space->machine().device(CASSETTE_TAG), 0.0);
 			break;
 		case 3:
-			cassette_output(space->machine().device("cassette"), 1.0);
+			cassette_output(space->machine().device(CASSETTE_TAG), 1.0);
 			break;
 	}
 }

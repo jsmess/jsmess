@@ -913,7 +913,7 @@ MACHINE_START( trs80 )
 	state->m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
 	state->m_printer = machine.device("centronics");
 	state->m_ay31015 = machine.device("tr1602");
-	state->m_cass = machine.device("cassette");
+	state->m_cass = machine.device(CASSETTE_TAG);
 	state->m_speaker = machine.device("speaker");
 	state->m_fdc = machine.device("wd179x");
 }

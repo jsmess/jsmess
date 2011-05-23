@@ -56,7 +56,7 @@ public:
 	d6800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_cass(*this, "cassette"),
+		  m_cass(*this, CASSETTE_TAG),
 		  m_pia(*this, "pia"),
 		  m_speaker(*this, "speaker")
 	{ }
@@ -297,14 +297,14 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
 	MCFG_PIA6821_ADD("pia", d6800_mc6821_intf)
-	MCFG_CASSETTE_ADD("cassette", d6800_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, d6800_cassette_config)
 MACHINE_CONFIG_END
 
 /* ROMs */

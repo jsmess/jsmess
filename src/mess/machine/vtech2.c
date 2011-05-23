@@ -187,7 +187,7 @@ WRITE8_HANDLER( laser_bank_select_w )
 
 static device_t *vtech2_cassette_image(running_machine &machine)
 {
-	return machine.device("cassette");
+	return machine.device(CASSETTE_TAG);
 }
 
 /*************************************************

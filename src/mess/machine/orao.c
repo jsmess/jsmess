@@ -58,7 +58,7 @@ READ8_HANDLER( orao_io_r )
 		case 0x03FF : return input_port_read(space->machine(), "LINE19");
 		/* Tape */
 		case 0x07FF :
-					level = cassette_input(space->machine().device("cassette"));
+					level = cassette_input(space->machine().device(CASSETTE_TAG));
 					if (level <  0) {
 						return 0x00;
 					}

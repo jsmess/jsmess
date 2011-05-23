@@ -149,10 +149,10 @@ static MACHINE_CONFIG_START( orion128, orion_state )
 	MCFG_VIDEO_START(orion128)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( "cassette", orion_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_config )
 
 	MCFG_WD1793_ADD("wd1793", orion_wd17xx_interface )
 
@@ -210,13 +210,13 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8912", AY8912, 1773400)
 	MCFG_SOUND_CONFIG(orionz80_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD( "cassette", orion_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_config )
 
 	MCFG_WD1793_ADD("wd1793", orion_wd17xx_interface )
 
@@ -264,13 +264,13 @@ static MACHINE_CONFIG_START( orionpro, orion_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8912", AY8912, 1773400)
 	MCFG_SOUND_CONFIG(orionz80_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD( "cassette", orion_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_config )
 
 	MCFG_WD1793_ADD("wd1793", orion_wd17xx_interface )
 

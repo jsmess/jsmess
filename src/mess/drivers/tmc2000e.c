@@ -274,7 +274,7 @@ static MACHINE_CONFIG_START( tmc2000e, tmc2000e_state )
 
 	/* devices */
 	MCFG_PRINTER_ADD("printer")
-	MCFG_CASSETTE_ADD("cassette", tmc2000_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, tmc2000_cassette_config)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(tmc2000e_floppy_config)
 

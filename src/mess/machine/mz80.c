@@ -51,9 +51,9 @@ static READ8_DEVICE_HANDLER(mz80k_8255_portc_r)
 	UINT8 val = 0;
 	val |= state->m_mz80k_vertical ? 0x80 : 0x00;
 	val |= (state->m_mz80k_cursor_cnt > 31) ? 0x40 : 0x00;
-    val |= (cassette_get_state(device->machine().device("cassette")) & CASSETTE_MASK_UISTATE)== CASSETTE_PLAY ? 0x10 : 0x00;
+    val |= (cassette_get_state(device->machine().device(CASSETTE_TAG)) & CASSETTE_MASK_UISTATE)== CASSETTE_PLAY ? 0x10 : 0x00;
 
-    if (cassette_input(device->machine().device("cassette")) > 0.00)
+    if (cassette_input(device->machine().device(CASSETTE_TAG)) > 0.00)
         val |= 0x20;
 
 	return val;

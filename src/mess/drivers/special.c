@@ -438,10 +438,10 @@ static MACHINE_CONFIG_START( special, special_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD( "cassette", special_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, special_cassette_config )
 
 MACHINE_CONFIG_END
 
@@ -516,10 +516,10 @@ static MACHINE_CONFIG_START( erik, special_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD( "cassette", special_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, special_cassette_config )
 
 	MCFG_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 

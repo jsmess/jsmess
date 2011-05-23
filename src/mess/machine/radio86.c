@@ -60,7 +60,7 @@ static READ8_DEVICE_HANDLER (radio86_8255_portb_r2 )
 static READ8_DEVICE_HANDLER (radio86_8255_portc_r2 )
 {
 	radio86_state *state = device->machine().driver_data<radio86_state>();
-	double level = cassette_input(device->machine().device("cassette"));
+	double level = cassette_input(device->machine().device(CASSETTE_TAG));
 	UINT8 dat = input_port_read(device->machine(), "LINE8");
 	if (level <  0) {
 		dat ^= state->m_tape_value;
@@ -76,7 +76,7 @@ static WRITE8_DEVICE_HANDLER (radio86_8255_porta_w2 )
 
 static WRITE8_DEVICE_HANDLER (radio86_8255_portc_w2 )
 {
-	cassette_output(device->machine().device("cassette"),data & 0x01 ? 1 : -1);
+	cassette_output(device->machine().device(CASSETTE_TAG),data & 0x01 ? 1 : -1);
 }
 
 
@@ -105,7 +105,7 @@ I8255A_INTERFACE( mikrosha_ppi8255_interface_1 )
 static READ8_DEVICE_HANDLER (rk7007_8255_portc_r )
 {
 	radio86_state *state = device->machine().driver_data<radio86_state>();
-	double level = cassette_input(device->machine().device("cassette"));
+	double level = cassette_input(device->machine().device(CASSETTE_TAG));
 	UINT8 key = 0xff;
 	if ((state->m_keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine(),"CLINE0"); }
 	if ((state->m_keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine(),"CLINE1"); }

@@ -23,7 +23,7 @@ READ8_HANDLER( galaxy_keyboard_r )
 
 	if (offset == 0)
 	{
-		double level = cassette_input(space->machine().device("cassette"));
+		double level = cassette_input(space->machine().device(CASSETTE_TAG));
 		return (level >  0) ? 0xfe : 0xff;
 	}
 	else
@@ -37,7 +37,7 @@ WRITE8_HANDLER( galaxy_latch_w )
 	galaxy_state *state = space->machine().driver_data<galaxy_state>();
 	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
 	state->m_latch_value = data;
-	cassette_output(space->machine().device("cassette"), val);
+	cassette_output(space->machine().device(CASSETTE_TAG), val);
 }
 
 

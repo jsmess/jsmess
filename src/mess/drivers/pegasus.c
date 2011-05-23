@@ -54,7 +54,7 @@ public:
 	pegasus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_cass(*this, "cassette"),
+	m_cass(*this, CASSETTE_TAG),
 	m_pia_s(*this, "pia_s"),
 	m_pia_u(*this, "pia_u")
 	{ }
@@ -527,7 +527,7 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_CARTSLOT_ADD("cart5")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_LOAD(pegasus_cart_5)
-	MCFG_CASSETTE_ADD( "cassette", pegasus_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, pegasus_cassette_config )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pegasusm, pegasus )

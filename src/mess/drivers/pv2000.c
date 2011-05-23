@@ -57,9 +57,9 @@ static WRITE8_HANDLER( pv2000_cass_conf_w )
 	state->m_cass_conf = data & 0x0f;
 
 	if ( state->m_cass_conf & 0x01 )
-		cassette_change_state( space->machine().device("cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
+		cassette_change_state( space->machine().device(CASSETTE_TAG), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
 	else
-		cassette_change_state( space->machine().device("cassette"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+		cassette_change_state( space->machine().device(CASSETTE_TAG), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 }
 
 
@@ -434,7 +434,7 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette", pv2000_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, pv2000_cassette_config )
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

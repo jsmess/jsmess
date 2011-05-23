@@ -379,7 +379,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 	vic20_state *state = device->machine().driver_data<vic20_state>();
 
 	/* cassette write */
-	cassette_output(device->machine().device("cassette"), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	cassette_output(device->machine().device(CASSETTE_TAG), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 
 	/* keyboard column */
 	state->m_key_col = data;

@@ -270,7 +270,7 @@ PB7
 
 static device_t *cassette_device_image(running_machine &machine)
 {
-	return machine.device("cassette");
+	return machine.device(CASSETTE_TAG);
 }
 
 /* not called yet - this will update the via with the state of the tape data.

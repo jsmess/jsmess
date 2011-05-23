@@ -2243,7 +2243,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	#endif
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8801_upd1990a_intf)
 	//MCFG_CENTRONICS_ADD("centronics", standard_centronics)
-	//MCFG_CASSETTE_ADD("cassette", pc88_cassette_config)
+	//MCFG_CASSETTE_ADD(CASSETTE_TAG, pc88_cassette_config)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(pc88_floppy_config)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc8801_flop")

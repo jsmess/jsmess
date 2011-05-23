@@ -118,7 +118,7 @@ WRITE8_HANDLER( nascom1_port_00_w )
 {
 	nascom1_state *state = space->machine().driver_data<nascom1_state>();
 
-	cassette_change_state( space->machine().device("cassette"),
+	cassette_change_state( space->machine().device(CASSETTE_TAG),
 		( data & 0x10 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
 	if (!(data & NASCOM1_KEY_RESET))

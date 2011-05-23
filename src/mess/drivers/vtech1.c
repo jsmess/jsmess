@@ -649,7 +649,7 @@ static DRIVER_INIT( vtech1 )
 	/* find devices */
 	vtech1->m_mc6847 = machine.device("mc6847");
 	vtech1->m_speaker = machine.device("speaker");
-	vtech1->m_cassette = machine.device("cassette");
+	vtech1->m_cassette = machine.device(CASSETTE_TAG);
 	vtech1->m_printer = machine.device("printer");
 
 	/* ram */
@@ -983,7 +983,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_CONFIG(vtech1_speaker_interface)
@@ -995,7 +995,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	/* snapshot/quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", vtech1, "vz", 1.5)
 
-	MCFG_CASSETTE_ADD( "cassette", laser_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, laser_cassette_config )
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

@@ -246,7 +246,7 @@ static READ8_DEVICE_HANDLER(apf_imagination_pia_in_b_func)
 
 	data = 0x000;
 
-	if (cassette_input(device->machine().device("cassette")) > 0.0038)
+	if (cassette_input(device->machine().device(CASSETTE_TAG)) > 0.0038)
 		data =(1<<7);
 
 	return data;
@@ -295,12 +295,12 @@ static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_b_func)
 	state->m_keyboard_data = input_port_read(device->machine(), keynames[keyboard_line]);
 
 	/* bit 4: cassette motor control */
-	cassette_change_state(device->machine().device("cassette"),
+	cassette_change_state(device->machine().device(CASSETTE_TAG),
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MASK_MOTOR);
 
 	/* bit 6: cassette write */
-	cassette_output(device->machine().device("cassette"),
+	cassette_output(device->machine().device(CASSETTE_TAG),
 		(data & 0x40) ? -1.0 : 1.0);
 }
 
@@ -731,7 +731,7 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD( "cassette", apf_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, apf_cassette_config )
 
 	MCFG_WD179X_ADD("wd179x", default_wd17xx_interface )
 
@@ -744,7 +744,7 @@ static MACHINE_CONFIG_DERIVED( apf_m1000, apf_imagination )
 
 	MCFG_DEVICE_REMOVE( "pia_1" )
 
-	MCFG_DEVICE_REMOVE( "cassette" )
+	MCFG_DEVICE_REMOVE( CASSETTE_TAG )
 	MCFG_FLOPPY_2_DRIVES_REMOVE()
 
 	MCFG_CARTSLOT_ADD("cart")
