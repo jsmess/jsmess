@@ -622,7 +622,7 @@ static READ8_HANDLER(vga_crtc_r)
 		break;
 	case 0xf:
 		/* oak test */
-		data=0;
+		//data=0;
 		/* pega bios on/off */
 		data=0x80;
 		break;

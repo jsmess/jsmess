@@ -108,6 +108,7 @@ READ8_MEMBER( ibm_vga_device::vga_port_03c0_r)
 					break;
 		case 0x0a : //
 					retVal = m_feature_ctrl;
+					break;
 		case 0x0c : // Miscellaneous Output Register
 					retVal = m_misc_out_reg;
 					break;
