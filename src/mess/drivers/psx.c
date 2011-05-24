@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "cpu/psx/psx.h"
+#include "video/psx.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/chd_cd.h"
 #include "includes/psx.h"
@@ -698,7 +699,6 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( psx )
 {
-	psx_machine_init(machine);
 	psx_sio_install_handler( machine, 0, psx_sio0 );
 
 	psx_dma_install_read_handler(machine, 3, psx_dma_read_delegate(FUNC(cd_dma_read),machine.device<psxcd_device>("psxcd")));
@@ -762,7 +762,7 @@ static void spu_irq(device_t *device, UINT32 data)
 
 static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( psx_map)
 	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
@@ -781,7 +781,7 @@ static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_VIDEO_START( psx_type2 )
+	MCFG_DEVICE_ADD( "gpu", CXD8561Q, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -818,7 +818,7 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_VIDEO_START( psx_type2 )
+	MCFG_DEVICE_ADD( "gpu", CXD8561Q, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
