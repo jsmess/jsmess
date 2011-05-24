@@ -8,6 +8,7 @@
 #define __ABC80__
 
 #include "machine/ram.h"
+#include "imagedev/cassette.h"
 
 #define ABC80_XTAL		11980800.0
 
@@ -45,7 +46,6 @@
 #define Z80PIO_TAG		"cd67"
 #define SN76477_TAG		"g8"
 #define ABCBUS_TAG		"abcbus"
-#define CASSETTE_TAG	"cassette"
 #define RS232_TAG		"rs232"
 
 class abc80_state : public driver_device

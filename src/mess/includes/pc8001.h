@@ -23,7 +23,6 @@
 #define I8257_TAG		"i8257"
 #define UPD1990A_TAG	"upd1990a"
 #define UPD3301_TAG		"upd3301"
-#define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
 #define SCREEN_TAG		"screen"
 #define SPEAKER_TAG		"speaker"

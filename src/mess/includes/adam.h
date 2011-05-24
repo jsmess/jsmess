@@ -13,8 +13,6 @@
 #define M6801_PRN_TAG	"cpu4"
 #define M6801_FDC_TAG	"cpu5"
 #define M6801_SPI_TAG	"cpu6"
-#define CASSETTE1_TAG	"cassette1"
-#define CASSETTE2_TAG	"cassette2"
 #define SCREEN_TAG		"screen"
 
 class adam_state : public driver_device
@@ -26,7 +24,7 @@ public:
 		  m_netcpu(*this, M6801_MAIN_TAG),
 		  m_fdc(*this, WD2793_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_ddp0(*this, CASSETTE1_TAG),
+		  m_ddp0(*this, CASSETTE_TAG),
 		  m_ddp1(*this, CASSETTE2_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_rxd(1),

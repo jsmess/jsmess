@@ -31,7 +31,6 @@
 #define MC6854_TAG		"econet_ic1"
 #define SCREEN_TAG		"screen"
 #define CENTRONICS_TAG	"centronics"
-#define CASSETTE_TAG	"cassette"
 #define SPEAKER_TAG		"speaker"
 
 #define X1	XTAL_3_579545MHz	// MC6847 Clock

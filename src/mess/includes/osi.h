@@ -20,7 +20,6 @@
 #define M6502_TAG		"m6502"
 #define DISCRETE_TAG	"discrete"
 #define BEEP_TAG		"beep"
-#define CASSETTE_TAG	"cassette"
 
 #define X1			3932160
 #define UK101_X1	XTAL_8MHz

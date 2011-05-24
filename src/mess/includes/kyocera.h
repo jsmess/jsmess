@@ -36,7 +36,6 @@
 #define HD44102_7_TAG	"m8"
 #define HD44102_8_TAG	"m9"
 #define HD44102_9_TAG	"m10"
-#define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
 #define SPEAKER_TAG		"speaker"
 

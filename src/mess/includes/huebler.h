@@ -7,7 +7,8 @@
 #define Z80SIO_TAG		"z80sio"
 #define Z80PIO1_TAG		"z80pio1"
 #define Z80PIO2_TAG		"z80pio2"
-#define CASSETTE_TAG	"cassette"
+
+#include "imagedev/cassette.h"
 
 class amu880_state : public driver_device
 {

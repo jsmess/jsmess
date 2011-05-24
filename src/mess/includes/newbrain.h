@@ -29,8 +29,6 @@
 #define Z80CTC_TAG		"458"
 #define FDC_Z80_TAG		"416"
 #define UPD765_TAG		"418"
-#define CASSETTE1_TAG	"cassette1"
-#define CASSETTE2_TAG	"cassette2"
 
 #define NEWBRAIN_EIM_RAM_SIZE			0x10000
 
@@ -64,7 +62,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_copcpu(*this, COP420_TAG),
-		  m_cassette1(*this, CASSETTE1_TAG),
+		  m_cassette1(*this, CASSETTE_TAG),
 		  m_cassette2(*this, CASSETTE2_TAG)
 	{ }
 

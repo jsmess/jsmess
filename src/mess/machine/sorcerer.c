@@ -35,9 +35,9 @@ static device_t *cassette_device_image(running_machine &machine)
 {
 	sorcerer_state *state = machine.driver_data<sorcerer_state>();
 	if (state->m_fe & 0x20)
-		return machine.device("cassette2");
+		return machine.device(CASSETTE2_TAG);
 	else
-		return machine.device("cassette1");
+		return machine.device(CASSETTE_TAG);
 }
 
 

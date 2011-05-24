@@ -10,9 +10,8 @@
 #include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
 #include "sound/wave.h"
-#include "imagedev/cassette.h"
-#include "includes/pecom.h"
 #include "machine/ram.h"
+#include "includes/pecom.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(pecom64_mem, AS_PROGRAM, 8)
@@ -189,7 +188,7 @@ static MACHINE_CONFIG_START( pecom64, pecom_state )
 
 	MCFG_FRAGMENT_ADD(pecom_video)
 
-	MCFG_CASSETTE_ADD( "cassette", pecom_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, pecom_cassette_config )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

@@ -605,7 +605,7 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 	MCFG_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -625,7 +625,7 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	MCFG_GROM_ADD( "grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
 
 	MCFG_PBOX8_ADD( "peribox", console_extint, console_notconnected, console_ready )
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
 
 	MCFG_TI99_GROMPORT_ADD( "gromport", console_ready )
 	MCFG_MECMOUSE_ADD( "mecmouse" )
@@ -650,7 +650,7 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", "cassette")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 	MCFG_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -670,7 +670,7 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	MCFG_GROM_ADD( "grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
 
 	MCFG_PBOX8_ADD( "peribox", console_extint, console_notconnected, console_ready )
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
 
 	MCFG_TI99_GROMPORT_ADD( "gromport", console_ready )
 	MCFG_MECMOUSE_ADD( "mecmouse" )

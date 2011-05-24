@@ -9,7 +9,6 @@
 #define Z80_TAG			"z80"
 #define SN76489A_TAG	"sn76489a"
 #define UPD765_TAG		"upd765"
-#define CASSETTE_TAG	"cassette"
 #define UPD8251_TAG		"upd8251"
 #define UPD9255_TAG		"upd9255"
 #define UPD9255_0_TAG	"upd9255_0"

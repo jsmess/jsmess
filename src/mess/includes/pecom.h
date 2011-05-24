@@ -2,6 +2,7 @@
 #define __PECOM__
 
 #include "cpu/cosmac/cosmac.h"
+#include "imagedev/cassette.h"
 
 #define SCREEN_TAG	"screen"
 #define CDP1802_TAG	"cdp1802"

@@ -18,7 +18,6 @@
 #define SCREEN_TAG		"screen"
 #define CDP1802_TAG		"cdp1802"
 #define CDP1869_TAG		"cdp1869"
-#define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
 
 #define TMC600_PAGE_RAM_SIZE	0x400

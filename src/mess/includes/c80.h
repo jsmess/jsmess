@@ -14,7 +14,6 @@
 #define Z80_TAG			"d2"
 #define Z80PIO1_TAG		"d11"
 #define Z80PIO2_TAG		"d12"
-#define CASSETTE_TAG	"cassette"
 
 class c80_state : public driver_device
 {

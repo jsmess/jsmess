@@ -21,7 +21,6 @@
 #define SED1320_TAG		"7c"
 #define I8251_TAG		"13e"
 #define UPD7001_TAG		"1d"
-#define CASSETTE_TAG	"cassette"
 #define SCREEN_TAG		"screen"
 
 #define PX8_VIDEORAM_MASK	0x17ff

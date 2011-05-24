@@ -17,7 +17,6 @@
 #define AY8910_TAG		"u21"
 #define MC6845_TAG		"mc6845"
 #define MC6847_TAG		"u19"
-#define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
 
 #define MC1000_MC6845_VIDEORAM_SIZE		0x800

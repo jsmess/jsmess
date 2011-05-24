@@ -18,7 +18,6 @@
 #define CDP1802_TAG		"ic19"
 #define CDP1864_TAG		"ic3"
 #define DM9368_TAG		"ic10"
-#define CASSETTE_TAG	"cassette"
 #define SCREEN_TAG		"screen"
 #define SPEAKER_TAG		"speaker"
 

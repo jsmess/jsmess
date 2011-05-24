@@ -22,7 +22,6 @@
 #define CDP1802_TAG		"u1"
 #define CDP1861_TAG		"u2"
 #define CDP1862_TAG		"cdp1862"
-#define CASSETTE_TAG	"cassette"
 #define DISCRETE_TAG	"discrete"
 
 #define VP590_COLOR_RAM_SIZE	0x100

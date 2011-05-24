@@ -9,7 +9,6 @@
 #define I8255A_TAG		"i8255a"
 #define Z80_FD5_TAG		"z80fd5"
 #define UPD765_TAG		"upd765"
-#define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
 #define SCREEN_TAG		"screen"
 

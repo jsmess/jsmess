@@ -9,7 +9,6 @@
 #define DISCRETE_TAG		"discrete"
 #define TIMER_Y_ODD_TAG		"odd"
 #define TIMER_Y_EVEN_TAG	"even"
-#define CASSETTE_TAG		"cassette"
 
 class vidbrain_state : public driver_device
 {

@@ -613,7 +613,7 @@ static DEVICE_START( sgcpu )
 	sgcpu->peribox = device->machine().device("peribox");
 	sgcpu->soundchip = device->machine().device("soundgen");
 	sgcpu->video = device->machine().device("video");
-	sgcpu->cassette = device->machine().device("cassette");
+	sgcpu->cassette = device->machine().device(CASSETTE_TAG);
 
 	assert(sgcpu->cpu && sgcpu->peribox && sgcpu->soundchip && sgcpu->video && sgcpu->cassette);
 

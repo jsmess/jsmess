@@ -113,8 +113,8 @@ public:
 	sol20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_cass1(*this, "cassette1"),
-	m_cass2(*this, "cassette2"),
+	m_cass1(*this, CASSETTE_TAG),
+	m_cass2(*this, CASSETTE2_TAG),
 	m_uart(*this, "uart"),
 	m_uart_s(*this, "uart_s"),
 	m_terminal(*this, TERMINAL_TAG)
@@ -161,9 +161,9 @@ static device_t *cassette_device_image(running_machine &machine)
 {
 	sol20_state *state = machine.driver_data<sol20_state>();
 	if (state->m_sol20_fa & 0x40)
-		return machine.device("cassette2");
+		return machine.device(CASSETTE2_TAG);
 	else
-		return machine.device("cassette1");
+		return machine.device(CASSETTE_TAG);
 }
 
 
@@ -686,14 +686,14 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave.1", "cassette1")
+	MCFG_SOUND_WAVE_ADD("wave.1", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass1 speaker
-	MCFG_SOUND_WAVE_ADD("wave.2", "cassette2")
+	MCFG_SOUND_WAVE_ADD("wave.2", CASSETTE2_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass2 speaker
 
 	// devices
-	MCFG_CASSETTE_ADD( "cassette1", sol20_cassette_config )
-	MCFG_CASSETTE_ADD( "cassette2", sol20_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, sol20_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE2_TAG, sol20_cassette_config )
 	MCFG_AY31015_ADD( "uart", sol20_ay31015_config )
 	MCFG_AY31015_ADD( "uart_s", sol20_ay31015_config )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, sol20_terminal_intf)

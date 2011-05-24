@@ -9,9 +9,8 @@
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
-#include "imagedev/cassette.h"
-#include "includes/pecom.h"
 #include "machine/ram.h"
+#include "includes/pecom.h"
 
 static TIMER_CALLBACK( reset_tick )
 {
@@ -187,10 +186,10 @@ COSMAC_INTERFACE( pecom64_cdp1802_config )
 	DEVCB_LINE_VCC,
 	DEVCB_LINE(clear_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE("cassette", ef2_r),
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, ef2_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE("cassette", pecom64_q_w),
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, pecom64_q_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	pecom64_sc_w,

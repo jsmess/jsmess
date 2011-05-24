@@ -3,6 +3,7 @@
 
 #include "machine/6522via.h"
 #include "machine/cbmiec.h"
+#include "imagedev/cassette.h"
 
 #define SCREEN_TAG		"screen"
 #define M6502_TAG		"ue10"
@@ -11,7 +12,6 @@
 #define M6560_TAG		"ub7"
 #define M6561_TAG		"ub7"
 #define IEC_TAG			"iec"
-#define CASSETTE_TAG	"cassette"
 #define TIMER_C1530_TAG	"c1530"
 
 class vic20_state : public driver_device

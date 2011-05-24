@@ -17,7 +17,6 @@
 #define Z80_TAG			"z80"
 #define AY8910_TAG		"ay8910"
 #define MC6847_TAG		"mc6847"
-#define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
 
 #define PHC25_VIDEORAM_SIZE		0x1800

@@ -15,7 +15,6 @@
 
 #define SCREEN_TAG		"screen"
 #define UB8830D_TAG		"ub8830d"
-#define CASSETTE_TAG	"cassette"
 #define SPEAKER_TAG		"speaker"
 #define CENTRONICS_TAG	"centronics"
 

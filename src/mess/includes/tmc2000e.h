@@ -18,7 +18,6 @@
 #define SCREEN_TAG		"screen"
 #define CDP1802_TAG		"cdp1802"
 #define CDP1864_TAG		"cdp1864"
-#define CASSETTE_TAG	"cassette"
 
 #define TMC2000E_COLORRAM_SIZE 0x100 // ???
 

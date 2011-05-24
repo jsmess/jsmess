@@ -2840,7 +2840,7 @@ static void generic_init_machine(running_machine &machine, const machine_init_in
 
 	/* locate devices */
 	state->m_cococart_device	= machine.device("coco_cartslot");
-	state->m_cassette_device	= machine.device("cassette");
+	state->m_cassette_device	= machine.device(CASSETTE_TAG);
 	state->m_bitbanger_device	= machine.device("bitbanger");
 	state->m_printer_device	= machine.device("printer");
 	state->m_dac				= machine.device("dac");

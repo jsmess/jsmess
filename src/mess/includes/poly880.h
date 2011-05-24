@@ -18,7 +18,6 @@
 #define Z80CTC_TAG		"i4"
 #define Z80PIO1_TAG		"i2"
 #define Z80PIO2_TAG		"i3"
-#define CASSETTE_TAG	"cassette"
 
 class poly880_state : public driver_device
 {

@@ -23,7 +23,6 @@
 #define TMS9929_TAG		"u3"
 #define PIA6821_TAG		"u21"
 #define SN76489_TAG		"u22"
-#define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
 
 #define BANK_ROM1		"bank1"

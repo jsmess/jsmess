@@ -17,7 +17,6 @@
 #define SN76489A_TAG	"sn76489a"
 #define MC6845_TAG		"mc6845"
 #define SCREEN_TAG		"screen"
-#define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
 
 class mtx_state : public driver_device

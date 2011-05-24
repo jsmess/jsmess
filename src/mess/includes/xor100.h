@@ -13,7 +13,6 @@
 #define COM5016_TAG		"15c"
 #define Z80CTC_TAG		"11b"
 #define WD1795_TAG		"wd1795"
-#define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
 
 class xor100_state : public driver_device

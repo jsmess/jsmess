@@ -21,7 +21,6 @@
 #define CDP1802_TAG		"cdp1802"
 #define CDP1861_TAG		"cdp1861"
 #define CDP1864_TAG		"m3"
-#define CASSETTE_TAG	"cassette"
 
 class tmc1800_state : public driver_device
 {

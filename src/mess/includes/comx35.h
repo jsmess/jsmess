@@ -32,8 +32,6 @@
 #define MC6845_TAG			"mc6845"
 #define WD1770_TAG			"wd1770"
 
-#define CASSETTE_TAG		"cassette"
-
 #define COMX35_CHARRAM_SIZE 0x800
 #define COMX35_VIDEORAM_SIZE 0x800
 
