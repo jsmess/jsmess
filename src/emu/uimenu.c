@@ -80,6 +80,8 @@ enum
 	VIDEO_ITEM_BACKDROPS,
 	VIDEO_ITEM_OVERLAYS,
 	VIDEO_ITEM_BEZELS,
+	VIDEO_ITEM_CPANELS,
+	VIDEO_ITEM_MARQUEES,
 	VIDEO_ITEM_ZOOM,
 	VIDEO_ITEM_VIEW
 };
@@ -3024,9 +3026,6 @@ static void menu_sliders_populate(running_machine &machine, ui_menu *menu, int m
 		if (curval < curslider->maxval)
 			flags |= MENU_FLAG_RIGHT_ARROW;
 		ui_menu_item_append(menu, curslider->description, tempstring, flags, (void *)curslider);
-
-		if (menuless_mode)
-			break;
 	}
 
 	ui_menu_set_custom_render(menu, menu_sliders_custom_render, 0.0f, 2.0f * ui_get_line_height(machine) + 2.0f * UI_BOX_TB_BORDER);
@@ -3213,6 +3212,22 @@ static void menu_video_options(running_machine &machine, ui_menu *menu, void *pa
 				}
 				break;
 
+			case VIDEO_ITEM_CPANELS:
+				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+				{
+					target->set_cpanels_enabled(!target->cpanels_enabled());
+					changed = TRUE;
+				}
+				break;
+
+			case VIDEO_ITEM_MARQUEES:
+				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+				{
+					target->set_marquees_enabled(!target->marquees_enabled());
+					changed = TRUE;
+				}
+				break;
+
 			case VIDEO_ITEM_ZOOM:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
@@ -3286,6 +3301,14 @@ static void menu_video_options_populate(running_machine &machine, ui_menu *menu,
 	/* bezel item */
 	enabled = target->bezels_enabled();
 	ui_menu_item_append(menu, "Bezels", enabled ? "Enabled" : "Disabled", enabled ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_BEZELS);
+
+	/* cpanel item */
+	enabled = target->cpanels_enabled();
+	ui_menu_item_append(menu, "CPanels", enabled ? "Enabled" : "Disabled", enabled ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_CPANELS);
+
+	/* marquee item */
+	enabled = target->marquees_enabled();
+	ui_menu_item_append(menu, "Marquees", enabled ? "Enabled" : "Disabled", enabled ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_MARQUEES);
 
 	/* cropping */
 	enabled = target->zoom_to_screen();

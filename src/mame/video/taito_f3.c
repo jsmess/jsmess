@@ -577,12 +577,12 @@ VIDEO_START( f3 )
 
 	state->m_f3_game_config=pCFG;
 
-	state->m_f3_vram =      auto_alloc_array(machine, UINT16, 0x2000/2);
-	state->m_f3_pf_data =   auto_alloc_array(machine, UINT16, 0xc000/2);
-	state->m_videoram =     auto_alloc_array(machine, UINT16, 0x2000/2);
-	state->m_f3_line_ram =  auto_alloc_array(machine, UINT16, 0x10000/2);
-	state->m_f3_pivot_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
-	state->m_spriteram =    auto_alloc_array(machine, UINT16, 0x10000/2);
+	state->m_f3_vram =      auto_alloc_array_clear(machine, UINT16, 0x2000/2);
+	state->m_f3_pf_data =   auto_alloc_array_clear(machine, UINT16, 0xc000/2);
+	state->m_videoram =     auto_alloc_array_clear(machine, UINT16, 0x2000/2);
+	state->m_f3_line_ram =  auto_alloc_array_clear(machine, UINT16, 0x10000/2);
+	state->m_f3_pivot_ram = auto_alloc_array_clear(machine, UINT16, 0x10000/2);
+	state->m_spriteram =    auto_alloc_array_clear(machine, UINT16, 0x10000/2);
 
 	if (state->m_f3_game_config->extend) {
 		state->m_pf1_tilemap = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,16,16,64,32);

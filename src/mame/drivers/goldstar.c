@@ -8019,7 +8019,7 @@ ROM_END
   1x simple 3-contacts switch.
 
 
-  The following PROMs weren't dumped:
+  The following PROMs were added later:
 
   1x TBP18S030 @ D12 (32 bytes)
   1x TBP18S030 @ D13 (32 bytes)
@@ -8032,6 +8032,16 @@ ROM_END
 
   @ D14:  1K - 470 - 220 - 1K - 470 - 220 - 470 - 220.
   @ F14:  1K - 470 - 220 - 1K - 1K - 470 - 220 - 1K - 470 - 220 - 1K.
+
+******************************************************************************
+
+  About encryption...
+
+  Seems that programmers left a hole at offset 3890-3a90, enough to see some
+  values and progressions as hints. Some of these strings (IE: 00 20 00 20),
+  are valid to XOR some text offsets, as 3ac7-3acf, 3ae5-3aea, 3c00-3c0f, and
+  other text strings. See also offsets 5240 and 5800 onward...
+
 
 ******************************************************************************/
 
@@ -8052,17 +8062,17 @@ ROM_START( luckylad )
 	ROM_LOAD( "14.h5",  0x6000, 0x2000, CRC(708d5b2d) SHA1(a619b84bc67d579345db636d33e7e4f27e37a18c) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "tbp24s10n.g13", 0x0000, 0x0100, NO_DUMP )	/* undumped */
-	ROM_LOAD( "tbp24s10n.g14", 0x0100, 0x0100, NO_DUMP )	/* undumped */
+	ROM_LOAD( "tbp24s10n.g13", 0x0000, 0x0100, CRC(b053242d) SHA1(00ed5c0d6694e83ae695fb0cdfed53be2b0bd6c9) )
+	ROM_LOAD( "tbp24s10n.g14", 0x0100, 0x0100, CRC(46209d2a) SHA1(1d539219238ee47cdba3e7d44504619c7fbd2ade) )
 
 	ROM_REGION( 0x20, "proms2", 0 )
-	ROM_LOAD( "tbp18s030.d13", 0x0000, 0x0020, NO_DUMP )	/* undumped */
+	ROM_LOAD( "tbp18s030.d13", 0x0000, 0x0020, CRC(41f3b9d3) SHA1(8b884a98e68ea438427227a64bf91fe86844a15f) )
 
 	ROM_REGION( 0x100, "unkprom", 0 )
-	ROM_LOAD( "tbp24s10n.f3", 0x0000, 0x0100, NO_DUMP )	/* undumped */
+	ROM_LOAD( "tbp24s10n.f3", 0x0000, 0x0100, CRC(8de9cb92) SHA1(01449974fa27ebfd2583d6b2845c4f43938e082d) )
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
-	ROM_LOAD( "tbp18s030.d12", 0x0000, 0x0020, NO_DUMP )	/* undumped */
+	ROM_LOAD( "tbp18s030.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
 /*
@@ -10324,13 +10334,13 @@ GAMEL( 198?, kkojnoli,  0,        kkojnoli, kkojnoli, 0,         ROT0, "hack",  
 GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, 0,         ROT0, "TAB Austria",          "Lady Liner",                                               0 )
 GAME(  198?, wcat3,     0,        wcat3,    lucky8,   0,         ROT0, "E.A.I.",               "Wild Cat 3",                                               GAME_NOT_WORKING )
 
-GAME( 1985, luckylad,   0,        lucky8,   luckylad, 0,         ROT0, "Wing Co., Ltd.",       "Lucky Lady (Wing, encrypted)",                             GAME_NOT_WORKING ) // encrypted...
+GAME(  1985, luckylad,  0,        lucky8,   luckylad, 0,         ROT0, "Wing Co., Ltd.",       "Lucky Lady (Wing, encrypted)",                             GAME_NOT_WORKING ) // encrypted (see notes in rom_load)...
 
-GAME(  1992, magodds,   0,         magodds,  magodds,   0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",               GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME(  1992, magoddsa,   magodds,  magodds,  magodds,   0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2)",               GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME(  1992, magoddsb,   magodds,  magodds,  magodds,   0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 3)",               GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME(  1991, magoddsc,   magodds,  magodds,  magoddsc,  magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND)
-GAME(  1991, magoddsd,   magodds,  magodds,  magoddsc,  magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 5, custom encrypted CPU block)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND)
+GAME(  1992, magodds,   0,        magodds,  magodds,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",                             GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME(  1992, magoddsa,   magodds, magodds,  magodds,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2)",                             GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME(  1992, magoddsb,   magodds, magodds,  magodds,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 3)",                             GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME(  1991, magoddsc,   magodds, magodds,  magoddsc, magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND)
+GAME(  1991, magoddsd,   magodds, magodds,  magoddsc, magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 5, custom encrypted CPU block)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND)
 
 
 /* --- Amcoe games --- */
