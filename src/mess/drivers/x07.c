@@ -360,7 +360,7 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 
 	case 0x1e:	//start program write cont
 		{
-			for(int i = (int)strlen((char*)m_t6834_ram[0x500]); i < 0x80; i++)
+			for(int i = (int)strlen((char*)&m_t6834_ram[0x500]); i < 0x80; i++)
 			{
 				UINT8 sp_char = m_in.data[m_in.read++];
 				m_t6834_ram[0x500 + i] = sp_char;
@@ -485,7 +485,7 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 			UINT8 pos = m_in.data[m_in.read++] - 1;
 			UINT8 udk_size = (pos != 5 && pos != 11) ? 0x2a : 0x2e;
 
-			for(int i = (int)strlen((char*)m_t6834_ram[udk_offset[pos]]); i < udk_size; i++)
+			for(int i = (int)strlen((char*)&m_t6834_ram[udk_offset[pos]]); i < udk_size; i++)
 			{
 				UINT8 udk_char = m_in.data[m_in.read++];
 				m_t6834_ram[udk_offset[pos] + i] = udk_char;
