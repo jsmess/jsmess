@@ -476,8 +476,8 @@ static MACHINE_CONFIG_START( z80ne, z80ne_state )
 
 	MCFG_AY31015_ADD( "ay_3_1015", z80ne_ay31015_config )
 
-	MCFG_CASSETTE_ADD( "cassettea", z80ne_cassettea_config )
-	MCFG_CASSETTE_ADD( "cassetteb", z80ne_cassetteb_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, z80ne_cassettea_config )
+	MCFG_CASSETTE_ADD( CASSETTE2_TAG, z80ne_cassetteb_config )
 
 	MCFG_DEFAULT_LAYOUT(layout_z80ne)
 
@@ -528,8 +528,8 @@ static MACHINE_CONFIG_START( z80netb, z80ne_state )
 
 	MCFG_AY31015_ADD( "ay_3_1015", z80ne_ay31015_config )
 
-	MCFG_CASSETTE_ADD( "cassettea", z80ne_cassettea_config )
-	MCFG_CASSETTE_ADD( "cassetteb", z80ne_cassetteb_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, z80ne_cassettea_config )
+	MCFG_CASSETTE_ADD( CASSETTE2_TAG, z80ne_cassetteb_config )
 
 	MCFG_KR2376_ADD( "lx388_kr2376", lx388_kr2376_interface)
 
@@ -564,8 +564,8 @@ static MACHINE_CONFIG_START( z80netf, z80ne_state )
 
 	MCFG_AY31015_ADD( "ay_3_1015", z80ne_ay31015_config )
 
-	MCFG_CASSETTE_ADD( "cassettea", z80ne_cassettea_config )
-	MCFG_CASSETTE_ADD( "cassetteb", z80ne_cassetteb_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, z80ne_cassettea_config )
+	MCFG_CASSETTE_ADD( CASSETTE2_TAG, z80ne_cassetteb_config )
 
 	MCFG_KR2376_ADD( "lx388_kr2376", lx388_kr2376_interface)
 

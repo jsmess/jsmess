@@ -35,9 +35,9 @@ static device_t *cassette_device_image(running_machine &machine)
 {
 	z80ne_state *state = machine.driver_data<z80ne_state>();
 	if (state->m_lx385_ctrl & 0x08)
-		return machine.device("cassetteb");
+		return machine.device(CASSETTE2_TAG);
 	else
-		return machine.device("cassettea");
+		return machine.device(CASSETTE_TAG);
 }
 
 static TIMER_CALLBACK(z80ne_cassette_tc)
@@ -610,10 +610,10 @@ WRITE8_HANDLER(lx385_ctrl_w)
 	/* motors */
 	if(changed_bits & 0x18)
 	{
-		cassette_change_state(space->machine().device("cassettea"),
+		cassette_change_state(space->machine().device(CASSETTE_TAG),
 			(motor_a) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
-		cassette_change_state(space->machine().device("cassetteb"),
+		cassette_change_state(space->machine().device(CASSETTE2_TAG),
 			(motor_b) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 		if (motor_a || motor_b)
