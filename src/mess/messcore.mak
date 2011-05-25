@@ -38,7 +38,6 @@ EMU_VIDEO = $(EMUOBJ)/video
 MAME_AUDIO = $(MAMEOBJ)/audio
 MAME_MACHINE = $(MAMEOBJ)/machine
 MAME_DRIVERS = $(MAMEOBJ)/drivers
-MAME_FORMATS = $(MAMEOBJ)/formats
 MAME_VIDEO = $(MAMEOBJ)/video
 MAME_LAYOUT = $(MAMEOBJ)/layout
 
@@ -57,7 +56,6 @@ OBJDIRS += \
 	$(EMU_VIDEO) \
 	$(MAME_AUDIO) \
 	$(MAME_DRIVERS) \
-	$(MAME_FORMATS) \
 	$(MAME_LAYOUT) \
 	$(MAME_MACHINE) \
 	$(MAME_VIDEO) \
