@@ -119,7 +119,8 @@ static void load_track_data(device_t *device,int floppy_select)
 	}
 
 	track_size = floppy_get_track_size(fimg, f->head, floppy_drive_get_current_track(&cur_image->device()));
-	new_data = (UINT8*)cur_image->image_realloc(f->loadedtrack_data, track_size);
+	if (f->loadedtrack_data) auto_free(device->machine(),f->loadedtrack_data);
+	new_data = auto_alloc_array(device->machine(),UINT8,track_size);
 	if (!new_data)
 	{
 		return;
@@ -520,6 +521,8 @@ static DEVICE_START( sonydriv_floppy )
 
 	sony.floppy[0].is_fdhd = 0;
 	sony.floppy[1].is_fdhd = 0;
+	sony.floppy[0].loadedtrack_data = NULL;
+	sony.floppy[1].loadedtrack_data = NULL;
 }
 
 static DEVICE_IMAGE_UNLOAD( sonydriv_floppy )

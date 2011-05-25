@@ -1650,7 +1650,7 @@ static void nes_load_proc( device_image_interface &image )
 	state->m_fds_sides = (image.length() - header) / 65500;
 
 	if (state->m_fds_data == NULL)
-		state->m_fds_data = (UINT8*)image.image_malloc(state->m_fds_sides * 65500);	// I don't think we can arrive here ever, probably it can be removed...
+		state->m_fds_data = auto_alloc_array(image.device().machine(),UINT8,state->m_fds_sides * 65500);	// I don't think we can arrive here ever, probably it can be removed...
 
 	/* if there is an header, skip it */
 	image.fseek(header, SEEK_SET);

@@ -124,7 +124,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	while (size_aligned < size) {
 		size_aligned *= 2;
 	}
-	mem = (UINT8*)image.image_malloc(size_aligned);
+	mem = auto_alloc_array(image.device().machine(),UINT8,size_aligned);
 	if (!mem) {
 		logerror ("cart #%d: error: failed to allocate memory for cartridge\n",
 						id);
@@ -177,7 +177,8 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	if (!type && size_aligned != 0x10000)
 	{
 		size_aligned = 0x10000;
-		mem = (UINT8*)image.image_realloc(mem, 0x10000);
+		auto_free(image.device().machine(),mem);
+		mem = auto_alloc_array(image.device().machine(),UINT8, 0x10000);
 		if (!mem) {
 			logerror ("cart #%d: error: cannot allocate memory\n", id);
 			return IMAGE_INIT_FAIL;
@@ -251,7 +252,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	}
 
 	/* allocate and set slot_state for this cartridge */
-	st = (slot_state*) image.image_malloc(sizeof (slot_state));
+	st = auto_alloc(image.device().machine(),slot_state);
 	if (!st)
 	{
 		logerror ("cart #%d: error: cannot allocate memory for "
@@ -261,7 +262,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	memset (st, 0, sizeof (slot_state));
 
 	st->m_type = type;
-	sramfile = (char*)image.image_malloc(strlen (image.filename () + 1));
+	sramfile = auto_alloc_array(image.device().machine(), char, strlen (image.filename () + 1));
 
 	if (sramfile) {
 		char *ext;

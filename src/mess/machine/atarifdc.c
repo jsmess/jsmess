@@ -155,7 +155,7 @@ static void atari_load_proc(device_image_interface &image)
 	int size, i;
 	const char *ext;
 
-	fdc->drv[id].image = (UINT8*)image.image_malloc(MAXSIZE);
+	fdc->drv[id].image = auto_alloc_array(image.device().machine(),UINT8,MAXSIZE);
 	if (!fdc->drv[id].image)
 		return;
 
@@ -180,7 +180,7 @@ static void atari_load_proc(device_image_interface &image)
 		return;
 	}
 	/* re allocate the buffer; we don't want to be too lazy ;) */
-    fdc->drv[id].image = (UINT8*)image.image_realloc(fdc->drv[id].image, size);
+    //fdc->drv[id].image = (UINT8*)image.image_realloc(fdc->drv[id].image, size);
 
 	ext = image.filetype();
     /* no extension: assume XFD format (no header) */
