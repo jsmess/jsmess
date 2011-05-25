@@ -1,4 +1,51 @@
-﻿0.142u3
+﻿0.142u4
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+System Driver Changes:
+----------------------
+- c64 : Enabled writing to cartridge RAM @ 0x8000-0x9fff. [Curt Coder]
+- apple2e : Add location for the two code roms of the Apple IIe enhanced.[Lord Nightmare]
+- apple2e : Restored the rom IC type information inadvertently removed by 
+	the addition of the locations for the Apple IIe enhanced roms. [Lord Nightmare]
+- c64 : Added mapper for the "Simons' BASIC" cartridge. [Curt Coder]
+- fidelz80 : Added Sensory Chess Challenger (model VSC). [Lord Nightmare, Kevtris, Sandro Ronco]
+- bbc : removed all the old video speed hacks, getting ready to 
+	switch over to using the MC6845 in the MAME core. (GordonJ)
+- c64 : Added mapper for the "Super Explode! v5.0" cartridge. [Curt Coder]
+- bbc : Cleaning up the BBC driver in an effort to switch to MAMEs MC6845, also 
+	removed large amounts of unused code from the m6845 code in MESS [GordonJ]
+- x1 : Implemented proper Sharp X1 pixel clock divider [Angelo Salese]
+- mk90 : Fixed reset vector. [Curt Coder]
+- tec1 : added JMON (not working) [Robbbert]
+- chessmst : Added layout and input ports. [Sandro Ronco]
+
+Software Lists:
+----------------
+- c64 : Added 8/16K cartridges to the softlist. [k1w1]
+- snes.xml : verified dumps and added alt dumps [MESSfan]
+- Added floppy softlists for C64, C128, VIC-20, and Plus/4. [Curt Coder]
+- c16 : Added cartridge softlist and connected it to the driver. [Curt Coder]
+- snes.xml : Added proper dump for Super Gussun Oyoyo (Jpn, Prototype)  [MESSFan]
+- c64 : Added some cartridges to the softlist. [k1w1]
+- c64 : Cart softlist fixes. [k1w1]
+
+Source Changes:
+----------------
+- pc_fdc - added disk change signal [Carl]
+- note that with new tools there are no unicode issue with tools (wimgtool)
+
+0.142u3
 
 New System Drivers Supported:
 -----------------------------
