@@ -18,7 +18,7 @@
 		<info name="serial" value="T116005" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="317042-01.u1" size="0x4000" crc="a059fccb" sha1="e919531d016596ec1a2fd349bbe6691716297f35" offset="0x0000" />
+				<rom name="317042-01.u1" size="0x4000" crc="a059fccb" sha1="e919531d016596ec1a2fd349bbe6691716297f35" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -28,9 +28,24 @@
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="T116002" />
+		<!--
+		ARTWORK NO. 310189 REV. 1
+		|===================================|
+		|=|                                 |
+		|=|                                 |
+		|=|      ROM                        |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|===================================|
+		
+		ROM     - MOS 25128 "317040-01 (C) 1984 CBM 26011D-722"
+		-->
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="317040-01.u1" size="0x4000" crc="6b624fec" sha1="ba54810ef1089fdf56b74536f9d679a80ace2dc1" offset="0x0000" />
+				<rom name="317040-01.u1" size="0x4000" crc="6b624fec" sha1="ba54810ef1089fdf56b74536f9d679a80ace2dc1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +57,7 @@
 		<info name="serial" value="T116004" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="317041-01.u1" size="0x4000" crc="a903dc53" sha1="410ccb6b304ca30e852fdc6ec33d9dacd7de3493" offset="0x0000" />
+				<rom name="317041-01.u1" size="0x4000" crc="a903dc53" sha1="410ccb6b304ca30e852fdc6ec33d9dacd7de3493" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -52,9 +67,24 @@
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="T116006" />
+		<!--
+		ARTWORK NO. 310189 REV. 1
+		|===================================|
+		|=|                                 |
+		|=|                                 |
+		|=|      ROM                        |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|===================================|
+		
+		ROM     - MOS 25128 "317043-01 (C) 1984 CBM 26011D-787"
+		-->
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="317043-01.u1" size="0x4000" crc="994c9b98" sha1="30a0707efe24f58525bffc228085f412d574fa3b" offset="0x0000" />
+				<rom name="317043-01.u1" size="0x4000" crc="994c9b98" sha1="30a0707efe24f58525bffc228085f412d574fa3b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64,9 +94,24 @@
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="T116001" />
+		<!--
+		ARTWORK NO. 310189 REV. 1
+		|===================================|
+		|=|                                 |
+		|=|                                 |
+		|=|      ROM                        |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|=|                                 |
+		|===================================|
+		
+		ROM     - MOS 25128 "317050-02 (C) 1984 CBM"
+		-->
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="unknown.u1" size="0x4000" crc="eaaa44ed" sha1="97c269ab7b57a5ddfe65a06c29986c6ccb3aeb2b" offset="0x0000" />
+				<rom name="317050-02.u1" size="0x4000" crc="eaaa44ed" sha1="97c269ab7b57a5ddfe65a06c29986c6ccb3aeb2b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -80,10 +125,10 @@
 		<info name="serial" value="T112003" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="calc-lo" size="0x4000" crc="8a085df6" sha1="2b8c748d7be725a1e4106b9cca167bd85786b809" offset="0x0000" />
+				<rom name="calc-lo" size="0x4000" crc="8a085df6" sha1="2b8c748d7be725a1e4106b9cca167bd85786b809" offset="0" />
 			</dataarea>
 			<dataarea name="c1h" size="0x4000">
-				<rom name="calc-hi" size="0x4000" crc="772803a9" sha1="49810afc29476cc2b2750d96beabd003cffbd5a6" offset="0x0000" />
+				<rom name="calc-hi" size="0x4000" crc="772803a9" sha1="49810afc29476cc2b2750d96beabd003cffbd5a6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -95,10 +140,10 @@
 		<info name="serial" value="T113016" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="kb-lo" size="0x4000" crc="c999369c" sha1="fea0b7df5ccec5ce05390c650ff5f4ea878bd468" offset="0x0000" />
+				<rom name="kb-lo" size="0x4000" crc="c999369c" sha1="fea0b7df5ccec5ce05390c650ff5f4ea878bd468" offset="0" />
 			</dataarea>
 			<dataarea name="c1h" size="0x4000">
-				<rom name="kb-hi" size="0x4000" crc="a617e188" sha1="8754ecc8b6ce2652eea4b997fb1f3ff9d3d7c9cb" offset="0x0000" />
+				<rom name="kb-hi" size="0x4000" crc="a617e188" sha1="8754ecc8b6ce2652eea4b997fb1f3ff9d3d7c9cb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -110,7 +155,7 @@
 		<info name="serial" value="T232001" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="317048-01.u1" size="0x4000" crc="5b0e82ae" sha1="0f1b8b20331c8c502fed507eca5d66683667757b" offset="0x0000" />
+				<rom name="317048-01.u1" size="0x4000" crc="5b0e82ae" sha1="0f1b8b20331c8c502fed507eca5d66683667757b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -123,10 +168,10 @@
 		<info name="video" value="NTSC" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="317046-01.u1" size="0x4000" crc="216fc5a8" sha1="6e22c082ef2659af4eb10f8acb14175941c9edc9" offset="0x0000" />
+				<rom name="317046-01.u1" size="0x4000" crc="216fc5a8" sha1="6e22c082ef2659af4eb10f8acb14175941c9edc9" offset="0" />
 			</dataarea>
 			<dataarea name="c1h" size="0x4000">
-				<rom name="317047-01.u2" size="0x4000" crc="4b7e5c5a" sha1="f2d4fdafef12762c96b88f06bb5d91644f54e5c7" offset="0x0000" />
+				<rom name="317047-01.u2" size="0x4000" crc="4b7e5c5a" sha1="f2d4fdafef12762c96b88f06bb5d91644f54e5c7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop" interface="floppy_5_25">
@@ -142,7 +187,7 @@
 		<publisher>Novotrade</publisher>
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c2l" size="0x4000">
-				<rom name="basic7" size="0x4000" crc="e900a1d5" sha1="5f96bdeffa42c18e869d9d045df65d98a4e561eb" offset="0x0000" />
+				<rom name="basic7" size="0x4000" crc="e900a1d5" sha1="5f96bdeffa42c18e869d9d045df65d98a4e561eb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -152,12 +197,28 @@
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="T112001" />
+		<!--
+		ARTWORK NO. 310189 REV. 1
+		|===================================|
+		|=|                                 |
+		|=|                                 |
+		|=|      ROM0                       |
+		|=|                                 |
+		|=|                                 |
+		|=|      ROM1                       |
+		|=|                                 |
+		|=|                                 |
+		|===================================|
+		
+		ROM0    - MOS 25128 "317051-01 (C) 1984 CBM 26011D-723"
+		ROM1    - MOS 25128 "317052-01 (C) 1984 CBM 26011D-724"
+		-->
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="317051-01.u1" size="0x4000" crc="d1679eea" sha1="d6d0d8f7feb16cdba650696683c02fcf62422f4a" offset="0x0000" />
+				<rom name="317051-01.u1" size="0x4000" crc="d1679eea" sha1="d6d0d8f7feb16cdba650696683c02fcf62422f4a" offset="0" />
 			</dataarea>
 			<dataarea name="c1h" size="0x4000">
-				<rom name="317052-01.u2" size="0x4000" crc="ad0696d9" sha1="5d7c6d0f2c732c92ca8f8f98486e08137824a4a4" offset="0x0000" />
+				<rom name="317052-01.u2" size="0x4000" crc="ad0696d9" sha1="5d7c6d0f2c732c92ca8f8f98486e08137824a4a4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -168,7 +229,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="speedy.u1" size="0x2000" crc="74f180bc" sha1="79a4b19c50bc9a85c0356a3d2d7453b2d1d8266f" offset="0x0000" />
+				<rom name="speedy.u1" size="0x2000" crc="74f180bc" sha1="79a4b19c50bc9a85c0356a3d2d7453b2d1d8266f" offset="0" />
 				<rom size="0x2000" offset="0x2000" loadflag="reload" />
 			</dataarea>
 		</part>
@@ -181,7 +242,7 @@
 		<info name="author" value="Andreas Arens" />
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="turboplus.u1" size="0x2000" crc="88b40daf" sha1="bb02e863193b9f7731e9bf5b554bb1e743a0a573" offset="0x0000" />
+				<rom name="turboplus.u1" size="0x2000" crc="88b40daf" sha1="bb02e863193b9f7731e9bf5b554bb1e743a0a573" offset="0" />
 				<rom size="0x2000" offset="0x2000" loadflag="reload" />
 			</dataarea>
 		</part>
