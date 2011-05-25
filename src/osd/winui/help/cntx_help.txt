@@ -202,3 +202,19 @@ Selects the volume level in games.
 Enables waiting for vertical sync.
 .topic HIDC_WINDOWED
 Enables running games in a window.
+.topic HIDC_HLSL_ALPHA
+Adjusts the alpha.
+.topic HIDC_HLSL_CURV
+Adjusts the curvature.
+.topic HIDC_HLSL_SAT
+Adjusts the saturation.
+.topic HIDC_HLSL_SHADOW
+Adjusts the effect of the shadowmask on the picture.
+.topic HIDC_HLSL_PIN
+Adjusts the pincushion distortion.
+.topic HIDC_HLSL_FLOOR
+.topic HIDC_HLSL_SCALE
+.topic HIDC_HLSL_POWER
+.topic HIDC_HLSL_PLIFE
+.topic HIDC_HLSL_ON
+Enables HLSL video enhancements.

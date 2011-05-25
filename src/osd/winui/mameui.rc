@@ -775,6 +775,63 @@ BEGIN
                     0,0,HIDC_USE_DEFAULT
 END
 
+IDD_PROP_HLSL DIALOGEX 0, 0, 220, 240
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "HLSL"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDI_DISPLAY,IDC_STATIC,20,10,20,20
+    LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,169,25,
+                    SS_NOPREFIX
+    CONTROL         "Enable",IDC_HLSL_ON,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,40,69,10,0
+    GROUPBOX        "Pincushion",IDC_STATIC,4,89,103,24
+    CONTROL         "GammaSlider",IDC_HLSL_PIN,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,10,99,71,10,0
+    RTEXT           "0.00",IDC_HLSL_PINDISP,84,98,14,11,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    GROUPBOX        "Scanline Alpha",IDC_STATIC,4,115,103,24
+    CONTROL         "GammaSlider",IDC_HLSL_ALPHA,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,10,125,71,10,0
+    RTEXT           "0.00",IDC_HLSL_ALPHADISP,84,124,14,10,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    GROUPBOX        "Screen Curvature",IDC_STATIC,4,141,103,24
+    CONTROL         "GammaSlider",IDC_HLSL_CURV,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,10,151,71,10,0
+    RTEXT           "0.00",IDC_HLSL_CURVDISP,84,150,14,10,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    GROUPBOX        "Shadowmask Alpha",IDC_STATIC,4,167,103,24
+    CONTROL         "GammaSlider",IDC_HLSL_SHADOW,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,10,176,71,10,0
+    RTEXT           "0.00",IDC_HLSL_SHADOWDISP,84,175,14,11,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    GROUPBOX        "Saturation",IDC_STATIC,4,193,103,24
+    CONTROL         "GammaSlider",IDC_HLSL_SAT,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,10,203,71,10,0
+    RTEXT           "1.00",IDC_HLSL_SATDISP,84,202,14,11,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    GROUPBOX        "Colour Scale",IDC_STATIC,113,89,102,24
+    CONTROL         "Slider1",IDC_HLSL_SCALE,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,119,99,71,10,0
+    RTEXT           "1.00",IDC_HLSL_SCALEDISP,193,98,16,10,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    GROUPBOX        "Colour Power",IDC_STATIC,113,115,102,24
+    CONTROL         "Slider1",IDC_HLSL_POWER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,119,125,71,10,0
+    RTEXT           "1.00",IDC_HLSL_POWERDISP,193,124,16,10,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    GROUPBOX        "Colour Phosphor Life",IDC_STATIC,113,141,102,24
+    CONTROL         "Slider1",IDC_HLSL_PLIFE,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,119,151,71,10,0
+    RTEXT           "0.00",IDC_HLSL_PLIFEDISP,193,150,16,11,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    GROUPBOX        "Colour Floor",IDC_STATIC,113,167,102,24
+    CONTROL         "Slider1",IDC_HLSL_FLOOR,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,119,177,71,10,0
+    RTEXT           "0.00",IDC_HLSL_FLOORDISP,193,176,16,11,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+END
+
 IDD_PROP_SOUND DIALOGEX 0, 0, 220, 240
 STYLE WS_CHILD | WS_CAPTION
 CAPTION "Sound"
@@ -1463,6 +1520,14 @@ BEGIN
     END
 
     IDD_PROP_DISPLAY, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        VERTGUIDE, 7
+        VERTGUIDE, 123
+        HORZGUIDE, 179
+    END
+
+    IDD_PROP_HLSL, DIALOG
     BEGIN
         LEFTMARGIN, 4
         VERTGUIDE, 7

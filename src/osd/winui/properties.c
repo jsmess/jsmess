@@ -1622,6 +1622,7 @@ static void SetPropEnabledControls(HWND hWnd)
 	BOOL useart = TRUE;
 	int joystick_attached = 0;
 	int in_window = 0;
+	bool hlsl_on = 0;
 
 	nIndex = g_nGame;
 
@@ -1675,6 +1676,19 @@ static void SetPropEnabledControls(HWND hWnd)
 	EnableWindow(GetDlgItem(hWnd, IDC_BEZELS),			useart);
 	EnableWindow(GetDlgItem(hWnd, IDC_OVERLAYS),		useart);
 	EnableWindow(GetDlgItem(hWnd, IDC_ARTMISCTEXT),		useart);
+
+	// HLSL
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_ON), TRUE);
+	hlsl_on = pCurrentOpts.bool_value(WINOPTION_HLSL_ENABLE);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_ALPHA),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_CURV),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_SAT),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_SHADOW),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PIN),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_FLOOR),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_SCALE),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_POWER),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PLIFE),		hlsl_on);
 
 	/* Joystick options */
 	joystick_attached = DIJoystick.Available();
@@ -2355,6 +2369,26 @@ static void BuildDataMap(void)
 	// show menu
 	datamap_add(properties_datamap, IDC_SHOW_MENU,				DM_BOOL,	WINOPTION_MENU);
 
+	// hlsl
+	datamap_add(properties_datamap, IDC_HLSL_ON,				DM_BOOL,	WINOPTION_HLSL_ENABLE);
+	datamap_add(properties_datamap, IDC_HLSL_ALPHA,				DM_FLOAT,	WINOPTION_SCANLINE_AMOUNT);
+	datamap_add(properties_datamap, IDC_HLSL_ALPHADISP,			DM_FLOAT,	WINOPTION_SCANLINE_AMOUNT);
+	datamap_add(properties_datamap, IDC_HLSL_CURV,				DM_FLOAT,	WINOPTION_CURVATURE);
+	datamap_add(properties_datamap, IDC_HLSL_CURVDISP,			DM_FLOAT,	WINOPTION_CURVATURE);
+	datamap_add(properties_datamap, IDC_HLSL_SAT,				DM_FLOAT,	WINOPTION_SATURATION);
+	datamap_add(properties_datamap, IDC_HLSL_SATDISP,			DM_FLOAT,	WINOPTION_SATURATION);
+	datamap_add(properties_datamap, IDC_HLSL_SHADOW,			DM_FLOAT,	WINOPTION_SHADOW_MASK_ALPHA);
+	datamap_add(properties_datamap, IDC_HLSL_SHADOWDISP,			DM_FLOAT,	WINOPTION_SHADOW_MASK_ALPHA);
+	datamap_add(properties_datamap, IDC_HLSL_PIN,				DM_FLOAT,	WINOPTION_PINCUSHION);
+	datamap_add(properties_datamap, IDC_HLSL_PINDISP,			DM_FLOAT,	WINOPTION_PINCUSHION);
+	datamap_add(properties_datamap, IDC_HLSL_FLOOR,				DM_FLOAT,	WINOPTION_RED_FLOOR);
+	datamap_add(properties_datamap, IDC_HLSL_FLOORDISP,			DM_FLOAT,	WINOPTION_RED_FLOOR);
+	datamap_add(properties_datamap, IDC_HLSL_SCALE,				DM_FLOAT,	WINOPTION_RED_SCALE);
+	datamap_add(properties_datamap, IDC_HLSL_SCALEDISP,			DM_FLOAT,	WINOPTION_RED_SCALE);
+	datamap_add(properties_datamap, IDC_HLSL_POWER,				DM_FLOAT,	WINOPTION_RED_POWER);
+	datamap_add(properties_datamap, IDC_HLSL_POWERDISP,			DM_FLOAT,	WINOPTION_RED_POWER);
+	datamap_add(properties_datamap, IDC_HLSL_PLIFE,				DM_FLOAT,	WINOPTION_RED_PHOSPHOR);
+	datamap_add(properties_datamap, IDC_HLSL_PLIFEDISP,			DM_FLOAT,	WINOPTION_RED_PHOSPHOR);
 
 	// set up callbacks
 	datamap_set_callback(properties_datamap, IDC_ROTATE,		DCT_READ_CONTROL,		RotateReadControl);
@@ -2388,11 +2422,20 @@ static void BuildDataMap(void)
 	datamap_set_float_format(properties_datamap, IDC_FSGAMMADISP,		"%03.2f");
 	datamap_set_float_format(properties_datamap, IDC_FSBRIGHTNESSDISP,	"%03.2f");
 	datamap_set_float_format(properties_datamap, IDC_FSCONTRASTDISP,	"%03.2f");
-	datamap_set_float_format(properties_datamap, IDC_JDZDISP,			"%03.2f");
-	datamap_set_float_format(properties_datamap, IDC_JSATDISP,			"%03.2f");
-	datamap_set_float_format(properties_datamap, IDC_SPEEDDISP,			"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_JDZDISP,		"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_JSATDISP,		"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_SPEEDDISP,		"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_ALPHADISP,	"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_CURVDISP,		"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_SATDISP,		"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_SHADOWDISP,	"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_PINDISP,		"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_FLOORDISP,	"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_SCALEDISP,	"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_POWERDISP,	"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_PLIFEDISP,	"%03.2f");
 
-	// trackbar ranges
+	// trackbar ranges - looks like start,end,step
 	datamap_set_trackbar_range(properties_datamap, IDC_PRESCALE,    1, 10, 1);
 	datamap_set_trackbar_range(properties_datamap, IDC_JDZ,         0.00, 1.00,  (float)0.05);
 	datamap_set_trackbar_range(properties_datamap, IDC_JSAT,        0.00, 1.00,  (float)0.05);
@@ -2400,6 +2443,15 @@ static void BuildDataMap(void)
 	datamap_set_trackbar_range(properties_datamap, IDC_BEAM,        (float)0.10, 10.00, (float)0.10);
 	datamap_set_trackbar_range(properties_datamap, IDC_VOLUME,      -32,  0, 1);
 	datamap_set_trackbar_range(properties_datamap, IDC_SECONDSTORUN, 0,  60, 1);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_ALPHA, 0.00,  4.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_CURV, 0.00,  4.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_SAT, 0.00,  4.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_SHADOW, 0.00,  1.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_PIN, 0.00,  4.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_FLOOR, 0.00,  1.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_SCALE, 0.00,  2.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_POWER, 0.01,  32.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_PLIFE, 0.00,  1.00, (float)0.01);
 
 	MessBuildDataMap(properties_datamap);
 }
