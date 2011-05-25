@@ -638,11 +638,11 @@ void psxgpu_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 #if defined( MAME_DEBUG )
 	if( DebugMeshDisplay( bitmap, cliprect ) )
 	{
-		return 0;
+		return;
 	}
 	if( DebugTextureDisplay( bitmap ) )
 	{
-		return 0;
+		return;
 	}
 #endif
 
