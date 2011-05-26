@@ -82,9 +82,9 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_ctc;
+	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;
-	required_device<device_t> m_sio;
+	required_device<z80dart_device> m_sio;
 	optional_device<device_t> m_discrete;
 	required_device<device_t> m_ram;
 
