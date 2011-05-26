@@ -691,7 +691,6 @@ static INTERRUPT_GEN( bbcb_vsync )
 	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
 	via_0->write_ca1(1);
 	via_0->write_ca1(0);
-	bbc_frameclock(device->machine());
 }
 
 
@@ -802,15 +801,13 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(800,300)
-	MCFG_SCREEN_VISIBLE_AREA(0,800-1,0,300-1)
 	MCFG_SCREEN_UPDATE(bbc)
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(bbc)
 	MCFG_SAA505X_VIDEO_ADD("saa505x", bbc_saa505x_intf)
 
-//    MCFG_MC6845_ADD("mc6845",MC6845,2000000, bbc_mc6845_intf)
+    MCFG_MC6845_ADD("mc6845",MC6845,2000000, bbc_mc6845_intf)
 
 	MCFG_VIDEO_START(bbca)
 

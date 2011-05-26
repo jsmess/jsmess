@@ -6,55 +6,20 @@
     Gordon Jefferyes
     mess_bbc@romvault.com
 
+	This is the first go around at converting the BBC code over to using
+	mames built in mc6845, there are a number of features now incorrect 
+	or missing in this build:
+	
+	Cursors are missing.
+	Mode 7 is shifted to the right by a couple of character.
+	BBC split modes no longer work (Like is used in Elite.)
+
 ******************************************************************************/
 
 #include "emu.h"
 #include "includes/bbc.h"
-#include "video/m6845.h"
 #include "saa505x.h"
 #include "video/mc6845.h"
-
-static MC6845_UPDATE_ROW( vid_update_row );
-static WRITE_LINE_DEVICE_HANDLER( vid_hsync_changed );
-static WRITE_LINE_DEVICE_HANDLER( vid_vsync_changed );
-
-static void BBC_draw_hi_res(running_machine &machine);
-static void BBC_draw_teletext(running_machine &machine);
-
-const mc6845_interface bbc_mc6845_intf =
-{
-	"screen",						/* screen number */
-	8,								/* numbers of pixels per video memory address */
-	NULL,							/* begin_update */
-	vid_update_row,					/* update_row */
-	NULL,							/* end_update */
-	DEVCB_NULL,						/* on_de_changed */
-	DEVCB_NULL,						/* on_cur_changed */
-	DEVCB_LINE(vid_hsync_changed),	/* on_hsync_changed */
-	DEVCB_LINE(vid_vsync_changed),	/* on_vsync_changed */
-	NULL
-};
-
-static MC6845_UPDATE_ROW( vid_update_row )
-{
-	int x_pos;
-	int pixelno;
-	for(x_pos=0; x_pos<x_count; x_pos++)
-	{
-		for(pixelno=0; pixelno<8; pixelno++)
-		{
-			*BITMAP_ADDR16(bitmap, y, (x_pos*8)+pixelno)=2;
-		}
-	}
-}
-static WRITE_LINE_DEVICE_HANDLER( vid_hsync_changed )
-{
-}
-
-static WRITE_LINE_DEVICE_HANDLER( vid_vsync_changed )
-{
-}
-
 
 /************************************************************************
  * C0 and C1 along with MA12 output from the 6845 drive 4 NAND gates in ICs 27,36 and 40
@@ -71,7 +36,7 @@ static WRITE_LINE_DEVICE_HANDLER( vid_vsync_changed )
  * the output of S4 is linked out to a 0v supply by link S25 to just access the 16K memory area.
  ************************************************************************/
 
-unsigned int calculate_video_address(bbc_state *state,int ma)
+unsigned int calculate_video_address(bbc_state *state,int ma,int ra)
 {
 	// ma = output from IC2 6845 MA address
 
@@ -114,7 +79,7 @@ unsigned int calculate_video_address(bbc_state *state,int ma)
 		m=((ma&0x3ff)|0x3c00)|((s&0x8)<<11);
 	} else {
 		// IC 8 and IC 9
-		m=((ma&0xff)<<3)|(s<<11)|(m6845_row_address_r(0)&0x7);
+		m=((ma&0xff)<<3)|(s<<11)|(ra&0x7);
 	}
 	if (state->m_memorySize==16)
 		return  m & 0x3fff;
@@ -122,44 +87,11 @@ unsigned int calculate_video_address(bbc_state *state,int ma)
 	return m;
 }
 
-
-
-
-
-/************************************************************************
- * Teletext Interface circuits
- ************************************************************************/
-static void BBC_draw_teletext(running_machine &machine)
-{
-	bbc_state *state = machine.driver_data<bbc_state>();
-
-	//Teletext Latch bits 0 to 5 go to bits 0 to 5 on the Teletext chip
-	//Teletext Latch bit 6 is only passed onto bits 6 on the Teletext chip if DE is true
-	//Teletext Latch bit 7 goes to LOSE on the Teletext chip
-
-	teletext_LOSE_w(state->m_saa505x, 0, (state->m_Teletext_Latch>>7)&1);
-
-	teletext_F1(state->m_saa505x);
-
-	teletext_data_w(state->m_saa505x, 0, (state->m_Teletext_Latch&0x3f)|((state->m_Teletext_Latch&0x40)|(m6845_display_enabled_r(0)?0:0x40)));
-
-	int meml=m6845_memory_address_r(0);
-
-	if (((meml>>13)&1)==0)
-	{
-		state->m_Teletext_Latch=0;
-	} else {
-		state->m_Teletext_Latch=(state->m_BBC_Video_RAM[calculate_video_address(state,meml)]&0x7f)|(m6845_display_enabled_r(0)?0x80:0);
-	}
-
-}
 /************************************************************************
  * VideoULA
  ************************************************************************/
 
 static const int pixels_per_byte_set[8]={ 2,4,8,16,1,2,4,8 };
-
-static const int emulation_pixels_per_real_pixel_set[4]={ 8,4,2,1 };
 
 static const int width_of_cursor_set[8]={ 0,0,1,2,1,0,2,4 };
 
@@ -193,6 +125,7 @@ WRITE8_HANDLER ( bbc_videoULA_w )
 	{
 	// Set the control register in the Video ULA
 	case 0:
+		{
 		state->m_videoULA_Reg=data;
 		state->m_videoULA_master_cursor_size=    (state->m_videoULA_Reg>>7)&0x01;
 		state->m_videoULA_width_of_cursor=       (state->m_videoULA_Reg>>5)&0x03;
@@ -205,41 +138,34 @@ WRITE8_HANDLER ( bbc_videoULA_w )
 
 		state->m_emulation_cursor_size=width_of_cursor_set[state->m_videoULA_width_of_cursor|(state->m_videoULA_master_cursor_size<<2)];
 
+		// this is the number of BBC pixels held in each byte
 		if (state->m_videoULA_teletext_normal_select)
 		{
 			state->m_pixels_per_byte=6;
-			state->m_emulation_pixels_per_byte=18;
-			state->m_emulation_pixels_per_real_pixel=3;
-			state->m_x_screen_offset=-154;
-			state->m_y_screen_offset=0;
-			state->m_draw_function=*BBC_draw_teletext;
 		} else {
-			// this is the number of BBC pixels held in each byte
 			state->m_pixels_per_byte=pixels_per_byte_set[state->m_videoULA_characters_per_line|(state->m_videoULA_6845_clock_rate<<2)];
-
-			// this is the number of emulation display pixels
-			state->m_emulation_pixels_per_byte=state->m_videoULA_6845_clock_rate?8:16;
-			state->m_emulation_pixels_per_real_pixel=emulation_pixels_per_real_pixel_set[state->m_videoULA_characters_per_line];
-			state->m_x_screen_offset=-96;
-			state->m_y_screen_offset=-11;
-			state->m_draw_function=*BBC_draw_hi_res;
 		}
-
+		mc6845_device *mc6845 = state->machine().device<mc6845_device>("mc6845");
+		mc6845->set_hpixels_per_column(state->m_pixels_per_byte);
+		if (state->m_videoULA_6845_clock_rate)
+			mc6845->set_clock(2000000);
+		else	
+			mc6845->set_clock(1000000);
+		}
 		break;
 	// Set a pallet register in the Video ULA
 	case 1:
 		int tpal=(data>>4)&0x0f;
 		int tcol=data&0x0f;
-		state->m_videoULA_pallet0[tpal]=tcol^7;
-		state->m_videoULA_pallet1[tpal]=tcol<8?tcol^7:tcol;
+		state->m_videoULA_pallet0[tpal]=tcol;
+		state->m_videoULA_pallet1[tpal]=tcol<8?tcol:tcol^7;
 		break;
 	}
-
 }
-
 
 // VideoULA Internal Cursor controls
 
+/*
 static void set_cursor(bbc_state *state)
 {
 	state->m_cursor_state=state->m_VideoULA_CR?0:7;
@@ -256,6 +182,266 @@ static void BBC_Clock_CR(bbc_state *state)
 		}
 	}
 }
+*/
+/************************************************************************
+ * BBC circuits controlled by 6845 Outputs
+ ************************************************************************/
+
+int returned_pixel_count;
+int returned_pixels[6];
+
+static MC6845_UPDATE_ROW( vid_update_row )
+{
+
+	bbc_state *state = device->machine().driver_data<bbc_state>();
+
+    logerror("MC6845_UPDATE_ROW: ma=%d, ra=%d, y=%d, x_count=%d\n",ma,ra,y,x_count);
+
+	if (state->m_videoULA_teletext_normal_select)
+	{
+		
+			teletext_LOSE_w(state->m_saa505x, 0,0);
+			teletext_LOSE_w(state->m_saa505x, 0,1);
+
+		for(int x_pos=0; x_pos<x_count; x_pos++)
+		{
+			//Teletext Latch bits 0 to 5 go to bits 0 to 5 on the Teletext chip
+			//Teletext Latch bit 6 is only passed onto bits 6 on the Teletext chip if DE is true
+			//Teletext Latch bit 7 goes to LOSE on the Teletext chip
+
+			returned_pixel_count=0;
+
+
+			teletext_F1(state->m_saa505x);
+
+			teletext_data_w(state->m_saa505x, 0, (state->m_Teletext_Latch&0x3f)|(state->m_Teletext_Latch&0x40));
+
+			if (((ma>>13)&1)==0)
+			{
+				state->m_Teletext_Latch=0;
+			} else {
+				state->m_Teletext_Latch=(state->m_BBC_Video_RAM[calculate_video_address(state,ma+x_pos,ra)]&0x7f);
+			}
+			for(int pixelno=0;pixelno<6;pixelno++)
+			{
+				int col=returned_pixels[pixelno];
+			
+					*BITMAP_ADDR16(bitmap, y, (x_pos*state->m_pixels_per_byte)+pixelno)=col;
+			}
+
+
+		}
+	}
+	else
+	{
+		// this is IC38 and IC41 takes 6845 DisplayEnabled and 6845 RA3
+		int DE= !(ra>=8);
+
+		if (DE)
+		{
+			for(int x_pos=0; x_pos<x_count; x_pos++)
+			{
+				int vmem=calculate_video_address(state,ma+x_pos,ra);
+				unsigned char i=state->m_BBC_Video_RAM[vmem];
+
+				for(int pixelno=0;pixelno<state->m_pixels_per_byte;pixelno++)
+				{
+					int col=state->m_videoULA_pallet_lookup[state->m_pixel_bits[i]];
+					*BITMAP_ADDR16(bitmap, y, (x_pos*state->m_pixels_per_byte)+pixelno)=col;
+					i=(i<<1)|1;
+				}
+			}
+		}
+		else
+		{
+			for(int x_pos=0; x_pos<x_count; x_pos++)
+			{
+				for(int pixelno=0;pixelno<state->m_pixels_per_byte;pixelno++)
+				{
+					*BITMAP_ADDR16(bitmap, y, (x_pos*state->m_pixels_per_byte)+pixelno)=7;
+				}
+			}
+		}
+	}
+}
+
+static WRITE_LINE_DEVICE_HANDLER( bbc_vsync )
+{
+	bbc_state *bstate = device->machine().driver_data<bbc_state>();
+	teletext_DEW(bstate->m_saa505x);
+}
+
+
+const mc6845_interface bbc_mc6845_intf =
+{
+	"screen",						/* screen number */
+	8,								/* numbers of pixels per video memory address */
+	NULL,							/* begin_update */
+	vid_update_row,					/* update_row */
+	NULL,							/* end_update */
+	DEVCB_NULL,						/* on_de_changed */
+	DEVCB_NULL,						/* on_cur_changed */
+	DEVCB_NULL,						/* on_hsync_changed */
+	DEVCB_LINE(bbc_vsync),			/* on_vsync_changed */
+	NULL
+};
+
+
+void bbc_draw_RGB_in(device_t *device, int offset,int data)
+{
+	if (returned_pixel_count<6)
+		returned_pixels[returned_pixel_count++]=7-data;
+
+}
+
+
+
+
+/************************************************************************
+ * memory interface to BBC's 6845
+ ************************************************************************/
+
+WRITE8_HANDLER ( bbc_6845_w )
+{
+	mc6845_device *mc6845 = space->machine().device<mc6845_device>("mc6845");
+	switch(offset & 1)
+	{
+		case 0 :
+			mc6845->address_w(*space,0,data);
+			break;
+		case 1 :
+			mc6845->register_w(*space,0,data);
+			break;
+	}
+	return;
+}
+
+READ8_HANDLER (bbc_6845_r)
+{
+
+	mc6845_device *mc6845 = space->machine().device<mc6845_device>("mc6845");
+
+	switch (offset&1)
+	{
+		case 0: return mc6845->status_r(*space,0); break;
+		case 1: return mc6845->register_r(*space,0); break;
+	}
+	return 0;
+}
+
+
+
+
+
+/************************************************************************
+ * bbc_vh_screenrefresh
+ * resfresh the BBC video screen
+ ************************************************************************/
+
+SCREEN_UPDATE( bbc )
+{
+
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>("mc6845");
+	mc6845->update( bitmap, cliprect);
+
+    return 0;
+
+}
+
+/**** BBC B+ Shadow Ram change ****/
+
+void bbcbp_setvideoshadow(running_machine &machine, int vdusel)
+{
+	bbc_state *state = machine.driver_data<bbc_state>();
+	if (vdusel)
+	{
+		state->m_BBC_Video_RAM= machine.region("maincpu")->base()+0x8000;
+	} else {
+		state->m_BBC_Video_RAM= machine.region("maincpu")->base();
+	}
+}
+
+/************************************************************************
+ * bbc_vh_start
+ * Initialize the BBC video emulation
+ ************************************************************************/
+
+static void common_init(running_machine &machine, int memorySize)
+{
+	bbc_state *state = machine.driver_data<bbc_state>();
+	state->m_emulation_cursor_size = 1;
+
+	state->m_VideoULA_CR = 7;
+	state->m_VideoULA_CR_counter = 0;
+
+	set_pixel_lookup(state);
+	state->m_saa505x = machine.device("saa505x");
+
+	state->m_BBC_Video_RAM = machine.region("maincpu")->base();
+	state->m_memorySize=memorySize;
+
+}
+
+VIDEO_START( bbca )
+{
+	common_init(machine,16);
+}
+
+VIDEO_START( bbcb )
+{
+	common_init(machine,32);
+}
+
+VIDEO_START( bbcbp )
+{
+	common_init(machine,32);
+}
+
+VIDEO_START( bbcm )
+{
+	common_init(machine,32);
+}
+
+
+/*
+
+Old removed BBC mc6845 video code.
+This has now all been replaced by MAMEs mc6845 code.
+
+
+
+static void BBC_draw_hi_res(running_machine &machine);
+static void BBC_draw_teletext(running_machine &machine);
+
+
+
+
+static void BBC_draw_teletext(running_machine &machine)
+{
+	bbc_state *state = machine.driver_data<bbc_state>();
+
+	//Teletext Latch bits 0 to 5 go to bits 0 to 5 on the Teletext chip
+	//Teletext Latch bit 6 is only passed onto bits 6 on the Teletext chip if DE is true
+	//Teletext Latch bit 7 goes to LOSE on the Teletext chip
+
+	teletext_LOSE_w(state->m_saa505x, 0, (state->m_Teletext_Latch>>7)&1);
+
+	teletext_F1(state->m_saa505x);
+
+	teletext_data_w(state->m_saa505x, 0, (state->m_Teletext_Latch&0x3f)|((state->m_Teletext_Latch&0x40)|(m6845_display_enabled_r(0)?0:0x40)));
+
+	int meml=m6845_memory_address_r(0);
+
+	if (((meml>>13)&1)==0)
+	{
+		state->m_Teletext_Latch=0;
+	} else {
+		state->m_Teletext_Latch=(state->m_BBC_Video_RAM[calculate_video_address(state,meml)]&0x7f)|(m6845_display_enabled_r(0)?0x80:0);
+	}
+
+}
+
+
 
 
 
@@ -280,6 +466,23 @@ static void BBC_ula_drawpixel(bbc_state *state, int col, int number_of_pixels)
 
 
 // the Video ULA hi-res shift registers, pallette lookup and display enabled circuits
+
+
+
+
+
+static const struct m6845_interface BBC6845 =
+{
+	0,// Memory Address register
+	0,// Row Address register
+	BBC_Set_HSync,// Horizontal status
+	BBC_Set_VSync,// Vertical status
+	0,// Display Enabled status
+	0,// Cursor status
+	BBC_Set_CRE, // Cursor status Emulation
+};
+
+
 
 static void BBC_draw_hi_res(running_machine &machine)
 {
@@ -322,9 +525,6 @@ void bbc_draw_RGB_in(device_t *device, int offset,int data)
 
 
 
-/************************************************************************
- * BBC circuits controlled by 6845 Outputs
- ************************************************************************/
 
 
 // called when the 6845 changes the HSync
@@ -392,38 +592,22 @@ static void BBC_Set_CRE(running_machine &machine, int offset, int data)
 }
 
 
-static const struct m6845_interface BBC6845 =
-{
-	0,// Memory Address register
-	0,// Row Address register
-	BBC_Set_HSync,// Horizontal status
-	BBC_Set_VSync,// Vertical status
-	0,// Display Enabled status
-	0,// Cursor status
-	BBC_Set_CRE, // Cursor status Emulation
-};
 
 
-
-
-
-/************************************************************************
- * memory interface to BBC's 6845
- ************************************************************************/
 
 WRITE8_HANDLER ( bbc_6845_w )
 {
-	/*device_t *mc6845 = space->machine().device("mc6845");
+	mc6845_device *mc6845 = space->machine().device<mc6845_device>("mc6845");
 	switch(offset & 1)
 	{
 		case 0 :
-			mc6845_address_w(mc6845,0,data);
+			mc6845->address_w(*space,0,data);
 			break;
 		case 1 :
-			mc6845_register_w(mc6845,0,data);
+			mc6845->register_w(*space,0,data);
 			break;
 	}
-	return;*/
+	return;
 
 	switch (offset&1)
 	{
@@ -440,14 +624,14 @@ WRITE8_HANDLER ( bbc_6845_w )
  READ8_HANDLER (bbc_6845_r)
 {
 
-	/*device_t *mc6845 = space->machine().device("mc6845");
+	mc6845_device *mc6845 = space->machine().device<mc6845_device>("mc6845");
 
 	switch (offset&1)
 	{
-		case 0: return mc6845_status_r(mc6845,0); break;
-		case 1: return mc6845_register_r(mc6845,0); break;
+		case 0: return mc6845->status_r(*space,0); break;
+		case 1: return mc6845->register_r(*space,0); break;
 	}
-	return 0;*/
+	return 0;
 
 	int retval=0;
 
@@ -466,18 +650,13 @@ WRITE8_HANDLER ( bbc_6845_w )
 
 
 
-/************************************************************************
- * bbc_vh_screenrefresh
- * resfresh the BBC video screen
- ************************************************************************/
-
 SCREEN_UPDATE( bbc )
 {
 
-	//device_t *devconf = screen->machine().device("mc6845");
-	//mc6845_update( devconf, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>("mc6845");
+	mc6845->update( bitmap, cliprect);
 
- //   return 0;
+    return 0;
 
 
 
@@ -527,60 +706,4 @@ void bbc_frameclock(running_machine &machine)
 	m6845_frameclock();
 }
 
-/**** BBC B+ Shadow Ram change ****/
-
-void bbcbp_setvideoshadow(running_machine &machine, int vdusel)
-{
-	bbc_state *state = machine.driver_data<bbc_state>();
-	if (vdusel)
-	{
-		state->m_BBC_Video_RAM= machine.region("maincpu")->base()+0x8000;
-	} else {
-		state->m_BBC_Video_RAM= machine.region("maincpu")->base();
-	}
-}
-
-/************************************************************************
- * bbc_vh_start
- * Initialize the BBC video emulation
- ************************************************************************/
-
-static void common_init(running_machine &machine, int memorySize)
-{
-	bbc_state *state = machine.driver_data<bbc_state>();
-	state->m_emulation_cursor_size = 1;
-	state->m_x_screen_offset = -96;
-	state->m_y_screen_offset = -8;
-
-	state->m_VideoULA_CR = 7;
-	state->m_VideoULA_CR_counter = 0;
-
-	set_pixel_lookup(state);
-	m6845_config(&BBC6845);
-	state->m_saa505x = machine.device("saa505x");
-
-	state->m_BBC_Video_RAM = machine.region("maincpu")->base();
-	state->m_draw_function = *BBC_draw_hi_res;
-	state->m_memorySize=memorySize;
-
-}
-
-VIDEO_START( bbca )
-{
-	common_init(machine,16);
-}
-
-VIDEO_START( bbcb )
-{
-	common_init(machine,32);
-}
-
-VIDEO_START( bbcbp )
-{
-	common_init(machine,32);
-}
-
-VIDEO_START( bbcm )
-{
-	common_init(machine,32);
-}
+*/

@@ -3436,7 +3436,7 @@ void teletext_data_w(device_t *device, int offset, int data)
 void teletext_DEW(device_t *device)
 {
 	teletext_t *tt = get_safe_token(device);
-	tt->linecount=9;
+	tt->linecount=18;
 	tt->double_height=0;
 	tt->double_height_set=0;
 	tt->double_height_offset=0;
@@ -3454,7 +3454,7 @@ void teletext_LOSE_w(device_t *device, int offset, int data)
 		tt->colour=7;
 		tt->bgcolour=0;
 		tt->graphics=teletext_graphics;
-		tt->linecount=(tt->linecount+1)%10;
+		tt->linecount=(tt->linecount+1)%19;
 		tt->start_line=0;
 		tt->double_height=0;
 		tt->flash=0;
@@ -3564,7 +3564,7 @@ void teletext_F1(device_t *device)
 			}
 		}
 		tt->lastcode=code;
-		code=(code-0x20)*60+(6*((tt->linecount+tt->start_line)>>tt->double_height));
+		code=(code-0x20)*60+(6*(((tt->linecount/2)+tt->start_line)>>tt->double_height));
 		for(sc1=0;sc1<6;sc1++)
 		{
 			(tt->intf->out_Pixel_func)(device,0,tt->lookup[code++]?tt->rcolour:tt->bgcolour);

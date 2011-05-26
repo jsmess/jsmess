@@ -203,11 +203,6 @@ public:
 	int m_videoULA_pallet0[16];
 	int m_videoULA_pallet1[16];
 	int *m_videoULA_pallet_lookup;
-
-	// this is the pixel position of the start of a scanline
-	// -96 sets the screen display to the middle of emulated screen.
-	int m_x_screen_offset;
-	int m_y_screen_offset;
 	
 	void (*m_draw_function)(running_machine &machine);
 };
@@ -302,7 +297,6 @@ SCREEN_UPDATE( bbc );
 
 void bbc_draw_RGB_in(device_t *device, int offset, int data);
 void bbc_set_video_memory_lookups(running_machine &machine, int ramsize);
-void bbc_frameclock(running_machine &machine);
 void bbc_setscreenstart(running_machine &machine, int b4, int b5);
 void bbcbp_setvideoshadow(running_machine &machine, int vdusel);
 
