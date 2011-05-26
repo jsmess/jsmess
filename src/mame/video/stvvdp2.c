@@ -108,6 +108,7 @@ In other words,the first three types uses the offset and not the color allocated
 static UINT8 get_hblank(running_machine &machine);
 static int get_vblank_duration(running_machine &machine);
 static int get_hblank_duration(running_machine &machine);
+static int get_pixel_clock(running_machine &machine);
 static UINT8 get_odd_bit(running_machine &machine);
 
 static void refresh_palette_data(running_machine &machine);
@@ -5317,44 +5318,15 @@ WRITE32_HANDLER ( saturn_vdp2_regs_w )
 	}
 }
 
-static UINT8 get_hblank(running_machine &machine)
-{
-	static int cur_h;
-
-	const rectangle &visarea = machine.primary_screen->visible_area();
-	cur_h = machine.primary_screen->hpos();
-
-	if (cur_h > visarea.max_x)
-		return 1;
-	else
-		return 0;
-}
-
 /* the following is a complete guess-work */
 static int get_hblank_duration(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	switch( STV_VDP2_HRES & 3 )
-	{
-		case 0: return 80;  //400-320
-		case 1: return 104; //456-352
-		case 2: return 160; //(400-320)*2
-		case 3: return 208; //(456-352)*2
-	}
 
-	return 0;
-}
+	if(STV_VDP2_HRES & 2)
+		return 464*2;
 
-UINT8 stv_get_vblank(running_machine &machine)
-{
-	static int cur_v;
-	const rectangle &visarea = machine.primary_screen->visible_area();
-	cur_v = machine.primary_screen->vpos();
-
-	if (cur_v > visarea.max_y)
-		return 1;
-	else
-		return 0;
+	return 464;
 }
 
 /*some vblank lines measurements (according to Charles MacDonald)*/
@@ -5362,19 +5334,71 @@ static int get_vblank_duration(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
+	/* TODO: interlace mode "eats" one line, should be 262.5 */
+
 	if(STV_VDP2_HRES & 4)
-		return (STV_VDP2_HRES & 1) ? 480+82 : 480+45; //Hi-Vision / 31kHz Monitor
+		return (STV_VDP2_HRES & 1) ? 561 : 525; //Hi-Vision / 31kHz Monitor
 
 	if((STV_VDP2_LSMD & 3) == 3)
-		return 264*2;
+		return 263*2;
 
-	return 264;
+	return 263; //TODO: PAL uses 313
+}
+
+static int get_pixel_clock(running_machine &machine)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	int res,divider;
+
+	res = state->m_vdp2.pixel_clock ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
+	/* TODO: divider is ALWAYS 8, this thing is just to over-compensate for MAME framework faults ... */
+	divider = 8;
+
+	if(STV_VDP2_HRES & 2)
+		divider>>=1;
+
+	if((STV_VDP2_LSMD & 3) == 3)
+		divider>>=1;
+
+	if(STV_VDP2_HRES & 4) //TODO
+		divider>>=1;
+
+	return res/divider;
+}
+
+static UINT8 get_hblank(running_machine &machine)
+{
+	static int cur_h;
+	const rectangle &visarea = machine.primary_screen->visible_area();
+	cur_h = machine.primary_screen->hpos();
+
+	if (cur_h > visarea.max_x) //TODO
+		return 1;
+
+	return 0;
+}
+
+UINT8 stv_get_vblank(running_machine &machine)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	int cur_v,vblank;
+	cur_v = machine.primary_screen->vpos();
+
+	vblank = 240;
+
+	if((STV_VDP2_LSMD & 3) == 3)
+		vblank<<=1;
+
+	if (cur_v >= vblank)
+		return 1;
+
+	return 0;
 }
 
 static UINT8 get_odd_bit(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	static int cur_v;
+	int cur_v;
 	cur_v = machine.primary_screen->vpos();
 
 	if(STV_VDP2_HRES & 4) //exclusive monitor mode makes this bit to be always 1
@@ -5382,8 +5406,8 @@ static UINT8 get_odd_bit(running_machine &machine)
 
 	if(cur_v % 2)
 		return 1;
-	else
-		return 0;
+
+	return 0;
 }
 
 static void stv_vdp2_state_save_postload(running_machine &machine)
@@ -5477,35 +5501,23 @@ VIDEO_START( stv_vdp2 )
 void stv_vdp2_dynamic_res_change(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	int horz_res = 0,vert_res = 0;
+	const int d_vres[4] = { 224, 240, 256, 256 };
+	const int d_hres[4] = { 320, 352, 640, 704 };
+	int horz_res,vert_res;
 
-	switch( STV_VDP2_VRES & 3 )
-	{
-		case 0: vert_res = 224; break;
-		case 1: vert_res = 240; break;
-		case 2: vert_res = 256; break;
-		case 3:
-			if(LOG_VDP2) logerror("WARNING: V Res setting (3) not allowed!\n");
-			vert_res = 256;
-			break;
-	}
+	vert_res = d_vres[STV_VDP2_VRES & 1]; //TODO: PAL uses mask 3, NTSC uses mask 1
+
+	if((STV_VDP2_VRES & 3) == 3)
+		popmessage("Illegal VRES MODE, contact MAMEdev");
 
 	/*Double-density interlace mode,doubles the vertical res*/
 	if((STV_VDP2_LSMD & 3) == 3) { vert_res*=2;  }
 
-	switch( STV_VDP2_HRES & 7 )
-	{
-		case 0: horz_res = 320; break;
-		case 1: horz_res = 352; break;
-		case 2: horz_res = 640; break;
-		case 3: horz_res = 704; break;
-		/*Exclusive modes,they sets the Vertical Resolution without considering the
-            VRES register.*/
-		case 4: horz_res = 320; vert_res = 480; break;
-		case 5: horz_res = 352; vert_res = 480; break;
-		case 6: horz_res = 640; vert_res = 480; break;
-		case 7: horz_res = 704; vert_res = 480; break;
-	}
+	horz_res = d_hres[STV_VDP2_HRES & 3];
+	/*Exclusive modes,they sets the Vertical Resolution without considering the
+      VRES register.*/
+	if(STV_VDP2_HRES & 4)
+		vert_res = 480;
 
 	{
 		int vblank_period,hblank_period;
@@ -5514,13 +5526,14 @@ void stv_vdp2_dynamic_res_change(running_machine &machine)
 		visarea.max_x = horz_res-1;
 		visarea.min_y = 0;
 		visarea.max_y = vert_res-1;
+		attoseconds_t refresh;;
 
 		vblank_period = get_vblank_duration(machine);
 		hblank_period = get_hblank_duration(machine);
-
+		refresh  = HZ_TO_ATTOSECONDS(get_pixel_clock(machine)) * (hblank_period) * vblank_period;
 		//printf("%d %d %d %d\n",horz_res,vert_res,horz_res+hblank_period,vblank_period);
 
-		machine.primary_screen->configure((horz_res+hblank_period), (vblank_period), visarea, machine.primary_screen->frame_period().attoseconds );
+		machine.primary_screen->configure((hblank_period), (vblank_period), visarea, refresh );
 	}
 //  machine.primary_screen->set_visible_area(0*8, horz_res-1,0*8, vert_res-1);
 	//if(LOG_VDP2) popmessage("%04d %04d",horz_res-1,vert-1);
@@ -5624,8 +5637,8 @@ static void stv_vdp2_get_window0_coordinates(running_machine &machine,UINT16 *s_
 			*e_y = ((STV_VDP2_W0EY & 0x3ff) >> 0);
 			break;
 		case 3:
-			*s_y = ((STV_VDP2_W0SY & 0x7ff) >> 0);
-			*e_y = ((STV_VDP2_W0EY & 0x7ff) >> 0);
+			*s_y = ((STV_VDP2_W1SY & 0x7ff) >> 0) << 1;
+			*e_y = ((STV_VDP2_W1EY & 0x7ff) >> 0) << 1;
 			break;
 	}
 	switch(STV_VDP2_HRES & 6)
@@ -5671,8 +5684,8 @@ static void stv_vdp2_get_window1_coordinates(running_machine &machine,UINT16 *s_
 			*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0);
 			break;
 		case 3:
-			*s_y = ((STV_VDP2_W1SY & 0x3ff) >> 0);
-			*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0);
+			*s_y = ((STV_VDP2_W1SY & 0x3ff) >> 0) << 1;
+			*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0) << 1;
 			break;
 	}
 	switch(STV_VDP2_HRES & 6)
@@ -5935,6 +5948,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	mycliprect.max_x = cliprect->max_x;
 	mycliprect.min_y = cliprect->min_y;
 	mycliprect.max_y = cliprect->max_y;
+
 	stv_vdp2_apply_window_on_layer(machine,&mycliprect);
 
 	if (interlace_framebuffer == 0 && double_x == 0 )
@@ -6115,7 +6129,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	}
 	else
 	{
-		for ( y = mycliprect.min_y; y <= mycliprect.max_y; y++ )
+		for ( y = mycliprect.min_y; y <= mycliprect.max_y / (interlace_framebuffer+1); y++ )
 		{
 			if ( stv_sprite_priorities_usage_valid )
 				if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
@@ -6132,7 +6146,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 				bitmap_line2 = BITMAP_ADDR16(bitmap, 2*y + 1, 0);
 			}
 
-			for ( x = mycliprect.min_x; double_x ? x <= ((mycliprect.max_x)/2) : (x <= mycliprect.max_x); x++ )
+			for ( x = mycliprect.min_x; x <= mycliprect.max_x /(double_x+1) ; x++ )
 			{
 				pix = framebuffer_line[x];
 				if ( (pix & 0x8000) && sprite_color_mode)
@@ -6433,7 +6447,7 @@ SCREEN_UPDATE( stv_vdp2 )
 		fp=fopen("mamevdp1", "w+b");
 		if (fp)
 		{
-			fwrite(stv_vdp1_vram, 0x80000, 1, fp);
+			fwrite(state->m_vdp1_vram, 0x80000, 1, fp);
 			fclose(fp);
 		}
 	}
@@ -6445,7 +6459,7 @@ SCREEN_UPDATE( stv_vdp2 )
 		fp=fopen("vdp1_vram.bin", "r+b");
 		if (fp)
 		{
-			fread(stv_vdp1_vram, 0x80000, 1, fp);
+			fread(state->m_vdp1_vram, 0x80000, 1, fp);
 			fclose(fp);
 		}
 	}
