@@ -1621,8 +1621,9 @@ static void SetPropEnabledControls(HWND hWnd)
 	BOOL gdi = FALSE;
 	BOOL useart = TRUE;
 	int joystick_attached = 0;
-	int in_window = 0;
+	bool in_window = 0;
 	bool hlsl_on = 0;
+	int d3d_version = 8;
 
 	nIndex = g_nGame;
 
@@ -1677,18 +1678,64 @@ static void SetPropEnabledControls(HWND hWnd)
 	EnableWindow(GetDlgItem(hWnd, IDC_OVERLAYS),		useart);
 	EnableWindow(GetDlgItem(hWnd, IDC_ARTMISCTEXT),		useart);
 
-	// HLSL
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_ON), TRUE);
-	hlsl_on = pCurrentOpts.bool_value(WINOPTION_HLSL_ENABLE);
+	// HLSL - only enable if D3D selected, and Version 9 selected
+	if (d3d)
+	{
+		d3d_version = pCurrentOpts.int_value(WINOPTION_D3DVERSION);
+
+		if (d3d_version >= 9)
+			hlsl_on = pCurrentOpts.bool_value(WINOPTION_HLSL_ENABLE);
+	}
+
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_ON), (d3d_version >= 9));
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_ALPHATEXT),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_ALPHADISP),	hlsl_on);
 	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_ALPHA),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_CURVTEXT),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_CURVDISP),	hlsl_on);
 	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_CURV),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_SATTEXT),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_SATDISP),	hlsl_on);
 	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_SAT),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_SHADOWTEXT),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_SHADOWDISP),	hlsl_on);
 	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_SHADOW),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PINTEXT),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PINDISP),	hlsl_on);
 	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PIN),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_FLOOR),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_SCALE),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_POWER),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PLIFE),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_XFOCUS),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_YFOCUS),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_XFOCUSDISP),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_YFOCUSDISP),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_FOCUSTEXT),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RSCALE),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GSCALE),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BSCALE),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RSCALEDISP),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GSCALEDISP),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BSCALEDISP),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_SCALETEXT),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RPOWER),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GPOWER),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BPOWER),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RPOWERDISP),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GPOWERDISP),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BPOWERDISP),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_POWERTEXT),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RPLIFE),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GPLIFE),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BPLIFE),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RPLIFEDISP),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GPLIFEDISP),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BPLIFEDISP),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PLIFETEXT),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RFLOOR),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GFLOOR),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BFLOOR),		hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RFLOORDISP),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GFLOORDISP),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BFLOORDISP),	hlsl_on);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_FLOORTEXT),	hlsl_on);
 
 	/* Joystick options */
 	joystick_attached = DIJoystick.Available();
@@ -2381,14 +2428,34 @@ static void BuildDataMap(void)
 	datamap_add(properties_datamap, IDC_HLSL_SHADOWDISP,			DM_FLOAT,	WINOPTION_SHADOW_MASK_ALPHA);
 	datamap_add(properties_datamap, IDC_HLSL_PIN,				DM_FLOAT,	WINOPTION_PINCUSHION);
 	datamap_add(properties_datamap, IDC_HLSL_PINDISP,			DM_FLOAT,	WINOPTION_PINCUSHION);
-	datamap_add(properties_datamap, IDC_HLSL_FLOOR,				DM_FLOAT,	WINOPTION_RED_FLOOR);
-	datamap_add(properties_datamap, IDC_HLSL_FLOORDISP,			DM_FLOAT,	WINOPTION_RED_FLOOR);
-	datamap_add(properties_datamap, IDC_HLSL_SCALE,				DM_FLOAT,	WINOPTION_RED_SCALE);
-	datamap_add(properties_datamap, IDC_HLSL_SCALEDISP,			DM_FLOAT,	WINOPTION_RED_SCALE);
-	datamap_add(properties_datamap, IDC_HLSL_POWER,				DM_FLOAT,	WINOPTION_RED_POWER);
-	datamap_add(properties_datamap, IDC_HLSL_POWERDISP,			DM_FLOAT,	WINOPTION_RED_POWER);
-	datamap_add(properties_datamap, IDC_HLSL_PLIFE,				DM_FLOAT,	WINOPTION_RED_PHOSPHOR);
-	datamap_add(properties_datamap, IDC_HLSL_PLIFEDISP,			DM_FLOAT,	WINOPTION_RED_PHOSPHOR);
+	datamap_add(properties_datamap, IDC_HLSL_XFOCUS,			DM_FLOAT,	WINOPTION_DEFOCUS_X);
+	datamap_add(properties_datamap, IDC_HLSL_YFOCUS,			DM_FLOAT,	WINOPTION_DEFOCUS_Y);
+	datamap_add(properties_datamap, IDC_HLSL_XFOCUSDISP,			DM_FLOAT,	WINOPTION_DEFOCUS_X);
+	datamap_add(properties_datamap, IDC_HLSL_YFOCUSDISP,			DM_FLOAT,	WINOPTION_DEFOCUS_Y);
+	datamap_add(properties_datamap, IDC_HLSL_RSCALE,			DM_FLOAT,	WINOPTION_RED_SCALE);
+	datamap_add(properties_datamap, IDC_HLSL_GSCALE,			DM_FLOAT,	WINOPTION_GREEN_SCALE);
+	datamap_add(properties_datamap, IDC_HLSL_BSCALE,			DM_FLOAT,	WINOPTION_BLUE_SCALE);
+	datamap_add(properties_datamap, IDC_HLSL_RSCALEDISP,			DM_FLOAT,	WINOPTION_RED_SCALE);
+	datamap_add(properties_datamap, IDC_HLSL_GSCALEDISP,			DM_FLOAT,	WINOPTION_GREEN_SCALE);
+	datamap_add(properties_datamap, IDC_HLSL_BSCALEDISP,			DM_FLOAT,	WINOPTION_BLUE_SCALE);
+	datamap_add(properties_datamap, IDC_HLSL_RPOWER,			DM_FLOAT,	WINOPTION_RED_POWER);
+	datamap_add(properties_datamap, IDC_HLSL_GPOWER,			DM_FLOAT,	WINOPTION_GREEN_POWER);
+	datamap_add(properties_datamap, IDC_HLSL_BPOWER,			DM_FLOAT,	WINOPTION_BLUE_POWER);
+	datamap_add(properties_datamap, IDC_HLSL_RPOWERDISP,			DM_FLOAT,	WINOPTION_RED_POWER);
+	datamap_add(properties_datamap, IDC_HLSL_GPOWERDISP,			DM_FLOAT,	WINOPTION_GREEN_POWER);
+	datamap_add(properties_datamap, IDC_HLSL_BPOWERDISP,			DM_FLOAT,	WINOPTION_BLUE_POWER);
+	datamap_add(properties_datamap, IDC_HLSL_RPLIFE,			DM_FLOAT,	WINOPTION_RED_PHOSPHOR);
+	datamap_add(properties_datamap, IDC_HLSL_GPLIFE,			DM_FLOAT,	WINOPTION_GREEN_PHOSPHOR);
+	datamap_add(properties_datamap, IDC_HLSL_BPLIFE,			DM_FLOAT,	WINOPTION_BLUE_PHOSPHOR);
+	datamap_add(properties_datamap, IDC_HLSL_RPLIFEDISP,			DM_FLOAT,	WINOPTION_RED_PHOSPHOR);
+	datamap_add(properties_datamap, IDC_HLSL_GPLIFEDISP,			DM_FLOAT,	WINOPTION_GREEN_PHOSPHOR);
+	datamap_add(properties_datamap, IDC_HLSL_BPLIFEDISP,			DM_FLOAT,	WINOPTION_BLUE_PHOSPHOR);
+	datamap_add(properties_datamap, IDC_HLSL_RFLOOR,			DM_FLOAT,	WINOPTION_RED_FLOOR);
+	datamap_add(properties_datamap, IDC_HLSL_GFLOOR,			DM_FLOAT,	WINOPTION_GREEN_FLOOR);
+	datamap_add(properties_datamap, IDC_HLSL_BFLOOR,			DM_FLOAT,	WINOPTION_BLUE_FLOOR);
+	datamap_add(properties_datamap, IDC_HLSL_RFLOORDISP,			DM_FLOAT,	WINOPTION_RED_FLOOR);
+	datamap_add(properties_datamap, IDC_HLSL_GFLOORDISP,			DM_FLOAT,	WINOPTION_GREEN_FLOOR);
+	datamap_add(properties_datamap, IDC_HLSL_BFLOORDISP,			DM_FLOAT,	WINOPTION_BLUE_FLOOR);
 
 	// set up callbacks
 	datamap_set_callback(properties_datamap, IDC_ROTATE,		DCT_READ_CONTROL,		RotateReadControl);
@@ -2430,10 +2497,20 @@ static void BuildDataMap(void)
 	datamap_set_float_format(properties_datamap, IDC_HLSL_SATDISP,		"%03.2f");
 	datamap_set_float_format(properties_datamap, IDC_HLSL_SHADOWDISP,	"%03.2f");
 	datamap_set_float_format(properties_datamap, IDC_HLSL_PINDISP,		"%03.2f");
-	datamap_set_float_format(properties_datamap, IDC_HLSL_FLOORDISP,	"%03.2f");
-	datamap_set_float_format(properties_datamap, IDC_HLSL_SCALEDISP,	"%03.2f");
-	datamap_set_float_format(properties_datamap, IDC_HLSL_POWERDISP,	"%03.2f");
-	datamap_set_float_format(properties_datamap, IDC_HLSL_PLIFEDISP,	"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_RFLOORDISP,	"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_GFLOORDISP,	"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_BFLOORDISP,	"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_RSCALEDISP,	"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_GSCALEDISP,	"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_BSCALEDISP,	"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_XFOCUSDISP,	"%3.0f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_YFOCUSDISP,	"%3.0f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_RPOWERDISP,	"%3.0f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_GPOWERDISP,	"%3.0f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_BPOWERDISP,	"%3.0f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_RPLIFEDISP,	"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_GPLIFEDISP,	"%03.2f");
+	datamap_set_float_format(properties_datamap, IDC_HLSL_BPLIFEDISP,	"%03.2f");
 
 	// trackbar ranges - looks like start,end,step
 	datamap_set_trackbar_range(properties_datamap, IDC_PRESCALE,    1, 10, 1);
@@ -2448,10 +2525,20 @@ static void BuildDataMap(void)
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_SAT, 0.00,  4.00, (float)0.01);
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_SHADOW, 0.00,  1.00, (float)0.01);
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_PIN, 0.00,  4.00, (float)0.01);
-	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_FLOOR, 0.00,  1.00, (float)0.01);
-	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_SCALE, 0.00,  2.00, (float)0.01);
-	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_POWER, 0.01,  32.00, (float)0.01);
-	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_PLIFE, 0.00,  1.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_RFLOOR, 0.00,  1.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_GFLOOR, 0.00,  1.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_BFLOOR, 0.00,  1.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_RSCALE, 0.00,  2.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_GSCALE, 0.00,  2.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_BSCALE, 0.00,  2.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_RPOWER, 0.0,  32.0, (float)1.0);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_GPOWER, 0.0,  32.0, (float)1.0);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_BPOWER, 0.0,  32.0, (float)1.0);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_XFOCUS, 0.0,  16.0, (float)1.0);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_YFOCUS, 0.0,  16.0, (float)1.0);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_RPLIFE, 0.00,  1.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_GPLIFE, 0.00,  1.00, (float)0.01);
+	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_BPLIFE, 0.00,  1.00, (float)0.01);
 
 	MessBuildDataMap(properties_datamap);
 }
