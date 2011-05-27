@@ -20,6 +20,7 @@
 #include "machine/i82371ab.h"
 #include "machine/i82439tx.h"
 #include "machine/cs4031.h"
+#include "machine/cs8221.h"
 #include "machine/pit8253.h"
 #include "video/pc_vga_mess.h"
 #include "video/pc_cga.h"
@@ -79,7 +80,15 @@ static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
 ADDRESS_MAP_END
 
-
+static ADDRESS_MAP_START( neat_map, AS_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x09ffff) AM_MIRROR(0xff000000) AM_RAMBANK("bank10")
+	AM_RANGE(0x0c0000, 0x0c7fff) AM_ROM
+	AM_RANGE(0x0c8000, 0x0cffff) AM_ROM
+	AM_RANGE(0x0d0000, 0x0effff) AM_RAM
+	AM_RANGE(0x0f0000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0xfeffff) AM_RAM
+	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( at386_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)
@@ -161,6 +170,45 @@ static ADDRESS_MAP_START(at16_io, AS_IO, 16)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
+static READ16_HANDLER( neat_chipset_r )
+{
+	if (ACCESSING_BITS_0_7)
+		return downcast<cs8221_device *>(space->machine().device("cs8221"))->data_r(*space, 0, 0);
+	return 0xffff;
+}
+
+static WRITE16_HANDLER( neat_chipset_w )
+{
+	if (ACCESSING_BITS_0_7)
+		downcast<cs8221_device *>(space->machine().device("cs8221"))->address_w(*space, 0, data, 0);
+
+	if (ACCESSING_BITS_8_15)
+		downcast<cs8221_device *>(space->machine().device("cs8221"))->data_w(*space, 0, data >> 8, 0);
+}
+
+static ADDRESS_MAP_START(neat_io, AS_IO, 16)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0022, 0x0023) AM_READWRITE(neat_chipset_r, neat_chipset_w)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffff)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
+	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8_MODERN("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write , 0xffff)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,               at_page8_w, 0xffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide16_r, ide16_w)
+	AM_RANGE(0x0200, 0x0207) AM_READWRITE8(pc_JOY_r,                 pc_JOY_w, 0xffff)
+	AM_RANGE(0x0220, 0x022f) AM_READWRITE8(soundblaster_r,           soundblaster_w, 0xffff)
+	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ns16450_3", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ns16450_1", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_r, pc_lpt_w, 0x00ff)
+	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ns16450_2", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,                 pc_fdc_w, 0xffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ins8250_r, ins8250_w, 0xffff)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(at386_io, AS_IO, 32)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
@@ -691,6 +739,66 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_START( neat, at_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I80286, 12000000)
+	MCFG_CPU_PROGRAM_MAP(neat_map)
+	MCFG_CPU_IO_MAP(neat_io)
+	MCFG_CPU_CONFIG(i286_address_mask)
+
+	MCFG_PIT8254_ADD( "pit8254", at_pit8254_config )
+
+	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, at_dma8237_1_config )
+
+	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
+
+	MCFG_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
+
+	MCFG_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
+
+	MCFG_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
+	MCFG_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
+	MCFG_NS16450_ADD( "ns16450_2", ibm5170_com_interface[2] )			/* TODO: verify model */
+	MCFG_NS16450_ADD( "ns16450_3", ibm5170_com_interface[3] )			/* TODO: verify model */
+
+	MCFG_FRAGMENT_ADD( pcvideo_cga )
+
+	MCFG_MACHINE_START( at )
+	MCFG_MACHINE_RESET( at )
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
+	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
+
+	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
+
+	MCFG_CS8221_ADD("cs8221", "maincpu", "isa", "bios")
+	
+	/* printers */
+	MCFG_PC_LPT_ADD("lpt_0", at_lpt_config)
+	MCFG_PC_LPT_ADD("lpt_1", at_lpt_config)
+	MCFG_PC_LPT_ADD("lpt_2", at_lpt_config)
+
+	/* harddisk */
+	MCFG_HARDDISK_ADD("harddisk")
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+
+	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+
+	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("1664K")
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( atvga, at_state )
 	/* basic machine hardware */
@@ -1319,7 +1427,7 @@ COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,	ps2m30286,  "Internat
 COMP ( 1989, i8555081, ibm5170, 0,       at386,		atvga,	at386,		"International Business Machines",  "IBM PS/2 Model 55SX", GAME_NOT_WORKING )
 COMP ( 1987, at,       ibm5170, 0,       ibm5162,   atcga,	atcga,      "<generic>",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1988, cmdpc30,  ibm5170, 0,       ibm5162,   atcga,	atcga,      "Commodore Business Machines",  "PC 30 III", GAME_NOT_WORKING )
-COMP ( 1989, neat,     ibm5170, 0,       ibm5162,   atcga,	atcga,      "<generic>",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1989, neat,     ibm5170, 0,       neat,   	atcga,	atcga,      "<generic>",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	at_vga,     "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,	at386,      "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga,	at386,      "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
