@@ -351,6 +351,18 @@ static void fdc_coco_dskreg_w(device_t *device, UINT8 data)
 	else if (data & 0x40)
 		drive = 3;
 
+	device_t *floppy[4];
+
+	floppy[0] = device->machine().device(FLOPPY_0);
+	floppy[1] = device->machine().device(FLOPPY_1);
+	floppy[2] = device->machine().device(FLOPPY_2);
+	floppy[3] = device->machine().device(FLOPPY_3);
+
+	for (int i = 0; i < 4; i++)
+	{
+		floppy_mon_w(floppy[i], i == drive ? CLEAR_LINE : ASSERT_LINE);
+	}
+
 	head = ((data & 0x40) && (drive != 3)) ? 1 : 0;
 
 	fdc->dskreg = data;
