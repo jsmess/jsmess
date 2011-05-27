@@ -2,20 +2,19 @@
  Contributors:
 
     Marat Fayzullin (MG source)
-    Charles Mac Donald
+    Charles MacDonald
     Mathis Rosenhauer
     Brad Oliver
     Michael Luong
 
  To do:
 
- - PSG control for Game Gear (needs custom SN76489 with stereo output for each channel)
  - SIO interface for Game Gear (needs netplay, I guess)
  - SMS lightgun support
  - LCD persistence emulation for GG
  - SMS 3D glass support
 
- The Game Gear SIO and PSG hardware are not emulated but have some
+ The Game Gear SIO hardware is not emulated but has some
  placeholders in 'machine/sms.c'
 
  Changes:
@@ -114,7 +113,7 @@ static ADDRESS_MAP_START( sms_io, AS_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(sms_bios_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_WRITE(sms_io_control_w)
 	AM_RANGE(0x40, 0x7f)                 AM_READ(sms_count_r)
-	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("smsiii", sn76496_w)
+	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("segapsg", sn76496_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sms_vdp_data_r, sms_vdp_data_w)
 	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sms_vdp_ctrl_r, sms_vdp_ctrl_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1e) AM_READ(sms_input_port_0_r)
@@ -414,7 +413,7 @@ static MACHINE_CONFIG_START( sms_ntsc_base, sms_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("smsiii", SMSIII, XTAL_53_693175MHz/15)
+	MCFG_SOUND_ADD("segapsg", SEGAPSG, XTAL_53_693175MHz/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_FRAGMENT_ADD( sms_cartslot )
@@ -520,7 +519,7 @@ static MACHINE_CONFIG_START( sms_pal_base, sms_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("smsiii", SMSIII, MASTER_CLOCK_PAL/15)
+	MCFG_SOUND_ADD("segapsg", SEGAPSG, MASTER_CLOCK_PAL/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_FRAGMENT_ADD( sms_cartslot )

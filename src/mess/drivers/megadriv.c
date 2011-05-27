@@ -1,6 +1,6 @@
 /*
 
-    Megadrive / Genesis support (formerly in mess/drivers)
+    Megadrive / Genesis support
 
     Current Issues
 
