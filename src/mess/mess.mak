@@ -541,7 +541,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/terminal.o	\
 	$(MESS_MACHINE)/teleprinter.o	\
 	$(MESS_MACHINE)/upd7002.o	\
-	$(MESS_VIDEO)/crtc6845.o	\
 	$(MESS_VIDEO)/dl1416.o		\
 	$(MESS_VIDEO)/hd44780.o		\
 	$(MESS_VIDEO)/hd66421.o		\

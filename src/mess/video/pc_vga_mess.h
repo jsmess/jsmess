@@ -9,12 +9,7 @@
 #ifndef PC_VGA_H
 #define PC_VGA_H
 
-typedef void (*pc_video_update_proc)(bitmap_t *bitmap,
-	struct mscrtc6845 *crtc);
-
-struct mscrtc6845 *pc_video_start(running_machine &machine, const struct mscrtc6845_config *config,
-	pc_video_update_proc (*choosevideomode)(running_machine &machine, int *width, int *height, struct mscrtc6845 *crtc),
-	size_t vramsize);
+typedef void (*pc_video_update_proc)(bitmap_t *bitmap);
 
 MACHINE_CONFIG_EXTERN( pcvideo_vga );
 

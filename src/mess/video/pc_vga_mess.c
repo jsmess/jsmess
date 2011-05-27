@@ -30,7 +30,6 @@
 
 #include "emu.h"
 #include "pc_vga_mess.h"
-#include "includes/crtc6845.h"
 
 /***************************************************************************
 
@@ -38,10 +37,7 @@
 
 ***************************************************************************/
 
-static size_t pc_videoram_size;
-
-static pc_video_update_proc (*pc_choosevideomode)(running_machine &machine, int *width, int *height, struct mscrtc6845 *crtc);
-static struct mscrtc6845 *pc_crtc;
+static pc_video_update_proc (*pc_choosevideomode)(running_machine &machine, int *width, int *height);
 
 static int pc_current_height;
 static int pc_current_width;
@@ -58,7 +54,7 @@ static PALETTE_INIT( vga );
 static VIDEO_START( vga );
 static VIDEO_RESET( vga );
 
-static pc_video_update_proc pc_vga_choosevideomode(running_machine &machine, int *width, int *height, struct mscrtc6845 *crtc);
+static pc_video_update_proc pc_vga_choosevideomode(running_machine &machine, int *width, int *height);
 
 /***************************************************************************
 
@@ -66,40 +62,11 @@ static pc_video_update_proc pc_vga_choosevideomode(running_machine &machine, int
 
 ***************************************************************************/
 
-
-static void pc_video_postload(running_machine *machine)
-{
-	pc_current_height = -1;
-	pc_current_width = -1;
-}
-
-
-
-struct mscrtc6845 *pc_video_start(running_machine &machine, const struct mscrtc6845_config *config,
-	pc_video_update_proc (*choosevideomode)(running_machine &machine, int *width, int *height, struct mscrtc6845 *crtc),
-	size_t vramsize)
+void pc_video_start(running_machine &machine, pc_video_update_proc (*choosevideomode)(running_machine &machine, int *width, int *height))
 {
 	pc_choosevideomode = choosevideomode;
-	pc_crtc = NULL;
 	pc_current_height = -1;
 	pc_current_width = -1;
-	machine.generic.tmpbitmap = NULL;
-
-	pc_videoram_size = vramsize;
-	if (config)
-	{
-		pc_crtc = mscrtc6845_init(machine, config);
-		if (!pc_crtc)
-			return NULL;
-	}
-
-	if (pc_videoram_size)
-	{
-		video_start_generic_bitmapped(machine);
-	}
-
-	machine.save().register_postload(save_prepost_delegate(FUNC(pc_video_postload), &machine));
-	return pc_crtc;
 }
 
 
@@ -108,15 +75,7 @@ SCREEN_UPDATE( pc_video )
 {
 	UINT32 rc = 0;
 	int w = 0, h = 0;
-	pc_video_update_proc video_update;
-
-	if (pc_crtc)
-	{
-		w = mscrtc6845_get_char_columns(pc_crtc);
-		h = mscrtc6845_get_char_height(pc_crtc) * mscrtc6845_get_char_lines(pc_crtc);
-	}
-
-	video_update = pc_choosevideomode(screen->machine(), &w, &h, pc_crtc);
+	pc_video_update_proc video_update = pc_choosevideomode(screen->machine(), &w, &h);
 
 	if (video_update)
 	{
@@ -139,12 +98,7 @@ SCREEN_UPDATE( pc_video )
 			bitmap_fill(bitmap, cliprect, 0);
 		}
 
-		video_update(screen->machine().generic.tmpbitmap ? screen->machine().generic.tmpbitmap : bitmap, pc_crtc);
-
-		if (screen->machine().generic.tmpbitmap)
-		{
-			copybitmap(bitmap, screen->machine().generic.tmpbitmap, 0, 0, 0, 0, cliprect);
-		}
+		video_update(bitmap);
 	}
 	return rc;
 }
@@ -224,8 +178,15 @@ static struct
 } vga;
 
 
-// to use the mscrtc6845 macros
 #define REG(x) vga.crtc.data[x]
+
+#define CRTC_CHAR_HEIGHT ((REG(9)&0x1f)+1)
+#define CRTC_CURSOR_MODE (REG(0xa)&0x60)
+#define CRTC_CURSOR_OFF 0x20
+#define CRTC_SKEW	(REG(8)&15)
+#define CRTC_CURSOR_POS ((REG(0xe)<<8)|REG(0xf))
+#define CRTC_CURSOR_TOP	(REG(0xa)&0x1f)
+#define CRTC_CURSOR_BOTTOM REG(0xb)
 
 #define DOUBLESCAN ((vga.crtc.data[9]&0x80)||((vga.crtc.data[9]&0x1f)!=0))
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
@@ -250,18 +211,12 @@ static struct
 #define VGA_LINE_LENGTH (EGA_LINE_LENGTH<<2)
 
 #define CHAR_WIDTH ((vga.sequencer.data[1]&1)?8:9)
-//#define CHAR_HEIGHT ((vga.crtc.data[9]&0x1f)+1)
 
 #define TEXT_COLUMNS (vga.crtc.data[1]+1)
 #define TEXT_START_ADDRESS (EGA_START_ADDRESS)
 #define TEXT_LINE_LENGTH (EGA_LINE_LENGTH>>2)
 
 #define TEXT_COPY_9COLUMN(ch) ((ch>=192)&&(ch<=223)&&(vga.attribute.data[0x10]&4))
-
-//#define CURSOR_ON (!(vga.crtc.data[0xa]&0x20))
-//#define CURSOR_STARTLINE (vga.crtc.data[0xa]&0x1f)
-//#define CURSOR_ENDLINE (vga.crtc.data[0xb]&0x1f)
-//#define CURSOR_POS (vga.crtc.data[0xf]|(vga.crtc.data[0xe]<<8))
 
 #define FONT1 (  ((vga.sequencer.data[3]&0x3)    |((vga.sequencer.data[3]&0x10)<<2))*0x2000 )
 #define FONT2 ( (((vga.sequencer.data[3]&0xc)>>2)|((vga.sequencer.data[3]&0x20)<<3))*0x2000 )
@@ -1049,7 +1004,7 @@ static VIDEO_START( vga )
 	vga.monitor.get_sync_lines=vga_get_crtc_sync_lines;
 	vga.monitor.get_sync_columns=vga_get_crtc_sync_columns;
 	machine.scheduler().timer_pulse(attotime::from_hz(60), FUNC(vga_timer));
-	pc_video_start(machine, NULL, pc_vga_choosevideomode, 0);
+	pc_video_start(machine, pc_vga_choosevideomode);
 }
 
 static VIDEO_RESET( vga )
@@ -1057,17 +1012,17 @@ static VIDEO_RESET( vga )
 	pc_vga_reset(machine);
 }
 
-static void vga_vh_text(bitmap_t *bitmap, struct mscrtc6845 *crtc)
+static void vga_vh_text(bitmap_t *bitmap)
 {
 	UINT8 ch, attr;
 	UINT8 bits;
 	UINT8 *font;
 	UINT16 *bitmapline;
-	int width=CHAR_WIDTH, height=CRTC6845_CHAR_HEIGHT;
+	int width=CHAR_WIDTH, height=CRTC_CHAR_HEIGHT;
 	int pos, line, column, mask, w, h, addr;
 	pen_t pen;
 
-	if (CRTC6845_CURSOR_MODE!=CRTC6845_CURSOR_OFF)
+	if (CRTC_CURSOR_MODE!=CRTC_CURSOR_OFF)
 	{
 		if (++vga.cursor.time>=0x10)
 		{
@@ -1076,7 +1031,7 @@ static void vga_vh_text(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 		}
 	}
 
-	for (addr = TEXT_START_ADDRESS, line = -CRTC6845_SKEW; line < TEXT_LINES;
+	for (addr = TEXT_START_ADDRESS, line = -CRTC_SKEW; line < TEXT_LINES;
 		 line += height, addr += TEXT_LINE_LENGTH)
 	{
 		for (pos = addr, column=0; column<TEXT_COLUMNS; column++, pos++)
@@ -1110,11 +1065,11 @@ static void vga_vh_text(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 					bitmapline[column*width+w] = pen;
 				}
 			}
-			if ((CRTC6845_CURSOR_MODE!=CRTC6845_CURSOR_OFF)
-				&&vga.cursor.visible&&(pos==CRTC6845_CURSOR_POS))
+			if ((CRTC_CURSOR_MODE!=CRTC_CURSOR_OFF)
+				&&vga.cursor.visible&&(pos==CRTC_CURSOR_POS))
 			{
-				for (h=CRTC6845_CURSOR_TOP;
-					 (h<=CRTC6845_CURSOR_BOTTOM)&&(h<height)&&(line+h<TEXT_LINES);
+				for (h=CRTC_CURSOR_TOP;
+					 (h<=CRTC_CURSOR_BOTTOM)&&(h<height)&&(line+h<TEXT_LINES);
 					 h++)
 				{
 					plot_box(bitmap, column*width, line+h, width, 1, vga.pens[attr&0xf]);
@@ -1124,10 +1079,10 @@ static void vga_vh_text(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 	}
 }
 
-static void vga_vh_ega(bitmap_t *bitmap, struct mscrtc6845 *crtc)
+static void vga_vh_ega(bitmap_t *bitmap)
 {
 	int pos, line, column, c, addr, i;
-	int height = CRTC6845_CHAR_HEIGHT;
+	int height = CRTC_CHAR_HEIGHT;
 	UINT16 *bitmapline;
 	UINT16 *newbitmapline;
 	pen_t pen;
@@ -1169,7 +1124,7 @@ static void vga_vh_ega(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 	}
 }
 
-static void vga_vh_vga(bitmap_t *bitmap, struct mscrtc6845 *crtc)
+static void vga_vh_vga(bitmap_t *bitmap)
 {
 	int pos, line, column, c, addr, curr_addr;
 	UINT16 *bitmapline;
@@ -1227,7 +1182,7 @@ static void vga_vh_vga(bitmap_t *bitmap, struct mscrtc6845 *crtc)
 	}
 }
 
-static pc_video_update_proc pc_vga_choosevideomode(running_machine &machine, int *width, int *height, struct mscrtc6845 *crtc)
+static pc_video_update_proc pc_vga_choosevideomode(running_machine &machine, int *width, int *height)
 {
 	pc_video_update_proc proc = NULL;
 	int i;
