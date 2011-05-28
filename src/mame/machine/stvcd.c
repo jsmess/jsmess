@@ -41,7 +41,7 @@ static void cd_playdata(void);
 
 #define MAX_FILTERS	(24)
 #define MAX_BLOCKS	(200)
-#define MAX_DIR_SIZE	(16384)
+#define MAX_DIR_SIZE	(128*1024)
 
 typedef struct
 {
@@ -377,7 +377,7 @@ static UINT16 cd_readWord(UINT32 addr)
 
 			hirqreg = rv;
 
-//          CDROM_LOG(("%s:RW HIRQ: %04x\n", Machine->describe_context(), rv))
+//          CDROM_LOG(("RW HIRQ: %04x\n", rv))
 
 			return rv;
 
@@ -443,7 +443,7 @@ static UINT16 cd_readWord(UINT32 addr)
 			return rv;
 
 		default:
-			CDROM_LOG(("%s:CD: RW %08x\n", machine.describe_context(), addr))
+			CDROM_LOG(("CD: RW %08x\n", addr))
 			return 0xffff;
 	}
 
@@ -517,7 +517,7 @@ static UINT32 cd_readLong(UINT32 addr)
 			return rv;
 
 		default:
-			CDROM_LOG(("%s:CD: RL %08x\n", machine.describe_context(), addr))
+			CDROM_LOG(("CD: RL %08x\n", addr))
 			return 0xffff;
 	}
 }
@@ -933,7 +933,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			cr3 = 0x1800;
 			cr4 = 200;
-			CDROM_LOG(("%s:CD: Get Buffer Size = %d\n", cr2, machine.describe_context()))
+			CDROM_LOG(("CD: Get Buffer Size = %d\n", cr2))
 			hirqreg |= (CMOK|ESEL|DRDY);	// DRDY is probably wrong
 			break;
 
@@ -1183,7 +1183,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			break;
 
 		case 0x7200:	// Get file system scope
-			CDROM_LOG(("%s:CD: Get file system scope(PC=%x)\n",   machine.describe_context()))
+			CDROM_LOG(("CD: Get file system scope\n"))
 			hirqreg |= (CMOK|DRDY);
 			cr2 = numfiles;	// # of files in directory
 			cr3 = 0x0100;	// report directory held
@@ -1301,14 +1301,14 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			break;
 
 		default:
-			CDROM_LOG(("%s:CD: Unknown command %04x\n", cr1,   machine.describe_context()))
+			CDROM_LOG(("CD: Unknown command %04x\n", cr1))
 			hirqreg |= (CMOK);
 			break;
 		}
 //      CDROM_LOG(("ret: %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 		break;
 	default:
-		CDROM_LOG(("%s:CD: WW %08x %04x\n", addr, data, machine.describe_context()))
+		CDROM_LOG(("CD: WW %08x %04x\n", addr, data))
 		break;
 	}
 }
