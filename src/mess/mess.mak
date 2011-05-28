@@ -1243,7 +1243,6 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_VIDEO)/isa_mda.o		\
 	$(MESS_VIDEO)/pc_cga.o		\
 	$(MESS_VIDEO)/cgapal.o		\
-	$(MESS_VIDEO)/pc_vga_mess.o	\
 	$(MESS_VIDEO)/crtc_ega.o	\
 	$(MESS_VIDEO)/pc_ega.o		\
 	$(MESS_VIDEO)/ibm_vga.o		\

@@ -69,7 +69,7 @@ Tandy 1000 (80386) variations:
 #include "machine/pic8259.h"
 
 #include "machine/pit8253.h"
-#include "video/pc_vga_mess.h"
+#include "video/pc_vga.h"
 #include "video/pc_cga.h"
 #include "video/pc_aga.h"
 #include "video/pc_t1t.h"

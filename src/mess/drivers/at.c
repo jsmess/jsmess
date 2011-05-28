@@ -22,7 +22,7 @@
 #include "machine/cs4031.h"
 #include "machine/cs8221.h"
 #include "machine/pit8253.h"
-#include "video/pc_vga_mess.h"
+#include "video/pc_vga.h"
 #include "video/pc_cga.h"
 #include "video/pc_ega.h"
 

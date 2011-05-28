@@ -64,7 +64,7 @@
 #include "emu.h"
 #include "memconv.h"
 #include "cirrus.h"
-#include "pc_vga_mess.h"
+#include "video/pc_vga.h"
 
 #define LOG_PCIACCESS	0
 
