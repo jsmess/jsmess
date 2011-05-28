@@ -173,7 +173,9 @@ ADDRESS_MAP_END
 static READ16_HANDLER( neat_chipset_r )
 {
 	if (ACCESSING_BITS_0_7)
-		return downcast<cs8221_device *>(space->machine().device("cs8221"))->data_r(*space, 0, 0);
+		return 0xff;
+	if (ACCESSING_BITS_8_15)
+		return downcast<cs8221_device *>(space->machine().device("cs8221"))->data_r(*space, 0, 0) << 8;
 	return 0xffff;
 }
 
