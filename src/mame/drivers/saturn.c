@@ -2645,16 +2645,16 @@ static MACHINE_RESET( stv )
 static MACHINE_CONFIG_START( saturn, saturn_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_320/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(saturn_mem)
 	MCFG_CPU_CONFIG(sh2_conf_master)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", saturn_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_320/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(saturn_mem)
 	MCFG_CPU_CONFIG(sh2_conf_slave)
 
-	MCFG_CPU_ADD("audiocpu", M68000, MASTER_CLOCK_352/5) //11.46 MHz
+	MCFG_CPU_ADD("audiocpu", M68000, MASTER_CLOCK_320/5) //11.46 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
 	MCFG_MACHINE_START(saturn)
@@ -2667,7 +2667,7 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_320/8, 464, 0, 320, 263, 0, 224)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_320/8, 427, 0, 320, 263, 0, 224)
 	MCFG_SCREEN_UPDATE(stv_vdp2)
 
 	MCFG_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
@@ -2690,16 +2690,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( stv, saturn_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_320/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(stv_mem)
 	MCFG_CPU_CONFIG(sh2_conf_master)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", saturn_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_320/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(stv_mem)
 	MCFG_CPU_CONFIG(sh2_conf_slave)
 
-	MCFG_CPU_ADD("audiocpu", M68000, MASTER_CLOCK_352/5) //11.46 MHz
+	MCFG_CPU_ADD("audiocpu", M68000, MASTER_CLOCK_320/5) //11.46 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
 	MCFG_MACHINE_START(stv)
@@ -2714,7 +2714,7 @@ static MACHINE_CONFIG_START( stv, saturn_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_320/8, 464, 0, 320, 263, 0, 224)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_320/8, 427, 0, 320, 263, 0, 224)
 	MCFG_SCREEN_UPDATE(stv_vdp2)
 
 	MCFG_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
