@@ -913,6 +913,8 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_SCREEN_UPDATE(bbc)
 
 	MCFG_SAA505X_VIDEO_ADD("saa505x", bbc_saa505x_intf)
+	
+    MCFG_MC6845_ADD("mc6845",MC6845,2000000, bbc_mc6845_intf)
 
 	MCFG_VIDEO_START(bbcm)
 
