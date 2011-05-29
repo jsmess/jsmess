@@ -648,7 +648,7 @@ ROM_START(sms)
 
 	ROM_REGION(0x20000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
-	ROMX_LOAD("akbios.rom", 0x0000, 0x20000, CRC(CF4A09EA) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1))
+	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(CF4A09EA) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1)) /* "SEGA // MPR-12808 W63 // 9114E9004" @ IC2 */
 ROM_END
 
 ROM_START(smssdisp)
@@ -682,8 +682,8 @@ ROM_START(smspal)
 	ROM_FILL(0x0000, 0x4000, 0xff)
 
 	ROM_REGION(0x40000, "user1", 0)
-	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
-	ROMX_LOAD("akbios.rom", 0x0000, 0x20000, CRC(CF4A09EA) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" ) /* PCB Label: SEGA // IC BD M4Jr. PAL" Master System II with 314-5246 (ZIP) VDP and 314-5237 (DIP48) IO */
+	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(CF4A09EA) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1)) /* "SEGA // MPR-12808 W63 // 9114E9004" @ IC2 */
 	ROM_SYSTEM_BIOS( 1, "sonic", "European/Brazilian BIOS with Sonic the Hedgehog (1991)" )
 	ROMX_LOAD("sonbios.rom", 0x0000, 0x40000, CRC(81C3476B) SHA1(6aca0e3dffe461ba1cb11a86cd4caf5b97e1b8df), ROM_BIOS(2))
 ROM_END
@@ -730,17 +730,17 @@ ROM_END
 
   US
    - Sega Master System I (sms1)
-     - prototype bios - 1986
+     - prototype (M404) bios - 1986
      - without built-in game v1.3 - 1986
      - built-in Hang On/Safari Hunt v2.4 - 1988
      - built-in Hang On v3.4 - 1988
      - built-in Missile Defense 3-D v4.4 - 1988
      - built-in Hang On/Astro Warrior ????
-   - Sega Master System II (sms/sms2)
+   - Sega Master System II (sms)
      - built-in Alex Kidd in Miracle World - 1990
 
   JP
-   - Sega SG-1000 Mark III (smsm3)
+   - Sega SG-1000 Mark III (sg1000m3)
      - no bios
    - Sega Master System (I) (smsj)
      - without built-in game v2.1 - 1987
@@ -756,7 +756,7 @@ ROM_END
      - built-in Hang On v3.4 - 1988
      - built-in Missile Defense 3-D v4.4 - 1988
      - built-in Hang On/Astro Warrior ????
-   - Sega Master System II (sms2pal)
+   - Sega Master System II (smspal)
      - built-in Alex Kidd in Miracle World - 1990
      - built-in Sonic the Hedgehog - 1991
 
