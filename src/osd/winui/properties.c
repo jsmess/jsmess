@@ -2652,28 +2652,26 @@ static void InitializeSkippingUI(HWND hwnd)
 	{
 		(void)ComboBox_AddString(hCtrl, TEXT("Draw every frame"));
 		(void)ComboBox_SetItemData(hCtrl, i++, 0);
-		(void)ComboBox_AddString(hCtrl, TEXT("Skip 1 of 12 frames"));
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 1 frame"));
 		(void)ComboBox_SetItemData(hCtrl, i++, 1);
-		(void)ComboBox_AddString(hCtrl, TEXT("Skip 2 of 12 frames"));
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 2 frames"));
 		(void)ComboBox_SetItemData(hCtrl, i++, 2);
-		(void)ComboBox_AddString(hCtrl, TEXT("Skip 3 of 12 frames"));
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 3 frames"));
 		(void)ComboBox_SetItemData(hCtrl, i++, 3);
-		(void)ComboBox_AddString(hCtrl, TEXT("Skip 4 of 12 frames"));
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 4 frames"));
 		(void)ComboBox_SetItemData(hCtrl, i++, 4);
-		(void)ComboBox_AddString(hCtrl, TEXT("Skip 5 of 12 frames"));
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 5 frames"));
 		(void)ComboBox_SetItemData(hCtrl, i++, 5);
-		(void)ComboBox_AddString(hCtrl, TEXT("Skip 6 of 12 frames"));
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 6 frames"));
 		(void)ComboBox_SetItemData(hCtrl, i++, 6);
-		(void)ComboBox_AddString(hCtrl, TEXT("Skip 7 of 12 frames"));
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 7 frames"));
 		(void)ComboBox_SetItemData(hCtrl, i++, 7);
-		(void)ComboBox_AddString(hCtrl, TEXT("Skip 8 of 12 frames"));
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 8 frames"));
 		(void)ComboBox_SetItemData(hCtrl, i++, 8);
-		(void)ComboBox_AddString(hCtrl, TEXT("Skip 9 of 12 frames"));
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 9 frames"));
 		(void)ComboBox_SetItemData(hCtrl, i++, 9);
-		(void)ComboBox_AddString(hCtrl, TEXT("Skip 10 of 12 frames"));
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 10 frames"));
 		(void)ComboBox_SetItemData(hCtrl, i++, 10);
-		(void)ComboBox_AddString(hCtrl, TEXT("Skip 11 of 12 frames"));
-		(void)ComboBox_SetItemData(hCtrl, i++, 11);
 	}
 }
 
