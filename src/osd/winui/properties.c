@@ -2402,8 +2402,8 @@ static void BuildDataMap(void)
 	datamap_add(properties_datamap, IDC_SWITCHRES,				DM_BOOL,	WINOPTION_SWITCHRES);
 	datamap_add(properties_datamap, IDC_FSBRIGHTNESS,			DM_FLOAT,	WINOPTION_FULLSCREENBRIGHTNESS);
 	datamap_add(properties_datamap, IDC_FSBRIGHTNESSDISP,		DM_FLOAT,	WINOPTION_FULLSCREENBRIGHTNESS);
-	datamap_add(properties_datamap, IDC_FSCONTRAST,				DM_FLOAT,	WINOPTION_FULLLSCREENCONTRAST);
-	datamap_add(properties_datamap, IDC_FSCONTRASTDISP,			DM_FLOAT,	WINOPTION_FULLLSCREENCONTRAST);
+	datamap_add(properties_datamap, IDC_FSCONTRAST,				DM_FLOAT,	WINOPTION_FULLSCREENCONTRAST);
+	datamap_add(properties_datamap, IDC_FSCONTRASTDISP,			DM_FLOAT,	WINOPTION_FULLSCREENCONTRAST);
 	datamap_add(properties_datamap, IDC_FSGAMMA,				DM_FLOAT,	WINOPTION_FULLSCREENGAMMA);
 	datamap_add(properties_datamap, IDC_FSGAMMADISP,			DM_FLOAT,	WINOPTION_FULLSCREENGAMMA);
 
@@ -2523,9 +2523,12 @@ static void BuildDataMap(void)
 	datamap_set_trackbar_range(properties_datamap, IDC_SECONDSTORUN, 0,  60, 1);
 	datamap_set_trackbar_range(properties_datamap, IDC_NUMSCREENS, 1,  4, 1);
 	datamap_set_trackbar_range(properties_datamap, IDC_PRESCALE, 1,  10, 1);
-	datamap_set_trackbar_range(properties_datamap, IDC_GAMMA, 0.0,  2.0, 0.1);
+	datamap_set_trackbar_range(properties_datamap, IDC_FSGAMMA, 0.0,  3.0, 0.1);
+	datamap_set_trackbar_range(properties_datamap, IDC_FSBRIGHTNESS, 0.00,  2.0, (float)0.1);
+	datamap_set_trackbar_range(properties_datamap, IDC_FSCONTRAST, 0.0,  2.0, (float)0.1);
+	datamap_set_trackbar_range(properties_datamap, IDC_GAMMA, 0.0,  3.0, 0.1);
 	datamap_set_trackbar_range(properties_datamap, IDC_BRIGHTCORRECT, 0.00,  2.0, (float)0.1);
-	datamap_set_trackbar_range(properties_datamap, IDC_CONTRAST, 0.0,  3.0, (float)0.1);
+	datamap_set_trackbar_range(properties_datamap, IDC_CONTRAST, 0.0,  2.0, (float)0.1);
 	datamap_set_trackbar_range(properties_datamap, IDC_PAUSEBRIGHT, 0.00,  1.00, (float)0.05);
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_ALPHA, 0.00,  4.00, (float)0.01);
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_CURV, 0.00,  4.00, (float)0.01);
