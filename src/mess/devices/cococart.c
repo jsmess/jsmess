@@ -370,6 +370,11 @@ static MACHINE_CONFIG_FRAGMENT( coco_cartridge )
 	MCFG_CARTSLOT_PCBTYPE(3, "rs232",		COCO_CARTRIDGE_PCB_RS232)
 	//MCFG_CARTSLOT_PCBTYPE(4, "coco_ssc",  COCO_CARTRIDGE_PCB_SSC)
 	MCFG_CARTSLOT_PCBTYPE(4, "",			COCO_CARTRIDGE_PCB_PAK)
+
+	MCFG_CARTSLOT_INTERFACE("coco_cart")
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -401,6 +406,11 @@ static MACHINE_CONFIG_FRAGMENT( dragon_cartridge )
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_PCBTYPE(0, "dragon_fdc", COCO_CARTRIDGE_PCB_FDC_DRAGON)
 	MCFG_CARTSLOT_PCBTYPE(1, "",           COCO_CARTRIDGE_PCB_PAK)
+
+	MCFG_CARTSLOT_INTERFACE("coco_cart")
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------

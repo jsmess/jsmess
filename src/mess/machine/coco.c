@@ -791,59 +791,7 @@ QUICKLOAD_LOAD ( coco )
   be used in place of PAK files, when possible
 ***************************************************************************/
 
-DEVICE_IMAGE_LOAD(coco_rom)
-{
-	UINT8 *dest = image.device().machine().region("cart")->base();
-	UINT16 destlength = (UINT16) image.device().machine().region("cart")->bytes();
-	UINT8 *rombase;
-	int   romsize;
-
-	romsize = image.length();
-
-	/* The following hack is for Arkanoid running on the CoCo2.
-        The issuse is the CoCo2 hardware only allows the cartridge
-        interface to access 0xC000-0xFEFF (16K). The Arkanoid ROM is
-        32K starting at 0x8000. The first 16K is totally inaccessable
-        from a CoCo2. Thus we need to skip ahead in the ROM file. On
-        the CoCo3 the entire 32K ROM is accessable. */
-
-	if (image.crc() == 0x25C3AA70)     /* Test for Arkanoid  */
-	{
-		if ( destlength == 0x4000 )						/* Test if CoCo2      */
-		{
-			image.fseek(0x4000, SEEK_SET );			/* Move ahead in file */
-			romsize -= 0x4000;							/* Adjust ROM size    */
-		}
-	}
-
-	if (romsize > destlength)
-	{
-		romsize = destlength;
-	}
-
-	image.fread( dest, romsize );
-
-	/* Now we need to repeat the mirror the ROM throughout the ROM memory */
-	rombase = dest;
-	dest += romsize;
-	destlength -= romsize;
-	while(destlength > 0)
-	{
-		if (romsize > destlength)
-			romsize = destlength;
-		memcpy(dest, rombase, romsize);
-		dest += romsize;
-		destlength -= romsize;
-	}
-	return IMAGE_INIT_PASS;
-}
-
-DEVICE_IMAGE_UNLOAD(coco_rom)
-{
-	UINT8 *dest = image.device().machine().region("cart")->base();
-	UINT16 destlength = (UINT16) image.device().machine().region("cart")->bytes();
-	memset(dest, 0, destlength);
-}
+// These are directly handled by ROM_CART_LOAD with no custom DEVICE_IMAGE_LOAD
 
 /***************************************************************************
   Interrupts

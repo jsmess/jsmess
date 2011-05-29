@@ -179,9 +179,6 @@ MACHINE_START( coco2 );
 MACHINE_START( coco3 );
 MACHINE_RESET( coco3 );
 
-DEVICE_IMAGE_LOAD(coco_rom);
-DEVICE_IMAGE_UNLOAD(coco_rom);
-
 INPUT_CHANGED(coco_keyboard_changed);
 INPUT_CHANGED(coco_joystick_mode_changed);
 
