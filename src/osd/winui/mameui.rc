@@ -902,30 +902,22 @@ STYLE DS_FIXEDSYS | WS_CHILD | WS_CAPTION
 CAPTION "Debug"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    ICON            IDI_DISPLAY,IDC_STATIC,20,10,20,20
-    LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
-                    SS_NOPREFIX
-    CONTROL         "Output log to Windows Debugger",IDC_OSLOG,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,40,124,10,0,HIDC_OSLOG
-    CONTROL         "Output log to Logfile",IDC_LOG,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,10,52,93,10,0,HIDC_LOG
-    CONTROL         "Output diagnostic information",IDC_VERBOSE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,64,111,10,0,HIDC_VERBOSE
-    CONTROL         "Update Main window during paused emulation",
-                    IDC_UPDATEINPAUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    10,76,171,10,0,HIDC_UPDATEINPAUSE
-    CONTROL         "Activate Integrated Debugger",IDC_DEBUG,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,88,118,10,0,HIDC_DEBUG
+    ICON            IDI_MANUFACTURER,IDC_STATIC,20,10,20,20
+    LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,SS_NOPREFIX
+
+    CONTROL         "Output log to Windows Debugger",IDC_OSLOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,40,124,10,0,HIDC_OSLOG
+    CONTROL         "Output log to Logfile",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,52,93,10,0,HIDC_LOG
+    CONTROL         "Output diagnostic information",IDC_VERBOSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,64,111,10,0,HIDC_VERBOSE
+    CONTROL         "Update Main window during paused emulation",IDC_UPDATEINPAUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,76,171,10,0,HIDC_UPDATEINPAUSE
+    CONTROL         "Activate Integrated Debugger",IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,88,118,10,0,HIDC_DEBUG
+
     GROUPBOX        "Debugscript",IDC_STATIC,6,104,211,50
-    EDITTEXT        IDC_DEBUGSCRIPT,14,114,200,14,ES_AUTOHSCROLL | 
-                    WS_DISABLED
-    PUSHBUTTON      "Select Debugscript",IDC_SELECT_DEBUGSCRIPT,14,133,67,14,
-                    0,0,HIDC_SELECT_DEBUGSCRIPT
-    PUSHBUTTON      "Reset Debugscript",IDC_RESET_DEBUGSCRIPT,149,133,65,14,
-                    0,0,HIDC_RESET_DEBUGSCRIPT
+    EDITTEXT        IDC_DEBUGSCRIPT,14,114,200,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "Select Debugscript",IDC_SELECT_DEBUGSCRIPT,14,133,67,14,0,0,HIDC_SELECT_DEBUGSCRIPT
+    PUSHBUTTON      "Reset Debugscript",IDC_RESET_DEBUGSCRIPT,149,133,65,14,0,0,HIDC_RESET_DEBUGSCRIPT
+
     PUSHBUTTON      "Reset",IDC_PROP_RESET,4,238,97,14,0,0,HIDC_PROP_RESET
-    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,120,238,97,14,
-                    0,0,HIDC_USE_DEFAULT
+    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,120,238,97,14,0,0,HIDC_USE_DEFAULT
 END
 
 IDD_PROP_INPUT DIALOGEX 0, 0, 220, 240
