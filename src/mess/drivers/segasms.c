@@ -693,13 +693,14 @@ ROM_START(sg1000m3)
 	ROM_FILL(0x0000, 0x4000, 0x00)
 ROM_END
 
-ROM_START(smsj)
+ROM_START(smsj) /* PCB Label: "SEGA(R) IC BOARD M4J MAIN // 837-6418"; has "YM2413 // 78 04 71 G" at IC10; Back of pcb has traces marked "171-5541 (C)SEGA 1987 MADE IN JAPAN"
+	see http://www.smspower.org/Development/JapaneseSMS837-6418 */ 
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_FILL(0x0000, 0x4000, 0xff)
 
 	ROM_REGION(0x4000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "jbios21", "Japanese BIOS v2.1 (1987)" )
-	ROMX_LOAD("jbios21.rom", 0x0000, 0x2000, CRC(48D44A13) SHA1(a8c1b39a2e41137835eda6a5de6d46dd9fadbaf2), ROM_BIOS(1))
+	ROMX_LOAD("mpr-11124.ic2", 0x0000, 0x2000, CRC(48D44A13) SHA1(a8c1b39a2e41137835eda6a5de6d46dd9fadbaf2), ROM_BIOS(1)) /* "SONY 7J06 // MPR-11124 // JAPAN 021" @ IC2 */
 ROM_END
 
 ROM_START(sms2kr)
