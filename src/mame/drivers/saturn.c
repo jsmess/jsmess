@@ -2223,6 +2223,7 @@ DRIVER_INIT ( stv )
 	state->m_smpc_ram[0x5f] = 0x10;
 
 	state->m_instadma_hack = 0;
+	state->m_vdp2.pal = 0;
 
 	#ifdef MAME_DEBUG
 	/*Uncomment this to enable header info*/
@@ -2563,17 +2564,22 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	saturn_state *state = timer.machine().driver_data<saturn_state>();
 	int scanline = param;
 	int max_y = timer.machine().primary_screen->height();
-	int y_step;
+	int y_step,vblank_line;
 
-	y_step = (max_y == 263) ? 1 : 2;
+	y_step = 2;
+
+	if((max_y == 263 && state->m_vdp2.pal == 0) || (max_y == 313 && state->m_vdp2.pal == 1))
+		y_step = 1;
+
+	vblank_line = (state->m_vdp2.pal) ? 288 : 240;
 
 	//popmessage("%08x %d %08x %08x",state->m_scu_regs[40] ^ 0xffffffff,max_y,state->m_scu_regs[36],state->m_scu_regs[38]);
 
 	if(scanline == 0*y_step)
 		device_set_input_line_and_vector(state->m_maincpu, 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41);
-	else if(scanline == 240*y_step)
+	else if(scanline == vblank_line*y_step)
 		device_set_input_line_and_vector(state->m_maincpu, 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40);
-	else if((scanline % y_step) == 0 && scanline < 240*y_step)
+	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
 		device_set_input_line_and_vector(state->m_maincpu, 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42);
 
 	/* TODO: this isn't completely correct */
@@ -2821,6 +2827,7 @@ static void saturn_init_driver(running_machine &machine, int rgn)
 	system_time systime;
 
 	state->saturn_region = rgn;
+	state->m_vdp2.pal = (rgn == 12) ? 1 : 0;
 
 	// set compatible options
 	sh2drc_set_options(machine.device("maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
