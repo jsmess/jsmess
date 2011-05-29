@@ -55,21 +55,12 @@
 
 *  (driver structure copied from vtech1.c)
 ******************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 /* Core includes */
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "votrpss.lh"
-
-
-class votrpss_state : public driver_device
-{
-public:
-	votrpss_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
-};
-
 
 /* Components */
 //#include "sound/ay8910.h"
@@ -78,26 +69,67 @@ public:
 //#include "machine/pit8253.h"
 //#include "machine/msm8251.h"
 
-/* Devices */
+/* For testing */
+#include "machine/terminal.h"
+
+
+class votrpss_state : public driver_device
+{
+public:
+	votrpss_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_terminal(*this, TERMINAL_TAG)
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_terminal;
+	DECLARE_READ8_MEMBER(votrpss_00_r);
+	DECLARE_READ8_MEMBER(votrpss_02_r);
+	DECLARE_READ8_MEMBER(votrpss_41_r);
+	DECLARE_WRITE8_MEMBER( votrpss_kbd_put );
+	UINT8 m_term_data;
+	UINT8 m_term_status;
+};
+
+READ8_MEMBER( votrpss_state::votrpss_02_r )
+{
+	return m_term_status;
+}
+
+READ8_MEMBER( votrpss_state::votrpss_00_r )
+{
+	m_term_status = 0;
+	return m_term_data;
+}
+
+READ8_MEMBER( votrpss_state::votrpss_41_r )
+{
+	return 1;
+}
 
 
 /******************************************************************************
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8)
-    ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE(0x0000, 0x3fff) AM_ROM /* main roms (in potted module) */
-    AM_RANGE(0x4000, 0x7fff) AM_NOP	/* open bus/space for expansion rom (reads as 0xFF) */
-    AM_RANGE(0x8000, 0x8fff) AM_RAM	/* onboard memory (2x 6116) */
-    AM_RANGE(0x9000, 0xbfff) AM_NOP	/* open bus (space for memory expansion, checked by main roms, will be used if found)*/
-    AM_RANGE(0xc000, 0xdfff) AM_ROM /* 'personality rom', containing self-test code and optional user code */
-    AM_RANGE(0xe000, 0xffff) AM_NOP	/* open bus (space for more personality rom, not normally used) */
+static ADDRESS_MAP_START(votrpss_mem, AS_PROGRAM, 8, votrpss_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x3fff) AM_ROM /* main roms (in potted module) */
+	AM_RANGE(0x4000, 0x7fff) AM_NOP	/* open bus/space for expansion rom (reads as 0xFF) */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM	/* onboard memory (2x 6116) */
+	AM_RANGE(0x9000, 0xbfff) AM_NOP	/* open bus (space for memory expansion, checked by main roms, will be used if found)*/
+	AM_RANGE(0xc000, 0xdfff) AM_ROM /* 'personality rom', containing self-test code and optional user code */
+	AM_RANGE(0xe000, 0xffff) AM_NOP	/* open bus (space for more personality rom, not normally used) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z80_io, AS_IO, 8)
+static ADDRESS_MAP_START(votrpss_io, AS_IO, 8, votrpss_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_NOP /* temporary */
+	AM_RANGE(0x00, 0x00) AM_READ(votrpss_00_r)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE(0x02, 0x02) AM_READ(votrpss_02_r)
+	AM_RANGE(0x41, 0x41) AM_READ(votrpss_41_r)
+	//AM_RANGE(0x00, 0xff) AM_NOP /* temporary */
 	//AM_RANGE(0x00, 0x03) AM_READWRITE(8255ppi_r, 8255ppi_w) AM_MIRROR (0x3c)
 	//AM_RANGE(0x40, 0x41) AM_READWRITE(msm8251_r, msm8251_w) AM_MIRROR (0x3e)
 	//AM_RANGE(0x80, 0x83) AM_READWRITE(pit8253_r, pit8253_w) AM_MIRROR (0x3c)
@@ -137,22 +169,32 @@ static INPUT_PORTS_START(votrpss)
 	PORT_DIPSETTING(    0x80, DEF_STR ( On )  )
 INPUT_PORTS_END
 
+WRITE8_MEMBER( votrpss_state::votrpss_kbd_put )
+{
+	m_term_data = data;
+	m_term_status = 0x20;
+}
+
+static GENERIC_TERMINAL_INTERFACE( votrpss_terminal_intf )
+{
+	DEVCB_DRIVER_MEMBER(votrpss_state, votrpss_kbd_put)
+};
 
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
 
 static MACHINE_CONFIG_START( votrpss, votrpss_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)  /* 4.000 MHz, verified */
-    MCFG_CPU_PROGRAM_MAP(z80_mem)
-    MCFG_CPU_IO_MAP(z80_io)
-    MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)  /* 4.000 MHz, verified */
+	MCFG_CPU_PROGRAM_MAP(votrpss_mem)
+	MCFG_CPU_IO_MAP(votrpss_io)
+	//MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-    /* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_votrpss)
+	/* video hardware */
+	//MCFG_DEFAULT_LAYOUT(layout_votrpss)
 
-    /* sound hardware */
+	/* sound hardware */
 	//MCFG_SPEAKER_STANDARD_MONO("mono")
 	//MCFG_SOUND_ADD("ay1", AY8910, XTAL_8MHz/4) /* 2.000 MHz, verified */
 	//MCFG_SOUND_CONFIG(ay8910_config)
@@ -162,6 +204,8 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 	/* printer */
 	//MCFG_PRINTER_ADD("printer")
 
+	MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, votrpss_terminal_intf)
 MACHINE_CONFIG_END
 
 
@@ -171,21 +215,21 @@ MACHINE_CONFIG_END
 ******************************************************************************/
 
 ROM_START(votrpss)
-    ROM_REGION(0x10000, "maincpu", 0)
-    /* old logo PSS, version 3.A (1982), selftest 3.0? (1982) */
-    //ROM_LOAD("u-2.3.A.bin",   0x0000, 0x2000, NO_DUMP )) /* 3.A 1982 */
-    //ROM_LOAD("u-3.3.A.bin",   0x2000, 0x2000, NO_DUMP )) /* 3.A 1982 */
-    //ROM_LOAD("u-4.3.0.bin", 0xc000, 0x2000, NO_DUMP )) /* 3.0? */
+	ROM_REGION(0x10000, "maincpu", 0)
+	/* old logo PSS, version 3.A (1982), selftest 3.0? (1982) */
+	//ROM_LOAD("u-2.3.A.bin",   0x0000, 0x2000, NO_DUMP )) /* 3.A 1982 */
+	//ROM_LOAD("u-3.3.A.bin",   0x2000, 0x2000, NO_DUMP )) /* 3.A 1982 */
+	//ROM_LOAD("u-4.3.0.bin", 0xc000, 0x2000, NO_DUMP )) /* 3.0? */
 
-    /* old logo PSS, version 3.B (late 82/early83), selftest 3.0? (1982) */
-    //ROM_LOAD("u-2.3.B.bin",   0x0000, 0x2000, NO_DUMP )) /* 3.B 1983? */
-    //ROM_LOAD("u-3.3.B.bin",   0x2000, 0x2000, NO_DUMP )) /* 3.B 1983? */
-    //ROM_LOAD("u-4.3.0.bin", 0xc000, 0x2000, NO_DUMP )) /* 3.0? */
+	/* old logo PSS, version 3.B (late 82/early83), selftest 3.0? (1982) */
+	//ROM_LOAD("u-2.3.B.bin",   0x0000, 0x2000, NO_DUMP )) /* 3.B 1983? */
+	//ROM_LOAD("u-3.3.B.bin",   0x2000, 0x2000, NO_DUMP )) /* 3.B 1983? */
+	//ROM_LOAD("u-4.3.0.bin", 0xc000, 0x2000, NO_DUMP )) /* 3.0? */
 
-    /* old or new logo PSS, Version 3.C (1984?), selftest 3.1 (1985?) */
-    ROM_LOAD("u-2.1985.bin",   0x0000, 0x2000, CRC(410c58cf) SHA1(6e181e61ab9c268e3772fbeba101302fd40b09a2)) /* 3.C 1984?; The 1987/1988 version marked "U-2 // 090788" matches this rom */
-    ROM_LOAD("u-3.1985.bin",   0x2000, 0x2000, CRC(1439492e) SHA1(46af8ccac6fdb93cbeb8a6d57dce5898e0e0d623)) /* 3.C 1984? */
-    ROM_LOAD("u-4.100985.bin", 0xc000, 0x2000, CRC(0b7c4260) SHA1(56f0b6b1cd7b1104e09a9962583121c112337984)) /* 3.1 10/09/85 */
+	/* old or new logo PSS, Version 3.C (1984?), selftest 3.1 (1985?) */
+	ROM_LOAD("u-2.1985.bin",   0x0000, 0x2000, CRC(410c58cf) SHA1(6e181e61ab9c268e3772fbeba101302fd40b09a2)) /* 3.C 1984?; The 1987/1988 version marked "U-2 // 090788" matches this rom */
+	ROM_LOAD("u-3.1985.bin",   0x2000, 0x2000, CRC(1439492e) SHA1(46af8ccac6fdb93cbeb8a6d57dce5898e0e0d623)) /* 3.C 1984? */
+	ROM_LOAD("u-4.100985.bin", 0xc000, 0x2000, CRC(0b7c4260) SHA1(56f0b6b1cd7b1104e09a9962583121c112337984)) /* 3.1 10/09/85 */
 
 ROM_END
 
@@ -196,5 +240,5 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1982, votrpss,   0,          0,      votrpss,   votrpss, 0,      "Votrax",        "Personal Speech System",                        GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, votrpss,   0,          0,      votrpss,   votrpss, 0,      "Votrax",        "Personal Speech System", GAME_NOT_WORKING | GAME_NO_SOUND)
 
