@@ -50,11 +50,8 @@
 #include "sound/wave.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
-#include "sound/tms5220.h"
-#include "video/v9938.h"
 
 #include "machine/tms9901.h"
-#include "machine/tms9902.h"
 #include "machine/ti99/peribox.h"
 
 #include "imagedev/cassette.h"

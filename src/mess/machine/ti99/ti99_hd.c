@@ -305,7 +305,9 @@ void ti99_mfm_harddisk_write_track(device_t *harddisk, int head, UINT8 *track_im
 {
 	int current_pos = 0;
 	int found;
-	UINT8 wident, whead = 0, wsector = 0, wsize;
+	// UINT8 wident;
+	UINT8 whead = 0, wsector = 0;
+	// UINT8 wsize;
 	UINT16 wcyl = 0;
 	int state;
 
@@ -362,11 +364,11 @@ void ti99_mfm_harddisk_write_track(device_t *harddisk, int head, UINT8 *track_im
 		{
 			/* IDAM found. */
 			current_pos = new_pos + 1;
-			wident = track_image[current_pos];
+			// wident = track_image[current_pos];  // unused
 			wcyl = track_image[current_pos+1] + ((track_image[current_pos+2]&0x70)<<4);
 			whead = track_image[current_pos+2]&0x0f;
 			wsector = track_image[current_pos+3];
-			wsize = track_image[current_pos+4];
+			// wsize = track_image[current_pos+4];  // unused
 
 			if (wcyl == hd->current_cylinder && whead == head)
 			{
