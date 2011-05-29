@@ -6118,6 +6118,18 @@
 		</part>
 	</software>
 
+	<software name="tarot">
+		<description>tarot</description>
+		<year>1999</year>
+		<publisher>MESS</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="toolbox_tarot.po" size="819200" crc="407db57f" sha1="4fc8d650da33a542538b8a08ebb69a3c80d865a3" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="taskfrce">
 		<description>Task Force</description>
 		<year>1990</year>
