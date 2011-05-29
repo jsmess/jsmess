@@ -150,7 +150,6 @@ BEGIN
         MENUITEM "&Reset to Default...",        ID_OPTIONS_RESET_DEFAULTS
         MENUITEM "&Interface Options...",       ID_OPTIONS_INTERFACE
         MENUITEM "&Background Image...",        ID_OPTIONS_BG
-        MENUITEM "Ch&eat File...",              ID_OPTIONS_CHEAT
         MENUITEM "&History File...",            ID_OPTIONS_HISTORY
         MENUITEM "&Mameinfo File...",           ID_OPTIONS_MAMEINFO
     END

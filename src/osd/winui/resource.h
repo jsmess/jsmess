@@ -456,7 +456,6 @@
 #define ID_FILE_LOADSTATE               40095
 #define ID_FOLDER_SOURCEPROPERTIES      40096
 #define ID_FOLDER_VECTORPROPERTIES      40097
-#define ID_OPTIONS_CHEAT                40099
 #define ID_OPTIONS_MAMEINFO             40100
 #define ID_OPTIONS_HISTORY              40101
 #define ID_VIEW_SOFTWARE_AREA           40102
