@@ -13,7 +13,6 @@
 
     TODO:
 
-    - keyboard
     - NE555 timeout is 10x too high
     - convert GRIP models to devices
     - grip31 does not work
@@ -541,6 +540,16 @@ WRITE8_MEMBER( grip_state::cxstb_w )
 	centronics_strobe_w(m_centronics, 1);
 }
 
+WRITE8_MEMBER( grip5_state::eprom_w )
+{
+	memory_set_bank(machine(), "eprom", BIT(data, 0));
+}
+
+WRITE8_MEMBER( grip5_state::dpage_w )
+{
+	m_dpage = BIT(data, 7);
+}
+
 // UNIO
 
 WRITE8_MEMBER( prof80_state::unio_ctrl_w )
@@ -608,6 +617,12 @@ static ADDRESS_MAP_START( grip_mem, AS_PROGRAM, 8, grip_state )
     AM_RANGE(0x8000, 0xffff) AM_RAMBANK("videoram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( grip5_mem, AS_PROGRAM, 8, grip5_state )
+    AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("eprom")
+    AM_RANGE(0x4000, 0x5fff) AM_RAM
+    AM_RANGE(0x8000, 0xffff) AM_RAMBANK("videoram")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( grip_io, AS_IO, 8, grip_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
@@ -637,23 +652,23 @@ static ADDRESS_MAP_START( grip_io, AS_IO, 8, grip_state )
 //  AM_RANGE(0xf0, 0xf0) AM_WRITE(clrg1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( grip5_io, AS_IO, 8, grip_state )
+static ADDRESS_MAP_START( grip5_io, AS_IO, 8, grip5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
-//  AM_RANGE(0x10, 0x10) AM_WRITE(eprom_w)
-//  AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(eprom_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
 //  AM_RANGE(0x12, 0x12) AM_WRITE(rts_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(page_w)
 //  AM_RANGE(0x14, 0x14) AM_WRITE(str_w)
 //  AM_RANGE(0x15, 0x15) AM_WRITE(intl_w)
-//  AM_RANGE(0x16, 0x16) AM_WRITE(dpage_w)
-//  AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
+	AM_RANGE(0x16, 0x16) AM_WRITE(dpage_w)
+	AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE_LEGACY(Z80STI_TAG, z80sti_r, z80sti_w)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
 	AM_RANGE(0x40, 0x40) AM_READ(stat_r)
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
-	AM_RANGE(0x52, 0x52) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_w)
-	AM_RANGE(0x53, 0x53) AM_DEVREAD(MC6845_TAG, mc6845_device, register_r)
+	AM_RANGE(0x50, 0x50) AM_DEVWRITE(HD6345_TAG, hd6345_device, address_w)
+	AM_RANGE(0x52, 0x52) AM_DEVWRITE(HD6345_TAG, hd6345_device, register_w)
+	AM_RANGE(0x53, 0x53) AM_DEVREAD(HD6345_TAG, hd6345_device, register_r)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 
@@ -929,6 +944,30 @@ static MC6845_UPDATE_ROW( grip_update_row )
 	}
 }
 
+static MC6845_UPDATE_ROW( grip5_update_row )
+{
+	grip5_state *state = device->machine().driver_data<grip5_state>();
+	int column, bit;
+
+	for (column = 0; column < x_count; column++)
+	{
+		UINT16 address = (state->m_dpage << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
+		UINT8 data = state->m_video_ram[address];
+
+		for (bit = 0; bit < 8; bit++)
+		{
+			int x = (column * 8) + bit;
+			int color = state->m_flash ? 0 : BIT(data, bit);
+
+			*BITMAP_ADDR16(bitmap, y, x) = color;
+		}
+	}
+}
+
+static MC6845_ON_UPDATE_ADDR_CHANGED( grip5_update_addr_changed )
+{
+}
+
 WRITE_LINE_MEMBER( grip_state::de_w )
 {
 	m_de = state;
@@ -957,9 +996,23 @@ static const mc6845_interface crtc_intf =
 	NULL
 };
 
+static const mc6845_interface grip5_crtc_intf =
+{
+	SCREEN_TAG,
+	8,
+	NULL,
+	grip5_update_row,
+	NULL,
+	DEVCB_DRIVER_LINE_MEMBER(grip_state, de_w),
+	DEVCB_DRIVER_LINE_MEMBER(grip_state, cursor_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	grip5_update_addr_changed
+};
+
 bool grip_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_crtc->update( &bitmap, &cliprect);
+	m_crtc->update(&bitmap, &cliprect);
 
 	return 0;
 }
@@ -1225,6 +1278,18 @@ void grip_state::machine_start()
 	save_item(NAME(m_flash));
 }
 
+void grip5_state::machine_start()
+{
+	grip_state::machine_start();
+
+	// setup ROM banking
+	memory_configure_bank(machine(), "eprom", 0, 2, machine().region(GRIP_Z80_TAG)->base(), 0x4000);
+	memory_set_bank(machine(), "eprom", 0);
+
+	// register for state saving
+	save_item(NAME(m_dpage));
+}
+
 static const floppy_config prof80_floppy_config =
 {
 	DEVCB_NULL,
@@ -1314,12 +1379,31 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( grip3, grip )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( grip5, grip )
+static MACHINE_CONFIG_DERIVED_CLASS( grip5, common, grip5_state )
     // basic machine hardware
-	MCFG_CPU_MODIFY(GRIP_Z80_TAG)
-    MCFG_CPU_IO_MAP(grip5_io)
-MACHINE_CONFIG_END
+    MCFG_CPU_MODIFY(Z80_TAG)
+    MCFG_CPU_IO_MAP(prof80_grip_io)
 
+	MCFG_CPU_ADD(GRIP_Z80_TAG, Z80, XTAL_16MHz/4)
+	MCFG_CPU_CONFIG(grip_daisy_chain)
+    MCFG_CPU_PROGRAM_MAP(grip5_mem)
+    MCFG_CPU_IO_MAP(grip5_io)
+
+	// keyboard hack
+	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_hz(50))
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_CONFIG(speaker_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	// devices
+	MCFG_MC6845_ADD(HD6345_TAG, HD6345, XTAL_16MHz/4, grip5_crtc_intf)
+	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
+	MCFG_Z80STI_ADD(Z80STI_TAG, XTAL_16MHz/4, sti_intf)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+MACHINE_CONFIG_END
 // ROMs
 
 #define ROM_PROF80 \

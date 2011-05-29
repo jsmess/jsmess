@@ -30,6 +30,7 @@
 #define SCREEN_TAG				"screen"
 #define GRIP_Z80_TAG			"grip_z1"
 #define MC6845_TAG				"z30"
+#define HD6345_TAG				"z30"
 #define I8255A_TAG				"z6"
 #define Z80STI_TAG				"z9"
 #define SPEAKER_TAG				"speaker"
@@ -165,6 +166,25 @@ public:
 	int m_flash;			// flash
 	int m_de;				// display enable
 	int m_cursor;			// cursor
+};
+
+class grip5_state : public grip_state
+{
+public:
+	grip5_state(const machine_config &mconfig, device_type type, const char *tag)
+		: grip_state(mconfig, type, tag),
+		  m_crtc(*this, HD6345_TAG)
+	{ }
+
+	required_device<hd6345_device> m_crtc;
+
+	virtual void machine_start();
+
+	DECLARE_WRITE8_MEMBER( eprom_w );
+	DECLARE_WRITE8_MEMBER( dpage_w );
+
+	// video state
+	int m_dpage;			// displayed video page
 };
 
 #endif
