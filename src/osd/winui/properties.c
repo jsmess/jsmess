@@ -1616,13 +1616,13 @@ static void SetPropEnabledControls(HWND hWnd)
 	HWND hCtrl;
 	int  nIndex;
 	int  sound;
-	BOOL ddraw = FALSE;
-	BOOL d3d = FALSE;
-	BOOL gdi = FALSE;
-	BOOL useart = TRUE;
-	int joystick_attached = 0;
-	bool in_window = 0;
-	bool hlsl_on = 0;
+	bool ddraw = FALSE;
+	bool d3d = FALSE;
+	bool gdi = FALSE;
+	bool useart = TRUE;
+	BOOL joystick_attached = FALSE;
+	bool in_window = FALSE;
+	bool hlsl_on = FALSE;
 	int d3d_version = 8;
 
 	nIndex = g_nGame;
@@ -1638,6 +1638,7 @@ static void SetPropEnabledControls(HWND hWnd)
 	EnableWindow(GetDlgItem(hWnd, IDC_TRIPLE_BUFFER), !gdi);
 	EnableWindow(GetDlgItem(hWnd, IDC_PRESCALE), !gdi);
 	EnableWindow(GetDlgItem(hWnd, IDC_PRESCALEDISP), !gdi);
+	EnableWindow(GetDlgItem(hWnd, IDC_PRESCALETEXT), !gdi);
 	EnableWindow(GetDlgItem(hWnd, IDC_HWSTRETCH),       ddraw && DirectDraw_HasHWStretch());
 	EnableWindow(GetDlgItem(hWnd, IDC_SWITCHRES), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_SYNCREFRESH),     TRUE);
@@ -2512,14 +2513,18 @@ static void BuildDataMap(void)
 	datamap_set_float_format(properties_datamap, IDC_HLSL_GPLIFEDISP,	"%03.2f");
 	datamap_set_float_format(properties_datamap, IDC_HLSL_BPLIFEDISP,	"%03.2f");
 
-	// trackbar ranges - looks like start,end,step
-	datamap_set_trackbar_range(properties_datamap, IDC_PRESCALE,    1, 10, 1);
+	// trackbar ranges - slider-name,start,end,step
 	datamap_set_trackbar_range(properties_datamap, IDC_JDZ,         0.00, 1.00,  (float)0.05);
 	datamap_set_trackbar_range(properties_datamap, IDC_JSAT,        0.00, 1.00,  (float)0.05);
 	datamap_set_trackbar_range(properties_datamap, IDC_SPEED,       0.00, 3.00,  (float)0.01);
 	datamap_set_trackbar_range(properties_datamap, IDC_BEAM,        (float)0.10, 10.00, (float)0.10);
 	datamap_set_trackbar_range(properties_datamap, IDC_VOLUME,      -32,  0, 1);
 	datamap_set_trackbar_range(properties_datamap, IDC_SECONDSTORUN, 0,  60, 1);
+	datamap_set_trackbar_range(properties_datamap, IDC_PRESCALE, 1,  10, 1);
+	datamap_set_trackbar_range(properties_datamap, IDC_GAMMA, 0.0,  2.0, 0.1);
+	datamap_set_trackbar_range(properties_datamap, IDC_BRIGHTCORRECT, 0.00,  2.0, (float)0.1);
+	datamap_set_trackbar_range(properties_datamap, IDC_CONTRAST, 0.0,  3.0, (float)0.1);
+	datamap_set_trackbar_range(properties_datamap, IDC_PAUSEBRIGHT, 0.00,  1.00, (float)0.05);
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_ALPHA, 0.00,  4.00, (float)0.01);
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_CURV, 0.00,  4.00, (float)0.01);
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_SAT, 0.00,  4.00, (float)0.01);

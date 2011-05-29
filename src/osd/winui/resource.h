@@ -293,6 +293,7 @@
 #define IDC_FSCONTRASTTEXT              1225
 #define IDC_VIDEO_MODE                  1226
 #define IDC_SCREENSELECTTEXT            1227
+#define IDC_PRESCALETEXT                1228
 #define IDC_MULTIMOUSE                  1230
 #define IDC_DEBUG                       1231
 #define IDC_REFRESHSPEED                1232
@@ -469,7 +470,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        192
 #define _APS_NEXT_COMMAND_VALUE         40103
-#define _APS_NEXT_CONTROL_VALUE         1255
+#define _APS_NEXT_CONTROL_VALUE         1337
 #define _APS_NEXT_SYMED_VALUE           93
 #endif
 #endif
