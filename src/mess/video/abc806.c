@@ -238,7 +238,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 {
 	abc806_state *state = device->machine().driver_data<abc806_state>();
 
-	UINT8 old_data = 0xff;
+//	UINT8 old_data = 0xff;
 	int fg_color = 7;
 	int bg_color = 0;
 	int underline = 0;
@@ -342,7 +342,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 			column++;
 		}
 
-		old_data = data;
+//		old_data = data;
 	}
 }
 

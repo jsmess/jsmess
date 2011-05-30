@@ -330,7 +330,7 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 static void SetDefaultTask(running_machine &machine)
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	UINT8 *videoram = state->m_videoram;
+//	UINT8 *videoram = state->m_videoram;
 	int		Idx;
 
 	LOG_DEFAULT_TASK(("SetDefaultTask()\n"));
@@ -361,7 +361,7 @@ static void SetDefaultTask(running_machine &machine)
 
 	/* Map video ram to base of area it can use, that way we can take the literal RA */
 	/* from the 6845 without having to mask it ! */
-	videoram=&ram_get_ptr(machine.device(RAM_TAG))[TextVidBasePage*RamPageSize];
+//	videoram=&ram_get_ptr(machine.device(RAM_TAG))[TextVidBasePage*RamPageSize];
 }
 
 // Return the value of a page register

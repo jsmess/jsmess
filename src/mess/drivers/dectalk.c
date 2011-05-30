@@ -542,10 +542,10 @@ static WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
 
 static READ16_HANDLER( m68k_tlc_dtmf_r ) // dtmf chip read
 {
+#ifdef TLC_LOG
 	dectalk_state *state = space->machine().driver_data<dectalk_state>();
 	UINT16 data = 0xFFFF;
 	data = state->m_tlc_dtmf&0xF;
-#ifdef TLC_LOG
 	logerror("m68k: TLC dtmf detector read, returning data = %02X", data);
 #endif
 	return 0;

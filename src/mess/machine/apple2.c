@@ -111,8 +111,8 @@ void apple2_update_memory(running_machine &machine)
 	read8_space_func rh; const char *rh_name = NULL;
 	write8_space_func wh; const char *wh_name = NULL;
 	offs_t begin, end_r, end_w;
-	UINT8 *rbase, *wbase, *rom, *slot_ram;
-	UINT32 rom_length, slot_length, offset;
+	UINT8 *rbase, *wbase, *rom; //, *slot_ram;
+	UINT32 rom_length, offset; //, slot_length;
 	bank_disposition_t bank_disposition;
 	int wh_nop = 0;
 
@@ -128,8 +128,8 @@ void apple2_update_memory(running_machine &machine)
 	/* get critical info */
 	rom = machine.region("maincpu")->base();
 	rom_length = machine.region("maincpu")->bytes() & ~0xFFF;
-	slot_length = machine.region("maincpu")->bytes() - rom_length;
-	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
+//	slot_length = machine.region("maincpu")->bytes() - rom_length;
+//	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
 
 	/* loop through the entire memory map */
 	bank = state->m_mem_config.first_bank;
