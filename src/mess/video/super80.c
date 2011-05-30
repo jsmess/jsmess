@@ -89,7 +89,7 @@ SCREEN_EOF( super80m )
 SCREEN_UPDATE( super80 )
 {
 	super80_state *state = screen->machine().driver_data<super80_state>();
-	UINT8 y,ra,chr=32,gfx,screen_on=0,i;
+	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->m_vidpg,x;
 	UINT8 *RAM = screen->machine().region("maincpu")->base();
 
@@ -110,11 +110,17 @@ SCREEN_UPDATE( super80 )
 					chr = RAM[ma | x] & 0x3f;
 
 				/* get pattern of pixels for that character scanline */
-				gfx = state->m_FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
+				gfx = state->m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 
-				/* Display a scanline of a character (8 pixels) */
-				for (i = 0; i < 8; i++)
-					*p++ = BIT(gfx, 7-i);
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
 		ma+=32;
@@ -125,7 +131,7 @@ SCREEN_UPDATE( super80 )
 SCREEN_UPDATE( super80d )
 {
 	super80_state *state = screen->machine().driver_data<super80_state>();
-	UINT8 y,ra,chr=32,gfx,screen_on=0,i;
+	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->m_vidpg,x;
 	UINT8 *RAM = screen->machine().region("maincpu")->base();
 
@@ -146,11 +152,17 @@ SCREEN_UPDATE( super80d )
 					chr = RAM[ma | x];
 
 				/* get pattern of pixels for that character scanline */
-				gfx = state->m_FNT[((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
+				gfx = state->m_p_chargen[((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
 
-				/* Display a scanline of a character (8 pixels) */
-				for (i = 0; i < 8; i++)
-					*p++ = BIT(gfx, 7-i);
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
 		ma+=32;
@@ -161,7 +173,7 @@ SCREEN_UPDATE( super80d )
 SCREEN_UPDATE( super80e )
 {
 	super80_state *state = screen->machine().driver_data<super80_state>();
-	UINT8 y,ra,chr=32,gfx,screen_on=0,i;
+	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->m_vidpg,x;
 	UINT8 *RAM = screen->machine().region("maincpu")->base();
 
@@ -182,11 +194,17 @@ SCREEN_UPDATE( super80e )
 					chr = RAM[ma | x];
 
 				/* get pattern of pixels for that character scanline */
-				gfx = state->m_FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
+				gfx = state->m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 
-				/* Display a scanline of a character (8 pixels) */
-				for (i = 0; i < 8; i++)
-					*p++ = BIT(gfx, 7-i);
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
 		ma+=32;
@@ -197,7 +215,7 @@ SCREEN_UPDATE( super80e )
 SCREEN_UPDATE( super80m )
 {
 	super80_state *state = screen->machine().driver_data<super80_state>();
-	UINT8 y,ra,chr=32,gfx,screen_on=0,i;
+	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->m_vidpg,x;
 	UINT8 col, bg=0, fg=0, options=input_port_read(screen->machine(), "CONFIG");
 	UINT8 *RAM = screen->machine().region("maincpu")->base();
@@ -238,13 +256,19 @@ SCREEN_UPDATE( super80m )
 
 				/* get pattern of pixels for that character scanline */
 				if (cgen)
-					gfx = state->m_FNT[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
+					gfx = state->m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
 				else
-					gfx = state->m_FNT[0x1000 | ((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
+					gfx = state->m_p_chargen[0x1000 | ((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
 
-				/* Display a scanline of a character (8 pixels) */
-				for (i = 0; i < 8; i++)
-					*p++ = BIT(gfx, 7-i) ? fg : bg;
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 7) ? fg : bg;
+				*p++ = BIT(gfx, 6) ? fg : bg;
+				*p++ = BIT(gfx, 5) ? fg : bg;
+				*p++ = BIT(gfx, 4) ? fg : bg;
+				*p++ = BIT(gfx, 3) ? fg : bg;
+				*p++ = BIT(gfx, 2) ? fg : bg;
+				*p++ = BIT(gfx, 1) ? fg : bg;
+				*p++ = BIT(gfx, 0) ? fg : bg;
 			}
 		}
 		ma+=32;
@@ -256,7 +280,7 @@ VIDEO_START( super80 )
 {
 	super80_state *state = machine.driver_data<super80_state>();
 	state->m_vidpg = 0xfe00;
-	state->m_FNT = machine.region("gfx1")->base();
+	state->m_p_chargen = machine.region("chargen")->base();
 }
 
 /**************************** I/O PORTS *****************************************************************/
@@ -278,40 +302,40 @@ static const UINT8 mc6845_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x
 READ8_MEMBER( super80_state::super80v_low_r )
 {
 	if (m_shared & 4)
-		return m_videoram[offset];
+		return m_p_videoram[offset];
 	else
-		return m_colorram[offset];
+		return m_p_colorram[offset];
 }
 
 WRITE8_MEMBER( super80_state::super80v_low_w )
 {
 	if (m_shared & 4)
-		m_videoram[offset] = data;
+		m_p_videoram[offset] = data;
 	else
-		m_colorram[offset] = data;
+		m_p_colorram[offset] = data;
 }
 
 READ8_MEMBER( super80_state::super80v_high_r )
 {
 	if (~m_shared & 4)
-		return m_colorram[0x800 | offset];
+		return m_p_colorram[0x800 | offset];
 	else
 	if (m_shared & 0x10)
-		return m_pcgram[0x800 | offset];
+		return m_p_pcgram[0x800 | offset];
 	else
-		return m_pcgram[offset];
+		return m_p_pcgram[offset];
 }
 
 WRITE8_MEMBER( super80_state::super80v_high_w )
 {
 	if (~m_shared & 4)
-		m_colorram[0x800 | offset] = data;
+		m_p_colorram[0x800 | offset] = data;
 	else
 	{
-		m_videoram[0x800 | offset] = data;
+		m_p_videoram[0x800 | offset] = data;
 
 		if (m_shared & 0x10)
-			m_pcgram[0x800 | offset] = data;
+			m_p_pcgram[0x800 | offset] = data;
 	}
 }
 
@@ -353,9 +377,9 @@ void super80_state::mc6845_cursor_configure()
 VIDEO_START( super80v )
 {
 	super80_state *state = machine.driver_data<super80_state>();
-	state->m_pcgram = machine.region("maincpu")->base()+0xf000;
-	state->m_videoram = machine.region("videoram")->base();
-	state->m_colorram = machine.region("colorram")->base();
+	state->m_p_pcgram = machine.region("maincpu")->base()+0xf000;
+	state->m_p_videoram = machine.region("videoram")->base();
+	state->m_p_colorram = machine.region("colorram")->base();
 }
 
 SCREEN_UPDATE( super80v )
@@ -373,7 +397,7 @@ SCREEN_UPDATE( super80v )
 MC6845_UPDATE_ROW( super80v_update_row )
 {
 	super80_state *state = device->machine().driver_data<super80_state>();
-	UINT8 chr,col,gfx,fg,bg=0,i;
+	UINT8 chr,col,gfx,fg,bg=0;
 	UINT16 mem,x;
 	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
 
@@ -382,7 +406,7 @@ MC6845_UPDATE_ROW( super80v_update_row )
 		UINT8 inv=0;
 		//      if (x == cursor_x) inv=0xff;    /* uncomment when mame fixed */
 		mem = (ma + x) & 0xfff;
-		chr = state->m_videoram[mem];
+		chr = state->m_p_videoram[mem];
 
 		/* get colour or b&w */
 		fg = 5;						/* green */
@@ -390,7 +414,7 @@ MC6845_UPDATE_ROW( super80v_update_row )
 
 		if (~state->m_s_options & 0x40)
 		{
-			col = state->m_colorram[mem];					/* byte of colour to display */
+			col = state->m_p_colorram[mem];					/* byte of colour to display */
 			fg = col & 0x0f;
 			bg = (col & 0xf0) >> 4;
 		}
@@ -410,11 +434,16 @@ MC6845_UPDATE_ROW( super80v_update_row )
 				inv ^= state->m_mc6845_cursor[ra];
 
 		/* get pattern of pixels for that character scanline */
-		gfx = state->m_pcgram[(chr<<4) | ra] ^ inv;
+		gfx = state->m_p_pcgram[(chr<<4) | ra] ^ inv;
 
-		/* Display a scanline of a character (7 pixels) */
-		for (i = 0; i < 7; i++)
-			*p++ = BIT(gfx, 7-i) ? fg : bg;
+		/* Display a scanline of a character */
+		*p++ = BIT(gfx, 7) ? fg : bg;
+		*p++ = BIT(gfx, 6) ? fg : bg;
+		*p++ = BIT(gfx, 5) ? fg : bg;
+		*p++ = BIT(gfx, 4) ? fg : bg;
+		*p++ = BIT(gfx, 3) ? fg : bg;
+		*p++ = BIT(gfx, 2) ? fg : bg;
+		*p++ = BIT(gfx, 1) ? fg : bg;
 	}
 }
 

@@ -62,7 +62,7 @@ public:
 	UINT16 m_vidpg;
 	UINT8 m_current_palette;
 	UINT8 m_current_charset;
-	const UINT8 *m_FNT;
+	const UINT8 *m_p_chargen;
 	UINT8 m_s_options;
 	UINT8 m_mc6845_cursor[16];
 	UINT8 m_mc6845_reg[32];
@@ -71,9 +71,9 @@ public:
 	UINT8 m_speed;
 	UINT8 m_flash;
 	UINT16 m_cursor;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
-	UINT8 *m_pcgram;
+	UINT8 *m_p_videoram;
+	UINT8 *m_p_colorram;
+	UINT8 *m_p_pcgram;
 	void mc6845_cursor_configure();
 };
 

@@ -573,20 +573,20 @@ static const gfx_layout super80v_charlayout =
 };
 
 static GFXDECODE_START( super80 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, super80_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, super80_charlayout, 0, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( super80d )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, super80d_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, super80d_charlayout, 0, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( super80e )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, super80e_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, super80e_charlayout, 0, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( super80m )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, super80e_charlayout, 0, 8 )
-	GFXDECODE_ENTRY( "gfx1", 0x1000, super80d_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, super80e_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "chargen", 0x1000, super80d_charlayout, 0, 8 )
 GFXDECODE_END
 
 /* This will show the 128 characters in the ROM + whatever happens to be in the PCG */
@@ -770,7 +770,7 @@ ROM_START( super80 )
 	ROM_LOAD("super80.u42",   0xe000, 0x1000, CRC(a1c6cb75) SHA1(d644ca3b399c1a8902f365c6095e0bbdcea6733b) )
 	ROM_FILL( 0xf000, 0x1000, 0xff)	/* This makes the screen show the FF character when O F1 F0 entered */
 
-	ROM_REGION(0x0400, "gfx1", 0)	// 2513 prom
+	ROM_REGION(0x0400, "chargen", 0)	// 2513 prom
 	ROM_LOAD("super80.u27",   0x0000, 0x0400, CRC(d1e4b3c6) SHA1(3667b97c6136da4761937958f281609690af4081) )
 ROM_END
 
@@ -786,7 +786,7 @@ ROM_START( super80d )
 	ROM_LOAD("super80.u42",	  0xe000, 0x1000, CRC(a1c6cb75) SHA1(d644ca3b399c1a8902f365c6095e0bbdcea6733b) )
 	ROM_FILL( 0xf000, 0x1000, 0xff)
 
-	ROM_REGION(0x0800, "gfx1", 0)	// 2716 eprom
+	ROM_REGION(0x0800, "chargen", 0)	// 2716 eprom
 	ROM_LOAD("super80d.u27",  0x0000, 0x0800, CRC(cb4c81e2) SHA1(8096f21c914fa76df5d23f74b1f7f83bd8645783) )
 ROM_END
 
@@ -797,7 +797,7 @@ ROM_START( super80e )
 	ROM_LOAD("super80.u42",	  0xe000, 0x1000, CRC(a1c6cb75) SHA1(d644ca3b399c1a8902f365c6095e0bbdcea6733b) )
 	ROM_FILL( 0xf000, 0x1000, 0xff)
 
-	ROM_REGION(0x1000, "gfx1", 0)	// 2732 eprom
+	ROM_REGION(0x1000, "chargen", 0)	// 2732 eprom
 	ROM_LOAD("super80e.u27",  0x0000, 0x1000, CRC(ebe763a7) SHA1(ffaa6d6a2c5dacc5a6651514e6707175a32e83e8) )
 ROM_END
 
@@ -827,7 +827,7 @@ ROM_START( super80m )
 	ROMX_LOAD("s80-v37.u33",  0xd000, 0x1000, CRC(afb52b15) SHA1(0a2c25834074ce44bf12ac8532b4add492bcf950), ROM_BIOS(2) )
 	ROMX_LOAD("s80-v37.u42",  0xe000, 0x1000, CRC(7344b27a) SHA1(f43fc47ddb5c12bffffa63488301cd5eb386cc9a), ROM_BIOS(2) )
 
-	ROM_REGION(0x1800, "gfx1", 0)
+	ROM_REGION(0x1800, "chargen", 0)
 	ROM_LOAD("super80e.u27",  0x0000, 0x1000, CRC(ebe763a7) SHA1(ffaa6d6a2c5dacc5a6651514e6707175a32e83e8) )
 	ROM_LOAD("super80d.u27",  0x1000, 0x0800, CRC(cb4c81e2) SHA1(8096f21c914fa76df5d23f74b1f7f83bd8645783) )
 ROM_END

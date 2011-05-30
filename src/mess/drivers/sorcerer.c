@@ -332,7 +332,7 @@ GFXDECODE_END
 
 static SCREEN_UPDATE( sorcerer )
 {
-	UINT8 y,ra,chr,gfx,i;
+	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0xf080,x;
 	UINT8 *RAM = screen->machine().region("maincpu")->base();
 
@@ -349,9 +349,15 @@ static SCREEN_UPDATE( sorcerer )
 				/* get pattern of pixels for that character scanline */
 				gfx = RAM[0xf800 | (chr<<3) | ra];
 
-				/* Display a scanline of a character (8 pixels) */
-				for (i = 0; i < 8; i++)
-					*p++ = BIT(gfx, 7-i);
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
 		ma+=64;
