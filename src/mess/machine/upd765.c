@@ -81,6 +81,8 @@ typedef enum
 
 #define UPD765_RESET 0x080
 
+#define UPD765_BAD_MEDIA 0x100
+
 typedef struct _upd765_t upd765_t;
 struct _upd765_t
 {
@@ -862,6 +864,11 @@ static int upd765_get_matching_sector(device_t *device)
 	/* number of times we have seen index hole */
 	int index_count = 0;
 
+	if (fdc->upd765_flags & UPD765_BAD_MEDIA) {
+		fdc->upd765_status[1] |= 1;
+		return FALSE;
+	}
+	
 	/* get sector id's */
 	do
     {
@@ -1503,6 +1510,15 @@ static TIMER_CALLBACK(upd765_continue_command)
 				/* sector id == EOT */
 				UINT8 ddam;
 
+				/* nothing to write */
+				if ((fdc->upd765_transfer_bytes_remaining==0) && (fdc->upd765_flags & UPD765_DMA_MODE))
+				{
+					if (fdc->upd765_flags & UPD765_TC)
+						upd765_write_complete(device);
+					// if TC or not set or PIO, what?
+					break;
+				}
+
 				ddam = 0;
 				if (fdc->command == 0x09)
 				{
@@ -1930,7 +1946,7 @@ static void upd765_setup_command(device_t *device)
 			{
 				/* is disk inserted? */
 				device_image_interface *image = dynamic_cast<device_image_interface *>( img);
-				if (image->exists())
+				if (image!=NULL && image->exists())
 				{
 					int index_count = 0;
 
@@ -1949,8 +1965,9 @@ static void upd765_setup_command(device_t *device)
 						/* get next id from disc */
 						if (floppy_drive_get_next_id(img, fdc->side, &id))
 						{
-							/* got an id - quit */
-							break;
+							/* got an id */
+							/* if bad media keep going until failure */
+							if (!(fdc->upd765_flags & UPD765_BAD_MEDIA)) break;
 						}
 
 						if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_INDEX))
@@ -1960,6 +1977,12 @@ static void upd765_setup_command(device_t *device)
 						}
 					}
 					while (index_count!=2);
+
+					if (fdc->upd765_flags & UPD765_BAD_MEDIA) 
+					{
+							fdc->upd765_status[0] |= 0x40;
+							fdc->upd765_status[1] |= 1;
+					}
 
 					/* at this point, we have seen a id or two index pulses have occured! */
 					fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
@@ -2206,6 +2229,13 @@ static TIMER_CALLBACK( interrupt_callback )
 {
 	device_t* device = (device_t*)ptr;
 	upd765_set_int(device, 1);
+}
+
+void upd765_set_bad(device_t *device, int state)
+{
+	upd765_t *fdc = get_safe_token(device);
+	if (state) fdc->upd765_flags |= UPD765_BAD_MEDIA;
+	else fdc->upd765_flags &= ~UPD765_BAD_MEDIA;
 }
 
 void upd765_reset(device_t *device, int offset)

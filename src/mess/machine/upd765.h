@@ -87,6 +87,7 @@ WRITE_LINE_DEVICE_HANDLER(upd765_tc_w);
 WRITE_LINE_DEVICE_HANDLER(upd765_ready_w);
 
 void upd765_idle(device_t *device);
+void upd765_set_bad(device_t *device, int state);
 
 /*********************/
 /* STATUS REGISTER 1 */

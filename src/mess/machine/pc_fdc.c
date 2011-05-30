@@ -327,7 +327,6 @@ static void pc_fdc_dor_w(running_machine &machine, UINT8 data)
 	}
 }
 
-
 /*  PCJr FDC Digitial Output Register (DOR)
 
     On a PC Jr the DOR is wired up a bit differently:
@@ -427,6 +426,38 @@ static void pcjr_fdc_dor_w(running_machine &machine, UINT8 data)
 	fdc->digital_output_register = data;
 }
 
+#define RATE_250  2
+#define RATE_300  1
+#define RATE_500  0
+#define RATE_1000 3
+
+static void pc_fdc_check_data_rate(running_machine &machine)
+{
+	device_t *device = floppy_get_device(machine, fdc->digital_output_register & 0x03);
+	floppy_image *image;
+	int tracks, sectors, rate;
+
+	upd765_set_bad(pc_get_device(machine), 0); // unset in case format is unknown
+	if (!device) return;
+	image = flopimg_get_image(device);
+	if (!image) return;
+	tracks = floppy_get_tracks_per_disk(image);
+	tracks -= (tracks % 10); // ignore extra tracks
+	floppy_get_sector_count(image, 0, 0, &sectors);
+
+	if (tracks == 40) {
+		if ((fdc->data_rate_register != RATE_250) && (fdc->data_rate_register != RATE_300))
+			upd765_set_bad(pc_get_device(machine), 1);
+		return;
+	} else if (tracks == 80) {
+		if (sectors <= 14)      rate = RATE_250;    // 720KB 5 1/4 and 3 1/2
+		else if (sectors <= 24) rate = RATE_500;    // 1.2MB 5 1/4 and 1.44MB 3 1/2
+		else                    rate = RATE_1000;   // 2.88MB 3 1/2
+	} else return;
+
+	if (rate != (fdc->data_rate_register & 3)) 
+		upd765_set_bad(pc_get_device(machine), 1);
+}
 
 READ8_HANDLER ( pc_fdc_r )
 {
@@ -469,6 +500,7 @@ WRITE8_HANDLER ( pc_fdc_w )
 	if (LOG_FDC)
 		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(space->machine().firstcpu,STATE_GENPC), offset, data);
 
+	pc_fdc_check_data_rate(space->machine());  // check every time a command may start
 	switch(offset)
 	{
 		case 0:	/* n/a */
@@ -499,6 +531,7 @@ WRITE8_HANDLER ( pc_fdc_w )
              *      1 0      250 kbps
              *      1 1     1000 kbps
              */
+			pc_fdc_data_rate_w(space->machine(), data & 3);
 			break;
 	}
 }
