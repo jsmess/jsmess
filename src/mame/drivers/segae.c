@@ -11,7 +11,10 @@
  An interesting feature of the system is that the CPU is contained on the ROM
  board, the MAIN System E board contains the Graphics processor, this opens the
  possibility for using processors other than the Standard Z80 to run the main
- game code on; several games have an encrypted Z80 module instead.
+ game code on; several games have an encrypted Z80 module instead. However, the
+ system as a whole is very Z80-centric; using a completely non-Z80 processor
+ would require the addition of glue logic to the rom board to make the cpu
+ 'look' like a Z80 to the rest of the system.
 
  Also interesting is each VDP has double the Video RAM found on the SMS console
  this is banked through Port Writes, the System also allows for the Video RAM
@@ -98,14 +101,15 @@ PCB Layout
 |                  | 2 |             | 2 |            |
 |                  | 4 |             | 4 |            |
 |                  |---|             |---|            |
-|               |--------ROM-BOARD-(above)---------|  |
+|               |--ROM-BOARD-(mounted above here)--|  |
 |               |                                  |  |
-|               |CN2                   10.7386MHz  |  |
+|               |CN2                     XTAL1     |  |
 |               |         D4168                    |  |
 |  VOL          |         D4168                    |  |
 | LA4460        |----------------------------------|  |
 |-----------------------------------------------------|
 Notes:
+      XTAL1              - 10.7386Mhz
       315-5124 VDP clock - 10.7386MHz
       SN76496 clock      - 3.579533MHz [10.7386/3]
       D4168              - 8k x8 SRAM
@@ -866,7 +870,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( systeme, driver_device )
-	MCFG_CPU_ADD("maincpu", Z80, 10738600/2) /* correct?  */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -891,10 +895,10 @@ static MACHINE_CONFIG_START( systeme, driver_device )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76496, 3579540)
+	MCFG_SOUND_ADD("sn1", SEGAPSG, XTAL_10_738635MHz/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76496, 3579540)
+	MCFG_SOUND_ADD("sn2", SEGAPSG, XTAL_10_738635MHz/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

@@ -124,7 +124,7 @@ static UINT32 pvrta_regs[0x2000/4];
 static const int pvr_parconfseq[] = {1,2,3,2,3,4,5,6,5,6,7,8,9,10,11,12,13,14,13,14,15,16,17,16,17,0,0,0,0,0,18,19,20,19,20,21,22,23,22,23};
 static const int pvr_wordsvertex[24]  = {8,8,8,8,8,16,16,8,8,8, 8, 8,8,8,8,8,16,16, 8,16,16,8,16,16};
 static const int pvr_wordspolygon[24] = {8,8,8,8,8, 8, 8,8,8,8,16,16,8,8,8,8, 8, 8,16,16,16,8, 8, 8};
-static int pvr_parameterconfig[64];
+static int pvr_parameterconfig[128];
 static UINT32 dilated0[15][1024];
 static UINT32 dilated1[15][1024];
 static int dilatechose[64];
@@ -1013,14 +1013,14 @@ WRITE64_HANDLER( pvr_ta_w )
 {
 	int reg;
 	UINT64 shift;
-	UINT32 old,dat;
+	UINT32 dat;
 	UINT32 sizera,offsetra;
 	int a;
 	int sanitycount;
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
-	old = pvrta_regs[reg];
+	//old = pvrta_regs[reg];
 
 	// Dreamcast BIOS attempts to set PVRID to zero and then dies
 	// if it succeeds.  Don't allow.
@@ -1632,12 +1632,12 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 
 WRITE64_HANDLER( ta_fifo_yuv_w )
 {
-	int reg;
-	UINT64 shift;
-	UINT32 dat;
+//	int reg;
+//	UINT64 shift;
+//	UINT32 dat;
 
-	reg = decode_reg_64(offset, mem_mask, &shift);
-	dat = (UINT32)(data >> shift);
+//	reg = decode_reg_64(offset, mem_mask, &shift);
+//	dat = (UINT32)(data >> shift);
 
 //  printf("YUV FIFO: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x %08x\n", 0x10800000+reg*4, dat, data, offset, mem_mask,test);
 }

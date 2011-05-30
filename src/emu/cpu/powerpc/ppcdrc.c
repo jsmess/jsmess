@@ -2123,7 +2123,7 @@ static void generate_sequence_instruction(powerpc_state *ppc, drcuml_block *bloc
 	if (desc->pc == PROBE_ADDRESS)
 	{
 		UML_MOV(block, mem(&ppc->pc), desc->pc);										// mov     [pc],desc->pc
-		UML_CALLC(block, cfunc_printf_probe, (void *)desc->pc);										// callc   cfunc_printf_probe,desc->pc
+		UML_CALLC(block, cfunc_printf_probe, (void *)(FPTR)desc->pc);										// callc   cfunc_printf_probe,desc->pc
 	}
 
 	/* if we are debugging, call the debugger */
