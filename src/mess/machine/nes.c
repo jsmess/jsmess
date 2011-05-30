@@ -646,7 +646,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 	if (image.software_entry() == NULL)
 	{
 		const char *mapinfo = NULL;
-		int mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0, goodcrcinfo = 0;
+		int mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0; //, goodcrcinfo = 0;
 		char magic[4], extend[5];
 		int local_options = 0;
 		char m;
@@ -709,7 +709,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 					state->m_chr_chunks = mapint4;
 					logerror("NES.HSI info: %d %d %d %d\n", mapint1, mapint2, mapint3, mapint4);
 //                  mame_printf_error("NES.HSI info: %d %d %d %d\n", mapint1, mapint2, mapint3, mapint4);
-					goodcrcinfo = 1;
+//					goodcrcinfo = 1;
 					state->m_ines20 = 0;
 				}
 				else

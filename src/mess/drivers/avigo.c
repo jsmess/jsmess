@@ -760,9 +760,9 @@ static WRITE8_HANDLER(avigo_speaker_w)
 {
 	avigo_state *state = space->machine().driver_data<avigo_state>();
 	device_t *speaker = space->machine().device("speaker");
-	UINT8 previous_speaker;
+//	UINT8 previous_speaker;
 
-	previous_speaker = state->m_speaker_data;
+//	previous_speaker = state->m_speaker_data;
 	state->m_speaker_data = data;
 
 	/* changed state? */

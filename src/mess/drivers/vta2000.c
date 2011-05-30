@@ -63,7 +63,7 @@ Here we just show the first 80x25, with no scrolling. */
 {
 	vta2000_state *state = screen->machine().driver_data<vta2000_state>();
 	//static UINT8 framecnt=0;
-	UINT8 y,ra,gfx,attr;
+	UINT8 y,ra,gfx; //,attr;
 	UINT16 sy=0,ma=0,x,xx=0,chr;
 
 	//framecnt++;
@@ -80,7 +80,8 @@ Here we just show the first 80x25, with no scrolling. */
 			for (x = ma; x < ma + 80; x++)
 			{
 				chr = state->m_p_videoram[xx++];
-				attr = state->m_p_videoram[xx++];
+//				attr = state->m_p_videoram[xx++];
+				xx++;
 
 				if ((chr & 0x60)==0x60)
 					chr+=256;

@@ -138,7 +138,7 @@ static TIMER_CALLBACK( z80ne_kbd_scan )
      */
 
 	UINT16 key_bits;
-	UINT8 ctrl, rst;
+	UINT8 ctrl; //, rst;
 	UINT8 i;
 
 	/* 4-bit counter */
@@ -149,7 +149,7 @@ static TIMER_CALLBACK( z80ne_kbd_scan )
 	{
 		state->m_lx383_downsampler = LX383_DOWNSAMPLING;
 		key_bits = (input_port_read(machine, "ROW1") << 8) | input_port_read(machine, "ROW0");
-		rst = input_port_read(machine, "RST");
+//		rst = input_port_read(machine, "RST");
 		ctrl = input_port_read(machine, "CTRL");
 
 		for ( i = 0; i<LX383_KEYS; i++)

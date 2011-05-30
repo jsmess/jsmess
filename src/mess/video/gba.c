@@ -1068,7 +1068,7 @@ static void draw_gba_oam(gba_state *state, running_machine &machine, UINT32 *sca
 	INT32 mosaiccnt = 0;
 	INT32 mosaicy = ((state->m_MOSAIC & 0xf000) >> 12) + 1;
 	INT32 mosaicx = ((state->m_MOSAIC & 0x0f00) >>  8) + 1;
-	UINT32 tilebytebase, tileindex, tiledrawindex;
+	UINT32 tileindex, tiledrawindex; //, tilebytebase
 	UINT8 width, height;
 	UINT16 *pgba_oam = (UINT16 *)state->m_gba_oam;
 	UINT8 *src = (UINT8 *)state->m_gba_vram;
@@ -1172,7 +1172,7 @@ static void draw_gba_oam(gba_state *state, running_machine &machine, UINT32 *sca
 				}
 
 				tiledrawindex = tileindex = (attr2 & OBJ_TILENUM);
-				tilebytebase = 0x10000;	// the index doesn't change in the higher modes, we just ignore sprites that are out of range
+//				tilebytebase = 0x10000;	// the index doesn't change in the higher modes, we just ignore sprites that are out of range
 
 				if (attr0 & OBJ_ROZMODE_ROZ)
 				{
