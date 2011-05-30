@@ -781,6 +781,20 @@ void windows_osd_interface::customize_input_type_list(input_type_desc *typelist)
 				typedesc->name = "Toggle Fullscreen";
 				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_LALT, KEYCODE_ENTER);
 				break;
+
+			// alt-F12 for fullscreen snap
+			case IPT_OSD_2:
+				typedesc->token = "RENDERED_SNAP";
+				typedesc->name = "Take Rendered Snapshot";
+				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_LALT, KEYCODE_F12);
+				break;
+
+			// alt-F11 for fullscreen video
+			case IPT_OSD_3:
+				typedesc->token = "RENDERED_AVI";
+				typedesc->name = "Record Rendered Video";
+				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_LALT, KEYCODE_F11);
+				break;
 		}
 }
 
