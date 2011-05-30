@@ -1487,7 +1487,7 @@ static void format_floppy_track(device_t *device, int flags)
 	int i,index,j, exp_size;
 	int gap0, gap1, gap2, gap3, gap4, sync1, sync2, count, size, fm;
 	int gap_byte, pre_gap, crc, mark, inam;
-	UINT8 curr_ident, curr_cyl, curr_head, curr_sect, curr_size;
+	UINT8 curr_cyl, curr_head, curr_sect, curr_size;
 
 	int normal_data_mark = flags & 0x10;
 
@@ -1590,7 +1590,8 @@ static void format_floppy_track(device_t *device, int flags)
 		buffer[index++] = 0xfe;
 
 		smc92x4_set_dip(device, TRUE);
-		if (!fm) curr_ident = (*w->intf->dma_read_callback)(device);
+//		if (!fm) curr_ident = (*w->intf->dma_read_callback)(device);
+		if (!fm) (*w->intf->dma_read_callback)(device);
 		curr_cyl = (*w->intf->dma_read_callback)(device);
 		curr_head = (*w->intf->dma_read_callback)(device);
 		curr_sect = (*w->intf->dma_read_callback)(device);
@@ -1655,7 +1656,7 @@ static void format_harddisk_track(device_t *device, int flags)
 {
 	smc92x4_state *w = get_safe_token(device);
 	int i,index,j;
-	int gap0, gap1, gap2, gap3, gap4, sync, count, size, fm, gap_byte, crc;
+	int gap1, gap2, gap3, gap4, sync, count, size, gap_byte, crc;
 	UINT8 curr_ident, curr_cyl, curr_head, curr_sect, curr_size;
 
 	int normal_data_mark = flags & 0x10;
@@ -1666,7 +1667,7 @@ static void format_harddisk_track(device_t *device, int flags)
 	sync_status_in(device);
 
 	/* Build buffer */
-	gap0 = (-w->register_w[DMA7_0])&0xff;
+//	gap0 = (-w->register_w[DMA7_0])&0xff;
 	gap1 = (-w->register_w[DMA15_8])&0xff;
 	gap2 = (-w->register_w[DMA23_16])&0xff;
 	gap3 = (-w->register_w[DESIRED_SECTOR])&0xff;
@@ -1681,7 +1682,8 @@ static void format_harddisk_track(device_t *device, int flags)
 	buffer = (UINT8*)malloc(data_count);
 
 	index = 0;
-	fm = controller_set_to_single_density(device);
+//	fm = controller_set_to_single_density(device);
+	controller_set_to_single_density(device);
 	gap_byte = 0x4e;
 
 	/* use the backup registers set up during drive_select */
