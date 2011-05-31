@@ -82,7 +82,6 @@
 #include "memconv.h"
 
 #define VERBOSE_CGA 0		/* CGA (Color Graphics Adapter) */
-#define	NTSC_FILTER	0
 
 #define CGA_LOG(N,M,A) \
 	do { \
@@ -255,166 +254,6 @@ static struct
 } cga;
 
 
-
-/***************************************************************************
- *
- * NTSC filter
- *
- * Code taken from http://www.reenigne.org/crtc.html
- *
- ***************************************************************************/
-
-static struct ntsc_decoder
-{
-	int period;
-
-	int *I_filter;
-	int *Q_filter;
-
-	int *Y_buffer;
-	int *I_buffer;
-	int *Q_buffer;
-
-	int Y_total;
-	int I_total;
-	int Q_total;
-} s_ntsc;
-
-
-/* Clear NTSC buffers and running totals. Call this before the beginning of each new line. */
-static void ntsc_clear(struct ntsc_decoder *ntsc)
-{
-	int j;
-	for (j=0;j<ntsc->period;++j)
-	{
-		ntsc->Y_buffer[j] = 0;
-		ntsc->I_buffer[j] = 0;
-		ntsc->Q_buffer[j] = 0;
-	}
-	ntsc->Y_total = 0;
-	ntsc->I_total = 0;
-	ntsc->Q_total = 0;
-}
-
-
-/* Create an NTSC decoder object.
-
-   period is the number of times the NTSC signal is sampled per cycle of the color subcarrier clock (3.579545 MHz).
-   e.g. CGA is 8 because you need to sample the chroma signal at 28.6MHz to retain all color information.
-   For 4-color composite systems such as CoCo, 2 samples may suffice.
-
-   samples is also the number of data points whose values are used to determine the color of a given point.
-
-   Points here do not necessarily correspond to pixels - points are samples of the RGB color decoded output and pixels
-   are CPU addressable points in the input composite data.
-
-   The correct value for hue will usually be a multiple of 128.
-*/
-static void ntsc_decoder_init(running_machine &machine, struct ntsc_decoder *ntsc, int period, int hue)
-{
-	int j;
-
-	ntsc->period = period;
-	ntsc->I_filter = auto_alloc_array(machine, int, period);
-	ntsc->Q_filter = auto_alloc_array(machine, int, period);
-	ntsc->Y_buffer = auto_alloc_array(machine, int, period);
-	ntsc->I_buffer = auto_alloc_array(machine, int, period);
-	ntsc->Q_buffer = auto_alloc_array(machine, int, period);
-	ntsc_clear(ntsc);
-	for (j=0;j<period;++j)
-	{
-		double angle = M_PI*((hue+(j<<8))/(period*128.0)-33.0/180);
-		ntsc->I_filter[j] = (int)(512.0*cos(angle));
-		ntsc->Q_filter[j] = (int)(512.0*sin(angle));
-	}
-}
-
-
-/* Decode some NTSC data, working from left to right.
-
-   The composite (luma+chroma) values are in "input", scaled to 0-255 values.
-   Red, green and blue bytes (in that order) are placed in "output".
-
-   Note that consecutive calls to ntsc_decode() should be on consecutive input data,
-   or the first ntsc->samples points will be inaccurate. To avoid this inaccuracy,
-   first call ntsc_decode(ntsc, input, NULL, 1) with "input" containing the
-   samples directly before the samples you will subsequently be using.
-*/
-static void ntsc_decode(struct ntsc_decoder *ntsc, UINT8 *input, UINT8 *output, int periods)
-{
-	int j;
-
-	int *I_filter;
-	int *Q_filter;
-	int *Y_buffer;
-	int *I_buffer;
-	int *Q_buffer;
-	int Y_total = ntsc->Y_total;
-	int I_total = ntsc->I_total;
-	int Q_total = ntsc->Q_total;
-	int Y,I,Q;
-	int R,G,B;
-	int period = ntsc->period;
-
-	while ((--periods)>=0)
-	{
-		I_filter = ntsc->I_filter;
-		Q_filter = ntsc->Q_filter;
-		Y_buffer = ntsc->Y_buffer;
-		I_buffer = ntsc->I_buffer;
-		Q_buffer = ntsc->Q_buffer;
-
-		for (j=0;j<period;++j)
-		{
-
-			/* Get next point */
-			Y = *(input++);
-			I = Y * *(I_filter++);
-			Q = Y * *(Q_filter++);
-
-			/* Update running totals */
-			Y_total += Y - *Y_buffer;
-			I_total += I - *I_buffer;
-			Q_total += Q - *Q_buffer;
-
-			/* Save point in buffer */
-			*(Y_buffer++) = Y;
-			*(I_buffer++) = I;
-			*(Q_buffer++) = Q;
-
-			/* Compute averages over entire period */
-			Y = Y_total/period;
-			I = I_total/period;
-			Q = Q_total/period;
-
-			/* Clamp YIQ values to avoid hue drift of oversaturated colors */
-			if (Y>256) Y=256; if (Y<0) Y=0;
-			if (I>39041) I=39041; if (I<-39041) I=-39041;
-			if (Q>34249) Q=34249; if (Q<-34249) Q=-34249;
-
-			/* Convert YIQ to RGB */
-			Y<<=16;
-			R = (Y + 249*I + 159*Q)>>16;
-			G = (Y -  70*I - 166*Q)>>16;
-			B = (Y - 283*I + 436*Q)>>16;
-
-			/* Clamp the RGB values */
-			if (R>255) R=255; if (R<0) R=0;
-			if (G>255) G=255; if (G<0) G=0;
-			if (B>255) B=255; if (B<0) B=0;
-
-			/* Emit the RGB values to the output buffer */
-			*output = R; output++;
-			*output = G; output++;
-			*output = B; output++;
-		}
-	}
-	ntsc->Y_total = Y_total;
-	ntsc->I_total = I_total;
-	ntsc->Q_total = Q_total;
-}
-
-
 /***************************************************************************
 
     Methods
@@ -499,8 +338,6 @@ static VIDEO_START( pc_cga )
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x4000);
 
 	memory_set_bankptr(machine,"bank11", cga.videoram);
-
-	ntsc_decoder_init( machine, &s_ntsc, 8, 256 );
 }
 
 
@@ -541,8 +378,6 @@ static VIDEO_START( pc_cga32k )
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x8000);
 
 	memory_set_bankptr(machine,"bank11", cga.videoram);
-
-	ntsc_decoder_init( machine, &s_ntsc, 8, 256 );
 }
 
 static SCREEN_UPDATE( mc6845_cga )
@@ -866,44 +701,16 @@ static const UINT8 yc_lut[16][8] =
 static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
 {
 	UINT8 *videoram = cga.videoram;
-	UINT8	samples[1280];
-	UINT8	ntsc_decoded[3*1280];
-	int		samp_index = 0;
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	int i;
 	running_machine &machine = device->machine();
 
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_4bpph_update_row",("\n"));
-if ( NTSC_FILTER )
-{
-	ntsc_clear( &s_ntsc );
-	memset( ntsc_decoded, 0, sizeof(ntsc_decoded));
-}
+
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
-
-if ( NTSC_FILTER )
-{
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][0]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][1]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][2]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][3]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][4]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][5]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][6]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][7]]; samp_index++;
-
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][0]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][1]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][2]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][3]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][4]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][5]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][6]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][7]]; samp_index++;
-}
 
 		*p = data >> 4; p++;
 		*p = data >> 4; p++;
@@ -916,27 +723,6 @@ if ( NTSC_FILTER )
 
 		data = videoram[ offset + 1 ];
 
-if ( NTSC_FILTER )
-{
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][0]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][1]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][2]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][3]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][4]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][5]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][6]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data>>4][7]]; samp_index++;
-
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][0]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][1]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][2]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][3]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][4]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][5]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][6]]; samp_index++;
-		samples[samp_index] = yc_lut2[yc_lut[data & 0x0F][7]]; samp_index++;
-}
-
 		*p = data >> 4; p++;
 		*p = data >> 4; p++;
 		*p = data >> 4; p++;
@@ -946,21 +732,6 @@ if ( NTSC_FILTER )
 		*p = data & 0x0F; p++;
 		*p = data & 0x0F; p++;
 	}
-if (NTSC_FILTER)
-{
-	ntsc_decode( &s_ntsc, samples, ntsc_decoded, 160 );
-	p = BITMAP_ADDR16(bitmap, y, 0);
-	samp_index = 0;
-	for ( i = 0; i < ( 8 * x_count ); i++ )
-	{
-		int r = ( ntsc_decoded[samp_index] + ntsc_decoded[samp_index+3] ) / 2;
-		int g = ( ntsc_decoded[samp_index+1] + ntsc_decoded[samp_index+4] ) / 2;
-		int b = ( ntsc_decoded[samp_index+2] + ntsc_decoded[samp_index+5] ) / 2;
-		*p = 0x8000 + ( ( ( r & 0xF8 ) << 7 ) | ( ( g & 0xF8 ) << 2 ) | ( ( b & 0xF8 ) >> 3 ) );
-		p++;
-		samp_index +=6;
-	}
-}
 }
 
 
