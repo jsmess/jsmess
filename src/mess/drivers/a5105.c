@@ -366,7 +366,7 @@ MACHINE_RESET_MEMBER(a5105_state)
 }
 
 
-static const gfx_layout x1_chars_8x8 =
+static const gfx_layout a5105_chars_8x8 =
 {
 	8,8,
 	RGN_FRAC(1,1),
@@ -378,7 +378,7 @@ static const gfx_layout x1_chars_8x8 =
 };
 
 static GFXDECODE_START( a5105 )
-	GFXDECODE_ENTRY( "pcg", 0x0000, x1_chars_8x8, 0, 8 )
+	GFXDECODE_ENTRY( "pcg", 0x0000, a5105_chars_8x8, 0, 8 )
 GFXDECODE_END
 
 static INTERRUPT_GEN( a5105_vblank_irq )

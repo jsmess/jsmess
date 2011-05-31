@@ -1,39 +1,96 @@
 /***************************************************************************
 
-    Robotron mz6500
+	Sharp MZ-6500
 
-    04/10/2009 Skeleton driver.
 
-    http://www.robotrontechnik.de/index.htm?/html/computer/mz6500.htm
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "machine/upd765.h"
+#include "video/upd7220.h"
 
 
 class mz6500_state : public driver_device
 {
 public:
 	mz6500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_hgdc(*this, "upd7220")
+	{ }
 
+	required_device<upd7220_device> m_hgdc;
+
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
+
+bool mz6500_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+{
+	bitmap_fill(&bitmap, &cliprect, 0);
+
+	/* graphics */
+	m_hgdc->update_screen(&bitmap, &cliprect);
+
+	return 0;
+}
+
+static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+{
+	//mz6500_state *state = device->machine().driver_data<mz6500_state>();
+	int xi,gfx[3];
+	UINT8 pen;
+
+	gfx[0] = vram[address + 0x00000];
+	gfx[1] = vram[address + 0x10000];
+	gfx[2] = vram[address + 0x20000];
+
+	for(xi=0;xi<8;xi++)
+	{
+		pen = ((gfx[0] >> (xi)) & 1) ? 1 : 0;
+		pen|= ((gfx[1] >> (xi)) & 1) ? 2 : 0;
+		pen|= ((gfx[2] >> (xi)) & 1) ? 4 : 0;
+
+		*BITMAP_ADDR16(bitmap, y, x + xi) = pen;
+	}
+}
+
 
 static VIDEO_START( mz6500 )
 {
 }
 
-static SCREEN_UPDATE( mz6500 )
+
+static READ8_HANDLER( fdc_r )
 {
-	return 0;
+	return (offset == 0) ? upd765_status_r(space->machine().device("upd765"),0) : upd765_data_r(space->machine().device("upd765"),0);
+}
+
+static WRITE8_HANDLER( fdc_w )
+{
+	if(offset)
+		upd765_data_w(space->machine().device("upd765"),0,data);
+}
+
+static READ8_HANDLER( mz6500_vram_r )
+{
+	mz6500_state *state = space->machine().driver_data<mz6500_state>();
+
+	return state->m_hgdc->vram_r(*space, offset);
+}
+
+static WRITE8_HANDLER( mz6500_vram_w )
+{
+	mz6500_state *state = space->machine().driver_data<mz6500_state>();
+
+	state->m_hgdc->vram_w(*space, offset, data);
 }
 
 static ADDRESS_MAP_START(mz6500_map, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x9ffff) AM_RAM
 //	AM_RANGE(0xa0000,0xbffff) kanji/dictionary ROM
-//  AM_RANGE(0xc0000,0xeffff) vram
+	AM_RANGE(0xc0000,0xeffff) AM_READWRITE8(mz6500_vram_r,mz6500_vram_w,0xffff)
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
@@ -41,14 +98,14 @@ static ADDRESS_MAP_START(mz6500_io, AS_IO, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x0000, 0x000f) i8237 dma
 //  AM_RANGE(0x0010, 0x001f) i8255
-//  AM_RANGE(0x0020, 0x002f) upd765
+	AM_RANGE(0x0020, 0x0021) AM_MIRROR(0xe) AM_READWRITE8(fdc_r,fdc_w,0xffff)
 //  AM_RANGE(0x0030, 0x003f) i8259 master
 //  AM_RANGE(0x0040, 0x004f) i8259 slave
 //	AM_RANGE(0x0050, 0x0050) segment byte for DMA
 //	AM_RANGE(0x0060, 0x0060) system port A
 //	AM_RANGE(0x0070, 0x0070) system port C
 //  AM_RANGE(0x00cd, 0x00cd) MZ-1R32
-//  AM_RANGE(0x0100, 0x010f) upd7220
+	AM_RANGE(0x0100, 0x0103) AM_MIRROR(0xc) AM_DEVREADWRITE8_MODERN("upd7220", upd7220_device, read, write, 0x00ff)
 //	AM_RANGE(0x0110, 0x011f) video address / data registers (priority)
 //	AM_RANGE(0x0120, 0x012f) video registers
 //	AM_RANGE(0x0130, 0x013f) video register
@@ -71,6 +128,53 @@ static MACHINE_RESET(mz6500)
 {
 }
 
+static WRITE_LINE_DEVICE_HANDLER( fdc_irq )
+{
+	//printf("%02x IRQ\n",state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( fdc_drq )
+{
+	//printf("%02x DRQ\n",state);
+}
+
+static const struct upd765_interface upd765_intf =
+{
+	DEVCB_LINE(fdc_irq),
+	DEVCB_LINE(fdc_drq),
+	NULL,
+	UPD765_RDY_PIN_CONNECTED,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
+
+static const floppy_config mz6500_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_OPTIONS_NAME(default),
+	NULL
+};
+
+
+static UPD7220_INTERFACE( hgdc_intf )
+{
+	"screen",
+	hgdc_display_pixels,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static ADDRESS_MAP_START( upd7220_map, AS_0, 8 )
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_MODERN("upd7220", upd7220_device, vram_r, vram_w)
+ADDRESS_MAP_END
+
+
 static MACHINE_CONFIG_START( mz6500, mz6500_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 4000000) //unk clock
@@ -79,6 +183,9 @@ static MACHINE_CONFIG_START( mz6500, mz6500_state )
 
 	MCFG_MACHINE_RESET(mz6500)
 
+	MCFG_UPD765A_ADD("upd765", upd765_intf)
+	MCFG_FLOPPY_2_DRIVES_ADD(mz6500_floppy_config)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -86,10 +193,11 @@ static MACHINE_CONFIG_START( mz6500, mz6500_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE(mz6500)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_UPD7220_ADD("upd7220", 4000000, hgdc_intf, upd7220_map)
+
+	MCFG_PALETTE_LENGTH(8)
+//	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(mz6500)
 MACHINE_CONFIG_END
@@ -104,7 +212,6 @@ ROM_START( mz6500 )
 
 	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x40000, CRC(b618e25d) SHA1(1da93337fecde6c0f8a5bd68f3f0b3222a38d63e))
-
 ROM_END
 
 /* Driver */
