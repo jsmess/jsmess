@@ -977,6 +977,7 @@ $(MESSOBJ)/hegener.a:			\
 $(MESSOBJ)/hitachi.a:			\
 	$(MESS_DRIVERS)/bmjr.o		\
 	$(MESS_DRIVERS)/bml3.o		\
+	$(MESS_DRIVERS)/b16.o           \
 
 $(MESSOBJ)/homebrew.a:			\
 	$(MESS_DRIVERS)/4004clk.o	\
