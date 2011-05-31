@@ -4,6 +4,8 @@
 
     31/05/2011 Skeleton driver.
 
+	0xfcc67 after the ROM checksum to zero (bp 0xfc153 -> SI = 0) -> system boots
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -103,6 +105,7 @@ WRITE8_MEMBER( b16_state::b16_pcg_w )
 
 static ADDRESS_MAP_START( b16_map, AS_PROGRAM, 16, b16_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x00000, 0x9ffff ) AM_RAM // probably not all of it.
 	AM_RANGE( 0xa0000, 0xaffff ) AM_RAM // bitmap?
 	AM_RANGE( 0xb0000, 0xb7fff ) AM_RAM AM_BASE(m_vram) // tvram
 	AM_RANGE( 0xb8000, 0xbbfff ) AM_WRITE8(b16_pcg_w,0x00ff) // pcg
@@ -131,6 +134,7 @@ static ADDRESS_MAP_START( b16_io, AS_IO, 16, b16_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x20, 0x21 ) AM_WRITE8(b16_6845_address_w,0x00ff)
 	AM_RANGE( 0x22, 0x23 ) AM_WRITE8(b16_6845_data_w,0x00ff)
+	//0x79 bit 0 DSW?
 	AM_RANGE( 0x80, 0x81 ) AM_READ(vblank_r) // TODO
 ADDRESS_MAP_END
 
@@ -189,7 +193,7 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_CONFIG_START( b16, b16_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8086, XTAL_4MHz) //unknown xtal
+	MCFG_CPU_ADD("maincpu",I8086, XTAL_14_31818MHz/2) //unknown xtal
 	MCFG_CPU_PROGRAM_MAP(b16_map)
 	MCFG_CPU_IO_MAP(b16_io)
 
