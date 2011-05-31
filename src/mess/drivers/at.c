@@ -558,6 +558,17 @@ static void ide_interrupt(device_t *device, int state)
 	pic8259_ir6_w(device->machine().device("pic8259_slave"),state);
 }
 
+static WRITE_LINE_DEVICE_HANDLER( at_mc146818_irq )
+{
+	at_state *st = device->machine().driver_data<at_state>();
+	pic8259_ir0_w(st->m_pic8259_slave, (state) ? 0 : 1);
+}
+
+const struct mc146818_interface at_mc146818_config =
+{
+	DEVCB_LINE(at_mc146818_irq)
+};
+
 static MACHINE_CONFIG_START( ibm5170, at_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, 6000000 /*6000000*/)
@@ -594,7 +605,7 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
-	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, at_mc146818_config )
 
 	/* printers */
 	MCFG_PC_LPT_ADD("lpt_0", at_lpt_config)
@@ -665,7 +676,7 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
-	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, at_mc146818_config )
 
 	/* printers */
 	MCFG_PC_LPT_ADD("lpt_0", at_lpt_config)
@@ -721,7 +732,7 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
-	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, at_mc146818_config )
 
 	/* printers */
 	MCFG_PC_LPT_ADD("lpt_0", at_lpt_config)
@@ -840,7 +851,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
-	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, at_mc146818_config )
 
 	/* printers */
 	MCFG_PC_LPT_ADD("lpt_0", at_lpt_config)
@@ -899,7 +910,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
-	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, at_mc146818_config )
     MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* printers */
