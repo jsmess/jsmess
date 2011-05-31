@@ -195,6 +195,7 @@ disabled). Perhaps power on/off related??
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "sound/speaker.h"
+#include "rendlay.h"
 
 
 class nakajies_state : public driver_device
@@ -209,6 +210,9 @@ public:
 	/* IRQ handling */
 	UINT8	m_irq_enabled;
 	UINT8	m_irq_active;
+
+	UINT8	m_lcd_memory_start;
+	UINT8*	m_ram_base;
 };
 
 
@@ -216,19 +220,19 @@ public:
 
 
 static ADDRESS_MAP_START( nakajies210_map, AS_PROGRAM, 8 )
-	AM_RANGE( 0x00000, 0x1ffff ) AM_RAM
+	AM_RANGE( 0x00000, 0x1ffff ) AM_RAM	AM_BASE_MEMBER(nakajies_state, m_ram_base)
 	AM_RANGE( 0x80000, 0xfffff ) AM_ROM AM_REGION( "bios", 0 )
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( nakajies220_map, AS_PROGRAM, 8 )
-	AM_RANGE( 0x00000, 0x3ffff ) AM_RAM
+	AM_RANGE( 0x00000, 0x3ffff ) AM_RAM	AM_BASE_MEMBER(nakajies_state, m_ram_base)
 	AM_RANGE( 0x80000, 0xfffff ) AM_ROM AM_REGION( "bios", 0 )
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( nakajies250_map, AS_PROGRAM, 8 )
-	AM_RANGE( 0x00000, 0x3ffff ) AM_RAM
+	AM_RANGE( 0x00000, 0x3ffff ) AM_RAM	AM_BASE_MEMBER(nakajies_state, m_ram_base)
 	AM_RANGE( 0x80000, 0xfffff ) AM_ROM AM_REGION( "bios", 0x80000 )
 ADDRESS_MAP_END
 
@@ -300,8 +304,16 @@ static READ8_HANDLER( unk_a0_r )
 	return 0xff;
 }
 
+static WRITE8_HANDLER( lcd_memory_start_w )
+{
+	nakajies_state *state = space->machine().driver_data<nakajies_state>();
+
+	state->m_lcd_memory_start = data;
+}
+
 
 static ADDRESS_MAP_START( nakajies_io_map, AS_IO, 8 )
+	AM_RANGE( 0x0000, 0x0000 ) AM_WRITE( lcd_memory_start_w )
 	AM_RANGE( 0x0060, 0x0060 ) AM_READWRITE( irq_enable_r, irq_enable_w )
 	AM_RANGE( 0x0090, 0x0090 ) AM_READWRITE( irq_clear_r, irq_clear_w )
 	AM_RANGE( 0x00a0, 0x00a0 ) AM_READ( unk_a0_r )
@@ -338,6 +350,27 @@ static MACHINE_RESET( nakajies )
 	state->m_cpu = machine.device( "v20hl" );
 	state->m_irq_enabled = 0;
 	state->m_irq_active = 0;
+	state->m_lcd_memory_start = 0;
+}
+
+static SCREEN_UPDATE( nakajies )
+{
+	nakajies_state *state = screen->machine().driver_data<nakajies_state>();
+	UINT8* lcd_memory_start = state->m_ram_base + (state->m_lcd_memory_start<<9);
+
+	for (int y=0; y<64; y++)
+		for (int x=0; x<60; x++)
+		{
+			UINT8 data = lcd_memory_start[y*64 + x];
+
+			for (int px=0; px<8; px++)
+			{
+				*BITMAP_ADDR16(bitmap, y, (x * 8) + px) = BIT(data, 7);
+				data <<= 1;
+			}
+		}
+
+	return 0;
 }
 
 /* F4 Character Displayer */
@@ -385,6 +418,9 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
 	MCFG_GFXDECODE(wales210)
 	MCFG_PALETTE_LENGTH( 2 )
+	MCFG_SCREEN_UPDATE(nakajies)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_PALETTE_INIT(black_and_white)
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
@@ -410,6 +446,9 @@ static MACHINE_CONFIG_START( nakajies220, nakajies_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
 	MCFG_GFXDECODE(drwrt400)
 	MCFG_PALETTE_LENGTH( 2 )
+	MCFG_SCREEN_UPDATE(nakajies)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_PALETTE_INIT(black_and_white)
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
@@ -432,6 +471,9 @@ static MACHINE_CONFIG_START( nakajies250, nakajies_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
 	MCFG_GFXDECODE(drwrt200)
 	MCFG_PALETTE_LENGTH( 2 )
+	MCFG_SCREEN_UPDATE(nakajies)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_PALETTE_INIT(black_and_white)
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
