@@ -2,7 +2,10 @@
 
     Hitachi B(asic Master?) 16
 
-    31/05/2011 Skeleton driver.
+    very preliminary driver by Angelo Salese
+
+    TODO:
+    - Driver is all made up of educated guesses (no documentation available)
 
 	0xfcc67 after the ROM checksum to zero (bp 0xfc153 -> SI = 0) -> system boots
 
@@ -12,6 +15,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
+#include "machine/8237dma.h"
 
 #define VIDEO_START_MEMBER(name) void name::video_start()
 #define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -31,11 +35,14 @@ public:
 	DECLARE_WRITE8_MEMBER(b16_pcg_w);
 	DECLARE_WRITE8_MEMBER(b16_6845_address_w);
 	DECLARE_WRITE8_MEMBER(b16_6845_data_w);
+	DECLARE_READ8_MEMBER(unk_dev_r);
+	DECLARE_WRITE8_MEMBER(unk_dev_w);
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	mc6845_device *m_mc6845;
+	i8237_device	*m_dma8237;
 };
 
 #define mc6845_h_char_total 	(m_crtc_vreg[0])
@@ -129,13 +136,80 @@ WRITE8_MEMBER( b16_state::b16_6845_data_w )
 	m_mc6845->register_w(space, offset, data);
 }
 
+/*
+Pretty weird protocol, dunno what it is ...
+
+8a (06) W
+(04) R
+ff (04) W
+(04) R
+ff (04) W
+36 (0e) W
+ff (08) W
+ff (08) W
+06 (0e) W
+(08) R
+(08) R
+36 (0e) W
+40 (08) W
+9c (08) W
+76 (0e) W
+ff (0a) W
+ff (0a) W
+46 (0e) W
+(0a) R
+(0a) R
+76 (0e) W
+1a (0a) W
+00 (0a) W
+b6 (0e) W
+ff (0c) W
+ff (0c) W
+86 (0e) W
+(0c) R
+(0c) R
+b6 (0e) W
+34 (0c) W
+00 (0c) W
+36 (0e) W
+b6 (0e) W
+40 (08) W
+9c (08) W
+34 (0c) W
+00 (0c) W
+8a (06) W
+06 (06) W
+05 (06) W
+*/
+
+READ8_MEMBER( b16_state::unk_dev_r )
+{
+	static int test;
+
+	printf("(%02x) R\n",offset << 1);
+
+	if(offset == 0x8/2 || offset == 0x0a/2 || offset == 0x0c/2) // quick hack
+	{
+		test^=1;
+		return test ? 0x9f : 0x92;
+	}
+
+	return 0xff;
+}
+
+WRITE8_MEMBER( b16_state::unk_dev_w )
+{
+	printf("%02x (%02x) W\n",data,offset << 1);
+
+}
 
 static ADDRESS_MAP_START( b16_io, AS_IO, 16, b16_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x20, 0x21 ) AM_WRITE8(b16_6845_address_w,0x00ff)
-	AM_RANGE( 0x22, 0x23 ) AM_WRITE8(b16_6845_data_w,0x00ff)
+	AM_RANGE(0x00, 0x0f) AM_READWRITE8(unk_dev_r,unk_dev_w,0x00ff) // DMA device?
+	AM_RANGE(0x20, 0x21) AM_WRITE8(b16_6845_address_w,0x00ff)
+	AM_RANGE(0x22, 0x23) AM_WRITE8(b16_6845_data_w,0x00ff)
 	//0x79 bit 0 DSW?
-	AM_RANGE( 0x80, 0x81 ) AM_READ(vblank_r) // TODO
+	AM_RANGE(0x80, 0x81) AM_READ(vblank_r) // TODO
 ADDRESS_MAP_END
 
 
@@ -165,6 +239,8 @@ static const gfx_layout b16_charlayout =
 static MACHINE_START(b16)
 {
 	b16_state *state = machine.driver_data<b16_state>();
+
+	state->m_dma8237 = machine.device<i8237_device>( "dma8237" );
 	state->m_mc6845 = machine.device<mc6845_device>("crtc");
 }
 
@@ -190,6 +266,20 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
+static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
+static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+
+static I8237_INTERFACE( b16_dma8237_interface )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
+};
+
 
 static MACHINE_CONFIG_START( b16, b16_state )
 	/* basic machine hardware */
@@ -209,6 +299,7 @@ static MACHINE_CONFIG_START( b16, b16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_14_31818MHz/5, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_I8237_ADD("8237dma", XTAL_14_31818MHz/2, b16_dma8237_interface)
 
 	MCFG_GFXDECODE(b16)
 	MCFG_PALETTE_LENGTH(8)
