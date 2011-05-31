@@ -791,7 +791,7 @@ static MACHINE_CONFIG_START( neat, at_state )
 	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
-	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, at_mc146818_config )
 
 	MCFG_CS8221_ADD("cs8221", "maincpu", "isa", "bios")
 	
