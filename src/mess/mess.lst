@@ -794,6 +794,8 @@ mz80b		// 1981 Sharp MZ80B
 mz2000	// 1981 Sharp MZ2000
 mz2200	// 1981 Sharp MZ2200
 
+mz6500  // 198? Sharp MZ6500
+
 x1		// 1982 Sharp X1
 x1twin	// 1986 Sharp X1 Twin
 x1turbo   // 1984 Sharp X1 Turbo (Model 10)
