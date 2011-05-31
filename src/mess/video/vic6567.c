@@ -1006,27 +1006,27 @@ static TIMER_CALLBACK( pal_timer_callback )
 
 //  printf("%02x %02x %02x\n",cpu_cycles,vic_cycles,vic2->rdy_cycles);
 #if 0
-if (input_code_pressed(machine, KEYCODE_X))
+if (machine.input().code_pressed(KEYCODE_X))
 {
-if (input_code_pressed_once(machine, KEYCODE_Q)) adjust[1]++;
-if (input_code_pressed_once(machine, KEYCODE_W)) adjust[2]++;
-if (input_code_pressed_once(machine, KEYCODE_E)) adjust[3]++;
-if (input_code_pressed_once(machine, KEYCODE_R)) adjust[4]++;
-if (input_code_pressed_once(machine, KEYCODE_T)) adjust[5]++;
-if (input_code_pressed_once(machine, KEYCODE_Y)) adjust[6]++;
-if (input_code_pressed_once(machine, KEYCODE_U)) adjust[7]++;
-if (input_code_pressed_once(machine, KEYCODE_I)) adjust[8]++;
-if (input_code_pressed_once(machine, KEYCODE_A)) adjust[1]--;
-if (input_code_pressed_once(machine, KEYCODE_S)) adjust[2]--;
-if (input_code_pressed_once(machine, KEYCODE_D)) adjust[3]--;
-if (input_code_pressed_once(machine, KEYCODE_F)) adjust[4]--;
-if (input_code_pressed_once(machine, KEYCODE_G)) adjust[5]--;
-if (input_code_pressed_once(machine, KEYCODE_H)) adjust[6]--;
-if (input_code_pressed_once(machine, KEYCODE_J)) adjust[7]--;
-if (input_code_pressed_once(machine, KEYCODE_K)) adjust[8]--;
-if (input_code_pressed_once(machine, KEYCODE_C)) adjust[0]++;
-if (input_code_pressed_once(machine, KEYCODE_V)) adjust[0]--;
-if (input_code_pressed_once(machine, KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:%02x 4:%02x 5:%02x 6:%02x 7:%02x 8:%02x\n",
+if (machine.input().code_pressed_once(KEYCODE_Q)) adjust[1]++;
+if (machine.input().code_pressed_once(KEYCODE_W)) adjust[2]++;
+if (machine.input().code_pressed_once(KEYCODE_E)) adjust[3]++;
+if (machine.input().code_pressed_once(KEYCODE_R)) adjust[4]++;
+if (machine.input().code_pressed_once(KEYCODE_T)) adjust[5]++;
+if (machine.input().code_pressed_once(KEYCODE_Y)) adjust[6]++;
+if (machine.input().code_pressed_once(KEYCODE_U)) adjust[7]++;
+if (machine.input().code_pressed_once(KEYCODE_I)) adjust[8]++;
+if (machine.input().code_pressed_once(KEYCODE_A)) adjust[1]--;
+if (machine.input().code_pressed_once(KEYCODE_S)) adjust[2]--;
+if (machine.input().code_pressed_once(KEYCODE_D)) adjust[3]--;
+if (machine.input().code_pressed_once(KEYCODE_F)) adjust[4]--;
+if (machine.input().code_pressed_once(KEYCODE_G)) adjust[5]--;
+if (machine.input().code_pressed_once(KEYCODE_H)) adjust[6]--;
+if (machine.input().code_pressed_once(KEYCODE_J)) adjust[7]--;
+if (machine.input().code_pressed_once(KEYCODE_K)) adjust[8]--;
+if (machine.input().code_pressed_once(KEYCODE_C)) adjust[0]++;
+if (machine.input().code_pressed_once(KEYCODE_V)) adjust[0]--;
+if (machine.input().code_pressed_once(KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3:%02x 4:%02x 5:%02x 6:%02x 7:%02x 8:%02x\n",
                                 adjust[0],adjust[1],adjust[2],adjust[3],adjust[4],adjust[5],adjust[6],adjust[7],adjust[8]);
 }
 #define adjust(x) adjust[x]

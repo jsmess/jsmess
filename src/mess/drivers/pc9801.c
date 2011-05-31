@@ -2258,7 +2258,7 @@ static INTERRUPT_GEN(pc9801_vrtc_irq)
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	static UINT8 test;
 
-	if(input_code_pressed_once(device->machine(),JOYCODE_BUTTON1))
+	if(device->machine().input().code_pressed_once(JOYCODE_BUTTON1))
 		test^=1;
 
 	if(test)

@@ -63,14 +63,14 @@ static VIDEO_START( paso7 )
 }
 
 #define keyb_press(_val_,_charset_) \
-	if(input_code_pressed(machine, _val_)) \
+	if(machine.input().code_pressed(_val_)) \
 	{ \
 		ram_space->write_byte(0xfda4,0x01); \
 		ram_space->write_byte(0xfce1,_charset_); \
 	} \
 
 #define keyb_shift_press(_val_,_charset_) \
-	if(input_code_pressed(machine, _val_) && input_code_pressed(machine, KEYCODE_LSHIFT)) \
+	if(machine.input().code_pressed(_val_) && machine.input().code_pressed(KEYCODE_LSHIFT)) \
 	{ \
 		ram_space->write_byte(0xfda4,0x01); \
 		ram_space->write_byte(0xfce1,_charset_); \

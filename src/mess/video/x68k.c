@@ -976,7 +976,7 @@ static void x68k_draw_sprites(running_machine &machine, bitmap_t* bitmap, int pr
 	{
 		pri = state->m_spritereg[ptr+3] & 0x03;
 #ifdef MAME_DEBUG
-		if(!(input_code_pressed(machine,KEYCODE_I)))
+		if(!(machine.input().code_pressed(KEYCODE_I)))
 #endif
 		if(pri == priority)
 		{  // if at the right priority level, draw the sprite
@@ -1225,19 +1225,19 @@ SCREEN_UPDATE( x68000 )
 	}
 
 #ifdef MAME_DEBUG
-	if(input_code_pressed(screen->machine(),KEYCODE_I))
+	if(screen->machine().input().code_pressed(KEYCODE_I))
 	{
 		state->m_mfp.isra = 0;
 		state->m_mfp.isrb = 0;
 //      mfp_trigger_irq(MFP_IRQ_GPIP6);
 //      cputag_set_input_line_and_vector(machine, "maincpu",6,ASSERT_LINE,0x43);
 	}
-	if(input_code_pressed(screen->machine(),KEYCODE_9))
+	if(screen->machine().input().code_pressed(KEYCODE_9))
 	{
 		state->m_sprite_shift--;
 		popmessage("Sprite shift = %i",state->m_sprite_shift);
 	}
-	if(input_code_pressed(screen->machine(),KEYCODE_0))
+	if(screen->machine().input().code_pressed(KEYCODE_0))
 	{
 		state->m_sprite_shift++;
 		popmessage("Sprite shift = %i",state->m_sprite_shift);

@@ -1799,12 +1799,12 @@ bool towns_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 
 	if(!(m_video.towns_video_reg[1] & 0x01))
 	{
-		if(!input_code_pressed(screen.machine(),KEYCODE_Q))
+		if(!screen.machine().input().code_pressed(KEYCODE_Q))
 		{
 			if((m_video.towns_layer_ctrl & 0x03) != 0)
 				towns_crtc_draw_layer(screen.machine(),&bitmap,&m_video.towns_crtc_layerscr[1],1);
 		}
-		if(!input_code_pressed(screen.machine(),KEYCODE_W))
+		if(!screen.machine().input().code_pressed(KEYCODE_W))
 		{
 			if((m_video.towns_layer_ctrl & 0x0c) != 0)
 				towns_crtc_draw_layer(screen.machine(),&bitmap,&m_video.towns_crtc_layerscr[0],0);
@@ -1812,12 +1812,12 @@ bool towns_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 	}
 	else
 	{
-		if(!input_code_pressed(screen.machine(),KEYCODE_Q))
+		if(!screen.machine().input().code_pressed(KEYCODE_Q))
 		{
 			if((m_video.towns_layer_ctrl & 0x0c) != 0)
 				towns_crtc_draw_layer(screen.machine(),&bitmap,&m_video.towns_crtc_layerscr[0],0);
 		}
-		if(!input_code_pressed(screen.machine(),KEYCODE_W))
+		if(!screen.machine().input().code_pressed(KEYCODE_W))
 		{
 			if((m_video.towns_layer_ctrl & 0x03) != 0)
 				towns_crtc_draw_layer(screen.machine(),&bitmap,&m_video.towns_crtc_layerscr[1],1);
@@ -1826,9 +1826,9 @@ bool towns_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 
 #if 0
 #ifdef SPR_DEBUG
-	if(input_code_pressed(screen->machine(),KEYCODE_O))
+	if(screen->machine().input().code_pressed(KEYCODE_O))
 		pshift+=0x80;
-	if(input_code_pressed(screen->machine(),KEYCODE_I))
+	if(screen->machine().input().code_pressed(KEYCODE_I))
 		pshift-=0x80;
 	popmessage("Pixel shift = %08x",pshift);
 #endif

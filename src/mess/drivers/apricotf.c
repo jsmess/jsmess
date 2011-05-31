@@ -264,7 +264,7 @@ static const z80_daisy_config x1_daisy[] =
 
 static INTERRUPT_GEN( act_f1_irq )
 {
-	//if(input_code_pressed(device->machine(), KEYCODE_C))
+	//if(device->machine().input().code_pressed(KEYCODE_C))
 	//  device_set_input_line_and_vector(device,0,HOLD_LINE,0x60);
 }
 
