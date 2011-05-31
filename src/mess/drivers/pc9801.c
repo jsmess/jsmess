@@ -275,7 +275,7 @@ public:
 
 	UINT8 m_keyb_press;
 
-	UINT8 m_fdc_2dd_ctrl;
+	UINT8 m_fdc_2dd_ctrl,m_fdc_2hd_ctrl;
 	UINT8 m_nmi_ff;
 
 	UINT8 m_vram_bank;
@@ -924,6 +924,58 @@ static WRITE8_HANDLER( pc9801_a0_w )
 	}
 }
 
+static READ8_HANDLER( pc9801_fdc_2hd_r )
+{
+	if((offset & 1) == 0)
+	{
+		switch(offset & 6)
+		{
+			case 0:	return upd765_status_r(space->machine().device("upd765_2hd"),0);
+			case 2: return upd765_data_r(space->machine().device("upd765_2hd"),0);
+			case 4: return 0x5f; //unknown port meaning
+		}
+	}
+	else
+	{
+		printf("Read to undefined port [%02x]\n",offset+0x90);
+		return 0xff;
+	}
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( pc9801_fdc_2hd_w )
+{
+	pc9801_state *state = space->machine().driver_data<pc9801_state>();
+
+	if((offset & 1) == 0)
+	{
+		switch(offset & 6)
+		{
+			case 0: printf("Write to undefined port [%02x] <- %02x\n",offset+0x90,data); return;
+			case 2: upd765_data_w(space->machine().device("upd765_2hd"),0,data); return;
+			case 4:
+				printf("%02x ctrl\n",data);
+				if(((state->m_fdc_2hd_ctrl & 0x80) == 0) && (data & 0x80))
+					upd765_reset_w(space->machine().device("upd765_2hd"),1);
+				if((state->m_fdc_2hd_ctrl & 0x80) && (!(data & 0x80)))
+					upd765_reset_w(space->machine().device("upd765_2hd"),0);
+
+				state->m_fdc_2hd_ctrl = data;
+				floppy_mon_w(floppy_get_device(space->machine(), 0), (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+				floppy_mon_w(floppy_get_device(space->machine(), 1), (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+				floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), (data & 0x40), 0);
+				floppy_drive_set_ready_state(floppy_get_device(space->machine(), 1), (data & 0x40), 0);
+				break;
+		}
+	}
+	else
+	{
+		printf("Write to undefined port [%02x] <- %02x\n",offset+0x90,data);
+	}
+}
+
+
 static READ8_HANDLER( pc9801_fdc_2dd_r )
 {
 	if((offset & 1) == 0)
@@ -1043,7 +1095,7 @@ static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16)
 	AM_RANGE(0xa8000, 0xbffff) AM_READWRITE8(pc9801_gvram_r,pc9801_gvram_w,0xffff) //bitmap VRAM
 	AM_RANGE(0xcc000, 0xcdfff) AM_ROM AM_REGION("sound_bios",0) //sound BIOS
 	AM_RANGE(0xd6000, 0xd6fff) AM_ROM AM_REGION("fdc_bios_2dd",0) //floppy BIOS 2dd
-//  AM_RANGE(0xd7000, 0xd7fff) AM_ROM AM_REGION("fdc_bios_2hd",0) //floppy BIOS 2hd
+    AM_RANGE(0xd7000, 0xd7fff) AM_ROM AM_REGION("fdc_bios_2hd",0) //floppy BIOS 2hd
 	AM_RANGE(0xe8000, 0xfffff) AM_ROM AM_REGION("ipl",0)
 ADDRESS_MAP_END
 
@@ -1060,7 +1112,7 @@ static ADDRESS_MAP_START( pc9801_io, AS_IO, 16)
 //  AM_RANGE(0x006c, 0x006f) border color / <undefined>
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,pc9801_70_w,0xffff) //display registers / i8253 pit
 	AM_RANGE(0x0080, 0x0083) AM_READWRITE8(pc9801_sasi_r,pc9801_sasi_w,0xffff) //HDD SASI interface / <undefined>
-//  AM_RANGE(0x0090, 0x0097) upd765a 2hd / cmt
+	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801_fdc_2hd_r,pc9801_fdc_2hd_w,0xffff) //upd765a 2hd / cmt
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00c8, 0x00cd) AM_READWRITE8(pc9801_fdc_2dd_r,pc9801_fdc_2dd_w,0xffff) //upd765a 2dd / <undefined>
 	AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,pc9801_opn_w,0xffff) //ym2203 opn / <undefined>
@@ -1803,16 +1855,19 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
 
 	PORT_START("ROM_LOAD")
-	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2dd BIOS" )
+	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2hd BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( No ) )
+	PORT_CONFNAME( 0x02, 0x02, "Load floppy 2dd BIOS" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( No ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc9801rs )
 	PORT_INCLUDE( pc9801 )
 
 	PORT_MODIFY("ROM_LOAD")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout charset_8x8 =
@@ -1923,15 +1978,15 @@ static const struct pit8253_config pit8253_config =
 {
 	{
 		{
-			1996800,				/* heartbeat IRQ */
+			5000000,//1996800,				/* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir0_w)
 		}, {
-			1996800,				/* Memory Refresh */
+			5000000,//1996800,				/* Memory Refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			1996800,				/* RS-232c */
+			5000000,//1996800,				/* RS-232c */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
@@ -2096,6 +2151,18 @@ static I8255A_INTERFACE( ppi_fdd_intf )
 *
 ****************************************/
 
+static WRITE_LINE_DEVICE_HANDLER( fdc_2hd_irq )
+{
+	printf("IRQ %d\n",state);
+	//if(state)
+	//	pic8259_ir3_w(device->machine().device("pic8259_slave"), state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( fdc_2hd_drq )
+{
+	printf("%02x DRQ\n",state);
+}
+
 static WRITE_LINE_DEVICE_HANDLER( fdc_2dd_irq )
 {
 	pc9801_state *drvstate = device->machine().driver_data<pc9801_state>();
@@ -2113,13 +2180,22 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_2dd_drq )
 	printf("%02x DRQ\n",state);
 }
 
+static const struct upd765_interface upd765_2hd_intf =
+{
+	DEVCB_LINE(fdc_2hd_irq),
+	DEVCB_LINE(fdc_2hd_drq), //DRQ, TODO
+	NULL,
+	UPD765_RDY_PIN_CONNECTED,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
+
 static const struct upd765_interface upd765_2dd_intf =
 {
 	DEVCB_LINE(fdc_2dd_irq),
 	DEVCB_LINE(fdc_2dd_drq), //DRQ, TODO
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+	{NULL, NULL, NULL, NULL}
 };
 
 static WRITE_LINE_DEVICE_HANDLER( pc9801rs_fdc_irq )
@@ -2227,14 +2303,21 @@ static MACHINE_RESET(pc9801f)
 
 	{
 		UINT8 op_mode;
-		UINT8 *ROM = machine.region("fdc_bios_2dd")->base();
+		UINT8 *ROM;
 		UINT8 *PRG = machine.region("fdc_data")->base();
 		int i;
 
-		op_mode = input_port_read(machine, "ROM_LOAD") & 1;
+		ROM = machine.region("fdc_bios_2dd")->base();
+		op_mode = (input_port_read(machine, "ROM_LOAD") & 2) >> 1;
 
 		for(i=0;i<0x1000;i++)
 			ROM[i] = PRG[i+op_mode*0x8000];
+
+		ROM = machine.region("fdc_bios_2hd")->base();
+		op_mode = input_port_read(machine, "ROM_LOAD") & 1;
+
+		for(i=0;i<0x1000;i++)
+			ROM[i] = PRG[i+op_mode*0x8000+0x10000];
 	}
 }
 
@@ -2293,6 +2376,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc9801_upd1990a_intf)
 
+	MCFG_UPD765A_ADD("upd765_2hd", upd765_2hd_intf)
 	MCFG_UPD765A_ADD("upd765_2dd", upd765_2dd_intf)
 	MCFG_FLOPPY_4_DRIVES_ADD(pc9801_floppy_config)
 
@@ -2438,9 +2522,12 @@ ROM_START( pc9801f )
 
 	ROM_REGION( 0x1000, "fdc_bios_2dd", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x10000, "fdc_data", ROMREGION_ERASEFF ) // 2dd fdc bios, presumably bad size (should be 0x800 for each rom)
+	ROM_REGION( 0x1000, "fdc_bios_2hd", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "fdc_data", ROMREGION_ERASEFF ) // 2dd fdc bios, presumably bad size (should be 0x800 for each rom)
 	ROM_LOAD16_BYTE( "urf01-01.bin", 0x00000, 0x4000, BAD_DUMP CRC(2f5ae147) SHA1(69eb264d520a8fc826310b4fce3c8323867520ee) )
 	ROM_LOAD16_BYTE( "urf02-01.bin", 0x00001, 0x4000, BAD_DUMP CRC(62a86928) SHA1(4160a6db096dbeff18e50cbee98f5d5c1a29e2d1) )
+	ROM_LOAD( "2hdif.rom", 0x10000, 0x1000, BAD_DUMP CRC(9652011b) SHA1(b607707d74b5a7d3ba211825de31a8f32aec8146) ) // needs dumping from a board
 
 	ROM_REGION( 0x800, "kbd_mcu", ROMREGION_ERASEFF)
 	ROM_LOAD( "mcu.bin", 0x0000, 0x0800, NO_DUMP ) //connected thru a i8251 UART, needs decapping
