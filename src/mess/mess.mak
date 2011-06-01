@@ -710,9 +710,10 @@ $(MESSOBJ)/cantab.a:			\
 	$(MESS_DRIVERS)/ace.o		\
 	$(MESS_FORMATS)/ace_ace.o	\
 
-$(MESSOBJ)/casio.a:				\
+$(MESSOBJ)/casio.a:			\
 	$(MESS_DRIVERS)/casloopy.o	\
 	$(MESS_DRIVERS)/cfx9850.o	\
+	$(MESS_DRIVERS)/fp1100.o        \
 	$(MESS_DRIVERS)/pv1000.o	\
 	$(MESS_DRIVERS)/pv2000.o	\
 	$(MESS_DRIVERS)/pb1000.o	\
@@ -940,7 +941,7 @@ $(MESSOBJ)/fujitsu.a:			\
 	$(MESS_MACHINE)/upd71071.o	\
 	$(MESS_MACHINE)/fm_scsi.o	\
 	$(MESS_DRIVERS)/fm7.o		\
-	$(MESS_VIDEO)/fm7.o			\
+	$(MESS_VIDEO)/fm7.o		\
 
 $(MESSOBJ)/funtech.a:			\
 	$(MESS_DRIVERS)/supracan.o	\
@@ -1567,7 +1568,7 @@ $(MESSOBJ)/tomy.a:				\
 	$(MESS_DRIVERS)/tutor.o		\
 
 $(MESSOBJ)/toshiba.a:			\
-	$(MESS_DRIVERS)/pasopia.o	\
+	$(MESS_DRIVERS)/pasopia7.o	\
 
 $(MESSOBJ)/trs.a:				\
 	$(MESS_MACHINE)/6883sam.o	\
