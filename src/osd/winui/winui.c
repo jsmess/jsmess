@@ -503,8 +503,8 @@ static PDIRWATCHER s_pWatcher;
 /* use a joystick subsystem in the gui? */
 static const struct OSDJoystick* g_pJoyGUI = NULL;
 
-/* store current keyboard state (in internal codes) here */
-static input_code keyboard_state[ 2048 ]; /* __code_max #defines the number of internal key_codes */
+/* store current keyboard state (in bools) here */
+static bool keyboard_state[4096]; /* __code_max #defines the number of internal key_codes */
 
 /* search */
 static char g_SearchText[256];
@@ -637,42 +637,42 @@ typedef struct
 
 static const GUISequence GUISequenceControl[]=
 {
-	{"gui_key_up",                SEQ_DEF_0,    ID_UI_UP,           Get_ui_key_up },
-	{"gui_key_down",              SEQ_DEF_0,    ID_UI_DOWN,         Get_ui_key_down },
-	{"gui_key_left",              SEQ_DEF_0,    ID_UI_LEFT,         Get_ui_key_left },
-	{"gui_key_right",             SEQ_DEF_0,    ID_UI_RIGHT,        Get_ui_key_right },
-	{"gui_key_start",             SEQ_DEF_0,    ID_UI_START,        Get_ui_key_start },
-	{"gui_key_pgup",              SEQ_DEF_0,    ID_UI_PGUP,         Get_ui_key_pgup },
-	{"gui_key_pgdwn",             SEQ_DEF_0,    ID_UI_PGDOWN,       Get_ui_key_pgdwn },
-	{"gui_key_home",              SEQ_DEF_0,    ID_UI_HOME,         Get_ui_key_home },
-	{"gui_key_end",               SEQ_DEF_0,    ID_UI_END,          Get_ui_key_end },
-	{"gui_key_ss_change",         SEQ_DEF_0,    IDC_SSFRAME,        Get_ui_key_ss_change },
-	{"gui_key_history_up",        SEQ_DEF_0,    ID_UI_HISTORY_UP,   Get_ui_key_history_up },
-	{"gui_key_history_down",      SEQ_DEF_0,    ID_UI_HISTORY_DOWN, Get_ui_key_history_down },
+	{"gui_key_up",                input_seq(),    ID_UI_UP,           Get_ui_key_up },
+	{"gui_key_down",              input_seq(),    ID_UI_DOWN,         Get_ui_key_down },
+	{"gui_key_left",              input_seq(),    ID_UI_LEFT,         Get_ui_key_left },
+	{"gui_key_right",             input_seq(),    ID_UI_RIGHT,        Get_ui_key_right },
+	{"gui_key_start",             input_seq(),    ID_UI_START,        Get_ui_key_start },
+	{"gui_key_pgup",              input_seq(),    ID_UI_PGUP,         Get_ui_key_pgup },
+	{"gui_key_pgdwn",             input_seq(),    ID_UI_PGDOWN,       Get_ui_key_pgdwn },
+	{"gui_key_home",              input_seq(),    ID_UI_HOME,         Get_ui_key_home },
+	{"gui_key_end",               input_seq(),    ID_UI_END,          Get_ui_key_end },
+	{"gui_key_ss_change",         input_seq(),    IDC_SSFRAME,        Get_ui_key_ss_change },
+	{"gui_key_history_up",        input_seq(),    ID_UI_HISTORY_UP,   Get_ui_key_history_up },
+	{"gui_key_history_down",      input_seq(),    ID_UI_HISTORY_DOWN, Get_ui_key_history_down },
 
-	{"gui_key_context_filters",    SEQ_DEF_0,    ID_CONTEXT_FILTERS,       Get_ui_key_context_filters },
-	{"gui_key_select_random",      SEQ_DEF_0,    ID_CONTEXT_SELECT_RANDOM, Get_ui_key_select_random },
-	{"gui_key_game_audit",         SEQ_DEF_0,    ID_GAME_AUDIT,            Get_ui_key_game_audit },
-	{"gui_key_game_properties",    SEQ_DEF_0,    ID_GAME_PROPERTIES,       Get_ui_key_game_properties },
-	{"gui_key_help_contents",      SEQ_DEF_0,    ID_HELP_CONTENTS,         Get_ui_key_help_contents },
-	{"gui_key_update_gamelist",    SEQ_DEF_0,    ID_UPDATE_GAMELIST,       Get_ui_key_update_gamelist },
-	{"gui_key_view_folders",       SEQ_DEF_0,    ID_VIEW_FOLDERS,          Get_ui_key_view_folders },
-	{"gui_key_view_fullscreen",    SEQ_DEF_0,    ID_VIEW_FULLSCREEN,       Get_ui_key_view_fullscreen },
-	{"gui_key_view_pagetab",       SEQ_DEF_0,    ID_VIEW_PAGETAB,          Get_ui_key_view_pagetab },
-	{"gui_key_view_picture_area",  SEQ_DEF_0,    ID_VIEW_PICTURE_AREA,     Get_ui_key_view_picture_area },
-	{"gui_key_view_software_area", SEQ_DEF_0,    ID_VIEW_SOFTWARE_AREA,    Get_ui_key_view_software_area },
-	{"gui_key_view_status",        SEQ_DEF_0,    ID_VIEW_STATUS,           Get_ui_key_view_status },
-	{"gui_key_view_toolbars",      SEQ_DEF_0,    ID_VIEW_TOOLBARS,         Get_ui_key_view_toolbars },
+	{"gui_key_context_filters",    input_seq(),    ID_CONTEXT_FILTERS,       Get_ui_key_context_filters },
+	{"gui_key_select_random",      input_seq(),    ID_CONTEXT_SELECT_RANDOM, Get_ui_key_select_random },
+	{"gui_key_game_audit",         input_seq(),    ID_GAME_AUDIT,            Get_ui_key_game_audit },
+	{"gui_key_game_properties",    input_seq(),    ID_GAME_PROPERTIES,       Get_ui_key_game_properties },
+	{"gui_key_help_contents",      input_seq(),    ID_HELP_CONTENTS,         Get_ui_key_help_contents },
+	{"gui_key_update_gamelist",    input_seq(),    ID_UPDATE_GAMELIST,       Get_ui_key_update_gamelist },
+	{"gui_key_view_folders",       input_seq(),    ID_VIEW_FOLDERS,          Get_ui_key_view_folders },
+	{"gui_key_view_fullscreen",    input_seq(),    ID_VIEW_FULLSCREEN,       Get_ui_key_view_fullscreen },
+	{"gui_key_view_pagetab",       input_seq(),    ID_VIEW_PAGETAB,          Get_ui_key_view_pagetab },
+	{"gui_key_view_picture_area",  input_seq(),    ID_VIEW_PICTURE_AREA,     Get_ui_key_view_picture_area },
+	{"gui_key_view_software_area", input_seq(),    ID_VIEW_SOFTWARE_AREA,    Get_ui_key_view_software_area },
+	{"gui_key_view_status",        input_seq(),    ID_VIEW_STATUS,           Get_ui_key_view_status },
+	{"gui_key_view_toolbars",      input_seq(),    ID_VIEW_TOOLBARS,         Get_ui_key_view_toolbars },
 
-	{"gui_key_view_tab_cabinet",     SEQ_DEF_0,  ID_VIEW_TAB_CABINET,       Get_ui_key_view_tab_cabinet },
-	{"gui_key_view_tab_cpanel",      SEQ_DEF_0,  ID_VIEW_TAB_CONTROL_PANEL, Get_ui_key_view_tab_cpanel },
-	{"gui_key_view_tab_flyer",       SEQ_DEF_0,  ID_VIEW_TAB_FLYER,         Get_ui_key_view_tab_flyer },
-	{"gui_key_view_tab_history",     SEQ_DEF_0,  ID_VIEW_TAB_HISTORY,       Get_ui_key_view_tab_history },
-	{"gui_key_view_tab_marquee",     SEQ_DEF_0,  ID_VIEW_TAB_MARQUEE,       Get_ui_key_view_tab_marquee },
-	{"gui_key_view_tab_screenshot",  SEQ_DEF_0,  ID_VIEW_TAB_SCREENSHOT,    Get_ui_key_view_tab_screenshot },
-	{"gui_key_view_tab_title",       SEQ_DEF_0,  ID_VIEW_TAB_TITLE,         Get_ui_key_view_tab_title },
-	{"gui_key_view_tab_pcb",         SEQ_DEF_0,  ID_VIEW_TAB_PCB,   	    Get_ui_key_view_tab_pcb },
-	{"gui_key_quit",                 SEQ_DEF_0,  ID_FILE_EXIT,              Get_ui_key_quit },
+	{"gui_key_view_tab_cabinet",     input_seq(),  ID_VIEW_TAB_CABINET,       Get_ui_key_view_tab_cabinet },
+	{"gui_key_view_tab_cpanel",      input_seq(),  ID_VIEW_TAB_CONTROL_PANEL, Get_ui_key_view_tab_cpanel },
+	{"gui_key_view_tab_flyer",       input_seq(),  ID_VIEW_TAB_FLYER,         Get_ui_key_view_tab_flyer },
+	{"gui_key_view_tab_history",     input_seq(),  ID_VIEW_TAB_HISTORY,       Get_ui_key_view_tab_history },
+	{"gui_key_view_tab_marquee",     input_seq(),  ID_VIEW_TAB_MARQUEE,       Get_ui_key_view_tab_marquee },
+	{"gui_key_view_tab_screenshot",  input_seq(),  ID_VIEW_TAB_SCREENSHOT,    Get_ui_key_view_tab_screenshot },
+	{"gui_key_view_tab_title",       input_seq(),  ID_VIEW_TAB_TITLE,         Get_ui_key_view_tab_title },
+	{"gui_key_view_tab_pcb",         input_seq(),  ID_VIEW_TAB_PCB,   	    Get_ui_key_view_tab_pcb },
+	{"gui_key_quit",                 input_seq(),  ID_FILE_EXIT,              Get_ui_key_quit },
 };
 
 
@@ -3461,30 +3461,29 @@ static int GUI_seq_pressed(const input_seq *seq)
 	int invert = 0;
 	int count = 0;
 
-	for (codenum = 0; codenum < ARRAY_LENGTH(seq->code); codenum++)
+	for (codenum = 0; codenum < ARRAY_LENGTH(seq); codenum++)
 	{
-		input_code code = seq->code[codenum];
+		input_code code = (*seq)[codenum];
 
-		switch (code)
+		if (code == input_seq::not_code)
+			invert = !invert;
+
+		else if (code == input_seq::or_code)
 		{
-			case SEQCODE_OR :
-				if (res && count)
-					return 1;
-				res = 1;
-				count = 0;
-				break;
-			case SEQCODE_NOT :
-				invert = !invert;
-				break;
-			default:
-				if (res)
-				{
-					int pressed = keyboard_state[code];
-					if ((pressed != 0) == invert)
-						res = 0;
-				}
-				invert = 0;
-				++count;
+			if (res && count)
+				return 1;
+			res = 1;
+			count = 0;
+		}
+		else
+		{
+			if (res)
+			{
+				if ((keyboard_state[(int)(code.item_id())] != 0) == invert)
+					res = 0;
+			}
+			invert = 0;
+			++count;
 		}
 	}
 	return res && count;
@@ -3527,7 +3526,7 @@ static void KeyboardStateClear(void)
 static void KeyboardKeyDown(int syskey, int vk_code, int special)
 {
 	int i, found = 0;
-	input_code icode = 0;
+	int icode = 0;
 	int special_code = (special >> 24) & 1;
 	int scancode = (special>>16) & 0xff;
 
@@ -3545,13 +3544,13 @@ static void KeyboardKeyDown(int syskey, int vk_code, int special)
 			switch(vk_code)
 			{
 			case VK_MENU:
-				icode = KEYCODE_RALT;
+				icode = (int)(KEYCODE_RALT.item_id());
 				break;
 			case VK_CONTROL:
-				icode = KEYCODE_RCONTROL;
+				icode = (int)(KEYCODE_RCONTROL.item_id());
 				break;
 			case VK_SHIFT:
-				icode = KEYCODE_RSHIFT;
+				icode = (int)(KEYCODE_RSHIFT.item_id());
 				break;
 			}
 		}
@@ -3560,13 +3559,13 @@ static void KeyboardKeyDown(int syskey, int vk_code, int special)
 			switch(vk_code)
 			{
 			case VK_MENU:
-				icode = KEYCODE_LALT;
+				icode = (int)(KEYCODE_LALT.item_id());
 				break;
 			case VK_CONTROL:
-				icode = KEYCODE_LCONTROL;
+				icode = (int)(KEYCODE_LCONTROL.item_id());
 				break;
 			case VK_SHIFT:
-				icode = KEYCODE_LSHIFT;
+				icode = (int)(KEYCODE_LSHIFT.item_id());
 				break;
 			}
 		}
@@ -3590,14 +3589,14 @@ static void KeyboardKeyDown(int syskey, int vk_code, int special)
 		return;
 	}
 	dprintf("VK_code pressed found =  %i, sys=%i, mame_keycode=%i special=%08x\n", vk_code, syskey, icode, special);
-	keyboard_state[icode] = 1;
+	keyboard_state[icode] = true;
 	check_for_GUI_action();
 }
 
 static void KeyboardKeyUp(int syskey, int vk_code, int special)
 {
 	int i, found = 0;
-	input_code icode = 0;
+	int icode = 0;
 	int special_code = (special >> 24) & 1;
 	int scancode = (special>>16) & 0xff;
 
@@ -3615,13 +3614,13 @@ static void KeyboardKeyUp(int syskey, int vk_code, int special)
 			switch(vk_code)
 			{
 			case VK_MENU:
-				icode = KEYCODE_RALT;
+				icode = (int)(KEYCODE_RALT.item_id());
 				break;
 			case VK_CONTROL:
-				icode = KEYCODE_RCONTROL;
+				icode = (int)(KEYCODE_RCONTROL.item_id());
 				break;
 			case VK_SHIFT:
-				icode = KEYCODE_RSHIFT;
+				icode = (int)(KEYCODE_RSHIFT.item_id());
 				break;
 			}
 		}
@@ -3630,13 +3629,13 @@ static void KeyboardKeyUp(int syskey, int vk_code, int special)
 			switch(vk_code)
 			{
 			case VK_MENU:
-				icode = KEYCODE_LALT;
+				icode = (int)(KEYCODE_LALT.item_id());
 				break;
 			case VK_CONTROL:
-				icode = KEYCODE_LCONTROL;
+				icode = (int)(KEYCODE_LCONTROL.item_id());
 				break;
 			case VK_SHIFT:
-				icode = KEYCODE_LSHIFT;
+				icode = (int)(KEYCODE_LSHIFT.item_id());
 				break;
 			}
 		}
@@ -3659,7 +3658,7 @@ static void KeyboardKeyUp(int syskey, int vk_code, int special)
 		//MessageBox(NULL,"keyup message arrived not processed","TitleBox",MB_OK);
 		return;
 	}
-	keyboard_state[icode] = 0;
+	keyboard_state[icode] = false;
 	dprintf("VK_code released found=  %i, sys=%i, mame_keycode=%i special=%08x\n", vk_code, syskey, icode, special );
 	check_for_GUI_action();
 }

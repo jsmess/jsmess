@@ -1064,7 +1064,7 @@ static void seqselect_settext(HWND editwnd)
 		return;	// this should not happen - need to fix this
 
 	// retrieve the seq name
-	input_seq_name(*Machine, seqstring, stuff->code);
+	*Machine->input().seq_name(seqstring, *stuff->code);
 
 	// change the text - avoid calls to SetWindowText() if we can
 	win_get_window_text_utf8(editwnd, buffer, ARRAY_LENGTH(buffer));
@@ -1123,12 +1123,12 @@ static void seqselect_start_read_from_main_thread(void *param)
 	win_window_list = &fake_window_info;
 
 	// start the polling
-	input_seq_poll_start(*Machine, stuff->is_analog ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, NULL);
+	(*Machine).input().seq_poll_start(stuff->is_analog ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, NULL);
 
 	while(stuff->poll_state == SEQSELECT_STATE_POLLING)
 	{
 		// poll
-		/*ret = */input_seq_poll(*Machine, stuff->code);
+		(*Machine).input().seq_poll();
 		seqselect_settext(editwnd);
 	}
 
