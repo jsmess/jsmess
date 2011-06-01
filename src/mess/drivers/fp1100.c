@@ -4,6 +4,7 @@
 
 	TODO:
 	- unimplemented instruction PER triggered
+	- unimplemented instruction SKIT_F0 triggered
 
 ****************************************************************************/
 
@@ -21,6 +22,13 @@ public:
 
 	UINT8 *m_wram;
 	UINT8 m_mem_bank;
+	UINT8 irq_mask;
+
+	struct {
+		UINT8 porta;
+		UINT8 portb;
+		UINT8 portc;
+	}m_upd7801;
 };
 
 static VIDEO_START( fp1100 )
@@ -59,6 +67,17 @@ static WRITE8_HANDLER( main_bank_w )
 	state->m_mem_bank = data & 2; //(1) RAM (0) ROM
 }
 
+static WRITE8_HANDLER( irq_mask_w )
+{
+	fp1100_state *state = space->machine().driver_data<fp1100_state>();
+
+	if((state->irq_mask & 0x80) != (data & 0x80))
+		cputag_set_input_line(space->machine(), "sub", UPD7810_INTF2, HOLD_LINE);
+
+	state->irq_mask = data;
+
+}
+
 static ADDRESS_MAP_START(fp1100_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(fp1100_mem_r,fp1100_mem_w)
@@ -66,7 +85,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(fp1100_io, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0xff80, 0xff80) AM_MIRROR(0x60) AM_READ(soundlatch2_r)
+	AM_RANGE(0xff80, 0xff80) AM_WRITE(irq_mask_w)
 	AM_RANGE(0xffa0, 0xffa0) AM_WRITE(main_bank_w)
+	AM_RANGE(0xffc0, 0xffc0) AM_WRITE(soundlatch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(fp1100_slave_map, AS_PROGRAM, 8 )
@@ -74,18 +96,61 @@ static ADDRESS_MAP_START(fp1100_slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xff80, 0xffff) AM_RAM		/* upd7801 internal RAM */
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("sub_ipl",0x0000)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("sub_ipl",0x1000)
+	AM_RANGE(0x2000, 0x5fff) AM_RAM //vram B
+	AM_RANGE(0x6000, 0x9fff) AM_RAM //vram R
+	AM_RANGE(0xa000, 0xdfff) AM_RAM //vram G
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
+	AM_RANGE(0xe400, 0xe400) AM_READ_PORT("DSW") AM_WRITENOP // key mux write
+	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r) AM_WRITE(soundlatch2_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("sub_ipl",0x2000)
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( portc_w )
+{
+	fp1100_state *state = space->machine().driver_data<fp1100_state>();
+
+	if((!(state->m_upd7801.portc & 8)) && data & 8)
+		cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, HOLD_LINE,0xf8); // TODO
+
+	state->m_upd7801.portc = data;
+}
+
 static ADDRESS_MAP_START(fp1100_slave_io, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x01, 0x01) AM_READNOP //key R
+	AM_RANGE(0x02, 0x02) AM_WRITE(portc_w)
 ADDRESS_MAP_END
 
 
 /* Input ports */
 static INPUT_PORTS_START( fp1100 )
+	/* TODO: All of those have unknown meaning */
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "DSW" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
