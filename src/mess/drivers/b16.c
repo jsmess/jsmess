@@ -42,7 +42,7 @@ public:
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	mc6845_device *m_mc6845;
-	i8237_device	*m_dma8237;
+	i8237_device  *m_dma8237;
 };
 
 #define mc6845_h_char_total 	(m_crtc_vreg[0])
@@ -107,7 +107,7 @@ WRITE8_MEMBER( b16_state::b16_pcg_w )
 {
 	m_char_rom[offset] = data;
 
-	gfx_element_mark_dirty(machine().gfx[0], offset >> 3);
+	gfx_element_mark_dirty(machine().gfx[0], offset >> 4);
 }
 
 static ADDRESS_MAP_START( b16_map, AS_PROGRAM, 16, b16_state)
@@ -222,19 +222,20 @@ INPUT_PORTS_END
 
 
 
-/* F4 Character Displayer */
 static const gfx_layout b16_charlayout =
 {
-	8, 16,					/* 8 x 16 characters */
-	RGN_FRAC(1,1),					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
+	8, 16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
 	{ STEP8(0,1) },
-	/* y offsets */
 	{ STEP16(0,8) },
-	8*16					/* every char takes 2 x 8 bytes */
+	8*16
 };
+
+static GFXDECODE_START( b16 )
+	GFXDECODE_ENTRY( "pcg", 0x0000, b16_charlayout, 0, 1 )
+GFXDECODE_END
 
 static MACHINE_START(b16)
 {
@@ -248,9 +249,7 @@ static MACHINE_RESET(b16)
 {
 }
 
-static GFXDECODE_START( b16 )
-	GFXDECODE_ENTRY( "pcg", 0x0000, b16_charlayout, 0, 1 )
-GFXDECODE_END
+
 
 static const mc6845_interface mc6845_intf =
 {
