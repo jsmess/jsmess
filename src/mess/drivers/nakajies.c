@@ -192,6 +192,8 @@ disabled). Perhaps power on/off related??
 
 ******************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "sound/speaker.h"
@@ -202,10 +204,22 @@ class nakajies_state : public driver_device
 {
 public:
 	nakajies_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "v20hl")
+		{}
 
-	/* Device lookups */
-	device_t *m_cpu;
+	required_device<cpu_device> m_maincpu;
+
+	virtual void machine_reset();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	void nakajies_update_irqs( running_machine &machine );
+	DECLARE_READ8_MEMBER( irq_clear_r );
+	DECLARE_WRITE8_MEMBER( irq_clear_w );
+	DECLARE_READ8_MEMBER( irq_enable_r );
+	DECLARE_WRITE8_MEMBER( irq_enable_w );
+	DECLARE_READ8_MEMBER( unk_a0_r );
+	DECLARE_WRITE8_MEMBER( lcd_memory_start_w );
 
 	/* IRQ handling */
 	UINT8	m_irq_enabled;
@@ -219,20 +233,20 @@ public:
 #define X301	19660000
 
 
-static ADDRESS_MAP_START( nakajies210_map, AS_PROGRAM, 8 )
-	AM_RANGE( 0x00000, 0x1ffff ) AM_RAM	AM_BASE_MEMBER(nakajies_state, m_ram_base)
+static ADDRESS_MAP_START( nakajies210_map, AS_PROGRAM, 8, nakajies_state )
+	AM_RANGE( 0x00000, 0x1ffff ) AM_RAM	AM_BASE(m_ram_base)
 	AM_RANGE( 0x80000, 0xfffff ) AM_ROM AM_REGION( "bios", 0 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nakajies220_map, AS_PROGRAM, 8 )
-	AM_RANGE( 0x00000, 0x3ffff ) AM_RAM	AM_BASE_MEMBER(nakajies_state, m_ram_base)
+static ADDRESS_MAP_START( nakajies220_map, AS_PROGRAM, 8, nakajies_state )
+	AM_RANGE( 0x00000, 0x3ffff ) AM_RAM	AM_BASE(m_ram_base)
 	AM_RANGE( 0x80000, 0xfffff ) AM_ROM AM_REGION( "bios", 0 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nakajies250_map, AS_PROGRAM, 8 )
-	AM_RANGE( 0x00000, 0x3ffff ) AM_RAM	AM_BASE_MEMBER(nakajies_state, m_ram_base)
+static ADDRESS_MAP_START( nakajies250_map, AS_PROGRAM, 8, nakajies_state )
+	AM_RANGE( 0x00000, 0x3ffff ) AM_RAM	AM_BASE(m_ram_base)
 	AM_RANGE( 0x80000, 0xfffff ) AM_ROM AM_REGION( "bios", 0x80000 )
 ADDRESS_MAP_END
 
@@ -241,13 +255,12 @@ ADDRESS_MAP_END
   IRQ Handling
 *********************************************/
 
-static void nakajies_update_irqs( running_machine &machine )
+void nakajies_state::nakajies_update_irqs( running_machine &machine )
 {
-	nakajies_state *state = machine.driver_data<nakajies_state>();
-	UINT8 irq = state->m_irq_enabled & state->m_irq_active;
+	UINT8 irq = m_irq_enabled & m_irq_active;
 	UINT8 vector = 0xff;
 
-	logerror("nakajies_update_irqs: irq_enabled = %02x, irq_active = %02x\n", state->m_irq_enabled, state->m_irq_active );
+	logerror("nakajies_update_irqs: irq_enabled = %02x, irq_active = %02x\n", m_irq_enabled, m_irq_active );
 
 	/* Assuming irq 0xFF has the highest priority and 0xF8 the lowest */
 	while( vector >= 0xf8 && ! ( irq & 0x01 ) )
@@ -258,61 +271,53 @@ static void nakajies_update_irqs( running_machine &machine )
 
 	if ( vector >= 0xf8 )
 	{
-		device_set_input_line_and_vector( state->m_cpu, 0, ASSERT_LINE, vector );
+		device_set_input_line_and_vector( m_maincpu, 0, ASSERT_LINE, vector );
 	}
 	else
 	{
-		device_set_input_line( state->m_cpu, 0, CLEAR_LINE );
+		device_set_input_line( m_maincpu, 0, CLEAR_LINE );
 	}
 }
 
 
-static READ8_HANDLER( irq_clear_r )
+READ8_MEMBER( nakajies_state::irq_clear_r )
 {
 	return 0x00;
 }
 
 
-static WRITE8_HANDLER( irq_clear_w )
+WRITE8_MEMBER( nakajies_state::irq_clear_w )
 {
-	nakajies_state *state = space->machine().driver_data<nakajies_state>();
-
-	state->m_irq_active &= ~data;
-	nakajies_update_irqs(space->machine());
+	m_irq_active &= ~data;
+	nakajies_update_irqs(machine());
 }
 
 
-static READ8_HANDLER( irq_enable_r )
+READ8_MEMBER( nakajies_state::irq_enable_r )
 {
-	nakajies_state *state = space->machine().driver_data<nakajies_state>();
-
-	return state->m_irq_enabled;
+	return m_irq_enabled;
 }
 
 
-static WRITE8_HANDLER( irq_enable_w )
+WRITE8_MEMBER( nakajies_state::irq_enable_w )
 {
-	nakajies_state *state = space->machine().driver_data<nakajies_state>();
-
-	state->m_irq_enabled = data;
-	nakajies_update_irqs(space->machine());
+	m_irq_enabled = data;
+	nakajies_update_irqs(machine());
 }
 
 
-static READ8_HANDLER( unk_a0_r )
+READ8_MEMBER( nakajies_state::unk_a0_r )
 {
 	return 0xff;
 }
 
-static WRITE8_HANDLER( lcd_memory_start_w )
+WRITE8_MEMBER( nakajies_state::lcd_memory_start_w )
 {
-	nakajies_state *state = space->machine().driver_data<nakajies_state>();
-
-	state->m_lcd_memory_start = data;
+	m_lcd_memory_start = data;
 }
 
 
-static ADDRESS_MAP_START( nakajies_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( nakajies_io_map, AS_IO, 8, nakajies_state )
 	AM_RANGE( 0x0000, 0x0000 ) AM_WRITE( lcd_memory_start_w )
 	AM_RANGE( 0x0060, 0x0060 ) AM_READWRITE( irq_enable_r, irq_enable_w )
 	AM_RANGE( 0x0090, 0x0090 ) AM_READWRITE( irq_clear_r, irq_clear_w )
@@ -326,7 +331,7 @@ static INPUT_CHANGED( trigger_irq )
 	UINT8 irqs = input_port_read( field.machine(), "debug" );
 
 	state->m_irq_active |= irqs;
-	nakajies_update_irqs(field.machine());
+	state->nakajies_update_irqs(field.machine());
 }
 
 
@@ -343,20 +348,16 @@ static INPUT_PORTS_START( nakajies )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( nakajies )
+void nakajies_state::machine_reset()
 {
-	nakajies_state *state = machine.driver_data<nakajies_state>();
-
-	state->m_cpu = machine.device( "v20hl" );
-	state->m_irq_enabled = 0;
-	state->m_irq_active = 0;
-	state->m_lcd_memory_start = 0;
+	m_irq_enabled = 0;
+	m_irq_active = 0;
+	m_lcd_memory_start = 0;
 }
 
-static SCREEN_UPDATE( nakajies )
+bool nakajies_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	nakajies_state *state = screen->machine().driver_data<nakajies_state>();
-	UINT8* lcd_memory_start = state->m_ram_base + (state->m_lcd_memory_start<<9);
+	UINT8* lcd_memory_start = m_ram_base + (m_lcd_memory_start<<9);
 
 	for (int y=0; y<64; y++)
 		for (int x=0; x<60; x++)
@@ -365,7 +366,7 @@ static SCREEN_UPDATE( nakajies )
 
 			for (int px=0; px<8; px++)
 			{
-				*BITMAP_ADDR16(bitmap, y, (x * 8) + px) = BIT(data, 7);
+				*BITMAP_ADDR16(&bitmap, y, (x * 8) + px) = BIT(data, 7);
 				data <<= 1;
 			}
 		}
@@ -409,8 +410,6 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	MCFG_CPU_PROGRAM_MAP( nakajies210_map)
 	MCFG_CPU_IO_MAP( nakajies_io_map)
 
-	MCFG_MACHINE_RESET( nakajies )
-
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE( 50 )	/* Wild guess */
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
@@ -418,7 +417,6 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
 	MCFG_GFXDECODE(wales210)
 	MCFG_PALETTE_LENGTH( 2 )
-	MCFG_SCREEN_UPDATE(nakajies)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_INIT(black_and_white)
 
@@ -437,8 +435,6 @@ static MACHINE_CONFIG_START( nakajies220, nakajies_state )
 	MCFG_CPU_PROGRAM_MAP( nakajies220_map)
 	MCFG_CPU_IO_MAP( nakajies_io_map)
 
-	MCFG_MACHINE_RESET( nakajies )
-
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE( 50 )	/* Wild guess */
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
@@ -446,7 +442,6 @@ static MACHINE_CONFIG_START( nakajies220, nakajies_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
 	MCFG_GFXDECODE(drwrt400)
 	MCFG_PALETTE_LENGTH( 2 )
-	MCFG_SCREEN_UPDATE(nakajies)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_INIT(black_and_white)
 
@@ -462,8 +457,6 @@ static MACHINE_CONFIG_START( nakajies250, nakajies_state )
 	MCFG_CPU_PROGRAM_MAP( nakajies250_map)
 	MCFG_CPU_IO_MAP( nakajies_io_map)
 
-	MCFG_MACHINE_RESET( nakajies )
-
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE( 50 )  /* Wild guess */
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
@@ -471,7 +464,6 @@ static MACHINE_CONFIG_START( nakajies250, nakajies_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
 	MCFG_GFXDECODE(drwrt200)
 	MCFG_PALETTE_LENGTH( 2 )
-	MCFG_SCREEN_UPDATE(nakajies)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_INIT(black_and_white)
 
