@@ -1426,6 +1426,32 @@ static ADDRESS_MAP_START( fm7_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( fm8_mem, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000,0x7fff) AM_RAM
+	AM_RANGE(0x8000,0xfbff) AM_ROMBANK("bank1") // also F-BASIC ROM, when enabled
+	AM_RANGE(0xfc00,0xfc7f) AM_RAM
+	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
+	// I/O space (FD00-FDFF)
+	AM_RANGE(0xfd00,0xfd01) AM_READ(fm7_keyboard_r)
+	AM_RANGE(0xfd02,0xfd02) AM_WRITE(fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
+	AM_RANGE(0xfd06,0xfd0c) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd10,0xfd17) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
+	AM_RANGE(0xfd24,0xfd36) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
+	// Boot ROM
+	AM_RANGE(0xfe00,0xffdf) AM_ROMBANK("bank17")
+	AM_RANGE(0xffe0,0xffef) AM_RAM
+	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
+ADDRESS_MAP_END
+
 /*
    0000 - 3FFF: Video RAM bank 0 (Blue plane)
    4000 - 7FFF: Video RAM bank 1 (Red plane)
@@ -1902,6 +1928,44 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","fm7_disk")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( fm8, fm7_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_1MHz)  // 68A09
+	MCFG_CPU_PROGRAM_MAP(fm8_mem)
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
+	MCFG_CPU_ADD("sub", M6809, XTAL_1MHz)
+	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
+	MCFG_QUANTUM_PERFECT_CPU("sub")
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+
+	MCFG_MACHINE_START(fm7)
+	MCFG_MACHINE_RESET(fm7)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE(fm7)
+
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(fm7)
+
+	MCFG_VIDEO_START(fm7)
+
+	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
+
+	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
+
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( fm77av, fm7_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // actually MB68B09E, but the 6809E core runs too slowly
@@ -1952,6 +2016,27 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 MACHINE_CONFIG_END
 
 /* ROM definition */
+ROM_START( fm8 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "fbasic10.rom", 0x38000,  0x7c00, CRC(e80ed96c) SHA1(f3fa8a6adb07224ad2a1def77d5dae9662de0867) )
+
+	ROM_REGION( 0x20000, "sub", 0 )
+	ROM_LOAD( "subsys_8.rom", 0xd800,  0x2800, CRC(979f9046) SHA1(9c52052087bf3a41b83d437a51d89b9fcfec2515) )
+
+	// either one of these boot ROMs are selectable via DIP switch
+	ROM_REGION( 0x200, "basic", 0 )
+	ROM_LOAD( "bootbas8.rom", 0x0000,  0x0200, CRC(8260267a) SHA1(fee6fb9c52d22dd7108c68d08c74e2f3ebcb9e4d) )
+
+	ROM_REGION( 0x200, "dos", 0 )
+	ROM_LOAD( "bootdos8.rom", 0x0000,  0x0200, CRC(1ed5a506) SHA1(966538fa92c32fc15034576dc480cfa4a339384d) )
+
+	// optional Kanji ROM (same as for the FM-7?)
+	ROM_REGION( 0x20000, "kanji1", 0 )
+	ROM_LOAD_OPTIONAL( "kanji.rom", 0x0000, 0x20000, NO_DUMP )
+
+ROM_END
+
+
 ROM_START( fm7 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "fbasic30.rom", 0x38000,  0x7c00, CRC(a96d19b6) SHA1(8d5f0cfe7e0d39bf2ab7e4c798a13004769c28b2) )
@@ -2058,6 +2143,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT  COMPANY      FULLNAME        FLAGS */
+COMP( 1981, fm8,      0,      0,      fm8,     fm7,    fm7,  "Fujitsu",   "FM-8",         0)
 COMP( 1982, fm7,      0,      0,      fm7,     fm7,    fm7,  "Fujitsu",   "FM-7",         0)
 COMP( 1982, fm7a,     fm7,    0,      fm7,     fm7,    fm7,  "Fujitsu",   "FM-7 (alternate)", 0)
 COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,    fm7,  "Fujitsu",   "FM-77AV",      GAME_IMPERFECT_GRAPHICS)
