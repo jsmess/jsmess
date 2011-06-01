@@ -3,8 +3,8 @@
 	Casio FP-1100
 
 	TODO:
+	- irq sources and communications;
 	- unimplemented instruction PER triggered
-	- unimplemented instruction SKIT_F0 triggered
 
 ****************************************************************************/
 
@@ -21,8 +21,16 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_wram;
+	UINT8 *m_vram;
 	UINT8 m_mem_bank;
 	UINT8 irq_mask;
+	UINT8 m_main_latch;
+	UINT8 m_sub_latch;
+	UINT8 m_slot_num;
+
+	struct {
+		UINT8 id;
+	}m_slot[8];
 
 	struct {
 		UINT8 porta;
@@ -65,17 +73,55 @@ static WRITE8_HANDLER( main_bank_w )
 	fp1100_state *state = space->machine().driver_data<fp1100_state>();
 
 	state->m_mem_bank = data & 2; //(1) RAM (0) ROM
+	state->m_slot_num = (state->m_slot_num & 3) | ((data & 1) << 2);
 }
 
 static WRITE8_HANDLER( irq_mask_w )
 {
 	fp1100_state *state = space->machine().driver_data<fp1100_state>();
 
-	if((state->irq_mask & 0x80) != (data & 0x80))
-		cputag_set_input_line(space->machine(), "sub", UPD7810_INTF2, HOLD_LINE);
+	//if((state->irq_mask & 0x80) != (data & 0x80))
+	//	cputag_set_input_line(space->machine(), "sub", UPD7810_INTF2, HOLD_LINE);
 
 	state->irq_mask = data;
+	printf("%02x\n",data);
 
+}
+
+static WRITE8_HANDLER( main_to_sub_w )
+{
+	fp1100_state *state = space->machine().driver_data<fp1100_state>();
+
+	space->machine().scheduler().synchronize(); // force resync
+	cputag_set_input_line(space->machine(), "sub", UPD7810_INTF2, ASSERT_LINE);
+	state->m_sub_latch = data;
+}
+
+static READ8_HANDLER( sub_to_main_r )
+{
+	fp1100_state *state = space->machine().driver_data<fp1100_state>();
+
+	space->machine().scheduler().synchronize(); // force resync
+//	cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, CLEAR_LINE, 0xf0);
+	return state->m_main_latch;
+}
+
+static READ8_HANDLER( unk_r )
+{
+	return 0;
+}
+
+static WRITE8_HANDLER( slot_bank_w )
+{
+	fp1100_state *state = space->machine().driver_data<fp1100_state>();
+
+	state->m_slot_num = (data & 3) | (state->m_slot_num & 4);
+}
+
+static READ8_HANDLER( slot_id_r )
+{
+	fp1100_state *state = space->machine().driver_data<fp1100_state>();
+	return state->m_slot[state->m_slot_num & 7].id;
 }
 
 static ADDRESS_MAP_START(fp1100_map, AS_PROGRAM, 8 )
@@ -85,24 +131,53 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(fp1100_io, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xff80, 0xff80) AM_MIRROR(0x60) AM_READ(soundlatch2_r)
-	AM_RANGE(0xff80, 0xff80) AM_WRITE(irq_mask_w)
+	AM_RANGE(0xff00, 0xff00) AM_READ(slot_id_r) AM_WRITE(slot_bank_w)
+	AM_RANGE(0xff80, 0xff80) AM_READ(sub_to_main_r) AM_WRITE(irq_mask_w)
 	AM_RANGE(0xffa0, 0xffa0) AM_WRITE(main_bank_w)
-	AM_RANGE(0xffc0, 0xffc0) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xffc0, 0xffc0) AM_READ(unk_r) AM_WRITE(main_to_sub_w)
 ADDRESS_MAP_END
 
+static READ8_HANDLER( fp1100_vram_r )
+{
+	fp1100_state *state = space->machine().driver_data<fp1100_state>();
+
+	return state->m_vram[offset];
+}
+
+static WRITE8_HANDLER( fp1100_vram_w )
+{
+	fp1100_state *state = space->machine().driver_data<fp1100_state>();
+
+	state->m_vram[offset] = data ^ 0xff;
+}
+
+static READ8_HANDLER( main_to_sub_r )
+{
+	fp1100_state *state = space->machine().driver_data<fp1100_state>();
+
+	space->machine().scheduler().synchronize(); // force resync
+	cputag_set_input_line(space->machine(), "sub", UPD7810_INTF2, CLEAR_LINE);
+	return state->m_sub_latch;
+}
+
+static WRITE8_HANDLER( sub_to_main_w )
+{
+	fp1100_state *state = space->machine().driver_data<fp1100_state>();
+
+	space->machine().scheduler().synchronize(); // force resync
+//	cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, ASSERT_LINE, 0xf0);
+	state->m_main_latch = data;
+}
+
 static ADDRESS_MAP_START(fp1100_slave_map, AS_PROGRAM, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xff80, 0xffff) AM_RAM		/* upd7801 internal RAM */
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("sub_ipl",0x0000)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("sub_ipl",0x1000)
-	AM_RANGE(0x2000, 0x5fff) AM_RAM //vram B
-	AM_RANGE(0x6000, 0x9fff) AM_RAM //vram R
-	AM_RANGE(0xa000, 0xdfff) AM_RAM //vram G
+	AM_RANGE(0x2000, 0xdfff) AM_READWRITE(fp1100_vram_r,fp1100_vram_w) AM_BASE_MEMBER(fp1100_state,m_vram) //vram B/R/G
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe400, 0xe400) AM_READ_PORT("DSW") AM_WRITENOP // key mux write
-	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0xe800, 0xe800) AM_READ(main_to_sub_r) AM_WRITE(sub_to_main_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("sub_ipl",0x2000)
 ADDRESS_MAP_END
 
@@ -151,6 +226,48 @@ static INPUT_PORTS_START( fp1100 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SLOTS")
+	PORT_CONFNAME( 0x0003, 0x0002, "Slot #0" )
+	PORT_CONFSETTING(    0x0000, "(null)" )
+	PORT_CONFSETTING(    0x0001, "ROM" )
+	PORT_CONFSETTING(    0x0002, "RAM" )
+	PORT_CONFSETTING(    0x0003, "FDC" )
+	PORT_CONFNAME( 0x000c, 0x0008, "Slot #1" )
+	PORT_CONFSETTING(    0x0000, "(null)" )
+	PORT_CONFSETTING(    0x0004, "ROM" )
+	PORT_CONFSETTING(    0x0008, "RAM" )
+	PORT_CONFSETTING(    0x000c, "FDC" )
+	PORT_CONFNAME( 0x0030, 0x0020, "Slot #2" )
+	PORT_CONFSETTING(    0x0000, "(null)" )
+	PORT_CONFSETTING(    0x0010, "ROM" )
+	PORT_CONFSETTING(    0x0020, "RAM" )
+	PORT_CONFSETTING(    0x0030, "FDC" )
+	PORT_CONFNAME( 0x00c0, 0x0080, "Slot #3" )
+	PORT_CONFSETTING(    0x0000, "(null)" )
+	PORT_CONFSETTING(    0x0040, "ROM" )
+	PORT_CONFSETTING(    0x0080, "RAM" )
+	PORT_CONFSETTING(    0x00c0, "FDC" )
+	PORT_CONFNAME( 0x0300, 0x0200, "Slot #4" )
+	PORT_CONFSETTING(    0x0000, "(null)" )
+	PORT_CONFSETTING(    0x0100, "ROM" )
+	PORT_CONFSETTING(    0x0200, "RAM" )
+	PORT_CONFSETTING(    0x0300, "FDC" )
+	PORT_CONFNAME( 0x0c00, 0x0800, "Slot #5" )
+	PORT_CONFSETTING(    0x0000, "(null)" )
+	PORT_CONFSETTING(    0x0400, "ROM" )
+	PORT_CONFSETTING(    0x0800, "RAM" )
+	PORT_CONFSETTING(    0x0c00, "FDC" )
+	PORT_CONFNAME( 0x3000, 0x2000, "Slot #6" )
+	PORT_CONFSETTING(    0x0000, "(null)" )
+	PORT_CONFSETTING(    0x1000, "ROM" )
+	PORT_CONFSETTING(    0x2000, "RAM" )
+	PORT_CONFSETTING(    0x3000, "FDC" )
+	PORT_CONFNAME( 0xc000, 0x8000, "Slot #7" )
+	PORT_CONFSETTING(    0x0000, "(null)" )
+	PORT_CONFSETTING(    0x4000, "ROM" )
+	PORT_CONFSETTING(    0x8000, "RAM" )
+	PORT_CONFSETTING(    0xc000, "FDC" )
 INPUT_PORTS_END
 
 
@@ -165,6 +282,16 @@ static MACHINE_START(fp1100)
 
 static MACHINE_RESET(fp1100)
 {
+	fp1100_state *state = machine.driver_data<fp1100_state>();
+	int i;
+	UINT8 slot_type;
+	const UINT8 id_type[4] = { 0xff, 0x00, 0x01, 0x04};
+
+	for(i=0;i<8;i++)
+	{
+		slot_type = (input_port_read(machine, "SLOTS") >> i*2) & 3;
+		state->m_slot[i].id = id_type[slot_type];
+	}
 }
 
 #if 0
@@ -201,11 +328,20 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
+static INTERRUPT_GEN( fp1100_vblank_irq )
+{
+	fp1100_state *state = device->machine().driver_data<fp1100_state>();
+
+	if(state->irq_mask & 0x10)
+		cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, HOLD_LINE, 0xf0);
+}
+
 static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(fp1100_map)
 	MCFG_CPU_IO_MAP(fp1100_io)
+	MCFG_CPU_VBLANK_INT("screen",fp1100_vblank_irq)
 
 	MCFG_CPU_ADD( "sub", UPD7801, XTAL_4MHz ) //unknown clock
 	MCFG_CPU_PROGRAM_MAP( fp1100_slave_map )
