@@ -6,6 +6,21 @@
 
  Driver by Dirk Best
 
+http://speleotrove.com/acorn/
+
+m 	(modify) Memory display and modification 	l 	(load) Reads a block of bytes from tape
+g 	(go) Run program starting at an address 	r 	(return) Resume after a breakpoint
+p 	(point) Inserts or removes breakpoint 	^ 	(up) Increment displayed address
+s 	(store) Writes a block of bytes to tape 	v 	(down) Decrement displayed address 
+
+ToDo:
+- Digits don't display in the right order. The digit on the left should be at the extreme right,
+  while the first one with '.' should display the mode letter (with the dot).
+- Keys don't work. Most either do a (down) command, or nothing. Not possible to type an address in.
+
+Example usage: Turn on. Press M. Type in an address (example FE00). Contents will show on the right,
+and the Mode letter will show 'A.'.
+
 ******************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -84,7 +99,7 @@ static ADDRESS_MAP_START( acrnsys1_map, AS_PROGRAM, 8, acrnsys1_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0e00, 0x0e7f) AM_MIRROR(0x100) AM_DEVREADWRITE_LEGACY("b1", ins8154_r, ins8154_w)
 	AM_RANGE(0x0e80, 0x0eff) AM_MIRROR(0x100) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_ROM
+	AM_RANGE(0xf800, 0xf9ff) AM_MIRROR(0x600) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -189,10 +204,7 @@ MACHINE_CONFIG_END
 
 ROM_START( acrnsys1 )
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("acrnsys1.bin", 0xfe00, 0x0200, CRC(43dcfc16) SHA1(b987354c55beb5e2ced761970c3339b895a8c09d))
-	ROM_COPY("maincpu", 0xfe00, 0xf800, 0x0200)
-	ROM_COPY("maincpu", 0xfe00, 0xfa00, 0x0200)
-	ROM_COPY("maincpu", 0xfe00, 0xfc00, 0x0200)
+	ROM_LOAD("acrnsys1.bin", 0xf800, 0x0200, CRC(43dcfc16) SHA1(b987354c55beb5e2ced761970c3339b895a8c09d))
 ROM_END
 
 
