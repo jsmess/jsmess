@@ -5,7 +5,7 @@
 <softwarelist name="apple2" description="Apple II 5.25 disks">
 
 	<software name="4080trkd">
-		<description>4080trkd</description>
+		<description>40 and 80 Track DOS</description>
 		<year>1980</year>
 		<publisher>Sympathetic Software</publisher>
 
@@ -17,7 +17,7 @@
 	</software>
 
 	<software name="a2desk10">
-		<description>a2desk10</description>
+		<description>Apple II Desktop (v1.0)</description>
 		<year>1986</year>
 		<publisher>Version Soft</publisher>
 
@@ -34,7 +34,7 @@
 	</software>
 
 	<software name="a2desk">
-		<description>a2desk</description>
+		<description>Apple II Desktop (v1.1)</description>
 		<year>1986</year>
 		<publisher>Version Soft</publisher>
 
@@ -46,7 +46,7 @@
 	</software>
 
 	<software name="amdos35">
-		<description>amdos35</description>
+		<description>AmDOS (v3.5)</description>
 		<year>1986</year>
 		<publisher>Gary B. Little</publisher>
 
@@ -58,7 +58,7 @@
 	</software>
 
 	<software name="davidos">
-		<description>davidos</description>
+		<description>David-DOS</description>
 		<year>1982</year>
 		<publisher>David Data</publisher>
 
@@ -70,7 +70,7 @@
 	</software>
 
 	<software name="divdos2c">
-		<description>divdos2c</description>
+		<description>Diversi-DOS (v2.0c)</description>
 		<year>1982</year>
 		<publisher>Diversified Software Research</publisher>
 
@@ -82,7 +82,7 @@
 	</software>
 
 	<software name="divdos41">
-		<description>divdos41</description>
+		<description>Diversi-DOS (v4.1c)</description>
 		<year>1983</year>
 		<publisher>Diversified Software Research</publisher>
 
@@ -94,7 +94,7 @@
 	</software>
 
 	<software name="dos3380a">
-		<description>dos3380a</description>
+		<description>DOS 3.3 System Master (1980, alternate)</description>
 		<year>1980</year>
 		<publisher>Apple Computer, Inc.</publisher>
 
@@ -106,20 +106,8 @@
 	</software>
 
 	<software name="dos3380">
-		<description>dos3380</description>
+		<description>DOS 3.3 System Master (1980 version)</description>
 		<year>1980</year>
-		<publisher>Apple Computer, Inc.</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="apple dos v3.3 (1980)(apple).do" size="143360" crc="e766f072" sha1="63392d078a159342b12667d0fdfea7a01a961978" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dos3383a">
-		<description>dos3383a</description>
-		<year>1983</year>
 		<publisher>Apple Computer, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -130,7 +118,7 @@
 	</software>
 
 	<software name="dos3383">
-		<description>dos3383</description>
+		<description>DOS 3.3 System Master (1983 version)</description>
 		<year>1983</year>
 		<publisher>Apple Computer, Inc.</publisher>
 
@@ -142,7 +130,7 @@
 	</software>
 
 	<software name="dosanat">
-		<description>dosanat</description>
+		<description>DOS Anatomy</description>
 		<year>1986</year>
 		<publisher>Windsor Scientific</publisher>
 
@@ -299,7 +287,7 @@
 	</software>
 
 	<software name="geos">
-		<description>geos</description>
+		<description>GEOS</description>
 		<year>1988</year>
 		<publisher>Berkeley Softworks</publisher>
 
@@ -346,7 +334,7 @@
 	</software>
 
 	<software name="prodos11">
-		<description>prodos11</description>
+		<description>ProDOS (v1.1.1)</description>
 		<year>1983</year>
 		<publisher>Apple Computer, Inc.</publisher>
 
