@@ -53,6 +53,13 @@ Tandy 1000 (80286) variations:
 Tandy 1000 (80386) variations:
 1000RSX/1000RSX-HD  1M-9M RAM           25.0/8.0 MHz    v01.10.00
 
+
+IBM5550
+=======
+Information can be found at http://homepage3.nifty.com/ibm5550/index-e.html
+It's an heavily modified IBM PC-XT machine, with a completely different
+video HW too.
+
 ***************************************************************************/
 
 
@@ -187,6 +194,41 @@ static ADDRESS_MAP_START(pc16_io, AS_IO, 16)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( ibm5550_map, AS_PROGRAM, 16 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
+	AM_RANGE(0xa0000, 0xeffff) AM_RAM
+	AM_RANGE(0xfc000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static READ8_HANDLER( unk_r )
+{
+	return 0;
+}
+
+static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", i8237_r, i8237_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8_MODERN("ppi8255", i8255_device, read, write, 0xffff)
+	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
+	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,				pc_page_w, 0xffff)
+	AM_RANGE(0x00a0, 0x00a1) AM_READWRITE8(unk_r, pc_nmi_enable_w, 0x00ff )
+	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,				pc16le_JOY_w)
+	AM_RANGE(0x0240, 0x0257) AM_READWRITE(pc16le_rtc_r,				pc16le_rtc_w)
+	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
+	AM_RANGE(0x02b0, 0x02bf) AM_RAM // needed for EC-18xx
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
+	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_r, pc_lpt_w, 0x00ff)
+	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,				pc_fdc_w, 0xffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_r, ins8250_w, 0xffff)
+ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( europc_map, AS_PROGRAM, 8 )
@@ -1917,6 +1959,54 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( ibm5550, pc_state )
+	/* basic machine hardware */
+	MCFG_CPU_PC(ibm5550, ibm5550, I8086, 8000000, pc_vga_frame_interrupt)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	MCFG_MACHINE_START(pc)
+	MCFG_MACHINE_RESET(pc)
+
+	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+
+	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
+
+	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+
+	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
+
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( pcvideo_cga )
+	MCFG_GFXDECODE(ibm5150)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	/* keyboard */
+	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+
+	/* printer */
+	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
+	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
+	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+
+	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+
+	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("640K")
+MACHINE_CONFIG_END
+
 #if 0
 	//pcjr roms? (incomplete dump, most likely 64 kbyte)
 	// basic c1.20
@@ -2446,6 +2536,15 @@ ROM_START( m240 )
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
+ROM_START( ibm5550 )
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROM_LOAD( "ipl.rom", 0xfc000, 0x4000, CRC(40cf34c9) SHA1(d41f77fdfa787b0e97ed311e1c084b8699a5b197))
+
+	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -2490,4 +2589,6 @@ COMP ( 19??,	mc1502,     ibm5150,	0,	mc1502,		pccga,	pccga,	"<unknown>",  "Elekt
 COMP(  1987,	zdsupers,   ibm5150,	0,	zenith,		pccga,	pccga,	"Zenith Data Systems",  "SuperSport" , 0)
 
 COMP ( 1983,	m24,        ibm5150,	0,	olivetti,	pccga,	pccga,	"Olivetti",  "M24" , GAME_NOT_WORKING)
-COMP ( 1987,	m240,        ibm5150,	0,	olivetti,	pccga,	pccga,	"Olivetti",  "M240" , GAME_NOT_WORKING)
+COMP ( 1987,	m240,       ibm5150,	0,	olivetti,	pccga,	pccga,	"Olivetti",  "M240" , GAME_NOT_WORKING)
+
+COMP ( 1983,	ibm5550,    ibm5150,	0,	ibm5550,	pccga,	pccga,	"IBM",  "5550" , GAME_NOT_WORKING)

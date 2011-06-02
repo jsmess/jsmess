@@ -620,6 +620,7 @@ ehx20
 ibm5150   // 1981 IBM 5150
 ibm5155   // 1982 IBM 5155
 ibm5140   // 1985 IBM 5140
+ibm5550
 dgone	 // 1984 Data General/One
 pcmda	 // 1987 PC with MDA
 pcherc	 // 1987 PC with Hercules (for testing hercules)
