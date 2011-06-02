@@ -37,6 +37,8 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "cpu/i86/i86.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
 #include "sound/wave.h"
@@ -1747,6 +1749,16 @@ static DRIVER_INIT(fm7)
 	device_set_irq_callback(machine.device("sub"),fm7_sub_irq_ack);
 }
 
+static DRIVER_INIT(fm11)
+{
+
+}
+
+static DRIVER_INIT(fm16beta)
+{
+
+}
+
 static MACHINE_START(fm7)
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
@@ -2038,6 +2050,97 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_list","fm7_disk")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( fm11, fm7_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // 2MHz 68B09E
+//	MCFG_CPU_PROGRAM_MAP(fm8_mem)
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
+	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)  // 2MHz 68B09
+//	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
+	MCFG_QUANTUM_PERFECT_CPU("sub")
+
+	MCFG_CPU_ADD("x86", I8088, XTAL_8MHz)  // 8MHz i8088
+	//MCFG_CPU_PROGRAM_MAP(fm11_i86_mem)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.20)
+
+//	MCFG_MACHINE_START(fm7)
+//	MCFG_MACHINE_RESET(fm7)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+//	MCFG_SCREEN_UPDATE(fm7)
+
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(fm7)
+
+//	MCFG_VIDEO_START(fm7)
+
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_config)
+
+	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
+
+	MCFG_CENTRONICS_ADD("lpt",standard_centronics)
+
+	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
+
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( fm16beta, fm7_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I8086, XTAL_8MHz)  // 8MHz i8086
+//	MCFG_CPU_PROGRAM_MAP(fm8_mem)
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
+	MCFG_CPU_ADD("sub", Z80, XTAL_4MHz)  // 4MHz (?) Z80A
+//	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
+	MCFG_QUANTUM_PERFECT_CPU("sub")
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.20)
+
+//	MCFG_MACHINE_START(fm7)
+//	MCFG_MACHINE_RESET(fm7)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+//	MCFG_SCREEN_UPDATE(fm7)
+
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(fm7)
+
+//	MCFG_VIDEO_START(fm7)
+
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_config)
+
+	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
+
+	MCFG_CENTRONICS_ADD("lpt",standard_centronics)
+
+	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
+
+MACHINE_CONFIG_END
+
 /* ROM definition */
 ROM_START( fm8 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -2163,6 +2266,32 @@ ROM_START( fm7740sx )
 
 ROM_END
 
+ROM_START( fm11 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "boot6809.rom", 0xf000, 0x1000, CRC(447caa6f) SHA1(4aa30314994c256d37ee01d11ec2bf4df3bc8cde) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "subsys.rom", 0xc000, 0x4000, CRC(436c0618) SHA1(cd508e3e8f79737afb4384ea4b278eddf0ce935d) )
+
+	ROM_REGION( 0x100000, "x86", 0 )
+	ROM_LOAD( "boot8088.rom", 0xff000, 0x1000, CRC(d13096a6) SHA1(f9bd95b3b8184d0e04fba9b50f273dbb8823be77) )
+
+	ROM_REGION( 0x10000, "subsys_e", 0 )
+	ROM_LOAD( "subsys_e.rom", 0x00000, 0x1000, CRC(31d838aa) SHA1(86a275c27bc99985bef7a51bdab2e47d68e31c6c) )
+ROM_END
+
+ROM_START( fm16beta )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "ipl.rom", 0xfc000, 0x4000, CRC(25f618ea) SHA1(9c27d6ad283260e071d64a1bfca16f7d3ad61f96) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "subsys.rom", 0x00000, 0x4f80, CRC(1d878514) SHA1(4673879a81e39880655b380250c6b81137028727) )
+
+	ROM_REGION( 0x10000, "subsys_cg", 0 )
+	ROM_LOAD( "sub_cg.rom", 0x00000, 0x1000, CRC(e7928bed) SHA1(68cf604aa7a5c2ec7bd0d612cf099302c7f8c442) )
+ROM_END
+
+
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT  COMPANY      FULLNAME        FLAGS */
@@ -2171,3 +2300,7 @@ COMP( 1982, fm7,      0,      0,      fm7,     fm7,    fm7,  "Fujitsu",   "FM-7"
 COMP( 1982, fm7a,     fm7,    0,      fm7,     fm7,    fm7,  "Fujitsu",   "FM-7 (alternate)", 0)
 COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,    fm7,  "Fujitsu",   "FM-77AV",      GAME_IMPERFECT_GRAPHICS)
 COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,    fm7,  "Fujitsu",   "FM-77AV40SX",  GAME_NOT_WORKING)
+
+// These may be separated into a separate driver, depending on how different they are to the FM-8/FM-7
+COMP( 1982, fm11,     0,      0,      fm11,     fm7,    fm11,      "Fujitsu",   "FM-11 EX",      GAME_NOT_WORKING)
+COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7,    fm16beta,  "Fujitsu",   "FM-16\xCE\xB2", GAME_NOT_WORKING)
