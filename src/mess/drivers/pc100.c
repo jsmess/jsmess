@@ -4,8 +4,16 @@
 
     TODO:
     - kanji rom has offsetted data for whatever reason.
-    - there's a regression with push/pop sp, when it triggers an iret program
-      flow jumps to la-la-land
+    - there's a regression with i8259, check this code:
+	F8209: B8 FB 00                  mov     ax,0FBh
+	F820C: E6 02                     out     2h,al
+	F820E: B9 00 00                  mov     cx,0h
+	F8211: FB                        sti
+	F8212: 0A E4                     or      ah,ah <- it's supposed to trigger an irq there!
+	F8214: E1 FC                     loopz   0F8212h
+	F8216: FA                        cli
+	F8217: 0A E9                     or      ch,cl
+	F8219: 74 15                     je      0F8230h
 
 ****************************************************************************/
 
@@ -317,25 +325,24 @@ static IRQ_CALLBACK(pc100_irq_callback)
 	return pic8259_acknowledge( device->machine().device( "pic8259" ) );
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pc100_pic_irq )
+static WRITE_LINE_DEVICE_HANDLER( pc100_set_int_line )
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
-//  logerror("PIC#1: set IRQ line to %i\n",interrupt);
+	//printf("%02x\n",interrupt);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
-
 
 static const struct pic8259_interface pc100_pic8259_config =
 {
-	DEVCB_LINE(pc100_pic_irq),
-	DEVCB_LINE_VCC,
+	DEVCB_LINE(pc100_set_int_line),
+	DEVCB_LINE_GND,
 	DEVCB_NULL
 };
 
 static MACHINE_START(pc100)
 {
 	pc100_state *state = machine.driver_data<pc100_state>();
-	device_set_irq_callback(machine.device("maincpu"), pc100_irq_callback);
 
+	device_set_irq_callback(machine.device("maincpu"), pc100_irq_callback);
 	state->m_kanji_rom = (UINT16 *)machine.region("kanji")->base();
 	state->m_vram = (UINT16 *)machine.region("vram")->base();
 }
@@ -402,7 +409,7 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(768, 560)
+	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
 	MCFG_SCREEN_UPDATE(pc100)
 
