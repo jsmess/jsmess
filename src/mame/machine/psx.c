@@ -66,12 +66,12 @@ void psx_irq_set( running_machine &machine, UINT32 data )
 
 void psx_dma_install_read_handler( running_machine &machine, int n_channel, psx_dma_read_delegate p_fn_dma_read )
 {
-	psxcpu_device::install_dma_read_handler( *machine.device("maincpu"), "maincpu", n_channel, p_fn_dma_read );
+	downcast<psxdma_device *>( machine.device("maincpu")->subdevice("dma") )->install_read_handler( n_channel, p_fn_dma_read );
 }
 
 void psx_dma_install_write_handler( running_machine &machine, int n_channel, psx_dma_read_delegate p_fn_dma_write )
 {
-	psxcpu_device::install_dma_write_handler( *machine.device("maincpu"), "maincpu", n_channel, p_fn_dma_write );
+	downcast<psxdma_device *>( machine.device("maincpu")->subdevice("dma") )->install_write_handler( n_channel, p_fn_dma_write );
 }
 
 void psx_sio_install_handler( running_machine &machine, int n_port, psx_sio_handler p_f_sio_handler )
@@ -84,22 +84,6 @@ void psx_sio_input( running_machine &machine, int n_port, int n_mask, int n_data
 	psxcpu_device::sio_input( *machine.device("maincpu"), "maincpu", n_port, n_mask, n_data );
 }
 
-static void gpu_read( psx_state *p_psx, UINT32 n_address, INT32 n_size )
-{
-	psxgpu_device *gpu = downcast<psxgpu_device *>( p_psx->machine().device("gpu") );
-	UINT32 *p_n_psxram = p_psx->m_p_n_psxram;
-
-	gpu->dma_read( &p_n_psxram[ n_address / 4 ], n_size );
-}
-
-static void gpu_write( psx_state *p_psx, UINT32 n_address, INT32 n_size )
-{
-	psxgpu_device *gpu = downcast<psxgpu_device *>( p_psx->machine().device("gpu") );
-	UINT32 *p_n_psxram = p_psx->m_p_n_psxram;
-
-	gpu->dma_write( &p_n_psxram[ n_address / 4 ], n_size );
-}
-
 void psx_driver_init( running_machine &machine )
 {
 	psx_state *p_psx = machine.driver_data<psx_state>();
@@ -107,9 +91,6 @@ void psx_driver_init( running_machine &machine )
 	p_psx->b_need_sianniv_vblank_hack = !strcmp(machine.system().name, "sianniv");
 
 	p_psx->m_p_n_psxram = (UINT32 *)memory_get_shared(machine, "share1", p_psx->m_n_psxramsize);
-
-	psx_dma_install_read_handler( machine, 2, psx_dma_read_delegate( FUNC( gpu_read ), p_psx ) );
-	psx_dma_install_write_handler( machine, 2, psx_dma_write_delegate( FUNC( gpu_write ), p_psx ) );
 }
 
 SCREEN_UPDATE( psx )

@@ -781,7 +781,7 @@ static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_DEVICE_ADD( "gpu", CXD8561Q, 0 )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -818,7 +818,7 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_DEVICE_ADD( "gpu", CXD8561Q, 0 )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
