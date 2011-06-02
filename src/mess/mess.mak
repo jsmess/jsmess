@@ -1679,6 +1679,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/fidelz80.o	\
 	$(MESS_DRIVERS)/horizon.o	\
 	$(MESS_DRIVERS)/ht68k.o		\
+	$(MESS_DRIVERS)/if800.o		\
 	$(MESS_DRIVERS)/iq151.o		\
 	$(MESS_DRIVERS)/indiana.o	\
 	$(MESS_DRIVERS)/instruct.o	\
