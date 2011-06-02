@@ -4,14 +4,14 @@
 
     TODO:
     - kanji rom has offsetted data for whatever reason.
+    - i8259 is bugged, program flow eventually jumps to la-la-land
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/i8255.h"
-
-
+#include "machine/pic8259.h"
 
 class pc100_state : public driver_device
 {
@@ -23,8 +23,14 @@ public:
 	UINT16 *m_vram;
 	UINT16 *m_palram;
 	UINT16 m_kanji_addr;
+	UINT8 m_timer_mode;
 
 	UINT8 m_bank_r,m_bank_w;
+
+	struct{
+		UINT8 shift;
+		UINT16 mask;
+	}m_crtc;
 };
 
 static VIDEO_START( pc100 )
@@ -76,12 +82,24 @@ static READ16_HANDLER( pc100_vram_r )
 static WRITE16_HANDLER( pc100_vram_w )
 {
 	pc100_state *state = space->machine().driver_data<pc100_state>();
+	UINT16 old_vram;
 	int i;
 
 	for(i=0;i<4;i++)
 	{
 		if((state->m_bank_w >> i) & 1)
+		{
+			old_vram = state->m_vram[offset+i*0x10000];
 			COMBINE_DATA(&state->m_vram[offset+i*0x10000]);
+			state->m_vram[offset+i*0x10000] = ((state->m_vram[offset+i*0x10000]|(state->m_vram[offset+i*0x10000]<<16)) >> state->m_crtc.shift);
+			if(ACCESSING_BITS_0_15)
+				state->m_vram[offset+i*0x10000] = (state->m_vram[offset+i*0x10000] & ~state->m_crtc.mask) | (old_vram & state->m_crtc.mask);
+			else if(ACCESSING_BITS_8_15)
+				state->m_vram[offset+i*0x10000] = (state->m_vram[offset+i*0x10000] & ((~state->m_crtc.mask) & 0xff00)) | (old_vram & (state->m_crtc.mask|0xff));
+			else if(ACCESSING_BITS_0_7)
+				state->m_vram[offset+i*0x10000] = (state->m_vram[offset+i*0x10000] & ((~state->m_crtc.mask) & 0xff)) | (old_vram & (state->m_crtc.mask|0xff00));
+
+		}
 	}
 }
 
@@ -115,6 +133,14 @@ static READ8_HANDLER( pc100_key_r )
 	return 0;
 }
 
+static WRITE8_HANDLER( pc100_output_w )
+{
+	pc100_state *state = space->machine().driver_data<pc100_state>();
+
+	if(offset == 0)
+		state->m_timer_mode = (data & 0x18) >> 3;
+}
+
 static WRITE16_HANDLER( pc100_paletteram_w )
 {
 	pc100_state *state = space->machine().driver_data<pc100_state>();
@@ -132,23 +158,40 @@ static WRITE16_HANDLER( pc100_paletteram_w )
 	}
 }
 
+static READ8_HANDLER( pc100_shift_r )
+{
+	pc100_state *state = space->machine().driver_data<pc100_state>();
+
+	return state->m_crtc.shift;
+}
+
+
+static WRITE8_HANDLER( pc100_shift_w )
+{
+	pc100_state *state = space->machine().driver_data<pc100_state>();
+
+	state->m_crtc.shift = data & 0xf;
+}
+
 /* everything is 8-bit bus wide */
 static ADDRESS_MAP_START(pc100_io, AS_IO, 16)
-//	AM_RANGE(0x00, 0x03) i8259
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0x00ff) // i8259
 //	AM_RANGE(0x04, 0x07) i8237?
 //	AM_RANGE(0x08, 0x0b) upd765
 //	AM_RANGE(0x10, 0x17) i8255 #1
 	AM_RANGE(0x18, 0x1f) AM_DEVREADWRITE8_MODERN("ppi8255_2", i8255_device, read, write,0x00ff) // i8255 #2
 	AM_RANGE(0x20, 0x23) AM_READ8(pc100_key_r,0x00ff) //i/o, keyboard, mouse
+	AM_RANGE(0x22, 0x25) AM_WRITE8(pc100_output_w,0x00ff) //i/o, keyboard, mouse
 //	AM_RANGE(0x28, 0x2b) i8251
-//	AM_RANGE(0x30, 0x31) crtc shift
+	AM_RANGE(0x30, 0x31) AM_READWRITE8(pc100_shift_r,pc100_shift_w,0x00ff) // crtc shift
 //	AM_RANGE(0x38, 0x39) crtc address reg
 //	AM_RANGE(0x3a, 0x3b) crtc data reg
 //	AM_RANGE(0x3c, 0x3f) crtc vertical start position
 	AM_RANGE(0x40, 0x5f) AM_RAM_WRITE(pc100_paletteram_w) AM_BASE_MEMBER(pc100_state,m_palram)
 //	AM_RANGE(0x60, 0x61) crtc command (16-bit wide)
 	AM_RANGE(0x80, 0x81) AM_READWRITE(pc100_kanji_r,pc100_kanji_w)
-//	AM_RANGE(0x84, 0x87) kanji "strobe" signal 0/1
+	AM_RANGE(0x82, 0x83) AM_WRITENOP //kanji-related?
+	AM_RANGE(0x84, 0x87) AM_WRITENOP //kanji "strobe" signal 0/1
 ADDRESS_MAP_END
 
 
@@ -171,26 +214,18 @@ static GFXDECODE_START( pc100 )
 	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_START(pc100)
-{
-	pc100_state *state = machine.driver_data<pc100_state>();
-
-	state->m_kanji_rom = (UINT16 *)machine.region("kanji")->base();
-	state->m_vram = (UINT16 *)machine.region("vram")->base();
-}
-
-static MACHINE_RESET(pc100)
-{
-}
-
 static WRITE8_DEVICE_HANDLER( lower_mask_w )
 {
-	//printf("%02x L\n",data);
+	pc100_state *state = device->machine().driver_data<pc100_state>();
+
+	state->m_crtc.mask = (state->m_crtc.mask & 0xff00) | (data & 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( upper_mask_w )
 {
-	//printf("%02x H\n",data);
+	pc100_state *state = device->machine().driver_data<pc100_state>();
+
+	state->m_crtc.mask = (state->m_crtc.mask & 0xff) | (data << 8);
 }
 
 static WRITE8_DEVICE_HANDLER( crtc_bank_w )
@@ -211,25 +246,104 @@ static I8255A_INTERFACE( pc100_ppi8255_interface_2 )
 	DEVCB_HANDLER(crtc_bank_w)
 };
 
+static IRQ_CALLBACK(pc100_irq_callback)
+{
+	return pic8259_acknowledge( device->machine().device( "pic8259" ) );
+}
+
+static WRITE_LINE_DEVICE_HANDLER( pc100_pic_irq )
+{
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
+//  logerror("PIC#1: set IRQ line to %i\n",interrupt);
+}
+
+
+static const struct pic8259_interface pc100_pic8259_config =
+{
+	DEVCB_LINE(pc100_pic_irq),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
+};
+
+static MACHINE_START(pc100)
+{
+	pc100_state *state = machine.driver_data<pc100_state>();
+	device_set_irq_callback(machine.device("maincpu"), pc100_irq_callback);
+
+	state->m_kanji_rom = (UINT16 *)machine.region("kanji")->base();
+	state->m_vram = (UINT16 *)machine.region("vram")->base();
+}
+
+static MACHINE_RESET(pc100)
+{
+
+}
+
+static INTERRUPT_GEN(pc100_vblank_irq)
+{
+	pic8259_ir4_w(device->machine().device("pic8259"), 1);
+}
+
+static TIMER_DEVICE_CALLBACK( pc100_600hz_irq )
+{
+	pc100_state *state = timer.machine().driver_data<pc100_state>();
+
+	if(state->m_timer_mode == 0)
+		pic8259_ir2_w(timer.machine().device("pic8259"), 1);
+}
+
+static TIMER_DEVICE_CALLBACK( pc100_100hz_irq )
+{
+	pc100_state *state = timer.machine().driver_data<pc100_state>();
+
+	if(state->m_timer_mode == 1)
+		pic8259_ir2_w(timer.machine().device("pic8259"), 1);
+}
+
+static TIMER_DEVICE_CALLBACK( pc100_50hz_irq )
+{
+	pc100_state *state = timer.machine().driver_data<pc100_state>();
+
+	if(state->m_timer_mode == 2)
+		pic8259_ir2_w(timer.machine().device("pic8259"), 1);
+}
+
+static TIMER_DEVICE_CALLBACK( pc100_10hz_irq )
+{
+	pc100_state *state = timer.machine().driver_data<pc100_state>();
+
+	if(state->m_timer_mode == 3)
+		pic8259_ir2_w(timer.machine().device("pic8259"), 1);
+}
+
+#define MASTER_CLOCK 6988800
+
 static MACHINE_CONFIG_START( pc100, pc100_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 4000000)
+	MCFG_CPU_ADD("maincpu", I8086, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pc100_map)
 	MCFG_CPU_IO_MAP(pc100_io)
+	MCFG_CPU_VBLANK_INT("screen",pc100_vblank_irq)
 
 	MCFG_MACHINE_START(pc100)
 	MCFG_MACHINE_RESET(pc100)
 
     MCFG_I8255_ADD( "ppi8255_2", pc100_ppi8255_interface_2 )
+	MCFG_PIC8259_ADD( "pic8259", pc100_pic8259_config )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(768, 512)
+	MCFG_SCREEN_SIZE(768, 560)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
 	MCFG_SCREEN_UPDATE(pc100)
+
+	MCFG_TIMER_ADD_PERIODIC("600hz", pc100_600hz_irq, attotime::from_hz(MASTER_CLOCK/600))
+	MCFG_TIMER_ADD_PERIODIC("100hz", pc100_100hz_irq, attotime::from_hz(MASTER_CLOCK/100))
+	MCFG_TIMER_ADD_PERIODIC("50hz", pc100_50hz_irq, attotime::from_hz(MASTER_CLOCK/50))
+	MCFG_TIMER_ADD_PERIODIC("10hz", pc100_10hz_irq, attotime::from_hz(MASTER_CLOCK/10))
 
 	MCFG_PALETTE_LENGTH(16)
 //	MCFG_PALETTE_INIT(black_and_white)
