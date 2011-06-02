@@ -12,6 +12,7 @@
 #include "machine/i8255.h"
 
 
+
 class pc100_state : public driver_device
 {
 public:
@@ -20,6 +21,7 @@ public:
 
 	UINT16 *m_kanji_rom;
 	UINT16 *m_vram;
+	UINT16 *m_palram;
 	UINT16 m_kanji_addr;
 
 	UINT8 m_bank_r,m_bank_w;
@@ -113,6 +115,23 @@ static READ8_HANDLER( pc100_key_r )
 	return 0;
 }
 
+static WRITE16_HANDLER( pc100_paletteram_w )
+{
+	pc100_state *state = space->machine().driver_data<pc100_state>();
+
+	COMBINE_DATA(&state->m_palram[offset]);
+
+	{
+		int r,g,b;
+
+		r = (state->m_palram[offset] >> 0) & 7;
+		g = (state->m_palram[offset] >> 3) & 7;
+		b = (state->m_palram[offset] >> 6) & 7;
+
+		palette_set_color_rgb(space->machine(), offset, pal3bit(r),pal3bit(g),pal3bit(b));
+	}
+}
+
 /* everything is 8-bit bus wide */
 static ADDRESS_MAP_START(pc100_io, AS_IO, 16)
 //	AM_RANGE(0x00, 0x03) i8259
@@ -126,7 +145,7 @@ static ADDRESS_MAP_START(pc100_io, AS_IO, 16)
 //	AM_RANGE(0x38, 0x39) crtc address reg
 //	AM_RANGE(0x3a, 0x3b) crtc data reg
 //	AM_RANGE(0x3c, 0x3f) crtc vertical start position
-//	AM_RANGE(0x40, 0x5f) palette
+	AM_RANGE(0x40, 0x5f) AM_RAM_WRITE(pc100_paletteram_w) AM_BASE_MEMBER(pc100_state,m_palram)
 //	AM_RANGE(0x60, 0x61) crtc command (16-bit wide)
 	AM_RANGE(0x80, 0x81) AM_READWRITE(pc100_kanji_r,pc100_kanji_w)
 //	AM_RANGE(0x84, 0x87) kanji "strobe" signal 0/1
