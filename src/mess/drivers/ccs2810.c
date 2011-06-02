@@ -3,52 +3,98 @@
         CCS Model 2810
 
         11/12/2009 Skeleton driver.
+        02/06/2011 Connected to a terminal
+
+Press Enter to start the system.
+All commands are in uppercase.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
+#include "machine/terminal.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class ccs2810_state : public driver_device
 {
 public:
 	ccs2810_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_terminal(*this, TERMINAL_TAG)
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_terminal;
+	DECLARE_READ8_MEMBER( ccs2810_20_r );
+	DECLARE_READ8_MEMBER( ccs2810_25_r );
+	DECLARE_READ8_MEMBER( ccs2810_26_r );
+	DECLARE_WRITE8_MEMBER( ccs2810_20_w );
+	DECLARE_WRITE8_MEMBER( kbd_put );
+	UINT8 m_term_data;
+	UINT8 m_26_count;
+	virtual void machine_reset();
 };
 
+READ8_MEMBER( ccs2810_state::ccs2810_20_r )
+{
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
+}
 
-static ADDRESS_MAP_START(ccs2810_mem, AS_PROGRAM, 8)
+READ8_MEMBER( ccs2810_state::ccs2810_25_r )
+{
+	return 0x20 | (m_term_data ? 1 : 0);
+}
+
+READ8_MEMBER( ccs2810_state::ccs2810_26_r )
+{
+	if (m_26_count) m_26_count--;
+	return m_26_count;
+}
+
+WRITE8_MEMBER( ccs2810_state::ccs2810_20_w )
+{
+	terminal_write(m_terminal, 0, data & 0x7f);
+}
+
+static ADDRESS_MAP_START(ccs2810_mem, AS_PROGRAM, 8, ccs2810_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf7ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ccs2810_io , AS_IO, 8)
+static ADDRESS_MAP_START(ccs2810_io, AS_IO, 8, ccs2810_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("ins8250", ins8250_r, ins8250_w )
+	AM_RANGE(0x20, 0x20) AM_READWRITE(ccs2810_20_r,ccs2810_20_w)
+	AM_RANGE(0x25, 0x25) AM_READ(ccs2810_25_r)
+	AM_RANGE(0x26, 0x26) AM_READ(ccs2810_26_r)
+	//AM_RANGE(0x20, 0x27) AM_DEVREADWRITE_LEGACY("ins8250", ins8250_r, ins8250_w )
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( ccs2810 )
 INPUT_PORTS_END
 
-
-static MACHINE_RESET(ccs2810)
+WRITE8_MEMBER( ccs2810_state::kbd_put )
 {
-	cpu_set_reg(machine.device("maincpu"), Z80_PC, 0xf000);
+	m_term_data = data;
 }
 
-static VIDEO_START( ccs2810 )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-}
+	DEVCB_DRIVER_MEMBER(ccs2810_state, kbd_put)
+};
 
-static SCREEN_UPDATE( ccs2810 )
+MACHINE_RESET_MEMBER(ccs2810_state)
 {
-    return 0;
+	cpu_set_reg(m_maincpu, Z80_PC, 0xf000);
+	m_26_count = 0x41;
 }
 
 static const ins8250_interface ccs2810_com_interface =
@@ -61,38 +107,25 @@ static const ins8250_interface ccs2810_com_interface =
 };
 
 static MACHINE_CONFIG_START( ccs2810, ccs2810_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MCFG_CPU_PROGRAM_MAP(ccs2810_mem)
-    MCFG_CPU_IO_MAP(ccs2810_io)
-
-    MCFG_MACHINE_RESET(ccs2810)
-
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MCFG_SCREEN_UPDATE(ccs2810)
-
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
-
-    MCFG_VIDEO_START(ccs2810)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(ccs2810_mem)
+	MCFG_CPU_IO_MAP(ccs2810_io)
 
 	MCFG_INS8250_ADD( "ins8250", ccs2810_com_interface )
+
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( ccs2810 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ccs2810_u8.bin", 0xf000, 0x0800, CRC(0c3054ea) SHA1(c554b7c44a61af13decb2785f3c9b33c6fc2bfce))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1980, ccs2810,  0,       0,	ccs2810,	ccs2810,	 0,   "California Computer Systems",   "CCS Model 2810",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+COMP( 1980, ccs2810,  0,    0,       ccs2810,   ccs2810,  0,   "California Computer Systems", "CCS Model 2810", GAME_NOT_WORKING | GAME_NO_SOUND)
