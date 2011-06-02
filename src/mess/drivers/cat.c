@@ -5,7 +5,32 @@
     12/06/2009 Skeleton driver.
     15/06/2009 Working driver
 
+Pictures: http://www.regnirps.com/Apple6502stuff/apple_iie_cat.htm
+
+How to enable the FORTH interpreter (http://canoncat.org/canoncat/enableforth.html)
+
+The definitive instructions of going Forth on a Cat, tested on a living Cat.
+The Canon Cat is programmed with FORTH, a remarkably different programming language in itself.
+On the Canon Cat, you can access the FORTH interpreter with a special sequence of key presses.
+Here are exact working instructions thanks to Sandy Bumgarner:
+- Type Enable Forth Language exactly like that, capitals and all.
+- Highlight from the En to the ge, exactly [i.e. Leap back to Enable by keeping the left Leap
+  key down while typing E n a, release the leap key, then click both leap keys simultaneously],
+  and press USE FRONT with ERASE (the ANSWER command).
+- The Cat should beep and flash the ruler.
+- Then press USE FRONT and the SHIFT keys together and tap the space bar. Note that the cursor
+  stops blinking. Now a Pressing the RETURN key gets the Forth OK and you are 'in' as they say. 
+
+
+ToDo:
+- Floppy drive (3.5", 256kb)
+- Beeper/speaker
+- Swyft - figure out the keyboard
+- Centronics port
+- RS232C port
+
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -17,91 +42,97 @@ public:
 	cat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT16 *m_video_ram;
-
+	DECLARE_WRITE16_MEMBER(cat_video_status_w);
+	DECLARE_WRITE16_MEMBER(cat_test_mode_w);
+	DECLARE_READ16_MEMBER(cat_modem_r);
+	DECLARE_WRITE16_MEMBER(cat_modem_w);
+	DECLARE_READ16_MEMBER(cat_battery_r);
+	DECLARE_WRITE16_MEMBER(cat_printer_w);
+	DECLARE_READ16_MEMBER(cat_floppy_r);
+	DECLARE_WRITE16_MEMBER(cat_floppy_w);
+	DECLARE_READ16_MEMBER(cat_keyboard_r);
+	DECLARE_WRITE16_MEMBER(cat_keyboard_w);
+	DECLARE_WRITE16_MEMBER(cat_video_w);
+	DECLARE_READ16_MEMBER(cat_something_r);
+	UINT16 *m_p_videoram;
 	UINT8 m_duart_inp;// = 0x0e;
-
-	UINT16 *m_sram;
+	UINT16 *m_p_sram;
 	UINT8 m_video_enable;
 	UINT16 m_pr_cont;
 	UINT8 m_keyboard_line;
 	emu_timer *m_keyboard_timer;
 };
 
-static WRITE16_HANDLER( cat_video_status_w )
+WRITE16_MEMBER( cat_state::cat_video_status_w )
 {
-	cat_state *state = space->machine().driver_data<cat_state>();
-
-	state->m_video_enable = BIT( data, 3 );
+	m_video_enable = BIT( data, 3 );
 }
 
-static WRITE16_HANDLER( cat_test_mode_w )
+WRITE16_MEMBER( cat_state::cat_test_mode_w )
 {
 }
 
-static READ16_HANDLER( cat_modem_r )
+READ16_MEMBER( cat_state::cat_modem_r )
 {
 	return 0;
 }
 
-static WRITE16_HANDLER( cat_modem_w )
+WRITE16_MEMBER( cat_state::cat_modem_w )
 {
 }
 
-static READ16_HANDLER( cat_battery_r )
+READ16_MEMBER( cat_state::cat_battery_r )
 {
 	/* just return that battery is full */
 	return 0x7fff;
 }
-static WRITE16_HANDLER( cat_printer_w )
-{
-	cat_state *state = space->machine().driver_data<cat_state>();
 
-	state->m_pr_cont = data;
-}
-static READ16_HANDLER( cat_floppy_r )
+WRITE16_MEMBER( cat_state::cat_printer_w )
 {
-	return 0x00;
-}
-static WRITE16_HANDLER( cat_floppy_w )
-{
+	m_pr_cont = data;
 }
 
-static READ16_HANDLER( cat_keyboard_r )
+READ16_MEMBER( cat_state::cat_floppy_r )
 {
-	cat_state *state = space->machine().driver_data<cat_state>();
+	return 0;
+}
+
+WRITE16_MEMBER( cat_state::cat_floppy_w )
+{
+}
+
+READ16_MEMBER( cat_state::cat_keyboard_r )
+{
 	UINT16 retVal = 0;
 	// Read country code
-	if (state->m_pr_cont == 0x0900)
-	{
-		retVal = input_port_read(space->machine(), "DIPSW1");
-	}
+	if (m_pr_cont == 0x0900)
+		retVal = input_port_read(machine(), "DIPSW1");
+
 	// Regular keyboard read
-	if (state->m_pr_cont == 0x0800 || state->m_pr_cont == 0x0a00)
+	if (m_pr_cont == 0x0800 || m_pr_cont == 0x0a00)
 	{
 		retVal=0xff00;
-		switch(state->m_keyboard_line)
+		switch(m_keyboard_line)
 		{
-			case 0x01: retVal = input_port_read(space->machine(), "LINE0") << 8; break;
-			case 0x02: retVal = input_port_read(space->machine(), "LINE1") << 8; break;
-			case 0x04: retVal = input_port_read(space->machine(), "LINE2") << 8; break;
-			case 0x08: retVal = input_port_read(space->machine(), "LINE3") << 8; break;
-			case 0x10: retVal = input_port_read(space->machine(), "LINE4") << 8; break;
-			case 0x20: retVal = input_port_read(space->machine(), "LINE5") << 8; break;
-			case 0x40: retVal = input_port_read(space->machine(), "LINE6") << 8; break;
-			case 0x80: retVal = input_port_read(space->machine(), "LINE7") << 8; break;
+			case 0x01: retVal = input_port_read(machine(), "LINE0") << 8; break;
+			case 0x02: retVal = input_port_read(machine(), "LINE1") << 8; break;
+			case 0x04: retVal = input_port_read(machine(), "LINE2") << 8; break;
+			case 0x08: retVal = input_port_read(machine(), "LINE3") << 8; break;
+			case 0x10: retVal = input_port_read(machine(), "LINE4") << 8; break;
+			case 0x20: retVal = input_port_read(machine(), "LINE5") << 8; break;
+			case 0x40: retVal = input_port_read(machine(), "LINE6") << 8; break;
+			case 0x80: retVal = input_port_read(machine(), "LINE7") << 8; break;
 		}
 	}
 	return retVal;
 }
-static WRITE16_HANDLER( cat_keyboard_w )
-{
-	cat_state *state = space->machine().driver_data<cat_state>();
 
-	state->m_keyboard_line = data >> 8;
+WRITE16_MEMBER( cat_state::cat_keyboard_w )
+{
+	m_keyboard_line = data >> 8;
 }
 
-static WRITE16_HANDLER( cat_video_w )
+WRITE16_MEMBER( cat_state::cat_video_w )
 {
 /*
  006500AE ,          ( HSS HSync Strart    89 )
@@ -114,33 +145,34 @@ static WRITE16_HANDLER( cat_video_w )
  006581C0 ,          ( VOC Video Control Normal Syncs )
  */
 }
-static READ16_HANDLER( cat_something_r )
+
+READ16_MEMBER( cat_state::cat_something_r )
 {
 	return 0x00ff;
 }
 
-static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM // 256 KB ROM
-	AM_RANGE(0x00040000, 0x00043fff) AM_RAM AM_BASE_MEMBER(cat_state,m_sram) // SRAM powered by batery
+	AM_RANGE(0x00040000, 0x00043fff) AM_RAM AM_BASE(m_p_sram) // SRAM powered by battery
 	AM_RANGE(0x00200000, 0x0027ffff) AM_ROM AM_REGION("svrom",0x0000) // SV ROM
-	AM_RANGE(0x00400000, 0x0047ffff) AM_RAM AM_BASE_MEMBER(cat_state,m_video_ram) // 512 KB RAM
+	AM_RANGE(0x00400000, 0x0047ffff) AM_RAM AM_BASE(m_p_videoram) // 512 KB RAM
 	AM_RANGE(0x00600000, 0x0065ffff) AM_WRITE(cat_video_w) // Video chip
 	AM_RANGE(0x00800000, 0x00800001) AM_READWRITE(cat_floppy_r, cat_floppy_w)
 	AM_RANGE(0x00800002, 0x00800003) AM_WRITE(cat_keyboard_w)
 	AM_RANGE(0x00800008, 0x00800009) AM_READ(cat_something_r)
 	AM_RANGE(0x0080000a, 0x0080000b) AM_READ(cat_keyboard_r)
 	AM_RANGE(0x0080000e, 0x0080000f) AM_READWRITE(cat_battery_r,cat_printer_w)
-	AM_RANGE(0x00810000, 0x0081001f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff )
+	AM_RANGE(0x00810000, 0x0081001f) AM_DEVREADWRITE8_LEGACY( "duart68681", duart68681_r, duart68681_w, 0xff )
 	AM_RANGE(0x00820000, 0x008200ff) AM_READWRITE(cat_modem_r, cat_modem_w)// modem
 	AM_RANGE(0x00840000, 0x00840001) AM_WRITE(cat_video_status_w) // Video status
 	AM_RANGE(0x00860000, 0x00860001) AM_WRITE(cat_test_mode_w) // Test mode
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 16, cat_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM // 64 KB ROM
-	AM_RANGE(0x00040000, 0x000fffff) AM_RAM AM_BASE_MEMBER(cat_state,m_video_ram)
+	AM_RANGE(0x00040000, 0x000fffff) AM_RAM AM_BASE(m_p_videoram)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -299,7 +331,7 @@ static SCREEN_UPDATE( cat )
 			int horpos = 0;
 			for (x = 0; x < 42; x++)
 			{
-				code = state->m_video_ram[addr++];
+				code = state->m_p_videoram[addr++];
 				for (b = 15; b >= 0; b--)
 				{
 					*BITMAP_ADDR16(bitmap, y, horpos++) = (code >> b) & 0x01;
@@ -343,10 +375,10 @@ static SCREEN_UPDATE( swyft )
 		int horpos = 0;
 		for (x = 0; x < 20; x++)
 		{
-			code = state->m_video_ram[addr++];
+			code = state->m_p_videoram[addr++];
 			for (b = 15; b >= 0; b--)
 			{
-				*BITMAP_ADDR16(bitmap, y, horpos++) =  (code >> b) & 0x01;
+				*BITMAP_ADDR16(bitmap, y, horpos++) = (code >> b) & 0x01;
 			}
 		}
 	}
@@ -355,7 +387,7 @@ static SCREEN_UPDATE( swyft )
 
 static void duart_irq_handler(device_t *device, UINT8 vector)
 {
-	logerror("duart_irq_handler\n");
+	//logerror("duart_irq_handler\n");
 }
 
 static void duart_tx(device_t *device, int channel, UINT8 data)
@@ -392,13 +424,13 @@ static NVRAM_HANDLER( cat )
 
 	if (read_or_write)
 	{
-		file->write(state->m_sram, 0x4000);
+		file->write(state->m_p_sram, 0x4000);
 	}
 	else
 	{
 		if (file)
 		{
-			file->read(state->m_sram, 0x4000);
+			file->read(state->m_p_sram, 0x4000);
 		}
 	}
 }
@@ -476,5 +508,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1985, swyft,0,       0,		swyft,		swyft,	 0, 	"Information Applicance Inc",   "Swyft",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1987, cat,  swyft,   0,		cat,		cat,	 0, 	"Canon",   "Cat",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, swyft,0,       0,      swyft,    swyft,    0,   "Information Applicance Inc", "Swyft", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1987, cat,  swyft,   0,      cat,      cat,      0,   "Canon",   "Cat", GAME_NOT_WORKING | GAME_NO_SOUND)
