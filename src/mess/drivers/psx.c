@@ -700,9 +700,6 @@ ADDRESS_MAP_END
 static MACHINE_RESET( psx )
 {
 	psx_sio_install_handler( machine, 0, psx_sio0 );
-
-	psx_dma_install_read_handler(machine, 3, psx_dma_read_delegate(FUNC(cd_dma_read),machine.device<psxcd_device>("psxcd")));
-	psx_dma_install_write_handler(machine, 3, psx_dma_write_delegate(FUNC(cd_dma_write),machine.device<psxcd_device>("psxcd")));
 }
 
 static DRIVER_INIT( psx )
@@ -793,7 +790,11 @@ static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	MCFG_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
 
 	MCFG_CDROM_ADD("cdrom")
+
 	MCFG_PSXCD_ADD("cdrom")
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( cd_dma_read ), (psxcd_device *) device ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( cd_dma_write ), (psxcd_device *) device ) )
+
 	MCFG_PSXCARD_ADD("card1")
 	MCFG_PSXCARD_ADD("card2")
 MACHINE_CONFIG_END
@@ -830,7 +831,11 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 	MCFG_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
 
 	MCFG_CDROM_ADD("cdrom")
+
 	MCFG_PSXCD_ADD("cdrom")
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( cd_dma_read ), (psxcd_device *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( cd_dma_write ), (psxcd_device *) owner ) )
+
 	MCFG_PSXCARD_ADD("card1")
 	MCFG_PSXCARD_ADD("card2")
 MACHINE_CONFIG_END
