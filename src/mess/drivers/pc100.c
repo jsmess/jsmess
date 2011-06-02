@@ -4,7 +4,8 @@
 
     TODO:
     - kanji rom has offsetted data for whatever reason.
-    - i8259 is bugged, program flow eventually jumps to la-la-land
+    - there's a regression with push/pop sp, when it triggers an iret program
+      flow jumps to la-la-land
 
 ****************************************************************************/
 
@@ -30,6 +31,9 @@ public:
 	struct{
 		UINT8 shift;
 		UINT16 mask;
+		UINT16 vstart;
+		UINT8 addr;
+		UINT8 reg[8];
 	}m_crtc;
 };
 
@@ -46,10 +50,12 @@ static SCREEN_UPDATE( pc100 )
 	int dot;
 	int pen[4],pen_i;
 
-	count = 0;
+	count = ((state->m_crtc.vstart + 0x20) * 0x40);
 
 	for(y=0;y<512;y++)
 	{
+		count &= 0xffff;
+
 		for(x=0;x<1024/16;x++)
 		{
 			for(xi=0;xi<16;xi++)
@@ -128,7 +134,7 @@ static WRITE16_HANDLER( pc100_kanji_w )
 static READ8_HANDLER( pc100_key_r )
 {
 	if(offset)
-		return 0x2d; // bit 5: horizontal/vertical monitor dsw
+		return input_port_read(space->machine(), "DSW"); // bit 5: horizontal/vertical monitor dsw
 
 	return 0;
 }
@@ -173,6 +179,41 @@ static WRITE8_HANDLER( pc100_shift_w )
 	state->m_crtc.shift = data & 0xf;
 }
 
+static READ8_HANDLER( pc100_vs_vreg_r )
+{
+	pc100_state *state = space->machine().driver_data<pc100_state>();
+
+	if(offset)
+		return state->m_crtc.vstart >> 8;
+
+	return state->m_crtc.vstart & 0xff;
+}
+
+static WRITE8_HANDLER( pc100_vs_vreg_w )
+{
+	pc100_state *state = space->machine().driver_data<pc100_state>();
+
+	if(offset)
+		state->m_crtc.vstart = (state->m_crtc.vstart & 0xff) | (data << 8);
+	else
+		state->m_crtc.vstart = (state->m_crtc.vstart & 0xff00) | (data & 0xff);
+}
+
+static WRITE8_HANDLER( pc100_crtc_addr_w )
+{
+	pc100_state *state = space->machine().driver_data<pc100_state>();
+
+	state->m_crtc.addr = data & 7;
+}
+
+static WRITE8_HANDLER( pc100_crtc_data_w )
+{
+	pc100_state *state = space->machine().driver_data<pc100_state>();
+
+	state->m_crtc.reg[state->m_crtc.addr] = data;
+}
+
+
 /* everything is 8-bit bus wide */
 static ADDRESS_MAP_START(pc100_io, AS_IO, 16)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0x00ff) // i8259
@@ -184,9 +225,9 @@ static ADDRESS_MAP_START(pc100_io, AS_IO, 16)
 	AM_RANGE(0x22, 0x25) AM_WRITE8(pc100_output_w,0x00ff) //i/o, keyboard, mouse
 //	AM_RANGE(0x28, 0x2b) i8251
 	AM_RANGE(0x30, 0x31) AM_READWRITE8(pc100_shift_r,pc100_shift_w,0x00ff) // crtc shift
-//	AM_RANGE(0x38, 0x39) crtc address reg
-//	AM_RANGE(0x3a, 0x3b) crtc data reg
-//	AM_RANGE(0x3c, 0x3f) crtc vertical start position
+	AM_RANGE(0x38, 0x39) AM_WRITE8(pc100_crtc_addr_w,0x00ff) //crtc address reg
+	AM_RANGE(0x3a, 0x3b) AM_WRITE8(pc100_crtc_data_w,0x00ff) //crtc data reg
+	AM_RANGE(0x3c, 0x3f) AM_READWRITE8(pc100_vs_vreg_r,pc100_vs_vreg_w,0x00ff) //crtc vertical start position
 	AM_RANGE(0x40, 0x5f) AM_RAM_WRITE(pc100_paletteram_w) AM_BASE_MEMBER(pc100_state,m_palram)
 //	AM_RANGE(0x60, 0x61) crtc command (16-bit wide)
 	AM_RANGE(0x80, 0x81) AM_READWRITE(pc100_kanji_r,pc100_kanji_w)
@@ -197,6 +238,31 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( pc100 )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "DSW" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Monitor" )
+	PORT_DIPSETTING(    0x20, "Horizontal" )
+	PORT_DIPSETTING(    0x00, "Vertical" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout kanji_layout =
