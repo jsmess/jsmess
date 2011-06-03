@@ -1573,6 +1573,7 @@ $(MESSOBJ)/tomy.a:				\
 $(MESSOBJ)/toshiba.a:			\
 	$(MESS_DRIVERS)/pasopia.o	\
 	$(MESS_DRIVERS)/pasopia7.o	\
+	$(MESS_DRIVERS)/paso1600.o      \
 
 $(MESSOBJ)/trs.a:				\
 	$(MESS_MACHINE)/6883sam.o	\

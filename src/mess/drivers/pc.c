@@ -2541,8 +2541,8 @@ ROM_START( ibm5550 )
 	ROM_LOAD( "ipl.rom", 0xfc000, 0x4000, CRC(40cf34c9) SHA1(d41f77fdfa787b0e97ed311e1c084b8699a5b197))
 
 	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+	ROM_REGION(0x2000,"gfx1", 0) /* original font rom is undumped */
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, BAD_DUMP CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 /***************************************************************************
