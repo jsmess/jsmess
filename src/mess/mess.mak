@@ -1571,6 +1571,7 @@ $(MESSOBJ)/tomy.a:				\
 	$(MESS_DRIVERS)/tutor.o		\
 
 $(MESSOBJ)/toshiba.a:			\
+	$(MESS_DRIVERS)/pasopia.o	\
 	$(MESS_DRIVERS)/pasopia7.o	\
 
 $(MESSOBJ)/trs.a:				\
