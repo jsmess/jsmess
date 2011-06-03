@@ -10,7 +10,6 @@
 	
 	TODO:
 	
-	- software list
 	- bankswitch
 	- DMA
 	- peripheral interfaces
@@ -416,7 +415,7 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_RAM_DEFAULT_SIZE("128K")
 
 	// software list
-	//MCFG_SOFTWARE_LIST_ADD("flop_list", "super6")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "super6")
 MACHINE_CONFIG_END
 
 
