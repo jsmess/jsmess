@@ -14,8 +14,7 @@
 	- terminal
 	- DMA
 	- peripheral interfaces
-	- baud select
-
+	
 */
 
 #include "includes/super6.h"
@@ -88,7 +87,7 @@ void super6_state::bankswitch()
 	if (BIT(m_bank0, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x8000);
 	if (BIT(m_bank0, 3)) program->install_ram(0xc000, 0xffff, ram + 0xc000);
 	
-	if (!BIT(m_bank0, 5)) program->install_rom(0xf000, 0xffff, 0, 0x800, rom);
+	if (!BIT(m_bank0, 5)) program->install_rom(0xf000, 0xf7ff, 0, 0x800, rom);
 }
 
 
@@ -217,16 +216,19 @@ WRITE8_MEMBER( super6_state::baud_w )
 		
 		bit		description
 		
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
+		0		SIO channel A baud bit A
+		1		SIO channel A baud bit B
+		2		SIO channel A baud bit C
+		3		SIO channel A baud bit D
+		4		SIO channel B baud bit A
+		5		SIO channel B baud bit B
+		6		SIO channel B baud bit C
+		7		SIO channel B baud bit D
 
 	*/
+
+	m_brg->str_w(space, 0, data & 0x0f);
+	m_brg->stt_w(space, 0, data >> 4);
 }
 
 
@@ -255,10 +257,11 @@ static ADDRESS_MAP_START( super6_io, AS_IO, 8, super6_state )
 	AM_RANGE(0x0d, 0x0f) AM_DEVREADWRITE_LEGACY(WD2793_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
 	AM_RANGE(0x14, 0x14) AM_WRITE(fdc_w)
-	AM_RANGE(0x15, 0x15) AM_READ_PORT("BAUD") AM_WRITE(s100_w)
+	AM_RANGE(0x15, 0x15) AM_READ_PORT("J7") AM_WRITE(s100_w)
 	AM_RANGE(0x16, 0x16) AM_WRITE(bank0_w)
 	AM_RANGE(0x17, 0x17) AM_WRITE(bank1_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0x03) AM_WRITE(baud_w)
+//	AM_RANGE(0x40, 0x40) ?
 ADDRESS_MAP_END
 
 
@@ -272,8 +275,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static INPUT_PORTS_START( super6 )
-	PORT_START("BAUD")
-	PORT_DIPNAME( 0x0f, 0x0e, "SIO Channel A Baud Rate" ) PORT_DIPLOCATION("S1:1,2,3,4")
+	PORT_START("J7")
+	PORT_DIPNAME( 0x0f, 0x0e, "SIO Channel A Baud Rate" ) PORT_DIPLOCATION("J7:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "50" )
 	PORT_DIPSETTING(    0x01, "75" )
 	PORT_DIPSETTING(    0x02, "110" )
@@ -290,7 +293,7 @@ static INPUT_PORTS_START( super6 )
 	PORT_DIPSETTING(    0x0d, "7200" )
 	PORT_DIPSETTING(    0x0e, "9600" )
 	PORT_DIPSETTING(    0x0f, "19200" )
-	PORT_DIPNAME( 0x70, 0x70, "SIO Channel B Baud Rate" ) PORT_DIPLOCATION("S1:5,6,7")
+	PORT_DIPNAME( 0x70, 0x70, "SIO Channel B Baud Rate" ) PORT_DIPLOCATION("J7:5,6,7")
 	PORT_DIPSETTING(    0x00, "50" )
 	PORT_DIPSETTING(    0x10, "75" )
 	PORT_DIPSETTING(    0x20, "110" )
@@ -299,9 +302,9 @@ static INPUT_PORTS_START( super6 )
 	PORT_DIPSETTING(    0x50, "300" )
 	PORT_DIPSETTING(    0x60, "600" )
 	PORT_DIPSETTING(    0x70, "1200" )
-	PORT_DIPNAME( 0x80, 0x00, "Double Sided Disk Drive" ) PORT_DIPLOCATION("S1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Disk Drive Type" ) PORT_DIPLOCATION("J7:8")
+	PORT_DIPSETTING(    0x80, "Single Sided" )
+	PORT_DIPSETTING(    0x00, "Double Sided" )
 INPUT_PORTS_END
 
 
@@ -379,6 +382,26 @@ static Z80PIO_INTERFACE( pio_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  COM8116_INTERFACE( brg_intf )
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( super6_state::fr_w )
+{
+	z80dart_rxca_w(m_dart, state);
+	z80dart_txca_w(m_dart, state);
+}
+
+static COM8116_INTERFACE( brg_intf )
+{
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(super6_state, fr_w),
+	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),
+	{ 6336, 4224, 2880, 2355, 2112, 1056, 528, 264, 176, 158, 132, 88, 66, 44, 33, 16 }, // from WD1943-00 datasheet
+	{ 6336, 4224, 2880, 2355, 2112, 1056, 528, 264, 176, 158, 132, 88, 66, 44, 33, 16 },
 };
 
 
@@ -483,6 +506,7 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_24MHz/6, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_24MHz/4, pio_intf)
 	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
+	MCFG_COM8116_ADD(BR1945_TAG, XTAL_5_0688MHz, brg_intf)
 	MCFG_FLOPPY_2_DRIVES_ADD(super6_floppy_config)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 

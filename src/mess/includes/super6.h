@@ -10,6 +10,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
+#include "machine/com8116.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/z80dma.h"
@@ -24,6 +25,7 @@
 #define Z80DMA_TAG		"u21"
 #define Z80PIO_TAG		"u7"
 #define WD2793_TAG		"u27"
+#define BR1945_TAG		"u31"
 #define SCREEN_TAG		"screen"
 #define TERMINAL_TAG	"terminal"
 
@@ -38,11 +40,11 @@ public:
 		  m_dma(*this, Z80DMA_TAG),
 		  m_pio(*this, Z80PIO_TAG),
 		  m_fdc(*this, WD2793_TAG),
+		  m_brg(*this, BR1945_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1)
-	{
-	}
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -50,6 +52,7 @@ public:
 	required_device<z80dma_device> m_dma;
 	required_device<z80pio_device> m_pio;
 	required_device<device_t> m_fdc;
+	required_device<com8116_device> m_brg;
 	required_device<device_t> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
@@ -62,6 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER( bank0_w );
 	DECLARE_WRITE8_MEMBER( bank1_w );
 	DECLARE_WRITE8_MEMBER( baud_w );
+	DECLARE_WRITE_LINE_MEMBER( fr_w );
 	
 	void bankswitch();
 	
