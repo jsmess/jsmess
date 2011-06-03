@@ -573,7 +573,7 @@ static WRITE8_HANDLER( pasopia7_fdc_w )
 	{
 		case 0: upd765_tc_w(space->machine().device("upd765"), 0); break;
 		case 2: upd765_tc_w(space->machine().device("upd765"), 1); break;
-		case 5: return upd765_data_w(space->machine().device("upd765"),0,data);
+		case 5: upd765_data_w(space->machine().device("upd765"),0,data); break;
 		case 6:
 		upd765_reset_w(space->machine().device("upd765"),data & 0x80);
 		floppy_mon_w(floppy_get_device(space->machine(), 0), (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
