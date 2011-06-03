@@ -355,8 +355,9 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
-			<dataarea name="roml" size="0x1000">
+			<dataarea name="roml" size="0x2000">
 				<rom name="shelp$.ba1" size="0x1000" crc="ecfeda87" sha1="dfebb9daf59a5e848f7500f11f3e7ed6ee877dcb" offset="0x0000" />
+				<rom size="0x1000" offset="0x1000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -606,7 +607,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-		
+	
 	<software name="expert" supported="no">
 		<description>The Expert Cartridge</description>
 		<year>198?</year>
@@ -686,6 +687,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<description>Magic Voice</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64850" />
 		<part name="cart" interface="c64_cart">
 			<feature name="cart_type" value="magic_voice" />
 			<feature name="game" value="0" />
@@ -2408,7 +2410,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="pitfal2a" cloneof="pitfall2">
+	<software name="pitfall2a" cloneof="pitfall2">
 		<description>Pitfall II: The Lost Caverns (Alt)</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
@@ -2529,7 +2531,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-		
+	
 	<software name="qbert2" cloneof="qbert">
 		<description>Q*bert (Alt 2)</description>
 		<year>1983</year>
@@ -3347,11 +3349,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>		
 	
 	<software name="afterwar">
-	<!-- Requires "Dinamic" cartridge hardware -->
 		<description>After The War</description>
 		<year>1990</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="dinamic" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
@@ -3361,11 +3363,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="aspargp">
-	<!-- Requires "Dinamic" cartridge hardware -->
 		<description>Aspar GTP Master</description>
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="dinamic" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
@@ -3375,11 +3377,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="arcade">
-	<!-- Requires "Magic Desk, Domark, HES Australia" cartridge hardware -->
 		<description>Arcade Classic Pak</description>
 		<year>1984</year>
 		<publisher>HES Australia</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
@@ -3431,12 +3433,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 		
 	<software name="c64gscrt">
-	<!-- Requires "C64 Game System, System 3" cartridge hardware -->
 		<description>Commodore 64 Game System Cartridge</description>
 		<!-- This cartridge came packaged with the C64 Game System. -->
 		<year>1990</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="c64gs" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x80000">
@@ -3460,7 +3462,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="dbldrgn">
-		<description>Double Dragon</description>
+		<description>Double Dragon (Ocean)</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3474,11 +3476,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="dbldrgm" cloneof="dbldrgn">
-	<!-- Requires "Magic Desk, Domark, HES Australia" cartridge hardware -->
-		<description>Double Dragon (Alt)</description>
+		<description>Double Dragon (Melbourne House)</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
@@ -3502,11 +3504,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="funplay">
-	<!-- Requires "Fun Play, Power Play" cartridge hardware -->
 		<description>Fun Play 3-in-1</description>
 		<year>1990</year>
 		<publisher>The Disc Company &amp; Codemasters</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="fun_play" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x20000">
@@ -3544,11 +3546,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="lstninja">
-	<!-- Requires "C64 Game System, System 3" cartridge hardware -->
 		<description>The Last Ninja Remix</description>
 		<year>1990</year>
 		<publisher>System 3</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="c64gs" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x80000">
@@ -3572,11 +3574,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="megafun">
-	<!-- Requires "Magic Desk, Domark, HES Australia" cartridge hardware -->
 		<description>Megafun</description>
 		<year>2004</year>
 		<publisher>Entertainment Software</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x80000">
@@ -3586,11 +3588,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="myth">
-	<!-- Requires "C64 Game System, System 3" cartridge hardware -->
 		<description>Myth: History in the Making</description>
 		<year>1990</year>
 		<publisher>System 3</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="c64gs" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x80000">
@@ -3600,11 +3602,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="narco">
-	<!-- Requires "Dinamic" cartridge hardware -->
 		<description>Narco Police</description>
 		<year>19??</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="dinamic" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
@@ -3642,11 +3644,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="parkptrl">
-	<!-- Requires "Magic Desk, Domark, HES Australia" cartridge hardware -->
 		<description>Park Patrol</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
@@ -3656,11 +3658,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="pwrplay">
-	<!-- Requires "Fun Play, Power Play" cartridge hardware -->
 		<description>PowerPlay</description>
 		<year>1990</year>
 		<publisher>The Disc Company &amp; Codemasters</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="fun_play" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x20000">
@@ -3698,11 +3700,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="satan">
-	<!-- Requires "Dinamic" cartridge hardware -->
 		<description>Satan</description>
 		<year>1990</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="dinamic" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
@@ -3740,11 +3742,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="szaxxon">
-	<!-- Requires "Zaxxon, Super Zaxxon (SEGA)" cartridge hardware -->
 		<description>Super Zaxxon</description>
 		<year>1984</year>
 		<publisher>HesWare</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="zaxxon" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x5000">
@@ -3782,11 +3784,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="tennis">
-	<!-- Requires "Magic Desk, Domark, HES Australia" cartridge hardware -->
 		<description>Tournament Tennis</description>
 		<year>1984</year>
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
@@ -3824,11 +3826,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="zaxxon">
-	<!-- Requires "Zaxxon, Super Zaxxon (SEGA)" cartridge hardware -->
 		<description>Zaxxon</description>
 		<year>1984</year>
 		<publisher>Synapse</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="zaxxon" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x5000">
@@ -4314,7 +4316,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="hes writer 64  (1982)(hesware).80" size="0x2000" crc="00d06822" sha1="d04cb8c29efe84c5ac556f88a725a7046fd44609" offset="0x0000" />
+				<rom name="hes writer 64 (1982)(hesware).80" size="0x2000" crc="00d06822" sha1="d04cb8c29efe84c5ac556f88a725a7046fd44609" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4591,11 +4593,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="backup13">
-	<!-- Requires "Action Replay" cartridge hardware -->
 		<description>One-Pass Backup v1.3</description>
 		<year>19??</year>
 		<publisher>Datel Electronics</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="action_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4605,11 +4607,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="ar42pro">
-	<!-- Requires "Action Replay" cartridge hardware -->
-		<description>Action Replay v4.2 Professional </description>
+		<description>Action Replay v4.2 Professional</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="action_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4619,11 +4621,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="ar42proa" cloneof="ar42pro">
-	<!-- Requires "Action Replay" cartridge hardware -->
-		<description>Action Replay v4.2 Professional  (Alt)</description>
+		<description>Action Replay v4.2 Professional (Alt)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="action_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4633,11 +4635,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="ar42prob" cloneof="ar42pro">
-	<!-- Requires "Action Replay" cartridge hardware -->
 		<description>Action Replay v4.2 Professional (Alt 2)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="action_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4647,11 +4649,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="ar50pro">
-	<!-- Requires "Action Replay" cartridge hardware -->
 		<description>Action Replay v5.0 Professional</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="action_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4661,11 +4663,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="ar50proa" cloneof="ar50pro">
-	<!-- Requires "Action Replay" cartridge hardware -->
 		<description>Action Replay v5.0 Professional (Alt)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="action_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4675,11 +4677,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="ar60plus">
-	<!-- Requires "Action Replay" cartridge hardware -->
 		<description>Action Replay v6.0 Plus (Ger)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="action_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4689,11 +4691,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="arpro60">
-	<!-- Requires "Action Replay" cartridge hardware -->
 		<description>Action Replay Professional v6.0</description>
 		<year>1989</year>
 		<publisher>Datel Electronics</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="action_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4703,11 +4705,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="arpro60a" cloneof="arpro60">
-	<!-- Requires "Action Replay" cartridge hardware -->
 		<description>Action Replay Professional v6.0 (Alt)</description>
 		<year>1989</year>
 		<publisher>Datel Electronics</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="action_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4717,11 +4719,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="acplus70">
-	<!-- Requires "Action Replay" cartridge hardware -->
 		<description>Action Cartridge Plus MK v7.0</description>
 		<year>1990</year>
 		<publisher>Datel Electronics</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="action_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4731,11 +4733,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="ar73pro">
-	<!-- Requires "Action Replay" cartridge hardware -->
 		<description>Action Replay v7.3 Professional</description>
 		<year>1991</year>
 		<publisher>Datel Electronics, Atrax</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="action_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4745,11 +4747,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="ar75pro">
-	<!-- Requires "Action Replay" cartridge hardware -->
 		<description>Action Replay v7.5 Professional</description>
 		<year>1989</year>
 		<publisher>Datel Electronics</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="action_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4759,11 +4761,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="comal80">
-	<!-- Requires "Comal 80" cartridge hardware -->
-		<description>Comal 80</description>
+		<description>COMAL 80 (Commodore)</description>
 		<year>1985</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="comal_80" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x10000">
@@ -4773,11 +4775,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="comal80a" cloneof="comal80">
-	<!-- Requires "Comal 80" cartridge hardware -->
-		<description>Comal 80 (Alt)</description>
+		<description>COMAL 80 (UniComal)</description>
 		<year>1985</year>
-		<publisher>Commodore</publisher>
+		<publisher>UniComal</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="comal_80" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x10000">
@@ -4787,11 +4789,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="fairlite">
-	<!-- Requires "Action Replay" cartridge hardware -->
 		<description>The Fairlight Cracking Cartridge</description>
 		<year>198?</year>
 		<publisher>Fairlight</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="action_replay" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4801,11 +4803,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="final">
-	<!-- Requires "Final Cartridge III" cartridge hardware -->
-		<description>The Final Cartridge III v.1988-12</description>
+		<description>The Final Cartridge III (1988-12)</description>
 		<year>1988</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge_3" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
@@ -4815,11 +4817,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="final2" cloneof="final">
-	<!-- Requires "Final Cartridge III" cartridge hardware -->
-		<description>The Final Cartridge III v.1988-05</description>
+		<description>The Final Cartridge III (1988-05)</description>
 		<year>1988</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge_3" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
@@ -4829,11 +4831,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="final3" cloneof="final">
-	<!-- Requires "Final Cartridge III" cartridge hardware -->
-		<description>The Final Cartridge III v.1987-11</description>
+		<description>The Final Cartridge III (1987-11)</description>
 		<year>1987</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge_3" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
@@ -4843,11 +4845,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="final4" cloneof="final">
-	<!-- Requires "Final Cartridge III" cartridge hardware -->
-		<description>The Final Cartridge III v.1987-09</description>
+		<description>The Final Cartridge III (1987-09)</description>
 		<year>1987</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge_3" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
@@ -4857,11 +4859,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="magicdsk">
-	<!-- Requires "Magic Desk, Domark, HES Australia" cartridge hardware -->
 		<description>Magic Desk I</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64801" />
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
@@ -4871,11 +4874,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="magicf">
-	<!-- Requires "Magic Formel" cartridge hardware -->
 		<description>Magic Formel</description>
 		<year>1984</year>
 		<publisher>LS</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="magic_formel" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
@@ -4885,11 +4888,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="nordic72">
-	<!-- Requires "Atomic Power" cartridge hardware -->
-		<description>Nordic Power - Action Cartridge v7.2</description>
+		<description>Nordic Power: Action Cartridge v7.2</description>
 		<year>1991</year>
 		<publisher>Gameworks</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="atomic_power" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4899,11 +4902,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="atomic" cloneof="nordic72">
-	<!-- Requires "Atomic Power" cartridge hardware -->
 		<description>Atomic Power Cartridge v1.1</description>
 		<year>1990</year>
 		<publisher>Frank &amp; Joe</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="atomic_power" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4913,11 +4916,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="nordic10" cloneof="nordic72">
-	<!-- Requires "Atomic Power" cartridge hardware -->
 		<description>Nordic Power v1.0</description>
 		<year>1989</year>
 		<publisher>D&amp;E, Venlo</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="atomic_power" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
@@ -4927,11 +4930,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="sprsnap5">
-	<!-- Requires "Super Snapshot 5" cartridge hardware -->
 		<description>Super Snapshot 5 (NTSC)</description>
 		<year>1989</year>
 		<publisher>LMS Tech</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="super_snapshot_5" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
@@ -4941,11 +4944,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="sprsnp5p" cloneof="sprsnap5">
-	<!-- Requires "Super Snapshot 5" cartridge hardware -->
 		<description>Super Snapshot 5 (PAL)</description>
 		<year>1989</year>
 		<publisher>LMS Tech</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="super_snapshot_5" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
@@ -4955,11 +4958,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="sprsn5pa" cloneof="sprsnap5">
-	<!-- Requires "Super Snapshot 5" cartridge hardware -->
 		<description>Super Snapshot 5 (PAL) (Alt)</description>
 		<year>1989</year>
 		<publisher>LMS Tech</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="super_snapshot_5" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">

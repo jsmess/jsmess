@@ -41,7 +41,7 @@
 		|=|                                 |
 		|===================================|
 		
-		ROM     - MOS 25128 "317040-01 (C) 1984 CBM 26011D-722"
+		ROM     - MOS 23128 "317040-01 (C) 1984 CBM 26011D-722"
 		-->
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
@@ -80,7 +80,7 @@
 		|=|                                 |
 		|===================================|
 		
-		ROM     - MOS 25128 "317043-01 (C) 1984 CBM 26011D-787"
+		ROM     - MOS 23128 "317043-01 (C) 1984 CBM 26011D-787"
 		-->
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
@@ -107,7 +107,7 @@
 		|=|                                 |
 		|===================================|
 		
-		ROM     - MOS 25128 "317050-02 (C) 1984 CBM"
+		ROM     - MOS 23128 "317050-02 (C) 1984 CBM"
 		-->
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
@@ -210,8 +210,8 @@
 		|=|                                 |
 		|===================================|
 		
-		ROM0    - MOS 25128 "317051-01 (C) 1984 CBM 26011D-723"
-		ROM1    - MOS 25128 "317052-01 (C) 1984 CBM 26011D-724"
+		ROM0    - MOS 23128 "317051-01 (C) 1984 CBM 26011D-723"
+		ROM1    - MOS 23128 "317052-01 (C) 1984 CBM 26011D-724"
 		-->
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">

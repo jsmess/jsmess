@@ -6,6 +6,7 @@
 		<description>Avenger (Jpn, v.02)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64621" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -20,6 +21,7 @@
 		<description>Avenger (Euro, USA)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64621" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -51,6 +53,7 @@
 		<description>Clowns (Jpn, v.01)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64606" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -65,6 +68,7 @@
 		<description>Clowns (Jpn, Newer)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64606" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -79,6 +83,7 @@
 		<description>Jupiter Lander (World, v.02)</description>
 		<year>1982</year>
 		<publisher>Commodore / HAL Laboratory</publisher>
+		<info name="serial" value="C-64601" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -93,6 +98,7 @@
 		<description>Kickman (World, v.03)</description>
 		<year>1982</year>
 		<publisher>Commodore / HAL Laboratory</publisher>
+		<info name="serial" value="C-64602" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -107,6 +113,7 @@
 		<description>Le Mans (Euro, USA)</description>
 		<year>1982</year>
 		<publisher>Commodore / HAL Laboratory</publisher>
+		<info name="serial" value="C-64616" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -181,6 +188,7 @@
 		<description>Music Maker (World)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64403" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -195,6 +203,7 @@
 		<description>Music Machine (Euro, USA)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64402" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -209,6 +218,7 @@
 		<description>Omega Race (Jpn, v.02)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64614" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -223,6 +233,7 @@
 		<description>Pinball Spectacular (World)</description>
 		<year>1983</year>
 		<publisher>Commodore / HAL Laboratory</publisher>
+		<info name="serial" value="C-64617" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -240,6 +251,7 @@
 		<description>Radar Rat Race (Alt)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64605" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -254,6 +266,7 @@
 		<description>Radar Rat Race (Jpn, v.02, Alt)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64605" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -268,6 +281,7 @@
 		<description>Radar Rat Race (Jpn, v.02)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64605" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -293,6 +307,7 @@
 		<description>Sea Wolf (Euro, USA)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64603" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -307,6 +322,7 @@
 		<description>Speed Math &amp; Bingo Math (Euro, USA, v.01)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64604" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -335,6 +351,7 @@
 		<description>The Visible Solar System (Euro, USA)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64609" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -349,6 +366,7 @@
 		<description>Wizard of Wor (Jpn)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64615" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
@@ -363,6 +381,7 @@
 		<description>Wizard of Wor (Jpn, v.02)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="C-64615" />
 		<part name="cart" interface="ultimax_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
