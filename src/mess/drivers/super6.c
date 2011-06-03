@@ -11,6 +11,7 @@
 	TODO:
 	
 	- bankswitch
+	- terminal
 	- DMA
 	- peripheral interfaces
 	- baud select
@@ -30,6 +31,64 @@
 
 void super6_state::bankswitch()
 {
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *rom = machine().region(Z80_TAG)->base();
+
+	program->unmap_readwrite(0x0000, 0xffff);
+
+	if (!BIT(m_bank0, 6))
+	{
+		program->install_rom(0x0000, 0x07ff, 0, 0xf800, rom);
+		return;
+	}
+	
+	int map = (m_bank1 >> 4) & 0x07;
+	
+	switch (map)
+	{
+	case 0:
+		if (BIT(m_bank1, 0)) program->install_ram(0x0000, 0x3fff, ram + 0x10000);
+		if (BIT(m_bank1, 1)) program->install_ram(0x4000, 0x7fff, ram + 0x14000);
+		if (BIT(m_bank1, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x18000);
+		if (BIT(m_bank1, 3)) program->install_ram(0xc000, 0xffff, ram + 0x1c000);
+		break;
+
+	case 1:
+		if (BIT(m_bank1, 0)) program->install_ram(0x0000, 0x3fff, ram + 0x10000);
+		if (BIT(m_bank1, 1)) program->install_ram(0x4000, 0x7fff, ram + 0x14000);
+		if (BIT(m_bank1, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x18000);
+		if (BIT(m_bank1, 3)) program->install_ram(0xc000, 0xffff, ram + 0x0000);
+		break;
+
+	case 2:
+		if (BIT(m_bank1, 0)) program->install_ram(0x0000, 0x3fff, ram + 0x10000);
+		if (BIT(m_bank1, 1)) program->install_ram(0x4000, 0x7fff, ram + 0x14000);
+		if (BIT(m_bank1, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x4000);
+		if (BIT(m_bank1, 3)) program->install_ram(0xc000, 0xffff, ram + 0x1c000);
+		break;
+
+	case 3:
+		if (BIT(m_bank1, 0)) program->install_ram(0x0000, 0x3fff, ram + 0x10000);
+		if (BIT(m_bank1, 1)) program->install_ram(0x4000, 0x7fff, ram + 0x14000);
+		if (BIT(m_bank1, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x0000);
+		if (BIT(m_bank1, 3)) program->install_ram(0xc000, 0xffff, ram + 0x4000);
+		break;
+
+	case 4:
+		if (BIT(m_bank1, 0)) program->install_ram(0x0000, 0x3fff, ram + 0xc000);
+		if (BIT(m_bank1, 1)) program->install_ram(0x4000, 0x7fff, ram + 0x14000);
+		if (BIT(m_bank1, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x18000);
+		if (BIT(m_bank1, 3)) program->install_ram(0xc000, 0xffff, ram + 0x1c000);
+		break;
+	}
+	
+	if (BIT(m_bank0, 0)) program->install_ram(0x0000, 0x3fff, ram + 0x0000);
+	if (BIT(m_bank0, 1)) program->install_ram(0x4000, 0x7fff, ram + 0x4000);
+	if (BIT(m_bank0, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x8000);
+	if (BIT(m_bank0, 3)) program->install_ram(0xc000, 0xffff, ram + 0xc000);
+	
+	if (!BIT(m_bank0, 5)) program->install_rom(0xf000, 0xffff, 0, 0x800, rom);
 }
 
 
@@ -141,7 +200,7 @@ WRITE8_MEMBER( super6_state::fdc_w )
 	wd17xx_set_drive(m_fdc, data & 0x03);
 	
 	// head select
-	wd17xx_set_side(m_fdc, !BIT(data, 2));
+	wd17xx_set_side(m_fdc, BIT(data, 2));
 	
 	// disk density
 	wd17xx_dden_w(m_fdc, !BIT(data, 3));
@@ -181,7 +240,6 @@ WRITE8_MEMBER( super6_state::baud_w )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( super6_mem, AS_PROGRAM, 8, super6_state )
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(Z80_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -190,6 +248,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( super6_io, AS_IO, 8, super6_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x08, 0x0c) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
@@ -214,28 +273,33 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( super6 )
 	PORT_START("BAUD")
-	PORT_DIPNAME( 0x01, 0x00, "Switch 1" ) PORT_DIPLOCATION("S1:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Switch 2" ) PORT_DIPLOCATION("S1:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Switch 3" ) PORT_DIPLOCATION("S1:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Switch 4" ) PORT_DIPLOCATION("S1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Switch 5" ) PORT_DIPLOCATION("S1:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Switch 6" ) PORT_DIPLOCATION("S1:6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Switch 7" ) PORT_DIPLOCATION("S1:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Double Sided Disk Drive" ) PORT_DIPLOCATION("S1:1")
+	PORT_DIPNAME( 0x0f, 0x0e, "SIO Channel A Baud Rate" ) PORT_DIPLOCATION("S1:1,2,3,4")
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPSETTING(    0x01, "75" )
+	PORT_DIPSETTING(    0x02, "110" )
+	PORT_DIPSETTING(    0x03, "134.5" )
+	PORT_DIPSETTING(    0x04, "150" )
+	PORT_DIPSETTING(    0x05, "300" )
+	PORT_DIPSETTING(    0x06, "600" )
+	PORT_DIPSETTING(    0x07, "1200" )
+	PORT_DIPSETTING(    0x08, "1800" )
+	PORT_DIPSETTING(    0x09, "2000" )
+	PORT_DIPSETTING(    0x0a, "2400" )
+	PORT_DIPSETTING(    0x0b, "3600" )
+	PORT_DIPSETTING(    0x0c, "4800" )
+	PORT_DIPSETTING(    0x0d, "7200" )
+	PORT_DIPSETTING(    0x0e, "9600" )
+	PORT_DIPSETTING(    0x0f, "19200" )
+	PORT_DIPNAME( 0x70, 0x70, "SIO Channel B Baud Rate" ) PORT_DIPLOCATION("S1:5,6,7")
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPSETTING(    0x10, "75" )
+	PORT_DIPSETTING(    0x20, "110" )
+	PORT_DIPSETTING(    0x30, "134.5" )
+	PORT_DIPSETTING(    0x40, "150" )
+	PORT_DIPSETTING(    0x50, "300" )
+	PORT_DIPSETTING(    0x60, "600" )
+	PORT_DIPSETTING(    0x70, "1200" )
+	PORT_DIPNAME( 0x80, 0x00, "Double Sided Disk Drive" ) PORT_DIPLOCATION("S1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -268,8 +332,8 @@ static Z80DART_INTERFACE( dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_r),
+	DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -382,6 +446,18 @@ void super6_state::machine_start()
 }
 
 
+//-------------------------------------------------
+//  MACHINE_RESET( super6 )
+//-------------------------------------------------
+
+void super6_state::machine_reset()
+{
+	m_bank0 = m_bank1 = 0;
+	
+	bankswitch();
+}
+
+
 
 //**************************************************************************
 //  MACHINE DRIVERS
@@ -402,10 +478,10 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_FRAGMENT_ADD(generic_terminal)
 	
 	// devices
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_24MHz/6, ctc_intf)
-	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_24MHz/6, dart_intf)
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_24MHz/4, ctc_intf)
+	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_24MHz/4, dart_intf)
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_24MHz/6, dma_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_24MHz/6, pio_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_24MHz/4, pio_intf)
 	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
 	MCFG_FLOPPY_2_DRIVES_ADD(super6_floppy_config)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
@@ -431,6 +507,10 @@ MACHINE_CONFIG_END
 ROM_START( super6 )
 	ROM_REGION( 0x800, Z80_TAG, 0 )
 	ROM_LOAD( "digitex monitor 1.2a 6oct1983.u29", 0x000, 0x800, CRC(a4c33ce4) SHA1(46dde43ea51d295f2b3202c2d0e1883bde1a8da7) )
+
+	ROM_REGION( 0x800, "plds", 0 )
+	ROM_LOAD( "pal16l8.u16", 0x000, 0x800, NO_DUMP )
+	ROM_LOAD( "pal16l8.u36", 0x000, 0x800, NO_DUMP )
 ROM_END
 
 

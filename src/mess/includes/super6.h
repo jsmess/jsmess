@@ -55,6 +55,7 @@ public:
 	required_device<device_t> m_floppy1;
 
 	virtual void machine_start();
+	virtual void machine_reset();
 
 	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_WRITE8_MEMBER( s100_w );
