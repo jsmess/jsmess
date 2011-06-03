@@ -1113,6 +1113,7 @@ $(MESSOBJ)/mits.a:				\
 
 $(MESSOBJ)/mitsubishi.a:		\
 	$(MESS_DRIVERS)/multi8.o	\
+	$(MESS_DRIVERS)/multi16.o       \
 
 $(MESSOBJ)/mos.a:				\
 	$(MESS_DRIVERS)/kim1.o		\
