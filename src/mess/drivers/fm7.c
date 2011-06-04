@@ -1401,20 +1401,6 @@ static void fm77av_fmirq(device_t* device,int irq)
 	}
 }
 
-static READ8_HANDLER(fm11_video_flags_r)
-{
-	fm7_state *state = space->machine().driver_data<fm7_state>();
-	UINT8 ret = 0xff;
-
-	if(space->machine().primary_screen->vblank())
-		ret &= ~0x80;
-
-	if(state->m_video.vsync_flag == 0)
-		ret &= ~0x04;
-
-	return ret;
-}
-
 /*
    0000 - 7FFF: (RAM) BASIC working area, user's area
    8000 - FBFF: (ROM) F-BASIC ROM, extra user RAM
@@ -1563,8 +1549,8 @@ static ADDRESS_MAP_START( fm11_sub_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000,0x8fff) AM_RAM // Console RAM(?)
 	AM_RANGE(0x9000,0x9f7f) AM_RAM // Work RAM(?)
 	AM_RANGE(0x9f80,0x9fff) AM_RAM AM_BASE_MEMBER(fm7_state, m_shared_ram)
-//	AM_RANGE(0xafe0,0xafe0) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
-	AM_RANGE(0xafe6,0xafe6) AM_READ(fm11_video_flags_r)
+	AM_RANGE(0xafe4,0xafe4) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
+	AM_RANGE(0xafe6,0xafe6) AM_READWRITE(fm77av_video_flags_r,fm77av_video_flags_w)
 	AM_RANGE(0xc000,0xffff) AM_ROM // sybsystem ROM
 ADDRESS_MAP_END
 
@@ -1954,7 +1940,7 @@ static MACHINE_RESET(fm7)
 	state->m_timer->adjust(attotime::from_nsec(2034500),0,attotime::from_nsec(2034500));
 	state->m_subtimer->adjust(attotime::from_msec(20),0,attotime::from_msec(20));
 	state->m_keyboard_timer->adjust(attotime::zero,0,attotime::from_msec(10));
-	if(state->m_type == SYS_FM77AV || state->m_type == SYS_FM77AV40EX)
+	if(state->m_type == SYS_FM77AV || state->m_type == SYS_FM77AV40EX || state->m_type == SYS_FM11)
 		state->m_fm77av_vsync_timer->adjust(machine.primary_screen->time_until_vblank_end());
 
 	state->m_irq_mask = 0x00;
