@@ -77,6 +77,10 @@ Hardware:   PPIA 8255
     reserved at present for the file server, and 235 for the printer server. Wire links must be soldered to each network station card during installation, a sugested
     scheme for number allocation is to number normal user stations from one upwards and to number special stations and servers from 255 downwards.
 
+	2011 June 04  - Phill Harvey-Smith 
+		Fixed "ERROR" repeating infinite loop, caused by random values in machine_start() being poked into the wrong memory reigion causing the basic ROM to become
+		corrupted. Values are now correctly placed in bytes 0x0008 - 0x000B of RAM.
+		
 
 ***************************************************************************/
 
@@ -84,21 +88,10 @@ Hardware:   PPIA 8255
 
     TODO:
 
-    - ERROR repeats forever after entering incorrect command
-
-        C26D: bcs  $C2AA
-        C26F: sta  $53
-        C271: lda  $C0EE,x
-        C274: bcc  $C29F
-        C29F: sta  $52
-        C2A1: sty  $03
-        C2A3: ldx  $04
-        C2A5: jmp  ($0052)
-        F251: ora  $0C0D        <---- Table of Base Address Value for Mnemonics, should not jump here!!
-
     - connect to softwarelist
     - e000 EPROM switching
-    - display should be monochrome
+    - display should be monochrome -- Should be optional, Acorn produced a Colour Card, and there is 
+		at least one aftermarket Colour card.
     - ram expansion
     - tap files
     - mouse
@@ -132,7 +125,7 @@ void atom_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
-	UINT8 *eprom = machine().region("a000")->base() + (m_eprom << 12);
+	UINT8 *eprom = machine().region(EXTROM_TAG)->base() + (m_eprom << 12);
 
 	program->install_rom(0xa000, 0xafff, eprom);
 }
@@ -184,13 +177,13 @@ WRITE8_MEMBER( atom_state::eprom_w )
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( atom_mem, AS_PROGRAM, 8, atom_state )
-	AM_RANGE(0x0000, 0x09ff) AM_RAM
+	AM_RANGE(0x0000, 0x09ff) AM_RAM 
 	AM_RANGE(0x0a00, 0x0a03) AM_MIRROR(0x1f8) AM_DEVREADWRITE_LEGACY(I8271_TAG, i8271_r, i8271_w)
 	AM_RANGE(0x0a04, 0x0a04) AM_MIRROR(0x1f8) AM_DEVREADWRITE_LEGACY(I8271_TAG, i8271_data_r, i8271_data_w)
 	AM_RANGE(0x0a05, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION("a000", 0)
+	AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION(EXTROM_TAG, 0)
 	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
 //  AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE_LEGACY(MC6854_TAG, mc6854_r, mc6854_w)
 //  AM_RANGE(0xb404, 0xb404) AM_READ_PORT("ECONET")
@@ -680,10 +673,12 @@ void atom_state::machine_start()
     generator. I don't know if this is hardware, or random data because the
     ram chips are not cleared at start-up. So at this time, these numbers
     are poked into the memory to simulate it. When I have more details I will fix it */
-	machine().region(SY6502_TAG)->base()[0x08] = machine().rand() & 0x0ff;
-	machine().region(SY6502_TAG)->base()[0x09] = machine().rand() & 0x0ff;
-	machine().region(SY6502_TAG)->base()[0x0a] = machine().rand() & 0x0ff;
-	machine().region(SY6502_TAG)->base()[0x0b] = machine().rand() & 0x0ff;
+	UINT8 *m_baseram = (UINT8 *)m_maincpu->memory().space(AS_PROGRAM)->get_write_ptr(0x0000);
+	
+	m_baseram[0x08] = machine().rand() & 0x0ff;
+	m_baseram[0x09] = machine().rand() & 0x0ff;
+	m_baseram[0x0a] = machine().rand() & 0x0ff;
+	m_baseram[0x0b] = machine().rand() & 0x0ff;
 }
 
 /*-------------------------------------------------
@@ -835,7 +830,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_EXTRA_OPTIONS("4K,6K,8K,10K,12K")
+	MCFG_RAM_EXTRA_OPTIONS("4K,6K,8K,10K,12K,32K")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","atom")
@@ -901,9 +896,9 @@ ROM_START( atomeb )
 	ROM_LOAD( "afloat.ic21", 0x1000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802) )
 	ROM_LOAD( "dosrom.u15",  0x2000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c) )
 
-	ROM_REGION( 0x10000, "a000", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, EXTROM_TAG, ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x2000, "e000", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, DOSROM_TAG, ROMREGION_ERASEFF )
 ROM_END
 
 /***************************************************************************

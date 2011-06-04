@@ -32,6 +32,10 @@
 #define SCREEN_TAG		"screen"
 #define CENTRONICS_TAG	"centronics"
 #define SPEAKER_TAG		"speaker"
+#define BASERAM_TAG		"baseram"
+#define EXTROM_TAG		"a000"
+#define DOSROM_TAG		"e000"
+
 
 #define X1	XTAL_3_579545MHz	// MC6847 Clock
 #define X2	XTAL_4MHz			// CPU Clock - a divider reduces it to 1MHz
