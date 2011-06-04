@@ -5,14 +5,18 @@
 	preliminary driver by Angelo Salese
 
 	TODO:
-	- needs a working floppy image
+	- needs a working floppy image, fdc probably needs IRQ / DRQ lines
+	  hooked up.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
+#include "machine/wd17xx.h"
 
+#include "imagedev/flopdrv.h"
+#include "formats/basicdsk.h"
 
 class myb3k_state : public driver_device
 {
@@ -110,6 +114,15 @@ static WRITE8_HANDLER( myb3k_video_mode_w )
 	state->m_vmode = data;
 }
 
+static WRITE8_DEVICE_HANDLER( myb3k_fdc_output_w )
+{
+	/* TODO: complete guesswork! (it just does a 0x24 -> 0x20 in there) */
+	wd17xx_set_drive(device,data & 3);
+	floppy_mon_w(floppy_get_device(device->machine(), data & 3), !data & 4);
+	floppy_drive_set_ready_state(floppy_get_device(device->machine(), data & 3), data & 0x4,0);
+	//wd17xx_set_side(dev,(data & 0x10)>>4);
+}
+
 static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x7ffff) AM_RAM
@@ -127,7 +140,8 @@ static ADDRESS_MAP_START(myb3k_io, AS_IO, 8)
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1c, 0x1c) AM_WRITE(myb3k_6845_address_w)
 	AM_RANGE(0x1d, 0x1d) AM_WRITE(myb3k_6845_data_w)
-//	AM_RANGE(0x20, 0x24) FDC, almost likely wd17xx
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("fdc",wd17xx_r,wd17xx_w) //FDC, almost likely wd17xx
+	AM_RANGE(0x24, 0x24) AM_DEVWRITE("fdc",myb3k_fdc_output_w)
 //  AM_RANGE(0x520,0x524) mirror of above
 ADDRESS_MAP_END
 
@@ -228,6 +242,27 @@ static const mc6845_interface mc6845_intf =
 };
 
 
+static const wd17xx_interface myb3k_wd17xx_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
+
+
+static const floppy_config myb3k_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSDD_40, //todo
+	FLOPPY_OPTIONS_NAME(default),
+	NULL
+};
+
 static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 4000000) /* unknown clock*/
@@ -236,6 +271,9 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 
 	MCFG_MACHINE_START(myb3k)
 	MCFG_MACHINE_RESET(myb3k)
+
+	MCFG_MB8877_ADD("fdc", myb3k_wd17xx_interface ) //unknown type
+	MCFG_FLOPPY_2_DRIVES_ADD(myb3k_floppy_config)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
