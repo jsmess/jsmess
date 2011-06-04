@@ -1084,6 +1084,7 @@ $(MESSOBJ)/mattel.a:			\
 $(MESSOBJ)/matsushi.a:			\
 	$(MESS_DRIVERS)/jr100.o		\
 	$(MESS_DRIVERS)/jr200.o		\
+	$(MESS_DRIVERS)/myb3k.o         \
 
 $(MESSOBJ)/mchester.a:			\
 	$(MESS_DRIVERS)/ssem.o		\
