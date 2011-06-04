@@ -1076,9 +1076,20 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 		space->install_legacy_readwrite_handler(bank*0x1000,(bank*0x1000)+size,FUNC(fm7_sub_ram_ports_banked_r),FUNC(fm7_sub_ram_ports_banked_w));
 		return;
 	}
+	if(physical == 0x35)
+	{
+		if(state->m_init_rom_en && (state->m_type == SYS_FM11 || state->m_type == SYS_FM16))
+		{
+			RAM = space->machine().region("init")->base();
+			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
+			space->nop_write(bank*0x1000,(bank*0x1000)+size);
+			memory_set_bankptr(space->machine(),bank_name,RAM+(physical<<12)-0x35000);
+			return;
+		}
+	}
 	if(physical == 0x36 || physical == 0x37)
 	{
-		if(state->m_init_rom_en)
+		if(state->m_init_rom_en && (state->m_type != SYS_FM11 || state->m_type != SYS_FM16))
 		{
 			RAM = space->machine().region("init")->base();
 			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
@@ -1089,7 +1100,7 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	}
 	if(physical > 0x37 && physical <= 0x3f)
 	{
-		if(state->m_basic_rom_en)
+		if(state->m_basic_rom_en && (state->m_type != SYS_FM11 || state->m_type != SYS_FM16))
 		{
 			RAM = space->machine().region("fbasic")->base();
 			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
@@ -1390,6 +1401,20 @@ static void fm77av_fmirq(device_t* device,int irq)
 	}
 }
 
+static READ8_HANDLER(fm11_video_flags_r)
+{
+	fm7_state *state = space->machine().driver_data<fm7_state>();
+	UINT8 ret = 0xff;
+
+	if(space->machine().primary_screen->vblank())
+		ret &= ~0x80;
+
+	if(state->m_video.vsync_flag == 0)
+		ret &= ~0x04;
+
+	return ret;
+}
+
 /*
    0000 - 7FFF: (RAM) BASIC working area, user's area
    8000 - FBFF: (ROM) F-BASIC ROM, extra user RAM
@@ -1482,6 +1507,117 @@ static ADDRESS_MAP_START( fm7_sub_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xd800,0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( fm11_mem, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000,0x0fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x1000,0x1fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x2000,0x2fff) AM_RAMBANK("bank3")
+	AM_RANGE(0x3000,0x3fff) AM_RAMBANK("bank4")
+	AM_RANGE(0x4000,0x4fff) AM_RAMBANK("bank5")
+	AM_RANGE(0x5000,0x5fff) AM_RAMBANK("bank6")
+	AM_RANGE(0x6000,0x6fff) AM_RAMBANK("bank7")
+	AM_RANGE(0x7000,0x7fff) AM_RAMBANK("bank8")
+	AM_RANGE(0x8000,0x8fff) AM_RAMBANK("bank9")
+	AM_RANGE(0x9000,0x9fff) AM_RAMBANK("bank10")
+	AM_RANGE(0xa000,0xafff) AM_RAMBANK("bank11")
+	AM_RANGE(0xb000,0xbfff) AM_RAMBANK("bank12")
+	AM_RANGE(0xc000,0xcfff) AM_RAMBANK("bank13")
+	AM_RANGE(0xd000,0xdfff) AM_RAMBANK("bank14")
+	AM_RANGE(0xe000,0xefff) AM_RAMBANK("bank15")
+	AM_RANGE(0xf000,0xfbff) AM_RAMBANK("bank16")
+	AM_RANGE(0xfc00,0xfc7f) AM_RAM
+	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
+	// I/O space (FD00-FDFF)
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
+	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
+	AM_RANGE(0xfd06,0xfd0a) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd0b,0xfd0b) AM_READ(fm77av_boot_mode_r)
+	AM_RANGE(0xfd0c,0xfd0c) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd10,0xfd10) AM_WRITE(fm7_init_en_w)
+	AM_RANGE(0xfd11,0xfd11) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd12,0xfd12) AM_READWRITE(fm77av_sub_modestatus_r,fm77av_sub_modestatus_w)
+	AM_RANGE(0xfd13,0xfd13) AM_WRITE(fm77av_sub_bank_w)
+	AM_RANGE(0xfd14,0xfd14) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd17,0xfd17) AM_READ(fm7_fmirq_r)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
+	AM_RANGE(0xfd24,0xfd2b) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd30,0xfd34) AM_WRITE(fm77av_analog_palette_w)
+	AM_RANGE(0xfd35,0xfd36) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfd40,0xfd7f) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd80,0xfd93) AM_READWRITE(fm7_mmr_r,fm7_mmr_w)
+	AM_RANGE(0xfd94,0xfdff) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE(fm77av_bootram_w) AM_BASE_MEMBER(fm7_state, m_boot_ram)
+	AM_RANGE(0xffe0,0xffef) AM_RAM
+	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
+ADDRESS_MAP_END
+
+// Much of this is guesswork at the moment
+static ADDRESS_MAP_START( fm11_sub_mem, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000,0x7fff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
+	AM_RANGE(0x8000,0x8fff) AM_RAM // Console RAM(?)
+	AM_RANGE(0x9000,0x9f7f) AM_RAM // Work RAM(?)
+	AM_RANGE(0x9f80,0x9fff) AM_RAM AM_BASE_MEMBER(fm7_state, m_shared_ram)
+//	AM_RANGE(0xafe0,0xafe0) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
+	AM_RANGE(0xafe6,0xafe6) AM_READ(fm11_video_flags_r)
+	AM_RANGE(0xc000,0xffff) AM_ROM // sybsystem ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( fm11_x86_mem, AS_PROGRAM, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00000,0xfefff) AM_RAM
+	AM_RANGE(0xff000,0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( fm11_x86_io, AS_IO, 8 )
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
+	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
+	AM_RANGE(0xfd06,0xfd0c) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd10,0xfd17) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
+	AM_RANGE(0xfd24,0xfd36) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( fm16_mem, AS_PROGRAM, 16 )
+	AM_RANGE(0x00000,0xfbfff) AM_RAM
+	AM_RANGE(0xfc000,0xfffff) AM_ROM // IPL
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( fm16_io, AS_IO, 16 )
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE8(fm7_keyboard_r,fm7_cassette_printer_w,0xffff)
+	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8(fm7_cassette_printer_r,fm7_irq_mask_w,0x00ff)  // IRQ mask
+	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8(fm7_irq_cause_r,fm7_beeper_w,0xff00)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd05) AM_READ8(fm7_fd04_r,0x00ff)
+	AM_RANGE(0xfd04,0xfd05) AM_READWRITE8(fm7_subintf_r,fm7_subintf_w,0xff00)
+//	AM_RANGE(0xfd06,0xfd0c) AM_READ8(fm7_unknown_r,0xffff)
+	AM_RANGE(0xfd0e,0xfd0f) AM_READWRITE8(fm7_rom_en_r,fm7_rom_en_w,0xff00)
+//	AM_RANGE(0xfd10,0xfd17) AM_READ8(fm7_unknown_r,0xffff)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE8(fm7_fdc_r,fm7_fdc_w,0xffff)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE8(fm7_kanji_r,fm7_kanji_w,0xffff)
+//	AM_RANGE(0xfd24,0xfd36) AM_READ8(fm7_unknown_r,0xffff)
+	AM_RANGE(0xfd36,0xfd37) AM_WRITE8(fm7_multipage_w,0xff00)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE8(fm7_palette_r,fm7_palette_w,0xffff)
+//	AM_RANGE(0xfd40,0xfdff) AM_READ8(fm7_unknown_r,0xffff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( fm16_sub_mem, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000,0xafff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
+	AM_RANGE(0xb000,0xffff) AM_ROM // subsystem ROM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( fm77av_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x0fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x1000,0x1fff) AM_RAMBANK("bank2")
@@ -1560,7 +1696,6 @@ static ADDRESS_MAP_START( fm77av_sub_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Input ports */
-
 INPUT_PORTS_START( fm7_keyboard )
 	PORT_START("key1")
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_UNUSED)
@@ -1743,20 +1878,9 @@ static DRIVER_INIT(fm7)
 	state->m_timer = machine.scheduler().timer_alloc(FUNC(fm7_timer_irq));
 	state->m_subtimer = machine.scheduler().timer_alloc(FUNC(fm7_subtimer_irq));
 	state->m_keyboard_timer = machine.scheduler().timer_alloc(FUNC(fm7_keyboard_poll));
-	if(state->m_type != SYS_FM7)
-		state->m_fm77av_vsync_timer = machine.scheduler().timer_alloc(FUNC(fm77av_vsync));
+	state->m_fm77av_vsync_timer = machine.scheduler().timer_alloc(FUNC(fm77av_vsync));
 	device_set_irq_callback(machine.device("maincpu"),fm7_irq_ack);
 	device_set_irq_callback(machine.device("sub"),fm7_sub_irq_ack);
-}
-
-static DRIVER_INIT(fm11)
-{
-
-}
-
-static DRIVER_INIT(fm16beta)
-{
-
 }
 
 static MACHINE_START(fm7)
@@ -1798,6 +1922,29 @@ static MACHINE_START(fm77av)
 	beep_set_state(machine.device("beeper"),0);
 }
 
+static MACHINE_START(fm11)
+{
+	fm7_state *state = machine.driver_data<fm7_state>();
+	UINT8* RAM = machine.region("maincpu")->base();
+	UINT8* ROM = machine.region("init")->base();
+
+	memset(state->m_shared_ram,0xff,0x80);
+	state->m_type = SYS_FM11;
+	beep_set_frequency(machine.device("beeper"),1200);
+	beep_set_state(machine.device("beeper"),0);
+	// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
+	memcpy(RAM+0x3fff0,ROM+0x0ff0,16);
+}
+
+static MACHINE_START(fm16)
+{
+	fm7_state *state = machine.driver_data<fm7_state>();
+
+	state->m_type = SYS_FM16;
+	beep_set_frequency(machine.device("beeper"),1200);
+	beep_set_state(machine.device("beeper"),0);
+}
+
 static MACHINE_RESET(fm7)
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
@@ -1807,22 +1954,31 @@ static MACHINE_RESET(fm7)
 	state->m_timer->adjust(attotime::from_nsec(2034500),0,attotime::from_nsec(2034500));
 	state->m_subtimer->adjust(attotime::from_msec(20),0,attotime::from_msec(20));
 	state->m_keyboard_timer->adjust(attotime::zero,0,attotime::from_msec(10));
-	if(state->m_type != SYS_FM7)
+	if(state->m_type == SYS_FM77AV || state->m_type == SYS_FM77AV40EX)
 		state->m_fm77av_vsync_timer->adjust(machine.primary_screen->time_until_vblank_end());
 
 	state->m_irq_mask = 0x00;
 	state->m_irq_flags = 0x00;
 	state->m_video.attn_irq = 0;
 	state->m_video.sub_busy = 0x80;  // busy at reset
-	state->m_basic_rom_en = 1;  // enabled at reset
-	if(state->m_type == SYS_FM7)
-		state->m_init_rom_en = 0;
+	if(state->m_type == SYS_FM11 || state->m_type == SYS_FM16)
+		state->m_basic_rom_en = 0;  // all FM11/16 systems have no BASIC ROM except for the FM-11 ST
 	else
+		state->m_basic_rom_en = 1;  // enabled at reset
+	if(state->m_type == SYS_FM77AV || state->m_type == SYS_FM77AV40EX)
 	{
 		state->m_init_rom_en = 1;
 		// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
 		memcpy(RAM+0x3fff0,ROM+0x1ff0,16);
 	}
+	else if (state->m_type == SYS_FM11)
+	{
+		state->m_init_rom_en = 1;
+		// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
+		memcpy(RAM+0x3fff0,ROM+0x0ff0,16);
+	}
+	else
+		state->m_init_rom_en = 0;
 	if(state->m_type == SYS_FM7)
 		memory_set_bankptr(machine,"bank1",RAM+0x38000);
 	state->m_key_delay = 700;  // 700ms on FM-7
@@ -1851,9 +2007,14 @@ static MACHINE_RESET(fm7)
 			memory_set_bankptr(machine,"bank17",machine.region("basic")->base());
 		}
 	}
-	if(state->m_type != SYS_FM7)  // set default RAM banks
+	if(state->m_type == SYS_FM77AV || state->m_type == SYS_FM77AV40EX || state->m_type == SYS_FM11)
 	{
 		fm7_mmr_refresh(machine.device("maincpu")->memory().space(AS_PROGRAM));
+	}
+	if(state->m_type == SYS_FM11)
+	{
+		// Probably best to halt the 8088, I'm pretty sure it and the main 6809 should not be running at the same time
+		cputag_set_input_line(machine,"x86",INPUT_LINE_HALT,ASSERT_LINE);
 	}
 }
 
@@ -2053,15 +2214,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( fm11, fm7_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // 2MHz 68B09E
-//	MCFG_CPU_PROGRAM_MAP(fm8_mem)
+	MCFG_CPU_PROGRAM_MAP(fm11_mem)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)  // 2MHz 68B09
-//	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
+	MCFG_CPU_PROGRAM_MAP(fm11_sub_mem)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	MCFG_CPU_ADD("x86", I8088, XTAL_8MHz)  // 8MHz i8088
-	//MCFG_CPU_PROGRAM_MAP(fm11_i86_mem)
+	MCFG_CPU_PROGRAM_MAP(fm11_x86_mem)
+	MCFG_CPU_IO_MAP(fm11_x86_io)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
@@ -2069,8 +2231,8 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.20)
 
-//	MCFG_MACHINE_START(fm7)
-//	MCFG_MACHINE_RESET(fm7)
+	MCFG_MACHINE_START(fm11)
+	MCFG_MACHINE_RESET(fm7)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2080,12 +2242,12 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-//	MCFG_SCREEN_UPDATE(fm7)
+	MCFG_SCREEN_UPDATE(fm7)
 
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(fm7)
 
-//	MCFG_VIDEO_START(fm7)
+	MCFG_VIDEO_START(fm7)
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_config)
 
@@ -2100,11 +2262,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( fm16beta, fm7_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_8MHz)  // 8MHz i8086
-//	MCFG_CPU_PROGRAM_MAP(fm8_mem)
+	MCFG_CPU_PROGRAM_MAP(fm16_mem)
+	MCFG_CPU_IO_MAP(fm16_io)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_4MHz)  // 4MHz (?) Z80A
-//	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
+	MCFG_CPU_ADD("sub", M6809, XTAL_2MHz)
+	MCFG_CPU_PROGRAM_MAP(fm16_sub_mem)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2113,8 +2276,8 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.20)
 
-//	MCFG_MACHINE_START(fm7)
-//	MCFG_MACHINE_RESET(fm7)
+	MCFG_MACHINE_START(fm16)
+	MCFG_MACHINE_RESET(fm7)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2124,12 +2287,12 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-//	MCFG_SCREEN_UPDATE(fm7)
+	MCFG_SCREEN_UPDATE(fm7)
 
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(fm7)
 
-//	MCFG_VIDEO_START(fm7)
+	MCFG_VIDEO_START(fm7)
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_config)
 
@@ -2268,7 +2431,10 @@ ROM_END
 
 ROM_START( fm11 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "boot6809.rom", 0xf000, 0x1000, CRC(447caa6f) SHA1(4aa30314994c256d37ee01d11ec2bf4df3bc8cde) )
+	ROM_FILL(0x0000,0x40000,0xff)
+
+	ROM_REGION( 0x1000, "init", 0 )
+	ROM_LOAD( "boot6809.rom", 0x0000, 0x1000, CRC(447caa6f) SHA1(4aa30314994c256d37ee01d11ec2bf4df3bc8cde) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "subsys.rom", 0xc000, 0x4000, CRC(436c0618) SHA1(cd508e3e8f79737afb4384ea4b278eddf0ce935d) )
@@ -2278,17 +2444,23 @@ ROM_START( fm11 )
 
 	ROM_REGION( 0x10000, "subsys_e", 0 )
 	ROM_LOAD( "subsys_e.rom", 0x00000, 0x1000, CRC(31d838aa) SHA1(86a275c27bc99985bef7a51bdab2e47d68e31c6c) )
+
+	// optional Kanji ROM
+	ROM_REGION( 0x20000, "kanji1", 0 )
+	ROM_LOAD_OPTIONAL( "kanji.rom", 0x0000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
+
 ROM_END
 
 ROM_START( fm16beta )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "ipl.rom", 0xfc000, 0x4000, CRC(25f618ea) SHA1(9c27d6ad283260e071d64a1bfca16f7d3ad61f96) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "subsys.rom", 0x00000, 0x4f80, CRC(1d878514) SHA1(4673879a81e39880655b380250c6b81137028727) )
+//	ROM_REGION( 0x10000, "subsys", 0 )
 
-	ROM_REGION( 0x10000, "subsys_cg", 0 )
-	ROM_LOAD( "sub_cg.rom", 0x00000, 0x1000, CRC(e7928bed) SHA1(68cf604aa7a5c2ec7bd0d612cf099302c7f8c442) )
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "sub_cg.rom", 0xa000, 0x0f80, CRC(e7928bed) SHA1(68cf604aa7a5c2ec7bd0d612cf099302c7f8c442) )
+	ROM_CONTINUE(0xff80,0x0080)
+	ROM_LOAD( "subsys.rom", 0xb000, 0x4f80, CRC(1d878514) SHA1(4673879a81e39880655b380250c6b81137028727) )
 ROM_END
 
 
@@ -2302,5 +2474,5 @@ COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,    fm7,  "Fujitsu",   "FM-77
 COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,    fm7,  "Fujitsu",   "FM-77AV40SX",  GAME_NOT_WORKING)
 
 // These may be separated into a separate driver, depending on how different they are to the FM-8/FM-7
-COMP( 1982, fm11,     0,      0,      fm11,     fm7,    fm11,      "Fujitsu",   "FM-11 EX",      GAME_NOT_WORKING)
-COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7,    fm16beta,  "Fujitsu",   "FM-16\xCE\xB2", GAME_NOT_WORKING)
+COMP( 1982, fm11,     0,      0,      fm11,     fm7,    fm7,       "Fujitsu",   "FM-11 EX",      GAME_NOT_WORKING)
+COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7,    fm7,       "Fujitsu",   "FM-16\xCE\xB2", GAME_NOT_WORKING)

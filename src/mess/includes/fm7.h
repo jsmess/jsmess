@@ -22,6 +22,8 @@
 #define SYS_FM7        1
 #define SYS_FM77AV     2
 #define SYS_FM77AV40EX 3
+#define SYS_FM11       4
+#define SYS_FM16       5
 
 // keyboard scancode formats
 #define KEY_MODE_FM7   0 // FM-7 ASCII type code
