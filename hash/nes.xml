@@ -839,7 +839,7 @@
 		<!-- Serial: VIC-AY - Release Date: 1986-11-21 - Alternative Title: アイギーナの予言 バルバルークの伝説より -->
 		<description>Aigiina no Yogen: from "The Legend of Balubalouk" (Jpn)</description>
 		<year>1986</year>
-		<publisher>VIC Tokai</publisher>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -1155,7 +1155,7 @@
 		<!-- Serial: NES-A2-USA - Release Date: 1989-12 -->
 		<description>All-Pro Basketball (USA)</description>
 		<year>1989</year>
-		<publisher>VIC Tokai</publisher>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -4303,7 +4303,7 @@
 		<!-- Serial: NES-BP-USA - Release Date: 1988-12 -->
 		<description>Bump 'n' Jump (USA)</description>
 		<year>1988</year>
-		<publisher>VIC Tokai</publisher>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
@@ -5154,7 +5154,7 @@
 		<!-- Serial: VIC-CF - Release Date: 1987-07-30 - Alternative Title: チェスター・フィールド  箱・説明書無し -->
 		<description>Chester Field: Ankoku Shin e no Chousen (Jpn)</description>
 		<year>1987</year>
-		<publisher>VIC Tokai</publisher>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -5513,7 +5513,7 @@
 		<!-- Serial: NES-B6-USA - Release Date: 1990-01 -->
 		<description>Clash At Demonhead (USA)</description>
 		<year>1990</year>
-		<publisher>VIC Tokai</publisher>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -5716,7 +5716,7 @@
 		<!-- Serial: NES-C3-USA - Release Date: 1990-03 -->
 		<description>Conflict (USA)</description>
 		<year>1990</year>
-		<publisher>VIC Tokai</publisher>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SKROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -11951,7 +11951,7 @@
 		<!-- Serial: VIC-G3 - Release Date: 1988-03-26 - Alternative Title: ゴルゴ13　第一章 神々の黄昏 -->
 		<description>Golgo 13: Dai 1 Shou: Kamigami no Tasogare (Jpn)</description>
 		<year>1988</year>
-		<publisher>VIC Tokai</publisher>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -11968,7 +11968,7 @@
 		<!-- Serial: NES-M4-USA - Release Date: 1990-06 -->
 		<description>Golgo 13: The Mafat Conspiracy (USA)</description>
 		<year>1990</year>
-		<publisher>VIC Tokai</publisher>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -11985,7 +11985,7 @@
 		<!-- Serial: NES-G3-USA - Release Date: 1988-09 -->
 		<description>Golgo 13: Top Secret Episode (USA)</description>
 		<year>1988</year>
-		<publisher>VIC Tokai</publisher>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -15425,7 +15425,7 @@
 		<!-- Serial: VIC-KX - Release Date: 1988-07-22 - Alternative Title: カケフくんのジャンプ天国 スピード地獄 -->
 		<description>Kakefu-kun no Jump Tengoku: Speed Jigoku (Jpn)</description>
 		<year>1988</year>
-		<publisher>VIC Tokai</publisher>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -15815,7 +15815,7 @@
 		<!-- Serial: NES-KX-USA - Release Date: 1990-03 -->
 		<description>Kid Kool and the Quest for the Seven Wonder Herbs (USA)</description>
 		<year>1990</year>
-		<publisher>VIC Tokai</publisher>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -16431,7 +16431,7 @@
 		<!-- Serial: NES-VF-USA - Release Date: 1991-01 -->
 		<description>The Krion Conquest (USA)</description>
 		<year>1991</year>
-		<publisher>VIC Tokai</publisher>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -30721,7 +30721,7 @@
 		<!-- Serial: NES-TQ-USA - Release Date: 1990-03 -->
 		<description>Terra Cresta (USA)</description>
 		<year>1990</year>
-		<publisher>VIC Tokai</publisher>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="horizontal" />
@@ -36048,7 +36048,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	<software name="chestfldp" cloneof="chestfld">
 		<description>Chester Field - Ankoku Shin E no Chousen (Jpn, Prototype)</description>
 		<year>1987</year>
-		<publisher>VIC Tokai</publisher>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
