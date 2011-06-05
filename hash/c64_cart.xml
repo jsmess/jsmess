@@ -4112,13 +4112,16 @@ http://www.retroport.de/C64_C128_Hardware.html
 		ROM     - "DEI-356NR-WRPIIDA1 (C) NCR A8847 609-2415038 F833071" 16Kx8 ROM
 		SW1     - mode switch (C64/C128)
 		SW2     - reset button
+		
+		data = BITSWAP8(data,7,6,5,2,0,1,3,4)
+		address = BITSWAP14(address,12,13,5,2,7,9,11,10,8,6,4,3,1,0)
 		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="cart_type" value="warp_speed" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="1" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="dei-356nr-wrpiida1.u2" size="0x4000" crc="6f3bba10" sha1="7d80ba999cd6dbffe42bdea8485fcdcaad503f8d" offset="0x0000" />
+				<rom name="dei-356nr-wrpiida1.u2" size="0x4000" crc="c5dd7720" sha1="062ea091bf085b09ce8ea85a9a498734b9138906" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
