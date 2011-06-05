@@ -22,6 +22,9 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 class homez80_state : public driver_device
 {
@@ -33,9 +36,12 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER( homez80_keyboard_r );
-	UINT8* m_videoram;
-	UINT8* m_char_rom;
-	int m_irq;
+	UINT8* m_p_videoram;
+	UINT8* m_p_chargen;
+	bool m_irq;
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -49,7 +55,7 @@ READ8_MEMBER( homez80_state::homez80_keyboard_r )
 static ADDRESS_MAP_START(homez80_mem, AS_PROGRAM, 8, homez80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM  // Monitor
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_BASE(m_videoram) // Video RAM
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_BASE(m_p_videoram) // Video RAM
 	AM_RANGE( 0x7020, 0x702f ) AM_READ(homez80_keyboard_r)
 	AM_RANGE( 0x8000, 0xffff ) AM_RAM  // 32 K RAM
 ADDRESS_MAP_END
@@ -207,40 +213,43 @@ INPUT_PORTS_START( homez80 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(homez80)
+MACHINE_RESET_MEMBER( homez80_state )
 {
-	homez80_state *state = machine.driver_data<homez80_state>();
-	state->m_irq = 0;
+	m_irq = 0;
 }
 
-static VIDEO_START( homez80 )
+VIDEO_START_MEMBER( homez80_state )
 {
-	homez80_state *state = machine.driver_data<homez80_state>();
-	state->m_char_rom = machine.region("chargen")->base();
+	m_p_chargen = machine().region("chargen")->base();
 }
 
-static SCREEN_UPDATE( homez80 )
+SCREEN_UPDATE_MEMBER( homez80_state )
 {
-	homez80_state *state = screen->machine().driver_data<homez80_state>();
-	UINT8 y,ra,chr,gfx,i;
+	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
 	for (y = 0; y < 32; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 44);
+			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 44);
 
 			for (x = ma; x < ma+32; x++)
 			{
-				chr = state->m_videoram[x];
+				chr = m_p_videoram[x];
 
 				/* get pattern of pixels for that character scanline */
-				gfx = state->m_char_rom[ (chr<<3) | ra];
+				gfx = m_p_chargen[ (chr<<3) | ra];
 
 				/* Display a scanline of a character (8 pixels) */
-				for (i = 0; i < 8; i++)
-					*p++ = BIT(gfx, 7-i);
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
 		ma+=32;
@@ -279,8 +288,6 @@ static MACHINE_CONFIG_START( homez80, homez80_state )
 	MCFG_CPU_IO_MAP(homez80_io)
 	MCFG_CPU_PERIODIC_INT(homez80_interrupt, 50)
 
-	MCFG_MACHINE_RESET(homez80)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -288,13 +295,9 @@ static MACHINE_CONFIG_START( homez80, homez80_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(344, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 344-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE(homez80)
-
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE( homez80 )
-
-	MCFG_VIDEO_START(homez80)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -309,5 +312,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 2008, homez80,  0,       0,	homez80,	homez80,	 0,  "Kun-Szabo Marton",   "Homebrew Z80 Computer",		GAME_NO_SOUND_HW)
-
+COMP( 2008, homez80,  0,     0,      homez80,   homez80, 0,    "Kun-Szabo Marton", "Homebrew Z80 Computer", GAME_NO_SOUND_HW)

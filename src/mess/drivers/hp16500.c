@@ -17,6 +17,8 @@
     IRQ 7 = 35d4 (jump 840120)
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/generic.h"
@@ -31,7 +33,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START(hp16500_map, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(hp16500_map, AS_PROGRAM, 32, hp16500_state)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x00600000, 0x0063ffff) AM_RAM
 	AM_RANGE(0x00800000, 0x009fffff) AM_RAM	    // 284e end of test - d0 = 0 for pass
