@@ -1253,7 +1253,7 @@ ROM_START( at386 )
     ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) ) 
 	ROM_SYSTEM_BIOS(0, "ami386", "AMI 386")
-    ROMX_LOAD("at386.bin",  0xf0000, 0x10000, CRC(3a807d7f) SHA1(8289ba36a3dfc3324333b1a834bc6b0402b546f0), ROM_BIOS(1))
+    ROMX_LOAD("ami386.bin",  0xf0000, 0x10000, CRC(3a807d7f) SHA1(8289ba36a3dfc3324333b1a834bc6b0402b546f0), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "at386", "unknown 386")	// This dump possibly comes from a MITAC INC 386 board, given that the original driver had it as manufacturer
     ROMX_LOAD("at386.bin",  0xf0000, 0x10000, CRC(3df9732a) SHA1(def71567dee373dc67063f204ef44ffab9453ead), ROM_BIOS(2))
 	//ROM_RELOAD(0xff0000,0x10000)
