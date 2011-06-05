@@ -576,6 +576,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 	case 0x0026:
 //              CDROM_LOG(("WW CR4: %04x\n", data))
 		cr4 = data;
+		if(cr1 != 0)
       	printf("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
 		if (!cdrom)
@@ -999,6 +1000,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			{
 				UINT32 bufnum = cr3>>8;
 
+				/* TODO: Akumajou Dracula X reads 0 there, why? */
 				// is the partition empty?
 				if (partitions[bufnum].size == -1)
 				{
