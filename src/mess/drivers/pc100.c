@@ -3,7 +3,6 @@
     NEC PC-100
 
     TODO:
-    - kanji rom has offsetted data for whatever reason.
     - there's a regression with i8259, check this code:
 	F8209: B8 FB 00                  mov     ax,0FBh
 	F820C: E6 02                     out     2h,al
