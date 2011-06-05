@@ -131,11 +131,11 @@ static UPD765_GET_IMAGE ( pc_fdc_get_image )
 
 	if (!fdc->fdc_interface.get_image)
 	{
-		image = floppy_get_device(device->machine(), floppy_index);
+		image = floppy_get_device(device->machine(), (fdc->digital_output_register & 0x03));
 	}
 	else
 	{
-		image = fdc->fdc_interface.get_image(device->machine(), floppy_index);
+		image = fdc->fdc_interface.get_image(device->machine(), (fdc->digital_output_register & 0x03));
 	}
 	return image;
 }
