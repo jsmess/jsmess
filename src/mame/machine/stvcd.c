@@ -682,6 +682,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			// clear the "transfer" flag
 			cd_stat &= ~CD_STAT_TRANS;
+			// hack for the bootloader (TODO: Falcom Classics doesn't want this!)
+			cd_stat |= CD_STAT_PERI;
 
 			if (xferdnum)
 			{
@@ -739,11 +741,6 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				default:
 					break;
 			}
-
-
-			// hack for the bootloader
-			//cd_stat |= CD_STAT_PERI;
-			//cr1 = cd_stat;
 
 			// and kick the CD if there's more to read
 			cd_playdata();
@@ -1228,8 +1225,10 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
-			//if(temp == 0xfffff8) /* TODO: Falcom Classics */
-			//	temp = 0;
+			#if 0
+			if(temp == 0xfffff8) /* TODO: Falcom Classics */
+				temp = 0;
+			#endif
 			read_new_dir(machine, temp);
 			break;
 
@@ -1239,8 +1238,10 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
-			//if(temp == 0xfffff8) /* TODO: Falcom Classics */
-			//	temp = 0;
+			#if 0
+			if(temp == 0xfffff8) /* TODO: Falcom Classics */
+				temp = 0;
+			#endif
 			cr2 = 0x4101;	// CTRL/track
 			cr3 = (curdir[temp].firstfad>>16)&0xff;
 			cr4 = (curdir[temp].firstfad&0xffff);
@@ -1263,8 +1264,10 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
 
-			//if(temp == 0xfffff8) /* TODO: Falcom Classics */
-			//	temp = 0;
+			#if 0
+			if(temp == 0xfffff8) /* TODO: Falcom Classics */
+				temp = 0;
+			#endif
 
 			if (temp == 0xffffff)	// special
 			{
