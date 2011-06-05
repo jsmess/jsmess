@@ -226,8 +226,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1572864">
-				<rom name="sns-el-0_p0.u1" size="1048576" crc="fdd1c730" sha1="3d2f2162bc35f8ff269cbe565ac503085f8d668d" offset="0x000000" />
-				<rom name="sns-el-0_p1.u2" size="524288"  crc="19a96456" sha1="356c10393ce3c709a0b51a11a8651a51824940f8" offset="0x100000" />
+				<rom name="sns-el-0 p0.u1" size="1048576" crc="fdd1c730" sha1="3d2f2162bc35f8ff269cbe565ac503085f8d668d" offset="0x000000" />
+				<rom name="sns-el-0 p1.u2" size="524288"  crc="19a96456" sha1="356c10393ce3c709a0b51a11a8651a51824940f8" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -290,8 +290,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1572864">
-				<rom name="sns-a8-0_p0.u1" size="1048576" crc="ee6433a4" sha1="27f8b2b2eb4af110a1395ee986abe902ea7704e9" offset="0x000000" />
-				<rom name="sns-a8-0_p1.u2" size="524288"  crc="119dbba1" sha1="8fe91811f9e48557eed2c34965fcd6e46e48f8e5" offset="0x100000" />
+				<rom name="sns-a8-0 p0.u1" size="1048576" crc="ee6433a4" sha1="27f8b2b2eb4af110a1395ee986abe902ea7704e9" offset="0x000000" />
+				<rom name="sns-a8-0 p1.u2" size="524288"  crc="119dbba1" sha1="8fe91811f9e48557eed2c34965fcd6e46e48f8e5" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -311,8 +311,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1310720">
-				<rom name="sns-rj-0_p0.u1" size="1048576" crc="a9b31442" sha1="c78f8594c905fd367e09b36e6e28e0dbffc98d24" offset="0x000000" />
-				<rom name="sns-rj-0_p1.u2" size="262144"  crc="7a00e3e0" sha1="2d2f29c0088a25e8c17bf6595dafaaa90cf27ee4" offset="0x100000" />
+				<rom name="sns-rj-0 p0.u1" size="1048576" crc="a9b31442" sha1="c78f8594c905fd367e09b36e6e28e0dbffc98d24" offset="0x000000" />
+				<rom name="sns-rj-0 p1.u2" size="262144"  crc="7a00e3e0" sha1="2d2f29c0088a25e8c17bf6595dafaaa90cf27ee4" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -404,11 +404,12 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="1572864">
-				<rom name="spal-axop-0_p0.u1" size="1048576" crc="2131d946" sha1="0446176192536b72c77a7783a4f374af6bdb44d6" offset="0x000000" />
-				<rom name="spal-axop-0_p1.u2" size="524288"  crc="2383509b" sha1="a4a01278572a9ebf543f6d6e19fabe7d123f4688" offset="0x100000" />
+				<rom name="spal-axop-0 p0.u1" size="1048576" crc="2131d946" sha1="0446176192536b72c77a7783a4f374af6bdb44d6" offset="0x000000" />
+				<rom name="spal-axop-0 p1.u2" size="524288"  crc="2383509b" sha1="a4a01278572a9ebf543f6d6e19fabe7d123f4688" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
+
 <!-- wip-b -->
 	<software name="bahamut">
 		<!-- Serial: SHVC-AXBJ-JPN - Release Date: 1996-02-09 - Alt. Title: バハムート ラグーン -->
@@ -450,8 +451,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="3145728">
-				<rom name="shvc-axbj-0_p0.u1" size="2097152" crc="196e9a8d" sha1="e25fcd539b2a2996a29eb8bed3bcb37e79cdf067" offset="0x000000" />
-				<rom name="shvc-axbj-0_p3.u2" size="1048576" crc="50fc1757" sha1="16acdc879d9e37e7e49239e8cf11c7aead9e9094" offset="0x200000" />
+				<rom name="shvc-axbj-0 p0.u1" size="2097152" crc="196e9a8d" sha1="e25fcd539b2a2996a29eb8bed3bcb37e79cdf067" offset="0x000000" />
+				<rom name="shvc-axbj-0 p3.u2" size="1048576" crc="50fc1757" sha1="16acdc879d9e37e7e49239e8cf11c7aead9e9094" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -473,8 +474,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1572864">
-				<rom name="sns-u5-0_p0.u1" size="1048576" crc="840d8dfa" sha1="0330800e346d72c4ca09c2b361d7df2e3baf7a07" offset="0x000000" />
-				<rom name="sns-u5-0_p1.u2" size="524288"  crc="417e3c1d" sha1="1de4d55b07f737f30aea4d788f937ff3b69e63bb" offset="0x100000" />
+				<rom name="sns-u5-0 p0.u1" size="1048576" crc="840d8dfa" sha1="0330800e346d72c4ca09c2b361d7df2e3baf7a07" offset="0x000000" />
+				<rom name="sns-u5-0 p1.u2" size="524288"  crc="417e3c1d" sha1="1de4d55b07f737f30aea4d788f937ff3b69e63bb" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -494,8 +495,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1572864">
-				<rom name="sns-abae-0_p0.u1" size="1048576" crc="2ef5cf42" sha1="a6ffb363a671cc8746c4859bfe2d27acb96c13f2" offset="0x000000" />
-				<rom name="sns-abae-0_p1.u2" size="524288"  crc="ff5eb5b4" sha1="e0e163012a61145ae27c723419d817a940e247ee" offset="0x100000" />
+				<rom name="sns-abae-0 p0.u1" size="1048576" crc="2ef5cf42" sha1="a6ffb363a671cc8746c4859bfe2d27acb96c13f2" offset="0x000000" />
+				<rom name="sns-abae-0 p1.u2" size="524288"  crc="ff5eb5b4" sha1="e0e163012a61145ae27c723419d817a940e247ee" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -679,8 +680,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1572864">
-				<rom name="sns-bf-0_p0.u1" size="1048576" crc="16257ec1" sha1="cb675b80a50af37e084d66b63e24b553da748eb3" offset="0x000000" />
-				<rom name="sns-bf-0_p1.u2" size="524288"  crc="69a82476" sha1="95b8e0a1edd99d46728d42c03761eb23eb2dcc2c" offset="0x100000" />
+				<rom name="sns-bf-0 p0.u1" size="1048576" crc="16257ec1" sha1="cb675b80a50af37e084d66b63e24b553da748eb3" offset="0x000000" />
+				<rom name="sns-bf-0 p1.u2" size="524288"  crc="69a82476" sha1="95b8e0a1edd99d46728d42c03761eb23eb2dcc2c" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -871,8 +872,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="4194304">
-				<rom name="shvc-actj-0_p0.u1" size="2097152" crc="ea81762f" sha1="ed96918a5b7b43bd6c817ced3a567768cc26fca1" offset="0x000000" />
-				<rom name="shvc-actj-0_p3.u2" size="2097152" crc="a7e0cf31" sha1="62564bb1ba9a4789c08cdb2738f3c37df94e4dc3" offset="0x200000" />
+				<rom name="shvc-actj-0 p0.u1" size="2097152" crc="ea81762f" sha1="ed96918a5b7b43bd6c817ced3a567768cc26fca1" offset="0x000000" />
+				<rom name="shvc-actj-0 p3.u2" size="2097152" crc="a7e0cf31" sha1="62564bb1ba9a4789c08cdb2738f3c37df94e4dc3" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -915,8 +916,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="5242880">
-				<rom name="shvc-ae6j-0_p0.u1" size="4194304" crc="f248b852" sha1="500f10baf23c23be58d1f31fd656d2f6dde9f916" offset="0x000000" />
-				<rom name="shvc-ae6j-0_p3.u2" size="1048576" crc="8ee34319" sha1="65159935c1c4386364afa581ec664430a905ec00" offset="0x400000" />
+				<rom name="shvc-ae6j-0 p0.u1" size="4194304" crc="f248b852" sha1="500f10baf23c23be58d1f31fd656d2f6dde9f916" offset="0x000000" />
+				<rom name="shvc-ae6j-0 p3.u2" size="1048576" crc="8ee34319" sha1="65159935c1c4386364afa581ec664430a905ec00" offset="0x400000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -1000,8 +1001,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="4194304">
-				<rom name="spal-8x-0_p0.u1" size="2097152" crc="d6086f47" sha1="afcef57cf7d80a2617e6f4c743fcca0fa544b732" offset="0x000000" />
-				<rom name="spal-8x-0_p3.u2" size="2097152" crc="d2abfe31" sha1="8bb81bc18d0c0a060c62af403b1e03d963835393" offset="0x200000" />
+				<rom name="spal-8x-0 p0.u1" size="2097152" crc="d6086f47" sha1="afcef57cf7d80a2617e6f4c743fcca0fa544b732" offset="0x000000" />
+				<rom name="spal-8x-0 p3.u2" size="2097152" crc="d2abfe31" sha1="8bb81bc18d0c0a060c62af403b1e03d963835393" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
 			</dataarea>
@@ -1093,8 +1094,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
-				<rom name="shvc-z2-0_p0.u1" size="1048576" crc="12429363" sha1="9fbac5feacf879adb21abcba82f5ef89cd833e13" offset="0x000000" />
-				<rom name="shvc-z2-0_p1.u2" size="1048576" crc="b358fabd" sha1="dacf5ba836c59411c7a34fb9c46f486b7bdd1c6a" offset="0x100000" />
+				<rom name="shvc-z2-0 p0.u1" size="1048576" crc="12429363" sha1="9fbac5feacf879adb21abcba82f5ef89cd833e13" offset="0x000000" />
+				<rom name="shvc-z2-0 p1.u2" size="1048576" crc="b358fabd" sha1="dacf5ba836c59411c7a34fb9c46f486b7bdd1c6a" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1132,8 +1133,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="3145728">
-				<rom name="sns-aeje-0_p0.u1" size="2097152" crc="e9a101df" sha1="2da7df7a8e3db7393cc86ca3041a52f83720786f" offset="0x000000" />
-				<rom name="sns-aeje-0_p3.u2" size="1048576" crc="69280f3f" sha1="f4aaf256fec33d5cb948158652e1d4b77de2183c" offset="0x200000" />
+				<rom name="sns-aeje-0 p0.u1" size="2097152" crc="e9a101df" sha1="2da7df7a8e3db7393cc86ca3041a52f83720786f" offset="0x000000" />
+				<rom name="sns-aeje-0 p3.u2" size="1048576" crc="69280f3f" sha1="f4aaf256fec33d5cb948158652e1d4b77de2183c" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1214,8 +1215,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2621440">
-				<rom name="shvc-anij-0_p0.u1" size="2097152" crc="7d8ab0fb" sha1="59b471693527fea4cc98f3d4bde09d553039799b" offset="0x000000" />
-				<rom name="shvc-anij-0_p3.u2" size="524288"  crc="d7aba1a0" sha1="45f8ccfbf1ca0bb83f4b57325e1510e92fc87b99" offset="0x200000" />
+				<rom name="shvc-anij-0 p0.u1" size="2097152" crc="7d8ab0fb" sha1="59b471693527fea4cc98f3d4bde09d553039799b" offset="0x000000" />
+				<rom name="shvc-anij-0 p3.u2" size="524288"  crc="d7aba1a0" sha1="45f8ccfbf1ca0bb83f4b57325e1510e92fc87b99" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -1304,8 +1305,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="2621440">
-				<rom name="sns-dj-0_p0.u1" size="2097152" crc="36555bec" sha1="7e8badd97d0eb09add2149685de5c8b16f36453d" offset="0x000000" />
-				<rom name="sns-dj-0_p3.u2" size="524288"  crc="b6d40fc2" sha1="de279f36d46e50fe702f36f63db1e6a2255ea3be" offset="0x200000" />
+				<rom name="sns-dj-0 p0.u1" size="2097152" crc="36555bec" sha1="7e8badd97d0eb09add2149685de5c8b16f36453d" offset="0x000000" />
+				<rom name="sns-dj-0 p3.u2" size="524288"  crc="b6d40fc2" sha1="de279f36d46e50fe702f36f63db1e6a2255ea3be" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1384,8 +1385,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="2621440">
-				<rom name="sns-yh-1_p0.u1" size="2097152" crc="b35a9548" sha1="632b379a1223ca3bdd19f2cac40fbc5c4909028c" offset="0x000000" />
-				<rom name="sns-yh-1_p3.u2" size="524288"  crc="5deb5992" sha1="b42f96897ba03b7b1d87058ad605c47578321336" offset="0x200000" />
+				<rom name="sns-yh-1 p0.u1" size="2097152" crc="b35a9548" sha1="632b379a1223ca3bdd19f2cac40fbc5c4909028c" offset="0x000000" />
+				<rom name="sns-yh-1 p3.u2" size="524288"  crc="5deb5992" sha1="b42f96897ba03b7b1d87058ad605c47578321336" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1476,8 +1477,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="3145728">
-				<rom name="sns-f6-0_p0.u1" size="2097152" crc="67cd4c51" sha1="83d8158d8a0fe5f83d4b4d3e89fbab35083072a3" offset="0x000000" />
-				<rom name="sns-f6-0_p3.u2" size="1048576" crc="2ce51469" sha1="d54d0e62323bd99083a9930c46bfe2ae0648c598" offset="0x200000" />
+				<rom name="sns-f6-0 p0.u1" size="2097152" crc="67cd4c51" sha1="83d8158d8a0fe5f83d4b4d3e89fbab35083072a3" offset="0x000000" />
+				<rom name="sns-f6-0 p3.u2" size="1048576" crc="2ce51469" sha1="d54d0e62323bd99083a9930c46bfe2ae0648c598" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -1594,8 +1595,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
-				<rom name="shvc-f5-0_p0.u1" size="1048576" crc="f6ccde10" sha1="a8a33c75cca3190de0b7f19aa1fcf089c8d1021a" offset="0x000000" />
-				<rom name="shvc-f5-0_p1.u2" size="1048576" crc="c6177c82" sha1="fdbd8f2187dd68d3a5a03c36277cd007c15bb7b9" offset="0x100000" />
+				<rom name="shvc-f5-0 p0.u1" size="1048576" crc="f6ccde10" sha1="a8a33c75cca3190de0b7f19aa1fcf089c8d1021a" offset="0x000000" />
+				<rom name="shvc-f5-0 p1.u2" size="1048576" crc="c6177c82" sha1="fdbd8f2187dd68d3a5a03c36277cd007c15bb7b9" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -1619,8 +1620,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="3145728">
-				<rom name="shvc-f6-0_p0.u1" size="2097152" crc="bafa8ed6" sha1="3a1e1b38c3bac784f2941a07ce15cee744c5a245" offset="0x000000" />
-				<rom name="shvc-f6-0_p3.u2" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="0x200000" />
+				<rom name="shvc-f6-0 p0.u1" size="2097152" crc="bafa8ed6" sha1="3a1e1b38c3bac784f2941a07ce15cee744c5a245" offset="0x000000" />
+				<rom name="shvc-f6-0 p3.u2" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -1646,9 +1647,9 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="3145728 ">
-				<rom name="shvc-f6-0_p1.u1" size="1048576" crc="bfc35e36" sha1="579cca6fd6c0b4f8d3489ba115d6bd51a745a16a" offset="0x000000" />
-				<rom name="shvc-f6-0_p2.u2" size="1048576" crc="82736bb1" sha1="1931269554c4aebbd4d250c881cd15906347062d" offset="0x100000" />
-				<rom name="shvc-f6-0_p3.u3" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="0x200000" />
+				<rom name="shvc-f6-0 p1.u1" size="1048576" crc="bfc35e36" sha1="579cca6fd6c0b4f8d3489ba115d6bd51a745a16a" offset="0x000000" />
+				<rom name="shvc-f6-0 p2.u2" size="1048576" crc="82736bb1" sha1="1931269554c4aebbd4d250c881cd15906347062d" offset="0x100000" />
+				<rom name="shvc-f6-0 p3.u3" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -1767,8 +1768,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="3145728">
-				<rom name="shvc-agcj-0_p0.u1" size="2097152" crc="6c48e2fa" sha1="eac970657f29126fc93c550080427a88427e34c5" offset="0x000000" />
-				<rom name="shvc-agcj-0_p3.u2" size="1048576" crc="e53074a7" sha1="2436b6f393dda9177f45ad1eb5b86652e9ddc2da" offset="0x200000" />
+				<rom name="shvc-agcj-0 p0.u1" size="2097152" crc="6c48e2fa" sha1="eac970657f29126fc93c550080427a88427e34c5" offset="0x000000" />
+				<rom name="shvc-agcj-0 p3.u2" size="1048576" crc="e53074a7" sha1="2436b6f393dda9177f45ad1eb5b86652e9ddc2da" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -2045,8 +2046,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1572864">
-				<rom name="shvc-2h-0_p0.u1" size="1048576" crc="3880dc58" sha1="be1cc6a81c10ed2fd89b376407cc7bcaaff23e81" offset="0x000000" />
-				<rom name="shvc-2h-0_p1.u2" size="524288" crc="147ba2e0" sha1="54ebbb549b824208d5217537ed899842934c255e" offset="0x100000" />
+				<rom name="shvc-2h-0 p0.u1" size="1048576" crc="3880dc58" sha1="be1cc6a81c10ed2fd89b376407cc7bcaaff23e81" offset="0x000000" />
+				<rom name="shvc-2h-0 p1.u2" size="524288" crc="147ba2e0" sha1="54ebbb549b824208d5217537ed899842934c255e" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2236,8 +2237,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="3145728">
-				<rom name="spal-alkp-0_p0.u1" size="2097152" crc="31394bcf" sha1="1028d5c0bb4b9411080d5418f81c124dd2bf27d7" offset="0x000000" />
-				<rom name="spal-alkp-0_p3.u2" size="1048576" crc="7a2b62c0" sha1="e5968e5ed6cd21dfe3c6f2ee7de5abb5c7d1cbed" offset="0x200000" />
+				<rom name="spal-alkp-0 p0.u1" size="2097152" crc="31394bcf" sha1="1028d5c0bb4b9411080d5418f81c124dd2bf27d7" offset="0x000000" />
+				<rom name="spal-alkp-0 p3.u2" size="1048576" crc="7a2b62c0" sha1="e5968e5ed6cd21dfe3c6f2ee7de5abb5c7d1cbed" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2288,7 +2289,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="lufia2u" cloneof="lufia2"> 
+	<software name="lufia2u" cloneof="lufia2">
 		<!-- Serial: M/SNS-ANIE-USA - Release Date: 1996-08 -->
 		<description>Lufia II - Rise of the Sinistrals (USA)</description>
 		<year>1996</year>
@@ -2333,6 +2334,7 @@ The software list will be divided in four categories:
 			</dataarea>
 		</part>
 	</software>
+
 <!-- wip-m -->
 	<software name="megamnx">
 		<!-- Serial: SNSP-RX-UKV -->
@@ -2349,8 +2351,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNSP-UKV" />
 			<dataarea name="rom" size="1572864">
-				<rom name="spal-rx-0_p0.u1" size="1048576" crc="331442f6" sha1="6d8d0c07ce1c60276838f16c725cfd0fa8268b42" offset="0x000000" />
-				<rom name="spal-rx-0_p1.u2" size="524288"  crc="af9ee767" sha1="e17d7579d8a28e721997948ae17983ffb8f762a6" offset="0x100000" />
+				<rom name="spal-rx-0 p0.u1" size="1048576" crc="331442f6" sha1="6d8d0c07ce1c60276838f16c725cfd0fa8268b42" offset="0x000000" />
+				<rom name="spal-rx-0 p1.u2" size="524288"  crc="af9ee767" sha1="e17d7579d8a28e721997948ae17983ffb8f762a6" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2414,8 +2416,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1048576">
-				<rom name="shvc-9m-0_p0.u1" size="524288" crc="f9f07acd" sha1="4307930a5f17054d0c42a5830ab57416158631c1" offset="0x000000" />
-				<rom name="shvc-9m-0_p1.u2" size="524288" crc="bc2f7fe4" sha1="c9454b3face4b8f5ed110d10178b29e7bad73431" offset="0x080000" />
+				<rom name="shvc-9m-0 p0.u1" size="524288" crc="f9f07acd" sha1="4307930a5f17054d0c42a5830ab57416158631c1" offset="0x000000" />
+				<rom name="shvc-9m-0 p1.u2" size="524288" crc="bc2f7fe4" sha1="c9454b3face4b8f5ed110d10178b29e7bad73431" offset="0x080000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2435,8 +2437,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1572864">
-				<rom name="sns-ni-0_p0.u1" size="1048576" crc="7857661c" sha1="3ad4eea78a6cd0031a58294245dbcb7ff4167650" offset="0x000000" />
-				<rom name="sns-ni-0_p1.u2" size="524288"  crc="81cf9dc4" sha1="390c1f3c3a6044f7b1778be16b7c3142ef58a742" offset="0x100000" />
+				<rom name="sns-ni-0 p0.u1" size="1048576" crc="7857661c" sha1="3ad4eea78a6cd0031a58294245dbcb7ff4167650" offset="0x000000" />
+				<rom name="sns-ni-0 p1.u2" size="524288"  crc="81cf9dc4" sha1="390c1f3c3a6044f7b1778be16b7c3142ef58a742" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2536,6 +2538,7 @@ The software list will be divided in four categories:
 			</dataarea>
 		</part>
 	</software>
+
 <!-- wip-r -->
 	<software name="ranmaf" cloneof="ranma">
 		<!-- Serial: SNSP-R2-FRA/SFRA -->
@@ -2552,8 +2555,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="1572864">
-				<rom name="sfra-r2-0_p0.u1" size="1048576" crc="1214c14d" sha1="f3429596c0174eeeafa89c63a19843217e858b91" offset="0x000000" />
-				<rom name="sfra-r2-0_p1.u2" size="524288"  crc="c8ee3dba" sha1="0daebdb7882ef641b2182ca0af7ea087f240c03e" offset="0x100000" />
+				<rom name="sfra-r2-0 p0.u1" size="1048576" crc="1214c14d" sha1="f3429596c0174eeeafa89c63a19843217e858b91" offset="0x000000" />
+				<rom name="sfra-r2-0 p1.u2" size="524288"  crc="c8ee3dba" sha1="0daebdb7882ef641b2182ca0af7ea087f240c03e" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2593,8 +2596,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="1572864">
-				<rom name="sns-e9-0_p0.u1" size="1048576" crc="5772eb00" sha1="c30d123c870ab4d892285e3e58c0806423efd249" offset="0x000000" />
-				<rom name="sns-e9-0_p1.u2" size="524288"  crc="d0d0f793" sha1="988d89628cf6317b9d4d97ee6421b44acd752094" offset="0x100000" />
+				<rom name="sns-e9-0 p0.u1" size="1048576" crc="5772eb00" sha1="c30d123c870ab4d892285e3e58c0806423efd249" offset="0x000000" />
+				<rom name="sns-e9-0 p1.u2" size="524288"  crc="d0d0f793" sha1="988d89628cf6317b9d4d97ee6421b44acd752094" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -2657,8 +2660,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" /> <!-- to do -->
 			<dataarea name="rom" size="1572864">
-				<rom name="shvc-rx-0_p0.u1" size="1048576" crc="adb7477d" sha1="17fe25d055eecfd1a84123fa86e902f76aeb22cc" offset="0x000000" />
-				<rom name="shvc-rx-0_p1.u2" size="524288"  crc="851e8b3e" sha1="793936f95da877f1467a5fd16a3ec7e32f74f36d" offset="0x100000" />
+				<rom name="shvc-rx-0 p0.u1" size="1048576" crc="adb7477d" sha1="17fe25d055eecfd1a84123fa86e902f76aeb22cc" offset="0x000000" />
+				<rom name="shvc-rx-0 p1.u2" size="524288"  crc="851e8b3e" sha1="793936f95da877f1467a5fd16a3ec7e32f74f36d" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2678,8 +2681,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920414" />
 			<dataarea name="rom" size="1572864">
-				<rom name="shvc-arxj-0_p0.u1" size="1048576" crc="b4f3d5ca" sha1="1ed5d6d1e2634d09061941402aae7ac30e33d4d7" offset="0x000000" />
-				<rom name="shvc-arxj-0_p1.u2" size="524288" crc="2d4cb9cc" sha1="df88b80678c254fba0da7b0d6b875129c1f5a299" offset="0x100000" />
+				<rom name="shvc-arxj-0 p0.u1" size="1048576" crc="b4f3d5ca" sha1="1ed5d6d1e2634d09061941402aae7ac30e33d4d7" offset="0x000000" />
+				<rom name="shvc-arxj-0 p1.u2" size="524288" crc="2d4cb9cc" sha1="df88b80678c254fba0da7b0d6b875129c1f5a299" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2789,8 +2792,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
-				<rom name="shvc-2l-0_p0.u1" size="1048576" crc="98453e17" sha1="01d54630d7caa1710cc4af7b68db262fe92b8305" offset="0x000000" />
-				<rom name="shvc-2l-0_p1.u2" size="1048576" crc="aad14245" sha1="9dde7ac6352ba1b57fc7241ac883aecb661b85ab" offset="0x100000" />
+				<rom name="shvc-2l-0 p0.u1" size="1048576" crc="98453e17" sha1="01d54630d7caa1710cc4af7b68db262fe92b8305" offset="0x000000" />
+				<rom name="shvc-2l-0 p1.u2" size="1048576" crc="aad14245" sha1="9dde7ac6352ba1b57fc7241ac883aecb661b85ab" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -3038,8 +3041,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="2097152">
-				<rom name="sns-k2-0_p0.u1" size="1048576" crc="2be27b19" sha1="afa19294c070d9a542a7ebab48c6fcc3610040bc" offset="0x000000" />
-				<rom name="sns-k2-0_p1.u2" size="1048576" crc="16ab5918" sha1="c00b95337595517eb514f468be272f8c964c8a17" offset="0x100000" />
+				<rom name="sns-k2-0 p0.u1" size="1048576" crc="2be27b19" sha1="afa19294c070d9a542a7ebab48c6fcc3610040bc" offset="0x000000" />
+				<rom name="sns-k2-0 p1.u2" size="1048576" crc="16ab5918" sha1="c00b95337595517eb514f468be272f8c964c8a17" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -3086,8 +3089,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
-				<rom name="shvc-k2-0_p0.u1" size="1048576" crc="259cfd2a" sha1="5bee3bf7159aca59fd4d2b77e97b096fe72f8044" offset="0x000000" />
-				<rom name="shvc-k2-0_p1.u2" size="1048576" crc="4e99646e" sha1="5861118bc3d4041313f94dfc6d1aaaae900dd796" offset="0x100000" />
+				<rom name="shvc-k2-0 p0.u1" size="1048576" crc="259cfd2a" sha1="5bee3bf7159aca59fd4d2b77e97b096fe72f8044" offset="0x000000" />
+				<rom name="shvc-k2-0 p1.u2" size="1048576" crc="4e99646e" sha1="5861118bc3d4041313f94dfc6d1aaaae900dd796" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -3134,8 +3137,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="4194304">
-				<rom name="shvc-a3dj-0_p0.u1" size="2097152" crc="58216f82" sha1="6c379dc16246122ee48ce7acb90bc5a313abaa80" offset="0x000000" />
-				<rom name="shvc-a3dj-0_p3.u2" size="2097152" crc="77da06fa" sha1="daf71888ec9181632bff7f7ea575dc26a3daf957" offset="0x200000" />
+				<rom name="shvc-a3dj-0 p0.u1" size="2097152" crc="58216f82" sha1="6c379dc16246122ee48ce7acb90bc5a313abaa80" offset="0x000000" />
+				<rom name="shvc-a3dj-0 p3.u2" size="2097152" crc="77da06fa" sha1="daf71888ec9181632bff7f7ea575dc26a3daf957" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -3260,8 +3263,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="6291456">
-				<rom name="shvc-arfj-0_p0.u1" size="4194304" crc="143af3f1" sha1="72dbe771061fb94001b1c72ed4ccf3728244d5c2" offset="0x000000" />
-				<rom name="shvc-arfj-0_p3.u2" size="2097152" crc="51877c67" sha1="86dcd84f4f45e4e5cf2da4a9f8f02e4ad3efe3a0" offset="0x400000" />
+				<rom name="shvc-arfj-0 p0.u1" size="4194304" crc="143af3f1" sha1="72dbe771061fb94001b1c72ed4ccf3728244d5c2" offset="0x000000" />
+				<rom name="shvc-arfj-0 p3.u2" size="2097152" crc="51877c67" sha1="86dcd84f4f45e4e5cf2da4a9f8f02e4ad3efe3a0" offset="0x400000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -3349,8 +3352,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-NOE" />
 			<dataarea name="rom" size="2097152">
-				<rom name="spal-s2-0_p0.u1" size="1048576" crc="96a87d4c" sha1="f4a815d1d54a154c3c0b24c029c8acc35afbafb2" offset="0x000000" />
-				<rom name="spal-s2-0_p1.u2" size="1048576" crc="03d700ac" sha1="993d2e9a055bf0f8d87ed52cf8f3530f551b3be5" offset="0x100000" />
+				<rom name="spal-s2-0 p0.u1" size="1048576" crc="96a87d4c" sha1="f4a815d1d54a154c3c0b24c029c8acc35afbafb2" offset="0x000000" />
+				<rom name="spal-s2-0 p1.u2" size="1048576" crc="03d700ac" sha1="993d2e9a055bf0f8d87ed52cf8f3530f551b3be5" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3370,8 +3373,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" /> <!-- to do -->
 			<dataarea name="rom" size="2097152">
-				<rom name="shvc-s2-0_p0.u1" size="1048576" crc="07f0cd71" sha1="47fa3e5897a3e336e9914bdf4b70e5d5073c00be" offset="0x000000" />
-				<rom name="shvc-s2-0_p1.u2" size="1048576" crc="7138cb94" sha1="3186e66bb2e806204b36258bf52ffa8fbb2988e3" offset="0x100000" />
+				<rom name="shvc-s2-0 p0.u1" size="1048576" crc="07f0cd71" sha1="47fa3e5897a3e336e9914bdf4b70e5d5073c00be" offset="0x000000" />
+				<rom name="shvc-s2-0 p1.u2" size="1048576" crc="7138cb94" sha1="3186e66bb2e806204b36258bf52ffa8fbb2988e3" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3409,8 +3412,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2621440">
-				<rom name="shvc-ti-0_p0.u1" size="2097152" crc="62704671" sha1="acac25bbd0cfb69b38805774566c379daf055873" offset="0x000000" />
-				<rom name="shvc-ti-0_p1.u2" size="524288"  crc="6056387f" sha1="31d0f2276b124bee206695ac6b2048918c25efcc" offset="0x200000" />
+				<rom name="shvc-ti-0 p0.u1" size="2097152" crc="62704671" sha1="acac25bbd0cfb69b38805774566c379daf055873" offset="0x000000" />
+				<rom name="shvc-ti-0 p1.u2" size="524288"  crc="6056387f" sha1="31d0f2276b124bee206695ac6b2048918c25efcc" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3431,9 +3434,9 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2621440">
-				<rom name="shvc-ti-0_p1.u1" size="1048576" crc="85e15c3f" sha1="01c00cfd47296e4fca7ca6ef631b561a444538c2" offset="0x000000" />
-				<rom name="shvc-ti-0_p2.u2" size="1048576" crc="20ace25a" sha1="55757c35bb51cb5974586cea4e732e74de7988a0" offset="0x100000" />
-				<rom name="shvc-ti-0_p3.u3" size="524288"  crc="6056387f" sha1="31d0f2276b124bee206695ac6b2048918c25efcc" offset="0x200000" />
+				<rom name="shvc-ti-0 p1.u1" size="1048576" crc="85e15c3f" sha1="01c00cfd47296e4fca7ca6ef631b561a444538c2" offset="0x000000" />
+				<rom name="shvc-ti-0 p2.u2" size="1048576" crc="20ace25a" sha1="55757c35bb51cb5974586cea4e732e74de7988a0" offset="0x100000" />
+				<rom name="shvc-ti-0 p3.u3" size="524288"  crc="6056387f" sha1="31d0f2276b124bee206695ac6b2048918c25efcc" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3620,8 +3623,8 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1310720">
-				<rom name="shvc-al2j-0_p0.u1" size="1048576" crc="d060dc70" sha1="cc9b02314ab8164d33cb858ca8dbe9718fd0624a" offset="0x000000" />
-				<rom name="shvc-al2j-0_p1.u2" size="262144" crc="018cbd87" sha1="e29f59ac56b49c16e9dc6f18cd957b552041187f" offset="0x100000" />
+				<rom name="shvc-al2j-0 p0.u1" size="1048576" crc="d060dc70" sha1="cc9b02314ab8164d33cb858ca8dbe9718fd0624a" offset="0x000000" />
+				<rom name="shvc-al2j-0 p1.u2" size="262144" crc="018cbd87" sha1="e29f59ac56b49c16e9dc6f18cd957b552041187f" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
 			</dataarea>
@@ -3695,8 +3698,8 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="2097152">
-				<rom name="spal-4m-0_p0.u1" size="1048576" crc="f9052663" sha1="0af248760877094129cf11fa05ada7eb6eaddec9" offset="0x000000" />
-				<rom name="spal-4m-0_p1.u2" size="1048576" crc="55654a35" sha1="c3f0c11fed72c0d39e00fb39fcac3c5921e525f5" offset="0x100000" />
+				<rom name="spal-4m-0 p0.u1" size="1048576" crc="f9052663" sha1="0af248760877094129cf11fa05ada7eb6eaddec9" offset="0x000000" />
+				<rom name="spal-4m-0 p1.u2" size="1048576" crc="55654a35" sha1="c3f0c11fed72c0d39e00fb39fcac3c5921e525f5" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -3926,8 +3929,8 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
 			<dataarea name="rom" size="1572864">
-				<rom name="sns-e5_p0.u1" size="1048576" crc="d1bc210a" sha1="fb6ea273a07de7b8c8bfbf44ac71268d94e9bc10" offset="0x000000" />
-				<rom name="sns-e5_p1.u2" size="524288"  crc="41b79a31" sha1="bc5660e78211cb7a44caf03b9568465255fd97fd" offset="0x100000" />
+				<rom name="sns-e5 p0.u1" size="1048576" crc="d1bc210a" sha1="fb6ea273a07de7b8c8bfbf44ac71268d94e9bc10" offset="0x000000" />
+				<rom name="sns-e5 p1.u2" size="524288"  crc="41b79a31" sha1="bc5660e78211cb7a44caf03b9568465255fd97fd" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3949,8 +3952,8 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="6291456">
-				<rom name="shvc-atvj-0_p0.u1" size="4194304" crc="2b987829" sha1="77d371264b3ff0ad028c4d7f5c77085fbb17a75e" offset="0x000000" />
-				<rom name="shvc-atvj-0_p3.u2" size="2097152" crc="865d9dd2" sha1="398be3c711010d560d5f3ae49417cf941c62ac63" offset="0x400000" />
+				<rom name="shvc-atvj-0 p0.u1" size="4194304" crc="2b987829" sha1="77d371264b3ff0ad028c4d7f5c77085fbb17a75e" offset="0x000000" />
+				<rom name="shvc-atvj-0 p3.u2" size="2097152" crc="865d9dd2" sha1="398be3c711010d560d5f3ae49417cf941c62ac63" offset="0x400000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -4465,8 +4468,8 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1310720">
-				<rom name="shvc-akyj-1_p0.u1" size="1048576" crc="94c2d558" sha1="e70d144d62840b24e95a7d4370f8d0a51b6e8e31" offset="0x000000" />
-				<rom name="shvc-akyj-1_p1.u2" size="262144" crc="1a3bb369" sha1="1de4d1162424a0dfc1cb832d35d9fd94a0432578" offset="0x100000" />
+				<rom name="shvc-akyj-1 p0.u1" size="1048576" crc="94c2d558" sha1="e70d144d62840b24e95a7d4370f8d0a51b6e8e31" offset="0x000000" />
+				<rom name="shvc-akyj-1 p1.u2" size="262144" crc="1a3bb369" sha1="1de4d1162424a0dfc1cb832d35d9fd94a0432578" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -5336,7 +5339,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<!-- Serial:  - Release Date: 1993-06 -->
 		<description>The Adventures of Rocky and Bullwinkle and Friends (USA)</description>
 		<year>1993</year>
-		<publisher>THQ</publisher>
+		<publisher>T*HQ</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="adventures of rocky and bullwinkle and friends, the (usa).sfc" size="1048576" crc="dc8f5734" sha1="a0ed3c23fc2c153ee3681c54eec300b3642bb3c9" offset="0x000000" />
