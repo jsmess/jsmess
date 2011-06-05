@@ -60,6 +60,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
+	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_WRITE8_MEMBER( s100_w );
 	DECLARE_WRITE8_MEMBER( bank0_w );
@@ -73,6 +74,9 @@ public:
 	UINT8 m_s100;
 	UINT8 m_bank0;
 	UINT8 m_bank1;
+
+	// floppy state
+	UINT8 m_fdc_data;
 };
 
 #endif

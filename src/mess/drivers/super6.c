@@ -10,8 +10,9 @@
 	
 	TODO:
 	
-	- bankswitch
-	- terminal
+	- interrupts
+	- terminal input
+	- floppy cold boot error
 	- DMA
 	- peripheral interfaces
 	
@@ -34,14 +35,13 @@ void super6_state::bankswitch()
 	UINT8 *ram = ram_get_ptr(m_ram);
 	UINT8 *rom = machine().region(Z80_TAG)->base();
 
-	program->unmap_readwrite(0x0000, 0xffff);
-
-	if (!BIT(m_bank0, 6))
-	{
-		program->install_rom(0x0000, 0x07ff, 0, 0xf800, rom);
-		return;
-	}
+	// power on jump
+	if (!BIT(m_bank0, 6)) {	program->install_rom(0x0000, 0x07ff, 0, 0xf800, rom); return; }
 	
+	// first 64KB of memory
+	program->install_ram(0x0000, 0xffff, ram);
+
+	// second 64KB of memory
 	int map = (m_bank1 >> 4) & 0x07;
 	
 	switch (map)
@@ -82,11 +82,13 @@ void super6_state::bankswitch()
 		break;
 	}
 	
+	// bank 0 overrides
 	if (BIT(m_bank0, 0)) program->install_ram(0x0000, 0x3fff, ram + 0x0000);
 	if (BIT(m_bank0, 1)) program->install_ram(0x4000, 0x7fff, ram + 0x4000);
 	if (BIT(m_bank0, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x8000);
 	if (BIT(m_bank0, 3)) program->install_ram(0xc000, 0xffff, ram + 0xc000);
 	
+	// PROM enabled
 	if (!BIT(m_bank0, 5)) program->install_rom(0xf000, 0xf7ff, 0, 0x800, rom);
 }
 
@@ -114,6 +116,7 @@ WRITE8_MEMBER( super6_state::s100_w )
 	
 	m_s100 = data;
 }
+
 
 //-------------------------------------------------
 //  bank0_w - on-board memory control port #0
@@ -175,6 +178,16 @@ WRITE8_MEMBER( super6_state::bank1_w )
 //**************************************************************************
 
 //-------------------------------------------------
+//  floppy_r - FDC synchronization/drive/density
+//-------------------------------------------------
+
+READ8_MEMBER( super6_state::fdc_r )
+{
+	return m_fdc_data;
+}
+
+
+//-------------------------------------------------
 //  floppy_w - FDC synchronization/drive/density
 //-------------------------------------------------
 
@@ -194,9 +207,13 @@ WRITE8_MEMBER( super6_state::fdc_w )
 		7		
 
 	*/
-	
+
+	m_fdc_data = data;
+
 	// disk drive select
 	wd17xx_set_drive(m_fdc, data & 0x03);
+	floppy_mon_w(m_floppy0, 0);
+	floppy_mon_w(m_floppy1, 0);
 	
 	// head select
 	wd17xx_set_side(m_fdc, BIT(data, 2));
@@ -253,15 +270,16 @@ static ADDRESS_MAP_START( super6_io, AS_IO, 8, super6_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0x08, 0x0c) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	AM_RANGE(0x0d, 0x0f) AM_DEVREADWRITE_LEGACY(WD2793_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY(WD2793_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(fdc_w)
+	AM_RANGE(0x14, 0x14) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x15, 0x15) AM_READ_PORT("J7") AM_WRITE(s100_w)
 	AM_RANGE(0x16, 0x16) AM_WRITE(bank0_w)
 	AM_RANGE(0x17, 0x17) AM_WRITE(bank1_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0x03) AM_WRITE(baud_w)
 //	AM_RANGE(0x40, 0x40) ?
+//	AM_RANGE(0xe0, 0xe7) HDC?
 ADDRESS_MAP_END
 
 
@@ -357,15 +375,18 @@ static Z80DART_INTERFACE( dart_intf )
 //  Z80DMA_INTERFACE( dma_intf )
 //-------------------------------------------------
 
+static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
+static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+
 static Z80DMA_INTERFACE( dma_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_write_byte),
+	DEVCB_MEMORY_HANDLER(Z80_TAG, IO, memory_read_byte),
+	DEVCB_MEMORY_HANDLER(Z80_TAG, IO, memory_write_byte)
 };
 
 
