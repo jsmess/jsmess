@@ -213,7 +213,7 @@ static ADDRESS_MAP_START(neat_io, AS_IO, 16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(at386_io, AS_IO, 32)
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
@@ -221,7 +221,7 @@ static ADDRESS_MAP_START(at386_io, AS_IO, 32)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write , 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00cf) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_1_r, at_dma8237_1_w, 0xffffffff)
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_r, ide_w)
 	AM_RANGE(0x0278, 0x027f) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x000000ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ns16450_3", ins8250_r, ins8250_w, 0xffffffff)
@@ -1252,13 +1252,15 @@ ROM_END
 ROM_START( at386 )
     ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) ) 
-	ROM_SYSTEM_BIOS(0, "at386", "unknown 386")	// This dump possibly comes from a MITAC INC 386 board, given that the original driver had it as manufacturer
-    ROMX_LOAD("at386.bin",  0xf0000, 0x10000, CRC(3df9732a) SHA1(def71567dee373dc67063f204ef44ffab9453ead), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(0, "ami386", "AMI 386")
+    ROMX_LOAD("at386.bin",  0xf0000, 0x10000, CRC(3a807d7f) SHA1(8289ba36a3dfc3324333b1a834bc6b0402b546f0), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "at386", "unknown 386")	// This dump possibly comes from a MITAC INC 386 board, given that the original driver had it as manufacturer
+    ROMX_LOAD("at386.bin",  0xf0000, 0x10000, CRC(3df9732a) SHA1(def71567dee373dc67063f204ef44ffab9453ead), ROM_BIOS(2))
 	//ROM_RELOAD(0xff0000,0x10000)
-	ROM_SYSTEM_BIOS(1, "neatsx", "NEATsx 386sx")
-	ROMX_LOAD("012l-u25.bin", 0xf0000, 0x8000, CRC(4AB1862D) SHA1(D4E8D0FF43731270478CA7671A129080FF350A4F),ROM_SKIP(1) | ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "neatsx", "NEATsx 386sx")
+	ROMX_LOAD("012l-u25.bin", 0xf0000, 0x8000, CRC(4AB1862D) SHA1(D4E8D0FF43731270478CA7671A129080FF350A4F),ROM_SKIP(1) | ROM_BIOS(3) )
 	//ROM_RELOAD(0xff0000,0x8000)
-	ROMX_LOAD("012h-u24.bin", 0xf0001, 0x8000, CRC(17472521) SHA1(7588C148FE53D9DC4CB2D0AB6E0FD51A39BB5D1A),ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD("012h-u24.bin", 0xf0001, 0x8000, CRC(17472521) SHA1(7588C148FE53D9DC4CB2D0AB6E0FD51A39BB5D1A),ROM_SKIP(1) | ROM_BIOS(3) )
 	//ROM_RELOAD(0xff0000,0x8000)
 ROM_END
 
