@@ -302,6 +302,24 @@ The software list will be divided in four categories:
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="MJSC-1A0N-30-2" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="SNS-USA/CAN-1-M" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-p-rj-0.u1" size="2097152" crc="e90e3640" sha1="4a49b90418702bb322b9526fc9ff387a5850032f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aladdinua" cloneof="aladdin">
+		<!-- Serial: SNS-RJ-USA - Release Date: 1993-11 -->
+		<description>Disney's Aladdin (USA, Alt)</description>
+		<year>1993</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-2A0N-11" />
 			<feature name="u1" value="U1 P0" />
 			<feature name="u2" value="U2 P1" />
@@ -1085,7 +1103,7 @@ The software list will be divided in four categories:
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-2A0N-01" /> <!-- also found with 2A0N-10 pcb -->
+			<feature name="pcb" value="SHVC-2A0N-01" /> <!-- also found with SHVC-2A0N-10 pcb -->
 			<feature name="u1" value="U1 P0" />
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
@@ -2176,6 +2194,24 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="kirbyava" cloneof="kirbygt">
+		<!-- Serial: SNS-PQ-USA-1 - Release Date: 1995-02 -->
+		<description>Kirby's Avalanche (USA)</description>
+		<year>1995</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-pq-0.u1" size="1048576" crc="21e658b8" sha1="95e4ac5f3f95863ffd8c6519f93a52b631c97d4a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kirbydc">
 		<!-- Serial: SNSP-CG-UKV -->
 		<description>Kirby's Dream Course (Euro)</description>
@@ -2517,6 +2553,24 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sfra-p4-0.u1" size="1048576" crc="e5e84e18" sha1="9fc200f34eece7e477cae7be0217b66015e613ee" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="porkypigu" cloneof="porkypig">
+		<!-- Serial: SNS-KX-USA --> <!-- Typo? The proper serial should be SNS-APPE-USA -->
+		<description>Porky Pig's Haunted Holiday (USA)</description>
+		<year>1995</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="MAXI-1A0N-30-2" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="SNS-USA/CAN-1-M" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-p-appe-0.u1" size="2097152" crc="f09e91a1" sha1="ef20e4ce1b4b6a25aac14613d4bed949017edfc9" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2931,6 +2985,27 @@ The software list will be divided in four categories:
 				<rom name="shvc-zs5j-0.u1" size="1048576" crc="133e1c5b" sha1="a6ad0f89c3e75327d70aa0f0239c7b06f151e0a4" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slammastu" cloneof="slammast">
+		<!-- Serial: SNS-ZW-USA - Release Date: 1994-06 -->
+		<description>Saturday Night Slam Masters (USA)</description>
+		<year>1994</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
+			<dataarea name="rom" size="3145728">
+				<rom name="sns-zw-0 p0.u1" size="2097152" crc="a11f7086" sha1="73caa035e9683c79d66db27d13698ec8cf23ff66" offset="0x000000" />
+				<rom name="sns-zw-0 p3.u2" size="1048576" crc="db423a58" sha1="db7cc1bce35bfb0e14dc7c93f42468d630a458f5" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3733,7 +3808,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 	</software>
 
 	<software name="smkarta" cloneof="smkart">
-		<!-- Serial: SNSP-MK-FAH, SNSP-MK-NOE -->
+		<!-- Serial: SNSP-MK-NOE, SNSP-MK-FAH -->
 		<description>Super Mario Kart (Euro)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -3855,6 +3930,24 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 	</software>
 -->
 
+	<software name="spinbalu" cloneof="spinbal">
+		<!-- Serial: SNS-XP-USA-2 - Release Date: 1994-11 -->
+		<description>Super Pinball - Behind the Mask (USA, Rev. A)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-xp-1.u1" size="1048576" crc="008463a0" sha1="ad9b9e8bf655ca24bc434080814e9f462d97c238" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spleagu4">
 		<!-- Serial: SHVC-AE7J-JPN - Release Date: 1996-08-09 - Alt. Title: スーパーパワーリーグ4 -->
 		<description>Super Power League 4 (Jpn)</description>
@@ -3931,6 +4024,24 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<dataarea name="rom" size="1572864">
 				<rom name="sns-e5 p0.u1" size="1048576" crc="d1bc210a" sha1="fb6ea273a07de7b8c8bfbf44ac71268d94e9bc10" offset="0x000000" />
 				<rom name="sns-e5 p1.u2" size="524288"  crc="41b79a31" sha1="bc5660e78211cb7a44caf03b9568465255fd97fd" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stennisu" cloneof="stennis">
+		<!-- Serial: SNS-ST-USA-1 - Release Date: 1991-11 -->
+		<description>Super Tennis (USA)</description>
+		<year>1991</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
+			<dataarea name="rom" size="524288">
+				<rom name="sns-st-0.u1" size="524288" crc="8d383776" sha1="9b2c6beb347c6487c170d4f6fc5ee537a223626e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4051,6 +4162,24 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
+	<software name="timonu" cloneof="timon">
+		<!-- Serial: SNS-AJ9E-USA - Release Date: 1997-11 -->
+		<description>Timon &amp; Pumbaa's Jungle Games (USA)</description>
+		<year>1996</year>
+		<publisher>T*HQ</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="MJSC-1J0N-20" />
+			<feature name="u1" value="U1 MASKROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="SNS-USA/CAN-1-M" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-p-aj9e-0.u1" size="2097152" crc="9951d9ee" sha1="dedf3e40c1e7e0a546a3cc44b917d7e99d7d65eb" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tintin">
 		<!-- Serial: SNSP-AT6P-FAH, SNSP-AT6P-FAH-1 -->
 		<description>Tintin in Tibet (Euro)</description>
@@ -4083,6 +4212,24 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="1048576">
 				<rom name="spal-ta-0.u1" size="1048576" crc="38cd6bb0" sha1="6748bcf849410d3b4797499447e76e51eba6d6a2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomjerryu" cloneof="tomjerry">
+		<!-- Serial: SNS-TJ-USA - Release Date: 1993-04 -->
+		<description>Tom &amp; Jerry (USA)</description>
+		<year>1993</year>
+		<publisher>Hi Tech Expressions</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="MJSC-1A0N-30-2" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="SNS-USA/CAN-1-M" />
+			<dataarea name="rom" size="524288">
+				<rom name="sns-p-tj-0.u1" size="524288" crc="8b1dafbb" sha1="768b7b339804ddf13aaca59713a4e2c5e7ef9f3a" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4171,6 +4318,47 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 <!-- wip-w -->
+	<software name="wariowodu" cloneof="wariowod">
+		<!-- Serial: SNS-65-USA-1 - Release Date: 1994-12 -->
+		<description>Wario's Woods (USA)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-65-0.u1" size="1048576" crc="2d1004f1" sha1="1d814276114bd5cafb6ab041305ce83e8093dc10" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wheelfod">
+		<!-- Serial: SNS-XF-USA - Release Date: 1994-04 -->
+		<description>Wheel of Fortune - Deluxe Edition (USA)</description>
+		<year>1994</year>
+		<publisher>GameTek</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="MJSC-1A0N-30-2" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="SNS-USA/CAN-1-M" />
+			<dataarea name="rom" size="524288">
+				<rom name="sns-p-xf-0.u1" size="524288" crc="d6a5984c" sha1="749e92f33ad803ce51d9faaf92670dfbe64a5770" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wildtrax" cloneof="stuntfx">
 		<!-- Serial: SHVC-CQ - Release Date: 1994-06-04 - Alt. Title: ワイルドトラックス -->
 		<description>Wild Trax (Jpn, v1.1)</description> <!-- Initial release is a v1.1 -->
@@ -4249,7 +4437,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 
 	<software name="batmanrnjs" cloneof="batmanrn">
 		<description>Batman Returns (Jpn, Prototype)</description>
-		<!-- evan_g, d4s -->
+		<!-- badinsults, d4s -->
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -4343,6 +4531,24 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
+	<software name="miraclep">
+		<!-- Serial: SNS-MR-USA -->
+		<description>The Miracle Piano Teaching System (USA)</description>
+		<year>1991</year>
+		<publisher>Software Toolworks</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
+			<dataarea name="rom" size="524288">
+				<rom name="sns-mr-0.u1" size="524288" crc="99331ecb" sha1="9abed3a02b0692b1613475b31e16df62d1c8e558" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mjkiwame">
 		<!-- Serial: SHVC-ZZ - Release Date: 1993-06-11 - Alt. Title: プロ麻雀 極 -->
 		<description>Pro Mahjong Kiwame (Jpn, Rev. A)</description>
@@ -4400,7 +4606,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 	</software>
 
 	<software name="sgossuns" cloneof="sgossun">
-		<!-- dizrythmia, evan_g -->
+		<!-- dizrythmia, badinsults -->
 		<description>Super Gussun Oyoyo (Jpn, Prototype)</description>
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
@@ -19503,18 +19709,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="kirbyava" cloneof="kirbygt">
-		<!-- Serial:  - Release Date: 1995-02 -->
-		<description>Kirby's Avalanche (USA)</description>
-		<year>1995</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="kirby's avalanche (usa).sfc" size="1048576" crc="21e658b8" sha1="95e4ac5f3f95863ffd8c6519f93a52b631c97d4a" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kirbydcu" cloneof="kirbydc">
 		<!-- Serial:  - Release Date: 1995-02 -->
 		<description>Kirby's Dream Course (USA)</description>
@@ -22878,17 +23072,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="miracle girls (japan).sfc" size="1048576" crc="ab82ebbe" sha1="f62471127ca7e6ac834fc90bbf1058a9e4102256" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="miraclep">
-		<description>The Miracle Piano Teaching System (USA)</description>
-		<year>1991</year>
-		<publisher>Software Toolworks</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="miracle piano teaching system, the (usa).sfc" size="524288" crc="99331ecb" sha1="9abed3a02b0692b1613475b31e16df62d1c8e558" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27290,17 +27473,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="porkypigu" cloneof="porkypig">
-		<description>Porky Pig's Haunted Holiday (USA)</description>
-		<year>1995</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="porky pig's haunted holiday (usa).sfc" size="2097152" crc="f09e91a1" sha1="ef20e4ce1b4b6a25aac14613d4bed949017edfc9" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="powerath" cloneof="powermov">
 		<!-- Serial: SHVC-P3 - Release Date: 1992-11-27 - Alt. Title: パワーアスリート -->
 		<description>Power Athlete (Jpn)</description>
@@ -29456,18 +29628,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="saturday night slam masters (europe).sfc" size="3145728" crc="a3876f76" sha1="d5e05973184d37849a00ab9feebec7edc31ccdc9" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="slammastu" cloneof="slammast">
-		<!-- Serial:  - Release Date: 1994-06 -->
-		<description>Saturday Night Slam Masters (USA)</description>
-		<year>1994</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="saturday night slam masters (usa).sfc" size="3145728" crc="54161830" sha1="df427b086f61af56424a0a2fa912c82b2587bcb8" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -36019,18 +36179,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="spinbalu" cloneof="spinbal">
-		<!-- Serial:  - Release Date: 1994-11 -->
-		<description>Super Pinball - Behind the Mask (USA, Rev. A)</description>
-		<year>1994</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="super pinball - behind the mask (usa) (rev 1).sfc" size="1048576" crc="008463a0" sha1="ad9b9e8bf655ca24bc434080814e9f462d97c238" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="spinbalua" cloneof="spinbal">
 		<!-- Serial:  - Release Date: 1994-11 -->
 		<description>Super Pinball - Behind the Mask (USA)</description>
@@ -36984,18 +37132,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="super tennis (europe).sfc" size="524288" crc="0e31fdef" sha1="2c2b30c060b022a3fc9b0a7972b0fc7f18ec6007" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="stennisu" cloneof="stennis">
-		<!-- Serial:  - Release Date: 1991-11 -->
-		<description>Super Tennis (USA)</description>
-		<year>1991</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="super tennis (usa).sfc" size="524288" crc="8d383776" sha1="9b2c6beb347c6487c170d4f6fc5ee537a223626e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -39044,18 +39180,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="timonu" cloneof="timon">
-		<!-- Serial:  - Release Date: 1997-11 -->
-		<description>Timon &amp; Pumbaa's Jungle Games (USA)</description>
-		<year>1996</year>
-		<publisher>T*HQ</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="timon &amp; pumbaa's jungle games (usa).sfc" size="1572864" crc="341c6fb0" sha1="28d76e1cc2b4f5399863b291d94e16600bf0bda6" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tinstar">
 		<!-- Serial:  - Release Date: 1994-11 -->
 		<description>Tin Star (USA)</description>
@@ -39314,18 +39438,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="tom &amp; jerry (usa) (beta).sfc" size="524288" crc="cb6d3883" sha1="bfbcd8432437f8fff6be15572cd2503fef792c37" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tomjerryu" cloneof="tomjerry">
-		<!-- Serial:  - Release Date: 1993-04 -->
-		<description>Tom &amp; Jerry (USA)</description>
-		<year>1993</year>
-		<publisher>Hi Tech Expressions</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="tom &amp; jerry (usa).sfc" size="524288" crc="8b1dafbb" sha1="768b7b339804ddf13aaca59713a4e2c5e7ef9f3a" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -41043,20 +41155,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="wariowodu" cloneof="wariowod">
-		<!-- Serial:  - Release Date: 1994-12 -->
-		<description>Wario's Woods (USA)</description>
-		<year>1994</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="wario's woods (usa).sfc" size="1048576" crc="2d1004f1" sha1="1d814276114bd5cafb6ab041305ce83e8093dc10" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="warlock">
 		<description>Warlock (Euro)</description>
 		<year>1995</year>
@@ -41276,18 +41374,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="wheel of fortune (usa).sfc" size="524288" crc="1c384b11" sha1="2e23f80d573b4047ed696ab1d901fa20c11136cc" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wheelfod">
-		<!-- Serial:  - Release Date: 1994-04 -->
-		<description>Wheel of Fortune - Deluxe Edition (USA)</description>
-		<year>1994</year>
-		<publisher>GameTek</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="wheel of fortune - deluxe edition (usa).sfc" size="524288" crc="d6a5984c" sha1="749e92f33ad803ce51d9faaf92670dfbe64a5770" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
