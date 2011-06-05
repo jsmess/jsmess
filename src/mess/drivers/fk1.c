@@ -5,6 +5,7 @@
         12/05/2009 Skeleton driver.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -13,14 +14,47 @@
 #include "machine/msm8251.h"
 #include "machine/ram.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+
 class fk1_state : public driver_device
 {
 public:
 	fk1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(fk1_ppi_1_a_w);
+	DECLARE_WRITE8_MEMBER(fk1_ppi_1_b_w);
+	DECLARE_WRITE8_MEMBER(fk1_ppi_1_c_w);
+	DECLARE_READ8_MEMBER(fk1_ppi_1_a_r);
+	DECLARE_READ8_MEMBER(fk1_ppi_1_b_r);
+	DECLARE_READ8_MEMBER(fk1_ppi_1_c_r);
+	DECLARE_WRITE8_MEMBER(fk1_ppi_2_a_w);
+	DECLARE_WRITE8_MEMBER(fk1_ppi_2_c_w);
+	DECLARE_READ8_MEMBER(fk1_ppi_2_b_r);
+	DECLARE_READ8_MEMBER(fk1_ppi_2_c_r);
+	DECLARE_WRITE8_MEMBER(fk1_ppi_3_a_w);
+	DECLARE_WRITE8_MEMBER(fk1_ppi_3_b_w);
+	DECLARE_WRITE8_MEMBER(fk1_ppi_3_c_w);
+	DECLARE_READ8_MEMBER(fk1_ppi_3_a_r);
+	DECLARE_READ8_MEMBER(fk1_ppi_3_b_r);
+	DECLARE_READ8_MEMBER(fk1_ppi_3_c_r);
+	DECLARE_WRITE_LINE_MEMBER(fk1_pit_out0);
+	DECLARE_WRITE_LINE_MEMBER(fk1_pit_out1);
+	DECLARE_WRITE_LINE_MEMBER(fk1_pit_out2);
+	DECLARE_WRITE8_MEMBER(fk1_intr_w);
+	DECLARE_READ8_MEMBER(fk1_bank_ram_r);
+	DECLARE_READ8_MEMBER(fk1_bank_rom_r);
+	DECLARE_WRITE8_MEMBER(fk1_disk_w);
+	DECLARE_READ8_MEMBER(fk1_mouse_r);
+	DECLARE_WRITE8_MEMBER(fk1_reset_int_w);
 	UINT8 m_video_rol;
 	UINT8 m_int_vector;
+	virtual void machine_reset();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -44,42 +78,47 @@ Port C:
         2 - INTE keyboard
  */
 
-static WRITE8_DEVICE_HANDLER (fk1_ppi_1_a_w )
+WRITE8_MEMBER( fk1_state::fk1_ppi_1_a_w )
 {
 //  logerror("fk1_ppi_1_a_w %02x\n",data);
 }
-static WRITE8_DEVICE_HANDLER (fk1_ppi_1_b_w )
+
+WRITE8_MEMBER( fk1_state::fk1_ppi_1_b_w )
 {
 //  logerror("fk1_ppi_1_b_w %02x\n",data);
 }
-static WRITE8_DEVICE_HANDLER (fk1_ppi_1_c_w )
+
+WRITE8_MEMBER( fk1_state::fk1_ppi_1_c_w )
 {
 	//logerror("fk1_ppi_1_c_w %02x\n",data);
 }
 
-static READ8_DEVICE_HANDLER (fk1_ppi_1_a_r )
+READ8_MEMBER( fk1_state::fk1_ppi_1_a_r )
 {
 	//logerror("fk1_ppi_1_a_r\n");
 	return 0xff;
 }
-static READ8_DEVICE_HANDLER (fk1_ppi_1_b_r )
+
+READ8_MEMBER( fk1_state::fk1_ppi_1_b_r )
 {
 //  logerror("fk1_ppi_1_b_r\n");
 	return 0;
 }
-static READ8_DEVICE_HANDLER (fk1_ppi_1_c_r )
+
+READ8_MEMBER( fk1_state::fk1_ppi_1_c_r )
 {
 //  logerror("fk1_ppi_1_c_r\n");
 	return 0;
 }
+
 static I8255_INTERFACE( fk1_ppi8255_interface_1 )
 {
-	DEVCB_HANDLER(fk1_ppi_1_a_r),
-	DEVCB_HANDLER(fk1_ppi_1_a_w),
-	DEVCB_HANDLER(fk1_ppi_1_b_r),
-	DEVCB_HANDLER(fk1_ppi_1_b_w),
-	DEVCB_HANDLER(fk1_ppi_1_c_r),
-	DEVCB_HANDLER(fk1_ppi_1_c_w)
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_1_a_r),
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_1_a_w),
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_1_b_r),
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_1_b_w),
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_1_c_r),
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_1_c_w)
 };
 
 /*
@@ -102,34 +141,37 @@ Port C:
         6 - INTE A - reading data
         2 - INTE B - writing data
 */
-static WRITE8_DEVICE_HANDLER (fk1_ppi_2_a_w )
+
+WRITE8_MEMBER( fk1_state::fk1_ppi_2_a_w )
 {
 //  logerror("write to disk %02x\n",data);
 }
 
-static WRITE8_DEVICE_HANDLER (fk1_ppi_2_c_w )
+WRITE8_MEMBER( fk1_state::fk1_ppi_2_c_w )
 {
 //  logerror("fk1_ppi_2_c_w %02x\n",data);
 }
 
-static READ8_DEVICE_HANDLER (fk1_ppi_2_b_r )
+READ8_MEMBER( fk1_state::fk1_ppi_2_b_r )
 {
 //  logerror("read from disk\n");
 	return 0;
 }
-static READ8_DEVICE_HANDLER (fk1_ppi_2_c_r )
+
+READ8_MEMBER( fk1_state::fk1_ppi_2_c_r )
 {
 //  logerror("fk1_ppi_2_c_r\n");
 	return 0;
 }
+
 static I8255_INTERFACE( fk1_ppi8255_interface_2 )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(fk1_ppi_2_a_w),
-	DEVCB_HANDLER(fk1_ppi_2_b_r),
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_2_a_w),
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_2_b_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(fk1_ppi_2_c_r),
-	DEVCB_HANDLER(fk1_ppi_2_c_w)
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_2_c_r),
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_2_c_w)
 };
 
 
@@ -158,63 +200,64 @@ Port C
     0 - STEP, move disk (0 1 .. 0.).
 
 */
-static WRITE8_DEVICE_HANDLER (fk1_ppi_3_a_w )
+WRITE8_MEMBER( fk1_state::fk1_ppi_3_a_w )
 {
 //  logerror("fk1_ppi_3_a_w %02x\n",data);
 }
-static WRITE8_DEVICE_HANDLER (fk1_ppi_3_b_w )
-{
-	fk1_state *state = device->machine().driver_data<fk1_state>();
 
-	state->m_video_rol = data;
+WRITE8_MEMBER( fk1_state::fk1_ppi_3_b_w )
+{
+	m_video_rol = data;
 }
-static WRITE8_DEVICE_HANDLER (fk1_ppi_3_c_w )
+
+WRITE8_MEMBER( fk1_state::fk1_ppi_3_c_w )
 {
 //  logerror("fk1_ppi_3_c_w %02x\n",data);
 }
 
-static READ8_DEVICE_HANDLER (fk1_ppi_3_a_r )
+READ8_MEMBER( fk1_state::fk1_ppi_3_a_r )
 {
 //  logerror("fk1_ppi_3_a_r\n");
 	return 0;
 }
-static READ8_DEVICE_HANDLER (fk1_ppi_3_b_r )
-{
-	fk1_state *state = device->machine().driver_data<fk1_state>();
 
-	return state->m_video_rol;
+READ8_MEMBER( fk1_state::fk1_ppi_3_b_r )
+{
+	return m_video_rol;
 }
-static READ8_DEVICE_HANDLER (fk1_ppi_3_c_r )
+
+READ8_MEMBER( fk1_state::fk1_ppi_3_c_r )
 {
 //  logerror("fk1_ppi_3_c_r\n");
 	return 0;
 }
+
 static I8255_INTERFACE( fk1_ppi8255_interface_3 )
 {
-	DEVCB_HANDLER(fk1_ppi_3_a_r),
-	DEVCB_HANDLER(fk1_ppi_3_a_w),
-	DEVCB_HANDLER(fk1_ppi_3_b_r),
-	DEVCB_HANDLER(fk1_ppi_3_b_w),
-	DEVCB_HANDLER(fk1_ppi_3_c_r),
-	DEVCB_HANDLER(fk1_ppi_3_c_w)
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_3_a_r),
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_3_a_w),
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_3_b_r),
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_3_b_w),
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_3_c_r),
+	DEVCB_DRIVER_MEMBER(fk1_state, fk1_ppi_3_c_w)
 };
 
-static WRITE_LINE_DEVICE_HANDLER(fk1_pit_out0)
+WRITE_LINE_MEMBER( fk1_state::fk1_pit_out0 )
 {
 	// System time
-	logerror("WRITE_LINE_DEVICE_HANDLER(fk1_pit_out0)\n");
+	logerror("WRITE_LINE_MEMBER(fk1_pit_out0)\n");
 }
 
-static WRITE_LINE_DEVICE_HANDLER(fk1_pit_out1)
+WRITE_LINE_MEMBER( fk1_state::fk1_pit_out1 )
 {
 	// Timeout for disk operation
-	logerror("WRITE_LINE_DEVICE_HANDLER(fk1_pit_out1)\n");
+	logerror("WRITE_LINE_MEMBER(fk1_pit_out1)\n");
 }
 
-static WRITE_LINE_DEVICE_HANDLER(fk1_pit_out2)
+WRITE_LINE_MEMBER( fk1_state::fk1_pit_out2 )
 {
 	// Overflow for disk operations
-	logerror("WRITE_LINE_DEVICE_HANDLER(fk1_pit_out2)\n");
+	logerror("WRITE_LINE_MEMBER(fk1_pit_out2)\n");
 }
 
 
@@ -224,17 +267,17 @@ static const struct pit8253_config fk1_pit8253_intf =
 		{
 			50,
 			DEVCB_NULL,
-			DEVCB_LINE(fk1_pit_out0)
+			DEVCB_DRIVER_LINE_MEMBER(fk1_state, fk1_pit_out0)
 		},
 		{
 			1000000,
 			DEVCB_NULL,
-			DEVCB_LINE(fk1_pit_out1)
+			DEVCB_DRIVER_LINE_MEMBER(fk1_state, fk1_pit_out1)
 		},
 		{
 			0,
 			DEVCB_NULL,
-			DEVCB_LINE(fk1_pit_out2)
+			DEVCB_DRIVER_LINE_MEMBER(fk1_state, fk1_pit_out2)
 		}
 	}
 };
@@ -246,28 +289,28 @@ static const struct pit8253_config fk1_pit8253_intf =
     8 any interruption allowed.
 */
 
-static WRITE8_HANDLER( fk1_intr_w )
+WRITE8_MEMBER( fk1_state::fk1_intr_w )
 {
 	logerror("fk1_intr_w %02x\n",data);
 }
 
-static READ8_HANDLER( fk1_bank_ram_r )
+READ8_MEMBER( fk1_state::fk1_bank_ram_r )
 {
-	address_space *space_mem = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(space->machine().device(RAM_TAG));
+	address_space *space_mem = m_maincpu->memory().space(AS_PROGRAM);
+	UINT8 *ram = ram_get_ptr(machine().device(RAM_TAG));
 
 	space_mem->install_write_bank(0x0000, 0x3fff, "bank1");
-	memory_set_bankptr(space->machine(), "bank1", ram);
-	memory_set_bankptr(space->machine(), "bank2", ram + 0x4000);
+	memory_set_bankptr(machine(), "bank1", ram);
+	memory_set_bankptr(machine(), "bank2", ram + 0x4000);
 	return 0;
 }
 
-static READ8_HANDLER( fk1_bank_rom_r )
+READ8_MEMBER( fk1_state::fk1_bank_rom_r )
 {
-	address_space *space_mem = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space_mem = m_maincpu->memory().space(AS_PROGRAM);
 	space_mem->unmap_write(0x0000, 0x3fff);
-	memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base());
-	memory_set_bankptr(space->machine(), "bank2", ram_get_ptr(space->machine().device(RAM_TAG)) + 0x10000);
+	memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base());
+	memory_set_bankptr(machine(), "bank2", ram_get_ptr(machine().device(RAM_TAG)) + 0x10000);
 	return 0;
 }
 
@@ -279,7 +322,8 @@ static READ8_HANDLER( fk1_bank_rom_r )
     0 - READ
     Functions are allowed in one.
 */
-static WRITE8_HANDLER( fk1_disk_w )
+
+WRITE8_MEMBER( fk1_state::fk1_disk_w )
 {
 //  logerror("fk1_disk_w %02x\n",data);
 }
@@ -293,7 +337,8 @@ static WRITE8_HANDLER( fk1_disk_w )
 1 - / BX, X-axis
 0 - / AX, X-axis
 */
-static READ8_HANDLER( fk1_mouse_r )
+
+READ8_MEMBER( fk1_state::fk1_mouse_r )
 {
 //  logerror("fk1_mouse_r\n");
 	return 0;
@@ -301,29 +346,29 @@ static READ8_HANDLER( fk1_mouse_r )
 
 /*Write to port 70 resets the interrupt from the system clock of 50 Hz. */
 
-static WRITE8_HANDLER( fk1_reset_int_w )
+WRITE8_MEMBER( fk1_state::fk1_reset_int_w )
 {
 	logerror("fk1_reset_int_w\n");
 }
 
-static ADDRESS_MAP_START(fk1_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(fk1_mem, AS_PROGRAM, 8, fk1_state)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fk1_io , AS_IO, 8)
+static ADDRESS_MAP_START(fk1_io, AS_IO, 8, fk1_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write)
-	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE("pit8253", pit8253_r,pit8253_w)
-	AM_RANGE( 0x20, 0x23 ) AM_DEVREADWRITE_MODERN("ppi8255_2", i8255_device, read, write)
+	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r,pit8253_w)
+	AM_RANGE( 0x20, 0x23 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE( 0x30, 0x30 ) AM_READWRITE(fk1_bank_ram_r,fk1_intr_w)
-	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
-	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
+	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE_LEGACY("uart", msm8251_data_r,msm8251_data_w)
+	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE_LEGACY("uart", msm8251_status_r,msm8251_control_w)
 	AM_RANGE( 0x50, 0x50 ) AM_READWRITE(fk1_bank_rom_r,fk1_disk_w)
-	AM_RANGE( 0x60, 0x63 ) AM_DEVREADWRITE_MODERN("ppi8255_3", i8255_device, read, write)
+	AM_RANGE( 0x60, 0x63 ) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)
 	AM_RANGE( 0x70, 0x70 ) AM_READWRITE(fk1_mouse_r,fk1_reset_int_w)
 ADDRESS_MAP_END
 
@@ -344,7 +389,8 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
 	fk1_state *state = timer.machine().driver_data<fk1_state>();
 
-	if (input_port_read(timer.machine(), "LINE0")) {
+	if (input_port_read(timer.machine(), "LINE0"))
+	{
 		state->m_int_vector = 6;
 		cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
 	}
@@ -378,39 +424,34 @@ static TIMER_DEVICE_CALLBACK( vsync_callback )
 }
 
 
-static MACHINE_RESET(fk1)
+MACHINE_RESET_MEMBER( fk1_state )
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
+	UINT8 *ram = ram_get_ptr(machine().device(RAM_TAG));
 
 	space->unmap_write(0x0000, 0x3fff);
-	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base()); // ROM
-	memory_set_bankptr(machine, "bank2", ram + 0x10000); // VRAM
-	memory_set_bankptr(machine, "bank3", ram + 0x8000);
-	memory_set_bankptr(machine, "bank4", ram + 0xc000);
+	memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base()); // ROM
+	memory_set_bankptr(machine(), "bank2", ram + 0x10000); // VRAM
+	memory_set_bankptr(machine(), "bank3", ram + 0x8000);
+	memory_set_bankptr(machine(), "bank4", ram + 0xc000);
 
-	device_set_irq_callback(machine.device("maincpu"), fk1_irq_callback);
+	device_set_irq_callback(machine().device("maincpu"), fk1_irq_callback);
 }
 
-static MACHINE_START( fk1 )
+SCREEN_UPDATE_MEMBER( fk1_state )
 {
-}
-
-static SCREEN_UPDATE( fk1 )
-{
-	fk1_state *state = screen->machine().driver_data<fk1_state>();
 	UINT8 code;
 	int y, x, b;
-	UINT8 *ram = ram_get_ptr(screen->machine().device(RAM_TAG));
+	UINT8 *ram = ram_get_ptr(machine().device(RAM_TAG));
 
 	for (x = 0; x < 64; x++)
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = ram[x * 0x100 + ((y + state->m_video_rol) & 0xff) + 0x10000];
+			code = ram[x * 0x100 + ((y + m_video_rol) & 0xff) + 0x10000];
 			for (b = 0; b < 8; b++)
 			{
-				*BITMAP_ADDR16(bitmap, y, x*8+b) =  ((code << b) & 0x80) ? 1 : 0;
+				*BITMAP_ADDR16(&bitmap, y, x*8+b) =  ((code << b) & 0x80) ? 1 : 0;
 			}
 		}
 	}
@@ -418,14 +459,10 @@ static SCREEN_UPDATE( fk1 )
 }
 
 static MACHINE_CONFIG_START( fk1, fk1_state )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(fk1_mem)
 	MCFG_CPU_IO_MAP(fk1_io)
-
-	MCFG_MACHINE_START(fk1)
-	MCFG_MACHINE_RESET(fk1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -434,11 +471,8 @@ static MACHINE_CONFIG_START( fk1, fk1_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE(fk1)
-
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
-
+	MCFG_PALETTE_INIT(monochrome_green)
 
 	MCFG_PIT8253_ADD( "pit8253", fk1_pit8253_intf )
 	MCFG_I8255_ADD( "ppi8255_1", fk1_ppi8255_interface_1 )
@@ -467,5 +501,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1989, fk1,  0,       0,	fk1,	fk1,	 0, 		 "Statni statek Klicany",   "FK-1",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1989, fk1,    0,      0,       fk1,       fk1,      0,  "Statni statek Klicany", "FK-1", GAME_NOT_WORKING | GAME_NO_SOUND)
 
