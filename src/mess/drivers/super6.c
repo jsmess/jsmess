@@ -10,9 +10,8 @@
 	
 	TODO:
 	
+	- floppy (cannot be implemented currently since this is another case of halting the cpu mid-instruction)
 	- interrupts
-	- terminal input
-	- floppy cold boot error
 	- DMA
 	- peripheral interfaces
 	
@@ -183,7 +182,24 @@ WRITE8_MEMBER( super6_state::bank1_w )
 
 READ8_MEMBER( super6_state::fdc_r )
 {
-	return m_fdc_data;
+	/*
+		
+		bit		description
+		
+		0		
+		1		
+		2		
+		3		
+		4		
+		5		
+		6		
+		7		FDC INTRQ
+
+	*/
+	
+	// TODO reading this port should halt the CPU until an INTRQ or DRQ from the FDC
+
+	return !wd17xx_intrq_r(m_fdc) << 7;
 }
 
 
@@ -207,8 +223,6 @@ WRITE8_MEMBER( super6_state::fdc_w )
 		7		
 
 	*/
-
-	m_fdc_data = data;
 
 	// disk drive select
 	wd17xx_set_drive(m_fdc, data & 0x03);
@@ -335,6 +349,14 @@ INPUT_PORTS_END
 //  Z80CTC_INTERFACE( ctc_intf )
 //-------------------------------------------------
 
+static TIMER_DEVICE_CALLBACK( ctc_tick )
+{
+	super6_state *state = timer.machine().driver_data<super6_state>();
+
+	z80ctc_trg0_w(state->m_ctc, 1);
+	z80ctc_trg0_w(state->m_ctc, 0);
+}
+
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	0,
@@ -381,7 +403,7 @@ static void memory_write_byte(address_space *space, offs_t address, UINT8 data) 
 static Z80DMA_INTERFACE( dma_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_DEVICE_LINE(Z80CTC_TAG, z80ctc_trg2_w),
 	DEVCB_NULL,
 	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_read_byte),
 	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_write_byte),
@@ -414,6 +436,8 @@ WRITE_LINE_MEMBER( super6_state::fr_w )
 {
 	z80dart_rxca_w(m_dart, state);
 	z80dart_txca_w(m_dart, state);
+	
+	z80ctc_trg1_w(m_ctc, state);
 }
 
 static COM8116_INTERFACE( brg_intf )
@@ -447,21 +471,38 @@ static const floppy_config super6_floppy_config =
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( super6_state::intrq_w )
+{
+	// TODO allow CPU to continue reading port 14
+
+	z80ctc_trg3_w(m_ctc, !state);
+}
+
+WRITE_LINE_MEMBER( super6_state::drq_w )
+{
+	// TODO allow CPU to continue reading port 14
+	
+	m_dma->rdy_w(state);
+}
+
 static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(Z80DMA_TAG, z80dma_device, rdy_w),
+	DEVCB_DRIVER_LINE_MEMBER(super6_state, intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(super6_state, drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
 
 //-------------------------------------------------
-//  Z80PIO_INTERFACE( pio_intf )
+//  z80_daisy_config super6_daisy_chain
 //-------------------------------------------------
 
 static const z80_daisy_config super6_daisy_chain[] =
 {
+	{ Z80CTC_TAG },
+	{ Z80DART_TAG },
+	{ Z80PIO_TAG },
 	{ NULL }
 };
 
@@ -470,9 +511,14 @@ static const z80_daisy_config super6_daisy_chain[] =
 //  GENERIC_TERMINAL_INTERFACE( terminal_intf )
 //-------------------------------------------------
 
+static WRITE8_DEVICE_HANDLER( dummy_w )
+{
+	// handled in Z80DART_INTERFACE
+}
+
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_NULL
+	DEVCB_HANDLER(dummy_w)
 };
 
 
@@ -487,6 +533,10 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 void super6_state::machine_start()
 {
+	// state saving
+	save_item(NAME(m_s100));
+	save_item(NAME(m_bank0));
+	save_item(NAME(m_bank1));
 }
 
 
@@ -523,6 +573,7 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_24MHz/4, ctc_intf)
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_24MHz/16))
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_24MHz/4, dart_intf)
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_24MHz/6, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_24MHz/4, pio_intf)

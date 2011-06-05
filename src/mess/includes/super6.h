@@ -67,6 +67,8 @@ public:
 	DECLARE_WRITE8_MEMBER( bank1_w );
 	DECLARE_WRITE8_MEMBER( baud_w );
 	DECLARE_WRITE_LINE_MEMBER( fr_w );
+	DECLARE_WRITE_LINE_MEMBER( intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( drq_w );
 	
 	void bankswitch();
 	
@@ -74,9 +76,6 @@ public:
 	UINT8 m_s100;
 	UINT8 m_bank0;
 	UINT8 m_bank1;
-
-	// floppy state
-	UINT8 m_fdc_data;
 };
 
 #endif
