@@ -5,6 +5,7 @@
         22/11/2009 Skeleton driver.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/scmp/scmp.h"
@@ -17,20 +18,22 @@ public:
 	elekscmp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_WRITE8_MEMBER(hex_display_w);
 };
 
 
-static WRITE8_HANDLER(hex_display_w)
+WRITE8_MEMBER(elekscmp_state::hex_display_w)
 {
-	output_set_digit_value(7-offset, data);
+	output_set_digit_value(offset, data);
 }
 
-static READ8_HANDLER(keyboard_r)
+READ8_MEMBER(elekscmp_state::keyboard_r)
 {
 	return 0;
 }
 
-static ADDRESS_MAP_START(elekscmp_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(elekscmp_mem, AS_PROGRAM, 8, elekscmp_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
 	AM_RANGE(0x000, 0x5ff) AM_ROM // ROM
@@ -49,20 +52,19 @@ static MACHINE_RESET(elekscmp)
 }
 
 static MACHINE_CONFIG_START( elekscmp, elekscmp_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",INS8060, XTAL_4MHz)
-    MCFG_CPU_PROGRAM_MAP(elekscmp_mem)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",INS8060, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(elekscmp_mem)
 
-    MCFG_MACHINE_RESET(elekscmp)
+	MCFG_MACHINE_RESET(elekscmp)
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_elekscmp)
-
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( elekscmp )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	// Too many possible errors, few found and fixed, but not sure if there are more
 	ROM_LOAD( "elbug.001", 0x0000, 0x0200, BAD_DUMP CRC(f733da28) SHA1(b65d98be03eab80478167964beec26bb327bfdf3))
 	ROM_LOAD( "elbug.002", 0x0200, 0x0200, BAD_DUMP CRC(529c0b88) SHA1(bd72dd890cd974e1744ca70aa3457657374cbf76))
@@ -72,5 +74,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1977, elekscmp,  0,       0,	elekscmp,	elekscmp,	 0,  "Elektor Electronics",   "Elektor SC/MP",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1977, elekscmp,  0,   0,       elekscmp,  elekscmp,  0,  "Elektor Electronics", "Elektor SC/MP", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
 
