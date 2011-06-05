@@ -771,7 +771,7 @@ $(DRIVLISTOBJ): $(DRIVLISTSRC)
 
 $(DRIVLISTSRC): $(SRC)/$(TARGET)/$(SUBTARGET).lst $(MAKELIST_TARGET)
 	@echo Building driver list $<...
-	@$(MAKELIST_TARGET) $< >$@
+	@$(MAKELIST) $< >$@
 
 $(OBJ)/%.a:
 	@echo Archiving $@...
