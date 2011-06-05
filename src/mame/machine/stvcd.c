@@ -576,7 +576,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 	case 0x0026:
 //              CDROM_LOG(("WW CR4: %04x\n", data))
 		cr4 = data;
-//      CDROM_LOG(("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat))
+      	printf("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
 		if (!cdrom)
 		{
@@ -741,8 +741,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 
 			// hack for the bootloader
-			cd_stat |= CD_STAT_PERI;
-			cr1 = cd_stat;
+			//cd_stat |= CD_STAT_PERI;
+			//cr1 = cd_stat;
 
 			// and kick the CD if there's more to read
 			cd_playdata();
@@ -1226,6 +1226,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
+			//if(temp == 0xfffff8) /* TODO: Falcom Classics */
+			//	temp = 0;
 			read_new_dir(machine, temp);
 			break;
 
@@ -1235,6 +1237,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
+			//if(temp == 0xfffff8) /* TODO: Falcom Classics */
+			//	temp = 0;
 			cr2 = 0x4101;	// CTRL/track
 			cr3 = (curdir[temp].firstfad>>16)&0xff;
 			cr4 = (curdir[temp].firstfad&0xffff);
@@ -1256,6 +1260,9 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
+
+			//if(temp == 0xfffff8) /* TODO: Falcom Classics */
+			//	temp = 0;
 
 			if (temp == 0xffffff)	// special
 			{
