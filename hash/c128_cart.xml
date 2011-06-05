@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="c128_cart" description="Commodore 128 cartridges">
+	
+	<software name="warpspd" supported="no">
+		<description>C128 Warp Speed v1</description>
+		<year>1987</year>
+		<publisher>Cinemaware</publisher>
+		<part name="cart" interface="c128_cart">
+			<feature name="cart_type" value="warp_speed" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x4000">
+				<!-- address/data lines scrambled 
+					Chip pin --- Cartridge port
+					A0 --------- Y/A0
+					A1 --------- X/A1
+					A2 --------- V/A3
+					A3 --------- U/A4
+					A4 --------- S/A6
+					A5 --------- P/A8
+					A6 --------- M/A10
+					A7 --------- L/A11
+					A8 --------- N/A9
+					A9 --------- R/A7
+					A10 -------- W/A2
+					A11 -------- T/A5
+					A12 -------- J/A13
+					A13 -------- K/A12
+					A14 -------- VCC
+
+					D0 --------- 17/D4
+					D1 --------- 18/D3
+					D2 --------- 20/D1
+					D3 --------- 21/D0
+					D4 --------- 19/D2
+					D5 --------- 16/D5
+					D6 --------- 15/D6
+					D7 --------- 14/D7				
+				-->
+				<rom name="c128warpspeedv1-1987.bin" size="0x4000" crc="986f61b8" sha1="31d7b7f864904deb947db3658d7da691b4db4fc2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="warpspd2" cloneof="warpspd" supported="no">
+		<description>C128 Warp Speed v2</description>
+		<year>1987</year>
+		<publisher>Cinemaware</publisher>
+		<part name="cart" interface="c128_cart">
+			<feature name="cart_type" value="warp_speed" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x4000">
+				<!-- address/data lines scrambled -->
+				<rom name="c128warpspeedv2-1987.bin" size="0x4000" crc="c5dd7720" sha1="062ea091bf085b09ce8ea85a9a498734b9138906" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mach128" supported="no">
+		<description>MACH 128 v.1A</description>
+		<year>1985</year>
+		<publisher>Access Software</publisher>
+		<part name="cart" interface="c128_cart">
+			<feature name="cart_type" value="mach128" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x2000">
+				<rom name="mach_128_v1a.bin" size="0x2000" crc="f91ed380" sha1="6f04d73fcde8b28903075e3adcd2d7ff49d2518a" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="mach_128_utilities.d64" size="174848" crc="5fb309f5" sha1="2f5e6c5c028654500425be7a703ba5d9bf72bdab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mach128_2a" cloneof="mach128" supported="no">
+		<description>MACH 128 v.2A</description>
+		<year>1985</year>
+		<publisher>Access Software</publisher>
+		<part name="cart" interface="c128_cart">
+			<feature name="cart_type" value="mach128" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x2000">
+				<rom name="mach_128_v2a.bin" size="0x2000" crc="fc60d92e" sha1="7f487134d314b4c5158954ad057e01c0da32a468" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="mach_128_utilities.d64" size="174848" crc="5fb309f5" sha1="2f5e6c5c028654500425be7a703ba5d9bf72bdab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

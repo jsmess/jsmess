@@ -173,7 +173,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="epyxfast" supported="no">
-		<description>Fast Load Cartridge</description>
+		<description>Fast Load Cartridge v2</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
 		<!--
@@ -184,11 +184,28 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 
 			<dataarea name="rom" size="0x2000">
-				<rom name="fastload.bin" size="0x2000" crc="dbe0a98c" sha1="83f296bb4d49781ac369469e3b5e862d2e57c303" offset="0x0000" />
+				<rom name="fastload_v2.bin" size="0x2000" crc="dbe0a98c" sha1="83f296bb4d49781ac369469e3b5e862d2e57c303" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="epyxfast1" cloneof="epyxfast" supported="no">
+		<description>Fast Load Cartridge v1</description>
+		<year>1984</year>
+		<publisher>Epyx</publisher>
+		<!--
+		-->
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="epyx_fast_load" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x2000">
+				<rom name="fastload_v1.bin" size="0x2000" crc="116ee31f" sha1="d1dd56a4e682c4726333f1bb7a7e783af617a750" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="ps64" supported="no">
 		<description>PS-64 puhemoduli v2.0 (Fin)</description>
 		<year>1988</year>
@@ -822,6 +839,110 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 
+	<software name="mach5" supported="no">
+		<description>MACH 5 v.1A</description>
+		<year>1985</year>
+		<publisher>Access Software</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="mach5" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x2000">
+				<rom name="mach_5_v1a.bin" size="0x2000" crc="46c0a547" sha1="fb30893f80abb0e7463adbda979e0ebe386022e8" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mach5_v1b1" cloneof="mach5" supported="no">
+		<description>MACH 5 v.1B</description>
+		<year>1985</year>
+		<publisher>Access Software</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="mach5" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x2000">
+				<rom name="mach_5_v1b_v1.bin" size="0x1000" crc="f1444e48" sha1="4236ad371a5df7046e770b858291b42fe14b8a18" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mach5_v1b2" cloneof="mach5" supported="no">
+		<description>MACH 5 v.1B (Alt)</description>
+		<year>1985</year>
+		<publisher>Access Software</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="mach5" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x2000">
+				<rom name="mach_5_v1b_v2.bin" size="0x2000" crc="c320e154" sha1="59de7347b61d39cfd0b89306e9e898b1452d3a20" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mach5_v2a" cloneof="mach5" supported="no">
+		<description>MACH 5 v.2A</description>
+		<year>1985</year>
+		<publisher>Access Software</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="mach5" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x2000">
+				<rom name="mach_5_v2a.bin" size="0x2000" crc="8d5b2d06" sha1="2b53dd5d6cf46fd7c90f4e2c4300d5d5bb970014" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mach5_v3" cloneof="mach5" supported="no">
+		<description>MACH 5 v3.A</description>
+		<year>1985</year>
+		<publisher>Access Software</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="mach5" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x2000">
+				<rom name="mach_5_v3a.bin" size="0x2000" crc="c2449aea" sha1="99b702275373480269cde747e774d54ca5d2e1dd" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stardos" supported="no">
+		<description>Stardos</description>
+		<year>1986</year>
+		<publisher>Starpoint Software</publisher>
+		<!--
+		|===========================|
+		|=|                         |
+		|=|   LS30                  |
+		|=|               LS157     |
+		|=|          LS00           |
+		|=|   ROM                   |
+		|=|          7407           |
+		|=|                         |
+		|=|                      SW1|
+		|===========================|
+		
+		ROM     - Toshiba TMM271128D-25 16Kx8 EPROM
+		-->
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="stardos" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x4000">
+				<rom name="stardos.bin" size="0x4000" crc="feda3c5d" sha1="8a6851ae17f99d2b76f7548119c20eb7f68326da" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<!-- Games Added by k1w1 -->
 	
 	<software name="advcrtor">
@@ -3971,28 +4092,46 @@ http://www.retroport.de/C64_C128_Hardware.html
 		</part>
 	</software>
 	
-	<software name="c64warp2" supported="no">
-		<description>C-64 Warpspeed v2.0</description>
-		<year>1987</year>
-		<publisher>Alien Technology</publisher>
+	<software name="warpspd" supported="no">
+		<description>Warp Speed v2.0</description>
+		<year>1988</year>
+		<publisher>Cinemaware</publisher>
+		<info name="developer" value="Alien Technology" />
+		<!--
+		|===================|
+		|=|             SW1 |
+		|=|                 |
+		|=|             SW2 |
+		|=|                 |
+		|=|                 |
+		|=|    ROM          |
+		|=|            LS109|
+		|=|                 |
+		|===================|
+		
+		ROM     - "DEI-356NR-WRPIIDA1 (C) NCR A8847 609-2415038 F833071" 16Kx8 ROM
+		SW1     - mode switch (C64/C128)
+		SW2     - reset button
+		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="cart_type" value="warpspeed" />
-			<feature name="exrom" value="1" />
+			<feature name="cart_type" value="warp_speed" />
 			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="c-64 warpspeed! v2.0 (1987)(alien technology).80" size="0x4000" crc="6f3bba10" sha1="7d80ba999cd6dbffe42bdea8485fcdcaad503f8d" offset="0x0000" />
+				<rom name="dei-356nr-wrpiida1.u2" size="0x4000" crc="6f3bba10" sha1="7d80ba999cd6dbffe42bdea8485fcdcaad503f8d" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 	
-	<software name="c64warp1" cloneof="c64warp2" supported="no">
-		<description>C-64 Warpspeed v1.0</description>
+	<software name="warpspd1" cloneof="warpspd" supported="no">
+		<description>Warp Speed v1.0</description>
 		<year>1987</year>
-		<publisher>Alien Technology</publisher>
+		<publisher>Cinemaware</publisher>
+		<info name="developer" value="Alien Technology" />
 		<part name="cart" interface="c64_cart">
-			<feature name="cart_type" value="warpspeed" />
-			<feature name="exrom" value="1" />
+			<feature name="cart_type" value="warp_speed" />
 			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
 			<dataarea name="roml" size="0x4000">
 				<rom name="c-64 warpspeed! v1.0 (1987)(alien technology).80" size="0x4000" crc="632aa2d7" sha1="8f4b9954bce6d739cf5dd2fbd402e0ececefd3b5" offset="0x0000" />
 			</dataarea>
