@@ -1381,7 +1381,7 @@ The software list will be divided in four categories:
 			<feature name="cart_model" value="SNSP-006(-01)" />
 			<feature name="cart_back_label" value="820661" />
 			<dataarea name="rom" size="2097152">
-				<rom name="fifa_97_pal.u1" size="2097152" crc="470eabe5" sha1="685cf7781356a0e354b3dd10fabba898885ba81b" offset="0x000000" />
+				<rom name="fifa 97 pal.u1" size="2097152" crc="470eabe5" sha1="685cf7781356a0e354b3dd10fabba898885ba81b" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -2558,7 +2558,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="porkypigu" cloneof="porkypig">
-		<!-- Serial: SNS-KX-USA --> <!-- Typo? The proper serial should be SNS-APPE-USA -->
+		<!-- Serial: SNS-KX-USA, this is a wrong serial in Majesco re-release, proper serial is SNS-APPE-USA -->
 		<description>Porky Pig's Haunted Holiday (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -3472,6 +3472,27 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="sf2tu" cloneof="sf2t">
+		<!-- Serial: SNS-TI-USA - Release Date: 1993-08 -->
+		<description>Street Fighter II Turbo - Hyper Fighting (USA)</description>
+		<year>1993</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="unknown" />
+			<dataarea name="rom" size="2621440">
+				<rom name="sns-ti-0 p0.u1" size="2097152" crc="bd9d41e0" sha1="c905ee39982ec4ffe8092ef1c0f8dfd8809575b7" offset="0x000000" />
+				<rom name="sns-ti-0 p3.u2" size="524288"  crc="6056387f" sha1="31d0f2276b124bee206695ac6b2048918c25efcc" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sf2tj" cloneof="sf2t">
 		<!-- Serial: SHVC-TI - Release Date: 1993-07-10 - Alt. Title: ストリートファイターII ターボ - Notes: Also re-released through Nintendo Power -->
 		<description>Street Fighter II Turbo - Hyper Fighting (Jpn)</description>
@@ -3488,7 +3509,7 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2621440">
 				<rom name="shvc-ti-0 p0.u1" size="2097152" crc="62704671" sha1="acac25bbd0cfb69b38805774566c379daf055873" offset="0x000000" />
-				<rom name="shvc-ti-0 p1.u2" size="524288"  crc="6056387f" sha1="31d0f2276b124bee206695ac6b2048918c25efcc" offset="0x200000" />
+				<rom name="shvc-ti-0 p3.u2" size="524288"  crc="6056387f" sha1="31d0f2276b124bee206695ac6b2048918c25efcc" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4021,9 +4042,33 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="unknown" />
 			<dataarea name="rom" size="1572864">
 				<rom name="sns-e5 p0.u1" size="1048576" crc="d1bc210a" sha1="fb6ea273a07de7b8c8bfbf44ac71268d94e9bc10" offset="0x000000" />
 				<rom name="sns-e5 p1.u2" size="524288"  crc="41b79a31" sha1="bc5660e78211cb7a44caf03b9568465255fd97fd" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssf2u" cloneof="ssf2">
+		<!-- Serial: SNS-XW-USA - Release Date: 1994-06 -->
+		<description>Super Street Fighter II - The New Challengers (USA)</description>
+		<year>1994</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_revision" value="none" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
+			<dataarea name="rom" size="4194304">
+				<rom name="sns-xw-0 p0.u1" size="2097152" crc="4939be29" sha1="0c9cb553f2bb713ea9ba5a6849babe79a299ba52" offset="0x000000" />
+				<rom name="sns-xw-0 p1.u2" size="2097152" crc="e4ed8b6a" sha1="a5b091c5089509285ba03813c38bcb8917c62441" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32761,18 +32806,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="sf2tu" cloneof="sf2t">
-		<!-- Serial:  - Release Date: 1993-08 -->
-		<description>Street Fighter II Turbo (USA)</description>
-		<year>1993</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2621440">
-				<rom name="street fighter ii turbo (usa).sfc" size="2621440" crc="a45cadd6" sha1="bd88a3189a34f1e652fe03d8e11a0ae9c0dadfa6" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sfz2" cloneof="sfa2">
 		<!-- Serial: SHVC-AUZJ - Release Date: 1996-12-20 - Alt. Title: ストリートファイターZERO2 -->
 		<description>Street Fighter Zero 2 (Jpn)</description>
@@ -37016,18 +37049,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="super street fighter ii (europe).sfc" size="4194304" crc="6d86bfb0" sha1="a6ffef36948854bece1266b78224daf3e64ca47e" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ssf2u" cloneof="ssf2">
-		<!-- Serial:  - Release Date: 1994-06 -->
-		<description>Super Street Fighter II (USA)</description>
-		<year>1994</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="super street fighter ii (usa).sfc" size="4194304" crc="f16d5ce9" sha1="8e67787988024503c4adeadd5fe50a340aa860d7" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
