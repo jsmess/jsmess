@@ -149,8 +149,12 @@ const char *attotime::as_string(int precision) const
 	static int nextbuf;
 	char *buffer = &buffers[nextbuf++ % 8][0];
 
+	// special case: never
+	if (*this == never)
+		sprintf(buffer, "%-*s", precision, "(never)");
+
 	// case 1: we want no precision; seconds only
-	if (precision == 0)
+	else if (precision == 0)
 		sprintf(buffer, "%d", seconds);
 
 	// case 2: we want 9 or fewer digits of precision

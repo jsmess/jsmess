@@ -727,7 +727,7 @@ private:
 class input_type_entry
 {
 	friend class simple_list<input_type_entry>;
-	
+
 public:
 	input_type_entry(UINT32 type, ioport_group group, int player, const char *token, const char *name, input_seq standard);
 	input_type_entry(UINT32 type, ioport_group group, int player, const char *token, const char *name, input_seq standard, input_seq decrement, input_seq increment);
@@ -937,7 +937,7 @@ void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, astring &er
 
 /* note that PORT_CENTERDELTA must appear after PORT_KEYDELTA */
 #define PORT_CENTERDELTA(_delta) \
-	curfield->delta = curfield->centerdelta = _delta;
+	curfield->centerdelta = _delta;
 
 #define PORT_CROSSHAIR(axis, scale, offset, altaxis) \
 	curfield->crossaxis = CROSSHAIR_AXIS_##axis; \

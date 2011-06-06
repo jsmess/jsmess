@@ -2886,7 +2886,7 @@ input_field_config::input_field_config(input_port_config &port, int _type, input
 	memset(&condition, 0, sizeof(condition));
 	for (int seqtype = 0; seqtype < ARRAY_LENGTH(seq); seqtype++)
 		seq[seqtype].set_default();
-	chars[0] = chars[1] = chars[2] = (unicode_char) 0;		
+	chars[0] = chars[1] = chars[2] = (unicode_char) 0;
 }
 
 
@@ -2991,6 +2991,7 @@ void diplocation_list_alloc(input_field_config &field, const char *location, ast
 	field.diploclist().reset();
 
 	/* parse the string */
+	astring name; // Don't move this variable inside the loop, lastname's lifetime depends on it being outside
 	const char *lastname = NULL;
 	const char *curentry = location;
 	int entries = 0;
@@ -3010,7 +3011,6 @@ void diplocation_list_alloc(input_field_config &field, const char *location, ast
 		const char *colon = strchr(tempstr, ':');
 
 		/* allocate and copy the name if it is present */
-		astring name;
 		if (colon != NULL)
 		{
 			lastname = name.cpy(number, colon - number);

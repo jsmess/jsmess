@@ -576,8 +576,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 	case 0x0026:
 //              CDROM_LOG(("WW CR4: %04x\n", data))
 		cr4 = data;
-		if(cr1 != 0)
-      	printf("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
+		if(cr1 != 0 && 0)
+    		printf("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
 		if (!cdrom)
 		{
@@ -814,7 +814,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 		case 0x1100: // disc seek
 			CDROM_LOG(("%s:CD: Disc seek\n",   machine.describe_context()))
-			printf("%08x %08x %08x %08x\n",cr1,cr2,cr3,cr4);
+			//printf("%08x %08x %08x %08x\n",cr1,cr2,cr3,cr4);
 			if (cr1 & 0x80)
 			{
 				temp = (cr1&0xff)<<16;	// get FAD to seek to
@@ -1891,7 +1891,7 @@ static void cd_playdata(void)
 	{
 		if (fadstoplay)
 		{
-       		logerror("STVCD: Reading FAD %d\n", cd_curfad);
+    		logerror("STVCD: Reading FAD %d\n", cd_curfad);
 
 			if (cdrom)
 			{

@@ -1300,6 +1300,23 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
+/* Super Ball */
+ROM_START( suprball )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80  Code */
+	ROM_LOAD( "superball.rom1", 0x00000, 0x40000, CRC(6134ec14) SHA1(4e48c1cac7bba8ec1453d4285cc2adf431b7d3d2) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "superball.rom2", 0x00000, 0x40000, CRC(8f4512bf) SHA1(e5f44624ba25cef8e38b752cb300a8bc259db3ec) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "superball.rom3", 0x00000, 0x80000, CRC(087a85a7) SHA1(c6c0945c5c591a20f709b2afff79c5f7bed7fa66) )
+	ROM_LOAD16_BYTE( "superball.rom4", 0x00001, 0x80000, CRC(811a1328) SHA1(ae012dcaf4c953b3f7fd45a70a4385cae4b7363b) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "superball.rom5", 0x00000, 0x80000, CRC(86bf2c84) SHA1(b8fdc5942a6f01ccdd41e3461d886bf285666355) )
+	ROM_LOAD16_BYTE( "superball.rom6", 0x00001, 0x80000, CRC(83d1fbb0) SHA1(80d67062a9ac2a28b47302481c3a692ac1a6a280) )
+ROM_END
+
 
 /* Skill Fruit Bonus */
 ROM_START( sfbonus )
@@ -5008,58 +5025,52 @@ ROM_START( fb6v2 )
 	ROM_LOAD_OPTIONAL( "fb617lt.id", 0x00, 0x20, CRC(9903b0a6) SHA1(840873524b1cc33539926655ef94d23f6b219f76) )
 ROM_END
 
-ROM_START( fb6s1 ) /* "Compact" PCB, the surface mounted roms haven't been dumped yet */
+ROM_START( fb6s1 ) /* Compact PCB version */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06s17r.bin", 0x00000, 0x40000, CRC(679747d1) SHA1(ca702324c436d54f4c23350b1af4f0250915883c) )
 
-	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "a29040bv.rom2", 0x00000, 0x40000, BAD_DUMP CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) ) /* dump is from a non compact PCB */
+	ROM_REGION( 0x080010, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "rom2.bin", 0x00000, 0x080010, CRC(b940a9b1) SHA1(944eb41b9bbf293a476d96fda0ad19710cbc970f) ) /* Surface mounted AMIC A29040BV */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "mx29lv400ttc.rom3", 0x00000, 0x080000, NO_DUMP )
-	ROM_LOAD16_BYTE( "fb06rom3.bin", 0x00000, 0x40000, CRC(63159a3a) SHA1(77e5801506ea58df73c406c8675dc8c06ba92313) ) /* Use these for now so we can see something */
-	ROM_LOAD16_BYTE( "fb06rom4.bin", 0x00001, 0x40000, CRC(e4f4f04e) SHA1(412cfec7235455c09cffde5ca05c3e2fe4a040a0) )
+	ROM_LOAD( "rom3.bin", 0x00000, 0x080000, CRC(4c2f9729) SHA1(2dd3ef0b90ab22caaafb412fa4bec4aa395bb718) ) /* Surface mounted MX29LV400TTC */
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "mx29lv400ttc.rom4", 0x00000, 0x080000, NO_DUMP )
+	ROM_LOAD( "rom4.bin", 0x00000, 0x080000, CRC(2310a5f1) SHA1(3ca7745f0aa79de03942e87a6a7d669dcd156af3) ) /* Surface mounted MX29LV400TTC */
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
 	ROM_LOAD_OPTIONAL( "fb617re.id", 0x00, 0x20, CRC(132908c4) SHA1(4e4c58327a181c511c8144349432a178936a997f) )
 ROM_END
 
-ROM_START( fb6s2 ) /* "Compact" PCB, the surface mounted roms haven't been dumped yet */
+ROM_START( fb6s2 ) /* Compact PCB version */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06s17lt.bin", 0x00000, 0x40000, CRC(2008a56f) SHA1(1dec4818c49cd63cc29fcb5abdab7a256731ae7b) )
 
-	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "a29040bv.rom2", 0x00000, 0x40000, BAD_DUMP CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) ) /* dump is from a non compact PCB */
+	ROM_REGION( 0x080010, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "rom2.bin", 0x00000, 0x80010, CRC(b940a9b1) SHA1(944eb41b9bbf293a476d96fda0ad19710cbc970f) ) /* Surface mounted AMIC A29040BV */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "mx29lv400ttc.rom3", 0x00000, 0x080000, NO_DUMP )
-	ROM_LOAD16_BYTE( "fb06rom3.bin", 0x00000, 0x40000, CRC(63159a3a) SHA1(77e5801506ea58df73c406c8675dc8c06ba92313) ) /* Use these for now so we can see something */
-	ROM_LOAD16_BYTE( "fb06rom4.bin", 0x00001, 0x40000, CRC(e4f4f04e) SHA1(412cfec7235455c09cffde5ca05c3e2fe4a040a0) )
+	ROM_LOAD( "rom3.bin", 0x00000, 0x080000, CRC(4c2f9729) SHA1(2dd3ef0b90ab22caaafb412fa4bec4aa395bb718) ) /* Surface mounted MX29LV400TTC */
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "mx29lv400ttc.rom4", 0x00000, 0x080000, NO_DUMP )
+	ROM_LOAD( "rom4.bin", 0x00000, 0x080000, CRC(2310a5f1) SHA1(3ca7745f0aa79de03942e87a6a7d669dcd156af3) ) /* Surface mounted MX29LV400TTC */
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
 	ROM_LOAD_OPTIONAL( "fb617lt.id", 0x00, 0x20, CRC(9903b0a6) SHA1(840873524b1cc33539926655ef94d23f6b219f76) )
 ROM_END
 
-ROM_START( fb6s3 ) /* "Compact" PCB, the surface mounted roms haven't been dumped yet */
+ROM_START( fb6s3 ) /* Compact PCB version */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06s13r.bin", 0x00000, 0x40000, CRC(93ba8c7c) SHA1(905572e98bd01c4db597ee30afbe5f9cb1b114ed) )
 
-	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "a29040bv.rom2", 0x00000, 0x40000, BAD_DUMP CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) ) /* dump is from a non compact PCB */
+	ROM_REGION( 0x080010, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "rom2.bin", 0x00000, 0x080010, CRC(b940a9b1) SHA1(944eb41b9bbf293a476d96fda0ad19710cbc970f) ) /* Surface mounted AMIC A29040BV */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "mx29lv400ttc.rom3", 0x00000, 0x080000, NO_DUMP )
-	ROM_LOAD16_BYTE( "fb06rom3.bin", 0x00000, 0x40000, CRC(63159a3a) SHA1(77e5801506ea58df73c406c8675dc8c06ba92313) ) /* Use these for now so we can see something */
-	ROM_LOAD16_BYTE( "fb06rom4.bin", 0x00001, 0x40000, CRC(e4f4f04e) SHA1(412cfec7235455c09cffde5ca05c3e2fe4a040a0) )
+	ROM_LOAD( "rom3.bin", 0x00000, 0x080000, CRC(4c2f9729) SHA1(2dd3ef0b90ab22caaafb412fa4bec4aa395bb718) ) /* Surface mounted MX29LV400TTC */
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "mx29lv400ttc.rom4", 0x00000, 0x080000, NO_DUMP )
+	ROM_LOAD( "rom4.bin", 0x00000, 0x080000, CRC(2310a5f1) SHA1(3ca7745f0aa79de03942e87a6a7d669dcd156af3) ) /* Surface mounted MX29LV400TTC */
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
 	ROM_LOAD_OPTIONAL( "fb6130r.id", 0x00, 0x20, CRC(959969d1) SHA1(885b4708fb459c96ead67ae911e5296adc148ee3) )
@@ -5865,6 +5876,7 @@ static DRIVER_INIT(sfruitb) { sfbonus_bitswap(machine,    0x3e, 2,1,7,6,5,4,3,0,
 static DRIVER_INIT(sfruitbd) { sfbonus_bitswap(machine,   0x3e, 1,0,7,6,5,4,3,2, 0xed, 1,7,6,5,4,3,0,2, 0x25, 2,0,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3c, 0,1,7,6,5,4,3,2, 0xed, 2,7,6,5,4,3,1,0, 0x25, 2,0,1,7,6,5,4,3, 0xae, 4,3,1,2,0,7,6,5); }
 static DRIVER_INIT(sfruitbv) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x25, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 static DRIVER_INIT(sfruitbv2) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x25, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x25, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(suprball) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xe7, 4,7,6,5,0,3,1,2, 0x33, 0,2,1,7,6,5,4,3, 0xb3, 0,3,4,2,1,7,6,5, 0x2a, 1,3,7,6,5,2,0,4, 0xe4, 3,7,6,5,2,0,4,1, 0x2d, 4,1,3,7,6,5,2,0, 0xb6, 0,3,2,1,4,7,6,5); }
 static DRIVER_INIT(tighook) { sfbonus_bitswap(machine,    0x33, 0,1,7,6,5,2,3,4, 0xf3, 3,7,6,5,1,0,4,2, 0x2e, 4,0,2,7,6,5,3,1, 0xa7, 1,0,4,2,3,7,6,5, 0x2d, 1,2,7,6,5,3,4,0, 0xff, 2,7,6,5,1,0,3,4, 0x27, 1,0,2,7,6,5,3,4, 0xa7, 1,0,4,2,3,7,6,5); }
 static DRIVER_INIT(tighookd) { sfbonus_bitswap(machine,   0x3d, 0,1,7,6,5,4,3,2, 0xed, 1,7,6,5,4,3,0,2, 0x26, 2,1,0,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3c, 1,0,7,6,5,4,3,2, 0xed, 2,7,6,5,4,3,1,0, 0x26, 2,1,0,7,6,5,4,3, 0xae, 4,3,1,2,0,7,6,5); }
 static DRIVER_INIT(tighookv) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x26, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xec, 0,7,6,5,4,3,2,1, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
@@ -5886,6 +5898,7 @@ static DRIVER_INIT(fb3g)       { sfbonus_bitswap(machine, 0x39, 1,2,7,6,5,4,3,0,
 static DRIVER_INIT(getrich)   { sfbonus_bitswap(machine,  0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x23, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,2,0, 0x24, 0,2,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
 
 
+GAME( 2002, suprball,    0,        sfbonus,    amcoe2_reels3,    suprball,        ROT0,  "Amcoe", "Super Ball (Version 1.3)", 0)
 
 GAME( 2003, sfbonus,     0,        sfbonus,    amcoe2_reels3,    sfbonus,         ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 1)", 0)
 GAME( 2003, sfbonusd1,   sfbonus,  sfbonus,    amcoe1_reels3,    sfbonusd,        ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 2)", 0)
@@ -6107,13 +6120,13 @@ GAME( 2005, fb5v,        fb5,      sfbonus,    amcoe1_reels3,    fb5v,          
 
 GAME( 2006, fb6,         0,        sfbonus,    amcoe1_reels3,    fb6,             ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7E CGA)", 0)
 GAME( 2006, fb6v,        fb6,      sfbonus,    amcoe1_reels3,    fb6v3,           ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7E Dual)", 0)
-GAME( 2006, fb6d1,       fb6,      sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R CGA, set 1)", 0)
-GAME( 2006, fb6s1,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R CGA, set 2)", GAME_NOT_WORKING) // no reel gfx
+GAME( 2006, fb6d1,       fb6,      sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R CGA)", 0)
+GAME( 2006, fb6s1,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R CGA, Compact PCB)", 0)
 GAME( 2006, fb6v1,       fb6,      sfbonus,    amcoe1_reels3,    fb6v,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R Dual)", 0)
-GAME( 2006, fb6d2,       fb6,      sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA, set 1)", 0)
-GAME( 2006, fb6s2,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA, set 2)", GAME_NOT_WORKING) // no reel gfx
+GAME( 2006, fb6d2,       fb6,      sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA)", 0)
+GAME( 2006, fb6s2,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA, Compact PCB)", 0)
 GAME( 2006, fb6v2,       fb6,      sfbonus,    amcoe1_reels3,    fb6v,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT Dual)", 0)
-GAME( 2006, fb6s3,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.3R CGA)", GAME_NOT_WORKING) // no reel gfx
+GAME( 2006, fb6s3,       fb6,      sfbonus,    amcoe1_reels3,    fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.3R CGA, Compact PCB)", 0)
 
 GAME( 2006, fb6se,       0,        sfbonus,    amcoe1_reels3,    fb6,             ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4E CGA)", 0) /* Released August 2006 according to Amcoe web site */
 GAME( 2006, fb6sev,      fb6se,    sfbonus,    amcoe1_reels3,    fb6v3,           ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4E Dual)", 0)
@@ -6160,7 +6173,6 @@ GAME( 200?, getrich,     0,        sfbonus,    amcoe1_reels3,    getrich,       
 
 // Known sets but no roms dumped at all for these:
 // Merry Circus
-// Super Ball (skill game)
 // Devil Island - 14 Liner version
 // Fruit Bonus 2010 (or is this on the older goldstar.c style hardware)
 
