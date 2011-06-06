@@ -61,6 +61,7 @@ Software Lists:
 - coco: added cart softlist [K1W1]
 - super6 : Added software list. [Curt Coder]
 - snes.xml: softlist wip [Lord Nightmare]
+- snes.xml: softlist wip documentation and redump [MESSfan]
 
 Source Changes:
 ----------------
