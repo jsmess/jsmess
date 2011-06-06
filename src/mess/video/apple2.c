@@ -226,7 +226,7 @@ static void apple2_hires_draw(running_machine &machine, bitmap_t *bitmap, const 
 	int row, col, b;
 	int offset;
 	int columns;
-	UINT8 vram_row[82];
+	UINT8 vram_row[81];
 	UINT16 v;
 	UINT16 *p;
 	UINT32 w;
@@ -245,7 +245,7 @@ static void apple2_hires_draw(running_machine &machine, bitmap_t *bitmap, const 
 	columns		= ((effective_a2(state) & (VAR_DHIRES|VAR_80COL)) == (VAR_DHIRES|VAR_80COL)) ? 80 : 40;
 
 	vram_row[0] = 0;
-	vram_row[columns + 1] = 0;
+	vram_row[columns] = 0;
 
 	for (row = beginrow; row <= endrow; row++)
 	{
@@ -256,12 +256,12 @@ static void apple2_hires_draw(running_machine &machine, bitmap_t *bitmap, const 
 			switch(columns)
 			{
 				case 40:
-					vram_row[1+col] = vram[offset];
+					vram_row[col] = vram[offset];
 					break;
 
 				case 80:
-					vram_row[1+(col*2)+0] = vram[offset + 0x10000];
-					vram_row[1+(col*2)+1] = vram[offset + 0x00000];
+					vram_row[(col*2)+0] = vram[offset + 0x10000];
+					vram_row[(col*2)+1] = vram[offset + 0x00000];
 					break;
 
 				default:
@@ -271,6 +271,8 @@ static void apple2_hires_draw(running_machine &machine, bitmap_t *bitmap, const 
 		}
 
 		p = BITMAP_ADDR16(bitmap, row, 0);
+		bool artifacting = false;
+		int x = 0;
 
 		for (col = 0; col < columns; col++)
 		{
@@ -281,6 +283,7 @@ static void apple2_hires_draw(running_machine &machine, bitmap_t *bitmap, const 
 			switch(columns)
 			{
 				case 40:
+				{
 					w = vram_row[col+0];
 					artifact_idx = 0;
 					for (b = 0; b < 7; b++)
@@ -291,33 +294,42 @@ static void apple2_hires_draw(running_machine &machine, bitmap_t *bitmap, const 
 						artifact_buf[artifact_idx++] = v ? WHITE : BLACK;
 					}
 
-					for(int a = 0; a < 14; a++)
+					int start = 0;
+
+					if (vram_row[col] & 0x80)
 					{
-						int idx = a + (14 - (vram_row[col+0] >> 7));
-						idx %= 14;
-						*(p++) = artifact_buf[idx];
+						if (x < 560)
+						{
+							UINT16 last = *(p - 1);
+							*(p++) = last;
+							x++;
+						}
+						artifacting = true;
+						start = 1;
+					}
+
+					for(int a = 0; a < 14 - start; a++)
+					{
+						if(x < 560)
+						{
+							*(p++) = artifact_buf[a];
+							x++;
+						}
 					}
 					break;
+				}
 
 				case 80:
-					if (state->m_monochrome_dhr)
+				{
+					w = vram_row[col+0];
+					for (b = 0; b < 7; b++)
 					{
-						for (b = 0; b < 7; b++)
-						{
-							v = (w & 1);
-							w >>= 1;
-							*(p++) = v ? WHITE : BLACK;
-						}
-					}
-					else
-					{
-						for (b = 0; b < 7; b++)
-						{
-							v = state->m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
-							*(p++) = v;
-						}
+						v = (w & 1);
+						w >>= 1;
+						*(p++) = v ? WHITE : BLACK;
 					}
 					break;
+				}
 
 				default:
 					fatalerror("Invalid column count");
