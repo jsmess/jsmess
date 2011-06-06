@@ -1,4 +1,87 @@
-﻿0.142u4
+﻿0.142u5
+
+New System Drivers Supported:
+-----------------------------
+ - Fujitsu FM-8 [Barry Rodewald]
+
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+ - Sharp MZ-6500 [Angelo Salese]
+ - Casio FP-1100 [Angelo Salese]
+ - Casio FP-6000 [Angelo Salese]
+ - Hitachi B16 [Angelo Salese]
+ - NEC PC-100 [Angelo Salese]
+ - Fujitsu FM-11 EX, Fujitsu FM-16 Beta.  [Barry Rodewald]
+ - IBM5550 [Angelo Salese]
+ - OKI if800 model 60 [Angelo Salese]
+ - Mitsubishi Multi 16 [Angelo Salese]
+ - Toshiba Pasopia [Angelo Salese]
+ - ADC Super Six SBC. [Curt Coder, Al Kossow]
+ - Pasopia 1600 [Angelo Salese]
+ - Matsushita MyBrain 3000 [Angelo Salese]
+
+
+System Driver Changes:
+----------------------
+- bbc : Convert the BBC drivers to use mames mc6845, 
+	graphics modes are working good, still missing the cursor, 
+	missing split screen support, and MODE 7 is shifted a 
+	couple of characters to the right. Removed the old 
+	src/mess/video/m6845.c [GordonJ]
+- saturn: verified saturn bios 1.01 labels [ElBarto]
+- neocd: added front loading neogeo cd dump [furrtek]
+- PlayStation GPU splits 4 point polygons into triangles. [smf]
+- saturn : Moved intback command inside a timer and hooked up SMPC 
+	direct mode inputs in Sega Saturn, allows it to load the CD 
+	menu and makes the diagnostic cart to be operational [Angelo Salese]
+- coco : Fixed floppy index pulse. [Curt Coder]
+- prof80g52: Added ROM banking and HD6345 CRTC. [Curt Coder]
+- Added PAL timing support for Sega Saturn [Angelo Salese]
+- sega sms : Add proper rom name/location 
+	for japanese v2.1 bios. [Lord Nightmare, ElBarto, SMSPower]
+- Implemented CART DRAM emulation in Sega Saturn [Angelo Salese]
+- sms : More SMS rom name corrections and comment updates.
+	[Lord Nightmare, SMSPower]
+- sms Added a few more rom labels for SMS bioses. [Lord Nightmare, SMSPower]
+- Unknown alt romset for IBM PC JX [Angelo Salese]
+- pc9801 : Added 2hdif.rom dump [Angelo Salese]
+- at: added Award 3.03 bios [Darkstar]
+- pc: added zenith 2.9e bios [Darkstar]
+
+Software Lists:
+----------------
+- apple2.xml: TOSEC mis-labeled a couple of DOS 3.3 versions, 
+	fixed that, also set display names properly. [R. Belmont]
+- apple2: Enabled usage of softlist for Apple II series [R. Belmont]
+- coco: added cart softlist [K1W1]
+- super6 : Added software list. [Curt Coder]
+- snes.xml: softlist wip [Lord Nightmare]
+
+Source Changes:
+----------------
+- MESSUI - finished adding HLSL sliders per game. The settings 
+	will be saved if your system is set up correctly. Note the 
+	page will be greyed out if D3D version 9 is not selected. 
+	Another note: The Defaults and Reset buttons don't do anything yet. [Robbbert]
+- MESSUI - fixed the 5 sliders on the Display sheet. [Robbbert]
+- MESSUI - advanced sheet - fixed frameskip. [Robbbert]
+- MESSUI - Sound property sheet - fixed Audio Latency slider. [Robbbert]
+- MESSUI - Screen property sheet - fixed Number of Screens slider. [Robbbert]
+- MESSUI - Advanced property sheet - fixed 3 full-screen sliders.  [Robbbert]
+	Fixed typo in FULLLSCREENCONTRAST. Fixed my mistake with Gamma 
+	and Contrast controls on Display property sheet. [Robbbert]
+- MESSUI - Debug property sheet - used a better icon. [Robbbert]
+- MESSUI - Removed option to load a cheat file. [Robbbert]
+- pc_fdc - Data rate detection added [Carl]
+- at - Implemented RTC IRQ callback for AT machines making OS/2 to boot [Carl]
+- pc_fdc - Fix booting from double density media with at bios set 0 [Carl]
+
+0.142u4
 
 New System Drivers Supported:
 -----------------------------
