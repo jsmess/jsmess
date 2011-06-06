@@ -358,8 +358,9 @@ void nakajies_state::machine_reset()
 bool nakajies_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8* lcd_memory_start = m_ram_base + (m_lcd_memory_start<<9);
+	int height = screen.height();
 
-	for (int y=0; y<64; y++)
+	for (int y=0; y<height; y++)
 		for (int x=0; x<60; x++)
 		{
 			UINT8 data = lcd_memory_start[y*64 + x];
@@ -460,8 +461,8 @@ static MACHINE_CONFIG_START( nakajies250, nakajies_state )
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE( 50 )  /* Wild guess */
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MCFG_SCREEN_SIZE( 80 * 6, 8 * 8 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
+	MCFG_SCREEN_SIZE( 80 * 6, 16 * 8 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 16 * 8 - 1 )
 	MCFG_GFXDECODE(drwrt200)
 	MCFG_PALETTE_LENGTH( 2 )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
