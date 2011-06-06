@@ -752,7 +752,6 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			break;
 
 		case 0x1000: // Play Disc.  FAD is in lowest 7 bits of cr1 and all of cr2.
-		//case 0x2000:
 			CDROM_LOG(("%s:CD: Play Disc\n",   machine.describe_context()))
 			cd_stat = CD_STAT_PLAY;
 
@@ -863,6 +862,31 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			cr2 = cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track;
 
 			break;
+
+		case 0x2000: // Get SubCode Q / RW Channel
+			switch(cr1 & 0xff)
+			{
+				case 0: // Get Q
+					cr1 = cd_stat | 0;
+					cr2 = 5;
+					cr3 = 0;
+					cr4 = 0;
+
+					// ...
+					break;
+
+				case 1: // Get RW
+					cr1 = cd_stat | 0;
+					cr2 = 12;
+					cr3 = 0;
+					cr4 = 0;
+
+					// ...
+					break;
+			}
+			hirqreg |= CMOK|DRDY;
+			break;
+
 
 		case 0x3000:	// Set CD Device connection
 			{
