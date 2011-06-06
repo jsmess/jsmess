@@ -576,7 +576,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 	case 0x0026:
 //              CDROM_LOG(("WW CR4: %04x\n", data))
 		cr4 = data;
-		if(cr1 != 0 && 0)
+		if(cr1 != 0 && 1)
     		printf("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
 		if (!cdrom)
@@ -1142,22 +1142,23 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 				if (bufnum >= MAX_FILTERS)
 				{
-					CDROM_LOG(("CD: invalid buffer number\n"))
-					cd_stat = 0xff;	// ERROR
+					printf("CD: invalid buffer number\n");
+					cd_stat = CD_STAT_REJECT;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
 
 				if (partitions[bufnum].numblks == 0)
 				{
-					CDROM_LOG(("CD: buffer is empty\n"))
-					cd_stat = 0xff;	// ERROR
+					printf("CD: buffer is empty\n");
+					cd_stat = CD_STAT_REJECT;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
 
 				cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
 
+				/* TODO: Cyber Doll crashes here with sectnum == 8*/
 				for (i = sectofs; i < (sectofs + sectnum); i++)
 				{
 					partitions[bufnum].size -= partitions[bufnum].blocks[i]->size;
