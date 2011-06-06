@@ -69,9 +69,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fr_w );
 	DECLARE_WRITE_LINE_MEMBER( intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
-	
+
 	void bankswitch();
-	
+
 	// memory state
 	UINT8 m_s100;
 	UINT8 m_bank0;

@@ -133,7 +133,7 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 
 			UINT16 fg = 0;
 			UINT16 bg = 0;
-			
+
 			/* Invert colours if invert is true */
 			if(!Invert)
 			{
@@ -146,8 +146,8 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 				fg	= (attr & 0x07);
 			}
 
-			
-			
+
+
 			UINT8 data = chr_gen[ chr * 16 + ra ];
 
 			*p = ( data & 0x80 ) ? fg : bg; p++;
@@ -167,14 +167,14 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 			*p = ( data & 0x01 ) ? fg : bg; p++;
 			*p = ( data & 0x01 ) ? fg : bg; p++;
 		}
-	
-	}	
+
+	}
 	else
 	{
 		for ( i = 0; i < x_count; i++ )
 		{
 			UINT32 offset = ((((ma + i ) & 0x1FFF) << 3) | (ra & 0x07)) << 1;
-		
+
 			UINT8 Lo = videoram[ offset ];
 			UINT8 Hi = videoram[ offset +1 ];
 			UINT16 Word	= (Hi<<8) | Lo;
@@ -198,12 +198,12 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 				Colour=((Intense&0x08) | (Red&0x08)>>1) | ((Green&0x08)>>2) | ((Blue&0x08)>>3);
 
 				for (Dot=0;Dot<4;Dot++)
-				{					
+				{
 					*p = Colour; p++;
 					*p = Colour; p++;
 					*p = Colour; p++;
 					*p = Colour; p++;
-					
+
 					Intense	=Intense<<1;
 					Red	=Red<<1;
 					Green	=Green<<1;
@@ -215,7 +215,7 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 				for (Dot=0;Dot<16;Dot=Dot+1)
 				{
 					Colour=state->m_ColourRAM[((Word&0x8000)>>15)];
-					
+
 					*p = Colour; p++;
 
 					Hi=(Word&0x8000) >> 15;
@@ -226,21 +226,21 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 			{
 				for (Dot=0;Dot<8;Dot++)
 				{
-					Colour=state->m_ColourRAM[((Word&0x8000)>>14) | ((Word&0x80)>>7)];					
+					Colour=state->m_ColourRAM[((Word&0x8000)>>14) | ((Word&0x80)>>7)];
 					*p = Colour; p++;
 					*p = Colour; p++;
-					
+
 					Hi=(Word&0x8000) >> 15;
 					Word=((Word<<1)&0xFFFE) | Hi;
 				}
-			}	
+			}
 		}
 	}
 
 }
 
 static WRITE_LINE_DEVICE_HANDLER( dgnbeta_vsync_changed )
-{	
+{
 	dgn_beta_state *st = device->machine().driver_data<dgn_beta_state>();
 
 	st->m_beta_VSync=state;

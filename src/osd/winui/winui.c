@@ -671,7 +671,7 @@ static const GUISequence GUISequenceControl[]=
 	{"gui_key_view_tab_marquee",     input_seq(),  ID_VIEW_TAB_MARQUEE,       Get_ui_key_view_tab_marquee },
 	{"gui_key_view_tab_screenshot",  input_seq(),  ID_VIEW_TAB_SCREENSHOT,    Get_ui_key_view_tab_screenshot },
 	{"gui_key_view_tab_title",       input_seq(),  ID_VIEW_TAB_TITLE,         Get_ui_key_view_tab_title },
-	{"gui_key_view_tab_pcb",         input_seq(),  ID_VIEW_TAB_PCB,   	    Get_ui_key_view_tab_pcb },
+	{"gui_key_view_tab_pcb",         input_seq(),  ID_VIEW_TAB_PCB, 	    Get_ui_key_view_tab_pcb },
 	{"gui_key_quit",                 input_seq(),  ID_FILE_EXIT,              Get_ui_key_quit },
 };
 

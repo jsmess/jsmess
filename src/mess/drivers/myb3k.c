@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	Matsushita / Panasonic My Brain 3000 / JB-3000
+    Matsushita / Panasonic My Brain 3000 / JB-3000
 
-	preliminary driver by Angelo Salese
+    preliminary driver by Angelo Salese
 
-	TODO:
-	- needs a working floppy image, fdc probably needs IRQ / DRQ lines
-	  hooked up.
+    TODO:
+    - needs a working floppy image, fdc probably needs IRQ / DRQ lines
+      hooked up.
 
 ****************************************************************************/
 
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8)
 	AM_RANGE(0x00000,0x7ffff) AM_RAM
 	AM_RANGE(0x80000,0x8ffff) AM_NOP
 	AM_RANGE(0xd0000,0xdffff) AM_RAM AM_BASE_MEMBER(myb3k_state,m_vram)
-//	AM_RANGE(0xe0000,0xexxxx) option ROM board
+//  AM_RANGE(0xe0000,0xexxxx) option ROM board
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 

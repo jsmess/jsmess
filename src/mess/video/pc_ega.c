@@ -601,7 +601,7 @@ static void pc_ega_install_banks( running_machine &machine )
 		memory_set_bankptr(machine,  "bank13", ega.videoram_b8000);
 	} else {
 		space->unmap_readwrite(0xb8000, 0xbffff);
-	}	
+	}
 }
 
 
@@ -637,7 +637,7 @@ static VIDEO_START( pc_ega )
 	spaceio->install_legacy_write_handler(0x3c0, 0x3cf, FUNC(pc_ega8_3c0_w), unitmask);
 	spaceio->install_legacy_read_handler(0x3d0, 0x3db, FUNC(pc_ega8_3d0_r), unitmask);
 	spaceio->install_legacy_write_handler(0x3d0, 0x3db, FUNC(pc_ega8_3d0_w), unitmask);
-	
+
 	memset( &ega, 0, sizeof( ega ) );
 
 	/* Install 256KB Video ram on our EGA card */
@@ -1034,7 +1034,7 @@ static WRITE8_HANDLER( pc_ega8_3c0_w )
 	case 2:
 		ega.misc_output = data;
 		pc_ega_install_banks(space->machine());
-		pc_ega_change_mode( ega.crtc_ega );		
+		pc_ega_change_mode( ega.crtc_ega );
 		break;
 
 	/* Sequencer */

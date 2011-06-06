@@ -1590,7 +1590,7 @@ static void format_floppy_track(device_t *device, int flags)
 		buffer[index++] = 0xfe;
 
 		smc92x4_set_dip(device, TRUE);
-//		if (!fm) curr_ident = (*w->intf->dma_read_callback)(device);
+//      if (!fm) curr_ident = (*w->intf->dma_read_callback)(device);
 		if (!fm) (*w->intf->dma_read_callback)(device);
 		curr_cyl = (*w->intf->dma_read_callback)(device);
 		curr_head = (*w->intf->dma_read_callback)(device);
@@ -1667,7 +1667,7 @@ static void format_harddisk_track(device_t *device, int flags)
 	sync_status_in(device);
 
 	/* Build buffer */
-//	gap0 = (-w->register_w[DMA7_0])&0xff;
+//  gap0 = (-w->register_w[DMA7_0])&0xff;
 	gap1 = (-w->register_w[DMA15_8])&0xff;
 	gap2 = (-w->register_w[DMA23_16])&0xff;
 	gap3 = (-w->register_w[DESIRED_SECTOR])&0xff;
@@ -1682,7 +1682,7 @@ static void format_harddisk_track(device_t *device, int flags)
 	buffer = (UINT8*)malloc(data_count);
 
 	index = 0;
-//	fm = controller_set_to_single_density(device);
+//  fm = controller_set_to_single_density(device);
 	controller_set_to_single_density(device);
 	gap_byte = 0x4e;
 

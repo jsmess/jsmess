@@ -247,17 +247,17 @@ void kaypro_state::mc6845_cursor_configure()
 
 void kaypro_state::mc6845_screen_configure()
 {
-//	rectangle visarea;
+//  rectangle visarea;
 
 	UINT16 width = m_mc6845_reg[1]*8-1;							// width in pixels
 	UINT16 height = m_mc6845_reg[6]*(m_mc6845_reg[9]+1)-1;					// height in pixels
 	UINT16 bytes = m_mc6845_reg[1]*m_mc6845_reg[6]-1;						// video ram needed -1
 
 	/* Resize the screen */
-//	visarea.min_x = 0;
-//	visarea.max_x = width-1;
-//	visarea.min_y = 0;
-//	visarea.max_y = height-1;
+//  visarea.min_x = 0;
+//  visarea.max_x = width-1;
+//  visarea.min_y = 0;
+//  visarea.max_y = height-1;
 	if ((width < 640) && (height < 400) && (bytes < 0x800))	/* bounds checking to prevent an assert or violation */
 		machine().primary_screen->set_visible_area(0, width, 0, height);
 }

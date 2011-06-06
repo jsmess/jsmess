@@ -1,20 +1,20 @@
 /*
 
-	ADC Super Six SBC
-	
-	Skeleton driver
-	
+    ADC Super Six SBC
+
+    Skeleton driver
+
 */
 
 /*
-	
-	TODO:
-	
-	- floppy (cannot be implemented currently since this is another case of halting the cpu mid-instruction)
-	- interrupts
-	- DMA
-	- peripheral interfaces
-	
+
+    TODO:
+
+    - floppy (cannot be implemented currently since this is another case of halting the cpu mid-instruction)
+    - interrupts
+    - DMA
+    - peripheral interfaces
+
 */
 
 #include "includes/super6.h"
@@ -36,13 +36,13 @@ void super6_state::bankswitch()
 
 	// power on jump
 	if (!BIT(m_bank0, 6)) {	program->install_rom(0x0000, 0x07ff, 0, 0xf800, rom); return; }
-	
+
 	// first 64KB of memory
 	program->install_ram(0x0000, 0xffff, ram);
 
 	// second 64KB of memory
 	int map = (m_bank1 >> 4) & 0x07;
-	
+
 	switch (map)
 	{
 	case 0:
@@ -80,13 +80,13 @@ void super6_state::bankswitch()
 		if (BIT(m_bank1, 3)) program->install_ram(0xc000, 0xffff, ram + 0x1c000);
 		break;
 	}
-	
+
 	// bank 0 overrides
 	if (BIT(m_bank0, 0)) program->install_ram(0x0000, 0x3fff, ram + 0x0000);
 	if (BIT(m_bank0, 1)) program->install_ram(0x4000, 0x7fff, ram + 0x4000);
 	if (BIT(m_bank0, 2)) program->install_ram(0x8000, 0xbfff, ram + 0x8000);
 	if (BIT(m_bank0, 3)) program->install_ram(0xc000, 0xffff, ram + 0xc000);
-	
+
 	// PROM enabled
 	if (!BIT(m_bank0, 5)) program->install_rom(0xf000, 0xf7ff, 0, 0x800, rom);
 }
@@ -99,20 +99,20 @@ void super6_state::bankswitch()
 WRITE8_MEMBER( super6_state::s100_w )
 {
 	/*
-		
-		bit		description
-		
-		0		A16
-		1		A17
-		2		A18
-		3		A19
-		4		A20
-		5		A21
-		6		A22
-		7		A23
 
-	*/
-	
+        bit     description
+
+        0       A16
+        1       A17
+        2       A18
+        3       A19
+        4       A20
+        5       A21
+        6       A22
+        7       A23
+
+    */
+
 	m_s100 = data;
 }
 
@@ -124,22 +124,22 @@ WRITE8_MEMBER( super6_state::s100_w )
 WRITE8_MEMBER( super6_state::bank0_w )
 {
 	/*
-		
-		bit		description
-		
-		0		memory bank 0 (0000-3fff)
-		1		memory bank 1 (4000-7fff)
-		2		memory bank 2 (8000-bfff)
-		3		memory bank 3 (c000-ffff)
-		4		
-		5		PROM enabled (0=enabled, 1=disabled)
-		6		power on jump reset
-		7		parity check enable
 
-	*/
-	
+        bit     description
+
+        0       memory bank 0 (0000-3fff)
+        1       memory bank 1 (4000-7fff)
+        2       memory bank 2 (8000-bfff)
+        3       memory bank 3 (c000-ffff)
+        4
+        5       PROM enabled (0=enabled, 1=disabled)
+        6       power on jump reset
+        7       parity check enable
+
+    */
+
 	m_bank0 = data;
-	
+
 	bankswitch();
 }
 
@@ -151,22 +151,22 @@ WRITE8_MEMBER( super6_state::bank0_w )
 WRITE8_MEMBER( super6_state::bank1_w )
 {
 	/*
-		
-		bit		description
-		
-		0		memory bank 4
-		1		memory bank 5
-		2		memory bank 6
-		3		memory bank 7
-		4		map select 0
-		5		map select 1
-		6		map select 2
-		7		
 
-	*/
-	
+        bit     description
+
+        0       memory bank 4
+        1       memory bank 5
+        2       memory bank 6
+        3       memory bank 7
+        4       map select 0
+        5       map select 1
+        6       map select 2
+        7
+
+    */
+
 	m_bank1 = data;
-	
+
 	bankswitch();
 }
 
@@ -183,20 +183,20 @@ WRITE8_MEMBER( super6_state::bank1_w )
 READ8_MEMBER( super6_state::fdc_r )
 {
 	/*
-		
-		bit		description
-		
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		FDC INTRQ
 
-	*/
-	
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7       FDC INTRQ
+
+    */
+
 	// TODO reading this port should halt the CPU until an INTRQ or DRQ from the FDC
 
 	return !wd17xx_intrq_r(m_fdc) << 7;
@@ -210,28 +210,28 @@ READ8_MEMBER( super6_state::fdc_r )
 WRITE8_MEMBER( super6_state::fdc_w )
 {
 	/*
-		
-		bit		description
-		
-		0		disk drive select 0
-		1		disk drive select 1
-		2		head select (0=head 1, 1=head 2)
-		3		disk density (0=single, 1=double)
-		4		size select (0=8", 1=5.25")
-		5		
-		6		
-		7		
 
-	*/
+        bit     description
+
+        0       disk drive select 0
+        1       disk drive select 1
+        2       head select (0=head 1, 1=head 2)
+        3       disk density (0=single, 1=double)
+        4       size select (0=8", 1=5.25")
+        5
+        6
+        7
+
+    */
 
 	// disk drive select
 	wd17xx_set_drive(m_fdc, data & 0x03);
 	floppy_mon_w(m_floppy0, 0);
 	floppy_mon_w(m_floppy1, 0);
-	
+
 	// head select
 	wd17xx_set_side(m_fdc, BIT(data, 2));
-	
+
 	// disk density
 	wd17xx_dden_w(m_fdc, !BIT(data, 3));
 }
@@ -244,19 +244,19 @@ WRITE8_MEMBER( super6_state::fdc_w )
 WRITE8_MEMBER( super6_state::baud_w )
 {
 	/*
-		
-		bit		description
-		
-		0		SIO channel A baud bit A
-		1		SIO channel A baud bit B
-		2		SIO channel A baud bit C
-		3		SIO channel A baud bit D
-		4		SIO channel B baud bit A
-		5		SIO channel B baud bit B
-		6		SIO channel B baud bit C
-		7		SIO channel B baud bit D
 
-	*/
+        bit     description
+
+        0       SIO channel A baud bit A
+        1       SIO channel A baud bit B
+        2       SIO channel A baud bit C
+        3       SIO channel A baud bit D
+        4       SIO channel B baud bit A
+        5       SIO channel B baud bit B
+        6       SIO channel B baud bit C
+        7       SIO channel B baud bit D
+
+    */
 
 	m_brg->str_w(space, 0, data & 0x0f);
 	m_brg->stt_w(space, 0, data >> 4);
@@ -292,8 +292,8 @@ static ADDRESS_MAP_START( super6_io, AS_IO, 8, super6_state )
 	AM_RANGE(0x16, 0x16) AM_WRITE(bank0_w)
 	AM_RANGE(0x17, 0x17) AM_WRITE(bank1_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0x03) AM_WRITE(baud_w)
-//	AM_RANGE(0x40, 0x40) ?
-//	AM_RANGE(0xe0, 0xe7) HDC?
+//  AM_RANGE(0x40, 0x40) ?
+//  AM_RANGE(0xe0, 0xe7) HDC?
 ADDRESS_MAP_END
 
 
@@ -436,7 +436,7 @@ WRITE_LINE_MEMBER( super6_state::fr_w )
 {
 	z80dart_rxca_w(m_dart, state);
 	z80dart_txca_w(m_dart, state);
-	
+
 	z80ctc_trg1_w(m_ctc, state);
 }
 
@@ -481,7 +481,7 @@ WRITE_LINE_MEMBER( super6_state::intrq_w )
 WRITE_LINE_MEMBER( super6_state::drq_w )
 {
 	// TODO allow CPU to continue reading port 14
-	
+
 	m_dma->rdy_w(state);
 }
 
@@ -547,7 +547,7 @@ void super6_state::machine_start()
 void super6_state::machine_reset()
 {
 	m_bank0 = m_bank1 = 0;
-	
+
 	bankswitch();
 }
 
@@ -570,7 +570,7 @@ static MACHINE_CONFIG_START( super6, super6_state )
 
 	// video hardware
 	MCFG_FRAGMENT_ADD(generic_terminal)
-	
+
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_24MHz/4, ctc_intf)
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_24MHz/16))

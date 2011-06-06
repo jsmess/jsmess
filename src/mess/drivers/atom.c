@@ -77,10 +77,10 @@ Hardware:   PPIA 8255
     reserved at present for the file server, and 235 for the printer server. Wire links must be soldered to each network station card during installation, a sugested
     scheme for number allocation is to number normal user stations from one upwards and to number special stations and servers from 255 downwards.
 
-	2011 June 04  - Phill Harvey-Smith 
-		Fixed "ERROR" repeating infinite loop, caused by random values in machine_start() being poked into the wrong memory reigion causing the basic ROM to become
-		corrupted. Values are now correctly placed in bytes 0x0008 - 0x000B of RAM.
-		
+    2011 June 04  - Phill Harvey-Smith
+        Fixed "ERROR" repeating infinite loop, caused by random values in machine_start() being poked into the wrong memory reigion causing the basic ROM to become
+        corrupted. Values are now correctly placed in bytes 0x0008 - 0x000B of RAM.
+
 
 ***************************************************************************/
 
@@ -90,8 +90,8 @@ Hardware:   PPIA 8255
 
     - connect to softwarelist
     - e000 EPROM switching
-    - display should be monochrome -- Should be optional, Acorn produced a Colour Card, and there is 
-		at least one aftermarket Colour card.
+    - display should be monochrome -- Should be optional, Acorn produced a Colour Card, and there is
+        at least one aftermarket Colour card.
     - ram expansion
     - tap files
     - mouse
@@ -177,7 +177,7 @@ WRITE8_MEMBER( atom_state::eprom_w )
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( atom_mem, AS_PROGRAM, 8, atom_state )
-	AM_RANGE(0x0000, 0x09ff) AM_RAM 
+	AM_RANGE(0x0000, 0x09ff) AM_RAM
 	AM_RANGE(0x0a00, 0x0a03) AM_MIRROR(0x1f8) AM_DEVREADWRITE_LEGACY(I8271_TAG, i8271_r, i8271_w)
 	AM_RANGE(0x0a04, 0x0a04) AM_MIRROR(0x1f8) AM_DEVREADWRITE_LEGACY(I8271_TAG, i8271_data_r, i8271_data_w)
 	AM_RANGE(0x0a05, 0x7fff) AM_RAM
@@ -674,7 +674,7 @@ void atom_state::machine_start()
     ram chips are not cleared at start-up. So at this time, these numbers
     are poked into the memory to simulate it. When I have more details I will fix it */
 	UINT8 *m_baseram = (UINT8 *)m_maincpu->memory().space(AS_PROGRAM)->get_write_ptr(0x0000);
-	
+
 	m_baseram[0x08] = machine().rand() & 0x0ff;
 	m_baseram[0x09] = machine().rand() & 0x0ff;
 	m_baseram[0x0a] = machine().rand() & 0x0ff;

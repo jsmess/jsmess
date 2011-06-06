@@ -28,7 +28,7 @@ SCREEN_UPDATE( irisha )
 		for (x = 0; x < 40; x++)
 		{
 			code1 = space->read_byte(0xe000 + x + y * 40);
-//			code2 = space->read_byte(0xc000 + x + y * 40);
+//          code2 = space->read_byte(0xc000 + x + y * 40);
 			for (b = 0; b < 8; b++)
 			{
 				col = ((code1 >> b) & 0x01);

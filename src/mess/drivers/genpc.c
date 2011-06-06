@@ -268,10 +268,10 @@ ROM_END
 ROM_START( pcega )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("xtbios.bin",  0xfe000, 0x02000, CRC(1d7bd86c) SHA1(33a500f599b4dad2fe6d7a5c3e89b13bd5dd2987))
-	
+
 	/* This region holds the original EGA Video bios */
 	ROM_REGION(0x4000, "user1", 0)
-	ROM_LOAD("6277356.u44", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b))	
+	ROM_LOAD("6277356.u44", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b))
 ROM_END
 
 ROM_START( pc )
@@ -310,7 +310,7 @@ DRIVER_INIT( pcega )
 
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
 COMP(  1987,	pc,         ibm5150,	0,		pccga,		pccga,		0,  		"<generic>",  "PC (CGA)" , GAME_NO_SOUND)
-COMP(  1987,	pcega,      ibm5150,	0,		pcega,		pccga,		pcega, 		"<generic>",  "PC (EGA)" , GAME_NO_SOUND)
+COMP(  1987,	pcega,      ibm5150,	0,		pcega,		pccga,		pcega,		"<generic>",  "PC (EGA)" , GAME_NO_SOUND)
 COMP ( 1987,	pcmda,      ibm5150,	0,		pcmda,      pcgen,		0,  		"<generic>",  "PC (MDA)" , GAME_NO_SOUND)
 COMP ( 1987,	pcherc,     ibm5150,	0,		pcherc,     pcgen,      0,  		"<generic>",  "PC (Hercules)" , GAME_NO_SOUND)
 COMP ( 1987,	xtvga,      ibm5150,	0,		xtvga,      pcgen,		0,			"<generic>",  "PC (VGA)" , GAME_NOT_WORKING | GAME_NO_SOUND)

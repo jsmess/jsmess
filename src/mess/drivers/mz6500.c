@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Sharp MZ-6500
+    Sharp MZ-6500
 
 
 
@@ -89,7 +89,7 @@ static WRITE8_HANDLER( mz6500_vram_w )
 static ADDRESS_MAP_START(mz6500_map, AS_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x9ffff) AM_RAM
-//	AM_RANGE(0xa0000,0xbffff) kanji/dictionary ROM
+//  AM_RANGE(0xa0000,0xbffff) kanji/dictionary ROM
 	AM_RANGE(0xc0000,0xeffff) AM_READWRITE8(mz6500_vram_r,mz6500_vram_w,0xffff)
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
@@ -101,22 +101,22 @@ static ADDRESS_MAP_START(mz6500_io, AS_IO, 16)
 	AM_RANGE(0x0020, 0x0021) AM_MIRROR(0xe) AM_READWRITE8(fdc_r,fdc_w,0xffff)
 //  AM_RANGE(0x0030, 0x003f) i8259 master
 //  AM_RANGE(0x0040, 0x004f) i8259 slave
-//	AM_RANGE(0x0050, 0x0050) segment byte for DMA
-//	AM_RANGE(0x0060, 0x0060) system port A
-//	AM_RANGE(0x0070, 0x0070) system port C
+//  AM_RANGE(0x0050, 0x0050) segment byte for DMA
+//  AM_RANGE(0x0060, 0x0060) system port A
+//  AM_RANGE(0x0070, 0x0070) system port C
 //  AM_RANGE(0x00cd, 0x00cd) MZ-1R32
 	AM_RANGE(0x0100, 0x0103) AM_MIRROR(0xc) AM_DEVREADWRITE8_MODERN("upd7220", upd7220_device, read, write, 0x00ff)
-//	AM_RANGE(0x0110, 0x011f) video address / data registers (priority)
-//	AM_RANGE(0x0120, 0x012f) video registers
-//	AM_RANGE(0x0130, 0x013f) video register
-//	AM_RANGE(0x0140, 0x015f) palette pens
+//  AM_RANGE(0x0110, 0x011f) video address / data registers (priority)
+//  AM_RANGE(0x0120, 0x012f) video registers
+//  AM_RANGE(0x0130, 0x013f) video register
+//  AM_RANGE(0x0140, 0x015f) palette pens
 //  AM_RANGE(0x0200, 0x020f) z80sio
 //  AM_RANGE(0x0210, 0x021f) z80ctc
 //  AM_RANGE(0x0220, 0x022f) rp5c01
 //  AM_RANGE(0x0230, 0x023f) ay-3-8912
-//	AM_RANGE(0x0240, 0x0240) z80ctc vector ack
-//	AM_RANGE(0x0250, 0x0250) z80sio vector ack
-//	AM_RANGE(0x0270, 0x0270) system port B
+//  AM_RANGE(0x0240, 0x0240) z80ctc vector ack
+//  AM_RANGE(0x0250, 0x0250) z80sio vector ack
+//  AM_RANGE(0x0270, 0x0270) system port B
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -197,7 +197,7 @@ static MACHINE_CONFIG_START( mz6500, mz6500_state )
 	MCFG_UPD7220_ADD("upd7220", 4000000, hgdc_intf, upd7220_map)
 
 	MCFG_PALETTE_LENGTH(8)
-//	MCFG_PALETTE_INIT(black_and_white)
+//  MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(mz6500)
 MACHINE_CONFIG_END

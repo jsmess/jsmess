@@ -1,10 +1,10 @@
 /***************************************************************************
 
-	Toshiba Pasopia 1600
+    Toshiba Pasopia 1600
 
-	TODO:
-	- charset ROM is WRONG! (needs a 8x16 or even a 16x16 one)
-	- identify fdc type (needs a working floppy image)
+    TODO:
+    - charset ROM is WRONG! (needs a 8x16 or even a 16x16 one)
+    - identify fdc type (needs a working floppy image)
 
 ****************************************************************************/
 
@@ -95,7 +95,7 @@ static SCREEN_UPDATE( paso1600 )
 	}
 	#endif
 
-//	popmessage("%d %d %d",mc6845_h_display,mc6845_v_display,mc6845_tile_height);
+//  popmessage("%d %d %d",mc6845_h_display,mc6845_v_display,mc6845_tile_height);
 
 	for(y=0;y<mc6845_v_display;y++)
 	{
@@ -226,7 +226,7 @@ static ADDRESS_MAP_START(paso1600_io, AS_IO, 16)
 	AM_RANGE(0x0048,0x0049) AM_READ(test_hi_r)
 	AM_RANGE(0x0090,0x0091) AM_READWRITE8(test_r,paso1600_6845_address_w,0x00ff)
 	AM_RANGE(0x0090,0x0091) AM_READWRITE8(test_r,paso1600_6845_data_w,0xff00)
-//	AM_RANGE(0x00d8,0x00df) //fdc, unknown type
+//  AM_RANGE(0x00d8,0x00df) //fdc, unknown type
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -297,9 +297,9 @@ static MACHINE_RESET(paso1600)
 
 static READ8_HANDLER( pc_dma_read_byte )
 {
-//	paso1600_state *state = space->machine().driver_data<paso1600_state>();
+//  paso1600_state *state = space->machine().driver_data<paso1600_state>();
 	//offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
-	//	& 0xFF0000;
+	//  & 0xFF0000;
 
 	return space->read_byte(0 + offset);
 }
@@ -307,9 +307,9 @@ static READ8_HANDLER( pc_dma_read_byte )
 
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
-//	paso1600_state *state = space->machine().driver_data<paso1600_state>();
+//  paso1600_state *state = space->machine().driver_data<paso1600_state>();
 	//offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
-	//	& 0xFF0000;
+	//  & 0xFF0000;
 
 	space->write_byte(0 + offset, data);
 }
@@ -351,7 +351,7 @@ static MACHINE_CONFIG_START( paso1600, paso1600_state )
 
 	MCFG_GFXDECODE(paso1600)
 	MCFG_PALETTE_LENGTH(8)
-//	MCFG_PALETTE_INIT(black_and_white)
+//  MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(paso1600)
 MACHINE_CONFIG_END

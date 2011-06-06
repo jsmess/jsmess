@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	if800
+    if800
 
 ****************************************************************************/
 
@@ -63,7 +63,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(if800_io, AS_IO, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x0640, 0x065f) dma?
+//  AM_RANGE(0x0640, 0x065f) dma?
 	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8_MODERN("upd7220", upd7220_device, read, write,0x00ff)
 ADDRESS_MAP_END
 
@@ -103,7 +103,7 @@ static MACHINE_CONFIG_START( if800, if800_state )
 	MCFG_MACHINE_START(if800)
 	MCFG_MACHINE_RESET(if800)
 
-//	MCFG_PIC8259_ADD( "pic8259", if800_pic8259_config )
+//  MCFG_PIC8259_ADD( "pic8259", if800_pic8259_config )
 	MCFG_UPD7220_ADD("upd7220", 8000000/4, hgdc_intf, upd7220_map)
 
 	/* video hardware */
@@ -113,12 +113,12 @@ static MACHINE_CONFIG_START( if800, if800_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-//	MCFG_SCREEN_UPDATE(if800)
+//  MCFG_SCREEN_UPDATE(if800)
 
 	MCFG_PALETTE_LENGTH(8)
-//	MCFG_PALETTE_INIT(black_and_white)
+//  MCFG_PALETTE_INIT(black_and_white)
 
-//	MCFG_VIDEO_START(if800)
+//  MCFG_VIDEO_START(if800)
 MACHINE_CONFIG_END
 
 /* ROM definition */

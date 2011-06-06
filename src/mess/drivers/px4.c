@@ -1321,8 +1321,8 @@ INPUT_PORTS_END
 
 /* item keyboard */
 /*static INPUT_PORTS_START( px4_h421a )
-	PORT_INCLUDE(px4_dips)
-	PORT_INCLUDE(tf20)
+    PORT_INCLUDE(px4_dips)
+    PORT_INCLUDE(tf20)
 INPUT_PORTS_END
 */
 

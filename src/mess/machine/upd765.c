@@ -868,7 +868,7 @@ static int upd765_get_matching_sector(device_t *device)
 		fdc->upd765_status[1] |= 1;
 		return FALSE;
 	}
-	
+
 	/* get sector id's */
 	do
     {
@@ -1978,7 +1978,7 @@ static void upd765_setup_command(device_t *device)
 					}
 					while (index_count!=2);
 
-					if (fdc->upd765_flags & UPD765_BAD_MEDIA) 
+					if (fdc->upd765_flags & UPD765_BAD_MEDIA)
 					{
 							fdc->upd765_status[0] |= 0x40;
 							fdc->upd765_status[1] |= 1;

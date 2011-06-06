@@ -692,8 +692,8 @@ void x07_state::cassette_w(running_machine &machine)
 void x07_state::printer_w(running_machine &machine)
 {
 	UINT16 char_pos = 0;
-//	UINT16 text_color = 0;
-//	UINT16 text_size = 1;
+//  UINT16 text_color = 0;
+//  UINT16 text_size = 1;
 
 	if (m_regs_r[4] & 0x20)
 		m_prn_char_code |= 1;
@@ -713,16 +713,16 @@ void x07_state::printer_w(running_machine &machine)
 					for (int i = 2; i < m_prn_size - 2; i++)
 					{
 /*
-						if (m_prn_buffer[i - 1] == 0x4f && m_prn_buffer[i] == 0x3d)
-							text_color = printer_charcode[m_prn_buffer[i + 1]] - 0x30;
+                        if (m_prn_buffer[i - 1] == 0x4f && m_prn_buffer[i] == 0x3d)
+                            text_color = printer_charcode[m_prn_buffer[i + 1]] - 0x30;
 
-						if (m_prn_buffer[i - 1] == 0x4f && m_prn_buffer[i] == 0x35)
-						{
-							if (m_prn_buffer[i + 2] == 0x4f)
-								text_size = printer_charcode[m_prn_buffer[i + 1]] - 0x2f;
-							else
-								text_size = 0x0a + (printer_charcode[m_prn_buffer[i + 2]] - 0x2f);
-						}
+                        if (m_prn_buffer[i - 1] == 0x4f && m_prn_buffer[i] == 0x35)
+                        {
+                            if (m_prn_buffer[i + 2] == 0x4f)
+                                text_size = printer_charcode[m_prn_buffer[i + 1]] - 0x2f;
+                            else
+                                text_size = 0x0a + (printer_charcode[m_prn_buffer[i + 2]] - 0x2f);
+                        }
 */
 						if (m_prn_buffer[i - 1] == 0x4f && m_prn_buffer[i] == 0x77)
 						{

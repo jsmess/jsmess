@@ -8,10 +8,10 @@
 
 http://speleotrove.com/acorn/
 
-m 	(modify) Memory display and modification 	l 	(load) Reads a block of bytes from tape
-g 	(go) Run program starting at an address 	r 	(return) Resume after a breakpoint
-p 	(point) Inserts or removes breakpoint 	^ 	(up) Increment displayed address
-s 	(store) Writes a block of bytes to tape 	v 	(down) Decrement displayed address 
+m   (modify) Memory display and modification    l   (load) Reads a block of bytes from tape
+g   (go) Run program starting at an address     r   (return) Resume after a breakpoint
+p   (point) Inserts or removes breakpoint   ^   (up) Increment displayed address
+s   (store) Writes a block of bytes to tape     v   (down) Decrement displayed address
 
 ToDo:
 - Digits don't display in the right order. The digit on the left should be at the extreme right,

@@ -140,7 +140,7 @@ public:
 	int m_ColourRAM[4];
 	int m_Field;
 	int m_DrawInterlace;
-	
+
 	required_device<mc6845_device> m_mc6845;
 };
 

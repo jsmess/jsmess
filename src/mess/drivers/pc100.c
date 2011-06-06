@@ -4,15 +4,15 @@
 
     TODO:
     - there's a regression with i8259, check this code:
-	F8209: B8 FB 00                  mov     ax,0FBh
-	F820C: E6 02                     out     2h,al
-	F820E: B9 00 00                  mov     cx,0h
-	F8211: FB                        sti
-	F8212: 0A E4                     or      ah,ah <- it's supposed to trigger an irq there!
-	F8214: E1 FC                     loopz   0F8212h
-	F8216: FA                        cli
-	F8217: 0A E9                     or      ch,cl
-	F8219: 74 15                     je      0F8230h
+    F8209: B8 FB 00                  mov     ax,0FBh
+    F820C: E6 02                     out     2h,al
+    F820E: B9 00 00                  mov     cx,0h
+    F8211: FB                        sti
+    F8212: 0A E4                     or      ah,ah <- it's supposed to trigger an irq there!
+    F8214: E1 FC                     loopz   0F8212h
+    F8216: FA                        cli
+    F8217: 0A E9                     or      ch,cl
+    F8219: 74 15                     je      0F8230h
 
 ****************************************************************************/
 
@@ -224,19 +224,19 @@ static WRITE8_HANDLER( pc100_crtc_data_w )
 /* everything is 8-bit bus wide */
 static ADDRESS_MAP_START(pc100_io, AS_IO, 16)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0x00ff) // i8259
-//	AM_RANGE(0x04, 0x07) i8237?
-//	AM_RANGE(0x08, 0x0b) upd765
-//	AM_RANGE(0x10, 0x17) i8255 #1
+//  AM_RANGE(0x04, 0x07) i8237?
+//  AM_RANGE(0x08, 0x0b) upd765
+//  AM_RANGE(0x10, 0x17) i8255 #1
 	AM_RANGE(0x18, 0x1f) AM_DEVREADWRITE8_MODERN("ppi8255_2", i8255_device, read, write,0x00ff) // i8255 #2
 	AM_RANGE(0x20, 0x23) AM_READ8(pc100_key_r,0x00ff) //i/o, keyboard, mouse
 	AM_RANGE(0x22, 0x25) AM_WRITE8(pc100_output_w,0x00ff) //i/o, keyboard, mouse
-//	AM_RANGE(0x28, 0x2b) i8251
+//  AM_RANGE(0x28, 0x2b) i8251
 	AM_RANGE(0x30, 0x31) AM_READWRITE8(pc100_shift_r,pc100_shift_w,0x00ff) // crtc shift
 	AM_RANGE(0x38, 0x39) AM_WRITE8(pc100_crtc_addr_w,0x00ff) //crtc address reg
 	AM_RANGE(0x3a, 0x3b) AM_WRITE8(pc100_crtc_data_w,0x00ff) //crtc data reg
 	AM_RANGE(0x3c, 0x3f) AM_READWRITE8(pc100_vs_vreg_r,pc100_vs_vreg_w,0x00ff) //crtc vertical start position
 	AM_RANGE(0x40, 0x5f) AM_RAM_WRITE(pc100_paletteram_w) AM_BASE_MEMBER(pc100_state,m_palram)
-//	AM_RANGE(0x60, 0x61) crtc command (16-bit wide)
+//  AM_RANGE(0x60, 0x61) crtc command (16-bit wide)
 	AM_RANGE(0x80, 0x81) AM_READWRITE(pc100_kanji_r,pc100_kanji_w)
 	AM_RANGE(0x82, 0x83) AM_WRITENOP //kanji-related?
 	AM_RANGE(0x84, 0x87) AM_WRITENOP //kanji "strobe" signal 0/1
@@ -418,7 +418,7 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_TIMER_ADD_PERIODIC("10hz", pc100_10hz_irq, attotime::from_hz(MASTER_CLOCK/10))
 
 	MCFG_PALETTE_LENGTH(16)
-//	MCFG_PALETTE_INIT(black_and_white)
+//  MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_GFXDECODE(pc100)
 

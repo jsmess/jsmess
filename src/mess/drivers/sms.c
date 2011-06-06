@@ -694,7 +694,7 @@ ROM_START(sg1000m3)
 ROM_END
 
 ROM_START(smsj) /* PCB Label: "SEGA(R) IC BOARD M4J MAIN // 837-6418"; has "YM2413 // 78 04 71 G" at IC10; Back of pcb has traces marked "171-5541 (C)SEGA 1987 MADE IN JAPAN"
-	see http://www.smspower.org/Development/JapaneseSMS837-6418 */ 
+    see http://www.smspower.org/Development/JapaneseSMS837-6418 */
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_FILL(0x0000, 0x4000, 0xff)
 

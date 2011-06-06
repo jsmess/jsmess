@@ -1,18 +1,18 @@
 /***************************************************************************
 
-	Casio FP-6000
+    Casio FP-6000
 
-	preliminary driver by Angelo Salese
+    preliminary driver by Angelo Salese
 
-	TODO:
-	- keyboard;
-	- fdc / cmt;
-	- gvram color pen is a rather crude guess (the layer is monochrome on
-	  BASIC?);
-	- everything else
+    TODO:
+    - keyboard;
+    - fdc / cmt;
+    - gvram color pen is a rather crude guess (the layer is monochrome on
+      BASIC?);
+    - everything else
 
-	Debug trick for the keyboard:
-	- bp 0xfc93e, ip+=2 then define al = ASCII code
+    Debug trick for the keyboard:
+    - bp 0xfc93e, ip+=2 then define al = ASCII code
 
 ****************************************************************************/
 
@@ -315,7 +315,7 @@ static MACHINE_CONFIG_START( fp6000, fp6000_state )
 	MCFG_MC6845_ADD("crtc", H46505, 16000000/5, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
 	MCFG_PALETTE_LENGTH(8)
-//	MCFG_PALETTE_INIT(black_and_white)
+//  MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(fp6000)
 
 	MCFG_VIDEO_START(fp6000)

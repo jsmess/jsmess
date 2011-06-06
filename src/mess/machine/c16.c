@@ -706,7 +706,7 @@ static DEVICE_IMAGE_LOAD( c16_cart )
 	{
 		result = plus4_crt_load(image);
 	}
-	
+
 	return result;
 }
 

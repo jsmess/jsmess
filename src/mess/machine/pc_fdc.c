@@ -455,7 +455,7 @@ static void pc_fdc_check_data_rate(running_machine &machine)
 		else                    rate = RATE_1000;   // 2.88MB 3 1/2
 	} else return;
 
-	if (rate != (fdc->data_rate_register & 3)) 
+	if (rate != (fdc->data_rate_register & 3))
 		upd765_set_bad(pc_get_device(machine), 1);
 }
 
@@ -482,7 +482,7 @@ READ8_HANDLER ( pc_fdc_r )
 		case 6: /* FDC reserved */
 			break;
 		case 7:
-			device_t *dev = floppy_get_device(space->machine(), fdc->digital_output_register & 0x03);		
+			device_t *dev = floppy_get_device(space->machine(), fdc->digital_output_register & 0x03);
 			data = fdc->digital_input_register;
 			if(dev) data |= (!floppy_dskchg_r(dev)<<7);
 			break;

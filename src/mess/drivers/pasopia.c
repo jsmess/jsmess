@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	Toshiba Pasopia
+    Toshiba Pasopia
 
-	TODO:
-	- just like Pasopia 7, z80pio is broken, hence it doesn't clear irqs
-	  after the first one (0xfe79 is the work ram buffer for keyboard).
-	- machine emulation needs merging with Pasopia 7 (video emulation is
-	  completely different tho)
+    TODO:
+    - just like Pasopia 7, z80pio is broken, hence it doesn't clear irqs
+      after the first one (0xfe79 is the work ram buffer for keyboard).
+    - machine emulation needs merging with Pasopia 7 (video emulation is
+      completely different tho)
 
 ****************************************************************************/
 
@@ -220,11 +220,11 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 static READ8_DEVICE_HANDLER( portb_1_r )
 {
 	/*
-	x--- ---- attribute latch
-	-x-- ---- hblank
-	--x- ---- vblank
-	---x ---- LCD system mode, active low
-	*/
+    x--- ---- attribute latch
+    -x-- ---- hblank
+    --x- ---- vblank
+    ---x ---- LCD system mode, active low
+    */
 	pasopia_state *state = device->machine().driver_data<pasopia_state>();
 	UINT8 grph_latch,lcd_mode;
 
@@ -303,7 +303,7 @@ static READ8_DEVICE_HANDLER( testa_r )
 
 static READ8_DEVICE_HANDLER( testb_r )
 {
-//	printf("B R\n");
+//  printf("B R\n");
 	return 0xff;
 }
 
@@ -396,7 +396,7 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_4MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
 	MCFG_PALETTE_LENGTH(8)
-//	MCFG_PALETTE_INIT(black_and_white)
+//  MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(pasopia)
 MACHINE_CONFIG_END

@@ -35,10 +35,10 @@ WRITE8_MEMBER( pc8001_state::port10_w )
         1       RTC C1
         2       RTC C2
         3       RTC DATA IN
-        4       
-        5       
-        6       
-        7       
+        4
+        5
+        6
+        7
 
     */
 
@@ -47,7 +47,7 @@ WRITE8_MEMBER( pc8001_state::port10_w )
 	m_rtc->c1_w(BIT(data, 1));
 	m_rtc->c2_w(BIT(data, 2));
 	m_rtc->data_in_w(BIT(data, 3));
-	
+
 	// centronics
 	centronics_data_w(m_centronics, 0, data);
 }

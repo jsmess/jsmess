@@ -1588,15 +1588,15 @@ static ADDRESS_MAP_START( fm16_io, AS_IO, 16 )
 	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8(fm7_irq_cause_r,fm7_beeper_w,0xff00)  // IRQ flags
 	AM_RANGE(0xfd04,0xfd05) AM_READ8(fm7_fd04_r,0x00ff)
 	AM_RANGE(0xfd04,0xfd05) AM_READWRITE8(fm7_subintf_r,fm7_subintf_w,0xff00)
-//	AM_RANGE(0xfd06,0xfd0c) AM_READ8(fm7_unknown_r,0xffff)
+//  AM_RANGE(0xfd06,0xfd0c) AM_READ8(fm7_unknown_r,0xffff)
 	AM_RANGE(0xfd0e,0xfd0f) AM_READWRITE8(fm7_rom_en_r,fm7_rom_en_w,0xff00)
-//	AM_RANGE(0xfd10,0xfd17) AM_READ8(fm7_unknown_r,0xffff)
+//  AM_RANGE(0xfd10,0xfd17) AM_READ8(fm7_unknown_r,0xffff)
 	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE8(fm7_fdc_r,fm7_fdc_w,0xffff)
 	AM_RANGE(0xfd20,0xfd23) AM_READWRITE8(fm7_kanji_r,fm7_kanji_w,0xffff)
-//	AM_RANGE(0xfd24,0xfd36) AM_READ8(fm7_unknown_r,0xffff)
+//  AM_RANGE(0xfd24,0xfd36) AM_READ8(fm7_unknown_r,0xffff)
 	AM_RANGE(0xfd36,0xfd37) AM_WRITE8(fm7_multipage_w,0xff00)
 	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE8(fm7_palette_r,fm7_palette_w,0xffff)
-//	AM_RANGE(0xfd40,0xfdff) AM_READ8(fm7_unknown_r,0xffff)
+//  AM_RANGE(0xfd40,0xfdff) AM_READ8(fm7_unknown_r,0xffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm16_sub_mem, AS_PROGRAM, 8 )
@@ -2441,7 +2441,7 @@ ROM_START( fm16beta )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "ipl.rom", 0xfc000, 0x4000, CRC(25f618ea) SHA1(9c27d6ad283260e071d64a1bfca16f7d3ad61f96) )
 
-//	ROM_REGION( 0x10000, "subsys", 0 )
+//  ROM_REGION( 0x10000, "subsys", 0 )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "sub_cg.rom", 0xa000, 0x0f80, CRC(e7928bed) SHA1(68cf604aa7a5c2ec7bd0d612cf099302c7f8c442) )

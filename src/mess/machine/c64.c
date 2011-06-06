@@ -246,7 +246,7 @@ WRITE8_HANDLER( c64_roml_w )
 	c64_state *state = space->machine().driver_data<c64_state>();
 
 	state->m_memory[offset + 0x8000] = data;
-	
+
 	if (state->m_roml_writable)
 		state->m_roml[offset] = data;
 }
@@ -1277,12 +1277,12 @@ static int c64_crt_load( device_image_interface &image )
 
 #define install_io2_handler(_handler) \
 	image.device().machine().firstcpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xdf00, 0xdf00, 0, 0xff, FUNC(_handler));
-	
+
 #define allocate_cartridge_timer(_period, _func) \
 	c64_state *state = image.device().machine().driver_data<c64_state>(); \
 	state->m_cartridge_timer = image.device().machine().scheduler().timer_alloc(FUNC(_func)); \
 	state->m_cartridge_timer->adjust(_period, 0);
-	
+
 #define set_game_line(_machine, _state) \
 	_machine.driver_data<c64_state>()->m_game = _state; \
 	c64_bankswitch(_machine, 0);
@@ -1481,13 +1481,13 @@ static WRITE8_HANDLER( pagefox_bank_w )
 			state->m_game = 0;
 			state->m_exrom = 0;
 		}
-		
+
 		int bank = (data >> 1) & 0x07;
 		int ram = BIT(data, 3);
 		offs_t address = bank * 0x4000;
-		
+
 		state->m_roml_writable = ram;
-		
+
 		if (ram)
 		{
 			state->m_roml = cart + address;
@@ -1503,7 +1503,7 @@ static WRITE8_HANDLER( pagefox_bank_w )
 
 	c64_bankswitch(space->machine(), 0);
 }
-	
+
 static void load_pagefox_cartridge(device_image_interface &image)
 {
 	load_cartridge_region(image, "rom", 0x0000, 0x10000);
@@ -1632,15 +1632,15 @@ static void c64_software_list_cartridge_load(device_image_interface &image)
 
 		else if (!strcmp(cart_type, "multiscreen"))
 			/*
-			
-				TODO: crashes on protection check after cartridge RAM test
-			
-				805A: lda  $01
-				805C: and  #$FE
-				805E: sta  $01
-				8060: m6502_brk#$00 <-- BOOM!
 
-			*/
+                TODO: crashes on protection check after cartridge RAM test
+
+                805A: lda  $01
+                805C: and  #$FE
+                805E: sta  $01
+                8060: m6502_brk#$00 <-- BOOM!
+
+            */
 			load_multiscreen_cartridge(image);
 
 		else if (!strcmp(cart_type, "simons_basic"))

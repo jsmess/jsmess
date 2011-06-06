@@ -609,7 +609,7 @@ static WRITE32_HANDLER( newport_vc2_w )
 
 READ32_HANDLER( newport_rex3_r )
 {
-//	UINT32 nTemp;
+//  UINT32 nTemp;
 	running_machine &machine = space->machine();
 
 //  if( offset >= ( 0x0800 / 4 ) )
@@ -883,7 +883,7 @@ READ32_HANDLER( newport_rex3_r )
 		return pNVID->REX3.nConfig;
 	case 0x1338/4:
 		verboselog(machine, 2, "REX3 Status Read: %08x\n", 0x00000001 );
-//		nTemp = pNVID->REX3.nStatus;
+//      nTemp = pNVID->REX3.nStatus;
 		pNVID->REX3.nStatus = 0;
 		return 0x00000001;
 	case 0x133c/4:

@@ -784,7 +784,7 @@ static SCREEN_UPDATE( supracan )
 	// mix screen
 	int xsize = 0, ysize = 0;
 	bitmap_t *src_bitmap = 0;
-//	int tilemap_num;
+//  int tilemap_num;
 	int which_tilemap_size;
 	int priority = 0;
 
@@ -816,7 +816,7 @@ static SCREEN_UPDATE( supracan )
 
 			if (priority==pri)
 			{
-//				tilemap_num = layer;
+//              tilemap_num = layer;
 				which_tilemap_size = get_tilemap_dimensions(screen->machine(), xsize, ysize, layer);
 				src_bitmap = tilemap_get_pixmap(state->m_tilemap_sizes[layer][which_tilemap_size]);
 				int gfx_region = supracan_tilemap_get_region(screen->machine(), layer);

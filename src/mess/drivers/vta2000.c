@@ -80,7 +80,7 @@ Here we just show the first 80x25, with no scrolling. */
 			for (x = ma; x < ma + 80; x++)
 			{
 				chr = state->m_p_videoram[xx++];
-//				attr = state->m_p_videoram[xx++];
+//              attr = state->m_p_videoram[xx++];
 				xx++;
 
 				if ((chr & 0x60)==0x60)

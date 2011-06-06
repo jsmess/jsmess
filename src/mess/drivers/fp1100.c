@@ -1,10 +1,10 @@
 /***************************************************************************
 
-	Casio FP-1100
+    Casio FP-1100
 
-	TODO:
-	- irq sources and communications;
-	- unimplemented instruction PER triggered
+    TODO:
+    - irq sources and communications;
+    - unimplemented instruction PER triggered
 
 ****************************************************************************/
 
@@ -81,7 +81,7 @@ static WRITE8_HANDLER( irq_mask_w )
 	fp1100_state *state = space->machine().driver_data<fp1100_state>();
 
 	//if((state->irq_mask & 0x80) != (data & 0x80))
-	//	cputag_set_input_line(space->machine(), "sub", UPD7810_INTF2, HOLD_LINE);
+	//  cputag_set_input_line(space->machine(), "sub", UPD7810_INTF2, HOLD_LINE);
 
 	state->irq_mask = data;
 	printf("%02x\n",data);
@@ -102,7 +102,7 @@ static READ8_HANDLER( sub_to_main_r )
 	fp1100_state *state = space->machine().driver_data<fp1100_state>();
 
 	space->machine().scheduler().synchronize(); // force resync
-//	cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, CLEAR_LINE, 0xf0);
+//  cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, CLEAR_LINE, 0xf0);
 	return state->m_main_latch;
 }
 
@@ -165,7 +165,7 @@ static WRITE8_HANDLER( sub_to_main_w )
 	fp1100_state *state = space->machine().driver_data<fp1100_state>();
 
 	space->machine().scheduler().synchronize(); // force resync
-//	cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, ASSERT_LINE, 0xf0);
+//  cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, ASSERT_LINE, 0xf0);
 	state->m_main_latch = data;
 }
 
@@ -308,7 +308,7 @@ static const gfx_layout fp1100_chars_8x8 =
 #endif
 
 static GFXDECODE_START( fp1100 )
-//	GFXDECODE_ENTRY( "chargen", 0x0000, fp1100_chars_8x8, 0, 8 )
+//  GFXDECODE_ENTRY( "chargen", 0x0000, fp1100_chars_8x8, 0, 8 )
 GFXDECODE_END
 
 static const UPD7810_CONFIG fp1100_slave_cpu_config = { TYPE_7801, NULL };

@@ -19,7 +19,7 @@ Here are exact working instructions thanks to Sandy Bumgarner:
   and press USE FRONT with ERASE (the ANSWER command).
 - The Cat should beep and flash the ruler.
 - Then press USE FRONT and the SHIFT keys together and tap the space bar. Note that the cursor
-  stops blinking. Now a Pressing the RETURN key gets the Forth OK and you are 'in' as they say. 
+  stops blinking. Now a Pressing the RETURN key gets the Forth OK and you are 'in' as they say.
 
 
 ToDo:

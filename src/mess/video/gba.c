@@ -1172,7 +1172,7 @@ static void draw_gba_oam(gba_state *state, running_machine &machine, UINT32 *sca
 				}
 
 				tiledrawindex = tileindex = (attr2 & OBJ_TILENUM);
-//				tilebytebase = 0x10000;	// the index doesn't change in the higher modes, we just ignore sprites that are out of range
+//              tilebytebase = 0x10000; // the index doesn't change in the higher modes, we just ignore sprites that are out of range
 
 				if (attr0 & OBJ_ROZMODE_ROZ)
 				{

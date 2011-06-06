@@ -7,7 +7,7 @@
     TODO:
     - Driver is all made up of educated guesses (no documentation available)
 
-	0xfcc67 after the ROM checksum to zero (bp 0xfc153 -> SI = 0) -> system boots
+    0xfcc67 after the ROM checksum to zero (bp 0xfc153 -> SI = 0) -> system boots
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -302,7 +302,7 @@ static MACHINE_CONFIG_START( b16, b16_state )
 
 	MCFG_GFXDECODE(b16)
 	MCFG_PALETTE_LENGTH(8)
-//	MCFG_PALETTE_INIT(black_and_white) // TODO
+//  MCFG_PALETTE_INIT(black_and_white) // TODO
 
 MACHINE_CONFIG_END
 

@@ -112,7 +112,7 @@ static DEVICE_RESET(mockingboard)
 
 READ8_DEVICE_HANDLER(mockingboard_r)
 {
-//	UINT8 result = 0x00;
+//  UINT8 result = 0x00;
 	mockingboard_token *token = get_token(device);
 
 	switch (offset)
@@ -120,12 +120,12 @@ READ8_DEVICE_HANDLER(mockingboard_r)
 		/* This is used to ID the board */
 		case 0x04:
 			token->flip1 ^= 0x08;
-//			result = token->flip1;
+//          result = token->flip1;
 			break;
 
 		case 0x84:
 			token->flip2 ^= 0x08;
-//			result = token->flip2;
+//          result = token->flip2;
 			break;
 
 		default:

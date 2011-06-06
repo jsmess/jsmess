@@ -2,15 +2,15 @@
 
     Chips & Technologies CS8221 chipset
 
-    a.k.a. NEW ENHANCED AT (NEAT) 
-	
-	Consists of four individual chips:
+    a.k.a. NEW ENHANCED AT (NEAT)
+
+    Consists of four individual chips:
 
     * 82C211 - CPU/Bus controller
-	* 82C212 - Page/Interleave and EMS Memory controller
+    * 82C212 - Page/Interleave and EMS Memory controller
     * 82C215 - Data/Address buffer
     * 82C206 - Integrated Peripherals Controller(IPC)
-	
+
 ***************************************************************************/
 
 #include "emu.h"

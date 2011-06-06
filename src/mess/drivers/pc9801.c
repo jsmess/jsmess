@@ -1978,15 +1978,15 @@ static const struct pit8253_config pit8253_config =
 {
 	{
 		{
-			5000000,//1996800,				/* heartbeat IRQ */
+			5000000,//1996800,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir0_w)
 		}, {
-			5000000,//1996800,				/* Memory Refresh */
+			5000000,//1996800,              /* Memory Refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			5000000,//1996800,				/* RS-232c */
+			5000000,//1996800,              /* RS-232c */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
@@ -2155,7 +2155,7 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_2hd_irq )
 {
 	printf("IRQ %d\n",state);
 	//if(state)
-	//	pic8259_ir3_w(device->machine().device("pic8259_slave"), state);
+	//  pic8259_ir3_w(device->machine().device("pic8259_slave"), state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_2hd_drq )

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Mitsubishi Multi 16
+    Mitsubishi Multi 16
 
 ****************************************************************************/
 
@@ -177,7 +177,7 @@ static MACHINE_CONFIG_START( multi16, multi16_state )
 	MCFG_MC6845_ADD("crtc", H46505, 16000000/5, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
 	MCFG_PALETTE_LENGTH(8)
-//	MCFG_PALETTE_INIT(black_and_white)
+//  MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_VIDEO_START(multi16)
 MACHINE_CONFIG_END

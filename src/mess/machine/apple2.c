@@ -128,8 +128,8 @@ void apple2_update_memory(running_machine &machine)
 	/* get critical info */
 	rom = machine.region("maincpu")->base();
 	rom_length = machine.region("maincpu")->bytes() & ~0xFFF;
-//	slot_length = machine.region("maincpu")->bytes() - rom_length;
-//	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
+//  slot_length = machine.region("maincpu")->bytes() - rom_length;
+//  slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
 
 	/* loop through the entire memory map */
 	bank = state->m_mem_config.first_bank;
