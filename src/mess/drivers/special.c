@@ -592,11 +592,18 @@ ROM_START( erik )
     ROM_LOAD( "erik.bin", 0x10000, 0x10000, CRC(6F3208F4) SHA1(41f6e2763ef60d3c7214c98893e580d25346fa2d))
 ROM_END
 
+ROM_START( pioner )
+	// Ukranian clone with 16KB RAM
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "pioner.rf2", 0xc000, 0x0800, CRC(d6250ab2) SHA1(b953517d883c64857e63139fed52436f77d371cb))
+ROM_END
+
 /* Driver */
 
 /*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT       INIT        COMPANY              FULLNAME       FLAGS */
 COMP( 1985, special,    0,  	0,		special,	special,	special,    "<unknown>",				 "Specialist",		0)
 COMP( 1985, specialm,   special,0,		special,	special,	special,    "<unknown>",				 "Specialist M",		0)
+COMP( 1985, pioner,     special,0,		special,	special,	special,    "<unknown>",				 "Pioner",		0)
 COMP( 1985, specialp,   special,0,		specialp,	specialp,	special,    "<unknown>",				 "Specialist + hires graph",		0)
 COMP( 1985, lik,    	special,0,		special,	lik,		special,    "<unknown>",				 "Lik",				0)
 COMP( 1985, specimx,	special,0,		specimx,	specimx,	0,	      "<unknown>",				 "Specialist MX",	0)
