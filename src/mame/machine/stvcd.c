@@ -204,7 +204,7 @@ TIMER_DEVICE_CALLBACK( stv_sector_cb )
 		cr2 = cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track;
 	}
 	cr3 = (cd_curfad>>16)&0xff;
-	cr4 = cd_curfad;
+	cr4 = cd_curfad&0xffff;
 
 	timer.adjust(attotime::from_hz(CD_SPEED));
 }
@@ -783,7 +783,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 			else	// play until the end of the disc
 			{
-				fadstoplay = cdrom_get_track_start(cdrom, 0xaa) + 150;
+				fadstoplay = (cdrom_get_track_start(cdrom, 0xaa)) - cd_curfad;
 				printf("track mode %08x %08x\n",cd_curfad,fadstoplay);
 			}
 
@@ -1927,6 +1927,7 @@ static void cd_playdata(void)
 			{
 				cd_read_filtered_sector(cd_curfad);
 
+				//popmessage("%08x %08x",cd_curfad,fadstoplay);
 				cd_curfad++;
 				fadstoplay--;
 
