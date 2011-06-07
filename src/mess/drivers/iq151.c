@@ -37,11 +37,16 @@ ToDo:
   otherwise then checks for non-FF at C800, if so, jumps to C800. Could be
   extra roms or some sort of boot device.
 
+- Key beep sounds better if clock speed changed to 1MHz, but it is still
+  highly annoying. Press Ctrl-G to hear the 2-tone bell.
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "sound/speaker.h"
+
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 #define VIDEO_START_MEMBER(name) void name::video_start()
@@ -52,9 +57,13 @@ class iq151_state : public driver_device
 {
 public:
 	iq151_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_speaker(*this, "speaker")
+	{ }
 
+	required_device<device_t> m_speaker;
 	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_WRITE8_MEMBER(speaker_w);
 	UINT8 *m_p_ram;
 	UINT8 *m_p_videoram;
 	const UINT8 *m_p_chargen;
@@ -93,7 +102,15 @@ READ8_MEMBER(iq151_state::keyboard_r)
 	return 0xff;
 }
 
+WRITE8_MEMBER(iq151_state::speaker_w)
+{
+// This port does many unknown things
 
+	if ((data & 0xfe) == 6)
+		speaker_level_w(m_speaker, BIT(data, 0));
+}
+
+		
 static ADDRESS_MAP_START(iq151_mem, AS_PROGRAM, 8, iq151_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("boot")
@@ -109,6 +126,7 @@ static ADDRESS_MAP_START(iq151_io, AS_IO, 8, iq151_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x84, 0x85 ) AM_READ(keyboard_r)
 	AM_RANGE( 0x86, 0x86 ) AM_READ_PORT("X8")
+	AM_RANGE( 0x87, 0x87 ) AM_WRITE(speaker_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -317,6 +335,11 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_GFXDECODE(iq151)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_ADD_PERIODIC("iq151a", iq151a, attotime::from_hz(3) )
 MACHINE_CONFIG_END
