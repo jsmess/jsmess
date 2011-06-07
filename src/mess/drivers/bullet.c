@@ -619,9 +619,14 @@ static const wd17xx_interface fdc_intf =
 //  GENERIC_TERMINAL_INTERFACE( terminal_intf )
 //-------------------------------------------------
 
+static WRITE8_DEVICE_HANDLER( dummy_w )
+{
+	// handled in Z80DART_INTERFACE
+}
+
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_NULL
+	DEVCB_HANDLER(dummy_w)
 };
 
 
