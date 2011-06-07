@@ -743,7 +743,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 
 			// and kick the CD if there's more to read
-			cd_playdata();
+			//cd_playdata();
 
 			xferdnum = 0;
 			hirqreg |= CMOK;
@@ -805,11 +805,11 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				cdda_pause_audio( machine.device( "cdda" ), 0 );
 				cdda_start_audio( machine.device( "cdda" ), cd_curfad, fadstoplay  );
 			}
-			else
-			{
-				sector_timer->reset();
-				sector_timer->adjust(attotime::from_hz(CD_SPEED));	// 150 sectors / second = 300kBytes/second
-			}
+			//else
+			//{
+			//	sector_timer->reset();
+			//	sector_timer->adjust(attotime::from_hz(CD_SPEED));	// 150 sectors / second = 300kBytes/second
+			//}
 			break;
 
 		case 0x1100: // disc seek
@@ -1925,7 +1925,8 @@ static void cd_playdata(void)
 
 			if (cdrom)
 			{
-				cd_read_filtered_sector(cd_curfad);
+				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
+					cd_read_filtered_sector(cd_curfad);
 
 				//popmessage("%08x %08x",cd_curfad,fadstoplay);
 				cd_curfad++;
