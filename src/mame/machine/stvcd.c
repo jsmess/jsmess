@@ -675,7 +675,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			cr4 = cd_curfad;
 			break;
 
-		case 0x0600:	// end data transfer
+		case 0x0600:	// end data transfer (TODO: needs to be worked on!)
 				// returns # of bytes transfered (24 bits) in
 				// low byte of cr1 (MSB) and cr2 (middle byte, LSB)
 			CDROM_LOG(("%s:CD: End data transfer (%d bytes xfer'd)\n", machine.describe_context(), xferdnum))
@@ -743,7 +743,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 
 			// and kick the CD if there's more to read
-			//cd_playdata();
+			cd_playdata();
 
 			xferdnum = 0;
 			hirqreg |= CMOK;
