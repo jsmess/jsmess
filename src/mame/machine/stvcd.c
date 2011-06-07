@@ -1375,8 +1375,12 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 		case 0x7500:
 			CDROM_LOG(("%s:CD: Abort File\n",   machine.describe_context()))
 			// bios expects "2bc" mask to work against this
-			hirqreg |= (CMOK|EFLS|EHST|ESEL|DCHG|PEND|BFUL|CSCT|DRDY);
-			cd_stat = CD_STAT_PERI|CD_STAT_PAUSE;	// force to pause
+			hirqreg |= (CMOK|EFLS);
+			sectorstore = 0;
+			xfertype32 = XFERTYPE32_INVALID;
+			xferdnum = 0;
+			cd_stat = CD_STAT_PAUSE;	// force to pause
+			cr1 = cd_stat;
 			break;
 
 		case 0xe000:	// appears to be copy protection check.  needs only to return OK.
