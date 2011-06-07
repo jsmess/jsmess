@@ -29,6 +29,10 @@ ToDo:
 - Line 32 does not scroll, should it show?
   (could be reserved for a status line in a terminal mode)
 
+- In 64 character-per-line mode, there are extra symbols showing. This is
+  because the system writes 0x0d characters to screen memory, and in the
+  64-width chargen, this is a visible graphics character.
+
 - Sort out the issue with memory location 6. If it isn't zero the computer hangs.
   But if it is always forced to zero, the keys repeat way too fast. Timer
   currently set to 3Hz for reasonable repeat, but it is far from perfect.
@@ -68,6 +72,7 @@ public:
 	UINT8 *m_p_videoram;
 	const UINT8 *m_p_chargen;
 	UINT8 m_framecnt;
+	UINT8 m_width;
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
@@ -116,8 +121,7 @@ static ADDRESS_MAP_START(iq151_mem, AS_PROGRAM, 8, iq151_state)
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("boot")
 	AM_RANGE( 0x0800, 0xdfff ) AM_RAM AM_REGION("maincpu", 0x0800) // puts FF into C800 so we can boot
 	AM_RANGE( 0xe000, 0xe7ff ) AM_ROM
-	AM_RANGE( 0xe800, 0xebff ) AM_RAM
-	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE( 0xe800, 0xefff ) AM_RAM AM_BASE(m_p_videoram)
 	AM_RANGE( 0xf000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -127,6 +131,7 @@ static ADDRESS_MAP_START(iq151_io, AS_IO, 8, iq151_state)
 	AM_RANGE( 0x84, 0x85 ) AM_READ(keyboard_r)
 	AM_RANGE( 0x86, 0x86 ) AM_READ_PORT("X8")
 	AM_RANGE( 0x87, 0x87 ) AM_WRITE(speaker_w)
+	AM_RANGE( 0xfe, 0xfe ) AM_READ_PORT("FE")
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -214,6 +219,11 @@ static INPUT_PORTS_START( iq151 )
 	PORT_START("X8")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+
+	PORT_START("FE")
+	PORT_DIPNAME( 0xff, 0xff, "Screen Width")
+	PORT_DIPSETTING(    0x00, "64")
+	PORT_DIPSETTING(    0xff, "32")
 INPUT_PORTS_END
 
 
@@ -237,6 +247,8 @@ DRIVER_INIT( iq151 )
 
 MACHINE_RESET_MEMBER( iq151_state )
 {
+	m_width = input_port_read(machine(), "FE") ? 32 : 64;
+	machine().primary_screen->set_visible_area(0, m_width*8-1, 0, 32*8-1);
 	memory_set_bank(machine(), "boot", 1);
 	machine().scheduler().timer_set(attotime::from_usec(5), FUNC(iq151_boot));
 }
@@ -247,11 +259,21 @@ VIDEO_START_MEMBER( iq151_state )
 	m_p_ram = machine().region("maincpu")->base();
 }
 
+// Note that the screen width is controlled by the port FE dipswitch, however there
+// is a software setting at memory [001F]. Poking this can cause strange things to
+// happen.
 SCREEN_UPDATE_MEMBER( iq151_state )
 {
 	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
-	UINT16 cursor = m_p_ram[12] | ((m_p_ram[13] & 3) << 8); // cursor address masked
+	UINT16 sy=0,x;
+	UINT16 chrstart = (m_width == 32) ? 0x800 : 0; // choose which charrom to use
+	UINT16 ma = m_p_ram[0x20] | ((m_p_ram[0x21] & 7) << 8); // start of videoram
+	UINT16 cursor = m_p_ram[0x0c] | ((m_p_ram[0x0d] & 7) << 8); // cursor address
+
+	if ((m_width == 32) || (m_width == 64)) {}
+	else
+		m_width = input_port_read(machine(), "FE") ? 32 : 64; // fix random crashing
+
 
 	m_framecnt++;
 
@@ -261,11 +283,12 @@ SCREEN_UPDATE_MEMBER( iq151_state )
 		{
 			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 0);
 
-			for (x = ma; x < ma+32; x++)
+			for (x = ma; x < ma + m_width; x++)
 			{
 				chr = m_p_videoram[x];
+				if (chrstart > 0) chr &= 0x7f; // 32chr rom only has 128 characters
 
-				gfx = m_p_chargen[(chr<<3) | ra ];
+				gfx = m_p_chargen[chrstart | (chr<<3) | ra ];
 
 				//display cursor if at cursor position and flash on
 				if ( (x==cursor) && (m_framecnt & 0x08) )
@@ -282,7 +305,7 @@ SCREEN_UPDATE_MEMBER( iq151_state )
 				*p++ = BIT(gfx, 0);
 			}
 		}
-		ma+=32;
+		ma+=m_width;
 	}
 	return 0;
 }
@@ -330,8 +353,8 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MCFG_GFXDECODE(iq151)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
@@ -360,11 +383,11 @@ ROM_START( iq151 )
 	ROMX_LOAD( "iq151_monitor_cpm_old.rom", 0xf000, 0x1000, CRC(6743e1b7) SHA1(ae4f3b1ba2511a1f91c4e8afdfc0e5aeb0fb3a42),ROM_BIOS(4))
 
 	ROM_REGION( 0x0c00, "chargen", ROMREGION_INVERT )
-	ROM_LOAD( "iq151_video32font.rom", 0x0000, 0x0400, CRC(395567a7) SHA1(18800543daf4daed3f048193c6ae923b4b0e87db))
-	ROM_LOAD( "iq151_video64font.rom", 0x0400, 0x0800, CRC(cb6f43c0) SHA1(4b2c1d41838d569228f61568c1a16a8d68b3dadf))
+	ROM_LOAD( "iq151_video64font.rom", 0x0000, 0x0800, CRC(cb6f43c0) SHA1(4b2c1d41838d569228f61568c1a16a8d68b3dadf))
+	ROM_LOAD( "iq151_video32font.rom", 0x0800, 0x0400, CRC(395567a7) SHA1(18800543daf4daed3f048193c6ae923b4b0e87db))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 198?, iq151,  0,       0,      iq151,     iq151,   iq151, "ZPA Novy Bor", "IQ-151", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, iq151,  0,       0,      iq151,     iq151,   iq151, "ZPA Novy Bor", "IQ-151", 0 )
