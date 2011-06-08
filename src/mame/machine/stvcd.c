@@ -1267,6 +1267,12 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 			break;
 
+		case 0x6400:    // put sector data
+			/* TODO: Dungeon Master Nexus trips this */
+			// ...
+			hirqreg |= (CMOK|EHST);
+			break;
+
 		case 0x6700:	// get copy error
 			CDROM_LOG(("%s:CD: Get copy error\n",   machine.describe_context()))
 			hirqreg |= (CMOK|ESEL|EFLS|SCDQ|DRDY);
