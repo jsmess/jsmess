@@ -1148,16 +1148,18 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 				if (bufnum >= MAX_FILTERS)
 				{
-					CDROM_LOG(("CD: invalid buffer number\n"));
-					cd_stat = 0xff;	// ERROR
+					printf("CD: invalid buffer number\n");
+					/* TODO: why this is happening? */
+					//cd_stat = 0xff00;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
 
 				if (partitions[bufnum].numblks == 0)
 				{
-					CDROM_LOG(("CD: buffer is empty\n"))
-					cd_stat = 0xff;	// ERROR
+					printf("CD: buffer is empty\n");
+					/* TODO: why this is happening? */
+					//cd_stat = 0xff00;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
@@ -1189,7 +1191,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				if (bufnum >= MAX_FILTERS)
 				{
 					printf("CD: invalid buffer number\n");
-					cd_stat = CD_STAT_REJECT;	// ERROR
+					/* TODO: why this is happening? */
+					//cd_stat = CD_STAT_REJECT;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
@@ -1197,7 +1200,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				if (partitions[bufnum].numblks == 0)
 				{
 					printf("CD: buffer is empty\n");
-					cd_stat = CD_STAT_REJECT;	// ERROR
+					/* TODO: why this is happening? */
+					//cd_stat = CD_STAT_REJECT;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
@@ -1232,16 +1236,18 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 				if (bufnum >= MAX_FILTERS)
 				{
-					CDROM_LOG(("CD: invalid buffer number\n"))
-					cd_stat = 0xff;	// ERROR
+					printf("CD: invalid buffer number\n");
+					/* TODO: why this is happening? */
+					//cd_stat = 0xff00;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
 
 				if (partitions[bufnum].numblks == 0)
 				{
-					CDROM_LOG(("CD: buffer is empty\n"))
-					cd_stat = 0xff;	// ERROR
+					printf("CD: buffer is empty\n");
+					/* TODO: why this is happening? */
+					//cd_stat = 0xff00;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
