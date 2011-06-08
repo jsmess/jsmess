@@ -257,6 +257,7 @@ VIDEO_START_MEMBER( iq151_state )
 {
 	m_p_chargen = machine().region("chargen")->base();
 	m_p_ram = machine().region("maincpu")->base();
+	m_width = 32;
 }
 
 // Note that the screen width is controlled by the port FE dipswitch, however there
@@ -269,11 +270,6 @@ SCREEN_UPDATE_MEMBER( iq151_state )
 	UINT16 chrstart = (m_width == 32) ? 0x800 : 0; // choose which charrom to use
 	UINT16 ma = m_p_ram[0x20] | ((m_p_ram[0x21] & 7) << 8); // start of videoram
 	UINT16 cursor = m_p_ram[0x0c] | ((m_p_ram[0x0d] & 7) << 8); // cursor address
-
-	if ((m_width == 32) || (m_width == 64)) {}
-	else
-		m_width = input_port_read(machine(), "FE") ? 32 : 64; // fix random crashing
-
 
 	m_framecnt++;
 

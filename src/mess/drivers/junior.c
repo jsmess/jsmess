@@ -5,6 +5,7 @@
         17/07/2009 Skeleton driver.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -16,8 +17,16 @@ class junior_state : public driver_device
 {
 public:
 	junior_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_riot(*this, "riot")
+	{ }
 
+	required_device<device_t> m_riot;
+	DECLARE_READ8_MEMBER(junior_riot_a_r);
+	DECLARE_READ8_MEMBER(junior_riot_b_r);
+	DECLARE_WRITE8_MEMBER(junior_riot_a_w);
+	DECLARE_WRITE8_MEMBER(junior_riot_b_w);
+	DECLARE_WRITE_LINE_MEMBER(junior_riot_irq);
 	UINT8 m_port_a;
 	UINT8 m_port_b;
 	UINT8 m_led_time[6];
@@ -26,12 +35,12 @@ public:
 
 
 
- static ADDRESS_MAP_START(junior_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(junior_mem, AS_PROGRAM, 8, junior_state)
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFF)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM // 1K RAM
 	AM_RANGE(0x1a00, 0x1a7f) AM_RAM // 6532 RAM
-	AM_RANGE(0x1a80, 0x1aff) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x1a80, 0x1aff) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_ROM	// Monitor
 ADDRESS_MAP_END
 
@@ -90,21 +99,20 @@ INPUT_PORTS_END
 
 
 
-static READ8_DEVICE_HANDLER(junior_riot_a_r)
+READ8_MEMBER( junior_state::junior_riot_a_r )
 {
-	junior_state *state = device->machine().driver_data<junior_state>();
-	UINT8	data = 0xff;
+	UINT8 data = 0xff;
 
-	switch( ( state->m_port_b >> 1 ) & 0x0f )
+	switch( ( m_port_b >> 1 ) & 0x0f )
 	{
 	case 0:
-		data = input_port_read(device->machine(), "LINE0");
+		data = input_port_read(machine(), "LINE0");
 		break;
 	case 1:
-		data = input_port_read(device->machine(), "LINE1");
+		data = input_port_read(machine(), "LINE1");
 		break;
 	case 2:
-		data = input_port_read(device->machine(), "LINE2");
+		data = input_port_read(machine(), "LINE2");
 		break;
 	}
 	return data;
@@ -112,9 +120,9 @@ static READ8_DEVICE_HANDLER(junior_riot_a_r)
 }
 
 
-static READ8_DEVICE_HANDLER(junior_riot_b_r)
+READ8_MEMBER( junior_state::junior_riot_b_r )
 {
-	if ( riot6532_portb_out_get(device) & 0x20 )
+	if ( riot6532_portb_out_get(m_riot) & 0x20 )
 		return 0xFF;
 
 	return 0x7F;
@@ -122,50 +130,47 @@ static READ8_DEVICE_HANDLER(junior_riot_b_r)
 }
 
 
-static WRITE8_DEVICE_HANDLER(junior_riot_a_w)
+WRITE8_MEMBER( junior_state::junior_riot_a_w )
 {
-	junior_state *state = device->machine().driver_data<junior_state>();
-	UINT8 idx = ( state->m_port_b >> 1 ) & 0x0f;
+	UINT8 idx = ( m_port_b >> 1 ) & 0x0f;
 
-	state->m_port_a = data;
+	m_port_a = data;
 
-	if ((idx >= 4 && idx < 10) & ( state->m_port_a != 0xff ))
+	if ((idx >= 4 && idx < 10) & ( m_port_a != 0xff ))
 	{
-		output_set_digit_value( idx-4, state->m_port_a ^ 0x7f );
-		state->m_led_time[idx - 4] = 10;
+		output_set_digit_value( idx-4, m_port_a ^ 0x7f );
+		m_led_time[idx - 4] = 10;
 	}
 }
 
 
-static WRITE8_DEVICE_HANDLER(junior_riot_b_w)
+WRITE8_MEMBER( junior_state::junior_riot_b_w )
 {
-	junior_state *state = device->machine().driver_data<junior_state>();
-	UINT8 newdata = data;
-	UINT8 idx = ( newdata >> 1 ) & 0x0f;
+	UINT8 idx = ( data >> 1 ) & 0x0f;
 
-	state->m_port_b = newdata;
+	m_port_b = data;
 
-	if ((idx >= 4 && idx < 10) & ( state->m_port_a != 0xff ))
+	if ((idx >= 4 && idx < 10) & ( m_port_a != 0xff ))
 	{
-		output_set_digit_value( idx-4, state->m_port_a ^ 0x7f );
-		state->m_led_time[idx - 4] = 10;
+		output_set_digit_value( idx-4, m_port_a ^ 0x7f );
+		m_led_time[idx - 4] = 10;
 	}
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( junior_riot_irq )
+WRITE_LINE_MEMBER( junior_state::junior_riot_irq )
 {
-	cputag_set_input_line(device->machine(), "maincpu", M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
 static const riot6532_interface junior_riot_interface =
 {
-	DEVCB_HANDLER(junior_riot_a_r),
-	DEVCB_HANDLER(junior_riot_b_r),
-	DEVCB_HANDLER(junior_riot_a_w),
-	DEVCB_HANDLER(junior_riot_b_w),
-	DEVCB_LINE(junior_riot_irq)
+	DEVCB_DRIVER_MEMBER(junior_state, junior_riot_a_r),
+	DEVCB_DRIVER_MEMBER(junior_state, junior_riot_b_r),
+	DEVCB_DRIVER_MEMBER(junior_state, junior_riot_a_w),
+	DEVCB_DRIVER_MEMBER(junior_state, junior_riot_b_w),
+	DEVCB_DRIVER_LINE_MEMBER(junior_state, junior_riot_irq)
 };
 
 
@@ -205,18 +210,18 @@ static MACHINE_RESET(junior)
 
 
 static MACHINE_CONFIG_START( junior, junior_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",M6502, XTAL_1MHz)
-    MCFG_CPU_PROGRAM_MAP(junior_mem)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",M6502, XTAL_1MHz)
+	MCFG_CPU_PROGRAM_MAP(junior_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	MCFG_MACHINE_START( junior )
-    MCFG_MACHINE_RESET(junior)
+	MCFG_MACHINE_RESET(junior)
 
-    /* video hardware */
-    MCFG_DEFAULT_LAYOUT( layout_junior )
+	/* video hardware */
+	MCFG_DEFAULT_LAYOUT( layout_junior )
 
-    MCFG_RIOT6532_ADD("riot", XTAL_1MHz, junior_riot_interface)
+	MCFG_RIOT6532_ADD("riot", XTAL_1MHz, junior_riot_interface)
 
 	MCFG_TIMER_ADD_PERIODIC("led_timer", junior_update_leds, attotime::from_hz(50))
 MACHINE_CONFIG_END
@@ -224,18 +229,20 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( junior )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_DEFAULT_BIOS("orig")
-    ROM_SYSTEM_BIOS( 0, "orig", "Original ESS503" )
-    ROMX_LOAD( "ess503.ic2", 0x1c00, 0x0400, CRC(9e804f8c) SHA1(181bdb69fb4711cb008e7966747d4775a5e3ef69), ROM_BIOS(1))
-    ROM_SYSTEM_BIOS( 1, "mod-orig", "Mod-Original (2708)" )
-    ROMX_LOAD( "junior-mod.ic2", 0x1c00, 0x0400, CRC(ee8aa69d) SHA1(a132a51603f1a841c354815e6d868b335ac84364), ROM_BIOS(2))
-    ROM_SYSTEM_BIOS( 2, "2732", "Just monitor (2732) " )
-    ROMX_LOAD( "junior27321a.ic2", 0x1c00, 0x0400, CRC(e22f24cc) SHA1(a6edb52a9eea5e99624c128065e748e5a3fb2e4c), ROM_BIOS(3))
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("orig")
+
+	ROM_SYSTEM_BIOS( 0, "orig", "Original ESS503" )
+	ROMX_LOAD( "ess503.ic2", 0x1c00, 0x0400, CRC(9e804f8c) SHA1(181bdb69fb4711cb008e7966747d4775a5e3ef69), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS( 1, "mod-orig", "Mod-Original (2708)" )
+	ROMX_LOAD( "junior-mod.ic2", 0x1c00, 0x0400, CRC(ee8aa69d) SHA1(a132a51603f1a841c354815e6d868b335ac84364), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS( 2, "2732", "Just monitor (2732)" )
+	ROMX_LOAD( "junior27321a.ic2", 0x1c00, 0x0400, CRC(e22f24cc) SHA1(a6edb52a9eea5e99624c128065e748e5a3fb2e4c), ROM_BIOS(3))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1980, junior,  0,       0,	junior, 	junior, 	 0,   "Elektor Electronics",   "Junior Computer",		GAME_SUPPORTS_SAVE | GAME_NO_SOUND)
-
+COMP( 1980, junior,  0,       0,     junior,    junior,   0,     "Elektor Electronics", "Junior Computer", GAME_SUPPORTS_SAVE | GAME_NO_SOUND)
