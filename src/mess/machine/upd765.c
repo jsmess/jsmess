@@ -542,11 +542,11 @@ static void upd765_seek_setup(device_t *device, int is_recalibrate)
 				signed_tracks = -77;
 			}
 
+			/* perform seek - if drive isn't present it will not do anything */
+			floppy_drive_seek(img, signed_tracks);
+			
 			if (signed_tracks!=0)
 			{
-				/* perform seek - if drive isn't present it will not do anything */
-				floppy_drive_seek(img, signed_tracks);
-
 				upd765_setup_timed_int(device,signed_tracks);
 			}
 			else
@@ -565,6 +565,9 @@ static void upd765_seek_setup(device_t *device, int is_recalibrate)
 		/* get signed tracks */
 		signed_tracks = fdc->ncn - fdc->pcn[fdc->drive];
 
+		/* perform seek - if drive isn't present it will not do anything */
+		floppy_drive_seek(img, signed_tracks);
+
 		/* if no tracks to seek, or drive is not ready, seek is complete */
 		if (img == NULL || (signed_tracks==0) || (!upd765_get_rdy(device)))
 		{
@@ -572,9 +575,6 @@ static void upd765_seek_setup(device_t *device, int is_recalibrate)
 		}
 		else
 		{
-			/* perform seek - if drive isn't present it will not do anything */
-			floppy_drive_seek(img, signed_tracks);
-
 			/* seek complete - issue an interrupt */
 			upd765_setup_timed_int(device,signed_tracks);
 		}
@@ -1515,7 +1515,7 @@ static TIMER_CALLBACK(upd765_continue_command)
 				{
 					if (fdc->upd765_flags & UPD765_TC)
 						upd765_write_complete(device);
-					// if TC or not set or PIO, what?
+					// if TC not set, what?
 					break;
 				}
 
