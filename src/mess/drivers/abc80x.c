@@ -1686,6 +1686,9 @@ ROM_START( abc800m )
 	ROM_REGION( 0x800, "xebec", 0 )
 	ROM_LOAD_OPTIONAL( "st4038.bin",   0x0000, 0x0800, CRC(4c803b87) SHA1(1141bb51ad9200fc32d92a749460843dc6af8953) ) // Seagate ST4038 (http://stason.org/TULARC/pc/hard-drives-hdd/seagate/ST4038-1987-31MB-5-25-FH-MFM-ST412.html)
 	ROM_LOAD_OPTIONAL( "st225.bin",    0x0000, 0x0800, CRC(c9f68f81) SHA1(7ff8b2a19f71fe0279ab3e5a0a5fffcb6030360c) ) // Seagate ST225 (http://stason.org/TULARC/pc/hard-drives-hdd/seagate/ST225-21MB-5-25-HH-MFM-ST412.html)
+
+	ROM_REGION( 0x800, "slutprov", 0 )
+	ROM_LOAD_OPTIONAL( "slutprov.bin",   0x0000, 0x0800, CRC(a5bb56f4) SHA1(f97cb6526a1d10b189164f26157522e382ca6bc6) )
 ROM_END
 
 
