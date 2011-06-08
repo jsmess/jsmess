@@ -152,6 +152,7 @@ extern const PROPERTYSHEETINFO g_propSheets[] =
 	{ FALSE,	NULL,					IDD_PROP_GAME,			GamePropertiesDialogProc },
 	{ FALSE,	NULL,					IDD_PROP_AUDIT,			GameAuditDialogProc },
 	{ TRUE,		NULL,					IDD_PROP_DISPLAY,		GameOptionsProc },
+	{ TRUE,		NULL,					IDD_PROP_HLSL,			GameOptionsProc },
 	{ TRUE,		NULL,					IDD_PROP_ADVANCED,		GameOptionsProc },
 	{ TRUE,		NULL,					IDD_PROP_SCREEN,		GameOptionsProc },
 	{ TRUE,		NULL,					IDD_PROP_SOUND,			GameOptionsProc },
