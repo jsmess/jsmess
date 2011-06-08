@@ -31,7 +31,7 @@ public:
 	required_device<device_t> m_terminal;
 	DECLARE_READ16_MEMBER(isbc_terminal_status_r);
 	DECLARE_READ16_MEMBER(isbc_terminal_r);
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
 	virtual void machine_reset();
 };
@@ -68,7 +68,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(isbc86_io, AS_IO, 16, isbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00d8, 0x00d9) AM_READ(isbc_terminal_r)  AM_DEVWRITE8_LEGACY(TERMINAL_TAG, terminal_write, 0Xff)
+	AM_RANGE(0x00d8, 0x00d9) AM_READ(isbc_terminal_r) AM_DEVWRITE8_LEGACY(TERMINAL_TAG, terminal_write, 0xff)
 	AM_RANGE(0x00da, 0x00db) AM_READ(isbc_terminal_status_r)
 ADDRESS_MAP_END
 
