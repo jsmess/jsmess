@@ -8,12 +8,6 @@ Notes:
 
 isbc86 commands: BYTE WORD REAL EREAL ROMTEST. ROMTEST works, the others hang.
 
-isbc286, isbc2861 - there is some kind of weird 80286 bug, when program makes a
-                    FAR jump or call, the pc becomes the segment, and the
-                    system jumps into space. If the 8086 is substituted, the
-                    jumps work correctly. Yet, the 80286 seems to work fine
-                    in the at driver. (08/June/2011)
-
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -140,11 +134,14 @@ static MACHINE_CONFIG_START( rpc86, isbc_state )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
+static const unsigned i286_address_mask = 0x00ffffff;
+
 static MACHINE_CONFIG_START( isbc286, isbc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_9_8304MHz)
 	MCFG_CPU_PROGRAM_MAP(isbc286_mem)
 	MCFG_CPU_IO_MAP(isbc286_io)
+	MCFG_CPU_CONFIG(i286_address_mask)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
@@ -156,6 +153,7 @@ static MACHINE_CONFIG_START( isbc2861, isbc_state )
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_9_8304MHz)
 	MCFG_CPU_PROGRAM_MAP(isbc2861_mem)
 	MCFG_CPU_IO_MAP(isbc2861_io)
+	MCFG_CPU_CONFIG(i286_address_mask)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
