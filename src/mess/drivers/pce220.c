@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
+#include "sound/beep.h"
 #include "rendlay.h"
 
 // Interrupt flags
@@ -32,11 +33,13 @@ public:
 	pce220_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_ram(*this, RAM_TAG)
+		  m_ram(*this, RAM_TAG),
+		  m_beep(*this, BEEPER_TAG)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_ram;
+	required_device<device_t> m_beep;
 
 	// HD61202 LCD controller
 	UINT8 m_lcd_index_row;
@@ -66,6 +69,7 @@ public:
 	DECLARE_WRITE8_MEMBER( timer_w );
 	DECLARE_READ8_MEMBER( port15_r );
 	DECLARE_READ8_MEMBER( port18_r );
+	DECLARE_WRITE8_MEMBER( port18_w );
 	DECLARE_READ8_MEMBER( port1f_r );
 	DECLARE_WRITE8_MEMBER( kb_matrix_w );
 	DECLARE_READ8_MEMBER( kb_r );
@@ -211,6 +215,11 @@ READ8_MEMBER( pce220_state::port18_r )
 	return 0;
 }
 
+WRITE8_MEMBER( pce220_state::port18_w )
+{
+	beep_set_state(m_beep, BIT(data, 7));
+}
+
 READ8_MEMBER( pce220_state::port1f_r )
 {
 	/*
@@ -302,7 +311,7 @@ static ADDRESS_MAP_START( pce220_io , AS_IO, 8, pce220_state)
 	AM_RANGE(0x15, 0x15) AM_READ(port15_r) AM_WRITENOP
 	AM_RANGE(0x16, 0x16) AM_READWRITE(irq_status_r, irq_ack_w)
 	AM_RANGE(0x17, 0x17) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x18, 0x18) AM_READ(port18_r) AM_WRITENOP
+	AM_RANGE(0x18, 0x18) AM_READWRITE(port18_r, port18_w)
 	AM_RANGE(0x19, 0x19) AM_READWRITE(rom_bank_r, rom_bank_w)
 	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //cleared on BASIC init
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(ram_bank_w)
@@ -507,6 +516,11 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
     MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(pce220)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_ADD_PERIODIC("pce220_timer", pce220_timer_callback, attotime::from_msec(468))
 
