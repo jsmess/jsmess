@@ -42,6 +42,8 @@
 #include "machine/6821pia.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
+#include "sound/wave.h"
+
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 #define MACHINE_START_MEMBER(name) void name::machine_start()
@@ -508,6 +510,11 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_GFXDECODE(pegasus)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MCFG_PIA6821_ADD( "pia_s", pegasus_pia_s_intf )
