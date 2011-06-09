@@ -8,7 +8,6 @@
     TODO:
     - Rewrite keyboard input hook-up and decap/dump the keyboard MCU if possible;
     - Fix the 0xe80/0xe83 kanji ROM readback;
-    - Fixe the 0xb00 RAM banking;
     - x1turbo keyboard inputs are currently broken, use x1turbo40 for now;
     - Hook-up remaining .tap image formats;
     - Implement APSS tape commands;
@@ -45,7 +44,7 @@
     - Trivia-Q: dunno what to do on the selection screen, missing inputs?
     - Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
     - Will 2: doesn't load, fdc issue presumably (note: it's a x1turbo game ONLY);
-    - X1F Demo ("New X1 Demo"): needs partial updates to work properly (note that INDEXED16 doesn't cope at all with partial updates);
+    - X1F Demo ("New X1 Demo"): needs partial updates, but they doesn't cope well with this system;
     - Ys 2: crashes after the disclaimer screen;
     - Ys 3: missing user disk, to hack it (and play with x1turboz features): bp 81ca,pc += 2
     - Ys 3: never uploads a valid 4096 palette, probably related to the fact that we don't have an user disk
@@ -260,23 +259,23 @@ static void x1_draw_pixel(running_machine &machine, bitmap_t *bitmap,int y,int x
 
 	if(width && height)
 	{
-		*BITMAP_ADDR16(bitmap, y+0, x+0) = machine.pens[pen];
-		*BITMAP_ADDR16(bitmap, y+0, x+1) = machine.pens[pen];
-		*BITMAP_ADDR16(bitmap, y+1, x+0) = machine.pens[pen];
-		*BITMAP_ADDR16(bitmap, y+1, x+1) = machine.pens[pen];
+		*BITMAP_ADDR32(bitmap, y+0, x+0) = machine.pens[pen];
+		*BITMAP_ADDR32(bitmap, y+0, x+1) = machine.pens[pen];
+		*BITMAP_ADDR32(bitmap, y+1, x+0) = machine.pens[pen];
+		*BITMAP_ADDR32(bitmap, y+1, x+1) = machine.pens[pen];
 	}
 	else if(width)
 	{
-		*BITMAP_ADDR16(bitmap, y, x+0) = machine.pens[pen];
-		*BITMAP_ADDR16(bitmap, y, x+1) = machine.pens[pen];
+		*BITMAP_ADDR32(bitmap, y, x+0) = machine.pens[pen];
+		*BITMAP_ADDR32(bitmap, y, x+1) = machine.pens[pen];
 	}
 	else if(height)
 	{
-		*BITMAP_ADDR16(bitmap, y+0, x) = machine.pens[pen];
-		*BITMAP_ADDR16(bitmap, y+1, x) = machine.pens[pen];
+		*BITMAP_ADDR32(bitmap, y+0, x) = machine.pens[pen];
+		*BITMAP_ADDR32(bitmap, y+1, x) = machine.pens[pen];
 	}
 	else
-		*BITMAP_ADDR16(bitmap, y, x) = machine.pens[pen];
+		*BITMAP_ADDR32(bitmap, y, x) = machine.pens[pen];
 }
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -323,7 +322,7 @@ static UINT8 check_line_valid_height(running_machine &machine,int y,int x_size,i
 	return height;
 }
 
-static void draw_fgtilemap(running_machine &machine, bitmap_t *bitmap)
+static void draw_fgtilemap(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	/*
         attribute table:
@@ -470,6 +469,9 @@ static void draw_fgtilemap(running_machine &machine, bitmap_t *bitmap)
 						res_x = x*8+xi*(width+1);
 						res_y = y*(mc6845_tile_height)+yi;
 
+						if(res_y < cliprect->min_y || res_y > cliprect->max_y) // partial update, TODO: optimize
+							continue;
+
 						x1_draw_pixel(machine,bitmap,res_y,res_x,pcg_pen,width,0);
 					}
 				}
@@ -509,7 +511,7 @@ static int priority_mixer_pri(running_machine &machine,int color)
 	return pri_mask_calc;
 }
 
-static void draw_gfxbitmap(running_machine &machine, bitmap_t *bitmap,int plane,int pri)
+static void draw_gfxbitmap(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect, int plane,int pri)
 {
 	x1_state *state = machine.driver_data<x1_state>();
 	int xi,yi,x,y;
@@ -551,6 +553,9 @@ static void draw_gfxbitmap(running_machine &machine, bitmap_t *bitmap,int plane,
 					if((color == 8 && state->m_scrn_reg.blackclip & 0x10) || (color == 9 && state->m_scrn_reg.blackclip & 0x20)) // bitmap color clip to black conditions
 						color = 0;
 
+					if(y*(mc6845_tile_height)+yi < cliprect->min_y || y*(mc6845_tile_height)+yi > cliprect->max_y) // partial update TODO: optimize
+						continue;
+
 					x1_draw_pixel(machine,bitmap,y*(mc6845_tile_height)+yi,x*8+xi,color,0,0);
 				}
 			}
@@ -564,15 +569,18 @@ static SCREEN_UPDATE( x1 )
 
 	bitmap_fill(bitmap, cliprect, MAKE_ARGB(0xff,0x00,0x00,0x00));
 
-	draw_gfxbitmap(screen->machine(),bitmap,state->m_scrn_reg.disp_bank,state->m_scrn_reg.pri);
-	draw_fgtilemap(screen->machine(),bitmap);
-	draw_gfxbitmap(screen->machine(),bitmap,state->m_scrn_reg.disp_bank,state->m_scrn_reg.pri^0xff);
+	draw_gfxbitmap(screen->machine(),bitmap,cliprect,state->m_scrn_reg.disp_bank,state->m_scrn_reg.pri);
+	draw_fgtilemap(screen->machine(),bitmap,cliprect);
+	draw_gfxbitmap(screen->machine(),bitmap,cliprect,state->m_scrn_reg.disp_bank,state->m_scrn_reg.pri^0xff);
 
 	return 0;
 }
 
 static SCREEN_EOF( x1 )
 {
+//	x1_state *state = screen->machine().driver_data<x1_state>();
+
+//	state->m_old_vpos = -1;
 }
 
 /*************************************
@@ -1281,6 +1289,11 @@ static WRITE8_HANDLER( x1_pal_r_w )
 	{
 		state->m_x_r = data;
 		set_current_palette(space->machine());
+		//if(state->m_old_vpos != space->machine().primary_screen->vpos())
+		//{
+		//	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+		//	state->m_old_vpos = space->machine().primary_screen->vpos();
+		//}
 	}
 }
 
@@ -1297,6 +1310,11 @@ static WRITE8_HANDLER( x1_pal_g_w )
 	{
 		state->m_x_g = data;
 		set_current_palette(space->machine());
+		//if(state->m_old_vpos != space->machine().primary_screen->vpos())
+		//{
+			space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+		//	state->m_old_vpos = space->machine().primary_screen->vpos();
+		//}
 	}
 }
 
@@ -1313,6 +1331,11 @@ static WRITE8_HANDLER( x1_pal_b_w )
 	{
 		state->m_x_b = data;
 		set_current_palette(space->machine());
+		//if(state->m_old_vpos != space->machine().primary_screen->vpos())
+		//{
+		//	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+		//	state->m_old_vpos = space->machine().primary_screen->vpos();
+		//}
 	}
 }
 
@@ -1581,7 +1604,6 @@ static WRITE8_HANDLER( x1_emm_w )
 
 /*
     CZ-141SF, CZ-127MF, X1turboZII, X1turboZ3 boards
-    TODO: still not quite right
 */
 static READ8_HANDLER( x1turbo_bank_r )
 {
@@ -2573,6 +2595,7 @@ static MACHINE_RESET( x1 )
 		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 
 	state->m_ram_bank = 0;
+//	state->m_old_vpos = -1;
 }
 
 static MACHINE_RESET( x1turbo )
@@ -2655,7 +2678,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE(x1)
