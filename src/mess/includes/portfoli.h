@@ -23,7 +23,6 @@
 #define M82C50A_TAG		"hpc102_u1"
 #define HD61830_TAG		"hd61830"
 #define CENTRONICS_TAG	"centronics"
-#define SPEAKER_TAG		"speaker"
 #define TIMER_TICK_TAG	"tick"
 
 class portfolio_state : public driver_device

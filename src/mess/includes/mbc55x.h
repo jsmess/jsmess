@@ -109,7 +109,6 @@ WRITE8_HANDLER(vram_page_w);
 READ8_HANDLER(mbc55x_video_io_r);
 WRITE8_HANDLER(mbc55x_video_io_w);
 
-#define	SPEAKER_TAG				"speaker"
 #define MONO_TAG                "mono"
 
 #define MSM8251A_KB_TAG			"msm8251a_kb"

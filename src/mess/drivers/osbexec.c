@@ -31,7 +31,7 @@ public:
 			m_pia_0( *this, "pia_0" ),
 			m_pia_1( *this, "pia_1" ),
 			m_sio( *this, "sio" ),
-			m_speaker( *this, "speaker" )
+			m_speaker( *this, SPEAKER_TAG )
 	{ }
 
 	required_device<cpu_device>	m_maincpu;
@@ -641,7 +641,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_VIDEO_START( generic_bitmapped )
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 //  MCFG_PIT8253_ADD( "pit", osbexec_pit_config )

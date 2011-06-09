@@ -14,7 +14,6 @@
 #define I8255_TAG		"i8255"
 #define SP0256AL2_TAG	"ic1"
 #define Z80PIO_TAG		"z80pio"
-#define SPEAKER_TAG		"speaker"
 #define CENTRONICS_TAG	"centronics"
 #define SCREEN_TAG		"screen"
 

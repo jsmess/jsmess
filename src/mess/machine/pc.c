@@ -252,7 +252,7 @@ UINT8 pc_speaker_get_spk(running_machine &machine)
 
 void pc_speaker_set_spkrdata(running_machine &machine, UINT8 data)
 {
-	device_t *speaker = machine.device("speaker");
+	device_t *speaker = machine.device(SPEAKER_TAG);
 	pc_state *st = machine.driver_data<pc_state>();
 	st->m_pc_spkrdata = data ? 1 : 0;
 	speaker_level_w( speaker, pc_speaker_get_spk(machine) );
@@ -261,7 +261,7 @@ void pc_speaker_set_spkrdata(running_machine &machine, UINT8 data)
 
 void pc_speaker_set_input(running_machine &machine, UINT8 data)
 {
-	device_t *speaker = machine.device("speaker");
+	device_t *speaker = machine.device(SPEAKER_TAG);
 	pc_state *st = machine.driver_data<pc_state>();
 	st->m_pc_input = data ? 1 : 0;
 	speaker_level_w( speaker, pc_speaker_get_spk(machine) );
@@ -1130,7 +1130,7 @@ MACHINE_START( pc )
 
 MACHINE_RESET( pc )
 {
-	device_t *speaker = machine.device("speaker");
+	device_t *speaker = machine.device(SPEAKER_TAG);
 	pc_state *st = machine.driver_data<pc_state>();
 	st->m_maincpu = machine.device("maincpu" );
 	device_set_irq_callback(st->m_maincpu, pc_irq_callback);
@@ -1173,7 +1173,7 @@ MACHINE_START( pcjr )
 
 MACHINE_RESET( pcjr )
 {
-	device_t *speaker = machine.device("speaker");
+	device_t *speaker = machine.device(SPEAKER_TAG);
 	pc_state *st = machine.driver_data<pc_state>();
 	st->m_u73_q2 = 0;
 	st->m_out1 = 0;

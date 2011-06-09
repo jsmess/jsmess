@@ -406,7 +406,7 @@ blink w: 03b6 03
 static WRITE8_HANDLER(z88_port_w)
 {
 	z88_state *state = space->machine().driver_data<z88_state>();
-	device_t *speaker = space->machine().device("speaker");
+	device_t *speaker = space->machine().device(SPEAKER_TAG);
 	unsigned char port;
 
 	port = offset & 0x0ff;
@@ -768,7 +768,7 @@ static MACHINE_CONFIG_START( z88, z88_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* internal ram */

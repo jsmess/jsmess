@@ -15,7 +15,6 @@
 
 #define SCREEN_TAG		"screen"
 #define UB8830D_TAG		"ub8830d"
-#define SPEAKER_TAG		"speaker"
 #define CENTRONICS_TAG	"centronics"
 
 #define JTC_ES40_VIDEORAM_SIZE	0x2000

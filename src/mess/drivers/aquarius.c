@@ -73,7 +73,7 @@ static READ8_HANDLER( cassette_r )
 */
 static WRITE8_HANDLER( cassette_w )
 {
-	device_t *speaker = space->machine().device("speaker");
+	device_t *speaker = space->machine().device(SPEAKER_TAG);
 	device_t *cassette = space->machine().device(CASSETTE_TAG);
 
 	speaker_level_w(speaker, BIT(data, 0));
@@ -417,7 +417,7 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_3_579545MHz/2) // ??? AY-3-8914

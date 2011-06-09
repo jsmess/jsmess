@@ -249,7 +249,7 @@ static READ8_HANDLER( samcoupe_keyboard_r )
 static WRITE8_HANDLER( samcoupe_border_w )
 {
 	device_t *cassette = space->machine().device(CASSETTE_TAG);
-	device_t *speaker = space->machine().device("speaker");
+	device_t *speaker = space->machine().device(SPEAKER_TAG);
 	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 
 	state->m_border = data;
@@ -584,7 +584,7 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_ADD("saa1099", SAA1099, SAMCOUPE_XTAL_X1/3) /* 8 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

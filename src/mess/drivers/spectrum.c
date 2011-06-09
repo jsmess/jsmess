@@ -295,7 +295,7 @@ SamRam
 WRITE8_HANDLER(spectrum_port_fe_w)
 {
 	spectrum_state *state = space->machine().driver_data<spectrum_state>();
-	device_t *speaker = space->machine().device("speaker");
+	device_t *speaker = space->machine().device(SPEAKER_TAG);
 	unsigned char Changed;
 
 	Changed = state->m_port_fe_data^data;
@@ -734,7 +734,7 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */

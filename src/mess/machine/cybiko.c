@@ -494,7 +494,7 @@ static WRITE8_HANDLER( cybiko_io_reg_w )
 {
 	cybiko_state *state = space->machine().driver_data<cybiko_state>();
 	device_t *rtc = space->machine().device("rtc");
-	device_t *speaker = space->machine().device("speaker");
+	device_t *speaker = space->machine().device(SPEAKER_TAG);
 
 	_logerror( 2, ("cybiko_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)

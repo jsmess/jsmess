@@ -31,7 +31,6 @@
 #define MC6854_TAG		"econet_ic1"
 #define SCREEN_TAG		"screen"
 #define CENTRONICS_TAG	"centronics"
-#define SPEAKER_TAG		"speaker"
 #define BASERAM_TAG		"baseram"
 #define EXTROM_TAG		"a000"
 #define DOSROM_TAG		"e000"

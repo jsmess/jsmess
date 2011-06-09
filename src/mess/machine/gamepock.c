@@ -215,7 +215,7 @@ SCREEN_UPDATE( gamepock )
 /* This is called whenever the T0 pin switches state */
 int gamepock_io_callback( device_t *device, int ioline, int state )
 {
-	device_t *speaker = device->machine().device("speaker");
+	device_t *speaker = device->machine().device(SPEAKER_TAG);
 	if ( ioline == UPD7810_TO )
 	{
 		speaker_level_w(speaker, state & 1 );

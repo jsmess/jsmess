@@ -83,7 +83,7 @@ static UINT8 at_speaker_get_spk(void)
 
 static void at_speaker_set_spkrdata(running_machine &machine, UINT8 data)
 {
-	device_t *speaker = machine.device("speaker");
+	device_t *speaker = machine.device(SPEAKER_TAG);
 	at_spkrdata = data ? 1 : 0;
 	speaker_level_w( speaker, at_speaker_get_spk() );
 }
@@ -91,7 +91,7 @@ static void at_speaker_set_spkrdata(running_machine &machine, UINT8 data)
 
 static void at_speaker_set_input(running_machine &machine, UINT8 data)
 {
-	device_t *speaker = machine.device("speaker");
+	device_t *speaker = machine.device(SPEAKER_TAG);
 	at_speaker_input = data ? 1 : 0;
 	speaker_level_w( speaker, at_speaker_get_spk() );
 }

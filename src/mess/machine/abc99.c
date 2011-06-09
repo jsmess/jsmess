@@ -63,7 +63,6 @@ Notes:
 
 #define I8035_Z2_TAG		"z2"
 #define I8035_Z5_TAG		"z5"
-#define SPEAKER_TAG			"speaker"
 
 
 enum

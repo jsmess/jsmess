@@ -247,7 +247,7 @@ READ8_HANDLER ( pc8300_io_r )
 
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
-	device_t *speaker = space->machine().device("speaker");
+	device_t *speaker = space->machine().device(SPEAKER_TAG);
 
 	if (offs == 0xf5)
 	{
@@ -319,7 +319,7 @@ READ8_HANDLER ( pow3000_io_r )
 
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
-	device_t *speaker = space->machine().device("speaker");
+	device_t *speaker = space->machine().device(SPEAKER_TAG);
 
 	if (offs == 0x7e)
 	{

@@ -62,7 +62,7 @@ class iq151_state : public driver_device
 public:
 	iq151_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_speaker(*this, "speaker")
+	m_speaker(*this, SPEAKER_TAG)
 	{ }
 
 	required_device<device_t> m_speaker;
@@ -357,7 +357,7 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_ADD_PERIODIC("iq151a", iq151a, attotime::from_hz(3) )

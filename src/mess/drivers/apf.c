@@ -163,7 +163,7 @@ static WRITE_LINE_DEVICE_HANDLER(apf_m1000_pia_out_ca2_func)
 
 static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_cb2_func)
 {
-	device_t *speaker = device->machine().device("speaker");
+	device_t *speaker = device->machine().device(SPEAKER_TAG);
 	speaker_level_w(speaker, data);
 }
 
@@ -728,7 +728,7 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, apf_cassette_config )

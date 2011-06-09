@@ -33,7 +33,6 @@
 #define HD6345_TAG				"z30"
 #define I8255A_TAG				"z6"
 #define Z80STI_TAG				"z9"
-#define SPEAKER_TAG				"speaker"
 #define CENTRONICS_TAG			"centronics"
 
 #define GRIP_VIDEORAM_SIZE	0x10000

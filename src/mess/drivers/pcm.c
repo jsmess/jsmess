@@ -80,7 +80,7 @@ public:
 	m_sio(*this, "z80sio"),
 	m_ctc_s(*this, "z80ctc_s"),
 	m_ctc_u(*this, "z80ctc_u"),
-	m_speaker(*this, "speaker"),
+	m_speaker(*this, SPEAKER_TAG),
 	m_cass(*this, CASSETTE_TAG)
 	{ }
 
@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

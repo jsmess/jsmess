@@ -74,7 +74,7 @@ static WRITE8_DEVICE_HANDLER(mz80k_8255_portc_w)
 static WRITE_LINE_DEVICE_HANDLER( pit_out0_changed )
 {
 	mz80_state *drvstate = device->machine().driver_data<mz80_state>();
-	device_t *speaker = device->machine().device("speaker");
+	device_t *speaker = device->machine().device(SPEAKER_TAG);
 	if((drvstate->m_prev_state==0) && (state==1)) {
 		drvstate->m_speaker_level ^= 1;
 	}

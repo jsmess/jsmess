@@ -113,7 +113,7 @@ static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
 	pk8000_state *state = device->machine().driver_data<pk8000_state>();
 	state->m_keyboard_line = data & 0x0f;
 
-	speaker_level_w(device->machine().device("speaker"), BIT(data,7));
+	speaker_level_w(device->machine().device(SPEAKER_TAG), BIT(data,7));
 
 	cassette_change_state(cassette_device_image(device->machine()),
 						(BIT(data,4)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

@@ -8,7 +8,6 @@
 #define M6522_1_TAG		"m6522_1"
 #define M6522_2_TAG		"m6522_2"
 #define M6551_TAG		"m6551"
-#define SPEAKER_TAG		"speaker"
 
 class aim65_40_state : public driver_device
 {

@@ -916,7 +916,7 @@ I8255A_INTERFACE( pk8020_ppi8255_interface_1 )
 static WRITE8_DEVICE_HANDLER(pk8020_2_portc_w)
 {
 	pk8020_state *state = device->machine().driver_data<pk8020_state>();
-	device_t *speaker = device->machine().device("speaker");
+	device_t *speaker = device->machine().device(SPEAKER_TAG);
 
 	state->m_sound_gate = BIT(data,3);
 
@@ -946,7 +946,7 @@ I8255A_INTERFACE( pk8020_ppi8255_interface_3 )
 static WRITE_LINE_DEVICE_HANDLER( pk8020_pit_out0 )
 {
 	pk8020_state *drvstate = device->machine().driver_data<pk8020_state>();
-	device_t *speaker = device->machine().device("speaker");
+	device_t *speaker = device->machine().device(SPEAKER_TAG);
 
 	drvstate->m_sound_level = state;
 

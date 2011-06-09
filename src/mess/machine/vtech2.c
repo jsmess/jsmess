@@ -292,7 +292,7 @@ static int mra_bank(running_machine &machine, int bank, int offs)
 static void mwa_bank(running_machine &machine, int bank, int offs, int data)
 {
 	vtech2_state *state = machine.driver_data<vtech2_state>();
-	device_t *speaker = machine.device("speaker");
+	device_t *speaker = machine.device(SPEAKER_TAG);
 	offs += 0x4000 * state->m_laser_bank[bank];
     switch (state->m_laser_bank[bank])
     {

@@ -14,7 +14,6 @@
 #define MC6820_COM_TAG		"u5"
 #define MC6850_TAG			"u25"
 #define RS232_TAG			"rs232"
-#define SPEAKER_TAG			"speaker"
 #define SCREEN_TAG			"screen"
 
 #define AM2901A_TAG			"am2901a"

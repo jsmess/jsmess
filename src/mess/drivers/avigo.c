@@ -759,7 +759,7 @@ static  READ8_HANDLER(avigo_ad_data_r)
 static WRITE8_HANDLER(avigo_speaker_w)
 {
 	avigo_state *state = space->machine().driver_data<avigo_state>();
-	device_t *speaker = space->machine().device("speaker");
+	device_t *speaker = space->machine().device(SPEAKER_TAG);
 //  UINT8 previous_speaker;
 
 //  previous_speaker = state->m_speaker_data;
@@ -968,7 +968,7 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* real time clock */

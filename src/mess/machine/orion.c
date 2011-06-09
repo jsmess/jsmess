@@ -255,7 +255,7 @@ MACHINE_START( orionz80 )
 WRITE8_HANDLER ( orionz80_sound_w )
 {
 	orion_state *state = space->machine().driver_data<orion_state>();
-	device_t *speaker = space->machine().device("speaker");
+	device_t *speaker = space->machine().device(SPEAKER_TAG);
 	if (state->m_speaker == 0)
 	{
 		state->m_speaker = data;
@@ -270,7 +270,7 @@ WRITE8_HANDLER ( orionz80_sound_w )
 
 static WRITE8_HANDLER ( orionz80_sound_fe_w )
 {
-	device_t *speaker = space->machine().device("speaker");
+	device_t *speaker = space->machine().device(SPEAKER_TAG);
 	speaker_level_w(speaker,(data>>4) & 0x01);
 }
 

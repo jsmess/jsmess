@@ -36,7 +36,6 @@
 #define M6522_4_TAG		"m6522_4"
 #define M6522_5_TAG		"m6522_5"
 #define M6522_6_TAG		"m6522_6"
-#define SPEAKER_TAG		"speaker"
 #define CENTRONICS_TAG	"centronics"
 
 class victor9k_state : public driver_device

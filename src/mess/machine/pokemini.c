@@ -167,7 +167,7 @@ static void pokemini_check_irqs( running_machine &machine )
 static void pokemini_update_sound( running_machine &machine )
 {
 	pokemini_state *state = machine.driver_data<pokemini_state>();
-	device_t *speaker = machine.device("speaker");
+	device_t *speaker = machine.device(SPEAKER_TAG);
 	/* Check if sound should be muted */
 	if ( state->m_pm_reg[0x70] & 0x03 )
 	{

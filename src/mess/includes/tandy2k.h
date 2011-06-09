@@ -17,7 +17,6 @@
 #define CRT9212_1_TAG	"u15"
 #define CRT9021B_TAG	"u14"
 #define WD1010_TAG		"u18"
-#define SPEAKER_TAG		"speaker"
 #define CENTRONICS_TAG	"centronics"
 
 class tandy2k_state : public driver_device

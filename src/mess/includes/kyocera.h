@@ -37,7 +37,6 @@
 #define HD44102_8_TAG	"m9"
 #define HD44102_9_TAG	"m10"
 #define CENTRONICS_TAG	"centronics"
-#define SPEAKER_TAG		"speaker"
 
 //#define I8085_TAG     "m19"
 //#define I8155_TAG     "m12"

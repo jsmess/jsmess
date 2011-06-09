@@ -25,7 +25,6 @@
 #define UPD3301_TAG		"upd3301"
 #define CENTRONICS_TAG	"centronics"
 #define SCREEN_TAG		"screen"
-#define SPEAKER_TAG		"speaker"
 
 class pc8001_state : public driver_device
 {

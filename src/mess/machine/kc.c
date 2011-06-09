@@ -1330,7 +1330,7 @@ bit 0: TRUCK */
 WRITE8_HANDLER ( kc85_4_pio_data_w )
 {
 	kc_state *state = space->machine().driver_data<kc_state>();
-	device_t *speaker = space->machine().device("speaker");
+	device_t *speaker = space->machine().device(SPEAKER_TAG);
 	state->m_kc85_pio_data[offset] = data;
 	z80pio_d_w(state->m_kc85_z80pio, offset, data);
 
@@ -1568,7 +1568,7 @@ bit 0: TRUCK */
 WRITE8_HANDLER ( kc85_3_pio_data_w )
 {
 	kc_state *state = space->machine().driver_data<kc_state>();
-	device_t *speaker = space->machine().device("speaker");
+	device_t *speaker = space->machine().device(SPEAKER_TAG);
 	state->m_kc85_pio_data[offset] = data;
 	z80pio_d_w(state->m_kc85_z80pio, offset, data);
 

@@ -19,7 +19,6 @@
 #define CDP1864_TAG		"ic3"
 #define DM9368_TAG		"ic10"
 #define SCREEN_TAG		"screen"
-#define SPEAKER_TAG		"speaker"
 
 enum
 {

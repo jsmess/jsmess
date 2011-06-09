@@ -136,7 +136,7 @@ READ8_HANDLER( primo_be_2_r )
 WRITE8_HANDLER( primo_ki_1_w )
 {
 	primo_state *state = space->machine().driver_data<primo_state>();
-	device_t *speaker = space->machine().device("speaker");
+	device_t *speaker = space->machine().device(SPEAKER_TAG);
 	// bit 7 - NMI generator enable/disable
 	state->m_nmi = (data & 0x80) ? 1 : 0;
 
@@ -276,7 +276,7 @@ static void primo_setup_pss (running_machine &machine, UINT8* snapshot_data, UIN
 {
 	primo_state *state = machine.driver_data<primo_state>();
 	int i;
-	device_t *speaker = machine.device("speaker");
+	device_t *speaker = machine.device(SPEAKER_TAG);
 
 	/* Z80 registers */
 

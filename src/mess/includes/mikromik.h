@@ -28,7 +28,6 @@
 #define I8275_TAG		"ic59"
 #define UPD7201_TAG		"ic11"
 #define UPD7220_TAG		"ic101"
-#define SPEAKER_TAG		"speaker"
 
 class mm1_state : public driver_device
 {

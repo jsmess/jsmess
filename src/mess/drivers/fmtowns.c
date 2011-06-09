@@ -2308,7 +2308,7 @@ void towns_state::machine_reset()
 	m_messram = machine().device(RAM_TAG);
 	m_cdrom = machine().device("cdrom");
 	m_cdda = machine().device("cdda");
-	m_speaker = machine().device("speaker");
+	m_speaker = machine().device(SPEAKER_TAG);
 	m_scsi = machine().device<fmscsi_device>("scsi");
 	m_hd0 = machine().device("harddisk0");
 	m_hd1 = machine().device("harddisk1");
@@ -2504,7 +2504,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 	MCFG_SOUND_ADD("cdda",CDDA,0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("speaker",SPEAKER_SOUND,0)
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND,0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_PIT8253_ADD("pit",towns_pit8253_config)

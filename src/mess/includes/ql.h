@@ -13,7 +13,6 @@
 #define I8051_TAG	"i8051"
 #define ZX8301_TAG	"ic22"
 #define ZX8302_TAG	"ic23"
-#define SPEAKER_TAG	"speaker"
 #define WD1772_TAG	"wd1772"
 
 #define ROMBANK_TAG	"rombank"

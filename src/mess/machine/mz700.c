@@ -427,7 +427,7 @@ WRITE8_HANDLER( mz700_bank_6_w )
 static WRITE_LINE_DEVICE_HANDLER( pit_out0_changed )
 {
 	mz_state *drvstate = device->machine().driver_data<mz_state>();
-	device_t *speaker = device->machine().device("speaker");
+	device_t *speaker = device->machine().device(SPEAKER_TAG);
 	if((drvstate->m_prev_state==0) && (state==1)) {
 		drvstate->m_speaker_level ^= 1;
 	}

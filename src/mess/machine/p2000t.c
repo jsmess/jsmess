@@ -134,7 +134,7 @@ WRITE8_HANDLER ( p2000t_port_303f_w )
 */
 WRITE8_HANDLER ( p2000t_port_505f_w )
 {
-	device_t *speaker = space->machine().device("speaker");
+	device_t *speaker = space->machine().device(SPEAKER_TAG);
 	speaker_level_w(speaker, BIT(data,0));
 }
 

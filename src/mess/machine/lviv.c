@@ -90,7 +90,7 @@ static WRITE8_DEVICE_HANDLER ( lviv_ppi_0_portb_w )
 static WRITE8_DEVICE_HANDLER ( lviv_ppi_0_portc_w )	/* tape in/out, video memory on/off */
 {
 	lviv_state *state = device->machine().driver_data<lviv_state>();
-	device_t *speaker = device->machine().device("speaker");
+	device_t *speaker = device->machine().device(SPEAKER_TAG);
 	state->m_ppi_port_outputs[0][2] = data;
 	if (state->m_ppi_port_outputs[0][1]&0x80)
 		speaker_level_w(speaker, data&0x01);

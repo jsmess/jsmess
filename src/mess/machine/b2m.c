@@ -329,7 +329,7 @@ MACHINE_START(b2m)
 	b2m_state *state = machine.driver_data<b2m_state>();
 	state->m_pic = machine.device("pic8259");
 	state->m_fdc = machine.device("wd1793");
-	state->m_speaker = machine.device("speaker");
+	state->m_speaker = machine.device(SPEAKER_TAG);
 
 	wd17xx_set_pause_time(state->m_fdc,10);
 
