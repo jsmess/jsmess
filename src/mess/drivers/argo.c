@@ -360,4 +360,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1986, argo,  0,      0,       argo,     argo,    argo,     "unknown",   "Argo", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, argo,  0,      0,       argo,     argo,    argo,     "<unknown>",   "Argo", GAME_NOT_WORKING | GAME_NO_SOUND)
