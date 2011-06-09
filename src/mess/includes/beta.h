@@ -16,7 +16,7 @@
 #define M6502_TAG		"m6502"
 #define M6532_TAG		"m6532"
 #define EPROM_TAG		"eprom"
-#define SPEAKER_TAG		"b237"
+//#define SPEAKER_TAG		"b237"
 
 class beta_state : public driver_device
 {

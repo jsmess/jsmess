@@ -9,6 +9,7 @@
 
 #include "imagedev/snapquik.h"
 #include "video/t6a04.h"
+#include "sound/speaker.h"
 
 
 class ti85_state : public driver_device

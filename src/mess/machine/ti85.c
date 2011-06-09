@@ -9,9 +9,8 @@
 #include <stdarg.h>
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "includes/ti85.h"
 #include "machine/ti85_ser.h"
-#include "sound/speaker.h"
+#include "includes/ti85.h"
 
 #define TI85_SNAPSHOT_SIZE	 32976
 #define TI86_SNAPSHOT_SIZE	131284

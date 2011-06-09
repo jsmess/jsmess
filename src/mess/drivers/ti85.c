@@ -187,11 +187,10 @@ TI-86 ports:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
-#include "includes/ti85.h"
 #include "imagedev/snapquik.h"
 #include "machine/ti85_ser.h"
 #include "machine/nvram.h"
+#include "includes/ti85.h"
 
 /* port i/o functions */
 
