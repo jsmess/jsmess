@@ -1695,6 +1695,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/mk14.o		\
 	$(MESS_DRIVERS)/mmd1.o		\
 	$(MESS_DRIVERS)/mod8.o		\
+	$(MESS_DRIVERS)/mpz80.o		\
 	$(MESS_DRIVERS)/mycom.o		\
 	$(MESS_DRIVERS)/okean240.o	\
 	$(MESS_DRIVERS)/p8k.o		\
@@ -1807,11 +1808,11 @@ $(MESS_DRIVERS)/mikrolab.o:	$(MESS_LAYOUT)/mikrolab.lh
 $(MESS_DRIVERS)/mk1.o:		$(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk14.o:		$(MESS_LAYOUT)/mk14.lh
 $(MESS_DRIVERS)/mk2.o:		$(MESS_LAYOUT)/mk2.lh
-$(MESS_DRIVERS)/mpf1.o:		$(MESS_LAYOUT)/mpf1.lh \
-					$(MESS_LAYOUT)/mpf1b.lh \
-					$(MESS_LAYOUT)/mpf1p.lh
 $(MESS_DRIVERS)/mmd1.o:		$(MESS_LAYOUT)/mmd1.lh \
-					$(MESS_LAYOUT)/mmd2.lh
+							$(MESS_LAYOUT)/mmd2.lh
+$(MESS_DRIVERS)/mpf1.o:		$(MESS_LAYOUT)/mpf1.lh \
+							$(MESS_LAYOUT)/mpf1b.lh \
+							$(MESS_LAYOUT)/mpf1p.lh
 $(MESS_VIDEO)/newbrain.o:	$(MESS_LAYOUT)/newbrain.lh
 $(MESS_DRIVERS)/ng_aes.o:	$(MESS_LAYOUT)/neogeo.lh
 $(MESS_DRIVERS)/poly880.o:	$(MESS_LAYOUT)/poly880.lh
@@ -1841,9 +1842,9 @@ $(MESS_DRIVERS)/vt100.o:	$(MESS_LAYOUT)/vt100.lh
 $(MESS_DRIVERS)/x68k.o:		$(MESS_LAYOUT)/x68000.lh
 $(MESS_DRIVERS)/z80dev.o:	$(MESS_LAYOUT)/z80dev.lh
 $(MESS_DRIVERS)/z80ne.o:	$(MESS_LAYOUT)/z80ne.lh   \
-					$(MESS_LAYOUT)/z80net.lh  \
-					$(MESS_LAYOUT)/z80netb.lh \
-					$(MESS_LAYOUT)/z80netf.lh
+							$(MESS_LAYOUT)/z80net.lh  \
+							$(MESS_LAYOUT)/z80netb.lh \
+							$(MESS_LAYOUT)/z80netf.lh
 
 
 #-------------------------------------------------
