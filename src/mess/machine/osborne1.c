@@ -337,7 +337,7 @@ static TIMER_CALLBACK(osborne1_video_callback)
 {
 	osborne1_state *state = machine.driver_data<osborne1_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *speaker = space->machine().device("beep");
+	device_t *speaker = space->machine().device(BEEPER_TAG);
 	pia6821_device *pia_1 = space->machine().device<pia6821_device>("pia_1");
 	int y = machine.primary_screen->vpos();
 
@@ -402,7 +402,7 @@ static TIMER_CALLBACK(osborne1_video_callback)
 
 static TIMER_CALLBACK( setup_osborne1 )
 {
-	device_t *speaker = machine.device("beep");
+	device_t *speaker = machine.device(BEEPER_TAG);
 	pia6821_device *pia_1 = machine.device<pia6821_device>("pia_1");
 
 	beep_set_state( speaker, 0 );

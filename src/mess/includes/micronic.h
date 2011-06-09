@@ -17,7 +17,6 @@
 #define Z80_TAG			"z80"
 #define MC146818_TAG	"mc146818"
 #define HD61830_TAG		"hd61830"
-#define BEEP_TAG		"beep"
 
 class micronic_state : public driver_device
 {
@@ -26,7 +25,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_lcdc(*this, HD61830_TAG),
-		  m_beep(*this, BEEP_TAG),
+		  m_beep(*this, BEEPER_TAG),
 		  m_rtc(*this, MC146818_TAG),
 		  m_ram(*this, RAM_TAG)
 		{ }

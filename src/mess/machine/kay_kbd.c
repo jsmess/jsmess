@@ -288,7 +288,7 @@ MACHINE_RESET( kay_kbd )
 	/* disable CapsLock LED initially */
 	set_led_status(machine, 1, 1);
 	set_led_status(machine, 1, 0);
-	kbd->beeper = machine.device("beep");
+	kbd->beeper = machine.device(BEEPER_TAG);
 	kbd->beep_on = 1;
 	kbd->control_status = 0x14;
 	beep_set_state(kbd->beeper, 0);

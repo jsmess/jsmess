@@ -17,7 +17,6 @@
 #define CDP1802_TAG		"ic1"
 #define CDP1861_TAG		"ic2"
 #define CDP1864_TAG		"cdp1864"
-#define BEEP_TAG		"beep"
 #define SCREEN_TAG		"screen"
 
 class studio2_state : public driver_device
@@ -26,7 +25,7 @@ public:
 	studio2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, CDP1802_TAG),
-		  m_speaker(*this, BEEP_TAG),
+		  m_speaker(*this, BEEPER_TAG),
 		  m_vdc(*this, CDP1861_TAG)
 	{ }
 

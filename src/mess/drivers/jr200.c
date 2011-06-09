@@ -245,7 +245,7 @@ static READ8_HANDLER( mcu_keyb_r )
 static WRITE8_HANDLER( jr200_beep_w )
 {
 	/* writing 0x0e enables the beeper, writing anything else disables it */
-	beep_set_state(space->machine().device("beeper"),((data & 0xf) == 0x0e) ? 1 : 0);
+	beep_set_state(space->machine().device(BEEPER_TAG),((data & 0xf) == 0x0e) ? 1 : 0);
 }
 
 static WRITE8_HANDLER( jr200_beep_freq_w )
@@ -257,7 +257,7 @@ static WRITE8_HANDLER( jr200_beep_freq_w )
 
 	beep_freq = ((state->m_freq_reg[0]<<8) | (state->m_freq_reg[1] & 0xff)) + 1;
 
-	beep_set_frequency(space->machine().device("beeper"),84000 / beep_freq);
+	beep_set_frequency(space->machine().device(BEEPER_TAG),84000 / beep_freq);
 }
 
 static WRITE8_HANDLER( jr200_border_col_w )
@@ -469,8 +469,8 @@ GFXDECODE_END
 static MACHINE_START(jr200)
 {
 	jr200_state *state = machine.driver_data<jr200_state>();
-	beep_set_frequency(machine.device("beeper"),0);
-	beep_set_state(machine.device("beeper"),0);
+	beep_set_frequency(machine.device(BEEPER_TAG),0);
+	beep_set_state(machine.device(BEEPER_TAG),0);
 	state->m_timer_d = machine.scheduler().timer_alloc(FUNC(timer_d_callback));
 }
 
@@ -519,7 +519,7 @@ static MACHINE_CONFIG_START( jr200, jr200_state )
 
 	// AY-8910 ?
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 

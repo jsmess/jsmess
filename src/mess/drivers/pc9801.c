@@ -2092,7 +2092,7 @@ static READ8_DEVICE_HANDLER( ppi_prn_portb_r ) { return input_port_read(device->
 
 static WRITE8_DEVICE_HANDLER( ppi_sys_portc_w )
 {
-	beep_set_state(device->machine().device("beeper"),!(data & 0x08));
+	beep_set_state(device->machine().device(BEEPER_TAG),!(data & 0x08));
 }
 
 static I8255A_INTERFACE( ppi_system_intf )
@@ -2285,8 +2285,8 @@ static MACHINE_RESET(pc9801)
 			state->m_tvram[(0x3fe0)+i*2] = default_memsw_data[i];
 	}
 
-	beep_set_frequency(machine.device("beeper"),2400);
-	beep_set_state(machine.device("beeper"),0);
+	beep_set_frequency(machine.device(BEEPER_TAG),2400);
+	beep_set_state(machine.device(BEEPER_TAG),0);
 
 	state->m_nmi_ff = 0;
 }
@@ -2406,7 +2406,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 
@@ -2455,7 +2455,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 
@@ -2504,7 +2504,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 

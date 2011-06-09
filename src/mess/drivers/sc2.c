@@ -89,7 +89,7 @@ static MACHINE_START(sc2)
 {
 	sc2_state *state = machine.driver_data<sc2_state>();
 
-	state->m_beep = machine.device("beep");
+	state->m_beep = machine.device(BEEPER_TAG);
 
 	state->save_item(NAME(state->m_led_7seg_data));
 	state->save_item(NAME(state->m_kp_matrix));
@@ -221,7 +221,7 @@ static MACHINE_CONFIG_START( sc2, sc2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beep", BEEP, 0 )
+	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 

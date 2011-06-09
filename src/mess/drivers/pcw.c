@@ -427,7 +427,7 @@ static WRITE8_HANDLER(pcw_system_control_w)
 {
 	pcw_state *state = space->machine().driver_data<pcw_state>();
 	device_t *fdc = space->machine().device("upd765");
-	device_t *speaker = space->machine().device("beep");
+	device_t *speaker = space->machine().device(BEEPER_TAG);
 	LOG(("SYSTEM CONTROL: %d\n",data));
 
 	switch (data)
@@ -1055,7 +1055,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK(setup_beep)
 {
-	device_t *speaker = machine.device("beep");
+	device_t *speaker = machine.device(BEEPER_TAG);
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 3750);
 }
@@ -1364,7 +1364,7 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_UPD765A_ADD("upd765", pcw_upd765_interface)

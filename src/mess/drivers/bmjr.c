@@ -121,7 +121,7 @@ static WRITE8_HANDLER( tape_w )
 	bmjr_state *state = space->machine().driver_data<bmjr_state>();
 	if(!state->m_tape_switch)
 	{
-		beep_set_state(space->machine().device("beeper"),!(data & 0x80));
+		beep_set_state(space->machine().device(BEEPER_TAG),!(data & 0x80));
 	}
 	else
 	{
@@ -321,8 +321,8 @@ static PALETTE_INIT( bmjr )
 
 static MACHINE_START(bmjr)
 {
-	beep_set_frequency(machine.device("beeper"),1200); //guesswork
-	beep_set_state(machine.device("beeper"),0);
+	beep_set_frequency(machine.device(BEEPER_TAG),1200); //guesswork
+	beep_set_state(machine.device(BEEPER_TAG),0);
 }
 
 static MACHINE_RESET(bmjr)
@@ -362,7 +362,7 @@ static MACHINE_CONFIG_START( bmjr, bmjr_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)

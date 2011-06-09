@@ -25,7 +25,7 @@ public:
 	m_printer(*this, "centronics"),
 	m_fdc(*this, "wd1793"),
 	m_crtc(*this, "crtc"),
-	m_beep(*this, "beep")
+	m_beep(*this, BEEPER_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

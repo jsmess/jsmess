@@ -586,7 +586,7 @@ static I8255_INTERFACE( ppi8255_intf_0 )
 
 static WRITE8_DEVICE_HANDLER( ym2203_porta_w )
 {
-	beep_set_state(device->machine().device("beeper"),(data & 0x08));
+	beep_set_state(device->machine().device(BEEPER_TAG),(data & 0x08));
 }
 
 static const ym2203_interface ym2203_config =
@@ -609,8 +609,8 @@ static MACHINE_START(multi8)
 static MACHINE_RESET(multi8)
 {
 	multi8_state *state = machine.driver_data<multi8_state>();
-	beep_set_frequency(machine.device("beeper"),1200); //guesswork
-	beep_set_state(machine.device("beeper"),0);
+	beep_set_frequency(machine.device(BEEPER_TAG),1200); //guesswork
+	beep_set_state(machine.device(BEEPER_TAG),0);
 	state->m_mcu_init = 0;
 }
 
@@ -648,7 +648,7 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_SOUND_CONFIG(ym2203_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/32))

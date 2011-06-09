@@ -25,10 +25,9 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "includes/pc4.h"
 #include "machine/rp5c01.h"
-#include "sound/beep.h"
 #include "rendlay.h"
+#include "includes/pc4.h"
 
 
 READ8_MEMBER( pc4_state::kb_r )
@@ -227,7 +226,7 @@ static MACHINE_CONFIG_START( pc4, pc4_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beep", BEEP, 0 )
+	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)

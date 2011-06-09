@@ -339,7 +339,7 @@ INPUT_PORTS_END
 static TIMER_DEVICE_CALLBACK( update_nmi )
 {
 	mephisto_state *state = timer.machine().driver_data<mephisto_state>();
-	device_t *speaker = timer.machine().device("beep");
+	device_t *speaker = timer.machine().device(BEEPER_TAG);
 	if (state->m_allowNMI) {
 		state->m_allowNMI = 0;
 		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI,PULSE_LINE);
@@ -350,7 +350,7 @@ static TIMER_DEVICE_CALLBACK( update_nmi )
 static TIMER_DEVICE_CALLBACK( update_irq )		//only mm2
 {
 	mephisto_state *state = timer.machine().driver_data<mephisto_state>();
-	device_t *speaker = timer.machine().device("beep");
+	device_t *speaker = timer.machine().device(BEEPER_TAG);
 
 	cputag_set_input_line(timer.machine(), "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
 	cputag_set_input_line(timer.machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
@@ -412,7 +412,7 @@ static MACHINE_CONFIG_START( mephisto, mephisto_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_ADD_PERIODIC("nmi_timer", update_nmi, attotime::from_hz(600))

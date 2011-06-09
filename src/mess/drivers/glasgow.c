@@ -83,7 +83,7 @@ static WRITE16_HANDLER( glasgow_lcd_w )
 static WRITE16_HANDLER( glasgow_lcd_flag_w )
 {
 	glasgow_state *state = space->machine().driver_data<glasgow_state>();
-	device_t *speaker = space->machine().device("beep");
+	device_t *speaker = space->machine().device(BEEPER_TAG);
 	UINT16 lcd_flag = data & 0x8100;
 
 	beep_set_state(speaker, (lcd_flag & 0x100) ? 1 : 0);
@@ -156,7 +156,7 @@ static WRITE16_HANDLER( write_lcd_flag )
 static WRITE16_HANDLER( write_irq_flag )
 {
 	glasgow_state *state = space->machine().driver_data<glasgow_state>();
-	device_t *speaker = space->machine().device("beep");
+	device_t *speaker = space->machine().device(BEEPER_TAG);
 
 	beep_set_state(speaker, data & 0x100);
 	logerror("Write 0x800004 = %x \n", data);
@@ -253,7 +253,7 @@ static READ16_HANDLER(read_board_amsterd)
 static WRITE32_HANDLER ( write_beeper32 )
 {
 	glasgow_state *state = space->machine().driver_data<glasgow_state>();
-	device_t *speaker = space->machine().device("beep");
+	device_t *speaker = space->machine().device(BEEPER_TAG);
 	beep_set_state(speaker, data & 0x01000000);
 	logerror("Write 0x8000004 = %x \n", data);
 	state->m_irq_flag = 1;
@@ -273,7 +273,7 @@ static TIMER_DEVICE_CALLBACK( update_nmi32 )
 static MACHINE_START( glasgow )
 {
 	glasgow_state *state = machine.driver_data<glasgow_state>();
-	device_t *speaker = machine.device("beep");
+	device_t *speaker = machine.device(BEEPER_TAG);
 
 	mboard_key_selector = 0;
 	state->m_irq_flag = 0;
@@ -287,7 +287,7 @@ static MACHINE_START( glasgow )
 static MACHINE_START( dallas32 )
 {
 	glasgow_state *state = machine.driver_data<glasgow_state>();
-	device_t *speaker = machine.device("beep");
+	device_t *speaker = machine.device(BEEPER_TAG);
 
 	state->m_lcd_shift_counter = 3;
 	beep_set_frequency(speaker, 44);
@@ -505,7 +505,7 @@ static MACHINE_CONFIG_START( glasgow, glasgow_state )
 	MCFG_MACHINE_START(glasgow)
 	MCFG_MACHINE_RESET(glasgow)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_ADD_PERIODIC("nmi_timer", update_nmi, attotime::from_hz(50))

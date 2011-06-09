@@ -192,7 +192,7 @@ static MACHINE_START(ex800)
 {
 	ex800_state *state = machine.driver_data<ex800_state>();
 	state->m_irq_state = ASSERT_LINE;
-	device_t *speaker = machine.device("beep");
+	device_t *speaker = machine.device(BEEPER_TAG);
 	/* Setup beep */
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 4000); /* measured at 4000 Hz */
@@ -251,7 +251,7 @@ static WRITE8_HANDLER(ex800_portb_w)
 
 static WRITE8_HANDLER(ex800_portc_w)
 {
-	device_t *speaker = space->machine().device("beep");
+	device_t *speaker = space->machine().device(BEEPER_TAG);
 	if (data & 0x80)
 		beep_set_state(speaker, 0);
 	else
@@ -443,7 +443,7 @@ static MACHINE_CONFIG_START( ex800, ex800_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -230,7 +230,7 @@ void vdt911_init(running_machine &machine)
 
 static TIMER_CALLBACK(setup_beep)
 {
-	beep_set_frequency(machine.device("beep"), 2000);
+	beep_set_frequency(machine.device(BEEPER_TAG), 2000);
 }
 
 
@@ -303,7 +303,7 @@ static TIMER_CALLBACK(blink_callback)
 */
 static TIMER_CALLBACK(beep_callback)
 {
-	beep_set_state(machine.device("beep"), 0);
+	beep_set_state(machine.device(BEEPER_TAG), 0);
 }
 
 /*
@@ -477,7 +477,7 @@ WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 
 		case 0xe:
 			/* beep enable strobe - not tested */
-			beep_set_state(device->machine().device("beep"), 1);
+			beep_set_state(device->machine().device(BEEPER_TAG), 1);
 
 			vdt->beep_timer->adjust(attotime::from_usec(300));
 			break;

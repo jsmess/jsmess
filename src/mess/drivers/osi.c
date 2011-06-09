@@ -799,7 +799,7 @@ static MACHINE_CONFIG_START( c1p, c1p_state )
 	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(osi600c_discrete_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD(BEEP_TAG, BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_PIA6821_ADD( "pia_1", pia_dummy_intf )
@@ -867,7 +867,7 @@ ROM_END
 
 static TIMER_CALLBACK( setup_beep )
 {
-	device_t *speaker = machine.device(BEEP_TAG);
+	device_t *speaker = machine.device(BEEPER_TAG);
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 300);
 }

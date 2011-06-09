@@ -127,7 +127,7 @@ static MACHINE_START( lx800 )
 {
 	lx800_state *lx800 = machine.driver_data<lx800_state>();
 
-	lx800->m_speaker = machine.device("beep");
+	lx800->m_speaker = machine.device(BEEPER_TAG);
 
 	beep_set_state(lx800->m_speaker, 0);
 	beep_set_frequency(lx800->m_speaker, 4000); /* ? */
@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( lx800, lx800_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* gate array */

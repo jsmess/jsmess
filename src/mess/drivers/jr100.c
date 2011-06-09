@@ -50,7 +50,7 @@ static WRITE8_HANDLER( jr100_via_w )
 		state->m_beep_en = ((data & 0xe0) == 0xe0);
 
 		if(!state->m_beep_en)
-			beep_set_state(space->machine().device("beeper"),0);
+			beep_set_state(space->machine().device(BEEPER_TAG),0);
 	}
 
 	/* T1L-L */
@@ -69,8 +69,8 @@ static WRITE8_HANDLER( jr100_via_w )
 		/* writing here actually enables the beeper, if above masking condition is satisfied */
 		if(state->m_beep_en)
 		{
-			beep_set_state(space->machine().device("beeper"),1);
-			beep_set_frequency(space->machine().device("beeper"),894886.25 / (double)(state->m_t1latch) / 2.0);
+			beep_set_state(space->machine().device(BEEPER_TAG),1);
+			beep_set_frequency(space->machine().device(BEEPER_TAG),894886.25 / (double)(state->m_t1latch) / 2.0);
 		}
 	}
 	via6522_device *via = space->machine().device<via6522_device>("via");
@@ -155,8 +155,8 @@ INPUT_PORTS_END
 
 static MACHINE_START(jr100)
 {
-	beep_set_frequency(machine.device("beeper"),0);
-	beep_set_state(machine.device("beeper"),0);
+	beep_set_frequency(machine.device(BEEPER_TAG),0);
+	beep_set_state(machine.device(BEEPER_TAG),0);
 }
 
 static MACHINE_RESET(jr100)
@@ -377,7 +377,7 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, jr100_cassette_config )

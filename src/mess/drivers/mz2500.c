@@ -1730,8 +1730,8 @@ static MACHINE_RESET(mz2500)
 
 	state->m_cg_clear_flag = 0;
 
-	beep_set_frequency(machine.device("beeper"),4096);
-	beep_set_state(machine.device("beeper"),0);
+	beep_set_frequency(machine.device(BEEPER_TAG),4096);
+	beep_set_state(machine.device(BEEPER_TAG),0);
 
 //  state->m_monitor_type = input_port_read(machine,"DSW1") & 0x40 ? 1 : 0;
 }
@@ -1868,7 +1868,7 @@ static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
 
 	state->m_old_portc = data;
 
-	beep_set_state(device->machine().device("beeper"),data & 0x04);
+	beep_set_state(device->machine().device(BEEPER_TAG),data & 0x04);
 
 	if(data & ~0x0e)
 		logerror("PPI PORTC W %02x\n",data & ~0x0e);
@@ -2113,7 +2113,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 

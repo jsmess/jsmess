@@ -107,7 +107,7 @@ static WRITE8_HANDLER ( write_io )
 	polgar_state *state = space->machine().driver_data<polgar_state>();
 	int i;
 	hd44780_device * hd44780 = space->machine().device<hd44780_device>("hd44780");
-	device_t *speaker = space->machine().device("beep");
+	device_t *speaker = space->machine().device(BEEPER_TAG);
 
 	if (BIT(data,1)) {
 		if (BIT(data,0)) {
@@ -433,7 +433,7 @@ INPUT_PORTS_END
 static TIMER_DEVICE_CALLBACK( update_nmi )
 {
 	//polgar_state *state = timer.machine().driver_data<polgar_state>();
-	// running_device *speaker = timer.machine().device("beep");
+	// running_device *speaker = timer.machine().device(BEEPER_TAG);
 	cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI,PULSE_LINE);
 	// cputag_set_input_line(timer.machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 	// dac_data_w(0,state->m_led_status&64?128:0);
@@ -485,7 +485,7 @@ static MACHINE_CONFIG_START( polgar, polgar_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	//MCFG_TIMER_ADD_PERIODIC("led_timer", update_leds, attotime::from_hz(60))

@@ -260,7 +260,7 @@ static WRITE8_HANDLER( bml3_io_w )
 //  else if(offset == 0xc4)                     { /* system latch, writes 0x53 -> 0x51 when a tape is loaded */}
 	else if(offset == 0xc6 || offset == 0xc7)	{ bml3_6845_w(space,offset-0xc6,data); }
 	else if(offset == 0xd0)						{ bml3_hres_reg_w(space,0,data);  }
-	else if(offset == 0xd3)						{ beep_set_state(space->machine().device("beeper"),!(data & 0x80)); }
+	else if(offset == 0xd3)						{ beep_set_state(space->machine().device(BEEPER_TAG),!(data & 0x80)); }
 	else if(offset == 0xd6)						{ bml3_vres_reg_w(space,0,data); }
 	else if(offset == 0xd8)						{ state->m_attr_latch = data; }
 	else
@@ -458,8 +458,8 @@ static PALETTE_INIT( bml3 )
 
 static MACHINE_START(bml3)
 {
-	beep_set_frequency(machine.device("beeper"),1200); //guesswork
-	beep_set_state(machine.device("beeper"),0);
+	beep_set_frequency(machine.device(BEEPER_TAG),1200); //guesswork
+	beep_set_state(machine.device(BEEPER_TAG),0);
 }
 
 static MACHINE_RESET(bml3)
@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/8))

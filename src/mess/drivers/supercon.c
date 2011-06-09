@@ -484,7 +484,7 @@ static WRITE8_HANDLER( supercon_port3_w )
 static WRITE8_HANDLER( supercon_port4_w )
 {
 	supercon_state *state = space->machine().driver_data<supercon_state>();
-	device_t *speaker = space->machine().device("beep");
+	device_t *speaker = space->machine().device(BEEPER_TAG);
 
 	if (data)
 		LOG(("Write from %04x data: %02x\n",0x1F00,data));
@@ -761,7 +761,7 @@ static MACHINE_CONFIG_START( supercon, supercon_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", update_artwork, attotime::from_hz(20))

@@ -32,7 +32,7 @@ public:
 	pb1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_beep(*this, "beep"),
+		  m_beep(*this, BEEPER_TAG),
 		  m_hd44352(*this, "hd44352")
 		{ }
 
@@ -447,7 +447,7 @@ static UINT8 pb2000c_port_r(hd61700_cpu_device &device)
 
 static void port_w(hd61700_cpu_device &device, UINT8 data)
 {
-	beep_set_state(device.machine().device("beep"), (BIT(data,7) ^ BIT(data,6)));
+	beep_set_state(device.machine().device(BEEPER_TAG), (BIT(data,7) ^ BIT(data,6)));
 	//printf("%x\n", data);
 }
 
@@ -531,7 +531,7 @@ static MACHINE_CONFIG_START( pb1000, pb1000_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beep", BEEP, 0 )
+	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
@@ -560,7 +560,7 @@ static MACHINE_CONFIG_START( pb2000c, pb1000_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beep", BEEP, 0 )
+	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_CARTSLOT_ADD("card1")

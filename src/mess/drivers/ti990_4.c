@@ -279,7 +279,7 @@ static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 #if VIDEO_911
 	/* 911 VDT has a beep tone generator */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
 	MCFG_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_config)

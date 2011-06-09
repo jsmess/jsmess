@@ -38,7 +38,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_lcdc(*this, "hd44780"),
-		  m_beep(*this, "beep")
+		  m_beep(*this, BEEPER_TAG)
 		{ }
 
 	required_device<cpu_device> m_maincpu;

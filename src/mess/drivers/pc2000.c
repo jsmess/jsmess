@@ -28,7 +28,7 @@ public:
 	pc2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_lcdc(*this, "hd44780"),
-		  m_beep(*this, "beep")
+		  m_beep(*this, BEEPER_TAG)
 		{ }
 
 	required_device<hd44780_device> m_lcdc;
@@ -353,7 +353,7 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beep", BEEP, 0 )
+	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_CARTSLOT_ADD("cart")

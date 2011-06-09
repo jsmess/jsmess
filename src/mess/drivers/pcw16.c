@@ -1072,7 +1072,7 @@ static READ8_HANDLER(pcw16_timer_interrupt_counter_r)
 static WRITE8_HANDLER(pcw16_system_control_w)
 {
 	pcw16_state *state = space->machine().driver_data<pcw16_state>();
-	device_t *speaker = space->machine().device("beep");
+	device_t *speaker = space->machine().device(BEEPER_TAG);
 	//logerror("0x0f8: function: %d\n",data);
 
 	/* lower 4 bits define function code */
@@ -1356,7 +1356,7 @@ static void pcw16_reset(running_machine &machine)
 static MACHINE_START( pcw16 )
 {
 	pcw16_state *state = machine.driver_data<pcw16_state>();
-	device_t *speaker = machine.device("beep");
+	device_t *speaker = machine.device(BEEPER_TAG);
 	state->m_system_status = 0;
 	state->m_interrupt_counter = 0;
 
@@ -1437,7 +1437,7 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */

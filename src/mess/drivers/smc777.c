@@ -479,7 +479,7 @@ static WRITE8_HANDLER( system_output_w )
 			state->m_raminh_prefetch = (UINT8)(cpu_get_reg(&space->device(), Z80_R)) & 0x7f;
 			break;
 		case 0x02: printf("Interlace %s\n",data & 0x10 ? "on" : "off"); break;
-		case 0x05: beep_set_state(space->machine().device("beeper"),data & 0x10); break;
+		case 0x05: beep_set_state(space->machine().device(BEEPER_TAG),data & 0x10); break;
 		default: printf("System FF W %02x\n",data); break;
 	}
 }
@@ -944,8 +944,8 @@ static MACHINE_START(smc777)
 	//smc777_state *state = machine.driver_data<smc777_state>();
 
 
-	beep_set_frequency(machine.device("beeper"),300); //guesswork
-	beep_set_state(machine.device("beeper"),0);
+	beep_set_frequency(machine.device(BEEPER_TAG),300); //guesswork
+	beep_set_state(machine.device(BEEPER_TAG),0);
 }
 
 static MACHINE_RESET(smc777)
@@ -1077,7 +1077,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_SOUND_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/32))

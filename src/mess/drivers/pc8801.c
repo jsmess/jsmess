@@ -947,14 +947,14 @@ static WRITE8_HANDLER( pc8801_ctrl_w )
 	state->m_rtc->clk_w((data & 4) >> 2);
 
 	if(((state->m_device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
-		beep_set_state(space->machine().device("beeper"),1);
+		beep_set_state(space->machine().device(BEEPER_TAG),1);
 
 	if(((state->m_device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
-		beep_set_state(space->machine().device("beeper"),0);
+		beep_set_state(space->machine().device(BEEPER_TAG),0);
 
 	/* TODO: is SING a buzzer mask? Bastard Special relies on this ... */
 	if(state->m_device_ctrl_data & 0x80)
-		beep_set_state(space->machine().device("beeper"),0);
+		beep_set_state(space->machine().device(BEEPER_TAG),0);
 
 	state->m_device_ctrl_data = data;
 }
@@ -2101,8 +2101,8 @@ static MACHINE_RESET( pc8801 )
 		state->m_crtc.status = 0;
 	}
 
-	beep_set_frequency(machine.device("beeper"),2400);
-	beep_set_state(machine.device("beeper"),0);
+	beep_set_frequency(machine.device(BEEPER_TAG),2400);
+	beep_set_state(machine.device(BEEPER_TAG),0);
 
 	#ifdef USE_PROPER_I8214
 	{
@@ -2269,7 +2269,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_SOUND_CONFIG(pc88_ym2203_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_TIMER_ADD_PERIODIC("rtc_timer", pc8801_rtc_irq, attotime::from_hz(600))
