@@ -1,6 +1,6 @@
 /*
 
-    Morrow MPZ80
+    Morrow MPZ80 "Decision"
 
     Skeleton driver
 
@@ -10,7 +10,21 @@
 
     TODO:
 
-	- everything
+	- trap logic
+	- memory management
+		- task RAM
+		- mapping RAM
+		- attribute RAM
+	- front panel LEDs
+	- keyboard
+	- I/O
+		- Mult I/O
+		- Wunderbuss I/O (8259A PIC, 3x 8250 ACE, uPD1990C RTC)
+	- floppy
+		- DJ/DMA controller (Z80, 1K RAM, 2/4K ROM, TTL floppy control logic)
+	- hard disk
+		- HDCA controller (Shugart SA4000/Fujitsu M2301B/Winchester M2320B)
+		- HD/DMA controller (Seagate ST-506/Shugart SA1000)
 	- AM9512 FPU
 
 */
@@ -64,7 +78,7 @@ READ8_MEMBER( mpz80_state::status_r )
 		3		_TRAP INT
 		4		_TRAP STOP
 		5		_TRAP AUX
-		6		RIO
+		6		R10
 		7		_RD STB
 		
 	*/
@@ -74,7 +88,7 @@ READ8_MEMBER( mpz80_state::status_r )
 
 
 //-------------------------------------------------
-//  keyboard_r -
+//  keyboard_r - front panel keyboard
 //-------------------------------------------------
 
 READ8_MEMBER( mpz80_state::keyboard_r )
@@ -110,21 +124,26 @@ READ8_MEMBER( mpz80_state::switch_r )
 		
 		0		_TRAP RESET
 		1		INT PEND
-		2		SW1-6
-		3		SW1-5
-		4		SW1-4
-		5		SW1-3
-		6		SW1-2
-		7		SW1-1
+		2		16C-6
+		3		16C-5
+		4		16C-4
+		5		16C-3
+		6		16C-2
+		7		16C-1
 		
 	*/
 
-	return 0;
+	UINT8 data = 0;
+	
+	// switches
+	data |= input_port_read(machine(), "16C") & 0xfc;
+	
+	return data;
 }
 
 
 //-------------------------------------------------
-//  disp_seg_w -
+//  disp_seg_w - front panel segment
 //-------------------------------------------------
 
 WRITE8_MEMBER( mpz80_state::disp_seg_w )
@@ -147,7 +166,7 @@ WRITE8_MEMBER( mpz80_state::disp_seg_w )
 
 
 //-------------------------------------------------
-//  disp_col_w -
+//  disp_col_w - front panel column
 //-------------------------------------------------
 
 WRITE8_MEMBER( mpz80_state::disp_col_w )
@@ -226,10 +245,11 @@ WRITE8_MEMBER( mpz80_state::mask_w )
 
 static ADDRESS_MAP_START( mpz80_mem, AS_PROGRAM, 8, mpz80_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x0400) AM_MIRROR(0x3fc) AM_READWRITE(trap_addr_r, disp_seg_w)
-	AM_RANGE(0x0401, 0x0401) AM_MIRROR(0x3fc) AM_READWRITE(keyboard_r, disp_col_w)
-	AM_RANGE(0x0402, 0x0402) AM_MIRROR(0x3fc) AM_READWRITE(switch_r, task_w)
-	AM_RANGE(0x0403, 0x0403) AM_MIRROR(0x3fc) AM_READWRITE(status_r, mask_w)
+	AM_RANGE(0x0400, 0x0400) AM_MIRROR(0x1fc) AM_READWRITE(trap_addr_r, disp_seg_w)
+	AM_RANGE(0x0401, 0x0401) AM_MIRROR(0x1fc) AM_READWRITE(keyboard_r, disp_col_w)
+	AM_RANGE(0x0402, 0x0402) AM_MIRROR(0x1fc) AM_READWRITE(switch_r, task_w)
+	AM_RANGE(0x0403, 0x0403) AM_MIRROR(0x1fc) AM_READWRITE(status_r, mask_w)
+	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE(m_map_ram)
 	AM_RANGE(0x0800, 0x0bff) AM_ROM AM_REGION(Z80_TAG, 0)
 //	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x3ff) AM_DEVREADWRITE(AM9512_TAG, am9512_device, read, write)
 ADDRESS_MAP_END
@@ -240,6 +260,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( mpz80_io, AS_IO, 8, mpz80_state )
+//	AM_RANGE(0x48, 0x48) Wunderbuss/Mult I/O
+//	AM_RANGE(0x80, 0x80) HD/DMA
 ADDRESS_MAP_END
 
 
@@ -253,6 +275,63 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static INPUT_PORTS_START( mpz80 )
+	PORT_START("16C")
+	PORT_DIPNAME( 0xf8, 0xf8, "Boot Address" ) PORT_DIPLOCATION("16C:1,2,3,4,5")
+	PORT_DIPSETTING(    0xf8, "F800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0xf0, "F000H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0xe8, "E800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0xe0, "E000H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0xd8, "D800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0xd0, "D000H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0xc8, "C800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0xc0, "C000H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0xb8, "B800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0xb0, "B000H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0xa8, "A800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0xa0, "A000H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x98, "9800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x90, "9000H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x88, "8800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x80, "8000H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x78, "7800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x70, "7000H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x68, "6800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x60, "6000H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x58, "5800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x50, "5000H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x48, "4800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x40, "4000H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x38, "3800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x30, "3000H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x28, "2800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x20, "2000H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x18, "1800H" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x10, "Boot DJ/DMA" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x08, "Boot HD/DMA" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, "Boot HDCA" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, "Read Registers" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, "Write Registers" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, "Write Map RAMs" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x30, "Write R/W RAMs" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, "R/W FPP" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x50, "R/W S-100 Bus" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x60, "R/W S-100 Bus" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x70, "Read Switches" ) PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0x04, 0x00, "Power Up" ) PORT_DIPLOCATION("16C:6")
+	PORT_DIPSETTING(    0x04, "Boot Address" )
+	PORT_DIPSETTING(    0x00, "Monitor" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("16C:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "S-100 MWRITE" ) PORT_DIPLOCATION("16C:8")
+	PORT_DIPSETTING(    0x01, "Disabled" )
+	PORT_DIPSETTING(    0x00, "Enabled" )
+
+	PORT_START("12C")
+	PORT_DIPNAME( 0x02, 0x02, "Operation Mode" )
+	PORT_DIPSETTING(    0x02, "Monitor" )
+	PORT_DIPSETTING(    0x00, "Diagnostic" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -361,4 +440,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1980, mpz80,  0,      0,      mpz80,  mpz80,  0,      "Morrow",	"MPZ80",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1980, mpz80,  0,      0,      mpz80,  mpz80,  0,      "Morrow Designs",	"MPZ80",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )

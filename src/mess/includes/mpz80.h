@@ -37,6 +37,9 @@ public:
 	DECLARE_WRITE8_MEMBER( disp_col_w );
 	DECLARE_WRITE8_MEMBER( task_w );
 	DECLARE_WRITE8_MEMBER( mask_w );
+	
+	// memory state
+	UINT8 *m_map_ram;
 };
 
 #endif
