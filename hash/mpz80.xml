@@ -1,0 +1,381 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="mpz80" description="Morrow MPZ80 diskettes">
+	
+	<software name="817">
+		<description>817</description>
+		<year>1979</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="817" />
+		<!--
+		48K CP/M Version 2.2, Cbios revision 2.9.20       #817
+		For a Disk Jockey 2D/B @ F800 + Fujitsu M20
+		Multio console
+		Serial port 3 with CTS protocal as LST:           
+		@ 1979 Digital Research   @ 1979 Morrow Designs
+		                                           #817
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="515868">
+				<rom name="817.imd" size="515868" crc="ad06b6fa" sha1="9fe071de61ee09ea4d285067c0b0daf2d0c9b163" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="901">
+		<description>901</description>
+		<year>1983</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="34-54574" />
+		<!--
+		48K CP/M version 2.2, CBIOS revision E.4     #901
+		MOVCPM;   AB: DJ/DMA 8,    CD: DJ/DMA 5,  E: HDC/DMA
+		MOVCPM5;   A: HDC/DMA M5,  BC: DJ/DMA 8, DE: DJ/DMA 5
+		MOVCPM10; AB: HDC/DMA M10, CD: DJ/DMA 8, EF: DJ/DMA 5     
+		MOVCPM16; AB: HDC/DMA M16, CD: DJ/DMA 8, EF: DJ/DMA 5
+		DJ/DMA as console, blank list, blank punch
+		
+		
+		
+		
+		
+		(c) 1980 Digital Research, (c) 1983 Morrow Designs
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="532383">
+				<rom name="901.imd" size="532383" crc="8b64244e" sha1="4dbcec48770a802bdb7f99de93af7b09e23527c5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="902">
+		<description>902</description>
+		<year>1983</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="902" />
+		<!--
+		@ @ @48K CP/M version 2.2, CBIOS REVISION E.4        #902
+		MOVCPM;   AB: DJ/DMA 8,   CD: DJ/DMA 5, E: HDC/DMA M5
+		MOVCPM5;   A: HDC/DMA M5  BC: DJ/DMA 8, DE: DJ/DMA 5
+		MOVCPM10; AB: HDC/DMA M10 CD: DJ/DMA 8, EF: DJ/DMA 5     
+		MOVCPM16; AB: HDC/DMA M16 CD: DJ/DMA 8, EF: DJ7DMA 5
+		MULTI/O (9600) console; MULTI/O (9600 CTS) LIST;
+		MULTI/O (Centronics) PUNCH
+		(c) 1980 Digital Research (c) 1983 Morrow Designs
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="586630">
+				<rom name="902.imd" size="586630" crc="db1243a5" sha1="76b73c8f8f5d8b59f66d600ba34a50d08200e415" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="908">
+		<description>908</description>
+		<year>1979</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="908" />
+		<!--
+		48K CP/M Version 2.2 Cbios Rev E mod 2       #908
+		Boot; AB: DJ/B, CD: DJDMA 8, EF: DJDMA 5, GH: HDDMA M5
+		Movcpm; AB: HDDMA M5, BC: DJDMA 8, DE: DJDMA 5, GH: DJ/B
+		Multio 9600 console; Multio 1200 serial LST:
+		@ 1979 Digital Research   @ 1979 Morrow Designs
+		                                           #908
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="590692">
+				<rom name="908.imd" size="590692" crc="2856c0bf" sha1="59dc578bf15f5c57b5eb7a52045a70d9644f646d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="909">
+		<description>909</description>
+		<year>1979</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="34-51616" />
+		<!--
+		48K CP/M Version 2.2 Cbios Rev E mod 2       #909
+		Boot; AB: DJDMA 8, CD: DJDMA 5, EF: DJ/B, GH: HDDMA M5
+		Movcpm; AB: HDDMA M5, BC: DJDMA 8, DE: DJDMA 5, GH: DJ/B
+		Multio 9600 console; Multio 1200 serial LST: MICROSOFT BASIC
+		@ 1979 Digital Research   @ 1979 Morrow DesignsVers 5.21
+		                                           #909 © 1979
+												       Microsoft
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="558903">
+				<rom name="909.imd" size="558903" crc="92f3490e" sha1="b53d8fd66f2cddbe7e9cf6d774e4b51d9daeb38e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="910">
+		<description>910</description>
+		<year>1982</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="34-52201" />
+		<!--
+		48K CP/M version 2.2, CBIOS revision E.31       #910
+		MOVCPM; AB: DJDMA 8, CD: DJDMA 5, EF: HDCA M10
+		MOVCPM10; AB: HDCA M10, BC: DJDMA 8, DE: DJDMA 5
+		Multio (9600) as console; Multio (1200 CTS) as list
+		
+		
+		
+		(c) 1980 Digital Research, (c) 1982 Morrow Designs
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="565036">
+				<rom name="910.imd" size="565036" crc="05121995" sha1="99a504b6500d945639c001c6cea4e967cbbc91bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="911">
+		<description>911</description>
+		<year>1979</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="911" />
+		<!--
+		48K CP/M Version 2.2 Cbios Rev E mod 2       #911
+		Boot; AB: DJDMA 8, CD: DJDMA 5, EFG: HDC3 M20
+		Movcpm; ABC: HDC3 M20, DE: DJDMA 8, FG: DJDMA 5
+		Multio 9600 console; Multio 1200 serial LST:
+		@ 1979 Digital Research   @ 1979 Morrow Designs
+		                                           #911
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="567059">
+				<rom name="911.imd" size="567059" crc="cdff7230" sha1="cbec93c8d66bd7793b39ff96698b67f93284ad33" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="921">
+		<description>921</description>
+		<year>1980</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="34-51856" />
+		<!--
+		48K CP/M version 2.2 CBIOS revision E.3        #921
+		MOVCPM;     AB: DJDMA 8,      CD: DJDMA 5, EF: HDDMA
+		MOVCPM5;    AB: HDDMA (2)M5,  CD: DJDMA 8, EF :DJDMA
+		MOVCPM10; ABCD: HDDMA (2)M10, EF: DJDMA 8, GH: DJDMA
+		MOVCPM16; ABCD: HDDMA (2)M16, EF: DJDMA 8, GH: DJDMA
+		DJDMA serial console; Blank list
+		(c) 1980 Digital Research, (c) 1982 Morrow Designs
+		                                           #921
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="497589">
+				<rom name="921.imd" size="497589" crc="5332bf9b" sha1="003658bb11523492c76cb7da6912d25e548f4536" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="922">
+		<description>922</description>
+		<year>1982</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="34-51859" />
+		<!--
+		48K CP/M version 2.2 CBIOS revision E.3        #922
+		MOVCPM;     AB: DJDMA 8,      CD: DJDMA 5, EF: HDDMA
+		MOVCPM5;    AB: HDDMA (2)M5,  CD: DJDMA 8, EF :DJDMA
+		MOVCPM10; ABCD: HDDMA (2)M10, EF: DJDMA 8, GH: DJDMA
+		MOVCPM16; ABCD: HDDMA (2)M16, EF: DJDMA 8, GH: DJDMA
+		Multio (9600) as console, Multio (1200) as list
+		(c) 1980 Digital Research, (c) 1982 Morrow Designs
+		                                           #922
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="541604">
+				<rom name="922.imd" size="541604" crc="18eda9da" sha1="904e5feaac35c54b12c228d31cd276d34bfdfa4e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="925">
+		<description>925</description>
+		<year>1982</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="925" />
+		<!--
+		48K CP/M version 2.2, CBIOS revision E.31       #925
+		MOVCPM; ABCD: DJDMA 8, EFGH: DJDMA 5
+		DJDMA as console, blank list
+
+
+
+
+
+		(c) 1980 Digital Research, (c) 1982 Morrow Designs
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="442175">
+				<rom name="925.imd" size="442175" crc="3767e22f" sha1="b63827e70fa18d77eaae0161d712995484f43f95" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="926">
+		<description>926</description>
+		<year>1982</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="34-51851" />
+		<!--
+		48K CP/M version 2.2, CBIOS revision E.3       #926
+		MOVCPM; ABCD: DJDMA 8, EFGH: DJDMA 5
+		Multio (9600) as console, Multio (1200) as list
+
+
+
+
+		(c) 1980 Digital Research, (c) 1982 Morrow Designs
+		                                           #926
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="460614">
+				<rom name="926.imd" size="460614" crc="35470d3c" sha1="cff4513d27652dfa243044a6f4b6b2b685422bde" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="930">
+		<description>930</description>
+		<year>1983</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="930" />
+		<!--
+		48K CP/M version 2.2, CBIOS revision E.31     #930
+		MOVCPM; ABCD: DJ2D/B @ F800, E: HDDMA
+		MOVCPM5;   A: HDDMA M5,  BCDE: DJ2D/B @ F800
+		MOVCPM10;  A: HDDMA M10, BCDE: DJ2D/B @ F800
+		MOVCPM16;  A: HDDMA M16, BCDE: DJ2D/B @ F800
+		Multio (9600) as console, Multio (1200 CTS) as list
+		
+		
+		
+		
+		(c) 1980 Digital Research, (c) 1983 Morrow Designs
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="539518">
+				<rom name="930.imd" size="539518" crc="e47aae78" sha1="c5323818c5acbf0b1fb64bc54b661240353787ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="931">
+		<description>931</description>
+		<year>1982</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="931" />
+		<!--
+		48K CP/M ver 2.2, CBIOS rev E.31  #931
+		MOVCPM; ABCD: DJ2D/B @ E000
+		DJ2D/B as console; blank list
+		
+		
+		(c) 1980 Digital Research
+		(c) 1982 Morrow Designs
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="543822">
+				<rom name="931.imd" size="543822" crc="e7fed2ba" sha1="b354a7227c13186089011413d5431fd3d57c6a86" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="935">
+		<description>935</description>
+		<year>1982</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="34-53954" />
+		<!--
+		48K CP/M version 2.2, CBIOS revision E.31       #935
+		MOVCPM; ABCD: DJ2D/B @F800
+		DJ2D/B as console, blank list
+		
+		
+		
+		
+		
+		(c) 1980 Digital Research, (c) 1982 Morrow Designs
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="404322">
+				<rom name="935.imd" size="404322" crc="85174a4d" sha1="1ba5c8d77a33b76c65d620c7c0eb1a59fc8eb055" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="942">
+		<description>Install Package for the HDCA</description>
+		<year>1982</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="942" />
+		<!--
+		INSTALL PACKAGE for the HDCA                 #942
+		PRL files supplied: HDCAM10F, HDCAM10M, HDCAM20,
+		                    HDCAM26
+							
+							
+		(c) 1982 Morrow Designs
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="222440">
+				<rom name="942.imd" size="222440" crc="f44a95ff" sha1="e64bded7bbeaa99a8af0fb563961497b9302aab7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="943">
+		<description>Install Package for the DJ2D/B</description>
+		<year>1982</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="943" />
+		<!--
+		I N S T A L L   P A C K A G E  f o r  t h e   D J 2 D / B                             #943
+		P R L   f i l e s  s u p p l i e d :  D J 2 D / B 4
+		
+		
+		
+		( c )  1 9 8 2  M o r r o w  D e s i g n s
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="160809">
+				<rom name="943.imd" size="160809" crc="250211a5" sha1="2a233b2b7815ea323b3c273e72cc41b7654e23f5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="947">
+		<description>Single Density CP/M with MBASIC</description>
+		<year>1982</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="34-54510" />
+		<!--
+		Single Density CP/M with MBASIC           #947
+		
+		____ NOT A BOOT DISKETTE ____        1 of 2
+		
+		CP/M (c) '76, '77, '78, '79, '80
+		   Digital Research
+		(c) 1982 Morrow Designs
+		-->
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="240296">
+				<rom name="947-1.imd" size="240296" crc="55893d01" sha1="c80d5144d1363813cd2fcdbd0283d8e18864e001" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_8">
+			<dataarea name="flop" size="240296">
+				<rom name="947-2.imd" offset="0" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+	
+</softwarelist>

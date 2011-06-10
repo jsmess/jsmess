@@ -339,6 +339,22 @@ INPUT_PORTS_END
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
+//-------------------------------------------------
+//  floppy_config super6_floppy_config
+//-------------------------------------------------
+
+static const floppy_config mpz80_floppy_config =
+{
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    FLOPPY_STANDARD_8_DSDD,
+    FLOPPY_OPTIONS_NAME(default),
+    "floppy_8"
+};
+
 
 //-------------------------------------------------
 //  GENERIC_TERMINAL_INTERFACE( terminal_intf )
@@ -396,6 +412,7 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 	MCFG_FRAGMENT_ADD( generic_terminal )
 
 	// devices
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, mpz80_floppy_config)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	// internal ram
@@ -403,7 +420,7 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 	MCFG_RAM_DEFAULT_SIZE("1K")
 
 	// software list
-	//MCFG_SOFTWARE_LIST_ADD("flop_list", "mpz80")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "mpz80")
 MACHINE_CONFIG_END
 
 
