@@ -405,7 +405,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 
 	// set up device and CRC, if specified
 	pInfo->device = device;
-	if ((device != NULL) && (device->has_partial_hash() != 0))
+	if ((device != NULL))
 		nCrc = 0;
 	//if (nCrc != 0)
 		//snprintf(pInfo->hash_string, ARRAY_LENGTH(pInfo->hash_string), "c:%08x#", nCrc);
