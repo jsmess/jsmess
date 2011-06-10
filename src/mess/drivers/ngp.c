@@ -674,6 +674,8 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 		memcpy(image.device().machine().region("cart")->base(), image.get_software_region("rom"), filesize);
 	}
 
+	//printf("%2x%2x - %x - %x\n", (unsigned int) image.device().machine().region("cart")->u8(0x20), (unsigned int) image.device().machine().region("cart")->u8(0x21), 
+	//        (unsigned int) image.device().machine().region("cart")->u8(0x22), (unsigned int) image.device().machine().region("cart")->u8(0x23));
 	state->m_flash_chip[0].manufacturer_id = 0x98;
 	switch( filesize )
 	{
@@ -809,7 +811,10 @@ static MACHINE_CONFIG_DERIVED( ngp, ngp_common )
 	MCFG_CARTSLOT_LOAD(ngp_cart)
 	MCFG_CARTSLOT_INTERFACE("ngp_cart")
 	MCFG_CARTSLOT_UNLOAD(ngp_cart)
+
+	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","ngp")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ngpc_list","ngpc")
 MACHINE_CONFIG_END
 
 
@@ -827,7 +832,10 @@ static MACHINE_CONFIG_DERIVED( ngpc, ngp_common )
 	MCFG_CARTSLOT_LOAD(ngp_cart)
 	MCFG_CARTSLOT_INTERFACE("ngp_cart")
 	MCFG_CARTSLOT_UNLOAD(ngp_cart)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","ngp")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","ngpc")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ngp_list","ngp")
 MACHINE_CONFIG_END
 
 
