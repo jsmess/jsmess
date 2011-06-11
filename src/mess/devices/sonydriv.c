@@ -343,7 +343,17 @@ int sony_read_status(device_t *device)
 			result = 0;
 			break;
 		case 0x0c:	/* Disk switched */
-			result = f->disk_switched;
+			{
+				if (cur_image)
+				{
+					if (!floppy_dskchg_r(&cur_image->device()))
+					{
+						printf("C: disk switch!");
+						f->disk_switched = 1;
+					}
+				}
+				result = f->disk_switched;
+			}
 			break;
 		case 0x0d:	/* Unknown */
 			/* I'm not sure what this one does, but the Mac Plus executes the
