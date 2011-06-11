@@ -250,7 +250,103 @@ WRITE8_MEMBER( mpz80_state::disp_col_w )
 
 READ8_MEMBER( mpz80_state::wunderbus_r )
 {
-	return 0;
+	UINT8 data = 0;
+
+	if (offset < 7)
+	{
+		switch (m_wb_group)
+		{
+		case 0:
+			switch (offset)
+			{
+			case 0: // DAISY 0 IN (STATUS)
+				/*
+				
+					bit		description
+					
+					0		End of Ribbon
+					1		Paper Out
+					2		Cover Open
+					3		Paper Feed Ready
+					4		Carriage Ready
+					5		Print Wheel Ready
+					6		Check
+					7		Printer Ready
+					
+				*/
+				break;
+				
+			case 1: // Switch/Parallel port flags
+				/*
+				
+					bit		description
+					
+					0		Serial channels baud rate select - normally ON
+					1		Serial channels baud rate select - normally ON
+					2		Serial channels baud rate select - normally ON
+					3		Not yet dedicated
+					4		Not yet dedicated
+					5		Not yet dedicated
+					6		Not connected
+					7		Not connected
+					
+				*/
+				
+				data = input_port_read(machine(), "10A");
+				break;
+				
+			case 2: // R.T. Clock IN/RESET CLK. Int.
+				/*
+				
+					bit		description
+					
+					0		1990 Data Out
+					1		1990 TP
+					2		
+					3		
+					4		
+					5		
+					6		
+					7		
+					
+				*/
+				
+				data |= m_rtc->data_out_r();
+				data |= m_rtc->tp_r() << 1;
+
+				// reset clock interrupt
+				m_rtc_tp = 0;
+				pic8259_ir7_w(m_pic, m_rtc_tp);
+				break;
+				
+			case 3: // Parallel data IN
+				break;
+				
+			case 4: // 8259 0 register
+			case 5: // 8259 1 register
+				data = pic8259_r(m_pic, offset & 0x01);
+				break;
+				
+			case 6: // not used
+				break;
+			}
+			break;
+			
+		case 1:
+			data = ins8250_r(m_ace1, offset);
+			break;
+			
+		case 2:
+			data = ins8250_r(m_ace2, offset);
+			break;
+			
+		case 3:
+			data = ins8250_r(m_ace3, offset);
+			break;
+		}
+	}
+	
+	return data;
 }
 
 
@@ -260,6 +356,115 @@ READ8_MEMBER( mpz80_state::wunderbus_r )
 
 WRITE8_MEMBER( mpz80_state::wunderbus_w )
 {
+	if (offset == 7)
+	{
+		m_wb_group = data;
+	}
+	else
+	{
+		switch (m_wb_group)
+		{
+		case 0:
+			switch (offset)
+			{
+			case 0: // DAISY 0 OUT
+				/*
+				
+					bit		description
+					
+					0		Data Bit 9
+					1		Data Bit 10
+					2		Data Bit 11
+					3		Data Bit 12
+					4		Paper Feed Strobe
+					5		Carriage Strobe
+					6		Print Wheel Strobe
+					7		Restore
+					
+				*/
+				break;
+				
+			case 1: // DAISY 1 OUT
+				/*
+				
+					bit		description
+					
+					0		Data Bit 1
+					1		Data Bit 2
+					2		Data Bit 3
+					3		Data Bit 4
+					4		Data Bit 5
+					5		Data Bit 6
+					6		Data Bit 7
+					7		Data Bit 8
+					
+				*/
+				break;
+				
+			case 2: // R.T. Clock OUT
+				/*
+				
+					bit		description
+					
+					0		1990 Data In
+					1		1990 Clk
+					2		1990 C0
+					3		1990 C1
+					4		1990 C2
+					5		1990 STB
+					6		Ribbon Lift
+					7		Select
+					
+				*/
+				
+				m_rtc->data_in_w(BIT(data, 0));
+				m_rtc->clk_w(BIT(data, 0));
+				m_rtc->c0_w(BIT(data, 0));
+				m_rtc->c1_w(BIT(data, 0));
+				m_rtc->c2_w(BIT(data, 0));
+				m_rtc->stb_w(BIT(data, 0));
+				break;
+				
+			case 3: // Par. data OUT
+				break;
+				
+			case 4: // 8259 0 register
+			case 5: // 8259 1 register
+				pic8259_w(m_pic, offset & 0x01, data);
+				break;
+				
+			case 6: // Par. port cntrl.
+				/*
+				
+					bit		description
+					
+					0		POE
+					1		_RST1
+					2		_RST2
+					3		_ATTN1
+					4		_ATTN2
+					5		
+					6		
+					7		
+					
+				*/
+				break;
+			}
+			break;
+			
+		case 1:
+			ins8250_w(m_ace1, offset, data);
+			break;
+			
+		case 2:
+			ins8250_w(m_ace2, offset, data);
+			break;
+			
+		case 3:
+			ins8250_w(m_ace3, offset, data);
+			break;
+		}
+	}
 }
 
 
@@ -289,7 +494,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( mpz80_io, AS_IO, 8, mpz80_state )
-	AM_RANGE(0x48, 0x48) AM_READWRITE(wunderbus_r, wunderbus_w)
+	AM_RANGE(0x48, 0x4f) AM_READWRITE(wunderbus_r, wunderbus_w)
 //	AM_RANGE(0x80, 0x80) HD/DMA
 ADDRESS_MAP_END
 
@@ -298,6 +503,56 @@ ADDRESS_MAP_END
 //**************************************************************************
 //  INPUT PORTS
 //**************************************************************************
+
+//-------------------------------------------------
+//  INPUT_PORTS( wunderbus )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( wunderbus )
+	PORT_START("7C")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("7C:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x3e, 0x24, "BASE Port Address" ) PORT_DIPLOCATION("7C:2,3,4,5,6")
+	PORT_DIPSETTING(    0x00, "00H" )
+	// ...
+	PORT_DIPSETTING(    0x24, "48H" )
+	// ...
+	PORT_DIPSETTING(    0x3e, "F8H" )
+	PORT_DIPNAME( 0x40, 0x40, "FLAG2 Polarity" ) PORT_DIPLOCATION("7C:7")
+	PORT_DIPSETTING(    0x40, "Positive" )
+	PORT_DIPSETTING(    0x00, "Negative" )
+	PORT_DIPNAME( 0x80, 0x80, "FLAG1 Polarity" ) PORT_DIPLOCATION("7C:8")
+	PORT_DIPSETTING(    0x80, "Positive" )
+	PORT_DIPSETTING(    0x00, "Negative" )
+
+	PORT_START("10A")
+	PORT_DIPNAME( 0x07, 0x00, "Baud Rate" ) PORT_DIPLOCATION("10A:1,2,3")
+	PORT_DIPSETTING(    0x00, "Automatic" )
+	PORT_DIPSETTING(    0x01, "19200" )
+	PORT_DIPSETTING(    0x02, "9600" )
+	PORT_DIPSETTING(    0x03, "4800" )
+	PORT_DIPSETTING(    0x04, "2400" )
+	PORT_DIPSETTING(    0x05, "1200" )
+	PORT_DIPSETTING(    0x06, "300" )
+	PORT_DIPSETTING(    0x07, "110" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("10A:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) PORT_DIPLOCATION("10A:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("10A:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("10A:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("10A:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 //-------------------------------------------------
 //  INPUT_PORTS( mpz80 )
@@ -361,6 +616,8 @@ static INPUT_PORTS_START( mpz80 )
 	PORT_DIPSETTING(    0x02, "Monitor" )
 	PORT_DIPSETTING(    0x00, "Diagnostic" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	
+	PORT_INCLUDE( wunderbus )
 INPUT_PORTS_END
 
 
@@ -373,10 +630,25 @@ INPUT_PORTS_END
 //	pic8259_interface pic_intf
 //-------------------------------------------------
 
+/*
+
+	bit		description
+	
+	IR0		S-100 V0
+	IR1		S-100 V1
+	IR2		S-100 V2
+	IR3		Serial Device 1
+	IR4		Serial Device 2
+	IR5		Serial Device 3
+	IR6		Daisy PWR line
+	IR7		RT Clock TP line
+
+*/
+
 static struct pic8259_interface pic_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_LINE_VCC,
 	DEVCB_NULL
 };
 
@@ -384,6 +656,13 @@ static struct pic8259_interface pic_intf =
 //-------------------------------------------------
 //	ins8250_interface ace1_intf
 //-------------------------------------------------
+
+static INS8250_INTERRUPT( ace1_interrupt )
+{
+	mpz80_state *driver_state = device->machine().driver_data<mpz80_state>();
+
+	pic8259_ir3_w(driver_state->m_pic, state);
+}
 
 static INS8250_TRANSMIT( ace1_transmit )
 {
@@ -394,8 +673,8 @@ static INS8250_TRANSMIT( ace1_transmit )
 
 static ins8250_interface ace1_intf =
 {
-	0,
-	NULL,
+	XTAL_1_8432MHz,
+	ace1_interrupt,
 	ace1_transmit,
 	NULL,
 	NULL
@@ -406,10 +685,17 @@ static ins8250_interface ace1_intf =
 //	ins8250_interface ace2_intf
 //-------------------------------------------------
 
+static INS8250_INTERRUPT( ace2_interrupt )
+{
+	mpz80_state *driver_state = device->machine().driver_data<mpz80_state>();
+
+	pic8259_ir4_w(driver_state->m_pic, state);
+}
+
 static ins8250_interface ace2_intf =
 {
-	0,
-	NULL,
+	XTAL_1_8432MHz,
+	ace2_interrupt,
 	NULL,
 	NULL,
 	NULL
@@ -420,10 +706,17 @@ static ins8250_interface ace2_intf =
 //	ins8250_interface ace3_intf
 //-------------------------------------------------
 
+static INS8250_INTERRUPT( ace3_interrupt )
+{
+	mpz80_state *driver_state = device->machine().driver_data<mpz80_state>();
+
+	pic8259_ir5_w(driver_state->m_pic, state);
+}
+
 static ins8250_interface ace3_intf =
 {
-	0,
-	NULL,
+	XTAL_1_8432MHz,
+	ace3_interrupt,
 	NULL,
 	NULL,
 	NULL
@@ -434,10 +727,17 @@ static ins8250_interface ace3_intf =
 //	UPD1990A_INTERFACE( rtc_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( mpz80_state::rtc_tp_w )
+{
+	m_rtc_tp = state;
+	
+	pic8259_ir7_w(m_pic, m_rtc_tp);
+}
+
 static UPD1990A_INTERFACE( rtc_intf )
 {
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(mpz80_state, rtc_tp_w)
 };
 
 

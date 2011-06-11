@@ -34,6 +34,7 @@ public:
 		  m_ace1(*this, INS8250_1_TAG),
 		  m_ace2(*this, INS8250_2_TAG),
 		  m_ace3(*this, INS8250_3_TAG),
+		  m_rtc(*this, UPD1990C_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_terminal(*this, TERMINAL_TAG)
 	{ }
@@ -43,6 +44,7 @@ public:
 	required_device<device_t> m_ace1;
 	required_device<device_t> m_ace2;
 	required_device<device_t> m_ace3;
+	required_device<upd1990a_device> m_rtc;
 	required_device<device_t> m_ram;
 	required_device<device_t> m_terminal;
 
@@ -60,9 +62,14 @@ public:
 	DECLARE_READ8_MEMBER( wunderbus_r );
 	DECLARE_WRITE8_MEMBER( wunderbus_w );
 	DECLARE_WRITE8_MEMBER( terminal_w );
+	DECLARE_WRITE_LINE_MEMBER( rtc_tp_w );
 	
 	// memory state
 	UINT8 *m_map_ram;
+	
+	// Wunderbus I/O state
+	UINT8 m_wb_group;
+	int m_rtc_tp;
 };
 
 #endif
