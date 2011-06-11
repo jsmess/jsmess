@@ -19,7 +19,7 @@
 	- keyboard
 	- I/O
 		- Mult I/O
-		- Wunderbuss I/O (8259A PIC, 3x 8250 ACE, uPD1990C RTC)
+		- Wunderbus I/O (8259A PIC, 3x 8250 ACE, uPD1990C RTC)
 	- floppy
 		- DJ/DMA controller (Z80, 1K RAM, 2/4K ROM, TTL floppy control logic)
 	- hard disk
@@ -175,12 +175,12 @@ READ8_MEMBER( mpz80_state::switch_r )
 		
 		0		_TRAP RESET
 		1		INT PEND
-		2		16C-6
-		3		16C-5
-		4		16C-4
-		5		16C-3
-		6		16C-2
-		7		16C-1
+		2		16C S6
+		3		16C S5
+		4		16C S4
+		5		16C S3
+		6		16C S2
+		7		16C S1
 		
 	*/
 
@@ -281,18 +281,18 @@ READ8_MEMBER( mpz80_state::wunderbus_r )
 				
 					bit		description
 					
-					0		Serial channels baud rate select - normally ON
-					1		Serial channels baud rate select - normally ON
-					2		Serial channels baud rate select - normally ON
-					3		Not yet dedicated
-					4		Not yet dedicated
-					5		Not yet dedicated
-					6		Not connected
-					7		Not connected
+					0		FLAG1
+					1		FLAG2
+					2		10A S6
+					3		10A S5
+					4		10A S4
+					5		10A S3
+					6		10A S2
+					7		10A S1
 					
 				*/
 				
-				data = input_port_read(machine(), "10A");
+				data = BITSWAP8(input_port_read(machine(), "10A"),0,1,2,3,4,5,6,7) & 0xfc;
 				break;
 				
 			case 2: // R.T. Clock IN/RESET CLK. Int.
@@ -520,11 +520,11 @@ static INPUT_PORTS_START( wunderbus )
 	// ...
 	PORT_DIPSETTING(    0x3e, "F8H" )
 	PORT_DIPNAME( 0x40, 0x40, "FLAG2 Polarity" ) PORT_DIPLOCATION("7C:7")
-	PORT_DIPSETTING(    0x40, "Positive" )
-	PORT_DIPSETTING(    0x00, "Negative" )
+	PORT_DIPSETTING(    0x40, "Negative" )
+	PORT_DIPSETTING(    0x00, "Positive" )
 	PORT_DIPNAME( 0x80, 0x80, "FLAG1 Polarity" ) PORT_DIPLOCATION("7C:8")
-	PORT_DIPSETTING(    0x80, "Positive" )
-	PORT_DIPSETTING(    0x00, "Negative" )
+	PORT_DIPSETTING(    0x80, "Negative" )
+	PORT_DIPSETTING(    0x00, "Positive" )
 
 	PORT_START("10A")
 	PORT_DIPNAME( 0x07, 0x00, "Baud Rate" ) PORT_DIPLOCATION("10A:1,2,3")
@@ -673,7 +673,7 @@ static INS8250_TRANSMIT( ace1_transmit )
 
 static ins8250_interface ace1_intf =
 {
-	XTAL_1_8432MHz,
+	XTAL_18_432MHz/10,
 	ace1_interrupt,
 	ace1_transmit,
 	NULL,
@@ -694,7 +694,7 @@ static INS8250_INTERRUPT( ace2_interrupt )
 
 static ins8250_interface ace2_intf =
 {
-	XTAL_1_8432MHz,
+	XTAL_18_432MHz/10,
 	ace2_interrupt,
 	NULL,
 	NULL,
@@ -715,7 +715,7 @@ static INS8250_INTERRUPT( ace3_interrupt )
 
 static ins8250_interface ace3_intf =
 {
-	XTAL_1_8432MHz,
+	XTAL_18_432MHz/10,
 	ace3_interrupt,
 	NULL,
 	NULL,
@@ -729,9 +729,11 @@ static ins8250_interface ace3_intf =
 
 WRITE_LINE_MEMBER( mpz80_state::rtc_tp_w )
 {
-	m_rtc_tp = state;
-	
-	pic8259_ir7_w(m_pic, m_rtc_tp);
+	if (state)
+	{
+		m_rtc_tp = state;
+		pic8259_ir7_w(m_pic, m_rtc_tp);
+	}
 }
 
 static UPD1990A_INTERFACE( rtc_intf )
