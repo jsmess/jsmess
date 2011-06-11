@@ -32,10 +32,163 @@
 #include "includes/mpz80.h"
 
 
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+enum
+{
+	NO_ACCESS = 0,
+	READ_ONLY,
+	EXECUTE_ONLY,
+	FULL_ACCESS
+};
+
+#define R10	0x04
+
+
 
 //**************************************************************************
 //  MEMORY MANAGEMENT
 //**************************************************************************
+
+//-------------------------------------------------
+//  get_address - 
+//-------------------------------------------------
+
+inline UINT32 mpz80_state::get_address(UINT16 offset)
+{
+	UINT16 map_addr = ((m_task & 0x0f) << 5) | (offset >> 11);
+	UINT8 map = m_map_ram[map_addr];
+	//UINT8 attr = m_map_ram[map_addr + 1];
+
+	//logerror("task %02x map %02x attr %02x address %06x\n", m_task, map, attr, addr);
+	
+	// T7 T6 T5 T4 M7 M6 M5 M4 M3 M2 M1 M0 A11 A10 A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
+	return ((m_task & 0xf0) << 16) | (map << 12) | (offset & 0xfff);
+}
+
+
+//-------------------------------------------------
+//  mmu_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( mpz80_state::mmu_r )
+{
+	UINT32 addr = get_address(offset);
+	UINT8 data = 0;
+		
+	if (addr < 0x1000)
+	{
+		if (addr < 0x400)
+		{
+			UINT8 *ram = ram_get_ptr(m_ram);
+			data = ram[addr & 0x3ff];
+		}
+		else if (addr == 0x400)
+		{
+			data = trap_addr_r(space, 0);
+		}
+		else if (addr == 0x401)
+		{
+			data = keyboard_r(space, 0);
+		}
+		else if (addr == 0x402)
+		{
+			data = switch_r(space, 0);
+		}
+		else if (addr == 0x403)
+		{
+			data = status_r(space, 0);
+		}
+		else if (addr >= 0x600 && addr < 0x800)
+		{
+			// TODO this might change the map RAM contents
+		}
+		else if (addr < 0xc00)
+		{
+			UINT8 *rom = machine().region(Z80_TAG)->base();
+			data = rom[addr & 0x7ff];
+		}
+		else
+		{
+			logerror("Unmapped LOCAL read at %06x\n", addr);
+		}
+	}
+	else
+	{
+		logerror("Unmapped RAM read at %06x\n", addr);
+	}
+	
+	return data;
+}
+
+
+//-------------------------------------------------
+//  mmu_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( mpz80_state::mmu_w )
+{
+	UINT32 addr = get_address(offset);
+
+	if (addr < 0x1000)
+	{
+		if (addr < 0x400)
+		{
+			UINT8 *ram = ram_get_ptr(m_ram);
+			ram[addr & 0x3ff] = data;
+		}
+		else if (addr == 0x400)
+		{
+			disp_seg_w(space, 0, data);
+		}
+		else if (addr == 0x401)
+		{
+			disp_col_w(space, 0, data);
+		}
+		else if (addr == 0x402)
+		{
+			task_w(space, 0, data);
+		}
+		else if (addr == 0x403)
+		{
+			mask_w(space, 0, data);
+		}
+		else if (addr >= 0x600 && addr < 0x800)
+		{
+			m_map_ram[addr - 0x600] = data;
+		}
+		else
+		{
+			logerror("Unmapped LOCAL read at %06x\n", addr);
+		}
+	}
+	else
+	{
+		logerror("Unmapped RAM read at %06x\n", addr);
+	}
+}
+
+
+//-------------------------------------------------
+//  mmu_io_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( mpz80_state::mmu_io_r )
+{
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  mmu_io_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( mpz80_state::mmu_io_w )
+{
+}
+
 
 //-------------------------------------------------
 //  trap_addr_r - trap address register
@@ -97,16 +250,18 @@ WRITE8_MEMBER( mpz80_state::task_w )
 		
 		bit		description
 		
-		0		T0
-		1		T1
-		2		T2
-		3		T3
-		4		T4
-		5		T5
-		6		T6
-		7		T7
+		0		T0, A16
+		1		T1, A17
+		2		T2, A18
+		3		T3, A19
+		4		T4, S-100 A20
+		5		T5, S-100 A21
+		6		T6, S-100 A22
+		7		T7, S-100 A23
 		
 	*/
+	
+	m_task = data;
 }
 
 
@@ -130,6 +285,8 @@ WRITE8_MEMBER( mpz80_state::mask_w )
 		7		_ZIO MODE
 		
 	*/
+	
+	m_mask = data;
 }
 
 
@@ -478,14 +635,19 @@ WRITE8_MEMBER( mpz80_state::wunderbus_w )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( mpz80_mem, AS_PROGRAM, 8, mpz80_state )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_r, mmu_w)
+/*
+	Task 0 Segment 0 map:
+	
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x0400) AM_MIRROR(0x1fc) AM_READWRITE(trap_addr_r, disp_seg_w)
-	AM_RANGE(0x0401, 0x0401) AM_MIRROR(0x1fc) AM_READWRITE(keyboard_r, disp_col_w)
-	AM_RANGE(0x0402, 0x0402) AM_MIRROR(0x1fc) AM_READWRITE(switch_r, task_w)
-	AM_RANGE(0x0403, 0x0403) AM_MIRROR(0x1fc) AM_READWRITE(status_r, mask_w)
+	AM_RANGE(0x0400, 0x0400) AM_READWRITE(trap_addr_r, disp_seg_w)
+	AM_RANGE(0x0401, 0x0401) AM_READWRITE(keyboard_r, disp_col_w)
+	AM_RANGE(0x0402, 0x0402) AM_READWRITE(switch_r, task_w)
+	AM_RANGE(0x0403, 0x0403) AM_READWRITE(status_r, mask_w)
 	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE(m_map_ram)
 	AM_RANGE(0x0800, 0x0bff) AM_ROM AM_REGION(Z80_TAG, 0)
-//	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x3ff) AM_DEVREADWRITE(AM9512_TAG, am9512_device, read, write)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVREADWRITE(AM9512_TAG, am9512_device, read, write)
+*/
 ADDRESS_MAP_END
 
 
@@ -494,7 +656,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( mpz80_io, AS_IO, 8, mpz80_state )
-	AM_RANGE(0x48, 0x4f) AM_READWRITE(wunderbus_r, wunderbus_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_io_r, mmu_io_w)
+//	AM_RANGE(0x48, 0x4f) AM_READWRITE(wunderbus_r, wunderbus_w)
 //	AM_RANGE(0x80, 0x80) HD/DMA
 ADDRESS_MAP_END
 
@@ -785,6 +948,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 void mpz80_state::machine_start()
 {
+	m_map_ram = auto_alloc_array_clear(machine(), UINT8, 0x200);
 }
 
 

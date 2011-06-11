@@ -50,7 +50,13 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
+	
+	inline UINT32 get_address(UINT16 offset);
 
+	DECLARE_READ8_MEMBER( mmu_r );
+	DECLARE_WRITE8_MEMBER( mmu_w );
+	DECLARE_READ8_MEMBER( mmu_io_r );
+	DECLARE_WRITE8_MEMBER( mmu_io_w );
 	DECLARE_READ8_MEMBER( trap_addr_r );
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_READ8_MEMBER( switch_r );
@@ -66,6 +72,8 @@ public:
 	
 	// memory state
 	UINT8 *m_map_ram;
+	UINT8 m_task;
+	UINT8 m_mask;
 	
 	// Wunderbus I/O state
 	UINT8 m_wb_group;
