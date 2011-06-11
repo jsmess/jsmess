@@ -34,7 +34,7 @@
 
 
 //**************************************************************************
-//  READ/WRITE HANDLERS
+//  MEMORY MANAGEMENT
 //**************************************************************************
 
 //-------------------------------------------------
@@ -86,6 +86,57 @@ READ8_MEMBER( mpz80_state::status_r )
 	return 0;
 }
 
+
+//-------------------------------------------------
+//  task_w - task register
+//-------------------------------------------------
+
+WRITE8_MEMBER( mpz80_state::task_w )
+{
+	/*
+		
+		bit		description
+		
+		0		T0
+		1		T1
+		2		T2
+		3		T3
+		4		T4
+		5		T5
+		6		T6
+		7		T7
+		
+	*/
+}
+
+
+//-------------------------------------------------
+//  mask_w - mask register
+//-------------------------------------------------
+
+WRITE8_MEMBER( mpz80_state::mask_w )
+{
+	/*
+		
+		bit		description
+		
+		0		_STOP ENBL
+		1		AUX ENBL
+		2		_TINT ENBL
+		3		RUN ENBL
+		4		_HALT ENBL
+		5		SINT ENBL
+		6		_IOENBL
+		7		_ZIO MODE
+		
+	*/
+}
+
+
+
+//**************************************************************************
+//  FRONT PANEL
+//**************************************************************************
 
 //-------------------------------------------------
 //  keyboard_r - front panel keyboard
@@ -188,49 +239,27 @@ WRITE8_MEMBER( mpz80_state::disp_col_w )
 }
 
 
+
+//**************************************************************************
+//  WUNDERBUS I/O
+//**************************************************************************
+
 //-------------------------------------------------
-//  task_w - task register
+//  wunderbus_r - 
 //-------------------------------------------------
 
-WRITE8_MEMBER( mpz80_state::task_w )
+READ8_MEMBER( mpz80_state::wunderbus_r )
 {
-	/*
-		
-		bit		description
-		
-		0		T0
-		1		T1
-		2		T2
-		3		T3
-		4		T4
-		5		T5
-		6		T6
-		7		T7
-		
-	*/
+	return 0;
 }
 
 
 //-------------------------------------------------
-//  mask_w - mask register
+//  wunderbus_w - 
 //-------------------------------------------------
 
-WRITE8_MEMBER( mpz80_state::mask_w )
+WRITE8_MEMBER( mpz80_state::wunderbus_w )
 {
-	/*
-		
-		bit		description
-		
-		0		_STOP ENBL
-		1		AUX ENBL
-		2		_TINT ENBL
-		3		RUN ENBL
-		4		_HALT ENBL
-		5		SINT ENBL
-		6		_IOENBL
-		7		_ZIO MODE
-		
-	*/
 }
 
 
@@ -260,7 +289,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( mpz80_io, AS_IO, 8, mpz80_state )
-//	AM_RANGE(0x48, 0x48) Wunderbuss/Mult I/O
+	AM_RANGE(0x48, 0x48) AM_READWRITE(wunderbus_r, wunderbus_w)
 //	AM_RANGE(0x80, 0x80) HD/DMA
 ADDRESS_MAP_END
 
@@ -339,6 +368,79 @@ INPUT_PORTS_END
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
+
+//-------------------------------------------------
+//	pic8259_interface pic_intf
+//-------------------------------------------------
+
+static struct pic8259_interface pic_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//	ins8250_interface ace1_intf
+//-------------------------------------------------
+
+static INS8250_TRANSMIT( ace1_transmit )
+{
+	mpz80_state *state = device->machine().driver_data<mpz80_state>();
+	
+	terminal_write(state->m_terminal, 0, data);
+}
+
+static ins8250_interface ace1_intf =
+{
+	0,
+	NULL,
+	ace1_transmit,
+	NULL,
+	NULL
+};
+
+
+//-------------------------------------------------
+//	ins8250_interface ace2_intf
+//-------------------------------------------------
+
+static ins8250_interface ace2_intf =
+{
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+
+//-------------------------------------------------
+//	ins8250_interface ace3_intf
+//-------------------------------------------------
+
+static ins8250_interface ace3_intf =
+{
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+
+//-------------------------------------------------
+//	UPD1990A_INTERFACE( rtc_intf )
+//-------------------------------------------------
+
+static UPD1990A_INTERFACE( rtc_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
 //-------------------------------------------------
 //  floppy_config super6_floppy_config
 //-------------------------------------------------
@@ -360,14 +462,14 @@ static const floppy_config mpz80_floppy_config =
 //  GENERIC_TERMINAL_INTERFACE( terminal_intf )
 //-------------------------------------------------
 
-static WRITE8_DEVICE_HANDLER( dummy_w )
+WRITE8_MEMBER( mpz80_state::terminal_w )
 {
-	// handled in Z80DART_INTERFACE
+	ins8250_receive(m_ace1, data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_HANDLER(dummy_w)
+	DEVCB_DRIVER_MEMBER(mpz80_state, terminal_w)
 };
 
 
@@ -412,6 +514,11 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 	MCFG_FRAGMENT_ADD( generic_terminal )
 
 	// devices
+	MCFG_PIC8259_ADD(I8259A_TAG, pic_intf)
+	MCFG_INS8250_ADD(INS8250_1_TAG, ace1_intf)
+	MCFG_INS8250_ADD(INS8250_2_TAG, ace2_intf)
+	MCFG_INS8250_ADD(INS8250_3_TAG, ace3_intf)
+	MCFG_UPD1990A_ADD(UPD1990C_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, mpz80_floppy_config)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
