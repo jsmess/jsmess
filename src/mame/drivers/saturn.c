@@ -2603,12 +2603,13 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	if(scanline == 0*y_step)
 	{
 		device_set_input_line_and_vector(state->m_maincpu, 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41);
-		CEF_0;
+		//CEF_0; //TODO
 	}
 	else if(scanline == vblank_line*y_step)
 	{
 		device_set_input_line_and_vector(state->m_maincpu, 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40);
-		device_set_input_line_and_vector(state->m_maincpu, 0x2, (stv_irq.vdp1_end) ? HOLD_LINE : CLEAR_LINE, 0x4d);
+		if(stv_irq.vdp1_end)
+			device_set_input_line_and_vector(state->m_maincpu, 0x2, HOLD_LINE, 0x4d);
 		CEF_1;
 	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
