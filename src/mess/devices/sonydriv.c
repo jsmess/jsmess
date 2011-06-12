@@ -348,7 +348,6 @@ int sony_read_status(device_t *device)
 				{
 					if (!floppy_dskchg_r(&cur_image->device()))
 					{
-						printf("C: disk switch!");
 						f->disk_switched = 1;
 					}
 				}
