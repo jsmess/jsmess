@@ -9,7 +9,6 @@ Framebuffer todo:
 - add proper framebuffer erase
 - 8 bpp support - now we always draw as 16 bpp, but this is not a problem since
   VDP2 interprets framebuffer as 8 bpp in these cases
-- make this to be inp record/playback safe
 
 */
 
