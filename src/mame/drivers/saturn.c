@@ -114,7 +114,7 @@ also has a DSP;
 
 /* TODO: do this in a verboselog style */
 #define LOG_CDB  0
-#define LOG_SMPC 0
+#define LOG_SMPC 1
 #define LOG_SCU  0
 #define LOG_IRQ  0
 #define LOG_IOGA 0
@@ -460,10 +460,10 @@ static void smpc_intbackhelper(running_machine &machine)
 	pad = input_port_read(machine, padnames[state->m_smpc.intback_stage-2]);
 
 //  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
-	state->m_smpc_ram[33] = 0xf1;	// no tap, direct connect
-	state->m_smpc_ram[35] = 0x02;	// saturn pad
-	state->m_smpc_ram[37] = pad>>8;
-	state->m_smpc_ram[39] = pad & 0xff;
+	state->m_smpc_ram[0x21] = 0xf1;	// no tap, direct connect
+	state->m_smpc_ram[0x23] = 0x02;	// saturn pad
+	state->m_smpc_ram[0x25] = pad>>8;
+	state->m_smpc_ram[0x27] = pad & 0xff;
 
 	if (state->m_smpc.intback_stage == 3)
 	{
@@ -1866,7 +1866,7 @@ static INPUT_PORTS_START( saturn )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Z") PORT_PLAYER(1)	// Z
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 L") PORT_PLAYER(1)	// L
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P1 R") PORT_PLAYER(1)	// R
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) //read '1' when direct mode is polled
+	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_UNUSED ) //read '1' when direct mode is polled
 
 	PORT_START("JOY2")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
@@ -1882,7 +1882,7 @@ static INPUT_PORTS_START( saturn )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Z") PORT_PLAYER(2)	// Z
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P2 L") PORT_PLAYER(2)	// L
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P2 R") PORT_PLAYER(2)	// R
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) //read '1' when direct mode is polled
+	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_UNUSED ) //read '1' when direct mode is polled
 
 	PORT_START("CART_AREA")
 	PORT_CONFNAME( 0x03, 0x02, "Cart Type" )
@@ -1991,37 +1991,6 @@ static INPUT_PORTS_START( stv )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	/* We don't need these, AFAIK the country code doesn't work either... */
-	#if 0
-	PORT_START("FAKE")	//7
-	PORT_DIPNAME( 0x0f, 0x01, "Country" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x02, "Asia Ntsc" )
-	PORT_DIPSETTING(    0x04, DEF_STR( USA ) )
-	PORT_DIPSETTING(    0x08, "Sud America Ntsc" )
-	PORT_DIPSETTING(    0x06, "Korea" )
-	PORT_DIPSETTING(    0x0a, "Asia Pal" )
-	PORT_DIPSETTING(    0x0c, "Europe/Other Pal" )
-	PORT_DIPSETTING(    0x0d, "Sud America Pal" )
-
-	PORT_START("PAD1A")	/* Pad data 1a */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("B") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("C") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("A") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Start") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Up") PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Down") PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right") PORT_CODE(KEYCODE_L)
-
-	PORT_START("PAD1B")	/* Pad data 1b */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L trig") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Z") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Y") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("X") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R trig") PORT_CODE(KEYCODE_S)
-	#endif
 
 	PORT_START("UNKNOWN")
 	PORT_DIPNAME( 0x01, 0x01, "UNK" )
@@ -2608,9 +2577,9 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	else if(scanline == vblank_line*y_step)
 	{
 		device_set_input_line_and_vector(state->m_maincpu, 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40);
+		video_update_vdp1(timer.machine());
 		if(stv_irq.vdp1_end)
 			device_set_input_line_and_vector(state->m_maincpu, 0x2, HOLD_LINE, 0x4d);
-		video_update_vdp1(timer.machine());
 		CEF_1;
 	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
