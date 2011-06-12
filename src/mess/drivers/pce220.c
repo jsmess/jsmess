@@ -68,6 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ram_bank_w );
 	DECLARE_READ8_MEMBER( timer_r );
 	DECLARE_WRITE8_MEMBER( timer_w );
+	DECLARE_WRITE8_MEMBER( boot_bank_w );
 	DECLARE_READ8_MEMBER( port15_r );
 	DECLARE_READ8_MEMBER( port18_r );
 	DECLARE_WRITE8_MEMBER( port18_w );
@@ -226,7 +227,7 @@ WRITE8_MEMBER( pce220_state::lcd_control_w )
 
 READ8_MEMBER( pce220_state::lcd_data_r )
 {
-	return m_vram[(m_lcd_index_row*0x40 + m_lcd_index_col) & 0x1ff];
+	return m_vram[(m_lcd_index_row*0x40 + m_lcd_index_col - 1) & 0x1ff];
 }
 
 WRITE8_MEMBER( pce220_state::lcd_data_w )
@@ -254,9 +255,7 @@ WRITE8_MEMBER( pce220_state::rom_bank_w )
 
 WRITE8_MEMBER( pce220_state::ram_bank_w )
 {
-	address_space *space_prg = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 bank = BIT(data,2);
-	space_prg->install_write_bank(0x0000, 0x3fff, "bank1");
 
 	memory_set_bank(machine(), "bank1", bank);
 	memory_set_bank(machine(), "bank2", bank);
@@ -270,6 +269,17 @@ READ8_MEMBER( pce220_state::timer_r )
 WRITE8_MEMBER( pce220_state::timer_w )
 {
 	m_timer_status = data & 1;
+}
+
+WRITE8_MEMBER( pce220_state::boot_bank_w )
+{
+	// set to 1 after boot for restore the ram in the first bank
+	if (data & 0x01)
+	{
+		address_space *space_prg = m_maincpu->memory().space(AS_PROGRAM);
+		space_prg->install_write_bank(0x0000, 0x3fff, "bank1");
+		memory_set_bank(machine(), "bank1", 0);
+	}
 }
 
 READ8_MEMBER( pce220_state::port15_r )
@@ -449,7 +459,7 @@ WRITE8_MEMBER( pcg850v_state::g850v_lcd_control_w )
 
 READ8_MEMBER( pcg850v_state::g850v_lcd_data_r )
 {
-	UINT8 data = m_vram[(m_lcd_index_row*0x100 + m_lcd_index_col) & 0x7ff];
+	UINT8 data = m_vram[(m_lcd_index_row*0x100 + m_lcd_index_col - 1) & 0x7ff];
 
 	if (m_lcd_read_mode == 1)
 		m_lcd_index_col++;
@@ -484,7 +494,7 @@ static ADDRESS_MAP_START( pce220_io , AS_IO, 8, pce220_state)
 	AM_RANGE(0x17, 0x17) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x18, 0x18) AM_READWRITE(port18_r, port18_w)
 	AM_RANGE(0x19, 0x19) AM_READWRITE(rom_bank_r, rom_bank_w)
-	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //cleared on BASIC init
+	AM_RANGE(0x1a, 0x1a) AM_WRITE(boot_bank_w)
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(ram_bank_w)
 	AM_RANGE(0x1c, 0x1c) AM_WRITENOP //peripheral reset
 	AM_RANGE(0x1d, 0x1d) AM_READ_PORT("BATTERY")
@@ -508,7 +518,7 @@ static ADDRESS_MAP_START( pcg850v_io , AS_IO, 8, pcg850v_state)
 	AM_RANGE(0x17, 0x17) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x18, 0x18) AM_READWRITE(port18_r, port18_w)
 	AM_RANGE(0x19, 0x19) AM_READWRITE(rom_bank_r, rom_bank_w)
-	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //cleared on BASIC init
+	AM_RANGE(0x1a, 0x1a) AM_WRITE(boot_bank_w)
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(ram_bank_w)
 	AM_RANGE(0x1c, 0x1c) AM_WRITENOP //peripheral reset
 	AM_RANGE(0x1d, 0x1d) AM_READ_PORT("BATTERY")
@@ -774,6 +784,8 @@ void pce220_state::machine_reset()
 {
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	space->unmap_write(0x0000, 0x3fff);
+
+	// install the boot code into the first bank
 	memory_set_bankptr(machine(), "bank1", machine().region("user1")->base() + 0x0000);
 
 	m_lcd_index_row = 0;
