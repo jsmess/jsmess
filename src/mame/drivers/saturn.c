@@ -114,7 +114,7 @@ also has a DSP;
 
 /* TODO: do this in a verboselog style */
 #define LOG_CDB  0
-#define LOG_SMPC 1
+#define LOG_SMPC 0
 #define LOG_SCU  0
 #define LOG_IRQ  0
 #define LOG_IOGA 0
@@ -448,7 +448,7 @@ static void smpc_change_clock(running_machine &machine, UINT8 cmd)
 static void smpc_intbackhelper(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	int pad;
+	int pad,i;
 	static const char *const padnames[] = { "JOY1", "JOY2" };
 
 	if (state->m_smpc.intback_stage == 1)
@@ -457,13 +457,15 @@ static void smpc_intbackhelper(running_machine &machine)
 		return;
 	}
 
-	pad = input_port_read(machine, padnames[state->m_smpc.intback_stage-2]);
-
 //  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
-	state->m_smpc_ram[0x21] = 0xf1;	// no tap, direct connect
-	state->m_smpc_ram[0x23] = 0x02;	// saturn pad
-	state->m_smpc_ram[0x25] = pad>>8;
-	state->m_smpc_ram[0x27] = pad & 0xff;
+	for(i=0;i<2;i++)
+	{
+		pad = input_port_read(machine, padnames[i]);
+		state->m_smpc_ram[0x21+i*8] = 0xf1;	// no tap, direct connect
+		state->m_smpc_ram[0x23+i*8] = 0x02;	// saturn pad
+		state->m_smpc_ram[0x25+i*8] = pad>>8;
+		state->m_smpc_ram[0x27+i*8] = pad & 0xff;
+	}
 
 	if (state->m_smpc.intback_stage == 3)
 	{
@@ -728,7 +730,7 @@ static READ8_HANDLER( saturn_SMPC_r8 )
 	if ((offset == 0x61))
 		return_data = state->m_smpc.smpcSR;
 
-	if (offset == 0x75)//PDR1 read
+	if (offset == 0x75 || offset == 0x77)//PDR1/2 read
 	{
 /*
     PORT_START("JOY1")
@@ -746,22 +748,18 @@ static READ8_HANDLER( saturn_SMPC_r8 )
     PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Z") PORT_PLAYER(1) // Z
     PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 L") PORT_PLAYER(1) // L
 */
-		if (state->m_smpc.IOSEL1)
+		if ((state->m_smpc.IOSEL1 && offset == 0x75) || (state->m_smpc.IOSEL2 && offset == 0x77))
 		{
 			int hshake;
 			const int shift_bit[4] = { 4, 12, 8, 0 };
+			const char *const padnames[] = { "JOY1", "JOY2" };
 
 			hshake = (state->m_smpc.PDR1>>5) & 3;
 
 			if (LOG_SMPC) logerror("SMPC: SH-2 direct mode, returning data for phase %d\n", hshake);
 
-			return_data = 0x80 | 0x10 | ((input_port_read(space->machine(), "JOY1")>>shift_bit[hshake]) & 0xf);
+			return_data = 0x80 | 0x10 | ((input_port_read(space->machine(), padnames[offset == 0x77])>>shift_bit[hshake]) & 0xf);
 		}
-	}
-
-	if (offset == 0x77)//PDR2 read
-	{
-		return_data =  0xff; // | EEPROM_read_bit());
 	}
 
 	if (offset == 0x33) return_data = state->m_saturn_region;
