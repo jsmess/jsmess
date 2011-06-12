@@ -341,7 +341,7 @@ static void cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectn
 	if (*sectoffs == 0xffff)
 	{
 		// last sector
-		CDROM_LOG(("CD: Don't know how to handle offset ffff\n"))
+		printf("CD: Don't know how to handle offset ffff\n");
 	}
 	else if (*sectnum == 0xffff)
 	{
@@ -934,6 +934,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			break;
 
 		case 0x4200:	// Set Filter Subheader conditions
+		case 0x4300:    // (mirror for Astal)
 			{
 				UINT8 fnum = (cr3>>8)&0xff;
 
@@ -953,7 +954,9 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 			break;
 
+
 		case 0x4400:	// Set Filter Mode
+		case 0x4500:    // (mirror for Astal)
 			{
 				UINT8 fnum = (cr3>>8)&0xff;
 				UINT8 mode = (cr1 & 0xff);
