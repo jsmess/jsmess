@@ -6,6 +6,12 @@
     You need to sign up and make an introductory thread.
     Then you will be granted permission to visit the repository.
 
+    First revealed to the world in December 1986 issue of Electronics Today
+    International (ETI) an Australian electronics magazine which is now defunct.
+
+    The main articles appeared in ETI February/March/April 1987, followed by
+    other articles in various issues after that.
+
     TODO: everything!
     - Required device Z8530 Z80SCC (not emulated, but it is just a dual-channel
       serial controller, possibly just like the other ones)
@@ -237,4 +243,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1993, applix,	0,       0, 	applix,	applix,	 0, 	  "Applix Pty Ltd",   "Applix 1616", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, applix,	0,       0, 	applix,	applix,	 0, 	  "Applix Pty Ltd",   "Applix 1616", GAME_NOT_WORKING | GAME_NO_SOUND)

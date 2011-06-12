@@ -46,7 +46,7 @@ public:
 	DECLARE_READ8_MEMBER( zrt80_10_r );
 	DECLARE_WRITE8_MEMBER( zrt80_30_w );
 	DECLARE_WRITE8_MEMBER( zrt80_38_w );
-	DECLARE_WRITE8_MEMBER( zrt80_kbd_put );
+	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 m_term_data;
 	const UINT8 *m_p_videoram;
 	const UINT8 *m_p_chargen;
@@ -186,9 +186,10 @@ static INPUT_PORTS_START( zrt80 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(zrt80_state)
+MACHINE_RESET_MEMBER( zrt80_state )
 {
 	beep_set_frequency(m_beep, 800);
+	m_term_data = 0;
 }
 
 VIDEO_START_MEMBER( zrt80_state )
@@ -265,15 +266,15 @@ static const ins8250_interface zrt80_com_interface =
 	NULL
 };
 
-WRITE8_MEMBER( zrt80_state::zrt80_kbd_put )
+WRITE8_MEMBER( zrt80_state::kbd_put )
 {
 	m_term_data = data;
 	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static GENERIC_TERMINAL_INTERFACE( zrt80_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(zrt80_state, zrt80_kbd_put)
+	DEVCB_DRIVER_MEMBER(zrt80_state, kbd_put)
 };
 
 
@@ -310,7 +311,7 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_GFXDECODE(zrt80)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT(monochrome_green)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -320,7 +321,7 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 8, zrt80_crtc6845_interface)
 	MCFG_INS8250_ADD( "ins8250", zrt80_com_interface )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, zrt80_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -336,5 +337,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, zrt80,  0,       0, 	zrt80,	zrt80,	 0, "Digital Research Computers", "ZRT-80", 0)
+COMP( 1982, zrt80,  0,       0,      zrt80,     zrt80,    0, "Digital Research Computers", "ZRT-80", 0)
 
