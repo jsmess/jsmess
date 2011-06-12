@@ -564,7 +564,7 @@
 
 <!-- ID 027 (MOH-001)-->
 	<software name="minasan">
-		<description>Minashanno Okageshamadeshu! Daishugorokutaikai</description>
+		<description>Minasanno Okagesamadesu! Daisugorokutaikai</description>
 		<year>1990</year>
 		<publisher>Monolith Corp.</publisher>
 		<part name="cart" interface="aes_cart">
