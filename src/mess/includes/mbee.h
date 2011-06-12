@@ -31,7 +31,7 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_pio(*this, "z80pio"),
 	m_cass(*this, CASSETTE_TAG),
-	m_wave(*this, "wave"),
+	m_wave(*this, WAVE_TAG),
 	m_speaker(*this, SPEAKER_TAG),
 	m_printer(*this, "centronics"),
 	m_crtc(*this, "crtc"),

@@ -62,7 +62,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_cass(*this, CASSETTE_TAG),
-	m_wave(*this, "wave")
+	m_wave(*this, WAVE_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -493,8 +493,8 @@ static MACHINE_CONFIG_START( rx78, rx78_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_28_63636MHz/8) // unknown divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

@@ -387,8 +387,8 @@ static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(0, "mono", 0.1)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 
 	MCFG_SOUND_ADD("sn76477", SN76477, 0)
 	MCFG_SOUND_CONFIG(hector_sn76477_interface)
@@ -431,8 +431,8 @@ static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(0, "mono", 0.1)// Sound level for cassette, as it is in mono => output channel=0
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)// Sound level for cassette, as it is in mono => output channel=0
 
 	MCFG_SOUND_ADD("sn76477", SN76477, 0)
 	MCFG_SOUND_CONFIG(hector_sn76477_interface)
@@ -482,8 +482,8 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(0, "mono", 0.1)// Sound level for cassette, as it is in mono => output channel=0
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)// Sound level for cassette, as it is in mono => output channel=0
 
 	MCFG_SOUND_ADD("sn76477", SN76477, 0)
 	MCFG_SOUND_CONFIG(hector_sn76477_interface)
@@ -533,8 +533,8 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(0, "mono", 0.1)// Sound level for cassette, as it is in mono => output channel=0
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)// Sound level for cassette, as it is in mono => output channel=0
 
 	MCFG_SOUND_ADD("sn76477", SN76477, 0)
 	MCFG_SOUND_CONFIG(hector_sn76477_interface)
@@ -583,8 +583,8 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(0, "mono", 0.1)// Sound level for cassette, as it is in mono => output channel=0
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)// Sound level for cassette, as it is in mono => output channel=0
 
 	MCFG_SOUND_ADD("sn76477", SN76477, 0)
 	MCFG_SOUND_CONFIG(hector_sn76477_interface)

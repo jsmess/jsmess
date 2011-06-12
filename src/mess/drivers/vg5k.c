@@ -405,8 +405,8 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* cassette */
-	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(0, "mono", 0.1)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, vg5k_cassette_config )
 

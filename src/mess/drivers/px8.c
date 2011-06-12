@@ -822,7 +822,7 @@ static MACHINE_CONFIG_START( px8, px8_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 
 	/* cartridge */
