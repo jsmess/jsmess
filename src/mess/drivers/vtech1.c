@@ -124,7 +124,7 @@ Notes:
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "formats/vt_cas.h"
-
+#include "formats/vtech1_dsk.h"
 
 /***************************************************************************
     CONSTANTS & MACROS
@@ -447,30 +447,6 @@ static WRITE8_HANDLER( vtech1_fdc_w )
 		break;
 	}
 }
-
-static FLOPPY_IDENTIFY( vtech1_dsk_identify )
-{
-	*vote = 100;
-	return FLOPPY_ERROR_SUCCESS;
-}
-
-
-static FLOPPY_CONSTRUCT( vtech1_dsk_construct )
-{
-	return FLOPPY_ERROR_SUCCESS;
-}
-
-FLOPPY_OPTIONS_START( vtech1_only )
-	FLOPPY_OPTION(
-		vtech1_dsk,
-		"dsk",
-		"Laser floppy disk image",
-		vtech1_dsk_identify,
-		vtech1_dsk_construct,
-		NULL,
-		NULL
-	)
-FLOPPY_OPTIONS_END0
 
 static const floppy_config vtech1_floppy_config =
 {
