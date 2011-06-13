@@ -487,7 +487,7 @@ unsigned int mess_cdrom_driver::find_track(const unsigned int sector, unsigned i
 		*end_sector = start + toc->tracks[track].frames;
 	}
 
-	printf("find_track: track %d start %d end %d\n", track, start, *end_sector);
+	printf("find_track: track %d start %d end %d\n", track, start, start + toc->tracks[track].frames);
 
 	return -1;
 }
