@@ -616,11 +616,6 @@ static TIMER_DEVICE_CALLBACK( cassette_output_tick )
 	state->m_hz2400 = !state->m_hz2400;
 }
 
-static CASSETTE_FORMATLIST_START( atom_cassette_formats )
-	CASSETTE_FORMAT(atom_tap_format)
-	CASSETTE_FORMAT(uef_cassette_format)
-CASSETTE_FORMATLIST_END
-
 static const cassette_config atom_cassette_config =
 {
 	atom_cassette_formats,
