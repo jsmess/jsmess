@@ -2320,6 +2320,16 @@ ROM_START( pc1512v2 )
 ROM_END
 
 
+ROM_START( pc1512v32 )
+//  ROM_REGION(0x100000,"maincpu", 0)
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROM_LOAD16_BYTE("40044.v32", 0xfc001, 0x2000, CRC(532c3854) SHA1(18a17b710f9eb079d9d7216d07807030f904ceda)) // v3.2
+	ROM_LOAD16_BYTE("40043.v32", 0xfc000, 0x2000, CRC(ea527e6e) SHA1(b77fa44767a71a0b321a88bb0a394f1125b7c220)) // v3.2
+	ROM_REGION(0x08100,"gfx1", 0)
+	ROM_LOAD("40078.bin",     0x00000, 0x02000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd))
+ROM_END
+
+
 ROM_START( pc1640 )
 //  ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
@@ -2575,7 +2585,8 @@ COMP(  1988,	pc20,       ibm5150,	0,	pc200,		pc200,	pc200,	"Amstrad plc",  "Amst
 COMP(  1987,	ppc512,     ibm5150,	0,	ppc512,		pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
 COMP(  1987,	ppc640,     ibm5150,	0,	ppc640,		pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
 COMP(  1986,	pc1512,     ibm5150,	0,	pc1512,     pc1512,	pc1512,	"Amstrad plc",  "Amstrad PC1512 (version 1)", GAME_NOT_WORKING)
-COMP(  198?,	pc1512v2,   ibm5150,	0,	pc1512,     pc1512,	pc1512,	"Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
+COMP(  1987,	pc1512v2,   ibm5150,	0,	pc1512,     pc1512,	pc1512,	"Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
+COMP(  1989,	pc1512v32,  ibm5150,	0,	pc1512,     pc1512,	pc1512,	"Amstrad plc",  "Amstrad PC1512 (version 3.2)", GAME_NOT_WORKING)
 COMP(  1987,	pc1640,     ibm5150,	0,	pc1640,     pc1640,	pc1640,	"Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
 // pc2086 pc1512 with vga??
 COMP ( 1989,	iskr1031,   ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-1031" , GAME_NOT_WORKING)
