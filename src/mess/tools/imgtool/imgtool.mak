@@ -11,7 +11,7 @@
 IMGTOOL = imgtool$(EXE)
 
 # add path to imgtool headers
-CFLAGS += -I$(SRC)/$(TARGET)/tools/imgtool
+INCPATH += -I$(SRC)/$(TARGET)/tools/imgtool
 
 # imgtool directories
 IMGTOOLOBJ = $(MESS_TOOLS)/imgtool

@@ -11,7 +11,7 @@
 CASTOOL = castool$(EXE)
 
 # add path to castool headers
-CFLAGS += -I$(SRC)/$(TARGET)/tools/castool
+INCPATH += -I$(SRC)/$(TARGET)/tools/castool
 
 # castool directories
 CASTOOLOBJ = $(MESS_TOOLS)/castool

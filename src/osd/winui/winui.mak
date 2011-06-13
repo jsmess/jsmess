@@ -197,7 +197,9 @@ LDFLAGSEMULATOR += -municode
 #-------------------------------------------------
 
 # add our prefix files to the mix, include WINSRC in UI build
-CFLAGS += -include $(WINSRC)/winprefix.h -I$(WINSRC)
+CFLAGS += -include $(WINSRC)/winprefix.h
+
+INCPATH += -I$(WINSRC)
 
 ifdef WIN95_MULTIMON
 CFLAGS += -DWIN95_MULTIMON

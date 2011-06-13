@@ -8,7 +8,7 @@
 
 
 # add include path to tools directory
-CFLAGS += -I$(MESSSRC)/tools
+INCPATH += -I$(MESSSRC)/tools
 
 # tools object directory
 MESS_TOOLS = $(MESSOBJ)/tools

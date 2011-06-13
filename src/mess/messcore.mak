@@ -16,7 +16,7 @@ DEFS += -DMESS
 endif
 
 # add some additional include libraries for the mame files
-CFLAGS += \
+INCPATH += \
 	-I$(SRC)/mame \
 	-I$(OBJ)/mame/layout \
 	-I$(SRC)/mess/osd \

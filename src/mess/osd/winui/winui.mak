@@ -19,7 +19,7 @@ WINUIOBJ = $(OBJ)/osd/winui
 
 RESFILE = $(MESS_WINUIOBJ)/messui.res
 
-CFLAGS += \
+INCPATH += \
 	-I$(MESSSRC)/osd/winui
 
 OBJDIRS += \
