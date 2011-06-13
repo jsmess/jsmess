@@ -702,13 +702,13 @@ bool device_image_interface::load_software(char *swlist, char *swname, rom_entry
 				{
 					for (software_info *swinfo = software_list_find(software_list_ptr, swname, NULL); swinfo != NULL; )
 					{
-						if (swinfo != NULL)
 						{
 							astring tmp(swinfo->shortname);
 							locationtag.cat(tmp);
 							locationtag.cat(breakstr);
 							//printf("%s\n", locationtag.cstr());
 						}
+
 						const char *parentname = software_get_clone(device().machine().options(), swlist, swinfo->shortname);
 						if (parentname != NULL)
 							swinfo = software_list_find(software_list_ptr, parentname, NULL);
