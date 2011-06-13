@@ -984,13 +984,8 @@ BEGIN
     ICON            IDI_MAMEUI_ICON,IDC_STATIC,20,10,20,20
     LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
                     SS_NOPREFIX
-#ifdef MESS
-    CONTROL         "Enable system cheats",IDC_CHEAT,"Button",BS_AUTOCHECKBOX |
+    CONTROL         "Enable cheats",IDC_CHEAT,"Button",BS_AUTOCHECKBOX |
                     WS_TABSTOP,10,40,86,10,0,HIDC_CHEAT
-#else
-    CONTROL         "Enable game cheats",IDC_CHEAT,"Button",BS_AUTOCHECKBOX |
-                    WS_TABSTOP,10,40,86,10,0,HIDC_CHEAT
-#endif
     CONTROL         "Sleep when possible",IDC_SLEEP,"Button",BS_AUTOCHECKBOX |
                     WS_TABSTOP,10,52,86,10,0,HIDC_SLEEP
 #ifdef MESS
@@ -1023,17 +1018,21 @@ BEGIN
     GROUPBOX        "Snapshot view",IDC_STATIC,7,148,103,28
     COMBOBOX        IDC_SNAPVIEW,13,158,90,60,CBS_DROPDOWNLIST | WS_VSCROLL |
                     WS_TABSTOP,0,HIDC_SNAPVIEW
-    GROUPBOX        "Artwork options",IDC_STATIC,113,40,102,61
+    GROUPBOX        "Artwork options",IDC_STATIC,113,40,102,85
     CONTROL         "Backdrops",IDC_BACKDROPS,"Button",BS_AUTOCHECKBOX |
                     WS_TABSTOP,119,50,86,10,0,HIDC_BACKDROPS
     CONTROL         "Bezels",IDC_BEZELS,"Button",BS_AUTOCHECKBOX |
                     WS_TABSTOP,119,62,86,10,0,HIDC_BEZELS
     CONTROL         "Overlays",IDC_OVERLAYS,"Button",BS_AUTOCHECKBOX |
                     WS_TABSTOP,119,74,84,10,0,HIDC_OVERLAYS
+    CONTROL         "CPanels",IDC_CPANELS,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,119,86,84,10,0
+    CONTROL         "Marquees",IDC_MARQUEES,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,119,98,84,10,0
     CONTROL         "Crop artwork",IDC_ARTWORK_CROP,"Button",BS_AUTOCHECKBOX |
-                    WS_TABSTOP,119,86,53,10,0,HIDC_ARTWORK_CROP
-    GROUPBOX        "BIOS",IDC_STATIC,113,104,102,28
-    COMBOBOX        IDC_BIOS,119,114,90,60,CBS_DROPDOWNLIST | WS_VSCROLL |
+                    WS_TABSTOP,119,110,53,10,0,HIDC_ARTWORK_CROP
+    GROUPBOX        "BIOS",IDC_STATIC,113,128,102,28
+    COMBOBOX        IDC_BIOS,119,138,90,60,CBS_DROPDOWNLIST | WS_VSCROLL |
                     WS_TABSTOP,0,HIDC_BIOS
     GROUPBOX        "",IDC_STATIC,7,178,208,28
     CONTROL         "Autoselect snapshot size",IDC_SNAPSIZE,"Button",
@@ -1050,7 +1049,7 @@ BEGIN
     PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,222,97,14,
                     0,0,HIDC_USE_DEFAULT
     CONTROL         "Show Menu",IDC_SHOW_MENU,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,119,134,86,10,0
+                    BS_AUTOCHECKBOX | WS_TABSTOP,119,160,86,10,0
 
 END
 

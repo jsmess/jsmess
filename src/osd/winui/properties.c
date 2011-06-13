@@ -1677,6 +1677,8 @@ static void SetPropEnabledControls(HWND hWnd)
 	EnableWindow(GetDlgItem(hWnd, IDC_BACKDROPS),		useart);
 	EnableWindow(GetDlgItem(hWnd, IDC_BEZELS),			useart);
 	EnableWindow(GetDlgItem(hWnd, IDC_OVERLAYS),		useart);
+	EnableWindow(GetDlgItem(hWnd, IDC_CPANELS),		useart);
+	EnableWindow(GetDlgItem(hWnd, IDC_MARQUEES),		useart);
 	EnableWindow(GetDlgItem(hWnd, IDC_ARTMISCTEXT),		useart);
 
 	// HLSL - only enable if D3D selected, and Version 9 selected
@@ -2295,7 +2297,9 @@ static void BuildDataMap(void)
 	datamap_add(properties_datamap, IDC_ARTWORK_CROP,			DM_BOOL,	OPTION_ARTWORK_CROP);
 	datamap_add(properties_datamap, IDC_BACKDROPS,				DM_BOOL,	OPTION_USE_BACKDROPS);
 	datamap_add(properties_datamap, IDC_OVERLAYS,				DM_BOOL,	OPTION_USE_OVERLAYS);
-	datamap_add(properties_datamap, IDC_BEZELS,					DM_BOOL,	OPTION_USE_BEZELS);
+	datamap_add(properties_datamap, IDC_BEZELS,				DM_BOOL,	OPTION_USE_BEZELS);
+	datamap_add(properties_datamap, IDC_CPANELS,				DM_BOOL,	OPTION_USE_CPANELS);
+	datamap_add(properties_datamap, IDC_MARQUEES,				DM_BOOL,	OPTION_USE_MARQUEES);
 
 	// core screen options
 	datamap_add(properties_datamap, IDC_BRIGHTCORRECT,			DM_FLOAT,	OPTION_BRIGHTNESS);
