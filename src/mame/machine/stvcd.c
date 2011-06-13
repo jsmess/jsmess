@@ -1004,7 +1004,37 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 		case 0x4800:	// Reset Selector
 			CDROM_LOG(("%s:CD: Reset Selector\n",   machine.describe_context()))
-			hirqreg |= (CMOK|ESEL|DRDY);
+
+			if((cr1 & 0xff) == 0x00)
+			{
+				UINT8 bufnum = cr3>>8;
+				int i;
+
+				if(bufnum < MAX_FILTERS)
+				{
+					partitions[bufnum].size = -1;
+					partitions[bufnum].numblks = 0;
+
+					for (i = 0; i < MAX_BLOCKS; i++)
+					{
+						partitions[bufnum].blocks[i] = (blockT *)NULL;
+						partitions[bufnum].bnum[i] = 0xff;
+					}
+				}
+
+				// TODO: buffer full flag
+
+				if (freeblocks == 200) { onesectorstored = 0; }
+
+				cr2 = 0x4101;	// ctrl/adr in hi byte, track # in low byte
+				cr3 = 0x0100|((cd_curfad>>16)&0xff);
+				cr4 = (cd_curfad & 0xffff);
+				hirqreg |= (CMOK|ESEL);
+				return;
+			}
+
+			// ...
+			hirqreg |= (CMOK|ESEL);
 			cr2 = 0x4101;	// ctrl/adr in hi byte, track # in low byte
 			cr3 = 0x0100|((cd_curfad>>16)&0xff);
 			cr4 = (cd_curfad & 0xffff);
