@@ -322,6 +322,9 @@ static void cd_free_block(blockT *blktofree)
 
 	CDROM_LOG(("cd_free_block: %x\n", (UINT32)(FPTR)blktofree))
 
+	if(blktofree == NULL)
+		return;
+
 	for (i = 0; i < 200; i++)
 	{
 		if (&blocks[i] == blktofree)
@@ -828,7 +831,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 					cdda_pause_audio( machine.device( "cdda" ), 1 );
 				}
 				else
-					printf("disc seek with params %04x %04x",cr1,cr2);
+					printf("disc seek with params %04x %04x\n",cr1,cr2); //Area 51 sets this up
 
 				cr3 = (temp>>16)&0xff;
 				cr4 = temp;
@@ -1012,24 +1015,25 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 				if(bufnum < MAX_FILTERS)
 				{
-					partitions[bufnum].size = -1;
-					partitions[bufnum].numblks = 0;
-
 					for (i = 0; i < MAX_BLOCKS; i++)
 					{
+						cd_free_block(partitions[bufnum].blocks[i]);
 						partitions[bufnum].blocks[i] = (blockT *)NULL;
 						partitions[bufnum].bnum[i] = 0xff;
 					}
+
+					partitions[bufnum].size = -1;
+					partitions[bufnum].numblks = 0;
 				}
 
 				// TODO: buffer full flag
 
 				if (freeblocks == 200) { onesectorstored = 0; }
 
+				hirqreg |= (CMOK|ESEL);
 				cr2 = 0x4101;	// ctrl/adr in hi byte, track # in low byte
 				cr3 = 0x0100|((cd_curfad>>16)&0xff);
 				cr4 = (cd_curfad & 0xffff);
-				hirqreg |= (CMOK|ESEL);
 				return;
 			}
 
@@ -1074,7 +1078,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 			break;
 
-		case 0x5200:	// calculate acutal size
+		case 0x5200:	// calculate actual size
 			{
 				UINT32 bufnum = cr3>>8;
 				UINT32 sectoffs = cr2;
