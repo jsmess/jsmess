@@ -1080,7 +1080,8 @@ void input_field_set_user_settings(const input_field_config *field, const input_
 	for (seqtype = 0; seqtype < ARRAY_LENGTH(settings->seq); seqtype++)
 	{
 		const input_seq &defseq = input_type_seq(field->machine(), field->type, field->player, (input_seq_type)seqtype);
-		if (defseq == settings->seq[seqtype])
+		// TODO: find what the default_seq/ITEM_ID_SEQ_DEFAULT is supposed to do, besides crashing mame
+		if (false && defseq == settings->seq[seqtype])
 			field->state->seq[seqtype] = input_seq::default_seq;
 		else
 			field->state->seq[seqtype] = settings->seq[seqtype];
@@ -3478,7 +3479,7 @@ static void save_game_inputs(running_machine &machine, xml_data_node *parentnode
 		for (field = port->first_field(); field != NULL; field = field->next())
 			if (save_this_input_field_type(field->type))
 			{
-				int changed = FALSE;
+				bool changed = false;
 				int seqtype;
 
 				/* determine if we changed */

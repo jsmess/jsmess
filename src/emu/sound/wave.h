@@ -11,9 +11,6 @@
 
 DECLARE_LEGACY_SOUND_DEVICE(WAVE, wave);
 
-#define WAVE_TAG		"wave"
-#define WAVE2_TAG		"wave2"
-
 
 #define MCFG_SOUND_WAVE_ADD(_tag, _cass_tag) \
 	MCFG_SOUND_ADD( _tag, WAVE, 0 ) \

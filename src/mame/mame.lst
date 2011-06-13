@@ -1416,6 +1416,9 @@ gypsyjug		// [1978?]
 minferno		// [1978?]
 medlanes		// [1977?]
 
+// Meadows Z80 game
+warpsped		// 197?
+
 // CVS games
 cosmos			// (c) 1981 Century
 darkwar			// (c) 1981 Century
@@ -3369,10 +3372,12 @@ ptblank2ua		// 1999.?? Point Blank 2 (US, GNB3/VER.A)
 
 // Namco System 12
 tekken3			// 1997.03 Tekken 3 (Japan, TET1/VER.E1)
+tekken3ae		// 1997.03 Tekken 3 (Asia, TET2/VER.E1)
 tekken3ud		// 1997.?? Tekken 3 (US, TET3/VER.D)
 tekken3ab		// 1997.?? Tekken 3 (Asia, TET2/VER.B)
 tekken3ua		// 1997.?? Tekken 3 (US, TET3/VER.A)
 tekken3aa		// 1997.?? Tekken 3 (Asia, TET2/VER.A)
+tekken3ja		// 1997.?? Tekken 3 (Japan, TET1/VER.A)
 lbgrande		// 1997.?? Libero Grande (Asia, LG2/VER.A)
 lbgrandeja		// 1997.12 Libero Grande (Japan, LG1/VER.A)
 toukon3			// 1997.12 Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)
@@ -7614,6 +7619,7 @@ heatbrl			// (c) 1992 Tad (World version 3)
 heatbrl2		// (c) 1992 Tad (World version 2)
 heatbrlo		// (c) 1992 Tad (World)
 heatbrlu		// (c) 1992 Tad (US)
+heatbrle		// (c) 1992 Tad (Electronic Devices license)
 godzilla		// (c) 1993 Banpresto
 denjinmk		// (c) 199? Banpresto
 grainbow		// (c) 1993 Banpresto
@@ -9004,6 +9010,7 @@ crysking		// 2001 Brezzasoft. Crystal of the kings
 evosocc			// 2001 Evoga. Evolution Soccer
 topbladv		// 2002 Sonokong. Top Blade V
 officeye
+donghaer
 
 ddz				// (c) 200?
 
@@ -9496,6 +9503,7 @@ megat5nj		// (c) 1997 Merit
 megat5tg		// (c) 1997 Merit
 megat6			// (c) 1998 Merit
 suprgolf		// (c) 1989 Nasco
+albatross
 hotblock		// (c) 1993 Nics? / Nix?
 pntnpuzl		// Century?
 trucocl			// (c) 1991 Miky SRL
@@ -10129,7 +10137,7 @@ unkch4			// bootleg
 ns8lines		// unknown
 ns8linew		// unknown
 ladylinr		// (c) 198? TAB Austria
-kkojnoli		// 198? south korean hack
+kkotnoli		// 198? south korean hack
 wcat3
 magodds			// 198? (c) Micro Manufacturing Ltd.
 magoddsa		// 198? (c) Micro Manufacturing Ltd.
@@ -10759,8 +10767,8 @@ vpoker			// (c) 198?
 5acespkr		// (c) 198?
 
 // Play Mechanix
-specfrce		// (c) 2002
-jnero			// (c) 2004
+specfrce        // (c) 2002 ICE/Play Mechanix
+jnero			// (c) 2004 ICE/Play Mechanix
 
 // Amatic Trading GMBH
 am_uslot		// (c) 1996 Amatic
