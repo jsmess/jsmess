@@ -13,6 +13,7 @@
 #include "machine/wd17xx.h"
 #include "machine/6883sam.h"
 #include "machine/6821pia.h"
+#include "imagedev/printer.h"
 
 
 /***************************************************************************
@@ -80,7 +81,7 @@ public:
 	device_t *m_cococart_device;
 	device_t *m_cassette_device;
 	device_t *m_bitbanger_device;
-	device_t *m_printer_device;
+	printer_image_device *m_printer_device;
 	device_t *m_dac;
 	device_t *m_sam;
 	pia6821_device *m_pia_0;

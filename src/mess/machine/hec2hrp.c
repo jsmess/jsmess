@@ -376,8 +376,10 @@ WRITE8_HANDLER( hector_io_8255_w)
 		/*  Caution : The strobe connection to the printer seems not be used
         So, all what is send to the Disc2 unit will be printed too! */
 
-		if (BIT(state->m_hector_port_c_l, 0))		// PC0 (bit X0)= strobe printer !
-			printer_output(space->machine().device("printer"), state->m_hector_port_a);
+		if (BIT(state->m_hector_port_c_l, 0)) {		// PC0 (bit X0)= strobe printer !
+			printer_image_device *printer = space->machine().device<printer_image_device>("printer");
+			printer->output(state->m_hector_port_a);
+		}
 
 #ifdef DEBUG_TRACE_COM_HECTOR
 		printf("\nEcriture data par Hector %x (dans portA)",data);

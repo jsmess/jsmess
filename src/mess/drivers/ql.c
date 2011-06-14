@@ -355,10 +355,10 @@ void ql_state::sandy_set_control(UINT8 data)
 		logerror("Accessing side 1\n");
 	}
 
-	if (printer_is_ready(m_printer))
+	if (m_printer->is_ready())
 	{
 		if(data & SANDY_PRINTER_STROBE)
-			printer_output(m_printer,m_printer_char);
+			m_printer->output(m_printer_char);
 
 		if(data & SANDY_PRINTER_INTMASK)
 			m_zx8302->extint_w(ASSERT_LINE);

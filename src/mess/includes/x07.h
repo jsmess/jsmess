@@ -5,6 +5,7 @@
 *********************************************************************/
 
 #include "machine/ram.h"
+#include "imagedev/printer.h"
 
 //default value for user defined keys, taken for official documentation
 static const char *const udk_ini[12] = {
@@ -156,7 +157,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_printer;
+	required_device<printer_image_device> m_printer;
 	required_device<device_t> m_beep;
 	required_device<device_t> m_ram;
 

@@ -1005,3 +1005,31 @@ void device_image_interface::unload()
     clear();
 	clear_error();
 }
+
+/*-------------------------------------------------
+    update_names - update brief and instance names
+-------------------------------------------------*/
+
+void device_image_interface::update_names()
+{
+	const device_image_interface *image = NULL;
+	int count = 0;
+	int index = -1;
+
+	for (bool gotone = device().mconfig().devicelist().first(image); gotone; gotone = image->next(image))
+	{
+		if (this == image)
+			index = count;
+		if (image->image_type() == image_type())
+			count++;
+	}
+	if (count > 1) {
+		m_instance_name.printf("%s%d", device_typename(image_type()), index + 1);
+		m_brief_instance_name.printf("%s%d", device_brieftypename(image_type()), index + 1);
+	}
+	else
+	{
+		m_instance_name = device_typename(image_type());
+		m_brief_instance_name = device_brieftypename(image_type());
+	}
+}

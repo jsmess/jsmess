@@ -1122,7 +1122,7 @@ static device_t *bitbanger_image(running_machine &machine)
 	return state->m_bitbanger_device;
 }
 
-static device_t *printer_image(running_machine &machine)
+static printer_image_device *printer_image(running_machine &machine)
 {
 	coco_state *state = machine.driver_data<coco_state>();
 	return state->m_printer_device;
@@ -1503,7 +1503,7 @@ static void printer_out_dragon(running_machine &machine, int data)
 	/* If strobe bit is high send data from pia0 port b to dragon parallel printer */
 	if (data & 0x02)
 	{
-		printer_output(printer_image(machine), state->m_pia_0->b_output());
+		printer_image(machine)->output(state->m_pia_0->b_output());
 	}
 }
 
@@ -2790,7 +2790,7 @@ static void generic_init_machine(running_machine &machine, const machine_init_in
 	state->m_cococart_device	= machine.device("coco_cartslot");
 	state->m_cassette_device	= machine.device(CASSETTE_TAG);
 	state->m_bitbanger_device	= machine.device("bitbanger");
-	state->m_printer_device	= machine.device("printer");
+	state->m_printer_device	= machine.device<printer_image_device>("printer");
 	state->m_dac				= machine.device("dac");
 	state->m_sam				= machine.device("sam");
 	state->m_pia_0			= machine.device<pia6821_device>("pia_0");

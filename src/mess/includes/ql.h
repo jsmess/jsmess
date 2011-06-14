@@ -89,7 +89,7 @@ public:
 	required_device<device_t> m_mdv2;
 	required_device<device_t> m_ram;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_printer;
+	required_device<printer_image_device> m_printer;
 
 	virtual void machine_start();
 	virtual void machine_reset();

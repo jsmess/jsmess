@@ -54,7 +54,7 @@ public:
 	required_device<device_t> m_dac;
 	required_device<device_t> m_ram;
 	required_device<device_t> m_cassette;
-	required_device<device_t> m_printer;
+	required_device<printer_image_device> m_printer;
 
 	UINT8 *m_ram_base;
 	UINT32 m_ram_size;
@@ -146,7 +146,7 @@ READ8_MEMBER( mc10_state::mc10_port2_r )
 	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(machine(), "pb7") >> 5;
 
 	/* bit 2, printer ots input */
-	result |= (printer_is_ready(m_printer) ? 0 : 4);
+	result |= (m_printer->is_ready() ? 0 : 4);
 
 	/* bit 3, rs232 input */
 
@@ -179,7 +179,7 @@ WRITE8_MEMBER( mc10_state::mc10_port2_w )
 			break;
 		case PRINTER_DONE:
 			if (BIT(data,0))
-				printer_output(m_printer, m_pr_buffer);
+				m_printer->output(m_pr_buffer);
 			m_pr_state = PRINTER_WAIT;
 			break;
 	}

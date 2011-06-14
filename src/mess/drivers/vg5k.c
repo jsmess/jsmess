@@ -73,7 +73,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ef9345_device> m_ef9345;
 	required_device<device_t> m_dac;
-	required_device<device_t> m_printer;
+	required_device<printer_image_device> m_printer;
 	required_device<device_t> m_cassette;
 
 	offs_t m_ef9345_offset;
@@ -94,13 +94,13 @@ public:
 
 READ8_MEMBER( vg5k_state::printer_r )
 {
-	return (printer_is_ready(m_printer) ? 0x00 : 0xff);
+	return (m_printer->is_ready() ? 0x00 : 0xff);
 }
 
 
 WRITE8_MEMBER( vg5k_state::printer_w )
 {
-	printer_output(m_printer, data);
+	m_printer->output(data);
 }
 
 
