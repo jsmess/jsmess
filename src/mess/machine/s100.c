@@ -116,7 +116,7 @@ void s100_device::device_config_complete()
 s100_device::s100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, S100, "S100", tag, owner, clock)
 {
-	for(int i = 0; i < MAX_S100_SLOTS; i++)
+	for (int i = 0; i < MAX_S100_SLOTS; i++)
 		m_s100_device[i] = NULL;
 }
 

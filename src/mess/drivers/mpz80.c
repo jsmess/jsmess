@@ -11,6 +11,7 @@
     TODO:
 
 	- trap logic
+		- reset trap
 	- memory management
 		- task RAM
 		- mapping RAM
@@ -18,7 +19,7 @@
 	- front panel LEDs
 	- keyboard
 	- I/O
-		- Mult I/O
+		- Mult I/O (8259A PIC, 3x 8250 ACE, uPD1990C RTC, 4K ROM/RAM)
 		- Wunderbus I/O (8259A PIC, 3x 8250 ACE, uPD1990C RTC)
 	- floppy
 		- DJ/DMA controller (Z80, 1K RAM, 2/4K ROM, TTL floppy control logic) for 5.25" floppy drives
@@ -27,7 +28,7 @@
 		- HDC/DMA controller (Seagate ST-506/Shugart SA1000)
 		- HDCA controller (Shugart SA4000/Fujitsu M2301B/Winchester M2320B)
 	- memory
-		- MM65KS (65K RAM, expandable to 1 MB)
+		- MM65K16S (64K RAM, expandable to 1 MB)
 	- AM9512 FPU
 	- models
 		- Decision I Desk Top Model D1 (MPZ80, MM65KS, Wunderbus)
@@ -98,7 +99,7 @@ READ8_MEMBER( mpz80_state::mmu_r )
 	UINT32 addr = get_address(offset);
 	UINT8 data = 0;
 		
-	if (addr < 0x1000)
+	if (((m_task & 0x0f) == 0) && (addr < 0x1000))
 	{
 		if (addr < 0x400)
 		{
@@ -152,7 +153,7 @@ WRITE8_MEMBER( mpz80_state::mmu_w )
 {
 	UINT32 addr = get_address(offset);
 
-	if (addr < 0x1000)
+	if (((m_task & 0x0f) == 0) && (addr < 0x1000))
 	{
 		if (addr < 0x400)
 		{
@@ -461,8 +462,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpz80_io, AS_IO, 8, mpz80_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_io_r, mmu_io_w)
-//	AM_RANGE(0x48, 0x4f) AM_READWRITE(wunderbus_r, wunderbus_w)
-//	AM_RANGE(0x80, 0x80) HD/DMA
 ADDRESS_MAP_END
 
 
@@ -594,7 +593,7 @@ static S100_INTERFACE( s100_intf )
 static SLOT_INTERFACE_START( mpz80_s100_cards )
 	SLOT_INTERFACE("wunderbus", S100_WUNDERBUS)
 //	SLOT_INTERFACE("multio", S100_MULTIO)
-//	SLOT_INTERFACE("mm65ks", S100_MM65KS)
+//	SLOT_INTERFACE("mm65k16s", S100_MM65K16S)
 //	SLOT_INTERFACE("djdma", S100_DJDMA)
 //	SLOT_INTERFACE("dj2db", S100_DJ2DB)
 //	SLOT_INTERFACE("hdcdma", S100_HDCDMA)
@@ -645,21 +644,21 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 	MCFG_FRAGMENT_ADD( generic_terminal )
 
 	// S-100
-	MCFG_S100_BUS_ADD(S100_TAG, Z80_TAG, s100_intf)
-	MCFG_S100_SLOT_ADD(S100_TAG,  1,  "s100_1", mpz80_s100_cards, NULL)//"mm65ks")
-	MCFG_S100_SLOT_ADD(S100_TAG,  2,  "s100_2", mpz80_s100_cards, "wunderbus")
-	MCFG_S100_SLOT_ADD(S100_TAG,  3,  "s100_3", mpz80_s100_cards, NULL)//"djdma")
-	MCFG_S100_SLOT_ADD(S100_TAG,  4,  "s100_4", mpz80_s100_cards, NULL)//"hdcdma")
-	MCFG_S100_SLOT_ADD(S100_TAG,  5,  "s100_5", mpz80_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD(S100_TAG,  6,  "s100_6", mpz80_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD(S100_TAG,  7,  "s100_7", mpz80_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD(S100_TAG,  8,  "s100_8", mpz80_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD(S100_TAG,  9,  "s100_9", mpz80_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD(S100_TAG, 10, "s100_10", mpz80_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD(S100_TAG, 11, "s100_11", mpz80_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD(S100_TAG, 12, "s100_12", mpz80_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD(S100_TAG, 13, "s100_13", mpz80_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD(S100_TAG, 14, "s100_14", mpz80_s100_cards, NULL)
+	MCFG_S100_BUS_ADD(Z80_TAG, s100_intf)
+	MCFG_S100_SLOT_ADD( 1,  "s100_1", mpz80_s100_cards, NULL)//"mm65k16s")
+	MCFG_S100_SLOT_ADD( 2,  "s100_2", mpz80_s100_cards, "wunderbus")
+	MCFG_S100_SLOT_ADD( 3,  "s100_3", mpz80_s100_cards, NULL)//"djdma")
+	MCFG_S100_SLOT_ADD( 4,  "s100_4", mpz80_s100_cards, NULL)//"hdcdma")
+	MCFG_S100_SLOT_ADD( 5,  "s100_5", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD( 6,  "s100_6", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD( 7,  "s100_7", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD( 8,  "s100_8", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD( 9,  "s100_9", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD(10, "s100_10", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD(11, "s100_11", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD(12, "s100_12", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD(13, "s100_13", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD(14, "s100_14", mpz80_s100_cards, NULL)
 	
 	// devices
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, mpz80_floppy_config)

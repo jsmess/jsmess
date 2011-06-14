@@ -164,9 +164,36 @@ static INPUT_PORTS_START( wunderbus )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x3e, 0x12, "BASE Port Address" ) PORT_DIPLOCATION("7C:2,3,4,5,6")
 	PORT_DIPSETTING(    0x00, "00H" )
-	// ...
+	PORT_DIPSETTING(    0x02, "08H" )
+	PORT_DIPSETTING(    0x04, "10H" )
+	PORT_DIPSETTING(    0x06, "18H" )
+	PORT_DIPSETTING(    0x08, "20H" )
+	PORT_DIPSETTING(    0x0a, "28H" )
+	PORT_DIPSETTING(    0x0c, "30H" )
+	PORT_DIPSETTING(    0x0e, "38H" )
+	PORT_DIPSETTING(    0x10, "40H" )
 	PORT_DIPSETTING(    0x12, "48H" )
-	// ...
+	PORT_DIPSETTING(    0x14, "50H" )
+	PORT_DIPSETTING(    0x16, "58H" )
+	PORT_DIPSETTING(    0x18, "60H" )
+	PORT_DIPSETTING(    0x1a, "68H" )
+	PORT_DIPSETTING(    0x1c, "70H" )
+	PORT_DIPSETTING(    0x1e, "78H" )
+	PORT_DIPSETTING(    0x20, "80H" )
+	PORT_DIPSETTING(    0x22, "88H" )
+	PORT_DIPSETTING(    0x24, "90H" )
+	PORT_DIPSETTING(    0x26, "98H" )
+	PORT_DIPSETTING(    0x28, "A0H" )
+	PORT_DIPSETTING(    0x2a, "A8H" )
+	PORT_DIPSETTING(    0x2c, "B0H" )
+	PORT_DIPSETTING(    0x2e, "B8H" )
+	PORT_DIPSETTING(    0x30, "C0H" )
+	PORT_DIPSETTING(    0x32, "C8H" )
+	PORT_DIPSETTING(    0x34, "D0H" )
+	PORT_DIPSETTING(    0x36, "D8H" )
+	PORT_DIPSETTING(    0x38, "E0H" )
+	PORT_DIPSETTING(    0x3a, "E8H" )
+	PORT_DIPSETTING(    0x3c, "F0H" )
 	PORT_DIPSETTING(    0x3e, "F8H" )
 	PORT_DIPNAME( 0x40, 0x40, "FLAG2 Polarity" ) PORT_DIPLOCATION("7C:7")
 	PORT_DIPSETTING(    0x40, "Negative" )
@@ -296,7 +323,7 @@ UINT8 s100_wunderbus_device::s100_sinp_r(offs_t offset)
 
 	if ((offset & 0x07) < 7)
 	{
-		switch (m_wb_group)
+		switch (m_group)
 		{
 		case 0:
 			switch (offset & 0x07)
@@ -403,11 +430,11 @@ void s100_wunderbus_device::s100_sout_w(offs_t offset, UINT8 data)
 
 	if ((offset & 0x07) == 7)
 	{
-		m_wb_group = data;
+		m_group = data;
 	}
 	else
 	{
-		switch (m_wb_group)
+		switch (m_group)
 		{
 		case 0:
 			switch (offset & 0x07)

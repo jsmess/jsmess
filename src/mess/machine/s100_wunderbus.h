@@ -64,7 +64,7 @@ protected:
 
 private:
 	// internal state
-	UINT8 m_wb_group;
+	UINT8 m_group;
 	int m_rtc_tp;
 };
 
