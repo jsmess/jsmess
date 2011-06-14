@@ -5,27 +5,36 @@
 
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/upd765.h"
 #include "video/upd7220.h"
 
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 class mz6500_state : public driver_device
 {
 public:
 	mz6500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_hgdc(*this, "upd7220")
+	m_hgdc(*this, "upd7220"),
+	m_fdc(*this, "upd765")
 	{ }
 
 	required_device<upd7220_device> m_hgdc;
-
+	required_device<device_t> m_fdc;
+	DECLARE_READ8_MEMBER(fdc_r);
+	DECLARE_WRITE8_MEMBER(fdc_w);
+	DECLARE_READ8_MEMBER(mz6500_vram_r);
+	DECLARE_WRITE8_MEMBER(mz6500_vram_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
-bool mz6500_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+SCREEN_UPDATE_MEMBER( mz6500_state )
 {
 	bitmap_fill(&bitmap, &cliprect, 0);
 
@@ -38,20 +47,18 @@ bool mz6500_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	//mz6500_state *state = device->machine().driver_data<mz6500_state>();
-	int xi,gfx[3];
-	UINT8 pen;
+	int gfx[3];
+	UINT8 i,pen;
 
 	gfx[0] = vram[address + 0x00000];
 	gfx[1] = vram[address + 0x10000];
 	gfx[2] = vram[address + 0x20000];
 
-	for(xi=0;xi<8;xi++)
+	for(i=0; i<8; i++)
 	{
-		pen = ((gfx[0] >> (xi)) & 1) ? 1 : 0;
-		pen|= ((gfx[1] >> (xi)) & 1) ? 2 : 0;
-		pen|= ((gfx[2] >> (xi)) & 1) ? 4 : 0;
+		pen = (BIT(gfx[0], i)) | (BIT(gfx[1], i) << 1) | (BIT(gfx[2], i) << 2);
 
-		*BITMAP_ADDR16(bitmap, y, x + xi) = pen;
+		*BITMAP_ADDR16(bitmap, y, x + i) = pen;
 	}
 }
 
@@ -61,32 +68,28 @@ static VIDEO_START( mz6500 )
 }
 
 
-static READ8_HANDLER( fdc_r )
+READ8_MEMBER( mz6500_state::fdc_r )
 {
-	return (offset == 0) ? upd765_status_r(space->machine().device("upd765"),0) : upd765_data_r(space->machine().device("upd765"),0);
+	return (offset) ? upd765_data_r(m_fdc, 0) : upd765_status_r(m_fdc, 0);
 }
 
-static WRITE8_HANDLER( fdc_w )
+WRITE8_MEMBER( mz6500_state::fdc_w )
 {
 	if(offset)
-		upd765_data_w(space->machine().device("upd765"),0,data);
+		upd765_data_w(m_fdc, 0, data);
 }
 
-static READ8_HANDLER( mz6500_vram_r )
+READ8_MEMBER( mz6500_state::mz6500_vram_r )
 {
-	mz6500_state *state = space->machine().driver_data<mz6500_state>();
-
-	return state->m_hgdc->vram_r(*space, offset);
+	return m_hgdc->vram_r(space, offset);
 }
 
-static WRITE8_HANDLER( mz6500_vram_w )
+WRITE8_MEMBER( mz6500_state::mz6500_vram_w )
 {
-	mz6500_state *state = space->machine().driver_data<mz6500_state>();
-
-	state->m_hgdc->vram_w(*space, offset, data);
+	m_hgdc->vram_w(space, offset, data);
 }
 
-static ADDRESS_MAP_START(mz6500_map, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(mz6500_map, AS_PROGRAM, 16, mz6500_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x9ffff) AM_RAM
 //  AM_RANGE(0xa0000,0xbffff) kanji/dictionary ROM
@@ -94,7 +97,7 @@ static ADDRESS_MAP_START(mz6500_map, AS_PROGRAM, 16)
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mz6500_io, AS_IO, 16)
+static ADDRESS_MAP_START(mz6500_io, AS_IO, 16, mz6500_state)
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x0000, 0x000f) i8237 dma
 //  AM_RANGE(0x0010, 0x001f) i8255
@@ -105,7 +108,7 @@ static ADDRESS_MAP_START(mz6500_io, AS_IO, 16)
 //  AM_RANGE(0x0060, 0x0060) system port A
 //  AM_RANGE(0x0070, 0x0070) system port C
 //  AM_RANGE(0x00cd, 0x00cd) MZ-1R32
-	AM_RANGE(0x0100, 0x0103) AM_MIRROR(0xc) AM_DEVREADWRITE8_MODERN("upd7220", upd7220_device, read, write, 0x00ff)
+	AM_RANGE(0x0100, 0x0103) AM_MIRROR(0xc) AM_DEVREADWRITE8("upd7220", upd7220_device, read, write, 0x00ff)
 //  AM_RANGE(0x0110, 0x011f) video address / data registers (priority)
 //  AM_RANGE(0x0120, 0x012f) video registers
 //  AM_RANGE(0x0130, 0x013f) video register
@@ -128,20 +131,20 @@ static MACHINE_RESET(mz6500)
 {
 }
 
-static WRITE_LINE_DEVICE_HANDLER( fdc_irq )
+WRITE_LINE_MEMBER( mz6500_state::fdc_irq )
 {
 	//printf("%02x IRQ\n",state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( fdc_drq )
+WRITE_LINE_MEMBER( mz6500_state::fdc_drq )
 {
 	//printf("%02x DRQ\n",state);
 }
 
 static const struct upd765_interface upd765_intf =
 {
-	DEVCB_LINE(fdc_irq),
-	DEVCB_LINE(fdc_drq),
+	DEVCB_DRIVER_LINE_MEMBER(mz6500_state, fdc_irq),
+	DEVCB_DRIVER_LINE_MEMBER(mz6500_state, fdc_drq),
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
@@ -170,8 +173,8 @@ static UPD7220_INTERFACE( hgdc_intf )
 	DEVCB_NULL
 };
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 8 )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_MODERN("upd7220", upd7220_device, vram_r, vram_w)
+static ADDRESS_MAP_START( upd7220_map, AS_0, 8, mz6500_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220", upd7220_device, vram_r, vram_w)
 ADDRESS_MAP_END
 
 
