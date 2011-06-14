@@ -2,10 +2,19 @@
 
         Microsystems International Limited MOD-8
 
+        M.I.L. was formed in 1968 from a joint venture between the Canadian
+        Government and Northern Telecom. It produced a variety of computer
+        chips, eproms, etc, plus parts for the telephone company. It folded
+        in 1975.
+        (Info from http://www.cse.yorku.ca/museum/v_tour/artifacts/artifacts.htm)
+
+
+        14/06/2011 Modernised & above notes added.
         02/12/2009 Working driver [Miodrag Milanovic]
         18/11/2009 Skeleton driver.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8008/i8008.h"
@@ -15,52 +24,55 @@ class mod8_state : public driver_device
 {
 public:
 	mod8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_teleprinter(*this, TELEPRINTER_TAG)
+	{ }
 
+	required_device<device_t> m_teleprinter;
+	DECLARE_WRITE8_MEMBER(out_w);
+	DECLARE_WRITE8_MEMBER(tty_w);
+	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_READ8_MEMBER(tty_r);
 	UINT16 m_tty_data;
 	UINT8 m_tty_key_data;
 	int m_tty_cnt;
 };
 
-static WRITE8_HANDLER(out_w)
+WRITE8_MEMBER( mod8_state::out_w )
 {
-	mod8_state *state = space->machine().driver_data<mod8_state>();
-	device_t *devconf = space->machine().device(TELEPRINTER_TAG);
+	m_tty_data >>= 1;
+	m_tty_data |= BIT(data, 0) ? 0x8000 : 0;
+	m_tty_cnt++;
 
-	state->m_tty_data >>= 1;
-	state->m_tty_data |= (data & 0x01) ? 0x8000 : 0;
-	state->m_tty_cnt++;
-	if (state->m_tty_cnt==10) {
-		teleprinter_write(devconf,0,(state->m_tty_data >> 7) & 0x7f);
-		state->m_tty_cnt = 0;
+	if (m_tty_cnt == 10)
+	{
+		teleprinter_write(m_teleprinter, 0, (m_tty_data >> 7) & 0x7f);
+		m_tty_cnt = 0;
 	}
 }
 
-static WRITE8_HANDLER(tty_w)
+WRITE8_MEMBER( mod8_state::tty_w )
 {
-	mod8_state *state = space->machine().driver_data<mod8_state>();
-
-	state->m_tty_data = 0;
-	state->m_tty_cnt = 0;
+	m_tty_data = 0;
+	m_tty_cnt = 0;
 }
 
-static READ8_HANDLER(tty_r)
+READ8_MEMBER( mod8_state::tty_r )
 {
-	mod8_state *state = space->machine().driver_data<mod8_state>();
-	UINT8 d = state->m_tty_key_data & 0x01;
-
-	state->m_tty_key_data >>= 1;
+	UINT8 d = m_tty_key_data & 1;
+	m_tty_key_data >>= 1;
 	return d;
 }
 
-static ADDRESS_MAP_START(mod8_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(mod8_mem, AS_PROGRAM, 8, mod8_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000,0x6ff) AM_ROM
 	AM_RANGE(0x700,0xfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mod8_io , AS_IO, 8)
+static ADDRESS_MAP_START(mod8_io, AS_IO, 8, mod8_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x00) AM_READ(tty_r)
 	AM_RANGE(0x0a,0x0a) AM_WRITE(out_w)
 	AM_RANGE(0x0b,0x0b) AM_WRITE(tty_w)
@@ -80,37 +92,34 @@ static MACHINE_RESET(mod8)
 	device_set_irq_callback(machine.device("maincpu"), mod8_irq_callback);
 }
 
-static WRITE8_DEVICE_HANDLER( mod8_kbd_put )
+WRITE8_MEMBER( mod8_state::kbd_put )
 {
-	mod8_state *state = device->machine().driver_data<mod8_state>();
-
-	state->m_tty_key_data = data ^ 0xff;
-	cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
+	m_tty_key_data = data ^ 0xff;
+	cputag_set_input_line(machine(), "maincpu", 0, HOLD_LINE);
 }
 
-static GENERIC_TELEPRINTER_INTERFACE( mod8_teleprinter_intf )
+static GENERIC_TELEPRINTER_INTERFACE( teleprinter_intf )
 {
-	DEVCB_HANDLER(mod8_kbd_put)
+	DEVCB_DRIVER_MEMBER(mod8_state, kbd_put)
 };
 
 static MACHINE_CONFIG_START( mod8, mod8_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",I8008, 800000)
+	MCFG_CPU_PROGRAM_MAP(mod8_mem)
+	MCFG_CPU_IO_MAP(mod8_io)
 
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I8008, 800000)
-    MCFG_CPU_PROGRAM_MAP(mod8_mem)
-    MCFG_CPU_IO_MAP(mod8_io)
+	MCFG_MACHINE_RESET(mod8)
 
-    MCFG_MACHINE_RESET(mod8)
-
-    /* video hardware */
-    MCFG_FRAGMENT_ADD( generic_teleprinter )
-	MCFG_GENERIC_TELEPRINTER_ADD(TELEPRINTER_TAG,mod8_teleprinter_intf)
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( generic_teleprinter )
+	MCFG_GENERIC_TELEPRINTER_ADD(TELEPRINTER_TAG, teleprinter_intf)
 MACHINE_CONFIG_END
 
 
 /* ROM definition */
 ROM_START( mod8 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "mon8.001", 0x0000, 0x0100, CRC(b82ac6b8) SHA1(fbea5a6dd4c779ca1671d84089f857a3f548ffcb))
 	ROM_LOAD( "mon8.002", 0x0100, 0x0100, CRC(8b82bc3c) SHA1(66222511527b27e56a5a1f9656d424d407eac7d3))
 	ROM_LOAD( "mon8.003", 0x0200, 0x0100, CRC(679ae913) SHA1(22423efcb9051c9812fcbac9a27af70415d0dd81))
@@ -122,6 +131,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1974, mod8,   0,       0, 		mod8,	mod8,	 0, 	"Microsystems International Ltd",   "MOD-8",		GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY                      FULLNAME       FLAGS */
+COMP( 1974, mod8,   0,       0,      mod8,      mod8,    0, "Microsystems International Ltd", "MOD-8", GAME_NO_SOUND_HW)
 
