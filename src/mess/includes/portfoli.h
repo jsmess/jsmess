@@ -67,6 +67,8 @@ public:
 	DECLARE_WRITE8_MEMBER( unknown_w );
 	DECLARE_WRITE8_MEMBER( counter_w );
 	DECLARE_WRITE8_MEMBER( ncc1_w );
+	
+	DECLARE_WRITE_LINE_MEMBER( i8250_intrpt_w );
 
 	/* interrupt state */
 	UINT8 m_ip;							/* interrupt pending */

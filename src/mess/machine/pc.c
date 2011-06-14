@@ -345,13 +345,13 @@ const struct pit8253_config pcjr_pit8253_config =
  **********************************************************/
 
 /* called when a interrupt is set/cleared from com hardware */
-static INS8250_INTERRUPT( pc_com_interrupt_1 )
+static WRITE_LINE_DEVICE_HANDLER( pc_com_interrupt_1 )
 {
 	pc_state *st = device->machine().driver_data<pc_state>();
 	pic8259_ir4_w(st->m_pic8259, state);
 }
 
-static INS8250_INTERRUPT( pc_com_interrupt_2 )
+static WRITE_LINE_DEVICE_HANDLER( pc_com_interrupt_2 )
 {
 	pc_state *st = device->machine().driver_data<pc_state>();
 	pic8259_ir3_w(st->m_pic8259, state);
@@ -377,28 +377,28 @@ const ins8250_interface ibm5150_com_interface[4]=
 {
 	{
 		1843200,
-		pc_com_interrupt_1,
+		DEVCB_LINE(pc_com_interrupt_1),
 		NULL,
 		pc_com_handshake_out_0,
 		NULL
 	},
 	{
 		1843200,
-		pc_com_interrupt_2,
+		DEVCB_LINE(pc_com_interrupt_2),
 		NULL,
 		pc_com_handshake_out_1,
 		NULL
 	},
 	{
 		1843200,
-		pc_com_interrupt_1,
+		DEVCB_LINE(pc_com_interrupt_1),
 		NULL,
 		pc_com_handshake_out_2,
 		NULL
 	},
 	{
 		1843200,
-		pc_com_interrupt_2,
+		DEVCB_LINE(pc_com_interrupt_2),
 		NULL,
 		pc_com_handshake_out_3,
 		NULL

@@ -374,7 +374,7 @@ static INS8250_HANDSHAKE_OUT( bebox_uart_handshake )
 const ins8250_interface bebox_uart_inteface_0 =
 {
 	0,
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	NULL,
 	NULL
@@ -383,7 +383,7 @@ const ins8250_interface bebox_uart_inteface_0 =
 const ins8250_interface bebox_uart_inteface_1 =
 {
 	0,
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	NULL,
 	NULL
@@ -392,7 +392,7 @@ const ins8250_interface bebox_uart_inteface_1 =
 const ins8250_interface bebox_uart_inteface_2 =
 {
 	0,
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	NULL,
 	NULL
@@ -401,7 +401,7 @@ const ins8250_interface bebox_uart_inteface_2 =
 const ins8250_interface bebox_uart_inteface_3 =
 {
 	0,
-	NULL,
+	DEVCB_NULL,
 	bebox_uart_transmit,
 	bebox_uart_handshake,
 	NULL

@@ -353,7 +353,7 @@ static void avigo_refresh_memory(running_machine &machine)
 
 
 
-static INS8250_INTERRUPT( avigo_com_interrupt )
+static WRITE_LINE_DEVICE_HANDLER( avigo_com_interrupt )
 {
 	avigo_state *drvstate = device->machine().driver_data<avigo_state>();
 	logerror("com int\r\n");
@@ -373,7 +373,7 @@ static INS8250_INTERRUPT( avigo_com_interrupt )
 static const ins8250_interface avigo_com_interface =
 {
 	1843200,
-	avigo_com_interrupt,
+	DEVCB_LINE(avigo_com_interrupt),
 	NULL,
 	NULL,
 	NULL

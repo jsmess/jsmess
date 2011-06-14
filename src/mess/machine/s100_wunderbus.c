@@ -66,13 +66,6 @@ static struct pic8259_interface pic_intf =
 //	ins8250_interface ace1_intf
 //-------------------------------------------------
 
-static INS8250_INTERRUPT( ace1_interrupt )
-{
-	s100_wunderbus_device *wunderbus = downcast<s100_wunderbus_device *>(device->owner());
-
-	pic8259_ir3_w(wunderbus->m_pic, state);
-}
-
 static INS8250_TRANSMIT( ace1_transmit )
 {
 //	terminal_write(m_terminal, 0, data);
@@ -81,7 +74,7 @@ static INS8250_TRANSMIT( ace1_transmit )
 static ins8250_interface ace1_intf =
 {
 	XTAL_18_432MHz/10,
-	ace1_interrupt,
+	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir3_w),
 	ace1_transmit,
 	NULL,
 	NULL
@@ -92,17 +85,10 @@ static ins8250_interface ace1_intf =
 //	ins8250_interface ace2_intf
 //-------------------------------------------------
 
-static INS8250_INTERRUPT( ace2_interrupt )
-{
-	s100_wunderbus_device *wunderbus = downcast<s100_wunderbus_device *>(device->owner());
-
-	pic8259_ir4_w(wunderbus->m_pic, state);
-}
-
 static ins8250_interface ace2_intf =
 {
 	XTAL_18_432MHz/10,
-	ace2_interrupt,
+	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir4_w),
 	NULL,
 	NULL,
 	NULL
@@ -113,17 +99,10 @@ static ins8250_interface ace2_intf =
 //	ins8250_interface ace3_intf
 //-------------------------------------------------
 
-static INS8250_INTERRUPT( ace3_interrupt )
-{
-	s100_wunderbus_device *wunderbus = downcast<s100_wunderbus_device *>(device->owner());
-
-	pic8259_ir5_w(wunderbus->m_pic, state);
-}
-
 static ins8250_interface ace3_intf =
 {
 	XTAL_18_432MHz/10,
-	ace3_interrupt,
+	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir5_w),
 	NULL,
 	NULL,
 	NULL

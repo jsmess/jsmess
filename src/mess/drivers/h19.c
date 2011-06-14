@@ -346,7 +346,7 @@ static MC6845_UPDATE_ROW( h19_update_row )
 	}
 }
 
-static INS8250_INTERRUPT(h19_ace_irq)
+static WRITE_LINE_DEVICE_HANDLER(h19_ace_irq)
 {
 	cputag_set_input_line(device->machine(), "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
 }
@@ -354,7 +354,7 @@ static INS8250_INTERRUPT(h19_ace_irq)
 static const ins8250_interface h19_ace_interface =
 {
 	XTAL_12_288MHz / 4, // 3.072mhz clock which gets divided down for the various baud rates
-	h19_ace_irq, // interrupt
+	DEVCB_LINE(h19_ace_irq), // interrupt
 	NULL, // transmit func
 	NULL, // handshake out
 	NULL // refresh func

@@ -34,7 +34,7 @@ static void svi318_set_banks(running_machine &machine);
 
 /* Serial ports */
 
-static INS8250_INTERRUPT( svi318_ins8250_interrupt )
+static WRITE_LINE_DEVICE_HANDLER( svi318_ins8250_interrupt )
 {
 	svi318_state *drvstate = device->machine().driver_data<svi318_state>();
 	if (drvstate->m_svi.bankLow != SVI_CART)
@@ -53,14 +53,14 @@ const ins8250_interface svi318_ins8250_interface[2]=
 {
 	{
 		1000000,
-		svi318_ins8250_interrupt,
+		DEVCB_LINE(svi318_ins8250_interrupt),
 		NULL,
 		NULL,
 		svi318_com_refresh_connected
 	},
 	{
 		3072000,
-		svi318_ins8250_interrupt,
+		DEVCB_LINE(svi318_ins8250_interrupt),
 		NULL,
 		NULL,
 		NULL

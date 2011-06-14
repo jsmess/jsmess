@@ -100,7 +100,7 @@ MACHINE_RESET_MEMBER(ccs2810_state)
 static const ins8250_interface ccs2810_com_interface =
 {
 	1843200,
-	NULL,
+	DEVCB_NULL,
 	NULL,
 	NULL,
 	NULL

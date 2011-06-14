@@ -252,15 +252,10 @@ static const mc6845_interface zrt80_crtc6845_interface =
 	NULL
 };
 
-static INS8250_INTERRUPT( zrt80_com_interrupt )
-{
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, state);
-}
-
 static const ins8250_interface zrt80_com_interface =
 {
 	2457600,
-	zrt80_com_interrupt,
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	NULL,
 	NULL,
 	NULL

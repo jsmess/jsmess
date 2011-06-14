@@ -10,13 +10,13 @@
 
 
 /* called when a interrupt is set/cleared from com hardware */
-static INS8250_INTERRUPT( pc_com_interrupt_1 )
+static WRITE_LINE_DEVICE_HANDLER( pc_com_interrupt_1 )
 {
 	isa8_com_device	*com  = downcast<isa8_com_device *>(device->owner());
 	com->m_isa->irq4_w(state);
 }
 
-static INS8250_INTERRUPT( pc_com_interrupt_2 )
+static WRITE_LINE_DEVICE_HANDLER( pc_com_interrupt_2 )
 {
 	isa8_com_device	*com  = downcast<isa8_com_device *>(device->owner());
 	com->m_isa->irq3_w(state);
@@ -40,28 +40,28 @@ static const ins8250_interface genpc_com_interface[4]=
 {
 	{
 		1843200,
-		pc_com_interrupt_1,
+		DEVCB_LINE(pc_com_interrupt_1),
 		NULL,
 		pc_com_handshake_out_0,
 		NULL
 	},
 	{
 		1843200,
-		pc_com_interrupt_2,
+		DEVCB_LINE(pc_com_interrupt_2),
 		NULL,
 		pc_com_handshake_out_1,
 		NULL
 	},
 	{
 		1843200,
-		pc_com_interrupt_1,
+		DEVCB_LINE(pc_com_interrupt_1),
 		NULL,
 		pc_com_handshake_out_2,
 		NULL
 	},
 	{
 		1843200,
-		pc_com_interrupt_2,
+		DEVCB_LINE(pc_com_interrupt_2),
 		NULL,
 		pc_com_handshake_out_3,
 		NULL

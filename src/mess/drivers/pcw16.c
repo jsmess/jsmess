@@ -1233,7 +1233,7 @@ static const struct pc_fdc_interface pcw16_fdc_interface=
 };
 
 
-static INS8250_INTERRUPT( pcw16_com_interrupt_1 )
+static WRITE_LINE_DEVICE_HANDLER( pcw16_com_interrupt_1 )
 {
 	pcw16_state *drvstate = device->machine().driver_data<pcw16_state>();
 	drvstate->m_system_status &= ~(1 << 4);
@@ -1246,7 +1246,7 @@ static INS8250_INTERRUPT( pcw16_com_interrupt_1 )
 }
 
 
-static INS8250_INTERRUPT( pcw16_com_interrupt_2 )
+static WRITE_LINE_DEVICE_HANDLER( pcw16_com_interrupt_2 )
 {
 	pcw16_state *drvstate = device->machine().driver_data<pcw16_state>();
 	drvstate->m_system_status &= ~(1 << 3);
@@ -1285,14 +1285,14 @@ static const ins8250_interface pcw16_com_interface[2]=
 {
 	{
 		1843200,
-		pcw16_com_interrupt_1,
+		DEVCB_LINE(pcw16_com_interrupt_1),
 		NULL,
 		pc_mouse_handshake_in,
 		pcw16_com_refresh_connected_1
 	},
 	{
 		1843200,
-		pcw16_com_interrupt_2,
+		DEVCB_LINE(pcw16_com_interrupt_2),
 		NULL,
 		NULL,
 		pcw16_com_refresh_connected_2

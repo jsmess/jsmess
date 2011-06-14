@@ -313,13 +313,13 @@ I8237_INTERFACE( at_dma8237_2_config )
  **********************************************************/
 
 /* called when a interrupt is set/cleared from com hardware */
-static INS8250_INTERRUPT( at_com_interrupt_1 )
+static WRITE_LINE_DEVICE_HANDLER( at_com_interrupt_1 )
 {
 	at_state *st = device->machine().driver_data<at_state>();
 	pic8259_ir4_w(st->m_pic8259_master, state);
 }
 
-static INS8250_INTERRUPT( at_com_interrupt_2 )
+static WRITE_LINE_DEVICE_HANDLER( at_com_interrupt_2 )
 {
 	at_state *st = device->machine().driver_data<at_state>();
 	pic8259_ir3_w(st->m_pic8259_master, state);
@@ -345,28 +345,28 @@ const ins8250_interface ibm5170_com_interface[4]=
 {
 	{
 		1843200,
-		at_com_interrupt_1,
+		DEVCB_LINE(at_com_interrupt_1),
 		NULL,
 		at_com_handshake_out_0,
 		NULL
 	},
 	{
 		1843200,
-		at_com_interrupt_2,
+		DEVCB_LINE(at_com_interrupt_2),
 		NULL,
 		at_com_handshake_out_1,
 		NULL
 	},
 	{
 		1843200,
-		at_com_interrupt_1,
+		DEVCB_LINE(at_com_interrupt_1),
 		NULL,
 		at_com_handshake_out_2,
 		NULL
 	},
 	{
 		1843200,
-		at_com_interrupt_2,
+		DEVCB_LINE(at_com_interrupt_2),
 		NULL,
 		at_com_handshake_out_3,
 		NULL

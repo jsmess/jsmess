@@ -714,17 +714,15 @@ static I8255_INTERFACE( ppi_intf )
 //  ins8250_interface i8250_intf
 //-------------------------------------------------
 
-static INS8250_INTERRUPT( i8250_intrpt_w )
+WRITE_LINE_MEMBER( portfolio_state::i8250_intrpt_w )
 {
-	portfolio_state *driver_state = device->machine().driver_data<portfolio_state>();
-
-	driver_state->trigger_interrupt(INT_EXTERNAL);
+	trigger_interrupt(INT_EXTERNAL);
 }
 
 static const ins8250_interface i8250_intf =
 {
 	XTAL_1_8432MHz,
-	i8250_intrpt_w,
+	DEVCB_DRIVER_LINE_MEMBER(portfolio_state, i8250_intrpt_w),
 	NULL,
 	NULL,
 	NULL
