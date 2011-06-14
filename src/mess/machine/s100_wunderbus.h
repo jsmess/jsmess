@@ -26,10 +26,9 @@
 
 // ======================> s100_wunderbus_device
 
-class s100_wunderbus_device :
-		public device_t,
-		public device_s100_card_interface,
-		public device_slot_card_interface
+class s100_wunderbus_device : public device_t,
+							  public device_s100_card_interface,
+							  public device_slot_card_interface
 {
 public:
 	DECLARE_READ8_MEMBER( read );
@@ -57,9 +56,11 @@ protected:
 	virtual void device_reset();
 
 	// device_s100_card_interface overrides
-	virtual void vi0_w(int state);
-	virtual void vi1_w(int state);
-	virtual void vi2_w(int state);
+	virtual void s100_vi0_w(int state);
+	virtual void s100_vi1_w(int state);
+	virtual void s100_vi2_w(int state);
+	virtual UINT8 s100_sinp_r(offs_t offset);
+	virtual void s100_sout_w(offs_t offset, UINT8 data);
 
 private:
 	// internal state

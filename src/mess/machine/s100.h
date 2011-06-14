@@ -89,6 +89,13 @@ struct s100_bus_interface
     devcb_write_line	m_out_vi5_cb;
     devcb_write_line	m_out_vi6_cb;
     devcb_write_line	m_out_vi7_cb;
+	devcb_write_line	m_out_dma0_cb;
+	devcb_write_line	m_out_dma1_cb;
+	devcb_write_line	m_out_dma2_cb;
+	devcb_write_line	m_out_dma3_cb;
+	devcb_write_line	m_out_rdy_cb;
+	devcb_write_line	m_out_hold_cb;
+	devcb_write_line	m_out_error_cb;
 };
 
 class device_s100_card_interface;
@@ -105,7 +112,13 @@ public:
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 
-	void add_s100_card(device_s100_card_interface *card,int pos);
+	void add_s100_card(device_s100_card_interface *card, int pos);
+
+	DECLARE_READ8_MEMBER( smemr_r );
+	DECLARE_WRITE8_MEMBER( mwrt_w );
+	
+	DECLARE_READ8_MEMBER( sinp_r );
+	DECLARE_WRITE8_MEMBER( sout_w );
 
 	DECLARE_WRITE_LINE_MEMBER( int_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
@@ -117,6 +130,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vi5_w );
 	DECLARE_WRITE_LINE_MEMBER( vi6_w );
 	DECLARE_WRITE_LINE_MEMBER( vi7_w );
+	DECLARE_WRITE_LINE_MEMBER( dma0_w );
+	DECLARE_WRITE_LINE_MEMBER( dma1_w );
+	DECLARE_WRITE_LINE_MEMBER( dma2_w );
+	DECLARE_WRITE_LINE_MEMBER( dma3_w );
+	DECLARE_WRITE_LINE_MEMBER( rdy_w );
+	DECLARE_WRITE_LINE_MEMBER( hold_w );
+	DECLARE_WRITE_LINE_MEMBER( error_w );
 
 protected:
 	// device-level overrides
@@ -138,6 +158,13 @@ private:
 	devcb_resolved_write_line	m_out_vi5_func;
 	devcb_resolved_write_line	m_out_vi6_func;
 	devcb_resolved_write_line	m_out_vi7_func;
+	devcb_resolved_write_line	m_out_dma0_func;
+	devcb_resolved_write_line	m_out_dma1_func;
+	devcb_resolved_write_line	m_out_dma2_func;
+	devcb_resolved_write_line	m_out_dma3_func;
+	devcb_resolved_write_line	m_out_rdy_func;
+	devcb_resolved_write_line	m_out_hold_func;
+	devcb_resolved_write_line	m_out_error_func;
 
 	device_s100_card_interface *m_s100_device[MAX_S100_SLOTS];
 	const char *m_cputag;
@@ -161,21 +188,39 @@ public:
 	virtual ~device_s100_card_interface();
 
 	// interrupts
-	virtual void int_w(int state) { };
-	virtual void nmi_w(int state) { };
+	virtual void s100_int_w(int state) { };
+	virtual void s100_nmi_w(int state) { };
+	virtual UINT8 s100_sinta_r(offs_t offset) { return 0; };
 
 	// vectored interrupts
-	virtual void vi0_w(int state) { };
-	virtual void vi1_w(int state) { };
-	virtual void vi2_w(int state) { };
-	virtual void vi3_w(int state) { };
-	virtual void vi4_w(int state) { };
-	virtual void vi5_w(int state) { };
-	virtual void vi6_w(int state) { };
-	virtual void vi7_w(int state) { };
+	virtual void s100_vi0_w(int state) { };
+	virtual void s100_vi1_w(int state) { };
+	virtual void s100_vi2_w(int state) { };
+	virtual void s100_vi3_w(int state) { };
+	virtual void s100_vi4_w(int state) { };
+	virtual void s100_vi5_w(int state) { };
+	virtual void s100_vi6_w(int state) { };
+	virtual void s100_vi7_w(int state) { };
+	
+	// memory access
+	virtual UINT8 s100_smemr_r(offs_t offset) { return 0; };
+	virtual void s100_mwrt_w(offs_t offset, UINT8 data) { };
 
+	// I/O access
+	virtual UINT8 s100_sinp_r(offs_t offset) { return 0; };
+	virtual void s100_sout_w(offs_t offset, UINT8 data) { };
+	
 	// configuration access
-	virtual int sixtn_r() { return 1; }
+	virtual void s100_phlda_w(int state) { }
+	virtual void s100_shalta_w(int state) { }
+	virtual void s100_phantom_w(int state) { }
+	virtual void s100_sxtrq_w(int state) { }
+	virtual int s100_sixtn_r() { return 1; }
+	
+	// reset
+	virtual void s100_poc_w(int state) { }
+	virtual void s100_reset_w(int state) { }
+	virtual void s100_slave_clr_w(int state) { }
 
     // inline configuration
     static void static_set_s100_tag(device_t &device, const char *tag);

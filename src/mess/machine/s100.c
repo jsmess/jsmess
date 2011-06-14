@@ -83,6 +83,8 @@ void s100_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
+    	memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
+    	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
     	memset(&m_out_vi0_cb, 0, sizeof(m_out_vi0_cb));
     	memset(&m_out_vi1_cb, 0, sizeof(m_out_vi1_cb));
     	memset(&m_out_vi2_cb, 0, sizeof(m_out_vi2_cb));
@@ -91,7 +93,13 @@ void s100_device::device_config_complete()
     	memset(&m_out_vi5_cb, 0, sizeof(m_out_vi5_cb));
     	memset(&m_out_vi6_cb, 0, sizeof(m_out_vi6_cb));
     	memset(&m_out_vi7_cb, 0, sizeof(m_out_vi7_cb));
-    	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
+    	memset(&m_out_dma0_cb, 0, sizeof(m_out_dma0_cb));
+    	memset(&m_out_dma1_cb, 0, sizeof(m_out_dma1_cb));
+    	memset(&m_out_dma2_cb, 0, sizeof(m_out_dma2_cb));
+    	memset(&m_out_dma3_cb, 0, sizeof(m_out_dma3_cb));
+    	memset(&m_out_rdy_cb, 0, sizeof(m_out_rdy_cb));
+    	memset(&m_out_hold_cb, 0, sizeof(m_out_hold_cb));
+    	memset(&m_out_error_cb, 0, sizeof(m_out_error_cb));
 	}
 }
 
@@ -132,6 +140,13 @@ void s100_device::device_start()
 	m_out_vi5_func.resolve(m_out_vi5_cb, *this);
 	m_out_vi6_func.resolve(m_out_vi6_cb, *this);
 	m_out_vi7_func.resolve(m_out_vi7_cb, *this);
+	m_out_dma0_func.resolve(m_out_dma0_cb, *this);
+	m_out_dma1_func.resolve(m_out_dma1_cb, *this);
+	m_out_dma2_func.resolve(m_out_dma2_cb, *this);
+	m_out_dma3_func.resolve(m_out_dma3_cb, *this);
+	m_out_rdy_func.resolve(m_out_rdy_cb, *this);
+	m_out_hold_func.resolve(m_out_hold_cb, *this);
+	m_out_error_func.resolve(m_out_error_cb, *this);
 }
 
 
@@ -144,13 +159,90 @@ void s100_device::device_reset()
 }
 
 
+//-------------------------------------------------
+//  add_s100_card - add S100 card
+//-------------------------------------------------
+
 void s100_device::add_s100_card(device_s100_card_interface *card, int pos)
 {
 	m_s100_device[pos] = card;
 }
 
 
-// interrupt request from S100 card
+//-------------------------------------------------
+//  smemr_r - memory read
+//-------------------------------------------------
+
+READ8_MEMBER( s100_device::smemr_r )
+{
+	UINT8 data = 0;
+	
+	for (int i = 0; i < MAX_S100_SLOTS; i++)
+	{
+		if (m_s100_device[i] != NULL)
+		{
+			data |= m_s100_device[i]->s100_smemr_r(offset);
+		}
+	}
+	
+	return data;
+}
+
+
+//-------------------------------------------------
+//  mwrt_w - memory write
+//-------------------------------------------------
+
+WRITE8_MEMBER( s100_device::mwrt_w )
+{
+	for (int i = 0; i < MAX_S100_SLOTS; i++)
+	{
+		if (m_s100_device[i] != NULL)
+		{
+			m_s100_device[i]->s100_mwrt_w(offset, data);
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  sinp_r - I/O read
+//-------------------------------------------------
+
+READ8_MEMBER( s100_device::sinp_r )
+{
+	UINT8 data = 0;
+	
+	for (int i = 0; i < MAX_S100_SLOTS; i++)
+	{
+		if (m_s100_device[i] != NULL)
+		{
+			data |= m_s100_device[i]->s100_sinp_r(offset);
+		}
+	}
+	
+	return data;
+}
+
+
+//-------------------------------------------------
+//  sout_w - I/O write
+//-------------------------------------------------
+
+WRITE8_MEMBER( s100_device::sout_w )
+{
+	for (int i = 0; i < MAX_S100_SLOTS; i++)
+	{
+		if (m_s100_device[i] != NULL)
+		{
+			m_s100_device[i]->s100_sout_w(offset, data);
+		}
+	}
+}
+
+
+WRITE_LINE_MEMBER( s100_device::int_w ) { m_out_nmi_func(state); }
+WRITE_LINE_MEMBER( s100_device::nmi_w ) { m_out_nmi_func(state); }
 WRITE_LINE_MEMBER( s100_device::vi0_w ) { m_out_vi0_func(state); }
 WRITE_LINE_MEMBER( s100_device::vi1_w ) { m_out_vi1_func(state); }
 WRITE_LINE_MEMBER( s100_device::vi2_w ) { m_out_vi2_func(state); }
@@ -159,14 +251,15 @@ WRITE_LINE_MEMBER( s100_device::vi4_w ) { m_out_vi4_func(state); }
 WRITE_LINE_MEMBER( s100_device::vi5_w ) { m_out_vi5_func(state); }
 WRITE_LINE_MEMBER( s100_device::vi6_w ) { m_out_vi6_func(state); }
 WRITE_LINE_MEMBER( s100_device::vi7_w ) { m_out_vi7_func(state); }
-WRITE_LINE_MEMBER( s100_device::int_w ) { m_out_nmi_func(state); }
-WRITE_LINE_MEMBER( s100_device::nmi_w ) { m_out_nmi_func(state); }
+WRITE_LINE_MEMBER( s100_device::dma0_w ) { m_out_dma0_func(state); }
+WRITE_LINE_MEMBER( s100_device::dma1_w ) { m_out_dma1_func(state); }
+WRITE_LINE_MEMBER( s100_device::dma2_w ) { m_out_dma2_func(state); }
+WRITE_LINE_MEMBER( s100_device::dma3_w ) { m_out_dma3_func(state); }
+WRITE_LINE_MEMBER( s100_device::rdy_w ) { m_out_rdy_func(state); }
+WRITE_LINE_MEMBER( s100_device::hold_w ) { m_out_hold_func(state); }
+WRITE_LINE_MEMBER( s100_device::error_w ) { m_out_error_func(state); }
 
 
-
-//**************************************************************************
-//  DEVICE CONFIG S100 CARD INTERFACE
-//**************************************************************************
 
 //**************************************************************************
 //  DEVICE S100 CARD INTERFACE

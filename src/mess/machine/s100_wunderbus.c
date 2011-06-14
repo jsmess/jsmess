@@ -38,9 +38,9 @@ const device_type S100_WUNDERBUS = &device_creator<s100_wunderbus_device>;
 
 	bit		description
 	
-	IR0		S-100 V0
-	IR1		S-100 V1
-	IR2		S-100 V2
+	IR0		S-100 VI0
+	IR1		S-100 VI1
+	IR2		S-100 VI2
 	IR3		Serial Device 1
 	IR4		Serial Device 2
 	IR5		Serial Device 3
@@ -162,10 +162,10 @@ static INPUT_PORTS_START( wunderbus )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("7C:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x3e, 0x24, "BASE Port Address" ) PORT_DIPLOCATION("7C:2,3,4,5,6")
+	PORT_DIPNAME( 0x3e, 0x12, "BASE Port Address" ) PORT_DIPLOCATION("7C:2,3,4,5,6")
 	PORT_DIPSETTING(    0x00, "00H" )
 	// ...
-	PORT_DIPSETTING(    0x24, "48H" )
+	PORT_DIPSETTING(    0x12, "48H" )
 	// ...
 	PORT_DIPSETTING(    0x3e, "F8H" )
 	PORT_DIPNAME( 0x40, 0x40, "FLAG2 Polarity" ) PORT_DIPLOCATION("7C:7")
@@ -254,49 +254,52 @@ void s100_wunderbus_device::device_reset()
 }
 
 //-------------------------------------------------
-//  vi0_w - vectored interrupt 0
+//  s100_vi0_w - vectored interrupt 0
 //-------------------------------------------------
 
-void s100_wunderbus_device::vi0_w(int state)
+void s100_wunderbus_device::s100_vi0_w(int state)
 {
 	pic8259_ir0_w(m_pic, state);
 }
 
 
 //-------------------------------------------------
-//  vi1_w - vectored interrupt 1
+//  s100_vi1_w - vectored interrupt 1
 //-------------------------------------------------
 
-void s100_wunderbus_device::vi1_w(int state)
+void s100_wunderbus_device::s100_vi1_w(int state)
 {
 	pic8259_ir1_w(m_pic, state);
 }
 
 
 //-------------------------------------------------
-//  vi2_w - vectored interrupt 2
+//  s100_vi2_w - vectored interrupt 2
 //-------------------------------------------------
 
-void s100_wunderbus_device::vi2_w(int state)
+void s100_wunderbus_device::s100_vi2_w(int state)
 {
 	pic8259_ir2_w(m_pic, state);
 }
 
 
 //-------------------------------------------------
-//  read - 
+//  s100_sinp_r - I/O read
 //-------------------------------------------------
 
-READ8_MEMBER( s100_wunderbus_device::read )
+UINT8 s100_wunderbus_device::s100_sinp_r(offs_t offset)
 {
+	UINT8 address = (input_port_read(this, "7C") & 0x3e) << 2;
+	if ((offset & 0xf8) != address) return 0;
+
 	UINT8 data = 0;
 
-	if (offset < 7)
+	if ((offset & 0x07) < 7)
 	{
 		switch (m_wb_group)
 		{
 		case 0:
-			switch (offset)
+			switch (offset & 0x07)
 			{
 			case 0: // DAISY 0 IN (STATUS)
 				/*
@@ -372,15 +375,15 @@ READ8_MEMBER( s100_wunderbus_device::read )
 			break;
 			
 		case 1:
-			data = ins8250_r(m_ace1, offset);
+			data = ins8250_r(m_ace1, offset & 0x07);
 			break;
 			
 		case 2:
-			data = ins8250_r(m_ace2, offset);
+			data = ins8250_r(m_ace2, offset & 0x07);
 			break;
 			
 		case 3:
-			data = ins8250_r(m_ace3, offset);
+			data = ins8250_r(m_ace3, offset & 0x07);
 			break;
 		}
 	}
@@ -390,12 +393,15 @@ READ8_MEMBER( s100_wunderbus_device::read )
 
 
 //-------------------------------------------------
-//  write - 
+//  s100_sout_w - I/O write
 //-------------------------------------------------
 
-WRITE8_MEMBER( s100_wunderbus_device::write )
+void s100_wunderbus_device::s100_sout_w(offs_t offset, UINT8 data)
 {
-	if (offset == 7)
+	UINT8 address = (input_port_read(this, "7C") & 0x3e) << 2;
+	if ((offset & 0xf8) != address) return;
+
+	if ((offset & 0x07) == 7)
 	{
 		m_wb_group = data;
 	}
@@ -404,7 +410,7 @@ WRITE8_MEMBER( s100_wunderbus_device::write )
 		switch (m_wb_group)
 		{
 		case 0:
-			switch (offset)
+			switch (offset & 0x07)
 			{
 			case 0: // DAISY 0 OUT
 				/*
@@ -492,15 +498,15 @@ WRITE8_MEMBER( s100_wunderbus_device::write )
 			break;
 			
 		case 1:
-			ins8250_w(m_ace1, offset, data);
+			ins8250_w(m_ace1, offset & 0x07, data);
 			break;
 			
 		case 2:
-			ins8250_w(m_ace2, offset, data);
+			ins8250_w(m_ace2, offset & 0x07, data);
 			break;
 			
 		case 3:
-			ins8250_w(m_ace3, offset, data);
+			ins8250_w(m_ace3, offset & 0x07, data);
 			break;
 		}
 	}

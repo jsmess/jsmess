@@ -56,6 +56,17 @@ enum
 #define R10	0x04
 
 
+// mask register
+#define MASK_STOP_ENBL		0x01
+#define MASK_AUX_ENBL		0x02
+#define MASK_TINT_ENBL		0x04
+#define MASK_RUN_ENBL		0x08
+#define MASK_HALT_ENBL		0x10
+#define MASK_SINT_ENBL		0x20
+#define MASK_IOENBL			0x40
+#define MASK_ZIO_MODE		0x80
+
+
 
 //**************************************************************************
 //  MEMORY MANAGEMENT
@@ -126,7 +137,7 @@ READ8_MEMBER( mpz80_state::mmu_r )
 	}
 	else
 	{
-		logerror("Unmapped RAM read at %06x\n", addr);
+		data = m_s100->smemr_r(space, offset);
 	}
 	
 	return data;
@@ -170,12 +181,12 @@ WRITE8_MEMBER( mpz80_state::mmu_w )
 		}
 		else
 		{
-			logerror("Unmapped LOCAL read at %06x\n", addr);
+			logerror("Unmapped LOCAL write at %06x\n", addr);
 		}
 	}
 	else
 	{
-		logerror("Unmapped RAM read at %06x\n", addr);
+		m_s100->mwrt_w(space, offset, data);
 	}
 }
 
@@ -186,7 +197,13 @@ WRITE8_MEMBER( mpz80_state::mmu_w )
 
 READ8_MEMBER( mpz80_state::mmu_io_r )
 {
-	return 0;
+	if (m_mask & MASK_ZIO_MODE)
+	{
+		// echo port address onto upper address lines (8080 emulation)
+		offset = ((offset << 8) & 0xff00) | (offset & 0xff);
+	}
+	
+	return m_s100->sinp_r(space, offset);
 }
 
 
@@ -196,6 +213,13 @@ READ8_MEMBER( mpz80_state::mmu_io_r )
 
 WRITE8_MEMBER( mpz80_state::mmu_io_w )
 {
+	if (m_mask & MASK_ZIO_MODE)
+	{
+		// echo port address onto upper address lines (8080 emulation)
+		offset = ((offset << 8) & 0xff00) | (offset & 0xff);
+	}
+	
+	m_s100->sout_w(space, offset, data);
 }
 
 
