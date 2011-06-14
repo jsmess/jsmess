@@ -648,6 +648,9 @@ pc1512	// 1986 Amstrad PC1512 v1 (CGA compatible)
 pc1512v2  // 1986 Amstrad PC1512 v2 (CGA compatible)
 pc1512v32  // 1986 Amstrad PC1512 v3.2 (CGA compatible)
 pc1640	// 1987 Amstrad PC1640 (EGA compatible)
+pc2086
+pc3086
+pc2386
 
 xtvga	 // 198? PC-XT (VGA, MF2 Keyboard)
 iskr1031

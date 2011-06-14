@@ -1428,6 +1428,17 @@ ROM_START( t2000sx )
 	ROM_LOAD( "014d.ic9", 0xe0000, 0x20000, CRC(e9010b02) SHA1(75688fc8e222640fa22bcc90343c6966fe0da87f))
 ROM_END
 
+ROM_START( pc2386 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD( "c000.bin", 0xc0000, 0x4000, CRC(33145bbf) SHA1(c49eaec19f656482e12c8bf282cd4ee5986d227d) )
+	ROM_LOAD( "f000.bin", 0xf0000, 0x10000, CRC(f54a063c) SHA1(ce70ec493053afab662f51199ef9c9304a209b8e) )
+	
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x1000, "keyboard", 0 ) // PC2286 / PC2386 102-key keyboard
+	ROM_LOAD( "40211.ic801", 0x000, 0x1000, CRC(4440d981) SHA1(a76006a929f26c178e09908c66f28abc92e7744c) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -1456,3 +1467,4 @@ COMP ( 1997, ficvt503, ibm5170, 0,       at586,     atvga,  at386,      "FIC", "
 COMP ( 1993, megapc,   ibm5170, 0,       megapc,    atvga,  at386,      "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
 COMP ( 199?, megapcpl, ibm5170, 0,       megapcpl,  atvga,  at386,      "Amstrad plc", "MegaPC Plus", GAME_NOT_WORKING )
 COMP ( 1991, t2000sx,  ibm5170, 0,       c386sx16,  atvga,	at386,      "Toshiba",  "T2000SX", GAME_NOT_WORKING )
+COMP ( 1989, pc2386,   ibm5170,	0,		 at386,     atvga,	at386,		"Amstrad plc",  "Amstrad PC2386", GAME_NOT_WORKING )

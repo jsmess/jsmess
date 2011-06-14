@@ -2341,8 +2341,8 @@ ROM_END
 ROM_START( pc1512v32 )
 //  ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
-	ROM_LOAD16_BYTE("40044.v32", 0xfc001, 0x2000, CRC(532c3854) SHA1(18a17b710f9eb079d9d7216d07807030f904ceda)) // v3.2
-	ROM_LOAD16_BYTE("40043.v32", 0xfc000, 0x2000, CRC(ea527e6e) SHA1(b77fa44767a71a0b321a88bb0a394f1125b7c220)) // v3.2
+	ROM_LOAD16_BYTE("40044-2.ic130", 0xfc001, 0x2000, CRC(532c3854) SHA1(18a17b710f9eb079d9d7216d07807030f904ceda)) // v3.2
+	ROM_LOAD16_BYTE("40043-2.ic129", 0xfc000, 0x2000, CRC(ea527e6e) SHA1(b77fa44767a71a0b321a88bb0a394f1125b7c220)) // v3.2
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("40078.bin",     0x00000, 0x02000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd))
 	
@@ -2372,6 +2372,32 @@ ROM_START( pc1640 )
 	
 	ROM_REGION( 0x400, "keyboard", 0 ) // PC1512 / PC1640 85-key keyboard
 	ROM_LOAD( "40042.ic801", 0x000, 0x400, CRC(607edaf6) SHA1(4422c6475596c3881c11b6a6266811c336d55d19) )
+ROM_END
+
+
+ROM_START( pc2086 )
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )
+	ROM_LOAD(        "40186.ic171", 0xc0000, 0x8000, CRC(959f00ba) SHA1(5df1efe4203cd076292a7713bd7ebd1196dca577) )
+	ROM_LOAD16_BYTE( "40179.ic129", 0xfc000, 0x2000, CRC(003605e4) SHA1(b882e97ee81b9ba0e7d969c63da3f2052f23b4b9) )
+	ROM_LOAD16_BYTE( "40180.ic132", 0xfc001, 0x2000, CRC(28ee5e58) SHA1(93e045609466fcec74e2bb72578bb7405281cf7b) )
+
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x800, "keyboard", 0 ) // PC2086 / PC3086 102-key keyboard
+	ROM_LOAD( "40178.ic801", 0x000, 0x800, CRC(f72f1c2e) SHA1(34897e78b3d10f96b36d81778e97c4a9a1b8618b) )
+ROM_END
+
+
+ROM_START( pc3086 )
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "c000.bin", 0xc0000, 0x8000, CRC(5a6c38e9) SHA1(382d2028e0dc5515a68843829563ce29018edb08) )
+	ROM_LOAD( "c800.bin", 0xc8000, 0x2000, CRC(3329c6d5) SHA1(982e852278185d69acde47a4f3942bc09ed76777) )
+	ROM_LOAD( "fc00.bin", 0xfc000, 0x4000, CRC(b5630753) SHA1(98c344831cc4dc59ebb39bbb1961964a8d39fe20) )
+	
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x800, "keyboard", 0 ) // PC2086 / PC3086 102-key keyboard
+	ROM_LOAD( "40178.ic801", 0x000, 0x800, CRC(f72f1c2e) SHA1(34897e78b3d10f96b36d81778e97c4a9a1b8618b) )
 ROM_END
 
 
@@ -2604,15 +2630,17 @@ COMP(  1987,	t1000tx,    ibm5150,	0,	t1000_286,  tandy1t,	t1000hx,    "Tandy Rad
 COMP(  1989,	t1000rl,    ibm5150,	0,	t1000_16,   tandy1t,    t1000hx,    "Tandy Radio Shack",  "Tandy 1000 RL", 0)
 
 // xt class (pc but 8086)
-COMP(  1988,	pc200,      ibm5150,	0,	pc200,		pc200,	pc200,	"Sinclair Research Ltd",  "PC200 Professional Series", GAME_NOT_WORKING)
-COMP(  1988,	pc20,       ibm5150,	0,	pc200,		pc200,	pc200,	"Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
-COMP(  1987,	ppc512,     ibm5150,	0,	ppc512,		pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
-COMP(  1987,	ppc640,     ibm5150,	0,	ppc640,		pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
 COMP(  1986,	pc1512,     ibm5150,	0,	pc1512,     pc1512,	pc1512,	"Amstrad plc",  "Amstrad PC1512 (version 1)", GAME_NOT_WORKING)
 COMP(  1987,	pc1512v2,   ibm5150,	0,	pc1512,     pc1512,	pc1512,	"Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
 COMP(  1989,	pc1512v32,  ibm5150,	0,	pc1512,     pc1512,	pc1512,	"Amstrad plc",  "Amstrad PC1512 (version 3.2)", GAME_NOT_WORKING)
 COMP(  1987,	pc1640,     ibm5150,	0,	pc1640,     pc1640,	pc1640,	"Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
-// pc2086 pc1512 with vga??
+COMP(  1987,	ppc512,     ibm5150,	0,	ppc512,		pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
+COMP(  1987,	ppc640,     ibm5150,	0,	ppc640,		pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
+COMP(  1988,	pc20,       ibm5150,	0,	pc200,		pc200,	pc200,	"Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
+COMP(  1988,	pc200,      ibm5150,	0,	pc200,		pc200,	pc200,	"Sinclair Research Ltd",  "PC200 Professional Series", GAME_NOT_WORKING)
+COMP(  1988,	pc2086,     ibm5150,	0,	pc1640,     pc1640,	pc1640,	"Amstrad plc",  "Amstrad PC2086", GAME_NOT_WORKING )
+COMP(  1990,	pc3086,     ibm5150,	0,	pc1640,     pc1640,	pc1640,	"Amstrad plc",  "Amstrad PC3086", GAME_NOT_WORKING )
+
 COMP ( 1989,	iskr1031,   ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-1031" , GAME_NOT_WORKING)
 COMP ( 1989,	iskr1030m,  ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-1030M" , GAME_NOT_WORKING)
 COMP ( 1987,	ec1840,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1840" , GAME_NOT_WORKING)
