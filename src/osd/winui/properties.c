@@ -1706,39 +1706,41 @@ static void SetPropEnabledControls(HWND hWnd)
 	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PINTEXT),	hlsl_on);
 	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PINDISP),	hlsl_on);
 	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PIN),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_XFOCUS),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_YFOCUS),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_XFOCUSDISP),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_YFOCUSDISP),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_FOCUSTEXT),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RSCALE),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GSCALE),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BSCALE),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RSCALEDISP),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GSCALEDISP),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BSCALEDISP),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_SCALETEXT),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RPOWER),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GPOWER),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BPOWER),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RPOWERDISP),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GPOWERDISP),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BPOWERDISP),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_POWERTEXT),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RPLIFE),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GPLIFE),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BPLIFE),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RPLIFEDISP),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GPLIFEDISP),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BPLIFEDISP),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PLIFETEXT),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RFLOOR),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GFLOOR),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BFLOOR),		hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RFLOORDISP),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GFLOORDISP),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BFLOORDISP),	hlsl_on);
-	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_FLOORTEXT),	hlsl_on);
+// The following are no longer supported on per-game basis, so now disabled.
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_XFOCUS),		0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_YFOCUS),		0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_XFOCUSDISP),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_YFOCUSDISP),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_FOCUSTEXT),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RSCALE),		0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GSCALE),		0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BSCALE),		0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RSCALEDISP),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GSCALEDISP),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BSCALEDISP),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_SCALETEXT),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RPOWER),		0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GPOWER),		0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BPOWER),		0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RPOWERDISP),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GPOWERDISP),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BPOWERDISP),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_POWERTEXT),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RPLIFE),		0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GPLIFE),		0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BPLIFE),		0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RPLIFEDISP),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GPLIFEDISP),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BPLIFEDISP),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PLIFETEXT),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RFLOOR),		0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GFLOOR),		0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BFLOOR),		0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_RFLOORDISP),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_GFLOORDISP),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_BFLOORDISP),	0);
+	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_FLOORTEXT),	0);
+
 
 	/* Joystick options */
 	joystick_attached = DIJoystick.Available();
@@ -2433,6 +2435,7 @@ static void BuildDataMap(void)
 	datamap_add(properties_datamap, IDC_HLSL_SHADOWDISP,			DM_FLOAT,	WINOPTION_SHADOW_MASK_ALPHA);
 	datamap_add(properties_datamap, IDC_HLSL_PIN,				DM_FLOAT,	WINOPTION_PINCUSHION);
 	datamap_add(properties_datamap, IDC_HLSL_PINDISP,			DM_FLOAT,	WINOPTION_PINCUSHION);
+#if 0
 	datamap_add(properties_datamap, IDC_HLSL_XFOCUS,			DM_FLOAT,	WINOPTION_DEFOCUS_X);
 	datamap_add(properties_datamap, IDC_HLSL_YFOCUS,			DM_FLOAT,	WINOPTION_DEFOCUS_Y);
 	datamap_add(properties_datamap, IDC_HLSL_XFOCUSDISP,			DM_FLOAT,	WINOPTION_DEFOCUS_X);
@@ -2461,6 +2464,7 @@ static void BuildDataMap(void)
 	datamap_add(properties_datamap, IDC_HLSL_RFLOORDISP,			DM_FLOAT,	WINOPTION_RED_FLOOR);
 	datamap_add(properties_datamap, IDC_HLSL_GFLOORDISP,			DM_FLOAT,	WINOPTION_GREEN_FLOOR);
 	datamap_add(properties_datamap, IDC_HLSL_BFLOORDISP,			DM_FLOAT,	WINOPTION_BLUE_FLOOR);
+#endif
 
 	// set up callbacks
 	datamap_set_callback(properties_datamap, IDC_ROTATE,		DCT_READ_CONTROL,		RotateReadControl);
@@ -2502,6 +2506,7 @@ static void BuildDataMap(void)
 	datamap_set_float_format(properties_datamap, IDC_HLSL_SATDISP,		"%03.2f");
 	datamap_set_float_format(properties_datamap, IDC_HLSL_SHADOWDISP,	"%03.2f");
 	datamap_set_float_format(properties_datamap, IDC_HLSL_PINDISP,		"%03.2f");
+#if 0
 	datamap_set_float_format(properties_datamap, IDC_HLSL_RFLOORDISP,	"%03.2f");
 	datamap_set_float_format(properties_datamap, IDC_HLSL_GFLOORDISP,	"%03.2f");
 	datamap_set_float_format(properties_datamap, IDC_HLSL_BFLOORDISP,	"%03.2f");
@@ -2516,6 +2521,7 @@ static void BuildDataMap(void)
 	datamap_set_float_format(properties_datamap, IDC_HLSL_RPLIFEDISP,	"%03.2f");
 	datamap_set_float_format(properties_datamap, IDC_HLSL_GPLIFEDISP,	"%03.2f");
 	datamap_set_float_format(properties_datamap, IDC_HLSL_BPLIFEDISP,	"%03.2f");
+#endif
 
 	// trackbar ranges - slider-name,start,end,step
 	datamap_set_trackbar_range(properties_datamap, IDC_JDZ,         0.00, 1.00,  (float)0.05);
@@ -2539,6 +2545,7 @@ static void BuildDataMap(void)
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_SAT, 0.00,  4.00, (float)0.05);
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_SHADOW, 0.00,  1.00, (float)0.05);
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_PIN, 0.00,  1.00, (float)0.01);
+#if 0
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_RFLOOR, 0.00,  1.00, (float)0.01);
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_GFLOOR, 0.00,  1.00, (float)0.01);
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_BFLOOR, 0.00,  1.00, (float)0.01);
@@ -2553,6 +2560,7 @@ static void BuildDataMap(void)
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_RPLIFE, 0.00,  1.00, (float)0.01);
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_GPLIFE, 0.00,  1.00, (float)0.01);
 	datamap_set_trackbar_range(properties_datamap, IDC_HLSL_BPLIFE, 0.00,  1.00, (float)0.01);
+#endif
 
 	MessBuildDataMap(properties_datamap);
 }
