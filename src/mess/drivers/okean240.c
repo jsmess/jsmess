@@ -134,32 +134,33 @@ VIDEO_START_MEMBER( okean240_state )
 {
 }
 
-// The video appears to be bitmapped, the below is just something to get us started
+// need to add colour
 SCREEN_UPDATE( okean240 )
 {
 	okean240_state *state = screen->machine().driver_data<okean240_state>();
-	UINT8 gfx;
-	UINT16 ma=0,x,y;
+	UINT8 gfx,a;
+	UINT16 x,y;
 
 	for (y = 0; y < 256; y++)
 	{
 		UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
 
-		for (x = ma; x < ma+64; x++)
+		for (x = 0; x < 0x4000; x+=0x200)
 		{
-			gfx = state->m_p_videoram[x];
+			gfx = state->m_p_videoram[x|y];
+			a = state->m_p_videoram[x|0x100|y];
+			gfx |= a;
 
 			/* Display a scanline of a character */
-			*p++ = BIT(gfx, 7);
-			*p++ = BIT(gfx, 6);
-			*p++ = BIT(gfx, 5);
-			*p++ = BIT(gfx, 4);
-			*p++ = BIT(gfx, 3);
-			*p++ = BIT(gfx, 2);
-			*p++ = BIT(gfx, 1);
 			*p++ = BIT(gfx, 0);
+			*p++ = BIT(gfx, 1);
+			*p++ = BIT(gfx, 2);
+			*p++ = BIT(gfx, 3);
+			*p++ = BIT(gfx, 4);
+			*p++ = BIT(gfx, 5);
+			*p++ = BIT(gfx, 6);
+			*p++ = BIT(gfx, 7);
 		}
-		ma+=64;
 	}
 	return 0;
 }
@@ -197,8 +198,8 @@ static MACHINE_CONFIG_START( okean240, okean240_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
 	MCFG_GFXDECODE(okean240)
 	MCFG_PALETTE_LENGTH(8)
 	//MCFG_PALETTE_INIT(black_and_white)
