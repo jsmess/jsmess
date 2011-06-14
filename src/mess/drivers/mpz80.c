@@ -21,11 +21,20 @@
 		- Mult I/O
 		- Wunderbus I/O (8259A PIC, 3x 8250 ACE, uPD1990C RTC)
 	- floppy
-		- DJ/DMA controller (Z80, 1K RAM, 2/4K ROM, TTL floppy control logic)
+		- DJ/DMA controller (Z80, 1K RAM, 2/4K ROM, TTL floppy control logic) for 5.25" floppy drives
+		- DJ2D/B controller for 8" floppy drives
 	- hard disk
+		- HDC/DMA controller (Seagate ST-506/Shugart SA1000)
 		- HDCA controller (Shugart SA4000/Fujitsu M2301B/Winchester M2320B)
-		- HD/DMA controller (Seagate ST-506/Shugart SA1000)
+	- memory
+		- MM65KS (65K RAM, expandable to 1 MB)
 	- AM9512 FPU
+	- models
+		- Decision I Desk Top Model D1 (MPZ80, MM65KS, Wunderbus)
+		- Decision I Desk Top Model D2 (MPZ80, MM65KS, Wunderbus, DJDMA, 2x DSDD 5.25")
+		- Decision I Desk Top Model D2A (MPZ80, MM65KS, Wunderbus, DJDMA, 2x DSDD 5.25", HDCDMA, 5 or 16 MB hard disk?)
+		- Decision I Desk Top Model D3A (MPZ80, MM65KS, Wunderbus, DJDMA, 2x DSDD 5.25", HDCDMA, 5 or 16 MB hard disk?)
+		- Decision I Desk Top Model D3C (MPZ80, MM65KS, Wunderbus, DJDMA, 2x DSDD 5.25", HDCDMA, 5 or 16 MB hard disk?)
 
 */
 
@@ -398,235 +407,6 @@ WRITE8_MEMBER( mpz80_state::disp_col_w )
 
 
 //**************************************************************************
-//  WUNDERBUS I/O
-//**************************************************************************
-
-//-------------------------------------------------
-//  wunderbus_r - 
-//-------------------------------------------------
-
-READ8_MEMBER( mpz80_state::wunderbus_r )
-{
-	UINT8 data = 0;
-
-	if (offset < 7)
-	{
-		switch (m_wb_group)
-		{
-		case 0:
-			switch (offset)
-			{
-			case 0: // DAISY 0 IN (STATUS)
-				/*
-				
-					bit		description
-					
-					0		End of Ribbon
-					1		Paper Out
-					2		Cover Open
-					3		Paper Feed Ready
-					4		Carriage Ready
-					5		Print Wheel Ready
-					6		Check
-					7		Printer Ready
-					
-				*/
-				break;
-				
-			case 1: // Switch/Parallel port flags
-				/*
-				
-					bit		description
-					
-					0		FLAG1
-					1		FLAG2
-					2		10A S6
-					3		10A S5
-					4		10A S4
-					5		10A S3
-					6		10A S2
-					7		10A S1
-					
-				*/
-				
-				data = BITSWAP8(input_port_read(machine(), "10A"),0,1,2,3,4,5,6,7) & 0xfc;
-				break;
-				
-			case 2: // R.T. Clock IN/RESET CLK. Int.
-				/*
-				
-					bit		description
-					
-					0		1990 Data Out
-					1		1990 TP
-					2		
-					3		
-					4		
-					5		
-					6		
-					7		
-					
-				*/
-				
-				data |= m_rtc->data_out_r();
-				data |= m_rtc->tp_r() << 1;
-
-				// reset clock interrupt
-				m_rtc_tp = 0;
-				pic8259_ir7_w(m_pic, m_rtc_tp);
-				break;
-				
-			case 3: // Parallel data IN
-				break;
-				
-			case 4: // 8259 0 register
-			case 5: // 8259 1 register
-				data = pic8259_r(m_pic, offset & 0x01);
-				break;
-				
-			case 6: // not used
-				break;
-			}
-			break;
-			
-		case 1:
-			data = ins8250_r(m_ace1, offset);
-			break;
-			
-		case 2:
-			data = ins8250_r(m_ace2, offset);
-			break;
-			
-		case 3:
-			data = ins8250_r(m_ace3, offset);
-			break;
-		}
-	}
-	
-	return data;
-}
-
-
-//-------------------------------------------------
-//  wunderbus_w - 
-//-------------------------------------------------
-
-WRITE8_MEMBER( mpz80_state::wunderbus_w )
-{
-	if (offset == 7)
-	{
-		m_wb_group = data;
-	}
-	else
-	{
-		switch (m_wb_group)
-		{
-		case 0:
-			switch (offset)
-			{
-			case 0: // DAISY 0 OUT
-				/*
-				
-					bit		description
-					
-					0		Data Bit 9
-					1		Data Bit 10
-					2		Data Bit 11
-					3		Data Bit 12
-					4		Paper Feed Strobe
-					5		Carriage Strobe
-					6		Print Wheel Strobe
-					7		Restore
-					
-				*/
-				break;
-				
-			case 1: // DAISY 1 OUT
-				/*
-				
-					bit		description
-					
-					0		Data Bit 1
-					1		Data Bit 2
-					2		Data Bit 3
-					3		Data Bit 4
-					4		Data Bit 5
-					5		Data Bit 6
-					6		Data Bit 7
-					7		Data Bit 8
-					
-				*/
-				break;
-				
-			case 2: // R.T. Clock OUT
-				/*
-				
-					bit		description
-					
-					0		1990 Data In
-					1		1990 Clk
-					2		1990 C0
-					3		1990 C1
-					4		1990 C2
-					5		1990 STB
-					6		Ribbon Lift
-					7		Select
-					
-				*/
-				
-				m_rtc->data_in_w(BIT(data, 0));
-				m_rtc->clk_w(BIT(data, 0));
-				m_rtc->c0_w(BIT(data, 0));
-				m_rtc->c1_w(BIT(data, 0));
-				m_rtc->c2_w(BIT(data, 0));
-				m_rtc->stb_w(BIT(data, 0));
-				break;
-				
-			case 3: // Par. data OUT
-				break;
-				
-			case 4: // 8259 0 register
-			case 5: // 8259 1 register
-				pic8259_w(m_pic, offset & 0x01, data);
-				break;
-				
-			case 6: // Par. port cntrl.
-				/*
-				
-					bit		description
-					
-					0		POE
-					1		_RST1
-					2		_RST2
-					3		_ATTN1
-					4		_ATTN2
-					5		
-					6		
-					7		
-					
-				*/
-				break;
-			}
-			break;
-			
-		case 1:
-			ins8250_w(m_ace1, offset, data);
-			break;
-			
-		case 2:
-			ins8250_w(m_ace2, offset, data);
-			break;
-			
-		case 3:
-			ins8250_w(m_ace3, offset, data);
-			break;
-		}
-	}
-}
-
-
-
-//**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
@@ -666,56 +446,6 @@ ADDRESS_MAP_END
 //**************************************************************************
 //  INPUT PORTS
 //**************************************************************************
-
-//-------------------------------------------------
-//  INPUT_PORTS( wunderbus )
-//-------------------------------------------------
-
-static INPUT_PORTS_START( wunderbus )
-	PORT_START("7C")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("7C:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x3e, 0x24, "BASE Port Address" ) PORT_DIPLOCATION("7C:2,3,4,5,6")
-	PORT_DIPSETTING(    0x00, "00H" )
-	// ...
-	PORT_DIPSETTING(    0x24, "48H" )
-	// ...
-	PORT_DIPSETTING(    0x3e, "F8H" )
-	PORT_DIPNAME( 0x40, 0x40, "FLAG2 Polarity" ) PORT_DIPLOCATION("7C:7")
-	PORT_DIPSETTING(    0x40, "Negative" )
-	PORT_DIPSETTING(    0x00, "Positive" )
-	PORT_DIPNAME( 0x80, 0x80, "FLAG1 Polarity" ) PORT_DIPLOCATION("7C:8")
-	PORT_DIPSETTING(    0x80, "Negative" )
-	PORT_DIPSETTING(    0x00, "Positive" )
-
-	PORT_START("10A")
-	PORT_DIPNAME( 0x07, 0x00, "Baud Rate" ) PORT_DIPLOCATION("10A:1,2,3")
-	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPSETTING(    0x01, "19200" )
-	PORT_DIPSETTING(    0x02, "9600" )
-	PORT_DIPSETTING(    0x03, "4800" )
-	PORT_DIPSETTING(    0x04, "2400" )
-	PORT_DIPSETTING(    0x05, "1200" )
-	PORT_DIPSETTING(    0x06, "300" )
-	PORT_DIPSETTING(    0x07, "110" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("10A:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) PORT_DIPLOCATION("10A:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("10A:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("10A:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("10A:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
 
 //-------------------------------------------------
 //  INPUT_PORTS( mpz80 )
@@ -779,8 +509,6 @@ static INPUT_PORTS_START( mpz80 )
 	PORT_DIPSETTING(    0x02, "Monitor" )
 	PORT_DIPSETTING(    0x00, "Diagnostic" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
-	PORT_INCLUDE( wunderbus )
 INPUT_PORTS_END
 
 
@@ -788,123 +516,6 @@ INPUT_PORTS_END
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
-
-//-------------------------------------------------
-//	pic8259_interface pic_intf
-//-------------------------------------------------
-
-/*
-
-	bit		description
-	
-	IR0		S-100 V0
-	IR1		S-100 V1
-	IR2		S-100 V2
-	IR3		Serial Device 1
-	IR4		Serial Device 2
-	IR5		Serial Device 3
-	IR6		Daisy PWR line
-	IR7		RT Clock TP line
-
-*/
-
-static struct pic8259_interface pic_intf =
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//	ins8250_interface ace1_intf
-//-------------------------------------------------
-
-static INS8250_INTERRUPT( ace1_interrupt )
-{
-	mpz80_state *driver_state = device->machine().driver_data<mpz80_state>();
-
-	pic8259_ir3_w(driver_state->m_pic, state);
-}
-
-static INS8250_TRANSMIT( ace1_transmit )
-{
-	mpz80_state *state = device->machine().driver_data<mpz80_state>();
-	
-	terminal_write(state->m_terminal, 0, data);
-}
-
-static ins8250_interface ace1_intf =
-{
-	XTAL_18_432MHz/10,
-	ace1_interrupt,
-	ace1_transmit,
-	NULL,
-	NULL
-};
-
-
-//-------------------------------------------------
-//	ins8250_interface ace2_intf
-//-------------------------------------------------
-
-static INS8250_INTERRUPT( ace2_interrupt )
-{
-	mpz80_state *driver_state = device->machine().driver_data<mpz80_state>();
-
-	pic8259_ir4_w(driver_state->m_pic, state);
-}
-
-static ins8250_interface ace2_intf =
-{
-	XTAL_18_432MHz/10,
-	ace2_interrupt,
-	NULL,
-	NULL,
-	NULL
-};
-
-
-//-------------------------------------------------
-//	ins8250_interface ace3_intf
-//-------------------------------------------------
-
-static INS8250_INTERRUPT( ace3_interrupt )
-{
-	mpz80_state *driver_state = device->machine().driver_data<mpz80_state>();
-
-	pic8259_ir5_w(driver_state->m_pic, state);
-}
-
-static ins8250_interface ace3_intf =
-{
-	XTAL_18_432MHz/10,
-	ace3_interrupt,
-	NULL,
-	NULL,
-	NULL
-};
-
-
-//-------------------------------------------------
-//	UPD1990A_INTERFACE( rtc_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( mpz80_state::rtc_tp_w )
-{
-	if (state)
-	{
-		m_rtc_tp = state;
-		pic8259_ir7_w(m_pic, m_rtc_tp);
-	}
-}
-
-static UPD1990A_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(mpz80_state, rtc_tp_w)
-};
-
 
 //-------------------------------------------------
 //  floppy_config super6_floppy_config
@@ -929,13 +540,43 @@ static const floppy_config mpz80_floppy_config =
 
 WRITE8_MEMBER( mpz80_state::terminal_w )
 {
-	ins8250_receive(m_ace1, data);
+//	ins8250_receive(m_ace1, data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
 	DEVCB_DRIVER_MEMBER(mpz80_state, terminal_w)
 };
+
+
+//-------------------------------------------------
+//  S100_INTERFACE( s100_intf )
+//-------------------------------------------------
+
+static S100_INTERFACE( s100_intf )
+{
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static SLOT_INTERFACE_START( mpz80_s100_cards )
+	SLOT_INTERFACE("wunderbus", S100_WUNDERBUS)
+//	SLOT_INTERFACE("multio", S100_MULTIO)
+//	SLOT_INTERFACE("mm65ks", S100_MM65KS)
+//	SLOT_INTERFACE("djdma", S100_DJDMA)
+//	SLOT_INTERFACE("dj2db", S100_DJ2DB)
+//	SLOT_INTERFACE("hdcdma", S100_HDCDMA)
+//	SLOT_INTERFACE("hdca", S100_HDCA)
+SLOT_INTERFACE_END
+
 
 
 //**************************************************************************
@@ -979,12 +620,24 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 	// video hardware
 	MCFG_FRAGMENT_ADD( generic_terminal )
 
+	// S-100
+	MCFG_S100_BUS_ADD(S100_TAG, Z80_TAG, s100_intf)
+	MCFG_S100_SLOT_ADD(S100_TAG,  1,  "s100_1", mpz80_s100_cards, NULL)//"mm65ks")
+	MCFG_S100_SLOT_ADD(S100_TAG,  2,  "s100_2", mpz80_s100_cards, "wunderbus")
+	MCFG_S100_SLOT_ADD(S100_TAG,  3,  "s100_3", mpz80_s100_cards, NULL)//"djdma")
+	MCFG_S100_SLOT_ADD(S100_TAG,  4,  "s100_4", mpz80_s100_cards, NULL)//"hdcdma")
+	MCFG_S100_SLOT_ADD(S100_TAG,  5,  "s100_5", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD(S100_TAG,  6,  "s100_6", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD(S100_TAG,  7,  "s100_7", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD(S100_TAG,  8,  "s100_8", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD(S100_TAG,  9,  "s100_9", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD(S100_TAG, 10, "s100_10", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD(S100_TAG, 11, "s100_11", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD(S100_TAG, 12, "s100_12", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD(S100_TAG, 13, "s100_13", mpz80_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD(S100_TAG, 14, "s100_14", mpz80_s100_cards, NULL)
+	
 	// devices
-	MCFG_PIC8259_ADD(I8259A_TAG, pic_intf)
-	MCFG_INS8250_ADD(INS8250_1_TAG, ace1_intf)
-	MCFG_INS8250_ADD(INS8250_2_TAG, ace2_intf)
-	MCFG_INS8250_ADD(INS8250_3_TAG, ace3_intf)
-	MCFG_UPD1990A_ADD(UPD1990C_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, mpz80_floppy_config)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 

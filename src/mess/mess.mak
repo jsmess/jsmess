@@ -342,6 +342,7 @@ DRVLIBS += \
 	$(MESSOBJ)/mit.a \
 	$(MESSOBJ)/mits.a \
 	$(MESSOBJ)/mitsubishi.a \
+	$(MESSOBJ)/morrow.a \
 	$(MESSOBJ)/mos.a \
 	$(MESSOBJ)/motorola.a \
 	$(MESSOBJ)/multitch.a \
@@ -527,6 +528,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/mpc105.o	\
 	$(MESS_MACHINE)/mos6530.o	\
 	$(MESS_MACHINE)/msm8251.o	\
+	$(MESS_MACHINE)/s100.o		\
 	$(MESS_MACHINE)/serial.o	\
 	$(MESS_MACHINE)/upd765.o	\
 	$(MESS_MACHINE)/ncr5380.o	\
@@ -1114,7 +1116,11 @@ $(MESSOBJ)/mits.a:				\
 
 $(MESSOBJ)/mitsubishi.a:		\
 	$(MESS_DRIVERS)/multi8.o	\
-	$(MESS_DRIVERS)/multi16.o       \
+	$(MESS_DRIVERS)/multi16.o	\
+
+$(MESSOBJ)/morrow.a:			\
+	$(MESS_DRIVERS)/mpz80.o		\
+	$(MESS_MACHINE)/s100_wunderbus.o	\
 
 $(MESSOBJ)/mos.a:				\
 	$(MESS_DRIVERS)/kim1.o		\
@@ -1695,7 +1701,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/mk14.o		\
 	$(MESS_DRIVERS)/mmd1.o		\
 	$(MESS_DRIVERS)/mod8.o		\
-	$(MESS_DRIVERS)/mpz80.o		\
 	$(MESS_DRIVERS)/mycom.o		\
 	$(MESS_DRIVERS)/okean240.o	\
 	$(MESS_DRIVERS)/p8k.o		\
