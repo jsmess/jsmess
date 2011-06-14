@@ -1706,7 +1706,7 @@ static void SetPropEnabledControls(HWND hWnd)
 	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PINTEXT),	hlsl_on);
 	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PINDISP),	hlsl_on);
 	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_PIN),		hlsl_on);
-// The following are no longer supported on per-game basis, so now disabled.
+// The following use multiple parameters per line, which cannot currently be supported.
 	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_XFOCUS),		0);
 	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_YFOCUS),		0);
 	EnableWindow(GetDlgItem(hWnd, IDC_HLSL_XFOCUSDISP),	0);
