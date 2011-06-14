@@ -1753,7 +1753,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	/* VDP1 */
 	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
 	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
-	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE(saturn_vdp1_regs_r, saturn_vdp1_regs_w)
+	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE16(saturn_vdp1_regs_r, saturn_vdp1_regs_w,0xffffffff)
 	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(saturn_vdp2_regs_r, saturn_vdp2_regs_w)
@@ -1781,7 +1781,7 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	/* VDP1 */
 	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
 	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
-	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE(saturn_vdp1_regs_r, saturn_vdp1_regs_w)
+	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE16(saturn_vdp1_regs_r, saturn_vdp1_regs_w,0xffffffff)
 	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(saturn_vdp2_regs_r, saturn_vdp2_regs_w)
@@ -2570,15 +2570,14 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	if(scanline == 0*y_step)
 	{
 		device_set_input_line_and_vector(state->m_maincpu, 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41);
-		//CEF_0; //TODO
 	}
 	else if(scanline == vblank_line*y_step)
 	{
 		device_set_input_line_and_vector(state->m_maincpu, 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40);
 		video_update_vdp1(timer.machine());
+
 		if(stv_irq.vdp1_end)
 			device_set_input_line_and_vector(state->m_maincpu, 0x2, HOLD_LINE, 0x4d);
-		CEF_1;
 	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
 		device_set_input_line_and_vector(state->m_maincpu, 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42);
