@@ -570,7 +570,7 @@ static I8255_INTERFACE( ppi_intf )
 
 static FLOPPY_OPTIONS_START( m5 )
 	FLOPPY_OPTION( m5, "dsk", "Sord M5 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
+		HEADS([2])
 		TRACKS([40])
 		SECTORS([18])
 		SECTOR_LENGTH([256])
@@ -584,7 +584,7 @@ static const floppy_config m5_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_SSDD_40,
+	FLOPPY_STANDARD_5_25_DSDD_40,
 	FLOPPY_OPTIONS_NAME(m5),
 	NULL
 };
@@ -750,7 +750,7 @@ ROM_START( m5 )
 	ROM_CART_LOAD( "cart",   0x2000, 0x5000, ROM_NOMIRROR | ROM_OPTIONAL )
 
 	ROM_REGION( 0x4000, Z80_FD5_TAG, 0 )
-	ROM_LOAD( "sordfd5.rom", 0x0000, 0x4000, BAD_DUMP CRC(aa172b1b) SHA1(007cceb12528ca7f3e381578da88a8fcd5bc3a20) ) // parsed from disassembly
+	ROM_LOAD( "sordfd5.rom", 0x0000, 0x4000, CRC(7263bbc5) SHA1(b729500d3d2b2e807d384d44b76ea5ad23996f4a))
 ROM_END
 
 
@@ -764,7 +764,7 @@ ROM_START( m5p )
 	ROM_CART_LOAD( "cart",   0x2000, 0x5000, ROM_NOMIRROR | ROM_OPTIONAL )
 
 	ROM_REGION( 0x4000, Z80_FD5_TAG, 0 )
-	ROM_LOAD( "sordfd5.rom", 0x0000, 0x4000, BAD_DUMP CRC(aa172b1b) SHA1(007cceb12528ca7f3e381578da88a8fcd5bc3a20) ) // parsed from disassembly
+	ROM_LOAD( "sordfd5.rom", 0x0000, 0x4000, CRC(7263bbc5) SHA1(b729500d3d2b2e807d384d44b76ea5ad23996f4a))
 ROM_END
 
 
