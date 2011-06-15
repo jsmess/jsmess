@@ -32,7 +32,6 @@ public:
 		  m_int_pend(0),
 		  m_pretrap(0),
 		  m_trap(0),
-		  m_trap_ctr(0),
 		  m_trap_reset(0),
 		  m_trap_void(1),
 		  m_trap_halt(1),
@@ -86,9 +85,9 @@ public:
 	UINT8 m_pretrap_addr;
 	UINT8 m_trap_addr;
 	UINT8 m_status;
+	UINT16 m_trap_start;
 	int m_pretrap;
 	int m_trap;
-	int m_trap_ctr;
 	int m_trap_reset;
 	int m_trap_void;
 	int m_trap_halt;

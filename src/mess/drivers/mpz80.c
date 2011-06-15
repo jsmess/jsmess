@@ -10,6 +10,7 @@
 
     TODO:
 
+	- "M0BAD"
 	- trap logic
 		- trap reset
 		- trap stop
@@ -102,6 +103,9 @@ inline void mpz80_state::check_traps()
 		
 		// latch trap address
 		m_pretrap_addr = ((m_addr >> 8) & 0xf0) | (m_pretrap_addr >> 4);
+
+		// set M1 trap region start address
+		m_trap_start = m_addr;
 	}
 }
 
@@ -180,54 +184,42 @@ READ8_MEMBER( mpz80_state::mmu_r )
 		m_pretrap_addr = ((m_addr >> 8) & 0xf0) | (m_pretrap_addr >> 4);
 		m_trap_addr = m_pretrap_addr;
 	}
-	
-	if (!m_trap_void || !m_trap_halt || m_trap)
+
+	if (TASK0 && (offset < 0x1000))
 	{
-		UINT16 rom_addr = (m_trap_reset << 10) | 0x3f0 | m_trap_ctr;
-		data = rom[rom_addr];
-		m_trap_ctr++;
-		
-		if (m_trap_ctr == 15)
-		{
-			m_trap = 0;
-		}
-	}
-	else if (TASK0 && (m_addr < 0x1000))
-	{
-		if (m_addr < 0x400)
+		if (offset < 0x400)
 		{
 			UINT8 *ram = ram_get_ptr(m_ram);
-			data = ram[m_addr & 0x3ff];
+			data = ram[offset & 0x3ff];
 		}
-		else if (m_addr == 0x400)
+		else if (offset == 0x400)
 		{
 			data = trap_addr_r(space, 0);
 		}
-		else if (m_addr == 0x401)
+		else if (offset == 0x401)
 		{
 			data = keyboard_r(space, 0);
 		}
-		else if (m_addr == 0x402)
+		else if (offset == 0x402)
 		{
 			data = switch_r(space, 0);
 		}
-		else if (m_addr == 0x403)
+		else if (offset == 0x403)
 		{
 			data = status_r(space, 0);
 		}
-		else if (m_addr >= 0x600 && m_addr < 0x800)
+		else if (offset >= 0x600 && offset < 0x800)
 		{
 			// TODO this might change the map RAM contents
 		}
-		else if (m_addr < 0xc00)
+		else if (offset < 0xc00)
 		{
-			UINT16 rom_addr = (m_trap_reset << 10) | (m_addr & 0x3ff);
+			UINT16 rom_addr = (m_trap_reset << 10) | (offset & 0x3ff);
 			data = rom[rom_addr];
-			printf("rom %03x\n", rom_addr);
 		}
 		else
 		{
-			logerror("Unmapped LOCAL read at %06x\n", m_addr);
+			logerror("Unmapped LOCAL read at %06x\n", offset);
 		}
 	}
 	else
@@ -247,36 +239,36 @@ WRITE8_MEMBER( mpz80_state::mmu_w )
 {
 	m_addr = get_address(offset);
 
-	if (TASK0 && (m_addr < 0x1000))
+	if (TASK0 && (offset < 0x1000))
 	{
-		if (m_addr < 0x400)
+		if (offset < 0x400)
 		{
 			UINT8 *ram = ram_get_ptr(m_ram);
-			ram[m_addr & 0x3ff] = data;
+			ram[offset & 0x3ff] = data;
 		}
-		else if (m_addr == 0x400)
+		else if (offset == 0x400)
 		{
 			disp_seg_w(space, 0, data);
 		}
-		else if (m_addr == 0x401)
+		else if (offset == 0x401)
 		{
 			disp_col_w(space, 0, data);
 		}
-		else if (m_addr == 0x402)
+		else if (offset == 0x402)
 		{
 			task_w(space, 0, data);
 		}
-		else if (m_addr == 0x403)
+		else if (offset == 0x403)
 		{
 			mask_w(space, 0, data);
 		}
-		else if (m_addr >= 0x600 && m_addr < 0x800)
+		else if (offset >= 0x600 && offset < 0x800)
 		{
-			m_map_ram[m_addr - 0x600] = data;
+			m_map_ram[offset - 0x600] = data;
 		}
 		else
 		{
-			logerror("Unmapped LOCAL write at %06x\n", m_addr);
+			logerror("Unmapped LOCAL write at %06x\n", offset);
 		}
 	}
 	else
@@ -746,8 +738,8 @@ void mpz80_state::machine_start()
 void mpz80_state::machine_reset()
 {
 	m_trap_reset = 0;
-	m_trap_ctr = 0;
 	m_trap = 1;
+	m_trap_start = 0;
 	
 	m_nmi = 1;
 	
@@ -832,8 +824,37 @@ ROM_END
 
 
 //**************************************************************************
+//  DRIVER INITIALIZATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  DRIVER_INIT( abc800c )
+//-------------------------------------------------
+
+DIRECT_UPDATE_HANDLER( mpz80_direct_update_handler )
+{
+	mpz80_state *state = machine.driver_data<mpz80_state>();
+	
+	if (state->m_trap && address >= state->m_trap_start && address <= state->m_trap_start + 0xf)
+	{
+		direct.explicit_configure(state->m_trap_start, state->m_trap_start + 0xf, 0xf, machine.region(Z80_TAG)->base() + ((state->m_trap_reset << 10) | 0x3f0));
+		return ~0;
+	}
+	
+	return address;
+}
+
+static DRIVER_INIT( mpz80 )
+{
+	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
+	program->set_direct_update_handler(direct_update_delegate(FUNC(mpz80_direct_update_handler), &machine));
+}
+
+
+
+//**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1980, mpz80,  0,      0,      mpz80,  mpz80,  0,      "Morrow Designs",	"MPZ80",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1980, mpz80,  0,      0,      mpz80,  mpz80,  mpz80,      "Morrow Designs",	"MPZ80",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )

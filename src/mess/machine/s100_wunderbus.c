@@ -69,6 +69,7 @@ static struct pic8259_interface pic_intf =
 static INS8250_TRANSMIT( ace1_transmit )
 {
 //	terminal_write(m_terminal, 0, data);
+	printf("%c", data);
 }
 
 static ins8250_interface ace1_intf =
@@ -430,7 +431,7 @@ void s100_wunderbus_device::s100_sout_w(offs_t offset, UINT8 data)
 
 	if ((offset & 0x07) == 7)
 	{
-		m_group = data;
+		m_group = data & 0x03;
 	}
 	else
 	{
