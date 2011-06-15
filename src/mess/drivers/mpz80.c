@@ -11,7 +11,15 @@
     TODO:
 
 	- trap logic
-		- reset trap
+		- trap reset
+		- trap stop
+		- trap aux
+		- trap halt
+		- trap int
+		- trap void
+		- in/out trap
+		- read/write trap
+		- exec trap
 	- memory management
 		- task RAM
 		- mapping RAM
@@ -54,6 +62,8 @@ enum
 	FULL_ACCESS
 };
 
+#define TASK0	((m_task & 0x0f) == 0)
+
 #define R10	0x04
 
 
@@ -70,6 +80,67 @@ enum
 
 
 //**************************************************************************
+//  INTERRUPTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  check_traps - 
+//-------------------------------------------------
+
+inline void mpz80_state::check_traps()
+{
+	m_pretrap = !(m_trap_int & m_trap_halt & m_trap_stop & m_trap_aux);
+	
+	if (m_pretrap)
+	{
+		// latch trap condition
+		m_status = m_trap_void;
+		m_status |= m_trap_halt << 2;
+		m_status |= m_trap_int << 3;
+		m_status |= m_trap_stop << 4;
+		m_status |= m_trap_aux << 5;
+		
+		// latch trap address
+		m_pretrap_addr = ((m_addr >> 8) & 0xf0) | (m_pretrap_addr >> 4);
+	}
+}
+
+
+//-------------------------------------------------
+//  check_interrupt - 
+//-------------------------------------------------
+
+inline void mpz80_state::check_interrupt()
+{
+	int tint_enbl = (m_mask & MASK_TINT_ENBL) ? 1 : 0;
+	int sint_enbl = (m_mask & MASK_SINT_ENBL) ? 0 : 1;
+
+	m_int_pend = !(m_nmi & m_pint);
+	m_trap_int = !(m_int_pend & tint_enbl);
+	
+	int z80irq = CLEAR_LINE;
+	int z80nmi = CLEAR_LINE;
+	
+	if (TASK0)
+	{
+		if (!m_pint && !sint_enbl) z80irq = ASSERT_LINE;
+		if (!m_nmi && !sint_enbl) z80nmi = ASSERT_LINE;
+	}
+	else
+	{
+		if (!m_pint && !tint_enbl) z80irq = ASSERT_LINE;
+		if (!m_nmi && !tint_enbl) z80nmi = ASSERT_LINE;
+	}
+	
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, z80irq);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, z80nmi);
+	
+	check_traps();
+}
+
+
+
+//**************************************************************************
 //  MEMORY MANAGEMENT
 //**************************************************************************
 
@@ -77,7 +148,7 @@ enum
 //  get_address - 
 //-------------------------------------------------
 
-inline UINT32 mpz80_state::get_address(UINT16 offset)
+inline offs_t mpz80_state::get_address(offs_t offset)
 {
 	UINT16 map_addr = ((m_task & 0x0f) << 5) | (offset >> 11);
 	UINT8 map = m_map_ram[map_addr];
@@ -96,49 +167,72 @@ inline UINT32 mpz80_state::get_address(UINT16 offset)
 
 READ8_MEMBER( mpz80_state::mmu_r )
 {
-	UINT32 addr = get_address(offset);
+	m_addr = get_address(offset);
+	UINT8 *rom = machine().region(Z80_TAG)->base();
 	UINT8 data = 0;
-		
-	if (((m_task & 0x0f) == 0) && (addr < 0x1000))
+	
+	if (m_pretrap)
 	{
-		if (addr < 0x400)
+		m_pretrap = 0;
+		m_trap = 1;
+		
+		// latch trap address
+		m_pretrap_addr = ((m_addr >> 8) & 0xf0) | (m_pretrap_addr >> 4);
+		m_trap_addr = m_pretrap_addr;
+	}
+	
+	if (!m_trap_void || !m_trap_halt || m_trap)
+	{
+		UINT16 rom_addr = (m_trap_reset << 10) | 0x3f0 | m_trap_ctr;
+		data = rom[rom_addr];
+		m_trap_ctr++;
+		
+		if (m_trap_ctr == 15)
+		{
+			m_trap = 0;
+		}
+	}
+	else if (TASK0 && (m_addr < 0x1000))
+	{
+		if (m_addr < 0x400)
 		{
 			UINT8 *ram = ram_get_ptr(m_ram);
-			data = ram[addr & 0x3ff];
+			data = ram[m_addr & 0x3ff];
 		}
-		else if (addr == 0x400)
+		else if (m_addr == 0x400)
 		{
 			data = trap_addr_r(space, 0);
 		}
-		else if (addr == 0x401)
+		else if (m_addr == 0x401)
 		{
 			data = keyboard_r(space, 0);
 		}
-		else if (addr == 0x402)
+		else if (m_addr == 0x402)
 		{
 			data = switch_r(space, 0);
 		}
-		else if (addr == 0x403)
+		else if (m_addr == 0x403)
 		{
 			data = status_r(space, 0);
 		}
-		else if (addr >= 0x600 && addr < 0x800)
+		else if (m_addr >= 0x600 && m_addr < 0x800)
 		{
 			// TODO this might change the map RAM contents
 		}
-		else if (addr < 0xc00)
+		else if (m_addr < 0xc00)
 		{
-			UINT8 *rom = machine().region(Z80_TAG)->base();
-			data = rom[addr & 0x7ff];
+			UINT16 rom_addr = (m_trap_reset << 10) | (m_addr & 0x3ff);
+			data = rom[rom_addr];
+			printf("rom %03x\n", rom_addr);
 		}
 		else
 		{
-			logerror("Unmapped LOCAL read at %06x\n", addr);
+			logerror("Unmapped LOCAL read at %06x\n", m_addr);
 		}
 	}
 	else
 	{
-		data = m_s100->smemr_r(space, offset);
+		data = m_s100->smemr_r(space, m_addr);
 	}
 	
 	return data;
@@ -151,44 +245,60 @@ READ8_MEMBER( mpz80_state::mmu_r )
 
 WRITE8_MEMBER( mpz80_state::mmu_w )
 {
-	UINT32 addr = get_address(offset);
+	m_addr = get_address(offset);
 
-	if (((m_task & 0x0f) == 0) && (addr < 0x1000))
+	if (TASK0 && (m_addr < 0x1000))
 	{
-		if (addr < 0x400)
+		if (m_addr < 0x400)
 		{
 			UINT8 *ram = ram_get_ptr(m_ram);
-			ram[addr & 0x3ff] = data;
+			ram[m_addr & 0x3ff] = data;
 		}
-		else if (addr == 0x400)
+		else if (m_addr == 0x400)
 		{
 			disp_seg_w(space, 0, data);
 		}
-		else if (addr == 0x401)
+		else if (m_addr == 0x401)
 		{
 			disp_col_w(space, 0, data);
 		}
-		else if (addr == 0x402)
+		else if (m_addr == 0x402)
 		{
 			task_w(space, 0, data);
 		}
-		else if (addr == 0x403)
+		else if (m_addr == 0x403)
 		{
 			mask_w(space, 0, data);
 		}
-		else if (addr >= 0x600 && addr < 0x800)
+		else if (m_addr >= 0x600 && m_addr < 0x800)
 		{
-			m_map_ram[addr - 0x600] = data;
+			m_map_ram[m_addr - 0x600] = data;
 		}
 		else
 		{
-			logerror("Unmapped LOCAL write at %06x\n", addr);
+			logerror("Unmapped LOCAL write at %06x\n", m_addr);
 		}
 	}
 	else
 	{
-		m_s100->mwrt_w(space, offset, data);
+		m_s100->mwrt_w(space, m_addr, data);
 	}
+}
+
+
+//-------------------------------------------------
+//  get_io_address - 
+//-------------------------------------------------
+
+inline offs_t mpz80_state::get_io_address(offs_t offset)
+{
+	if (m_mask & MASK_ZIO_MODE)
+	{
+		// echo port address onto upper address lines (8080 emulation)
+		offset = ((offset << 8) & 0xff00) | (offset & 0xff);
+	}
+	
+	return offset;
 }
 
 
@@ -198,13 +308,7 @@ WRITE8_MEMBER( mpz80_state::mmu_w )
 
 READ8_MEMBER( mpz80_state::mmu_io_r )
 {
-	if (m_mask & MASK_ZIO_MODE)
-	{
-		// echo port address onto upper address lines (8080 emulation)
-		offset = ((offset << 8) & 0xff00) | (offset & 0xff);
-	}
-	
-	return m_s100->sinp_r(space, offset);
+	return m_s100->sinp_r(space, get_io_address(offset));
 }
 
 
@@ -214,13 +318,7 @@ READ8_MEMBER( mpz80_state::mmu_io_r )
 
 WRITE8_MEMBER( mpz80_state::mmu_io_w )
 {
-	if (m_mask & MASK_ZIO_MODE)
-	{
-		// echo port address onto upper address lines (8080 emulation)
-		offset = ((offset << 8) & 0xff00) | (offset & 0xff);
-	}
-	
-	m_s100->sout_w(space, offset, data);
+	m_s100->sout_w(space, get_io_address(offset), data);
 }
 
 
@@ -245,7 +343,7 @@ READ8_MEMBER( mpz80_state::trap_addr_r )
 		
 	*/
 
-	return 0;
+	return m_trap_addr;
 }
 
 
@@ -270,7 +368,7 @@ READ8_MEMBER( mpz80_state::status_r )
 		
 	*/
 
-	return 0;
+	return m_status;
 }
 
 
@@ -296,6 +394,9 @@ WRITE8_MEMBER( mpz80_state::task_w )
 	*/
 	
 	m_task = data;
+	
+	m_trap_reset = 1;
+	check_traps();
 }
 
 
@@ -377,7 +478,13 @@ READ8_MEMBER( mpz80_state::switch_r )
 
 	UINT8 data = 0;
 	
-	// switches
+	// trap reset
+	data |= m_trap_reset;
+	
+	// interrupt pending
+	data |= m_int_pend << 1;
+	
+	// boot address
 	data |= input_port_read(machine(), "16C") & 0xfc;
 	
 	return data;
@@ -576,9 +683,25 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 //  S100_INTERFACE( s100_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( mpz80_state::s100_pint_w )
+{
+	m_pint = (state == ASSERT_LINE) ? 0 : 1;
+	
+	check_interrupt();
+}
+
+WRITE_LINE_MEMBER( mpz80_state::s100_nmi_w )
+{
+	if (state == ASSERT_LINE)
+	{
+		m_nmi = 0;
+	}
+	
+	check_interrupt();
+}
 static S100_INTERFACE( s100_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_DRIVER_LINE_MEMBER(mpz80_state, s100_pint_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -622,6 +745,13 @@ void mpz80_state::machine_start()
 
 void mpz80_state::machine_reset()
 {
+	m_trap_reset = 0;
+	m_trap_ctr = 0;
+	m_trap = 1;
+	
+	m_nmi = 1;
+	
+	check_interrupt();
 }
 
 
