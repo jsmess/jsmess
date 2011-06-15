@@ -1672,6 +1672,12 @@ static const pc_lpt_interface ip22_lpt_config =
 	DEVCB_NULL /* no idea if the lpt irq is connected and where */
 };
 
+struct cdrom_interface ip22_cdrom =
+{
+	NULL,
+	NULL
+};
+
 static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_CPU_ADD( "maincpu", R5000BE, 50000000*3 )
 	MCFG_CPU_CONFIG( config )
@@ -1710,7 +1716,7 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom",ip22_cdrom )
 	MCFG_HARDDISK_ADD( "harddisk1" )
 MACHINE_CONFIG_END
 

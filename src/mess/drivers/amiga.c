@@ -421,6 +421,11 @@ static MACHINE_CONFIG_DERIVED( a500n, ntsc )
 	MCFG_FRAGMENT_ADD(amiga_cartslot)
 MACHINE_CONFIG_END
 
+struct cdrom_interface cdtv_cdrom =
+{
+	"cdrom",
+	NULL
+};
 
 static MACHINE_CONFIG_DERIVED( cdtv, ntsc )
 	MCFG_CPU_REPLACE("maincpu", M68000, CDTV_CLOCK_X1 / 4)
@@ -445,8 +450,7 @@ static MACHINE_CONFIG_DERIVED( cdtv, ntsc )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 
 	/* cdrom */
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("cdrom")
+	MCFG_CDROM_ADD( "cdrom", cdtv_cdrom)
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "cdtv")
 
 	MCFG_TPI6525_ADD("tpi6525", cdtv_tpi_intf)

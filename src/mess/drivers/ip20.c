@@ -594,6 +594,12 @@ static const mips3_config config =
 	32768	/* data cache size */
 };
 
+struct cdrom_interface ip20_cdrom =
+{
+	NULL,
+	NULL
+};
+
 static MACHINE_CONFIG_START( ip204415, ip20_state )
 	MCFG_CPU_ADD( "maincpu", R4600BE, 50000000*3 )
 	MCFG_CPU_CONFIG( config )
@@ -621,7 +627,7 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 
 	MCFG_SCC8530_ADD("scc", 7000000)
 
-	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom",ip20_cdrom )
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C56)
 MACHINE_CONFIG_END

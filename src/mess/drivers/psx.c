@@ -757,6 +757,12 @@ static void spu_irq(device_t *device, UINT32 data)
 	}
 }
 
+struct cdrom_interface psx_cdrom =
+{
+	NULL,
+	NULL
+};
+
 static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
@@ -789,7 +795,7 @@ static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
 
-	MCFG_CDROM_ADD("cdrom")
+	MCFG_CDROM_ADD("cdrom",psx_cdrom)
 
 	MCFG_PSXCD_ADD("cdrom")
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( cd_dma_read ), (psxcd_device *) device ) )
@@ -830,7 +836,7 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
 
-	MCFG_CDROM_ADD("cdrom")
+	MCFG_CDROM_ADD("cdrom",psx_cdrom)
 
 	MCFG_PSXCD_ADD("cdrom")
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( cd_dma_read ), (psxcd_device *) owner ) )

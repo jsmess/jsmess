@@ -578,7 +578,7 @@ void dreamcast_atapi_reset(running_machine &machine)
 	atapi_xferlen = 0;
 	atapi_xfermod = 0;
 
-	if ( cd_get_cdrom_file(machine.device( "cdrom" )) != NULL )
+	if ( machine.device<cdrom_image_device>("cdrom")->get_cdrom_file() != NULL )
 	{
 		SCSIAllocInstance( machine, &SCSIClassGDROM, &gdrom_device, "cdrom" );
 	}

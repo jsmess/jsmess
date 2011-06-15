@@ -163,10 +163,10 @@ void psxcd_device::device_reset()
 		m_timerinuse[i] = false;
 	}
 
-	m_cddevice = machine().device(m_devname);
+	m_cddevice = machine().device<cdrom_image_device>(m_devname);
 	if (m_cddevice)
 	{
-		m_cd = cd_get_cdrom_file(m_cddevice);
+		m_cd = m_cddevice->get_cdrom_file();
 
 		if (m_cd)
 		{

@@ -226,6 +226,12 @@ static const aica_interface dc_aica_interface =
 
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
+struct cdrom_interface dc_cdrom =
+{
+	NULL,
+	NULL
+};
+
 static MACHINE_CONFIG_START( dc, driver_device )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4, CPU_CLOCK)
@@ -260,7 +266,7 @@ static MACHINE_CONFIG_START( dc, driver_device )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom",dc_cdrom )
 MACHINE_CONFIG_END
 
 ROM_START(dc)

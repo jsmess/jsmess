@@ -157,7 +157,7 @@ private:
 	emu_timer *m_timer;
 	UINT32 m_sysclock;
 	const char *m_devname;
-	device_t *m_cddevice;
+	cdrom_image_device *m_cddevice;
 	cdrom_file	*m_cd;
 	emu_timer *m_timers[MAX_PSXCD_TIMERS];
 	event *m_eventfortimer[MAX_PSXCD_TIMERS];

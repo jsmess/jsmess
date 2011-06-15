@@ -1208,14 +1208,14 @@ static void towns_cd_set_status(running_machine &machine, UINT8 st0, UINT8 st1, 
 static UINT8 towns_cd_get_track(running_machine &machine)
 {
 	towns_state* state = machine.driver_data<towns_state>();
-	device_t* cdrom = state->m_cdrom;
+	cdrom_image_device* cdrom = state->m_cdrom;
 	device_t* cdda = state->m_cdda;
 	UINT32 lba = cdda_get_audio_lba(cdda);
 	UINT8 track;
 
 	for(track=1;track<99;track++)
 	{
-		if(cdrom_get_track_start(cd_get_cdrom_file(cdrom),track) > lba)
+		if(cdrom_get_track_start(cdrom->get_cdrom_file(),track) > lba)
 			break;
 	}
 	return track;
@@ -1264,7 +1264,7 @@ static TIMER_CALLBACK( towns_cdrom_read_byte )
 				state->m_towns_cd.extra_status = 0;
 				towns_cd_set_status(device->machine(),0x22,0x00,0x00,0x00);
 				towns_cdrom_set_irq(device->machine(),TOWNS_CD_IRQ_DMA,1);
-				cdrom_read_data(cd_get_cdrom_file(state->m_cdrom),++state->m_towns_cd.lba_current,state->m_towns_cd.buffer,CD_TRACK_MODE1);
+				cdrom_read_data(state->m_cdrom->get_cdrom_file(),++state->m_towns_cd.lba_current,state->m_towns_cd.buffer,CD_TRACK_MODE1);
 				state->m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
 				state->m_towns_cd.buffer_ptr = -1;
 			}
@@ -1272,7 +1272,7 @@ static TIMER_CALLBACK( towns_cdrom_read_byte )
 	}
 }
 
-static void towns_cdrom_read(device_t* device)
+static void towns_cdrom_read(cdrom_image_device* device)
 {
 	// MODE 1 read
 	// load data into buffer to be sent via DMA1 channel 3
@@ -1294,7 +1294,7 @@ static void towns_cdrom_read(device_t* device)
 	state->m_towns_cd.lba_last = msf_to_lbafm(lba2);
 
 	// first track starts at 00:02:00 - this is hardcoded in the boot procedure
-	track = cdrom_get_track(cd_get_cdrom_file(device),state->m_towns_cd.lba_current);
+	track = cdrom_get_track(device->get_cdrom_file(),state->m_towns_cd.lba_current);
 	if(track < 2)
 	{  // recalculate LBA
 		state->m_towns_cd.lba_current -= 150;
@@ -1314,7 +1314,7 @@ static void towns_cdrom_read(device_t* device)
 	}
 	else
 	{
-		cdrom_read_data(cd_get_cdrom_file(device),state->m_towns_cd.lba_current,state->m_towns_cd.buffer,CD_TRACK_MODE1);
+		cdrom_read_data(device->get_cdrom_file(),state->m_towns_cd.lba_current,state->m_towns_cd.buffer,CD_TRACK_MODE1);
 		state->m_towns_cd.status |= 0x10;  // DMA transfer begin
 		state->m_towns_cd.status &= ~0x20;  // not a software transfer
 //      state->m_towns_cd.buffer_ptr = 0;
@@ -1332,7 +1332,7 @@ static void towns_cdrom_read(device_t* device)
 	}
 }
 
-static void towns_cdrom_play_cdda(device_t* device)
+static void towns_cdrom_play_cdda(cdrom_image_device* device)
 {
 	// PLAY AUDIO
 	// Plays CD-DA audio from the specified MSF
@@ -1352,7 +1352,7 @@ static void towns_cdrom_play_cdda(device_t* device)
 	state->m_towns_cd.cdda_current = msf_to_lbafm(lba1);
 	state->m_towns_cd.cdda_length = msf_to_lbafm(lba2) - state->m_towns_cd.cdda_current;
 
-	cdda_set_cdrom(cdda,cd_get_cdrom_file(device));
+	cdda_set_cdrom(cdda,device->get_cdrom_file());
 	cdda_start_audio(cdda,state->m_towns_cd.cdda_current,state->m_towns_cd.cdda_length);
 	logerror("CD: CD-DA start from LBA:%i length:%i\n",state->m_towns_cd.cdda_current,state->m_towns_cd.cdda_length);
 	if(state->m_towns_cd.command & 0x20)
@@ -1364,14 +1364,14 @@ static void towns_cdrom_play_cdda(device_t* device)
 
 static TIMER_CALLBACK(towns_delay_cdda)
 {
-	towns_cdrom_play_cdda((device_t*)ptr);
+	towns_cdrom_play_cdda((cdrom_image_device*)ptr);
 }
 
-static void towns_cdrom_execute_command(device_t* device)
+static void towns_cdrom_execute_command(cdrom_image_device* device)
 {
 	towns_state* state = device->machine().driver_data<towns_state>();
 
-	if(cd_get_cdrom_file(device) == NULL)
+	if(device->get_cdrom_file() == NULL)
 	{  // No CD in drive
 		if(state->m_towns_cd.command & 0x20)
 		{
@@ -1529,18 +1529,18 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 									break;
 								case 4: // st1 = last track number (BCD)
 									towns_cd_set_status(space.machine(),0x17,
-										byte_to_bcd(cdrom_get_last_track(cd_get_cdrom_file(m_cdrom))),
+										byte_to_bcd(cdrom_get_last_track(m_cdrom->get_cdrom_file())),
 										0x00,0x00);
 									m_towns_cd.extra_status++;
 									break;
 								case 5:  // st1 = control/adr of track 0xaa?
 									towns_cd_set_status(space.machine(),0x16,
-										cdrom_get_adr_control(cd_get_cdrom_file(m_cdrom),0xaa),
+										cdrom_get_adr_control(m_cdrom->get_cdrom_file(),0xaa),
 										0xaa,0x00);
 									m_towns_cd.extra_status++;
 									break;
 								case 6:  // st1/2/3 = address of track 0xaa? (BCD)
-									addr = cdrom_get_track_start(cd_get_cdrom_file(m_cdrom),0xaa);
+									addr = cdrom_get_track_start(m_cdrom->get_cdrom_file(),0xaa);
 									addr = lba_to_msf(addr);
 									towns_cd_set_status(space.machine(),0x17,
 										(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
@@ -1550,18 +1550,18 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 									if(m_towns_cd.extra_status & 0x01)
 									{
 										towns_cd_set_status(space.machine(),0x16,
-											((cdrom_get_adr_control(cd_get_cdrom_file(m_cdrom),(m_towns_cd.extra_status/2)-3) & 0x0f) << 4)
-											| ((cdrom_get_adr_control(cd_get_cdrom_file(m_cdrom),(m_towns_cd.extra_status/2)-3) & 0xf0) >> 4),
+											((cdrom_get_adr_control(m_cdrom->get_cdrom_file(),(m_towns_cd.extra_status/2)-3) & 0x0f) << 4)
+											| ((cdrom_get_adr_control(m_cdrom->get_cdrom_file(),(m_towns_cd.extra_status/2)-3) & 0xf0) >> 4),
 											(m_towns_cd.extra_status/2)-3,0x00);
 										m_towns_cd.extra_status++;
 									}
 									else
 									{
-										addr = cdrom_get_track_start(cd_get_cdrom_file(m_cdrom),(m_towns_cd.extra_status/2)-4);
+										addr = cdrom_get_track_start(m_cdrom->get_cdrom_file(),(m_towns_cd.extra_status/2)-4);
 										addr = lba_to_msf(addr);
 										towns_cd_set_status(space.machine(),0x17,
 											(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
-										if(((m_towns_cd.extra_status/2)-3) >= cdrom_get_last_track(cd_get_cdrom_file(m_cdrom)))
+										if(((m_towns_cd.extra_status/2)-3) >= cdrom_get_last_track(m_cdrom->get_cdrom_file()))
 										{
 											m_towns_cd.extra_status = 0;
 										}
@@ -2306,7 +2306,7 @@ void towns_state::machine_reset()
 	m_pic_slave = machine().device("pic8259_slave");
 	m_pit = machine().device("pit");
 	m_messram = machine().device(RAM_TAG);
-	m_cdrom = machine().device("cdrom");
+	m_cdrom = machine().device<cdrom_image_device>("cdrom");
 	m_cdda = machine().device("cdda");
 	m_speaker = machine().device(SPEAKER_TAG);
 	m_scsi = machine().device<fmscsi_device>("scsi");
@@ -2474,6 +2474,12 @@ static GFXDECODE_START( towns )
 	GFXDECODE_ENTRY( "user",   0x180000, fnt_chars_16x16,  0, 16 )
 GFXDECODE_END
 
+struct cdrom_interface towns_cdrom =
+{
+	NULL,
+	NULL
+};
+
 static MACHINE_CONFIG_FRAGMENT( towns_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I386, 16000000)
@@ -2516,7 +2522,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_MB8877_ADD("fdc",towns_mb8877a_interface)
 	MCFG_FLOPPY_4_DRIVES_ADD(towns_floppy_config)
 
-	MCFG_CDROM_ADD("cdrom")
+	MCFG_CDROM_ADD("cdrom",towns_cdrom)
 
 	MCFG_HARDDISK_ADD("harddisk0")
 	MCFG_HARDDISK_ADD("harddisk1")

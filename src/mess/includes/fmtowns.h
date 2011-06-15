@@ -113,7 +113,7 @@ class towns_state : public driver_device
 	device_t* m_pic_slave;
 	device_t* m_pit;
 	device_t* m_messram;
-	device_t* m_cdrom;
+	cdrom_image_device* m_cdrom;
 	device_t* m_cdda;
 	device_t* m_speaker;
 	class fmscsi_device* m_scsi;

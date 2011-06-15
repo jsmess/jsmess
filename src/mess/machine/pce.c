@@ -1183,7 +1183,7 @@ static void pce_cd_init( running_machine &machine )
 {
 	pce_state *state = machine.driver_data<pce_state>();
 	pce_cd_t &pce_cd = state->m_cd;
-	device_t *device;
+	cdrom_image_device *device;
 
 	/* Initialize pce_cd struct */
 	memset( &pce_cd, 0, sizeof(pce_cd) );
@@ -1217,10 +1217,10 @@ static void pce_cd_init( running_machine &machine )
 
 	pce_cd.subcode_buffer = auto_alloc_array(machine, UINT8, 96 );
 
-	device = machine.device("cdrom");
+	device = machine.device<cdrom_image_device>("cdrom");
 	if ( device )
 	{
-		pce_cd.cd = cd_get_cdrom_file(device);
+		pce_cd.cd = device->get_cdrom_file();
 		if ( pce_cd.cd )
 		{
 			pce_cd.toc = cdrom_get_toc( pce_cd.cd );

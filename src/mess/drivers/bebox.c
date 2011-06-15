@@ -116,6 +116,12 @@ static const floppy_config bebox_floppy_config =
 	NULL
 };
 
+struct cdrom_interface bebox_cdrom =
+{
+	NULL,
+	NULL
+};
+
 static MACHINE_CONFIG_START( bebox, bebox_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("ppc1", PPC603, 66000000)	/* 66 MHz */
@@ -155,7 +161,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_FUJITSU_29F016A_ADD("flash")
 
-	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom",bebox_cdrom )
 	MCFG_HARDDISK_ADD( "harddisk1" )
 
 	MCFG_MPC105_ADD("mpc105","ppc1",0)

@@ -301,9 +301,15 @@ static const c6280_interface c6280_config =
 {
 	"maincpu"
 };
+
+struct cdrom_interface pce_cdrom =
+{
+	"pce_cdrom",
+	NULL
+};
+
 static MACHINE_CONFIG_FRAGMENT( pce_cdslot )
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("pce_cdrom")
+	MCFG_CDROM_ADD("cdrom",pce_cdrom)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","pcecd")
 MACHINE_CONFIG_END

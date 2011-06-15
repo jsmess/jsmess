@@ -137,6 +137,12 @@ static SCREEN_UPDATE( pippin )
     return 0;
 }
 
+struct cdrom_interface pippin_cdrom =
+{
+	NULL,
+	NULL
+};
+
 static MACHINE_CONFIG_START( pippin, pippin_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",PPC603, 66000000)
@@ -165,7 +171,7 @@ static MACHINE_CONFIG_START( pippin, pippin_state )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
-	MCFG_CDROM_ADD("cdrom")
+	MCFG_CDROM_ADD("cdrom",pippin_cdrom)
 MACHINE_CONFIG_END
 
 /* ROM definition */
