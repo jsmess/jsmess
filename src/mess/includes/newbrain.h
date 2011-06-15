@@ -68,8 +68,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_copcpu;
-	required_device<device_t> m_cassette1;
-	required_device<device_t> m_cassette2;
+	required_device<cassette_image_device> m_cassette1;
+	required_device<cassette_image_device> m_cassette2;
 
 	virtual void machine_start();
 	virtual void machine_reset();

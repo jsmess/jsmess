@@ -67,7 +67,7 @@ typedef struct _sgcpu_state
 	device_t *cpu;
 	device_t *soundchip;
 	device_t *video;
-	device_t *cassette;
+	cassette_image_device *cassette;
 	device_t *peribox;
 
 	int keyCol;
@@ -500,7 +500,7 @@ static READ8_DEVICE_HANDLER( sgcpu_R9901_3 )
 	device_t *dev = device->machine().device("sgcpu_board");
 	sgcpu_state *sgcpu = get_safe_token(dev);
 	int answer = 4;	/* on systems without handset, the pin is pulled up to avoid spurious interrupts */
-	if (cassette_input(sgcpu->cassette) > 0)
+	if ((sgcpu->cassette)->input() > 0)
 		answer |= 8;
 	return answer;
 }
@@ -535,7 +535,7 @@ static WRITE8_DEVICE_HANDLER( sgcpu_CS_motor )
 {
 	device_t *dev = device->machine().device("sgcpu_board");
 	sgcpu_state *sgcpu = get_safe_token(dev);
-	cassette_change_state(sgcpu->cassette, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	sgcpu->cassette->change_state(data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
 /*
@@ -559,7 +559,7 @@ static WRITE8_DEVICE_HANDLER( sgcpu_CS_output )
 {
 	device_t *dev = device->machine().device("sgcpu_board");
 	sgcpu_state *sgcpu = get_safe_token(dev);
-	cassette_output(sgcpu->cassette, data ? +1 : -1);
+	sgcpu->cassette->output(data ? +1 : -1);
 }
 
 /* TMS9901 setup. The callback functions pass a reference to the TMS9901 as device. */
@@ -613,7 +613,7 @@ static DEVICE_START( sgcpu )
 	sgcpu->peribox = device->machine().device("peribox");
 	sgcpu->soundchip = device->machine().device("soundgen");
 	sgcpu->video = device->machine().device("video");
-	sgcpu->cassette = device->machine().device(CASSETTE_TAG);
+	sgcpu->cassette = device->machine().device<cassette_image_device>(CASSETTE_TAG);
 
 	assert(sgcpu->cpu && sgcpu->peribox && sgcpu->soundchip && sgcpu->video && sgcpu->cassette);
 

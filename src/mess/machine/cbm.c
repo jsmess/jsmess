@@ -349,10 +349,11 @@ UINT8 cbm_common_cia0_port_b_r( device_t *device, UINT8 output_a )
 
 ***********************************************/
 
-const cassette_config cbm_cassette_config =
+const cassette_interface cbm_cassette_interface =
 {
 	cbm_cassette_formats,
 	NULL,
 	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };

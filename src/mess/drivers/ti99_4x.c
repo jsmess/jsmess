@@ -852,8 +852,8 @@ static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x_state )
 
 	MCFG_PBOX4_ADD( "peribox", console_extint, console_notconnected, console_ready )
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
-	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_interface )
 
 	MCFG_MECMOUSE_ADD( "mecmouse" )
 	MCFG_HANDSET_ADD( "handset", "tms9901" )
@@ -898,8 +898,8 @@ static MACHINE_CONFIG_START( ti99_4_50hz, ti99_4x_state )
 
 	MCFG_PBOX4_ADD( "peribox", console_extint, console_notconnected, console_ready )
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
-	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_interface )
 
 	MCFG_MECMOUSE_ADD( "mecmouse" )
 	MCFG_HANDSET_ADD( "handset", "tms9901" )
@@ -943,8 +943,8 @@ static MACHINE_CONFIG_START( ti99_4a_60hz, ti99_4x_state )
 
 	MCFG_PBOX4A_ADD( "peribox", console_extint, console_notconnected, console_ready )
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
-	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_interface )
 
 	MCFG_MECMOUSE_ADD( "mecmouse" )
 MACHINE_CONFIG_END
@@ -987,8 +987,8 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x_state )
 
 	MCFG_PBOX4A_ADD( "peribox", console_extint, console_notconnected, console_ready )
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
-	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_interface )
 
 	MCFG_MECMOUSE_ADD( "mecmouse" )
 MACHINE_CONFIG_END
@@ -1042,8 +1042,8 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 
 	MCFG_PBOXEV_ADD( "peribox", console_extint, console_notconnected, console_ready )
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
-	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_CASSETTE_ADD( CASSETTE2_TAG, default_cassette_interface )
 MACHINE_CONFIG_END
 
 /*

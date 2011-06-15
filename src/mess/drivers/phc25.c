@@ -68,7 +68,7 @@ READ8_MEMBER( phc25_state::port40_r )
 	data |= !mc6847_fs_r(m_vdg) << 4;
 
 	/* cassette read */
-	data |= (cassette_input(m_cassette) < +0.3) << 5;
+	data |= ((m_cassette)->input() < +0.3) << 5;
 
 	/* centronics busy */
 	data |= centronics_busy_r(m_centronics) << 6;
@@ -97,10 +97,10 @@ WRITE8_MEMBER( phc25_state::port40_w )
     */
 
 	/* cassette output */
-	cassette_output(m_cassette, BIT(data, 0) ? -1.0 : +1.0);
+	m_cassette->output( BIT(data, 0) ? -1.0 : +1.0);
 
 	/* cassette motor */
-	cassette_change_state(m_cassette, BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(BIT(data,1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* centronics strobe */
 	centronics_strobe_w(m_centronics, BIT(data, 3));
@@ -319,11 +319,12 @@ static const ay8910_interface ay8910_intf =
 
 /* Cassette Configuration */
 
-static const cassette_config phc25_cassette_config =
+static const cassette_interface phc25_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -342,7 +343,7 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, phc25_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, phc25_cassette_interface)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */

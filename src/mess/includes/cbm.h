@@ -28,7 +28,7 @@ UINT8 cbm_common_cia0_port_b_r( device_t *device, UINT8 output_a );
 
 ***********************************************/
 
-extern const cassette_config cbm_cassette_config;
+extern const cassette_interface cbm_cassette_interface;
 
 
 #endif /* CBM_H_ */

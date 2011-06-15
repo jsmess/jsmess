@@ -521,9 +521,9 @@ INTERRUPT_GEN( msx_interrupt )
 ** The I/O funtions
 */
 
-static device_t *cassette_device_image(running_machine &machine)
+static cassette_image_device *cassette_device_image(running_machine &machine)
 {
-	return machine.device(CASSETTE_TAG);
+	return machine.device<cassette_image_device>(CASSETTE_TAG);
 }
 
 READ8_HANDLER ( msx_psg_port_a_r )
@@ -531,7 +531,7 @@ READ8_HANDLER ( msx_psg_port_a_r )
 	msx_state *state = space->machine().driver_data<msx_state>();
 	int data, inp;
 
-	data = (cassette_input(cassette_device_image(space->machine())) > 0.0038 ? 0x80 : 0);
+	data = (cassette_device_image(space->machine())->input() > 0.0038 ? 0x80 : 0);
 
 	if ( (state->m_psg_b ^ input_port_read(space->machine(), "DSW") ) & 0x40)
 		{
@@ -786,14 +786,14 @@ static WRITE8_DEVICE_HANDLER ( msx_ppi_port_c_w )
 
 	/* cassette motor on/off */
 	if ( (state->m_port_c_old ^ data) & 0x10)
-		cassette_change_state(cassette_device_image(device->machine()),
+		cassette_device_image(device->machine())->change_state(
 						(data & 0x10) ? CASSETTE_MOTOR_DISABLED :
 										CASSETTE_MOTOR_ENABLED,
 						CASSETTE_MASK_MOTOR);
 
 	/* cassette signal write */
 	if ( (state->m_port_c_old ^ data) & 0x20)
-		cassette_output(cassette_device_image(device->machine()), (data & 0x20) ? -1.0 : 1.0);
+		cassette_device_image(device->machine())->output((data & 0x20) ? -1.0 : 1.0);
 
 	state->m_port_c_old = data;
 }

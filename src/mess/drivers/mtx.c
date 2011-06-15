@@ -299,22 +299,23 @@ static const z80_daisy_config rs128_daisy_chain[] =
 };
 
 /*-------------------------------------------------
-    cassette_config mtx_cassette_config
+    cassette_interface mtx_cassette_interface
 -------------------------------------------------*/
 
 static TIMER_DEVICE_CALLBACK( cassette_tick )
 {
 	mtx_state *state = timer.machine().driver_data<mtx_state>();
-	int data = (cassette_input(state->m_cassette) > +0.0) ? 0 : 1;
+	int data = ((state->m_cassette)->input() > +0.0) ? 0 : 1;
 
 	z80ctc_trg3_w(state->m_z80ctc, data);
 }
 
-static const cassette_config mtx_cassette_config =
+static const cassette_interface mtx_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -354,7 +355,7 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	MCFG_TIMER_ADD_PERIODIC("z80ctc_timer", ctc_tick, attotime::from_hz(XTAL_4MHz/13))
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_SNAPSHOT_ADD("snapshot", mtx, "mtb", 0.5)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, mtx_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, mtx_cassette_interface)
 	MCFG_TIMER_ADD_PERIODIC("cassette_timer", cassette_tick, attotime::from_hz(44100))
 
 	/* internal ram */

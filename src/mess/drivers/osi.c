@@ -591,12 +591,12 @@ INPUT_PORTS_END
 
 READ_LINE_MEMBER( sb2m600_state::cassette_rx )
 {
-	return (cassette_input(m_cassette) > 0.0) ? 1 : 0;
+	return ((m_cassette)->input() > 0.0) ? 1 : 0;
 }
 
 WRITE_LINE_MEMBER( sb2m600_state::cassette_tx )
 {
-	cassette_output(m_cassette, state ? +1.0 : -1.0);
+	m_cassette->output(state ? +1.0 : -1.0);
 }
 
 static ACIA6850_INTERFACE( osi600_acia_intf )
@@ -756,7 +756,7 @@ static MACHINE_CONFIG_START( osi600, sb2m600_state )
 	MCFG_ACIA6850_ADD("acia_0", osi600_acia_intf)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, default_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, default_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -777,7 +777,7 @@ static MACHINE_CONFIG_START( uk101, uk101_state )
 	MCFG_ACIA6850_ADD("acia_0", uk101_acia_intf)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, default_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, default_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -810,7 +810,7 @@ static MACHINE_CONFIG_START( c1p, c1p_state )
 	MCFG_ACIA6850_ADD("acia_0", osi600_acia_intf)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, default_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, default_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

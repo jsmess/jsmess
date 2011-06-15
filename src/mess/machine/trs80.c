@@ -51,7 +51,7 @@ static TIMER_CALLBACK( cassette_data_callback )
 /* This does all baud rates. 250 baud (trs80), and 500 baud (all others) set bit 7 of "cassette_data".
     1500 baud (trs80m3, trs80m4) is interrupt-driven and uses bit 0 of "cassette_data" */
 
-	double new_val = cassette_input(state->m_cass);
+	double new_val = (state->m_cass->input());
 
 	/* Check for HI-LO transition */
 	if ( state->m_old_cassette_val > -0.2 && new_val < -0.2 )
@@ -530,7 +530,7 @@ WRITE8_HANDLER( trs80m4_ec_w )
 
 	state->m_mode = (state->m_mode & 0xde) | ((data & 4) ? 1 : 0) | ((data & 8) ? 0x20 : 0);
 
-	cassette_change_state( state->m_cass, ( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+	state->m_cass->change_state(( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR );
 
 	state->m_port_ec = data & 0x7e;
 }
@@ -644,8 +644,8 @@ WRITE8_HANDLER( trs80_ff_w )
 
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
 
-	cassette_change_state( state->m_cass, ( data & 4 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
-	cassette_output( state->m_cass, levels[data & 3]);
+	state->m_cass->change_state(( data & 4 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR );
+	state->m_cass->output(levels[data & 3]);
 	state->m_cassette_data &= ~0x80;
 
 	state->m_mode = (state->m_mode & 0xfe) | ((data & 8) >> 3);
@@ -662,7 +662,7 @@ WRITE8_HANDLER( trs80m4_ff_w )
     d1, d0 Cassette output */
 
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
-	cassette_output( state->m_cass, levels[data & 3]);
+	state->m_cass->output(levels[data & 3]);
 	state->m_cassette_data &= ~0x80;
 }
 
@@ -913,7 +913,7 @@ MACHINE_START( trs80 )
 	state->m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
 	state->m_printer = machine.device("centronics");
 	state->m_ay31015 = machine.device("tr1602");
-	state->m_cass = machine.device(CASSETTE_TAG);
+	state->m_cass = machine.device<cassette_image_device>(CASSETTE_TAG);
 	state->m_speaker = machine.device(SPEAKER_TAG);
 	state->m_fdc = machine.device("wd179x");
 }

@@ -828,11 +828,12 @@ speed of 3.8 MHz */
  */
 
 
-static const cassette_config amstrad_cassette_config =
+static const cassette_interface amstrad_cassette_interface =
 {
 	cdt_cassette_formats,
 	NULL,
 	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -912,7 +913,7 @@ static MACHINE_CONFIG_START( amstrad, amstrad_state )
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, amstrad_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, amstrad_cassette_interface )
 
 	MCFG_UPD765A_ADD("upd765", amstrad_upd765_interface)
 
@@ -975,7 +976,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, amstrad_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, amstrad_cassette_interface )
 
 	MCFG_UPD765A_ADD("upd765", amstrad_upd765_interface)
 

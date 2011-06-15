@@ -141,11 +141,12 @@ static INPUT_PORTS_START( mikrosha )
 INPUT_PORTS_END
 
 /* Machine driver */
-static const cassette_config mikrosha_cassette_config =
+static const cassette_interface mikrosha_cassette_interface =
 {
 	rkm_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -231,7 +232,7 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 
 	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, mikrosha_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, mikrosha_cassette_interface )
 MACHINE_CONFIG_END
 
 

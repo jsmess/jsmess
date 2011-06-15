@@ -41,7 +41,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7220_device> m_hgdc;
-	required_device<device_t> m_cass;
+	required_device<cassette_image_device> m_cass;
 	required_device<device_t> m_beep;
 	DECLARE_READ8_MEMBER(a5105_memsel_r);
 	DECLARE_READ8_MEMBER(key_r);
@@ -177,13 +177,13 @@ WRITE8_MEMBER( a5105_state::a5105_ab_w )
 	{
 	case 0:
 		if (BIT(data, 0))
-			cassette_change_state(m_cass, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+			m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		else
-			cassette_change_state(m_cass, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+			m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		break;
 
 	case 2:
-		cassette_output(m_cass, BIT(data, 0) ? -1.0 : +1.0);
+		m_cass->output( BIT(data, 0) ? -1.0 : +1.0);
 		break;
 
 	case 4:
@@ -458,7 +458,7 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 
 	/* Devices */
 	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, upd7220_map) //unknown clock
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 MACHINE_CONFIG_END
 
 /* ROM definition */

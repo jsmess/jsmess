@@ -605,11 +605,12 @@ static const z80_daisy_config super80_daisy_chain[] =
 	{ NULL }
 };
 
-static const cassette_config super80_cassette_config =
+static const cassette_interface super80_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -677,7 +678,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", default, 3)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, super80_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, super80_cassette_interface )
 
 	/* cartridge */
 	MCFG_FRAGMENT_ADD(super80_cartslot)
@@ -750,7 +751,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", default, 3)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, super80_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, super80_cassette_interface )
 
 	/* cartridge */
 	MCFG_FRAGMENT_ADD(super80_cartslot)

@@ -1360,9 +1360,9 @@ WRITE8_HANDLER ( apple2_c05x_w )
   apple2_c06x_r
 ***************************************************************************/
 
-static device_t *cassette_device_image(running_machine &machine)
+static cassette_image_device *cassette_device_image(running_machine &machine)
 {
-	return machine.device(CASSETTE_TAG);
+	return machine.device<cassette_image_device>(CASSETTE_TAG);
 }
 
 READ8_HANDLER ( apple2_c06x_r )
@@ -1376,11 +1376,11 @@ READ8_HANDLER ( apple2_c06x_r )
 			case 0x00:
 				/* Cassette input */
 				{
-					device_t *dev = cassette_device_image(space->machine());
+					cassette_image_device *dev = cassette_device_image(space->machine());
 
 					if (dev)
 					{
-						result = cassette_input(dev) > 0.0 ? 0x80 : 0;
+						result = dev->input() > 0.0 ? 0x80 : 0;
 					}
 					else
 					{

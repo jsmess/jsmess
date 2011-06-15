@@ -679,18 +679,19 @@ const device_type IBM5150_MOTHERBOARD = &device_creator<ibm5150_mb_device>;
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
-static const cassette_config ibm5150_cassette_config =
+static const cassette_interface ibm5150_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
 static MACHINE_CONFIG_FRAGMENT( ibm5150_mb_config )
 	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_interface )
 MACHINE_CONFIG_END
 
 
@@ -813,7 +814,7 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 
 	if ( ! ( m_ppi_portb & 0x08 ) )
 	{
-		double tap_val = cassette_input(m_cassette);
+		double tap_val = m_cassette->input();
 
 		if ( tap_val < 0 )
 		{
@@ -847,7 +848,7 @@ WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
 	pit8253_gate2_w(m_pit8253, BIT(data, 0));
 	pc_speaker_set_spkrdata( data & 0x02 );
 
-	cassette_change_state( m_cassette, ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
 		m_kb_set_clock_signal_func(m_ppi_clock_signal);

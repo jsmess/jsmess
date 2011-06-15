@@ -120,7 +120,7 @@ public:
 	UINT8 *m_ramdisk;
 
 	/* external cassette/barcode reader */
-	device_t *m_ext_cas;
+	cassette_image_device *m_ext_cas;
 	emu_timer *m_ext_cas_timer;
 	int m_ear_last_state;
 
@@ -270,7 +270,7 @@ static TIMER_CALLBACK( ext_cassette_read )
 	int trigger = 0;
 
 	/* sample input state */
-	result = cassette_input(px4->m_ext_cas) > 0 ? 1 : 0;
+	result = (px4->m_ext_cas->input() > 0) ? 1 : 0;
 
 	/* detect transition */
 	switch ((px4->m_ctrl1 >> 1) & 0x03)
@@ -397,17 +397,17 @@ static WRITE8_HANDLER( px4_ctrl2_w )
 		logerror("%s: px4_ctrl2_w (0x%02x)\n", space->machine().describe_context(), data);
 
 	/* bit 0, MIC, cassette output */
-	cassette_output(px4->m_ext_cas, BIT(data, 0) ? -1.0 : +1.0);
+	px4->m_ext_cas->output( BIT(data, 0) ? -1.0 : +1.0);
 
 	/* bit 1, RMT, cassette motor */
 	if (BIT(data, 1))
 	{
-		cassette_change_state(px4->m_ext_cas, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		px4->m_ext_cas->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		px4->m_ext_cas_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
 	}
 	else
 	{
-		cassette_change_state(px4->m_ext_cas, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		px4->m_ext_cas->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		px4->m_ext_cas_timer->adjust(attotime::zero);
 	}
 }
@@ -459,7 +459,7 @@ static READ8_HANDLER( px4_str_r )
 	if (VERBOSE)
 		logerror("%s: px4_str_r\n", space->machine().describe_context());
 
-	result |= cassette_input(px4->m_ext_cas) > 0 ? 1 : 0;
+	result |= (px4->m_ext_cas)->input() > 0 ? 1 : 0;
 	result |= 1 << 1;	/* BCRD, barcode reader input */
 	result |= 1 << 2;	/* RDY signal from 7805 */
 	result |= 1 << 3;	/* RDYSIO, enable access to the 7805 */
@@ -1096,7 +1096,7 @@ static DRIVER_INIT( px4 )
 
 	/* external cassette or barcode reader */
 	px4->m_ext_cas_timer = machine.scheduler().timer_alloc(FUNC(ext_cassette_read));
-	px4->m_ext_cas = machine.device("extcas");
+	px4->m_ext_cas = machine.device<cassette_image_device>("extcas");
 	px4->m_ear_last_state = 0;
 
 	/* external devices */
@@ -1347,11 +1347,12 @@ static PALETTE_INIT( px4p )
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const cassette_config px4_cassette_config =
+static const cassette_interface px4_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED),
+	NULL,
 	NULL
 };
 
@@ -1388,7 +1389,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* external cassette */
-	MCFG_CASSETTE_ADD("extcas", px4_cassette_config)
+	MCFG_CASSETTE_ADD("extcas", px4_cassette_interface)
 
 	/* rom capsules */
 	MCFG_CARTSLOT_ADD("capsule1")

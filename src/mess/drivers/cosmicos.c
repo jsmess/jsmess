@@ -423,7 +423,7 @@ READ_LINE_MEMBER( cosmicos_state::ef1_r )
 READ_LINE_MEMBER( cosmicos_state::ef2_r )
 {
 	UINT8 special = input_port_read(machine(), "SPECIAL");
-	int casin = cassette_input(m_cassette) < 0.0;
+	int casin = (m_cassette)->input() < 0.0;
 
 	output_set_led_value(LED_CASSETTE, casin);
 
@@ -465,7 +465,7 @@ static COSMAC_SC_WRITE( cosmicos_sc_w )
 WRITE_LINE_MEMBER( cosmicos_state::q_w )
 {
 	/* cassette */
-	cassette_output(m_cassette, state ? +1.0 : -1.0);
+	m_cassette->output(state ? +1.0 : -1.0);
 
 	/* boot */
 	if (state) m_boot = 0;
@@ -559,11 +559,12 @@ static QUICKLOAD_LOAD( cosmicos )
 
 /* Machine Driver */
 
-static const cassette_config cosmicos_cassette_config =
+static const cassette_interface cosmicos_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -602,7 +603,7 @@ static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", cosmicos, "bin", 0)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cosmicos_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, cosmicos_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

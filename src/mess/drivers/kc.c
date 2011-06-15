@@ -417,7 +417,7 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc, "kcc", 0)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

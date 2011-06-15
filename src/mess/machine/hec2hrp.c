@@ -55,7 +55,7 @@
 static void Mise_A_Jour_Etat(running_machine &machine, int Adresse, int Value );
 static void Update_Sound(address_space *space, UINT8 data);
 
-static device_t *cassette_device_image(running_machine &machine);
+static cassette_image_device *cassette_device_image(running_machine &machine);
 
 /* Cassette timer*/
 static TIMER_CALLBACK( Callback_CK )
@@ -209,7 +209,7 @@ READ8_HANDLER( hector_cassette_r )
 		if (state->m_write_cassette == 0)
 		{
 			/* Accee a la cassette*/
-			level = cassette_input(cassette_device_image(space->machine()));
+			level = (cassette_device_image(space->machine())->input());
 
 			/* Travail du 741 en trigger*/
 			if  (level < -0.08)
@@ -252,11 +252,11 @@ WRITE8_HANDLER( hector_color_a_w )
 	{
 		/* Bit 6 => motor ON/OFF => for cassette state!*/
 		if (state->m_write_cassette==0)
-			 cassette_set_state(cassette_device_image(space->machine()) , (cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED));
+			 cassette_device_image(space->machine())->set_state((cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED));
 	}
 	else
 	{	/* stop motor*/
-		cassette_set_state(cassette_device_image(space->machine()) , CASSETTE_STOPPED);
+		cassette_device_image(space->machine())->set_state(CASSETTE_STOPPED);
 		state->m_write_cassette=0;
 		state->m_counter_write =0;
 	}
@@ -271,12 +271,12 @@ WRITE8_HANDLER( hector_color_a_w )
 			state->m_counter_write = 6;
 			if (state->m_write_cassette==0)
 			{	/* C'est la 1er fois => record*/
-				cassette_set_state(cassette_device_image(space->machine()) , CASSETTE_RECORD );
+				cassette_device_image(space->machine())->set_state(CASSETTE_RECORD);
 				state->m_write_cassette=1;
 			}
 		}
 		/* cassette data */
-		cassette_output(cassette_device_image(space->machine()), ((data & 0x80) == 0x80) ? -1.0 : +1.0);
+		cassette_device_image(space->machine())->output(((data & 0x80) == 0x80) ? -1.0 : +1.0);
 	}
 
 	/* Other bit : color definition*/
@@ -305,9 +305,9 @@ WRITE8_HANDLER( hector_color_b_w )
  Cassette Handling
 ******************************************************************************/
 
-static device_t *cassette_device_image(running_machine &machine)
+static cassette_image_device *cassette_device_image(running_machine &machine)
 {
-	return machine.device(CASSETTE_TAG);
+	return machine.device<cassette_image_device>(CASSETTE_TAG);
 }
 
 

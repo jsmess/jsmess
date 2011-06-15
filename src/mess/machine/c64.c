@@ -573,19 +573,19 @@ WRITE8_DEVICE_HANDLER(c64_m6510_port_write)
 	{
 		if (direction & 0x08)
 		{
-			cassette_output(device->machine().device(CASSETTE_TAG), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+			device->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 		}
 
 		if (direction & 0x20)
 		{
 			if(!(data & 0x20))
 			{
-				cassette_change_state(device->machine().device(CASSETTE_TAG), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+				device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 				state->m_datasette_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
 			}
 			else
 			{
-				cassette_change_state(device->machine().device(CASSETTE_TAG), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+				device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 				state->m_datasette_timer->reset();
 			}
 		}
@@ -606,7 +606,7 @@ READ8_DEVICE_HANDLER(c64_m6510_port_read)
 
 	if (state->m_tape_on)
 	{
-		if ((cassette_get_state(device->machine().device(CASSETTE_TAG)) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+		if ((device->machine().device<cassette_image_device>(CASSETTE_TAG)->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 			data &= ~0x10;
 		else
 			data |=  0x10;
@@ -744,7 +744,7 @@ WRITE8_HANDLER( c64_colorram_write )
 
 TIMER_CALLBACK( c64_tape_timer )
 {
-	double tmp = cassette_input(machine.device(CASSETTE_TAG));
+	double tmp = machine.device<cassette_image_device>(CASSETTE_TAG)->input();
 	device_t *cia_0 = machine.device("cia_0");
 
 	mos6526_flag_w(cia_0, tmp > +0.0);

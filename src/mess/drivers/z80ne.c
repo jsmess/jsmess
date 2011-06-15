@@ -415,19 +415,21 @@ static const ay31015_config z80ne_ay31015_config =
 	NULL
 };
 
-static const cassette_config z80ne_cassettea_config =
+static const cassette_interface z80ne_cassettea_config =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
-static const cassette_config z80ne_cassetteb_config =
+static const cassette_interface z80ne_cassetteb_config =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 

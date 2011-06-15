@@ -11,6 +11,7 @@
 #include "machine/i8255.h"
 #include "machine/8237dma.h"
 #include "machine/isa.h"
+#include "imagedev/cassette.h"
 
 #define MCFG_IBM5160_MOTHERBOARD_ADD(_tag, _cputag, _config) \
     MCFG_DEVICE_ADD(_tag, IBM5160_MOTHERBOARD, 0) \
@@ -139,7 +140,7 @@ protected:
         virtual void device_start();
         virtual void device_reset();
 
-		required_device<device_t>	m_cassette;
+		required_device<cassette_image_device>	m_cassette;
 public:
 		virtual DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
 		virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r );

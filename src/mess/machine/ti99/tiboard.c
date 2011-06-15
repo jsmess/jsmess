@@ -242,7 +242,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_1 )
 	}
 
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	//  if (cassette_input(device->machine().device(CASSETTE_TAG)) > 0)
+	//  if ((device->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0)
 	//      answer |= 8;
 
 	return answer;
@@ -280,7 +280,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_3 )
 		if (ti99_handset_get_int(board->handset)) answer = 0;
 
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	if (cassette_input(device->machine().device(CASSETTE_TAG)) > 0)
+	if ((device->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0)
 		answer |= 8;
 
 	return answer;
@@ -295,7 +295,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_3 )
 static READ8_DEVICE_HANDLER( ti99_8_R9901_3 )
 {
 	int answer = 4;	/* on systems without handset, the pin is pulled up to avoid spurious interrupts */
-	if (cassette_input(device->machine().device(CASSETTE_TAG)) > 0)
+	if ((device->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0)
 		answer |= 8;
 	return answer;
 }
@@ -337,8 +337,8 @@ static WRITE8_DEVICE_HANDLER( ti99_AlphaW )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS1_motor )
 {
-	device_t *img = device->machine().device(CASSETTE_TAG);
-	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	cassette_image_device *img = device->machine().device<cassette_image_device>(CASSETTE_TAG);
+	img->change_state(data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
 /*
@@ -346,8 +346,8 @@ static WRITE8_DEVICE_HANDLER( ti99_CS1_motor )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS2_motor )
 {
-	device_t *img = device->machine().device(CASSETTE2_TAG);
-	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	cassette_image_device *img = device->machine().device<cassette_image_device>(CASSETTE2_TAG);
+	img->change_state(data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
 /*
@@ -355,8 +355,8 @@ static WRITE8_DEVICE_HANDLER( ti99_CS2_motor )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS_motor )
 {
-	device_t *img = device->machine().device(CASSETTE_TAG);
-	cassette_change_state(img, data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	cassette_image_device *img = device->machine().device<cassette_image_device>(CASSETTE_TAG);
+	img->change_state(data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
 /*
@@ -378,8 +378,8 @@ static WRITE8_DEVICE_HANDLER( ti99_audio_gate )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS12_output )
 {
-	cassette_output(device->machine().device(CASSETTE_TAG), data ? +1 : -1);
-	cassette_output(device->machine().device(CASSETTE2_TAG), data ? +1 : -1);
+	device->machine().device<cassette_image_device>(CASSETTE_TAG)->output(data ? +1 : -1);
+	device->machine().device<cassette_image_device>(CASSETTE2_TAG)->output(data ? +1 : -1);
 }
 
 /*
@@ -388,7 +388,7 @@ static WRITE8_DEVICE_HANDLER( ti99_CS12_output )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS_output )
 {
-	cassette_output(device->machine().device(CASSETTE_TAG), data ? +1 : -1);
+	device->machine().device<cassette_image_device>(CASSETTE_TAG)->output(data ? +1 : -1);
 }
 
 /*

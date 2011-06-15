@@ -212,7 +212,7 @@ static WRITE8_HANDLER( samcoupe_midi_w )
 
 static READ8_HANDLER( samcoupe_keyboard_r )
 {
-	device_t *cassette = space->machine().device(CASSETTE_TAG);
+	cassette_image_device *cassette = space->machine().device<cassette_image_device>(CASSETTE_TAG);
 	UINT8 data = 0x1f;
 
 	/* bit 0-4, keyboard input */
@@ -238,7 +238,7 @@ static READ8_HANDLER( samcoupe_keyboard_r )
 	data |= 1 << 5;
 
 	/* bit 6, cassette input */
-	data |= (cassette_input(cassette) > 0 ? 1 : 0) << 6;
+	data |= ((cassette)->input() > 0 ? 1 : 0) << 6;
 
 	/* bit 7, external memory */
 	data |= 1 << 7;
@@ -248,14 +248,14 @@ static READ8_HANDLER( samcoupe_keyboard_r )
 
 static WRITE8_HANDLER( samcoupe_border_w )
 {
-	device_t *cassette = space->machine().device(CASSETTE_TAG);
+	cassette_image_device *cassette = space->machine().device<cassette_image_device>(CASSETTE_TAG);
 	device_t *speaker = space->machine().device(SPEAKER_TAG);
 	samcoupe_state *state = space->machine().driver_data<samcoupe_state>();
 
 	state->m_border = data;
 
 	/* bit 3, cassette output */
-	cassette_output(cassette, BIT(data, 3) ? -1.0 : +1.0);
+	cassette->output( BIT(data, 3) ? -1.0 : +1.0);
 
 	/* bit 4, beep */
 	speaker_level_w(speaker, BIT(data, 4));
@@ -495,11 +495,12 @@ static PALETTE_INIT( samcoupe )
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const cassette_config samcoupe_cassette_config =
+static const cassette_interface samcoupe_cassette_interface =
 {
 	tzx_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -580,7 +581,7 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_CENTRONICS_ADD("lpt2", standard_centronics)
 	MCFG_MSM6242_ADD("sambus_clock")
 	MCFG_WD1772_ADD("wd1772", samcoupe_wd17xx_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, samcoupe_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, samcoupe_cassette_interface)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

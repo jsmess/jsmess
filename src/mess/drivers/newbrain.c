@@ -410,8 +410,8 @@ WRITE8_MEMBER( newbrain_state::cop_g_w )
 
 	/* tape motor enable */
 
-	cassette_change_state(m_cassette1, BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-	cassette_change_state(m_cassette2, BIT(data, 3) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	m_cassette1->change_state(BIT(data,1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	m_cassette2->change_state(BIT(data,3) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
 READ8_MEMBER( newbrain_state::cop_g_r )
@@ -458,8 +458,8 @@ WRITE8_MEMBER( newbrain_state::cop_d_w )
 
 	m_cop_tdo = BIT(data, 1);
 
-	cassette_output(m_cassette1, m_cop_tdo ? -1.0 : +1.0);
-	cassette_output(m_cassette2, m_cop_tdo ? -1.0 : +1.0);
+	m_cassette1->output(m_cop_tdo ? -1.0 : +1.0);
+	m_cassette2->output(m_cop_tdo ? -1.0 : +1.0);
 
 	/* keyboard and display clock */
 
@@ -510,7 +510,7 @@ WRITE8_MEMBER( newbrain_state::cop_sk_w )
 READ8_MEMBER( newbrain_state::cop_si_r )
 {
 	// connected to TDI
-	m_cop_tdi = ((cassette_input(m_cassette1) > +1.0) || (cassette_input(m_cassette2) > +1.0)) ^ m_cop_tdo;
+	m_cop_tdi = (((m_cassette1)->input() > +1.0) || ((m_cassette2)->input() > +1.0)) ^ m_cop_tdo;
 
 	return m_cop_tdi;
 }
@@ -1351,11 +1351,12 @@ static COP400_INTERFACE( newbrain_cop_intf )
 
 /* Machine Drivers */
 
-static const cassette_config newbrain_cassette_config =
+static const cassette_interface newbrain_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -1396,8 +1397,8 @@ static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
 	MCFG_FRAGMENT_ADD(newbrain_video)
 
 	// devices
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, newbrain_cassette_config)
-	MCFG_CASSETTE_ADD(CASSETTE2_TAG, newbrain_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, newbrain_cassette_interface)
+	MCFG_CASSETTE_ADD(CASSETTE2_TAG, newbrain_cassette_interface)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

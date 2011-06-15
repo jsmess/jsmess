@@ -83,7 +83,7 @@ public:
 	required_device<hd44102_device> m_lcdc9;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_speaker;
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_ram;
 
 	virtual void machine_start();
@@ -168,7 +168,7 @@ public:
 	required_device<hd61830_device> m_lcdc;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_speaker;
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_ram;
 
 	virtual void machine_start();

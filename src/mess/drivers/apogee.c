@@ -132,11 +132,12 @@ static INPUT_PORTS_START( apogee )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rus/Lat") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
 INPUT_PORTS_END
 
-static const cassette_config apogee_cassette_config =
+static const cassette_interface apogee_cassette_interface =
 {
 	rka_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -193,7 +194,7 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
 
 	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, apogee_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, apogee_cassette_interface )
 MACHINE_CONFIG_END
 
 /* ROM definition */

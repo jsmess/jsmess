@@ -137,7 +137,7 @@ READ8_HANDLER ( zx80_io_r )
 		if (!input_port_read(space->machine(), "CONFIG"))
 			data &= ~0x40;
 
-		cassette_output(space->machine().device(CASSETTE_TAG), +1.0);
+		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
 
 		if (state->m_ula_irq_active)
 		{
@@ -148,7 +148,7 @@ READ8_HANDLER ( zx80_io_r )
 		}
 //      else
 //      {
-			if ((cassette_input(space->machine().device(CASSETTE_TAG)) < -0.75) && state->m_tape_bit)
+			if (((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() < -0.75) && state->m_tape_bit)
 			{
 				state->m_tape_bit = 0x00;
 				space->machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
@@ -202,7 +202,7 @@ READ8_HANDLER ( zx81_io_r )
 		if (!input_port_read(space->machine(), "CONFIG"))
 			data &= ~0x40;
 
-		cassette_output(space->machine().device(CASSETTE_TAG), +1.0);
+		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
 
 		if (state->m_ula_irq_active)
 		{
@@ -213,7 +213,7 @@ READ8_HANDLER ( zx81_io_r )
 		}
 		else
 		{
-			if ((cassette_input(space->machine().device(CASSETTE_TAG)) < -0.75) && state->m_tape_bit)
+			if (((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() < -0.75) && state->m_tape_bit)
 			{
 				state->m_tape_bit = 0x00;
 				space->machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
@@ -274,7 +274,7 @@ READ8_HANDLER ( pc8300_io_r )
 		if ((offset & 0x8000) == 0)
 			data &= input_port_read(space->machine(), "ROW7");
 
-		cassette_output(space->machine().device(CASSETTE_TAG), +1.0);
+		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
 
 		if (state->m_ula_irq_active)
 		{
@@ -285,7 +285,7 @@ READ8_HANDLER ( pc8300_io_r )
 		}
 		else
 		{
-			if ((cassette_input(space->machine().device(CASSETTE_TAG)) < -0.75) && state->m_tape_bit)
+			if (((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() < -0.75) && state->m_tape_bit)
 			{
 				state->m_tape_bit = 0x00;
 				space->machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
@@ -351,7 +351,7 @@ READ8_HANDLER ( pow3000_io_r )
 		if ((offset & 0x8000) == 0)
 			data &= input_port_read(space->machine(), "ROW7");
 
-		cassette_output(space->machine().device(CASSETTE_TAG), +1.0);
+		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
 
 		if (state->m_ula_irq_active)
 		{
@@ -361,7 +361,7 @@ READ8_HANDLER ( pow3000_io_r )
 		}
 		else
 		{
-			if ((cassette_input(space->machine().device(CASSETTE_TAG)) < -0.75) && state->m_tape_bit)
+			if (((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() < -0.75) && state->m_tape_bit)
 			{
 				state->m_tape_bit = 0x00;
 				space->machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
@@ -390,7 +390,7 @@ WRITE8_HANDLER( zx80_io_w )
 	UINT8 offs = offset & 0xff;
 
 	if (offs == 0xff)
-		cassette_output(space->machine().device(CASSETTE_TAG), -1.0);
+		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(-1.0);
 	else
 		LOG_ZX81_IOR("Unmapped port");
 }
@@ -428,7 +428,7 @@ WRITE8_HANDLER ( zx81_io_w )
 	else
 	if (offs == 0xff)
 	{
-		cassette_output(space->machine().device(CASSETTE_TAG), -1.0);
+		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(-1.0);
 		zx_ula_bkgnd(space->machine(), 1);
 		if (state->m_ula_frame_vsync == 2)
 		{

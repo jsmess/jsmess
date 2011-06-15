@@ -35,7 +35,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_vdg;
 	required_device<device_t> m_centronics;
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);

@@ -167,11 +167,12 @@ ROM_START(electron)
         /* 3c000 15 */
 ROM_END
 
-static const cassette_config electron_cassette_config =
+static const cassette_interface electron_cassette_interface =
 {
 	uef_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
+	NULL,
 	NULL
 };
 
@@ -198,7 +199,7 @@ static MACHINE_CONFIG_START( electron, electron_state )
 	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, electron_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, electron_cassette_interface )
 MACHINE_CONFIG_END
 
 

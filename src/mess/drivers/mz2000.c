@@ -565,8 +565,8 @@ static READ8_DEVICE_HANDLER( mz2000_portb_r )
     */
 	UINT8 res = 0xff ^ 0xe0;
 
-	res |= (cassette_input(device->machine().device(CASSETTE_TAG)) > 0.00) ? 0x40 : 0x00;
-	res |= ((cassette_get_state(device->machine().device(CASSETTE_TAG)) & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x20;
+	res |= ((device->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.00) ? 0x40 : 0x00;
+	res |= (((device->machine().device<cassette_image_device>(CASSETTE_TAG))->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x20;
 
 	popmessage("%02x",res);
 
@@ -756,7 +756,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_MB8877_ADD("mb8877a",mz2000_mb8877a_interface)
 	MCFG_FLOPPY_4_DRIVES_ADD(mz2000_floppy_config)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

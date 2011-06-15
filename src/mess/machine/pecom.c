@@ -129,7 +129,7 @@ static READ_LINE_DEVICE_HANDLER( clear_r )
 static READ_LINE_DEVICE_HANDLER( ef2_r )
 {
 	int shift = BIT(input_port_read(device->machine(), "CNT"), 1);
-	double cas = cassette_input(device);
+	double cas = dynamic_cast<cassette_image_device *>(device)->input();
 
 	return (cas > 0.0) | shift;
 }
@@ -138,7 +138,7 @@ static READ_LINE_DEVICE_HANDLER( ef2_r )
 static COSMAC_EF_READ( pecom64_ef_r )
 {
     int flags = 0x0f;
-    double valcas = cassette_input(cassette_device_image(device->machine()));
+    double valcas = (cassette_device_image(device->machine()));->input()
     UINT8 val = input_port_read(device->machine(), "CNT");
 
     if ((val & 0x04)==0x04 && pecom_prev_caps_state==0)
@@ -158,7 +158,7 @@ static COSMAC_EF_READ( pecom64_ef_r )
 */
 static WRITE_LINE_DEVICE_HANDLER( pecom64_q_w )
 {
-	cassette_output(device, state ? -1.0 : +1.0);
+	dynamic_cast<cassette_image_device *>(device)->output(state ? -1.0 : +1.0);
 }
 
 static COSMAC_SC_WRITE( pecom64_sc_w )

@@ -600,7 +600,7 @@ READ8_MEMBER( sc3000_state::ppi_pb_r )
 	data |= 0x60;
 
 	/* tape input */
-	if (cassette_input(m_cassette) > +0.0) data |= 0x80;
+	if ((m_cassette)->input() > +0.0) data |= 0x80;
 
 	return data;
 }
@@ -624,7 +624,7 @@ WRITE8_MEMBER( sc3000_state::ppi_pc_w )
 	m_keylatch = data & 0x07;
 
 	/* cassette */
-	cassette_output(m_cassette, BIT(data, 4) ? +1.0 : -1.0);
+	m_cassette->output( BIT(data, 4) ? +1.0 : -1.0);
 
 	/* TODO printer */
 }
@@ -640,14 +640,15 @@ I8255_INTERFACE( sc3000_ppi_intf )
 };
 
 /*-------------------------------------------------
-    cassette_config sc3000_cassette_config
+    cassette_interface sc3000_cassette_interface
 -------------------------------------------------*/
 
-const cassette_config sc3000_cassette_config =
+const cassette_interface sc3000_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -1120,7 +1121,7 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 	/* devices */
 	MCFG_I8255_ADD(UPD9255_TAG, sc3000_ppi_intf)
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_interface)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -1166,7 +1167,7 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, sf7000_floppy_config)
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

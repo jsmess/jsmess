@@ -34,7 +34,7 @@ static READ8_DEVICE_HANDLER( vector06_8255_portb_r )
 
 static READ8_DEVICE_HANDLER (vector06_8255_portc_r )
 {
-	double level = cassette_input(device->machine().device(CASSETTE_TAG));
+	double level = device->machine().device<cassette_image_device>(CASSETTE_TAG)->input();
 	UINT8 retVal = input_port_read(device->machine(), "LINE8");
 	if (level >  0) {
 		retVal |= 0x10;

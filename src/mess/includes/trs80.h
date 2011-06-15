@@ -8,6 +8,7 @@
 #define TRS80_H_
 
 #include "imagedev/snapquik.h"
+#include "imagedev/cassette.h"
 #include "machine/wd17xx.h"
 
 #define FW 6
@@ -42,7 +43,7 @@ public:
 	emu_timer *m_cassette_data_timer;
 	device_t *m_printer;
 	device_t *m_ay31015;
-	device_t *m_cass;
+	cassette_image_device *m_cass;
 	device_t *m_speaker;
 	device_t *m_fdc;
 	double m_old_cassette_val;

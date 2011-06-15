@@ -198,7 +198,7 @@ static READ8_DEVICE_HANDLER( via0_pa_r )
 	data &= ~(input_port_read(device->machine(), "JOY") & 0x3c);
 
 	/* cassette switch */
-	if ((cassette_get_state(state->m_cassette) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((state->m_cassette->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x40;
 	else
 		data |=  0x40;
@@ -273,12 +273,12 @@ static WRITE8_DEVICE_HANDLER( via0_ca2_w )
 
 	if (!BIT(data, 0))
 	{
-		cassette_change_state(state->m_cassette, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		state->m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		state->m_cassette_timer->enable(true);
 	}
 	else
 	{
-		cassette_change_state(state->m_cassette, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		state->m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		state->m_cassette_timer->enable(false);
 	}
 }
@@ -379,7 +379,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 	vic20_state *state = device->machine().driver_data<vic20_state>();
 
 	/* cassette write */
-	cassette_output(device->machine().device(CASSETTE_TAG), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	device->machine().device<cassette_image_device>(CASSETTE_TAG)->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 
 	/* keyboard column */
 	state->m_key_col = data;
@@ -425,7 +425,7 @@ static const via6522_interface vic20_via1_intf =
 static TIMER_DEVICE_CALLBACK( cassette_tick )
 {
 	vic20_state *state = timer.machine().driver_data<vic20_state>();
-	int data = (cassette_input(state->m_cassette) > +0.0) ? 1 : 0;
+	int data = (state->m_cassette->input() > +0.0) ? 1 : 0;
 
 	state->m_via1->write_ca1(data);
 }
@@ -688,7 +688,7 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 	MCFG_VIA6522_ADD(M6522_1_TAG, 0, vic20_via1_intf)
 
 	MCFG_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_config )
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface )
 	MCFG_CBM_IEC_CONFIG_ADD(cbm_iec_daisy, cbm_iec_intf)
 	MCFG_C1541_ADD(C1541_TAG, 8)
 #ifdef INCLUDE_VIC1112

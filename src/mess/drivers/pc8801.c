@@ -1922,11 +1922,12 @@ static const floppy_config pc88_floppy_config =
 
 /* Cassette Configuration */
 
-static const cassette_config pc88_cassette_config =
+static const cassette_interface pc88_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -2243,7 +2244,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	#endif
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8801_upd1990a_intf)
 	//MCFG_CENTRONICS_ADD("centronics", standard_centronics)
-	//MCFG_CASSETTE_ADD(CASSETTE_TAG, pc88_cassette_config)
+	//MCFG_CASSETTE_ADD(CASSETTE_TAG, pc88_cassette_interface)
 
 	MCFG_FLOPPY_2_DRIVES_ADD(pc88_floppy_config)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc8801_flop")

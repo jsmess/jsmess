@@ -146,7 +146,7 @@ static READ8_DEVICE_HANDLER ( svi318_ppi_port_a_r )
 {
 	int data = 0x0f;
 
-	if (cassette_input(device->machine().device(CASSETTE_TAG)) > 0.0038)
+	if ((device->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0038)
 		data |= 0x80;
 	if (!svi318_cassette_present(device->machine(), 0))
 		data |= 0x40;
@@ -210,14 +210,14 @@ static WRITE8_DEVICE_HANDLER ( svi318_ppi_port_c_w )
 	/* cassette motor on/off */
 	if (svi318_cassette_present(device->machine(), 0))
 	{
-		cassette_change_state(
-			device->machine().device(CASSETTE_TAG),
+		
+			device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
 			(data & 0x10) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,
 			CASSETTE_MOTOR_DISABLED);
 	}
 
 	/* cassette signal write */
-	cassette_output(device->machine().device(CASSETTE_TAG), (data & 0x20) ? -1.0 : +1.0);
+	device->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x20) ? -1.0 : +1.0);
 
 	state->m_svi.keyboard_row = data & 0x0F;
 }
@@ -808,7 +808,7 @@ static void svi318_set_banks(running_machine &machine)
 
 int svi318_cassette_present(running_machine &machine, int id)
 {
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device(CASSETTE_TAG));
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device<cassette_image_device>(CASSETTE_TAG));
 
 	if ( image == NULL )
 		return FALSE;

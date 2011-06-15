@@ -84,7 +84,7 @@ public:
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<i8255_device> m_ppi2;
-	required_device<device_t> m_cass;
+	required_device<cassette_image_device> m_cass;
 	required_device<device_t> m_wave;
 	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_fdc;
@@ -387,7 +387,7 @@ READ8_MEMBER( mycom_state::mycom_08_r )
 
 	data = m_keyb_press_flag; //~m_keyb_press_flag & 1;
 
-	if (cassette_input(m_cass) > 0.03) // not working
+	if ((m_cass)->input() > 0.03) // not working
 		data+=4;
 
 	return data;
@@ -423,11 +423,11 @@ WRITE8_MEMBER( mycom_state::mycom_0a_w )
     */
 
 	if ( (BIT(m_0a, 3)) != (BIT(data, 3)) )
-		cassette_change_state(m_cass,
-		BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		m_cass->change_state(
+		BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	if BIT(data, 3) // motor on
-		cassette_output(m_cass, BIT(data, 2) ? -1.0 : +1.0);
+		m_cass->output( BIT(data, 2) ? -1.0 : +1.0);
 
 	if ( (BIT(data, 7)) != (BIT(m_0a, 7)) )
 		m_crtc->set_clock(BIT(data, 7) ? 1008000 : 2016000);
@@ -594,7 +594,7 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 
 	/* Devices */
 	MCFG_MSM5832_ADD(MSM5832RS_TAG, XTAL_32_768kHz)
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_WD179X_ADD("fdc", wd1771_intf) // WD1771
 
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", mycom_kbd, attotime::from_hz(20))

@@ -238,11 +238,12 @@ static const struct CassetteOptions primo_cassette_options = {
 	22050	/* sample frequency */
 };
 
-static const cassette_config primo_cassette_config =
+static const cassette_interface primo_cassette_interface =
 {
 	primo_ptp_format,
 	&primo_cassette_options,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -283,7 +284,7 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 	MCFG_SNAPSHOT_ADD("snapshot", primo, "pss", 0)
 	MCFG_QUICKLOAD_ADD("quickload", primo, "pp", 0)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, primo_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, primo_cassette_interface )
 
 	/* floppy from serial bus */
 	/* for some reason machine/primo.c sets up the serial bus

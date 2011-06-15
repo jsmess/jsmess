@@ -673,14 +673,14 @@ static WRITE8_HANDLER ( pc6001_system_latch_w )
 	if((!(state->m_sys_latch & 8)) && data & 0x8) //PLAY tape cmd
 	{
 		state->m_cas_switch = 1;
-		//cassette_change_state(space->machine().device(CASSETTE_TAG ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		//cassette_change_state(space->machine().device(CASSETTE_TAG ),CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+		//space->machine().device(CASSETTE_TAG )->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		//space->machine().device(CASSETTE_TAG )->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 	}
 	if((state->m_sys_latch & 8) && ((data & 0x8) == 0)) //STOP tape cmd
 	{
 		state->m_cas_switch = 0;
-		//cassette_change_state(space->machine().device(CASSETTE_TAG ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-		//cassette_change_state(space->machine().device(CASSETTE_TAG ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+		//space->machine().device(CASSETTE_TAG )->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		//space->machine().device(CASSETTE_TAG )->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 		//state->m_irq_vector = 0x00;
 		//cputag_set_input_line(space->machine(),"maincpu", 0, ASSERT_LINE);
 	}
@@ -1171,14 +1171,14 @@ static WRITE8_HANDLER ( pc6001m2_system_latch_w )
 	if((!(state->m_sys_latch & 8)) && data & 0x8) //PLAY tape cmd
 	{
 		state->m_cas_switch = 1;
-		//cassette_change_state(space->machine().device(CASSETTE_TAG ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		//cassette_change_state(space->machine().device(CASSETTE_TAG ),CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+		//space->machine().device(CASSETTE_TAG )->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		//space->machine().device(CASSETTE_TAG )->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 	}
 	if((state->m_sys_latch & 8) && ((data & 0x8) == 0)) //STOP tape cmd
 	{
 		state->m_cas_switch = 0;
-		//cassette_change_state(space->machine().device(CASSETTE_TAG ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-		//cassette_change_state(space->machine().device(CASSETTE_TAG ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+		//space->machine().device(CASSETTE_TAG )->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		//space->machine().device(CASSETTE_TAG )->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 		//state->m_irq_vector = 0x00;
 		//cputag_set_input_line(space->machine(),"maincpu", 0, ASSERT_LINE);
 	}
@@ -1535,14 +1535,14 @@ static WRITE8_HANDLER ( pc6001sr_system_latch_w )
 	if((!(state->m_sys_latch & 8)) && data & 0x8) //PLAY tape cmd
 	{
 		state->m_cas_switch = 1;
-		//cassette_change_state(space->machine().device(CASSETTE_TAG ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		//cassette_change_state(space->machine().device(CASSETTE_TAG ),CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+		//space->machine().device(CASSETTE_TAG )->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		//space->machine().device(CASSETTE_TAG )->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 	}
 	if((state->m_sys_latch & 8) && ((data & 0x8) == 0)) //STOP tape cmd
 	{
 		state->m_cas_switch = 0;
-		//cassette_change_state(space->machine().device(CASSETTE_TAG ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-		//cassette_change_state(space->machine().device(CASSETTE_TAG ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+		//space->machine().device(CASSETTE_TAG )->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		//space->machine().device(CASSETTE_TAG )->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 		//state->m_irq_vector = 0x00;
 		//cputag_set_input_line(space->machine(),"maincpu", 0, ASSERT_LINE);
 	}
@@ -1973,7 +1973,7 @@ static TIMER_DEVICE_CALLBACK(cassette_callback)
 		#if 0
 		static UINT8 cas_data_i = 0x80,cas_data_poll;
 		//state->m_cur_keycode = gfx_data[state->m_cas_offset++];
-		if(cassette_input(timer.machine().device(CASSETTE_TAG)) > 0.03)
+		if((timer.machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.03)
 			cas_data_poll|= cas_data_i;
 		else
 			cas_data_poll&=~cas_data_i;
@@ -2211,11 +2211,12 @@ static PALETTE_INIT(pc6001m2)
 		palette_set_color(machine, i,mk2_defcolors[i-0x10]);
 }
 
-static const cassette_config pc6001_cassette_config =
+static const cassette_interface pc6001_cassette_interface =
 {
 	pc6001_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -2306,7 +2307,7 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 
-//  MCFG_CASSETTE_ADD(CASSETTE_TAG,pc6001_cassette_config)
+//  MCFG_CASSETTE_ADD(CASSETTE_TAG,pc6001_cassette_interface)
 	MCFG_CARTSLOT_ADD(CASSETTE_TAG)
 	MCFG_CARTSLOT_EXTENSION_LIST("cas,p6")
 	MCFG_CARTSLOT_NOT_MANDATORY

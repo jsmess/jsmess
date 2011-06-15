@@ -139,7 +139,7 @@ WRITE8_HANDLER( mtx_sound_latch_w )
 
 WRITE8_DEVICE_HANDLER( mtx_cst_w )
 {
-	cassette_output(device, BIT(data, 0) ? -1 : 1);
+	dynamic_cast<cassette_image_device *>(device)->output( BIT(data, 0) ? -1 : 1);
 }
 
 /*-------------------------------------------------
@@ -409,7 +409,7 @@ MACHINE_START( mtx512 )
 	/* find devices */
 	state->m_z80ctc = machine.device(Z80CTC_TAG);
 	state->m_z80dart = machine.device(Z80DART_TAG);
-	state->m_cassette = machine.device(CASSETTE_TAG);
+	state->m_cassette = machine.device<cassette_image_device>(CASSETTE_TAG);
 
 	/* configure memory */
 	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());

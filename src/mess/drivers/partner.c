@@ -138,11 +138,12 @@ static INPUT_PORTS_START( partner )
 INPUT_PORTS_END
 
 /* Machine driver */
-static const cassette_config partner_cassette_config =
+static const cassette_interface partner_cassette_interface =
 {
 	rkp_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -218,7 +219,7 @@ static MACHINE_CONFIG_START( partner, partner_state )
 
 	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, partner_dma)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, partner_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, partner_cassette_interface )
 
 	MCFG_WD1793_ADD("wd1793", partner_wd17xx_interface )
 

@@ -599,19 +599,21 @@ static const floppy_config thomson_floppy_config =
 
 
 /********************* devices ************************/
-const cassette_config to7_cassette_config =
+const cassette_interface to7_cassette_interface =
 {
 	to7_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
-const cassette_config mo5_cassette_config =
+const cassette_interface mo5_cassette_interface =
 {
 	mo5_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -654,7 +656,7 @@ static MACHINE_CONFIG_START( to7, driver_device )
      MCFG_CENTRONICS_ADD("centronics", to7_centronics_config)
 
 /* cassette */
-     MCFG_CASSETTE_ADD( CASSETTE_TAG, to7_cassette_config )
+     MCFG_CASSETTE_ADD( CASSETTE_TAG, to7_cassette_interface )
 
 /* timer */
      MCFG_MC6846_ADD( "mc6846", to7_timer )
@@ -1049,7 +1051,7 @@ static MACHINE_CONFIG_DERIVED( mo5, to7 )
      MCFG_CPU_MODIFY( "maincpu" )
      MCFG_CPU_PROGRAM_MAP ( mo5)
 
-     MCFG_CASSETTE_MODIFY( CASSETTE_TAG, mo5_cassette_config )
+     MCFG_CASSETTE_MODIFY( CASSETTE_TAG, mo5_cassette_interface )
 
      MCFG_DEVICE_REMOVE( "mc6846" )
 

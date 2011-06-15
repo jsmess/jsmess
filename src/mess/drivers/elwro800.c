@@ -258,7 +258,7 @@ static READ8_HANDLER(elwro800jr_io_r)
 			}
 
 			/* cassette input from wav */
-			if (cassette_input(space->machine().device(CASSETTE_TAG)) > 0.0038 )
+			if ((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0038 )
 			{
 				data &= ~0x40;
 			}
@@ -524,11 +524,12 @@ static MACHINE_RESET(elwro800)
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(elwro800_direct_handler), &machine));
 }
 
-static const cassette_config elwro800jr_cassette_config =
+static const cassette_interface elwro800jr_cassette_interface =
 {
 	tzx_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -609,7 +610,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, elwro800jr_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, elwro800jr_cassette_interface )
 
 	MCFG_FLOPPY_2_DRIVES_ADD(elwro800jr_floppy_config)
 

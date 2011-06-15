@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( mekd2, mekd2_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
 	/* Cartslot ?? does not come with one.. */
 	MCFG_CARTSLOT_ADD("cart")

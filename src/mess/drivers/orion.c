@@ -78,11 +78,12 @@ static ADDRESS_MAP_START( orionpro_io , AS_IO, 8)
     AM_RANGE( 0x0000, 0xffff) AM_READWRITE ( orionpro_io_r, orionpro_io_w )
 ADDRESS_MAP_END
 
-static const cassette_config orion_cassette_config =
+static const cassette_interface orion_cassette_interface =
 {
 	rko_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -152,7 +153,7 @@ static MACHINE_CONFIG_START( orion128, orion_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_interface )
 
 	MCFG_WD1793_ADD("wd1793", orion_wd17xx_interface )
 
@@ -216,7 +217,7 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
 	MCFG_SOUND_CONFIG(orionz80_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_interface )
 
 	MCFG_WD1793_ADD("wd1793", orion_wd17xx_interface )
 
@@ -270,7 +271,7 @@ static MACHINE_CONFIG_START( orionpro, orion_state )
 	MCFG_SOUND_CONFIG(orionz80_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_interface )
 
 	MCFG_WD1793_ADD("wd1793", orion_wd17xx_interface )
 

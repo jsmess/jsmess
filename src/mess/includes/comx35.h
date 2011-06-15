@@ -70,7 +70,7 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_fdc;
 	required_device<cdp1871_device> m_kbe;
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_ram;
 
 	virtual void machine_start();

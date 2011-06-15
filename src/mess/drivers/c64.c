@@ -726,7 +726,7 @@ static MACHINE_CONFIG_START( c64, c64_state )
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
 
 	/* cia */
 	MCFG_MOS6526R1_ADD("cia_0", VIC6567_CLOCK, c64_ntsc_cia0)
@@ -777,7 +777,7 @@ static MACHINE_CONFIG_START( c64pal, c64_state )
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
 
 	/* cia */
 	MCFG_MOS6526R1_ADD("cia_0", VIC6569_CLOCK, c64_pal_cia0)

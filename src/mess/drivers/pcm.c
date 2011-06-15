@@ -92,7 +92,7 @@ public:
 	required_device<device_t> m_ctc_s;
 	required_device<device_t> m_ctc_u;
 	required_device<device_t> m_speaker;
-	required_device<device_t> m_cass;
+	required_device<cassette_image_device> m_cass;
 	DECLARE_READ8_MEMBER( pcm_84_r );
 	DECLARE_READ8_MEMBER( pcm_85_r );
 	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
@@ -149,7 +149,7 @@ READ8_MEMBER( pcm_state::pcm_85_r )
 {
 	UINT8 data = m_85 & 0x7f;
 
-	if (cassette_input(m_cass) > 0.03)
+	if ((m_cass)->input() > 0.03)
 		data |= 0x80;
 
 	return data;
@@ -158,11 +158,11 @@ READ8_MEMBER( pcm_state::pcm_85_r )
 WRITE8_MEMBER( pcm_state::pcm_85_w )
 {
 	if (BIT(data, 5))
-		cassette_change_state(m_cass, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 	else
-		cassette_change_state(m_cass, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 
-	cassette_output(m_cass, BIT(data, 6) ? -1.0 : +1.0);
+	m_cass->output( BIT(data, 6) ? -1.0 : +1.0);
 	m_85 = data;
 }
 
@@ -354,7 +354,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 
 	/* Devices */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_Z80PIO_ADD( "z80pio_u", XTAL_10MHz /4, pio_u_intf )
 	MCFG_Z80PIO_ADD( "z80pio_s", XTAL_10MHz /4, pio_s_intf )
 	MCFG_Z80SIO_ADD( "z80sio", 4800, sio_intf ) // clocks come from the system ctc

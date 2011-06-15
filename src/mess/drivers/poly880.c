@@ -172,7 +172,7 @@ READ8_MEMBER( poly880_state::pio1_pb_r )
 
     */
 
-	UINT8 data = 0xf0 | ((cassette_input(m_cassette) < +0.0) << 1);
+	UINT8 data = 0xf0 | (((m_cassette)->input() < +0.0) << 1);
 	int i;
 
 	for (i = 0; i < 8; i++)
@@ -206,7 +206,7 @@ WRITE8_MEMBER( poly880_state::pio1_pb_w )
     */
 
 	/* tape output */
-	cassette_output(m_cassette, BIT(data, 2) ? +1.0 : -1.0);
+	m_cassette->output( BIT(data, 2) ? +1.0 : -1.0);
 }
 
 static Z80PIO_INTERFACE( pio1_intf )
@@ -252,11 +252,12 @@ void poly880_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_config poly880_cassette_config =
+static const cassette_interface poly880_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -274,7 +275,7 @@ static MACHINE_CONFIG_START( poly880, poly880_state )
 	MCFG_Z80PIO_ADD(Z80PIO1_TAG, XTAL_7_3728MHz/16, pio1_intf)
 	MCFG_Z80PIO_ADD(Z80PIO2_TAG, XTAL_7_3728MHz/16, pio2_intf)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, poly880_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, poly880_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

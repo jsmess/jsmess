@@ -83,11 +83,11 @@ READ8_MEMBER( ace_state::io_r )
 	{
 		data &= input_port_read(machine(), "A15");
 
-		cassette_output(m_cassette, -1);
+		m_cassette->output(-1);
 		speaker_level_w(m_speaker, 0);
 	}
 
-	if (cassette_input(m_cassette) > 0)
+	if (m_cassette->input() > 0)
 	{
 		data &= ~0x20;
 	}
@@ -102,7 +102,7 @@ READ8_MEMBER( ace_state::io_r )
 
 WRITE8_MEMBER( ace_state::io_w )
 {
-	cassette_output(m_cassette, 1);
+	m_cassette->output(1);
 	speaker_level_w(m_speaker, 1);
 }
 
@@ -426,14 +426,15 @@ bool ace_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 //**************************************************************************
 
 //-------------------------------------------------
-//  cassette_config ace_cassette_config
+//  cassette_interface ace_cassette_interface
 //-------------------------------------------------
 
-static const cassette_config ace_cassette_config =
+static const cassette_interface ace_cassette_interface =
 {
 	ace_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED),
+	NULL,
 	NULL
 };
 
@@ -654,7 +655,7 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, ace_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, ace_cassette_interface)
 	MCFG_SNAPSHOT_ADD("snapshot", ace, "ace", 1)
 	MCFG_I8255A_ADD(I8255_TAG, ppi_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_6_5MHz/2, pio_intf)

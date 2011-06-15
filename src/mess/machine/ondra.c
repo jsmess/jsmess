@@ -14,9 +14,9 @@
 #include "machine/ram.h"
 
 
-static device_t *cassette_device_image(running_machine &machine)
+static cassette_image_device *cassette_device_image(running_machine &machine)
 {
-	return machine.device(CASSETTE_TAG);
+	return machine.device<cassette_image_device>(CASSETTE_TAG);
 }
 
 
@@ -25,7 +25,7 @@ static READ8_HANDLER( ondra_keyboard_r )
 	UINT8 retVal = 0x00;
 	UINT8 ondra_keyboard_line = offset & 0x000f;
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
-	double valcas = cassette_input(cassette_device_image(space->machine()));
+	double valcas = (cassette_device_image(space->machine())->input());
 	if ( valcas < 0.00) {
 		retVal = 0x80;
 	}
@@ -65,7 +65,7 @@ WRITE8_HANDLER( ondra_port_03_w )
 	state->m_bank1_status = (data >> 1) & 1;
 	state->m_bank2_status = (data >> 2) & 1;
 	ondra_update_banks(space->machine());
-	cassette_output(cassette_device_image(space->machine()), ((data >> 3) & 1) ? -1.0 : +1.0);
+	cassette_device_image(space->machine())->output(((data >> 3) & 1) ? -1.0 : +1.0);
 }
 
 WRITE8_HANDLER( ondra_port_09_w )

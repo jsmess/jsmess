@@ -21,7 +21,7 @@ public:
 		  m_key_a8(1)
 	{ }
 
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 
 	virtual void machine_start();
 

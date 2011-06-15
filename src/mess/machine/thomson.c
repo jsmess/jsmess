@@ -46,8 +46,8 @@ static int old_floppy_bank;
 
 /********************* common cassette code ***************************/
 
-INLINE device_t* thom_cassette_img( running_machine &machine )
-{ return machine.device(CASSETTE_TAG); }
+INLINE cassette_image_device* thom_cassette_img( running_machine &machine )
+{ return machine.device<cassette_image_device>(CASSETTE_TAG); }
 
 /*-------------- TO7 ------------*/
 
@@ -85,13 +85,12 @@ static UINT8* to7_k7_bits;
 */
 static int to7_get_cassette ( running_machine &machine )
 {
-	device_t* img = thom_cassette_img(machine);
-	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
-	if ( image->exists() )
+	cassette_image_device* img = thom_cassette_img(machine);
+	if ( img->exists() )
 	{
-		cassette_image* cass = cassette_get_image( img );
-		cassette_state state = cassette_get_state( img );
-		double pos = cassette_get_position( img );
+		cassette_image* cass = img->get_image();
+		cassette_state state = img->get_state();
+		double pos = img->get_position();
 		int bitpos = pos / TO7_BIT_LENGTH;
 
 		if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED )
@@ -139,17 +138,17 @@ static int to7_get_cassette ( running_machine &machine )
 /* 1-bit cassette output */
 static void to7_set_cassette ( running_machine &machine, int data )
 {
-	device_t* img = thom_cassette_img(machine);
-	cassette_output( img, data ? 1. : -1. );
+	cassette_image_device* img = thom_cassette_img(machine);
+	img->output(data ? 1. : -1. );
 }
 
 
 
 static WRITE8_DEVICE_HANDLER ( to7_set_cassette_motor )
 {
-	device_t* img = thom_cassette_img(device->machine());
-	cassette_state state = cassette_get_state( img );
-	double pos = cassette_get_position(img);
+	cassette_image_device* img = thom_cassette_img(device->machine());
+	cassette_state state =  img->get_state();
+	double pos = img->get_position();
 
 	LOG (( "$%04x %f to7_set_cassette_motor: cassette motor %s bitpos=%i\n",
 	       cpu_get_previouspc(device->machine().device("maincpu")), img->machine().time().as_double(), data ? "off" : "on",
@@ -158,10 +157,10 @@ static WRITE8_DEVICE_HANDLER ( to7_set_cassette_motor )
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED && !data && pos > 0.3 )
 	{
 		/* rewind a little before starting the motor */
-		cassette_seek( img, -0.3, SEEK_CUR );
+		img->seek(-0.3, SEEK_CUR );
 	}
 
-	cassette_change_state( img, data ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
+	img->change_state(data ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR );
 }
 
 
@@ -186,14 +185,14 @@ static WRITE8_DEVICE_HANDLER ( to7_set_cassette_motor )
 
 static int mo5_get_cassette ( running_machine &machine )
 {
-	device_t* img = thom_cassette_img(machine);
+	cassette_image_device* img = thom_cassette_img(machine);
 	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
 
 	if ( image->exists() )
 	{
-		cassette_image* cass = cassette_get_image( img );
-		cassette_state state = cassette_get_state( img );
-		double pos = cassette_get_position( img );
+		cassette_image* cass = img->get_image();
+		cassette_state state = img->get_state();
+		double pos = img->get_position();
 		INT32 hbit;
 
 		if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED )
@@ -215,17 +214,17 @@ static int mo5_get_cassette ( running_machine &machine )
 
 static void mo5_set_cassette ( running_machine &machine, int data )
 {
-	device_t* img = thom_cassette_img(machine);
-	cassette_output( img, data ? 1. : -1. );
+	cassette_image_device* img = thom_cassette_img(machine);
+	img->output(data ? 1. : -1. );
 }
 
 
 
 static WRITE8_DEVICE_HANDLER ( mo5_set_cassette_motor )
 {
-	device_t* img = thom_cassette_img(device->machine());
-	cassette_state state = cassette_get_state( img );
-	double pos = cassette_get_position(img);
+	cassette_image_device* img = thom_cassette_img(device->machine());
+	cassette_state state = img->get_state();
+	double pos = img->get_position();
 
 	LOG (( "$%04x %f mo5_set_cassette_motor: cassette motor %s hbitpos=%i\n",
 	       cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double(), data ? "off" : "on",
@@ -234,10 +233,10 @@ static WRITE8_DEVICE_HANDLER ( mo5_set_cassette_motor )
 	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED &&  !data && pos > 0.3 )
 	{
 		/* rewind a little before starting the motor */
-		cassette_seek( img, -0.3, SEEK_CUR );
+		img->seek(-0.3, SEEK_CUR );
 	}
 
-	cassette_change_state( img, data ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
+	img->change_state(data ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR );
 }
 
 

@@ -265,12 +265,13 @@ static const ay8910_interface svi318_ay8910_interface =
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, svi318_psg_port_b_w)
 };
 
-static const cassette_config svi318_cassette_config =
+static const cassette_interface svi318_cassette_interface =
 {
 	svi_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
-	"svi318_cass"
+	"svi318_cass",
+	NULL
 };
 
 static const floppy_config svi318_floppy_config =
@@ -333,7 +334,7 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, svi318_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, svi318_cassette_interface )
 
 	MCFG_WD179X_ADD("wd179x", svi_wd17xx_interface )
 
@@ -460,7 +461,7 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, svi318_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, svi318_cassette_interface )
 
 	MCFG_WD179X_ADD("wd179x", svi_wd17xx_interface )
 

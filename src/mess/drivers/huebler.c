@@ -304,12 +304,14 @@ static Z80PIO_INTERFACE( pio2_intf )
 
 static READ_LINE_DEVICE_HANDLER( cassette_r )
 {
-	return cassette_input(device) < 0.0;
+	cassette_image_device* dev = dynamic_cast<cassette_image_device*>(device);
+	return dev->input() < 0.0;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cassette_w )
 {
-	cassette_output(device, state ? -1.0 : +1.0);
+	cassette_image_device* dev = dynamic_cast<cassette_image_device*>(device);
+	dev->output(state ? -1.0 : +1.0);
 }
 
 static Z80DART_INTERFACE( sio_intf )
@@ -361,11 +363,12 @@ void amu880_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_config amu880_cassette_config =
+static const cassette_interface amu880_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -412,7 +415,7 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_Z80PIO_ADD(Z80PIO2_TAG, XTAL_10MHz/4, pio2_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_10MHz/4, sio_intf) // U856
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, amu880_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, amu880_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

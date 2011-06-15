@@ -108,7 +108,7 @@ READ16_HANDLER (bk_vid_scrool_r)
 READ16_HANDLER (bk_key_press_r)
 {
 	bk_state *state = space->machine().driver_data<bk_state>();
-	double level = cassette_input(space->machine().device(CASSETTE_TAG));
+	double level = (space->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
 	UINT16 cas;
 	if (level < 0)
 	{

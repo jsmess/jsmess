@@ -139,7 +139,7 @@ READ_LINE_MEMBER( exp85_state::sid_r )
 
 	if (m_tape_control)
 	{
-		data = cassette_input(m_cassette) > +1.0;
+		data = (m_cassette)->input() > +1.0;
 	}
 	else
 	{
@@ -153,7 +153,7 @@ WRITE_LINE_MEMBER( exp85_state::sod_w )
 {
 	if (m_tape_control)
 	{
-		cassette_output(m_cassette, state ? -1.0 : +1.0);
+		m_cassette->output(state ? -1.0 : +1.0);
 	}
 	else
 	{
@@ -192,11 +192,12 @@ void exp85_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_config exp85_cassette_config =
+static const cassette_interface exp85_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -218,7 +219,7 @@ static MACHINE_CONFIG_START( exp85, exp85_state )
 	/* devices */
 	MCFG_I8155_ADD(I8155_TAG, XTAL_6_144MHz/2, i8155_intf)
 	MCFG_I8355_ADD(I8355_TAG, XTAL_6_144MHz/2, i8355_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, exp85_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, exp85_cassette_interface)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	/* internal ram */

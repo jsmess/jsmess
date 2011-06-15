@@ -625,7 +625,7 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	MCFG_GROM_ADD( "grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
 
 	MCFG_PBOX8_ADD( "peribox", console_extint, console_notconnected, console_ready )
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
 	MCFG_TI99_GROMPORT_ADD( "gromport", console_ready )
 	MCFG_MECMOUSE_ADD( "mecmouse" )
@@ -670,7 +670,7 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	MCFG_GROM_ADD( "grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
 
 	MCFG_PBOX8_ADD( "peribox", console_extint, console_notconnected, console_ready )
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
 	MCFG_TI99_GROMPORT_ADD( "gromport", console_ready )
 	MCFG_MECMOUSE_ADD( "mecmouse" )

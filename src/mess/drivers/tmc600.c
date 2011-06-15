@@ -201,7 +201,7 @@ READ_LINE_MEMBER( tmc600_state::clear_r )
 
 READ_LINE_MEMBER( tmc600_state::ef2_r )
 {
-	return cassette_input(m_cassette) < 0;
+	return (m_cassette)->input() < 0;
 }
 
 READ_LINE_MEMBER( tmc600_state::ef3_r )
@@ -214,7 +214,7 @@ READ_LINE_MEMBER( tmc600_state::ef3_r )
 
 WRITE_LINE_MEMBER( tmc600_state::q_w )
 {
-	cassette_output(m_cassette, state ? +1.0 : -1.0);
+	m_cassette->output(state ? +1.0 : -1.0);
 }
 
 static COSMAC_INTERFACE( cosmac_intf )
@@ -257,11 +257,12 @@ void tmc600_state::machine_start()
 
 /* Machine Drivers */
 
-static const cassette_config tmc600_cassette_config =
+static const cassette_interface tmc600_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -289,7 +290,7 @@ static MACHINE_CONFIG_START( tmc600, tmc600_state )
 
 	/* devices */
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, tmc600_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, tmc600_cassette_interface)
 	MCFG_FLOPPY_2_DRIVES_ADD(tmc600_floppy_config)
 
 	/* internal ram */

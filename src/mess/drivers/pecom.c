@@ -164,11 +164,12 @@ static INPUT_PORTS_START( pecom )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_MINUS) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF4)
 INPUT_PORTS_END
 
-static const cassette_config pecom_cassette_config =
+static const cassette_interface pecom_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -188,7 +189,7 @@ static MACHINE_CONFIG_START( pecom64, pecom_state )
 
 	MCFG_FRAGMENT_ADD(pecom_video)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, pecom_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, pecom_cassette_interface )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

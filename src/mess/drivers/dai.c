@@ -174,11 +174,12 @@ static const struct CassetteOptions dai_cassette_options = {
 	44100		/* sample frequency */
 };
 
-static const cassette_config dai_cassette_config =
+static const cassette_interface dai_cassette_interface =
 {
 	cassette_default_formats,
 	&dai_cassette_options,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -240,7 +241,7 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, dai_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, dai_cassette_interface )
 
 	/* tms5501 */
 	MCFG_TMS5501_ADD( "tms5501", dai_tms5501_interface )

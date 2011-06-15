@@ -702,11 +702,12 @@ static INTERRUPT_GEN( bbcb_vsync )
 //};
 
 
-static const cassette_config bbc_cassette_config =
+static const cassette_interface bbc_cassette_interface =
 {
 	bbc_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
+	NULL,
 	NULL
 };
 
@@ -818,7 +819,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 //  MCFG_SOUND_ADD("tms5220", TMS5220, tms5220_interface)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, bbc_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, bbc_cassette_interface )
 
 	/* acia */
 	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
@@ -929,7 +930,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_CENTRONICS_ADD("centronics", bbcb_centronics_config)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, bbc_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, bbc_cassette_interface )
 
 	/* acia */
 	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)

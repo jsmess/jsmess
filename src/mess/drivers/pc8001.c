@@ -76,7 +76,7 @@ WRITE8_MEMBER( pc8001_state::port30_w )
 	m_color = BIT(data, 1);
 
 	/* cassette motor */
-	cassette_change_state(m_cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 WRITE8_MEMBER( pc8001mk2_state::port31_w )
@@ -510,11 +510,12 @@ void pc8001_state::machine_start()
 
 /* Cassette Configuration */
 
-static const cassette_config pc8001_cassette_config =
+static const cassette_interface pc8001_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -550,7 +551,7 @@ static MACHINE_CONFIG_START( pc8001, pc8001_state )
 	MCFG_UPD3301_ADD(UPD3301_TAG, 14318180, pc8001_upd3301_intf)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, pc8001_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, pc8001_cassette_interface)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
@@ -587,7 +588,7 @@ static MACHINE_CONFIG_START( pc8001mk2, pc8001mk2_state )
 	MCFG_UPD3301_ADD(UPD3301_TAG, 14318180, pc8001_upd3301_intf)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, pc8001_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, pc8001_cassette_interface)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")

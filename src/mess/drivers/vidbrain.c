@@ -378,14 +378,15 @@ static const f3853_interface smi_intf =
 
 
 //-------------------------------------------------
-//  cassette_config vidbrain_cassette_config
+//  cassette_interface vidbrain_cassette_interface
 //-------------------------------------------------
 
-static const cassette_config vidbrain_cassette_config =
+static const cassette_interface vidbrain_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -466,7 +467,7 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 
 	// devices
 //  MCFG_F3853_ADD(F3853_TAG, XTAL_14_31818MHz/8, smi_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, vidbrain_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, vidbrain_cassette_interface)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")

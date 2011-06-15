@@ -92,13 +92,13 @@ WRITE8_HANDLER( ut88_sound_w )
 {
 	device_t *dac_device = space->machine().device("dac");
 	dac_data_w(dac_device, data); //beeper
-	cassette_output(space->machine().device(CASSETTE_TAG),data & 0x01 ? 1 : -1);
+	space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(data & 0x01 ? 1 : -1);
 }
 
 
 READ8_HANDLER( ut88_tape_r )
 {
-	double level = cassette_input(space->machine().device(CASSETTE_TAG));
+	double level = space->machine().device<cassette_image_device>(CASSETTE_TAG)->input();
 	if (level <  0) {
 			return 0x00;
 	}

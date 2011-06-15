@@ -92,6 +92,7 @@
 
 #include "emu.h"
 #include "includes/mbee.h"
+
 #define XTAL_13_5MHz 13500000
 
 /********** NOTE !!! ***********************************************************
@@ -701,7 +702,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_QUICKLOAD_ADD("quickload", mbee, "mwb,com", 2)
 	MCFG_Z80BIN_QUICKLOAD_ADD("quickload2", mbee, 2)
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 MACHINE_CONFIG_END
 
 
@@ -743,7 +744,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_QUICKLOAD_ADD("quickload", mbee, "mwb,com", 2)
 	MCFG_Z80BIN_QUICKLOAD_ADD("quickload2", mbee, 2)
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeepc, mbeeic )

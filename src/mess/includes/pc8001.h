@@ -45,7 +45,7 @@ public:
 	required_device<upd1990a_device> m_rtc;
 	required_device<device_t> m_dma;
 	required_device<upd3301_device> m_crtc;
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_ram;

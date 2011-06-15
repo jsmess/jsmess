@@ -53,8 +53,8 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_cass1;
-	required_device<device_t> m_cass2;
+	required_device<cassette_image_device> m_cass1;
+	required_device<cassette_image_device> m_cass2;
 	required_device<device_t> m_wave1;
 	required_device<device_t> m_wave2;
 	required_device<device_t> m_dac;

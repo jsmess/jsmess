@@ -522,11 +522,12 @@ static GFXDECODE_START(radionic)
 GFXDECODE_END
 
 
-static const cassette_config trs80l2_cassette_config =
+static const cassette_interface trs80l2_cassette_interface =
 {
 	trs80l2_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
+	NULL,
 	NULL
 };
 
@@ -584,7 +585,7 @@ static MACHINE_CONFIG_START( trs80, trs80_state )		// the original model I, leve
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( model1, trs80 )		// model I, level II
@@ -594,7 +595,7 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )		// model I, level II
 	MCFG_CPU_PERIODIC_INT(trs80_rtc_interrupt, 40)
 
 	/* devices */
-	MCFG_CASSETTE_MODIFY( CASSETTE_TAG, trs80l2_cassette_config )
+	MCFG_CASSETTE_MODIFY( CASSETTE_TAG, trs80l2_cassette_interface )
 	MCFG_QUICKLOAD_ADD("quickload", trs80_cmd, "cmd", 0.5)
 	MCFG_WD179X_ADD("wd179x", trs80_wd17xx_interface )
 	MCFG_FLOPPY_4_DRIVES_ADD(trs80_floppy_config)

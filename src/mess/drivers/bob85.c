@@ -24,7 +24,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_cass;
+	required_device<cassette_image_device> m_cass;
 	DECLARE_READ8_MEMBER(bob85_keyboard_r);
 	DECLARE_WRITE8_MEMBER(bob85_7seg_w);
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
@@ -167,22 +167,23 @@ static MACHINE_RESET(bob85)
 {
 }
 
-static const cassette_config bob85_cassette_config =
+static const cassette_interface bob85_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
 WRITE_LINE_MEMBER( bob85_state::sod_w )
 {
-	cassette_output(m_cass, state ? +1.0 : -1.0);
+	m_cass->output(state ? +1.0 : -1.0);
 }
 
 READ_LINE_MEMBER( bob85_state::sid_r )
 {
-	return cassette_input(m_cass) > 0.0;
+	return (m_cass)->input() > 0.0;
 }
 
 static I8085_CONFIG( cpu_config )
@@ -206,7 +207,7 @@ static MACHINE_CONFIG_START( bob85, bob85_state )
 	MCFG_DEFAULT_LAYOUT(layout_bob85)
 
 	// devices
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, bob85_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, bob85_cassette_interface)
 MACHINE_CONFIG_END
 
 /* ROM definition */

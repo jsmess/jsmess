@@ -344,11 +344,12 @@ static const ay8910_interface oric_ay_interface =
 };
 
 
-static const cassette_config oric_cassette_config =
+static const cassette_interface oric_cassette_interface =
 {
 	oric_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED),
+	NULL,
 	NULL
 };
 
@@ -419,7 +420,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_CENTRONICS_ADD("centronics", oric_centronics_config)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, oric_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, oric_cassette_interface )
 
 	/* via */
 	MCFG_VIA6522_ADD( "via6522_0", 1000000, oric_6522_interface )

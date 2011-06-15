@@ -16,7 +16,7 @@ static READ8_DEVICE_HANDLER (ac1_port_b_r)
 	ac1_state *state = device->machine().driver_data<ac1_state>();
 	UINT8 data = 0x7f;
 
-	if (cassette_input(state->m_cassette) > 0.03)
+	if (state->m_cassette->input() > 0.03)
 		data |= 0x80;
 
 	return data;
@@ -95,7 +95,7 @@ static WRITE8_DEVICE_HANDLER (ac1_port_b_w)
 
     */
 	ac1_state *state = device->machine().driver_data<ac1_state>();
-	cassette_output(state->m_cassette, (data & 0x40) ? -1.0 : +1.0);
+	state->m_cassette->output((data & 0x40) ? -1.0 : +1.0);
 }
 
 Z80PIO_INTERFACE( ac1_z80pio_intf )
@@ -117,5 +117,5 @@ DRIVER_INIT(ac1)
 MACHINE_RESET( ac1 )
 {
 	ac1_state *state = machine.driver_data<ac1_state>();
-	state->m_cassette = machine.device(CASSETTE_TAG);
+	state->m_cassette = machine.device<cassette_image_device>(CASSETTE_TAG);
 }

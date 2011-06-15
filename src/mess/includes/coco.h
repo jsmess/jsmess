@@ -10,6 +10,7 @@
 #define __COCO_H__
 
 #include "imagedev/snapquik.h"
+#include "imagedev/cassette.h"
 #include "machine/wd17xx.h"
 #include "machine/6883sam.h"
 #include "machine/6821pia.h"
@@ -79,7 +80,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	device_t *m_cococart_device;
-	device_t *m_cassette_device;
+	cassette_image_device *m_cassette_device;
 	device_t *m_bitbanger_device;
 	printer_image_device *m_printer_device;
 	device_t *m_dac;

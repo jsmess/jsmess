@@ -288,7 +288,7 @@ WRITE8_MEMBER( mc1000_state::keylatch_w )
 {
 	m_keylatch = data;
 
-	cassette_output(m_cassette, BIT(data, 7) ? -1.0 : +1.0);
+	m_cassette->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
 READ8_MEMBER( mc1000_state::keydata_r )
@@ -314,7 +314,7 @@ READ8_MEMBER( mc1000_state::keydata_r )
 
 	data = (input_port_read(machine(), "MODIFIERS") & 0xc0) | (data & 0x3f);
 
-	if (cassette_input(m_cassette) < +0.0)	data &= 0x7f;
+	if (m_cassette->input() < +0.0)	data &= 0x7f;
 
 	return data;
 }
@@ -429,11 +429,12 @@ static TIMER_DEVICE_CALLBACK( ne555_tick )
 	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, param);
 }
 
-static const cassette_config mc1000_cassette_config =
+static const cassette_interface mc1000_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -489,7 +490,7 @@ static MACHINE_CONFIG_START( mc1000, mc1000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, mc1000_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, mc1000_cassette_interface)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */

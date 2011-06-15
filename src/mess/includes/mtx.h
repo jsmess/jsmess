@@ -8,6 +8,7 @@
 #define __MTX__
 
 #include "imagedev/snapquik.h"
+#include "imagedev/cassette.h"
 
 #define Z80_TAG			"z80"
 #define Z80CTC_TAG		"z80ctc"
@@ -38,7 +39,7 @@ public:
 	/* devices */
 	device_t *m_z80ctc;
 	device_t *m_z80dart;
-	device_t *m_cassette;
+	cassette_image_device *m_cassette;
 	device_t *m_centronics;
 
 	/* timers */

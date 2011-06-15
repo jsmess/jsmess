@@ -199,7 +199,7 @@ WRITE8_MEMBER( pc8201_state::scp_w )
     */
 
 	/* cassette motor */
-	cassette_change_state(m_cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	/* RTC strobe */
 	m_rtc->stb_w(BIT(data, 4));
@@ -445,7 +445,7 @@ WRITE8_MEMBER( kc85_state::ctrl_w )
 	m_rtc->stb_w(BIT(data, 2));
 
 	/* cassette motor */
-	cassette_change_state(m_cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 READ8_MEMBER( kc85_state::keyboard_r )
@@ -522,7 +522,7 @@ WRITE8_MEMBER( tandy200_state::stbk_w )
 	centronics_strobe_w(m_centronics, BIT(data, 0));
 
 	/* cassette motor */
-	cassette_change_state(m_cassette, BIT(data, 1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(BIT(data,1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 READ8_MEMBER( kc85_state::lcd_r )
@@ -1245,22 +1245,23 @@ void tandy200_state::machine_start()
 	state_save_register_global(machine(), m_bell);
 }
 
-static const cassette_config kc85_cassette_config =
+static const cassette_interface kc85_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
 static WRITE_LINE_DEVICE_HANDLER( kc85_sod_w )
 {
-	cassette_output(device, state ? +1.0 : -1.0);
+	dynamic_cast<cassette_image_device *>(device)->output(state ? +1.0 : -1.0);
 }
 
 static READ_LINE_DEVICE_HANDLER( kc85_sid_r )
 {
-	return cassette_input(device) > 0.0;
+	return dynamic_cast<cassette_image_device *>(device)->input() > 0.0;
 }
 
 static I8085_CONFIG( kc85_i8085_config )
@@ -1299,7 +1300,7 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_interface)
 
 	/* option ROM cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -1335,7 +1336,7 @@ static MACHINE_CONFIG_START( pc8201, pc8201_state )
 	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_interface)
 
 	/* option ROM cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -1377,7 +1378,7 @@ static MACHINE_CONFIG_START( trsm100, trsm100_state )
 	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_interface)
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 
 	/* option ROM cartridge */
@@ -1426,7 +1427,7 @@ static MACHINE_CONFIG_START( tandy200, tandy200_state )
 	MCFG_MSM8251_ADD(MSM8251_TAG, /*XTAL_4_9152MHz/2,*/ tandy200_uart_intf)
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_interface)
 
 	/* option ROM cartridge */
 	MCFG_CARTSLOT_ADD("cart")

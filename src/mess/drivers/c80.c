@@ -104,7 +104,7 @@ READ8_MEMBER( c80_state::pio1_pa_r )
 		}
 	}
 
-	data |= (cassette_input(m_cassette) < +0.0) << 7;
+	data |= (m_cassette->input() < +0.0) << 7;
 
 	return data;
 }
@@ -133,7 +133,7 @@ WRITE8_MEMBER( c80_state::pio1_pa_w )
 		m_digit = 0;
 	}
 
-	cassette_output(m_cassette, BIT(data, 6) ? +1.0 : -1.0);
+	m_cassette->output(BIT(data, 6) ? +1.0 : -1.0);
 }
 
 WRITE8_MEMBER( c80_state::pio1_pb_w )
@@ -221,11 +221,12 @@ void c80_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_config c80_cassette_config =
+static const cassette_interface c80_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -242,7 +243,7 @@ static MACHINE_CONFIG_START( c80, c80_state )
 	/* devices */
 	MCFG_Z80PIO_ADD(Z80PIO1_TAG, 2500000, pio1_intf)
 	MCFG_Z80PIO_ADD(Z80PIO2_TAG, 2500000, pio2_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, c80_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, c80_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

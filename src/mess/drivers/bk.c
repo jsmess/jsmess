@@ -160,11 +160,12 @@ static const struct t11_setup t11_data =
 };
 
 /* Machine driver */
-static const cassette_config bk0010_cassette_config =
+static const cassette_interface bk0010_cassette_interface =
 {
 	/*rk8_cassette_formats*/cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -196,7 +197,7 @@ static MACHINE_CONFIG_START( bk0010, bk_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, bk0010_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, bk0010_cassette_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( bk0010fd, bk_state )
@@ -226,7 +227,7 @@ static MACHINE_CONFIG_START( bk0010fd, bk_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, bk0010_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, bk0010_cassette_interface )
 MACHINE_CONFIG_END
 
 

@@ -788,7 +788,7 @@ static MACHINE_CONFIG_START( c128, c128_state )
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
 
 	/* cia */
 	MCFG_MOS6526R1_ADD("cia_0", VIC6567_CLOCK, c128_ntsc_cia0)

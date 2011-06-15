@@ -389,11 +389,12 @@ static INPUT_PORTS_START( specimx )
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-static const cassette_config special_cassette_config =
+static const cassette_interface special_cassette_interface =
 {
 	rks_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -441,7 +442,7 @@ static MACHINE_CONFIG_START( special, special_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, special_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, special_cassette_interface )
 
 MACHINE_CONFIG_END
 
@@ -519,7 +520,7 @@ static MACHINE_CONFIG_START( erik, special_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, special_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, special_cassette_interface )
 
 	MCFG_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 

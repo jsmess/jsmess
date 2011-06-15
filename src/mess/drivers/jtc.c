@@ -49,7 +49,7 @@ READ8_MEMBER( jtc_state::p3_r )
 
 	UINT8 data = 0;
 
-	data |= (cassette_input(m_cassette) < 0.0) ? 1 : 0;
+	data |= ((m_cassette)->input() < 0.0) ? 1 : 0;
 	data |= centronics_busy_r(m_centronics) << 3;
 
 	return data;
@@ -73,7 +73,7 @@ WRITE8_MEMBER( jtc_state::p3_w )
     */
 
 	/* tape */
-	cassette_output(m_cassette, BIT(data, 6) ? +1.0 : -1.0);
+	m_cassette->output( BIT(data, 6) ? +1.0 : -1.0);
 
 	/* speaker */
 	speaker_level_w(m_speaker, BIT(data, 7));
@@ -589,11 +589,12 @@ void jtc_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_config jtc_cassette_config =
+static const cassette_interface jtc_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -647,7 +648,7 @@ static MACHINE_CONFIG_START( basic, jtc_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, jtc_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, jtc_cassette_interface)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)

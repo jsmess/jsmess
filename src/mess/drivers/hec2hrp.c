@@ -348,11 +348,12 @@ static const struct CassetteOptions hector_cassette_options = {
 	44100	/* sample frequency */
 };
 
-static const cassette_config hector_cassette_config =
+static const cassette_interface hector_cassette_interface =
 {
 	hector_cassette_formats,
 	&hector_cassette_options,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER),
+	NULL,
 	NULL
 };
 
@@ -399,7 +400,7 @@ static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_interface )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")
@@ -443,7 +444,7 @@ static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_interface )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")
@@ -494,7 +495,7 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_interface )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")
@@ -545,7 +546,7 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// Gestion cassette
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_interface )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")
@@ -595,7 +596,7 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_interface )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")

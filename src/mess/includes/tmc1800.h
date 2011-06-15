@@ -34,7 +34,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cdp1861_device> m_vdc;
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -63,7 +63,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -93,7 +93,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_ram;
 
 	virtual void machine_start();
@@ -139,7 +139,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_ram;
 
 	virtual void machine_start();

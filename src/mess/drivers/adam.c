@@ -768,10 +768,10 @@ WRITE8_MEMBER( adam_state::ddp6801_p1_w )
 //  cassette_set_speed(m_ddp1, BIT(data, 0) ? 80 : 20);
 
 	// motor stop 0
-	cassette_set_state(m_ddp0, BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED);
+	m_ddp0->set_state(BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED);
 
 	// motor stop 1
-	cassette_set_state(m_ddp1, BIT(data, 2) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED);
+	m_ddp1->set_state(BIT(data, 2) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED);
 
 	// data write 0
 	m_wr0 = BIT(data, 6);
@@ -837,8 +837,8 @@ WRITE8_MEMBER( adam_state::ddp6801_p2_w )
 	m_track = !BIT(data, 2);
 
 	// write data
-	if (!m_wr0) cassette_output(m_ddp0, BIT(data, 0) ? 1.0 : -1.0);
-	if (!m_wr1) cassette_output(m_ddp0, BIT(data, 0) ? 1.0 : -1.0);
+	if (!m_wr0) m_ddp0->output(BIT(data, 0) ? 1.0 : -1.0);
+	if (!m_wr1) m_ddp1->output(BIT(data, 0) ? 1.0 : -1.0);
 
 	// NET TXD
 	adamnet_txd_w(ADAMNET_DDP, BIT(data, 4));
@@ -869,10 +869,10 @@ READ8_MEMBER( adam_state::ddp6801_p4_r )
 	UINT8 data = 0;
 
 	// motion sense 0
-	data |= ((cassette_get_state(m_ddp0) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) << 3;
+	data |= ((m_ddp0->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) << 3;
 
 	// motion sense 1
-	data |= ((cassette_get_state(m_ddp1) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) << 4;
+	data |= ((m_ddp1->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) << 4;
 
 	// cassette in place 0
 //  data |= dynamic_cast<device_image_interface *>(&m_ddp0)->exists() << 5;
@@ -881,7 +881,7 @@ READ8_MEMBER( adam_state::ddp6801_p4_r )
 	data |= 0x40;
 
 	// read data 1
-	data |= ((cassette_input(m_ddp0) < 0) || (cassette_input(m_ddp1) < 0)) << 7;
+	data |= ((m_ddp0->input() < 0) || (m_ddp1->input() < 0)) << 7;
 
 	return data;
 }
@@ -1522,14 +1522,15 @@ static const TMS9928a_interface tms9928a_interface =
 
 
 //-------------------------------------------------
-//  cassette_config adam_cassette_config
+//  cassette_interface adam_cassette_interface
 //-------------------------------------------------
 
-static const cassette_config adam_cassette_config =
+static const cassette_interface adam_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -1724,8 +1725,8 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_TIMER_ADD_PERIODIC("paddles", paddle_tick, attotime::from_msec(20))
 	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, adam_floppy_config)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, adam_cassette_config)
-	MCFG_CASSETTE_ADD(CASSETTE2_TAG, adam_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, adam_cassette_interface)
+	MCFG_CASSETTE_ADD(CASSETTE2_TAG, adam_cassette_interface)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")

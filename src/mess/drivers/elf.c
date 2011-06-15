@@ -263,11 +263,12 @@ void elf2_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_config elf_cassette_config =
+static const cassette_interface elf_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -324,7 +325,7 @@ static MACHINE_CONFIG_START( elf2, elf2_state )
 	MCFG_CDP1861_ADD(CDP1861_TAG, XTAL_3_579545MHz/2, elf2_cdp1861_intf)
 
 	/* devices */
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, elf_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, elf_cassette_interface)
 	MCFG_QUICKLOAD_ADD("quickload", elf, "bin", 0)
 
 	/* internal ram */

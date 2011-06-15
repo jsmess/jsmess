@@ -129,11 +129,12 @@ static INPUT_PORTS_START( vector06 )
 
 INPUT_PORTS_END
 
-static const cassette_config vector_cassette_config =
+static const cassette_interface vector_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -200,7 +201,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, vector_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, vector_cassette_interface )
 
 	MCFG_WD1793_ADD("wd1793", vector06_wd17xx_interface)
 	MCFG_FLOPPY_2_DRIVES_ADD(vector_floppy_config)

@@ -1063,17 +1063,17 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 static READ_LINE_DEVICE_HANDLER( dfd_in_r )
 {
-	return cassette_input(device) > 0.0;
+	return dynamic_cast<cassette_image_device *>(device)->input() > 0.0;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( dfd_out_w )
 {
-	cassette_output(device, state ? +1.0 : -1.0);
+	dynamic_cast<cassette_image_device *>(device)->output(state ? +1.0 : -1.0);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( motor_control_w )
 {
-	cassette_change_state(device, state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	dynamic_cast<cassette_image_device *>(device)->change_state(state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
 static Z80DART_INTERFACE( sio_intf )
@@ -1221,14 +1221,15 @@ static const z80_daisy_config abc800_daisy_chain[] =
 
 
 //-------------------------------------------------
-//  cassette_config abc800_cassette_config
+//  cassette_interface abc800_cassette_interface
 //-------------------------------------------------
 
-static const cassette_config abc800_cassette_config =
+static const cassette_interface abc800_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -1429,7 +1430,7 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 	MCFG_PRINTER_ADD("printer")
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
 	MCFG_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, attotime::from_hz(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
 
 	// ABC bus
@@ -1476,7 +1477,7 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 	MCFG_PRINTER_ADD("printer")
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
 	MCFG_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, attotime::from_hz(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
 
 	// ABC bus
@@ -1521,7 +1522,7 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
 	MCFG_ABC77_ADD(abc77_intf)
 	MCFG_PRINTER_ADD("printer")
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
 
 	// ABC bus
 	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
@@ -1556,7 +1557,7 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
 	MCFG_ABC77_ADD(abc77_intf)
 	MCFG_PRINTER_ADD("printer")
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
 
 	// ABC bus
 	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)

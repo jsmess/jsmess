@@ -153,9 +153,9 @@ static void microtan_set_irq_line(running_machine &machine)
     cputag_set_input_line(machine, "maincpu", 0, state->m_via_0_irq_line | state->m_via_1_irq_line | state->m_kbd_irq_line);
 }
 
-static device_t *cassette_device_image(running_machine &machine)
+static cassette_image_device *cassette_device_image(running_machine &machine)
 {
-	return machine.device(CASSETTE_TAG);
+	return machine.device<cassette_image_device>(CASSETTE_TAG);
 }
 
 /**************************************************************
@@ -212,7 +212,7 @@ static WRITE8_DEVICE_HANDLER (via_0_out_b )
 {
     LOG(("microtan_via_0_out_b %02X\n", data));
     /* bit #7 is the cassette output signal */
-    cassette_output(cassette_device_image(device->machine()), data & 0x80 ? +1.0 : -1.0);
+    cassette_device_image(device->machine())->output(data & 0x80 ? +1.0 : -1.0);
 }
 
 static WRITE8_DEVICE_HANDLER ( via_0_out_ca2 )
@@ -335,7 +335,7 @@ const via6522_interface microtan_via6522_1 =
 
 static TIMER_CALLBACK(microtan_read_cassette)
 {
-	double level = cassette_input(cassette_device_image(machine));
+	double level = (cassette_device_image(machine))->input();
 	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
 
 	LOG(("microtan_read_cassette: %g\n", level));

@@ -41,7 +41,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_pio;
-	required_device<device_t> m_cass;
+	required_device<cassette_image_device> m_cass;
 	required_device<device_t> m_wave;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_printer;

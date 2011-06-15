@@ -1010,11 +1010,12 @@ static VIDEO_START( msx2 )
 #define MSX_VISIBLE_XBORDER_PIXELS	8
 #define MSX_VISIBLE_YBORDER_PIXELS	24
 
-static const cassette_config msx_cassette_config =
+static const cassette_interface msx_cassette_interface =
 {
 	fmsx_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
+	NULL,
 	NULL
 };
 
@@ -1082,7 +1083,7 @@ static MACHINE_CONFIG_START( msx, msx_state )
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, msx_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, msx_cassette_interface )
 
 	MCFG_WD179X_ADD("wd179x", msx_wd17xx_interface )
 
@@ -1155,7 +1156,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, msx_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, msx_cassette_interface )
 
 	/* real time clock */
 	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)

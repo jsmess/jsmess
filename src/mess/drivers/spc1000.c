@@ -276,11 +276,12 @@ static const ay8910_interface spc1000_ay_interface =
 	DEVCB_NULL
 };
 
-static const cassette_config spc1000_cassette_config =
+static const cassette_interface spc1000_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -330,7 +331,7 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, spc1000_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, spc1000_cassette_interface )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

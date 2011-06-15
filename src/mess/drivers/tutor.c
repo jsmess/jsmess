@@ -387,13 +387,13 @@ static TIMER_CALLBACK(tape_interrupt_handler)
 {
 	//tutor_state *state = machine.driver_data<tutor_state>();
 	//assert(state->m_tape_interrupt_enable);
-	cputag_set_input_line(machine, "maincpu", 1, (cassette_input(machine.device(CASSETTE_TAG)) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, ((machine.device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* CRU handler */
 static  READ8_HANDLER(tutor_cassette_r)
 {
-	return (cassette_input(space->machine().device(CASSETTE_TAG)) > 0.0) ? 1 : 0;
+	return ((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0) ? 1 : 0;
 }
 
 /* memory handler */
@@ -411,7 +411,7 @@ static WRITE8_HANDLER(tutor_cassette_w)
 		{
 		case 0:
 			/* data out */
-			cassette_output(space->machine().device(CASSETTE_TAG), (data) ? +1.0 : -1.0);
+			space->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data) ? +1.0 : -1.0);
 			break;
 		case 1:
 			/* interrupt control??? */
@@ -711,7 +711,7 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 
 	MCFG_CENTRONICS_ADD("printer", standard_centronics)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

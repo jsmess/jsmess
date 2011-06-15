@@ -33,7 +33,7 @@ public:
 	required_device<device_t> m_ctc;
 	required_device<i8255_device> m_ppi;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_ram;
 	required_device<device_t> m_floppy0;

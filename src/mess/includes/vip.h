@@ -75,7 +75,7 @@ public:
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1861_device> m_vdc;
 	required_device<cdp1862_device> m_cgc;
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_beeper;
 	required_device<vp595_device> m_vp595;
 	required_device<vp550_device> m_vp550;

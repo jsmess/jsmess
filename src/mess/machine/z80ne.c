@@ -31,13 +31,13 @@
 
 /* timer to read cassette waveforms */
 
-static device_t *cassette_device_image(running_machine &machine)
+static cassette_image_device *cassette_device_image(running_machine &machine)
 {
 	z80ne_state *state = machine.driver_data<z80ne_state>();
 	if (state->m_lx385_ctrl & 0x08)
-		return machine.device(CASSETTE2_TAG);
+		return machine.device<cassette_image_device>(CASSETTE2_TAG);
 	else
-		return machine.device(CASSETTE_TAG);
+		return machine.device<cassette_image_device>(CASSETTE_TAG);
 }
 
 static TIMER_CALLBACK(z80ne_cassette_tc)
@@ -46,7 +46,7 @@ static TIMER_CALLBACK(z80ne_cassette_tc)
 	UINT8 cass_ws = 0;
 	state->m_cass_data.input.length++;
 
-	cass_ws = (cassette_input(cassette_device_image(machine)) > +0.02) ? 1 : 0;
+	cass_ws = ((cassette_device_image(machine))->input() > +0.02) ? 1 : 0;
 
 	if ((cass_ws ^ state->m_cass_data.input.level) & cass_ws)
 	{
@@ -71,7 +71,7 @@ static TIMER_CALLBACK(z80ne_cassette_tc)
 			cass_ws = ay31015_get_output_pin( state->m_ay31015, AY31015_SO );
 			state->m_cass_data.wave_length = cass_ws ? state->m_cass_data.wave_short : state->m_cass_data.wave_long;
 		}
-		cassette_output(cassette_device_image(machine), state->m_cass_data.output.level ? -1.0 : +1.0);
+		cassette_device_image(machine)->output(state->m_cass_data.output.level ? -1.0 : +1.0);
 		state->m_cass_data.output.length = state->m_cass_data.wave_length;
 	}
 }
@@ -610,11 +610,11 @@ WRITE8_HANDLER(lx385_ctrl_w)
 	/* motors */
 	if(changed_bits & 0x18)
 	{
-		cassette_change_state(space->machine().device(CASSETTE_TAG),
-			(motor_a) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		space->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
+			(motor_a) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 
-		cassette_change_state(space->machine().device(CASSETTE2_TAG),
-			(motor_b) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		space->machine().device<cassette_image_device>(CASSETTE2_TAG)->change_state(
+			(motor_b) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 
 		if (motor_a || motor_b)
 			state->m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(LX385_TAPE_SAMPLE_FREQ));

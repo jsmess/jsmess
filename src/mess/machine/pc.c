@@ -814,7 +814,7 @@ static WRITE8_DEVICE_HANDLER ( pcjr_ppi_portb_w )
 	pit8253_gate2_w(device->machine().device("pit8253"), BIT(data, 0));
 	pc_speaker_set_spkrdata( device->machine(), data & 0x02 );
 
-	cassette_change_state( device->machine().device(CASSETTE_TAG), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 }
 
 
@@ -856,7 +856,7 @@ static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 	data = ( data & ~0x01 ) | ( pcjr_keyb.latch ? 0x01: 0x00 );
 	if ( ! ( st->m_ppi_portb & 0x08 ) )
 	{
-		double tap_val = cassette_input( device->machine().device(CASSETTE_TAG) );
+		double tap_val = (device->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
 
 		if ( tap_val < 0 )
 		{

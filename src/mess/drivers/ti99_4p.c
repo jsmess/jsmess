@@ -311,7 +311,7 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	/* devices */
 	MCFG_PBOXSG_ADD( "peribox", card_extint, card_notconnected, card_ready )
 	MCFG_SGCPUB_ADD( "sgcpu_board" )
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 MACHINE_CONFIG_END
 
 

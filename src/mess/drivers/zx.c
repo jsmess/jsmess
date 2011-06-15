@@ -366,7 +366,7 @@ static const struct CassetteOptions zx81_cassette_options = {
 	44100	/* sample frequency */
 };
 
-static const cassette_config zx80_cassette_config =
+static const cassette_interface zx80_cassette_interface =
 {
 	zx80_o_format,
 	&zx81_cassette_options,
@@ -374,11 +374,12 @@ static const cassette_config zx80_cassette_config =
 	NULL
 };
 
-static const cassette_config zx81_cassette_config =
+static const cassette_interface zx81_cassette_interface =
 {
 	zx81_p_format,
 	&zx81_cassette_options,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -414,7 +415,7 @@ static MACHINE_CONFIG_START( zx80, zx_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, zx80_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, zx80_cassette_interface )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -429,7 +430,7 @@ static MACHINE_CONFIG_DERIVED( zx81, zx80 )
 
 	MCFG_GFXDECODE(zx81)
 
-	MCFG_CASSETTE_MODIFY( CASSETTE_TAG, zx81_cassette_config )
+	MCFG_CASSETTE_MODIFY( CASSETTE_TAG, zx81_cassette_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ts1000, zx81 )

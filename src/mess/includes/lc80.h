@@ -33,7 +33,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio2;
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_ram;
 

@@ -77,9 +77,9 @@ WRITE8_DEVICE_HANDLER(c16_m7501_port_write)
 	state->m_iec->clk_w(!BIT(data, 1));
 	state->m_iec->data_w(!BIT(data, 0));
 
-	cassette_output(state->m_cassette, !BIT(data, 1) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	state->m_cassette->output(!BIT(data, 1) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 
-	cassette_change_state(state->m_cassette, BIT(data, 7) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	state->m_cassette->change_state(BIT(data, 7) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
 READ8_DEVICE_HANDLER(c16_m7501_port_read)
@@ -96,7 +96,7 @@ READ8_DEVICE_HANDLER(c16_m7501_port_read)
 
 //  data &= ~0x20; // port bit not in pinout
 
-	if (cassette_input(state->m_cassette) > +0.0)
+	if (state->m_cassette->input() > +0.0)
 		data |=  0x10;
 	else
 		data &= ~0x10;
@@ -259,7 +259,7 @@ READ8_HANDLER( plus4_6529_port_r )
 	c16_state *state = space->machine().driver_data<c16_state>();
 	int data = 0x00;
 
-	if ((cassette_get_state(state->m_cassette) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((state->m_cassette->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x04;
 	else
 		data |=  0x04;
@@ -272,7 +272,7 @@ READ8_HANDLER( c16_fd1x_r )
 	c16_state *state = space->machine().driver_data<c16_state>();
 	int data = 0x00;
 
-	if ((cassette_get_state(state->m_cassette) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((state->m_cassette->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x04;
 	else
 		data |=  0x04;

@@ -596,7 +596,7 @@ READ8_MEMBER( abc80_state::pio_pb_r )
 	data |= rs232_dcd_r(m_rs232) << 2;
 
 	/* cassette data */
-	data |= (cassette_input(m_cassette) > +1.0) << 7;
+	data |= ((m_cassette)->input() > +1.0) << 7;
 
 	return data;
 };
@@ -625,10 +625,10 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
 	rs232_rts_w(m_rs232, BIT(data, 4));
 
 	/* cassette motor */
-	cassette_change_state(m_cassette, BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(BIT(data,5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	/* cassette data */
-	cassette_output(m_cassette, BIT(data, 6) ? -1.0 : +1.0);
+	m_cassette->output( BIT(data, 6) ? -1.0 : +1.0);
 };
 
 static Z80PIO_INTERFACE( pio_intf )
@@ -655,14 +655,15 @@ static const z80_daisy_config abc80_daisy_chain[] =
 
 
 //-------------------------------------------------
-//  cassette_config abc80_cassette_config
+//  cassette_interface abc80_cassette_interface
 //-------------------------------------------------
 
-static const cassette_config abc80_cassette_config =
+static const cassette_interface abc80_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -758,7 +759,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, ABC80_XTAL/2/2, pio_intf)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 	MCFG_PRINTER_ADD("printer")
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc80_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc80_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

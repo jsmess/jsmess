@@ -29,9 +29,9 @@ public:
 
 
 
-static device_t *cassette_device_image(running_machine &machine)
+static cassette_image_device *cassette_device_image(running_machine &machine)
 {
-	return machine.device(CASSETTE_TAG);
+	return machine.device<cassette_image_device>(CASSETTE_TAG);
 }
 
 static void pk8000_set_bank(running_machine &machine,UINT8 data)
@@ -115,10 +115,10 @@ static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
 
 	speaker_level_w(device->machine().device(SPEAKER_TAG), BIT(data,7));
 
-	cassette_change_state(cassette_device_image(device->machine()),
+	cassette_device_image(device->machine())->change_state(
 						(BIT(data,4)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 						CASSETTE_MASK_MOTOR);
-	cassette_output(cassette_device_image(device->machine()), (BIT(data,6)) ? +1.0 : 0.0);
+	cassette_device_image(device->machine())->output((BIT(data,6)) ? +1.0 : 0.0);
 }
 
 static I8255_INTERFACE( pk8000_ppi8255_interface_1 )
@@ -157,13 +157,13 @@ static I8255_INTERFACE( pk8000_ppi8255_interface_2 )
 
 static READ8_HANDLER(pk8000_joy_1_r)
 {
-	UINT8 retVal = (cassette_input(cassette_device_image(space->machine())) > 0.0038 ? 0x80 : 0);
+	UINT8 retVal = (cassette_device_image(space->machine())->input() > 0.0038 ? 0x80 : 0);
 	retVal |= input_port_read(space->machine(), "JOY1") & 0x7f;
 	return retVal;
 }
 static READ8_HANDLER(pk8000_joy_2_r)
 {
-	UINT8 retVal = (cassette_input(cassette_device_image(space->machine())) > 0.0038 ? 0x80 : 0);
+	UINT8 retVal = (cassette_device_image(space->machine())->input() > 0.0038 ? 0x80 : 0);
 	retVal |= input_port_read(space->machine(), "JOY2") & 0x7f;
 	return retVal;
 }
@@ -329,11 +329,12 @@ static SCREEN_UPDATE( pk8000 )
 }
 
 /* Machine driver */
-static const cassette_config pk8000_cassette_config =
+static const cassette_interface pk8000_cassette_interface =
 {
 	fmsx_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
+	NULL,
 	NULL
 };
 
@@ -370,7 +371,7 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, pk8000_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, pk8000_cassette_interface )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

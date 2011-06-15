@@ -137,7 +137,7 @@ READ_LINE_MEMBER( eti660_state::clear_r )
 
 READ_LINE_MEMBER( eti660_state::ef2_r )
 {
-	return cassette_input(m_cassette) < 0;
+	return (m_cassette)->input() < 0;
 }
 
 READ_LINE_MEMBER( eti660_state::ef4_r )
@@ -154,7 +154,7 @@ WRITE_LINE_MEMBER( eti660_state::q_w )
 	set_led_status(machine(), LED_PULSE, state);
 
 	/* tape output */
-	cassette_output(m_cassette, state ? 1.0 : -1.0);
+	m_cassette->output(state ? 1.0 : -1.0);
 }
 
 WRITE8_MEMBER( eti660_state::dma_w )
@@ -250,11 +250,12 @@ static const pia6821_interface eti660_mc6821_intf =
 
 /* Machine Drivers */
 
-static const cassette_config eti660_cassette_config =
+static const cassette_interface eti660_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -277,7 +278,7 @@ static MACHINE_CONFIG_START( eti660, eti660_state )
 
 	/* devices */
 	MCFG_PIA6821_ADD(MC6821_TAG, eti660_mc6821_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, eti660_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, eti660_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

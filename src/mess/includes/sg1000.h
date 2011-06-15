@@ -31,7 +31,7 @@ extern const TMS9928a_interface tms9928a_interface;
 INPUT_PORTS_EXTERN( sk1100 );
 extern INTERRUPT_GEN( sg1000_int );
 extern const i8255_interface ( sc3000_ppi_intf );
-extern const cassette_config sc3000_cassette_config;
+extern const cassette_interface sc3000_cassette_interface;
 
 class sg1000_state : public driver_device
 {
@@ -69,7 +69,7 @@ public:
 		  m_cassette(*this, CASSETTE_TAG)
 	{ }
 
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 
 	virtual void machine_start();
 

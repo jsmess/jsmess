@@ -40,7 +40,7 @@ public:
 	/* devices */
 	legacy_cpu_device *m_maincpu;
 	device_t *m_ted7360;
-	device_t *m_cassette;
+	cassette_image_device *m_cassette;
 	device_t *m_messram;
 	device_t *m_sid;
 };

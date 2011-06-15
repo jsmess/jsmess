@@ -1110,7 +1110,7 @@ static int coco_hiresjoy_ry( running_machine &machine )
 #define SOUNDMUX_STATUS_SEL2	2
 #define SOUNDMUX_STATUS_SEL1	1
 
-static device_t *cassette_device_image(running_machine &machine)
+static cassette_image_device *cassette_device_image(running_machine &machine)
 {
 	coco_state *state = machine.driver_data<coco_state>();
 	return state->m_cassette_device;
@@ -1174,7 +1174,7 @@ static void soundmux_update(running_machine &machine)
 		(soundmux_status == (SOUNDMUX_STATUS_ENABLE|SOUNDMUX_STATUS_SEL2)
 			? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR));
 
-	cassette_change_state(cassette_device_image(machine), new_state, CASSETTE_MASK_SPEAKER);
+	cassette_device_image(machine)->change_state(new_state,CASSETTE_MASK_SPEAKER);
 }
 
 static void coco_sound_update(running_machine &machine)
@@ -1568,7 +1568,7 @@ static WRITE8_DEVICE_HANDLER ( d_pia1_pa_w )
 	}
 	else
 	{
-		cassette_output(cassette_device_image(device->machine()), ((int) dac - 0x80) / 128.0);
+		cassette_device_image(device->machine())->output(((int) dac - 0x80) / 128.0);
 	}
 
 	(*state->update_keyboard)(device->machine());
@@ -1780,8 +1780,8 @@ WRITE8_HANDLER(dgnalpha_modem_w)
 
 static WRITE8_DEVICE_HANDLER ( d_pia1_ca2_w )
 {
-	cassette_change_state(
-		cassette_device_image(device->machine()),
+	
+		cassette_device_image(device->machine())->change_state(
 		data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MASK_MOTOR);
 }
@@ -1791,7 +1791,7 @@ static READ8_DEVICE_HANDLER ( d_pia1_pa_r )
 	coco_state *state = device->machine().driver_data<coco_state>();
    UINT8 result;
 
-   result = cassette_input(cassette_device_image(device->machine())) >= 0 ? 1 : 0;
+   result = (cassette_device_image(device->machine()))->input() >= 0 ? 1 : 0;
    result |= state->m_bitbanger_output_value << 1;
    result |= state->m_dac_value << 2;
 
@@ -2788,7 +2788,7 @@ static void generic_init_machine(running_machine &machine, const machine_init_in
 
 	/* locate devices */
 	state->m_cococart_device	= machine.device("coco_cartslot");
-	state->m_cassette_device	= machine.device(CASSETTE_TAG);
+	state->m_cassette_device	= machine.device<cassette_image_device>(CASSETTE_TAG);
 	state->m_bitbanger_device	= machine.device("bitbanger");
 	state->m_printer_device	= machine.device<printer_image_device>("printer");
 	state->m_dac				= machine.device("dac");

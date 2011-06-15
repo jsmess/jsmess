@@ -110,11 +110,12 @@ static INTERRUPT_GEN( ondra_interrupt )
 	device_set_input_line(device, 0, HOLD_LINE);
 }
 
-static const cassette_config ondra_cassette_config =
+static const cassette_interface ondra_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -148,7 +149,7 @@ static MACHINE_CONFIG_START( ondra, ondra_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, ondra_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, ondra_cassette_interface )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

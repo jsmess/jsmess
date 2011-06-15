@@ -1318,7 +1318,7 @@ static TIMER_CALLBACK(bbc_tape_timer_cb)
 	bbc_state *state = machine.driver_data<bbc_state>();
 
 	double dev_val;
-	dev_val=cassette_input(machine.device(CASSETTE_TAG));
+	dev_val=machine.device<cassette_image_device>(CASSETTE_TAG)->input();
 
 	// look for rising edges on the cassette wave
 	if (((dev_val>=0.0) && (state->m_last_dev_val<0.0)) || ((dev_val<0.0) && (state->m_last_dev_val>=0.0)))
@@ -1378,12 +1378,12 @@ static void BBC_Cassette_motor(running_machine &machine, unsigned char status)
 	bbc_state *state = machine.driver_data<bbc_state>();
 	if (status)
 	{
-		cassette_change_state(machine.device(CASSETTE_TAG), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		machine.device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		state->m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
 	}
 	else
 	{
-		cassette_change_state(machine.device(CASSETTE_TAG), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		machine.device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		state->m_tape_timer->reset();
 		state->m_len0 = 0;
 		state->m_len1 = 0;

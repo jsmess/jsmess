@@ -101,11 +101,12 @@ static const struct CassetteOptions interact_cassette_options = {
 	44100	/* sample frequency */
 };
 
-static const cassette_config interact_cassette_config =
+static const cassette_interface interact_cassette_interface =
 {
 	hector_cassette_formats,
 	&interact_cassette_options,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER),
+	NULL,
 	NULL
 };
 
@@ -169,7 +170,7 @@ static MACHINE_CONFIG_START( interact, interact_state )
 	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, interact_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, interact_cassette_interface )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")
@@ -211,7 +212,7 @@ static MACHINE_CONFIG_START( hector1, interact_state )
 	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, interact_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, interact_cassette_interface )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")

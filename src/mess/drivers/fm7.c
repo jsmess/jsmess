@@ -748,7 +748,7 @@ static READ8_HANDLER( fm7_cassette_printer_r )
 	// bit 1: printer error
 	// bit 0: printer busy
 	UINT8 ret = 0x00;
-	double data = cassette_input(space->machine().device(CASSETTE_TAG));
+	double data = (space->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
 	device_t* printer_dev = space->machine().device("lpt");
 	UINT8 pdata;
 	int x;
@@ -756,7 +756,7 @@ static READ8_HANDLER( fm7_cassette_printer_r )
 	if(data > 0.03)
 		ret |= 0x80;
 
-	if(cassette_get_state(space->machine().device(CASSETTE_TAG)) & CASSETTE_MOTOR_DISABLED)
+	if(space->machine().device<cassette_image_device>(CASSETTE_TAG)->get_state() & CASSETTE_MOTOR_DISABLED)
 		ret |= 0x80;  // cassette input is high when not in use.
 
 	ret |= 0x70;
@@ -803,9 +803,9 @@ static WRITE8_HANDLER( fm7_cassette_printer_w )
 		// bit 1: cassette motor
 		// bit 0: cassette output
 			if((data & 0x01) != (state->m_cp_prev & 0x01))
-				cassette_output(space->machine().device(CASSETTE_TAG),(data & 0x01) ? +1.0 : -1.0);
+				space->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x01) ? +1.0 : -1.0);
 			if((data & 0x02) != (state->m_cp_prev & 0x02))
-				cassette_change_state(space->machine().device(CASSETTE_TAG),(data & 0x02) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+				space->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state((data & 0x02) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 			centronics_strobe_w(space->machine().device("lpt"),!(data & 0x40));
 			state->m_cp_prev = data;
 			break;
@@ -2035,12 +2035,13 @@ static const ym2203_interface fm7_ym_intf =
 	fm77av_fmirq
 };
 
-static const cassette_config fm7_cassette_config =
+static const cassette_interface fm7_cassette_interface =
 {
 	fm7_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	"fm7_cass"
+	"fm7_cass",
+	NULL
 };
 
 static const floppy_config fm7_floppy_config =
@@ -2092,7 +2093,7 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 
 	MCFG_VIDEO_START(fm7)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
@@ -2138,7 +2139,7 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 
 	MCFG_VIDEO_START(fm7)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
@@ -2184,7 +2185,7 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 
 	MCFG_VIDEO_START(fm7)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
@@ -2235,7 +2236,7 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 
 	MCFG_VIDEO_START(fm7)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
@@ -2280,7 +2281,7 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 
 	MCFG_VIDEO_START(fm7)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 

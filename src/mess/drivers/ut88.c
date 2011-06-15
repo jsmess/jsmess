@@ -166,11 +166,12 @@ static INPUT_PORTS_START( ut88mini )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 INPUT_PORTS_END
 
-static const cassette_config ut88_cassette_config =
+static const cassette_interface ut88_cassette_interface =
 {
 	rku_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -206,7 +207,7 @@ static MACHINE_CONFIG_START( ut88, ut88_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, ut88_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, ut88_cassette_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ut88mini, ut88_state )
@@ -220,7 +221,7 @@ static MACHINE_CONFIG_START( ut88mini, ut88_state )
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_ut88mini)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, ut88_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, ut88_cassette_interface )
 MACHINE_CONFIG_END
 
 /* ROM definition */

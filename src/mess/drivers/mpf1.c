@@ -231,7 +231,7 @@ READ8_MEMBER( mpf1_state::ppi_pa_r )
 	data &= input_port_read(machine(), "SPECIAL") & 1 ? 0xff : 0xbf;
 
 	/* bit 7, tape input */
-	data |= (cassette_input(m_cassette) > 0 ? 1 : 0) << 7;
+	data |= ((m_cassette)->input() > 0 ? 1 : 0) << 7;
 
 	return data;
 }
@@ -263,7 +263,7 @@ WRITE8_MEMBER( mpf1_state::ppi_pc_w )
 	/* bit 7, tape output, tone and led */
 	set_led_status(machine(), 0, !BIT(data, 7));
 	speaker_level_w(m_speaker, BIT(data, 7));
-	cassette_output(m_cassette, BIT(data, 7));
+	m_cassette->output( BIT(data, 7));
 }
 
 static I8255A_INTERFACE( ppi8255_intf )
@@ -311,11 +311,12 @@ static const z80_daisy_config mpf1_daisy_chain[] =
 
 /* Cassette Interface */
 
-static const cassette_config mpf1_cassette_config =
+static const cassette_interface mpf1_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -373,7 +374,7 @@ static MACHINE_CONFIG_START( mpf1, mpf1_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_3_579545MHz/2, mpf1_pio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_3_579545MHz/2, mpf1_ctc_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi8255_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, mpf1_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, mpf1_cassette_interface)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mpf1)
@@ -397,7 +398,7 @@ static MACHINE_CONFIG_START( mpf1b, mpf1_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_3_579545MHz/2, mpf1_pio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_3_579545MHz/2, mpf1_ctc_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi8255_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, mpf1_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, mpf1_cassette_interface)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mpf1b)
@@ -428,7 +429,7 @@ static MACHINE_CONFIG_START( mpf1p, mpf1_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, 2500000, mpf1_pio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2500000, mpf1_ctc_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi8255_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, mpf1_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, mpf1_cassette_interface)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

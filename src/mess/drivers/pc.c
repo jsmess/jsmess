@@ -1682,11 +1682,12 @@ static GFXDECODE_START( ibmpcjr )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_8_charlayout, 3, 1 )
 GFXDECODE_END
 
-static const cassette_config ibm5150_cassette_config =
+static const cassette_interface ibm5150_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -1725,7 +1726,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_interface )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 

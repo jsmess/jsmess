@@ -137,11 +137,12 @@ static const struct CassetteOptions poly88_cassette_options =
 	7200	/* sample frequency */
 };
 
-static const cassette_config poly88_cassette_config =
+static const cassette_interface poly88_cassette_interface =
 {
 	cassette_default_formats,
 	&poly88_cassette_options,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -193,7 +194,7 @@ static MACHINE_CONFIG_START( poly88, poly88_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, poly88_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, poly88_cassette_interface )
 
 	/* uart */
 	MCFG_MSM8251_ADD("uart", poly88_usart_interface)

@@ -31,7 +31,7 @@ public:
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_device<cbm_iec_device> m_iec;
-	required_device<device_t> m_cassette;
+	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_mos6560;
 
 	/* keyboard state */

@@ -322,7 +322,7 @@ static READ8_DEVICE_HANDLER( sys9901_r0 )
 		reply |= input_port_read(device->machine(), keynames[state->m_digitsel]) << 1;
 
 	/* tape input */
-	if (cassette_input(device->machine().device(CASSETTE_TAG)) > 0.0)
+	if ((device->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0)
 		reply |= 0x40;
 
 	return reply;
@@ -377,7 +377,7 @@ static WRITE8_DEVICE_HANDLER( sys9901_spkrdrive_w )
 
 static WRITE8_DEVICE_HANDLER( sys9901_tapewdata_w )
 {
-	cassette_output(device->machine().device(CASSETTE_TAG), data ? +1.0 : -1.0);
+	device->machine().device<cassette_image_device>(CASSETTE_TAG)->output(data ? +1.0 : -1.0);
 }
 
 /*
@@ -481,16 +481,16 @@ static WRITE8_HANDLER(ext_instr_decode)
 	case 5: /* CKON: set DECKCONTROL */
 		state->m_LED_state |= 0x20;
 		{
-			device_t *img = space->machine().device(CASSETTE_TAG);
-			cassette_change_state(img, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+			cassette_image_device *img = space->machine().device<cassette_image_device>(CASSETTE_TAG);
+			img->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		}
 		break;
 
 	case 6: /* CKOF: clear DECKCONTROL */
 		state->m_LED_state &= ~0x20;
 		{
-			device_t *img = space->machine().device(CASSETTE_TAG);
-			cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+			cassette_image_device *img = space->machine().device<cassette_image_device>(CASSETTE_TAG);
+			img->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		}
 		break;
 
@@ -825,7 +825,7 @@ static MACHINE_CONFIG_START( tm990_189, tm990189_state )
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
 	/* tms9901 */
 	MCFG_TMS9901_ADD("tms9901_0", usr9901reset_param)
@@ -872,7 +872,7 @@ static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
 	/* tms9901 */
 	MCFG_TMS9901_ADD("tms9901_0", usr9901reset_param)

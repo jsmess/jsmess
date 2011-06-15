@@ -447,7 +447,7 @@ READ8_MEMBER( atom_state::ppi_pc_r )
 	data |= m_hz2400 << 4;
 
 	/* cassette input */
-	data |= (cassette_input(m_cassette) > 0.0) << 5;
+	data |= (m_cassette->input() > 0.0) << 5;
 
 	/* keyboard RPT */
 	data |= BIT(input_port_read(machine(), "RPT"), 0) << 6;
@@ -602,7 +602,7 @@ static const floppy_config atom_floppy_config =
 };
 
 /*-------------------------------------------------
-    cassette_config atom_cassette_config
+    cassette_interface atom_cassette_interface
 -------------------------------------------------*/
 
 static TIMER_DEVICE_CALLBACK( cassette_output_tick )
@@ -611,16 +611,17 @@ static TIMER_DEVICE_CALLBACK( cassette_output_tick )
 
 	int level = !(!(!state->m_hz2400 & state->m_pc1) & state->m_pc0);
 
-	cassette_output(state->m_cassette, level ? -1.0 : +1.0);
+	state->m_cassette->output(level ? -1.0 : +1.0);
 
 	state->m_hz2400 = !state->m_hz2400;
 }
 
-static const cassette_config atom_cassette_config =
+static const cassette_interface atom_cassette_interface =
 {
 	atom_cassette_formats,
 	NULL,
 	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -816,7 +817,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_I8271_ADD(I8271_TAG, fdc_intf)
 	MCFG_FLOPPY_2_DRIVES_ADD(atom_floppy_config)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, atom_centronics_config)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, atom_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, atom_cassette_interface)
 	MCFG_QUICKLOAD_ADD("quickload", atom_atm, "atm", 0)
 
 	/* cartridge */

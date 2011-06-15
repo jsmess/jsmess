@@ -68,7 +68,7 @@ READ8_MEMBER( m5_state::sts_r )
 	UINT8 data = 0;
 
 	// cassette input
-	data |= cassette_input(m_cassette) >= 0 ? 1 : 0;
+	data |= (m_cassette)->input() >= 0 ? 1 : 0;
 
 	// centronics busy
 	data |= centronics_busy_r(m_centronics) << 1;
@@ -102,13 +102,13 @@ WRITE8_MEMBER( m5_state::com_w )
     */
 
 	// cassette output
-	cassette_output(m_cassette, BIT(data, 0) ? -1.0 : 1.0);
+	m_cassette->output( BIT(data, 0) ? -1.0 : 1.0);
 
 	// centronics strobe
 	centronics_strobe_w(m_centronics, BIT(data, 0));
 
 	// cassette remote
-	cassette_change_state(m_cassette, BIT(data, 1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(BIT(data,1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 
@@ -417,14 +417,15 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 
 //-------------------------------------------------
-//  cassette_config cassette_intf
+//  cassette_interface cassette_intf
 //-------------------------------------------------
 
-static const cassette_config cassette_intf =
+static const cassette_interface cassette_intf =
 {
 	sordm5_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
+	NULL,
 	NULL
 };
 

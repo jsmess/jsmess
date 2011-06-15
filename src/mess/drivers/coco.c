@@ -734,11 +734,12 @@ static MACHINE_CONFIG_FRAGMENT( coco_sound )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static const cassette_config coco_cassette_config =
+static const cassette_interface coco_cassette_interface =
 {
 	coco_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -780,7 +781,7 @@ static MACHINE_CONFIG_START( dragon32, coco_state )
 	/* snapshot/quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_interface )
 
 	MCFG_PIA6821_ADD( "pia_0", dragon32_pia_intf_0 )
 	MCFG_PIA6821_ADD( "pia_1", dragon32_pia_intf_1 )
@@ -826,7 +827,7 @@ static MACHINE_CONFIG_START( dragon64, coco_state )
 	MCFG_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_interface )
 
 	/* acia */
 	MCFG_ACIA6551_ADD("acia")
@@ -875,7 +876,7 @@ static MACHINE_CONFIG_START( d64plus, coco_state )
 	MCFG_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_interface )
 
 	/* acia */
 	MCFG_ACIA6551_ADD("acia")
@@ -931,7 +932,7 @@ static MACHINE_CONFIG_START( dgnalpha, coco_state )
 	MCFG_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_interface )
 
 	/* acia */
 	MCFG_ACIA6551_ADD("acia")
@@ -981,7 +982,7 @@ static MACHINE_CONFIG_START( tanodr64, coco_state )
 	MCFG_SNAPSHOT_ADD("snapshot", coco_pak, "pak", 0)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_interface )
 
 	/* acia */
 	MCFG_ACIA6551_ADD("acia")
@@ -1031,7 +1032,7 @@ static MACHINE_CONFIG_START( coco, coco_state )
 	MCFG_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_interface )
 
 	MCFG_PIA6821_ADD( "pia_0", coco_pia_intf_0 )
 	MCFG_PIA6821_ADD( "pia_1", coco_pia_intf_1 )
@@ -1079,7 +1080,7 @@ static MACHINE_CONFIG_START( coco2, coco_state )
 	MCFG_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_interface )
 
 	MCFG_PIA6821_ADD( "pia_0", coco2_pia_intf_0 )
 	MCFG_PIA6821_ADD( "pia_1", coco2_pia_intf_1 )
@@ -1127,7 +1128,7 @@ static MACHINE_CONFIG_START( coco2b, coco_state )
 	MCFG_QUICKLOAD_ADD("quickload", coco, "bin", 0.5)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_interface )
 
 	MCFG_PIA6821_ADD( "pia_0", coco2_pia_intf_0 )
 	MCFG_PIA6821_ADD( "pia_1", coco2_pia_intf_1 )
@@ -1190,7 +1191,7 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 	MCFG_COCO_VHD_ADD("vhd")
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, coco_cassette_interface )
 
 	MCFG_SAM6883_GIME_ADD("sam", coco3_sam_intf)
 

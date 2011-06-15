@@ -268,9 +268,9 @@ PB7
  */
 
 
-static device_t *cassette_device_image(running_machine &machine)
+static cassette_image_device *cassette_device_image(running_machine &machine)
 {
-	return machine.device(CASSETTE_TAG);
+	return machine.device<cassette_image_device>(CASSETTE_TAG);
 }
 
 /* not called yet - this will update the via with the state of the tape data.
@@ -283,7 +283,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
 
 	data = 0;
 
-	if (cassette_input(cassette_device_image(machine)) > 0.0038)
+	if ((cassette_device_image(machine))->input() > 0.0038)
 		data |= 1;
 
 	/* "A simple cable to catch the vertical retrace signal !
@@ -320,13 +320,13 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 		}
 	}
 
-	cassette_change_state(
-		cassette_device_image(device->machine()),
+	
+		cassette_device_image(device->machine())->change_state(
 		(data & 0x40) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);
 
 	/* cassette data out */
-	cassette_output(cassette_device_image(device->machine()), (data & (1<<7)) ? -1.0 : +1.0);
+	cassette_device_image(device->machine())->output((data & (1<<7)) ? -1.0 : +1.0);
 
 	/* centronics STROBE is connected to PB4 */
 	centronics_strobe_w(printer, BIT(data, 4));

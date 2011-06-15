@@ -463,9 +463,9 @@ READ_LINE_MEMBER( vip_state::clear_r )
 
 READ_LINE_MEMBER( vip_state::ef2_r )
 {
-	set_led_status(machine(), LED_TAPE, (cassette_input(m_cassette) > 0));
+	set_led_status(machine(), LED_TAPE, ((m_cassette)->input() > 0));
 
-	return cassette_input(m_cassette) < 0;
+	return (m_cassette)->input() < 0;
 }
 
 READ_LINE_MEMBER( vip_state::ef3_r )
@@ -529,7 +529,7 @@ WRITE_LINE_MEMBER( vip_state::q_w )
 	set_led_status(machine(), LED_Q, state);
 
 	// tape output
-	cassette_output(m_cassette, state ? 1.0 : -1.0);
+	m_cassette->output(state ? 1.0 : -1.0);
 }
 
 WRITE8_MEMBER( vip_state::dma_w )
@@ -666,11 +666,12 @@ void vip_state::machine_reset()
 
 /* Machine Drivers */
 
-static const cassette_config vip_cassette_config =
+static const cassette_interface vip_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -703,7 +704,7 @@ static MACHINE_CONFIG_START( vip, vip_state )
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", vip, "bin,c8,c8x", 0)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, vip_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, vip_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

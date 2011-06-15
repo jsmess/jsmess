@@ -154,11 +154,12 @@ static const ay8910_interface galaxy_ay_interface =
 #define XTAL 6144000
 
 
-static const cassette_config galaxy_cassette_config =
+static const cassette_interface galaxy_cassette_interface =
 {
 	gtp_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -211,7 +212,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, galaxy_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, galaxy_cassette_interface )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -251,7 +252,7 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, galaxy_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, galaxy_cassette_interface )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

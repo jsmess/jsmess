@@ -317,11 +317,12 @@ INPUT_PORTS_START( ms7007 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
 INPUT_PORTS_END
 
-static const cassette_config radio86_cassette_config =
+static const cassette_interface radio86_cassette_interface =
 {
 	rkr_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -376,7 +377,7 @@ static MACHINE_CONFIG_START( radio86, radio86_state )
 
 	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, radio86_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, radio86_cassette_interface )
 MACHINE_CONFIG_END
 
 

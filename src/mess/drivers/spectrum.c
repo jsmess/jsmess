@@ -316,7 +316,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & (1<<3))!=0)
 	{
 		/* write cassette data */
-		cassette_output(space->machine().device(CASSETTE_TAG), (data & (1<<3)) ? -1.0 : +1.0);
+		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & (1<<3)) ? -1.0 : +1.0);
 	}
 
 	state->m_port_fe_data = data;
@@ -392,7 +392,7 @@ READ8_HANDLER(spectrum_port_fe_r)
 	data |= (0xe0); /* Set bits 5-7 - as reset above */
 
 	/* cassette input from wav */
-	if (cassette_input(space->machine().device(CASSETTE_TAG)) > 0.0038 )
+	if ((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0038 )
 	{
 		data &= ~0x40;
 	}
@@ -668,11 +668,12 @@ static INTERRUPT_GEN( spec_interrupt )
 	device_set_input_line(device, 0, HOLD_LINE);
 }
 
-static const cassette_config spectrum_cassette_config =
+static const cassette_interface spectrum_cassette_interface =
 {
 	tzx_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -740,7 +741,7 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 	/* devices */
 	MCFG_SNAPSHOT_ADD("snapshot", spectrum, "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", 0)
 	MCFG_QUICKLOAD_ADD("quickload", spectrum, "raw,scr", 2) // The delay prevents the screen from being cleared by the RAM test at boot
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, spectrum_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, spectrum_cassette_interface )
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

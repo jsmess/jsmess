@@ -121,8 +121,8 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_cass1;
-	required_device<device_t> m_cass2;
+	required_device<cassette_image_device> m_cass1;
+	required_device<cassette_image_device> m_cass2;
 	required_device<device_t> m_uart;
 	required_device<device_t> m_uart_s;
 	required_device<device_t> m_terminal;
@@ -157,13 +157,13 @@ public:
 /* timer to read cassette waveforms */
 
 
-static device_t *cassette_device_image(running_machine &machine)
+static cassette_image_device *cassette_device_image(running_machine &machine)
 {
 	sol20_state *state = machine.driver_data<sol20_state>();
 	if (state->m_sol20_fa & 0x40)
-		return machine.device(CASSETTE2_TAG);
+		return machine.device<cassette_image_device>(CASSETTE2_TAG);
 	else
-		return machine.device(CASSETTE_TAG);
+		return machine.device<cassette_image_device>(CASSETTE_TAG);
 }
 
 
@@ -181,7 +181,7 @@ static TIMER_CALLBACK(sol20_cassette_tc)
 
 			state->m_cass_data.input.length++;
 
-			cass_ws = (cassette_input(cassette_device_image(machine)) > +0.02) ? 1 : 0;
+			cass_ws = ((cassette_device_image(machine))->input() > +0.02) ? 1 : 0;
 
 			if (cass_ws != state->m_cass_data.input.level)
 			{
@@ -210,7 +210,7 @@ static TIMER_CALLBACK(sol20_cassette_tc)
 				if (!((state->m_cass_data.output.bit == 0) && (state->m_cass_data.output.length & 4)))
 				{
 					state->m_cass_data.output.level ^= 1;			// toggle output state, except on 2nd half of low bit
-					cassette_output(cassette_device_image(machine), state->m_cass_data.output.level ? -1.0 : +1.0);
+					cassette_device_image(machine)->output(state->m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
@@ -219,7 +219,7 @@ static TIMER_CALLBACK(sol20_cassette_tc)
 			/* loading a tape */
 			state->m_cass_data.input.length++;
 
-			cass_ws = (cassette_input(cassette_device_image(machine)) > +0.02) ? 1 : 0;
+			cass_ws = ((cassette_device_image(machine))->input() > +0.02) ? 1 : 0;
 
 			if (cass_ws != state->m_cass_data.input.level || state->m_cass_data.input.length == 10)
 			{
@@ -250,7 +250,7 @@ static TIMER_CALLBACK(sol20_cassette_tc)
 				if (!((state->m_cass_data.output.bit == 0) && (state->m_cass_data.output.length & 8)))
 				{
 					state->m_cass_data.output.level ^= 1;			// toggle output state, except on 2nd half of low bit
-					cassette_output(cassette_device_image(machine), state->m_cass_data.output.level ? -1.0 : +1.0);
+					cassette_device_image(machine)->output(state->m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
@@ -333,12 +333,12 @@ WRITE8_MEMBER( sol20_state::sol20_fa_w )
 	m_sol20_fa |= (data & 0xf0);
 
 	/* cassette 1 motor */
-	cassette_change_state(m_cass1,
-		(BIT(data, 7)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_cass1->change_state(
+		(BIT(data,7)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	/* cassette 2 motor */
-	cassette_change_state(m_cass2,
-		(BIT(data, 6)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_cass2->change_state(
+		(BIT(data,6)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	if (data & 0xc0)
 		m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(19200));
@@ -484,11 +484,12 @@ static const ay31015_config sol20_ay31015_config =
 };
 
 
-static const cassette_config sol20_cassette_config =
+static const cassette_interface sol20_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -692,8 +693,8 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)	// cass2 speaker
 
 	// devices
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, sol20_cassette_config )
-	MCFG_CASSETTE_ADD( CASSETTE2_TAG, sol20_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, sol20_cassette_interface )
+	MCFG_CASSETTE_ADD( CASSETTE2_TAG, sol20_cassette_interface )
 	MCFG_AY31015_ADD( "uart", sol20_ay31015_config )
 	MCFG_AY31015_ADD( "uart_s", sol20_ay31015_config )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, sol20_terminal_intf)

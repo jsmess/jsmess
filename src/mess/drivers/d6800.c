@@ -62,7 +62,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_cass;
+	required_device<cassette_image_device> m_cass;
 	required_device<device_t> m_pia;
 	required_device<device_t> m_speaker;
 	DECLARE_READ8_MEMBER( d6800_cassette_r );
@@ -267,11 +267,12 @@ static MACHINE_RESET( d6800 )
 
 /* Machine Drivers */
 
-static const cassette_config d6800_cassette_config =
+static const cassette_interface d6800_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -304,7 +305,7 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 
 	/* devices */
 	MCFG_PIA6821_ADD("pia", d6800_mc6821_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, d6800_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, d6800_cassette_interface)
 MACHINE_CONFIG_END
 
 /* ROMs */

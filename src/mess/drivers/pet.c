@@ -693,8 +693,8 @@ static MACHINE_CONFIG_START( pet_general, pet_state )
 	MCFG_PALETTE_INIT( pet )
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_config )
-	MCFG_CASSETTE_ADD( CASSETTE2_TAG, cbm_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
+	MCFG_CASSETTE_ADD( CASSETTE2_TAG, cbm_cassette_interface )
 
 	/* via */
 	MCFG_VIA6522_ADD( "via6522_0", 0, pet_via)

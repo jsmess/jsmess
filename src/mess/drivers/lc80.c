@@ -170,7 +170,7 @@ READ8_MEMBER( lc80_state::pio1_pb_r )
 
     */
 
-	return (cassette_input(m_cassette) < +0.0);
+	return ((m_cassette)->input() < +0.0);
 }
 
 WRITE8_MEMBER( lc80_state::pio1_pb_w )
@@ -191,7 +191,7 @@ WRITE8_MEMBER( lc80_state::pio1_pb_w )
     */
 
 	/* tape output */
-	cassette_output(m_cassette, BIT(data, 1) ? +1.0 : -1.0);
+	m_cassette->output( BIT(data, 1) ? +1.0 : -1.0);
 
 	/* speaker */
 	speaker_level_w(m_speaker, !BIT(data, 1));
@@ -327,11 +327,12 @@ void lc80_state::machine_start()
 
 /* Machine Driver */
 
-static const cassette_config lc80_cassette_config =
+static const cassette_interface lc80_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
 	NULL
 };
 
@@ -354,7 +355,7 @@ static MACHINE_CONFIG_START( lc80, lc80_state )
 	MCFG_Z80PIO_ADD(Z80PIO1_TAG, 900000, pio1_intf)
 	MCFG_Z80PIO_ADD(Z80PIO2_TAG, 900000, pio2_intf)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, lc80_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, lc80_cassette_interface)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
@@ -380,7 +381,7 @@ static MACHINE_CONFIG_START( lc80_2, lc80_state )
 	MCFG_Z80PIO_ADD(Z80PIO1_TAG, 900000, pio1_intf)
 	MCFG_Z80PIO_ADD(Z80PIO2_TAG, 900000, pio2_intf)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, lc80_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, lc80_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

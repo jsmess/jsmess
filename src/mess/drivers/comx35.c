@@ -205,7 +205,7 @@ READ_LINE_MEMBER( comx35_state::ef2_r )
 
 READ_LINE_MEMBER( comx35_state::ef4_r )
 {
-	return (cassette_input(m_cassette) < 0) | m_cdp1802_ef4;
+	return (m_cassette->input() < 0) | m_cdp1802_ef4;
 }
 
 static COSMAC_SC_WRITE( comx35_sc_w )
@@ -258,7 +258,7 @@ WRITE_LINE_MEMBER( comx35_state::q_w )
 	}
 
 	// cassette output
-	cassette_output(m_cassette, state ? +1.0 : -1.0);
+	m_cassette->output(state ? +1.0 : -1.0);
 }
 
 static COSMAC_INTERFACE( cosmac_intf )
@@ -311,11 +311,12 @@ static CDP1871_INTERFACE( comx35_cdp1871_intf )
 
 /* Machine Drivers */
 
-static const cassette_config comx35_cassette_config =
+static const cassette_interface comx35_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
 	NULL
 };
 
@@ -345,7 +346,7 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	MCFG_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_PAL / 8)
 	MCFG_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )
 	MCFG_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_interface)
 	MCFG_PRINTER_ADD("printer")
 
 	MCFG_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
@@ -370,7 +371,7 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	MCFG_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_NTSC / 8)
 	MCFG_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )
 	MCFG_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_interface)
 	MCFG_PRINTER_ADD("printer")
 
 	MCFG_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)

@@ -448,7 +448,7 @@ static MACHINE_START( c16 )
 
 	state->m_maincpu = machine.device<legacy_cpu_device>("maincpu");
 	state->m_ted7360 = machine.device("ted7360");
-	state->m_cassette = machine.device(CASSETTE_TAG);
+	state->m_cassette = machine.device<cassette_image_device>(CASSETTE_TAG);
 	state->m_messram = machine.device(RAM_TAG);
 	state->m_sid = machine.device("sid");
 
@@ -493,7 +493,7 @@ static MACHINE_CONFIG_START( c16, c16_state )
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_config )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
 
 	MCFG_FRAGMENT_ADD(c16_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "plus4_flop")

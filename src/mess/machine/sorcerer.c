@@ -31,13 +31,13 @@ static TIMER_CALLBACK(sorcerer_serial_tc)
 /* timer to read cassette waveforms */
 
 
-static device_t *cassette_device_image(running_machine &machine)
+static cassette_image_device *cassette_device_image(running_machine &machine)
 {
 	sorcerer_state *state = machine.driver_data<sorcerer_state>();
 	if (state->m_fe & 0x20)
-		return machine.device(CASSETTE2_TAG);
+		return machine.device<cassette_image_device>(CASSETTE2_TAG);
 	else
-		return machine.device(CASSETTE_TAG);
+		return machine.device<cassette_image_device>(CASSETTE_TAG);
 }
 
 
@@ -55,7 +55,7 @@ static TIMER_CALLBACK(sorcerer_cassette_tc)
 
 			state->m_cass_data.input.length++;
 
-			cass_ws = (cassette_input(cassette_device_image(machine)) > +0.02) ? 1 : 0;
+			cass_ws = ((cassette_device_image(machine))->input() > +0.02) ? 1 : 0;
 
 			if (cass_ws != state->m_cass_data.input.level)
 			{
@@ -84,7 +84,7 @@ static TIMER_CALLBACK(sorcerer_cassette_tc)
 				if (!((state->m_cass_data.output.bit == 0) && (state->m_cass_data.output.length & 4)))
 				{
 					state->m_cass_data.output.level ^= 1;			// toggle output state, except on 2nd half of low bit
-					cassette_output(cassette_device_image(machine), state->m_cass_data.output.level ? -1.0 : +1.0);
+					cassette_device_image(machine)->output(state->m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
@@ -93,7 +93,7 @@ static TIMER_CALLBACK(sorcerer_cassette_tc)
 			/* loading a tape */
 			state->m_cass_data.input.length++;
 
-			cass_ws = (cassette_input(cassette_device_image(machine)) > +0.02) ? 1 : 0;
+			cass_ws = ((cassette_device_image(machine))->input() > +0.02) ? 1 : 0;
 
 			if (cass_ws != state->m_cass_data.input.level || state->m_cass_data.input.length == 10)
 			{
@@ -124,7 +124,7 @@ static TIMER_CALLBACK(sorcerer_cassette_tc)
 				if (!((state->m_cass_data.output.bit == 0) && (state->m_cass_data.output.length & 8)))
 				{
 					state->m_cass_data.output.level ^= 1;			// toggle output state, except on 2nd half of low bit
-					cassette_output(cassette_device_image(machine), state->m_cass_data.output.level ? -1.0 : +1.0);
+					cassette_device_image(machine)->output(state->m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
@@ -178,19 +178,19 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 
 		UINT8 sound = input_port_read(machine(), "CONFIG") & 8;
 
-		cassette_change_state(m_cass1,
-			((BIT(data, 4)) && (sound)) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+		m_cass1->change_state(
+			((BIT(data,4)) && (sound)) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 
-		cassette_change_state(m_cass2,
-			((BIT(data, 5)) && (sound)) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+		m_cass2->change_state(
+			((BIT(data,5)) && (sound)) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 
 		/* cassette 1 motor */
-		cassette_change_state(m_cass1,
-			(BIT(data, 4)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		m_cass1->change_state(
+			(BIT(data,4)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 		/* cassette 2 motor */
-		cassette_change_state(m_cass2,
-			(BIT(data, 5)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		m_cass2->change_state(
+			(BIT(data,5)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 		if (data & 0x30)
 			m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(19200));
