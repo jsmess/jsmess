@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Luxor ABC-bus emulation
+    Luxor ABC (Databoard 4680) Bus emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -12,40 +12,64 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
+//  GLOBAL VARIABLES
 //**************************************************************************
 
-#define LOG 1
+const device_type ABCBUS_SLOT = &device_creator<abcbus_slot_device>;
 
-
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type ABCBUS = &device_creator<abcbus_device>;
 
 
 //**************************************************************************
-//  DEVICE INTERFACE
+//  LIVE DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
-//  device_abcbus_interface - constructor
+//  abcbus_slot_device - constructor
 //-------------------------------------------------
 
-device_abcbus_interface::device_abcbus_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, ABCBUS_SLOT, "ABC bus slot", tag, owner, clock),
+		device_slot_interface(mconfig, *this)
 {
 }
 
 
 //-------------------------------------------------
-//  ~device_abcbus_interface - destructor
+//  static_set_abcbus_slot - 
 //-------------------------------------------------
 
-device_abcbus_interface::~device_abcbus_interface()
+void abcbus_slot_device::static_set_abcbus_slot(device_t &device, const char *tag, int num)
 {
+	abcbus_slot_device &abcbus_card = dynamic_cast<abcbus_slot_device &>(device);
+	abcbus_card.m_bus_tag = tag;
+	abcbus_card.m_bus_num = num;
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void abcbus_slot_device::device_start()
+{
+	m_bus = machine().device<abcbus_device>(m_bus_tag);
+	device_abcbus_card_interface *dev = dynamic_cast<device_abcbus_card_interface *>(get_card_device());
+	if (dev) m_bus->add_abcbus_card(dev, m_bus_num);
+}
+
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+const device_type ABCBUS = &device_creator<abcbus_device>;
+
+
+void abcbus_device::static_set_cputag(device_t &device, const char *tag)
+{
+	abcbus_device &abcbus = downcast<abcbus_device &>(device);
+	abcbus.m_cputag = tag;
 }
 
 
@@ -58,17 +82,44 @@ device_abcbus_interface::~device_abcbus_interface()
 void abcbus_device::device_config_complete()
 {
 	// inherit a copy of the static data
-	const abcbus_config *intf = reinterpret_cast<const abcbus_config *>(static_config());
+	const abcbus_interface *intf = reinterpret_cast<const abcbus_interface *>(static_config());
 	if (intf != NULL)
-		*static_cast<abcbus_config *>(this) = *intf;
+	{
+		*static_cast<abcbus_interface *>(this) = *intf;
+	}
 
 	// or initialize to defaults if none provided
 	else
 	{
-		fatalerror("Daisy chain not provided!");
+    	memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
+    	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
+    	memset(&m_out_rdy_cb, 0, sizeof(m_out_rdy_cb));
+    	memset(&m_out_resin_cb, 0, sizeof(m_out_resin_cb));
 	}
+}
 
-	m_daisy = intf;
+
+
+//**************************************************************************
+//  DEVICE ABCBUS CARD INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_abcbus_card_interface - constructor
+//-------------------------------------------------
+
+device_abcbus_card_interface::device_abcbus_card_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device)
+{
+}
+
+
+//-------------------------------------------------
+//  ~device_abcbus_card_interface - destructor
+//-------------------------------------------------
+
+device_abcbus_card_interface::~device_abcbus_card_interface()
+{
 }
 
 
@@ -81,9 +132,11 @@ void abcbus_device::device_config_complete()
 //  abcbus_device - constructor
 //-------------------------------------------------
 
-abcbus_device::abcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, ABCBUS, "Luxor ABC bus", tag, owner, clock)
+abcbus_device::abcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, ABCBUS, "ABC bus", tag, owner, clock)
 {
+	for (int i = 0; i < MAX_ABCBUS_SLOTS; i++)
+		m_abcbus_device[i] = NULL;
 }
 
 
@@ -93,51 +146,47 @@ abcbus_device::abcbus_device(const machine_config &mconfig, const char *tag, dev
 
 void abcbus_device::device_start()
 {
-	const abcbus_config *daisy = m_daisy;
+	m_maincpu = machine().device(m_cputag);
 
-	// create a linked list of devices
-	daisy_entry **tailptr = &m_daisy_list;
-	for ( ; daisy->devname != NULL; daisy++)
-	{
-		// find the device
-		device_t *target = machine().device(daisy->devname);
-		if (target == NULL)
-			fatalerror("Unable to locate device '%s'", daisy->devname);
-
-		// make sure it has an interface
-		device_abcbus_interface *intf;
-		if (!target->interface(intf))
-			fatalerror("Device '%s' does not implement the abcbus interface!", daisy->devname);
-
-		// append to the end
-		*tailptr = auto_alloc(machine(), daisy_entry(target));
-		tailptr = &(*tailptr)->m_next;
-	}
+	// resolve callbacks
+	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
+	m_out_rdy_func.resolve(m_out_rdy_cb, *this);
+	m_out_resin_func.resolve(m_out_resin_cb, *this);
 }
 
 
 //-------------------------------------------------
-//  daisy_entry - constructor
+//  device_reset - device-specific reset
 //-------------------------------------------------
 
-abcbus_device::daisy_entry::daisy_entry(device_t *device)
-	: m_next(NULL),
-	  m_device(device),
-	  m_interface(NULL)
+void abcbus_device::device_reset()
 {
-	device->interface(m_interface);
 }
 
 
+//-------------------------------------------------
+//  add_abcbus_card - add ABC bus card
+//-------------------------------------------------
+
+void abcbus_device::add_abcbus_card(device_abcbus_card_interface *card, int pos)
+{
+	m_abcbus_device[pos] = card;
+}
+
+	
 //-------------------------------------------------
 //  cs_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( abcbus_device::cs_w )
 {
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	for (int i = 0; i < MAX_ABCBUS_SLOTS; i++)
 	{
-		daisy->m_interface->abcbus_cs(data);
+		if (m_abcbus_device[i] != NULL)
+		{
+			m_abcbus_device[i]->abcbus_cs(data);
+		}
 	}
 }
 
@@ -148,10 +197,13 @@ WRITE8_MEMBER( abcbus_device::cs_w )
 
 READ8_MEMBER( abcbus_device::rst_r )
 {
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	for (int i = 0; i < MAX_ABCBUS_SLOTS; i++)
 	{
-		daisy->m_interface->abcbus_rst(0);
-		daisy->m_interface->abcbus_rst(1);
+		if (m_abcbus_device[i] != NULL)
+		{
+			m_abcbus_device[i]->abcbus_rst(0);
+			m_abcbus_device[i]->abcbus_rst(1);
+		}
 	}
 
 	return 0xff;
@@ -166,9 +218,12 @@ READ8_MEMBER( abcbus_device::inp_r )
 {
 	UINT8 data = 0xff;
 
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	for (int i = 0; i < MAX_ABCBUS_SLOTS; i++)
 	{
-		data &= daisy->m_interface->abcbus_inp();
+		if (m_abcbus_device[i] != NULL)
+		{
+			data &= m_abcbus_device[i]->abcbus_inp();
+		}
 	}
 
 	return data;
@@ -181,9 +236,12 @@ READ8_MEMBER( abcbus_device::inp_r )
 
 WRITE8_MEMBER( abcbus_device::utp_w )
 {
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	for (int i = 0; i < MAX_ABCBUS_SLOTS; i++)
 	{
-		daisy->m_interface->abcbus_utp(data);
+		if (m_abcbus_device[i] != NULL)
+		{
+			m_abcbus_device[i]->abcbus_utp(data);
+		}
 	}
 }
 
@@ -196,9 +254,12 @@ READ8_MEMBER( abcbus_device::stat_r )
 {
 	UINT8 data = 0xff;
 
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	for (int i = 0; i < MAX_ABCBUS_SLOTS; i++)
 	{
-		data &= daisy->m_interface->abcbus_stat();
+		if (m_abcbus_device[i] != NULL)
+		{
+			data &= m_abcbus_device[i]->abcbus_stat();
+		}
 	}
 
 	return data;
@@ -211,9 +272,12 @@ READ8_MEMBER( abcbus_device::stat_r )
 
 WRITE8_MEMBER( abcbus_device::c1_w )
 {
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	for (int i = 0; i < MAX_ABCBUS_SLOTS; i++)
 	{
-		daisy->m_interface->abcbus_c1(data);
+		if (m_abcbus_device[i] != NULL)
+		{
+			m_abcbus_device[i]->abcbus_c1(data);
+		}
 	}
 }
 
@@ -224,9 +288,12 @@ WRITE8_MEMBER( abcbus_device::c1_w )
 
 WRITE8_MEMBER( abcbus_device::c2_w )
 {
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	for (int i = 0; i < MAX_ABCBUS_SLOTS; i++)
 	{
-		daisy->m_interface->abcbus_c2(data);
+		if (m_abcbus_device[i] != NULL)
+		{
+			m_abcbus_device[i]->abcbus_c2(data);
+		}
 	}
 }
 
@@ -237,9 +304,12 @@ WRITE8_MEMBER( abcbus_device::c2_w )
 
 WRITE8_MEMBER( abcbus_device::c3_w )
 {
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	for (int i = 0; i < MAX_ABCBUS_SLOTS; i++)
 	{
-		daisy->m_interface->abcbus_c3(data);
+		if (m_abcbus_device[i] != NULL)
+		{
+			m_abcbus_device[i]->abcbus_c3(data);
+		}
 	}
 }
 
@@ -250,19 +320,13 @@ WRITE8_MEMBER( abcbus_device::c3_w )
 
 WRITE8_MEMBER( abcbus_device::c4_w )
 {
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	for (int i = 0; i < MAX_ABCBUS_SLOTS; i++)
 	{
-		daisy->m_interface->abcbus_c4(data);
+		if (m_abcbus_device[i] != NULL)
+		{
+			m_abcbus_device[i]->abcbus_c4(data);
+		}
 	}
-}
-
-
-//-------------------------------------------------
-//  resin_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( abcbus_device::resin_w )
-{
 }
 
 
@@ -272,6 +336,7 @@ WRITE_LINE_MEMBER( abcbus_device::resin_w )
 
 WRITE_LINE_MEMBER( abcbus_device::int_w )
 {
+	m_out_int_func(state);
 }
 
 
@@ -281,6 +346,7 @@ WRITE_LINE_MEMBER( abcbus_device::int_w )
 
 WRITE_LINE_MEMBER( abcbus_device::nmi_w )
 {
+	m_out_nmi_func(state);
 }
 
 
@@ -290,4 +356,15 @@ WRITE_LINE_MEMBER( abcbus_device::nmi_w )
 
 WRITE_LINE_MEMBER( abcbus_device::rdy_w )
 {
+	m_out_rdy_func(state);
+}
+
+
+//-------------------------------------------------
+//  resin_w -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( abcbus_device::resin_w )
+{
+	m_out_resin_func(state);
 }

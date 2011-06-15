@@ -278,9 +278,6 @@ public:
 	virtual void s100_poc_w(int state) { }
 	virtual void s100_reset_w(int state) { }
 	virtual void s100_slave_clr_w(int state) { }
-
-    // inline configuration
-    static void static_set_s100_tag(device_t &device, const char *tag);
 	
 public:
 	s100_device  *m_s100;

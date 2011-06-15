@@ -46,7 +46,6 @@
 #define Z80PIO_TAG		"cd67"
 #define SN76477_TAG		"g8"
 #define ABCBUS_TAG		"abcbus"
-#define RS232_TAG		"rs232"
 
 class abc80_state : public driver_device
 {
@@ -55,14 +54,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_pio(*this, Z80PIO_TAG),
-		  m_rs232(*this, RS232_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_pio;
-	required_device<device_t> m_rs232;
 	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_ram;
 

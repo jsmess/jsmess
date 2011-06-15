@@ -132,32 +132,6 @@ Notes:
 
 const device_type LUXOR_55_10828 = &device_creator<luxor_55_10828_device>;
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void luxor_55_10828_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const luxor_55_10828_interface *intf = reinterpret_cast<const luxor_55_10828_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<luxor_55_10828_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		fatalerror("Interface not provided!");
-	}
-
-	m_sw1 = intf->m_sw1;
-	m_drive_type = intf->m_drive_type;
-	m_s1 = intf->m_s1;
-
-	m_shortname = "lux10828";
-}
-
 
 //-------------------------------------------------
 //  ROM( luxor_55_10828 )
@@ -195,7 +169,7 @@ const rom_entry *luxor_55_10828_device::device_rom_region() const
 
 static ADDRESS_MAP_START( luxor_55_10828_mem, AS_PROGRAM, 8, luxor_55_10828_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("luxor_55_10828:abc830", 0)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("abc1:slow:abc830", 0)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM
 ADDRESS_MAP_END
 
@@ -428,12 +402,11 @@ ioport_constructor luxor_55_10828_device::device_input_ports() const
 
 luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, LUXOR_55_10828, "Luxor 55 10828", tag, owner, clock),
-	  device_abcbus_interface(mconfig, *this),
+	  device_abcbus_card_interface(mconfig, *this),
+	  device_slot_card_interface(mconfig, *this),
 	  m_maincpu(*this, Z80_TAG),
 	  m_pio(*this, Z80PIO_TAG),
 	  m_fdc(*this, FD1791_TAG),
-	  m_image0(*this->owner(), FLOPPY_0),
-	  m_image1(*this->owner(), FLOPPY_1),
 	  m_cs(false),
 	  m_fdc_irq(0),
 	  m_fdc_drq(0),
@@ -450,6 +423,10 @@ luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, cons
 
 void luxor_55_10828_device::device_start()
 {
+	// find floppy image devices
+	m_image0 = machine().device(FLOPPY_0);
+	m_image1 = machine().device(FLOPPY_1);
+
 	// state saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_status));

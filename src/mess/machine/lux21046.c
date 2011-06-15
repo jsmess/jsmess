@@ -88,33 +88,6 @@ const device_type LUXOR_55_21046 = &device_creator<luxor_55_21046_device>;
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void luxor_55_21046_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const luxor_55_21046_interface *intf = reinterpret_cast<const luxor_55_21046_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<luxor_55_21046_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		fatalerror("Interface not provided!");
-	}
-
-	m_sw1 = intf->m_sw1;
-	m_sw2 = intf->m_sw2;
-	m_sw3 = intf->m_sw3;
-
-	m_shortname = "lux21046";
-}
-
-
-//-------------------------------------------------
 //  ROM( luxor_55_21046 )
 //-------------------------------------------------
 
@@ -143,7 +116,7 @@ const rom_entry *luxor_55_21046_device::device_rom_region() const
 static ADDRESS_MAP_START( luxor_55_21046_mem, AS_PROGRAM, 8, luxor_55_21046_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("luxor_55_21046:conkort", 0x2000)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("abc1:fast:conkort", 0x2000)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -303,46 +276,46 @@ machine_config_constructor luxor_55_21046_device::device_mconfig_additions() con
 INPUT_PORTS_START( luxor_55_21046 )
 	PORT_START("SW1")
 	// ABC 838
-	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
-	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
 	// ABC 830
-	PORT_DIPNAME( 0x01, 0x00, "Drive 0 Sided" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x01, "Double" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPNAME( 0x02, 0x00, "Drive 1 Sided" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x02, "Double" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Density" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x04, "Double" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPNAME( 0x08, 0x00, "Drive 1 Density" ) PORT_DIPLOCATION("SW1:4") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x08, "Double" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPNAME( 0x01, 0x00, "Drive 0 Sided" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x01, "Double" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPNAME( 0x02, 0x00, "Drive 1 Sided" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x02, "Double" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Density" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x04, "Double" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPNAME( 0x08, 0x00, "Drive 1 Density" ) PORT_DIPLOCATION("SW1:4") PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x08, "Double" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2d)
 	// ABC 832/834/850
-	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sided" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x01, "Double" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPNAME( 0x02, 0x02, "Drive 1 Sided" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x02, "Double" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Tracks" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x00, "80" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x04, "40" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPNAME( 0x08, 0x00, "Drive 1 Tracks" ) PORT_DIPLOCATION("SW1:4") PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x00, "80" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x08, "40" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sided" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x01, "Double" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPNAME( 0x02, 0x02, "Drive 1 Sided" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x02, "Double" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Tracks" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x00, "80" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x04, "40" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPNAME( 0x08, 0x00, "Drive 1 Tracks" ) PORT_DIPLOCATION("SW1:4") PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x00, "80" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x08, "40" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c)
 
 	PORT_START("SW2")
 	PORT_DIPNAME( 0x0f, 0x01, "Drive Type" ) PORT_DIPLOCATION("SW2:1,2,3,4")
-	PORT_DIPSETTING(    0x01, "TEAC FD55F (ABC 834)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 230 7802-01
-	PORT_DIPSETTING(    0x02, "BASF 6138 (ABC 850)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 230 8440-15
-	PORT_DIPSETTING(    0x03, "Micropolis 1015F (ABC 832)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-15
-	PORT_DIPSETTING(    0x04, "BASF 6118 (ABC 832)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-16
-	PORT_DIPSETTING(    0x05, "Micropolis 1115F (ABC 832)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-17
-	PORT_DIPSETTING(    0x08, "BASF 6106/08 (ABC 830)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d) // 190 9206-16
-	PORT_DIPSETTING(    0x09, "MPI 51 (ABC 830)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2d) // 190 9206-16
-	PORT_DIPSETTING(    0x0e, "BASF 6105 (ABC 838)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
-	PORT_DIPSETTING(    0x0f, "BASF 6106 (ABC 838)" ) PORT_CONDITION("luxor_55_21046:SW3", 0x7f, PORTCOND_EQUALS, 0x2e) // 230 8838-15
+	PORT_DIPSETTING(    0x01, "TEAC FD55F (ABC 834)" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 230 7802-01
+	PORT_DIPSETTING(    0x02, "BASF 6138 (ABC 850)" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 230 8440-15
+	PORT_DIPSETTING(    0x03, "Micropolis 1015F (ABC 832)" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-15
+	PORT_DIPSETTING(    0x04, "BASF 6118 (ABC 832)" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-16
+	PORT_DIPSETTING(    0x05, "Micropolis 1115F (ABC 832)" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2c) // 190 9711-17
+	PORT_DIPSETTING(    0x08, "BASF 6106/08 (ABC 830)" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2d) // 190 9206-16
+	PORT_DIPSETTING(    0x09, "MPI 51 (ABC 830)" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2d) // 190 9206-16
+	PORT_DIPSETTING(    0x0e, "BASF 6105 (ABC 838)" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2e)
+	PORT_DIPSETTING(    0x0f, "BASF 6106 (ABC 838)" ) PORT_CONDITION("abc1:fast:SW3", 0x7f, PORTCOND_EQUALS, 0x2e) // 230 8838-15
 
 	PORT_START("SW3")
 	PORT_DIPNAME( 0x7f, 0x2c, "Card Address" ) PORT_DIPLOCATION("SW3:1,2,3,4,5,6,7")
@@ -388,12 +361,11 @@ ioport_constructor luxor_55_21046_device::device_input_ports() const
 
 luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, LUXOR_55_21046, "Luxor 55 21046", tag, owner, clock),
-	  device_abcbus_interface(mconfig, *this),
+	  device_abcbus_card_interface(mconfig, *this),
+	  device_slot_card_interface(mconfig, *this),
 	  m_maincpu(*this, Z80_TAG),
 	  m_dma(*this, Z80DMA_TAG),
 	  m_fdc(*this, SAB1793_TAG),
-	  m_image0(*this->owner(), FLOPPY_0),
-	  m_image1(*this->owner(), FLOPPY_1),
 	  m_cs(false),
 	  m_fdc_irq(0),
 	  m_dma_irq(0),
@@ -409,6 +381,10 @@ luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, cons
 
 void luxor_55_21046_device::device_start()
 {
+	// find floppy image devices
+	m_image0 = machine().device(FLOPPY_0);
+	m_image1 = machine().device(FLOPPY_1);
+
 	// state saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_status));
@@ -453,7 +429,7 @@ void luxor_55_21046_device::device_reset()
 
 void luxor_55_21046_device::abcbus_cs(UINT8 data)
 {
-	m_cs = (data == m_sw3);
+	m_cs = (data == input_port_read(this, "SW3"));
 }
 
 
@@ -710,14 +686,12 @@ READ8_MEMBER( luxor_55_21046_device::_9a_r )
 	data |= m_busy;
 
 	// SW1
-//  UINT8 sw1 = input_port_read(this, "SW1") & 0x0f;
-	UINT8 sw1 = m_sw1;
+	UINT8 sw1 = input_port_read(this, "SW1") & 0x0f;
 
 	data |= sw1 << 4;
 
 	// SW2
-//  UINT8 sw2 = input_port_read(this, "SW2") & 0x0f;
-	UINT8 sw2 = m_sw2;
+	UINT8 sw2 = input_port_read(this, "SW2") & 0x0f;
 
 	// TTL inputs float high so DIP switch in off position equals 1
 	int sw2_1 = BIT(sw2, 0) ? 1 : BIT(offset, 8);

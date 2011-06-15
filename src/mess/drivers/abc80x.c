@@ -1235,13 +1235,20 @@ static const cassette_interface abc800_cassette_interface =
 
 
 //-------------------------------------------------
-//  ABCBUS_DAISY( abcbus_daisy )
+//  ABCBUS_INTERFACE( abcbus_intf )
 //-------------------------------------------------
 
-static ABCBUS_DAISY( abcbus_daisy )
+static SLOT_INTERFACE_START( abc800_abcbus_cards )
+	SLOT_INTERFACE("fast", LUXOR_55_21046)
+SLOT_INTERFACE_END
+
+
+static ABCBUS_INTERFACE( abcbus_intf )
 {
-	{ LUXOR_55_21046_TAG },
-	{ NULL }
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -1432,11 +1439,15 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
 	MCFG_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, attotime::from_hz(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
+	MCFG_ABC832_ADD()
 
 	// ABC bus
-	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-	MCFG_ABC830_ADD()
-	MCFG_LUXOR_55_21046_ADD(abc830_fast_intf)
+	MCFG_ABCBUS_ADD(Z80_TAG, abcbus_intf)
+	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc800_abcbus_cards, "fast")
+	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc800_abcbus_cards, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1479,11 +1490,15 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
 	MCFG_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, attotime::from_hz(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
+	MCFG_ABC832_ADD()
 
 	// ABC bus
-	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-	MCFG_ABC830_ADD()
-	MCFG_LUXOR_55_21046_ADD(abc830_fast_intf)
+	MCFG_ABCBUS_ADD(Z80_TAG, abcbus_intf)
+	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc800_abcbus_cards, "fast")
+	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc800_abcbus_cards, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1523,11 +1538,15 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_ABC77_ADD(abc77_intf)
 	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
+	MCFG_ABC834_ADD()
 
 	// ABC bus
-	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-	MCFG_ABC834_ADD()
-	MCFG_LUXOR_55_21046_ADD(abc834_fast_intf)
+	MCFG_ABCBUS_ADD(Z80_TAG, abcbus_intf)
+	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc800_abcbus_cards, "fast")
+	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc800_abcbus_cards, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1558,11 +1577,15 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_ABC77_ADD(abc77_intf)
 	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
+	MCFG_ABC832_ADD()
 
 	// ABC bus
-	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-	MCFG_ABC832_ADD()
-	MCFG_LUXOR_55_21046_ADD(abc832_fast_intf)
+	MCFG_ABCBUS_ADD(Z80_TAG, abcbus_intf)
+	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc800_abcbus_cards, "fast")
+	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc800_abcbus_cards, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

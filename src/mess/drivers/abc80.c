@@ -187,7 +187,6 @@ Notes:
 #include "machine/abcbus.h"
 #include "machine/abc830.h"
 #include "machine/lux10828.h"
-#include "machine/rs232.h"
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
 #include "includes/abc80.h"
@@ -587,13 +586,10 @@ READ8_MEMBER( abc80_state::pio_pb_r )
 	UINT8 data = 0;
 
 	/* serial receive */
-	data |= rs232_rd_r(m_rs232);
 
 	/* clear to send */
-	data |= rs232_cts_r(m_rs232) << 1;
 
 	/* data connection detect */
-	data |= rs232_dcd_r(m_rs232) << 2;
 
 	/* cassette data */
 	data |= ((m_cassette)->input() > +1.0) << 7;
@@ -619,10 +615,8 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
     */
 
 	/* transmit */
-	rs232_td_w(m_rs232, m_pio, BIT(data, 3));
 
 	/* request to send */
-	rs232_rts_w(m_rs232, BIT(data, 4));
 
 	/* cassette motor */
 	m_cassette->change_state(BIT(data,5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -669,31 +663,20 @@ static const cassette_interface abc80_cassette_interface =
 
 
 //-------------------------------------------------
-//  ABCBUS_DAISY( abcbus_daisy )
+//  ABCBUS_INTERFACE( abcbus_intf )
 //-------------------------------------------------
 
-static ABCBUS_DAISY( abcbus_daisy )
+static SLOT_INTERFACE_START( abc80_abcbus_cards )
+	SLOT_INTERFACE("slow", LUXOR_55_10828)
+SLOT_INTERFACE_END
+
+
+static ABCBUS_INTERFACE( abcbus_intf )
 {
-	{ LUXOR_55_10828_TAG },
-	{ NULL }
-};
-
-
-//-------------------------------------------------
-//  RS232_INTERFACE( rs232_intf )
-//-------------------------------------------------
-
-static RS232_INTERFACE( rs232_intf )
-{
-	{ Z80PIO_TAG ,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
-	}
 };
 
 
@@ -749,17 +732,20 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	/* keyboard */
 	MCFG_TIMER_ADD_PERIODIC("keyboard", abc80_keyboard_tick, attotime::from_usec(2500))
 
-	/* Luxor Conkort 55-10828 */
-	MCFG_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
-	MCFG_ABC830_ADD()
-	MCFG_LUXOR_55_10828_ADD(abc830_slow_intf)
-
 	/* devices */
 	MCFG_TIMER_ADD_SCANLINE("pio_astb", z80pio_astb_tick, SCREEN_TAG, 0, 1)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, ABC80_XTAL/2/2, pio_intf)
-	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc80_cassette_interface)
+	MCFG_ABC830_ADD()
+
+	// ABC bus
+	MCFG_ABCBUS_ADD(Z80_TAG, abcbus_intf)
+	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc80_abcbus_cards, "slow")
+	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc80_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc80_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc80_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc80_abcbus_cards, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

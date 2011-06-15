@@ -21,7 +21,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LUXOR_55_21046_TAG	"luxor_55_21046"
+#define LUXOR_55_21046_TAG		"luxor_55_21046"
 
 
 #define ADDRESS_ABC832			44
@@ -42,37 +42,14 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_LUXOR_55_21046_ADD(_config) \
-    MCFG_DEVICE_ADD(LUXOR_55_21046_TAG, LUXOR_55_21046, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define LUXOR_55_21046_INTERFACE(name) \
-	const luxor_55_21046_interface (name) =
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// ======================> luxor_55_21046_interface
-
-struct luxor_55_21046_interface
-{
-	UINT8 m_sw1;				// single/double sided/density
-	UINT8 m_sw2;				// drive type
-	UINT8 m_sw3;				// ABC bus address
-};
 
 // ======================> luxor_55_21046_device
 
 class luxor_55_21046_device :  public device_t,
-							   public device_abcbus_interface,
-							   public luxor_55_21046_interface
+							   public device_abcbus_card_interface,
+							   public device_slot_card_interface
 {
 public:
     // construction/destruction
@@ -83,13 +60,13 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
+	// not really public
 	DECLARE_READ8_MEMBER( _3d_r );
 	DECLARE_WRITE8_MEMBER( _4d_w );
 	DECLARE_WRITE8_MEMBER( _4b_w );
 	DECLARE_WRITE8_MEMBER( _9b_w );
 	DECLARE_WRITE8_MEMBER( _8a_w );
 	DECLARE_READ8_MEMBER( _9a_r );
-
 	DECLARE_WRITE_LINE_MEMBER( dma_int_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 
@@ -97,7 +74,7 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
+    virtual void device_config_complete() { m_shortname = "lux21046"; }
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(UINT8 data);
@@ -112,8 +89,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_image0;
-	required_device<device_t> m_image1;
+	device_t *m_image0;
+	device_t *m_image1;
 
 	bool m_cs;					// card selected
 	UINT8 m_status;				// ABC BUS status
@@ -123,10 +100,6 @@ private:
 	int m_dma_irq;				// DMA interrupt
 	int m_busy;					// busy bit
 	int m_force_busy;			// force busy bit
-
-	UINT8 m_sw1;				// DS/DD
-	UINT8 m_sw2;				// drive type
-	UINT8 m_sw3;				// ABC bus address
 };
 
 

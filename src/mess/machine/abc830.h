@@ -44,11 +44,11 @@ extern const floppy_config fd2_floppy_config;
 
 
 // conkort interfaces
-extern const luxor_55_10828_interface( abc830_slow_intf );
-extern const luxor_55_21046_interface( abc830_fast_intf );
-extern const luxor_55_21046_interface( abc832_fast_intf );
-extern const luxor_55_21046_interface( abc834_fast_intf );
-extern const luxor_55_21046_interface( abc838_fast_intf );
+extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc830_slow )[];
+extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc830_fast )[];
+extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc832_fast )[];
+extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc834_fast )[];
+extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc838_fast )[];
 
 
 #endif
