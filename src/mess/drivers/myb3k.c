@@ -118,7 +118,7 @@ static WRITE8_DEVICE_HANDLER( myb3k_fdc_output_w )
 {
 	/* TODO: complete guesswork! (it just does a 0x24 -> 0x20 in there) */
 	wd17xx_set_drive(device,data & 3);
-	floppy_mon_w(floppy_get_device(device->machine(), data & 3), !data & 4);
+	floppy_mon_w(floppy_get_device(device->machine(), data & 3), (!data & 4) ? 1: 0);
 	floppy_drive_set_ready_state(floppy_get_device(device->machine(), data & 3), data & 0x4,0);
 	//wd17xx_set_side(dev,(data & 0x10)>>4);
 }
