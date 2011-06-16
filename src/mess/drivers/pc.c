@@ -1728,9 +1728,9 @@ static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_interface )
 
-	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+	MCFG_UPD765A_ADD("upd765", pcjr_fdc_upd765_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, ibmpc_floppy_config)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart1")
