@@ -28,15 +28,15 @@ class altair_state : public driver_device
 public:
 	altair_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-		{ }
+	m_maincpu(*this, "maincpu")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER( sio_status_r );
-	DECLARE_READ8_MEMBER( sio_data_r );
-	DECLARE_READ8_MEMBER( sio_key_status_r );
-	DECLARE_WRITE8_MEMBER( sio_command_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	DECLARE_READ8_MEMBER(sio_status_r);
+	DECLARE_READ8_MEMBER(sio_data_r);
+	DECLARE_READ8_MEMBER(sio_key_status_r);
+	DECLARE_WRITE8_MEMBER(sio_command_w);
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
 	UINT8* m_ram;
 };
@@ -45,8 +45,7 @@ public:
 
 READ8_MEMBER(altair_state::sio_status_r)
 {
-	if (m_term_data!=0) return 0x01; // data in
-	return 0x02; // ready
+	return (m_term_data) ? 1 : 2;
 }
 
 WRITE8_MEMBER(altair_state::sio_command_w)
@@ -56,14 +55,14 @@ WRITE8_MEMBER(altair_state::sio_command_w)
 
 READ8_MEMBER(altair_state::sio_data_r)
 {
-	UINT8 retVal = m_term_data;
+	UINT8 ret = m_term_data;
 	m_term_data = 0;
-	return retVal;
+	return ret;
 }
 
 READ8_MEMBER(altair_state::sio_key_status_r)
 {
-	return (m_term_data!=0) ? 0x40 : 0x01;
+	return (m_term_data) ? 0x40 : 0x01;
 }
 
 static ADDRESS_MAP_START(altair_mem, AS_PROGRAM, 8, altair_state)
@@ -116,7 +115,7 @@ WRITE8_MEMBER( altair_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( altair_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
 	DEVCB_DRIVER_MEMBER(altair_state, kbd_put)
 };
@@ -131,7 +130,7 @@ static MACHINE_CONFIG_START( altair, altair_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,altair_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", altair, "bin", 0)
