@@ -79,8 +79,8 @@ void ti99_mfm_harddisk_read_sector(device_t *harddisk, int cylinder, int head, i
 {
 	UINT32 lba;
 	mfmhd_state *hd = get_safe_token(harddisk);
-	device_t *drive = harddisk->subdevice("drive");
-	hard_disk_file *file = hd_get_hard_disk_file(drive);
+	harddisk_image_device *drive = harddisk->subdevice<harddisk_image_device>("drive");
+	hard_disk_file *file = drive->get_hard_disk_file();
 
 	*sector_length = 256;
 	*buf = (UINT8 *)malloc(*sector_length);
@@ -115,8 +115,8 @@ void ti99_mfm_harddisk_write_sector(device_t *harddisk, int cylinder, int head, 
 {
 	UINT32 lba;
 	mfmhd_state *hd = get_safe_token(harddisk);
-	device_t *drive = harddisk->subdevice("drive");
-	hard_disk_file *file = hd_get_hard_disk_file(drive);
+	harddisk_image_device *drive = harddisk->subdevice<harddisk_image_device>("drive");
+	hard_disk_file *file = drive->get_hard_disk_file();
 
 	if (file==NULL)
 	{
@@ -180,7 +180,7 @@ static int find_block(const UINT8 *buffer, int start, int stop, UINT8 byte, size
 void ti99_mfm_harddisk_read_track(device_t *harddisk, int head, UINT8 **pbuffer, int *data_count)
 {
 	mfmhd_state *hd = get_safe_token(harddisk);
-	device_t *drive = harddisk->subdevice("drive");
+	harddisk_image_device *drive = harddisk->subdevice<harddisk_image_device>("drive");
 
 	/* We assume an interleave of 3 for 32 sectors. */
 	int step = 3;
@@ -199,7 +199,7 @@ void ti99_mfm_harddisk_read_track(device_t *harddisk, int head, UINT8 **pbuffer,
 	int crc;
 
 	const hard_disk_info *info;
-	hard_disk_file *file = hd_get_hard_disk_file(drive);
+	hard_disk_file *file = drive->get_hard_disk_file();
 
 	if (file==NULL)
 	{
@@ -317,8 +317,8 @@ void ti99_mfm_harddisk_write_track(device_t *harddisk, int head, UINT8 *track_im
 
 	UINT32 lba;
 	mfmhd_state *hd = get_safe_token(harddisk);
-	device_t *drive = harddisk->subdevice("drive");
-	hard_disk_file *file = hd_get_hard_disk_file(drive);
+	harddisk_image_device *drive = harddisk->subdevice<harddisk_image_device>("drive");
+	hard_disk_file *file = drive->get_hard_disk_file();
 
 	/* printf("ti99_hd write track c=%d h=%d\n", hd->current_cylinder, head); */
 
@@ -418,10 +418,10 @@ void ti99_mfm_harddisk_write_track(device_t *harddisk, int head, UINT8 *track_im
 UINT8 ti99_mfm_harddisk_status(device_t *harddisk)
 {
 	UINT8 status = 0;
-	device_t *drive;
+	harddisk_image_device *drive;
 	mfmhd_state *hd = get_safe_token(harddisk);
-	drive = harddisk->subdevice("drive");
-	hard_disk_file *file = hd_get_hard_disk_file(drive);
+	drive = harddisk->subdevice<harddisk_image_device>("drive");
+	hard_disk_file *file = drive->get_hard_disk_file();
 
 	if (file!=NULL)
 		status |= MFMHD_READY;
@@ -441,10 +441,10 @@ UINT8 ti99_mfm_harddisk_status(device_t *harddisk)
 
 void ti99_mfm_harddisk_seek(device_t *harddisk, int direction)
 {
-	device_t *drive = harddisk->subdevice("drive");
+	harddisk_image_device *drive = harddisk->subdevice<harddisk_image_device>("drive");
 	mfmhd_state *hd = get_safe_token(harddisk);
 	const hard_disk_info *info;
-	hard_disk_file *file = hd_get_hard_disk_file(drive);
+	hard_disk_file *file = drive->get_hard_disk_file();
 
 	if (file==NULL)	return;
 
@@ -468,13 +468,13 @@ void ti99_mfm_harddisk_seek(device_t *harddisk, int direction)
 
 void ti99_mfm_harddisk_get_next_id(device_t *harddisk, int head, chrn_id_hd *id)
 {
-	device_t *drive = harddisk->subdevice("drive");
+	harddisk_image_device *drive = harddisk->subdevice<harddisk_image_device>("drive");
 	mfmhd_state *hd = get_safe_token(harddisk);
 	const hard_disk_info *info;
 	hard_disk_file *file;
 	int interleave = 3;
 
-	file = hd_get_hard_disk_file(drive);
+	file = drive->get_hard_disk_file();
 	if (file==NULL)
 	{
 		hd->status &= ~MFMHD_READY;
@@ -507,11 +507,11 @@ static DEVICE_START( idehd )
 
 
 MACHINE_CONFIG_FRAGMENT( mfmhd )
-	MCFG_DEVICE_ADD( "drive", HARDDISK, 0 )
+	MCFG_HARDDISK_ADD("drive")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( idehd )
-	MCFG_DEVICE_ADD( "drive", HARDDISK, 0 )
+	MCFG_HARDDISK_ADD("drive")
 MACHINE_CONFIG_END
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;

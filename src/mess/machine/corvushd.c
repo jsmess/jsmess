@@ -1177,12 +1177,12 @@ static hard_disk_file *corvus_hdc_file(running_machine &machine, int id) {
 	static const char *const tags[] = {
 		"harddisk1"
 	};
-	device_image_interface *img;
+	harddisk_image_device *img;
 
 	/* Only one harddisk supported right now */
 	assert ( id == 0 );
 
-	img = dynamic_cast<device_image_interface *>(machine.device(tags[id]));
+	img = dynamic_cast<harddisk_image_device *>(machine.device(tags[id]));
 
 	if ( !img )
 		return NULL;
@@ -1190,7 +1190,7 @@ static hard_disk_file *corvus_hdc_file(running_machine &machine, int id) {
 	if (!img->exists())
 		return NULL;
 
-	return hd_get_hard_disk_file(&img->device());
+	return img->get_hard_disk_file();
 }
 
 

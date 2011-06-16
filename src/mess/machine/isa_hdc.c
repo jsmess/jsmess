@@ -212,15 +212,15 @@ void isa8_hdc_device::device_reset()
 
 hard_disk_file *isa8_hdc_device::pc_hdc_file(int id)
 {
-	device_image_interface *img = NULL;
+	harddisk_image_device *img = NULL;
 	astring tempstring;
 	switch( id )
 	{
 	case 0:
-		img = dynamic_cast<device_image_interface *>(machine().device(subtag(tempstring,"primary")));
+		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag(tempstring,"primary")));
 		break;
 	case 1:
-		img = dynamic_cast<device_image_interface *>(machine().device(subtag(tempstring,"slave")));
+		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag(tempstring,"slave")));
 		break;
 	}
 	if ( img == NULL )
@@ -229,7 +229,7 @@ hard_disk_file *isa8_hdc_device::pc_hdc_file(int id)
 	if (!img->exists())
 		return NULL;
 
-	return hd_get_hard_disk_file(&img->device());
+	return img->get_hard_disk_file();
 }
 
 void isa8_hdc_device::pc_hdc_result(int set_error_info)

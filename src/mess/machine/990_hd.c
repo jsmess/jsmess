@@ -212,7 +212,7 @@ static DEVICE_IMAGE_LOAD( ti990_hd )
 	d = &hdc.d[id];
 	d->img = &image;
 
-	hd_file = hd_get_hard_disk_file( image );
+	hd_file = dynamic_cast<harddisk_image_device *>(&image)->get_hard_disk_file();
 
 	if ( hd_file )
 	{
@@ -1036,20 +1036,16 @@ WRITE16_HANDLER(ti990_hdc_w)
 }
 
 
-static const struct harddisk_callback_config ti990_harddisk_config =
+static const struct harddisk_interface ti990_harddisk_config =
 {
 	DEVICE_IMAGE_LOAD_NAME( ti990_hd ),
 	DEVICE_IMAGE_UNLOAD_NAME( ti990_hd )
 };
 
 MACHINE_CONFIG_FRAGMENT( ti990_hdc )
-	MCFG_DEVICE_ADD( "harddisk1", HARDDISK, 0 )
-	MCFG_DEVICE_CONFIG( ti990_harddisk_config )
-	MCFG_DEVICE_ADD( "harddisk2", HARDDISK, 0 )
-	MCFG_DEVICE_CONFIG( ti990_harddisk_config )
-	MCFG_DEVICE_ADD( "harddisk3", HARDDISK, 0 )
-	MCFG_DEVICE_CONFIG( ti990_harddisk_config )
-	MCFG_DEVICE_ADD( "harddisk4", HARDDISK, 0 )
-	MCFG_DEVICE_CONFIG( ti990_harddisk_config )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk1", ti990_harddisk_config )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk2", ti990_harddisk_config )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk3", ti990_harddisk_config )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk4", ti990_harddisk_config )
 MACHINE_CONFIG_END
 
