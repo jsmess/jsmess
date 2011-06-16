@@ -595,6 +595,8 @@ $(MESSOBJ)/amiga.a:				\
 $(MESSOBJ)/amstrad.a:			\
 	$(MESS_DRIVERS)/amstrad.o	\
 	$(MESS_MACHINE)/amstrad.o	\
+	$(MESS_DRIVERS)/amstr_pc.o	\
+	$(MESS_MACHINE)/amstr_pc.o	\
 	$(MESS_VIDEO)/nc.o			\
 	$(MESS_DRIVERS)/nc.o		\
 	$(MESS_MACHINE)/nc.o		\
@@ -1229,7 +1231,6 @@ $(MESSOBJ)/pitronic.a:			\
 $(MESSOBJ)/pc.a:				\
 	$(MESS_VIDEO)/pc_aga.o		\
 	$(MESS_MACHINE)/tandy1t.o	\
-	$(MESS_MACHINE)/amstr_pc.o	\
 	$(MESS_MACHINE)/europc.o	\
 	$(MESS_MACHINE)/pc.o		\
 	$(MESS_DRIVERS)/pc.o		\
