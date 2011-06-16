@@ -68,8 +68,9 @@ static struct pic8259_interface pic_intf =
 
 static INS8250_TRANSMIT( ace1_transmit )
 {
-//	terminal_write(m_terminal, 0, data);
-	printf("%c", data);
+	s100_wunderbus_device *wunderbus = downcast<s100_wunderbus_device *>(device->owner());
+
+	wunderbus->m_s100->terminal_transmit_w(data);
 }
 
 static ins8250_interface ace1_intf =
@@ -538,4 +539,14 @@ void s100_wunderbus_device::s100_sout_w(offs_t offset, UINT8 data)
 			break;
 		}
 	}
+}
+
+
+//-------------------------------------------------
+//  s100_terminal_w - terminal write
+//-------------------------------------------------
+
+void s100_wunderbus_device::s100_terminal_w(UINT8 data)
+{
+	ins8250_receive(m_ace1, data);
 }

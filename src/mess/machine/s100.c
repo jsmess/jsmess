@@ -100,6 +100,7 @@ void s100_device::device_config_complete()
     	memset(&m_out_rdy_cb, 0, sizeof(m_out_rdy_cb));
     	memset(&m_out_hold_cb, 0, sizeof(m_out_hold_cb));
     	memset(&m_out_error_cb, 0, sizeof(m_out_error_cb));
+    	memset(&m_out_terminal_cb, 0, sizeof(m_out_terminal_cb));
 	}
 }
 
@@ -147,6 +148,7 @@ void s100_device::device_start()
 	m_out_rdy_func.resolve(m_out_rdy_cb, *this);
 	m_out_hold_func.resolve(m_out_hold_cb, *this);
 	m_out_error_func.resolve(m_out_error_cb, *this);
+	m_out_terminal_func.resolve(m_out_terminal_cb, *this);
 }
 
 
@@ -258,6 +260,38 @@ WRITE_LINE_MEMBER( s100_device::dma3_w ) { m_out_dma3_func(state); }
 WRITE_LINE_MEMBER( s100_device::rdy_w ) { m_out_rdy_func(state); }
 WRITE_LINE_MEMBER( s100_device::hold_w ) { m_out_hold_func(state); }
 WRITE_LINE_MEMBER( s100_device::error_w ) { m_out_error_func(state); }
+
+
+//-------------------------------------------------
+//  terminal_receive_w - receive character
+//-------------------------------------------------
+
+WRITE8_MEMBER( s100_device::terminal_receive_w )
+{
+	for (int i = 0; i < MAX_S100_SLOTS; i++)
+	{
+		if (m_s100_device[i] != NULL && m_s100_device[i]->s100_has_terminal())
+		{
+			m_s100_device[i]->s100_terminal_w(data);
+			break;
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  terminal_transmit_w - transmit character
+//-------------------------------------------------
+
+WRITE8_MEMBER( s100_device::terminal_transmit_w )
+{
+	terminal_transmit_w(data);
+}
+
+void s100_device::terminal_transmit_w(UINT8 data)
+{
+	m_out_terminal_func(0, data);
+}
 
 
 

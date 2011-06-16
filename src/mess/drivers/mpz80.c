@@ -660,14 +660,9 @@ static const floppy_config mpz80_floppy_config =
 //  GENERIC_TERMINAL_INTERFACE( terminal_intf )
 //-------------------------------------------------
 
-WRITE8_MEMBER( mpz80_state::terminal_w )
-{
-//	ins8250_receive(m_ace1, data);
-}
-
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(mpz80_state, terminal_w)
+	DEVCB_DEVICE_MEMBER(S100_TAG, s100_device, terminal_receive_w)
 };
 
 
@@ -691,9 +686,11 @@ WRITE_LINE_MEMBER( mpz80_state::s100_nmi_w )
 	
 	check_interrupt();
 }
+
 static S100_INTERFACE( s100_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(mpz80_state, s100_pint_w),
+	DEVCB_DRIVER_LINE_MEMBER(mpz80_state, s100_nmi_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -702,7 +699,14 @@ static S100_INTERFACE( s100_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(TERMINAL_TAG, terminal_write)
 };
 
 static SLOT_INTERFACE_START( mpz80_s100_cards )

@@ -61,6 +61,8 @@ protected:
 	virtual void s100_vi2_w(int state);
 	virtual UINT8 s100_sinp_r(offs_t offset);
 	virtual void s100_sout_w(offs_t offset, UINT8 data);
+	virtual bool s100_has_terminal() { return true; }
+	virtual void s100_terminal_w(UINT8 data);
 
 private:
 	// internal state
