@@ -237,14 +237,15 @@ void s100_mm65k16s_device::device_reset()
 
 UINT8 s100_mm65k16s_device::s100_smemr_r(offs_t offset)
 {
+#if 0
 	UINT8 data = 0;
 	logerror("mem read %06x\n", offset);
 	if (offset < 0x10000)
 	{
 		data = m_ram[offset];
 	}
-	
-	return 0;
+#endif	
+	return 0;	// should this return data?
 }
 
 
