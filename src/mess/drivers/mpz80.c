@@ -154,11 +154,11 @@ inline void mpz80_state::check_interrupt()
 
 inline offs_t mpz80_state::get_address(offs_t offset)
 {
-	UINT16 map_addr = ((m_task & 0x0f) << 5) | (offset >> 11);
+	UINT16 map_addr = ((m_task & 0x0f) << 5) | ((offset & 0xf000) >> 11);
 	UINT8 map = m_map_ram[map_addr];
 	//UINT8 attr = m_map_ram[map_addr + 1];
 
-	//logerror("task %02x map %02x attr %02x address %06x\n", m_task, map, attr, addr);
+	//logerror("task %02x map_addr %03x map %02x attr %02x address %06x\n", m_task, map_addr, map, attr, offset);
 	
 	// T7 T6 T5 T4 M7 M6 M5 M4 M3 M2 M1 M0 A11 A10 A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
 	return ((m_task & 0xf0) << 16) | (map << 12) | (offset & 0xfff);
@@ -710,9 +710,9 @@ static S100_INTERFACE( s100_intf )
 };
 
 static SLOT_INTERFACE_START( mpz80_s100_cards )
+	SLOT_INTERFACE("mm65k16s", S100_MM65K16S)
 	SLOT_INTERFACE("wunderbus", S100_WUNDERBUS)
 //	SLOT_INTERFACE("multio", S100_MULTIO)
-//	SLOT_INTERFACE("mm65k16s", S100_MM65K16S)
 //	SLOT_INTERFACE("djdma", S100_DJDMA)
 //	SLOT_INTERFACE("dj2db", S100_DJ2DB)
 //	SLOT_INTERFACE("hdcdma", S100_HDCDMA)
@@ -771,7 +771,7 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 
 	// S-100
 	MCFG_S100_BUS_ADD(Z80_TAG, s100_intf)
-	MCFG_S100_SLOT_ADD( 1,  "s100_1", mpz80_s100_cards, NULL)//"mm65k16s")
+	MCFG_S100_SLOT_ADD( 1,  "s100_1", mpz80_s100_cards, "mm65k16s")
 	MCFG_S100_SLOT_ADD( 2,  "s100_2", mpz80_s100_cards, "wunderbus")
 	MCFG_S100_SLOT_ADD( 3,  "s100_3", mpz80_s100_cards, NULL)//"djdma")
 	MCFG_S100_SLOT_ADD( 4,  "s100_4", mpz80_s100_cards, NULL)//"hdcdma")
@@ -792,7 +792,7 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
+	MCFG_RAM_DEFAULT_SIZE("65K")
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mpz80")

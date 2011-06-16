@@ -1120,6 +1120,7 @@ $(MESSOBJ)/mitsubishi.a:		\
 
 $(MESSOBJ)/morrow.a:			\
 	$(MESS_DRIVERS)/mpz80.o		\
+	$(MESS_MACHINE)/s100_mm65k16s.o		\
 	$(MESS_MACHINE)/s100_wunderbus.o	\
 
 $(MESSOBJ)/mos.a:				\
