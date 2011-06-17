@@ -503,48 +503,80 @@ INTERRUPT_GEN( intv_interrupt )
 	intv_stic_screenrefresh(device->machine());
 }
 
-static const UINT8 controller_table[] =
+/* hand 0 == left, 1 == right */
+UINT8 intv_control_r(address_space *space, int hand)
 {
-	0x81, 0x41, 0x21, 0x82, 0x42, 0x22, 0x84, 0x44,
-	0x24, 0x88, 0x48, 0x28, 0xa0, 0x60, 0xc0, 0x00,
-	0x04, 0x16, 0x02, 0x13, 0x01, 0x19, 0x08, 0x1c
-};
-
-READ8_HANDLER( intv_right_control_r )
-{
-	UINT8 rv = 0x00;
-
-	int bit, byte;
-	int value=0;
-
-	for(byte=0; byte<3; byte++)
+	static const char* const keypad_name[] = { "KEYPAD1", "KEYPAD2" };
+	static const UINT8 keypad_table[] =
 	{
-		switch(byte)
+		0xFF, 0x3F, 0x9F, 0x5F, 0xD7, 0xB7, 0x77, 0xDB,
+		0xBB, 0x7B, 0xDD, 0xBD, 0x7D, 0xDE, 0xBE, 0x7E
+	};
+
+	static const char* const disc_name[] = { "DISC1", "DISC2" };
+	static const UINT8 disc_table[] =
+	{
+		0xF3, 0xE3, 0xE7, 0xF7, 0xF6, 0xE6, 0xEE, 0xFE,
+		0xFC, 0xEC, 0xED, 0xFD, 0xF9, 0xE9, 0xEB, 0xFB
+	};
+
+	static const char* const discx_name[] = { "DISCX1", "DISCX2" };
+	static const char* const discy_name[] = { "DISCY1", "DISCY2" };
+	static const UINT8 discyx_table[5][5] =
+	{
+		{ 0xE3, 0xF3, 0xFB, 0xEB, 0xE9 },
+		{ 0xE7, 0xE3, 0xFB, 0xE9, 0xF9 },
+		{ 0xF7, 0xF7, 0xFF, 0xFD, 0xFD },
+		{ 0xF6, 0xE6, 0xFE, 0xEC, 0xED },
+		{ 0xE6, 0xEE, 0xFE, 0xFC, 0xEC }
+	};
+
+	int x, y;
+	UINT8 rv = 0xFF;
+
+	/* keypad */
+	x = input_port_read(space->machine(), keypad_name[hand]);
+	for (y = 0; y < 16; y++)
+	{
+		if (x & (1 << y))
 		{
-			case 0:
-				value = input_port_read(space->machine(), "IN0");
-				break;
-			case 1:
-				value = input_port_read(space->machine(), "IN1");
-				break;
-			case 2:
-				value = input_port_read(space->machine(), "IN2");
-				break;
-		}
-		for(bit=7; bit>=0; bit--)
-		{
-			if (value & (1<<bit))
-			{
-				rv |= controller_table[byte*8+(7-bit)];
-			}
+			rv &= keypad_table[y];
 		}
 	}
-	return rv ^ 0xff;
+
+	switch ((input_port_read(space->machine(), "OPTIONS") >> hand) & 1)
+	{
+		case 0: /* disc == digital */
+		default:
+
+			x = input_port_read(space->machine(), disc_name[hand]);
+			for (y = 0; y < 16; y++)
+			{
+				if (x & (1 << y))
+				{
+					rv &= disc_table[y];
+				}
+			}
+			break;
+
+		case 1: /* disc == _fake_ analog */
+
+			x = input_port_read(space->machine(), discx_name[hand]);
+			y = input_port_read(space->machine(), discy_name[hand]);
+			rv &= discyx_table[y / 32][x / 32];
+	}
+
+	return rv;
 }
 
 READ8_HANDLER( intv_left_control_r )
 {
-	return intv_right_control_r(space, 0 ); //0xff; /* small patch to allow Frogger to be played */
+	return intv_control_r(space, 0);
+}
+
+READ8_HANDLER( intv_right_control_r )
+{
+	return intv_control_r(space, 1);
 }
 
 /* Intellivision console + keyboard component */
