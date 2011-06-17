@@ -824,7 +824,7 @@ static void i286_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	}
 
 	cpustate->CPL = cpustate->sreg[CS].selector & 0x03;
-	printf("286 Task Switch from selector %04x to %04x",old_task,seg.selector);
+	printf("286 Task Switch from selector %04x to %04x\n",old_task,seg.selector);
 }
 
 static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested)
@@ -1413,6 +1413,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 				if(DPL < CPL && (desc.flags & 0x0004) == 0)
 				{
 					I386_SREG stack;
+					I386_SREG temp;
 					UINT32 oldSS,oldESP;
 					/* more privilege */
 					/* Check new SS segment for privilege level from TSS */
@@ -1523,12 +1524,15 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 						PUSH16(cpustate,oldESP & 0xffff);
 					}
 
-					for(x=0;x<(gate.dword_count & 0x1f);x++)
+					memset(&temp, 0, sizeof(temp));
+					temp.selector = oldSS;
+					i386_load_protected_mode_segment(cpustate,&temp);
+					/* copy parameters from old stack to new stack */
+					for(x=(gate.dword_count & 0x1f)-1;x>=0;x--)
 					{
-						/* TODO: copy parameters from old stack to new stack */
-						PUSH16(cpustate,0x1234);
+						UINT32 addr = temp.base + oldESP + (x*2);
+						PUSH16(cpustate,READ16(cpustate,addr));
 					}
-					logerror("Call gate parameters pushed = %i\n",gate.dword_count);
 					cpustate->CPL = (stack.flags >> 5) & 0x03;
 					SetRPL = 1;
 				}
