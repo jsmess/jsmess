@@ -920,12 +920,23 @@ static FLOPPY_OPTIONS_START( sf7000 )
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
+    sf7000_fdc_index_callback -
+-------------------------------------------------*/
+
+static WRITE_LINE_DEVICE_HANDLER(sf7000_fdc_index_callback)
+{
+	sf7000_state *driver_state = device->machine().driver_data<sf7000_state>();
+
+	driver_state->m_fdc_index = state;
+}
+
+/*-------------------------------------------------
     floppy_interface sf7000_floppy_interface
 -------------------------------------------------*/
 
 static const floppy_interface sf7000_floppy_interface =
 {
-	DEVCB_NULL,
+	DEVCB_LINE(sf7000_fdc_index_callback),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -939,17 +950,6 @@ static const floppy_interface sf7000_floppy_interface =
 /***************************************************************************
     MACHINE INITIALIZATION
 ***************************************************************************/
-
-/*-------------------------------------------------
-    sf7000_fdc_index_callback -
--------------------------------------------------*/
-
-static void sf7000_fdc_index_callback(device_t *controller, device_t *img, int state)
-{
-	sf7000_state *driver_state = img->machine().driver_data<sf7000_state>();
-
-	driver_state->m_fdc_index = state;
-}
 
 /*-------------------------------------------------
     TIMER_CALLBACK( lightgun_tick )
@@ -1013,10 +1013,7 @@ void sf7000_state::machine_start()
 {
 	/* configure VDP */
 	TMS9928A_configure(&tms9928a_interface);
-
-	/* configure FDC */
-	floppy_drive_set_index_pulse_callback(m_floppy0, sf7000_fdc_index_callback);
-
+	
 	/* configure memory banking */
 	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base(), 0);
 	memory_configure_bank(machine(), "bank1", 1, 1, ram_get_ptr(m_ram), 0);

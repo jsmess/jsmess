@@ -332,9 +332,9 @@ WRITE8_MEMBER( c1p_state::osi630_sound_w )
     C011 ACIAIO         DISK CONTROLLER ACIA I/O PORT
 */
 
-static void osi470_index_callback(device_t *controller, device_t *img, int state)
+static WRITE_LINE_DEVICE_HANDLER(osi470_index_callback)
 {
-	sb2m600_state *driver_state = img->machine().driver_data<sb2m600_state>();
+	sb2m600_state *driver_state = device->machine().driver_data<sb2m600_state>();
 
 	driver_state->m_fdc_index = state;
 }
@@ -691,9 +691,6 @@ void c1p_state::machine_start()
 void c1pmf_state::machine_start()
 {
 	c1p_state::machine_start();
-
-	/* set floppy index hole callback */
-	floppy_drive_set_index_pulse_callback(m_floppy, osi470_index_callback);
 }
 
 static FLOPPY_OPTIONS_START(osi)
@@ -707,7 +704,7 @@ FLOPPY_OPTIONS_END
 
 static const floppy_interface osi_floppy_interface =
 {
-	DEVCB_NULL,
+	DEVCB_LINE(osi470_index_callback),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

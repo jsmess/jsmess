@@ -434,7 +434,6 @@ static void to7_5p14sd_reset( running_machine &machine )
 			floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 			floppy_drive_set_rpm( img, 300. );
 			floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );
-			floppy_drive_set_index_pulse_callback( img, to7_5p14_index_pulse_callback );
 		}
 	}
 }
@@ -837,7 +836,6 @@ static void to7_qdd_reset( running_machine &machine )
 	{
 		device_t * img = floppy_get_device( machine, i );
 		if (img) {
-			floppy_drive_set_index_pulse_callback( img, to7_qdd_index_pulse_cb );
 			floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 
 			motor_on = CLEAR_LINE;
@@ -1534,7 +1532,6 @@ void thmfc_floppy_reset( running_machine &machine )
 	{
 		device_t * img = floppy_get_device( machine, i );
 		if (img) {
-			floppy_drive_set_index_pulse_callback( img, thmfc_floppy_index_pulse_cb );
 			floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 			floppy_drive_seek( img, - floppy_drive_get_current_track( img ) );
 		}
@@ -1926,4 +1923,29 @@ WRITE8_HANDLER ( to9_floppy_w )
 		to7_floppy_w( space, offset, data );
 	else
 		to7_5p14_w( space, offset, data );
+}
+
+WRITE_LINE_DEVICE_HANDLER(thomson_index_callback)
+{
+	switch ( to7_controller_type )
+	{
+	case 1:
+		to7_5p14_index_pulse_callback(NULL, device, state);
+		break;
+
+	case 2:
+		wd17xx_index_pulse_callback(device->machine().device("wd2793"), device, state);
+		break;
+
+	case 3:
+		thmfc_floppy_index_pulse_cb(NULL, device, state);
+		break;
+
+	case 4:
+		to7_qdd_index_pulse_cb(NULL, device, state);
+		break;
+
+	default:
+		break;
+	}
 }

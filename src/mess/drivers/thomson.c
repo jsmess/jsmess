@@ -587,7 +587,7 @@ INPUT_PORTS_END
 
 static const floppy_interface thomson_floppy_interface =
 {
-	DEVCB_NULL,
+	DEVCB_LINE(thomson_index_callback),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

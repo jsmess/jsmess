@@ -1027,13 +1027,6 @@ static UPD1990A_INTERFACE( rtc_intf )
 
 // UPD765 Interface
 
-static void prof80_fdc_index_callback(device_t *controller, device_t *img, int state)
-{
-	prof80_state *driver_state = img->machine().driver_data<prof80_state>();
-
-	driver_state->m_fdc_index = state;
-}
-
 static const struct upd765_interface fdc_intf =
 {
 	DEVCB_NULL,
@@ -1224,9 +1217,6 @@ void prof80_state::machine_start()
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
-	// configure FDC
-	floppy_drive_set_index_pulse_callback(m_floppy0, prof80_fdc_index_callback);
-
 	// allocate floppy motor off timer
 	m_floppy_motor_off_timer = machine().scheduler().timer_alloc(FUNC(floppy_motor_off_tick));
 
@@ -1290,9 +1280,16 @@ void grip5_state::machine_start()
 	save_item(NAME(m_dpage));
 }
 
+static WRITE_LINE_DEVICE_HANDLER(prof80_fdc_index_callback)
+{
+	prof80_state *driver_state = device->machine().driver_data<prof80_state>();
+
+	driver_state->m_fdc_index = state;
+}
+
 static const floppy_interface prof80_floppy_interface =
 {
-	DEVCB_NULL,
+	DEVCB_LINE(prof80_fdc_index_callback),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

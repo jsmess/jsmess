@@ -48,5 +48,6 @@ extern void thmfc_floppy_reset ( running_machine &machine );
 extern READ8_HANDLER  ( thmfc_floppy_r );
 extern WRITE8_HANDLER ( thmfc_floppy_w );
 
+extern WRITE_LINE_DEVICE_HANDLER(thomson_index_callback);
 
 #endif /* THOMFLOP_H_ */
