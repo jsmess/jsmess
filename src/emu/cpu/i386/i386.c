@@ -734,15 +734,15 @@ static void i286_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	/* For tasks that aren't nested, clear the busy bit in the task's descriptor */
 	if(nested == 0)
 	{
-		if(cpustate->sreg[CS].selector & 0x0004)
+		if(cpustate->task.segment & 0x0004)
 		{
-			ar_byte = READ8(cpustate,cpustate->ldtr.base + (cpustate->sreg[CS].selector & ~0x0007) + 5);
-			WRITE8(cpustate,cpustate->ldtr.base + (cpustate->sreg[CS].selector & ~0x0007) + 5,ar_byte & ~0x02);
+			ar_byte = READ8(cpustate,cpustate->ldtr.base + (cpustate->task.segment & ~0x0007) + 5);
+			WRITE8(cpustate,cpustate->ldtr.base + (cpustate->task.segment & ~0x0007) + 5,ar_byte & ~0x02);
 		}
 		else
 		{
-			ar_byte = READ8(cpustate,cpustate->gdtr.base + (cpustate->sreg[CS].selector & ~0x0007) + 5);
-			WRITE8(cpustate,cpustate->gdtr.base + (cpustate->sreg[CS].selector & ~0x0007) + 5,ar_byte & ~0x02);
+			ar_byte = READ8(cpustate,cpustate->gdtr.base + (cpustate->task.segment & ~0x0007) + 5);
+			WRITE8(cpustate,cpustate->gdtr.base + (cpustate->task.segment & ~0x0007) + 5,ar_byte & ~0x02);
 		}
 	}
 
@@ -841,15 +841,15 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	/* For tasks that aren't nested, clear the busy bit in the task's descriptor */
 	if(nested == 0)
 	{
-		if(cpustate->sreg[CS].selector & 0x0004)
+		if(cpustate->task.segment & 0x0004)
 		{
-			ar_byte = READ8(cpustate,cpustate->ldtr.base + (cpustate->sreg[CS].selector & ~0x0007) + 5);
-			WRITE8(cpustate,cpustate->ldtr.base + (cpustate->sreg[CS].selector & ~0x0007) + 5,ar_byte & ~0x02);
+			ar_byte = READ8(cpustate,cpustate->ldtr.base + (cpustate->task.segment & ~0x0007) + 5);
+			WRITE8(cpustate,cpustate->ldtr.base + (cpustate->task.segment & ~0x0007) + 5,ar_byte & ~0x02);
 		}
 		else
 		{
-			ar_byte = READ8(cpustate,cpustate->gdtr.base + (cpustate->sreg[CS].selector & ~0x0007) + 5);
-			WRITE8(cpustate,cpustate->gdtr.base + (cpustate->sreg[CS].selector & ~0x0007) + 5,ar_byte & ~0x02);
+			ar_byte = READ8(cpustate,cpustate->gdtr.base + (cpustate->task.segment & ~0x0007) + 5);
+			WRITE8(cpustate,cpustate->gdtr.base + (cpustate->task.segment & ~0x0007) + 5,ar_byte & ~0x02);
 		}
 	}
 
@@ -1211,7 +1211,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 				return;
 				break;
 			default:  // invalid segment type
-				logerror("JMP: Invalid segment type (%i) to jump to.",desc.flags & 0x000f);
+				logerror("JMP: Invalid segment type (%i) to jump to.\n",desc.flags & 0x000f);
 				FAULT(FAULT_GP,segment & 0xfffc)
 			}
 		}
