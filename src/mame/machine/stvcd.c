@@ -911,8 +911,12 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 			break;
 
-		case 0x3200:
-			popmessage("Last Buffer Destination triggered, contact MAMEdev");
+		case 0x3200:	// Last Buffer Destination
+			cr1 = cd_stat | 0;
+			cr2 = 0;
+			cr3 = lastbuf << 8;
+			cr4 = 0;
+			hirqreg |= (CMOK);
 			break;
 
 		case 0x4000:	// Set Filter Range
