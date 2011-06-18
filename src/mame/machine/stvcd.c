@@ -597,6 +597,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			cr2 = 0xffff;
 			cr3 = 0xffff;
 			cr4 = 0xffff;
+			hirqreg |= CMOK;
 			return;
 		}
 
@@ -658,7 +659,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			hirqreg |= (CMOK);
 			break;
 
-		case 0x400:	// initialize CD system
+		case 0x0400:	// initialize CD system
 				// CR1 & 1 = reset software
 				// CR1 & 2 = decode RW subcode
 				// CR1 & 4 = don't confirm mode 2 subheader
