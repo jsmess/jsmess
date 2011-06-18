@@ -115,7 +115,7 @@ also has a DSP;
 /* TODO: do this in a verboselog style */
 #define LOG_CDB  0
 #define LOG_SMPC 0
-#define LOG_SCU  1
+#define LOG_SCU  0
 #define LOG_IRQ  0
 #define LOG_IOGA 0
 
@@ -1273,7 +1273,7 @@ static READ32_HANDLER( saturn_scu_r )
 		state->m_scu_regs[41]|= (stv_irq.vdp1_end & 1)<<13;
 		state->m_scu_regs[41]|= (stv_irq.abus & 1)<<15;
 
-		return state->m_scu_regs[41] ^ 0xffffffff;
+		return state->m_scu_regs[41] ^ 0xffffffff; //TODO: this is WRONG (Choice Cuts is a good test case)
 	}
 	else if( offset == 50 )
 	{
