@@ -494,7 +494,7 @@ static FLOPPY_OPTIONS_START(nanos)
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config nanos_floppy_config =
+static const floppy_interface nanos_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -503,6 +503,7 @@ static const floppy_config nanos_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(nanos),
+	NULL,
 	NULL
 };
 
@@ -553,7 +554,7 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	/* UPD765 */
 	MCFG_UPD765A_ADD("upd765", nanos_upd765_interface)
 
-	MCFG_FLOPPY_4_DRIVES_ADD(nanos_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(nanos_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

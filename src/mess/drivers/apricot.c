@@ -320,7 +320,7 @@ static FLOPPY_OPTIONS_START( apricot )
 	)
 FLOPPY_OPTIONS_END
 
-static const floppy_config apricot_floppy_config =
+static const floppy_interface apricot_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -329,6 +329,7 @@ static const floppy_config apricot_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	FLOPPY_OPTIONS_NAME(apricot),
+	NULL,
 	NULL
 };
 
@@ -371,7 +372,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 
 	/* floppy */
 	MCFG_WD2793_ADD("ic68", apricot_wd17xx_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(apricot_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(apricot_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apricotxi, apricot )

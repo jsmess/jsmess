@@ -585,7 +585,7 @@ static INPUT_PORTS_START ( t9000 )
      PORT_INCLUDE ( to7 )
 INPUT_PORTS_END
 
-static const floppy_config thomson_floppy_config =
+static const floppy_interface thomson_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -594,6 +594,7 @@ static const floppy_config thomson_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(thomson),
+	NULL,
 	NULL
 };
 
@@ -667,7 +668,7 @@ static MACHINE_CONFIG_START( to7, driver_device )
 /* floppy */
      MCFG_MC6843_ADD( "mc6843", to7_6843_itf )
      MCFG_WD2793_ADD( "wd2793", default_wd17xx_interface )
-     MCFG_FLOPPY_4_DRIVES_ADD(thomson_floppy_config)
+     MCFG_FLOPPY_4_DRIVES_ADD(thomson_floppy_interface)
 
 /* network */
      MCFG_MC6854_ADD( "mc6854", to7_network_iface )

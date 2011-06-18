@@ -1396,7 +1396,7 @@ static const pc_lpt_interface pcw16_lpt_config =
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
-static const floppy_config pcw16_floppy_config =
+static const floppy_interface pcw16_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1405,6 +1405,7 @@ static const floppy_config pcw16_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(pc),
+	NULL,
 	NULL
 };
 
@@ -1443,7 +1444,7 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt", pcw16_lpt_config)
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_connected_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(pcw16_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(pcw16_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

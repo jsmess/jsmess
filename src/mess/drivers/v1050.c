@@ -1070,7 +1070,7 @@ static FLOPPY_OPTIONS_START( v1050 )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config v1050_floppy_config =
+static const floppy_interface v1050_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1079,7 +1079,8 @@ static const floppy_config v1050_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(v1050),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 /* Machine Initialization */
@@ -1195,7 +1196,7 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_MSM8251_ADD(I8251A_KB_TAG, /*XTAL_16MHz/8,*/ kb_8251_intf)
 	MCFG_MSM8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
 	MCFG_WD1793_ADD(MB8877_TAG, /*XTAL_16MHz/16,*/ fdc_intf )
-	MCFG_FLOPPY_2_DRIVES_ADD(v1050_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(v1050_floppy_interface)
 	MCFG_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, attotime::from_hz((double)XTAL_16MHz/4/13/8))
 	MCFG_TIMER_ADD(TIMER_SIO_TAG, sio_8251_tick)
 

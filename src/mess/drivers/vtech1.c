@@ -448,7 +448,7 @@ static WRITE8_HANDLER( vtech1_fdc_w )
 	}
 }
 
-static const floppy_config vtech1_floppy_config =
+static const floppy_interface vtech1_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -457,6 +457,7 @@ static const floppy_config vtech1_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(vtech1_only),
+	NULL,
 	NULL
 };
 
@@ -983,7 +984,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	MCFG_RAM_DEFAULT_SIZE("66K")
 	MCFG_RAM_EXTRA_OPTIONS("2K,18K,4098K")
 
-	MCFG_FLOPPY_2_DRIVES_ADD(vtech1_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(vtech1_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser200, laser110 )

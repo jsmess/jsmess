@@ -49,7 +49,7 @@ static WRITE_LINE_DEVICE_HANDLER( hector_disc2_fdc_dma_irq );
 */
 
 // Define the hardware of the disk
- const floppy_config hector_disc2_floppy_config =
+ const floppy_interface hector_disc2_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -58,6 +58,7 @@ static WRITE_LINE_DEVICE_HANDLER( hector_disc2_fdc_dma_irq );
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(hector_disc2),
+	NULL,
 	NULL
 };
 

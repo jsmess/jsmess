@@ -535,7 +535,7 @@ FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
-//  floppy_config c1571_floppy_config
+//  floppy_interface c1571_floppy_interface
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( base_c1571_device::wpt_w )
@@ -544,7 +544,7 @@ WRITE_LINE_MEMBER( base_c1571_device::wpt_w )
 }
 
 
-static const floppy_config c1571_floppy_config =
+static const floppy_interface c1571_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -553,7 +553,8 @@ static const floppy_config c1571_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
 	FLOPPY_OPTIONS_NAME(c1571),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 
@@ -568,10 +569,10 @@ FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
-//  floppy_config c1570_floppy_config
+//  floppy_interface c1570_floppy_interface
 //-------------------------------------------------
 
-static const floppy_config c1570_floppy_config =
+static const floppy_interface c1570_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -580,6 +581,7 @@ static const floppy_config c1570_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(c1570),
+	NULL,
 	NULL
 };
 
@@ -597,7 +599,7 @@ static MACHINE_CONFIG_FRAGMENT( c1571 )
 	MCFG_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/16, cia_intf)
 	MCFG_WD1770_ADD(WD1770_TAG, /* XTAL_16MHz/2, */ fdc_intf)
 
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_interface)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
 MACHINE_CONFIG_END
 
@@ -615,7 +617,7 @@ static MACHINE_CONFIG_FRAGMENT( c1570 )
 	MCFG_MOS6526R1_ADD(M6526_TAG, XTAL_16MHz/16, cia_intf)
 	MCFG_WD1770_ADD(WD1770_TAG, /* XTAL_16MHz/2, */ fdc_intf)
 
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1570_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1570_floppy_interface)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
 MACHINE_CONFIG_END
 

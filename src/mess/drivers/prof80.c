@@ -1290,7 +1290,7 @@ void grip5_state::machine_start()
 	save_item(NAME(m_dpage));
 }
 
-static const floppy_config prof80_floppy_config =
+static const floppy_interface prof80_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1299,6 +1299,7 @@ static const floppy_config prof80_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -1336,7 +1337,7 @@ static MACHINE_CONFIG_START( common, prof80_state )
 	// devices
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
-	MCFG_FLOPPY_4_DRIVES_ADD(prof80_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(prof80_floppy_interface)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

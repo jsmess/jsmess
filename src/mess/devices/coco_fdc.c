@@ -473,7 +473,7 @@ static void fdc_coco_w(device_t *device, offs_t addr, UINT8 data)
 }
 
 
-static const floppy_config coco_floppy_config =
+static const floppy_interface coco_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -482,6 +482,7 @@ static const floppy_config coco_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(coco),
+	NULL,
 	NULL
 };
 

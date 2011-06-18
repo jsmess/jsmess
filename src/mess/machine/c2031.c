@@ -390,10 +390,10 @@ FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
-//  floppy_config c2031_floppy_config
+//  floppy_interface c2031_floppy_interface
 //-------------------------------------------------
 
-static const floppy_config c2031_floppy_config =
+static const floppy_interface c2031_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -402,7 +402,8 @@ static const floppy_config c2031_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
 	FLOPPY_OPTIONS_NAME(c2031),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 
@@ -417,7 +418,7 @@ static MACHINE_CONFIG_FRAGMENT( c2031 )
 	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, via0_intf)
 	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, via1_intf)
 
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c2031_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c2031_floppy_interface)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
 MACHINE_CONFIG_END
 

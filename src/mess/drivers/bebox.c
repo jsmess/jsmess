@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( bebox_slave_mem, AS_PROGRAM, 64 )
 	AM_IMPORT_FROM(bebox_mem)
 ADDRESS_MAP_END
 
-static const floppy_config bebox_floppy_config =
+static const floppy_interface bebox_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -113,6 +113,7 @@ static const floppy_config bebox_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(pc),
+	NULL,
 	NULL
 };
 
@@ -174,7 +175,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_SMC37C78_ADD("smc37c78", pc_fdc_upd765_connected_1_drive_interface)
 
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, bebox_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, bebox_floppy_interface)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 

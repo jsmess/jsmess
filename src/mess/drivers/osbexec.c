@@ -517,7 +517,7 @@ static FLOPPY_OPTIONS_START(osbexec )
 FLOPPY_OPTIONS_END
 
 
-static const floppy_config osbexec_floppy_config =
+static const floppy_interface osbexec_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -526,6 +526,7 @@ static const floppy_config osbexec_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	FLOPPY_OPTIONS_NAME(osbexec),
+	NULL,
 	NULL
 };
 
@@ -653,7 +654,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 
 	MCFG_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
 
-	MCFG_FLOPPY_2_DRIVES_ADD(osbexec_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(osbexec_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

@@ -830,7 +830,7 @@ static ZX8302_INTERFACE( ql_zx8302_intf )
 
 
 //-------------------------------------------------
-//  floppy_config ql_floppy_config
+//  floppy_interface ql_floppy_interface
 //-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( ql )
@@ -866,7 +866,7 @@ static FLOPPY_OPTIONS_START( ql )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config ql_floppy_config =
+static const floppy_interface ql_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -875,6 +875,7 @@ static const floppy_config ql_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(ql),
+	NULL,
 	NULL
 };
 
@@ -1026,7 +1027,7 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_ZX8301_ADD(ZX8301_TAG, X1, ql_zx8301_intf)
 	MCFG_ZX8302_ADD(ZX8302_TAG, X1, ql_zx8302_intf)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(ql_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(ql_floppy_interface)
 	MCFG_WD1772_ADD(WD1772_TAG,ql_wd17xx_interface)
 
 	MCFG_MICRODRIVE_ADD(MDV_1, mdv1_config)

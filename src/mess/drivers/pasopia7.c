@@ -970,7 +970,7 @@ static const struct upd765_interface pasopia7_upd765_interface =
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
-static const floppy_config pasopia7_floppy_config =
+static const floppy_interface pasopia7_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -979,6 +979,7 @@ static const floppy_config pasopia7_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -1000,7 +1001,7 @@ static MACHINE_CONFIG_START( paso7, pasopia_state )
 	MCFG_Z80PIO_ADD( "z80pio_0", XTAL_4MHz, z80pio_intf )
 
 	MCFG_UPD765A_ADD("upd765", pasopia7_upd765_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(pasopia7_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(pasopia7_floppy_interface)
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)

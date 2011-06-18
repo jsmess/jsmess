@@ -137,7 +137,7 @@ do not depend on the card being active at that time.
 #include "formats/ti99_dsk.h"
 #include "ti99_hd.h"
 
-static const floppy_config ti99_4_floppy_config =
+static const floppy_interface ti99_4_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -146,6 +146,7 @@ static const floppy_config ti99_4_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(ti99),
+	NULL,
 	NULL
 };
 
@@ -460,7 +461,7 @@ static MACHINE_CONFIG_FRAGMENT( ti99_peb )
 	MCFG_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
 	MCFG_PBOXCARD_ADD( "bwg",			BWG,	  8 )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_interface)
 	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
@@ -478,7 +479,7 @@ static MACHINE_CONFIG_FRAGMENT( ti994a_peb )
 	MCFG_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
 	MCFG_PBOXCARD_ADD( "bwg",			BWG,	  8 )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_interface)
 	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
@@ -497,7 +498,7 @@ static MACHINE_CONFIG_FRAGMENT( ti99ev_peb )
 	MCFG_PBOXCARD_ADD( "bwg",			BWG,	  8 )
 	MCFG_PBOXCARD_ADD( "evpc",			EVPC,	  9 )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_interface)
 	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
@@ -510,7 +511,7 @@ static MACHINE_CONFIG_FRAGMENT( ti998_peb )
 	MCFG_PBOXCARD_ADD( "hfdc",			HFDC,	  8 )
 	MCFG_PBOXCARD_ADD( "bwg",			BWG,	  8 )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_interface)
 	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
@@ -525,7 +526,7 @@ static MACHINE_CONFIG_FRAGMENT( ti99sg_peb )
 	MCFG_PBOXCARD_ADD( "bwg",			BWG,	  7 )
 	MCFG_PBOXCARD_ADD( "evpc",			EVPC,	  8 )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_interface)
 	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
@@ -539,7 +540,7 @@ static MACHINE_CONFIG_FRAGMENT( geneve_peb )
 	MCFG_PBOXCARD_ADD( "hfdc",			HFDC,	  7 )
 	MCFG_PBOXCARD_ADD( "bwg",			BWG,	  7 )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_interface)
 	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 

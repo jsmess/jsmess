@@ -538,7 +538,7 @@ static INTERRUPT_GEN( elwro800jr_interrupt )
 	device_set_input_line(device, 0, HOLD_LINE);
 }
 
-static const floppy_config elwro800jr_floppy_config =
+static const floppy_interface elwro800jr_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -547,6 +547,7 @@ static const floppy_config elwro800jr_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -612,7 +613,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, elwro800jr_cassette_interface )
 
-	MCFG_FLOPPY_2_DRIVES_ADD(elwro800jr_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(elwro800jr_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

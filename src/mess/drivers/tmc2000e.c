@@ -244,7 +244,7 @@ static const cassette_interface tmc2000_cassette_interface =
 	NULL
 };
 
-static const floppy_config tmc2000e_floppy_config =
+static const floppy_interface tmc2000e_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -253,6 +253,7 @@ static const floppy_config tmc2000e_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -277,7 +278,7 @@ static MACHINE_CONFIG_START( tmc2000e, tmc2000e_state )
 	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, tmc2000_cassette_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(tmc2000e_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(tmc2000e_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

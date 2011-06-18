@@ -640,10 +640,10 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  floppy_config super6_floppy_config
+//  floppy_interface super6_floppy_interface
 //-------------------------------------------------
 
-static const floppy_config mpz80_floppy_config =
+static const floppy_interface mpz80_floppy_interface =
 {
     DEVCB_NULL,
     DEVCB_NULL,
@@ -652,7 +652,8 @@ static const floppy_config mpz80_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_8_DSDD,
     FLOPPY_OPTIONS_NAME(default),
-    "floppy_8"
+    "floppy_8",
+	NULL
 };
 
 
@@ -787,7 +788,7 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 	MCFG_S100_SLOT_ADD(14, "s100_14", mpz80_s100_cards, NULL)
 	
 	// devices
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, mpz80_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, mpz80_floppy_interface)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	// internal ram

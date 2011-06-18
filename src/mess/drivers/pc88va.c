@@ -1554,7 +1554,7 @@ static INTERRUPT_GEN( pc88va_vrtc_irq )
 }
 
 /* TODO */
-static const floppy_config pc88va_floppy_config =
+static const floppy_interface pc88va_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1563,6 +1563,7 @@ static const floppy_config pc88va_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -1664,7 +1665,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_PIC8259_ADD( "pic8259_slave", pc88va_pic8259_slave_config )
 
 	MCFG_UPD765A_ADD("upd765", pc88va_upd765_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(pc88va_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(pc88va_floppy_interface)
 
     MCFG_PIT8253_ADD("pit8253",pc88va_pit8253_config)
 

@@ -743,7 +743,7 @@ static const cassette_interface coco_cassette_interface =
 	NULL
 };
 
-static const floppy_config coco_floppy_config =
+static const floppy_interface coco_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -752,6 +752,7 @@ static const floppy_config coco_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(coco),
+	NULL,
 	NULL
 };
 
@@ -798,7 +799,7 @@ static MACHINE_CONFIG_START( dragon32, coco_state )
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dragon64, coco_state )
@@ -846,7 +847,7 @@ static MACHINE_CONFIG_START( dragon64, coco_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( d64plus, coco_state )
@@ -895,7 +896,7 @@ static MACHINE_CONFIG_START( d64plus, coco_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dgnalpha, coco_state )
@@ -948,7 +949,7 @@ static MACHINE_CONFIG_START( dgnalpha, coco_state )
 	MCFG_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
 	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
 
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1001,7 +1002,7 @@ static MACHINE_CONFIG_START( tanodr64, coco_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco, coco_state )
@@ -1049,7 +1050,7 @@ static MACHINE_CONFIG_START( coco, coco_state )
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("4K,32K,64K")
 
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco2, coco_state )
@@ -1097,7 +1098,7 @@ static MACHINE_CONFIG_START( coco2, coco_state )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("16K")
 
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco2b, coco_state )
@@ -1145,7 +1146,7 @@ static MACHINE_CONFIG_START( coco2b, coco_state )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("16K")
 
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco3, coco3_state )
@@ -1205,7 +1206,7 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("128K,2M,8M")
 
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coco3p, coco3 )

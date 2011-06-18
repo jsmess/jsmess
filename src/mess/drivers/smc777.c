@@ -1019,7 +1019,7 @@ static FLOPPY_OPTIONS_START( smc777 )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config smc777_floppy_config =
+static const floppy_interface smc777_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1028,7 +1028,8 @@ static const floppy_config smc777_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(smc777),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 static INTERRUPT_GEN( smc777_vblank_irq )
@@ -1069,7 +1070,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
     MCFG_VIDEO_START(smc777)
 
 	MCFG_WD179X_ADD("fdc",smc777_mb8876_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(smc777_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(smc777_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","smc777")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

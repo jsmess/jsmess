@@ -158,7 +158,7 @@ static FLOPPY_OPTIONS_START(pk8020)
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config pk8020_floppy_config =
+static const floppy_interface pk8020_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -167,6 +167,7 @@ static const floppy_config pk8020_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(pk8020),
+	NULL,
 	NULL
 };
 
@@ -241,7 +242,7 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, pk8020_cassette_interface )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(pk8020_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(pk8020_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

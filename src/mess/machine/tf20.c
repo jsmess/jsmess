@@ -276,7 +276,7 @@ static const upd765_interface tf20_upd765a_intf =
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
-static const floppy_config tf20_floppy_config =
+static const floppy_interface tf20_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -285,6 +285,7 @@ static const floppy_config tf20_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD_40,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -305,7 +306,7 @@ static MACHINE_CONFIG_FRAGMENT( tf20 )
 	MCFG_TIMER_ADD_PERIODIC("serial_timer", serial_clock, attotime::from_hz(XTAL_CR2 / 128))
 
 	/* 2 floppy drives */
-	MCFG_FLOPPY_2_DRIVES_ADD(tf20_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(tf20_floppy_interface)
 MACHINE_CONFIG_END
 
 

@@ -2044,7 +2044,7 @@ static const cassette_interface fm7_cassette_interface =
 	NULL
 };
 
-static const floppy_config fm7_floppy_config =
+static const floppy_interface fm7_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -2053,7 +2053,8 @@ static const floppy_config fm7_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 static MACHINE_CONFIG_START( fm7, fm7_state )
@@ -2099,7 +2100,7 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 
 	MCFG_CENTRONICS_ADD("lpt",standard_centronics)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","fm7_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_list","fm7_disk")
@@ -2145,7 +2146,7 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 
 	MCFG_CENTRONICS_ADD("lpt",standard_centronics)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 
 MACHINE_CONFIG_END
 
@@ -2191,7 +2192,7 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 
 	MCFG_CENTRONICS_ADD("lpt",standard_centronics)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 
 	MCFG_SOFTWARE_LIST_ADD("av_flop_list","fm77av")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_list","fm7_cass")
@@ -2242,7 +2243,7 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 
 	MCFG_CENTRONICS_ADD("lpt",standard_centronics)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 
 MACHINE_CONFIG_END
 
@@ -2287,7 +2288,7 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 
 	MCFG_CENTRONICS_ADD("lpt",standard_centronics)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 
 MACHINE_CONFIG_END
 

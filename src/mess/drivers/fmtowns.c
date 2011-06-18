@@ -2398,7 +2398,7 @@ static FLOPPY_OPTIONS_START( towns )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config towns_floppy_config =
+static const floppy_interface towns_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -2407,6 +2407,7 @@ static const floppy_config towns_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(towns),
+	NULL,
 	NULL
 };
 
@@ -2520,7 +2521,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_PIC8259_ADD( "pic8259_slave", towns_pic8259_slave_config )
 
 	MCFG_MB8877_ADD("fdc",towns_mb8877a_interface)
-	MCFG_FLOPPY_4_DRIVES_ADD(towns_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(towns_floppy_interface)
 
 	MCFG_CDROM_ADD("cdrom",towns_cdrom)
 

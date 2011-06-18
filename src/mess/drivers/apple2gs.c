@@ -153,7 +153,7 @@ static const es5503_interface apple2gs_es5503_interface =
 	NULL
 };
 
-static const floppy_config apple2gs_floppy35_floppy_config =
+static const floppy_interface apple2gs_floppy35_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -162,10 +162,11 @@ static const floppy_config apple2gs_floppy35_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(apple35_iigs),
-	"floppy_3_5"
+	"floppy_3_5",
+	NULL
 };
 
-static const floppy_config apple2gs_floppy525_floppy_config =
+static const floppy_interface apple2gs_floppy525_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -174,7 +175,8 @@ static const floppy_config apple2gs_floppy525_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(apple2),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 
@@ -244,8 +246,8 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	/* SCC */
 	MCFG_SCC8530_ADD("scc", APPLE2GS_14M/2)
 
-	MCFG_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_config,15,16)
-	MCFG_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2gs_floppy35_floppy_config)
+	MCFG_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_interface,15,16)
+	MCFG_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2gs_floppy35_floppy_interface)
 
 	MCFG_NVRAM_HANDLER( apple2gs )
 

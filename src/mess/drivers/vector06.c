@@ -147,7 +147,7 @@ static FLOPPY_OPTIONS_START(vector)
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config vector_floppy_config =
+static const floppy_interface vector_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -156,6 +156,7 @@ static const floppy_config vector_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(vector),
+	NULL,
 	NULL
 };
 
@@ -204,7 +205,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, vector_cassette_interface )
 
 	MCFG_WD1793_ADD("wd1793", vector06_wd17xx_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(vector_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(vector_floppy_interface)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

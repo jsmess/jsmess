@@ -178,7 +178,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const floppy_config unixpc_floppy_config =
+static const floppy_interface unixpc_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -187,6 +187,7 @@ static const floppy_config unixpc_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -221,7 +222,7 @@ static MACHINE_CONFIG_START( unixpc, unixpc_state )
 
 	// floppy
 	MCFG_WD2797_ADD("wd2797", unixpc_wd17xx_intf)
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, unixpc_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, unixpc_floppy_interface)
 MACHINE_CONFIG_END
 
 

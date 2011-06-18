@@ -753,7 +753,7 @@ static FLOPPY_OPTIONS_START( xerox820 )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config xerox820_floppy_config =
+static const floppy_interface xerox820_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -762,6 +762,7 @@ static const floppy_config xerox820_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
 	FLOPPY_OPTIONS_NAME(xerox820),
+	NULL,
 	NULL
 };
 
@@ -829,7 +830,7 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_Z80PIO_ADD(Z80GPPIO_TAG, XTAL_20MHz/8, gppio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
 	MCFG_WD1771_ADD(WD1771_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(xerox820_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(xerox820_floppy_interface)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
 
 	/* internal ram */
@@ -863,7 +864,7 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_Z80PIO_ADD(Z80GPPIO_TAG, XTAL_16MHz/4, gppio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
 	MCFG_WD179X_ADD(WD1771_TAG, fdc_intf) // WD1797
-	MCFG_FLOPPY_2_DRIVES_ADD(xerox820_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(xerox820_floppy_interface)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
 
 	/* internal ram */

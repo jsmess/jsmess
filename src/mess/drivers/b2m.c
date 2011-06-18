@@ -185,7 +185,7 @@ static FLOPPY_OPTIONS_START(b2m)
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config b2m_floppy_config =
+static const floppy_interface b2m_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -194,6 +194,7 @@ static const floppy_config b2m_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(b2m),
+	NULL,
 	NULL
 };
 
@@ -242,7 +243,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 
 	MCFG_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
-	MCFG_FLOPPY_2_DRIVES_ADD(b2m_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(b2m_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

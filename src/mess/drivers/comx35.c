@@ -320,7 +320,7 @@ static const cassette_interface comx35_cassette_interface =
 	NULL
 };
 
-static const floppy_config comx35_floppy_config =
+static const floppy_interface comx35_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -329,6 +329,7 @@ static const floppy_config comx35_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(comx35),
+	NULL,
 	NULL
 };
 
@@ -349,7 +350,7 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_interface)
 	MCFG_PRINTER_ADD("printer")
 
-	MCFG_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(comx35_floppy_interface)
 	MCFG_COMXPL80_ADD()
 
 	/* internal ram */
@@ -374,7 +375,7 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_interface)
 	MCFG_PRINTER_ADD("printer")
 
-	MCFG_FLOPPY_2_DRIVES_ADD(comx35_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(comx35_floppy_interface)
 	MCFG_COMXPL80_ADD()
 
 	/* internal ram */

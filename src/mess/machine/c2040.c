@@ -985,10 +985,10 @@ FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
-//  floppy_config c2040_floppy_config
+//  floppy_interface c2040_floppy_interface
 //-------------------------------------------------
 
-static const floppy_config c2040_floppy_config =
+static const floppy_interface c2040_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -997,15 +997,16 @@ static const floppy_config c2040_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(c2040),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 
 //-------------------------------------------------
-//  floppy_config c4040_floppy_config
+//  floppy_interface c4040_floppy_interface
 //-------------------------------------------------
 
-static const floppy_config c4040_floppy_config =
+static const floppy_interface c4040_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1014,15 +1015,16 @@ static const floppy_config c4040_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(c4040),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 
 //-------------------------------------------------
-//  floppy_config c8050_floppy_config
+//  floppy_interface c8050_floppy_interface
 //-------------------------------------------------
 
-static const floppy_config c8050_floppy_config =
+static const floppy_interface c8050_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1031,15 +1033,16 @@ static const floppy_config c8050_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(c8050),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 
 //-------------------------------------------------
-//  floppy_config c8250_floppy_config
+//  floppy_interface c8250_floppy_interface
 //-------------------------------------------------
 
-static const floppy_config c8250_floppy_config =
+static const floppy_interface c8250_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1048,7 +1051,8 @@ static const floppy_config c8250_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSQD,
 	FLOPPY_OPTIONS_NAME(c8250),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 
@@ -1071,7 +1075,7 @@ static MACHINE_CONFIG_FRAGMENT( c2040 )
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
 	MCFG_MOS6530_ADD(M6530_TAG, XTAL_16MHz/16, miot_intf)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(c2040_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(c2040_floppy_interface)
 MACHINE_CONFIG_END
 
 
@@ -1094,7 +1098,7 @@ static MACHINE_CONFIG_FRAGMENT( c4040 )
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
 	MCFG_MOS6530_ADD(M6530_TAG, XTAL_16MHz/16, miot_intf)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(c4040_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(c4040_floppy_interface)
 MACHINE_CONFIG_END
 
 
@@ -1117,7 +1121,7 @@ static MACHINE_CONFIG_FRAGMENT( c8050 )
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_12MHz/12, c8050_via_intf)
 	MCFG_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(c8050_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(c8050_floppy_interface)
 MACHINE_CONFIG_END
 
 
@@ -1140,7 +1144,7 @@ static MACHINE_CONFIG_FRAGMENT( c8250 )
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_12MHz/12, c8050_via_intf)
 	MCFG_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(c8250_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(c8250_floppy_interface)
 MACHINE_CONFIG_END
 
 
@@ -1163,7 +1167,7 @@ static MACHINE_CONFIG_FRAGMENT( sfd1001 )
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_12MHz/12, c8050_via_intf)
 	MCFG_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c8250_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c8250_floppy_interface)
 MACHINE_CONFIG_END
 
 

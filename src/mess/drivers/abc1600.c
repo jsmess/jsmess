@@ -1324,7 +1324,7 @@ static Z8536_INTERFACE( cio_intf )
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
-static const floppy_config abc1600_floppy_config =
+static const floppy_interface abc1600_floppy_interface =
 {
     DEVCB_NULL,
     DEVCB_NULL,
@@ -1333,7 +1333,8 @@ static const floppy_config abc1600_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_5_25_DSQD,
     FLOPPY_OPTIONS_NAME(default),
-    "floppy_5_25"
+    "floppy_5_25",
+	NULL
 };
 
 WRITE_LINE_MEMBER( abc1600_state::drq_w )
@@ -1444,7 +1445,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_NMC9306_ADD(NMC9306_TAG)
 	MCFG_E0516_ADD(E050_C16PC_TAG, XTAL_32_768kHz)
 	MCFG_WD1797_ADD(SAB1797_02P_TAG, fdc_intf)
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, abc1600_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, abc1600_floppy_interface)
 	MCFG_HARDDISK_ADD("harddisk0")
 	MCFG_ABC99_ADD(abc99_intf)
 	MCFG_S1410_ADD()

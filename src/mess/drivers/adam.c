@@ -1548,7 +1548,7 @@ static FLOPPY_OPTIONS_START( adam )
 		FIRST_SECTOR_ID([0]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config adam_floppy_config =
+static const floppy_interface adam_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1557,6 +1557,7 @@ static const floppy_config adam_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(adam),
+	NULL,
 	NULL
 };
 
@@ -1724,7 +1725,7 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	// devices
 	MCFG_TIMER_ADD_PERIODIC("paddles", paddle_tick, attotime::from_msec(20))
 	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, adam_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, adam_floppy_interface)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, adam_cassette_interface)
 	MCFG_CASSETTE_ADD(CASSETTE2_TAG, adam_cassette_interface)
 

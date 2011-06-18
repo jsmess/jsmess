@@ -287,7 +287,7 @@ static PALETTE_INIT( dgnbeta )
 	}
 }
 
-static const floppy_config dgnbeta_floppy_config =
+static const floppy_interface dgnbeta_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -296,6 +296,7 @@ static const floppy_config dgnbeta_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(coco),
+	NULL,
 	NULL
 };
 
@@ -349,7 +350,7 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 
 	MCFG_WD179X_ADD(FDC_TAG, dgnbeta_wd17xx_interface )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_interface)
 
 	MCFG_MC6845_ADD("crtc", HD6845, XTAL_12_288MHz / 16, dgnbeta_crtc6845_interface)	//XTAL is guessed
 

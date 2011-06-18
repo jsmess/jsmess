@@ -378,7 +378,7 @@ static DRIVER_INIT( plus2 )
 	state->m_floppy = 0;
 }
 
-static const floppy_config specpls3_floppy_config =
+static const floppy_interface specpls3_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -387,6 +387,7 @@ static const floppy_config specpls3_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_SSDD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -418,7 +419,7 @@ static MACHINE_CONFIG_DERIVED( spectrum_plus3, spectrum_128 )
 	MCFG_MACHINE_RESET( spectrum_plus3 )
 
 	MCFG_UPD765A_ADD("upd765", spectrum_plus3_upd765_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(specpls3_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(specpls3_floppy_interface)
 MACHINE_CONFIG_END
 
 /***************************************************************************

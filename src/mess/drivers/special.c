@@ -398,7 +398,7 @@ static const cassette_interface special_cassette_interface =
 	NULL
 };
 
-static const floppy_config specimx_floppy_config =
+static const floppy_interface specimx_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -407,6 +407,7 @@ static const floppy_config specimx_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(specimx),
+	NULL,
 	NULL
 };
 
@@ -482,7 +483,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 
 	MCFG_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
-	MCFG_FLOPPY_2_DRIVES_ADD(specimx_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(specimx_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -524,7 +525,7 @@ static MACHINE_CONFIG_START( erik, special_state )
 
 	MCFG_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
-	MCFG_FLOPPY_2_DRIVES_ADD(specimx_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(specimx_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

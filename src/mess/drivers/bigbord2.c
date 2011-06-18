@@ -533,7 +533,7 @@ static FLOPPY_OPTIONS_START( bigbord2 )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config bigbord2_floppy_config =
+static const floppy_interface bigbord2_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -542,6 +542,7 @@ static const floppy_config bigbord2_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
 	FLOPPY_OPTIONS_NAME(bigbord2),
+	NULL,
 	NULL
 };
 
@@ -642,7 +643,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_Z80CTC_ADD("ctc_84", MAIN_CLOCK, ctc_intf)
 	MCFG_Z80CTC_ADD("ctc_88", MAIN_CLOCK, ctc_intf)
 	MCFG_WD1771_ADD(WD1771_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(bigbord2_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(bigbord2_floppy_interface)
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_16MHz / 8, bigbord2_crtc)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, bigbord2_terminal_intf)
 MACHINE_CONFIG_END

@@ -1908,7 +1908,7 @@ static UPD1990A_INTERFACE( pc8801_upd1990a_intf )
 
 /* Floppy Configuration */
 
-static const floppy_config pc88_floppy_config =
+static const floppy_interface pc88_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1917,7 +1917,8 @@ static const floppy_config pc88_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 /* Cassette Configuration */
@@ -2246,7 +2247,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	//MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 	//MCFG_CASSETTE_ADD(CASSETTE_TAG, pc88_cassette_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(pc88_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(pc88_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc8801_flop")
 
 	/* video hardware */

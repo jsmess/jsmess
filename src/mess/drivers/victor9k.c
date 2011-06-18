@@ -866,7 +866,7 @@ static const via6522_interface via6_intf =
 
 /* Floppy Configuration */
 
-static const floppy_config victor9k_floppy_config =
+static const floppy_interface victor9k_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -875,6 +875,7 @@ static const floppy_config victor9k_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSQD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -963,7 +964,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_VIA6522_ADD(M6522_4_TAG, XTAL_30MHz/30, via4_intf)
 	MCFG_VIA6522_ADD(M6522_5_TAG, XTAL_30MHz/30, via5_intf)
 	MCFG_VIA6522_ADD(M6522_6_TAG, XTAL_30MHz/30, via6_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(victor9k_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(victor9k_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

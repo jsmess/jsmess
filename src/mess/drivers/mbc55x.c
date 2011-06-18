@@ -34,7 +34,7 @@ const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3] =
 	{ 0x80,0x80,0x80 },		 /* light grey */
 };
 
-static const floppy_config mbc55x_floppy_config =
+static const floppy_interface mbc55x_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -43,6 +43,7 @@ static const floppy_config mbc55x_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSSD_35,
 	FLOPPY_OPTIONS_NAME(pc),
+	NULL,
 	NULL
 };
 
@@ -268,7 +269,7 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 
     /* Backing storage */
 	MCFG_WD1793_ADD(FDC_TAG, mbc55x_wd17xx_interface )
-	MCFG_FLOPPY_4_DRIVES_ADD(mbc55x_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(mbc55x_floppy_interface)
 
     MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")

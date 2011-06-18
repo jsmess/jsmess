@@ -321,7 +321,7 @@ static const mm58274c_interface compis_mm58274c_interface =
 	1   /*  first day of week */
 };
 
-static const floppy_config compis_floppy_config =
+static const floppy_interface compis_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -330,6 +330,7 @@ static const floppy_config compis_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(compis),
+	NULL,
 	NULL
 };
 
@@ -406,7 +407,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 
 	MCFG_UPD765A_ADD("upd765", compis_fdc_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(compis_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(compis_floppy_interface)
 MACHINE_CONFIG_END
 
 /***************************************************************************

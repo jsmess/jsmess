@@ -46,7 +46,7 @@ const unsigned char nimbus_palette[SCREEN_NO_COLOURS][3] =
 	{ 0xFF,0xFF,0xFF }		 /* white */
 };
 
-static const floppy_config nimbus_floppy_config =
+static const floppy_interface nimbus_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -55,6 +55,7 @@ static const floppy_config nimbus_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSSD_35,
 	FLOPPY_OPTIONS_NAME(pc),
+	NULL,
 	NULL
 };
 
@@ -333,7 +334,7 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 
     /* Backing storage */
 	MCFG_WD2793_ADD(FDC_TAG, nimbus_wd17xx_interface )
-	MCFG_FLOPPY_4_DRIVES_ADD(nimbus_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(nimbus_floppy_interface)
 
     MCFG_HARDDISK_ADD(HARDDISK0_TAG)
     MCFG_HARDDISK_ADD(HARDDISK1_TAG)

@@ -1019,7 +1019,7 @@ static const cassette_interface msx_cassette_interface =
 	NULL
 };
 
-static const floppy_config msx_floppy_config =
+static const floppy_interface msx_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1028,6 +1028,7 @@ static const floppy_config msx_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(msx),
+	NULL,
 	NULL
 };
 
@@ -1087,7 +1088,7 @@ static MACHINE_CONFIG_START( msx, msx_state )
 
 	MCFG_WD179X_ADD("wd179x", msx_wd17xx_interface )
 
-	MCFG_FLOPPY_2_DRIVES_ADD(msx_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(msx_floppy_interface)
 
 	MCFG_FRAGMENT_ADD(msx_cartslot)
 MACHINE_CONFIG_END
@@ -1163,7 +1164,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 
 	MCFG_WD179X_ADD("wd179x", msx_wd17xx_interface )
 
-	MCFG_FLOPPY_2_DRIVES_ADD(msx_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(msx_floppy_interface)
 
 	MCFG_FRAGMENT_ADD(msx_cartslot)
 MACHINE_CONFIG_END

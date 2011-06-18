@@ -134,10 +134,10 @@ FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
-//  floppy_config c8280_floppy_config
+//  floppy_interface c8280_floppy_interface
 //-------------------------------------------------
 
-static const floppy_config c8280_floppy_config =
+static const floppy_interface c8280_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -146,7 +146,8 @@ static const floppy_config c8280_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_8_DSDD,
 	FLOPPY_OPTIONS_NAME(c8280),
-	"floppy_8"
+	"floppy_8",
+	NULL
 };
 
 
@@ -164,7 +165,7 @@ static MACHINE_CONFIG_FRAGMENT( c8280 )
 	MCFG_CPU_ADD(M6502_FDC_TAG, M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(c8280_fdc_mem)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(c8280_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(c8280_floppy_interface)
 MACHINE_CONFIG_END
 
 

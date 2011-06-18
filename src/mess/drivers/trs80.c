@@ -541,7 +541,7 @@ static const ay31015_config trs80_ay31015_config =
 	NULL
 };
 
-static const floppy_config trs80_floppy_config =
+static const floppy_interface trs80_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -550,6 +550,7 @@ static const floppy_config trs80_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(trs80),
+	NULL,
 	NULL
 };
 
@@ -598,7 +599,7 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )		// model I, level II
 	MCFG_CASSETTE_MODIFY( CASSETTE_TAG, trs80l2_cassette_interface )
 	MCFG_QUICKLOAD_ADD("quickload", trs80_cmd, "cmd", 0.5)
 	MCFG_WD179X_ADD("wd179x", trs80_wd17xx_interface )
-	MCFG_FLOPPY_4_DRIVES_ADD(trs80_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(trs80_floppy_interface)
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 	MCFG_AY31015_ADD( "tr1602", trs80_ay31015_config )
 MACHINE_CONFIG_END

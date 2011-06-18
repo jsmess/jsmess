@@ -601,7 +601,7 @@ static FLOPPY_OPTIONS_START(mbee)
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config mbee_floppy_config =
+static const floppy_interface mbee_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -610,6 +610,7 @@ static const floppy_config mbee_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(mbee),
+	NULL,
 	NULL
 };
 
@@ -781,7 +782,7 @@ static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
 	MCFG_CPU_IO_MAP(mbee56_io)
 	MCFG_MACHINE_RESET( mbee56 )
 	MCFG_WD2793_ADD("fdc", mbee_wd17xx_interface )
-	MCFG_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(mbee_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee64, mbee56 )
@@ -797,7 +798,7 @@ static MACHINE_CONFIG_DERIVED( mbee128, mbeeppc )
 	MCFG_CPU_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET( mbee128 )
 	MCFG_WD2793_ADD("fdc", mbee_wd17xx_interface )
-	MCFG_FLOPPY_2_DRIVES_ADD(mbee_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(mbee_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee256, mbee128 )

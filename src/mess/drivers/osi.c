@@ -705,7 +705,7 @@ static FLOPPY_OPTIONS_START(osi)
 		FIRST_SECTOR_ID([0]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config osi_floppy_config =
+static const floppy_interface osi_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -714,6 +714,7 @@ static const floppy_config osi_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	FLOPPY_OPTIONS_NAME(osi),
+	NULL,
 	NULL
 };
 
@@ -827,7 +828,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( c1pmf, c1p, c1pmf_state )
 	/* floppy ACIA */
 	MCFG_ACIA6850_ADD("acia_1", osi470_acia_intf)
 
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, osi_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, osi_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

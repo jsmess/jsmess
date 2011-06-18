@@ -505,7 +505,7 @@ static FLOPPY_OPTIONS_START(cgenie )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config cgenie_floppy_config =
+static const floppy_interface cgenie_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -514,6 +514,7 @@ static const floppy_config cgenie_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(cgenie),
+	NULL,
 	NULL
 };
 
@@ -556,7 +557,7 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 
 	MCFG_WD179X_ADD("wd179x", cgenie_wd17xx_interface )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(cgenie_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(cgenie_floppy_interface)
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")

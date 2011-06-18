@@ -2064,7 +2064,7 @@ static MC68901_INTERFACE( stbook_mfp_intf )
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
-static const floppy_config atarist_floppy_config =
+static const floppy_interface atarist_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -2073,10 +2073,11 @@ static const floppy_config atarist_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSDD,
 	FLOPPY_OPTIONS_NAME(atarist),
+	NULL,
 	NULL
 };
 
-static const floppy_config megaste_floppy_config =
+static const floppy_interface megaste_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -2085,6 +2086,7 @@ static const floppy_config megaste_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSHD,
 	FLOPPY_OPTIONS_NAME(atarist),
+	NULL,
 	NULL
 };
 
@@ -2378,7 +2380,7 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
 	MCFG_WD1772_ADD(WD1772_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(atarist_floppy_interface)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 
@@ -2428,7 +2430,7 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
 	MCFG_WD1772_ADD(WD1772_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(atarist_floppy_interface)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
@@ -2487,7 +2489,7 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, atariste_mfp_intf)
 	MCFG_WD1772_ADD(WD1772_TAG, fdc_intf )
-	MCFG_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(atarist_floppy_interface)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 
@@ -2515,7 +2517,7 @@ static MACHINE_CONFIG_DERIVED( megaste, ste )
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_SCC8530_ADD(Z8530_TAG, Y2/4)
 
-	MCFG_FLOPPY_2_DRIVES_MODIFY(megaste_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_MODIFY(megaste_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -2558,7 +2560,7 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, U517/8, stbook_mfp_intf)
 	MCFG_WD1772_ADD(WD1772_TAG, stbook_fdc_intf )
-	MCFG_FLOPPY_2_DRIVES_ADD(megaste_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(megaste_floppy_interface)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 

@@ -505,7 +505,7 @@ static FLOPPY_OPTIONS_START(pyldin)
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config pyldin_floppy_config =
+static const floppy_interface pyldin_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -514,6 +514,7 @@ static const floppy_config pyldin_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(pyldin),
+	NULL,
 	NULL
 };
 
@@ -579,7 +580,7 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 
 	MCFG_UPD765A_ADD("upd765", pyldin_upd765_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(pyldin_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(pyldin_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

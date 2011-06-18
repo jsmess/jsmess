@@ -525,7 +525,7 @@ static const pc_lpt_interface at_lpt_config =
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
-static const floppy_config ibmat_floppy_config =
+static const floppy_interface ibmat_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -534,7 +534,8 @@ static const floppy_config ibmat_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(pc),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 static const at_keyboard_controller_interface keyboard_controller_intf =
@@ -618,7 +619,7 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_interface)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5170")
@@ -689,7 +690,7 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -745,7 +746,7 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -806,7 +807,7 @@ static MACHINE_CONFIG_START( neat, at_state )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -864,7 +865,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -924,7 +925,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(ibmat_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

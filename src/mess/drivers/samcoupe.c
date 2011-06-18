@@ -535,7 +535,7 @@ static FLOPPY_OPTIONS_START( samcoupe )
 	)
 FLOPPY_OPTIONS_END
 
-static const floppy_config samcoupe_floppy_config =
+static const floppy_interface samcoupe_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -544,6 +544,7 @@ static const floppy_config samcoupe_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(samcoupe),
+	NULL,
 	NULL
 };
 
@@ -590,7 +591,7 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_SOUND_ADD("saa1099", SAA1099, SAMCOUPE_XTAL_X1/3) /* 8 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(samcoupe_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(samcoupe_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

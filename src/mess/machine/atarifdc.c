@@ -776,7 +776,7 @@ WRITE_LINE_DEVICE_HANDLER(atarifdc_pia_cb2_w)
 	}
 }
 
-static const floppy_config atari_floppy_config =
+static const floppy_interface atari_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -785,11 +785,12 @@ static const floppy_config atari_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(atari_only),
+	NULL,
 	NULL
 };
 
 static MACHINE_CONFIG_FRAGMENT( atari_fdc )
-	MCFG_FLOPPY_4_DRIVES_ADD(atari_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(atari_floppy_interface)
 MACHINE_CONFIG_END
 
 device_t *atari_floppy_get_device_child(device_t *device,int drive)

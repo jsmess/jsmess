@@ -450,7 +450,7 @@ static FLOPPY_OPTIONS_START(aquarius)
 	/* 128K images, 64K/side */
 FLOPPY_OPTIONS_END
 
-static const floppy_config aquarius_floppy_config =
+static const floppy_interface aquarius_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -459,6 +459,7 @@ static const floppy_config aquarius_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(aquarius),
+	NULL,
 	NULL
 };
 
@@ -470,7 +471,7 @@ static MACHINE_CONFIG_DERIVED( aquarius_qd, aquarius )
 	MCFG_DEVICE_REMOVE("cart")
 	MCFG_DEVICE_REMOVE("cart_list")
 
-	MCFG_FLOPPY_2_DRIVES_ADD(aquarius_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(aquarius_floppy_interface)
 MACHINE_CONFIG_END
 
 

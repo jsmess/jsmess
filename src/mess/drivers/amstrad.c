@@ -837,7 +837,7 @@ static const cassette_interface amstrad_cassette_interface =
 	NULL
 };
 
-static const floppy_config cpc6128_floppy_config =
+static const floppy_interface cpc6128_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -846,10 +846,11 @@ static const floppy_config cpc6128_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_SSDD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
-static const floppy_config aleste_floppy_config =
+static const floppy_interface aleste_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -858,6 +859,7 @@ static const floppy_config aleste_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(msx),
+	NULL,
 	NULL
 };
 
@@ -917,7 +919,7 @@ static MACHINE_CONFIG_START( amstrad, amstrad_state )
 
 	MCFG_UPD765A_ADD("upd765", amstrad_upd765_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -982,7 +984,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 
 	MCFG_FRAGMENT_ADD(cpcplus_cartslot)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1045,7 +1047,7 @@ static MACHINE_CONFIG_DERIVED( aleste, amstrad )
 	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 	MCFG_UPD765A_MODIFY("upd765", aleste_8272_interface)
 
-	MCFG_FLOPPY_2_DRIVES_MODIFY(aleste_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_MODIFY(aleste_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

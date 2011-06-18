@@ -412,7 +412,7 @@ static const cassette_interface laser_cassette_interface =
 	NULL
 };
 
-static const floppy_config vtech2_floppy_config =
+static const floppy_interface vtech2_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -421,6 +421,7 @@ static const floppy_config vtech2_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -466,7 +467,7 @@ static MACHINE_CONFIG_START( laser350, vtech2_state )
 	MCFG_CARTSLOT_UNLOAD(laser_cart)
 
 	/* 5.25" Floppy drive */
-	MCFG_FLOPPY_DRIVE_ADD( FLOPPY_0, vtech2_floppy_config )
+	MCFG_FLOPPY_DRIVE_ADD( FLOPPY_0, vtech2_floppy_interface )
 MACHINE_CONFIG_END
 
 
@@ -479,7 +480,7 @@ static MACHINE_CONFIG_DERIVED( laser700, laser350 )
 	MCFG_MACHINE_RESET( laser700 )
 
 	/* Second 5.25" floppy drive */
-	MCFG_FLOPPY_DRIVE_ADD( FLOPPY_1, vtech2_floppy_config )
+	MCFG_FLOPPY_DRIVE_ADD( FLOPPY_1, vtech2_floppy_interface )
 MACHINE_CONFIG_END
 
 

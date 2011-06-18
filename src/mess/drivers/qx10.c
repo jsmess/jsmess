@@ -246,7 +246,7 @@ static WRITE8_HANDLER(cmos_sel_w)
     FDD
 */
 
-static const floppy_config qx10_floppy_config =
+static const floppy_interface qx10_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -255,6 +255,7 @@ static const floppy_config qx10_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -1000,7 +1001,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
 	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
 	MCFG_UPD765A_ADD("upd765", qx10_upd765_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(qx10_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(qx10_floppy_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

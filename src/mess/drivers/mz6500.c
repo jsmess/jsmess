@@ -150,7 +150,7 @@ static const struct upd765_interface upd765_intf =
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
-static const floppy_config mz6500_floppy_config =
+static const floppy_interface mz6500_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -159,6 +159,7 @@ static const floppy_config mz6500_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -187,7 +188,7 @@ static MACHINE_CONFIG_START( mz6500, mz6500_state )
 	MCFG_MACHINE_RESET(mz6500)
 
 	MCFG_UPD765A_ADD("upd765", upd765_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(mz6500_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(mz6500_floppy_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

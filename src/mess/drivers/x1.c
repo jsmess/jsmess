@@ -2647,7 +2647,7 @@ static FLOPPY_OPTIONS_START( x1 )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config x1_floppy_config =
+static const floppy_interface x1_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -2656,7 +2656,8 @@ static const floppy_config x1_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD_40,
 	FLOPPY_OPTIONS_NAME(x1),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 static MACHINE_CONFIG_START( x1, x1_state )
@@ -2715,7 +2716,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG,x1_cassette_interface)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
 
-	MCFG_FLOPPY_4_DRIVES_ADD(x1_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(x1_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x1_flop")
 
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(250))

@@ -188,7 +188,7 @@ static const struct upd765_interface fdc_intf =
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
-static const floppy_config prof180x_floppy_config =
+static const floppy_interface prof180x_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -197,6 +197,7 @@ static const floppy_config prof180x_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -242,7 +243,7 @@ static MACHINE_CONFIG_START( prof180x, prof180x_state )
     MCFG_PALETTE_INIT(black_and_white)
 
 	/* devices */
-	MCFG_FLOPPY_4_DRIVES_ADD(prof180x_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(prof180x_floppy_interface)
 	MCFG_UPD765A_ADD(FDC9268_TAG, fdc_intf)
 	//MCFG_RTC8583_ADD(MK3835_TAG, rtc_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)

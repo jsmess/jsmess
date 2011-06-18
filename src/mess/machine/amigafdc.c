@@ -860,7 +860,7 @@ UINT8  amiga_fdc_status_r (device_t *device)
 	return ret;
 }
 
-static const floppy_config amiga_floppy_config =
+static const floppy_interface amiga_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -869,11 +869,12 @@ static const floppy_config amiga_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSHD,
 	FLOPPY_OPTIONS_NAME(amiga_only),
+	NULL,
 	NULL
 };
 
 static MACHINE_CONFIG_FRAGMENT( amiga_fdc )
-	MCFG_FLOPPY_2_DRIVES_ADD(amiga_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(amiga_floppy_interface)
 MACHINE_CONFIG_END
 
 

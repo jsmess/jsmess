@@ -690,7 +690,7 @@ static FLOPPY_OPTIONS_START( bw12 )
 		FIRST_SECTOR_ID([0]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config bw12_floppy_config =
+static const floppy_interface bw12_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -699,6 +699,7 @@ static const floppy_config bw12_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(bw12),
+	NULL,
 	NULL
 };
 
@@ -736,7 +737,7 @@ static FLOPPY_OPTIONS_START( bw14 )
 FLOPPY_OPTIONS_END
 
 
-static const floppy_config bw14_floppy_config =
+static const floppy_interface bw14_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -745,6 +746,7 @@ static const floppy_config bw14_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(bw14),
+	NULL,
 	NULL
 };
 
@@ -808,7 +810,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw12, common )
 	/* floppy drives */
-	MCFG_FLOPPY_2_DRIVES_ADD(bw12_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(bw12_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -817,7 +819,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw14, common )
 	/* floppy drives */
-	MCFG_FLOPPY_2_DRIVES_ADD(bw14_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(bw14_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

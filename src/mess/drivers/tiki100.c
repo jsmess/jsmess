@@ -601,7 +601,7 @@ static FLOPPY_OPTIONS_START(tiki100)
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config tiki100_floppy_config =
+static const floppy_interface tiki100_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -610,6 +610,7 @@ static const floppy_config tiki100_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(tiki100),
+	NULL,
 	NULL
 };
 
@@ -638,7 +639,7 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2000000, ctc_intf)
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(2000000))
 	MCFG_WD179X_ADD(FD1797_TAG, fdc_intf) // FD1767PL-02 or FD1797-PL
-	MCFG_FLOPPY_2_DRIVES_ADD(tiki100_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(tiki100_floppy_interface)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

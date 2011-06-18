@@ -599,7 +599,7 @@ static FLOPPY_OPTIONS_START(bw2)
 		FIRST_SECTOR_ID([0]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config bw2_floppy_config =
+static const floppy_interface bw2_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -608,7 +608,8 @@ static const floppy_config bw2_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(bw2),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 static const wd17xx_interface fdc_intf =
@@ -695,7 +696,7 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_MSM8251_ADD(MSM8251_TAG, default_msm8251_interface)
 	MCFG_WD2797_ADD(WD2797_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(bw2_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(bw2_floppy_interface)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")

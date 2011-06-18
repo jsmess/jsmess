@@ -118,7 +118,7 @@ static void lisa_floppy_getinfo(const mess_device_class *devclass, UINT32 state,
 }
 #endif
 
-static const floppy_config lisa_floppy_config =
+static const floppy_interface lisa_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -127,7 +127,8 @@ static const floppy_config lisa_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(apple35_mac),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 static COP400_INTERFACE( cop_intf )
@@ -187,7 +188,7 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 
 	/* devices */
 	MCFG_IWM_ADD("fdc", lisa2_fdc_interface)
-	MCFG_FLOPPY_SONY_2_DRIVES_ADD(lisa_floppy_config)
+	MCFG_FLOPPY_SONY_2_DRIVES_ADD(lisa_floppy_interface)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","lisa")

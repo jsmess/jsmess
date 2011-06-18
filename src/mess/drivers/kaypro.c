@@ -191,7 +191,7 @@ static FLOPPY_OPTIONS_START(kaypro2x)
 		FIRST_SECTOR_ID([0]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config kayproii_floppy_config =
+static const floppy_interface kayproii_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -200,9 +200,10 @@ static const floppy_config kayproii_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(kayproii),
+	NULL,
 	NULL
 };
-static const floppy_config kaypro2x_floppy_config =
+static const floppy_interface kaypro2x_floppy_interface =
 {
 	DEVCB_LINE(wd17xx_idx_w),
 	DEVCB_NULL,
@@ -211,6 +212,7 @@ static const floppy_config kaypro2x_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(kaypro2x),
+	NULL,
 	NULL
 };
 
@@ -251,7 +253,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_Z80PIO_ADD( "z80pio_s", 2500000, kayproii_pio_s_intf )
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )	/* start at 300 baud */
 
-	MCFG_FLOPPY_2_DRIVES_ADD(kayproii_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(kayproii_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( kaypro4, kayproii )
@@ -296,7 +298,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )
 	MCFG_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )	/* extra sio for modem and printer */
 
-	MCFG_FLOPPY_2_DRIVES_ADD(kaypro2x_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(kaypro2x_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( omni2, kaypro4 )

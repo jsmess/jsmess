@@ -95,7 +95,7 @@ static const struct upd765_interface microdec_upd765_interface =
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
-static const floppy_config microdec_floppy_config =
+static const floppy_interface microdec_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -104,6 +104,7 @@ static const floppy_config microdec_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -120,7 +121,7 @@ static MACHINE_CONFIG_START( microdec, microdec_state )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,microdec_terminal_intf)
 
 	MCFG_UPD765A_ADD("upd765", microdec_upd765_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(microdec_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(microdec_floppy_interface)
 MACHINE_CONFIG_END
 
 /* ROM definition */

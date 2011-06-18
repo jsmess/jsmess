@@ -211,7 +211,7 @@ static FLOPPY_OPTIONS_START(mirage)
 		FIRST_SECTOR_ID([0]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config mirage_floppy_config =
+static const floppy_interface mirage_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -220,6 +220,7 @@ static const floppy_config mirage_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSDD,
 	FLOPPY_OPTIONS_NAME(mirage),
+	NULL,
 	NULL
 };
 
@@ -254,7 +255,7 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_ACIA6850_ADD("acia6850", mirage_acia6850_interface)
 
 	MCFG_WD177X_ADD("wd177x", mirage_wd17xx_interface )
-	MCFG_FLOPPY_2_DRIVES_ADD(mirage_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(mirage_floppy_interface)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( mirage )

@@ -223,7 +223,7 @@ static const tms9900reset_param reset_params =
 };
 #endif
 
-static const floppy_config ti990_4_floppy_config =
+static const floppy_interface ti990_4_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -232,6 +232,7 @@ static const floppy_config ti990_4_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(fd800),
+	NULL,
 	NULL
 };
 
@@ -282,7 +283,7 @@ static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 #endif
-	MCFG_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
 
 MACHINE_CONFIG_END
 

@@ -342,7 +342,7 @@ static const struct upd765_interface p8k_i8272_intf =
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
-static const floppy_config p8k_floppy_config =
+static const floppy_interface p8k_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -351,6 +351,7 @@ static const floppy_config p8k_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -519,7 +520,7 @@ static MACHINE_CONFIG_START( p8k, p8k_state )
 	MCFG_Z80PIO_ADD("z80pio_1", 1229000, p8k_pio_1_intf)
 	MCFG_Z80PIO_ADD("z80pio_2", 1229000, p8k_pio_2_intf)
 	MCFG_UPD765A_ADD("i8272", p8k_i8272_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(p8k_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(p8k_floppy_interface)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

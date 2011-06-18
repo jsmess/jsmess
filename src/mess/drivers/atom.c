@@ -586,10 +586,10 @@ static FLOPPY_OPTIONS_START( atom )
 FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
-    floppy_config atom_floppy_config
+    floppy_interface atom_floppy_interface
 -------------------------------------------------*/
 
-static const floppy_config atom_floppy_config =
+static const floppy_interface atom_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -598,7 +598,8 @@ static const floppy_config atom_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	FLOPPY_OPTIONS_NAME(atom),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 /*-------------------------------------------------
@@ -815,7 +816,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_VIA6522_ADD(R6522_TAG, X2/4, via_intf)
 	MCFG_I8255_ADD(INS8255_TAG, ppi_intf)
 	MCFG_I8271_ADD(I8271_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(atom_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(atom_floppy_interface)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, atom_centronics_config)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, atom_cassette_interface)
 	MCFG_QUICKLOAD_ADD("quickload", atom_atm, "atm", 0)

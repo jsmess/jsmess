@@ -389,7 +389,7 @@ static const cassette_interface sorcerer_cassette_interface =
 };
 
 #if SORCERER_USING_DISKS
-static const floppy_config sorcerer_floppy_config =
+static const floppy_interface sorcerer_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -398,6 +398,7 @@ static const floppy_config sorcerer_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(sorcerer),
+	NULL,
 	NULL
 };
 #endif
@@ -460,7 +461,7 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 
 #if SORCERER_USING_DISKS
 	MCFG_xx_ADD("micropolis", default_micropolis_interface ) // custom micropolis controller
-	MCFG_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
 #endif
 MACHINE_CONFIG_END
 

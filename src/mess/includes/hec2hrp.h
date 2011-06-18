@@ -161,4 +161,4 @@ WRITE8_HANDLER( hector_disc2_io70_port_w);
 void hector_disc2_init( running_machine &machine);
 
 extern const upd765_interface hector_disc2_upd765_interface;
-extern const floppy_config    hector_disc2_floppy_config;
+extern const floppy_interface    hector_disc2_floppy_interface;

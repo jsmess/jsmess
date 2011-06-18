@@ -29,7 +29,7 @@
 //**************************************************************************
 
 //-------------------------------------------------
-//  floppy_config abc830_floppy_config
+//  floppy_interface abc830_floppy_interface
 //-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( abc830 )
@@ -47,7 +47,7 @@ static FLOPPY_OPTIONS_START( abc830 )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-const floppy_config abc830_floppy_config =
+const floppy_interface abc830_floppy_interface =
 {
     DEVCB_NULL,
     DEVCB_NULL,
@@ -56,12 +56,13 @@ const floppy_config abc830_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_5_25_SSDD_40,
     FLOPPY_OPTIONS_NAME(abc830),
-    "abc830"
+    "abc830",
+	NULL
 };
 
 
 //-------------------------------------------------
-//  floppy_config abc832_floppy_config
+//  floppy_interface abc832_floppy_interface
 //-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( abc832 )
@@ -73,7 +74,7 @@ static FLOPPY_OPTIONS_START( abc832 )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-const floppy_config abc832_floppy_config =
+const floppy_interface abc832_floppy_interface =
 {
     DEVCB_NULL,
     DEVCB_NULL,
@@ -82,12 +83,13 @@ const floppy_config abc832_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_5_25_DSQD,
     FLOPPY_OPTIONS_NAME(abc832),
-    "abc832"
+    "abc832",
+	NULL
 };
 
 
 //-------------------------------------------------
-//  floppy_config abc838_floppy_config
+//  floppy_interface abc838_floppy_interface
 //-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( abc838 )
@@ -99,7 +101,7 @@ static FLOPPY_OPTIONS_START( abc838 )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-const floppy_config abc838_floppy_config =
+const floppy_interface abc838_floppy_interface =
 {
     DEVCB_NULL,
     DEVCB_NULL,
@@ -108,12 +110,13 @@ const floppy_config abc838_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_8_DSDD,
     FLOPPY_OPTIONS_NAME(abc838),
-    "abc838"
+    "abc838",
+	NULL
 };
 
 
 //-------------------------------------------------
-//  floppy_config fd2_floppy_config
+//  floppy_interface fd2_floppy_interface
 //-------------------------------------------------
 
 static FLOPPY_OPTIONS_START( fd2 )
@@ -127,7 +130,7 @@ static FLOPPY_OPTIONS_START( fd2 )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-const floppy_config fd2_floppy_config =
+const floppy_interface fd2_floppy_interface =
 {
     DEVCB_NULL,
     DEVCB_NULL,
@@ -136,7 +139,8 @@ const floppy_config fd2_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_5_25_SSSD,
     FLOPPY_OPTIONS_NAME(fd2),
-    "floppy_5_25"
+    "floppy_5_25",
+	NULL
 };
 
 

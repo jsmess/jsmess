@@ -1671,7 +1671,7 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_TIMER_ADD_PERIODIC("dummy_timer", dummy_timer_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
-static const floppy_config nc200_floppy_config =
+static const floppy_interface nc200_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1680,6 +1680,7 @@ static const floppy_config nc200_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(pc),
+	NULL,
 	NULL
 };
 
@@ -1710,7 +1711,7 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 
 	MCFG_UPD765A_ADD("upd765", nc200_upd765_interface)
 
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, nc200_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, nc200_floppy_interface)
 
 	MCFG_MC146818_ADD( "mc", MC146818_STANDARD )
 

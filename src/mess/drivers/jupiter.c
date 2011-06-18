@@ -94,7 +94,7 @@ INPUT_PORTS_END
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
-static const floppy_config jupiter_floppy_config =
+static const floppy_interface jupiter_floppy_interface =
 {
     DEVCB_NULL,
 	DEVCB_NULL,
@@ -103,7 +103,8 @@ static const floppy_config jupiter_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_5_25_SSDD_40,
     FLOPPY_OPTIONS_NAME(default),
-    NULL
+    NULL,
+	NULL
 };
 
 static const wd17xx_interface fdc_intf =

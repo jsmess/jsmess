@@ -440,8 +440,8 @@ static MACHINE_RESET( einstein )
 	einstein->m_ctc_trigger = 0;
 
 	/* configure floppy drives */
-	floppy_type type_80 = FLOPPY_STANDARD_5_25_DSHD;
-	floppy_type type_40 = FLOPPY_STANDARD_5_25_SSDD_40;
+	floppy_type_t type_80 = FLOPPY_STANDARD_5_25_DSHD;
+	floppy_type_t type_40 = FLOPPY_STANDARD_5_25_SSDD_40;
 	floppy = machine.device("floppy0");
 	floppy_drive_set_geometry(floppy, config & 0x01 ? type_80 : type_40);
 	floppy = machine.device("floppy1");
@@ -741,7 +741,7 @@ static const mc6845_interface einstein_crtc6845_interface =
 	NULL
 };
 
-static const floppy_config einstein_floppy_config =
+static const floppy_interface einstein_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -750,7 +750,8 @@ static const floppy_config einstein_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25"
+	"floppy_5_25",
+	NULL
 };
 
 
@@ -819,7 +820,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 
 	MCFG_WD1770_ADD(IC_I042, default_wd17xx_interface)
 
-	MCFG_FLOPPY_4_DRIVES_ADD(einstein_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(einstein_floppy_interface)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","einstein")

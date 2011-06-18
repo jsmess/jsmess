@@ -145,7 +145,7 @@ static const wd17xx_interface ht68k_wd17xx_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
-static const floppy_config ht68k_floppy_config =
+static const floppy_interface ht68k_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -154,6 +154,7 @@ static const floppy_config ht68k_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -170,7 +171,7 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8MHz / 2, ht68k_duart68681_config )
 	MCFG_WD1770_ADD("wd1770", ht68k_wd17xx_interface )
-	MCFG_FLOPPY_4_DRIVES_ADD(ht68k_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(ht68k_floppy_interface)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -802,7 +802,7 @@ static const struct pic8259_interface i8259_1_intf =
 
 /* Floppy Configuration */
 
-static const floppy_config tandy2k_floppy_config =
+static const floppy_interface tandy2k_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -811,6 +811,7 @@ static const floppy_config tandy2k_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSQD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -911,7 +912,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_PIC8259_ADD(I8259A_0_TAG, i8259_0_intf)
 	MCFG_PIC8259_ADD(I8259A_1_TAG, i8259_1_intf)
 	MCFG_UPD765A_ADD(I8272A_TAG, i8272_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(tandy2k_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(tandy2k_floppy_interface)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */

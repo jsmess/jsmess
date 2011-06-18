@@ -18,16 +18,16 @@
 //**************************************************************************
 
 #define MCFG_ABC830_ADD() \
-	MCFG_FLOPPY_2_DRIVES_ADD(abc830_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(abc830_floppy_interface)
 
 #define MCFG_ABC832_ADD() \
-	MCFG_FLOPPY_2_DRIVES_ADD(abc832_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(abc832_floppy_interface)
 
 #define MCFG_ABC834_ADD() \
-	MCFG_FLOPPY_2_DRIVES_ADD(abc832_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(abc832_floppy_interface)
 
 #define MCFG_ABC838_ADD() \
-	MCFG_FLOPPY_2_DRIVES_ADD(abc838_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(abc838_floppy_interface)
 
 
 
@@ -36,11 +36,11 @@
 //**************************************************************************
 
 // floppy configuration
-extern const floppy_config abc830_floppy_config;
-extern const floppy_config abc832_floppy_config;
-extern const floppy_config abc834_floppy_config;
-extern const floppy_config abc838_floppy_config;
-extern const floppy_config fd2_floppy_config;
+extern const floppy_interface abc830_floppy_interface;
+extern const floppy_interface abc832_floppy_interface;
+extern const floppy_interface abc834_floppy_interface;
+extern const floppy_interface abc838_floppy_interface;
+extern const floppy_interface fd2_floppy_interface;
 
 
 // conkort interfaces

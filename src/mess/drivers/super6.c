@@ -451,10 +451,10 @@ static COM8116_INTERFACE( brg_intf )
 
 
 //-------------------------------------------------
-//  floppy_config super6_floppy_config
+//  floppy_interface super6_floppy_interface
 //-------------------------------------------------
 
-static const floppy_config super6_floppy_config =
+static const floppy_interface super6_floppy_interface =
 {
     DEVCB_NULL,
     DEVCB_NULL,
@@ -463,7 +463,8 @@ static const floppy_config super6_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_5_25_DSHD,
     FLOPPY_OPTIONS_NAME(default),
-    "floppy_5_25"
+    "floppy_5_25",
+	NULL
 };
 
 
@@ -579,7 +580,7 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_24MHz/4, pio_intf)
 	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
 	MCFG_COM8116_ADD(BR1945_TAG, XTAL_5_0688MHz, brg_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(super6_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(super6_floppy_interface)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	// internal ram

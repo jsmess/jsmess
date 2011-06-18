@@ -361,7 +361,7 @@ static const centronics_interface oric_centronics_config =
 	DEVCB_NULL
 };
 
-static const floppy_config oric1_floppy_config =
+static const floppy_interface oric1_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -370,10 +370,11 @@ static const floppy_config oric1_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(oric),
+	NULL,
 	NULL
 };
 
-static const floppy_config prav8d_floppy_config =
+static const floppy_interface prav8d_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -382,6 +383,7 @@ static const floppy_config prav8d_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(apple2),
+	NULL,
 	NULL
 };
 
@@ -427,12 +429,12 @@ static MACHINE_CONFIG_START( oric, oric_state )
 
 	MCFG_WD179X_ADD("wd179x", oric_wd17xx_interface )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(oric1_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(oric1_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( prav8d, oric )
 	MCFG_FLOPPY_4_DRIVES_REMOVE()
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, prav8d_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, prav8d_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( telstrat, oric )

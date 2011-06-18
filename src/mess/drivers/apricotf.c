@@ -277,7 +277,7 @@ static FLOPPY_OPTIONS_START( act )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config act_floppy_config =
+static const floppy_interface act_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -286,6 +286,7 @@ static const floppy_config act_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(act),
+	NULL,
 	NULL
 };
 
@@ -320,7 +321,7 @@ static MACHINE_CONFIG_START( act_f1, act_state )
 
 	MCFG_VIDEO_START(act_f1)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(act_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(act_floppy_interface)
 MACHINE_CONFIG_END
 
 /* ROM definition */

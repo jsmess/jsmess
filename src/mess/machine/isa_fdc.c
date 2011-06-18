@@ -22,7 +22,7 @@ static WRITE8_DEVICE_HANDLER ( pc_fdc_w );
 
 #define LOG_FDC		0
 
-static const floppy_config ibmpc_floppy_config =
+static const floppy_interface ibmpc_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -31,6 +31,7 @@ static const floppy_config ibmpc_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(pc),
+	NULL,
 	NULL
 };
 
@@ -49,7 +50,7 @@ const upd765_interface pc_fdc_upd765_not_connected_interface =
 static MACHINE_CONFIG_FRAGMENT( fdc_config )
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
 MACHINE_CONFIG_END
 
 //**************************************************************************

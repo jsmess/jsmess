@@ -453,7 +453,7 @@ static const ppu2c0x_interface nes_ppu_interface =
 	ppu_nmi
 };
 
-static const floppy_config nes_floppy_config =
+static const floppy_interface nes_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -462,6 +462,7 @@ static const floppy_config nes_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(nes_only),
+	NULL,
 	NULL
 };
 
@@ -558,7 +559,7 @@ static MACHINE_CONFIG_DERIVED( famicom, nes )
 	MCFG_CARTSLOT_LOAD(nes_cart)
 	MCFG_CARTSLOT_PARTIALHASH(nes_partialhash)
 
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_interface)
 MACHINE_CONFIG_END
 
 

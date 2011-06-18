@@ -639,7 +639,7 @@ static FLOPPY_OPTIONS_START( mm2 )
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
-static const floppy_config mm1_floppy_config =
+static const floppy_interface mm1_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -648,6 +648,7 @@ static const floppy_config mm1_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(mm1),
+	NULL,
 	NULL
 };
 
@@ -731,7 +732,7 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	MCFG_UPD765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ fdc_intf)
 	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mpsc_intf)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(mm1_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(mm1_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

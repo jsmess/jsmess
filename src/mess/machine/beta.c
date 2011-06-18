@@ -203,7 +203,7 @@ WRITE8_DEVICE_HANDLER(betadisk_data_w)
 	}
 }
 
-static const floppy_config beta_floppy_config =
+static const floppy_interface beta_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -212,12 +212,13 @@ static const floppy_config beta_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(trd),
+	NULL,
 	NULL
 };
 
 static MACHINE_CONFIG_FRAGMENT( beta_disk )
 	MCFG_WD179X_ADD("wd179x", beta_wd17xx_interface )
-	MCFG_FLOPPY_4_DRIVES_ADD(beta_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(beta_floppy_interface)
 MACHINE_CONFIG_END
 
 ROM_START( beta_disk )

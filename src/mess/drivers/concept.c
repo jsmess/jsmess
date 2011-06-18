@@ -101,7 +101,7 @@ static FLOPPY_OPTIONS_START(concept)
 #endif
 FLOPPY_OPTIONS_END
 
-static const floppy_config concept_floppy_config =
+static const floppy_interface concept_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -110,6 +110,7 @@ static const floppy_config concept_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(concept),
+	NULL,
 	NULL
 };
 
@@ -150,7 +151,7 @@ static MACHINE_CONFIG_START( concept, concept_state )
 
 	MCFG_WD179X_ADD("wd179x", concept_wd17xx_interface )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(concept_floppy_config)
+	MCFG_FLOPPY_4_DRIVES_ADD(concept_floppy_interface)
 MACHINE_CONFIG_END
 
 

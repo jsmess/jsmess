@@ -594,7 +594,7 @@ WRITE_LINE_MEMBER( bullet_state::fdrdy_w )
 	update_dma_rdy();
 }
 
-static const floppy_config bullet_floppy_config =
+static const floppy_interface bullet_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -603,7 +603,8 @@ static const floppy_config bullet_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
 	FLOPPY_OPTIONS_NAME(default),
-	"bullet_flop"
+	"bullet_flop",
+	NULL
 };
 
 static const wd17xx_interface fdc_intf =
@@ -721,7 +722,7 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, pio_intf)
 	MCFG_WD179X_ADD(MB8877_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(bullet_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(bullet_floppy_interface)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 

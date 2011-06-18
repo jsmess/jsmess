@@ -318,10 +318,10 @@ FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
-//  floppy_config c1581_floppy_config
+//  floppy_interface c1581_floppy_interface
 //-------------------------------------------------
 
-static const floppy_config c1581_floppy_config =
+static const floppy_interface c1581_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -330,7 +330,8 @@ static const floppy_config c1581_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSDD,
 	FLOPPY_OPTIONS_NAME(c1581),
-	"floppy_3_5"
+	"floppy_3_5",
+	NULL
 };
 
 
@@ -345,7 +346,7 @@ static MACHINE_CONFIG_FRAGMENT( c1581 )
 	MCFG_MOS8520_ADD(M8520_TAG, XTAL_16MHz/8, cia_intf)
 	MCFG_WD1770_ADD(WD1770_TAG, /*XTAL_16MHz/2,*/ fdc_intf)
 
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1581_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, c1581_floppy_interface)
 MACHINE_CONFIG_END
 
 

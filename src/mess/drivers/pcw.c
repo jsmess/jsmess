@@ -1317,7 +1317,7 @@ static INPUT_PORTS_START(pcw)
 	PORT_BIT( 0xff, 0x00,	 IPT_UNUSED)
 INPUT_PORTS_END
 
-static const floppy_config pcw_floppy_config =
+static const floppy_interface pcw_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1326,6 +1326,7 @@ static const floppy_config pcw_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -1369,7 +1370,7 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 
 	MCFG_UPD765A_ADD("upd765", pcw_upd765_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(pcw_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(pcw_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

@@ -733,7 +733,7 @@ static IEEE488_INTERFACE( ieee488_intf )
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
-static const floppy_config vixen_floppy_config =
+static const floppy_interface vixen_floppy_interface =
 {
     DEVCB_NULL,
 	DEVCB_NULL,
@@ -742,7 +742,8 @@ static const floppy_config vixen_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_5_25_SSDD_40,
     FLOPPY_OPTIONS_NAME(default),
-    "floppy_5_25"
+    "floppy_5_25",
+	NULL
 };
 
 WRITE_LINE_MEMBER( vixen_state::fdint_w )
@@ -867,7 +868,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_I8155_ADD(P8155H_IO_TAG, XTAL_23_9616MHz/6, io_i8155_intf)
 	MCFG_MSM8251_ADD(P8251A_TAG, usart_intf)
 	MCFG_WD179X_ADD(FDC1797_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(vixen_floppy_config)
+	MCFG_FLOPPY_2_DRIVES_ADD(vixen_floppy_interface)
 	MCFG_IEEE488_CONFIG_ADD(ieee488_daisy, ieee488_intf)
 
 	/* software lists */

@@ -247,7 +247,7 @@ static MCCS1850_INTERFACE( rtc_intf )
     DEVCB_NULL
 };
 
-static const floppy_config next_floppy_config =
+static const floppy_interface next_floppy_interface =
 {
     DEVCB_NULL,
     DEVCB_NULL,
@@ -256,7 +256,8 @@ static const floppy_config next_floppy_config =
     DEVCB_NULL,
     FLOPPY_STANDARD_3_5_DSED,
     FLOPPY_OPTIONS_NAME(default),
-    "floppy_3_5"
+    "floppy_3_5",
+	NULL
 };
 
 static MACHINE_CONFIG_START( next, next_state )
@@ -277,7 +278,7 @@ static MACHINE_CONFIG_START( next, next_state )
 
 	// devices
 	MCFG_MCCS1850_ADD(MCCS1850_TAG, XTAL_32_768kHz, rtc_intf)
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, next_floppy_config)
+	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, next_floppy_interface)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")
