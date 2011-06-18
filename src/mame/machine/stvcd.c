@@ -1325,6 +1325,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			hirqreg |= (CMOK|EFLS);
 
 			// TODO!
+			popmessage("X");
 
 			//temp = (cr3&0xff)<<16;
 			//temp |= cr4;
