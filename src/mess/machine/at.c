@@ -259,7 +259,7 @@ static WRITE8_DEVICE_HANDLER( at_dma8237_fdc_dack_w ) {
 
 
 static WRITE_LINE_DEVICE_HANDLER( at_dma8237_out_eop ) {
-	pc_fdc_set_tc_state( device->machine(), state );
+	pc_fdc_set_tc_state( device->machine(), state ? CLEAR_LINE : ASSERT_LINE );
 }
 
 static void set_dma_channel(device_t *device, int channel, int state)
