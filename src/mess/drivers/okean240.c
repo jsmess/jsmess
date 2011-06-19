@@ -27,13 +27,14 @@ ppaC0 : K580ww55
   portC=vid.scroll.x
 
 
-NOTES ABOUT THE TEST ROM:
-The test rom tests various things including video memory. The test results
+NOTES ABOUT THE TEST ROM (-bios 1):
+- The test rom tests various things including video memory. The test results
 are sent to the comport (for us, the generic terminal). Therefore it would
 be useful to have the 2 screens side-by-side. Unfortunately they will not
 co-exist, instead causing a crash at start ("Mandatory artwork is missing").
 So, if you want to see the test rom results, you'll have to compile a modified
 driver (change the below line to 1).
+- All 'rand()' returns are only there to allow the tests to proceed.
 
 
 ToDo:
@@ -43,6 +44,11 @@ ToDo:
 - Add disks
 - Add cassette
 
+Usage of terminal:
+- okean240 bios 0 - the keyboard
+- okean240a bios 0 - not used
+- (either) bios 1 - the screen if compiled specially
+ 
 ****************************************************************************/
 #define OKEAN240_USING_TESTROM 0
 
@@ -60,39 +66,56 @@ class okean240_state : public driver_device
 public:
 	okean240_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_p_videoram(0),
 	m_term_data(0),
-	m_j(0)
+	m_j(0),
+	m_scroll(0)
 	{ }
 
-	DECLARE_READ8_MEMBER(okean240_rand_r);
+	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
+	DECLARE_READ8_MEMBER(okean240a_kbd_status_r);
+	DECLARE_READ8_MEMBER(term_status_r);
 	DECLARE_READ8_MEMBER(okean240_keyboard_r);
 	DECLARE_WRITE8_MEMBER(okean240_keyboard_w);
 	DECLARE_READ8_MEMBER(okean240a_keyboard_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_WRITE8_MEMBER(scroll_w);
 	UINT8 *m_p_videoram;
 	UINT8 m_term_data;
 	UINT8 m_j;
+	UINT8 m_scroll;
 	virtual void machine_reset();
 	virtual void video_start();
 };
 
 
-READ8_MEMBER( okean240_state::okean240_rand_r )
+READ8_MEMBER( okean240_state::okean240_kbd_status_r )
 {
-	offset += 0x80;
-	if (offset == 0xa1)
-		return 1 | (machine().rand() & 2);
+	if (m_term_data)
+		return (machine().rand() & 0x10) | 2;
 	else
-	if (offset == 0x80)
+		return machine().rand() & 0x10;
+}
+
+// see if a key is pressed and indicate status
+READ8_MEMBER( okean240_state::okean240a_kbd_status_r )
+{
+	char kbdrow[6];
+	UINT8 i,j;
+
+	for (i = 0; i < 11; i++)
 	{
-		if (m_term_data)
+		sprintf(kbdrow,"X%X",i);
+		j = input_port_read(machine(), kbdrow);
+		if (j)
 			return (machine().rand() & 0x10) | 2;
-		else
-			return machine().rand() & 0x10;
 	}
-	else
-		return 0;
+	m_j = 0;
+	return machine().rand() & 0x10;
+}
+
+READ8_MEMBER( okean240_state::term_status_r )
+{
+	return 1 | (machine().rand() & 2);
 }
 
 READ8_MEMBER( okean240_state::okean240_keyboard_r )
@@ -127,7 +150,6 @@ READ8_MEMBER( okean240_state::okean240a_keyboard_r )
 			{
 				if (j==m_j) return 0;
 				m_j=j;
-				m_term_data = 1;
 				return j;
 			}
 		}
@@ -159,6 +181,11 @@ WRITE8_MEMBER( okean240_state::okean240_keyboard_w )
 // okean240a: port 42 bit 4
 }
 
+WRITE8_MEMBER( okean240_state::scroll_w )
+{
+	m_scroll = data;
+}
+
 static ADDRESS_MAP_START(okean240_mem, AS_PROGRAM, 8, okean240_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
@@ -169,19 +196,25 @@ static ADDRESS_MAP_START(okean240_mem, AS_PROGRAM, 8, okean240_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(okean240_io, AS_IO, 8, okean240_state)
-	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0xff) AM_READ(okean240_rand_r)
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
 	AM_RANGE(0x40, 0x42) AM_READWRITE(okean240_keyboard_r,okean240_keyboard_w)
+	AM_RANGE(0x80, 0x80) AM_READ(okean240_kbd_status_r)
+#if OKEAN240_USING_TESTROM
+	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE(0xa1, 0xa1) AM_READ(term_status_r)
+#endif
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(scroll_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(okean240a_io, AS_IO, 8, okean240_state)
-	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0xff) AM_READ(okean240_rand_r)
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
 	AM_RANGE(0x40, 0x42) AM_READWRITE(okean240a_keyboard_r,okean240_keyboard_w)
+	AM_RANGE(0x80, 0x80) AM_READ(okean240a_kbd_status_r)
+#if OKEAN240_USING_TESTROM
+	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE(0xa1, 0xa1) AM_READ(term_status_r)
+#endif
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(scroll_w)
 	// AM_RANGE(0x00, 0x1f)=ppa00.data
 	// AM_RANGE(0x20, 0x23)=dsk.data
 	// AM_RANGE(0x24, 0x24)=dsk.wait
@@ -327,7 +360,8 @@ MACHINE_RESET_MEMBER( okean240_state )
 	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(okean240_boot));
 	memory_set_bank(machine(), "boot", 1);
 	m_term_data = 0;
-	m_j=0;
+	m_j = 0;
+	m_scroll = 0;
 }
 
 WRITE8_MEMBER( okean240_state::kbd_put )
@@ -335,9 +369,14 @@ WRITE8_MEMBER( okean240_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( okean240_terminal_intf )
 {
 	DEVCB_DRIVER_MEMBER(okean240_state, kbd_put)
+};
+
+static GENERIC_TERMINAL_INTERFACE( okean240a_terminal_intf )
+{
+	DEVCB_NULL
 };
 
 DRIVER_INIT( okean240 )
@@ -350,22 +389,20 @@ VIDEO_START_MEMBER( okean240_state )
 {
 }
 
-// need to add colour
-SCREEN_UPDATE( okean240 )
+static SCREEN_UPDATE( okean240 )
 {
 	okean240_state *state = screen->machine().driver_data<okean240_state>();
-	UINT8 gfx,a;
+	UINT8 gfx,ma; // ma must be 8bit
 	UINT16 x,y;
 
 	for (y = 0; y < 256; y++)
 	{
+		ma = y + state->m_scroll;
 		UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
 
 		for (x = 0; x < 0x4000; x+=0x200)
 		{
-			gfx = state->m_p_videoram[x|y];
-			a = state->m_p_videoram[x|0x100|y];
-			gfx |= a;
+			gfx = state->m_p_videoram[x|ma] | state->m_p_videoram[x|ma|0x100];
 
 			/* Display a scanline of a character */
 			*p++ = BIT(gfx, 0);
@@ -425,13 +462,15 @@ static MACHINE_CONFIG_START( okean240, okean240_state )
 #endif
 	MCFG_GFXDECODE(okean240)
 
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, okean240_terminal_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( okean240a, okean240 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(okean240a_io)
 	MCFG_GFXDECODE(okean240a)
+	MCFG_GENERIC_TERMINAL_REMOVE(TERMINAL_TAG)
+	//MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, okean240a_terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
