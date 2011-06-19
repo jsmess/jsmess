@@ -443,6 +443,7 @@ static void smpc_change_clock(running_machine &machine, UINT8 cmd)
 	stv_vdp2_dynamic_res_change(machine);
 
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
+	smpc_slave_enable(machine,1);
 	/* TODO: VDP1 / VDP2 / SCU / SCSP default power ON values */
 }
 
@@ -798,7 +799,7 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 			state->m_smpc.intback_stage = 2;
 		}
 		smpc_intbackhelper(machine);
-		cputag_set_input_line_and_vector(machine, "maincpu", 8, HOLD_LINE , 0x47);
+		device_set_input_line_and_vector(state->m_maincpu, 8, HOLD_LINE, 0x47);
 	}
 
 	if ((offset == 1) && (data & 0x40))
@@ -2756,6 +2757,7 @@ static MACHINE_RESET( stv )
 	state->m_scu.start_factor[1] = -1;
 	state->m_scu.start_factor[2] = -1;
 }
+
 struct cdrom_interface saturn_cdrom =
 {
 	NULL,
