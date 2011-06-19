@@ -38,8 +38,8 @@ driver (change the below line to 1).
 
 ToDo:
 - Add devices
-- Fix keyboard (Shift and Ctrl are the only correct keys)
-- Fix colours
+- Find out if any unconnected keyboard entries are real keys
+- Colours (if it had colours)
 - Add disks
 - Add cassette
 
@@ -59,11 +59,16 @@ class okean240_state : public driver_device
 {
 public:
 	okean240_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_p_videoram(0),
+	m_term_data(0),
+	m_j(0)
+	{ }
 
 	DECLARE_READ8_MEMBER(okean240_rand_r);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
+	DECLARE_READ8_MEMBER(okean240_keyboard_r);
+	DECLARE_WRITE8_MEMBER(okean240_keyboard_w);
+	DECLARE_READ8_MEMBER(okean240a_keyboard_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 *m_p_videoram;
 	UINT8 m_term_data;
@@ -90,12 +95,29 @@ READ8_MEMBER( okean240_state::okean240_rand_r )
 		return 0;
 }
 
-READ8_MEMBER( okean240_state::keyboard_r )
+READ8_MEMBER( okean240_state::okean240_keyboard_r )
+{
+	if (offset == 0) // port 40 (get ascii key value)
+	{
+		UINT8 ret = m_term_data;
+		m_term_data = 0;
+		return ret;
+	}
+	else
+	if (offset == 1) // port 41 bit 1 (status bit used by test rom)
+	{
+		return (machine().rand() & 2);
+	}
+	else // port 42 (not used)
+		return 0;
+}
+
+READ8_MEMBER( okean240_state::okean240a_keyboard_r )
 {
 	char kbdrow[6];
 	UINT8 i,j;
 
-	if (offset == 0) // port 40 get a row
+	if (offset == 0) // port 40 (get a column)
 	{
 		for (i = 0; i < 11; i++)
 		{
@@ -117,7 +139,7 @@ READ8_MEMBER( okean240_state::keyboard_r )
 	{
 		return (machine().rand() & 2) | input_port_read(machine(), "MODIFIERS");
 	}
-	else // port 42 (bits 0-1-2-3)
+	else // port 42 (get a row)
 	{
 		for (i = 0; i < 11; i++)
 		{
@@ -129,11 +151,12 @@ READ8_MEMBER( okean240_state::keyboard_r )
 	return 0;
 }
 
-WRITE8_MEMBER( okean240_state::keyboard_w )
+// This is a keyboard acknowledge pulse, it goes high then
+// straightaway low, if reading port 40 indicates a key is pressed.
+WRITE8_MEMBER( okean240_state::okean240_keyboard_w )
 {
-	if ((offset == 2) && (data == 0x10)) // port 42 bit 4 keyboard acknowledge
-	{
-	}
+// okean240: port 42 bit 7
+// okean240a: port 42 bit 4
 }
 
 static ADDRESS_MAP_START(okean240_mem, AS_PROGRAM, 8, okean240_state)
@@ -150,7 +173,15 @@ static ADDRESS_MAP_START(okean240_io, AS_IO, 8, okean240_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0xff) AM_READ(okean240_rand_r)
 	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
-	AM_RANGE(0x40, 0x42) AM_READWRITE(keyboard_r,keyboard_w)
+	AM_RANGE(0x40, 0x42) AM_READWRITE(okean240_keyboard_r,okean240_keyboard_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(okean240a_io, AS_IO, 8, okean240_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0xff) AM_READ(okean240_rand_r)
+	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE(0x40, 0x42) AM_READWRITE(okean240a_keyboard_r,okean240_keyboard_w)
 	// AM_RANGE(0x00, 0x1f)=ppa00.data
 	// AM_RANGE(0x20, 0x23)=dsk.data
 	// AM_RANGE(0x24, 0x24)=dsk.wait
@@ -165,6 +196,10 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( okean240 )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( okean240a )
 	PORT_START("X0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) // comma
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED) // minus
@@ -291,6 +326,7 @@ MACHINE_RESET_MEMBER( okean240_state )
 {
 	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(okean240_boot));
 	memory_set_bank(machine(), "boot", 1);
+	m_term_data = 0;
 	m_j=0;
 }
 
@@ -360,6 +396,10 @@ static const gfx_layout okean240_charlayout =
 };
 
 static GFXDECODE_START( okean240 )
+	GFXDECODE_ENTRY( "maincpu", 0xec08, okean240_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START( okean240a )
 	GFXDECODE_ENTRY( "maincpu", 0xef63, okean240_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -379,13 +419,19 @@ static MACHINE_CONFIG_START( okean240, okean240_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
-	MCFG_GFXDECODE(okean240)
-	MCFG_PALETTE_LENGTH(16)
-	//MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_SCREEN_UPDATE(okean240)
 #endif
+	MCFG_GFXDECODE(okean240)
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( okean240a, okean240 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(okean240a_io)
+	MCFG_GFXDECODE(okean240a)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -395,16 +441,23 @@ ROM_START( okean240 )
 	ROMX_LOAD( "monitor.bin", 0xe000, 0x2000, CRC(587799bc) SHA1(1f677afa96722ca4ed2643eaca243548845fc854), ROM_BIOS(1))
 	ROMX_LOAD( "cpm80.bin",   0xc000, 0x2000, CRC(7378e4f9) SHA1(c3c06c6f2e953546452ca6f82140a79d0e4953b4), ROM_BIOS(1))
 
-	ROM_SYSTEM_BIOS(1, "FDDNormal", "FDDNormal")
-	ROMX_LOAD( "fddmonitor.bin", 0xe000, 0x2000, CRC(bcac5ca0) SHA1(602ab824704d3d5d07b3787f6227ff903c33c9d5), ROM_BIOS(2))
-	ROMX_LOAD( "fddcpm80.bin",   0xc000, 0x2000, CRC(b89a7e16) SHA1(b8f937c04f430be18e48f296ed3ef37194171204), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(1, "Test", "Test")
+	ROMX_LOAD( "test.bin",    0xe000, 0x0800, CRC(e9e2b7b9) SHA1(e4e0b6984a2514b6ba3e97500d487ea1a68b7577), ROM_BIOS(2))
+ROM_END
 
-	ROM_SYSTEM_BIOS(2, "Test", "Test")
-	ROMX_LOAD( "test.bin",    0xe000, 0x0800, CRC(e9e2b7b9) SHA1(e4e0b6984a2514b6ba3e97500d487ea1a68b7577), ROM_BIOS(3))
+ROM_START( okean240a )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS(0, "Normal", "Normal")
+	ROMX_LOAD( "fddmonitor.bin", 0xe000, 0x2000, CRC(bcac5ca0) SHA1(602ab824704d3d5d07b3787f6227ff903c33c9d5), ROM_BIOS(1))
+	ROMX_LOAD( "fddcpm80.bin",   0xc000, 0x2000, CRC(b89a7e16) SHA1(b8f937c04f430be18e48f296ed3ef37194171204), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(1, "Test", "Test")
+	ROMX_LOAD( "test.bin",    0xe000, 0x0800, CRC(e9e2b7b9) SHA1(e4e0b6984a2514b6ba3e97500d487ea1a68b7577), ROM_BIOS(2))
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT     INIT         COMPANY     FULLNAME       FLAGS */
-COMP( ????, okean240,  0,       0,   okean240,  okean240, okean240,  "<unknown>", "Okean-240", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT      INIT         COMPANY     FULLNAME       FLAGS */
+COMP( 1986, okean240,  0,       0,   okean240,  okean240,  okean240,  "<unknown>", "Okeah-240", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, okean240a, okean240,0,   okean240a, okean240a, okean240,  "<unknown>", "Ocean-240 with fdd", GAME_NOT_WORKING | GAME_NO_SOUND)
 
