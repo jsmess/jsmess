@@ -6,8 +6,14 @@
     improvements by Sandro Ronco
 
     Notes:
-    - checks for a "machine language" string at some point, nothing in the
-      current dump match it
+    - NVRAM works only if the machine is turned off (with OFF key) before closing MESS
+
+    TODO:
+    - ON key doesn't work.
+    - Fix the PC-G850V keyboard, that sometimes is too slow.
+    - LCD contrast.
+    - Add an artwork for the LCD symbols.
+    - Add other models that have a similar hardware.
 
     More info:
       http://wwwhomes.uni-bielefeld.de/achim/pc-e220.html
@@ -856,6 +862,29 @@ static TIMER_DEVICE_CALLBACK(pce220_timer_callback)
 	}
 }
 
+static NVRAM_HANDLER(pce220)
+{
+	pce220_state *state = machine.driver_data<pce220_state>();
+	UINT8 *ram_base = (UINT8*)ram_get_ptr(state->m_ram);
+	UINT32 ram_size = ram_get_size(state->m_ram);
+
+	if (read_or_write)
+	{
+		file->write(ram_base, ram_size);
+	}
+	else
+	{
+		if (file)
+		{
+			file->read(ram_base, ram_size);
+		}
+		else
+		{
+			memset(ram_base, 0, ram_size);
+		}
+	}
+}
+
 static PALETTE_INIT(pce220)
 {
 	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
@@ -889,6 +918,8 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
 
 	MCFG_TIMER_ADD_PERIODIC("pce220_timer", pce220_timer_callback, attotime::from_msec(468))
 
+	MCFG_NVRAM_HANDLER(pce220)
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
@@ -921,6 +952,8 @@ static MACHINE_CONFIG_START( pcg850v, pcg850v_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_ADD_PERIODIC("pce220_timer", pce220_timer_callback, attotime::from_msec(468))
+
+	MCFG_NVRAM_HANDLER(pce220)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
