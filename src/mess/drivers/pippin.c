@@ -27,6 +27,7 @@
     F3016000 : 6522 VIA (look at machine/mac.c for Apple's unique register mapping)
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
@@ -40,58 +41,57 @@ public:
 	pippin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_READ64_MEMBER(unk1_r);
+	DECLARE_READ64_MEMBER(unk2_r);
+	DECLARE_READ64_MEMBER(adb_portb_r);
+	DECLARE_WRITE64_MEMBER(adb_portb_w);
 	UINT16 m_unk1_test;
 	UINT8 m_portb_data;
 };
 
 
-static READ64_HANDLER( unk1_r )
+READ64_MEMBER( pippin_state::unk1_r )
 {
-	pippin_state *state = space->machine().driver_data<pippin_state>();
-	state->m_unk1_test ^= 0x0400; //PC=ff808760
+	m_unk1_test ^= 0x0400; //PC=ff808760
 
-	return state->m_unk1_test << 16 | 0;
+	return m_unk1_test << 16;
 }
 
-static READ64_HANDLER( unk2_r )
+READ64_MEMBER( pippin_state::unk2_r )
 {
-	if(ACCESSING_BITS_32_47)
+	if (ACCESSING_BITS_32_47)
 		return (UINT64)0xe1 << 32; //PC=fff04810
 
 	return 0;
 }
 
 
-static READ64_HANDLER( adb_portb_r )
+READ64_MEMBER( pippin_state::adb_portb_r )
 {
-	pippin_state *state = space->machine().driver_data<pippin_state>();
-	if(ACCESSING_BITS_56_63)
+	if (ACCESSING_BITS_56_63)
 	{
-		if(state->m_portb_data == 0x10)
+		if (m_portb_data == 0x10)
 			return (UINT64)0x08 << 56;
 
-		if(state->m_portb_data == 0x38)	//fff04c80
+		if (m_portb_data == 0x38)	//fff04c80
 			return (UINT64)0x20 << 56; //almost sure this is wrong
 
-		//printf("PORTB R %02x\n",state->m_portb_data);
-
+		//printf("PORTB R %02x\n", m_portb_data);
 
 		return 0;
 	}
-
 	return 0;
 }
 
-static WRITE64_HANDLER( adb_portb_w )
+WRITE64_MEMBER( pippin_state::adb_portb_w )
 {
-	pippin_state *state = space->machine().driver_data<pippin_state>();
-	if(ACCESSING_BITS_56_63)
+	if (ACCESSING_BITS_56_63)
 	{
-		state->m_portb_data = (UINT64)data >> 56;
+		m_portb_data = (UINT64)data >> 56;
 	}
 }
 
-static ADDRESS_MAP_START( pippin_mem, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START(pippin_mem, AS_PROGRAM, 64, pippin_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x005fffff) AM_RAM
 
@@ -124,7 +124,7 @@ static INPUT_PORTS_START( pippin )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(pippin)
+static MACHINE_RESET( pippin )
 {
 }
 
@@ -134,7 +134,7 @@ static VIDEO_START( pippin )
 
 static SCREEN_UPDATE( pippin )
 {
-    return 0;
+	return 0;
 }
 
 struct cdrom_interface pippin_cdrom =
@@ -144,25 +144,25 @@ struct cdrom_interface pippin_cdrom =
 };
 
 static MACHINE_CONFIG_START( pippin, pippin_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",PPC603, 66000000)
-    MCFG_CPU_PROGRAM_MAP(pippin_mem)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",PPC603, 66000000)
+	MCFG_CPU_PROGRAM_MAP(pippin_mem)
 
-    MCFG_MACHINE_RESET(pippin)
+	MCFG_MACHINE_RESET(pippin)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(60)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MCFG_SCREEN_UPDATE(pippin)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(pippin)
 
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-    MCFG_VIDEO_START(pippin)
+	MCFG_VIDEO_START(pippin)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -188,19 +188,21 @@ MACHINE_CONFIG_END
 */
 
 ROM_START( pippin )
-    ROM_REGION( 0x400000, "user1",  ROMREGION_64BIT | ROMREGION_BE )
+	ROM_REGION( 0x400000, "user1",  ROMREGION_64BIT | ROMREGION_BE )
 	ROM_SYSTEM_BIOS(0, "v1", "Kinka v 1.0")
-    ROMX_LOAD( "341s0251.u1", 0x000006, 0x100000, CRC(aaea2449) SHA1(2f63e215260a42fb7c5f2364682d5e8c0604646f),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(1))
+	ROMX_LOAD( "341s0251.u1", 0x000006, 0x100000, CRC(aaea2449) SHA1(2f63e215260a42fb7c5f2364682d5e8c0604646f),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(1))
 	ROMX_LOAD( "341s0252.u2", 0x000004, 0x100000, CRC(3d584419) SHA1(e29c764816755662693b25f1fb3c24faef4e9470),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(1))
 	ROMX_LOAD( "341s0253.u3", 0x000002, 0x100000, CRC(d8ae5037) SHA1(d46ce4d87ca1120dfe2cf2ba01451f035992b6f6),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(1))
 	ROMX_LOAD( "341s0254.u4", 0x000000, 0x100000, CRC(3e2851ba) SHA1(7cbf5d6999e890f5e9ab2bc4b10ca897c4dc2016),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(1))
+
 	ROM_SYSTEM_BIOS(1, "pre", "Kinka pre-release")
-    ROMX_LOAD( "kinka-pre.rom", 0x000000, 0x400000, CRC(4ff875e6) SHA1(eb8739cab1807c6c7c51acc7f4a3afc1f9c6ddbb),ROM_BIOS(2))
+	ROMX_LOAD( "kinka-pre.rom", 0x000000, 0x400000, CRC(4ff875e6) SHA1(eb8739cab1807c6c7c51acc7f4a3afc1f9c6ddbb),ROM_BIOS(2))
+
 	ROM_REGION( 0x10000, "cdrom", 0 ) /* MATSUSHITA CR504-L OEM */
 	ROM_LOAD( "504par4.0i.ic7", 0x0000, 0x10000, CRC(25f7dd46) SHA1(ec3b3031742807924c6259af865e701827208fec) )
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1996, pippin,  0,       0,	pippin, 	pippin, 	 0,  "Apple / Bandai",   "Pippin @mark",		GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY            FULLNAME       FLAGS */
+COMP( 1996, pippin,  0,       0,     pippin,    pippin,  0,  "Apple / Bandai",   "Pippin @mark", GAME_NOT_WORKING)

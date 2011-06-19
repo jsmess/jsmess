@@ -8,6 +8,7 @@ although it is very related to standard pc hardware, it is different enough
 to make the standard pc driver one level more complex, so own driver
 
 ******************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -57,9 +58,15 @@ class pasogo_state : public driver_device
 {
 public:
 	pasogo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu")
+	{ }
 
-
+	required_device<cpu_device> m_maincpu;
+	DECLARE_READ8_MEMBER(ems_r);
+	DECLARE_WRITE8_MEMBER(ems_w);
+	DECLARE_READ8_MEMBER(vg230_io_r);
+	DECLARE_WRITE8_MEMBER(vg230_io_w);
 	struct _vg230_t m_vg230;
 	struct _ems_t m_ems;
 };
@@ -120,10 +127,9 @@ static void vg230_init(running_machine &machine)
 }
 
 
-static READ8_HANDLER( vg230_io_r )
+READ8_MEMBER( pasogo_state::vg230_io_r )
 {
-	pasogo_state *state = space->machine().driver_data<pasogo_state>();
-	vg230_t *vg230 = &state->m_vg230;
+	vg230_t *vg230 = &m_vg230;
 	int log=TRUE;
 	UINT8 data=0;
 
@@ -136,13 +142,9 @@ static READ8_HANDLER( vg230_io_r )
 			case 0x09: break;
 			case 0x0a:
 				if (vg230->data[9]&1)
-				{
-					data=input_port_read(space->machine(), "JOY");
-				}
+					data=input_port_read(machine(), "JOY");
 				else
-				{
 					data=0xff;
-				}
 				break;
 
 			case 0x30:
@@ -175,20 +177,17 @@ static READ8_HANDLER( vg230_io_r )
 		}
 
 		if (log)
-			logerror("%.5x vg230 %02x read %.2x\n",(int) cpu_get_pc(&space->device()),vg230->index,data);
+			logerror("%.5x vg230 %02x read %.2x\n",(int) cpu_get_pc(m_maincpu),vg230->index,data);
       //    data=machine.region("maincpu")->base()[0x4000+offset];
 	}
 	else
-	{
 		data=vg230->index;
-    }
+
 	return data;
 }
-
-static WRITE8_HANDLER( vg230_io_w )
+WRITE8_MEMBER( pasogo_state::vg230_io_w )
 {
-	pasogo_state *state = space->machine().driver_data<pasogo_state>();
-	vg230_t *vg230 = &state->m_vg230;
+	vg230_t *vg230 = &m_vg230;
 	int log=TRUE;
 
 	if (offset&1)
@@ -222,18 +221,15 @@ static WRITE8_HANDLER( vg230_io_w )
 		}
 
 		if (log)
-			logerror("%.5x vg230 %02x write %.2x\n",(int)cpu_get_pc(&space->device()),vg230->index,data);
+			logerror("%.5x vg230 %02x write %.2x\n",(int)cpu_get_pc(m_maincpu),vg230->index,data);
 	}
 	else
-	{
 		vg230->index=data;
-	}
 }
 
-static READ8_HANDLER( ems_r )
+READ8_MEMBER( pasogo_state::ems_r )
 {
-	pasogo_state *state = space->machine().driver_data<pasogo_state>();
-	ems_t *ems = &state->m_ems;
+	ems_t *ems = &m_ems;
 	UINT8 data=0;
 
 	switch (offset)
@@ -244,10 +240,9 @@ static READ8_HANDLER( ems_r )
 	return data;
 }
 
-static WRITE8_HANDLER( ems_w )
+WRITE8_MEMBER( pasogo_state::ems_w )
 {
-	pasogo_state *state = space->machine().driver_data<pasogo_state>();
-	ems_t *ems = &state->m_ems;
+	ems_t *ems = &m_ems;
 	char bank[10];
 
 	switch (offset)
@@ -293,30 +288,31 @@ static WRITE8_HANDLER( ems_w )
 		ems->mapper[ems->index].address=(ems->mapper[ems->index].data[0]<<14)|((ems->mapper[ems->index].data[1]&0xf)<<22);
 		ems->mapper[ems->index].on=ems->mapper[ems->index].data[1]&0x80;
 		ems->mapper[ems->index].type=(ems->mapper[ems->index].data[1]&0x70)>>4;
-		logerror("%.5x ems mapper %d(%05x)on:%d type:%d address:%07x\n",(int)cpu_get_pc(&space->device()),ems->index, ems->data<<12,
+		logerror("%.5x ems mapper %d(%05x)on:%d type:%d address:%07x\n",(int)cpu_get_pc(m_maincpu),ems->index, ems->data<<12,
 			ems->mapper[ems->index].on, ems->mapper[ems->index].type, ems->mapper[ems->index].address );
+
 		switch (ems->mapper[ems->index].type)
 		{
 		case 0: /*external*/
 		case 1: /*ram*/
-		sprintf(bank,"bank%d",ems->index+1);
-		memory_set_bankptr( space->machine(), bank, space->machine().region("maincpu")->base() + (ems->mapper[ems->index].address&0xfffff) );
-		break;
+			sprintf(bank,"bank%d",ems->index+1);
+			memory_set_bankptr( machine(), bank, machine().region("maincpu")->base() + (ems->mapper[ems->index].address&0xfffff) );
+			break;
 		case 3: /* rom 1 */
 		case 4: /* pc card a */
 		case 5: /* pc card b */
 		default:
-		break;
+			break;
 		case 2:
-		sprintf(bank,"bank%d",ems->index+1);
-		memory_set_bankptr( space->machine(),  bank, space->machine().region("user1")->base() + (ems->mapper[ems->index].address&0xfffff) );
-		break;
+			sprintf(bank,"bank%d",ems->index+1);
+			memory_set_bankptr( machine(),  bank, machine().region("user1")->base() + (ems->mapper[ems->index].address&0xfffff) );
+			break;
 		}
 		break;
 	}
 }
 
-static ADDRESS_MAP_START( pasogo_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START(pasogo_mem, AS_PROGRAM, 8, pasogo_state)
 //  AM_RANGE(0x00000, 0xfffff) AM_UNMAP AM_MASK(0xfffff)
 //  AM_RANGE( 0x4000, 0x7fff) AM_READWRITE(gmaster_io_r, gmaster_io_w)
 	ADDRESS_MAP_GLOBAL_MASK(0xffFFF)
@@ -353,11 +349,11 @@ static ADDRESS_MAP_START( pasogo_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("bank27")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pasogo_io, AS_IO, 8)
+static ADDRESS_MAP_START(pasogo_io, AS_IO, 8, pasogo_state)
 //  ADDRESS_MAP_GLOBAL_MASK(0xfFFF)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x26, 0x27) AM_READWRITE(vg230_io_r, vg230_io_w )
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8254", pit8253_r, pit8253_w)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8254", pit8253_r, pit8253_w)
 	AM_RANGE(0x6c, 0x6f) AM_READWRITE(ems_r, ems_w )
 ADDRESS_MAP_END
 
@@ -557,7 +553,5 @@ static DRIVER_INIT( pasogo )
 	memory_set_bankptr( machine, "bank28", machine.region("maincpu")->base() + 0xb8000/*?*/ );
 }
 
-/*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT
-      COMPANY                 FULLNAME */
-CONS( 1996, pasogo,       0,          0, pasogo,  pasogo,    pasogo,   "KOEI", "PasoGo", GAME_NO_SOUND|GAME_NOT_WORKING)
-
+//    YEAR   NAME    PARENT  COMPAT    MACHINE   INPUT     INIT      COMPANY  FULLNAME          FLAGS
+CONS( 1996, pasogo,   0,      0,       pasogo,  pasogo,    pasogo,   "KOEI", "PasoGo", GAME_NO_SOUND|GAME_NOT_WORKING)

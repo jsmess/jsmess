@@ -1,6 +1,6 @@
 /***************************************************************************
 
-        pipbug
+        PIPBUG
 
         08/04/2010 Skeleton driver.
 
@@ -23,6 +23,7 @@
              currently to prevent a crash).
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
@@ -34,20 +35,21 @@ public:
 	pipbug_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_WRITE8_MEMBER(pipbug_ctrl_w);
 };
 
-static WRITE8_HANDLER( pipbug_ctrl_w )
+WRITE8_MEMBER( pipbug_state::pipbug_ctrl_w )
 {
 // 0x80 is written here - not connected in the baby 2650
 }
 
-static ADDRESS_MAP_START(pipbug_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(pipbug_mem, AS_PROGRAM, 8, pipbug_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff) AM_ROM
 	AM_RANGE( 0x0400, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pipbug_io, AS_IO, 8)
+static ADDRESS_MAP_START(pipbug_io, AS_IO, 8, pipbug_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(pipbug_ctrl_w)
 	//AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(pipbug_serial_in,pipbug_serial_out)
@@ -103,5 +105,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1979, pipbug,  0,       0,	pipbug, 	pipbug, 	 0,  "<unknown>",   "PIPBUG", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1979, pipbug,  0,       0,     pipbug,    pipbug,    0,  "Signetics", "PIPBUG", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
 

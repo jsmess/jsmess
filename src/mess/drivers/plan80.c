@@ -22,27 +22,33 @@
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
-
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 class plan80_state : public driver_device
 {
 public:
 	plan80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+	m_maincpu(*this, "maincpu")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER( plan80_04_r );
-	DECLARE_WRITE8_MEMBER( plan80_09_w );
-	UINT8* m_videoram;
+	DECLARE_READ8_MEMBER(plan80_04_r);
+	DECLARE_WRITE8_MEMBER(plan80_09_w);
+	UINT8* m_p_videoram;
+	const UINT8* m_p_chargen;
 	UINT8 m_kbd_row;
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
-READ8_MEMBER(plan80_state::plan80_04_r)
+READ8_MEMBER( plan80_state::plan80_04_r )
 {
 	UINT8 data = 0xff;
 
@@ -64,7 +70,7 @@ READ8_MEMBER(plan80_state::plan80_04_r)
 	return data;
 }
 
-WRITE8_MEMBER(plan80_state::plan80_09_w)
+WRITE8_MEMBER( plan80_state::plan80_09_w )
 {
 	m_kbd_row = data;
 }
@@ -74,11 +80,11 @@ static ADDRESS_MAP_START(plan80_mem, AS_PROGRAM, 8, plan80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_p_videoram)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( plan80_io , AS_IO, 8, plan80_state)
+static ADDRESS_MAP_START(plan80_io, AS_IO, 8, plan80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_READ(plan80_04_r)
@@ -141,10 +147,10 @@ static TIMER_CALLBACK( plan80_boot )
 	memory_set_bank(machine, "boot", 0);
 }
 
-static MACHINE_RESET(plan80)
+MACHINE_RESET_MEMBER( plan80_state )
 {
-	memory_set_bank(machine, "boot", 1);
-	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(plan80_boot));
+	memory_set_bank(machine(), "boot", 1);
+	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(plan80_boot));
 }
 
 DRIVER_INIT( plan80 )
@@ -153,33 +159,37 @@ DRIVER_INIT( plan80 )
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xf800);
 }
 
-static VIDEO_START( plan80 )
+VIDEO_START_MEMBER( plan80_state )
 {
+	m_p_chargen = machine().region("chargen")->base();
 }
 
-static SCREEN_UPDATE( plan80 )
+SCREEN_UPDATE_MEMBER( plan80_state )
 {
-	plan80_state *state = screen->machine().driver_data<plan80_state>();
-	UINT8 *gfx = screen->machine().region("gfx")->base();
-	int x,y,j,b;
-	UINT16 addr;
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
 
-	for(y = 0; y < 32; y++ )
+	for (y = 0; y < 32; y++)
 	{
-		addr = y*64;
-		for(x = 0; x < 48; x++ )
+		for (ra = 0; ra < 8; ra++)
 		{
-			UINT8 code = state->m_videoram[addr + x];
-			for(j = 0; j < 8; j++ )
+			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 0);
+
+			for (x = ma; x < ma+48; x++)
 			{
-				UINT8 val = gfx[code*8 + j];
-				if (BIT(code,7))  val ^= 0xff;
-				for(b = 0; b < 6; b++ )
-				{
-					*BITMAP_ADDR16(bitmap, y*8+j, x*6+b ) = (val >> (5-b)) & 1;
-				}
+				chr = m_p_videoram[x];
+				gfx = m_p_chargen[(chr << 3) | ra] ^ (BIT(chr, 7) ? 0xff : 0);
+
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
 			}
 		}
+		ma+=64;
 	}
 	return 0;
 }
@@ -199,7 +209,7 @@ static const gfx_layout plan80_charlayout =
 };
 
 static GFXDECODE_START( plan80 )
-	GFXDECODE_ENTRY( "gfx", 0x0000, plan80_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, plan80_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -209,8 +219,6 @@ static MACHINE_CONFIG_START( plan80, plan80_state )
 	MCFG_CPU_PROGRAM_MAP(plan80_mem)
 	MCFG_CPU_IO_MAP(plan80_io)
 
-	MCFG_MACHINE_RESET(plan80)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -218,13 +226,9 @@ static MACHINE_CONFIG_START( plan80, plan80_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(48*6, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*6-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE(plan80)
-
 	MCFG_GFXDECODE(plan80)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(plan80)
+	MCFG_PALETTE_INIT(monochrome_green)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -235,7 +239,7 @@ ROM_START( plan80 )
 	ROM_REGION( 0x10000, "spare", 0 )
 	ROM_LOAD_OPTIONAL( "pl80mod.bin", 0xf000, 0x0800, CRC(6bdd7136) SHA1(721eab193c33c9330e0817616d3d2b601285fe50))
 
-	ROM_REGION( 0x0800, "gfx", 0 )
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "pl80gzn.bin", 0x0000, 0x0800, CRC(b4ddbdb6) SHA1(31bf9cf0f2ed53f48dda29ea830f74cea7b9b9b2))
 ROM_END
 

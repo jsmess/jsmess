@@ -52,6 +52,7 @@
         Two Z8 for power management and character recognition
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
@@ -66,7 +67,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START(pda600_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(pda600_mem, AS_PROGRAM, 8, pda600_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_RAM
@@ -74,7 +75,7 @@ static ADDRESS_MAP_START(pda600_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xf0000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pda600_io , AS_IO, 8)
+static ADDRESS_MAP_START(pda600_io, AS_IO, 8, pda600_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_NOP /* Z180 internal registers */
@@ -99,39 +100,39 @@ static VIDEO_START( pda600 )
 
 static SCREEN_UPDATE( pda600 )
 {
-    return 0;
+	return 0;
 }
 
 static MACHINE_CONFIG_START( pda600, pda600_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",Z180, XTAL_14_31818MHz)
-    MCFG_CPU_PROGRAM_MAP(pda600_mem)
-    MCFG_CPU_IO_MAP(pda600_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z180, XTAL_14_31818MHz)
+	MCFG_CPU_PROGRAM_MAP(pda600_mem)
+	MCFG_CPU_IO_MAP(pda600_io)
 
-    MCFG_MACHINE_RESET(pda600)
+	MCFG_MACHINE_RESET(pda600)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(240, 320)
-    MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 320-1)
-    MCFG_SCREEN_UPDATE(pda600)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(240, 320)
+	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 320-1)
+	MCFG_SCREEN_UPDATE(pda600)
 
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-    MCFG_VIDEO_START(pda600)
+	MCFG_VIDEO_START(pda600)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pda600 )
-    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "pdarom.bin", 0x00000, 0x20000, CRC(f793a6c5) SHA1(ab14b0fdcedb927c66357368a2bfff605ba758fb))
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1993, pda600,  0,       0,	pda600, 	pda600,  0, 	 "Amstrad plc",   "PenPad PDA 600",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY        FULLNAME       FLAGS */
+COMP( 1993, pda600,  0,       0,     pda600,    pda600,   0,  "Amstrad plc", "PenPad PDA 600", GAME_NOT_WORKING | GAME_NO_SOUND)

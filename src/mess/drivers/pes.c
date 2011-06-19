@@ -227,7 +227,7 @@ void pes_state::machine_reset()
 ******************************************************************************/
 /*static TIMER_CALLBACK( serial_read_cb )
 {
-    machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
+	machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
 }*/
 
 DRIVER_INIT( pes )
@@ -263,15 +263,15 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 static MACHINE_CONFIG_START( pes, pes_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", I80C31, CPU_CLOCK)
-    MCFG_CPU_PROGRAM_MAP(i80c31_mem)
-    MCFG_CPU_IO_MAP(i80c31_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I80C31, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(i80c31_mem)
+	MCFG_CPU_IO_MAP(i80c31_io)
 
-    /* sound hardware */
-    MCFG_SPEAKER_STANDARD_MONO("mono")
-    MCFG_SOUND_ADD("tms5220", TMS5220C, 720000) /* 720Khz clock, 10khz output */
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("tms5220", TMS5220C, 720000) /* 720Khz clock, 10khz output */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,pes_terminal_intf)
@@ -293,5 +293,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY     FULLNAME            FLAGS */
-COMP( 1987, pes,	0,		0,		pes,		pes,	pes,	"Pacific Educational Systems",	"VPU-01 Speech box",	GAME_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                        FULLNAME            FLAGS */
+COMP( 1987, pes,    0,      0,      pes,        pes,    pes, "Pacific Educational Systems", "VPU-01 Speech box", GAME_NOT_WORKING )
