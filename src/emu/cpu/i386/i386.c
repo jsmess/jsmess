@@ -422,7 +422,6 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 
 		cpustate->TF = 0;
 		cpustate->IF = 0;
-
 	}
 	else
 	{
@@ -1363,7 +1362,6 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 				break;
 			case 0x04:  // 286 call gate
 			case 0x0c:  // 386 call gate
-				logerror("CALL: Call gate at %08x\n",cpustate->pc);
 				if((desc.flags & 0x000f) == 0x04)
 					operand32 = 0;
 				else
@@ -1372,6 +1370,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 				gate.segment = selector;
 				i386_load_call_gate(cpustate,&gate);
 				DPL = gate.dpl;
+				logerror("CALL: Call gate at %08x (%i parameters)\n",cpustate->pc,gate.dword_count);
 				if(DPL < CPL)
 				{
 					logerror("CALL: Call gate DPL %i is less than CPL %i.\n",DPL,CPL);
@@ -1790,6 +1789,7 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 				FAULT(FAULT_SS,0)
 			}
 		}
+
 		/* Check CS selector and descriptor */
 		if((newCS & ~0x07) == 0)
 		{
@@ -1897,6 +1897,11 @@ static void i386_protected_mode_retf(i386_state* cpustate, UINT8 count, UINT8 op
 			REG32(ESP) = newESP;
 		cpustate->sreg[SS].selector = newSS;
 		i386_load_segment_descriptor(cpustate, SS );
+
+		if(operand32 == 0)
+			REG16(SP) += count;
+		else
+			REG32(ESP) += count;
 
 		/* Check that DS, ES, FS and GS are valid for the new privilege level */
 		i386_check_sreg_validity(cpustate,DS);
