@@ -1388,6 +1388,7 @@ $(MESSOBJ)/sharp.a:				\
 	$(MESS_MACHINE)/x1.o		\
 	$(MESS_DRIVERS)/mz2500.o	\
 	$(MESS_DRIVERS)/pce220.o	\
+	$(MESS_MACHINE)/pce220_ser.o	\
 	$(MESS_DRIVERS)/mz6500.o	\
 
 $(MESSOBJ)/sinclair.a:			\

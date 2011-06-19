@@ -21,6 +21,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "sound/beep.h"
+#include "machine/pce220_ser.h"
 #include "rendlay.h"
 
 // Interrupt flags
@@ -35,12 +36,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_ram(*this, RAM_TAG),
-		  m_beep(*this, BEEPER_TAG)
+		  m_beep(*this, BEEPER_TAG),
+		  m_serial(*this, PCE220SERIAL_TAG)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_ram;
 	required_device<device_t> m_beep;
+	required_device<pce220_serial_device> m_serial;
 
 	// HD61202 LCD controller
 	UINT8 m_lcd_index_row;
@@ -56,6 +59,9 @@ public:
 	UINT16 m_kb_matrix;
 	UINT8 *m_vram;
 
+	UINT8 m_port15;
+	UINT8 m_port18;
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
@@ -70,6 +76,7 @@ public:
 	DECLARE_WRITE8_MEMBER( timer_w );
 	DECLARE_WRITE8_MEMBER( boot_bank_w );
 	DECLARE_READ8_MEMBER( port15_r );
+	DECLARE_WRITE8_MEMBER( port15_w );
 	DECLARE_READ8_MEMBER( port18_r );
 	DECLARE_WRITE8_MEMBER( port18_w );
 	DECLARE_READ8_MEMBER( port1f_r );
@@ -288,7 +295,14 @@ READ8_MEMBER( pce220_state::port15_r )
     x--- ---- XIN input enabled
     ---- ---0
     */
-	return 0;
+	return m_port15;
+}
+
+WRITE8_MEMBER( pce220_state::port15_w )
+{
+	m_serial->enable_interface(BIT(data, 7));
+
+	m_port15 = data;
 }
 
 READ8_MEMBER( pce220_state::port18_r )
@@ -298,12 +312,19 @@ READ8_MEMBER( pce220_state::port18_r )
     ---- --x- DOUT
     ---- ---x BUSY/CTS
     */
-	return 0;
+
+	return m_port18;
 }
 
 WRITE8_MEMBER( pce220_state::port18_w )
 {
 	beep_set_state(m_beep, BIT(data, 7));
+
+	m_serial->out_busy(BIT(data, 0));
+	m_serial->out_dout(BIT(data, 1));
+	m_serial->out_xout(BIT(data, 7));
+
+	m_port18 = data;
 }
 
 READ8_MEMBER( pce220_state::port1f_r )
@@ -315,7 +336,15 @@ READ8_MEMBER( pce220_state::port1f_r )
     ---- ---x DIN
     */
 
-	return input_port_read(machine(), "ON")<<7;
+	UINT8 data = 0;
+
+	data |= m_serial->in_din()<<0;
+	data |= m_serial->in_ack()<<1;
+	data |= m_serial->in_xin()<<2;
+
+	data |= input_port_read(machine(), "ON")<<7;
+
+	return data;
 }
 
 WRITE8_MEMBER( pce220_state::kb_matrix_w )
@@ -489,7 +518,7 @@ static ADDRESS_MAP_START( pce220_io , AS_IO, 8, pce220_state)
 	AM_RANGE(0x11, 0x12) AM_WRITE(kb_matrix_w)
 	AM_RANGE(0x13, 0x13) AM_READ_PORT("SHIFT")
 	AM_RANGE(0x14, 0x14) AM_READWRITE(timer_r, timer_w)
-	AM_RANGE(0x15, 0x15) AM_READ(port15_r) AM_WRITENOP
+	AM_RANGE(0x15, 0x15) AM_READWRITE(port15_r, port15_w)
 	AM_RANGE(0x16, 0x16) AM_READWRITE(irq_status_r, irq_ack_w)
 	AM_RANGE(0x17, 0x17) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x18, 0x18) AM_READWRITE(port18_r, port18_w)
@@ -499,7 +528,7 @@ static ADDRESS_MAP_START( pce220_io , AS_IO, 8, pce220_state)
 	AM_RANGE(0x1c, 0x1c) AM_WRITENOP //peripheral reset
 	AM_RANGE(0x1d, 0x1d) AM_READ_PORT("BATTERY")
 	AM_RANGE(0x1e, 0x1e) AM_WRITENOP //???
-	AM_RANGE(0x1f, 0x1f) AM_READ(port1f_r) AM_WRITENOP
+	AM_RANGE(0x1f, 0x1f) AM_READ(port1f_r)
 	AM_RANGE(0x58, 0x58) AM_WRITE(lcd_control_w)
 	AM_RANGE(0x59, 0x59) AM_READ(lcd_status_r)
 	AM_RANGE(0x5a, 0x5a) AM_WRITE(lcd_data_w)
@@ -513,7 +542,7 @@ static ADDRESS_MAP_START( pcg850v_io , AS_IO, 8, pcg850v_state)
 	AM_RANGE(0x11, 0x12) AM_WRITE(kb_matrix_w)
 	AM_RANGE(0x13, 0x13) AM_READ_PORT("SHIFT")
 	AM_RANGE(0x14, 0x14) AM_READWRITE(timer_r, timer_w)
-	AM_RANGE(0x15, 0x15) AM_READ(port15_r) AM_WRITENOP
+	AM_RANGE(0x15, 0x15) AM_READWRITE(port15_r, port15_w)
 	AM_RANGE(0x16, 0x16) AM_READWRITE(irq_status_r, irq_ack_w)
 	AM_RANGE(0x17, 0x17) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x18, 0x18) AM_READWRITE(port18_r, port18_w)
@@ -523,7 +552,7 @@ static ADDRESS_MAP_START( pcg850v_io , AS_IO, 8, pcg850v_state)
 	AM_RANGE(0x1c, 0x1c) AM_WRITENOP //peripheral reset
 	AM_RANGE(0x1d, 0x1d) AM_READ_PORT("BATTERY")
 	AM_RANGE(0x1e, 0x1e) AM_WRITENOP //???
-	AM_RANGE(0x1f, 0x1f) AM_READ(port1f_r) AM_WRITENOP
+	AM_RANGE(0x1f, 0x1f) AM_READ(port1f_r)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(g850v_lcd_status_r, g850v_lcd_control_w)
 	AM_RANGE(0x41, 0x41) AM_READWRITE(g850v_lcd_data_r, g850v_lcd_data_w)
 	AM_RANGE(0x69, 0x69) AM_READWRITE(g850v_bank_r, g850v_bank_w)
@@ -534,9 +563,11 @@ static INPUT_CHANGED( kb_irq )
 	pce220_state *state = field.machine().driver_data<pce220_state>();
 
 	if (state->m_irq_mask & IRQ_FLAG_KEY)
+	{
 		device_set_input_line( state->m_maincpu, 0, newval ? ASSERT_LINE : CLEAR_LINE );
 
-	state->m_irq_flag = (state->m_irq_flag & 0xfe) | (newval & 0x01);
+		state->m_irq_flag = (state->m_irq_flag & 0xfe) | (newval & 0x01);
+	}
 }
 
 static INPUT_CHANGED( on_irq )
@@ -544,9 +575,11 @@ static INPUT_CHANGED( on_irq )
 	pce220_state *state = field.machine().driver_data<pce220_state>();
 
 	if (state->m_irq_mask & IRQ_FLAG_ON)
+	{
 		device_set_input_line( state->m_maincpu, 0, newval ? ASSERT_LINE : CLEAR_LINE );
 
-	state->m_irq_flag = (state->m_irq_flag & 0xfd) | ((newval & 0x01)<<1);
+		state->m_irq_flag = (state->m_irq_flag & 0xfd) | ((newval & 0x01)<<1);
+	}
 }
 
 /* Input ports */
@@ -815,10 +848,12 @@ static TIMER_DEVICE_CALLBACK(pce220_timer_callback)
 
 	state->m_timer_status = !state->m_timer_status;
 
-	state->m_irq_flag = (state->m_irq_flag&0xfb) | (state->m_timer_status<<2);
-
 	if (state->m_irq_mask & IRQ_FLAG_TIMER)
+	{
 		device_set_input_line( state->m_maincpu, 0, HOLD_LINE );
+
+		state->m_irq_flag = (state->m_irq_flag & 0xfb) | (state->m_timer_status<<2);
+	}
 }
 
 static PALETTE_INIT(pce220)
@@ -857,6 +892,8 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+
+	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pcg850v, pcg850v_state )
@@ -888,6 +925,8 @@ static MACHINE_CONFIG_START( pcg850v, pcg850v_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+
+	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
 
 /* ROM definition */
