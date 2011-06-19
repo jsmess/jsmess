@@ -755,7 +755,10 @@ static READ8_HANDLER( saturn_SMPC_r8 )
 			const int shift_bit[4] = { 4, 12, 8, 0 };
 			const char *const padnames[] = { "JOY1", "JOY2" };
 
-			hshake = (state->m_smpc.PDR1>>5) & 3;
+			if(offset == 0x75)
+				hshake = (state->m_smpc.PDR1>>5) & 3;
+			else
+				hshake = (state->m_smpc.PDR2>>5) & 3;
 
 			if (LOG_SMPC) logerror("SMPC: SH-2 direct mode, returning data for phase %d\n", hshake);
 
