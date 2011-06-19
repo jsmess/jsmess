@@ -1,0 +1,91 @@
+<tests>
+
+<imgtooltest name="mac_001">
+	<!-- Basic Mac tests -->
+	<createimage driver="apple35_dc_mac_mfs"/>
+	<checkdirectory/>
+
+	<putfile name="Foo">'Hello World!'</putfile>
+	<checkdirectory>
+		<entry name="Foo" size="12"/>
+	</checkdirectory>
+	<checkfile name="Foo">'Hello World!'</checkfile>
+
+	<putfile name="Bar">'Dingus!'</putfile>
+	<checkdirectory>
+		<entry name="Foo" size="12"/>
+		<entry name="Bar" size="7"/>
+	</checkdirectory>
+	<checkfile name="Foo">'Hello World!'</checkfile>
+	<checkfile name="Bar">'Dingus!'</checkfile>
+
+	<putfile name="Foo"/>
+	<checkdirectory>
+		<entry name="Foo" size="0"/>
+		<entry name="Bar" size="7"/>
+	</checkdirectory>
+	<checkfile name="Foo"/>
+	<checkfile name="Bar">'Dingus!'</checkfile>
+<!--
+	<deletefile name="Bar"/>
+	<checkdirectory>
+		<entry name="Foo" size="0"/>
+	</checkdirectory>
+	<checkfile name="Foo"/>
+-->
+</imgtooltest>
+
+<imgtooltest name="mac_002">
+	<!-- Testing larger files -->
+	<createimage driver="apple35_dc_mac_mfs"/>
+
+	<putfile name="Foo">'Abcdefg' * 111</putfile>
+	<checkdirectory>
+		<entry name="Foo" size="777"/>
+	</checkdirectory>
+	<checkfile name="Foo">'Abcdefg' * 111</checkfile>
+
+	<putfile name="Foo">'Abcdefghijk' * 2010</putfile>
+	<checkdirectory>
+		<entry name="Foo" size="22110"/>
+	</checkdirectory>
+	<checkfile name="Foo">'Abcdefghijk' * 2010</checkfile>
+
+	<putfile name="Foo">'Abcdefg' * 111</putfile>
+	<checkdirectory>
+		<entry name="Foo" size="777"/>
+	</checkdirectory>
+	<checkfile name="Foo">'Abcdefg' * 111</checkfile>
+<!--
+	<deletefile name="Foo"/>
+	<checkdirectory/>
+-->
+</imgtooltest>
+
+<imgtooltest name="mac_003">
+	<!-- Testing many files -->
+	<createimage driver="apple35_dc_mac_mfs"/>
+
+	<putfile name="1 File"/>
+	<putfile name="2 File"/>
+	<putfile name="3 File"/>
+	<putfile name="4 File"/>
+	<putfile name="5 File"/>
+	<putfile name="6 File"/>
+	<putfile name="7 File"/>
+	<putfile name="8 File"/>
+	<putfile name="9 File"/>
+	<checkdirectory>
+		<entry name="1 File"/>
+		<entry name="2 File"/>
+		<entry name="3 File"/>
+		<entry name="4 File"/>
+		<entry name="5 File"/>
+		<entry name="6 File"/>
+		<entry name="7 File"/>
+		<entry name="8 File"/>
+		<entry name="9 File"/>
+	</checkdirectory>
+</imgtooltest>
+
+</tests>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Mattel Aquarius (TOSEC-v0.40) -->
+	<hash crc32="5dd79191" name="Alien Quest (Part 1 of 2)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="689f7866" name="Alien Quest (Part 2 of 2)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5cfa5b42" name="Aquarius BASIC ROM">
+		<year>1982</year>
+		<manufacturer>Microsoft</manufacturer>
+	</hash>
+	<hash crc32="ce76c898" name="Astrosmash">
+		<year>1982</year>
+		<manufacturer>Mattel</manufacturer>
+	</hash>
+	<hash crc32="11332b7b" name="Cute Cubes (Part 1 of 2)">
+		<year>19??</year>
+		<manufacturer>K. Baker</manufacturer>
+	</hash>
+	<hash crc32="c06bb781" name="Cute Cubes (Part 2 of 2)">
+		<year>19??</year>
+		<manufacturer>K. Baker</manufacturer>
+	</hash>
+	<hash crc32="a7d29abd" name="Fileform">
+		<year>1982</year>
+		<manufacturer>Mattel</manufacturer>
+	</hash>
+	<hash crc32="366a6a5b" name="Fileform [a]">
+		<year>1982</year>
+		<manufacturer>Mattel</manufacturer>
+	</hash>
+	<hash crc32="218ccb45" name="Macho Man (Part 1 of 2)">
+		<year>19??</year>
+		<manufacturer>K. Baker</manufacturer>
+	</hash>
+	<hash crc32="0556d6bb" name="Macho Man (Part 2 of 2)">
+		<year>19??</year>
+		<manufacturer>K. Baker</manufacturer>
+	</hash>
+	<hash crc32="608efa0a" name="Mould (Part 1 of 2)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="931d2378" name="Mould (Part 2 of 2)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="032ae514" name="Night Stalker">
+		<year>1982</year>
+		<manufacturer>Mattel</manufacturer>
+	</hash>
+	<hash crc32="aed0ea34" name="Snafu">
+		<year>1982</year>
+		<manufacturer>Mattel</manufacturer>
+	</hash>
+	<hash crc32="a99430b3" name="Stalactites (Part 1 of 2)">
+		<year>1984</year>
+		<manufacturer>K. Baker</manufacturer>
+	</hash>
+	<hash crc32="97db4daf" name="Stalactites (Part 2 of 2)">
+		<year>1984</year>
+		<manufacturer>K. Baker</manufacturer>
+	</hash>
+	<hash crc32="9674f096" name="Torment (Part 1)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="53b0fdf1" name="Torment (Part 2)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6d6ebd1d" name="Tron - Deadly Discs">
+		<year>1982</year>
+		<manufacturer>Mattel</manufacturer>
+	</hash>
+	<hash crc32="1fc3002e" name="Utopia">
+		<year>1982</year>
+		<manufacturer>Mattel</manufacturer>
+	</hash>
+	<hash crc32="469222ab" name="Window (PD)">
+		<year>2000</year>
+	</hash>
+</hashfile>

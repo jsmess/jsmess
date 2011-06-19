@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="HTML Tidy for Cygwin (vers 1st September 2004), see www.w3.org" />
+<title>MESS FAQ</title>
+<link href="style.css" type="text/css" rel="StyleSheet" />
+</head>
+<body>
+
+<h1>MESS FAQ</h1>
+<h2>About this FAQ</h2>
+<ul>
+<li><a href="#a01">MESS FAQ?</a></li>
+</ul>
+<h2>General</h2>
+<ul>
+<li><a href="#g01">What is MESS?</a></li>
+<li><a href="#g02">What is the purpose of MESS?</a></li>
+<li><a href="#g03">What is an emulator and a simulator?</a></li>
+<li><a href="#g04">What makes MESS different from other emulators?</a></li>
+<li><a href="#g05">Is MESS really free?</a></li>
+<li><a href="#g06">Isn't MESS the same as MAME?</a></li>
+<li><a href="#g07">Why don't MESS and MAME merge?</a></li>
+<li><a href="#g08">How come my emails to the MESS developers do not receive replies?</a></li>
+</ul>
+<h2>Starting Up</h2>
+<ul>
+<li><a href="#s01">What do I need to run MESS?</a></li>
+<li><a href="#s02">What is a BIOS?/What is a ROM?/What's a disk image?</a></li>
+<li><a href="#s03">Where do I get BIOSes/ROMs?/How do I use my old software with MESS?</a></li>
+<li><a href="#s04">Okay, I got some BIOSes and images, now where do I put them?</a></li>
+<li><a href="#s05">How do I run the MESS application?</a></li>
+<li><a href="#s06">I did everything just like you said, but it still doesn't work!</a></li>
+<li><a href="#s07">It works, but why is it slow?</a></li>
+<li><a href="#s08">How can I speed MESS up?</a></li>
+<li><a href="#s09">For some reason, ESC does not quit MESS nor does TAB bring up the menu!</a></li>
+</ul>
+<h2>How Do I...</h2>
+<ul>
+<li><a href="#h01">How do I set up the screenshots/snapshots folder for MESS?</a></li>
+<li><a href="#h02">How do get screenshots?</a></li>
+<li><a href="#h03">How do I compile/build/debug MESS for Windows?</a></li>
+<li><a href="#h04">How do I compile/build/debug MESS with Visual C?</a></li>
+<li><a href="#h05">How do I compile/build/debug MESS for Un*x?</a></li>
+<li><a href="#h06">How do I contribute to the MESS project?</a></li>
+</ul>
+<h2>Trouble Shooting</h2>
+<ul>
+<li><a href="#t01">I have found a bug; what can I do to help the MESS developers fix it?</a></li>
+<li><a href="#t02">My English is not good. I do not understand!</a></li>
+</ul>
+<h2>MESS FAQ?</h2>
+<p>This FAQ was written to support <a href="http://www.mess.org/">MESS</a>. If you have any changes, suggestions or additions please contact the <a href="http://www.mess.org/">MESS</a> team. Changes will be made as time is available. If you have a question that is not answered in this FAQ, try the searching the <a href="http://www.mess.org/">MESS</a> message boards. There is a wealth of
+information there already.</p>
+<h2 id="g01">What is MESS?</h2>
+<p><a href="http://www.mess.org/">MESS</a> is an acronym that stands for Multi Emulator Super System. <a href="http://www.mess.org/">MESS</a> will more or less faithfully reproduce computer and console systems on a PC. <a href="http://www.mess.org/">MESS</a> can currently emulate over 250 systems from the last 5 decades.</p>
+<p><a href="http://www.mess.org/">MESS</a> emulates the hardware of the systems and sometimes utilizes ROM images to load programs and games. Therefore, these systems are NOT simulations, but the actual emulations of the hardware.</p>
+<h2 id="g02">What is the purpose of MESS?</h2>
+<p>The primary purpose of <a href="http://www.mess.org/">MESS</a> is to preserve decades of computer and console history. As technology continues to rush forward, <a href="http://www.mess.org/">MESS</a> prevents these important "vintage" systems from being lost and forgotten. <a href="http://www.mess.org/">MESS</a> is based on <a href="http://www.mamedev.org/">MAME</a> . Additional information about
+<a href="http://www.mess.org/">MESS</a> or <a href="http://www.mamedev.org/">MAME</a> can be found at <a href="http://www.mess.org/">www.mess.org</a> or <a href="http://www.mamedev.org/">www.mamedev.org</a>.</p>
+<h2 id="g03">What is an emulator and a simulator?</h2>
+<p>An <i>emulator</i> attempts to recreate the original functions of the hardware. Software run on a emulator should perform exactly as if it were being run on the original hardware.</p>
+<p>A <i>simulator</i> attempts to recreate the original functions of the software, essentially imitating the game or software. The end results may look very similar between emulation and simulation but they are very different in how they are implemented.</p>
+<p><a href="http://www.mess.org/">MESS</a> and <a href="http://www.mamedev.org/">MAME</a> are both emulators. <a href="http://www.mess.org/">MESS</a> emulates computer and console systems, and <a href="http://www.mamedev.org/">MAME</a> emulates arcade games. This may include bugs or flaws that were on the original system.</p>
+
+<h2 id="g04">What makes MESS different from other emulators?</h2>
+
+<ul>
+<li><a href="http://www.mess.org/">MESS</a> emulates many types of systems (console, computer, handheld, calculator etc...), not just one like some other emulators.</li>
+<li><a href="http://www.mess.org/">MESS</a> is free.</li>
+<li><a href="http://www.mess.org/">MESS</a> is open source so anyone who knows the C programming language can help improve the project.</li>
+<li>The architecture of <a href="http://www.mess.org/">MESS</a> makes it easy to add lesser known systems.</li>
+<li><a href="http://www.mess.org/">MESS</a> strives for accuracy and portability above all else.</li>
+</ul>
+<p>The primary objective of <a href="http://www.mess.org/">MESS</a> is to accurately emulate multiple systems. Most stand alone emulators/simulators often focus on letting you play games on your PC. They often include speed hacks or fudge things to make them <i>look</i> right. The philosophy of MESS is to behave <u>exactly</u> like the original hardware, even if it
+is slower, so that <u>all</u> software for the original machine will work as it would on the original hardware. The focus on accuracy tends to make MESS a bit slower than other emulators, but this is not always true.</p>
+
+<h2 id="g05">Is MESS really free?</h2>
+
+<p>Yes, <a href="http://www.mess.org/">MESS</a> is really free. The source code is freely available, too. It is illegal to sell <a href="http://www.mess.org/">MESS</a> or its source.</p>
+<h2 id="g06">Isn't MESS the same as MAME?</h2>
+<p>No. <a href="http://www.mess.org/">MESS</a> is based on <a href="http://www.mamedev.org/">MAME</a>, and uses the same underlying engine, but its goals are different. To put it simply, <a href="http://www.mamedev.org/">MAME</a> is for arcade machines, and <a href="http://www.mess.org/">MESS</a> is for home computers and video game consoles.</p>
+
+<h2 id="g07">Why don't MESS and MAME merge?</h2>
+
+<p>It is could be possible in the future but right now each is targeting a set of systems to emulate. MESS is built on top of the MAME infrastructure and they share many of the same CPU code. The teams work very close and many developers contribute to both projects. Many arcade systems emulated in MAME are based on or related to consoles emulated in MESS. There is a mutual benefit in testing and development of these related drivers.</p>
+
+<p>The MESS project keeps up-to-date with changes to the core MAME system, and generally releases shortly after each major MAME release.</p>
+
+<h2 id="g08">How come my emails to the MESS developers do not receive replies?</h2>
+
+<p>The <a href="http://www.mess.org/">MESS</a> developers receive a large volume of email, and also suffer from "Real life syndrome", and thus might not be able to reply, particularly when such questions are answered in this FAQ. Your best bet is to ask a question on the <a href="http://www.mess.org/">MESS</a> message board at <a href="http://www.mess.org/">http://www.mess.org/</a></p>
+
+<h2 id="s01">What do I need to run MESS?</h2>
+<p>In general a PC with a decent processor should run most of the systems at a decent speed. There are an enormous variety of systems emulated and each system has its own requirements. The best thing to do is try the system you are interested in. But remember accuracy is the primary goal not speed.</p>
+
+<h2 id="s02">What is a BIOS?/What's a ROM?/What is a disk image?</h2>
+
+<p>First, it is important to note that in the emulation world, the term ROM is used to refer to two different things:</p>
+<ol>
+<li>The ROM chips within a computer system, that usually contain some form of BASIC or the like</li>
+<li>The ROM chips within a game cartridge for a console system</li>
+</ol>
+<p>In <a href="http://www.mess.org/">MESS</a>, #1 are also termed as "BIOS", after what they are typically called in Intel PC systems. The term "cartridge image" is used to refer to #2, where "image" is a generic term that applies to downloaded images of removable media, whether they be a cartridge, a floppy drive, or a hard
+disk.</p>
+
+<h2 id="s03">Where do I get BIOSes/ROMs?/How do I use my old software with MESS?</h2>
+
+<p>In most cases, old software is physically incompatible with modern computers. No matter how hard you push, an Atari cartridge just plain won't fit in your computer's floppy drive. Folding up old 5 1/4" diskettes so they fit in a 3 1/2" drive will only break your disks. Obviously there is a problem here - how do I get that software into my PC so an emulator can use it?</p>
+<p>It is possible to build special cartridge reading devices for console systems and hook up old computers to new ones to transfer floppy disks. These media get transferred into files on the new computer.</p>
+<p>Now, originally emulation was just for hobbyists who had all this special equipment, but some of them put these BIOSes and images up on the Internet for people to download, on the honor system that people would only download the BIOSes and images that they owned the original software for. Unfortunately, a lot of people came along who just wanted to download free games and did not care about
+preservation, and gave the emulation community a bad name among software companies. There are many BIOSes/images sites on the Internet, using a search engine should turn up the ones you want. But remember: downloading pirated BIOSes/images that you do not own is illegal. Some people say that the copyrights have expired or that you can download it if you delete it after 24 hours, but they are
+wrong. It is up to you whether you want to ignore the law, as most of the games are not and will not ever be sold again.</p>
+<p>Most systems require BIOSes. <a href="http://www.mess.org/">MESS</a> is very picky about its BIOSes - they must be exactly the ones it is expecting, otherwise it may not work.</p>
+
+<h2 id="s04">Okay, I got some BIOSes and images, now where do I put them?</h2>
+
+<p>BIOSes should go, still zipped, in the "roms" subfolder of wherever you put <a href="http://www.mess.org/">MESS</a> (create it if it doesn't exist). Game images can go anywhere, although by default the GUI will look in the software\[system name] subfolder of your MESS folder. They can still be zipped, but only one image per zip file.</p>
+
+<h2 id="s05">How do I start the MESS application?</h2>
+
+<p>For DOS, type "mess [system] [device] [game] [options]", where [system] is the system driver name, [device] is the type of ROM, [game] is the filename of the ROM, and options are command line options. Valid [device] names (eg -cart and -flop) can be found by using "mess -listmedia" or "mess -listdevices".</p>
+<p>For example:<br />
+mess nes -cart C:\ROMs\NES\zelda.nes -nosound
+<p>This will run the Zelda game on the <a href="http://www.nintendo.com">Nintendo</a> system without sound.</p>
+<p>For UNIX/Linux, do the same thing except the name of the program is xmess.</p>
+<p>For Macintosh or Windows OS, run the MacMESS or messgui.exe application and click on the system or software you want to run.</p>
+
+<h2 id="s06">I did everything just like you said, but it still does not work!</h2>
+
+<p>There is a message board you can go to for help at <a href="http://www.mess.org/">http://www.mess.org</a>. But first, make sure you read this FAQ and the rest of the documentation. The answers can often be found there. Also check out the <a href="http://mamedev.org/devwiki/index.php?title=Frequently_Asked_Questions">MAME FAQs</a> at <a href="http://www.mamedev.org/">http://www.mamedev.org</a> --it is a very good resource for things common to
+<a href="http://www.mamedev.org/">MAME</a> and <a href="http://www.mess.org/">MESS</a>, such as sound and graphics setup. Also search through the message board to see if somebody already had the same problem. And at least put some effort into fixing it yourself. People on message boards can get very annoyed with people who ask questions that have already been answered elsewhere, especially in
+config.txt and windows.txt.</p>
+
+<h2 id="s07">It works, but why is it slow?</h2>
+
+<p><a href="http://www.mess.org/">MESS</a>' goal is compatibility over speed. Some computers might not be able to provide the needed power for full speed emulation. Many other emulators perform shortcuts that sacrifice compatibility in favor of performance, which is a valid tradeoff given a different set of design goals. With MESS, your CPU is doing the jobs of the CPU(s), graphics chip(s), sound chip(s), as well as any other special hardware present in the original machine, so it can be bogged down fairly easily, especially by the relatively unoptimized MESS core. MESS is written almost entirely in C, not assembly, for compatibility and portability reasons. Additionally, there is a level of overhead required to get the level of modularity that it takes to have the myriad components in the emulation be usable across a broad set of drivers.</p>
+
+<h2 id="s08">How can I speed MESS up?</h2>
+
+<p>There are some tweaks you can do to speed up the performance a bit (see the <a href="http://www.mamedev.org/">MAME</a> FAQ), but if you need a big boost, there is not much you can do except buy a faster computer. Some speed issues can be solved by selecting an appropriate display method. Refer to CONFIG.TXT to set MESS to run in the windowed mode and in the lowest resolution available. If it runs at a good speed systematically try different video options (e.g. resolution, yuvmode etc.) for the fullscreen mode until you get a satisfying result. As computers differ a lot in their graphical capabilities, there is no "best" configuration for all systems. You will have to find the best one for your system yourself.</p>
+
+<h2 id="s09">For some reason, ESC does not quit MESS nor does TAB bring up the menu!</h2>
+
+<p>In <a href="http://www.mess.org/">MESS</a> for Win32, there are two UIs use at runtime. There is the "Classic UI" which is derived from <a href="http://www.mamedev.org/">MAME</a>'s UI enabled by default.  There is the optional "New UI" which uses a standard Windows menu bar to operate the emulation. By default, the New UI is disabled, and it may be
+    removed in the future.&nbsp; To use the "New UI", perform one of the following steps:</p>
+<ol>
+<li>When running the MESS GUI (messui.exe), choose "Options --&gt; Default System Options --&gt; Miscellaneous Tab" and check the "Use New UI" checkbox.</li>
+<li>If it exists, edit mess.ini and change the "newui" setting to "1". For more details on mess.ini, consult <a href="windows/win32cmd.htm">Using MESS at the Command Line</a></li>
+</ol>
+<h2 id="h01">How do I set up the screenshots/snapshots folder for MESS?</h2>
+<p>The snapshot (aka screenshot) folder is the place to store images to be displayed in the GUI. It can display in-game/software images and system images, or anything else as long as it is named correctly.</p>
+<p>The snapshot folder can be configured in the Directories... window under the Options menu in the GUI. The default screen folder is snap. Store system images with the system name. Store software/game snapshots in a folder under the system they belong to.</p>
+<p>For example:<br />
+mess/snap/a2600.png &lt;&lt;&lt; This is a picture of an Atari system. The name needs to match the driver.<br />
+mess/snap/a2600/junglehunt.png &lt;&lt;&lt; This is an in-game screenshot of the game Jungle Hunt. The name needs to match game name.</p>
+<h2 id="h02">How do get screenshots?</h2>
+<p>You can take your own screen shots by selecting the 'Save Screenshot' option in the file menu while in emulation. This will save an image in the png format with the name of the driver (if one does not exist already). If an image already exists an a sequential number will be added to the name (for example coco.png, coco0000.png, coco0001.png etc...).</p>
+<p>You can also find many images on various emulation or download images from the internet at various sites. Try your favorite search engine.</p>
+<h2 id="h03">How do I compile/build/debug MESS for Windows?</h2>
+<p>For Windows, see the <a href="windows/compile.htm">How to compile MESS (Win32)</a> document. Compiling <a href="http://www.mess.org/">MESS</a> for Windows requires the <a href="http://www.mingw.org">MinGW</a> toolkit, a variant of <a href="http://gcc.gnu.org">GCC</a>. <a href="http://www.mingw.org">MinGW</a> comes with a variant of GDB for debugging.</p>
+
+<h2 id="h04">How do I compile/build/debug MESS with Visual C?</h2>
+
+<p>You can invoke the build with MSVC_BUILD=1 and the build will use Visual C instead of <a href="http://www.mingw.org">MinGW</a>.&nbsp; Note that <a href="http://www.mingw.org">MinGW</a> is still required as <a href="http://www.gnu.org/software/make/">GNU make</a> is used rather than nmake. Using the Microsoft compilers allows one to use the Visual C debugger to debug <a href="http://www.mess.org/">MESS</a>, but one does not get the full benefits of the IDE.</p>
+
+<h2 id="h05">How do I compile/build/debug MESS for Un*x?</h2>
+
+<p>See <a href="http://rbelmont.mameworld.info/?page_id=163">SDLMESS</a>.</p>
+
+<h2 id="h06">How do I contribute to the MESS project?</h2>
+<p>If you have programming skills, you can download the source and fix bugs, improve emulation on existing systems or add a new one! If you fix anything, be sure to submit the fixes so they can be included in the source. Be advised that corrections or additions may not be accepted if they are hackish in nature; <a href="http://www.mess.org/">MESS</a> strives for accuracy both in emulation and in
+the source code. Another major concern is the verifiability of the changes. One major obstacle in <a href="http://www.mess.org/">MESS</a> that often the <a href="http://www.mess.org/">MESS</a> maintainer may understand the system much less than you do, and it can be very difficult for the <a href="http://www.mess.org/">MESS</a> maintainer to validate any changes, so changes submitted
+to&nbsp;<a href="http://www.mess.org/">MESS</a>&nbsp;<strong>should be accompanied with instructions on how to run the system and how to run specific software that failed to run before, but runs after the changes</strong>.&nbsp;It generally does not suffice to simply say "Look at page XYZ.&nbsp; It provides complete information on how to run the WowieZowie system." The <a href="http://www.mess.org/">MESS</a> &nbsp;developers need to know the specifics, and cannot&nbsp;run around&nbsp;how to use a very obscure system just to save the time&nbsp;of a submitter.</p>
+<p>As an alternative, one way to contribute is to modernize drivers. Over <a href="http://www.mamedev.org/">MAME</a>'s/<a href="http://www.mess.org/">MESS</a>'s lifetime, there have been core improvements for which not all drivers have been modified to take advantage. These techniques include:</p>
+<ul>
+<li>Unified read/write address maps</li>
+<li>Natural keyboard support</li>
+<li>Tagged input ports</li>
+</ul>
+For details on what these mean, it is probably best to ask about them on the <a href="http://www.mess.org/">MESS</a> message board.
+<p>If you do not have programming skills, you can help by documenting emulated systems and software, adding FAQ entries, reporting bugs, submitting artwork and so on - anything to assist those with programming skills and improve the project.</p>
+
+<h2 id="t01">I have found a bug; what can I do to help the MESS developers fix it?</h2>
+
+<p>If you are comfortable programming C, you can download the <a href="http://www.mess.org/">MESS</a> source code and attempt to fix it yourself. If you have questions about the MESS source, ask them on the MESS message board.</p>
+<p>If you are not comfortable programming C, the best thing for you to do is to create a bug report at <a href="http://bugzilla.mess.org">MESS Bugzilla</a>. When reporting a bug, make sure to include as much information as possible, including snapshots, links, descriptions, and instructions. Keep in mind that MESS emulates hundreds of systems and the reader may not be familiar with the system or driver you are reporting a bug in. A bug report with simple, clear instructions and a reproducible case is much more likely to get fixed. Also, if you know a previous version of MESS that worked correctly please include that information.</p>
+
+<h2 id="t02">My English is not good. I do not understand!</h2>
+
+<p>If you ask for help on the message board, post it in both English and your native language. Many people there speak more than one language and may be able to help you in your native language. Also, visit <a href="http://babelfish.altavista.com">http://babelfish.altavista.com</a>. They have a translation program that can translate between English and most European languages as well as a number of other languages. </p>
+
+</body>
+</html>

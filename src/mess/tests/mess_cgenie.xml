@@ -1,0 +1,8 @@
+<tests>
+
+<test name="cgenie_000" driver="cgenie">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+</tests>

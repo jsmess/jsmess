@@ -1,0 +1,249 @@
+<hashfile>
+	<!-- Nascom series image CRC List -->
+	<!-- Compiled by Stefano &quot;JoJo&quot; Priore -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<!-- Send corrections/submissions to: battlepriest@hotmail.com -->
+	<!-- These programs have been tested and work -->
+	<hash crc32="78fd2aa7" name="3D-Labyrinth (E1000).nas"/>
+	<hash crc32="745baa26" name="3D-Labyrinth.cas">
+		<manufacturer>MpdK-Soft</manufacturer>
+		<status>Source Code in BLS Pascal 1.0 Format</status>
+	</hash>
+	<hash crc32="4aaa531e" name="3D-Maze (E1000).nas">
+		<manufacturer>K. K. S&#248;rensen</manufacturer>
+	</hash>
+	<hash crc32="9a5e56ee" name="Adventure Land.cas"/>
+	<hash crc32="2602b346" name="Aktive Filter.cas">
+		<year>1982</year>
+		<manufacturer>R&#252;diger Maurer</manufacturer>
+	</hash>
+	<hash crc32="249e0fe1" name="ASSCROL 2 (EB800).nas">
+		<manufacturer>Compware</manufacturer>
+	</hash>
+	<hash crc32="6950265c" name="Asteroids (E1000).nas">
+		<year>1982</year>
+		<manufacturer>Level 9 Computing</manufacturer>
+	</hash>
+	<hash crc32="55fc09c1" name="Avalanche (ED000).nas"/>
+	<hash crc32="2151a79a" name="BASIC 4.7 (EE000).nas">
+		<year>1978</year>
+		<manufacturer>Microsoft</manufacturer>
+	</hash>
+	<hash crc32="48ccc050" name="BASIC Extension for Advanced Video Card (EAEF6?).nas"/>
+	<hash crc32="344a3347" name="BLS PASCAL 1.0 ROM Version (ED000).nas">
+		<year>1981</year>
+		<manufacturer>Poly-Data Microcenter</manufacturer>
+	</hash>
+	<hash crc32="f50f0293" name="BLS PASCAL 1.2 RAM Version (E1000).nas">
+		<year>1981</year>
+		<manufacturer>Poly-Data Microcenter</manufacturer>
+	</hash>
+	<hash crc32="6d83059a" name="BLS PASCAL 1.3 (E1000).cas">
+		<manufacturer>Poly-Data Microcenter</manufacturer>
+		<status>BAD DUMP</status>
+	</hash>
+	<hash crc32="50603615" name="Breakout (E1000).cas">
+		<year>1980</year>
+		<manufacturer>Blue Label Software</manufacturer>
+	</hash>
+	<hash crc32="20f20885" name="Calculation of the Euler Number.cas">
+		<manufacturer>J&#246;rg Wittich</manufacturer>
+		<status>Source Code in ZEAP 2.x Format</status>
+	</hash>
+	<hash crc32="b7552ec4" name="Camel.cas"/>
+	<hash crc32="cf1ff446" name="Car Racing (E1000).nas">
+		<manufacturer>Nobody</manufacturer>
+	</hash>
+	<hash crc32="ef905b05" name="Character Set for &quot;Graphic PROM Editor&quot;.nas">
+		<status>Stored at $8000</status>
+	</hash>
+	<hash crc32="8dbc69a9" name="COMPASS 1.3 (E1000).nas">
+		<year>1982</year>
+		<manufacturer>Level 9 Computing</manufacturer>
+	</hash>
+	<hash crc32="63bdc22d" name="Das Damespiel.cas">
+		<year>1980</year>
+	</hash>
+	<hash crc32="9c5f13d6" name="Disasm (E6000).nas"/>
+	<hash crc32="b3cd521e" name="Eliza (E1000).nas"/>
+	<hash crc32="c0c04911" name="Eprommer 1.1 (Driver for Prommer-80 ECB) (E8000).nas"/>
+	<hash crc32="c2f13fbe" name="Extention BASIC 1.3 (E1000).nas">
+		<year>1982</year>
+		<manufacturer>Level 9 Computing</manufacturer>
+		<status>Needs BASIC</status>
+	</hash>
+	<hash crc32="25c7272b" name="Falling Stones (E1000).cas">
+		<year>1981</year>
+		<manufacturer>Erling T. Madsen</manufacturer>
+	</hash>
+	<hash crc32="40196603" name="Fruit Machine (E4400).nas">
+		<year>1981</year>
+		<manufacturer>S. C. Allen</manufacturer>
+	</hash>
+	<hash crc32="21fa02cd" name="Game of Life (E1000).nas"/>
+	<hash crc32="2147b550" name="Gener-80 1.1 (E1000).nas">
+		<year>1983</year>
+	</hash>
+	<hash crc32="90298c74" name="Graphics PROM Editor (E1000).nas">
+		<year>1983</year>
+		<manufacturer>ZRL</manufacturer>
+		<status>Needs BASIC &amp; Character Set</status>
+	</hash>
+	<hash crc32="bb0c2b28" name="Hisoft PASCAL 1.0 (E1000).nas">
+		<year>1982</year>
+		<manufacturer>Hisoft</manufacturer>
+	</hash>
+	<hash crc32="7b384508" name="Hisoft PASCAL 1.5 (E1000).nas">
+		<year>1983</year>
+		<manufacturer>Hisoft</manufacturer>
+	</hash>
+	<hash crc32="8c2bf9f2" name="Hisoft PASCAL 2.0 with Screen Editor (E1000).nas">
+		<year>1983</year>
+		<manufacturer>Hisoft</manufacturer>
+	</hash>
+	<hash crc32="a7b15303" name="Hobbit (Driver for Philips Mini Digital Cassette Recorder) (ED000).nas">
+		<status>Needs NAS-SYS 3</status>
+	</hash>
+	<hash crc32="a0480895" name="Hole in the Wall (E1000).nas">
+		<year>1982</year>
+		<manufacturer>ZRL</manufacturer>
+		<status>Needs BASIC</status>
+	</hash>
+	<hash crc32="e18777f4" name="HullFORTH 1.1 (E1400).nas">
+		<year>1982</year>
+		<manufacturer>AFTW / PSC</manufacturer>
+	</hash>
+	<hash crc32="5454b1e8" name="Integer PASCAL Compiler (E1000).nas">
+		<year>1980</year>
+		<manufacturer>Paul Wood</manufacturer>
+	</hash>
+	<hash crc32="4d968139" name="Lemonade Stand.cas"/>
+	<hash crc32="75475343" name="Logichess (E1000).nas">
+		<year>1980</year>
+		<manufacturer>Blue Label Software</manufacturer>
+	</hash>
+	<hash crc32="91abcb15" name="Lollypop Lady Trainer (E1000).nas">
+		<status>Needs NAS-SYS 3</status>
+	</hash>
+	<hash crc32="54369479" name="Lord of Time (E1000).nas">
+		<manufacturer>Level 9 Computing</manufacturer>
+	</hash>
+	<hash crc32="3c8ed777" name="Lost Dutchman's Gold.cas">
+		<year>1980</year>
+		<manufacturer>Teri Li</manufacturer>
+	</hash>
+	<hash crc32="ddafd1a7" name="Lumberjack (E1000).nas">
+		<year>1980</year>
+		<manufacturer>Program Power</manufacturer>
+	</hash>
+	<hash crc32="faf86258" name="Lunar Lander (E1E6A).nas"/>
+	<hash crc32="72470f5b" name="Monster (E1000).nas">
+		<manufacturer>S. S. I. Realtime Games</manufacturer>
+	</hash>
+	<hash crc32="e3a2a06f" name="NAP 2.2 (E1000).nas"/>
+	<hash crc32="fece96a9" name="NASCALC (E5000).nas">
+		<status>Needs BASIC</status>
+	</hash>
+	<hash crc32="68842437" name="NAS-Chess (E1000).nas">
+		<status>Needs a custom character set (not dumped yet)</status>
+	</hash>
+	<hash crc32="f31b5256" name="Nascom PASCAL 2.0 ROM Version (ED000).nas">
+		<year>1981</year>
+		<manufacturer>Poly-Data Microcenter</manufacturer>
+	</hash>
+	<hash crc32="900b9ae8" name="Nascom-Schach (E1000).nas">
+		<year>1980</year>
+		<manufacturer>Bregulla / MKS</manufacturer>
+	</hash>
+	<hash crc32="ae6a6b48" name="NAS-DEBUG &amp; NAS-DIS (EC000).nas"/>
+	<hash crc32="fe20d501" name="NAS-FORTH 1.11 (E1000).nas"/>
+	<hash crc32="b539c523" name="NAS-Graphpac 1.0 (E1000).nas">
+		<year>1982</year>
+		<manufacturer>CCsoft</manufacturer>
+		<status>Needs BASIC</status>
+	</hash>
+	<hash crc32="22e39d5f" name="NASPEN 1.0 (EB800).nas">
+		<status>Needs NAS-SYS</status>
+	</hash>
+	<hash crc32="649c2d18" name="NASPEN 2.0 (E8000).nas">
+		<status>Needs NAS-SYS</status>
+	</hash>
+	<hash crc32="37bb2d73" name="NAS-SYS Programmers Toolkit (EB000).nas">
+		<status>Needs BASIC</status>
+	</hash>
+	<hash crc32="5c05ba65" name="Night Driver (E1000).cas">
+		<year>1983</year>
+		<manufacturer>OZ1AEX</manufacturer>
+	</hash>
+	<hash crc32="551c57bd" name="NIP 1.1 (EC400).nas"/>
+	<hash crc32="7dd26ed7" name="Pac Man (E1000).nas">
+		<manufacturer>2001 Jule-Manden</manufacturer>
+	</hash>
+	<hash crc32="5fcce477" name="Pac Man (Scrolling Display) (E1000).nas"/>
+	<hash crc32="e89ba8f2" name="Piranha (E1000).nas"/>
+	<hash crc32="0b8fa1f9" name="Return to Eden (E1000).nas">
+		<year>1984</year>
+		<manufacturer>Level 9 Computing</manufacturer>
+	</hash>
+	<hash crc32="1da17911" name="Reversi (E1000).nas"/>
+	<hash crc32="6c276b6b" name="Schiffe Versenken.cas">
+		<year>1981</year>
+		<manufacturer>Klaus Mombaur</manufacturer>
+	</hash>
+	<hash crc32="e0435228" name="Serpent (E1000).nas"/>
+	<hash crc32="e9fe4035" name="Skatte Jagt (E1000).cas">
+		<manufacturer>Henrik K. Jensen</manufacturer>
+	</hash>
+	<hash crc32="0f48a8c8" name="Snail Racing.cas"/>
+	<hash crc32="f2f79f58" name="Snowball (E1000).nas">
+		<year>1983</year>
+		<manufacturer>Level 9 Computing</manufacturer>
+	</hash>
+	<hash crc32="a9c6dffa" name="Space Invaders (E1000).nas"/>
+	<hash crc32="136d9d92" name="Space Invaders (alt) (E1000).nas">
+		<manufacturer>Helmut Emmelmann</manufacturer>
+	</hash>
+	<hash crc32="5e9c43eb" name="Space Zap (E1000).nas">
+		<manufacturer>Blue Label Software</manufacturer>
+	</hash>
+	<hash crc32="3abb6851" name="Starfighters (E1000).nas">
+		<year>1982</year>
+		<manufacturer>A. L. Cross</manufacturer>
+		<status>Needs digital joystick attached to the PIO</status>
+	</hash>
+	<hash crc32="590b4246" name="Star Trek.cas"/>
+	<hash crc32="e380b2b2" name="Super Tiny BASIC Interpreter 3.2 (E1000).nas"/>
+	<hash crc32="3fc16a3f" name="SuperTrace (EC000).nas"/>
+	<hash crc32="e39bb715" name="SwingHouse.cas"/>
+	<hash crc32="10570e4f" name="Swords and Sorcery.cas">
+		<manufacturer>David Kastrup</manufacturer>
+	</hash>
+	<hash crc32="72bca35e" name="Symbolische Differentation.cas">
+		<year>1982</year>
+		<manufacturer>Martin Albrecht</manufacturer>
+	</hash>
+	<hash crc32="c2280e64" name="SYS-EX (EB000).nas"/>
+	<hash crc32="e6ed1ea7" name="T FORTH Interpreter (E1000).nas"/>
+	<hash crc32="12c313b4" name="The Nascom Demon (E0D00).nas">
+		<status>Needs NAS-SYS</status>
+	</hash>
+	<hash crc32="a3cc72b5" name="The Revenge of the Drosophila (E3123).nas">
+		<manufacturer>Garry Rowland</manufacturer>
+	</hash>
+	<hash crc32="7c8d5fa0" name="Vectorrechnung.cas"/>
+	<hash crc32="3bab84a0" name="V &amp; T Assembler (E1000).nas"/>
+	<hash crc32="c3e33b43" name="WordEase (EF002).nas"/>
+	<hash crc32="00a63143" name="XTAL BASIC 2.2 (E1000).nas">
+		<manufacturer>Crystal / C. C. Electronics</manufacturer>
+	</hash>
+	<hash crc32="429c1da1" name="Z80 Relocater 1.6 (E1000).nas">
+		<year>1981</year>
+		<manufacturer>Logic Soft</manufacturer>
+	</hash>
+	<hash crc32="6096f5c6" name="ZEAP 2.1 (ED000).nas">
+		<manufacturer>Sigma Software Unit</manufacturer>
+	</hash>
+	<hash crc32="d508f9d8" name="ZEAP 2.1 to COMPASS 1.3 File Converter (ED000).nas"/>
+</hashfile>

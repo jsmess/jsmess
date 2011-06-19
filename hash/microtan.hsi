@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Tangerine MICROTAN 65 (TOSEC-v0.21) -->
+	<hash crc32="747853fc" name="256 Digit Factorials">
+		<year>19??</year>
+	</hash>
+	<hash crc32="adf3e99f" name="Adventure 7.1-The Sceptre Of Hamloth">
+		<year>1981</year>
+		<manufacturer>I.Dickinson</manufacturer>
+	</hash>
+	<hash crc32="62e786f2" name="Air Attack">
+		<year>1980</year>
+		<manufacturer>David A Brown</manufacturer>
+	</hash>
+	<hash crc32="d2499579" name="Astro Fighter">
+		<year>1984</year>
+		<manufacturer>G.Macdonald</manufacturer>
+	</hash>
+	<hash crc32="251f9029" name="Berzerk">
+		<year>1984</year>
+		<manufacturer>G.MacDonald</manufacturer>
+	</hash>
+	<hash crc32="bb724376" name="Border">
+		<year>19??</year>
+	</hash>
+	<hash crc32="16b11a37" name="Breakout">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9c3f92bf" name="Chessboard">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6c423cc5" name="Conways's Game of Life">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c3965948" name="Defender">
+		<year>1984</year>
+		<manufacturer>G.MacDonald</manufacturer>
+	</hash>
+	<hash crc32="41e82728" name="Gobbler And Adventure 7.1-The Sceptre Of Hamloth">
+		<year>1981</year>
+		<manufacturer>I.Dickinson-A.Moore</manufacturer>
+	</hash>
+	<hash crc32="d73c542e" name="Graphics Subroutine">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e1ea0fd4" name="Hangman">
+		<year>1981</year>
+		<manufacturer>Microtanic Software</manufacturer>
+	</hash>
+	<hash crc32="9b90eb6a" name="Hells Bells">
+		<year>1984</year>
+		<manufacturer>G.Macdonald</manufacturer>
+	</hash>
+	<hash crc32="67d885a7" name="Hi-res Pattern">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cde9f84d" name="Hi-res Square">
+		<year>19??</year>
+	</hash>
+	<hash crc32="66e2b0cd" name="Lunar Lander">
+		<year>198?</year>
+		<manufacturer>F.Woodcock</manufacturer>
+	</hash>
+	<hash crc32="bd335005" name="Message">
+		<year>19??</year>
+	</hash>
+	<hash crc32="56c83d14" name="Moon Cresta">
+		<year>1985</year>
+		<manufacturer>G.Macdonald</manufacturer>
+	</hash>
+	<hash crc32="9532232f" name="Moon Rescue">
+		<year>1984</year>
+		<manufacturer>G.Macdonald</manufacturer>
+	</hash>
+	<hash crc32="7d8e4d22" name="Othello [2 Playergame]">
+		<year>1981</year>
+		<manufacturer>F.Woodcock</manufacturer>
+	</hash>
+	<hash crc32="85dc9b19" name="Pattern">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e192537d" name="Phase Pattern">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9240ee04" name="Screen Clear">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c58348f0" name="Scroll Downwards">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d174e1cb" name="Scroller Clearscreen">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7b41b3de" name="Shootdown">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8765d9a7" name="Slot Machine">
+		<year>1983</year>
+		<manufacturer>G.Macdonald</manufacturer>
+	</hash>
+	<hash crc32="59484e43" name="Space Invasion">
+		<year>1980</year>
+		<manufacturer>Tangerine</manufacturer>
+	</hash>
+	<hash crc32="ba58361d" name="Tangerine Face Invaders">
+		<year>1981</year>
+		<manufacturer>David A Brown</manufacturer>
+	</hash>
+	<hash crc32="e7badb02" name="Timed">
+		<year>19??</year>
+	</hash>
+</hashfile>

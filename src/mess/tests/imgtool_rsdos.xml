@@ -1,0 +1,129 @@
+<!DOCTYPE tests
+[
+	<!ENTITY eoln SYSTEM "http://www.mess.org/messtest/">
+]>
+
+<tests>
+
+<imgtooltest name="coco_rs_jvc">
+	<createimage driver="coco_jvc_rsdos"/>
+	<checkdirectory/>
+
+	<putfile name="FOO.TXT">'Hello World!'</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="12"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Hello World!'</checkfile>
+
+	<putfile name="BIG.TXT">'Abcde' * 1500 </putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="12"/>
+		<entry name="BIG.TXT" size="7500"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Hello World!'</checkfile>
+	<checkfile name="BIG.TXT">'Abcde' * 1500 </checkfile>
+</imgtooltest>
+
+<imgtooltest name="coco_rs_vdk">
+	<createimage driver="coco_vdk_rsdos"/>
+	<checkdirectory/>
+
+	<putfile name="FOO.TXT">'Hello World!'</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="12"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Hello World!'</checkfile>
+
+	<putfile name="BIG.TXT">'Abcde' * 1500 </putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="12"/>
+		<entry name="BIG.TXT" size="7500"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Hello World!'</checkfile>
+	<checkfile name="BIG.TXT">'Abcde' * 1500 </checkfile>
+</imgtooltest>
+
+<imgtooltest name="coco_rs_dmk">
+	<createimage driver="coco_dmk_rsdos"/>
+	<checkdirectory/>
+
+	<putfile name="FOO.TXT">'Hello World!'</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="12"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Hello World!'</checkfile>
+
+	<putfile name="BIG.TXT">'Abcde' * 1500 </putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="12"/>
+		<entry name="BIG.TXT" size="7500"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Hello World!'</checkfile>
+	<checkfile name="BIG.TXT">'Abcde' * 1500 </checkfile>
+</imgtooltest>
+
+<imgtooltest name="coco_rs_001">
+	<createimage driver="coco_jvc_rsdos"/>
+	<checkdirectory/>
+
+	<putfile name="FOO.TXT"/>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="0"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT"/>
+
+	<putfile name="FOO.TXT">'Hello World!'</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="12"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Hello World!'</checkfile>
+
+	<putfile name="FOO.TXT">'Hello'</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="5"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Hello'</checkfile>
+</imgtooltest>
+
+<imgtooltest name="coco_rs_002">
+	<createimage driver="coco_jvc_rsdos"/>
+	<recordfreespace/>
+
+	<putfile name="ALPHA.TXT">'Hello!'</putfile>
+	<putfile name="BRAVO.TXT">'Achtung!'</putfile>
+	<putfile name="CHARLIE.TXT">'Bienvenue!'</putfile>
+	<deletefile name="ALPHA.TXT"/>
+	<deletefile name="BRAVO.TXT"/>
+	<deletefile name="CHARLIE.TXT"/>
+
+	<checkfreespace/>
+</imgtooltest>
+
+<imgtooltest name="coco_rs_003">
+	<createimage driver="coco_jvc_rsdos"/>
+	<putfile name="FOO.TXT" filter="ascii">'Hello&#13;&#10;World&#10;'</putfile>
+	<checkfile name="FOO.TXT">'Hello&#13;World&#13;'</checkfile>
+</imgtooltest>
+
+<imgtooltest name="coco_rs_004">
+	<!-- NOTE: should be using &eoln; here; this test assumes that the host is CRLF -->
+	<createimage driver="coco_jvc_rsdos"/>
+	<putfile name="FOO.TXT">'Hello&#13;World&#13;'</putfile>
+	<checkfile name="FOO.TXT" filter="ascii">'Hello&#13;&#10;World&#13;&#10;'</checkfile>
+</imgtooltest>
+
+<imgtooltest name="coco_rs_005">
+	<!-- NOTE: should be using &eoln; here; this test assumes that the host is CRLF -->
+	<createimage driver="coco_jvc_rsdos"/>
+	<putfile name="FOO.BAS">0xFF000B260A000A81A53130000000</putfile>
+	<checkfile name="FOO.BAS" filter="cocobas">'10 GOTO10&#13;&#10;'</checkfile>
+</imgtooltest>
+
+<imgtooltest name="coco_rs_006">
+  <!-- NOTE: should be using &eoln; here; this test assumes that the host is CRLF -->
+  <createimage driver="coco_jvc_rsdos"/>
+  <putfile name="FOO.BAS" filter="cocobas">'10 GOTO10&#13;&#10;'</putfile>
+  <checkfile name="FOO.BAS">0xFF000E2607000A81A53130000000</checkfile>
+</imgtooltest>
+
+</tests>

@@ -1,0 +1,13 @@
+<tests>
+
+<test name="pc88srl_000" driver="pc88srl">
+	<wait time="14"/>
+	<checkblank/>
+</test>
+
+<test name="pc88srh_000" driver="pc88srh">
+	<wait time="14"/>
+	<checkblank/>
+</test>
+
+</tests>

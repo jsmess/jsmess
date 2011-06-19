@@ -1,0 +1,7 @@
+<tests>
+
+<test name="apple2gs_000" driver="apple2gs">
+	<wait time="5"/>
+</test>
+
+</tests>

@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="HTML Tidy for Cygwin (vers 1st September 2004), see www.w3.org" />
+<title>MESS Guide</title>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<link href="../style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h1>MESS Configuration Files</h1>
+<p class="normal">This section deals with configuration files used by MESS. You will find an explanation on how to find create configuration files
+for your games and where to put them.</p>
+<hr />
+<h2>Introduction</h2>
+<p class="normal">In MESS you have always been able to configure each game individually MESS GUI is the same. This is of great use if for instance
+you are having performance issues with systems or say want to run certain systems in windows and others in full screen. The command line version of
+MESS or MAME never had this option so you had to change the command line for each game you wanted different settings on.</p>
+<p class="normal">Now with the latest versions of MESS and MAME you can have configuration files for any system or clone system you want and when
+MESS starts it will automatically load the settings for you.</p>
+<p class="normal">&nbsp;</p>
+<hr />
+<h2>Creating The Files</h2>
+<p class="normal">The settings files are based on the <span class="filename">MESS.ini</span> file that is created when MESS starts. The easiest way
+to create a new config file is to simply duplicate the original file and remove/change the stuff you don't want.</p>
+<p class="normal">Open you MESS folder and find the <span class="filename">MESS.ini</span> file. It'll look something like this...</p>
+<p align="center"><img src="images/iniicon.gif" width="166" height="61" border="1" /></p>
+<p class="normal">Right click on the file and select copy. Now right click on a blank area and select paste and you will see a file "copy of MESS"
+appear. Right click over this file and select rename. In the box type the name of the system as it appears on the original BIOS zip file e.g. Atari
+2600 = a2600.</p>
+<p class="normal">It will keep things a lot tidier if you move your new config file to the ini folder. MESS will by default look there anyway.</p>
+<p class="normal">Double click your config file and it should open up in notepad. Below you can see the default <span class="filename">MESS.ini</span> file.</p>
+<table width="35%" border="1" cellpadding="3" align="center">
+<tr>
+<td>
+<pre class="fixedsize">#
+# CORE SEARCH PATH OPTIONS
+#
+rompath                   roms
+hashpath                  hash
+softwarepath              software
+samplepath                samples
+artpath                   artwork
+ctrlrpath                 ctrlr
+inipath                   .;ini
+fontpath                  .
+
+#
+# CORE OUTPUT DIRECTORY OPTIONS
+#
+cfg_directory             cfg
+nvram_directory           nvram
+memcard_directory         memcard
+input_directory           inp
+state_directory           sta
+snapshot_directory        snap
+diff_directory            diff
+comment_directory         comments
+
+#
+# CORE FILENAME OPTIONS
+#
+cheat_file                cheat.dat
+
+#
+# CONFIGURATION OPTIONS
+#
+readconfig                1
+skip_gameinfo             0
+
+#
+# MISC OPTIONS
+#
+bios                      default
+cheat                     0
+
+#
+# STATE/PLAYBACK OPTIONS
+#
+# state                   &lt;NULL&gt; (not set)
+autosave                  0
+# playback                &lt;NULL&gt; (not set)
+# record                  &lt;NULL&gt; (not set)
+# mngwrite                &lt;NULL&gt; (not set)
+# wavwrite                &lt;NULL&gt; (not set)
+
+#
+# DEBUGGING OPTIONS
+#
+log                       0
+oslog                     0
+verbose                   0
+
+#
+# PERFORMANCE OPTIONS
+#
+autoframeskip             0
+frameskip                 0
+frames_to_run             0
+throttle                  1
+sleep                     1
+rdtsc                     0
+priority                  0
+multithreading            0
+
+#
+# VIDEO OPTIONS
+#
+video                     d3d
+numscreens                1
+window                    0
+maximize                  1
+keepaspect                1
+prescale                  1
+effect                    none
+pause_brightness          0.65
+waitvsync                 0
+syncrefresh               0
+
+#
+# VIDEO ROTATION OPTIONS
+#
+rotate                    1
+ror                       0
+rol                       0
+autoror                   0
+autorol                   0
+flipx                     0
+flipy                     0
+
+#
+# DIRECTDRAW-SPECIFIC OPTIONS
+#
+hwstretch                 1
+
+#
+# DIRECT3D-SPECIFIC OPTIONS
+#
+d3dversion                9
+filter                    1
+
+#
+# PER-WINDOW VIDEO OPTIONS
+#
+screen                    auto
+aspect                    auto
+resolution                auto
+view                      auto
+screen0                   auto
+aspect0                   auto
+resolution0               auto
+view0                     auto
+screen1                   auto
+aspect1                   auto
+resolution1               auto
+view1                     auto
+screen2                   auto
+aspect2                   auto
+resolution2               auto
+view2                     auto
+screen3                   auto
+aspect3                   auto
+resolution3               auto
+view3                     auto
+
+#
+# FULL SCREEN OPTIONS
+#
+triplebuffer              0
+switchres                 0
+full_screen_brightness    1.0
+full_screen_contrast      1.0
+full_screen_gamma         1.0
+
+#
+# GAME SCREEN OPTIONS
+#
+brightness                1.0
+contrast                  1.0
+gamma                     1.0
+
+#
+# VECTOR RENDERING OPTIONS
+#
+antialias                 1
+beam                      1.0
+flicker                   0
+
+#
+# ARTWORK OPTIONS
+#
+artwork_crop              0
+use_backdrops             1
+use_overlays              1
+use_bezels                1
+
+#
+# SOUND OPTIONS
+#
+sound                     1
+samplerate                48000
+samples                   1
+volume                    0
+audio_latency             1
+
+#
+# INPUT DEVICE OPTIONS
+#
+# ctrlr                   &lt;NULL&gt; (not set)
+mouse                     0
+joystick                  0
+lightgun                  0
+dual_lightgun             0
+offscreen_reload          0
+steadykey                 0
+a2d_deadzone              0.3
+digital                   none
+
+#
+# AUTOMATIC DEVICE SELECTION OPTIONS
+#
+paddle_device             keyboard
+adstick_device            keyboard
+pedal_device              keyboard
+dial_device               keyboard
+trackball_device          keyboard
+lightgun_device           keyboard
+mouse_device              mouse
+
+#
+# MESS SPECIFIC OPTIONS
+#
+newui                     1
+# ramsize                 &lt;NULL&gt; (not set)
+threads                   0
+natural                   0
+min_width                 200
+min_height                200
+writeconfig               0
+skip_warnings             0
+</pre></td>
+</tr>
+</table>
+<p class="normal">As you can see most of the lines mimic the command line options use by MESS and you can find detailed explanations of these
+commands on the <a href="win32cmd.htm" target="_blank">MESS W32 Commands</a> page. The only difference is the 1 or 0 that follows the command. These
+mean yes (1) or no (0) on most commands but check on the setup page as they may refer to a value. The lines starting with # are comments and are
+ignored by MESS.</p>
+<p class="normal">Remember no matter what changes you make you can't mess up MESS, just change the setting back or delete the config file and start
+again.</p>
+<p class="normal">&nbsp;</p>
+<hr />
+<h2>Types Of Config Files</h2>
+<p class="normal">There are four types of config types. You have one for vector games called <span class="filename">vector.ini</span> and one for
+specific drivers for games, e.g. <span class="filename">oric.ini</span> would affect all the systems in oric.c (which are oric1, orica, prav8d, 
+prav8dd and telstrat). You can also create files for specific parent sets that will be used by all of the clones, e.g. <span class="filename">
+oric1.ini</span> would be used also by the clones (i.e. orica, prav8d, prav8dd, telstrat), or you can make config file for specific clones (e.g.  
+<span class="filename">prav8d.ini</span> in the example above).</p>
+<p class="normal">To find out what drivers a game uses you can add the -verbose option to your command line. e.g. <span class="command">MESS a2600
+-verbose</span> and will give you something like the following...</p>
+<table width="52%" border="1" align="center">
+<tr>
+<td class="consoletext">
+<pre>parsing mess.ini...OK.
+parsing /a2600.ini...N/A
+parsing root.ini...N/A
+parsing a2600.ini...N/A
+Using DirectInput 5
+Keyboards=1 Mice=1 Joysticks=1 Lightguns=0
+Mouse support disabled
+Joystick support disabled
+Keyboards=1 Mice=0 Joysticks=0
+Initialising DirectDraw &amp; Direct3D 7 blitter (58.81MB video memory 
+available)
+Rendering to an off-screen surface and using blt()
+Primary surface created: 1280x1024x32 (R=00ff0000 G=0000ff00 B=000000ff)
+Managed texture surface created: 256x256x16 (R=00007c00 G=000003e0 B=0000001f)
+Pre-process texture surface created: 1024x1024x16
+RGB effects surface created: 1280x1024x32
+Scanline surface[0] created: 2x2x32
+Scanline surface[1] created: 4x4x32
+Blitter initialisation complete (46.78MB video memory free)
+Primary buffer: 44100 Hz, 16 bits, 1 channels
+SSE supported
+</pre></td>
+</tr>
+</table>
+<p class="normal">If you look at the first couple of lines you can see the ini files that MESS is looking for. MESS always loads the MESS.ini file
+first but in this instance it looks for the <span class="filename">a2600.ini</span> file (system file). If I had used a clone system MESS would also
+look for the .ini file for that as well. Each of these files would override the previous one and MESS would only use the commands in the final config
+file.</p>
+<p class="normal">As an example of a config file, here is one that I have made up for the Atari 2600 system. The reason behind it was that I wanted
+it to run fullscreen as it was easier to see. The d3d option made MESS use my 3D card to draw the graphics as it's faster on my system.</p>
+<table width="27%" border="1" align="center">
+<tr>
+<td>
+<pre class="fixedsize">#Atari 2600 Fullscreen
+window 0
+direct3d 1
+</pre></td>
+</tr>
+</table>
+<p class="normal">Once you are happy with your file save it and run MESS and it will use your new settings.</p>
+</body>
+</html>

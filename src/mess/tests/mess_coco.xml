@@ -1,0 +1,91 @@
+<tests>
+
+<test name="coco_000" driver="coco2b">
+	<wait time="2"/>
+	<memverify start="0x400" end="0x40C" cpu="maincpu">"DISK&#96;EXTENDED"</memverify>
+</test>
+
+<test name="coco_001" driver="coco2b">
+	<wait time="2"/>
+	<input>CLS7&#13;</input>
+	<wait time="1"/>
+	<memverify start="0x421" end="0x5FF" cpu="maincpu">0xef</memverify>
+</test>
+
+<test name="coco_002" driver="coco2b">
+	<wait time="20"/>
+	<input>PMODE3:PCLS1&#13;</input>
+	<wait time="1"/>
+	<memverify start="0xE00" end="0x25FF" cpu="maincpu">0x00</memverify>
+	<input>PMODE3:PCLS2&#13;</input>
+	<wait time="1"/>
+	<memverify start="0xE00" end="0x25FF" cpu="maincpu">0x55</memverify>
+	<input>PMODE3:PCLS3&#13;</input>
+	<wait time="1"/>
+	<memverify start="0xE00" end="0x25FF" cpu="maincpu">0xAA</memverify>
+	<input>PMODE3:PCLS4&#13;</input>
+	<wait time="1"/>
+	<memverify start="0xE00" end="0x25FF" cpu="maincpu">0xFF</memverify>
+</test>
+
+<test name="coco_003" driver="coco2b">
+	<!-- This test tests disk reading/writing with JVC disk images -->
+	<wait time="2"/>
+	<imagecreate type="flop" format="coco_jvc"/>
+	<input>10 CLS 7&#13;</input>
+	<input>20 GOTO 20&#13;</input>
+	<input>SAVE "JVCTEST"&#13;</input>
+	<wait time="4"/>
+	<input>RUN "JVCTEST"&#13;</input>
+	<wait time="4"/>
+	<memverify start="0x400" end="0x5FF" cpu="maincpu">0xef</memverify>
+</test>
+
+<test name="coco_004" driver="coco2b">
+	<!-- This test tests disk reading/writing with VDK disk images -->
+	<wait time="2"/>
+	<imagecreate type="flop" format="coco_vdk"/>
+	<input>10 CLS 6&#13;</input>
+	<input>20 GOTO 20&#13;</input>
+	<input>SAVE "VDKTEST"&#13;</input>
+	<wait time="4"/>
+	<input>RUN "VDKTEST"&#13;</input>
+	<wait time="4"/>
+	<memverify start="0x400" end="0x5FF" cpu="maincpu">0xdf</memverify>
+</test>
+
+<test name="coco_005" driver="coco2b">
+	<!-- This test tests disk reading/writing with DMK disk images -->
+	<wait time="2"/>
+	<imagecreate type="flop" format="coco_dmk"/>
+	<input>10 CLS 5&#13;</input>
+	<input>20 GOTO 20&#13;</input>
+	<input>SAVE "DMKTEST"&#13;</input>
+	<wait time="4"/>
+	<input>RUN "DMKTEST"&#13;</input>
+	<wait time="4"/>
+	<memverify start="0x400" end="0x5FF" cpu="maincpu">0xcf</memverify>
+</test>
+
+<test name="coco_006" driver="coco2b">
+	<!-- This test tests printing -->
+	<wait time="2"/>
+	<imagecreate tag="bitbanger"/>
+	<input>?#-2, "FOO";&#13;</input>
+	<wait time="4"/>
+	<imageverify tag="bitbanger">"FOO"</imageverify>
+</test>
+
+<test name="coco_bug993" driver="coco2b" ramsize="16k">
+	<!-- Tests a bug that would cause the CoCo with 16k RAM to not run properly -->
+	<wait time="2"/>
+	<memverify start="0x480" end="0x481" cpu="maincpu">"OK"</memverify>
+</test>
+
+<test name="coco_bug1131" driver="coco2b">
+  <wait time="2"/>
+  <hardreset/>
+  <wait time="2"/>
+</test>
+
+</tests>

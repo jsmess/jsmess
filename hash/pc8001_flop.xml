@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pc8001_flop" description="NEC PC-8001 &amp; PC-8001SR disk images">
+
+<!-- DISKS -->
+
+	<software name="crmanor">
+		<description>Cranston Manor</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="pc8001_flop">
+			<dataarea name="flop" size="693344">
+				<rom name="cranston_manor_v80.d88" size="693344" crc="54e4e5e7" sha1="4a1a3aa26a71bf61e0fb81a9a53c438cbd2745b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ulysses">
+		<description>Ulysses</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="pc8001_flop">
+			<dataarea name="flop" size="1042192">
+				<rom name="ulysses_v80.d88" size="1042192" crc="b4ee359c" sha1="4cb6a4a69b942184d43e639ec7ae9c20c1c5c20c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaxus">
+		<description>Zaxus</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="pc8001_flop">
+			<dataarea name="flop" size="40128">
+				<rom name="zaxus.d88" size="40128" crc="a5fed0de" sha1="8d7a2df8eb5b0934c6abad75af962c6a979d121d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- SR DISKS -->
+
+	<software name="laptick">
+		<description>Laptick</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="pc8001_flop">
+			<dataarea name="flop" size="348720">
+				<rom name="laptick_v80.d88" size="348720" crc="ad4d2567" sha1="9ff209c3e0aff4afc71ebe73740a5a97b2428394" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mappy">
+		<description>Mappy</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="pc8001_flop">
+			<dataarea name="flop" size="353200">
+				<rom name="mappy_v80.d88" size="353200" crc="a9978924" sha1="0bf806b8f1ef54960d855c62af367dd2e1ff2351" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shitokei">
+		<description>Shitokei...</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="pc8001_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="shikotei_v80.d88" size="348848" crc="23f27524" sha1="6b0629a526f11df8c889eeef5d74e518d00b9354" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xanadu">
+		<description>Xanadu</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="pc8001_flop">
+			<dataarea name="flop" size="834800">
+				<rom name="xanadu_v80.d88" size="834800" crc="534e44cf" sha1="d79f694897801150e131e58e02622ec43ebca4ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n80basic">
+		<description>N80 BASIC</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="pc8001_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="N80 BASIC (1983)(Microsoft - NEC).d88" size="348848" crc="ff9416a4" sha1="3321c6a723545ef7f413a372683a1e40ef7ea4ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n80basica" cloneof="n80basic">
+		<description>N80 BASIC v1.8</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="pc8001_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="N80 BASIC v1.8 (1981)(Microsoft).d88" size="348848" crc="00b2a439" sha1="ce234142ec31e8ec2e862042b2c6889650ed59d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- These are going to be replaced by the correspondent separate tapes, as soon as possible!! -->
+
+	<software name="pack1">
+		<description>Dig Dug / Xevious / Nintendo no Golf / Nuts &amp; Milk</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="pc8001_flop">
+			<dataarea name="flop" size="353200">
+				<rom name="dig dug - xevious - nintendo no golf - nuts&amp;milk.d88" size="353200" crc="1e6c02fe" sha1="039c2e1831f8f4d0ca4ca2d9bc8ad857cf4bade2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pack2">
+		<description>Dragon Slayer / Burger Time / Excite Bike / Dig Dug / Xevious</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="pc8001_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="dragon slayer - burger time - excite bike - dig dug - xevious.d88" size="348848" crc="143636e6" sha1="077a419dac5c1562a04e6a8467cf8ecd7a590427" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pack3">
+		<description>Video-kun / F2 Grand Prix / Eggy</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="pc8001_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="video-kun - f2 grand prix - eggy.d88" size="348848" crc="45d3515f" sha1="5d6def548da8f943eebdf7f524bea58ed1dab456" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>

@@ -1,0 +1,263 @@
+<tests>
+
+<imgtooltest name="prodos_001">
+	<createimage driver="apple2_do_prodos_525"/>
+
+	<putfile name="EMPTY.TXT"/>
+	<checkdirectory>
+		<entry name="EMPTY.TXT" size="0"/>
+	</checkdirectory>
+	<checkfile name="EMPTY.TXT"/>
+
+	<putfile name="SEEDLING.TXT">'seed!' * 10 </putfile>
+	<checkdirectory>
+		<entry name="EMPTY.TXT" size="0"/>
+		<entry name="SEEDLING.TXT" size="50"/>
+	</checkdirectory>
+	<checkfile name="EMPTY.TXT"/>
+	<checkfile name="SEEDLING.TXT">'seed!' * 10 </checkfile>
+
+	<putfile name="SAPLING.TXT">'splng' * 500 </putfile>
+	<checkdirectory>
+		<entry name="EMPTY.TXT" size="0"/>
+		<entry name="SEEDLING.TXT" size="50"/>
+		<entry name="SAPLING.TXT" size="2500"/>
+	</checkdirectory>
+	<checkfile name="EMPTY.TXT"/>
+	<checkfile name="SEEDLING.TXT">'seed!' * 10 </checkfile>
+	<checkfile name="SAPLING.TXT">'splng' * 500 </checkfile>
+
+	<putfile name="TREE.TXT">'tree!' * 26400 </putfile>
+	<checkdirectory>
+		<entry name="EMPTY.TXT" size="0"/>
+		<entry name="SEEDLING.TXT" size="50"/>
+		<entry name="SAPLING.TXT" size="2500"/>
+		<entry name="TREE.TXT" size="132000"/>
+	</checkdirectory>
+	<checkfile name="EMPTY.TXT"/>
+	<checkfile name="SEEDLING.TXT">'seed!' * 10 </checkfile>
+	<checkfile name="SAPLING.TXT">'splng' * 500 </checkfile>
+	<checkfile name="TREE.TXT">'tree!' * 26400 </checkfile>
+</imgtooltest>
+
+<imgtooltest name="prodos_002">
+	<createimage driver="apple2_do_prodos_525"/>
+	<putfile name="01.TXT">'Alpha'</putfile>
+	<putfile name="02.TXT">'Bravo'</putfile>
+	<putfile name="03.TXT">'Charlie'</putfile>
+	<putfile name="04.TXT">'Delta'</putfile>
+	<putfile name="05.TXT">'Echo'</putfile>
+	<putfile name="06.TXT">'Foxtrot'</putfile>
+	<putfile name="07.TXT">'Golf'</putfile>
+	<putfile name="08.TXT">'Hotel'</putfile>
+	<putfile name="09.TXT">'Indigo'</putfile>
+	<putfile name="10.TXT">'Jackal'</putfile>
+	<putfile name="11.TXT">'Kilo'</putfile>
+	<putfile name="12.TXT">'Limo'</putfile>
+	<putfile name="13.TXT">'Money'</putfile>
+	<putfile name="14.TXT">'November'</putfile>
+	<putfile name="15.TXT">'Omega'</putfile>
+	<checkdirectory>
+		<entry name="01.TXT" size="5"/>
+		<entry name="02.TXT" size="5"/>
+		<entry name="03.TXT" size="7"/>
+		<entry name="04.TXT" size="5"/>
+		<entry name="05.TXT" size="4"/>
+		<entry name="06.TXT" size="7"/>
+		<entry name="07.TXT" size="4"/>
+		<entry name="08.TXT" size="5"/>
+		<entry name="09.TXT" size="6"/>
+		<entry name="10.TXT" size="6"/>
+		<entry name="11.TXT" size="4"/>
+		<entry name="12.TXT" size="4"/>
+		<entry name="13.TXT" size="5"/>
+		<entry name="14.TXT" size="8"/>
+		<entry name="15.TXT" size="5"/>
+	</checkdirectory>
+	<checkfile name="01.TXT">'Alpha'</checkfile>
+	<checkfile name="02.TXT">'Bravo'</checkfile>
+	<checkfile name="03.TXT">'Charlie'</checkfile>
+	<checkfile name="04.TXT">'Delta'</checkfile>
+	<checkfile name="05.TXT">'Echo'</checkfile>
+	<checkfile name="06.TXT">'Foxtrot'</checkfile>
+	<checkfile name="07.TXT">'Golf'</checkfile>
+	<checkfile name="08.TXT">'Hotel'</checkfile>
+	<checkfile name="09.TXT">'Indigo'</checkfile>
+	<checkfile name="10.TXT">'Jackal'</checkfile>
+	<checkfile name="11.TXT">'Kilo'</checkfile>
+	<checkfile name="12.TXT">'Limo'</checkfile>
+	<checkfile name="13.TXT">'Money'</checkfile>
+	<checkfile name="14.TXT">'November'</checkfile>
+	<checkfile name="15.TXT">'Omega'</checkfile>
+</imgtooltest>
+
+<imgtooltest name="prodos_003">
+	<createimage driver="apple2_do_prodos_525"/>
+	<putfile name="01.TXT">'Alpha'</putfile>
+	<putfile name="02.TXT">'Bravo'</putfile>
+	<putfile name="03.TXT">'Charlie'</putfile>
+	<putfile name="04.TXT">'Delta'</putfile>
+	<putfile name="05.TXT">'Echo'</putfile>
+	<putfile name="06.TXT">'Foxtrot'</putfile>
+	<putfile name="07.TXT">'Golf'</putfile>
+	<putfile name="08.TXT">'Hotel'</putfile>
+	<putfile name="09.TXT">'Indigo'</putfile>
+	<putfile name="10.TXT">'Jackal'</putfile>
+	<putfile name="11.TXT">'Kilo'</putfile>
+	<putfile name="12.TXT">'Limo'</putfile>
+	<putfile name="13.TXT">'Money'</putfile>
+	<putfile name="14.TXT">'November'</putfile>
+	<putfile name="15.TXT">'Omega'</putfile>
+	<deletefile name="02.TXT"/>
+	<deletefile name="03.TXT"/>
+	<deletefile name="05.TXT"/>
+	<deletefile name="07.TXT"/>
+	<deletefile name="11.TXT"/>
+	<deletefile name="13.TXT"/>
+	<checkdirectory>
+		<entry name="01.TXT" size="5"/>
+		<entry name="04.TXT" size="5"/>
+		<entry name="06.TXT" size="7"/>
+		<entry name="08.TXT" size="5"/>
+		<entry name="09.TXT" size="6"/>
+		<entry name="10.TXT" size="6"/>
+		<entry name="12.TXT" size="4"/>
+		<entry name="14.TXT" size="8"/>
+		<entry name="15.TXT" size="5"/>
+	</checkdirectory>
+</imgtooltest>
+
+<imgtooltest name="prodos_004">
+	<createimage driver="apple2_do_prodos_525"/>
+	<putfile name="FILE.TXT">'tree!' * 26400</putfile>
+	<checkfile name="FILE.TXT">'tree!' * 26400</checkfile>
+	<putfile name="FILE.TXT">'splng' * 500</putfile>
+	<checkfile name="FILE.TXT">'splng' * 500</checkfile>
+	<putfile name="FILE.TXT">'splng' * 500</putfile>
+	<checkfile name="FILE.TXT">'splng' * 500</checkfile>
+	<putfile name="FILE.TXT"/>
+	<checkfile name="FILE.TXT"/>
+</imgtooltest>
+
+<imgtooltest name="prodos_005">
+	<createimage driver="apple2_do_prodos_525"/>
+	<createdirectory path="/DIR"/>
+	<checkdirectory path="/">
+		<entry name="DIR"/>
+	</checkdirectory>
+
+	<putfile name="/DIR/FILE.TXT">'subdir file'</putfile>
+	<checkdirectory path="/">
+		<entry name="DIR"/>
+	</checkdirectory>
+	<checkdirectory path="/DIR">
+		<entry name="FILE.TXT"/>
+	</checkdirectory>
+
+	<checkfile name="/DIR/FILE.TXT">'subdir file'</checkfile>
+</imgtooltest>
+
+<imgtooltest name="prodos_006">
+	<createimage driver="apple2_do_prodos_525"/>
+	<createdirectory path="/DIR"/>
+	<putfile name="/DIR/FILE.TXT">'subdir file'</putfile>
+	<deletefile name="/DIR/FILE.TXT"/>
+	<deletedirectory path="/DIR"/>
+	<checkdirectory path="/"/>
+</imgtooltest>
+
+<imgtooltest name="prodos_007">
+	<createimage driver="apple2_do_prodos_525"/>
+
+	<putfile name="FOO.TXT">'data fork text'</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="14"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT" fork="">'data fork text'</checkfile>
+	<checkfile name="FOO.TXT" fork="RESOURCE_FORK"/>
+
+	<putfile name="FOO.TXT" fork="RESOURCE_FORK">'resource fork text'</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="14"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT" fork="">'data fork text'</checkfile>
+	<checkfile name="FOO.TXT" fork="RESOURCE_FORK">'resource fork text'</checkfile>
+</imgtooltest>
+
+<imgtooltest name="prodos_008">
+	<createimage driver="apple2_do_prodos_525"/>
+
+	<putfile name="FOO.TXT">'data fork text' * 500</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="14"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT" fork="">'data fork text' * 500</checkfile>
+	<checkfile name="FOO.TXT" fork="RESOURCE_FORK"/>
+
+	<putfile name="FOO.TXT" fork="RESOURCE_FORK">'resource fork text' * 1000</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="14"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT" fork="">'data fork text' * 500</checkfile>
+	<checkfile name="FOO.TXT" fork="RESOURCE_FORK">'resource fork text' * 1000</checkfile>
+</imgtooltest>
+
+<imgtooltest name="prodos_009">
+	<createimage driver="apple2_do_prodos_525"/>
+
+	<putfile name="FOO.TXT">'data fork text' * 500</putfile>
+	<checkattr path="FOO.TXT" name="mac_file_type" value="????"/>
+	<checkattr path="FOO.TXT" name="mac_file_creator" value="????"/>
+
+	<setattr path="FOO.TXT" name="mac_file_type" value="TEXT"/>
+	<checkattr path="FOO.TXT" name="mac_file_type" value="TEXT"/>
+	<checkattr path="FOO.TXT" name="mac_file_creator" value="????"/>
+
+	<setattr path="FOO.TXT" name="mac_file_creator" value="NATE"/>
+	<checkattr path="FOO.TXT" name="mac_file_type" value="TEXT"/>
+	<checkattr path="FOO.TXT" name="mac_file_creator" value="NATE"/>
+</imgtooltest>
+
+<imgtooltest name="prodos_010">
+	<createimage driver="apple2_do_prodos_525"/>
+	<recordfreespace/>
+<!--
+	<putfile name="FOO.TXT">'data fork text' * 500</putfile>
+	<setattr path="FOO.TXT" name="mac_file_type" value="TEXT"/>
+	<putfile name="FOO.TXT" fork="RESOURCE_FORK">'resource fork text' * 1000</putfile>
+	<deletefile name="FOO.TXT"/>
+-->
+	<checkfreespace/>
+</imgtooltest>
+
+<imgtooltest name="prodos_525_do">
+	<createimage driver="apple2_do_prodos_525"/>
+	<checkdirectory/>
+</imgtooltest>
+
+<imgtooltest name="prodos_525_po">
+	<createimage driver="apple2_po_prodos_525"/>
+	<checkdirectory/>
+</imgtooltest>
+
+<imgtooltest name="prodos_525_nib">
+	<createimage driver="apple2_nib_prodos_525"/>
+	<checkdirectory/>
+</imgtooltest>
+
+<imgtooltest name="prodos_35_raw">
+	<createimage driver="apple35_raw_prodos_35"/>
+	<checkdirectory/>
+</imgtooltest>
+
+<imgtooltest name="prodos_35_dc">
+	<createimage driver="apple35_dc_prodos_35"/>
+	<checkdirectory/>
+</imgtooltest>
+
+<imgtooltest name="prodos_35_2img">
+	<createimage driver="apple35_2img_prodos_35"/>
+	<checkdirectory/>
+</imgtooltest>
+
+</tests>

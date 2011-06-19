@@ -1,0 +1,8 @@
+<tests>
+
+<test name="ti99_8_000" driver="ti99_8">
+	<wait time="2"/>
+	<checkblank/>
+</test>
+
+</tests>

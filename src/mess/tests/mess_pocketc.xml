@@ -1,0 +1,23 @@
+<tests>
+
+<test name="pc1251_000" driver="pc1251">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+<test name="pc1350_000" driver="pc1350">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+<test name="pc1401_000" driver="pc1401">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+<test name="pc1403_000" driver="pc1403">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+</tests>

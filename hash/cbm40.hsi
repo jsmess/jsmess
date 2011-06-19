@@ -1,0 +1,24 @@
+<hashfile>
+	<!-- Commodore PET series image CRC List -->
+	<!-- Compiled by Stefano &quot;JoJo&quot; Priore -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<!-- Send corrections/submissions to: battlepriest@hotmail.com -->
+	<!-- These programs have been tested and work -->
+	<hash crc32="3249A34C" name="Flash Attack for CBM4032.prg">
+		<year>1980</year>
+		<manufacturer>Timothy Stryker, Kenneth Wasserman</manufacturer>
+	</hash>
+	<hash crc32="d5cdd48b" name="D64 to 1541.prg">
+		<year>1998</year>
+		<manufacturer>Andr&#233; Fachat</manufacturer>
+	</hash>
+	<hash crc32="71d98903" name="Emutil 2.0.prg">
+		<manufacturer>Andr&#233; Fachat, Bo Zimmerman</manufacturer>
+	</hash>
+	<hash crc32="29e61ea9" name="1541 to D64.prg">
+		<year>1998</year>
+		<manufacturer>Andr&#233; Fachat</manufacturer>
+	</hash>
+</hashfile>

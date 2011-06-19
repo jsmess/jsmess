@@ -1,0 +1,17 @@
+<hashfile>
+	<!-- PDP1 - Spacewar CRC -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<hash crc32="b3504cbb" name="PDP-1 LISP.rim">
+		<year>1963</year>
+		<manufacturer>Peter L. Deutsch</manufacturer>
+	</hash>
+	<hash crc32="f0c4436e" name="Munching Squares.rim">
+		<manufacturer>Daniel P. B. Smith</manufacturer>
+	</hash>
+	<hash crc32="b4ea9c04" name="Spacewar!.rim">
+		<year>1962</year>
+		<manufacturer>Wayne Witanen, J. Martin Graetz, Stephen R. Russell</manufacturer>
+	</hash>
+</hashfile>

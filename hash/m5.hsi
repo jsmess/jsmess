@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<hash crc32="47be051f" name="BASIC-F">
+		<year>1983</year>
+		<manufacturer>Sord</manufacturer>
+	</hash>
+	<hash crc32="107b5ddc" name="BASIC-G">
+		<year>1983</year>
+		<manufacturer>Sord</manufacturer>
+	</hash>
+	<hash crc32="9a98e6ce" name="BASIC-I">
+		<year>1983</year>
+		<manufacturer>Sord</manufacturer>
+	</hash>
+	<hash crc32="5862d06c" name="Dragon Attack">
+		<year>1983</year>
+		<manufacturer>Takara Ltd.</manufacturer>
+	</hash>
+	<hash crc32="78037f97" name="FALC"/>
+	<hash crc32="333ac50f" name="Fruit Search">
+		<year>1983</year>
+		<manufacturer>Takara Ltd.</manufacturer>
+	</hash>
+	<hash crc32="0f70fa69" name="Guttang Gottong">
+		<year>1981</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="19540dce" name="Heavy Boxing">
+		<year>1983</year>
+		<manufacturer>Takara Ltd.</manufacturer>
+	</hash>
+	<hash crc32="2b73c483" name="M5 Terminal"/>
+	<hash crc32="ded8b4f4" name="Pooyan">
+		<year>1982</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="ed80d6c9" name="Real Tennis">
+		<year>1983</year>
+		<manufacturer>Takara Ltd.</manufacturer>
+	</hash>
+	<hash crc32="942cc7e8" name="Step Up">
+		<year>1983</year>
+		<manufacturer>Takara Ltd.</manufacturer>
+	</hash>
+	<hash crc32="55cbd90b" name="Super Cobra">
+		<year>1981</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="daa0d610" name="Tank Battalion">
+		<year>1980</year>
+		<manufacturer>Namco Ltd.</manufacturer>
+	</hash>
+	<hash crc32="68c85890" name="Up Up Balloon">
+		<status>INCORRECT HEADER</status>
+	</hash>
+	<hash crc32="4e12e6bc" name="Up Up Balloon">
+		<year>1983</year>
+		<manufacturer>Takara Ltd.</manufacturer>
+	</hash>
+	<hash crc32="aba2cece" name="Wonder Hole">
+		<year>1982</year>
+		<manufacturer>Irem Corp.</manufacturer>
+	</hash>
+	<hash crc32="fda88e0d" name="Word Maze">
+		<year>1983</year>
+		<manufacturer>Sord</manufacturer>
+	</hash>
+</hashfile>

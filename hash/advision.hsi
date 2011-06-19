@@ -1,0 +1,24 @@
+<hashfile>
+	<!-- Entex AdventureVision Cartridge CRC List -->
+	<!-- Compiled by Chris Henry -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<!-- crc    = Game Name | Year | Manufacturer -->
+	<hash crc32="3e280096" name="Defender (6075)">
+		<year>1982</year>
+		<manufacturer>Entex Industries</manufacturer>
+	</hash>
+	<hash crc32="c70d4028" name="Space Force (6078)">
+		<year>1982</year>
+		<manufacturer>Entex Industries</manufacturer>
+	</hash>
+	<hash crc32="b6045c9e" name="Super Cobra (6077)">
+		<year>1982</year>
+		<manufacturer>Entex Industries</manufacturer>
+	</hash>
+	<hash crc32="33a23eba" name="Turtles (6076)">
+		<year>1982</year>
+		<manufacturer>Entex Industries</manufacturer>
+	</hash>
+</hashfile>

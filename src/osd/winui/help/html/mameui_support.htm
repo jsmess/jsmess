@@ -1,0 +1,739 @@
+<html xmlns:m="http://schemas.microsoft.com/office/2004/12/omml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
+<head>
+<style type="text/css">
+div.Section1
+	{page:Section1;}
+ h1
+	{margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	page-break-after:avoid;
+	font-size:16.0pt;
+	font-family:"Arial","sans-serif";
+	color:windowtext;
+	font-weight:bold;
+}
+p
+	{margin-right:0in;
+	margin-left:0in;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";
+	color:black;
+}
+a:link
+	{color:blue;
+	text-decoration:underline;
+	text-underline:single;
+}
+</style>
+</head>
+
+<body style="background-image: url('../images/bkground.gif')">
+
+<div class="Section1">
+	<h1 style="mso-margin-bottom-alt: auto"><span style="COLOR: black">MameUI 
+	Troubleshooting [&amp; Tips]<o:p></o:p></span></h1>
+	<p style="MARGIN-TOP: 0in">MameUI [previously Mame32] has been in development since 1997.<span style="mso-spacerun: yes">&nbsp;
+	</span>It is mature, complex, and robust.&nbsp; However, since the Mame 
+	project itself is a documentation effort, and development is continuous, 
+	there will be times when changes to the core program effect MameUI.&nbsp; 
+	When problems do occur with a specific game in a specific version of MameUI, 
+	a previous version of MameUI may be used.&nbsp; </p>
+	<p style="MARGIN-TOP: 0in">MameUI is now an integrated GUI front end which 
+	passes user input from the GUI to the
+	<b style="mso-bidi-font-weight: normal"><a href="http://www.mamedev.org/">
+	<span style="COLOR: black">Mame</span></a></b> engine/core.<span style="mso-spacerun: yes">&nbsp;
+	</span>Thus, any problems that occur in the
+	<b style="mso-bidi-font-weight: normal"><a href="http://www.mamedev.org">
+	<span style="COLOR: black">Mame</span></a></b> engine will be inherited by 
+	MameUI.&nbsp; Prior to <b>
+	<a href="http://www.mameworld.info/ubbthreads/postlist.php?Cat=&amp;Board=mameui">
+	<span style="COLOR: black">reporting problems</span></a> </b>
+	<span style="mso-bidi-font-weight: bold">against MameUI</span>, verify that 
+	the issue is not a known, core defect in
+	<b style="mso-bidi-font-weight: normal"><a href="http://www.mamedev.org/">
+	<span style="COLOR: black">Mame</span></a></b>.&nbsp; The <b>
+	<a target="_blank" href="http://mametesters.org/mantis/my_view_page.php">
+	<span style="COLOR: black">Mametesters.org</span></a></b> site is designed 
+	to track and report bugs in the baseline
+	<b style="mso-bidi-font-weight: normal"><a href="http://www.mamedev.org/">
+	<span style="COLOR: black">Mame</span></a></b> version.&nbsp; To find if a 
+	problem plagues the game in question, do an
+	<b style="mso-bidi-font-weight: normal">alt-enter</b> on the game and note 
+	its driver/source name at the bottom of the general properties tab; then 
+	search the Mametesters’ bug database.<span style="mso-spacerun: yes">&nbsp;
+	</span>The current list of known MameUI specific issues and defect tracking 
+	is available at <b>
+	<a target="_blank" href="http://mameui.info//MameUI_Bugs.xls">
+	<span style="COLOR: black">MameUI</span></a></b>.&nbsp; &nbsp;</p>
+	<p style="BACKGROUND: white; MARGIN: 0in 0in 5pt 0.25in"><strong>
+	<span style="FONT-SIZE: 12pt; FONT-FAMILY: 'Arial','sans-serif'">ROMs and 
+	CHDs Related Topics</span></strong><span style="FONT-SIZE: 12pt"><o:p></o:p></span></p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l5 level1 lfo2; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Utilization of an external ROMs management utility like
+	<b style="mso-bidi-font-weight: normal"><a href="http://www.clrmame.com/">
+	<span style="COLOR: black">Clrmame</span></a></b> is recommended for repair 
+	and identification of damaged or incomplete sets.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l5 level1 lfo2; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If receiving missing ROMs error messages when 
+	attempting to run a game, secondary click on the game in the list and choose 
+	properties, do an audit on that game [or use <b>Alt-A</b>].<span style="mso-spacerun: yes">&nbsp;
+	</span>The audit will determine which files are missing from the ROMset 
+	currently being played.<span style="mso-spacerun: yes">&nbsp; </span>MameUI 
+	will not run a game which fails its internal audit.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l5 level1 lfo2; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Mame is an ongoing documentation project. Sometimes old 
+	ROM sets are found to have miss-dumped, missing, or damaged ROMs, which need 
+	to be replaced.&nbsp; As new versions of Mame are released, the Mame 
+	developers add support for these new iterations of ROMs, supplanting or 
+	renaming the old supported versions.<span style="mso-spacerun: yes">&nbsp;
+	</span>Thus, often, older versions of ROMs which did work in older versions 
+	of MameUI, will <u>not</u> work with newer versions of MameUI because they 
+	are now read as incomplete or wrong.<span style="mso-spacerun: yes">&nbsp;
+	</span>MameUI will not play the game in question until the updated ROMs are 
+	utilized.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l5 level1 lfo2; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>MameUI utilizes the idea of a parent / clone 
+	relationship for its games.&nbsp; If trying to play a clone or a bootleg of 
+	a game, MameUI will need the ROMs for the clone game, <b>and</b> the parent 
+	set.&nbsp; MameUI indicates the parent set of a clone at the bottom of the 
+	game’s properties tab, or more easily in grouped view, View \ Grouped.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l5 level1 lfo2; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>MameUI utilizes the idea of having single zip files to 
+	house the BIOS files for a large number of similar games.<span style="mso-spacerun: yes">&nbsp;
+	</span>The NeoGeo games for example, share upwards of ten BIOS files in 
+	every game.&nbsp; Mame will look to neogeo.zip as the BIOS zip, if this file 
+	is freestanding along with the other NeoGeo games, it will use it. 
+	Otherwise, MameUI expects all the BIOS files in every NeoGeo game’s zip 
+	file. DECO cassette, PGM, and Playchoice are some examples of other BIOS 
+	games.&nbsp; An error message will occur if the BIOS files are not present 
+	and those games are run.<span style="mso-spacerun: yes">&nbsp; </span>
+	Occasionally, new ROMs will need to be added to the BIOS packages 
+	themselves, this occurred recently with the ‘ng-lo.rom’ and then 6 new 
+	regional BIOSes in the neogeo.zip. MameUI will not audit a game as correct 
+	without all the BIOS files with the correct CRC, while it may however be 
+	possible to play the game after an error message.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l5 level1 lfo2; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Games that support .CHD [compressed hunks of data] 
+	images [Max Force, Killer Instinct I &amp; II, Area 51, Vicious Circle, War 
+	Gods, beatmania games, and items in the CHD folder view on the left pane] 
+	have to have their ROMs and .CHD files in a very specific directory 
+	structure. The <b style="mso-bidi-font-weight: normal">single</b> large .CHD 
+	file needs to go in the \ROMs\gamename\ directory, and have the *.CHD 
+	extension, e.g. \ROMs\area51\area51.chd.<span style="mso-spacerun: yes">&nbsp;
+	</span>These games also have ROMs, these go one level up in the \ROMs folder 
+	proper like any other game.<span style="mso-spacerun: yes">&nbsp; </span>So 
+	in the end two files should exist for these games one *.zip in the \ROMs 
+	folder and the *.chd in a sub-directory named for the game.<span style="mso-spacerun: yes">&nbsp;
+	</span></p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l5 level1 lfo2; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span><b>F5 </b>/ View • Refresh in the GUI. (Do this anytime 
+	ROMs are altered, renaming, etc.)</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l5 level1 lfo2; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If games are not displaying in the game list, ensure 
+	the appropriate folder view on the far left is toggled, i.e. 'all games' and 
+	it doesn't have filtering on it to stop the display of the game being 
+	searched for.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l5 level1 lfo2; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Use the Options • Reset to default menu choice and 
+	check all of the items, restart MameUI.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l5 level1 lfo2; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Final option, manually delete the MameUI32/64.ini and the 
+	Mame.ini file in the \ini directory.</p>
+	<p style="BACKGROUND: white; MARGIN: 0in 0in 5pt 0.25in"><strong>
+	<span style="FONT-SIZE: 12pt; FONT-FAMILY: 'Arial','sans-serif'">Crash 
+	Related Topics</span></strong><span style="FONT-SIZE: 12pt"><o:p></o:p></span></p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Delete the \cfg\*.CFG, \diff\*.DIF, \ini\*.INI, or 
+	\nv\*.NV files for the game that's crashing.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Check to see that the zip file is valid and that it's 
+	not corrupt or read-only.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Verify the presence of the \ini directory under 
+	MameUI.exe’s location.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If versions of MameUI prior to .66 had been installed 
+	on the system, verify that the old registry key has been deleted with 
+	regedit.exe. HKEY_CURRENT_USER/Software/Freeware/Mame32</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If crashing during an audit or an [<b>F5</b>] refresh, 
+	it could be a corrupt .zip file. &nbsp;Extract it and re-zip. Pkunzip -t *.zip. 
+	Note the file that dies during the audit and concentrate on that one. Also 
+	verify that if zip files are not used, that the folder is not empty, or 
+	contains partial or damaged ROMs.<span style="mso-spacerun: yes">&nbsp;
+	</span>Utilization of an external ROMs management utility like
+	<b style="mso-bidi-font-weight: normal"><a href="http://www.clrmame.com/">
+	<span style="COLOR: black">Clrmame</span></a></b> is recommended for repair 
+	and identification of damaged sets.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If seeing crashes or weird screen coloration, try 
+	disabling running background apps [in Win98, use msconfig.exe], Norton 
+	Crashguard, PnP programs like Kaaza, eDonkey, LimeWire, popup killers, 
+	viruscans, MS Office Fast Find, the Microsoft Office Bar, Intellimouse, even 
+	IE subscription updates, etc. Try moving MameUI away from compressed 
+	[DriveSpace, DoubleSpace, stacker] drives.&nbsp; IntelliMouse and Office 
+	Toolbars have been known to cause conflicts.<span style="mso-spacerun: yes">&nbsp;
+	</span>Also disable items in the system tray, like the CD player, etc.&nbsp; 
+	It may also be necessary to download and install the latest version of 
+	DirectX from Microsoft to prevent some errors.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If MameUI crashes with an access violation it may be 
+	the DEP (Data Execution Prevention) setting on that machine.<span style="mso-spacerun: yes">&nbsp;
+	</span>Add MameUI to the exception list in Control Panel / System / Advanced 
+	/ DEP.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>In some instances games may fail to start if the 
+	installed directory path contains a large number of characters and spaces, 
+	to alleviate this, install MameUI and its support directory structure into a 
+	shorter path name, i.e. c:\MameUI\.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>MameUI may fail to launch its games in situations where 
+	an errant, non-DX compliant, or badly written gamepad USB adapter 
+	driver/software is used.<span style="mso-spacerun: yes">&nbsp; </span>This 
+	includes some cheap Playstation, SNES, U64 converters.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Games may fail to start if a video cards DirectX driver 
+	is flakey, utilise an earlier one to test or re-install DirectX.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Some recent viruses which attach to .exes will cause 
+	page faults and access violations in MameUI when it's run.&nbsp; Use an 
+	anti-virus check and verify MameUI is not infected.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Odd behaviour may be exhibited in NT based systems if 
+	attempting to run games while security/permissions settings do not allow it 
+	or the user is not an administrator or member of the administrator’s group.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Some anti-virus packages may slow down navigation 
+	within the MameUI directory.<span style="mso-spacerun: yes">&nbsp; </span>
+	These are false positives and the anti-virus vendors should update their 
+	virus dat signatures.<span style="mso-spacerun: yes">&nbsp; </span>It may 
+	also be possible to exclude the MameUI.exe from real-time scanning as a 
+	workaround.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>In the event of MameUI not launching a game and just 
+	sitting there, try placing the entire MameUI directory and its 
+	sub-directories including \ROMs into a more simple path, like c:\MameUI 
+	instead of &quot;c:\Games for Fun\MameUI Goes Here\&quot;.<span style="mso-spacerun: yes">&nbsp;
+	</span>Simplify the path.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>On rare occasions malformed or damaged *.dat files 
+	[history.dat, mameinfo.dat, cheat.dat] can cause MameUI to error on startup 
+	when it tries to read them.<span style="mso-spacerun: yes">&nbsp; </span>
+	Remove those files individually to check for the one causing the crash.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>With the move to XML based Controller *.cfg files in 
+	the .8x era it is necessary to remove the old \Ctrlr\*.ini files and use 
+	their new *.cfg counterparts, otherwise MameUI may launch games then 
+	immediately return to the GUI.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Use the Options • Reset to default menu choice and 
+	check all of the items, restart MameUI.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l3 level1 lfo4; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Final option, manually delete the MameUI32/64.ini and the 
+	Mame.ini file in the \ini directory.</p>
+	<p style="BACKGROUND: white; MARGIN: 0in 0in 5pt 0.25in"><strong>
+	<span style="FONT-SIZE: 12pt; FONT-FAMILY: 'Arial','sans-serif'">Performance 
+	Related Topics [incl. sound scratchiness and stuttering]</span></strong><span style="FONT-SIZE: 12pt"><o:p></o:p></span></p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>MameUI will start to crackle, scratch, or echo if the 
+	game running is too taxing for the processor in use. This can be visually 
+	confirmed by turning on FPS display with [<b>F11</b>], and frame skip to 
+	auto with [<b>F8</b>].&nbsp; If the FPS dips anywhere or frame skipping 
+	rises anywhere during the game play, the game is maxing out the CPU and 
+	sound breakup could occur.<span style="mso-spacerun: yes">&nbsp; It is also 
+	possible to determine if the host CPU can run the game at 100% by 
+	unthrottling the emulation with the [F10] key, if the CPU can do it, it will 
+	run the game faster than 100%.&nbsp; </span>If 
+	upgrading machine components, provide MameUI with as much hardware as 
+	possible; a faster CPU makes the most difference, followed by video card, 
+	and RAM.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>MameUI will start to 'skip' sound on games that run 
+	slightly over the host monitor refresh rate in full-screen mode with 
+	triplebuffer.&nbsp; For example, Pac-Man and other early Namco games run at 
+	60.60Hz and if they are run on a fixed 60Hz LCD monitor using triplebuffer 
+	they will skip since the emulation is outpacing the monitor. In this 
+	instance it is necessary to toggle on the 'Refresh Speed' switch in the 
+	Options • Default Options • Advanced tab.&nbsp; This issue can also be 
+	overcome by running the game in windowed mode.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>As Mame has continued development, infrastructure and 
+	accuracy has improved.<span style="mso-spacerun: yes">&nbsp; </span>As such, 
+	the optimization point of the games has shifted so that older games may be 
+	slower unthrottled overall than when run on earlier versions.<span style="mso-spacerun: yes">&nbsp;
+	</span>For example, in version .36 Donkey Kong may have run unthrottled at 
+	1900 FPS, but in .77 it runs 1500 FPS.<span style="mso-spacerun: yes">&nbsp;
+	Thus older machines [P3 and prior] will continue to have trouble playing the 
+	same games as earlier versions of Mame.&nbsp; M</span>odern machines should have no problem running these 
+	early 80's games at their intended ~60 FPS rate.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Periodically, speed-up hacks in the core code will be 
+	removed to provide more accurate emulation of the games.<span style="mso-spacerun: yes">&nbsp;
+	</span>This can result in a drop in FPS for that particular family of games, 
+	but can be offset by upgrading the machine MameUI is used on.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>On certain system setups (older), DirectDraw may be a 
+	faster option than the D3D settings.<span style="mso-spacerun: yes">&nbsp;
+	</span>Choose Ddraw as the video mode in Default Options • Display. </p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>With the advent of MameUI .120 some historically 
+	host CPU punishing games become playable on high end overclocked [3.6Ghz+] 
+	Intel Core2Duo and Quad Cores.&nbsp; These processors combined with 64bit 
+	operating systems and native 64bit MameUI provide almost 100% playability in 
+	namcos21.c / namcos22.c / seattle.c and midvunit.c games.&nbsp; MameUI64 + 
+	Vista64 + C2D chips is the best current combination for MameUI gaming on the 
+	Windows platform.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Some of the largest games supported by MameUI [NeoGeo 
+	mainly] can run into the hundreds of megabyte range when they are 
+	uncompressed into memory, this combined with MameUI in memory, plus OS 
+	overhead can lead to very slow performance as Windows swaps the information 
+	out to disk if there is not enough physical memory.&nbsp; 512M to 1G of 
+	memory is recommended for all current games [.118].</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>AMD’s Cool ‘n Quiet technology on certain setups has 
+	been known to cause slowdowns and lags while working in the MameUI GUI as 
+	well as causing some in-game sound and graphic stuttering.<span style="mso-spacerun: yes">&nbsp;
+	</span>Disable the feature in the BIOS to verify.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If seeing a severe slowdown in games that previously 
+	didn't, toggle the 'Sleep when possible' menu item in Options • 
+	Default Options • Miscellaneous.&nbsp; This happens to laptop users 
+	particularly.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Certain games in MameUI perform better on machines that 
+	cannot handle them 100% if auto-frame skipping is turned <b>off</b>.&nbsp;
+	</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Certain games if run with D3D settings will perform 
+	better if Triplebuffering is set to <b style="mso-bidi-font-weight: normal">
+	off</b>.<span style="mso-spacerun: yes">&nbsp; </span>D3D will double buffer 
+	if triple is turned off.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>There may be certain sound anomalies in games if the 
+	*.cfg files have become damaged, delete all the files in \cfg to remedy.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If games are running too <b>fast</b>, verify in the 
+	Options • Default Game Options menu that the throttle option is turned <b>on</b>, 
+	that sync to monitor refresh is turned <b>off </b>and Wait for Vertical Sync 
+	is turned <b>off</b> in the Options • Default Game Options • Advanced menu.<span style="mso-spacerun: yes">&nbsp;
+	</span></p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>MameUI video performance can be greatly enhanced if 
+	running in 32bpp mode by ensuring AGP Fast Writes are toggled on in the 
+	motherboard BIOS.<span style="mso-spacerun: yes">&nbsp; </span>The videocard 
+	drivers also need to support this setting, the switch for this may be in the 
+	advanced tab of the Windows display control panel applet.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>There are some soundcards like early PCI
+	<span class="SpellE">SoundBlaster</span> 128 that will cause scratchiness 
+	if their hardware acceleration is turned up too high.&nbsp; Move the slider 
+	down various steps to troubleshoot in Control Panel • Sound • Advanced 
+	Audio.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>There are some older video card/video driver 
+	combinations that <b>can</b> do hardware stretching, but are slower than 
+	running with hardware stretch <b>off</b>. If games are too sluggish with the 
+	hw stretch on, toggle it off if possible.&nbsp; Some old PCI graphic cards have 
+	been seen to have this problem.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l1 level1 lfo6; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If a large number of icons are being used in the GUI, 
+	it is typically quicker to unzip them into the \icons folder instead of 
+	leaving them zipped as icons.zip.</p>
+	<p style="BACKGROUND: white; MARGIN: 0in 0in 5pt 0.25in"><strong>
+	<span style="FONT-SIZE: 12pt; FONT-FAMILY: 'Arial','sans-serif'">Joysticks / 
+	Mice / Gamepad / Lightgun Related Topics</span></strong><span style="FONT-SIZE: 12pt"><o:p></o:p></span></p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l6 level1 lfo8; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Gamepads and mouse are disabled by default on first 
+	MameUI launch, enable them by toggling their check boxes on in Options • 
+	Default Options • Controllers.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l6 level1 lfo8; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>MameUI relies on DirectX’s DirectInput for joystick 
+	support, ensure the game pad is seen as present and active in the game 
+	controller control panel: start menu • settings • control panel • game 
+	controllers.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l6 level1 lfo8; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If seeing keys ‘stick’ while playing, verify that the 
+	operating systems’ accessibility options and their shortcut keys are turned 
+	off, things like ‘sticky keys’, and verify that Popup killers or other 
+	resident programs are not mapped to the sticking key.<span style="mso-spacerun: yes">&nbsp;
+	</span>Also keys can stick on some KVM switch boxes if their hotkey switches 
+	are set to [<b style="mso-bidi-font-weight: normal">Ctrl</b>] etc.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l6 level1 lfo8; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Daisy chained gameport Microsoft Sidewinders [original] 
+	in Win2k or XP do not work very well.&nbsp; Use USB gamepads instead. Single 
+	Sidewinders may also cause odd behavior like ghost button presses.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l6 level1 lfo8; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Lightguns and mice are treated like mappable joysticks 
+	in current versions of MameUI.<span style="mso-spacerun: yes">&nbsp; </span>If 
+	multiple mice are in use it is necessary to enter the in-game [<b style="mso-bidi-font-weight: normal">TAB</b>] 
+	menu and map their axes in the ‘Input General’ section.</p>
+	<p style="BACKGROUND: white; MARGIN: 0in 0in 5pt 0.25in"><strong>
+	<span style="FONT-SIZE: 12pt; FONT-FAMILY: 'Arial','sans-serif'">Settings 
+	Topics</span></strong><span style="FONT-SIZE: 12pt"><o:p></o:p></span></p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>With the advent of version 0.66 MameUI no longer stores 
+	its configuration information in the Windows registry, it stores it in 
+	\MameUI32/64.ini and \ini\Mame.ini.<span style="mso-spacerun: yes">&nbsp;
+	</span>To remove vestiges of the old versions, run regedit.exe and delete 
+	the following key: HKEY_CURRENT_USER\Software\Freeware\MameUI.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If having trouble saving keyboard mappings and 
+	configuration, verify that the *.cfg files are not read-only and that a 
+	\MameUI\cfg directory is present.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If GUI settings and/or audit results aren’t being 
+	maintained, verify the existence of a writeable MameUI32/64.ini and that the 
+	\ini directory is present and writeable [not read only] under the MameUI.exe 
+	location.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If baseline Mame settings like directories and game 
+	options are not being maintained, verify the existence of a writeable 
+	Mame.ini [not read-only] in the \ini directory and that the \ini directory 
+	itself is writeable.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If experiencing odd behavior with MameUI saving files 
+	or not appearing to clear its settings, verify that there are not multiple 
+	shortcuts pointing to different versions, that an .exe is not being used by 
+	itself instead of a shortcut to the .exe, or a shortcut pointing to an old 
+	version of the .exe.<span style="mso-spacerun: yes">&nbsp; </span>Also 
+	verify that there are not multiple versions of MameUI running in memory as 
+	the last one out will save the settings.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If seeing MameUI folders being created on the desktop, 
+	verify that the .exe itself is not sitting on the desktop and being launched 
+	which is not correct. Verify that a short-cut to the original is being 
+	properly utilised.<span style="mso-spacerun: yes">&nbsp; </span>This means 
+	setting the properties on the shortcut to ‘start in’ the appropriate 
+	directory that the original .exe resides in.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If the in-game [<b>TAB</b>] menu is no longer working 
+	or can’t be accessed, it has been mapped to another key; delete the 
+	default.cfg file in the \MameUI\cfg directory.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If in-game [<b style="mso-bidi-font-weight: normal">TAB</b>] 
+	settings need to be completely reset due to bad mappings, delete the 
+	default.cfg file in the \MameUI\cfg directory.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>To remove the mappings on an individual game from the [<b style="mso-bidi-font-weight: normal">TAB</b>] 
+	menu, delete its *.cfg file in the \MameUI\cfg directory, i.e. dkong.cfg, 
+	asteroid.cfg.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If having trouble mapping keys with the [<b style="mso-bidi-font-weight: normal">TAB</b>] 
+	menu, verify the game is not paused while mapping.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>MameUI inherits a limit from baseline Mame on the 
+	amount of characters that can be used for the ROM paths.<span style="mso-spacerun: yes">&nbsp;
+	</span>If directory settings are not being maintained, pare down the number 
+	and names of the directories being added or simply use a single \ROMs 
+	directory which MameUI expects.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If having trouble getting games to display in the 
+	proper orientation [they will not rotate] verify that rotation is set to 
+	default, and that there are no video-card specific hot-keys set in Windows’ 
+	advanced display settings tab that could impact rotation, ATI and NVIDIA 
+	both now include the ability to rotate the Windows screen to portrait 
+	orientation.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If games are appearing sideways regardless of rotation 
+	settings, an onboard Intel graphic chipset or similar may be in use.<span style="mso-spacerun: yes">&nbsp;
+	</span>Disable the auto rotation capabilities of the Intel graphic chip.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>MameUI now supports the core’s –<span class="SpellE">mt</span> 
+	switch.<span style="mso-spacerun: yes">&nbsp; </span>This allows 
+	multi-threading of the final video blit during games. Dual core chips [X2, 
+	C2D, etc.] can take advantage of this feature to offload the work to the 
+	second thread and make MameUI more efficient.<span style="mso-spacerun: yes">&nbsp;
+	</span>Speed gains are seen on the unthrottled GPU bound games like dkong, 
+	invaders, etc.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l4 level1 lfo10; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>MameUI now stores its settings in external *.ini files 
+	instead of the registry.<span style="mso-spacerun: yes">&nbsp; </span>If it 
+	is necessary to return MameUI to baseline, simply delete the MameUI32/64.ini 
+	file and the Mame.ini file in the \ini directory.<span style="mso-spacerun: yes">&nbsp;
+	</span>The next time MameUI runs it will recreate those files with the 
+	default settings.</p>
+	<p style="BACKGROUND: white; MARGIN: 0in 0in 5pt 0.25in"><strong>
+	<span style="FONT-SIZE: 12pt; FONT-FAMILY: 'Arial','sans-serif'">GUI Related 
+	Topics &amp; Miscellaneous Tips</span></strong><span style="FONT-SIZE: 12pt"><o:p></o:p></span></p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo12; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>MameUI will read freestanding icons in the \icons 
+	directory first, then icons in the icons.zip file.&nbsp; </p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo12; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>If seeing icon palette corruption in the GUI when 
+	returning from a full screen game, try increasing the desktop color depth to 
+	24bpp or 32bpp.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo12; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Sometimes icons in large icon view may appear to be 
+	missing their white color or have portions transparent, this is the result 
+	of having white chosen as the windows desktop window setting in Control 
+	Panel / Display.&nbsp; Change the window setting to slightly off-white or 
+	another color to return the icons to their appropriate look.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo12; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>To toggle the MameUI UI fullscreen [no Windows titlebar 
+	and potentially no toolbar or status bar] and back use the [<b style="mso-bidi-font-weight: normal">F11</b>] 
+	key.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo12; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>The GUI text may disappear from the folder view if the 
+	GUI font color chosen is very close to the Windows system background color 
+	scheme or if it is a large enough font [or bold] to anti-alias. </p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo12; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>MameUI no longer supports *.bmp format and may show a 
+	blank or empty background if a *.bmp is erroneously renamed and used for 
+	bkground.png, or if the bkground directory is marked as read only and MameUI 
+	cannot create the bkground.png file when run.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo12; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>To return to a blank gray background in the GUI, delete 
+	the bkground.png file in the \MameUI\bkground directory.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo12; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Quickly navigate through games in the details view by 
+	simply typing the first few letters in the name of the game, the highlight 
+	will jump to that game and become more granular as the name is typed out.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo12; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Select a random game with [<b>Ctrl-R</b>].</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo12; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Audit an individual game with [<b>Alt-A</b>].</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo12; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Various arcade game controller companies produce custom 
+	made configuration files for their setups; these *.cfg files need to go in 
+	the \MameUI\ctrlr folder to be recognized in the MameUI controllers tab.<span style="mso-spacerun: yes">&nbsp;
+	</span>These files are the responsibility of the controller companies 
+	themselves and are not included or endorsed by MameUI, they can typically be 
+	found at the companies’ web sites.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo12; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>In grouped view, clones are indented regardless of 
+	whether their parents are visible; in a non-All Games folder this means that 
+	there is not a direct relationship of a clone to the game item above it if 
+	that games’ parent is not shown.&nbsp; This behaviour can be changed by the 
+	setting Interface Options • No offset for clones missing parent in view.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo12; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>Certain items in the GUI may be missing if MameUI is 
+	run on a Win2K/XP box and the user is not an admin or member of the admin 
+	group.</p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l0 level1 lfo12; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span>The unavailable folder and the available filter are 
+	disabled in MameUI due to a direct request from Nicola.</p>
+	<p style="BACKGROUND: white; MARGIN: 0in 0in 5pt 0.25in"><strong>
+	<span style="FONT-SIZE: 12pt; FONT-FAMILY: 'Arial','sans-serif'">Keyboard 
+	Shortcuts</span></strong><span style="FONT-SIZE: 12pt"><o:p></o:p></span></p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l2 level1 lfo14; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span><b style="mso-bidi-font-weight: normal">Type letters of 
+	game name</b> to jump directly to its first instance.<span style="mso-spacerun: yes">&nbsp;
+	</span><b style="mso-bidi-font-weight: normal">Alt-1 through Alt-7</b>: 
+	Toggle art views.<span style="mso-spacerun: yes">&nbsp; </span>
+	<b style="mso-bidi-font-weight: normal">Alt-A</b>: Audit selected game.<span style="mso-spacerun: yes">&nbsp;
+	</span><b style="mso-bidi-font-weight: normal">Alt-B</b>: Toggle art tabs.<span style="mso-spacerun: yes">&nbsp;
+	</span><b style="mso-bidi-font-weight: normal">Alt-D</b>: Toggle folder 
+	pane.<span style="mso-spacerun: yes">&nbsp; </span>
+	<b style="mso-bidi-font-weight: normal">Alt-P</b>: Toggle screenshot area.<span style="mso-spacerun: yes">&nbsp;
+	</span><b style="mso-bidi-font-weight: normal">Alt-S</b>: Toggle status bar.
+	<b style="mso-bidi-font-weight: normal">Alt-T</b>: Toggle toolbar.
+	<b style="mso-bidi-font-weight: normal">Alt-U</b>: Audit selected folder.
+	<b style="mso-bidi-font-weight: normal">Alt-Enter</b>: Show games’ 
+	properties.<span style="mso-spacerun: yes">&nbsp; </span>
+	<b style="mso-bidi-font-weight: normal">Ctrl-F</b>: Text filter.<span style="mso-spacerun: yes">&nbsp;
+	</span><b style="mso-bidi-font-weight: normal">Ctrl-R</b>: Choose random 
+	game from GUI. <b style="mso-bidi-font-weight: normal">Ctrl-Page Up</b>: 
+	Scroll up in history.dat text window.<span style="mso-spacerun: yes">&nbsp;
+	</span><b style="mso-bidi-font-weight: normal">Ctrl-Page Down</b>: Scroll 
+	down in history.dat text window. <b style="mso-bidi-font-weight: normal">F11</b>: 
+	Fullscreen mode toggle.</p>
+	<p style="BACKGROUND: white; MARGIN: 0in 0in 5pt 0.25in"><strong>
+	<span style="FONT-SIZE: 12pt; FONT-FAMILY: 'Arial','sans-serif'">Refresh 
+	Restart Instructions<o:p></o:p></span></strong></p>
+	<p style="MARGIN: 0in 0in 5pt 0.5in; TEXT-INDENT: -0.25in; mso-list: l2 level1 lfo14; tab-stops: list .5in">
+	<span style="FONT-FAMILY: Symbol; mso-fareast-font-family: Symbol; mso-bidi-font-family: Symbol">
+	<span style="mso-list: Ignore">·<span style="FONT: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	</span></span></span><b style="mso-bidi-font-weight: normal">a.</b> 
+	Re-download the binary dist package from
+	<a href="http://mameui.info/">
+	<span style="COLOR: black">MameUI</span></a>.<span style="mso-spacerun: yes">&nbsp;
+	</span><b style="mso-bidi-font-weight: normal">b.</b> Disable running 
+	anti-virus packages before extracting the files.
+	<b style="mso-bidi-font-weight: normal">c.</b> Double-click the 
+	self-extracting archive. <span style="mso-spacerun: yes">&nbsp;</span><b style="mso-bidi-font-weight: normal">d.</b> 
+	When prompted, enter “c:\” [no quotes] as the destination folder.<span style="mso-spacerun: yes">&nbsp;
+	</span><b style="mso-bidi-font-weight: normal">e.</b> Launch MameUI by 
+	double-clicking its .exe, allow the audit/refresh to finish, it should go 
+	quick as there are no ROMs.<span style="mso-spacerun: yes">&nbsp; </span>
+	<b style="mso-bidi-font-weight: normal">f.</b> Put a couple of zipped ROMs 
+	from <a href="http://www.mamedev.org/roms"><span style="COLOR: black">
+	mamedev.org</span></a> in the c:\MameUI\ROMs directory.<span style="mso-spacerun: yes">&nbsp;
+	</span><b style="mso-bidi-font-weight: normal">g.</b> Launch MameUI, audit 
+	the two games individually with [<b style="mso-bidi-font-weight: normal">Alt-A</b>].<span style="mso-spacerun: yes">&nbsp;
+	</span><b style="mso-bidi-font-weight: normal">h.</b> Launch Robby or 
+	Gridlee.<span style="mso-spacerun: yes">&nbsp; </span>
+	<b style="mso-bidi-font-weight: normal">i.</b> Quit the game, then quit 
+	MameUI.<span style="mso-spacerun: yes">&nbsp; </span>
+	<b style="mso-bidi-font-weight: normal">j.</b> Add more ROMs and try again.<br style="mso-special-character: line-break">
+	<br style="mso-special-character: line-break">
+	</p>
+	<p style="MARGIN: 0in 0in 5pt 0.25in"><span style="FONT-SIZE: 8pt">
+	<span style="mso-no-proof: yes">8/17/2007 1:17:01 AM</span> / john iv<o:p></o:p></span></p>
+</div>
+
+
+</html>

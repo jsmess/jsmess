@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="background">
+	</element>
+  <element name="red_led" defstate="0">
+    <disk state="1">
+      <color red="0.75" green="0.0" blue="0.0" />
+    </disk>
+    <disk state="0">
+      <color red="0.09375" green="0.0" blue="0.0" />
+    </disk>
+  </element>
+  <element name="green_led" defstate="0">
+    <disk state="1">
+      <color red="0.0" green="0.75" blue="0.0" />
+    </disk>
+    <disk state="0">
+      <color red="0.0" green="0.09375" blue="0.0" />
+    </disk>
+  </element>
+	<view name="Front panel">
+		<bezel element="background">
+			<bounds x="0" y="0" width="628" height="77" />
+		</bezel>
+		<bezel name="led_0" element="red_led">
+			<bounds x="474" y="34" width="6" height="6" />
+		</bezel>
+		<bezel name="led_1" element="green_led">
+			<bounds x="510" y="34" width="6" height="6" />
+		</bezel>
+	</view>
+</mamelayout>

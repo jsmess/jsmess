@@ -1,0 +1,8 @@
+<tests>
+
+<test name="samcoupe_000" driver="samcoupe">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+</tests>

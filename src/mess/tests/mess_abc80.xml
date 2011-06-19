@@ -1,0 +1,12 @@
+<tests>
+
+<test name="abc80_000" driver="abc80">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+<test name="abc802_000" driver="abc802">
+	<wait time="5"/>
+</test>
+
+</tests>

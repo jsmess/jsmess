@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pc8001_cass" description="NEC PC-8001 &amp; PC-8001SR tape images">
+
+
+<!-- CASSETTES -->
+
+	<software name="galaxian">
+		<description>Galaxian</description>
+		<year>19??</year>
+		<publisher>Dempa</publisher>
+		<part name="tape1" interface="pc8001_cass">
+			<dataarea name="side1" size="18426">
+				<rom name="galaxian_dempa_v80.t88" size="18426" crc="da9fec0d" sha1="4b8992cec6deaecd6efe7fe401c1d134ec6465a5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starflet">
+		<description>Star Fleet</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="tape1" interface="pc8001_cass">
+			<dataarea name="side1" size="20553">
+				<rom name="star_fleet_v80.t88" size="20553" crc="47ac3ccb" sha1="2e3d459f12acccc13247f7dc2c42d6732ce7dcdd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yojigen">
+		<description>Yojigen no...</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="tape1" interface="pc8001_cass">
+			<dataarea name="side1" size="24890">
+				<rom name="yojigennno_ie_v80.t88" size="24890" crc="40e6938c" sha1="b642f87dc619975e60561499dc35b9b5d7afff07" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- SR CASSETTES -->
+
+<!-- these might be 2-sided cassettes (i.e. we should merge some parts) -->
+	<software name="pacland">
+		<description>Pac-Land</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="tape1" interface="pc8001_cass">
+			<dataarea name="side1" size="114341">
+				<rom name="pac-land_a.t88" size="114341" crc="42e990c5" sha1="46cbd8e91421ff701e9f0e98444a27a526e33867"/>
+			</dataarea>
+		</part>
+		<part name="tape2" interface="pc8001_cass">
+			<dataarea name="side1" size="106404">
+				<rom name="pac-land_b.t88" size="106404" crc="0c8a5a96" sha1="ea71b6f51c8cd2fdcd7d62e31fbd5ad356df8168"/>
+			</dataarea>
+		</part>
+		<part name="tape3" interface="pc8001_cass">
+			<dataarea name="side1" size="110004">
+				<rom name="pac-land_c.t88" size="110004" crc="5c29c64a" sha1="4e1a9dc18a026be4add67db8724ef05da1275e1a"/>
+			</dataarea>
+		</part>
+		<part name="tape4" interface="pc8001_cass">
+			<dataarea name="side1" size="111401">
+				<rom name="pac-land_d.t88" size="111401" crc="d22bd412" sha1="0858e14003b65bd5024eb5a4a46f3cae4be12f7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blonyx">
+		<description>The Black Onyx</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="tape1" interface="pc8001_cass">
+			<dataarea name="side1" size="64295">
+				<rom name="the_black_onyx_v80.t88" size="64295" crc="3671cfd9" sha1="5e7289c85cd12cb3012533077ceb4355cc151349"/>
+			</dataarea>
+		</part>
+		<part name="tape2" interface="pc8001_cass">
+			<dataarea name="side1" size="29795">
+				<rom name="the_black_onyx_v80_character creation.t88" size="29795" crc="23f62174" sha1="3960a0cd2987cf655faa406e58b1dc05ec6f9ebf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>

@@ -1,0 +1,924 @@
+<hashfile>
+	<!-- NEC PC-Engine/TurboGrafx-16 HuCard CRC List -->
+	<!-- Compiled by Chris Henry and Cowering -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<!-- Send corrections/submissions to: battlepriest@hotmail.com -->
+	<hash crc32="8bc47a35" name="15 in 1 Mega Collection (J) (alt)"/>
+	<hash crc32="83c9238f" name="15 in 1 Mega Collection (J) (bad dump 1)"/>
+	<hash crc32="6c30f0ac" name="15 in 1 Mega Collection (J)"/>
+	<!-- 15 in 1 Mega-Collection (J) (bad dump 2) -->
+	<!-- 1941 Counter Attack (SGX) (J) (alt 1) -->
+	<!-- 1941 Counter Attack (SGX) (J) (alt 2) -->
+	<hash crc32="9cc1f2b4" name="1941 Counter Attack (SGX) (J) (bad dump)"/>
+	<hash crc32="f59c5804" name="1941 Counter Attack (SGX) (J) (hacked for non SGX) (alt)"/>
+	<hash crc32="6a46ca22" name="1941 Counter Attack (SGX) (J) (hacked for non SGX)"/>
+	<hash crc32="8c4588e2" name="1941 Counter Attack (SGX) (J)"/>
+	<hash crc32="61918dab" name="1943 Kai (J) (alt 1)"/>
+	<hash crc32="fe95666e" name="1943 Kai (J) (alt 2)"/>
+	<hash crc32="647deb69" name="1943 Kai (J) (alt 3)"/>
+	<hash crc32="99584bb7" name="1943 Kai (J) (alt 4)"/>
+	<hash crc32="79362389" name="1943 Kai (J)"/>
+	<hash crc32="b5b0a21e" name="21-Emon (J)"/>
+	<hash crc32="637ba71d" name="5 in 1 Fami Collection (J)"/>
+	<!-- Adventure Island (J) (bad dump) -->
+	<hash crc32="8e71d4f3" name="Adventure Island (J)"/>
+	<hash crc32="0fb8d51b" name="Aero Blasters (J) (alt 1)"/>
+	<!-- Aero Blasters (J) (bad dump) -->
+	<hash crc32="76568abb" name="Aero Blasters (J)"/>
+	<hash crc32="c02b1b59" name="Aero Blasters (U)"/>
+	<hash crc32="6c3823f8" name="After Burner II (J) (bad dump 1)"/>
+	<!-- After Burner II (J) (bad dump 2) -->
+	<hash crc32="9fd134b5" name="After Burner II (J) (bad dump 3)"/>
+	<hash crc32="999a0912" name="After Burner II (J)"/>
+	<!-- Air Zonk (J) -->
+	<!-- Air Zonk (U) (bit-flipped) -->
+	<hash crc32="b0c0ea9d" name="Air Zonk (U)"/>
+	<!-- Aldynes (SGX) (J) (bad dump 1) -->
+	<!-- Aldynes (SGX) (J) (bad dump 2) -->
+	<!-- Aldynes (SGX) (J) (bad dump 3) -->
+	<hash crc32="4c2126b0" name="Aldynes (SGX) (J)"/>
+	<hash crc32="05453628" name="Alice in Wonderdream (J) (512K)"/>
+	<hash crc32="d7a0cc44" name="Alice in Wonderdream (J) (bad dump 1)"/>
+	<hash crc32="e49258f2" name="Alice in Wonderdream (J) (bad dump 2)"/>
+	<hash crc32="ea746353" name="Alice in Wonderdream (J)"/>
+	<hash crc32="8d80f611" name="Alien Crush (J) (bad dump)"/>
+	<hash crc32="60edf4e1" name="Alien Crush (J)"/>
+	<hash crc32="a9d599e4" name="Alien Crush (U) (bad dump)"/>
+	<hash crc32="b64de6fd" name="Alien Crush (U)"/>
+	<!-- Andre Panza Kick Boxing (U) (bad dump 1) -->
+	<!-- Andre Panza Kick Boxing (U) (bad dump 2) -->
+	<!-- Andre Panza Kick Boxing (U) (bad dump 3) -->
+	<!-- Andre Panza Kick Boxing (U) (bad dump 4) -->
+	<hash crc32="2ba52e07" name="Andre Panza Kick Boxing (U)"/>
+	<!-- Ankoko Densetsu (J) (bad dump) -->
+	<hash crc32="c3a1fb28" name="Ankoko Densetsu (J)"/>
+	<hash crc32="25de250a" name="Aoi Blink (J) (512K)"/>
+	<!-- Aoi Blink (J) (bad dump 1) -->
+	<!-- Aoi Blink (J) (bad dump 2) -->
+	<hash crc32="82e47fd2" name="Aoi Blink (J)"/>
+	<hash crc32="22393671" name="Appare! Gateball (J)"/>
+	<hash crc32="5e4fa713" name="Artist Tool (J)"/>
+	<!-- Atomic Robokid Special (J) (bad dump 1) -->
+	<!-- Atomic Robokid Special (J) (bad dump 2) -->
+	<hash crc32="8effffc7" name="Atomic Robokid Special (J)"/>
+	<hash crc32="7eb736fc" name="Av Poker World Gambler (J)"/>
+	<hash crc32="83a23579" name="Ballistix (J)"/>
+	<hash crc32="9693d259" name="Ballistix (U)"/>
+	<hash crc32="e13a6ce8" name="Bari Bari Densetsu (J) (512K) (bad dump)"/>
+	<hash crc32="72a7c22c" name="Bari Bari Densetsu (J) (512K)"/>
+	<!-- Bari Bari Densetsu (J) (bad dump) -->
+	<hash crc32="3ad767f3" name="Bari Bari Densetsu (J)"/>
+	<!-- Barunba (J) (bad dump) -->
+	<hash crc32="d64cf30c" name="Barunba (J)"/>
+	<hash crc32="92c919ea" name="Batman (J) (512K)"/>
+	<!-- Batman (J) (bad dump) -->
+	<!-- Batman (J) (hacked) -->
+	<hash crc32="e8db321c" name="Batman (J)"/>
+	<hash crc32="0115fb6f" name="Battle Ace (SGX) (J) (bad dump 1)"/>
+	<!-- Battle Ace (SGX) (J) (bad dump 2) -->
+	<hash crc32="fdc24b1f" name="Battle Ace (SGX) (J)"/>
+	<hash crc32="5089b296" name="Battle Lode Runner (J)"/>
+	<!-- Battle Royale (U) (bad dump) -->
+	<hash crc32="1c4bc9b7" name="Battle Royale (U)"/>
+	<!-- Be Ball (J) (bad dump 1) -->
+	<!-- Be Ball (J) (bad dump 2) -->
+	<!-- Be Ball (J) (bad dump 3) -->
+	<hash crc32="ea6a3174" name="Be Ball (J) (hacked)"/>
+	<hash crc32="45314323" name="Be Ball (J)"/>
+	<hash crc32="f97d90ce" name="Be Ball - Taisang Version (J)"/>
+	<hash crc32="c42b6d76" name="Benkei Gaiden (J) (512K)"/>
+	<!-- Benkei Gaiden (J) (alt) -->
+	<hash crc32="54c21fc5" name="Benkei Gaiden (J)"/>
+	<!-- Blazing Lazers (J) (bad dump 1) -->
+	<!-- Blazing Lazers (J) (bad dump 2) -->
+	<hash crc32="f0ed3094" name="Blazing Lazers (J)"/>
+	<!-- Blazing Lazers (U) (hacked) (512K) -->
+	<!-- Blazing Lazers (U) (hacked) -->
+	<!-- Blazing Lazers (U) -->
+	<!-- Blodia (J) (alt) -->
+	<hash crc32="039ef938" name="Blodia (J)"/>
+	<hash crc32="5918b033" name="Bloody Wolf (U) (bad dump)"/>
+	<hash crc32="144747ed" name="Bloody Wolf (U)"/>
+	<hash crc32="ffd92458" name="Body Conquest 2 (J)"/>
+	<!-- Bomberman '93 (J) (bad dump 1) -->
+	<!-- Bomberman '93 (J) (bad dump 2) -->
+	<hash crc32="75d121ae" name="Bomberman '93 (J)"/>
+	<hash crc32="26020c77" name="Bomberman '93 (U)"/>
+	<!-- Bomberman '94 (J) (bad dump 1) -->
+	<!-- Bomberman '94 (J) (bad dump 2) -->
+	<hash crc32="b25fb323" name="Bomberman '94 (J)"/>
+	<!-- Bomberman (J) (bad dump 1) -->
+	<!-- Bomberman (J) (bad dump 2) -->
+	<hash crc32="87fd22ad" name="Bomberman (J) (Pirate)"/>
+	<hash crc32="1835da36" name="Bomberman (J)"/>
+	<hash crc32="8bf34ffa" name="Bomberman (U)"/>
+	<!-- Bonk 3 - Bonk's Big Adventure (U) (bad dump) -->
+	<!-- Bonk 3 - Bonk's Big Adventure (U) (bit-flipped) -->
+	<hash crc32="9913a9de" name="Bonk 3 - Bonk's Big Adventure (U)"/>
+	<!-- Bonk's Adventure (U) (512K) (alt 1) -->
+	<!-- Bonk's Adventure (U) (512K) (alt 2) -->
+	<hash crc32="d70892a3" name="Bonk's Adventure (U) (512K)"/>
+	<!-- Bonk's Adventure (U) -->
+	<!-- Bonk's Revenge (U) (bad dump 1) -->
+	<!-- Bonk's Revenge (U) (bad dump 2) -->
+	<hash crc32="64301ff1" name="Bonk's Revenge (U)"/>
+	<!-- Bonze Adventure (J) (alt) -->
+	<hash crc32="34cdbb45" name="Bonze Adventure (J)"/>
+	<!-- Bouken Danshakan Don Sunheart Hen (J) (hacked) -->
+	<hash crc32="8f4d9f94" name="Bouken Danshakan Don Sunheart Hen (J)"/>
+	<!-- Bouncing Ball Demo (PD) -->
+	<hash crc32="2e5ac9c0" name="Boxy Boy (U)"/>
+	<hash crc32="393a0ecd" name="Bravoman (U) (hacked)"/>
+	<hash crc32="cca08b02" name="Bravoman (U)"/>
+	<!-- Break in (J) (alt) -->
+	<hash crc32="c7848187" name="Break in (J)"/>
+	<!-- Bubblegum Crash (J) (alt) -->
+	<!-- Bubblegum Crash (J) (bad dump) -->
+	<hash crc32="0d766139" name="Bubblegum Crash (J)"/>
+	<hash crc32="3e4eaf98" name="Bullfight Ring no Haja (J) (512K)"/>
+	<!-- Bullfight Ring no Haja (J) (bad dump) -->
+	<hash crc32="a4fd9c3f" name="Bullfight Ring no Haja (J)"/>
+	<hash crc32="17a47d0d" name="Burning Angels (J) (512K)"/>
+	<hash crc32="2a8345f4" name="Burning Angels (J)"/>
+	<hash crc32="780ee8df" name="Cadash (J) (512K)"/>
+	<!-- Cadash (J) (bad dump 1) -->
+	<!-- Cadash (J) (bad dump 2) -->
+	<hash crc32="75705df1" name="Cadash (J)"/>
+	<hash crc32="a3eb340c" name="Cadash (U)"/>
+	<hash crc32="3c33e016" name="Cart (maybe demo) (PD)"/>
+	<!-- CD-ROM System Ver. 1.00 (J) (bad dump) -->
+	<hash crc32="31cc5649" name="CD-ROM System Ver. 1.00 (J)"/>
+	<hash crc32="5c01c82b" name="CD-ROM System Ver. 2.00 (J)"/>
+	<hash crc32="a0bcce2d" name="CD-ROM System Ver. 2.00 (U)"/>
+	<!-- CD-ROM System Ver. 2.10 (J) (bad dump) -->
+	<hash crc32="cfc02772" name="CD-ROM System Ver. 2.10 (J) (hacked to report V1)"/>
+	<hash crc32="2668b70d" name="CD-ROM System Ver. 2.10 (J)"/>
+	<hash crc32="76164593" name="Champion Wrestler (J) (512K)"/>
+	<!-- Champion Wrestler (J) (bad dump) -->
+	<hash crc32="666c8f44" name="Champion Wrestler (J)"/>
+	<!-- Champions Forever Boxing (U) (bad dump 1) -->
+	<!-- Champions Forever Boxing (U) (bad dump 2) -->
+	<hash crc32="2cee30ee" name="Champions Forever Boxing (U)"/>
+	<hash crc32="033e8c4a" name="Chase HQ (J) (512K)"/>
+	<hash crc32="97ff523e" name="Chase HQ (J)"/>
+	<hash crc32="e84890a5" name="Chase HQ (U)"/>
+	<!-- Chew-man-fu (U) (bad dump) -->
+	<hash crc32="88796264" name="Chew-man-fu (U)"/>
+	<hash crc32="879beddd" name="Chibi Marukochan Quiz De Pihyara (J)"/>
+	<hash crc32="cab21b2e" name="Chikudenya Toubee (J)"/>
+	<hash crc32="218a2859" name="China Warrior (J) (bad dump 1) (trained)"/>
+	<hash crc32="427a1738" name="China Warrior (J) (bad dump 2) (trained)"/>
+	<!-- China Warrior (J) (trained) (pirate) -->
+	<hash crc32="0815c236" name="China Warrior (J) (trained)"/>
+	<hash crc32="38d41afc" name="China Warrior (J)"/>
+	<hash crc32="8b3b0003" name="China Warrior (U)"/>
+	<!-- Chouzetsu Rinjin (BravoMan) (J) (bad dump 1) -->
+	<!-- Chouzetsu Rinjin (BravoMan) (J) (bad dump 2) -->
+	<!-- Chouzetsu Rinjin (BravoMan) (J) (bad dump 3) -->
+	<!-- Chouzetsu Rinjin (BravoMan) (J) (bad dump 4) -->
+	<hash crc32="cb2498ee" name="Chouzetsu Rinjin (BravoMan) (J)"/>
+	<hash crc32="c3212c24" name="Circus Lido (J)"/>
+	<hash crc32="74200339" name="City Hunter (J) (512K)"/>
+	<hash crc32="84c2baa1" name="City Hunter (J) (bad dump)"/>
+	<hash crc32="01ab80f1" name="City Hunter (J)"/>
+	<hash crc32="4d9bfce4" name="College Pro Baseball '89 (J)"/>
+	<hash crc32="364f445a" name="College Pro Baseball '90 (J)"/>
+	<!-- Columns (J) (alt) -->
+	<hash crc32="2d9d87c3" name="Columns (J)"/>
+	<hash crc32="0398fad2" name="Coryoon Child of Dragon (J) (alt 1)"/>
+	<!-- Coryoon Child of Dragon (J) (alt 2) -->
+	<hash crc32="e73a3f01" name="Coryoon Child of Dragon (J)"/>
+	<!-- Cratermaze (U) (bad dump) -->
+	<hash crc32="44af9bea" name="Cratermaze (U)"/>
+	<!-- Cross Wiber - Cyber Combat Police (J) (bad dump 1) -->
+	<!-- Cross Wiber - Cyber Combat Police (J) (bad dump 2) -->
+	<hash crc32="3f7c458d" name="Cross Wiber - Cyber Combat Police (J)"/>
+	<!-- Cyber Core (J) (512K) -->
+	<!-- Cyber Core (J) (alt 1) -->
+	<!-- Cyber Core (J) (alt 2) -->
+	<!-- Cyber Core (J) -->
+	<!-- Cyber Core (U) (512K) -->
+	<!-- Cyber Core (U) -->
+	<!-- Cyber Cross (J) (512K) -->
+	<!-- Cyber Cross (J) (bad dump) -->
+	<!-- Cyber Cross (J) -->
+	<!-- Cyber Dodge (J) -->
+	<!-- Cyber Knight (J) -->
+	<!-- Dai Makai Mura (SGX) (Ghouls and Ghosts) (J) (bad dump) -->
+	<!-- Dai Makai Mura (SGX) (Ghouls and Ghosts) (J) -->
+	<!-- Daichikun Crisis Do Natural (J) -->
+	<!-- Darius Alpha (J) (alt) -->
+	<!-- Darius Alpha (J) -->
+	<!-- Darius Plus (SGX) (J) (1024K) (different filler) -->
+	<!-- Darius Plus (SGX) (J) (1024K) -->
+	<!-- Darius Plus (SGX) (J) (bad dump 1) -->
+	<!-- Darius Plus (SGX) (J) (bad dump 2) -->
+	<!-- Darius Plus (SGX) (J) (hacked) -->
+	<!-- Darius Plus (SGX) (J) -->
+	<!-- Darkwing Duck (U) (bad dump 1) -->
+	<!-- Darkwing Duck (U) (bad dump 2) -->
+	<!-- Darkwing Duck (U) (bit-flipped) -->
+	<!-- Darkwing Duck (U) -->
+	<!-- Davis Cup Tennis (U) (bit-flipped) -->
+	<!-- Davis Cup Tennis (U) -->
+	<!-- Dead Moon (J) -->
+	<!-- Dead Moon (U) (bad dump) -->
+	<!-- Dead Moon (U) -->
+	<!-- Deep Blue (J) -->
+	<!-- Deep Blue (U) -->
+	<!-- Detana!! Twinbee (J) (1024K) -->
+	<!-- Detana!! Twinbee (J) (bad dump) -->
+	<!-- Detana!! Twinbee (J) -->
+	<!-- Devil Crash (J) (512K) -->
+	<!-- Devil Crash (J) -->
+	<!-- Devil's Crush (U) (512K) (bad dump) -->
+	<!-- Devil's Crush (U) (512K) -->
+	<!-- Devil's Crush (U) -->
+	<!-- Die Hard (J) -->
+	<!-- Digital Champ (J) (alt) -->
+	<!-- Digital Champ (J) -->
+	<!-- Don Doko Don (J) (512K) -->
+	<!-- Don Doko Don (J) (bad dump) -->
+	<!-- Don Doko Don (J) -->
+	<!-- Doraemon Meikyu Daisakusen (J) (bad dump) -->
+	<!-- Doraemon Meikyu Daisakusen (J) -->
+	<!-- Doraemon Nobita no Dorabian Night (J) (Bad Dump) -->
+	<!-- Doraemon Nobita no Dorabian Night (J) -->
+	<!-- Double Dungeons (J) (bad dump 1) -->
+	<!-- Double Dungeons (J) (bad dump 2) -->
+	<!-- Double Dungeons (J) -->
+	<!-- Double Dungeons (U) (bad dump 3) -->
+	<!-- Double Dungeons (U) (bit-flipped) -->
+	<!-- Double Dungeons (U) -->
+	<!-- Download (J) (alt 1) -->
+	<!-- Download (J) (alt 2) -->
+	<!-- Download (J) (alt 3) -->
+	<!-- Download (J) -->
+	<!-- Dragon Egg! (J) (alt) -->
+	<!-- Dragon Egg! (J) (bad dump) -->
+	<!-- Dragon Egg! (J) -->
+	<!-- Dragon Fighter (J) -->
+	<!-- Dragon Saber (J) (bad dump) -->
+	<!-- Dragon Saber (J) -->
+	<!-- Dragon Spirit (J) -->
+	<!-- Dragon Spirit (U) (bad dump) -->
+	<!-- Dragon Spirit (U) -->
+	<!-- Dragon's Curse (U) (bad dump) -->
+	<!-- Dragon's Curse (U) (bit-flipped) -->
+	<!-- Dragon's Curse (U) -->
+	<!-- Drop off (U) -->
+	<!-- Drop Rock Hora Hora (J) -->
+	<!-- Dungeon Explorer (J) (512K) -->
+	<!-- Dungeon Explorer (J) (bad dump 1) -->
+	<!-- Dungeon Explorer (J) (bad dump 2) -->
+	<!-- Dungeon Explorer (J) -->
+	<!-- Dungeon Explorer (U) (512K) -->
+	<!-- Dungeon Explorer (U) (alt) -->
+	<!-- Dungeon Explorer (U) (bit-flipped) -->
+	<!-- Dungeon Explorer (U) -->
+	<!-- Energy (J) (bad dump) -->
+	<!-- Energy (J) -->
+	<!-- Eternal City Toshi Tenso Keikaku (J) (512K) -->
+	<!-- Eternal City Toshi Tenso Keikaku (J) (bad dump) -->
+	<!-- Eternal City Toshi Tenso Keikaku (J) -->
+	<!-- F-1 Dream (J) (alt 1) -->
+	<!-- F-1 Dream (J) (alt 2) -->
+	<!-- F-1 Dream (J) -->
+	<!-- F-1 Pilot (J) (512K) -->
+	<!-- F-1 Pilot (J) (alt) -->
+	<!-- F-1 Pilot (J) -->
+	<!-- F1 Circus '91 - World Championship (J) (bad dump 1) -->
+	<!-- F1 Circus '91 - World Championship (J) (bad dump 2) -->
+	<!-- F1 Circus '91 - World Championship (J) (bad dump 3) -->
+	<!-- F1 Circus '91 - World Championship (J) (bad dump) -->
+	<!-- F1 Circus '91 - World Championship (J) -->
+	<!-- F1 Circus '92 - The Speed of Sound (J) (1024K) -->
+	<!-- F1 Circus '92 - The Speed of Sound (J) -->
+	<!-- F1 Circus (J) (alt) -->
+	<!-- F1 Circus (J) -->
+	<!-- F1 Triple Battle (J) (512K) -->
+	<!-- F1 Triple Battle (J) (bad dump 1) -->
+	<!-- F1 Triple Battle (J) (bad dump 2) -->
+	<!-- F1 Triple Battle (J) (overdumped) -->
+	<!-- F1 Triple Battle (J) -->
+	<!-- Falcon (U) (bad dump) -->
+	<!-- Falcon (U) (bit-flipped) -->
+	<!-- Falcon (U) -->
+	<!-- Fantasy Zone (J) -->
+	<!-- Fantasy Zone (U) (bad dump 1) -->
+	<!-- Fantasy Zone (U) (bad dump 2) -->
+	<!-- Fantasy Zone (U) -->
+	<!-- Fighting Run (J) (bad dump 1) -->
+	<!-- Fighting Run (J) (bad dump 2) -->
+	<!-- Fighting Run (J) -->
+	<!-- Final Blaster (J) (512K) -->
+	<!-- Final Blaster (J) (bad dump 1) -->
+	<!-- Final Blaster (J) (bad dump 2) -->
+	<!-- Final Blaster (J) -->
+	<!-- Final Lap Twin (J) (512K) -->
+	<!-- Final Lap Twin (J) (bad dump) -->
+	<!-- Final Lap Twin (J) -->
+	<!-- Final Lap Twin (U) (512K) -->
+	<!-- Final Lap Twin (U) (bit-flipped) -->
+	<!-- Final Lap Twin (U) -->
+	<!-- Final Match Tennis (J) -->
+	<!-- Final Soldier (J) (alt) -->
+	<!-- Final Soldier (J) (bad dump 1) -->
+	<!-- Final Soldier (J) (bad dump 2) -->
+	<!-- Final Soldier (J) (bad dump 3) -->
+	<!-- Final Soldier (J) -->
+	<!-- Final Soldier Special Version (J) (bad dump) -->
+	<!-- Final Soldier Special Version (J) -->
+	<!-- Fire Pro Wrestling 2nd Bout (J) -->
+	<!-- Fire Pro Wrestling 3 - Legend Bout (J) -->
+	<!-- Fire Pro Wrestling Combination Tag (J) (512k) -->
+	<!-- Fire Pro Wrestling Combination Tag (J) -->
+	<!-- Formation Armed F (J) (bad dump) -->
+	<!-- Formation Armed F (J) -->
+	<!-- Formation Soccer Human Cup '90 (J) (bad dump) -->
+	<!-- Formation Soccer Human Cup '90 (J) -->
+	<!-- Formation Soccer on J.league (J) -->
+	<!-- Gai Flame (J) (512K) -->
+	<!-- Gai Flame (J) -->
+	<!-- Gaia no Monsho (J) (bad dump) -->
+	<!-- Gaia no Monsho (J) -->
+	<!-- Galaga '88 (J) -->
+	<hash crc32="6273a9d4" name="Galaga '90 (U)"/>
+	<!-- Galaga '90 - Taisang Version (U) -->
+	<!-- Galaga Sound Rips (PD) -->
+	<!-- Game of Life (PD) -->
+	<!-- Games Express CD Card 1993 (U) (overdumped 1) -->
+	<!-- Games Express CD Card 1993 (U) (overdumped 2) -->
+	<!-- Games Express CD Card 1993 (U) -->
+	<!-- Ganbare! Golf Boys (J) -->
+	<!-- Genji Tsushin Agedama (Hero Agent) (J) (alt) -->
+	<!-- Genji Tsushin Agedama (Hero Agent) (J) (bad dump 1) -->
+	<!-- Genji Tsushin Agedama (Hero Agent) (J) (bad dump 2) -->
+	<!-- Genji Tsushin Agedama (Hero Agent) (J) -->
+	<!-- Genpei Touma Den (J) (bad dump 1) -->
+	<!-- Genpei Touma Den (J) (bad dump 2) -->
+	<!-- Genpei Touma Den (J) -->
+	<!-- Genpei Touma Den 2 (J) -->
+	<!-- Ghost Manor (U) (bad dump) -->
+	<!-- Ghost Manor (U) (bit-flipped) -->
+	<hash crc32="3f31ffa0" name="Ghost Manor (U)"/>
+	<!-- Gokuraku Chuka Taisen (J) (512K) -->
+	<!-- Gokuraku Chuka Taisen (J) -->
+	<!-- Gomola Speed (J) (512K) (bad dump) -->
+	<!-- Gomola Speed (J) (512K) -->
+	<!-- Gomola Speed (J) (different version) -->
+	<!-- Gomola Speed (J) -->
+	<!-- Gradius (J) (different version 1) -->
+	<!-- Gradius (J) (different version 2) -->
+	<!-- Gradius (J) -->
+	<!-- Grandzort (SGX) (J) -->
+	<!-- Gunboat (U) (bit-flipped) -->
+	<!-- Gunboat (U) -->
+	<!-- Gunhed (J) (512K) -->
+	<!-- Gunhed (J) (bad dump 1) -->
+	<!-- Gunhed (J) (bad dump 2) -->
+	<!-- Gunhed (J) -->
+	<!-- Gunhed Hudson Gunhed Taikai (J) -->
+	<!-- Hana Tahka Daka (J) (bad dump 1) -->
+	<!-- Hana Tahka Daka (J) (bad dump 2) -->
+	<!-- Hana Tahka Daka (J) -->
+	<!-- Hani in the Sky (J) (bad dump 1) -->
+	<!-- Hani in the Sky (J) (bad dump 2) -->
+	<!-- Hani in the Sky (J) -->
+	<!-- Hani on the Road (J) (512K) -->
+	<!-- Hani on the Road (J) -->
+	<!-- Hatris (J) (256K) -->
+	<!-- Hatris (J) -->
+	<!-- Heavy Unit (J) (512K) -->
+	<!-- Heavy Unit (J) -->
+	<!-- Hisou Kihei Serd (J) -->
+	<!-- Hisou Kihei Serd Gai Shadow (J) -->
+	<!-- Hit the Ice (J) (512K) -->
+	<!-- Hit the Ice (J) -->
+	<!-- Hit the Ice (U) (!) -->
+	<!-- Hono no Tataka Tamako Dodge Danpei (J) -->
+	<!-- Hyperdyne Sidearms (J) (bad dump) -->
+	<!-- Hyperdyne Sidearms (J) -->
+	<!-- Hyperdyne Sidearms - Taisang Version (J) -->
+	<!-- Idol Hanafuda Fan Club (J) -->
+	<!-- Image Fight (J) (alt) (bad dump) -->
+	<!-- Image Fight (J) (alt) -->
+	<!-- Image Fight (J) (bad dump) -->
+	<!-- Image Fight (J) -->
+	<!-- Impossamole (U) (alt) -->
+	<!-- Impossamole (U) (bit-flipped) -->
+	<!-- Impossamole (U) -->
+	<!-- J. League Greatest Eleven Soccer (J) (bad dump) -->
+	<!-- J. League Greatest Eleven Soccer (J) -->
+	<!-- Jack Nicklaus' Greatest 18 Holes of Championship Golf (J) -->
+	<!-- Jack Nicklaus' Turbo Golf (U) -->
+	<!-- Jackie Chan's Action Kung Fu (J) (alt) -->
+	<!-- Jackie Chan's Action Kung Fu (J) -->
+	<!-- Jackie Chan's Action Kung Fu (U) -->
+	<!-- Jamanoid (version unknown) (PD) -->
+	<!-- Jamanoid V.50 (PD) -->
+	<!-- Jamanoid V.60 (PD) -->
+	<!-- Jamanoid V.62 (PD) -->
+	<!-- Jamanoid V.63 (PD) -->
+	<!-- Jaseikin Necromancer (J) -->
+	<!-- Jigoku Meguri (J) -->
+	<!-- Jimmu Densho Yaksa (J) (alt) -->
+	<!-- Jimmu Densho Yaksa (J) -->
+	<!-- JJ &amp; Jeff (U) (bad dump) -->
+	<!-- JJ &amp; Jeff (U) -->
+	<hash crc32="f6138944" name="Jyuohki (Altered Beast) (J)"/>
+	<!-- Jyuohki (J) -->
+	<!-- Kaiser's Quest (J) (alt) -->
+	<!-- Kaiser's Quest (J) -->
+	<!-- Kaizou Ningen Shubibiman (J) (pirate) -->
+	<!-- Kaizou Ningen Shubibiman (J) -->
+	<!-- Kaizou Ningen Shubibiman 2 (J) (bad dump) -->
+	<!-- Kaizou Ningen Shubibiman 2 (J) -->
+	<!-- Kato Chan &amp; Ken Chan (J) -->
+	<!-- Katutobi Takuhai Kun (J) (512K) -->
+	<!-- Katutobi Takuhai Kun (J) -->
+	<!-- Keith Courage in Alpha Zones (U) (hacked 1) -->
+	<!-- Keith Courage in Alpha Zones (U) (hacked 2) -->
+	<!-- Keith Courage in Alpha Zones (U) -->
+	<!-- KickBall (J) (512K) -->
+	<!-- Kickball (J) (bad dump) -->
+	<!-- KickBall (J) -->
+	<!-- Kiki Kai Kai (J) (512K) (bad dump) -->
+	<!-- Kiki Kai Kai (J) (512K) -->
+	<!-- Kiki Kai Kai (J) -->
+	<!-- King of Casino (J) (bad dump) -->
+	<!-- King of Casino (J) -->
+	<!-- King of Casino (U) -->
+	<!-- King of Fighters 97 Artshow 1 (PD) -->
+	<!-- King of Fighters 97 Artshow 2 (PD) -->
+	<!-- King of Fighters 98 Artshow (PD) -->
+	<!-- Kiyuu Kiyoku Mahjong Idol Graphics (J) -->
+	<!-- Kiyuu Kiyoku Mahjong Idol Graphics II (J) -->
+	<!-- Klax (J) -->
+	<!-- Klax (U) -->
+	<!-- Knight Rider Special (J) (alt) -->
+	<!-- Knight Rider Special (J) -->
+	<!-- Kyuukyoku Tiger (Ultimate Tiger) (J) (bad dump 1) -->
+	<!-- Kyuukyoku Tiger (Ultimate Tiger) (J) (bad dump 2) -->
+	<!-- Kyuukyoku Tiger (Ultimate Tiger) (J) (bad dump 3) -->
+	<!-- Kyuukyoku Tiger (Ultimate Tiger) (J) -->
+	<!-- Lady Sword (J) (alt) -->
+	<!-- Lady Sword (J) -->
+	<!-- Legend of Hero Tonma (J) (bad dump 1) -->
+	<!-- Legend of Hero Tonma (J) (bad dump 2) -->
+	<!-- Legend of Hero Tonma (J) -->
+	<!-- Legend of Hero Tonma (U) -->
+	<!-- Legendary Axe II, The (U) (bad dump) -->
+	<!-- Legendary Axe II, The (U) -->
+	<!-- Legendary Axe, The (U) -->
+	<!-- Liquid Kids (J) (bad dump 1) -->
+	<!-- Liquid Kids (J) (bad dump 2) -->
+	<!-- Liquid Kids (J) -->
+	<!-- Lode Runner - Ushina Wareta Maikyuu (J) (bad dump) -->
+	<!-- Lode Runner Ushina Wareta Maikyuu (J) -->
+	<!-- Maerchen Maze (J) (bad dump) -->
+	<!-- Maerchen Maze (J) -->
+	<!-- Magic PCE Demo (PD) -->
+	<!-- Magic Team Demo 1 (PD) -->
+	<!-- Magic Team Demo 2 (PD) -->
+	<!-- Magical Chase (J) (bad dump) -->
+	<!-- Magical Chase (J) -->
+	<!-- Mahjong Gakuen Mild (J) (alt) -->
+	<!-- Mahjong Gakuen Mild (J) (bad dump) -->
+	<!-- Mahjong Gakuen Mild (J) -->
+	<!-- Mahjong Gakuen Touma Shiro Tojo (J) -->
+	<!-- Mahjong Goku Special (J) (512K) -->
+	<!-- Mahjong Goku Special (J) -->
+	<!-- Mahjong Shikaka Retsuden Mahjong Wars (J) (bad dump) -->
+	<!-- Mahjong Shikaka Retsuden Mahjong Wars (J) -->
+	<!-- Majin Eiyu Wataru (J) -->
+	<!-- Makai Hakkenden Shada (J) -->
+	<!-- Makai Prince Dorabo Chan (J) (512K) -->
+	<!-- Makai Prince Dorabo Chan (J) (alt) -->
+	<!-- Makai Prince Dorabo Chan (J) -->
+	<!-- Makyo Densetsu (J) -->
+	<!-- Maniac Pro Wrestling (J) -->
+	<!-- Mesopotamia (J) (bad dump) -->
+	<!-- Mesopotamia (J) -->
+	<!-- Metal Stoker (J) (alt) -->
+	<!-- Metal Stoker (J) -->
+	<!-- Mezon Ikkoku (J) -->
+	<!-- Military Madness (J) -->
+	<!-- Military Madness (U) (alt) -->
+	<!-- Military Madness (U) -->
+	<!-- Momo Tarou Densetsu Gaiden (J) -->
+	<!-- Momo Tarou Densetsu Turbo (J) (512K) -->
+	<!-- Momo Tarou Densetsu Turbo (J) -->
+	<!-- Momo Tarou Dentetsu II (J) (alt) -->
+	<!-- Momo Tarou Dentetsu II (J) -->
+	<!-- Momo Tarou Katsu Geki (J) -->
+	<!-- Monster Pro Wrestling (J) (alt) -->
+	<!-- Monster Pro Wrestling (J) (bad dump) -->
+	<!-- Monster Pro Wrestling (J) -->
+	<!-- Morita Shogi PC (J) (bad dump 1) -->
+	<!-- Morita Shogi PC (J) (bad dump 2) -->
+	<!-- Morita Shogi PC (J) -->
+	<!-- Moto Roader (J) (alt) -->
+	<!-- Moto Roader (J) -->
+	<!-- Moto Roader (U) (alt) -->
+	<!-- Moto Roader II (J) (512K) -->
+	<!-- Moto Roader II (J) (alt 1) -->
+	<!-- Moto Roader II (J) (alt 2) -->
+	<!-- Moto Roader II (J) -->
+	<!-- Mr. Heli no Dai Bouken (J) (alt 1) -->
+	<!-- Mr. Heli no Dai Bouken (J) (alt 2) -->
+	<!-- Mr. Heli no Dai Bouken (J) -->
+	<!-- Narazumo no Sentou Butai (Bloody Wolf) (J) -->
+	<!-- Naxat Open (J) (512K) (bad dump 1) -->
+	<!-- Naxat Open (J) (512K) (bad dump 2) -->
+	<!-- Naxat Open (J) (512K) -->
+	<!-- Naxat Open (J) -->
+	<!-- Naxat Stadium (J) -->
+	<!-- Naxat Stadium - Taisang Version (J) -->
+	<!-- Nazo no Masukare-do (J) (512K) -->
+	<!-- Nazo no Masukare-do (J) -->
+	<!-- Necros no Yousai (J) -->
+	<!-- Nectaris (J) (512K) -->
+	<!-- Nectaris (J) -->
+	<hash crc32="007c5a65" name="Nekketsu Koukou Dodgeball Bu Pc Bangai Hen (J)"/>
+	<!-- Nekketsu Koukou Dodgeball Bu Soccer PC Hen (J) -->
+	<!-- Neutopia (J) (512K) -->
+	<!-- Neutopia (J) (bad dump) -->
+	<!-- Neutopia (J) -->
+	<!-- Neutopia (U) (512K) (hacked) -->
+	<!-- Neutopia (U) (alt) -->
+	<!-- Neutopia (U) (bit-flipped) -->
+	<!-- Neutopia (U) -->
+	<!-- Neutopia II (J) (1024K) -->
+	<!-- Neutopia II (J) -->
+	<!-- Neutopia II (U) (1024K) -->
+	<!-- Neutopia II (U) (bad dump) -->
+	<!-- Neutopia II (U) (bit-flipped) -->
+	<!-- Neutopia II (U) -->
+	<!-- New Adventure Island (U) (hacked) -->
+	<!-- New Adventure Island (U) -->
+	<!-- New Zealand Story, The (J) (512K) -->
+	<!-- New Zealand Story, The (J) -->
+	<!-- NHK Taiga Drama Taiheiki (J) -->
+	<!-- Night Creatures (U) (alt) -->
+	<!-- Night Creatures (U) (bad dump) -->
+	<!-- Night Creatures (U) (bit-flipped) -->
+	<!-- Night Creatures (U) -->
+	<!-- Niko Niko Pun (J) -->
+	<!-- Ninja Gaiden (J) (alt) -->
+	<!-- Ninja Gaiden (J) (bad dump) -->
+	<!-- Ninja Gaiden (J) -->
+	<!-- Ninja Spirit (J) (bad dump) -->
+	<!-- Ninja Spirit (J) -->
+	<!-- Ninja Spirit (U) (bad dump) -->
+	<!-- Ninja Spirit (U) (hacked) -->
+	<!-- Ninja Spirit (U) -->
+	<!-- Ninja Warriors, The (J) (512K) -->
+	<!-- Ninja Warriors, The (J) -->
+	<!-- Obocchama Kun (Younger) (J) (alt) -->
+	<!-- Obocchama Kun (Younger) (J) -->
+	<!-- Operation Wolf (J) (bad dump) -->
+	<!-- Operation Wolf (J) -->
+	<!-- Order of the Griffon (U) (bad dump) -->
+	<!-- Order of the Griffon (U) (hacked) -->
+	<hash crc32="3c31181e" name="Order of the Griffon (U)"/>
+	<!-- Ordyne (J) -->
+	<!-- Ordyne (U) -->
+	<!-- Outlive (J) -->
+	<!-- OutRun (J) (alt) -->
+	<hash crc32="24d2165d" name="OutRun (J)"/>
+	<!-- Override (J) -->
+	<!-- P-47 the Freedom Fighter (J) (bad dump 1) -->
+	<!-- P-47 the Freedom Fighter (J) (bad dump 2) -->
+	<!-- P-47 the Freedom Fighter (J) -->
+	<!-- Pac-Land (J) (alt) -->
+	<hash crc32="1d972e69" name="Pac-Land (J)"/>
+	<hash crc32="568f9005" name="Pac-Land (U) (bit-flipped)"/>
+	<!-- Pac-Land (U) -->
+	<!-- Pachiokun Juban Shobu (J) -->
+	<!-- Paranoia (J) (alt 1) -->
+	<!-- Paranoia (J) (alt 2) -->
+	<!-- Paranoia (J) (trained) -->
+	<!-- Paranoia (J) -->
+	<!-- Parasol Stars (J) (512K) (different padding) -->
+	<!-- Parasol Stars (J) (512K) -->
+	<!-- Parasol Stars (J) (bad dump) -->
+	<!-- Parasol Stars (J) -->
+	<hash crc32="1ef507bc" name="Parasol Stars (U)"/>
+	<!-- Parodius (J) -->
+	<!-- Pc Denjin - Punkic Cyborgs (J) -->
+	<!-- Pc Genjin (J) (512K) (alt) -->
+	<!-- Pc Genjin (J) (512K) -->
+	<!-- Pc Genjin (J) (alt) -->
+	<!-- Pc Genjin (J) (bad dump 1) -->
+	<!-- Pc Genjin (J) (bad dump 2) -->
+	<!-- Pc Genjin (J) -->
+	<!-- Pc Genjin 2 (J) (bad dump 1) -->
+	<!-- Pc Genjin 2 (J) (bad dump 2) -->
+	<!-- Pc Genjin 2 (J) -->
+	<!-- Pc Genjin 3 (J) -->
+	<!-- Pc Pachislot Idol Gambler (J) -->
+	<!-- Photograph Boy (J) (bad dump) -->
+	<!-- Photograph Boy (J) -->
+	<!-- Populous (J) (1024K) (overdumped 1) -->
+	<!-- Populous (J) (1024K) (overdumped 2) -->
+	<!-- Populous (J) (768k) (alt) -->
+	<!-- Populous (J) (bad dump) -->
+	<!-- Populous (J) -->
+	<!-- Power Drift (J) (alt 1) -->
+	<!-- Power Drift (J) (alt 2) -->
+	<!-- Power Drift (J) -->
+	<!-- Power Eleven (J) (512K) -->
+	<!-- Power Eleven (J) (bad dump) -->
+	<!-- Power Eleven (J) -->
+	<!-- Power Gate (J) (bad dump 1) -->
+	<!-- Power Gate (J) (bad dump 2) -->
+	<!-- Power Gate (J) -->
+	<!-- Power Golf (J) (512K) (bad dump 1) -->
+	<!-- Power Golf (J) (512K) (bad dump 2) -->
+	<!-- Power Golf (J) (512K) -->
+	<!-- Power Golf (J) -->
+	<!-- Power Golf (U) (512K) -->
+	<!-- Power League '93 (J) -->
+	<!-- Power League Baseball (U) -->
+	<!-- Power League II (J) (512K) -->
+	<!-- Power League II (J) -->
+	<!-- Power League III (J) (512K) -->
+	<!-- Power League III (J) -->
+	<!-- Power League IV (J) -->
+	<!-- Power League V (J) (bad dump) -->
+	<!-- Power League V (J) -->
+	<!-- Power Sports (J) (bad dump) -->
+	<!-- Power Sports (J) -->
+	<hash crc32="4b3ebedf" name="Power Tennis (J)"/>
+	<!-- Pro Yakyuu World Stadium '91 (J) (alt) -->
+	<!-- Pro Yakyuu World Stadium '91 (J) -->
+	<hash crc32="34e089a9" name="Pro Yakyuu World Stadium (J)"/>
+	<!-- Psycho Chaser (J) -->
+	<!-- Psychosis (U) (bad dump) -->
+	<!-- Psychosis (U) -->
+	<!-- Puzzle Boy (J) (bad dump) -->
+	<!-- Puzzle Boy (J) -->
+	<!-- Puzznic (J) -->
+	<!-- Quiz Toukou Shashin (J) -->
+	<!-- R-Type (J) (alt) -->
+	<!-- R-Type (Orig) (J) -->
+	<!-- R-Type (U) (cracked for Japan) -->
+	<!-- R-Type (U) (hacked) -->
+	<!-- R-Type - Taisang Version (J) -->
+	<!-- R-Type Complete (U) -->
+	<!-- R-Type II (J) (alt) -->
+	<!-- R-Type II (J) (bad dump 1) -->
+	<!-- R-Type II (J) (bad dump 2) -->
+	<!-- R-Type II (J) -->
+	<!-- R-Type II - Taisang Version (J) (bad dump) -->
+	<!-- R-Type II - Taisang Version (J) -->
+	<!-- Rabio Lepus Special (J) (512K) (bad dump) -->
+	<!-- Rabio Lepus Special (J) (512K) -->
+	<!-- Rabio Lepus Special (J) -->
+	<!-- Racing Spirits (J) (bad dump 1) -->
+	<!-- Racing Spirits (J) (bad dump 2) -->
+	<!-- Racing Spirits (J) -->
+	<!-- Raiden (J) (1024K) -->
+	<!-- Raiden (J) (bad dump) -->
+	<!-- Raiden (J) -->
+	<!-- Raiden (U) (bad dump) -->
+	<!-- Raiden (U) -->
+	<!-- Raishisu (J) -->
+	<!-- Rastan Saga II (J) (512K) -->
+	<!-- Rastan Saga II (J) (bad dump) -->
+	<!-- Rastan Saga II (J) -->
+	<!-- Rock on (J) (512K) -->
+	<!-- Rock on (J) -->
+	<!-- Ryukyu (J) -->
+	<!-- S.C.I. - Special Criminal Investigation (J) (alt) -->
+	<!-- S.C.I. - Special Criminal Investigation (J) (bad dump 1) -->
+	<!-- S.C.I. - Special Criminal Investigation (J) (bad dump 2) -->
+	<!-- S.C.I. - Special Criminal Investigation (J) -->
+	<!-- Sadakichi Saban Hideyoshi no Ougon (J) -->
+	<!-- Salamander (J) (bad dump 1) -->
+	<!-- Salamander (J) (bad dump 2) -->
+	<!-- Salamander (J) -->
+	<!-- Samurai-Ghost (U) (alt) -->
+	<!-- Samurai-Ghost (U) -->
+	<!-- Sekikehara (J) -->
+	<!-- Sengoku Mahjong (J) (bad dump) -->
+	<!-- Sengoku Mahjong (J) -->
+	<!-- Shanghai (J) -->
+	<!-- Shinobi (J) (512K) -->
+	<!-- Shinobi (J) -->
+	<!-- Shiryou Sensen (War of the Dead) (J) (bad dump) -->
+	<!-- Shiryou Sensen (War of the Dead) (J) -->
+	<!-- Shockman (U) (bad dump) -->
+	<!-- Shockman (U) -->
+	<!-- Shogi Shodan Icchokusen (J) -->
+	<!-- Shogi Shoshinsha Muyo (J) (Bad Dump) -->
+	<!-- Shogi Shoshinsha Muyo (J) -->
+	<!-- Sidearms (Magea Chip) (U) -->
+	<!-- Sidearms (U) -->
+	<!-- Silent Debuggers, The (J) (alt 1) -->
+	<!-- Silent Debuggers, The (J) (alt 2) -->
+	<!-- Silent Debuggers, The (J) (bad dump 1) -->
+	<!-- Silent Debuggers, The (J) (bad dump 2) -->
+	<!-- Silent Debuggers, The (J) -->
+	<!-- Silent Debuggers, The (U) (bit flipped) (alt 1) -->
+	<!-- Silent Debuggers, The (U) (bit flipped) (alt 2) -->
+	<!-- Silent Debuggers, The (U) (bit flipped) (alt 3) -->
+	<!-- Silent Debuggers, The (U) (bit flipped) -->
+	<!-- Silent Debuggers, The (U) -->
+	<!-- Sindibad Chitei no Dai Makyu (J) (512K) -->
+	<!-- Sindibad Chitei no Dai Makyu (J) -->
+	<!-- Sinistron (U) (512K) (bad dump) -->
+	<!-- Sinistron (U) (512K) -->
+	<!-- Sinistron (U) (bad dump) -->
+	<!-- Sinistron (U) -->
+	<!-- Skweek (J) -->
+	<!-- SlideShow (PD) -->
+	<!-- Soldier Blade (J) (bad dump) -->
+	<!-- Soldier Blade (J) -->
+	<!-- Soldier Blade (U) -->
+	<!-- Somer Assault (U) -->
+	<!-- Son Son II (J) (English Translation) (bad dump) -->
+	<!-- Son Son II (J) (English Translation) -->
+	<!-- Son Son II (J) -->
+	<!-- Sonic Spike (U) -->
+	<!-- Soukoban World (Boxy Boy) (J) -->
+	<!-- Space Harrier (J) (alt) -->
+	<!-- Space Harrier (J) (bad dump 1) -->
+	<!-- Space Harrier (J) (bad dump 2) -->
+	<!-- Space Harrier (J) (pirate) -->
+	<!-- Space Harrier (J) -->
+	<!-- Space Harrier (U) -->
+	<!-- Space Invaders Fukkatsu no Hi (J) -->
+	<!-- Spin Pair (J) -->
+	<!-- Spiral Wave (J) -->
+	<!-- Splatterhouse (J) (alt 1) -->
+	<!-- Splatterhouse (J) (alt 2) -->
+	<!-- Splatterhouse (J) (alt 3) -->
+	<hash crc32="6b319457" name="Splatterhouse (J)"/>
+	<!-- Splatterhouse (U) -->
+	<!-- Stratego (J) (alt) -->
+	<!-- Stratego (J) -->
+	<!-- Street Fighter II Champion Edition (J) (alt) -->
+	<!-- Street Fighter II Champion Edition (J) (Avenging Angels hack) -->
+	<!-- Street Fighter II Champion Edition (J) (bad dump) -->
+	<!-- Street Fighter II Champion Edition (J) -->
+	<!-- Strip Fighter II (J) (bad dump 1) -->
+	<!-- Strip Fighter II (J) (bad dump 2) -->
+	<!-- Strip Fighter II (J) -->
+	<!-- Super CD-ROM2 System Ver. 3.00 (J) (384K) (overdumped 1) -->
+	<!-- Super CD-ROM2 System Ver. 3.00 (J) (384K) (overdumped 2) -->
+	<!-- Super CD-ROM2 System Ver. 3.00 (J) (384K) (overdumped 3) -->
+	<!-- Super CD-ROM2 System Ver. 3.00 (J) (512K) -->
+	<!-- Super CD-ROM2 System Ver. 3.00 (J) (bit-flipped for USA) -->
+	<!-- Super CD-ROM2 System Ver. 3.00 (J) -->
+	<!-- Super Metal Crusher (J) (alt) -->
+	<!-- Super Metal Crusher (J) -->
+	<!-- Super Momo Tarou Densetsu (J) (512K) -->
+	<!-- Super Momo Tarou Dentetsu (J) -->
+	<!-- Super Momo Tarou Dentetsu II (J) (1024K) (bad dump) -->
+	<!-- Super Momo Tarou Dentetsu II (J) (1024K) -->
+	<!-- Super Momo Tarou Dentetsu II (J) -->
+	<!-- Super Star Soldier (J) (alt) -->
+	<!-- Super Star Soldier (J) -->
+	<!-- Super Star Soldier (U) (bad dump) -->
+	<!-- Super Star Soldier (U) -->
+	<!-- Super Volley Ball (J) (bad dump) -->
+	<!-- Super Volley Ball (J) -->
+	<!-- Super Volley Ball (U) -->
+	<!-- Susano Oh Densetsu (J) -->
+	<!-- Takahashi Meijin no Shin Boukenjima (New Adventure Island) (J) (bad dump 1) -->
+	<!-- Takahashi Meijin no Shin Boukenjima (New Adventure Island) (J) (bad dump 2) -->
+	<!-- Takahashi Meijin no Shin Boukenjima (New Adventure Island) (J) (bad dump 3) -->
+	<!-- Takahashi Meijin no Shin Boukenjima (New Adventure Island) (J) (bad dump 4) -->
+	<!-- Takahashi Meijin no Shin Boukenjima (New Adventure Island) (J) -->
+	<!-- Takeda Shingen (J) -->
+	<!-- Takin it to the Hoop (U) -->
+	<!-- Talespin (U) (bad dump 1) -->
+	<!-- Talespin (U) (bad dump 2) -->
+	<!-- Talespin (U) (bad dump 3) -->
+	<!-- Talespin (U) -->
+	<!-- Tatsujin (J) (alt) -->
+	<!-- Tatsujin (J) (bad dump) -->
+	<!-- Tatsujin (J) -->
+	<!-- Tennokoe Memory Bank (J) (384k) -->
+	<!-- Tennokoe Memory Bank (J) -->
+	<!-- Tenseiryu Saint Dragon (J) (512K) (bad dump 1) -->
+	<!-- Tenseiryu Saint Dragon (J) (512K) (bad dump 2) -->
+	<!-- Tenseiryu Saint Dragon (J) (512K) -->
+	<!-- Tenseiryu Saint Dragon (J) -->
+	<!-- Terra Cresta II (J) -->
+	<!-- Tetris V0.0 (PD) -->
+	<!-- Tetris V0.1 (PD) -->
+	<!-- Tetris V0.2 (PD) -->
+	<!-- Tetris V0.3 (PD) -->
+	<!-- Tetris V0.4 (PD) -->
+	<!-- Text Sample 1 (PD) -->
+	<!-- Text Sample 2 (PD) -->
+	<!-- Thunder Blade (J) -->
+	<!-- Tiger Road (U) (512K) -->
+	<!-- Tiger Road (U) (alt) -->
+	<!-- Tiger Road (U) -->
+	<!-- Tiger Shark (J) (alt) -->
+	<!-- Tiger Shark (J) -->
+	<!-- Time Cruise (U) -->
+	<!-- Time Cruise 2 (J) (bad dump 1) -->
+	<!-- Time Cruise 2 (J) (bad dump 2) -->
+	<!-- Time Cruise 2 (J) (bad dump 3) -->
+	<!-- Time Cruise 2 (J) (bad dump 4) -->
+	<!-- Time Cruise 2 (J) (bad dump 5) -->
+	<!-- Time Cruise 2 (J) -->
+	<!-- Timeball (U) -->
+	<!-- Titan (J) -->
+	<!-- Toilet Kids (J) (bad dump 1) -->
+	<!-- Toilet Kids (J) (bad dump 2) -->
+	<!-- Toilet Kids (J) -->
+	<!-- Tora E no Michi (J) (512K) -->
+	<!-- Tora E no Michi (J) -->
+	<!-- Toriyuu Siyoujin no Jitsen Kabushiki Bai Bai Game (J) -->
+	<!-- Tower of Druaga, The (J) (bad dump 1) -->
+	<!-- Tower of Druaga, The (J) (bad dump 2) -->
+	<!-- Tower of Druaga, The (J) -->
+	<!-- Toy Shop Boys (J) -->
+	<!-- Tricky (J) -->
+	<!-- Tricky Kick (U) (alt) -->
+	<!-- Tricky Kick (U) -->
+	<!-- Tsuppari Sumo Wrestling Game (J) -->
+	<!-- Turrican (U) (alt) -->
+	<!-- Turrican (U) -->
+	<!-- TV Sports Basketball (J) (alt) -->
+	<!-- TV Sports Basketball (J) -->
+	<!-- TV Sports Basketball (U) -->
+	<!-- TV Sports Football (J) (512K) -->
+	<!-- TV Sports Football (J) -->
+	<!-- TV Sports Football (U) -->
+	<!-- TV Sports Hockey (U) (alt) -->
+	<!-- TV Sports Hockey (U) -->
+	<!-- TV Sports Ice Hockey (J) (512K) -->
+	<!-- TV Sports Ice Hockey (J) -->
+	<!-- USA Pro Basketball (J) -->
+	<!-- Valkyrie no Densetsu (J) -->
+	<!-- Veigues Tactical Gladiator (J) (512K) -->
+	<!-- Veigues Tactical Gladiator (J) -->
+	<!-- Veigues Tactical Gladiator (U) -->
+	<!-- Victory Run (J) (alt) -->
+	<!-- Victory Run (J) -->
+	<!-- Victory Run (U) -->
+	<!-- Vigilante (J) -->
+	<!-- Vigilante (U) (alt) -->
+	<!-- Vigilante (U) -->
+	<!-- Violent Soldier (J) (512K) -->
+	<!-- Violent Soldier (J) (bad dump 1) -->
+	<!-- Violent Soldier (J) (bad dump 2) -->
+	<!-- Violent Soldier (J) -->
+	<!-- Volfied (J) (512K) -->
+	<!-- Volfied (J) (alt 1) -->
+	<!-- Volfied (J) (alt 2) -->
+	<!-- Volfied (J) -->
+	<!-- W-ring the Double Rings (J) (512K) (alt) -->
+	<!-- W-ring the Double Rings (J) (512K) -->
+	<!-- W-ring the Double Rings (J) -->
+	<!-- Wai Wai Mahjong (J) (bad dump 1) -->
+	<!-- Wai Wai Mahjong (J) (bad dump 2) -->
+	<!-- Wai Wai Mahjong (J) (bad dump 3) -->
+	<!-- Wai Wai Mahjong (J) -->
+	<!-- Walker Demo (PD) -->
+	<!-- Wallaby!! (J) (512K) (alt) -->
+	<!-- Wallaby!! (J) (512K) -->
+	<!-- Wallaby!! (J) -->
+	<!-- Winning Shot (J) -->
+	<!-- Wonder Momo (J) -->
+	<!-- Wonderboy in Monsterland (J) (alt 1) -->
+	<!-- Wonderboy in Monsterland (J) (alt 2) -->
+	<!-- Wonderboy in Monsterland (J) (bad dump) (English Translation) -->
+	<!-- Wonderboy in Monsterland (J) (bad dump) -->
+	<!-- Wonderboy in Monsterland (J) (English Translation) -->
+	<!-- Wonderboy in Monsterland (J) (partial English Translation) -->
+	<!-- Wonderboy in Monsterland (J) -->
+	<!-- World Beach Volley (J) -->
+	<!-- World Circuit (J) -->
+	<!-- World Class Baseball (U) (alt) -->
+	<!-- World Class Baseball (U) (bad dump 1) -->
+	<!-- World Class Baseball (U) (bad dump 2) -->
+	<!-- World Class Baseball (U) (hacked) -->
+	<!-- World Class Baseball (U) -->
+	<!-- World Court Tennis (J) (bad dump) -->
+	<!-- World Court Tennis (J) -->
+	<!-- World Court Tennis (U) (bad dump) -->
+	<!-- World Court Tennis (U) (bit flipped) -->
+	<!-- World Court Tennis (U) -->
+	<!-- World Jockey (J) -->
+	<!-- World Sports Competition (U) -->
+	<hash crc32="17ebeb29" name="Xevious (J)"/>
+	<!-- Yo' Bro (U) (bit flipped) -->
+	<!-- Yo' Bro (U) -->
+	<!-- Youkai Douchuuki (J) (hacked) -->
+	<!-- Youkai Douchuuki (J) -->
+	<!-- Yuu Yuu Jinsei (J) -->
+	<!-- Zero 4 Champ (J) (alt 1) -->
+	<!-- Zero 4 Champ (J) (alt 2) -->
+	<!-- Zero 4 Champ (J) -->
+	<!-- Zipang (J) -->
+</hashfile>

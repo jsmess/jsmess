@@ -1,0 +1,319 @@
+<hashfile>
+	<!-- MESS crc file for: Magnavox Odyssey 2 (Philips G7000) -->
+	<!-- crc = Game Name | Year | Manufacturer | Emulation Status -->
+	<hash crc32="688fad11" name="A - Keyboard Creations">
+		<manufacturer>Magnavox</manufacturer>
+	</hash>
+	<hash crc32="71ae8533" name="Alien Invaders Plus">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>22</status>
+	</hash>
+	<hash crc32="4663c4b6" name="Alpine Skiing">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>25</status>
+	</hash>
+	<hash crc32="2247405e" name="Amok (PD)">
+		<year>19??</year>
+		<manufacturer>UE?</manufacturer>
+	</hash>
+	<hash crc32="a7344d1f" name="Atlantis">
+		<year>1983</year>
+		<manufacturer>Imagic</manufacturer>
+	</hash>
+	<hash crc32="fc5a7f08" name="Attack Of The Timelord">
+		<manufacturer>Magnavox</manufacturer>
+		<status>51?</status>
+	</hash>
+	<hash crc32="b07748e7" name="Baseball">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>08</status>
+	</hash>
+	<hash crc32="6f66b1f7" name="Blackjack">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>05</status>
+	</hash>
+	<hash crc32="fb83171e" name="Blockout and Breakdown">
+		<year>1981</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>29</status>
+	</hash>
+	<hash crc32="084ee035" name="Bowling - Basketball">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>06</status>
+	</hash>
+	<hash crc32="bb6e7135" name="Casino Slot Machine">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>23</status>
+	</hash>
+	<hash crc32="a57e1724" name="Catch The Ball and Noughts &amp; Crosses">
+		<year>1980</year>
+		<manufacturer>Phillips</manufacturer>
+		<status>19</status>
+	</hash>
+	<hash crc32="fd179f6d" name="Clay Pigeon">
+		<manufacturer>Philips Brasil</manufacturer>
+	</hash>
+	<hash crc32="0f870806" name="Computer Golf">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>10</status>
+	</hash>
+	<hash crc32="95efa98b" name="Computer Intro">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>09</status>
+	</hash>
+	<hash crc32="afc093fd" name="Conquest Of The World">
+		<year>1982</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>41</status>
+	</hash>
+	<hash crc32="c049e79e" name="Cosmic Conflict">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>11</status>
+	</hash>
+	<hash crc32="9bfc3e01" name="Demon Attack">
+		<year>1983</year>
+		<manufacturer>Imagic</manufacturer>
+	</hash>
+	<hash crc32="dc30ad3d" name="Dynasty -Directional Dynasty">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>15</status>
+	</hash>
+	<hash crc32="39989464" name="Electronic Hockey - Soccer">
+		<year>1981</year>
+		<manufacturer>Philips</manufacturer>
+		<status>36</status>
+	</hash>
+	<hash crc32="89c6de2c" name="Electronic Table Football">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>27</status>
+	</hash>
+	<hash crc32="f9084aa3" name="Football">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>03</status>
+	</hash>
+	<hash crc32="54736b74" name="Freedom Fighters">
+		<year>1982</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>39</status>
+	</hash>
+	<hash crc32="d0bc4ee6" name="Frogger">
+		<year>1982</year>
+		<manufacturer>Parker Brothers</manufacturer>
+	</hash>
+	<hash crc32="881ceae4" name="Great Wall Street Fortune Hunt, The">
+		<manufacturer>Magnavox (Master Strategy Series)</manufacturer>
+		<status>46</status>
+	</hash>
+	<hash crc32="1c8368e7" name="I've Got Your Number">
+		<year>1979</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>13</status>
+	</hash>
+	<hash crc32="ad7a9a11" name="Invaders From Hyperspace">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>18</status>
+	</hash>
+	<hash crc32="a6909a8b" name="K.C.'s Crazy Chase (Voice Add-on)">
+		<year>1982</year>
+		<manufacturer>Magnavox</manufacturer>
+	</hash>
+	<hash crc32="7108e058" name="K.C. Munchkin">
+		<year>1982</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>38</status>
+	</hash>
+	<hash crc32="b096654e" name="Killer Bees (Voice Add-on)">
+		<manufacturer>Magnavox</manufacturer>
+	</hash>
+	<hash crc32="d158eeba" name="Labyrinth &amp; Supermind">
+		<year>1981</year>
+		<manufacturer>Philips</manufacturer>
+		<status>32</status>
+	</hash>
+	<hash crc32="b932d584" name="Looney Balloon">
+		<manufacturer>Philips</manufacturer>
+		<status>54 Plus</status>
+	</hash>
+	<hash crc32="bbf276a0" name="Matchmaker - Buzzword! - Logix">
+		<manufacturer>Magnavox</manufacturer>
+	</hash>
+	<hash crc32="dc5afaa2" name="Math-A-Magic &amp; Echo">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>07</status>
+	</hash>
+	<hash crc32="fee664f3" name="Monkeyshines">
+		<year>1982</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>37</status>
+	</hash>
+	<hash crc32="2122012c" name="Morse">
+		<manufacturer>Philips</manufacturer>
+		<status>45</status>
+	</hash>
+	<hash crc32="cf2f8e7a" name="Nimble Numbers Ned (Voice Add-on)">
+		<manufacturer>Magnavox</manufacturer>
+	</hash>
+	<hash crc32="0c2e4811" name="Out Of This World &amp; Helicopter Rescue">
+		<manufacturer>Magnavox</manufacturer>
+	</hash>
+	<hash crc32="874f36a4" name="P.T. Barnum's Acrobats (Voice Add-on)">
+		<year>1981</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>33</status>
+	</hash>
+	<hash crc32="239df97d" name="Pachinko">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>26</status>
+	</hash>
+	<hash crc32="d62814a3" name="Pick Axe Pete">
+		<year>1982</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>43</status>
+	</hash>
+	<hash crc32="24d53e2c" name="Pocket Billiards">
+		<year>1981</year>
+		<manufacturer>Philips</manufacturer>
+		<status>35</status>
+	</hash>
+	<hash crc32="5216771a" name="Popeye">
+		<year>1983</year>
+		<manufacturer>Parker Brothers</manufacturer>
+	</hash>
+	<hash crc32="40ae062d" name="Power Lords">
+		<manufacturer>Magnavox</manufacturer>
+		<status>Bad dump?</status>
+	</hash>
+	<hash crc32="202f2749" name="Q-Bert">
+		<year>1983</year>
+		<manufacturer>Parker Brothers</manufacturer>
+	</hash>
+	<hash crc32="9451be1e" name="Quest for the Rings">
+		<year>1982</year>
+		<manufacturer>Magnavox (Master Strategy Series)</manufacturer>
+		<status>42</status>
+	</hash>
+	<hash crc32="1b9f2f16" name="S.I.D. The Spellbinder">
+		<manufacturer>Magnavox</manufacturer>
+	</hash>
+	<hash crc32="9487c920" name="Showdown In 2100 AD">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>14</status>
+	</hash>
+	<hash crc32="67069924" name="Smithereens (Voice Add-On)">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>20</status>
+	</hash>
+	<hash crc32="4eda4917" name="Speedway - SpinOut - Cryptologic">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>01</status>
+	</hash>
+	<hash crc32="5ae57a8c" name="Sub Chase - Armored Encounter">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>04</status>
+	</hash>
+	<hash crc32="95936b07" name="Super Cobra">
+		<year>1982</year>
+		<manufacturer>Parker Brothers</manufacturer>
+	</hash>
+	<hash crc32="11ff50ad" name="Take the Money and Run">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>12</status>
+	</hash>
+	<hash crc32="2c9d1715" name="Thunderball">
+		<year>1980</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>24</status>
+	</hash>
+	<hash crc32="9e42e766" name="Turtles.bin">
+		<year>1983</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>49</status>
+	</hash>
+	<hash crc32="b936bd78" name="Type &amp; Tell (Voice Add-On)">
+		<manufacturer>Magnavox</manufacturer>
+	</hash>
+	<hash crc32="2b1e9e19" name="U.F.O.">
+		<year>1981</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>34</status>
+	</hash>
+	<hash crc32="d3b09fec" name="Volleyball">
+		<year>1981</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>28</status>
+	</hash>
+	<hash crc32="58fa6766" name="War of Nerves">
+		<year>1981</year>
+		<manufacturer>Magnavox</manufacturer>
+		<status>30</status>
+	</hash>
+	<!-- [bios] [Don't think this is needed here...??? - FIXME] -->
+	<hash crc32="8016a315" name="Odyssey 2 System ROM"/>
+	<!-- Other dumps - Status unknown -->
+	<hash crc32="bbeb1bd2" name="powerlords_set2.bin"/>
+	<hash crc32="39e31bf0" name="JAKE.BIN"/>
+	<hash crc32="c91df148" name="ROBOSTAD.BIN"/>
+	<hash crc32="bcc964be" name="SUPBEE.BIN"/>
+	<hash crc32="977f9101" name="CATCHNR.BIN"/>
+	<hash crc32="25874b04" name="NEUTRON.BIN"/>
+	<!-- Other raw TOSEC Data - needs to be checked&#133;and formated -->
+	<hash crc32="0f46cf66" name="Restaurant (19xx)(Jopac)[!]"/>
+	<hash crc32="11edf25b" name="17 - Chinese Logic (1980)(Philips)(Eu)[!]"/>
+	<hash crc32="14b6cc76" name="10 - Computer Golf (1980)(Philips)(Eu)[!]"/>
+	<hash crc32="17be749b" name="18 - Invaders From Hyperspace (1980)(Philips)(Eu)[!]"/>
+	<hash crc32="1c750349" name="49 - Turtles (1983)(Philips)(Eu)[!]"/>
+	<hash crc32="26b0ff5b" name="53 PLUS - Nightmare (19xx)(Philips)(Eu)[x]"/>
+	<hash crc32="2a5f0b2b" name="11 - Cosmic Conflict (1980)(Philips)(Eu)[!]"/>
+	<hash crc32="2dcb77f0" name="16 - Depth Charge - Marksman (1980)(Philips)(Eu)[!]"/>
+	<hash crc32="3351feda" name="Power Lords (19xx)(Magnavox)(U)"/>
+	<hash crc32="395629e1" name="34 - U.F.O. (1981)(Philips)(Eu)[!]"/>
+	<hash crc32="44d1a8a5" name="20 - Smithereens (1980)(Philips)(Eu)[!]"/>
+	<hash crc32="45e62222" name="V1 - Traffic Games 1 (19xx)(CSV)(Eu)"/>
+	<hash crc32="4a3e2dc8" name="38 - K.C. Munchkin (1982)(Philips)(Eu)[!]"/>
+	<hash crc32="4f73b44c" name="38 - K.C. Munchkin (1982)(Magnavox)(U)[h]"/>
+	<hash crc32="69893f7f" name="V2 - Traffic Games 2 (19xx)(CSV)(Eu)"/>
+	<hash crc32="6cebab74" name="33 - P.T. Barnum's Acrobats (1981)(Philips)(Eu)[!]"/>
+	<hash crc32="7394e82c" name="21 - Secret of the Pharaohs (1980)(Philips)(Eu)[!]"/>
+	<hash crc32="764894a1" name="51 PLUS - Terrahawks (19xx)(Philips)(Eu)[x]"/>
+	<hash crc32="7810bad5" name="15 - Dynasty - Directional Dynasty (1980)(Philips)(Eu)[!]"/>
+	<hash crc32="85dfcdd7" name="A - Keyboard Creations (19xx)(Philips)(Eu)[!]"/>
+	<hash crc32="9585d511" name="50 - Super Bee (19xx)(Philips)(Eu)[!]"/>
+	<hash crc32="975ab8da" name="40 - Four in 1 row (1982)(Philips)(Eu)[x]"/>
+	<hash crc32="9c9dddf9" name="V - Traffic Games (19xx)(Philips)(Eu)"/>
+	<hash crc32="a69c2c93" name="02 - Pairs - Space Rendezvous - Logic (1980)(Philips)(Eu)[!]"/>
+	<hash crc32="a75c42f8" name="56 PLUS - Norseman (19xx)(Philips)(Eu)[x]"/>
+	<hash crc32="abe368bf" name="14 - Showdown in 2100 AD (1980)(Philips)(Eu)[!]"/>
+	<hash crc32="b2ffb353" name="43 PLUS - Pick Axe Pete (19xx)(Philips)(Eu)[x]"/>
+	<hash crc32="b4735e6b" name="34 PLUS - Satellite Attack (1981)(Philips)(Eu)[x]"/>
+	<hash crc32="b590cf14" name="09 - Computer Intro (1980)(Philips)(Eu)[!]"/>
+	<hash crc32="dee70b33" name="52 PLUS - Killer Bees (19xx)(Philips)(Eu)[x]"/>
+	<hash crc32="e246a812" name="60 PLUS - Transamerican Rally (1984)(Philips)[!]"/>
+	<hash crc32="e7b26a56" name="33 - P.T. Barnum's Acrobats (1981)(Philips)(Eu)[!][a](extra keys on label)"/>
+	<hash crc32="ee3ee642" name="01 PLUS- Race - SpinOut - Cryptogram (1980)(Philips)(Eu)"/>
+	<hash crc32="f4c2075e" name="11 - Cosmic Conflict (1980)(Philips)(Eu)[!][a]"/>
+	<!-- [bad dumps] -->
+	<hash crc32="3351feda" name="powerlords_set2.bin, ssuperco.bin">
+		<status>overdumped, use first 4kb only</status>
+	</hash>
+	<hash crc32="8d657a73" name="zip archive (???)"/>
+</hashfile>

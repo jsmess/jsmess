@@ -1,0 +1,13 @@
+<tests>
+
+<test name="c64_000" driver="c64">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+<test name="c64_001" driver="c64">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+</tests>

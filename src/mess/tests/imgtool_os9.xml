@@ -1,0 +1,277 @@
+<tests>
+
+<imgtooltest name="coco_jvc_os9">
+	<createimage driver="coco_jvc_os9"/>
+	<checkdirectory/>
+</imgtooltest>
+
+<imgtooltest name="coco_vdk_os9">
+	<createimage driver="coco_vdk_os9"/>
+	<checkdirectory/>
+</imgtooltest>
+
+<imgtooltest name="coco_dmk_os9">
+	<createimage driver="coco_dmk_os9"/>
+	<checkdirectory/>
+</imgtooltest>
+
+<imgtooltest name="coco_os9_os9">
+	<createimage driver="coco_os9_os9"/>
+	<checkdirectory/>
+</imgtooltest>
+
+<imgtooltest name="coco_os9_001">
+	<createimage driver="coco_jvc_os9"/>
+	<checkdirectory/>
+
+	<putfile name="FOO.TXT"/>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="0"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT"/>
+
+	<putfile name="FOO.TXT">'Hello World!'</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="12"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Hello World!'</checkfile>
+
+	<putfile name="FOO.TXT">'Party'</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="5"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Party'</checkfile>
+
+	<putfile name="BAR.TXT">'Lame'</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="5"/>
+		<entry name="BAR.TXT" size="4"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Party'</checkfile>
+	<checkfile name="BAR.TXT">'Lame'</checkfile>
+
+	<deletefile name="BAR.TXT"/>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="5"/>
+	</checkdirectory>
+</imgtooltest>
+
+<imgtooltest name="coco_os9_002">
+	<!-- Testing larger files -->
+	<createimage driver="coco_jvc_os9"/>
+
+	<putfile name="FOO.TXT">'Abcdefg' * 111</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="777"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Abcdefg' * 111</checkfile>
+
+	<putfile name="FOO.TXT">'Abcdefghijk' * 2010</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="22110"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Abcdefghijk' * 2010</checkfile>
+
+	<putfile name="FOO.TXT">'Abcdefg' * 111</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="777"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Abcdefg' * 111</checkfile>
+
+	<deletefile name="FOO.TXT"/>
+	<checkdirectory/>
+</imgtooltest>
+
+<imgtooltest name="coco_os9_003">
+	<!-- Testing many files -->
+	<createimage driver="coco_jvc_os9"/>
+
+	<putfile name="1.TXT"/>
+	<putfile name="2.TXT"/>
+	<putfile name="3.TXT"/>
+	<putfile name="4.TXT"/>
+	<putfile name="5.TXT"/>
+	<putfile name="6.TXT"/>
+	<putfile name="7.TXT"/>
+	<putfile name="8.TXT"/>
+	<putfile name="9.TXT"/>
+  <putfile name="10.TXT"/>
+  <putfile name="11.TXT"/>
+  <putfile name="12.TXT"/>
+  <putfile name="13.TXT"/>
+  <putfile name="14.TXT"/>
+  <putfile name="15.TXT"/>
+  <putfile name="16.TXT"/>
+  <putfile name="17.TXT"/>
+  <putfile name="18.TXT"/>
+  <putfile name="19.TXT"/>
+  <putfile name="20.TXT"/>
+  <checkdirectory>
+		<entry name="1.TXT"/>
+		<entry name="2.TXT"/>
+		<entry name="3.TXT"/>
+		<entry name="4.TXT"/>
+		<entry name="5.TXT"/>
+		<entry name="6.TXT"/>
+		<entry name="7.TXT"/>
+		<entry name="8.TXT"/>
+		<entry name="9.TXT"/>
+    <entry name="10.TXT"/>
+    <entry name="11.TXT"/>
+    <entry name="12.TXT"/>
+    <entry name="13.TXT"/>
+    <entry name="14.TXT"/>
+    <entry name="15.TXT"/>
+    <entry name="16.TXT"/>
+    <entry name="17.TXT"/>
+    <entry name="18.TXT"/>
+    <entry name="19.TXT"/>
+    <entry name="20.TXT"/>
+  </checkdirectory>
+</imgtooltest>
+
+<imgtooltest name="coco_os9_004">
+	<!-- Testing directories -->
+	<createimage driver="coco_jvc_os9"/>
+	<recordfreespace/>
+
+	<createdirectory path="FOO"/>
+	<putfile name="/FOO/BAR.TXT">'Party'</putfile>
+
+	<checkdirectory path="/">
+		<entry name="FOO"/>
+	</checkdirectory>
+	<checkdirectory path="/FOO">
+		<entry name="BAR.TXT"/>
+	</checkdirectory>
+
+	<deletefile name="/FOO/BAR.TXT"/>
+
+	<checkdirectory path="/">
+		<entry name="FOO"/>
+	</checkdirectory>
+	<checkdirectory path="/FOO"/>
+
+	<deletedirectory path="/FOO"/>
+
+	<checkdirectory path="/"/>
+	<checkfreespace/>
+</imgtooltest>
+
+<imgtooltest name="coco_os9_005">
+	<!-- Testing many files in a subdirectory -->
+	<createimage driver="coco_jvc_os9"/>
+	<createdirectory path="FOO"/>
+
+	<putfile name="/FOO/1.TXT"/>
+	<putfile name="/FOO/2.TXT"/>
+	<putfile name="/FOO/3.TXT"/>
+	<putfile name="/FOO/4.TXT"/>
+	<putfile name="/FOO/5.TXT"/>
+	<putfile name="/FOO/6.TXT"/>
+	<putfile name="/FOO/7.TXT"/>
+	<putfile name="/FOO/8.TXT"/>
+	<putfile name="/FOO/9.TXT"/>
+	<checkdirectory path="/FOO">
+		<entry name="1.TXT"/>
+		<entry name="2.TXT"/>
+		<entry name="3.TXT"/>
+		<entry name="4.TXT"/>
+		<entry name="5.TXT"/>
+		<entry name="6.TXT"/>
+		<entry name="7.TXT"/>
+		<entry name="8.TXT"/>
+		<entry name="9.TXT"/>
+	</checkdirectory>
+  <checkdirectory path="/">
+    <entry name="FOO"/>
+  </checkdirectory>
+</imgtooltest>
+
+<imgtooltest name="coco_os9_006">
+	<!-- Testing many more files in a subdirectory -->
+	<createimage driver="coco_jvc_os9"/>
+	<createdirectory path="FOO"/>
+
+	<putfile name="/FOO/1.TXT"/>
+	<createdirectory path="/FOO/A"/>
+	<putfile name="/FOO/2.TXT"/>
+	<createdirectory path="/FOO/B"/>
+	<putfile name="/FOO/3.TXT"/>
+	<createdirectory path="/FOO/C"/>
+	<putfile name="/FOO/4.TXT"/>
+	<createdirectory path="/FOO/D"/>
+	<putfile name="/FOO/5.TXT"/>
+	<createdirectory path="/FOO/E"/>
+	<putfile name="/FOO/6.TXT"/>
+	<createdirectory path="/FOO/F"/>
+	<putfile name="/FOO/7.TXT"/>
+	<createdirectory path="/FOO/G"/>
+	<putfile name="/FOO/8.TXT"/>
+	<createdirectory path="/FOO/H"/>
+	<putfile name="/FOO/9.TXT"/>
+	<createdirectory path="/FOO/I"/>
+	<checkdirectory path="/FOO">
+		<entry name="1.TXT"/>
+		<entry name="A"/>
+		<entry name="2.TXT"/>
+		<entry name="B"/>
+		<entry name="3.TXT"/>
+		<entry name="C"/>
+		<entry name="4.TXT"/>
+		<entry name="D"/>
+		<entry name="5.TXT"/>
+		<entry name="E"/>
+		<entry name="6.TXT"/>
+		<entry name="F"/>
+		<entry name="7.TXT"/>
+		<entry name="G"/>
+		<entry name="8.TXT"/>
+		<entry name="H"/>
+		<entry name="9.TXT"/>
+		<entry name="I"/>
+	</checkdirectory>
+</imgtooltest>
+
+<imgtooltest name="coco_os9_007">
+	<!-- Testing many more files in a subdirectory -->
+	<createimage driver="coco_jvc_os9"/>
+	<createdirectory path="FOO"/>
+
+	<putfile name="/FOO/1.TXT">'Alpha'</putfile>
+	<putfile name="/FOO/2.TXT">'Bravo'</putfile>
+	<putfile name="/FOO/3.TXT">'Charlie'</putfile>
+	<deletefile name="/FOO/2.TXT"/>
+	<checkdirectory path="/FOO">
+		<entry name="1.TXT" size="5"/>
+		<entry name="3.TXT" size="7"/>
+	</checkdirectory>
+
+	<putfile name="/FOO/4.TXT">'Delta'</putfile>
+	<checkfile name="/FOO/1.TXT">'Alpha'</checkfile>
+	<checkfile name="/FOO/3.TXT">'Charlie'</checkfile>
+	<checkfile name="/FOO/4.TXT">'Delta'</checkfile>
+</imgtooltest>
+
+<imgtooltest name="coco_os9_008">
+	<createimage driver="coco_jvc_os9">
+		<param name="heads" value="1"/>
+		<param name="tracks" value="80"/>
+	</createimage>
+
+	<putfile name="/FOO.TXT">'Alpha' * 60000 </putfile>
+	<checkfile name="/FOO.TXT">'Alpha' * 60000 </checkfile>
+</imgtooltest>
+
+<imgtooltest name="coco_os9_009">
+	<!-- This catches bug #633 -->
+	<createimage driver="coco_jvc_os9">
+		<param name="heads" value="2"/>
+		<param name="tracks" value="40"/>
+	</createimage>
+
+	<putfile name="/FOO.TXT">'Alpha' * 60000 </putfile>
+	<checkfile name="/FOO.TXT">'Alpha' * 60000 </checkfile>
+</imgtooltest>
+
+</tests>

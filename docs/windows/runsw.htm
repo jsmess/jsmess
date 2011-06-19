@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="HTML Tidy for Cygwin (vers 1st September 2004), see www.w3.org" />
+<title>MESS Guide</title>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<link href="../style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h1>Running Software</h1>
+
+<p class="normal">On this page you'll find a quick guide on how to run software in MESS. Most of this is covered in the other pages but this should
+make things simpler.<br /></p>
+
+<hr />
+
+<h2>First Things</h2>
+
+<p class="normal">You need to make sure you've done a few things before running MESS. First you need the systems ROM zip file in the <span class="filename">C:\MESS\roms</span>
+folder. Secondly, the recommended place for software images is <span class="filename">C:\MESS\software\<em>&lt;system_name&gt;</em></span> folder where
+<em>&lt;system_name&gt;</em> is the name of the system you want to run. However, notice that when you run MESS from command line, you always have to specify the full path of
+the software image you want to emulate.<br /></p>
+
+<hr align="center" width="95%" />
+
+<h2>Quick start (Command Line)</h2>
+
+<p class="normal">To run the command line version of MESS you need to do to open a command prompt. Either go to the start button, press run and type
+<em>command</em> or you can run the command prompt from the start/programs/accessories menu.</p>
+
+<p class="normal">Once you are in a DOS box type in this command</p>
+<p align="center"><span class="command">cd C:\MESS</span></p>
+<p class="normal">You should see the prompt</p>
+<p align="center"><span class="command">C:\MESS&gt;</span></p>
+<p class="normal">MESS for Win32 uses a straightforward command format to execute. Here is what it looks like...</p>
+<p align="center" class="Tutorial"><span class="command">MESS &lt;system&gt; &lt;device&gt; &lt;software_name&gt; -options</span></p>
+<p class="normal">Here is an example of running MESS at the command line...</p>
+<p align="center"><span class="command">MESS a2600 -cart c:\games\defender.a26 -now</span></p>
+<p class="normal">This will run defender on an Atari 2600 using the full screen.</p>
+<p class="normal">As you can see it's not too hard. Use the <a href="messw32command.htm" target="_blank">MESS W32 Commands</a> page for info on
+options and system names can be found on the <a href="messsuppsys.htm" target="_blank">Supported Systems</a> page.</p>
+<p class="normal">If your brain is easily frazzled and you want an easier MESS use the GUI version as it's much easier to configure.<br /></p>
+
+<hr align="center" width="95%" />
+
+<h2>Quick Start (MESSUI)</h2>
+
+<p class="normal">Open the MESS GUI and you'll see something like this...</p>
+
+<p align="center" class="Tutorial"><img src="images/gui.gif" width="593" height="432" /></p>
+
+<p class="normal">All you need to do to run systems is to double click an icon in the first list. However MESS may say that software needs to be
+present to load the system. Therefore once you've installed some software just double click it from the second list and it will load. That's It!</p>
+
+</body>
+
+</html>

@@ -1,0 +1,7 @@
+<tests>
+
+<test name="ti990_10_000" driver="ti990_10">
+	<wait time="5"/>
+</test>
+
+</tests>

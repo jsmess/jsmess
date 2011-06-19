@@ -1,0 +1,2166 @@
+<hashfile>
+	<!-- This MESS HASH file was auto-generated from Cowering's GoodSamC database (V3.14)  -->
+	<!-- for the exclusive use of MESS.  Keep this notice intact if editing this file  -->
+
+	<hash crc32="4abf93ea" sha1="af51d3b23fb04ca4ebe8e358aacae9ce4865e77a" name="18 Rated Poker for 512k (Supplement Software)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8900fbec" sha1="5343c02e3d603829bd3def91eeb342762003c9e9" name="32 Colour Demo by Gordon Wallis (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="a1c627e5" sha1="49ce0b29fd3cd57bffa589c7d46da8e8731f610c" name="Adventures of Captain Comic, The (Lars)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3b0f3a55" sha1="713053b4931ccdb64e4a2b00c08761b942fc5dfb" name="Aliens vs Predator Demo by Gordon Wallis (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="c555c010" sha1="bba196114019676561f876b873657b514ae13a97" name="All Star Belch by Tobermory (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="8f6a31b4" sha1="d90376dbfb0c36046e3260ed747c2ff90ea81ad5" name="Allan Stevens - 50 Programs to Play and Write">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7ed001f5" sha1="be32499096f225f0bca19ec2cfcd290a1e680961" name="Allan Stevens - Capricorn Software Disk 1">
+		<year>1994</year>
+	</hash>
+	<hash crc32="02d03768" sha1="c65442d245ba7b1ca9ef2f6a4bb55f8793866f0e" name="Allan Stevens - Capricorn Software Disk 2">
+		<year>1994</year>
+	</hash>
+	<hash crc32="78e6e019" sha1="473d591b56e1528adf557e48ef7767d417cf5ef4" name="Allan Stevens - Capricorn Software Disk 3 Unfinished">
+		<year>1994</year>
+	</hash>
+	<hash crc32="9566d2d6" sha1="a8e344c45400b71f91f7ec2de52a299d5bfd73ee" name="Allan Stevens - Colour Cycle">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b8ee6218" sha1="8ea1ec5f3fa6f903a4a4bb9dc8e251da27b73872" name="Allan Stevens - Home Utilities">
+		<year>1994</year>
+	</hash>
+	<hash crc32="8713a2fd" sha1="e0a89fd1c33076444efe42612a21eccbcae28041" name="Allan Stevens - Home Utilities - Seven Pack">
+		<year>1994</year>
+	</hash>
+	<hash crc32="d71fd169" sha1="31750ac3c0ad7020aa37ae9a12dc8e9a3fac5581" name="Allan Stevens - Learn With Timmy Under 6s">
+		<year>1994</year>
+	</hash>
+	<hash crc32="03c0c1a8" sha1="b1123326772329fb6f55482d181fdc4c6b72e236" name="Allan Stevens - Learning Games">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c4f81e31" sha1="68b041e9e3284571ff5e86ce764ce89145c6bb0e" name="Allan Stevens - Spectrum Screens">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ef0d0455" sha1="bc3806888e35e8b6745646a75277aa4b681416a9" name="Allan Stevens - World Finder">
+		<year>1994</year>
+	</hash>
+	<hash crc32="642df095" sha1="8146278c170d4a2b933544a7a831402e7fcf7bd2" name="Allan Stevens Compilation - Gallery 1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="62ead93d" sha1="ff688f6a0ebdc1e2cd0b05a14ca1a0f6d86f8840" name="Allan Stevens Compilation - Gallery 2">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="46e9eaa7" sha1="4bdcb56d7f8b7fe24c901920d0b4b4f99da3870d" name="Allan Stevens Compilation - Gallery 3">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="168dcc94" sha1="0bc1ec70b825ccd5c126383fab55724f761b6e8b" name="Allan Stevens Compilation - Games Disk 1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="135a3286" sha1="f863c6b4a5924856ae102f1ff1ba5ff6d2ac3a5e" name="Allan Stevens Compilation - Games Disk 3">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="10198dc3" sha1="a45da0cfe64bbaf2339498f90ed9cb0f5fb07938" name="Allan Stevens Compilation - Games Disk 4">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="fda6f6bf" sha1="6d92ee379c48efbaf9423f97daf2a5fcd4913714" name="Allan Stevens Compilation - Spectrum Disk 1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="bbfd7eb8" sha1="27187196fa7d926e18d99eb7727557859383aaf3" name="Allan Stevens Compilation - Spectrum Disk 2">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5d7b3147" sha1="a784f7dc37a837430a238578001dd868f54da809" name="Allan Stevens Compilation - Spectrum Disk 3">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ceea4967" sha1="d2179df949e6503620ecebb1c2c603a7955d931f" name="Allan Stevens Compilation - Spectrum Disk 4">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="aaf83e82" sha1="3946455b4387ce5eb4a54401532d0eb6a0879df4" name="Allan Stevens Compilation - Spectrum Disk 5">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2aabe234" sha1="5b576ede209b8925e23c130ebf1235c703ee5396" name="Allan Stevens Compilation - Spectrum Disk 6">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="83c5b7d6" sha1="ed983af82b35004d9fb706364b22cd6ce188e51a" name="Allan Stevens Compilation - Tunes">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f66dce36" sha1="1560c7d864622391a766ec6fd181c9e1df324e8c" name="Alternative Module Player &amp; Tunes V1.2 (Aley Keprt)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="ff60a5b3" sha1="0614c0d43d036dd4f8156fa38ce1dcc899c9cd9a" name="Amiga MODS Disk">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a5ffd630" sha1="6f94293351891e15091ab465ae03761a46a4b8e1" name="AMRAD Amateur Radio Logbook (Spencer)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="faccbd2c" sha1="2dff994ced0c2971a14741e5c2c7419087d3f33a" name="Andy Monk's Music (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8bd4fa97" sha1="3e420815dde9410ba5c71f2f89777142d61ad062" name="Arcadia Disk Magazine #1">
+		<year>1991</year>
+	</hash>
+	<hash crc32="1e04e9f5" sha1="f7f105c1b7c000aba5f41a5630698e6f574d4c92" name="Arcadia Disk Magazine #2">
+		<year>1991</year>
+	</hash>
+	<hash crc32="ec518fe2" sha1="040b9f6a8fc920bd46d282dfb66ac6382f59ee51" name="Arcadia Disk Magazine #3">
+		<year>1991</year>
+	</hash>
+	<hash crc32="3c86eee7" sha1="ad0d23a33b16c0ed767ce4dce39afeb5773c14fa" name="Arcadia Disk Magazine #3b">
+		<year>1991</year>
+	</hash>
+	<hash crc32="97046a0d" sha1="9aeeb39614271cdaf81c7bed217891d6e1c88319" name="Arcadia Disk Magazine #5">
+		<year>1991</year>
+	</hash>
+	<hash crc32="f68a097b" sha1="2e9eca6af193d2cf7d0cd8045b5c369814bc9812" name="Arnie's Samples">
+		<year>1991</year>
+	</hash>
+	<hash crc32="ca2f39e3" sha1="01fce66c92afd1c902f527cd9bcbe553bc65a939" name="Astroball Demo by Balor Knight (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="e8215294" sha1="2f57e4b0f6eaafa580683e38c27a94241e68a616" name="B-DOS V1.5A (Martijn Groen &amp; Edwin Blink) (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="6cc28f63" sha1="43fb9e51bb693459027230040b57df20d025d1bf" name="B-DOS V1.7D (Martijn Groen &amp; Edwin Blink) (PD)">
+		<year>1999</year>
+	</hash>
+	<hash crc32="87c5922b" sha1="43301071512d669d2b76530f69c84bbd7aec4e29" name="B-DOS V1.7J (Martijn Groen &amp; Edwin Blink) (PD)">
+		<year>1999</year>
+	</hash>
+	<hash crc32="01188492" sha1="8e3b56ec649254fecfe2acf6b90675ce2ef5f981" name="B-DOS V1.7N (Martijn Groen &amp; Edwin Blink) (PD)">
+		<year>1999</year>
+	</hash>
+	<hash crc32="9a394558" sha1="529179de64bdcb556bd8e18f75dc039f374cb3b7" name="Banzai - The Demos &amp; Utils by Dan Doore (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="c644e19e" sha1="cab30a58e5e3363aa51f22442b72a221f7b17358" name="Banzai - The Double by Dan Doore (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="2aeb010f" sha1="5815b8afeedb570c3291654d746411d9a33a1f48" name="Banzai - The Games Compliation by Dan Doore (PD) [a1]">
+		<year>1995</year>
+	</hash>
+	<hash crc32="491db55f" sha1="1f712d8cb8bd4aee305c899ad7e1c43f8f70779e" name="Banzai - The Games Compliation by Dan Doore (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="6a39b85a" sha1="3f90cc93d207f669d58c774956bd4fcc352b1e98" name="Banzai Babes 1 - Cindy &amp; Claudia by Dan Doore (PD) [a1]">
+		<year>1994</year>
+	</hash>
+	<hash crc32="7ea8b3ff" sha1="f0ebcbf27de5960849823189e9ef1cc9833152fd" name="Banzai Babes 1 - Cindy &amp; Claudia by Dan Doore (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="677510f5" sha1="58f2bac5e64ece76a4f7acdc54bcbdf59fe8ab5e" name="Banzai Babes 2 - Claudia - Elle - Kate by Dan Doore (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="5fa8d3ce" sha1="ccb81c3849227565798d9767b39229c690bd14aa" name="Banzai Pictures I by Dan Doore (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="038c18a2" sha1="e5720eb639f0094a2a5582edc01fb5ac031a0cf9" name="Banzai Pictures II - The Atari Job by Dan Doore (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="5bbfcfb6" sha1="0c87a5b8da43dfc43262a90b7201ce33dc7c3f7b" name="Banzai Pictures III - The PC Blag by Dan Doore (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="2f4640fd" sha1="f457b42984bd4ba69221a984c8031d31272b212a" name="Banzai Pictures IV - Pics R Us by Dan Doore (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="fdfcdbda" sha1="6623d4726ae9b9b50b4688864ae48539db623067" name="Banzai Pictures V by Dan Doore (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="03c0f47c" sha1="fa266117ce2fdf63074cb3b1a699913766903fb5" name="Banzai Pictures VI - BlAgArAma by Dan Doore (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="c7046707" sha1="efd9c764f9095576a91a091c9fed5d232c18206c" name="Banzai Pictures VII by Dan Doore (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="61ca9fab" sha1="740d375a149947e0711be1bc9b41e5ba07b494c9" name="Basic Scrolly Pokers by Chris White">
+		<year>1992</year>
+	</hash>
+	<hash crc32="b0c6c499" sha1="35434bc14f2890e4be266be125acea224410e652" name="Bats 'n' Balls by David Gommerman (Revelation)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="0ef487e4" sha1="a70cce1e4c50ebe12ddffe49095dd1177e6fabec" name="Bats 'n' Balls Demo by Lord Insanity (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="ba867362" sha1="f8dfee3ba6f645d9a28474e2d854d30a6e8895ca" name="Best of ENCELADUS, Birthday Pack Edition (Relion)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a34009af" sha1="cd4a7649fbb0f3518fe5fce699f2af171421b65f" name="Best of KAPSA I-V, The (KAPSA) [a1]">
+		<year>1993</year>
+	</hash>
+	<hash crc32="069097e6" sha1="6f624f70bcc1c84b51483b7eb4b3adb8c8035a51" name="Best of KAPSA I-V, The (KAPSA)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="5adf0bb0" sha1="2dbcbfe91853298f037211f1aea9b6e447e10345" name="Beta DOS 1.0 For the Plus D (Betasoft)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="66fe5b2e" sha1="98393db8ce3ad9b826cd5bce0d690e74ea6047f5" name="Blancmange Burps 2 - Smell the Glove! by Tobermory (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="45f3c484" sha1="9c1e156640202d49da9d3f9babc88b5055530bc1" name="Blancmange Burps by Tobermory (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="da07c55f" sha1="7ec5201edd5dca67e7c516f705ae45d2a4c4b6a2" name="Blast Turbo! by James R Curry (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="708a7928" sha1="8ab5ed562d21ca4622d57b1e239d260072d43ab2" name="Blinky Samples Disk 1 (Edwin Blink)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="5caa67fc" sha1="f749b5cef1bb51932c826f0d534d1546fd4f06f1" name="Blinky Samples Disk 2 (Edwin Blink)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="43f84f62" sha1="03bd2f1a2e9eb1959b5579106fb2e136b62d033a" name="Blinky Samples Disk 3 (Edwin Blink)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="2698dfde" sha1="6ca7e4618efa130eddb7c5a239038b55c8631010" name="Blinky Samples Disk 4 (Edwin Blink)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="6609feaa" sha1="f0b971aee8a01813e8115db1c9be010a7f02f201" name="Blitz 6 Menu by Edwin Blink (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="bb558839" sha1="c9b5655eb63423123b6fa35e70c6494ebb87796e" name="Blitz Magazine Issue 2 (Persona)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="8e075a50" sha1="22b4158893c6a4f352800232487fbd16b018109e" name="Blitz Magazine Issue 4A (Persona)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="352a2817" sha1="86b7d127ec948c5c1dc46f4f72b050232d48ab92" name="Blitz Magazine Issue 4B - Sound Machine (Persona)">
+		<status>Known Bad Image</status>
+		<year>1997</year>
+	</hash>
+	<hash crc32="462e07d8" sha1="740289ee8eab1fb50e074133a671ae02bd02ee82" name="Blokker (Stephen McGreal)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ef743b1f" sha1="7938c77a0a3106e24de10101581e16dac648aa4b" name="Blondie and Dagwood, Arkanoid, Prince of the Yolk Folk">
+		<year>199x</year>
+	</hash>
+	<hash crc32="52ecf245" sha1="0cb1f26f9fb92e8fba926bfec086b5004425b6c2" name="Blue Disk Show, The">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e244f0c3" sha1="b19c10da156d80b85122c632d17acab8e6a0d484" name="Boing &amp; Sphera (Noesis Software)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="fcc856a7" sha1="3ddfa86162cb58aeda0df2c17254ddc87fb28dbc" name="Bombed Out,Nuclear Waste,Magic Caves,Blockade (Enigma)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="e23f21e7" sha1="69735e03f5fa9acd03d8e89c0c8f3f6d45ce1d95" name="Bowin and the Count Dracula (Lucosoft and Revelation)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="b8a50272" sha1="3a50ab53b1f3e192c47c35d417327e238c511984" name="Bunnik 2K MOD Slide (Edwin Blink)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="6c44bc99" sha1="6c9955119fb77b190a6897e2a44512a59fda5fcc" name="Cheats By Paul Crompton (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="b39adaaa" sha1="7b8d10774f74853a998440ce772d34511926187a" name="Colour Clipart Samples V1.0 (Nov 1995) (Steve's Software)"> </hash>
+	<hash crc32="9fd67b31" sha1="f6f781281f1415efc826ca777022deab91cf080f" name="COMET Opcodes by Tobermory (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="4cfa842a" sha1="1eeb72342d49b3a112ee05475b14f7f041970124" name="COMET to ASCII by Simon Cooke">
+		<year>1995</year>
+	</hash>
+	<hash crc32="5000e895" sha1="6de5093557b5aa7f9ff887ab7d34333e3c9bad1f" name="COMET Z80 Assembler V1.8 (Revelation)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="6e0807b4" sha1="868bdf69cfeed75cc189f9f451abec9aa30c2e1b" name="COMMIX V2.00 by S. Grodkowski (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="332e1850" sha1="b4cea77d4627a4eb7d3debafae7fc12c575d2de0" name="COMMIX V2.01 by S. Grodkowski (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="28ee58d5" sha1="8845e5bc6f91f0ea2aacb6fe5fb5cf4711c34f04" name="COMMIX V2.02 by S. Grodkowski (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="df2584af" sha1="39481d4e537b7628238d7d0fe3dc6daf33280f99" name="Comms Loader">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d1135bfc" sha1="72137b45ec201e9dfc53ca7ceeeaf7a35253b30e" name="Compressor Utilities (ESI) (PD)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="e6ac423a" sha1="7cc72a50496bbc57e8e7a2fa9d5b0a16eb76ad79" name="Contact Demos by Chris White (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="f69f5963" sha1="b85e256bca584ae87d585a9bb93606076eab39ff" name="Craft Demo by ESI (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="7f110d10" sha1="dfbe6a04bbad8d8053f913d2a94d41b4e7f76916" name="Curse of the Serpent's Eye, The (Dream World) [a1]">
+		<year>1994</year>
+	</hash>
+	<hash crc32="08456a6a" sha1="ce3b7d2392abb62267aa841fc829e8e885d049d5" name="Curse of the Serpent's Eye, The (Dream World) [a2]">
+		<year>1994</year>
+	</hash>
+	<hash crc32="9c10b6f3" sha1="3f8e3594237cbcb59bbae1e353e9fae095c8390c" name="Curse of the Serpent's Eye, The (Dream World) [a3]">
+		<year>1994</year>
+	</hash>
+	<hash crc32="ac955e2e" sha1="30a2c484f2a78332364d5f40e77f04c96fdfb4f5" name="Curse of the Serpent's Eye, The (Dream World)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="d3eb2a36" sha1="fa99ee6d3e9a8eded3ca0099759fa77f3becdf93" name="Daton MasterBASIC Demos (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="cfa24737" sha1="b2fb849b26855f14358532d82518e6c2df042449" name="Defender - Persona and Digital Reality (Chris Pile)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="2539b7b8" sha1="6f09a3aa9964e1d9117a3e010c0cd9ffc3e12b30" name="Defender Compilation">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="145ac562" sha1="364071bf3bfa2560b3c24c574e9fa4a30c14f76a" name="Demo Collection 1 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a2f74fb8" sha1="f7106a9117cfa4868e3b25be9f49d31b35dccc7b" name="Demo Collection 2 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b6ce836b" sha1="14b6eb41183f9ed9edf0ad609640eb2f8062fdf7" name="Demo Disk (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="c0e02d87" sha1="5849c72b887301d176f76834178eed3f67904525" name="Diaz Demo 2">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="77fcdab6" sha1="8ad878ca2e67e04120fd8d16c9febe242bcb3eb8" name="Dino Sourcerer (Softdisk Inc.)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="54ba1a08" sha1="816195a5bdd71e1b41f14306ee1dd6c92ddb2085" name="Dissasembler (Chris White)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="23abd828" sha1="7eda0ecab957db7df4cff9ae8c8f24e3cfe57c86" name="Domino Box (Supplement Software)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="07623d79" sha1="76257649838b4113fda868459dcf208671141db6" name="Driver Icons (Saturn Software)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="20244234" sha1="baf7eb84b60565625921ddf75ede6340a23cbe1c" name="DS12 Duff Capers Music Demo (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="bfc1ba31" sha1="7df1db6cb94d051ff19bd35b98263b70dde27b70" name="DS4 80 Pixel Demo by Tobermory &amp; Andrew Collier (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="ad923840" sha1="1551626ca2d6d3a18aaf17e7bd2ec8c1b80615ab" name="DS5 SIN Wave Distort Toy by Tobermory &amp; Steve Taylor (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="984bd93b" sha1="b359067e47c363d7ac68d063054b27d2730765cc" name="DS7 RainBow Scroller (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="20a7d94e" sha1="a71dc8ac508c302d48efa112d48c195c06492f54" name="Duff Capers v0.51 by Tobermory (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="25b70ed8" sha1="e4e78faa6f8d55bfd58b049efa2ae3dd9c91c74f" name="Dyzonium, WaterWorks, WOP Gamma, Bugulators">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3dd50da4" sha1="2da09a7e4c514faa9da88df37e1bd2444aba86cc" name="E-Copier V2.0 (Chris White)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="f0c4d5ac" sha1="2101e00df017475e30dc523cd609cd39c780a8f4" name="E-Demo by Simon Cooke (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="9d39a30b" sha1="8940d3c71953b9a111629c617678a82f2895c629" name="E-Mag Demo (PD)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="5c25a4de" sha1="6313761239cfe877bdf2adcea161e69ffed3033e" name="E-Tracker Program Disk (FRED Publishing)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="55d4e22c" sha1="efdc7f7cbd87b189e72c925600d0ba7391e9cd54" name="E-Tracker Program Disk V1.2 (FRED Publishing)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="6a328b55" sha1="8aab7fc59172c2043fbbdb137db64f2f041fbc18" name="E-Tracker Tunes (ESI)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="36b4a13e" sha1="d1f0e902bc61008df8494e7fb9da9cb0248e0e27" name="E-Tunes Player (Andrew Collier)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f9c8c1fd" sha1="599f02e74a45db993846018bbe9d4cee47be5abc" name="Easydisc V4.9 (Saturn Software)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="8ce0d8e4" sha1="9254ec8351027446f7342cfcb9f1aa232dc58750" name="Easydisc V5.0 (Saturn Software)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="81be5801" sha1="d53a3e479480cb1de3287462366c55905ce6b81d" name="Edition 3 (Zenith Graphics) (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="e6737866" sha1="dfd40eb16f370e47b3ec746b5ddc7fa1481ff6a4" name="Edwin Blink's Samples (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="9d9cd461" sha1="ea55c4e7a815f51070fc717c7f5fd70d8495d4f2" name="ENCELADUS - Complete Guide to SAMBASIC Parts 1-7 (Relion)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="6294309f" sha1="6a14c3a01b6f52b4fad5841a89e34f9e6087a01f" name="ENCELADUS Magazine Issue 01 (Oct 1990) (Relion Software)"> </hash>
+	<hash crc32="f2f47a36" sha1="f7f5bbc47f7613f994ec214851d889dc8a01cb4a" name="ENCELADUS Magazine Issue 02 (Dec 1990) (Relion Software)"> </hash>
+	<hash crc32="a052d7fa" sha1="22494600cfab4b41030ab826dc733de096cff8b3" name="ENCELADUS Magazine Issue 03 (Feb 1991) (Relion Software)"> </hash>
+	<hash crc32="3a37b145" sha1="a9b424cd09ed2e4f2b4f7b0ea67dfb0be8610d4e" name="ENCELADUS Magazine Issue 04 (Apr 1991) (Relion Software)"> </hash>
+	<hash crc32="a8405e86" sha1="32a024ac9f3d7032f94903264d4032b6ea71fd54" name="ENCELADUS Magazine Issue 05 (Jun 1991) (Relion Software)"> </hash>
+	<hash crc32="b746916e" sha1="fb2589b28924f969a6be3e029cb51b8be9030362" name="ENCELADUS Magazine Issue 06 (Aug 1991) (Relion Software) [a1]"> </hash>
+	<hash crc32="1606dd3f" sha1="6e1e67a602af57eb29f0bec5b14071ae97c23905" name="ENCELADUS Magazine Issue 06 (Aug 1991) (Relion Software)"> </hash>
+	<hash crc32="629ce438" sha1="de436a715d628cd610d8ab4f5409d49b70c56a76" name="ENCELADUS Magazine Issue 07 (Oct 1991) (Relion Software)"> </hash>
+	<hash crc32="c712fcca" sha1="cebea7db99a61b71c549e07ab6ba77a2593d06aa" name="ENCELADUS Magazine Issue 08 (Dec 1991) (Relion Software)"> </hash>
+	<hash crc32="2922f3f9" sha1="b0058453f925796d8a355a213415b87c2b558320" name="ENCELADUS Magazine Issue 09 (Feb 1992) (Relion Software)"> </hash>
+	<hash crc32="4a1a2b68" sha1="1bf6e0501d7b4b5fe2d8736aea88612cc2d61986" name="ENCELADUS Magazine Issue 10 (Apr 1992) (Relion Software)"> </hash>
+	<hash crc32="0d33cc52" sha1="84e107ece0a817e06fbd9b9853ea9d6f937a7205" name="ENCELADUS Magazine Issue 11 (Jun 1992) (Relion Software)"> </hash>
+	<hash crc32="cd28d5ec" sha1="0d5136765ce0b00acc12a4b80d85721e4dd7d140" name="ENCELADUS Magazine Issue 12 (Oct 1992) (Relion Software)"> </hash>
+	<hash crc32="9c870029" sha1="2e8c9aaf3c506d3a42bcf350cf9a4a21f4b67073" name="Entropy Demo (PD) [a1]">
+		<year>1992</year>
+	</hash>
+	<hash crc32="a3210e59" sha1="3f626fb788f31bbd99a91dbd46ff87cd561c52eb" name="Entropy Demo (PD) [a2]">
+		<year>1992</year>
+	</hash>
+	<hash crc32="fb6ed11e" sha1="a3748c628f3350c74c99fef884fac3bef8fcb657" name="Entropy Demo (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="49aa8482" sha1="e7d8c83ba0ba6f2146e33a7741cb6b6fa68cf196" name="ESI Demos (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5463b401" sha1="88274f4672f19148cca763df2a585bd01d9c9370" name="EXPLOSION - 0 - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="7c3db0c0" sha1="20faa9ae4872d0a8b5f2ad9843d82cdb21a65483" name="EXPLOSION - 1 - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="529fec56" sha1="3cd6733c0965ba24fa50e2f7fc4514f30b283473" name="EXPLOSION - 2 - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="c7aaa89c" sha1="9a829828019a649b9b17b304abedaa31937eb5a1" name="EXPLOSION - 3 - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="0a338d8e" sha1="9a0f5afdd06f4dba106c472c706b89c6bc79c370" name="EXPLOSION - 4 - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="7d9fe4ac" sha1="8d2509e17380e3d36965eea0171be4d93cf347ec" name="EXPLOSION - 5 - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="4651d116" sha1="fe3c5d972a7a12383f83574502596ad70409e249" name="EXPLOSION - 6 - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="205f7771" sha1="67910fea424cc0020258f594b0bcab6e89db014b" name="EXPLOSION - 7 - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="f81dbaa0" sha1="a304f1d3b412165aebb1398bee57d887e2677302" name="EXPLOSION - 8 - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="16d66fa5" sha1="8a978457d1592d8c3c4d584ed301beca0a478b71" name="EXPLOSION - A - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="9c67bc95" sha1="a0b52ade25322be5e54440687129b265509af287" name="EXPLOSION - B - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="20661581" sha1="86f4c1093049365f90d2b36e770bbfafddd8cc66" name="EXPLOSION - C - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="dc0a0bda" sha1="949aca36b54d6f0ddbd7e5ca955a13a051124833" name="EXPLOSION - D - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="32b90127" sha1="7d784e6655244b103cd6da3d8d7f3ebb72ac6442" name="EXPLOSION - E - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="059e21c6" sha1="12cd608aef6a4f9217454bbc7e407e09441ce706" name="EXPLOSION - F - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="4a2c6ca3" sha1="fe44ad2b2a1bbd6f1365815dc35cd60d98897a1c" name="EXPLOSION - G - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="ad0efbdd" sha1="151c3dda36162e6ec73bae82db334bec93b30123" name="EXPLOSION - H - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="ae1f7b77" sha1="a28a5e9fcd3c0cabb54a368fc2f631fb9059e4be" name="EXPLOSION - I - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="af160126" sha1="f63d4206212b7df2cefb82e6def3e5f2f4c9b9a7" name="EXPLOSION - J - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="ca5919e0" sha1="6f323cdc4b934a0e16dc26305ea997883a570ca5" name="EXPLOSION - K - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="0377a44c" sha1="8451e3588624357d004393901014b39d2477c7f5" name="EXPLOSION - L - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="7722cba1" sha1="8d25e849d0d5a082f56a5f67de6b318f40fbec00" name="EXPLOSION - M - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="6cc2d745" sha1="be2c15848c0f3c9f705b59b8ed5439807e0ba52e" name="EXPLOSION - N - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="a52c71bf" sha1="4e8bc6249c9c70cf5d35954e87d608133698f466" name="EXPLOSION - O - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="1c8a4c3c" sha1="b48cc3ea5aceda91564d8eb26c5c700d06569ebe" name="EXPLOSION - P - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="5b80e21d" sha1="dc8aa87ab855adc9cfe75d0fb59edbf3034478fd" name="EXPLOSION - Q - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="ef1aef78" sha1="50978be2ab968c857f008206310850a5a4e4de65" name="EXPLOSION - R - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="db837caf" sha1="cd84468bebf296f4ecd1be7524222065b45c0368" name="EXPLOSION - S - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="966c4c17" sha1="5e99deaf76486756c8888746fca47933ee7522e5" name="EXPLOSION - T - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="91e12867" sha1="6d78bd8f0d0a2da3452ed98b6c46988c9cc4a097" name="EXPLOSION - U - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="b6f3ff7d" sha1="b5dfaa78e92f68552148a5ad94199f0be35217df" name="EXPLOSION - V - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="86f46bcf" sha1="cf87df3cb09228d5aba55bfb475377d8a59c9c10" name="EXPLOSION - X - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="9f683edf" sha1="a7fe49a4da66a76f52f39cba3c542946608f178c" name="EXPLOSION - Z - GAMES FOR EMULATOR EXPLOSION">
+		<year>1996</year>
+	</hash>
+	<hash crc32="688a2a61" sha1="b3ebe8a6b04112692045bcde22d93d528373744c" name="EXPLOSION - ZX SPECTRUM 48 Emulator + COMMANDER">
+		<year>1996</year>
+	</hash>
+	<hash crc32="fccc1bdc" sha1="05cc86f1f2631c84bae67c6cc6bdfbaed133112c" name="EXPLOSION MELODY DISK - FOR SELECT A CREATE BLOCK">
+		<year>1996</year>
+	</hash>
+	<hash crc32="0ff29d1b" sha1="06e6e37162857fa9eda7e5827c917c740af46e7a" name="F-16 Combat Pilot Demo (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="d177d3de" sha1="977d46b351fd7d5613084b66e822f26408900957" name="Fashoom! (Sad Snail Productions)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="0288600e" sha1="581252b0bc89b80c256aba9c22d6785cc4164cfd" name="Fastline Public Domain Library Disk 10">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7a2fb21e" sha1="2a1098a0991d76da83a4ba5a661aceabadab4c18" name="Fastline Public Domain Library Disk 12">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="efa1b13b" sha1="7bcc2dfeb5f96db50ec7c5f1de44494abac39ffc" name="Fastline Public Domain Library Disk 13">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f6902f58" sha1="0961dccf9ff008d703a054961e2fee33f623b835" name="Fastline Public Domain Library Disk 16">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1241dd41" sha1="af5caf2e42d6e7743ea7811da375781a2ec8d416" name="Flight of Fantasy and Occult Connection Adventures">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="09188269" sha1="3bc4dcfb50f0ac06420f44c19146723f18b3014a" name="Font Loader (Phantom Software)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="4c243eb7" sha1="131dbd7f7a5ef066200d898b69f4557bb04858a6" name="Football League Manager (Key Software-FRED Publishing)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="a3c663b0" sha1="44a4a33dd2a2cf83416302dbae0a6097f2b881b9" name="FRED &amp; SamCo Demo Disk (PD)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="945fed48" sha1="5961b88c9e73809a8b10e078a1b7124678245fd7" name="FRED &amp; Samco Disc, The Best of">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0ade650b" sha1="e0aec50d35f013ab3672ec08f2d1efd7cc572310" name="FRED Magazine - Morkography">
+		<year>1992</year>
+	</hash>
+	<hash crc32="43331ccb" sha1="924bfdce65cf0fc10a7c21b2faf92314d6e40def" name="FRED Magazine Issue 01 &amp; 02">
+		<year>1990</year>
+	</hash>
+	<hash crc32="89a85203" sha1="20a8013dea2a707a34817b23645e00ece02e267f" name="FRED Magazine Issue 01 [a1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="5fad644a" sha1="110d030a076e2a5a67dec73169d770c38cb6fd85" name="FRED Magazine Issue 01">
+		<year>1990</year>
+	</hash>
+	<hash crc32="f563f3d6" sha1="dfb2ed0146ce0c7e700f28190315eea238641e86" name="FRED Magazine Issue 02 [a1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="ee20ecb7" sha1="55dbfd4646ccfa4e532928de05233498925b1bcd" name="FRED Magazine Issue 02">
+		<year>1990</year>
+	</hash>
+	<hash crc32="52137120" sha1="a2ab7ae123708d8746f22574c89cb2bbad846c75" name="FRED Magazine Issue 03 [a1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="74975d40" sha1="590802121f53968966e82ae42f04d478685537d2" name="FRED Magazine Issue 03">
+		<year>1990</year>
+	</hash>
+	<hash crc32="5a2f1fa4" sha1="5c4b4ebe16042962c6802972fa262941d5a1636c" name="FRED Magazine Issue 04 [a1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="88d491a6" sha1="7ad3fa837dbfa9c92d0a039c5a0eb2c8948ef138" name="FRED Magazine Issue 04">
+		<year>1990</year>
+	</hash>
+	<hash crc32="86019ce3" sha1="5f52bfa5fbebe135cc976566608c32d66c73ecea" name="FRED Magazine Issue 05 [a1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="adc85ea9" sha1="c7fae2c2f8deba7ad29dd6e77e9642815d6b8bc2" name="FRED Magazine Issue 05">
+		<year>1990</year>
+	</hash>
+	<hash crc32="e85b5fc2" sha1="ec72e50b0889a4e4c0f34d869debc83cb949d613" name="FRED Magazine Issue 06 [a1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="f5f05c9e" sha1="259ecb448312391e9b476accc7b2e2e7f2030210" name="FRED Magazine Issue 06">
+		<year>1990</year>
+	</hash>
+	<hash crc32="6985b604" sha1="929ba3153e22f9e6cba341a86a6a51cec805d821" name="FRED Magazine Issue 07 [a1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="2adc23a9" sha1="df8a03c5aae329cf7b3b691396f70a97fce95586" name="FRED Magazine Issue 07">
+		<year>1990</year>
+	</hash>
+	<hash crc32="74da3a9b" sha1="15551b7b7c1edf82ce48238a65223549eb07bcdb" name="FRED Magazine Issue 08 [a1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="a530cacb" sha1="6dfd0c9780e163298f62eaeca2f22c54bb046a94" name="FRED Magazine Issue 08">
+		<year>1991</year>
+	</hash>
+	<hash crc32="56ae8617" sha1="70f4afdfcc04535786accd8b27e4e16c2d83a8c5" name="FRED Magazine Issue 09 [a1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="cfdae291" sha1="c1dfbd660e7efa0db787b5f812b6092ca6bb6cdf" name="FRED Magazine Issue 09">
+		<year>1991</year>
+	</hash>
+	<hash crc32="ba635fff" sha1="8e47f00c0267aae116f89c2468d48d1685f33e15" name="FRED Magazine Issue 10 [a1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="1b534b76" sha1="1cc402e0b184dfcd95b56ee41ccea466bd48c6e2" name="FRED Magazine Issue 10 [a2]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="3d441304" sha1="28cfeb17e3e6e594eeaf299742c03bdf18bf6c57" name="FRED Magazine Issue 10">
+		<year>1991</year>
+	</hash>
+	<hash crc32="ce3cec95" sha1="d21172084b5a4d380cdd967cdb6f48edf546374c" name="FRED Magazine Issue 11A [a1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="12c995d4" sha1="1086ca79aec707af21de6ab671e34ed15e5fb2d5" name="FRED Magazine Issue 11A [a2]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="eb7fc2aa" sha1="cd57adaf3b0c5bd4725735c80b6aea6f1e23f739" name="FRED Magazine Issue 11A">
+		<year>1991</year>
+	</hash>
+	<hash crc32="c35ceb40" sha1="eec023668c7f678de632c708ccc018f54d1ba6e3" name="FRED Magazine Issue 11B [a1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="1433b06f" sha1="9d0a90826edf3531b0fe74a84a9cb06258b194ca" name="FRED Magazine Issue 11B [a2]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="a074077f" sha1="aa720c8bb7719e38aef289e195de4bf8cb53a2d9" name="FRED Magazine Issue 11B">
+		<year>1991</year>
+	</hash>
+	<hash crc32="546f3033" sha1="3a56574be1a24175d2a0783507811aa72c3e77be" name="FRED Magazine Issue 12 [a1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="d15edb4e" sha1="609301d4679de49d5640b09a3c9073ebd5a700c2" name="FRED Magazine Issue 12 [a2]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="0e149d6b" sha1="dcbb9dede81a0f54df45a60f5fde209957f1c359" name="FRED Magazine Issue 12">
+		<year>1991</year>
+	</hash>
+	<hash crc32="91c0fc1b" sha1="2430aff54f7f8a15fe179b769e27a8074c6a6fe7" name="FRED Magazine Issue 13 [a1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="03e0a8d0" sha1="84d7a5b69216a1005d287ffdf8df870b9eb6bf96" name="FRED Magazine Issue 13">
+		<year>1991</year>
+	</hash>
+	<hash crc32="7652f394" sha1="67aae63daa2fc4e32a7a082c5c02ee8d2d025e9d" name="FRED Magazine Issue 14">
+		<year>1991</year>
+	</hash>
+	<hash crc32="7e16d5c8" sha1="144de85968ea095baa8928ec6f0e45bb70c76d38" name="FRED Magazine Issue 15">
+		<year>1991</year>
+	</hash>
+	<hash crc32="9eb453d4" sha1="bd2f1aebb95f9fc42bd1099eb957dc27e4f64c3f" name="FRED Magazine Issue 16">
+		<year>1991</year>
+	</hash>
+	<hash crc32="8939bc77" sha1="d903f1283b17aaa8018e06d6fa22ac79771237bb" name="FRED Magazine Issue 17">
+		<year>1991</year>
+	</hash>
+	<hash crc32="d44efdc9" sha1="a866c42678dfe8dd6cffe347c602cb6cd2d5365d" name="FRED Magazine Issue 18 [a1]">
+		<year>1992</year>
+	</hash>
+	<hash crc32="046a0111" sha1="917e503fbd2eae73da447c8c59600e75cd5a5894" name="FRED Magazine Issue 18">
+		<year>1992</year>
+	</hash>
+	<hash crc32="ba9473cc" sha1="1281c049c0cc01da0b8139b72e24138a1c623291" name="FRED Magazine Issue 19 [a1]">
+		<year>1992</year>
+	</hash>
+	<hash crc32="4d25cae7" sha1="7c344c6e29b71258a5c94dbe50ee01cd3f61ae89" name="FRED Magazine Issue 19">
+		<year>1992</year>
+	</hash>
+	<hash crc32="0d43d7cb" sha1="4c8f482f1b8b68407ce241fdbad0360be7faf77f" name="FRED Magazine Issue 20 [a1]">
+		<year>1992</year>
+	</hash>
+	<hash crc32="14769aaf" sha1="38ccbc723c4d3e47c728422e0f5b569b7dc3f7ef" name="FRED Magazine Issue 20">
+		<year>1992</year>
+	</hash>
+	<hash crc32="35c9ae43" sha1="66b5c7b1cd8aea275bec9639f6d4f7d66b5a8724" name="FRED Magazine Issue 21 [a1]">
+		<year>1992</year>
+	</hash>
+	<hash crc32="316884a7" sha1="b3f3879527a12da588050b31648cadf5e3284b7a" name="FRED Magazine Issue 21">
+		<year>1992</year>
+	</hash>
+	<hash crc32="c3d14e47" sha1="54eae07d261712065fa67d7447e93f17615e54b2" name="FRED Magazine Issue 22 [a1]">
+		<year>1992</year>
+	</hash>
+	<hash crc32="5e439298" sha1="d33b762267ce88c14d835ebfd1b2ee983fe09f6e" name="FRED Magazine Issue 22">
+		<year>1992</year>
+	</hash>
+	<hash crc32="0c35d272" sha1="da4cf4aac3b8aedef8e1372ed94ee26f043f4f8c" name="FRED Magazine Issue 23 [a1]">
+		<year>1992</year>
+	</hash>
+	<hash crc32="cb8f194e" sha1="eb307a4b16abca9b1f0e1950de4d4ecdfd30df84" name="FRED Magazine Issue 23">
+		<year>1992</year>
+	</hash>
+	<hash crc32="df0f33fb" sha1="24f752605a27d32596eadbff95eff9fe1e487457" name="FRED Magazine Issue 24A">
+		<year>1992</year>
+	</hash>
+	<hash crc32="3a8a50d7" sha1="e2fc893317f9d73970b05e8ada8eecb3db99d85b" name="FRED Magazine Issue 24B [a1]">
+		<year>1992</year>
+	</hash>
+	<hash crc32="c3b06222" sha1="abbe0f3a9bdace83d66a24acc7c87229d2f02b55" name="FRED Magazine Issue 24B">
+		<year>1992</year>
+	</hash>
+	<hash crc32="e3821327" sha1="3286ac1238e8ab5b1ea7262be791472fb080524c" name="FRED Magazine Issue 25 [a1]">
+		<year>1992</year>
+	</hash>
+	<hash crc32="7a298345" sha1="c81082f59f4862a815abb1dad5f11f6b874f90f5" name="FRED Magazine Issue 25">
+		<year>1992</year>
+	</hash>
+	<hash crc32="ebac1942" sha1="a5ea36fe10c8e77c21165cf91a9e5a698c0d5702" name="FRED Magazine Issue 26">
+		<year>1992</year>
+	</hash>
+	<hash crc32="3cffb000" sha1="7eef5227cdf07a2edd67aed26e3db0dc8794f06b" name="FRED Magazine Issue 27">
+		<year>1992</year>
+	</hash>
+	<hash crc32="ef80321c" sha1="5c00a6631fdef51a4aa0df30bcd07d6ba6508ea5" name="FRED Magazine Issue 28">
+		<year>1992</year>
+	</hash>
+	<hash crc32="e1f6277a" sha1="53e05af0bbab3ab33b9e97ac374c316141d4b45b" name="FRED Magazine Issue 29 [a1]">
+		<year>1992</year>
+	</hash>
+	<hash crc32="e1712f90" sha1="90ef8862a1c11cfe42d940a4798eb4169af9cd42" name="FRED Magazine Issue 29">
+		<year>1992</year>
+	</hash>
+	<hash crc32="6fe5f82f" sha1="6e06e2f1302a19450dab6e52c44bcb144735d848" name="FRED Magazine Issue 30">
+		<year>1993</year>
+	</hash>
+	<hash crc32="ee516277" sha1="a4d7a279c6eddf850386ceed5864f4716c6bf6d2" name="FRED Magazine Issue 31 [a1]">
+		<year>1993</year>
+	</hash>
+	<hash crc32="8bb70d00" sha1="3e80c27573d7fc418229c3f1576146b5240b50cc" name="FRED Magazine Issue 31">
+		<year>1993</year>
+	</hash>
+	<hash crc32="95740c83" sha1="aa5ebaeca55b583490afedf23581a17d4b6c45b4" name="FRED Magazine Issue 32 [a1]">
+		<year>1993</year>
+	</hash>
+	<hash crc32="88f22319" sha1="f2f295cdf1d1d16be296764dfe587adb1618c6b3" name="FRED Magazine Issue 32">
+		<year>1993</year>
+	</hash>
+	<hash crc32="841471ec" sha1="726edf354afff98b07bb8731b3507ec3530d361e" name="FRED Magazine Issue 33">
+		<year>1993</year>
+	</hash>
+	<hash crc32="7e6d4206" sha1="139bb63c727d6d632afb5c00cbdf290fef517b32" name="FRED Magazine Issue 34">
+		<year>1993</year>
+	</hash>
+	<hash crc32="cc91b0b5" sha1="83d5a5007265265cc3a883fefc8cd4c51461e528" name="FRED Magazine Issue 35 [a1]">
+		<year>1993</year>
+	</hash>
+	<hash crc32="34794a3b" sha1="b391b41c9641953ed53e5b596c1dc443e0c80fa7" name="FRED Magazine Issue 35">
+		<year>1993</year>
+	</hash>
+	<hash crc32="472192be" sha1="aa37554a237e4d9fa242da99cdb87f47dc915645" name="FRED Magazine Issue 36">
+		<year>1993</year>
+	</hash>
+	<hash crc32="58a260bf" sha1="89a0112a12a5b72ecd4374e69b34d6b8140e85dd" name="FRED Magazine Issue 37">
+		<year>1993</year>
+	</hash>
+	<hash crc32="bdf4ffdb" sha1="419086f89f256b083f06b210bc3b217555081633" name="FRED Magazine Issue 38 [a1]">
+		<year>1993</year>
+	</hash>
+	<hash crc32="23b74072" sha1="9ab53b063847ee005152fa6673119fe5a85bf0de" name="FRED Magazine Issue 38">
+		<year>1993</year>
+	</hash>
+	<hash crc32="7a84c15c" sha1="05a86e2a020272ec88a6b6c3d56edd103398273c" name="FRED Magazine Issue 39 [a1]">
+		<year>1993</year>
+	</hash>
+	<hash crc32="c07afc3d" sha1="c0312254ba13b25dbce53079422292194119ac18" name="FRED Magazine Issue 39">
+		<year>1993</year>
+	</hash>
+	<hash crc32="505a8951" sha1="b32365d9c82fab107b789af9cce106f5b81b4fe8" name="FRED Magazine Issue 40">
+		<year>1993</year>
+	</hash>
+	<hash crc32="692b25bc" sha1="a566846da602e0be3f395f62f0d36a7bd09a4274" name="FRED Magazine Issue 41">
+		<year>1994</year>
+	</hash>
+	<hash crc32="352175ab" sha1="236edd6537529897d5151d69f3a5883ab718ce19" name="FRED Magazine Issue 42">
+		<year>1994</year>
+	</hash>
+	<hash crc32="4b5dd9dc" sha1="4d77659973b2e884378c268a630ba12194867b93" name="FRED Magazine Issue 43">
+		<year>1994</year>
+	</hash>
+	<hash crc32="e00f3169" sha1="5bebc2837aa9dc5b165c3300932dfced21dd71ad" name="FRED Magazine Issue 44 [a1]">
+		<year>1994</year>
+	</hash>
+	<hash crc32="5601670a" sha1="edaa20b73dedaaf34b92586ba5bcaff3e85bceac" name="FRED Magazine Issue 44">
+		<year>1994</year>
+	</hash>
+	<hash crc32="27981cf5" sha1="0bfd88f0e60f91e74d84360f27589163c72ce531" name="FRED Magazine Issue 45">
+		<year>1994</year>
+	</hash>
+	<hash crc32="c22be10b" sha1="e0fedbcd36680f6fd7e00b5d9b8506326b0598a9" name="FRED Magazine Issue 46">
+		<year>1994</year>
+	</hash>
+	<hash crc32="4f2c9df6" sha1="fc410f4a5970c3c18b92e21910555f96d0a77261" name="FRED Magazine Issue 47">
+		<year>1994</year>
+	</hash>
+	<hash crc32="4e288ef8" sha1="a00dd279b00d60650428f266e52185debd0f8174" name="FRED Magazine Issue 48 [a1]">
+		<year>1994</year>
+	</hash>
+	<hash crc32="ce9b9799" sha1="2a15fd8e5272b6162943bc4548d871586f8df078" name="FRED Magazine Issue 48">
+		<year>1994</year>
+	</hash>
+	<hash crc32="9de44c58" sha1="5bdcbb29db956ce295a03380e3c80323d597b2b9" name="FRED Magazine Issue 49">
+		<year>1994</year>
+	</hash>
+	<hash crc32="f9da5721" sha1="c40412a539eecc100b7c943adbd3cf1026bc1fcc" name="FRED Magazine Issue 50">
+		<year>1994</year>
+	</hash>
+	<hash crc32="cb39c14b" sha1="6c50f76e54268b03f46b9cc5f7e60f5511d7ae52" name="FRED Magazine Issue 51">
+		<year>1994</year>
+	</hash>
+	<hash crc32="54e50a41" sha1="573fd4de5706c7755cced47b5c299943e2a1ca95" name="FRED Magazine Issue 52 [a1]">
+		<year>1994</year>
+	</hash>
+	<hash crc32="e004023a" sha1="c1a98ad02106900722c0220c4b79de189f29fed1" name="FRED Magazine Issue 52">
+		<year>1994</year>
+	</hash>
+	<hash crc32="6e626a24" sha1="112930be99ddaefa7e6d3142e9fe1a49daed9384" name="FRED Magazine Issue 53">
+		<year>1995</year>
+	</hash>
+	<hash crc32="b3fd4403" sha1="707fe93a7f82ebcc6f7f669df3d93fbac1c32693" name="FRED Magazine Issue 54">
+		<year>1995</year>
+	</hash>
+	<hash crc32="ff899ec6" sha1="c16a1eb933b1779d4d9494452c2c5b8fe2690c11" name="FRED Magazine Issue 55">
+		<year>1995</year>
+	</hash>
+	<hash crc32="593208f5" sha1="c8126ff527f08ec8ebfb4143421444720d46653c" name="FRED Magazine Issue 56">
+		<year>1995</year>
+	</hash>
+	<hash crc32="90c668dd" sha1="881b2b74cf6a318665548201dad5bb39ff2dbdd4" name="FRED Magazine Issue 57 [a1]">
+		<year>1995</year>
+	</hash>
+	<hash crc32="a51d0ec6" sha1="5649c07d501ae2116da6f2600edce1e1049391bf" name="FRED Magazine Issue 57">
+		<year>1995</year>
+	</hash>
+	<hash crc32="b1385739" sha1="fafc0ebb2ffd58dc1005dca14debb1fc81b65cab" name="FRED Magazine Issue 58 [a1]">
+		<year>1995</year>
+	</hash>
+	<hash crc32="a13003cf" sha1="7d1ea0af8027d1701e2e1008adfb0b6fdc4305ed" name="FRED Magazine Issue 58">
+		<year>1995</year>
+	</hash>
+	<hash crc32="3571cab4" sha1="50fc1940b0978fe5c438881657e10bb1099c8e17" name="FRED Magazine Issue 59">
+		<year>1995</year>
+	</hash>
+	<hash crc32="159204ee" sha1="f843b4b034c09619fda979562d3e039c6e593d68" name="FRED Magazine Issue 60">
+		<year>1995</year>
+	</hash>
+	<hash crc32="3c3ae063" sha1="9ab23c0150fc2806c6f665e6c820009325f421c8" name="FRED Magazine Issue 61 [a1]">
+		<year>1995</year>
+	</hash>
+	<hash crc32="310d207d" sha1="4d5aef822295bb25b80bc0fa5ad955d7c509985e" name="FRED Magazine Issue 61">
+		<year>1995</year>
+	</hash>
+	<hash crc32="24e5ed2c" sha1="a146b6257240d849d7116c8ab611151340ff9179" name="FRED Magazine Issue 62">
+		<year>1995</year>
+	</hash>
+	<hash crc32="169d7fd7" sha1="8c9d963747718c058cb6f03eff045dd86f7fa1e9" name="FRED Magazine Issue 63">
+		<year>1995</year>
+	</hash>
+	<hash crc32="4377252e" sha1="0164e66476ea5b02b99e496fdbc4fae2d490a7b0" name="FRED Magazine Issue 64">
+		<year>1995</year>
+	</hash>
+	<hash crc32="c7cf476a" sha1="52c0a27cfc49f99a5b8f5b69bdacf8c8c094063b" name="FRED Magazine Issue 65">
+		<year>1995</year>
+	</hash>
+	<hash crc32="74a34313" sha1="6fd6d937bd360514bbb089cd657899d4af9d3875" name="FRED Magazine Issue 65 Menu">
+		<year>1995</year>
+	</hash>
+	<hash crc32="22225839" sha1="04536328c81f3ad5374ebda93f72d783ef606c15" name="FRED Magazine Issue 66">
+		<year>1996</year>
+	</hash>
+	<hash crc32="834ca9a5" sha1="1f101551bdb3b949c6aad9e191afce2dc14bf5f3" name="FRED Magazine Issue 67">
+		<year>1996</year>
+	</hash>
+	<hash crc32="8614e720" sha1="cb666410206a0260f3ecd951d942738319cb5393" name="FRED Magazine Issue 68">
+		<year>1996</year>
+	</hash>
+	<hash crc32="34382754" sha1="fe6a624424e9b6320d4027570b66928e77cee945" name="FRED Magazine Issue 69">
+		<year>1996</year>
+	</hash>
+	<hash crc32="9c54cfe9" sha1="a5b226b7d64aeb548c2bdea0b543b11ef0a84026" name="FRED Magazine Issue 70">
+		<year>1996</year>
+	</hash>
+	<hash crc32="6119ac92" sha1="ebdb3348c3cdd2bf4a386dbd1cc617d538ab4efe" name="FRED Magazine Issue 71">
+		<year>1996</year>
+	</hash>
+	<hash crc32="c868cb1a" sha1="0b178eb072c3032b7aa7bd8989f6146e75fbe48b" name="FRED Magazine Issue 72">
+		<year>1996</year>
+	</hash>
+	<hash crc32="3ed6ddd8" sha1="a941a44eabe7b9168ec0a160d21802f7e5e3b410" name="FRED Magazine Issue 73">
+		<year>1996</year>
+	</hash>
+	<hash crc32="4d53b6a7" sha1="8107da149b6c70596e69d9f7f5e37af945231a20" name="FRED Magazine Issue 74 [a1]">
+		<year>1996</year>
+	</hash>
+	<hash crc32="44fe85f7" sha1="9e05aef4f2c43118a0a37fbe1a87f40cac99d25a" name="FRED Magazine Issue 74">
+		<year>1996</year>
+	</hash>
+	<hash crc32="7a42f8b7" sha1="6b3f373805b310cac54e703ef1c58f9d329c76a3" name="FRED Magazine Issue 75 [a1]">
+		<year>1996</year>
+	</hash>
+	<hash crc32="ce9b0ece" sha1="4173b445aed4370019f5d9843b74043150778b66" name="FRED Magazine Issue 75">
+		<year>1996</year>
+	</hash>
+	<hash crc32="a87f559c" sha1="6755f1ecb5c0b98716160502dc54c6eed309e8f8" name="FRED Magazine Issue 76">
+		<year>1997</year>
+	</hash>
+	<hash crc32="98420fb6" sha1="413bfd09775b5514202a2c631931a02299125771" name="FRED Magazine Issue 77">
+		<year>1997</year>
+	</hash>
+	<hash crc32="e2f6b7ca" sha1="0c657f5645f2b5e4c27089b246b0f5516ea78bd2" name="FRED Magazine Issue 78 [a1]">
+		<year>1997</year>
+	</hash>
+	<hash crc32="735c206c" sha1="1244d99f8827f7835f34dd301db4cd3b946f7bed" name="FRED Magazine Issue 78">
+		<year>1997</year>
+	</hash>
+	<hash crc32="5607657d" sha1="41f8ab6e6e6dc77e1ebf1ad6bbb9332acd18e57d" name="FRED Magazine Issue 79 [a1]">
+		<year>1997</year>
+	</hash>
+	<hash crc32="2ca0359b" sha1="8193aee3127dfe7e2e18fb468e0407c67a663dcf" name="FRED Magazine Issue 79">
+		<year>1997</year>
+	</hash>
+	<hash crc32="16082dfe" sha1="82500bb4480c7a43b5f875e07197281aa8169a28" name="FRED Magazine Issue 80 [a1]">
+		<year>1997</year>
+	</hash>
+	<hash crc32="4f3cfabc" sha1="bb876e1f03055d686cd20ae926681c6bbd6e8bbe" name="FRED Magazine Issue 81 [a1]">
+		<year>1997</year>
+	</hash>
+	<hash crc32="efc22446" sha1="45f7a538e62aba595e28481b6682a1adb7306a75" name="FRED Magazine Issue 81">
+		<year>1997</year>
+	</hash>
+	<hash crc32="56e4ec13" sha1="be08aef030612eb47d23a0657c77dbab0fac6dde" name="FRED Magazine Issue 82">
+		<year>1997</year>
+	</hash>
+	<hash crc32="52bba488" sha1="9756194ac0f274b38d97fdb6c55b53d354acd023" name="Fredatives 3">
+		<year>1992</year>
+	</hash>
+	<hash crc32="8b7ac899" sha1="8b5ee525717fe2763ad7ca77d9198b34f3ce306f" name="Fredatives 4">
+		<year>1992</year>
+	</hash>
+	<hash crc32="4ad98fbf" sha1="104bf3e6a3a21334b6c739c6e2187052f6f9b61d" name="Game Dos - DVar 8.92n3">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="50244206" sha1="f6a578f5a8b200ee7c2921f22d56970f8148e2ad" name="GamesMaster 1.2 (Betasoft)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="689627bf" sha1="f9048b3bd0030da6c31ff9662d80131bc8add85e" name="GamesMaster 1.52 (Betasoft)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="eb1bb0d4" sha1="8f1dd26b8a21557fb041eb0db0bb6e3dc442684c" name="GFX Demo by Doug Holmes (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="19627694" sha1="a94b032261a2b11219a423b8f26efa2a0f2015e9" name="GM-Calc V1.0 (GM Software)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="6c745010" sha1="c50cfef4fbf0b6a386265ca133e7caac4d1daa6a" name="Goblin Mountain Adventure (Sam PD Sware Lib.) (PD)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="0e7046f6" sha1="ca1c05aa6235c099ca50f08f8a56e6fdef57cb2b" name="Golden Sword of Bhakhor, The (Persona)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="e109d33a" sha1="c85006aff50e2918e2947386ac550e65bcf5ca97" name="H-DOS V2.12 HD Loader V2.0">
+		<year>1996</year>
+	</hash>
+	<hash crc32="a85cc5ea" sha1="51135f2825ac6939784201a6eda9575d0a770fe8" name="Hexagonia Demo by Fuxoft (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="4aeb0aad" sha1="ce9605583015b8180e6bf4695eae847841dc6243" name="Hexagonia  &amp; Witching Hour">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="383d809d" sha1="389457378d4e07b25301129451ae30ed521aa7cf" name="Highway Code, Quizball + Editor (Revelation)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="f86449e1" sha1="320aa8bca96c151c066b74ba780ee68ebcd3cfc9" name="Ice Chicken Demo by ESI (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="26df0a50" sha1="f8931c542bf7f294121bf92298e8a156a4e42759" name="ICONMASTER V1.0 by Steve Taylor (Revelation)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="8708db34" sha1="a9326382e21c33c34161f047b2e6a2ea1553b0b7" name="Images SAM Software - Pictures &amp; Demos">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7a079b8c" sha1="33020b343f3e7b15749a85c1c5eaf50cef7f6afb" name="Images SAM Software - Roboblob &amp; Give a Dog a Bone">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0d0ae973" sha1="e76fe4d0ef454cb6f8b8ea1ec50fb92789d49ae5" name="Impatience - Triltex Viking (Fred Publishing) [a1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="912ca9b6" sha1="250e8c899cc2b4b5ddaae9b06e0e4b57982fe5a2" name="Impatience - Triltex Viking (Fred Publishing)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="e710f04f" sha1="4e47816ee0564b44b4e24bfb78d3ec3dae6bd205" name="In Comet Format Master V1.2 by Chris White">
+		<year>1990</year>
+	</hash>
+	<hash crc32="85a6e8ef" sha1="a1b398c9c6e1e542ba05f5a556f0e8ea8aba021c" name="In Comet Format Work Copy V1.2 by Chris White">
+		<year>1990</year>
+	</hash>
+	<hash crc32="2230b41d" sha1="fed11f7ea6d9fff2af7a90532398e2f0d06d8717" name="Infinity - E-Tracker Crack Menu Demo by Entropy (PD)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="642ce688" sha1="013c6b9fc1fc32ecaab7bbf2994f91d2184f2882" name="Integrated Logic's Demo Disk and Utils (PD)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="aaa8c282" sha1="59fff5be00495d54664bf4b27b8d8fceacef679e" name="Integrated Logic's Madonna Strip Show (PD)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="86d9e189" sha1="68b29d1edd9041e6263d4e1f53b10919d12c1d7a" name="Integrated Logic's PD Disk (PD)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="dca6c573" sha1="a5fc458142044024fc8300f7797943773ab6acab" name="Interlaced RGB Viewer Pics (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="bb17ef4e" sha1="99c37d4a163bf828970746371d9bf12827281779" name="Jigsaw Disk - Jigsaw Creator (Colony Software)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="280417f4" sha1="16e203cb0e85e63a90ec05822bd18acc642a9430" name="Juggler Demo [f1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="eb7a835d" sha1="45ac97d1d30c041c86383a17cdc9438c7364e5eb" name="KEdisk V2.04">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4093a838" sha1="ed8bc261314a1f9de1373b7ab82a0cfdbdfef95d" name="Kim Wilde - Gary Moore Samples (PD)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="3a583bb6" sha1="0d4612ecc3a7404c709c7dbf97ae769f059d822f" name="Lemmings (Chris White) [f1]">
+		<year>1992</year>
+	</hash>
+	<hash crc32="b6744599" sha1="0418afd642d12fdda0e0288dd443b629d32bc67a" name="Lemmings - Assemble Disk 1 (Chris White)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4206bf38" sha1="ec2049103d0a1a1321b6c5217047146cb05d902c" name="Lemmings - DOS Test Side 1 (Chris White)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="93510b1e" sha1="bb14710fa9bdd2403583f6374382062512b8736e" name="Lemmings - DOS Test Side 2 (Chris White)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e4589561" sha1="997327dbb225731c1fe2c46d223f17364d19bd8a" name="Lemmings - Front End GFX (Chris White)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a7217cca" sha1="9f1aedb6306ebdf6f0f1ac0a85ed7efec6cb7377" name="Lemmings - GFX IFF 1 (Chris White)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f2c97f2b" sha1="bc2027174201532702ca4a285e63fccc3a5f6689" name="Lemmings - GFX IFF 2 (Chris White)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5d431844" sha1="5e33950058a10385aa7e2b36c0e5c3983f2f95b8" name="Lemmings - Stuff From DMA (Chris White)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="37d78008" sha1="189196fdb30ab2e8ed758fefe77f9a6c073046fe" name="Lemmings Raw Data Disk 1 (DMA-Chris White)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="be2d8449" sha1="35b64de367d73d61cf6301a2d5f44429a9259bbc" name="Lemmings Raw Data Disk 2 (DMA-Chris White)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="5003f4ce" sha1="2c9c854bd1947118239b6e8700731522bc1cd953" name="Lemmings Raw Data Disk 3 (DMA-Chris White)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="55829b77" sha1="5ebd3035403b2869b6af963bfc891f7feb06db67" name="Lettis Demo by Daniel Cannon (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="e0065408" sha1="1f12a41a7cd49832e91ff93b6c71eb885817da18" name="Little Joke - Lords Demo by Lord Insanity (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="611fa525" sha1="279b9992bd9961d0ca67e58409b6431ac65076f6" name="Lovehearts (Supplement Software)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2d8ac9b2" sha1="d17077fb2f0466e5747c9fb1da5bc0e4ea4eaae5" name="Lyra 3 Megademo by ESI (PD) [a1]">
+		<year>1993</year>
+	</hash>
+	<hash crc32="e737316b" sha1="012d199a8754aa600b4525d1b7f9c02f5a556c9a" name="Lyra 3 Megademo by ESI (PD) [a2]">
+		<year>1993</year>
+	</hash>
+	<hash crc32="2d833c39" sha1="e4399bc2c9c966f20be29bf50ed050b606889e22" name="Lyra 3 Megademo by ESI (PD)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="02708a54" sha1="a2d5634f5e64960db21eed38c1cef79bd2e13e7a" name="Manic Miner (Revelation Software)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="9e217bc6" sha1="74de8b2965f2d1fbbff8904dd0fd88a08c3e0eec" name="Manic Miner, Splat, Mr Pac, Snake Mania, Craft Compilation">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8e3aad56" sha1="cb65bd36e3c50a112fbf9ca3f9b259d3480ccb9e" name="Map Print Routines by Chris White">
+		<year>1990</year>
+	</hash>
+	<hash crc32="a54d3c59" sha1="1f0f1936931a9d031eef966634ede064b269f32d" name="MasterBASIC V1.7 (Betasoft)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="86a4ea94" sha1="b1eb0b53f7c50c3add24ba44b3207fd2e774da52" name="MasterDOS - MasterBASIC BootDisk Creator">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c0f9b54f" sha1="727f64d3983ad972e1808a0e605a92b7699876e7" name="MasterDOS - Utility Disk V3.0">
+		<year>199x</year>
+	</hash>
+	<hash crc32="3c0d0f9a" sha1="5aa080e492a50b093236ad83b4614d5b307cd03b" name="MasterDOS File Manager V1.0">
+		<year>1991</year>
+	</hash>
+	<hash crc32="2cd3137f" sha1="2ae672288b9f8711c40ee84368a0a3a0c6c0b865" name="MasterDOS V2.1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="77fd4c20" sha1="031bd6fbd9a5e1b498137857b37bd87e8d41e491" name="MDOS &amp; MBASIC for Formatting Discs in 2 Drives">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3613c40f" sha1="715de38350e2059a333908f696b25fd5b53c3069" name="Mega Demo 6 by Supplement Software (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="2d25fe20" sha1="314bd6d4a440e298b4c8af4de8479816179c884b" name="Mega Text Demo III by Masters of Magic (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f164f99d" sha1="e03a9d85dfdfd652f150111d60698d660f51455a" name="Megaboot V2.3 (Atom HD Interface) (M.Groen)">
+		<year>1999</year>
+	</hash>
+	<hash crc32="d3077915" sha1="40c20fe27bf3d43c6058819d650664a18e878c70" name="Megadisk 1 - Puzzles">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f58f7c8e" sha1="210d32905102e9e97322d6016ea0b3a1d2e9727c" name="Metempsychosis Demo - Christine">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5ed23352" sha1="9babf846822ff4dabda6c4ef6148de3c1cd560fb" name="Metempsychosis Demo - Highlander">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4a25aa48" sha1="9725dc2ff4c4953e77a81c6d7b76250deffa70b0" name="Metempsychosis Demo 2">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4a3b5884" sha1="e6f81f877bd56b04acd8e2298eb871ce0c4a881f" name="Metempsychosis Demo 4">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="67042c3c" sha1="b359b560a233439670a74fb127c91e4be8422b21" name="Metempsychosis Demo 5">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2a17797b" sha1="18fc7ae0e2b769fefb382b4077729c42f8af56bc" name="Metempsychosis Demo 6">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e62a94c7" sha1="362076c293e90da0a8319029ede3b5016cb9da5f" name="Metempsychosis Demo 7">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a4273fb2" sha1="a0a52525e3702af201fc0c709d8ad7efab1aadf9" name="Metempsychosis pdm10">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9da4e38f" sha1="271c40a0c617814955b7388f139f03dce4dec4ff" name="Metempsychosis pdm11">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="24d918c2" sha1="08203dc748832b377a85cb84be1fdbbf67f1e419" name="Metempsychosis pdm12">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="78ee0660" sha1="894ca3ceac30f294e29277a7eecbba006e6f3dd3" name="Metempsychosis pdm7">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ed668d11" sha1="64bfd26d8fa771430f243bf9c5467fdf99ed966d" name="Metempsychosis pdm8">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="fee387e0" sha1="5f6894bb5be5b7adce096bf86bd28387b81b3b2a" name="Metempsychosis pdm9">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f6880402" sha1="dc3363f257e85c03418ac1a446ea309c63690b62" name="Metempsychosis promo1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1c7f74a9" sha1="f5ef8a93632e9831fdda5a5a423048d9b09fc7da" name="Metempsychosis Sample Disk 7">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2f038dfe" sha1="7cef50095e40458b32c69193f66d8e2d28da13cb" name="Metempsychosis slide_1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4e61bb6a" sha1="3de50d4954b0e2bd9c1f5291491778e585199ed4" name="Metempsychosis slide_2">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9303b581" sha1="70019a117575e7b8d6a8919b2637add324a5a578" name="Metempsychosis term_1a">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d08d7602" sha1="b790b5ad95b77e77d8b35fb474d0a7a4927ae6f3" name="Metempsychosis term_1b">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1ec2e62e" sha1="e6d76c1ce63dbf4b310835cf6218d48fd8e684e4" name="Metempsychosis Unreleased Demo - Adrian_letter2">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="bdc37a56" sha1="16597cbbe32a0530cc55b9055034385d13e106f1" name="Metempsychosis Unreleased Demo - CD_demo">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0d7639ca" sha1="9d487dba1dc9c99b4d0faff31eeabe44028f8172" name="Metempsychosis Unreleased Demo - Demos4metemp">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="09e6452c" sha1="9b02d3449eb1d069c60f4721e0ebbc06478b9bd5" name="Metempsychosis Unreleased Demo - Internal_advert">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1bfb88da" sha1="c331a857ae5965132ce156924883cd119ca6cd60" name="Metempsychosis Unreleased Demo - Internal_digi_utils">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7b040964" sha1="3a95e3fe2e513bfb27c59cb5d393681cf24b4532" name="Metempsychosis Unreleased Demo - Internal_highlander">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="19ee19fa" sha1="858549d3dd519a86b62a632f18837fb995635e10" name="Metempsychosis Unreleased Demo - Internal_joy_pen">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="05004ee6" sha1="e352317101cb2968d9004fd3f217fdcd12f49803" name="Metempsychosis Unreleased Demo - Internal_small_demos">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2498e662" sha1="d81cc6541cae30ba567916390a3d57597210bae4" name="Metempsychosis Unreleased Demo - Jukebox">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ee5abfda" sha1="5aba86c0280f700d429b8adbbf6a5bedb97e7da6" name="Metempsychosis Unreleased Demo - Kinetik">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4b668e6e" sha1="facc46764373badb73ff767c1d022a5ca41dbe92" name="Metempsychosis Unreleased Demo - Mega_mix">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1a98bba3" sha1="727fafa720a4a21491811cbf82c8b6639ffc54ad" name="Metempsychosis Unreleased Demo - Omnicide_3d">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d1f323d9" sha1="e8eb94380ec33fc19ccbd9345eb0279c77938772" name="Metempsychosis Unreleased Demo - RTJ_pdm1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="74702514" sha1="59d6542d908ab06049e06031c242c0e98f7b71f9" name="Metempsychosis Unreleased Demo - RTJ_pdm2">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ecde2ab4" sha1="e8fa96df35295952f83ed6567255f966a7e768f4" name="Metempsychosis Unreleased Demo - RTJ_pdm3">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a6f46c05" sha1="b2be65747986c510199320be9149892c18056b6b" name="Metempsychosis Unreleased Demo - Samples1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1e3e5619" sha1="732002245e5965a79c114f6cce45afe96e031198" name="Metempsychosis Unreleased Demo - Unknown1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="bd449c2c" sha1="a4716bbdc22a785b2811676a5feea01bc8e7e274" name="Metempsychosis Unreleased Demo - WIP1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="da7f8010" sha1="4b5c544456d6536c3283805503b9ebc908493867" name="Metempsychosis Unreleased Demo - Wizard">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="dba10b0f" sha1="e8b0a446b4493cecc5558bc4c6bed50f5b5c35fb" name="Metempsychosis Unreleased Demo 9">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="89816d37" sha1="9c56f8ec1f90df3a10f32d54bfe2baf3d03fcf0c" name="Mike AJ Demo Disk 1 [a1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="e21e7f2f" sha1="4fd8a0178c1a622023ffb33e483688b3d27b4742" name="Mike AJ Demo Disk 1">
+		<year>1991</year>
+	</hash>
+	<hash crc32="99fd6304" sha1="ae92749972d952426853f62bf47085e17aec2baf" name="Mike AJ Demo Disk 7">
+		<year>1991</year>
+	</hash>
+	<hash crc32="013a9567" sha1="b58b46e7218b7825f8a367bf1190cc25e08d22e6" name="Mike AJ Demo Disk 8">
+		<year>1991</year>
+	</hash>
+	<hash crc32="5d70f140" sha1="a345200c5cf85c86612a66686dee5d75f9f1e3f1" name="Mike AJ Disc 5">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f3c42d69" sha1="576f185e19ea5f9113a6e951720b3d0e46f973ff" name="Mike AJ Disc 5-Edwin">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a0163064" sha1="56d50ccd4db8341f6117ab74b9f736ad79e088a3" name="Mike AJ Disc 6">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="bb8dd385" sha1="f2c950a434218eb6baf7f223fd43b23909fadf1b" name="Mike AJ Disc 6-Edwin">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5b18fcdf" sha1="1e4e3929b7be46391709089ca5378ab1f9f1df92" name="Mike AJ Disc 7">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="86827ec7" sha1="5f6774d364a54e844ae7a2b324b02b1ec280aa17" name="Mind Games II (Enigma Variations)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="5a72b206" sha1="e1d9dc270c5ce027fdcc51a268494562cca16b54" name="Misc. Games 1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="94a9b892" sha1="3704fc4ab2167f34c5db689bb3e0b0141adf7831" name="Misc. Text Files for Secretary Word Processor">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9a7aa035" sha1="504a8f5617a51cc880fddab4b74689daf85ed201" name="Misc. Utilities 1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="add97dbd" sha1="c42fb7824fbc830199d702031113904972b21efa" name="Misc. Utilities 2">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="30270cdc" sha1="907794f28bcee6c87e5b7adf5f68f3d81faf9bea" name="Misc. Utilities 3">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="076840c0" sha1="8c813b91a8a781cad3fe9baa0c1776dcfaa4d962" name="Misc. Utilities 4">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b2f93dad" sha1="27eff75a0d31e4905452f1ed57a66d4d5adce511" name="MNEMOtech Demo 1 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="05779029" sha1="219edf440625871998cdfb42eddb8d20d8ac7e12" name="MNEMOtech Demo 2 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="bbdcf9cc" sha1="e791344c52a87220d123f2a2c5edd38652e4e3b4" name="Mono Clipart Samples V1.0 (Nov 1995) (Steve's Software)"> </hash>
+	<hash crc32="362ee4ec" sha1="a647cf92d708519100a2e8b91a5990a04afdf6e4" name="Morse Code Tutor (R.J. Wilkins) (PD)">
+		<year>1999</year>
+	</hash>
+	<hash crc32="c9de6f30" sha1="3019a8b621d4015f9d68318edf823e69a80c4279" name="Mouse Driver V2.0 by Steve Taylor (Sam PD Sware Lib.) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="66fbd9be" sha1="c65469e39ab0299b2f853c90bb8f374b4ebced55" name="Mouse Flash 1.1 for MDOS">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="335a6011" sha1="caee0025f78893e5e75456bed1888914a79f25ac" name="Music Disk (Unk)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="fa2b7541" sha1="b19c89b8cd54ca06674035c10eb8a92b917c3540" name="Music Player 2.1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4c050f57" sha1="8b31e02020d2966fcc3e8ace8232a71826260df2" name="Neil Holmes' Boing! Graphics (Noesis Software) [a1]">
+		<year>1992</year>
+	</hash>
+	<hash crc32="c7f81167" sha1="7305db3c9db95980d5e167e4b71aa680edef6055" name="Neil Holmes' Boing! Graphics (Noesis Software)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="8212e398" sha1="4abfecdd94126ffa1465c1effa1892ad64a0e81b" name="Network Sigma Issue 6 (Feb-Mar 1996) (Saturn Software)"> </hash>
+	<hash crc32="486193af" sha1="a1e83b0a734c3af428f50dff697b560eb764afe9" name="Night Breed Demo (PD)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="81a5cb65" sha1="a21d235d7c5739eaf6037755594e2484567ac7e7" name="Occult Adventure by David Munden (PD)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="cdddd038" sha1="59a9f6f39646e6374a93984b2b2caa8b1cd1abae" name="Oh No More Lemmings - Data Before Compression (Chris White)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1e487442" sha1="3abde1af7b2c0b3614f52a6c64858a8f199c0219" name="Oh No More Lemmings - GFX IFF (Chris White)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="88ae725b" sha1="375c37393bdbdbeb49b96c7b5a946d31039b47e9" name="Oh No More Lemmings - Make Files (Chris White)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="814b6c3e" sha1="3b5178c7241b2e9a3857e6446b4ef9de13a8b62c" name="Oh No More Lemmings - Make Master Side 1&amp;2 (Chris White)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c8df5026" sha1="0b4788665da26992a240d4331527b153670aa75d" name="Oh No More Lemmings - Raw Data IFFs (Chris White)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="71362e3a" sha1="fb44a7073f873ae38064e608c24b46b69aaf609f" name="Open 3D V082 by Tobermory (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="1e1ec42b" sha1="0b86dfa283f00d848f3709df230e5c0aa5375f0d" name="Ore Warz II (William McGugan)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="fb951765" sha1="a5067292c4e41fbebaa9c4e71c95862036b0ec77" name="Outlet - Sam &amp; Spectrum Mag Issue 33 (May 1990)"> </hash>
+	<hash crc32="1ccedd66" sha1="8bc8442222994e064d46d31cfbc3bf591d55234f" name="Outlet - Sam &amp; Spectrum Mag Issue 56 (April 1992)"> </hash>
+	<hash crc32="472670a0" sha1="38ace1201521f4f20d3dbf443953d634450871b1" name="Outwrite V2 (Rj Will Kinson)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="cd7f5dc5" sha1="3e67ce1be2b19f1a5f41e2daff0cb3d4b3f005e6" name="Outwrite V2.0 (Chezron Software)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="bbde773d" sha1="66a2f119346b17a1a6074b1d7ce348d8122cb522" name="PacEmu by Simon Owen (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="f91fd693" sha1="a00c2c2536987f3488b4097a35762333910d91b7" name="Park DBS">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d70ad207" sha1="30f8005818c400d0d777b7aef9b7b9f62726b71b" name="PAW Convertor by Martijn Groen (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="de47b6f0" sha1="348e571235ae956159483787cc94f134662ed9d5" name="PAX Disk 1 (Glenco)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="a6abba63" sha1="1514c23ad7942c67ef203c2bb73906c546519ac6" name="PAX Disk 2 (Glenco)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="297dfd16" sha1="6357d4cd981fac64fd17186557addb3602b72c56" name="PC Suite V2.2 (Spencer)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="e59e0b5c" sha1="cc8c0ce970435dfcb38e9dcb756df39a2159846b" name="PC2SAM Disk 1 (ColonySoft)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="ecd1ca83" sha1="3a0ea70121950124a800f7eadaee16baae8f3796" name="PC2SAM Disk 2 (ColonySoft)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="58d7992a" sha1="6022d36b3cd0198be9d6fbccfe187625d8e6e601" name="PC2SAM Disk 3 (ColonySoft)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="f3e42529" sha1="607eb5381bd1269c21388c54482b71b7df981813" name="PC2SAM Disk 4 (ColonySoft)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="5ecc3751" sha1="8ab3ca5b68b8218625042e6d908faf1db076e3d7" name="PC2SAM Disk 5 (ColonySoft)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="65737183" sha1="665771434f24ff30a3884914f9860d9f012df6f4" name="PC2SAM Disk 6 (ColonySoft)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="e3a7afd7" sha1="eb840caf898ea1dd29e53600369c155cb731b0ae" name="PD'90 The Best of 1990 (PD)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="dac868a3" sha1="a3ab351e61825b060b76edf800f934e45142ce97" name="PDS Boot Disk (Rob Holman)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="5a558d2a" sha1="b19acfa27d4d9f7215c39c18ea7c795d525fe43a" name="Personal Filing System V2.07 (Hilton Comp. Services)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="1433c603" sha1="1a246c9d28e5c40d3f53066723fcc3ad16366c52" name="Pickasso's GFX by Steven Pick (PD)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="c419719e" sha1="8f492a1cdcac847a898335856823b661ee98eb7c" name="Pics from the Net 06 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5996dc1e" sha1="4e0f85c6eee139921ff6524f2d0b88994bf6732d" name="Pics from the Net 08 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="59e3970b" sha1="a1e4c517ef5e52168a6fa4fbf96d55484d336bdf" name="Pics from the Net 09 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4733cd0d" sha1="6122905b54c3ea21fd05101899af5e31b6b5eb76" name="Pics from the Net 10 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a8c43a9a" sha1="3b7ddf37f9ee0a3ffaa85776ed09345bd8ebf924" name="Pics from the Net 11 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4e546598" sha1="dd9b6b2a61a6876b92862e9652fe2ad79fbd73a5" name="Pics from the Net 12 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c7ce2fdc" sha1="a288464960ba1475b975889841e487ff46740c97" name="Pics from the Net 13 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="34ed122f" sha1="3cf5febd07abcda779270347d4b9dec99c588e8b" name="Pics from the Net 14 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="761f8823" sha1="33d8b36dc2507d6dd9c70bbd7b4a1fee795dd8f0" name="Pics from the Net 15 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="80792bc2" sha1="beda68aaf6867131270e73f1e2cc19198e50132a" name="Pics from the Net 16 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4cc1fbef" sha1="4208b408bb17222049529b49d97f1035e2ef3cc3" name="Pics from the Net 17 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="97961d86" sha1="84e0abf716db89a7795e7f112f2efbda880497a3" name="Pics from the Net 18 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5a309558" sha1="9042d220d55653a5b0a10250324ac645554de689" name="Pics from the Net 19 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="275c7758" sha1="d9cd7581930f05b8355d4305621e572df8f88cd8" name="Pics from the Net 20 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="edd2815c" sha1="d7e24a6d6e89482b41cfc5fa2a9721b5bef94cf1" name="Pics from the Net 21 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="75b2ec96" sha1="8f667a202e42b54a442f3f1ee4e1f882fde93ccb" name="Pics from the Net 22 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d5edec7c" sha1="4918bb288a8dd5269026f81d1a537f132082ff09" name="Pics from the Net 24 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="34e492bd" sha1="5c51fbe4191fa5d6c0d46c0426c3a35679609e24" name="Pics from the Net 25 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5221784c" sha1="49efc13f3bf577d0d1e942c57129a00d3acf6f62" name="Pics from the Net 26 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0c58c71f" sha1="2cb48eecfc97da59fe77ae7b203ab8ae5a97a70f" name="Pipe Mania, EFPOTRM, Klax, Tetris, Defenders of Earth">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4e8c21ca" sha1="21a773d56c9277acd2bba10b45116ab5cc2ddcf6" name="Porno Disk 1 (SAM Psychopaths Incorporated)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9ff3f023" sha1="d0e82e9a7609c8f4eb26d8d208af341316f6b273" name="Porno TV (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="57d7d8d7" sha1="d79eb68eace46277245e5c26baa2e38532fab81f" name="Prince of Persia (Revelation-Chris White)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="3484de0c" sha1="aa0bfcfe9ea60ad339f28f7e7c4ce5be6d0323be" name="Prince of Persia - Assemble Disk (Chris White)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="e4cee699" sha1="de09124b56658e66eea3152d7bdd002186b0ade0" name="Prince of Persia - Assembly &amp; Pokers (Chris White)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="4f1f1b77" sha1="9edc076850d5542bdd21051d60b8e07986f63ac9" name="Prince of Persia - Screens 1 (Chris White) [a1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="2f52688e" sha1="0522dfb790fa7bb13d0379da674db0155a54eadb" name="Prince of Persia - Screens 1 (Chris White)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="0046b1c3" sha1="ed800eff2b3d85781ab2314b6cec4c751e950f34" name="Prince of Persia - Screens 2 (Chris White)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="a53b0589" sha1="57fbf7752352ca89c764466d8df323e01e22711a" name="Prince of Persia - Show Levels (Chris White)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="bfecf694" sha1="2aab235538fa36ca4b586b596ac8ba1ae289ba7d" name="Prince of Persia - Source (Chris White)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="6ef16e40" sha1="c473b4c1df6fe824df28c2a37025dce786acfe09" name="Prince of Persia - Trans Disk &amp; GameDOS (Chris White)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="53fadf0d" sha1="1ddc8885809e1e78946675fb16f107a31cf1851b" name="Prince of Persia - YS Cover Mount Demo (Chris White)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="9a236e3c" sha1="0dbb386b7f220a77a11a37bb6b62618ec84c3baa" name="Prince of Persia Demo (Revelation-Chris White) [a1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="c115389e" sha1="0d343f79b4ee2ad313f0030ad81d280d1513a6f2" name="Prince of Persia Demo (Revelation-Chris White)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="60c1b6a7" sha1="1bf8e35b74c8a0da0837bc6897aded8513f0b084" name="Print Routines+Tables+Testers by Chris White">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="71f59766" sha1="cc44decf0861605319b3723ce4c951f333610410" name="Printer Port Music Sample Player">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="6631988a" sha1="d7ce561164e7773541d94b8f56478d8571b557d9" name="Public the Third">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e48091e5" sha1="0d1f74b3fcf0b8ae57b36e418af5f3f547bafa34" name="Raytrace Disk 1 (Colonysoft)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="d78f2543" sha1="0aafc2d39f0925d3f4ee589d5f609cf67ea82802" name="Recover-E">
+		<year>1995</year>
+	</hash>
+	<hash crc32="330211d1" sha1="8734af522b3eefae3efadba81ac7332397cffdd1" name="RGB Viewer Pics Disk 1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9abfc103" sha1="ef744797f7055a6feb6a0d7ac860eeab00601ab7" name="RGB Viewer Pics Disk 2">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="77e5d56d" sha1="40cf3d5b0470b69714b62028d84ef56abb600543" name="RGB Viewer Pics Disk 3">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="735e092d" sha1="2dd085b3fd4edb71e734017cd7633b29867b48bf" name="RGB Viewer Pics Disk 4">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5a153238" sha1="2e2d96e1bd4ca062ddba8fb9483114bb1ca53534" name="RGB Viewer Pics Disk 5">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="28f3804b" sha1="0884e7dde964df7c0dbfd0e5b2ce2ead6425daea" name="RGB Viewer Pics Disk 6">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b58e8d07" sha1="f41c7f5f737ad3df45c638ece2caa5a85207e864" name="Robocop - Rolling Demo (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="dba20d3a" sha1="b60d76858b42855fa67df226a28f1602bbabff06" name="Sam Adventure Club Issue 01 (Nov 1991)"> </hash>
+	<hash crc32="ac4bac66" sha1="a46ab034d06a662ce026252f50395a6ed4cb2463" name="Sam Adventure Club Issue 02 (Jan 1992)"> </hash>
+	<hash crc32="8c57ad8f" sha1="efaf7c8cb2b54655d5d6c031d9b2a27df0141f89" name="Sam Adventure Club Issue 03 (Mar 1992) [a1]"> </hash>
+	<hash crc32="d8b5b8c3" sha1="73a106d8643f6be2f14b5f3396f204eb8c0f28ec" name="Sam Adventure Club Issue 03 (Mar 1992)"> </hash>
+	<hash crc32="4933c54d" sha1="e80a1e99c0fed591a764f682c589f46770e0c289" name="Sam Adventure Club Issue 04 (May 1992) [a1]"> </hash>
+	<hash crc32="4b2ef5e0" sha1="32af50d9872be6f781db0efb7d532b5d776035e9" name="Sam Adventure Club Issue 04 (May 1992) [a2]"> </hash>
+	<hash crc32="9253fa33" sha1="8f50af41fcb478d5ecbf6c946fe406cf488417d8" name="Sam Adventure Club Issue 04 (May 1992)"> </hash>
+	<hash crc32="e85a319a" sha1="eeb222180925b9ff92c6625ef8dba50d5981f1bf" name="Sam Adventure Club Issue 05 (Aug 1992) [a1]"> </hash>
+	<hash crc32="1b6ffcc7" sha1="3089e03ab2945e82bf9ae906e55d1a9695546fdc" name="Sam Adventure Club Issue 05 (Aug 1992)"> </hash>
+	<hash crc32="928aeeab" sha1="304084c774faf9c4e62adcef3e635f1768db6cc5" name="Sam Adventure Club Issue 06 (Sep 1992)"> </hash>
+	<hash crc32="9c4e3431" sha1="7cda94a72ae1500111073877c41dff93c8e49be1" name="Sam Adventure Club Issue 07 (Nov 1992) [a1]"> </hash>
+	<hash crc32="4d4f70f6" sha1="cd617bb43f1c1ff988e9564b391d640946ee531d" name="Sam Adventure Club Issue 07 (Nov 1992)"> </hash>
+	<hash crc32="9a7276c0" sha1="368115bb6af2562a09bb4a102ccbf1b7e30e3bb8" name="Sam Adventure Club Issue 08 (Feb 1993) [a1]"> </hash>
+	<hash crc32="ef9cd165" sha1="27c78e495bdb02cb9787ff38ae75243a2fa4a077" name="Sam Adventure Club Issue 08 (Feb 1993) [a2]"> </hash>
+	<hash crc32="f4685f89" sha1="a55124cf37a49e3f758e2e6598067fef541d3403" name="Sam Adventure Club Issue 08 (Feb 1993)"> </hash>
+	<hash crc32="bd1795a0" sha1="44af1648c4a61f360528c226bb6b4cb8708c5f21" name="Sam Adventure Club Issue 09a (Mar 1993) [a1]"> </hash>
+	<hash crc32="c45d4df1" sha1="4d195e8e739e133d81720c7ee62c82b06a371c57" name="Sam Adventure Club Issue 09a (Mar 1993) [a2]"> </hash>
+	<hash crc32="8947e4b6" sha1="26a239e290f2dd944de69c9583bc44df3085a1c2" name="Sam Adventure Club Issue 09a (Mar 1993)"> </hash>
+	<hash crc32="e339b4c9" sha1="7ac6f938ff8c603c4476067ebee47cd272398954" name="Sam Adventure Club Issue 09b (Mar 1993) [a1]"> </hash>
+	<hash crc32="271e4cce" sha1="f3db77b8ba5d18aa3ca9165aaae31acafb631586" name="Sam Adventure Club Issue 09b (Mar 1993)"> </hash>
+	<hash crc32="452abad8" sha1="dac8c193199adfccb330f60fce959da65b7deda6" name="Sam Adventure Club Issue 10a (Jun 1993) [a1]"> </hash>
+	<hash crc32="191cc9ae" sha1="a553fb15cfeab2b2c4fe70b39ede95a1e4256d0c" name="Sam Adventure Club Issue 10a (Jun 1993)"> </hash>
+	<hash crc32="f3ca044a" sha1="4bd3e72c696a6054e6e7f6b1ce0dfd54a16276db" name="Sam Adventure Club Issue 10b (Jun 1993) [a1]"> </hash>
+	<hash crc32="a5e76c2b" sha1="751233b968c2e13c9cd614e9106dda93ae5d56f3" name="Sam Adventure Club Issue 10b (Jun 1993) [a2]"> </hash>
+	<hash crc32="bf6e937d" sha1="1da5da82128ed47232a17ac31d5a711542ab8f2f" name="Sam Adventure Club Issue 10b (Jun 1993)"> </hash>
+	<hash crc32="4a0b209e" sha1="09caf614c88512ad8d5e216152d735e1f2ab83b7" name="Sam Adventure Club Issue 11 (Aug 1993) [a1]"> </hash>
+	<hash crc32="665156a0" sha1="50ec34fbfe1fb73140f45e4cd86c62e0a386f9f6" name="Sam Adventure Club Issue 11 (Aug 1993)"> </hash>
+	<hash crc32="8a24d750" sha1="9b0efd2ec1d06a78c4bb351a3dc528bc4eb70efb" name="Sam Adventure Club Issue 12 (Oct 1993) [a1]"> </hash>
+	<hash crc32="bd6b09ec" sha1="72b070b637e4b1851bc370e5f86c5f1f3a229b9d" name="Sam Adventure Club Issue 12 (Oct 1993)"> </hash>
+	<hash crc32="e780e7ed" sha1="c28c2de3290d2a89470689416711abcf3f0065fa" name="Sam Adventure Club Issue 13 (Dec 1993) (Disk 1 of 2) [a1]"> </hash>
+	<hash crc32="dbc80ca9" sha1="6400abf5ee79e2f756ce7508c8035dcc146bdcfd" name="Sam Adventure Club Issue 13 (Dec 1993) (Disk 1 of 2)"> </hash>
+	<hash crc32="2d785aca" sha1="923ac5d192b3435a716475aba88075441d2bab6d" name="Sam Adventure Club Issue 13 (Dec 1993) (Disk 2 of 2)"> </hash>
+	<hash crc32="9efc34ec" sha1="aad9fb3d4b54869604cc1a516f62e8470747f013" name="Sam Adventure Club Library Disk 3 SamScratch V3.2">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="64d385f0" sha1="16b0ff45c2fb150dc671506e3a7586b96d9d66af" name="Sam Adventure System Demo Disk (Axxent Software)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="a51ed853" sha1="d77032be20ae76262a29edd8a07521c91d3252cd" name="Sam Adventure System Test Disk (Axxent Software)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="17254ace" sha1="fca0e71ee4868ca77758732684036744602aeb2e" name="Sam Adventure System V1.0 (Axxent Software)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="c8147879" sha1="63249ed46495280244a0d406e30d99ced5ce0953" name="Sam Adventure System V1.2 (Axxent Software)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="548ca066" sha1="07eec3dddcf33485ab63d055a2872ccc23d60b79" name="Sam Amateur Programming &amp; Electronics Issue 1 (Feb 1992)"> </hash>
+	<hash crc32="39f47d9b" sha1="745c6ec56fbe9da453aed2d697a7a6daba8af023" name="Sam Amateur Programming &amp; Electronics Issue 2 (Mar 1992)"> </hash>
+	<hash crc32="a9072c61" sha1="d285aee0f67aae1e94ea574e503281c5b852fcca" name="Sam Amateur Programming &amp; Electronics Issue 3 (Apr 1992)"> </hash>
+	<hash crc32="5fe8b3cd" sha1="75aa450b50881fb4523d3c11898076e435394d61" name="Sam Amateur Programming &amp; Electronics Issue 4 (May 1992)"> </hash>
+	<hash crc32="cc628893" sha1="da03e0589bda7a168919a1d0302dbb4c37e69db5" name="Sam Amateur Programming &amp; Electronics Issue 5 (Jun 1992)"> </hash>
+	<hash crc32="1c9986c3" sha1="031859fee116b421d24d8f74cf35c40fa47d61e3" name="Sam Amateur Programming &amp; Electronics Issue 6 (Aug 1992)"> </hash>
+	<hash crc32="03d7201b" sha1="865ef48535ac10f7aedcd744ae091e6edd8b747a" name="Sam BASIC Demo Programs by Chris White (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="fae03774" sha1="a97b10741c02181fb48e27c34b63d2b6b224ce6d" name="Sam C (FRED Publishing)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="e7a9be33" sha1="8f5c91dca950cf40a74baaf73c8317ac7fc0409d" name="Sam Cards (Supplement Software)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="45e47c2f" sha1="92707514e67e033b8f3fbe3c81ec50dae4b98fa9" name="Sam CD2 Utility (Kobrahsoft)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="87ce81c4" sha1="a22b7d703ea24e48fa71aa0356a23678fc2cebf4" name="Sam Coupe Demo Collection Disk 01 (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="b879f690" sha1="2570abf0d99cd4ed4639e5a523f91781f7127826" name="Sam Coupe Demo Collection Disk 02 (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="1fb9db15" sha1="1ebe095dd721810491251682a0a3ea433ece6924" name="Sam Coupe Demo Collection Disk 03 (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="4868c6b6" sha1="3074206521a1d84c8b9abfbd575ff024af81c872" name="Sam Coupe Demo Collection Disk 04 (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="9606f95f" sha1="72274e2063348a0cdb56c7b8e33996f2fe2b29d2" name="Sam Coupe Demo Collection Disk 06 (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="6c2a4a94" sha1="b5182b21c156ec95cb4805c4d78665110a2171c0" name="Sam Coupe Demo Collection Disk 07 (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="4b186de2" sha1="5919292ba378eaffd6d7c7004bd90c39fd376719" name="Sam Coupe Demo Collection Disk 08 (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="d0703974" sha1="941a724bc9b7c6a3f1aebf100156bd9d1545a5c1" name="Sam Coupe Demo Collection Disk 09 (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="21ef8089" sha1="67c3e2bfe1e0c3afe6c0ccc8b8c77481b710c7ca" name="Sam Coupe Demo Collection Disk 10 (PD)">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="a00116a1" sha1="8cbcd215fb3a38dfc8035a218e8991789a4ab749" name="Sam Coupe Demo Collection Disk 10 (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="ce7f08f0" sha1="2b2897ae07f5279fd41c22335519e3d11d4478f9" name="Sam D I C E V1.0 for MasterDOS (Kobrahsoft)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="57e2e72a" sha1="4a525740b34354f908d984373ab3d312b40fed2a" name="Sam D I C E V1.1 for MasterDOS (Kobrahsoft)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="fa871802" sha1="9085daf1a45a020294a69de79493afa990dd70bf" name="Sam Demo (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1822510a" sha1="5133bbb36d18f89fb706295952a91275b04aa104" name="Sam Demo Disk (Chris White)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="45940515" sha1="106547dc6c7318814214f1bfb5ba701aef66abf1" name="Sam Demo Disk Issue 3 (Apr 1990) (SAM Computers LTD)"> </hash>
+	<hash crc32="98a7ccb4" sha1="7e3a5921e65f5e7dd7b122a4d5036527e0f4e583" name="Sam Fire Sample Demo (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3f557c1d" sha1="e2be28e51d8fc0c362ff9dbdfa4189bb2b7ff096" name="Sam Mines (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a42beceb" sha1="2145b4ebc640158129507a6ec9457b2d460bf090" name="Sam Mouse Disk v1.2">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9ce8ea58" sha1="23c346655abceaf19577353600aeaa1203ce1561" name="Sam News Disk">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="21795937" sha1="8f2f8a0e44f98e9e7257c4712b36385dca3c8145" name="Sam News Disk Issue 1 (Jan 1992) (SAM Computers LTD)"> </hash>
+	<hash crc32="1dc6732e" sha1="701d3a1039f0026134952d49d808a2c5b7e4a3c5" name="Sam News Disk Issue 2 (Feb 1992) (SAM Computers LTD)"> </hash>
+	<hash crc32="d557166d" sha1="f497c46a5572f8619f9eb72cd6f46a33cdf2acab" name="Sam News Disk Issue 4 (SAM Computers LTD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="0dc5ce02" sha1="fa934baaf83ae7dd57b3bd6dfc78653b864db096" name="Sam News Disk Issue 5 (SAM Computers LTD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="bb7f35f9" sha1="b83f03af1e14704e6728d5ab03de6e7a5aacb2fe" name="Sam Paint">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="17f7a2bd" sha1="ed7ef979c0e5f8bdafe8d338d33491aa97fa1571" name="Sam Paper Magazine Issue 6">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4c992797" sha1="c2f22b2446ce86edf77be8df7bd523d441d84632" name="Sam Paper Magazine Issue 8">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4b60446a" sha1="3adbd6908c981a67697f49bb9aae0e9512335e0e" name="Sam Paper Magazine Issue 9">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="891b315b" sha1="4985a9c25953c79f959f14bc3bda2412dac69fb7" name="Sam Prime">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a5482272" sha1="00421579169271b96f9bb94aa1fac8bec80bec33" name="Sam Public Quarterly Issue 5 [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="be43d60f" sha1="7ab61c2d3a0bca4f07119127b00c733e57a0f6df" name="Sam Public Quarterly Issue 5">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7a5a2f6a" sha1="d653af52fc9018ccde82f1441cb4849a45be35cf" name="Sam Small C by Rumspft (Fred Publishing)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="5c5051b3" sha1="d15436cde71617172da49ffe49c1ed2c40b550b1" name="Sam Spectrum Games Disk 06 (Chris White)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="e3608d20" sha1="0571345bcb682b014f77d3d9af5a1d9453d756a8" name="Sam Supplement Magazine - The Best Of">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9aa67b97" sha1="fc7e19d0398b26d2929d8b31a514dc47e389e050" name="Sam Supplement Magazine Issue 01 (Sep 1990)"> </hash>
+	<hash crc32="d64238d1" sha1="b901319886b342bce075f7f93aa6e48d7ab6b750" name="Sam Supplement Magazine Issue 02 (Nov 1990)"> </hash>
+	<hash crc32="180ae514" sha1="7b33e02436e3c974429a619ff72dcace5496be74" name="Sam Supplement Magazine Issue 03 (Dec 1990)"> </hash>
+	<hash crc32="1cddb26d" sha1="fa0ae109dec56a828b95224db90aff60c3a3c93b" name="Sam Supplement Magazine Issue 04 (Jan 1991)"> </hash>
+	<hash crc32="61da1ff8" sha1="7c63374d95070d4da9b60828fb0e3d026659ca2f" name="Sam Supplement Magazine Issue 05 (Feb 1991)"> </hash>
+	<hash crc32="bf83cfb0" sha1="7b4570fba09b16217c90072297f6c20f183db816" name="Sam Supplement Magazine Issue 06 (Mar 1991)"> </hash>
+	<hash crc32="997f9506" sha1="651242b2af29e3f121dcf05a3b1e1d7aa91c06e9" name="Sam Supplement Magazine Issue 07 (Apr 1991)"> </hash>
+	<hash crc32="d45cdbae" sha1="93b9b46b030cf8efc5dd91391f5f26b0b640f593" name="Sam Supplement Magazine Issue 08 (May 1991)"> </hash>
+	<hash crc32="c17a4fed" sha1="b3ead2111a23196721ac8d88e3cc618c20923319" name="Sam Supplement Magazine Issue 09 (Jun 1991)"> </hash>
+	<hash crc32="76b14d8d" sha1="23a5119acd91c24bcf03bcbe3c6ce98cec61b04e" name="Sam Supplement Magazine Issue 10 (Jul 1991)"> </hash>
+	<hash crc32="4a4e28e3" sha1="e01f55a1aab245a6c50ac38f7f290fa6ca86ae58" name="Sam Supplement Magazine Issue 11 (Aug 1991)"> </hash>
+	<hash crc32="9b135a6f" sha1="f17fe40a267b901d9f162d70a5e5ba9dd057456d" name="Sam Supplement Magazine Issue 12A (Sep 1991)"> </hash>
+	<hash crc32="104d49c5" sha1="19b15cbd94e89139ec52c035cac0428586d4eff0" name="Sam Supplement Magazine Issue 12B Freeware (Sep 1991)"> </hash>
+	<hash crc32="ece2feb0" sha1="bf0b1ce7c7e9db1ad2cfbc67418d71f96c9a00a3" name="Sam Supplement Magazine Issue 13 (Oct 1991)"> </hash>
+	<hash crc32="3665b221" sha1="a01814c3f403dccaf4515bafe215c1995892a444" name="Sam Supplement Magazine Issue 14 (Nov 1991)"> </hash>
+	<hash crc32="974ace5b" sha1="1bfd609220926726dcab5484fdedfa86f2f37415" name="Sam Supplement Magazine Issue 15 (Dec 1991)"> </hash>
+	<hash crc32="504119e2" sha1="3a201f85f3c590c29670ac7c0aaa5ca64d962528" name="Sam Supplement Magazine Issue 16 (Jan 1992)"> </hash>
+	<hash crc32="b1dee26a" sha1="272e177df91f497f76432523b6931e38b912c07e" name="Sam Supplement Magazine Issue 17 (Feb 1992)"> </hash>
+	<hash crc32="a429ca19" sha1="34358fe4a4160e2aef4faadc3046396c82016cad" name="Sam Supplement Magazine Issue 18 (Mar 1992)"> </hash>
+	<hash crc32="6dcdbe68" sha1="b557f951439d0a2d6298a46a6c9245d543f5e4c4" name="Sam Supplement Magazine Issue 19 (Apr 1992)"> </hash>
+	<hash crc32="8e1d2fab" sha1="ef43d6f3f45398bf8d3ec0854b33abeb2959a200" name="Sam Supplement Magazine Issue 20 (May 1992)"> </hash>
+	<hash crc32="c6209338" sha1="7b234c6a0ddfdc441cb46a75cfa94d94e352da14" name="Sam Supplement Magazine Issue 21 (Jun 1992)"> </hash>
+	<hash crc32="d394346b" sha1="32025aaee70e76131bd1869c00d0a3288ca1c78b" name="Sam Supplement Magazine Issue 22 (Jul 1992)"> </hash>
+	<hash crc32="e5f96812" sha1="5d5f64660c986d5a813b5efad14e7643d8de6293" name="Sam Supplement Magazine Issue 23 (Aug 1992)"> </hash>
+	<hash crc32="dd7bf1f6" sha1="b358533888d72f0a653dcaa968c42c02cd3875cf" name="Sam Supplement Magazine Issue 24 (Sep 1992)"> </hash>
+	<hash crc32="8b54bcff" sha1="2b2c052c5c46c9db51f1cc344c887eb3046d2352" name="Sam Supplement Magazine Issue 25 (Oct 1992)"> </hash>
+	<hash crc32="6dbff457" sha1="1ff58ec8e59a7beb888f7249c7be6e339e347e81" name="Sam Supplement Magazine Issue 26 (Nov 1992)"> </hash>
+	<hash crc32="c63c665b" sha1="cd64c0f7853eec01b0b25df0786745a4bbbe910d" name="Sam Supplement Magazine Issue 27 (Dec 1992)"> </hash>
+	<hash crc32="c7bec442" sha1="7ff2af82c89990b7c47d28f0c3a7a30ccd10c98a" name="Sam Supplement Magazine Issue 28 (Jan 1993)"> </hash>
+	<hash crc32="138eaa5f" sha1="2d86acc5b57c7891995036421969bcca913d6355" name="Sam Supplement Magazine Issue 29 (Feb 1993)"> </hash>
+	<hash crc32="542703f3" sha1="14cf919a11d36a1493681177211d682c5c5c9fb1" name="Sam Supplement Magazine Issue 30 (Mar 1993)"> </hash>
+	<hash crc32="6ac2ffdf" sha1="1250614eaeb02bb02e0535afd879ecd17939e8bf" name="Sam Supplement Magazine Issue 31 (Apr 1993)"> </hash>
+	<hash crc32="b0785ef5" sha1="cfc4af4f7e9ec6714161a26b9541a91c84343119" name="Sam Supplement Magazine Issue 32 (May 1993)"> </hash>
+	<hash crc32="15580b04" sha1="0343f3363abbd4013d2ae20316317509133d8add" name="Sam Supplement Magazine Issue 33 (Jun 1993)"> </hash>
+	<hash crc32="cba02c74" sha1="de984b2c5756e8f6700a7ac25d340b9b6477364d" name="Sam Supplement Magazine Issue 34 (Jul 1993)"> </hash>
+	<hash crc32="d13b71f0" sha1="973ce99bbdb245034981d6d643c1ee26ea6062b4" name="Sam Supplement Magazine Issue 35 (Aug 1993)"> </hash>
+	<hash crc32="4d724cfa" sha1="1c48ddd44cb6792d23b156928be7a58a154f0d74" name="Sam Supplement Magazine Issue 37 (Oct 1993)"> </hash>
+	<hash crc32="51a20a7c" sha1="cdf3c7914966a0448a06f97b4014339ce40d6e4f" name="Sam Supplement Magazine Issue 38 (Nov 1993)"> </hash>
+	<hash crc32="377ecbdd" sha1="ce639de75cae29ed8b47e8143ab6b53e03adab17" name="Sam Supplement Magazine Issue 39 (Dec 1993)"> </hash>
+	<hash crc32="78cee691" sha1="dfa1ab1e20298b866ccec5539003a2575ee5a0a8" name="Sam Supplement Magazine Issue 40 (Jan 1994)"> </hash>
+	<hash crc32="a606eff4" sha1="f81e693778c6304e2e5bcbf77c549b3594deb180" name="Sam Supplement Magazine Issue 43 (Apr 1994)"> </hash>
+	<hash crc32="95a28f45" sha1="9268ded9e8655a938d8cb98336d8d9649fc2ae92" name="Sam Supplement Magazine Issue 44 (May 1994)"> </hash>
+	<hash crc32="52f90554" sha1="f22b83d2ed7bcab6f899e31ee9da21cf3912baeb" name="Sam Supplement Magazine Issue 45 (Jun 1994)"> </hash>
+	<hash crc32="02f29a2f" sha1="97f486d3d98072c691faa628868d496ef39b9c7a" name="Sam Supplement Magazine Issue 46 (Jul 1994)"> </hash>
+	<hash crc32="37f96b0e" sha1="6fd60d5256b82d0a4a0dd38f84aef6ca3139ed64" name="Sam Supplement Magazine Issue 47 (Aug 1994)"> </hash>
+	<hash crc32="f7d80f50" sha1="c9683efa665b48d6da4212b041cda51c1ac72a5c" name="Sam Supplement Magazine Issue 48 (Sep 1994)"> </hash>
+	<hash crc32="91cea37c" sha1="cb7691520467a40897c0a26df222d5557f89991f" name="Sam Supplement Magazine Issue 49 (Oct 1994)"> </hash>
+	<hash crc32="3e162ef9" sha1="4b02cf77b5b0fa1492b42431f038dfafd0de5f7b" name="Sam Supplement Magazine Issue 50 (Nov 1994)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="f933d1a2" sha1="90c389033469ceb62e8d134c65d7e2cfdd05c036" name="Sam Supplement Magazine Issue 50 (Nov 1994)"> </hash>
+	<hash crc32="a3bf8a8c" sha1="85dfd7e89e507ea89b7f23584a4bb61fce5faa1d" name="Sam Supplement Magazine Issue 51 (Dec 1994)"> </hash>
+	<hash crc32="7f0f6e67" sha1="3b3d31314dd7215f4cbceb1f1c50efcd7c179278" name="Sam Supplement Magazine Issue 52 (Jan 1995)"> </hash>
+	<hash crc32="91e0c051" sha1="248a069f8fb835f0e665f915ca7824f549504ea4" name="Sam Supplement Magazine Issue 53 (Feb 1995)"> </hash>
+	<hash crc32="ff258745" sha1="5dd19a32c21ed51e728fdf1c260833a9f0a00fbb" name="Sam Supplement Magazine Issue 54 (Mar 1995)"> </hash>
+	<hash crc32="3463b2a8" sha1="34465a6385444cde6b55c63d6f6290ca12699df0" name="Sam Supplement Magazine Xmas Disk (Dec 1992)"> </hash>
+	<hash crc32="040e1580" sha1="bda55c87dcb25487e42aa8d8db0fa05fcd18bc29" name="Sam Utils">
+		<year>1993</year>
+	</hash>
+	<hash crc32="e59a2a81" sha1="17f1598a7a86a461380bebd792f09ff4e5309788" name="Sam X (Supplement Software)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2bcd42c9" sha1="d6279599d5ff0a74cb9d445dee6d2977c2b00548" name="SAMart and Slideshow (Sam PD Sware Lib.) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e58a2050" sha1="1e7944cc7d21a1aa01405c5421d98f2c6bc238e9" name="SamCo Birthday Demos for 512K by Chris White (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="14a5b363" sha1="28dcebef99dfbbbf0e587cf89249fb918a393456" name="SamCo Birthday Pack Best of Enceledus">
+		<year>1991</year>
+	</hash>
+	<hash crc32="0f9b8056" sha1="a7e268a7900638f8860736a4188cf787bedb5853" name="SamCo Birthday Pack Demo and Previews">
+		<year>1991</year>
+	</hash>
+	<hash crc32="79f673e3" sha1="52ac3b1058f6c6f1ed660783a02eaaa59b3e411b" name="SamCo Birthday Pack Games and Utils (Revelation) [a1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="80d16e5b" sha1="38d9f0c2ba95c83a1afd9acce011147467b148c0" name="SamCo Birthday Pack Games and Utils (Revelation)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="a7e6ddfb" sha1="1abf93c703f76f21f1c3ef00f0667c210bc83d92" name="SamCo News Disk - Sam Juggler">
+		<year>1991</year>
+	</hash>
+	<hash crc32="24df16f4" sha1="d4978c8fd99af96a0b33b2f1a946a7e19981991d" name="SamCo News Disk 1 (Jan 1992)"> </hash>
+	<hash crc32="d03b52d0" sha1="5be1de47b097fa6c0edbfa0db2be0e5fc3d73ae0" name="SamCo News Disk 2 (Feb 1992)"> </hash>
+	<hash crc32="15f91ed9" sha1="c593067aef1d6f025140e5aeba4fd0a87b1cb5f8" name="SamCo News Disk 3 (Mar 1992)"> </hash>
+	<hash crc32="9cb2ca51" sha1="0dbd5d59a72bf453c195d5431e49a9fd70c8ac4f" name="SamCo News Disk 4">
+		<year>1992</year>
+	</hash>
+	<hash crc32="3b147680" sha1="baed93fec04002ce9eee0f18e254e9d00eb583fe" name="SamCo News Disk 5">
+		<year>1992</year>
+	</hash>
+	<hash crc32="04b9bdcd" sha1="56602010fad3883ac88b5e60446dd7e66b88ef47" name="SamCo-Tech PC Contracts">
+		<year>1989</year>
+	</hash>
+	<hash crc32="aa06c658" sha1="5ff69654a64744fda89b55c0c5c2cfe6bcb66bda" name="Samples and Instruments (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="a41d5afa" sha1="eab717da1a48ed9244bfdd82e9c6df87e82a1341" name="Samsational Complete Guide to SAM PD Software (SCPDSA)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="5b675b5a" sha1="4fd08699c2c887bde38305759c3c266c6b25bc94" name="Sandman's Shadow 1 (PD)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="8e37ea6e" sha1="ba26d0955486b48ecc6376e2af24db6cb74de49f" name="Sandman's Shadow 2 (PD)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="7e696b33" sha1="f7e78b343290aa2fd645cea50502a602b7d28a43" name="Sandman's Shadow 3 (PD)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="89a15267" sha1="a8c412c276baa59210a48a8c42d5beff8eb98a69" name="Satellite'92">
+		<year>1992</year>
+	</hash>
+	<hash crc32="9d74108f" sha1="29f6bbea3459b9965930fcf2098dd371e0eb7367" name="SC Compressor 2 (Steve's Software)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="b53815c1" sha1="0544c7aa8cc70db99b23a9df80bc4bb6bf8fa964" name="SC DTP (Steve's Software)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="0bb37701" sha1="de1d4db314608d59b9800a2b7b69deb8bbfa74c5" name="SC Filer V2.0 (Steve's Software)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="ed3e1f07" sha1="d701f69015d7533144c49951a60d9e435577ed47" name="SC Monitor Pro 1.2, TurboMon 1.0 (Steve's Software)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="fe241546" sha1="1f6f7678ede950d871de3aa5a229919543b0bac4" name="SC PD 1 - Speclone&amp;Compressor by Steve's Software (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="7cea153c" sha1="6a73e776ef2e04c5e461b3cf922fd59dfbed3e90" name="SC PD 3 by Steve's Software (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="caee4ef1" sha1="222bcaf3b708d773dd11c8df68fbe64026f9f6f7" name="Sci-Fi Screens Disk 1 (ColonySoft)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="a7694b73" sha1="c7761d71abad5bdaf65bcc671efb80392e919749" name="SCPDSA Demo Disk 1 (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="01758418" sha1="8720e5854d02d44b7960da72e667aaecb2866118" name="Screens Shots 1">
+		<year>1991</year>
+	</hash>
+	<hash crc32="29d0ee6a" sha1="55a96275b0a8689906eab7d0a5e1f3b85e86f924" name="Screens Shots 2">
+		<year>1991</year>
+	</hash>
+	<hash crc32="e47738f4" sha1="03d7f45ec08e40a5e6c458564396ebf4a58670bf" name="Screens Shots 3">
+		<year>1991</year>
+	</hash>
+	<hash crc32="93ac4cf4" sha1="e9d890f0ba6a2c89e27b096212a34a4cc333aad6" name="Screens Shots 4">
+		<year>1991</year>
+	</hash>
+	<hash crc32="b5458e38" sha1="ae7db3e3e31af98dd978cd5ec415d4488a3b9666" name="Screens Shots 5">
+		<year>1991</year>
+	</hash>
+	<hash crc32="33b537e7" sha1="c6e7e65e7fe2948e1c3d74fbcea6afc07c0e2361" name="Screens Viewer Disk 1">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="59197b45" sha1="166d58a6e1b5503694ba85999a8728251df643c6" name="Screens Viewer Disk 2">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="abc1d6cf" sha1="75005ecb9f0c20b08208caed132cc77ce29ca1a2" name="Screens Viewer Disk 3">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8ccbff6d" sha1="fe6b683f8d68add95d1ee5412713e1709d8ce64e" name="Screens Viewer Disk 4">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="be23f166" sha1="f86074a7671cac1580e970dd3d154ec1c5f7d81c" name="Secretary Word Processor, The (A.N.Stevens)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="cdee8a94" sha1="455a459bdcd8a11226cbfe77ab19843fba739bb9" name="Sega Graphic Converters (Chris White)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="cc1bcaf3" sha1="b9c29d7cbf6eb2b4c8a84178cf9c68caf23c4df0" name="Shanghai (Fuxsoft)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="70f903cf" sha1="3257092f9afbae2afe462ae002582b5c699a0a8b" name="Silly Demo 1 by Lord Insanity (PD) [a1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="9b03ab33" sha1="b8aa00d961f0fdd8309b4715a6a0f7742bce5ab7" name="Silly Demo 1 by Lord Insanity (PD)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="e207b93d" sha1="f4f66c3ed36985524d9b443a073270bbf4d97397" name="Simon Cooke - Fast E-Tracker Player for Lemmings">
+		<year>1992</year>
+	</hash>
+	<hash crc32="83864dce" sha1="295d99205e3591e1cbc53bad0dafe0d76b747085" name="Simon Cooke - Fred 18 Freebie">
+		<year>1991</year>
+	</hash>
+	<hash crc32="54191eb1" sha1="a34db373a4aab12cc2d0508b368fa683e1672857" name="Simon Cooke - Graphic Converters">
+		<year>1993</year>
+	</hash>
+	<hash crc32="653bb0d3" sha1="c62843476a50a6f6fac75b118dfc44c63e81d047" name="Simon Cooke - Holidaying At SamTech">
+		<year>1991</year>
+	</hash>
+	<hash crc32="064e92cf" sha1="1ce9ef0e91e5d57ea264573130527cd3de55b3c6" name="Simon Cooke - Loading Tetris">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="86ae90dd" sha1="79181bafbb1ab2d751becc4eb7f2259aafd3d38b" name="Simon Cooke - Rick Dangerous Stuff">
+		<year>1990</year>
+	</hash>
+	<hash crc32="7a55e95e" sha1="4c39fafcd9a2bfa7a92a871f3352281200d49150" name="Simon Cooke - Samples">
+		<year>1991</year>
+	</hash>
+	<hash crc32="ab27d2a9" sha1="ffb4dca3fcfd91c0d4f2ae1688a50ddb9363f595" name="Simon Cooke - Stuff">
+		<year>1992</year>
+	</hash>
+	<hash crc32="7480e7b7" sha1="105437941fffd1cc298ab0c1ffc122c1130a76e5" name="Simon Cooke - Work Disk">
+		<year>1992</year>
+	</hash>
+	<hash crc32="5157a3c1" sha1="db45e2d879f02daa27af519332e047afe5012bae" name="Small C - Compiler V3.1 (Rumsoft)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b4d76c6f" sha1="93a88a4ae3122535e9b27f20aaa3255617394ad7" name="SoulMagician (Pc-Act)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="baaa98ba" sha1="0e1f6f292024bdecde4ab02f053bfe4a8ef00391" name="Sound Machine (Paul Angel)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="d4fce0b6" sha1="fc6680bdb063e7467a34aea9d0211fe38137fb6c" name="Source Code Samples Disk 1 (Chris White)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="23b008ed" sha1="c378c24f1ef2a554b1de3a2306c086946f7968b0" name="Source Code Samples Disk 2 (Chris White)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="d87d2d4b" sha1="318804712941a194fa40ad644b82490c790d9647" name="Speccy Emulators (Chris White)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="e2e30e53" sha1="f43318f278534be88e13cd8b802e51655b4ea044" name="Speccy EmulFiles (Chris White)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="b5a7e093" sha1="b59e5ba3921ccfb12199a979fbf45ff7b03114e3" name="Speccy Utils (Chris White)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="6ac873e7" sha1="f03321b0b79b90f9127b3ddb1b99ae958830c805" name="Spectrum &amp; SAM Computing Issue 3">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="fa78dfe9" sha1="bf2b73015285d3b441248c36b7aec89df2b09c20" name="Spectrum 128 - Myth and Escape From Singe's Castle">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2716f96c" sha1="8043a64d5cdb3d8660e471c37c123a7dff0361dd" name="Spectrum 128 Music Disk 1 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9ef17cc9" sha1="e95ada7af3dc0c4c16efd780dab50b9d9edca567" name="Spectrum 128 Music Disk 2 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2ac5a110" sha1="74d6811436406b1f980de6597710889e01d5d94a" name="Spectrum Emulator (Sept 04)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="0a75eaa8" sha1="4408d3d92d91712090546472869582c0d4c43343" name="Spectrum Games (128K) Disk 01">
+		<year>1991</year>
+	</hash>
+	<hash crc32="7790e017" sha1="df09d55d35bb7455c8d819ccc828f80fb00ca90f" name="Spectrum Games (128K) Disk 02">
+		<year>1991</year>
+	</hash>
+	<hash crc32="31a2f31e" sha1="dc6d013395d3dd6ad6a62733569b32a182d6fdc8" name="Spectrum Games (128K) Disk 03">
+		<year>1991</year>
+	</hash>
+	<hash crc32="e067b6ca" sha1="4e5447dec36ce32231e5a973df24ecf3a9d231e0" name="Spectrum Games (128K) Disk 04">
+		<year>1991</year>
+	</hash>
+	<hash crc32="d8b59422" sha1="17a78bc063a0cff8b846a6d4a6cf89c0662e668a" name="Spectrum Games (128K) Disk 05">
+		<year>1991</year>
+	</hash>
+	<hash crc32="1804ae74" sha1="2ab00f768283949cd960d5c21699659cbf54528f" name="Spectrum Games (128K) Disk 06">
+		<year>1991</year>
+	</hash>
+	<hash crc32="c5cdc795" sha1="237aeaa619b1c745c5131cfb955b8d30699b8957" name="Spectrum Games (128K) Disk 07">
+		<year>1991</year>
+	</hash>
+	<hash crc32="f514a1e4" sha1="dbbf48dee27016009f4d0459cecf51dc7999adb6" name="Spectrum Games (128K) Disk 08">
+		<year>1991</year>
+	</hash>
+	<hash crc32="c6ba66bb" sha1="e2a6b46c3804862c2d9e4f56ab140995239b3de3" name="Spectrum Games (128K) Disk 09">
+		<year>1991</year>
+	</hash>
+	<hash crc32="4c0390ec" sha1="75fd76b8da34e4819db1a32581166156ae01f852" name="Spectrum Games (128K) Disk 10">
+		<year>1991</year>
+	</hash>
+	<hash crc32="5db2695f" sha1="98f854a8d80a962ed7ec5413cfb9c4b1fc3b313d" name="Spectrum Games (128K) Disk 11">
+		<year>1991</year>
+	</hash>
+	<hash crc32="b52eaed7" sha1="da7b6fda002f46bde407775669b10858b441587c" name="Spectrum Games (128K) Disk 12">
+		<year>1991</year>
+	</hash>
+	<hash crc32="7770b9e1" sha1="7e9458870e0dbb52a95672cd7122283effbdda0b" name="Spectrum Games (48K) Disk 1">
+		<year>1991</year>
+	</hash>
+	<hash crc32="34067756" sha1="ece58101f43d99a854a6417bac66f635096da505" name="Spectrum Games (48K) Disk 2">
+		<year>1991</year>
+	</hash>
+	<hash crc32="faf414e3" sha1="045f21500ccab1857a2df26baff971f9059af94e" name="Spectrum Games (48K) Disk 3">
+		<year>1991</year>
+	</hash>
+	<hash crc32="2cc1f35c" sha1="be4851f71156efc34f1b6e1cb07818ebed8a471b" name="Spectrum Games (48K) Disk 4">
+		<year>1991</year>
+	</hash>
+	<hash crc32="6e8654b7" sha1="dae3e9d82257b9900c43f98b7c45251650e2e417" name="Spectrum Games (48K) Disk 5">
+		<year>1991</year>
+	</hash>
+	<hash crc32="209614ea" sha1="9b5b6eab0875f3c9ae4a265405dba465660912e6" name="Spectrum Games (48K) Disk 6">
+		<year>1991</year>
+	</hash>
+	<hash crc32="e8080e92" sha1="319638a0c8e1ba2cc72e92eb9bd8a42c544e9b10" name="Spectrum Games Compilation 01">
+		<year>1992</year>
+	</hash>
+	<hash crc32="386718e6" sha1="b02d85b7b95feb7b04c5dfa23570d0731728f903" name="Spectrum Games Compilation 02">
+		<year>1992</year>
+	</hash>
+	<hash crc32="ce94334d" sha1="b2b477e0eb933769e4ce961e3d26bdd0cc78320d" name="Spectrum Games Compilation 03">
+		<year>1992</year>
+	</hash>
+	<hash crc32="21646207" sha1="992004a768b2ec548f98bdfc29a9382d7cdfc76f" name="Spectrum Games Compilation 04">
+		<year>1992</year>
+	</hash>
+	<hash crc32="4d7d4d21" sha1="34e0ebdf156b6f46c39665eadba5f2db0d031c72" name="Spectrum Games Compilation 05">
+		<year>1992</year>
+	</hash>
+	<hash crc32="b77994ee" sha1="4f2a44485a2e0dab4ba62d00b2bc95665db1a569" name="Spectrum Games Compilation 06">
+		<year>1992</year>
+	</hash>
+	<hash crc32="b12797fd" sha1="a474130d736fa34489e2e772425fd4c6a3cf5a28" name="Spectrum Games Compilation 07">
+		<year>1992</year>
+	</hash>
+	<hash crc32="e01595e2" sha1="a9853ebf5c7c90a54f65a44db9a1d2e28e24a845" name="Spectrum Games Compilation 08">
+		<year>1992</year>
+	</hash>
+	<hash crc32="fff4ba4e" sha1="e97e9ae226c98faafb578a33d56bac04708169fe" name="Spectrum Games Compilation 09">
+		<year>1992</year>
+	</hash>
+	<hash crc32="87acf6e9" sha1="56286b61b4d4ea255c35ebf40904ceda305c1980" name="Spectrum Games Compilation 10">
+		<year>1992</year>
+	</hash>
+	<hash crc32="4b367559" sha1="828f3f3896bb6eb158bf33cce5fe0e86817303f4" name="Spectrum Games Compilation 11">
+		<year>1992</year>
+	</hash>
+	<hash crc32="ee19318a" sha1="6a3169d24f3d087e915c36e07ba590bc57d194db" name="Spectrum Games Compilation 12">
+		<year>1992</year>
+	</hash>
+	<hash crc32="621517eb" sha1="c12716cd48ee55abe9ddb5c9db6d2a68bb23818a" name="Spectrum Games Compilation 13">
+		<year>1992</year>
+	</hash>
+	<hash crc32="1044b072" sha1="0cbc47c23e7a13f61e1cb924c8b4efa7542fec65" name="Spectrum Games Compilation 14">
+		<year>1992</year>
+	</hash>
+	<hash crc32="23d29bb6" sha1="9c20bb433484ad037e229d2d4e4395aba471d2a9" name="Spectrum Games Compilation 15">
+		<year>1992</year>
+	</hash>
+	<hash crc32="3c72058f" sha1="18e3e8a8798b5fba61d8b0fa6835090f63d54dc5" name="Spectrum Games Compilation 16">
+		<year>1992</year>
+	</hash>
+	<hash crc32="5c5fc348" sha1="5255096c1cca65491f1107905243e0a9dbbf4933" name="Spectrum Games Compilation 17">
+		<year>1992</year>
+	</hash>
+	<hash crc32="163f69ec" sha1="2aa4e439ae89d8dde232e7a87cfe188a62bef19c" name="Spectrum Games Compilation 18">
+		<year>1992</year>
+	</hash>
+	<hash crc32="86199244" sha1="c2765bc10a875d11394290190cb247dfa42b768a" name="Speed King Hacking (Chris White)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="161cd00f" sha1="ca9634ccc7a1acb7fa97d9518336ec9cfc94a86b" name="SpellMaster">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c723ab70" sha1="63bd51cd7b6ab4257793f0586f96b7f52d4eafe9" name="Splat Demo by Colin Jordan (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="12d1d5aa" sha1="0e21909fbe3136575fc14a1bdf3d38fc1af7c3d6" name="Star Demo (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="82d66614" sha1="979df782c90ba012701dd1a3ba69faf33c6cfd49" name="Star Wars Slideshow 1 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9813c7fe" sha1="8e7ae8ff054f7cb1b9d293ce0bd5fe859fc21fe0" name="Steffan Drisson's Multiple Stuff">
+		<year>1991</year>
+	</hash>
+	<hash crc32="a7fde2ef" sha1="2b510c414758a944ebc4b592e3b47938e3cb9eca" name="Stuart's Leonardi's Rotater Stuff">
+		<year>1990</year>
+	</hash>
+	<hash crc32="7955491e" sha1="7e768d917981a5bb506d8327f7cbbf21b6ca8375" name="Stuart's Leonardi's Vector Stuff">
+		<year>1990</year>
+	</hash>
+	<hash crc32="8457b096" sha1="d05a1ba1380afcb2bc7e54415be0438d9a23e07e" name="Surprise Demo from SAMCO News Disk 1 (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="121f96ef" sha1="9512ff9145a1a8170544fd62a370ead258835181" name="Tetris (Lord Insanity)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="d9fd7cd5" sha1="7c60befcd4f91236ddf45fcaf9f1b40533f7ec1a" name="Top Gun 1Mb MDOS Demo Disk 1 (PD) [a1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="0194071a" sha1="af1a3a99bc012e8935506736b882fb1469feab69" name="Top Gun 1Mb MDOS Demo Disk 1 (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="1d3f4a84" sha1="8c0ed1c53b206f16f9e1648e52890fb5859bbcad" name="Top Gun 1Mb MDOS Demo Disk 2 (PD) [a1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="864f3407" sha1="101c197eed4214f771b11caa5a1d68bc757ead83" name="Top Gun 1Mb MDOS Demo Disk 2 (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="40290c8a" sha1="36176294cd77987ba37c236e15fe3738119de548" name="Triltex (Fred Software)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="a7d513d8" sha1="69a8683df6b257eaf7d1cd5e2f0f65ce20b9d597" name="TurboMON V1.0">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c3283ffb" sha1="86474ddb446400a8f3a5195ddd2c8c90cf4e81b7" name="Various E-Tracker Stuff (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="0ac57e22" sha1="80a20922ac1fa75265c86ff0f8534c284da0d875" name="Various Unused GFX (Evolution)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="01788d33" sha1="54448c6dde721c55b827bdaa2ae5a91a4d1dae27" name="Vegetable Vacation Demo (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="c85b973e" sha1="2fcaa1d4f57a0d398338d30babaa337e3526c407" name="Visually 1 (Zenith Graphics)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7b0e4dea" sha1="3a5a28c3d00cb38222ffae6c5a1c449f6a6cc54b" name="Visually 2 (Zenith Graphics)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="bfe42f4e" sha1="cbb850f79221c98206e8104bd1d9e431ae9a333c" name="Visually 3 (Zenith Graphics)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1102fcf8" sha1="1c8f3537d5bb63bcdfe6d17624b73f7f08827413" name="Visually 4 (Zenith Graphics)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="42281c5c" sha1="899f8741c0886c4d4fd5e5e98bb5e7dbe3e26199" name="Visually 5 (Zenith Graphics)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a45072a0" sha1="7183f501152bc8e38301db34bd4c10167e871b95" name="Visually 6 (Zenith Graphics)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0c1a079f" sha1="89fb468d458251b9e871fe5d884c1072a2a1c7c3" name="Walker 1 Meg Demo (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="07024f2a" sha1="1ad9b147ee75449c9dcde8b38d63be036ffa6f33" name="WaterWorks Demo (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="cb119b4d" sha1="a6c79c7858ce10bd5c4b93af30b236e584f09b4f" name="Witching Hour Demo by Chris White">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="24aa4545" sha1="4f0ea548f93b36b3dcff89be8759db84664136b9" name="Wobbles Painful History, The (The Wobbles)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="f792b389" sha1="a4b6f7593a80e4dccb31e8130c954ee29d40c605" name="WOP Gamma (Andrew Fish)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="d6a4521b" sha1="cff2412063cb9e228c978ec6513ed554b1045fe3" name="ZAT-FRED Disc (ZAT Magazine)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="743c648c" sha1="dc0f30658faacdce5a7662d51e04b54eb48b9081" name="Zeddy - ZX81 Emu and Programs 1 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8f95513b" sha1="60d9be8f1340e079165c55c0e17f479934621416" name="Zeddy - ZX81 Emu and Programs 2 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="76de290b" sha1="4513b3962ad61977d30f6334d66ac48755fa4ee0" name="Zeddy - ZX81 Emu and Programs 3 (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5f457bb7" sha1="4d7cef7c6ce7c37183939695c11afcb5343a6e26" name="Zenith Edition 1 (Zenith Graphics)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="40f39ff6" sha1="3dc31ca1abb68500748c02e062a758a24a389217" name="Zenith Edition 2 (Zenith Graphics)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8d1d7e0a" sha1="89601212777155802345a69723f5a70097a1acbc" name="Zenith Edition 2-5 (Zenith Graphics)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="32d52815" sha1="92dbdd178cba4e4cf5dbd263986f26f4baf90a10" name="Zenith Edition 3 (Zenith Graphics)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5dab4338" sha1="e79393ffdfcc1ab794556fb825571c4a8a171aa5" name="ZUB Demo by Simon Cooke (PD)">
+		<year>1992</year>
+	</hash>
+</hashfile>

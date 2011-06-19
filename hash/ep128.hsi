@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Enterprise 64 &amp; 128 - Bios Images (TOSEC-v0.01) -->
+	<hash crc32="55f96251" name="Basic Interpreter v2.1 [BASIC.ROM]">
+		<year>1985</year>
+		<manufacturer>Intelligent Software</manufacturer>
+	</hash>
+	<hash crc32="683cf455" name="Basic Interpreter v2.1 [EXBAS.ROM]">
+		<year>1985</year>
+		<manufacturer>Intelligent Software</manufacturer>
+	</hash>
+	<hash crc32="d1d7e157" name="Disk Controller v1.3 [EXDOS.ROM]">
+		<year>1985</year>
+		<manufacturer>Intelligent Software</manufacturer>
+	</hash>
+	<hash crc32="d421795f" name="Expandible OS v2.0 [EXOS.ROM]">
+		<year>1984</year>
+		<manufacturer>Intelligent Software</manufacturer>
+	</hash>
+	<hash crc32="982a3b44" name="Expandible OS v2.1 [EXOS21.ROM]">
+		<year>1985</year>
+		<manufacturer>Intelligent Software</manufacturer>
+	</hash>
+	<hash crc32="24838410" name="Expandible OS v2.3 [EXOS23.ROM]">
+		<year>1987</year>
+		<manufacturer>Intelligent Software</manufacturer>
+	</hash>
+</hashfile>

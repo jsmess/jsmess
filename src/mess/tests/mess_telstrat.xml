@@ -1,0 +1,8 @@
+<tests>
+
+<test name="telstrat_000" driver="telstrat">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+</tests>

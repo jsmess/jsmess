@@ -1,0 +1,12 @@
+<hashfile>
+	<!-- Commodore CBM80 image CRC List -->
+	<!-- Compiled by Stefano &quot;JoJo&quot; Priore -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<!-- Send corrections/submissions to: battlepriest@hotmail.com -->
+	<hash crc32="224312D9" name="CBM4032 Any Hz.prg">
+		<year>1997</year>
+		<manufacturer>Wolfgang Guenther</manufacturer>
+	</hash>
+</hashfile>

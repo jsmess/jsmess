@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Tandy MC-10 (TOSEC-v0.11) -->
+	<hash crc32="1d6d2b34" name="Breakout">
+		<year>19??</year>
+	</hash>
+	<hash crc32="39bd94fa" name="Eggs">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bf0d402a" name="Graphics loop (demo)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7ce66d5b" name="Kaleido">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e557ff52" name="Lander">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ddd3651e" name="MC-10 Duelling Cannons Game">
+		<year>19??</year>
+	</hash>
+	<hash crc32="08aa0881" name="MC-10 Graphics Routines">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b342d165" name="MC-10 Mini Calculator">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6e085588" name="MC-10 Space Invaders Game">
+		<year>19??</year>
+	</hash>
+	<hash crc32="85d1f036" name="MC-10 Word Processor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="62870276" name="Micro Checkers">
+		<year>1983</year>
+		<manufacturer>Tandy Corporation</manufacturer>
+	</hash>
+	<hash crc32="6faa1922" name="Micro Color Checkers">
+		<year>1984</year>
+	</hash>
+	<hash crc32="215179cb" name="Micro Color Compac">
+		<year>1983</year>
+		<manufacturer>Tandy Corporation</manufacturer>
+	</hash>
+	<hash crc32="96f8c02f" name="Micro Color Lostworld Pinball">
+		<year>1983</year>
+		<manufacturer>Tandy Corp</manufacturer>
+	</hash>
+	<hash crc32="05f0afd6" name="Pong">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3f779cb7" name="Quarter Horse Race">
+		<year>19??</year>
+	</hash>
+	<hash crc32="82e1adb1" name="Squares">
+		<year>1981</year>
+		<manufacturer>Tom Rugg-Phil Feldman</manufacturer>
+	</hash>
+</hashfile>

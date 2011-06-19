@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="alice90" description="Matra Alice 90 Cassette">
+	<software name="budget">
+		<description>Budget Familial</description>
+		<year>1985</year>
+		<publisher>Matra</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="20242">
+				<rom name="budget.k7" size="20242" crc="228e4b62" sha1="31f838d7490b8484ddbabf036119654ac5bf45fe" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dessin">
+		<description>Dessine Moi</description>
+		<year>1985</year>
+		<publisher>Matra</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="31324">
+				<rom name="dessin.k7" size="31324" crc="4fed7561" sha1="6f7a1bf3717b67f5e54bd5fb4feb479844187346" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fringale">
+		<description>Fringale</description>
+		<year>1985</year>
+		<publisher>EH Services</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="52953">
+				<rom name="fringale.k7" size="52953" crc="b55fa035" sha1="f3c1e95a434d3e11905952caed3210addf319eee" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planvl">
+		<description>Plan de Vol</description>
+		<year>1985</year>
+		<publisher>EH Services</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="19968">
+				<rom name="planvl.k7" size="19968" crc="ec0838be" sha1="335f775e45b84fb15c142440eaee12649637210b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="textra">
+		<description>T'extra</description>
+		<year>1985</year>
+		<publisher>Matra</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="17947">
+				<rom name="textra.k7" size="17947" crc="eda0fdd4" sha1="92044736d0780e4b331a412631fbee94027bafe4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

@@ -1,0 +1,241 @@
+<hashfile>
+	<!-- PS-X Executable CRC file -->
+	<!-- single file demos -->
+
+	<!-- crc = Name | Year | Author | Emulation Status -->
+	<hash crc32="0ee10ace" name="Xerox">
+		<year>1998</year>
+		<manufacturer>Legend</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="e1e91931" name="Bitmaster's 1st">
+		<year>1998</year>
+		<manufacturer>Bitmaster</manufacturer>
+		<status>requires libps.exe</status>
+	</hash>
+	<hash crc32="c0bb623c" name="Second Demo">
+		<year>1999</year>
+		<manufacturer>AUMatt</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="23804eff" name="BakaTro">
+		<year>1998</year>
+		<manufacturer>K-Comm</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="55844af2" name="Recycling">
+		<year>1998</year>
+		<manufacturer>Birdhouse Projects</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="9e179a15" name="Lametro">
+		<year>1999</year>
+		<manufacturer>Birdhouse Projects</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="9d4107e9" name="bufftr0">
+		<year>1998</year>
+		<manufacturer>bufferman</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="1ce6979d" name="carnival99intro">
+		<year>1999</year>
+		<manufacturer>Birdhouse Projects</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="ebfa60e8" name="PlayStation - Op.1">
+		<year>1999</year>
+		<manufacturer>Crazy Cellist</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="3a8cd3c7" name="A Y2K Demo">
+		<year>1999</year>
+		<manufacturer>Crazy Cellist</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="c4d57f4d" name="Eurasia PSX Intro #1">
+		<year>1999</year>
+		<manufacturer>Eurasia</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="66f24b98" name="Anime Demo (PAL)">
+		<year>1998</year>
+		<manufacturer>Hitmen</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="13c52cbd" name="Full Effect">
+		<year>1998</year>
+		<manufacturer>Hitmen</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="496fdcf4" name="DrugTro">
+		<year>1998</year>
+		<manufacturer>Hitmen</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="361ce9e4" name="GreenTro">
+		<year>1998</year>
+		<manufacturer>Hitmen</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="88f9d1df" name="HitWorld">
+		<year>1998</year>
+		<manufacturer>Hitmen</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="ac70e28e" name="Mother">
+		<year>1997</year>
+		<manufacturer>Hitmen</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="621dc244" name="Minimum">
+		<year>2000</year>
+		<manufacturer>Hitmen</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="5aadc930" name="Pactro">
+		<year>1999</year>
+		<manufacturer>Hitmen</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="7755191b" name="A Peacey Intro">
+		<year>1998</year>
+		<manufacturer>Hitmen</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="bc88b1fc" name="Remembers Amiga">
+		<year>1998</year>
+		<manufacturer>Hitmen</manufacturer>
+		<status>requires libps.exe</status>
+	</hash>
+	<hash crc32="dd8b9325" name="The Roots">
+		<year>1999</year>
+		<manufacturer>Hitmen</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="57dfc662" name="SadTro">
+		<year>1998</year>
+		<manufacturer>Hitmen</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="d8b0ffd8" name="Silpheed's Contribution">
+		<year>1998</year>
+		<manufacturer>Hitmen</manufacturer>
+		<status>requires libps.exe</status>
+	</hash>
+	<hash crc32="dfc11c9f" name="TranceTro">
+		<year>1997</year>
+		<manufacturer>Hitmen</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="8b2e8ca1" name="1st ASM Production">
+		<year>1999</year>
+		<manufacturer>Jammy Bit</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="0fcbc375" name="Fractal Landscape Gen. (ntsc)">
+		<year>1998</year>
+		<manufacturer>Davide Pasca</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="b233cb70" name="Fractal Landscape Gen. (pal)">
+		<year>1998</year>
+		<manufacturer>Davide Pasca</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="50962a79" name="first intro">
+		<year>1998</year>
+		<manufacturer>madman</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="2b6acee6" name="mahjongg">
+		<year>1998</year>
+		<manufacturer>?</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="1674cf33" name="Newbie Intro">
+		<year>1998</year>
+		<manufacturer>Stdragut</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="7a70b2f1" name="Bitz-n-Pieceez">
+		<year>1998</year>
+		<manufacturer>Napalm</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="10c17a90" name="FlapTro (ntsc)">
+		<year>Napalm</year>
+		<manufacturer>?</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="f93989c3" name="FlapTro (pal)">
+		<year>1999</year>
+		<manufacturer>Napalm</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="a0c2441c" name="JaneyTro">
+		<year>1998</year>
+		<manufacturer>Napalm</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="4097c707" name="Lightastic Intro">
+		<year>1999</year>
+		<manufacturer>Napalm</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="d9507dff" name="Monotone Introduction">
+		<year>1999</year>
+		<manufacturer>Napalm</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="a9995d15" name="WebTro">
+		<year>1998</year>
+		<manufacturer>Napalm</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="6bff8dbc" name="Hypnopup (pal)">
+		<year>1997</year>
+		<manufacturer>Gadget</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="01529f14" name="Comtro">
+		<year>1999</year>
+		<manufacturer>Paradox</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="f300075e" name="Rogue">
+		<year>1999</year>
+		<manufacturer>Da Swieep</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="de078e91" name="ROLE Intro #1">
+		<year>1999</year>
+		<manufacturer>Raiders Of the Lost Empire</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="7806600f" name="Sand">
+		<year>1999</year>
+		<manufacturer>Tursi</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="a2ba6d5e" name="Tribute">
+		<year>1998</year>
+		<manufacturer>Napalm</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="0c645fd5" name="zeldademo">
+		<year>1999</year>
+		<manufacturer>?</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="5d49c456" name="Space Lemmings">
+		<year>1998</year>
+		<manufacturer>High Society</manufacturer>
+		<status>?</status>
+	</hash>
+	<hash crc32="298d754b" name="High Society 1st">
+		<year>1998</year>
+		<manufacturer>High Society</manufacturer>
+		<status>?</status>
+	</hash>
+</hashfile>

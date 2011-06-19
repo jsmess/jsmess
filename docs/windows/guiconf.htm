@@ -1,0 +1,530 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="HTML Tidy for Cygwin (vers 1st September 2004), see www.w3.org" />
+<title>MESS Guide</title>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<link href="../style.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+<h1>MESSUI Configuration</h1>
+
+<p class="normal">This section describes the basics of the running and configuring the MESSUI. MESSUI is the graphical user interface to the MESS core. This section also includes a description of menu options and system configuration tabs.</p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<h2>Quick Start</h2>
+
+<p>Open MESSUI by double clicking messui.exe and you will see a screen like this:</p>
+
+<p align="center"><img alt="easyEmu!" src="images/gui.gif" width="593" height="432" border="1" /></p>
+
+<p>When you run MESSUI for the first time it will automatically hunt for available system rom files. If it doesn't find any or you add more press "F5" to
+update the system list.</p>
+
+<h2>Menu Options</h2>
+
+<p>MESSUI is far easier to use than the command line versions of MESS. Most of the functions can be accessed from its menus. Here is the complete
+description of all of MESSUI's menus...</p>
+<p>&nbsp;</p>
+<table width="98%" border="1" cellpadding="3" align="center">
+<tr>
+<td colspan="2" class="tabletitle">File Menu</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Run (Selected System)</td>
+<td width="77%" class="Maintext">Runs the selected system in the system list</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Play and Record Input</td>
+<td width="77%" class="tabledesc">Saves a file that contains all the control inputs that you make whilst running a system.</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Playback Input</td>
+<td width="77%" class="tabledesc">Lets you play back the Input file of you running a system.</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Select Random system</td>
+<td width="77%" class="tabledesc">Runs a system randomly from the list</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Open Other Software</td>
+<td width="77%" class="tabledesc">Lets you load software from a different folder.</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Create Image</td>
+<td width="77%" class="tabledesc">Takes the software you've loaded and will save it as a snapshot image.</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Properties</td>
+<td width="77%" class="tabledesc">
+<p>Opens the currently selected systems properties box. Here is a description...</p>
+<p align="center"><img alt="properties" src="images/prop.gif" width="356" height="452" /></p>
+<p>General - Gives you information on the system.</p>
+<p>Audit - Tells you if you have a problem with the ROM file.</p>
+<p>Software - Will let you add more folders of software for the selected system.</p>
+<p>All the other options are covered in the MESSUI Configuration section below. Any settings changed in this window will only affect the selected
+system.</p>
+</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Audit All systems</td>
+<td width="77%" class="Maintext"><span>Check all of the systems in MESS to see if the rom files are OK. If this option report a faulty system you
+will need to re-download it.</span></td>
+</tr>
+</table>
+<p>&nbsp;</p>
+<table width="98%" border="1" align="center">
+<tr>
+<td colspan="2" class="tabletitle">View Menu</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Toolbar</td>
+<td width="77%" class="tabledesc">Toggles the toolbar on the main MESS window</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Status Bar</td>
+<td width="77%" class="tabledesc">Toggles the status bar on the main MESS window</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Folder List</td>
+<td width="77%" class="tabledesc">Toggles the folders window on the main MESS window</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Picture Area</td>
+<td width="77%" class="tabledesc">Toggles the Screen Shot window on the main MESS window</td>
+</tr>
+<tr>
+<td class="tablehead">Screenshot Tab</td>
+<td class="tabledesc">Toggles whether the tabs above the screen shots are displayed.</td>
+</tr>
+<tr>
+<td class="tablehead">Fullscreen</td>
+<td class="tabledesc">Runs the MESSUI using the whole of your screen.</td>
+</tr>
+<tr>
+<td class="tablehead">Show Pictures</td>
+<td class="tabledesc">Lets you pick what pictures are shown in the picture area.</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Large Icons</td>
+<td width="77%" class="tabledesc">Views the system list as Large icons</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Small Icons</td>
+<td width="77%" class="tabledesc">Views the system list as small icons</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">List</td>
+<td width="77%" class="tabledesc">Views the system list as a list of systems</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Details</td>
+<td width="77%" class="tabledesc">Views the system list as a detailed list of systems</td>
+</tr>
+<tr>
+<td class="tablehead">Grouped</td>
+<td class="tabledesc">Views the system list with parent systems and clones listed together.</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Arrange Icons</td>
+<td width="77%" class="Maintext">Arranges the icons on the system list if you have moved them</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Line Up Icons</td>
+<td width="77%" class="Maintext">Lines up the icons in the main windows without sorting them.</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Refresh</td>
+<td width="77%" class="Maintext">Refresh the system list if you add new systems.</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Custom Filters</td>
+<td width="77%" class="Maintext">Lets you filter out unwanted system types in the folders window.</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Customize Fields</td>
+<td width="77%" class="Maintext">Lets you decide what information is displayed about systems in the detailed system list.</td>
+</tr>
+</table>
+<p>&nbsp;</p>
+<table width="98%" border="1" bordercolor="#EEEEEE" cellpadding="3" align="center">
+<tr>
+<td colspan="2" class="tabletitle">Options Menu</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">System List Font</td>
+<td width="77%" class="Maintext">Lets you customize the font used to display system names.</td>
+</tr>
+<tr>
+<td class="tablehead">System List Clone Colour</td>
+<td class="tabledesc">Lets you specify a color for systems that are clones to differentiate them.</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Directories</td>
+<td width="77%" class="tabledesc">Lets you add or overide the default directories used by MESS. Useful if you store you systems on CD for
+example.</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Default System Options</td>
+<td width="77%" class="tabledesc">Lets you set the options used for every system in MESS unless it is overidden by changing the systems properties.
+See below for details.</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Reset To Default</td>
+<td width="77%" class="tabledesc">Resets all setting to the original default settings.</td>
+</tr>
+<tr>
+<td width="23%" height="172" class="tablehead">Interface Options</td>
+<td width="77%" height="172" class="Maintext">
+<p>Changes the settings for when MESSUI initially starts.</p>
+<p align="center"><img alt="easyEmu!" src="images/startup.gif" width="324" height="359" /></p>
+<p>The best options here are at the bottom as they turn off the annoying "Press OK to continue" loading screen.<br /></p>
+</td>
+</tr>
+<tr>
+<td class="tablehead">Background Image</td>
+<td class="tabledesc">Lets your pick an image to display as the background to the rom lists</td>
+</tr>
+<tr>
+<td width="23%" class="tablehead">Language</td>
+<td width="77%" class="tabledesc"><span>Lets you select an alternative language file if you have a problem understanding English.</span></td>
+</tr>
+</table>
+<p>&nbsp;</p>
+<table width="98%" border="1" align="center" cellpadding="3">
+<tr>
+<td class="tabletitle">Help Menu</td>
+</tr>
+<tr>
+<td class="tabledesc">Help and Readme Files</td>
+</tr>
+</table>
+<p>&nbsp;</p>
+<hr />
+<h2><b>Config Window</b></h2>
+<p><font face="Arial, Helvetica, sans-serif" size="2"><b>You can see below the default options window on MESSUI. This is where you set up all of
+MESSUI's options. You can access if by going to Options -&gt; Default Options menus. Here is a complete description of what you can
+change...</b></font></p>
+<p align="center"><img alt="easyEmu!" src="images/props.gif" /><br />
+<br /></p>
+<table width="98%" border="1" align="center" cellpadding="3">
+<tr>
+<td colspan="2" class="tabletitle">Display Tab</td>
+</tr>
+<tr>
+<td width="30%" class="tablehead">Run In A Window</td>
+<td width="70%" class="Maintext"><span>Chooses between running the selected system in a window on your desktop or fullscreen. Most of the time the
+fullscreen option will make systems run smoother.</span></td>
+</tr>
+<tr>
+<td width="30%" class="tablehead">Start Out Maximized</td>
+<td width="70%" class="Maintext">Opens a system window using the whole desktop.</td>
+</tr>
+<tr>
+<td width="30%" height="25" class="tablehead">Enforce Aspect Ratio</td>
+<td width="70%" height="25" class="Maintext">Makes sure that the system screen is drawn in the same aspect as the original machine. If you turn it
+off the system will be stretched to fill the entire screen therefore distorting it.</td>
+</tr>
+<tr>
+<td width="30%" class="tablehead">Throttle</td>
+<td width="70%" class="Maintext">Enables the speed throttle built into MESS.</td>
+</tr>
+<tr>
+<td class="tablehead">Clean Stretch</td>
+<td class="tabledesc">Stops the blurriness you normally see when MESS has to stretch the system screen</td>
+</tr>
+<tr>
+<td class="tablehead">Zoom</td>
+<td class="tabledesc">Lets you zoom in a system</td>
+</tr>
+<tr>
+<td width="30%" class="tablehead">Rotation</td>
+<td width="70%" class="Maintext">Rotates or flips the screen which is useful if you have an arcade monitor in a cabinet that has been rotated.</td>
+</tr>
+<tr>
+<td width="30%" class="tablehead">Effects</td>
+<td width="70%" class="Maintext">Adds some effects to the systems screen that can give a more "authentic" TV monitor feel on your PC monitor.</td>
+</tr>
+<tr>
+<td width="30%" class="tablehead">Gamma Correction</td>
+<td width="70%" class="tabledesc"><span>Increases the overall brightness of the systems screen if you find it too dark.</span></td>
+</tr>
+<tr>
+<td class="tablehead">Brightness Correction</td>
+<td class="tabledesc"><span>Increases the brightness of the systems screen if you find it too dark.</span></td>
+</tr>
+<tr>
+<td width="30%" class="tablehead">Pause Brightness</td>
+<td width="70%" class="tabledesc"><span>Changes the overall brightness of the system when its paused.</span></td>
+</tr>
+</table>
+<p align="center"><img src="images/propadv.gif" /></p>
+<table border="1" bordercolor="#EEEEEE" align="center" width="98%" cellpadding="3">
+<tr>
+<td colspan="2" class="tabletitle">Advanced Tab</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Use Direct Draw</td>
+<td width="656" class="tabledesc">Turning this off is a bad idea as it will slow things down considerably!</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Triple Buffering</td>
+<td width="656" class="tabledesc">Helps systems run smoothly (if supported by your video card)</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Match system Refresh Rate</td>
+<td width="656" class="tabledesc">Syncs your monitor to the refresh rate used on the original system. (If your monitor can!)</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Sync To Monitor Refresh</td>
+<td width="656" class="tabledesc">Tells MESS to ignore the systems refresh rate and use your monitors.</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Wait For Vertical Sync</td>
+<td width="656" class="tabledesc">Makes MESS wait before drawing a systems screen until the last one finishes which stops the screen appear to "tear."</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Stretch Using Hardware</td>
+<td width="656" class="Maintext">Uses your video card's hardware to stretch a systems graphics to fill the screen.</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Switch Resolutions To Fit</td>
+<td width="656" class="Maintext">Switches the screen resolution to best fit the systems one.</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Switch Color Depths To Fit</td>
+<td width="656" class="Maintext">Tries to ensure that the correct amount of colors are used to match the systems.</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Full Screen Brightness</td>
+<td width="656" class="Maintext">Increases or decreases the overall brightness of the systems screen.</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Aspect Ratio</td>
+<td width="656" class="Maintext">Lets you set the exact screen aspect that suits you monitor. (Useful for widescreen monitors)</td>
+</tr>
+<tr>
+<td width="272" height="23" class="tablehead">Resolution</td>
+<td width="656" height="23" class="Maintext">Lets you set the system screen to an exact size and color depth.</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Frame Skipping</td>
+<td width="656" class="Maintext">If you find that systems are running slow you can tell MESS to skip x amount of
+frames in every 12. If left on "Auto" MESS will adjust it itself.</td>
+</tr>
+</table>
+<p align="center"><img src="images/propd3d.gif" /></p>
+<table border="1" bordercolor="#EEEEEE" align="center" width="98%" cellpadding="3">
+<tr>
+<td colspan="2" class="tabletitle">Direct3D Tab</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Use Direct3D</td>
+<td width="656" class="Maintext">Lets you use your 3D card to draw the system screen as it can be faster.</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Texture Management</td>
+<td width="656" class="Maintext">Lets DirectX manage all system screen to texture operations rather than MESS. Only change if you have problems.</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Rotate Effects</td>
+<td width="656" class="Maintext">Rotates the d3deffect command to work with vertically aligned monitors.</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Filter</td>
+<td width="656" class="Maintext">
+<p>Sets the filter (blurriness) when using D3D for rendering the system screen thus reducing jagged edges.</p>
+</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Effect</td>
+<td width="656" class="Maintext">
+<p>Adds screen effects when the system screen is drawn.</p>
+</td>
+</tr>
+<tr>
+<td class="tablehead">Prescale</td>
+<td class="tabledesc">Works like sharp in the effects so doesn't blur the screen.</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Scanlines</td>
+<td width="656" class="Maintext">Sets the scanline intensity if you select this effect.</td>
+</tr>
+<tr>
+<td width="272" class="tablehead">Feedback</td>
+<td width="656" class="Maintext">Something about feedback intensity (Whatever that is!)</td>
+</tr>
+</table>
+<p align="center"><img src="images/propsnd.gif" /><br />
+<br /></p>
+<table width="98%" border="1" align="center" cellpadding="3">
+<tr>
+<td colspan="2" class="tabletitle">Sound Tab</td>
+</tr>
+<tr>
+<td width="288" class="tablehead">Enable Sound And Sound CPU's</td>
+<td width="631" class="Maintext">Enables / Disables Sound (<font color="#FF0000">Tip!</font> Sometimes you can speed up a system by disabling its
+sound!)</td>
+</tr>
+<tr>
+<td width="288" class="tablehead">Use Samples</td>
+<td width="631" class="Maintext">Sometimes systems require extra sound samples to work completely. Sound samples must be downloaded and stored in the
+samples directory.</td>
+</tr>
+<tr>
+<td width="288" class="tablehead">Resample If Sample Rate Does Not Match</td>
+<td width="631" class="Maintext">Lets MESS ensure that the correct sound quality is produced by a system.</td>
+</tr>
+<tr>
+<td width="288" class="tablehead">Sample Rate</td>
+<td width="631" class="Maintext">Determines the quality of the sound produced by MESS. (Tip! You can improve performance sometimes by lowering sound
+quality)</td>
+</tr>
+<tr>
+<td class="tablehead">Volume Attenuation</td>
+<td class="tabledesc">Simply a volume control.</td>
+</tr>
+<tr>
+<td width="288" class="tablehead">Audio Latency</td>
+<td width="631" class="Maintext">Increase this slider if you get clicks and pops in a systems sound.</td>
+</tr>
+</table>
+<p align="center"><img src="images/propctrlr.gif" /><br />
+<br /></p>
+<table width="98%" border="1" bordercolor="#EEEEEE" align="center" cellpadding="3">
+<tr>
+<td colspan="2" class="tabletitle">Controllers Tab</td>
+</tr>
+<tr>
+<td width="25%" class="tablehead">Enable Joystick Input</td>
+<td width="75%" class="Maintext">Let you use a joystick to control systems</td>
+</tr>
+<tr>
+<td class="tablehead">Analog Joystick Deadzone</td>
+<td class="tabledesc">Sets the dead zone (a distance a controller travels without registering a movement) of an analog controller when used on a
+digital system.</td>
+</tr>
+<tr>
+<td width="25%" class="tablehead">Enable Mouse Input</td>
+<td width="75%" class="Maintext">Lets you choose whether MESS uses the mouse on trackball systems.</td>
+</tr>
+<tr>
+<td class="tablehead">Enable Lightgun Input</td>
+<td class="tabledesc">Lets you use a lightgun on systems that support it.</td>
+</tr>
+<tr>
+<td width="25%" class="tablehead">Enable Steadykey Support</td>
+<td class="tabledesc">If you find that MESS won't let you press more than one key at a time (usually during combos in fighting games on consoles or
+the Capcom CPS Changer), steadykey will help.</td>
+</tr>
+<tr>
+<td class="tablehead">Default Input Layout</td>
+<td class="tabledesc">Determines which controller ini file MESS uses.</td>
+</tr>
+</table>
+<p>&nbsp;</p>
+<div align="center"><img src="images/propmisc.gif" /><br />
+<br /></div>
+<table width="98%" border="1" bordercolor="#EEEEEE" align="center" cellpadding="3">
+<tr>
+<td colspan="2" class="tabletitle">Miscellaneous Tab</td>
+</tr>
+<tr>
+<td class="tablehead">Enable system cheats</td>
+<td class="tabledesc">Cheater...!!</td>
+</tr>
+<tr>
+<td class="tablehead">Error log (for Developers)</td>
+<td class="tabledesc">Enables some extra logging features.</td>
+</tr>
+<tr>
+<td class="tablehead">Sleep when possible</td>
+<td class="tabledesc">Allows MESS to give time back to the system when running with -throttle. This allows other programs to have some CPU time, assuming that the
+game isn't taxing 100% of your CPU resources. This option can potentially cause hiccups in performance if other demanding programs are running. The default is ON.</td>
+</tr>
+<tr>
+<td class="tablehead">Skip System info</td>
+<td class="tabledesc">Bypasses initial system info screen when starting a new system</td>
+</tr>
+<tr>
+<tr>
+<td class="tablehead">Save game state on exit</td>
+<td class="tabledesc">If save states are supported on the system it will save the state (not working).</td>
+</tr>
+<tr>
+<td class="tablehead">Multi-threaded rendering</td>
+<td class="tabledesc">	Enables multithreading within MESS. At the moment, this causes the window and all DirectDraw/Direct3D code to execute on a second thread, which can improve performance on hyperthreaded and multicore systems. The default is OFF (-nomultithreading).</td>
+</tr>
+<tr>
+<td class="tablehead">Thread priority</td>
+<td class="tabledesc">Sets the thread priority for the MESS threads. By default the priority is left alone to guarantee proper cooperation with other applications. The valid range is -15 to 1, with 1 being the highest priority. The default is 0 (NORMAL priority).</td>
+</tr>
+<tr>
+<td class="tablehead">Skip warnings</td>
+<td class="tabledesc">Bypasses system warning screens when starting a new system. Not reccomended.</td>
+</tr>
+<tr>
+<td class="tablehead">Use New UI</td>
+<td class="tabledesc">Utilize a windows menu based system as opposed to the classic "MAME" like interface</td>
+</tr>
+<tr>
+<td class="tablehead">Backdrops</td>
+<td class="tabledesc">Enable artwork used as backdrop images.</td>
+</tr>
+<tr>
+<td class="tablehead">Bezels</td>
+<td class="tabledesc">Enable artwork used as the bezel surround.</td>
+</tr>
+<tr>
+<td class="tablehead">Overlays</td>
+<td class="tabledesc">Enable artwork used as overlays to systems.</td>
+</tr>
+<tr>
+<td class="tablehead">Crop Artwork</td>
+<td class="tabledesc">Crops the edges of the artwork to the edge of the system screen.</td>
+</tr>
+<tr>
+<td class="tablehead">BIOS</td>
+<td class="tabledesc">Select the system BIOS to use.</td>
+</tr>
+</table>
+
+<p align="center"><img src="images/propvec.gif" /><br />
+<br /></p>
+<table width="98%" border="1" bordercolor="#EEEEEE" align="center" cellpadding="3">
+<tr>
+<td colspan="2" class="tabletitle">Vector Tab</td>
+</tr>
+<tr>
+<td width="22%" class="tablehead">Draw Antialiased Vectors</td>
+<td class="tabledesc">Let you choose whether MESS smoothes the edges of vector graphics systems such as the Vectrex. (Tip! Unchecking this option can
+significantly improve vector systems speed).</td>
+</tr>
+<tr>
+<td width="22%" class="tablehead">Draw Translucency Vectors</td>
+<td class="tabledesc">Simulates the translucency of the beam that is generated in arcade machines displays.</td>
+</tr>
+<tr>
+<td width="22%" class="tablehead">Beam Width</td>
+<td class="tabledesc">Width of the line being drawn for the vector.</td>
+</tr>
+<tr>
+<td class="tablehead">Flicker</td>
+<td class="tabledesc">Simulates the flicker of the beam on arcade machine displays.</td>
+</tr>
+<tr>
+<td width="22%" class="tablehead">Intensity</td>
+<td width="78%" class="Maintext">Sets the brightness of the lines.</td>
+</tr>
+</table>
+<p align="center">&nbsp;</p>
+<p>You must remember that changing these settings affects all systems. Sometimes you will find that changing a setting to benefit one system can
+hinder another. The obvious answer is if the system you are using performs badly and other systems don't, change it's settings individually using the
+file menu &#8594; properties option.</p>
+</body>
+</html>

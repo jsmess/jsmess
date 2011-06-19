@@ -1,0 +1,7 @@
+<tests>
+
+<test name="nc100_000" driver="nc100">
+	<wait time="5"/>
+</test>
+
+</tests>

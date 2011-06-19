@@ -1,0 +1,21 @@
+<!-- Rockwell AIM-65 hash file -->
+
+<!-- Number in parenthesis is the chip location: -->
+<!--   cartridge slot 1 for Z26 -->
+<!--   cartridge slot 2 for Z25 -->
+<!--   cartridge slot 3 for Z24 -->
+
+<!-- Z22 and Z23 are always the monitor ROM and built-in -->
+
+<hashfile>
+	<hash crc32="0878b399" sha1="483e92b57d64be51643a9f6490521a8572aa2f68" name="Assembler (Z24)"/>
+	<hash crc32="d7b42d2a" sha1="4bbdb28d332429825adea0266ed9192786d9e392" name="Basic V1.1 (Z25)"/>
+	<hash crc32="36a61f39" sha1="f5ce0126cb594a565e730973fd140d03c298cefa" name="Basic V1.1 (Z26)"/>
+	<hash crc32="0671d019" sha1="dd2a1613e435c833634100cf4a22c6cff70c7a26" name="Forth V1.3 (Z25)"/>
+	<hash crc32="a80ad472" sha1="42a2e8c86829a2fe48090e6665ff9fe25b12b070" name="Forth V1.3 (Z26)"/>
+	<hash crc32="4889af55" sha1="5e9541ddfc06e3802d09b30d1bd89c5da914c76e" name="Mathpack (Z24)"/>
+	<hash crc32="d01914b0" sha1="e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf" name="Monitor (Z22)"/>
+	<hash crc32="90e44afe" sha1="78e38601edf6bfc787b58750555a636b0cf74c5c" name="Monitor (Z23)"/>
+	<hash crc32="76dcf864" sha1="e937c54ed109401f796640cd45b27dfefb76667e" name="PL/65 V1.0 (Z25)"/>
+	<hash crc32="2ac71abd" sha1="6df5e3125bebefac80d51d9337555f54bdf0d8ea" name="PL/65 V1.0 (Z26)"/>
+</hashfile>

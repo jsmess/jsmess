@@ -1,0 +1,233 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="HTML Tidy for Cygwin (vers 1st September 2004), see www.w3.org" />
+<title>MESS Guide</title>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<link href="../style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h1>Controls</h1>
+<p class="normal">This section gives you the basic keys used in MESS. You will find a keymap for MESS and more importantly how to find and change the
+keys used for different systems. Finally you'll see how to configure your system to use a joystick and running systems using a joystick or mouse.</p>
+<p class="normal">&nbsp;</p>
+<hr />
+<h2>Default Keymap (old UI)</h2>
+<table width="100%" border="1" cellpadding="" bordercolor="#EEEEEE">
+<tr>
+<td colspan="2" class="tabletitle">Main Keys</td>
+</tr>
+<tr>
+<td class="tablehead">Scroll Lock</td>
+<td class="tabledesc">On the new UI it will hide the menubar. On the old UI it will switch MESS to partial keyboard emulation which lets you use keys
+like TAB, Alt and Ctrl.</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F2</div>
+</td>
+<td width="72%" class="tabledesc">Test/Service Switch</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F3</div>
+</td>
+<td width="72%" class="tabledesc">System Reset</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F4</div>
+</td>
+<td width="72%" class="tabledesc">Show the system graphics. Use cursor keys to change the set or colour.</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F7</div>
+</td>
+<td width="72%" class="tabledesc">Load a saved system state from a slot number.</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>Shift+F7</div>
+</td>
+<td width="72%" class="tabledesc">Save system state to 1 of 10 slots.</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F8</div>
+</td>
+<td width="72%" class="tabledesc">
+<p>Decrease frame skip during a system.</p>
+</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F9</div>
+</td>
+<td width="72%" class="tabledesc">Increase frame skip during a system.</td>
+</tr>
+<tr>
+<td width="28%" height="23" class="tablehead">
+<div>F10</div>
+</td>
+<td width="72%" height="23" class="tabledesc">Speed Throttle (Makes system overspeed)</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F11</div>
+</td>
+<td width="72%" class="tabledesc">Frames Per Second and Frameskip information</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>Left Shift + F11</div>
+</td>
+<td width="72%" class="Maintext">Enables the profiler</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F12</div>
+</td>
+<td width="72%" class="tabledesc">Saves image of system screen to snaps directory.</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>P</div>
+</td>
+<td width="72%" class="tabledesc">Pause the system</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>Shift + P</div>
+<td width="72%" class="tabledesc">Skip one frame forward if paused.</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>Esc</div>
+</td>
+<td width="72%" class="tabledesc">Exit from system</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>"~" or "&#172;" (Above Tab)</div>
+</td>
+<td width="72%" class="tabledesc">Volume Control</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>Tab</div>
+</td>
+<td width="72%" class="tabledesc">Access MESS's in-system menu</td>
+</tr>
+</table>
+<p class="normal">These are the default keys found in MESS. You can however customize them by pressing the "Tab" key during the emulation and selecting
+"Input (general)".</p>
+<p class="normal">&nbsp;</p>
+<hr />
+<h2>Changing The Default Keys</h2>
+<p class="normal">To change the system control keys simply run the system you want to play. Once the system has loaded press the "Tab" key to open
+the in-system menu and highlight "Input (this System)". Press enter and you will see this screen:</p>
+<p align="center" class="Tutorial"><img alt="easyEmu!" src="images/keybcnt.gif" width="293" height="262" /></p>
+<p class="normal">All you need to do now is to select the function you want to change, press enter and then press the key you want to use. It is
+possible to assign more than one key to a function by pressing enter again and pressing a different key.</p>
+<p class="normal">More fancy key combinations can be made as well: 
+<ul><li>To map 'key1' OR 'key2' (i.e. more than one key will produce the same effect), set one of the keys as before, wait until MESS accepts it, 
+then repeat for second key.</li>
+<li>To map 'key1' AND 'key2' (i.e. you need to press to keys at the same time to obtain an effect) press both (or more than two) keys after 
+pressing enter. </li>
+<li>To map 'key1' NOT 'key2' (i.e. 'key1' has an effect only if 'key2' is not also pressed), select the function you want to change, press enter, 
+press the first key and then quickly press the second key(s) twice.</li>
+</ul>
+The correspondent combination will appear on screen and you can check if the result is the one you wanted to obtain.</p> 
+<p class="normal">Notice that you must be careful when selecting the keys you want to use: they may be already in use for other functions.</p>
+<p class="normal">If you want to assign joystick movements to a function then once you have selected the function you want to change move the
+joystick/pad or press the fire button you want to use. (N.B. You must have the <span class="command">-joystick</span> option used for the command
+line versions of MESS or Use Joystick selected in the MESS32 configuration)</p>
+<p class="normal">&nbsp;</p>
+<hr />
+<h2>Something Has Gone Wrong!</h2>
+<p class="normal">If you muck up your system keys and want to reset them to default then open the C:\MESS\cfg folder and delete the relevant .cfg
+file for the system. If for some insane reason you change the default MESS keys and can't get back into the in-system menu then you will need to
+delete the default.cfg file from the same folder as before.</p>
+<p class="normal">&nbsp;</p>
+<hr />
+<h2>Configuring Keyboards</h2>
+<p class="normal">Dealing with the emulation of a wide range of systems, from console and handhelds devices, to home computer, calculators and chess 
+computers, MESS has to emulate very different kinds of controllers. In particular, it has to emulate the original keyboard of a system through 
+the keyboard of your computer.</p> 
+<p class="normal">However, due to differences in the keyboard layouts (e.g. QWERTY vs. QWERTZ vs. AZERTY vs. Russian and Bulgarian keyboards) and the 
+possible presence of custom keys in the emulated system (e.g. the 'Apple' command key in Macintosh, the 'CBM' key in Commodore computers etc.), it is 
+tough to cover all the possibilities and to offer at the same time a nice interface for configurations.</p>
+<p class="normal">MESS solution to this problem is two offer two different emulation modes for the keyboard of each system, Full and Partial, whenever
+you start the emulation of computer system (this does not apply to console). As said above, you can switch between the two using 'Scroll Lock'.</p>
+<p class="normal">Below, is a short description of the differences between the two</p>
+<h3>Partial Emulation Mode
+</h3>
+<p class="normal">In this emulation mode, you can access the UI keys described above (Tab, Esc, F4, F12 etc.). Therefore, this suits your needs whenever
+you want to configure Inputs and Dip Switches, to take Screenshots, Movies or Savestates, or simply to quit.</p>
+<p class="normal">Notice that anyway inputs are registered also by the emulated system, so if you e.g. pause the emulation with 'P' in Partial Emulation, 
+a P will appear on the emulated screen as well.</p>
+<h3>Full Emulation Mode
+</h3>
+<p class="normal">In this emulation mode, the UI vanishes and each key on your keyboard corresponds to a key on the keyboard of the emulated computer.</p>
+<p class="normal">Actually, MESS offers two different flavours of Full Emulation: default and natural.</p> 
+<p class="normal"><b>Full Emulation Mode (default behaviour)</b>: by default MESS in Full Emulation mode tries to change your keyboard into the original 
+keyboard. This way, if you were used to type without even looking at your keyboard on the real thing, you can do the same in MESS! This can produce 
+a few strange situations, e.g. in aquarius emulation 'Return' is mapped to the '/ ?' key of your keyboard because that was the position on the real 
+keyboard. However, a few exceptions are in order: 
+<ul>
+<li>'Spacebar', 'Backspace' and the arrow keys (when they have separate keys) are ususally mapped to the correspondent keys
+of your keyboard; </li>
+<li>when an emulated keyboard presents keys that are not on a modern pc keyboards, then MESS tries to map them to a closer key  
+<ul>
+<li>character keys at left of '1' or between 'Shift' and 'Z' are often mapped to '~', </li>
+<li>a third character key after '0' and 'P' or a fourth one after 'L' and 'M' is often mapped
+to 'Backlash2' or to'Page Up' and 'Page Down' etc.</li>
+</ul>
+</ul>
+Recall that you can always reconfigure all these inputs in the 'Input (this System)' menu.</p>
+<p class="normal"><b>Full Emulation Mode with Natural Keyboard</b>: this mode can be activated launching MESS with the
+<span class="command">-natural</span> option and set up the emulator to translate the key you press in the key of the original keyboard, so that
+when you press e.g. '+' you will see on screen a plus sign, no matter where that key was located on the original system. This makes typing much 
+easier but it presents a couple of limitations:
+<ul>
+<li>many custom key have no equivalent on modern pc keyboards: in this case, usually MESS maps them to function keys ('F1', 'F2' etc.) if they are unused,
+or to other keys not already mapped (e.g. keypad numbers, 'Home', 'End' etc.); you can find out where the keys are mapped looking at the source or
+in sysinfo.dat.
+<li>some UTF-8 characters are not present on every keyboard (e.g. &pound;, &yen;, &sect;, &#960; etc.): in this case, usually MESS maps them to the 
+corresponding keys and if you don't have them on your keyboard, you shall use the default 'Full Emulation' mode above.
+</ul>
+Notice that the Natural Keyboard cannot be remapped.
+</p>
+<p class="normal">&nbsp;</p>
+<p class="normal">Summing up, 
+<ul>
+<li>if you lauch MESS without <span class="command">-natural</span>, you can switch between the 'Partial Emulation' and 
+the 'Full Emulation' with a layout which closely reproduce the original one;</li>
+<li>if you lauch MESS with <span class="command">-natural</span>, you can switch between the 'Partial Emulation' and
+the 'Full Emulation' with a layout which matches the one of your keyboard.</li>
+</ul>
+</p>
+<p class="normal">A few experiments combining the three modes, and a bit of time spent configuring the keys you use most, shall allow you to recreate a perfect
+experience of the emulated system.</p>
+<p class="normal">However, if you experience any problem, or if you think an important key is still unmapped, please file a bug report in Bugzilla.</p>
+<p class="normal">&nbsp;</p>
+<hr />
+<h2>Configuring Joysticks</h2>
+<p class="normal">The simple fact is, if Windows supports your joystick or gamepad and it has been set up properly in the windows control panel, there
+shouldn't be an issue with MESS supporting it.</p>
+<p class="normal">If you haven't configured your controller then open the Start&#8594;Settings&#8594;Control Panel window. You'll see one of two things
+in Windows 95 there'll be a joystick icon, 98/2000 and XP will have a system Controllers icon. You'll have to refer to the Windows help file to
+configure your controller (as I can't remember how to do it on 9x) but make sure that the main controller is Joystick 1.</p>
+<p class="normal">Once your controller is properly set up, its inputs will be recognized in both "Input (general)" and "Input (this System)" menu 
+described above, and you will be able to remap emulated directions and keys to your controller.
+</p>
+<p class="normal">&nbsp;</p>
+<hr />
+<h2>Using Joysticks &amp; Mice</h2>
+<p class="normal">MESS W32 needs the -joystick option in its command line and MESS GUI will need the "Use Joystick" option selected in its
+configuration window.</p>
+<p><span class="Tutorial">MESS also supports the mouse. As usual the command line versions of MESS will need the -mouse option and MESS GUI will need
+the "Use Mouse" option selected in it's config window.</span></p>
+<p class="normal">&nbsp;</p>
+</body>
+</html>

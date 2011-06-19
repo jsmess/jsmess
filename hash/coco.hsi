@@ -1,0 +1,524 @@
+<hashfile>
+	<!-- This MESS HASH file was auto-generated from Cowering's GoodCoCo database (V3.13)  -->
+	<!-- for the exclusive use of MESS.  Keep this notice intact if editing this file  -->
+  
+  <!--
+      Supported <pcb> types:
+      
+      banked_16k    - CoCo "super" cartridges
+      coco_fdc      - CoCo FDC
+      dragon_fdc    - Dragon FDC
+      orch90        - Orch-90
+      ssc           - Speech/Sound cartridge
+  -->
+
+
+  <hash crc32="d4bbe731" sha1="d2a70452a120d3164ae52e16062fb2a4539fd377" name="A Mazing World of Malcom Mortar (26-3160)">
+    <year>1987</year>
+    <manufacturer>ZCT Systems</manufacturer>
+  </hash>
+  <hash crc32="93ddfc53" sha1="bdd56931325648d5ecc860ff77c59d27637687de" name="A Mazing World of Malcom Mortar (26-3160)">
+    <year>1987</year>
+    <manufacturer>ZCT Systems</manufacturer>
+  </hash>
+  <hash crc32="7d1cac0e" sha1="b19da63ba28a1278c3921a2dc739ad1d0dbd5402" name="Androne (26-3096)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1983</year>
+    <manufacturer>Robert Arnstein</manufacturer>
+  </hash>
+  <hash crc32="e79644a9" sha1="d50efeb1f6ae3ef0b1b34b0741cfbbb4ce87df34" name="Arkanoid (26-3043)">
+    <status>Known Bad Image</status>
+    <year>1987</year>
+    <manufacturer>Taito</manufacturer>
+  </hash>
+  <hash crc32="2fab4955" sha1="399a67d4e9dcffdbc79ab3e88a19bf5d18cad31e" name="Arkanoid (26-3043)">
+    <year>1987</year>
+    <manufacturer>Taito</manufacturer>
+  </hash>
+  <hash crc32="2fdf5b58" sha1="430f3f9391e63b21b5d14b1c54168d76171492a6" name="Art Gallery (26-3061)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Robert G. Kilgus</manufacturer>
+  </hash>
+  <hash crc32="04d9cfe4" sha1="654b989c4ca40d5acc78dca701cd3004293bf334" name="Atom (26-3149)">
+    <year>1983</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="16d2d946" sha1="4055aba10fc02c13f7e7a5e637832b0e77bb9928" name="Audio Spectrum Analyzer (26-3156) Steve Bjork">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="3be0cf60" sha1="74444a440545c1375546b30a3160a37f7967ff40" name="Bingo Math (26-3150)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1980</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="d6b940f1" sha1="882dbbd3dd79a94b08d4b662e2d2744150156479" name="Bridge Tutor I (26-3158)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1982</year>
+    <manufacturer>Philidor Software</manufacturer>
+  </hash>
+  <hash crc32="d2e79c66" sha1="a66787404bd8b5d68808969602bb6f595c59665b" name="Bustout (26-3056)">
+    <status>Known Bad Image</status>
+    <year>1980</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="c7ed9d30" sha1="b3bc9ae5ff59e8ca1f00c54523e2828f709680fc" name="Bustout (26-3056)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="aa214e43" sha1="ac5d771b3fd692de72d69945ae1fa4788db54538" name="Canyon Climber (26-3089)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1982</year>
+    <manufacturer>DataSoft</manufacturer>
+  </hash>
+  <hash crc32="23e3869f" sha1="b064b863b0e621bdfece76a0ac7b11301b5d8528" name="Canyon Climber (26-3089)">
+    <year>1982</year>
+    <manufacturer>DataSoft</manufacturer>
+  </hash>
+  <hash crc32="8869eddc" sha1="f4aab6a31b8aef3f08c13fd5c5fbd48ed75bb4fa" name="Castle Guard (26-3079)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>The Image Producers</manufacturer>
+  </hash>
+  <hash crc32="82929650" sha1="485477577db4751da4c0db3a402bb9b45fa65667" name="Castle of Tharoggad (26-3159)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1988</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="05dc5ef3" sha1="32f7c203dc9f5345c75cbfc4f93dfd1e8a626955" name="Checker King (26-3055)">
+    <year>1980</year>
+    <manufacturer>Personal Software</manufacturer>
+  </hash>
+  <hash crc32="fe4c93e4" sha1="dd597a3c965916c1342428f163ccf19b63a03c57" name="Clowns &amp; Balloons (26-3087)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1982</year>
+    <manufacturer>Steve Bjork</manufacturer>
+  </hash>
+  <hash crc32="a3b8ba85" sha1="0abf66c7e392c67a5735856f907501f26b70a69e" name="Color Backgammon (26-3059)">
+    <year>1980</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="ad1937c1" sha1="a86b8b3feb79f25eefff946b325b9df385fc3fa2" name="Color Baseball (26-3095)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1980</year>
+    <manufacturer>Dale A. Lear</manufacturer>
+  </hash>
+  <hash crc32="58d32dfe" sha1="e25065b49f5848ea4bea25d435533a65119b2e4e" name="Color Computer Disk BASIC for FD502 (26-3131)">
+    <year>1982</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="0b9c5415" sha1="10bdc5aa2d7d7f205f67b47b19003a4bd89defd1" name="Color Computer Disk BASIC V1.1 (26-3022)">
+    <year>1982</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="f4be90bc" sha1="9cd165a29dec6bfb29ed420039a46d50c1e15d3a" name="Color Cubes (26-3075)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Robert G. Kilgus</manufacturer>
+  </hash>
+  <hash crc32="d78be10a" sha1="aa2c65c5d0e9102720e9954707d2be2efab25c0d" name="Color File (26-3103)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="8acd7ea2" sha1="4ddafa18eaf0a33c03bf46f10dbea2301e05e622" name="Color Forth (26-xxxx)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Microworks</manufacturer>
+  </hash>
+  <hash crc32="9fb1e7d9" sha1="6ada350152b561eb66369389681953a849b2243b" name="Color Logo (26-2722)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1983</year>
+    <manufacturer>Larry Kheriaty &amp; George Gerhold</manufacturer>
+  </hash>
+  <hash crc32="3aca199b" sha1="1cd4c737fafe52fbd87413902cb0feb263037938" name="Color Scripsit (26-3105)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Robert G. Kilgus</manufacturer>
+  </hash>
+  <hash crc32="bc930185" sha1="f7d9b6d981ee316dccc6b4442e590f52f1b3cc30" name="Color Scripsit (26-3105)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Robert G. Kilgus</manufacturer>
+  </hash>
+  <hash crc32="7bffd03a" sha1="ad0039936e8c921c1f884f23f5aff29dbd0aca7a" name="Color Scripsit II (26-3109)">
+    <year>1986</year>
+    <manufacturer>Dale Lear</manufacturer>
+  </hash>
+  <hash crc32="bfa3585d" sha1="bd6ebd24a854fb98fa303b8cac09d8405d08252b" name="Cyrus Wodl Class Chess (26-3064)">
+    <year>1983</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="d990e1f9" sha1="3fad25f3462a0b581b9c182ac11ad90c8fa08cb6" name="Deluxe RS-232 Program Pak (26-2226)">
+    <year>1983</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="1199d27f" sha1="36c23e8a66cd1822efe9c667b2e621109a48e17e" name="Demolition Derby (26-3044)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1984</year>
+    <manufacturer>Spectral Associates</manufacturer>
+  </hash>
+  <hash crc32="a9d52b01" sha1="bcefee58ba00c0105813220cca4035b1fccbdffe" name="Demon Attack (26-3099)">
+    <status>Known Bad Image</status>
+    <year>1984</year>
+    <manufacturer>Activision</manufacturer>
+  </hash>
+  <hash crc32="b7a1aa3e" sha1="aeb7548474fa049704262f7fb5dcf514e64c70c6" name="Demon Attack (26-3099)">
+    <year>1984</year>
+    <manufacturer>Activision</manufacturer>
+  </hash>
+  <hash crc32="d5257b50" sha1="e359c48fc325c9ab243335653a5f8cae4f8fbd7e" name="Diagnostics (26-3019)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1980</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="8cd56308" sha1="3292b08ddc686590defe65b663c84578d24cc0a2" name="Diagnostics V2.0 (26-3019)">
+    <year>1982</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="ba1d9e81" sha1="f9e91893e577f5c762dd312219a6203794b99b4c" name="Dino Wars (26-3057)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Robert G. Kilgus</manufacturer>
+  </hash>
+  <hash crc32="667bc55d" sha1="703fe0aba4a603591078cb675ffd26a67c02df88" name="Direct Connect Modem Pak (26-2228)">
+    <year>1985</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="819fc9fb" sha1="649ada27254714b538b743189a974714de6fc390" name="DON-PAN (26-3097)">
+    <year>1984</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="b86830a9" sha1="9562f400bced999fa5e05b654c3f1eb9f5d085e1" name="Doodle Bug 1 (26-xxxx)">
+    <year>1982</year>
+    <manufacturer>Computerware</manufacturer>
+  </hash>
+  <hash crc32="c3d41232" sha1="065d7e16319735888c945d77f3192af1b34e8bd7" name="Doodle Bug 2 (26-xxxx)">
+    <year>1982</year>
+    <manufacturer>Computerware</manufacturer>
+  </hash>
+  <hash crc32="ea820c39" sha1="6bd818617d1db6b0a9d4304c84089a7ae1d20dac" name="Doodle Bug 3 (26-xxxx)">
+    <year>1982</year>
+    <manufacturer>Computerware</manufacturer>
+  </hash>
+  <hash crc32="4cc44337" sha1="bebd3f50f84c7e83f61f905f5bb13df0ee4227cc" name="Doubleback (26-3091)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1982</year>
+    <manufacturer>Dale A. Lear</manufacturer>
+  </hash>
+  <hash crc32="a923f5a2" sha1="60c12c0c96f8ee029cc69102c9907938acedf596" name="Downland V1.0 (26-3046)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1983</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="0229c319" sha1="a0121376f0952965a68bb9d9779553f1ce373dcf" name="Downland V1.1 (26-3046)">
+    <year>1983</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="1031fa22" sha1="70d93265f53d603854327a8fcf85d02fdaaadac1" name="Dragon Fire (26-3098)">
+    <year>1984</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="d45e59e3" sha1="b313259369d93c4badfba9a0126e320438d4a8b9" name="Dungeons of Daggorath (26-3093)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1982</year>
+    <manufacturer>DynaMicro</manufacturer>
+  </hash>
+  <hash crc32="f4374a55" sha1="994d9ae48a955a51329e6a518cb366997af757a7" name="EDTASM+ (26-3250)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1982</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="7a1c2f2d" sha1="beda70715726b2419f5828ab217411723bb8efbd" name="Facemaker (26-3166)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1984</year>
+    <manufacturer>Spinnaker</manufacturer>
+  </hash>
+  <hash crc32="f17b5b38" sha1="154a5eea94a28479c34d72ea63ccfe052b0f315b" name="Football (26-3053)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1980</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="93153b15" sha1="896e12d5f317338dfff9f18293faa41ee393a737" name="Fraction Fever (26-3169)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1984</year>
+    <manufacturer>Spinnaker</manufacturer>
+  </hash>
+  <hash crc32="984ee0d9" sha1="61979060256744a65f34089f8537cc72b4e674a7" name="Galactic Attack (26-3066)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1982</year>
+    <manufacturer>The Image Producers</manufacturer>
+  </hash>
+  <hash crc32="899978e7" sha1="b575b379a7cf41fadfa5c1b525d5f0103544eafa" name="GFL Championship Football II (26-3172)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1988</year>
+    <manufacturer>ZCT Systems</manufacturer>
+  </hash>
+  <hash crc32="c858d1cf" sha1="7187aafc99ba8a0286831a2f76772c83ea83b755" name="GFL Championship Football II (26-3172)">
+    <status>Known Bad Image</status>
+    <year>1988</year>
+    <manufacturer>ZCT Systems</manufacturer>
+  </hash>
+  <hash crc32="b42423a7" sha1="ac2946b11cb63a65a9cbd80494f70e4e23200684" name="Gin Champion (26-3083)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1982</year>
+    <manufacturer>Philidor Software</manufacturer>
+  </hash>
+  <hash crc32="fd84fc5c" sha1="210b5df78ffe4b4cc4ed7845b50c1e17fc79bf0f" name="Gomoku-Renju (26-3069)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1983</year>
+    <manufacturer>Intelligent Software Ltd</manufacturer>
+  </hash>
+  <hash crc32="174cf6ea" sha1="4834f069a13530d6f168c60ab1dd7e96c9db4e3f" name="JDOS V1.08 (26-xxxx)">
+    <year>1983</year>
+    <manufacturer>J&amp;M Systems</manufacturer>
+  </hash>
+  <hash crc32="9a2f498a" sha1="c2ebb308fcc2347b03eaa343c1d6b17b7638d22c" name="JDOS V1.10 (26-xxxx)">
+    <year>1983</year>
+    <manufacturer>J&amp;M Systems</manufacturer>
+  </hash>
+  <hash crc32="f1050d71" sha1="d4559e23df1fcbb2894245976b2068105521e626" name="JDOS V1.23 (26-xxxx)">
+    <year>1985</year>
+    <manufacturer>J&amp;M Systems</manufacturer>
+  </hash>
+  <hash crc32="b2e463b6" sha1="e6c18226c079a24ecfd1dcf5628f12f3c8d3bb11" name="Kids on Keys (26-3167)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1984</year>
+    <manufacturer>Spinnaker</manufacturer>
+  </hash>
+  <hash crc32="36eecac4" sha1="182250101a7320d05ef8feac1725e72b37b3dd8f" name="Kindercomp (26-3168)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1984</year>
+    <manufacturer>Spinnaker</manufacturer>
+  </hash>
+  <hash crc32="4cee1c54" sha1="4c956f3594ac9b941bfb936c2cf4b4c68200a112" name="Mega-Bug (26-3076)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1982</year>
+    <manufacturer>Steve Bjork</manufacturer>
+  </hash>
+  <hash crc32="66130daa" sha1="454138c61f494ac81e2e842d3d58df00d20feae6" name="Micro Chess V2.0 (26-3050)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1980</year>
+    <manufacturer>Personal Software</manufacturer>
+  </hash>
+  <hash crc32="7abb161b" sha1="5b57c69c50a8c10ef4e9c73faf4523982b048a7e" name="Micro Chess V2.0 (26-3050)">
+    <year>1980</year>
+    <manufacturer>Personal Software</manufacturer>
+  </hash>
+  <hash crc32="d4320300" sha1="29f75a77af62eb6cb5a35ca152a4b9f53514364b" name="Micro Painter (26-3077)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1982</year>
+    <manufacturer>DataSoft</manufacturer>
+  </hash>
+  <hash crc32="24772d4f" sha1="f812a0989d711a3c2ce82b7ec73561eab1753299" name="Microbes (26-3085)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Spectral Associates</manufacturer>
+  </hash>
+  <hash crc32="83bd6056" sha1="f7b505383ca5739a98a5130549d534c38cb1bd2f" name="Mind-Roll (26-3100)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1988</year>
+    <manufacturer>EPYX</manufacturer>
+    <pcb>banked_16k</pcb>
+  </hash>
+  <hash crc32="9c241cdc" sha1="c6de5760b75b99d131aa0bd28206be84f9e8ef8c" name="Mind-Roll (26-3100)">
+    <year>1988</year>
+    <manufacturer>EPYX</manufacturer>
+    <pcb>banked_16k</pcb>
+  </hash>
+  <hash crc32="f7653118" sha1="f752d96655f9a1bc0f9454b539a32c8405d4a41a" name="Monster Maze (26-3081)">
+    <year>1983</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="15fb39af" sha1="6a20fee9c70b36a6435ac8378f31d5b626017df0" name="Orchestra 90-CC (26-3143)">
+    <year>1984</year>
+    <manufacturer>Tandy</manufacturer>
+    <pcb>orch90</pcb>
+  </hash>
+  <hash crc32="54094dea" sha1="7c85ec411d4a7fc088cf18ae2886ff63c0d5972b" name="Panic Button (26-3147)">
+    <year>1983</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="d577436a" sha1="2826351f5dc33367f7f2b17502de163550cc4ab4" name="Personal Finance (26-3101)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1980</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="73c41fde" sha1="36cf2f33f9d8350da08c73eb04e23a1988907593" name="Personal Finance II (26-3106)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1983</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="d5baf3ad" sha1="ee64647d5e0b5a8fd83bdfa7c41d846b570d9170" name="Pinball (26-3052)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1980</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="f7dcc3bb" sha1="e0a80962bd95239c109a450da6fc132f7799345f" name="Polaris (26-3065)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="770e5f3a" sha1="6805cda6d138c6b68c173c09c0113470b7407e88" name="Poltergeist (26-3073)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1982</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="7f507089" sha1="f9cc452f5492d98abbd4c3ba6d99ab7cef81db13" name="Popcorn (26-3090)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Steve Bjork</manufacturer>
+  </hash>
+  <hash crc32="4ef9c448" sha1="f2c053489a0c51d33eb2570831ecab2b7ce420dc" name="Popcorn (26-3090)">
+    <year>1981</year>
+    <manufacturer>Steve Bjork</manufacturer>
+  </hash>
+  <hash crc32="4123fb50" sha1="ca2356a3032344d0065a3885b4ff92c9e3aa25eb" name="Project Nebula (26-3063)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="3218e0f5" sha1="e5afd97e69ae4d0a1ae4a3283b5321a6bef9091f" name="Quasar Commander (26-3051)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1980</year>
+    <manufacturer>Robert G. Kilgus</manufacturer>
+  </hash>
+  <hash crc32="c8b64049" sha1="5e3d4d57cd19a71ecd668ff7ce0d05d0adf30e93" name="RAD Warrior (26-3162)">
+    <year>1987</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="09c2e97d" sha1="02c6a560ede8b3b87fb8420ee05ba9ac6704f101" name="Rampage! (26-3174)">
+    <year>1989</year>
+    <manufacturer>Activision</manufacturer>
+  </hash>
+  <hash crc32="fad4c7e3" sha1="288f3d0afc38aeb858f313ea4a67b7c046ae0e91" name="Reactoid (26-3092)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1983</year>
+    <manufacturer>Robert Arnstein</manufacturer>
+  </hash>
+  <hash crc32="dd94dd06" sha1="82ad8a207a446d99455926bd27d4490578de2b41" name="RoboCop (26-3164)">
+    <year>1988</year>
+    <manufacturer>Data East</manufacturer>
+    <pcb>banked_16k</pcb>
+  </hash>
+  <hash crc32="3bf566bb" sha1="ab471a6ab6e5e5636278dd1a211e539503a998b1" name="Roman Checkers (26-3071)">
+    <year>1981</year>
+    <manufacturer>The Image Producers</manufacturer>
+  </hash>
+  <hash crc32="5a54973c" sha1="0c500d34b4fd1170093cdf3209a201d14b86160a" name="Shanghai (26-3084)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1987</year>
+    <manufacturer>Activision</manufacturer>
+  </hash>
+  <hash crc32="3dc0ba73" sha1="8b93f09e68d21509871d67391e0cde4864d5ce28" name="Shanghai (26-3084)">
+    <status>Known Bad Image</status>
+    <year>1987</year>
+    <manufacturer>Activision</manufacturer>
+  </hash>
+  <hash crc32="1f1ba95d" sha1="472c50185ca129c84729e9cbddd1d5b3d10c1bce" name="Shooting Gallery (26-3088)">
+    <year>1982</year>
+    <manufacturer>DataSoft</manufacturer>
+  </hash>
+  <hash crc32="fe17e96d" sha1="c49bc7ee1571e3fba5d6e29b8c7672c8df767a9f" name="Silpheed (26-3054)">
+    <year>1988</year>
+    <manufacturer>Sierra</manufacturer>
+  </hash>
+  <hash crc32="bed7dcde" sha1="42f70dacfd1a81ec0e052d7f325e7751855d1113" name="Silpheed (26-3054)">
+    <year>1988</year>
+    <manufacturer>Sierra</manufacturer>
+  </hash>
+  <hash crc32="1a05a395" sha1="f60694dc36f2c1b92fc0d407b5cac9ad49ca26a9" name="Skiing (26-3058)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Robert G. Kilgus</manufacturer>
+  </hash>
+  <hash crc32="b98d5eaf" sha1="72a781c467c4c8562dfc953c063208b1d17f5758" name="Slay the Nereis (26-3086)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1983</year>
+    <manufacturer>Spectral Associates</manufacturer>
+  </hash>
+  <hash crc32="44390e55" sha1="dcc394b84d2c644e0d74c9a439dff24065e580c2" name="Soko-Ban (26-3161)">
+    <year>1988</year>
+    <manufacturer>Spectral Associates</manufacturer>
+  </hash>
+  <hash crc32="f4700120" sha1="9ab7f2499d52e77ec64d8c3812d7d0cde8b7f8a5" name="Space Assault (26-3060)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="80d7ac8b" sha1="8cd0ba6f25c177295df2a42b989ce88d44888e39" name="Spectaculator (26-3104)">
+    <year>1983</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="ec9d0199" sha1="b28d9042e72b249c75ca78d38719a625a6d98dec" name="Spidercide (26-3049)">
+    <year>1983</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="f47d3880" sha1="31b54b74e8c1ee018b905d4f76cd5a6341954301" name="Springster (26-3078)">
+    <year>1987</year>
+    <manufacturer>Spectral Associates</manufacturer>
+  </hash>
+  <hash crc32="36f31eb7" sha1="27e27b03245e603f03dfb33b1b630bebadb8d8d9" name="Starblaze (26-3094)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1983</year>
+    <manufacturer>Greg Zumwalt</manufacturer>
+  </hash>
+  <hash crc32="aeb38e39" sha1="d2d4fa14e8358aac975ede5a5c2e972daab60a37" name="Stellar Lifeline (26-3047)">
+    <year>1983</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="e8e54cbe" sha1="10f4e78255d61dce2c882f9a136a94cbb7860fc1" name="Super Pitfall (26-3171)">
+    <year>1988</year>
+    <manufacturer>Activision</manufacturer>
+  </hash>
+  <hash crc32="f4f2b0a0" sha1="2f43b65084c90114ee4951792e0eec31bb3c333b" name="Temple of ROM (26-3045)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1984</year>
+    <manufacturer>Rick Adams</manufacturer>
+  </hash>
+  <hash crc32="99de1a03" sha1="553fce950a794d3fee3cc98408e0eb1098d61af3" name="Tennis (26-3080)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="8375f98b" sha1="bc8d2f56126a330aa3607d01a232523ed99ee481" name="Tetris (26-3163)">
+    <year>1987</year>
+    <manufacturer>Greg Zumwalt</manufacturer>
+  </hash>
+  <hash crc32="0ef0df20" sha1="36919b37f858ecf71c77ee7a766370fd6d4a6b7e" name="Thexder (26-3072)">
+    <year>1987</year>
+    <manufacturer>Sierra</manufacturer>
+  </hash>
+  <hash crc32="54f38ab8" sha1="8249b036ed2add30c864ee167ebfe940ea7e29aa" name="TypeMate (26-3155)">
+    <year>1988</year>
+    <manufacturer>ZCT Systems</manufacturer>
+  </hash>
+  <hash crc32="cebd3196" sha1="d5d8e2c1df18120f0c72fd70bf3ca077e74aed5c" name="Typing Tutor (26-3152)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1980</year>
+    <manufacturer>Leah R. O'Connor</manufacturer>
+  </hash>
+  <hash crc32="8987b1e3" sha1="6c3180d15b6684c853221380a0887306b426a58e" name="Videotex V1.1 (26-2222)">
+    <year>1981</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="1cd04106" sha1="7efbe2049d4879d4005b47a95e2495fc4548409d" name="Videotex V1.2 (26-2222)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1981</year>
+    <manufacturer>Tandy</manufacturer>
+  </hash>
+  <hash crc32="ab96914a" sha1="dd7a884f3d55ce9787285517ea29e993b7aae57a" name="Wildcatting (26-3067)">
+    <status>GoodCoCo Verified Image</status>
+    <year>1982</year>
+    <manufacturer>Harlow B. Staley</manufacturer>
+  </hash>
+  <hash crc32="7f0edf28" sha1="6ca61e29c136ec8201492ca7f9eb050912f3582d" name="Extended ADOS">
+    <pcb>coco_fdc</pcb>
+  </hash>
+  <hash crc32="d990e1f9" name="RS-232 Pak">
+    <pcb>rs232</pcb>
+  </hash>
+</hashfile>

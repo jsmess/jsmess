@@ -1,0 +1,2203 @@
+<hashfile>
+	<!-- This MESS HASH file was auto-generated from Cowering's GoodSMS database (V3.13a)  -->
+	<!-- for the exclusive use of MESS.  Keep this notice intact if editing this file  -->
+
+	<hash crc32="d87316f6" sha1="6dfb51aa9581065ef370a36b57e102a6d0a64c1b" name="#gscept Intro by blindio (PD)"> </hash>
+	<hash crc32="993fddf9" sha1="c757b08499f9cf08090c9cb83be7ce421be8c7ac" name="102 Example Programs for Yeno (SF-7000)"> </hash>
+	<hash crc32="f0f35c22" sha1="2012763dc08dedc68af8538698bd66618212785d" name="20-em-1 (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a581402e" sha1="91fdefc0a3d009d116e91e844496884b18b2aa49" name="64 Color Palette Test (PD)"> </hash>
+	<hash crc32="887d9f6b" sha1="08a79905767b8e5af8a9c9c232342e6c47588093" name="Ace of Aces (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d91b340d" sha1="5dbcfb75958f4cfa1b61d9ea114bab67787b113e" name="Action Fighter (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3658f3e0" sha1="b462246fed3cbb9dc3909a2d5befaec65d7a0014" name="Action Fighter (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="72420f38" sha1="3fc6ccc556a1e4eb376f77eef8f16b1ff76a17d0" name="Addams Family, The (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="ecf491cf" sha1="2a9090ed365e7425ca7a59f87b942c16b376f0a3" name="Aerial Assault (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1c951f8e" sha1="51531df038783c84640a0cab93122e0b59e3b69a" name="After Burner (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="fc79b585" sha1="c9090eb06b58e16e0c3f68231c43eb2f7c55ce75" name="After Burner (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="8b43d21d" sha1="4edd1b62abbbf2220961a06eb139db1838fb700b" name="Air Rescue (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7337abb7" sha1="0040a484e2e5ce1a86c296a78d5cdb21c5273c6f" name="Air Rescue (E)[T+Bra_Emutrans]">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="8b4ca9e4" sha1="7fa59da6aed5eb290e756aeeb7b6c00c6ce7a74c" name="Air Rescue (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="7338d04e" sha1="e285b0757537945aae8479bf12cb440a884c8cdf" name="Air Rescue (E) [T+Bra_Emutrans]"> </hash>
+	<hash crc32="60c19645" sha1="6a0a21426cadadb5567907d9cc4cdaf63195d5c3" name="Akai Koudan Zillion (J) (V1.0)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c8718d40" sha1="585967f400473e289cda611e7686ae98ae43172e" name="Aladdin (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f69c331a" sha1="eaad554efad3728b930e638a0780a4bf3ee17c0e" name="Aladdin (E) [T+Bra_Imp4444]"> </hash>
+	<hash crc32="615d8d35" sha1="7bbfa2e6f2667059090932b1c01d2f2ee2b2d23d" name="Aladdin (E) [T+Fre_GenerationIX]"> </hash>
+	<hash crc32="5cb24c41" sha1="e9b86aa951ce003eb71c657966369f44caee28a1" name="Aladdin (E) [T-Bra70%_lmp4444]"> </hash>
+	<hash crc32="d8c4165b" sha1="cba75b0d54df3c9a8e399851a05c194c7a05fbfe" name="Aleste (W)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f9dbb533" sha1="77cc767bfae01e9cc81612c780c939ed954a6312" name="Alex Kidd - BMX Trial (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c13896d5" sha1="6dbf2684c3dfea7442d0b40a9ff7c8b8fc9b1b98" name="Alex Kidd - The Lost Stars (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="2210f389" sha1="397651666be6d52298d59fecc026b929a6741995" name="Alex Kidd - The Lost Stars (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="013c0a94" sha1="2d0a581da1c787b1407fb1cfefd0571e37899978" name="Alex Kidd in High Tech World (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="dd6277fb" sha1="996b4c40b5b64b0e2b89fd7be22d36786f1ff4f7" name="Alex Kidd in High Tech World (UE) [T+Bra_GamesBR]"> </hash>
+	<hash crc32="29220201" sha1="b3cfe76c54c1b02457fc54a5c216615e99f04345" name="Alex Kidd in High Tech World (UE) [T+Ger1.00_Star-trans]"> </hash>
+	<hash crc32="7545d7c2" sha1="823c3051018c7acce15a7ff1d704eab5dd686a1f" name="Alex Kidd in Miracle World (B) (V1.1) [p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9f10e7f8" sha1="011e675236dbfcf18a61a006125f36254d3d3f16" name="Alex Kidd in Miracle World (B) (V1.1) [p1]">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="31e00b51" sha1="0cbf3a3aa0fa94d537030eed0b3455b1d1bd4b2f" name="Alex Kidd in Miracle World (B) (V1.1) [p1][o1]"> </hash>
+	<hash crc32="08c9ec91" sha1="62fdc25501e17b87c355378562c3b1966e5f9008" name="Alex Kidd in Miracle World (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9c99ed7b" sha1="bff3aa67268309f079696d596ca7e650165e9af9" name="Alex Kidd in Miracle World (J) [T+Fre_Terminus]"> </hash>
+	<hash crc32="4213fa16" sha1="c3deb4daa9966ad698c041d7904419b1fb40a891" name="Alex Kidd in Miracle World (U) (V1.0) [T+Ita1.0_Anthrax]"> </hash>
+	<hash crc32="17a40e29" sha1="8cecf8ed0f765163b2657be1b0a3ce2a9cb767f4" name="Alex Kidd in Miracle World (U) (V1.0)"> </hash>
+	<hash crc32="aed9aac4" sha1="6d052e0cca3f2712434efd856f733c03011be41c" name="Alex Kidd in Miracle World (UE) (V1.1)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="84286131" sha1="3f4b2c76919202d24fb6ee8774842eb978157e98" name="Alex Kidd in Miracle World (UE) (V1.1) [o1]"> </hash>
+	<hash crc32="f8144914" sha1="7a061cc1fcd5d41f4a7fa053cd390a0a5e7e3c7e" name="Alex Kidd in Miracle World (UE) (V1.1) [o2]"> </hash>
+	<hash crc32="8938b5c8" sha1="1f500a381cb2322fc3b13d0e9e2e766d31c5043b" name="Alex Kidd in Miracle World (UE) (V1.1) [T+Bra_CBT]"> </hash>
+	<hash crc32="b33817ae" sha1="4cc0c4a3c5ee7820097da7cee678831beb49e7ca" name="Alex Kidd in Miracle World (UE) (V1.1) [T+Fre][a1]"> </hash>
+	<hash crc32="944bed08" sha1="de4a12603bc721551caeced7fa83ca3a46130697" name="Alex Kidd in Miracle World (UE) (V1.1) [T+Fre]"> </hash>
+	<hash crc32="5bcd77ed" sha1="7ca11ce9aff9c14e1ad61fcf17caa91237f34935" name="Alex Kidd in Miracle World (UE) (V1.1) [T+Ita1.0]"> </hash>
+	<hash crc32="61273f35" sha1="a0ace9411b04baf5ed77299262cf4d4c462559a9" name="Alex Kidd in Miracle World (UE) (V1.1) [T-Bra_CBT][a1]"> </hash>
+	<hash crc32="d7d01766" sha1="63665970a6b6f12eeafaf082c35070d3e62ba6e3" name="Alex Kidd in Miracle World (UE) (V1.1) [T-Bra_CBT]"> </hash>
+	<hash crc32="d2417ed7" sha1="e7c7c24e208afb986ab389883f98a1b5a8249fea" name="Alex Kidd in Shinobi World (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="2cd7dec7" sha1="7fe4be956d2fe73a5e8b68946486157d509a0e5c" name="Alex Kidd in Shinobi World (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="99b590d5" sha1="93a77fa0e807d1ab89f7a61f5d7e429434caabbf" name="Alex Kidd in Shinobi World (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="587e41d5" sha1="83ccf0b391dc3322c7a0d8a7b652ec0e8d9688b5" name="Alex Kidd in Shinobi World (UE) [T+Fre_Terminus]"> </hash>
+	<hash crc32="82038ad4" sha1="7706485b735f5d7f7a59c7d626b13b23e8696087" name="ALF (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="b618b144" sha1="be40ffc72ee19620a8bac89d5d96bbafcefc74e7" name="Alien 3 (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7f30f793" sha1="aece64ecbfbe08b199b29df9bc75743773ea3d34" name="Alien Storm (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="4cc11df9" sha1="5d786476b275de34efb95f576dd556cf4b335a83" name="Alien Syndrome (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5cbfe997" sha1="0da0b9755b6a6ef145ec3b95e651d2a384b3f7f9" name="Alien Syndrome (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="bba2fe98" sha1="413986f174799f094a8dd776d91dcf018ee17290" name="Altered Beast (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7b27202f" sha1="fff4006fe47de8138db246af8863e28b81718abe" name="American Baseball (JE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3727d8b2" sha1="986b860465fc9748c6be1815c0e4c0ea94473040" name="American Pro Football (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f499034d" sha1="81dbacad4739b98281c750d9af21606275398fc8" name="Andre Agassi Tennis (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="009f8630" sha1="e17f86d06a741f2d0538f5b55967e0c441a00428" name="Andre Agassi Tennis (E) [T+Bra][p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="fff63b0b" sha1="74057d3b7f384c91871a2db2fbc86d3e700c45e5" name="Anmitsu Hime (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="ca270f40" sha1="38916ce0becf7eab5889c417789d1f8c2ab8bbfe" name="AntiISDA Warrior by Ventzislav Tzvetkov (V1.00) (PD)"> </hash>
+	<hash crc32="7408ef2f" sha1="fdc16e9085f645672a6a778b176d68f593e983d1" name="AntiISDA Warrior by Ventzislav Tzvetkov (V1.01) (PD)"> </hash>
+	<hash crc32="b3e5986e" sha1="a83f6d91de84ff63655edb492a0a61725600e7d9" name="AntiISDA Warrior by Ventzislav Tzvetkov (V1.02) (PD)"> </hash>
+	<hash crc32="e4163163" sha1="44ed3aeaa4c8a627b88c099b184ca99710fac0ad" name="Arcade Smash Hits (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="bae75805" sha1="a4b63ed417380f8170091e66c0417123799a731f" name="Argos no Juujiken (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="32da4b0d" sha1="6c11879612dc00c18f6d2a1823bdd26522dc9c91" name="Argos no Juujiken (J) [a1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f4b3a7bd" sha1="77a35c0b622786183d6703a5d7546728db44b68d" name="Ariel - The Little Mermaid (B)"> </hash>
+	<hash crc32="66c125f1" sha1="1dfda4bc44f1cdc54ab92bb31df54365edd385ae" name="Artillery Master 8k V0.9 by Haroldo O. Pinheiro (PD)"> </hash>
+	<hash crc32="e1714a88" sha1="1b4f7eca8a3f04ead404e6f439a6c49a0d0500df" name="As Aventuras da TV Colosso (B)"> </hash>
+	<hash crc32="ae705699" sha1="e9f90d63320295e4bd9a87e6078186c5efb7e84e" name="Ashura (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="861b6e79" sha1="835217550ecb92422d887a3353ff43890c71566b" name="Assault City - Light Phaser Version (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="0bd8da96" sha1="ea46350ce4827b282b73600a7f4feadbec7c0ed4" name="Assault City - Pad Version (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="147e02fa" sha1="70e311421467acd01e55f1908eae653bf20de175" name="Asterix (E) (V1.0)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8c9d5be8" sha1="ae56c708bc197f462b68c3e5ff9f0379d841c8b0" name="Asterix (E) (V1.1)"> </hash>
+	<hash crc32="f9b7d26b" sha1="5e409247f6a611437380b7a9f0e3cccab5dd1987" name="Asterix and the Great Rescue (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="def9b14e" sha1="de6a32a548551553a4b3ae332f4bf98ed22d8ab5" name="Asterix and the Secret Mission (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c795182d" sha1="8370957b1192349d0a610437cd5d91ea4e3892c4" name="Astro Flash (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="0e21e6cf" sha1="e522a7ad519091a0955a6cf54590a7bd9708c56f" name="Astro Flash (J) [p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="69efd483" sha1="2b3a9da256f2918b859ebcb6ffa1b36a09e7595d" name="Astro Warrior &amp; Pit Pot (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6a9eaef7" sha1="ff9a67839bb974e2ec24df28babbe79b4b8a9891" name="Astro Warrior &amp; Pit Pot (E)[o1]">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="d7c7ff54" sha1="59effe74a9e7b3b8993ecb04f7b2e6ded1f679b3" name="Astro Warrior &amp; Pit Pot (E) [o1]"> </hash>
+	<hash crc32="299cbb74" sha1="901697a3535ad70190647f34ad5b30b695d54542" name="Astro Warrior (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="fe8e978b" sha1="7ec6b921cc5cf0222c1e4a967014dc67e96cd426" name="Astro Warrior (U)[o1]">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="bbe02270" sha1="8b18fa4921bb40b11dffe519127b82a717f51098" name="Astro Warrior (U)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="4184e4c4" sha1="0057804295650fb09c28a0c0c7ea28b9ff9b2606" name="Astro Warrior (U)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="e890331d" sha1="b6819b014168aaa03b65dae97ba6cd5fa0d7f0d9" name="Ayrton Senna's Super Monaco GP II (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="ff614eb3" sha1="317775a17867530a8fe3a5b17b681d5ada351432" name="Aztec Adventure - The Golden Road to Paradise (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="884a18b9" sha1="c1413e0dbccd8ab1c3f53157a3b828daebd9c43b" name="Aztec Adventure - The Golden Road to Paradise (UE) [o1]"> </hash>
+	<hash crc32="e5ff50d8" sha1="31af58e655e12728b01e7da64b46934979b82ecf" name="Back to the Future Part II (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="2d48c1d3" sha1="7d67dd38fea5dba4224a119cc4840f6fb8e023b9" name="Back to the Future Part III (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="35d84dc2" sha1="07d8f300b3a3542734fcd24fa8312fe99fbfef0e" name="Baku Baku Animals (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="655fb1f4" sha1="661bbe20f01b7afb242936d409fdd30420c6de5f" name="Bank Panic (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="b4dfb825" sha1="983c10f9431e19e0f79627cf72d5425895fd32f8" name="Bank Panic (E) [p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d8a87095" sha1="8e1dc4d79c5bc45fc6112969ea9a2c68b3c86666" name="Bank Panic (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="0df8597f" sha1="0fa1156931c83763bc6906efce75045327cdd7aa" name="Basket Ball Nightmare (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7163231c" sha1="d0842716f018f8af20946f1d4b59eb349ab559b2" name="Basket Ball Nightmare (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="cf97932d" sha1="753b0ec9fa500e038163b27e810cf10ce337a000" name="Basket Ball Nightmare (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="b154ec38" sha1="0ccc0e2d91a345c39a7406e148da147a2edce979" name="Batman Returns (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c19430ce" sha1="cfa8721d4fc71b1f14e9a06f2db715a6f88be7dd" name="Battle Out Run (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1cbb7bf1" sha1="0854e36d3bb011e712a06633f188c0d64cd65893" name="Battlemaniacs (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="da3a2f57" sha1="7c5524cff2de9b694e925297e8e74c7c8d292e46" name="Black Belt (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9fa3b61a" sha1="9aa1cbd479e3433d9644f02e54469f973b6688a5" name="Black Belt (UE) [o1]"> </hash>
+	<hash crc32="26ecd094" sha1="7ecb9ac646346900046a61ff0242d6c90a812eda" name="Black Onyx, The (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8ecd201c" sha1="b786d15b26b914c24cd1c36a8fca41b215c0a4e7" name="Blade Eagle 3D (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="fbf96c81" sha1="6465f8b1159078d7fafeba4fed674a07d1b66c7e" name="Blade Eagle 3D (UE) [T+Bra]"> </hash>
+	<hash crc32="fc259738" sha1="1d0ca7f98a3cfc11388d375ee980fb3ea1968d97" name="Blade Eagle 3D (UE) [T+Bra_TMT]"> </hash>
+	<hash crc32="6994770d" sha1="05fbfaf8880b4cdd595d4afa586b8004752015cb" name="Blockhead v20040714 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="aed594a2" sha1="d7cb1abc4c8378469cfb31c04f5d6e92d9924db5" name="Blockhead v20040807 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="a11b791c" sha1="f5c1c5b0bc89a2593b1213c2002b6fd449f19a91" name="Blockhead v20041016 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="79a1d911" sha1="9061b3a9015618488e60c4224cff806e1f2838d2" name="Blockhead WIP1 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="2734a9b4" sha1="1bf83f9be51226d3311aa604e30b39a20c1a1fdc" name="Blockhead WIP2 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="7694ed1c" sha1="acd8e2f4985a2181fdde21b9906f7ae3d5bfbed9" name="BMP2Tile Demo (PD)"> </hash>
+	<hash crc32="1d43a351" sha1="cc6ddee5221fb0ce65dc60228b5cdfd026a26747" name="Bock's Birthday 2002 by Maxim (PD)"> </hash>
+	<hash crc32="c07cb738" sha1="e50ce7e24774bb5239323350caf9bea9fafd4dba" name="Bock's Birthday 2003 by Maxim (PD)"> </hash>
+	<hash crc32="31a5ca6a" sha1="5d1ce5bcb980c34ec26ee10500390cc1331bd7bb" name="Bock's Birthday 2004 by xiao (PD)"> </hash>
+	<hash crc32="f0f53c64" sha1="a5e84ebb07220f7b7fafaef4dd0e9b4092e0cfb4" name="Bock's Birthday 2006 by Charles MacDonald (PD)"> </hash>
+	<hash crc32="ea0f2691" sha1="7859b9ee5614c595cb57a832ef7a8f1ab473b45b" name="Bomb Jack (SG-1000)"> </hash>
+	<hash crc32="3084cf11" sha1="d754ef2b6e05c76502c02c71dbfcf6150ee12f6f" name="Bomber Raid (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8a3ed944" sha1="f33f44507cf5d013505c360a81ad052166dfb7aa" name="Bomber Raid (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="e5fa2fab" sha1="65e513dfeaccebdaafa087e67f23caabff7b3bd1" name="Bomber Raid (UE) [T+Bra_TMT]"> </hash>
+	<hash crc32="caea8002" sha1="bbaedefa0bb489ece4bbd965f09a417be4b76cc7" name="Bonanza Bros (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="b3768a7a" sha1="e1f8da3897f0756c8764ece6605f940ce79e81ca" name="Bonkers Wax Up! (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="0b4bca74" sha1="b967340fa91d960f86548f15e6d25a8e7e2c5043" name="Borderline (SG-1000)"> </hash>
+	<hash crc32="1b10a951" sha1="6c9f52cdae96541020eaaa543ca6f729763f3ada" name="Bram Stoker's Dracula (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="47c05b0c" sha1="07e9abfd655a4ea3197854e428963562dba9c39d" name="Bram Stoker's Dracula (E) [T+Bra_TransCenter]"> </hash>
+	<hash crc32="e843ba7e" sha1="44876b44089b4174858e54202e567e02efa76859" name="Bubble Bobble (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f7294ee1" sha1="1dd0fa2949504a5ae3e4b772318000f27c4b548a" name="Bubble Bobble (E) [T+Fre]"> </hash>
+	<hash crc32="b0fc4577" sha1="4b1975190ac9d6281325de0925980283fdce51ca" name="Buggy Run (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="ac6009a7" sha1="d0f8298bb2a30a3569c65372a959612df3b608db" name="California Games (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="13d49d42" sha1="efd94b3fcf0a964907f2389def4dd0875927f9f8" name="California Games (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="9f28e5f4" sha1="0e8f2ec5d263210c14bf8cddef69e60e602df535" name="California Games (UE) [o1]"> </hash>
+	<hash crc32="b3b5d047" sha1="bcdc3656a7e7b63b36f937832e14baf21023401d" name="California Games (UE) [T+Bra_Emuboarding]"> </hash>
+	<hash crc32="86c1320a" sha1="bb6dc8612deb4924c59ae42a2bbcf85c83e6fa73" name="California Games (UE) [T+Bra_TMT]"> </hash>
+	<hash crc32="c0e25d62" sha1="5c7d99ba54caf9a674328df787a89e0ab4730de8" name="California Games II (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5f5d13af" sha1="ff2db6db5c7477734dc50d4efc71bf55039f55db" name="California Games II (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="eead16c7" sha1="09e537f2d84d09df9610ad3fd592ae2093a624c2" name="Canyon Racer V0.01alpha by Haroldo O. Pinheiro (PD)"> </hash>
+	<hash crc32="a4852757" sha1="88402392e93b220632a61e0c07731a7ed087cbef" name="Captain Silver (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="87bf8a47" sha1="914e0652a96e9d4a4e9aaecb212dc04575bdcb32" name="Captain Silver (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="b81f6fa5" sha1="7c2b23f4a806c89a533f27e190499243e7311c47" name="Captain Silver (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3cff6e80" sha1="8353b86965a87c724b95bb768d00dc84eeadce96" name="Casino Games (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f964f356" sha1="6d2d9f7984c67a6b9ce209c72243cd46a4b3b0d1" name="Casino Games (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="e239ed95" sha1="44874a93a34485892ccc67fd824ee34d30d1c851" name="Casino Games (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="31ffd7c3" sha1="4e40155720957a0ca7cf67d7c99bbc178e2f0fd4" name="Castelo Ra Tin Bum (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="dcd38617" sha1="1789c6eac85bd8f3d6b3aa0871c70e22776312a3" name="Castelo Ra Tin Bum (B)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="b9db4282" sha1="c31d80429801e8c927cb0536d66a16d51788ff4f" name="Castle of Illusion Starring Mickey Mouse (U) (V1.0)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="21a5434f" sha1="0e9f012ad91c8c4ef1b09f182a20a4fb13af59f3" name="Castle of Illusion Starring Mickey Mouse (U) (V1.0) [T+Fre_terminus]"> </hash>
+	<hash crc32="7a47ae9f" sha1="f135c33b26f4572a3f846a29b9254cc41d834b01" name="Castle of Illusion Starring Mickey Mouse (U) (V1.0) [T+Ita0.99_darq]">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="953f42e1" sha1="c200b5e585d59f8bfcbb40fd6d4314de8abcfae3" name="Castle of Illusion Starring Mickey Mouse (U) (V1.1)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6203efbb" sha1="e3e319d903c797ab8772be4d921b4c7511763f37" name="Castle of Illusion Starring Mickey Mouse (U) (V1.1)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="56a3aefc" sha1="99e4aa1fcf43dd19ed2d52789673150b99af711d" name="Castle of Illusion Starring Mickey Mouse (U) (V1.1) [T+Ita0.99_darq]"> </hash>
+	<hash crc32="092f29d6" sha1="2681786bffccf58b59410c331865d30a4d027087" name="Castle, The (SG-1000)"> </hash>
+	<hash crc32="d37bda49" sha1="08b5c1135f9678465ece6a886c948ce091637372" name="Chack'n Pop (SG-1000)"> </hash>
+	<hash crc32="5970a12b" sha1="737b9478c4ce6df2afcd36f78011019f5d669226" name="Champion Baseball (SG-1000)"> </hash>
+	<hash crc32="62b21e31" sha1="f517e6a6123643a5e7e5fff6b413139afa412d8e" name="Champion Billards (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f8b2ac1d" sha1="7a7ace132090f11bac4f4aec58bcbf6a2a1c6168" name="Champion Boxing (SG-1000 Card)"> </hash>
+	<hash crc32="26f947d1" sha1="8cd55ee1efcab917087b80629ca18b4629edc15d" name="Champion Boxing (SG-1000 Cart)"> </hash>
+	<hash crc32="868419b5" sha1="05deb000f24b7d8625c6e9332dcc91416ed3258f" name="Champion Golf (SG-1000)"> </hash>
+	<hash crc32="bdc05652" sha1="ff6440fc7e5c5faa0b9868d5cb5110d1d8635284" name="Champion Ice Hockey (SG-1000)"> </hash>
+	<hash crc32="10cdebce" sha1="8565fc398d0206100da785d10e008f7f6a3c225e" name="Champion Kendou (SG-1000)"> </hash>
+	<hash crc32="372fe6bc" sha1="3bdb1e9d8b1a04d8fcc242c47be790c427a75403" name="Champion Pro Wrestling (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6f39719e" sha1="0b3cf82f020ac9249ea52766ffbad41515d0b8b4" name="Champion Soccer (SG-1000)"> </hash>
+	<hash crc32="7c663316" sha1="8b90300dcabc2cf8d58ee4800dce3084b739886b" name="Champion Tennis (SG-1000)"> </hash>
+	<hash crc32="23163a12" sha1="e1d0b1b25b7d9bb423dadfe792bd177e01bc2ca2" name="Champions of Europe (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7e5839a0" sha1="d11eefe122de42a73d221d9efde1086d4a8ce147" name="Championship Hockey (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="11db4b1d" sha1="a0dad095489da2bdf8ec03f1acc83f809db2371f" name="Championship Loderunner (SG-1000)"> </hash>
+	<hash crc32="492c7c6e" sha1="6590080f5db87afab1286f11ce77c60c3167b2b7" name="Chapolim x Dracula - Um Duelo Assustador (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="46340c41" sha1="09edc943fc6da8657231b09f75d5e5c6bbbac24d" name="Cheese Cat-astrophe (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="4bf77ec9" sha1="90655be22fad792a674a6ee9c9cd2ef8935e7ac6" name="Cheese Cat-astrophe (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="5cb841dd" sha1="4afd95fc1d0ee4cd6e110767c8d406ae1d0187b6" name="Chkstate Demo by Dave (PD)"> </hash>
+	<hash crc32="16ec3575" sha1="c8e87b309bbae6af7cf05602ffbd28f9495c83d8" name="Choplifter (J) (Prototype)"> </hash>
+	<hash crc32="ff435469" sha1="da92459e64ed6cc0ce93b03a60fad049e13a505f" name="Choplifter (SG-1000) (Prototype)"> </hash>
+	<hash crc32="732b7180" sha1="e0828517fdc9a5537fda39dbc49942494eb3196d" name="Choplifter (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="4a21c15f" sha1="856e741eec9692fcc3b22c5c5642f54482e6e00b" name="Choplifter (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="75eb037d" sha1="eeb5107700b837b9cf1027b95649514798aca1d9" name="Choplifter (UE)[o1]">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="c96fcd19" sha1="529caa100ee2b76a3917eb4133e62c1d90bdbdd2" name="Choplifter (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="debb2e3a" sha1="a1241ef23c436c3f4b10fdde1081c215d59fb078" name="Choplifter (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="fd6fcfce" sha1="760a4a365d23188cb3e48d07b117a9abe974c549" name="Choplifter (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="8c02d693" sha1="53f11d76010f0adb164d9bef60b7121c8121ff14" name="Choplifter (UE) [o1]"> </hash>
+	<hash crc32="e421e466" sha1="9f987e022090a40506b78d89523e9f88b3bb0c0b" name="Chouon Senshi Borgman (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="dd0e2927" sha1="0199c62afb5c09f09999a4815079875b480129f3" name="Chuck Rock (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="87783c04" sha1="b966120d9eacea683bc136c405c50a81763ecab8" name="Chuck Rock II - Son of Chuck (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c30e690a" sha1="46c326d7eb73b0393de7fc40bf2ee094ebab482d" name="Chuck Rock II - Son of Chuck (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8fb75994" sha1="34307a745d3d52a4b814e9831b7041f25e8052d1" name="Circuit, The (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="e7f62e6d" sha1="b936276b272d8361bca8d7b05d1ebc59f1f639bc" name="Cloud Master (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="13d762eb" sha1="7ea1c5d90f0750c243403d0f11f0e5dd48f43705" name="Cloud Master (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="aa21bdf1" sha1="546b8c95405eda86d2917397c724922fc563e391" name="Cloud Master (UE) [o1]"> </hash>
+	<hash crc32="84e45c25" sha1="1f07da14310bdb244be18d94a64b192934687996" name="Cloud Master (UE) [T+Fre100]"> </hash>
+	<hash crc32="bfee193c" sha1="2d4ee3f01400648c533e47cd8f551b9e9a4b1c5f" name="Code 38 - Volume I (PD)"> </hash>
+	<hash crc32="7253c3ec" sha1="3d23afcc802cd414849b0eac69ce712bf2fa72ff" name="Color &amp; Switch Test (PD)"> </hash>
+	<hash crc32="665fda92" sha1="3d16b0954b5419b071de270b44d38fc6570a8439" name="Columns (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="ad19c0a0" sha1="e12dd5f93df9f536ce4e6f7c445467358c31145a" name="Complete Arcade Pack Collection, The (SF-7000)"> </hash>
+	<hash crc32="b09e2e6d" sha1="01b65ecfb5307bff0d8222f266b9d641b6a203db" name="Congo Bongo (SG-1000) [a1]"> </hash>
+	<hash crc32="dc4383cc" sha1="96dd55a63bae0abc666fe317d50612116100d7b1" name="Congo Bongo (SG-1000)"> </hash>
+	<hash crc32="13ac9023" sha1="cf36c1900d1c658cbfd974464761d145af3467c8" name="Cool Spot (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="cc92058a" sha1="cd158f5a1a58617f5af57322554d80a538aabece" name="Cool Spot (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="43600bb1" sha1="3ab41c5f531840743c128cbf73520746332fba26" name="Copyright Violation by Nicolas Warren (PD)"> </hash>
+	<hash crc32="29822980" sha1="f46f716dd34a1a5013a2d8a59769f6ef7536a567" name="Cosmic Spacehead (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c98e8e96" sha1="115040e3d548220ca6270054822dcff6b137b7de" name="Crocky &amp; BASIC Level IIIB (SF-7000)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="1350e4f8" sha1="991803feb42a6f0f93ac0e97854132736def2933" name="Cyber Shinobi (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c576c058" sha1="87a13e507507f08c3602bc2999b945b6f58a23fa" name="Cyber Shinobi (UE) [T+Fre]"> </hash>
+	<hash crc32="908e7524" sha1="b6131585cb944d7fae69ad609802a1b5d51b442f" name="Cyborg Hunter (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="903aad36" sha1="b27fb42d5cc3f91b228d232089735f262b0f5e1c" name="Cyborg Hunter (UE) [T+Bra]"> </hash>
+	<hash crc32="0f2e4f1e" sha1="de871501d86c48fdc4b86cbd215e7be4ec047631" name="Cyborg Hunter (UE) [T+Fre_Terminus]"> </hash>
+	<hash crc32="bdd034ee" sha1="b310851284a5f9c9ffdc61ba520a79cba17db82e" name="Cyborg Hunter (UE) [T+Ita1.00]"> </hash>
+	<hash crc32="71abef27" sha1="50ab645971b7d9c25a0a93080f70f3a9c6910c59" name="Daffy Duck in Hollywood (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="97f8dcc8" sha1="c81dd94fd35b1ec680f46f8ad901cd079b98bc04" name="Damiana (PD)"> </hash>
+	<hash crc32="ae4a28d7" sha1="c99f2562117a2bf7100a3992608e9a2bcb50df35" name="Danan the Jungle Fighter (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7cc2a20b" sha1="a0da40b93630017227da9777b109ed29dc04eea1" name="DCEvolution.net Intro (PD)"> </hash>
+	<hash crc32="e2f7193e" sha1="0236c5239c924b425a99367260b9ebfa8b8e0bca" name="Dead Angle (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5ef8dbda" sha1="20aff3ef3287f19e41e0958e0e922bfab5c8ca75" name="Dead Angle (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="42fc3a6e" sha1="26ec82b96650a7329b66bf90b54b869c1ec12f6b" name="Deep Duck Trouble (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="b137007a" sha1="60e2b6ec69d73dd73c1ef846634942c81800655b" name="Desert Speedtrap - Starring Road Runner and Wile E. Coyote (E) (M5)"> </hash>
+	<hash crc32="6c1433f9" sha1="e6181baef80ecc88b3eb82a46cf93793f06e01f1" name="Desert Strike (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="df8c8f76" sha1="c3ecf4206eb85e1f9d1dfb8428af33b7f8c01feb" name="Desert Strike (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="82efda3c" sha1="281b6ad0518ab98b685578b190f7eba4eab6374a" name="Desert Strike (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="f6fab48d" sha1="b788f0394aafbc213e6fa6dcfae40ebb7659f533" name="Dick Tracy (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c4ca6878" sha1="4f95f34795e817626b1fd39966eca448009c1e51" name="Digger Chan by Aypok (PD)"> </hash>
+	<hash crc32="ea5c3a6f" sha1="05b4f23e33ada08e0a8b1fc6feccd8a97c690a21" name="Dinobasher - Starring Bignose the Caveman (Prototype)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="89b79e77" sha1="9ebd5a7b025e980795eaac206f3f6f5dc297084f" name="Dodgeball King (K)"> </hash>
+	<hash crc32="fdc095bc" sha1="176e2d2648b20e6fac823021697138803ef38b27" name="Doki Doki Penguin Land (SG-1000)"> </hash>
+	<hash crc32="a55d89f3" sha1="cad5532af94ed75c0ada8820a83fa04d22f7bef5" name="Double Dragon (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="e730bb27" sha1="324fe5ae2172de7bb489acfb8945a4d97d8dae5a" name="Double Dragon (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="3b79d63e" sha1="395406ce1ed2ccaa6f3415c66558bbd3c53a2880" name="Double Dragon (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="c154f62c" sha1="ddc7a28aa6985660739e620602cea71e5147953e" name="Double Dragon (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="8370f6cd" sha1="d2428baf22da8a70a08ff35389d59030ce764372" name="Double Hawk (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="52d9eaf1" sha1="76d8b47310f5d2b48bf1aa091292bb9b40b0d17a" name="Double Hawk (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="52b83072" sha1="51f9ce05e383983ce1fe930ec178406b277db69c" name="Double Target (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="16537865" sha1="8206e4b1df9468f4f60e654a0a4044083bd6e5d1" name="Dr. HELLO (K)"> </hash>
+	<hash crc32="6c696221" sha1="89df035da8de68517f82bdf176d3b3f2edcd9e31" name="Dr. Robotnik's Mean Bean Machine (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c88a5064" sha1="3d41a4e3b9ffc3e2ba87bd89baf13271f8560775" name="Dragon - The Bruce Lee Story (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c81c3061" sha1="991b4f0ad0bfde5fd2dc542a0bf1c2882e09ec4b" name="Dragon - The Bruce Lee Story (E) [T+Bra99%_Guto]"> </hash>
+	<hash crc32="9549fce4" sha1="021c6983fdab4b0215ca324734deef0d32c29562" name="Dragon Crystal (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="99c3de21" sha1="43807c9f634b8cf85aa5c3b2459885eedbb99955" name="Dragon Wang (SG-1000) (Ver-A)"> </hash>
+	<hash crc32="60f30138" sha1="78f26d0a1d4f08a6378700b81ab38fc7c0f6bdc0" name="Dragon Wang (SG-1000) (Ver-B)"> </hash>
+	<hash crc32="dddb3dd8" sha1="55bf216888c7980ce16510e63d33cd6f29d4e310" name="Draw Poker by Mike Beaver (PD)"> </hash>
+	<hash crc32="2e31acd2" sha1="04bd21aacb4f776d7ca11cd82d90c97f6553f23d" name="Driar (V0.05) by fx and ejdolf (PD)"> </hash>
+	<hash crc32="288940cb" sha1="607b2b9a946eaaebb938800bd3b1df7d9342388c" name="Drol (SG-1000)"> </hash>
+	<hash crc32="07306947" sha1="258901a74176fc78f9c669cd7d716da0c872ca67" name="Dynamite Duke (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="2bb5f2cd" sha1="116755e0a52a2f1ca633f497f86d1e9ce4d20f98" name="Dynamite Duke (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="0e1cc1e0" sha1="2a513aef0f0bdcdf4aaa71e7b26a15ce686db765" name="Dynamite Dux (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7db5b0fa" sha1="12877c1c9bfba6462606717cf0a94f700ac970e4" name="Dynamite Headdy (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c4bb1676" sha1="075297d2f3a8ec4c399eaeab6b60e246e11b41fe" name="E-SWAT - City Under Siege (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c10fce39" sha1="c481b4e5ca136fbb4105ae465259125392faffd3" name="E-SWAT - City Under Siege (UE) [a1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c4d5efc5" sha1="a1966c2d8e75ea17df461a46c4a1a8b0b5fecd4e" name="Earthworm Jim (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6687fab9" sha1="3bfdef48f27f2e53e2c31cb9626606a1541889dd" name="Ecco the Dolphin (UE)"> </hash>
+	<hash crc32="7c28703a" sha1="61cef405e5bc71f1a603881c025bc245a8d14be4" name="Ecco the Dolphin - Tides of Time (B)"> </hash>
+	<hash crc32="5af8f69d" sha1="f72b3e44309e7c2e447c46928ce795453102f717" name="Elevator Action (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="87ab46f8" sha1="75f58c9317bfe02ce4e03e258545438577d63a8a" name="Elite Gaiden V0.1.8 by Ricardo Bittencourt (PD)"> </hash>
+	<hash crc32="5d5c50b3" sha1="7a0216af8d4a5aeda1d42e2703f140d08b3f92f6" name="Enduro Racer (J)"> </hash>
+	<hash crc32="00e73541" sha1="10dc132166c1aa47ca7b89fbb1f0a4e56b428359" name="Enduro Racer (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="dfa2ae07" sha1="f050bcd787427f591be42f9ed028d9dc1fb040ff" name="Enduro Racer (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="1fe4e74d" sha1="d2aee33687778fc1cd5928ec7215b2c80eab39b8" name="Enduro Racer (UE) [T+Bra]"> </hash>
+	<hash crc32="81c3476b" sha1="6aca0e3dffe461ba1cb11a86cd4caf5b97e1b8df" name="European SMS BIOS (Sonic The Hedgehog) (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a2c45b61" sha1="839e19487b96d02222ff397b047cbc6a0fbc08ff" name="Exerion (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="eaebf323" sha1="de63ca2f59adb94fac87623fe68de75940397449" name="F-16 Fighter (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7ce06fce" sha1="0f60f545ce99366860a94fbb115ce7d8531ab7ba" name="F-16 Fighting Falcon (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="184c23b7" sha1="a8f083b3db721b672b5b023d673a64577cb48ef3" name="F-16 Fighting Falcon (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="ec788661" sha1="247fd74485073695a88f6813482f67516860b3a0" name="F1 Championship (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="b9664ae1" sha1="4202ce26832046c7ca8209240f097a8a0a84d981" name="Fantastic Dizzy (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="65d7e4e0" sha1="0278cd120dc3a7707eda9314c46c7f27f9e8fdda" name="Fantasy Zone (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="82a38ef8" sha1="4d2929237217072b9467ec8a4717e25a30d5e4d8" name="Fantasy Zone (UE) [o1]"> </hash>
+	<hash crc32="0df8d42e" sha1="9b5f2118f7a58ee568aead26eb7ce5f5e3fcb8cb" name="Fantasy Zone (UE) [T+Fre_GIX]"> </hash>
+	<hash crc32="d29889ad" sha1="a2cd356826c8116178394d8aba444cb636ef784e" name="Fantasy Zone - The Maze (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="483394f9" sha1="a47f9420ecf18344c0e97d66c8c65f1025d4c06a" name="Fantasy Zone - The Maze (UE) [o1]"> </hash>
+	<hash crc32="c722fb42" sha1="60d8135e8f15fe48f504d0ec69010a4b886dcda8" name="Fantasy Zone II - The Tears of Opa-Opa (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="b8b141f9" sha1="b84831378c7c19798b6fd560647e2941842bb80a" name="Fantasy Zone II - The Tears of Opa-Opa (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f7eaf75a" sha1="c251ce4fe4b394ba002998aff951076ae41b6ec5" name="Fantasy Zone II - The Tears of Opa-Opa (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="ccb2cab4" sha1="b7601ff0116490b85c9bd50109db175ce2dd9104" name="Felipe em Acao (B)"> </hash>
+	<hash crc32="bf6c2e37" sha1="81dd4d7f1376e639cabebecdc821e9b5a635952b" name="Ferias Frustradas do Picapau (B)"> </hash>
+	<hash crc32="9bb3b5f9" sha1="360073cb28e87a05b7f3a5922a24601981330046" name="FIFA International Soccer (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3ebb7457" sha1="ab585612fddb90b5285e2804f63fd7fb7ba02900" name="Final Bubble Bobble (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="86d6384e" sha1="1cb40bf697374c73b89623fef49951b9622a0d96" name="Final Bubble Bobble (J) [T+Spa100_pkt]"> </hash>
+	<hash crc32="f6ad7b1d" sha1="f934b35d27330cc2737d6a2d590dcef56004b983" name="Fire &amp; Forget 2 (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8b24a640" sha1="0e12ce919cda400b8681e18bdad31ba74f07a92b" name="Fire &amp; Ice (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="be31d63f" sha1="1732b4c13fd00dd5efc5bf1ccb1ab6ed3889c8ba" name="Flash, The (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d4c8c6d7" sha1="6c1a77ebec46ec730bbf255dbbd3b9a7e1e00555" name="Flicky (SG-1000)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="bd24d27b" sha1="39a91b5ad6b139ca5d8ac60b78520210e84944bd" name="Flicky (SG-1000)"> </hash>
+	<hash crc32="ca5c78a5" sha1="a0aa76d89f6831999c328877057a99e72c6b533b" name="Flintstones, The (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="38c53916" sha1="3f034429b23b6976c961595c1bcbd68826cb760d" name="Forgotten Worlds (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a93df954" sha1="c335412db8ed6b4c9a25efcf7f21d54eaff13080" name="French Board Games (SF-7000)"> </hash>
+	<hash crc32="3afbcb9c" sha1="3cd6d69318fb9a3b8ebccf41436175137794dd29" name="French Educational Games (SF-7000)"> </hash>
+	<hash crc32="634fca3e" sha1="8a293c8646e96d95dd34977cdac0c1ea78e7b0ec" name="French Electricity Utils (SF-7000)"> </hash>
+	<hash crc32="1d1a96ef" sha1="a855f9604ffdb14c3437b16a67f56d643c61d7bc" name="French Games 1 (SF-7000)"> </hash>
+	<hash crc32="06fc874e" sha1="c4341db107c02c314466661ae39be8b2a9ff8a57" name="French Games 2 (SF-7000)"> </hash>
+	<hash crc32="52d68a52" sha1="588b1e0f4b20214841dc5dcf060ab35539eb7687" name="French Graphic Example Programs (SF-7000)"> </hash>
+	<hash crc32="a8c5b0b3" sha1="7b7379131af99677ce4727fab249cd3eac3c4764" name="French Musique (SF-7000)"> </hash>
+	<hash crc32="a95013d3" sha1="508bc5b33b1517341089f55bed1f72de678faa32" name="Fri For Fransk! V1.02 by Marc Klemp (PD)"> </hash>
+	<hash crc32="dda01774" sha1="96c6fd49694e08beaf43c2fac7876c56491f9876" name="FudeBrowser - BrMSX (SG-1000) (PD)"> </hash>
+	<hash crc32="4a696389" sha1="b160f3a273bf9f675ba13f6a5a61c92c2b16bd36" name="FudeBrowser - BrSMS (SG-1000) (PD)"> </hash>
+	<hash crc32="697925ec" sha1="cfe16bd68f409de8c21631dc8fa63322ae959f5c" name="FudeBrowser - Chrissy M Picture by Newo (SG-1000) (PD)"> </hash>
+	<hash crc32="de6cc6e6" sha1="185575d35e32cd9280015a4b63a4b24c3179f220" name="FudeBrowser - Expo SALT Logo (SG-1000) (PD)"> </hash>
+	<hash crc32="dda0619b" sha1="e77f199938a5a63a1a167a449a2891e694715f79" name="FudeBrowser - Goatse Picture by Newo (SG-1000) (PD)"> </hash>
+	<hash crc32="c9a6217a" sha1="8bd5fb07dff9548afa12a48a263e569036eddb7b" name="FudeBrowser - How Do They Do That With HTML (SG-1000) (PD)"> </hash>
+	<hash crc32="4f95660e" sha1="4aa7d2466c314be8881c88be5ed4abb0accac1b2" name="FudeBrowser - Jiraiya (SG-1000) (PD)"> </hash>
+	<hash crc32="2aef0693" sha1="cf546c0a5e75c70c12ce0fb272766dd07562c956" name="FudeBrowser - Never (SG-1000) (PD)"> </hash>
+	<hash crc32="0f8a5a2a" sha1="5ce20d2b6db811deafc83f8b42144fc1bc519efd" name="FudeBrowser - Newo (SG-1000) (PD)"> </hash>
+	<hash crc32="6fbe54b1" sha1="3463d5fc43e15a045abd048c04acf4bdd9eab683" name="FudeBrowser - Sandy Style Picture by Newo (SG-1000) (PD)"> </hash>
+	<hash crc32="16695ba9" sha1="4a7aafb9059a701ec3ea4742169476371f75d9e5" name="FudeBrowser - Shurato (SG-1000) (PD)"> </hash>
+	<hash crc32="280876dc" sha1="09590758b33f704cc520d80ac28942a1558c0f05" name="FudeBrowser - Skybaby's SMS List (SG-1000) (PD)"> </hash>
+	<hash crc32="5d9aa9a7" sha1="45a2ba5e299194515c2097efc0814c8f2fcfba6f" name="FudeBrowser - Winnie Cooper (SG-1000) (PD)"> </hash>
+	<hash crc32="e6795c53" sha1="b1afa682b2f70bfc4ab2020d7c3047aabbaf9a24" name="Fushigi no Oshiro Pit Pot (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5d08e823" sha1="1298aab2a29071e258dcbb962c3b80f8fc337b7a" name="Fushigi no Oshiro Pit Pot (J) [p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="05cdc24e" sha1="144bd2f8f6e480829c50f71baa370a838e8cec41" name="G-Loc Air Battle (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3ec5e627" sha1="62c0ca61ad8f679f90f253ab6bbffd0c7737a8c0" name="Gain Ground (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a6fa42d0" sha1="e8bcc3621e30ee445a74e6ddbe0842d0a6753f36" name="Galactic Protector (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a4ac35d8" sha1="54fe2f686fb9ec3e34b41d58778118b11f920440" name="Galaxy Force (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6c827520" sha1="874289a1e8110312db48c5111fbf8e70b2426b5f" name="Galaxy Force (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1820c8ac" sha1="7ece3410b9488c535600c6787a963be9aa4101a5" name="Galaxy Force (U)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="1890f407" sha1="c0ee197e93c9ec81f5b788e8d6b20b3ab57d2259" name="Game Box Esportes Radicais (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5fc74d2a" sha1="57f0972109cb6f9a74c65d70d6497bc02fdfc942" name="Gangster Town (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d9190956" sha1="4e583ce9b95e20ecddc6c1dac9941c28a3e80808" name="Gauntlet (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="af2abb95" sha1="f8b661d83372dc4401e6a831831d7337721b2f1e" name="Gauntlet (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="4fcc473b" sha1="81fe545942e12cb2aa1a0f453dac843b2fe85402" name="Genesis 6 Button Controller Test by Charles MacDonald (PD)"> </hash>
+	<hash crc32="a64898ce" sha1="d0ddb71c6ca823c53d7e927a0de7de4b56745331" name="George Foreman's KO Boxing (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="956c416b" sha1="d82145b582e21ae5cb562030b5042ec85d440add" name="Geraldinho (B)"> </hash>
+	<hash crc32="c3e7c1ed" sha1="f341e68bad5029bf475922c2c1b79eb109f467a1" name="Ghost House (J) (Prototype)"> </hash>
+	<hash crc32="c0f3ce7e" sha1="051e74c499c6792f891668a7be23a11c2c4087af" name="Ghost House (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="dabcc054" sha1="4f93c7185c9ebdd70d9f7be56761bf9031934c6a" name="Ghost House (J) [p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f1f8ff2d" sha1="cbce4c5d819be524f874ec9b60ca9442047a6681" name="Ghost House (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="51d7e0b5" sha1="2429975b0937144f0149834ad52dc921ff3a6113" name="Ghost House (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="eedd93fa" sha1="8cc7bf3a07de049e2a18ee5d4e79de4e4657fc37" name="Ghost House (UE) [o1]"> </hash>
+	<hash crc32="d3e6eaa6" sha1="d1458b85dc6106c318a07182149e5575c9821832" name="Ghost House (UE) [o2]"> </hash>
+	<hash crc32="3a020f2b" sha1="97e67421a81f19d531a6202fa1d35948a87bf3bd" name="Ghost House (UE) [o3]"> </hash>
+	<hash crc32="7c2e6c5a" sha1="2cfe53c6af86bfde112bbe12f0ac1ec3be3765ec" name="Ghost House (UE) [o4]"> </hash>
+	<hash crc32="9a1ecfec" sha1="4900dc747803eadd7928ef37939c0945ca37eb7a" name="Ghost House (UE) [T+Bra_Leo]"> </hash>
+	<hash crc32="1ddc3059" sha1="8945a9dfc99a2081a6fb74bbabf8feaac83a7e1a" name="Ghostbusters (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7a92eba6" sha1="b193e624795b2beb741249981d621cb650c658db" name="Ghouls 'n Ghosts (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="db48b5ec" sha1="a6ff2e80ed0ae97fea5d32f8333673af21656e84" name="Ghouls 'n Ghosts (UE) [T+Bra][p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="cfae7e9b" sha1="84f9e843d8ec3cc545bdead388038ec03423255a" name="Ghouls 'n Ghosts (UE) [T+Bra_Guto]"> </hash>
+	<hash crc32="1898f274" sha1="0e08786587fb76909b3f9806ba1f5d57ea17728c" name="Girl's Garden (SG-1000)"> </hash>
+	<hash crc32="91a0fc4e" sha1="f92e1a9f7499b344e7865b18c042e09e7d614796" name="Global Defense (Prototype)"> </hash>
+	<hash crc32="b746a6f5" sha1="189ee1d4250a1f33e97053aa804a97b4e1467728" name="Global Defense (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="68646b7b" sha1="6bd5c7bfc30deaaf376e0f80cd2557c631da82e8" name="Global Defense (UE) [o1]"> </hash>
+	<hash crc32="a249fa9d" sha1="77f1e788f43fb59456f982472f02f109f53c7918" name="Gokuaku Doumei Dump Matsumoto (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c08132fb" sha1="d92538cb16a7a456255fa0da2bd8d0f588cd12ab" name="Golden Axe (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1eec7abc" sha1="6ca6733b2591bc4c7d42b0cecb44837ad5477186" name="Golden Axe (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="c7ded988" sha1="fbda0486b393708a89756bb57d116ad6007484e4" name="Golden Axe Warrior (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f424ad15" sha1="fafb492a1f08d002e254e6e3fe1aebc980fa616f" name="Golden Axe Warrior (UE) [T+Bra]"> </hash>
+	<hash crc32="68f58df7" sha1="856693eb3beba7d29505c736014c4b2b784f04af" name="Golden Axe Warrior (UE) [T+Bra_ALVS]"> </hash>
+	<hash crc32="8872f23f" sha1="9787bdd235659f72ff001fe22848d3b32cf0bdfc" name="Golden Axe Warrior (UE) [T+Bra_Emuboarding]"> </hash>
+	<hash crc32="472d1ce4" sha1="23e474361f17b5de674162dcc8ad8ffc6eed708b" name="Golden Axe Warrior (UE) [T+Fre_Haruney]"> </hash>
+	<hash crc32="21db20ae" sha1="332682b2fad6e7d6fd654e696d5e32ae4f97cece" name="Golden Axe Warrior (UE) [T+Ger0.82_Taurus]"> </hash>
+	<hash crc32="a53677b3" sha1="5bb0ea9cd8e0b86878e3d72237ef091535d57d27" name="Golden Axe Warrior (UE) [T+Spa100_pkt]"> </hash>
+	<hash crc32="48651325" sha1="d0b964dd7cd8ccdd730de4d8e4bb2e87bea7686e" name="Golf Mania (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5dabfdc3" sha1="da88dc3e84daa2f8b8d803b00a13b5fb3185d8c5" name="Golf Mania (Prototype)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="0d159ed0" sha1="bf27536c6ae71b333da8b362479da0a838d0715e" name="Golgo 13 (SG-1000)"> </hash>
+	<hash crc32="bf0411ad" sha1="f62c5c9dea4368e6475517c4220a62e40fedd35d" name="Golvellius - Valley of Doom (J)"> </hash>
+	<hash crc32="a51376fe" sha1="cb8c2de9a8e91c0e4e60e5d4d9958e671d84da4c" name="Golvellius - Valley of Doom (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="00196eba" sha1="dc74109ecc5afc840dd91cabeac9aba939edc035" name="Golvellius - Valley of Doom (UE) [T+Bra]"> </hash>
+	<hash crc32="11e19fb1" sha1="bc40ec2213c6d85e1e6fbb4d03dc9489c712a700" name="Golvellius - Valley of Doom (UE) [T+Fre_floflo]"> </hash>
+	<hash crc32="359141ef" sha1="b39c7259f1d146772fb7a0c4b60a29900126047f" name="Golvellius - Valley of Doom (UE) [T+Ger1.00_Star-trans]"> </hash>
+	<hash crc32="e02fc973" sha1="74a50fc79e988296496e99398d4121dc1e5fb16e" name="GoodAdvice by Nicolas Warren (PD)"> </hash>
+	<hash crc32="ec2da554" sha1="3083069782c7cfcf2cc1229aca38f8f2971cf284" name="GP Rider (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="191ffe0a" sha1="37aa4812d37445c9e86bc4e02f056fb50d19dc6a" name="GP World (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="89e98a7c" sha1="e6eaaec61bec32dee5161ae59a7a0902f0d05dc9" name="Great Baseball (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c1e699db" sha1="878852cb66427b0de11fba76bf6c8830a751d29f" name="Great Baseball (J) [p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="10ed6b57" sha1="b332344eb529bad29dfb582633e787f7e42f71ae" name="Great Baseball (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="2ac001eb" sha1="2fdb7ebce61e316ded27b575535d4f475c9dd822" name="Great Basketball (UEB)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="2055825f" sha1="a768f44ce7e50083ffe8c4b5e3ac93ceb7bd3266" name="Great Football (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="08a1c711" sha1="323547ea8fe9436a1b2b747d74ce357f9f919680" name="Great Football (UE) [o1]"> </hash>
+	<hash crc32="4847bc91" sha1="ce0662179bb0ca4a6491ef2be8839168b993c04e" name="Great Golf (J) (Prototype)"> </hash>
+	<hash crc32="6586bd1f" sha1="417739aa248032f5aebe05750a5de85346e36712" name="Great Golf (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c6611c84" sha1="eab0eed872dd26b13bcf0b2dd74fcbbc078812c9" name="Great Golf (UE) (V1.0)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="98e4ae4a" sha1="3c0b12cfb70f2515429b6e88e0753d69dbb907ab" name="Great Golf (UE) (V1.1)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1d2165a4" sha1="a18e9214904a92767bf9e45bf086f6a694228395" name="Great Golf (UE) (V1.1) [o1]"> </hash>
+	<hash crc32="9ac4b0ac" sha1="bef37321b43518aba0b2eb83805466225a1d6d60" name="Great Golf (UE) (V1.1) [o2]"> </hash>
+	<hash crc32="0cb7e21f" sha1="bbe6bd6b59e5ae20cd1a4a8c72276aac7d2964a3" name="Great Ice Hockey (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="946b8c4a" sha1="a7b76be9d3ed5d6a94917e444a188767ede1cc79" name="Great Ice Hockey (UE) [o1]"> </hash>
+	<hash crc32="0ed170c9" sha1="7d1a381be96474f18ba1dac8eaf6710010b0e481" name="Great Soccer (E)"> </hash>
+	<hash crc32="2d7fd7ef" sha1="110536303b7bccc193bef4437ba5a9eb6fd4ac8e" name="Great Soccer (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="84665648" sha1="88611c50fcaa307bfd70b2bd5effeb39c2c4f3ae" name="Great Soccer (J) [p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6819b0c0" sha1="b9e3284c7b557eed84661c98bc733d32b46c7a07" name="Great Volleyball (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8d43ea95" sha1="133ffdde0a5a0ce951c667a4c5d7f9d9f35e9658" name="Great Volleyball (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="b2801b0c" sha1="bdfb693adb73b3c869bdb8ed2ea4f97511613fd0" name="Great Volleyball (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="d3c52b09" sha1="d0d1badad4c05ff59cde327929acf8dd02c81a09" name="Guerreiro Lobo V2.0 (Wonder Boy III Hack)"> </hash>
+	<hash crc32="15a754a3" sha1="3fb197d16b25bc128a2866c4b78b0535ab8dc412" name="Gulkave (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="61fa9ea0" sha1="d42b2c5f1da4e0fbd29fcea91bfc092ae46da4b8" name="Guzzler (MV)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="4587de6e" sha1="19acb69b7b64da5083349d8bc40a47beacc88c41" name="H.E.R.O. (SG-1000)"> </hash>
+	<hash crc32="b9fdf6d9" sha1="46a032004d49fec58099aa6bf0dd796997e95142" name="Haja no Fuuin (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1c5059f0" sha1="ae29f676846fc740a2cfc69756875b6480265f97" name="Hang-On &amp; Astro Warrior (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="e167a561" sha1="7c741493889788d4511979bcaa3c48708d6240ed" name="Hang-On &amp; Safari Hunt (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c5083000" sha1="16bc6e3fcdd71470dbfa12bc33eb2864a7647b7b" name="Hang-On &amp; Safari Hunt (U)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="071b045e" sha1="e601257f6477b85eb0b25a5b6d46ebc070d8a05a" name="Hang-On (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="303ea475" sha1="9ddebe596f94a02609f07b4706e78769275124a5" name="Hang-On (E) [T+Bra]"> </hash>
+	<hash crc32="cf1d7990" sha1="238d71f12bdfed679875c472f0e5663e651e9d5d" name="Hang-On (E) [T-Bra]"> </hash>
+	<hash crc32="bcd19bc6" sha1="1a3892d49e2c8107641ac601e7d4f04558e2e28c" name="Hang-On (E) [T-Bra_TMT]">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="5c01adf9" sha1="43552f58f0c0c292f3e4c1b1525fd0344dc220c6" name="Hang-On (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9be3c6bd" sha1="e636e889d4e81c024ee7dae8943c2b8d9d4a5414" name="Hang-On 2 (SG-1000)"> </hash>
+	<hash crc32="922954c6" sha1="3142b7a9450445d959f6980102c1057b8875f78a" name="Happy Looser by Zoop (PD) [a1]"> </hash>
+	<hash crc32="07c39ba4" sha1="e85f0d88c072250f2fb5480000024fecc678586b" name="Happy Looser by Zoop (PD)"> </hash>
+	<hash crc32="ed169d59" sha1="9ca296effbbac9ac5d1c0fb63ae040793f960590" name="Headbreak For A Scroller (PD)"> </hash>
+	<hash crc32="fdab876a" sha1="7e2523061df0c08b7df7b446b5504c4eb0fea163" name="Heavyweight Champ (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="10ca9dd3" sha1="40becc56873eaceb816712a5882df32cfecff8df" name="Hello, World Test 1 (PD)"> </hash>
+	<hash crc32="cde13ffb" sha1="16b2219a1493c06d18c973fc550ea563c3116207" name="Heroes of the Lance (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9eb1aa4f" sha1="d3c0aeeacccef77c45ab4219c7d6d8ed04d467cb" name="High School! Kimengumi (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8a296a3e" sha1="f4350a41ec6cd685e21b09ce471c3456646d6904" name="High School! Kimengumi (J) [T+Eng]"> </hash>
+	<hash crc32="6f30434b" sha1="d62ae48b6f236f1c2296210130c4d0673f687261" name="High School! Kimengumi (J) [T-EngBeta]"> </hash>
+	<hash crc32="24f5fe8c" sha1="26c5da3ee48bc0f8fd3d20f9408e584242edcd9d" name="Hokuto no Ken (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="656d1a3e" sha1="e77c7150ad274fb9d7df378e460e64daa9b9e9b6" name="Hokuto no Ken (J) [p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c9dbf936" sha1="9b9be300fdc386f864af516000ffa3a53f1613e2" name="Home Alone (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9ced34a7" sha1="b7bbd78b301244d7ce83f79d72fd28c56a870905" name="Hook (Prototype)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="95256919" sha1="1c1b24f91c3b244e7307320f617755332b1de09c" name="Hook (Prototype) [T+Bra_ALVS]"> </hash>
+	<hash crc32="955a009e" sha1="f9ce8b80d8671db6ab38ba5b7ce46324a65ebc3d" name="Hoshi wo Sagasite... (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a627d440" sha1="1f1bad94b2d869c10a2373ca40d4076d227cc302" name="Hustle Chummy (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="ba09a0fd" sha1="8a13ee297f861f436b9529a5e2193cb697baa56f" name="Hyper Sports (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="64d6af3b" sha1="d883f28e77e575edca6dcb1c4cd1f2b1f11393b2" name="Impossible Mission (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="b4584dde" sha1="94a4ba183de82fc0066a0edab2acaee5e8bdd0e7" name="Incredible Crash Dummies, The (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="be9a7071" sha1="235ad7d259023610d8aa59d066aaf0dba2ff8138" name="Incredible Hulk, The (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8aeb574b" sha1="68e23692a12628dde805ded9de356c5e19e4eba6" name="Indiana Jones and the Last Crusade (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="191c3113" sha1="090165e257aa5427bd94863b171413ebe649d661" name="Interactive Sprite Test (PD)"> </hash>
+	<hash crc32="6887900e" sha1="0a4821c3669623bf72c627b0fcc889473db3b631" name="Interrupt Test (PD)"> </hash>
+	<hash crc32="6a664405" sha1="b07000feb0c74824f2e3e74fd415631a8f3c4da6" name="James 'Buster' Douglas Knockout Boxing (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="90160849" sha1="88d8c1f56f06ec76be285c29f41322a748f7c4db" name="James Bond 007 (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8feff688" sha1="cc3eec4da3758fe9e407ab80fa88dc952d33cdd5" name="James Bond 007 - The Duel (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="2b7f7447" sha1="57abea18de266e67c7d137fe1c51e176ee66c2cf" name="James Bond 007 - The Duel (B)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="8d23587f" sha1="89f86869b90af986bee2acff44defe420e405a1e" name="James Bond 007 - The Duel (E)"> </hash>
+	<hash crc32="102d5fea" sha1="df4f55f7ff9236f65aee737743e7500c4d96cf12" name="James Pond 2 - Codename Robocod (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="fef68275" sha1="51d785e502093a851a365727bb88a414df849de2" name="James Pond 2 - Codename Robocod (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="48d44a13" sha1="a8c1b39a2e41137835eda6a5de6d46dd9fadbaf2" name="Japanese SMS BIOS v2.1 (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="0a9089e5" sha1="7452f7286cee78ce4bbd05841a4d087fdfba12e3" name="Joe Montana Football (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="45c50294" sha1="4d6c46dedfe38fcfb740e948563b8eeec3bd4305" name="Jogos de Verao II (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="bbc237c0" sha1="3c48d5103d057fd3426b09365bcdeb86694da5cd" name="Jornada do Mymo (Psycho Fox Hack) [a1]"> </hash>
+	<hash crc32="e05e3d2b" sha1="256b1f899db9b294871df8b4ba56fca5db300873" name="Jornada do Mymo (Psycho Fox Hack)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="5d6dec5e" sha1="73fb8f841ae9d1a2ad93c9b391b87ff84d7b7918" name="Jornada do Mymo (Psycho Fox Hack)"> </hash>
+	<hash crc32="16c217c9" sha1="34f2c6f59cbb642fae78219af8072559f4b794e5" name="Jornada do Mymo II (Psycho Fox Hack)"> </hash>
+	<hash crc32="695a9a15" sha1="f65b5957b4b21bd16b4aa8a6e93fed944dd7d9ac" name="Jungle Book, The (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="e959e820" sha1="baffc9429aa6ccbfe8ebeefe228ab3ec0a3643fc" name="Jungle Book, The (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="dca0c49e" sha1="bc3c7d0d00ad5a0cf3fad5e3691312cb9b07984b" name="Jungle Book, The (UE) [T+Bra][p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5ca3b6ab" sha1="688ddab54b9adfab3b7b8d76dd7003170ab455f0" name="Jungle Book, The (UE) [T+Bra_Emubrazil]"> </hash>
+	<hash crc32="0667ed9f" sha1="67a6e6c132362f3d9263dda68d77c279b08f1fde" name="Jurassic Park (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7654e077" sha1="8995356ea9dcca2fbbbf33dc730e391b29b138a4" name="Kamikaze (SF-7000)"> </hash>
+	<hash crc32="05ea5353" sha1="cd349833ff41821635c6242a0b8cef7e071103d5" name="Kenseiden (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="516ed32e" sha1="3fce661d57e8bc764e7190ddbee4bf3d3e214c6c" name="Kenseiden (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="4cc95b51" sha1="ab8bd01009de185d1f564c8b3f25bd761c7a1702" name="Kenseiden (UE) [o1]"> </hash>
+	<hash crc32="4918d6c0" sha1="c9785a84e2fe6567f1720fd8398760002d21fe32" name="Kenseiden (UE) [T+Bra_ALVS]"> </hash>
+	<hash crc32="a28218fe" sha1="51605e388a4860f2faaa8df4d09bc4daafd36d1d" name="Kenseiden (UE) [T+Fre]"> </hash>
+	<hash crc32="f6915e4b" sha1="d0381b51aa194e63f52d44df5067c8a83af7f8d3" name="Kenseiden (UE) [T+Pol1.1_devilfox]"> </hash>
+	<hash crc32="616db05d" sha1="c03677e7dda5a7f495c683df2878fce535a611a6" name="Kenseiden (UE) [T-Pol1.0fix_devilfox]"> </hash>
+	<hash crc32="b7fe0a9d" sha1="1b6330199444e303aafb9a2fd3f2119cedab0712" name="King's Quest - Quest for the Crown (Prototype)"> </hash>
+	<hash crc32="f8d33bc4" sha1="d05ae9652b85c858f4e7db0b7b7c457a4e0a6a49" name="King's Quest - Quest for the Crown (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="2b435fd6" sha1="53ae621e66d8e5f2e7276e461e8771c3c2037a7a" name="Klax (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="bb351118" sha1="0a6778db2bc30474b776405108710498fdf10a5a" name="Klax (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="97b38e8a" sha1="d28351431692667dca6a446821929360d0d47a5e" name="Klax (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="ed15f21e" sha1="b2ec6a83a804e9932b376e21f7c7c55077cd5b0b" name="Klax (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="64a585eb" sha1="54714a19c2d24260b117ebc5ae391d9b24ca9166" name="Krusty's Fun House (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d11d32e4" sha1="6974d27bc31c2634bec54c4e9935a28461fb60f7" name="Kujaku Ou (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="68108314" sha1="07d37ace35695587443a240586236c3f9826b5b6" name="Kujaku Ou (J)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="1e949d1f" sha1="7e1c32f5abf9ff906ffe113ffab6eecd1c86b381" name="Kung Fu Kid (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1fbe3106" sha1="293cda42f2dcf1eed9e78a350392bda5d62246c4" name="Kung Fu Kid (UE) [o1]"> </hash>
+	<hash crc32="7e15a103" sha1="ea2e08841aacfb7bc02d9937fb1ae2a74454bf84" name="KunKun &amp; KokoKun by Bock (PD)"> </hash>
+	<hash crc32="24e97200" sha1="a120f29c6bf2e733775d5b984bd3a156682699c6" name="Land of Illusion Starring Mickey Mouse (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="0ca95637" sha1="a21286d282ca994c66d8e7a91ee0a05ff69c7981" name="Laser Ghost (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="33cf8213" sha1="ba942cec1e169f4e8adc879442751c86b4b9b092" name="Laser Ghost (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="6350e649" sha1="62adbd8e5a41d08c4745e9fbb1c51f0091c9dea6" name="Legend of Illusion Starring Mickey Mouse (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f369b2d8" sha1="f3a853cce1249a0848bfc0344f3ee2db6efa4c01" name="Lemmings (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="2c61ed88" sha1="8d8692d363348f7c93f402c6485f5f831d1c8190" name="Lemmings (Prototype)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c264580f" sha1="ebae1289aefbe590605c3aaff31f677abacff954" name="Line Interrupt Test #1 by Charles MacDonald (PD)"> </hash>
+	<hash crc32="cb09f355" sha1="985f78bcaf64bb088d64517f80b0acc7f5034b24" name="Line of Fire (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c352c7eb" sha1="3a64657e3523a5da1b99db9d89b1a48ed4ccc5ed" name="Lion King, The (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="00ed3970" sha1="f14f216edfda7dfd113f5cb32375a27be8a6409d" name="Loderunner (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="323f357f" sha1="0ddd7448f5bd437d0d33b85a44f2bcc2bf2ea05e" name="Loletta no Syouzou (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="aa7d6f45" sha1="6a08d913fd92a213b1ecf5aa7c5630362cccc6b4" name="Lord of the Sword (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="e8511b08" sha1="a5326a0029f7c3101add3335a599a01ccd7634c5" name="Lord of the Sword (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f77517eb" sha1="6d757fb9d3f9f737e65e1a786d8e488bb4b659c9" name="Lord of the Sword (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="2c3fa788" sha1="8cdf396273eb325cceead0a3c8b29fc4a432477d" name="Lord of the Sword (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="326b7348" sha1="2c1e2568a9c15801cf467971098a16899771bb12" name="Loriciel's Z-80 Utilities Disk (SF-7000)"> </hash>
+	<hash crc32="a1710f13" sha1="a08815d27e431f0bee70b4ebfb870a3196c2a732" name="Lucky Dime Caper, The - Starring Donald Duck (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d79e51a8" sha1="65a94f09a278b74052ae1cea009b0f97d6c4e8a8" name="Lucky Dime Caper, The - Starring Donald Duck (E) [T+Bra]"> </hash>
+	<hash crc32="47340be0" sha1="59c385af9137a14876f223189f02d8ef252ced48" name="Lucky Dime Caper, The - Starring Donald Duck (E) [T+Fre_GIX]"> </hash>
+	<hash crc32="7f6d0df6" sha1="5ac3e68b34ee4499ddbdee28b47a1440782a9c04" name="Lucky Dime Caper, The - Starring Donald Duck (Prototype)"> </hash>
+	<hash crc32="9d549e08" sha1="33c21d164fd3cdf7aa9e7e0fe1a3ae5a491bd9f5" name="Machine Gun Joe (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="56abc493" sha1="0d6c27af48bd4fb4d1d4ebead0db3da6b4f727f6" name="Maechiko's Omikuji (SG-1000) (PD)"> </hash>
+	<hash crc32="b1cbec5a" sha1="9561d2970afe8eae5d46e0ff8abd09f49bf5ba7d" name="Maechiko's S_Sniper (SG-1000) (PD)"> </hash>
+	<hash crc32="55c88828" sha1="cfb2f974f2d14d5b6febdb5f8f7b091b480d47b0" name="Magali no Castelo do Dragao (Monica no Castelo Hack)"> </hash>
+	<hash crc32="1232a774" sha1="d0ec9a509c399576b9c4b07301c3af2abe3357c3" name="Magic Drive Plus BIOS">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="bcfbfc67" sha1="9b7cd3a25b2a1fc880683dcdca81457c93d46de5" name="Mahjong Sengoku Jidai (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3faf4e19" sha1="febedffac44e283de1eefc6f4c7de4e0c8e24ec4" name="Mahjong Sengoku Jidai (J)[o1]">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="1a9b396f" sha1="f8672bd90f88da3f927424944636be13269bbade" name="Mahjong Sengoku Jidai (J) [o1]"> </hash>
+	<hash crc32="996b2a07" sha1="169510c0575e4f53b9da8197fc48608993351182" name="Mahjong Sengoku Jidai (Prototype)"> </hash>
+	<hash crc32="ca860451" sha1="59d520fdb2b6cbd5736b2bd6045ad3ee3ad2e3a6" name="Makai Retsuden (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="bf6f3e5f" sha1="f5efe0635e283a08f98272a9ff1bc7d37c35692c" name="Marble Madness (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="94fee07b" sha1="8b5e6e2c8b34861d25c07a8a51a98394260cc779" name="Marble Madness (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="d4f59afb" sha1="448e40c96b831d26af170adc86639a34e4f9e097" name="Marble Madness (UE) [T+Spa100_sinister]"> </hash>
+	<hash crc32="e8ea842c" sha1="5491cce7b9c19cb49060da94ab8f9c4331e77cb3" name="Marksman Shooting - Trap Shooting (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="76bbd33e" sha1="dba290723d61954d26b6a6fc03e45b5fb026d0d0" name="Master Mario Bros (Teddy Boy Hack)"> </hash>
+	<hash crc32="e15ba28b" sha1="4bb4d98f79dce7ab5934c893bf04fbd700eedc86" name="Master Mega Man (Wonder Boy in ML Hack) [o1]"> </hash>
+	<hash crc32="d164fde7" sha1="09b786f3fe0321a804de17156d9baf3d977a0900" name="Master Mega Man (Wonder Boy in ML Hack)"> </hash>
+	<hash crc32="96fb4d4b" sha1="ed3569be5d5a49ff5a09b2b04ec0101d4edfa81e" name="Master of Darkness (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="49c5d8e2" sha1="34c42beb04caded370eae9cd5e0c558a9bcc348c" name="Master of Darkness (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="1c04a0bc" sha1="4da2e931c752ea50040c74057f4d7cabbf84086b" name="Master Smash Brothers V1.0 (Psycho Fox Hack)"> </hash>
+	<hash crc32="b936f761" sha1="33d14e70c96a79ad670a522d06e3b8a1c468ee47" name="Master Zelda (Teddy Boy Hack) [a1]"> </hash>
+	<hash crc32="e29c4016" sha1="68167b6f01b47a5b0f967b6e0a2498b5eaa9d0c2" name="Master Zelda (Teddy Boy Hack)"> </hash>
+	<hash crc32="93141463" sha1="9596400394f2bb3dbf7eb4a26b820cdfe5cd6094" name="Masters of Combat (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="22f2c541" sha1="acdfc95114d7333ac209af328f4ae1c8dcae56b7" name="Masters of Combat (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="31b8040b" sha1="6d94c2159a67f3140d0c9158b58aa8f0474eaaba" name="Maze Hunter 3D (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="871562b0" sha1="ade756eccaf94c79e8b3636921b6f8669a163265" name="Maze Walker (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="29bc7fad" sha1="7bd156cf8dc2ad07c666ac58ccb3c0ff6671b93f" name="Megumi Rescue (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d7416b83" sha1="f2cfad96a116bde9a91240eb1ad520dc448fa20f" name="Mercs (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="56cc906b" sha1="939416cebb381458d28ff628afb3d1f80293afa9" name="Michael Jackson's Moonwalker (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9c4f03ac" sha1="d85cb8c7c29d64aea94e532589194c683aaaa182" name="Michael Jackson's Moonwalker (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="b67ceb76" sha1="e2e2f45e43f0d4fa5974327e96d7c3ee7f057fad" name="Mick &amp; Mack as The Global Gladiators (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="87475035" sha1="f9b1f7b17c222ac1bd5bd10a75678f3ab0c809b9" name="Mick &amp; Mack as The Global Gladiators (E) [o1]">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="8dae576e" sha1="c0ba154464f839fdcd2bb36c3bf498f382ffa6b4" name="Mick &amp; Mack as The Global Gladiators (E) [o1]"> </hash>
+	<hash crc32="619fde2c" sha1="129ea57e49d27ab27683753af445225e55e43d53" name="Mick &amp; Mack as The Global Gladiators (E) [t1]"> </hash>
+	<hash crc32="25051dd5" sha1="7253b4df642c56f266e5542a60065ca2c00ad0df" name="Mickey's Ultimate Challenge (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="80f94f99" sha1="9adc9ecb7af8de548da5a911baf0418143e9d93a" name="Mickey's Ultimate Challenge (B)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="2b86bcd7" sha1="0b46e31f656fee2ac8d947ca9bb91881d1c72428" name="Mickey's Ultimate Challenge (B) [o1]"> </hash>
+	<hash crc32="7e811f8d" sha1="e4dce623b5d2c465155749d989da82d5467dc401" name="Mickey's Ultimate Challenge (B) [o2]"> </hash>
+	<hash crc32="a577ce46" sha1="425621f350d011fd021850238c6de9999625fd69" name="Micro Machines (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="58fa27c6" sha1="16fece472a2c490ea10df276dbae6901e87116bc" name="Micro Machines (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="0e333b6e" sha1="f952406bca4918ee91a89b27e949e224eae96d85" name="Miracle Warriors - Seal of the Dark Lord (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="ebc2bfa1" sha1="ea799dd5207d7852470fe5d4d507fa2a0df1469c" name="Miracle Warriors - Seal of the Dark Lord (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="f14a8546" sha1="0df890c3dd153e3eb41df482c371b259d4129162" name="Miracle Warriors - Seal of the Dark Lord (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="e79bb689" sha1="aa92ae576ca670b00855e278378d89e9f85e0351" name="Missile Defense 3-D (SMS BIOS V4.4)"> </hash>
+	<hash crc32="fbe5cfbb" sha1="86242fcc8b9f93cdad2241f40c3eebbf4c9ff213" name="Missile Defense 3-D (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="72542786" sha1="6476bc0fc1608dd69a1ae62617ea4719bc7eaa50" name="Monaco GP (SG-1000)"> </hash>
+	<hash crc32="693c63d5" sha1="42ae56318499fbed305d5ccc852febf392ecfd53" name="Monica 3 (Wonder Boy in MW Hack)"> </hash>
+	<hash crc32="01d67c0b" sha1="e05953a3772452f821c3815231a25940a1d93803" name="Monica no Castelo do Dragao (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="fac09af4" sha1="2a8538f2f7c3cb61d15311d8178cb2bba7549531" name="Monica no Castelo do Dragao (B)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="026d94a4" sha1="6bad7176011dd4bbd007498d167399daacde173d" name="Monopoly (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="69538469" sha1="8dd7bb4f666f70f7f57687823d0068c9100af8e5" name="Monopoly (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="fff835bd" sha1="fda8521c5474b49766e789e6bbb3029db95fb9ed" name="Monopoly (U) [o1]"> </hash>
+	<hash crc32="82fda895" sha1="a2665093b8588d5d6f24c6b329080fb3ebee896e" name="Montezuma's Revenge (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="302dc686" sha1="3f67e0e702f391839b51a43125f971ae1c5fad92" name="Mortal Kombat (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="563f2487" sha1="583615501146e34582d58ccafabacd80f17dd210" name="Mortal Kombat (E) [T+Bra_Guto]"> </hash>
+	<hash crc32="2663bf18" sha1="12bd887efb87f410d3b65bf9e6dfe2745b345539" name="Mortal Kombat 2 (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9ed8341a" sha1="60bce167da3fecbd0500b7d02117d2f0b6318a47" name="Mortal Kombat 2 (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="395ae757" sha1="f1f43f57982dd22caa8869a85b1a05fa61c349dd" name="Mortal Kombat 3 (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3cd816c6" sha1="4dd7cb303793792edd9a4c717a727f46db857dae" name="Ms. Pac-man (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f40fa5d6" sha1="8876e8f16b09b69235c249ecadeeec405f096698" name="Music Station V1.6 (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="62f0c23d" sha1="7583c5fb1963c070b7bda72b447cc3fd611ddf1a" name="My Hero (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="93097cb7" sha1="15914753d727108cbdfb312da0f523ea914070b9" name="My Hero (UE) [o1]"> </hash>
+	<hash crc32="99985ad9" sha1="9e1c4bca01f5288cfe5714b52a4db663a2af09d5" name="My Hero (UE) [o2]"> </hash>
+	<hash crc32="144cfa14" sha1="d11d0404a0bf0d31e16439b51063c000cd7bf55e" name="My Hero (UE) [o3]"> </hash>
+	<hash crc32="09196fc5" sha1="32a263110434288d3720e2370241d1e93b3f07a9" name="N-Sub (SG-1000)"> </hash>
+	<hash crc32="a06d065c" sha1="2e9cceec6c872dc988236c96618225e953c4d794" name="NanoWars 8k v0.7 by Haroldo O. Pinheiro (PD)"> </hash>
+	<hash crc32="02bd3a57" sha1="bc5f9aea187e9c4b2b370ea2e86bdc4b1f3b85ea" name="Natal do Mymo (Psycho Fox Hack)"> </hash>
+	<hash crc32="5b5f9106" sha1="35e882723189178c1dc811a04125daec4487e693" name="Nekyuu Kousien (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c660ff34" sha1="e433b21b505ed5428d1b2f07255e49c6db2edc6c" name="New Zealand Story, The (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="fbc66cbf" sha1="5c17cd898f8d9b0922144ce0721ce8106e13d769" name="New Zealand Story, The (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="22f4f92a" sha1="972cf86f8f627c7b8e1ac9c5a837bd4673be6e54" name="Nihonshi Ninpyou (SC-3000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="82ae5acd" sha1="124012c8611db1e5a5013012fd8b10f4bfcc2e02" name="Nine Pixels by Nicolas Warren (PD)"> </hash>
+	<hash crc32="1b1d8cc2" sha1="4c65db563e8407444020ab7fd93fc45193ae923a" name="Ninja Gaiden (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="4cd38be4" sha1="77390c4ac4311342ef0ddc4c5a366e4df0ced7b4" name="Ninja Gaiden (E) [T+Fre_Terminus]"> </hash>
+	<hash crc32="c28e542f" sha1="6d5ec6defd0de8e8001ea1cfaa7f7d74ed8f5081" name="Ninja Gaiden (E) [T+Ger]"> </hash>
+	<hash crc32="c94c2b4e" sha1="10d5f612a3df6ba7c8e033091fa35676feec1559" name="Ninja Gaiden (E) [T+Spa100_Pkt]"> </hash>
+	<hash crc32="761e9396" sha1="c67db6539dc609b08d3ca6f9e6f8f41daf150743" name="Ninja Gaiden (Prototype)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9d5a2845" sha1="1cde5cf83c59f2b8dad512b66413c0b6932d04fa" name="Ninja Gaiden (Prototype) [T+Fre]">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="0643620e" sha1="d362aead517c9e40e94cbae35c210437744f759b" name="Ninja Gaiden (Prototype) [T+Fre]"> </hash>
+	<hash crc32="41e5b485" sha1="9d0772c95c5fafaf21c1e026dedcd40cb7954491" name="Ninja Gaiden (Prototype) [T+Fre_Terminus]"> </hash>
+	<hash crc32="317f14da" sha1="3a4137288455c1922cd4ddc84877f15d801017db" name="Ninja Gaiden (Prototype) [T+Ger1.00_Star-trans]"> </hash>
+	<hash crc32="17fee94a" sha1="4caf200795f8fc6897cebc502d93d43c89c2d6b5" name="Ninja Gaiden (Prototype) [T+Spa100_Pkt]"> </hash>
+	<hash crc32="3b912408" sha1="f142bb823cebc4e31488e7a9a94644af24186d99" name="Ninja Princess (SG-1000)"> </hash>
+	<hash crc32="320313ec" sha1="e9acdae112a898f7db090fc0b8f1ce9b86637234" name="Ninja, The (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="66a15bd9" sha1="76396a25902700e18adf6bc5c8668e2a8bdf03a9" name="Ninja, The (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3398242a" sha1="839996ad43274384ddd2a615955de3d34170650f" name="Ninja, The (UE) [o1]"> </hash>
+	<hash crc32="cf9f0a7f" sha1="46248d387a9a32931cfa257a6f418015e2ce2653" name="Ninja, The (UE) [o2]"> </hash>
+	<hash crc32="261587b8" sha1="9eb8d2bdcfb823d5a86dd2fa262e7890a51cdd7a" name="Not Only Words (PD)"> </hash>
+	<hash crc32="95d917dd" sha1="41f24aa32ee30263221176da281562c6d83fb51e" name="Olympiades (SF-7000)"> </hash>
+	<hash crc32="580293ee" sha1="f839ca05726c190908b29865a70f9c38ede67a79" name="Only Words by Mike Gordon (PD)"> </hash>
+	<hash crc32="bea27d5c" sha1="38bd50181b98216c9ccf1d7dd6bc2c0a21e9a283" name="Opa Opa (J)"> </hash>
+	<hash crc32="205caae8" sha1="064040452b6bacc75443dae7916a0fd573f1600d" name="Operation Wolf (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d85a05e8" sha1="f2cea900ad72215a12e098f82670ed9e36aaa493" name="Operation Wolf (U) [o1]"> </hash>
+	<hash crc32="23283f37" sha1="94e41adff987e252e409b5c74404c0eb00ad5274" name="Operation Wolf (U) [T+Fre]"> </hash>
+	<hash crc32="f4f78b76" sha1="c50b133dac95718e3a92a7ed45b6c7e83927abb0" name="Orguss (SG-1000)"> </hash>
+	<hash crc32="82ef2a7d" sha1="465e7a8cdfad8fc96587f6516770eb81a171f036" name="Ottifants, The (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5589d8d2" sha1="4f9b61b24f0d9fee0448cdbbe8fc05411dbb1102" name="OutRun (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1968757e" sha1="754d813e1cb87d0e9460ad2cd2f2dc9556c49e19" name="OutRun (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="d70bbd06" sha1="0aaa9b8ea8c5962b6420de3dadde39ed6125a077" name="OutRun (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="dc0860e7" sha1="fcaba54799fb899d1e8123b8485e3ae37ee68dba" name="OutRun (UE) [o1]"> </hash>
+	<hash crc32="d6f43dda" sha1="93c3fbe23848556fc6a737db1b5182537db5961d" name="OutRun 3D (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3932adbc" sha1="c8fbf18eabdcf90cd70fc77444cf309ff47f5827" name="OutRun Europa (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="be57a9a5" sha1="c0a11248bbb556b643accd3c76737be35cbada54" name="Pac-Mania (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="367b1267" sha1="4824318365fd4e6500af856067ed4f35c9d0e234" name="Pac-Mania (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="7a9abfcb" sha1="e22a53c07160a9428a635fc799a0103ca7a63449" name="Pac-Mania (E) [o1]"> </hash>
+	<hash crc32="30c52e5e" sha1="91fd213308b83bb1bda1dfc7e971e576caace291" name="Pacar (SG-1000)"> </hash>
+	<hash crc32="fd7cb50a" sha1="1dbc4babbbb377a1ff59a11e550a9b1b5e742b02" name="Pachinko 2 (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="294e0759" sha1="e91dae35a3ca3a475e30b7863c03375d656ec734" name="Paperboy (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c0e1ebc4" sha1="3ed935f886bc74dcdc9d33effbb10ef7c113df84" name="Paperboy (E) [t1]"> </hash>
+	<hash crc32="327a0b4c" sha1="736718efab4737ebf9d06221ac35fa2fcc4593ce" name="Paperboy (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="36f04d14" sha1="0217f7d1e3164830adb9e8675430efed969287d1" name="Paperboy (U) [t1]"> </hash>
+	<hash crc32="e030e66c" sha1="06664daf208f07cb00b603b12eccfc3f01213a17" name="Parlour Games (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7abc70e9" sha1="dfbf0186d497cf53d1f21a9430991ed4124cc4c2" name="Party Games (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9aefe664" sha1="8b49c7772bd398665217bf81648353ff46485cac" name="Pat Riley Basketball (Prototype)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="85060847" sha1="316e888237f274663939597bd33407e718bed969" name="Paws 32K Intro by An!mal (PD)"> </hash>
+	<hash crc32="2bcdb8fa" sha1="c01cf44eee335d509dc20a165add8514e7fbb7c4" name="Penguin Land (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="ac7f95b4" sha1="c1a39ba36afb89ba3c6734d931205826918f2acd" name="Penguin Land (SG-1000)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="346556b9" sha1="f49c43b1f9a0b19ef5f30d9bf2b222af7aeb9fbf" name="Penguin Land (SG-1000)"> </hash>
+	<hash crc32="f97e9875" sha1="8762239c339a084dfb8443cc38515301476bde28" name="Penguin Land (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f6552da8" sha1="1a59ed9f6c3ef7ded27135a4e905ca2edbbe94bf" name="Penguin Land (UE) [o1]"> </hash>
+	<hash crc32="ad0ff4f1" sha1="2067fd259798c8c26492c160ea61384a01c8df26" name="PFR Detect V1.00 by Eric R. Quinn (PD)"> </hash>
+	<hash crc32="1f30cb32" sha1="e91f0d3c4015d69071c15dee7ffea6e69c03b9ba" name="PFR Detect V2.00 by Eric R. Quinn (PD)"> </hash>
+	<hash crc32="95b9ea95" sha1="bdbb1337453234289fbd193d7d7fcf1ad3c3807c" name="PGA Tour Golf (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="75971bef" sha1="fd8dad6acb6fa75dc8e9bbaea2a7e9fd486fc2dd" name="Phantasy Star (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="07301f83" sha1="b3ae447dc739256616b44cbd77cb903c9f19e980" name="Phantasy Star (J) (from Saturn Collection CD)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6605d36a" sha1="c9a40ddd217c58dddcd6b5c0fe66c3a50d3e68e4" name="Phantasy Star (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="eefe22de" sha1="0d2697c750e8e7ea877050c580dd0856f8e495f7" name="Phantasy Star (J)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="747e83b5" sha1="52b2aa52a1c96e15869498a8e42b074705070007" name="Phantasy Star (K)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3ca83c04" sha1="7b63dbe1f9e2459a2d664acc485ab28810d4bcd9" name="Phantasy Star (Lutz Hack)"> </hash>
+	<hash crc32="e4a65e79" sha1="257ca76ebcd54c75a414ca7ce968fa59ea42f150" name="Phantasy Star (UE) (V1.2)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="00bef1d7" sha1="07fcf297be4f4c9d92cd3f119a7ac48467e06838" name="Phantasy Star (UE) (V1.3)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7f4f28c6" sha1="151f9260bda90521c6b6edcf152631cf1238567f" name="Phantasy Star (UE) (V1.3)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="e80ee900" sha1="a59f117bb93cda3e8322e6607666d87ce52b7a53" name="Phantasy Star (UE) (V1.3)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="56bd28d8" sha1="0ac126a48e3a43c0a2282d51320b9cdc415836b3" name="Phantasy Star (UE) (V1.3) [T+Fre_floflo]"> </hash>
+	<hash crc32="0652b785" sha1="1033072fe34e553cbdd9fdeb5577cd1ca30a9c44" name="Photo (PD)"> </hash>
+	<hash crc32="aa4d4b5a" sha1="409ccca9dcb78a20f7dd917699ce2c70f87f857f" name="Pit Fighter (B)"> </hash>
+	<hash crc32="b840a446" sha1="e2856b4ae331aea100984ac778b5e726f5da8709" name="Pit Fighter (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="283712a9" sha1="8f85652e871c7c57d188142852f7444669402ca6" name="Pit Fighter (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="37fca2eb" sha1="356db6edcd337a06063957bd8cb27edeb7160f6c" name="Pitfall II (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3db74761" sha1="a14453650b6b2ef85e03b9637f08f691878acff4" name="Pitfall II (SG-1000) [a1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d3aa5894" sha1="f225951ed2a5c4fb9e6759ff6dc368f859af60c6" name="Pokemon Master V2.0 (Psycho Fox Hack)"> </hash>
+	<hash crc32="6c476aa9" sha1="b8aadb553f8f18825ce83d4827fc9b800042fd2d" name="Pokemon Versao Amarela (Teddy Boy Hack)"> </hash>
+	<hash crc32="d0e919bd" sha1="f8888acfb67e73cc1c74a13329fdc141702d7b0a" name="Pokemon Versao Azul (Teddy Boy Hack)"> </hash>
+	<hash crc32="647d8edc" sha1="7d8aca93d8c7ff90cfbfc0d04496023b227e340a" name="Pokemon Versao Secreta (Teddy Boy Hack)"> </hash>
+	<hash crc32="3f78e5c8" sha1="ab5b6b0a8d2253f25d8daa4fd636118a67c4001e" name="Pokemon Versao Vermelha (Teddy Boy Hack)"> </hash>
+	<hash crc32="f87d50fd" sha1="25644756bfc1844c6ace0e4aa92e243090441743" name="Pongmaster 4k by Haroldo O. Pinheiro (PD)"> </hash>
+	<hash crc32="ef3d4c50" sha1="3806ba3dc2ca3c56f3f74271211cede9e922d420" name="Pongmaster by Haroldo O. Pinheiro (PD) [a1]"> </hash>
+	<hash crc32="3879ac1b" sha1="94219edefecb1cdaa78e02ec546b9ddfbf3acfde" name="Pongmaster by Haroldo O. Pinheiro (PD)"> </hash>
+	<hash crc32="db6404ba" sha1="84b59a9f855ef5e953c43495d7a15dd78386d0a8" name="Pop Flamer (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c7a1fdef" sha1="d6142584b9796a96941b6a95bda14cf137b47085" name="Populous (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="4a9b4ecb" sha1="b50e4b49beefab04e09449a6884aac6dcbc81dfa" name="Populous (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="5ca7b5c4" sha1="909d6335034cf9e241d7fc4c8074a280b5c4112f" name="Poseidon Wars - Space Panic - Rambo (SF-7000)"> </hash>
+	<hash crc32="abd48ad2" sha1="c177effd5fd18a082393a2b4167c49bcc5db1f64" name="Poseidon Wars 3D (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="4077efd9" sha1="f6f245c41163b15bce95368e4684b045790a1148" name="Power Strike (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="514e7abe" sha1="6b3753d579a440bd223db8578a9d2b1a9d81ac69" name="Power Strike (UE) [o1]"> </hash>
+	<hash crc32="a109a6fe" sha1="3bcffd47294f25b25cccb7f42c3a9c3f74333d73" name="Power Strike 2 (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="673c68b8" sha1="61688c543a51cb986fb82137139174959a3e6e41" name="Power Strike 2 (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="0047b615" sha1="ee26c9f5fd08ac73b5e28b20f35889d24c88c6db" name="Predator 2 (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7704287d" sha1="7ef7b4e2fcec69946844c186c62836c0ae34665f" name="Prince of Persia (E)"> </hash>
+	<hash crc32="fbde42d3" sha1="b0e4832af04b4fb832092ad093d982ce11160eef" name="Pro Wrestling (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="fd069aae" sha1="a91bbab31c7ec741738b8b6ed84d794b0432d51d" name="Pro Wrestling (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="09489195" sha1="c819cb47b62fc736f0ada56ac572aa7295d19c1c" name="Pro Wrestling (UE) [o1]"> </hash>
+	<hash crc32="da9be8f0" sha1="1ee602f8711d82d13b006984cef95512a93c7783" name="Pro Yakyuu Pennant Race, The (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="30af0233" sha1="53b50a1c574479359f85327a8000d3f03f0963d5" name="Promocao Especial M.System III Compact (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5c0b1f0f" sha1="5fa54329692e680a190291d0744580968aa8b3fe" name="Psychic World (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="255c2560" sha1="130cc93f8b77e3689bb1bbabca2eaeebf4291ca7" name="Psychic World (E) [T+Fre]"> </hash>
+	<hash crc32="9b700645" sha1="1e0cdc4d288b3dbe0839a9d3da4c7beeed9657f0" name="Psychic World (E) [T+Ger1.00_Star-trans]"> </hash>
+	<hash crc32="d155c2f8" sha1="ef6c3eacc6a734cac49310618b0c086b4b21a41f" name="Psychic World (E) [T+Ita1.00_darq]"> </hash>
+	<hash crc32="97993479" sha1="278cc3853905626138e83b6cfa39c26ba8e4f632" name="Psycho Fox (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="92d2c75b" sha1="8eefdd6e6cbd450d5d4757057658249ad64cde52" name="Psycho Fox (UE) [T+Bra_Tamanduon]"> </hash>
+	<hash crc32="b8e2febc" sha1="c405a83a9e792ea97d84a32bfc0023f020c11d81" name="Psycho Fox (UE) [T+Fre_Terminus]"> </hash>
+	<hash crc32="357d4f78" sha1="760d330047a77b98e2fff786052741dc7e3760e8" name="Putt &amp; Putter (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8167ccc4" sha1="c6d3f256f938827899807884253817f432379d7c" name="Putt &amp; Putter (Prototype)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="77db4704" sha1="ae23fce5dbbc1536275d57ca65d2aa9170d46ea4" name="Q-bert (MV)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="e0f34fa6" sha1="08a3484e862a284f6038b7cd0dfc745a8b7c6c51" name="Quartet (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="001db6d7" sha1="9cdf89c9827f16f68859ceee5f96bcdbd03a8bd1" name="Quartet (UE) [o1]"> </hash>
+	<hash crc32="bb54b6b0" sha1="08ec70a2cd98fcb2645f59857f845d41b0045115" name="R-Type (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a3c80ee3" sha1="6fa3c84c3ff65e6d7f044d206bc6d819c6cb7cf1" name="R-Type (UE) [T+Bra_Emuboarding][a1]"> </hash>
+	<hash crc32="7510bce3" sha1="7c16f916b8b134a2a254a6513e8a4d0a638b6cef" name="R-Type (UE) [T+Bra_Emuboarding]"> </hash>
+	<hash crc32="54316fea" sha1="94cc64f6febdb0fe4e89ecd9deeca96694e5bead" name="R.C. Grand Prix (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6edf4c12" sha1="0f995079fdc89114cf7eb64d382b6097a10c0eec" name="R.C. Grand Prix (UE) [T+Bra_TMT]"> </hash>
+	<hash crc32="c804943f" sha1="f84f5677e376ccaca48814c95ea170acb458fc5f" name="R.H.W. 2000 (Psycho Fox Hack)"> </hash>
+	<hash crc32="00ec173a" sha1="a3958277129916a4fd32f3d5f2345b8d0fc23faf" name="Rainbow Islands (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c172a22c" sha1="acff4b6175aaaed9075f6e41cf387cbfd03eb330" name="Rainbow Islands (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="bbda65f0" sha1="dc44b090a01d6a4d9b5700ada764b00c62c00e91" name="Rambo - First Blood Part 2 (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="da5a7013" sha1="6d9746c0e3c50e87fa773a64e2f0bb76f722d76c" name="Rambo III (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="42fc47ee" sha1="cbf5b6f06bec42db8a99c7b9c00118521aded858" name="Rampage (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="426e5c8a" sha1="bfea7112a7e2eb2c5e7c20147197ffe3b06d5711" name="Rampart (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c547eb1b" sha1="90f9ccf516db2a1cf20e199cfd5d31d4cfce0f1f" name="Rastan (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="796c76b4" sha1="abb7ca44902449397862fa6c443ce85602f64032" name="Rastan (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="6d94bb0e" sha1="b7c387256e58a95bd3c3c4358a8a106f2304e9f2" name="Reggie Jackson Baseball (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f42e145c" sha1="418ea57fdbd06aca4285447db2ecb2b0392a178d" name="Ren &amp; Stimpy - Quest for the Shaven Yak, The (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3be7f641" sha1="c07a04f3ab811b52c97b9bf850670057148de6f0" name="Renegade (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="e3ec5b2d" sha1="517839ca587743373675efe8a77d42faf0b46b51" name="Renegade (E) [T+Bra_Emuboarding]"> </hash>
+	<hash crc32="79ac8e7f" sha1="6a561bff2f8022261708b91722caf1ec0e63f9c4" name="Rescue Mission (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="53cb13c1" sha1="b14512d5503ee9557608d629857dfb162eb8073a" name="River Strike V0.01alpha by Haroldo O. Pinheiro (PD)"> </hash>
+	<hash crc32="78df344c" sha1="029269260f101519e4de723679cd6e39a3310ea4" name="River Strike V0.02alpha by Haroldo O. Pinheiro (PD)"> </hash>
+	<hash crc32="767c6744" sha1="7a95d82fd86326b0c5e0f3197a4fc02518fc2559" name="River Strike V0.03alpha by Haroldo O. Pinheiro (PD)"> </hash>
+	<hash crc32="1fe7f34e" sha1="3504e57c4cce39d930def2434cbeeb4284af7f85" name="River Strike V0.04alpha by Haroldo O. Pinheiro (PD)"> </hash>
+	<hash crc32="b876fc74" sha1="7976e717125757b1900a540a68e0ef3083839f85" name="Road Rash (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6fe5bbc3" sha1="8a14442cdacf60a99824e3639b7a5b7e669ebd74" name="Road Rash (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="f61874c9" sha1="f63f90a7d03c45385c14c3f25cad96c7e13792ee" name="Robbyie v0.999 (PD)"> </hash>
+	<hash crc32="9f951756" sha1="459a01f6e240e6f81726f174fadcfe06badce841" name="Robocop 3 (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8212b754" sha1="a5fe99ce04cb172714a431b12ce14e39fcc573e4" name="Robocop versus The Terminator (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="0ffdd03d" sha1="d5e8e7ca7623521d4291ae5ab2740816fc674389" name="Rock N' Bolt (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1bcc7be3" sha1="8601927ca17419f5d61f757e9371ce533228f7bb" name="Rocky (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5d634d43" sha1="b525dc2d61f951e1295ad9e92330a18538c84b85" name="Rocky (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="9d79ed79" sha1="d3ebfcd7596b1adea43e08bb2700d56ee2c0bbb2" name="Rodrigo 2 em - Mate O Leonardo (Teddy Boy Hack)"> </hash>
+	<hash crc32="c7f3da07" sha1="d6936885ae890e3192cf1e86886e6369b7148465" name="Rodrigo 2 em - Mate O Papai Noel - Versao de Natal (Teddy Boy Hack)"> </hash>
+	<hash crc32="715e4e4c" sha1="21e347425dbe784e3cee37000ab7a1ce5e594355" name="Rodrigo O Resgate (Wonder Boy Hack) [a1][o1]"> </hash>
+	<hash crc32="947db11a" sha1="66e4c435785932b7c4ceb20e62ce115eafc65c9a" name="Rodrigo O Resgate (Wonder Boy Hack) [a1]"> </hash>
+	<hash crc32="1076c897" sha1="c2f68d15da78b2bf104e2838e32099502a0c8e76" name="Rodrigo O Resgate (Wonder Boy Hack) [o1]"> </hash>
+	<hash crc32="1ee6e034" sha1="cb2d0484757d5c0500ed268143cbca271cad5a2f" name="Rodrigo O Resgate (Wonder Boy Hack)"> </hash>
+	<hash crc32="1fdae719" sha1="8f680b3a9782304a2f879f6590dc78ea4e366163" name="Running Battle (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="49e9718b" sha1="902dbabbfa98d71299adda0638b87152188e1cf1" name="Safari Hunt (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="619dd066" sha1="1d2ca62c894fc8aab97605e65078e834bbbe3d8b" name="Safari Race (SG-1000)"> </hash>
+	<hash crc32="66388128" sha1="2a3e859139f8ca83494bb800dc848fe4d02db82a" name="Sagaia (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="cb5d369b" sha1="f50ca50960a92deb1fd217deaab521887339f228" name="Sagaia (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="7cbd4432" sha1="8630c3135021f51b84d2722b25a9c4081c5d1062" name="SALY V1.00 by Marc Klemp (PD)"> </hash>
+	<hash crc32="97d03541" sha1="c0256188b15271bb814bb8356b3311340e53ea3e" name="Sangokushi 3 (K)"> </hash>
+	<hash crc32="890e83e4" sha1="f14a7448f38766640c0bc9ea3410eb55194da58f" name="Sapo Xule O Mestre do Kung Fu (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7ab2946a" sha1="2583b9027fd2a4d84ed324ed03fc82b9eedd1ff4" name="Sapo Xule SOS Lagoa Poluida (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9a608327" sha1="fb4205bf1c1df55455a7ab4d4a6a9c5fe7d12a0b" name="Sapo Xule vs. os Invasores do Brejo (B)"> </hash>
+	<hash crc32="16249e19" sha1="88fc5596773ea31eda8ae5a8baf6f0ce5c3f7e5e" name="Satellite 7 (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="87b9ecb8" sha1="a48b642ac12379944fc829585dacb8e7effdcc82" name="Satellite 7 (J) [p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9a8b28ec" sha1="430154dc7ac1bb580c7663019ca476e5333e0508" name="Scramble Spirits (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5dd789a2" sha1="c9f78566ed6ed300b851035ccfc4ad97ae0f5047" name="Scramble Spirits (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="6841ce1d" sha1="fb5a3c57794b1c47c19e0e107279a455c60fde7d" name="Scroll Test Program by Charles MacDonald (PD)"> </hash>
+	<hash crc32="1de2c2d0" sha1="2000b3b291dd7b76c3b8801a88fb0e293ca7e278" name="SDI (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="00529114" sha1="e7a952f8bd6dddbb365870e906801021b240a533" name="Secret Commando (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6e5f8a27" sha1="63f3b632325eb5a7021fac1fc24c80478bd4b56e" name="Secret Commando (E) [o1]"> </hash>
+	<hash crc32="f691f9c7" sha1="1fa9f4ec347681d7909415b6d06179e44b0fcd5e" name="Sega BASIC Level 2 (SC-3000)"> </hash>
+	<hash crc32="155fd01f" sha1="2a21a2099f7f829d90aff158bc5a77d685e8aa81" name="Sega BASIC Level 3 V1 (SC-3000)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="5d9f11ca" sha1="a43aef367857a681decea52377c2e7a992c2ac68" name="Sega BASIC Level 3 V1 (SC-3000)"> </hash>
+	<hash crc32="a8061aef" sha1="2c386825dce99b340084b28bdf90fb4ee7107317" name="Sega Chess (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5b905d3f" sha1="7ecc99443c7f3c5da9dca81080ba02ef461c3742" name="Sega Chess (E) [T+Bra_Altieres]"> </hash>
+	<hash crc32="2ecfe5f2" sha1="04bfc7a071ed6a73ac3218ae24274807cb0e9ebd" name="Sega Chess (E) [T+Spa]"> </hash>
+	<hash crc32="50a2a040" sha1="1e3c0651757d304ba1184e43f1cb1ce1ca3be22e" name="Sega Disk Basic v1.0p (SF-7000)"> </hash>
+	<hash crc32="ffdbcd97" sha1="c7c55da3c2f0fa90895f8b2802bad2606ff16578" name="Sega Disk Basic v1.0p with Yeno Demo (SF-7000)"> </hash>
+	<hash crc32="981e36c1" sha1="32e776b3a17f7c0df0fa9eb49a3e451cfe702bfd" name="Sega Galaga (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a7b1da17" sha1="1a54fbf5bd1442a96e7806249a6812ea2006e092" name="Sega Logo V1.0e (SF-7000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5f1120c8" sha1="d5a8965ccc3a5e209ff27e951061e4aa8d58633a" name="Sega Mark III BG Test v0.01 (PD)"> </hash>
+	<hash crc32="49790a5a" sha1="c20e4db5062f584dcbf5ab2350205467f575a017" name="Sega Mark III Port Test v0.1 (PD)"> </hash>
+	<hash crc32="2ec28526" sha1="a2137e818242e8b361d5d5677797034c55fb1a2d" name="Sega Music Editor (SC-3000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="622010e1" sha1="61f40e4b7576d4d55322f3d6eef2038aa784336e" name="Sega Music Editor (SC-3000) [a1]"> </hash>
+	<hash crc32="b67ea1c4" sha1="6740b5acaf045ac10f72b72ee4384e21b56faa0f" name="Sega Music Editor (SC-3000)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="b0131d77" sha1="0b51e0ca87f766a4a21499181bc4f61b9fc5b181" name="Sega Tween (3D) by Ben Ryves (PD)"> </hash>
+	<hash crc32="f97c47a0" sha1="a45fef434eb9a0d235b505eed46c96353397c1b3" name="Sega Tween (Normal) by Ben Ryves (PD)"> </hash>
+	<hash crc32="296879dd" sha1="fd5a92e74a3c5fa16727637f1839b28595449bf6" name="Sega World Tournament Golf (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="2a2ac7e1" sha1="14213dffac2fbc5be8b19b755ba5407c0d91a76c" name="SegaSlide by FluBBa (PD)"> </hash>
+	<hash crc32="f0ba2bc6" sha1="6942f38e608cc7d70cf9cc8c13ee8c22e4b81679" name="Seishyun Scandal (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="56476a54" sha1="a04042ff5f36cce2ed251badd16edac239b3a161" name="Seishyun Scandal (J)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="bcd91d78" sha1="3da61c3f36aaa885c3efa58807fd122f24643ded" name="Seishyun Scandal (J) [p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f8176918" sha1="08b4f5b8096bc811bc9a7750deb21def67711a9f" name="Sensible Soccer (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d76810b8" sha1="77339a6db2593aadc638bed77b8e9bed5d9d87e3" name="SF-7000 Initial Program Loader ROM (SF-7000)"> </hash>
+	<hash crc32="3793c01a" sha1="99a5995f31dcf6fbbef56d3ea0d2094ef039479f" name="Shadow Dancer (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="4135ae1d" sha1="acf54158de2ea769583cac0fbc87712d051ec515" name="Shadow Dancer (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="1575581d" sha1="45943b021cbaee80a149b80ddb6f3fb5eb8b9e43" name="Shadow of the Beast (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="aab67ec3" sha1="58f01556d1f2da0af9dfcddcb3ac26cb299220d3" name="Shanghai (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8d3d6bff" sha1="70f91b293c71a93e908e0d8eed4ab0c05e59a1e6" name="Shanghai (UE) [o1]"> </hash>
+	<hash crc32="5a917e06" sha1="83784e8248e2367546115382dac157ca8e6fe3ab" name="Shinnyushain Tooru Kun (SG-1000)"> </hash>
+	<hash crc32="e1fff1bb" sha1="26070deaa2d3c170d31ac395a50231204250bdf3" name="Shinobi (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="0c6fac4e" sha1="7c0778c055dc9c2b0aae1d166dbdb4734e55b9d1" name="Shinobi (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="483bd1c8" sha1="af995d51c81df0de329d5594acf07abc4ccf2a12" name="Shinobi (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="4bfd45f0" sha1="d1b61757930cf76467272b41b106da75b13d4cd5" name="Shinobi (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="b2f41ad6" sha1="a41aacb1ccaac7b519aedb4c713bdb292cf768aa" name="Shinobi (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="4b051022" sha1="6c22e3fa928c2aed468e925af65ea7f7c6292905" name="Shooting Gallery (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5f40660d" sha1="a94b76119a96c7290c76057723b254997666379a" name="Simple Sprite Demo Release 2 by Nicolas Warren (PD)"> </hash>
+	<hash crc32="d1cc08ee" sha1="4fa839db6de21fd589f6a91791fff25ca2ab88f4" name="Simpsons, The - Bart vs. the Space Mutants (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f6b2370a" sha1="038920e63437e05d8431e4cbab2131dd76fb3345" name="Simpsons, The - Bart vs. the World (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="54d5bec3" sha1="a3b3f96685815d6ab0751e6442c7349d5b91d60c" name="Sindbad Mystery (SG-1000)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="01932df9" sha1="90bb8b8337866339f32b3fd48b4d25d78d682b55" name="Sindbad Mystery (SG-1000)"> </hash>
+	<hash crc32="abdf3923" sha1="9d626e9faa29a63ed396959894d4a481f1e7a01d" name="Sitio do Picapau Amarelo (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c93bd0e9" sha1="6327fb7129ecfcebdcd6b9c941703fda15a8a195" name="Slap Shot (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d33b296a" sha1="5979ee84570f7c930f20be473e895fc1d2b9e3f4" name="Slap Shot (U) (V1.0)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="0473142f" sha1="56581911bc1009019f17e47ee9169a66fdb2bdfc" name="Slap Shot (U) (V1.0)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="074f0893" sha1="8e500e463e9ed971494572a6036c6087ca9ac0c0" name="Slap Shot (U) (V1.0)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="702c3e98" sha1="2259dcf3ce702b5ddc8d0a5ed335263f45ecd2ce" name="Slap Shot (U) (V1.1)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a0440666" sha1="3cb1b750911ee7474d5091f3b3dbb12825191810" name="SMS 3-D Demo by Chris Covell (PD)"> </hash>
+	<hash crc32="350f7497" sha1="42f64f5ee3cc8a8f74c2601a93c5e619976a31f0" name="SMS APA Demo V0.01 by Haroldo O. Pinheiro (PD)"> </hash>
+	<hash crc32="ad31c5ff" sha1="8d9824b736fc220dc4de1afb89397359533b1c58" name="SMS Boot Loader 0.9 (PD)"> </hash>
+	<hash crc32="97b89878" sha1="f6b9b0383d17674a4a938e9a2dcfbb79ce41c0db" name="SMS Cast - A Tribute To Loose Logic (PD)"> </hash>
+	<hash crc32="1e9fce5f" sha1="f3d14a8fc3787521dd7bc328897ec1dd51172489" name="SMS Chip-8 V0.1 by Maxim (PD)"> </hash>
+	<hash crc32="1abf0172" sha1="ba5e1eff0f3acf04dde2d1e1d658bfccbe3d1440" name="SMS Chip-8 V0.21 by Maxim (PD)"> </hash>
+	<hash crc32="a0154e51" sha1="0faa352434a113ab374190a5e49d755649740df0" name="SMS Chip-8 V1.11 by Maxim (PD)"> </hash>
+	<hash crc32="ea766665" sha1="a08d6242093b6e2f0956a4183a0f180df1fc509f" name="SMS Palette by Omar Cornut (PD)"> </hash>
+	<hash crc32="1a07b7a4" sha1="161a4fcc96a85deed4bf09e15a89f7c995ff19cc" name="SMS Power Demo Build 31 by Zoop (PD)"> </hash>
+	<hash crc32="297efb87" sha1="a47d5e8e3a388df1eb6e794f3100eaad6532c4d8" name="SMS Power's 7th Anniversary Intro V1.00 by Nicolas Warren (PD)"> </hash>
+	<hash crc32="a2ff5a9e" sha1="09ae5fe0ff001e3de17217b608b4309bbc14c1d5" name="SMS Power's 7th Anniversary Intro V1.03 by Nicolas Warren (PD) [a1]"> </hash>
+	<hash crc32="72506a85" sha1="40cb17e76a79fad0630d0b58c0cd96c037be22d6" name="SMS Power's 7th Anniversary Intro V1.03 by Nicolas Warren (PD)"> </hash>
+	<hash crc32="1a15dfcc" sha1="4a06c8e66261611dce0305217c42138b71331701" name="SMS Prototype M404 BIOS"> </hash>
+	<hash crc32="bd274327" sha1="11eb24dff09441a85aec470bfe706f7aed501746" name="SMS Sprite Test (PD)"> </hash>
+	<hash crc32="ee2c29ba" sha1="fc465122134d95363112eb51b9ab71db3576cefd" name="SMS Store Display Unit BIOS"> </hash>
+	<hash crc32="983e17e4" sha1="2695de00ea34cefe884fc7acc1e328c3745b3c77" name="SMS Tetris Release 2 by Nicolas Warren (PD)"> </hash>
+	<hash crc32="fd603aea" sha1="b838a84c65596f43310eac806b9f7465f2cb8373" name="SMS Tetris Release 3 by Nicolas Warren (PD)"> </hash>
+	<hash crc32="a0bf829b" sha1="3d0d82e4401c0d2f89130326d95a09f528ac2010" name="SMS Tetris Release 4 by Nicolas Warren (PD)"> </hash>
+	<hash crc32="7dbde57e" sha1="715fa8723926319ac73df3a922e8a9b3cfc14c59" name="SMS VGM player V0.45 by Maxim (PD)"> </hash>
+	<hash crc32="d654cfad" sha1="b98f05f6ff89a7cae80e31859098f84119678554" name="SMSC Basic Demo by Super Majik Spiral Crew (PD)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="05480c72" sha1="eeb6cf8ccc984b1a72b101e28a471846d0387fb5" name="SMSC Text Demo V1 by Super Majik Spiral Crew (PD)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="1079ce44" sha1="fdb706a2b0c4af503e48d8934c31cd4aa07153e2" name="SMSC Text Demo V1 by Super Majik Spiral Crew (PD)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="b20cc036" sha1="d1bcf1721c79fbd2d37bb42bbde24e24e1b73545" name="SMSC Text Demo V2 by Super Majik Spiral Crew (PD)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="8a098a14" sha1="10abcd7df65a2fcd42353725a33913e92eb810ff" name="SMSC Text Demo V2 by Super Majik Spiral Crew (PD)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="357f000b" sha1="f4516eb564fc944e21ee783439ea03b2c930389d" name="SMSC Text Demo V2 by Super Majik Spiral Crew (PD)"> </hash>
+	<hash crc32="97e5bb7d" sha1="16f756e00314781e07af84c871e82ec8e0a68a57" name="Smurfs Travel the World, The (E) (M4)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3e63768a" sha1="82f75232e195b8bdcd9c0d852076d999899cc92e" name="Smurfs, The (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="304fe02b" sha1="499ac51501035b5ec5a993c0c9c0163d8a49e35c" name="Snail Music Demo (PD)"> </hash>
+	<hash crc32="11645549" sha1="875f35d0775609776ec75ea2a8fa2297643e906c" name="Solomon no Kagi - Oujo Rihita no Namida (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="54f91cba" sha1="452f12cd054f278048fa6bc5a3d6f610d0dc7d0a" name="Sonic 2 Rebirth (Sonic 2 Hack)"> </hash>
+	<hash crc32="96b3f29e" sha1="4ad77a472e98002dc0d5c1463965720a257e1b8f" name="Sonic Blast (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="11637350" sha1="27ae2cff8e690016ffec733d1335682696d894b4" name="Sonic Boy 4 - Monster World (Wonder Boy in MW Hack)"> </hash>
+	<hash crc32="aedf3bdf" sha1="f64c8eea26a103582f09831c3e02c6045a6aff94" name="Sonic Chaos (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="fb14f1cf" sha1="63f6efea4dbf9cd099097baaf5c6001794de9ab6" name="Sonic Chaos (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="11c1bc8a" sha1="a6aa8038feb54e84759fcdfced2270afbbef9bfc" name="Sonic Spinball (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="b519e833" sha1="6b9677e4a9abb37765d6db4658f4324251807e07" name="Sonic The Hedgehog (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="48806ff7" sha1="4a257cbad310adcf32bb483c5647753068ddaf01" name="Sonic The Hedgehog (UE) [T+Fre_Terminus]"> </hash>
+	<hash crc32="5b3b922c" sha1="acdb0b5e8bf9c1e9c9d1a8ac6d282cb8017d091c" name="Sonic The Hedgehog 2 (UE) (V1.0)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d6f2bfca" sha1="689339bac11c3565dd774f8cd4d8ea1b27831118" name="Sonic The Hedgehog 2 (UE) (V2.2)"> </hash>
+	<hash crc32="a6933e55" sha1="81b6f4127914124259c652de56c9593419f3185a" name="Sonic vs. os Mauniks (Psycho Fox Hack)"> </hash>
+	<hash crc32="6259ae57" sha1="e14e720c347e8dcfccf55397e5d06438a8ee5cb3" name="Sonic-Boy 2 - Eggman's Trap (Wonder Boy III Hack)"> </hash>
+	<hash crc32="f8c3d4f4" sha1="26fe62b99488048a3f3677123b5065e62a6376f0" name="Sonic-Boy 3 - Eggman's Room (Teddy Boy Hack)"> </hash>
+	<hash crc32="6a16dce4" sha1="91fdd27e774e4102b32ab6c6b707e0c7b3a85be8" name="Sonic-Boy in Monster Land (Wonder Boy in ML Hack)"> </hash>
+	<hash crc32="922c5468" sha1="94e79b4a8b4a5fb77c837ea0a1e28bc5993d36af" name="Soukoban (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1b1efc66" sha1="b9a4612bcf172323e65fa77dad2a91d57cf1edf9" name="Sound Test by Nicolas Warren (PD)"> </hash>
+	<hash crc32="beddf80e" sha1="51ba2185a2b93957c1c51b0a2e2b80394463bed8" name="Space Harrier (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="fcd537d6" sha1="16124a25384339b0879c2b0d55d2920fe2a7202b" name="Space Harrier (J) [o1]"> </hash>
+	<hash crc32="ca1d3752" sha1="9e92d8e27fad71635c71612e8bdd632d760f9a2d" name="Space Harrier (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="47bd2006" sha1="6c2f2bfd6778fdc96938c42e704efdabec9be16d" name="Space Harrier (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="156948f9" sha1="7caf44ecc3de6daffedf7a494d449202888a6156" name="Space Harrier 3D (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6bd5c2bf" sha1="ce3507f62563f7d4cb4b2fc6497317685626af92" name="Space Harrier 3D (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6ad5cb3d" sha1="a4e4b0c2967e39c4931fba8bc87428f296e461c5" name="Space Invaders (SG-1000)"> </hash>
+	<hash crc32="bbd87d8f" sha1="08d9360d6e92b081d99b7629f91d4fe482383a18" name="Space Mountain (SG-1000)"> </hash>
+	<hash crc32="172474f3" sha1="32b7e0c831182af1a63bc94a7fdb10973faf4ef7" name="Space Oddity Demo by Tetsujin (PD)"> </hash>
+	<hash crc32="33fdea7a" sha1="7784016fa1b0dcfb33f5824ad6e9441fdf45e2f0" name="Space Oddity V.0 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="5ed9495b" sha1="3ac1dd95e822482c8771757fa4ae8de6322b15ef" name="Space Oddity V.01 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="9039db33" sha1="1032d23d195104002ed10ab660aa707a84aa4cf5" name="Space Oddity V.02 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="743e0e73" sha1="7c6d276cc8e8b159c8de47d799f30d0e724602bc" name="Space Oddity V.03 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="fbde8c25" sha1="af66443a8d223effdaba6f644a44797dd62eb5cd" name="Space Oddity V.04 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="9a023763" sha1="d3aab50720b493d27046fdf3d96202a6914a9f49" name="Space Oddity V.05 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="e2d9560a" sha1="a2624e83458ca5f471e47031153aaf9b92446fdd" name="Space Oddity V.06 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="6447d4e2" sha1="fb143396e840c9bf39430a62a265b03eec576d84" name="Space Oddity V.07 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="8abb04fd" sha1="cacff095c55578ba182d47c09e094caa1e3205a8" name="Space Oddity V.08 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="eda91464" sha1="a02b7d976a164738c38d3b8a36fc5cd8302e6080" name="Space Oddity V.09 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="bb8aa4d6" sha1="363ab461590926d98bffc9eaaf643fe8a7d07021" name="Space Oddity V.10 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="d57e9069" sha1="6075731a8e7b0b7a65e8bca3ee8b34fd8b94035f" name="Space Oddity V.11 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="0fbc0916" sha1="64ce2f8035c29a323762dc25dda4d1940b980eeb" name="Space Oddity V.12 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="6de37953" sha1="4463d87760079ffcf13048849ab22b2d3d4a1eb1" name="Space Oddity V.13 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="17a8f966" sha1="db127ff41d9cc6b57f47be49a550dfc5d7137b6a" name="Space Oddity V.14 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="08803e45" sha1="93c321589ea2137e6f64f758bef3e43f826955e7" name="Space Oddity V.15 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="1d6d755e" sha1="b11f588d98cdf4764bf1fab6eab9114d2fc3b76b" name="Space Oddity V.16 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="c5b73614" sha1="548f06a6399de07b94b812218807b15c2e0f4c48" name="Space Oddity V.17 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="4a81a3ec" sha1="cd2be00793b51ecda768e51d5626fdeadfbc0b03" name="Space Oddity V.18 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="a79aed1b" sha1="ac8b6a65c3039c76fbc60443f7291e74de7724c1" name="Space Oddity V.19 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="2beb762d" sha1="86c8183d3991192c370eaef3159462c022490eab" name="Space Oddity V.20 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="c9d7a460" sha1="f49376425033db482d3fe39fa375eab0f85c6567" name="Space Oddity V.21 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="26ed3d83" sha1="87480aab9923b6ed9831d24220be790d0b0dfcbb" name="Space Oddity V.22 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="ea3d0d59" sha1="83998196c5746f488f91728a26b49d4ec81281ed" name="Space Oddity V.23 by Proppy &amp; Tet (PD)"> </hash>
+	<hash crc32="b8b58b30" sha1="798b5f3742cb3f95fd5977d9a2cb48ba2dc804e6" name="Space Slalom (SG-1000)"> </hash>
+	<hash crc32="a908cff5" sha1="c5afd5fa7b26da55d243df6822c16dae3a401ac1" name="Spacegun (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="fa8e4ca0" sha1="8daabf51099bd2702fe4418fd202eff532bc710a" name="Special Criminal Investigation (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1b7d2a20" sha1="a0b4be5b62a0a836e227983647e0140df3eafe4d" name="Special Criminal Investigation (Prototype)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a57cad18" sha1="e51cbdb9b74ce4b53747215b23b54eb62f8392b3" name="Speedball (E) (Mirrorsoft)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5ccc1a65" sha1="a4cf72c985d0fe51ac36388774c7f0bf982c19e3" name="Speedball (E) (Virgin)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="0c7366a0" sha1="4e0b456441f0acef737e463e6ee5bbcb377ea308" name="Speedball 2 (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="4752cae7" sha1="eed8b01fca86dbd8291d5ca2d1e6f6ca1b60fe68" name="Spellcaster (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="da375abd" sha1="34e8f2bbb4a29568fe1f8d8ac393b719e3b3cdb5" name="Spellcaster (UE) [h1]"> </hash>
+	<hash crc32="a0587800" sha1="9e5221b8ac5ca7940da3e9a42d99f38bf7a87e38" name="Spellcaster (UE) [T+Fre][a1]"> </hash>
+	<hash crc32="9b1f566e" sha1="d36020c7a2455b7c77e0af4ef6fdb538744db746" name="Spellcaster (UE) [T+Fre]"> </hash>
+	<hash crc32="ebe45388" sha1="5d4fbf3873af14afcda10fadfdb3f4f8919b3b1e" name="Spider-Man - Return of the Sinister Six (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="908ff25c" sha1="02ebee891d88bacdadd37a3e75e05763b7ad3c9b" name="Spider-Man vs. the Kingpin (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="e42e4998" sha1="556d9ab4ba3c3a34440b36c6fc8e972f70f16d72" name="Sports Pad Football (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="41c948bf" sha1="7634ce39e87049dad1ee4f32a80d728e4bd1f81f" name="Sports Pad Soccer (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d6a8dd98" sha1="be0f850af3a10c96124ce01b12a534be8f33a29b" name="Sprite and Priority Test Program by Charles MacDonald (PD)"> </hash>
+	<hash crc32="ffcf390e" sha1="7602aebdc7abc5b4fa9f10dbb46fd554260fc301" name="Sprite Multiplex Demo (03012005) by Charles MacDonald (PD)"> </hash>
+	<hash crc32="d41b9a08" sha1="c5e004b34d6569e6e1d99bff6be940f308e2c39f" name="Spy vs. Spy (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a71bc542" sha1="5f87871a120c2de05a0d60cbca2a8007cab27c61" name="Spy vs. Spy (J) [h1]"> </hash>
+	<hash crc32="b87e1b2b" sha1="03eec0d33d7c3b376fe08ffec79f84091f58366b" name="Spy vs. Spy (U) (Display-Unit Cart)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="78d7faab" sha1="feab16dd8b807b88395e91c67e9ff52f8f7aa7e4" name="Spy vs. Spy (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="b846b52a" sha1="d38875cb08de0ea892e5ef80f93987bbc445ef8f" name="Star Force (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1ae94122" sha1="5d074708edf6c40dc6d80032cd91ff6197aa79c7" name="Star Jacker (SG-1000) (V1.0)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7f25deca" sha1="be078bfa5340f2e1d307b85d3648192972529e46" name="Star Jacker (SG-1000) (V1.1)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3fe59505" sha1="a2a06e7545ca1e0d522d0eb75a72b5b520f42330" name="Star Jacker (SG-1000) (V1.1) [h1]"> </hash>
+	<hash crc32="d4b8f66d" sha1="be75ca8ace66b72a063b4be2da2b1ed92f8449b0" name="Star Wars (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="0f8287ec" sha1="1866752a92abbf0eb55fbf9de1cd1b731ec62a54" name="Street Fighter 2 (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="87aabdfe" sha1="e7beba39bd6a1e78966c1cc5c47c87b3902fa3fd" name="Street Fighter 2 (B)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="599901bb" sha1="1c1dc1354148f173b1f6c59cd9f1ea7059d73bd0" name="Street Fighter 2 (B)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="4ab3790f" sha1="5bdec24d9ba0f6ed359dcb3b11910ec86866ec98" name="Streets of Rage (E) [a1]"> </hash>
+	<hash crc32="6f2cf48a" sha1="ea4214198a53dbcc0e4df5f1c34530bff5bea1f5" name="Streets of Rage (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="c95e0cc2" sha1="44abcb41221dab398cf10085e276cece191cd2c6" name="Streets of Rage (E) [T+Fre_1.0]"> </hash>
+	<hash crc32="ecc18147" sha1="fd5c661c8b92812af3d161ed1f43e308c85d843a" name="Streets of Rage (E) [T-Fre]"> </hash>
+	<hash crc32="04e9c089" sha1="cc18171a860711f6ad18ff89254dd7bd05c54654" name="Streets of Rage 2 (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9802ed31" sha1="051e72c8ffec7606c04409ef38244cfdd592252f" name="Strider (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="54a82e50" sha1="d40b6a0be9c41f1cde15af4a38f9cd8d77ecd0fb" name="Strider (UE)[T+Bra_CBT]">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="5b731a99" sha1="ed39e48d85b027770b9d26bdd5f0625759da3159" name="Strider (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="53c2feb2" sha1="9b306e98e6a12b86c5d4b7f4900bd2cc30a09a36" name="Strider (UE) [T+Bra_CBT]"> </hash>
+	<hash crc32="471cdb51" sha1="f35b74360bc099462f665e8f52b9e92112dc0ebe" name="Strider (UE) [T+Bra_Emunow][a1]"> </hash>
+	<hash crc32="40760bb3" sha1="32e386a2c801761cdfdc818069b1b0ec5057154c" name="Strider (UE) [T+Bra_Emunow]"> </hash>
+	<hash crc32="b8f0915a" sha1="f9d58bd9a5a99f2fd26fb411b0783fcd220249a4" name="Strider II (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d8f2f1b9" sha1="44384ec8bf91e1ca5512ff88bbcf1ae1ce5a1a35" name="Submarine Attack (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="b13df647" sha1="5cd041990c7418ba63cde54f83d3e0e323b42c3b" name="Sukeban Deka 2 (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8da5c93f" sha1="f9638b693ca3a7c65cfc589aaea0bbab56fc7238" name="Summer Games (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="0dbf3b4a" sha1="616b95baad61086f08d8688c2bf06838b902ac75" name="Super Basketball (Demo)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="85307975" sha1="36cc8301384537a700ec4ae85d2a24d0c5d1bd11" name="Super Jeux Yeno Examples (SF-7000)"> </hash>
+	<hash crc32="406aa0c2" sha1="4116e4a742e3209ca5db9887cd92219d15cf3c9a" name="Super Kick Off (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="29768bea" sha1="2fe27e2c091645a44ab2cea7fb78d3b2909d88b3" name="Super Kick Off (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="90bfd088" sha1="58320ebfe196828f4a18e60bdce44e8635c6f2aa" name="Super Magic Drive BIOS V3">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="e08173ba" sha1="bd44dade030a417ed35d60649fc4a508d5c54c8d" name="Super Magic Drive BIOS V3.1G"> </hash>
+	<hash crc32="07402a75" sha1="74deed8fa6aa51de1fb40a81afc1d48a8dd22407" name="Super Magic Drive BIOS V4.1a">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3ef12baa" sha1="fc933d9ec3a7e699c1e2cda89b957665e7321a80" name="Super Monaco GP (UE) (V1.0)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="55bf81a0" sha1="0f11b9d7d6d16b09f7be0dace3b6c7d3524da725" name="Super Monaco GP (UE) (V1.1)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="54f68c2a" sha1="804cd74bbcf452613f6c3a722be1c94338499813" name="Super Off-Road (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7e0ef8cb" sha1="442f3ba8a66a0d9c49a46091df83fcdba4b63c3a" name="Super Racing (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="e0b1aff8" sha1="b4515aad1cad31980d041632e23d3be82aa31828" name="Super Smash TV (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1d6244ee" sha1="b28d2a9c0fe597892e21fb2611798765f5435885" name="Super Space Invaders (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="084cc13e" sha1="58d7d51b91b763d812376d56643a4f8a331e826b" name="Super Tank (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="95cbf3dd" sha1="e7f3529689cd29be3fa02f94266e4ee8e0795d7d" name="Super Tennis (J)"> </hash>
+	<hash crc32="914514e3" sha1="67787f3f29a5b5e74b5f6a636428da4517a0f992" name="Super Tennis (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="e2fcb6f3" sha1="14210196f454b6d938f15cf7b52076796c5d0f7d" name="Super Wonder Boy (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="b1da6a30" sha1="f4cd1ee6f98bc77fb36e232bf755d61d88e219d7" name="Super Wonder Boy - Monster World (J) (V1.0)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6f9ac98f" sha1="f12b0eddfc271888bbcb1de3df25072b96b024ec" name="Superman (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="76b86e59" sha1="d4c1cfec416c401f7ed302f32cb9c5934a8fa721" name="Superman (E) [T+Bra_guto]"> </hash>
+	<hash crc32="85cfc9c9" sha1="495e3ced83ccd938b549bc76905097dba0aaf32b" name="Taito Chase H.Q. (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="eeeaaee5" sha1="3cdb5efc71408bc53499ea42c54546d65fdf00ae" name="Taito Chase H.Q. (J) [o1]"> </hash>
+	<hash crc32="6a96978d" sha1="751d82119e19d46a20165c8debbfe95b3241a701" name="Tanoshii Sansuu (SC-3000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="11ce074c" sha1="36a67210ca9762f280364007fcacbd7b1416d6ee" name="Taz in Escape From Mars (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7cc3e837" sha1="ac98f23ddc24609cb77bb13102e0386f8c2a4a76" name="Taz-Mania (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1b312e04" sha1="274641b3b05245504f763a5e4bc359183d16a092" name="Taz-Mania (Prototype)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c63e7b0a" sha1="a9e1d27b65a8b70e52fdbe6b961b0d701cc1979f" name="Taz-Mania (Prototype) [T+Bra1.0_EmuBrazil][p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="96e75f48" sha1="bfc473bcfd849c8955f24e82347423fef4f7faf5" name="Tecmo World Cup '92 (Prototype for '93)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5a1c3dde" sha1="43a30da241f57cf086ab9b2ed25fe018171f2908" name="Tecmo World Cup '93 (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="2728faa3" sha1="6ae39718703dbf7126f71387ce24ad956710a315" name="Teddy Boy (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d7508041" sha1="51014d89cd8770df8a3d837a0208cb69d5bf7903" name="Teddy Boy Blues (J) (EP-MyCard)"> </hash>
+	<hash crc32="316727dd" sha1="fb61c04f30c83733fdbf503b16e17aa8086932df" name="Teddy Boy Blues (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9dfa67ee" sha1="839da36557b494299b427bda4e32d2ba61977b25" name="Teddy Boy Blues (J) [p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8fc6fef9" sha1="803faca145bbbfb2195022e5089d4d7f8b790315" name="Teddy Boy e Geraldinho (B) (Geraldinho Hack)"> </hash>
+	<hash crc32="1a390b93" sha1="0d202166d4a3bdfcf90514c711c77e4f20764552" name="Tennis Ace (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8132ab2c" sha1="ca802b7bdbc0b458d02fda2da32c2e27e50eef19" name="Tensai Bakabon (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="dd4a661b" sha1="12296f2bb57d80d1774749d3002a039e0940c6fa" name="Terebi Oekaki (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="ac56104f" sha1="a8fe50e27fa9d44f3bd05d249a964352a32d1799" name="Terminator 2 - Judgment Day (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="93ca8152" sha1="cfa4a899185fced837991d14f011cdaca81e9dd7" name="Terminator 2 - The Arcade Game (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="edc5c012" sha1="eaf733d385e61526b90c1b194bf605078d43e2d3" name="Terminator, The (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8640e7e8" sha1="a05a7a41295c38add5dfc71032d2d83b96f518b1" name="Three Dragon Story, The (K)"> </hash>
+	<hash crc32="c0ce19b1" sha1="535dbd339f4b5c5efd502cffbbe719d7b3e7f1c3" name="Thunder Blade (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="ae920e4b" sha1="c38f3eea4e7224bc6042723e88b26c85b1a56ddc" name="Thunder Blade (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="51bd14be" sha1="89842cb30cc3ba626901a5da41481f6d157ebd15" name="Time Soldiers (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="dc2a88cb" sha1="e2702f6b58c612baa52c98b03db90f30878e8b36" name="Time Soldiers (UE) [o1]"> </hash>
+	<hash crc32="ff0f9323" sha1="7bef54dbba39191fa27853252800f507a1bacf3e" name="Time Soldiers (UE) [T+Bra_CBT]"> </hash>
+	<hash crc32="ed9a19b6" sha1="8ffc179388dfbcc42ed62721040d9d89f10d1734" name="Time Soldiers (UE) [T+Bra_Emunow]"> </hash>
+	<hash crc32="0c2fc2de" sha1="83133cc875f4124b6ede7a9afc29aa311b36c285" name="Tom and Jerry (Prototype)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a2ff09b9" sha1="0c7925b53401f8084caf9fda4758703ecc2cb410" name="Tom and Jerry - The Movie (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="b003f4eb" sha1="229765ece83a84ea4f1f01be2e54f0a346d841e5" name="Tom and Jerry - The Movie (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="bf7b7285" sha1="30224286c65beddf37dc83f688f1bd362f325227" name="Tom and Jerry - The Movie (E)"> </hash>
+	<hash crc32="4f8d75ec" sha1="55ca8a8b1f2a342fc8b8fc3f3ccd98ed44b2fe98" name="Toto World 3 (K)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="d78c600d" sha1="94a2b37ff816992d7824c37ba8489abfa6284e2b" name="Tototek Menu Boot - SG-1000 Mode by Chris Covell (PD)"> </hash>
+	<hash crc32="fe38661a" sha1="cfcb2e75f03d1005927e16e146ac5ca8a1a91b57" name="Tototek Menu Boot - SMS Mode by Chris Covell (PD)"> </hash>
+	<hash crc32="4bc42857" sha1="73273e6d44ad7aea828b642d22f6f1c138be9d2b" name="Trans-Bot (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="cbbd21f6" sha1="d9662cc7ee6046961c3edfb034d11c7f4c38e319" name="Trans-Bot (UE) [o1]"> </hash>
+	<hash crc32="69362bf1" sha1="c5f445d21318a6401aa9db930f3247b24baf8de2" name="Trans-Bot (UE) [o2]"> </hash>
+	<hash crc32="bd6f2c92" sha1="6650d2b07db55f507b0ee291756fdf71903b6ff1" name="Trans-Bot (UE) [o3]"> </hash>
+	<hash crc32="e8215c2e" sha1="eaae5c9d9de24c0991500122042b3aa2210d50d9" name="Trap Shooting - Marksman Shooting - Safari Hunt (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="86f60ef6" sha1="bf799b9184015d2ab2b3188f183066e42c653d6f" name="Treinamento Do Guerreiro Lobo (Wonder Boy in MW Hack) [a1]"> </hash>
+	<hash crc32="8cc9b324" sha1="28585245a7464f6f6a2edbbc437f536f6f97f4ee" name="Treinamento Do Guerreiro Lobo (Wonder Boy in MW Hack)"> </hash>
+	<hash crc32="e94784f2" sha1="327c3518363ee060b681ff34c0b2eea3ffea27e4" name="Treinamento Do Mymo (B)"> </hash>
+	<hash crc32="e5374022" sha1="bafaaeaa376e109db5d52a484a3efcd6ed84d4d6" name="Trivial Pursuit (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="458390e7" sha1="22335dd5b85b312db33edd2f11dbefc5d0bae69e" name="Turma da Monica 3 v01 (Monster World III Hack)"> </hash>
+	<hash crc32="22cca9bb" sha1="77b4ec8086d81029b596020f202df3e210df985d" name="Turma da Monica em - O Resgate (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="4e9cc98f" sha1="287235ca264f150beffecbff29a0634b8b9cb35b" name="Ultima III V2006-05-13prealpha (PD)"> </hash>
+	<hash crc32="b52d60c8" sha1="a90e21e5961bcf2e10b715a009c04e7c2017a3b1" name="Ultima IV - Quest of the Avatar (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="19d64680" sha1="8e6a70ff3ea7ea43d1c2dd84f1efd1bb7a545204" name="Ultima IV - Quest of the Avatar (E) [T+Ger]"> </hash>
+	<hash crc32="de9f8517" sha1="bb1ae06b62a9f7d3259c51eee4cfded781eb5d30" name="Ultima IV - Quest of the Avatar (Prototype)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="15668ca4" sha1="e0adf52b6e1f54260dd6ea80e99ffb8bf76fd49a" name="Ultimate Soccer (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7840d45c" sha1="51ee4506e2e07bde203d224f91a08463a58e1d94" name="Ultimate Soccer (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="046ebc1b" sha1="a362b6b54738faf9eba6b9b1b6ba75a6c140f090" name="Unite Centrale de Huit Bits by Comic Bakery (PD)"> </hash>
+	<hash crc32="cf4a09ea" sha1="3af7b66248d34eb26da40c92bf2fa4c73a46a051" name="US-European SMS BIOS + Alex Kidd in Miracle World (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="0072ed54" sha1="c315672807d8ddb8d91443729405c766dd95cae7" name="US-European SMS BIOS V1.3 (UE) [f1]"> </hash>
+	<hash crc32="5ad6edac" sha1="083ce08bff13b3530371c6021dc740f1cfc78e0c" name="US-European SMS BIOS V1.3 (UE) [h1]"> </hash>
+	<hash crc32="91e93385" sha1="9e179392cd416af14024d8f31c981d9ee9a64517" name="US-European SMS BIOS V2.4 (Hang On &amp; Safari Hunt) (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="8edf7ac6" sha1="51fd6d7990f62cd9d18c9ecfc62ed7936169107e" name="US-European SMS BIOS V3.4 (Hang On) (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6d0f1673" sha1="7e6ffa26022ce2967c1d487283a689ce57f147fb" name="V Counter Test by Charles MacDonald (PD)"> </hash>
+	<hash crc32="20f40cae" sha1="d03fb8fb31d6c49ce92e0a4c952768896f798dd5" name="Vampire (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="39540619" sha1="bbd730a6d6a9b744095376c7bf593d1027244a06" name="Vampire (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="720b6973" sha1="c5d39f5891dee424a2d5cbc5910ceaf6f4cebcaa" name="Vampire (E) [T+Fre1.00_Terminus]"> </hash>
+	<hash crc32="8efc77bc" sha1="e0605e23d80b8b975743d3417f548b28810e0ba3" name="Video Flipper (SG-1000)"> </hash>
+	<hash crc32="dfb0b161" sha1="0dc37f1104508c2c0e2593b10dffc3f268ae8ff9" name="Vigilante (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a986542b" sha1="b60969d4e7a5d3c022e346be3075219575b3cce8" name="Vigilante (UE) [T+Fre_Terminus]"> </hash>
+	<hash crc32="ad300bd9" sha1="014b8bb21ed60729c79f675196d052463ad29c36" name="Vik 01 (PD)"> </hash>
+	<hash crc32="57f1545b" sha1="ee24af11f2066dc8ffbefb72a5048a2471576229" name="Virtua Fighter Animation (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3d55759b" sha1="2d1201523540ae1673fe75bd2c9d1db1cc61987d" name="Walter Payton Football (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="73b9d9bb" sha1="bfa6c358f7fed09b5ab45252ed181b0af38fd762" name="Walter Payton Football (U) [o1]"> </hash>
+	<hash crc32="5359762d" sha1="6135e4d0f76812f9d35ddb5b3e7d34d56a5458b3" name="Wanted (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="88aa8ca6" sha1="c848e92899dc9b6f664e98ad247fed86c0e46a41" name="Where in the World is Carmen Sandiego (B)"> </hash>
+	<hash crc32="428b1e7c" sha1="683317c8d7d8b974066d7ddb3ed64f99801aa9de" name="Where in the World is Carmen Sandiego (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="912d92af" sha1="07bc7896efc9eae77a9be68c190071c99eb17a8a" name="Wimbledon (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7f3afe58" sha1="55dd4aaa92de4bdaa1d8b6463a34887f4a8baa28" name="Wimbledon II (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c2fee1e4" sha1="d59897788ead1515667c9005f85736e121765acb" name="Winnie Cooper (SG-1000) (PD)"> </hash>
+	<hash crc32="2fec2b4a" sha1="758f3dc68db93f35e315fbf2fcd904484cce2ad1" name="Winter Olympics '94 (B) (M8)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a20290b6" sha1="20b73d53e6868957f07b1a813b853943bfb90307" name="Winter Olympics '94 (UE) (M8)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1f8efa1d" sha1="92873f8d7b81a57114b135a2dfffc58d45643703" name="Wolf Child (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="160535c5" sha1="4a54933135cdff546fd79cbc61a38355f7335f3f" name="Wonder Boy (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="73705c02" sha1="63149f20bf69cd2f24d0e58841fcfcdace972f49" name="Wonder Boy (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="ec7cf033" sha1="1d86d1052f9e56c795b3489cf15957f79ada31f1" name="Wonder Boy (UE) [o1]"> </hash>
+	<hash crc32="679e1676" sha1="99e73de2ffe5ea5d40998faec16504c226f4c1ba" name="Wonder Boy III - The Dragon's Trap (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="da7762af" sha1="8f0c7526d1ea03abd670e852808d336bb0027c39" name="Wonder Boy III - The Dragon's Trap (UE) [o1]"> </hash>
+	<hash crc32="79ec738b" sha1="d7fc428a33487ff581a1135c16ebb034991bb1ec" name="Wonder Boy III - The Dragon's Trap (UE) [T+Fre]"> </hash>
+	<hash crc32="42012b7d" sha1="46e5e7c6c4a730bcd257f1537fdc3da4b8c3d10a" name="Wonder Boy III - The Dragon's Trap (UE) [T+Swe.7b_Metalhead]"> </hash>
+	<hash crc32="ca500a43" sha1="0f21d0f830686e83b112de3202238ccbb9fb0efe" name="Wonder Boy III D.C. (Wonder Boy III Hack)"> </hash>
+	<hash crc32="8cbef0c1" sha1="51715db7a49a18452292dadb2bba0108aa6d6402" name="Wonder Boy in Monster Land (UE) (V1.1)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="7522cf0a" sha1="24889396756fc5a1e043e89d70c5431c9d98df7d" name="Wonder Boy in Monster Land (UE) (V1.1) [h1]"> </hash>
+	<hash crc32="43933407" sha1="77aa8666a9a41ee2fdb4fc111d22b7c663359d08" name="Wonder Boy in Monster Land (UE) (V1.1) [T+Fre_Crispysix]"> </hash>
+	<hash crc32="7d7ce80b" sha1="da0acdb1b9e806aa67a0216a675cb02ed24abf8b" name="Wonder Boy in Monster World (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5c87b0ae" sha1="ff6aee1cb1257b9d6b48eb35ebdebcf2a43f7817" name="Wonder Boy in Monster World (E) [T+Fre_Microtrads]"> </hash>
+	<hash crc32="81bff9bb" sha1="7a26de7a544c602daeadbd3507028ac68ef35e91" name="Wonder Boy in Monster World (Prototype)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="fa8b5f3d" sha1="8affabf9735ec0292ed6bb1bcf79b0ebd7dae48e" name="Wonder Boy in Monster World (Prototype)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="315917d4" sha1="b74078c4a3e6d20d21ca81e88c0cb3381b0c84a4" name="Woody Pop (J)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="c9a449b7" sha1="7bd82131944020a20167f37071ccc1dfa3ae0b3d" name="World Class Leaderboard (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a6bf8f9e" sha1="f41d81710f24b08a2a3ac28f2679338a47ca5890" name="World Cup '94 (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="6e1ad6fd" sha1="dfa51a4f982d0bec61532e16a679edae605d0aea" name="World Cup Italia '90 (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="1ed55767" sha1="7466390735f90f009a20263518bf65ab6d3ce403" name="World Cup Italia '90 (E)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="2377fa48" sha1="992e84114a0d511c3cf7e844f0d65a85b9647825" name="World Cup Italia '90 (E) [T+Bra][p1]">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a2a60bc8" sha1="4f3c04e40dd4b94d5d090068ba99b8461af56f51" name="World Games (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="914d3fc4" sha1="6361f796248c71ecfaaa02aafe6ddbbaebf6ebba" name="World Games (Prototype)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="4aaad0d6" sha1="650f15ebbd149f5c357f089d7bd305fcb20b068f" name="World Grand Prix (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="ff6e23b0" sha1="7a348588f5a8943daf4c495b03976c92ea1c3871" name="World Grand Prix (E) [o1]"> </hash>
+	<hash crc32="7b369892" sha1="feff411732ca2dc17dab6d7868749d79326993d7" name="World Grand Prix (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="72112b75" sha1="bd385b69805c623ab9934174a19a30371584c4b0" name="World Soccer (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="bae431a4" sha1="15f6ef8b3b926cab18671cb9bbd6f786bacfccfd" name="World Soccer (E) [o1]"> </hash>
+	<hash crc32="ab260100" sha1="7c4b8cd2232249bea27ab8c10c3f2ad6679dd950" name="World Soccer (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="2db21448" sha1="6fd4f5af0f14e1e0a934cd9e39a6bb476eda7e97" name="WWF Wrestlemania Steel Cage Challenge (U)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="3e1387f6" sha1="6405a2f8b6f220b4349f8006c3d75dfcdcd6db6d" name="X-Men - Mojo World (B)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="5c205ee1" sha1="72cb8a24f63e9e79c65c26141abdf53f96c60c0c" name="Xenon 2 (E) (Image Works)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="ec726c0d" sha1="860cff21eff077acd92b06a71d859bf3e81fe628" name="Xenon 2 (E) (Virgin)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f13e118d" sha1="8f7f085a3047221fb0f0448948faf239e18c5ce8" name="Xenon 2 (E) (Virgin)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="e2fd5201" sha1="4d746558fb699c5cb480ba26130518105b2e2031" name="Yamato (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="e2956dd0" sha1="327b9ac2a35714dc9f920e2fef4f1a24a2259f7d" name="Yeno Draw (Side 1) (SF-7000)"> </hash>
+	<hash crc32="be53243a" sha1="9f693e4cdb9eb89c167e7291bcfd9c1bb2ffc5ad" name="Yeno Draw (Side 2) (SF-7000)"> </hash>
+	<hash crc32="32759751" sha1="614b589080b732e17cc0d253e17216a72a268955" name="Ys (J)"> </hash>
+	<hash crc32="b33e2827" sha1="e73e836c353543e9f48315410b0d72278899ff59" name="Ys - The Vanished Omens (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="afd29460" sha1="2288827eeb2afecd62c0d0288a482d66208fd94a" name="Ys - The Vanished Omens (UE) [T+Fre_Crispysix]"> </hash>
+	<hash crc32="905467e4" sha1="e32f536c3576d41ab485e07809c4404e6b462443" name="Zaxxon (SG-1000)"> </hash>
+	<hash crc32="bba74147" sha1="85a67064c71dfa58eb150cc090beb5ae6639b527" name="Zaxxon 3D (Prototype)"> </hash>
+	<hash crc32="a3ef13cb" sha1="257946fe8a230ac1308fc60a8ed43851cfe6b915" name="Zaxxon 3D (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="05f471de" sha1="ae696b32f713c04aa513323c0db06c5cf1c40cea" name="ZEXALL V0.12SDSC by Maxim &amp; Eric Quinn (PD)"> </hash>
+	<hash crc32="38e4b272" sha1="38d4a7fc5ccc2558305dcf614729d805888e84aa" name="ZEXALL V0.12VDP by Maxim &amp; Eric Quinn (PD)"> </hash>
+	<hash crc32="5718762c" sha1="3aab3e95dac0fa93612da20cf525dba4dc4ca6ba" name="Zillion (UE) (V1.1)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f21a8f56" sha1="bd97ec69ad42b20c1ff2134518a19e03afd8b76f" name="Zillion (UE) (V1.1)[o1]">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="acbebb10" sha1="1736b8891bfaa24ce1c2bec660e24aba6c58bbe2" name="Zillion (UE) (V1.1) [o1]"> </hash>
+	<hash crc32="206bcf81" sha1="e44b657c75e5a75e5cbe8ae46a8ee7e0ef32af25" name="Zillion (UE) (V1.1) [T+Bra_CBT][o1]"> </hash>
+	<hash crc32="dabc7c0e" sha1="bb81185b3b1d0486f8e1ba18c50ee4b182ca0dc2" name="Zillion (UE) (V1.1) [T+Bra_CBT]"> </hash>
+	<hash crc32="e51f3d1b" sha1="4f64c69011c0c6fa723a6c506803a9ee0aadedec" name="Zillion (US) (V1.1) [T+Fre_Terminus]"> </hash>
+	<hash crc32="2f2e3bc9" sha1="1e08be828ecf4cf5db787704ab8779f4b5a444b5" name="Zillion II - The Tri Formation (UE)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="f0f81241" sha1="e7fc6f7973751b7193d61db16d87639be400a5f5" name="Zillion II - The Tri Formation (UE)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="3328b900" sha1="35dd98834aab5ee6d823887760255515beb86510" name="Zillion II - The Tri Formation (UE) [o1]"> </hash>
+	<hash crc32="bc5d20df" sha1="8c48dbe187ff4b26d6244d38075565f284536d0c" name="Zippy Race (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="9d9d0a5f" sha1="aed98f2fc885c9a6e121982108f843388eb46304" name="Zool (E)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="093830d8" sha1="09552aaa7140f9fc780b5f7d541478b534320075" name="Zoom 909 (SG-1000)">
+		<status>GoodSMS Verified Image</status>
+	</hash>
+	<hash crc32="a463ddfa" sha1="f0025f0d4b64978ca625aa7b9a742a8a47d42063" name="Zoom Effect #1_1 by Charles MacDonald (PD)"> </hash>
+	<hash crc32="b97e110a" sha1="4e8a2cc35ebb4b8f0eb1c644d2aa76db11082bb2" name="Zoom Effect #1_2 by Charles MacDonald (PD)"> </hash>
+	<hash crc32="980fdc4b" sha1="ce662419f10946fb05a511ddec13150fc641581a" name="Zoom Effect #1_3 by Charles MacDonald (PD)"> </hash>
+	<hash crc32="3396bf81" sha1="8ebcca84c7c76200fcb491e01b217b8939b6c0fb" name="Zoop's Birthday Demo (PD)"> </hash>
+</hashfile>

@@ -1,0 +1,8 @@
+<tests>
+
+<test name="primoa32_000" driver="primoa32">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+</tests>

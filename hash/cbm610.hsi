@@ -1,0 +1,19 @@
+<hashfile>
+	<!-- Commodore CBM610 image CRC List -->
+	<!-- Compiled by Stefano &quot;JoJo&quot; Priore and Peter Trauner -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<!-- Send corrections/submissions to: battlepriest@hotmail.com -->
+	<!-- These programs have been proved to work -->
+	<hash crc32="B3B6173A" name="DEC VT-52 Term Emulator (SYS16384).40">
+		<status>ESC-? to enable</status>
+	</hash>
+	<hash crc32="43B08D1F" name="Monitor 2.0 (SYS16384).40">
+		<status>Type HELP to list commands</status>
+	</hash>
+	<hash crc32="AC622A2B" name="ProfiText.20"/>
+	<!-- This program doesn't start (it should run with SYS4096, but I'm not sure) -->
+	<!-- The problem could also be emu-related -->
+	<hash crc32="1C0FD916" name="SFD1001 Disk Copy.10"/>
+</hashfile>
