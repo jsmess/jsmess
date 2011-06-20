@@ -556,11 +556,20 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 			{
 				/* IRQ to inner privilege */
 				I386_SREG stack;
+				UINT32 newESP,oldSS,oldESP;
 
 				/* Check new stack segment in TSS */
 				memset(&stack, 0, sizeof(stack));
-				stack.selector = i386_get_stack_segment(cpustate,DPL);
+				if(flags & 0x0008)
+					stack.selector = i386_get_stack_segment(cpustate,DPL);
+				else
+					stack.selector = i286_get_stack_segment(cpustate,DPL);
 				i386_load_protected_mode_segment(cpustate,&stack);
+				oldSS = cpustate->sreg[SS].selector;
+				if(flags & 0x0008)
+					oldESP = REG32(ESP);
+				else
+					oldESP = REG16(SP);
 				if((stack.selector & ~0x07) == 0)
 				{
 					logerror("IRQ: New stack selector is null.\n");
@@ -604,7 +613,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				}
 				if(type & 0x08) // 32-bit gate
 				{
-					UINT32 newESP = i386_get_stack_ptr(cpustate,DPL);
+					newESP = i386_get_stack_ptr(cpustate,DPL);
 					if(newESP < 20)
 					{
 						logerror("IRQ: New stack has no space for return addresses.\n");
@@ -613,7 +622,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				}
 				else // 16-bit gate
 				{
-					UINT32 newESP = i386_get_stack_ptr(cpustate,DPL);
+					newESP = i286_get_stack_ptr(cpustate,DPL);
 					if(newESP < 10)
 					{
 						logerror("IRQ: New stack has no space for return addresses.\n");
@@ -626,20 +635,23 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 					FAULT_EXP(FAULT_GP,0)
 				}
 				/* Load new stack segment descriptor */
-				cpustate->sreg[SS].selector = i386_get_stack_segment(cpustate,DPL);
+				cpustate->sreg[SS].selector = stack.selector;
 				i386_load_segment_descriptor(cpustate,SS);
-				REG32(ESP) = i386_get_stack_ptr(cpustate,DPL);
+				if(flags & 0x0008)
+					REG32(ESP) = i386_get_stack_ptr(cpustate,DPL);
+				else
+					REG16(SP) = i286_get_stack_ptr(cpustate,DPL);
 				if(type & 0x08)
 				{
 					// 32-bit gate
-					PUSH32(cpustate,cpustate->sreg[SS].selector);
-					PUSH32(cpustate,REG32(ESP));
+					PUSH32(cpustate,oldSS);
+					PUSH32(cpustate,oldESP);
 				}
 				else
 				{
 					// 16-bit gate
-					PUSH16(cpustate,cpustate->sreg[SS].selector);
-					PUSH16(cpustate,REG16(ESP));
+					PUSH16(cpustate,oldSS);
+					PUSH16(cpustate,oldESP);
 				}
 				cpustate->CPL = DPL;
 				SetRPL = 1;
