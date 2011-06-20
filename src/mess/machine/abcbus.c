@@ -35,7 +35,7 @@ abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char
 
 
 //-------------------------------------------------
-//  static_set_abcbus_slot - 
+//  static_set_abcbus_slot -
 //-------------------------------------------------
 
 void abcbus_slot_device::static_set_abcbus_slot(device_t &device, const char *tag, int num)
@@ -174,7 +174,7 @@ void abcbus_device::add_abcbus_card(device_abcbus_card_interface *card, int pos)
 	m_abcbus_device[pos] = card;
 }
 
-	
+
 //-------------------------------------------------
 //  cs_w -
 //-------------------------------------------------

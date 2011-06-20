@@ -534,7 +534,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
         For the moment, the user can use the UI to select play, stop, etc.
         If you load from the command-line or the software-picker, type in L <enter> immediately. */
 #if 0
-	
+
 		device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
 		((data & 0x08) && mz700_motor_on) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);

@@ -1013,7 +1013,7 @@ void sf7000_state::machine_start()
 {
 	/* configure VDP */
 	TMS9928A_configure(&tms9928a_interface);
-	
+
 	/* configure memory banking */
 	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base(), 0);
 	memory_configure_bank(machine(), "bank1", 1, 1, ram_get_ptr(m_ram), 0);

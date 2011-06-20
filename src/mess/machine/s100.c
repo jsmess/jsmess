@@ -1,6 +1,6 @@
 /**********************************************************************
 
-	S-100 (IEEE-696/1983) bus emulation
+    S-100 (IEEE-696/1983) bus emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -178,7 +178,7 @@ void s100_device::add_s100_card(device_s100_card_interface *card, int pos)
 READ8_MEMBER( s100_device::smemr_r )
 {
 	UINT8 data = 0;
-	
+
 	for (int i = 0; i < MAX_S100_SLOTS; i++)
 	{
 		if (m_s100_device[i] != NULL)
@@ -186,7 +186,7 @@ READ8_MEMBER( s100_device::smemr_r )
 			data |= m_s100_device[i]->s100_smemr_r(offset);
 		}
 	}
-	
+
 	return data;
 }
 
@@ -214,7 +214,7 @@ WRITE8_MEMBER( s100_device::mwrt_w )
 READ8_MEMBER( s100_device::sinp_r )
 {
 	UINT8 data = 0;
-	
+
 	for (int i = 0; i < MAX_S100_SLOTS; i++)
 	{
 		if (m_s100_device[i] != NULL)
@@ -222,7 +222,7 @@ READ8_MEMBER( s100_device::sinp_r )
 			data |= m_s100_device[i]->s100_sinp_r(offset);
 		}
 	}
-	
+
 	return data;
 }
 

@@ -1780,7 +1780,7 @@ WRITE8_HANDLER(dgnalpha_modem_w)
 
 static WRITE8_DEVICE_HANDLER ( d_pia1_ca2_w )
 {
-	
+
 		cassette_device_image(device->machine())->change_state(
 		data ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MASK_MOTOR);

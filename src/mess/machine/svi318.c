@@ -210,7 +210,7 @@ static WRITE8_DEVICE_HANDLER ( svi318_ppi_port_c_w )
 	/* cassette motor on/off */
 	if (svi318_cassette_present(device->machine(), 0))
 	{
-		
+
 			device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
 			(data & 0x10) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,
 			CASSETTE_MOTOR_DISABLED);

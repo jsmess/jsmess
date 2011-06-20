@@ -17,7 +17,7 @@
 #define Z80CTC_TAG		"d208"
 #define Z80PIO1_TAG		"d206"
 #define Z80PIO2_TAG		"d207"
-//#define SPEAKER_TAG		"b237"
+//#define SPEAKER_TAG       "b237"
 
 class lc80_state : public driver_device
 {

@@ -1,6 +1,6 @@
 /**********************************************************************
 
-	Morrow Designs Wunderbus I/O card emulation
+    Morrow Designs Wunderbus I/O card emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -31,21 +31,21 @@ const device_type S100_WUNDERBUS = &device_creator<s100_wunderbus_device>;
 
 
 //-------------------------------------------------
-//	pic8259_interface pic_intf
+//  pic8259_interface pic_intf
 //-------------------------------------------------
 
 /*
 
-	bit		description
-	
-	IR0		S-100 VI0
-	IR1		S-100 VI1
-	IR2		S-100 VI2
-	IR3		Serial Device 1
-	IR4		Serial Device 2
-	IR5		Serial Device 3
-	IR6		Daisy PWR line
-	IR7		RT Clock TP line
+    bit     description
+
+    IR0     S-100 VI0
+    IR1     S-100 VI1
+    IR2     S-100 VI2
+    IR3     Serial Device 1
+    IR4     Serial Device 2
+    IR5     Serial Device 3
+    IR6     Daisy PWR line
+    IR7     RT Clock TP line
 
 */
 
@@ -63,7 +63,7 @@ static struct pic8259_interface pic_intf =
 
 
 //-------------------------------------------------
-//	ins8250_interface ace1_intf
+//  ins8250_interface ace1_intf
 //-------------------------------------------------
 
 static INS8250_TRANSMIT( ace1_transmit )
@@ -84,7 +84,7 @@ static ins8250_interface ace1_intf =
 
 
 //-------------------------------------------------
-//	ins8250_interface ace2_intf
+//  ins8250_interface ace2_intf
 //-------------------------------------------------
 
 static ins8250_interface ace2_intf =
@@ -98,7 +98,7 @@ static ins8250_interface ace2_intf =
 
 
 //-------------------------------------------------
-//	ins8250_interface ace3_intf
+//  ins8250_interface ace3_intf
 //-------------------------------------------------
 
 static ins8250_interface ace3_intf =
@@ -112,7 +112,7 @@ static ins8250_interface ace3_intf =
 
 
 //-------------------------------------------------
-//	UPD1990A_INTERFACE( rtc_intf )
+//  UPD1990A_INTERFACE( rtc_intf )
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( s100_wunderbus_device::rtc_tp_w )
@@ -332,56 +332,56 @@ UINT8 s100_wunderbus_device::s100_sinp_r(offs_t offset)
 			{
 			case 0: // DAISY 0 IN (STATUS)
 				/*
-				
-					bit		description
-					
-					0		End of Ribbon
-					1		Paper Out
-					2		Cover Open
-					3		Paper Feed Ready
-					4		Carriage Ready
-					5		Print Wheel Ready
-					6		Check
-					7		Printer Ready
-					
-				*/
+
+                    bit     description
+
+                    0       End of Ribbon
+                    1       Paper Out
+                    2       Cover Open
+                    3       Paper Feed Ready
+                    4       Carriage Ready
+                    5       Print Wheel Ready
+                    6       Check
+                    7       Printer Ready
+
+                */
 				break;
-				
+
 			case 1: // Switch/Parallel port flags
 				/*
-				
-					bit		description
-					
-					0		FLAG1
-					1		FLAG2
-					2		10A S6
-					3		10A S5
-					4		10A S4
-					5		10A S3
-					6		10A S2
-					7		10A S1
-					
-				*/
-				
+
+                    bit     description
+
+                    0       FLAG1
+                    1       FLAG2
+                    2       10A S6
+                    3       10A S5
+                    4       10A S4
+                    5       10A S3
+                    6       10A S2
+                    7       10A S1
+
+                */
+
 				data = BITSWAP8(input_port_read(this, "10A"),0,1,2,3,4,5,6,7) & 0xfc;
 				break;
-				
+
 			case 2: // R.T. Clock IN/RESET CLK. Int.
 				/*
-				
-					bit		description
-					
-					0		1990 Data Out
-					1		1990 TP
-					2		
-					3		
-					4		
-					5		
-					6		
-					7		
-					
-				*/
-				
+
+                    bit     description
+
+                    0       1990 Data Out
+                    1       1990 TP
+                    2
+                    3
+                    4
+                    5
+                    6
+                    7
+
+                */
+
 				data |= m_rtc->data_out_r();
 				data |= m_rtc->tp_r() << 1;
 
@@ -389,34 +389,34 @@ UINT8 s100_wunderbus_device::s100_sinp_r(offs_t offset)
 				m_rtc_tp = 0;
 				pic8259_ir7_w(m_pic, m_rtc_tp);
 				break;
-				
+
 			case 3: // Parallel data IN
 				break;
-				
+
 			case 4: // 8259 0 register
 			case 5: // 8259 1 register
 				data = pic8259_r(m_pic, offset & 0x01);
 				break;
-				
+
 			case 6: // not used
 				break;
 			}
 			break;
-			
+
 		case 1:
 			data = ins8250_r(m_ace1, offset & 0x07);
 			break;
-			
+
 		case 2:
 			data = ins8250_r(m_ace2, offset & 0x07);
 			break;
-			
+
 		case 3:
 			data = ins8250_r(m_ace3, offset & 0x07);
 			break;
 		}
 	}
-	
+
 	return data;
 }
 
@@ -443,54 +443,54 @@ void s100_wunderbus_device::s100_sout_w(offs_t offset, UINT8 data)
 			{
 			case 0: // DAISY 0 OUT
 				/*
-				
-					bit		description
-					
-					0		Data Bit 9
-					1		Data Bit 10
-					2		Data Bit 11
-					3		Data Bit 12
-					4		Paper Feed Strobe
-					5		Carriage Strobe
-					6		Print Wheel Strobe
-					7		Restore
-					
-				*/
+
+                    bit     description
+
+                    0       Data Bit 9
+                    1       Data Bit 10
+                    2       Data Bit 11
+                    3       Data Bit 12
+                    4       Paper Feed Strobe
+                    5       Carriage Strobe
+                    6       Print Wheel Strobe
+                    7       Restore
+
+                */
 				break;
-				
+
 			case 1: // DAISY 1 OUT
 				/*
-				
-					bit		description
-					
-					0		Data Bit 1
-					1		Data Bit 2
-					2		Data Bit 3
-					3		Data Bit 4
-					4		Data Bit 5
-					5		Data Bit 6
-					6		Data Bit 7
-					7		Data Bit 8
-					
-				*/
+
+                    bit     description
+
+                    0       Data Bit 1
+                    1       Data Bit 2
+                    2       Data Bit 3
+                    3       Data Bit 4
+                    4       Data Bit 5
+                    5       Data Bit 6
+                    6       Data Bit 7
+                    7       Data Bit 8
+
+                */
 				break;
-				
+
 			case 2: // R.T. Clock OUT
 				/*
-				
-					bit		description
-					
-					0		1990 Data In
-					1		1990 Clk
-					2		1990 C0
-					3		1990 C1
-					4		1990 C2
-					5		1990 STB
-					6		Ribbon Lift
-					7		Select
-					
-				*/
-				
+
+                    bit     description
+
+                    0       1990 Data In
+                    1       1990 Clk
+                    2       1990 C0
+                    3       1990 C1
+                    4       1990 C2
+                    5       1990 STB
+                    6       Ribbon Lift
+                    7       Select
+
+                */
+
 				m_rtc->data_in_w(BIT(data, 0));
 				m_rtc->clk_w(BIT(data, 0));
 				m_rtc->c0_w(BIT(data, 0));
@@ -498,42 +498,42 @@ void s100_wunderbus_device::s100_sout_w(offs_t offset, UINT8 data)
 				m_rtc->c2_w(BIT(data, 0));
 				m_rtc->stb_w(BIT(data, 0));
 				break;
-				
+
 			case 3: // Par. data OUT
 				break;
-				
+
 			case 4: // 8259 0 register
 			case 5: // 8259 1 register
 				pic8259_w(m_pic, offset & 0x01, data);
 				break;
-				
+
 			case 6: // Par. port cntrl.
 				/*
-				
-					bit		description
-					
-					0		POE
-					1		_RST1
-					2		_RST2
-					3		_ATTN1
-					4		_ATTN2
-					5		
-					6		
-					7		
-					
-				*/
+
+                    bit     description
+
+                    0       POE
+                    1       _RST1
+                    2       _RST2
+                    3       _ATTN1
+                    4       _ATTN2
+                    5
+                    6
+                    7
+
+                */
 				break;
 			}
 			break;
-			
+
 		case 1:
 			ins8250_w(m_ace1, offset & 0x07, data);
 			break;
-			
+
 		case 2:
 			ins8250_w(m_ace2, offset & 0x07, data);
 			break;
-			
+
 		case 3:
 			ins8250_w(m_ace3, offset & 0x07, data);
 			break;

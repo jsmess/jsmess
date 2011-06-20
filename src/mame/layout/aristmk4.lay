@@ -78,7 +78,7 @@
 		</text>
 	</element>
 
-	<element name="double up">
+	<element name="gamble">
 		<rect state="1">
 			<color red="0.5" green="0.0" blue="0.7" />
 		</rect>
@@ -86,7 +86,7 @@
 		<color red="0.25" green="0.0" blue="0.35" />
 
 		</rect>
-		<text string="DOUBLE UP">
+		<text string="GAMBLE">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
@@ -291,7 +291,7 @@
 			<bounds x="2.72" y="3.02" width="0.31" height="0.24" />
 		</bezel>
 
-		<bezel name="lamp18" element="double up">
+		<bezel name="lamp18" element="gamble">
 			<bounds x="3.13" y="3.02" width="0.31" height="0.24" />
 		</bezel>
 
@@ -310,6 +310,7 @@
 		<bezel name="lamp3" element="5 lines">
 			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
 		</bezel>
+
 		<bezel name="lamp9" element="7 lines">
 			<bounds x="2.31" y="3.28" width="0.31" height="0.24" />
 		</bezel>

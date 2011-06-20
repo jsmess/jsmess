@@ -79,7 +79,7 @@ READ8_MEMBER( mmd1_state::mmd1_keyboard_r )
 	UINT8 line1 = input_port_read(machine(),"LINE1");
 	UINT8 line2 = input_port_read(machine(),"LINE2");
 	UINT8 i, data = 0xff;
-	
+
 
 	for (i = 0; i < 8; i++)
 	{

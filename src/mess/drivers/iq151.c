@@ -115,7 +115,7 @@ WRITE8_MEMBER(iq151_state::speaker_w)
 		speaker_level_w(m_speaker, BIT(data, 0));
 }
 
-		
+
 static ADDRESS_MAP_START(iq151_mem, AS_PROGRAM, 8, iq151_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("boot")

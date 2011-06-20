@@ -48,10 +48,10 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	inline offs_t get_address(offs_t offset);
 	inline offs_t get_io_address(offs_t offset);
-	
+
 	inline void check_traps();
 	inline void check_interrupt();
 
@@ -70,7 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER( terminal_w );
 	DECLARE_WRITE_LINE_MEMBER( s100_pint_w );
 	DECLARE_WRITE_LINE_MEMBER( s100_nmi_w );
-	
+
 	// memory state
 	UINT32 m_addr;
 	UINT8 *m_map_ram;
@@ -81,7 +81,7 @@ public:
 	int m_nmi;
 	int m_pint;
 	int m_int_pend;
-	
+
 	// trap state
 	UINT8 m_pretrap_addr;
 	UINT8 m_trap_addr;
