@@ -2,6 +2,46 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="mpz80" description="Morrow MPZ80 diskettes">
 	
+	<software name="509">
+		<description>509</description>
+		<year>1979</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="509" />
+		<!--
+		CP/M Ver 2.2 Cbios Rev 3.1         #509
+		Disk Jockey 2D @ F800h
+		
+		@ 1979 Digital Research  @ 1979 Morrow Designs
+		
+					                              #509
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="324473">
+				<rom name="509.imd" size="324473" crc="5597639b" sha1="662643080d52947f3182eda30dd88dc8a87daec7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="805">
+		<description>805</description>
+		<year>1979</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="34-50607" />
+		<!--
+		48K CP/M Version 2.2, Cbios revision 2.9.20       #805
+		For a Disk Jockey 2D/B @ F800 + Fujitsu M20 MICROSOFT BASIC
+		Decision 1 as console                          Vers 5.21
+		Serial port 3 with CTS protocall as LST:        © 1979   
+		@ 1979 Digital Research   @ 1979 Morrow Designs Microsoft
+		                                           #805
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="498497">
+				<rom name="817.imd" size="498497" crc="046e77db" sha1="5d1437daa201a56762a8065855cf847077221510" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="817">
 		<description>817</description>
 		<year>1979</year>
@@ -312,6 +352,26 @@
 		</part>
 	</software>
 	
+	<software name="941">
+		<description>Install Package for the HDDMA</description>
+		<year>1982</year>
+		<publisher>Morrow Designs</publisher>
+		<info name="serial" value="941" />
+		<!--
+		INSTALL PACKAGE for the HDDMA                   #941-8
+		PRL files supplied: M5, (4)M5, M10, (4)M10,
+		                    M16, (4)M16
+							
+							
+		(c) 1982 Morrow Designs
+		-->
+		<part name="flop8" interface="floppy_8">
+			<dataarea name="flop" size="227884">
+				<rom name="941-8.imd" size="227884" crc="cb157336" sha1="5387e922790bc97c83e8c6e3dc747a8a1f0f6694" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="942">
 		<description>Install Package for the HDCA</description>
 		<year>1982</year>
@@ -371,11 +431,38 @@
 				<rom name="947-1.imd" size="240296" crc="55893d01" sha1="c80d5144d1363813cd2fcdbd0283d8e18864e001" offset="0" />
 			</dataarea>
 		</part>
+		<!--
+		Single Density CP/M with MBASIC           #947
+		
+		____ NOT A BOOT DISKETTE ____        2 of 2
+		
+		MBASIC Rev 5.21 (c) 1979 Microsoft, Inc.
+		CP/M (c) '76, '77, '78, '79, '80
+		   Digital Research
+		(c) 1982 Morrow Designs
+		-->
 		<part name="flop2" interface="floppy_8">
-			<dataarea name="flop" size="240296">
-				<rom name="947-2.imd" offset="0" status="nodump" />
+			<dataarea name="flop" size="239441">
+				<rom name="947-2.imd" size="239441" crc="98eb5e5a" sha1="6210092acc923d872bd2a257a95dfc250bf405a9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	
+
+	<software name="traptest">
+		<description></description>
+		<year>1982</year>
+		<publisher>Morrow Designs</publisher>
+		<!--
+		Morrow Designs 48K CP/M 2.2 E3
+		AB: DjDMA8", CD: DjDMA51/4", E:HDDMA
+		Multio I/O; DjDMA; WN-12 System
+		MPZ80 ("Trap Test")
+		"Write Enable" in order to Run "Submit:Files"
+		-->
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="485190">
+				<rom name="traptest.imd" size="485190" crc="584da78d" sha1="72fe3d9e0c117949de152b389db2face839df85b" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
 </softwarelist>
