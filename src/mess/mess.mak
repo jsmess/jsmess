@@ -1823,10 +1823,11 @@ $(MESS_DRIVERS)/mpf1.o:		$(MESS_LAYOUT)/mpf1.lh \
 							$(MESS_LAYOUT)/mpf1p.lh
 $(MESS_VIDEO)/newbrain.o:	$(MESS_LAYOUT)/newbrain.lh
 $(MESS_DRIVERS)/ng_aes.o:	$(MESS_LAYOUT)/neogeo.lh
-$(MESS_DRIVERS)/poly880.o:	$(MESS_LAYOUT)/poly880.lh
 $(MESS_DRIVERS)/pc1500.o:	$(MESS_LAYOUT)/pc1500.lh
 $(MESS_VIDEO)/pc8401a.o:	$(MESS_LAYOUT)/pc8500.lh
 $(MESS_DRIVERS)/pcw.o:		$(MESS_LAYOUT)/pcw.lh
+$(MESS_DRIVERS)/pmi80.o:	$(MESS_LAYOUT)/pmi80.lh
+$(MESS_DRIVERS)/poly880.o:	$(MESS_LAYOUT)/poly880.lh
 $(MESS_DRIVERS)/pro80.o:	$(MESS_LAYOUT)/pro80.lh
 $(MESS_DRIVERS)/px4.o:		$(MESS_LAYOUT)/px4.lh
 $(MESS_DRIVERS)/px8.o:		$(MESS_LAYOUT)/px8.lh
