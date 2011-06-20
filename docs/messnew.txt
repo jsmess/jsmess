@@ -1,4 +1,63 @@
-﻿0.142u5
+﻿0.142u6
+
+New System Drivers Supported:
+-----------------------------
+- Pioner (Specialist clone) [Miodrag Milanovic]
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- Morrow MPZ80 [Curt Coder]
+- Sharp PC-G850V [Sandro Ronco]
+
+System Driver Changes:
+----------------------
+-bullet: Fixed terminal input. [Curt Coder]
+-abc800m: Added Slutprov factory test card ROM dump. [FatArnold, robcfg]
+-pce220: Added keyboard input and fixed the LCD emulation. [Sandro Ronco]
+-x1: Implemented preliminary video partial updates effect in Sharp X1 HW [Angelo Salese]
+-pcg850v: Fixed bankswitch and added LCD emulation. [Sandro Ronco]
+-pc1512: Added Amstrad PC1512 v3.2 BIOS. [DRomero]
+-pc: Added keyboard controller ROMs to Amstrad XT clones. [John Elliot]
+-pc: Added non-working drivers for Amstrad PC2086, PC3086, PC2386. [John Elliott]
+-mpz80: Connected S-100 bus memory and I/O read/write lines. [Curt Coder]
+-abc80: Refactored the Luxor ABC bus to use slot interface. 
+	ABC800 has an ABC832 disk drive for now until default device 
+	inputs can be passed onto slot devices. [Curt Coder]
+-sordm5 : Added proper FD rom image and fixed floppy type [Marcel Vasak]
+-pcjr - Fixed floppy issues [Carl]
+-intv: Added support for both hand controllers: [H@P]
+* Updated player 1 to use the left hand controller by default.
+* Prefixed all left hand controller inputs with "Left/", right hand controller inputs with "Right/".
+* Added all 16 digital disc inputs, and added full position names ("Up", "Up-Up-Left", "Up-Left", "Left-Up-Left", "Left" ...)
+* Added optional alternate disc control using analog inputs.  Use "Driver Configuration" menu to enable analog support per hand controller.
+* Renamed "DEL" to "Clear", "ENTER" to "Enter", "But1" to "Upper", "But2" to "Lower-Left" and "But3" to "Lower-Right".
+* Removed frogger hack -- must use left hand controller to play.
+* Fixes mess bug ID's:
+	- 164 Second hand controller not emulated
+	- 165 Auto Racing hangs (user must map left hand controller keypad to continue in AUTO RACING). 
+-atvga: New AMI bios based on Headland GC102 chipset [kaylee]
+-pce220: Added serial I/O. [Sandro Ronco]
+
+Software Lists:
+----------------
+-snes.xml: softlist wip documentation and redump [MESSfan]
+-ngp.c: split ngp and and ngpc softlists and updated the driver accordingly [Fabio Priuli]
+-ngpc.xml: added a few new dumps [xxxddd, Kaylee]
+-mpz80: Added floppy softlist. [Curt Coder]
+-Added preliminary S-100 bus emulation with SLOT interface. 
+ Refactored MPZ80 and its Wunderbus I/O card to implement the S-100 bus. [Curt Coder]
+
+Source Changes:
+----------------
+-upd765: Fix issue accessing floppies when initially drive is empty [Carl]
+-pc_mouse: Fixed mouse issues, making it work in OS/2 [Carl]
+-upd765: Fixed cylinder number increment on EOT, helps minix2 to boot [Carl]
+
+0.142u5
 
 New System Drivers Supported:
 -----------------------------

@@ -578,9 +578,9 @@ static SCREEN_UPDATE( x1 )
 
 static SCREEN_EOF( x1 )
 {
-//	x1_state *state = screen->machine().driver_data<x1_state>();
+//  x1_state *state = screen->machine().driver_data<x1_state>();
 
-//	state->m_old_vpos = -1;
+//  state->m_old_vpos = -1;
 }
 
 /*************************************
@@ -1291,8 +1291,8 @@ static WRITE8_HANDLER( x1_pal_r_w )
 		set_current_palette(space->machine());
 		//if(state->m_old_vpos != space->machine().primary_screen->vpos())
 		//{
-		//	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-		//	state->m_old_vpos = space->machine().primary_screen->vpos();
+		//  space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+		//  state->m_old_vpos = space->machine().primary_screen->vpos();
 		//}
 	}
 }
@@ -1313,7 +1313,7 @@ static WRITE8_HANDLER( x1_pal_g_w )
 		//if(state->m_old_vpos != space->machine().primary_screen->vpos())
 		//{
 			space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-		//	state->m_old_vpos = space->machine().primary_screen->vpos();
+		//  state->m_old_vpos = space->machine().primary_screen->vpos();
 		//}
 	}
 }
@@ -1333,8 +1333,8 @@ static WRITE8_HANDLER( x1_pal_b_w )
 		set_current_palette(space->machine());
 		//if(state->m_old_vpos != space->machine().primary_screen->vpos())
 		//{
-		//	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-		//	state->m_old_vpos = space->machine().primary_screen->vpos();
+		//  space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+		//  state->m_old_vpos = space->machine().primary_screen->vpos();
 		//}
 	}
 }
@@ -2596,7 +2596,7 @@ static MACHINE_RESET( x1 )
 		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 
 	state->m_ram_bank = 0;
-//	state->m_old_vpos = -1;
+//  state->m_old_vpos = -1;
 }
 
 static MACHINE_RESET( x1turbo )

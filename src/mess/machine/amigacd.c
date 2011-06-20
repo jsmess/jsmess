@@ -527,7 +527,7 @@ MACHINE_START( amigacd )
 	/* set up DMAC with autoconfig */
 	amiga_add_autoconfig( machine, &dmac_device );
 
-	matsucd_init( machine.device<cdrom_image_device>("cdrom"), "cdda" );	
+	matsucd_init( machine.device<cdrom_image_device>("cdrom"), "cdda" );
 }
 
 MACHINE_RESET( amigacd )

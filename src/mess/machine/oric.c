@@ -320,7 +320,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 		}
 	}
 
-	
+
 		cassette_device_image(device->machine())->change_state(
 		(data & 0x40) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);

@@ -112,7 +112,7 @@ class abcbus_slot_device : public device_t,
 public:
 	// construction/destruction
 	abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 
@@ -186,7 +186,7 @@ private:
 	devcb_resolved_write_line	m_out_nmi_func;
 	devcb_resolved_write_line	m_out_rdy_func;
 	devcb_resolved_write_line	m_out_resin_func;
-	
+
 	device_abcbus_card_interface *m_abcbus_device[MAX_ABCBUS_SLOTS];
 	const char *m_cputag;
 };
@@ -202,7 +202,7 @@ extern const device_type ABCBUS;
 class device_abcbus_card_interface : public device_interface
 {
 	friend class abcbus_device;
-	
+
 public:
 	// construction/destruction
 	device_abcbus_card_interface(const machine_config &mconfig, device_t &device);

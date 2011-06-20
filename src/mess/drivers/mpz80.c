@@ -10,41 +10,41 @@
 
     TODO:
 
-	- "M0BAD"
-	- trap logic
-		- trap reset
-		- trap stop
-		- trap aux
-		- trap halt
-		- trap int
-		- trap void
-		- in/out trap
-		- read/write trap
-		- exec trap
-	- memory management
-		- task RAM
-		- mapping RAM
-		- attribute RAM
-	- front panel LEDs
-	- keyboard
-	- I/O
-		- Mult I/O (8259A PIC, 3x 8250 ACE, uPD1990C RTC, 4K ROM/RAM)
-		- Wunderbus I/O (8259A PIC, 3x 8250 ACE, uPD1990C RTC)
-	- floppy
-		- DJ/DMA controller (Z80, 1K RAM, 2/4K ROM, TTL floppy control logic) for 5.25" floppy drives
-		- DJ2D/B controller for 8" floppy drives
-	- hard disk
-		- HDC/DMA controller (Seagate ST-506/Shugart SA1000)
-		- HDCA controller (Shugart SA4000/Fujitsu M2301B/Winchester M2320B)
-	- memory
-		- MM65K16S (64K RAM, expandable to 1 MB)
-	- AM9512 FPU
-	- models
-		- Decision I Desk Top Model D1 (MPZ80, MM65KS, Wunderbus)
-		- Decision I Desk Top Model D2 (MPZ80, MM65KS, Wunderbus, DJDMA, 2x DSDD 5.25")
-		- Decision I Desk Top Model D2A (MPZ80, MM65KS, Wunderbus, DJDMA, 2x DSDD 5.25", HDCDMA, 5 or 16 MB hard disk?)
-		- Decision I Desk Top Model D3A (MPZ80, MM65KS, Wunderbus, DJDMA, 2x DSDD 5.25", HDCDMA, 5 or 16 MB hard disk?)
-		- Decision I Desk Top Model D3C (MPZ80, MM65KS, Wunderbus, DJDMA, 2x DSDD 5.25", HDCDMA, 5 or 16 MB hard disk?)
+    - "M0BAD"
+    - trap logic
+        - trap reset
+        - trap stop
+        - trap aux
+        - trap halt
+        - trap int
+        - trap void
+        - in/out trap
+        - read/write trap
+        - exec trap
+    - memory management
+        - task RAM
+        - mapping RAM
+        - attribute RAM
+    - front panel LEDs
+    - keyboard
+    - I/O
+        - Mult I/O (8259A PIC, 3x 8250 ACE, uPD1990C RTC, 4K ROM/RAM)
+        - Wunderbus I/O (8259A PIC, 3x 8250 ACE, uPD1990C RTC)
+    - floppy
+        - DJ/DMA controller (Z80, 1K RAM, 2/4K ROM, TTL floppy control logic) for 5.25" floppy drives
+        - DJ2D/B controller for 8" floppy drives
+    - hard disk
+        - HDC/DMA controller (Seagate ST-506/Shugart SA1000)
+        - HDCA controller (Shugart SA4000/Fujitsu M2301B/Winchester M2320B)
+    - memory
+        - MM65K16S (64K RAM, expandable to 1 MB)
+    - AM9512 FPU
+    - models
+        - Decision I Desk Top Model D1 (MPZ80, MM65KS, Wunderbus)
+        - Decision I Desk Top Model D2 (MPZ80, MM65KS, Wunderbus, DJDMA, 2x DSDD 5.25")
+        - Decision I Desk Top Model D2A (MPZ80, MM65KS, Wunderbus, DJDMA, 2x DSDD 5.25", HDCDMA, 5 or 16 MB hard disk?)
+        - Decision I Desk Top Model D3A (MPZ80, MM65KS, Wunderbus, DJDMA, 2x DSDD 5.25", HDCDMA, 5 or 16 MB hard disk?)
+        - Decision I Desk Top Model D3C (MPZ80, MM65KS, Wunderbus, DJDMA, 2x DSDD 5.25", HDCDMA, 5 or 16 MB hard disk?)
 
 */
 
@@ -85,13 +85,13 @@ enum
 //**************************************************************************
 
 //-------------------------------------------------
-//  check_traps - 
+//  check_traps -
 //-------------------------------------------------
 
 inline void mpz80_state::check_traps()
 {
 	m_pretrap = !(m_trap_int & m_trap_halt & m_trap_stop & m_trap_aux);
-	
+
 	if (m_pretrap)
 	{
 		// latch trap condition
@@ -100,7 +100,7 @@ inline void mpz80_state::check_traps()
 		m_status |= m_trap_int << 3;
 		m_status |= m_trap_stop << 4;
 		m_status |= m_trap_aux << 5;
-		
+
 		// latch trap address
 		m_pretrap_addr = ((m_addr >> 8) & 0xf0) | (m_pretrap_addr >> 4);
 
@@ -111,7 +111,7 @@ inline void mpz80_state::check_traps()
 
 
 //-------------------------------------------------
-//  check_interrupt - 
+//  check_interrupt -
 //-------------------------------------------------
 
 inline void mpz80_state::check_interrupt()
@@ -121,10 +121,10 @@ inline void mpz80_state::check_interrupt()
 
 	m_int_pend = !(m_nmi & m_pint);
 	m_trap_int = !(m_int_pend & tint_enbl);
-	
+
 	int z80irq = CLEAR_LINE;
 	int z80nmi = CLEAR_LINE;
-	
+
 	if (TASK0)
 	{
 		if (!m_pint && !sint_enbl) z80irq = ASSERT_LINE;
@@ -135,10 +135,10 @@ inline void mpz80_state::check_interrupt()
 		if (!m_pint && !tint_enbl) z80irq = ASSERT_LINE;
 		if (!m_nmi && !tint_enbl) z80nmi = ASSERT_LINE;
 	}
-	
+
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, z80irq);
 	m_maincpu->set_input_line(INPUT_LINE_NMI, z80nmi);
-	
+
 	check_traps();
 }
 
@@ -149,7 +149,7 @@ inline void mpz80_state::check_interrupt()
 //**************************************************************************
 
 //-------------------------------------------------
-//  get_address - 
+//  get_address -
 //-------------------------------------------------
 
 inline offs_t mpz80_state::get_address(offs_t offset)
@@ -159,14 +159,14 @@ inline offs_t mpz80_state::get_address(offs_t offset)
 	//UINT8 attr = m_map_ram[map_addr + 1];
 
 	//logerror("task %02x map_addr %03x map %02x attr %02x address %06x\n", m_task, map_addr, map, attr, offset);
-	
+
 	// T7 T6 T5 T4 M7 M6 M5 M4 M3 M2 M1 M0 A11 A10 A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
 	return ((m_task & 0xf0) << 16) | (map << 12) | (offset & 0xfff);
 }
 
 
 //-------------------------------------------------
-//  mmu_r - 
+//  mmu_r -
 //-------------------------------------------------
 
 READ8_MEMBER( mpz80_state::mmu_r )
@@ -174,12 +174,12 @@ READ8_MEMBER( mpz80_state::mmu_r )
 	m_addr = get_address(offset);
 	UINT8 *rom = machine().region(Z80_TAG)->base();
 	UINT8 data = 0;
-	
+
 	if (m_pretrap)
 	{
 		m_pretrap = 0;
 		m_trap = 1;
-		
+
 		// latch trap address
 		m_pretrap_addr = ((m_addr >> 8) & 0xf0) | (m_pretrap_addr >> 4);
 		m_trap_addr = m_pretrap_addr;
@@ -226,13 +226,13 @@ READ8_MEMBER( mpz80_state::mmu_r )
 	{
 		data = m_s100->smemr_r(space, m_addr);
 	}
-	
+
 	return data;
 }
 
 
 //-------------------------------------------------
-//  mmu_w - 
+//  mmu_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( mpz80_state::mmu_w )
@@ -279,7 +279,7 @@ WRITE8_MEMBER( mpz80_state::mmu_w )
 
 
 //-------------------------------------------------
-//  get_io_address - 
+//  get_io_address -
 //-------------------------------------------------
 
 inline offs_t mpz80_state::get_io_address(offs_t offset)
@@ -289,13 +289,13 @@ inline offs_t mpz80_state::get_io_address(offs_t offset)
 		// echo port address onto upper address lines (8080 emulation)
 		offset = ((offset << 8) & 0xff00) | (offset & 0xff);
 	}
-	
+
 	return offset;
 }
 
 
 //-------------------------------------------------
-//  mmu_io_r - 
+//  mmu_io_r -
 //-------------------------------------------------
 
 READ8_MEMBER( mpz80_state::mmu_io_r )
@@ -305,7 +305,7 @@ READ8_MEMBER( mpz80_state::mmu_io_r )
 
 
 //-------------------------------------------------
-//  mmu_io_w - 
+//  mmu_io_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( mpz80_state::mmu_io_w )
@@ -321,19 +321,19 @@ WRITE8_MEMBER( mpz80_state::mmu_io_w )
 READ8_MEMBER( mpz80_state::trap_addr_r )
 {
 	/*
-		
-		bit		description
-		
-		0		DADDR 12
-		1		DADDR 13
-		2		DADDR 14
-		3		DADDR 15
-		4		I-ADDR 12
-		5		I-ADDR 13
-		6		I-ADDR 14
-		7		I-ADDR 15
-		
-	*/
+
+        bit     description
+
+        0       DADDR 12
+        1       DADDR 13
+        2       DADDR 14
+        3       DADDR 15
+        4       I-ADDR 12
+        5       I-ADDR 13
+        6       I-ADDR 14
+        7       I-ADDR 15
+
+    */
 
 	return m_trap_addr;
 }
@@ -346,19 +346,19 @@ READ8_MEMBER( mpz80_state::trap_addr_r )
 READ8_MEMBER( mpz80_state::status_r )
 {
 	/*
-		
-		bit		description
-		
-		0		_TRAP VOID
-		1		_IORQ
-		2		_TRAP HALT
-		3		_TRAP INT
-		4		_TRAP STOP
-		5		_TRAP AUX
-		6		R10
-		7		_RD STB
-		
-	*/
+
+        bit     description
+
+        0       _TRAP VOID
+        1       _IORQ
+        2       _TRAP HALT
+        3       _TRAP INT
+        4       _TRAP STOP
+        5       _TRAP AUX
+        6       R10
+        7       _RD STB
+
+    */
 
 	return m_status;
 }
@@ -371,22 +371,22 @@ READ8_MEMBER( mpz80_state::status_r )
 WRITE8_MEMBER( mpz80_state::task_w )
 {
 	/*
-		
-		bit		description
-		
-		0		T0, A16
-		1		T1, A17
-		2		T2, A18
-		3		T3, A19
-		4		T4, S-100 A20
-		5		T5, S-100 A21
-		6		T6, S-100 A22
-		7		T7, S-100 A23
-		
-	*/
-	
+
+        bit     description
+
+        0       T0, A16
+        1       T1, A17
+        2       T2, A18
+        3       T3, A19
+        4       T4, S-100 A20
+        5       T5, S-100 A21
+        6       T6, S-100 A22
+        7       T7, S-100 A23
+
+    */
+
 	m_task = data;
-	
+
 	m_trap_reset = 1;
 	check_traps();
 }
@@ -399,20 +399,20 @@ WRITE8_MEMBER( mpz80_state::task_w )
 WRITE8_MEMBER( mpz80_state::mask_w )
 {
 	/*
-		
-		bit		description
-		
-		0		_STOP ENBL
-		1		AUX ENBL
-		2		_TINT ENBL
-		3		RUN ENBL
-		4		_HALT ENBL
-		5		SINT ENBL
-		6		_IOENBL
-		7		_ZIO MODE
-		
-	*/
-	
+
+        bit     description
+
+        0       _STOP ENBL
+        1       AUX ENBL
+        2       _TINT ENBL
+        3       RUN ENBL
+        4       _HALT ENBL
+        5       SINT ENBL
+        6       _IOENBL
+        7       _ZIO MODE
+
+    */
+
 	m_mask = data;
 }
 
@@ -429,19 +429,19 @@ WRITE8_MEMBER( mpz80_state::mask_w )
 READ8_MEMBER( mpz80_state::keyboard_r )
 {
 	/*
-		
-		bit		description
-		
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
-		
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7
+
+    */
 
 	return 0;
 }
@@ -454,31 +454,31 @@ READ8_MEMBER( mpz80_state::keyboard_r )
 READ8_MEMBER( mpz80_state::switch_r )
 {
 	/*
-		
-		bit		description
-		
-		0		_TRAP RESET
-		1		INT PEND
-		2		16C S6
-		3		16C S5
-		4		16C S4
-		5		16C S3
-		6		16C S2
-		7		16C S1
-		
-	*/
+
+        bit     description
+
+        0       _TRAP RESET
+        1       INT PEND
+        2       16C S6
+        3       16C S5
+        4       16C S4
+        5       16C S3
+        6       16C S2
+        7       16C S1
+
+    */
 
 	UINT8 data = 0;
-	
+
 	// trap reset
 	data |= m_trap_reset;
-	
+
 	// interrupt pending
 	data |= m_int_pend << 1;
-	
+
 	// boot address
 	data |= input_port_read(machine(), "16C") & 0xfc;
-	
+
 	return data;
 }
 
@@ -490,19 +490,19 @@ READ8_MEMBER( mpz80_state::switch_r )
 WRITE8_MEMBER( mpz80_state::disp_seg_w )
 {
 	/*
-		
-		bit		description
-		
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
-		
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7
+
+    */
 }
 
 
@@ -513,19 +513,19 @@ WRITE8_MEMBER( mpz80_state::disp_seg_w )
 WRITE8_MEMBER( mpz80_state::disp_col_w )
 {
 	/*
-		
-		bit		description
-		
-		0		
-		1		
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		
-		
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7
+
+    */
 }
 
 
@@ -541,16 +541,16 @@ WRITE8_MEMBER( mpz80_state::disp_col_w )
 static ADDRESS_MAP_START( mpz80_mem, AS_PROGRAM, 8, mpz80_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_r, mmu_w)
 /*
-	Task 0 Segment 0 map:
-	
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x0400) AM_READWRITE(trap_addr_r, disp_seg_w)
-	AM_RANGE(0x0401, 0x0401) AM_READWRITE(keyboard_r, disp_col_w)
-	AM_RANGE(0x0402, 0x0402) AM_READWRITE(switch_r, task_w)
-	AM_RANGE(0x0403, 0x0403) AM_READWRITE(status_r, mask_w)
-	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE(m_map_ram)
-	AM_RANGE(0x0800, 0x0bff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREADWRITE(AM9512_TAG, am9512_device, read, write)
+    Task 0 Segment 0 map:
+
+    AM_RANGE(0x0000, 0x03ff) AM_RAM
+    AM_RANGE(0x0400, 0x0400) AM_READWRITE(trap_addr_r, disp_seg_w)
+    AM_RANGE(0x0401, 0x0401) AM_READWRITE(keyboard_r, disp_col_w)
+    AM_RANGE(0x0402, 0x0402) AM_READWRITE(switch_r, task_w)
+    AM_RANGE(0x0403, 0x0403) AM_READWRITE(status_r, mask_w)
+    AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE(m_map_ram)
+    AM_RANGE(0x0800, 0x0bff) AM_ROM AM_REGION(Z80_TAG, 0)
+    AM_RANGE(0x0c00, 0x0c00) AM_DEVREADWRITE(AM9512_TAG, am9512_device, read, write)
 */
 ADDRESS_MAP_END
 
@@ -674,7 +674,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 WRITE_LINE_MEMBER( mpz80_state::s100_pint_w )
 {
 	m_pint = (state == ASSERT_LINE) ? 0 : 1;
-	
+
 	check_interrupt();
 }
 
@@ -684,7 +684,7 @@ WRITE_LINE_MEMBER( mpz80_state::s100_nmi_w )
 	{
 		m_nmi = 0;
 	}
-	
+
 	check_interrupt();
 }
 
@@ -713,11 +713,11 @@ static S100_INTERFACE( s100_intf )
 static SLOT_INTERFACE_START( mpz80_s100_cards )
 	SLOT_INTERFACE("mm65k16s", S100_MM65K16S)
 	SLOT_INTERFACE("wunderbus", S100_WUNDERBUS)
-//	SLOT_INTERFACE("multio", S100_MULTIO)
-//	SLOT_INTERFACE("djdma", S100_DJDMA)
-//	SLOT_INTERFACE("dj2db", S100_DJ2DB)
-//	SLOT_INTERFACE("hdcdma", S100_HDCDMA)
-//	SLOT_INTERFACE("hdca", S100_HDCA)
+//  SLOT_INTERFACE("multio", S100_MULTIO)
+//  SLOT_INTERFACE("djdma", S100_DJDMA)
+//  SLOT_INTERFACE("dj2db", S100_DJ2DB)
+//  SLOT_INTERFACE("hdcdma", S100_HDCDMA)
+//  SLOT_INTERFACE("hdca", S100_HDCA)
 SLOT_INTERFACE_END
 
 
@@ -745,9 +745,9 @@ void mpz80_state::machine_reset()
 	m_trap_reset = 0;
 	m_trap = 1;
 	m_trap_start = 0;
-	
+
 	m_nmi = 1;
-	
+
 	check_interrupt();
 }
 
@@ -786,7 +786,7 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 	MCFG_S100_SLOT_ADD(12, "s100_12", mpz80_s100_cards, NULL)
 	MCFG_S100_SLOT_ADD(13, "s100_13", mpz80_s100_cards, NULL)
 	MCFG_S100_SLOT_ADD(14, "s100_14", mpz80_s100_cards, NULL)
-	
+
 	// devices
 	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, mpz80_floppy_interface)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
@@ -839,13 +839,13 @@ ROM_END
 DIRECT_UPDATE_HANDLER( mpz80_direct_update_handler )
 {
 	mpz80_state *state = machine.driver_data<mpz80_state>();
-	
+
 	if (state->m_trap && address >= state->m_trap_start && address <= state->m_trap_start + 0xf)
 	{
 		direct.explicit_configure(state->m_trap_start, state->m_trap_start + 0xf, 0xf, machine.region(Z80_TAG)->base() + ((state->m_trap_reset << 10) | 0x3f0));
 		return ~0;
 	}
-	
+
 	return address;
 }
 

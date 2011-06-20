@@ -1176,7 +1176,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/model1.o $(MACHINE)/model1.o $(VIDEO)/model1.o \
 	$(DRIVERS)/model2.o $(VIDEO)/model2.o \
 	$(DRIVERS)/model3.o $(VIDEO)/model3.o $(MACHINE)/model3.o \
-	$(DRIVERS)/naomi.o $(MACHINE)/dc.o $(VIDEO)/dc.o $(MACHINE)/gdcrypt.o $(MACHINE)/naomibd.o $(MACHINE)/naomi.o \
+	$(DRIVERS)/naomi.o $(MACHINE)/dc.o $(VIDEO)/dc.o $(MACHINE)/gdcrypt.o $(MACHINE)/naomibd.o $(MACHINE)/naomi.o $(MACHINE)/naomim4decoder.o\
 	$(MACHINE)/mie.o $(MACHINE)/maple-dc.o $(MACHINE)/mapledev.o $(MACHINE)/dc-ctrl.o \
 	$(MACHINE)/jvs13551.o \
 	$(DRIVERS)/triforce.o \
@@ -1824,6 +1824,18 @@ $(DRIVERS)/ampoker2.o:	$(LAYOUT)/ampoker2.lh \
 			$(LAYOUT)/sigmapkr.lh \
 
 $(DRIVERS)/aristmk4.o:	$(LAYOUT)/aristmk4.lh \
+			$(LAYOUT)/arimk4nz.lh \
+			$(LAYOUT)/3bagflnz.lh \
+			$(LAYOUT)/3bagflvt.lh \
+			$(LAYOUT)/arcwins.lh \
+			$(LAYOUT)/cgold2.lh \
+			$(LAYOUT)/eforest.lh \
+			$(LAYOUT)/fhunter.lh \
+			$(LAYOUT)/goldenc.lh \
+			$(LAYOUT)/kgbird.lh \
+			$(LAYOUT)/topgear.lh \
+			$(LAYOUT)/wildone.lh \
+			$(LAYOUT)/gldnpkr.lh \
 
 $(DRIVERS)/astrocde.o:	$(LAYOUT)/gorf.lh \
 			$(LAYOUT)/tenpindx.lh

@@ -50,7 +50,7 @@ Usage of terminal:
 - okean240 bios 0 - the keyboard
 - okean240a bios 0 - not used
 - (either) bios 1 - the keyboard (part of the testing), & the screen if compiled specially
- 
+
 ****************************************************************************/
 //#define OKEAN240_USING_TESTROM
 

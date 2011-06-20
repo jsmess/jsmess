@@ -544,7 +544,7 @@ static void upd765_seek_setup(device_t *device, int is_recalibrate)
 
 			/* perform seek - if drive isn't present it will not do anything */
 			floppy_drive_seek(img, signed_tracks);
-			
+
 			if (signed_tracks!=0)
 			{
 				upd765_setup_timed_int(device,signed_tracks);
@@ -1367,7 +1367,7 @@ static void	upd765_increment_sector(device_t *device)
 		{
 			/* reset sector id to 1 */
 			fdc->upd765_command_bytes[4] = 1;
-		
+
 			/* yes */
 			if(fdc->side == 1) {
 				fdc->upd765_command_bytes[3] = 0;
@@ -1396,7 +1396,7 @@ static void	upd765_increment_sector(device_t *device)
 			fdc->upd765_command_bytes[2]++;
 			return;
 		}
-				
+
 		fdc->upd765_command_bytes[4]++;
 	}
 }

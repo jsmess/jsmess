@@ -1,6 +1,6 @@
 /**********************************************************************
 
-	Morrow Designs MM65K16S memory board emulation
+    Morrow Designs MM65K16S memory board emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -77,7 +77,7 @@ static INPUT_PORTS_START( mm65k16s )
 	PORT_DIPNAME( 0x01, 0x00, "Bank B Recognizes Phantom" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("5D")
 	PORT_DIPNAME( 0x03, 0x00, "First 16K Memory Addressing" ) PORT_DIPLOCATION("5D:1,2")
 	PORT_DIPSETTING(    0x00, "Block 0 (0000H-3FFFH)" )
@@ -116,7 +116,7 @@ static INPUT_PORTS_START( mm65k16s )
 	PORT_DIPNAME( 0x01, 0x01, "Addressing Mode" )
 	PORT_DIPSETTING(    0x01, "Extended Addressing" )
 	PORT_DIPSETTING(    0x00, "Bank Select" )
-	
+
 	PORT_START("1C")
 	PORT_DIPNAME( 0xff, 0x00, "Extended Addressing" ) PORT_CONDITION("s100_1:mm65k16s:J3", 0x01, PORTCOND_EQUALS, 0x01)
 	PORT_DIPSETTING(    0x00, "000000H" ) PORT_CONDITION("s100_1:mm65k16s:J3", 0x01, PORTCOND_EQUALS, 0x01)
@@ -128,7 +128,7 @@ static INPUT_PORTS_START( mm65k16s )
 	PORT_DIPSETTING(    0x40, "40H" ) PORT_CONDITION("s100_1:mm65k16s:J3", 0x01, PORTCOND_EQUALS, 0x00)
 	// ...
 	PORT_DIPSETTING(    0xff, "FFH" ) PORT_CONDITION("s100_1:mm65k16s:J3", 0x01, PORTCOND_EQUALS, 0x00)
-	
+
 	PORT_START("A0A7")
 	PORT_DIPNAME( 0x01, 0x01, "Bank Select Data Bit A0" ) PORT_CONDITION("s100_1:mm65k16s:J3", 0x01, PORTCOND_EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, "0" ) PORT_CONDITION("s100_1:mm65k16s:J3", 0x01, PORTCOND_EQUALS, 0x00)
@@ -154,7 +154,7 @@ static INPUT_PORTS_START( mm65k16s )
 	PORT_DIPNAME( 0x80, 0x00, "Bank Select Data Bit A7" ) PORT_CONDITION("s100_1:mm65k16s:J3", 0x01, PORTCOND_EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, "0" ) PORT_CONDITION("s100_1:mm65k16s:J3", 0x01, PORTCOND_EQUALS, 0x00)
 	PORT_DIPSETTING(    0x80, "1" ) PORT_CONDITION("s100_1:mm65k16s:J3", 0x01, PORTCOND_EQUALS, 0x00)
-	
+
 	PORT_START("0B7B")
 	PORT_DIPNAME( 0x01, 0x00, "Bank Select Data Bit 0B" ) PORT_CONDITION("s100_1:mm65k16s:J3", 0x01, PORTCOND_EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, "0" ) PORT_CONDITION("s100_1:mm65k16s:J3", 0x01, PORTCOND_EQUALS, 0x00)
@@ -217,7 +217,7 @@ s100_mm65k16s_device::s100_mm65k16s_device(const machine_config &mconfig, const 
 void s100_mm65k16s_device::device_start()
 {
 	m_s100 = machine().device<s100_device>("s100");
-	
+
 	m_ram = auto_alloc_array(machine(), UINT8, 0x10000);
 }
 
