@@ -33,7 +33,7 @@ const device_type S100_DJ2DB = &device_creator<s100_dj2db_device>;
 //-------------------------------------------------
 
 ROM_START( dj2db )
-	ROM_REGION( 0x400, "dj2db", 0 )
+	ROM_REGION( 0x400, "dj2db", ROMREGION_INVERT ) // TODO does not invert currently
 	ROM_LOAD( "bv-2 f8.11d", 0x000, 0x400, CRC(b6218d0b) SHA1(e4b2ae886c0dd7717e2e02ae2e202115d8ec2def) )
 
 	ROM_REGION( 0x220, "proms", 0 )
@@ -269,6 +269,9 @@ s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *
 void s100_dj2db_device::device_start()
 {
 	m_s100 = machine().device<s100_device>("s100");
+
+	m_rom = subregion("dj2db")->base();
+	m_ram = auto_alloc_array(machine(), UINT8, 0x400);
 }
 
 
@@ -287,7 +290,34 @@ void s100_dj2db_device::device_reset()
 
 UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 {
-	return 0;
+	UINT8 data = 0;
+	
+	if ((offset >= 0xf800) && (offset < 0xfbf8))
+	{
+		data = m_rom[offset & 0x3ff] ^ 0xff; // TODO remove ^0xff once ROMREGION_INVERT has been fixed
+	}
+	else if (offset == 0xfbf8)
+	{
+		// UART inverted data
+	}
+	else if (offset == 0xfbf9)
+	{
+		// UART inverted status
+	}
+	else if (offset == 0xfbfa)
+	{
+		// disk jockey status
+	}
+	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
+	{
+		data = wd17xx_r(m_fdc, offset & 0x03);
+	}
+	else if ((offset >= 0xfc00) && (offset < 0x10000))
+	{
+		data = m_ram[offset & 0x3ff];
+	}
+	
+	return data;
 }
 
 
@@ -297,6 +327,26 @@ UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 
 void s100_dj2db_device::s100_mwrt_w(offs_t offset, UINT8 data)
 {
+	if (offset == 0xfbf8)
+	{
+		// UART inverted data
+	}
+	else if (offset == 0xfbf9)
+	{
+		// disk jockey function
+	}
+	else if (offset == 0xfbfa)
+	{
+		// drive control register
+	}
+	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
+	{
+		wd17xx_w(m_fdc, offset & 0x03, data);
+	}
+	else if ((offset >= 0xfc00) && (offset < 0x10000))
+	{
+		m_ram[offset & 0x3ff] = data;
+	}
 }
 
 

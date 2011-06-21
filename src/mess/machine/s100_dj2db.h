@@ -63,6 +63,9 @@ private:
 	required_device<com8116_device> m_dbrg;
 	device_t *m_image0;
 	device_t *m_image1;
+	
+	UINT8 *m_rom;
+	UINT8 *m_ram;
 };
 
 
