@@ -11,6 +11,7 @@
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "machine/s100.h"
+#include "machine/s100_dj2db.h"
 #include "machine/s100_djdma.h"
 #include "machine/s100_mm65k16s.h"
 #include "machine/s100_wunderbus.h"
