@@ -4,101 +4,109 @@
 
         23/02/2009 Skeleton driver.
 
+How to use this is unknown, most commands either give an error (! symbol),
+or cause the cpu to halt.
+
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8008/i8008.h"
 #include "machine/terminal.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+
 class sacstate_state : public driver_device
 {
 public:
 	sacstate_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_terminal(*this, TERMINAL_TAG),
+	m_val(0)
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_terminal;
+	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_READ8_MEMBER(tty_r);
+	DECLARE_READ8_MEMBER(unknown_r);
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
+	UINT8 m_val;
+	virtual void machine_reset();
 };
 
-UINT8 val = 0x00;
-static READ8_HANDLER(status_r)
+READ8_MEMBER( sacstate_state::status_r )
 {
-	UINT8 old_val = val;
-	sacstate_state *state = space->machine().driver_data<sacstate_state>();
-	if (state->m_term_data!=0) old_val |= 0x04; // data in
-	val = val ^ 0x40;
+	UINT8 old_val = m_val;
+	if (m_term_data) old_val |= 0x04; // data in
+	m_val ^= 0x40;
 	return old_val;
 }
 
-static READ8_HANDLER(tty_r)
+READ8_MEMBER( sacstate_state::tty_r )
 {
-	sacstate_state *state = space->machine().driver_data<sacstate_state>();
-	UINT8 retVal = state->m_term_data;
-	state->m_term_data = 0;
-	return retVal;
-}
-static WRITE8_HANDLER(tty_w)
-{
-	device_t *devconf = space->machine().device("terminal");
-	logerror("TTY : %02x [%c]\n",data,data);
-	terminal_write(devconf,0,data);
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
 }
 
-static READ8_HANDLER(unknown_r)
+READ8_MEMBER( sacstate_state::unknown_r )
 {
 	logerror("unknown_r\n");
 	return 0;
 }
 
-static ADDRESS_MAP_START(sacstate_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(sacstate_mem, AS_PROGRAM, 8, sacstate_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000,0x7ff) AM_ROM
 	AM_RANGE(0x800,0xfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sacstate_io , AS_IO, 8)
+static ADDRESS_MAP_START(sacstate_io, AS_IO, 8, sacstate_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x00) AM_READ(tty_r)
 	AM_RANGE(0x01,0x01) AM_READ(status_r)
 	AM_RANGE(0x04,0x04) AM_READ(unknown_r)
-	AM_RANGE(0x16,0x16) AM_READ(tty_w)
+	AM_RANGE(0x16,0x16) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( sacstate )
-	PORT_INCLUDE(generic_terminal)
+static INPUT_PORTS_START( sacstate )
 INPUT_PORTS_END
 
-static WRITE8_DEVICE_HANDLER( sacstate_kbd_put )
+WRITE8_MEMBER( sacstate_state::kbd_put )
 {
-	sacstate_state *state = device->machine().driver_data<sacstate_state>();
-	state->m_term_data = data;
+	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( sacstate_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_HANDLER(sacstate_kbd_put)
+	DEVCB_DRIVER_MEMBER(sacstate_state, kbd_put)
 };
 
-static MACHINE_RESET(sacstate)
+MACHINE_RESET_MEMBER( sacstate_state )
 {
+	m_term_data = 0;
+	m_val = 8; // must be 8 or 0
 }
 
 static MACHINE_CONFIG_START( sacstate, sacstate_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I8008, 800000)
-    MCFG_CPU_PROGRAM_MAP(sacstate_mem)
-    MCFG_CPU_IO_MAP(sacstate_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",I8008, 800000)
+	MCFG_CPU_PROGRAM_MAP(sacstate_mem)
+	MCFG_CPU_IO_MAP(sacstate_io)
 
-    MCFG_MACHINE_RESET(sacstate)
-
-    /* video hardware */
-    MCFG_FRAGMENT_ADD( generic_terminal )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sacstate_terminal_intf)
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( sacstate )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "sacst1.bin", 0x0700, 0x0100, CRC(ba020160) SHA1(6337cdf65583808768664653c937e50040aec6d4))
 	ROM_LOAD( "sacst2.bin", 0x0600, 0x0100, CRC(26f3e505) SHA1(3526060dbd1bf885c2e686bc9a6082387630952a))
 	ROM_LOAD( "sacst3.bin", 0x0500, 0x0100, CRC(965b3474) SHA1(6d9142e68d375fb000fd6ea48369d0801274ded6))
@@ -111,6 +119,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, sacstate,  0,       0,	sacstate,	sacstate,	 0,  "SacState",   "SacState 8008",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY      FULLNAME       FLAGS */
+COMP( ????, sacstate,  0,       0,   sacstate,  sacstate,  0,  "SacState", "SacState 8008", GAME_NOT_WORKING | GAME_NO_SOUND)
