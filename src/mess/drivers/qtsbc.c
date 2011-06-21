@@ -29,7 +29,7 @@ public:
 	DECLARE_READ8_MEMBER( qtsbc_06_r );
 	DECLARE_READ8_MEMBER( qtsbc_43_r );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 *m_ram;
+	UINT8 *m_p_ram;
 	UINT8 m_term_data;
 	virtual void machine_reset();
 };
@@ -49,7 +49,7 @@ READ8_MEMBER( qtsbc_state::qtsbc_43_r )
 
 static ADDRESS_MAP_START(qtsbc_mem, AS_PROGRAM, 8, qtsbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xffff ) AM_RAM AM_BASE(m_ram) AM_REGION("maincpu", 0)
+	AM_RANGE( 0x0000, 0xffff ) AM_RAM AM_BASE(m_p_ram) AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qtsbc_io, AS_IO, 8, qtsbc_state)
@@ -67,7 +67,7 @@ INPUT_PORTS_END
 MACHINE_RESET_MEMBER(qtsbc_state)
 {
 	UINT8* bios = machine().region("maincpu")->base()+0x10000;
-	memcpy(m_ram, bios, 0x800);
+	memcpy(m_p_ram, bios, 0x800);
 }
 
 WRITE8_MEMBER( qtsbc_state::kbd_put )
@@ -99,5 +99,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 19??, qtsbc,  0,       0, 	qtsbc,	qtsbc,	 0, 		 "Computer Systems Inc.",   "QT SBC +2/4",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                FULLNAME       FLAGS */
+COMP( 19??, qtsbc,  0,       0,      qtsbc,     qtsbc,    0,  "Computer Systems Inc.", "QT SBC +2/4", GAME_NOT_WORKING | GAME_NO_SOUND)
