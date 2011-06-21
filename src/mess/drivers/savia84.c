@@ -56,7 +56,7 @@ static ADDRESS_MAP_START(savia84_mem, AS_PROGRAM, 8, savia84_state)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( savia84_io , AS_IO, 8, savia84_state)
+static ADDRESS_MAP_START(savia84_io, AS_IO, 8, savia84_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // ports F8-FB
@@ -195,6 +195,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1984, savia84,  0,       0,	savia84,	savia84,	 0,   "<unknown>",   "Savia 84", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
-
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY     FULLNAME       FLAGS */
+COMP( 1984, savia84,  0,       0,    savia84,   savia84, 0,     "<unknown>", "Savia 84", GAME_NOT_WORKING | GAME_NO_SOUND_HW)

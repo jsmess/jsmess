@@ -31,11 +31,11 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_terminal;
-	DECLARE_READ16_MEMBER( sun1_upd7201_r );
-	DECLARE_WRITE16_MEMBER( sun1_upd7201_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	DECLARE_READ16_MEMBER(sun1_upd7201_r);
+	DECLARE_WRITE16_MEMBER(sun1_upd7201_w);
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	virtual void machine_reset();
-	UINT16* m_ram;
+	UINT16* m_p_ram;
 	UINT8 m_term_data;
 };
 
@@ -43,7 +43,7 @@ public:
 
 // Just hack to show output since upd7201 is not implemented yet
 
-READ16_MEMBER(sun1_state::sun1_upd7201_r)
+READ16_MEMBER( sun1_state::sun1_upd7201_r )
 {
 	UINT16 ret;
 	if (offset == 0)
@@ -57,7 +57,7 @@ READ16_MEMBER(sun1_state::sun1_upd7201_r)
 	return ret;
 }
 
-WRITE16_MEMBER(sun1_state::sun1_upd7201_w)
+WRITE16_MEMBER( sun1_state::sun1_upd7201_w )
 {
 	if (offset == 0)
 		terminal_write(m_terminal, 0, data >> 8);
@@ -65,7 +65,7 @@ WRITE16_MEMBER(sun1_state::sun1_upd7201_w)
 
 static ADDRESS_MAP_START(sun1_mem, AS_PROGRAM, 16, sun1_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_ram) // 512 KB RAM / ROM at boot
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_p_ram) // 512 KB RAM / ROM at boot
 	AM_RANGE(0x00200000, 0x00203fff) AM_ROM AM_REGION("user1",0)
 	AM_RANGE(0x00600000, 0x00600007) AM_READWRITE( sun1_upd7201_r, sun1_upd7201_w )
 ADDRESS_MAP_END
@@ -79,7 +79,7 @@ MACHINE_RESET_MEMBER(sun1_state)
 {
 	UINT8* user1 = machine().region("user1")->base();
 
-	memcpy((UINT8*)m_ram,user1,0x4000);
+	memcpy((UINT8*)m_p_ram,user1,0x4000);
 
 	machine().device("maincpu")->reset();
 	m_term_data = 0;
@@ -134,6 +134,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, sun1,  0,       0,		 sun1,		sun1,	 0, 	 "Sun Microsystems",   "Sun-1",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY         FULLNAME       FLAGS */
+COMP( 1982, sun1,  0,       0,       sun1,      sun1,     0,  "Sun Microsystems", "Sun-1", GAME_NOT_WORKING | GAME_NO_SOUND)
 

@@ -33,33 +33,35 @@ class swtpc_state : public driver_device
 {
 public:
 	swtpc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_terminal(*this, TERMINAL_TAG)
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_terminal;
 	DECLARE_READ8_MEMBER(swtpc_status_r);
 	DECLARE_READ8_MEMBER(swtpc_terminal_r);
 	DECLARE_READ8_MEMBER(swtpc_tricky_r);
 	DECLARE_WRITE8_MEMBER(swtpc_terminal_w);
-	DECLARE_WRITE8_MEMBER(swtpc_kbd_put);
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
 };
 
 // bit 0 - ready to receive a character; bit 1 - ready to send a character to the terminal
-READ8_MEMBER(swtpc_state::swtpc_status_r)
+READ8_MEMBER( swtpc_state::swtpc_status_r )
 {
-	if (m_term_data)
-		return 3;
-	else
-		return 0x82;
+	return (m_term_data) ? 3 : 0x82;
 }
 
-READ8_MEMBER(swtpc_state::swtpc_terminal_r)
+READ8_MEMBER( swtpc_state::swtpc_terminal_r )
 {
 	UINT8 ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER(swtpc_state::swtpc_tricky_r)
+READ8_MEMBER( swtpc_state::swtpc_tricky_r )
 {
 	UINT8 ret = m_term_data;
 	return ret;
@@ -69,10 +71,7 @@ READ8_MEMBER(swtpc_state::swtpc_tricky_r)
 WRITE8_MEMBER(swtpc_state::swtpc_terminal_w)
 {
 	if (data)
-	{
-		device_t *devconf = machine().device(TERMINAL_TAG);
-		terminal_write(devconf,0,data);
-	}
+		terminal_write(m_terminal, 0, data);
 }
 
 
@@ -94,14 +93,14 @@ static MACHINE_RESET(swtpc)
 {
 }
 
-WRITE8_MEMBER( swtpc_state::swtpc_kbd_put )
+WRITE8_MEMBER( swtpc_state::kbd_put )
 {
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( swtpc_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(swtpc_state, swtpc_kbd_put)
+	DEVCB_DRIVER_MEMBER(swtpc_state, kbd_put)
 };
 
 static MACHINE_CONFIG_START( swtpc, swtpc_state )
@@ -113,7 +112,7 @@ static MACHINE_CONFIG_START( swtpc, swtpc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, swtpc_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -128,4 +127,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1975, swtpc,  0,       0, 		swtpc,	swtpc,	 0, 	"Southwest Technical Products Corporation",   "SWTPC 6800",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1975, swtpc,  0,       0,      swtpc,     swtpc,    0, "Southwest Technical Products Corporation", "SWTPC 6800", GAME_NO_SOUND)
