@@ -449,7 +449,7 @@
 	</software>
 
 	<software name="traptest">
-		<description></description>
+		<description>Trap Test</description>
 		<year>1982</year>
 		<publisher>Morrow Designs</publisher>
 		<!--
