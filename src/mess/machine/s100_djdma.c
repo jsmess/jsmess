@@ -60,7 +60,7 @@ const rom_entry *s100_djdma_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( djdma_mem, AS_PROGRAM, 8, s100_djdma_device )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("s100_3:djdma:14a", 0)
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("14a", 0)
 ADDRESS_MAP_END
 
 
