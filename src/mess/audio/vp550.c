@@ -62,6 +62,8 @@ void vp550_device::static_set_config(device_t &device, int variant)
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( vp550 )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
 	MCFG_CDP1863_ADD(CDP1863_A_TAG, 0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -75,6 +77,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( vp551 )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
 	MCFG_CDP1863_ADD(CDP1863_A_TAG, 0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

@@ -33,6 +33,8 @@ const device_type VP595 = &device_creator<vp595_device>;
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( vp595 )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
 	MCFG_CDP1863_ADD(CDP1863_TAG, 0, CDP1863_XTAL)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
