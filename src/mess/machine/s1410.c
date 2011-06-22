@@ -147,7 +147,7 @@ const rom_entry *s1410_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( s1410_mem, AS_PROGRAM, 8, s1410_device )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(Z8400A_TAG, 0)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 

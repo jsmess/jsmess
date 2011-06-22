@@ -33,7 +33,7 @@ const device_type S100_DJ2DB = &device_creator<s100_dj2db_device>;
 //-------------------------------------------------
 
 ROM_START( dj2db )
-	ROM_REGION( 0x400, "dj2db", ROMREGION_INVERT )
+	ROM_REGION( 0x400, "dj2db", ROMREGION_INVERT ) // 2708, inverted data outputs
 	ROM_LOAD( "bv-2 f8.11d", 0x000, 0x400, CRC(b6218d0b) SHA1(e4b2ae886c0dd7717e2e02ae2e202115d8ec2def) )
 
 	ROM_REGION( 0x220, "proms", 0 )
@@ -120,7 +120,7 @@ machine_config_constructor s100_dj2db_device::device_mconfig_additions() const
 
 static INPUT_PORTS_START( dj2db )
 	PORT_START("SW1")
-	PORT_DIPNAME( 0xf8, 0xf8, "Power-On Jump Address" ) PORT_DIPLOCATION("SW1:1,2,3,4,5") PORT_CONDITION("s100_3:dj2db:SW1", 0x01, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0xf8, 0xf8, "Power-On Jump Address" ) PORT_DIPLOCATION("SW1:1,2,3,4,5") PORT_CONDITION("SW1", 0x01, PORTCOND_EQUALS, 0x00)
 	PORT_DIPSETTING(    0xf8, "F800H" )
 	PORT_DIPSETTING(    0xf0, "F000H" )
 	PORT_DIPSETTING(    0xe8, "E800H" )
@@ -175,7 +175,7 @@ static INPUT_PORTS_START( dj2db )
 	PORT_DIPNAME( 0x20, 0x20, "Stop Bit Count" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "2 Stop Bits" )
 	PORT_DIPSETTING(    0x00, "1 Stop Bit" )
-	PORT_DIPNAME( 0x40, 0x40, "Parity" ) PORT_DIPLOCATION("SW2:7") PORT_CONDITION("s100_3:dj2db:SW2", 0x80, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0x40, 0x40, "Parity" ) PORT_DIPLOCATION("SW2:7") PORT_CONDITION("SW2", 0x80, PORTCOND_EQUALS, 0x00)
 	PORT_DIPSETTING(    0x40, "Even Parity" )
 	PORT_DIPSETTING(    0x00, "Odd Parity" )
 	PORT_DIPNAME( 0x80, 0x80, "Parity" ) PORT_DIPLOCATION("SW2:8")

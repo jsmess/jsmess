@@ -106,7 +106,7 @@ const rom_entry *abc77_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( abc77_map, AS_PROGRAM, 8, abc77_device )
-	AM_RANGE(0x000, 0xfff) AM_ROM AM_REGION("abc77:z16", 0)
+	AM_RANGE(0x000, 0xfff) AM_ROM AM_REGION("z16", 0)
 ADDRESS_MAP_END
 
 
@@ -325,11 +325,11 @@ INPUT_PORTS_START( abc77 )
 	PORT_DIPNAME( 0x04, 0x04, "External Encoding PROM" ) // @ Z14
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, "Keyboard Language" ) PORT_CONDITION("abc77:DSW", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, "Danish" )			PORT_CONDITION("abc77:DSW", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, DEF_STR( French ) )	PORT_CONDITION("abc77:DSW", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x08, DEF_STR( German ) )	PORT_CONDITION("abc77:DSW", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x18, DEF_STR( Spanish ) )	PORT_CONDITION("abc77:DSW", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0x18, 0x18, "Keyboard Language" ) PORT_CONDITION("DSW", 0x04, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "Danish" )
+	PORT_DIPSETTING(    0x10, DEF_STR( French ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( Spanish ) )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("SW1")

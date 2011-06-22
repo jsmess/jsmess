@@ -562,7 +562,7 @@ static WRITE8_HANDLER( kb_keytronic_internal_data_w )
 *****************************************************************************/
 
 static ADDRESS_MAP_START( keytronic_program, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("kb_keytr", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( keytronic_io, AS_IO, 8 )
