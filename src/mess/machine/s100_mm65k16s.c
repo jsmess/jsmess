@@ -218,7 +218,7 @@ void s100_mm65k16s_device::device_start()
 {
 	m_s100 = machine().device<s100_device>("s100");
 
-	m_ram = auto_alloc_array(machine(), UINT8, 0x10000);
+	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
 }
 
 
@@ -239,7 +239,7 @@ UINT8 s100_mm65k16s_device::s100_smemr_r(offs_t offset)
 {
 	UINT8 data = 0;
 
-	if (offset < 0x10000)
+	if (offset < 0xf800)
 	{
 		data = m_ram[offset];
 	}
@@ -254,7 +254,7 @@ UINT8 s100_mm65k16s_device::s100_smemr_r(offs_t offset)
 
 void s100_mm65k16s_device::s100_mwrt_w(offs_t offset, UINT8 data)
 {
-	if (offset < 0x10000)
+	if (offset < 0xf800)
 	{
 		m_ram[offset] = data;
 	}

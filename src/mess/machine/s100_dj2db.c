@@ -70,16 +70,16 @@ static COM8116_INTERFACE( brg_intf )
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
-static const floppy_interface dj2db_floppy_interface =
+static const floppy_interface floppy_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_8_DSDD,
-	FLOPPY_OPTIONS_NAME(default),
-	"floppy_8",
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    FLOPPY_STANDARD_8_DSDD,
+    FLOPPY_OPTIONS_NAME(default),
+    "floppy_8",
 	NULL
 };
 
@@ -99,7 +99,8 @@ static const wd17xx_interface fdc_intf =
 static MACHINE_CONFIG_FRAGMENT( s100_dj2db )
 	MCFG_COM8116_ADD(BR1941_TAG, XTAL_5_0688MHz, brg_intf)
 	MCFG_WD179X_ADD(MB8866_TAG, fdc_intf) // FD1791
-	MCFG_FLOPPY_2_DRIVES_ADD(dj2db_floppy_interface)
+
+	MCFG_FLOPPY_2_DRIVES_ADD(floppy_intf)
 MACHINE_CONFIG_END
 
 
@@ -257,7 +258,9 @@ s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *
 	device_s100_card_interface(mconfig, *this),
 	device_slot_card_interface(mconfig, *this),
 	m_fdc(*this, MB8866_TAG),
-	m_dbrg(*this, BR1941_TAG)
+	m_dbrg(*this, BR1941_TAG),
+	m_floppy0(*this, FLOPPY_0),
+	m_floppy1(*this, FLOPPY_1)
 {
 }
 
@@ -291,22 +294,57 @@ void s100_dj2db_device::device_reset()
 UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	if ((offset >= 0xf800) && (offset < 0xfbf8))
 	{
-		data = m_rom[offset & 0x3ff];
+		data = m_rom[offset & 0x3ff] ^ 0xff;
 	}
-	else if (offset == 0xfbf8)
+	else if (offset == 0xfbf8) // SERIAL IN
 	{
 		// UART inverted data
 	}
-	else if (offset == 0xfbf9)
+	else if (offset == 0xfbf9) // SERIAL STAT
 	{
-		// UART inverted status
+		/*
+		
+			bit		description
+			
+			0		
+			1		
+			2		
+			3		
+			4		
+			5		
+			6		
+			7		
+		
+		*/
 	}
-	else if (offset == 0xfbfa)
+	else if (offset == 0xfbfa) // DISK STAT
 	{
-		// disk jockey status
+		/*
+		
+			bit		description
+			
+			0		HEAD
+			1		DATA RQ
+			2		INT RQ
+			3		_TWO SIDED
+			4		_INDEX
+			5		
+			6		
+			7		_READY
+		
+		*/
+		
+		data |= !m_head;
+		data |= !wd17xx_drq_r(m_fdc) << 1;
+		data |= !wd17xx_intrq_r(m_fdc) << 2;
+		
+		device_t *floppy = m_drive ? m_floppy1 : m_floppy0;
+		data |= floppy_twosid_r(floppy) << 3;
+		data |= floppy_index_r(floppy) << 4;
+		data |= floppy_ready_r(floppy) << 7;
 	}
 	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
 	{
@@ -316,8 +354,13 @@ UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 	{
 		data = m_ram[offset & 0x3ff];
 	}
+	else
+	{
+		return 0;
+	}
 	
-	return data;
+	// LS241 inverts data
+	return data ^ 0xff;
 }
 
 
@@ -327,17 +370,61 @@ UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 
 void s100_dj2db_device::s100_mwrt_w(offs_t offset, UINT8 data)
 {
-	if (offset == 0xfbf8)
+	// LS96 inverts data
+	data ^= 0xff;
+
+	if (offset == 0xfbf8) // SERIAL OUT
 	{
 		// UART inverted data
 	}
-	else if (offset == 0xfbf9)
+	else if (offset == 0xfbf9) // DRIVE SEL
 	{
-		// disk jockey function
+		/*
+		
+			bit		description
+			
+			0		DRIVE 1
+			1		DRIVE 2
+			2		DRIVE 3
+			3		DRIVE 4
+			4		IN USE / SIDE SELECT
+			5		INT ENBL
+			6		_ACCESS ENBL
+			7		START
+		
+		*/
+		
+		if (BIT(data, 0)) m_drive = 0;
+		if (BIT(data, 1)) m_drive = 1;
+		//if (BIT(data, 2)) m_drive = 2;
+		//if (BIT(data, 3)) m_drive = 3;
+		wd17xx_set_drive(m_fdc, m_drive);
+		
+		wd17xx_set_side(m_fdc, BIT(data, 4));
+		
+		m_int_enbl = BIT(data, 5);
+		m_access_enbl = BIT(data, 6);
+		m_start = BIT(data, 7);
 	}
-	else if (offset == 0xfbfa)
+	else if (offset == 0xfbfa) // FUNCTION SEL
 	{
-		// drive control register
+		/*
+		
+			bit		description
+			
+			0		DOUBLE
+			1		8A SET
+			2		8A CLEAR
+			3		LED
+			4		
+			5		
+			6		
+			7		
+		
+		*/
+	}
+	else if (offset == 0xfbfb) // WAIT ENBL
+	{
 	}
 	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
 	{
