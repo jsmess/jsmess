@@ -33,7 +33,7 @@ const device_type S100_DJ2DB = &device_creator<s100_dj2db_device>;
 //-------------------------------------------------
 
 ROM_START( dj2db )
-	ROM_REGION( 0x400, "dj2db", ROMREGION_INVERT ) // TODO does not invert currently
+	ROM_REGION( 0x400, "dj2db", ROMREGION_INVERT )
 	ROM_LOAD( "bv-2 f8.11d", 0x000, 0x400, CRC(b6218d0b) SHA1(e4b2ae886c0dd7717e2e02ae2e202115d8ec2def) )
 
 	ROM_REGION( 0x220, "proms", 0 )
@@ -294,7 +294,7 @@ UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 	
 	if ((offset >= 0xf800) && (offset < 0xfbf8))
 	{
-		data = m_rom[offset & 0x3ff] ^ 0xff; // TODO remove ^0xff once ROMREGION_INVERT has been fixed
+		data = m_rom[offset & 0x3ff];
 	}
 	else if (offset == 0xfbf8)
 	{
