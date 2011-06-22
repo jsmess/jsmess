@@ -169,7 +169,7 @@ const rom_entry *luxor_55_10828_device::device_rom_region() const
 
 static ADDRESS_MAP_START( luxor_55_10828_mem, AS_PROGRAM, 8, luxor_55_10828_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("abc1:slow:abc830", 0)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("abc830", 0)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM
 ADDRESS_MAP_END
 
