@@ -250,6 +250,8 @@ static const tms5220_interface ti99_4x_tms5200interface =
 };
 
 MACHINE_CONFIG_FRAGMENT( ti99_speech )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
 	MCFG_SOUND_ADD("speechsyn", TMC0285, 680000L)
 	MCFG_SOUND_CONFIG(ti99_4x_tms5200interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
