@@ -10,9 +10,7 @@
 
     TODO:
 
-    - "M0BAD"
     - trap logic
-        - trap reset
         - trap stop
         - trap aux
         - trap halt
@@ -21,23 +19,16 @@
         - in/out trap
         - read/write trap
         - exec trap
-    - memory management
-        - task RAM
-        - mapping RAM
-        - attribute RAM
     - front panel LEDs
     - keyboard
     - I/O
         - Mult I/O (8259A PIC, 3x 8250 ACE, uPD1990C RTC, 4K ROM/RAM)
-        - Wunderbus I/O (8259A PIC, 3x 8250 ACE, uPD1990C RTC)
     - floppy
         - DJ/DMA controller (Z80, 1K RAM, 2/4K ROM, TTL floppy control logic) for 5.25" floppy drives
         - DJ2D/B controller for 8" floppy drives
     - hard disk
         - HDC/DMA controller (Seagate ST-506/Shugart SA1000)
         - HDCA controller (Shugart SA4000/Fujitsu M2301B/Winchester M2320B)
-    - memory
-        - MM65K16S (64K RAM, expandable to 1 MB)
     - AM9512 FPU
     - models
         - Decision I Desk Top Model D1 (MPZ80, MM65KS, Wunderbus)
@@ -640,24 +631,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  floppy_interface super6_floppy_interface
-//-------------------------------------------------
-
-static const floppy_interface mpz80_floppy_interface =
-{
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    FLOPPY_STANDARD_8_DSDD,
-    FLOPPY_OPTIONS_NAME(default),
-    "floppy_8",
-	NULL
-};
-
-
-//-------------------------------------------------
 //  GENERIC_TERMINAL_INTERFACE( terminal_intf )
 //-------------------------------------------------
 
@@ -788,7 +761,6 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 	MCFG_S100_SLOT_ADD(14, "s100_14", mpz80_s100_cards, NULL)
 
 	// devices
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, mpz80_floppy_interface)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	// internal ram

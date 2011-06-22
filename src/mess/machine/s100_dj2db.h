@@ -61,11 +61,16 @@ private:
 	// internal state
 	required_device<device_t> m_fdc;
 	required_device<com8116_device> m_dbrg;
-	device_t *m_image0;
-	device_t *m_image1;
+	required_device<device_t> m_floppy0;
+	required_device<device_t> m_floppy1;
 	
 	UINT8 *m_rom;
 	UINT8 *m_ram;
+	int m_drive;
+	int m_head;
+	int m_int_enbl;
+	int m_access_enbl;
+	int m_start;
 };
 
 
