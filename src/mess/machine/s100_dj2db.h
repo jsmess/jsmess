@@ -27,7 +27,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> s100_djdma_device
+// ======================> s100_dj2db_device
 
 class s100_dj2db_device : public device_t,
 						  public device_s100_card_interface,
@@ -41,6 +41,9 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
+
+	// not really public
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 
 protected:
 	// device-level overrides
@@ -61,16 +64,20 @@ private:
 	// internal state
 	required_device<device_t> m_fdc;
 	required_device<com8116_device> m_dbrg;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	device_t* m_floppy0;
+	device_t* m_floppy1;
+
+	// floppy state
+	int m_drive;				// selected drive
+	int m_head;					// head loaded
+	int m_int_enbl;				// interrupt enable
 	
-	UINT8 *m_rom;
-	UINT8 *m_ram;
-	int m_drive;
-	int m_head;
-	int m_int_enbl;
-	int m_access_enbl;
-	int m_start;
+	// S-100 bus state
+	UINT8 *m_rom;				// ROM
+	UINT8 *m_ram;				// RAM
+	int m_access_enbl;			// access enable
+	int m_board_enbl;			// board enable
+	int m_phantom;				// phantom
 };
 
 
