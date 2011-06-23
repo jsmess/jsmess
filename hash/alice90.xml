@@ -35,6 +35,50 @@
 		</part>
 	</software>
 
+	<software name="galixian">
+		<description>Galixian</description>
+		<year>1984</year>
+		<publisher>Sprites</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="20961">
+				<rom name="galixian.k7" size="20961" crc="1af30fd8" sha1="e875da577e24b1ed020df559816924e0a447d471" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="incv40">
+		<description>Incrustation Video 40 Colonnes</description>
+		<year>1985</year>
+		<publisher>Matra</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="10598">
+				<rom name="incv40.k7" size="10598" crc="ed0f60dc" sha1="01bad4777519de9bc4bf4c1cbd80c883ace6bdfa" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="incv80" supported="no">
+		<description>Incrustation Video 80 Colonnes</description>
+		<year>1985</year>
+		<publisher>Matra</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="8950">
+				<rom name="incv80.k7" size="8950" crc="11ecea51" sha1="c2edac43dc6437a03f78ed4076497bb41e1d29c6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monop">
+		<description>Monopolic</description>
+		<year>1985</year>
+		<publisher>Free Game Blot (Matra)</publisher>
+		<part name="cass" interface="alice32_cass">
+			<dataarea name="cass" size="41119">
+				<rom name="monop.k7" size="41119" crc="c9f1ab62" sha1="003e66698cf5538e62bf8cee5d6bebcdb16c7c3f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="planvl">
 		<description>Plan de Vol</description>
 		<year>1985</year>
