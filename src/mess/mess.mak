@@ -819,6 +819,8 @@ $(MESSOBJ)/concept.a:			\
 
 $(MESSOBJ)/conitec.a:			\
 	$(MESS_DRIVERS)/prof80.o	\
+	$(MESS_MACHINE)/ecbbus.o	\
+	$(MESS_MACHINE)/ecb_grip.o	\
 	$(MESS_DRIVERS)/prof180x.o	\
 
 $(MESSOBJ)/cybiko.a:			\
