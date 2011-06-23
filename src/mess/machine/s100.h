@@ -105,6 +105,8 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> s100_slot_device
+
 class s100_device;
 
 class s100_slot_device : public device_t,
