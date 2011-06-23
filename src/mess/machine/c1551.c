@@ -408,7 +408,7 @@ static const floppy_interface c1551_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(c1551),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
