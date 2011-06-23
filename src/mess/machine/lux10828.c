@@ -340,7 +340,7 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
 
 	// devices
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf)
-	MCFG_WD179X_ADD(FD1791_TAG, fdc_intf)
+	MCFG_FD1791_ADD(FD1791_TAG, fdc_intf)
 MACHINE_CONFIG_END
 
 
@@ -675,8 +675,7 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 	case 3: data = wd17xx_data_r(m_fdc, 0);   break;
 	}
 
-	// FD1791 has inverted data lines
-	return data ^ 0xff;
+	return data;
 }
 
 
@@ -692,9 +691,6 @@ WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
 		// TODO: this is really connected to the Z80 WAIT line
 		device_set_input_line(m_maincpu, INPUT_LINE_HALT, ASSERT_LINE);
 	}
-
-	// FD1791 has inverted data lines
-	data ^= 0xff;
 
 	switch (offset & 0x03)
 	{

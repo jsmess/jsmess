@@ -247,7 +247,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kayproii, "com,cpm", 3)
-	MCFG_WD1793_ADD("wd1793", kaypro_wd1793_interface )
+	MCFG_FD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 	MCFG_Z80PIO_ADD( "z80pio_g", 2500000, kayproii_pio_g_intf )
 	MCFG_Z80PIO_ADD( "z80pio_s", 2500000, kayproii_pio_s_intf )
@@ -293,7 +293,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	/* devices */
 	MCFG_MC6845_ADD("crtc", MC6845, 2000000, kaypro2x_crtc) /* comes out of ULA - needs to be measured */
 	MCFG_QUICKLOAD_ADD("quickload", kaypro2x, "com,cpm", 3)
-	MCFG_WD1793_ADD("wd1793", kaypro_wd1793_interface )
+	MCFG_FD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )
 	MCFG_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )	/* extra sio for modem and printer */

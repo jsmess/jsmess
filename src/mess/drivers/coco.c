@@ -924,7 +924,7 @@ static MACHINE_CONFIG_START( dgnalpha, coco_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* onboard fdc */
-	MCFG_WD179X_ADD("wd2797", dgnalpha_wd17xx_interface)
+	MCFG_WD2797_ADD("wd2797", dgnalpha_wd17xx_interface)
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")

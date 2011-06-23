@@ -10,7 +10,7 @@
 #define Z80GPPIO_TAG	"u101"
 #define Z80SIO_TAG		"u96"
 #define Z80CTC_TAG		"u99"
-#define WD1771_TAG		"u109"
+#define FD1797_TAG		"u109"
 #define COM8116_TAG		"u76"
 #define I8086_TAG		"i8086"
 
@@ -25,7 +25,7 @@ public:
 		  m_maincpu(*this, Z80_TAG),
 		  m_kbpio(*this, Z80KBPIO_TAG),
 		  m_ctc(*this, Z80CTC_TAG),
-		  m_fdc(*this, WD1771_TAG),
+		  m_fdc(*this, FD1797_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1)

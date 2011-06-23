@@ -427,7 +427,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	/* via */
 	MCFG_VIA6522_ADD( "via6522_0", 1000000, oric_6522_interface )
 
-	MCFG_WD179X_ADD("wd179x", oric_wd17xx_interface )
+	MCFG_WD1770_ADD("wd179x", oric_wd17xx_interface )
 
 	MCFG_FLOPPY_4_DRIVES_ADD(oric1_floppy_interface)
 MACHINE_CONFIG_END

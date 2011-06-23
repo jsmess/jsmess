@@ -204,7 +204,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, vector_cassette_interface )
 
-	MCFG_WD1793_ADD("wd1793", vector06_wd17xx_interface)
+	MCFG_FD1793_ADD("wd1793", vector06_wd17xx_interface)
 	MCFG_FLOPPY_2_DRIVES_ADD(vector_floppy_interface)
 
 	/* cartridge */

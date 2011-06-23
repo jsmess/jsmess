@@ -1086,7 +1086,7 @@ static MACHINE_CONFIG_START( msx, msx_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, msx_cassette_interface )
 
-	MCFG_WD179X_ADD("wd179x", msx_wd17xx_interface )
+	MCFG_FD1793_ADD("wd179x", msx_wd17xx_interface ) // TODO confirm type
 
 	MCFG_FLOPPY_2_DRIVES_ADD(msx_floppy_interface)
 
@@ -1162,7 +1162,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	/* real time clock */
 	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
 
-	MCFG_WD179X_ADD("wd179x", msx_wd17xx_interface )
+	MCFG_FD1793_ADD("wd179x", msx_wd17xx_interface ) // TODO confirm type
 
 	MCFG_FLOPPY_2_DRIVES_ADD(msx_floppy_interface)
 

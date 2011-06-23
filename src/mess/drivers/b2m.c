@@ -241,7 +241,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 	/* uart */
 	MCFG_MSM8251_ADD("uart", default_msm8251_interface)
 
-	MCFG_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
+	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
 	MCFG_FLOPPY_2_DRIVES_ADD(b2m_floppy_interface)
 

@@ -247,7 +247,7 @@ static READ8Z_DEVICE_HANDLER( data_r )
 			UINT8 reply = 0;
 
 			if ((offset & 0x1ff9)==0x1ff0)
-				reply = wd17xx_r(card->controller, (offset >> 1)&0x03) ^ 0xff;
+				reply = wd17xx_r(card->controller, (offset >> 1)&0x03);
 			else
 				reply = card->rom[offset & 0x1fff];
 
@@ -270,7 +270,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 			// Note that data is inverted.
 			// 0101 1111 1111 1xx0
 			if ((offset & 0x1ff9)==0x1ff8)
-				wd17xx_w(card->controller, (offset >> 1)&0x03, data ^ 0xff);
+				wd17xx_w(card->controller, (offset >> 1)&0x03, data);
 		}
 	}
 }
@@ -407,7 +407,7 @@ static WRITE_LINE_DEVICE_HANDLER( ti99_fdc_ready )
 #endif
 
 MACHINE_CONFIG_FRAGMENT( ti99_fdc )
-	MCFG_WD1771_ADD("fd1771", ti_wd17xx_interface )
+	MCFG_FD1771_ADD("fd1771", ti_wd17xx_interface )
 MACHINE_CONFIG_END
 
 ROM_START( ti99_fdc )

@@ -268,7 +268,7 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
     MCFG_VIDEO_RESET(mbc55x)
 
     /* Backing storage */
-	MCFG_WD1793_ADD(FDC_TAG, mbc55x_wd17xx_interface )
+	MCFG_FD1793_ADD(FDC_TAG, mbc55x_wd17xx_interface )
 	MCFG_FLOPPY_4_DRIVES_ADD(mbc55x_floppy_interface)
 
     MCFG_RAM_ADD(RAM_TAG)

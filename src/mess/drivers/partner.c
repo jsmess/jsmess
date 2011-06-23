@@ -222,7 +222,7 @@ static MACHINE_CONFIG_START( partner, partner_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, partner_cassette_interface )
 
-	MCFG_WD1793_ADD("wd1793", partner_wd17xx_interface )
+	MCFG_FD1793_ADD("wd1793", partner_wd17xx_interface )
 
 	MCFG_FLOPPY_2_DRIVES_ADD(partner_floppy_interface)
 

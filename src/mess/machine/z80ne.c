@@ -741,19 +741,19 @@ READ8_DEVICE_HANDLER(lx390_fdc_r)
 	switch(offset)
 	{
 	case 0:
-		d = wd17xx_status_r(device, 0);
+		d = wd17xx_status_r(device, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx status: %02x\n", d));
 		break;
 	case 1:
-		d = wd17xx_track_r(device, 0);
+		d = wd17xx_track_r(device, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx track:  %02x\n", d));
 		break;
 	case 2:
-		d = wd17xx_sector_r(device, 0);
+		d = wd17xx_sector_r(device, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx sector: %02x\n", d));
 		break;
 	case 3:
-		d = wd17xx_data_r(device, 0);
+		d = wd17xx_data_r(device, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx data3:  %02x\n", d));
 		break;
 	case 6:
@@ -761,7 +761,7 @@ READ8_DEVICE_HANDLER(lx390_fdc_r)
 		lx390_reset_bank(device, 0);
 		break;
 	case 7:
-		d = wd17xx_data_r(device, 3);
+		d = wd17xx_data_r(device, 3) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx data7, force:  %02x\n", d));
 		break;
 	default:
@@ -780,7 +780,7 @@ WRITE8_DEVICE_HANDLER(lx390_fdc_w)
 	{
 	case 0:
 		LOG(("lx390_fdc_w, WD17xx command: %02x\n", d));
-		wd17xx_command_w(device, offset, d);
+		wd17xx_command_w(device, offset, d ^ 0xff);
 		if (state->m_wd17xx_state.drive & 1)
 			output_set_value("drv0", 2);
 		else if (state->m_wd17xx_state.drive & 2)
@@ -788,14 +788,14 @@ WRITE8_DEVICE_HANDLER(lx390_fdc_w)
 		break;
 	case 1:
 		LOG(("lx390_fdc_w, WD17xx track:   %02x\n", d));
-		wd17xx_track_w(device, offset, d);
+		wd17xx_track_w(device, offset, d ^ 0xff);
 		break;
 	case 2:
 		LOG(("lx390_fdc_w, WD17xx sector:  %02x\n", d));
-		wd17xx_sector_w(device, offset, d);
+		wd17xx_sector_w(device, offset, d ^ 0xff);
 		break;
 	case 3:
-		wd17xx_data_w(device, 0, d);
+		wd17xx_data_w(device, 0, d ^ 0xff);
 		LOG(("lx390_fdc_w, WD17xx data3:   %02x\n", d));
 		break;
 	case 6:
@@ -804,7 +804,7 @@ WRITE8_DEVICE_HANDLER(lx390_fdc_w)
 		break;
 	case 7:
 		LOG(("lx390_fdc_w, WD17xx data7, force:   %02x\n", d));
-		wd17xx_data_w(device, 3, d);
+		wd17xx_data_w(device, 3, d ^ 0xff);
 		break;
 	}
 }

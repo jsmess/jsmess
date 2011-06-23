@@ -481,7 +481,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_SOUND_ADD("custom", SPECIMX, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
+	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
 	MCFG_FLOPPY_2_DRIVES_ADD(specimx_floppy_interface)
 
@@ -523,7 +523,7 @@ static MACHINE_CONFIG_START( erik, special_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, special_cassette_interface )
 
-	MCFG_WD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
+	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
 	MCFG_FLOPPY_2_DRIVES_ADD(specimx_floppy_interface)
 

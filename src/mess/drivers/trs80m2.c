@@ -295,6 +295,16 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
 	bankswitch();
 }
 
+READ8_MEMBER( trs80m2_state::fdc_r )
+{
+	return wd17xx_r(m_fdc, offset) ^ 0xff;
+}
+
+WRITE8_MEMBER( trs80m2_state::fdc_w )
+{
+	wd17xx_w(m_fdc, offset, data ^ 0xff);
+}
+
 READ8_MEMBER( trs80m2_state::keyboard_busy_r )
 {
 	return m_kbirq;
@@ -381,7 +391,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_io, AS_IO, 8, trs80m2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE_LEGACY(FD1791_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0xe4, 0xe7) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0xef, 0xef) AM_WRITE(drvslt_w)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_cd_ba_r, z80dart_cd_ba_w)
@@ -882,7 +892,7 @@ WRITE_LINE_MEMBER( trs80m2_state::fdc_intrq_w )
 	z80pio_pa_w(m_pio, 0, state);
 }
 
-static const wd17xx_interface fd1791_intf =
+static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(trs80m2_state, fdc_intrq_w),
@@ -967,7 +977,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_12_48MHz/8, mc6845_intf)
 
 	/* devices */
-	MCFG_WD179X_ADD(FD1791_TAG, fd1791_intf)
+	MCFG_FD1791_ADD(FD1791_TAG, fdc_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)

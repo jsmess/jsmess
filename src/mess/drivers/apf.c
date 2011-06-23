@@ -734,7 +734,7 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, apf_cassette_interface )
 
-	MCFG_WD179X_ADD("wd179x", default_wd17xx_interface )
+	MCFG_FD1793_ADD("wd179x", default_wd17xx_interface ) // TODO confirm type
 
 	MCFG_FLOPPY_2_DRIVES_ADD(apfimag_floppy_interface)
 MACHINE_CONFIG_END

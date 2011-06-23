@@ -23,7 +23,7 @@
 
     TODO:
 
-    - floppy images are bad
+    - cannot boot from floppy because terminal does not support CTRL modifier key (CTRL-C)
     - honor jumper settings
     - CTC signal header
     - serial printer
@@ -588,7 +588,7 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_I8255A_ADD(I8255A_TAG, printer_8255_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MCFG_COM8116_ADD(COM5016_TAG, 5000000, com5016_intf)
-	MCFG_WD179X_ADD(WD1795_TAG, /*XTAL_8MHz/8,*/ fdc_intf)
+	MCFG_FD1795_ADD(WD1795_TAG, /*XTAL_8MHz/8,*/ fdc_intf)
 	MCFG_FLOPPY_2_DRIVES_ADD(xor100_floppy_interface)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, xor100_centronics_intf)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, xor100_terminal_intf)

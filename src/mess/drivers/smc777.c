@@ -1069,7 +1069,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 
     MCFG_VIDEO_START(smc777)
 
-	MCFG_WD179X_ADD("fdc",smc777_mb8876_interface)
+	MCFG_MB8876_ADD("fdc",smc777_mb8876_interface)
 	MCFG_FLOPPY_2_DRIVES_ADD(smc777_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","smc777")
 

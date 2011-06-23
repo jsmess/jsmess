@@ -595,7 +595,7 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	/* Devices */
 	MCFG_MSM5832_ADD(MSM5832RS_TAG, XTAL_32_768kHz)
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
-	MCFG_WD179X_ADD("fdc", wd1771_intf) // WD1771
+	MCFG_FD1771_ADD("fdc", wd1771_intf)
 
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", mycom_kbd, attotime::from_hz(20))
 MACHINE_CONFIG_END
