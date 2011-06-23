@@ -748,8 +748,8 @@ void grip_device::device_start()
 	m_video_ram = auto_alloc_array(machine(), UINT8, VIDEORAM_SIZE);
 
 	// setup GRIP memory banking
-	memory_configure_bank(machine(), "ecb_1:grip21:videoram", 0, 2, m_video_ram, 0x8000);
-	memory_set_bank(machine(), "ecb_1:grip21:videoram", 0);
+	memory_configure_bank(this, "videoram", 0, 2, m_video_ram, 0x8000);
+	memory_set_bank(this, "videoram", 0);
 
 	// allocate keyboard scan timer
 	m_kb_timer = timer_alloc();
@@ -773,7 +773,7 @@ void grip5_state::machine_start()
 
 	// setup ROM banking
 	memory_configure_bank(machine(), "eprom", 0, 2, machine().region(Z80_TAG)->base(), 0x4000);
-	memory_set_bank(machine(), "eprom", 0);
+	memory_set_bank(this, "eprom", 0);
 
 	// register for state saving
 	save_item(NAME(m_dpage));
@@ -841,7 +841,7 @@ WRITE8_MEMBER( grip_device::page_w )
 {
 	m_page = BIT(data, 7);
 
-	memory_set_bank(machine(), "ecb_1:grip21:videoram", m_page);
+	memory_set_bank(this, "videoram", m_page);
 }
 
 
