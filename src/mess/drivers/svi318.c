@@ -337,7 +337,7 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, svi318_cassette_interface )
 
-	MCFG_WD179X_ADD("wd179x", svi_wd17xx_interface )
+	MCFG_FD1793_ADD("wd179x", svi_wd17xx_interface )
 
 	MCFG_FLOPPY_2_DRIVES_ADD(svi318_floppy_interface)
 
@@ -464,7 +464,7 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, svi318_cassette_interface )
 
-	MCFG_WD179X_ADD("wd179x", svi_wd17xx_interface )
+	MCFG_FD1793_ADD("wd179x", svi_wd17xx_interface )
 
 	MCFG_FLOPPY_2_DRIVES_ADD(svi318_floppy_interface)
 

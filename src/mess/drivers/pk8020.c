@@ -231,7 +231,7 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_MSM8251_ADD( "rs232", default_msm8251_interface)
 	MCFG_MSM8251_ADD( "lan", default_msm8251_interface)
 
-	MCFG_WD1793_ADD( "wd1793", pk8020_wd17xx_interface )
+	MCFG_FD1793_ADD( "wd1793", pk8020_wd17xx_interface )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

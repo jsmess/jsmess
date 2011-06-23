@@ -168,7 +168,7 @@ static MACHINE_CONFIG_START( jupiter, jupiter2_state )
 	MCFG_FRAGMENT_ADD( generic_terminal )
 
 	// devices
-	MCFG_WD1771_ADD(INS1771N1_TAG, fdc_intf)
+	MCFG_FD1771_ADD(INS1771N1_TAG, fdc_intf)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	// internal ram
@@ -191,7 +191,7 @@ static MACHINE_CONFIG_START( jupiter3, jupiter3_state )
 	MCFG_FRAGMENT_ADD( generic_terminal )
 
 	// devices
-	MCFG_WD1771_ADD(INS1771N1_TAG, fdc_intf)
+	MCFG_FD1771_ADD(INS1771N1_TAG, fdc_intf)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	// internal ram

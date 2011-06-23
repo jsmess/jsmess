@@ -642,7 +642,7 @@ static void fdc_dragon_w(device_t *device, offs_t addr, UINT8 data)
     get info function for the CoCo FDC
 -------------------------------------------------*/
 static MACHINE_CONFIG_FRAGMENT(dragon_fdc)
-	MCFG_WD179X_ADD(WD_TAG, coco_wd17xx_interface)
+	MCFG_WD2797_ADD(WD_TAG, coco_wd17xx_interface)
 MACHINE_CONFIG_END
 
 DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon)
@@ -654,7 +654,7 @@ DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon)
 		fdc_dragon_r,
 		fdc_dragon_w,
 		0,
-		WD179X,
+		WD2797,
 		MACHINE_CONFIG_NAME(dragon_fdc)
 	};
 	general_fdc_get_info(device, state, info, &hwtype);

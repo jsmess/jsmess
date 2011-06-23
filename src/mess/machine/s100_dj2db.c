@@ -101,7 +101,7 @@ static const wd17xx_interface fdc_intf =
 
 static MACHINE_CONFIG_FRAGMENT( s100_dj2db )
 	MCFG_COM8116_ADD(BR1941_TAG, XTAL_5_0688MHz, brg_intf)
-	MCFG_WD179X_ADD(MB8866_TAG, fdc_intf) // FD1791
+	MCFG_MB8866_ADD(MB8866_TAG, fdc_intf)
 MACHINE_CONFIG_END
 
 
@@ -349,7 +349,7 @@ UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 	}
 	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
 	{
-		data = wd17xx_r(m_fdc, offset & 0x03) ^ 0xff;
+		data = wd17xx_r(m_fdc, offset & 0x03);
 	}
 	else if ((offset >= 0xfc00) && (offset < 0x10000))
 	{
@@ -443,7 +443,7 @@ void s100_dj2db_device::s100_mwrt_w(offs_t offset, UINT8 data)
 	}
 	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
 	{
-		wd17xx_w(m_fdc, offset & 0x03, data ^ 0xff);
+		wd17xx_w(m_fdc, offset & 0x03, data);
 	}
 	else if ((offset >= 0xfc00) && (offset < 0x10000))
 	{

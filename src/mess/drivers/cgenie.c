@@ -555,7 +555,7 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, cgenie_cassette_interface )
 
-	MCFG_WD179X_ADD("wd179x", cgenie_wd17xx_interface )
+	MCFG_FD1793_ADD("wd179x", cgenie_wd17xx_interface ) // TODO confirm type
 
 	MCFG_FLOPPY_4_DRIVES_ADD(cgenie_floppy_interface)
 	/* cartridge */

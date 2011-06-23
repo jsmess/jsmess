@@ -149,7 +149,7 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	/* via */
 	MCFG_VIA6522_ADD("via6522_0", 1022750, concept_via6522_intf)
 
-	MCFG_WD179X_ADD("wd179x", concept_wd17xx_interface )
+	MCFG_FD1793_ADD("wd179x", concept_wd17xx_interface )
 
 	MCFG_FLOPPY_4_DRIVES_ADD(concept_floppy_interface)
 MACHINE_CONFIG_END
