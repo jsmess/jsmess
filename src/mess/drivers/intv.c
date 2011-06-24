@@ -391,6 +391,8 @@ static ADDRESS_MAP_START( intv_mem , AS_PROGRAM, 16)
 	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("maincpu", 0x3000<<1)	/* GROM,     8-bits wide */
 	AM_RANGE(0x3800, 0x39ff) AM_READWRITE( intv_gram_r, intv_gram_w )		/* GRAM,     8-bits wide */
 	AM_RANGE(0x4800, 0x7fff) AM_ROM		/* Cartridges? */
+	AM_RANGE(0x8000, 0xBfff) AM_ROM		/* Cartridges? */
+	AM_RANGE(0xD000, 0xFfff) AM_ROM		/* Cartridges? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( intvkbd_mem , AS_PROGRAM, 16)
@@ -443,7 +445,7 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_SCREEN_REFRESH_RATE(59.92)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(40*8, 24*8)
+	MCFG_SCREEN_SIZE(41*8, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 24*8-1)
 	MCFG_SCREEN_UPDATE( generic_bitmapped )
 
