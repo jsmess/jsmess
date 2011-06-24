@@ -166,7 +166,7 @@ Possible Undumped protos: -
 		<publisher>Atari / Lucasfilm</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="ballblze.bin" size="32768" crc="def2a207" sha1="1dfd9cb5eb608590c84e14376291f8c02fb1ab93" offset="0" />
+				<rom name="ballblze.bin" size="32768" crc="94d97d14" sha1="ed92ffd21abd50339f5be0cbff9bdcc8fafbc67f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
