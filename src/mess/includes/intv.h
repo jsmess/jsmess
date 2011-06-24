@@ -37,6 +37,9 @@ public:
 	intv_sprite_type m_sprite[8];
 	UINT8 m_sprite_buffers[8][16][128];
 	int m_color_stack_mode;
+	UINT16 m_x_registers[8];
+	UINT16 m_y_registers[8];
+	UINT16 m_a_registers[8];
 	int m_collision_registers[8];
 	int m_color_stack_offset;
 	int m_color_stack[4];

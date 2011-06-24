@@ -10,6 +10,33 @@ READ16_HANDLER( intv_stic_r )
 	//logerror("%x = stic_r(%x)\n",0,offset);
 	switch (offset)
 	{
+		case 0x00:
+		case 0x01:
+		case 0x02:
+		case 0x03:
+		case 0x04:
+		case 0x05:
+		case 0x06:
+		case 0x07: 
+			return 0x3800 | state->m_x_registers[offset & 0x07];
+		case 0x08:
+		case 0x09:
+		case 0x0a:
+		case 0x0b:
+		case 0x0c:
+		case 0x0d:
+		case 0x0e:
+		case 0x0f:
+			return 0x3000 | state->m_y_registers[offset & 0x07];
+		case 0x10:
+		case 0x11:
+		case 0x12:
+		case 0x13:
+		case 0x14:
+		case 0x15:
+		case 0x16:
+		case 0x17:
+			return state->m_a_registers[offset & 0x07];
 		case 0x18:
 		case 0x19:
 		case 0x1a:
@@ -18,11 +45,26 @@ READ16_HANDLER( intv_stic_r )
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-            return state->m_collision_registers[offset & 0x07];
+            return 0x3C00 | state->m_collision_registers[offset & 0x07];
+      case 0x20:
+      	return 0;
 		case 0x21:
 			state->m_color_stack_mode = 1;
 			//logerror("Setting color stack mode\n");
 			break;
+		case 0x28:
+      case 0x29:
+      case 0x2A:
+      case 0x2B:
+      	return 0x3FF0 | state->m_color_stack[offset&0x3];
+      case 0x2C:
+      	return 0x3FF0 | state->m_border_color;
+      case 0x30:
+      	return 0x3FF8 | state->m_col_delay;
+      case 0x31:
+      	return 0x3FF8 | state->m_row_delay;
+      case 0x32:
+      	return 0x3FFC | state->m_top_edge_inhibit<<1 | state->m_left_edge_inhibit;
 	}
 	return 0;
 }
@@ -49,6 +91,7 @@ WRITE16_HANDLER( intv_stic_w )
 			s->visible = !!(data & 0x0200);
 			s->coll = !!(data & 0x0100);
 			s->xpos = (data & 0xFF);
+			state->m_x_registers[offset & 0x07] = data & 0x07FF;
 			break;
 		/* Y Positions */
 		case 0x08:
@@ -66,6 +109,7 @@ WRITE16_HANDLER( intv_stic_w )
 			s->doubley = !!(data & 0x0100);
 			s->doubleyres = !!(data & 0x0080);
 			s->ypos = (data & 0x7F);
+			state->m_y_registers[offset & 0x07] = data & 0x0FFF;
 			break;
 		/* Attributes */
 		case 0x10:
@@ -81,6 +125,7 @@ WRITE16_HANDLER( intv_stic_w )
             s->grom = !(data & 0x0800);
 			s->card = ((data >> 3) & 0xFF);
 			s->color = ((data >> 9) & 0x08) | (data & 0x7);
+			state->m_a_registers[offset & 0x07] = data&0x3FFF;
 			break;
 		/* Collision Detection - TBD */
 		case 0x18:

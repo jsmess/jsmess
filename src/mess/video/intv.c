@@ -67,13 +67,15 @@ VIDEO_START( intv )
 
 static int sprites_collide(intv_state *state, int spriteNum0, int spriteNum1) {
     INT16 x1, x2, y1, y2, w1, w2, h1, h2, x0, y0, r0y, r1y,
-          width, height, x, y;
+          width, height, x, y, x_offset,y_offset;
 
     intv_sprite_type* s1 = &state->m_sprite[spriteNum0];
     intv_sprite_type* s2 = &state->m_sprite[spriteNum1];
 
-    x1 = s1->xpos-8; x2 = s2->xpos-8;
-    y1 = (s1->ypos-8)<<1; y2 = (s2->ypos-8)<<1;
+	 x_offset = state->m_col_delay - 8;
+    y_offset = state->m_row_delay - 8;
+    x1 = s1->xpos+x_offset; x2 = s2->xpos+x_offset;
+    y1 = (s1->ypos+y_offset)<<1; y2 = (s2->ypos+y_offset)<<1;
     w1 = (s1->doublex ? 2 : 1)<<3;
     w2 = (s2->doublex ? 2 : 1)<<3;
     h1 = (s1->quady ? 4 : 1) * (s1->doubley ? 2 : 1) * (s1->doubleyres ? 2 : 1)<<3;
@@ -133,7 +135,7 @@ static void render_sprites(running_machine &machine)
     INT32 nextX;
     INT32 nextY;
     INT32 xInc;
-    INT32 i, j;
+    INT32 i, j, k;
 
     UINT8* memory = machine.region("maincpu")->base();
 
@@ -159,47 +161,11 @@ static void render_sprites(running_machine &machine)
             nextX = (s->xflip ? (s->doublex ? 15 : 7) : 0);
             nextY = (s->yflip ? (spritePixelHeight - j - 1) : j);
             xInc = (s->xflip ? -1: 1);
-            state->m_sprite_buffers[i][nextX][nextY] = ((nextData & 0x0080) != 0);
-            state->m_sprite_buffers[i][nextX + xInc][nextY] = (s->doublex
-                    ? ((nextData & 0x0080) != 0)
-                    : ((nextData & 0x0040) != 0));
-            state->m_sprite_buffers[i][nextX + (2*xInc)][nextY] = (s->doublex
-                    ? ((nextData & 0x0040) != 0)
-                    : ((nextData & 0x0020) != 0));
-            state->m_sprite_buffers[i][nextX + (3*xInc)][nextY] = (s->doublex
-                    ? ((nextData & 0x0040) != 0)
-                    : ((nextData & 0x0010) != 0));
-            state->m_sprite_buffers[i][nextX + (4*xInc)][nextY] = (s->doublex
-                    ? ((nextData & 0x0020) != 0)
-                    : ((nextData & 0x0008) != 0));
-            state->m_sprite_buffers[i][nextX + (5*xInc)][nextY] = (s->doublex
-                    ? ((nextData & 0x0020) != 0)
-                    : ((nextData & 0x0004) != 0));
-            state->m_sprite_buffers[i][nextX + (6*xInc)][nextY] = (s->doublex
-                    ? ((nextData & 0x0010) != 0)
-                    : ((nextData & 0x0002) != 0));
-            state->m_sprite_buffers[i][nextX + (7*xInc)][nextY] = (s->doublex
-                    ? ((nextData & 0x0010) != 0)
-                    : ((nextData & 0x0001) != 0));
-            if (!s->doublex)
-                continue;
-
-            state->m_sprite_buffers[i][nextX + (8*xInc)][nextY] =
-                    ((nextData & 0x0008) != 0);
-            state->m_sprite_buffers[i][nextX + (9*xInc)][nextY] =
-                    ((nextData & 0x0008) != 0);
-            state->m_sprite_buffers[i][nextX + (10*xInc)][nextY] =
-                    ((nextData & 0x0004) != 0);
-            state->m_sprite_buffers[i][nextX + (11*xInc)][nextY] =
-                    ((nextData & 0x0004) != 0);
-            state->m_sprite_buffers[i][nextX + (12*xInc)][nextY] =
-                    ((nextData & 0x0002) != 0);
-            state->m_sprite_buffers[i][nextX + (13*xInc)][nextY] =
-                    ((nextData & 0x0002) != 0);
-            state->m_sprite_buffers[i][nextX + (14*xInc)][nextY] =
-                    ((nextData & 0x0001) != 0);
-            state->m_sprite_buffers[i][nextX + (15*xInc)][nextY] =
-                    ((nextData & 0x0001) != 0);
+            
+            for (k=0;k < 8*(1+s->doublex);k++)
+				{
+					state->m_sprite_buffers[i][nextX + k*xInc][nextY] = (nextData & (1<<(7 - k/(1 + s->doublex)))) != 0; 
+				}
         }
 
     }
@@ -208,53 +174,16 @@ static void render_sprites(running_machine &machine)
 static void render_line(running_machine &machine, bitmap_t *bitmap,
 	UINT8 nextByte, UINT16 x, UINT16 y, UINT8 fgcolor, UINT8 bgcolor)
 {
-    UINT32 color = (nextByte & 0x80 ? fgcolor : bgcolor);
-    intv_plot_pixel(bitmap, x, y, color);
-    intv_plot_pixel(bitmap, x+1, y, color);
-    intv_plot_pixel(bitmap, x, y+1, color);
-    intv_plot_pixel(bitmap, x+1, y+1, color);
-
-    color = (nextByte & 0x40 ? fgcolor : bgcolor);
-    intv_plot_pixel(bitmap, x+2, y, color);
-    intv_plot_pixel(bitmap, x+3, y, color);
-    intv_plot_pixel(bitmap, x+2, y+1, color);
-    intv_plot_pixel(bitmap, x+3, y+1, color);
-
-    color = (nextByte & 0x20 ? fgcolor : bgcolor);
-    intv_plot_pixel(bitmap, x+4, y, color);
-    intv_plot_pixel(bitmap, x+5, y, color);
-    intv_plot_pixel(bitmap, x+4, y+1, color);
-    intv_plot_pixel(bitmap, x+5, y+1, color);
-
-    color = (nextByte & 0x10 ? fgcolor : bgcolor);
-    intv_plot_pixel(bitmap, x+6, y, color);
-    intv_plot_pixel(bitmap, x+7, y, color);
-    intv_plot_pixel(bitmap, x+6, y+1, color);
-    intv_plot_pixel(bitmap, x+7, y+1, color);
-
-    color = (nextByte & 0x08 ? fgcolor : bgcolor);
-    intv_plot_pixel(bitmap, x+8, y, color);
-    intv_plot_pixel(bitmap, x+9, y, color);
-    intv_plot_pixel(bitmap, x+8, y+1, color);
-    intv_plot_pixel(bitmap, x+9, y+1, color);
-
-    color = (nextByte & 0x04 ? fgcolor : bgcolor);
-    intv_plot_pixel(bitmap, x+10, y, color);
-    intv_plot_pixel(bitmap, x+11, y, color);
-    intv_plot_pixel(bitmap, x+10, y+1, color);
-    intv_plot_pixel(bitmap, x+11, y+1, color);
-
-    color = (nextByte & 0x02 ? fgcolor : bgcolor);
-    intv_plot_pixel(bitmap, x+12, y, color);
-    intv_plot_pixel(bitmap, x+13, y, color);
-    intv_plot_pixel(bitmap, x+12, y+1, color);
-    intv_plot_pixel(bitmap, x+13, y+1, color);
-
-    color = (nextByte & 0x01 ? fgcolor : bgcolor);
-    intv_plot_pixel(bitmap, x+14, y, color);
-    intv_plot_pixel(bitmap, x+15, y, color);
-    intv_plot_pixel(bitmap, x+14, y+1, color);
-    intv_plot_pixel(bitmap, x+15, y+1, color);
+    UINT32 color;
+    UINT8 i;
+	 for (i=0; i<8; i++)
+	 {
+	 	color = (nextByte & (1<<(7-i)) ? fgcolor : bgcolor);
+    	intv_plot_pixel(bitmap, x+2*i, y, color);
+    	intv_plot_pixel(bitmap, x+2*i+1, y, color);
+    	intv_plot_pixel(bitmap, x+2*i, y+1, color);
+    	intv_plot_pixel(bitmap, x+2*i+1, y+1, color);
+    }
 }
 
 static void render_colored_squares(running_machine &machine, bitmap_t *bitmap,
@@ -269,8 +198,8 @@ static void render_colored_squares(running_machine &machine, bitmap_t *bitmap,
 static void render_color_stack_mode(running_machine &machine, bitmap_t *bitmap)
 {
 	intv_state *state = machine.driver_data<intv_state>();
-    UINT8 h, csPtr = 0, nexty = 0;
-    UINT16 nextCard, nextx = 0;
+    UINT8 h, csPtr = 0, nexty = 2*state->m_row_delay;
+    UINT16 nextCard, nextx = 2*state->m_col_delay;
     UINT8 *ram = machine.region("maincpu")->base();
 
     for (h = 0; h < 240; h++) {
@@ -321,8 +250,8 @@ static void render_color_stack_mode(running_machine &machine, bitmap_t *bitmap)
             }
         }
         nextx += 16;
-        if (nextx == 320) {
-            nextx = 0;
+        if (nextx >= 320) {
+            nextx = 2*state->m_col_delay;
             nexty += 16;
         }
     }
@@ -331,8 +260,8 @@ static void render_color_stack_mode(running_machine &machine, bitmap_t *bitmap)
 static void render_fg_bg_mode(running_machine &machine, bitmap_t *bitmap)
 {
 	intv_state *state = machine.driver_data<intv_state>();
-    UINT8 i, j, isGrom, fgcolor, bgcolor, nexty = 0;
-    UINT16 nextCard, memoryLocation, nextx = 0;
+    UINT8 i, j, isGrom, fgcolor, bgcolor, nexty = 2*state->m_row_delay;
+    UINT16 nextCard, memoryLocation, nextx = 2*state->m_col_delay;
     UINT8* memory;
     UINT8* ram = machine.region("maincpu")->base();
 
@@ -359,8 +288,8 @@ static void render_fg_bg_mode(running_machine &machine, bitmap_t *bitmap)
         }
 
         nextx += 16;
-        if (nextx == 320) {
-            nextx = 0;
+        if (nextx >= 320) {
+            nextx = 2*state->m_col_delay;
             nexty += 16;
         }
     }
@@ -388,8 +317,8 @@ static void copy_sprites_to_background(running_machine &machine, bitmap_t *bitma
                 (s->doubley ? 2 : 1) * (s->doubleyres ? 2 : 1)<<3;
         width = (s->doublex ? 2 : 1)<<3;
 
-        leftX = (s->xpos-8)<<1;
-        nextY = (s->ypos-8)<<1;
+        leftX = (s->xpos-8+state->m_col_delay)<<1;
+        nextY = (s->ypos-8+state->m_row_delay)<<1;
 
         for (y = 0; y < spritePixelHeight; y++) {
             for (x = 0; x < width; x++) {
@@ -400,8 +329,8 @@ static void copy_sprites_to_background(running_machine &machine, bitmap_t *bitma
                 nextX = leftX + (x<<1);
                 //if the next pixel location is on the border, then we
                 //have a border collision and we can ignore painting it
-                if (nextX < (state->m_row_delay ? 8 : 0) || nextX > 317 ||
-                        nextY < (state->m_col_delay ? 16 : 0) || nextY > 191)
+                if (nextX < (state->m_left_edge_inhibit ? 16 : 0) || nextX > 317 ||
+                       nextY < (state->m_top_edge_inhibit ? 16: 0) || nextY > 191)
                 {
                     borderCollision = TRUE;
                     continue;
@@ -697,10 +626,14 @@ static void draw_borders(running_machine &machine, bitmap_t *bm)
 {
 	intv_state *state = machine.driver_data<intv_state>();
 	if (state->m_left_edge_inhibit)
-		plot_box(bm, 0, 0, 16-state->m_col_delay*2, 16*12, (state->m_border_color<<1)+1);
+		plot_box(bm, 0, 0, 16, 16*12, (state->m_border_color<<1)+1);
+	else if (state->m_col_delay)
+		plot_box(bm, 0, 0, state->m_col_delay*2, 16*12, (state->m_border_color<<1)+1);
 
 	if (state->m_top_edge_inhibit)
-		plot_box(bm, 0, 0, 16*20, 16-state->m_row_delay*2, (state->m_border_color<<1)+1);
+		plot_box(bm, 0, 0, 16*20, 16, (state->m_border_color<<1)+1);
+	else if (state->m_row_delay)
+	   plot_box(bm, 0, 0, 16*20, state->m_row_delay*2, (state->m_border_color<<1)+1);
 }
 
 void intv_stic_screenrefresh(running_machine &machine)
