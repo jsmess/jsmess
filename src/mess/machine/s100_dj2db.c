@@ -7,6 +7,14 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+	
+	- stall logic (read from fdc data register halts CPU until intrq/drq from FDC)
+
+*/
+
 #include "s100_dj2db.h"
 
 
@@ -407,7 +415,7 @@ void s100_dj2db_device::s100_mwrt_w(offs_t offset, UINT8 data)
 		floppy_mon_w(m_floppy1, CLEAR_LINE);
 		
 		// side select
-		wd17xx_set_side(m_fdc, !BIT(data, 4));
+		wd17xx_set_side(m_fdc, BIT(data, 4));
 		
 		// interrupt enable
 		m_int_enbl = BIT(data, 5);
