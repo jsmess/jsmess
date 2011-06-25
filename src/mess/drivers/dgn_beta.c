@@ -45,7 +45,6 @@ documentation still exists.
 #include "machine/6551.h"
 #include "formats/coco_dsk.h"
 #include "imagedev/flopdrv.h"
-#include "machine/coco_vhd.h"
 #include "machine/ram.h"
 #include "video/mc6845.h"
 
