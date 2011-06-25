@@ -31,7 +31,6 @@ Undumped
   - Shin Megami Tensei II (Japan) (Rev A) 84268A75
   - Shin Megami Tensei II (Japan) (Rev B) E38228A7
   - Shodai Nekketsu Kouha Kunio-kun (Japan) (Rev A) 5DF55465
-  - Star Fox (Japan) (v1.1) - Found on a Super Famicom Box, to be confirmed on retail cart
   - Super Jinsei Game 2 (Japan) (Rev A)
   - Super Mahjong Taikai (Japan) (Rev B)
   - Tsukikomori (Japan) (v1.1) (NP) F37C6726
@@ -6651,6 +6650,20 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="first samurai (europe) (beta).sfc" size="524288" crc="9b855ed0" sha1="93f142fb27f778576a8e0ccc06e8fef60eaf637b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starfoxja" cloneof="starwing">
+		<!-- Dumped from a Super Famicom Box, CONFIRMATION NEEDED on a retail cartridge -->
+		<description>Star Fox (Jpn, Rev. A)</description>
+		<year>1993</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-fo-1.ic20" size="1048576" crc="ad668a41" sha1="39ff7354a7fa02295c899b7a7ec3556998ac2636" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="131072">
 			</dataarea>
 		</part>
 	</software>
@@ -47085,7 +47098,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
-				<rom name="the king of fighters 2000 (brazil) (unl).sfc"         size="3145728" crc="a7813943" sha1="7a7dc960d8c5946d249d715c9595257f65801db4" offset="0x000000" />
+				<rom name="the king of fighters 2000 (brazil) (unl).sfc"         size="3145728" crc="ee339f08" sha1="ac7a8d84635240e1fe7e8ef4199db823c63b7d9a" offset="0x000000" />
 <!--		 rom name="the king of fighters 2000 (brazil) (unl) CRACKED.sfc" size="3145728" crc="e6715b8c" sha1="daa98501ae0a95327be9e729140f8c90118d1e63" offset="0x000000" -->
 			</dataarea>
 		</part>
