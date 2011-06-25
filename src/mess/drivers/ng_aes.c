@@ -34,7 +34,6 @@
 #include "machine/pd4990a.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
-#include "devices/aescart.h"
 #include "imagedev/cartslot.h"
 #ifdef MESS
 #include "neogeo.lh"
@@ -1214,6 +1213,186 @@ static READ16_HANDLER(aes_in2_r)
 	return ret;
 }
 
+// handle protected carts
+static void install_protection(device_image_interface& image)
+{
+	neogeo_state *state = image.device().machine().driver_data<neogeo_state>();
+	const char *crypt_feature = image.get_feature( "crypt" );
+
+	if(crypt_feature == NULL)
+		return;
+
+	if(strcmp(crypt_feature,"fatfury2_prot") == 0)
+	{
+		fatfury2_install_protection(image.device().machine());
+		logerror("Installed Fatal Fury 2 protection\n");
+	}
+	if(strcmp(crypt_feature,"kof99_crypt") == 0)
+	{
+		kof99_decrypt_68k(image.device().machine());
+		state->m_fixed_layer_bank_type = 1;
+		kof99_neogeo_gfx_decrypt(image.device().machine(), 0x00);
+		kof99_install_protection(image.device().machine());
+		logerror("Decrypted KOF99 code and graphics.\n");
+	}
+	if(strcmp(crypt_feature,"mslug3_crypt") == 0)
+	{
+		state->m_fixed_layer_bank_type = 1;
+		kof99_neogeo_gfx_decrypt(image.device().machine(), 0xad);
+		logerror("Decrypted Metal Slug 3 graphics\n");
+	}
+	if(strcmp(crypt_feature,"matrim_crypt") == 0)
+	{
+		matrim_decrypt_68k(image.device().machine());
+		neo_pcm2_swap(image.device().machine(), 1);
+		state->m_fixed_layer_bank_type = 2;
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x6a);
+		logerror("Decrypted Matrimelee code, sound and graphics\n");
+	}
+	if(strcmp(crypt_feature,"svc_crypt") == 0)
+	{
+		svc_px_decrypt(image.device().machine());
+		neo_pcm2_swap(image.device().machine(), 3);
+		state->m_fixed_layer_bank_type = 2;
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x57);
+		install_pvc_protection(image.device().machine());
+		logerror("Decrypted SvC code, sound and graphics.\n");
+	}
+	if(strcmp(crypt_feature,"samsho5_crypt") == 0)
+	{
+		samsho5_decrypt_68k(image.device().machine());
+		neo_pcm2_swap(image.device().machine(), 4);
+		state->m_fixed_layer_bank_type = 1;
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x0f);
+		logerror("Decrypted Samurai Shodown V code, sound and graphics.\n");
+	}
+	if(strcmp(crypt_feature,"kof2000_crypt") == 0)
+	{
+		kof2000_decrypt_68k(image.device().machine());
+		state->m_fixed_layer_bank_type = 2;
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x00);
+		kof2000_install_protection(image.device().machine());
+		logerror("Decrypted KOF2000 code, sound and graphics.\n");
+	}
+	if(strcmp(crypt_feature,"kof2001_crypt") == 0)
+	{
+		state->m_fixed_layer_bank_type = 1;
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x1e);
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		logerror("Decrypted KOF2001 code and graphics.\n");
+	}
+	if(strcmp(crypt_feature,"kof2002_crypt") == 0)
+	{
+		kof2002_decrypt_68k(image.device().machine());
+		neo_pcm2_swap(image.device().machine(), 0);
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0xec);
+		logerror("Decrypted KOF2002 code, sound and graphics.\n");
+	}
+	if(strcmp(crypt_feature,"mslug4_crypt") == 0)
+	{
+		state->m_fixed_layer_bank_type = 1; /* USA violent content screen is wrong -- not a bug, confirmed on real hardware! */
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x31);
+		neo_pcm2_snk_1999(image.device().machine(), 8);
+		logerror("Decrypted Metal Slug 4 code, sound and graphics.\n");
+	}
+	if(strcmp(crypt_feature,"mslug5_crypt") == 0)
+	{
+		mslug5_decrypt_68k(image.device().machine());
+		neo_pcm2_swap(image.device().machine(), 2);
+		state->m_fixed_layer_bank_type = 1;
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x19);
+		install_pvc_protection(image.device().machine());
+		logerror("Decrypted Metal Slug 5 code and graphics, and installed protection routines.\n");
+	}
+	if(strcmp(crypt_feature,"kof2003_crypt") == 0)
+	{
+		kof2003h_decrypt_68k(image.device().machine());
+		neo_pcm2_swap(image.device().machine(), 5);
+		state->m_fixed_layer_bank_type = 2;
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x9d);
+		install_pvc_protection(image.device().machine());
+		logerror("Decrypted KOF2003 code and graphicss, and installed protection routines.\n");
+	}
+	if(strcmp(crypt_feature,"samsho5s_crypt") == 0)
+	{
+		samsh5sp_decrypt_68k(image.device().machine());
+		neo_pcm2_swap(image.device().machine(), 6);
+		state->m_fixed_layer_bank_type = 1;
+		neogeo_cmc50_m1_decrypt(image.device().machine());
+		kof2000_neogeo_gfx_decrypt(image.device().machine(), 0x0d);
+	}
+}
+
+/*
+    Load the cartridge image files. Apart from reading, we set pointers
+    to the image files so that during runtime we do not need search
+    operations.
+*/
+static DEVICE_IMAGE_LOAD( aes_cartridge )
+{
+	UINT32 size;
+	device_t* ym = image.device().machine().device("ymsnd");
+
+	// first check software list
+	if(image.software_entry() != NULL)
+	{
+		// create memory regions
+		size = image.get_software_region_length("maincpu");
+		image.device().machine().region_free("maincpu");
+		image.device().machine().region_alloc("maincpu",size,1, ENDIANNESS_LITTLE);
+		memcpy(image.device().machine().region("maincpu")->base(),image.get_software_region("maincpu"),size);
+		size = image.get_software_region_length("fixed");
+		image.device().machine().region_free("fixed");
+		image.device().machine().region_alloc("fixed",size,1, ENDIANNESS_LITTLE);
+		memcpy(image.device().machine().region("fixed")->base(),image.get_software_region("fixed"),size);
+		size = image.get_software_region_length("audiocpu");
+		image.device().machine().region_free("audiocpu");
+		image.device().machine().region_alloc("audiocpu",size,1, ENDIANNESS_LITTLE);
+		memcpy(image.device().machine().region("audiocpu")->base(),image.get_software_region("audiocpu"),size);
+		size = image.get_software_region_length("ymsnd");
+		image.device().machine().region_free("ymsnd");
+		image.device().machine().region_alloc("ymsnd",size,1, ENDIANNESS_LITTLE);
+		memcpy(image.device().machine().region("ymsnd")->base(),image.get_software_region("ymsnd"),size);
+		if(image.get_software_region("ymsnd.deltat") != NULL)
+		{
+			size = image.get_software_region_length("ymsnd.deltat");
+			image.device().machine().region_free("ymsnd.deltat");
+			image.device().machine().region_alloc("ymsnd.deltat",size,1, ENDIANNESS_LITTLE);
+			memcpy(image.device().machine().region("ymsnd.deltat")->base(),image.get_software_region("ymsnd.deltat"),size);
+		}
+		else
+			image.device().machine().region_free("ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
+		ym->reset();
+		size = image.get_software_region_length("sprites");
+		image.device().machine().region_free("sprites");
+		image.device().machine().region_alloc("sprites",size,1, ENDIANNESS_LITTLE);
+		memcpy(image.device().machine().region("sprites")->base(),image.get_software_region("sprites"),size);
+		if(image.get_software_region("audiocrypt") != NULL)  // encrypted Z80 code
+		{
+			size = image.get_software_region_length("audiocrypt");
+			image.device().machine().region_alloc("audiocrypt",size,1, ENDIANNESS_LITTLE);
+			memcpy(image.device().machine().region("audiocrypt")->base(),image.get_software_region("audiocrypt"),size);
+		}
+
+		// setup cartridge ROM area
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x000080,0x0fffff,"cart_rom");
+		memory_set_bankptr(image.device().machine(),"cart_rom",&image.device().machine().region("maincpu")->base()[0x80]);
+
+		// handle possible protection
+		install_protection(image);
+
+		return IMAGE_INIT_PASS;
+	}
+	return IMAGE_INIT_FAIL;
+}
 
 /*************************************
  *
@@ -1752,12 +1931,11 @@ static MACHINE_CONFIG_DERIVED( aes, neogeo )
 
 	MCFG_MEMCARD_HANDLER(neogeo)
 
-	MCFG_AES_CARTRIDGE_ADD("aes_multicart")
-//  MCFG_CARTSLOT_ADD("cart")
-//  MCFG_CARTSLOT_MANDATORY
-
-//  MCFG_CARTSLOT_LOAD(aes_cart)
-
+    MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_LOAD(aes_cartridge)
+	MCFG_CARTSLOT_INTERFACE("aes_cart")
+	MCFG_CARTSLOT_MANDATORY
+	
 	MCFG_SOFTWARE_LIST_ADD("cart_list","aes")
 MACHINE_CONFIG_END
 
