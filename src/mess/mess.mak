@@ -1423,7 +1423,6 @@ $(MESSOBJ)/neocd.a:				\
 
 $(MESSOBJ)/snk.a:				\
 	$(MESS_DRIVERS)/ng_aes.o	\
-	$(MESS_DEVICES)/aescart.o   \
 	$(MESS_DRIVERS)/ngp.o		\
 	$(MESS_VIDEO)/k1ge.o		\
 
