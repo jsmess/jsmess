@@ -42,7 +42,7 @@
 #include "imagedev/snapquik.h"
 #include "imagedev/cartslot.h"
 #include "devices/cococart.h"
-#include "devices/coco_vhd.h"
+#include "machine/coco_vhd.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "machine/ram.h"
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( coco3_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
 	AM_RANGE(0xff20, 0xff3f) AM_DEVREAD_MODERN("pia_1", pia6821_device, read) AM_DEVWRITE("pia_1", coco_pia_1_w)
 	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("coco_cartslot", coco_cartridge_r, coco_cartridge_w)
-	AM_RANGE(0xff80, 0xff85) AM_DEVREADWRITE("vhd", coco_vhd_io_r, coco_vhd_io_w)
+	AM_RANGE(0xff80, 0xff85) AM_DEVREADWRITE_MODERN("vhd", coco_vhd_image_device, read, write)
 	AM_RANGE(0xff90, 0xff9f) AM_READWRITE(coco3_gime_r, coco3_gime_w)
 	AM_RANGE(0xffa0, 0xffaf) AM_READWRITE(coco3_mmu_r, coco3_mmu_w)
 	AM_RANGE(0xffb0, 0xffbf) AM_READ_BANK("bank10") AM_WRITE(coco3_palette_w)

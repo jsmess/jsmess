@@ -1596,7 +1596,7 @@ $(MESSOBJ)/trs.a:				\
 	$(MESS_DRIVERS)/coco.o		\
 	$(MESS_VIDEO)/coco3.o		\
 	$(MESS_FORMATS)/cocopak.o	\
-	$(MESS_DEVICES)/coco_vhd.o	\
+	$(MESS_MACHINE)/coco_vhd.o	\
 	$(MESS_DEVICES)/cococart.o	\
 	$(MESS_DEVICES)/coco_fdc.o	\
 	$(MESS_DEVICES)/coco_pak.o	\
