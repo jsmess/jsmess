@@ -437,7 +437,6 @@ static void smpc_change_clock(running_machine &machine, UINT8 cmd)
 
 	machine.device("maincpu")->set_unscaled_clock(xtal/2);
 	machine.device("slave")->set_unscaled_clock(xtal/2);
-	machine.device("audiocpu")->set_unscaled_clock(xtal/5);
 
 	state->m_vdp2.dotsel = cmd ^ 1;
 	stv_vdp2_dynamic_res_change(machine);
@@ -2776,7 +2775,7 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 	MCFG_CPU_PROGRAM_MAP(saturn_mem)
 	MCFG_CPU_CONFIG(sh2_conf_slave)
 
-	MCFG_CPU_ADD("audiocpu", M68000, MASTER_CLOCK_352/5) //11.46 MHz
+	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
 	MCFG_MACHINE_START(saturn)
@@ -2825,7 +2824,7 @@ static MACHINE_CONFIG_START( stv, saturn_state )
 	MCFG_CPU_PROGRAM_MAP(stv_mem)
 	MCFG_CPU_CONFIG(sh2_conf_slave)
 
-	MCFG_CPU_ADD("audiocpu", M68000, MASTER_CLOCK_352/5) //11.46 MHz
+	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
 	MCFG_MACHINE_START(stv)
