@@ -6,6 +6,9 @@
 
  Driver by Dirk Best
 
+2011-06-26 Keyboard & display fixed. [Robbbert]
+
+
 http://speleotrove.com/acorn/
 
 m   (modify) Memory display and modification    l   (load) Reads a block of bytes from tape
@@ -14,12 +17,14 @@ p   (point) Inserts or removes breakpoint   ^   (up) Increment displayed address
 s   (store) Writes a block of bytes to tape     v   (down) Decrement displayed address
 
 ToDo:
-- Digits don't display in the right order. The digit on the left should be at the extreme right,
-  while the first one with '.' should display the mode letter (with the dot).
-- Keys don't work. Most either do a (down) command, or nothing. Not possible to type an address in.
+- Artwork
+- Cassette
 
-Example usage: Turn on. Press M. Type in an address (example FE00). Contents will show on the right,
-and the Mode letter will show 'A.'.
+Example usage: Turn on. Press M. Mode letter will show 'A'. Type in an address
+               (example FE00). Press M (or any command key). Contents will show
+               on the right. Use Up & Down keys to cycle through addresses.
+
+Note that left-most digit is not wired up, and therefore will always be blank.
 
 ******************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -37,7 +42,8 @@ public:
 	acrnsys1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_ttl74145(*this, "ic8_7445")
+	m_ttl74145(*this, "ic8_7445"),
+	m_digit(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -45,6 +51,7 @@ public:
 	DECLARE_READ8_MEMBER(ins8154_b1_port_a_r);
 	DECLARE_WRITE8_MEMBER(ins8154_b1_port_a_w);
 	DECLARE_WRITE8_MEMBER(acrnsys1_led_segment_w);
+	UINT8 m_digit;
 };
 
 
@@ -52,30 +59,30 @@ public:
 /***************************************************************************
     KEYBOARD HANDLING
 ***************************************************************************/
-
+// bit 7 is cassin
 READ8_MEMBER( acrnsys1_state::ins8154_b1_port_a_r )
 {
-	UINT8 key_line = ttl74145_r(m_ttl74145, 0, 0);
+	UINT8 data = 0xff, i, key_line = ttl74145_r(m_ttl74145, 0, 0);
 
-	switch (key_line)
+	for (i = 0; i < 8; i++)
 	{
-	case 1 << 0: return input_port_read(machine(), "X0");
-	case 1 << 1: return input_port_read(machine(), "X1");
-	case 1 << 2: return input_port_read(machine(), "X2");
-	case 1 << 3: return input_port_read(machine(), "X3");
-	case 1 << 4: return input_port_read(machine(), "X4");
-	case 1 << 5: return input_port_read(machine(), "X5");
-	case 1 << 6: return input_port_read(machine(), "X6");
-	case 1 << 7: return input_port_read(machine(), "X7");
+		if (BIT(key_line, i))
+		{	
+			char kbdrow[6];
+			sprintf(kbdrow,"X%X",i);
+			data = (input_port_read(machine(), kbdrow) & 0x38) | m_digit;
+			break;
+		}
 	}
 
-	/* should never reach this */
-	return 0xff;
+	return data;
 }
 
+// bit 6 is cassout
 WRITE8_MEMBER( acrnsys1_state::ins8154_b1_port_a_w )
 {
-	ttl74145_w(m_ttl74145, 0, data & 0x07);
+	m_digit = data & 0xc7;
+	ttl74145_w(m_ttl74145, 0, m_digit & 7);
 }
 
 
@@ -213,4 +220,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     INIT  COMPANY  FULLNAME    FLAGS */
-COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, 0,    "Acorn", "System 1", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, 0,    "Acorn", "System 1", GAME_NO_SOUND_HW )
