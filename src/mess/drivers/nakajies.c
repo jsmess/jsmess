@@ -54,29 +54,29 @@ NTS information from http://web.archive.org/web/19980205154137/nts.dreamwriter.c
 
 File Management & Memory:
 
-?? Uniquely name up to 128 files
-?? Recall, rename or delete files
-?? Copy files to and from PCMCIA Memory card
-?? PCMCIA Memory expansion cards available for 60 or 250 pages of text
-?? Working memory allows up to 20 pages of text (50KB) to be displayed
-?? Storage memory allows up to 80 pages of text (128KB) in total
-?? DreamLink software exports and imports documents in RTF retaining all
+- Uniquely name up to 128 files
+- Recall, rename or delete files
+- Copy files to and from PCMCIA Memory card
+- PCMCIA Memory expansion cards available for 60 or 250 pages of text
+- Working memory allows up to 20 pages of text (50KB) to be displayed
+- Storage memory allows up to 80 pages of text (128KB) in total
+- DreamLink software exports and imports documents in RTF retaining all
   formatting to Macintosh or Windows PC to all commonly used Word Processing programs
-?? Transfer cable provided compatible to both Macintosh and Windows PC's.
-?? T400 is field upgradeable to IR with the optional Infrared module.
+- Transfer cable provided compatible to both Macintosh and Windows PC's.
+- T400 is field upgradeable to IR with the optional Infrared module.
 
 Hardware:
 
-?? LCD Screen displays 8 lines by 80 characters raised and tilted 30 degrees
-?? Contrast Dial and feet adjust to user preference
-?? Parallel and Serial ports( IR Upgrade Optional) for connectivity to printers, Macintosh and Windows PC's
-?? Full size 64 key keyboard with color coded keys and quick reference menu bar
-?? NiCad rechargeable batteries for up to 8 hours of continuous use prior to recharging
-?? AC adapter for recharging batteries is lightweight and compact design
-?? NEC V20HL 9.83 MHz processor for fast response time
-?? Durable solid state construction weighing 2.2 lbs including battery pack
-?? Dimensions approximately 11" wide by 8" long by 1" deep
-?? FCC and CSA approved
+- LCD Screen displays 8 lines by 80 characters raised and tilted 30 degrees
+- Contrast Dial and feet adjust to user preference
+- Parallel and Serial ports( IR Upgrade Optional) for connectivity to printers, Macintosh and Windows PC's
+- Full size 64 key keyboard with color coded keys and quick reference menu bar
+- NiCad rechargeable batteries for up to 8 hours of continuous use prior to recharging
+- AC adapter for recharging batteries is lightweight and compact design
+- NEC V20HL 9.83 MHz processor for fast response time
+- Durable solid state construction weighing 2.2 lbs including battery pack
+- Dimensions approximately 11" wide by 8" long by 1" deep
+- FCC and CSA approved
 
 
 I/O Map:
@@ -241,7 +241,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nakajies220_map, AS_PROGRAM, 8, nakajies_state )
 	AM_RANGE( 0x00000, 0x3ffff ) AM_RAM	AM_BASE(m_ram_base)
-	AM_RANGE( 0x80000, 0xfffff ) AM_ROM AM_REGION( "bios", 0 )
+	AM_RANGE( 0x80000, 0xfffff ) AM_ROM AM_REGION( "bios", 0x80000 )
 ADDRESS_MAP_END
 
 
@@ -476,13 +476,16 @@ MACHINE_CONFIG_END
 
 
 ROM_START(drwrt400)
-	ROM_REGION( 0x80000, "bios", 0 )
+	ROM_REGION( 0x100000, "bios", 0 )
 
-	ROM_SYSTEM_BIOS( 0, "drwrt400", "DreamWriter T400" )
-	ROMX_LOAD("t4_ir_2.1.ic303", 0x00000, 0x80000, CRC(f0f45fd2) SHA1(3b4d5722b3e32e202551a1be8ae36f34ad705ddd), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 0, "drwrt450", "DreamWriter 450" )
+	ROMX_LOAD("t4_ir_35ba308.ic303", 0x00000, 0x100000, CRC(3b5a580d) SHA1(72df34ece1e6d70adf953025d1c458e22ce819e1), ROM_BIOS(1))
 
-	ROM_SYSTEM_BIOS( 1, "drwrt100", "DreamWriter T100" )
-	ROMX_LOAD("t100_2.3.ic303", 0x00000, 0x80000, CRC(8a16f12f) SHA1(0a907186db3d1756566d767ee847a7ecf694e74b), ROM_BIOS(2))	/* Checksum 01F5 on label */
+	ROM_SYSTEM_BIOS( 1, "drwrt400", "DreamWriter T400" )
+	ROMX_LOAD("t4_ir_2.1.ic303", 0x80000, 0x80000, CRC(f0f45fd2) SHA1(3b4d5722b3e32e202551a1be8ae36f34ad705ddd), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS( 2, "drwrt100", "DreamWriter T100" )
+	ROMX_LOAD("t100_2.3.ic303", 0x80000, 0x80000, CRC(8a16f12f) SHA1(0a907186db3d1756566d767ee847a7ecf694e74b), ROM_BIOS(3))	/* Checksum 01F5 on label */
 ROM_END
 
 
