@@ -1597,11 +1597,11 @@ $(MESSOBJ)/trs.a:				\
 	$(MESS_VIDEO)/coco3.o		\
 	$(MESS_FORMATS)/cocopak.o	\
 	$(MESS_MACHINE)/coco_vhd.o	\
-	$(MESS_DEVICES)/cococart.o	\
-	$(MESS_DEVICES)/coco_fdc.o	\
-	$(MESS_DEVICES)/coco_pak.o	\
-	$(MESS_DEVICES)/coco_232.o	\
-	$(MESS_DEVICES)/orch90.o	\
+	$(MESS_MACHINE)/cococart.o	\
+	$(MESS_MACHINE)/coco_232.o	\
+	$(MESS_MACHINE)/coco_orch90.o\
+	$(MESS_MACHINE)/coco_pak.o	\
+	$(MESS_MACHINE)/coco_fdc.o	\
 	$(MESS_DRIVERS)/mc10.o		\
 	$(MESS_MACHINE)/trs80.o		\
 	$(MESS_VIDEO)/trs80.o		\

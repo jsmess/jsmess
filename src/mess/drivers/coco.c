@@ -41,8 +41,12 @@
 #include "imagedev/bitbngr.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cartslot.h"
-#include "devices/cococart.h"
+#include "machine/cococart.h"
 #include "machine/coco_vhd.h"
+#include "machine/coco_232.h"
+#include "machine/coco_orch90.h"
+#include "machine/coco_pak.h"
+#include "machine/coco_fdc.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "machine/ram.h"
@@ -71,7 +75,7 @@ static ADDRESS_MAP_START( coco_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK("bank16")
 	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
 	AM_RANGE(0xff20, 0xff3f) AM_DEVREAD_MODERN("pia_1", pia6821_device, read) AM_DEVWRITE("pia_1", coco_pia_1_w)
-	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("coco_cartslot", coco_cartridge_r, coco_cartridge_w)
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE_MODERN("ext", cococart_slot_device, read, write)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE("sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
@@ -98,7 +102,7 @@ static ADDRESS_MAP_START( dragon_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xF000, 0xFEFF) AM_RAMBANK("bank16")
 	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
 	AM_RANGE(0xff20, 0xff3f) AM_DEVREAD_MODERN("pia_1", pia6821_device, read) AM_DEVWRITE("pia_1", coco_pia_1_w)
-	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("coco_cartslot", coco_cartridge_r, coco_cartridge_w)
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE_MODERN("ext", cococart_slot_device, read, write)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE("sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
@@ -126,7 +130,7 @@ static ADDRESS_MAP_START( coco3_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfe00, 0xfeff) AM_RAMBANK("bank9")
 	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
 	AM_RANGE(0xff20, 0xff3f) AM_DEVREAD_MODERN("pia_1", pia6821_device, read) AM_DEVWRITE("pia_1", coco_pia_1_w)
-	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("coco_cartslot", coco_cartridge_r, coco_cartridge_w)
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE_MODERN("ext", cococart_slot_device, read, write)
 	AM_RANGE(0xff80, 0xff85) AM_DEVREADWRITE_MODERN("vhd", coco_vhd_image_device, read, write)
 	AM_RANGE(0xff90, 0xff9f) AM_READWRITE(coco3_gime_r, coco3_gime_w)
 	AM_RANGE(0xffa0, 0xffaf) AM_READWRITE(coco3_mmu_r, coco3_mmu_w)
@@ -158,7 +162,7 @@ static ADDRESS_MAP_START( d64_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xff00, 0xff03) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write) AM_MIRROR(0x0018)
 	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE("acia", acia_6551_r,			acia_6551_w)	AM_MIRROR(0x0018)
 	AM_RANGE(0xff20, 0xff3f) AM_DEVREAD_MODERN("pia_1", pia6821_device, read) AM_DEVWRITE("pia_1", coco_pia_1_w)
-	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("coco_cartslot", coco_cartridge_r, coco_cartridge_w)
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE_MODERN("ext", cococart_slot_device, read, write)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE("sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
@@ -192,7 +196,7 @@ static ADDRESS_MAP_START( d64_plus_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xff00, 0xff03) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write) AM_MIRROR(0x0018)
 	AM_RANGE(0xff04, 0xff07) AM_DEVREADWRITE("acia", acia_6551_r,			acia_6551_w)	AM_MIRROR(0x0018)
 	AM_RANGE(0xff20, 0xff3f) AM_DEVREAD_MODERN("pia_1", pia6821_device, read) AM_DEVWRITE("pia_1", coco_pia_1_w)
-	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("coco_cartslot", coco_cartridge_r, coco_cartridge_w)
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE_MODERN("ext", cococart_slot_device, read, write)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE("sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffe1) AM_NOP
@@ -273,7 +277,7 @@ static ADDRESS_MAP_START( dgnalpha_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xff24, 0xff27) AM_DEVREADWRITE_MODERN("pia_2", pia6821_device, read, write)	    /* Third PIA on Dragon Alpha */
 	AM_RANGE(0Xff28, 0xff2b) AM_READWRITE(dgnalpha_modem_r, dgnalpha_modem_w)		/* Modem, dummy to stop eror log ! */
 	AM_RANGE(0xff2c, 0xff2f) AM_READWRITE(dgnalpha_wd2797_r, dgnalpha_wd2797_w)	/* Alpha onboard disk interface */
-	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("coco_cartslot", coco_cartridge_r, coco_cartridge_w)
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE_MODERN("ext", cococart_slot_device, read, write)
 	AM_RANGE(0xff90, 0xffbf) AM_NOP
 	AM_RANGE(0xffc0, 0xffdf) AM_DEVWRITE("sam", sam6883_w)
 	AM_RANGE(0xffe0, 0xffef) AM_NOP
@@ -756,6 +760,36 @@ static const floppy_interface coco_floppy_interface =
 	NULL
 };
 
+static const cococart_interface coco_cococart_interface =
+{
+	DEVCB_LINE(coco_cart_w),
+	DEVCB_LINE(coco_nmi_w),
+	DEVCB_LINE(coco_halt_w)
+};
+
+static const cococart_interface coco3_cococart_interface =
+{
+	DEVCB_LINE(coco3_cart_w),
+	DEVCB_LINE(coco_nmi_w),
+	DEVCB_LINE(coco_halt_w)
+};
+
+static SLOT_INTERFACE_START(dragon_cart)
+	SLOT_INTERFACE("dragon_fdc", DRAGON_FDC)
+	SLOT_INTERFACE("sdtandy_fdc", SDTANDY_FDC)	
+	SLOT_INTERFACE("pak", COCO_PAK)
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START(coco_cart)
+	SLOT_INTERFACE("fdc", COCO_FDC)
+	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
+	SLOT_INTERFACE("cp400_fdc", CP400_FDC)	
+	SLOT_INTERFACE("rs232", COCO_232)
+	SLOT_INTERFACE("orch90", COCO_ORCH90)
+	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
+	SLOT_INTERFACE("pak", COCO_PAK)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( dragon32, coco_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809E, COCO_CPU_SPEED_HZ * 4)        /* 0,894886 MHz */
@@ -789,17 +823,12 @@ static MACHINE_CONFIG_START( dragon32, coco_state )
 
 	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MCFG_DRAGON_CARTRIDGE_ADD("coco_cartslot")
-	MCFG_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MCFG_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_COCO_CARTRIDGE_ADD("ext", coco_cococart_interface, dragon_cart, "dragon_fdc")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
-
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dragon64, coco_state )
@@ -838,16 +867,11 @@ static MACHINE_CONFIG_START( dragon64, coco_state )
 
 	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MCFG_DRAGON_CARTRIDGE_ADD("coco_cartslot")
-	MCFG_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MCFG_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_COCO_CARTRIDGE_ADD("ext", coco_cococart_interface, dragon_cart, "dragon_fdc")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
-
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( d64plus, coco_state )
@@ -887,16 +911,11 @@ static MACHINE_CONFIG_START( d64plus, coco_state )
 
 	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MCFG_DRAGON_CARTRIDGE_ADD("coco_cartslot")
-	MCFG_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MCFG_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_COCO_CARTRIDGE_ADD("ext", coco_cococart_interface, dragon_cart, "dragon_fdc")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
-
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dgnalpha, coco_state )
@@ -944,10 +963,7 @@ static MACHINE_CONFIG_START( dgnalpha, coco_state )
 
 	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MCFG_DRAGON_CARTRIDGE_ADD("coco_cartslot")
-	MCFG_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MCFG_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_COCO_CARTRIDGE_ADD("ext", coco_cococart_interface, dragon_cart, NULL)
 
 	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 
@@ -993,16 +1009,11 @@ static MACHINE_CONFIG_START( tanodr64, coco_state )
 
 	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MCFG_DRAGON_CARTRIDGE_ADD("coco_cartslot")
-	MCFG_DRAGON_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MCFG_DRAGON_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MCFG_DRAGON_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_COCO_CARTRIDGE_ADD("ext", coco_cococart_interface, dragon_cart, "sdtandy_fdc")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
-
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco, coco_state )
@@ -1040,17 +1051,12 @@ static MACHINE_CONFIG_START( coco, coco_state )
 
 	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MCFG_COCO_CARTRIDGE_ADD("coco_cartslot")
-	MCFG_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MCFG_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MCFG_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_COCO_CARTRIDGE_ADD("ext", coco_cococart_interface, coco_cart, "pak")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("4K,32K,64K")
-
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco2, coco_state )
@@ -1088,17 +1094,12 @@ static MACHINE_CONFIG_START( coco2, coco_state )
 
 	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MCFG_COCO_CARTRIDGE_ADD("coco_cartslot")
-	MCFG_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MCFG_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MCFG_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_COCO_CARTRIDGE_ADD("ext", coco_cococart_interface, coco_cart, "fdcv11")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("16K")
-
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco2b, coco_state )
@@ -1136,17 +1137,12 @@ static MACHINE_CONFIG_START( coco2b, coco_state )
 
 	MCFG_SAM6883_ADD("sam", coco_sam_intf)
 
-	MCFG_COCO_CARTRIDGE_ADD("coco_cartslot")
-	MCFG_COCO_CARTRIDGE_CART_CALLBACK(coco_cart_w)
-	MCFG_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MCFG_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_COCO_CARTRIDGE_ADD("ext", coco_cococart_interface, coco_cart, "fdcv11")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("16K")
-
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco3, coco3_state )
@@ -1196,17 +1192,12 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 
 	MCFG_SAM6883_GIME_ADD("sam", coco3_sam_intf)
 
-	MCFG_COCO_CARTRIDGE_ADD("coco_cartslot")
-	MCFG_COCO_CARTRIDGE_CART_CALLBACK(coco3_cart_w)
-	MCFG_COCO_CARTRIDGE_HALT_CALLBACK(coco_halt_w)
-	MCFG_COCO_CARTRIDGE_NMI_CALLBACK(coco_nmi_w)
+	MCFG_COCO_CARTRIDGE_ADD("ext", coco3_cococart_interface, coco_cart, "fdcv11")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("128K,2M,8M")
-
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coco3p, coco3 )
@@ -1227,11 +1218,17 @@ static MACHINE_CONFIG_DERIVED( coco3h, coco3 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cocoe, coco )
-
+	MCFG_COCO_CARTRIDGE_REMOVE("ext")
+	MCFG_COCO_CARTRIDGE_ADD("ext", coco_cococart_interface, coco_cart, "fdc")
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("4K,16K,32K")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( cp400, coco )
+	MCFG_COCO_CARTRIDGE_REMOVE("ext")
+	MCFG_COCO_CARTRIDGE_ADD("ext", coco_cococart_interface, coco_cart, "cp400_fdc")
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1242,124 +1239,69 @@ MACHINE_CONFIG_END
 
 ROM_START(dragon32)
 	ROM_REGION(0xC000, "maincpu",0)
-	ROM_LOAD(           "d32.rom",      0x0000,  0x4000, CRC(e3879310) SHA1(f2dab125673e653995a83bf6b793e3390ec7f65a))
-
-	ROM_REGION(0x4000,"cart",0)
-	ROM_LOAD_OPTIONAL(  "ddos10.rom",   0x0000,  0x2000, CRC(b44536f6) SHA1(a8918c71d319237c1e3155bb38620acb114a80bc))
-	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
+	ROM_LOAD("d32.rom",      0x0000,  0x4000, CRC(e3879310) SHA1(f2dab125673e653995a83bf6b793e3390ec7f65a))
 ROM_END
 
 ROM_START(dragon64)
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD(           "d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
-	ROM_LOAD(           "d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
-
-	ROM_REGION(0x4000,"cart",0)
-	ROM_LOAD_OPTIONAL(  "ddos10.rom",   0x0000,  0x2000, CRC(b44536f6) SHA1(a8918c71d319237c1e3155bb38620acb114a80bc))
-	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
+	ROM_LOAD("d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
+	ROM_LOAD("d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
 ROM_END
 
 ROM_START(d64plus)
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD(           "d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
-	ROM_LOAD(           "d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
-
-	ROM_REGION(0x4000,"cart",0)
-	ROM_LOAD_OPTIONAL(  "ddos10.rom",   0x0000,  0x2000, CRC(b44536f6) SHA1(a8918c71d319237c1e3155bb38620acb114a80bc))
-	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
+	ROM_LOAD("d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
+	ROM_LOAD("d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
 ROM_END
 
 ROM_START(tanodr64)
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD(           "d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
-	ROM_LOAD(           "d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
-
-	ROM_REGION(0x4000,"cart",0)
-	ROM_LOAD_OPTIONAL(  "sdtandy.rom",   0x0000,  0x2000, CRC(5d7779b7) SHA1(ca03942118f2deab2f6c8a89b8a4f41f2d0b94f1))
-	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
+	ROM_LOAD("d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
+	ROM_LOAD("d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))	
 ROM_END
 
 ROM_START(dgnalpha)
 	ROM_REGION(0xC000,"maincpu",1)
-	ROM_LOAD(           "alpha_bt.rom",    0x2000,  0x2000, CRC(c3dab585) SHA1(4a5851aa66eb426e9bb0bba196f1e02d48156068))
-	ROM_LOAD(           "alpha_ba.rom",    0x8000,  0x4000, CRC(84f68bf9) SHA1(1983b4fb398e3dd9668d424c666c5a0b3f1e2b69))
-
-	//ROM_REGION(0x4000,"coco_cartslot:cart",0)
-	ROM_REGION(0x4000,"cart",0)
-	ROM_FILL( 0x0000, 0x4000, 0x00 )
-	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
+	ROM_LOAD("alpha_bt.rom",    0x2000,  0x2000, CRC(c3dab585) SHA1(4a5851aa66eb426e9bb0bba196f1e02d48156068))
+	ROM_LOAD("alpha_ba.rom",    0x8000,  0x4000, CRC(84f68bf9) SHA1(1983b4fb398e3dd9668d424c666c5a0b3f1e2b69))
 ROM_END
 
 ROM_START(coco)
 	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD(			"bas10.rom",	0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539))
-
-	ROM_REGION(0x4000,"cart",0)
-	ROM_FILL( 0x0000, 0x4000, 0x00 )
-	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
+	ROM_LOAD("bas10.rom",	0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539))
 ROM_END
 
 ROM_START(cocoe)
 	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD(			"bas11.rom",	0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3))
-	ROM_LOAD(	        "extbas10.rom",	0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e))
-
-	ROM_REGION(0x4000,"cart",0)
-	ROM_LOAD_OPTIONAL(	"disk10.rom",	0x0000, 0x2000, CRC(b4f9968e) SHA1(04115be3f97952b9d9310b52f806d04f80b40d03))
-	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
+	ROM_LOAD("bas11.rom",	0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3))
+	ROM_LOAD("extbas10.rom",	0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e))
 ROM_END
 
 ROM_START(coco2)
 	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD(			"bas12.rom",	0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f))
-	ROM_LOAD(   	"extbas11.rom",	0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
-
-	ROM_REGION(0x4000,"cart",0)
-	ROM_LOAD_OPTIONAL(	"disk11.rom",	0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
-	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
+	ROM_LOAD("bas12.rom",	0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f))
+	ROM_LOAD("extbas11.rom",	0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
 ROM_END
 
 ROM_START(coco2b)
 	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD(			"bas13.rom",	0x2000, 0x2000, CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
-	ROM_LOAD(   	"extbas11.rom",	0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
-
-	ROM_REGION(0x4000,"cart",0)
-	ROM_LOAD_OPTIONAL(	"disk11.rom",	0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
-	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
+	ROM_LOAD("bas13.rom",	0x2000, 0x2000, CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
+	ROM_LOAD("extbas11.rom",	0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
 ROM_END
 
 ROM_START(coco3)
 	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD(			"coco3.rom",	0x0000, 0x8000, CRC(b4c88d6c) SHA1(e0d82953fb6fd03768604933df1ce8bc51fc427d))
-
-	ROM_REGION(0x8000,"cart",0)
-	ROM_LOAD_OPTIONAL(	"disk11.rom",	0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
-	ROM_RELOAD(0x2000, 0x2000)
-	ROM_RELOAD(0x4000, 0x2000)
-	ROM_RELOAD(0x6000, 0x2000)
-	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x8000, ROM_OPTIONAL | ROM_MIRROR)
+	ROM_LOAD("coco3.rom",	0x0000, 0x8000, CRC(b4c88d6c) SHA1(e0d82953fb6fd03768604933df1ce8bc51fc427d))
 ROM_END
 
 ROM_START(coco3p)
 	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD(			"coco3p.rom",	0x0000, 0x8000, CRC(ff050d80) SHA1(631e383068b1f52a8f419f4114b69501b21cf379))
-
-	ROM_REGION(0x8000,"cart",0)
-	ROM_LOAD_OPTIONAL(	"disk11.rom",	0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
-	ROM_RELOAD(0x2000, 0x2000)
-	ROM_RELOAD(0x4000, 0x2000)
-	ROM_RELOAD(0x6000, 0x2000)
-	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x8000, ROM_OPTIONAL | ROM_MIRROR)
+	ROM_LOAD("coco3p.rom",	0x0000, 0x8000, CRC(ff050d80) SHA1(631e383068b1f52a8f419f4114b69501b21cf379))
 ROM_END
 
 ROM_START(cp400)
 	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD("cp400bas.rom",  0x0000, 0x4000, CRC(878396a5) SHA1(292c545da3c77978e043b00a3dbc317201d18c3b))
-
-	ROM_REGION(0x4000,"cart",0)
-	ROM_LOAD("cp400dsk.rom",  0x0000, 0x2000, CRC(e9ad60a0) SHA1(827697fa5b755f5dc1efb054cdbbeb04e405405b))
-	ROM_CART_LOAD("coco_cartslot:cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_MIRROR)
 ROM_END
 
 #define rom_coco3h	rom_coco3
@@ -1381,4 +1323,4 @@ COMP(  1983,    dragon64,   coco,   0,      dragon64,  dragon32,  0,      "Drago
 COMP(  1983,    d64plus,    coco,   0,      d64plus,   dragon32,  0,      "Dragon Data Ltd",            "Dragon 64 Plus", 0)
 COMP(  1983,    tanodr64,   coco,   0,      tanodr64,  dragon32,  0,      "Dragon Data Ltd / Tano Ltd", "Tano Dragon 64 (NTSC)", 0)
 COMP(  1984,    dgnalpha,   coco,   0,      dgnalpha,  dragon32,  0,      "Dragon Data Ltd",            "Dragon Alpha Prototype", 0)
-COMP(  1984,    cp400,      coco,   0,      coco,      coco,      0,      "Prologica",                  "CP400", 0)
+COMP(  1984,    cp400,      coco,   0,      cp400,     coco,      0,      "Prologica",                  "CP400", 0)

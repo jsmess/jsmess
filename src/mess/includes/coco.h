@@ -14,6 +14,7 @@
 #include "machine/wd17xx.h"
 #include "machine/6883sam.h"
 #include "machine/6821pia.h"
+#include "machine/cococart.h"
 #include "imagedev/printer.h"
 
 
@@ -79,7 +80,7 @@ public:
 	coco_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	device_t *m_cococart_device;
+	cococart_slot_device *m_cococart_device;
 	cassette_image_device *m_cassette_device;
 	device_t *m_bitbanger_device;
 	printer_image_device *m_printer_device;
@@ -197,10 +198,10 @@ void coco3_horizontal_sync_callback(running_machine &machine,int data);
 void coco3_field_sync_callback(running_machine &machine,int data);
 void coco3_gime_field_sync_callback(running_machine &machine);
 
-void coco_cart_w(device_t *device, int data);
-void coco3_cart_w(device_t *device, int data);
-void coco_nmi_w(device_t *device, int data);
-void coco_halt_w(device_t *device, int data);
+WRITE_LINE_DEVICE_HANDLER(coco_cart_w);
+WRITE_LINE_DEVICE_HANDLER(coco3_cart_w);
+WRITE_LINE_DEVICE_HANDLER(coco_nmi_w);
+WRITE_LINE_DEVICE_HANDLER(coco_halt_w);
 
 /* Compusense Dragon Plus board */
 READ8_HANDLER ( dgnplus_reg_r );

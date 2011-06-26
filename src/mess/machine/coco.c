@@ -101,7 +101,7 @@ DAC and bitbanger values written should be reflected in the read.
 #include "machine/wd17xx.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
-#include "devices/cococart.h"
+#include "machine/cococart.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
@@ -1128,7 +1128,7 @@ static printer_image_device *printer_image(running_machine &machine)
 	return state->m_printer_device;
 }
 
-static device_t *cococart_device(running_machine &machine)
+static cococart_slot_device *cococart_device(running_machine &machine)
 {
 	coco_state *state = machine.driver_data<coco_state>();
 	return state->m_cococart_device;
@@ -1167,13 +1167,11 @@ static void soundmux_update(running_machine &machine)
 		new_state = CASSETTE_SPEAKER_MUTED;
 		break;
 	}
-
-	coco_cartridge_set_line(
-		cococart_device(machine),
+	
+	cococart_device(machine)->cart_set_line(
 		COCOCART_LINE_SOUND_ENABLE,
 		(soundmux_status == (SOUNDMUX_STATUS_ENABLE|SOUNDMUX_STATUS_SEL2)
 			? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR));
-
 	cassette_device_image(machine)->change_state(new_state,CASSETTE_MASK_SPEAKER);
 }
 
@@ -2077,8 +2075,7 @@ static void setup_memory_map(running_machine &machine)
 	/* If in maptype 0 we need to map in the rom also, for now this just maps in the system and cart roms */
 	if(!maptype)
 	{
-		UINT8 *cart_rom = machine.region("cart")->base();
-		UINT32 cart_length = machine.region("cart")->bytes();
+		UINT8 *cart_rom = cococart_device(machine)->get_cart_base();
 
 		for(block_index=0;block_index<=7;block_index++)
 		{
@@ -2086,12 +2083,20 @@ static void setup_memory_map(running_machine &machine)
 			/* If we are in the BASIC rom area $8000-$BFFF, then we map to the bas_rom_bank */
 			/* as this may be in a different block of coco_rom, in the Dragon 64 and Alpha */
 			/* as these machines have mutiple bios roms that can ocupy this area */
-			if (block_index < 4)
+			if (block_index < 4) 
 				offset = &state->m_bas_rom_bank[0x1000*block_index];
-			else
-				offset = &cart_rom[(0x1000*(block_index-4)) % cart_length];
-
-			memory_set_bankptr(machine, bank,offset);
+			else {					
+				if (cart_rom) {
+					offset = &cart_rom[(0x1000*(block_index-4)) % 0x4000];
+				} else {
+					offset = NULL;
+				}
+			}
+			if (offset){
+				memory_set_bankptr(machine, bank,offset);
+			} else {
+				space->unmap_read(memmap[block_index+8].start, memmap[block_index+8].end);
+			}
 			space->nop_write(memmap[block_index+8].start, memmap[block_index+8].end);
 		}
 	}
@@ -2371,8 +2376,9 @@ static void coco3_mmu_update(running_machine &machine, int lowblock, int hiblock
 
 	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 	int i, offset;
-	UINT8 *readbank;
-	UINT8 *cart_rom = machine.region("cart")->base();
+	UINT8 *readbank = NULL;
+	UINT8 *cart_rom = cococart_device(machine)->get_cart_base();
+
 	char bank[10];
 
 	for (i = lowblock; i <= hiblock; i++)
@@ -2383,8 +2389,11 @@ static void coco3_mmu_update(running_machine &machine, int lowblock, int hiblock
 		if (offset & 0x80000000)
 		{
 			/* an offset into the CoCo 3 ROM */
-			if (offset & 0x8000)
-				readbank = &cart_rom[offset & ~0x80008000];
+			if (offset & 0x8000) {
+				if (cart_rom) {
+					readbank = &cart_rom[offset & ~0x80008000];
+				}
+			}
 			else
 				readbank = &state->m_rom[offset & ~0x80000000];
 			space->unmap_write(bank_info[i].start, bank_info[i].end);
@@ -2397,7 +2406,11 @@ static void coco3_mmu_update(running_machine &machine, int lowblock, int hiblock
 		}
 
 		/* set up the banks */
-		memory_set_bankptr(machine, bank, readbank);
+		if (readbank) {
+			memory_set_bankptr(machine, bank, readbank);
+		} else {
+			space->unmap_read(bank_info[i].start, bank_info[i].end);
+		}
 
 		if (LOG_MMU)
 		{
@@ -2507,9 +2520,8 @@ WRITE8_HANDLER(coco3_gime_w)
 			{
 				if (state->m_gimereg[0] & 0x04)
 				{
-					device_t *device = cococart_device(space->machine());
-					space->install_legacy_read_handler(*device, 0xFF40, 0xFF5F, FUNC(coco_cartridge_r));
-					space->install_legacy_write_handler(*device, 0xFF40, 0xFF5F, FUNC(coco_cartridge_w));
+					space->install_read_handler (0xFF40, 0xFF5F, read8_delegate (FUNC(cococart_slot_device::read), cococart_device(space->machine())));
+					space->install_write_handler(0xFF40, 0xFF5F, write8_delegate(FUNC(cococart_slot_device::write),cococart_device(space->machine())));
 				}
 				else
 				{
@@ -2554,7 +2566,7 @@ WRITE8_HANDLER(coco3_gime_w)
 					(data & 0x02) ? "EI1 " : "",
 					(data & 0x01) ? "EI0 " : "");
 			}
-			coco_cartridge_twiddle_q_lines(cococart_device(space->machine()));
+			cococart_device(space->machine())->twiddle_q_lines();
 			break;
 
 		case 3:
@@ -2578,7 +2590,7 @@ WRITE8_HANDLER(coco3_gime_w)
 					(data & 0x02) ? "EI1 " : "",
 					(data & 0x01) ? "EI0 " : "");
 			}
-			coco_cartridge_twiddle_q_lines(cococart_device(space->machine()));
+			cococart_device(space->machine())->twiddle_q_lines();
 			break;
 
 		case 4:
@@ -2710,10 +2722,10 @@ static SAM6883_SET_MAP_TYPE( coco3_sam_set_maptype )
     coco_cart_w - call for CART line
 -------------------------------------------------*/
 
-void coco_cart_w(device_t *device, int data)
+WRITE_LINE_DEVICE_HANDLER(coco_cart_w)
 {
-	coco_state *state = device->machine().driver_data<coco_state>();
-	state->m_pia_1->cb1_w(data ? ASSERT_LINE : CLEAR_LINE);
+	coco_state *st = device->machine().driver_data<coco_state>();
+	st->m_pia_1->cb1_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2722,10 +2734,10 @@ void coco_cart_w(device_t *device, int data)
     in addition will raise the GIME interrupt
 -------------------------------------------------*/
 
-void coco3_cart_w(device_t *device, int data)
-{
-	coco3_raise_interrupt(device->machine(), COCO3_INT_EI0, data ? ASSERT_LINE : CLEAR_LINE);
-	coco_cart_w(device, data);
+WRITE_LINE_DEVICE_HANDLER(coco3_cart_w)
+{	
+	coco3_raise_interrupt(device->machine(), COCO3_INT_EI0, state ? ASSERT_LINE : CLEAR_LINE);
+	coco_cart_w(device, state);
 }
 
 
@@ -2734,9 +2746,9 @@ void coco3_cart_w(device_t *device, int data)
     coco_halt_w - sets the HALT line
 -------------------------------------------------*/
 
-void coco_halt_w(device_t *device, int data)
+WRITE_LINE_DEVICE_HANDLER(coco_halt_w)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2745,9 +2757,9 @@ void coco_halt_w(device_t *device, int data)
     coco_nmi_w - sets the NMI
 -------------------------------------------------*/
 
-void coco_nmi_w(device_t *device, int data)
+WRITE_LINE_DEVICE_HANDLER(coco_nmi_w)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2760,7 +2772,7 @@ void coco_nmi_w(device_t *device, int data)
 WRITE8_DEVICE_HANDLER(coco_pia_1_w)
 {
 	downcast<pia6821_device *>(device)->write(*memory_nonspecific_space(device->machine()), offset, data);
-	coco_cartridge_twiddle_q_lines(cococart_device(device->machine()));
+	cococart_device(device->machine())->twiddle_q_lines();
 }
 
 
@@ -2787,7 +2799,7 @@ static void generic_init_machine(running_machine &machine, const machine_init_in
 	coco_state *state = (coco_state *) machine.driver_data<coco_state>();
 
 	/* locate devices */
-	state->m_cococart_device	= machine.device("coco_cartslot");
+	state->m_cococart_device	= machine.device<cococart_slot_device>("ext");
 	state->m_cassette_device	= machine.device<cassette_image_device>(CASSETTE_TAG);
 	state->m_bitbanger_device	= machine.device("bitbanger");
 	state->m_printer_device	= machine.device<printer_image_device>("printer");
