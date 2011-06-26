@@ -152,7 +152,7 @@ static MACHINE_CONFIG_START( 4004clk, nixieclock_state )
 	MCFG_MACHINE_START(4004clk)
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT(layoutnixieclock)
+	MCFG_DEFAULT_LAYOUT(layout_4004clk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
