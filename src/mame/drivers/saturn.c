@@ -1464,7 +1464,7 @@ static TIMER_CALLBACK( dma_lv2_ended )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	if(stv_irq.dma_end[2])	device_set_input_line_and_vector(state->m_maincpu, 6, HOLD_LINE, 0x49);
+	if(stv_irq.dma_end[2]) device_set_input_line_and_vector(state->m_maincpu, 6, HOLD_LINE, 0x49);
 
 	DnMV_0(2);
 }
