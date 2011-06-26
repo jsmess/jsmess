@@ -18,7 +18,7 @@
 *  Attached i8251a uart at u15
 *  Added dipswitch array S4
 *  Attached 8259 PIC
-   * IR0 = upd7720 p0 pin masked by something, not hooked up yet
+   * IR0 = upd7720 p0 pin masked by (probably peripheral bit 0)
    * IR1 = i8251 rxrdy
    * IR2 = i8251 txempty
    * IR3 = i8251 txrdy
@@ -33,7 +33,7 @@
 *  Correctly implement UPD7720 cpu core to avoid needing revolting conversion code; this probably involves overriding and duplicating much of the exec_xx sections of the 7725 core
 *  Correct memory maps and io maps, and figure out what all the proms do - mostly done
 *  8259 PIC: figure out where IR4-7 come from, if anywhere.
-*  UPD7720: hook up p0 and p1 as outputs, and figure out how IR0 is masked from p0.
+*  UPD7720 and 8259: hook up p0 and p1 as outputs, and figure out how 8259 IR0 is masked from 7720 p0.
 *  Add other dipswitches and jumpers (these may actually just control clock dividers for the two 8251s)
 *  Everything else
 *
@@ -46,27 +46,17 @@
 *    the low 8 bits (7-0) are Sw4
 *    the high 8 bits:
 *    Bit F E D C B A 9 8
-*        | | | | | | | \- unknown, possibly related to 7720 p0 int mask
+*        | | | | | | | \- unknown but used, probably control (1=allow 0=mask?) 7720 p0 int to 8259 ir0?
 *        | | | | | | \--- LED 6 control (0 = on)
 *        | | | | | \----- LED 5 control (0 = on)
 *        | | | | \------- LED 4 control (0 = on)
 *        | | | \--------- LED 3 control (0 = on)
-*        | | \----------- unknown
+*        | | \----------- unknown, possibly unused?
 *        | \------------- UPD7720 RESET line (0 = high/in reset, 1 = low/running)
-*        \--------------- unknown
-*
-* in other words:
-*                    LEDS 6    5    4    3
-*    write of 0100 - LEDS on,  on,  on,  on (7720 mask int changed? needs further test)
-*    write of 0200 - LEDS off, on,  on,  on (led 6 control)
-*    write of 0400 - LEDS on,  off, on,  on (led 5 control)
-*    write of 0800 - LEDS on,  on,  off, on (led 4 control)
-*    write of 1000 - LEDS on,  on,  on,  off(led 3 control)
-*    write of 2000 - LEDS on,  on,  on,  on (?)
-*    write of 4000 - LEDS on,  on,  on,  on (changes upd7720 RESET line status from high to low)
-*    write of 8000 - LEDS on,  on,  on,  on (?)
+*        \--------------- unknown, possibly unused? but might possibly related to 7720 p0->8259 as well?
 *
 *    When the unit is idle, leds 5 and 3 are on and upd7720 reset is low (write of 0b?1?0101?.
+*    On all character writes from i8251, bit 8 is unset, then set again, possibly to avoid interrupt clashes?
 *
 *  Bootup notes:
 *    D3109: checks if 0x80 (S4-8) is set: if set, continue, else jump to D3123
@@ -126,6 +116,14 @@
 /*
    Devices and handlers
  */
+//upd7720 (TODO: hook up p0, p1, int)
+static NECDSP_INTERFACE( upd7720_config )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 
 /*****************************************************************************
  USART 8251 and Terminal stuff
@@ -147,7 +145,7 @@ static WRITE_LINE_DEVICE_HANDLER( i8251_txrdy_int )
 
 const msm8251_interface msm8251_config =
 {
-	DEVCB_NULL, // in rxd, serial
+	DEVCB_NULL, // in rxd, serial (todo: proper hookup, currently using hack w/msm8251_recieve_character())
 	DEVCB_NULL, // out txd, serial
 	DEVCB_NULL, // in dsr
 	DEVCB_NULL, // out dtr
@@ -205,19 +203,17 @@ READ8_MEMBER( tsispch_state::dsw_r )
 
 WRITE8_MEMBER( tsispch_state::peripheral_w )
 {
-	/* These are the 4 debug leds on the pcb inside the case.
-       They are called on the silkscreen, '6','5','4',and '3', and
-       are connected to bits 1, 2, 3, and 4 of this register.
-       Bit 4 also connects to the 'talking' LED on the front panel.
-       When 0 is written to a bit, the led turns on.
-       See notes at beginning of file for more info.
-    */
+	/* This controls the four LEDS, the RESET line for the upd77p20,
+	and (probably) the p0-to-ir0 masking of the upd77p20; there are two
+	unknown and seemingly unused bits as well.
+	see the top of the file for more info.
+	*/
 	tsispch_state *state = machine().driver_data<tsispch_state>();
 	state->m_paramReg = data;
 	cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, BIT(data,6)?CLEAR_LINE:ASSERT_LINE);
 #ifdef DEBUG_PARAM
-	//fprintf(stderr,"8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; UNK0: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
-	logerror("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; UNK0: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
+	//fprintf(stderr,"8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; DSPIRQMASK: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
+	logerror("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; DSPIRQMASK: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
 #endif
 	popmessage("LEDS: 6/Talking:%d 5:%d 4:%d 3:%d\n", 1-BIT(data,1), 1-BIT(data,2), 1-BIT(data,3), 1-BIT(data,4));
 }
@@ -339,11 +335,11 @@ DRIVER_INIT( prose2k )
      0   0   x   x    0   x   1   0    *   *  *  *   *  *  *  *   *  *  *  s  6264*2 SRAM 3rd quarter
      0   0   x   x    0   x   1   1    0   0  0  x   x  x  x  x   x  x  *  x  iP8251A @ U15
      0   0   x   x    0   x   1   1    0   0  1  x   x  x  x  x   x  x  *  x  AMD P8259A PIC
-     0   0   x   x    0   x   1   1    0   1  0  x   x  x  x  x   x  x  x  *  LEDS and dipswitches?
+     0   0   x   x    0   x   1   1    0   1  0  x   x  x  x  x   x  x  x  *  LEDS, dipswitches, and UPD77P20 control lines
      0   0   x   x    0   x   1   1    0   1  1  x   x  x  x  x   x  x  *  x  UPD77P20 data/status
      0   0   x   x    0   x   1   1    1   x  x                               Open bus, verified (returns 0x00EA)
      0   0   x   x    1   x                                                   Open bus? (or maybe status?) (returns 0xFA,B,C,FFF)
-     0   1                                                                    Open bus, verfiied (returns 0x00EA)
+     0   1                                                                    Open bus, verified (returns 0x00EA)
      1   0                                                                    Open bus, verified (returns 0x00EA)
      1   1   0   *    *   *   *   *    *   *  *  *   *  *  *  *   *  *  *  s  ROMs 2 and 3
      1   1   1   *    *   *   *   *    *   *  *  *   *  *  *  *   *  *  *  s  ROMs 0 and 1
@@ -398,7 +394,7 @@ PORT_START("s4") // dipswitch array s4
 	PORT_DIPNAME( 0x20, 0x20, "S4-6") PORT_DIPLOCATION("SW4:6")
 	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Self Test") PORT_DIPLOCATION("SW4:7")
+	PORT_DIPNAME( 0x40, 0x40, "S4-7: Self Test") PORT_DIPLOCATION("SW4:7")
 	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "S4-8") PORT_DIPLOCATION("SW4:8")
@@ -421,6 +417,7 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
     MCFG_CPU_ADD("dsp", UPD7725, 8000000) /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
     MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
     MCFG_CPU_DATA_MAP(dsp_data_map)
+    MCFG_CPU_CONFIG(upd7720_config)
 
     /* PIC 8259 */
     MCFG_PIC8259_ADD("pic8259", pic8259_config)
@@ -430,7 +427,7 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
 
     /* sound hardware */
     //MCFG_SPEAKER_STANDARD_MONO("mono")
-    //MCFG_SOUND_ADD("dac", DAC, 0) /* TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be fun to connect up */
+    //MCFG_SOUND_ADD("dac", DAC, 0) /* TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up */
     //MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
     MCFG_FRAGMENT_ADD( generic_terminal )
@@ -460,12 +457,12 @@ ROM_START( prose2k )
 	// L - always low; H - always high
 	// U77: unknown (what does this do?)
 	//      input is A19 for I4, A18 for I3, A15 for I2, A13 for I1, A12 for I0
-	//      output bits 0bLLLLzyxH
+	//      output bits 0bLLLLzyxH (TODO: recheck)
 	//      bit - function
 	//      7, 6, 5, 4 - seem unconnected?
 	//      3 - connection unknown, low in the RAM, ROM, and Peripheral memory areas
 	//      2 - connection unknown, low in the RAM and ROM memory areas
-	//      1 - unknown, always high
+	//      1 - unknown, always high (TODO: recheck)
 	//      0 - unknown, always high
 	//
 	// U79: SRAM and peripheral mapping:
@@ -484,17 +481,17 @@ ROM_START( prose2k )
 	//              inputs: S0 - A9; S1 - A10; S2 - A11
 	//              /Y0 - /CS (pin 11) of iP8251A at U15
 	//              /Y1 - /CS (pin 1) of AMD 8259A at U4
-	//              /Y2 - pins 1, 4, 9 (1A, 2A, 3A inputs) of 74HCT32 Quad OR gate at U58 <wip, involves LEDS?>
+	//              /Y2 - pins 1, 4, 9 (1A, 2A, 3A inputs) of 74HCT32 Quad OR gate at U58 <wip, this is the 'peripheral' register, which deals with upd7720 control lines, LEDS and dipswitches>
 	//              /Y3 - pin 26 (/CS) of UPD77P20 at U29
 	//              /Y4 thru /Y7 - seem unconnected SO FAR? <wip>
 	//          The 74S138N at U78: <wip>
-	//              /EN3 - ?
+	//              /EN3 - ? (TODO: figure these out)
 	//              /EN2 - ?
 	//              inputs: S0 - A18; S1 - A19; S2 - Pulled to GND
 	//              /Y0 - ?
 	//              /Y1 - ?
 	//              /Y2 - ?
-	//              /Y3 - connects somewhere
+	//              /Y3 - connects somewhere, only active when A18 and A19 are high, possibly a rom bus buffer enable? (TODO: figure out what this does)
 	//              /Y4-/Y7 - never used since S2 is pulled to GND
 	//      2 - to /CS1 on 6264 SRAMs at U63 and U66
 	//      1 - to /CS1 on 6264 SRAMs at U62 and U65
