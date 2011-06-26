@@ -30,6 +30,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/terminal.h"
 
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class c68ksbc_state : public driver_device
 {
@@ -44,18 +45,15 @@ public:
 	required_device<device_t> m_terminal;
 	DECLARE_READ16_MEMBER( c68ksbc_status_r );
 	DECLARE_READ16_MEMBER( c68ksbc_terminal_r );
-	DECLARE_WRITE16_MEMBER( c68ksbc_terminal_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 m_term_data;
+	virtual void machine_reset();
 };
 
 //bit 0 high = a key is ready; bit 1 high = ready to output to terminal
 READ16_MEMBER( c68ksbc_state::c68ksbc_status_r )
 {
-	if (m_term_data)
-		return 3;
-	else
-		return 2;
+	return (m_term_data) ? 3 : 2;
 }
 
 READ16_MEMBER( c68ksbc_state::c68ksbc_terminal_r )
@@ -65,18 +63,13 @@ READ16_MEMBER( c68ksbc_state::c68ksbc_terminal_r )
 	return ret;
 }
 
-WRITE16_MEMBER(c68ksbc_state::c68ksbc_terminal_w)
-{
-	terminal_write(m_terminal, 0, data&0xff);
-}
-
 
 static ADDRESS_MAP_START(c68ksbc_mem, AS_PROGRAM, 16, c68ksbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x002fff) AM_ROM
 	AM_RANGE(0x003000, 0x5fffff) AM_RAM
 	AM_RANGE(0x600000, 0x600001) AM_READ(c68ksbc_status_r)
-	AM_RANGE(0x600002, 0x600003) AM_READWRITE(c68ksbc_terminal_r, c68ksbc_terminal_w)
+	AM_RANGE(0x600002, 0x600003) AM_READ(c68ksbc_terminal_r) AM_DEVWRITE8_LEGACY(TERMINAL_TAG, terminal_write, 0xff)
 ADDRESS_MAP_END
 
 
@@ -85,8 +78,9 @@ static INPUT_PORTS_START( c68ksbc )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(c68ksbc)
+MACHINE_RESET_MEMBER( c68ksbc_state )
 {
+	m_term_data = 0;
 }
 
 WRITE8_MEMBER( c68ksbc_state::kbd_put )
@@ -103,7 +97,7 @@ static MACHINE_CONFIG_START( c68ksbc, c68ksbc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // text says 8MHz, schematic says 10MHz
 	MCFG_CPU_PROGRAM_MAP(c68ksbc_mem)
-	MCFG_MACHINE_RESET(c68ksbc)
+
 	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
@@ -116,5 +110,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 2002, 68ksbc,	0,       0, c68ksbc,c68ksbc,	 0, 	  "Ichit Sirichote",   "68k Single Board Computer", GAME_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                FULLNAME               FLAGS */
+COMP( 2002, 68ksbc,   0,       0,    c68ksbc,   c68ksbc,  0,  "Ichit Sirichote", "68k Single Board Computer", GAME_NO_SOUND_HW)
