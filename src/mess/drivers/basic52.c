@@ -4,6 +4,12 @@
 
         03/12/2009 Skeleton driver.
 
+BASIC-52 is an official Intel release.
+
+BASIC-31 (and variants) as found on the below url, are homebrews.
+
+http://dsaprojects.110mb.com/electronics/8031-ah/8031-bas.html
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -19,8 +25,14 @@ public:
 	basic52_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_WRITE8_MEMBER(kbd_put);
+	UINT8 m_term_data;
 };
 
+// may need AS_DATA as well..
+
+// according to my reading of the mcs51 cpu source, AS_PROGRAM is for
+// external RAM, AS_DATA for internal RAM, and AS_IO for the IO ports
 
 static ADDRESS_MAP_START(basic52_mem, AS_PROGRAM, 8, basic52_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -45,18 +57,18 @@ static INPUT_PORTS_START( basic52 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(basic52)
+static MACHINE_RESET( basic52 )
 {
 }
 
-static WRITE8_DEVICE_HANDLER( basic52_kbd_put )
+WRITE8_MEMBER( basic52_state::kbd_put )
 {
-
+	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( basic52_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_HANDLER(basic52_kbd_put)
+	DEVCB_DRIVER_MEMBER(basic52_state, kbd_put)
 };
 
 static I8255_INTERFACE( ppi8255_intf )
@@ -79,7 +91,7 @@ static MACHINE_CONFIG_START( basic31, basic52_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	MCFG_I8255_ADD("ppi8255", ppi8255_intf )
 MACHINE_CONFIG_END
@@ -94,7 +106,7 @@ static MACHINE_CONFIG_START( basic52, basic52_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,basic52_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	MCFG_I8255_ADD("ppi8255", ppi8255_intf )
 MACHINE_CONFIG_END
@@ -120,6 +132,6 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1985, basic52,  0,       0,	basic52,	basic52,	 0,  "Intel",   "MCS BASIC 52", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1985, basic31,  basic52, 0,	basic31,	basic52,	 0,  "Intel",   "MCS BASIC 31", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, basic52,  0,       0,    basic52,   basic52,  0,    "Intel", "MCS BASIC 52", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, basic31,  basic52, 0,    basic31,   basic52,  0,    "Intel", "MCS BASIC 31", GAME_NOT_WORKING | GAME_NO_SOUND)
 
