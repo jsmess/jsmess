@@ -7,7 +7,7 @@
 		</rect>
 	</element>
 	<element name="warning"><text string="Mandatory Artwork '4004clk.zip' is missing from 'Artwork' folder."><color red="1.0" green="0.5" blue="0.5" /></text></element>
-	<view name="Clock">
+	<view name="artwork_missing">
 		<bezel element="background">
 			<bounds left="0" top="0" right="580" bottom="150" />
 		</bezel>
