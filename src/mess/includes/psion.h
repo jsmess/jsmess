@@ -9,28 +9,6 @@
 #ifndef _PSION_H_
 #define _PSION_H_
 
-class datapack
-{
-public:
-	UINT8 update(UINT8 data);
-	void control_lines_w(UINT8 data);
-	UINT8 control_lines_r();
-	int load(device_image_interface &image);
-	void unload(device_image_interface &image);
-	void reset();
-
-private:
-	device_image_interface *d_image;
-	UINT8 id;
-	UINT8 len;
-	UINT16 counter;
-	UINT8 page;
-	UINT8 segment;
-	UINT8 control_lines;
-	UINT8 *buffer;
-	bool write_flag;
-};
-
 class psion_state : public driver_device
 {
 public:
@@ -38,12 +16,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_lcdc(*this, "hd44780"),
-		  m_beep(*this, BEEPER_TAG)
+		  m_beep(*this, BEEPER_TAG),
+		  m_pack1(*this, "pack1"),
+		  m_pack2(*this, "pack2")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	required_device<device_t> m_beep;
+	required_device<datapack_device> m_pack1;
+	required_device<datapack_device> m_pack2;
 
 	UINT16 m_kb_counter;
 	UINT8 m_enable_nmi;
@@ -66,16 +48,12 @@ public:
 	UINT8 m_ram_bank_count;
 	UINT8 m_rom_bank_count;
 
-	datapack m_pack1;
-	datapack m_pack2;
-
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	UINT8 kb_read(running_machine &machine);
 	void update_banks(running_machine &machine);
-	datapack *get_active_slot(UINT8 data);
 	DECLARE_WRITE8_MEMBER( hd63701_int_reg_w );
 	DECLARE_READ8_MEMBER( hd63701_int_reg_r );
 	void io_rw(address_space &space, UINT16 offset);
