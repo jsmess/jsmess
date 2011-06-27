@@ -10,16 +10,17 @@
 #include "sound/cdp1869.h"
 #include "sound/wave.h"
 #include "imagedev/flopdrv.h"
-#include "formats/comx35_dsk.h"
 #include "formats/comx35_comx.h"
+#include "formats/comx35_dsk.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
 #include "imagedev/snapquik.h"
 #include "machine/cdp1871.h"
+#include "machine/comxexp.h"
 #include "machine/comxpl80.h"
-#include "machine/wd17xx.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
+#include "machine/wd17xx.h"
 #include "video/mc6845.h"
 
 #define SCREEN_TAG			"screen"
@@ -62,7 +63,8 @@ public:
 		  m_fdc(*this, WD1770_TAG),
 		  m_kbe(*this, CDP1871_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG)
+		  m_ram(*this, RAM_TAG),
+		  m_expansion(*this, COMX_EXPANSION_TAG)
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
@@ -72,6 +74,7 @@ public:
 	required_device<cdp1871_device> m_kbe;
 	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_ram;
+	required_device<comx_expansion_bus_device> m_expansion;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -92,6 +95,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( control_r );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	DECLARE_WRITE_LINE_MEMBER( ef4_w );
 
 	UINT8 read_expansion();
 	bool is_expansion_box_installed();
