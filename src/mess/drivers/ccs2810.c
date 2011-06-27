@@ -8,6 +8,26 @@
 Press Enter to start the system.
 All commands are in uppercase.
 
+A
+Dn,n Dump memory
+E
+F    Fill
+G    Go
+H    Hex arithmetic
+I    In
+L
+M    Move
+O    Out
+Q
+R
+S    Edit memory
+T
+V
+W
+X    Registers
+Y
+Z
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -128,4 +148,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1980, ccs2810,  0,    0,       ccs2810,   ccs2810,  0,   "California Computer Systems", "CCS Model 2810", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1980, ccs2810,  0,    0,       ccs2810,   ccs2810,  0,   "California Computer Systems", "CCS Model 2810", GAME_NO_SOUND_HW)
