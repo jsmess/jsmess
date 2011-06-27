@@ -235,6 +235,29 @@ WRITE_LINE_MEMBER( comx_expansion_bus_device::q_w )
 }
 
 
+//-------------------------------------------------
+//  screen_update -
+//-------------------------------------------------
+
+bool comx_expansion_bus_device::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+{
+	bool value = false;
+	
+	for (int i = 0; i < MAX_COMX_EXPANSION_SLOTS; i++)
+	{
+		if (m_comx_expansion_bus_device[i] != NULL)
+		{
+			if (m_comx_expansion_bus_device[i]->comx_screen_update(screen, bitmap, cliprect))
+			{
+				value = true;
+			}
+		}
+	}
+	
+	return value;
+}
+
+
 WRITE_LINE_MEMBER( comx_expansion_bus_device::int_w ) { m_out_int_func(state); }
 WRITE_LINE_MEMBER( comx_expansion_bus_device::ef4_w ) { m_out_ef4_func(state); }
 WRITE_LINE_MEMBER( comx_expansion_bus_device::wait_w ) { m_out_wait_func(state); }
