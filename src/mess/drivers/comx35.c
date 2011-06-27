@@ -226,7 +226,7 @@ static COSMAC_SC_WRITE( comx35_sc_w )
 
 			if (!state->m_iden)
 			{
-				device_set_input_line(device, COSMAC_INPUT_LINE_DMAOUT, ASSERT_LINE);
+				state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAOUT, ASSERT_LINE);
 			}
 		}
 		else
@@ -237,12 +237,12 @@ static COSMAC_SC_WRITE( comx35_sc_w )
 
 	case COSMAC_STATE_CODE_S2_DMA:
 		// DMA acknowledge clears the DMAOUT request
-		device_set_input_line(device, COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
+		state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
 		break;
 
 	case COSMAC_STATE_CODE_S3_INTERRUPT:
 		// interrupt acknowledge clears the INT request
-		device_set_input_line(device, COSMAC_INPUT_LINE_INT, CLEAR_LINE);
+		state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, CLEAR_LINE);
 		break;
 	}
 }
@@ -259,6 +259,9 @@ WRITE_LINE_MEMBER( comx35_state::q_w )
 
 	// cassette output
 	m_cassette->output(state ? +1.0 : -1.0);
+	
+	// expansion bus
+	m_expansion->q_w(state);
 }
 
 static COSMAC_INTERFACE( cosmac_intf )
@@ -289,7 +292,7 @@ READ_LINE_MEMBER( comx35_state::control_r )
 	return BIT(input_port_read(machine(), "MODIFIERS"), 1);
 }
 
-static CDP1871_INTERFACE( comx35_cdp1871_intf )
+static CDP1871_INTERFACE( kbc_intf )
 {
 	DEVCB_INPUT_PORT("D1"),
 	DEVCB_INPUT_PORT("D2"),
@@ -311,7 +314,7 @@ static CDP1871_INTERFACE( comx35_cdp1871_intf )
 
 /* Machine Drivers */
 
-static const cassette_interface comx35_cassette_interface =
+static const cassette_interface cassette_intf =
 {
 	cassette_default_formats,
 	NULL,
@@ -320,18 +323,46 @@ static const cassette_interface comx35_cassette_interface =
 	NULL
 };
 
-static const floppy_interface comx35_floppy_interface =
+static const floppy_interface floppy_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_5_25_DSDD,
 	FLOPPY_OPTIONS_NAME(comx35),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
+
+WRITE_LINE_MEMBER( comx35_state::ef4_w )
+{
+	m_cdp1802_ef4 = state;
+}
+
+static COMX_EXPANSION_INTERFACE( expansion_intf )
+{
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, ef4_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static SLOT_INTERFACE_START( mpz80_s100_cards )
+/*	SLOT_INTERFACE("eb", COMX_EB)
+	SLOT_INTERFACE("ebfm31", COMX_EB_FM_31)
+	SLOT_INTERFACE("ebfm32", COMX_EB_FM_32)
+	SLOT_INTERFACE("fd", COMX_FD)
+	SLOT_INTERFACE("clm", COMX_CLM)
+	SLOT_INTERFACE("ramcard", COMX_RAMCARD)
+	SLOT_INTERFACE("joycard", COMX_JOYCARD)
+	SLOT_INTERFACE("parallel", COMX_PARALLEL)
+	SLOT_INTERFACE("parallel_fm", COMX_PARALLEL_FM)
+	SLOT_INTERFACE("serial", COMX_SERIAL)
+	SLOT_INTERFACE("thermal", COMX_THERMAL)*/
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( pal, comx35_state )
 	/* basic system hardware */
@@ -344,14 +375,17 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	MCFG_FRAGMENT_ADD(comx35_pal_video)
 
 	/* peripheral hardware */
-	MCFG_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_PAL / 8)
-	MCFG_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )
+	MCFG_CDP1871_ADD(CDP1871_TAG, kbc_intf, CDP1869_CPU_CLK_PAL / 8)
+	MCFG_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface)
 	MCFG_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_interface)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
 	MCFG_PRINTER_ADD("printer")
 
-	MCFG_FLOPPY_2_DRIVES_ADD(comx35_floppy_interface)
+	MCFG_FLOPPY_2_DRIVES_ADD(floppy_intf)
 	MCFG_COMXPL80_ADD()
+	
+	// expansion bus
+	MCFG_COMX_EXPANSION_BUS_ADD(CDP1802_TAG, CDP1869_CPU_CLK_PAL, expansion_intf)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -369,14 +403,17 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	MCFG_FRAGMENT_ADD(comx35_ntsc_video)
 
 	/* peripheral hardware */
-	MCFG_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_NTSC / 8)
-	MCFG_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )
+	MCFG_CDP1871_ADD(CDP1871_TAG, kbc_intf, CDP1869_CPU_CLK_NTSC / 8)
+	MCFG_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface)
 	MCFG_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_interface)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
 	MCFG_PRINTER_ADD("printer")
 
-	MCFG_FLOPPY_2_DRIVES_ADD(comx35_floppy_interface)
+	MCFG_FLOPPY_2_DRIVES_ADD(floppy_intf)
 	MCFG_COMXPL80_ADD()
+	
+	// expansion bus
+	MCFG_COMX_EXPANSION_BUS_ADD(CDP1802_TAG, CDP1869_CPU_CLK_NTSC, expansion_intf)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
