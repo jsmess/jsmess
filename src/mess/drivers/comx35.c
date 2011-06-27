@@ -350,18 +350,14 @@ static COMX_EXPANSION_INTERFACE( expansion_intf )
 	DEVCB_NULL
 };
 
-static SLOT_INTERFACE_START( mpz80_s100_cards )
-/*	SLOT_INTERFACE("eb", COMX_EB)
-	SLOT_INTERFACE("ebfm31", COMX_EB_FM_31)
-	SLOT_INTERFACE("ebfm32", COMX_EB_FM_32)
+static SLOT_INTERFACE_START( comx_expansion_cards )
+	SLOT_INTERFACE("eb", COMX_EB)
 	SLOT_INTERFACE("fd", COMX_FD)
 	SLOT_INTERFACE("clm", COMX_CLM)
-	SLOT_INTERFACE("ramcard", COMX_RAMCARD)
-	SLOT_INTERFACE("joycard", COMX_JOYCARD)
-	SLOT_INTERFACE("parallel", COMX_PARALLEL)
-	SLOT_INTERFACE("parallel_fm", COMX_PARALLEL_FM)
-	SLOT_INTERFACE("serial", COMX_SERIAL)
-	SLOT_INTERFACE("thermal", COMX_THERMAL)*/
+	SLOT_INTERFACE("ram", COMX_RAM)
+	SLOT_INTERFACE("joy", COMX_JOY)
+	SLOT_INTERFACE("prn", COMX_PRN)
+	SLOT_INTERFACE("thm", COMX_THM)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( pal, comx35_state )
@@ -386,6 +382,7 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	
 	// expansion bus
 	MCFG_COMX_EXPANSION_BUS_ADD(CDP1802_TAG, CDP1869_CPU_CLK_PAL, expansion_intf)
+	//MCFG_COMX_EXPANSION_SLOT_ADD("slot", comx_expansion_cards, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -414,6 +411,7 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	
 	// expansion bus
 	MCFG_COMX_EXPANSION_BUS_ADD(CDP1802_TAG, CDP1869_CPU_CLK_NTSC, expansion_intf)
+	//MCFG_COMX_EXPANSION_SLOT_ADD("slot", comx_expansion_cards, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
