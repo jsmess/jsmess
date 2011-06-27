@@ -147,6 +147,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( clear_w );
 	DECLARE_WRITE_LINE_MEMBER( extrom_w );
 
+	bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -194,6 +196,9 @@ public:
 	// I/O access
 	virtual UINT8 comx_io_r(offs_t offset) { return 0; };
 	virtual void comx_io_w(offs_t offset, UINT8 data) { };
+
+	// video
+	virtual bool comx_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect) { return false; }
 
 public:
 	comx_expansion_bus_device  *m_bus;

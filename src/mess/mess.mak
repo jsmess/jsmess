@@ -813,6 +813,7 @@ $(MESSOBJ)/comx.a:				\
 	$(MESS_MACHINE)/comx35.o	\
 	$(MESS_MACHINE)/comxexp.o	\
 	$(MESS_MACHINE)/comx_fd.o	\
+	$(MESS_MACHINE)/comx_clm.o	\
 
 $(MESSOBJ)/concept.a:			\
 	$(MESS_DRIVERS)/concept.o   \
