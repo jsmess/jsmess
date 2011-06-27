@@ -812,8 +812,9 @@ $(MESSOBJ)/comx.a:				\
 	$(MESS_VIDEO)/comx35.o		\
 	$(MESS_MACHINE)/comx35.o	\
 	$(MESS_MACHINE)/comxexp.o	\
-	$(MESS_MACHINE)/comx_fd.o	\
 	$(MESS_MACHINE)/comx_clm.o	\
+	$(MESS_MACHINE)/comx_fd.o	\
+	$(MESS_MACHINE)/comx_joy.o	\
 
 $(MESSOBJ)/concept.a:			\
 	$(MESS_DRIVERS)/concept.o   \
