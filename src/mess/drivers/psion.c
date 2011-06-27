@@ -5,7 +5,6 @@
         Driver by Sandro Ronco
 
         TODO:
-        - move datapack into device
         - dump CGROM of the HD44780
         - emulate other devices in slot C(Comms Link, printer)
 
@@ -23,194 +22,10 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/beep.h"
-#include "imagedev/cartslot.h"
+#include "machine/psion_pack.h"
 #include "video/hd44780.h"
 #include "includes/psion.h"
 #include "rendlay.h"
-
-/***********************************************
-
-    Datapack
-
-***********************************************/
-
-//Datapack control line
-#define DP_LINE_CLOCK			0x01
-#define DP_LINE_RESET			0x02
-#define DP_LINE_PROGRAM			0x04
-#define DP_LINE_OUTPUT_ENABLE	0x08
-#define DP_LINE_POWER_ON		0x80
-
-//Datapack ID
-#define DP_ID_EPROM				0x02
-#define DP_ID_PAGED				0x04
-#define DP_ID_WRITE				0x08
-#define DP_ID_BOOT				0x10
-#define DP_ID_COPY				0x20
-
-UINT8 datapack::update(UINT8 data)
-{
-	if (len == 0 || (control_lines & DP_LINE_POWER_ON))
-		return 0;
-
-	UINT32 pack_addr = counter + ((id & DP_ID_PAGED) ? 0x100 * page : 0);
-
-	// if the datapack is 128k or more is treated as segmented
-	if (len >= 0x10)
-		pack_addr += (segment * 0x4000);
-
-	if (pack_addr < len * 0x2000)
-	{
-		if ((control_lines & DP_LINE_OUTPUT_ENABLE) && !(control_lines & DP_LINE_RESET))
-		{
-			//write latched data
-			buffer[pack_addr] = data;
-			write_flag = true;
-		}
-		else if ((control_lines & DP_LINE_OUTPUT_ENABLE) && (control_lines & DP_LINE_RESET))
-		{
-			//write datapack segment
-			if (len <= 0x10)
-				segment = data & 0x07;
-			else if (len <= 0x20)
-				segment = data & 0x0f;
-			else if (len <= 0x40)
-				segment = data & 0x1f;
-			else if (len <= 0x80)
-				segment = data & 0x3f;
-			else
-				segment = data;
-		}
-		else if (!(control_lines & DP_LINE_OUTPUT_ENABLE) && !(control_lines & DP_LINE_RESET))
-		{
-			//latch data
-			data = buffer[pack_addr];
-		}
-		else if (!(control_lines & DP_LINE_OUTPUT_ENABLE) && (control_lines & DP_LINE_RESET))
-		{
-			//read datapack ID
-			if (id & DP_ID_EPROM)
-				data = buffer[0];
-			else
-				data = 1;
-		}
-	}
-
-	return data;
-}
-
-void datapack::control_lines_w(UINT8 data)
-{
-	if ((control_lines & DP_LINE_CLOCK) != (data & DP_LINE_CLOCK))
-	{
-		counter++;
-
-		if (counter >= ((id & DP_ID_PAGED) ? 0x100 : (len * 0x2000)))
-			counter = 0;
-	}
-
-	if ((control_lines & DP_LINE_PROGRAM) && !(data & DP_LINE_PROGRAM))
-	{
-		page++;
-
-		if (page >= (len * 0x2000) / 0x100)
-			page = 0;
-	}
-
-	if (data & DP_LINE_RESET)
-	{
-		counter = 0;
-		page = 0;
-	}
-
-	control_lines = data;
-}
-
-UINT8 datapack::control_lines_r()
-{
-	return control_lines;
-}
-
-int datapack::load(device_image_interface &image)
-{
-	running_machine &machine = image.device().machine();
-	UINT8 *data;
-	UINT32 length;
-
-	if (image.software_entry() == NULL)
-	{
-		length = image.length();
-		data = auto_alloc_array(machine, UINT8, length);
-		image.fread(data, image.length());
-	}
-	else
-	{
-		length = image.get_software_region_length("rom");
-		data = auto_alloc_array(machine, UINT8, length);
-		memcpy(data, image.get_software_region("rom"), length);
-	}
-
-	//check the OPK head
-	if(strncmp((const char*)data, "OPK", 3) || data[7] * 0x2000 < length - 6)
-		return IMAGE_INIT_FAIL;
-
-	d_image = &image;
-	write_flag = false;
-	id = data[6];
-	len = data[7];
-	buffer = auto_alloc_array(machine, UINT8, len * 0x2000);
-	memset(buffer, 0xff, len * 0x2000);
-	memcpy(buffer, data + 6, length - 6);
-
-	/* load battery */
-	UINT8 *opk = auto_alloc_array(machine, UINT8, len * 0x2000 + 6);
-	image.battery_load(opk, len * 0x2000 + 6, 0xff);
-	if(!strncmp((char*)opk, "OPK", 3))
-		memcpy(buffer, opk + 6, len * 0x2000);
-
-	return IMAGE_INIT_PASS;
-}
-
-void datapack::unload(device_image_interface &image)
-{
-	running_machine &machine = image.device().machine();
-
-	// save battery only if a write-access occurs
-	if (len > 0 && write_flag)
-	{
-		const UINT8 opk_magic[6] = {'O', 'P', 'K', 0x00, 0x00, 0x00};
-		UINT8 *opk = auto_alloc_array(machine, UINT8, len * 0x2000 + 6);
-
-		memcpy(opk, opk_magic, 6);
-		memcpy(opk + 6, buffer, len * 0x2000);
-
-		d_image->battery_save(opk, len * 0x2000 + 6);
-
-		auto_free(machine, opk);
-	}
-
-	auto_free(machine, buffer);
-	len = 0;
-}
-
-void datapack::reset()
-{
-	d_image = NULL;
-	id = 0;
-	len = 0;
-	counter = 0;
-	page = 0;
-	segment = 0;
-	control_lines = 0;
-	buffer = NULL;
-	write_flag = false;
-}
-
-/***********************************************
-
-    basic machine
-
-***********************************************/
 
 static TIMER_DEVICE_CALLBACK( nmi_timer )
 {
@@ -250,22 +65,6 @@ void psion_state::update_banks(running_machine &machine)
 		memory_set_bank(machine, "rombank", m_rom_bank);
 }
 
-datapack* psion_state::get_active_slot(UINT8 data)
-{
-	switch(data & 0x70)
-	{
-		case 0x60:
-			return &m_pack1;
-		case 0x50:
-			return &m_pack2;
-		case 0x30:
-			//Unemulated slot C
-			return NULL;
-	}
-
-	return NULL;
-}
-
 WRITE8_MEMBER( psion_state::hd63701_int_reg_w )
 {
 	switch (offset)
@@ -275,15 +74,8 @@ WRITE8_MEMBER( psion_state::hd63701_int_reg_w )
 		break;
 	case 0x03:
 		/* datapack i/o data bus */
-		if (m_port2_ddr == 0xff)
-		{
-			datapack *pack = get_active_slot(m_port6);
-
-			if (pack)
-				m_port2 = pack->update(data);
-			else
-				m_port2 = data;
-		}
+		m_pack1->data_w(data & m_port2_ddr);
+		m_pack2->data_w(data & m_port2_ddr);
 		break;
 	case 0x08:
 		m_tcsr_value = data;
@@ -306,16 +98,10 @@ WRITE8_MEMBER( psion_state::hd63701_int_reg_w )
         ---- --x- reset line
         ---- ---x clock line
         */
-		{
-			m_port6 = (data & m_port6_ddr) | (m_port6 & ~m_port6_ddr);
-			datapack *pack = get_active_slot(m_port6);
+		m_port6 = (data & m_port6_ddr) | (m_port6 & ~m_port6_ddr);
 
-			if (pack != NULL)
-			{
-				pack->control_lines_w(m_port6);
-				pack->update(m_port2);
-			}
-		}
+		m_pack1->control_w((m_port6 & 0x8f) | (m_port6 & 0x10));
+		m_pack2->control_w((m_port6 & 0x8f) | ((m_port6 & 0x20) >> 1));
 		break;
 	}
 
@@ -328,19 +114,7 @@ READ8_MEMBER( psion_state::hd63701_int_reg_r )
 	{
 	case 0x03:
 		/* datapack i/o data bus */
-		if (m_port2_ddr == 0)
-		{
-			datapack *pack = get_active_slot(m_port6);
-
-			if (pack)
-				m_port2 = pack->update(m_port2);
-			else
-				m_port2 = 0;
-
-			return m_port2;
-		}
-		else
-			return 0;
+		return (m_pack1->data_r() | m_pack2->data_r()) & (~m_port2_ddr);
 	case 0x14:
 		return (m6801_io_r(&space, offset)&0x7f) | (m_stby_pwr<<7);
 	case 0x15:
@@ -353,14 +127,7 @@ READ8_MEMBER( psion_state::hd63701_int_reg_r )
 		return kb_read(machine()) | input_port_read(machine(), "BATTERY") | input_port_read(machine(), "ON") | (m_kb_counter == 0x7ff)<<1 | m_pulse<<1;
 	case 0x17:
 		/* datapack control lines */
-		{
-			datapack *pack = get_active_slot(m_port6);
-
-			if (pack)
-				return pack->control_lines_r();
-			else
-				return m_port6;
-		}
+		return (m_pack1->control_r() | (m_pack2->control_r() & 0x8f)) | ((m_pack2->control_r() & 0x10)<<1);
 	case 0x08:
 		m6801_io_w(&space, offset, m_tcsr_value);
 	default:
@@ -577,34 +344,6 @@ INPUT_PORTS_START( psion )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D [)]") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
-static DEVICE_IMAGE_LOAD( psion_pack1 )
-{
-	psion_state *state = image.device().machine().driver_data<psion_state>();
-
-	return state->m_pack1.load(image);
-}
-
-static DEVICE_IMAGE_UNLOAD( psion_pack1 )
-{
-	psion_state *state = image.device().machine().driver_data<psion_state>();
-
-	state->m_pack1.unload(image);
-}
-
-static DEVICE_IMAGE_LOAD( psion_pack2 )
-{
-	psion_state *state = image.device().machine().driver_data<psion_state>();
-
-	return state->m_pack2.load(image);
-}
-
-static DEVICE_IMAGE_UNLOAD( psion_pack2 )
-{
-	psion_state *state = image.device().machine().driver_data<psion_state>();
-
-	state->m_pack2.unload(image);
-}
-
 static NVRAM_HANDLER( psion )
 {
 	psion_state *state = machine.driver_data<psion_state>();
@@ -709,14 +448,6 @@ bool psion_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 	return m_lcdc->video_update( &bitmap, &cliprect );
 }
 
-static DRIVER_INIT( psion )
-{
-	psion_state *state = machine.driver_data<psion_state>();
-
-	state->m_pack1.reset();
-	state->m_pack2.reset();
-}
-
 static PALETTE_INIT( psion )
 {
 	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
@@ -737,28 +468,6 @@ static const gfx_layout psion_charlayout =
 static GFXDECODE_START( psion )
 	GFXDECODE_ENTRY( "hd44780", 0x0000, psion_charlayout, 0, 1 )
 GFXDECODE_END
-
-
-static MACHINE_CONFIG_FRAGMENT( psion_slot )
-	/* Datapack slot 1 */
-	MCFG_CARTSLOT_ADD("pack1")
-	MCFG_CARTSLOT_EXTENSION_LIST("opk")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(psion_pack1)
-	MCFG_CARTSLOT_UNLOAD(psion_pack1)
-	MCFG_CARTSLOT_INTERFACE("psion_pack")
-
-	/* Datapack slot 2 */
-	MCFG_CARTSLOT_ADD("pack2")
-	MCFG_CARTSLOT_EXTENSION_LIST("opk")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(psion_pack2)
-	MCFG_CARTSLOT_UNLOAD(psion_pack2)
-	MCFG_CARTSLOT_INTERFACE("psion_pack")
-
-	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion")
-MACHINE_CONFIG_END
 
 static const hd44780_interface psion_2line_display =
 {
@@ -793,9 +502,14 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
 
 	MCFG_NVRAM_HANDLER(psion)
 
-	MCFG_FRAGMENT_ADD( psion_slot )
-
 	MCFG_TIMER_ADD_PERIODIC("nmi_timer", nmi_timer, attotime::from_seconds(1))
+
+	/* Datapack */
+	MCFG_PSION_DATAPACK_ADD("pack1")
+	MCFG_PSION_DATAPACK_ADD("pack2")
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion")
 MACHINE_CONFIG_END
 
 static const UINT8 psion_4line_layout[] =
@@ -839,9 +553,14 @@ static MACHINE_CONFIG_START( psion_4lines, psion_state )
 
 	MCFG_NVRAM_HANDLER(psion)
 
-	MCFG_FRAGMENT_ADD( psion_slot )
-
 	MCFG_TIMER_ADD_PERIODIC("nmi_timer", nmi_timer, attotime::from_seconds(1))
+
+	/* Datapack */
+	MCFG_PSION_DATAPACK_ADD("pack1")
+	MCFG_PSION_DATAPACK_ADD("pack2")
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psioncm, psion_2lines )
@@ -952,11 +671,11 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1986, psioncm,	0,       0, 	psioncm,		psion,	 psion,   "Psion",   "Organiser II CM",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1986, psionla,	psioncm, 0, 	psionla,	    psion,	 psion,   "Psion",   "Organiser II LA",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1986, psionp350,	psioncm, 0, 	psionp350,	    psion,	 psion,   "Psion",   "Organiser II P350",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1986, psionlam,	psioncm, 0, 	psionlam,	    psion,	 psion,   "Psion",   "Organiser II LAM",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionlz,	0,		 0, 	psionlz,	    psion,	 psion,   "Psion",   "Organiser II LZ",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionlz64,  psionlz, 0, 	psionlz,	    psion,	 psion,   "Psion",   "Organiser II LZ64",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionlz64s,	psionlz, 0, 	psionlz,	    psion,	 psion,   "Psion",   "Organiser II LZ64S",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionp464,	psionlz, 0, 	psionlz,	    psion,	 psion,   "Psion",   "Organiser II P464",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psioncm,	0,       0, 	psioncm,		psion,	 0,   "Psion",   "Organiser II CM",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psionla,	psioncm, 0, 	psionla,	    psion,	 0,   "Psion",   "Organiser II LA",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psionp350,	psioncm, 0, 	psionp350,	    psion,	 0,   "Psion",   "Organiser II P350",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psionlam,	psioncm, 0, 	psionlam,	    psion,	 0,   "Psion",   "Organiser II LAM",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz,	0,		 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz64,  psionlz, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz64s,	psionlz, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II LZ64S",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionp464,	psionlz, 0, 	psionlz,	    psion,	 0,   "Psion",   "Organiser II P464",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)

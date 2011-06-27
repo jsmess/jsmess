@@ -127,7 +127,7 @@ Undumped datapack:
 				<rom name="clip.opk" size="32270" crc="6c7afbdd" sha1="6505cb269ec5cc63cd57cc54b0b12181f155f9f3" offset="0" />
 			</dataarea>
 		</part>
-		<part name="cart2" interface="psion_pack2">
+		<part name="cart2" interface="psion_pack">
 			<dataarea name="rom" size="16007">
 				<rom name="notice.opk" size="16007" crc="e1a5d6e0" sha1="46e4f89ba13381e8684fe40194ea2ddaa4f8c924" offset="0" />
 			</dataarea>

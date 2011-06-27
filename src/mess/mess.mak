@@ -1294,6 +1294,7 @@ $(MESSOBJ)/poly88.a:			\
 
 $(MESSOBJ)/psion.a:				\
 	$(MESS_DRIVERS)/psion.o		\
+	$(MESS_MACHINE)/psion_pack.o	\
 
 $(MESSOBJ)/radio.a:				\
 	$(MESS_DRIVERS)/radio86.o	\
