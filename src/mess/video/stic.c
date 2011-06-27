@@ -1,6 +1,6 @@
 #include "emu.h"
+#include "includes/stic.h"
 #include "includes/intv.h"
-
 
 /* STIC variables */
 
@@ -10,63 +10,64 @@ READ16_HANDLER( intv_stic_r )
 	//logerror("%x = stic_r(%x)\n",0,offset);
 	switch (offset)
 	{
-		case 0x00:
-		case 0x01:
-		case 0x02:
-		case 0x03:
-		case 0x04:
-		case 0x05:
-		case 0x06:
-		case 0x07: 
-			return 0x3800 | state->m_x_registers[offset & 0x07];
-		case 0x08:
-		case 0x09:
-		case 0x0a:
-		case 0x0b:
-		case 0x0c:
-		case 0x0d:
-		case 0x0e:
-		case 0x0f:
-			return 0x3000 | state->m_y_registers[offset & 0x07];
-		case 0x10:
-		case 0x11:
-		case 0x12:
-		case 0x13:
-		case 0x14:
-		case 0x15:
-		case 0x16:
-		case 0x17:
-			return state->m_a_registers[offset & 0x07];
-		case 0x18:
-		case 0x19:
-		case 0x1a:
-		case 0x1b:
-		case 0x1c:
-		case 0x1d:
-		case 0x1e:
-		case 0x1f:
-            return 0x3C00 | state->m_collision_registers[offset & 0x07];
-      case 0x20:
-      	return 0;
-		case 0x21:
+		case STIC_MXR + STIC_MOB0:
+		case STIC_MXR + STIC_MOB1:
+		case STIC_MXR + STIC_MOB2:
+		case STIC_MXR + STIC_MOB3:
+		case STIC_MXR + STIC_MOB4:
+		case STIC_MXR + STIC_MOB5:
+		case STIC_MXR + STIC_MOB6:
+		case STIC_MXR + STIC_MOB7:
+			return 0x3800 | (state->m_stic_registers[offset] & 0x07FF);
+		case STIC_MYR + STIC_MOB0:
+		case STIC_MYR + STIC_MOB1:
+		case STIC_MYR + STIC_MOB2:
+		case STIC_MYR + STIC_MOB3:
+		case STIC_MYR + STIC_MOB4:
+		case STIC_MYR + STIC_MOB5:
+		case STIC_MYR + STIC_MOB6:
+		case STIC_MYR + STIC_MOB7:
+			return 0x3000 | (state->m_stic_registers[offset] & 0x0FFF);
+		case STIC_MAR + STIC_MOB0:
+		case STIC_MAR + STIC_MOB1:
+		case STIC_MAR + STIC_MOB2:
+		case STIC_MAR + STIC_MOB3:
+		case STIC_MAR + STIC_MOB4:
+		case STIC_MAR + STIC_MOB5:
+		case STIC_MAR + STIC_MOB6:
+		case STIC_MAR + STIC_MOB7:
+			return state->m_stic_registers[offset] & 0x3FFF;
+		case STIC_MCR + STIC_MOB0:
+		case STIC_MCR + STIC_MOB1:
+		case STIC_MCR + STIC_MOB2:
+		case STIC_MCR + STIC_MOB3:
+		case STIC_MCR + STIC_MOB4:
+		case STIC_MCR + STIC_MOB5:
+		case STIC_MCR + STIC_MOB6:
+		case STIC_MCR + STIC_MOB7:
+			return 0x3C00 | (state->m_stic_registers[offset] & 0x03FF);
+		case STIC_GMR:
 			state->m_color_stack_mode = 1;
 			//logerror("Setting color stack mode\n");
+			/*** fall through ***/
+		case STIC_DER:
+			return 0x3FFF;
 			break;
-		case 0x28:
-      case 0x29:
-      case 0x2A:
-      case 0x2B:
-      	return 0x3FF0 | state->m_color_stack[offset&0x3];
-      case 0x2C:
-      	return 0x3FF0 | state->m_border_color;
-      case 0x30:
-      	return 0x3FF8 | state->m_col_delay;
-      case 0x31:
-      	return 0x3FF8 | state->m_row_delay;
-      case 0x32:
-      	return 0x3FFC | state->m_top_edge_inhibit<<1 | state->m_left_edge_inhibit;
+		case STIC_CSR + STIC_CSR0:
+		case STIC_CSR + STIC_CSR1:
+		case STIC_CSR + STIC_CSR2:
+		case STIC_CSR + STIC_CSR3:
+		case STIC_BCR:
+			return 0x3FF0 | (state->m_stic_registers[offset] & 0x000F);
+		case STIC_HDR:
+		case STIC_VDR:
+			return 0x3FF8 | (state->m_stic_registers[offset] & 0x0007);
+		case STIC_CBR:
+			return 0x3FFC | (state->m_stic_registers[offset] & 0x0003);
+		default:
+			//logerror("unmapped read from STIC register %02X\n", offset);
+			return 0x3FFF;
 	}
-	return 0;
 }
 
 WRITE16_HANDLER( intv_stic_w )
@@ -78,101 +79,102 @@ WRITE16_HANDLER( intv_stic_w )
 	switch (offset)
 	{
 		/* X Positions */
-		case 0x00:
-		case 0x01:
-		case 0x02:
-		case 0x03:
-		case 0x04:
-		case 0x05:
-		case 0x06:
-		case 0x07:
-			s =  &state->m_sprite[offset & 0x07];
-			s->doublex = !!(data & 0x0400);
-			s->visible = !!(data & 0x0200);
-			s->coll = !!(data & 0x0100);
-			s->xpos = (data & 0xFF);
-			state->m_x_registers[offset & 0x07] = data & 0x07FF;
+		case STIC_MXR + STIC_MOB0:
+		case STIC_MXR + STIC_MOB1:
+		case STIC_MXR + STIC_MOB2:
+		case STIC_MXR + STIC_MOB3:
+		case STIC_MXR + STIC_MOB4:
+		case STIC_MXR + STIC_MOB5:
+		case STIC_MXR + STIC_MOB6:
+		case STIC_MXR + STIC_MOB7:
+			s =  &state->m_sprite[offset & (STIC_MOBS - 1)];
+			s->doublex = !!(data & STIC_MXR_XSIZE);
+			s->visible = !!(data & STIC_MXR_VIS);
+			s->coll = !!(data & STIC_MXR_COL);
+			s->xpos = (data & STIC_MXR_X);
 			break;
 		/* Y Positions */
-		case 0x08:
-		case 0x09:
-		case 0x0a:
-		case 0x0b:
-		case 0x0c:
-		case 0x0d:
-		case 0x0e:
-		case 0x0f:
-			s =  &state->m_sprite[offset & 0x07];
-			s->yflip = !!(data & 0x0800);
-			s->xflip = !!(data & 0x0400);
-			s->quady = !!(data & 0x0200);
-			s->doubley = !!(data & 0x0100);
-			s->doubleyres = !!(data & 0x0080);
-			s->ypos = (data & 0x7F);
-			state->m_y_registers[offset & 0x07] = data & 0x0FFF;
+		case STIC_MYR + STIC_MOB0:
+		case STIC_MYR + STIC_MOB1:
+		case STIC_MYR + STIC_MOB2:
+		case STIC_MYR + STIC_MOB3:
+		case STIC_MYR + STIC_MOB4:
+		case STIC_MYR + STIC_MOB5:
+		case STIC_MYR + STIC_MOB6:
+		case STIC_MYR + STIC_MOB7:
+			s =  &state->m_sprite[offset & (STIC_MOBS - 1)];
+			s->yflip = !!(data & STIC_MYR_YFLIP);
+			s->xflip = !!(data & STIC_MYR_XFLIP);
+			s->quady = !!(data & STIC_MYR_YSIZE);
+			s->doubley = !!(data & STIC_MYR_YFULL);
+			s->doubleyres = !!(data & STIC_MYR_YRES);
+			s->ypos = (data & STIC_MYR_Y);
 			break;
 		/* Attributes */
-		case 0x10:
-		case 0x11:
-		case 0x12:
-		case 0x13:
-		case 0x14:
-		case 0x15:
-		case 0x16:
-		case 0x17:
-			s =  &state->m_sprite[offset & 0x07];
-            s->behind_foreground = !!(data & 0x2000);
-            s->grom = !(data & 0x0800);
-			s->card = ((data >> 3) & 0xFF);
-			s->color = ((data >> 9) & 0x08) | (data & 0x7);
-			state->m_a_registers[offset & 0x07] = data&0x3FFF;
+		case STIC_MAR + STIC_MOB0:
+		case STIC_MAR + STIC_MOB1:
+		case STIC_MAR + STIC_MOB2:
+		case STIC_MAR + STIC_MOB3:
+		case STIC_MAR + STIC_MOB4:
+		case STIC_MAR + STIC_MOB5:
+		case STIC_MAR + STIC_MOB6:
+		case STIC_MAR + STIC_MOB7:
+			s =  &state->m_sprite[offset & (STIC_MOBS - 1)];
+			s->behind_foreground = !!(data & STIC_MAR_PRI);
+			s->grom = !(data & STIC_MAR_SEL);
+			s->card = ((data & STIC_MAR_C) >> 3);
+			s->color = ((data & STIC_MAR_FG3) >> 9) | (data & STIC_MAR_FG20);
 			break;
 		/* Collision Detection - TBD */
-		case 0x18:
-		case 0x19:
-		case 0x1a:
-		case 0x1b:
-		case 0x1c:
-		case 0x1d:
-		case 0x1e:
-		case 0x1f:
-            //a MOB's own collision bit is *always* zero, even if a
-            //one is poked into it
-            data &= (~(1 << (offset & 0x07))) & 0x03FF;
-            state->m_collision_registers[offset & 0x07] = data;
+		case STIC_MCR + STIC_MOB0:
+		case STIC_MCR + STIC_MOB1:
+		case STIC_MCR + STIC_MOB2:
+		case STIC_MCR + STIC_MOB3:
+		case STIC_MCR + STIC_MOB4:
+		case STIC_MCR + STIC_MOB5:
+		case STIC_MCR + STIC_MOB6:
+		case STIC_MCR + STIC_MOB7:
+			// a MOB's own collision bit is *always* zero, even if a
+			// one is poked into it
+			data &= ~(1 << (offset & (STIC_MOBS - 1)));
 			break;
 		/* Display enable */
-		case 0x20:
+		case STIC_DER:
 			//logerror("***Writing a %x to the STIC handshake\n",data);
 			state->m_stic_handshake = 1;
 			break;
 		/* Graphics Mode */
-		case 0x21:
+		case STIC_GMR:
 			state->m_color_stack_mode = 0;
 			break;
 		/* Color Stack */
-		case 0x28:
-		case 0x29:
-		case 0x2a:
-		case 0x2b:
-			logerror("Setting color_stack[%x] = %x (%x)\n",offset&0x3,data&0xf,cpu_get_pc(&space->device()));
-			state->m_color_stack[offset&0x3] = data&0xf;
+		case STIC_CSR + STIC_CSR0:
+		case STIC_CSR + STIC_CSR1:
+		case STIC_CSR + STIC_CSR2:
+		case STIC_CSR + STIC_CSR3:
+			logerror("Setting color_stack[%x] = %x (%x)\n", offset & (STIC_CSRS - 1),data & STIC_CSR_BG, cpu_get_pc(&space->device()));
 			break;
 		/* Border Color */
-		case 0x2c:
+		case STIC_BCR:
 			//logerror("***Writing a %x to the border color\n",data);
-			state->m_border_color = data & 0xf;
+			state->m_border_color = data & STIC_BCR_BC;
 			break;
 		/* Framing */
-		case 0x30:
-			state->m_col_delay = data & 0x7;
+		case STIC_HDR:
+			state->m_col_delay = data & STIC_HDR_DEL;
 			break;
-		case 0x31:
-			state->m_row_delay = data & 0x7;
+		case STIC_VDR:
+			state->m_row_delay = data & STIC_VDR_DEL;
 			break;
-		case 0x32:
-			state->m_left_edge_inhibit = (data & 0x01);
-			state->m_top_edge_inhibit = (data & 0x02)>>1;
+		case STIC_CBR:
+			state->m_left_edge_inhibit = (data & STIC_CBR_COL);
+			state->m_top_edge_inhibit = (data & STIC_CBR_ROW) >> 1;
+			break;
+		default:
+			//logerror("unmapped write to STIC register %02X: %04X\n", offset, data);
 			break;
 	}
+
+	if (offset < sizeof(state->m_stic_registers) / sizeof(state->m_stic_registers[0]))
+		state->m_stic_registers[offset] = data;
 }

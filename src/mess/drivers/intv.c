@@ -34,6 +34,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/cp1610/cp1610.h"
+#include "includes/stic.h"
 #include "includes/intv.h"
 #include "imagedev/cartslot.h"
 #include "sound/ay8910.h"
@@ -445,8 +446,8 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_SCREEN_REFRESH_RATE(59.92)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(41*8, 25*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 24*8-1)
+	MCFG_SCREEN_SIZE((STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTV_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTV_Y_SCALE)
+	MCFG_SCREEN_VISIBLE_AREA(0, (STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTV_X_SCALE-1, 0, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTV_Y_SCALE-1)
 	MCFG_SCREEN_UPDATE( generic_bitmapped )
 
 	MCFG_GFXDECODE( intv )
@@ -481,6 +482,8 @@ static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 	/* video hardware */
 	MCFG_GFXDECODE(intvkbd)
 	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE((STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTVKBD_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTVKBD_Y_SCALE)
+	MCFG_SCREEN_VISIBLE_AREA(0, (STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTVKBD_X_SCALE-1, 0, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTVKBD_Y_SCALE-1)
 	MCFG_SCREEN_UPDATE(intvkbd)
 
 	/* cartridge */
@@ -546,6 +549,21 @@ static void intvkbd_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 }
 #endif
 
+static DRIVER_INIT( intv )
+{
+	intv_state *state = machine.driver_data<intv_state>();
+
+	state->m_x_scale = INTV_X_SCALE;
+	state->m_y_scale = INTV_Y_SCALE;
+}
+
+static DRIVER_INIT( intvkbd )
+{
+	intv_state *state = machine.driver_data<intv_state>();
+
+	state->m_x_scale = INTVKBD_X_SCALE;
+	state->m_y_scale = INTVKBD_Y_SCALE;
+}
 
 /***************************************************************************
 
@@ -553,7 +571,7 @@ static void intvkbd_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 
 ***************************************************************************/
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   INIT     COMPANY      FULLNAME */
-CONS( 1979, intv,	0,	0,	intv,     intv, 	0,			"Mattel",    "Intellivision", 0 )
-CONS( 1981, intvsrs,	intv,	0,	intv,     intv, 	0,	"Mattel",    "Intellivision (Sears)", 0 )
-COMP( 1981, intvkbd,	intv,	0,	intvkbd,  intvkbd,	0,	"Mattel",    "Intellivision Keyboard Component (Unreleased)", GAME_NOT_WORKING)
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
+CONS( 1979,	intv,		0,		0,		intv,		intv,		intv,		"Mattel",	"Intellivision", 0 )
+CONS( 1981,	intvsrs,	intv,	0,		intv,		intv,		intv,		"Mattel",	"Intellivision (Sears)", 0 )
+COMP( 1981,	intvkbd,	intv,	0,		intvkbd,	intvkbd,	intvkbd,	"Mattel",	"Intellivision Keyboard Component (Unreleased)", GAME_NOT_WORKING)

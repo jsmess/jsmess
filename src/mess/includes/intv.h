@@ -34,15 +34,11 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
-	intv_sprite_type m_sprite[8];
-	UINT8 m_sprite_buffers[8][16][128];
+	intv_sprite_type m_sprite[STIC_MOBS];
+	UINT8 m_sprite_buffers[STIC_MOBS][STIC_CARD_WIDTH*2][STIC_CARD_HEIGHT*4*2*2];
 	int m_color_stack_mode;
-	UINT16 m_x_registers[8];
-	UINT16 m_y_registers[8];
-	UINT16 m_a_registers[8];
-	int m_collision_registers[8];
+	int m_stic_registers[STIC_REGISTERS];
 	int m_color_stack_offset;
-	int m_color_stack[4];
 	int m_stic_handshake;
 	int m_border_color;
 	int m_col_delay;
@@ -53,6 +49,8 @@ public:
 	UINT8 m_gram[512];
 	UINT8 m_gramdirtybytes[512];
 	UINT16 m_ram16[0x160];
+	int m_x_scale;
+	int m_y_scale;
 	int m_intvkbd_text_blanked;
 	UINT16 *m_intvkbd_dualport_ram;
 	int m_intvkbd_keyboard_col;
