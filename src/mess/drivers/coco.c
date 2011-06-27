@@ -47,6 +47,7 @@
 #include "machine/coco_orch90.h"
 #include "machine/coco_pak.h"
 #include "machine/coco_fdc.h"
+#include "machine/coco_multi.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "machine/ram.h"
@@ -788,6 +789,7 @@ static SLOT_INTERFACE_START(coco_cart)
 	SLOT_INTERFACE("orch90", COCO_ORCH90)
 	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
 	SLOT_INTERFACE("pak", COCO_PAK)
+	SLOT_INTERFACE("multi", COCO_MULTIPAK)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( dragon32, coco_state )
@@ -1192,7 +1194,7 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 
 	MCFG_SAM6883_GIME_ADD("sam", coco3_sam_intf)
 
-	MCFG_COCO_CARTRIDGE_ADD("ext", coco3_cococart_interface, coco_cart, "fdcv11")
+	MCFG_COCO_CARTRIDGE_ADD("ext", coco3_cococart_interface, coco_cart, "multi")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
