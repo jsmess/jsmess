@@ -1,5 +1,5 @@
 #include "emu.h"
-#include "includes/stic.h"
+#include "video/stic.h"
 #include "includes/intv.h"
 #include "cpu/cp1610/cp1610.h"
 #include "image.h"
