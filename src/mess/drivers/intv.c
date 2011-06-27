@@ -34,7 +34,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/cp1610/cp1610.h"
-#include "includes/stic.h"
+#include "video/stic.h"
 #include "includes/intv.h"
 #include "imagedev/cartslot.h"
 #include "sound/ay8910.h"

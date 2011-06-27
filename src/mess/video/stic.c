@@ -1,5 +1,5 @@
 #include "emu.h"
-#include "includes/stic.h"
+#include "video/stic.h"
 #include "includes/intv.h"
 
 /* STIC variables */
