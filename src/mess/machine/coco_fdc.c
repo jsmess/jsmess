@@ -91,15 +91,6 @@
 ***************************************************************************/
 
 /***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-static WRITE_LINE_DEVICE_HANDLER( coco_fdc_intrq_w );
-static WRITE_LINE_DEVICE_HANDLER( coco_fdc_drq_w );
-static WRITE_LINE_DEVICE_HANDLER( dragon_fdc_intrq_w );
-static WRITE_LINE_DEVICE_HANDLER( dragon_fdc_drq_w );
-
-/***************************************************************************
     LOCAL VARIABLES
 ***************************************************************************/
 
@@ -120,6 +111,46 @@ static const floppy_interface coco_floppy_interface =
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
+/*-------------------------------------------------
+    real_time_clock
+-------------------------------------------------*/
+
+coco_rtc_type_t coco_fdc_device::real_time_clock()
+{
+	coco_rtc_type_t result = (coco_rtc_type_t) input_port_read_safe(machine(), "real_time_clock", RTC_NONE);
+
+	/* check to make sure we don't have any invalid values */
+	if (((result == RTC_DISTO) && (m_disto_msm6242 == NULL))
+		|| ((result == RTC_CLOUD9) && (m_ds1315 == NULL)))
+	{
+		result = RTC_NONE;
+	}
+
+	return result;
+}
+/*-------------------------------------------------
+    fdc_intrq_w - callback from the FDC
+-------------------------------------------------*/
+
+static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w )
+{
+	coco_fdc_device *fdc = dynamic_cast<coco_fdc_device *>(device->owner());
+	fdc->set_intrq(state);
+	fdc->update_lines();
+}
+
+
+/*-------------------------------------------------
+    fdc_drq_w - callback from the FDC
+-------------------------------------------------*/
+
+static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
+{
+	coco_fdc_device *fdc = dynamic_cast<coco_fdc_device *>(device->owner());
+	fdc->set_drq(state);
+	fdc->update_lines();
+}
+
 
 //**************************************************************************
 //  			COCO FDC
@@ -128,8 +159,8 @@ static const floppy_interface coco_floppy_interface =
 static const wd17xx_interface coco_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(coco_fdc_intrq_w),
-	DEVCB_LINE(coco_fdc_drq_w),
+	DEVCB_LINE(fdc_intrq_w),
+	DEVCB_LINE(fdc_drq_w),
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
@@ -172,7 +203,14 @@ coco_fdc_device::coco_fdc_device(const machine_config &mconfig, const char *tag,
 void coco_fdc_device::device_start()
 {
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
-	subtag(m_region_name, "eprom");
+	subtag(m_region_name, "eprom");	
+	m_drq           	= 1;
+	m_disto_msm6242		= subdevice(DISTO_TAG);
+	m_ds1315			= subdevice(CLOUD9_TAG);
+	m_wd17xx			= subdevice(WD_TAG);
+	m_dskreg			= 0x00;
+	m_intrq				= 0;
+	m_msm6242_rtc_address = 0;
 }
 
 //-------------------------------------------------
@@ -213,45 +251,189 @@ UINT8* coco_fdc_device::get_cart_base()
 	return machine().region(m_region_name.cstr())->base();
 }
 
-
 /*-------------------------------------------------
-    coco_fdc_intrq_w - callback from the FDC
+    update_lines - CoCo specific disk
+    controller lines
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER( coco_fdc_intrq_w )
+void coco_fdc_device::update_lines()
 {
-	//fdc->intrq = state;
-	//(*fdc->hwtype->update_lines)(device->owner());
+	/* clear HALT enable under certain circumstances */
+	if ((m_intrq != 0) && (m_dskreg & 0x20))
+		m_dskreg &= ~0x80;	/* clear halt enable */
+
+	/* set the NMI line */
+	m_owner->cart_set_line(COCOCART_LINE_NMI,
+		((m_intrq != 0) && (m_dskreg & 0x20)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
+
+	/* set the HALT line */
+	m_owner->cart_set_line(COCOCART_LINE_HALT,
+		((m_drq == 0) && (m_dskreg & 0x80)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
+}
+
+/*-------------------------------------------------
+    dskreg_w - function to write to CoCo
+    dskreg
+-------------------------------------------------*/
+
+void coco_fdc_device::dskreg_w(UINT8 data)
+{
+	UINT8 drive = 0;
+	UINT8 head = 0;
+
+	if (LOG_FDC)
+	{
+		logerror("fdc_coco_dskreg_w(): %c%c%c%c%c%c%c%c ($%02x)\n",
+			data & 0x80 ? 'H' : 'h',
+			data & 0x40 ? '3' : '.',
+			data & 0x20 ? 'D' : 'S',
+			data & 0x10 ? 'P' : 'p',
+			data & 0x08 ? 'M' : 'm',
+			data & 0x04 ? '2' : '.',
+			data & 0x02 ? '1' : '.',
+			data & 0x01 ? '0' : '.',
+			data);
+	}
+
+	/* An email from John Kowalski informed me that if the DS3 is
+     * high, and one of the other drive bits is selected (DS0-DS2), then the
+     * second side of DS0, DS1, or DS2 is selected.  If multiple bits are
+     * selected in other situations, then both drives are selected, and any
+     * read signals get yucky.
+     */
+
+	if (data & 0x04)
+		drive = 2;
+	else if (data & 0x02)
+		drive = 1;
+	else if (data & 0x01)
+		drive = 0;
+	else if (data & 0x40)
+		drive = 3;
+
+	device_t *floppy[4];
+
+	floppy[0] = subdevice(FLOPPY_0);
+	floppy[1] = subdevice(FLOPPY_1);
+	floppy[2] = subdevice(FLOPPY_2);
+	floppy[3] = subdevice(FLOPPY_3);
+
+	for (int i = 0; i < 4; i++)
+	{
+		floppy_mon_w(floppy[i], i == drive ? CLEAR_LINE : ASSERT_LINE);
+	}
+
+	head = ((data & 0x40) && (drive != 3)) ? 1 : 0;
+
+	m_dskreg = data;
+
+	update_lines();
+
+	wd17xx_set_drive(m_wd17xx, drive);
+	wd17xx_set_side(m_wd17xx, head);
+	wd17xx_dden_w(m_wd17xx, !BIT(m_dskreg, 5));
+}
+
+/*-------------------------------------------------
+    read
+-------------------------------------------------*/
+
+READ8_MEMBER(coco_fdc_device::read)
+{
+	UINT8 result = 0;
+
+	switch(offset & 0xEF)
+	{
+		case 8:
+			result = wd17xx_status_r(m_wd17xx, 0);
+			break;
+		case 9:
+			result = wd17xx_track_r(m_wd17xx, 0);
+			break;
+		case 10:
+			result = wd17xx_sector_r(m_wd17xx, 0);
+			break;
+		case 11:
+			result = wd17xx_data_r(m_wd17xx, 0);
+			break;
+	}
+
+	/* other stuff for RTCs */
+	switch(offset)
+	{
+		case 0x10:	/* FF50 */
+			if (real_time_clock() == RTC_DISTO)
+				result = msm6242_r(m_disto_msm6242, m_msm6242_rtc_address);
+			break;
+
+		case 0x38:	/* FF78 */
+			if (real_time_clock() == RTC_CLOUD9)
+				ds1315_r_0(m_ds1315, offset);
+			break;
+
+		case 0x39:	/* FF79 */
+			if (real_time_clock() == RTC_CLOUD9)
+				ds1315_r_1(m_ds1315, offset);
+			break;
+
+		case 0x3C:	/* FF7C */
+			if (real_time_clock() == RTC_CLOUD9)
+				result = ds1315_r_data(m_ds1315, offset);
+			break;
+	}
+	return result;
 }
 
 
+
 /*-------------------------------------------------
-    coco_fdc_drq_w - callback from the FDC
+    write
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER( coco_fdc_drq_w )
+WRITE8_MEMBER(coco_fdc_device::write)
 {
-	//fdc->drq = state;
-	//(*fdc->hwtype->update_lines)(device->owner());
+	switch(offset & 0x1F)
+	{
+		case 0: case 1: case 2: case 3:
+		case 4: case 5: case 6: case 7:
+			dskreg_w(data);
+			break;
+		case 8:
+			wd17xx_command_w(m_wd17xx, 0, data);
+			break;
+		case 9:
+			wd17xx_track_w(m_wd17xx, 0, data);
+			break;
+		case 10:
+			wd17xx_sector_w(m_wd17xx, 0, data);
+			break;
+		case 11:
+			wd17xx_data_w(m_wd17xx, 0, data);
+			break;
+	};
+
+	/* other stuff for RTCs */
+	switch(offset)
+	{
+		case 0x10:	/* FF50 */
+			if (real_time_clock() == RTC_DISTO)
+				msm6242_w(m_disto_msm6242, m_msm6242_rtc_address, data);
+			break;
+
+		case 0x11:	/* FF51 */
+			if (real_time_clock() == RTC_DISTO)
+				m_msm6242_rtc_address = data & 0x0f;
+			break;
+	}
 }
+
 
 //**************************************************************************
 //  			DRAGON FDC
 //**************************************************************************
 
-static const wd17xx_interface dragon_wd17xx_interface =
-{
-	DEVCB_NULL,
-	DEVCB_LINE(dragon_fdc_intrq_w),
-	DEVCB_LINE(dragon_fdc_drq_w),
-	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
-};
-
 static MACHINE_CONFIG_FRAGMENT(dragon_fdc)
-	MCFG_WD2797_ADD(WD_TAG, dragon_wd17xx_interface)
-	MCFG_MSM6242_ADD(DISTO_TAG)
-	MCFG_DS1315_ADD(CLOUD9_TAG)
-	
+	MCFG_WD2797_ADD(WD_TAG, coco_wd17xx_interface)	
 	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
@@ -273,6 +455,21 @@ dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, device_type 
 dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
       : coco_fdc_device(mconfig, DRAGON_FDC, "Dragon FDC", tag, owner, clock)
 {
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void dragon_fdc_device::device_start()
+{
+	m_owner = dynamic_cast<cococart_slot_device *>(owner());
+	subtag(m_region_name, "eprom");	
+	m_drq           	= 0;
+	m_wd17xx			= subdevice(WD_TAG);
+	m_dskreg			= 0x00;
+	m_intrq				= 0;
+	m_msm6242_rtc_address = 0;
 }
 
 //-------------------------------------------------
@@ -304,25 +501,112 @@ const rom_entry *dragon_fdc_device::device_rom_region() const
 	return ROM_NAME( dragon_fdc );
 }
 
+
+
 /*-------------------------------------------------
-    dragon_fdc_intrq_w - callback from the FDC
+    update_lines - Dragon specific disk
+    controller lines
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER( dragon_fdc_intrq_w )
+void dragon_fdc_device::update_lines()
 {
-	//fdc->intrq = state;
-	//(*fdc->hwtype->update_lines)(device->owner());
+	/* set the NMI line */
+	m_owner->cart_set_line(COCOCART_LINE_NMI,
+		((m_intrq != 0) && (m_dskreg & 0x20)) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
+
+	/* set the CART line */
+	m_owner->cart_set_line(COCOCART_LINE_CART,
+		(m_drq != 0) ? COCOCART_LINE_VALUE_ASSERT : COCOCART_LINE_VALUE_CLEAR);
 }
 
 
 /*-------------------------------------------------
-    dragon_fdc_drq_w - callback from the FDC
+    dskreg_w - function to write to
+    Dragon dskreg
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER( dragon_fdc_drq_w )
+void dragon_fdc_device::dskreg_w(UINT8 data)
 {
-	//fdc->drq = state;
-	//(*fdc->hwtype->update_lines)(device->owner());
+	if (LOG_FDC)
+	{
+		logerror("fdc_dragon_dskreg_w(): %c%c%c%c%c%c%c%c ($%02x)\n",
+			data & 0x80 ? 'X' : 'x',
+			data & 0x40 ? 'X' : 'x',
+			data & 0x20 ? 'N' : 'n',
+			data & 0x10 ? 'P' : 'p',
+			data & 0x08 ? 'S' : 'D',
+			data & 0x04 ? 'M' : 'm',
+			data & 0x02 ? '1' : '0',
+			data & 0x01 ? '1' : '0',
+			data);
+	}
+
+	if (data & 0x04)
+		wd17xx_set_drive(m_wd17xx, data & 0x03);
+
+	wd17xx_dden_w(m_wd17xx, BIT(data, 3));
+	m_dskreg = data;
+}
+
+
+
+/*-------------------------------------------------
+    read
+-------------------------------------------------*/
+
+READ8_MEMBER(dragon_fdc_device::read)
+{
+	UINT8 result = 0;
+	switch(offset & 0xEF)
+	{
+		case 0:
+			result = wd17xx_status_r(m_wd17xx, 0);
+			break;
+		case 1:
+			result = wd17xx_track_r(m_wd17xx, 0);
+			break;
+		case 2:
+			result = wd17xx_sector_r(m_wd17xx, 0);
+			break;
+		case 3:
+			result = wd17xx_data_r(m_wd17xx, 0);
+			break;
+	}
+	return result;
+}
+
+
+
+/*-------------------------------------------------
+    write
+-------------------------------------------------*/
+
+WRITE8_MEMBER(dragon_fdc_device::write)
+{
+	switch(offset & 0xEF)
+	{
+		case 0:
+			wd17xx_command_w(m_wd17xx, 0, data);
+
+			/* disk head is encoded in the command byte */
+			/* Only for type 3 & 4 commands */
+			if (data & 0x80)
+				wd17xx_set_side(m_wd17xx, (data & 0x02) ? 1 : 0);
+			break;
+		case 1:
+			wd17xx_track_w(m_wd17xx, 0, data);
+			break;
+		case 2:
+			wd17xx_sector_w(m_wd17xx, 0, data);
+			break;
+		case 3:
+			wd17xx_data_w(m_wd17xx, 0, data);
+			break;
+		case 8: case 9: case 10: case 11:
+		case 12: case 13: case 14: case 15:
+			dskreg_w(data);
+			break;
+	};
 }
 
 //**************************************************************************

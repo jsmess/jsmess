@@ -10,6 +10,16 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> coco_rtc_type_t
+
+typedef enum
+{
+	RTC_DISTO	= 0x00,
+	RTC_CLOUD9	= 0x01,
+
+	RTC_NONE	= 0xFF
+} coco_rtc_type_t;
+
 // ======================> coco_fdc_device
 
 class coco_fdc_device :
@@ -27,14 +37,35 @@ public:
 		virtual const rom_entry *device_rom_region() const;
 		
 		virtual UINT8* get_cart_base();
+		
+		virtual void update_lines();
+		virtual void dskreg_w(UINT8 data);
+		
+		void set_intrq(UINT8 val) { m_intrq = val; }
+		void set_drq(UINT8 val) { m_drq = val; }
 protected:
         // device-level overrides
         virtual void device_start();
 		virtual void device_config_complete();
+		virtual DECLARE_READ8_MEMBER(read);
+		virtual DECLARE_WRITE8_MEMBER(write);		
 
+		coco_rtc_type_t real_time_clock();
+		
         // internal state
 		cococart_slot_device *m_owner;
 		astring m_region_name;
+		
+		UINT8 m_dskreg;
+		UINT8 m_drq : 1;
+		UINT8 m_intrq : 1;
+
+		device_t *m_wd17xx;			/* WD17xx */
+		device_t *m_ds1315;			/* DS1315 */
+
+		/* Disto RTC */
+		device_t *m_disto_msm6242;		/* 6242 RTC on Disto interface */
+		offs_t m_msm6242_rtc_address;		
 };
 
 
@@ -94,9 +125,14 @@ public:
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
 		virtual const rom_entry *device_rom_region() const;
+		virtual void update_lines();
+		virtual void dskreg_w(UINT8 data);				
 protected:
         // device-level overrides
+		virtual void device_start();
 		virtual void device_config_complete();
+		virtual DECLARE_READ8_MEMBER(read);
+		virtual DECLARE_WRITE8_MEMBER(write);				
 private:		
 };
 
