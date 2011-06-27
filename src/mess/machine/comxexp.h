@@ -66,10 +66,9 @@
 	const comx_expansion_bus_interface (_name) =
 
 
-#define MCFG_COMX_EXPANSION_SLOT_ADD(_num, _tag, _slot_intf, _def_slot) \
+#define MCFG_COMX_EXPANSION_SLOT_ADD(_tag, _slot_intf, _def_slot) \
     MCFG_DEVICE_ADD(_tag, COMX_EXPANSION_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot) \
-	comx_expansion_slot_device::static_set_slot(*device, COMX_EXPANSION_TAG, _num);
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot)
 
 
 

@@ -216,6 +216,23 @@ void comx_fd_device::comx_q_w(int state)
 
 
 //-------------------------------------------------
+//  comx_mrd_r - memory read
+//-------------------------------------------------
+
+UINT8 comx_fd_device::comx_mrd_r(offs_t offset)
+{
+	UINT8 data = 0;
+	
+	if (offset >= 0xc000 && offset < 0xd000)
+	{
+		data = m_rom[offset & 0xfff];
+	}
+	
+	return data;
+}
+
+
+//-------------------------------------------------
 //  comx_io_r - I/O read
 //-------------------------------------------------
 
