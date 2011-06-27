@@ -137,6 +137,7 @@ PCB 'Z545-1 A240570-1'
 1x 3V coin battery (CR2032)
 
 ******************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/sh2/sh2.h"
@@ -165,15 +166,15 @@ static SCREEN_UPDATE( casloopy )
 	return 0;
 }
 
-static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_BASE_MEMBER(casloopy_state, m_bios_rom)
+static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32, casloopy_state )
+	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_BASE(m_bios_rom)
 //  AM_RANGE(0x01000000, 0x017fffff) - i/o?
 	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("cart",0) // wrong?
 	AM_RANGE(0x07fff000, 0x07ffffff) AM_RAM
 ADDRESS_MAP_END
 
 #if 0
-static ADDRESS_MAP_START( casloopy_sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( casloopy_sub_map, AS_PROGRAM, 16, casloopy_state )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("subcpu",0)
 ADDRESS_MAP_END
 #endif

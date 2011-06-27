@@ -4,6 +4,8 @@
 
         11/12/2009 Skeleton driver.
 
+It requires a floppy disk to boot from.
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -43,7 +45,7 @@ READ8_MEMBER( ccs2422_state::ccs2422_10_r )
 
 READ8_MEMBER( ccs2422_state::ccs2422_11_r )
 {
-	return 4 | (m_term_data ? 1 : 0);
+	return (m_term_data) ? 5 : 4;
 }
 
 WRITE8_MEMBER( ccs2422_state::ccs2422_10_w )
@@ -107,6 +109,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 19??, ccs2422,  0,       0,	ccs2422,	ccs2422,	 0,   "California Computer Systems",   "CCS Model 2422B",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                          FULLNAME       FLAGS */
+COMP( 19??, ccs2422,  0,       0,    ccs2422,   ccs2422,  0,   "California Computer Systems", "CCS Model 2422B", GAME_NOT_WORKING | GAME_NO_SOUND)
