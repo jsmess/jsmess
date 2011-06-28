@@ -33,12 +33,6 @@ comx_expansion_slot_device::comx_expansion_slot_device(const machine_config &mco
 {
 }
 
-void comx_expansion_slot_device::static_set_slot(device_t &device, const char *tag, int num)
-{
-	comx_expansion_slot_device &comx_expansion_card = dynamic_cast<comx_expansion_slot_device &>(device);
-	comx_expansion_card.m_bus_tag = tag;
-	comx_expansion_card.m_bus_num = num;
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -46,9 +40,9 @@ void comx_expansion_slot_device::static_set_slot(device_t &device, const char *t
 
 void comx_expansion_slot_device::device_start()
 {
-	m_bus = machine().device<comx_expansion_bus_device>(m_bus_tag);
+	m_bus = machine().device<comx_expansion_bus_device>(COMX_EXPANSION_BUS_TAG);
 	device_comx_expansion_card_interface *dev = dynamic_cast<device_comx_expansion_card_interface *>(get_card_device());
-	if (dev) m_bus->add_card(dev, m_bus_num);
+	if (dev) m_bus->add_card(dev);
 }
 
 
@@ -58,13 +52,6 @@ void comx_expansion_slot_device::device_start()
 //**************************************************************************
 
 const device_type COMX_EXPANSION_BUS = &device_creator<comx_expansion_bus_device>;
-
-
-void comx_expansion_bus_device::static_set_cputag(device_t &device, const char *tag)
-{
-	comx_expansion_bus_device &comx_expansion = downcast<comx_expansion_bus_device &>(device);
-	comx_expansion.m_cputag = tag;
-}
 
 
 //-------------------------------------------------
@@ -104,10 +91,9 @@ void comx_expansion_bus_device::device_config_complete()
 //-------------------------------------------------
 
 comx_expansion_bus_device::comx_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, COMX_EXPANSION_BUS, "COMX_EXPANSION", tag, owner, clock)
+        device_t(mconfig, COMX_EXPANSION_BUS, "COMX_EXPANSION", tag, owner, clock),
+		m_card(NULL)
 {
-	for (int i = 0; i < MAX_COMX_EXPANSION_SLOTS; i++)
-		m_comx_expansion_bus_device[i] = NULL;
 }
 
 
@@ -117,8 +103,6 @@ comx_expansion_bus_device::comx_expansion_bus_device(const machine_config &mconf
 
 void comx_expansion_bus_device::device_start()
 {
-	m_maincpu = machine().device(m_cputag);
-
 	// resolve callbacks
 	m_out_int_func.resolve(m_out_int_cb, *this);
 	m_out_ef4_func.resolve(m_out_ef4_cb, *this);
@@ -141,9 +125,9 @@ void comx_expansion_bus_device::device_reset()
 //  add_card - add COMX_EXPANSION card
 //-------------------------------------------------
 
-void comx_expansion_bus_device::add_card(device_comx_expansion_card_interface *card, int pos)
+void comx_expansion_bus_device::add_card(device_comx_expansion_card_interface *card)
 {
-	m_comx_expansion_bus_device[pos] = card;
+	m_card = card;
 }
 
 
@@ -154,15 +138,12 @@ void comx_expansion_bus_device::add_card(device_comx_expansion_card_interface *c
 READ8_MEMBER( comx_expansion_bus_device::mrd_r )
 {
 	UINT8 data = 0;
-
-	for (int i = 0; i < MAX_COMX_EXPANSION_SLOTS; i++)
+	
+	if (m_card != NULL)
 	{
-		if (m_comx_expansion_bus_device[i] != NULL)
-		{
-			data |= m_comx_expansion_bus_device[i]->comx_mrd_r(offset);
-		}
+		data = m_card->comx_mrd_r(offset);
 	}
-
+	
 	return data;
 }
 
@@ -173,12 +154,9 @@ READ8_MEMBER( comx_expansion_bus_device::mrd_r )
 
 WRITE8_MEMBER( comx_expansion_bus_device::mwr_w )
 {
-	for (int i = 0; i < MAX_COMX_EXPANSION_SLOTS; i++)
+	if (m_card != NULL)
 	{
-		if (m_comx_expansion_bus_device[i] != NULL)
-		{
-			m_comx_expansion_bus_device[i]->comx_mwr_w(offset, data);
-		}
+		m_card->comx_mwr_w(offset, data);
 	}
 }
 
@@ -190,15 +168,12 @@ WRITE8_MEMBER( comx_expansion_bus_device::mwr_w )
 READ8_MEMBER( comx_expansion_bus_device::io_r )
 {
 	UINT8 data = 0;
-
-	for (int i = 0; i < MAX_COMX_EXPANSION_SLOTS; i++)
+	
+	if (m_card != NULL)
 	{
-		if (m_comx_expansion_bus_device[i] != NULL)
-		{
-			data |= m_comx_expansion_bus_device[i]->comx_io_r(offset);
-		}
+		data = m_card->comx_io_r(offset);
 	}
-
+	
 	return data;
 }
 
@@ -209,12 +184,9 @@ READ8_MEMBER( comx_expansion_bus_device::io_r )
 
 WRITE8_MEMBER( comx_expansion_bus_device::io_w )
 {
-	for (int i = 0; i < MAX_COMX_EXPANSION_SLOTS; i++)
+	if (m_card != NULL)
 	{
-		if (m_comx_expansion_bus_device[i] != NULL)
-		{
-			m_comx_expansion_bus_device[i]->comx_io_w(offset, data);
-		}
+		m_card->comx_io_w(offset, data);
 	}
 }
 
@@ -225,12 +197,9 @@ WRITE8_MEMBER( comx_expansion_bus_device::io_w )
 
 WRITE_LINE_MEMBER( comx_expansion_bus_device::q_w )
 {
-	for (int i = 0; i < MAX_COMX_EXPANSION_SLOTS; i++)
+	if (m_card != NULL)
 	{
-		if (m_comx_expansion_bus_device[i] != NULL)
-		{
-			m_comx_expansion_bus_device[i]->comx_q_w(state);
-		}
+		m_card->comx_q_w(state);
 	}
 }
 
@@ -243,15 +212,9 @@ bool comx_expansion_bus_device::screen_update(screen_device &screen, bitmap_t &b
 {
 	bool value = false;
 	
-	for (int i = 0; i < MAX_COMX_EXPANSION_SLOTS; i++)
+	if (m_card != NULL)
 	{
-		if (m_comx_expansion_bus_device[i] != NULL)
-		{
-			if (m_comx_expansion_bus_device[i]->comx_screen_update(screen, bitmap, cliprect))
-			{
-				value = true;
-			}
-		}
+		value = m_card->comx_screen_update(screen, bitmap, cliprect);
 	}
 	
 	return value;

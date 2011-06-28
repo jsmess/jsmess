@@ -72,7 +72,7 @@ public:
 		  m_kbe(*this, CDP1871_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_expansion(*this, COMX_EXPANSION_TAG)
+		  m_expansion(*this, COMX_EXPANSION_BUS_TAG)
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
