@@ -45,10 +45,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define COMX_EXPANSION_TAG		"comxexp"
-
-
-#define MAX_COMX_EXPANSION_SLOTS	1
+#define COMX_EXPANSION_BUS_TAG		"comxexp"
 
 
 
@@ -57,9 +54,8 @@
 //**************************************************************************
 
 #define MCFG_COMX_EXPANSION_BUS_ADD(_cpu_tag, _clock, _config) \
-    MCFG_DEVICE_ADD(COMX_EXPANSION_TAG, COMX_EXPANSION_BUS, _clock) \
-    MCFG_DEVICE_CONFIG(_config) \
-    comx_expansion_bus_device::static_set_cputag(*device, _cpu_tag);
+    MCFG_DEVICE_ADD(COMX_EXPANSION_BUS_TAG, COMX_EXPANSION_BUS, _clock) \
+    MCFG_DEVICE_CONFIG(_config)
 
 
 #define COMX_EXPANSION_INTERFACE(_name) \
@@ -91,12 +87,10 @@ public:
 	virtual void device_start();
 
     // inline configuration
-    static void static_set_slot(device_t &device, const char *tag, int num);
+    static void static_set_slot(device_t &device, const char *tag);
 
 private:
 	// configuration
-	const char *m_bus_tag;
-	int m_bus_num;
 	comx_expansion_bus_device  *m_bus;
 };
 
@@ -127,10 +121,9 @@ class comx_expansion_bus_device : public device_t,
 public:
 	// construction/destruction
 	comx_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
 
-	void add_card(device_comx_expansion_card_interface *card, int pos);
+	// inline configuration
+	void add_card(device_comx_expansion_card_interface *card);
 
 	DECLARE_READ8_MEMBER( mrd_r );
 	DECLARE_WRITE8_MEMBER( mwr_w );
@@ -156,16 +149,13 @@ protected:
 
 private:
 	// internal state
-	device_t   *m_maincpu;
-
 	devcb_resolved_write_line	m_out_int_func;
 	devcb_resolved_write_line	m_out_ef4_func;
 	devcb_resolved_write_line	m_out_wait_func;
 	devcb_resolved_write_line	m_out_clear_func;
 	devcb_resolved_write_line	m_out_extrom_func;
 
-	device_comx_expansion_card_interface *m_comx_expansion_bus_device[MAX_COMX_EXPANSION_SLOTS];
-	const char *m_cputag;
+	device_comx_expansion_card_interface *m_card;
 };
 
 
