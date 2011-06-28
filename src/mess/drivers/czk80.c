@@ -35,7 +35,7 @@ public:
 	DECLARE_READ8_MEMBER( czk80_81_r );
 	DECLARE_READ8_MEMBER( czk80_c0_r );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 *m_ram;
+	UINT8 *m_p_ram;
 	UINT8 m_term_data;
 	virtual void machine_reset();
 };
@@ -55,12 +55,12 @@ READ8_MEMBER( czk80_state::czk80_c0_r )
 
 READ8_MEMBER( czk80_state::czk80_81_r )
 {
-	return 1 | (m_term_data ? 2 : 0);
+	return (m_term_data) ? 3 : 1;
 }
 
 static ADDRESS_MAP_START(czk80_mem, AS_PROGRAM, 8, czk80_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE(m_p_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(czk80_io, AS_IO, 8, czk80_state)
@@ -77,8 +77,8 @@ INPUT_PORTS_END
 MACHINE_RESET_MEMBER(czk80_state)
 {
 	UINT8* bios = machine().region("maincpu")->base() + 0xe000;
-	memcpy(m_ram, bios, 0x2000);
-	memcpy(m_ram+0xe000, bios, 0x2000);
+	memcpy(m_p_ram, bios, 0x2000);
+	memcpy(m_p_ram+0xe000, bios, 0x2000);
 }
 
 
@@ -111,5 +111,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 198?, czk80,  0,       0, 	czk80,	czk80,	 0, 	  "<unknown>",   "CZK-80",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY      FULLNAME       FLAGS */
+COMP( 198?, czk80,  0,       0,     czk80,   czk80, 0,        "<unknown>",  "CZK-80", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
