@@ -211,7 +211,7 @@ comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag,
 
 void comx_clm_device::device_start()
 {
-	m_bus = machine().device<comx_expansion_bus_device>(COMX_EXPANSION_TAG);
+	m_bus = machine().device<comx_expansion_bus_device>(COMX_EXPANSION_BUS_TAG);
 
 	m_rom = subregion("c000")->base();
 	m_char_rom = subregion(MC6845_TAG)->base();

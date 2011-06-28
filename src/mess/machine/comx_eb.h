@@ -27,6 +27,14 @@
 
 
 //**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+#define MAX_EB_SLOTS	4
+
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -63,13 +71,9 @@ private:
 	UINT8 *m_rom;				// program ROM
 	
 	comx_expansion_slot_device	*m_owner;
+	device_comx_expansion_card_interface	*m_slot[MAX_EB_SLOTS];
 	
-	comx_expansion_slot_device	*m_slot1;
-	comx_expansion_slot_device	*m_slot2;
-	comx_expansion_slot_device	*m_slot3;
-	comx_expansion_slot_device	*m_slot4;
-	
-	comx_expansion_slot_device	*m_active;
+	UINT8 m_select;
 };
 
 

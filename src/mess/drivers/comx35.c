@@ -382,7 +382,7 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	
 	// expansion bus
 	MCFG_COMX_EXPANSION_BUS_ADD(CDP1802_TAG, CDP1869_CPU_CLK_PAL, expansion_intf)
-	MCFG_COMX_EXPANSION_SLOT_ADD("slot", comx_expansion_cards, NULL)
+	MCFG_COMX_EXPANSION_SLOT_ADD("slot", comx_expansion_cards, "fd")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	
 	// expansion bus
 	MCFG_COMX_EXPANSION_BUS_ADD(CDP1802_TAG, CDP1869_CPU_CLK_NTSC, expansion_intf)
-	MCFG_COMX_EXPANSION_SLOT_ADD("slot", comx_expansion_cards, NULL)
+	MCFG_COMX_EXPANSION_SLOT_ADD("slot", comx_expansion_cards, "fd")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
