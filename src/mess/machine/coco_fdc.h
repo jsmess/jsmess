@@ -54,7 +54,6 @@ protected:
 		
         // internal state
 		cococart_slot_device *m_owner;
-		astring m_region_name;
 		
 		UINT8 m_dskreg;
 		UINT8 m_drq : 1;

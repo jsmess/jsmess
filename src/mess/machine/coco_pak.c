@@ -66,7 +66,6 @@ void coco_pak_device::device_start()
 {
 	m_cart = dynamic_cast<device_image_interface *>(subdevice(CARTSLOT_TAG));
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
-	subtag(m_region_name, CARTSLOT_TAG);	 
 }
 
 //-------------------------------------------------
@@ -122,7 +121,7 @@ void coco_pak_device::device_reset()
 
 UINT8* coco_pak_device::get_cart_base()
 {
-	return machine().region(m_region_name.cstr())->base();
+	return subregion(CARTSLOT_TAG)->base();
 }
 
 /***************************************************************************
@@ -167,8 +166,8 @@ void coco_pak_banked_device::banked_pak_set_bank(UINT32 bank)
 {
 	UINT64 pos;
 	UINT32 i;
-	UINT8 *rom = machine().region(m_region_name.cstr())->base();
-	UINT32 rom_length = machine().region(m_region_name.cstr())->bytes();
+	UINT8 *rom = subregion(CARTSLOT_TAG)->base();
+	UINT32 rom_length = subregion(CARTSLOT_TAG)->bytes();
 
 	pos = (bank * 0x4000) % m_cart->length();
 
