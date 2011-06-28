@@ -203,7 +203,6 @@ coco_fdc_device::coco_fdc_device(const machine_config &mconfig, const char *tag,
 void coco_fdc_device::device_start()
 {
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
-	subtag(m_region_name, "eprom");	
 	m_drq           	= 1;
 	m_disto_msm6242		= subdevice(DISTO_TAG);
 	m_ds1315			= subdevice(CLOUD9_TAG);
@@ -248,7 +247,7 @@ const rom_entry *coco_fdc_device::device_rom_region() const
 
 UINT8* coco_fdc_device::get_cart_base()
 {
-	return machine().region(m_region_name.cstr())->base();
+	return subregion("eprom")->base();
 }
 
 /*-------------------------------------------------
@@ -464,7 +463,6 @@ dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, const char *
 void dragon_fdc_device::device_start()
 {
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
-	subtag(m_region_name, "eprom");	
 	m_drq           	= 0;
 	m_wd17xx			= subdevice(WD_TAG);
 	m_dskreg			= 0x00;

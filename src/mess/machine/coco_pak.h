@@ -36,7 +36,6 @@ protected:
         // internal state
 		device_image_interface *m_cart;		
 		cococart_slot_device *m_owner;
-		astring m_region_name;
 };
 
 
