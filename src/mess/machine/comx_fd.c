@@ -144,11 +144,11 @@ inline void comx_fd_device::update_ef4()
 {
 	if (m_ef4_enable)
 	{
-		m_bus->ef4_w(m_drq);
+		m_slot->ef4_w(m_drq);
 	}
 	else
 	{
-		m_bus->ef4_w(CLEAR_LINE);
+		m_slot->ef4_w(CLEAR_LINE);
 	}
 }
 
@@ -183,7 +183,7 @@ comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, d
 
 void comx_fd_device::device_start()
 {
-	m_bus = machine().device<comx_expansion_bus_device>(COMX_EXPANSION_BUS_TAG);
+	m_slot = dynamic_cast<comx_expansion_slot_device *>(owner());
 
 	m_rom = subregion("c000")->base();
 

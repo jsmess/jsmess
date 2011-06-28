@@ -55,6 +55,8 @@ protected:
 
 private:
 	// internal state
+	comx_expansion_slot_device *m_slot;
+	
 	required_device<mc6845_device> m_crtc;
 
 	UINT8 *m_rom;				// program ROM

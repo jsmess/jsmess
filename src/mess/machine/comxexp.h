@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    COMX-35 expansion bus emulation
+    COMX-35 Expansion Slot emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -34,8 +34,8 @@
 
 #pragma once
 
-#ifndef __COMX35_EXPANSION_BUS__
-#define __COMX35_EXPANSION_BUS__
+#ifndef __COMX35_EXPANSION_SLOT__
+#define __COMX35_EXPANSION_SLOT__
 
 #include "emu.h"
 
@@ -53,17 +53,13 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_COMX_EXPANSION_BUS_ADD(_cpu_tag, _clock, _config) \
-    MCFG_DEVICE_ADD(COMX_EXPANSION_BUS_TAG, COMX_EXPANSION_BUS, _clock) \
-    MCFG_DEVICE_CONFIG(_config)
-
-
 #define COMX_EXPANSION_INTERFACE(_name) \
-	const comx_expansion_bus_interface (_name) =
+	const comx_expansion_slot_interface (_name) =
 
 
-#define MCFG_COMX_EXPANSION_SLOT_ADD(_tag, _slot_intf, _def_slot) \
+#define MCFG_COMX_EXPANSION_SLOT_ADD(_tag, _config, _slot_intf, _def_slot) \
     MCFG_DEVICE_ADD(_tag, COMX_EXPANSION_SLOT, 0) \
+    MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot)
 
 
@@ -72,36 +68,9 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> comx_expansion_slot_device
+// ======================> comx_expansion_slot_interface
 
-class comx_expansion_bus_device;
-
-class comx_expansion_slot_device : public device_t,
-								   public device_slot_interface
-{
-public:
-	// construction/destruction
-	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_start();
-
-    // inline configuration
-    static void static_set_slot(device_t &device, const char *tag);
-
-private:
-	// configuration
-	comx_expansion_bus_device  *m_bus;
-};
-
-
-// device type definition
-extern const device_type COMX_EXPANSION_SLOT;
-
-
-// ======================> comx_expansion_bus_interface
-
-struct comx_expansion_bus_interface
+struct comx_expansion_slot_interface
 {
     devcb_write_line	m_out_int_cb;
     devcb_write_line	m_out_ef4_cb;
@@ -109,20 +78,43 @@ struct comx_expansion_bus_interface
     devcb_write_line	m_out_clear_cb;
 };
 
-class device_comx_expansion_card_interface;
 
+// ======================> device_comx_expansion_card_interface
 
-// ======================> comx_expansion_bus_device
-
-class comx_expansion_bus_device : public device_t,
-								  public comx_expansion_bus_interface
+// class representing interface-specific live comx_expansion card
+class device_comx_expansion_card_interface : public device_interface
 {
 public:
 	// construction/destruction
-	comx_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	device_comx_expansion_card_interface(const machine_config &mconfig, device_t &device);
+	virtual ~device_comx_expansion_card_interface();
 
-	// inline configuration
-	void add_card(device_comx_expansion_card_interface *card);
+	// interrupts
+	virtual void comx_q_w(int state) { };
+
+	// memory access
+	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom) { return 0; };
+	virtual void comx_mwr_w(offs_t offset, UINT8 data) { };
+
+	// I/O access
+	virtual UINT8 comx_io_r(offs_t offset) { return 0; };
+	virtual void comx_io_w(offs_t offset, UINT8 data) { };
+
+	// video
+	virtual bool comx_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect) { return false; }
+};
+
+
+// ======================> comx_expansion_slot_device
+
+class comx_expansion_slot_device : public device_t,
+								   public comx_expansion_slot_interface,
+								   public device_slot_interface
+{
+public:
+	// construction/destruction
+	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~comx_expansion_slot_device();
 
 	UINT8 mrd_r(offs_t offset, int *extrom);
 	void mwr_w(offs_t offset, UINT8 data);
@@ -157,37 +149,8 @@ private:
 
 
 // device type definition
-extern const device_type COMX_EXPANSION_BUS;
+extern const device_type COMX_EXPANSION_SLOT;
 
 
-// ======================> device_comx_expansion_card_interface
-
-// class representing interface-specific live comx_expansion card
-class device_comx_expansion_card_interface : public device_interface
-{
-	friend class comx_expansion_bus_device;
-
-public:
-	// construction/destruction
-	device_comx_expansion_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_comx_expansion_card_interface();
-
-	// interrupts
-	virtual void comx_q_w(int state) { };
-
-	// memory access
-	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom) { return 0; };
-	virtual void comx_mwr_w(offs_t offset, UINT8 data) { };
-
-	// I/O access
-	virtual UINT8 comx_io_r(offs_t offset) { return 0; };
-	virtual void comx_io_w(offs_t offset, UINT8 data) { };
-
-	// video
-	virtual bool comx_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect) { return false; }
-
-public:
-	comx_expansion_bus_device  *m_bus;
-};
 
 #endif

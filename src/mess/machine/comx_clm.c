@@ -120,7 +120,7 @@ static MC6845_UPDATE_ROW( comx_clm_update_row )
 
 WRITE_LINE_MEMBER( comx_clm_device::hsync_w )
 {
-	m_bus->ef4_w(state);
+	m_slot->ef4_w(state);
 }
 
 static const mc6845_interface crtc_intf =
@@ -211,7 +211,7 @@ comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag,
 
 void comx_clm_device::device_start()
 {
-	m_bus = machine().device<comx_expansion_bus_device>(COMX_EXPANSION_BUS_TAG);
+	m_slot = dynamic_cast<comx_expansion_slot_device *>(owner());
 
 	m_rom = subregion("c000")->base();
 	m_char_rom = subregion(MC6845_TAG)->base();

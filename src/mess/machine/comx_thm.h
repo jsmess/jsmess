@@ -48,6 +48,8 @@ protected:
 	virtual void comx_io_w(offs_t offset, UINT8 data);
 
 private:
+	comx_expansion_slot_device *m_slot;
+
 	// internal state
 	UINT8 *m_rom;				// program ROM
 };

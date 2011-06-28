@@ -68,9 +68,10 @@ protected:
 
 private:
 	// internal state
+	comx_expansion_slot_device *m_owner_slot;
+
 	UINT8 *m_rom;				// program ROM
 	
-	comx_expansion_slot_device	*m_owner;
 	device_comx_expansion_card_interface	*m_slot[MAX_EB_SLOTS];
 	
 	UINT8 m_select;
