@@ -63,7 +63,7 @@ comx_prn_device::comx_prn_device(const machine_config &mconfig, const char *tag,
 
 void comx_prn_device::device_start()
 {
-	m_bus = machine().device<comx_expansion_bus_device>(COMX_EXPANSION_BUS_TAG);
+	m_slot = dynamic_cast<comx_expansion_slot_device *>(owner());
 
 	m_rom = subregion("c000")->base();
 }

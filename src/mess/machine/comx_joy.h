@@ -46,6 +46,7 @@ protected:
 
 private:
 	// internal state
+	comx_expansion_slot_device *m_slot;
 };
 
 

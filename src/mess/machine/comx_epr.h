@@ -48,6 +48,8 @@ protected:
 
 private:
 	// internal state
+	comx_expansion_slot_device *m_slot;
+
 	UINT8 *m_rom;				// program ROM
 };
 

@@ -114,10 +114,10 @@ static COMX_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( comx_eb )
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT1_TAG, comx_expansion_cards, "fd")
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT2_TAG, comx_expansion_cards, "clm")
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT3_TAG, comx_expansion_cards, "joy")
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT4_TAG, comx_expansion_cards, "ram")
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT1_TAG, expansion_intf, comx_expansion_cards, "fd")
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT2_TAG, expansion_intf, comx_expansion_cards, "clm")
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT3_TAG, expansion_intf, comx_expansion_cards, "joy")
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT4_TAG, expansion_intf, comx_expansion_cards, "ram")
 MACHINE_CONFIG_END
 
 
@@ -155,13 +155,12 @@ comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, d
 
 void comx_eb_device::device_start()
 {
-	m_bus = machine().device<comx_expansion_bus_device>(COMX_EXPANSION_BUS_TAG);
+	m_owner_slot = dynamic_cast<comx_expansion_slot_device *>(owner());
 
 	m_slot[0] = dynamic_cast<device_comx_expansion_card_interface *>(subdevice(SLOT1_TAG));
 	m_slot[1] = dynamic_cast<device_comx_expansion_card_interface *>(subdevice(SLOT2_TAG));
 	m_slot[2] = dynamic_cast<device_comx_expansion_card_interface *>(subdevice(SLOT3_TAG));
 	m_slot[3] = dynamic_cast<device_comx_expansion_card_interface *>(subdevice(SLOT4_TAG));
-	m_owner = dynamic_cast<comx_expansion_slot_device *>(owner());
 	
 	m_rom = subregion("e000")->base();
 }

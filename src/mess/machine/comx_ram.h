@@ -45,6 +45,8 @@ protected:
 
 private:
 	// internal state
+	comx_expansion_slot_device *m_slot;
+
 	UINT8 *m_ram;
 	int m_ram_bank;
 };
