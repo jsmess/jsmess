@@ -156,6 +156,7 @@
 	</hash>
 	<hash crc32="f3df94e0" name="Duncan's Thin Ice (Mattel)">
 		<year>1983</year>
+		<extrainfo>0 84 210 242 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="20ace89d" name="Easter Eggs (Mattel)">
 		<year>1981</year>
@@ -213,7 +214,7 @@
 	</hash>
 	<hash crc32="ff83ff80" name="Hover Force (Intv Corp)">
 		<year>1986</year>
-		<extrainfo>0 84 148 210 0 0 0</extrainfo>
+		<extrainfo>0 84 150 210 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="a3147630" name="Hypnotic Lights (Mattel)">
 		<year>1981</year>
@@ -319,6 +320,7 @@
 	</hash>
 	<hash crc32="e806ad91" name="Microsurgeon (Imagic) [!]">
 		<year>1982</year>
+		<extrainfo>0 68 0 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="9d57498f" name="Mind Strike! (Mattel) [!]">
 		<year>1982</year>
