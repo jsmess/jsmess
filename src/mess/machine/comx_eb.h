@@ -66,13 +66,12 @@ protected:
 	virtual void comx_io_w(offs_t offset, UINT8 data);
 	virtual bool comx_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
-private:
 	// internal state
 	comx_expansion_slot_device *m_owner_slot;
 
 	UINT8 *m_rom;				// program ROM
 	
-	device_comx_expansion_card_interface	*m_slot[MAX_EB_SLOTS];
+	comx_expansion_slot_device	*m_slot[MAX_EB_SLOTS];
 	
 	UINT8 m_select;
 };
