@@ -137,8 +137,6 @@ protected:
 	virtual void device_reset();
 	virtual void device_config_complete();
 
-private:
-	// internal state
 	devcb_resolved_write_line	m_out_int_func;
 	devcb_resolved_write_line	m_out_ef4_func;
 	devcb_resolved_write_line	m_out_wait_func;

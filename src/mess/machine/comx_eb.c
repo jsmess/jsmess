@@ -100,12 +100,36 @@ static SLOT_INTERFACE_START( comx_expansion_cards )
 	SLOT_INTERFACE("thm", COMX_THM)
 SLOT_INTERFACE_END
 
+WRITE_LINE_DEVICE_HANDLER( int_w )
+{
+	comx_expansion_slot_device *slot = dynamic_cast<comx_expansion_slot_device *>(device->owner()->owner());
+	slot->int_w(state);
+}
+
+WRITE_LINE_DEVICE_HANDLER( ef4_w )
+{
+	comx_expansion_slot_device *slot = dynamic_cast<comx_expansion_slot_device *>(device->owner()->owner());
+	slot->ef4_w(state);
+}
+
+WRITE_LINE_DEVICE_HANDLER( wait_w )
+{
+	comx_expansion_slot_device *slot = dynamic_cast<comx_expansion_slot_device *>(device->owner()->owner());
+	slot->wait_w(state);
+}
+
+WRITE_LINE_DEVICE_HANDLER( clear_w )
+{
+	comx_expansion_slot_device *slot = dynamic_cast<comx_expansion_slot_device *>(device->owner()->owner());
+	slot->clear_w(state);
+}
+
 static COMX_EXPANSION_INTERFACE( expansion_intf )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_LINE(int_w),
+	DEVCB_LINE(ef4_w),
+	DEVCB_LINE(wait_w),
+	DEVCB_LINE(clear_w)
 };
 
 
@@ -144,7 +168,8 @@ machine_config_constructor comx_eb_device::device_mconfig_additions() const
 comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_EB, "COMX-35E Expansion Box", tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
-	device_slot_card_interface(mconfig, *this)
+	device_slot_card_interface(mconfig, *this),
+	m_select(0)
 {
 }
 
@@ -157,10 +182,10 @@ void comx_eb_device::device_start()
 {
 	m_owner_slot = dynamic_cast<comx_expansion_slot_device *>(owner());
 
-	m_slot[0] = dynamic_cast<device_comx_expansion_card_interface *>(subdevice(SLOT1_TAG));
-	m_slot[1] = dynamic_cast<device_comx_expansion_card_interface *>(subdevice(SLOT2_TAG));
-	m_slot[2] = dynamic_cast<device_comx_expansion_card_interface *>(subdevice(SLOT3_TAG));
-	m_slot[3] = dynamic_cast<device_comx_expansion_card_interface *>(subdevice(SLOT4_TAG));
+	m_slot[0] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT1_TAG));
+	m_slot[1] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT2_TAG));
+	m_slot[2] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT3_TAG));
+	m_slot[3] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT4_TAG));
 	
 	m_rom = subregion("e000")->base();
 }
@@ -185,7 +210,7 @@ void comx_eb_device::comx_q_w(int state)
 	{
 		if (BIT(m_select, slot) && m_slot[slot] != NULL)
 		{
-			m_slot[slot]->comx_q_w(state);
+			m_slot[slot]->q_w(state);
 		}
 	}
 }
@@ -214,7 +239,7 @@ UINT8 comx_eb_device::comx_mrd_r(offs_t offset, int *extrom)
 		{
 			if (BIT(m_select, slot) && m_slot[slot] != NULL)
 			{
-				data |= m_slot[slot]->comx_mrd_r(offset, extrom);
+				data |= m_slot[slot]->mrd_r(offset, extrom);
 			}
 		}
 	}
@@ -233,7 +258,7 @@ void comx_eb_device::comx_mwr_w(offs_t offset, UINT8 data)
 	{
 		if (BIT(m_select, slot) && m_slot[slot] != NULL)
 		{
-			m_slot[slot]->comx_mwr_w(offset, data);
+			m_slot[slot]->mwr_w(offset, data);
 		}
 	}
 }
@@ -251,7 +276,7 @@ UINT8 comx_eb_device::comx_io_r(offs_t offset)
 	{
 		if (BIT(m_select, slot) && m_slot[slot] != NULL)
 		{
-			data |= m_slot[slot]->comx_io_r(offset);
+			data |= m_slot[slot]->io_r(offset);
 		}
 	}
 
@@ -274,7 +299,7 @@ void comx_eb_device::comx_io_w(offs_t offset, UINT8 data)
 	{
 		if (BIT(m_select, slot) && m_slot[slot] != NULL)
 		{
-			m_slot[slot]->comx_io_w(offset, data);
+			m_slot[slot]->io_w(offset, data);
 		}
 	}
 }
@@ -286,5 +311,15 @@ void comx_eb_device::comx_io_w(offs_t offset, UINT8 data)
 
 bool comx_eb_device::comx_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return false;
+	bool value = false;
+	
+	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+	{
+		if (BIT(m_select, slot) && m_slot[slot] != NULL)
+		{
+			m_slot[slot]->screen_update(screen, bitmap, cliprect);
+		}
+	}
+
+	return value;
 }

@@ -239,7 +239,7 @@ UINT8 comx_clm_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	address_space *space = machine().firstcpu->memory().space(AS_PROGRAM);
 
-	UINT8 data = 0;
+	UINT8 data = 0xff;
 	
 	if (offset >= 0xc000 && offset < 0xc800)
 	{

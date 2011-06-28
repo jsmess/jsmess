@@ -221,16 +221,16 @@ void comx_fd_device::comx_q_w(int state)
 
 UINT8 comx_fd_device::comx_mrd_r(offs_t offset, int *extrom)
 {
-	UINT8 data = 0;
+	UINT8 data = 0xff;
 	
-	if (offset >= 0x0dd0 && offset < 0x0ddf)
+	if (offset >= 0x0dd0 && offset < 0x0de0)
 	{
-		data = m_rom[offset & 0xfff];
+		data = m_rom[offset & 0x1fff];
 		*extrom = 0;
 	}
-	if (offset >= 0xc000 && offset < 0xd000)
+	if (offset >= 0xc000 && offset < 0xe000)
 	{
-		data = m_rom[offset & 0xfff];
+		data = m_rom[offset & 0x1fff];
 	}
 	
 	return data;
@@ -243,15 +243,18 @@ UINT8 comx_fd_device::comx_mrd_r(offs_t offset, int *extrom)
 
 UINT8 comx_fd_device::comx_io_r(offs_t offset)
 {
-	UINT8 data;
+	UINT8 data = 0xff;
 
-	if (m_q)
+	if (offset == 2)
 	{
-		data = m_intrq;
-	}
-	else
-	{
-		data = wd17xx_r(m_fdc, m_addr);
+		if (m_q)
+		{
+			data = m_intrq;
+		}
+		else
+		{
+			data = wd17xx_r(m_fdc, m_addr);
+		}
 	}
 
 	return data;
@@ -277,28 +280,31 @@ void comx_fd_device::comx_io_w(offs_t offset, UINT8 data)
 
     */
 
-	if (m_q)
+	if (offset == 2)
 	{
-		// latch data to F3
-		m_addr = data & 0x03;
-
-		if (BIT(data, 2))
+		if (m_q)
 		{
-			wd17xx_set_drive(m_fdc, 0);
+			// latch data to F3
+			m_addr = data & 0x03;
+
+			if (BIT(data, 2))
+			{
+				wd17xx_set_drive(m_fdc, 0);
+			}
+			else if (BIT(data, 3))
+			{
+				wd17xx_set_drive(m_fdc, 1);
+			}
+
+			m_ef4_enable = BIT(data, 4);
+			update_ef4();
+
+			wd17xx_set_side(m_fdc, BIT(data, 5));
 		}
-		else if (BIT(data, 3))
+		else
 		{
-			wd17xx_set_drive(m_fdc, 1);
+			// write data to WD1770
+			wd17xx_w(m_fdc, m_addr, data);
 		}
-
-		m_ef4_enable = BIT(data, 4);
-		update_ef4();
-
-		wd17xx_set_side(m_fdc, BIT(data, 5));
-	}
-	else
-	{
-		// write data to WD1770
-		wd17xx_w(m_fdc, m_addr, data);
 	}
 }

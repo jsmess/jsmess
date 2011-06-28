@@ -125,12 +125,10 @@ void comx_expansion_slot_device::device_reset()
 UINT8 comx_expansion_slot_device::mrd_r(offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
-	logerror("%04x %u\n", offset, *extrom);
 	
 	if (m_card != NULL)
 	{
 		data = m_card->comx_mrd_r(offset, extrom);
-		logerror("%02x\n", data);
 	}
 	
 	return data;
