@@ -1792,9 +1792,10 @@ ccs2422
 ccs2810
 qtsbc
 msbc1
-ipb
-ipc
-ipds
+ipb // intel
+ipc // intel
+ipds // intel
+imds // intel
 sbc6510
 supracan
 scv

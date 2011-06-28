@@ -1035,6 +1035,7 @@ $(MESSOBJ)/intel.a:				\
 	$(MESS_DRIVERS)/isbc.o		\
 	$(MESS_DRIVERS)/ipc.o		\
 	$(MESS_DRIVERS)/ipds.o		\
+	$(MESS_DRIVERS)/imds.o		\
 	$(MESS_DRIVERS)/sdk85.o		\
 	$(MESS_DRIVERS)/sdk86.o		\
 	$(MESS_DRIVERS)/rex6000.o	\

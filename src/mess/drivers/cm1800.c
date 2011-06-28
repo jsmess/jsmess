@@ -8,6 +8,26 @@
 
         26/04/2011 Skeleton driver.
 
+Commands:
+C Compare
+D Dump
+F Fill
+G
+I
+L
+M Move
+S Edit
+T
+X Registers
+
+For most commands, enter all 4 digits of each hex address, the system will
+add the appropriate spacing as you type. No need to press Enter.
+
+The L command looks like it might be for loading a file, for example
+L ABC will read/write to port 70,71,73 and eventually time out if you wait
+a while. No idea if it wants to read a disk or a tape. There doesn't seem
+to be a save command.
+
 ****************************************************************************/
 
 #define ADDRESS_MAP_MODERN
@@ -22,35 +42,26 @@ public:
 	cm1800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	DECLARE_READ8_MEMBER( term_ready_r );
+	DECLARE_READ8_MEMBER( term_status_r );
 	DECLARE_READ8_MEMBER( term_r );
-	DECLARE_WRITE8_MEMBER( term_ready_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-
-	UINT8 m_key_ready;
 	UINT8 m_term_data;
 };
 
-READ8_MEMBER( cm1800_state::term_ready_r )
+READ8_MEMBER( cm1800_state::term_status_r )
 {
-	return 0x04 | m_key_ready; // always ready to write
-}
-
-WRITE8_MEMBER( cm1800_state::term_ready_w )
-{
-	m_key_ready = 0;
-	m_term_data = 0;
+	return (m_term_data) ? 5 : 4;
 }
 
 READ8_MEMBER( cm1800_state::term_r )
 {
-	m_key_ready = 0;
-	return m_term_data;
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
 }
 
 WRITE8_MEMBER( cm1800_state::kbd_put )
 {
-	m_key_ready = 1;
 	m_term_data = data;
 }
 
@@ -63,7 +74,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cm1800_io , AS_IO, 8, cm1800_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_READ(term_r) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
-	AM_RANGE(0x01, 0x01) AM_READ(term_ready_r)
+	AM_RANGE(0x01, 0x01) AM_READ(term_status_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -75,7 +86,7 @@ static MACHINE_RESET(cm1800)
 {
 }
 
-static GENERIC_TERMINAL_INTERFACE( cm1800_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
 	DEVCB_DRIVER_MEMBER(cm1800_state, kbd_put)
 };
@@ -90,7 +101,7 @@ static MACHINE_CONFIG_START( cm1800, cm1800_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,cm1800_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -102,5 +113,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1981, cm1800,  0,       0,    cm1800,    cm1800,     0,  "<unknown>", "CM-1800", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, cm1800,  0,       0,    cm1800,    cm1800,     0,  "<unknown>", "CM-1800", GAME_NO_SOUND_HW)
 
