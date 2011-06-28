@@ -82,7 +82,7 @@ void comx_prn_device::device_reset()
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_prn_device::comx_mrd_r(offs_t offset)
+UINT8 comx_prn_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
 	

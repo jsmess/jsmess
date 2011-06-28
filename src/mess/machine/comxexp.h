@@ -107,7 +107,6 @@ struct comx_expansion_bus_interface
     devcb_write_line	m_out_ef4_cb;
     devcb_write_line	m_out_wait_cb;
     devcb_write_line	m_out_clear_cb;
-    devcb_write_line	m_out_extrom_cb;
 };
 
 class device_comx_expansion_card_interface;
@@ -125,11 +124,11 @@ public:
 	// inline configuration
 	void add_card(device_comx_expansion_card_interface *card);
 
-	DECLARE_READ8_MEMBER( mrd_r );
-	DECLARE_WRITE8_MEMBER( mwr_w );
+	UINT8 mrd_r(offs_t offset, int *extrom);
+	void mwr_w(offs_t offset, UINT8 data);
 
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	UINT8 io_r(offs_t offset);
+	void io_w(offs_t offset, UINT8 data);
 
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 
@@ -137,7 +136,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ef4_w );
 	DECLARE_WRITE_LINE_MEMBER( wait_w );
 	DECLARE_WRITE_LINE_MEMBER( clear_w );
-	DECLARE_WRITE_LINE_MEMBER( extrom_w );
 
 	bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
@@ -153,7 +151,6 @@ private:
 	devcb_resolved_write_line	m_out_ef4_func;
 	devcb_resolved_write_line	m_out_wait_func;
 	devcb_resolved_write_line	m_out_clear_func;
-	devcb_resolved_write_line	m_out_extrom_func;
 
 	device_comx_expansion_card_interface *m_card;
 };
@@ -179,7 +176,7 @@ public:
 	virtual void comx_q_w(int state) { };
 
 	// memory access
-	virtual UINT8 comx_mrd_r(offs_t offset) { return 0; };
+	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom) { return 0; };
 	virtual void comx_mwr_w(offs_t offset, UINT8 data) { };
 
 	// I/O access

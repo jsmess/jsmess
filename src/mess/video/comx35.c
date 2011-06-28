@@ -10,7 +10,7 @@ WRITE8_MEMBER( comx35_state::cdp1869_w )
 {
 	UINT16 ma = m_maincpu->get_memory_address();
 
-	switch (offset + 3)
+	switch (offset)
 	{
 	case 3:
 		m_vis->out3_w(space, ma, data);
@@ -103,11 +103,9 @@ void comx35_state::video_start()
 {
 	// allocate memory
 	m_charram = auto_alloc_array(machine(), UINT8, COMX35_CHARRAM_SIZE);
-	m_videoram = auto_alloc_array(machine(), UINT8, COMX35_VIDEORAM_SIZE);
 
 	// register for save state
 	state_save_register_global_pointer(machine(), m_charram, COMX35_CHARRAM_SIZE);
-	state_save_register_global_pointer(machine(), m_videoram, COMX35_VIDEORAM_SIZE);
 }
 
 bool comx35_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -118,103 +116,18 @@ bool comx35_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 	}
 	else
 	{
-		m_crtc->update(&bitmap, &cliprect);
+		//m_crtc->update(&bitmap, &cliprect);
 	}
 
 	return false;
 }
 
-/* MC6845 */
-
-static MC6845_UPDATE_ROW( comx35_update_row )
-{
-	comx35_state *state = device->machine().driver_data<comx35_state>();
-
-	UINT8 *charrom = device->machine().region("chargen")->base();
-
-	int column, bit;
-
-	for (column = 0; column < x_count; column++)
-	{
-		UINT8 code = state->m_videoram[((ma + column) & 0x7ff)];
-		UINT16 addr = (code << 3) | (ra & 0x07);
-		UINT8 data = charrom[addr & 0x7ff];
-
-		if (BIT(ra, 3) && column == cursor_x)
-		{
-			data = 0xff;
-		}
-
-		for (bit = 0; bit < 8; bit++)
-		{
-			int x = (column * 8) + bit;
-			int color = BIT(data, 7) ? 7 : 0;
-
-			*BITMAP_ADDR16(bitmap, y, x) = color;
-
-			data <<= 1;
-		}
-	}
-}
-
-static WRITE_LINE_DEVICE_HANDLER( comx35_hsync_changed )
-{
-	comx35_state *driver_state = device->machine().driver_data<comx35_state>();
-
-	driver_state->m_cdp1802_ef4 = state;
-}
-
-static const mc6845_interface comx35_mc6845_interface =
-{
-	MC6845_SCREEN_TAG,
-	8,
-	NULL,
-	comx35_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_LINE(comx35_hsync_changed),
-	DEVCB_NULL,
-	NULL
-};
-
-/* F4 Character Displayer */
-static const gfx_layout comx35_charlayout =
-{
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
-};
-
-static GFXDECODE_START( comx35 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, comx35_charlayout, 0, 36 )
-GFXDECODE_END
-
 /* Machine Drivers */
-
-static MACHINE_CONFIG_FRAGMENT( comx35_80_video )
-	MCFG_SCREEN_ADD(MC6845_SCREEN_TAG, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(80*8, 24*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_REFRESH_RATE(50)
-
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_14_31818MHz, comx35_mc6845_interface)
-MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( comx35_pal_video )
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_CDP1869_SCREEN_PAL_ADD(SCREEN_TAG, CDP1869_DOT_CLK_PAL)
-
-	MCFG_GFXDECODE(comx35)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -224,16 +137,12 @@ MACHINE_CONFIG_FRAGMENT( comx35_pal_video )
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_FRAGMENT_ADD(comx35_80_video)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( comx35_ntsc_video )
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_CDP1869_SCREEN_NTSC_ADD(SCREEN_TAG, CDP1869_DOT_CLK_NTSC)
-
-	MCFG_GFXDECODE(comx35)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -243,6 +152,4 @@ MACHINE_CONFIG_FRAGMENT( comx35_ntsc_video )
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_FRAGMENT_ADD(comx35_80_video)
 MACHINE_CONFIG_END

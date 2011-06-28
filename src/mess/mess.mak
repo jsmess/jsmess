@@ -810,7 +810,6 @@ $(MESSOBJ)/comx.a:				\
 	$(MESS_FORMATS)/comx35_comx.o	\
 	$(MESS_MACHINE)/comxpl80.o	\
 	$(MESS_VIDEO)/comx35.o		\
-	$(MESS_MACHINE)/comx35.o	\
 	$(MESS_MACHINE)/comxexp.o	\
 	$(MESS_MACHINE)/comx_clm.o	\
 	$(MESS_MACHINE)/comx_eb.o	\
