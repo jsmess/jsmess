@@ -67,13 +67,13 @@ const device_type COMX_EB = &device_creator<comx_eb_device>;
 
 ROM_START( comx_eb )
 	ROM_REGION( 0x1000, "e000", 0 )
-	ROM_LOAD( "expansion.e5",			0x0000, 0x1000, CRC(52cb44e2) SHA1(3f9a3d9940b36d4fee5eca9f1359c99d7ed545b9) )
+	ROM_LOAD( "expansion.e5",		  0x0000, 0x1000, CRC(52cb44e2) SHA1(3f9a3d9940b36d4fee5eca9f1359c99d7ed545b9) )
 
 	ROM_REGION( 0x1000, "fm31", 0 )
-	ROM_LOAD( "f&m.expansion.3.1.e5",	0x0000, 0x1000, CRC(818ca2ef) SHA1(ea000097622e7fd472d53e7899e3c83773433045) )
+	ROM_LOAD( "f&m.expansion.3.1.e5", 0x0000, 0x1000, CRC(818ca2ef) SHA1(ea000097622e7fd472d53e7899e3c83773433045) )
 
 	ROM_REGION( 0x1000, "fm32", 0 )
-	ROM_LOAD( "f&m.expansion.3.2.e5",	0x0000, 0x1000, CRC(0f0fc960) SHA1(eb6b6e7bc9e761d13554482025d8cb5e260c0619) )
+	ROM_LOAD( "f&m.expansion.3.2.e5", 0x0000, 0x1000, CRC(0f0fc960) SHA1(eb6b6e7bc9e761d13554482025d8cb5e260c0619) )
 ROM_END
 
 
@@ -268,7 +268,7 @@ void comx_eb_device::comx_io_w(offs_t offset, UINT8 data)
 {
 	if (offset == 1)
 	{
-		m_select = data;
+		m_select = data >> 1;
 	}
 	
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)

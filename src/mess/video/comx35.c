@@ -116,7 +116,7 @@ bool comx35_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 	}
 	else
 	{
-		//m_crtc->update(&bitmap, &cliprect);
+		m_expansion->screen_update(screen, bitmap, cliprect);
 	}
 
 	return false;
