@@ -293,6 +293,14 @@ void comx_eb_device::comx_io_w(offs_t offset, UINT8 data)
 	if (offset == 1)
 	{
 		m_select = data >> 1;
+		
+		for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+		{
+			if (m_slot[slot] != NULL)
+			{
+				m_slot[slot]->ds_w(BIT(m_select, slot));
+			}
+		}
 	}
 	
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)

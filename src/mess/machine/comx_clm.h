@@ -49,6 +49,7 @@ protected:
     virtual void device_config_complete() { m_shortname = "comx_clm"; }
 
 	// device_comx_expansion_card_interface overrides
+	virtual void comx_ds_w(int state);
 	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom);
 	virtual void comx_mwr_w(offs_t offset, UINT8 data);
 	virtual bool comx_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
@@ -59,9 +60,10 @@ private:
 	
 	required_device<mc6845_device> m_crtc;
 
-	UINT8 *m_rom;				// program ROM
-	UINT8 *m_char_rom;			// character ROM
-	UINT8 *m_video_ram;			// video RAM
+	int m_ds;				// device select
+	UINT8 *m_rom;			// program ROM
+	UINT8 *m_char_rom;		// character ROM
+	UINT8 *m_video_ram;		// video RAM
 };
 
 

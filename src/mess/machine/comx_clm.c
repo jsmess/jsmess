@@ -120,7 +120,10 @@ static MC6845_UPDATE_ROW( comx_clm_update_row )
 
 WRITE_LINE_MEMBER( comx_clm_device::hsync_w )
 {
-	m_slot->ef4_w(state);
+	if (m_ds)
+	{
+		m_slot->ef4_w(state);
+	}
 }
 
 static const mc6845_interface crtc_intf =
@@ -200,7 +203,8 @@ comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag,
 	device_t(mconfig, COMX_CLM, "COMX 80 Column Card", tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	device_slot_card_interface(mconfig, *this),
-	m_crtc(*this, MC6845_TAG)
+	m_crtc(*this, MC6845_TAG),
+	m_ds(0)
 {
 }
 
@@ -218,6 +222,7 @@ void comx_clm_device::device_start()
 	m_video_ram = auto_alloc_array(machine(), UINT8, VIDEORAM_SIZE);
 
 	// state saving
+	save_item(NAME(m_ds));
 	save_pointer(NAME(m_video_ram), VIDEORAM_SIZE);
 }
 
@@ -228,6 +233,16 @@ void comx_clm_device::device_start()
 
 void comx_clm_device::device_reset()
 {
+}
+
+
+//-------------------------------------------------
+//  comx_ds_w - device select write
+//-------------------------------------------------
+
+void comx_clm_device::comx_ds_w(int state)
+{
+	m_ds = state;
 }
 
 
