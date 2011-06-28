@@ -105,7 +105,6 @@ static COMX_EXPANSION_INTERFACE( expansion_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -115,10 +114,10 @@ static COMX_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( comx_eb )
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT1_TAG, comx_expansion_cards, NULL)
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT2_TAG, comx_expansion_cards, NULL)
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT3_TAG, comx_expansion_cards, NULL)
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT4_TAG, comx_expansion_cards, NULL)
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT1_TAG, comx_expansion_cards, "fd")
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT2_TAG, comx_expansion_cards, "clm")
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT3_TAG, comx_expansion_cards, "joy")
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT4_TAG, comx_expansion_cards, "ram")
 MACHINE_CONFIG_END
 
 
@@ -178,37 +177,6 @@ void comx_eb_device::device_reset()
 
 
 //-------------------------------------------------
-//  comx_mrd_r - memory read
-//-------------------------------------------------
-
-UINT8 comx_eb_device::comx_mrd_r(offs_t offset)
-{
-	UINT8 data = 0;
-	
-	if (offset >= 0x1000 && offset < 0x1800)
-	{
-		data = m_rom[offset & 0x7ff];
-	}
-	else if (offset >= 0xe000 && offset < 0xf000)
-	{
-		data = m_rom[offset & 0xfff];
-	}
-	else
-	{
-		for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
-		{
-			if (BIT(m_select, slot) && m_slot[slot] != NULL)
-			{
-				data |= m_slot[slot]->comx_mrd_r(offset);
-			}
-		}
-	}
-	
-	return data;
-}
-
-
-//-------------------------------------------------
 //  comx_q_w - Q write
 //-------------------------------------------------
 
@@ -221,6 +189,38 @@ void comx_eb_device::comx_q_w(int state)
 			m_slot[slot]->comx_q_w(state);
 		}
 	}
+}
+
+
+//-------------------------------------------------
+//  comx_mrd_r - memory read
+//-------------------------------------------------
+
+UINT8 comx_eb_device::comx_mrd_r(offs_t offset, int *extrom)
+{
+	UINT8 data = 0;
+	
+	if (offset >= 0x1000 && offset < 0x1800)
+	{
+		data = m_rom[offset & 0x7ff];
+		*extrom = 0;
+	}
+	else if (offset >= 0xe000 && offset < 0xf000)
+	{
+		data = m_rom[offset & 0xfff];
+	}
+	else
+	{
+		for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+		{
+			if (BIT(m_select, slot) && m_slot[slot] != NULL)
+			{
+				data |= m_slot[slot]->comx_mrd_r(offset, extrom);
+			}
+		}
+	}
+	
+	return data;
 }
 
 

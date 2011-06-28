@@ -76,7 +76,6 @@ void comx_expansion_bus_device::device_config_complete()
     	memset(&m_out_ef4_cb, 0, sizeof(m_out_ef4_cb));
     	memset(&m_out_wait_cb, 0, sizeof(m_out_wait_cb));
     	memset(&m_out_clear_cb, 0, sizeof(m_out_clear_cb));
-    	memset(&m_out_extrom_cb, 0, sizeof(m_out_extrom_cb));
 	}
 }
 
@@ -108,7 +107,6 @@ void comx_expansion_bus_device::device_start()
 	m_out_ef4_func.resolve(m_out_ef4_cb, *this);
 	m_out_wait_func.resolve(m_out_wait_cb, *this);
 	m_out_clear_func.resolve(m_out_clear_cb, *this);
-	m_out_extrom_func.resolve(m_out_extrom_cb, *this);
 }
 
 
@@ -135,13 +133,13 @@ void comx_expansion_bus_device::add_card(device_comx_expansion_card_interface *c
 //  mrd_r - memory read
 //-------------------------------------------------
 
-READ8_MEMBER( comx_expansion_bus_device::mrd_r )
+UINT8 comx_expansion_bus_device::mrd_r(offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
 	
 	if (m_card != NULL)
 	{
-		data = m_card->comx_mrd_r(offset);
+		data = m_card->comx_mrd_r(offset, extrom);
 	}
 	
 	return data;
@@ -152,7 +150,7 @@ READ8_MEMBER( comx_expansion_bus_device::mrd_r )
 //  mwr_w - memory write
 //-------------------------------------------------
 
-WRITE8_MEMBER( comx_expansion_bus_device::mwr_w )
+void comx_expansion_bus_device::mwr_w(offs_t offset, UINT8 data)
 {
 	if (m_card != NULL)
 	{
@@ -165,7 +163,7 @@ WRITE8_MEMBER( comx_expansion_bus_device::mwr_w )
 //  io_r - I/O read
 //-------------------------------------------------
 
-READ8_MEMBER( comx_expansion_bus_device::io_r )
+UINT8 comx_expansion_bus_device::io_r(offs_t offset)
 {
 	UINT8 data = 0;
 	
@@ -182,7 +180,7 @@ READ8_MEMBER( comx_expansion_bus_device::io_r )
 //  sout_w - I/O write
 //-------------------------------------------------
 
-WRITE8_MEMBER( comx_expansion_bus_device::io_w )
+void comx_expansion_bus_device::io_w(offs_t offset, UINT8 data)
 {
 	if (m_card != NULL)
 	{
@@ -225,7 +223,6 @@ WRITE_LINE_MEMBER( comx_expansion_bus_device::int_w ) { m_out_int_func(state); }
 WRITE_LINE_MEMBER( comx_expansion_bus_device::ef4_w ) { m_out_ef4_func(state); }
 WRITE_LINE_MEMBER( comx_expansion_bus_device::wait_w ) { m_out_wait_func(state); }
 WRITE_LINE_MEMBER( comx_expansion_bus_device::clear_w ) { m_out_clear_func(state); }
-WRITE_LINE_MEMBER( comx_expansion_bus_device::extrom_w ) { m_out_extrom_func(state); }
 
 
 

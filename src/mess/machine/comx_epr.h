@@ -44,7 +44,7 @@ protected:
     virtual void device_config_complete() { m_shortname = "comx_epr"; }
 
 	// device_comx_expansion_card_interface overrides
-	virtual UINT8 comx_mrd_r(offs_t offset);
+	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom);
 
 private:
 	// internal state

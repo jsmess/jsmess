@@ -183,7 +183,7 @@ comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, d
 
 void comx_fd_device::device_start()
 {
-	m_bus = machine().device<comx_expansion_bus_device>(COMX_EXPANSION_TAG);
+	m_bus = machine().device<comx_expansion_bus_device>(COMX_EXPANSION_BUS_TAG);
 
 	m_rom = subregion("c000")->base();
 
@@ -219,10 +219,15 @@ void comx_fd_device::comx_q_w(int state)
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_fd_device::comx_mrd_r(offs_t offset)
+UINT8 comx_fd_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
 	
+	if (offset >= 0x0dd0 && offset < 0x0ddf)
+	{
+		data = m_rom[offset & 0xfff];
+		*extrom = 0;
+	}
 	if (offset >= 0xc000 && offset < 0xd000)
 	{
 		data = m_rom[offset & 0xfff];

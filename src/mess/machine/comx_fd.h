@@ -53,7 +53,7 @@ protected:
 
 	// device_comx_expansion_card_interface overrides
 	virtual void comx_q_w(int state);
-	virtual UINT8 comx_mrd_r(offs_t offset);
+	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom);
 	virtual UINT8 comx_io_r(offs_t offset);
 	virtual void comx_io_w(offs_t offset, UINT8 data);
 
