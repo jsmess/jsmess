@@ -61,7 +61,6 @@ TOOLS += \
 	srcclean$(EXE) \
 	src2html$(EXE) \
 	split$(EXE) \
-	pngcmp$(EXE) \
 
 
 
@@ -193,17 +192,3 @@ SPLITOBJS = \
 split$(EXE): $(SPLITOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
-
-
-
-#-------------------------------------------------
-# pngcmp
-#-------------------------------------------------
-
-PNGCMPOBJS = \
-	$(TOOLSOBJ)/pngcmp.o \
-
-pngcmp$(EXE): $(PNGCMPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
-	
