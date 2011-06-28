@@ -741,14 +741,25 @@ endif
 $(OBJ)/%.o: $(SRC)/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+ifdef CPPCHECK
+	@$(CPPCHECK) $(CDEFS) $(INCPATH) $<
+endif
 
 $(OBJ)/%.pp: $(SRC)/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -E $< -o $@
+ifdef CPPCHECK
+	@$(CPPCHECK) $(CDEFS) $(INCPATH) $<
+endif
+
 
 $(OBJ)/%.s: $(SRC)/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
+ifdef CPPCHECK
+	@$(CPPCHECK) $(CDEFS) $(INCPATH) $<
+endif
+
 
 $(OBJ)/%.lh: $(SRC)/%.lay $(FILE2STR_TARGET)
 	@echo Converting $<...
@@ -762,6 +773,10 @@ $(OBJ)/%.fh: $(SRC)/%.png $(PNG2BDC_TARGET) $(FILE2STR_TARGET)
 $(DRIVLISTOBJ): $(DRIVLISTSRC)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+ifdef CPPCHECK
+	@$(CPPCHECK) $(CDEFS) $(INCPATH) $<
+endif
+
 
 $(DRIVLISTSRC): $(SRC)/$(TARGET)/$(SUBTARGET).lst $(MAKELIST_TARGET)
 	@echo Building driver list $<...
