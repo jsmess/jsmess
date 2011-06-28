@@ -156,12 +156,12 @@ comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, d
 
 void comx_eb_device::device_start()
 {
-	m_bus = machine().device<comx_expansion_bus_device>(COMX_EXPANSION_TAG);
+	m_bus = machine().device<comx_expansion_bus_device>(COMX_EXPANSION_BUS_TAG);
 
-	m_slot1 = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT1_TAG));
-	m_slot2 = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT2_TAG));
-	m_slot3 = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT3_TAG));
-	m_slot4 = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT4_TAG));
+	m_slot[0] = dynamic_cast<device_comx_expansion_card_interface *>(subdevice(SLOT1_TAG));
+	m_slot[1] = dynamic_cast<device_comx_expansion_card_interface *>(subdevice(SLOT2_TAG));
+	m_slot[2] = dynamic_cast<device_comx_expansion_card_interface *>(subdevice(SLOT3_TAG));
+	m_slot[3] = dynamic_cast<device_comx_expansion_card_interface *>(subdevice(SLOT4_TAG));
 	m_owner = dynamic_cast<comx_expansion_slot_device *>(owner());
 	
 	m_rom = subregion("e000")->base();
@@ -185,9 +185,23 @@ UINT8 comx_eb_device::comx_mrd_r(offs_t offset)
 {
 	UINT8 data = 0;
 	
-	if (offset >= 0xe000 && offset < 0xf000)
+	if (offset >= 0x1000 && offset < 0x1800)
+	{
+		data = m_rom[offset & 0x7ff];
+	}
+	else if (offset >= 0xe000 && offset < 0xf000)
 	{
 		data = m_rom[offset & 0xfff];
+	}
+	else
+	{
+		for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+		{
+			if (BIT(m_select, slot) && m_slot[slot] != NULL)
+			{
+				data |= m_slot[slot]->comx_mrd_r(offset);
+			}
+		}
 	}
 	
 	return data;
@@ -200,6 +214,13 @@ UINT8 comx_eb_device::comx_mrd_r(offs_t offset)
 
 void comx_eb_device::comx_q_w(int state)
 {
+	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+	{
+		if (BIT(m_select, slot) && m_slot[slot] != NULL)
+		{
+			m_slot[slot]->comx_q_w(state);
+		}
+	}
 }
 
 
@@ -209,6 +230,13 @@ void comx_eb_device::comx_q_w(int state)
 
 void comx_eb_device::comx_mwr_w(offs_t offset, UINT8 data)
 {
+	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+	{
+		if (BIT(m_select, slot) && m_slot[slot] != NULL)
+		{
+			m_slot[slot]->comx_mwr_w(offset, data);
+		}
+	}
 }
 
 
@@ -218,7 +246,17 @@ void comx_eb_device::comx_mwr_w(offs_t offset, UINT8 data)
 
 UINT8 comx_eb_device::comx_io_r(offs_t offset)
 {
-	return 0;
+	UINT8 data = 0;
+	
+	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+	{
+		if (BIT(m_select, slot) && m_slot[slot] != NULL)
+		{
+			data |= m_slot[slot]->comx_io_r(offset);
+		}
+	}
+
+	return data;
 }
 
 
@@ -228,6 +266,18 @@ UINT8 comx_eb_device::comx_io_r(offs_t offset)
 
 void comx_eb_device::comx_io_w(offs_t offset, UINT8 data)
 {
+	if (offset == 1)
+	{
+		m_select = data;
+	}
+	
+	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+	{
+		if (BIT(m_select, slot) && m_slot[slot] != NULL)
+		{
+			m_slot[slot]->comx_io_w(offset, data);
+		}
+	}
 }
 
 
