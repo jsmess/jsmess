@@ -33,6 +33,7 @@
 #define CDP1869_TAG			"u2"
 #define CDP1802_TAG			"u3"
 #define CDP1871_TAG			"u4"
+#define EXPANSION_TAG		"slot"
 
 #define COMX35_CHARRAM_SIZE 0x800
 #define COMX35_CHARRAM_MASK 0x7ff
@@ -47,7 +48,7 @@ public:
 		  m_kbe(*this, CDP1871_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_expansion(*this, COMX_EXPANSION_BUS_TAG)
+		  m_expansion(*this, EXPANSION_TAG)
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
