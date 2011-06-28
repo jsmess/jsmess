@@ -8,13 +8,13 @@
 **********************************************************************
 
 					GND		 1		A		GND
-					NC		 2		B		NC (DS)
+					NC		 2		B		DS
 					+5V		 3		C		V+
 					D0		 4		D		D1
 					D2		 5		E		D3
 					D4		 6		F		D5
 					D6		 7		H		D7
-					NC (DP)	 8		J		Q
+					_DP		 8		J		Q
 					_CLEAR	 9		K		_MRD
 					TPA		10		L		N0
 					N1		11		M		N2
@@ -89,7 +89,8 @@ public:
 	device_comx_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_comx_expansion_card_interface();
 
-	// interrupts
+	// signals
+	virtual void comx_ds_w(int state) { };
 	virtual void comx_q_w(int state) { };
 
 	// memory access
@@ -122,6 +123,7 @@ public:
 	UINT8 io_r(offs_t offset);
 	void io_w(offs_t offset, UINT8 data);
 
+	DECLARE_WRITE_LINE_MEMBER( ds_w );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 
 	DECLARE_WRITE_LINE_MEMBER( int_w );

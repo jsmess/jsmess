@@ -179,6 +179,19 @@ void comx_expansion_slot_device::io_w(offs_t offset, UINT8 data)
 
 
 //-------------------------------------------------
+//  ds_w - device select write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( comx_expansion_slot_device::ds_w )
+{
+	if (m_card != NULL)
+	{
+		m_card->comx_ds_w(state);
+	}
+}
+
+
+//-------------------------------------------------
 //  q_w - Q write
 //-------------------------------------------------
 

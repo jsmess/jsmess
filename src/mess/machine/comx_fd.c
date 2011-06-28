@@ -84,7 +84,7 @@ static const floppy_interface floppy_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
+	FLOPPY_STANDARD_5_25_DSSD,
 	FLOPPY_OPTIONS_NAME(comx35),
 	"floppy_5_25",
 	NULL
@@ -98,12 +98,13 @@ WRITE_LINE_MEMBER( comx_fd_device::intrq_w )
 WRITE_LINE_MEMBER( comx_fd_device::drq_w )
 {
 	m_drq = state;
+
 	update_ef4();
 }
 
 static const wd17xx_interface fdc_intf =
 {
-	DEVCB_NULL,
+	DEVCB_LINE_VCC,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, comx_fd_device, intrq_w),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, comx_fd_device, drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
@@ -137,18 +138,14 @@ machine_config_constructor comx_fd_device::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  comx_fd_device - constructor
+//  update_ef4 - 
 //-------------------------------------------------
 
 inline void comx_fd_device::update_ef4()
 {
-	if (m_ef4_enable)
+	if (m_ds)
 	{
 		m_slot->ef4_w(m_drq);
-	}
-	else
-	{
-		m_slot->ef4_w(CLEAR_LINE);
 	}
 }
 
@@ -169,10 +166,11 @@ comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, d
 	m_fdc(*this, WD1770_TAG),
 	m_floppy0(*this, FLOPPY_0),
 	m_floppy1(*this, FLOPPY_1),
+	m_ds(0),
 	m_q(0),
+	m_addr(0),
 	m_intrq(0),
-	m_drq(0),
-	m_ef4_enable(0)
+	m_drq(0)
 {
 }
 
@@ -188,11 +186,11 @@ void comx_fd_device::device_start()
 	m_rom = subregion("c000")->base();
 
 	// state saving
+	save_item(NAME(m_ds));
 	save_item(NAME(m_q));
 	save_item(NAME(m_addr));
 	save_item(NAME(m_intrq));
 	save_item(NAME(m_drq));
-	save_item(NAME(m_ef4_enable));
 }
 
 
@@ -212,6 +210,18 @@ void comx_fd_device::device_reset()
 void comx_fd_device::comx_q_w(int state)
 {
 	m_q = state;
+}
+
+
+//-------------------------------------------------
+//  comx_ds_w - device select write
+//-------------------------------------------------
+
+void comx_fd_device::comx_ds_w(int state)
+{
+	m_ds = state;
+
+	update_ef4();
 }
 
 
@@ -295,9 +305,6 @@ void comx_fd_device::comx_io_w(offs_t offset, UINT8 data)
 			{
 				wd17xx_set_drive(m_fdc, 1);
 			}
-
-			m_ef4_enable = BIT(data, 4);
-			update_ef4();
 
 			wd17xx_set_side(m_fdc, BIT(data, 5));
 		}

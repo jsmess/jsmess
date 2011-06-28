@@ -52,6 +52,7 @@ protected:
     virtual void device_config_complete() { m_shortname = "comx_fd"; }
 
 	// device_comx_expansion_card_interface overrides
+	virtual void comx_ds_w(int state);
 	virtual void comx_q_w(int state);
 	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom);
 	virtual UINT8 comx_io_r(offs_t offset);
@@ -68,12 +69,12 @@ private:
 	required_device<device_t> m_floppy1;
 
 	// floppy state
+	int m_ds;				// device select
 	UINT8 *m_rom;
 	int m_q;				// FDC register select
 	int m_addr;				// FDC address
 	int m_intrq;			// interrupt request
 	int m_drq;				// data request
-	int m_ef4_enable;		// EF4 enable
 };
 
 
