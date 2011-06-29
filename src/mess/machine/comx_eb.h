@@ -52,6 +52,10 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
+	// not really public
+	void set_int(const char *tag, int state);
+	void set_ef4(const char *tag, int state);
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -65,13 +69,15 @@ protected:
 	virtual UINT8 comx_io_r(offs_t offset);
 	virtual void comx_io_w(offs_t offset, UINT8 data);
 	virtual bool comx_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-
+	
 	// internal state
 	comx_expansion_slot_device *m_owner_slot;
 
 	UINT8 *m_rom;				// program ROM
 	
 	comx_expansion_slot_device	*m_slot[MAX_EB_SLOTS];
+	int m_int[MAX_EB_SLOTS];
+	int m_ef4[MAX_EB_SLOTS];
 	
 	UINT8 m_select;
 };

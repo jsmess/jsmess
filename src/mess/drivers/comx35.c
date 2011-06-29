@@ -339,19 +339,6 @@ static const cassette_interface cassette_intf =
 	NULL
 };
 
-static const floppy_interface floppy_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	FLOPPY_OPTIONS_NAME(comx35),
-	"floppy_5_25",
-	NULL
-};
-
 WRITE_LINE_MEMBER( comx35_state::ef4_w )
 {
 	m_cdp1802_ef4 = state;
@@ -462,7 +449,7 @@ MACHINE_CONFIG_END
 
 ROM_START( comx35p )
 	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
-	ROM_DEFAULT_BIOS( "basic101" )
+	ROM_DEFAULT_BIOS( "basic100" )
 	ROM_SYSTEM_BIOS( 0, "basic100", "COMX BASIC V1.00" )
 	ROMX_LOAD( "comx_10.u21", 0x0000, 0x4000, CRC(68d0db2d) SHA1(062328361629019ceed9375afac18e2b7849ce47), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "basic101", "COMX BASIC V1.01" )

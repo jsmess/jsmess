@@ -102,14 +102,14 @@ SLOT_INTERFACE_END
 
 WRITE_LINE_DEVICE_HANDLER( int_w )
 {
-	comx_expansion_slot_device *slot = dynamic_cast<comx_expansion_slot_device *>(device->owner()->owner());
-	slot->int_w(state);
+	comx_eb_device *eb = downcast<comx_eb_device *>(device->owner());
+	eb->set_int(device->tag(), state);
 }
 
 WRITE_LINE_DEVICE_HANDLER( ef4_w )
 {
-	comx_expansion_slot_device *slot = dynamic_cast<comx_expansion_slot_device *>(device->owner()->owner());
-	slot->ef4_w(state);
+	comx_eb_device *eb = downcast<comx_eb_device *>(device->owner());
+	eb->set_ef4(device->tag(), state);
 }
 
 WRITE_LINE_DEVICE_HANDLER( wait_w )
@@ -158,6 +158,67 @@ machine_config_constructor comx_eb_device::device_mconfig_additions() const
 
 
 //**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  set_int - set INT line state
+//-------------------------------------------------
+
+void comx_eb_device::set_int(const char *tag, int state)
+{
+	int slot = 0;
+	
+	for (slot = 0; slot < MAX_EB_SLOTS; slot++)
+	{
+		if (!strcmp(tag, m_slot[slot]->tag())) break;
+	}
+
+	assert(slot < MAX_EB_SLOTS);
+	
+	m_int[slot] = state;
+
+	int irq = CLEAR_LINE;
+	
+	for (slot = 0; slot < MAX_EB_SLOTS; slot++)
+	{
+		irq |= m_int[slot];
+	}
+
+	m_owner_slot->int_w(irq);
+}
+
+
+//-------------------------------------------------
+//  set_ef4 - set EF4 line state
+//-------------------------------------------------
+
+void comx_eb_device::set_ef4(const char *tag, int state)
+{
+	int slot = 0;
+	
+	for (slot = 0; slot < MAX_EB_SLOTS; slot++)
+	{
+		if (!strcmp(tag, m_slot[slot]->tag())) break;
+	}
+
+	assert(slot < MAX_EB_SLOTS);
+	
+	m_ef4[slot] = state;
+	
+	int ef4 = CLEAR_LINE;
+	
+	for (slot = 0; slot < MAX_EB_SLOTS; slot++)
+	{
+		ef4 |= m_ef4[slot];
+	}
+
+	m_owner_slot->ef4_w(ef4);
+}
+
+
+
+//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -186,6 +247,12 @@ void comx_eb_device::device_start()
 	m_slot[1] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT2_TAG));
 	m_slot[2] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT3_TAG));
 	m_slot[3] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT4_TAG));
+	
+	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+	{
+		m_int[slot] = CLEAR_LINE;
+		m_ef4[slot] = CLEAR_LINE;
+	}
 	
 	m_rom = subregion("e000")->base();
 }
