@@ -97,7 +97,7 @@ UINT8 comx_joy_device::comx_io_r(offs_t offset)
 	{
 		data = input_port_read(this, "JOY1");
 	}
-	else if (offset == 1)
+	else if (offset == 4)
 	{
 		data = input_port_read(this, "JOY2");
 	}

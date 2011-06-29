@@ -35,7 +35,6 @@ public:
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
 	// device-level overrides
@@ -45,17 +44,20 @@ protected:
 
 	// device_comx_expansion_card_interface overrides
 	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom);
+	virtual void comx_io_w(offs_t offset, UINT8 data);
 
 private:
 	// internal state
 	comx_expansion_slot_device *m_slot;
 
+	UINT8 m_select;
 	UINT8 *m_rom;				// program ROM
+	UINT8 *m_eprom;				// EPROMs
 };
 
 
 // device type definition
-extern const device_type COMX_THM;
+extern const device_type COMX_EPR;
 
 
 #endif

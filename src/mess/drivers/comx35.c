@@ -32,10 +32,6 @@ READ8_MEMBER( comx35_state::mem_r )
 	{
 		data = m_vis->char_ram_r(space, offset & 0x3ff);
 	}
-	else if (offset >= 0xf800)
-	{
-		data = m_vis->page_ram_r(space, offset & 0x3ff);
-	}
 	
 	return data;
 }
@@ -360,6 +356,7 @@ static SLOT_INTERFACE_START( comx_expansion_cards )
 	SLOT_INTERFACE("joy", COMX_JOY)
 	SLOT_INTERFACE("prn", COMX_PRN)
 	SLOT_INTERFACE("thm", COMX_THM)
+	SLOT_INTERFACE("epr", COMX_EPR)
 SLOT_INTERFACE_END
 
 static TIMER_CALLBACK( reset_tick )
@@ -375,11 +372,11 @@ void comx35_state::machine_start()
 	m_reset_timer = machine().scheduler().timer_alloc(FUNC(reset_tick));
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_reset);
-	state_save_register_global(machine(), m_cdp1802_q);
-	state_save_register_global(machine(), m_cdp1802_ef4);
-	state_save_register_global(machine(), m_iden);
-	state_save_register_global(machine(), m_dma);
+	save_item(NAME(m_reset));
+	save_item(NAME(m_cdp1802_q));
+	save_item(NAME(m_cdp1802_ef4));
+	save_item(NAME(m_iden));
+	save_item(NAME(m_dma));
 }
 
 void comx35_state::machine_reset()
