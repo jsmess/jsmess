@@ -91,9 +91,9 @@
 	const abcbus_interface (_name) =
 
 
-#define MCFG_ABCBUS_SLOT_ADD(_num, _tag, _slot_intf, _def_slot) \
+#define MCFG_ABCBUS_SLOT_ADD(_num, _tag, _slot_intf, _def_slot, _def_inp) \
     MCFG_DEVICE_ADD(_tag, ABCBUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
 	abcbus_slot_device::static_set_abcbus_slot(*device, ABCBUS_TAG, _num);
 
 

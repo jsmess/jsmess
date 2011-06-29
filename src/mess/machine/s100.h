@@ -94,9 +94,9 @@
 	const s100_bus_interface (_name) =
 
 
-#define MCFG_S100_SLOT_ADD(_num, _tag, _slot_intf, _def_slot) \
+#define MCFG_S100_SLOT_ADD(_num, _tag, _slot_intf, _def_slot, _def_inp) \
     MCFG_DEVICE_ADD(_tag, S100_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
 	s100_slot_device::static_set_s100_slot(*device, S100_TAG, _num); \
 
 

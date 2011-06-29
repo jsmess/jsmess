@@ -659,11 +659,11 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 	
 	// ECB bus
 	MCFG_ECBBUS_ADD(Z80_TAG, ecb_intf)
-	MCFG_ECBBUS_SLOT_ADD(1, "ecb_1", prof80_ecb_cards, "grip21")
-	MCFG_ECBBUS_SLOT_ADD(2, "ecb_2", prof80_ecb_cards, NULL)
-	MCFG_ECBBUS_SLOT_ADD(3, "ecb_3", prof80_ecb_cards, NULL)
-	MCFG_ECBBUS_SLOT_ADD(4, "ecb_4", prof80_ecb_cards, NULL)
-	MCFG_ECBBUS_SLOT_ADD(5, "ecb_5", prof80_ecb_cards, NULL)
+	MCFG_ECBBUS_SLOT_ADD(1, "ecb_1", prof80_ecb_cards, "grip21", NULL)
+	MCFG_ECBBUS_SLOT_ADD(2, "ecb_2", prof80_ecb_cards, NULL, NULL)
+	MCFG_ECBBUS_SLOT_ADD(3, "ecb_3", prof80_ecb_cards, NULL, NULL)
+	MCFG_ECBBUS_SLOT_ADD(4, "ecb_4", prof80_ecb_cards, NULL, NULL)
+	MCFG_ECBBUS_SLOT_ADD(5, "ecb_5", prof80_ecb_cards, NULL, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

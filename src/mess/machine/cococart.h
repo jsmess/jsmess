@@ -128,10 +128,10 @@ public:
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_COCO_CARTRIDGE_ADD(_tag,_config,_slot_intf,_def_slot) \
+#define MCFG_COCO_CARTRIDGE_ADD(_tag,_config,_slot_intf,_def_slot, _def_inp) \
 	MCFG_DEVICE_ADD(_tag, COCOCART_SLOT, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp)
 
 #define MCFG_COCO_CARTRIDGE_REMOVE(_tag)		\
     MCFG_DEVICE_REMOVE(_tag)

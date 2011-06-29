@@ -741,11 +741,11 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 
 	// ABC bus
 	MCFG_ABCBUS_ADD(Z80_TAG, abcbus_intf)
-	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc80_abcbus_cards, "slow")
-	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc80_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc80_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc80_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc80_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc80_abcbus_cards, "slow", NULL)
+	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc80_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc80_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc80_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc80_abcbus_cards, NULL, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
