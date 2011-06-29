@@ -12,28 +12,25 @@
 
 #include "includes/eti660.h"
 
-#define RX \
-	cpu_get_reg(m_maincpu, COSMAC_R0 + cpu_get_reg(m_maincpu, COSMAC_X))
-
 /* Read/Write Handlers */
 
 READ8_MEMBER( eti660_state::pia_r )
 {
-	int pia_offset = RX & 0x03;
+	int pia_offset = m_maincpu->get_memory_address() & 0x03;
 
 	return m_pia->read(space, pia_offset);
 }
 
 WRITE8_MEMBER( eti660_state::pia_w )
 {
-	int pia_offset = RX & 0x03;
+	int pia_offset = m_maincpu->get_memory_address() & 0x03;
 
 	m_pia->write(space, pia_offset, data);
 }
 
 WRITE8_MEMBER( eti660_state::colorram_w )
 {
-	int colorram_offset = RX & 0xff;
+	int colorram_offset = m_maincpu->get_memory_address() & 0xff;
 
 	colorram_offset = ((colorram_offset & 0xf8) >> 1) || (colorram_offset & 0x03);
 
