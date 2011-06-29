@@ -1,4 +1,56 @@
-﻿0.142u6
+﻿0.143
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+- PMI80 (except for cassette) [Robbbert]
+- SDK85 [Robbbert]
+- SDK86 [Robbbert]
+- SELZ80 [Robbbert]
+- ACRNSYS1 (except for cassette) [Robbbert]
+
+Skeleton drivers:
+-----------------
+- Intel MDS [Robbbert]
+
+System Driver Changes:
+----------------------
+- prof80: Refactored the ECB bus to use slot interface, and 
+	separated GRIP into a slot device. [Curt Coder]
+- intv: Implemented scrolling  [Huygens]
+  Implemented reading from stic registers other than collision
+  Bug 167 - Diagnostic cartridge fixed
+- nakajies: Added dump for the DreamWriter 450.
+	[Roberto Carlos Fernandez Gerhardt, Wilbert Pol]
+- prose2000: update a lot of comments, bare beginnings of 
+	upd7720 px line and int support. [Lord Nightmare]
+- [intv] Proper rendering of overscan borders and native resolution,  [H@P]
+	along with various updates and cleanups
+	* Converted intv driver to use native Intellivision resolution of 159x192.  
+		Scaled intvkbd driver so carts look correct.
+	* Added overscan borders.  Approximate, but at least measured on an actual Intellivision.
+	* Added a STIC header file, defining various object sizes, and register and bit names.
+	* Cleaned up render_color_stack_mode() and render_fg_bg_mode() loops, 
+		eliminating the ugly fix-ups at the end of each row.
+	* Updated the code found in UNUSED_FUNCTION, but neither compiled nor tested it.
+
+Software Lists:
+----------------
+- snes.xml: softlist wip documentation and redump [MESSfan]
+- a800.xml: added some extension and support disks (+ comments) to the list. [K1W1]
+- a5200.xml: replaced ballblazer dump [K1W1]
+- snes.xml: Added a new snes dump [badinsults, d4s, MESSfan] (nw)
+- intv.hsi: Some corrections to the Intellivision hash file [John Rieman]
+
+Source Changes:
+----------------
+- Added device types for all known WD17XX variants, and enforced inverted DAL lines 
+	with e.g. FD1771/FD1791. Used correct variants in drivers, except TRS-80. [Curt Coder]
+
+0.142u6
 
 New System Drivers Supported:
 -----------------------------
