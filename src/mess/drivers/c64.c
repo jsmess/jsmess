@@ -343,6 +343,7 @@ C64DTV TODO:
 #include "machine/c1541.h"
 #include "machine/c2040.h"
 #include "machine/interpod.h"
+#include "machine/c64exp.h"
 
 #include "includes/c64.h"
 
@@ -681,6 +682,19 @@ static const vic2_interface ultimax_vic2_intf = {
 	c64_rdy_cb
 };
 
+static C64_EXPANSION_INTERFACE( c64_expansion_intf )
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
+	DEVCB_NULL, // DMA
+	DEVCB_NULL, // RESET
+	DEVCB_NULL, // GAME
+	DEVCB_NULL  // EXROM
+};
+
+static SLOT_INTERFACE_START( c64_expansion_cards )
+SLOT_INTERFACE_END
+
 
 /*************************************
  *
@@ -738,6 +752,8 @@ static MACHINE_CONFIG_START( c64, c64_state )
 
 	MCFG_FRAGMENT_ADD(c64_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
+	
+	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( c64pal, c64_state )
@@ -793,6 +809,8 @@ static MACHINE_CONFIG_START( c64pal, c64_state )
 
 	MCFG_FRAGMENT_ADD(c64_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
+	
+	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ultimax, c64 )
