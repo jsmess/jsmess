@@ -20,8 +20,13 @@ const device_type COMX_EPR = &device_creator<comx_epr_device>;
 //-------------------------------------------------
 
 ROM_START( comx_epr )
-	ROM_REGION( 0x2000, "c000", 0 )
+	ROM_REGION( 0x800, "f800", 0 )
 	ROM_LOAD( "f&m.eprom.board.1.1.bin", 0x0000, 0x0800, CRC(a042a31a) SHA1(13831a1350aa62a87988bfcc99c4b7db8ef1cf62) )
+
+	ROM_REGION( 0x10000, "eprom", 0 )
+	ROM_LOAD( "f&m.basic.bin",  	0x0000, 0x2000, CRC(22ab7b61) SHA1(68b5770bca37b1ba94083f944086884e612b5a1b) )
+	ROM_LOAD( "disk.utilities.bin", 0x2000, 0x2000, CRC(2576c945) SHA1(e80481054c6997a5f418d8a5872ac0110ae7b75a) )
+	ROM_LOAD( "tennismania.bin", 	0x4000, 0x2000, CRC(a956cc74) SHA1(8bc914f52f0dd2cf792da74ec4e9e333365619ef) )
 ROM_END
 
 
@@ -44,9 +49,10 @@ const rom_entry *comx_epr_device::device_rom_region() const
 //-------------------------------------------------
 
 comx_epr_device::comx_epr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, COMX_EPR, "COMX-35 F&M EPROM Card", tag, owner, clock),
+	device_t(mconfig, COMX_EPR, "COMX-35 F&M EPROM Switchboard", tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
-	device_slot_card_interface(mconfig, *this)
+	device_slot_card_interface(mconfig, *this),
+	m_select(0)
 {
 }
 
@@ -59,7 +65,11 @@ void comx_epr_device::device_start()
 {
 	m_slot = dynamic_cast<comx_expansion_slot_device *>(owner());
 
-	m_rom = subregion("c000")->base();
+	m_rom = subregion("f800")->base();
+	m_eprom = subregion("eprom")->base();
+	
+	// state saving
+	save_item(NAME(m_select));
 }
 
 
@@ -80,10 +90,28 @@ UINT8 comx_epr_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
 	
-	if (offset >= 0xc000 && offset < 0xd000)
+	if (offset >= 0xc000 && offset < 0xe000)
 	{
-		data = m_rom[offset & 0xfff];
+		offs_t address = (m_select << 13) | (offset & 0x1fff);
+		data = m_eprom[address];
+	}
+	else if (offset >= 0xf800)
+	{
+		data = m_rom[offset & 0x7ff];
 	}
 	
 	return data;
+}
+
+
+//-------------------------------------------------
+//  comx_io_w - I/O write
+//-------------------------------------------------
+
+void comx_epr_device::comx_io_w(offs_t offset, UINT8 data)
+{
+	if (offset == 1)
+	{
+		m_select = data >> 5;
+	}
 }
