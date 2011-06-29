@@ -56,9 +56,9 @@
     MCFG_DEVICE_CONFIG(_config) \
     isa8_device::static_set_cputag(*device, _cputag); \
 
-#define MCFG_ISA8_SLOT_ADD(_isatag, _num, _tag, _slot_intf, _def_slot) \
+#define MCFG_ISA8_SLOT_ADD(_isatag, _num, _tag, _slot_intf, _def_slot, _def_inp) \
     MCFG_DEVICE_ADD(_tag, ISA8_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
 	isa8_slot_device::static_set_isa8_slot(*device, _isatag, _num); \
 
 

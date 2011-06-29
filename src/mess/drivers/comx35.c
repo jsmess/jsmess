@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	MCFG_COMXPL80_ADD()
 	
 	// expansion bus
-	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb")
+	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb", NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -435,7 +435,7 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	MCFG_COMXPL80_ADD()
 	
 	// expansion bus
-	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb")
+	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb", NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

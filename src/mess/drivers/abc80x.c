@@ -1443,11 +1443,11 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 
 	// ABC bus
 	MCFG_ABCBUS_ADD(Z80_TAG, abcbus_intf)
-	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc800_abcbus_cards, "fast")
-	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc800_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc800_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc800_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc800_abcbus_cards, "fast", NULL)
+	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc800_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc800_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc800_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc800_abcbus_cards, NULL, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1494,11 +1494,11 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 
 	// ABC bus
 	MCFG_ABCBUS_ADD(Z80_TAG, abcbus_intf)
-	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc800_abcbus_cards, "fast")
-	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc800_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc800_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc800_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc800_abcbus_cards, "fast", NULL)
+	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc800_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc800_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc800_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc800_abcbus_cards, NULL, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1542,11 +1542,11 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 
 	// ABC bus
 	MCFG_ABCBUS_ADD(Z80_TAG, abcbus_intf)
-	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc800_abcbus_cards, "fast")
-	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc800_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc800_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc800_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc800_abcbus_cards, "fast", NULL)
+	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc800_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc800_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc800_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc800_abcbus_cards, NULL, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1581,11 +1581,11 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 
 	// ABC bus
 	MCFG_ABCBUS_ADD(Z80_TAG, abcbus_intf)
-	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc800_abcbus_cards, "fast")
-	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc800_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc800_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc800_abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc800_abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc800_abcbus_cards, "fast", NULL)
+	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc800_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc800_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc800_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc800_abcbus_cards, NULL, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
