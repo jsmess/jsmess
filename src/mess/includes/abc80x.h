@@ -14,6 +14,8 @@
 #include "machine/abc77.h"
 #include "machine/abc830.h"
 #include "machine/abcbus.h"
+#include "machine/abc_uni800.h"
+#include "machine/abc_slutprov.h"
 #include "machine/e0516.h"
 #include "machine/lux21046.h"
 #include "machine/z80ctc.h"

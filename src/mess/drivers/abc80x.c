@@ -134,33 +134,6 @@ Notes:
     PROM1   - Philips 82S131 512x4 Bipolar PROM "HRU II"
 
 
-UNI-800 PCB Layout
-------------------
-
-8120 821025 REV.3
-
-|-------------------------------------------|
-|                                           |
-|                   4164        PROM0   CN3 |
-|                   4164                    |
-|                   4164                    |
-|                   4164                    |
-|                   4164                    |
-|                   4164                    |
-|CN1                4164                CN2 |
-|                   4164                    |
-|-------------------------------------------|
-
-Notes:
-    Relevant IC's shown.
-
-    4164    - Hitachi HM4864P-2 64Kx1 RAM
-    PROM0   - Philips 82S129 256x4 Bipolar PROM ".800 1.2"
-    CN1     - 2x6 pin PCB header
-    CN2     - 2x10 pin PCB header
-    CN3     - 2x10 pin PCB header
-
-
 Keyboard PCB Layout
 -------------------
 
@@ -1240,6 +1213,8 @@ static const cassette_interface abc800_cassette_interface =
 
 static SLOT_INTERFACE_START( abc800_abcbus_cards )
 	SLOT_INTERFACE("fast", LUXOR_55_21046)
+	SLOT_INTERFACE("uni800", ABC_UNI800)
+	SLOT_INTERFACE("slutprov", ABC_SLUTPROV)
 SLOT_INTERFACE_END
 
 
@@ -1689,9 +1664,6 @@ ROM_START( abc800m )
 	ROM_REGION( 0x200, "hru2", 0 )
 	ROM_LOAD( "hru ii.3a", 0x0000, 0x0200, CRC(8e9d7cdc) SHA1(4ad16dc0992e31cdb2e644c7be81d334a56f7ad6) )
 
-	ROM_REGION( 0x100, "uni800", 0 )
-	ROM_LOAD( ".800 1.2.bin", 0x0000, 0x0100, CRC(df4897f8) SHA1(0c641f4cf321f0003da3fbd435edb138a9b949b4) )
-
 	ROM_REGION( 0x800, "abc850", 0 )
 	ROM_LOAD_OPTIONAL( "rodi202.bin",  0x0000, 0x0800, CRC(337b4dcf) SHA1(791ebeb4521ddc11fb9742114018e161e1849bdf) ) // Rodime RO202 (http://stason.org/TULARC/pc/hard-drives-hdd/rodime/RO202-11MB-5-25-FH-MFM-ST506.html)
 	ROM_LOAD_OPTIONAL( "basf6185.bin", 0x0000, 0x0800, CRC(06f8fe2e) SHA1(e81f2a47c854e0dbb096bee3428d79e63591059d) ) // BASF 6185 (http://stason.org/TULARC/pc/hard-drives-hdd/basf-magnetics/6185-22MB-5-25-FH-MFM-ST412.html)
@@ -1710,9 +1682,6 @@ ROM_START( abc800m )
 	ROM_REGION( 0x800, "xebec", 0 )
 	ROM_LOAD_OPTIONAL( "st4038.bin",   0x0000, 0x0800, CRC(4c803b87) SHA1(1141bb51ad9200fc32d92a749460843dc6af8953) ) // Seagate ST4038 (http://stason.org/TULARC/pc/hard-drives-hdd/seagate/ST4038-1987-31MB-5-25-FH-MFM-ST412.html)
 	ROM_LOAD_OPTIONAL( "st225.bin",    0x0000, 0x0800, CRC(c9f68f81) SHA1(7ff8b2a19f71fe0279ab3e5a0a5fffcb6030360c) ) // Seagate ST225 (http://stason.org/TULARC/pc/hard-drives-hdd/seagate/ST225-21MB-5-25-HH-MFM-ST412.html)
-
-	ROM_REGION( 0x800, "slutprov", 0 )
-	ROM_LOAD_OPTIONAL( "slutprov.bin",   0x0000, 0x0800, CRC(a5bb56f4) SHA1(f97cb6526a1d10b189164f26157522e382ca6bc6) )
 ROM_END
 
 
