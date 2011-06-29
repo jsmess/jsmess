@@ -24,7 +24,6 @@
 #include "opcntrl.h"
 #include "strconv.h"
 #include "debug/debugcpu.h"
-#include "inptport.h"
 #include "imagedev/cassette.h"
 #include "windows/window.h"
 #include "winutf8.h"
