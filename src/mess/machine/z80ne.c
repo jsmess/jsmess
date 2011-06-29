@@ -9,7 +9,6 @@
 
 /* Core includes */
 #include "emu.h"
-#include "devintrf.h"
 #include "includes/z80ne.h"
 
 /* Components */
