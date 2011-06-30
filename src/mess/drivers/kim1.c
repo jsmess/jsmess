@@ -78,6 +78,7 @@ change from 1 to 0.
 
 
 ******************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -92,8 +93,15 @@ class kim1_state : public driver_device
 {
 public:
 	kim1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_riot2(*this, "miot_u2")
+	{ }
 
+	required_device<device_t> m_riot2;
+	DECLARE_READ8_MEMBER(kim1_u2_read_a);
+	DECLARE_WRITE8_MEMBER(kim1_u2_write_a);
+	DECLARE_READ8_MEMBER(kim1_u2_read_b);
+	DECLARE_WRITE8_MEMBER(kim1_u2_write_b);
 	UINT8 m_u2_port_b;
 	UINT8 m_311_output;
 	UINT32 m_cassette_high_count;
@@ -104,10 +112,10 @@ public:
 
 
 
-static ADDRESS_MAP_START ( kim1_map , AS_PROGRAM, 8)
+static ADDRESS_MAP_START(kim1_map, AS_PROGRAM, 8, kim1_state)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0xe000) AM_RAM
-	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u3", mos6530_r, mos6530_w )
-	AM_RANGE(0x1740, 0x177f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u2", mos6530_r, mos6530_w )
+	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0xe000) AM_DEVREADWRITE_LEGACY("miot_u3", mos6530_r, mos6530_w )
+	AM_RANGE(0x1740, 0x177f) AM_MIRROR(0xe000) AM_DEVREADWRITE_LEGACY("miot_u2", mos6530_r, mos6530_w )
 	AM_RANGE(0x1780, 0x17bf) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x17c0, 0x17ff) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0xe000) AM_ROM
@@ -167,61 +175,57 @@ static INPUT_PORTS_START( kim1 )
 INPUT_PORTS_END
 
 
-static READ8_DEVICE_HANDLER( kim1_u2_read_a )
+READ8_MEMBER( kim1_state::kim1_u2_read_a )
 {
-	kim1_state *state = device->machine().driver_data<kim1_state>();
 	UINT8	data = 0xff;
 
-	switch( ( state->m_u2_port_b >> 1 ) & 0x0f )
+	switch( ( m_u2_port_b >> 1 ) & 0x0f )
 	{
 	case 0:
-		data = input_port_read(device->machine(), "LINE0");
+		data = input_port_read(machine(), "LINE0");
 		break;
 	case 1:
-		data = input_port_read(device->machine(), "LINE1");
+		data = input_port_read(machine(), "LINE1");
 		break;
 	case 2:
-		data = input_port_read(device->machine(), "LINE2");
+		data = input_port_read(machine(), "LINE2");
 		break;
 	}
 	return data;
 }
 
 
-static WRITE8_DEVICE_HANDLER( kim1_u2_write_a )
+WRITE8_MEMBER( kim1_state::kim1_u2_write_a )
 {
-	kim1_state *state = device->machine().driver_data<kim1_state>();
-	UINT8 idx = ( state->m_u2_port_b >> 1 ) & 0x0f;
+	UINT8 idx = ( m_u2_port_b >> 1 ) & 0x0f;
 
 	if ( idx >= 4 && idx < 10 )
 	{
 		if ( data & 0x80 )
 		{
 			output_set_digit_value( idx-4, data & 0x7f );
-			state->m_led_time[idx - 4] = 15;
+			m_led_time[idx - 4] = 15;
 		}
 	}
 }
 
-static READ8_DEVICE_HANDLER( kim1_u2_read_b )
+READ8_MEMBER( kim1_state::kim1_u2_read_b )
 {
-	kim1_state *state = device->machine().driver_data<kim1_state>();
-	if ( mos6530_portb_out_get(device) & 0x20 )
+	if ( mos6530_portb_out_get(m_riot2) & 0x20 )
 		return 0xFF;
 
-	return 0x7F | ( state->m_311_output ^ 0x80 );
+	return 0x7F | ( m_311_output ^ 0x80 );
 }
 
 
-static WRITE8_DEVICE_HANDLER( kim1_u2_write_b )
+WRITE8_MEMBER( kim1_state::kim1_u2_write_b )
 {
-	kim1_state *state = device->machine().driver_data<kim1_state>();
-	state->m_u2_port_b = data;
+	m_u2_port_b = data;
 
 	if ( data & 0x20 )
 	{
 		/* cassette write/speaker update */
-		device->machine().device<cassette_image_device>(CASSETTE_TAG)->output(( data & 0x80 ) ? -1.0 : 1.0 );
+		machine().device<cassette_image_device>(CASSETTE_TAG)->output(( data & 0x80 ) ? -1.0 : 1.0 );
 	}
 
 	/* Set IRQ when bit 7 is cleared */
@@ -230,10 +234,10 @@ static WRITE8_DEVICE_HANDLER( kim1_u2_write_b )
 
 static MOS6530_INTERFACE( kim1_u2_mos6530_interface )
 {
-	DEVCB_HANDLER(kim1_u2_read_a),
-	DEVCB_HANDLER(kim1_u2_write_a),
-	DEVCB_HANDLER(kim1_u2_read_b),
-	DEVCB_HANDLER(kim1_u2_write_b)
+	DEVCB_DRIVER_MEMBER(kim1_state, kim1_u2_read_a),
+	DEVCB_DRIVER_MEMBER(kim1_state, kim1_u2_write_a),
+	DEVCB_DRIVER_MEMBER(kim1_state, kim1_u2_read_b),
+	DEVCB_DRIVER_MEMBER(kim1_state, kim1_u2_write_b)
 };
 
 static MOS6530_INTERFACE( kim1_u3_mos6530_interface )
@@ -351,5 +355,5 @@ ROM_START(kim1)
 ROM_END
 
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    COMPANY   FULLNAME */
-COMP( 1975, kim1,	  0,		0,		kim1,	  kim1, 	0,		"MOS Technologies",  "KIM-1" , GAME_SUPPORTS_SAVE)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    COMPANY          FULLNAME        FLAGS */
+COMP( 1975, kim1,     0,        0,      kim1,     kim1,     0,    "MOS Technologies", "KIM-1" , GAME_SUPPORTS_SAVE)

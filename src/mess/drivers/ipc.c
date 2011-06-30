@@ -74,10 +74,7 @@ READ8_MEMBER( ipc_state::ipc_f4_r )
 // bit 0 high = ok to send to terminal; bit 1 high = key is pressed
 READ8_MEMBER( ipc_state::ipc_f5_r )
 {
-	if (m_term_data)
-		return 3;
-	else
-		return 1;
+	return (m_term_data) ? 3 : 1;
 }
 
 
@@ -143,5 +140,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 19??, ipb,      0,      0,      ipc,      ipc,     0,     "Intel",   "iPB", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 19??, ipb,      0,      0,      ipc,      ipc,     0,     "Intel",   "iPB", GAME_NO_SOUND)
 COMP( 19??, ipc,      ipb,    0,      ipc,      ipc,     0,     "Intel",   "iPC", GAME_NOT_WORKING | GAME_NO_SOUND)
