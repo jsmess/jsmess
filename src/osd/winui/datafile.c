@@ -337,23 +337,27 @@ static void ParseClose(void)
 /****************************************************************************
  *      ParseOpen - Open up file for reading
  ****************************************************************************/
-static UINT8 ParseOpen(const char *pszFilename)
+static BOOL ParseOpen(const char *pszFilename)
 {
         /* Open file up in binary mode */
-		fp =global_alloc(emu_file("", OPEN_FLAG_READ));
-		fp->open(pszFilename);
-
-        /* If this is NULL, return FALSE. We can't open it */
-
-        if (NULL == fp)
-        {
-                return(FALSE);
-        }
-
+		fp = global_alloc(emu_file("", OPEN_FLAG_READ));
+		/* If this is NULL, return FALSE. We can't open it */
+		if (fp == NULL)
+		{
+			return FALSE;
+		}
+		
+		file_error err = fp->open(pszFilename);
+		if (err != FILERR_NONE)
+		{
+			global_free(fp);
+			fp = NULL;
+			return FALSE;
+		}
+        
         /* Otherwise, prepare! */
-
         dwFilePos = 0;
-        return(TRUE);
+        return TRUE;
 }
 
 
