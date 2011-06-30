@@ -730,6 +730,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/pet.o		\
 	$(MESS_DRIVERS)/c64.o		\
 	$(MESS_MACHINE)/c64exp.o	\
+	$(MESS_MACHINE)/c64_xl80.o	\
 	$(MESS_MACHINE)/interpod.o	\
 	$(MESS_DRIVERS)/vic20.o		\
 	$(MESS_MACHINE)/vic1112.o	\

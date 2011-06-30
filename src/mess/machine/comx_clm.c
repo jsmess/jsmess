@@ -145,21 +145,8 @@ static const mc6845_interface crtc_intf =
 //  GFXDECODE( comx_clm )
 //-------------------------------------------------
 
-static const gfx_layout comx_clm_gfxlayout =
-{
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
-};
-
 static GFXDECODE_START( comx_clm )
-	GFXDECODE_ENTRY( "chargen", 0x0000, comx_clm_gfxlayout, 0, 36 )
+	GFXDECODE_ENTRY(MC6845_TAG, 0x0000, gfx_8x8x1, 0, 1)
 GFXDECODE_END
 
 
@@ -174,6 +161,8 @@ static MACHINE_CONFIG_FRAGMENT( comx_clm )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(50)
+	
+	//MCFG_GFXDECODE(comx_clm)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_14_31818MHz, crtc_intf)
 MACHINE_CONFIG_END
