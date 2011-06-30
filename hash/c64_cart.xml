@@ -592,8 +592,8 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="game" value="1" />
 			<feature name="exrom" value="1" />
 
-			<dataarea name="roml" size="0x2000">
-				<rom name="9433cs-0090.u3" size="0x2000" status="nodump" offset="0x0000" />
+			<dataarea name="roml" size="0x1000">
+				<rom name="9433cs-0090.u3" size="0x1000" status="nodump" offset="0x0000" />
 			</dataarea>
 
 			<dataarea name="crtc" size="0x800">

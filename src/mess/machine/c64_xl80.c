@@ -61,8 +61,8 @@ const device_type C64_XL80 = &device_creator<c64_xl80_device>;
 //-------------------------------------------------
 
 ROM_START( c64_xl80 )
-	ROM_REGION( 0x2000, "roml", 0 )
-	ROM_LOAD( "9433cs-0090.u3",	0x0000, 0x2000, NO_DUMP )
+	ROM_REGION( 0x1000, "roml", 0 )
+	ROM_LOAD( "9433cs-0090.u3",	0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x800, HD46505SP_TAG, 0 )
 	ROM_LOAD( "dtc.u14", 0x000, 0x800, CRC(9edf5e58) SHA1(4b244e6d94a7653a2e52c351589f0b469119fb04) )
@@ -84,6 +84,27 @@ const rom_entry *c64_xl80_device::device_rom_region() const
 
 void c64_xl80_device::crtc_update_row(mc6845_device *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
+	for (int column = 0; column < x_count; column++)
+	{
+		UINT8 code = m_video_ram[((ma + column) & 0x7ff)];
+		UINT16 addr = (code << 3) | (ra & 0x07);
+		UINT8 data = m_char_rom[addr & 0x7ff];
+
+		if (column == cursor_x)
+		{
+			data = 0xff;
+		}
+
+		for (int bit = 0; bit < 8; bit++)
+		{
+			int x = (column * 8) + bit;
+			int color = BIT(data, 7) ? 7 : 0;
+
+			*BITMAP_ADDR16(bitmap, y, x) = color;
+
+			data <<= 1;
+		}
+	}
 }
 
 static MC6845_UPDATE_ROW( c64_xl80_update_row )
@@ -195,7 +216,27 @@ void c64_xl80_device::device_reset()
 
 UINT8 c64_xl80_device::c64_cd_r(offs_t offset, int roml, int romh, int io1, int io2)
 {
-	return 0;
+	UINT8 data = 0;
+	
+	if (!io2 && BIT(offset, 1))
+	{
+		address_space *space = machine().firstcpu->memory().space(AS_PROGRAM);
+		
+		if (offset & 0x01)
+		{
+			data = m_crtc->register_r(*space, 0);
+		}
+	}
+	else if (offset >= 0x8000 && offset < 0x9000)
+	{
+		data = m_rom[offset & 0xfff];
+	}
+	else if (offset >= 0x9800 && offset < 0xa000)
+	{
+		data = m_video_ram[offset & 0x7ff];
+	}
+
+	return data;
 }
 
 
@@ -205,6 +246,23 @@ UINT8 c64_xl80_device::c64_cd_r(offs_t offset, int roml, int romh, int io1, int 
 
 void c64_xl80_device::c64_cd_w(offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
 {
+	if (!io2 && BIT(offset, 1))
+	{
+		address_space *space = machine().firstcpu->memory().space(AS_PROGRAM);
+		
+		if (offset & 0x01)
+		{
+			m_crtc->register_w(*space, 0, data);
+		}
+		else
+		{
+			m_crtc->address_w(*space, 0, data);
+		}
+	}
+	if (offset >= 0x9800 && offset < 0xa000)
+	{
+		m_video_ram[offset & 0x7ff] = data;
+	}
 }
 
 
