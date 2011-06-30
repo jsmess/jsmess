@@ -596,8 +596,8 @@ http://www.retroport.de/C64_C128_Hardware.html
 				<rom name="9433cs-0090.u3" size="0x2000" status="nodump" offset="0x0000" />
 			</dataarea>
 
-			<dataarea name="crtc" size="0x2000">
-				<rom name="dtc.u14" size="0x2000" status="nodump" offset="0x0000" />
+			<dataarea name="crtc" size="0x800">
+				<rom name="dtc.u14" size="0x800" crc="9edf5e58" sha1="4b244e6d94a7653a2e52c351589f0b469119fb04" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop" interface="floppy_5_25">
