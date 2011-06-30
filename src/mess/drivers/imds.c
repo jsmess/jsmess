@@ -1,8 +1,17 @@
 /***************************************************************************
 
-        Intel MDS
+        Intel Intellec MDS
 
         28/06/2011 Skeleton driver.
+
+This is a prototyping machine, very complex and expensive.
+
+It does all i/o via uarts, that is TTY, paper-tape puncher, CRT terminal.
+It also has proms which can be dynamically programmed to alter the machine
+architecture, so internal ports change meaning mid-stream. (e.g. port 80).
+
+The code below is just a sample; it does not represent any aspect of the
+real hardware.
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -25,37 +34,23 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_terminal;
-	DECLARE_READ8_MEMBER( imds_20_r );
-	DECLARE_READ8_MEMBER( imds_25_r );
-	DECLARE_READ8_MEMBER( imds_26_r );
-	DECLARE_WRITE8_MEMBER( imds_20_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	DECLARE_READ8_MEMBER(term_r);
+	DECLARE_READ8_MEMBER(term_status_r);
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
-	UINT8 m_26_count;
 	virtual void machine_reset();
 };
 
-READ8_MEMBER( imds_state::imds_20_r )
+READ8_MEMBER( imds_state::term_status_r )
 {
 	UINT8 ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( imds_state::imds_25_r )
+READ8_MEMBER( imds_state::term_r )
 {
-	return 0x20 | (m_term_data ? 1 : 0);
-}
-
-READ8_MEMBER( imds_state::imds_26_r )
-{
-	if (m_26_count) m_26_count--;
-	return m_26_count;
-}
-
-WRITE8_MEMBER( imds_state::imds_20_w )
-{
-	terminal_write(m_terminal, 0, data & 0x7f);
+	return (m_term_data) ? 0x21 : 0x20;
 }
 
 static ADDRESS_MAP_START(imds_mem, AS_PROGRAM, 8, imds_state)
@@ -65,12 +60,8 @@ static ADDRESS_MAP_START(imds_mem, AS_PROGRAM, 8, imds_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(imds_io, AS_IO, 8, imds_state)
-	//ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x20, 0x20) AM_READWRITE(imds_20_r,imds_20_w)
-	//AM_RANGE(0x25, 0x25) AM_READ(imds_25_r)
-	//AM_RANGE(0x26, 0x26) AM_READ(imds_26_r)
-	//AM_RANGE(0x20, 0x27) AM_DEVREADWRITE_LEGACY("ins8250", ins8250_r, ins8250_w )
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -87,7 +78,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 	DEVCB_DRIVER_MEMBER(imds_state, kbd_put)
 };
 
-MACHINE_RESET_MEMBER(imds_state)
+MACHINE_RESET_MEMBER( imds_state )
 {
 	m_term_data = 0;
 }
@@ -126,4 +117,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT  COMPANY   FULLNAME       FLAGS */
-COMP( 1983, imds,     0,    0,       imds,      imds,     0,   "Intel", "MDS", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, imds,     0,    0,       imds,      imds,     0,   "Intel", "Intellec MDS", GAME_NOT_WORKING | GAME_NO_SOUND)
