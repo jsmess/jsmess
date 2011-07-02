@@ -165,6 +165,14 @@ isa8_mda_device::isa8_mda_device(const machine_config &mconfig, const char *tag,
 	m_shortname = "mda";
 }
 
+isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, type, name, tag, owner, clock),
+		device_isa8_card_interface(mconfig, *this),
+		device_slot_card_interface(mconfig, *this)
+{
+	m_shortname = "mda";
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -578,7 +586,7 @@ const rom_entry *isa8_hercules_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_hercules_device::isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        isa8_mda_device(mconfig, tag, owner, clock)
+        isa8_mda_device(mconfig, ISA8_HERCULES, "ISA8_HERCULES", tag, owner, clock)
 {
 	m_shortname = "hercules";
 }
