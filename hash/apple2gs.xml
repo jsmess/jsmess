@@ -710,7 +710,7 @@
 
 	<software name="captbld">
 		<description>Captain Blood</description>
-		<year>1999</year>
+		<year>1989</year>
 		<publisher>Mindscape</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3178,7 +3178,7 @@
 
 	<software name="manoir">
 		<description>Le Manoir de Mortevielle</description>
-		<year>1999</year>
+		<year>1989</year>
 		<publisher>Lankhor</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5379,7 +5379,7 @@
 
 	<software name="ssinsts">
 		<description>FUN Instruments vols. 1-5 (for SoundSmith)</description>
-		<year>1999</year>
+		<year>1989</year>
 		<publisher>Huibert Aalbers</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5411,7 +5411,7 @@
 
 	<software name="ssxmas">
 		<description>SoundSmith Christmas Songs</description>
-		<year>1999</year>
+		<year>1989</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -6916,7 +6916,7 @@
 
 	<software name="wordpfct">
 		<description>WordPerfect v2.1</description>
-		<year>1999</year>
+		<year>1987</year>
 		<publisher>WordPerfect Corp.</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
