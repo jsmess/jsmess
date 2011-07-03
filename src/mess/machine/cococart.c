@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cococart.h"
+#include "emuopts.h"
 
 /***************************************************************************
     PARAMETERS
@@ -30,7 +31,8 @@ const device_type COCOCART_SLOT = &device_creator<cococart_slot_device>;
 //-------------------------------------------------
 cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, COCOCART_SLOT, "CoCo Cartridge Slot", tag, owner, clock),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this),
+		device_image_interface(mconfig, *this)
 {
 }
 
@@ -50,9 +52,9 @@ void cococart_slot_device::device_start()
 {
 	for(int i=0; i<TIMER_POOL; i++ )
 	{
-	   m_cart_line.timer[i]		= device().machine().scheduler().timer_alloc(FUNC(cart_timer_callback), (void *) this);
-	   m_nmi_line.timer[i]		= device().machine().scheduler().timer_alloc(FUNC(nmi_timer_callback), (void *)  this);
-	   m_halt_line.timer[i]		= device().machine().scheduler().timer_alloc(FUNC(halt_timer_callback), (void *) this);
+	   m_cart_line.timer[i]		= machine().scheduler().timer_alloc(FUNC(cart_timer_callback), (void *) this);
+	   m_nmi_line.timer[i]		= machine().scheduler().timer_alloc(FUNC(nmi_timer_callback), (void *)  this);
+	   m_halt_line.timer[i]		= machine().scheduler().timer_alloc(FUNC(halt_timer_callback), (void *) this);
 	}
 
 	m_cart_line.timer_index     = 0;
@@ -100,6 +102,9 @@ void cococart_slot_device::device_config_complete()
     	memset(&m_nmi_callback,  0, sizeof(m_nmi_callback));
     	memset(&m_halt_callback, 0, sizeof(m_halt_callback));
 	}
+	
+	// set brief and instance name
+	update_names();
 }
 
 /*-------------------------------------------------
@@ -163,7 +168,7 @@ void cococart_slot_device::set_line(const char *line_name, coco_cartridge_line *
 		line->value = value;
 
 		if (LOG_LINE)
-			logerror("[%s]: set_line(): %s <= %s\n", device().machine().describe_context(), line_name, line_value_string(value));
+			logerror("[%s]: set_line(): %s <= %s\n", machine().describe_context(), line_name, line_value_string(value));
 		/* engage in a bit of gymnastics for this odious 'Q' value */
 		switch(line->value)
 		{
@@ -230,7 +235,7 @@ void cococart_slot_device::set_line_timer(coco_cartridge_line *line, cococart_li
 {
 	/* calculate delay; delay dependant on cycles per second */
 	attotime delay = (line->delay != 0)
-		? device().machine().firstcpu->cycles_to_attotime(line->delay)
+		? machine().firstcpu->cycles_to_attotime(line->delay)
 		: attotime::zero;
 
    line->timer[line->timer_index]->adjust(delay, (int) value);
@@ -299,6 +304,44 @@ UINT8* cococart_slot_device::get_cart_base()
 		return m_cart->get_cart_base();
 	}
 	return NULL;
+}
+
+
+bool cococart_slot_device::call_load() 
+{	
+	if (m_cart) {
+		offs_t read_length = 0;
+		if (software_entry() == NULL)
+		{
+			read_length = fread(m_cart->get_cart_base(), 0x8000);
+		}			
+		else
+		{
+			read_length = get_software_region_length("rom");
+			memcpy(m_cart->get_cart_base(), get_software_region("rom"), read_length);
+		}		
+		while(read_length < 0x8000)
+		{
+			offs_t len = MIN(read_length, 0x8000 - read_length);
+			memcpy(m_cart->get_cart_base() + read_length, m_cart->get_cart_base(), len);
+			read_length += len;
+		}
+	}
+	return IMAGE_INIT_PASS;
+}
+
+bool cococart_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+{
+	load_software_part_region(this, swlist, swname, start_entry ); return TRUE;
+	return TRUE;
+}
+
+const char * cococart_slot_device::get_default_card(emu_options &options) const
+{
+	if (strlen(options.value(m_instance_name))>0) {
+		return "pak";
+	}
+	return m_default_card;	
 }
 
 //**************************************************************************
