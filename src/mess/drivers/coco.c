@@ -831,6 +831,9 @@ static MACHINE_CONFIG_START( dragon32, coco_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
+	
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dragon64, coco_state )
@@ -874,6 +877,9 @@ static MACHINE_CONFIG_START( dragon64, coco_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
+	
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( d64plus, coco_state )
@@ -918,6 +924,9 @@ static MACHINE_CONFIG_START( d64plus, coco_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
+	
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dgnalpha, coco_state )
@@ -972,6 +981,9 @@ static MACHINE_CONFIG_START( dgnalpha, coco_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
+	
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tanodr64, coco_state )
@@ -1016,6 +1028,9 @@ static MACHINE_CONFIG_START( tanodr64, coco_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
+	
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco, coco_state )
@@ -1059,6 +1074,9 @@ static MACHINE_CONFIG_START( coco, coco_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("4K,32K,64K")
+	
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco2, coco_state )
@@ -1102,6 +1120,9 @@ static MACHINE_CONFIG_START( coco2, coco_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("16K")
+	
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco2b, coco_state )
@@ -1145,6 +1166,9 @@ static MACHINE_CONFIG_START( coco2b, coco_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("16K")
+	
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco3, coco3_state )
@@ -1194,12 +1218,15 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 
 	MCFG_SAM6883_GIME_ADD("sam", coco3_sam_intf)
 
-	MCFG_COCO_CARTRIDGE_ADD("ext", coco3_cococart_interface, coco_cart, "multi", NULL)
+	MCFG_COCO_CARTRIDGE_ADD("ext", coco3_cococart_interface, coco_cart, "fdcv11", NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("128K,2M,8M")
+	
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coco3p, coco3 )

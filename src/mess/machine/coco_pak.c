@@ -17,13 +17,6 @@
 ***************************************************************************/
 
 static MACHINE_CONFIG_FRAGMENT(coco_pak)
-	MCFG_CARTSLOT_ADD(CARTSLOT_TAG)
-	MCFG_CARTSLOT_EXTENSION_LIST("ccc,rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("coco_cart")
-
-	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
 MACHINE_CONFIG_END
 
 ROM_START( coco_pak )
@@ -64,7 +57,7 @@ coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag,
 
 void coco_pak_device::device_start()
 {
-	m_cart = dynamic_cast<device_image_interface *>(subdevice(CARTSLOT_TAG));
+	m_cart = dynamic_cast<device_image_interface *>(owner());
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
 }
 
