@@ -461,7 +461,7 @@ void necdsp_device::exec_op(UINT32 opcode) {
       }
     }
     // flag.ov1 is only set if the number of overflows of the past 3 opcodes (of type 4,5,6,7,8,9) is odd
-    flag.ov1 = ((flag.ov0?1:0)+(flag.ov0p?1:0)+(flag.ov0pp?1:0))&1;
+    flag.ov1 = (flag.ov0 + flag.ov0p + flag.ov0pp) & 1;
     // flag.s1 is based on ov1: s1 = s0 ^ ov1;
     flag.s1 = flag.ov1 ^ flag.s0;
 
