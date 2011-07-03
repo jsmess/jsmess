@@ -435,11 +435,11 @@ static const gfx_layout okean240_charlayout =
 };
 
 static GFXDECODE_START( okean240 )
-	GFXDECODE_ENTRY( "maincpu", 0xec08, okean240_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0xec08, okean240_charlayout, 2, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( okean240a )
-	GFXDECODE_ENTRY( "maincpu", 0xef63, okean240_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0xef63, okean240_charlayout, 2, 1 )
 GFXDECODE_END
 
 // Palette 0 & 1 are for terminal and are defined in terminal.c
