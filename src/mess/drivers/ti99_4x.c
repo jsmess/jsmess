@@ -960,7 +960,7 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x_state )
 	MCFG_MACHINE_RESET( ti99_4a )
 
 	/* video hardware */
-	MCFG_TI_TMS991x_ADD("video", tms9928a, 60, "screen", 2500, &tms9929a_interface)
+	MCFG_TI_TMS991x_ADD("video", tms9928a, 50, "screen", 2500, &tms9929a_interface)
 	MCFG_GFXDECODE(ti99a)
 
 	/* sound hardware */
