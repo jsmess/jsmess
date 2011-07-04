@@ -1867,6 +1867,7 @@ static int invoke_command(HWND wnd, UINT command)
 			{
 				// render views
 				window->target->set_view(command - ID_VIDEO_VIEW_0);
+				winwindow_video_window_update(window); // actually change window size
 			}
 			else if (input_item_from_serial_number(window->machine(), command - ID_INPUT_0, NULL, &field, &setting))
 			{
