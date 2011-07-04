@@ -239,8 +239,9 @@ static DEVICE_START( ti99_video )
 
 	video->cpu = device->machine().device("maincpu");
 	video->space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	video->chip = conf->chip;
 
-	if (conf->chip==TI_TMS991X)
+	if (video->chip==TI_TMS991X)
 	{
 		TMS9928A_configure(conf->tmsparam);
 	}
