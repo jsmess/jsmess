@@ -9,7 +9,6 @@
 #ifndef __TI99CART_H__
 #define __TI99CART_H__
 
-#include "imagedev/cartslot.h"
 #include "ti99defs.h"
 
 typedef struct _ti99_multicart_config
@@ -37,7 +36,7 @@ READ8Z_DEVICE_HANDLER( gromportr_rz );
 WRITE8_DEVICE_HANDLER( gromportc_w );
 READ8Z_DEVICE_HANDLER( gromportc_rz );
 
-DECLARE_LEGACY_CART_SLOT_DEVICE(TI99_MULTICART, ti99_multicart);
+DECLARE_LEGACY_DEVICE(TI99_MULTICART, ti99_multicart);
 
 #define MCFG_TI99_GROMPORT_ADD(_tag, _ready) \
 	MCFG_DEVICE_ADD(_tag, TI99_MULTICART, 0) \
