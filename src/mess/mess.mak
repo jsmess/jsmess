@@ -465,6 +465,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/megadriv.o  \
 	$(MAME_MACHINE)/dc.o		\
 	$(MAME_MACHINE)/naomibd.o	\
+	$(MAME_MACHINE)/naomim4decoder.o \
 	$(MAME_MACHINE)/gdcrypt.o	\
 	$(MAME_MACHINE)/mie.o		\
 	$(MAME_MACHINE)/maple-dc.o	\
