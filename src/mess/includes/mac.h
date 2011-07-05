@@ -38,7 +38,8 @@ typedef enum
 	MODEL_MAC_PLUS,
 	MODEL_MAC_SE,
 	MODEL_MAC_CLASSIC,
-	MODEL_MAC_PORTABLE,
+
+    MODEL_MAC_PORTABLE, // Portable/PB100 are sort of hybrid classic and Mac IIs
 	MODEL_MAC_PB100,
 
 	MODEL_MAC_II,		// Mac II class 68020/030 machines
@@ -148,6 +149,7 @@ NVRAM_HANDLER( mac );
 VIDEO_START( mac );
 SCREEN_UPDATE( mac );
 SCREEN_UPDATE( macse30 );
+SCREEN_UPDATE( macprtb );
 PALETTE_INIT( mac );
 
 VIDEO_START( macrbv );
