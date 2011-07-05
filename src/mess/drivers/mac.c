@@ -382,18 +382,13 @@ READ32_MEMBER(mac_state::mac_read_id)
 }
 
 // Portable/PB100 video
-static VIDEO_START( mac_prtb )
+static VIDEO_START( macprtb )
 {
-}
-
-static SCREEN_UPDATE( mac_prtb )
-{
-	return 0;
 }
 
 READ16_MEMBER(mac_state::mac_config_r)
 {
-	return 0xffff;	// not sure what this does
+	return 0xffff;	// returns nonzero if no PDS RAM expansion, 0 if present
 }
 
 /***************************************************************************
@@ -422,7 +417,7 @@ static ADDRESS_MAP_START(macprtb_map, AS_PROGRAM, 16, mac_state )
 	AM_RANGE(0xf60000, 0xf6ffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
 	AM_RANGE(0xf70000, 0xf7ffff) AM_READWRITE(mac_via_r, mac_via_w)
 	AM_RANGE(0xf90000, 0xf9ffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
-	AM_RANGE(0xfa8000, 0xfaffff) AM_RAM	// VRAM
+	AM_RANGE(0xfa8000, 0xfaffff) AM_RAM	AM_BASE(m_se30_vram)	// VRAM
 	AM_RANGE(0xfb0000, 0xfbffff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffff)
 	AM_RANGE(0xfc0000, 0xfcffff) AM_READ(mac_config_r)
 	AM_RANGE(0xfd0000, 0xfdffff) AM_READWRITE(mac_scc_r, mac_scc_2_w)
@@ -690,12 +685,12 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(700, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
-	MCFG_SCREEN_UPDATE(mac_prtb)
+	MCFG_SCREEN_UPDATE(macprtb)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(mac)
 
-	MCFG_VIDEO_START(mac_prtb)
+	MCFG_VIDEO_START(macprtb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -723,13 +718,12 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_EXTRA_OPTIONS("1M,3M,5M,7M,9M")
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( macii, mac_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68020HMMU, 7833600*2)
+	MCFG_CPU_ADD("maincpu", M68020PMMU, 7833600*2)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
 	MCFG_CPU_VBLANK_INT("screen", mac_cb264_vbl)
 
@@ -799,6 +793,8 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_V8, mac_asc_irq)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+//	MCFG_EGRET_ADD()
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maclc2, maclc )
@@ -849,9 +845,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_CPU_ADD("maincpu", M68030, 7833600*2)
 	MCFG_CPU_PROGRAM_MAP(macse30_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-       /* video hardware */
+    /* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.15)
@@ -878,7 +872,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	/* devices */
 	MCFG_NCR5380_ADD("ncr5380", 7833600, macplus_5380intf)
 
-	MCFG_IWM_ADD("fdc", mac_iwm_interface)
+	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
 	MCFG_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
 	MCFG_SCC8530_ADD("scc", 7833600)
@@ -960,6 +954,9 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M,48M,64M")
+//	MCFG_EGRET_ADD()
+
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pwrmac, mac_state )
@@ -1456,4 +1453,3 @@ COMP( 1991, maclc2,   0,	0,	maclc2,   maciici,  maclc2,	          "Apple Compute
 COMP( 1993, maccclas, 0,        0,      maclc2,   macadb,   maclrcclassic,        "Apple Computer", "Macintosh Color Classic", GAME_NOT_WORKING )
 COMP( 1993, maclc3,   0,	0,	maclc3,   maciici,  maclc3,	          "Apple Computer", "Macintosh LC III",  GAME_NOT_WORKING )
 COMP( 1994, pmac6100, 0,	0,	pwrmac,   macadb,   macpm6100,	      "Apple Computer", "Power Macintosh 6100",  GAME_NOT_WORKING | GAME_NO_SOUND )
-

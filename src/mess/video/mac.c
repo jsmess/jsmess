@@ -80,8 +80,33 @@ SCREEN_UPDATE( macse30 )
 
 		for (x = 0; x < MAC_H_VIS; x += 16)
 		{
-//          word = *(video_ram++);
 			word = video_ram[((y * MAC_H_VIS)/16) + ((x/16)^1)];
+			for (b = 0; b < 16; b++)
+			{
+				line[x + b] = (word >> (15 - b)) & 0x0001;
+			}
+		}
+	}
+	return 0;
+}
+
+SCREEN_UPDATE( macprtb )
+{
+	const UINT16 *video_ram;
+	UINT16 word;
+	UINT16 *line;
+	int y, x, b;
+	mac_state *state = screen->machine().driver_data<mac_state>();
+
+	video_ram = (const UINT16 *) state->m_se30_vram;
+
+	for (y = 0; y < 400; y++)
+	{
+		line = BITMAP_ADDR16(bitmap, y, 0);
+
+		for (x = 0; x < 640; x += 16)
+		{
+			word = video_ram[((y * 640)/16) + ((x/16))];
 			for (b = 0; b < 16; b++)
 			{
 				line[x + b] = (word >> (15 - b)) & 0x0001;

@@ -37,7 +37,7 @@
           mirroring to determine if SCSI is available.  If the ROM is mirrored,
           then SCSI is not available.  Thanks to R. Belmont for making this
           discovery.
-        - On the SE and most later Macs, the first access to 4xxxxx turns off the overlay.
+        - On the SE and most later Macs, the first access to ROM turns off the overlay.
           However, the Mac II/IIx/IIcx (and others?) have the old-style VIA overlay control bit!
         - The Mac II can have either a 68551 PMMU fitted or an Apple custom that handles 24 vs. 32
           bit addressing mode.  The ROM is *not* 32-bit clean so Mac OS normally runs in 24 bit mode,
@@ -54,14 +54,8 @@
             LC 55x, LC 57x, LC 58x, Quadra 630, Quadra 660AV, Quadra 840AV, PowerMac 6100/7100/8100,
             IIci, and PowerMac 5200.
 
-`    TODO:
-        - Mac Portable and PowerBook 100 are similar to this hardware, but we need ROMs!
+     TODO:
         - Call the RTC timer
-        - SE FDHD and Classic require SWIM support.  SWIM is IWM compatible with 800k drives, but
-          becomes a different chip for 1.44MB.
-        - Check that 0x600000-0x6fffff still address RAM when overlay bit is off
-          (IM-III seems to say it does not on Mac 128k, 512k, and 512ke).
-        - What on earth are 0x700000-0x7fffff mapped to ?
 
      Egret version spotting:
      341S0417 - 0x???? (?.??) - Color Classic
@@ -81,6 +75,8 @@
 ****************************************************************************/
 
 #define ADDRESS_MAP_MODERN
+
+//#define USE_EGRET_DEVICE
 
 #include <time.h>
 
@@ -260,9 +256,20 @@ void mac_state::field_interrupts()
 {
 	int take_interrupt = -1;
 
-	if (m_model < MODEL_MAC_II)
+	if (m_model < MODEL_MAC_PORTABLE)
 	{
 		if ((m_scc_interrupt) || (m_scsi_interrupt))
+		{
+			take_interrupt = 2;
+		}
+		else if (m_via_interrupt)
+		{
+			take_interrupt = 1;
+		}
+	}
+	else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100))
+	{
+		if (m_scc_interrupt)
 		{
 			take_interrupt = 2;
 		}
@@ -1108,7 +1115,6 @@ void mac_state::scc_mouse_irq(int x, int y)
 			scc8530_set_status(scc, 0x02);
 	}
 
-	//cputag_set_input_line(machine, "maincpu", 2, ASSERT_LINE);
 	this->set_scc_interrupt(1);
 }
 
@@ -1915,6 +1921,7 @@ static TIMER_CALLBACK(mac_adb_tick)
 		{
 			mac->adb_talk();
 		}
+        #ifndef USE_EGRET_DEVICE
 		else if (ADB_IS_EGRET)
 		{
 			// Egret sending a response to the 680x0?
@@ -1980,6 +1987,7 @@ static TIMER_CALLBACK(mac_adb_tick)
 				}
 			}
 		}
+        #endif
 	}
 	else
 	{
@@ -1992,8 +2000,20 @@ static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 	UINT8 ret;
 	mac_state *mac = device->machine().driver_data<mac_state>();
 
-	ret = (mac->m_adb_send & 0x80)>>7;
-	mac->m_adb_send <<= 1;
+    if (ADB_IS_EGRET)
+    {
+        #ifdef USE_EGRET_DEVICE
+        ret = mac->m_egret->get_via_data();
+        #else
+        ret = (mac->m_adb_send & 0x80)>>7;
+        mac->m_adb_send <<= 1;
+        #endif
+    }
+    else
+    {
+        ret = (mac->m_adb_send & 0x80)>>7;
+        mac->m_adb_send <<= 1;
+    }
 
 //  printf("VIA IN CB2 = %x\n", ret);
 
@@ -2005,8 +2025,20 @@ static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2)
 	mac_state *mac = device->machine().driver_data<mac_state>();
 
 //        printf("VIA OUT CB2 = %x\n", data);
-	mac->m_adb_command <<= 1;
-	mac->m_adb_command |= data & 1;
+    if (ADB_IS_EGRET)
+    {
+        #ifdef USE_EGRET_DEVICE
+        mac->m_egret->set_via_data(data & 1);
+        #else
+        mac->m_adb_command <<= 1;
+        mac->m_adb_command |= data & 1;
+        #endif
+    }
+    else
+    {
+        mac->m_adb_command <<= 1;
+        mac->m_adb_command |= data & 1;
+    }
 }
 
 static void mac_adb_newaction(mac_state *mac, int state)
@@ -2067,6 +2099,7 @@ static void mac_adb_newaction(mac_state *mac, int state)
 	}
 }
 
+#ifndef USE_EGRET_DEVICE
 static void mac_egret_response_std(mac_state *mac, int type, int flag, int cmd)
 {
 	mac->m_adb_send = 0xaa;
@@ -2408,22 +2441,50 @@ static void mac_egret_newaction(mac_state *mac, int state)
 		mac->m_adb_state |= state & 0x6;
 	}
 }
+#endif
 
 static TIMER_CALLBACK(mac_pmu_tick)
 {
 	mac_state *mac = machine.driver_data<mac_state>();
 
-	#if LOG_ADB
-	printf("PM: timer tick, lowering ACK\n");
-	#endif
-	mac->m_pm_ack &= ~2;	// lower ACK to handshake next step
+	// state 10 means this is in response to an ADB command
+	if (mac->m_pm_state == 10)
+	{
+		#if LOG_ADB
+		printf("PM: was state 10, chunk-chunking CB1\n");
+		#endif
+		mac->m_pm_state = 0;
+
+		// tick CB1, which should cause a PMU interrupt on PMU machines
+		mac->m_adb_extclock ^= 1;
+		mac->m_via1->write_cb1(mac->m_adb_extclock);
+		mac->m_adb_extclock ^= 1;
+		mac->m_via1->write_cb1(mac->m_adb_extclock);
+	}
+	else
+	{
+		#if LOG_ADB
+		printf("PM: timer tick, lowering ACK\n");
+		#endif
+		mac->m_pm_ack &= ~2;	// lower ACK to handshake next step
+	}
 }
 
 static void pmu_one_byte_reply(mac_state *mac, UINT8 result)
 {
-	mac->m_pm_out[0] = 1;	// length
-	mac->m_pm_out[1] = result;
-	mac->m_pm_slen = 2;
+	mac->m_pm_out[0] = mac->m_pm_out[1] = 1;	// length
+	mac->m_pm_out[2] = result;
+	mac->m_pm_slen = 3;
+	mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
+}
+
+static void pmu_three_byte_reply(mac_state *mac, UINT8 result1, UINT8 result2, UINT8 result3)
+{
+	mac->m_pm_out[0] = mac->m_pm_out[1] = 3;	// length
+	mac->m_pm_out[2] = result1;
+	mac->m_pm_out[3] = result2;
+	mac->m_pm_out[4] = result3;
+	mac->m_pm_slen = 5;
 	mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
 }
 
@@ -2433,9 +2494,36 @@ static void pmu_exec(mac_state *mac)
 	mac->m_pm_slen = 0;	// and send length
 	mac->m_pm_dptr = 0;	// and recieve pointer
 
+//	printf("PMU: Command %02x\n", mac->m_pm_cmd[0]);
 	switch (mac->m_pm_cmd[0])
 	{
-		case 0x10:	// subsystem power and clock ctrl (no response)
+		case 0x10:	// subsystem power and clock ctrl
+			break;
+
+		case 0x20:	// send ADB command (PMU must issue an IRQ on completion)
+			mac->m_pm_state = 10;
+			mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
+			break;
+
+		case 0x21:	// turn ADB auto-poll off (does this need a reply?)
+			break;
+
+		case 0x28:	// read ADB
+			mac->m_pm_out[0] = mac->m_pm_out[1] = 4;
+			mac->m_pm_out[2] = mac->m_pm_out[3] = 0;	// not sure
+			mac->m_pm_out[4] = 1;	// length of following data
+			mac->m_pm_out[5] = 0;
+			mac->m_pm_slen = 6;
+			mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
+			break;
+
+		case 0x31:  // write first 20 bytes of PRAM
+			{
+				for (int i = 0; i < 20; i++)
+				{
+					mac->m_rtc_ram[i] = mac->m_pm_cmd[1+i];
+				}
+			}
 			break;
 
 		case 0x32:	// write extended PRAM byte(s).  cmd[2] = address, cmd[3] = length, cmd[4...] = data
@@ -2450,16 +2538,28 @@ static void pmu_exec(mac_state *mac)
 			}
 			break;
 
+		case 0x38:  // read time
+			{
+				mac->m_pm_out[0] = mac->m_pm_out[1] = 4;
+				mac->m_pm_out[2] = mac->m_rtc_seconds[0];
+				mac->m_pm_out[3] = mac->m_rtc_seconds[1];
+				mac->m_pm_out[4] = mac->m_rtc_seconds[2];
+				mac->m_pm_out[5] = mac->m_rtc_seconds[3];
+				mac->m_pm_slen = 6;
+				mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
+			}
+			break;
+
 		case 0x39:	// read first 20 bytes of PRAM
 			{
 				int i;
 
-				mac->m_pm_out[0] = 20;
+				mac->m_pm_out[0] = mac->m_pm_out[1] = 20;
 				for (i = 0; i < 20; i++)
 				{
-					mac->m_pm_out[1 + i] = mac->m_rtc_ram[i];
+					mac->m_pm_out[2 + i] = mac->m_rtc_ram[i];
 				}
-				mac->m_pm_slen = 21;
+				mac->m_pm_slen = 22;
 				mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
 			}
 			break;
@@ -2469,22 +2569,57 @@ static void pmu_exec(mac_state *mac)
 			{
 				int i;
 
-				mac->m_pm_out[0] = mac->m_pm_cmd[3];
+				mac->m_pm_out[0] = mac->m_pm_out[1] = mac->m_pm_cmd[3];
 				for (i = 0; i < mac->m_pm_cmd[3]; i++)
 				{
-					mac->m_pm_out[1 + i] = mac->m_rtc_ram[mac->m_pm_cmd[2] + i];
+					mac->m_pm_out[2 + i] = mac->m_rtc_ram[mac->m_pm_cmd[2] + i];
 				}
-				mac->m_pm_slen = mac->m_pm_cmd[3] + 1;
+				mac->m_pm_slen = mac->m_pm_out[0] + 2;
 				mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
 			}
 			break;
 
+		case 0x40:  // set screen contrast
+			break;
+
 		case 0x68:	// read battery/charger level
-			pmu_one_byte_reply(mac, 1);
+			pmu_three_byte_reply(mac, 255, 255, 255);
+			break;
+
+		case 0x69:  // read battery/charger instantaneous level and status
+			pmu_three_byte_reply(mac, 255, 255, 255);
 			break;
 
 		case 0x78:	// read interrupt flag
-			pmu_one_byte_reply(mac, 0);
+			pmu_one_byte_reply(mac, 0xab);
+			break;
+
+		case 0x90: // sound power control
+			break;
+
+		case 0x98:	// read sound power state
+			pmu_one_byte_reply(mac, 1);
+			break;
+
+		case 0xe0:	// write PMU internal RAM
+			break;
+
+		case 0xe8:  // read PMU internal RAM (just return zeroes)
+			{
+				int i;
+
+				mac->m_pm_out[0] = mac->m_pm_out[1] = mac->m_pm_cmd[4];
+//				printf("PMU read at %x\n", mac->m_pm_cmd[2] | (mac->m_pm_cmd[3]<<8));
+
+				// note: read at 0xEE00 0 = target disk mode, 0xff = normal bootup
+
+				for (i = 0; i < mac->m_pm_cmd[4]; i++)
+				{
+					mac->m_pm_out[2 + i] = 0xff;
+				}
+				mac->m_pm_slen = mac->m_pm_out[0] + 2;
+				mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
+			}
 			break;
 
 		case 0xec:	// PMU self-test (send 1 count byte + reply)
@@ -2715,9 +2850,13 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 			}
 		}
 		else if (ADB_IS_EGRET)
-		{
+        {
+            #ifdef USE_EGRET_DEVICE
+            val = mac->m_egret->get_xcvr_session();
+            #else
 			val |= mac->m_adb_state<<3;
 			val ^= 0x08;	// maybe it's reversed?
+            #endif
 		}
 		else
 		{
@@ -2889,7 +3028,13 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 	}
 	else if (ADB_IS_EGRET)
 	{
+        #ifdef USE_EGRET_DEVICE
+        printf("EGRET (%02x): VF %d SS %d\n", data&0x30, (data&0x10) ? 1 : 0, (data&0x20) ? 1 : 0);
+        mac->m_egret->set_via_full((data&0x10) ? 1 : 0);
+        mac->m_egret->set_sys_session((data&0x20) ? 1 : 0);
+        #else
 		mac_egret_newaction(mac, (data & 0x30) >> 3);
+        #endif
 	}
 }
 
@@ -3346,7 +3491,7 @@ void mac_state::vblank_irq()
 	}
 
 	/* signal VBlank on CA1 input on the VIA */
-	if (m_model < MODEL_MAC_II)
+	if ((m_model < MODEL_MAC_II) || (m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100))
 	{
 		ca1_data ^= 1;
 		m_via1->write_ca1(ca1_data);
@@ -3359,7 +3504,6 @@ void mac_state::vblank_irq()
 		ca2_data ^= 1;
 		/* signal 1 Hz irq on CA2 input on the VIA */
 		m_via1->write_ca2(ca2_data);
-
 		rtc_incticks();
 	}
 
