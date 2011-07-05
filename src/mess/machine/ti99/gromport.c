@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "gromport.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/multcart.h"
 #include "grom.h"
 
@@ -194,12 +193,12 @@ INLINE ti99_pcb_t *get_safe_pcb_token(device_t *device)
 	return (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE cartslot_t *get_safe_cartslot_token(device_t *device)
+INLINE multicartslot_t *get_safe_cartslot_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CARTSLOT);
+	assert(device->type() == MULTICARTSLOT);
 
-	return (cartslot_t *)downcast<legacy_device_base *>(device)->token();
+	return (multicartslot_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cart_grom_ready )
@@ -1453,7 +1452,7 @@ DEVICE_GET_INFO(ti99_cartridge_pcb_gramkracker)
 */
 static DEVICE_START( ti99_cartridge )
 {
-	cartslot_t *cart = get_safe_cartslot_token(device);
+	multicartslot_t *cart = get_safe_cartslot_token(device);
 
 	/* find the PCB device */
 	cart->pcb_device = device->subdevice(TAG_PCB);
@@ -1476,7 +1475,7 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 	{
 		/* If we are here, we have a multicart. */
 		ti99_pcb_t *pcb = get_safe_pcb_token(pcbdev);
-		cartslot_t *cart = get_safe_cartslot_token(&image.device());
+		multicartslot_t *cart = get_safe_cartslot_token(&image.device());
 
 		/* try opening this as a multicart */
 		// This line requires that cartslot_t be included in cartslot.h,
@@ -1521,7 +1520,7 @@ static DEVICE_IMAGE_UNLOAD( ti99_cartridge )
 	if (pcbdev != NULL)
 	{
 		ti99_pcb_t *pcb = get_safe_pcb_token(pcbdev);
-		cartslot_t *cart = get_safe_cartslot_token(&image.device());
+		multicartslot_t *cart = get_safe_cartslot_token(&image.device());
 
 		if (cart->mc != NULL)
 		{
@@ -2148,20 +2147,20 @@ static WRITE8_DEVICE_HANDLER( ti99_cart_cru_gk_w )
 }
 
 /*****************************************************************************/
-#define TI99_CARTRIDGE_SLOT(p)  MCFG_CARTSLOT_ADD(p) \
-	MCFG_CARTSLOT_EXTENSION_LIST("rpk,bin") \
-	MCFG_CARTSLOT_PCBTYPE(0, "none", TI99_CARTRIDGE_PCB_NONE) \
-	MCFG_CARTSLOT_PCBTYPE(1, "standard", TI99_CARTRIDGE_PCB_STD) \
-	MCFG_CARTSLOT_PCBTYPE(2, "paged", TI99_CARTRIDGE_PCB_PAGED) \
-	MCFG_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM) \
-	MCFG_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER) \
-	MCFG_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX) \
-	MCFG_CARTSLOT_PCBTYPE(6, "paged379i", TI99_CARTRIDGE_PCB_PAGED379I) \
-	MCFG_CARTSLOT_PCBTYPE(7, "pagedcru", TI99_CARTRIDGE_PCB_PAGEDCRU) \
-	MCFG_CARTSLOT_PCBTYPE(8, "gramkracker", TI99_CARTRIDGE_PCB_GRAMKRACKER) \
-	MCFG_CARTSLOT_START(ti99_cartridge) \
-	MCFG_CARTSLOT_LOAD(ti99_cartridge) \
-	MCFG_CARTSLOT_UNLOAD(ti99_cartridge)
+#define TI99_CARTRIDGE_SLOT(p)  MCFG_MULTICARTSLOT_ADD(p) \
+	MCFG_MULTICARTSLOT_EXTENSION_LIST("rpk,bin") \
+	MCFG_MULTICARTSLOT_PCBTYPE(0, "none", TI99_CARTRIDGE_PCB_NONE) \
+	MCFG_MULTICARTSLOT_PCBTYPE(1, "standard", TI99_CARTRIDGE_PCB_STD) \
+	MCFG_MULTICARTSLOT_PCBTYPE(2, "paged", TI99_CARTRIDGE_PCB_PAGED) \
+	MCFG_MULTICARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM) \
+	MCFG_MULTICARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER) \
+	MCFG_MULTICARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX) \
+	MCFG_MULTICARTSLOT_PCBTYPE(6, "paged379i", TI99_CARTRIDGE_PCB_PAGED379I) \
+	MCFG_MULTICARTSLOT_PCBTYPE(7, "pagedcru", TI99_CARTRIDGE_PCB_PAGEDCRU) \
+	MCFG_MULTICARTSLOT_PCBTYPE(8, "gramkracker", TI99_CARTRIDGE_PCB_GRAMKRACKER) \
+	MCFG_MULTICARTSLOT_START(ti99_cartridge) \
+	MCFG_MULTICARTSLOT_LOAD(ti99_cartridge) \
+	MCFG_MULTICARTSLOT_UNLOAD(ti99_cartridge)
 
 static MACHINE_CONFIG_FRAGMENT(ti99_multicart)
 	TI99_CARTRIDGE_SLOT("cartridge1")
@@ -2178,4 +2177,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FAMILY              "Multi-cartridge system"
 #include "devtempl.h"
 
-DEFINE_LEGACY_CART_SLOT_DEVICE(TI99_MULTICART, ti99_multicart);
+DEFINE_LEGACY_DEVICE(TI99_MULTICART, ti99_multicart);
