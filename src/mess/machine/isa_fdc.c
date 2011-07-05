@@ -377,7 +377,7 @@ void isa8_fdc_device::dack_w(int line,UINT8 data)
 }
 void isa8_fdc_device::eop_w(int state)
 {
-	pc_fdc_set_tc_state( this, state ? CLEAR_LINE : ASSERT_LINE );
+	pc_fdc_set_tc_state( this, state);
 }
 
 bool isa8_fdc_device::have_dack(int line)
