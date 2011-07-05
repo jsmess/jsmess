@@ -585,9 +585,9 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
 
-	MCFG_PIC8259A_ADD( "pic8259_master", at_pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
-	MCFG_PIC8259A_ADD( "pic8259_slave", at_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
 
 	MCFG_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] ) /* Verified: IBM P/N 6320947 Serial/Parallel card uses an NS16450N */
 	MCFG_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )
@@ -655,9 +655,9 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
 
-	MCFG_PIC8259A_ADD( "pic8259_master", at_pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
-	MCFG_PIC8259A_ADD( "pic8259_slave", at_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
 
 	MCFG_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
 	MCFG_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
@@ -711,9 +711,9 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
 
-	MCFG_PIC8259A_ADD( "pic8259_master", at_pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
-	MCFG_PIC8259A_ADD( "pic8259_slave", at_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
 
 	MCFG_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
 	MCFG_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
@@ -767,9 +767,9 @@ static MACHINE_CONFIG_START( neat, at_state )
 
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
 
-	MCFG_PIC8259A_ADD( "pic8259_master", at_pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
-	MCFG_PIC8259A_ADD( "pic8259_slave", at_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
 
 	MCFG_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
 	MCFG_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
@@ -827,9 +827,9 @@ static MACHINE_CONFIG_START( atvga, at_state )
 
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
 
-	MCFG_PIC8259A_ADD( "pic8259_master", at_pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
-	MCFG_PIC8259A_ADD( "pic8259_slave", at_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
 
 	MCFG_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
 	MCFG_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
@@ -889,9 +889,9 @@ static MACHINE_CONFIG_START( at386, at_state )
 
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
 
-	MCFG_PIC8259A_ADD( "pic8259_master", at_pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
 
-	MCFG_PIC8259A_ADD( "pic8259_slave", at_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
 
 	MCFG_NS16450_ADD( "ns16450_0", ibm5170_com_interface[0] )			/* TODO: verify model */
 	MCFG_NS16450_ADD( "ns16450_1", ibm5170_com_interface[1] )			/* TODO: verify model */
