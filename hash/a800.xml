@@ -85,6 +85,11 @@ Compiled by K1W1
                 A3=1, A0=0 - disable cartridge.
                 A3=1, A0=1 - $A000-$AFFF: bank C, $B000-$BFFF: bank A.
 
+		043M = Not much is known about this mapping scheme. It is only used in the "MAC/65 v1.0" & "Action! v3.5" cartridges.
+
+		8k OSS = Not much is known about this mapping scheme. It is only used in the "The Writers Tool" cartridge.
+
+
   * Copy Protection - Some cartridges were produced that utilised a form of copy protection by writing data back to the ROM area in memory. There are many versions of
     these ROM's available that have been altered to circumvent this protection. This collection where possible has used original unaltered ROM's, those that have been
     altered have been commented. The original Copy Protected versions will run in MESS emulation.
@@ -420,26 +425,26 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="action">
-		<description>Action! Programming Language (OSS Type A)</description>
-		<year>1983</year>
-		<publisher>OSS</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="oss 034m" />
-			<dataarea name="rom" size="16384">
-				<rom name="action! programming language  (oss type a).rom" size="16384" crc="b2611fd3" sha1="e87becc0346d0ad40ffc7aac12a1a0353210ffef" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="actionb" cloneof="action">
-		<description>Action! Programming Language (OSS Type B)</description>
+	<software name="action36">
+		<description>Action! Programming Language v3.6</description>
 		<year>1983</year>
 		<publisher>OSS</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="oss m091" />
 			<dataarea name="rom" size="16384">
-				<rom name="action! programming language (oss type b) .rom" size="16384" crc="a1f90dfd" sha1="03b31582133c4883f470ef08c7b9eaad71fc8710" offset="0" />
+				<rom name="action! programming language v3.6.rom" size="16384" crc="a1f90dfd" sha1="03b31582133c4883f470ef08c7b9eaad71fc8710" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="action35" cloneof="action36">
+		<description>Action! Programming Language v3.5</description>
+		<year>1983</year>
+		<publisher>OSS</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="oss m091" />
+			<dataarea name="rom" size="16384">
+				<rom name="action! programming language v3.5.rom" size="16384" crc="ae298a33" sha1="8928a0c6a93e5b78aa3f91d8bd25b2e529e274ae" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -917,43 +922,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="bxl102a">
-		<description>Basic XL Programming Language v1.02 (OSS Type A)</description>
-		<year>1983</year>
-		<publisher>OSS</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="oss 034m" />
-			<dataarea name="rom" size="16384">
-				<rom name="basic xl programming language v1.02 (oss type a).rom" size="16384" crc="e8b3fc3c" sha1="d43bea60d15aa7ad41e074396dfe5019e8415353" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bxl102aa">
-		<description>Basic XL Programming Language v1.02 (OSS Type A)(Alt)</description>
-		<year>1983</year>
-		<publisher>OSS</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="oss 034m" />
-			<dataarea name="rom" size="16384">
-				<rom name="basic xl programming language v1.02 (oss type a) (alt).rom" size="16384" crc="5752d29f" sha1="787402aa14379f70e5102a066473a0bdd490d834" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bxl102b">
-		<description>Basic XL Programming Language v1.02 (OSS Type B)</description>
-		<year>1983</year>
-		<publisher>OSS</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="oss m091" />
-			<dataarea name="rom" size="16384">
-				<rom name="basic xl programming language v1.02 (oss type b).rom" size="16384" crc="81383e8b" sha1="101edda4bbe8d81af386b0cf3f7cc4f6d35e2fed" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="basxl103">
+	<software name="bxl103">
 		<description>Basic XL Programming Language v1.03</description>
 		<year>1983</year>
 		<publisher>OSS</publisher>
@@ -961,6 +930,31 @@ Compiled by K1W1
 			<feature name="cart_type" value="oss m091" />
 			<dataarea name="rom" size="16384">
 				<rom name="basic xl programming language v1.03.rom" size="16384" crc="94a05568" sha1="01eefc1ed8625cf264a00b15acd6c3698cebfdcc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="bxl102" cloneof="bxl103">
+		<description>Basic XL Programming Language v1.02</description>
+		<year>1983</year>
+		<publisher>OSS</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="oss 034m" />
+			<dataarea name="rom" size="16384">
+				<rom name="basic xl programming language v1.02.rom" size="16384" crc="e8b3fc3c" sha1="d43bea60d15aa7ad41e074396dfe5019e8415353" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bxl102a" cloneof="bxl103">
+		<description>Basic XL Programming Language v1.02 (Alt)</description>
+		<year>1983</year>
+		<publisher>OSS</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="oss 043m" />
+			<dataarea name="rom" size="16384">
+				<rom name="basic xl programming language v1.02 (alt).rom" size="16384" crc="5752d29f" sha1="787402aa14379f70e5102a066473a0bdd490d834" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1299,6 +1293,20 @@ Compiled by K1W1
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="chiffres et des lettres, des.rom" size="16384" crc="c7705c53" sha1="fd45a75178dbe2426373bf720639160ed91d892a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chifresa" cloneof="chiffres">
+		<description>Des Chiffres et des Lettres (France) (Alt)</description>
+		<!-- Probably an earlier version. Attempts to boot from disk on restart. -->
+		<year>1983</year>
+		<publisher>Atari France</publisher>
+		<info name="serial" value="RXF52001" />
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="chiffres et des lettres, des (alt).rom" size="16384" crc="3d8f5c25" sha1="51c490b284e44923943b2327550e3e40e7bcc6c5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2720,38 +2728,26 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mac65100">
-		<description>MAC-65 Macro Assembler v1.00</description>
-		<year>1984</year>
-		<publisher>OSS</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="oss 034m" />
-			<dataarea name="rom" size="16384">
-				<rom name="mac-65 macro assembler v1.0.rom" size="16384" crc="5e033719" sha1="13197d3c67efc7df429480bd0cd784bd62268b50" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mac6511a">
-		<description>MAC-65 Macro Assembler v1.01 (OSS Type A)</description>
-		<year>1984</year>
-		<publisher>OSS</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="oss 034m" />
-			<dataarea name="rom" size="16384">
-				<rom name="mac-65 macro assembler v1.01 (oss type a).rom" size="16384" crc="a91560ad" sha1="150e33ad1dfd07ad2d731ce121a8f4cc65ce93b8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mac6511b">
-		<description>MAC-65 Macro Assembler v1.01 (OSS Type B)</description>
+	<software name="mac65101">
+		<description>MAC-65 Macro Assembler v1.01</description>
 		<year>1984</year>
 		<publisher>OSS</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="oss m091" />
 			<dataarea name="rom" size="16384">
-				<rom name="mac-65 macro assembler v1.01 (oss type b).rom" size="16384" crc="4102ca4f" sha1="2143a8317e85ec7eb27770a9f38e63867e41014b" offset="0" />
+				<rom name="mac-65 macro assembler v1.01.rom" size="16384" crc="4102ca4f" sha1="2143a8317e85ec7eb27770a9f38e63867e41014b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mac65100" cloneof="mac65101">
+		<description>MAC-65 Macro Assembler v1.00</description>
+		<year>1984</year>
+		<publisher>OSS</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="oss 043m" />
+			<dataarea name="rom" size="16384">
+				<rom name="mac-65 macro assembler v1.0.rom" size="16384" crc="5e033719" sha1="13197d3c67efc7df429480bd0cd784bd62268b50" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3932,6 +3928,66 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="spart439">
+		<description>Sparta DOS X v4.39rc</description>
+		<year>2006</year>
+		<publisher>DLT</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="spartados x" />
+			<dataarea name="rom" size="131072">
+				<rom name="spartados x v4.39rc.rom" size="131072" crc="a3ec2e58" sha1="79ad6acd8a61fdcbf427d098c77d84282110a6ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spart441">
+		<description>Sparta DOS X v4.41</description>
+		<year>2008</year>
+		<publisher>DLT</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="spartados x" />
+			<dataarea name="rom" size="131072">
+				<rom name="spartados x v4.41.rom" size="131072" crc="687c7a15" sha1="12fc71f8437528117079fff777838b7193d38fcc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spart442">
+		<description>Sparta DOS X v4.42</description>
+		<year>2008</year>
+		<publisher>DLT</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="spartados x" />
+			<dataarea name="rom" size="131072">
+				<rom name="spartados x v4.42.rom" size="131072" crc="0b4bcfc5" sha1="663fef048ddd76316dd193023c560631b161257b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spart443">
+		<description>Sparta DOS X v4.43</description>
+		<year>2011</year>
+		<publisher>DLT</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="spartados x" />
+			<dataarea name="rom" size="131072">
+				<rom name="spartados x v4.43.rom" size="131072" crc="48be5d1e" sha1="d0579bc19d0fa8938d1557924c2e1c3b968e02e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spart444">
+		<description>Sparta DOS X v4.44</description>
+		<year>2011</year>
+		<publisher>DLT</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="spartados x" />
+			<dataarea name="rom" size="131072">
+				<rom name="spartados x v4.44.rom" size="131072" crc="337516b0" sha1="99518cab315b564b2f7621d6969709bf7ee7c5af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spedwayb">
 		<description>Speedway Blast</description>
 		<year>1982</year>
@@ -4384,22 +4440,9 @@ Compiled by K1W1
 		<year>1985</year>
 		<publisher>OSS</publisher>
 		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="standard 8k" />
+			<feature name="cart_type" value="8k oss" />
 			<dataarea name="rom" size="8192">
 				<rom name="the writer&apos;s tool.rom" size="8192" crc="13bcf201" sha1="7de7b160c60f162b19f45789db07ddfd13836da2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="writersf" cloneof="writers">
-		<description>The Writer's Tool (Fixed)</description>
-		<!-- This rom has been fixed to run under the OSS 'M034' cartridge format scheme and will need the Writer's Tool disk software. -->
-		<year>1985</year>
-		<publisher>OSS</publisher>
-		<part name="cart" interface="a800_cart">
-			<feature name="cart_type" value="oss 034m" />
-			<dataarea name="rom" size="16384">
-				<rom name="the writer&apos;s tool [fixed].rom" size="16384" crc="a1cb09bc" sha1="a2ce17cf15a7df539de45aed7b920aa374856905" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop1" interface="floppy_5_25">

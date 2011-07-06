@@ -133,7 +133,7 @@ Compiled by K1W1
 		<info name="serial" value="RX8096" />
 		<part name="cart" interface="xegs_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="choplifter! (atari)(1987)(rx8096).rom" size="65536" crc="d426eccc" sha1="03600f288ecedaa61fe7976dfe32ce9a6fdfe03e" offset="0" />
+				<rom name="choplifter! (atari)(1987)(rx8096).rom" size="65536" crc="d426eccc" sha1="03600f288ecedaa61fe7976dfe32ce9a6fdfe03e" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
