@@ -873,14 +873,14 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 //  build_generic_filter
 //============================================================
 
-static void build_generic_filter(device_t *device, int is_save, char *filter, size_t filter_len)
+static void build_generic_filter(device_image_interface *dev, int is_save, char *filter, size_t filter_len)
 {
 	char *s;
 
 	const char *file_extension;
 
 	/* copy the string */
-	file_extension = downcast<const legacy_image_device_base *>(device)->file_extensions();
+	file_extension = dev->file_extensions();
 
 	// start writing the filter
 	s = filter;
@@ -944,7 +944,7 @@ static void change_device(HWND wnd, device_image_interface *image, int is_save)
 	else
 	{
 		// build a normal filter
-		build_generic_filter(&image->device(), is_save, filter, ARRAY_LENGTH(filter));
+		build_generic_filter(image, is_save, filter, ARRAY_LENGTH(filter));
 	}
 
 	// display the dialog
@@ -1112,7 +1112,7 @@ static void setup_joystick_menu(running_machine &machine, HMENU menu_bar)
 	int joystick_count = 0;
 	HMENU joystick_menu;
 	int i;
-	UINT command;
+	UINT command = 0;
 	HMENU submenu = NULL;
 	input_port_config *port;
 	input_field_config *field;
@@ -1421,7 +1421,7 @@ static void prepare_menus(HWND wnd)
 
 
 //============================================================
-//  set_seped
+//  set_speed
 //============================================================
 
 static void set_speed(running_machine &machine, int speed)
