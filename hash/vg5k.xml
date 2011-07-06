@@ -291,7 +291,7 @@
 	</software>
 
 	<software name="microp">
-		<description>Micropocesseur</description>
+		<description>Microprocesseur</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 		<part name="cass" interface="vg5k_cass">
