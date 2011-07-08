@@ -36,6 +36,27 @@
     A29  IO  A2            B29      +5V
     A30  IO  A1            B30  I   OSC
     A31  IO  A0            B31      GND
+	
+	16 bit ISA bus extension
+	
+    C1   I   SBHE          D1   I   /MEM CS 16
+    C2   IO  A23           D2   I   /I/O CS 16
+    C3   IO  A22           D3    O  IRQ10
+    C4   IO  A21           D4    O  IRQ11
+    C5   IO  A20           D5    O  IRQ12
+    C6   IO  A19           D6    O  IRQ15
+    C7   IO  A18           D7    O  IRQ14
+    C8   IO  A17           D8   I   /DACK0
+    C9   I   /MEMR         D9    O  DRQ0
+    C10  I   /MEMW         D10  I   /DACK5
+    C11  IO  D8            D11   O  DRQ5  
+    C12  IO  D9            D12  I   /DACK6
+    C13  IO  D10           D13   O  DRQ6
+    C14  IO  D11           D14  I   /DACK7
+    C15  IO  D12           D15   O  DRQ7
+    C16  IO  D13           D16      +5V
+    C17  IO  D14           D17  I   MASTER
+    C18  IO  D15           D18      GND
 
 ***************************************************************************/
 
@@ -61,6 +82,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
 	isa8_slot_device::static_set_isa8_slot(*device, _isatag, _num); \
 
+#define MCFG_ISA8_ONBOARD_ADD(_isatag, _tag, _dev_type, _def_inp) \
+    MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
+	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
+	device_isa8_card_interface::static_set_isa8_tag(*device, _isatag); 	
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -74,11 +99,13 @@ class isa8_slot_device : public device_t,
 public:
 	// construction/destruction
 	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	// device-level overrides
+	
+	isa8_device* get_isa_device() const { return m_isa; }
+	// device-level overrides	
 	virtual void device_start();
 
     // inline configuration
-    static void static_set_isa8_slot(device_t &device, const char *tag, int num);
+    static void static_set_isa8_slot(device_t &device, const char *tag, int num);	
 private:
 	// configuration
 	const char *m_isa_tag;
@@ -89,9 +116,9 @@ private:
 // device type definition
 extern const device_type ISA8_SLOT;
 
-// ======================> isabus_interface
+// ======================> isa8bus_interface
 
-struct isabus_interface
+struct isa8bus_interface
 {
     devcb_write_line	m_out_irq2_cb;
     devcb_write_line	m_out_irq3_cb;
@@ -107,7 +134,7 @@ struct isabus_interface
 class device_isa8_card_interface;
 // ======================> isa8_device
 class isa8_device : public device_t,
-                    public isabus_interface
+                    public isa8bus_interface
 {
 public:
 	// construction/destruction
@@ -176,6 +203,7 @@ public:
 	device_isa8_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_isa8_card_interface();
 
+	void set_isa_device();
 	// configuration access
 	virtual UINT8 dack_r(int line);
 	virtual void dack_w(int line,UINT8 data);
@@ -186,6 +214,33 @@ public:
     static void static_set_isa8_tag(device_t &device, const char *tag);
 public:
 	isa8_device  *m_isa;
+	const char *m_isa_tag;
+};
+
+// ======================> isa16bus_interface
+
+struct isa16bus_interface
+{
+    devcb_write_line	m_out_irq2_cb; // this goes to IRQ 9 on pic
+    devcb_write_line	m_out_irq3_cb;
+    devcb_write_line	m_out_irq4_cb;
+    devcb_write_line	m_out_irq5_cb;
+    devcb_write_line	m_out_irq6_cb;
+    devcb_write_line	m_out_irq7_cb;
+	
+	devcb_write_line	m_out_irq10_cb;
+	devcb_write_line	m_out_irq11_cb;
+	devcb_write_line	m_out_irq12_cb;
+	devcb_write_line	m_out_irq14_cb;
+	devcb_write_line	m_out_irq15_cb;
+	
+    devcb_write_line	m_out_drq0_cb;
+	devcb_write_line	m_out_drq1_cb;
+    devcb_write_line	m_out_drq2_cb;
+    devcb_write_line	m_out_drq3_cb;
+	devcb_write_line	m_out_drq5_cb;
+	devcb_write_line	m_out_drq6_cb;
+	devcb_write_line	m_out_drq7_cb;
 };
 
 #endif  /* __ISA_H__ */

@@ -68,10 +68,10 @@ void isa8_device::static_set_cputag(device_t &device, const char *tag)
 void isa8_device::device_config_complete()
 {
 	// inherit a copy of the static data
-	const isabus_interface *intf = reinterpret_cast<const isabus_interface *>(static_config());
+	const isa8bus_interface *intf = reinterpret_cast<const isa8bus_interface *>(static_config());
 	if (intf != NULL)
 	{
-		*static_cast<isabus_interface *>(this) = *intf;
+		*static_cast<isa8bus_interface *>(this) = *intf;
 	}
 
 	// or initialize to defaults if none provided
@@ -227,7 +227,9 @@ void isa8_device::eop_w(int state)
 //-------------------------------------------------
 
 device_isa8_card_interface::device_isa8_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_interface(device),
+	  m_isa(NULL),
+	  m_isa_tag(NULL)
 {
 }
 
@@ -254,4 +256,19 @@ void device_isa8_card_interface::eop_w(int state)
 bool device_isa8_card_interface::have_dack(int line)
 {
 	return FALSE;
+}
+
+void device_isa8_card_interface::static_set_isa8_tag(device_t &device, const char *tag)
+{
+	device_isa8_card_interface &isa_card = dynamic_cast<device_isa8_card_interface &>(device);
+	isa_card.m_isa_tag = tag;
+}
+
+void device_isa8_card_interface::set_isa_device()
+{
+	if(m_isa_tag) {
+		m_isa = device().machine().device<isa8_device>(m_isa_tag);
+	} else {
+		m_isa = (dynamic_cast<isa8_slot_device *>(device().owner()))->get_isa_device();
+	}
 }

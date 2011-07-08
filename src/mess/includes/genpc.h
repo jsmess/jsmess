@@ -18,7 +18,7 @@
     MCFG_DEVICE_CONFIG(_config) \
     ibm5160_mb_device::static_set_cputag(*device, _cputag); \
 
-// ======================> isabus_interface
+// ======================> motherboard_interface
 
 struct motherboard_interface
 {

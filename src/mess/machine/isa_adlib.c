@@ -79,7 +79,7 @@ isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *
 
 void isa8_adlib_device::device_start()
 {
-	m_isa = machine().device<isa8_device>("mb:isa");
+	set_isa_device();
 	m_isa->install_device(subdevice("ym3812"), 0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
 }
 
