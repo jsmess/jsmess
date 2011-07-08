@@ -170,7 +170,7 @@ isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, const char *tag,
 
 void isa8_hdc_device::device_start()
 {
-	m_isa = machine().device<isa8_device>("mb:isa");
+	set_isa_device();
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
 	m_isa->install_device(this, 0x0320, 0x0323, 0, 0, FUNC(pc_HDC_r), FUNC(pc_HDC_w) );
 	buffer = auto_alloc_array(machine(), UINT8, 17*4*512);

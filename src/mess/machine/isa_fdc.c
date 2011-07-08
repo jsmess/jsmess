@@ -91,7 +91,7 @@ isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, const char *tag,
 
 void isa8_fdc_device::device_start()
 {
-	m_isa = machine().device<isa8_device>("mb:isa");
+	set_isa_device();
 	m_isa->install_device(this, 0x03f0, 0x03f7, 0, 0, FUNC(pc_fdc_r), FUNC(pc_fdc_w) );
 }
 

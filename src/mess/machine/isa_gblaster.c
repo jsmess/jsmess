@@ -76,7 +76,7 @@ isa8_gblaster_device::isa8_gblaster_device(const machine_config &mconfig, const 
 
 void isa8_gblaster_device::device_start()
 {
-	m_isa = machine().device<isa8_device>("mb:isa");
+	set_isa_device();
 	m_isa->install_device(subdevice("saa1099.1"), 0x0220, 0x0221, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
 	m_isa->install_device(subdevice("saa1099.2"), 0x0222, 0x0223, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
 }

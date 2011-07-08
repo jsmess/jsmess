@@ -415,7 +415,7 @@ I8255A_INTERFACE( pc_ppi8255_interface )
 	DEVCB_NULL
 };
 
-static const isabus_interface isabus_intf =
+static const isa8bus_interface isabus_intf =
 {
 	// interrupts
 	DEVCB_DEVICE_LINE("pic8259", pic8259_ir2_w),

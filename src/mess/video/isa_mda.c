@@ -179,7 +179,7 @@ isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type
 
 void isa8_mda_device::device_start()
 {
-	m_isa = machine().device<isa8_device>("mb:isa");
+	set_isa_device();
 	videoram = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_isa->install_device(this, 0x3b0, 0x3bf, 0, 0, FUNC(pc_MDA_r), FUNC(pc_MDA_w) );
 	m_isa->install_bank(0xb0000, 0xb0fff, 0, 0x07000, "bank_mda", videoram);
@@ -598,7 +598,7 @@ isa8_hercules_device::isa8_hercules_device(const machine_config &mconfig, const 
 void isa8_hercules_device::device_start()
 {
 	videoram = auto_alloc_array(machine(), UINT8, 0x10000);
-	m_isa = machine().device<isa8_device>("mb:isa");
+	set_isa_device();
 	m_isa->install_device(this, 0x3b0, 0x3bf, 0, 0, FUNC(hercules_r), FUNC(hercules_w) );
 	m_isa->install_bank(0xb0000, 0xbffff, 0, 0, "bank_hercules", videoram);
 
