@@ -1273,6 +1273,7 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_MACHINE)/isa_gblaster.o	\
 	$(MESS_MACHINE)/isa_hdc.o	\
 	$(MESS_MACHINE)/isa_sblaster.o	\
+	$(MESS_MACHINE)/isa_ide.o	\
 	$(MESS_VIDEO)/isa_mda.o		\
 	$(MESS_VIDEO)/pc_cga.o		\
 	$(MESS_VIDEO)/cgapal.o		\

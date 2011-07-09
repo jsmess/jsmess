@@ -28,6 +28,12 @@ isa8_slot_device::isa8_slot_device(const machine_config &mconfig, const char *ta
 {
 }
 
+isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, type, name, tag, owner, clock),
+		device_slot_interface(mconfig, *this)
+{
+}
+
 void isa8_slot_device::static_set_isa8_slot(device_t &device, const char *tag, int num)
 {
 	isa8_slot_device &isa_card = dynamic_cast<isa8_slot_device &>(device);
@@ -44,6 +50,44 @@ void isa8_slot_device::device_start()
 	m_isa = machine().device<isa8_device>(m_isa_tag);
 	device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
 	if (dev) m_isa->add_isa_card(dev, m_isa_num);
+}
+
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+const device_type ISA16_SLOT = &device_creator<isa16_slot_device>;
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  isa16_slot_device - constructor
+//-------------------------------------------------
+isa16_slot_device::isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        isa8_slot_device(mconfig, ISA16_SLOT, "ISA16_SLOT", tag, owner, clock)
+{
+}
+
+void isa16_slot_device::static_set_isa16_slot(device_t &device, const char *tag, int num)
+{
+	isa16_slot_device &isa_card = dynamic_cast<isa16_slot_device &>(device);
+	isa_card.m_isa_tag = tag;
+	isa_card.m_isa_num = num;
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void isa16_slot_device::device_start()
+{
+	m_isa16 = machine().device<isa16_device>(m_isa_tag);
+	device_isa16_card_interface *dev = dynamic_cast<device_isa16_card_interface *>(get_card_device());
+	if (dev) m_isa16->add_isa_card(dev, m_isa_num);
 }
 
 
@@ -104,6 +148,12 @@ isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_
 		m_isa_device[i] = NULL;
 }
 
+isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, type, name, tag, owner, clock)
+{
+	for(int i = 0; i < 8; i++)
+		m_isa_device[i] = NULL;
+}
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -147,6 +197,9 @@ void isa8_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t
 			break;
 		case 16:
 			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff);
+			break;
+		case 32:
+			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
 			break;
 		default:
 			fatalerror("ISA8: Bus width %d not supported", buswidth);
@@ -267,8 +320,151 @@ void device_isa8_card_interface::static_set_isa8_tag(device_t &device, const cha
 void device_isa8_card_interface::set_isa_device()
 {
 	if(m_isa_tag) {
-		m_isa = device().machine().device<isa8_device>(m_isa_tag);
+		m_isa = dynamic_cast<isa8_device *>(device().machine().device(m_isa_tag));
 	} else {
 		m_isa = (dynamic_cast<isa8_slot_device *>(device().owner()))->get_isa_device();
+	}
+}
+
+
+const device_type ISA16 = &device_creator<isa16_device>;
+
+//-------------------------------------------------
+//  isa16_device - constructor
+//-------------------------------------------------
+
+isa16_device::isa16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        isa8_device(mconfig, ISA16, "ISA16", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void isa16_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const isa16bus_interface *intf = reinterpret_cast<const isa16bus_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<isa16bus_interface *>(this) = *intf;
+	}
+
+	// or initialize to defaults if none provided
+	else
+	{
+    	memset(&(isa16bus_interface::m_out_irq2_cb), 0, sizeof(isa16bus_interface::m_out_irq2_cb));
+    	memset(&(isa16bus_interface::m_out_irq3_cb), 0, sizeof(isa16bus_interface::m_out_irq3_cb));
+    	memset(&(isa16bus_interface::m_out_irq4_cb), 0, sizeof(isa16bus_interface::m_out_irq4_cb));
+    	memset(&(isa16bus_interface::m_out_irq5_cb), 0, sizeof(isa16bus_interface::m_out_irq5_cb));
+    	memset(&(isa16bus_interface::m_out_irq6_cb), 0, sizeof(isa16bus_interface::m_out_irq6_cb));
+    	memset(&(isa16bus_interface::m_out_irq7_cb), 0, sizeof(isa16bus_interface::m_out_irq7_cb));
+		
+		memset(&m_out_irq10_cb, 0, sizeof(m_out_irq10_cb));
+    	memset(&m_out_irq11_cb, 0, sizeof(m_out_irq11_cb));
+    	memset(&m_out_irq12_cb, 0, sizeof(m_out_irq12_cb));
+    	memset(&m_out_irq14_cb, 0, sizeof(m_out_irq14_cb));
+    	memset(&m_out_irq15_cb, 0, sizeof(m_out_irq15_cb));
+
+		memset(&m_out_drq0_cb, 0, sizeof(m_out_drq0_cb));
+    	memset(&(isa16bus_interface::m_out_drq1_cb), 0, sizeof(isa16bus_interface::m_out_drq1_cb));
+    	memset(&(isa16bus_interface::m_out_drq2_cb), 0, sizeof(isa16bus_interface::m_out_drq2_cb));
+    	memset(&(isa16bus_interface::m_out_drq3_cb), 0, sizeof(isa16bus_interface::m_out_drq3_cb));
+		
+		memset(&m_out_drq5_cb, 0, sizeof(m_out_drq5_cb));
+    	memset(&m_out_drq6_cb, 0, sizeof(m_out_drq6_cb));
+    	memset(&m_out_drq7_cb, 0, sizeof(m_out_drq7_cb));
+	}
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void isa16_device::device_start()
+{
+	m_maincpu = machine().device(m_cputag);
+	// resolve callbacks
+	m_out_irq2_func.resolve(isa16bus_interface::m_out_irq2_cb, *this);	
+	m_out_irq3_func.resolve(isa16bus_interface::m_out_irq3_cb, *this);
+	m_out_irq4_func.resolve(isa16bus_interface::m_out_irq4_cb, *this);
+	m_out_irq5_func.resolve(isa16bus_interface::m_out_irq5_cb, *this);
+	m_out_irq6_func.resolve(isa16bus_interface::m_out_irq6_cb, *this);
+	m_out_irq7_func.resolve(isa16bus_interface::m_out_irq7_cb, *this);
+	m_out_drq1_func.resolve(isa16bus_interface::m_out_drq1_cb, *this);
+	m_out_drq2_func.resolve(isa16bus_interface::m_out_drq2_cb, *this);
+	m_out_drq3_func.resolve(isa16bus_interface::m_out_drq3_cb, *this);
+
+	// resolve callbacks
+	m_out_irq10_func.resolve(m_out_irq10_cb, *this);
+	m_out_irq11_func.resolve(m_out_irq11_cb, *this);
+	m_out_irq12_func.resolve(m_out_irq12_cb, *this);
+	m_out_irq14_func.resolve(m_out_irq14_cb, *this);
+	m_out_irq15_func.resolve(m_out_irq15_cb, *this);
+	
+	m_out_drq0_func.resolve(m_out_drq0_cb, *this);
+	m_out_drq5_func.resolve(m_out_drq5_cb, *this);
+	m_out_drq6_func.resolve(m_out_drq6_cb, *this);
+	m_out_drq7_func.resolve(m_out_drq7_cb, *this);
+}
+
+void isa16_device::install16_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_device_func rhandler, const char* rhandler_name, write16_device_func whandler, const char *whandler_name)
+{
+	m_maincpu = machine().device(m_cputag);
+	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	switch(buswidth)
+	{
+		case 16:
+			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0);
+			break;
+		case 32:
+			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
+			break;
+		default:
+			fatalerror("ISA16: Bus width %d not supported", buswidth);
+			break;
+	}
+}
+
+// interrupt request from isa card
+WRITE_LINE_MEMBER( isa16_device::irq10_w ) { m_out_irq10_func(state); }
+WRITE_LINE_MEMBER( isa16_device::irq11_w ) { m_out_irq11_func(state); }
+WRITE_LINE_MEMBER( isa16_device::irq12_w ) { m_out_irq12_func(state); }
+WRITE_LINE_MEMBER( isa16_device::irq14_w ) { m_out_irq14_func(state); }
+WRITE_LINE_MEMBER( isa16_device::irq15_w ) { m_out_irq15_func(state); }
+
+// dma request from isa card
+WRITE_LINE_MEMBER( isa16_device::drq0_w ) { m_out_drq0_func(state); }
+WRITE_LINE_MEMBER( isa16_device::drq5_w ) { m_out_drq5_func(state); }
+WRITE_LINE_MEMBER( isa16_device::drq6_w ) { m_out_drq6_func(state); }
+WRITE_LINE_MEMBER( isa16_device::drq7_w ) { m_out_drq7_func(state); }
+
+//-------------------------------------------------
+//  device_isa16_card_interface - constructor
+//-------------------------------------------------
+
+device_isa16_card_interface::device_isa16_card_interface(const machine_config &mconfig, device_t &device)
+	: device_isa8_card_interface(mconfig,device)
+{
+}
+
+
+//-------------------------------------------------
+//  ~device_isa16_card_interface - destructor
+//-------------------------------------------------
+
+device_isa16_card_interface::~device_isa16_card_interface()
+{
+}
+
+void device_isa16_card_interface::set_isa_device()
+{
+	if(m_isa_tag) {
+		m_isa = dynamic_cast<isa16_device *>(device().machine().device(m_isa_tag));
+	} else {
+		m_isa = (dynamic_cast<isa16_slot_device *>(device().owner()))->get_isa_device();
 	}
 }
