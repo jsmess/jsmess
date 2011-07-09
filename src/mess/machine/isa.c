@@ -46,9 +46,8 @@ void isa8_slot_device::static_set_isa8_slot(device_t &device, const char *tag)
 
 void isa8_slot_device::device_start()
 {
-	m_isa = machine().device<isa8_device>(m_isa_tag);
 	device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
-	if (dev) m_isa->add_isa_card(dev);
+	if (dev) device_isa8_card_interface::static_set_isabus_tag(*dev,m_isa_tag);
 }
 
 
@@ -83,9 +82,8 @@ void isa16_slot_device::static_set_isa16_slot(device_t &device, const char *tag)
 
 void isa16_slot_device::device_start()
 {
-	m_isa16 = machine().device<isa16_device>(m_isa_tag);
-	device_isa16_card_interface *dev = dynamic_cast<device_isa16_card_interface *>(get_card_device());
-	if (dev) m_isa16->add_isa_card(dev);
+	device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
+	if (dev) device_isa8_card_interface::static_set_isabus_tag(*dev,m_isa_tag);
 }
 
 
@@ -312,7 +310,7 @@ bool device_isa8_card_interface::have_dack(int line)
 	return FALSE;
 }
 
-void device_isa8_card_interface::static_set_isa8_tag(device_t &device, const char *tag)
+void device_isa8_card_interface::static_set_isabus_tag(device_t &device, const char *tag)
 {
 	device_isa8_card_interface &isa_card = dynamic_cast<device_isa8_card_interface &>(device);
 	isa_card.m_isa_tag = tag;
@@ -320,12 +318,8 @@ void device_isa8_card_interface::static_set_isa8_tag(device_t &device, const cha
 
 void device_isa8_card_interface::set_isa_device()
 {
-	if(m_isa_tag) {
-		m_isa = dynamic_cast<isa8_device *>(device().machine().device(m_isa_tag));
-		m_isa->add_isa_card(this);
-	} else {
-		m_isa = (dynamic_cast<isa8_slot_device *>(device().owner()))->get_isa_device();
-	}
+	m_isa = dynamic_cast<isa8_device *>(device().machine().device(m_isa_tag));
+	m_isa->add_isa_card(this);
 }
 
 
@@ -353,17 +347,26 @@ void isa16_device::device_config_complete()
 	if (intf != NULL)
 	{
 		*static_cast<isa16bus_interface *>(this) = *intf;
+		memcpy(&(isa8bus_interface::m_out_irq2_cb),&(isa16bus_interface::m_out_irq2_cb), sizeof(isa16bus_interface::m_out_irq2_cb));
+    	memcpy(&(isa8bus_interface::m_out_irq3_cb),&(isa16bus_interface::m_out_irq3_cb), sizeof(isa16bus_interface::m_out_irq3_cb));
+    	memcpy(&(isa8bus_interface::m_out_irq4_cb),&(isa16bus_interface::m_out_irq4_cb), sizeof(isa16bus_interface::m_out_irq4_cb));
+    	memcpy(&(isa8bus_interface::m_out_irq5_cb),&(isa16bus_interface::m_out_irq5_cb), sizeof(isa16bus_interface::m_out_irq5_cb));
+    	memcpy(&(isa8bus_interface::m_out_irq6_cb),&(isa16bus_interface::m_out_irq6_cb), sizeof(isa16bus_interface::m_out_irq6_cb));
+    	memcpy(&(isa8bus_interface::m_out_irq7_cb),&(isa16bus_interface::m_out_irq7_cb), sizeof(isa16bus_interface::m_out_irq7_cb));
+    	memcpy(&(isa8bus_interface::m_out_drq1_cb),&(isa16bus_interface::m_out_drq1_cb), sizeof(isa16bus_interface::m_out_drq1_cb));
+    	memcpy(&(isa8bus_interface::m_out_drq2_cb),&(isa16bus_interface::m_out_drq2_cb), sizeof(isa16bus_interface::m_out_drq2_cb));
+    	memcpy(&(isa8bus_interface::m_out_drq3_cb),&(isa16bus_interface::m_out_drq3_cb), sizeof(isa16bus_interface::m_out_drq3_cb));
 	}
 
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&(isa16bus_interface::m_out_irq2_cb), 0, sizeof(isa16bus_interface::m_out_irq2_cb));
-    	memset(&(isa16bus_interface::m_out_irq3_cb), 0, sizeof(isa16bus_interface::m_out_irq3_cb));
-    	memset(&(isa16bus_interface::m_out_irq4_cb), 0, sizeof(isa16bus_interface::m_out_irq4_cb));
-    	memset(&(isa16bus_interface::m_out_irq5_cb), 0, sizeof(isa16bus_interface::m_out_irq5_cb));
-    	memset(&(isa16bus_interface::m_out_irq6_cb), 0, sizeof(isa16bus_interface::m_out_irq6_cb));
-    	memset(&(isa16bus_interface::m_out_irq7_cb), 0, sizeof(isa16bus_interface::m_out_irq7_cb));
+    	memset(&(isa8bus_interface::m_out_irq2_cb), 0, sizeof(isa8bus_interface::m_out_irq2_cb));
+    	memset(&(isa8bus_interface::m_out_irq3_cb), 0, sizeof(isa8bus_interface::m_out_irq3_cb));
+    	memset(&(isa8bus_interface::m_out_irq4_cb), 0, sizeof(isa8bus_interface::m_out_irq4_cb));
+    	memset(&(isa8bus_interface::m_out_irq5_cb), 0, sizeof(isa8bus_interface::m_out_irq5_cb));
+    	memset(&(isa8bus_interface::m_out_irq6_cb), 0, sizeof(isa8bus_interface::m_out_irq6_cb));
+    	memset(&(isa8bus_interface::m_out_irq7_cb), 0, sizeof(isa8bus_interface::m_out_irq7_cb));
 		
 		memset(&m_out_irq10_cb, 0, sizeof(m_out_irq10_cb));
     	memset(&m_out_irq11_cb, 0, sizeof(m_out_irq11_cb));
@@ -372,9 +375,9 @@ void isa16_device::device_config_complete()
     	memset(&m_out_irq15_cb, 0, sizeof(m_out_irq15_cb));
 
 		memset(&m_out_drq0_cb, 0, sizeof(m_out_drq0_cb));
-    	memset(&(isa16bus_interface::m_out_drq1_cb), 0, sizeof(isa16bus_interface::m_out_drq1_cb));
-    	memset(&(isa16bus_interface::m_out_drq2_cb), 0, sizeof(isa16bus_interface::m_out_drq2_cb));
-    	memset(&(isa16bus_interface::m_out_drq3_cb), 0, sizeof(isa16bus_interface::m_out_drq3_cb));
+    	memset(&(isa8bus_interface::m_out_drq1_cb), 0, sizeof(isa8bus_interface::m_out_drq1_cb));
+    	memset(&(isa8bus_interface::m_out_drq2_cb), 0, sizeof(isa8bus_interface::m_out_drq2_cb));
+    	memset(&(isa8bus_interface::m_out_drq3_cb), 0, sizeof(isa8bus_interface::m_out_drq3_cb));
 		
 		memset(&m_out_drq5_cb, 0, sizeof(m_out_drq5_cb));
     	memset(&m_out_drq6_cb, 0, sizeof(m_out_drq6_cb));
@@ -388,17 +391,7 @@ void isa16_device::device_config_complete()
 
 void isa16_device::device_start()
 {
-	m_maincpu = machine().device(m_cputag);
-	// resolve callbacks
-	m_out_irq2_func.resolve(isa16bus_interface::m_out_irq2_cb, *this);	
-	m_out_irq3_func.resolve(isa16bus_interface::m_out_irq3_cb, *this);
-	m_out_irq4_func.resolve(isa16bus_interface::m_out_irq4_cb, *this);
-	m_out_irq5_func.resolve(isa16bus_interface::m_out_irq5_cb, *this);
-	m_out_irq6_func.resolve(isa16bus_interface::m_out_irq6_cb, *this);
-	m_out_irq7_func.resolve(isa16bus_interface::m_out_irq7_cb, *this);
-	m_out_drq1_func.resolve(isa16bus_interface::m_out_drq1_cb, *this);
-	m_out_drq2_func.resolve(isa16bus_interface::m_out_drq2_cb, *this);
-	m_out_drq3_func.resolve(isa16bus_interface::m_out_drq3_cb, *this);
+	isa8_device::device_start();
 
 	// resolve callbacks
 	m_out_irq10_func.resolve(m_out_irq10_cb, *this);
@@ -464,10 +457,6 @@ device_isa16_card_interface::~device_isa16_card_interface()
 
 void device_isa16_card_interface::set_isa_device()
 {
-	if(m_isa_tag) {
-		m_isa = dynamic_cast<isa16_device *>(device().machine().device(m_isa_tag));
-		m_isa->add_isa_card(this);
-	} else {
-		m_isa = (dynamic_cast<isa16_slot_device *>(device().owner()))->get_isa_device();
-	}
+	m_isa = dynamic_cast<isa16_device *>(device().machine().device(m_isa_tag));
+	m_isa->add_isa_card(this);
 }
