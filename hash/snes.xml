@@ -54,11 +54,6 @@ Undumped
   - Biker Mice From Mars (Europe) (Sample)
   - Donkey Kong Country 2 - Diddy's Kong Quest (Europe) - Initial release prior to Rev A
 
-  Multi-region
-
-  - X-Terminator (Unlicensed)
-  - X-Terminator 2 (Unlicensed)
-
 -->
 
 
@@ -7113,6 +7108,18 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="cart_back_label" value="SNSP-ESP" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sesp-zn-0.u1" size="2097152" crc="e9e676c2" sha1="81fcf88a24c80189f90ffc00243992c0d58d0692" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xterm">
+		<!-- Serial:  - Release Date:  -->
+		<description>X-Terminator (World)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="gm76c256all-70" size="32768" crc="243c4a53" sha1="2f0bc91d8d59bc0533433a4a7501d5e59e4ce44e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
