@@ -24,10 +24,6 @@
 
 #define LOG_PORT80	0
 
-
-static int poll_delay;
-
-
 /*************************************************************
  *
  * pic8259 configuration
@@ -65,28 +61,18 @@ const struct pic8259_interface at_pic8259_slave_config =
  *
  *************************************************************************/
 
-static UINT8 at_spkrdata = 0;
-static UINT8 at_speaker_input = 0;
-
-static UINT8 at_speaker_get_spk(void)
-{
-	return at_spkrdata & at_speaker_input;
-}
-
-
 static void at_speaker_set_spkrdata(running_machine &machine, UINT8 data)
 {
-	device_t *speaker = machine.device(SPEAKER_TAG);
-	at_spkrdata = data ? 1 : 0;
-	speaker_level_w( speaker, at_speaker_get_spk() );
+	at_state *st = machine.driver_data<at_state>();
+	st->m_at_spkrdata = data ? 1 : 0;
+	speaker_level_w( st->m_speaker, st->m_at_spkrdata & st->m_at_speaker_input);
 }
-
 
 static void at_speaker_set_input(running_machine &machine, UINT8 data)
 {
-	device_t *speaker = machine.device(SPEAKER_TAG);
-	at_speaker_input = data ? 1 : 0;
-	speaker_level_w( speaker, at_speaker_get_spk() );
+	at_state *st = machine.driver_data<at_state>();
+	st->m_at_speaker_input = data ? 1 : 0;
+	speaker_level_w( st->m_speaker, st->m_at_spkrdata & st->m_at_speaker_input);
 }
 
 
@@ -139,28 +125,23 @@ const struct pit8253_config at_pit8254_config =
  *
  *************************************************************************/
 
-static int dma_channel;
-static UINT8 dma_offset[2][4];
-static UINT8 at_pages[0x10];
-static UINT16 dma_high_byte;
-
-
 READ8_HANDLER(at_page8_r)
 {
-	UINT8 data = at_pages[offset % 0x10];
+	at_state *st = space->machine().driver_data<at_state>();
+	UINT8 data = st->m_at_pages[offset % 0x10];
 
 	switch(offset % 8) {
 	case 1:
-		data = dma_offset[(offset / 8) & 1][2];
+		data = st->m_dma_offset[(offset / 8) & 1][2];
 		break;
 	case 2:
-		data = dma_offset[(offset / 8) & 1][3];
+		data = st->m_dma_offset[(offset / 8) & 1][3];
 		break;
 	case 3:
-		data = dma_offset[(offset / 8) & 1][1];
+		data = st->m_dma_offset[(offset / 8) & 1][1];
 		break;
 	case 7:
-		data = dma_offset[(offset / 8) & 1][0];
+		data = st->m_dma_offset[(offset / 8) & 1][0];
 		break;
 	}
 	return data;
@@ -169,7 +150,8 @@ READ8_HANDLER(at_page8_r)
 
 WRITE8_HANDLER(at_page8_w)
 {
-	at_pages[offset % 0x10] = data;
+	at_state *st = space->machine().driver_data<at_state>();
+	st->m_at_pages[offset % 0x10] = data;
 
 	if (LOG_PORT80 && (offset == 0))
 	{
@@ -179,16 +161,16 @@ WRITE8_HANDLER(at_page8_w)
 
 	switch(offset % 8) {
 	case 1:
-		dma_offset[(offset / 8) & 1][2] = data;
+		st->m_dma_offset[(offset / 8) & 1][2] = data;
 		break;
 	case 2:
-		dma_offset[(offset / 8) & 1][3] = data;
+		st->m_dma_offset[(offset / 8) & 1][3] = data;
 		break;
 	case 3:
-		dma_offset[(offset / 8) & 1][1] = data;
+		st->m_dma_offset[(offset / 8) & 1][1] = data;
 		break;
 	case 7:
-		dma_offset[(offset / 8) & 1][0] = data;
+		st->m_dma_offset[(offset / 8) & 1][0] = data;
 		break;
 	}
 }
@@ -205,8 +187,9 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 
 static READ8_HANDLER( pc_dma_read_byte )
 {
+	at_state *st = space->machine().driver_data<at_state>();
 	UINT8 result;
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16) & 0xFF0000;
+	offs_t page_offset = (((offs_t) st->m_dma_offset[0][st->m_dma_channel]) << 16) & 0xFF0000;
 
 	result = space->read_byte(page_offset + offset);
 	return result;
@@ -215,7 +198,8 @@ static READ8_HANDLER( pc_dma_read_byte )
 
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16) & 0xFF0000;
+	at_state *st = space->machine().driver_data<at_state>();
+	offs_t page_offset = (((offs_t) st->m_dma_offset[0][st->m_dma_channel]) << 16) & 0xFF0000;
 
 	space->write_byte(page_offset + offset, data);
 }
@@ -223,11 +207,12 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 
 static READ8_HANDLER( pc_dma_read_word )
 {
+	at_state *st = space->machine().driver_data<at_state>();
 	UINT16 result;
-	offs_t page_offset = (((offs_t) dma_offset[1][dma_channel & 3]) << 16) & 0xFF0000;
+	offs_t page_offset = (((offs_t) st->m_dma_offset[1][st->m_dma_channel & 3]) << 16) & 0xFF0000;
 
 	result = space->read_word(page_offset + ( offset << 1 ) );
-	dma_high_byte = result & 0xFF00;
+	st->m_dma_high_byte = result & 0xFF00;
 
 	return result & 0xFF;
 }
@@ -235,9 +220,10 @@ static READ8_HANDLER( pc_dma_read_word )
 
 static WRITE8_HANDLER( pc_dma_write_word )
 {
-	offs_t page_offset = (((offs_t) dma_offset[1][dma_channel & 3]) << 16) & 0xFF0000;
+	at_state *st = space->machine().driver_data<at_state>();
+	offs_t page_offset = (((offs_t) st->m_dma_offset[1][st->m_dma_channel & 3]) << 16) & 0xFF0000;
 
-	space->write_word(page_offset + ( offset << 1 ), dma_high_byte | data);
+	space->write_word(page_offset + ( offset << 1 ), st->m_dma_high_byte | data);
 }
 
 
@@ -262,8 +248,9 @@ static WRITE_LINE_DEVICE_HANDLER( at_dma8237_out_eop ) { at_state *st = device->
 
 static void set_dma_channel(device_t *device, int channel, int state)
 {
+	at_state *st = device->machine().driver_data<at_state>();
 	if (!state)
-		dma_channel = channel;
+		st->m_dma_channel = channel;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
@@ -303,24 +290,20 @@ I8237_INTERFACE( at_dma8237_2_config )
 	{ DEVCB_LINE(pc_dack4_w), DEVCB_LINE(pc_dack5_w), DEVCB_LINE(pc_dack6_w), DEVCB_LINE(pc_dack7_w) }
 };
 
-
-static UINT8 at_speaker;
-static UINT8 at_offset1;
-
 READ8_HANDLER( at_portb_r )
 {
 	at_state *st = space->machine().driver_data<at_state>();
 
-	UINT8 data = at_speaker;
+	UINT8 data = st->m_at_speaker;
 	data &= ~0xc0; /* AT BIOS don't likes this being set */
 
 	/* This needs fixing/updating not sure what this is meant to fix */
-	if ( --poll_delay < 0 )
+	if ( --st->m_poll_delay < 0 )
 	{
-		poll_delay = 3;
-		at_offset1 ^= 0x10;
+		st->m_poll_delay = 3;
+		st->m_at_offset1 ^= 0x10;
 	}
-	data = (data & ~0x10) | ( at_offset1 & 0x10 );
+	data = (data & ~0x10) | ( st->m_at_offset1 & 0x10 );
 
 	if ( pit8253_get_output(st->m_pit8254, 2 ) )
 		data |= 0x20;
@@ -333,7 +316,7 @@ READ8_HANDLER( at_portb_r )
 WRITE8_HANDLER( at_portb_w )
 {
 	at_state *st = space->machine().driver_data<at_state>();
-	at_speaker = data;
+	st->m_at_speaker = data;
 	pit8253_gate2_w(st->m_pit8254, BIT(data, 0));
 	at_speaker_set_spkrdata( space->machine(), data & 0x02 );
 }
@@ -347,6 +330,7 @@ WRITE8_HANDLER( at_portb_w )
 
 static void init_at_common(running_machine &machine)
 {
+	at_state *st = machine.driver_data<at_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	// The CS4031 chipset does this itself
@@ -364,7 +348,7 @@ static void init_at_common(running_machine &machine)
 		}
 	}
 
-	at_offset1 = 0xff;
+	st->m_at_offset1 = 0xff;
 }
 
 
@@ -430,5 +414,8 @@ MACHINE_RESET( at )
 	st->m_dma8237_2 = machine.device("dma8237_2");
 	st->m_pit8254 = machine.device("pit8254");
 	st->m_isabus = machine.device<isa16_device>("isabus");
-	poll_delay = 4;
+	st->m_speaker = machine.device(SPEAKER_TAG);
+	st->m_poll_delay = 4;
+	st->m_at_spkrdata = 0;
+	st->m_at_speaker_input = 0;
 }

@@ -24,7 +24,19 @@ public:
 	device_t *m_dma8237_1;
 	device_t *m_dma8237_2;
 	device_t *m_pit8254;
+	device_t *m_speaker;
 	isa16_device *m_isabus;
+	
+	int m_poll_delay;
+	UINT8 m_at_spkrdata;
+	UINT8 m_at_speaker_input;
+
+	int m_dma_channel;
+	UINT8 m_dma_offset[2][4];
+	UINT8 m_at_pages[0x10];
+	UINT16 m_dma_high_byte;
+	UINT8 m_at_speaker;
+	UINT8 m_at_offset1;
 };
 
 
