@@ -87,6 +87,17 @@
 	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
 	device_isa8_card_interface::static_set_isa8_tag(*device, _isatag); 	
 
+
+#define MCFG_ISA16_BUS_ADD(_tag, _cputag, _config) \
+    MCFG_DEVICE_ADD(_tag, ISA16, 0) \
+    MCFG_DEVICE_CONFIG(_config) \
+    isa8_device::static_set_cputag(*device, _cputag); \
+
+#define MCFG_ISA16_SLOT_ADD(_isatag, _num, _tag, _slot_intf, _def_slot, _def_inp) \
+    MCFG_DEVICE_ADD(_tag, ISA16_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
+	isa16_slot_device::static_set_isa16_slot(*device, _isatag, _num); \
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -99,6 +110,7 @@ class isa8_slot_device : public device_t,
 public:
 	// construction/destruction
 	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	
 	isa8_device* get_isa_device() const { return m_isa; }
 	// device-level overrides	
@@ -106,7 +118,7 @@ public:
 
     // inline configuration
     static void static_set_isa8_slot(device_t &device, const char *tag, int num);	
-private:
+protected:
 	// configuration
 	const char *m_isa_tag;
 	int m_isa_num;
@@ -139,6 +151,7 @@ class isa8_device : public device_t,
 public:
 	// construction/destruction
 	isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 
@@ -168,9 +181,7 @@ protected:
 	virtual void device_reset();
 	virtual void device_config_complete();
 
-private:
 	// internal state
-
 	device_t   *m_maincpu;
 
 	devcb_resolved_write_line	m_out_irq2_func;
@@ -241,6 +252,88 @@ struct isa16bus_interface
 	devcb_write_line	m_out_drq5_cb;
 	devcb_write_line	m_out_drq6_cb;
 	devcb_write_line	m_out_drq7_cb;
+};
+
+class isa16_device;
+
+class isa16_slot_device : public isa8_slot_device
+{
+public:
+	// construction/destruction
+	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	isa16_device* get_isa_device() const { return m_isa16; }
+	// device-level overrides	
+	virtual void device_start();
+
+    // inline configuration
+    static void static_set_isa16_slot(device_t &device, const char *tag, int num);	
+private:
+	// configuration
+	isa16_device  *m_isa16;
+};
+
+
+// device type definition
+extern const device_type ISA16_SLOT;
+
+// ======================> isa16_device
+class isa16_device : public isa8_device,
+                     public isa16bus_interface
+{
+public:
+	// construction/destruction
+	isa16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	void install16_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_device_func rhandler, const char* rhandler_name, write16_device_func whandler, const char *whandler_name);
+
+	DECLARE_WRITE_LINE_MEMBER( irq10_w );
+	DECLARE_WRITE_LINE_MEMBER( irq11_w );
+	DECLARE_WRITE_LINE_MEMBER( irq12_w );
+	DECLARE_WRITE_LINE_MEMBER( irq14_w );
+	DECLARE_WRITE_LINE_MEMBER( irq15_w );
+
+	DECLARE_WRITE_LINE_MEMBER( drq0_w );
+	DECLARE_WRITE_LINE_MEMBER( drq5_w );
+	DECLARE_WRITE_LINE_MEMBER( drq6_w );
+	DECLARE_WRITE_LINE_MEMBER( drq7_w );
+	
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_config_complete();
+	
+private:
+	// internal state
+	devcb_resolved_write_line	m_out_irq10_func;
+	devcb_resolved_write_line	m_out_irq11_func;
+	devcb_resolved_write_line	m_out_irq12_func;
+	devcb_resolved_write_line	m_out_irq14_func;
+	devcb_resolved_write_line	m_out_irq15_func;
+
+	devcb_resolved_write_line	m_out_drq0_func;
+	devcb_resolved_write_line	m_out_drq5_func;
+	devcb_resolved_write_line	m_out_drq6_func;
+	devcb_resolved_write_line	m_out_drq7_func;
+};
+
+
+// device type definition
+extern const device_type ISA16;
+
+// ======================> device_isa16_card_interface
+
+// class representing interface-specific live isa16 card
+class device_isa16_card_interface : public device_isa8_card_interface
+{
+	friend class isa16_device;
+public:
+	// construction/destruction
+	device_isa16_card_interface(const machine_config &mconfig, device_t &device);
+	virtual ~device_isa16_card_interface();
+
+	void set_isa_device();
+	isa16_device  *m_isa;	
 };
 
 #endif  /* __ISA_H__ */
