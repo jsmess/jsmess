@@ -77,10 +77,10 @@
     MCFG_DEVICE_CONFIG(_config) \
     isa8_device::static_set_cputag(*device, _cputag); \
 
-#define MCFG_ISA8_SLOT_ADD(_isatag, _num, _tag, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_ISA8_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _def_inp) \
     MCFG_DEVICE_ADD(_tag, ISA8_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
-	isa8_slot_device::static_set_isa8_slot(*device, _isatag, _num); \
+	isa8_slot_device::static_set_isa8_slot(*device, _isatag); \
 
 #define MCFG_ISA8_ONBOARD_ADD(_isatag, _tag, _dev_type, _def_inp) \
     MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
@@ -93,10 +93,10 @@
     MCFG_DEVICE_CONFIG(_config) \
     isa8_device::static_set_cputag(*device, _cputag); \
 
-#define MCFG_ISA16_SLOT_ADD(_isatag, _num, _tag, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_ISA16_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _def_inp) \
     MCFG_DEVICE_ADD(_tag, ISA16_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
-	isa16_slot_device::static_set_isa16_slot(*device, _isatag, _num); \
+	isa16_slot_device::static_set_isa16_slot(*device, _isatag); \
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -117,11 +117,10 @@ public:
 	virtual void device_start();
 
     // inline configuration
-    static void static_set_isa8_slot(device_t &device, const char *tag, int num);	
+    static void static_set_isa8_slot(device_t &device, const char *tag);
 protected:
 	// configuration
 	const char *m_isa_tag;
-	int m_isa_num;
 	isa8_device  *m_isa;
 };
 
@@ -155,7 +154,7 @@ public:
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 
-	void add_isa_card(device_isa8_card_interface *card,int pos);
+	void add_isa_card(device_isa8_card_interface *card);
 	void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name);
 	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
 	void install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region);
@@ -195,7 +194,7 @@ protected:
 	devcb_resolved_write_line	m_out_drq2_func;
 	devcb_resolved_write_line	m_out_drq3_func;
 
-	device_isa8_card_interface *m_isa_device[8];
+	simple_list<device_isa8_card_interface> m_device_list;
 	const char *m_cputag;
 };
 
@@ -214,6 +213,8 @@ public:
 	device_isa8_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_isa8_card_interface();
 
+	device_isa8_card_interface *next() const { return m_next; }
+	
 	void set_isa_device();
 	// configuration access
 	virtual UINT8 dack_r(int line);
@@ -226,6 +227,7 @@ public:
 public:
 	isa8_device  *m_isa;
 	const char *m_isa_tag;
+	device_isa8_card_interface *m_next;
 };
 
 // ======================> isa16bus_interface
@@ -267,7 +269,7 @@ public:
 	virtual void device_start();
 
     // inline configuration
-    static void static_set_isa16_slot(device_t &device, const char *tag, int num);	
+    static void static_set_isa16_slot(device_t &device, const char *tag);	
 private:
 	// configuration
 	isa16_device  *m_isa16;

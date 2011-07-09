@@ -34,11 +34,10 @@ isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type ty
 {
 }
 
-void isa8_slot_device::static_set_isa8_slot(device_t &device, const char *tag, int num)
+void isa8_slot_device::static_set_isa8_slot(device_t &device, const char *tag)
 {
 	isa8_slot_device &isa_card = dynamic_cast<isa8_slot_device &>(device);
 	isa_card.m_isa_tag = tag;
-	isa_card.m_isa_num = num;
 }
 
 //-------------------------------------------------
@@ -49,7 +48,7 @@ void isa8_slot_device::device_start()
 {
 	m_isa = machine().device<isa8_device>(m_isa_tag);
 	device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
-	if (dev) m_isa->add_isa_card(dev, m_isa_num);
+	if (dev) m_isa->add_isa_card(dev);
 }
 
 
@@ -72,11 +71,10 @@ isa16_slot_device::isa16_slot_device(const machine_config &mconfig, const char *
 {
 }
 
-void isa16_slot_device::static_set_isa16_slot(device_t &device, const char *tag, int num)
+void isa16_slot_device::static_set_isa16_slot(device_t &device, const char *tag)
 {
 	isa16_slot_device &isa_card = dynamic_cast<isa16_slot_device &>(device);
 	isa_card.m_isa_tag = tag;
-	isa_card.m_isa_num = num;
 }
 
 //-------------------------------------------------
@@ -87,7 +85,7 @@ void isa16_slot_device::device_start()
 {
 	m_isa16 = machine().device<isa16_device>(m_isa_tag);
 	device_isa16_card_interface *dev = dynamic_cast<device_isa16_card_interface *>(get_card_device());
-	if (dev) m_isa16->add_isa_card(dev, m_isa_num);
+	if (dev) m_isa16->add_isa_card(dev);
 }
 
 
@@ -144,15 +142,11 @@ void isa8_device::device_config_complete()
 isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, ISA8, "ISA8", tag, owner, clock)
 {
-	for(int i = 0; i < 8; i++)
-		m_isa_device[i] = NULL;
-}
+}	
 
 isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, type, name, tag, owner, clock)
 {
-	for(int i = 0; i < 8; i++)
-		m_isa_device[i] = NULL;
 }
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -181,9 +175,9 @@ void isa8_device::device_reset()
 {
 }
 
-void isa8_device::add_isa_card(device_isa8_card_interface *card,int pos)
+void isa8_device::add_isa_card(device_isa8_card_interface *card)
 {
-	m_isa_device[pos] = card;
+	m_device_list.append(*card);
 }
 
 void isa8_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name)
@@ -241,27 +235,34 @@ WRITE_LINE_MEMBER( isa8_device::drq3_w ) { m_out_drq3_func(state); }
 UINT8 isa8_device::dack_r(int line)
 {
 	UINT8 retVal = 0xff;
-	for(int i=0;i<8;i++) {
-		if (m_isa_device[i] != NULL && m_isa_device[i]->have_dack(line)) {
-			retVal = m_isa_device[i]->dack_r(line);
+	device_isa8_card_interface *entry = m_device_list.first();
+	while(entry) {
+		if (entry->have_dack(line)) {
+			retVal = entry->dack_r(line);
+			break;
 		}
+		entry = entry->next();
 	}
 	return retVal;
 }
 
 void isa8_device::dack_w(int line,UINT8 data)
 {
-	for(int i=0;i<8;i++) {
-		if (m_isa_device[i] != NULL && m_isa_device[i]->have_dack(line)) {
-			m_isa_device[i]->dack_w(line,data);
+	device_isa8_card_interface *entry = m_device_list.first();
+	while(entry) {
+		if (entry->have_dack(line)) {
+			entry->dack_w(line,data);
 		}
+		entry = entry->next();
 	}
 }
 
 void isa8_device::eop_w(int state)
 {
-	for(int i=0;i<8;i++) {
-		if (m_isa_device[i] != NULL) m_isa_device[i]->eop_w(state);
+	device_isa8_card_interface *entry = m_device_list.first();
+	while(entry) {
+		entry->eop_w(state);
+		entry = entry->next();
 	}
 }
 
@@ -321,6 +322,7 @@ void device_isa8_card_interface::set_isa_device()
 {
 	if(m_isa_tag) {
 		m_isa = dynamic_cast<isa8_device *>(device().machine().device(m_isa_tag));
+		m_isa->add_isa_card(this);
 	} else {
 		m_isa = (dynamic_cast<isa8_slot_device *>(device().owner()))->get_isa_device();
 	}
@@ -464,6 +466,7 @@ void device_isa16_card_interface::set_isa_device()
 {
 	if(m_isa_tag) {
 		m_isa = dynamic_cast<isa16_device *>(device().machine().device(m_isa_tag));
+		m_isa->add_isa_card(this);
 	} else {
 		m_isa = (dynamic_cast<isa16_slot_device *>(device().owner()))->get_isa_device();
 	}
