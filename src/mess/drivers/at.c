@@ -449,7 +449,7 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 
 	MCFG_FRAGMENT_ADD( at_motherboard )
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
-	MCFG_ISA8_SLOT_ADD("isabus", "isa1", pc_isa8_cards, "fdc", NULL)
+	MCFG_ISA8_SLOT_ADD("isabus","isa1", pc_isa8_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
 	
 	MCFG_FRAGMENT_ADD( pcvideo_ega )
@@ -485,7 +485,7 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_FRAGMENT_ADD( at_motherboard )
 
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
-	MCFG_ISA8_SLOT_ADD("isabus", "isa1", pc_isa8_cards, "fdc", NULL)
+	MCFG_ISA8_SLOT_ADD("isabus","isa1", pc_isa8_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
-	MCFG_ISA8_ONBOARD_ADD("isabus", "fdc", ISA8_FDC, NULL)
+	MCFG_ISA16_ONBOARD_ADD("isabus", "fdc", ISA8_FDC, NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 

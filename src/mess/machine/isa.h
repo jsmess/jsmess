@@ -85,7 +85,7 @@
 #define MCFG_ISA8_ONBOARD_ADD(_isatag, _tag, _dev_type, _def_inp) \
     MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
 	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
-	device_isa8_card_interface::static_set_isa8_tag(*device, _isatag); 	
+	device_isa8_card_interface::static_set_isabus_tag(*device, _isatag); 	
 
 
 #define MCFG_ISA16_BUS_ADD(_tag, _cputag, _config) \
@@ -98,6 +98,11 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
 	isa16_slot_device::static_set_isa16_slot(*device, _isatag); \
 
+#define MCFG_ISA16_ONBOARD_ADD(_isatag, _tag, _dev_type, _def_inp) \
+    MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
+	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
+	device_isa8_card_interface::static_set_isabus_tag(*device, _isatag); 
+	
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -112,7 +117,6 @@ public:
 	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	isa8_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	
-	isa8_device* get_isa_device() const { return m_isa; }
 	// device-level overrides	
 	virtual void device_start();
 
@@ -121,7 +125,6 @@ public:
 protected:
 	// configuration
 	const char *m_isa_tag;
-	isa8_device  *m_isa;
 };
 
 // device type definition
@@ -223,7 +226,7 @@ public:
 	virtual bool have_dack(int line);
 
     // inline configuration
-    static void static_set_isa8_tag(device_t &device, const char *tag);
+    static void static_set_isabus_tag(device_t &device, const char *tag);
 public:
 	isa8_device  *m_isa;
 	const char *m_isa_tag;
@@ -263,16 +266,11 @@ class isa16_slot_device : public isa8_slot_device
 public:
 	// construction/destruction
 	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
-	isa16_device* get_isa_device() const { return m_isa16; }
-	// device-level overrides	
+		// device-level overrides	
 	virtual void device_start();
 
     // inline configuration
     static void static_set_isa16_slot(device_t &device, const char *tag);	
-private:
-	// configuration
-	isa16_device  *m_isa16;
 };
 
 
