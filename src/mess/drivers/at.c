@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
-	MCFG_ISA16_ONBOARD_ADD("isabus", "fdc", ISA8_FDC, NULL)
+	MCFG_ISA_ONBOARD_ADD("isabus", "fdc", ISA8_FDC, NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 

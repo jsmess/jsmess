@@ -47,6 +47,10 @@ void isa8_slot_device::static_set_isa8_slot(device_t &device, const char *tag)
 void isa8_slot_device::device_start()
 {
 	device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
+	const device_isa16_card_interface *intf;
+	if (get_card_device()->interface(intf))
+		fatalerror("Error ISA16 device in ISA8 slot\n");
+
 	if (dev) device_isa8_card_interface::static_set_isabus_tag(*dev,m_isa_tag);
 }
 
