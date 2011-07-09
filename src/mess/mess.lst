@@ -430,8 +430,13 @@ macclasc  // 1990 Apple Macintosh Classic
 maclc // 1990 Apple Macintosh LC
 maciisi   // 1990 Apple Macintosh IIsi
 macpb100  // 1991 Apple Macintosh PowerBook 100
+macpb140  // 1991 Apple Macintosh PowerBook 140
+macpb170  // 1991 Apple Macintosh PowerBook 140
 macclas2  // 1991 Apple Macintosh Classic II
 maclc2	// 1991 Apple Macintosh LC II
+macpb145  // 1992 Apple Macintosh PowerBook 145
+maccclas // 1993 Apple Macintosh Color Classic
+macpb145b  // 1993 Apple Macintosh PowerBook 145B
 maclc3	// 1993 Apple Macintosh LC III
 pmac6100  // 1994 Apple Power Macintosh 6100
 

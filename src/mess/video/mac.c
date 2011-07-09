@@ -72,7 +72,7 @@ SCREEN_UPDATE( macse30 )
 	mac_state *state = screen->machine().driver_data<mac_state>();
 
 	video_base = state->m_screen_buffer ? 0x8000 : 0;
-	video_ram = (const UINT16 *) &state->m_se30_vram[video_base/4];
+	video_ram = (const UINT16 *) &state->m_vram[video_base/4];
 
 	for (y = 0; y < MAC_V_VIS; y++)
 	{
@@ -98,7 +98,7 @@ SCREEN_UPDATE( macprtb )
 	int y, x, b;
 	mac_state *state = screen->machine().driver_data<mac_state>();
 
-	video_ram = (const UINT16 *) state->m_se30_vram;
+	video_ram = (const UINT16 *) state->m_vram;
 
 	for (y = 0; y < 400; y++)
 	{
@@ -107,6 +107,32 @@ SCREEN_UPDATE( macprtb )
 		for (x = 0; x < 640; x += 16)
 		{
 			word = video_ram[((y * 640)/16) + ((x/16))];
+			for (b = 0; b < 16; b++)
+			{
+				line[x + b] = (word >> (15 - b)) & 0x0001;
+			}
+		}
+	}
+	return 0;
+}
+
+SCREEN_UPDATE( macpb140 )
+{
+	const UINT16 *video_ram;
+	UINT16 word;
+	UINT16 *line;
+	int y, x, b;
+	mac_state *state = screen->machine().driver_data<mac_state>();
+
+	video_ram = (const UINT16 *) state->m_vram;
+
+	for (y = 0; y < 400; y++)
+	{
+		line = BITMAP_ADDR16(bitmap, y, 0);
+
+		for (x = 0; x < 640; x += 16)
+		{
+			word = video_ram[((y * 640)/16) + ((x/16)^1)]; 
 			for (b = 0; b < 16; b++)
 			{
 				line[x + b] = (word >> (15 - b)) & 0x0001;
@@ -158,7 +184,7 @@ SCREEN_UPDATE( mac_cb264 )
 	{
 		case 0: // 1 bpp
 			{
-				UINT8 *vram8 = (UINT8 *)mac->m_cb264_vram;
+				UINT8 *vram8 = (UINT8 *)mac->m_vram;
 				UINT8 pixels;
 
 				for (y = 0; y < 480; y++)
@@ -183,7 +209,7 @@ SCREEN_UPDATE( mac_cb264 )
 
 		case 1: // 2 bpp (3f/7f/bf/ff)
 			{
-				UINT8 *vram8 = (UINT8 *)mac->m_cb264_vram;
+				UINT8 *vram8 = (UINT8 *)mac->m_vram;
 				UINT8 pixels;
 
 				for (y = 0; y < 480; y++)
@@ -204,7 +230,7 @@ SCREEN_UPDATE( mac_cb264 )
 
 		case 2: // 4 bpp
 			{
-				UINT8 *vram8 = (UINT8 *)mac->m_cb264_vram;
+				UINT8 *vram8 = (UINT8 *)mac->m_vram;
 				UINT8 pixels;
 
 				for (y = 0; y < 480; y++)
@@ -224,7 +250,7 @@ SCREEN_UPDATE( mac_cb264 )
 
 		case 3: // 8 bpp
 			{
-				UINT8 *vram8 = (UINT8 *)mac->m_cb264_vram;
+				UINT8 *vram8 = (UINT8 *)mac->m_vram;
 				UINT8 pixels;
 
 				for (y = 0; y < 480; y++)
@@ -245,7 +271,7 @@ SCREEN_UPDATE( mac_cb264 )
 			for (y = 0; y < 480; y++)
 			{
 				scanline = BITMAP_ADDR32(bitmap, y, 0);
-				base = &mac->m_cb264_vram[y * 1024];
+				base = &mac->m_vram[y * 1024];
 				for (x = 0; x < 640; x++)
 				{
 					*scanline++ = *base++;
@@ -586,7 +612,7 @@ SCREEN_UPDATE( macrbvvram )
 	{
 		case 0:	// 1bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_rbv_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram;
 			UINT8 pixels;
 
 
@@ -635,7 +661,7 @@ SCREEN_UPDATE( macrbvvram )
 
 		case 1:	// 2bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_rbv_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram;
 			UINT8 pixels;
 
 			for (y = 0; y < 480; y++)
@@ -656,7 +682,7 @@ SCREEN_UPDATE( macrbvvram )
 
 		case 2: // 4bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_rbv_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram;
 			UINT8 pixels;
 
 			for (y = 0; y < 480; y++)
@@ -676,7 +702,7 @@ SCREEN_UPDATE( macrbvvram )
 
 		case 3: // 8bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_rbv_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram;
 			UINT8 pixels;
 
 			for (y = 0; y < 480; y++)
