@@ -36,6 +36,10 @@ System Driver Changes:
 	* Cleaned up render_color_stack_mode() and render_fg_bg_mode() loops, 
 		eliminating the ugly fix-ups at the end of each row.
 	* Updated the code found in UNUSED_FUNCTION, but neither compiled nor tested it.
+- ti99: Added real RS232 connection capability [Michael Zapf]
+        Output works quite well, input has issues (overflows)
+        Handshaking not verified yet
+        For the meantime, TMS9902 output to a file is disabled
 
 Software Lists:
 ----------------
@@ -49,6 +53,8 @@ Source Changes:
 ----------------
 - Added device types for all known WD17XX variants, and enforced inverted DAL lines 
 	with e.g. FD1771/FD1791. Used correct variants in drivers, except TRS-80. [Curt Coder]
+- ti99: Replaced TRUE/FALSE for line states with ASSERT/CLEAR (which helped to
+        find an inconsistency in the implementation) [Michael Zapf]
 
 0.142u6
 
