@@ -77,6 +77,16 @@ TODO:
       which makes sense with most tms9900 family members).  There is no way
       this "feature" (I would call it a hardware bug) can be emulated
       efficiently, as we would need to watch every memory access.
+
+MZ: According to the description in
+       A. Osborne, G. Kane: Osborne 16-bit microprocessor handbook
+       page 3-81
+    the 9901 only temporarily leaves the timer mode as long as S0 is set to 1.
+    In the meantime the timer function continues but cannot be queried. This
+    makes it possible to continue using the chip as a timer while working with
+    its I/O pins. Thus I believe the above TODO concering the exit of the timer
+    mode is not applicable.
+    The problem is that the original 9901 specification is not clear about this.
 */
 
 
@@ -93,38 +103,46 @@ typedef struct _tms9901_t tms9901_t;
 struct _tms9901_t
 {
 	/* interrupt registers */
-	int supported_int_mask;	/* mask:  bit #n is set if pin #n is supported as an interrupt pin,
-                              i.e. the driver sends a notification whenever the pin state changes */
-							/* setting these bits is not required, but it saves you the trouble of
-                              saving the state of interrupt pins and feeding it to the port read
-                              handlers again */
+	// mask:  bit #n is set if pin #n is supported as an interrupt pin,
+	// i.e. the driver sends a notification whenever the pin state changes
+	// setting these bits is not required, but it saves you the trouble of
+	// saving the state of interrupt pins and feeding it to the port read
+	// handlers again
+	int supported_int_mask;
 	int int_state;			/* state of the int1-int15 lines */
+	int old_int_state;      /* stores the previous value to avoid useless INT line assertions */
 	int timer_int_pending;	/* timer int pending (overrides int3 pin if timer enabled) */
 	int enabled_ints;		/* interrupt enable mask */
 	int int_pending;		/* status of the int* pin (connected to TMS9900) */
 
 	/* PIO registers */
 	int pio_direction;		/* direction register for PIO */
-	int pio_output;			/* current PIO output (to be masked with pio_direction) */
+
+	/* current PIO output (to be masked with pio_direction) */
+	int pio_output;
+
 	/* mirrors used for INT7*-INT15* */
 	int pio_direction_mirror;
 	int pio_output_mirror;
 
 	/* clock registers */
-	emu_timer *timer;			/* MESS timer, used to emulate the decrementer register */
+	// MESS timer, used to emulate the decrementer register
+	emu_timer *timer;
 
-	int clockinvl;			/* clock interval, loaded in decrementer when it reaches 0.
-                              0 means decrementer off */
-	int latchedtimer;		/* when we go into timer mode, the decrementer is copied there to allow to read it reliably */
+	// clock interval, loaded in decrementer when it reaches 0.
+	// 0 means decrementer off
+	int clockinvl;
+	// when we go into timer mode, the decrementer is copied there to allow to read it reliably
+	int latchedtimer;
 
-	int mode9901;			/* TMS9901 current mode
-                              0 = so-called interrupt mode (read interrupt
-                                state, write interrupt enable mask)
-                              1 = clock mode (read/write clock interval) */
+	// TMS9901 current mode
+	// 0 = so-called interrupt mode (read interrupt state, write interrupt enable mask)
+	// 1 = clock mode (read/write clock interval)
+	int mode9901;
 
-	/* tms9901 clock rate (PHI* pin, normally connected to TMS9900 Phi3*) */
-	/* decrementer rate equates PHI* rate/64 (e.g. 46875Hz for a 3MHz clock)
-    (warning: 3MHz on a tms9900 is equivalent to 12MHz on a tms9995 or tms99000) */
+	// tms9901 clock rate (PHI* pin, normally connected to TMS9900 Phi3*)
+	// decrementer rate equates PHI* rate/64 (e.g. 46875Hz for a 3MHz clock)
+	// (warning: 3MHz on a tms9900 is equivalent to 12MHz on a tms9995 or tms99000)
 	double clock_rate;
 
 	/* Pointer to interface */
@@ -143,12 +161,6 @@ INLINE tms9901_t *get_token(device_t *device)
 	return (tms9901_t *) downcast<legacy_device_base *>(device)->token();
 }
 
-
-/*
-    utilities
-*/
-
-
 /*
     return the number of the first (i.e. least significant) non-zero bit among
     the 16 first bits
@@ -160,32 +172,11 @@ static int find_first_bit(int value)
 	if (! value)
 		return -1;
 
-#if 0
-	if (! (value & 0x00FF))
-	{
-		value >> 8;
-		bit = 8;
-	}
-	if (! (value & 0x000F))
-	{
-		value >> 4;
-		bit += 4;
-	}
-	if (! (value & 0x0003))
-	{
-		value >> 2;
-		bit += 2;
-	}
-	if (! (value & 0x0001))
-		bit++;
-#else
 	while (! (value & 1))
 	{
 		value >>= 1;	/* try next bit */
 		bit++;
 	}
-#endif
-
 	return bit;
 }
 
@@ -211,10 +202,18 @@ static void tms9901_field_interrupts(device_t *device)
 	/* mask out all int pins currently set as output */
 	current_ints &= tms->enabled_ints & (~ tms->pio_direction_mirror);
 
+	// Check whether we have a new state. For systems that use level-triggered
+	// interrupts it should not do any harm if the line is re-asserted
+	// but we may as well avoid this.
+	if (current_ints == tms->old_int_state)
+		return;
+
+	tms->old_int_state = current_ints;
+
 	if (current_ints)
 	{
-		/* find which interrupt tripped us:
-          we simply look for the first bit set to 1 in current_ints... */
+		// find which interrupt tripped us:
+		// we simply look for the first bit set to 1 in current_ints... */
 		int level = find_first_bit(current_ints);
 
 		tms->int_pending = TRUE;
@@ -349,7 +348,8 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 		break;
 	case 2:
 		/* exit timer mode */
-		tms->mode9901 = 0;
+		// MZ: See comments at the beginning. I'm pretty sure this is not correct.
+		// tms->mode9901 = 0;
 
 		answer = (tms->intf->read_handlers[2]) ? (* tms->intf->read_handlers[2])(device, 2) : 0;
 
@@ -359,7 +359,8 @@ READ8_DEVICE_HANDLER ( tms9901_cru_r )
 		break;
 	default:
 		/* exit timer mode */
-		tms->mode9901 = 0;
+		// MZ: dito
+		// tms->mode9901 = 0;
 
 		answer = (tms->intf->read_handlers[3]) ? (* tms->intf->read_handlers[3])(device, 3) : 0;
 
@@ -505,7 +506,8 @@ WRITE8_DEVICE_HANDLER ( tms9901_cru_w )
 			int mask = (1 << pin);
 
 			/* exit timer mode */
-			tms->mode9901 = 0;
+			// MZ: dito
+			// tms->mode9901 = 0;
 
 			tms->pio_direction |= mask;			/* set up as output pin */
 
