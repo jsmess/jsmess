@@ -50,18 +50,6 @@
 
 */
 
-/*
-    TEST: Check whether the TMS9902 sometimes polls the bytes too quickly.
-    For instance, bytes may be buffered, and if for some reason 2 or more bytes
-    are in the input queue we must not poll too quickly, or the UART buffer
-    will overflow.
-
-    Possible test: Determine the baud rate and report when two bytes are
-    pushed into the RBR faster than the baud rate
-
-    (seems plausible since overflows increase with higher polling rates)
-*/
-
 #include "emu.h"
 #include "peribox.h"
 #include "machine/tms9902.h"
@@ -96,6 +84,11 @@ typedef struct _ti_rs232_state
 
 	int	recv_mode0; // May be NORMAL or ESC
 	int recv_mode1;
+
+	// Baud rate management
+	// not part of the real device, but required for the connection to the
+	// real UART
+	double time_hold0, time_hold1;
 
 	// PIO flags
 	int pio_direction;		// a.k.a. PIOOC pio in output mode if 0
@@ -520,7 +513,7 @@ static void transmit_data(device_t *tms9902, int uart, UINT8 value)
 	serial->fwrite(&buf, 1);
 }
 
-static void receive_data_or_line_state(device_t *tms9902, int uart)
+static void receive_data_or_line_state(device_t *tms9902, int uart, double baudpoll)
 {
 	ti_rs232_state *card = get_safe_token(tms9902->owner());
 	device_image_interface *serial = (uart==0)? dynamic_cast<device_image_interface *>(card->serdev0)
@@ -529,10 +522,24 @@ static void receive_data_or_line_state(device_t *tms9902, int uart)
 	int len = 0;
 	int *mode = (uart==0)? &card->recv_mode0 : &card->recv_mode1;
 
+	double *timehold = (uart==0)? &card->time_hold0 : &card->time_hold1;
+
 	if (!serial->exists()) return;
 
-	len = serial->fread(&buffer, 1);
-	if (len==0) return;
+	// If no data is currently held back, get a new value.
+	if (*timehold > 1.0)
+	{
+		len = serial->fread(&buffer, 1);
+		if (len==0) return;
+	}
+	else
+	{
+		// number of polls has not yet elapsed; we have to wait.
+		*timehold += baudpoll;
+		return;
+	}
+	// time has elapsed; we can get another value now
+	// (without pushing too quickly into the UART)
 
 	// No config parameters here, only data or line setting
 	switch (*mode)
@@ -544,6 +551,7 @@ static void receive_data_or_line_state(device_t *tms9902, int uart)
 		{
 			if (VERBOSE) logerror("TI-RS232: received: %c <%02x>, pass to UART\n", buffer, buffer);
 			tms9902_receive_data(tms9902, buffer);
+			*timehold = 0.0;
 		}
 		break;
 	case RECV_MODE_ESC:
@@ -552,7 +560,9 @@ static void receive_data_or_line_state(device_t *tms9902, int uart)
 			*mode = RECV_MODE_NORMAL;
 			if (VERBOSE) logerror("TI-RS232: received: %c <%02x>, pass to UART\n", buffer, buffer);
 			tms9902_receive_data(tms9902, buffer);
+			*timehold = 0.0;
 		}
+		// TODO: else ... Line management (does not reset timehold)
 		break;
 	default:
 		logerror("TI-RS232: unknown mode: %d\n", *mode);
@@ -565,12 +575,12 @@ static TMS9902_RCV_CALLBACK( rcv_callback_0 )
 	// However, characters are not passed to it at this point
 	// Instead, we check for signal line change or data transmission
 	// and call the respective function
-	receive_data_or_line_state(device, 0);
+	receive_data_or_line_state(device, 0, baudpoll);
 }
 
 static TMS9902_RCV_CALLBACK( rcv_callback_1 )
 {
-	receive_data_or_line_state(device, 1);
+	receive_data_or_line_state(device, 1, baudpoll);
 }
 
 static TMS9902_XMIT_CALLBACK( xmit_callback_0 )
@@ -847,6 +857,8 @@ static DEVICE_RESET( ti_rs232 )
 
 		card->select_mask = 0x7e000;
 		card->select_value = 0x74000;
+
+		card->time_hold0 = card->time_hold1 = 0.0;
 
 		// The GenMod modification changes the address bus width of the Geneve.
 		// All peripheral cards need to be manually modified to properly decode

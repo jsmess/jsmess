@@ -14,8 +14,8 @@ DECLARE_LEGACY_DEVICE(TMS9902, tms9902);
 typedef void (*tms9902_int_callback_func)(device_t *device, int state);
 #define TMS9902_INT_CALLBACK(name)	void name(device_t *device, int state )
 
-typedef void (*tms9902_rcv_callback_func)(device_t *device);
-#define TMS9902_RCV_CALLBACK(name)	void name(device_t *device)
+typedef void (*tms9902_rcv_callback_func)(device_t *device, double baudpoll);
+#define TMS9902_RCV_CALLBACK(name)	void name(device_t *device, double baudpoll)
 
 typedef void (*tms9902_xmit_callback_func)(device_t *device, int data);
 #define TMS9902_XMIT_CALLBACK(name)	void name(device_t *device, int data )
@@ -57,6 +57,8 @@ void tms9902_set_cts(device_t *device, int state);
 void tms9902_set_dsr(device_t *device, int state);
 void tms9902_receive_data(device_t *device, int data);
 void tms9902_clock(device_t *device, int state);
+
+emu_timer *get_timer(device_t *device);
 
 READ8_DEVICE_HANDLER ( tms9902_cru_r );
 WRITE8_DEVICE_HANDLER( tms9902_cru_w );
