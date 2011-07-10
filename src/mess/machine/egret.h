@@ -30,16 +30,16 @@
 
 // ======================> egret_device
 
-class egret_device :  public device_t //, public device_nvram_interface
+class egret_device :  public device_t, public device_nvram_interface
 {
 public:
     // construction/destruction
 	egret_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device_config_nvram_interface overrides
-//	virtual void nvram_default();
-//	virtual void nvram_read(emu_file &file);
-//	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default();
+	virtual void nvram_read(emu_file &file);
+	virtual void nvram_write(emu_file &file);
 
 	DECLARE_READ8_MEMBER( ddr_r );
 	DECLARE_WRITE8_MEMBER( ddr_w );
@@ -53,6 +53,8 @@ public:
 	DECLARE_WRITE8_MEMBER( timer_counter_w );
 	DECLARE_READ8_MEMBER( onesec_r );
 	DECLARE_WRITE8_MEMBER( onesec_w );
+	DECLARE_READ8_MEMBER( pram_r );
+	DECLARE_WRITE8_MEMBER( pram_w );
 
     // interface routines
     UINT8 get_xcvr_session() { return xcvr_session; }
@@ -86,6 +88,8 @@ private:
 	bool adb_in;
 	int reset_line;
     emu_timer *m_timer;
+    UINT8 pram[0x100], disk_pram[0x100];
+    bool pram_loaded;
 
 	void send_port(address_space &space, UINT8 offset, UINT8 data);
 };
