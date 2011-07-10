@@ -73,12 +73,20 @@ ADDRESS_MAP_END
 
 /*
     CRU map
+    TMS9900 CRU address space is 12 bits wide, attached to A3-A14, A0-A2 must
+    be 000 (other values for external commands like RSET, LREX, CKON...),
+    A15 is used as CRUOUT
+    The TMS9901 is incompletely decoded
+    ---0 00xx xxcc ccc0
+    causing 16 mirrors (0000, 0040, 0080, 00c0, ... , 03c0)
+    Note that the CRU write address here is shifted 1 right (counting bit positions)
+    while the CRU reads address 8 bits in one go
 */
 static ADDRESS_MAP_START(cru_map, AS_IO, 8)
-	AM_RANGE(0x0000, 0x007f) AM_DEVREAD("tms9901", tms9901_cru_r)
+	AM_RANGE(0x0000, 0x003f) AM_DEVREAD("tms9901", tms9901_cru_r)
 	AM_RANGE(0x0000, 0x01ff) AM_DEVREAD("crubus", ti99_crubus_r )
 
-	AM_RANGE(0x0000, 0x03ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
+	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
 	AM_RANGE(0x0000, 0x0fff) AM_DEVWRITE("crubus", ti99_crubus_w )
 ADDRESS_MAP_END
 
@@ -448,7 +456,7 @@ static INPUT_PORTS_START(ti99_4)
 		PORT_DIPSETTING( 0x01, "DSK1-DSK2")
 		PORT_DIPSETTING( 0x02, "DSK1-DSK3")
 		PORT_DIPSETTING( 0x03, "DSK1-DSK4")
-		
+
 	PORT_START( "HFDCDIP" )
 	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
 		PORT_DIPSETTING( 0x00, "40 track, 16 ms")

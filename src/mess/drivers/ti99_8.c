@@ -231,13 +231,17 @@ ADDRESS_MAP_END
 
 /*
     CRU map - see description above
+    The TMS9901 is fully decoded according to the specification, so we only
+    have 32 bits for it; the rest goes to the CRU bus
+    (decoded by the "Vaquerro" chip, signal NNOICS*)
+    TODO: Check whether the CRU address space goes up to 7fff (15 bit)
 */
 
 static ADDRESS_MAP_START(ti99_8_cru_map, AS_IO, 8)
-	AM_RANGE(0x0000, 0x007f) AM_DEVREAD("tms9901", tms9901_cru_r)
+	AM_RANGE(0x0000, 0x0003) AM_DEVREAD("tms9901", tms9901_cru_r)
 	AM_RANGE(0x0000, 0x02ff) AM_DEVREAD("crubus", ti99_crubus_r )
 
-	AM_RANGE(0x0000, 0x03ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE("tms9901", tms9901_cru_w)
 	AM_RANGE(0x0000, 0x17ff) AM_DEVWRITE("crubus", ti99_crubus_w )
 ADDRESS_MAP_END
 
