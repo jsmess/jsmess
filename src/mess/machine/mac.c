@@ -62,6 +62,7 @@
      Egret version spotting:
      341S0850 - 0x???? (?.??) - LC, LC II
      341S0851 - 0x0101 (1.01) - Classic II, IIsi, IIvx, LC III (probably also IIvi?)
+     344S0100 - 0x0100 (1.00) - Some (early production?) IIsi
 
      Cuda version spotting:
      341S0060 - 0x00020028 (2.40) - Performa/Quadra 6xx, PMac 6200, x400, some x500, Pippin, Gossamer G3, others?
@@ -77,8 +78,6 @@
 ****************************************************************************/
 
 #define ADDRESS_MAP_MODERN
-
-//#define USE_EGRET_DEVICE
 
 #include <time.h>
 
@@ -103,8 +102,7 @@
 #define ADB_IS_PM_VIA2	(mac->m_model >= MODEL_MAC_PB140 && mac->m_model <= MODEL_MAC_PB180c)
 #define ADB_IS_PM_CLASS	((m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100) || (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PB180c)) 
 
-#define AUDIO_IS_CLASSIC (mac->m_model < MODEL_MAC_II) && (mac->m_model != MODEL_MAC_PORTABLE) && (mac->m_model != MODEL_MAC_PB100)
-#define AUDIO_IS_CLASSIC_CLASS (m_model < MODEL_MAC_II) && (m_model != MODEL_MAC_PORTABLE) && (m_model != MODEL_MAC_PB100)
+#define AUDIO_IS_CLASSIC (mac->m_model <= MODEL_MAC_CLASSIC)
 #define MAC_HAS_VIA2	(m_model >= MODEL_MAC_II)
 
 #define ASC_INTS_RBV	((mac->m_model >= MODEL_MAC_IICI) && (mac->m_model <= MODEL_MAC_IIVI)) || ((mac->m_model >= MODEL_MAC_LC) && (mac->m_model <= MODEL_MAC_COLOR_CLASSIC))
@@ -1932,73 +1930,6 @@ static TIMER_CALLBACK(mac_adb_tick)
 		{
 			mac->adb_talk();
 		}
-        #ifndef USE_EGRET_DEVICE
-		else if (ADB_IS_EGRET)
-		{
-			// Egret sending a response to the 680x0?
-			if (mac->m_adb_state & 1)
-			{
-				if (mac->m_adb_datasize > 0)
-				{
-					mac->m_adb_send = mac->m_adb_buffer[mac->m_adb_datasize];
-					#if LOG_ADB
-					printf("Egret ADB: sending byte %02x, %d left\n", mac->m_adb_send, mac->m_adb_datasize-1);
-					#endif
-
-					mac->m_adb_datasize--;
-				}
-				else
-				{
-					switch (mac->m_adb_streaming)
-					{
-						case MCU_STREAMING_PRAMRD:
-							#if LOG_ADB
-							printf("Egret ADB: streaming PRAM byte %02x = %02x\n", mac->m_adb_stream_ptr, mac->m_rtc_ram[mac->m_adb_stream_ptr]);
-							#endif
-							mac->m_adb_send = mac->m_rtc_ram[mac->m_adb_stream_ptr++];
-							if (mac->m_adb_stream_ptr >= 256)
-							{
-								#if LOG_ADB
-								printf("Egret ADB: this is the last PRAM byte, dropping XS\n");
-								#endif
-								mac->m_adb_state &= ~1;
-							}
-							break;
-
-						default:
-							#if LOG_ADB
-							printf("Egret ADB: trying to stream unhandled type\n");
-							#endif
-							mac->m_adb_send = 0;
-							break;
-					}
-				}
-
-//              mac->m_adb_timer_ticks = 8;
-//              mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-
-				if ((mac->m_adb_datasize == 0) && (mac->m_adb_streaming == MCU_STREAMING_NONE))
-				{
-					#if LOG_ADB
-					printf("Egret ADB: this is the last byte, dropping XS\n");
-					#endif
-					mac->m_adb_state &= ~1;
-				}
-			}
-			else
-			{
-				// it's not a command byte if SS is low
-				if (mac->m_adb_state & 0x02)
-				{
-					#if LOG_ADB
-					printf("Egret ADB: got command byte %02x [%02x]\n", mac->m_adb_command, mac->m_adb_datasize);
-					#endif
-					mac->m_adb_buffer[mac->m_adb_datasize++] = mac->m_adb_command;
-					mac->m_adb_command = 0;
-				}
-			}
-		}
-        #endif
 	}
 	else
 	{
@@ -2013,12 +1944,10 @@ static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 
     if (ADB_IS_EGRET)
     {
-        #ifdef USE_EGRET_DEVICE
         ret = mac->m_egret->get_via_data();
-        #else
-        ret = (mac->m_adb_send & 0x80)>>7;
-        mac->m_adb_send <<= 1;
-        #endif
+		#if LOG_ADB
+		printf("68K: Read VIA_DATA %x\n", ret);
+		#endif
     }
     else
     {
@@ -2038,12 +1967,7 @@ static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2)
 //        printf("VIA OUT CB2 = %x\n", data);
     if (ADB_IS_EGRET)
     {
-        #ifdef USE_EGRET_DEVICE
         mac->m_egret->set_via_data(data & 1);
-        #else
-        mac->m_adb_command <<= 1;
-        mac->m_adb_command |= data & 1;
-        #endif
     }
     else
     {
@@ -2109,350 +2033,6 @@ static void mac_adb_newaction(mac_state *mac, int state)
 		}
 	}
 }
-
-#ifndef USE_EGRET_DEVICE
-static void mac_egret_response_std(mac_state *mac, int type, int flag, int cmd)
-{
-	mac->m_adb_send = 0xaa;
-	mac->m_adb_buffer[3] = type;
-	mac->m_adb_buffer[2] = flag;
-	mac->m_adb_buffer[1] = cmd;
-	mac->m_adb_state |= 1;
-	mac->m_adb_timer_ticks = 8;
-	mac->m_adb_datasize = 3;
-	mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-}
-
-static void mac_egret_response_adb(mac_state *mac, int type, int flag, int cmd, int extra)
-{
-	mac->m_adb_send = 0xaa;
-	mac->m_adb_buffer[4] = extra;
-	mac->m_adb_buffer[3] = type;
-	mac->m_adb_buffer[2] = flag;
-	mac->m_adb_buffer[1] = cmd;
-	mac->m_adb_state |= 1;
-	mac->m_adb_timer_ticks = 8;
-	mac->m_adb_datasize = 4;
-	mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-}
-
-static void mac_egret_response_read_pram(mac_state *mac, int cmd, int addr)
-{
-	mac->m_adb_datasize = 4;
-
-	mac->m_adb_send = 0xaa;
-	mac->m_adb_buffer[4] = 1;	// type
-	mac->m_adb_buffer[3] = 0;	// flag
-	mac->m_adb_buffer[2] = cmd; // command
-	mac->m_adb_buffer[1] = mac->m_rtc_ram[addr];
-
-	mac->m_adb_state |= 1;
-	mac->m_adb_timer_ticks = 8;
-	mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-
-	// read PRAM is a "streaming" command, don't drop the state line when we're out of data
-	mac->m_adb_streaming = MCU_STREAMING_PRAMRD;
-	mac->m_adb_stream_ptr = addr+1;
-}
-
-static void mac_egret_response_read_rtc(mac_state *mac)
-{
-	mac->m_adb_datasize = 7;
-
-	mac->m_adb_send = 0xaa;
-	mac->m_adb_buffer[7] = 1;	// type
-	mac->m_adb_buffer[6] = 0;	// flag
-	mac->m_adb_buffer[5] = 7;	// command
-	mac->m_adb_buffer[4] = mac->m_rtc_seconds[3];
-	mac->m_adb_buffer[3] = mac->m_rtc_seconds[2];
-	mac->m_adb_buffer[2] = mac->m_rtc_seconds[1];
-	mac->m_adb_buffer[1] = mac->m_rtc_seconds[0];
-
-	mac->m_adb_state |= 1;
-	mac->m_adb_timer_ticks = 8;
-	mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-}
-
-static void mac_egret_mcu_exec(mac_state *mac)
-{
-	mac->m_adb_streaming = MCU_STREAMING_NONE;
-	switch (mac->m_adb_buffer[1])
-	{
-		case 0x01:	// enable/disable ADB auto-polling
-			#if LOG_ADB || LOG_ADB_MCU_CMD
-			if (mac->m_adb_buffer[2])
-			{
-				printf("ADB: Egret enable ADB auto-poll\n");
-			}
-			else
-			{
-				printf("ADB: Egret disable ADB auto-poll\n");
-			}
-			#endif
-
-			mac_egret_response_std(mac, 1, 0, 1);
-			break;
-
-		case 0x02: // read 6805 address
-			{
-				int addr = mac->m_adb_buffer[2]<<8 | mac->m_adb_buffer[3];
-
-				#if LOG_ADB || LOG_ADB_MCU_CMD
-				printf("ADB: Egret read 6805 address %x\n", addr);
-				#endif
-
-				// check if this is a sneaky PRAM read (PRAM is at 6805 address 0x100)
-				if ((addr >= 0x100) && (addr <= 0x200))
-				{
-					mac_egret_response_read_pram(mac, 2, addr&0xff);
-				}
-				#if LOG_ADB
-				else
-				{
-					printf("ADB: Egret unhandled direct read @ %x\n", addr);
-				}
-				#endif
-			}
-			break;
-
-		case 0x03: // read RTC
-			#if LOG_ADB || LOG_ADB_MCU_CMD
-			printf("ADB: Egret read RTC = %08x\n", mac->m_rtc_seconds[3]<<24|mac->m_rtc_seconds[2]<<16|mac->m_rtc_seconds[1]<<8|mac->m_rtc_seconds[0]);
-			#endif
-
-			mac_egret_response_read_rtc(mac);
-			break;
-
-		case 0x07: // read PRAM
-			#if LOG_ADB || LOG_ADB_MCU_CMD
-			printf("ADB: Egret read PRAM from %x\n", mac->m_adb_buffer[2]<<8 | mac->m_adb_buffer[3]);
-			#endif
-
-			mac_egret_response_read_pram(mac, 7, mac->m_adb_buffer[2]<<8 | mac->m_adb_buffer[3]);
-			break;
-
-		case 0x08: // write 6805 address
-			{
-				int addr = mac->m_adb_buffer[2]<<8 | mac->m_adb_buffer[3];
-				int len = mac->m_adb_datasize - 4;
-
-				#if LOG_ADB || LOG_ADB_MCU_CMD
-				printf("ADB: Egret write %d bytes to address %x\n", len, addr);
-				#endif
-
-				// check if this is a sneaky PRAM write (PRAM is at 6805 address 0x100)
-				if ((addr >= 0x100) && (addr <= 0x200))
-				{
-					for (int i = 0; i < len; i++)
-					{
-						mac->m_rtc_ram[(addr-0x100)+i] = mac->m_adb_buffer[4+i];
-					}
-				}
-				#if LOG_ADB || LOG_ADB_MCU_CMD
-				else
-				{
-					printf("ADB: Egret unhandled direct write @ %x\n", addr);
-				}
-				#endif
-
-				mac_egret_response_std(mac, 1, 0, 0x08);
-			}
-			break;
-
-		case 0x0c: // write PRAM
-			#if LOG_ADB || LOG_ADB_MCU_CMD
-			printf("ADB: Egret write %02x to PRAM at %x\n", mac->m_adb_buffer[4], mac->m_adb_buffer[2]<<8 | mac->m_adb_buffer[3]);
-			#endif
-
-			mac->m_rtc_ram[mac->m_adb_buffer[2]<<8 | mac->m_adb_buffer[3]] = mac->m_adb_buffer[4];
-
-			mac->m_adb_datasize = 4;
-			mac->m_adb_buffer[4] = 1;	// type
-			mac->m_adb_buffer[3] = 0;	// flag
-			mac->m_adb_buffer[2] = 0x0c;	// command
-			mac->m_adb_buffer[1] = 0;	// spare
-			mac->m_adb_state |= 1;
-			mac->m_adb_timer_ticks = 8;
-			mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-			break;
-
-		case 0x0e: // send to DFAC
-			#if LOG_ADB || LOG_ADB_MCU_CMD
-			printf("ADB: Egret send %02x to DFAC\n", mac->m_adb_buffer[2]);
-			#endif
-
-			mac_egret_response_std(mac, 1, 0, 0x0e);
-			break;
-
-		case 0x19: // set device list bitmap
-			#if LOG_ADB || LOG_ADB_MCU_CMD
-			printf("ADB: Egret set device list bitmap %02x%02x\n", mac->m_adb_buffer[2], mac->m_adb_buffer[3]);
-			#endif
-
-			mac_egret_response_std(mac, 1, 0, 0x19);
-			break;
-
-		case 0x1b: // set one-second interrupt
-			#if LOG_ADB || LOG_ADB_MCU_CMD
-			if (mac->m_adb_buffer[2])
-			{
-				printf("ADB: Egret enable one-second IRQ\n");
-			}
-			else
-			{
-				printf("ADB: Egret disable one-second IRQ\n");
-			}
-			#endif
-
-			mac_egret_response_std(mac, 1, 0, 0x1b);
-			break;
-
-		case 0x1c:	// enable/disable keyboard NMI
-			#if LOG_ADB || LOG_ADB_MCU_CMD
-			if (mac->m_adb_buffer[2])
-			{
-				printf("ADB: Egret enable keyboard NMI\n");
-			}
-			else
-			{
-				printf("ADB: Egret disable keyboard NMI\n");
-			}
-			#endif
-
-			mac_egret_response_std(mac, 1, 0, 0x1c);
-			break;
-
-		default:
-			#if LOG_ADB || LOG_ADB_MCU_CMD
-			printf("ADB: Unknown Egret MCU command %02x\n", mac->m_adb_buffer[1]);
-			#endif
-			break;
-	}
-}
-
-static void mac_egret_newaction(mac_state *mac, int state)
-{
-	if (state != mac->m_adb_state)
-	{
-		#if LOG_ADB
-		printf("ADB: New Egret state: SS %d VF %d XS (68k %d MCU %d)\n", (state>>2)&1, (state>>1)&1, state&1, mac->m_adb_state&1);
-		#endif
-
-		// if bit 2 is high and stays high, the rising edge of bit 1 indicates the start of sending a byte to the MCU if XS isn't high
-		if ((state & 0x04) && (mac->m_adb_state & 0x04) && (state & 0x02) && !(mac->m_adb_state & 0x02) && !(mac->m_adb_state & 0x01))
-		{
-			mac->m_adb_command = 0;
-			mac->m_adb_timer_ticks = 8;
-			mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-		}
-
-		// if bit 2 is high and stays high, the falling edge of bit 1, and we're in send phase, the MCU should clock out a byte
-		if ((state & 0x04) && (mac->m_adb_state & 0x04) && !(state & 0x02) && (mac->m_adb_state & 0x02) && (mac->m_adb_state & 0x01))
-		{
-			mac->m_adb_timer_ticks = 8;
-			mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-		}
-
-		// if bit 2 rises, bit 1 is 0, and MCU XS is high, the MCU should clock out a byte
-		if ((state & 0x04) && !(mac->m_adb_state & 0x04) && !(state & 0x02) && (mac->m_adb_state & 0x01))
-		{
-			mac->m_adb_timer_ticks = 8;
-			mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-		}
-
-		// if bit 2 drops and bit 1 is 1, terminate the command
-		if ((state & 0x02) && !(state & 0x04) && (mac->m_adb_state & 0x04))
-		{
-			#if LOG_ADB
-			printf("Egret ADB: SESSION dropped with VF=1, terminating command\n");
-			#endif
-			mac->m_adb_streaming = MCU_STREAMING_NONE;
-			mac->m_adb_state &= ~1;
-			mac->m_adb_datasize = 0;
-		}
-
-		// if bit 2 drops and bit 1 is zero, execute the command
-		if (!(state & 0x02) && !(state & 0x04) && (mac->m_adb_state & 0x04) && (mac->m_adb_datasize > 0))
-		{
-			#if LOG_ADB || LOG_ADB_MCU_CMD
-			int i;
-
-			printf("Egret ADB: exec command with %d bytes: ", mac->m_adb_datasize);
-
-			for (i = 0; i < mac->m_adb_datasize; i++)
-			{
-				printf("%02x ", mac->m_adb_buffer[i]);
-			}
-
-			printf("\n");
-			#endif
-
-			// exec command here
-			switch (mac->m_adb_buffer[0])
-			{
-				case 0:	// ADB command
-					switch (mac->m_adb_buffer[1] & 0xf)
-					{
-						case 0:		// reset
-							#if LOG_ADB || LOG_ADB_MCU_CMD
-							printf("Egret: ADB Reset\n");
-							#endif
-							mac_egret_response_adb(mac, 0, 0, 0, 0);
-							break;
-
-						case 1:		// flush
-							#if LOG_ADB || LOG_ADB_MCU_CMD
-							printf("Egret: ADB Flush\n");
-							#endif
-							mac_egret_response_std(mac, 1, 1, 0);
-							break;
-
-						default:
-							switch ((mac->m_adb_buffer[1]>>2)&3)
-							{
-								case 2:	// ADB listen
-									#if LOG_ADB || LOG_ADB_MCU_CMD
-									printf("Egret: ADB listen to device %d\n", mac->m_adb_buffer[1]>>4);
-									#endif
-									mac_egret_response_adb(mac, 0, 2, 0, 0);
-									break;
-
-								case 3: // ADB talk
-									#if LOG_ADB || LOG_ADB_MCU_CMD
-									printf("Egret: ADB talk to device %d\n", mac->m_adb_buffer[1]>>4);
-									#endif
-									mac_egret_response_adb(mac, 0, 2, 0, 0);
-									break;
-							}
-
-							#if LOG_ADB || LOG_ADB_MCU_CMD
-							printf("Egret: Unhandled ADB command %02x\n", mac->m_adb_buffer[1]);
-							#endif
-							mac->m_adb_datasize = 0;
-							break;
-
-					}
-					break;
-
-				case 1: // general Egret MCU command
-					mac_egret_mcu_exec(mac);
-					break;
-
-				case 2: // error
-					mac->m_adb_datasize = 0;
-					break;
-
-				case 3: // one-second interrupt
-					mac->m_adb_datasize = 0;
-					break;
-			}
-		}
-
-		mac->m_adb_state &= ~0x6;
-		mac->m_adb_state |= state & 0x6;
-	}
-}
-#endif
 
 static TIMER_CALLBACK(mac_pmu_tick)
 {
@@ -2959,12 +2539,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 		}
 		else if (ADB_IS_EGRET)
         {
-            #ifdef USE_EGRET_DEVICE
-            val = mac->m_egret->get_xcvr_session();
-            #else
-			val |= mac->m_adb_state<<3;
-			val ^= 0x08;	// maybe it's reversed?
-            #endif
+            val |= mac->m_egret->get_xcvr_session()<<3;
 		}
 		else
 		{
@@ -3136,13 +2711,11 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 	}
 	else if (ADB_IS_EGRET)
 	{
-        #ifdef USE_EGRET_DEVICE
-        printf("EGRET (%02x): VF %d SS %d\n", data&0x30, (data&0x10) ? 1 : 0, (data&0x20) ? 1 : 0);
+		#if LOG_ADB
+		printf("68K: New Egret state: SS %d VF %d (PC %x)\n", (data>>5)&1, (data>>4)&1, cpu_get_pc(mac->m_maincpu));
+		#endif
         mac->m_egret->set_via_full((data&0x10) ? 1 : 0);
         mac->m_egret->set_sys_session((data&0x20) ? 1 : 0);
-        #else
-		mac_egret_newaction(mac, (data & 0x30) >> 3);
-        #endif
 	}
 }
 
@@ -3462,8 +3035,8 @@ void mac_state::machine_reset()
 	/* setup videoram */
 	this->m_screen_buffer = 1;
 
-	/* setup sound */
-	if (AUDIO_IS_CLASSIC_CLASS)
+	/* setup 'classic' sound */
+	if (machine().device("custom") != NULL)
 	{
 		mac_set_sound_buffer(machine().device("custom"), 0);
 	}
@@ -3755,7 +3328,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 	int scanline;
 	mac_state *mac = machine.driver_data<mac_state>();
 
-	if (AUDIO_IS_CLASSIC)
+	if (machine.device("custom") != NULL)
 	{
 		mac_sh_updatebuffer(machine.device("custom"));
 	}

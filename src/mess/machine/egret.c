@@ -1,0 +1,385 @@
+/*
+	Apple "Egret" ADB/system controller MCU
+	Emulation by R. Belmont
+
+	Port definitions (big thanks to schematics for these!):
+
+	Port A:
+
+	x-------  O  ADB data line out
+	-x------  I  ADB data line in
+	--x-----  I  System type.  0 = hardware power switch, 1 = Egret controls power on/off
+	---x----  O  DFAC latch
+	----x---  O  ? (asserted briefly when resetting 680x0)
+	-----x--  I  Keyboard power switch 
+	------x-  ?  PSU enable OUT for system type 0, otherwise chassis power switch IN
+	-------x  ?  Control panel enable IN for system type 0 (e.g. LC), power supply enable OUT for type 1
+
+	Port B:
+
+	x-------  O  DFAC bit clock
+	-x------  ?  DFAC data I/O (used in both directions)
+	--x-----  ?  VIA shift register data (used in both directions)
+	---x----  O  VIA clock
+	----x---  I  VIA SYS_SESSION
+	-----x--  I  VIA VIA_FULL
+	------x-  O  VIA XCEIVER SESSION
+	-------x  I  +5v sense
+
+	Port C:
+	x---      O  680x0 reset
+	-x--      ?  680x0 IPL 2 (used in both directions)
+	--xx      ?  IPL 1/0 for hardware power switch, trickle sense (bit 1) and pulled up to +5v (bit 0) if Egret controls the PSU
+*/
+
+#define ADDRESS_MAP_MODERN
+
+//#define EGRET_SUPER_VERBOSE
+
+#include "emu.h"
+#include "egret.h"
+#include "cpu/m6805/m6805.h"
+#include "machine/6522via.h"
+#include "sound/asc.h"
+#include "includes/mac.h"
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define EGRET_CPU_TAG	"egret"
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type EGRET = &device_creator<egret_device>;
+
+ROM_START( egret )
+	ROM_REGION(0x1100, EGRET_CPU_TAG, 0)
+	ROM_LOAD( "341s0851.bin", 0x0000, 0x1100, CRC(ea9ea6e4) SHA1(8b0dae3ec66cdddbf71567365d2c462688aeb571) )
+ROM_END
+
+//-------------------------------------------------
+//  ADDRESS_MAP
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( egret_map, AS_PROGRAM, 8, egret_device )
+	AM_RANGE(0x0000, 0x0002) AM_READWRITE(ports_r, ports_w)
+	AM_RANGE(0x0004, 0x0006) AM_READWRITE(ddr_r, ddr_w)
+	AM_RANGE(0x0007, 0x0007) AM_READWRITE(pll_r, pll_w)
+	AM_RANGE(0x0008, 0x0008) AM_READWRITE(timer_ctrl_r, timer_ctrl_w)
+	AM_RANGE(0x0009, 0x0009) AM_READWRITE(timer_counter_r, timer_counter_w)
+	AM_RANGE(0x0012, 0x0012) AM_READWRITE(onesec_r, onesec_w)
+	AM_RANGE(0x0090, 0x00ff) AM_RAM							// work RAM and stack
+	AM_RANGE(0x0100, 0x01ff) AM_RAM //AM_BASE(pram)   		// PRAM image
+	AM_RANGE(0x0f00, 0x1fff) AM_ROM AM_REGION(EGRET_CPU_TAG, 0)
+ADDRESS_MAP_END
+
+//-------------------------------------------------
+//  MACHINE_CONFIG
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( egret )
+	MCFG_CPU_ADD(EGRET_CPU_TAG, M68HC05EG, XTAL_32_768kHz*256)	// 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
+	MCFG_CPU_PROGRAM_MAP(egret_map)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor egret_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( egret );
+}
+
+const rom_entry *egret_device::device_rom_region() const
+{
+	return ROM_NAME( egret );
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+void egret_device::send_port(address_space &space, UINT8 offset, UINT8 data)
+{
+	switch (offset)
+	{
+		case 0: // port A
+/*			printf("ADB:%d DFAC:%d PowerEnable:%d\n",
+				(data & 0x80) ? 1 : 0,
+				(data & 0x10) ? 1 : 0,
+				(data & 0x02) ? 1 : 0);*/
+			break;
+
+        case 1: // port B
+            {
+				if (xcvr_session != ((data>>1)&1))
+				{
+					#ifdef EGRET_SUPER_VERBOSE
+                    printf("EG-> XCVR_SESSION: %d (PC=%x)\n", (data>>1)&1, cpu_get_pc(m_maincpu));
+					#endif
+					xcvr_session = (data>>1) & 1;
+				}
+                if (via_data != ((data>>5)&1))
+                {
+					#ifdef EGRET_SUPER_VERBOSE
+                    printf("EG-> VIA_DATA: %d (PC=%x)\n", (data>>5)&1, cpu_get_pc(m_maincpu));
+					#endif
+					via_data = (data>>5) & 1;
+                }
+                if (via_clock != ((data>>4)&1))
+                {
+					#ifdef EGRET_SUPER_VERBOSE
+                    printf("EG-> VIA_CLOCK: %d (PC=%x)\n", ((data>>4)&1)^1, cpu_get_pc(m_maincpu));
+					#endif
+					via_clock = (data>>4) & 1;
+					via6522_device *via1 = machine().device<via6522_device>("via6522_0");
+					via1->write_cb1(via_clock^1);
+                }
+            }
+            break;
+
+		case 2: // port C
+			if ((data & 8) != reset_line)
+			{
+				#ifdef EGRET_SUPER_VERBOSE
+				printf("680x0 reset: %d -> %d\n", (ports[2] & 8)>>3, (data & 8)>>3);
+				#endif
+				reset_line = (data & 8);
+
+				// falling edge, should reset the machine too
+				if ((ports[2] & 8) && !(data&8))
+				{
+					mac_state *mac = machine().driver_data<mac_state>();
+
+					// force the memory overlay
+					mac->set_memory_overlay(0);
+					mac->set_memory_overlay(1);
+				}
+
+				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, (reset_line & 8) ? ASSERT_LINE : CLEAR_LINE);
+			}
+			break;
+	}
+}
+
+READ8_MEMBER( egret_device::ddr_r )
+{
+	return ddrs[offset];
+}
+
+WRITE8_MEMBER( egret_device::ddr_w )
+{
+/*	printf("%02x to DDR %c\n", data, 'A' + offset);*/
+
+	send_port(space, offset, ports[offset] & data);
+
+	ddrs[offset] = data;
+}
+
+READ8_MEMBER( egret_device::ports_r )
+{
+	UINT8 incoming = 0;
+
+	switch (offset)
+	{
+		case 0:   	// port A
+//			incoming |= adb_in ? 0x40 : 0;
+
+			if (egret_controls_power)
+			{
+				incoming |= 0x40 | 0x02;	// indicate soft power, indicate chassis switch on
+			}
+			else
+			{
+				//incoming |= 0x01;	// enable control panel enabled
+			}
+			break;
+
+		case 1:		// port B
+			incoming |= 0x01;	// always show +5v active
+            incoming |= via_full<<2;
+            incoming |= sys_session<<3;
+            incoming |= via_data<<5;
+			incoming |= 0x40;	// show DFAC line high
+			break;
+
+		case 2:		// port C
+			if (egret_controls_power)
+			{
+				incoming |= 0x3;	// trickle sense active, bit 0 pulled up as per schematics
+			}
+			break;
+	}
+
+	// apply data direction registers							 
+	incoming &= (ddrs[offset] ^ 0xff);
+	// add in ddr-masked version of port writes
+	incoming |= (ports[offset] & ddrs[offset]);
+
+	return incoming;
+}
+
+WRITE8_MEMBER( egret_device::ports_w )
+{
+	send_port(space, offset, data);
+
+	ports[offset] = data;
+}
+
+READ8_MEMBER( egret_device::pll_r )
+{
+	return pll_ctrl;
+}
+
+WRITE8_MEMBER( egret_device::pll_w )
+{
+	#ifdef EGRET_SUPER_VERBOSE
+	if (pll_ctrl != data)
+	{
+		static const int clocks[4] = { 524288, 1048576, 2097152, 4194304 };
+		printf("PLL ctrl: clock %d TCS:%d BCS:%d AUTO:%d BWC:%d PLLON:%d\n", clocks[data&3],
+			(data & 0x80) ? 1 : 0,
+			(data & 0x40) ? 1 : 0,
+			(data & 0x20) ? 1 : 0,
+			(data & 0x10) ? 1 : 0,
+			(data & 0x08) ? 1 : 0);
+	}
+	#endif
+	pll_ctrl = data;
+}
+
+READ8_MEMBER( egret_device::timer_ctrl_r )
+{
+	return timer_ctrl;
+}
+
+WRITE8_MEMBER( egret_device::timer_ctrl_w )
+{
+//	printf("%02x to timer control\n", data);
+	timer_ctrl = data;
+}
+
+READ8_MEMBER( egret_device::timer_counter_r )
+{
+	return timer_counter;
+}
+
+WRITE8_MEMBER( egret_device::timer_counter_w )
+{
+//	printf("%02x to timer/counter\n", data);
+	timer_counter = data;
+}
+
+READ8_MEMBER( egret_device::onesec_r )
+{
+	return onesec;
+}
+
+WRITE8_MEMBER( egret_device::onesec_w )
+{
+	static const float rates[4] = { 0.5f, 1.0f, 2.0f, 4.0f };
+
+//	printf("%02x to one-second control\n", data);
+
+	m_timer->adjust(attotime::from_hz(rates[data&3]*128.0f), 0, attotime::from_hz(rates[data&3]*128.0f));
+
+	if ((onesec & 0x40) && !(data & 0x40))
+	{
+		device_set_input_line(m_maincpu, M68HC05EG_INT_CPI, CLEAR_LINE);
+	}
+
+	onesec = data;
+}
+
+//-------------------------------------------------
+//  egret_device - constructor
+//-------------------------------------------------
+
+egret_device::egret_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, EGRET, "Apple Egret", tag, owner, clock),
+	  m_maincpu(*this, EGRET_CPU_TAG)
+//	device_nvram_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void egret_device::device_start()
+{
+	m_timer = timer_alloc(0, NULL);
+	save_item(NAME(ddrs[0]));
+	save_item(NAME(ddrs[1]));
+	save_item(NAME(ddrs[2]));
+	save_item(NAME(ports[0]));
+	save_item(NAME(ports[1]));
+	save_item(NAME(ports[2]));
+	save_item(NAME(pll_ctrl));
+	save_item(NAME(timer_ctrl));
+	save_item(NAME(timer_counter));
+	save_item(NAME(onesec));
+	save_item(NAME(xcvr_session));
+	save_item(NAME(via_full));
+	save_item(NAME(sys_session));
+	save_item(NAME(via_data));
+	save_item(NAME(via_clock));
+	save_item(NAME(adb_in));
+	save_item(NAME(reset_line));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void egret_device::device_reset()
+{
+	ddrs[0] = ddrs[1] = ddrs[2] = 0;
+	ports[0] = ports[1] = ports[2] = 0;
+
+	m_timer->adjust(attotime::never);
+
+	egret_controls_power = false;	// set to hard power control
+	adb_in = true;	// line is pulled up to +5v, so nothing plugged in would read as "1"
+	reset_line = 0;
+    xcvr_session = 0;
+    via_full = 0;
+    sys_session = 0;
+    via_data = 0;
+    via_clock = 0;
+    pll_ctrl = 0;
+    timer_ctrl = 0;
+    timer_counter = 0;
+}
+
+void egret_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	onesec |= 0x40;
+
+	if (onesec & 0x10)
+	{
+		device_set_input_line(m_maincpu, M68HC05EG_INT_CPI, ASSERT_LINE);
+	}
+}
+
+#if 0   							
+void egret_device::nvram_default()
+{
+}
+
+void egret_device::nvram_read(emu_file &file)
+{
+}
+
+void egret_device::nvram_write(emu_file &file)
+{
+}
+#endif
