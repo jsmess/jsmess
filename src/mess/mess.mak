@@ -1788,16 +1788,16 @@ $(MESS_MACHINE)/nes_mmc.o:	$(MESSSRC)/machine/nes_ines.c \
 				$(MESSSRC)/machine/nes_unif.c \
 
 $(MESS_AUDIO)/mac.o:		$(MESSSRC)/audio/mac.c \
-				$(MESSSRC)/includes/mac.h
+				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h
 
 $(MESS_VIDEO)/mac.o:		$(MESSSRC)/video/mac.c \
-				$(MESSSRC)/includes/mac.h
+				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h
 
 $(MESS_MACHINE)/mac.o:		$(MESSSRC)/machine/mac.c \
-				$(MESSSRC)/includes/mac.h
+				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h
 
 $(MESS_DRIVERS)/mac.o:		$(MESSSRC)/drivers/mac.c \
-				$(MESSSRC)/includes/mac.h
+				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h
 
 $(MESS_MACHINE)/egret.o:    $(MESSSRC)/machine/egret.c\
                 $(MESSSRC)/machine/egret.h

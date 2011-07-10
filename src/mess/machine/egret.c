@@ -2,7 +2,7 @@
 	Apple "Egret" ADB/system controller MCU
 	Emulation by R. Belmont
 
-	Port definitions (big thanks to schematics for these!):
+	Port definitions, primarily from the schematics.
 
 	Port A:
 
@@ -72,7 +72,7 @@ static ADDRESS_MAP_START( egret_map, AS_PROGRAM, 8, egret_device )
 	AM_RANGE(0x0009, 0x0009) AM_READWRITE(timer_counter_r, timer_counter_w)
 	AM_RANGE(0x0012, 0x0012) AM_READWRITE(onesec_r, onesec_w)
 	AM_RANGE(0x0090, 0x00ff) AM_RAM							// work RAM and stack
-	AM_RANGE(0x0100, 0x01ff) AM_RAM //AM_BASE(pram)   		// PRAM image
+	AM_RANGE(0x0100, 0x01ff) AM_READWRITE(pram_r, pram_w)
 	AM_RANGE(0x0f00, 0x1fff) AM_ROM AM_REGION(EGRET_CPU_TAG, 0)
 ADDRESS_MAP_END
 
@@ -81,7 +81,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( egret )
-	MCFG_CPU_ADD(EGRET_CPU_TAG, M68HC05EG, XTAL_32_768kHz*256)	// 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
+	MCFG_CPU_ADD(EGRET_CPU_TAG, M68HC05EG, XTAL_32_768kHz*192)	// 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
 	MCFG_CPU_PROGRAM_MAP(egret_map)
 MACHINE_CONFIG_END
 
@@ -160,6 +160,13 @@ void egret_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 					// force the memory overlay
 					mac->set_memory_overlay(0);
 					mac->set_memory_overlay(1);
+
+					// if PRAM's waiting to be loaded, transfer it now
+					if (!pram_loaded)
+					{
+						memcpy(pram, disk_pram, 0x100);
+						pram_loaded = true;
+					}
 				}
 
 				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, (reset_line & 8) ? ASSERT_LINE : CLEAR_LINE);
@@ -297,14 +304,24 @@ WRITE8_MEMBER( egret_device::onesec_w )
 	onesec = data;
 }
 
+READ8_MEMBER( egret_device::pram_r )
+{
+	return pram[offset];
+}
+
+WRITE8_MEMBER( egret_device::pram_w )
+{
+	pram[offset] = data;
+}
+
 //-------------------------------------------------
 //  egret_device - constructor
 //-------------------------------------------------
 
 egret_device::egret_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, EGRET, "Apple Egret", tag, owner, clock),
-	  m_maincpu(*this, EGRET_CPU_TAG)
-//	device_nvram_interface(mconfig, *this)
+	device_nvram_interface(mconfig, *this),
+	m_maincpu(*this, EGRET_CPU_TAG)
 {
 }
 
@@ -333,6 +350,9 @@ void egret_device::device_start()
 	save_item(NAME(via_clock));
 	save_item(NAME(adb_in));
 	save_item(NAME(reset_line));
+	save_item(NAME(pram_loaded));
+	save_item(NAME(pram));
+	save_item(NAME(disk_pram));
 }
 
 
@@ -370,16 +390,23 @@ void egret_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-#if 0   							
+// the 6805 program clears PRAM on startup (on h/w it's always running once a battery is inserted)
+// we deal with that by loading pram from disk to a secondary buffer and then slapping it into "live"
+// once the Egret reboots the 68k
 void egret_device::nvram_default()
 {
+	memset(pram, 0, 0x100);
+	memset(disk_pram, 0, 0x100);
+	pram_loaded = true;	// no sense doing the transfer in this case
 }
 
 void egret_device::nvram_read(emu_file &file)
 {
+	file.read(disk_pram, 0x100);
+	pram_loaded = false;
 }
 
 void egret_device::nvram_write(emu_file &file)
 {
+	file.write(pram, 0x100);
 }
-#endif
