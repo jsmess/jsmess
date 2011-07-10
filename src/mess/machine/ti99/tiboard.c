@@ -601,7 +601,7 @@ const tms9901_interface tms9901_wiring_ti99_8 =
 };
 
 /*
-    Handles the EXTINT line. This one is directly connected to the 9901.
+    Handles the EXTINT line. This one is directly connected to the 9901 (/INT1).
 */
 WRITE_LINE_DEVICE_HANDLER( console_extint )
 {
@@ -610,7 +610,7 @@ WRITE_LINE_DEVICE_HANDLER( console_extint )
 
 WRITE_LINE_DEVICE_HANDLER( console_notconnected )
 {
-	logerror("Not connected line set ... sorry\n");
+	logerror("Setting a not connected line ... ignored\n");
 }
 
 WRITE_LINE_DEVICE_HANDLER( console_ready )

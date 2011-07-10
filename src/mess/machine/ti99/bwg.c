@@ -51,7 +51,7 @@ typedef struct _ti99_bwg_state
 	int					strobe_motor;
 
 	/* Signal DVENA. When TRUE, makes some drive turning. */
-	int					DVENA;
+	line_state			DVENA;
 
 	/* When TRUE the CPU is halted while DRQ/IRQ are true. */
 	int					hold;
@@ -117,7 +117,7 @@ static void bwg_handle_hold(device_t *device)
 	ti99_bwg_state *card = get_safe_token(device);
 	line_state state;
 
-	if (card->hold && (!card->DRQ_IRQ_status) && card->DVENA)
+	if (card->hold && (!card->DRQ_IRQ_status) && (card->DVENA==ASSERT_LINE))
 		state = ASSERT_LINE;
 	else
 		state = CLEAR_LINE;
@@ -171,15 +171,15 @@ static WRITE_LINE_DEVICE_HANDLER( ti_bwg_intrq_w )
 	if (state)
 	{
 		card->DRQ_IRQ_status |= bwg_IRQ;
-		// Note that INTB is actually not used in the TI-99 family. But the
-		// controller asserts the line nevertheless
-		card->lines.intb(TRUE);
 	}
 	else
 	{
 		card->DRQ_IRQ_status &= ~bwg_IRQ;
-		card->lines.intb(FALSE);
 	}
+	// Note that INTB is actually not used in the TI-99 family. But the
+	// controller asserts the line nevertheless
+	// INTB* is active low.
+	card->lines.intb(state);
 	bwg_handle_hold(carddev);
 }
 
@@ -203,7 +203,7 @@ static TIMER_CALLBACK(motor_on_timer_callback)
 {
 	device_t *device = (device_t *)ptr;
 	ti99_bwg_state *card = get_safe_token(device);
-	card->DVENA = 0;
+	card->DVENA = CLEAR_LINE;
 	bwg_handle_hold(device);
 }
 
@@ -273,7 +273,7 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			/* Activate motor */
 			if (data && !card->strobe_motor)
 			{	/* on rising edge, set motor_running for 4.23s */
-				card->DVENA = TRUE;
+				card->DVENA = ASSERT_LINE;
 				bwg_handle_hold(device);
 				card->motor_on_timer->adjust(attotime::from_msec(4230));
 			}
@@ -536,7 +536,7 @@ static DEVICE_RESET( ti99_bwg )
 
 		card->DSEL = 0;
 		card->SIDE = 0;
-		card->DVENA = 0;
+		card->DVENA = CLEAR_LINE;
 		card->strobe_motor = 0;
 
 		ti99_set_80_track_drives(FALSE);
