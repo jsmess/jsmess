@@ -36,7 +36,7 @@ typedef struct _ti99_fdc_state
 	int					strobe_motor;
 
 	/* Signal DVENA. When TRUE, makes some drive turning. */
-	int					DVENA;
+	line_state			DVENA;
 
 	/* When TRUE the CPU is halted while DRQ/IRQ are true. */
 	int					hold;
@@ -96,7 +96,7 @@ static void fdc_handle_hold(device_t *device)
 	ti99_fdc_state *card = get_safe_token(device);
 	line_state state;
 
-	if (card->hold && (!card->DRQ_IRQ_status) && card->DVENA)
+	if (card->hold && (!card->DRQ_IRQ_status) && (card->DVENA==ASSERT_LINE))
 		state = ASSERT_LINE;
 	else
 		state = CLEAR_LINE;
@@ -150,7 +150,7 @@ static READ8Z_DEVICE_HANDLER( cru_r )
 			// deliver bits 0-7
 			// TODO: HLD pin
 			// The DVENA state is returned inverted
-			if (card->DVENA) reply |= ((card->DSEL)<<1);
+			if (card->DVENA==ASSERT_LINE) reply |= ((card->DSEL)<<1);
 			else reply |= 0x10;
 			reply |= 0x40;
 			if (card->SIDSEL) reply |= 0x80;
@@ -177,7 +177,7 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			/* Activate motor */
 			if (data && !card->strobe_motor)
 			{	/* on rising edge, set motor_running for 4.23s */
-				card->DVENA = TRUE;
+				card->DVENA = ASSERT_LINE;
 				fdc_handle_hold(device);
 				card->motor_on_timer->adjust(attotime::from_msec(4230));
 			}
@@ -283,18 +283,18 @@ static WRITE_LINE_DEVICE_HANDLER( ti_fdc_intrq_w )
 	device_t *carddev = device->owner();
 	ti99_fdc_state *card = get_safe_token(carddev);
 
-	if (state)
+	if (state==ASSERT_LINE)
 	{
-		card->DRQ_IRQ_status |= fdc_IRQ;
 		// Note that INTB is actually not used in the TI-99 family. But the
 		// controller asserts the line nevertheless
-		card->lines.intb(TRUE);
+		card->DRQ_IRQ_status |= fdc_IRQ;
 	}
 	else
 	{
 		card->DRQ_IRQ_status &= ~fdc_IRQ;
-		card->lines.intb(FALSE);
 	}
+	// INTB* is active low; gets inverted on the board
+	card->lines.intb(state);
 	fdc_handle_hold(carddev);
 }
 
@@ -318,7 +318,7 @@ static TIMER_CALLBACK(motor_on_timer_callback)
 {
 	device_t *device = (device_t *)ptr;
 	ti99_fdc_state *card = get_safe_token(device);
-	card->DVENA = 0;
+	card->DVENA = CLEAR_LINE;
 	fdc_handle_hold(device);
 }
 
@@ -375,7 +375,7 @@ static DEVICE_RESET( ti99_fdc )
 
 		card->DSEL = 0;
 		card->SIDSEL = 0;
-		card->DVENA = 0;
+		card->DVENA = CLEAR_LINE;
 		card->strobe_motor = 0;
 
 		card->select_mask = 0x7e000;

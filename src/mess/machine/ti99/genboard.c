@@ -475,6 +475,7 @@ READ8_DEVICE_HANDLER( geneve_r )
 			// DRAM. One wait state.
 			device_adjust_icount(board->cpu, -4);
 			value = board->dram[physaddr & 0x07ffff];
+//          printf("dram read physaddr = %06x logaddr = %04x value = %02x\n", physaddr, offset, value);
 			return value;
 		}
 
@@ -500,6 +501,7 @@ READ8_DEVICE_HANDLER( geneve_r )
 				value = board->sram[physaddr & ~board->sram_mask];
 			}
 			// Return in any case
+//          printf("sram read physaddr = %06x logaddr = %04x value = %02x\n", physaddr, offset, value);
 			return value;
 		}
 
@@ -669,6 +671,8 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 
 	physaddr |= offset & 0x1fff;
 
+//  printf("write physaddr = %06x logaddr = %04x value = %02x\n", physaddr, offset, data);
+
 	if (!board->genmod)
 	{
 		if ((physaddr & 0x180000)==0x000000)
@@ -764,7 +768,7 @@ WRITE8_DEVICE_HANDLER ( geneve_cru_w )
 {
 	genboard_state *board = get_safe_token(device);
 
-	int addroff = (offset + 0x0800) << 1;
+	int addroff = offset << 1;
 	int rising_edge = FALSE;
 	int falling_edge = FALSE;
 
@@ -841,7 +845,7 @@ READ8_DEVICE_HANDLER ( geneve_cru_r )
 {
 	UINT8 value = 0;
 	genboard_state *board = get_safe_token(device);
-	int addroff = (offset + 0x0100) << 4;
+	int addroff = offset << 4;
 
 	// TMS9995-internal CRU locations (1ee0-1efe) are handled within the 99xxcore
 	// implementation (read_single_cru), so we don't arrive here
@@ -1304,7 +1308,7 @@ const tms9901_interface tms9901_wiring_geneve =
 WRITE_LINE_DEVICE_HANDLER( board_inta )
 {
 	tms9901_set_single_int(device->machine().device("tms9901"), 1, state);
-	cputag_set_input_line(device->machine(), "maincpu", 1, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 1, state);
 }
 
 /*

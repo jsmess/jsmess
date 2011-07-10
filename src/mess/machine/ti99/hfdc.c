@@ -387,15 +387,9 @@ static WRITE_LINE_DEVICE_HANDLER( intrq_w )
 	ti99_hfdc_state *card = get_safe_token(device->owner());
 	card->irq = state;
 
-	/* Set INTA */
-	if (state)
-	{
-		card->lines.inta(ASSERT_LINE);
-	}
-	else
-	{
-		card->lines.inta(CLEAR_LINE);
-	}
+	// Set INTA* (active low)
+	// Signal from SMC is active high, INTA* is active low; board inverts signal
+	card->lines.inta(state);
 }
 
 /*
