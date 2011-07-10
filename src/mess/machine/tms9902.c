@@ -40,6 +40,11 @@
 
 #define VERBOSE 1
 
+// Polling frequency. We use a much higher value to allow for line state changes
+// happening between character transmissions (which happen in parallel in real
+// communications but which must be serialized here)
+#define POLLING_FREQ 20000
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -131,6 +136,12 @@ struct _tms9902_t
 	emu_timer *dectimer;			/* MESS timer, used to emulate the decrementer register */
 	emu_timer *optimer;
 
+	// This value is the ratio of data input versus the poll rate. The
+	// data source should deliver data bytes at every 1/baudpoll call.
+	// This is to ensure that data is delivered at a rate that is expected
+	// from the emulated program.
+	double baudpoll;
+
 	/* Pointer to interface */
 	const tms9902_interface *intf;
 };
@@ -214,7 +225,7 @@ void tms9902_clock(device_t *device, int state)
 {
 	tms9902_t *tms9902 = get_token(device);
 	if (state)
-		tms9902->optimer->adjust(attotime::from_msec(1), 0, attotime::from_hz(5000));
+		tms9902->optimer->adjust(attotime::from_msec(1), 0, attotime::from_hz(POLLING_FREQ));
 	else
 		tms9902->optimer->reset();
 }
@@ -260,7 +271,6 @@ void tms9902_receive_data(device_t *device, int data)
 	}
 }
 
-
 /*
     This call-back is called by the MESS timer system when the decrementer
     reaches 0.
@@ -281,15 +291,16 @@ static TIMER_CALLBACK(decrementer_callback)
     controlled by an external clock of 3-4 MHz, internally divided by 3 or 4,
     depending on CLK4M. With this timer, reception of characters becomes
     possible.
-    We use a lower frequency which is high enough to just enable a 9600 baud
-    transfer (~1200 chars/s, cycle time of 0.83 ms)
+    We deliver the baudpoll value which allows the callback function to know
+    when the next data byte shall be delivered.
 */
 static TIMER_CALLBACK(op_callback)
 {
 	device_t *device = (device_t *) ptr;
 	tms9902_t *tms9902 = get_token(device);
+
 	if (tms9902->intf->rcv_callback)
-		(*tms9902->intf->rcv_callback)(device);
+		(*tms9902->intf->rcv_callback)(device, tms9902->baudpoll);
 }
 
 /*
@@ -330,8 +341,12 @@ static void set_brk(device_t *device, int state)
 /*
     Sets the data rate for the receiver part. If a remote UART is attached,
     propagate this setting.
-    We transmit the bit pattern and leave it up to the remote UART to
-    interpret this as a baud rate.
+    The TMS9902 calculates the baud rate from the external clock, and the result
+    does not match the known baud rates precisely (e.g. for 9600 baud the
+    closest value is 9615). Other UARTs may have a different way to set baud
+    rates. Thus we transmit the bit pattern and leave it up to the remote UART
+    to calculate its own baud rate from it. Apart from that, the callback
+    function should add information about the UART.
 
     CLK4M RDV8 RDR9 RDR8 | RDR7 RDR6 RDR5 RDR4 | RDR3 RDR2 RDR1 RDR0
 */
@@ -340,6 +355,18 @@ static void set_receive_data_rate(device_t *device)
 	tms9902_t *tms9902 = get_token(device);
 	int value = (tms9902->CLK4M? 0x800 : 0) | (tms9902->RDV8? 0x400 : 0) | tms9902->RDR;
 	if (VERBOSE) logerror("receive rate = %04x\n", value);
+
+	// Calculate the ratio between receive baud rate and polling frequency
+	double fint = tms9902->clock_rate / ((tms9902->CLK4M) ? 4.0 : 3.0);
+	double baud = fint / (2.0 * ((tms9902->RDV8)? 8:1) * tms9902->RDR);
+
+	// We assume 10 bit per character (7 data usually add 1 parity; 1 start, 1 stop)
+	// This value represents the ratio of data inputs of one poll.
+	// Thus the callback function should add up this value on each poll
+	// and deliver a data input not before it sums up to 1.
+	tms9902->baudpoll = (double)(baud / (10*POLLING_FREQ));
+	if (VERBOSE) logerror ("baudpoll = %lf\n", tms9902->baudpoll);
+
 	if (tms9902->intf->ctrl_callback)
 		(*tms9902->intf->ctrl_callback)(device, TMS9902_CONF_RRATE, value);
 }
