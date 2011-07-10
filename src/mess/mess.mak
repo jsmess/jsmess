@@ -635,6 +635,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_VIDEO)/apple3.o		\
 	$(MESS_MACHINE)/apple3.o	\
 	$(MESS_DRIVERS)/apple3.o	\
+    $(MESS_MACHINE)/egret.o     \
 
 $(MESSOBJ)/applied.a:			\
 	$(MESS_VIDEO)/mbee.o		\
@@ -1797,6 +1798,9 @@ $(MESS_MACHINE)/mac.o:		$(MESSSRC)/machine/mac.c \
 
 $(MESS_DRIVERS)/mac.o:		$(MESSSRC)/drivers/mac.c \
 				$(MESSSRC)/includes/mac.h
+
+$(MESS_MACHINE)/egret.o:    $(MESSSRC)/machine/egret.c\
+                $(MESSSRC)/machine/egret.h
 
 #-------------------------------------------------
 # layout dependencies
