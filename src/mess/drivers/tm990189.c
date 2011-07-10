@@ -392,7 +392,7 @@ static TIMER_CALLBACK(rs232_input_callback)
 	if (/*state->m_rs232_rts &&*/ /*(mame_ftell(state->m_rs232_fp) < mame_fsize(state->m_rs232_fp))*/1)
 	{
 		if (image->fread(&buf, 1) == 1)
-			tms9902_push_data(machine.device("tms9902"), buf);
+			tms9902_receive_data(machine.device("tms9902"), buf);
 	}
 }
 
@@ -442,12 +442,12 @@ DEFINE_LEGACY_IMAGE_DEVICE(TM990_189_RS232, tm990_189_rs232);
 	MCFG_DEVICE_ADD(_tag, TM990_189_RS232, 0)
 
 
-static TMS9902_RST_CALLBACK( rts_callback )
+/* static TMS9902_RTS_CALLBACK( rts_callback )
 {
-	tm990189_state *state = device->machine().driver_data<tm990189_state>();
-	state->m_rs232_rts = RTS;
-	tms9902_set_cts(device, RTS);
-}
+    tm990189_state *state = device->machine().driver_data<tm990189_state>();
+    state->m_rs232_rts = RTS;
+    tms9902_set_cts(device, RTS);
+} */
 
 static TMS9902_XMIT_CALLBACK( xmit_callback )
 {
@@ -690,13 +690,14 @@ static const tms9901_interface sys9901reset_param =
     0x3000-0x3fff: 4kb onboard ROM
 */
 
+// MZ: needs to be fixed once the RS232 support is complete
 static const tms9902_interface tms9902_params =
 {
 	2000000.,				/* clock rate (2MHz) */
 	NULL,/*int_callback,*/	/* called when interrupt pin state changes */
-	rts_callback,			/* called when Request To Send pin state changes */
-	NULL,/*brk_callback,*/	/* called when BReaK state changes */
-	xmit_callback			/* called when a character is transmitted */
+	NULL,/*rcv_callback,*/	/* called when a character shall be received  */
+	xmit_callback,			/* called when a character is transmitted */
+	NULL					/* called for setting interface parameters and line states */
 };
 
 static ADDRESS_MAP_START(tm990_189_memmap, AS_PROGRAM, 8)
