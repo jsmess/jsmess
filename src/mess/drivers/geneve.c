@@ -226,13 +226,18 @@ ADDRESS_MAP_END
 
 /*
     CRU map
+    The TMS9901 is fully decoded, no mirroring, so we have 32 bits for it,
+    and the rest goes to the board (and from there to the PEB)
+    TMS9995 has a full 15-bit CRU bit address space (attached to A0-A14)
+    TODO: Check whether A0-A2 are available for CRU addressing since those
+    bits are usually routed through the mapper first.
 */
 static ADDRESS_MAP_START(cru_map, AS_IO, 8)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVREAD("tms9901", tms9901_cru_r)
-	AM_RANGE(0x0100, 0x01ff) AM_DEVREAD("geneve_board", geneve_cru_r)
+	AM_RANGE(0x0000, 0x0003) AM_DEVREAD("tms9901", tms9901_cru_r)
+	AM_RANGE(0x0000, 0x0fff) AM_DEVREAD("geneve_board", geneve_cru_r)
 
-	AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
-	AM_RANGE(0x0800, 0x0fff) AM_DEVWRITE("geneve_board", geneve_cru_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE("tms9901", tms9901_cru_w)
+	AM_RANGE(0x0000, 0x7fff) AM_DEVWRITE("geneve_board", geneve_cru_w)
 ADDRESS_MAP_END
 
 static INPUT_CHANGED( gm_changed )
@@ -279,9 +284,26 @@ static INPUT_PORTS_START(geneve)
 	PORT_CONFNAME( 0x07, 0x03, "Disk controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "TI SD Floppy Controller" )
-//		PORT_CONFSETTING(    0x02, "SNUG BwG Controller" )
+//      PORT_CONFSETTING(    0x02, "SNUG BwG Controller" )
 		PORT_CONFSETTING(    0x03, "Myarc HFDC" )
 //      PORT_CONFSETTING(    0x04, "Corcomp" )
+
+	PORT_START( "BWGDIP1" )
+	PORT_DIPNAME( 0x01, 0x00, "BwG step rate" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
+		PORT_DIPSETTING( 0x00, "6 ms")
+		PORT_DIPSETTING( 0x01, "20 ms")
+
+	PORT_START( "BWGDIP2" )
+	PORT_DIPNAME( 0x01, 0x00, "BwG date/time display" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
+		PORT_DIPSETTING( 0x00, "Hide")
+		PORT_DIPSETTING( 0x01, "Show")
+
+	PORT_START( "BWGDIP34" )
+	PORT_DIPNAME( 0x03, 0x00, "BwG drives" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
+		PORT_DIPSETTING( 0x00, "DSK1 only")
+		PORT_DIPSETTING( 0x01, "DSK1-DSK2")
+		PORT_DIPSETTING( 0x02, "DSK1-DSK3")
+		PORT_DIPSETTING( 0x03, "DSK1-DSK4")
 
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
