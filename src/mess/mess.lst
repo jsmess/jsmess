@@ -641,6 +641,7 @@ t1000hx   // 1987 Tandy 1000 HX (similiar to PCJr)
 t1000sx   // 1987 Tandy 1000 SX (similiar to PCJr)
 t1000tx	// 1987 Tandy 1000 TX
 t1000rl	// 1989 Tandy 1000 RL
+t1000tl2 // 1989 Tandy 1000 TL/2
 
 // XT
 ibm5160   // 1982 IBM XT 5160
@@ -692,6 +693,7 @@ megapcpl
 ec1849
 t2000sx
 cmdpc30
+
 
 // 3Com / Palm / USRobotics
 pilot1k   // Pilot 1000
