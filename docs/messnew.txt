@@ -2,7 +2,8 @@
 
 New System Drivers Supported:
 -----------------------------
-(none)
+- Macintosh PowerBook 140, 145, 145B, 170 [R. Belmont]
+- Macintosh Color Classic [R. Belmont]
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
@@ -40,6 +41,9 @@ System Driver Changes:
         Output works quite well, input has issues (overflows)
         Handshaking not verified yet
         For the meantime, TMS9902 output to a file is disabled
+- mac: Improved PMU simulation for PowerBooks.  Replaced Egret simulation with emulation of 
+      the dumped 6805 code.  Improved interrupt handling for RBV/V8 machines (fixes IIci 
+      sound).  [R. Belmont]
 
 Software Lists:
 ----------------
