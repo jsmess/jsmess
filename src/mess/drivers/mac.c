@@ -217,12 +217,12 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		switch (offset)
 		{
 			case 13:	// IFR
-//              printf("Read IER = %02x (PC=%x)\n", m_rbv_ier, cpu_get_pc(space.cpu));
+//				printf("Read IER = %02x (PC=%x)\n", m_rbv_ier, cpu_get_pc(m_maincpu));
 				return m_rbv_ifr;
 				break;
 
 			case 14:	// IER
-//              printf("Read IFR = %02x (PC=%x)\n", m_rbv_ifr, cpu_get_pc(space.cpu));
+//				printf("Read IFR = %02x (PC=%x)\n", m_rbv_ifr, cpu_get_pc(m_maincpu));
 				return m_rbv_ier;
 				break;
 
@@ -292,6 +292,11 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 				else			// 1 bits write 0s
 				{
 					m_rbv_regs[offset] &= ~(data & 0x7f);
+
+					if (data & 0x78)
+					{
+						m_rbv_ifr &= ~0x2;
+					}
 				}
 				break;
 
@@ -321,9 +326,20 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 		switch (offset)
 		{
 			case 13:	// IFR
-//              printf("rbv_w: %02x to IFR\n", data);
-				m_rbv_ifr = data;
-				this->set_via2_interrupt(0);
+				if (data & 0x80)
+				{
+					data = 0x7f;
+				}
+				m_rbv_ifr = (m_rbv_ifr & ~data) & 0x7f;
+
+				if (m_rbv_ifr & m_rbv_ier & 0x7f)
+				{
+					this->set_via2_interrupt(1);
+				}
+				else
+				{
+					this->set_via2_interrupt(0);
+				}
 				break;
 
 			case 14:	// IER
@@ -336,7 +352,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 					m_rbv_ier &= ~(data & 0x7f);
 				}
 
-//              printf("rbv_w: %02x to IER => %02x\n", data, m_rbv_ier);
+//                printf("rbv_w: %02x to IER => %02x\n", data, m_rbv_ier);
 				break;
 
 			default:
