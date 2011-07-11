@@ -17,7 +17,7 @@
 		</rect>
 	</element>
 
-	<view name="LEDs only">
+	<view name="Default Layout">
 
 		<!-- Background -->
 		<backdrop element="background">

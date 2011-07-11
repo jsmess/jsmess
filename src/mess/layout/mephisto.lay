@@ -20,7 +20,7 @@
 		</rect>
 	</element>
 
-	<view name="Simple LCD/LEDs">
+	<view name="Default Layout">
 		<!-- Black background -->
 		<bezel element="background">
 			<bounds left="95" top="85" right="310" bottom="210" />

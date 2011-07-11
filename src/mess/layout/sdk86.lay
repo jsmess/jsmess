@@ -17,7 +17,7 @@
 		</rect>
 	</element>
 
-	<view name="SDK86">
+	<view name="Default Layout">
 
 		<!-- Background -->
 		<backdrop element="background">

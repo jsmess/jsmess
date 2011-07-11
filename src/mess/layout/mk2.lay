@@ -30,7 +30,7 @@
 		</text>
 	</element>
 
-	<view name="Simple LEDs">
+	<view name="Default Layout">
 		<bezel name="labels" element="labels">
 			<bounds left="0" top="65" right="133" bottom="73" />
 		</bezel>

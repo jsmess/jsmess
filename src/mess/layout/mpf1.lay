@@ -24,7 +24,7 @@
 		</disk>
 	</element>
 
-	<view name="Standard">
+	<view name="Default Layout">
 		<bezel name="led0" element="ledgreen">
 			<bounds x="277" y="375" width="15" height="15" />
 		</bezel>

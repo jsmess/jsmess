@@ -40,7 +40,7 @@
         </text>
     </element>
 
-    <view name="Standard">
+    <view name="Default Layout">
         <backdrop element="gray">
             <bounds x="65" y="74" width="640" height="480" />
         </backdrop>

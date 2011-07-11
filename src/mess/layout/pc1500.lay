@@ -76,7 +76,7 @@
 		</rect>
 	</element>
 
-	<view name="Simple LCD">
+	<view name="Default Layout">
 		<!-- LCD background -->
 		<bezel element="background">
 			<bounds left="0" top="0" right="156" bottom="4" />

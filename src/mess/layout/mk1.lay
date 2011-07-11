@@ -12,7 +12,7 @@
 		</disk>
 	</element>
 
-	<view name="Simple LEDs">
+	<view name="Default Layout">
 		<bezel name="digit0" element="digit">
 			<bounds x="0" y="1" width="26" height="35" />
 		</bezel>
