@@ -557,7 +557,7 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 
 	MCFG_FD1793_ADD("wd179x", cgenie_wd17xx_interface ) // TODO confirm type
 
-	MCFG_FLOPPY_4_DRIVES_ADD(cgenie_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(cgenie_floppy_interface)
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")

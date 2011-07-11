@@ -2089,7 +2089,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_PIT8253_ADD("pit", mz2500_pit8253_intf)
 
 	MCFG_MB8877_ADD("mb8877a",mz2500_mb8877a_interface)
-	MCFG_FLOPPY_4_DRIVES_ADD(mz2500_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(mz2500_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mz2500")
 
 	/* video hardware */

@@ -820,7 +820,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 
 	MCFG_WD1770_ADD(IC_I042, default_wd17xx_interface)
 
-	MCFG_FLOPPY_4_DRIVES_ADD(einstein_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(einstein_floppy_interface)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","einstein")

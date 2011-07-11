@@ -224,7 +224,7 @@ static MACHINE_CONFIG_START( partner, partner_state )
 
 	MCFG_FD1793_ADD("wd1793", partner_wd17xx_interface )
 
-	MCFG_FLOPPY_2_DRIVES_ADD(partner_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(partner_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

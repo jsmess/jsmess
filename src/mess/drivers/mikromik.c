@@ -732,7 +732,7 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	MCFG_UPD765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ fdc_intf)
 	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mpsc_intf)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(mm1_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mm1_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

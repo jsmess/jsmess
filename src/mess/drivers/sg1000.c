@@ -1162,7 +1162,7 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_I8255_ADD(UPD9255_1_TAG, sf7000_ppi_intf)
 	MCFG_MSM8251_ADD(UPD8251_TAG, default_msm8251_interface)
 	MCFG_UPD765A_ADD(UPD765_TAG, sf7000_upd765_interface)
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, sf7000_floppy_interface)
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, sf7000_floppy_interface)
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_interface)

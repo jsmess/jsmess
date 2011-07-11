@@ -654,7 +654,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 
 	MCFG_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
 
-	MCFG_FLOPPY_2_DRIVES_ADD(osbexec_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(osbexec_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

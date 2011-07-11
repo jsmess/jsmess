@@ -2379,7 +2379,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_UPD765A_ADD("upd765_2hd", upd765_2hd_intf)
 	MCFG_UPD765A_ADD("upd765_2dd", upd765_2dd_intf)
-	MCFG_FLOPPY_4_DRIVES_ADD(pc9801_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(pc9801_floppy_interface)
 
 	#if 0
 	MCFG_RAM_ADD(RAM_TAG)
@@ -2431,7 +2431,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 
 	MCFG_UPD765A_ADD("upd765_2hd", pc9801rs_upd765_intf)
 	//"upd765_2dd"
-	MCFG_FLOPPY_4_DRIVES_ADD(pc9801_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(pc9801_floppy_interface)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
@@ -2480,7 +2480,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 
 	MCFG_UPD765A_ADD("upd765_2hd", pc9801rs_upd765_intf)
 	//"upd765_2dd"
-	MCFG_FLOPPY_4_DRIVES_ADD(pc9801_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(pc9801_floppy_interface)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")

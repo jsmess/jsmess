@@ -461,7 +461,7 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 
 #if SORCERER_USING_DISKS
 	MCFG_xx_ADD("micropolis", default_micropolis_interface ) // custom micropolis controller
-	MCFG_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
 #endif
 MACHINE_CONFIG_END
 

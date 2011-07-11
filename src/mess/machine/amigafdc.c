@@ -874,7 +874,7 @@ static const floppy_interface amiga_floppy_interface =
 };
 
 static MACHINE_CONFIG_FRAGMENT( amiga_fdc )
-	MCFG_FLOPPY_2_DRIVES_ADD(amiga_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(amiga_floppy_interface)
 MACHINE_CONFIG_END
 
 

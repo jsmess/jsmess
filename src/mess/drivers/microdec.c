@@ -121,7 +121,7 @@ static MACHINE_CONFIG_START( microdec, microdec_state )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,microdec_terminal_intf)
 
 	MCFG_UPD765A_ADD("upd765", microdec_upd765_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(microdec_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(microdec_floppy_interface)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -278,7 +278,7 @@ static MACHINE_CONFIG_START( next, next_state )
 
 	// devices
 	MCFG_MCCS1850_ADD(MCCS1850_TAG, XTAL_32_768kHz, rtc_intf)
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, next_floppy_interface)
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, next_floppy_interface)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")

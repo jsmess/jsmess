@@ -668,7 +668,7 @@ static MACHINE_CONFIG_START( to7, driver_device )
 /* floppy */
      MCFG_MC6843_ADD( "mc6843", to7_6843_itf )
      MCFG_WD2793_ADD( "wd2793", default_wd17xx_interface )
-     MCFG_FLOPPY_4_DRIVES_ADD(thomson_floppy_interface)
+     MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(thomson_floppy_interface)
 
 /* network */
      MCFG_MC6854_ADD( "mc6854", to7_network_iface )

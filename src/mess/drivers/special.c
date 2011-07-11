@@ -483,7 +483,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 
 	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
-	MCFG_FLOPPY_2_DRIVES_ADD(specimx_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(specimx_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -525,7 +525,7 @@ static MACHINE_CONFIG_START( erik, special_state )
 
 	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 
-	MCFG_FLOPPY_2_DRIVES_ADD(specimx_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(specimx_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

@@ -218,7 +218,7 @@ static const floppy_interface beta_floppy_interface =
 
 static MACHINE_CONFIG_FRAGMENT( beta_disk )
 	MCFG_WD2793_ADD("wd179x", beta_wd17xx_interface ) // KR1818VG93
-	MCFG_FLOPPY_4_DRIVES_ADD(beta_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(beta_floppy_interface)
 MACHINE_CONFIG_END
 
 ROM_START( beta_disk )

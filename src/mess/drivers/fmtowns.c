@@ -2521,7 +2521,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_PIC8259_ADD( "pic8259_slave", towns_pic8259_slave_config )
 
 	MCFG_MB8877_ADD("fdc",towns_mb8877a_interface)
-	MCFG_FLOPPY_4_DRIVES_ADD(towns_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(towns_floppy_interface)
 
 	MCFG_CDROM_ADD("cdrom",towns_cdrom)
 

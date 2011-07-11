@@ -188,7 +188,7 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 
 	/* devices */
 	MCFG_IWM_ADD("fdc", lisa2_fdc_interface)
-	MCFG_FLOPPY_SONY_2_DRIVES_ADD(lisa_floppy_interface)
+	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(lisa_floppy_interface)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","lisa")

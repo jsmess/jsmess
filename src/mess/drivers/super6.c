@@ -580,7 +580,7 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_24MHz/4, pio_intf)
 	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
 	MCFG_COM8116_ADD(BR1945_TAG, XTAL_5_0688MHz, brg_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(super6_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(super6_floppy_interface)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	// internal ram

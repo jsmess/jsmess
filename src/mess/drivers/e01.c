@@ -420,7 +420,7 @@ static MACHINE_CONFIG_START( e01, e01_state )
 	MCFG_VIA6522_ADD(R6522_TAG, 100000, via_intf)
 	MCFG_MC6854_ADD(MC6854_TAG, adlc_intf)
 	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(e01_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(e01_floppy_interface)
 //  MCFG_CENTRONICS_ADD(CENTRONICS_TAG, e01_centronics_config)
 
 	/* internal ram */

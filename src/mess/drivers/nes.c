@@ -559,7 +559,7 @@ static MACHINE_CONFIG_DERIVED( famicom, nes )
 	MCFG_CARTSLOT_LOAD(nes_cart)
 	MCFG_CARTSLOT_PARTIALHASH(nes_partialhash)
 
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_interface)
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_interface)
 MACHINE_CONFIG_END
 
 

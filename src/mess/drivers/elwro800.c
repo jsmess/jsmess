@@ -613,7 +613,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, elwro800jr_cassette_interface )
 
-	MCFG_FLOPPY_2_DRIVES_ADD(elwro800jr_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(elwro800jr_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

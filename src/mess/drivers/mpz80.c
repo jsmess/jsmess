@@ -779,7 +779,7 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 	MCFG_S100_SLOT_ADD(14, "s100_14", mpz80_s100_cards, NULL, NULL)
 
 	// devices
-	MCFG_FLOPPY_2_DRIVES_ADD(floppy_intf)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	// internal ram

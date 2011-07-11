@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 
 	MCFG_WD2797_ADD(FDC_TAG, dgnbeta_wd17xx_interface )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_interface)
 
 	MCFG_MC6845_ADD("crtc", HD6845, XTAL_12_288MHz / 16, dgnbeta_crtc6845_interface)	//XTAL is guessed
 

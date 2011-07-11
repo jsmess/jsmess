@@ -419,7 +419,7 @@ static MACHINE_CONFIG_DERIVED( spectrum_plus3, spectrum_128 )
 	MCFG_MACHINE_RESET( spectrum_plus3 )
 
 	MCFG_UPD765A_ADD("upd765", spectrum_plus3_upd765_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(specpls3_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(specpls3_floppy_interface)
 MACHINE_CONFIG_END
 
 /***************************************************************************

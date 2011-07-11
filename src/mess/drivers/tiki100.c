@@ -639,7 +639,7 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2000000, ctc_intf)
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(2000000))
 	MCFG_FD1797_ADD(FD1797_TAG, fdc_intf) // FD1767PL-02 or FD1797-PL
-	MCFG_FLOPPY_2_DRIVES_ADD(tiki100_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(tiki100_floppy_interface)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

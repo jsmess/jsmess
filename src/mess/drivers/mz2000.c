@@ -755,7 +755,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_PIT8253_ADD("pit", mz2000_pit8253_intf)
 
 	MCFG_MB8877_ADD("mb8877a",mz2000_mb8877a_interface)
-	MCFG_FLOPPY_4_DRIVES_ADD(mz2000_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(mz2000_floppy_interface)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 

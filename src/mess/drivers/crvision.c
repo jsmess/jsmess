@@ -1073,7 +1073,7 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	// devices
 	MCFG_PIA6821_ADD(PIA6821_TAG, lasr2001_pia_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, lasr2001_cassette_interface)
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, lasr2001_floppy_interface)
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, lasr2001_floppy_interface)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, lasr2001_centronics_intf)
 
 	// video hardware

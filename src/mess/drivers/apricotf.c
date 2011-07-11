@@ -321,7 +321,7 @@ static MACHINE_CONFIG_START( act_f1, act_state )
 
 	MCFG_VIDEO_START(act_f1)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(act_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(act_floppy_interface)
 MACHINE_CONFIG_END
 
 /* ROM definition */

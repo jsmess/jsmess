@@ -585,7 +585,7 @@ static MACHINE_CONFIG_START( z80netf, z80ne_state )
 	MCFG_MC6847_PALETTE(lx388palette)
 
 	MCFG_FD1771_ADD("wd1771", default_wd17xx_interface)
-	MCFG_FLOPPY_4_DRIVES_ADD(z80netf_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(z80netf_floppy_interface)
 
 	MCFG_DEFAULT_LAYOUT(layout_z80netf)
 

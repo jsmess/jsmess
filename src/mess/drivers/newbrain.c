@@ -1437,7 +1437,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( newbrain_eim, newbrain_a, newbrain_eim_stat
 	MCFG_ADC0808_ADD(ADC0809_TAG, 500000, adc_intf)
 	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(newbrain_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(newbrain_floppy_interface)
 
 	// internal ram
 	MCFG_RAM_MODIFY(RAM_TAG)

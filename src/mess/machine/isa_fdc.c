@@ -50,7 +50,7 @@ const upd765_interface pc_fdc_upd765_not_connected_interface =
 static MACHINE_CONFIG_FRAGMENT( fdc_config )
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
 MACHINE_CONFIG_END
 
 //**************************************************************************

@@ -269,7 +269,7 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 
     /* Backing storage */
 	MCFG_FD1793_ADD(FDC_TAG, mbc55x_wd17xx_interface )
-	MCFG_FLOPPY_4_DRIVES_ADD(mbc55x_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(mbc55x_floppy_interface)
 
     MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")

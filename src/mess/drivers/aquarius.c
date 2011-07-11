@@ -471,7 +471,7 @@ static MACHINE_CONFIG_DERIVED( aquarius_qd, aquarius )
 	MCFG_DEVICE_REMOVE("cart")
 	MCFG_DEVICE_REMOVE("cart_list")
 
-	MCFG_FLOPPY_2_DRIVES_ADD(aquarius_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(aquarius_floppy_interface)
 MACHINE_CONFIG_END
 
 

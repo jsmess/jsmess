@@ -188,7 +188,7 @@ static MACHINE_CONFIG_START( mz6500, mz6500_state )
 	MCFG_MACHINE_RESET(mz6500)
 
 	MCFG_UPD765A_ADD("upd765", upd765_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(mz6500_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mz6500_floppy_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

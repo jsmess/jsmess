@@ -1370,7 +1370,7 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 
 	MCFG_UPD765A_ADD("upd765", pcw_upd765_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(pcw_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pcw_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

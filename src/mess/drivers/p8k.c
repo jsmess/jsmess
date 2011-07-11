@@ -521,7 +521,7 @@ static MACHINE_CONFIG_START( p8k, p8k_state )
 	MCFG_Z80PIO_ADD("z80pio_1", 1229000, p8k_pio_1_intf)
 	MCFG_Z80PIO_ADD("z80pio_2", 1229000, p8k_pio_2_intf)
 	MCFG_UPD765A_ADD("i8272", p8k_i8272_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(p8k_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(p8k_floppy_interface)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -830,7 +830,7 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_Z80PIO_ADD(Z80GPPIO_TAG, XTAL_20MHz/8, gppio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
 	MCFG_FD1797_ADD(FD1797_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(xerox820_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(xerox820_floppy_interface)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
 
 	/* internal ram */
@@ -864,7 +864,7 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_Z80PIO_ADD(Z80GPPIO_TAG, XTAL_16MHz/4, gppio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
 	MCFG_FD1797_ADD(FD1797_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(xerox820_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(xerox820_floppy_interface)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
 
 	/* internal ram */

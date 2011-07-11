@@ -242,7 +242,7 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, pk8020_cassette_interface )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(pk8020_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(pk8020_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

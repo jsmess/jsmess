@@ -1088,7 +1088,7 @@ static MACHINE_CONFIG_START( msx, msx_state )
 
 	MCFG_FD1793_ADD("wd179x", msx_wd17xx_interface ) // TODO confirm type
 
-	MCFG_FLOPPY_2_DRIVES_ADD(msx_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(msx_floppy_interface)
 
 	MCFG_FRAGMENT_ADD(msx_cartslot)
 MACHINE_CONFIG_END
@@ -1164,7 +1164,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 
 	MCFG_FD1793_ADD("wd179x", msx_wd17xx_interface ) // TODO confirm type
 
-	MCFG_FLOPPY_2_DRIVES_ADD(msx_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(msx_floppy_interface)
 
 	MCFG_FRAGMENT_ADD(msx_cartslot)
 MACHINE_CONFIG_END

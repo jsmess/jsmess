@@ -429,12 +429,12 @@ static MACHINE_CONFIG_START( oric, oric_state )
 
 	MCFG_WD1770_ADD("wd179x", oric_wd17xx_interface )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(oric1_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(oric1_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( prav8d, oric )
-	MCFG_FLOPPY_4_DRIVES_REMOVE()
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, prav8d_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_REMOVE()
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, prav8d_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( telstrat, oric )

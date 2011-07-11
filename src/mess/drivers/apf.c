@@ -736,7 +736,7 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 
 	MCFG_FD1793_ADD("wd179x", default_wd17xx_interface ) // TODO confirm type
 
-	MCFG_FLOPPY_2_DRIVES_ADD(apfimag_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(apfimag_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apf_m1000, apf_imagination )
@@ -746,7 +746,7 @@ static MACHINE_CONFIG_DERIVED( apf_m1000, apf_imagination )
 	MCFG_DEVICE_REMOVE( "pia_1" )
 
 	MCFG_DEVICE_REMOVE( CASSETTE_TAG )
-	MCFG_FLOPPY_2_DRIVES_REMOVE()
+	MCFG_LEGACY_FLOPPY_2_DRIVES_REMOVE()
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_INTERFACE("apfm1000_cart")
