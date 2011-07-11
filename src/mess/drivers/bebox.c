@@ -175,7 +175,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_SMC37C78_ADD("smc37c78", pc_fdc_upd765_connected_1_drive_interface)
 
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, bebox_floppy_interface)
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, bebox_floppy_interface)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 

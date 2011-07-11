@@ -630,7 +630,7 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	MCFG_APPLE2_SLOT_ADD(4, "mockingboard", mockingboard_r, mockingboard_w, 0, 0, 0, 0)
 	MCFG_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w, 0, 0, 0, 0)
 
-	MCFG_FLOPPY_APPLE_2_DRIVES_ADD(apple2_floppy_interface,15,16)
+	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(apple2_floppy_interface,15,16)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
 MACHINE_CONFIG_END

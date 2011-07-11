@@ -334,7 +334,7 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 
     /* Backing storage */
 	MCFG_WD2793_ADD(FDC_TAG, nimbus_wd17xx_interface )
-	MCFG_FLOPPY_4_DRIVES_ADD(nimbus_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(nimbus_floppy_interface)
 
     MCFG_HARDDISK_ADD(HARDDISK0_TAG)
     MCFG_HARDDISK_ADD(HARDDISK1_TAG)

@@ -169,7 +169,7 @@ static MACHINE_CONFIG_FRAGMENT(coco_fdc)
 	MCFG_MSM6242_ADD(DISTO_TAG)
 	MCFG_DS1315_ADD(CLOUD9_TAG)
 	
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 ROM_START( coco_fdc )
@@ -433,7 +433,7 @@ WRITE8_MEMBER(coco_fdc_device::write)
 
 static MACHINE_CONFIG_FRAGMENT(dragon_fdc)
 	MCFG_WD2797_ADD(WD_TAG, coco_wd17xx_interface)	
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
 

@@ -643,7 +643,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_Z80CTC_ADD("ctc_84", MAIN_CLOCK, ctc_intf)
 	MCFG_Z80CTC_ADD("ctc_88", MAIN_CLOCK, ctc_intf)
 	MCFG_FD1793_ADD(WD1771_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(bigbord2_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bigbord2_floppy_interface)
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_16MHz / 8, bigbord2_crtc)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, bigbord2_terminal_intf)
 MACHINE_CONFIG_END

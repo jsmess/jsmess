@@ -339,7 +339,7 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 
 	MCFG_FD1793_ADD("wd179x", svi_wd17xx_interface )
 
-	MCFG_FLOPPY_2_DRIVES_ADD(svi318_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(svi318_floppy_interface)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list","svi318_flop")
@@ -466,7 +466,7 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 
 	MCFG_FD1793_ADD("wd179x", svi_wd17xx_interface )
 
-	MCFG_FLOPPY_2_DRIVES_ADD(svi318_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(svi318_floppy_interface)
 
 	MCFG_FRAGMENT_ADD( svi318_cartslot )
 

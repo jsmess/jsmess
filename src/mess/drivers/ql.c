@@ -1027,7 +1027,7 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_ZX8301_ADD(ZX8301_TAG, X1, ql_zx8301_intf)
 	MCFG_ZX8302_ADD(ZX8302_TAG, X1, ql_zx8302_intf)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(ql_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ql_floppy_interface)
 	MCFG_WD1772_ADD(WD1772_TAG,ql_wd17xx_interface)
 
 	MCFG_MICRODRIVE_ADD(MDV_1, mdv1_config)

@@ -407,7 +407,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 
 	MCFG_UPD765A_ADD("upd765", compis_fdc_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(compis_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(compis_floppy_interface)
 MACHINE_CONFIG_END
 
 /***************************************************************************

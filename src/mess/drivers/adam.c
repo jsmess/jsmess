@@ -1725,7 +1725,7 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	// devices
 	MCFG_TIMER_ADD_PERIODIC("paddles", paddle_tick, attotime::from_msec(20))
 	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, adam_floppy_interface)
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, adam_floppy_interface)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, adam_cassette_interface)
 	MCFG_CASSETTE_ADD(CASSETTE2_TAG, adam_cassette_interface)
 

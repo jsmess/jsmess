@@ -554,7 +554,7 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	/* UPD765 */
 	MCFG_UPD765A_ADD("upd765", nanos_upd765_interface)
 
-	MCFG_FLOPPY_4_DRIVES_ADD(nanos_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(nanos_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

@@ -158,7 +158,7 @@ static MACHINE_CONFIG_START( orion128, orion_state )
 
 	MCFG_FD1793_ADD("wd1793", orion_wd17xx_interface )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(orion_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(orion_floppy_interface)
 
 	MCFG_CARTSLOT_ADD("cart")
 
@@ -222,7 +222,7 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
 
 	MCFG_FD1793_ADD("wd1793", orion_wd17xx_interface )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(orion_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(orion_floppy_interface)
 
 	MCFG_CARTSLOT_ADD("cart")
 
@@ -276,7 +276,7 @@ static MACHINE_CONFIG_START( orionpro, orion_state )
 
 	MCFG_FD1793_ADD("wd1793", orion_wd17xx_interface )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(orion_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(orion_floppy_interface)
 
 	MCFG_CARTSLOT_ADD("cart")
 

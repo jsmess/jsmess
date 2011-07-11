@@ -102,7 +102,7 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 
 	/* fdc */
 	MCFG_APPLEFDC_ADD("fdc", apple3_fdc_interface)
-	MCFG_FLOPPY_APPLE_4_DRIVES_ADD(apple3_floppy_interface,1,4)
+	MCFG_LEGACY_FLOPPY_APPLE_4_DRIVES_ADD(apple3_floppy_interface,1,4)
 	/* acia */
 	MCFG_ACIA6551_ADD("acia")
 

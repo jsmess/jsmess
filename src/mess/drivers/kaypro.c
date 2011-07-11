@@ -253,7 +253,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_Z80PIO_ADD( "z80pio_s", 2500000, kayproii_pio_s_intf )
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )	/* start at 300 baud */
 
-	MCFG_FLOPPY_2_DRIVES_ADD(kayproii_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(kayproii_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( kaypro4, kayproii )
@@ -298,7 +298,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )
 	MCFG_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )	/* extra sio for modem and printer */
 
-	MCFG_FLOPPY_2_DRIVES_ADD(kaypro2x_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(kaypro2x_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( omni2, kaypro4 )

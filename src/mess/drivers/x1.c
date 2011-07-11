@@ -2716,7 +2716,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG,x1_cassette_interface)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
 
-	MCFG_FLOPPY_4_DRIVES_ADD(x1_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(x1_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x1_flop")
 
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(250))

@@ -810,7 +810,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw12, common )
 	/* floppy drives */
-	MCFG_FLOPPY_2_DRIVES_ADD(bw12_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bw12_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -819,7 +819,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw14, common )
 	/* floppy drives */
-	MCFG_FLOPPY_2_DRIVES_ADD(bw14_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bw14_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

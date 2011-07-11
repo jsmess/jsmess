@@ -372,7 +372,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 
 	/* floppy */
 	MCFG_WD2793_ADD("ic68", apricot_wd17xx_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(apricot_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(apricot_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apricotxi, apricot )

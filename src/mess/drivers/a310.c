@@ -288,7 +288,7 @@ static MACHINE_CONFIG_START( a310, a310_state )
 
 	MCFG_WD1772_ADD("wd1772", a310_wd17xx_interface )
 
-	//MCFG_FLOPPY_4_DRIVES_ADD(a310_floppy_interface)
+	//MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(a310_floppy_interface)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac0", DAC, 0)

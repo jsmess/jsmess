@@ -2247,7 +2247,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	//MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 	//MCFG_CASSETTE_ADD(CASSETTE_TAG, pc88_cassette_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(pc88_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pc88_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc8801_flop")
 
 	/* video hardware */

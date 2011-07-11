@@ -29,33 +29,33 @@ struct _appledriv_config
 
 DECLARE_LEGACY_IMAGE_DEVICE(FLOPPY_APPLE, apple525);
 
-#define MCFG_FLOPPY_APPLE_PARAMS(_dividend,_divisor)	\
+#define MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor)	\
 	MCFG_DEVICE_CONFIG_DATA32(appledriv_config, dividend, _dividend)	\
 	MCFG_DEVICE_CONFIG_DATA32(appledriv_config, divisor,  _divisor)
 
-#define MCFG_FLOPPY_APPLE_2_DRIVES_ADD(_config,_dividend,_divisor)	\
+#define MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(_config,_dividend,_divisor)	\
 	MCFG_DEVICE_ADD(FLOPPY_0, FLOPPY_APPLE, 0)		\
 	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
+	MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
 	MCFG_DEVICE_ADD(FLOPPY_1, FLOPPY_APPLE, 0)		\
 	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_FLOPPY_APPLE_PARAMS(_dividend,_divisor)
+	MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor)
 
-#define MCFG_FLOPPY_APPLE_4_DRIVES_ADD(_config,_dividend,_divisor)	\
+#define MCFG_LEGACY_FLOPPY_APPLE_4_DRIVES_ADD(_config,_dividend,_divisor)	\
 	MCFG_DEVICE_ADD(FLOPPY_0, FLOPPY_APPLE, 0)		\
 	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
+	MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
 	MCFG_DEVICE_ADD(FLOPPY_1, FLOPPY_APPLE, 0)		\
 	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
+	MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
 	MCFG_DEVICE_ADD(FLOPPY_2, FLOPPY_APPLE, 0)		\
 	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
+	MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
 	MCFG_DEVICE_ADD(FLOPPY_3, FLOPPY_APPLE, 0)		\
 	MCFG_DEVICE_CONFIG(_config)	\
-	MCFG_FLOPPY_APPLE_PARAMS(_dividend,_divisor)
+	MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor)
 
-#define MCFG_FLOPPY_APPLE_2_DRIVES_REMOVE() 	\
+#define MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_REMOVE() 	\
 	MCFG_DEVICE_REMOVE(FLOPPY_0)		\
 	MCFG_DEVICE_REMOVE(FLOPPY_1)
 

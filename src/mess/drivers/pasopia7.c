@@ -1001,7 +1001,7 @@ static MACHINE_CONFIG_START( paso7, pasopia_state )
 	MCFG_Z80PIO_ADD( "z80pio_0", XTAL_4MHz, z80pio_intf )
 
 	MCFG_UPD765A_ADD("upd765", pasopia7_upd765_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(pasopia7_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pasopia7_floppy_interface)
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)

@@ -591,7 +591,7 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_SOUND_ADD("saa1099", SAA1099, SAMCOUPE_XTAL_X1/3) /* 8 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(samcoupe_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(samcoupe_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

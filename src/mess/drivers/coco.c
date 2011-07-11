@@ -976,7 +976,7 @@ static MACHINE_CONFIG_START( dgnalpha, coco_state )
 
 	MCFG_COCO_CARTRIDGE_ADD("ext", coco_cococart_interface, dragon_cart, NULL, NULL)
 
-	MCFG_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

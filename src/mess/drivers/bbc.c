@@ -844,7 +844,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 
 	MCFG_I8271_ADD("i8271", bbc_i8271_interface)
 	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )
-	MCFG_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
 
 	MCFG_FRAGMENT_ADD(bbc_cartslot)
 
@@ -864,7 +864,7 @@ static MACHINE_CONFIG_DERIVED( bbcbp, bbca )
 	MCFG_CENTRONICS_ADD("centronics", bbcb_centronics_config)
 
 	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )
-	MCFG_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
 
 	MCFG_FRAGMENT_ADD(bbc_cartslot)
 
@@ -884,7 +884,7 @@ static MACHINE_CONFIG_DERIVED( bbcbp128, bbca )
 	MCFG_CENTRONICS_ADD("centronics", bbcb_centronics_config)
 
 	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )
-	MCFG_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
 
 	MCFG_FRAGMENT_ADD(bbc_cartslot)
 
@@ -942,7 +942,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
 
 	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )
-	MCFG_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
 
 	MCFG_FRAGMENT_ADD(bbc_cartslot)
 MACHINE_CONFIG_END

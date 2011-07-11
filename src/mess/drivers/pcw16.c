@@ -1444,7 +1444,7 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt", pcw16_lpt_config)
 	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_connected_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(pcw16_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pcw16_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

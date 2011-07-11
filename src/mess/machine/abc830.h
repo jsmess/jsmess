@@ -18,16 +18,16 @@
 //**************************************************************************
 
 #define MCFG_ABC830_ADD() \
-	MCFG_FLOPPY_2_DRIVES_ADD(abc830_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(abc830_floppy_interface)
 
 #define MCFG_ABC832_ADD() \
-	MCFG_FLOPPY_2_DRIVES_ADD(abc832_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(abc832_floppy_interface)
 
 #define MCFG_ABC834_ADD() \
-	MCFG_FLOPPY_2_DRIVES_ADD(abc832_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(abc832_floppy_interface)
 
 #define MCFG_ABC838_ADD() \
-	MCFG_FLOPPY_2_DRIVES_ADD(abc838_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(abc838_floppy_interface)
 
 
 

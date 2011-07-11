@@ -656,7 +656,7 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 
 	/* devices */
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
-	MCFG_FLOPPY_SONY_2_DRIVES_ADD(mac128512_floppy_interface)
+	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac128512_floppy_interface)
 
 	MCFG_SCC8530_ADD("scc", C7M)
 	MCFG_SCC8530_IRQ(mac_scc_irq)
@@ -683,7 +683,7 @@ static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 	MCFG_HARDDISK_ADD( "harddisk1" )
 	MCFG_HARDDISK_ADD( "harddisk2" )
 
-	MCFG_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_interface)
+	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -737,7 +737,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
-	MCFG_FLOPPY_SONY_2_DRIVES_ADD(mac128512_floppy_interface)
+	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac128512_floppy_interface)
 
 	MCFG_SCC8530_ADD("scc", C7M)
 	MCFG_SCC8530_IRQ(mac_scc_irq)
@@ -787,7 +787,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
-	MCFG_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
+	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
 	MCFG_SCC8530_ADD("scc", C7M)
 	MCFG_SCC8530_IRQ(mac_scc_irq)
@@ -906,7 +906,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
 	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
-	MCFG_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
+	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
 	MCFG_SCC8530_ADD("scc", C7M)
 	MCFG_SCC8530_IRQ(mac_scc_irq)
@@ -956,7 +956,7 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
 	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
-	MCFG_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
+	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
 	MCFG_SCC8530_ADD("scc", C7M)
 	MCFG_SCC8530_IRQ(mac_scc_irq)
@@ -1092,7 +1092,7 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
-	MCFG_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
+	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
 	MCFG_SCC8530_ADD("scc", C7M)
 	MCFG_SCC8530_IRQ(mac_scc_irq)

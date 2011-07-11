@@ -655,7 +655,7 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 	// devices
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(floppy_intf)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
 	
 	// ECB bus
 	MCFG_ECBBUS_ADD(Z80_TAG, ecb_intf)

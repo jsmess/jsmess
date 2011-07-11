@@ -171,7 +171,7 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8MHz / 2, ht68k_duart68681_config )
 	MCFG_WD1770_ADD("wd1770", ht68k_wd17xx_interface )
-	MCFG_FLOPPY_4_DRIVES_ADD(ht68k_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ht68k_floppy_interface)
 MACHINE_CONFIG_END
 
 /* ROM definition */

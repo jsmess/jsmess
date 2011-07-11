@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_interface)
 	MCFG_MACHINE_RESET(hec2hrx)
 	MCFG_MACHINE_START(hec2hrx)
 
@@ -517,7 +517,7 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", hector_disc2_upd765_interface)
-	MCFG_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(hector_disc2_floppy_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -306,7 +306,7 @@ static MACHINE_CONFIG_FRAGMENT( tf20 )
 	MCFG_TIMER_ADD_PERIODIC("serial_timer", serial_clock, attotime::from_hz(XTAL_CR2 / 128))
 
 	/* 2 floppy drives */
-	MCFG_FLOPPY_2_DRIVES_ADD(tf20_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(tf20_floppy_interface)
 MACHINE_CONFIG_END
 
 

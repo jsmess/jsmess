@@ -274,7 +274,7 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_MACHINE_RESET(myb3k)
 
 	MCFG_MB8877_ADD("fdc", myb3k_wd17xx_interface ) //unknown type
-	MCFG_FLOPPY_2_DRIVES_ADD(myb3k_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(myb3k_floppy_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

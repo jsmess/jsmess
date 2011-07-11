@@ -2784,7 +2784,7 @@ static MACHINE_CONFIG_START( x68000_base, x68k_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_UPD72065_ADD("upd72065", fdc_interface)
-	MCFG_FLOPPY_4_DRIVES_ADD(x68k_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(x68k_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x68k_flop")
 
 	/* internal ram */

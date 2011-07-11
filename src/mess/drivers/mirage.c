@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_ACIA6850_ADD("acia6850", mirage_acia6850_interface)
 
 	MCFG_WD1770_ADD("wd177x", mirage_wd17xx_interface )
-	MCFG_FLOPPY_2_DRIVES_ADD(mirage_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mirage_floppy_interface)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( mirage )

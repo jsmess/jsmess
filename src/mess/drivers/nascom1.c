@@ -353,7 +353,7 @@ static MACHINE_CONFIG_DERIVED( nascom2, nascom1 )
 
 	MCFG_FD1793_ADD("wd1793", nascom2_wd17xx_interface )
 
-	MCFG_FLOPPY_4_DRIVES_ADD(nascom2_floppy_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(nascom2_floppy_interface)
 MACHINE_CONFIG_END
 
 

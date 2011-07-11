@@ -580,7 +580,7 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 
 	MCFG_UPD765A_ADD("upd765", pyldin_upd765_interface)
 
-	MCFG_FLOPPY_2_DRIVES_ADD(pyldin_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pyldin_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

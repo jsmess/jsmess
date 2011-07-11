@@ -117,7 +117,7 @@ static const wd17xx_interface fdc_intf =
 
 static MACHINE_CONFIG_FRAGMENT( comx_fd )
 	MCFG_WD1770_ADD(WD1770_TAG, fdc_intf)
-	MCFG_FLOPPY_2_DRIVES_ADD(floppy_intf)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
 MACHINE_CONFIG_END
 
 
