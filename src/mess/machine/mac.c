@@ -340,7 +340,7 @@ void mac_asc_irq(device_t *device, int state)
 	{
 		if (state)
 		{
-			mac->m_rbv_regs[3] |= 0x90;	// any VIA 2 interrupt | sound interrupt
+			mac->m_rbv_regs[3] |= 0x10;	// any VIA 2 interrupt | sound interrupt
 
 			if (mac->m_rbv_ier & 0x10)	// ASC on RBV is CB1, bit 4 of IER/IFR
 			{
@@ -350,7 +350,7 @@ void mac_asc_irq(device_t *device, int state)
 		}
 		else
 		{
-			mac->m_rbv_regs[3] &= ~0x90;
+			mac->m_rbv_regs[3] &= ~0x10;
 			mac->m_rbv_ifr &= ~0x10;
 		}
 
