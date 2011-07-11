@@ -22,8 +22,9 @@
 #define STA_KEY (1<<2)
 
 /* ints bits */
-#define INT_TIME (1<<1)
 #define INT_GINT (1<<0)
+#define INT_TIME (1<<1)
+#define INT_KEY (1<<2)
 #define INT_KWAIT (1<<7)
 
 #define Z88_SCR_HW_REV  (1<<4)
@@ -37,42 +38,48 @@
 #define Z88_COMA	2
 
 #define Z88_SNOOZE_TRIGGER 2
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
+
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "sound/speaker.h"
+
 
 typedef struct
 {
-	int z88_state;
-	int pb[4];
-	int sbr;
+	UINT8 z88_state;
+	UINT16 pb[4];
+	UINT16 sbr;
 
-    /* screen */
-    int sbf;
-    int lores0;
-    int lores1;
-    int hires0;
-    int hires1;
+	/* screen */
+	UINT32 sbf;
+	UINT32 lores0;
+	UINT32 lores1;
+	UINT32 hires0;
+	UINT32 hires1;
 
-	int com;
-	int ints;
-	int sta;
-	int ack;
-	int mem[4];
+	UINT8 com;
+	UINT8 ints;
+	UINT8 sta;
+	UINT8 ack;
+	UINT8 mem[4];
 
 	/* rtc acknowledge */
 	/* bit 2 = min */
 	/* bit 1 = sec */
 	/* bit 0 = tick */
-	int tack;
+	UINT8 tack;
 	/* rtc interrupt mask */
-	int tmk;
+	UINT8 tmk;
 	/* rtc interrupt status */
-	int tsta;
+	UINT8 tsta;
 	/* real time clock registers */
 	/* tim0 = 5ms counter */
 	/* tim1 = second counter */
 	/* tim2 = minute counter */
 	/* tim3 = 256 minute counter */
 	/* tim4 = 64k minute counter */
-	int tim[5];
+	UINT8 tim[5];
 } blink_hw_t;
 
 
@@ -80,11 +87,21 @@ class z88_state : public driver_device
 {
 public:
 	z88_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_speaker(*this, SPEAKER_TAG)
+	{ }
 
-	int m_frame_number;
-	int m_flash_invert;
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_speaker;
+	DECLARE_READ8_MEMBER(z88_port_r);
+	DECLARE_WRITE8_MEMBER(z88_port_w);
+	UINT8 m_frame_number;
+	bool m_flash_invert;
 	blink_hw_t m_blink;
+	void z88_refresh_memory_bank(UINT8 bank);
+	void z88_install_memory_handler_pair(offs_t start, offs_t size, UINT8 bank_base, UINT8 *read_addr, UINT8 *write_addr);
+	virtual void machine_reset();
 };
 
 

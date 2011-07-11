@@ -2,12 +2,10 @@
 
   z88.c
 
-  Functions to emulate the video hardware of the Acorn Z88
+  Functions to emulate the video hardware of the Cambridge Z88
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "machine/ram.h"
 #include "includes/z88.h"
 
 
@@ -119,19 +117,7 @@ static void z88_vh_render_line(bitmap_t *bitmap, int x, int y,int pen)
 /* convert absolute offset into correct address to get data from */
 static unsigned char *z88_convert_address(running_machine &machine, unsigned long offset)
 {
-//        return ram_get_ptr(machine.device(RAM_TAG));
-	if (offset>(32*16384))
-	{
-		unsigned long get_offset;
-		get_offset = offset - (32*16384);
-		get_offset = get_offset & 0x01fffff;
-		return ram_get_ptr(machine.device(RAM_TAG)) + get_offset;
-	}
-	else
-	{
-		offset = offset & 0x01FFFF;
-		return machine.region("maincpu")->base() + 0x010000 + offset;
-	}
+	return machine.region("maincpu")->base() + 0x010000 + offset;
 }
 
 
