@@ -15,7 +15,7 @@
 		</rect>
 	</element>
 
-	<view name="LED's">
+	<view name="Default Layout">
 		<bezel element="background">
 			<bounds left="0" top="0" right="1280" bottom="150" />
 		</bezel>

@@ -50,7 +50,7 @@
 		</rect>
 	</element>
 
-	<view name="Keyboard LED's">
+	<view name="Keyboard LEDs">
 		<bezel name="online_txt" element="ON_LINE">
 			<bounds left="0" right="100" top="800" bottom="820" />
 		</bezel>

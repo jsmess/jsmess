@@ -482,7 +482,7 @@
         </text>
     </element>
 
-    <view name="Standard">
+    <view name="Default Layout">
         <backdrop element="flatbackground">
             <bounds x="704" y="50" width="420" height="400" />
         </backdrop>

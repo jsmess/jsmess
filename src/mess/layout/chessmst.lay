@@ -32,7 +32,7 @@
 		</rect>
 	</element>
 
-	<view name="Simple Display/LEDs">
+	<view name="Default Layout">
 		<!-- background -->
 		<bezel element="background">
 			<bounds left="00" top="00" right="100" bottom="80" />
