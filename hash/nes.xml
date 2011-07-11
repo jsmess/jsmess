@@ -63030,6 +63030,119 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+
+	<software name="mc_14">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>14 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-OneBus" />
+			<dataarea name="prg" size="4194304">
+				<rom name="100-in-1 arcade action ii (at-103)(unl)[!].prg" size="4194304" crc="33923995" sha1="a206e8c0ee6e86adb800cf66697defabcbd01902" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_999">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>999 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-OneBus" />
+			<dataarea name="prg" size="4194304">
+				<rom name="100-in-1 arcade action ii (at-103)(unl)[!].prg" size="4194304" crc="33923995" sha1="a206e8c0ee6e86adb800cf66697defabcbd01902" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dhh7">
+		<!-- Serial:  - Release Date:  - Alternative Title: 大航海7 -->
+		<description>Dai Hang Hai VII</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-OneBus" />
+			<dataarea name="prg" size="4194304">
+				<rom name="100-in-1 arcade action ii (at-103)(unl)[!].prg" size="4194304" crc="33923995" sha1="a206e8c0ee6e86adb800cf66697defabcbd01902" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supfight">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Super Fighter (Asia, Ripped from multicart XB-F865)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-OneBus" />
+			<dataarea name="prg" size="4194304">
+				<rom name="100-in-1 arcade action ii (at-103)(unl)[!].prg" size="4194304" crc="33923995" sha1="a206e8c0ee6e86adb800cf66697defabcbd01902" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pogie" supported="no">
+		<description>Dreamworld Pogie (Prototype)</description>
+		<year>198?</year>
+		<publisher>Unknown</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="CAMERICA-BF9093" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="dreamworld pogie (prototype).prg" size="131072" crc="63d38b86" sha1="2a5c1d05518a1ae1a13bde19c904c8bdb772fbf8" offset="00000" status="baddump"/>
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcadia6">
+		<description>Arcadia VI (Prototype)</description>
+		<year>198?</year>
+		<publisher>Unknown</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SAROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="arcadia vi (proto).prg" size="131072" crc="25974957" sha1="cb12efbf4dc60faf53f1fb6ba961d65d0d005e2f" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="arcadia vi (proto).chr" size="131072" crc="c96a177a" sha1="ecd32a155c4dc8f723231eeb2b973f823766ddb6" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dknife">
+		<description>Dragon Knife (Chi)</description>
+		<year>198?</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TBROM" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="262144">
+				<rom name="dragon knife (chi).prg" size="262144" crc="077f6a0f" sha1="dd2da92cbd245dd5b68817673dd07e0e233a41c4" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="dragon knife (chi).chr" size="262144" crc="990f8fea" sha1="5af1ddf12a5e630425e2db38135c32176780e8c7" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Finally, these require more study, but they might simply be bad dumps -->
 
 	<software name="unk1" supported="no">
@@ -63233,3 +63346,4 @@ that the real dumps might surface -->
 	</software>
 
 </softwarelist>
+
