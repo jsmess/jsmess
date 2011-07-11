@@ -152,7 +152,7 @@ TODO:
 #include "machine/smpc.h"
 #include "machine/eeprom.h"
 
-#define LOG_SMPC 0
+#define LOG_SMPC 1
 
 READ8_HANDLER( stv_SMPC_r )
 {
@@ -357,7 +357,7 @@ static TIMER_CALLBACK( smpc_intback )
 		state->m_smpc.smpcSR = 0x60;		// peripheral data ready, no reset, etc.
 		state->m_smpc.pmode = state->m_smpc_ram[1]>>4;
 
-		state->m_smpc.intback_stage = 1;
+		state->m_smpc.intback_stage = 2;
 
 		smpc_intbackhelper(machine);
 	}
