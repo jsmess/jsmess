@@ -134,6 +134,11 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 
 UINT64 *dc_framebuffer_ram; // '32-bit access area'
 UINT64 *dc_texture_ram; // '64-bit access area'
+UINT64 *pvr2_texture_ram;
+UINT64 *pvr2_framebuffer_ram;
+
+UINT64 *elan_ram;
+
 static UINT32 tafifo_buff[32];
 
 static emu_timer *vbout_timer;
@@ -2036,9 +2041,29 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 
 	switch (packmode)
 	{
-		case 0x00:
-			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (0555 KRGB)\n",x,y,packmode);
-			break;
+		// used by ringout
+		case 0x00: //0555 KRGB
+		{
+			int xcnt,ycnt;
+			for (ycnt=0;ycnt<32;ycnt++)
+			{
+				UINT32 realwriteoffs = 0x05000000 + writeoffs + (y+ycnt) * (stride<<3) + (x*2);
+				src = BITMAP_ADDR32(fake_accumulationbuffer_bitmap, y+ycnt, x);
+
+
+				for (xcnt=0;xcnt<32;xcnt++)
+				{
+					// data starts in 8888 format, downsample it
+					UINT32 data = src[xcnt];
+					UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
+					                ((((data & 0x0000f800) >> 11)) << 5)  |
+									((((data & 0x00f80000) >> 19)) << 10);
+
+					space->write_word(realwriteoffs+xcnt*2, newdat);
+				}
+			}
+		}
+		break;
 
 		// used by cleoftp
 		case 0x01: //565 RGB 16 bit
@@ -2620,4 +2645,84 @@ SCREEN_UPDATE(dc)
 	debug_dip_status = input_port_read(screen->machine(), "MAMEDEBUG");
 
 	return 0;
+}
+
+
+/* Naomi 2 attempts (TBD) */
+
+READ64_HANDLER( pvr2_ta_r )
+{
+	int reg;
+	UINT64 shift;
+
+	reg = decode_reg_64(offset, mem_mask, &shift);
+
+	switch (reg)
+	{
+	}
+
+	printf("PVR2 %08x R\n",reg);
+
+	return 0;
+}
+
+WRITE64_HANDLER( pvr2_ta_w )
+{
+//	int reg;
+//	UINT64 shift;
+//	UINT32 dat;
+
+//	reg = decode_reg_64(offset, mem_mask, &shift);
+//	dat = (UINT32)(data >> shift);
+
+	//printf("PVR2 %08x %08x\n",reg,dat);
+}
+
+READ32_HANDLER( elan_regs_r )
+{
+	switch(offset)
+	{
+		case 0x00/4: // ID chip (TODO: BIOS crashes / gives a black screen with this as per now!)
+			return 0xe1ad0000;
+		case 0x04/4: // REVISION
+			return 0x12; //or 0x01?
+		case 0x10/4: // SH4 interface control (???)
+			/* ---- -x-- enable second PVR */
+			/* ---- --x- elan has channel 2 */
+			/* ---- ---x broadcast on cs1 (?) */
+			return 6;
+		case 0x14/4: // SDRAM refresh register
+			return 0x2029; //default 0x1429
+		case 0x1c/4: // SDRAM CFG
+			return 0xa7320961; //default 0xa7320961
+		case 0x30/4: // Macro tiler configuration, bit 0 is enable
+			return 0;
+		case 0x74/4: // IRQ STAT
+			return 0;
+		case 0x78/4: // IRQ MASK
+			return 0;
+		default:
+			printf("%08x %08x\n",cpu_get_pc(&space->device()),offset*4);
+			break;
+	}
+
+	return 0;
+}
+
+WRITE32_HANDLER( elan_regs_w )
+{
+	switch(offset)
+	{
+		default:
+			printf("%08x %08x %08x W\n",cpu_get_pc(&space->device()),offset*4,data);
+			break;
+	}
+}
+
+
+WRITE64_HANDLER( pvrs_ta_w )
+{
+	pvr_ta_w(space,offset,data,mem_mask);
+	pvr2_ta_w(space,offset,data,mem_mask);
+	//printf("PVR2 %08x %08x\n",reg,dat);
 }

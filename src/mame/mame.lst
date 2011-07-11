@@ -5759,8 +5759,11 @@ nyanpani		// GX712 (c) 1988 (Japan)
 hcrash			// GX790 (c) 1987
 hcrashc			// GX790 (c) 1987
 
+// Bubble System
+bubsys
+
 // GX400 BIOS based games
-rf2				// GX561 (c) 1985
+rf2			// GX561 (c) 1985
 twinbee			// GX412 (c) 1985
 gradius			// GX456 (c) 1985
 gwarrior		// GX578 (c) 1985
@@ -6147,8 +6150,9 @@ montecar		// 035763-035780    1980/04 [6502]
 soccer			// 035222-035260    1980/04 [6502]
 
 // Atari "Missile Command hardware" games
-missile			// 035820-035825    (c) 1980
+missile			// 035820-035825    (c) 1980, 1 ROM update to rev 2 board
 missile2		// 035820-035825    (c) 1980
+missile1		// 035820-035825    (c) 1980
 suprmatk		//                  (c) 1980 + (c) 1981 Gencomp
 suprmatkd		//                  (c) 1980 + (c) 1981 Gencomp
 mcombat
@@ -10117,6 +10121,20 @@ margmgc			// (c) 2000
 geishanz		// (c) 2001
 wtiger			// (c) 2001
 
+// Aristocrat Mk6 hardware
+aristmk6
+antcleo
+50lions
+50lionsa
+choysun
+cristals
+indianmm
+wheregld
+whalecsh
+wildways
+thaiprin
+
+
 // Eagle
 janshi
 ronjan
@@ -10479,6 +10497,7 @@ cmkenospa		// (c) 2000 Coinmaster-Gaming, Ltd.
 
 // Igrosoft Original sets
 // Multifish
+goldfish		// (c) 2002 - Prototype of Multifish
 //mfish 		// (c) 2002
 //mfish_2		// (c) 2002
 mfish_3			// (c) 2002
@@ -10486,13 +10505,12 @@ mfish_3			// (c) 2002
 //mfish_5		// (c) 2002
 mfish_6			// (c) 2002
 //mfish_7		// (c) 2002
-mfish_8		// (c) 2002
+mfish_8			// (c) 2002
 //mfish_9		// (c) 2002
-//mfish_10  	// (c) 2002
+//mfish_10  		// (c) 2002
 mfish_11		// (c) 2002
 mfish_12		// (c) 2002
 mfish_13		// (c) 2002
-mfish_14	// (c) 2002
 
 // Crazy Monkey
 //crzmon		// (c) 2003
@@ -10593,6 +10611,10 @@ gnome_3			// (c) 2007
 // Sweet Life 2
 sweetl2			// (c) 2007
 sweetl2_2		// (c) 2007
+
+// Fruit Cocktail 2
+fcockt2			// (c) 2008
+
 
 // Igrosoft bootleg sets
 
@@ -10695,6 +10717,7 @@ sweetl2_2a		// bootleg - Sweet Life 2
 sweetl2_2b		// bootleg
 sweetl2_2c		// bootleg
 sweetl2_2d		// bootleg
+fcockt2a		// bootleg - Fruit Cocktail 2
 
 // TAB Austria
 //cdimono1		// Base unit (enabled below, see MESS drivers)

@@ -390,6 +390,7 @@ $(MAMEOBJ)/amiga.a: \
 
 $(MAMEOBJ)/aristocr.a: \
 	$(DRIVERS)/aristmk4.o \
+	$(DRIVERS)/aristmk6.o \
 	$(DRIVERS)/caswin.o \
 
 $(MAMEOBJ)/ascii.a: \
@@ -1939,7 +1940,9 @@ $(DRIVERS)/mpoker.o:	$(LAYOUT)/mpoker.lh
 $(DRIVERS)/mpu4.o:	$(LAYOUT)/mpu4.lh \
 			$(LAYOUT)/connect4.lh \
 			$(LAYOUT)/mpu4ext.lh \
-			$(LAYOUT)/gamball.lh
+			$(LAYOUT)/gamball.lh \
+			$(LAYOUT)/crmaze2p.lh \
+			$(LAYOUT)/crmaze4p.lh
 
 $(DRIVERS)/mw18w.o:	$(LAYOUT)/18w.lh
 
