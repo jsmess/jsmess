@@ -22,7 +22,7 @@
 
 		<!-- Black background -->
 		<bezel element="background">
-			<bounds left="0" top="0" right="803" bottom="328" />
+			<bounds left="55" top="60" right="758" bottom="130" />
 		</bezel>
 
 		<!-- DL1416A DS1 -->
