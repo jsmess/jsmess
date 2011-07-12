@@ -81,8 +81,8 @@ static volatile BOOL bCancel = FALSE;
 void AuditDialog(HWND hParent)
 {
 	HMODULE hModule = NULL;
-	rom_index         = 0;
-	roms_correct      = 0;
+	rom_index         = -1; // do not include the empty game
+	roms_correct      = -1;
 	roms_incorrect    = 0;
 	sample_index      = 0;
 	samples_correct   = 0;
