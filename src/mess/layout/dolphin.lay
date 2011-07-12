@@ -20,7 +20,7 @@
 	<view name="Default Layout">
 		<!-- Black background -->
 		<bezel element="background">
-			<bounds left="1" top="65" right="600" bottom="200" />
+			<bounds left="97" top="65" right="308" bottom="156" />
 		</bezel>
 		<bezel name="digit0" element="digit">
 			<bounds left="107" top="075" right="154" bottom="146" />

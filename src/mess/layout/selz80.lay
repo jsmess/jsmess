@@ -15,7 +15,7 @@
 	<view name="Default Layout">
 		<!-- Black background -->
 		<bezel element="background">
-			<bounds left="1" top="1" right="600" bottom="480" />
+			<bounds left="1" top="95" right="501" bottom="195" />
 		</bezel>
 		<bezel name="digit0" element="digit">
 			<bounds left="11" top="105" right="59" bottom="185" />
