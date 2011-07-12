@@ -1,9 +1,58 @@
-﻿0.143
+﻿0.143u1
 
 New System Drivers Supported:
 -----------------------------
+- Tandy 1000 TL/2 [Kaylee]
 - Macintosh PowerBook 140, 145, 145B, 170 [R. Belmont]
 - Macintosh Color Classic [R. Belmont]
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- Poly1 [Robbbert]
+
+System Driver Changes:
+----------------------
+- cp1610: maskable interrupts do not latch [H@P]
+	* maskable interrupts that trigger while interrupts are disabled are not latched.
+	* fixes Activision's Dreadnaught Factor.
+
+- abc800: Used default input ports, ABC830 is now the default drive for ABC800 again. [Curt Coder]
+
+- abc800: Refactored UNI-800 and Slutprov to ABC bus slot devices. [Curt Coder]
+
+- c64: Added expansion port slot interface. [Curt Coder]
+
+- ti99: Added real RS232 connection capability [Michael Zapf]
+        Output works quite well, input has issues (overflows)
+        Handshaking not verified yet
+        For the meantime, TMS9902 output to a file is disabled
+- mac: Improved PMU simulation for PowerBooks.  Replaced Egret simulation with emulation of 
+      the dumped 6805 code.  Improved interrupt handling for RBV/V8 machines (fixes IIci 
+      sound).  [R. Belmont]
+
+Software Lists:
+----------------
+- added more dumps to coleco.xml and updated a800.xml and xegs.xml [K1W1]
+- snes.xml: more dump verifications [MESSfan]
+- snes.xml: Added a new dump [MESSfan, badinsults]
+- nes.xml: added several new dumps [Kaylee]
+
+Source Changes:
+----------------
+- asc: minor cleanup; use device timer instead of stand-alone [R. Belmont]
+
+- ti99: Replaced TRUE/FALSE for line states with ASSERT/CLEAR (which helped to
+        find an inconsistency in the implementation) [Michael Zapf]
+
+0.143
+
+New System Drivers Supported:
+-----------------------------
+(none)
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
@@ -37,13 +86,6 @@ System Driver Changes:
 	* Cleaned up render_color_stack_mode() and render_fg_bg_mode() loops, 
 		eliminating the ugly fix-ups at the end of each row.
 	* Updated the code found in UNUSED_FUNCTION, but neither compiled nor tested it.
-- ti99: Added real RS232 connection capability [Michael Zapf]
-        Output works quite well, input has issues (overflows)
-        Handshaking not verified yet
-        For the meantime, TMS9902 output to a file is disabled
-- mac: Improved PMU simulation for PowerBooks.  Replaced Egret simulation with emulation of 
-      the dumped 6805 code.  Improved interrupt handling for RBV/V8 machines (fixes IIci 
-      sound).  [R. Belmont]
 
 Software Lists:
 ----------------
@@ -57,8 +99,6 @@ Source Changes:
 ----------------
 - Added device types for all known WD17XX variants, and enforced inverted DAL lines 
 	with e.g. FD1771/FD1791. Used correct variants in drivers, except TRS-80. [Curt Coder]
-- ti99: Replaced TRUE/FALSE for line states with ASSERT/CLEAR (which helped to
-        find an inconsistency in the implementation) [Michael Zapf]
 
 0.142u6
 
