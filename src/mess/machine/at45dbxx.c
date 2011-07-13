@@ -94,7 +94,7 @@ static void common_start(device_t *device, int device_type)
 	at45dbxx_t *flash = get_token(device);
 
 	_logerror( 0, ("at45dbxx_init (%d)\n", device_type));
-	memset( flash, 0, sizeof( flash));
+	memset(flash, 0, sizeof(at45dbxx_t));
 	switch (device_type)
 	{
 		case TYPE_AT45DB041 : flash->pages = 2048; flash->page_size = 264; flash->devid = 0x18; break;

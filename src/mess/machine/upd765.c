@@ -1264,7 +1264,7 @@ static int upd765_sector_count_complete(device_t *device)
 	else
 	{
 		/* sector id == EOT? */
-		if ((fdc->upd765_command_bytes[4]==fdc->upd765_command_bytes[6]))
+		if (fdc->upd765_command_bytes[4]==fdc->upd765_command_bytes[6])
 		{
 
 			/* completed */
