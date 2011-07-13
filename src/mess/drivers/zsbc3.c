@@ -51,17 +51,10 @@ public:
 	required_device<device_t> m_terminal;
 	DECLARE_READ8_MEMBER(zsbc3_28_r);
 	DECLARE_READ8_MEMBER(zsbc3_2a_r);
-	DECLARE_WRITE8_MEMBER(zsbc3_28_w);
-	DECLARE_WRITE8_MEMBER(zsbc3_kbd_put);
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
 };
 
-
-
-WRITE8_MEMBER( zsbc3_state::zsbc3_28_w )
-{
-	terminal_write(m_terminal, 0, data);
-}
 
 READ8_MEMBER( zsbc3_state::zsbc3_28_r )
 {
@@ -72,7 +65,7 @@ READ8_MEMBER( zsbc3_state::zsbc3_28_r )
 
 READ8_MEMBER( zsbc3_state::zsbc3_2a_r )
 {
-	return 4 | ((m_term_data) ? 1 : 0);
+	return (m_term_data) ? 5 : 4;
 }
 
 static ADDRESS_MAP_START(zsbc3_mem, AS_PROGRAM, 8, zsbc3_state)
@@ -81,10 +74,10 @@ static ADDRESS_MAP_START(zsbc3_mem, AS_PROGRAM, 8, zsbc3_state)
 	AM_RANGE( 0x0800, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zsbc3_io , AS_IO, 8, zsbc3_state)
+static ADDRESS_MAP_START(zsbc3_io, AS_IO, 8, zsbc3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x28, 0x28) AM_READWRITE(zsbc3_28_r,zsbc3_28_w)
+	AM_RANGE(0x28, 0x28) AM_READ(zsbc3_28_r) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
 	AM_RANGE(0x2a, 0x2a) AM_READ(zsbc3_2a_r)
 ADDRESS_MAP_END
 
@@ -97,14 +90,14 @@ static MACHINE_RESET(zsbc3)
 {
 }
 
-WRITE8_MEMBER( zsbc3_state::zsbc3_kbd_put )
+WRITE8_MEMBER( zsbc3_state::kbd_put )
 {
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( zsbc3_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(zsbc3_state, zsbc3_kbd_put)
+	DEVCB_DRIVER_MEMBER(zsbc3_state, kbd_put)
 };
 
 
@@ -119,7 +112,7 @@ static MACHINE_CONFIG_START( zsbc3, zsbc3_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
 
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, zsbc3_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -134,5 +127,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY               FULLNAME       FLAGS */
-COMP( 1980, zsbc3,  0,       0, 		zsbc3,	zsbc3,	 0, 	  "Digital Microsystems",   "ZSBC-3",		GAME_NOT_WORKING | GAME_NO_SOUND_HW)
-
+COMP( 1980, zsbc3,  0,      0,       zsbc3,     zsbc3,   0,   "Digital Microsystems",   "ZSBC-3", GAME_NO_SOUND_HW)
