@@ -63,7 +63,7 @@ static void common_start(device_t *device, int device_type)
 	const sst39vfx_config *config = get_config(device);
 
 	_logerror( 0, ("sst39vfx_init (%d)\n", device_type));
-	memset( flash, 0, sizeof( flash));
+	memset(flash, 0, sizeof(sst39vfx_t));
 	switch (device_type)
 	{
 		case TYPE_SST39VF020  : flash->size = 256 * 1024; break;

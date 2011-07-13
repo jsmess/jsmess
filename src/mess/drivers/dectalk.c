@@ -447,7 +447,7 @@ static WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only
 #ifdef SPC_LOG_68K
 		logerror(" | 0x40: speech int enabled\n");
 #endif
-		if ((state->m_infifo_semaphore == 1))
+		if (state->m_infifo_semaphore == 1)
 		{
 #ifdef SPC_LOG_68K
 			logerror("    speech int fired!\n");
@@ -489,7 +489,7 @@ static WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
 #ifdef TLC_LOG
 		logerror(" | 0x40: tone detect int enabled\n");
 #endif
-		if ((state->m_tlc_tonedetect == 1))
+		if (state->m_tlc_tonedetect == 1)
 		{
 #ifdef TLC_LOG
 			logerror("    TLC int fired!\n");
@@ -522,7 +522,7 @@ static WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
 #ifdef TLC_LOG
 		logerror(" | 0x4000: ring detect int enabled\n");
 #endif
-		if ((state->m_tlc_ringdetect == 1))
+		if (state->m_tlc_ringdetect == 1)
 		{
 #ifdef TLC_LOG
 			logerror("    TLC int fired!\n");

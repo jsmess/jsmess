@@ -1379,7 +1379,7 @@ static UINT8 coco_update_keyboard( running_machine &machine )
 			if ((dac >> 2) <= dclg_table[(joystick_axis ? state->m_dclg_output_h : state->m_dclg_output_v) & 0x03])
 				porta |= 0x80;
 
-			if ((state->m_dclg_state == 7))
+			if (state->m_dclg_state == 7)
 			{
 				/* While in state 7, prepare to chech next video frame for a hit */
 				dclg_time = machine.primary_screen->time_until_pos(input_port_read_safe(machine, portnames[joystick][ctrl][1], 0), 0);

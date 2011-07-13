@@ -533,8 +533,7 @@ static void dreamcast_atapi_exit(running_machine& machine)
 
 void dreamcast_atapi_init(running_machine &machine)
 {
-	atapi_regs = auto_alloc_array(machine, UINT8,  ATAPI_REG_MAX );
-	memset(atapi_regs, 0, sizeof(atapi_regs));
+	atapi_regs = auto_alloc_array_clear(machine, UINT8, ATAPI_REG_MAX);
 
 	atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 	atapi_regs[ATAPI_REG_ERROR] = 1;
