@@ -1710,7 +1710,7 @@ static void to7_network_reset( running_machine &machine )
 
 static READ8_HANDLER ( to7_network_r )
 {
-	if ( offset >= 0 && offset < 4 )
+	if ( offset < 4 )
 		return mc6854_r( space->machine().device("mc6854"), offset );
 
 	if ( offset == 8 )
@@ -1729,7 +1729,7 @@ static READ8_HANDLER ( to7_network_r )
 
 static WRITE8_HANDLER ( to7_network_w )
 {
-	if ( offset >= 0 && offset < 4 )
+	if ( offset < 4 )
 		mc6854_w( space->machine().device("mc6854"), offset, data );
 	else
 	{

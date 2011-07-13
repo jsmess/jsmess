@@ -251,7 +251,7 @@ DIRECT_UPDATE_HANDLER( scorpion_direct )
 		state->m_ROMSelection = 3;
 		betadisk_enable(beta);
 	}
-	if((address>=0x0000) && (address<=0x3fff))
+	if(address<=0x3fff)
 	{
 		state->m_ram_disabled_by_beta = 1;
 		direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));

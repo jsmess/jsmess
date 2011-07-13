@@ -404,7 +404,7 @@ io_status *mess_cdrom_driver::read_sectors(const unsigned int startsec, const un
 	printf("mess: read %d sectors from %d (secsize %d)\n",numsec,startsec,secsize);
 	#endif
 
-	if ((startsec>=0)) // && ((int)startsec<num_sectors))
+	if (1) // && ((int)startsec<num_sectors))
 	{
 //      fin->seek((INT64)startsec*(INT64)bin_sector_size);
 

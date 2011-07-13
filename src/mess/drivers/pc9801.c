@@ -1254,7 +1254,7 @@ static READ8_HANDLER( pc9801rs_memory_r )
 	if(state->m_gate_a20 == 0)
 		offset &= 0xfffff;
 
-	if	   (offset >= 0x00000000 && offset <= 0x0009ffff)                   { return pc9801rs_wram_r(space,offset);               }
+	if	   (                        offset <= 0x0009ffff)                   { return pc9801rs_wram_r(space,offset);               }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { return pc9801_tvram_r(space,offset-0xa0000);        }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { return pc9801rs_knjram_r(space,offset & 0xfff);     }
 	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { return pc9801_gvram_r(space,offset-0xa8000);        }
@@ -1274,7 +1274,7 @@ static WRITE8_HANDLER( pc9801rs_memory_w )
 	if(state->m_gate_a20 == 0)
 		offset &= 0xfffff;
 
-	if	   (offset >= 0x00000000 && offset <= 0x0009ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
+	if	   (                        offset <= 0x0009ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { pc9801_tvram_w(space,offset-0xa0000,data);           }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { pc9801rs_knjram_w(space,offset & 0xfff,data);        }
 	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { pc9801_gvram_w(space,offset-0xa8000,data);           }
