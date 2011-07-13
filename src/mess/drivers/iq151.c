@@ -48,7 +48,7 @@ ToDo:
 #define ADDRESS_MAP_MODERN
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "cpu/i8085/i8085.h"
 #include "sound/speaker.h"
 #include "imagedev/cartslot.h"
 
@@ -368,7 +368,7 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( iq151, iq151_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(iq151_mem)
 	MCFG_CPU_IO_MAP(iq151_io)
 
