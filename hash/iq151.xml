@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="iq151" description="IQ151 cartridges">
+	<software name="basic6">
+		<description>BASIC 6</description>
+		<year>198?</year>
+		<publisher>ZPA Novy Bor</publisher>
+		<part name="cart" interface="iq151_cart">
+			<feature name="cart_type" value="BASIC6" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="basic6.rom" size="0x2000" crc="8d9fd36f" sha1="2fa3b142938ed5e8ec7c62a0a14a55cbde231a2e" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

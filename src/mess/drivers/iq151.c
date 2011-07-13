@@ -50,6 +50,7 @@ ToDo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
+#include "imagedev/cartslot.h"
 
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
@@ -217,8 +218,10 @@ static INPUT_PORTS_START( iq151 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // 0x03
 
 	PORT_START("X8")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)  PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FA") PORT_CODE(KEYCODE_RSHIFT)		// Function A
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FB") PORT_CODE(KEYCODE_RCONTROL)		// Function B
 
 	PORT_START("FE")
 	PORT_DIPNAME( 0xff, 0xff, "Screen Width")
@@ -306,6 +309,31 @@ SCREEN_UPDATE_MEMBER( iq151_state )
 	return 0;
 }
 
+static DEVICE_IMAGE_LOAD( iq151_cart )
+{
+	if (image.software_entry() != NULL)
+	{
+		// get the cartridge type
+		const char *cart_type = image.get_feature("cart_type");
+
+		if (!strcmp(cart_type, "BASIC6"))
+		{
+			// BASIC6 cartridge
+			address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+			space->install_rom(0xc800, 0xe7ff, image.get_software_region("rom"));
+
+			return IMAGE_INIT_PASS;
+		}
+		else
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unknown cartridge type");
+			return IMAGE_INIT_FAIL;
+		}
+	}
+
+	return IMAGE_INIT_FAIL;
+}
+
 /* F4 Character Displayer */
 static const gfx_layout iq151_32_charlayout =
 {
@@ -361,6 +389,16 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_ADD_PERIODIC("iq151a", iq151a, attotime::from_hz(3) )
+
+	/* cartridge */
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(iq151_cart)
+	MCFG_CARTSLOT_INTERFACE("iq151_cart")
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq151_cart")
 MACHINE_CONFIG_END
 
 /* ROM definition */
