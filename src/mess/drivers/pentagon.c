@@ -30,7 +30,7 @@ DIRECT_UPDATE_HANDLER( pentagon_direct )
 			betadisk_enable(beta);
 
 	}
-	if((address>=0x0000) && (address<=0x3fff))
+	if(address<=0x3fff)
 	{
 		if (state->m_ROMSelection == 3) {
 			if (beta->started()) {

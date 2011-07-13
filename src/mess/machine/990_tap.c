@@ -961,7 +961,7 @@ static void execute_command(device_t *device)
 READ16_DEVICE_HANDLER(ti990_tpc_r)
 {
 	tap_990_t *tpc = get_safe_token(device);
-	if ((offset >= 0) && (offset < 8))
+	if (offset < 8)
 		return tpc->w[offset];
 	else
 		return 0;
@@ -973,7 +973,7 @@ READ16_DEVICE_HANDLER(ti990_tpc_r)
 WRITE16_DEVICE_HANDLER(ti990_tpc_w)
 {
 	tap_990_t *tpc = get_safe_token(device);
-	if ((offset >= 0) && (offset < 8))
+	if (offset < 8)
 	{
 		/* write protect if a command is in progress */
 		if (tpc->w[7] & w7_idle)

@@ -3215,7 +3215,7 @@ static offs_t coco_dasm_override(device_t &device, char *buffer, offs_t pc, cons
 	if ((oprom[0] == 0x10) && (oprom[1] == 0x3F))
 	{
 		call = oprom[2];
-		if ((call >= 0) && (call < ARRAY_LENGTH(os9syscalls)) && os9syscalls[call])
+		if ((call < ARRAY_LENGTH(os9syscalls)) && os9syscalls[call])
 		{
 			sprintf(buffer, "OS9   %s", os9syscalls[call]);
 			result = 3;

@@ -556,7 +556,7 @@ long myo;
 //      return space->machine().region("user1")->base()[offset+0x43c00];
 //  };
 
-	if ((offset>=0x000) && (offset<=0x0ff)) /* FRED */
+	if (offset<=0x0ff) /* FRED */
 	{
 		return 0xff;
 	};

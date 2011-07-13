@@ -41,7 +41,7 @@ DIRECT_UPDATE_HANDLER( atm_direct )
 			betadisk_enable(beta);
 
 	}
-	if((address>=0x0000) && (address<=0x3fff))
+	if(address<=0x3fff)
 	{
 		if (state->m_ROMSelection == 3) {
 			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine.region("maincpu")->base() + 0x018000);

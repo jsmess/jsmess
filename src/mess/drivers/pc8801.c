@@ -780,7 +780,7 @@ static READ8_HANDLER( pc8801_cdbios_rom_r )
 static READ8_HANDLER( pc8801_mem_r )
 {
 	pc8801_state *state = space->machine().driver_data<pc8801_state>();
-	if(offset >= 0x0000 && offset <= 0x7fff)
+	if(offset <= 0x7fff)
 	{
 		if(state->m_extram_mode & 1)
 			return pc8801_ext_wram_r(space,offset | (state->m_extram_bank * 0x8000));
@@ -849,7 +849,7 @@ static READ8_HANDLER( pc8801_mem_r )
 static WRITE8_HANDLER( pc8801_mem_w )
 {
 	pc8801_state *state = space->machine().driver_data<pc8801_state>();
-	if(offset >= 0x0000 && offset <= 0x7fff)
+	if(offset <= 0x7fff)
 	{
 		if(state->m_extram_mode & 0x10)
 			pc8801_ext_wram_w(space,offset | (state->m_extram_bank * 0x8000),data);

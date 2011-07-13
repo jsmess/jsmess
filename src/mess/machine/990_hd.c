@@ -1003,7 +1003,7 @@ static void execute_command(running_machine &machine)
 */
 READ16_HANDLER(ti990_hdc_r)
 {
-	if ((offset >= 0) && (offset < 8))
+	if (offset < 8)
 		return hdc.w[offset];
 	else
 		return 0;
@@ -1014,7 +1014,7 @@ READ16_HANDLER(ti990_hdc_r)
 */
 WRITE16_HANDLER(ti990_hdc_w)
 {
-	if ((offset >= 0) && (offset < 8))
+	if (offset < 8)
 	{
 		/* write protect if a command is in progress */
 		if (hdc.w[7] & w7_idle)

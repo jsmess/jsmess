@@ -1344,7 +1344,7 @@ static WRITE8_HANDLER( x1_ex_gfxram_w )
 	x1_state *state = space->machine().driver_data<x1_state>();
 	UINT8 ex_mask;
 
-	if     (offset >= 0x0000 && offset <= 0x3fff)	{ ex_mask = 7; }
+	if     (                    offset <= 0x3fff)	{ ex_mask = 7; }
 	else if(offset >= 0x4000 && offset <= 0x7fff)	{ ex_mask = 6; }
 	else if(offset >= 0x8000 && offset <= 0xbfff)	{ ex_mask = 5; }
 	else                                        	{ ex_mask = 3; }
