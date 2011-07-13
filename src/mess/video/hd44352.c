@@ -62,7 +62,7 @@ void hd44352_device::device_config_complete()
 //  on this device
 //-------------------------------------------------
 
-bool hd44352_device::device_validity_check( const game_driver &driver ) const
+bool hd44352_device::device_validity_check( emu_options &options, const game_driver &driver ) const
 {
 	bool error = false;
 
