@@ -42,7 +42,7 @@ void t6a04_device::device_config_complete()
 //  on this device
 //-------------------------------------------------
 
-bool t6a04_device::device_validity_check( const game_driver &driver ) const
+bool t6a04_device::device_validity_check( emu_options &options, const game_driver &driver ) const
 {
 	bool error = false;
 
