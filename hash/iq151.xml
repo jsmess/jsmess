@@ -13,4 +13,19 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="basicg">
+		<description>BASIC-G</description>
+		<year>198?</year>
+		<publisher>ZPA Novy Bor</publisher>
+		<part name="cart" interface="iq151_cart">
+			<feature name="cart_type" value="BASICG" />
+			<dataarea name="rom_a" size="0x2000">
+				<rom name="basicg_a.rom" size="0x1000" crc="1890de5e" sha1="0b04458518b3bc23d6af52a373f9f88aa5eb28a6" offset="0x00000" />
+			</dataarea>
+			<dataarea name="rom_b" size="0x2000">
+				<rom name="basicg_b.rom" size="0x2000" crc="ac632b85" sha1="062a6812b167a8a94ee391a3e73a024b3fab3506" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
