@@ -77,6 +77,11 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+
+	// AMOS
+	UINT8 *m_amos_banks[4];
+	DECLARE_WRITE8_MEMBER(amos_bankswitch_w);
 };
 
 READ8_MEMBER(iq151_state::keyboard_r)
@@ -243,8 +248,12 @@ static TIMER_DEVICE_CALLBACK( iq151a )
 
 DRIVER_INIT( iq151 )
 {
+	iq151_state *state = machine.driver_data<iq151_state>();
+
 	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xf800);
+
+	memset(state->m_amos_banks, 0, sizeof(state->m_amos_banks));
 }
 
 MACHINE_RESET_MEMBER( iq151_state )
@@ -308,17 +317,33 @@ SCREEN_UPDATE_MEMBER( iq151_state )
 	return 0;
 }
 
+
+//**************************************************************************
+//  IQ151 cartridges management
+//**************************************************************************
+
+WRITE8_MEMBER(iq151_state::amos_bankswitch_w)
+{
+	address_space *prog_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+
+	if (m_amos_banks[data & 3] != NULL)
+		prog_space->install_rom(0x8000, 0xbfff, m_amos_banks[data & 3]);
+	else
+		prog_space->unmap_readwrite(0x8000, 0xbfff);
+}
+
+
 static DEVICE_IMAGE_LOAD( iq151_cart )
 {
 	if (image.software_entry() != NULL)
 	{
 		// get the cartridge type
 		const char *cart_type = image.get_feature("cart_type");
+		address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		if (!strcmp(cart_type, "BASIC6"))
 		{
 			// BASIC6 cartridge
-			address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 			space->install_rom(0xc800, 0xe7ff, image.get_software_region("rom"));
 
 			return IMAGE_INIT_PASS;
@@ -326,9 +351,33 @@ static DEVICE_IMAGE_LOAD( iq151_cart )
 		else if (!strcmp(cart_type, "BASICG"))
 		{
 			// BASIC-G cartridge
-			address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 			space->install_rom(0xb000, 0xbfff, image.get_software_region("rom_a"));
 			space->install_rom(0xc800, 0xe7ff, image.get_software_region("rom_b"));
+			return IMAGE_INIT_PASS;
+		}
+		else if (!strncmp(cart_type, "AMOS", 4))
+		{
+			// AMOS cartridges
+			iq151_state *state = image.device().machine().driver_data<iq151_state>();
+
+			switch ((const char)cart_type[4])
+			{
+			case '0':	// Pascal cartridge
+				state->m_amos_banks[0] = (UINT8*)image.get_software_region("rom");
+				space->install_rom(0x8000, 0xbfff, state->m_amos_banks[0]);
+				break;
+			case '1':	// Pascal 1 cartridge
+				state->m_amos_banks[1] = (UINT8*)image.get_software_region("rom");
+				break;
+			case '2':	// Assembler cartridge
+				state->m_amos_banks[2] = (UINT8*)image.get_software_region("rom");
+				break;
+			}
+
+			// install AMOS bankswitch handler
+			address_space *io = image.device().machine().device("maincpu")->memory().space(AS_IO);
+			io->install_write_handler(0xec, 0xef, write8_delegate(FUNC(iq151_state::amos_bankswitch_w), state));
+
 			return IMAGE_INIT_PASS;
 		}
 		else
@@ -398,7 +447,29 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_TIMER_ADD_PERIODIC("iq151a", iq151a, attotime::from_hz(3) )
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
+	// On real hardware only 4 slots are available, because one
+	// slot is always used for the Video 32/64 cartridge.
+	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(iq151_cart)
+	MCFG_CARTSLOT_INTERFACE("iq151_cart")
+	MCFG_CARTSLOT_ADD("cart2")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(iq151_cart)
+	MCFG_CARTSLOT_INTERFACE("iq151_cart")
+	MCFG_CARTSLOT_ADD("cart3")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(iq151_cart)
+	MCFG_CARTSLOT_INTERFACE("iq151_cart")
+	MCFG_CARTSLOT_ADD("cart4")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(iq151_cart)
+	MCFG_CARTSLOT_INTERFACE("iq151_cart")
+	MCFG_CARTSLOT_ADD("cart5")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_LOAD(iq151_cart)
