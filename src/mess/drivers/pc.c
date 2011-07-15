@@ -1805,6 +1805,16 @@ ROM_START( ibm5550 )
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, BAD_DUMP CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
+ROM_START( pc7000 )
+    ROM_REGION16_LE(0x100000,"maincpu", 0)
+    ROMX_LOAD( "mitsubishi-m5l27128k-1.bin", 0xf8000, 0x4000, CRC(9683957f) SHA1(4569eab6d88eb1bba0d553d1358e593c326978aa), ROM_SKIP(1))
+    ROMX_LOAD( "mitsubishi-m5l27128k-2.bin", 0xf8001, 0x4000, CRC(99b229a4) SHA1(5800c8bafed26873d8cfcc79a05f93a780a31c91), ROM_SKIP(1))
+
+	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -1844,3 +1854,5 @@ COMP ( 1983,	m24,        ibm5150,	0,	olivetti,	pccga,	pccga,	"Olivetti",  "M24" 
 COMP ( 1987,	m240,       ibm5150,	0,	olivetti,	pccga,	pccga,	"Olivetti",  "M240" , GAME_NOT_WORKING)
 
 COMP ( 1983,	ibm5550,    ibm5150,	0,	ibm5550,	pccga,	pccga,	"IBM",  "5550" , GAME_NOT_WORKING)
+
+COMP(  1985,	pc7000,      ibm5150,	0,	pccga,  	pccga,		pccga,	"Sharp",  "PC-7000" , GAME_NOT_WORKING)
