@@ -29,10 +29,6 @@ ToDo:
 - Line 32 does not scroll, should it show?
   (could be reserved for a status line in a terminal mode)
 
-- In 64 character-per-line mode, there are extra symbols showing. This is
-  because the system writes 0x0d characters to screen memory, and in the
-  64-width chargen, this is a visible graphics character.
-
 - Sort out the issue with memory location 6. If it isn't zero the computer hangs.
   But if it is always forced to zero, the keys repeat way too fast. Timer
   currently set to 3Hz for reasonable repeat, but it is far from perfect.
@@ -259,7 +255,7 @@ DRIVER_INIT( iq151 )
 MACHINE_RESET_MEMBER( iq151_state )
 {
 	m_width = input_port_read(machine(), "FE") ? 32 : 64;
-	machine().primary_screen->set_visible_area(0, m_width*8-1, 0, 32*8-1);
+	machine().primary_screen->set_visible_area(0, (m_width == 32 ? 32*8 : 64*6)-1, 0, 32*8-1);
 	memory_set_bank(machine(), "boot", 1);
 	machine().scheduler().timer_set(attotime::from_usec(5), FUNC(iq151_boot));
 }
@@ -297,13 +293,21 @@ SCREEN_UPDATE_MEMBER( iq151_state )
 
 				gfx = m_p_chargen[chrstart | (chr<<3) | ra ];
 
+				// in Video 32, chars above 0x7f have colors inverted
+				if (m_width == 32 && m_p_videoram[x] > 0x7f)
+					gfx = ~gfx;
+
 				//display cursor if at cursor position and flash on
 				if ( (x==cursor) && (m_framecnt & 0x08) )
 					gfx = 0xff;
 
 				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
+				if (m_width == 32)
+				{
+					// bit 7 and 6 are ignored in Video 64 mode
+					*p++ = BIT(gfx, 7);
+					*p++ = BIT(gfx, 6);
+				}
 				*p++ = BIT(gfx, 5);
 				*p++ = BIT(gfx, 4);
 				*p++ = BIT(gfx, 3);
@@ -418,8 +422,8 @@ static const gfx_layout iq151_64_charlayout =
 };
 
 static GFXDECODE_START( iq151 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, iq151_32_charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "chargen", 0x0400, iq151_64_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0800, iq151_32_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, iq151_64_charlayout, 0, 1 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( iq151, iq151_state )
@@ -433,8 +437,8 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
+	MCFG_SCREEN_SIZE(64*6, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
 	MCFG_GFXDECODE(iq151)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
