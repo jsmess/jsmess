@@ -1450,9 +1450,11 @@ static READ8_HANDLER( bbc_i8271_read )
 			/* 8271 registers */
 			ret=i8271_r(i8271, offset);
 			logerror("  %d\n",ret);
+			break;
 		case 4:
 			ret=i8271_data_r(i8271, offset);
 			logerror("  %d\n",ret);
+			break;
 		default:
 			ret=0x0ff;
 			break;
