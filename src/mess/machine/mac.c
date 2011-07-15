@@ -516,10 +516,10 @@ void mac_state::set_memory_overlay(int overlay)
 			}
 			else	// RAM: be careful not to populate ram B with a mirror or the ROM will get confused
 			{
-				mac_install_memory(machine(), 0x00000000, 0x03ffffff, memory_size, memory_data, is_rom, "bank1");
+				mac_install_memory(machine(), 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 			}
 		}
-		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100))
+		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIVX))
 		{
 			mac_install_memory(machine(), 0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
@@ -2475,6 +2475,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 
 		case MODEL_MAC_LC:		// apollo board is 0x38, box 0x11 (17), vid hw 0x21
 		case MODEL_MAC_LC_II:
+		case MODEL_MAC_IIVX:
 			return 0x81 | PA6 | PA4 | PA2;
 
 		case MODEL_MAC_IICI:
@@ -2988,19 +2989,19 @@ void mac_state::machine_reset()
 			break;
 
 		case 7833600*2:	// "16 MHz" Macs
-			m_via_cycles = -20;
+			m_via_cycles = -30;
 			break;
 
 		case 20000000:	// 20 MHz Macs
-			m_via_cycles = -25;
+			m_via_cycles = -40;
 			break;
 
 		case 25000000:	// 25 MHz Macs
-			m_via_cycles = -32;
+			m_via_cycles = -50;
 			break;
 
-		case 7833600*4:	// "33 MHz" Macs (are these C7M*4 or true 33 MHz?)
-			m_via_cycles = -40;
+		case 7833600*4:	// 32 MHz Macs (these are C7M * 4, there are true 33 MHz models too)
+			m_via_cycles = -60;
 			break;
 
 		default:
@@ -3207,6 +3208,7 @@ MAC_DRIVER_INIT(macprtb, MODEL_MAC_PORTABLE)
 MAC_DRIVER_INIT(macpb100, MODEL_MAC_PB100)
 MAC_DRIVER_INIT(macpb140, MODEL_MAC_PB140)
 MAC_DRIVER_INIT(macpb160, MODEL_MAC_PB160)
+MAC_DRIVER_INIT(maciivx, MODEL_MAC_IIVX)
 
 // make the appletalk init fail instead of hanging on the II FDHD/IIx/IIcx/SE30 ROM
 static void patch_appletalk_iix(running_machine &machine)

@@ -71,6 +71,7 @@ static INTERRUPT_GEN( mac_rbv_vbl )
 {
 	mac_state *mac = device->machine().driver_data<mac_state>();
 
+	mac->m_rbv_regs[2] |= 0x7f;	// hack!
 	mac->m_rbv_regs[2] &= ~0x40;	// set vblank signal
 
 	if ((mac->m_rbv_regs[0x12] & 0x40) && (mac->m_rbv_ier & 0x2))
@@ -177,7 +178,7 @@ READ8_MEMBER( mac_state::mac_sonora_vctl_r )
 
 WRITE8_MEMBER( mac_state::mac_sonora_vctl_w )
 {
-//  printf("Sonora: %02x to vctl %x\n", data, offset);
+//	printf("Sonora: %02x to vctl %x\n", data, offset);
 	m_sonora_vctl[offset] = data;
 }
 
@@ -232,7 +233,7 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		}
 	}
 
-//  if (offset != 2) printf("rbv_r: %x = %02x (PC=%x)\n", offset, data, cpu_get_pc(space.cpu));
+//	printf("rbv_r: %x = %02x (PC=%x)\n", offset, data, cpu_get_pc(m_maincpu));
 
 	return data;
 }
@@ -242,7 +243,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 	if (offset < 0x100)
 	{
 //      if (offset == 0x10)
-//      printf("rbv_w: %02x to offset %x (PC=%x)\n", data, offset, cpu_get_pc(space.cpu));
+//		printf("rbv_w: %02x to offset %x (PC=%x)\n", data, offset, cpu_get_pc(m_maincpu));
 		switch (offset)
 		{
 			case 0x00:
@@ -261,14 +262,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 				break;
 
 			case 0x02:
-				if ((data & 0x40) && (m_rbv_type == RBV_TYPE_SONORA))
-				{
-					m_rbv_regs[offset] &= ~0x40;
-				}
-				else
-				{
-					m_rbv_regs[offset] = data;
-				}
+				m_rbv_regs[offset] &= ~data;
 				break;
 
 			case 0x03:
@@ -848,7 +842,7 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MCFG_CPU_VBLANK_INT("screen", mac_rbv_vbl)
 
 	MCFG_VIDEO_START(macsonora)
-	MCFG_VIDEO_RESET(macrbv)
+	MCFG_VIDEO_RESET(macsonora)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(macrbvvram)
@@ -860,6 +854,40 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_SONORA, mac_asc_irq)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( maciivx, maclc )
+
+	MCFG_CPU_REPLACE("maincpu", M68030, C32M)
+	MCFG_CPU_PROGRAM_MAP(maclc3_map)
+	MCFG_CPU_VBLANK_INT("screen", mac_rbv_vbl)
+
+	MCFG_VIDEO_START(macv8)
+	MCFG_VIDEO_RESET(macrbv)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(macrbvvram)
+
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,60M,64M")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( maciivi, maclc )
+
+	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
+	MCFG_CPU_PROGRAM_MAP(maclc3_map)
+	MCFG_CPU_VBLANK_INT("screen", mac_rbv_vbl)
+
+	MCFG_VIDEO_START(macv8)
+	MCFG_VIDEO_RESET(macrbv)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(macrbvvram)
+
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,60M,64M")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciix, macii )
@@ -1482,6 +1510,16 @@ ROM_START( maciisi )
 	ROM_LOAD( "36b7fb6c.rom", 0x000000, 0x080000, CRC(f304d973) SHA1(f923de4125aae810796527ff6e25364cf1d54eec) )
 ROM_END
 
+ROM_START( maciivx )
+	ROM_REGION32_BE(0x100000, "bootrom", 0)
+	ROM_LOAD( "4957eb49.rom", 0x000000, 0x100000, CRC(61be06e5) SHA1(560ce203d65178657ad09d03f532f86fa512bb40) ) 
+ROM_END
+
+ROM_START( maciivi )
+	ROM_REGION32_BE(0x100000, "bootrom", 0)
+	ROM_LOAD( "4957eb49.rom", 0x000000, 0x100000, CRC(61be06e5) SHA1(560ce203d65178657ad09d03f532f86fa512bb40) ) 
+ROM_END
+
 ROM_START( macclas2 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "3193670e.rom", 0x000000, 0x080000, CRC(96d2e1fd) SHA1(50df69c1b6e805e12a405dc610bc2a1471b2eac2) )
@@ -1541,7 +1579,7 @@ ROM_START( maccclas )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */
-COMP( 1984, mac128k,  0,		0,	mac128k,  macplus,  mac128k512k,      "Apple Computer", "Macintosh 128k",  GAME_NOT_WORKING )
+COMP( 1984, mac128k,  0,		0,	mac128k,  macplus,  mac128k512k,  "Apple Computer", "Macintosh 128k",  GAME_NOT_WORKING )
 COMP( 1984, mac512k,  mac128k,  0,	mac512ke, macplus,  mac128k512k,  "Apple Computer", "Macintosh 512k",  GAME_NOT_WORKING )
 COMP( 1986, mac512ke, macplus,  0,	mac512ke, macplus,  mac512ke,	  "Apple Computer", "Macintosh 512ke", 0 )
 COMP( 1986, macplus,  0,		0,	macplus,  macplus,  macplus,	  "Apple Computer", "Macintosh Plus",  0 )
@@ -1566,4 +1604,6 @@ COMP( 1992, macpb145, macpb140, 0,  macpb145, macadb,   macpb140,  	  "Apple Com
 COMP( 1993, maccclas, 0,        0,  maclc2,   macadb,   maclrcclassic,"Apple Computer", "Macintosh Color Classic", GAME_NOT_WORKING )
 COMP( 1992, macpb145b,macpb140, 0,  macpb170, macadb,   macpb140,  	  "Apple Computer", "Macintosh PowerBook 145B", GAME_NOT_WORKING )
 COMP( 1993, maclc3,   0,		0,	maclc3,   maciici,  maclc3,	      "Apple Computer", "Macintosh LC III",  GAME_NOT_WORKING )
+COMP( 1993, maciivx,  0,		0,	maciivx,  maciici,  maciivx,	  "Apple Computer", "Macintosh IIvx",  GAME_NOT_WORKING )
+COMP( 1993, maciivi,  maciivx,	0,	maciivi,  maciici,  maciivx,	  "Apple Computer", "Macintosh IIvi",  GAME_NOT_WORKING )
 COMP( 1994, pmac6100, 0,		0,	pwrmac,   macadb,   macpm6100,	  "Apple Computer", "Power Macintosh 6100",  GAME_NOT_WORKING | GAME_NO_SOUND )

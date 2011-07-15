@@ -140,6 +140,7 @@ DRIVER_INIT(macprtb);
 DRIVER_INIT(macpb100);
 DRIVER_INIT(macpb140);
 DRIVER_INIT(macpb160);
+DRIVER_INIT(maciivx);
 
 NVRAM_HANDLER( mac );
 
@@ -159,6 +160,7 @@ SCREEN_UPDATE( macrbv );
 SCREEN_UPDATE( macrbvvram );
 VIDEO_RESET(macrbv);
 VIDEO_RESET(maceagle);
+VIDEO_RESET(macsonora);
 
 VIDEO_START( mac_cb264 );
 SCREEN_UPDATE( mac_cb264 );
