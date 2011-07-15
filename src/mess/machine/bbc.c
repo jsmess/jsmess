@@ -1440,7 +1440,6 @@ static READ8_HANDLER( bbc_i8271_read )
 {
 	int ret;
 	device_t *i8271 = space->machine().device("i8271");
-	ret=0x0ff;
 	logerror("i8271 read %d  ",offset);
 	switch (offset)
 	{
@@ -1451,16 +1450,15 @@ static READ8_HANDLER( bbc_i8271_read )
 			/* 8271 registers */
 			ret=i8271_r(i8271, offset);
 			logerror("  %d\n",ret);
-			return ret;
 		case 4:
 			ret=i8271_data_r(i8271, offset);
 			logerror("  %d\n",ret);
-			return ret;
 		default:
+			ret=0x0ff;
 			break;
 	}
 	logerror("  void\n");
-	return 0x0ff;
+	return ret;
 }
 
 static WRITE8_HANDLER( bbc_i8271_write )
