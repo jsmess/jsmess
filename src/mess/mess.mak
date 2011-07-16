@@ -392,6 +392,7 @@ DRVLIBS += \
 	$(MESSOBJ)/svi.a \
 	$(MESSOBJ)/svision.a \
 	$(MESSOBJ)/synertec.a \
+	$(MESSOBJ)/tandberg.a \
 	$(MESSOBJ)/tangerin.a \
 	$(MESSOBJ)/tatung.a \
 	$(MESSOBJ)/teamconc.a \
@@ -1475,6 +1476,9 @@ $(MESSOBJ)/svision.a:			\
 $(MESSOBJ)/synertec.a:			\
 	$(MESS_MACHINE)/sym1.o		\
 	$(MESS_DRIVERS)/sym1.o		\
+
+$(MESSOBJ)/tandberg.a:			\
+	$(MESS_DRIVERS)/tdv2324.o	\
 
 $(MESSOBJ)/tangerin.a:			\
 	$(MESS_VIDEO)/microtan.o	\
