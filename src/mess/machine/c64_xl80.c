@@ -62,7 +62,7 @@ const device_type C64_XL80 = &device_creator<c64_xl80_device>;
 
 ROM_START( c64_xl80 )
 	ROM_REGION( 0x1000, "roml", 0 )
-	ROM_LOAD( "9433cs-0090.u3",	0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "9433cs-0090.u3",	0x0000, 0x1000, CRC(aec58630) SHA1(49fb99afcb419413be4b82babf022793362dd15b) )
 
 	ROM_REGION( 0x800, HD46505SP_TAG, 0 )
 	ROM_LOAD( "dtc.u14", 0x000, 0x800, CRC(9edf5e58) SHA1(4b244e6d94a7653a2e52c351589f0b469119fb04) )
