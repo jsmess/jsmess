@@ -760,7 +760,7 @@ static void snes_cart_log_info( running_machine &machine, int total_blocks, int 
 
 static DEVICE_IMAGE_LOAD( snes_cart )
 {
-	int supported_type = 1, i, j;
+	int supported_type = 1;
 	running_machine &machine = image.device().machine();
 	snes_state *state = machine.driver_data<snes_state>();
 	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
@@ -1005,6 +1005,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			{
 				// The Base ST cart consists of 8 * 0x8000 block which have to be loaded (and mirrored)
 				// at 0x00-0x1f:0x8000-0xffff and 0x80-0x9f:0x8000-0xffff
+				int i = 0;
 				for (i = 0; i < 8; i++)
 				{
 					/* Loading data */
@@ -1013,6 +1014,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 					memcpy(&snes_ram[0x808000 + i * 0x10000], &snes_ram[0x8000 + (i * 0x10000)], 0x8000);
 
 					/* Additional mirrors (to fill snes_ram up to 0x1fffff) */
+					int j = 0;
 					for (j = 1; j < 4; j++)
 					{
 						memcpy(&snes_ram[0x008000 + i * 0x10000 + j * 0x80000], &snes_ram[0x8000 + (i * 0x10000)], 0x8000);
