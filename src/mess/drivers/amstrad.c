@@ -57,7 +57,7 @@
 
 
    January 2008 - added preliminary Aleste 520EX support
-               The Aleste 520EX is a Russian clone of the CPC6128, that expands on existing video mode, and can run MSX-DOS.
+               The Aleste 520EX is a Russian clone of the CPC6128, that expands on existing video modes, and can run MSX-DOS.
                It also adds an MC146818 RTC/NVRAM, an Intel 8253 timer, and the "Magic Sound" board, a 4-channel DMA-based
                sample player.  Also includes a software emulation of the MSX2 VDP, used in the ports of MSX games.
 
@@ -72,6 +72,9 @@
    January 2009 - changed drivers to use the mc6845 device implementation
                To get rid of duplicated code the drivers have been changed to use the new mc6845 device
                implementation. As a result the (runtime) selection of CRTC type has been removed.
+
+	July 2011 - added basic expansion port interface, with support for both the Amstrad SSA-1 and DK'Tronics
+	            speech synthesisers.
 
 
 Some bugs left :
@@ -105,8 +108,12 @@ Some bugs left :
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
+#include "machine/cpcexp.h"
+#include "machine/cpc_ssa1.h"
 
 #include "machine/ram.h"
+
+
 
 #define MANUFACTURER_NAME 0x07
 #define TV_REFRESH_RATE 0x10
@@ -863,6 +870,18 @@ static const floppy_interface aleste_floppy_interface =
 	NULL
 };
 
+static CPC_EXPANSION_INTERFACE(cpc_exp_intf)
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
+	DEVCB_NULL  // RESET
+};
+
+static SLOT_INTERFACE_START(cpc_exp_cards)
+	SLOT_INTERFACE("ssa1", CPC_SSA1)
+	SLOT_INTERFACE("dkspeech", CPC_DKSPEECH)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("cpr,bin")
@@ -920,6 +939,8 @@ static MACHINE_CONFIG_START( amstrad, amstrad_state )
 	MCFG_UPD765A_ADD("upd765", amstrad_upd765_interface)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_interface)
+
+	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL,NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
