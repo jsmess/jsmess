@@ -53,7 +53,8 @@ device_c64_expansion_card_interface::~device_c64_expansion_card_interface()
 
 c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, C64_EXPANSION_SLOT, "C64 expansion port", tag, owner, clock),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this),
+		device_image_interface(mconfig, *this)
 {
 }
 
@@ -101,7 +102,7 @@ void c64_expansion_slot_device::device_config_complete()
 
 void c64_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_c64_expansion_card_interface *>(get_card_device());
+	m_cart = dynamic_cast<device_c64_expansion_card_interface *>(get_card_device());
 
 	// resolve callbacks
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
@@ -123,6 +124,81 @@ void c64_expansion_slot_device::device_reset()
 
 
 //-------------------------------------------------
+//  call_load - 
+//-------------------------------------------------
+
+bool c64_expansion_slot_device::call_load() 
+{	
+	if (m_cart)
+	{
+		offs_t read_length = 0;
+		
+		if (software_entry() == NULL)
+		{
+			read_length = fread(m_cart->get_cart_base(), 0x4000);
+		}			
+		else
+		{
+			read_length = get_software_region_length("roml");
+			
+			if (read_length > 0)
+			{
+				memcpy(m_cart->get_cart_base(), get_software_region("roml"), read_length);
+
+				if (read_length < 0x4000)
+				{
+					memcpy(m_cart->get_cart_base() + 0x2000, get_software_region("romh"), read_length);
+				}
+			}
+			else
+			{
+				read_length = get_software_region_length("rom");
+			}
+		}
+	}
+	
+	return IMAGE_INIT_PASS;
+}
+
+
+//-------------------------------------------------
+//  call_softlist_load - 
+//-------------------------------------------------
+
+bool c64_expansion_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+{
+	load_software_part_region(this, swlist, swname, start_entry);
+	
+	return true;
+}
+
+
+//-------------------------------------------------
+//  get_default_card - 
+//-------------------------------------------------
+
+const char * c64_expansion_slot_device::get_default_card(emu_options &options) const
+{
+	if (strlen(options.value(m_instance_name)) > 0)
+	{
+		return "standard";
+	}
+
+	return m_default_card;	
+}
+
+
+//-------------------------------------------------
+//  get_cart_base - 
+//-------------------------------------------------
+
+UINT8* c64_expansion_slot_device::get_cart_base()
+{
+	return NULL;
+}
+
+
+//-------------------------------------------------
 //  roml_r - low ROM read
 //-------------------------------------------------
 
@@ -130,9 +206,9 @@ READ8_MEMBER( c64_expansion_slot_device::roml_r )
 {
 	UINT8 data = 0;
 	
-	if (m_card != NULL)
+	if (m_cart != NULL)
 	{
-		data = m_card->c64_cd_r(offset, 0, 1, 1, 1);
+		data = m_cart->c64_cd_r(offset, 0, 1, 1, 1);
 	}
 	
 	return data;
@@ -147,9 +223,9 @@ READ8_MEMBER( c64_expansion_slot_device::romh_r )
 {
 	UINT8 data = 0;
 	
-	if (m_card != NULL)
+	if (m_cart != NULL)
 	{
-		data = m_card->c64_cd_r(offset, 1, 0, 1, 1);
+		data = m_cart->c64_cd_r(offset, 1, 0, 1, 1);
 	}
 	
 	return data;
@@ -164,9 +240,9 @@ READ8_MEMBER( c64_expansion_slot_device::io1_r )
 {
 	UINT8 data = 0;
 	
-	if (m_card != NULL)
+	if (m_cart != NULL)
 	{
-		data = m_card->c64_cd_r(offset, 1, 1, 0, 1);
+		data = m_cart->c64_cd_r(offset, 1, 1, 0, 1);
 	}
 	
 	return data;
@@ -179,9 +255,9 @@ READ8_MEMBER( c64_expansion_slot_device::io1_r )
 
 WRITE8_MEMBER( c64_expansion_slot_device::io1_w )
 {
-	if (m_card != NULL)
+	if (m_cart != NULL)
 	{
-		m_card->c64_cd_w(offset, data, 1, 1, 0, 1);
+		m_cart->c64_cd_w(offset, data, 1, 1, 0, 1);
 	}
 }
 
@@ -194,9 +270,9 @@ READ8_MEMBER( c64_expansion_slot_device::io2_r )
 {
 	UINT8 data = 0;
 	
-	if (m_card != NULL)
+	if (m_cart != NULL)
 	{
-		data = m_card->c64_cd_r(offset, 1, 1, 1, 0);
+		data = m_cart->c64_cd_r(offset, 1, 1, 1, 0);
 	}
 	
 	return data;
@@ -209,9 +285,9 @@ READ8_MEMBER( c64_expansion_slot_device::io2_r )
 
 WRITE8_MEMBER( c64_expansion_slot_device::io2_w )
 {
-	if (m_card != NULL)
+	if (m_cart != NULL)
 	{
-		m_card->c64_cd_w(offset, data, 1, 1, 1, 0);
+		m_cart->c64_cd_w(offset, data, 1, 1, 1, 0);
 	}
 }
 
@@ -224,9 +300,9 @@ bool c64_expansion_slot_device::screen_update(screen_device &screen, bitmap_t &b
 {
 	bool value = false;
 	
-	if (m_card != NULL)
+	if (m_cart != NULL)
 	{
-		value = m_card->c64_screen_update(screen, bitmap, cliprect);
+		value = m_cart->c64_screen_update(screen, bitmap, cliprect);
 	}
 	
 	return value;

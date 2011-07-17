@@ -104,6 +104,8 @@ public:
 
 	// video
 	virtual bool c64_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect) { return false; }
+	
+	virtual UINT8* get_cart_base() { return NULL; }
 };
 
 
@@ -111,7 +113,8 @@ public:
 
 class c64_expansion_slot_device : public device_t,
 								  public c64_expansion_slot_interface,
-								  public device_slot_interface
+								  public device_slot_interface,
+								  public device_image_interface
 {
 public:
 	// construction/destruction
@@ -139,7 +142,27 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete();
+	
+	// image-level overrides
+	virtual bool call_load();
+	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
 
+	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 0; }
+	virtual bool is_creatable() const { return 0; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 1; }
+	virtual const char *image_interface() const { return "c64_cart"; }
+	virtual const char *file_extensions() const { return "bin,rom,80"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+	
+	// slot interface overrides
+	virtual const char * get_default_card(emu_options &options) const;
+	
+	virtual UINT8* get_cart_base();
+	
 	devcb_resolved_write_line	m_out_irq_func;
 	devcb_resolved_write_line	m_out_nmi_func;
 	devcb_resolved_write_line	m_out_dma_func;
@@ -147,7 +170,7 @@ protected:
 	devcb_resolved_write_line	m_out_game_func;
 	devcb_resolved_write_line	m_out_exrom_func;
 
-	device_c64_expansion_card_interface *m_card;
+	device_c64_expansion_card_interface *m_cart;
 };
 
 
