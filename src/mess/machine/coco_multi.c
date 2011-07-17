@@ -2,8 +2,51 @@
 
     coco_multi.c
 
-    Code for emulating CoCo Multi PAK
+    Code for emulating CoCo's Multi-Pak Interface
 
+	 The Multi-Pak interface multiplexes all I/O lines from the Color
+	 Computer's expansion port to four identical ports. All I/O lines
+	 are continuously multiplexed except:
+	 
+	 Pin 36 - *SCS
+	 Pin 32 - *CTS
+	 Pin  8 - *CART
+	 
+	 These I/O lines are switched in one of two ways. First, is the front
+	 panel, four position switch. When adjusted the switch will direct the
+	 MPI to target these three I/O lines to the selected slot.
+	 
+	 Second, the MPI will listen to writes to 0xff7f and respond accordingly:
+	 
+	 bit 0 --\___ Target *SCS to this slot number
+	 bit 1 --/
+	 bit 2 ------ Ignore
+	 bit 3 ------ Ignore
+	 bit 4 --\___ Target *CTS and *CART to this slot number
+	 bit 5 --/
+	 bit 6 ------ Ignore
+	 bit 7 ------ Ignore
+	 
+	 After writing to 0xff7f, the position of the physical switch has no
+	 effect until reset.
+	 
+	 Reading is supported on 0xff7f. It will reflect the position of the
+	 physical switch. Until data is written to 0xff7f, then it will only
+	 reflect what has been written until a reset.
+	 
+	 A common modification users of the OS-9 operating system made was to
+	 tie all of the *CART pins together on the MPI motherboard. The *CART
+	 line is connected to the 6809's IRQ line. This allowed any hardware
+	 device in any slot to signal an IRQ to the CPU, no matter what the
+	 switch position was. OS-9 was designed from the very start to poll
+	 each device attached on every IQR signal.
+	 
+	 Because of sloppy address decoding the original MPI also responds to
+	 0xff9f. No software is known to take advantage of this. After the
+	 introduction of the CoCo 3, which uses 0xff9f internally, Tandy provided
+	 free upgrades to any MPI to fix this problem.
+	 
+	 
 ***************************************************************************/
 
 #include "emu.h"
@@ -82,7 +125,7 @@ const device_type COCO_MULTIPAK = &device_creator<coco_multipak_device>;
 //  coco_multipak_device - constructor
 //-------------------------------------------------
 coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, COCO_MULTIPAK, "CoCo Multi PAK", tag, owner, clock),
+      : device_t(mconfig, COCO_MULTIPAK, "CoCo Multi-Pak Interface", tag, owner, clock),
 		device_cococart_interface( mconfig, *this ),
 		device_slot_card_interface(mconfig, *this)
 {
