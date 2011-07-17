@@ -549,10 +549,10 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 	data &= 1;	/* clear extra bits */
 	offset &= 0x01F;
 
-	int mask = (1 << offset);
-
 	if (offset <= 0x0a)
 	{
+		int mask = (1 << offset);
+
 		if (tms9902->register_select & register_select_LDCTRL)
 		{	/* Control Register */
 			switch (offset)

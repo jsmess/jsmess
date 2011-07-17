@@ -134,7 +134,7 @@ static SCREEN_UPDATE( smc777 )
 			int color = attr[count] & 7;
 			int bk_color = (attr[count] & 0x18) >> 3;
 			int blink = attr[count] & 0x40;
-			int yi,xi;
+			int xi;
 			int bk_pen;
 			//int bk_struct[4] = { -1, 0x10, 0x11, (color & 7) ^ 8 };
 

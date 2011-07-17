@@ -1216,10 +1216,10 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 	{
 		UINT8	header[0x200];
 
-		unsigned size = image.length();
+		unsigned image_size = image.length();
 
 		/* Check for supported image sizes */
-		switch( size )
+		switch( image_size )
 		{
 		case 0x2200:
 		case 0x4200:
@@ -1239,7 +1239,7 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 		}
 
 		/* Read the cartridge contents */
-		if ( ( size - 0x200 ) != image.fread(image.device().machine().region("maincpu")->base() + address, size - 0x200 ) )
+		if ( ( image_size - 0x200 ) != image.fread(image.device().machine().region("maincpu")->base() + address, image_size - 0x200 ) )
 		{
 			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
 			return IMAGE_INIT_FAIL;
