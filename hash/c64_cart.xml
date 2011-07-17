@@ -583,8 +583,8 @@ http://www.retroport.de/C64_C128_Hardware.html
 		
 		CRTC - Hitachi HD46505SP
 		RAM  - Toshiba TMM2016AP-12 2Kx8 Static RAM
-		ROM0 - GI 9433CS-0090 8Kx8 ROM?
-		ROM1 - GI 9316CS-F67 2Kx8 ROM? "DTC"
+		ROM0 - GI 9433CS-0090 4Kx8 ROM
+		ROM1 - GI 9316CS-F67 2Kx8 ROM "DTC"
 		CN1  - RCA video output
 		-->
 		<part name="cart" interface="c64_cart">
@@ -593,7 +593,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x1000">
-				<rom name="9433cs-0090.u3" size="0x1000" status="nodump" offset="0x0000" />
+				<rom name="9433cs-0090.u3" size="0x1000" crc="aec58630" sha1="49fb99afcb419413be4b82babf022793362dd15b" offset="0x0000" />
 			</dataarea>
 
 			<dataarea name="crtc" size="0x800">
