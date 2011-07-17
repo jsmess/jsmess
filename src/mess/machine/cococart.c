@@ -338,10 +338,7 @@ bool cococart_slot_device::call_softlist_load(char *swlist, char *swname, rom_en
 
 const char * cococart_slot_device::get_default_card(emu_options &options) const
 {
-	if (strlen(options.value(m_instance_name))>0) {
-		return "pak";
-	}
-	return m_default_card;	
+	return software_get_default_slot(options, this, m_default_card, "pak");
 }
 
 //**************************************************************************

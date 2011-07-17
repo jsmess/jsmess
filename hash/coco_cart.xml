@@ -127,6 +127,7 @@ Compiled by K1W1
 		<publisher>Tandy</publisher>
 		<info name="serial" value="26-3149" />
 		<part name="cart" interface="coco_cart">
+			<feature name="slot" value="pak" />
 			<dataarea name="rom" size="16384">
 				<rom name="atom (1983)(26-3149)(tandy).rom" size="16384" crc="04d9cfe4" sha1="654b989c4ca40d5acc78dca701cd3004293bf334" offset="0" />
 			</dataarea>
