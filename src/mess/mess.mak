@@ -598,6 +598,8 @@ $(MESSOBJ)/amiga.a:				\
 $(MESSOBJ)/amstrad.a:			\
 	$(MESS_DRIVERS)/amstrad.o	\
 	$(MESS_MACHINE)/amstrad.o	\
+	$(MESS_MACHINE)/cpcexp.o	\
+	$(MESS_MACHINE)/cpc_ssa1.o	\
 	$(MESS_DRIVERS)/amstr_pc.o	\
 	$(MESS_MACHINE)/amstr_pc.o	\
 	$(MESS_VIDEO)/nc.o			\
