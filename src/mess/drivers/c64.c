@@ -344,6 +344,7 @@ C64DTV TODO:
 #include "machine/c2040.h"
 #include "machine/interpod.h"
 #include "machine/c64exp.h"
+#include "machine/c64_std.h"
 #include "machine/c64_xl80.h"
 
 #include "includes/c64.h"
@@ -694,6 +695,7 @@ static C64_EXPANSION_INTERFACE( c64_expansion_intf )
 };
 
 static SLOT_INTERFACE_START( c64_expansion_cards )
+	SLOT_INTERFACE("standard", C64_STD)
 	SLOT_INTERFACE("xl80", C64_XL80)
 SLOT_INTERFACE_END
 
