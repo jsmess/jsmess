@@ -1687,7 +1687,7 @@ static WRITE16_HANDLER( x68k_enh_areaset_w )
 	logerror("SYS: Enhanced Supervisor area set (from %iMB): 0x%02x\n",(offset + 1) * 2,data & 0xff);
 }
 
-static TIMER_CALLBACK(x68k_fake_bus_error)
+static TIMER_CALLBACK(x68k_bus_error)
 {
 	int val = param;
 	int v;
@@ -1697,32 +1697,11 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 		v = 0x0b;
 	else
 		v = 0x09;
-
-	// rather hacky, but this generally works for programs that check for MIDI hardware
 	if(ram[v] != 0x02)  // normal vector for bus errors points to 02FF0540
 	{
-		int addr = (ram[0x09] << 24) | (ram[0x08] << 16) |(ram[0x0b] << 8) | ram[0x0a];
-		int sp = cpu_get_reg(machine.device("maincpu"), STATE_GENSP);
-		int pc = cpu_get_reg(machine.device("maincpu"), STATE_GENPC);
-		int sr = cpu_get_reg(machine.device("maincpu"), M68K_SR);
-		//int pda = cpu_get_reg(machine.device("maincpu"), M68K_PREF_DATA);
-		if(strcmp(machine.system().name,"x68030") == 0)
-		{  // byte order varies on the 68030
-			addr = (ram[0x0b] << 24) | (ram[0x0a] << 16) |(ram[0x09] << 8) | ram[0x08];
-		}
-		cpu_set_reg(machine.device("maincpu"), STATE_GENSP, sp - 14);
-		ram[sp-11] = (val & 0xff000000) >> 24;
-		ram[sp-12] = (val & 0x00ff0000) >> 16;
-		ram[sp-9] = (val & 0x0000ff00) >> 8;
-		ram[sp-10] = (val & 0x000000ff);  // place address onto the stack
-		ram[sp-3] = (pc & 0xff000000) >> 24;
-		ram[sp-4] = (pc & 0x00ff0000) >> 16;
-		ram[sp-1] = (pc & 0x0000ff00) >> 8;
-		ram[sp-2] = (pc & 0x000000ff);  // place PC onto the stack
-		ram[sp-5] = (sr & 0xff00) >> 8;
-		ram[sp-6] = (sr & 0x00ff);  // place SR onto the stack
-		cpu_set_reg(machine.device("maincpu"), STATE_GENPC, addr);  // real exceptions seem to take too long to be acknowledged
-		popmessage("Expansion access [%08x]: PC jump to %08x", val, addr);
+		cputag_set_input_line(machine, "maincpu", M68K_LINE_BUSERROR, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", M68K_LINE_BUSERROR, CLEAR_LINE);
+		popmessage("Bus error: Unused RAM access [%08x]", val);
 	}
 }
 
@@ -1739,7 +1718,7 @@ static READ16_HANDLER( x68k_rom0_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), 0xbffffc+offset);
+		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), 0xbffffc+offset);
 	}
 	return 0xff;
 }
@@ -1757,7 +1736,7 @@ static WRITE16_HANDLER( x68k_rom0_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), 0xbffffc+offset);
+		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), 0xbffffc+offset);
 	}
 }
 
@@ -1774,7 +1753,7 @@ static READ16_HANDLER( x68k_emptyram_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), offset);
+		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), offset);
 	}
 	return 0xff;
 }
@@ -1792,7 +1771,7 @@ static WRITE16_HANDLER( x68k_emptyram_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_fake_bus_error), offset);
+		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), FUNC(x68k_bus_error), offset);
 	}
 }
 
@@ -1807,7 +1786,7 @@ static READ16_HANDLER( x68k_exp_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_fake_bus_error), 0xeafa00+offset);
+		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_bus_error), 0xeafa00+offset);
 //      cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,state->m_current_vector[2]);
 	}
 	return 0xffff;
@@ -1824,7 +1803,7 @@ static WRITE16_HANDLER( x68k_exp_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_fake_bus_error), 0xeafa00+offset);
+		space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), FUNC(x68k_bus_error), 0xeafa00+offset);
 //      cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,state->m_current_vector[2]);
 	}
 }
@@ -2048,6 +2027,7 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32)
+	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)  // Still only has 24-bit address space
 //  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
 //  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE_MEMBER(x68k_state, m_gvram)
@@ -2070,7 +2050,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE16(x68k_scc_r, x68k_scc_w,0xffffffff)
 	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE16(x68k_ppi_r, x68k_ppi_w,0xffffffff)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE16(x68k_ioc_r, x68k_ioc_w,0xffffffff)
-	AM_RANGE(0xea0000, 0xea1fff) AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)  // external SCSI ROM and controller
+	AM_RANGE(0xea0000, 0xea1fff) AM_NOP//AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)  // external SCSI ROM and controller
 	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)
 	AM_RANGE(0xeafa80, 0xeafa8b) AM_READWRITE16(x68k_areaset_r, x68k_enh_areaset_w,0xffffffff)
 	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE16(x68k_spritereg_r, x68k_spritereg_w,0xffffffff)
