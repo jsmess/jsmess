@@ -362,6 +362,9 @@ READ32_MEMBER(mac_state::mac_read_id)
 
 	switch (m_model)
 	{
+		case MODEL_MAC_IIFX:
+			return 0xa55a1808;	// IIfx ROM doesn't actually check this
+
 		case MODEL_MAC_LC_III:
 			return 0xa55a0001;	// 25 MHz LC III
 
@@ -399,6 +402,64 @@ static VIDEO_START( macprtb )
 READ16_MEMBER(mac_state::mac_config_r)
 {
 	return 0xffff;	// returns nonzero if no PDS RAM expansion, 0 if present
+}
+
+// IIfx
+READ32_MEMBER(mac_state::biu_r)
+{
+//	printf("biu_r @ %x, mask %08x\n", offset, mem_mask);
+	return 0;
+}
+
+WRITE32_MEMBER(mac_state::biu_w)
+{
+//	printf("biu_w %x @ %x, mask %08x\n", data, offset, mem_mask);
+}
+
+READ8_MEMBER(mac_state::oss_r)
+{
+//	printf("oss_r @ %x\n", offset);
+//	if (offset <= 0xe)	// for interrupt mask registers, we're intended to return something different than is written in the low 3 bits (?)
+//	{
+//		return m_oss_regs[offset]<<4;
+//	}
+
+	return m_oss_regs[offset];
+}
+
+WRITE8_MEMBER(mac_state::oss_w)
+{
+//	printf("oss_w %x @ %x\n", data, offset);
+	m_oss_regs[offset] = data;
+}
+
+READ32_MEMBER(mac_state::buserror_r)
+{
+	cputag_set_input_line(machine(), "maincpu", M68K_LINE_BUSERROR, ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", M68K_LINE_BUSERROR, CLEAR_LINE);
+	return 0;
+}
+
+READ8_MEMBER(mac_state::scciop_r)
+{
+//	printf("scciop_r @ %x (PC=%x)\n", offset, cpu_get_pc(m_maincpu));
+	return 0;
+}
+
+WRITE8_MEMBER(mac_state::scciop_w)
+{
+//	printf("scciop_w %x @ %x (PC=%x)\n", data, offset, cpu_get_pc(m_maincpu));
+}
+
+READ8_MEMBER(mac_state::swimiop_r)
+{
+//	printf("swimiop_r @ %x (PC=%x)\n", offset, cpu_get_pc(m_maincpu));
+	return 0;
+}
+
+WRITE8_MEMBER(mac_state::swimiop_w)
+{
+//	printf("swimiop_w %x @ %x (PC=%x)\n", data, offset, cpu_get_pc(m_maincpu));
 }
 
 /***************************************************************************
@@ -522,6 +583,29 @@ static ADDRESS_MAP_START(macse30_map, AS_PROGRAM, 32, mac_state )
 
 	AM_RANGE(0xfe000000, 0xfe00ffff) AM_RAM	AM_BASE(m_vram)
 	AM_RANGE(0xfeffe000, 0xfeffffff) AM_ROM AM_REGION("se30vrom", 0x0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(maciifx_map, AS_PROGRAM, 32, mac_state )
+	AM_RANGE(0x40000000, 0x4007ffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff80000)
+
+	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE8(scciop_r, scciop_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x5000a000, 0x5000bfff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x5000c060, 0x5000c063) AM_READ(macii_scsi_drq_r) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x5000d000, 0x5000d003) AM_WRITE(macii_scsi_drq_w) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x5000d060, 0x5000d063) AM_READ(macii_scsi_drq_r) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50010000, 0x50011fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50012000, 0x50013fff) AM_READWRITE8(swimiop_r, swimiop_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50018000, 0x50019fff) AM_READWRITE(biu_r, biu_w) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x5001a000, 0x5001bfff) AM_READWRITE8(oss_r, oss_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50024000, 0x50027fff) AM_READ(buserror_r) AM_MIRROR(0x00f00000)   // must bus error on access here so ROM can determine we're an FMC
+	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
+
+	// RasterOps 264 640x480 fixed-res color video card (8, 16, or 24 bit)
+	AM_RANGE(0xfe000000, 0xfe1fffff) AM_RAM	AM_BASE(m_vram) // supposed to be 1.5 megs of VRAM, but every other word?
+	AM_RANGE(0xfeff6000, 0xfeff60ff) AM_READWRITE( mac_cb264_r, mac_cb264_w )
+	AM_RANGE(0xfeff7000, 0xfeff7fff) AM_WRITE( mac_cb264_ramdac_w )
+	AM_RANGE(0xfeff8000, 0xfeffffff) AM_ROM AM_REGION("rops264", 0)
 ADDRESS_MAP_END
 
 // ROM detects the "Jaws" ASIC by checking for I/O space mirrored at 0x01000000 boundries
@@ -749,7 +833,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( macii, mac_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68020PMMU, C15M)
+	MCFG_CPU_ADD("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
 	MCFG_CPU_VBLANK_INT("screen", mac_cb264_vbl)
 
@@ -796,6 +880,57 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,32M,64M,96M,128M")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( maciifx, mac_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68030, 40000000)
+	MCFG_CPU_PROGRAM_MAP(maciifx_map)
+	MCFG_CPU_VBLANK_INT("screen", mac_cb264_vbl)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+
+        /* video hardware */
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(1024, 768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(mac_cb264)
+
+	MCFG_PALETTE_LENGTH(256)
+
+	MCFG_VIDEO_START(mac_cb264)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, mac_asc_irq)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	/* nvram */
+	MCFG_NVRAM_HANDLER(mac)
+
+	/* devices */
+	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
+
+	MCFG_IWM_ADD("fdc", mac_iwm_interface)
+	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
+
+	MCFG_SCC8530_ADD("scc", C7M)
+	MCFG_SCC8530_IRQ(mac_scc_irq)
+
+	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
+
+	MCFG_HARDDISK_ADD( "harddisk1" )
+	MCFG_HARDDISK_ADD( "harddisk2" )
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,64M,96M,128M")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maclc, macii )
@@ -1500,6 +1635,16 @@ ROM_START( macse30 )
 	ROM_LOAD( "se30vrom.uk6", 0x000000, 0x002000, CRC(b74c3463) SHA1(584201cc67d9452b2488f7aaaf91619ed8ce8f03) )
 ROM_END
 
+ROM_START( maciifx )
+	ROM_REGION32_BE(0x80000, "bootrom", 0)
+	ROM_LOAD( "4147dd77.rom", 0x000000, 0x080000, CRC(ef441bbd) SHA1(9fba3d4f672a630745d65788b1d1119afa2c6728) ) 
+
+	// RasterOps "ColorBoard 264" NuBus video card
+	ROM_REGION32_BE(0x8000, "rops264", 0)
+	ROM_LOAD32_BYTE( "264-1914.bin", 0x000003, 0x002000, CRC(d5fbd5ad) SHA1(98d35ed3fb0bca4a9bee1cdb2af0d3f22b379386) )
+	ROM_LOAD32_BYTE( "264-1915.bin", 0x000002, 0x002000, CRC(26c19ee5) SHA1(2b2853d04cc6b0258e85eccd23ebfd4f4f63a084) )
+ROM_END
+
 ROM_START( maciici )
 	ROM_REGION32_BE(0x80000, "bootrom", 0)
         ROM_LOAD( "368cadfe.rom", 0x000000, 0x080000, CRC(46adbf74) SHA1(b54f9d2ed16b63c49ed55adbe4685ebe73eb6e80) )
@@ -1592,6 +1737,7 @@ COMP( 1989, macprtb,  0,        0,  macprtb,  macadb,   macprtb,  	  "Apple Comp
 COMP( 1989, macse30,  mac2fdhd, 0,	macse30,  macadb,   macse30,	  "Apple Computer", "Macintosh SE/30",  0 )
 COMP( 1989, maciicx,  mac2fdhd, 0,	maciix,   macadb,   maciicx,	  "Apple Computer", "Macintosh IIcx",  0 )
 COMP( 1989, maciici,  0,		0,	maciici,  maciici,  maciici,	  "Apple Computer", "Macintosh IIci", 0 )
+COMP( 1990, maciifx,  0,		0,	maciifx,  macadb,   maciifx,      "Apple Computer", "Macintosh IIfx",  GAME_NOT_WORKING )
 COMP( 1990, macclasc, 0,		0,	macse,    macadb,   macclassic,	  "Apple Computer", "Macintosh Classic",  GAME_NOT_WORKING )
 COMP( 1990, maclc,    0,		0,	maclc,    maciici,  maclc,	      "Apple Computer", "Macintosh LC",  GAME_NOT_WORKING )
 COMP( 1990, maciisi,  0,		0,	maciisi,  maciici,  maciisi,	  "Apple Computer", "Macintosh IIsi",  GAME_NOT_WORKING )

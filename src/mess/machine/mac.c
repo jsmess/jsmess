@@ -103,7 +103,7 @@
 #define ADB_IS_PM_CLASS	((m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100) || (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PB180c)) 
 
 #define AUDIO_IS_CLASSIC (mac->m_model <= MODEL_MAC_CLASSIC)
-#define MAC_HAS_VIA2	(m_model >= MODEL_MAC_II)
+#define MAC_HAS_VIA2	((m_model >= MODEL_MAC_II) && (m_model != MODEL_MAC_IIFX))
 
 #define ASC_INTS_RBV	((mac->m_model >= MODEL_MAC_IICI) && (mac->m_model <= MODEL_MAC_IIVI)) || ((mac->m_model >= MODEL_MAC_LC) && (mac->m_model <= MODEL_MAC_COLOR_CLASSIC))
 
@@ -280,7 +280,7 @@ void mac_state::field_interrupts()
 			take_interrupt = 1;
 		}
 	}
-	else if (m_model < MODEL_MAC_POWERMAC_6100)
+	else if ((m_model < MODEL_MAC_POWERMAC_6100) && (m_model != MODEL_MAC_IIFX))
 	{
 		if (m_scc_interrupt)
 		{
@@ -360,7 +360,7 @@ void mac_asc_irq(device_t *device, int state)
 //		m_asc_interrupt = state;
 //		mac->field_interrupts();
 	}
-	else if (mac->m_model >= MODEL_MAC_II)
+	else if ((mac->m_model >= MODEL_MAC_II) && (mac->m_model != MODEL_MAC_IIFX))
 	{
 		mac->m_via2->write_cb1(state^1);
 	}
@@ -419,7 +419,7 @@ void mac_state::v8_resize()
 		is_rom = FALSE;
 	}
 
-//  printf("mac_v8_resize: memory_size = %x, ctrl bits %02x (overlay %d = %s)\n", memory_size, mac->m_rbv_regs[1] & 0xe0, mac->m_overlay, is_rom ? "ROM" : "RAM");
+//	printf("mac_v8_resize: memory_size = %x, ctrl bits %02x (overlay %d = %s)\n", memory_size, m_rbv_regs[1] & 0xe0, m_overlay, is_rom ? "ROM" : "RAM");
 
 	if (is_rom)
 	{
@@ -434,7 +434,7 @@ void mac_state::v8_resize()
 		// force unmap of entire RAM region
 		space->unmap_write(0, 0x9fffff, 0x9fffff, 0);
 
-		// LC has 2 MB built-in, all other V8-style machines have 4 MB
+		// LC  2 MB built-in, all other V8-style machines have 4 MB
 		// we reserve the first 2 or 4 MB of mess_ram for the onboard,
 		// RAM above that mark is the SIMM
 		onboard_amt = ((m_model == MODEL_MAC_LC) || (m_model == MODEL_MAC_CLASSIC_II)) ? 2*1024*1024 : 4*1024*1024;
@@ -465,7 +465,7 @@ void mac_state::v8_resize()
 //          printf("mac_v8_resize: SIMM off, mobo RAM at 0 and top\n");
 
 			mac_install_memory(machine(), 0x000000, onboard_amt-1, onboard_amt, memory_data, is_rom, "bank1");
-			mac_install_memory(machine(), 0x800000, 0x9fffff, 0x200000, memory_data, is_rom, "bank3");
+			mac_install_memory(machine(), 0x900000, 0x9fffff, 0x200000, memory_data+0x100000, is_rom, "bank3");
 		}
 	}
 }
@@ -516,10 +516,10 @@ void mac_state::set_memory_overlay(int overlay)
 			}
 			else	// RAM: be careful not to populate ram B with a mirror or the ROM will get confused
 			{
-				mac_install_memory(machine(), 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
+				mac_install_memory(machine(), 0x00000000, 0x3fffffff, memory_size, memory_data, is_rom, "bank1");
 			}
 		}
-		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIVX))
+		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIVX) || (m_model == MODEL_MAC_IIFX))
 		{
 			mac_install_memory(machine(), 0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
@@ -2485,7 +2485,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 			return 0x81 | PA4 | PA2 | PA1;
 
 		case MODEL_MAC_IIFX:
-			return 0x81 | PA6 | PA1;
+			return 0x81 | PA6 | PA4 | PA1;
 
 		case MODEL_MAC_IICX:
 			return 0x81 | PA6;
@@ -3004,6 +3004,10 @@ void mac_state::machine_reset()
 			m_via_cycles = -60;
 			break;
 
+		case 40000000:	// 40 MHz Macs
+			m_via_cycles = -80;
+			break;
+
 		default:
 			fatalerror("mac: unknown clock\n");
 			break;
@@ -3209,6 +3213,7 @@ MAC_DRIVER_INIT(macpb100, MODEL_MAC_PB100)
 MAC_DRIVER_INIT(macpb140, MODEL_MAC_PB140)
 MAC_DRIVER_INIT(macpb160, MODEL_MAC_PB160)
 MAC_DRIVER_INIT(maciivx, MODEL_MAC_IIVX)
+MAC_DRIVER_INIT(maciifx, MODEL_MAC_IIFX)
 
 // make the appletalk init fail instead of hanging on the II FDHD/IIx/IIcx/SE30 ROM
 static void patch_appletalk_iix(running_machine &machine)
@@ -3254,19 +3259,22 @@ void mac_state::nubus_slot_interrupt(UINT8 slot, UINT32 state)
 		mac->m_nubus_irq_state |= masks[slot];
 	}
 
-	if ((mac->m_nubus_irq_state & 0x3f) != 0x3f)
+	if (mac->m_model != MODEL_MAC_IIFX)
 	{
-		// HACK: sometimes we miss an ack (possible misbehavior in the VIA?)
-		if (m_via2->read_ca1() == 0)
+		if ((mac->m_nubus_irq_state & 0x3f) != 0x3f)
+		{
+			// HACK: sometimes we miss an ack (possible misbehavior in the VIA?)
+			if (m_via2->read_ca1() == 0)
+			{
+				m_via2->write_ca1(1);
+			}
+
+			m_via2->write_ca1(0);
+		}
+		else
 		{
 			m_via2->write_ca1(1);
 		}
-
-		m_via2->write_ca1(0);
-	}
-	else
-	{
-		m_via2->write_ca1(1);
 	}
 }
 

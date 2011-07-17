@@ -141,6 +141,7 @@ DRIVER_INIT(macpb100);
 DRIVER_INIT(macpb140);
 DRIVER_INIT(macpb160);
 DRIVER_INIT(maciivx);
+DRIVER_INIT(maciifx);
 
 NVRAM_HANDLER( mac );
 
@@ -347,6 +348,16 @@ public:
 	DECLARE_WRITE32_MEMBER( mac_cb264_w );
 	DECLARE_WRITE32_MEMBER( mac_cb264_ramdac_w );
 
+    DECLARE_READ32_MEMBER(biu_r);
+    DECLARE_WRITE32_MEMBER(biu_w);
+    DECLARE_READ8_MEMBER(oss_r);
+    DECLARE_WRITE8_MEMBER(oss_w);
+    DECLARE_READ32_MEMBER(buserror_r);
+    DECLARE_READ8_MEMBER(swimiop_r);
+    DECLARE_WRITE8_MEMBER(swimiop_w);
+    DECLARE_READ8_MEMBER(scciop_r);
+    DECLARE_WRITE8_MEMBER(scciop_w);
+
 private:
 	int has_adb();
 	void rtc_init();
@@ -367,6 +378,8 @@ private:
 	// ADB keyboard state
 	int m_adb_keybaddr;
 	int m_adb_keybinitialized, m_adb_currentkeys[2], m_adb_modifiers;
+
+    UINT8 m_oss_regs[0x400];
 public:
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;
