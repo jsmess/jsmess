@@ -80,6 +80,8 @@ static COM8116_INTERFACE( brg_intf )
 
 WRITE_LINE_MEMBER( s100_dj2db_device::fdc_intrq_w )
 {
+	m_s100->rdy_w(CLEAR_LINE);
+	
 	switch (input_port_read(this, "J1A"))
 	{
 	case 0: m_s100->vi0_w(state); break;
@@ -94,11 +96,16 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_intrq_w )
 	}
 }
 
+WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
+{
+	m_s100->rdy_w(CLEAR_LINE);
+}
+
 static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, s100_dj2db_device, fdc_intrq_w),
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, s100_dj2db_device, fdc_drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
@@ -357,6 +364,8 @@ UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 	}
 	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
 	{
+		m_s100->rdy_w(ASSERT_LINE);
+		
 		data = wd17xx_r(m_fdc, offset & 0x03);
 	}
 	else if ((offset >= 0xfc00) && (offset < 0x10000))

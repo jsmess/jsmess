@@ -31,12 +31,12 @@ s100_slot_device::s100_slot_device(const machine_config &mconfig, const char *ta
 {
 }
 
-void s100_slot_device::static_set_s100_slot(device_t &device, const char *tag, int num)
+void s100_slot_device::static_set_s100_slot(device_t &device, const char *tag)
 {
 	s100_slot_device &s100_card = dynamic_cast<s100_slot_device &>(device);
 	s100_card.m_bus_tag = tag;
-	s100_card.m_bus_num = num;
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -46,7 +46,7 @@ void s100_slot_device::device_start()
 {
 	m_bus = machine().device<s100_device>(m_bus_tag);
 	device_s100_card_interface *dev = dynamic_cast<device_s100_card_interface *>(get_card_device());
-	if (dev) m_bus->add_s100_card(dev, m_bus_num);
+	if (dev) m_bus->add_s100_card(dev);
 }
 
 
@@ -117,8 +117,6 @@ void s100_device::device_config_complete()
 s100_device::s100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, S100, "S100", tag, owner, clock)
 {
-	for (int i = 0; i < MAX_S100_SLOTS; i++)
-		m_s100_device[i] = NULL;
 }
 
 
@@ -165,9 +163,9 @@ void s100_device::device_reset()
 //  add_s100_card - add S100 card
 //-------------------------------------------------
 
-void s100_device::add_s100_card(device_s100_card_interface *card, int pos)
+void s100_device::add_s100_card(device_s100_card_interface *card)
 {
-	m_s100_device[pos] = card;
+	m_device_list.append(*card);
 }
 
 
@@ -179,12 +177,12 @@ READ8_MEMBER( s100_device::smemr_r )
 {
 	UINT8 data = 0;
 
-	for (int i = 0; i < MAX_S100_SLOTS; i++)
+	device_s100_card_interface *entry = m_device_list.first();
+
+	while (entry)
 	{
-		if (m_s100_device[i] != NULL)
-		{
-			data |= m_s100_device[i]->s100_smemr_r(offset);
-		}
+		data |= entry->s100_smemr_r(offset);
+		entry = entry->next();
 	}
 
 	return data;
@@ -197,12 +195,12 @@ READ8_MEMBER( s100_device::smemr_r )
 
 WRITE8_MEMBER( s100_device::mwrt_w )
 {
-	for (int i = 0; i < MAX_S100_SLOTS; i++)
+	device_s100_card_interface *entry = m_device_list.first();
+
+	while (entry)
 	{
-		if (m_s100_device[i] != NULL)
-		{
-			m_s100_device[i]->s100_mwrt_w(offset, data);
-		}
+		entry->s100_mwrt_w(offset, data);
+		entry = entry->next();
 	}
 }
 
@@ -215,12 +213,12 @@ READ8_MEMBER( s100_device::sinp_r )
 {
 	UINT8 data = 0;
 
-	for (int i = 0; i < MAX_S100_SLOTS; i++)
+	device_s100_card_interface *entry = m_device_list.first();
+
+	while (entry)
 	{
-		if (m_s100_device[i] != NULL)
-		{
-			data |= m_s100_device[i]->s100_sinp_r(offset);
-		}
+		data |= entry->s100_sinp_r(offset);
+		entry = entry->next();
 	}
 
 	return data;
@@ -233,12 +231,12 @@ READ8_MEMBER( s100_device::sinp_r )
 
 WRITE8_MEMBER( s100_device::sout_w )
 {
-	for (int i = 0; i < MAX_S100_SLOTS; i++)
+	device_s100_card_interface *entry = m_device_list.first();
+
+	while (entry)
 	{
-		if (m_s100_device[i] != NULL)
-		{
-			m_s100_device[i]->s100_sout_w(offset, data);
-		}
+		entry->s100_sout_w(offset, data);
+		entry = entry->next();
 	}
 }
 
@@ -268,13 +266,16 @@ WRITE_LINE_MEMBER( s100_device::error_w ) { m_out_error_func(state); }
 
 WRITE8_MEMBER( s100_device::terminal_receive_w )
 {
-	for (int i = 0; i < MAX_S100_SLOTS; i++)
+	device_s100_card_interface *entry = m_device_list.first();
+
+	while (entry)
 	{
-		if (m_s100_device[i] != NULL && m_s100_device[i]->s100_has_terminal())
+		if (entry->s100_has_terminal())
 		{
-			m_s100_device[i]->s100_terminal_w(data);
+			entry->s100_terminal_w(data);
 			break;
 		}
+		entry = entry->next();
 	}
 }
 
