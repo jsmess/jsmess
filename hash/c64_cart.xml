@@ -5160,22 +5160,8 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>	
-
-	<software name="final3">
-		<description>The Final Cartridge III (1988-13)</description>
-		<year>1988</year>
-		<publisher>Riska H&amp;P</publisher>
-		<part name="cart" interface="c64_cart">
-			<feature name="cart_type" value="final_cartridge_3" />
-			<feature name="exrom" value="1" />
-			<feature name="game" value="1" />
-			<dataarea name="roml" size="0x10000">
-				<rom name="final_cartridge_3_1988-13.bin" size="0x10000" crc="2e9f46b1" sha1="abee8366e2c87b091428a2a81b8d4fee6bdc4bd3" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
 	
-	<software name="final3_8812" cloneof="final3">
+	<software name="final3">
 		<description>The Final Cartridge III (1988-12)</description>
 		<year>1988</year>
 		<publisher>Riska H&amp;P</publisher>
