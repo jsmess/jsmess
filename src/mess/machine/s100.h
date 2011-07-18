@@ -76,9 +76,6 @@
 #define S100_TAG		"s100"
 
 
-#define MAX_S100_SLOTS	16
-
-
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -94,10 +91,10 @@
 	const s100_bus_interface (_name) =
 
 
-#define MCFG_S100_SLOT_ADD(_num, _tag, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_S100_SLOT_ADD(_tag, _slot_intf, _def_slot, _def_inp) \
     MCFG_DEVICE_ADD(_tag, S100_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
-	s100_slot_device::static_set_s100_slot(*device, S100_TAG, _num); \
+	s100_slot_device::static_set_s100_slot(*device, S100_TAG); \
 
 
 
@@ -120,12 +117,11 @@ public:
 	virtual void device_start();
 
     // inline configuration
-    static void static_set_s100_slot(device_t &device, const char *tag, int num);
+    static void static_set_s100_slot(device_t &device, const char *tag);
 
 private:
 	// configuration
 	const char *m_bus_tag;
-	int m_bus_num;
 	s100_device  *m_bus;
 };
 
@@ -172,7 +168,7 @@ public:
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 
-	void add_s100_card(device_s100_card_interface *card, int pos);
+	void add_s100_card(device_s100_card_interface *card);
 
 	DECLARE_READ8_MEMBER( smemr_r );
 	DECLARE_WRITE8_MEMBER( mwrt_w );
@@ -231,7 +227,7 @@ private:
 	devcb_resolved_write_line	m_out_error_func;
 	devcb_resolved_write8		m_out_terminal_func;
 
-	device_s100_card_interface *m_s100_device[MAX_S100_SLOTS];
+	simple_list<device_s100_card_interface> m_device_list;
 	const char *m_cputag;
 };
 
@@ -251,6 +247,8 @@ public:
 	// construction/destruction
 	device_s100_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_s100_card_interface();
+
+	device_s100_card_interface *next() const { return m_next; }
 
 	// interrupts
 	virtual void s100_int_w(int state) { };
@@ -293,6 +291,7 @@ public:
 
 public:
 	s100_device  *m_s100;
+	device_s100_card_interface *m_next;
 };
 
 #endif

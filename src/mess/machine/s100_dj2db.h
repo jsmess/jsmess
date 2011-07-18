@@ -44,6 +44,7 @@ public:
 
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 protected:
 	// device-level overrides
