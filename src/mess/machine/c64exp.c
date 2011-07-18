@@ -179,12 +179,7 @@ bool c64_expansion_slot_device::call_softlist_load(char *swlist, char *swname, r
 
 const char * c64_expansion_slot_device::get_default_card(emu_options &options) const
 {
-	if (strlen(options.value(m_instance_name)) > 0)
-	{
-		return "standard";
-	}
-
-	return m_default_card;	
+	return software_get_default_slot(options, this, m_default_card, "standard");
 }
 
 
@@ -289,6 +284,40 @@ WRITE8_MEMBER( c64_expansion_slot_device::io2_w )
 	{
 		m_cart->c64_cd_w(offset, data, 1, 1, 1, 0);
 	}
+}
+
+
+//-------------------------------------------------
+//  game_r - GAME read
+//-------------------------------------------------
+
+READ_LINE_MEMBER( c64_expansion_slot_device::game_r )
+{
+	int state = 1;
+	
+	if (m_cart != NULL)
+	{
+		state = m_cart->c64_game_r();
+	}
+	
+	return state;
+}
+
+
+//-------------------------------------------------
+//  game_r - EXROM read
+//-------------------------------------------------
+
+READ_LINE_MEMBER( c64_expansion_slot_device::exrom_r )
+{
+	int state = 1;
+	
+	if (m_cart != NULL)
+	{
+		state = m_cart->c64_exrom_r();
+	}
+	
+	return state;
 }
 
 
