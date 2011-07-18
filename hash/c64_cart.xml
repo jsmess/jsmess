@@ -588,7 +588,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		CN1  - RCA video output
 		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="cart_type" value="xl80" />
+			<feature name="slot" value="xl80" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="1" />
 
@@ -4993,6 +4993,189 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 	
 	<software name="final">
+		<description>The Final Cartridge (v4)</description>
+		<year>1986</year>
+		<publisher>Riska H&amp;P</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="final_cartridge_1_v4_1986.bin" size="0x4000" crc="fb4c9356" sha1="d6391d5e3da908f53905f86190ad30dfaa615d39" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="finalint" cloneof="final">
+		<description>The Final Cartridge (Proto)</description>
+		<year>198?</year>
+		<publisher>Riska H&amp;P</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="rom" size="0x6000">
+				<rom name="final_cartridge_internal_27128_eprom.bin" size="0x4000" crc="b648329a" sha1="daa1c5bf42773ee0e187a2063d459955889b033b" offset="0x4000"/>
+				<rom name="final_cartridge_internal_2764_eprom.bin" size="0x2000" crc="03c5e7f9" sha1="b20138182c920ba5c4fce7a58151482094e8c4d1" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="finalv1" cloneof="final">
+		<description>The Final Cartridge (v1)</description>
+		<year>1986</year>
+		<publisher>Riska H&amp;P</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="final_cartridge_1_v1_1986.bin" size="0x4000" crc="913036be" sha1="b2669cdc8de64d4311b44e49f5895c4887d2a9e1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="finalv2" cloneof="final">
+		<description>The Final Cartridge (v2)</description>
+		<year>1986</year>
+		<publisher>Riska H&amp;P</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="final_cartridge_1_v2_1986.bin" size="0x4000" crc="bfbe6ee6" sha1="b08216a5fde0866053ea255eb8ac65ad020f8c32" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="finalv3" cloneof="final">
+		<description>The Final Cartridge (v3)</description>
+		<year>1986</year>
+		<publisher>Riska H&amp;P</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="final_cartridge_1_v3_1986.bin" size="0x4000" crc="30081860" sha1="28af9c1641301d9be02d589d3084e6ff551371ec" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+		
+	<software name="killer" cloneof="final">
+		<description>Killercart</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="final_cartridge_1_1986_killercart_texthack.bin" size="0x4000" crc="1dcb6380" sha1="c7815de1277a864e03307e7d5138c7167da46bd4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="icemchne">
+		<description>The Ice Machine</description>
+		<year>1986</year>
+		<publisher>Eurosystems</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="the_ice_machine_1986.bin" size="0x4000" crc="585e053f" sha1="38e41fda8fa154217a05d7ef637edf68ba7f4ce4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="finalpls">
+		<description>Final Cartridge Plus (v2)</description>
+		<year>1986</year>
+		<publisher>Riska H&amp;P</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="final_cartridge_plus_v2_1987.bin" size="0x8000" crc="15427023" sha1="4afd9465bab6fcc59dc589212f0381f721117404" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="finalplsv1" cloneof="finalpls">
+		<description>Final Cartridge Plus (v1)</description>
+		<year>1986</year>
+		<publisher>Riska H&amp;P</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="final_cartridge_plus_v1_1987.bin" size="0x8000" crc="c372eac4" sha1="53fc6552dea71a05051d83675c7d5469bf93abe4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="finalplsv1a" cloneof="finalpls">
+		<description>Final Cartridge Plus (v1, Alt)</description>
+		<year>1986</year>
+		<publisher>Riska H&amp;P</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="final_cartridge_plus_v1.bin" size="0x8000" crc="a089670c" sha1="f9be25b9f9809941411af7b6c72e882a1c41ed96" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="final2">
+		<description>The Final Cartridge II</description>
+		<year>1987</year>
+		<publisher>Riska H&amp;P</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge_2" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="final_cartridge_2_1987.bin" size="0x4000" crc="57717f60" sha1="07315ec80a0c67907c3f3803bce733b3dc722981" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>	
+
+	<software name="final2pl">
+		<description>The Final Cartridge II (Pol)</description>
+		<year>1986</year>
+		<publisher>Micro-Luc</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge_2" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="final_cartridge_2_1986_polish.bin" size="0x4000" crc="99303e17" sha1="4114d1fee4e5db18ad5df188a0f16e4646698b98" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>	
+
+	<software name="final3">
+		<description>The Final Cartridge III (1988-13)</description>
+		<year>1988</year>
+		<publisher>Riska H&amp;P</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="final_cartridge_3" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="final_cartridge_3_1988-13.bin" size="0x10000" crc="2e9f46b1" sha1="abee8366e2c87b091428a2a81b8d4fee6bdc4bd3" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="final3_8812" cloneof="final3">
 		<description>The Final Cartridge III (1988-12)</description>
 		<year>1988</year>
 		<publisher>Riska H&amp;P</publisher>
@@ -5001,12 +5184,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-				<rom name="final cartridge iii (1988-12)(riska h&amp;p).80" size="0x10000" crc="83e54062" sha1="f1ee8d32ad5deeb3c3ebb516382a6c94090353e6" offset="0x0000" />
+				<rom name="final_cartridge_3_1988-12.bin" size="0x10000" crc="83e54062" sha1="f1ee8d32ad5deeb3c3ebb516382a6c94090353e6" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-	
-	<software name="final2" cloneof="final">
+
+	<software name="final3_8805" cloneof="final">
 		<description>The Final Cartridge III (1988-05)</description>
 		<year>1988</year>
 		<publisher>Riska H&amp;P</publisher>
@@ -5015,12 +5198,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-					<rom name="final cartridge iii (1988-05)(riska h&amp;p).80" size="0x10000" crc="0d54e680" sha1="85870c1608538169fbae0563e8a3ac8d3ead12a1" offset="0x0000" />
+					<rom name="final_cartridge_3_1988-05.bin" size="0x10000" crc="0d54e680" sha1="85870c1608538169fbae0563e8a3ac8d3ead12a1" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 	
-	<software name="final3" cloneof="final">
+	<software name="final3_8711" cloneof="final">
 		<description>The Final Cartridge III (1987-11)</description>
 		<year>1987</year>
 		<publisher>Riska H&amp;P</publisher>
@@ -5029,12 +5212,12 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-					<rom name="final cartridge iii (1987-11)(riska h&amp;p).80" size="0x10000" crc="e3257fd5" sha1="be832850972f909a204f633011898a5ddab0b8f0" offset="0x0000" />
+					<rom name="final_cartridge_3_1987-11.bin" size="0x10000" crc="e3257fd5" sha1="be832850972f909a204f633011898a5ddab0b8f0" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 	
-	<software name="final4" cloneof="final">
+	<software name="final3_8709" cloneof="final">
 		<description>The Final Cartridge III (1987-09)</description>
 		<year>1987</year>
 		<publisher>Riska H&amp;P</publisher>
@@ -5043,7 +5226,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-					<rom name="final cartridge iii (1987-09)(riska h&amp;p).80" size="0x10000" crc="eeab7bc3" sha1="a1f40b46df36161419092b7b8d7a085e821070d5" offset="0x0000" />
+					<rom name="final_cartridge_3_1987-09.bin" size="0x10000" crc="eeab7bc3" sha1="a1f40b46df36161419092b7b8d7a085e821070d5" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
