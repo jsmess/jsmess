@@ -2062,7 +2062,7 @@ void video_update_vdp1(running_machine &machine)
 		case 1:/*Draw by request*/
 			break;
 		case 2:/*Automatic Draw*/
-			//if ( framebuffer_changed )
+			if ( framebuffer_changed )
 			{
 				/*set CEF to 1*/
 				stv_vdp1_process_list(machine);
