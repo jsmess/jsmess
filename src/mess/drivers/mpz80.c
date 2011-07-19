@@ -810,11 +810,14 @@ ROM_START( mpz80 )
 	ROM_SYSTEM_BIOS( 2, "447", "4.47" )
 	ROMX_LOAD( "mon 4.47 f4f6.17c", 0x0000, 0x1000, CRC(b99c5d7f) SHA1(11181432ee524c7e5a68ead0671fc945256f5d1b), ROM_BIOS(3) )
 
-	ROM_REGION( 0x20, "proms", 0 )
-	ROM_LOAD( "z80-2 15a.15a", 0x00, 0x20, CRC(8a84249d) SHA1(dfbc49c5944f110f48419fd893fa84f4f0e113b8) ) // this is actually the 6331 PROM?
+	ROM_REGION( 0x20, "s100rev2", 0 )
+	ROM_LOAD( "z80-2 15a.15a", 0x00, 0x20, CRC(8a84249d) SHA1(dfbc49c5944f110f48419fd893fa84f4f0e113b8) ) // 82S123 or 6331
 
-	ROM_REGION( 0x20, "plds", 0 )
-	ROM_LOAD( "z80-2 5c.5c", 0x00, 0x20, NO_DUMP )
+	ROM_REGION( 0xeb, "s100rev3", 0 )
+	ROM_LOAD( "z80-15a-a.15a", 0x00, 0xeb, CRC(713243cd) SHA1(802b318cc9795d87f03622e878d9a4d5d7dea7d4) ) // 82S153
+
+	ROM_REGION( 0x104, "mm1", 0 )
+	ROM_LOAD( "z80-2 5c.5c", 0x000, 0x104, CRC(732be0cd) SHA1(545a37e5a871fcd1bb59b30056b837f03889b4d5) ) // PAL16R4
 ROM_END
 
 
@@ -824,7 +827,7 @@ ROM_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  DRIVER_INIT( abc800c )
+//  DRIVER_INIT( mpz80 )
 //-------------------------------------------------
 
 DIRECT_UPDATE_HANDLER( mpz80_direct_update_handler )
