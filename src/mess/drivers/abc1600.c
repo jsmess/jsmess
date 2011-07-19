@@ -357,7 +357,11 @@ UINT8 abc1600_state::read_user_memory(offs_t offset)
 
 	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
 
-	//if (PAGE_NONX) BUS ERROR
+	if (PAGE_NONX)
+	{
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	}
 
 	UINT8 data = 0;
 
@@ -387,7 +391,13 @@ void abc1600_state::write_user_memory(offs_t offset, UINT8 data)
 	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
 
 	if (!PAGE_WP) return;
-	//if (PAGE_NONX) BUS ERROR
+
+	if (PAGE_NONX)
+	{
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+		return;
+	}
 
 	if (virtual_offset < 0x1fe000)
 	{
