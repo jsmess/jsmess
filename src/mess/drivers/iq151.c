@@ -45,6 +45,8 @@ ToDo:
 #include "machine/i8255.h"
 #include "sound/speaker.h"
 #include "imagedev/cartslot.h"
+#include "machine/upd765.h"
+#include "formats/basicdsk.h"
 
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
@@ -59,12 +61,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_pic(*this, "pic8259"),
-		  m_speaker(*this, SPEAKER_TAG)
+		  m_speaker(*this, SPEAKER_TAG),
+		  m_fdc(*this, "fdc")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_pic;
 	required_device<device_t> m_speaker;
+	required_device<device_t> m_fdc;
 
 	DECLARE_READ8_MEMBER(keyboard_row_r);
 	DECLARE_READ8_MEMBER(keyboard_column_r);
@@ -122,6 +126,7 @@ static ADDRESS_MAP_START(iq151_mem, AS_PROGRAM, 8, iq151_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("boot")
 	AM_RANGE( 0x0800, 0x7fff ) AM_RAM
+	AM_RANGE( 0xe000, 0xe7ff ) AM_ROM AM_REGION("disc2", 0)
 	AM_RANGE( 0xe800, 0xefff ) AM_RAM AM_BASE(m_p_videoram)		// on Video 32/64 cartridge
 	AM_RANGE( 0xf000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
@@ -131,6 +136,8 @@ static ADDRESS_MAP_START(iq151_io, AS_IO, 8, iq151_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x84, 0x87 ) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE( 0x88, 0x89 ) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w )
+	AM_RANGE( 0xaa, 0xaa ) AM_DEVREAD_LEGACY("fdc", upd765_status_r)
+	AM_RANGE( 0xab, 0xab ) AM_DEVREADWRITE_LEGACY("fdc", upd765_data_r, upd765_data_w)
 	AM_RANGE( 0xfe, 0xfe ) AM_READ_PORT("FE")
 ADDRESS_MAP_END
 
@@ -453,6 +460,37 @@ static I8255_INTERFACE( iq151_ppi8255_intf )
 	DEVCB_DRIVER_MEMBER(iq151_state, speaker_w)
 };
 
+static FLOPPY_OPTIONS_START( iq151 )
+	FLOPPY_OPTION( iq151_disk, "iqd", "IQ-151 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+		HEADS([1])
+		TRACKS([77])
+		SECTORS([26])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_interface iq151_floppy_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_8_SSSD,
+	FLOPPY_OPTIONS_NAME(iq151),
+	"floppy_8",
+	NULL
+};
+
+static const upd765_interface iq151_fdc_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL,
+	UPD765_RDY_PIN_NOT_CONNECTED,
+	{ NULL, FLOPPY_0, FLOPPY_1, NULL }
+};
+
 static MACHINE_CONFIG_START( iq151, iq151_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
@@ -479,6 +517,9 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_PIC8259_ADD("pic8259", iq151_pic8259_config)
 
 	MCFG_I8255_ADD("ppi8255", iq151_ppi8255_intf)
+
+	MCFG_UPD72065_ADD("fdc", iq151_fdc_intf)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(iq151_floppy_intf)
 
 	/* cartridge */
 	// On real hardware only 4 slots are available, because one
@@ -515,10 +556,8 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( iq151 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE )
 	/* A number of bios versions here. The load address is shown for each */
-	ROM_LOAD( "iq151_disc2_12_5_1987_v4_0.rom", 0xe000, 0x0800, CRC(b189b170) SHA1(3e2ca80934177e7a32d0905f5a0ad14072f9dabf))
-
 	ROM_SYSTEM_BIOS( 0, "orig", "Original" )
 	ROMX_LOAD( "iq151_monitor_orig.rom", 0xf000, 0x1000, CRC(acd10268) SHA1(4d75c73f155ed4dc2ac51a9c22232f869cca95e2),ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "disasm", "Disassembler" )
@@ -531,6 +570,9 @@ ROM_START( iq151 )
 	ROM_REGION( 0x0c00, "chargen", ROMREGION_INVERT )
 	ROM_LOAD( "iq151_video64font.rom", 0x0000, 0x0800, CRC(cb6f43c0) SHA1(4b2c1d41838d569228f61568c1a16a8d68b3dadf))
 	ROM_LOAD( "iq151_video32font.rom", 0x0800, 0x0400, CRC(395567a7) SHA1(18800543daf4daed3f048193c6ae923b4b0e87db))
+
+	ROM_REGION( 0x0800, "disc2", 0 )
+	ROM_LOAD( "iq151_disc2_12_5_1987_v4_0.rom", 0x0000, 0x0800, CRC(b189b170) SHA1(3e2ca80934177e7a32d0905f5a0ad14072f9dabf))
 ROM_END
 
 /* Driver */
