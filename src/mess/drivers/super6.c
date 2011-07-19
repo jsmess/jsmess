@@ -197,7 +197,7 @@ READ8_MEMBER( super6_state::fdc_r )
 
     */
 
-	// TODO reading this port should halt the CPU until an INTRQ or DRQ from the FDC
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 
 	return !wd17xx_intrq_r(m_fdc) << 7;
 }
@@ -474,14 +474,14 @@ static const floppy_interface super6_floppy_interface =
 
 WRITE_LINE_MEMBER( super6_state::intrq_w )
 {
-	// TODO allow CPU to continue reading port 14
+	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 
 	z80ctc_trg3_w(m_ctc, !state);
 }
 
 WRITE_LINE_MEMBER( super6_state::drq_w )
 {
-	// TODO allow CPU to continue reading port 14
+	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 
 	m_dma->rdy_w(state);
 }

@@ -300,22 +300,14 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
 	m_fdc_irq = state;
 	z80pio_pb_w(m_pio, 0, state << 7);
 
-	if (state)
-	{
-		// TODO: this is really connected to the Z80 WAIT line
-		device_set_input_line(m_maincpu, INPUT_LINE_HALT, CLEAR_LINE);
-	}
+	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 {
 	m_fdc_drq = state;
 
-	if (state)
-	{
-		// TODO: this is really connected to the Z80 WAIT line
-		device_set_input_line(m_maincpu, INPUT_LINE_HALT, CLEAR_LINE);
-	}
+	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
 
 static const wd17xx_interface fdc_intf =
@@ -554,8 +546,8 @@ void luxor_55_10828_device::abcbus_c1(UINT8 data)
 {
 	if (m_cs)
 	{
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 
@@ -568,8 +560,8 @@ void luxor_55_10828_device::abcbus_c3(UINT8 data)
 {
 	if (m_cs)
 	{
-		device_set_input_line(m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
-		device_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 }
 
@@ -663,8 +655,8 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 
 	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
 	{
-		// TODO: this is really connected to the Z80 WAIT line
-		device_set_input_line(m_maincpu, INPUT_LINE_HALT, ASSERT_LINE);
+		logerror("WAIT\n");
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	}
 
 	switch (offset & 0x03)
@@ -688,8 +680,7 @@ WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
 	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
 	{
 		logerror("WAIT\n");
-		// TODO: this is really connected to the Z80 WAIT line
-		device_set_input_line(m_maincpu, INPUT_LINE_HALT, ASSERT_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	}
 
 	switch (offset & 0x03)

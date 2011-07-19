@@ -80,7 +80,7 @@ static COM8116_INTERFACE( brg_intf )
 
 WRITE_LINE_MEMBER( s100_dj2db_device::fdc_intrq_w )
 {
-	m_s100->rdy_w(CLEAR_LINE);
+	if (state) m_s100->rdy_w(CLEAR_LINE);
 	
 	switch (input_port_read(this, "J1A"))
 	{
@@ -98,7 +98,7 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_intrq_w )
 
 WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
 {
-	m_s100->rdy_w(CLEAR_LINE);
+	if (state) m_s100->rdy_w(CLEAR_LINE);
 }
 
 static const wd17xx_interface fdc_intf =
