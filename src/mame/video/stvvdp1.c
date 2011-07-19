@@ -350,7 +350,7 @@ WRITE32_HANDLER ( saturn_vdp1_framebuffer0_w )
 	if ( STV_VDP1_TVM & 1 )
 	{
 		/* 8-bit mode */
-		printf("%08x %02x\n",offset,data);
+		printf("VDP1 8-bit mode %08x %02x\n",offset,data);
 	}
 	else
 	{
@@ -374,7 +374,7 @@ READ32_HANDLER ( saturn_vdp1_framebuffer0_r )
 	if ( STV_VDP1_TVM & 1 )
 	{
 		/* 8-bit mode */
-		printf("%08x\n",offset);
+		printf("VDP1 8-bit mode %08x\n",offset);
 	}
 	else
 	{
@@ -2062,7 +2062,7 @@ void video_update_vdp1(running_machine &machine)
 		case 1:/*Draw by request*/
 			break;
 		case 2:/*Automatic Draw*/
-			if ( framebuffer_changed )
+			//if ( framebuffer_changed )
 			{
 				/*set CEF to 1*/
 				stv_vdp1_process_list(machine);
