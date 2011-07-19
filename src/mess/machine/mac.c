@@ -3008,6 +3008,10 @@ void mac_state::machine_reset()
 			m_via_cycles = -80;
 			break;
 
+		case 66000000:	// 66 MHz PowerMac
+			m_via_cycles = -130;
+			break;
+
 		default:
 			fatalerror("mac: unknown clock\n");
 			break;
@@ -3101,8 +3105,11 @@ static void mac_state_load(mac_state *mac)
 {
 	int overlay;
 	overlay = mac->m_overlay;
-	mac->m_overlay = -1;
-	mac->set_memory_overlay(overlay);
+	if (mac->m_model < MODEL_MAC_POWERMAC_6100)	// no overlay for PowerPC
+	{
+		mac->m_overlay = -1;
+		mac->set_memory_overlay(overlay);
+	}
 }
 
 
@@ -3164,7 +3171,10 @@ static void mac_driver_init(running_machine &machine, model_t model)
 	}
 
 	mac->m_overlay = -1;
-	mac->set_memory_overlay(1);
+	if (mac->m_model < MODEL_MAC_POWERMAC_6100)	// no overlay for PowerPC
+	{
+		mac->set_memory_overlay(1);
+	}
 
 	memset(ram_get_ptr(mac->m_ram), 0, ram_get_size(mac->m_ram));
 
