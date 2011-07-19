@@ -774,8 +774,18 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 			else	// play until the end of the disc
 			{
-				fadstoplay = (cdrom_get_track_start(cdrom, 0xaa)) - cd_curfad;
-				printf("track mode %08x %08x\n",cd_curfad,fadstoplay);
+				UINT32 start_pos;
+
+				start_pos = ((cr1&0xff)<<16) | cr2;
+
+				/* Galaxy Fight calls 10ff ffff ffff ffff, is it a valid command? */
+				if(start_pos != 0xffffff)
+				{
+					fadstoplay = (cdrom_get_track_start(cdrom, 0xaa)) - cd_curfad;
+					printf("track mode %08x %08x\n",cd_curfad,fadstoplay);
+				}
+				else
+					printf("Illegal play call?\n");
 			}
 
 			CDROM_LOG(("CD: Play Disc: start %x length %x\n", cd_curfad, fadstoplay))
