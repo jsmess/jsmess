@@ -29,10 +29,6 @@ ToDo:
 - Line 32 does not scroll, should it show?
   (could be reserved for a status line in a terminal mode)
 
-- Sort out the issue with memory location 6. If it isn't zero the computer hangs.
-  But if it is always forced to zero, the keys repeat way too fast. Timer
-  currently set to 3Hz for reasonable repeat, but it is far from perfect.
-
 - Note that the system checks for 3E at C000, if exist, jump to C000;
   otherwise then checks for non-FF at C800, if so, jumps to C800. Could be
   extra roms or some sort of boot device.
@@ -45,6 +41,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/pic8259.h"
 #include "sound/speaker.h"
 #include "imagedev/cartslot.h"
 
@@ -59,21 +56,25 @@ class iq151_state : public driver_device
 public:
 	iq151_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_speaker(*this, SPEAKER_TAG)
+		  m_maincpu(*this, "maincpu"),
+		  m_pic(*this, "pic8259"),
+		  m_speaker(*this, SPEAKER_TAG)
 	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_pic;
 	required_device<device_t> m_speaker;
+
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(speaker_w);
-	UINT8 *m_p_ram;
+	DECLARE_WRITE_LINE_MEMBER(pic_set_int_line);
 	UINT8 *m_p_videoram;
+	UINT8 m_vblank_irq_state;
 	const UINT8 *m_p_chargen;
-	UINT8 m_framecnt;
 	UINT8 m_width;
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-
 
 	// AMOS
 	UINT8 *m_amos_banks[4];
@@ -132,6 +133,7 @@ static ADDRESS_MAP_START(iq151_io, AS_IO, 8, iq151_state)
 	AM_RANGE( 0x84, 0x85 ) AM_READ(keyboard_r)
 	AM_RANGE( 0x86, 0x86 ) AM_READ_PORT("X8")
 	AM_RANGE( 0x87, 0x87 ) AM_WRITE(speaker_w)
+	AM_RANGE( 0x88, 0x89 ) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w )
 	AM_RANGE( 0xfe, 0xfe ) AM_READ_PORT("FE")
 ADDRESS_MAP_END
 
@@ -236,10 +238,24 @@ static TIMER_CALLBACK( iq151_boot )
 	memory_set_bank(machine, "boot", 0);
 }
 
-static TIMER_DEVICE_CALLBACK( iq151a )
+WRITE_LINE_MEMBER( iq151_state::pic_set_int_line )
 {
-	iq151_state *state = timer.machine().driver_data<iq151_state>();
-	state->m_p_ram[6]=0; // fixme
+	device_set_input_line(m_maincpu, 0, state ?  HOLD_LINE : CLEAR_LINE);
+}
+
+static INTERRUPT_GEN( iq151_vblank_interrupt )
+{
+	iq151_state *state = device->machine().driver_data<iq151_state>();
+
+	pic8259_ir6_w(state->m_pic, state->m_vblank_irq_state & 1);
+	state->m_vblank_irq_state ^= 1;
+}
+
+static IRQ_CALLBACK(iq151_irq_callback)
+{
+	iq151_state *state = device->machine().driver_data<iq151_state>();
+
+	return pic8259_acknowledge(state->m_pic);
 }
 
 DRIVER_INIT( iq151 )
@@ -250,6 +266,8 @@ DRIVER_INIT( iq151 )
 	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xf800);
 
 	memset(state->m_amos_banks, 0, sizeof(state->m_amos_banks));
+
+	device_set_irq_callback(state->m_maincpu, iq151_irq_callback);
 }
 
 MACHINE_RESET_MEMBER( iq151_state )
@@ -258,12 +276,13 @@ MACHINE_RESET_MEMBER( iq151_state )
 	machine().primary_screen->set_visible_area(0, (m_width == 32 ? 32*8 : 64*6)-1, 0, 32*8-1);
 	memory_set_bank(machine(), "boot", 1);
 	machine().scheduler().timer_set(attotime::from_usec(5), FUNC(iq151_boot));
+
+	m_vblank_irq_state = 0;
 }
 
 VIDEO_START_MEMBER( iq151_state )
 {
 	m_p_chargen = machine().region("chargen")->base();
-	m_p_ram = machine().region("maincpu")->base();
 	m_width = 32;
 }
 
@@ -275,10 +294,7 @@ SCREEN_UPDATE_MEMBER( iq151_state )
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,x;
 	UINT16 chrstart = (m_width == 32) ? 0x800 : 0; // choose which charrom to use
-	UINT16 ma = m_p_ram[0x20] | ((m_p_ram[0x21] & 7) << 8); // start of videoram
-	UINT16 cursor = m_p_ram[0x0c] | ((m_p_ram[0x0d] & 7) << 8); // cursor address
-
-	m_framecnt++;
+	UINT16 ma = (m_width == 32) ? 0x400 : 0; // start of videoram
 
 	for (y = 0; y < 32; y++)
 	{
@@ -296,10 +312,6 @@ SCREEN_UPDATE_MEMBER( iq151_state )
 				// in Video 32, chars above 0x7f have colors inverted
 				if (m_width == 32 && m_p_videoram[x] > 0x7f)
 					gfx = ~gfx;
-
-				//display cursor if at cursor position and flash on
-				if ( (x==cursor) && (m_framecnt & 0x08) )
-					gfx = 0xff;
 
 				/* Display a scanline of a character */
 				if (m_width == 32)
@@ -328,7 +340,7 @@ SCREEN_UPDATE_MEMBER( iq151_state )
 
 WRITE8_MEMBER(iq151_state::amos_bankswitch_w)
 {
-	address_space *prog_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *prog_space = m_maincpu->memory().space(AS_PROGRAM);
 
 	if (m_amos_banks[data & 3] != NULL)
 		prog_space->install_rom(0x8000, 0xbfff, m_amos_banks[data & 3]);
@@ -339,11 +351,13 @@ WRITE8_MEMBER(iq151_state::amos_bankswitch_w)
 
 static DEVICE_IMAGE_LOAD( iq151_cart )
 {
+	iq151_state *state = image.device().machine().driver_data<iq151_state>();
+
 	if (image.software_entry() != NULL)
 	{
 		// get the cartridge type
 		const char *cart_type = image.get_feature("cart_type");
-		address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 
 		if (!strcmp(cart_type, "BASIC6"))
 		{
@@ -362,7 +376,6 @@ static DEVICE_IMAGE_LOAD( iq151_cart )
 		else if (!strncmp(cart_type, "AMOS", 4))
 		{
 			// AMOS cartridges
-			iq151_state *state = image.device().machine().driver_data<iq151_state>();
 
 			switch ((const char)cart_type[4])
 			{
@@ -379,7 +392,7 @@ static DEVICE_IMAGE_LOAD( iq151_cart )
 			}
 
 			// install AMOS bankswitch handler
-			address_space *io = image.device().machine().device("maincpu")->memory().space(AS_IO);
+			address_space *io = state->m_maincpu->memory().space(AS_IO);
 			io->install_write_handler(0xec, 0xef, write8_delegate(FUNC(iq151_state::amos_bankswitch_w), state));
 
 			return IMAGE_INIT_PASS;
@@ -426,11 +439,19 @@ static GFXDECODE_START( iq151 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, iq151_64_charlayout, 0, 1 )
 GFXDECODE_END
 
+const struct pic8259_interface iq151_pic8259_config =
+{
+	DEVCB_DRIVER_LINE_MEMBER(iq151_state, pic_set_int_line),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( iq151, iq151_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(iq151_mem)
 	MCFG_CPU_IO_MAP(iq151_io)
+	MCFG_CPU_VBLANK_INT("screen", iq151_vblank_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -448,7 +469,7 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_TIMER_ADD_PERIODIC("iq151a", iq151a, attotime::from_hz(3) )
+	MCFG_PIC8259_ADD("pic8259", iq151_pic8259_config)
 
 	/* cartridge */
 	// On real hardware only 4 slots are available, because one
