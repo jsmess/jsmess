@@ -28,7 +28,7 @@ enum
 
 int imgtool_floppy_make_class(int index, imgtool_class *imgclass);
 
-floppy_image *imgtool_floppy(imgtool_image *img);
+floppy_image_legacy *imgtool_floppy(imgtool_image *img);
 imgtoolerr_t imgtool_floppy_error(floperr_t err);
 
 imgtoolerr_t imgtool_floppy_read_sector_to_stream(imgtool_image *img, int head, int track, int sector, int offset, size_t length, imgtool_stream *f);

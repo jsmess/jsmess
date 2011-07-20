@@ -94,7 +94,7 @@ static const struct io_procs imgtool_noclose_ioprocs =
 
 struct imgtool_floppy_image
 {
-	floppy_image *floppy;
+	floppy_image_legacy *floppy;
 };
 
 
@@ -297,7 +297,7 @@ int imgtool_floppy_make_class(int index, imgtool_class *imgclass)
 
 
 
-floppy_image *imgtool_floppy(imgtool_image *img)
+floppy_image_legacy *imgtool_floppy(imgtool_image *img)
 {
 	struct imgtool_floppy_image *fimg;
 	fimg = (struct imgtool_floppy_image *) imgtool_image_extra_bytes(img);
@@ -309,7 +309,7 @@ floppy_image *imgtool_floppy(imgtool_image *img)
 static imgtoolerr_t imgtool_floppy_transfer_sector_tofrom_stream(imgtool_image *img, int head, int track, int sector, int offset, size_t length, imgtool_stream *f, int direction)
 {
 	floperr_t err;
-	floppy_image *floppy;
+	floppy_image_legacy *floppy;
 	void *buffer = NULL;
 
 	floppy = imgtool_floppy(img);
