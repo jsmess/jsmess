@@ -642,6 +642,6 @@ CONS( 1987, nespal,    nes,    0,     nespal,   nes,     0,       "Nintendo",  "
 CONS( 1983, famicom,   nes,    0,     famicom,  famicom, famicom, "Nintendo",  "Famicom (w/ Disk System add-on)", GAME_IMPERFECT_GRAPHICS )
 CONS( 1983, fami_key,  nes,    0,     famicom,  famikey, famicom, "Nintendo",  "Famicom (w/ Disk System add-on + Keyboard add-on)", GAME_IMPERFECT_GRAPHICS )
 CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, famicom, "Sharp",     "Famicom Twin", GAME_IMPERFECT_GRAPHICS )
-CONS( 198?, m82,       nes,    0,     nes,      nes,     0,       "Nintendo",  "M82 Display Unit", GAME_IMPERFECT_GRAPHICS )
+CONS( 198?, m82,       nes,    0,     nes,      nes,     0,       "Nintendo",  "M82 Display Unit", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 CONS( 1996, drpcjr,    nes,    0,     famicom,  famicom, famicom, "Bung",      "Doctor PC Jr", GAME_IMPERFECT_GRAPHICS )
 CONS( 1992, dendy,     nes,    0,     dendy,    nes,     0,       "Steepler",  "Dendy Classic", GAME_IMPERFECT_GRAPHICS )
