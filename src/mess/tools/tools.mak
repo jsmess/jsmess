@@ -24,6 +24,9 @@ include $(MESSSRC)/tools/castool/castool.mak
 TOOLS += $(CASTOOL)
 endif
 
+include $(MESSSRC)/tools/floptool/floptool.mak
+TOOLS += $(FLOPTOOL)
+
 #ifdef BUILD_MESSTEST
 #include $(MESSSRC)/tools/messtest/messtest.mak
 #TOOLS += $(MESSTEST)
