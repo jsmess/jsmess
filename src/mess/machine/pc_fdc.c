@@ -458,7 +458,7 @@ static void pcjr_fdc_dor_w(running_machine &machine, UINT8 data)
 static void pc_fdc_check_data_rate(running_machine &machine)
 {
 	device_t *device = floppy_get_device(machine, fdc->digital_output_register & 0x03);
-	floppy_image *image;
+	floppy_image_legacy *image;
 	int tracks, sectors, rate;
 
 	upd765_set_bad(pc_get_device(machine), 0); // unset in case format is unknown

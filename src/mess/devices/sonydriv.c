@@ -111,7 +111,7 @@ static void load_track_data(device_t *device,int floppy_select)
 	f = &sony.floppy[floppy_select];
 	cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, floppy_select));
 
-	floppy_image *fimg = flopimg_get_image(&cur_image->device());
+	floppy_image_legacy *fimg = flopimg_get_image(&cur_image->device());
 
 	if (!fimg)
 	{
@@ -325,7 +325,7 @@ int sony_read_status(device_t *device)
 		case 0x09:	/* Number of sides: 0=single sided, 1=double sided */
 			if (cur_image)
 			{
-				floppy_image *fimg = flopimg_get_image(&cur_image->device());
+				floppy_image_legacy *fimg = flopimg_get_image(&cur_image->device());
 				if (fimg)
 				{
 					result = floppy_get_heads_per_disk(fimg) - 1;

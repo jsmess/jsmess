@@ -270,7 +270,7 @@ INLINE smc92x4_state *get_safe_token(device_t *device)
 
 static int image_is_single_density(device_t *current_floppy)
 {
-	floppy_image *image = flopimg_get_image(current_floppy);
+	floppy_image_legacy *image = flopimg_get_image(current_floppy);
 	return (floppy_get_track_size(image, 0, 0)<4000);
 }
 
@@ -1483,7 +1483,7 @@ static void format_floppy_track(device_t *device, int flags)
 	smc92x4_state *w = get_safe_token(device);
 	device_t *current_floppy = NULL;
 
-	floppy_image *floppy;
+	floppy_image_legacy *floppy;
 	int i,index,j, exp_size;
 	int gap0, gap1, gap2, gap3, gap4, sync1, sync2, count, size, fm;
 	int gap_byte, pre_gap, crc, mark, inam;
@@ -1768,7 +1768,7 @@ static void read_floppy_track(device_t *device, int transfer_only_ids)
 	smc92x4_state *w = get_safe_token(device);
 	device_t *current_floppy = (*w->intf->current_floppy)(device);
 
-	floppy_image *floppy;
+	floppy_image_legacy *floppy;
 	/* Determine the track size. We cannot allow different sizes in this design. */
 	int data_count = 0;
 	int i;

@@ -312,7 +312,7 @@ static WRITE8_HANDLER( smc777_fbuf_w )
 static void check_floppy_inserted(running_machine &machine)
 {
 	int f_num;
-	floppy_image *floppy;
+	floppy_image_legacy *floppy;
 
 	/* check if a floppy is there, automatically disconnect the ready line if so (HW doesn't control the ready line) */
 	/* FIXME: floppy drive 1 doesn't work? */
