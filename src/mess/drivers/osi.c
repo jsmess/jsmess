@@ -693,14 +693,14 @@ void c1pmf_state::machine_start()
 	c1p_state::machine_start();
 }
 
-static FLOPPY_OPTIONS_START(osi)
-	FLOPPY_OPTION(osi, "img", "OSI disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START(osi)
+	LEGACY_FLOPPY_OPTION(osi, "img", "OSI disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([36])
 		SECTORS([10])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface osi_floppy_interface =
 {
@@ -710,7 +710,7 @@ static const floppy_interface osi_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
-	FLOPPY_OPTIONS_NAME(osi),
+	LEGACY_FLOPPY_OPTIONS_NAME(osi),
 	NULL,
 	NULL
 };

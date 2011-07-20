@@ -173,23 +173,23 @@ static const mc6845_interface kaypro2x_crtc = {
     Machine Driver
 
 ************************************************************/
-static FLOPPY_OPTIONS_START(kayproii)
-	FLOPPY_OPTION(kayproii, "dsk", "Kaypro II disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START(kayproii)
+	LEGACY_FLOPPY_OPTION(kayproii, "dsk", "Kaypro II disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([10])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
-static FLOPPY_OPTIONS_START(kaypro2x)
-	FLOPPY_OPTION(kaypro2x, "dsk", "Kaypro 2x disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START(kaypro2x)
+	LEGACY_FLOPPY_OPTION(kaypro2x, "dsk", "Kaypro 2x disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([10])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface kayproii_floppy_interface =
 {
@@ -199,7 +199,7 @@ static const floppy_interface kayproii_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(kayproii),
+	LEGACY_FLOPPY_OPTIONS_NAME(kayproii),
 	NULL,
 	NULL
 };
@@ -211,7 +211,7 @@ static const floppy_interface kaypro2x_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(kaypro2x),
+	LEGACY_FLOPPY_OPTIONS_NAME(kaypro2x),
 	NULL,
 	NULL
 };

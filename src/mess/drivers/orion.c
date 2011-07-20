@@ -87,20 +87,20 @@ static const cassette_interface orion_cassette_interface =
 	NULL
 };
 
-static FLOPPY_OPTIONS_START(orion)
-	FLOPPY_OPTION(orion, "odi,img", "Orion disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START(orion)
+	LEGACY_FLOPPY_OPTION(orion, "odi,img", "Orion disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([5])
 		SECTOR_LENGTH([1024])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(orion_lk, "odi,img", "Lucksian Key Orion disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+	LEGACY_FLOPPY_OPTION(orion_lk, "odi,img", "Lucksian Key Orion disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([9])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const wd17xx_interface orion_wd17xx_interface =
 {
@@ -118,7 +118,7 @@ static const floppy_interface orion_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(orion),
+	LEGACY_FLOPPY_OPTIONS_NAME(orion),
 	NULL,
 	NULL
 };

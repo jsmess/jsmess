@@ -496,14 +496,14 @@ static const cassette_interface cgenie_cassette_interface =
 };
 
 // This is currently broken
-static FLOPPY_OPTIONS_START(cgenie )
-	FLOPPY_OPTION( cgd, "cgd", "Colour Genie disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START(cgenie )
+	LEGACY_FLOPPY_OPTION( cgd, "cgd", "Colour Genie disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([40])
 		SECTORS([10])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface cgenie_floppy_interface =
 {
@@ -513,7 +513,7 @@ static const floppy_interface cgenie_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(cgenie),
+	LEGACY_FLOPPY_OPTIONS_NAME(cgenie),
 	NULL,
 	NULL
 };

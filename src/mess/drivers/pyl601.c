@@ -496,14 +496,14 @@ static INTERRUPT_GEN( pyl601_interrupt )
 	device_set_input_line(device, 0, HOLD_LINE);
 }
 
-static FLOPPY_OPTIONS_START(pyldin)
-	FLOPPY_OPTION(pyldin, "img", "Pyldin disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START(pyldin)
+	LEGACY_FLOPPY_OPTION(pyldin, "img", "Pyldin disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([9])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface pyldin_floppy_interface =
 {
@@ -513,7 +513,7 @@ static const floppy_interface pyldin_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(pyldin),
+	LEGACY_FLOPPY_OPTIONS_NAME(pyldin),
 	NULL,
 	NULL
 };

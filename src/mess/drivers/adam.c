@@ -1539,14 +1539,14 @@ static const cassette_interface adam_cassette_interface =
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
-static FLOPPY_OPTIONS_START( adam )
-	FLOPPY_OPTION( adam, "dsk", "Coleco Adam floppy disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START( adam )
+	LEGACY_FLOPPY_OPTION( adam, "dsk", "Coleco Adam floppy disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([8])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface adam_floppy_interface =
 {
@@ -1556,7 +1556,7 @@ static const floppy_interface adam_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
-	FLOPPY_OPTIONS_NAME(adam),
+	LEGACY_FLOPPY_OPTIONS_NAME(adam),
 	NULL,
 	NULL
 };

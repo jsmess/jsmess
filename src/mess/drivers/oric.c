@@ -369,7 +369,7 @@ static const floppy_interface oric1_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(oric),
+	LEGACY_FLOPPY_OPTIONS_NAME(oric),
 	NULL,
 	NULL
 };
@@ -382,7 +382,7 @@ static const floppy_interface prav8d_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(apple2),
+	LEGACY_FLOPPY_OPTIONS_NAME(apple2),
 	NULL,
 	NULL
 };

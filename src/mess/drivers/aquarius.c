@@ -446,9 +446,9 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","aquarius")
 MACHINE_CONFIG_END
 
-static FLOPPY_OPTIONS_START(aquarius)
+static LEGACY_FLOPPY_OPTIONS_START(aquarius)
 	/* 128K images, 64K/side */
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface aquarius_floppy_interface =
 {
@@ -458,7 +458,7 @@ static const floppy_interface aquarius_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(aquarius),
+	LEGACY_FLOPPY_OPTIONS_NAME(aquarius),
 	NULL,
 	NULL
 };

@@ -868,7 +868,7 @@ static const floppy_interface amiga_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSHD,
-	FLOPPY_OPTIONS_NAME(amiga_only),
+	LEGACY_FLOPPY_OPTIONS_NAME(amiga_only),
 	NULL,
 	NULL
 };

@@ -1405,9 +1405,9 @@ static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
 	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
 
-static FLOPPY_OPTIONS_START(newbrain)
+static LEGACY_FLOPPY_OPTIONS_START(newbrain)
 	// 180K img
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface newbrain_floppy_interface =
 {
@@ -1417,7 +1417,7 @@ static const floppy_interface newbrain_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
-	FLOPPY_OPTIONS_NAME(newbrain),
+	LEGACY_FLOPPY_OPTIONS_NAME(newbrain),
 	NULL,
 	NULL
 };

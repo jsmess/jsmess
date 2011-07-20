@@ -882,7 +882,7 @@ static const floppy_interface trs80m2_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_8_DSDD, // Shugart SA-800
-	FLOPPY_OPTIONS_NAME(default),
+	LEGACY_FLOPPY_OPTIONS_NAME(default),
 	"floppy_8",
 	NULL
 };

@@ -309,12 +309,12 @@ static const wd17xx_interface fdc_intf =
 
 
 //-------------------------------------------------
-//  FLOPPY_OPTIONS( c1581 )
+//  LEGACY_FLOPPY_OPTIONS( c1581 )
 //-------------------------------------------------
 
-static FLOPPY_OPTIONS_START( c1581 )
-	FLOPPY_OPTION( c1581, "d81", "Commodore 1581 Disk Image", d81_dsk_identify, d81_dsk_construct, NULL, NULL )
-FLOPPY_OPTIONS_END
+static LEGACY_FLOPPY_OPTIONS_START( c1581 )
+	LEGACY_FLOPPY_OPTION( c1581, "d81", "Commodore 1581 Disk Image", d81_dsk_identify, d81_dsk_construct, NULL, NULL )
+LEGACY_FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
@@ -329,7 +329,7 @@ static const floppy_interface c1581_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSDD,
-	FLOPPY_OPTIONS_NAME(c1581),
+	LEGACY_FLOPPY_OPTIONS_NAME(c1581),
 	"floppy_3_5",
 	NULL
 };

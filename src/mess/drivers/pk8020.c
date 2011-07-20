@@ -149,14 +149,14 @@ static const cassette_interface pk8020_cassette_interface =
 	NULL
 };
 
-static FLOPPY_OPTIONS_START(pk8020)
-	FLOPPY_OPTION(pk8020, "kdi", "PK8020 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START(pk8020)
+	LEGACY_FLOPPY_OPTION(pk8020, "kdi", "PK8020 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([5])
 		SECTOR_LENGTH([1024])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface pk8020_floppy_interface =
 {
@@ -166,7 +166,7 @@ static const floppy_interface pk8020_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(pk8020),
+	LEGACY_FLOPPY_OPTIONS_NAME(pk8020),
 	NULL,
 	NULL
 };

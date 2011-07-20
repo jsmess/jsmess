@@ -57,7 +57,7 @@ static WRITE_LINE_DEVICE_HANDLER( hector_disc2_fdc_dma_irq );
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(hector_disc2),
+	LEGACY_FLOPPY_OPTIONS_NAME(hector_disc2),
 	NULL,
 	NULL
 };

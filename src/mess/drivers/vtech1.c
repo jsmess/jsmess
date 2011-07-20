@@ -456,7 +456,7 @@ static const floppy_interface vtech1_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(vtech1_only),
+	LEGACY_FLOPPY_OPTIONS_NAME(vtech1_only),
 	NULL,
 	NULL
 };

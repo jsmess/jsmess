@@ -666,14 +666,14 @@ static const cassette_interface apf_cassette_interface =
 	NULL
 };
 
-static FLOPPY_OPTIONS_START(apfimag)
-	FLOPPY_OPTION(apfimag, "apd", "APF disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START(apfimag)
+	LEGACY_FLOPPY_OPTION(apfimag, "apd", "APF disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([8])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface apfimag_floppy_interface =
 {
@@ -683,7 +683,7 @@ static const floppy_interface apfimag_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
-	FLOPPY_OPTIONS_NAME(apfimag),
+	LEGACY_FLOPPY_OPTIONS_NAME(apfimag),
 	NULL,
 	NULL
 };

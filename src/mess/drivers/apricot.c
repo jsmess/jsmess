@@ -308,8 +308,8 @@ static PALETTE_INIT( apricot )
     MACHINE DRIVERS
 ***************************************************************************/
 
-static FLOPPY_OPTIONS_START( apricot )
-	FLOPPY_OPTION
+static LEGACY_FLOPPY_OPTIONS_START( apricot )
+	LEGACY_FLOPPY_OPTION
 	(
 		apridisk, "dsk", "ACT Apricot disk image", apridisk_identify, apridisk_construct, NULL,
 		HEADS(1-[2])
@@ -318,7 +318,7 @@ static FLOPPY_OPTIONS_START( apricot )
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1])
 	)
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface apricot_floppy_interface =
 {
@@ -328,7 +328,7 @@ static const floppy_interface apricot_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
-	FLOPPY_OPTIONS_NAME(apricot),
+	LEGACY_FLOPPY_OPTIONS_NAME(apricot),
 	NULL,
 	NULL
 };

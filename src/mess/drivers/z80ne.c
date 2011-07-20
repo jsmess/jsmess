@@ -447,7 +447,7 @@ static const floppy_interface z80netf_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(z80ne),
+	LEGACY_FLOPPY_OPTIONS_NAME(z80ne),
 	NULL,
 	NULL
 };

@@ -329,7 +329,7 @@ static const floppy_interface compis_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(compis),
+	LEGACY_FLOPPY_OPTIONS_NAME(compis),
 	NULL,
 	NULL
 };
