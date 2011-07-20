@@ -176,14 +176,14 @@ static INPUT_PORTS_START( b2m )
 	PORT_CONFSETTING(	0x00, "B/W")
 INPUT_PORTS_END
 
-static FLOPPY_OPTIONS_START(b2m)
-	FLOPPY_OPTION(b2m, "cpm", "Bashkiria-2M disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START(b2m)
+	LEGACY_FLOPPY_OPTION(b2m, "cpm", "Bashkiria-2M disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([5])
 		SECTOR_LENGTH([1024])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface b2m_floppy_interface =
 {
@@ -193,7 +193,7 @@ static const floppy_interface b2m_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(b2m),
+	LEGACY_FLOPPY_OPTIONS_NAME(b2m),
 	NULL,
 	NULL
 };

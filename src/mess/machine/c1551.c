@@ -386,13 +386,13 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  FLOPPY_OPTIONS( c1551 )
+//  LEGACY_FLOPPY_OPTIONS( c1551 )
 //-------------------------------------------------
 
-static FLOPPY_OPTIONS_START( c1551 )
-	FLOPPY_OPTION( c1551, "g64", "Commodore 1551 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
-	FLOPPY_OPTION( c1551, "d64", "Commodore 1551 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
-FLOPPY_OPTIONS_END
+static LEGACY_FLOPPY_OPTIONS_START( c1551 )
+	LEGACY_FLOPPY_OPTION( c1551, "g64", "Commodore 1551 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
+	LEGACY_FLOPPY_OPTION( c1551, "d64", "Commodore 1551 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
+LEGACY_FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
@@ -407,7 +407,7 @@ static const floppy_interface c1551_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
-	FLOPPY_OPTIONS_NAME(c1551),
+	LEGACY_FLOPPY_OPTIONS_NAME(c1551),
 	"floppy_5_25",
 	NULL
 };

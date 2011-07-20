@@ -202,14 +202,14 @@ static ACIA6850_INTERFACE( mirage_acia6850_interface )
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_FIRQ_LINE)
 };
 
-static FLOPPY_OPTIONS_START(mirage)
-	FLOPPY_OPTION(mirage, "img", "Mirage disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START(mirage)
+	LEGACY_FLOPPY_OPTION(mirage, "img", "Mirage disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([80])
 		SECTORS([5])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface mirage_floppy_interface =
 {
@@ -219,7 +219,7 @@ static const floppy_interface mirage_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSDD,
-	FLOPPY_OPTIONS_NAME(mirage),
+	LEGACY_FLOPPY_OPTIONS_NAME(mirage),
 	NULL,
 	NULL
 };

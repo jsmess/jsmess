@@ -126,11 +126,11 @@ static const riot6532_interface riot1_intf =
 
 
 //-------------------------------------------------
-//  FLOPPY_OPTIONS( c8280 )
+//  LEGACY_FLOPPY_OPTIONS( c8280 )
 //-------------------------------------------------
 
-static FLOPPY_OPTIONS_START( c8280 )
-FLOPPY_OPTIONS_END
+static LEGACY_FLOPPY_OPTIONS_START( c8280 )
+LEGACY_FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
@@ -145,7 +145,7 @@ static const floppy_interface c8280_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_8_DSDD,
-	FLOPPY_OPTIONS_NAME(c8280),
+	LEGACY_FLOPPY_OPTIONS_NAME(c8280),
 	"floppy_8",
 	NULL
 };

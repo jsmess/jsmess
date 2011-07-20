@@ -147,14 +147,14 @@ static const cassette_interface partner_cassette_interface =
 	NULL
 };
 
-static FLOPPY_OPTIONS_START(partner)
-	FLOPPY_OPTION(partner, "cpm", "Partner disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START(partner)
+	LEGACY_FLOPPY_OPTION(partner, "cpm", "Partner disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([5])
 		SECTOR_LENGTH([1024])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface partner_floppy_interface =
 {
@@ -164,7 +164,7 @@ static const floppy_interface partner_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(partner),
+	LEGACY_FLOPPY_OPTIONS_NAME(partner),
 	NULL,
 	NULL
 };

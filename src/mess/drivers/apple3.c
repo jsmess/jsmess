@@ -71,7 +71,7 @@ static const floppy_interface apple3_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(apple2),
+	LEGACY_FLOPPY_OPTIONS_NAME(apple2),
 	NULL,
 	NULL
 };

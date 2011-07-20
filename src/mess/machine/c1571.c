@@ -524,14 +524,14 @@ static const wd17xx_interface fdc_intf =
 
 
 //-------------------------------------------------
-//  FLOPPY_OPTIONS( c1571 )
+//  LEGACY_FLOPPY_OPTIONS( c1571 )
 //-------------------------------------------------
 
-static FLOPPY_OPTIONS_START( c1571 )
-	FLOPPY_OPTION( c1571, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
-	FLOPPY_OPTION( c1571, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
-	FLOPPY_OPTION( c1571, "d71", "Commodore 1571 Disk Image", d71_dsk_identify, d64_dsk_construct, NULL, NULL )
-FLOPPY_OPTIONS_END
+static LEGACY_FLOPPY_OPTIONS_START( c1571 )
+	LEGACY_FLOPPY_OPTION( c1571, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
+	LEGACY_FLOPPY_OPTION( c1571, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
+	LEGACY_FLOPPY_OPTION( c1571, "d71", "Commodore 1571 Disk Image", d71_dsk_identify, d64_dsk_construct, NULL, NULL )
+LEGACY_FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
@@ -552,20 +552,20 @@ static const floppy_interface c1571_floppy_interface =
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c1571_device, wpt_w),
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
-	FLOPPY_OPTIONS_NAME(c1571),
+	LEGACY_FLOPPY_OPTIONS_NAME(c1571),
 	"floppy_5_25",
 	NULL
 };
 
 
 //-------------------------------------------------
-//  FLOPPY_OPTIONS( c1570 )
+//  LEGACY_FLOPPY_OPTIONS( c1570 )
 //-------------------------------------------------
 
-static FLOPPY_OPTIONS_START( c1570 )
-	FLOPPY_OPTION( c1570, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
-	FLOPPY_OPTION( c1570, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
-FLOPPY_OPTIONS_END
+static LEGACY_FLOPPY_OPTIONS_START( c1570 )
+	LEGACY_FLOPPY_OPTION( c1570, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
+	LEGACY_FLOPPY_OPTION( c1570, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
+LEGACY_FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
@@ -580,7 +580,7 @@ static const floppy_interface c1570_floppy_interface =
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c1571_device, wpt_w),
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
-	FLOPPY_OPTIONS_NAME(c1570),
+	LEGACY_FLOPPY_OPTIONS_NAME(c1570),
 	NULL,
 	NULL
 };

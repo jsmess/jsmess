@@ -255,7 +255,7 @@ static const floppy_interface next_floppy_interface =
     DEVCB_NULL,
     DEVCB_NULL,
     FLOPPY_STANDARD_3_5_DSED,
-    FLOPPY_OPTIONS_NAME(default),
+    LEGACY_FLOPPY_OPTIONS_NAME(default),
     "floppy_3_5",
 	NULL
 };

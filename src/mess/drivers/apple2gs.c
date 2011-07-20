@@ -161,7 +161,7 @@ static const floppy_interface apple2gs_floppy35_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(apple35_iigs),
+	LEGACY_FLOPPY_OPTIONS_NAME(apple35_iigs),
 	"floppy_3_5",
 	NULL
 };
@@ -174,7 +174,7 @@ static const floppy_interface apple2gs_floppy525_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(apple2),
+	LEGACY_FLOPPY_OPTIONS_NAME(apple2),
 	"floppy_5_25",
 	NULL
 };

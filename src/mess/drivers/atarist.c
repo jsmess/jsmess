@@ -2072,7 +2072,7 @@ static const floppy_interface atarist_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSDD,
-	FLOPPY_OPTIONS_NAME(atarist),
+	LEGACY_FLOPPY_OPTIONS_NAME(atarist),
 	NULL,
 	NULL
 };
@@ -2085,7 +2085,7 @@ static const floppy_interface megaste_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSHD,
-	FLOPPY_OPTIONS_NAME(atarist),
+	LEGACY_FLOPPY_OPTIONS_NAME(atarist),
 	NULL,
 	NULL
 };

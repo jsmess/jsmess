@@ -461,7 +461,7 @@ static const floppy_interface nes_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(nes_only),
+	LEGACY_FLOPPY_OPTIONS_NAME(nes_only),
 	NULL,
 	NULL
 };

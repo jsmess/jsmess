@@ -268,14 +268,14 @@ static INTERRUPT_GEN( act_f1_irq )
 	//  device_set_input_line_and_vector(device,0,HOLD_LINE,0x60);
 }
 
-static FLOPPY_OPTIONS_START( act )
-	FLOPPY_OPTION( img2hd, "dsk", "2HD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START( act )
+	LEGACY_FLOPPY_OPTION( img2hd, "dsk", "2HD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface act_floppy_interface =
 {
@@ -285,7 +285,7 @@ static const floppy_interface act_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(act),
+	LEGACY_FLOPPY_OPTIONS_NAME(act),
 	NULL,
 	NULL
 };

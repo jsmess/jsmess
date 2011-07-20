@@ -1342,7 +1342,7 @@ static const floppy_interface abc1600_floppy_interface =
     DEVCB_NULL,
     DEVCB_NULL,
     FLOPPY_STANDARD_5_25_DSQD,
-    FLOPPY_OPTIONS_NAME(default),
+    LEGACY_FLOPPY_OPTIONS_NAME(default),
     "floppy_5_25",
 	NULL
 };

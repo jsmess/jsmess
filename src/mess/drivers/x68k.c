@@ -2473,15 +2473,15 @@ static void x68k_unload_proc(device_image_interface &image)
 	state->m_fdc.disk_inserted[floppy_get_drive(&image.device())] = 0;
 }
 
-static FLOPPY_OPTIONS_START( x68k )
-	FLOPPY_OPTION( img2d, "xdf,hdm,2hd", "XDF disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START( x68k )
+	LEGACY_FLOPPY_OPTION( img2d, "xdf,hdm,2hd", "XDF disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([77])
 		SECTORS([8])
 		SECTOR_LENGTH([1024])
 		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION( dim, "dim",		"DIM floppy disk image",	dim_dsk_identify, dim_dsk_construct, NULL, NULL)
-FLOPPY_OPTIONS_END
+	LEGACY_FLOPPY_OPTION( dim, "dim",		"DIM floppy disk image",	dim_dsk_identify, dim_dsk_construct, NULL, NULL)
+LEGACY_FLOPPY_OPTIONS_END
 
 
 static const floppy_interface x68k_floppy_interface =
@@ -2492,7 +2492,7 @@ static const floppy_interface x68k_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(x68k),
+	LEGACY_FLOPPY_OPTIONS_NAME(x68k),
 	"floppy_5_25",
 	NULL
 };

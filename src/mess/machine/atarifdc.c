@@ -784,7 +784,7 @@ static const floppy_interface atari_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(atari_only),
+	LEGACY_FLOPPY_OPTIONS_NAME(atari_only),
 	NULL,
 	NULL
 };

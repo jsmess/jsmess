@@ -324,7 +324,7 @@ static const floppy_interface e01_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSDD, // NEC FD1036 A
-	FLOPPY_OPTIONS_NAME(default),
+	LEGACY_FLOPPY_OPTIONS_NAME(default),
 	NULL,
 	NULL
 };

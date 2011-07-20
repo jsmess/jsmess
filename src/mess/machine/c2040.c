@@ -946,42 +946,42 @@ static MOS6530_INTERFACE( c8050_miot_intf )
 
 
 //-------------------------------------------------
-//  FLOPPY_OPTIONS( c2040 )
+//  LEGACY_FLOPPY_OPTIONS( c2040 )
 //-------------------------------------------------
 
-static FLOPPY_OPTIONS_START( c2040 )
-	FLOPPY_OPTION( c2040, "d67", "Commodore 2040/3040 Disk Image", d67_dsk_identify, d64_dsk_construct, NULL, NULL )
-	FLOPPY_OPTION( c2040, "g64", "Commodore 2040/3040 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
-FLOPPY_OPTIONS_END
-
-
-//-------------------------------------------------
-//  FLOPPY_OPTIONS( c4040 )
-//-------------------------------------------------
-
-static FLOPPY_OPTIONS_START( c4040 )
-	FLOPPY_OPTION( c4040, "d64", "Commodore 4040 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
-	FLOPPY_OPTION( c4040, "g64", "Commodore 4040 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
-FLOPPY_OPTIONS_END
+static LEGACY_FLOPPY_OPTIONS_START( c2040 )
+	LEGACY_FLOPPY_OPTION( c2040, "d67", "Commodore 2040/3040 Disk Image", d67_dsk_identify, d64_dsk_construct, NULL, NULL )
+	LEGACY_FLOPPY_OPTION( c2040, "g64", "Commodore 2040/3040 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
+LEGACY_FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
-//  FLOPPY_OPTIONS( c8050 )
+//  LEGACY_FLOPPY_OPTIONS( c4040 )
 //-------------------------------------------------
 
-static FLOPPY_OPTIONS_START( c8050 )
-	FLOPPY_OPTION( c8050, "d80", "Commodore 8050 Disk Image", d80_dsk_identify, d64_dsk_construct, NULL, NULL )
-FLOPPY_OPTIONS_END
+static LEGACY_FLOPPY_OPTIONS_START( c4040 )
+	LEGACY_FLOPPY_OPTION( c4040, "d64", "Commodore 4040 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
+	LEGACY_FLOPPY_OPTION( c4040, "g64", "Commodore 4040 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
+LEGACY_FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
-//  FLOPPY_OPTIONS( c8250 )
+//  LEGACY_FLOPPY_OPTIONS( c8050 )
 //-------------------------------------------------
 
-static FLOPPY_OPTIONS_START( c8250 )
-	FLOPPY_OPTION( c8250, "d80", "Commodore 8050 Disk Image", d80_dsk_identify, d64_dsk_construct, NULL, NULL )
-	FLOPPY_OPTION( c8250, "d82", "Commodore 8250/SFD1001 Disk Image", d82_dsk_identify, d64_dsk_construct, NULL, NULL )
-FLOPPY_OPTIONS_END
+static LEGACY_FLOPPY_OPTIONS_START( c8050 )
+	LEGACY_FLOPPY_OPTION( c8050, "d80", "Commodore 8050 Disk Image", d80_dsk_identify, d64_dsk_construct, NULL, NULL )
+LEGACY_FLOPPY_OPTIONS_END
+
+
+//-------------------------------------------------
+//  LEGACY_FLOPPY_OPTIONS( c8250 )
+//-------------------------------------------------
+
+static LEGACY_FLOPPY_OPTIONS_START( c8250 )
+	LEGACY_FLOPPY_OPTION( c8250, "d80", "Commodore 8050 Disk Image", d80_dsk_identify, d64_dsk_construct, NULL, NULL )
+	LEGACY_FLOPPY_OPTION( c8250, "d82", "Commodore 8250/SFD1001 Disk Image", d82_dsk_identify, d64_dsk_construct, NULL, NULL )
+LEGACY_FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
@@ -996,7 +996,7 @@ static const floppy_interface c2040_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
-	FLOPPY_OPTIONS_NAME(c2040),
+	LEGACY_FLOPPY_OPTIONS_NAME(c2040),
 	"floppy_5_25",
 	NULL
 };
@@ -1014,7 +1014,7 @@ static const floppy_interface c4040_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
-	FLOPPY_OPTIONS_NAME(c4040),
+	LEGACY_FLOPPY_OPTIONS_NAME(c4040),
 	"floppy_5_25",
 	NULL
 };
@@ -1032,7 +1032,7 @@ static const floppy_interface c8050_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
-	FLOPPY_OPTIONS_NAME(c8050),
+	LEGACY_FLOPPY_OPTIONS_NAME(c8050),
 	"floppy_5_25",
 	NULL
 };
@@ -1050,7 +1050,7 @@ static const floppy_interface c8250_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSQD,
-	FLOPPY_OPTIONS_NAME(c8250),
+	LEGACY_FLOPPY_OPTIONS_NAME(c8250),
 	"floppy_5_25",
 	NULL
 };

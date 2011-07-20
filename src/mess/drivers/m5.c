@@ -568,14 +568,14 @@ static I8255_INTERFACE( ppi_intf )
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-static FLOPPY_OPTIONS_START( m5 )
-	FLOPPY_OPTION( m5, "dsk", "Sord M5 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START( m5 )
+	LEGACY_FLOPPY_OPTION( m5, "dsk", "Sord M5 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([40])
 		SECTORS([18])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface m5_floppy_interface =
 {
@@ -585,7 +585,7 @@ static const floppy_interface m5_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD_40,
-	FLOPPY_OPTIONS_NAME(m5),
+	LEGACY_FLOPPY_OPTIONS_NAME(m5),
 	NULL,
 	NULL
 };

@@ -145,7 +145,7 @@ static const floppy_interface ti99_4_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(ti99),
+	LEGACY_FLOPPY_OPTIONS_NAME(ti99),
 	NULL,
 	NULL
 };

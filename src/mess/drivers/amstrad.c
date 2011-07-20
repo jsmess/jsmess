@@ -852,7 +852,7 @@ static const floppy_interface cpc6128_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_SSDD,
-	FLOPPY_OPTIONS_NAME(default),
+	LEGACY_FLOPPY_OPTIONS_NAME(default),
 	NULL,
 	NULL
 };
@@ -865,7 +865,7 @@ static const floppy_interface aleste_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(msx),
+	LEGACY_FLOPPY_OPTIONS_NAME(msx),
 	NULL,
 	NULL
 };

@@ -907,17 +907,17 @@ static const struct upd765_interface sf7000_upd765_interface =
 };
 
 /*-------------------------------------------------
-    FLOPPY_OPTIONS( sf7000 )
+    LEGACY_FLOPPY_OPTIONS( sf7000 )
 -------------------------------------------------*/
 
-static FLOPPY_OPTIONS_START( sf7000 )
-	FLOPPY_OPTION(sf7000, "sf7", "SF7 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START( sf7000 )
+	LEGACY_FLOPPY_OPTION(sf7000, "sf7", "SF7 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 /*-------------------------------------------------
     sf7000_fdc_index_callback -
@@ -942,7 +942,7 @@ static const floppy_interface sf7000_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(sf7000),
+	LEGACY_FLOPPY_OPTIONS_NAME(sf7000),
 	NULL,
 	NULL
 };

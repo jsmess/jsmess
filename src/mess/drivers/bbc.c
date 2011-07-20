@@ -738,14 +738,14 @@ static ACIA6850_INTERFACE( bbc_acia6850_interface )
 	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
 };
 
-static FLOPPY_OPTIONS_START(bbc)
-	FLOPPY_OPTION(bbc, "ssd,bbc,img", "BBC disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START(bbc)
+	LEGACY_FLOPPY_OPTION(bbc, "ssd,bbc,img", "BBC disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([80])
 		SECTORS([10])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface bbc_floppy_interface =
 {
@@ -755,7 +755,7 @@ static const floppy_interface bbc_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(bbc),
+	LEGACY_FLOPPY_OPTIONS_NAME(bbc),
 	NULL,
 	NULL
 };

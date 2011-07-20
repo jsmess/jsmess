@@ -2389,14 +2389,14 @@ static const wd17xx_interface towns_mb8877a_interface =
 	{FLOPPY_0,FLOPPY_1,0,0}
 };
 
-static FLOPPY_OPTIONS_START( towns )
-	FLOPPY_OPTION( fmt_bin, "bin", "BIN disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START( towns )
+	LEGACY_FLOPPY_OPTION( fmt_bin, "bin", "BIN disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([77])
 		SECTORS([8])
 		SECTOR_LENGTH([1024])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface towns_floppy_interface =
 {
@@ -2406,7 +2406,7 @@ static const floppy_interface towns_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(towns),
+	LEGACY_FLOPPY_OPTIONS_NAME(towns),
 	NULL,
 	NULL
 };

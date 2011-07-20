@@ -85,7 +85,7 @@ static const floppy_interface floppy_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSSD,
-	FLOPPY_OPTIONS_NAME(comx35),
+	LEGACY_FLOPPY_OPTIONS_NAME(comx35),
 	"floppy_5_25",
 	NULL
 };

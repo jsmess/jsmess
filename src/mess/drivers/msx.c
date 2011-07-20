@@ -1027,7 +1027,7 @@ static const floppy_interface msx_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(msx),
+	LEGACY_FLOPPY_OPTIONS_NAME(msx),
 	NULL,
 	NULL
 };

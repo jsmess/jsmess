@@ -688,7 +688,7 @@ static const floppy_interface mac128512_floppy_interface = //SONY_FLOPPY_ALLOW40
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSHD,
-	FLOPPY_OPTIONS_NAME(apple35_mac),
+	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
 	NULL,
 	NULL
 };
@@ -702,7 +702,7 @@ static const floppy_interface mac_floppy_interface = //SONY_FLOPPY_ALLOW400K | S
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSHD,
-	FLOPPY_OPTIONS_NAME(apple35_mac),
+	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
 	NULL,
 	NULL
 };

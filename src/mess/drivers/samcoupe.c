@@ -505,8 +505,8 @@ static const cassette_interface samcoupe_cassette_interface =
 };
 
 
-static FLOPPY_OPTIONS_START( samcoupe )
-	FLOPPY_OPTION
+static LEGACY_FLOPPY_OPTIONS_START( samcoupe )
+	LEGACY_FLOPPY_OPTION
 	(
 		coupe_mgt, "mgt,dsk,sad", "SAM Coupe MGT disk image", coupe_mgt_identify, coupe_mgt_construct, NULL,
 		HEADS([2])
@@ -515,7 +515,7 @@ static FLOPPY_OPTIONS_START( samcoupe )
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1])
 	)
-	FLOPPY_OPTION
+	LEGACY_FLOPPY_OPTION
 	(
 		coupe_sad, "sad,dsk", "SAM Coupe SAD disk image", coupe_sad_identify, coupe_sad_construct, NULL,
 		HEADS(1-[2]-255)
@@ -524,7 +524,7 @@ static FLOPPY_OPTIONS_START( samcoupe )
 		SECTOR_LENGTH(64/128/256/[512]/1024/2048/4096)
 		FIRST_SECTOR_ID([1])
 	)
-	FLOPPY_OPTION
+	LEGACY_FLOPPY_OPTION
 	(
 		coupe_sdf, "sdf,dsk,sad", "SAM Coupe SDF disk image", coupe_sdf_identify, coupe_sdf_construct, NULL,
 		HEADS(1-[2])
@@ -533,7 +533,7 @@ static FLOPPY_OPTIONS_START( samcoupe )
 		SECTOR_LENGTH(128/256/[512]/1024)
 		FIRST_SECTOR_ID([1])
 	)
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface samcoupe_floppy_interface =
 {
@@ -543,7 +543,7 @@ static const floppy_interface samcoupe_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(samcoupe),
+	LEGACY_FLOPPY_OPTIONS_NAME(samcoupe),
 	NULL,
 	NULL
 };

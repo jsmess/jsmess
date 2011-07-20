@@ -344,14 +344,14 @@ static ADDRESS_MAP_START(kc85_disc_hw_io, AS_IO, 8)
 ADDRESS_MAP_END
 
 
-static FLOPPY_OPTIONS_START(kc85)
-	FLOPPY_OPTION(kc85, "img", "KC85 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START(kc85)
+	LEGACY_FLOPPY_OPTION(kc85, "img", "KC85 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([9])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface kc85_floppy_interface =
 {
@@ -361,7 +361,7 @@ static const floppy_interface kc85_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(kc85),
+	LEGACY_FLOPPY_OPTIONS_NAME(kc85),
 	NULL,
 	NULL
 };

@@ -485,14 +485,14 @@ static const upd765_interface nanos_upd765_interface =
 	{FLOPPY_0,FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
-static FLOPPY_OPTIONS_START(nanos)
-	FLOPPY_OPTION(nanos, "img", "NANOS disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START(nanos)
+	LEGACY_FLOPPY_OPTION(nanos, "img", "NANOS disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([5])
 		SECTOR_LENGTH([1024])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface nanos_floppy_interface =
 {
@@ -502,7 +502,7 @@ static const floppy_interface nanos_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	FLOPPY_OPTIONS_NAME(nanos),
+	LEGACY_FLOPPY_OPTIONS_NAME(nanos),
 	NULL,
 	NULL
 };

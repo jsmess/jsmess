@@ -460,14 +460,14 @@ static I8255_INTERFACE( iq151_ppi8255_intf )
 	DEVCB_DRIVER_MEMBER(iq151_state, speaker_w)
 };
 
-static FLOPPY_OPTIONS_START( iq151 )
-	FLOPPY_OPTION( iq151_disk, "iqd", "IQ-151 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+static LEGACY_FLOPPY_OPTIONS_START( iq151 )
+	LEGACY_FLOPPY_OPTION( iq151_disk, "iqd", "IQ-151 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([77])
 		SECTORS([26])
 		SECTOR_LENGTH([128])
 		FIRST_SECTOR_ID([1]))
-FLOPPY_OPTIONS_END
+LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface iq151_floppy_intf =
 {
@@ -477,7 +477,7 @@ static const floppy_interface iq151_floppy_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_8_SSSD,
-	FLOPPY_OPTIONS_NAME(iq151),
+	LEGACY_FLOPPY_OPTIONS_NAME(iq151),
 	"floppy_8",
 	NULL
 };
