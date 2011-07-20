@@ -17,7 +17,7 @@
 
 #include "corestr.h"
 
-#include "formats/flopimg.h"
+#include "formats/hxcmfm_dsk.h"
 
 static FLOPPY_OPTIONS_START( supported )
 	FLOPPY_OPTION( mfm, "mfm", "HxCFloppyEmulator floppy disk image", FLOPPY_MFM_FORMAT, NULL )
