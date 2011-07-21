@@ -13,11 +13,14 @@
 
 #include "emu.h"
 #include "includes/amiga.h"
-#include "imagedev/flopdrv.h"
-#include "formats/ami_dsk.h"
+#include "imagedev/floppy.h"
+#include "formats/hxcmfm_dsk.h"
 #include "amigafdc.h"
 #include "machine/6526cia.h"
 
+static FLOPPY_OPTIONS_START( amiga_only )
+	FLOPPY_OPTION( mfm, "mfm", "HxCFloppyEmulator floppy disk image", FLOPPY_MFM_FORMAT, NULL )
+FLOPPY_OPTIONS_END
 
 #define MAX_TRACK_BYTES			12500
 #define ACTUAL_TRACK_BYTES		11968
@@ -43,7 +46,7 @@ typedef struct {
 	int dir;
 	int wprot;
 	int disk_changed;
-	device_image_interface *f;
+	floppy_image_device *f;
 	UINT32 extinfo[MAX_TRACKS];
 	UINT32 extoffs[MAX_TRACKS];
 	int is_ext_image;
@@ -87,14 +90,21 @@ INLINE amiga_fdc_t *get_safe_token(device_t *device)
 static TIMER_CALLBACK(fdc_rev_proc);
 static TIMER_CALLBACK(fdc_dma_proc);
 static TIMER_CALLBACK(fdc_sync_proc);
-static void check_extended_image( device_t *device, int id );
 
-static void amiga_load_proc(device_image_interface &image)
+static int amiga_floppy_get_drive(device_t *image)
+{
+	int drive =0;
+	if (strcmp(image->tag(), FLOPPY_0) == 0) drive = 0;
+	if (strcmp(image->tag(), FLOPPY_1) == 0) drive = 1;
+	return drive;
+}
+
+static int amiga_load_proc(device_image_interface &image)
 {
 	amiga_fdc_t *fdc = get_safe_token(image.device().owner());
-	int id = floppy_get_drive(&image.device());
+	int id = amiga_floppy_get_drive(&image.device());
 	fdc->fdc_status[id].disk_changed = DISK_DETECT_DELAY;
-	fdc->fdc_status[id].f = &image;
+	fdc->fdc_status[id].f = dynamic_cast<floppy_image_device*>(&image);
 	fdc->fdc_status[id].cached = -1;
 	fdc->fdc_status[id].motor_on = 0;
 	fdc->fdc_status[id].rev_timer_started = 0;
@@ -103,13 +113,13 @@ static void amiga_load_proc(device_image_interface &image)
 	fdc->fdc_status[id].dma_timer->reset(  );
 	fdc->fdc_rdy = 0;
 
-	check_extended_image( image.device().owner(), id );
+	return IMAGE_INIT_PASS;
 }
 
 static void amiga_unload_proc(device_image_interface &image)
 {
 	amiga_fdc_t *fdc = get_safe_token(image.device().owner());
-	int id = floppy_get_drive(&image.device());
+	int id = amiga_floppy_get_drive(&image.device());
 	fdc->fdc_status[id].disk_changed = DISK_DETECT_DELAY;
 	fdc->fdc_status[id].f = NULL;
 	fdc->fdc_status[id].cached = -1;
@@ -124,14 +134,6 @@ static void amiga_unload_proc(device_image_interface &image)
 /*-------------------------------------------------
     DEVICE_START(amiga_fdc)
 -------------------------------------------------*/
-device_t *amiga_floppy_get_device_child(device_t *device,int drive)
-{
-	switch(drive) {
-		case 0 : return device->subdevice(FLOPPY_0);
-		case 1 : return device->subdevice(FLOPPY_1);
-	}
-	return NULL;
-}
 
 static DEVICE_START(amiga_fdc)
 {
@@ -142,8 +144,6 @@ static DEVICE_START(amiga_fdc)
 		fdc->fdc_status[id].rev_timer = device->machine().scheduler().timer_alloc(FUNC(fdc_rev_proc), (void*)device);
 		fdc->fdc_status[id].dma_timer = device->machine().scheduler().timer_alloc(FUNC(fdc_dma_proc), (void*)device);
 		fdc->fdc_status[id].sync_timer = device->machine().scheduler().timer_alloc(FUNC(fdc_sync_proc), (void*)device);
-		floppy_install_load_proc(amiga_floppy_get_device_child(device, id), amiga_load_proc);
-		floppy_install_unload_proc(amiga_floppy_get_device_child(device, id), amiga_unload_proc);
 		fdc->fdc_status[id].motor_on = 0;
 		fdc->fdc_status[id].side = 0;
 		fdc->fdc_status[id].dir = 0;
@@ -178,49 +178,6 @@ static DEVICE_START(amiga_fdc)
 
 static DEVICE_RESET(amiga_fdc)
 {
-}
-
-static void check_extended_image( device_t *device, int id )
-{
-	UINT8	header[8], data[4];
-	amiga_fdc_t *fdc = get_safe_token(device);
-
-	fdc->fdc_status[id].is_ext_image = 0;
-
-	if ( fdc->fdc_status[id].f->fseek( 0, SEEK_SET ) )
-	{
-		logerror("FDC: image_fseek failed!\n" );
-		return;
-	}
-
-	fdc->fdc_status[id].f->fread( &header, sizeof( header ) );
-
-	if ( memcmp( header, "UAE--ADF", sizeof( header ) ) == 0 )
-	{
-		int		i;
-
-		for( i = 0; i < MAX_TRACKS; i++ )
-		{
-			fdc->fdc_status[id].f->fread( &data, sizeof( data ) );
-
-			/* data[0,1] = SYNC - data[2,3] = LEN */
-
-			fdc->fdc_status[id].extinfo[i] = data[0];
-			fdc->fdc_status[id].extinfo[i] <<= 8;
-			fdc->fdc_status[id].extinfo[i] |= data[1];
-			fdc->fdc_status[id].extinfo[i] <<= 8;
-			fdc->fdc_status[id].extinfo[i] |= data[2];
-			fdc->fdc_status[id].extinfo[i] <<= 8;
-			fdc->fdc_status[id].extinfo[i] |= data[3];
-
-			if ( i == 0 )
-				fdc->fdc_status[id].extoffs[i] = sizeof( header ) + ( MAX_TRACKS * sizeof( data ) );
-			else
-				fdc->fdc_status[id].extoffs[i] = fdc->fdc_status[id].extoffs[i-1] + ( fdc->fdc_status[id].extinfo[i-1] & 0xffff );
-		}
-
-		fdc->fdc_status[id].is_ext_image = 1;
-	}
 }
 
 static int fdc_get_curpos( device_t *device, int drive )
@@ -502,8 +459,6 @@ bail:
 
 static void setup_fdc_buffer( device_t *device,int drive )
 {
-	int		sector, offset, len;
-	UINT8	temp_cyl[512*11];
 	amiga_fdc_t *fdc = get_safe_token(device);
 
 	/* no disk in drive */
@@ -513,9 +468,7 @@ static void setup_fdc_buffer( device_t *device,int drive )
 		return;
 	}
 
-	len = 512*11;
-
-	offset = ( fdc->fdc_status[drive].cyl << 1 ) | fdc->fdc_side;
+	int offset = ( fdc->fdc_status[drive].cyl << 1 ) | fdc->fdc_side;
 
 	if ( fdc->fdc_status[drive].cached == offset )
 		return;
@@ -523,171 +476,7 @@ static void setup_fdc_buffer( device_t *device,int drive )
 #if 0
 	popmessage("T:%d S:%d", fdc->fdc_status[drive].cyl, fdc_side );
 #endif
-
-	if ( fdc->fdc_status[drive].is_ext_image )
-	{
-		len = fdc->fdc_status[drive].extinfo[offset] & 0xffff;
-
-		if ( len > ( MAX_MFM_TRACK_LEN - 2 ) )
-			len = MAX_MFM_TRACK_LEN - 2;
-
-		if ( fdc->fdc_status[drive].f->fseek( fdc->fdc_status[drive].extoffs[offset], SEEK_SET ) )
-		{
-			logerror("FDC: image_fseek failed!\n" );
-			fdc->fdc_status[drive].f = NULL;
-			fdc->fdc_status[drive].disk_changed = DISK_DETECT_DELAY;
-			return;
-		}
-
-		/* if SYNC is 0000, then its a regular amiga dos track image */
-		if ( ( fdc->fdc_status[drive].extinfo[offset] >> 16 ) == 0x0000 )
-		{
-			fdc->fdc_status[drive].f->fread( temp_cyl, len );
-			/* fall through to regular load */
-		}
-		else /* otherwise, it's a raw track */
-		{
-			fdc->fdc_status[drive].mfm[0] = ( fdc->fdc_status[drive].extinfo[offset] >> 24 ) & 0xff;
-			fdc->fdc_status[drive].mfm[1] = ( fdc->fdc_status[drive].extinfo[offset] >> 16 ) & 0xff;
-			fdc->fdc_status[drive].f->fread( &fdc->fdc_status[drive].mfm[2], len );
-			fdc->fdc_status[drive].tracklen = len + 2;
-			fdc->fdc_status[drive].cached = offset;
-			return;
-		}
-	}
-	else
-	{
-		if ( fdc->fdc_status[drive].f->fseek( offset * len, SEEK_SET ) )
-		{
-			logerror("FDC: image_fseek failed!\n" );
-			fdc->fdc_status[drive].f = NULL;
-			fdc->fdc_status[drive].disk_changed = DISK_DETECT_DELAY;
-			return;
-		}
-
-		fdc->fdc_status[drive].f->fread( temp_cyl, len );
-	}
-
-	fdc->fdc_status[drive].tracklen = MAX_TRACK_BYTES;
-
-	memset( &fdc->fdc_status[drive].mfm[ONE_SECTOR_BYTES*11], 0xaa, GAP_TRACK_BYTES );
-
-	for ( sector = 0; sector < 11; sector++ ) {
-		int x;
-	    UINT8 *dest = ( &fdc->fdc_status[drive].mfm[(ONE_SECTOR_BYTES*sector)] );
-	    UINT8 *src = &temp_cyl[sector*512];
-		UINT32 tmp;
-		UINT32 even, odd;
-		UINT32 hck = 0, dck = 0;
-
-		/* Preamble and sync */
-		*(dest + 0) = 0xaa;
-		*(dest + 1) = 0xaa;
-		*(dest + 2) = 0xaa;
-		*(dest + 3) = 0xaa;
-		*(dest + 4) = 0x44;
-		*(dest + 5) = 0x89;
-		*(dest + 6) = 0x44;
-		*(dest + 7) = 0x89;
-
-		/* Track and sector info */
-
-		tmp = 0xff000000 | (offset<<16) | (sector<<8) | (11 - sector);
-		odd = (tmp & 0x55555555) | 0xaaaaaaaa;
-		even = ( ( tmp >> 1 ) & 0x55555555 ) | 0xaaaaaaaa;
-		*(dest +  8) = (UINT8) ((even & 0xff000000)>>24);
-		*(dest +  9) = (UINT8) ((even & 0xff0000)>>16);
-		*(dest + 10) = (UINT8) ((even & 0xff00)>>8);
-		*(dest + 11) = (UINT8) ((even & 0xff));
-		*(dest + 12) = (UINT8) ((odd & 0xff000000)>>24);
-		*(dest + 13) = (UINT8) ((odd & 0xff0000)>>16);
-		*(dest + 14) = (UINT8) ((odd & 0xff00)>>8);
-		*(dest + 15) = (UINT8) ((odd & 0xff));
-
-		/* Fill unused space */
-
-		for (x = 16 ; x < 48; x++)
-			*(dest + x) = 0xaa;
-
-		/* Encode data section of sector */
-
-		for (x = 64 ; x < 576; x++)
-		{
-			tmp = *(src + x - 64);
-			odd = (tmp & 0x55);
-			even = (tmp>>1) & 0x55;
-			*(dest + x) = (UINT8) (even | 0xaa);
-			*(dest + x + 512) = (UINT8) (odd | 0xaa);
-		}
-
-		/* Calculate checksum for unused space */
-
-		for(x = 8; x < 48; x += 4)
-		    hck ^= (((UINT32) *(dest + x))<<24) | (((UINT32) *(dest + x + 1))<<16) |
-		    	   (((UINT32) *(dest + x + 2))<<8) | ((UINT32) *(dest + x + 3));
-
-		even = odd = hck;
-		odd >>= 1;
-		even |= 0xaaaaaaaa;
-		odd |= 0xaaaaaaaa;
-
-		*(dest + 48) = (UINT8) ((odd & 0xff000000)>>24);
-		*(dest + 49) = (UINT8) ((odd & 0xff0000)>>16);
-		*(dest + 50) = (UINT8) ((odd & 0xff00)>>8);
-		*(dest + 51) = (UINT8) (odd & 0xff);
-		*(dest + 52) = (UINT8) ((even & 0xff000000)>>24);
-		*(dest + 53) = (UINT8) ((even & 0xff0000)>>16);
-		*(dest + 54) = (UINT8) ((even & 0xff00)>>8);
-		*(dest + 55) = (UINT8) (even & 0xff);
-
-		/* Calculate checksum for data section */
-
-		for(x = 64; x < 1088; x += 4)
-			dck ^= (((UINT32) *(dest + x))<<24) | (((UINT32) *(dest + x + 1))<<16) |
-				   (((UINT32) *(dest + x + 2))<< 8) |  ((UINT32) *(dest + x + 3));
-		even = odd = dck;
-		odd >>= 1;
-		even |= 0xaaaaaaaa;
-		odd |= 0xaaaaaaaa;
-		*(dest + 56) = (UINT8) ((odd & 0xff000000)>>24);
-		*(dest + 57) = (UINT8) ((odd & 0xff0000)>>16);
-		*(dest + 58) = (UINT8) ((odd & 0xff00)>>8);
-		*(dest + 59) = (UINT8) (odd & 0xff);
-		*(dest + 60) = (UINT8) ((even & 0xff000000)>>24);
-		*(dest + 61) = (UINT8) ((even & 0xff0000)>>16);
-		*(dest + 62) = (UINT8) ((even & 0xff00)>>8);
-		*(dest + 63) = (UINT8) (even & 0xff);
-	}
-
-	// update MFM data with proper CLK signal
-	int lastbit= 0;
-	for(int i=0;i<MAX_TRACK_BYTES ;i++)
-	{
-		UINT8 c=fdc->fdc_status[drive].mfm[i];
-		UINT8 dat = 0;
-		for(int j=0;j<8;j=j+2)
-		{
-			UINT8 c1=(c>>(6-j))&0x3;
-			if(c1&0x1)
-			{
-				dat |= (0x01<<(6-j));
-				lastbit=1;
-			}
-			else
-			{
-				if(lastbit==0 && (c1&0x2))
-				{
-					dat |= (0x02<<(6-j));
-				}
-				else
-				{
-					dat |= (0x00<<(6-j));
-				}
-				lastbit=0;
-			}
-		}
-		fdc->fdc_status[drive].mfm[i] = dat;
-	}
+	memcpy(fdc->fdc_status[drive].mfm,fdc->fdc_status[drive].f->get_buffer(fdc->fdc_status[drive].cyl, fdc->fdc_side), MAX_MFM_TRACK_LEN);	
 	fdc->fdc_status[drive].cached = offset;
 }
 
@@ -862,19 +651,15 @@ UINT8  amiga_fdc_status_r (device_t *device)
 
 static const floppy_interface amiga_floppy_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_3_5_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(amiga_only),
+	FLOPPY_OPTIONS_NAME(amiga_only),
 	NULL,
-	NULL
+	NULL,
+	amiga_load_proc,
+	amiga_unload_proc
 };
 
 static MACHINE_CONFIG_FRAGMENT( amiga_fdc )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(amiga_floppy_interface)
+	MCFG_FLOPPY_2_DRIVES_ADD(amiga_floppy_interface)
 MACHINE_CONFIG_END
 
 
