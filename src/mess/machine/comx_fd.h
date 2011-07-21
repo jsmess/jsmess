@@ -75,6 +75,7 @@ private:
 	int m_addr;				// FDC address
 	int m_intrq;			// interrupt request
 	int m_drq;				// data request
+	int m_disb;				// data request disable
 };
 
 

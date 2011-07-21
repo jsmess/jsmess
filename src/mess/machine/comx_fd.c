@@ -143,9 +143,13 @@ machine_config_constructor comx_fd_device::device_mconfig_additions() const
 
 inline void comx_fd_device::update_ef4()
 {
-	if (m_ds)
+	if (m_ds && !m_disb)
 	{
 		m_slot->ef4_w(m_drq);
+	}
+	else
+	{
+		m_slot->ef4_w(CLEAR_LINE);
 	}
 }
 
@@ -170,7 +174,8 @@ comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, d
 	m_q(0),
 	m_addr(0),
 	m_intrq(0),
-	m_drq(0)
+	m_drq(0),
+	m_disb(1)
 {
 }
 
@@ -191,6 +196,7 @@ void comx_fd_device::device_start()
 	save_item(NAME(m_addr));
 	save_item(NAME(m_intrq));
 	save_item(NAME(m_drq));
+	save_item(NAME(m_disb));
 }
 
 
@@ -200,6 +206,7 @@ void comx_fd_device::device_start()
 
 void comx_fd_device::device_reset()
 {
+	wd17xx_reset(m_fdc);
 }
 
 
@@ -277,23 +284,23 @@ UINT8 comx_fd_device::comx_io_r(offs_t offset)
 
 void comx_fd_device::comx_io_w(offs_t offset, UINT8 data)
 {
-	/*
-
-        bit     description
-
-        0       A0
-        1       A1
-        2       DRIVE0
-        3       DRIVE1
-        4       F9 DISB
-        5       SIDE SELECT
-
-    */
-
 	if (offset == 2)
 	{
 		if (m_q)
 		{
+			/*
+
+				bit     description
+
+				0       A0
+				1       A1
+				2       DRIVE0
+				3       DRIVE1
+				4       F9 DISB
+				5       SIDE SELECT
+
+			*/
+
 			// latch data to F3
 			m_addr = data & 0x03;
 
@@ -306,6 +313,9 @@ void comx_fd_device::comx_io_w(offs_t offset, UINT8 data)
 				wd17xx_set_drive(m_fdc, 1);
 			}
 
+			m_disb = !BIT(data, 4);
+			update_ef4();
+			
 			wd17xx_set_side(m_fdc, BIT(data, 5));
 		}
 		else

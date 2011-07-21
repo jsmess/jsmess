@@ -49,7 +49,7 @@ public:
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_expansion(*this, EXPANSION_TAG),
-		  m_cdp1802_ef4(0)
+		  m_ef4(0)
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
@@ -65,6 +65,8 @@ public:
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
+	void check_interrupt();
+	
 	DECLARE_READ8_MEMBER( mem_r );
 	DECLARE_WRITE8_MEMBER( mem_w );
 	DECLARE_READ8_MEMBER( io_r );
@@ -77,13 +79,18 @@ public:
 	DECLARE_READ_LINE_MEMBER( shift_r );
 	DECLARE_READ_LINE_MEMBER( control_r );
 	DECLARE_WRITE_LINE_MEMBER( ef4_w );
+	DECLARE_WRITE_LINE_MEMBER( int_w );
+	DECLARE_WRITE_LINE_MEMBER( prd_w );
 
 	// processor state
-	int m_reset;				// CPU mode
-	int m_cdp1802_q;			// Q flag
-	int m_cdp1802_ef4;			// EF4 flag
+	int m_clear;				// CPU mode
+	int m_q;					// Q flag
+	int m_ef4;					// EF4 flag
 	int m_iden;					// interrupt/DMA enable
 	int m_dma;					// memory refresh DMA
+	int m_int;					// interrupt request
+	int m_prd;					// predisplay
+	int m_cr1;					// interrupt enable
 
 	// video state
 	UINT8 *m_charram;			// character memory
