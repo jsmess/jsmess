@@ -2836,7 +2836,7 @@ static READ8_DEVICE_HANDLER(mac_via2_in_b)
 		return 0x4f;
 	}
 
-	if (mac->m_model == MODEL_MAC_SE30)
+	if ((mac->m_model == MODEL_MAC_SE30) || (mac->m_model == MODEL_MAC_IIX))
 	{
 		return 0x87;	// bits 3 and 6 are tied low on SE/30
 	}
@@ -2973,6 +2973,11 @@ void mac_state::machine_reset()
 	// stop 60.15 Hz timer
 	m_6015_timer->adjust(attotime::never);
 
+	if (m_model >= MODEL_MAC_POWERMAC_6100 && m_model <= MODEL_MAC_POWERMAC_8100)
+	{
+		m_awacs->set_dma_base(m_maincpu->memory().space(AS_PROGRAM), 0x10000, 0x12000);
+	}
+
 	// start 60.15 Hz timer for most systems
 	if (((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || (m_model >= MODEL_MAC_LC))
 	{
@@ -3000,16 +3005,24 @@ void mac_state::machine_reset()
 			m_via_cycles = -50;
 			break;
 
-		case 7833600*4:	// 32 MHz Macs (these are C7M * 4, there are true 33 MHz models too)
+		case 7833600*4:	// 32 MHz Macs (these are C7M * 4 like IIvx)
 			m_via_cycles = -60;
+			break;
+
+		case 33000000:	// 33 MHz Macs ('040s)
+			m_via_cycles = -64;
 			break;
 
 		case 40000000:	// 40 MHz Macs
 			m_via_cycles = -80;
 			break;
 
+		case 60000000:	// 60 MHz PowerMac
+			m_via_cycles = -120;
+			break;
+
 		case 66000000:	// 66 MHz PowerMac
-			m_via_cycles = -130;
+			m_via_cycles = -128;
 			break;
 
 		default:

@@ -13,6 +13,7 @@
 #include "machine/6522via.h"
 #include "machine/ram.h"
 #include "machine/egret.h"
+#include "sound/awacs.h"
 
 /* for Egret and CUDA streaming MCU commands, command types */
 typedef enum
@@ -188,6 +189,7 @@ public:
 		m_via1(*this, "via6522_0"),
 		m_via2(*this, "via6522_1"),
 		m_asc(*this, "asc"),
+        m_awacs(*this, "awacs"),
         m_egret(*this, "egret"),
 		m_ram(*this, RAM_TAG)
 	 { }
@@ -196,6 +198,7 @@ public:
 	required_device<via6522_device> m_via1;
 	optional_device<via6522_device> m_via2;
 	optional_device<asc_device> m_asc;
+	optional_device<awacs_device> m_awacs;
     optional_device<egret_device> m_egret;
 	required_device<device_t> m_ram;
 
@@ -285,7 +288,7 @@ public:
 	UINT8 m_rbv_regs[256], m_rbv_ier, m_rbv_ifr, m_rbv_type, m_rbv_montype;
 	UINT32 m_rbv_colors[3], m_rbv_count, m_rbv_clutoffs, m_rbv_immed10wr;
 	UINT32 m_rbv_palette[256];
-	UINT8 m_sonora_vctl[4];
+	UINT8 m_sonora_vctl[8];
 
     // this is shared among all video setups with vram
 	UINT32 *m_vram;
@@ -358,6 +361,12 @@ public:
     DECLARE_READ8_MEMBER(scciop_r);
     DECLARE_WRITE8_MEMBER(scciop_w);
 
+    DECLARE_READ8_MEMBER(hmc_r);
+    DECLARE_WRITE8_MEMBER(hmc_w);
+    DECLARE_READ8_MEMBER(amic_dma_r);
+    DECLARE_WRITE8_MEMBER(amic_dma_w);
+    DECLARE_READ8_MEMBER(pmac_diag_r);
+
 private:
 	int has_adb();
 	void rtc_init();
@@ -380,6 +389,13 @@ private:
 	int m_adb_keybinitialized, m_adb_currentkeys[2], m_adb_modifiers;
 
     UINT8 m_oss_regs[0x400];
+
+    // AMIC for x100 PowerMacs
+    UINT8 m_amic_regs[0x200];
+
+    // HMC for x100 PowerMacs
+    UINT64 m_hmc_reg, m_hmc_shiftout;
+
 public:
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;

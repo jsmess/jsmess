@@ -51,6 +51,7 @@
 #include "machine/ram.h"
 #include "imagedev/chd_cd.h"
 #include "sound/asc.h"
+#include "sound/awacs.h"
 #include "sound/cdda.h"
 #include "includes/mac.h"
 
@@ -358,7 +359,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 
 READ32_MEMBER(mac_state::mac_read_id)
 {
-	logerror("Mac read ID reg @ PC=%x\n", cpu_get_pc(&space.device()));
+//	printf("Mac read ID reg @ PC=%x\n", cpu_get_pc(m_maincpu));
 
 	switch (m_model)
 	{
@@ -460,6 +461,50 @@ READ8_MEMBER(mac_state::swimiop_r)
 WRITE8_MEMBER(mac_state::swimiop_w)
 {
 //	printf("swimiop_w %x @ %x (PC=%x)\n", data, offset, cpu_get_pc(m_maincpu));
+}
+
+READ8_MEMBER(mac_state::pmac_diag_r)
+{
+	switch (offset)
+	{
+		case 0:	// return 0 here to get the 'car crash' sound after the boot bong, 1 otherwise
+			return 1;
+	}
+
+	return 0;
+}
+
+READ8_MEMBER(mac_state::amic_dma_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(mac_state::amic_dma_w)
+{
+//	printf("amic_dma_w: %02x at %x (PC=%x)\n", data, offset+0x1000, cpu_get_pc(m_maincpu));
+}
+
+// HMC has one register: a 35-bit shift register which is accessed one bit at a time (see pmac6100 code at 4030383c which makes this obvious)
+READ8_MEMBER(mac_state::hmc_r)
+{
+	UINT8 rv = (UINT8)(m_hmc_shiftout&1);
+	m_hmc_shiftout>>= 1;
+	return rv;
+}
+
+WRITE8_MEMBER(mac_state::hmc_w)
+{
+	// writes to xxx8 reset the bit shift position
+	if ((offset&0x8) == 8)
+	{
+		m_hmc_shiftout = m_hmc_reg;
+	}
+	else
+	{
+		UINT64 temp = (data & 1) ? U64(0x400000000) : U64(0x0);
+		m_hmc_reg >>= 1;
+		m_hmc_reg |= temp;
+	}
 }
 
 /***************************************************************************
@@ -635,14 +680,16 @@ static ADDRESS_MAP_START(pwrmac_map, AS_PROGRAM, 64, mac_state )
 	// 5000a000 = MACE ethernet controller
 	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
 	// 50014000 = sound registers (AWACS)
+	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("awacs", awacs_device, read, write, U64(0xffffffffffffffff)) AM_MIRROR(0x01f00000)
 	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	// 50024000 = VDAC (similar to Sonora)
+	AM_RANGE(0x50024000, 0x50025fff) AM_WRITE32( ariel_ramdac_w, U64(0xffffffffffffffff) ) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50026000, 0x50027fff) AM_READWRITE16(mac_via2_r, mac_via2_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	// 50028000 = video control registers (similar to Sonora)
+	AM_RANGE(0x50028000, 0x50028007) AM_READWRITE8(mac_sonora_vctl_r, mac_sonora_vctl_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
 	// 5002a000 = interrupt controller
 	// 5002c000 = diagnostic registers
-	// 50031000 = DMA controller
-	// 50040000 = memory controller
+	AM_RANGE(0x5002c000, 0x5002dfff) AM_READ8(pmac_diag_r, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000) 
+	AM_RANGE(0x50031000, 0x50032fff) AM_READWRITE8(amic_dma_r, amic_dma_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000) 
+	AM_RANGE(0x50040000, 0x5004000f) AM_READWRITE8(hmc_r, hmc_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)  
 	AM_RANGE(0x5ffffff8, 0x5fffffff) AM_READ32(mac_read_id, U64(0xffffffffffffffff))
 
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("bootrom", 0)
@@ -1238,7 +1285,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( pwrmac, mac_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC601, 66000000)
+	MCFG_CPU_ADD("maincpu", PPC601, 60000000)
 	MCFG_CPU_PROGRAM_MAP(pwrmac_map)
 
     /* video hardware */
@@ -1258,6 +1305,9 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_AWACS_ADD("awacs", 44100)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* nvram */
 	MCFG_NVRAM_HANDLER(mac)
@@ -1755,7 +1805,7 @@ COMP( 1986, macplus,  0,		0,	macplus,  macplus,  macplus,	  "Apple Computer", "M
 COMP( 1987, macse,    0,		0,	macse,    macadb,   macse,	      "Apple Computer", "Macintosh SE",  0 )
 COMP( 1987, macsefd,  0,		0,	macse,    macadb,   macse,	      "Apple Computer", "Macintosh SE (FDHD)",  0 )
 COMP( 1987, macii,    0,		0,	macii,    macadb,   macii,	      "Apple Computer", "Macintosh II",  0 )
-COMP( 1987, maciihmu, macii,	0,	maciihmu, macadb,   macii,	      "Apple Computer", "Macintosh II (w/o 68851 MMU)",  GAME_NOT_WORKING )
+COMP( 1987, maciihmu, macii,	0,	maciihmu, macadb,   macii,	      "Apple Computer", "Macintosh II (w/o 68851 MMU)", 0 )
 COMP( 1988, mac2fdhd, 0,		0,	macii,    macadb,   maciifdhd,	  "Apple Computer", "Macintosh II (FDHD)",  0 )
 COMP( 1988, maciix,   mac2fdhd, 0,	maciix,   macadb,   maciix,	      "Apple Computer", "Macintosh IIx",  0 )
 COMP( 1989, macprtb,  0,        0,  macprtb,  macadb,   macprtb,  	  "Apple Computer", "Macintosh Portable", GAME_NOT_WORKING )
@@ -1777,4 +1827,4 @@ COMP( 1992, macpb145b,macpb140, 0,  macpb170, macadb,   macpb140,  	  "Apple Com
 COMP( 1993, maclc3,   0,		0,	maclc3,   maciici,  maclc3,	      "Apple Computer", "Macintosh LC III",  GAME_NOT_WORKING )
 COMP( 1993, maciivx,  0,		0,	maciivx,  maciici,  maciivx,	  "Apple Computer", "Macintosh IIvx",  GAME_NOT_WORKING )
 COMP( 1993, maciivi,  maciivx,	0,	maciivi,  maciici,  maciivx,	  "Apple Computer", "Macintosh IIvi",  GAME_NOT_WORKING )
-COMP( 1994, pmac6100, 0,		0,	pwrmac,   macadb,   macpm6100,	  "Apple Computer", "Power Macintosh 6100",  GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1994, pmac6100, 0,		0,	pwrmac,   macadb,   macpm6100,	  "Apple Computer", "Power Macintosh 6100/60",  GAME_NOT_WORKING | GAME_NO_SOUND )
