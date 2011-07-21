@@ -124,6 +124,10 @@ WRITE_LINE_MEMBER( comx_clm_device::hsync_w )
 	{
 		m_slot->ef4_w(state);
 	}
+	else
+	{
+		m_slot->ef4_w(CLEAR_LINE);
+	}
 }
 
 static const mc6845_interface crtc_intf =

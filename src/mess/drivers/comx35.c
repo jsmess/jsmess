@@ -142,7 +142,7 @@ static INPUT_CHANGED( comx35_reset )
 {
 	comx35_state *state = field.machine().driver_data<comx35_state>();
 
-	if (BIT(input_port_read(field.machine(), "RESET"), 0) && BIT(input_port_read(field.machine(), "D6"), 7))
+	if (newval && BIT(input_port_read(field.machine(), "D6"), 7))
 	{
 		state->machine_reset();
 	}
@@ -255,9 +255,14 @@ INPUT_PORTS_END
 //  COSMAC_INTERFACE( cosmac_intf )
 //-------------------------------------------------
 
+void comx35_state::check_interrupt()
+{
+	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, m_cr1 | m_int);
+}
+
 READ_LINE_MEMBER( comx35_state::clear_r )
 {
-	return m_reset;
+	return m_clear;
 }
 
 READ_LINE_MEMBER( comx35_state::ef2_r )
@@ -276,7 +281,7 @@ READ_LINE_MEMBER( comx35_state::ef2_r )
 
 READ_LINE_MEMBER( comx35_state::ef4_r )
 {
-	return (m_cassette->input() < 0) | m_cdp1802_ef4;
+	return (m_cassette->input() > 0.0f) | m_ef4;
 }
 
 static COSMAC_SC_WRITE( comx35_sc_w )
@@ -320,7 +325,7 @@ static COSMAC_SC_WRITE( comx35_sc_w )
 
 WRITE_LINE_MEMBER( comx35_state::q_w )
 {
-	m_cdp1802_q = state;
+	m_q = state;
 
 	if (m_iden && state)
 	{
@@ -405,14 +410,20 @@ static const cassette_interface cassette_intf =
 //  COMX_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( comx35_state::int_w )
+{
+	m_int = state;
+	check_interrupt();
+}
+
 WRITE_LINE_MEMBER( comx35_state::ef4_w )
 {
-	m_cdp1802_ef4 = state;
+	m_ef4 = state;
 }
 
 static COMX_EXPANSION_INTERFACE( expansion_intf )
 {
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, int_w),
 	DEVCB_DRIVER_LINE_MEMBER(comx35_state, ef4_w),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -436,41 +447,47 @@ SLOT_INTERFACE_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_START( mpz80 )
+//  MACHINE_START( comx35 )
 //-------------------------------------------------
 
 static TIMER_CALLBACK( reset_tick )
 {
 	comx35_state *state = machine.driver_data<comx35_state>();
 
-	state->m_reset = 1;
+	state->m_clear = 1;
 }
 
 void comx35_state::machine_start()
 {
-	/* allocate reset timer */
+	// allocate reset timer
 	m_reset_timer = machine().scheduler().timer_alloc(FUNC(reset_tick));
 
-	/* register for state saving */
-	save_item(NAME(m_reset));
-	save_item(NAME(m_cdp1802_q));
-	save_item(NAME(m_cdp1802_ef4));
+	// register for state saving
+	save_item(NAME(m_clear));
+	save_item(NAME(m_q));
+	save_item(NAME(m_ef4));
 	save_item(NAME(m_iden));
 	save_item(NAME(m_dma));
+	save_item(NAME(m_int));
+	save_item(NAME(m_prd));
+	save_item(NAME(m_cr1));
 }
 
 
 //-------------------------------------------------
-//  MACHINE_RESET( mpz80 )
+//  MACHINE_RESET( comx35 )
 //-------------------------------------------------
 
 void comx35_state::machine_reset()
 {
 	int t = RES_K(27) * CAP_U(1) * 1000; // t = R1 * C1
 
-	m_reset = 0;
+	m_clear = 0;
 	m_iden = 1;
-	m_cdp1802_ef4 = CLEAR_LINE;
+	m_cr1 = 1;
+	m_ef4 = CLEAR_LINE;
+	m_int = CLEAR_LINE;
+	m_prd = CLEAR_LINE;
 
 	m_reset_timer->adjust(attotime::from_msec(t));
 }
@@ -486,16 +503,16 @@ void comx35_state::machine_reset()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( pal, comx35_state )
-	/* basic system hardware */
+	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, CDP1869_CPU_CLK_PAL)
 	MCFG_CPU_PROGRAM_MAP(comx35_mem)
 	MCFG_CPU_IO_MAP(comx35_io)
 	MCFG_CPU_CONFIG(cosmac_intf)
 
-	/* sound and video hardware */
+	// sound and video hardware
 	MCFG_FRAGMENT_ADD(comx35_pal_video)
 
-	/* peripheral hardware */
+	// peripheral hardware
 	MCFG_CDP1871_ADD(CDP1871_TAG, kbc_intf, CDP1869_CPU_CLK_PAL / 8)
 	MCFG_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
@@ -506,7 +523,7 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	// expansion bus
 	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb", NULL)
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
@@ -517,16 +534,16 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( ntsc, comx35_state )
-	/* basic system hardware */
+	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, CDP1869_CPU_CLK_NTSC)
 	MCFG_CPU_PROGRAM_MAP(comx35_mem)
 	MCFG_CPU_IO_MAP(comx35_io)
 	MCFG_CPU_CONFIG(cosmac_intf)
 
-	/* sound and video hardware */
+	// sound and video hardware
 	MCFG_FRAGMENT_ADD(comx35_ntsc_video)
 
-	/* peripheral hardware */
+	// peripheral hardware
 	MCFG_CDP1871_ADD(CDP1871_TAG, kbc_intf, CDP1869_CPU_CLK_NTSC / 8)
 	MCFG_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
@@ -537,7 +554,7 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	// expansion bus
 	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb", NULL)
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END

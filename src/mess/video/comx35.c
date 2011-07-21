@@ -65,16 +65,17 @@ static CDP1869_PCB_READ( comx35_pcb_r )
 	return BIT(pmd, 7);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( comx35_prd_w )
+WRITE_LINE_MEMBER( comx35_state::prd_w )
 {
-	comx35_state *driver_state = device->machine().driver_data<comx35_state>();
-
-	if (!driver_state->m_iden && !state)
+	if ((m_prd == CLEAR_LINE) && (state == ASSERT_LINE))
 	{
-		device_set_input_line(driver_state->m_maincpu, COSMAC_INPUT_LINE_INT, ASSERT_LINE);
+		m_cr1 = m_iden ? CLEAR_LINE : ASSERT_LINE;
+		check_interrupt();
 	}
+	
+	m_prd = state;
 
-	device_set_input_line(driver_state->m_maincpu, COSMAC_INPUT_LINE_EF1, state);
+	m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF1, state);
 }
 
 static CDP1869_INTERFACE( pal_cdp1869_intf )
@@ -85,7 +86,7 @@ static CDP1869_INTERFACE( pal_cdp1869_intf )
 	comx35_pcb_r,
 	comx35_charram_r,
 	comx35_charram_w,
-	DEVCB_LINE(comx35_prd_w)
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, prd_w)
 };
 
 static CDP1869_INTERFACE( ntsc_cdp1869_intf )
@@ -96,7 +97,7 @@ static CDP1869_INTERFACE( ntsc_cdp1869_intf )
 	comx35_pcb_r,
 	comx35_charram_r,
 	comx35_charram_w,
-	DEVCB_LINE(comx35_prd_w)
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, prd_w)
 };
 
 void comx35_state::video_start()
