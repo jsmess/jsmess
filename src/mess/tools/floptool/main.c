@@ -58,10 +58,12 @@ int CLIB_DECL main(int argc, char *argv[])
 					fprintf(stderr, "File %s not found.\n",argv[2]);
 					return -1;
 				}
-				floppy_image *image = new floppy_image(f, &stdio_ioprocs_noclose, floppyoptions_supported);
-				const struct floppy_format_def *format = image->identify();
+				floppy_image *image = new floppy_image(f, &stdio_ioprocs_noclose, FLOPPY_OPTIONS_NAME(supported));
+				int best;
+				const struct floppy_format_def *format = image->identify(&best);
 				if (format) {
 					fprintf(stderr, "File identified as %s\n",format->description);
+					image->load(best);
 				} else {
 					fprintf(stderr, "Unable to identified file type\n");
 				}
