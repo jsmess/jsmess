@@ -567,6 +567,7 @@ static DEVICE_RESET( tms9901 )
 	tms->pio_direction_mirror = 0;
 	tms->pio_output = tms->pio_output_mirror = 0;
 
+	tms->old_int_state = -1;
 	tms9901_field_interrupts(device);
 
 	tms->mode9901 = 0;
