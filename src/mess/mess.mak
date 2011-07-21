@@ -250,7 +250,7 @@ SOUNDS += TMS5200
 #SOUNDS += TMS5100
 #SOUNDS += TMS5110A
 SOUNDS += LMC1992
-
+SOUNDS += AWACS
 
 #-------------------------------------------------
 # this is the list of driver libraries that
