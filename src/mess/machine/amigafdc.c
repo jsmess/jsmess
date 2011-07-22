@@ -14,11 +14,13 @@
 #include "emu.h"
 #include "includes/amiga.h"
 #include "imagedev/floppy.h"
+#include "formats/ami_dsk.h"
 #include "formats/hxcmfm_dsk.h"
 #include "amigafdc.h"
 #include "machine/6526cia.h"
 
 static FLOPPY_OPTIONS_START( amiga_only )
+	FLOPPY_OPTION( adf, "adf", "Amiga ADF floppy disk image", FLOPPY_ADF_FORMAT, NULL )
 	FLOPPY_OPTION( mfm, "mfm", "HxCFloppyEmulator floppy disk image", FLOPPY_MFM_FORMAT, NULL )
 FLOPPY_OPTIONS_END
 
