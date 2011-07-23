@@ -1085,26 +1085,7 @@ static void apple2_reset(running_machine &machine)
 
 INTERRUPT_GEN( apple2_interrupt )
 {
-	int irq_freq = 1;
-	int scanline;
-
-	g_profiler.start(PROFILER_A2INT);
-
-	scanline = device->machine().primary_screen->vpos();
-
-	if (scanline > 190)
-	{
-		irq_freq --;
-		if (irq_freq < 0)
-			irq_freq = 1;
-
-		if (irq_freq)
-			cputag_set_input_line(device->machine(), "maincpu", M6502_IRQ_LINE, PULSE_LINE);
-	}
-
-	device->machine().primary_screen->update_partial(scanline);
-
-	g_profiler.stop();
+	device->machine().primary_screen->update_partial(device->machine().primary_screen->vpos());
 }
 
 
