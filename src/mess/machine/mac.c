@@ -1423,6 +1423,8 @@ NVRAM_HANDLER( mac )
 		}
 		else
 		{
+			UINT8 *pram = &mac->m_rtc_ram[0];
+
 			if (LOG_RTC)
 				logerror("trashing PRAM\n");
 
@@ -1430,31 +1432,57 @@ NVRAM_HANDLER( mac )
 
 			// some Mac ROMs are buggy in the presence of
 			// no NVRAM, so let's initialize it right
-			mac->m_rtc_ram[0] = 0xa8;	// valid
-			mac->m_rtc_ram[4] = 0xcc;
-			mac->m_rtc_ram[5] = 0x0a;
-			mac->m_rtc_ram[6] = 0xcc;
-			mac->m_rtc_ram[7] = 0x0a;
-			mac->m_rtc_ram[0xc] = 0x42;	// XPRAM valid for Plus/SE
-			mac->m_rtc_ram[0xd] = 0x75;
-			mac->m_rtc_ram[0xe] = 0x67;
-			mac->m_rtc_ram[0xf] = 0x73;
-			mac->m_rtc_ram[0x10] = 0x18;
-			mac->m_rtc_ram[0x11] = 0x88;
-			mac->m_rtc_ram[0x12] = 0x01;
-			mac->m_rtc_ram[0x13] = 0x4c;
+			pram[0] = 0xa8;	// valid
+			pram[4] = 0xcc;
+			pram[5] = 0x0a;
+			pram[6] = 0xcc;
+			pram[7] = 0x0a;
+			pram[0xc] = 0x42;	// XPRAM valid for Plus/SE
+			pram[0xd] = 0x75;
+			pram[0xe] = 0x67;
+			pram[0xf] = 0x73;
+			pram[0x10] = 0x18;
+			pram[0x11] = 0x88;
+			pram[0x12] = 0x01;
+			pram[0x13] = 0x4c;
 
 			if (mac->m_model >= MODEL_MAC_II)
 			{
-				mac->m_rtc_ram[0xc] = 0x4e;	// XPRAM valid is different for these
-				mac->m_rtc_ram[0xd] = 0x75;
-				mac->m_rtc_ram[0xe] = 0x4d;
-				mac->m_rtc_ram[0xf] = 0x63;
-				mac->m_rtc_ram[0x77] = 0x01;
-				mac->m_rtc_ram[0x78] = 0xff;
-				mac->m_rtc_ram[0x79] = 0xff;
-				mac->m_rtc_ram[0x7a] = 0xff;
-				mac->m_rtc_ram[0x7b] = 0xdf;
+				pram[0xc] = 0x4e;	// XPRAM valid is different for these
+				pram[0xd] = 0x75;
+				pram[0xe] = 0x4d;
+				pram[0xf] = 0x63;
+				pram[0x77] = 0x01;
+				pram[0x78] = 0xff;
+				pram[0x79] = 0xff;
+				pram[0x7a] = 0xff;
+				pram[0x7b] = 0xdf;
+
+				if (mac->m_model == MODEL_MAC_IICI)
+				{
+					pram[0] = 0xa8;
+					pram[1] = 0x80;
+					pram[2] = 0x4f;
+					pram[3] = 0x48;
+					pram[4] = 0xcc;
+					pram[5] = 0x0a;
+					pram[6] = 0xcc;
+					pram[7] = 0x0a;
+					pram[0x10] = 0x18;
+					pram[0x11] = 0x88;
+					pram[0x12] = 0x03;
+					pram[0x13] = 0xec;
+					pram[0x57] = 0x1f;
+					pram[0x58] = 0x83;
+					pram[0x59] = 0x86;
+					pram[0x81] = 0x86;
+					pram[0x8a] = 0x05;
+					pram[0xb9] = 0xb0;
+					pram[0xf1] = 0x01;
+					pram[0xf3] = 0x02;
+					pram[0xf9] = 0x01;
+					pram[0xfb] = 0x8e;
+				}
 			}
 		}
 

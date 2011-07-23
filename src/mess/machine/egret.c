@@ -114,6 +114,20 @@ void egret_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 				(data & 0x80) ? 1 : 0,
 				(data & 0x10) ? 1 : 0,
 				(data & 0x02) ? 1 : 0);*/
+
+			if ((data & 0x80) != last_adb)
+			{
+/*				if (data & 0x80)
+				{
+					printf("EG ADB: 1->0 time %lld\n", m_maincpu->total_cycles()-last_adb_time);
+				}
+				else
+				{
+					printf("EG ADB: 0->1 time %lld\n", m_maincpu->total_cycles()-last_adb_time);
+				}*/
+				last_adb = data & 0x80;
+				last_adb_time = m_maincpu->total_cycles();
+			}
 			break;
 
         case 1: // port B
@@ -294,7 +308,7 @@ WRITE8_MEMBER( egret_device::onesec_w )
 
 //	printf("%02x to one-second control\n", data);
 
-	m_timer->adjust(attotime::from_hz(rates[data&3]*128.0f), 0, attotime::from_hz(rates[data&3]*128.0f));
+	m_timer->adjust(attotime::from_hz(rates[data&3]), 0, attotime::from_hz(rates[data&3]));
 
 	if ((onesec & 0x40) && !(data & 0x40))
 	{
@@ -378,6 +392,7 @@ void egret_device::device_reset()
     pll_ctrl = 0;
     timer_ctrl = 0;
     timer_counter = 0;
+	last_adb_time = m_maincpu->total_cycles();
 }
 
 void egret_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -397,7 +412,39 @@ void egret_device::nvram_default()
 {
 	memset(pram, 0, 0x100);
 	memset(disk_pram, 0, 0x100);
-	pram_loaded = true;	// no sense doing the transfer in this case
+
+	// IIsi and IIvx both default PRAM to this, it seems a reasonable default for Egret systems
+	pram[0x1] = 0x80;
+	pram[0x2] = 0x4f;
+	pram[0x3] = 0x48;
+	pram[0x8] = 0x13;
+	pram[0x9] = 0x88;
+	pram[0xb] = 0x4c;
+	pram[0xc] = 0x4e;
+	pram[0xd] = 0x75;
+	pram[0xe] = 0x4d;
+	pram[0xf] = 0x63;
+	pram[0x10] = 0xa8;
+	pram[0x14] = 0xcc;
+	pram[0x15] = 0x0a;
+	pram[0x16] = 0xcc;
+	pram[0x17] = 0x0a;
+	pram[0x1d] = 0x02;
+	pram[0x17] = 0x63;
+	pram[0x6f] = 0x28;
+	pram[0x70] = 0x83;
+	pram[0x71] = 0x26;
+	pram[0x77] = 0x01;
+	pram[0x78] = 0xff;
+	pram[0x79] = 0xff;
+	pram[0x7a] = 0xff;
+	pram[0x7b] = 0xdf;
+	pram[0x7d] = 0x09;
+	pram[0xf3] = 0x12;
+	pram[0xf9] = 0x01;
+	pram[0xf3] = 0x12;
+	pram[0xfb] = 0x8d;
+	pram_loaded = false;
 }
 
 void egret_device::nvram_read(emu_file &file)
