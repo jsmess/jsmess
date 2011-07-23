@@ -1,22 +1,11 @@
 /***************************************************************************
-   
+
         Zenith Z-100
 
         15/07/2011 Skeleton driver.
 
-****************************************************************************/
+============================================================================
 
-#include "emu.h"
-#include "cpu/i86/i86.h"
-
-class z100_state : public driver_device
-{
-public:
-	z100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-	{ }
-};
-/*
 Z207A		EQU 0B0H	; Z-207 disk controller base port
   ; (See DEFZ207 to program controller)
 Z217A		EQU 0AEH	; Z-217 disk controller base port
@@ -25,7 +14,7 @@ ZGRNSEG		EQU 0E000H	; Segment of green video plane
 ZREDSEG		EQU 0D000H	; Segment of red video plane
 ZBLUSEG		EQU 0C000H	; Segment of blue video plane
 ZVIDEO		EQU 0D8H	; Video 68A21 port
-  ; PA0 -> enable red display 
+  ; PA0 -> enable red display
   ; PA1 -> enable green display
   ; PA2 -> enable blue display
   ; PA3 -> not flash screen
@@ -141,34 +130,18 @@ ZDIPSW		EQU 0FFH	; Configuration dip switches
   ZDIPSWRES	  EQU 01110000B	  ; Reserved
   ZDIPSWHZ	  EQU 10000000B	  ; 1=50Hz(0=60HZ)
 
- */
-static ADDRESS_MAP_START(z100_mem, AS_PROGRAM, 8)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0x1ffff) AM_RAM // 128 KB RAM
-	AM_RANGE(0xc0000,0xcffff) AM_RAM // Green
-	AM_RANGE(0xd0000,0xdffff) AM_RAM // Red
-	AM_RANGE(0xe0000,0xeffff) AM_RAM // Blue 
-	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
-ADDRESS_MAP_END
+****************************************************************************/
 
-static READ8_HANDLER(unk_f5_r)
+#include "emu.h"
+#include "cpu/i86/i86.h"
+
+class z100_state : public driver_device
 {
-	return 0;
-}
-
-static ADDRESS_MAP_START( z100_io , AS_IO, 8)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0xf5, 0xf5) AM_READ(unk_f5_r)
-ADDRESS_MAP_END
-
-/* Input ports */
-INPUT_PORTS_START( z100 )
-INPUT_PORTS_END
-
-
-static MACHINE_RESET(z100) 
-{	
-}
+public:
+	z100_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+	{ }
+};
 
 static VIDEO_START( z100 )
 {
@@ -179,14 +152,60 @@ static SCREEN_UPDATE( z100 )
     return 0;
 }
 
+static ADDRESS_MAP_START(z100_mem, AS_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00000,0x1ffff) AM_RAM // 128 KB RAM
+	AM_RANGE(0xc0000,0xcffff) AM_RAM // Green
+	AM_RANGE(0xd0000,0xdffff) AM_RAM // Red
+	AM_RANGE(0xe0000,0xeffff) AM_RAM // Blue
+	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
+ADDRESS_MAP_END
+
+static READ8_HANDLER(keyb_status_r)
+{
+	return 0;
+}
+
+static ADDRESS_MAP_START( z100_io , AS_IO, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+//	AM_RANGE (0x98, 0x98) Z-205 max number
+//	AM_RANGE (0xae, 0xaf) Z-217 disk controller
+//	AM_RANGE (0xb0, 0xb1) Z-207 disk controller
+//	AM_RANGE (0xd8, 0xdb) 68A21 PIA
+//	AM_RANGE (0xdc, 0xdd) M6845
+//	AM_RANGE (0xde, 0xde) light pen
+//	AM_RANGE (0xe0, 0xe3) 68A21 PIA (printer & VSYNC)
+//	AM_RANGE (0xe4, 0xe7) 8253 PIT
+//	AM_RANGE (0xe8, 0xeb) First 2661-2 serial port
+//	AM_RANGE (0xec, 0xef) Second 2661-2 serial port
+//	AM_RANGE (0xf0, 0xf1) Slave i8259
+//	AM_RANGE (0xf2, 0xf3) Master i8259
+//	AM_RANGE (0xf4, 0xf4) keyboard data port
+	AM_RANGE (0xf5, 0xf5) AM_READ(keyb_status_r) //W keyboard command port
+//	AM_RANGE (0xfb, 0xfb) timer irq status
+//	AM_RANGE (0xfc, 0xfc) memory latch
+//	AM_RANGE (0xfd, 0xfd) Hi-address latch
+//	AM_RANGE (0xfe, 0xfe) Processor swap port
+//	AM_RANGE (0xff, 0xff) Configuration DIP-SW
+ADDRESS_MAP_END
+
+/* Input ports */
+INPUT_PORTS_START( z100 )
+INPUT_PORTS_END
+
+
+static MACHINE_RESET(z100)
+{
+}
+
 static MACHINE_CONFIG_START( z100, z100_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",I8088, XTAL_14_31818MHz/3)
     MCFG_CPU_PROGRAM_MAP(z100_mem)
-    MCFG_CPU_IO_MAP(z100_io)	
+    MCFG_CPU_IO_MAP(z100_io)
 
     MCFG_MACHINE_RESET(z100)
-	
+
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
@@ -206,6 +225,9 @@ MACHINE_CONFIG_END
 ROM_START( z100 )
 	ROM_REGION( 0x4000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "intel-d27128-1.bin", 0x0000, 0x4000, CRC(b21f0392) SHA1(69e492891cceb143a685315efe0752981a2d8143))
+
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 /* Driver */
