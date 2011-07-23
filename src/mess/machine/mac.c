@@ -516,15 +516,19 @@ void mac_state::set_memory_overlay(int overlay)
 			}
 			else	// RAM: be careful not to populate ram B with a mirror or the ROM will get confused
 			{
-				mac_install_memory(machine(), 0x00000000, 0x3fffffff, memory_size, memory_data, is_rom, "bank1");
+				mac_install_memory(machine(), 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 			}
 		}
 		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIVX) || (m_model == MODEL_MAC_IIFX))
 		{
+			address_space* space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+			space->unmap_write(0x000000, 0x9fffff, 0x9fffff, 0);
 			mac_install_memory(machine(), 0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
-		else if ((m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB180c))
+		else if ((m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160))
 		{
+			address_space* space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+			space->unmap_write(0x000000, 0xffffff, 0xffffff, 0);
 			mac_install_memory(machine(), 0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
 		else if ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30))
@@ -2224,8 +2228,14 @@ static void pmu_exec(mac_state *mac)
 		case 0x40:  // set screen contrast
 			break;
 
+		case 0x41:
+			break;
+
 		case 0x58:	// read internal modem status
 			pmu_one_byte_reply(mac, 0);
+			break;
+
+		case 0x60:	// set low power warning and cutoff battery levels
 			break;
 
 		case 0x68:	// read battery/charger level
@@ -2491,6 +2501,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 			return 0x81 | PA6;
 
 		case MODEL_MAC_PB140:	// since the ASICs are different, these are allowed to "collide" 
+		case MODEL_MAC_PB160:
 		case MODEL_MAC_CLASSIC_II:
 		case MODEL_MAC_QUADRA_800:
 			return 0x81 | PA4 | PA1;
@@ -2777,7 +2788,7 @@ READ16_MEMBER ( mac_state::mac_via2_r )
 
 	data = m_via2->read(space, offset);
 
-//  if (LOG_VIA)
+  if (LOG_VIA)
 		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, cpu_get_pc(space.machine().device("maincpu")));
 
 	return (data & 0xff) | (data << 8);
@@ -2788,7 +2799,7 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 	offset >>= 8;
 	offset &= 0x0f;
 
-//  if (LOG_VIA)
+  if (LOG_VIA)
 		logerror("mac_via2_w: offset=%x data=0x%08x (PC=%x)\n", offset, data, cpu_get_pc(space.machine().device("maincpu")));
 
 	if (ACCESSING_BITS_8_15)
@@ -3193,7 +3204,7 @@ static void mac_driver_init(running_machine &machine, model_t model)
 
 	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) ||
 	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((mac->m_model >= MODEL_MAC_II) && (mac->m_model <= MODEL_MAC_SE30)) ||
-	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100) || (model == MODEL_MAC_PB140))
+	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100) || (model == MODEL_MAC_PB140) || (model == MODEL_MAC_PB160))
 	{
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(overlay_opbaseoverride), &machine));
 	}

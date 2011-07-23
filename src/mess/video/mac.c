@@ -23,7 +23,16 @@ PALETTE_INIT( mac )
 	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0x00);
 }
 
+// 16-level grayscale
+PALETTE_INIT( macgsc )
+{
+	for (int i = 15; i >= 0; i--)
+	{
+		UINT8 component = i | (i<<4);
 
+		palette_set_color_rgb(machine, 15-i, component, component, component);
+	}
+}
 
 VIDEO_START( mac )
 {
@@ -137,6 +146,29 @@ SCREEN_UPDATE( macpb140 )
 			{
 				line[x + b] = (word >> (15 - b)) & 0x0001;
 			}
+		}
+	}
+	return 0;
+}
+
+SCREEN_UPDATE( macpb160 )
+{
+	UINT16 *line;
+	int y, x;
+	UINT8 pixels;
+	mac_state *state = screen->machine().driver_data<mac_state>();
+	UINT8 *vram8 = (UINT8 *)state->m_vram;
+
+	for (y = 0; y < 480; y++)
+	{
+		line = BITMAP_ADDR16(bitmap, y, 0);
+
+		for (x = 0; x < 640/2; x++)
+		{
+			pixels = vram8[(y * 320) + (BYTE4_XOR_BE(x))];
+
+			*line++ = (pixels>>4)&0xf;
+			*line++ = pixels&0xf;
 		}
 	}
 	return 0;
