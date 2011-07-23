@@ -6,6 +6,7 @@
 
 	TODO:
 	- remove parity check IRQ patch (understand what it really wants there!)
+	- video RAM banks not fully understood
 
 ============================================================================
 
@@ -148,13 +149,42 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
+	UINT8 *m_tvram;
 	UINT8 *m_gvram;
-	UINT8 m_keyb_press;
+	UINT8 m_keyb_press,m_keyb_status;
+	UINT8 m_tbank;
+	UINT8 m_gbank;
+	UINT8 m_clr_val;
+	UINT8 m_crtc_vreg[0x100],m_crtc_index;
+
+	mc6845_device *m_mc6845;
+
 };
+
+#define mc6845_h_char_total 	(state->m_crtc_vreg[0])
+#define mc6845_h_display		(state->m_crtc_vreg[1])
+#define mc6845_h_sync_pos		(state->m_crtc_vreg[2])
+#define mc6845_sync_width		(state->m_crtc_vreg[3])
+#define mc6845_v_char_total		(state->m_crtc_vreg[4])
+#define mc6845_v_total_adj		(state->m_crtc_vreg[5])
+#define mc6845_v_display		(state->m_crtc_vreg[6])
+#define mc6845_v_sync_pos		(state->m_crtc_vreg[7])
+#define mc6845_mode_ctrl		(state->m_crtc_vreg[8])
+#define mc6845_tile_height		(state->m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start	(state->m_crtc_vreg[0x0a])
+#define mc6845_cursor_y_end 	(state->m_crtc_vreg[0x0b])
+#define mc6845_start_addr		(((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr  	(((state->m_crtc_vreg[0x0e]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr	(((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
+
 
 static VIDEO_START( z100 )
 {
+	z100_state *state = machine.driver_data<z100_state>();
 
+	state->m_tvram = auto_alloc_array_clear(machine, UINT8, 0x30000);
+	state->m_gvram = auto_alloc_array_clear(machine, UINT8, 0x30000*3);
 }
 
 static SCREEN_UPDATE( z100 )
@@ -162,31 +192,52 @@ static SCREEN_UPDATE( z100 )
 	z100_state *state = screen->machine().driver_data<z100_state>();
 	int x,y,xi,yi;
 	int dot;
+	UINT32 count;
+	int r,g,b;
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	for (y=0;y<25;y++)
+	count = 0;
+	for(y=0;y<216;y++)
 	{
-		for(x=0;x<80;x++)
+		for(x=0;x<1024;x+=8)
+		{
+			for(xi=0;xi<8;xi++)
+			{
+				b = ((state->m_gvram[count+0x20000] >> (7-xi)) & 1) << 0;
+				r = ((state->m_gvram[count+0x00000] >> (7-xi)) & 1) << 1;
+				g = ((state->m_gvram[count+0x10000] >> (7-xi)) & 1) << 2;
+
+				if(y < 216 && x+xi < 640) /* TODO: safety check */
+					*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine().pens[r|g|b];
+			}
+
+			count++;
+		}
+	}
+
+	for(y=0;y<mc6845_v_display;y++)
+	{
+		for(x=0;x<mc6845_h_display;x++)
 		{
 			UINT32 base_offs,attr_offs;
 			int color;
 
 			attr_offs = 0x20000 + y * 0x800 + x + 0x500;
 
-			color = state->m_gvram[attr_offs] & 7;
+			color = state->m_tvram[attr_offs] & 7;
 
-			for(yi=0;yi<8;yi++)
+			for(yi=0;yi<mc6845_tile_height;yi++)
 			{
 				base_offs = 0x20000 + y * 0x800 + yi * 0x80 + x;
 
 				for(xi=0;xi<8;xi++)
 				{
-					dot = ((state->m_gvram[base_offs] >> (7-xi)) & 1);
+					dot = ((state->m_tvram[base_offs] >> (7-xi)) & 1);
 
 					if(dot)
-						if(y*8+yi < 216 && x*8+xi < 640) /* TODO: safety check */
-							*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine().pens[color];
+						if(y*mc6845_tile_height+yi < 216 && x*8+xi < 640) /* TODO: safety check */
+							*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen->machine().pens[color];
 				}
 			}
 		}
@@ -195,11 +246,44 @@ static SCREEN_UPDATE( z100 )
     return 0;
 }
 
+static READ8_HANDLER( z100_vram_r )
+{
+	z100_state *state = space->machine().driver_data<z100_state>();
+	UINT8 res;
+
+	res = 0;
+
+	if(state->m_gbank == 0xf)
+		res |= state->m_tvram[offset & 0x3ffff];
+	else if(state->m_gbank & 7)
+		res |= state->m_gvram[offset];
+
+	return res;
+}
+
+static WRITE8_HANDLER( z100_vram_w )
+{
+	z100_state *state = space->machine().driver_data<z100_state>();
+
+	if(state->m_gbank == 0xf)
+		state->m_tvram[offset & 0x3ffff] = data;
+	else
+	{
+		int i;
+
+		for(i=0;i<3;i++)
+		{
+			if(state->m_gbank & (1 << i))
+				state->m_gvram[(offset & 0xffff)+0x10000*i] = data;
+		}
+	}
+}
+
 static ADDRESS_MAP_START(z100_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x1ffff) AM_RAM // 128 KB RAM
 //	AM_RANGE(0xb0000,0xbffff) AM_ROM // expansion ROM
-	AM_RANGE(0xc0000,0xeffff) AM_RAM AM_BASE_MEMBER(z100_state,m_gvram) // Blue / Red / Green
+	AM_RANGE(0xc0000,0xeffff) AM_READWRITE(z100_vram_r,z100_vram_w) // Blue / Red / Green
 //	AM_RANGE(0xfbffa,0xfbffb) // expansion ROM check ID 0x4550
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
@@ -208,17 +292,51 @@ static READ8_HANDLER(keyb_data_r)
 {
 	z100_state *state = space->machine().driver_data<z100_state>();
 
+	if(state->m_keyb_press)
+	{
+		UINT8 res;
+
+		res = state->m_keyb_press;
+
+		state->m_keyb_press = 0;
+		return res;
+	}
+
 	return state->m_keyb_press;
 }
 
 static READ8_HANDLER(keyb_status_r)
 {
-	return 1;
+	z100_state *state = space->machine().driver_data<z100_state>();
+
+	if(state->m_keyb_status)
+	{
+		state->m_keyb_status = 0;
+		return 1;
+	}
+
+	return state->m_keyb_status;
 }
 
 static WRITE8_HANDLER(keyb_command_w)
 {
 	// ...
+}
+
+static WRITE8_HANDLER( z100_6845_address_w )
+{
+	z100_state *state = space->machine().driver_data<z100_state>();
+
+	state->m_crtc_index = data;
+	state->m_mc6845->address_w(*space, offset, data);
+}
+
+static WRITE8_HANDLER( z100_6845_data_w )
+{
+	z100_state *state = space->machine().driver_data<z100_state>();
+
+	state->m_crtc_vreg[state->m_crtc_index] = data;
+	state->m_mc6845->register_w(*space, offset, data);
 }
 
 static ADDRESS_MAP_START( z100_io , AS_IO, 8)
@@ -227,8 +345,8 @@ static ADDRESS_MAP_START( z100_io , AS_IO, 8)
 //	AM_RANGE (0xae, 0xaf) Z-217 disk controller
 //	AM_RANGE (0xb0, 0xb1) Z-207 disk controller
 	AM_RANGE (0xd8, 0xdb) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE (0xdc, 0xdc) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE (0xdd, 0xdd) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
+	AM_RANGE (0xdc, 0xdc) AM_WRITE(z100_6845_address_w)
+	AM_RANGE (0xdd, 0xdd) AM_WRITE(z100_6845_data_w)
 //	AM_RANGE (0xde, 0xde) light pen
 	AM_RANGE (0xe0, 0xe3) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
 //	AM_RANGE (0xe4, 0xe7) 8253 PIT
@@ -254,10 +372,14 @@ static INPUT_CHANGED( key_stroke )
 	{
 		state->m_keyb_press = (UINT8)(FPTR)(param) & 0x7f;
 		//pic8259_ir1_w(field.machine().device("pic8259_master"), 1);
+		state->m_keyb_status = 1;
 	}
 
 	if(oldval && !newval)
+	{
 		state->m_keyb_press = 0;
+		state->m_keyb_status = 0;
+	}
 }
 
 /* Input ports */
@@ -323,18 +445,18 @@ INPUT_PORTS_START( z100 )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x2f)
 
 	PORT_START("KEY6") // 0x30 - 0x37
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x30)
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x31)
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x32)
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x33)
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x34)
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x35)
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x36)
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x37)
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_IMPULSE(1) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x30)
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x31)
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x32)
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x33)
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x34)
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x35)
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x36)
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x37)
 
 	PORT_START("KEY7") // 0x38 - 0x3f
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x38)
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x39)
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x38)
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x39)
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x3a)
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x3b)
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x3c)
@@ -461,8 +583,10 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static WRITE8_DEVICE_HANDLER( video_pia_porta_w )
+static WRITE8_DEVICE_HANDLER( video_pia_A_w )
 {
+	z100_state *state = device->machine().driver_data<z100_state>();
+
  /*
  	x--- ---- -> disable video RAM
 	-x-- ---- -> not write multiple blue
@@ -473,6 +597,30 @@ static WRITE8_DEVICE_HANDLER( video_pia_porta_w )
   	---- --x- -> enable green display
  	---- ---x -> enable red display
     */
+    if(data != 0x08 && data != 0xf8)
+    printf("%02x\n",data);
+
+    state->m_gbank = ((data & 0xf0) >> 4) ^ 0xf;
+}
+
+/* clear screen */
+static WRITE_LINE_DEVICE_HANDLER( video_pia_CA2_w )
+{
+	z100_state *drvstate = device->machine().driver_data<z100_state>();
+	int i;
+
+	for(i=0;i<0x10000;i++)
+		drvstate->m_tvram[i] = drvstate->m_clr_val;
+
+	for(i=0;i<0x30000;i++)
+		drvstate->m_gvram[i] = drvstate->m_clr_val;
+}
+
+static WRITE8_DEVICE_HANDLER( video_pia_CB2_w )
+{
+	z100_state *state = device->machine().driver_data<z100_state>();
+
+	state->m_clr_val = (data & 1) ? 0x00 : 0xff;
 }
 
 static const pia6821_interface pia0_intf =
@@ -483,10 +631,10 @@ static const pia6821_interface pia0_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(video_pia_porta_w),		/* port A out */
+	DEVCB_HANDLER(video_pia_A_w),		/* port A out */
 	DEVCB_NULL,		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(video_pia_CA2_w),		/* line CA2 out */
+	DEVCB_HANDLER(video_pia_CB2_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_NULL		/* IRQB */
 };
@@ -514,9 +662,10 @@ static PALETTE_INIT(z100)
 
 static MACHINE_START(z100)
 {
-//	z100_state *state = machine.driver_data<z100_state>();
+	z100_state *state = machine.driver_data<z100_state>();
 
 	device_set_irq_callback(machine.device("maincpu"), z100_irq_callback);
+	state->m_mc6845 = machine.device<mc6845_device>("crtc");
 }
 
 static MACHINE_RESET(z100)
