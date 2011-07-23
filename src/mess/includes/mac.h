@@ -153,7 +153,9 @@ SCREEN_UPDATE( mac );
 SCREEN_UPDATE( macse30 );
 SCREEN_UPDATE( macprtb );
 SCREEN_UPDATE( macpb140 );
+SCREEN_UPDATE( macpb160 );
 PALETTE_INIT( mac );
+PALETTE_INIT( macgsc );
 
 VIDEO_START( macrbv );
 VIDEO_START( macv8 );
@@ -366,6 +368,9 @@ public:
     DECLARE_READ8_MEMBER(amic_dma_r);
     DECLARE_WRITE8_MEMBER(amic_dma_w);
     DECLARE_READ8_MEMBER(pmac_diag_r);
+
+    DECLARE_READ8_MEMBER(mac_gsc_r);
+    DECLARE_WRITE8_MEMBER(mac_gsc_w);
 
 private:
 	int has_adb();
