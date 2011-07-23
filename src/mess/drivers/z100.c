@@ -160,27 +160,35 @@ static VIDEO_START( z100 )
 static SCREEN_UPDATE( z100 )
 {
 	z100_state *state = screen->machine().driver_data<z100_state>();
-	int x,y,xi;
-	int count;
-	int r,g,b;
+	int x,y,xi,yi;
+	int dot;
 
-	count = 0;
+	bitmap_fill(bitmap, cliprect, 0);
 
-	for (y=0;y<200;y++)
+	for (y=0;y<25;y++)
 	{
-		for(x=0;x<1024;x+=8)
+		for(x=0;x<80;x++)
 		{
-			for(xi=0;xi<8;xi++)
+			UINT32 base_offs,attr_offs;
+			int color;
+
+			attr_offs = 0x20000 + y * 0x800 + x + 0x500;
+
+			color = state->m_gvram[attr_offs] & 7;
+
+			for(yi=0;yi<8;yi++)
 			{
-				b = ((state->m_gvram[count+0x00000] >> (7-xi)) & 1)<<0;
-				r = ((state->m_gvram[count+0x10000] >> (7-xi)) & 1)<<1;
-				g = ((state->m_gvram[count+0x20000] >> (7-xi)) & 1)<<2;
+				base_offs = 0x20000 + y * 0x800 + yi * 0x80 + x;
 
-				if(y < 200 && x+xi < 640) /* TODO: safety check */
-					*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine().pens[b|r|g];
+				for(xi=0;xi<8;xi++)
+				{
+					dot = ((state->m_gvram[base_offs] >> (7-xi)) & 1);
+
+					if(dot)
+						if(y*8+yi < 216 && x*8+xi < 640) /* TODO: safety check */
+							*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine().pens[color];
+				}
 			}
-
-			count++;
 		}
 	}
 
@@ -355,14 +363,14 @@ INPUT_PORTS_START( z100 )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x6f)
 
 	PORT_START("KEYA") // 0x50 - 0x57
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x70)
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x71)
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x72)
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x73)
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x74)
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x75)
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x76)
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x77)
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x70)
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x71)
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x72)
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x73)
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x74)
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x75)
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x76)
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x77)
 
 	PORT_START("KEYB") // 0x58 - 0x5f
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x78)
