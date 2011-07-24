@@ -287,7 +287,7 @@ public:
 	emu_timer *m_6015_timer;
 
 	// RBV and friends (V8, etc)
-	UINT8 m_rbv_regs[256], m_rbv_ier, m_rbv_ifr, m_rbv_type, m_rbv_montype;
+	UINT8 m_rbv_regs[256], m_rbv_ier, m_rbv_ifr, m_rbv_type, m_rbv_montype, m_rbv_vbltime;
 	UINT32 m_rbv_colors[3], m_rbv_count, m_rbv_clutoffs, m_rbv_immed10wr;
 	UINT32 m_rbv_palette[256];
 	UINT8 m_sonora_vctl[8];
@@ -319,6 +319,7 @@ public:
 	void rtc_incticks();
 	void adb_talk();
 	void mouse_callback();
+    void rbv_recalc_irqs();
 
 	DECLARE_READ16_MEMBER ( mac_via_r );
 	DECLARE_WRITE16_MEMBER ( mac_via_w );
