@@ -16,8 +16,8 @@
 
     byte 0:
     1ccc xaaa = configuration of parameter ccc; UART type aaaa
-    0abc defg = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f, g=BRK
-    (comprising both directions; not all combinations available)
+    01ab cdef = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
+    00gh i000 = exception g=BRK, h=FRMERR, i=PARERR
 
     TI99 RS232 card ('rs232')
     TMS9902 ('rs232:tms9902_0')
@@ -26,28 +26,67 @@
     TI99 RS232 attached serial device ('rs232:serdev1')
     TI99 PIO attached parallel device ('rs232:piodev')
 
-    One of the somewhat unexpected but important details is that the wiring
-    of the signals implies that the RS232 interface acts like a DCE, not like
-    a DTE. Maybe the designers of this card thought of a VT100 terminal
-    connected to the TI, with the TI playing the role of a modem.
+    TI RS232 card wiring
+    --------------------
+    The card uses this wiring (inverters not included)
+
+     +-----+         Pins of the connector
+     | 9902|          (common naming)
+     | RIN |---<-------  2  (TD)
+     | XOUT|--->-------  3  (RD)
+     | RTS |--->-------  8  (DCD)
+     | CTS |-<-+------- 20  (DTR)
+     | DSR |-<-+    H--> 6  (DSR)
+     +-----+     +-----> 5  (CTS)
+                /
+     +-----+   /
+     | CRU |--+
+     +-----+
+
+    Obviously we have a wiring which is typical for a DCE, not a DTE. The TI
+    RS232 was designed to look like a modem.
 
     The advantage is that you can use the same cables for connecting a modem
     to the RS232 interface or for connecting a second TI via its interface. To
     connect to a DTE you can use a 1-1 wiring cable (1 on 1, 2 on 2 ...)
 
-    The disadvantage is that serial library APIs assume you have a DTE, so if
-    we want to use them to connect to a real interface we must first find
-    corresponding signals and translate them. For instance, which line should
-    become active when the interface activates the Carrier Detect line?
+    The TI manual for the RS232 card suggests the following cables:
 
-    Map:  TI    -   DTE
-          -------------
-          CTS   ->  RTS
-          DCD   ->  DTR
-          DTR   <-  CTS | DSR
-          DSR   ->  n.c.
-          (DSR hardwired to +5)
+    TI RS232   -    Modem or other TI RS232
+      2 -----<----- 3
+      3 ----->----- 2
+      6 ----->---- 20         (crossover cable)
+     20 -----<----- 6
 
+    TI RS232   -    Terminal (DTE)
+      2 ----<------ 2
+      3 ---->------ 3
+      5 ---->------ 5
+      6 ---->------ 6         (1-1 cable)
+      8 ---->------ 8
+     20 ----<------20
+
+    If we want to use a PC serial interface to play the role of the TI
+    interface we have to map the TI wiring to a suitable wiring for PC
+    interfaces which are designed as DTEs.
+
+    From the signals used in the suggested cables we can conclude that we just
+    need to do the following conversion if we want a PC serial interface
+    to play the role of the TI RS232:
+
+     Emulated      PC serial
+     TI RS232      interface
+       2 -----------( 3) --->
+       3 -----------( 2) <---
+       4 (nc) ------( 5) <---     (cable)
+       5 -----------( 4) --->
+       6 -----------(20) --->
+       8 ---| nc |--( 8) <---
+      20 -----------( 6) <---
+
+     Note that we now have to swap the cable types: Use a 1-1 cable to connect
+     another TI or a modem on the other end, and use a crossover cable for
+     another PC (the usual way of connecting).
 */
 
 #include "emu.h"
@@ -63,6 +102,7 @@
 
 #define RECV_MODE_NORMAL 1
 #define RECV_MODE_ESC 2
+#define RECV_MODE_ESC_LINES 3
 
 #define VERBOSE 1
 
@@ -73,22 +113,20 @@ typedef ti99_pebcard_config ti_rs232_config;
 
 typedef struct _ti_rs232_state
 {
-	device_t *uart0, *uart1, *serdev0, *serdev1, *piodev;
+	device_t *uart[2];
+	device_t *serdev[2], *piodev;
 
 	int 	selected;
 	int		select_mask;
 	int		select_value;
 
-	UINT8	lines0;
-	UINT8	lines1;
-
-	int	recv_mode0; // May be NORMAL or ESC
-	int recv_mode1;
+	UINT8	signals[2]; // Latches the state of the output lines for UART0/UART1
+	int		recv_mode[2]; // May be NORMAL or ESC
 
 	// Baud rate management
 	// not part of the real device, but required for the connection to the
 	// real UART
-	double time_hold0, time_hold1;
+	double time_hold[2];
 
 	// PIO flags
 	int pio_direction;		// a.k.a. PIOOC pio in output mode if 0
@@ -117,25 +155,7 @@ typedef struct _ti_rs232_state
 
 } ti_rs232_state;
 
-/*
-    Serial control protocol values
-*/
-#define CONFIG 0x80
-#define RATERECV 0x70
-#define RATEXMIT 0x60
-#define DATABITS 0x50
-#define STOPBITS 0x40
-#define PARITY   0x30
-
-// lines
-#define RTS 0x40
-#define CTS 0x20
-#define DSR 0x10
-#define DCD 0x08
-#define DTR 0x04
-#define RI  0x02
-
-#define TYPE_TMS9902 0x01
+#define ESC 0x1b
 
 INLINE ti_rs232_state *get_safe_token(device_t *device)
 {
@@ -145,8 +165,8 @@ INLINE ti_rs232_state *get_safe_token(device_t *device)
 	return (ti_rs232_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-static void set_dtr(device_t *device, int value);
-static void set_cts(device_t *device, int chip, UINT8 value);
+static void incoming_dtr(device_t *device, line_state value);
+static void output_line_state(device_t *tms9902, int mask, UINT8 value);
 
 
 /**************************************************************************/
@@ -188,12 +208,14 @@ static DEVICE_IMAGE_LOAD( ti99_rs232_serdev )
 	if (devnumber==0)
 	{
 		tms9902 = image.device().siblingdevice("tms9902_0");
-		tms9902_clock(tms9902, 1);
+		// Turn on polling
+		tms9902_clock(tms9902, true);
 	}
 	else if (devnumber==1)
 	{
 		tms9902 = image.device().siblingdevice("tms9902_1");
-		tms9902_clock(tms9902, 1);
+		// Turn on polling
+		tms9902_clock(tms9902, true);
 	}
 	else
 	{
@@ -201,7 +223,7 @@ static DEVICE_IMAGE_LOAD( ti99_rs232_serdev )
 		return IMAGE_INIT_FAIL;
 	}
 
-	set_dtr(tms9902, image? 1:0);
+	incoming_dtr(tms9902, image? ASSERT_LINE : CLEAR_LINE);
 
 	return IMAGE_INIT_PASS;
 }
@@ -213,12 +235,14 @@ static DEVICE_IMAGE_UNLOAD( ti99_rs232_serdev )
 	if (devnumber==0)
 	{
 		tms9902 = image.device().siblingdevice("tms9902_0");
-		tms9902_clock(tms9902, 0);
+		// Turn off polling
+		tms9902_clock(tms9902, false);
 	}
 	else if (devnumber==1)
 	{
 		tms9902 = image.device().siblingdevice("tms9902_1");
-		tms9902_clock(tms9902, 0);
+		// Turn off polling
+		tms9902_clock(tms9902, false);
 	}
 }
 
@@ -279,9 +303,11 @@ static READ8Z_DEVICE_HANDLER( cru_rz )
 				reply |= 0x08;
 			if (card->flag0)
 				reply |= 0x10;
-			if (card->lines0 & CTS)
+			// The CTS line is realized as CRU bits
+			// Mind that this line is handled as an output going to the remote CTS
+			if (card->signals[0] & CTS)
 				reply |= 0x20;
-			if (card->lines1 & CTS)
+			if (card->signals[1] & CTS)
 				reply |= 0x40;
 			if (card->led)
 				reply |= 0x80;
@@ -290,12 +316,12 @@ static READ8Z_DEVICE_HANDLER( cru_rz )
 		}
 		if ((offset & 0x00c0)==0x0040)
 		{
-			*value = tms9902_cru_r(card->uart0, offset>>4);
+			*value = tms9902_cru_r(card->uart[0], offset>>4);
 			return;
 		}
 		if ((offset & 0x00c0)==0x0080)
 		{
-			*value = tms9902_cru_r(card->uart1, offset>>1);
+			*value = tms9902_cru_r(card->uart[1], offset>>1);
 			return;
 		}
 	}
@@ -312,12 +338,12 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 	{
 		if ((offset & 0x00c0)==0x0040)
 		{
-			tms9902_cru_w(card->uart0, offset>>1, data);
+			tms9902_cru_w(card->uart[0], offset>>1, data);
 			return;
 		}
 		if ((offset & 0x00c0)==0x0080)
 		{
-			tms9902_cru_w(card->uart1, offset>>1, data);
+			tms9902_cru_w(card->uart[1], offset>>1, data);
 			return;
 		}
 
@@ -383,15 +409,13 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			break;
 
 		case 5:
-			set_cts(device, 0, data);
-			if (data) card->lines0 |= CTS;
-			else card->lines0 &= ~CTS;
+			// Set the CTS line for RS232/1
+			output_line_state(card->uart[0], CTS, (data)? CTS : 0);
 			break;
 
 		case 6:
-			set_cts(device, 1, data);
-			if (data) card->lines1 |= CTS;
-			else card->lines1 &= ~CTS;
+			// Set the CTS line for RS232/2
+			output_line_state(card->uart[1], CTS, (data)? CTS : 0);
 			break;
 
 		case 7:
@@ -411,14 +435,13 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 
 	if (card->senila)
 	{
-		if (VERBOSE) logerror("ti99/rs232: Sensing ILA\n");
+		if (VERBOSE>3) logerror("ti99/rs232: Sensing ILA\n");
 		*value = card->ila;
-		// hope that the card rom was *not* selected, or we get two values
-		// on the address bus
+		// The card ROM must be unselected, or we get two values
+		// on the data bus
 
-		// Not sure whether this is right. Unfortunately, this is difficult
-		// to verify since the system does not make use of it, although the
-		// lines are there.
+		// Not sure whether this is correct; there is no software that makes
+		// use of it
 		card->ila = 0;
 	}
 	if (((offset & card->select_mask)==card->select_value) && card->selected)
@@ -455,79 +478,133 @@ static WRITE8_DEVICE_HANDLER( data_w )
 /*
     Propagates the /INT signal of the UARTs to the /INT line of the pbox.
 */
-static TMS9902_INT_CALLBACK( int_callback_0 )
+static TMS9902_INT_CALLBACK( int_callback )
 {
 	device_t *carddev = device->owner();
 	ti_rs232_state *card = get_safe_token(carddev);
+	int senila_bit = (device==card->uart[0])? SENILA_0_BIT : SENILA_1_BIT;
+
 	if (state==FALSE)
-		card->ila |= SENILA_0_BIT;
+		card->ila |= senila_bit;
 	else
-		card->ila &= ~SENILA_0_BIT;
+		card->ila &= ~senila_bit;
 
 	card->lines.inta(state);
 }
 
-static TMS9902_INT_CALLBACK( int_callback_1 )
-{
-	device_t *carddev = device->owner();
-	ti_rs232_state *card = get_safe_token(carddev);
-	if (state==FALSE)
-		card->ila |= SENILA_1_BIT;
-	else
-		card->ila &= ~SENILA_1_BIT;
-
-	card->lines.inta(state);
-}
 // ==========================================================
 
 /*
     The DTR line of the interface card is wired to the CTS and DSR
     of the UART.
 */
-static void set_dtr(device_t *tms9902, int value)
+static void incoming_dtr(device_t *tms9902, line_state value)
 {
-	if (VERBOSE) logerror("TI-RS232: got dtr = %d\n", value);
-	// Invert the signal and put it on CTS, DSR of the UART
-	tms9902_set_cts(tms9902, (value==0)? 1:0);
-	tms9902_set_dsr(tms9902, (value==0)? 1:0);
-}
+	ti_rs232_state *card = get_safe_token(tms9902->owner());
+	int uartind = (tms9902==card->uart[0])? 0 : 1;
 
-static void set_cts(device_t *device, int chip, UINT8 value)
-{
-	if (VERBOSE) logerror("TI-RS232: set cts %d = %d\n", chip, value);
+	if (VERBOSE>2) logerror("TI-RS232/%d: incoming DTR = %d\n", uartind+1, (value==ASSERT_LINE)? 1:0);
+
+	tms9902_rcv_cts(tms9902, value);
+	tms9902_rcv_dsr(tms9902, value);
 }
 
 /*
     Data transmission
 */
-static void transmit_data(device_t *tms9902, int uart, UINT8 value)
+static void transmit_data(device_t *tms9902, UINT8 value)
 {
 	UINT8 buf = value;
 	ti_rs232_state *card = get_safe_token(tms9902->owner());
+	int uartind = (tms9902==card->uart[0])? 0 : 1;
 
-	device_image_interface *serial = (uart==0)? dynamic_cast<device_image_interface *>(card->serdev0)
-												: dynamic_cast<device_image_interface *>(card->serdev1);
+	device_image_interface *serial;
+	serial = dynamic_cast<device_image_interface *>(card->serdev[uartind]);
+	if (!serial->exists())
+	{
+		if (VERBOSE>1) logerror("TI-RS232/%d: No serial output attached\n", uartind+1);
+		return;
+	}
+
 	// Send a double ESC if this is not a control operation
 	if (buf==0x1b)
+	{
+		if (VERBOSE>2) logerror("TI-RS232/%d: send ESC (requires another ESC)\n", uartind+1);
 		serial->fwrite(&buf, 1);
+	}
+	if (VERBOSE>3) logerror("TI-RS232/%d: send %c <%02x>\n", uartind+1, buf, buf);
 	serial->fwrite(&buf, 1);
 }
 
-static void receive_data_or_line_state(device_t *tms9902, int uart, double baudpoll)
+/*
+    Map the DCE-like wiring to a DTE-like wiring (and vice versa)
+    If suffices to swap RTS/CTS and DTR/DSR. We can use this function for
+    either direction; note that the RTS pin in the TI RS232 connector is not used.
+*/
+static UINT8 map_lines(int uartind, UINT8 value)
+{
+	UINT8 ret = 0;
+
+	//    00ab cdef = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
+
+	if (VERBOSE>3) logerror("TI-RS232/%d: connector pins = 0x%02x; translate for DTE\n", uartind+1, value);
+
+	if (value & CTS)
+	{
+		ret |= RTS;
+		if (VERBOSE>5) logerror("TI-RS232/%d: ... setting RTS line\n", uartind+1);
+	}
+	if (value & DSR)
+	{
+		ret |= DTR;
+		if (VERBOSE>5) logerror("TI-RS232/%d: ... setting DTR line\n", uartind+1);
+	}
+	if (value & DCD)
+	{
+		if (VERBOSE>5) logerror("TI-RS232/%d: ... cannot map DCD line, ignoring\n", uartind+1);
+	}
+	if (value & BRK)
+	{
+		if (VERBOSE>5) logerror("TI-RS232/%d: ... sending BRK\n", uartind+1);
+		ret |= EXCEPT | BRK;
+	}
+
+	return ret;
+}
+
+/*
+    Receive a character or a line state from the remote site. This method
+    is called by a timer with some sufficiently high polling frequency. Note
+    that the control lines are not subject to baud rates.
+    The higher polling frequency will cause overloads in the TMS9902 which has
+    a one-byte buffer only: Since the data source (e.g. the PC UART and the
+    socket connection) may be buffered, we may get a cluster of bytes in rapid
+    succession. In order to avoid this, this function uses the parameter
+    "baudpoll" which is the ratio of the characters/second and the polling
+    frequency. (char/sec is baud rate divided by 10.)
+    Whenever we receive a character that is passed to the UART, we have to
+    pause for 1/baudpoll iterations before getting the next byte from the
+    data source.
+*/
+static void receive_data_or_line_state(device_t *tms9902, double baudpoll)
 {
 	ti_rs232_state *card = get_safe_token(tms9902->owner());
-	device_image_interface *serial = (uart==0)? dynamic_cast<device_image_interface *>(card->serdev0)
-											: dynamic_cast<device_image_interface *>(card->serdev1);
+	device_image_interface *serial;
 	UINT8 buffer;
+	int uartind = (tms9902==card->uart[0])? 0 : 1;
 	int len = 0;
-	int *mode = (uart==0)? &card->recv_mode0 : &card->recv_mode1;
 
-	double *timehold = (uart==0)? &card->time_hold0 : &card->time_hold1;
+	serial = dynamic_cast<device_image_interface *>(card->serdev[uartind]);
 
-	if (!serial->exists()) return;
+	if (!serial->exists())
+	{
+		if (VERBOSE>1) logerror("TI-RS232/%d: No serial input attached\n", uartind+1);
+		return;
+	}
 
-	// If no data is currently held back, get a new value.
-	if (*timehold > 1.0)
+	// If more than the minimum waiting time since the last data byte has
+	// elapsed, we can get a new value.
+	if (card->time_hold[uartind] > 1.0)
 	{
 		len = serial->fread(&buffer, 1);
 		if (len==0) return;
@@ -535,218 +612,280 @@ static void receive_data_or_line_state(device_t *tms9902, int uart, double baudp
 	else
 	{
 		// number of polls has not yet elapsed; we have to wait.
-		*timehold += baudpoll;
+		card->time_hold[uartind] += baudpoll;
 		return;
 	}
-	// time has elapsed; we can get another value now
-	// (without pushing too quickly into the UART)
 
 	// No config parameters here, only data or line setting
-	switch (*mode)
+	switch (card->recv_mode[uartind])
 	{
 	case RECV_MODE_NORMAL:
 		if (buffer==0x1b)
-			*mode = RECV_MODE_ESC;
+		{
+			if (VERBOSE>2) logerror("TI-RS232/%d: received: %c <%02x>, switch to ESC mode\n", uartind+1, buffer, buffer);
+			card->recv_mode[uartind] = RECV_MODE_ESC;
+		}
 		else
 		{
-			if (VERBOSE) logerror("TI-RS232: received: %c <%02x>, pass to UART\n", buffer, buffer);
-			tms9902_receive_data(tms9902, buffer);
-			*timehold = 0.0;
+			if (VERBOSE>3) logerror("TI-RS232/%d: received: %c <%02x>, pass to UART\n", uartind+1, buffer, buffer);
+			tms9902_rcv_data(tms9902, buffer);
+			card->time_hold[uartind] = 0.0;
 		}
 		break;
 	case RECV_MODE_ESC:
 		if (buffer==0x1b)
 		{
-			*mode = RECV_MODE_NORMAL;
-			if (VERBOSE) logerror("TI-RS232: received: %c <%02x>, pass to UART\n", buffer, buffer);
-			tms9902_receive_data(tms9902, buffer);
-			*timehold = 0.0;
+			card->recv_mode[uartind] = RECV_MODE_NORMAL;
+			if (VERBOSE>2) logerror("TI-RS232/%d: leaving ESC mode, received: %c <%02x>, pass to UART\n", uartind+1, buffer, buffer);
+			tms9902_rcv_data(tms9902, buffer);
+			card->time_hold[uartind] = 0.0;
 		}
-		// TODO: else ... Line management (does not reset timehold)
+		else
+		{
+			// the byte in buffer is the length byte
+			if (VERBOSE>3) logerror("TI-RS232/%d: received length byte <%02x> in ESC mode\n", uartind+1, buffer);
+			if (buffer != 1)
+			{
+				logerror("TI-RS232/%d: expected length 1 but got %02x, leaving ESC mode.\n", uartind+1, buffer);
+				card->recv_mode[uartind] = RECV_MODE_NORMAL;
+			}
+			else
+				card->recv_mode[uartind] = RECV_MODE_ESC_LINES;
+		}
 		break;
+
+	case RECV_MODE_ESC_LINES:
+		// Map the real serial interface lines to our emulated connector
+		// The mapping is the same for both directions, so we use the same function
+		if (buffer & EXCEPT)
+		{
+			// Exception states: BRK, FRMERR, PARERR
+			tms9902_rcv_break(tms9902, ((buffer & BRK)!=0));
+
+			if (buffer & FRMERR)
+				tms9902_rcv_framing_error(tms9902);
+			if (buffer & PARERR)
+				tms9902_rcv_parity_error(tms9902);
+		}
+		else
+		{
+			buffer = map_lines(uartind, buffer);
+			if (VERBOSE>2) logerror("TI-RS232/%d: received (remapped) <%02x> in ESC mode\n", uartind+1, buffer);
+
+			// The DTR line on the RS232 connector of the board is wired to both the
+			// CTS and the DSR pin of the TMS9902
+			// Apart from the data line, DTR is the only input line
+			incoming_dtr(tms9902,  (buffer & DTR)? ASSERT_LINE : CLEAR_LINE);
+		}
+
+		card->recv_mode[uartind] = RECV_MODE_NORMAL;
+		break;
+
 	default:
-		logerror("TI-RS232: unknown mode: %d\n", *mode);
+		logerror("TI-RS232/%d: unknown mode: %d\n", uartind+1, card->recv_mode[uartind]);
 	}
 }
 
-static TMS9902_RCV_CALLBACK( rcv_callback_0 )
+static TMS9902_RCV_CALLBACK( rcv_callback )
 {
 	// Called from the UART when it wants to receive a character
 	// However, characters are not passed to it at this point
 	// Instead, we check for signal line change or data transmission
 	// and call the respective function
-	receive_data_or_line_state(device, 0, baudpoll);
+	receive_data_or_line_state(device, baudpoll);
 }
 
-static TMS9902_RCV_CALLBACK( rcv_callback_1 )
+static TMS9902_XMIT_CALLBACK( xmit_callback )
 {
-	receive_data_or_line_state(device, 1, baudpoll);
-}
-
-static TMS9902_XMIT_CALLBACK( xmit_callback_0 )
-{
-	transmit_data(device, 0, (UINT8)data);
-}
-
-static TMS9902_XMIT_CALLBACK( xmit_callback_1 )
-{
-	transmit_data(device, 1, (UINT8)data);
-}
-
-/*
-    Re-interpret the lines as wired on the board. We have to turn the DCE-type
-    wiring into a DTE-type wiring.
-*/
-static UINT8 translate_out(UINT8 value)
-{
-	UINT8 ret = 0;
-	if (value & CTS) ret |= RTS;
-	if (value & DCD) ret |= DTR;
-	if (value & TMS9902_BRK) ret |= TMS9902_BRK;
-	return ret;
+	transmit_data(device, (UINT8)data);
 }
 
 /*
     Control operations like configuration or line changes
 */
-static void transmit_control(device_t *tms9902, device_image_interface *serial, int type, int value, int chip)
+static void configure_interface(device_t *tms9902, int type, int value)
 {
-	UINT8 bufctrl[4];
-
-	UINT8 esc = 0x1b;
 	ti_rs232_state *card = get_safe_token(tms9902->owner());
+	UINT8 bufctrl[4];
+	device_image_interface *serial;
+	int uartind = (tms9902==card->uart[0])? 0 : 1;
+	UINT8 esc = ESC;
+
+	serial = dynamic_cast<device_image_interface *>(card->serdev[uartind]);
+
+	if (!serial->exists())
+	{
+		if (VERBOSE>1) logerror("TI-RS232/%d: No serial output attached\n", uartind+1);
+		return;
+	}
 
 	serial->fwrite(&esc, 1);
 	bufctrl[0] = 0x02;
+	bufctrl[1] = CONFIG | TYPE_TMS9902;
 
-	if (type & TMS9902_CONF)
-	{
-		switch (type) {
-		case TMS9902_CONF_RRATE:
-			if (VERBOSE) logerror("TI-RS232: send receive rate %04x\n", value);
-			// value has 12 bits
-			// 1ccc xaaa                         = config adapter type a
-			// 1111 xaaa rrrr rrrr rrrr 0000     = config receive rate on a
-			// 1110 xaaa rrrr rrrr rrrr 0000     = config transmit rate on a
-			bufctrl[0] = 0x03; // length
-			bufctrl[1] = CONFIG | RATERECV | TYPE_TMS9902;
-			bufctrl[2] = (value & 0x0ff0)>>4;
-			bufctrl[3] = (value & 0x0f)<<4;
-			break;
-		case TMS9902_CONF_XRATE:
-			if (VERBOSE) logerror("TI-RS232: send transmit rate %04x\n", value);
-			bufctrl[0] = 0x03; // length
-			bufctrl[1] = CONFIG | RATEXMIT | TYPE_TMS9902;
-			bufctrl[2] = (value & 0x0ff0)>>4;
-			bufctrl[3] = (value & 0x0f)<<4;
-			break;
-		case TMS9902_CONF_STOPB:
-			if (VERBOSE) logerror("TI-RS232: send stop bit config %02x\n", value&0x03);
-			bufctrl[1] = CONFIG | STOPBITS | TYPE_TMS9902;
-			bufctrl[2] = (value & 0x03);
-			break;
-		case TMS9902_CONF_DATAB:
-			if (VERBOSE) logerror("TI-RS232: send data bit config %02x\n", value&0x03);
-			bufctrl[1] = CONFIG | DATABITS | TYPE_TMS9902;
-			bufctrl[2] = (value & 0x03);
-			break;
-		case TMS9902_CONF_PAR:
-			if (VERBOSE) logerror("TI-RS232: send parity config %02x\n", value&0x03);
-			bufctrl[1] = CONFIG | PARITY | TYPE_TMS9902;
-			bufctrl[2] = (value & 0x03);
-			break;
-		default:
-			logerror("TI-RS232: error - unknown config type %02x\n", type);
-		}
-	}
-	else
-	{
-		// 0abc defg
-		bufctrl[0] = 0x01;
-		// Note that we have to translate the lines
-		// first according to the schematics
-		// and second according to the interpretation of the lines as used by a DTE
-
-		// RTS(tms) -> DCD(card) -> DTR(conn)
-		// CRU      -> CTS(card) -> RTS(conn)
-		UINT8 *lines = (chip==0)? &card->lines0 : &card->lines1;
-
-		if (value & RTS)
-		{
-			if (VERBOSE) logerror("TI-RS232: set DCD=1\n");
-			*lines  = *lines | DCD;
-		}
-		else
-		{
-			if (VERBOSE) logerror("TI-RS232: set DCD=0\n");
-			*lines = *lines & ~DCD;
-		}
-
-		if (value & TMS9902_BRK)
-		{
-			if (VERBOSE) logerror("TI-RS232: set BRK=1\n");
-			*lines  = *lines | TMS9902_BRK;
-		}
-		else
-		{
-			if (VERBOSE) logerror("TI-RS232: set BRK=0\n");
-			*lines  = *lines & ~TMS9902_BRK;
-		}
-		// We need to change the pins
-		bufctrl[1] = translate_out(*lines);
+	switch (type) {
+	case RATERECV:
+		if (VERBOSE>2) logerror("TI-RS232/%d: send receive rate %04x\n", uartind+1, value);
+		// value has 12 bits
+		// 1ccc xaaa                         = config adapter type a
+		// 1111 xaaa rrrr rrrr rrrr 0000     = config receive rate on a
+		// 1110 xaaa rrrr rrrr rrrr 0000     = config transmit rate on a
+		bufctrl[0] = 0x03; // length
+		bufctrl[1] |= RATERECV;
+		bufctrl[2] = (value & 0x0ff0)>>4;
+		bufctrl[3] = (value & 0x0f)<<4;
+		break;
+	case RATEXMIT:
+		if (VERBOSE>2) logerror("TI-RS232/%d: send transmit rate %04x\n", uartind+1, value);
+		bufctrl[0] = 0x03; // length
+		bufctrl[1] |= RATEXMIT;
+		bufctrl[2] = (value & 0x0ff0)>>4;
+		bufctrl[3] = (value & 0x0f)<<4;
+		break;
+	case STOPBITS:
+		if (VERBOSE>2) logerror("TI-RS232/%d: send stop bit config %02x\n", uartind+1, value&0x03);
+		bufctrl[1] |= STOPBITS;
+		bufctrl[2] = (value & 0x03);
+		break;
+	case DATABITS:
+		if (VERBOSE>2) logerror("TI-RS232/%d: send data bit config %02x\n", uartind+1, value&0x03);
+		bufctrl[1] |= DATABITS;
+		bufctrl[2] = (value & 0x03);
+		break;
+	case PARITY:
+		if (VERBOSE>2) logerror("TI-RS232/%d: send parity config %02x\n", uartind+1, value&0x03);
+		bufctrl[1] |= PARITY;
+		bufctrl[2] = (value & 0x03);
+		break;
+	default:
+		if (VERBOSE>1) logerror("TI-RS232/%d: error - unknown config type %02x\n", uartind+1, type);
 	}
 
 	serial->fwrite(bufctrl, bufctrl[0]+1);
 }
 
-static TMS9902_CTRL_CALLBACK( ctrl_callback_0 )
+static void set_bit(device_t *device, int uartind, int line, int value)
 {
-	device_image_interface *rs232_fp = dynamic_cast<device_image_interface *>(device->siblingdevice("serdev0"));
+	ti_rs232_state *card = get_safe_token(device);
+	if (VERBOSE>5)
+	{
+		switch (line)
+		{
+		case CTS: logerror("TI-RS232/%d: set CTS(out)=%s\n", uartind+1, (value)? "asserted" : "cleared"); break;
+		case DCD: logerror("TI-RS232/%d: set DCD(out)=%s\n", uartind+1, (value)? "asserted" : "cleared"); break;
+		case BRK: logerror("TI-RS232/%d: set BRK(out)=%s\n", uartind+1, (value)? "asserted" : "cleared"); break;
+		}
+	}
 
-	if (rs232_fp->exists())
-		transmit_control(device, rs232_fp, type, data, 0);
+	if (value)
+		card->signals[uartind] |= line;
 	else
-		logerror("TI-RS232: serdev0 not found\n");
+		card->signals[uartind] &= ~line;
 }
 
-static TMS9902_CTRL_CALLBACK( ctrl_callback_1 )
+/*
+   Line changes
+*/
+static void output_exception(device_t *tms9902, int param, UINT8 value)
 {
-	device_image_interface *rs232_fp = dynamic_cast<device_image_interface *>(device->siblingdevice("serdev1"));
+	ti_rs232_state *card = get_safe_token(tms9902->owner());
+	device_image_interface *serial;
+	UINT8 bufctrl[2];
+	UINT8 esc = ESC;
 
-	if (rs232_fp->exists())
-		transmit_control(device, rs232_fp, type, data, 1);
-	else
-		logerror("TI-RS232: serdev1 not found\n");
+	int uartind = (tms9902==card->uart[0])? 0 : 1;
+
+	serial = dynamic_cast<device_image_interface *>(card->serdev[uartind]);
+
+	if (!serial->exists())
+	{
+		if (VERBOSE>1) logerror("TI-RS232/%d: No serial output attached\n", uartind+1);
+		return;
+	}
+
+	serial->fwrite(&esc, 1);
+
+	bufctrl[0] = 1;
+	// 0100 0xxv = exception xx: 02=BRK, 04=FRMERR, 06=PARERR; v=0,1 (only for BRK)
+	// BRK is the only output exception
+	bufctrl[1] = EXCEPT | param | (value&1);
+	serial->fwrite(bufctrl, 2);
 }
 
+/*
+   Line changes
+*/
+static void output_line_state(device_t *tms9902, int mask, UINT8 value)
+{
+	ti_rs232_state *card = get_safe_token(tms9902->owner());
+	device_image_interface *serial;
+	UINT8 bufctrl[2];
+	UINT8 esc = ESC;
+
+	int uartind = (tms9902==card->uart[0])? 0 : 1;
+
+	serial = dynamic_cast<device_image_interface *>(card->serdev[uartind]);
+
+	if (!serial->exists())
+	{
+		if (VERBOSE>1) logerror("TI-RS232/%d: No serial output attached\n", uartind+1);
+		return;
+	}
+
+	serial->fwrite(&esc, 1);
+
+	//  01ab cdef = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
+	bufctrl[0] = 1;
+
+	// The CTS line (coming from a CRU bit) is connected to the CTS pin
+	if (mask & CTS) set_bit(tms9902->owner(), uartind, CTS, value & CTS);
+
+	// The RTS line (from 9902) is connected to the DCD pin
+	if (mask & RTS) set_bit(tms9902->owner(), uartind, DCD, value & RTS);
+
+	// The DSR pin is hardwired to +5V
+	set_bit(tms9902->owner(), uartind, DSR, 1);
+
+	// As of here, the lines are set according to the schematics of the
+	// serial interface.
+
+	// Now translate the signals of the board to those of a DTE-like device
+	// so that we can pass the signal to the real PC serial interface
+	// (can be imagined as if we emulated the cable)
+	bufctrl[1] = map_lines(uartind, card->signals[uartind]);
+	serial->fwrite(bufctrl, 2);
+}
+
+static TMS9902_CTRL_CALLBACK( ctrl_callback )
+{
+	switch (type)
+	{
+	case CONFIG:
+		configure_interface(device, param, value); break;
+	case EXCEPT:
+		output_exception(device, param, value); break;
+	default:
+		output_line_state(device, param, value);
+	}
+}
 
 
 static WRITE_LINE_DEVICE_HANDLER( senila )
 {
 	// put the value on the data bus. We store it in a state variable.
 	ti_rs232_state *card = get_safe_token(device);
-	if (VERBOSE) logerror("TI-RS232: Setting SENILA=%d\n", state);
+	if (VERBOSE>3) logerror("TI-RS232/1-2: Setting SENILA=%d\n", state);
 	card->senila = state;
 }
 
-static const tms9902_interface tms9902_params_0 =
+static const tms9902_interface tms9902_params =
 {
 	3000000.,				/* clock rate (3MHz) */
-	int_callback_0,			/* called when interrupt pin state changes */
-	rcv_callback_0,			/* called when a character is received */
-	xmit_callback_0,			/* called when a character is transmitted */
-	ctrl_callback_0
+	int_callback,			/* called when interrupt pin state changes */
+	rcv_callback,			/* called when a character is received */
+	xmit_callback,			/* called when a character is transmitted */
+	ctrl_callback
 };
-
-static const tms9902_interface tms9902_params_1 =
-{
-	3000000.,				/* clock rate (3MHz) */
-	int_callback_1,			/* called when interrupt pin state changes */
-	rcv_callback_1,			/* called when a character is received */
-	xmit_callback_1,			/* called when a character is transmitted */
-	ctrl_callback_1
-};
-
 
 static const ti99_peb_card tirs232_card =
 {
@@ -822,10 +961,10 @@ static DEVICE_START( ti_rs232 )
 	card->rom = device->machine().region(astring_c(region))->base();
 	card->lines.inta.resolve(topeb->inta, *device);
 	// READY and INTB are not used
-	card->uart0 = device->subdevice("tms9902_0");
-	card->uart1 = device->subdevice("tms9902_1");
-	card->serdev0 = device->subdevice("serdev0");
-	card->serdev1 = device->subdevice("serdev1");
+	card->uart[0] = device->subdevice("tms9902_0");
+	card->uart[1] = device->subdevice("tms9902_1");
+	card->serdev[0] = device->subdevice("serdev0");
+	card->serdev[1] = device->subdevice("serdev1");
 	card->piodev = device->subdevice("piodev");
 }
 
@@ -848,17 +987,19 @@ static DEVICE_RESET( ti_rs232 )
 		card->pio_handshakeout = 0;
 		card->pio_spareout = 0;
 		card->flag0 = 0;
-		card->lines0 &= ~CTS;
-		card->lines1 &= ~CTS;
+
+		set_bit(device, 0, CTS, 0);
+		set_bit(device, 1, CTS, 0);
+
 		card->led = 0;
 		card->pio_write = 1;
-		card->recv_mode0 = RECV_MODE_NORMAL;
-		card->recv_mode1 = RECV_MODE_NORMAL;
+		card->recv_mode[0] = RECV_MODE_NORMAL;
+		card->recv_mode[1] = RECV_MODE_NORMAL;
 
 		card->select_mask = 0x7e000;
 		card->select_value = 0x74000;
 
-		card->time_hold0 = card->time_hold1 = 0.0;
+		card->time_hold[0] = card->time_hold[1] = 0.0;
 
 		// The GenMod modification changes the address bus width of the Geneve.
 		// All peripheral cards need to be manually modified to properly decode
@@ -874,8 +1015,8 @@ static DEVICE_RESET( ti_rs232 )
 }
 
 static MACHINE_CONFIG_FRAGMENT( ti_rs232 )
-	MCFG_TMS9902_ADD("tms9902_0", tms9902_params_0)
-	MCFG_TMS9902_ADD("tms9902_1", tms9902_params_1)
+	MCFG_TMS9902_ADD("tms9902_0", tms9902_params)
+	MCFG_TMS9902_ADD("tms9902_1", tms9902_params)
 	MCFG_DEVICE_ADD("serdev0", TI99_RS232, 0)
 	MCFG_DEVICE_ADD("serdev1", TI99_RS232, 0)
 	MCFG_DEVICE_ADD("piodev", TI99_PIO, 0)

@@ -392,7 +392,7 @@ static TIMER_CALLBACK(rs232_input_callback)
 	if (/*state->m_rs232_rts &&*/ /*(mame_ftell(state->m_rs232_fp) < mame_fsize(state->m_rs232_fp))*/1)
 	{
 		if (image->fread(&buf, 1) == 1)
-			tms9902_receive_data(machine.device("tms9902"), buf);
+			tms9902_rcv_data(machine.device("tms9902"), buf);
 	}
 }
 
@@ -402,10 +402,9 @@ static TIMER_CALLBACK(rs232_input_callback)
 static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 {
 	tm990189_state *state = image.device().machine().driver_data<tm990189_state>();
-	tms9902_set_dsr(image.device().machine().device("tms9902"), 1);
+	tms9902_rcv_dsr(image.device().machine().device("tms9902"), ASSERT_LINE);
 	state->m_rs232_input_timer = image.device().machine().scheduler().timer_alloc(FUNC(rs232_input_callback), (void*)image);
 	state->m_rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
-
 	return IMAGE_INIT_PASS;
 }
 
@@ -415,7 +414,7 @@ static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 static DEVICE_IMAGE_UNLOAD( tm990_189_rs232 )
 {
 	tm990189_state *state = image.device().machine().driver_data<tm990189_state>();
-	tms9902_set_dsr(image.device().machine().device("tms9902"), 0);
+	tms9902_rcv_dsr(image.device().machine().device("tms9902"), CLEAR_LINE);
 
 	state->m_rs232_input_timer->reset();	/* FIXME - timers should only be allocated once */
 }

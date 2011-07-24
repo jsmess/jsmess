@@ -20,20 +20,34 @@ typedef void (*tms9902_rcv_callback_func)(device_t *device, double baudpoll);
 typedef void (*tms9902_xmit_callback_func)(device_t *device, int data);
 #define TMS9902_XMIT_CALLBACK(name)	void name(device_t *device, int data )
 
-typedef void (*tms9902_ctrl_callback_func)(device_t *device, int type, int data);
-#define TMS9902_CTRL_CALLBACK(name)	void name(device_t *device, int type, int data )
+typedef void (*tms9902_ctrl_callback_func)(device_t *device, int type, int param, int value);
+#define TMS9902_CTRL_CALLBACK(name)	void name(device_t *device, int type, int param, int value )
 
-/*
-    Constants for configuration markup
-*/
-#define	TMS9902_CONF 0x80
-#define	TMS9902_CONF_XRATE 0x81
-#define TMS9902_CONF_RRATE 0x82
-#define TMS9902_CONF_STOPB 0x83
-#define TMS9902_CONF_DATAB 0x84
-#define TMS9902_CONF_PAR   0x85
+// Serial control protocol values
+#define TYPE_TMS9902 0x01
 
-#define TMS9902_BRK 0x01
+// Configuration (output only)
+#define CONFIG   0x80
+#define RATERECV 0x70
+#define RATEXMIT 0x60
+#define DATABITS 0x50
+#define STOPBITS 0x40
+#define PARITY   0x30
+
+// Exceptional states (BRK: both directions; FRMERR/PARERR: input only)
+#define EXCEPT 0x40
+#define BRK    0x02
+#define FRMERR 0x04
+#define PARERR 0x06
+
+// Line states (RTS, DTR: output; CTS, DSR, RI, DCD: input)
+#define LINES 0x00
+#define RTS 0x20
+#define CTS 0x10
+#define DSR 0x08
+#define DCD 0x04
+#define DTR 0x02
+#define RI  0x01
 
 typedef struct _tms9902_interface tms9902_interface;
 struct _tms9902_interface
@@ -53,12 +67,22 @@ struct _tms9902_interface
 /*
     Functions called by the modem.
 */
-void tms9902_set_cts(device_t *device, int state);
-void tms9902_set_dsr(device_t *device, int state);
-void tms9902_receive_data(device_t *device, int data);
-void tms9902_clock(device_t *device, int state);
+void tms9902_rcv_cts(device_t *device, line_state state);
+void tms9902_rcv_dsr(device_t *device, line_state state);
+void tms9902_rcv_data(device_t *device, UINT8 data);
 
-emu_timer *get_timer(device_t *device);
+/*
+    Functions to set internal exception states, according to the states
+    as received by the serial bridge
+*/
+void tms9902_rcv_framing_error(device_t *device);
+void tms9902_rcv_parity_error(device_t *device);
+void tms9902_rcv_break(device_t *device, bool value);
+
+/*
+    Control functions
+*/
+void tms9902_clock(device_t *device, bool state);
 
 READ8_DEVICE_HANDLER ( tms9902_cru_r );
 WRITE8_DEVICE_HANDLER( tms9902_cru_w );

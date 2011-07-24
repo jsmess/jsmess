@@ -63,48 +63,47 @@ struct _tms9902_t
     but can prevent good optimization. */
 
 	/* CRU interface */
-	int register_select;	/* bits device select device register is being written to */
+	UINT8 register_select;	/* bits device select device register is being written to */
 
 	/* inputs pins */
-	int CTS;
-	int DSR;
+	bool CTSflag;
+	bool DSRflag;
 
 	/* output pin */
-	int RTSON;
-	int RTS;
+	bool RTSON;
+	bool RTSflag;
 
 	/* transmitter registers */
-	int BRKON;		/* Flag which causes BRK to go active */
-	int BRK;		/* Current BRK state */
+	bool BRKON;		/* Flag which causes BRK to go active */
+	bool BRKflag;	/* Current BRK state */
 
-	int XBR;		/* transmit buffer register */
-	int XSR;		/* transmit shift register */
+	UINT8 XBR;		/* transmit buffer register */
+	UINT8 XSR;		/* transmit shift register */
 
-	int XBRE;
-	int XSRE;
+	bool XBRE;
+	bool XSRE;
 
 	/* receiver registers */
 
-	int RBR;		/* receive buffer register */
-	int RBRL;
-	int ROVER;
+	UINT8 RBR;		/* receive buffer register */
+	bool RBRL;
+	bool ROVER;
 
 	/* various status flags */
 
-	int DSCH;
-	int TIMELP;
+	bool DSCH;
+	bool TIMELP;
 
-	int TIMERR;
+	bool TIMERR;
 
-	int DSCENB;
-	int RIENB;
-	int XBIENB;
-	int TIMENB;
+	bool DSCENB;
+	bool RIENB;
+	bool XBIENB;
+	bool TIMENB;
 
-	int INT;		// mirrors /INT output line, inverted
+	bool INT;		// mirrors /INT output line, inverted
 
-	int CLK4M;
-	int RC;
+	bool CLK4M;
 
 	/*
         Rate registers. The receive bit rate calculates as
@@ -113,24 +112,24 @@ struct _tms9902_t
 
         where clock1 = clock_rate / (CLK4M? 4:3)
     */
-	int RDR;
-	int RDV8;
-	int XDR;
-	int XDV8;
+	UINT16 RDR;
+	bool RDV8;
+	UINT16 XDR;
+	bool XDV8;
 
-	int RIN;
-	int RSBD;
-	int RFBD;
-	int RFER;
-	int RPER;
-	int RCVERR;
+	bool RIN;		// mirrors the state of the RIN pin
+	bool RSBD;
+	bool RFBD;
+	bool RFER;
+	bool RPER;
+	bool RCVERR;
 
-	int RCL;		// Character length
-	int ODDP;
-	int PENB;
-	int STOPB;
+	UINT8 RCL;		// Character length
+	bool ODDP;
+	bool PENB;
+	UINT8 STOPB;
 
-	int TMR;		/* interval timer */
+	UINT8 TMR;		/* interval timer */
 
 	/* clock registers */
 	emu_timer *dectimer;			/* MESS timer, used to emulate the decrementer register */
@@ -156,7 +155,7 @@ enum
 };
 
 static void initiate_transmit(device_t *device);
-static void set_brk(device_t *device, int state);
+static void send_break(device_t *device, bool state);
 static DEVICE_RESET( tms9902 );
 
 /***************************************************************************
@@ -181,47 +180,47 @@ static void field_interrupts(device_t *device)
 							|| (tms9902->RBRL && tms9902->RIENB)
 							|| (tms9902->XBRE && tms9902->XBIENB)
 							|| (tms9902->TIMELP && tms9902->TIMENB);
-// if (VERBOSE) logerror("TMS9902: interrupt flags (DSCH = %02x, DSCENB = %02x), (RBRL = %02x, RIENB = %02x), (XBRE = %02x, XBIENB = %02x), (TIMELP = %02x, TIMENB = %02x)\n",
+// if (VERBOSE>3) logerror("TMS9902: interrupt flags (DSCH = %02x, DSCENB = %02x), (RBRL = %02x, RIENB = %02x), (XBRE = %02x, XBIENB = %02x), (TIMELP = %02x, TIMENB = %02x)\n",
 //  tms9902->DSCH, tms9902->DSCENB, tms9902->RBRL, tms9902->RIENB, tms9902->XBRE, tms9902->XBIENB, tms9902->TIMELP, tms9902->TIMENB);
 	if (new_int != tms9902->INT)
 	{
 		// Only consider edges
 		tms9902->INT = new_int;
-		if (VERBOSE) logerror("TMS9902: /INT = %d\n", (tms9902->INT==0)?1:0);
+		if (VERBOSE>3) logerror("TMS9902: /INT = %s\n", (tms9902->INT)? "asserted" : "cleared");
 		if (tms9902->intf->int_callback)
 			(*tms9902->intf->int_callback)(device, tms9902->INT? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 /*
-    function device should be called by the driver when the state of CTS changes
-
-    state != 0: CTS* is inactive
-    state == 0: CTS* is active (low)
+    Called whenever the incoming CTS* line changes. This should be called by
+    the device that contains the UART.
 */
-void tms9902_set_cts(device_t *device, int state)
+void tms9902_rcv_cts(device_t *device, line_state state)
 {
 	tms9902_t *tms9902 = get_token(device);
-	int previous = tms9902->CTS;
-	tms9902->CTS = (state==0)? 1:0;
+	bool previous = tms9902->CTSflag;
+	// CTS is an internal register of the TMS9902 with positive logic
+	tms9902->CTSflag = (state==ASSERT_LINE)? 1:0;
 	tms9902->DSCH = 1;
-	if (VERBOSE) logerror("TMS9902: got /CTS=%d\n", state);
 
-	if (tms9902->CTS != previous)
+	if (VERBOSE>3) logerror("TMS9902: CTS* = %s\n", (state==ASSERT_LINE)? "asserted" : "cleared");
+
+	if (tms9902->CTSflag != previous)
 	{
 		field_interrupts(device);
 
-		if (!state && tms9902->RTS && tms9902->XSRE)
+		if (!state && tms9902->RTSflag && tms9902->XSRE)
 		{
-			if ((! tms9902->XBRE) && ! tms9902->BRK)
+			if ((! tms9902->XBRE) && !tms9902->BRKflag)
 				initiate_transmit(device);
 			else if (tms9902->BRKON)
-				set_brk(device, 1);
+				send_break(device, 1);
 		}
 	}
 }
 
-void tms9902_clock(device_t *device, int state)
+void tms9902_clock(device_t *device, bool state)
 {
 	tms9902_t *tms9902 = get_token(device);
 	if (state)
@@ -231,45 +230,95 @@ void tms9902_clock(device_t *device, int state)
 }
 
 /*
-    function device should be called by the driver when the state of DSR changes
-
-    state == 0: DSR* is inactive (high)
-    state != 0: DSR* is active (low)
+    Called whenever the incoming DSR* line changes. This should be called by
+    the device that contains the UART.
 */
-void tms9902_set_dsr(device_t *device, int state)
+void tms9902_rcv_dsr(device_t *device, line_state state)
 {
 	tms9902_t *tms9902 = get_token(device);
-	int previous = tms9902->DSR;
-	if (VERBOSE) logerror("TMS9902: got /DSR=%d\n", state);
-	tms9902->DSR = (state==0)? 1:0;
+	bool previous = tms9902->DSRflag;
+	if (VERBOSE>3) logerror("TMS9902: DSR* = %s\n", (state==ASSERT_LINE)? "asserted" : "cleared");
+	tms9902->DSRflag = (state==ASSERT_LINE)? true:false;
 	tms9902->DSCH = 1;
 
-	if (tms9902->DSR != previous)
+	if (tms9902->DSRflag != previous)
 	{
 		field_interrupts(device);
 	}
 }
 
 /*
-    Receive data from the modem. Called from the external device.
+    Called whenever the incoming RIN line changes. This should be called by
+    the device that contains the UART. Unlike the real thing, we deliver
+    complete bytes in one go.
 */
-void tms9902_receive_data(device_t *device, int data)
+void tms9902_rcv_data(device_t *device, UINT8 data)
 {
 	tms9902_t *tms9902 = get_token(device);
+
+	// Put the received byte into the 1-byte receive buffer
 	tms9902->RBR = data;
+
+	// Clear last errors
+	tms9902->RFER = 0;
+	tms9902->RPER = 0;
 
 	if (!tms9902->RBRL)
 	{
+		// Receive buffer was empty
 		tms9902->RBRL = 1;
-		if (VERBOSE) logerror("TMS9902: load RBR\n");
+		if (VERBOSE>3) logerror("TMS9902: Receive buffer loaded with byte %02x\n", data);
 		field_interrupts(device);
 	}
 	else
 	{
+		// Receive buffer was full
 		tms9902->ROVER = 1;
-		logerror("TMS9902: RBR still loaded; overflow error\n");
+		if (VERBOSE>1) logerror("TMS9902: Receive buffer still loaded; overflow error\n");
 	}
 }
+
+//------------------------------------------------
+
+/*
+    Framing error. This can only be detected by a remotely attached real UART;
+    if we get a report on a framing error we use it to announce the framing error
+    as if it occured here.
+    The flag is reset by the next correctly received byte.
+*/
+void tms9902_rcv_framing_error(device_t *device)
+{
+	tms9902_t *tms9902 = get_token(device);
+	if (VERBOSE>2) logerror("TMS9902: Detected framing error\n");
+	tms9902->RFER = 1;
+}
+
+/*
+    Parity error. This can only be detected by a remotely attached real UART;
+    if we get a report on a parity error we use it to announce the parity error
+    as if it occured here.
+    The flag is reset by the next correctly received byte.
+*/
+void tms9902_rcv_parity_error(device_t *device)
+{
+	tms9902_t *tms9902 = get_token(device);
+	if (VERBOSE>2) logerror("TMS9902: Detected parity error\n");
+	tms9902->RPER = 1;
+}
+
+/*
+    Incoming BREAK condition. The TMS9902 does not show any directly visible
+    reactions on a BREAK (no interrupt, no flag set). A BREAK is a time period
+    of low level on the RIN pin which makes the chip re-synchronize on the
+    next rising edge.
+*/
+void tms9902_rcv_break(device_t *device, bool value)
+{
+	if (VERBOSE>2) logerror("TMS9902: Receive BREAK=%d (no effect)\n", value? 1:0);
+}
+
+//------------------------------------------------
+
 
 /*
     This call-back is called by the MESS timer system when the decrementer
@@ -322,17 +371,17 @@ static void reload_interval_timer(device_t *device)
 	}
 }
 
-static void set_brk(device_t *device, int state)
+static void send_break(device_t *device, bool state)
 {
 	tms9902_t *tms9902 = get_token(device);
 
-	if (state != tms9902->BRK)
+	if (state != tms9902->BRKflag)
 	{
-		tms9902->BRK = state;
+		tms9902->BRKflag = state;
 
-		// Signal BRK to the modem
+		// Signal BRK (on/off) to the remote site
 		if (tms9902->intf->ctrl_callback)
-			(*tms9902->intf->ctrl_callback)(device, 0, (state!=0)? TMS9902_BRK : 0);
+			(*tms9902->intf->ctrl_callback)(device, EXCEPT, BRK, state? 1:0);
 	}
 }
 
@@ -354,7 +403,7 @@ static void set_receive_data_rate(device_t *device)
 {
 	tms9902_t *tms9902 = get_token(device);
 	int value = (tms9902->CLK4M? 0x800 : 0) | (tms9902->RDV8? 0x400 : 0) | tms9902->RDR;
-	if (VERBOSE) logerror("receive rate = %04x\n", value);
+	if (VERBOSE>3) logerror("receive rate = %04x\n", value);
 
 	// Calculate the ratio between receive baud rate and polling frequency
 	double fint = tms9902->clock_rate / ((tms9902->CLK4M) ? 4.0 : 3.0);
@@ -365,10 +414,10 @@ static void set_receive_data_rate(device_t *device)
 	// Thus the callback function should add up this value on each poll
 	// and deliver a data input not before it sums up to 1.
 	tms9902->baudpoll = (double)(baud / (10*POLLING_FREQ));
-	if (VERBOSE) logerror ("baudpoll = %lf\n", tms9902->baudpoll);
+	if (VERBOSE>3) logerror ("baudpoll = %lf\n", tms9902->baudpoll);
 
 	if (tms9902->intf->ctrl_callback)
-		(*tms9902->intf->ctrl_callback)(device, TMS9902_CONF_RRATE, value);
+		(*tms9902->intf->ctrl_callback)(device, CONFIG, RATERECV, value);
 }
 
 /*
@@ -379,9 +428,9 @@ static void set_transmit_data_rate(device_t *device)
 {
 	tms9902_t *tms9902 = get_token(device);
 	int value = (tms9902->CLK4M? 0x800 : 0) | (tms9902->XDV8? 0x400 : 0) | tms9902->XDR;
-	if (VERBOSE) logerror("transmit rate = %04x\n", value);
+	if (VERBOSE>3) logerror("transmit rate = %04x\n", value);
 	if (tms9902->intf->ctrl_callback)
-		(*tms9902->intf->ctrl_callback)(device, TMS9902_CONF_XRATE, value);
+		(*tms9902->intf->ctrl_callback)(device, CONFIG, RATEXMIT, value);
 }
 
 static void set_stop_bits(device_t *device)
@@ -389,7 +438,7 @@ static void set_stop_bits(device_t *device)
 	tms9902_t *tms9902 = get_token(device);
 	int value = tms9902->STOPB;
 	if (tms9902->intf->ctrl_callback)
-		(*tms9902->intf->ctrl_callback)(device, TMS9902_CONF_STOPB, value);
+		(*tms9902->intf->ctrl_callback)(device, CONFIG, STOPBITS, value);
 }
 
 static void set_data_bits(device_t *device)
@@ -397,7 +446,7 @@ static void set_data_bits(device_t *device)
 	tms9902_t *tms9902 = get_token(device);
 	int value = tms9902->RCL;
 	if (tms9902->intf->ctrl_callback)
-		(*tms9902->intf->ctrl_callback)(device, TMS9902_CONF_DATAB, value);
+		(*tms9902->intf->ctrl_callback)(device, CONFIG, DATABITS, value);
 }
 
 static void set_parity(device_t *device)
@@ -405,29 +454,30 @@ static void set_parity(device_t *device)
 	tms9902_t *tms9902 = get_token(device);
 	int value = (tms9902->PENB? 2:0) | (tms9902->ODDP? 1:0);
 	if (tms9902->intf->ctrl_callback)
-		(*tms9902->intf->ctrl_callback)(device, TMS9902_CONF_PAR, value);
+		(*tms9902->intf->ctrl_callback)(device, CONFIG, PARITY, value);
 }
 
 static void transmit_line_state(device_t *device)
 {
 	tms9902_t *tms9902 = get_token(device);
-	// build a sum of all signals here
-	// 0abc defg = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f, BRK=g
-	UINT8 lines = (tms9902->RTS << 6);
+
+	// 00ab cdef = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
+	// The 9902 only outputs RTS and BRK
+
 	if (tms9902->intf->ctrl_callback)
-		(*tms9902->intf->ctrl_callback)(device, 0, lines);
+		(*tms9902->intf->ctrl_callback)(device, LINES, RTS, (tms9902->RTSflag)? RTS : 0);
 }
 
-static void set_rts(device_t *device, int state)
+static void set_rts(device_t *device, line_state state)
 {
 	tms9902_t *tms9902 = get_token(device);
-	/*state = state != 0;*/
+	bool lstate = (state==ASSERT_LINE);
 
-	if (state != tms9902->RTS)
+	if (lstate != tms9902->RTSflag)
 	{
 		// Signal RTS to the modem
-		if (VERBOSE) logerror("TMS9902: Set RTS=%d\n", state);
-		tms9902->RTS = state;
+		if (VERBOSE>3) logerror("TMS9902: Set RTS=%d\n", lstate? 1:0);
+		tms9902->RTSflag = lstate;
 		transmit_line_state(device);
 	}
 }
@@ -440,26 +490,27 @@ static void initiate_transmit(device_t *device)
 
 	/* Load transmit register */
 	tms9902->XSR = tms9902->XBR;
-	tms9902->XSRE = 0;
-	tms9902->XBRE = 1;
+	tms9902->XSRE = false;
+	tms9902->XBRE = true;
+
 	field_interrupts(device);
 
-	/* Do transmit at once (I will add a timer delay some day, maybe) */
+	if (VERBOSE>4) logerror("TMS9902: transmit XSR=%02x, RCL=%02x\n", tms9902->XSR, tms9902->RCL);
 
 	if (tms9902->intf->xmit_callback)
 		(*tms9902->intf->xmit_callback)(device, tms9902->XSR & (0xff >> (3-tms9902->RCL)));
 
-	tms9902->XSRE = 1;
+	tms9902->XSRE = true;
 
-	if ((! tms9902->XBRE) /*&& tms9902->RTS*/ && tms9902->CTS /*&& ! tms9902->BRK*/)
+	if ((!tms9902->XBRE) /*&& tms9902->RTS*/ && tms9902->CTSflag /*&& ! tms9902->BRK*/)
 		/* load next byte */
 		initiate_transmit(device);
-	else if (tms9902->BRKON /*&& tms9902->RTS*/ && tms9902->CTS)
+	else if (tms9902->BRKON /*&& tms9902->RTS*/ && tms9902->CTSflag)
 		/* enter break mode */
-		set_brk(device, 1);
-	else if ((! tms9902->RTSON) && ((! tms9902->CTS) || (tms9902->XBRE && ! tms9902->BRK)))
+		send_break(device, true);
+	else if ((! tms9902->RTSON) && ((! tms9902->CTSflag) || (tms9902->XBRE && !tms9902->BRKflag)))
 		/* clear RTS output */
-		set_rts(device, 0);
+		set_rts(device, CLEAR_LINE);
 }
 
 
@@ -483,52 +534,61 @@ static void initiate_transmit(device_t *device)
 */
 READ8_DEVICE_HANDLER( tms9902_cru_r )
 {
-	int answer = 0;
+	UINT8 answer = 0;
 	tms9902_t *tms9902 = get_token(device);
 
-	offset &= 0x003;
+	offset &= 0x0003;
 
 	switch (offset)
 	{
-	case 0:
-		answer = tms9902->RBR;
-		break;
-
-	case 1:
-		answer =	(tms9902->RIN << 7)
-					| (tms9902->RSBD << 6)
-					| (tms9902->RFBD << 5)
-					| (tms9902->RFER << 4)
-					| (tms9902->ROVER << 3)
-					| (tms9902->RPER << 2)
-					| (tms9902->RCVERR << 1);
+	case 3:
+		if (tms9902->INT) answer |= 0x80;
+		if ((tms9902->register_select != 0) || tms9902->BRKON) answer |= 0x40;
+		if (tms9902->DSCH) answer |= 0x20;
+		if (tms9902->CTSflag) answer |= 0x10;
+		if (tms9902->DSRflag) answer |= 0x08;
+		if (tms9902->RTSflag) answer |= 0x04;
+		if (tms9902->TIMELP)  answer |= 0x02;
+		if (tms9902->TIMERR)  answer |= 0x01;
 		break;
 
 	case 2:
-		answer = (tms9902->XSRE << 7)
-					| (tms9902->XBRE << 6)
-					| (tms9902->RBRL << 5)
-					| ((tms9902->DSCH & tms9902->DSCENB) << 4)
-					| ((tms9902->TIMELP & tms9902->TIMENB) << 3)
-					| ((tms9902->XBRE & tms9902->XBIENB) << 1)
-					| (tms9902->RBRL & tms9902->RIENB);
+		if (tms9902->XSRE) answer |= 0x80;
+		if (tms9902->XBRE) answer |= 0x40;
+		if (tms9902->RBRL) answer |= 0x20;
+		if (tms9902->DSCH & tms9902->DSCENB) answer |= 0x10;
+		if (tms9902->TIMELP & tms9902->TIMENB) answer |= 0x08;
+		if (tms9902->XBRE & tms9902->XBIENB) answer |= 0x02;
+		if (tms9902->RBRL & tms9902->RIENB) answer |= 0x01;
 		break;
 
-	case 3:
-		answer = (tms9902->INT << 7)
-					| ((tms9902->register_select != 0) << 6)
-					| (tms9902->DSCH << 5)
-					| (tms9902->CTS << 4)
-					| (tms9902->DSR << 3)
-					| (tms9902->RTS << 2)
-					| (tms9902->TIMELP << 1)
-					| (tms9902->TIMERR);
+	case 1:
+		if (tms9902->RIN) answer |= 0x80;
+		if (tms9902->RSBD) answer |= 0x40;
+		if (tms9902->RFBD) answer |= 0x20;
+		if (tms9902->RFER) answer |= 0x10;
+		if (tms9902->ROVER) answer |= 0x08;
+		if (tms9902->RPER) answer |= 0x04;
+		if (tms9902->RCVERR) answer |= 0x02;
+		break;
+
+	case 0:
+		answer = tms9902->RBR;
+		if (VERBOSE>3) logerror("TMS9902: Reading receive buffer\n");
 		break;
 	}
 	return answer;
 }
 
-static inline void set_bits(int *reg, int bits, int set)
+static inline void set_bits8(UINT8 *reg, UINT8 bits, bool set)
+{
+	if (set)
+		*reg |= bits;
+	else
+		*reg &= ~bits;
+}
+
+static inline void set_bits16(UINT16 *reg, UINT16 bits, bool set)
 {
 	if (set)
 		*reg |= bits;
@@ -537,65 +597,63 @@ static inline void set_bits(int *reg, int bits, int set)
 }
 
 /*
-    Write 1 bit to tms9902.
-
-    signification:
-    ...
+    TMS9902 CRU write
 */
 WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 {
 	tms9902_t *tms9902 = get_token(device);
 
 	data &= 1;	/* clear extra bits */
-	offset &= 0x01F;
+
+	offset &= 0x1F;
 
 	if (offset <= 0x0a)
 	{
-		int mask = (1 << offset);
+		UINT16 mask = (1 << offset);
 
 		if (tms9902->register_select & register_select_LDCTRL)
 		{	/* Control Register */
 			switch (offset)
 			{
 			case 0:
-				set_bits(&tms9902->RCL, 0x01, data);
+				set_bits8(&tms9902->RCL, 0x01, (data!=0));
 				// we assume that bits are written in increasing order
 				// so we do not transmit the data bits twice
 				break;
 			case 1:
-				set_bits(&tms9902->RCL, 0x02, data);
+				set_bits8(&tms9902->RCL, 0x02, (data!=0));
 				set_data_bits(device);
 				break;
 			case 2:
 				break;
 			case 3:
-				tms9902->CLK4M = data;
+				tms9902->CLK4M = (data!=0);
 				break;
 			case 4:
-				tms9902->ODDP = data;
+				tms9902->ODDP = (data!=0);
 				// we also assume that the parity type is set before the parity enable
 				break;
 			case 5:
-				tms9902->PENB = data;
+				tms9902->PENB = (data!=0);
 				set_parity(device);
 				break;
 			case 6:
-				set_bits(&tms9902->STOPB, 0x01, data);
+				set_bits8(&tms9902->STOPB, 0x01, (data!=0));
 				break;
 			case 7:
-				set_bits(&tms9902->STOPB, 0x02, data);
+				set_bits8(&tms9902->STOPB, 0x02, (data!=0));
 				tms9902->register_select &= ~register_select_LDCTRL;
 				set_stop_bits(device);
 				break;
 			default:
-				logerror("tms9902: Invalid control register address %d\n", offset);
+				if (VERBOSE>1) logerror("tms9902: Invalid control register address %d\n", offset);
 			}
 		}
 		else if (tms9902->register_select & register_select_LDIR)
 		{	/* Interval Register */
 			if (offset <= 7)
 			{
-				set_bits(&tms9902->TMR, mask, data);
+				set_bits8(&tms9902->TMR, mask, (data!=0));
 
 				if (offset == 7)
 				{
@@ -610,23 +668,23 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 			{
 				if (tms9902->register_select & register_select_LRDR)
 				{
-					set_bits(&tms9902->RDR, mask, data);
+					set_bits16(&tms9902->RDR, mask, (data!=0));
 				}
 				if (tms9902->register_select & register_select_LXDR)
 				{
-					set_bits(&tms9902->XDR, mask, data);
+					set_bits16(&tms9902->XDR, mask, (data!=0));
 				}
 			}
 			else if (offset == 10)
 			{
 				if (tms9902->register_select & register_select_LRDR)
 				{
-					tms9902->RDV8 = data;
+					tms9902->RDV8 = (data!=0);
 					set_receive_data_rate(device);
 				}
 				if (tms9902->register_select & register_select_LXDR)
 				{
-					tms9902->XDV8 = data;
+					tms9902->XDV8 = (data!=0);
 					set_transmit_data_rate(device);
 				}
 				tms9902->register_select &= ~ (register_select_LRDR | register_select_LXDR);
@@ -636,7 +694,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 		{	/* Transmit Buffer Register */
 			if (offset <= 7)
 			{
-				set_bits(&tms9902->XBR, mask, data);
+				set_bits8(&tms9902->XBR, mask, (data!=0));
 
 				if (offset == 7)
 				{	/* transmit */
@@ -644,7 +702,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 					// Spec: When the transmitter is active, the contents of the Transmit
 					// Buffer Register are transferred to the Transmit Shift Register
 					// each time the previous character has been completely transmitted
-					if (tms9902->XSRE && tms9902->RTS && tms9902->CTS && ! tms9902->BRK)
+					if (tms9902->XSRE && tms9902->RTSflag && tms9902->CTSflag && !tms9902->BRKflag)
 					{
 						initiate_transmit(device);
 					}
@@ -663,7 +721,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 			reload_interval_timer(device);
 		}
 
-		set_bits(&tms9902->register_select, mask, data);
+		set_bits8(&tms9902->register_select, mask, (data!=0));
 		return;
 	}
 
@@ -675,23 +733,24 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 
 	if (offset == 0x10)
 	{
-		tms9902->RTSON = data;
-		if (data==1)
+		if (data!=0)
 		{
-			set_rts(device, 1);
-			if (tms9902->CTS)
+			tms9902->RTSON = true;
+			set_rts(device, ASSERT_LINE);
+			if (tms9902->CTSflag)
 			{
-				if (tms9902->XSRE && (!tms9902->XBRE) && !tms9902->BRK)
+				if (tms9902->XSRE && !tms9902->XBRE && !tms9902->BRKflag)
 					initiate_transmit(device);
 				else if (tms9902->BRKON)
-					set_brk(device, 1);
+					send_break(device, true);
 			}
 		}
 		else
 		{
-			if (tms9902->XBRE && tms9902->XSRE && !tms9902->BRK)
+			tms9902->RTSON = false;
+			if (tms9902->XBRE && tms9902->XSRE && !tms9902->BRKflag)
 			{
-				set_rts(device, 0);
+				set_rts(device, CLEAR_LINE);
 			}
 		}
 		return;
@@ -699,13 +758,13 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 
 	if (offset == 0x11)
 	{
-		if (VERBOSE) logerror("TMS9902: set BRKON=%d; BRK=%d\n", data, tms9902->BRK);
-		tms9902->BRKON = data;
-		if (tms9902->BRK && data==0)
+		if (VERBOSE>3) logerror("TMS9902: set BRKON=%d; BRK=%d\n", data, tms9902->BRKflag? 1:0);
+		tms9902->BRKON = (data!=0);
+		if (tms9902->BRKflag && data==0)
 		{
 			// clear BRK
-			tms9902->BRK = 0;
-			if ((!tms9902->XBRE) && tms9902->CTS)
+			tms9902->BRKflag = false;
+			if ((!tms9902->XBRE) && tms9902->CTSflag)
 			{
 				/* transmit next byte */
 				initiate_transmit(device);
@@ -713,12 +772,12 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 			else if (!tms9902->RTSON)
 			{
 				/* clear RTS */
-				set_rts(device, 0);
+				set_rts(device, CLEAR_LINE);
 			}
 		}
-		else if (tms9902->XBRE && tms9902->XSRE && tms9902->RTS && tms9902->CTS)
+		else if (tms9902->XBRE && tms9902->XSRE && tms9902->RTSflag && tms9902->CTSflag)
 		{
-			set_brk(device, data);
+			send_break(device, (data!=0));
 		}
 		return;
 	}
@@ -727,9 +786,9 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 	{	// Receiver Interrupt Enable
 		// According to spec, (re)setting this flag clears the RBRL flag
 		// (the only way to clear the flag!)
-		tms9902->RIENB = data;
-		tms9902->RBRL = 0;
-		if (VERBOSE) logerror("TMS9902: set RBRL=0, set RIENB=%d\n", data);
+		tms9902->RIENB = (data!=0);
+		tms9902->RBRL = false;
+		if (VERBOSE>4) logerror("TMS9902: set RBRL=0, set RIENB=%d\n", data);
 		field_interrupts(device);
 		return;
 	}
@@ -737,8 +796,8 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 	if (offset == 0x13)
 	{
 		/* Transmit Buffer Interrupt Enable */
-		tms9902->XBIENB = data;
-		if (VERBOSE) logerror("TMS9902: set XBIENB=%d\n", data);
+		tms9902->XBIENB = (data!=0);
+		if (VERBOSE>4) logerror("TMS9902: set XBIENB=%d\n", data);
 		field_interrupts(device);
 		return;
 	}
@@ -746,9 +805,9 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 	if (offset == 0x14)
 	{
 		/* Timer Interrupt Enable */
-		tms9902->TIMENB = data;
-		tms9902->TIMELP = 0;
-		tms9902->TIMERR = 0;
+		tms9902->TIMENB = (data!=0);
+		tms9902->TIMELP = false;
+		tms9902->TIMERR = false;
 		field_interrupts(device);
 		return;
 	}
@@ -756,9 +815,9 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 	if (offset == 0x15)
 	{
 		/* Data Set Change Interrupt Enable */
-		tms9902->DSCENB = data;
-		tms9902->DSCH = 0;
-		if (VERBOSE) logerror("TMS9902: set DSCH=0, set DSCENB=%d\n", data);
+		tms9902->DSCENB = (data!=0);
+		tms9902->DSCH = false;
+		if (VERBOSE>4) logerror("TMS9902: set DSCH=0, set DSCENB=%d\n", data);
 		field_interrupts(device);
 		return;
 	}
@@ -771,7 +830,8 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 		DEVICE_RESET_CALL( tms9902 );
 		return;
 	}
-	else logerror("tms9902: Write to undefined address %0x ignored.\n", offset);
+	else
+		if (VERBOSE>1) logerror("tms9902: Write to undefined address %0x ignored.\n", offset);
 }
 
 
@@ -785,7 +845,7 @@ static DEVICE_STOP( tms9902 )
 
 	if (tms9902->dectimer)
 	{
-		tms9902->dectimer->reset();	/* FIXME - timers should only be allocated once */
+		tms9902->dectimer->reset();
 		tms9902->dectimer = NULL;
 	}
 }
@@ -799,29 +859,28 @@ static DEVICE_RESET( tms9902 )
 	tms9902_t *tms9902 = get_token(device);
 
 	/*  disable all interrupts */
-	tms9902->DSCENB = 0;	// Data Set Change Interrupt Enable
-	tms9902->TIMENB = 0;	// Timer Interrupt Enable
-	tms9902->XBIENB = 0;	// Transmit Buffer Interrupt Enable
-	tms9902->RIENB = 0;		// Read Buffer Interrupt Enable
+	tms9902->DSCENB = false;	// Data Set Change Interrupt Enable
+	tms9902->TIMENB = false;	// Timer Interrupt Enable
+	tms9902->XBIENB = false;	// Transmit Buffer Interrupt Enable
+	tms9902->RIENB = false;		// Read Buffer Interrupt Enable
 
 	/* initialize transmitter */
-	tms9902->XBRE = 1;		// Transmit Buffer Register Empty
-	tms9902->XSRE = 1;		// Transmit Shift Register Empty
+	tms9902->XBRE = true;		// Transmit Buffer Register Empty
+	tms9902->XSRE = true;		// Transmit Shift Register Empty
 
 	/* initialize receiver */
-	tms9902->RBRL = 0;		// Read Buffer Register Loaded
+	tms9902->RBRL = false;		// Read Buffer Register Loaded
 
-	/* we probably need to clear receive error conditions, too... */
 	/* clear RTS */
-	tms9902->RTSON = 0;		// Request-to-send on (flag)
-	tms9902->RTS = 0;		// Request-to-send line
+	tms9902->RTSON = false;		// Request-to-send on (flag)
+	tms9902->RTSflag = false;		// Request-to-send line
 
 	/* set all resister load flags to 1 */
 	tms9902->register_select = 0xf;
 
 	/* clear break condition */
-	tms9902->BRKON = 0;
-	tms9902->BRK = 0;
+	tms9902->BRKON = false;
+	tms9902->BRKflag = false;
 
 	field_interrupts(device);
 }

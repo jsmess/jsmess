@@ -27,8 +27,7 @@ System Driver Changes:
 - c64: Added expansion port slot interface. [Curt Coder]
 
 - ti99: Added real RS232 connection capability [Michael Zapf]
-        Output works quite well, input has issues (overflows)
-        Handshaking not verified yet
+        Input/Output OK so far, hardware handshaking still not perfect yet
         For the meantime, TMS9902 output to a file is disabled
 - mac: Improved PMU simulation for PowerBooks.  Replaced Egret simulation with emulation of 
       the dumped 6805 code.  Improved interrupt handling for RBV/V8 machines (fixes IIci 
