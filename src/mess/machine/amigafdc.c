@@ -43,23 +43,15 @@ static void setup_fdc_buffer( device_t *device,int drive );
     TYPE DEFINITIONS
 ***************************************************************************/
 typedef struct {
-	int motor_on;
 	int side;
 	int dir;
 	int wprot;
 	int disk_changed;
 	floppy_image_device *f;
-	UINT32 extinfo[MAX_TRACKS];
-	UINT32 extoffs[MAX_TRACKS];
-	int is_ext_image;
 	int cyl;
 	int tracklen;
-	UINT8 mfm[MAX_MFM_TRACK_LEN];
-	int	cached;
-	emu_timer *rev_timer;
-	emu_timer *sync_timer;
+	UINT8 *mfm;
 	emu_timer *dma_timer;
-	int rev_timer_started;
 	int pos;
 	int len;
 	offs_t ptr;
@@ -89,9 +81,7 @@ INLINE amiga_fdc_t *get_safe_token(device_t *device)
 	return (amiga_fdc_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-static TIMER_CALLBACK(fdc_rev_proc);
 static TIMER_CALLBACK(fdc_dma_proc);
-static TIMER_CALLBACK(fdc_sync_proc);
 
 static int amiga_floppy_get_drive(device_t *image)
 {
@@ -106,12 +96,6 @@ static int amiga_load_proc(device_image_interface &image)
 	amiga_fdc_t *fdc = get_safe_token(image.device().owner());
 	int id = amiga_floppy_get_drive(&image.device());
 	fdc->fdc_status[id].disk_changed = DISK_DETECT_DELAY;
-	fdc->fdc_status[id].f = dynamic_cast<floppy_image_device*>(&image);
-	fdc->fdc_status[id].cached = -1;
-	fdc->fdc_status[id].motor_on = 0;
-	fdc->fdc_status[id].rev_timer_started = 0;
-	fdc->fdc_status[id].rev_timer->reset(  );
-	fdc->fdc_status[id].sync_timer->reset(  );
 	fdc->fdc_status[id].dma_timer->reset(  );
 	fdc->fdc_rdy = 0;
 
@@ -123,12 +107,6 @@ static void amiga_unload_proc(device_image_interface &image)
 	amiga_fdc_t *fdc = get_safe_token(image.device().owner());
 	int id = amiga_floppy_get_drive(&image.device());
 	fdc->fdc_status[id].disk_changed = DISK_DETECT_DELAY;
-	fdc->fdc_status[id].f = NULL;
-	fdc->fdc_status[id].cached = -1;
-	fdc->fdc_status[id].motor_on = 0;
-	fdc->fdc_status[id].rev_timer_started = 0;
-	fdc->fdc_status[id].rev_timer->reset(  );
-	fdc->fdc_status[id].sync_timer->reset(  );
 	fdc->fdc_status[id].dma_timer->reset(  );
 	fdc->fdc_rdy = 0;
 }
@@ -143,27 +121,22 @@ static DEVICE_START(amiga_fdc)
 	int id;
 	for(id=0;id<2;id++)
 	{
-		fdc->fdc_status[id].rev_timer = device->machine().scheduler().timer_alloc(FUNC(fdc_rev_proc), (void*)device);
 		fdc->fdc_status[id].dma_timer = device->machine().scheduler().timer_alloc(FUNC(fdc_dma_proc), (void*)device);
-		fdc->fdc_status[id].sync_timer = device->machine().scheduler().timer_alloc(FUNC(fdc_sync_proc), (void*)device);
-		fdc->fdc_status[id].motor_on = 0;
 		fdc->fdc_status[id].side = 0;
 		fdc->fdc_status[id].dir = 0;
 		fdc->fdc_status[id].wprot = 1;
 		fdc->fdc_status[id].cyl = 0;
-		fdc->fdc_status[id].rev_timer_started = 0;
-		fdc->fdc_status[id].cached = -1;
 		fdc->fdc_status[id].pos = 0;
 		fdc->fdc_status[id].len = 0;
 		fdc->fdc_status[id].ptr = 0;
-		fdc->fdc_status[id].f = NULL;
-		fdc->fdc_status[id].is_ext_image = 0;
+		if (id==0) {
+			fdc->fdc_status[id].f = device->subdevice<floppy_image_device>(FLOPPY_0);
+		} else {
+			fdc->fdc_status[id].f = device->subdevice<floppy_image_device>(FLOPPY_1);
+		}
 		fdc->fdc_status[id].tracklen = MAX_TRACK_BYTES;
 		fdc->fdc_status[id].disk_changed = DISK_DETECT_DELAY;
-		fdc->fdc_status[id].rev_timer->reset(  );
-		fdc->fdc_status[id].sync_timer->reset(  );
 		fdc->fdc_status[id].dma_timer->reset(  );
-		memset( fdc->fdc_status[id].mfm, 0xaa, MAX_MFM_TRACK_LEN );
 	}
 	fdc->fdc_sel = 0x0f;
 	fdc->fdc_dir = 0;
@@ -190,13 +163,8 @@ static int fdc_get_curpos( device_t *device, int drive )
 	int	bytes;
 	int pos;
 	amiga_fdc_t *fdc = get_safe_token(device);
-
-	if ( fdc->fdc_status[drive].rev_timer_started == 0 ) {
-		logerror("Rev timer not started on drive %d, cant get position!\n", drive );
-		return 0;
-	}
-
-	elapsed = fdc->fdc_status[drive].rev_timer ->elapsed( ).as_double();
+	
+	elapsed = fdc->fdc_status[drive].f->get_pos();
 	speed = ( CUSTOM_REG(REG_ADKCON) & 0x100 ) ? 2 : 4;
 
 	bytes = elapsed /  attotime::from_usec( speed * 8 ).as_double();
@@ -230,7 +198,6 @@ UINT16 amiga_fdc_get_byte (device_t *device)
 	setup_fdc_buffer( device,drive );
 
 	pos = fdc_get_curpos( device, drive );
-
 	if ( fdc->fdc_status[drive].mfm[pos] == ( CUSTOM_REG(REG_DSRSYNC) >> 8 ) &&
 		 fdc->fdc_status[drive].mfm[pos+1] == ( CUSTOM_REG(REG_DSRSYNC) & 0xff ) )
 			ret |= 0x1000;
@@ -243,61 +210,6 @@ UINT16 amiga_fdc_get_byte (device_t *device)
 	ret |= fdc->fdc_status[drive].mfm[pos];
 
 	return ret;
-}
-
-static TIMER_CALLBACK(fdc_sync_proc)
-{
-	amiga_state *state = machine.driver_data<amiga_state>();
-	int drive = param;
-	UINT16			sync = CUSTOM_REG(REG_DSRSYNC);
-	int				cur_pos;
-	int				sector;
-	int				time;
-	amiga_fdc_t *fdc = get_safe_token((device_t*)ptr);
-
-	/* if floppy got ejected, stop */
-	if ( fdc->fdc_status[drive].disk_changed )
-		goto bail;
-
-	if ( fdc->fdc_status[drive].motor_on == 0 )
-		goto bail;
-
-	cur_pos = fdc_get_curpos( (device_t*)ptr, drive );
-
-	if ( cur_pos <= ( GAP_TRACK_BYTES + 6 ) )
-	{
-		sector = 0;
-	}
-	else
-	{
-		sector = ( cur_pos - ( GAP_TRACK_BYTES + 6 ) ) / ONE_SECTOR_BYTES;
-	}
-
-	setup_fdc_buffer( (device_t*)ptr, drive );
-
-	if ( cur_pos < 2 )
-		cur_pos = 2;
-
-	if ( fdc->fdc_status[drive].mfm[cur_pos-2] == ( ( sync >> 8 ) & 0xff ) &&
-		 fdc->fdc_status[drive].mfm[cur_pos-1] == ( sync & 0xff ) )
-	{
-		address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-
-		amiga_custom_w(space, REG_INTREQ, 0x8000 | INTENA_DSKSYN, 0xffff);
-	}
-
-	if ( sector < 10 )
-	{
-		/* start the sync timer */
-		time = ONE_SECTOR_BYTES;
-		time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
-		time *= 8;
-		fdc->fdc_status[drive].sync_timer->adjust(attotime::from_usec( time ), drive);
-		return;
-	}
-
-bail:
-	fdc->fdc_status[drive].sync_timer->reset(  );
 }
 
 static TIMER_CALLBACK(fdc_dma_proc)
@@ -317,7 +229,7 @@ static TIMER_CALLBACK(fdc_dma_proc)
 	if ( fdc->fdc_status[drive].disk_changed )
 		goto bail;
 
-	if ( fdc->fdc_status[drive].motor_on == 0 )
+	if ( fdc->fdc_status[drive].f->ready_r()==0)
 		goto bail;
 
 	setup_fdc_buffer( (device_t*)ptr, drive );
@@ -464,89 +376,30 @@ static void setup_fdc_buffer( device_t *device,int drive )
 	amiga_fdc_t *fdc = get_safe_token(device);
 
 	/* no disk in drive */
-	if ( fdc->fdc_status[drive].f == NULL ) {
-		memset( &fdc->fdc_status[drive].mfm[0], 0xaa, 32 );
+	if (fdc->fdc_status[drive].f->ready_r()==0) {
 		fdc->fdc_status[drive].disk_changed = DISK_DETECT_DELAY;
 		return;
 	}
 
-	int offset = ( fdc->fdc_status[drive].cyl << 1 ) | fdc->fdc_side;
-
-	if ( fdc->fdc_status[drive].cached == offset )
-		return;
-
 #if 0
-	popmessage("T:%d S:%d", fdc->fdc_status[drive].cyl, fdc_side );
+	popmessage("T:%d S:%d", fdc->fdc_status[drive].cyl, fdc->fdc_side );	
 #endif
-	memcpy(fdc->fdc_status[drive].mfm,fdc->fdc_status[drive].f->get_buffer(fdc->fdc_status[drive].cyl, fdc->fdc_side), MAX_MFM_TRACK_LEN);	
-	fdc->fdc_status[drive].cached = offset;
+	fdc->fdc_status[drive].mfm = fdc->fdc_status[drive].f->get_buffer(fdc->fdc_status[drive].cyl, fdc->fdc_side);	
 }
 
-static TIMER_CALLBACK(fdc_rev_proc)
-{
-	amiga_state *state = machine.driver_data<amiga_state>();
-	int drive = param;
-	int time;
-	device_t *cia;
-	amiga_fdc_t *fdc = get_safe_token((device_t*)ptr);
-
-	/* Issue a index pulse when a disk revolution completes */
-	cia = machine.device("cia_1");
-	mos6526_flag_w(cia, 0);
-	mos6526_flag_w(cia, 1);
-
-	fdc->fdc_status[drive].rev_timer->adjust(attotime::from_msec( ONE_REV_TIME ), drive);
-	fdc->fdc_status[drive].rev_timer_started = 1;
-
-	if ( fdc->fdc_status[drive].is_ext_image == 0 )
-	{
-		/* also start the sync timer */
-		time = GAP_TRACK_BYTES + 6;
-		time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
-		time *= 8;
-		fdc->fdc_status[drive].sync_timer->adjust(attotime::from_usec( time ), drive);
-	}
-}
-
-static void start_rev_timer( device_t *device,int drive ) {
-//  double time;
-	amiga_fdc_t *fdc = get_safe_token(device);
-
-	if ( fdc->fdc_status[drive].rev_timer_started ) {
-		logerror("Revolution timer started twice?!\n" );
-		return;
-	}
-
-	fdc->fdc_status[drive].rev_timer->adjust(attotime::from_msec( ONE_REV_TIME ), drive);
-	fdc->fdc_status[drive].rev_timer_started = 1;
-}
-
-static void stop_rev_timer( device_t *device,int drive ) {
-	amiga_fdc_t *fdc = get_safe_token(device);
-
-	if ( fdc->fdc_status[drive].rev_timer_started == 0 ) {
-		logerror("Revolution timer never started?!\n" );
-		return;
-	}
-
-	fdc->fdc_status[drive].rev_timer->reset(  );
-	fdc->fdc_status[drive].rev_timer_started = 0;
-	fdc->fdc_status[drive].dma_timer->reset(  );
-	fdc->fdc_status[drive].sync_timer->reset(  );
-}
 
 static void fdc_setup_leds(device_t *device, int drive ) {
 
 	char portname[12];
 	amiga_fdc_t *fdc = get_safe_token(device);
 	sprintf(portname, "drive_%d_led", drive);
-	output_set_value(portname, fdc->fdc_status[drive].motor_on == 0 ? 0 : 1);
+	output_set_value(portname, fdc->fdc_status[drive].f->ready_r() == 0 ? 0 : 1);
 
 	if ( drive == 0 )
-		set_led_status(device->machine(), 1, fdc->fdc_status[drive].motor_on ); /* update internal drive led */
+		set_led_status(device->machine(), 1, fdc->fdc_status[drive].f->ready_r()); /* update internal drive led */
 
 	if ( drive == 1 )
-		set_led_status(device->machine(), 2, fdc->fdc_status[drive].motor_on ); /* update external drive led */
+		set_led_status(device->machine(), 2, fdc->fdc_status[drive].f->ready_r() ); /* update external drive led */
 }
 
 static void fdc_stepdrive( device_t *device,int drive ) {
@@ -561,28 +414,11 @@ static void fdc_stepdrive( device_t *device,int drive ) {
 	}
 
 	/* Update disk detection if applicable */
-	if ( fdc->fdc_status[drive].f != NULL )
+	if ( fdc->fdc_status[drive].f->exists())
 	{
 		if ( fdc->fdc_status[drive].disk_changed > 0 )
 			fdc->fdc_status[drive].disk_changed--;
 	}
-}
-
-static void fdc_motor( device_t *device,int drive, int off ) {
-	amiga_fdc_t *fdc = get_safe_token(device);
-	int on = !off;
-
-	if ( ( fdc->fdc_status[drive].motor_on == 0 ) && on ) {
-		fdc->fdc_status[drive].pos = 0;
-
-		start_rev_timer( device,drive );
-
-	} else {
-		if ( fdc->fdc_status[drive].motor_on && off )
-			stop_rev_timer(device, drive );
-	}
-
-	fdc->fdc_status[drive].motor_on = on;
 }
 
 WRITE8_DEVICE_HANDLER( amiga_fdc_control_w )
@@ -614,7 +450,7 @@ WRITE8_DEVICE_HANDLER( amiga_fdc_control_w )
 
 	for ( drive = 0; drive < NUM_DRIVES; drive++ ) {
 		if ( !( fdc->fdc_sel & ( 1 << drive ) ) ) {
-			fdc_motor( device, drive, ( data >> 7 ) & 1 );
+			fdc->fdc_status[drive].f->mon_w((( data >> 7 ) & 1)  );
 			fdc_setup_leds( device,drive );
 		}
     }
@@ -627,7 +463,7 @@ UINT8  amiga_fdc_status_r (device_t *device)
 	for ( drive = 0; drive < NUM_DRIVES; drive++ ) {
 		if ( !( fdc->fdc_sel & ( 1 << drive ) ) ) {
 
-			if ( fdc->fdc_status[drive].motor_on ) {
+			if ( fdc->fdc_status[drive].f->ready_r()==1) {
 				if ( fdc->fdc_rdy ) ret &= ~0x20;
 				fdc->fdc_rdy = 1;
 			} else {
@@ -651,8 +487,16 @@ UINT8  amiga_fdc_status_r (device_t *device)
 	return ret;
 }
 
+WRITE_LINE_DEVICE_HANDLER(amiga_index_callback)
+{	
+	/* Issue a index pulse when a disk revolution completes */
+	device_t *cia = device->machine().device("cia_1");
+	mos6526_flag_w(cia, state);
+}
+
 static const floppy_interface amiga_floppy_interface =
 {
+	DEVCB_LINE(amiga_index_callback),
 	FLOPPY_OPTIONS_NAME(amiga_only),
 	NULL,
 	NULL,
