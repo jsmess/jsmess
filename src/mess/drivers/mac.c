@@ -62,23 +62,24 @@
 // do this here - SCREEN_UPDATE is called each scanline when stepping in the
 // debugger, which means you can't escape the VIA2 IRQ handler
 //
-// RBV/MDU interrupts:
+// RBV/MDU bits in IER/IFR:
 //
 // CA1: any slot interrupt = 0x02
-// CA2: SCSI interrupt = 0x01
-// CB1: ASC interrupt = 0x10
+// CA2: SCSI interrupt     = 0x01
+// CB1: ASC interrupt      = 0x10
 
 static INTERRUPT_GEN( mac_rbv_vbl )
 {
 	mac_state *mac = device->machine().driver_data<mac_state>();
 
-	mac->m_rbv_regs[2] |= 0x7f;	// hack!
 	mac->m_rbv_regs[2] &= ~0x40;	// set vblank signal
+	mac->m_rbv_vbltime = 10;
 
-	if ((mac->m_rbv_regs[0x12] & 0x40) && (mac->m_rbv_ier & 0x2))
+//	printf("RBV: raising VBL!\n");
+
+	if (mac->m_rbv_regs[0x12] & 0x40)
 	{
-		mac->m_rbv_ifr |= 0x82;
-		mac->set_via2_interrupt(1);
+		mac->rbv_recalc_irqs();
 	}
 }
 
@@ -183,6 +184,40 @@ WRITE8_MEMBER( mac_state::mac_sonora_vctl_w )
 	m_sonora_vctl[offset] = data;
 }
 
+void mac_state::rbv_recalc_irqs()
+{
+	// check slot interrupts and bubble them down to IFR
+	UINT8 slot_irqs = (~m_rbv_regs[2]) & 0x78;
+	slot_irqs &= (m_rbv_regs[0x12] & 0x78);
+
+//	printf("slot_irqs = %02x\n", slot_irqs);
+	if (slot_irqs)
+	{
+		m_rbv_regs[3] |= 2;	// any slot
+	}
+	else	// no slot irqs, clear the pending bit
+	{
+		m_rbv_regs[3] &= ~2; // any slot
+	}
+
+	UINT8 ifr = (m_rbv_regs[3] & m_rbv_ier) & 0x1b; //m_rbv_regs[0x13]);
+
+//	printf("ifr = %02x (reg3 %02x reg13 %02x)\n", ifr, m_rbv_regs[3], m_rbv_regs[0x13]);
+	if (ifr != 0)
+	{
+		m_rbv_regs[3] = ifr | 0x80;
+		m_rbv_ifr = ifr | 0x80;
+
+//		printf("VIA2 raise\n");
+		this->set_via2_interrupt(1);
+	}
+	else
+	{
+//		printf("VIA2 lower\n");
+		this->set_via2_interrupt(0);
+	}
+}
+
 READ8_MEMBER ( mac_state::mac_rbv_r )
 {
 	int data = 0;
@@ -190,14 +225,6 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 	if (offset < 0x100)
 	{
 		data = m_rbv_regs[offset];
-
-		if (offset == 0x02)
-		{
-			if (!space.machine().primary_screen->vblank())
-			{
-				data |= 0x40;
-			}
-		}
 
 		if (offset == 0x10)
 		{
@@ -219,12 +246,12 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		switch (offset)
 		{
 			case 13:	// IFR
-//				printf("Read IER = %02x (PC=%x)\n", m_rbv_ier, cpu_get_pc(m_maincpu));
+//				printf("Read IER = %02x (PC=%x) 2=%02x\n", m_rbv_ier, cpu_get_pc(m_maincpu), m_rbv_regs[2]);
 				return m_rbv_ifr;
 				break;
 
 			case 14:	// IER
-//				printf("Read IFR = %02x (PC=%x)\n", m_rbv_ifr, cpu_get_pc(m_maincpu));
+//				printf("Read IFR = %02x (PC=%x) 2=%02x\n", m_rbv_ifr, cpu_get_pc(m_maincpu), m_rbv_regs[2]);
 				return m_rbv_ier;
 				break;
 
@@ -263,12 +290,23 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 				break;
 
 			case 0x02:
+				data &= 0x40;
 				m_rbv_regs[offset] &= ~data;
+				rbv_recalc_irqs();
 				break;
 
-			case 0x03:
-				this->set_via2_interrupt(0);
-				m_rbv_regs[offset] = data;
+			case 0x03:	// write here to ack
+				if (data & 0x80)	// 1 bits write 1s
+				{
+					m_rbv_regs[offset] |= data & 0x7f;
+					m_rbv_ifr |= data & 0x7f;
+				}
+				else			// 1 bits write 0s
+				{
+					m_rbv_regs[offset] &= ~(data & 0x7f);
+					m_rbv_ifr &= ~(data & 0x7f);
+				}
+				rbv_recalc_irqs();
 				break;
 
 			case 0x10:
@@ -287,12 +325,8 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 				else			// 1 bits write 0s
 				{
 					m_rbv_regs[offset] &= ~(data & 0x7f);
-
-					if (data & 0x78)
-					{
-						m_rbv_ifr &= ~0x2;
-					}
 				}
+				rbv_recalc_irqs();
 				break;
 
 			case 0x13:
@@ -306,7 +340,6 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 				{
 					m_rbv_regs[offset] &= ~(data & 0x7f);
 				}
-//              printf("RBV: 0x13 (%02x) = %02x (PC %x)\n", data, m_rbv_regs[offset], cpu_get_pc(space.cpu));
 				break;
 
 			default:
@@ -321,23 +354,16 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 		switch (offset)
 		{
 			case 13:	// IFR
+//				printf("%02x to IFR (PC=%x)\n", data, cpu_get_pc(m_maincpu));
 				if (data & 0x80)
 				{
 					data = 0x7f;
 				}
-				m_rbv_ifr = (m_rbv_ifr & ~data) & 0x7f;
-
-				if (m_rbv_ifr & m_rbv_ier & 0x7f)
-				{
-					this->set_via2_interrupt(1);
-				}
-				else
-				{
-					this->set_via2_interrupt(0);
-				}
+				rbv_recalc_irqs();
 				break;
 
 			case 14:	// IER
+//				printf("%02x to IER (PC=%x)\n", data, cpu_get_pc(m_maincpu));
 				if (data & 0x80)	// 1 bits write 1s
 				{
 					m_rbv_ier |= data & 0x7f;
@@ -346,8 +372,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 				{
 					m_rbv_ier &= ~(data & 0x7f);
 				}
-
-//                printf("rbv_w: %02x to IER => %02x\n", data, m_rbv_ier);
+				rbv_recalc_irqs();
 				break;
 
 			default:

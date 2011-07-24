@@ -420,7 +420,8 @@ VIDEO_RESET(macrbv)
 	mac->m_rbv_clutoffs = 0;
 	mac->m_rbv_immed10wr = 0;
 
-	mac->m_rbv_regs[2] = 0xff;
+	mac->m_rbv_regs[2] = 0x7f;
+	mac->m_rbv_regs[3] = 0;
 
 	mac->m_rbv_type = RBV_TYPE_RBV;
 
@@ -473,7 +474,8 @@ VIDEO_RESET(macsonora)
 	mac->m_rbv_clutoffs = 0;
 	mac->m_rbv_immed10wr = 0;
 
-	mac->m_rbv_regs[2] = 0xff;
+	mac->m_rbv_regs[2] = 0x7f;
+	mac->m_rbv_regs[3] = 0;
 
 	mac->m_rbv_type = RBV_TYPE_SONORA;
 
@@ -523,7 +525,8 @@ VIDEO_START( macsonora )
 	mac->m_rbv_clutoffs = 0;
 	mac->m_rbv_immed10wr = 0;
 
-	mac->m_rbv_regs[2] = 0xff;
+	mac->m_rbv_regs[2] = 0x7f;
+	mac->m_rbv_regs[3] = 0;
 	mac->m_rbv_regs[4] = 0x6;
 	mac->m_rbv_regs[5] = 0x3;
 
@@ -546,7 +549,7 @@ VIDEO_START( macv8 )
 
 	mac->m_rbv_regs[0] = 0x4f;
 	mac->m_rbv_regs[1] = 0x06;
-	mac->m_rbv_regs[2] = 0xff;
+	mac->m_rbv_regs[2] = 0x7f;
 
 	mac->m_rbv_type = RBV_TYPE_V8;
 }

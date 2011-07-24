@@ -341,19 +341,13 @@ void mac_asc_irq(device_t *device, int state)
 		if (state)
 		{
 			mac->m_rbv_regs[3] |= 0x10;	// any VIA 2 interrupt | sound interrupt
-
-			if (mac->m_rbv_ier & 0x10)	// ASC on RBV is CB1, bit 4 of IER/IFR
-			{
-				mac->m_rbv_ifr |= 0x90;
-				mac->set_via2_interrupt(1);
-			}
+			mac->rbv_recalc_irqs();
 		}
 		else
 		{
 			mac->m_rbv_regs[3] &= ~0x10;
-			mac->m_rbv_ifr &= ~0x10;
+			mac->rbv_recalc_irqs();
 		}
-
 	}
 	else if ((mac->m_model == MODEL_MAC_PORTABLE) || (mac->m_model == MODEL_MAC_PB100))
 	{
@@ -2274,6 +2268,20 @@ static void pmu_exec(mac_state *mac)
 			pmu_three_byte_reply(mac, 255, 255, 255);
 			break;
 
+		case 0x6b:	// read extended battery/charger level and status (wants an 8 byte reply)
+			mac->m_pm_out[0] = mac->m_pm_out[1] = 8;	// length
+			mac->m_pm_out[2] = 255;
+			mac->m_pm_out[3] = 255;
+			mac->m_pm_out[4] = 255;
+			mac->m_pm_out[5] = 255;
+			mac->m_pm_out[6] = 255;
+			mac->m_pm_out[7] = 255;
+			mac->m_pm_out[8] = 255;
+			mac->m_pm_out[9] = 255;
+			mac->m_pm_slen = 10;
+			mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
+			break;
+
 		case 0x78:	// read interrupt flag
 			if (ADB_IS_PM_VIA2)	// PB 140/170 use a "leaner" PMU protocol where you get the data for a PMU interrupt here
 			{
@@ -3012,6 +3020,8 @@ void mac_state::machine_reset()
 	// stop 60.15 Hz timer
 	m_6015_timer->adjust(attotime::never);
 
+	m_rbv_vbltime = 0;
+
 	if (m_model >= MODEL_MAC_POWERMAC_6100 && m_model <= MODEL_MAC_POWERMAC_8100)
 	{
 		m_awacs->set_dma_base(m_maincpu->memory().space(AS_PROGRAM), 0x10000, 0x12000);
@@ -3403,6 +3413,17 @@ static TIMER_CALLBACK(mac_scanline_tick)
 	if (machine.device("custom") != NULL)
 	{
 		mac_sh_updatebuffer(machine.device("custom"));
+	}
+
+	if (mac->m_rbv_vbltime > 0)
+	{
+		mac->m_rbv_vbltime--;
+
+		if (mac->m_rbv_vbltime == 0)
+		{
+			mac->m_rbv_regs[2] |= 0x40;
+			mac->rbv_recalc_irqs();
+		}
 	}
 
 	scanline = machine.primary_screen->vpos();
