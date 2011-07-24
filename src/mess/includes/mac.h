@@ -13,6 +13,7 @@
 #include "machine/6522via.h"
 #include "machine/ram.h"
 #include "machine/egret.h"
+#include "machine/nubus.h"
 #include "sound/awacs.h"
 
 /* for Egret and CUDA streaming MCU commands, command types */
@@ -143,6 +144,7 @@ DRIVER_INIT(macpb140);
 DRIVER_INIT(macpb160);
 DRIVER_INIT(maciivx);
 DRIVER_INIT(maciifx);
+DRIVER_INIT(macpbduo210);
 
 NVRAM_HANDLER( mac );
 
@@ -372,6 +374,13 @@ public:
 
     DECLARE_READ8_MEMBER(mac_gsc_r);
     DECLARE_WRITE8_MEMBER(mac_gsc_w);
+
+    DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
+    DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
+    DECLARE_WRITE_LINE_MEMBER(nubus_irq_b_w);
+    DECLARE_WRITE_LINE_MEMBER(nubus_irq_c_w);
+    DECLARE_WRITE_LINE_MEMBER(nubus_irq_d_w);
+    DECLARE_WRITE_LINE_MEMBER(nubus_irq_e_w);
 
 private:
 	int has_adb();
