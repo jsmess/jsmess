@@ -388,9 +388,6 @@ READ32_MEMBER(mac_state::mac_read_id)
 
 	switch (m_model)
 	{
-		case MODEL_MAC_IIFX:
-			return 0xa55a1808;	// IIfx ROM doesn't actually check this
-
 		case MODEL_MAC_LC_III:
 			return 0xa55a0001;	// 25 MHz LC III
 
@@ -744,6 +741,7 @@ static ADDRESS_MAP_START(macpb165c_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0xfcff0000, 0xfcffffff) AM_ROM AM_REGION("bootrom", 0xf0000)
 ADDRESS_MAP_END
 */
+
 static ADDRESS_MAP_START(pwrmac_map, AS_PROGRAM, 64, mac_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	// 8 MB standard
 
@@ -797,6 +795,17 @@ static const struct NCR5380interface macplus_5380intf =
 {
 	&dev_table,	// SCSI device table
 	mac_scsi_irq	// IRQ (unconnected on the Mac Plus)
+};
+
+static const struct nbbus_interface nubus_intf =
+{
+	// interrupt lines
+	DEVCB_DRIVER_LINE_MEMBER(mac_state, nubus_irq_9_w),
+	DEVCB_DRIVER_LINE_MEMBER(mac_state, nubus_irq_a_w),
+	DEVCB_DRIVER_LINE_MEMBER(mac_state, nubus_irq_b_w),
+	DEVCB_DRIVER_LINE_MEMBER(mac_state, nubus_irq_c_w),
+	DEVCB_DRIVER_LINE_MEMBER(mac_state, nubus_irq_d_w),
+	DEVCB_DRIVER_LINE_MEMBER(mac_state, nubus_irq_e_w)
 };
 
 /***************************************************************************
@@ -968,7 +977,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 
-        /* video hardware */
+    /* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(1024, 768)
@@ -989,6 +998,8 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
+	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
+
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
@@ -1047,6 +1058,7 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
+	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
@@ -1083,6 +1095,8 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,6M,8M,10M")
+
+	MCFG_NUBUS_BUS_REMOVE("nubus")
 
 	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_V8, mac_asc_irq)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1136,6 +1150,8 @@ static MACHINE_CONFIG_DERIVED( maciivx, maclc )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(macrbvvram)
 
+	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
+
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,60M,64M")
@@ -1152,6 +1168,8 @@ static MACHINE_CONFIG_DERIVED( maciivi, maclc )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(macrbvvram)
+
+	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1456,6 +1474,8 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
+	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
+
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
@@ -1948,6 +1968,11 @@ ROM_END
 ROM_START( maccclas )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "ecd99dc0.rom", 0x000000, 0x100000, CRC(c84c3aa5) SHA1(fd9e852e2d77fe17287ba678709b9334d4d74f1e) )
+ROM_END
+
+ROM_START( macpd210 )
+	ROM_REGION32_BE(0x100000, "bootrom", 0)
+	ROM_LOAD( "ecfa989b.rom", 0x000000, 0x100000, CRC(b86ed854) SHA1(ed1371c97117a5884da4a6605ecfc5abed48ae5a) ) 
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */

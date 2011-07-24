@@ -97,10 +97,10 @@
 #define ADB_IS_BITBANG	((mac->m_model == MODEL_MAC_SE || mac->m_model == MODEL_MAC_CLASSIC) || (mac->m_model >= MODEL_MAC_II && mac->m_model <= MODEL_MAC_IICI) || (mac->m_model == MODEL_MAC_SE30))
 #define ADB_IS_BITBANG_CLASS	((m_model == MODEL_MAC_SE || m_model == MODEL_MAC_CLASSIC) || (m_model >= MODEL_MAC_II && m_model <= MODEL_MAC_IICI) || (m_model == MODEL_MAC_SE30))
 #define ADB_IS_EGRET	(mac->m_model >= MODEL_MAC_LC && mac->m_model <= MODEL_MAC_CLASSIC_II) || ((mac->m_model >= MODEL_MAC_IISI) && (mac->m_model <= MODEL_MAC_IIVI))
-#define ADB_IS_PM	((mac->m_model >= MODEL_MAC_PORTABLE && mac->m_model <= MODEL_MAC_PB100) || (mac->m_model >= MODEL_MAC_PB140 && mac->m_model <= MODEL_MAC_PB180c))
+#define ADB_IS_PM	((mac->m_model >= MODEL_MAC_PORTABLE && mac->m_model <= MODEL_MAC_PB100) || (mac->m_model >= MODEL_MAC_PB140 && mac->m_model <= MODEL_MAC_PBDUO_270c))
 #define ADB_IS_PM_VIA1	(mac->m_model >= MODEL_MAC_PORTABLE && mac->m_model <= MODEL_MAC_PB100)
-#define ADB_IS_PM_VIA2	(mac->m_model >= MODEL_MAC_PB140 && mac->m_model <= MODEL_MAC_PB180c)
-#define ADB_IS_PM_CLASS	((m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100) || (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PB180c)) 
+#define ADB_IS_PM_VIA2	(mac->m_model >= MODEL_MAC_PB140 && mac->m_model <= MODEL_MAC_PBDUO_270c)
+#define ADB_IS_PM_CLASS	((m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100) || (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c)) 
 
 #define AUDIO_IS_CLASSIC (mac->m_model <= MODEL_MAC_CLASSIC)
 #define MAC_HAS_VIA2	((m_model >= MODEL_MAC_II) && (m_model != MODEL_MAC_IIFX))
@@ -519,7 +519,7 @@ void mac_state::set_memory_overlay(int overlay)
 			space->unmap_write(0x000000, 0x9fffff, 0x9fffff, 0);
 			mac_install_memory(machine(), 0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
-		else if ((m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160))
+		else if ((m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160) || ((m_model >= MODEL_MAC_PBDUO_210) && (m_model <= MODEL_MAC_PBDUO_270c)))
 		{
 			address_space* space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 			space->unmap_write(0x000000, 0xffffff, 0xffffff, 0);
@@ -2111,7 +2111,7 @@ static void pmu_exec(mac_state *mac)
 	mac->m_pm_slen = 0;	// and send length
 	mac->m_pm_dptr = 0;	// and recieve pointer
 
-//	printf("PMU: Command %02x\n", mac->m_pm_cmd[0]);
+	printf("PMU: Command %02x\n", mac->m_pm_cmd[0]);
 	switch (mac->m_pm_cmd[0])
 	{
 		case 0x10:	// subsystem power and clock ctrl
@@ -3242,7 +3242,7 @@ static void mac_driver_init(running_machine &machine, model_t model)
 
 	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) ||
 	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((mac->m_model >= MODEL_MAC_II) && (mac->m_model <= MODEL_MAC_SE30)) ||
-	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100) || (model == MODEL_MAC_PB140) || (model == MODEL_MAC_PB160))
+	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100) || (model == MODEL_MAC_PB140) || (model == MODEL_MAC_PB160) || (model == MODEL_MAC_PBDUO_210))
 	{
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(overlay_opbaseoverride), &machine));
 	}
@@ -3286,6 +3286,7 @@ MAC_DRIVER_INIT(macpb140, MODEL_MAC_PB140)
 MAC_DRIVER_INIT(macpb160, MODEL_MAC_PB160)
 MAC_DRIVER_INIT(maciivx, MODEL_MAC_IIVX)
 MAC_DRIVER_INIT(maciifx, MODEL_MAC_IIFX)
+MAC_DRIVER_INIT(macpbduo210, MODEL_MAC_PBDUO_210)
 
 // make the appletalk init fail instead of hanging on the II FDHD/IIx/IIcx/SE30 ROM
 static void patch_appletalk_iix(running_machine &machine)
@@ -3440,7 +3441,35 @@ static TIMER_CALLBACK(mac_scanline_tick)
 	mac->m_scanline_timer->adjust(machine.primary_screen->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
 }
 
+WRITE_LINE_MEMBER(mac_state::nubus_irq_9_w)
+{
+	nubus_slot_interrupt(9, state);
+}
 
+WRITE_LINE_MEMBER(mac_state::nubus_irq_a_w)
+{
+	nubus_slot_interrupt(0xa, state);
+}
+
+WRITE_LINE_MEMBER(mac_state::nubus_irq_b_w)
+{
+	nubus_slot_interrupt(0xb, state);
+}
+
+WRITE_LINE_MEMBER(mac_state::nubus_irq_c_w)
+{
+	nubus_slot_interrupt(0xc, state);
+}
+
+WRITE_LINE_MEMBER(mac_state::nubus_irq_d_w)
+{
+	nubus_slot_interrupt(0xd, state);
+}
+
+WRITE_LINE_MEMBER(mac_state::nubus_irq_e_w)
+{
+	nubus_slot_interrupt(0xe, state);
+}   					 
 
 /* *************************************************************************
  * Trap Tracing

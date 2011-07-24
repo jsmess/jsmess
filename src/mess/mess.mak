@@ -628,6 +628,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_MACHINE)/a2cffa.o	\
 	$(MESS_MACHINE)/lisa.o		\
 	$(MESS_DRIVERS)/lisa.o		\
+    $(MESS_MACHINE)/nubus.o     \
 	$(MESS_AUDIO)/mac.o			\
 	$(MESS_VIDEO)/mac.o			\
 	$(MESS_MACHINE)/mac.o		\
