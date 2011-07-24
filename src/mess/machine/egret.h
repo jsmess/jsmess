@@ -83,7 +83,8 @@ private:
 	UINT8 timer_ctrl;
 	UINT8 timer_counter;
 	UINT8 onesec;
-    UINT8 xcvr_session, via_full, sys_session, via_data, via_clock;
+    UINT8 xcvr_session, via_full, sys_session, via_data, via_clock, last_adb;
+    UINT64 last_adb_time;
 	bool egret_controls_power;
 	bool adb_in;
 	int reset_line;
