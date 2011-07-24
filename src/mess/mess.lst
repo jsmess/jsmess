@@ -694,6 +694,11 @@ ct486		// 1993? 486 with CS4031
 ficpio2	// 1995 FIC 486-PIO-2
 at586	 // 19?? AT 586
 c386sx16	// 1990 Commodore 386SX-16
+xb42663    // 1988 Apricot Qi 300 (Rev D,E & F Motherboard)
+qi600    // 1988 Apricot Qi 600 (Neptune Motherboard
+qi900    // 1990 Apricot Qi 900 (Scorpion Motherboard)
+xb42639  // 1988 Apricot XEN-S (Venus I Motherboard 286) (Bios:3.10.17i)
+xb42664  // 1988 Apricot XEN-S (Venus I Motherboard 386) (Bios:3.10.17i)
 ficvt503	// 1997 FIC VT-503
 megapc
 megapcpl
