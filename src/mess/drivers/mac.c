@@ -53,6 +53,7 @@
 #include "sound/asc.h"
 #include "sound/awacs.h"
 #include "sound/cdda.h"
+#include "video/nubus_48gc.h"
 #include "includes/mac.h"
 
 #define C7M	(7833600)
@@ -808,6 +809,10 @@ static const struct nbbus_interface nubus_intf =
 	DEVCB_DRIVER_LINE_MEMBER(mac_state, nubus_irq_e_w)
 };
 
+static SLOT_INTERFACE_START(mac_nubus_cards)
+//	SLOT_INTERFACE("48gc", NUBUS_48GC)
+SLOT_INTERFACE_END
+
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -999,6 +1004,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 
 	/* devices */
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
+//	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc", NULL)
 
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
@@ -1968,11 +1974,6 @@ ROM_END
 ROM_START( maccclas )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "ecd99dc0.rom", 0x000000, 0x100000, CRC(c84c3aa5) SHA1(fd9e852e2d77fe17287ba678709b9334d4d74f1e) )
-ROM_END
-
-ROM_START( macpd210 )
-	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "ecfa989b.rom", 0x000000, 0x100000, CRC(b86ed854) SHA1(ed1371c97117a5884da4a6605ecfc5abed48ae5a) ) 
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */

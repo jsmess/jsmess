@@ -26,12 +26,12 @@
 #define MCFG_NUBUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot, _def_inp) \
     MCFG_DEVICE_ADD(_tag, NUBUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
-	nubus_slot_device::static_set_nubus_slot(*device, _nbtag); \
+	nubus_slot_device::static_set_nubus_slot(*device, _nbtag, _tag, _def_slot); \
 
 #define MCFG_NUBUS_ONBOARD_ADD(_nbtag, _tag, _dev_type, _def_inp) \
     MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
 	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
-	device_nubus_card_interface::static_set_nubus_tag(*device, _nbtag); 	
+	device_nubus_card_interface::static_set_nubus_tag(*device, _nbtag, _tag); 	
 	
 #define MCFG_NUBUS_BUS_REMOVE(_tag) \
     MCFG_DEVICE_REMOVE(_tag)
@@ -54,10 +54,10 @@ public:
 	virtual void device_start();
 
     // inline configuration
-    static void static_set_nubus_slot(device_t &device, const char *tag);
+    static void static_set_nubus_slot(device_t &device, const char *tag, const char *slottag, const char *defslot);
 protected:
 	// configuration
-	const char *m_nubus_tag;
+	const char *m_nubus_tag, *m_nubus_slottag, *m_nubus_defslot;
 };
 
 // device type definition
@@ -88,7 +88,7 @@ public:
 	static void static_set_cputag(device_t &device, const char *tag);
 
 	void add_nubus_card(device_nubus_card_interface *card);
-	void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name);
+	void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read32_device_func rhandler, const char* rhandler_name, write32_device_func whandler, const char *whandler_name);
 	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
 	void install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region);
 
@@ -138,11 +138,17 @@ public:
 	
 	void set_nubus_device();
 
+    void install_declaration_rom(const char *romregion);
+
+    UINT32 get_slotspace() { return 0xf0000000 | (m_slot<<24); }
+    UINT32 get_super_slotspace() { return m_slot<<28; }
+
     // inline configuration
-    static void static_set_nubus_tag(device_t &device, const char *tag);
+    static void static_set_nubus_tag(device_t &device, const char *tag, const char *slottag, const char *defslot);
 public:
 	nubus_device  *m_nubus;
-	const char *m_nubus_tag;
+    const char *m_nubus_tag, *m_nubus_slottag, *m_nubus_defslot;
+    int m_slot;
 	device_nubus_card_interface *m_next;
 };
 

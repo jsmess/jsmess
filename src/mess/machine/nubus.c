@@ -3,7 +3,7 @@
   nubus.c - NuBus bus and card emulation
  
   by R. Belmont, based heavily on Miodrag Milanovic's ISA8/16 implementation  
-
+ 
 ***************************************************************************/
 
 #include "emu.h"
@@ -36,10 +36,12 @@ nubus_slot_device::nubus_slot_device(const machine_config &mconfig, device_type 
 {
 }
 
-void nubus_slot_device::static_set_nubus_slot(device_t &device, const char *tag)
+void nubus_slot_device::static_set_nubus_slot(device_t &device, const char *tag, const char *slottag, const char *defslot)
 {
 	nubus_slot_device &nubus_card = dynamic_cast<nubus_slot_device &>(device);
 	nubus_card.m_nubus_tag = tag;
+	nubus_card.m_nubus_slottag = slottag;
+	nubus_card.m_nubus_defslot = defslot;
 }
 
 //-------------------------------------------------
@@ -50,7 +52,7 @@ void nubus_slot_device::device_start()
 {
 	device_nubus_card_interface *dev = dynamic_cast<device_nubus_card_interface *>(get_card_device());
 
-	if (dev) device_nubus_card_interface::static_set_nubus_tag(*dev,m_nubus_tag);
+	if (dev) device_nubus_card_interface::static_set_nubus_tag(*dev, m_nubus_tag, m_nubus_slottag, m_nubus_defslot);
 }
 
 //**************************************************************************
@@ -138,20 +140,17 @@ void nubus_device::add_nubus_card(device_nubus_card_interface *card)
 	m_device_list.append(*card);
 }
 
-void nubus_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name)
+void nubus_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read32_device_func rhandler, const char* rhandler_name, write32_device_func whandler, const char *whandler_name)
 {
 	m_maincpu = machine().device(m_cputag);
 	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
-		case 8:
-			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0);
-			break;
-		case 16:
-			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff);
-			break;
 		case 32:
-			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
+			m_maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
+			break;
+		case 64:
+			m_maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,U64(0xffffffffffffffff));
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported", buswidth);
@@ -214,15 +213,38 @@ device_nubus_card_interface::~device_nubus_card_interface()
 {
 }
 
-void device_nubus_card_interface::static_set_nubus_tag(device_t &device, const char *tag)
+void device_nubus_card_interface::static_set_nubus_tag(device_t &device, const char *tag, const char *slottag, const char *defslot)
 {
 	device_nubus_card_interface &nubus_card = dynamic_cast<device_nubus_card_interface &>(device);
 	nubus_card.m_nubus_tag = tag;
+	nubus_card.m_nubus_slottag = slottag;
+	nubus_card.m_nubus_defslot = defslot;
 }
 
 void device_nubus_card_interface::set_nubus_device()
 {
+	// extract the slot number from the last digit of the slot tag
+	int tlen = strlen(m_nubus_slottag);
+	m_slot = (m_nubus_slottag[tlen-1] - '9') + 9;
+
+	if (m_slot < 9 || m_slot > 0xe)
+	{
+		fatalerror("Slot %x out of range for Apple NuBus\n", m_slot);
+	}
+
 	m_nubus = dynamic_cast<nubus_device *>(device().machine().device(m_nubus_tag));
 	m_nubus->add_nubus_card(this);
+}
+
+void device_nubus_card_interface::install_declaration_rom(const char *romregion)
+{
+	char region_name[128];
+
+	sprintf(region_name, "%s:%s:%s", m_nubus_slottag, m_nubus_defslot, romregion);
+
+	UINT8 *rom = device().machine().region(region_name)->base();
+	UINT32 romlen = device().machine().region(region_name)->bytes();
+
+	printf("ROM length is %x, last byte is %02x\n", romlen, rom[romlen-1]);
 }
 
