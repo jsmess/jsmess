@@ -914,6 +914,18 @@ ROM_START( xb42639 )
 	ROM_RELOAD(0xff0001,0x8000)
 ROM_END
 
+ROM_START( xb42639a )
+	/* actual VGA BIOS not dumped*/
+	ROM_REGION(0x1000000, "maincpu", 0)
+    ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
+	
+	// XEN-S (Venus II Motherboard)
+    ROM_LOAD16_BYTE("10217.lo", 0xf0000, 0x8000, CRC(ea53406f) SHA1(2958dfdbda14de4e6b9d6a8c3781131ab1e32bef))
+	ROM_RELOAD(0xff0000,0x8000)
+    ROM_LOAD16_BYTE("10217.hi", 0xf0001, 0x8000, CRC(111725cf) SHA1(f6018a45bda4476d40c5881fb0a506ff75ec1688))
+	ROM_RELOAD(0xff0001,0x8000)
+ROM_END
+
 ROM_START( xb42664 )
 	/* actual VGA BIOS not dumped */
     ROM_REGION(0x1000000, "maincpu", 0)
@@ -923,6 +935,18 @@ ROM_START( xb42664 )
     ROM_LOAD16_BYTE("3-10-17i.lo", 0xf0000, 0x8000, CRC(3786ca1e) SHA1(c682d7c76f234559d03bcf21010c13c4dbeafb69))
 	ROM_RELOAD(0xff0000,0x8000)
     ROM_LOAD16_BYTE("3-10-17i.hi", 0xf0001, 0x8000, CRC(d66710eb) SHA1(e8c1cd5f9ecfbd8825655e416d7ddf2ae362e69b))
+	ROM_RELOAD(0xff0001,0x8000)
+ROM_END
+
+ROM_START( xb42664a )
+	/* actual VGA BIOS not dumped*/
+	ROM_REGION(0x1000000, "maincpu", 0)
+    ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
+	
+	// XEN-S (Venus II Motherboard)
+    ROM_LOAD16_BYTE("10217.lo", 0xf0000, 0x8000, CRC(ea53406f) SHA1(2958dfdbda14de4e6b9d6a8c3781131ab1e32bef))
+	ROM_RELOAD(0xff0000,0x8000)
+    ROM_LOAD16_BYTE("10217.hi", 0xf0001, 0x8000, CRC(111725cf) SHA1(f6018a45bda4476d40c5881fb0a506ff75ec1688))
 	ROM_RELOAD(0xff0001,0x8000)
 ROM_END
 
@@ -1108,6 +1132,56 @@ ROM_START( qi900 )
 	ROM_LOAD16_BYTE( "qi910224.hi", 0xe0001, 0x10000, CRC(36e66d56) SHA1(0900c5272ec3ced550f18fb08db59ab7f67a621e)) 
 ROM_END
 
+ROM_START( ftsserv )
+	ROM_REGION(0x1000000,"maincpu", 0)
+    ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
+
+	ROM_LOAD16_BYTE( "fts10226.lo", 0xe0000, 0x10000, CRC(efbd738f) SHA1(d5258760bafdaf1bf13c4a49da76d4b5e7b4ccbd)) 
+	ROM_LOAD16_BYTE( "fts10226.hi", 0xe0001, 0x10000, CRC(2460853f) SHA1(a6bba8d2f800140afd129c4d5278f7ae8fe7e63a)) 
+	/* FT Server series Front Panel */
+	ROM_REGION(0x10000,"front", 0)
+	ROM_LOAD( "fp10009.bin",	 0x0000, 0x8000, CRC(8aa7f718) SHA1(9ee6c6a5bb92622ea8d3805196d42ff68887d820))
+ROM_END
+
+ROM_START( apxenls3 )
+	ROM_REGION(0x1000000,"maincpu", 0)
+    ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
+
+	ROM_LOAD16_BYTE( "31020.lo", 0xf0000, 0x8000, CRC(a19678d2) SHA1(d13c12fa7e94333555eabf58b81bad421e21cd91)) 
+	ROM_LOAD16_BYTE( "31020.hi", 0xf0001, 0x8000, CRC(4922e020) SHA1(64e6448323dad2209e004cd93fa181582e768ed5)) 
+ROM_END
+
+ROM_START( aplanst )
+	ROM_REGION(0x1000000,"maincpu", 0)
+    ROM_LOAD("et4000.bin", 0x00000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
+	
+	ROM_SYSTEM_BIOS(0, "31024", "Bios 3-10-24")
+    ROMX_LOAD("31024.lo", 0xf0000, 0x8000, CRC(e52b59e1) SHA1(cfcaa4d8d658df8df463108ef30695bd4ee7a617), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD("31024.hi", 0xf0001, 0x8000, CRC(7286aefa) SHA1(dfc0e3f4936780fa62ae9ec392ce17aa65e717cd), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "31025", "Bios 3-10-25")
+    ROMX_LOAD("31025.lo", 0xf0000, 0x8000, CRC(1aec09bc) SHA1(51d56c97c7c1674554aa89b68945329ea967a8bc), ROM_SKIP(1) | ROM_BIOS(2) )
+    ROMX_LOAD("31025.hi", 0xf0001, 0x8000, CRC(0763caa5) SHA1(48510a933dcd6efea3b14d04444f584c3e6fefeb), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "31026", "Bios 3-10-26i")
+    ROMX_LOAD("31026i.lo", 0xf0000, 0x8000, CRC(670b6ab4) SHA1(8d61a0edf187f99b67eb58f5e11276deee801d17), ROM_SKIP(1) | ROM_BIOS(3) )
+    ROMX_LOAD("31026i.hi", 0xf0001, 0x8000, CRC(ef01c54f) SHA1(911f95d65ab96878e5e7ebccfc4b329db47a1351), ROM_SKIP(1) | ROM_BIOS(3) )
+ROM_END
+
+ROM_START( aplannb )
+	ROM_REGION(0x1000000,"maincpu", 0)
+    ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
+
+	ROM_LOAD16_BYTE( "lsl31025.lo", 0xe0000, 0x10000, CRC(8bb7229b) SHA1(31449d12884ec4e7752e6c1ce7ce9e0d044eadf2)) 
+	ROM_LOAD16_BYTE( "lsh31025.hi", 0xe0001, 0x10000, CRC(09e5c1b9) SHA1(d42be83b4181d3733268c29df04a4d2918370f4e)) 
+ROM_END
+
+ROM_START( apvxft )
+	ROM_REGION(0x1000000,"maincpu", 0)
+    ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
+
+	ROM_LOAD16_BYTE( "ft10221.lo", 0xe0000, 0x10000, CRC(8f339de0) SHA1(a6542406746eaf1ff7f9e3678c5cbe5522fb314a)) 
+	ROM_LOAD16_BYTE( "ft10221.hi", 0xe0001, 0x10000, CRC(3b16bc31) SHA1(0592d1d81e7fd4715b0612083482db122d78c7f2)) 
+ROM_END
+
 /* FIC VT-503 (Intel TX chipset, ITE 8679 Super I/O) */
 ROM_START( ficvt503 )
 	ROM_REGION32_LE(0x40000, "user1", 0)
@@ -1167,27 +1241,35 @@ ROM_END
 /*     YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT       INIT    COMPANY     FULLNAME */
 COMP ( 1984, ibm5170,  0,       ibm5150, ibm5170,   atcga,	atega,      "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
 COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,  atega,      "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
-COMP ( 1993, ec1849,   ibm5170, 0,       ec1849,    atcga,	atcga,      "<unknown>",  "EC-1849", GAME_NOT_WORKING )
 COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,  atcga,      "International Business Machines",  "IBM PC/XT-286 5162", GAME_NOT_WORKING )
 COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,	atvga, 		"International Business Machines",  "IBM PS/2 Model 30-286", GAME_NOT_WORKING )
 COMP ( 1989, i8555081, ibm5170, 0,       at386,		atvga,	atvga,		"International Business Machines",  "IBM PS/2 Model 55SX", GAME_NOT_WORKING )
 COMP ( 1987, at,       ibm5170, 0,       ibm5162,   atcga,	atcga,      "<generic>",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1988, cmdpc30,  ibm5170, 0,       ibm5162,   atcga,	atcga,      "Commodore Business Machines",  "PC 30 III", GAME_NOT_WORKING )
-COMP ( 1989, neat,     ibm5170, 0,       neat,  	atcga,	atcga,      "<generic>",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	atvga,      "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
-COMP ( 1988, xb42639,  ibm5170, 0,       xb42639,   atvga,	atvga,      "Apricot",  "Apricot XEN-S (Venus I Motherboard 286)" , GAME_NOT_WORKING )
-COMP ( 1988, xb42664,  ibm5170, 0,       at386,     atvga,	atvga,      "Apricot",  "Apricot XEN-S (Venus I Motherboard 386)" , GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,	atvga,      "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1988, xb42663,  ibm5170, 0,       at386,     atvga,	atvga,      "Apricot",  "Apricot Qi 300 (Rev D,E & F Motherboard)", GAME_NOT_WORKING )
-COMP ( 1988, qi600,    ibm5170, 0,       at386,     atvga,	atvga,      "Apricot",  "Apricot Qi 600 (Neptune Motherboard)", GAME_NOT_WORKING )
-COMP ( 1988, qi900,    ibm5170, 0,       at486,     atvga,	atvga,      "Apricot",  "Apricot Qi 900 (Scorpion Motherboard)", GAME_NOT_WORKING )
-COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga,	atvga,      "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1993, ct486,    ibm5170, 0,       ct486,     atvga,	atvga,      "<unknown>",  "PC/AT 486 with C&T chipset", GAME_NOT_WORKING )
-COMP ( 1995, ficpio2,  ibm5170, 0,       at486,     atvga,  atvga,      "FIC", "486-PIO-2", GAME_NOT_WORKING )
 COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,	atvga,      "<generic>",  "PC/AT 586 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1990, c386sx16, ibm5170, 0,       c386sx16,  atvga,  atvga,      "Commodore Business Machines", "Commodore 386SX-16", GAME_NOT_WORKING )
-COMP ( 1997, ficvt503, ibm5170, 0,       at586,     atvga,  atvga,      "FIC", "VT-503", GAME_NOT_WORKING )
+COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga,	atvga,      "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1989, neat,     ibm5170, 0,       neat,  	atcga,	atcga,      "<generic>",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1993, ct486,    ibm5170, 0,       ct486,     atvga,	atvga,      "<unknown>",  "PC/AT 486 with C&T chipset", GAME_NOT_WORKING )
+COMP ( 1993, ec1849,   ibm5170, 0,       ec1849,    atcga,	atcga,      "<unknown>",  "EC-1849", GAME_NOT_WORKING )
 COMP ( 1993, megapc,   ibm5170, 0,       megapc,    atvga,  atvga,      "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
 COMP ( 199?, megapcpl, ibm5170, 0,       megapcpl,  atvga,  atvga,      "Amstrad plc", "MegaPC Plus", GAME_NOT_WORKING )
+COMP ( 1989, pc2386,   ibm5170, 0,	     at386,     atvga,	atvga,		"Amstrad plc", "Amstrad PC2386", GAME_NOT_WORKING )
+COMP ( 1991, ftsserv,  ibm5170, 0,       at486,     atvga,	atvga,      "Apricot",  "Apricot FTs (Scorpion)", GAME_NOT_WORKING )
+COMP ( 1990, aplanst,  ibm5170, 0,       at386,     atvga,	atvga,      "Apricot",  "Apricot LANstation (Krypton Motherboard)", GAME_NOT_WORKING )
+COMP ( 1990, aplannb,  ibm5170, 0,       at386,     atvga,	atvga,      "Apricot",  "Apricot LANstation (Novell Remote Boot)", GAME_NOT_WORKING )
+COMP ( 1988, xb42663,  ibm5170, 0,       at386,     atvga,	atvga,      "Apricot",  "Apricot Qi 300 (Rev D,E & F Motherboard)", GAME_NOT_WORKING )
+COMP ( 1988, qi600,    ibm5170, 0,       at386,     atvga,	atvga,      "Apricot",  "Apricot Qi 600 (Neptune Motherboard)", GAME_NOT_WORKING )
+COMP ( 1990, qi900,    ibm5170, 0,       at486,     atvga,	atvga,      "Apricot",  "Apricot Qi 900 (Scorpion Motherboard)", GAME_NOT_WORKING )
+COMP ( 1989, apvxft,   ibm5170, 0,       at486,     atvga,	atvga,      "Apricot",  "Apricot VX FT server", GAME_NOT_WORKING )
+COMP ( 1991, apxenls3, ibm5170, 0,       at486,     atvga,	atvga,      "Apricot",  "Apricot XEN-LS (Venus IV Motherboard)", GAME_NOT_WORKING )
+COMP ( 1989, xb42639,  ibm5170, 0,       xb42639,   atvga,	atvga,      "Apricot",  "Apricot XEN-S (Venus I Motherboard 286)" , GAME_NOT_WORKING )
+COMP ( 1990, xb42639a, ibm5170, 0,       xb42639,   atvga,	atvga,      "Apricot",  "Apricot XEN-S (Venus II Motherboard 286)" , GAME_NOT_WORKING )
+COMP ( 1989, xb42664,  ibm5170, 0,       at386,     atvga,	atvga,      "Apricot",  "Apricot XEN-S (Venus I Motherboard 386)" , GAME_NOT_WORKING )
+COMP ( 1990, xb42664a, ibm5170, 0,       at386,     atvga,	atvga,      "Apricot",  "Apricot XEN-S (Venus II Motherboard 386)" , GAME_NOT_WORKING )
+COMP ( 1990, c386sx16, ibm5170, 0,       c386sx16,  atvga,  atvga,      "Commodore Business Machines", "Commodore 386SX-16", GAME_NOT_WORKING )
+COMP ( 1988, cmdpc30,  ibm5170, 0,       ibm5162,   atcga,	atcga,      "Commodore Business Machines",  "PC 30 III", GAME_NOT_WORKING )
+COMP ( 1995, ficpio2,  ibm5170, 0,       at486,     atvga,  atvga,      "FIC", "486-PIO-2", GAME_NOT_WORKING )
+COMP ( 1997, ficvt503, ibm5170, 0,       at586,     atvga,  atvga,      "FIC", "VT-503", GAME_NOT_WORKING )
 COMP ( 1991, t2000sx,  ibm5170, 0,       c386sx16,  atvga,	atvga,      "Toshiba",  "T2000SX", GAME_NOT_WORKING )
-COMP ( 1989, pc2386,   ibm5170,	0,		 at386,     atvga,	atvga,		"Amstrad plc",  "Amstrad PC2386", GAME_NOT_WORKING )
+
