@@ -43,12 +43,7 @@ static void setup_fdc_buffer( device_t *device,int drive );
     TYPE DEFINITIONS
 ***************************************************************************/
 typedef struct {
-	int side;
-	int dir;
-	int wprot;
-	int disk_changed;
 	floppy_image_device *f;
-	int cyl;
 	int tracklen;
 	UINT8 *mfm;
 	emu_timer *dma_timer;
@@ -64,9 +59,6 @@ struct _amiga_fdc_t
 
 	/* signals */
 	int fdc_sel;
-	int fdc_dir;
-	int fdc_side;
-	int fdc_step;
 	int fdc_rdy;
 };
 
@@ -95,7 +87,6 @@ static int amiga_load_proc(device_image_interface &image)
 {
 	amiga_fdc_t *fdc = get_safe_token(image.device().owner());
 	int id = amiga_floppy_get_drive(&image.device());
-	fdc->fdc_status[id].disk_changed = DISK_DETECT_DELAY;
 	fdc->fdc_status[id].dma_timer->reset(  );
 	fdc->fdc_rdy = 0;
 
@@ -106,7 +97,6 @@ static void amiga_unload_proc(device_image_interface &image)
 {
 	amiga_fdc_t *fdc = get_safe_token(image.device().owner());
 	int id = amiga_floppy_get_drive(&image.device());
-	fdc->fdc_status[id].disk_changed = DISK_DETECT_DELAY;
 	fdc->fdc_status[id].dma_timer->reset(  );
 	fdc->fdc_rdy = 0;
 }
@@ -122,10 +112,6 @@ static DEVICE_START(amiga_fdc)
 	for(id=0;id<2;id++)
 	{
 		fdc->fdc_status[id].dma_timer = device->machine().scheduler().timer_alloc(FUNC(fdc_dma_proc), (void*)device);
-		fdc->fdc_status[id].side = 0;
-		fdc->fdc_status[id].dir = 0;
-		fdc->fdc_status[id].wprot = 1;
-		fdc->fdc_status[id].cyl = 0;
 		fdc->fdc_status[id].pos = 0;
 		fdc->fdc_status[id].len = 0;
 		fdc->fdc_status[id].ptr = 0;
@@ -135,13 +121,9 @@ static DEVICE_START(amiga_fdc)
 			fdc->fdc_status[id].f = device->subdevice<floppy_image_device>(FLOPPY_1);
 		}
 		fdc->fdc_status[id].tracklen = MAX_TRACK_BYTES;
-		fdc->fdc_status[id].disk_changed = DISK_DETECT_DELAY;
 		fdc->fdc_status[id].dma_timer->reset(  );
 	}
 	fdc->fdc_sel = 0x0f;
-	fdc->fdc_dir = 0;
-	fdc->fdc_side = 1;
-	fdc->fdc_step = 1;
 	fdc->fdc_rdy = 0;
 
 }
@@ -192,9 +174,6 @@ UINT16 amiga_fdc_get_byte (device_t *device)
 	if ( drive == -1 )
 		return ret;
 
-	if ( fdc->fdc_status[drive].disk_changed )
-		return ret;
-
 	setup_fdc_buffer( device,drive );
 
 	pos = fdc_get_curpos( device, drive );
@@ -226,10 +205,7 @@ static TIMER_CALLBACK(fdc_dma_proc)
 		goto bail;
 
 	/* if floppy got ejected, also stop */
-	if ( fdc->fdc_status[drive].disk_changed )
-		goto bail;
-
-	if ( fdc->fdc_status[drive].f->ready_r()==0)
+	if ( fdc->fdc_status[drive].f->ready_r()==1)
 		goto bail;
 
 	setup_fdc_buffer( (device_t*)ptr, drive );
@@ -322,9 +298,6 @@ void amiga_fdc_setup_dma( device_t *device ) {
 	if ( ( CUSTOM_REG(REG_DMACON) & 0x0210 ) == 0 )
 		goto bail;
 
-	if ( fdc->fdc_status[drive].disk_changed )
-		goto bail;
-
 	setup_fdc_buffer( device,drive );
 
 	fdc->fdc_status[drive].len = CUSTOM_REG(REG_DSKLEN) & 0x3fff;
@@ -374,17 +347,7 @@ bail:
 static void setup_fdc_buffer( device_t *device,int drive )
 {
 	amiga_fdc_t *fdc = get_safe_token(device);
-
-	/* no disk in drive */
-	if (fdc->fdc_status[drive].f->ready_r()==0) {
-		fdc->fdc_status[drive].disk_changed = DISK_DETECT_DELAY;
-		return;
-	}
-
-#if 0
-	popmessage("T:%d S:%d", fdc->fdc_status[drive].cyl, fdc->fdc_side );	
-#endif
-	fdc->fdc_status[drive].mfm = fdc->fdc_status[drive].f->get_buffer(fdc->fdc_status[drive].cyl, fdc->fdc_side);	
+	fdc->fdc_status[drive].mfm = fdc->fdc_status[drive].f->get_buffer();	
 }
 
 
@@ -393,63 +356,32 @@ static void fdc_setup_leds(device_t *device, int drive ) {
 	char portname[12];
 	amiga_fdc_t *fdc = get_safe_token(device);
 	sprintf(portname, "drive_%d_led", drive);
-	output_set_value(portname, fdc->fdc_status[drive].f->ready_r() == 0 ? 0 : 1);
+	int val = fdc->fdc_status[drive].f->ready_r() == 0 ? 0 : 1;
+	output_set_value(portname, val);
 
 	if ( drive == 0 )
-		set_led_status(device->machine(), 1, fdc->fdc_status[drive].f->ready_r()); /* update internal drive led */
+		set_led_status(device->machine(), 1, val); /* update internal drive led */
 
 	if ( drive == 1 )
-		set_led_status(device->machine(), 2, fdc->fdc_status[drive].f->ready_r() ); /* update external drive led */
-}
-
-static void fdc_stepdrive( device_t *device,int drive ) {
-	amiga_fdc_t *fdc = get_safe_token(device);
-
-	if ( fdc->fdc_dir ) {
-		if ( fdc->fdc_status[drive].cyl )
-			fdc->fdc_status[drive].cyl--;
-	} else {
-		if ( fdc->fdc_status[drive].cyl < 79 )
-			fdc->fdc_status[drive].cyl++;
-	}
-
-	/* Update disk detection if applicable */
-	if ( fdc->fdc_status[drive].f->exists())
-	{
-		if ( fdc->fdc_status[drive].disk_changed > 0 )
-			fdc->fdc_status[drive].disk_changed--;
-	}
+		set_led_status(device->machine(), 2, val); /* update external drive led */
 }
 
 WRITE8_DEVICE_HANDLER( amiga_fdc_control_w )
 {
-	int step_pulse;
 	int drive;
 
 	amiga_fdc_t *fdc = get_safe_token(device);
 
 	if ( fdc->fdc_sel != ( ( data >> 3 ) & 15 ) )
-		fdc->fdc_rdy = 0;
-
+		fdc->fdc_rdy = 0;	
 	fdc->fdc_sel = ( data >> 3 ) & 15;
-    fdc->fdc_side = 1 - ( ( data >> 2 ) & 1 );
-	fdc->fdc_dir = ( data >> 1 ) & 1;
-
-	step_pulse = data & 1;
-
-    if ( fdc->fdc_step != step_pulse ) {
-		fdc->fdc_step = step_pulse;
-
-    	if ( fdc->fdc_step == 0 ) {
-		    for ( drive = 0; drive < NUM_DRIVES; drive++ ) {
-				if ( !( fdc->fdc_sel & ( 1 << drive ) ) )
-				    fdc_stepdrive( device, drive );
-			}
-		}
-	}
-
+	
 	for ( drive = 0; drive < NUM_DRIVES; drive++ ) {
 		if ( !( fdc->fdc_sel & ( 1 << drive ) ) ) {
+			fdc->fdc_status[drive].f->ss_w(( data >> 2 ) & 1); 
+			fdc->fdc_status[drive].f->dir_w(( data >> 1 ) & 1); 
+			fdc->fdc_status[drive].f->stp_w(data & 1);
+		
 			fdc->fdc_status[drive].f->mon_w((( data >> 7 ) & 1)  );
 			fdc_setup_leds( device,drive );
 		}
@@ -463,7 +395,7 @@ UINT8  amiga_fdc_status_r (device_t *device)
 	for ( drive = 0; drive < NUM_DRIVES; drive++ ) {
 		if ( !( fdc->fdc_sel & ( 1 << drive ) ) ) {
 
-			if ( fdc->fdc_status[drive].f->ready_r()==1) {
+			if ( fdc->fdc_status[drive].f->ready_r()==0) {
 				if ( fdc->fdc_rdy ) ret &= ~0x20;
 				fdc->fdc_rdy = 1;
 			} else {
@@ -471,15 +403,15 @@ UINT8  amiga_fdc_status_r (device_t *device)
 				ret &= ~0x20;
 			}
 
-			if ( fdc->fdc_status[drive].cyl == 0 )
+			if ( fdc->fdc_status[drive].f->trk00_r() == 0 )
 				ret &= ~0x10;
 
-			if ( fdc->fdc_status[drive].wprot )
+			if ( fdc->fdc_status[drive].f->wpt_r()==0 )
 				ret &= ~0x08;
 
-			if ( fdc->fdc_status[drive].disk_changed )
+			if ( fdc->fdc_status[drive].f->dskchg_r() == 0)
 				ret &= ~0x04;
-
+				
 			return ret;
 		}
 	}
