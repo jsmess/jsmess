@@ -110,6 +110,7 @@ Some bugs left :
 #include "formats/tzx_cas.h"
 #include "machine/cpcexp.h"
 #include "machine/cpc_ssa1.h"
+#include "machine/cpc_rom.h"
 
 #include "machine/ram.h"
 
@@ -880,6 +881,7 @@ static CPC_EXPANSION_INTERFACE(cpc_exp_intf)
 static SLOT_INTERFACE_START(cpc_exp_cards)
 	SLOT_INTERFACE("ssa1", CPC_SSA1)
 	SLOT_INTERFACE("dkspeech", CPC_DKSPEECH)
+	SLOT_INTERFACE("rom", CPC_ROM)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
@@ -1006,6 +1008,8 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_FRAGMENT_ADD(cpcplus_cartslot)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_interface)
+
+	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL,NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

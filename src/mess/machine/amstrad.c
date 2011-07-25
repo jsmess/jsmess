@@ -41,6 +41,7 @@ This gives a total of 19968 NOPs per frame.
 #include "machine/mc146818.h"
 #include "machine/upd765.h"
 #include "machine/ctronics.h"
+#include "machine/cpc_rom.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "includes/amstrad.h"
@@ -1726,6 +1727,7 @@ WRITE8_HANDLER( amstrad_plus_asic_6000_w )
 			state->m_plus_irq_cause = 0x06;
 			state->m_asic.ram[0x2c0f] &= ~0x10;
 		}
+		state->m_asic.ram[0x2c0f] = (state->m_asic.ram[0x2c0f] & 0xf8) | (data & 0x07);
 		break;
 	}
 }
@@ -3022,6 +3024,10 @@ static void amstrad_common_init(running_machine &machine)
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	device_t* romexp;
+	rom_image_device* romimage;
+	char str[20];
+	int x;
 
 	state->m_aleste_mode = 0;
 
@@ -3054,6 +3060,21 @@ static void amstrad_common_init(running_machine &machine)
 
 	space->install_write_bank(0xc000, 0xdfff, "bank15");
 	space->install_write_bank(0xe000, 0xffff, "bank16");
+
+	/* Set up ROMs, if we have an expansion device connected */
+	romexp = space->machine().device("exp:rom");
+	if(romexp)
+	{
+		for(x=0;x<6;x++)
+		{
+			sprintf(str,"exp:rom:rom%i",x+1);
+			romimage = space->machine().device<rom_image_device>(str);
+			if(romimage->base() != NULL)
+			{
+				state->m_Amstrad_ROM_Table[x+1] = romimage->base();
+			}
+		}
+	}
 
 	space->machine().device("maincpu")->reset();
 	if ( state->m_system_type == SYSTEM_CPC || state->m_system_type == SYSTEM_ALESTE )
