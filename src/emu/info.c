@@ -471,7 +471,7 @@ void info_xml_creator::output_rom()
 					else
 					{
 						fprintf(m_output, " index=\"%x\"", DISK_GETINDEX(rom));
-						fprintf(m_output, " writeable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
+						fprintf(m_output, " writable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
 					}
 
 					// add optional flag
@@ -1107,9 +1107,9 @@ void info_xml_creator::output_slots()
 		{
 			fprintf(m_output, "\t\t\t<slotoption");
 			fprintf(m_output, " name=\"%s\"", xml_normalize_string(intf[i].name));
-			if (slot->get_default_card(m_drivlist.options()))
+			if (slot->get_default_card(m_drivlist.config().devicelist(), m_drivlist.options()))
 			{
-				if (slot->get_default_card(m_drivlist.options()) == intf[i].name)
+				if (slot->get_default_card(m_drivlist.config().devicelist(), m_drivlist.options()) == intf[i].name)
 					fprintf(m_output, " default=\"yes\"");
 			}
 			fprintf(m_output, "/>\n");
