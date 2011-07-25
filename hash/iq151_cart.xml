@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="iq151" description="IQ151 cartridges">
+<softwarelist name="iq151_cart" description="IQ-151 cartridges">
 	<software name="basic6">
 		<description>BASIC 6</description>
 		<year>198?</year>
