@@ -588,7 +588,8 @@ static void upd765_setup_execution_phase_read(device_t *device, char *ptr, int s
 {
 	upd765_t *fdc = get_safe_token(device);
 
-	fdc->FDC_main &= ~0x040;                     /* FDC->CPU */
+//  fdc->FDC_main &= ~0x040;                     /* FDC->CPU */
+	fdc->FDC_main |= 0x040;                      /* FDC->CPU */
 
 	fdc->upd765_transfer_bytes_count = 0;
 	fdc->upd765_transfer_bytes_remaining = size;
