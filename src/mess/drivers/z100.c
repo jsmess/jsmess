@@ -149,13 +149,13 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	UINT8 *m_tvram;
-	UINT8 *m_gvram;
+	UINT8 *m_gvram, *m_wram;
 	UINT8 m_keyb_press,m_keyb_status;
-	UINT8 m_tbank;
+	UINT8 m_tbank,m_PA7_latch;
 	UINT8 m_gbank;
 	UINT8 m_clr_val;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
+	UINT16 m_start_addr;
 
 	mc6845_device *m_mc6845;
 
@@ -183,39 +183,43 @@ static VIDEO_START( z100 )
 {
 	z100_state *state = machine.driver_data<z100_state>();
 
-	state->m_tvram = auto_alloc_array_clear(machine, UINT8, 0x30000);
-	state->m_gvram = auto_alloc_array_clear(machine, UINT8, 0x30000*3);
+	state->m_gvram = auto_alloc_array_clear(machine, UINT8, 0x30000);
+	state->m_wram = auto_alloc_array_clear(machine, UINT8, 0x30000);
 }
 
 static SCREEN_UPDATE( z100 )
 {
 	z100_state *state = screen->machine().driver_data<z100_state>();
 	int x,y,xi,yi;
-	int dot;
-	UINT32 count;
+	//int dot;
 	int r,g,b;
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	count = 0;
-	for(y=0;y<216;y++)
+	for(y=0;y<mc6845_v_display;y++)
 	{
-		for(x=0;x<1024;x+=8)
+		for(x=0;x<mc6845_h_display;x++)
 		{
-			for(xi=0;xi<8;xi++)
+			UINT32 base_offs;
+
+			for(yi=0;yi<mc6845_tile_height;yi++)
 			{
-				b = ((state->m_gvram[count+0x20000] >> (7-xi)) & 1) << 0;
-				r = ((state->m_gvram[count+0x00000] >> (7-xi)) & 1) << 1;
-				g = ((state->m_gvram[count+0x10000] >> (7-xi)) & 1) << 2;
+				base_offs = (y+state->m_start_addr) * 0x800 + yi * 0x80 + x;
 
-				if(y < 216 && x+xi < 640) /* TODO: safety check */
-					*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine().pens[r|g|b];
+				for(xi=0;xi<8;xi++)
+				{
+					b = ((state->m_gvram[(base_offs & 0xffff)+0x20000] >> (7-xi)) & 1) << 0;
+					r = ((state->m_gvram[(base_offs & 0xffff)+0x00000] >> (7-xi)) & 1) << 1;
+					g = ((state->m_gvram[(base_offs & 0xffff)+0x10000] >> (7-xi)) & 1) << 2;
+
+					if(y*mc6845_tile_height+yi < 216 && x*8+xi < 640) /* TODO: safety check */
+						*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen->machine().pens[r|g|b];
+				}
 			}
-
-			count++;
 		}
 	}
 
+	#if 0
 	for(y=0;y<mc6845_v_display;y++)
 	{
 		for(x=0;x<mc6845_h_display;x++)
@@ -242,6 +246,7 @@ static SCREEN_UPDATE( z100 )
 			}
 		}
 	}
+	#endif
 
     return 0;
 }
@@ -253,10 +258,10 @@ static READ8_HANDLER( z100_vram_r )
 
 	res = 0;
 
-	if(state->m_gbank == 0xf)
-		res |= state->m_tvram[offset & 0x3ffff];
-	else if(state->m_gbank & 7)
-		res |= state->m_gvram[offset];
+	if(!state->m_tbank)
+		res = state->m_wram[offset];
+	else
+		res = state->m_gvram[offset];
 
 	return res;
 }
@@ -265,11 +270,14 @@ static WRITE8_HANDLER( z100_vram_w )
 {
 	z100_state *state = space->machine().driver_data<z100_state>();
 
-	if(state->m_gbank == 0xf)
-		state->m_tvram[offset & 0x3ffff] = data;
+	if(!state->m_tbank)
+		state->m_wram[offset & 0x3ffff] = data;
 	else
 	{
 		int i;
+
+		//if(state->m_gbank & (1 << i))
+		//	state->m_gvram[offset] = data;
 
 		for(i=0;i<3;i++)
 		{
@@ -281,7 +289,7 @@ static WRITE8_HANDLER( z100_vram_w )
 
 static ADDRESS_MAP_START(z100_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0x1ffff) AM_RAM // 128 KB RAM
+	AM_RANGE(0x00000,0x3ffff) AM_RAM // 128*2 KB RAM
 //	AM_RANGE(0xb0000,0xbffff) AM_ROM // expansion ROM
 	AM_RANGE(0xc0000,0xeffff) AM_READWRITE(z100_vram_r,z100_vram_w) // Blue / Red / Green
 //	AM_RANGE(0xfbffa,0xfbffb) // expansion ROM check ID 0x4550
@@ -597,10 +605,22 @@ static WRITE8_DEVICE_HANDLER( video_pia_A_w )
   	---- --x- -> enable green display
  	---- ---x -> enable red display
     */
-    if(data != 0x08 && data != 0xf8)
-    printf("%02x\n",data);
+    if(state->m_PA7_latch & 0x80 && ((data & 0x80) == 0x00))
+    	state->m_tbank = 1;
 
-    state->m_gbank = ((data & 0xf0) >> 4) ^ 0xf;
+    if(((state->m_PA7_latch & 0x80) == 0x00) && (data & 0x80))
+    	state->m_tbank = 0;
+
+    state->m_PA7_latch = data & 0x80;
+
+    state->m_gbank = ((data & 0x70) >> 4) ^ 0x7;
+}
+
+static WRITE8_DEVICE_HANDLER( video_pia_B_w )
+{
+	z100_state *state = device->machine().driver_data<z100_state>();
+
+	state->m_start_addr = 0;//data <- TODO
 }
 
 /* clear screen */
@@ -608,9 +628,6 @@ static WRITE_LINE_DEVICE_HANDLER( video_pia_CA2_w )
 {
 	z100_state *drvstate = device->machine().driver_data<z100_state>();
 	int i;
-
-	for(i=0;i<0x10000;i++)
-		drvstate->m_tvram[i] = drvstate->m_clr_val;
 
 	for(i=0;i<0x30000;i++)
 		drvstate->m_gvram[i] = drvstate->m_clr_val;
@@ -632,7 +649,7 @@ static const pia6821_interface pia0_intf =
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_HANDLER(video_pia_A_w),		/* port A out */
-	DEVCB_NULL,		/* port B out */
+	DEVCB_HANDLER(video_pia_B_w),		/* port B out */
 	DEVCB_LINE(video_pia_CA2_w),		/* line CA2 out */
 	DEVCB_HANDLER(video_pia_CB2_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
@@ -670,6 +687,7 @@ static MACHINE_START(z100)
 
 static MACHINE_RESET(z100)
 {
+	z100_state *state = machine.driver_data<z100_state>();
 	int i;
 
 	if(input_port_read(machine,"CONFIG") & 1)
@@ -682,6 +700,8 @@ static MACHINE_RESET(z100)
 		for(i=0;i<8;i++)
 			palette_set_color_rgb(machine, i,pal3bit(i),pal3bit(i),pal3bit(i));
 	}
+
+	state->m_PA7_latch = 0x00;
 }
 
 static MACHINE_CONFIG_START( z100, z100_state )
