@@ -552,6 +552,7 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq151_cart")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "iq151_flop")
 MACHINE_CONFIG_END
 
 /* ROM definition */
