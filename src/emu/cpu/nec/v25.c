@@ -432,11 +432,11 @@ static void v25_init(legacy_cpu_device *device, device_irq_callback irqcallback)
 		Mod_RM.RM.b[i] = breg_name[i & 7];
 	}
 
-	memset(nec_state, 0, sizeof(v25_state_t));
+	memset(nec_state, 0, sizeof(*nec_state));
 
 	nec_state->config = config;
 
-	for (int i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++)
 		nec_state->timers[i] = device->machine().scheduler().timer_alloc(FUNC(v25_timer_callback), nec_state);
 
 	device->save_item(NAME(nec_state->ram.w));
