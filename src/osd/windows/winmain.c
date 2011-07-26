@@ -552,7 +552,8 @@ static void winui_output_error(void *param, const char *format, va_list argptr)
 
 static void output_oslog(running_machine &machine, const char *buffer)
 {
-	win_output_debug_string_utf8(buffer);
+	if (IsDebuggerPresent())
+		win_output_debug_string_utf8(buffer);
 }
 
 
