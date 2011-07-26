@@ -153,10 +153,12 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	UINT8 *m_gvram, *m_wram;
+	UINT8 *m_gvram;
 	UINT8 m_keyb_press,m_keyb_status;
-	UINT8 m_tbank,m_PA7_latch;
+	UINT8 m_vram_enable;
 	UINT8 m_gbank;
+	UINT8 m_display_mask;
+	UINT8 m_flash;
 	UINT8 m_clr_val;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 	UINT16 m_start_addr;
@@ -189,15 +191,14 @@ static VIDEO_START( z100 )
 	z100_state *state = machine.driver_data<z100_state>();
 
 	state->m_gvram = auto_alloc_array_clear(machine, UINT8, 0x30000);
-	state->m_wram = auto_alloc_array_clear(machine, UINT8, 0x30000);
 }
 
 static SCREEN_UPDATE( z100 )
 {
 	z100_state *state = screen->machine().driver_data<z100_state>();
 	int x,y,xi,yi;
-	//int dot;
-	int r,g,b;
+	int dot;
+	int i;
 
 	bitmap_fill(bitmap, cliprect, 0);
 
@@ -213,12 +214,18 @@ static SCREEN_UPDATE( z100 )
 
 				for(xi=0;xi<8;xi++)
 				{
-					b = ((state->m_gvram[(base_offs & 0xffff)+0x00000] >> (7-xi)) & 1) << 0;
-					r = ((state->m_gvram[(base_offs & 0xffff)+0x10000] >> (7-xi)) & 1) << 1;
-					g = ((state->m_gvram[(base_offs & 0xffff)+0x20000] >> (7-xi)) & 1) << 2;
+					dot = 0;
+					for(i=0;i<3;i++)
+						dot |= ((state->m_gvram[(base_offs & 0xffff)+0x10000*i] >> (7-xi)) & 1) << i; // b, r, g
+
+					dot &= state->m_display_mask;
+
+					/* overwrite */
+					if(state->m_flash)
+						dot = state->m_display_mask;
 
 					if(y*mc6845_tile_height+yi < 216 && x*8+xi < 640) /* TODO: safety check */
-						*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen->machine().pens[r|g|b];
+						*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen->machine().pens[dot];
 				}
 			}
 		}
@@ -259,25 +266,15 @@ static SCREEN_UPDATE( z100 )
 static READ8_HANDLER( z100_vram_r )
 {
 	z100_state *state = space->machine().driver_data<z100_state>();
-	UINT8 res;
 
-	res = 0;
-
-	if(!state->m_tbank)
-		res = state->m_wram[offset];
-	else
-		res = state->m_gvram[offset];
-
-	return res;
+	return state->m_gvram[offset];
 }
 
 static WRITE8_HANDLER( z100_vram_w )
 {
 	z100_state *state = space->machine().driver_data<z100_state>();
 
-	if(!state->m_tbank)
-		state->m_wram[offset & 0x3ffff] = data;
-	else
+	if(state->m_vram_enable)
 	{
 		int i;
 
@@ -428,7 +425,7 @@ static INPUT_CHANGED( key_stroke )
 	{
 		/* TODO: table */
 		state->m_keyb_press = (UINT8)(FPTR)(param) & 0xff;
-		//pic8259_ir1_w(field.machine().device("pic8259_master"), 1);
+		//pic8259_ir6_w(field.machine().device("pic8259_master"), 1);
 		state->m_keyb_status = 1;
 	}
 
@@ -559,7 +556,7 @@ INPUT_PORTS_START( z100 )
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("B-5") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x7c)
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("B-6") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x7d)
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("B-7") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x7e)
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("B-8") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x7f)
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("DELETE key") PORT_CODE(KEYCODE_DEL) PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x7f)
 
 	PORT_START("KEYC") // 0x58 - 0x5f
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("HELP key") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x95)
@@ -648,7 +645,8 @@ static WRITE8_DEVICE_HANDLER( video_pia_A_w )
 {
 	z100_state *state = device->machine().driver_data<z100_state>();
 
- /*
+ 	/*
+ 	all bits are active low
  	x--- ---- -> disable video RAM
 	-x-- ---- -> not write multiple blue
     --x- ---- -> not write multiple green
@@ -658,15 +656,11 @@ static WRITE8_DEVICE_HANDLER( video_pia_A_w )
   	---- --x- -> enable green display
  	---- ---x -> enable red display
     */
-    if(state->m_PA7_latch & 0x80 && ((data & 0x80) == 0x00))
-    	state->m_tbank = 1;
 
-    if(((state->m_PA7_latch & 0x80) == 0x00) && (data & 0x80))
-    	state->m_tbank = 0;
-
-    state->m_PA7_latch = data & 0x80;
-
+	state->m_vram_enable = ((data & 0x80) >> 7) ^ 1;
     state->m_gbank = BITSWAP8(((data & 0x70) >> 4) ^ 0x7,7,6,5,4,3,1,0,2);
+	state->m_flash = ((data & 8) >> 3) ^ 1;
+	state->m_display_mask = BITSWAP8((data & 7) ^ 7,7,6,5,4,3,1,0,2);
 }
 
 static WRITE8_DEVICE_HANDLER( video_pia_B_w )
@@ -770,7 +764,7 @@ static MACHINE_START(z100)
 
 static MACHINE_RESET(z100)
 {
-	z100_state *state = machine.driver_data<z100_state>();
+	//z100_state *state = machine.driver_data<z100_state>();
 	int i;
 
 	if(input_port_read(machine,"CONFIG") & 1)
@@ -783,8 +777,6 @@ static MACHINE_RESET(z100)
 		for(i=0;i<8;i++)
 			palette_set_color_rgb(machine, i,pal3bit(0),pal3bit(i),pal3bit(0));
 	}
-
-	state->m_PA7_latch = 0x00;
 }
 
 static MACHINE_CONFIG_START( z100, z100_state )
