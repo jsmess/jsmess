@@ -587,6 +587,9 @@ static MACHINE_CONFIG_START( pc1640, pc_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1640")
 MACHINE_CONFIG_END
 
 
