@@ -479,29 +479,29 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="congo">
 		<!-- Serial: G-1007 - Alt Title: コンゴ・ボンゴ -->
-		<description>Congo Bongo (Jpn, v1)</description>
-        <!-- other 32k dumps floating around are overdumps, as verified by Bock! -->
+		<description>Congo Bongo (Euro, Jpn, v1)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="24576">
-				<rom name="congo bongo [v1].bin" size="24576" crc="5eb48a20" sha1="9e153c7822a36230e85e9ac0ddc53d6fee810089" offset="000000" />
+				<rom name="congo bongo [v1].bin" size="24576" crc="5a24c7cf" sha1="47aba6a295e5695db4c3aaa1dea8ad8ac961b5f9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="congo1" cloneof="congo">
-		<description>Congo Bongo (Euro, Jpn, v0)</description>
+		<description>Congo Bongo (Jpn, v0)</description>
+        <!-- other 32k dumps floating around are overdumps, as verified by Bock! -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="24576">
-				<rom name="congo bongo.bin" size="24576" crc="5a24c7cf" sha1="47aba6a295e5695db4c3aaa1dea8ad8ac961b5f9" offset="000000" />
+				<rom name="congo bongo [v0].bin" size="24576" crc="5eb48a20" sha1="9e153c7822a36230e85e9ac0ddc53d6fee810089" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="congot" cloneof="congo"> <!-- based on Jpn v0 release -->
+	<software name="congot" cloneof="congo"> <!-- based on Jpn v1 release -->
 		<!-- Serial: A103 - Alt Title: Dà jīn gāng ~ 大金鋼 -->
 		<description>Congo Bongo (Tw)</description>
 		<year>19??</year>

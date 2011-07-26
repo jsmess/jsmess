@@ -6530,6 +6530,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="dlair">
+		<description>Dragon's Lair (USA, Prototype)</description>
+		<year>199?</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="dragon's lair (usa, prototype).bin" size="524288" crc="a33eb522" sha1="d29ec9588dcbc27a4ef3f838191b767235a6ff17" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="devlcrsh" cloneof="dfury">
 		<!-- Serial: T-18053 - Release Date: 1991-10-10 -->
 		<description>Devil Crash MD (Jpn)</description>
