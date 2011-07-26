@@ -700,13 +700,19 @@ qi900    // 1990 Apricot Qi 900 (Scorpion Motherboard)
 aplanst // 1990 Apricot LANstation (Krypton Motherboard)
 ftsserv    // 1991 Apricot FTs (Scorpion)
 aplannb    // 1990 Apricot LANstation (Novell Remote Boot)
+apxeni  // 1987 Apricot XEN-i 386 (Leopard Motherboard)
 xb42639  // 1989 Apricot XEN-S (Venus I Motherboard 286) (Bios:3.10.17i)
 xb42639a // 1990 Apricot XEN-S (Venus II Motherboard 286) (Bios:1.02.17)
 xb42664  // 1989 Apricot XEN-S (Venus I Motherboard 386) (Bios:3.10.17i)
 xb42664a // 1990 Apricot XEN-S (Venus II Motherboard 386) (Bios:1.02.17)
+aplscar  // 1992 Apricot LS Pro (Caracal Motherboard)
+aplsbon  // 1992 Apricot LS Pro (Bonsai Motherboard)
 ficvt503	// 1997 FIC VT-503
 apxenls3  // 1991 Apricot XEN-LS (Venus IV Motherboard)
+apxlsam  // 1993 Apricot XEN-LS II (Samurai Motherboard)
 apvxft  // 1989 Apricot VX FT server
+apxena1 // 1993 Apricot XEN PC (A1 Motherboard)
+apxenp2 // 1993 Apricot XEN PC (P2 Motherboard)
 megapc
 megapcpl
 ec1849
