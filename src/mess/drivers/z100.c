@@ -6,7 +6,9 @@
 
 	TODO:
 	- remove parity check IRQ patch (understand what it really wants there!)
-	- vertical scrolling isn't understood
+	- implement S-100 bus features;
+	- irqs needs 8259 "auto-ack"-ing in order to work properly;
+	- vertical scrolling isn't understood;
 
 ============================================================================
 
@@ -165,7 +167,6 @@ public:
 	UINT8 m_z207_cur_drive;
 
 	mc6845_device *m_mc6845;
-
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -589,7 +590,7 @@ static WRITE_LINE_DEVICE_HANDLER( z100_pic_irq )
 
 static READ8_DEVICE_HANDLER( get_slave_ack )
 {
-	if (offset==3) { // IRQ = 7
+	if (offset==7) { // IRQ = 7
 		return pic8259_acknowledge(device->machine().device( "pic8259_slave"));
 	}
 	return 0x00;
@@ -604,7 +605,7 @@ static const struct pic8259_interface z100_pic8259_master_config =
 
 static const struct pic8259_interface z100_pic8259_slave_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w),
+	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir3_w),
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };
