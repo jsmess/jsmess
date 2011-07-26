@@ -73,6 +73,7 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_row_r);
 	DECLARE_READ8_MEMBER(keyboard_column_r);
 	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_WRITE8_MEMBER(boot_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(pic_set_int_line);
 	UINT8 *m_p_videoram;
 	UINT8 m_vblank_irq_state;
@@ -121,6 +122,10 @@ WRITE8_MEMBER(iq151_state::speaker_w)
 	speaker_level_w(m_speaker, BIT(data, 3));
 }
 
+WRITE8_MEMBER(iq151_state::boot_bank_w)
+{
+	memory_set_bank(machine(), "boot", data & 1);
+}
 
 static ADDRESS_MAP_START(iq151_mem, AS_PROGRAM, 8, iq151_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -134,12 +139,20 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(iq151_io, AS_IO, 8, iq151_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x80, 0x80 ) AM_WRITE(boot_bank_w)
 	AM_RANGE( 0x84, 0x87 ) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE( 0x88, 0x89 ) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w )
 	AM_RANGE( 0xaa, 0xaa ) AM_DEVREAD_LEGACY("fdc", upd765_status_r)
 	AM_RANGE( 0xab, 0xab ) AM_DEVREADWRITE_LEGACY("fdc", upd765_data_r, upd765_data_w)
-	AM_RANGE( 0xfe, 0xfe ) AM_READ_PORT("FE")
+	AM_RANGE( 0xfc, 0xff ) AM_READ_PORT("FE")
 ADDRESS_MAP_END
+
+
+static INPUT_CHANGED( iq151_break )
+{
+	iq151_state *state = field.machine().driver_data<iq151_state>();
+	pic8259_ir5_w(state->m_pic, newval & 1);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( iq151 )
@@ -229,18 +242,15 @@ static INPUT_PORTS_START( iq151 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FA") PORT_CODE(KEYCODE_RSHIFT)		// Function A
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FB") PORT_CODE(KEYCODE_RCONTROL)		// Function B
 
+	PORT_START("BREAK")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_ESC)   PORT_CHANGED(iq151_break, 0)  PORT_CHAR(UCHAR_MAMEKEY(ESC))
+
 	PORT_START("FE")
 	PORT_DIPNAME( 0xff, 0xff, "Screen Width")
-	PORT_DIPSETTING(    0x00, "64")
+	PORT_DIPSETTING(    0xfe, "64")
 	PORT_DIPSETTING(    0xff, "32")
 INPUT_PORTS_END
 
-
-/* after the first 4 bytes have been read from ROM, switch the ram back in */
-static TIMER_CALLBACK( iq151_boot )
-{
-	memory_set_bank(machine, "boot", 0);
-}
 
 WRITE_LINE_MEMBER( iq151_state::pic_set_int_line )
 {
@@ -267,7 +277,8 @@ DRIVER_INIT( iq151 )
 	iq151_state *state = machine.driver_data<iq151_state>();
 
 	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xf800);
+	memory_configure_bank(machine, "boot", 0, 1, RAM + 0xf800, 0);
+	memory_configure_bank(machine, "boot", 1, 2, RAM + 0x0000, 0);
 
 	memset(state->m_amos_banks, 0, sizeof(state->m_amos_banks));
 
@@ -276,10 +287,9 @@ DRIVER_INIT( iq151 )
 
 MACHINE_RESET_MEMBER( iq151_state )
 {
-	m_width = input_port_read(machine(), "FE") ? 32 : 64;
+	m_width = input_port_read(machine(), "FE") == 0xff ? 32 : 64;
 	machine().primary_screen->set_visible_area(0, (m_width == 32 ? 32*8 : 64*6)-1, 0, 32*8-1);
-	memory_set_bank(machine(), "boot", 1);
-	machine().scheduler().timer_set(attotime::from_usec(5), FUNC(iq151_boot));
+	memory_set_bank(machine(), "boot", 0);
 
 	m_vblank_irq_state = 0;
 }
