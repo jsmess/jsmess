@@ -6,7 +6,7 @@
 
 	TODO:
 	- remove parity check IRQ patch (understand what it really wants there!)
-	- video RAM banks not fully understood
+	- vertical scrolling isn't understood
 
 ============================================================================
 
@@ -180,10 +180,10 @@ public:
 #define mc6845_tile_height		(state->m_crtc_vreg[9]+1)
 #define mc6845_cursor_y_start	(state->m_crtc_vreg[0x0a])
 #define mc6845_cursor_y_end 	(state->m_crtc_vreg[0x0b])
-#define mc6845_start_addr		(((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr  	(((state->m_crtc_vreg[0x0e]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr	(((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
+#define mc6845_start_addr		(((state->m_crtc_vreg[0x0c]<<8) & 0xff00) | (state->m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr  	(((state->m_crtc_vreg[0x0e]<<8) & 0xff00) | (state->m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr	(((state->m_crtc_vreg[0x10]<<8) & 0xff00) | (state->m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0xff00) | (state->m_crtc_vreg[0x13] & 0xff))
 
 
 static VIDEO_START( z100 )
@@ -231,35 +231,6 @@ static SCREEN_UPDATE( z100 )
 		}
 	}
 
-	#if 0
-	for(y=0;y<mc6845_v_display;y++)
-	{
-		for(x=0;x<mc6845_h_display;x++)
-		{
-			UINT32 base_offs,attr_offs;
-			int color;
-
-			attr_offs = 0x20000 + y * 0x800 + x + 0x500;
-
-			color = state->m_tvram[attr_offs] & 7;
-
-			for(yi=0;yi<mc6845_tile_height;yi++)
-			{
-				base_offs = 0x20000 + y * 0x800 + yi * 0x80 + x;
-
-				for(xi=0;xi<8;xi++)
-				{
-					dot = ((state->m_tvram[base_offs] >> (7-xi)) & 1);
-
-					if(dot)
-						if(y*mc6845_tile_height+yi < 216 && x*8+xi < 640) /* TODO: safety check */
-							*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen->machine().pens[color];
-				}
-			}
-		}
-	}
-	#endif
-
     return 0;
 }
 
@@ -293,7 +264,9 @@ static ADDRESS_MAP_START(z100_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x00000,0x3ffff) AM_RAM // 128*2 KB RAM
 //	AM_RANGE(0xb0000,0xbffff) AM_ROM // expansion ROM
 	AM_RANGE(0xc0000,0xeffff) AM_READWRITE(z100_vram_r,z100_vram_w) // Blue / Red / Green
-//	AM_RANGE(0xfbffa,0xfbffb) // expansion ROM check ID 0x4550
+//	AM_RANGE(0xf0000,0xf0fff) // network card (NET-100)
+//	AM_RANGE(0xf4000,0xf7fff) // MTRET-100 Firmware I expansion ROM
+//	AM_RANGE(0xf8000,0xfbfff) // MTRET-100 Firmware II expansion ROM check ID 0x4550
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
@@ -394,27 +367,37 @@ static WRITE8_HANDLER( z207_fdc_w )
 
 static ADDRESS_MAP_START( z100_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE (0x98, 0x98) Z-205 max number
-//	AM_RANGE (0xae, 0xaf) Z-217 disk controller
-	AM_RANGE (0xb0, 0xb7) AM_READWRITE(z207_fdc_r,z207_fdc_w)
-	AM_RANGE (0xd8, 0xdb) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
+//	AM_RANGE (0x00, 0x3f) reserved for non-ZDS vendors
+//	AM_RANGE (0x40, 0x5f) secondary Multiport card (Z-204)
+//	AM_RANGE (0x60, 0x7f) primary Multiport card (Z-204)
+//	AM_RANGE (0x80, 0x83) development board
+//	AM_RANGE (0x98, 0x9f) Z-205 expansion memory boards
+//	AM_RANGE (0xa0, 0xa3) network card (NET-100)
+//	AM_RANGE (0xa4, 0xa7) gateway (reserved)
+//	AM_RANGE (0xac, 0xad) Z-217 secondary disk controller (winchester)
+//	AM_RANGE (0xae, 0xaf) Z-217 primary disk controller (winchester)
+	AM_RANGE (0xb0, 0xb7) AM_READWRITE(z207_fdc_r,z207_fdc_w) // primary (wd1797)
+//  z-207 secondary disk controller (wd1797)
+//	AM_RANGE (0xcd, 0xce) ET-100 CRT Controller
+//	AM_RANGE (0xd4, 0xd7) ET-100 Trainer Parallel I/O
+	AM_RANGE (0xd8, 0xdb) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write) //video board
 	AM_RANGE (0xdc, 0xdc) AM_WRITE(z100_6845_address_w)
 	AM_RANGE (0xdd, 0xdd) AM_WRITE(z100_6845_data_w)
 //	AM_RANGE (0xde, 0xde) light pen
-	AM_RANGE (0xe0, 0xe3) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
+	AM_RANGE (0xe0, 0xe3) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write) //main board
 //	AM_RANGE (0xe4, 0xe7) 8253 PIT
-//	AM_RANGE (0xe8, 0xeb) First 2661-2 serial port
-//	AM_RANGE (0xec, 0xef) Second 2661-2 serial port
+//	AM_RANGE (0xe8, 0xeb) First 2661-2 serial port (printer)
+//	AM_RANGE (0xec, 0xef) Second 2661-2 serial port (modem)
 	AM_RANGE (0xf0, 0xf1) AM_DEVREADWRITE("pic8259_slave", pic8259_r, pic8259_w)
 	AM_RANGE (0xf2, 0xf3) AM_DEVREADWRITE("pic8259_master", pic8259_r, pic8259_w)
-	AM_RANGE (0xf4, 0xf4) AM_READ(keyb_data_r)
+	AM_RANGE (0xf4, 0xf4) AM_READ(keyb_data_r) // -> 8041 MCU
 	AM_RANGE (0xf5, 0xf5) AM_READWRITE(keyb_status_r,keyb_command_w)
 //	AM_RANGE (0xf6, 0xf6) expansion ROM is present (bit 0, active low)
 //	AM_RANGE (0xfb, 0xfb) timer irq status
 //	AM_RANGE (0xfc, 0xfc) memory latch
 //	AM_RANGE (0xfd, 0xfd) Hi-address latch
 //	AM_RANGE (0xfe, 0xfe) Processor swap port
-	AM_RANGE (0xff, 0xff) AM_READ_PORT("DSW")
+	AM_RANGE (0xff, 0xff) AM_READ_PORT("DSW101")
 ADDRESS_MAP_END
 
 static INPUT_CHANGED( key_stroke )
@@ -561,8 +544,7 @@ INPUT_PORTS_START( z100 )
 	PORT_START("KEYC") // 0x58 - 0x5f
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("HELP key") PORT_IMPULSE(1) PORT_CHANGED(key_stroke, 0x95)
 
-
-	PORT_START("DSW")
+	PORT_START("DSW101")
 	PORT_DIPNAME( 0x07, 0x00, "Default Auto-boot Device" )
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x01, "1" )
@@ -667,7 +649,7 @@ static WRITE8_DEVICE_HANDLER( video_pia_B_w )
 {
 	z100_state *state = device->machine().driver_data<z100_state>();
 
-	state->m_start_addr = data; //<- TODO
+	state->m_start_addr = data << 4; //<- TODO
 }
 
 /* clear screen */
