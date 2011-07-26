@@ -22391,7 +22391,7 @@
 		</part>
 	</software>
 
-	<software name="perfbowl">
+	<software name="perfbowl" cloneof="bowling">
 		<!-- Serial: TKS-G8 - Release Date: 1989-07-25 - Alternative Title: パーフェクトボーリング -->
 		<description>Perfect Bowling (Jpn)</description>
 		<year>1989</year>
@@ -35782,6 +35782,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bowling">
+		<!-- Serial:  - Release Date:  - Alternative Title: -->
+		<description>Bowling! (USA, Prototype)</description>
+		<year>1989</year>
+		<publisher>Coconuts Japan</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="bowling (usa, prototype).prg" size="131072" crc="beff6ec2" sha1="11d4034a805415ce93a55793f58d0c2300ef1f86" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="bowling (usa, prototype).chr" size="131072" crc="fe332485" sha1="90941ca4949a869db56d2bcc675bdfe6ad02270c" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
