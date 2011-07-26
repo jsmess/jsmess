@@ -344,9 +344,9 @@ static WRITE8_HANDLER( z207_fdc_w )
 {
 	z100_state *state = space->machine().driver_data<z100_state>();
 	device_t* dev = space->machine().device("z207_fdc");
-	UINT8 res;
+//	UINT8 res;
 
-	res = 0;
+//	res = 0;
 
 	switch(offset)
 	{
