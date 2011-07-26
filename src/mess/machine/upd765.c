@@ -2272,7 +2272,7 @@ void upd765_reset(device_t *device, int offset)
 	fdc->upd765_flags |= UPD765_DMA_MODE;
 
 	/* if ready input is set during reset generate an int */
-	if (fdc->upd765_flags & UPD765_FDD_READY)
+	if (upd765_get_rdy(device))
 	{
 		int i;
 		int a_drive_is_ready;
@@ -2280,7 +2280,7 @@ void upd765_reset(device_t *device, int offset)
 		fdc->upd765_status[0] = 0x080 | 0x040;
 
 		/* for the purpose of pc-xt. If any of the drives have a disk inserted,
-        do not set not-ready - need to check with pc_fdc->c whether all drives
+        do not set not-ready - need to check with pc_fdc.c whether all drives
         are checked or only the drive selected with the drive select bits?? */
 
 		a_drive_is_ready = 0;
