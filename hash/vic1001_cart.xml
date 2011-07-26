@@ -5,21 +5,13 @@
   Compiled by K1W1.
 -->
 
-<!--
-
-  * Missing Files: -
-
-    - Space Ric-O-Shay
-
--->
-
 <softwarelist name="vic1001" description="Commodore VIC-1001 / VIC-20 cartridges">
 
 	<software name="worldwar">
 		<description>A World at War (PAL)</description>
 		<year>198?</year>
 		<publisher>Handic</publisher>
-		<info name="serial" value="VIC-7303" />
+		<info name="serial" value="Vic-7303" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
 				<rom name="a world at war (handic)(198-)(vic-7303)(e).a0" size="8192" crc="89a8b4af" sha1="63a0ca93c2270d578f6bcde17bc6f5970ec30974" offset="0x0000" />
@@ -49,12 +41,12 @@
 		<info name="serial" value="VicCart-224" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="6000" size="8192">
-				<rom name="a.e. (broderbund)(1982)(viccart-224)(jue) [a].60" size="8192" crc="7f942bcd" sha1="770762ccff81231ef703af35d86850391fa7dd94" offset="0x0000" />
+				<rom name="a.e. (broderbund)(1982)(viccart-224)(jue)[a].60" size="8192" crc="7f942bcd" sha1="770762ccff81231ef703af35d86850391fa7dd94" offset="0x0000" />
 				<!-- File Difference -->
 				<!-- 0x1ff9 : 0xcf 0xc6 0xf0 0xd3 0xd4 0xcf 0xff 0xff ('ae') - 0x41 0x2e 0x45 0x2e 0x20 0x24 0x41 0x08 ('ae1') -->
 			</dataarea>
 			<dataarea name="a000" size="8192">
-				<rom name="a.e. (broderbund)(1982)(viccart-224)(jue) [a].a0" size="8192" crc="2cfe98cb" sha1="d4b7b055ec31ad302e8c12fbc3b1ddfe457dee73" offset="0x0000" />
+				<rom name="a.e. (broderbund)(1982)(viccart-224)(jue)[a].a0" size="8192" crc="2cfe98cb" sha1="d4b7b055ec31ad302e8c12fbc3b1ddfe457dee73" offset="0x0000" />
 				<!-- File Difference -->
 				<!-- 0x1ffe : 0xff 0xff ('ae') - 0x66 0x66 ('ae1') -->
 			</dataarea>
@@ -85,10 +77,10 @@
 		<info name="usage" value="Enter 'SYS 32592' to run" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="4000" size="8192">
-				<rom name="adventure #2 - pirate&apos;s cove (commodore)(1981)(vic-1915)(jue)(sys 32592).40" size="8192" crc="59597b72" sha1="89d0d1a7c02e5f3fa11b57b23216765898a93149" offset="0x0000" />
+				<rom name="adventure #2 - pirate's cove (commodore)(1981)(vic-1915)(jue)(sys 32592).40" size="8192" crc="59597b72" sha1="89d0d1a7c02e5f3fa11b57b23216765898a93149" offset="0x0000" />
 			</dataarea>
 			<dataarea name="6000" size="8192">
-				<rom name="adventure #2 - pirate&apos;s cove (commodore)(1981)(vic-1915)(jue)(sys 32592).60" size="8192" crc="87bb03b9" sha1="dae31fb5563899901677407bafb480ebfc5e1a25" offset="0x0000" />
+				<rom name="adventure #2 - pirate's cove (commodore)(1981)(vic-1915)(jue)(sys 32592).60" size="8192" crc="87bb03b9" sha1="dae31fb5563899901677407bafb480ebfc5e1a25" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -160,7 +152,7 @@
 		<info name="serial" value="C305" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
-				<rom name="aggressor (hes)(1982)(c305) [a].a0" size="8192" crc="8610fbab" sha1="c89c75d5c543c68b429c7d7f98f68105464d3b19" offset="0x0000" />
+				<rom name="aggressor (hes)(1982)(c305)[a].a0" size="8192" crc="8610fbab" sha1="c89c75d5c543c68b429c7d7f98f68105464d3b19" offset="0x0000" />
 				<!-- File Difference -->
 				<!-- 0x0c9e : 0x00  ('agressor') - 0x05 ('agressora') -->
 				<!-- 0x0ca2 : 0x00  ('agressor') - 0x0c ('agressora') -->
@@ -308,7 +300,7 @@
 
     <software name="artilery">
 		<description>Artillery Duel (NTSC)</description>
-		<!-- This double ended cartridge also contains "Chuck Norris Superkicks". -->
+		<!-- This double ended cartridge also included "Chuck Norris Superkicks". -->
 		<year>1983</year>
 		<publisher>Xonox</publisher>
 		<info name="serial" value="6235-A" />
@@ -329,7 +321,7 @@
 		<info name="usage" value="Enter 'SYS 700' to run" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
-				<rom name="assam - assembler (198-)(jue) (sys 700).a0" size="8192" crc="122a4ad8" sha1="b3a31ba894f021f30521e22251cb2091345dee09" offset="0x0000" />
+				<rom name="assam - assembler (198-)(jue)(sys 700).a0" size="8192" crc="122a4ad8" sha1="b3a31ba894f021f30521e22251cb2091345dee09" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -413,10 +405,10 @@
 		<info name="usage" value="Enter 'SYS 20182' to run" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="2000" size="8192">
-				<rom name="baldor&apos;s castle (daedalus)(1983)(ju) (sys 20182).20" size="8192" crc="f01e2642" sha1="dd890ef9391159ae4a252a318b789c98cd355f34" offset="0x0000" />
+				<rom name="baldor's castle (daedalus)(1983)(ju) (sys 20182).20" size="8192" crc="f01e2642" sha1="dd890ef9391159ae4a252a318b789c98cd355f34" offset="0x0000" />
 			</dataarea>
 			<dataarea name="4000" size="4096">
-				<rom name="baldor&apos;s castle (daedalus)(1983)(ju) (sys 20182).40" size="4096" crc="282bc964" sha1="a2186040572cde2a39f4b350bd8475316096d394" offset="0x0000" />
+				<rom name="baldor's castle (daedalus)(1983)(ju) (sys 20182).40" size="4096" crc="282bc964" sha1="a2186040572cde2a39f4b350bd8475316096d394" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -453,7 +445,7 @@
 		<info name="serial" value="VIC-1910" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
-				<rom name="radar rat race (commodore)(1981)(vic-1910)(ju) [a].a0" size="8192" crc="c0ce818b" sha1="0b972189ca7358c4085eb7e11f8b527fbd285e7c" offset="0x0000" />
+				<rom name="radar rat race (commodore)(1981)(vic-1910)(ju)[a].a0" size="8192" crc="c0ce818b" sha1="0b972189ca7358c4085eb7e11f8b527fbd285e7c" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -616,7 +608,7 @@
 		<description>Bridge 20 (PAL)</description>
 		<year>1983</year>
 		<publisher>Handic</publisher>
-		<info name="serial" value="ViC-7302" />
+		<info name="serial" value="Vic-7302" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="6000" size="8192">
 				<rom name="bridge 20 (handic)(1983)(vic-7302).60" size="8192" crc="feebc44d" sha1="235a2b627c77429165538ecbd50e426fc5f91df5" offset="0x0000" />
@@ -700,7 +692,7 @@
 		<info name="serial" value="220??" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
-				<rom name="capture the flag (sirius)(1983)(220--)(ju) [a].a0" size="8192" crc="e6897978" sha1="e43f0e28dfb06f0fe3637094ef0f78cdf91a255c" offset="0x0000" />
+				<rom name="capture the flag (sirius)(1983)(220--)(ju)[a].a0" size="8192" crc="e6897978" sha1="e43f0e28dfb06f0fe3637094ef0f78cdf91a255c" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -780,7 +772,7 @@
 
     <software name="suprkick">
 		<description>Chuck Norris Superkicks</description>
-		<!-- This double ended cartridge also contains "Artillery". -->
+		<!-- This double ended cartridge also included "Artillery". -->
 		<year>1983</year>
 		<publisher>Xonox</publisher>
 		<info name="serial" value="6235-B" />
@@ -893,7 +885,7 @@
 		<info name="serial" value="THC22006" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
-				<rom name="computer war (thorn emi)(1983)(thc22006)(jue) [a].a0" size="8192" crc="24b7cdd6" sha1="3cb69d196c3614d86be94f1f6fea53e37a184305" offset="0x0000" />
+				<rom name="computer war (thorn emi)(1983)(thc22006)(jue)[a].a0" size="8192" crc="24b7cdd6" sha1="3cb69d196c3614d86be94f1f6fea53e37a184305" offset="0x0000" />
 				<!-- File Difference -->
 				<!-- 0x1309 : 0xa3 0xba ('compwar') - 0x37 0xa7 ('compwar1') -->
 				<!-- 0x1e5d : 0xa4 0x73 0x84 ('compwar') - 0x4c 0xdb 0xbf ('compwar1') -->
@@ -933,19 +925,9 @@
 		<info name="serial" value="VIC-1922" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
-				<rom name="cosmic cruncher (commodore)(1982)(vic-1922)(jue) [a].a0" size="8192" crc="b545bd68" sha1="bcec5781f40b2522bca9b303b14d2ce137ba9ac1" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-    <software name="cosmic2" cloneof="cosmic">
-		<description>Cosmic Cruncher (Alt 2)</description>
-		<year>1982</year>
-		<publisher>Commodore</publisher>
-		<info name="serial" value="VIC-1922" />
-		<part name="cart" interface="vic1001_cart">
-			<dataarea name="a000" size="8192">
-				<rom name="cosmic cruncher (commodore)(1982)(vic-1922)(jue) [a1].a0" size="8192" crc="93674261" sha1="ee6cb8958220de1b2753920d27318121eb4692ba" offset="0x0000" />
+				<rom name="cosmic cruncher (commodore)(1982)(vic-1922)(jue)[a].a0" size="8192" crc="b545bd68" sha1="bcec5781f40b2522bca9b303b14d2ce137ba9ac1" offset="0x0000" />
+				<!-- File Difference -->
+				<!-- 0x018f : 0x16 0xe8 0xe0 0x08 0xd0 0xe9 ('cosmic') - 0xba 0x38 0x02 0x34 0x3a 0x40 ('cosmic1') -->
 			</dataarea>
 		</part>
 	</software>
@@ -1029,7 +1011,7 @@
 		<info name="serial" value="V2CDF" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
-				<rom name="d&apos;fuse (tymac)(1984)(v2cdf).a0" size="8192" crc="f9abf6c0" sha1="8b92be771e4a74923ae6cf5a866ff678996afff8" offset="0x0000" />
+				<rom name="d'fuse (tymac)(1984)(v2cdf).a0" size="8192" crc="f9abf6c0" sha1="8b92be771e4a74923ae6cf5a866ff678996afff8" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1191,7 +1173,7 @@
 		<publisher>H. Jans</publisher>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
-				<rom name="e.t. - the extra terrestrial (h. jans)(1983)(e) [a].a0" size="8192" crc="84ed1a3c" sha1="25eb848d997135b2c2c12cc14f9c1daf965fdfb7" offset="0x0000" />
+				<rom name="e.t. - the extra terrestrial (h. jans)(1983)(e)[a].a0" size="8192" crc="84ed1a3c" sha1="25eb848d997135b2c2c12cc14f9c1daf965fdfb7" offset="0x0000" />
 				<!-- File Difference -->
 				<!-- 0x0000 : 0x7d 0xa9 ('et') - 0xf2 0xaa ('et1') -->
 				<!-- 0x1ffe : 0xc0 0x00 ('et') - 0x00 0xff ('et1') -->
@@ -1329,7 +1311,7 @@
 
 	<software name="gstmanor">
 		<description>Ghost Manor (NTSC)</description>
-		<!-- This double ended cartridge also contains "Spikes Peak". -->
+		<!-- This double ended cartridge also included "Spikes Peak". -->
 		<year>1983</year>
 		<publisher>Xonox</publisher>
 		<info name="serial" value="6215-A" />
@@ -1417,7 +1399,7 @@
 		<info name="serial" value="C302" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="4096">
-				<rom name="hesmon v1.1 (hes)(1982)(c302)(jue) [a].a0" size="4096" crc="de4937f5" sha1="2944eb748747bcf2f1e8a8b1ce71b7199a6f36f8" offset="0x0000" />
+				<rom name="hesmon v1.1 (hes)(1982)(c302)(jue)[a].a0" size="4096" crc="de4937f5" sha1="2944eb748747bcf2f1e8a8b1ce71b7199a6f36f8" offset="0x0000" />
 				<!-- File Difference -->
 				<!-- 0x05a1 : 0x8d ('hesmon') - 0xcd ('hesmona') -->
 				<!-- 0x0d98 : 0x91 ('hesmon') - 0xd1 ('hesmona') -->
@@ -1490,7 +1472,7 @@
 		<publisher>Academy</publisher>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
-				<rom name="ifr - flight simulator (academy)(1983)(jue) [a].a0" size="8192" crc="fb97bd96" sha1="130873b7e2dde965af451f730d08956d12cfadbe" offset="0x0000" />
+				<rom name="ifr - flight simulator (academy)(1983)(jue)[a].a0" size="8192" crc="fb97bd96" sha1="130873b7e2dde965af451f730d08956d12cfadbe" offset="0x0000" />
 				<!-- File Difference -->
 				<!-- 0x0094 : 0xad ('fltsim') - 0x8d ('fltsima') -->
 			</dataarea>
@@ -1548,19 +1530,6 @@
 		</part>
 	</software>
 
-	<software name="jellym2f" cloneof="jellym2">
-		<description>Jelly Monster v.2 (Fixed)</description>
-		<!-- Fixes a memory initialization problem. -->
-		<year>1981</year>
-		<publisher>Commodore</publisher>
-		<info name="serial" value="Vic-1905" />
-		<part name="cart" interface="vic1001_cart">
-			<dataarea name="a000" size="8192">
-				<rom name="jelly monsters v2.0 (commodore)(1981)(vic-1905) [fixed].a0" size="8192" crc="cc514ae5" sha1="9bf55e1da16ae31e7f12020270d595550c4a5d16" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="jellym1" cloneof="jellym2">
 		<description>Jelly Monster v.1</description>
 		<year>1981</year>
@@ -1569,19 +1538,6 @@
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
 				<rom name="jelly monsters v1.0 (commodore)(1981)(vic-1905).a0" size="8192" crc="d8af8fe3" sha1="e46f91b0e9355bf260e4cd85ab4b10fa89c24a20" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jellym1f" cloneof="jellym2">
-		<description>Jelly Monster v.1 (Fixed)</description>
-		<!-- Fixes a memory initialization problem. -->
-		<year>1981</year>
-		<publisher>Commodore</publisher>
-		<info name="serial" value="Vic-1905" />
-		<part name="cart" interface="vic1001_cart">
-			<dataarea name="a000" size="8192">
-				<rom name="jelly monsters v1.0 (commodore)(1981)(vic-1905) [fixed].a0" size="8192" crc="d0d4b510" sha1="75e7f350199fd27e08cd04fe14fa59cc1f05a32e" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1654,7 +1610,7 @@
 		</part>
 	</software>
 
-	<software name="kantikp" cloneof="kantiks">
+	<software name="kantiksp" cloneof="kantiks">
 		<description>K-Razy Antiks (PAL)</description>
 		<year>1982</year>
 		<publisher>CBS Software</publisher>
@@ -1699,7 +1655,7 @@
 	<software name="loderunr">
 		<description>Lode Runner</description>
 		<year>1983</year>
-		<publisher>Br0derbund</publisher>
+		<publisher>Brøderbund</publisher>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="6000" size="8192">
 				<rom name="lode runner (br0derbund)(1983)(jue).60" size="8192" crc="320149be" sha1="94e7492a2fa267158c301c9b0e21ac049947dc69" offset="0x0000" />
@@ -1741,7 +1697,7 @@
 	<software name="mstrtype">
 		<description>Mastertype</description>
 		<year>1983</year>
-		<publisher>Br0derbund</publisher>
+		<publisher>Brøderbund</publisher>
 		<info name="serial" value="VicCart-221" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="6000" size="8192">
@@ -1784,22 +1740,10 @@
 		<info name="serial" value="THC22007" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
-				<rom name="medieval joust (thorn emi)(1983)(thc22007)(jue) [a].a0" size="8192" crc="25d9a370" sha1="e762520166c7e60086e28f5e9119e9f5b6248703" offset="0x0000" />
+				<rom name="medieval joust (thorn emi)(1983)(thc22007)(jue)[a].a0" size="8192" crc="25d9a370" sha1="e762520166c7e60086e28f5e9119e9f5b6248703" offset="0x0000" />
 				<!-- File Difference -->
 				<!-- 0x04c9 : 0x8d 0xa3 0xa0 ('mjoust') - 0xa9 0x12 0xea ('mjousta') -->
 				<!-- 0x0829 : 0x8d 0x2c 0xa8 ('mjoust') - 0x60 0xea 0xea ('mjousta') -->
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="menag">
-		<description>VIC Menagerie</description>
-		<year>1982</year>
-		<publisher>Commodore</publisher>
-		<info name="serial" value="VIC-1926" />
-		<part name="cart" interface="vic1001_cart">
-			<dataarea name="a000" size="8192">
-				<rom name="menagerie  (commodore)(1982)(vic-1926)(jue).a0" size="8192" crc="a3c74629" sha1="aec46a3e6f9797b116cbe6a8792e00530234ae80" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1834,7 +1778,7 @@
 		<publisher>Reston</publisher>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
-				<rom name="miner 2049&apos;er (reston)(1983)(e).a0" size="8192" crc="80439200" sha1="32af135822d95ffec61cc11a6ba336897fdf867c" offset="0x0000" />
+				<rom name="miner 2049'er (reston)(1983)(e).a0" size="8192" crc="80439200" sha1="32af135822d95ffec61cc11a6ba336897fdf867c" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1845,7 +1789,7 @@
 		<publisher>Reston</publisher>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
-				<rom name="miner 2049&apos;er (reston)(1983)(e) [a].a0" size="8192" crc="3ad92fdc" sha1="9fab5f03270604357441e459895b9c8c1bdff84b" offset="0x0000" />
+				<rom name="miner 2049'er (reston)(1983)(e)[a].a0" size="8192" crc="3ad92fdc" sha1="9fab5f03270604357441e459895b9c8c1bdff84b" offset="0x0000" />
 				<!-- File Difference -->
 				<!-- 0x1888 : 0x20 ('mine2049') - 0x5c ('min2049a') -->
 			</dataarea>
@@ -1894,7 +1838,7 @@
 		<info name="serial" value="VIC-1925" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="8192">
-				<rom name="money wars (commodore)(1982)(vic-1925)(ju) [a].a0" size="8192" crc="fff6a4a7" sha1="d6680086aa6c0d5b29b7368a1b14d583088771ec" offset="0x0000" />
+				<rom name="money wars (commodore)(1982)(vic-1925)(ju)[a].a0" size="8192" crc="fff6a4a7" sha1="d6680086aa6c0d5b29b7368a1b14d583088771ec" offset="0x0000" />
 				<!-- File Difference -->
 				<!-- 0x1fff : 0x23 ('moneywar') - 0x44 ('monywar1') -->
 			</dataarea>
@@ -1956,7 +1900,7 @@
 
 	<software name="motoracr">
 		<description>Motocross Racer (NTSC)</description>
-		<!-- This double ended cartridge also contains "Tomarc the Barbarian". -->
+		<!-- This double ended cartridge also included "Tomarc the Barbarian". -->
 		<year>1984</year>
 		<publisher>Xonox</publisher>
 		<info name="serial" value="6245-B" />
@@ -2044,19 +1988,22 @@
 		</part>
 	</software>
 
-	<software name="omegract" cloneof="omegrace">
-		<description>Omega Race (Trained)</description>
+	<software name="outworld">
+		<description>Outworld (NTSC)</description>
 		<year>1982</year>
-		<publisher>Commodore</publisher>
-		<info name="serial" value="VIC-1924" />
+		<publisher>UMI</publisher>
+		<info name="serial" value="1635" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="a000" size="8192">
-				<rom name="omega race (commodore)(1982)(vic-1924)[trained].a0" size="8192" crc="79ceb70e" sha1="9eac887da51d6923a7829f56e1682020accec930" offset="0x0000" />
+			<dataarea name="6000" size="4096">
+				<rom name="outworld (umi)(1981)(1635)(ju).60" size="4096" crc="6dd5da16" sha1="91899c4769880277e16cb63e825e2e2b5e2b0071" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="4096">
+				<rom name="outworld (umi)(1981)(1635)(ju).a0" size="4096" crc="f67a2b0f" sha1="71cb6c1cfd4eab706c58c47e7ac5b666db60c890" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="outworld">
+	<software name="outworldp" cloneof="outworld">
 		<description>Outworld (PAL)</description>
 		<year>1982</year>
 		<publisher>UMI</publisher>
@@ -2068,17 +2015,1429 @@
 		</part>
 	</software>
 
-	<software name="outworldn" cloneof="outworld">
-		<description>Outworld (NTSC)</description>
+	<software name="pacman">
+		<description>Pac-Man</description>
+		<year>1983</year>
+		<publisher>Atarisoft</publisher>
+		<info name="serial" value="RX8501" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="pac-man (atarisoft)(rx8501)(1983)(jue).a0" size="8192" crc="659a30ba" sha1="544781944934288524460c30d67c8474a7476095" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ptroopr">
+		<description>Paratrooper</description>
+		<year>198?</year>
+		<publisher>Antiram</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="paratrooper (antiram)(198-).a0" size="8192" crc="534b1190" sha1="c8a01127d12d7d37071c895da32882f69fcc9c5d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="persfin">
+		<description>Personal Finance</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1929" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="personal finance (commodore)(1982)(vic-1929)(jue).a0" size="8192" crc="276857e9" sha1="f3467d3af4d3974b2eb56c89d9fe0f872ade62a4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petloder">
+		<description>PET Loader (PAL)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="pet loader (198-)(e).a0" size="8192" crc="47014455" sha1="0b21d39fd1f9dfea4676be0c8934139a7feeb769" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pharaoh">
+		<description>Pharaoh's Curse</description>
+		<year>1983</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="C321" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="pharaoh's curse (hes)(1983)(c321)(jue).60" size="8192" crc="61ae6e79" sha1="1f03ef463547c9364d9c56fbd932a814cf134944" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="pharaoh's curse (hes)(1983)(c321)(jue).a0" size="8192" crc="537998fb" sha1="0c4005556333350164db05985442da349a882208" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinspec">
+		<description>Pinball Spectacular (NTSC)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1920" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="pinball spectacular (commodore)(1982)(vic-1920)(ju).60" size="8192" crc="5a6d36e0" sha1="bb67dc8db5c9050ca6812d583bfdd910da26a420" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="pinball spectacular (commodore)(1982)(vic-1920)(ju).a0" size="8192" crc="46cc3836" sha1="5d6db0d177af5054494b76357aaed24af466b923" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinball" cloneof="pinspec">
+		<description>Pinball (PAL)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1920" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="pinball (commodore)(1982)(vic-1920)(e).60" size="8192" crc="5ff8f444" sha1="82922eeba4e4c576359b6baaa3ba37c6d9a237d3" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="pinball (commodore)(1982)(vic-1920)(e).a0" size="8192" crc="1e2cfc26" sha1="761a75536399605a1033c0b40e730f2174cb98e9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pipes">
+		<description>Pipes (NTSC)</description>
+		<year>1983</year>
+		<publisher>Creative</publisher>
+		<info name="serial" value="VI PI C" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="pipes (creative)(1983)(vi pi c)(ju).a0" size="8192" crc="24fb7693" sha1="c1a3c241444236b4accf38637bbaf78d323e3e48" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poker">
+		<description>Poker (AKA Draw Poker)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1908" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="poker (aka draw poker) (commodore)(1981)(vic-1908).a0" size="8192" crc="9fe0bd6d" sha1="ed0979602a67a34a928c85792218184edac4350c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poker1" cloneof="poker">
+		<description>Poker (AKA Draw Poker, Alt)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1908" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="poker (aka draw poker) (commodore)(1981)(vic-1908)[a].a0" size="8192" crc="4c543cbb" sha1="16406655efff06e702ca77bf8a9857ba6468f4c4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polaris">
+		<description>Polaris (NTSC)</description>
+		<year>1983</year>
+		<publisher>Tigervision</publisher>
+		<info name="serial" value="7-007-20" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="polaris (tigervision)(1983)(7-007-20)(ju).a0" size="8192" crc="9538b3af" sha1="56b3d961cb859fdccfdede5e46eeb563180e0486" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poleposn">
+		<description>Pole Position</description>
+		<year>1983</year>
+		<publisher>Atarisoft</publisher>
+		<info name="serial" value="RX8535" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="pole position (atarisoft)(1983)(rx8535)(ju).60" size="8192" crc="e0c6b380" sha1="8b4563c9b57fc9cd24abede74296f190f5761de5" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="pole position (atarisoft)(1983)(rx8535)(ju).a0" size="8192" crc="548c1ef9" sha1="40a717ffb02a2053b86578b12984e2fa287e509c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="predator">
+		<description>Predator (NTSC)</description>
+		<year>1982</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="C316" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="predator (hes)(1982)(c316)(ju).a0" size="8192" crc="f36acbfc" sha1="f8b12d83b5e6dc9f6aca8c32c36de2b39e1d2e41" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="princess">
+		<description>Princess and Frog (NTSC)</description>
+		<year>1983</year>
+		<publisher>Romox</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="princess and frog (romox)(1983)(ju).a0" size="8192" crc="7bc153f4" sha1="f258392508bc83bbc37333d244e1ecc38157da76" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="progaid">
+		<description>Programmer's Aid Cartridge </description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1212" />
+		<info name="usage" value="Enter 'SYS 28681' to run" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="7000" size="8192">
+				<rom name="programmer's aid cartridge (commodore)(198-)(vic-1212)(jue) (sys 28681).70" size="4096" crc="1eead29f" sha1="17311a74f6e6fbf0222dbe866c82c8ce1dd5dd6d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="protectr">
+		<description>Protector</description>
+		<year>1983</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="C308" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="protector (hes)(1983)(c308)(jue).a0" size="8192" crc="451d0e1e" sha1="63e6ba97b833dfe1c74386fca2dfc018ab73e784" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qbert">
+		<description>Q*bert</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="serial" value="PB1420" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="qbert (parker brothers)(1983)(pb1420).a0" size="8192" crc="da471219" sha1="a255010a03a941c9224732f93115dd33f6438d2e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quackers">
+		<description>Quackers (PAL)</description>
+		<year>1982</year>
+		<publisher>Interesting Software</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="quackers (interesting software)(1982)(e).a0" size="8192" crc="99833504" sha1="e500b2676b5f074d71bc8a400834f6aa67461468" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qbfox">
+		<description>Quick Brown Fox</description>
+		<year>1982</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="usage" value="Enter 'SYS 32692' to run" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="quick brown fox (quick brown fox)(1982)(jue) (sys 32692).60" size="8192" crc="16954b5e" sha1="a38d2259489c6862d2e73b0f8977f8fc729bdda3" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rathotel">
+		<description>Rat Hotel (NTSC)</description>
+		<year>1982</year>
+		<publisher>Creative</publisher>
+		<info name="serial" value="VI RH C" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="rat hotel (creative)(1982)(vi rh c)(ju).a0" size="8192" crc="12434785" sha1="b6d2da93084f8657af1bf34c9e9a3b35a5573c81" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="renais">
+		<description>Renaissance</description>
 		<year>1982</year>
 		<publisher>UMI</publisher>
-		<info name="serial" value="1635" />
+		<info name="serial" value="1600" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="6000" size="4096">
-				<rom name="outworld (umi)(1981)(1635)(ju).60" size="4096" crc="6dd5da16" sha1="91899c4769880277e16cb63e825e2e2b5e2b0071" offset="0x0000" />
+				<rom name="renaissance (umi)(1982)(1600).60" size="4096" crc="44eeb525" sha1="89127b505a4d956bf77d445e4c371af178934444" offset="0x0000" />
 			</dataarea>
 			<dataarea name="a000" size="4096">
-				<rom name="outworld (umi)(1981)(1635)(ju).a0" size="4096" crc="f67a2b0f" sha1="71cb6c1cfd4eab706c58c47e7ac5b666db60c890" offset="0x0000" />
+				<rom name="renaissance (umi)(1982)(1600).a0" size="4096" crc="40033ecb" sha1="3710f155e34b77affc9b48e144937bfac952b87f" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rivrresc">
+		<description>River Rescue</description>
+		<year>1982</year>
+		<publisher>Thorn EMI</publisher>
+		<info name="serial" value="THC22001" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="river rescue (thorn emi)(1982)(thc22001)(jue).a0" size="8192" crc="9176e97f" sha1="b136ed904c95d8496e0935493f05eb264566aa31" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadrace">
+		<description>Road Race</description>
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1909" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="road race (aka midnight  drive) (commodore)(1981)(vic-1909).a0" size="8192" crc="49ed41da" sha1="5cb8f3cc2529a0144b1e66e1cd7af41ad1ba78b4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robnhood">
+		<description>Robin Hood (NTSC)</description>
+		<!-- This double ended cartridge also included "Sir Lancelot". -->
+		<year>1983</year>
+		<publisher>Xonox</publisher>
+		<info name="serial" value="6225-B" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="robin hood (xonox)(1983)(6225-b)(ju).a0" size="8192" crc="aefdb3af" sha1="0f7874e020cb4e7a15e062d3536f98633b89d58a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robopanc">
+		<description>Robot Panic</description>
+		<year>1982</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="C310" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="robot panic (hes)(1982)(c310)(jue).a0" size="8192" crc="9282db33" sha1="4d65707384b7be4ee4f59ad79186cb296c7dbc74" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotron">
+		<description>Robotron - 2084</description>
+		<year>1983</year>
+		<publisher>Atarisoft</publisher>
+		<info name="serial" value="RX8520" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="4096">
+				<rom name="robotron - 2084 (atarisoft)(1983)(rx8520).60" size="4094" crc="6a91181a" sha1="a09d2cb31890b2767b84ae908f41e3855cfda4f4" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="robotron - 2084 (atarisoft)(1983)(rx8520).a0" size="8192" crc="3710f99e" sha1="0a134eedaea32b45a5a568a67023fc37163cfb66" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sammon">
+		<description>SamMON</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+				<part name="cart" interface="vic1001_cart">
+			<dataarea name="2000" size="8192">
+				<rom name="sammon (198-).20" size="7684" crc="e11e43a1" sha1="9440be029d31e1cb1beaf43fdec7dab115035e69" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sargon2">
+		<description>Sargon II Chess (NTSC)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1919" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="sargon ii chess (commodore)(1982)(vic-1919)(ju).a0" size="8192" crc="cd1ca8ec" sha1="3c1b6c2068d036aee40dbc31f075d0b789a503aa" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="satpatrl">
+		<description>Satellite Patrol (NTSC)</description>
+		<year>1982</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="C3??" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="satellite patrol (hes)(1982)(c3--)(ju).a0" size="4096" crc="5f64f10b" sha1="b6bf1b3dca7d9ea356d54e80fd7306658070bee6" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="satmet">
+		<description>Satellite and Meteorites! (NTSC)</description>
+		<year>1982</year>
+		<publisher>UMI</publisher>
+		<info name="serial" value="1650" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="4096">
+				<rom name="satellites and meteorites! (umi)(1982)(1650)(ju).60" size="4096" crc="eb3361c6" sha1="7376391e363074bf99843bfb2ecf4277edb6d17d" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="4096">
+				<rom name="satellites and meteorites! (umi)(1982)(1650)(ju).a0" size="4096" crc="be390d00" sha1="53afad6a1c2fb87a82ecb28d86258ea2d78615cb" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="satmetp" cloneof="satmet">
+		<description>Satellite and Meteorites! (PAL)</description>
+		<year>1982</year>
+		<publisher>UMI</publisher>
+		<info name="serial" value="1650" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="satellites and meteorites! (umi)(1982)(1650)(e).a0" size="8192" crc="f3db203b" sha1="fe823deb548c3dac51b24aaf28758c248487f170" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scorpion">
+		<description>Scorpion (PAL)</description>
+		<year>1983</year>
+		<publisher>Tronix</publisher>
+				<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="scorpion (tronix)(1983)(e).a0" size="8192" crc="cbc23ea1" sha1="bcbbefd734ac6bee83e02a1d232f548dd806cbc7" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scram20">
+		<description>Scram 20</description>
+		<year>1983</year>
+		<publisher>Nalin Sharma</publisher>
+				<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="scram 20 (nalin sharma)(1983)(jue).a0" size="4096" crc="24d08856" sha1="54bfccc2df8ee0e27b7c11986897f8f4b4210736" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrnmstr">
+		<description>Screen Master</description>
+		<year>1982</year>
+		<publisher>Handic</publisher>
+				<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="screen master (handic)(1982)(jue).a0" size="4096" crc="1b61cd52" sha1="5420b4d54f7a9eaeaa8a32760b771214a2567e55" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seawolf">
+		<description>Sea Wolf</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1937" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="sea wolf (commodore)(1982)(vic-1937).a0" size="8192" crc="6770e9bb" sha1="79a69acc8847e0b8d90498fc97a9b87c7e75b7c1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seafox">
+		<description>Seafox (NTSC)</description>
+		<year>1983</year>
+		<publisher>Brøderbund</publisher>
+		<info name="serial" value="VicCart-193" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="seafox (br0derbund)(1983)(viccart-193)(ju).60" size="8192" crc="9415538f" sha1="2f9c99843a9c155b247f7a2dfbfa1845997c52a1" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="seafox (br0derbund)(1983)(viccart-193)(ju).a0" size="8192" crc="ce4164f1" sha1="e6a4c23f10c4c64946582e57eaa26d32ab75c184" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="serpent">
+		<description>Serpentine (NTSC)</description>
+		<year>1982</year>
+		<publisher>Creative</publisher>
+		<info name="serial" value="VI SE C" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="serpentine (creative)(1982)(vi se c)(ju).a0" size="8192" crc="0f4df9cd" sha1="59ce31902ffd7547973fe1e7690d9c6182b944b7" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="serpentp" cloneof="serpent">
+		<description>Serpentine (PAL)</description>
+		<year>1982</year>
+		<publisher>Creative</publisher>
+		<info name="serial" value="VI SE C" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="serpentine (creative)(1982)(vi se c)(e).a0" size="8192" crc="90592645" sha1="6ea2c90874289399e3f0b71a7d95a8635a2e1ecb" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="shamus">
+		<description>Shamus</description>
+		<year>1983</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="C307" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="shamus (hes)(1983)(c307).a0" size="8192" crc="21e7bda6" sha1="e8ac7374bd5292edec15848660c64dcc3c748642" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sirlance">
+		<description>Sir Lancelot (NTSC)</description>
+		<!-- This double ended cartridge also included "Robin Hood". -->
+		<year>1983</year>
+		<publisher>Xonox</publisher>
+		<info name="serial" value="6225-A" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="sir lancelot (xonox)(1983)(6225-a)(jue).a0" size="8192" crc="0a0dabec" sha1="5f74be5c64cd764fa6e13268266cfe790ac0da1c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skibern">
+		<description>Skibbereen (NTSC)</description>
+		<year>1982</year>
+		<publisher>UMI</publisher>
+		<info name="serial" value="1641" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="skibbereen (umi)(1982)(1641)(ju).a0" size="4096" crc="eaf65586" sha1="54ecf775299e37d3e9f8287da691efdeaf3a98a2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skibernp" cloneof="skibern">
+		<description>Skibbereen (PAL)</description>
+		<year>1982</year>
+		<publisher>UMI</publisher>
+		<info name="serial" value="1641" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="skibbereen (umi)(1982)(1641)(e).a0" size="4096" crc="376b9a3e" sha1="c848869daefd55f7c2cd8029320d05780a288767" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="skyblazr">
+		<description>Skyblazer (NTSC)</description>
+		<year>1983</year>
+		<publisher>Brøderbund</publisher>
+		<info name="serial" value="VicCart-???" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="skyblazer (br0derbund)(1983)(ju).60" size="8192" crc="07cbdd86" sha1="6f2f2935fccaeb50fb399f85b29264f768771542" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="skyblazer (br0derbund)(1983)(ju).a0" size="8192" crc="c9c0b743" sha1="09dd57af4fa8d4cabee675a21a7f3c24d710118d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slot">
+		<description>Slot</description>
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1904" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="slot (commodore)(1981)(vic-1904).a0" size="8192" crc="64d4a871" sha1="4e1582c516007613e2ca02cfa8f482603cbbd38f" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprslot" cloneof="slot">
+		<description>Super Slot</description>
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1904" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="super slot (commodore)(1981)(vic-1904).a0" size="8192" crc="183c0866" sha1="a0b3cf83e4f780007c17986586c204863c0c3027" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snakbyte">
+		<description>Snake Byte</description>
+		<year>1982</year>
+		<publisher>Sirius</publisher>
+		<info name="serial" value="22031" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="snake byte (sirius)(1982)(22031).a0" size="4096" crc="1840411b" sha1="8e6d796acfe40d7b5357f78ac5a088562b602c6b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcsnake">
+		<description>Space Snake</description>
+		<year>1982</year>
+		<publisher>Handic</publisher>
+		<info name="serial" value="Vic-7301" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="space snake (handic)(1982)(vic-7301).a0" size="8192" crc="a52ef578" sha1="b268b7a0cada2314872ae3986191fb2eead3b903" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ricoshay">
+		<description>Space Ric-o-Shay (NTSC)</description>
+		<year>198?</year>
+		<publisher>OEM</publisher>
+		<info name="serial" value="&lt;unknown&gt;" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="space ric-o-shay (oem)(198-)(ju).a0" size="4096" crc="af2fd976" sha1="e44317b0943e1d77bf5826c13f51c4085a1a7669" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spedmath">
+		<description>Speed Math &amp; Bingo Math (NTSC)</description>
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1933" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="speed math &amp; bingo math (commodore)(1982)(vic-1933)(ju).a0" size="8192" crc="a002f34c" sha1="62cdff8107257381280f1ca076f52116c08c8cd7" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spider">
+		<description>Spider City (NTSC)</description>
+		<year>1983</year>
+		<publisher>Sirius</publisher>
+		<info name="serial" value="22015" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="spider city (sirius)(1983)(22015)(ju).a0" size="4096" crc="b9b5cffe" sha1="38c2e4ac0bc3eca5d0fb12f25843d0ba1d8bca88" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spider1" cloneof="spider">
+		<description>Spider City (NTSC, Alt)</description>
+		<year>1983</year>
+		<publisher>Sirius</publisher>
+		<info name="serial" value="22015" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="spider city (sirius)(1983)(22015)(ju)[a].a0" size="4096" crc="12d40755" sha1="8e657056525d3fbce967aec908ce975c6117e121" offset="0x0000" />
+				<!-- File Difference -->
+				<!-- 0x0e86 : 0x60 ('spider') - 0xa0 ('spider1') -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidrmrs">
+		<description>Spider of Mars (NTSC)</description>
+		<year>1982</year>
+		<publisher>UMI</publisher>
+		<info name="serial" value="1604" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="spiders of mars (umi)(1982)(1604)(ntsc).a0" size="8192" crc="9055c7d9" sha1="663993c0ae68a08caa62ef34e973a30d73b33cb4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidrmrsp" cloneof="spidrmrs">
+		<description>Spider of Mars (PAL)</description>
+		<year>1982</year>
+		<publisher>UMI</publisher>
+		<info name="serial" value="1604" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="4096">
+				<rom name="spiders of mars (umi)(1982)(1604)(e).60" size="4096" crc="619fc2f8" sha1="fbfae17cb7ca8fbecc099ea07341a39a020b688f" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="4096">
+				<rom name="spiders of mars (umi)(1982)(1604)(e).a0" size="4096" crc="b1f31ddc" sha1="9dd7507761b9ae818ce17c04239bdc1ae2445f44" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spikpeak">
+		<description>Spike's Peak (NTSC)</description>
+		<!-- This double ended cartridge also included "Ghost Manor". -->
+		<year>1983</year>
+		<publisher>Xonox</publisher>
+		<info name="serial" value="6215-B" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="spike's peak (xonox)(1983)(6215-b)(ju).a0" size="8192" crc="cffb4e0e" sha1="099264d056610864901b2708bab385c93d54d5da" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spills">
+		<description>Spills &amp; Fills (NTSC)</description>
+		<year>1983</year>
+		<publisher>Creative</publisher>
+		<info name="serial" value="VI SF C" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="spills &amp; fills (creative)(1983)(vi sf c)(ju).a0" size="8192" crc="fdd7c24d" sha1="7275ea56cfc5836733cbefd037252cf06518f0c9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="springer">
+		<description>Springer (NTSC)</description>
+		<year>1983</year>
+		<publisher>UMI</publisher>
+		<info name="serial" value="7-006-20" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="springer (tigervision)(1983)(7-006-20)(ju).60" size="8192" crc="0a962ad5" sha1="b179e1c65107f6491d46629e4d4044e9ccdb113b" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="springer (tigervision)(1983)(7-006-20)(ju).a0" size="8192" crc="8513de1a" sha1="6f5c6e812c877217099e36e9a0f567eb1c5c6dc8" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="squish">
+		<description>Squish 'em (NTSC)</description>
+		<year>1983</year>
+		<publisher>Sirius</publisher>
+		<info name="serial" value="220??" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="squish 'em (sirius)(1983)(220--)(ju).60" size="8192" crc="a40f5508" sha1="d6531a660aadef9688bb1e9ca193d68a36c74435" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="squish 'em (sirius)(1983)(220--)(ju).a0" size="8192" crc="d5dd5203" sha1="a3cac49d89ff5c77630b7347d28b2f4257f5d2b3" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starbatl">
+		<description>Star Battle (NTSC)</description>
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1902" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="star battle (commodore)(1981)(vic-1902)(ju).a0" size="8192" crc="e222063c" sha1="19ae9d851e50b90f17b1b2c2446abccda7c2396f" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starpost">
+		<description>Star Post</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1939" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="star post (commodore)(1982)(vic-1939).a0" size="8192" crc="34e894f9" sha1="7ae08def878f0397cd23fb9d1bd345740787acab" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="startrek">
+		<description>Star Trek: Strategic Operations Simulator</description>
+		<year>1983</year>
+		<publisher>SEGA</publisher>
+		<info name="serial" value="006-04" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="star trek - strategic operations simulator (sega)(1983)(006-04)(jue).a0" size="8192" crc="dc95800f" sha1="4d2c6b511f9e7666bfdf66dafb3c1f043956f291" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="storymac">
+		<description>Story Machine</description>
+		<year>1983</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="C323" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="story machine (hes)(1983)(c323)(jue).60" size="8192" crc="8ba0e1a0" sha1="97052c7bc17688faebc1483c8cc9f958ad1ff9d6" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="4096">
+				<rom name="story machine (hes)(1983)(c323)(jue).a0" size="4096" crc="b691d4df" sha1="7be1deccc0b9ded4a49d1991dc421cfa199f91aa" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subchase">
+		<description>Sub Chase (PAL)</description>
+		<year>1982</year>
+		<publisher>UMI</publisher>
+		<info name="serial" value="16??" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="sub chase (umi)(1982)(16--)(e).a0" size="4096" crc="585a901f" sha1="077ceaeb63fb95a8255321aded3f246c1142bd18" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subcmndr">
+		<description>Sub Commander</description>
+		<year>1982</year>
+		<publisher>Thorn EMI</publisher>
+		<info name="serial" value="THC22003" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="4096">
+				<rom name="submarine commander (thorn emi)(1982)(thc22003)(jue).60" size="4096" crc="8817b702" sha1="3311c1c9b864447349da3987056de2e7628496ce" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="submarine commander (thorn emi)(1982)(thc22003)(jue).a0" size="8192" crc="e402fb1d" sha1="0aa97e2931446b1286a01f563198e7c40f5b4678" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spramok">
+		<description>Super Amok (NTSC)</description>
+		<year>198?</year>
+		<publisher>UMI</publisher>
+		<info name="serial" value="1642" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="super amok (umi)(198-)(1642)(ju).a0" size="8192" crc="ddc1a498" sha1="455e1273f7b9e1527e2ac3c4ba45432e0cc18d6a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprexpnd">
+		<description>Super Expander</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1211A" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="super expander(commadore)(198-)(vic-1211a).a0" size="4096" crc="c576ba40" sha1="aa92ac00a945d8496d7f2bf1c869736ee840d7c5" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprsmash">
+		<description>Super Smash (NTSC)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1921" />
+		<info name="usage" value="Game Paddles required" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="super smash (commodore)(1982)(vic-1921)(ju)(paddles).a0" size="8192" crc="51d04db0" sha1="cd5e5917b81fd5c3226f668e42b4381df6307d70" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprsmash1" cloneof="sprsmash">
+		<description>Super Smash (NTSC, Alt)</description>
+		<!-- File Difference -->
+				<!-- 0x1fff : 0x00 ('sprsmash') - 0xaa ('sprsmash1') -->
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1921" />
+		<info name="usage" value="Game Paddles required" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="super smash (commodore)(1982)(vic-1921)(ju)(paddles)[a].a0" size="8192" crc="67d30746" sha1="3a8487f4cccded83a98ec0a2e023107e663527c2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="synthsnd">
+		<description>Synthesound</description>
+		<year>1982</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="C306" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="synthesound (hes)(1982)(c306)(jue).a0" size="8192" crc="ed36a7fe" sha1="e456598df2e6ef4bb3ea4e3d21716355da332f33" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankatak">
+		<description>Tank Atak (PAL)</description>
+		<year>1982</year>
+		<publisher>Supersoft</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="tank atak (supersoft)(1982)(e).a0" size="8192" crc="4b6d5477" sha1="ec1892427afc29fd76bcf6120e985d4ef99c0f41" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankwars">
+		<description>Tank Wars</description>
+		<year>198?</year>
+		<publisher>Machine Language Games</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="tank wars (machine language games)(198-).a0" size="4096" crc="a0678801" sha1="1fb132603c241c45c2fcef4d2f75a5acb79b6bde" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teragard">
+		<description>Terraguard (NTSC)</description>
+		<year>1982</year>
+		<publisher>Creative</publisher>
+		<info name="serial" value="VI TG C" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="terraguard (creative)(1982)(vi tg c)(ju).a0" size="4096" crc="bc4eb662" sha1="24570432675476fed13a8bccc33e93c54e62eff2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teragard1" cloneof="teragard">
+		<description>Terraguard (NTSC, Alt)</description>
+		<year>1982</year>
+		<publisher>Creative</publisher>
+		<info name="serial" value="VI TG C" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="terraguard (creative)(1982)(vi tg c)(ju)[a].a0" size="4096" crc="3079a31b" sha1="34548ad6f1e61c99cf7d5575101b0f8186390201" offset="0x0000" />
+				<!-- File Difference -->
+				<!-- 0x0460 : 0xea 0xea 0xea ('teragard') - 0x8c 0x8c 0xaa3 ('teragard1') -->
+				<!-- 0x0480 : 0xea 0xea 0xea ('teragard') - 0x8c 0x8f 0xaa3 ('teragard1') -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teragardp" cloneof="teragard">
+		<description>Terraguard (PAL)</description>
+		<year>1982</year>
+		<publisher>Creative</publisher>
+		<info name="serial" value="VI TG C" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="terraguard (creative)(1982)(vi tg c)(e).a0" size="4096" crc="08d51a03" sha1="8fa90ca6cbc32db4efc01a1bb8329b0900d57558" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skyfall">
+		<description>The Sky is Falling</description>
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1911" />
+		<info name="usage" value="Game Paddles required" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="the sky is falling (commodore)(1981)(vic-1911)(paddles).a0" size="8192" crc="1f89c40d" sha1="dbed847a8d6d318ae267cdf1e2ffcdc55170fe23" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skyfall1" cloneof="skyfall">
+		<description>The Sky is Falling (Alt)</description>
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1911" />
+		<info name="usage" value="Game Paddles required" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="the sky is falling (commodore)(1981)(vic-1911)(paddles)[a].a0" size="8192" crc="c29a3a27" sha1="1a600e542333f0e36632955035acc70c05159ac2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thresh">
+		<description>Threshold (NTSC)</description>
+		<year>1981</year>
+		<publisher>Sierra</publisher>
+		<info name="serial" value="THL-401" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="threshold (sierra)(1981)(thl-401)(ju).a0" size="8192" crc="fc2dc4b0" sha1="2fdfc64bb0e8ff182ef70756ae02d6e557aedc0f" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="titan">
+		<description>Titan</description>
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="titan (commodore)(1981)(jue).a0" size="8192" crc="b2625ec5" sha1="616e9f26135653061b36cddb77e2e2da12660f22" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomarc">
+		<description>Tomarc the Barbarian</description>
+		<!-- This double ended cartridge also included "Motocross Racer". -->
+		<year>1984</year>
+		<publisher>Xonox</publisher>
+		<info name="serial" value="6245-A" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="tomarc the barbarian (xonox)(1984)(6245-a)(jue).a0" size="8192" crc="6678daf4" sha1="2100d4d96a68b5c523c740f6e3c935e4811c6843" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toothinv">
+		<description>Tooth Invaders (NTSC)</description>
+		<year>1983</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1938" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="tooth invaders (commodore)(1983)(vic-1938)(ju).a0" size="8192" crc="8364dbbd" sha1="36b8bf6bfc402d62a7a52432356f804db2911d37" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="topper">
+		<description>Topper (NTSC)</description>
+		<year>1983</year>
+		<publisher>Romox</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="topper (romox)(1983)(ju).a0" size="8192" crc="8a655c87" sha1="6b7c4d29645adda84ab04cce28972a8b1a1cb403" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trashman">
+		<description>Trashman</description>
+		<year>1982</year>
+		<publisher>Creative</publisher>
+		<info name="serial" value="VI TM C" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="4096">
+				<rom name="trashman (creative)(1982)(vi tm c).60" size="4096" crc="d2c807e5" sha1="da05171341e6a0b5aa2ca880c7e296ade01333d4" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="4096">
+				<rom name="trashman (creative)(1982)(vi tm c).a0" size="4096" crc="16d0af06" sha1="03859da8bdced9c404baf387bff3d03e2a3bdd6c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turmoil">
+		<description>Turmoil</description>
+		<year>1982</year>
+		<publisher>Sirius</publisher>
+		<info name="serial" value="22005" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="turmoil (sirius)(1982)(22005).a0" size="8192" crc="15a24c3e" sha1="4838ad99e260fbf1fbc851c0f4d0f87719f3e8e9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turtle">
+		<description>Turtle Graphics</description>
+		<year>1982</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="C303" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="turtle graphics (hes)(1982)(c303)(jue).a0" size="8192" crc="b0fc4418" sha1="4ed3ba195a1255e8d5ea74082f012ebbde98668b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turtle1" cloneof="turtle">
+		<description>Turtle Graphics (Alt)</description>
+		<year>1982</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="C303" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="turtle graphics (hes)(1982)(c303)(jue)[a].a0" size="8192" crc="c7bf4db9" sha1="f6723c8225ed7efd0f277bdef42f27d51fe2525a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turtle2" cloneof="turtle">
+		<description>Turtle Graphics (Alt 2)</description>
+		<year>1982</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="C303" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="turtle graphics (hes)(1982)(c303)(jue)[a2].a0" size="8192" crc="8e25f1d3" sha1="7ff339e27c464e4a6758bbd65efd3e72e83d3a6a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tutank">
+		<description>Tutankham</description>
+		<year>198?</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="serial" value="PB1430" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="tutankham (parker brothers)(198-)(pb1430).a0" size="8192" crc="bf4d8607" sha1="8373441050ef0cdb5af93fc11009d43e5f608ddb" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typeatak">
+		<description>Type Attack (NTSC)</description>
+		<year>1982</year>
+		<publisher>Sirius</publisher>
+		<info name="serial" value="22010" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="type attack (sirius)(1982)(22010)(ju).a0" size="8192" crc="693cb8d2" sha1="e89a82c1d2db70eb71196e767afea5ccc3fbfc1e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typo">
+		<description>Typo (NTSC)</description>
+		<year>1983</year>
+		<publisher>Romox</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="typo (romox)(1983)(ju).a0" size="8192" crc="55fb5912" sha1="0a775cd657685a965c254490e8bbffa3123ecc63" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vcextra">
+		<description>VC Extra</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="vc extra (198-).a0" size="8192" crc="74f0ab30" sha1="314198eef14266c83b088781ed3fbf0c06daa236" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madboogy">
+		<description>VC Song-Cartridge - The Mad Boogy (Ger)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="vc song-cartridge - the mad boogy (g).a0" size="8192" crc="98730bfb" sha1="46f0c59278716fc337672c952d8a9eb07bd1d013" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madboogy1" cloneof="madboogy">
+		<description>VC Song-Cartridge - The Mad Boogy (Ger, Alt)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="vc song-cartridge - the mad boogy (g) [a].a0" size="8192" crc="a1aef256" sha1="2de4d9786cb56bf4fad52059d6b41803fd279c76" offset="0x0000" />
+				<!-- File Difference -->
+				<!-- 0x0000 : 0x09 0xa0 ('madboogy') - 0x63 0xb0 ('madboogy1') -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="syntsong">
+		<description>VC Song-Cartridge - The Synthe-Song (Ger)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="vc song-cartridge - the synthe-song (g).a0" size="8192" crc="73000cb0" sha1="670410e00d52442dcee2221327bf832e115ba691" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micromon">
+		<description>VIC 20 Micromon v1.2</description>
+		<year>1983</year>
+		<publisher>Bill Yee</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="b000" size="4096">
+				<rom name="vic 20 micromon v1.2 (bill yee)(1983)(jue).b0" size="4096" crc="91828167" sha1="60753be59f87fafd4931dbf48a5248dc3d25fcc9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colrtest">
+		<description>VIC Color Test (Ger)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="2048">
+				<rom name="vic color test (g).a0" size="2048" crc="076cf09c" sha1="3269d14e73f961254a8f3afeb5c73f7dc6855e6b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="debug98">
+		<description>VIC Debug 98</description>
+		<year>1998</year>
+		<publisher>Flat Earth Software</publisher>
+		<info name="usage" value="Enter 'SYS 40960' to run" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="vic debug 98 (flat earth software)(1998)(sys40960).a0" size="8192" crc="8f760726" sha1="1e8f4187e025fd52bdde9eb1753588324082c996" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth11">
+		<description>VIC Forth v1.1</description>
+		<year>1982</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="C301" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="vic forth v1.1 (hes)(1982)(c301)(jue).a0" size="8192" crc="e4b00103" sha1="8d0012e12e9dfda39644993ee94a5e9ecf881629" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth10" cloneof="forth11">
+		<description>VIC Forth v1.0</description>
+		<year>1982</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="C301" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="vic forth v1.0 (hes)(1982)(c301)(jue).a0" size="8192" crc="9008d71d" sha1="f1ea128567ed23dd2e0e528595a0474e2a4f1d81" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vicgraph">
+		<description>VIC Graph</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="vic graph (commodore)(198-)(jue).a0" size="8192" crc="b0e6262a" sha1="cdb5ceceef44220399fe794a0a92dfade7cd269a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vicmenag">
+		<description>VIC Menagerie</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1926" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="menagerie  (commodore)(1982)(vic-1926)(jue).a0" size="8192" crc="a3c74629" sha1="aec46a3e6f9797b116cbe6a8792e00530234ae80" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vicmenag1" cloneof="vicmenag">
+		<description>VIC Menagerie (Alt)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1926" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="vic menagerie (commodore)(1982)(vic-1926)(jue)[a].a0" size="8192" crc="1653f246" sha1="26e60943fe75de30945c9459421dc8c9b295e952" offset="0x0000" />
+				<!-- File Difference -->
+				<!-- 0x14d3 : 0x60 ('vicmenag') - 0x64 ('vicmenag1') -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="composer">
+		<description>The VIC Music Composer (NTSC)</description>
+		<year>1982</year>
+		<publisher>Thorn EMI</publisher>
+		<info name="serial" value="THC22002" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="vic music composer, the (thorn emi)(1982)(thc22002)(ju).a0" size="8192" crc="6ec257ab" sha1="4879a29477db77f2f57f557ef36ccf07550a922a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="composer1" cloneof="composer">
+		<description>The VIC Music Composer (NTSC, Alt)</description>
+		<year>1982</year>
+		<publisher>Thorn EMI</publisher>
+		<info name="serial" value="THC22002" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="vic music composer, the (thorn emi)(1982)(thc22002)(ju)[a].a0" size="8192" crc="f24498d1" sha1="e3ba0b528c7c9a4aad741d0b68d2348dea0bace2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vicstat">
+		<description>VIC Stat</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="vic stat (commodore)(198-)(jue).a0" size="8192" crc="a66c4bc1" sha1="3d643ecb7bc55130c2ca23ce1dd4070973e0ad9e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vicdiag">
+		<description>VIC 20 Diagnostic Cartridge (NTSC)</description>
+		<year>1980</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="vic20 diagnostic cartridge (commodore)(1980)(ju).a0" size="4096" crc="a351a316" sha1="bf90b19e175d60bff7a52e9a9feee6ad20f3b38b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vicdiagp" cloneof="vicdiag">
+		<description>VIC 20 Diagnostic Cartridge (PAL)</description>
+		<year>1980</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="vic20 diagnostic cartridge (commodore)(1980)(e).a0" size="4096" crc="bead85aa" sha1="b0f54a7a736f92c2a47fbb7fa44854407033b8ec" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="victerm">
+		<description>VICterm 40</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1610" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="victerm 40 (commodore)(198-)(vic-1610)(jue).a0" size="4096" crc="3acd824e" sha1="893653dd0e54ff37fbf68afbfb84626eeb16a848" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="victool">
+		<description>Vic Tool</description>
+		<year>198?</year>
+		<publisher>VCC</publisher>
+		<info name="usage" value="Enter 'SYS 45056' to run" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="b000" size="2048">
+				<rom name="victool (vcc)(198-)(jue) (sys 45056).b0" size="2048" crc="b17037e0" sha1="f585462ad2c8241380895c99e2f57f75758d7b82" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vidverm">
+		<description>Video Vermin</description>
+		<year>1982</year>
+		<publisher>UMI</publisher>
+		<info name="serial" value="1638" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="video vermin (umi)(1982)(1638)(jue).a0" size="8192" crc="a4fe2362" sha1="6df279e642dfe5cc2915ac99382ad43c6c60ad9f" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vsolsys">
+		<description>Visible Solar System</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1930" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="visible solar system (commodore)(1982)(vic-1930)(jue).a0" size="8192" crc="0a9b0456" sha1="a7b767173316eecb1407083ab4715963bef9d751" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vsolsys1" cloneof="vsolsys">
+		<description>Visible Solar System (Alt)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1930" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="visible solar system (commodore)(1982)(vic-1930)(jue)[a].a0" size="8192" crc="c4967f23" sha1="459a22a9affdc73b5fa6868fef398b0707a70a17" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vsolsys2" cloneof="vsolsys">
+		<description>Visible Solar System (Alt 2)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="VIC-1930" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+					<rom name="visible solar system (commodore)(1982)(vic-1930)(jue)[a2].a0" size="8192" crc="ee5d7a91" sha1="94f2ac4d58e9ffe4861c00de5551bdcb60b9dbf7" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vidmania">
+		<description>Videomania (NTSC)</description>
+		<year>1982</year>
+		<publisher>Creative</publisher>
+		<info name="serial" value="VI VM C" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="videomania (creative)(1982)(vi vm c)(ju).a0" size="4096" crc="5e62733d" sha1="cf5afd0db85f4959d8601ea10240345b527a825b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vidmaniap" cloneof="vidmania">
+		<description>Videomania (PAL)</description>
+		<year>1982</year>
+		<publisher>Creative</publisher>
+		<info name="serial" value="VI VM C" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="4096">
+				<rom name="videomania (creative)(1982)(vi vm c)(e).a0" size="4096" crc="e32563a9" sha1="e8b7be53ef5b8d2660483721c984a5a584aae0a0" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordcrft">
+		<description>Wordcraft 20</description>
+		<year>1982</year>
+		<publisher>UMI</publisher>
+		<info name="serial" value="16??" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="6000" size="8192">
+				<rom name="wordcraft 20 (umi)(1982)(16--).60" size="8192" crc="7478d259" sha1="f96b9d229dbd6e0acd7f4084a2a48e017ea6a6a8" offset="0x0000" />
+			</dataarea>
+			<dataarea name="a000" size="8192">
+				<rom name="wordcraft 20 (umi)(1982)(16--).a0" size="8192" crc="ae8e906b" sha1="89ff138c27caf9a4a0fbe2429f36b2ae9d078f10" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="writenow">
+		<description>Writre Now!</description>
+		<year>1983</year>
+		<publisher>Cardco</publisher>
+		<info name="usage" value="Enter 'SYS 41000' to run" />
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="a000" size="8192">
+				<rom name="write now! (cardco)(1983)(jue)(sys 41000).a0" size="8192" crc="3616451e" sha1="e4b9a71dfd5b31406a681a7e5b09888039789fd2" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
