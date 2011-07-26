@@ -1925,6 +1925,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+	<software name="drfrankn">
+		<description>Dr. Franken (Prototype Demo)</description>
+		<year>1993</year>
+		<publisher>Elite</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="dr. franken (demo).bin" size="131072" crc="c9907dce" sha1="e64e08db40c9e2358535b143cf7a18bc7c315846" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Serial: T-70148-50 -->
 	<software name="dragon">
 		<description>Dragon - The Bruce Lee Story (Euro)</description>
@@ -7525,6 +7536,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="superman - the man of steel (europe).bin" size="262144" crc="73df5a15" sha1="8e0d837cf285d8669d30ef1328453949cea70a6a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supermanp" cloneof="superman">
+		<description>Superman - The Man of Steel (Euro, Prototype)</description>
+		<year>1993</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="superman - the man of steel (proto).bin" size="262144" crc="aa3f2172" sha1="e5eb3687937f453e67c912e429894fe2196fb419" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
