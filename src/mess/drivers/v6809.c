@@ -25,17 +25,14 @@ Monitor commands:
 D boot from floppy (launch Flex OS)
 F relaunch Flex
 G go
-M modify memory
+M modify memory (. to exit)
 
 ToDo:
 
 - Fix the video, it is currently a complete hackfest.
--- The system constantly modifies the crtc start address, cursor address,
-   and the location of the prompt, causing the screen to go insane. So,
-   these are currently disabled.
--- Doing a soft reset fixes the cursor problem.
+-- Cursor not working
 -- Colours are a guess
--- Doesn't scroll
+-- Doesn't scroll properly.
 -- Please note, the colour bytes are intermingled with the characters,
    this appears to be the most likely mode of operation.
 
@@ -109,9 +106,6 @@ READ8_MEMBER( v6809_state::status_r )
 
 WRITE8_MEMBER( v6809_state::videoram_w )
 {
-	// Stops screen getting filled with garbage - fixme
-	if ( ((data == 0x20) || (data == 0x2a) || (data == 0x7f)) && !BIT(m_video_address,0) ) return;
-
 	m_p_videoram[m_video_address & 0xfff] = data;
 }
 
@@ -130,9 +124,6 @@ WRITE8_MEMBER( v6809_state::v6809_register_w )
 {
 	UINT16 temp = m_video_address >> 1;
 
-	if ((m_video_index == 12) || (m_video_index == 13))
-	{  } // stop screen going berserk - fixme
-	else
 	m_crtc->register_w( space, 0, data );
 
 	// Get transparent address
@@ -203,11 +194,13 @@ MC6845_UPDATE_ROW( v6809_update_row )
 	UINT16 mem,x;
 	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
 
+	ma &= 0x7ff;
+
 	for (x = 0; x < x_count; x++)
 	{
 		mem = (ma + x) << 1;
 		chr = state->m_p_videoram[mem++];
-		if (!chr) chr=0x20;
+		if (!chr) chr=0x20; // remove when we get the correct chargen
 
 		col = state->m_p_videoram[mem];
 		fg = col >> 4;
