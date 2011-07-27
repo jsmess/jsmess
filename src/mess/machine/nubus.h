@@ -1,8 +1,8 @@
 /***************************************************************************
- 
+
   nubus.h - NuBus bus and card emulation
- 
-  by R. Belmont, based heavily on Miodrag Milanovic's ISA8/16 implementation  
+
+  by R. Belmont, based heavily on Miodrag Milanovic's ISA8/16 implementation
 
 ***************************************************************************/
 
@@ -31,8 +31,8 @@
 #define MCFG_NUBUS_ONBOARD_ADD(_nbtag, _tag, _dev_type, _def_inp) \
     MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
 	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
-	device_nubus_card_interface::static_set_nubus_tag(*device, _nbtag, _tag); 	
-	
+	device_nubus_card_interface::static_set_nubus_tag(*device, _nbtag, _tag);
+
 #define MCFG_NUBUS_BUS_REMOVE(_tag) \
     MCFG_DEVICE_REMOVE(_tag)
 
@@ -49,8 +49,8 @@ public:
 	// construction/destruction
 	nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	nubus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-	
-	// device-level overrides	
+
+	// device-level overrides
 	virtual void device_start();
 
     // inline configuration
@@ -135,7 +135,7 @@ public:
 	virtual ~device_nubus_card_interface();
 
 	device_nubus_card_interface *next() const { return m_next; }
-	
+
 	void set_nubus_device();
 
     void install_declaration_rom(const char *romregion);

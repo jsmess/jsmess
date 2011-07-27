@@ -100,7 +100,7 @@
 #define ADB_IS_PM	((mac->m_model >= MODEL_MAC_PORTABLE && mac->m_model <= MODEL_MAC_PB100) || (mac->m_model >= MODEL_MAC_PB140 && mac->m_model <= MODEL_MAC_PBDUO_270c))
 #define ADB_IS_PM_VIA1	(mac->m_model >= MODEL_MAC_PORTABLE && mac->m_model <= MODEL_MAC_PB100)
 #define ADB_IS_PM_VIA2	(mac->m_model >= MODEL_MAC_PB140 && mac->m_model <= MODEL_MAC_PBDUO_270c)
-#define ADB_IS_PM_CLASS	((m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100) || (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c)) 
+#define ADB_IS_PM_CLASS	((m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100) || (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c))
 
 #define AUDIO_IS_CLASSIC (mac->m_model <= MODEL_MAC_CLASSIC)
 #define MAC_HAS_VIA2	((m_model >= MODEL_MAC_II) && (m_model != MODEL_MAC_IIFX))
@@ -351,8 +351,8 @@ void mac_asc_irq(device_t *device, int state)
 	}
 	else if ((mac->m_model == MODEL_MAC_PORTABLE) || (mac->m_model == MODEL_MAC_PB100))
 	{
-//		m_asc_interrupt = state;
-//		mac->field_interrupts();
+//      m_asc_interrupt = state;
+//      mac->field_interrupts();
 	}
 	else if ((mac->m_model >= MODEL_MAC_II) && (mac->m_model != MODEL_MAC_IIFX))
 	{
@@ -413,7 +413,7 @@ void mac_state::v8_resize()
 		is_rom = FALSE;
 	}
 
-//	printf("mac_v8_resize: memory_size = %x, ctrl bits %02x (overlay %d = %s)\n", memory_size, m_rbv_regs[1] & 0xe0, m_overlay, is_rom ? "ROM" : "RAM");
+//  printf("mac_v8_resize: memory_size = %x, ctrl bits %02x (overlay %d = %s)\n", memory_size, m_rbv_regs[1] & 0xe0, m_overlay, is_rom ? "ROM" : "RAM");
 
 	if (is_rom)
 	{
@@ -2119,7 +2119,7 @@ static void pmu_exec(mac_state *mac)
 
 		case 0x20:	// send ADB command (PMU must issue an IRQ on completion)
 			#if 0
-			printf("PMU: Send ADB %02x %02x cmd %02x flag %02x data %02x\n", 
+			printf("PMU: Send ADB %02x %02x cmd %02x flag %02x data %02x\n",
 				   mac->m_pm_cmd[0],
 				   mac->m_pm_cmd[1],
 				   mac->m_pm_cmd[2],
@@ -2129,7 +2129,7 @@ static void pmu_exec(mac_state *mac)
 
 			if (((mac->m_pm_cmd[2] == 0xfc) || (mac->m_pm_cmd[2] == 0x2c)) && (mac->m_pm_cmd[3] == 4))
 			{
-//				printf("PMU: request to poll ADB, returning nothing\n");
+//              printf("PMU: request to poll ADB, returning nothing\n");
 				mac->m_pm_slen = 0;
 				mac->m_pmu_int_status = 0;
 			}
@@ -2289,7 +2289,7 @@ static void pmu_exec(mac_state *mac)
 				{
 					mac->m_pm_out[0] = mac->m_pm_out[1] = 2;
 					mac->m_pm_out[2] = mac->m_pmu_int_status; // ADB status in low nibble
-					mac->m_pm_out[3] = mac->m_pmu_last_adb_command;	  	  // ADB command that was sent OR 0x80 for extra error-ness
+					mac->m_pm_out[3] = mac->m_pmu_last_adb_command;		  // ADB command that was sent OR 0x80 for extra error-ness
 					mac->m_pm_out[4] = 0;							  // return data
 					mac->m_pm_slen = 4;
 					mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1500)));
@@ -2326,7 +2326,7 @@ static void pmu_exec(mac_state *mac)
 				int i;
 
 				mac->m_pm_out[0] = mac->m_pm_out[1] = mac->m_pm_cmd[4];
-//				printf("PMU read at %x\n", mac->m_pm_cmd[2] | (mac->m_pm_cmd[3]<<8));
+//              printf("PMU read at %x\n", mac->m_pm_cmd[2] | (mac->m_pm_cmd[3]<<8));
 
 				// note: read at 0xEE00 0 = target disk mode, 0xff = normal bootup
 
@@ -2536,7 +2536,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 		case MODEL_MAC_IICX:
 			return 0x81 | PA6;
 
-		case MODEL_MAC_PB140:	// since the ASICs are different, these are allowed to "collide" 
+		case MODEL_MAC_PB140:	// since the ASICs are different, these are allowed to "collide"
 		case MODEL_MAC_PB160:
 		case MODEL_MAC_CLASSIC_II:
 		case MODEL_MAC_QUADRA_800:
@@ -3033,7 +3033,7 @@ void mac_state::machine_reset()
 		m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 	}
 
-	// we use the CPU clock divided by the VIA clock (783360 Hz) rounded up as 
+	// we use the CPU clock divided by the VIA clock (783360 Hz) rounded up as
 	// an approximation for the right number of wait states.  this yields good
 	// results - it's towards the end of the worst-case delay on h/w.
 	switch (m_maincpu->clock())
@@ -3469,7 +3469,7 @@ WRITE_LINE_MEMBER(mac_state::nubus_irq_d_w)
 WRITE_LINE_MEMBER(mac_state::nubus_irq_e_w)
 {
 	nubus_slot_interrupt(0xe, state);
-}   					 
+}
 
 /* *************************************************************************
  * Trap Tracing

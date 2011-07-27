@@ -7,28 +7,28 @@
 
 **********************************************************************
 
-					GND		 1		A		GND
-					NC		 2		B		DS
-					+5V		 3		C		V+
-					D0		 4		D		D1
-					D2		 5		E		D3
-					D4		 6		F		D5
-					D6		 7		H		D7
-					_DP		 8		J		Q
-					_CLEAR	 9		K		_MRD
-					TPA		10		L		N0
-					N1		11		M		N2
-					_RAS	12		N		_INT
-					_WAIT	13		P		CLOCK
-					SC1		14		R		SC0
-					_EF4	15		S		_CASE
-					TPB		16		T		_A15
-					_MWR	17		U		A14
-					MA7		18		V		_A14
-					MA5		19		W		MA6
-					MA4		20		X		MA3
-					MA2		21		Y		_EXTROM
-					MA1		22		Z		MA0
+                    GND      1      A       GND
+                    NC       2      B       DS
+                    +5V      3      C       V+
+                    D0       4      D       D1
+                    D2       5      E       D3
+                    D4       6      F       D5
+                    D6       7      H       D7
+                    _DP      8      J       Q
+                    _CLEAR   9      K       _MRD
+                    TPA     10      L       N0
+                    N1      11      M       N2
+                    _RAS    12      N       _INT
+                    _WAIT   13      P       CLOCK
+                    SC1     14      R       SC0
+                    _EF4    15      S       _CASE
+                    TPB     16      T       _A15
+                    _MWR    17      U       A14
+                    MA7     18      V       _A14
+                    MA5     19      W       MA6
+                    MA4     20      X       MA3
+                    MA2     21      Y       _EXTROM
+                    MA1     22      Z       MA0
 
 **********************************************************************/
 

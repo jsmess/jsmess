@@ -20,10 +20,10 @@ class coco_multipak_device :
 public:
 		// construction/destruction
         coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		
+
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
-		
+
 		virtual UINT8* get_cart_base();
 protected:
         // device-level overrides
@@ -33,12 +33,12 @@ protected:
 
         // internal state
 		cococart_slot_device *m_owner;
-		
+
 		cococart_slot_device *m_slot1;
 		cococart_slot_device *m_slot2;
 		cococart_slot_device *m_slot3;
 		cococart_slot_device *m_slot4;
-		
+
 		cococart_slot_device *m_active;
 };
 

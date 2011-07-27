@@ -104,8 +104,8 @@ static ADDRESS_MAP_START(sdk86_io, AS_IO, 16, sdk86_state)
 	// FFF0-FFF3 = 8251 serial chip (even -> data, control) AM_MIRROR(4)
 	// FFF8-FFFF = 2 x 8255A i/o chips. chip 1 uses the odd addresses, chip 2 uses the even addresses.
 	//             ports are A,B,C,control in that order.
-	
-	
+
+
 ADDRESS_MAP_END
 
 /* Input ports */

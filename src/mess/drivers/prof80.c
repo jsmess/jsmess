@@ -43,7 +43,7 @@
 //**************************************************************************
 
 //-------------------------------------------------
-//  bankswitch - 
+//  bankswitch -
 //-------------------------------------------------
 
 void prof80_state::bankswitch()
@@ -96,7 +96,7 @@ void prof80_state::bankswitch()
 //**************************************************************************
 
 //-------------------------------------------------
-//  floppy_motor_off - 
+//  floppy_motor_off -
 //-------------------------------------------------
 
 void prof80_state::floppy_motor_off()
@@ -123,7 +123,7 @@ static TIMER_CALLBACK( floppy_motor_off_tick )
 
 
 //-------------------------------------------------
-//  ls259_w - 
+//  ls259_w -
 //-------------------------------------------------
 
 void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
@@ -225,7 +225,7 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 
 
 //-------------------------------------------------
-//  flr_w - 
+//  flr_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( prof80_state::flr_w )
@@ -256,7 +256,7 @@ WRITE8_MEMBER( prof80_state::flr_w )
 
 
 //-------------------------------------------------
-//  status_r - 
+//  status_r -
 //-------------------------------------------------
 
 READ8_MEMBER( prof80_state::status_r )
@@ -291,7 +291,7 @@ READ8_MEMBER( prof80_state::status_r )
 
 
 //-------------------------------------------------
-//  status2_r - 
+//  status2_r -
 //-------------------------------------------------
 
 READ8_MEMBER( prof80_state::status2_r )
@@ -349,7 +349,7 @@ READ8_MEMBER( prof80_state::status2_r )
 
 
 //-------------------------------------------------
-//  par_w - 
+//  par_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( prof80_state::par_w )
@@ -368,20 +368,20 @@ WRITE8_MEMBER( prof80_state::par_w )
 WRITE8_MEMBER( prof80_state::unio_ctrl_w )
 {
 //  int flag = BIT(data, 0);
-	int flad = (data >> 1) & 0x07;
+    int flad = (data >> 1) & 0x07;
 
-	switch (flad)
-	{
-	case 0: // CG1
-	case 1: // CG2
-	case 2: // _STB1
-	case 3: // _STB2
-	case 4: // _INIT
-	case 5: // JSO0
-	case 6: // JSO1
-	case 7: // JSO2
-		break;
-	}
+    switch (flad)
+    {
+    case 0: // CG1
+    case 1: // CG2
+    case 2: // _STB1
+    case 3: // _STB2
+    case 4: // _INIT
+    case 5: // JSO0
+    case 6: // JSO1
+    case 7: // JSO2
+        break;
+    }
 }
 */
 
@@ -408,7 +408,7 @@ static ADDRESS_MAP_START( prof80_io, AS_IO, 8, prof80_state )
 //  AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(UNIO_Z80STI_TAG, z80sti_r, z80sti_w)
 //  AM_RANGE(0x94, 0x95) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(UNIO_Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
 //  AM_RANGE(0x96, 0x97) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(UNIO_Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
-//	AM_RANGE(0x9e, 0x9e) AM_MIRROR(0xff00) AM_WRITE(unio_ctrl_w)
+//  AM_RANGE(0x9e, 0x9e) AM_MIRROR(0xff00) AM_WRITE(unio_ctrl_w)
 //  AM_RANGE(0x9c, 0x9c) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY(UNIO_CENTRONICS1_TAG, centronics_data_w)
 //  AM_RANGE(0x9d, 0x9d) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY(UNIO_CENTRONICS1_TAG, centronics_data_w)
 //  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_READ(gripc_r)
@@ -573,11 +573,11 @@ static ECBBUS_INTERFACE( ecb_intf )
 
 static SLOT_INTERFACE_START( prof80_ecb_cards )
 	SLOT_INTERFACE("grip21", ECB_GRIP21)
-/*	SLOT_INTERFACE("grip25", ECB_GRIP25)
-	SLOT_INTERFACE("grip26", ECB_GRIP26)
-	SLOT_INTERFACE("grip31", ECB_GRIP31)
-	SLOT_INTERFACE("grip562", ECB_GRIP562)
-	SLOT_INTERFACE("grips115", ECB_GRIPS115)*/
+/*  SLOT_INTERFACE("grip25", ECB_GRIP25)
+    SLOT_INTERFACE("grip26", ECB_GRIP26)
+    SLOT_INTERFACE("grip31", ECB_GRIP31)
+    SLOT_INTERFACE("grip562", ECB_GRIP562)
+    SLOT_INTERFACE("grips115", ECB_GRIPS115)*/
 SLOT_INTERFACE_END
 
 
@@ -656,7 +656,7 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
-	
+
 	// ECB bus
 	MCFG_ECBBUS_ADD(Z80_TAG, ecb_intf)
 	MCFG_ECBBUS_SLOT_ADD(1, "ecb_1", prof80_ecb_cards, "grip21", NULL)

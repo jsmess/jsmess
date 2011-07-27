@@ -3,7 +3,7 @@
  *
  *  Created on: 16/07/2011
  *
- *	Amstrad SSA-1 - SP0256-AL2 based Speech Synthesiser and Sound Amplifier
+ *  Amstrad SSA-1 - SP0256-AL2 based Speech Synthesiser and Sound Amplifier
  *
  *  Uses on-board resonator, clocked at 3.12MHz
  *

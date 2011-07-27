@@ -79,12 +79,12 @@ void comx_thm_device::device_reset()
 UINT8 comx_thm_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
-	
+
 	if (offset >= 0xc000 && offset < 0xd000)
 	{
 		data = m_rom[offset & 0xfff];
 	}
-	
+
 	return data;
 }
 
@@ -96,11 +96,11 @@ UINT8 comx_thm_device::comx_mrd_r(offs_t offset, int *extrom)
 UINT8 comx_thm_device::comx_io_r(offs_t offset)
 {
 	/*
-		INP 2 is used for the printer status, where:
-		b0=1: Printer Not Ready
-		b1=1: Energizing Head
-		b2=1: Head At Position 0
-	*/
+        INP 2 is used for the printer status, where:
+        b0=1: Printer Not Ready
+        b1=1: Energizing Head
+        b2=1: Head At Position 0
+    */
 
 	return 0;
 }
@@ -113,10 +113,10 @@ UINT8 comx_thm_device::comx_io_r(offs_t offset)
 void comx_thm_device::comx_io_w(offs_t offset, UINT8 data)
 {
 	/*
-		OUT 2 is used to control the thermal printer where:
-		Q = 0, b0-7: Pixel 1 to 8
-		Q = 1, b7: Pixel 9 (if b0-6=#21)
-		Q = 1, b3=1: Move head right
-		Q = 1, b0-7=#12: Move head left
-	*/
+        OUT 2 is used to control the thermal printer where:
+        Q = 0, b0-7: Pixel 1 to 8
+        Q = 1, b7: Pixel 9 (if b0-6=#21)
+        Q = 1, b3=1: Move head right
+        Q = 1, b0-7=#12: Move head left
+    */
 }

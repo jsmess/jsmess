@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	GRIP - Grafik Interface Prozessor
+    GRIP - Grafik Interface Prozessor
 
 ***************************************************************************/
 
@@ -173,24 +173,24 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( grip5_io, AS_IO, 8, grip5_device )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(eprom_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
+    ADDRESS_MAP_GLOBAL_MASK(0xff)
+    AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
+    AM_RANGE(0x10, 0x10) AM_WRITE(eprom_w)
+    AM_RANGE(0x11, 0x11) AM_WRITE(vol0_w)
 //  AM_RANGE(0x12, 0x12) AM_WRITE(rts_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(page_w)
+    AM_RANGE(0x13, 0x13) AM_WRITE(page_w)
 //  AM_RANGE(0x14, 0x14) AM_WRITE(str_w)
 //  AM_RANGE(0x15, 0x15) AM_WRITE(intl_w)
-	AM_RANGE(0x16, 0x16) AM_WRITE(dpage_w)
-	AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
-	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE_LEGACY(Z80STI_TAG, z80sti_r, z80sti_w)
-	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
-	AM_RANGE(0x40, 0x40) AM_READ(stat_r)
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE(HD6345_TAG, hd6345_device, address_w)
-	AM_RANGE(0x52, 0x52) AM_DEVWRITE(HD6345_TAG, hd6345_device, register_w)
-	AM_RANGE(0x53, 0x53) AM_DEVREAD(HD6345_TAG, hd6345_device, register_r)
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
+    AM_RANGE(0x16, 0x16) AM_WRITE(dpage_w)
+    AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
+    AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE_LEGACY(Z80STI_TAG, z80sti_r, z80sti_w)
+    AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
+    AM_RANGE(0x40, 0x40) AM_READ(stat_r)
+    AM_RANGE(0x50, 0x50) AM_DEVWRITE(HD6345_TAG, hd6345_device, address_w)
+    AM_RANGE(0x52, 0x52) AM_DEVWRITE(HD6345_TAG, hd6345_device, register_w)
+    AM_RANGE(0x53, 0x53) AM_DEVREAD(HD6345_TAG, hd6345_device, register_r)
+    AM_RANGE(0x60, 0x60) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
+    AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 
 //  AM_RANGE(0x80, 0x80) AM_WRITE(xrflgs_w)
 //  AM_RANGE(0xc0, 0xc0) AM_WRITE(xrclrg_w)
@@ -241,28 +241,28 @@ void grip_device::crtc_update_row(mc6845_device *device, bitmap_t *bitmap, const
 static MC6845_UPDATE_ROW( grip_update_row )
 {
 	grip_device *grip = downcast<grip_device *>(device->owner());
-	
+
 	grip->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,param);
 }
 /*
 static MC6845_UPDATE_ROW( grip5_update_row )
 {
-	grip5_state *state = device->machine().driver_data<grip5_state>();
-	int column, bit;
+    grip5_state *state = device->machine().driver_data<grip5_state>();
+    int column, bit;
 
-	for (column = 0; column < x_count; column++)
-	{
-		UINT16 address = (state->m_dpage << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
-		UINT8 data = state->m_video_ram[address];
+    for (column = 0; column < x_count; column++)
+    {
+        UINT16 address = (state->m_dpage << 12) | (((ma + column) & 0xfff) << 3) | (ra & 0x07);
+        UINT8 data = state->m_video_ram[address];
 
-		for (bit = 0; bit < 8; bit++)
-		{
-			int x = (column * 8) + bit;
-			int color = state->m_flash ? 0 : BIT(data, bit);
+        for (bit = 0; bit < 8; bit++)
+        {
+            int x = (column * 8) + bit;
+            int color = state->m_flash ? 0 : BIT(data, bit);
 
-			*BITMAP_ADDR16(bitmap, y, x) = color;
-		}
-	}
+            *BITMAP_ADDR16(bitmap, y, x) = color;
+        }
+    }
 }
 
 static MC6845_ON_UPDATE_ADDR_CHANGED( grip5_update_addr_changed )
@@ -294,16 +294,16 @@ static const mc6845_interface crtc_intf =
 /*
 static const mc6845_interface grip5_crtc_intf =
 {
-	SCREEN_TAG,
-	8,
-	NULL,
-	grip5_update_row,
-	NULL,
-	DEVCB_DEVICE_LINE(Z80STI_TAG, z80sti_i1_w),
-	DEVCB_DEVICE_LINE(Z80STI_TAG, z80sti_i2_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	grip5_update_addr_changed
+    SCREEN_TAG,
+    8,
+    NULL,
+    grip5_update_row,
+    NULL,
+    DEVCB_DEVICE_LINE(Z80STI_TAG, z80sti_i1_w),
+    DEVCB_DEVICE_LINE(Z80STI_TAG, z80sti_i2_w),
+    DEVCB_NULL,
+    DEVCB_NULL,
+    grip5_update_addr_changed
 };
 */
 
@@ -514,7 +514,7 @@ static MACHINE_CONFIG_FRAGMENT( grip )
 
 	// devices
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz/4, crtc_intf)
-//	MCFG_MC6845_ADD(HD6345_TAG, HD6345, XTAL_16MHz/4, grip5_crtc_intf)
+//  MCFG_MC6845_ADD(HD6345_TAG, HD6345, XTAL_16MHz/4, grip5_crtc_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_Z80STI_ADD(Z80STI_TAG, XTAL_16MHz/4, sti_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
@@ -754,7 +754,7 @@ void grip_device::device_start()
 	// allocate keyboard scan timer
 	m_kb_timer = timer_alloc();
 	m_kb_timer->adjust(attotime::zero, 0, attotime::from_hz(2500));
-	
+
 	// register for state saving
 	save_item(NAME(m_vol0));
 	save_item(NAME(m_vol1));
@@ -769,14 +769,14 @@ void grip_device::device_start()
 /*
 void grip5_state::machine_start()
 {
-	grip_device::machine_start();
+    grip_device::machine_start();
 
-	// setup ROM banking
-	memory_configure_bank(machine(), "eprom", 0, 2, machine().region(Z80_TAG)->base(), 0x4000);
-	memory_set_bank(this, "eprom", 0);
+    // setup ROM banking
+    memory_configure_bank(machine(), "eprom", 0, 2, machine().region(Z80_TAG)->base(), 0x4000);
+    memory_set_bank(this, "eprom", 0);
 
-	// register for state saving
-	save_item(NAME(m_dpage));
+    // register for state saving
+    save_item(NAME(m_dpage));
 }
 */
 
@@ -824,7 +824,7 @@ WRITE8_MEMBER( grip_device::vol1_w )
 
 
 //-------------------------------------------------
-//  flash_w - 
+//  flash_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( grip_device::flash_w )
@@ -955,7 +955,7 @@ WRITE8_MEMBER( grip_device::cxstb_w )
 
 WRITE8_MEMBER( grip5_state::eprom_w )
 {
-	memory_set_bank(machine(), "eprom", BIT(data, 0));
+    memory_set_bank(machine(), "eprom", BIT(data, 0));
 }
 
 
@@ -965,7 +965,7 @@ WRITE8_MEMBER( grip5_state::eprom_w )
 
 WRITE8_MEMBER( grip5_state::dpage_w )
 {
-	m_dpage = BIT(data, 7);
+    m_dpage = BIT(data, 7);
 }
 */
 
@@ -977,7 +977,7 @@ WRITE8_MEMBER( grip5_state::dpage_w )
 UINT8 grip_device::ecbbus_io_r(offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	if ((offset & 0xfe) == m_base)
 	{
 		if (BIT(offset, 0))
@@ -993,8 +993,8 @@ UINT8 grip_device::ecbbus_io_r(offs_t offset)
 			data = m_ppi_pc;
 		}
 	}
-	
-	return data; 
+
+	return data;
 };
 
 

@@ -72,7 +72,7 @@ WRITE_LINE_MEMBER( comx35_state::prd_w )
 		m_cr1 = m_iden ? CLEAR_LINE : ASSERT_LINE;
 		check_interrupt();
 	}
-	
+
 	m_prd = state;
 
 	m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF1, state);

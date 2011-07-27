@@ -58,7 +58,7 @@ void cococart_slot_device::device_start()
 	}
 
 	m_cart_line.timer_index     = 0;
-	m_cart_line.delay		    = 0;	
+	m_cart_line.delay		    = 0;
 	m_cart_line.value		    = COCOCART_LINE_VALUE_CLEAR;
 	m_cart_line.q_count		    = 0;
 	m_cart_line.callback.resolve(m_cart_callback, *this);
@@ -76,7 +76,7 @@ void cococart_slot_device::device_start()
 	m_halt_line.value		    = COCOCART_LINE_VALUE_CLEAR;
 	m_halt_line.q_count		    = 0;
 	m_halt_line.callback.resolve(m_halt_callback, *this);
-	
+
 	m_cart = dynamic_cast<device_cococart_interface *>(get_card_device());
 }
 
@@ -102,7 +102,7 @@ void cococart_slot_device::device_config_complete()
     	memset(&m_nmi_callback,  0, sizeof(m_nmi_callback));
     	memset(&m_halt_callback, 0, sizeof(m_halt_callback));
 	}
-	
+
 	// set brief and instance name
 	update_names();
 }
@@ -307,19 +307,19 @@ UINT8* cococart_slot_device::get_cart_base()
 }
 
 
-bool cococart_slot_device::call_load() 
-{	
+bool cococart_slot_device::call_load()
+{
 	if (m_cart) {
 		offs_t read_length = 0;
 		if (software_entry() == NULL)
 		{
 			read_length = fread(m_cart->get_cart_base(), 0x8000);
-		}			
+		}
 		else
 		{
 			read_length = get_software_region_length("rom");
 			memcpy(m_cart->get_cart_base(), get_software_region("rom"), read_length);
-		}		
+		}
 		while(read_length < 0x8000)
 		{
 			offs_t len = MIN(read_length, 0x8000 - read_length);

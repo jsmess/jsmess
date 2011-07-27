@@ -64,7 +64,7 @@ class ecbbus_slot_device : public device_t,
 public:
 	// construction/destruction
 	ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 
@@ -115,7 +115,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( int_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
-	
+
 	bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 protected:
@@ -130,7 +130,7 @@ private:
 
 	devcb_resolved_write_line	m_out_int_func;
 	devcb_resolved_write_line	m_out_nmi_func;
-	
+
 	device_ecbbus_card_interface *m_ecbbus_device[MAX_ECBBUS_SLOTS];
 	const char *m_cputag;
 };
@@ -146,7 +146,7 @@ extern const device_type ECBBUS;
 class device_ecbbus_card_interface : public device_interface
 {
 	friend class ecbbus_device;
-	
+
 public:
 	// construction/destruction
 	device_ecbbus_card_interface(const machine_config &mconfig, device_t &device);

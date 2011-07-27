@@ -36,13 +36,13 @@ static void display_formats(void)
 	for (i = 0; floppyoptions_supported[i].name; i++) {
 		fprintf(stderr, "%15s - %s\n",floppyoptions_supported[i].name,floppyoptions_supported[i].description);
 		fprintf(stderr, "%20s [%s]\n","",floppyoptions_supported[i].extensions);
-	}	
+	}
 }
 
 int CLIB_DECL main(int argc, char *argv[])
 {
 	FILE *f;
-	
+
 	if (argc > 1)
 	{
 		if (!core_stricmp("identify", argv[1]))

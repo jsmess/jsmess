@@ -756,7 +756,7 @@ static MACHINE_CONFIG_START( c64, c64_state )
 
 	MCFG_FRAGMENT_ADD(c64_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
-	
+
 	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
@@ -813,7 +813,7 @@ static MACHINE_CONFIG_START( c64pal, c64_state )
 
 	MCFG_FRAGMENT_ADD(c64_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
-	
+
 	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 

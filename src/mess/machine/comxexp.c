@@ -125,12 +125,12 @@ void comx_expansion_slot_device::device_reset()
 UINT8 comx_expansion_slot_device::mrd_r(offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
-	
+
 	if (m_card != NULL)
 	{
 		data = m_card->comx_mrd_r(offset, extrom);
 	}
-	
+
 	return data;
 }
 
@@ -155,12 +155,12 @@ void comx_expansion_slot_device::mwr_w(offs_t offset, UINT8 data)
 UINT8 comx_expansion_slot_device::io_r(offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	if (m_card != NULL)
 	{
 		data = m_card->comx_io_r(offset);
 	}
-	
+
 	return data;
 }
 
@@ -211,12 +211,12 @@ WRITE_LINE_MEMBER( comx_expansion_slot_device::q_w )
 bool comx_expansion_slot_device::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	bool value = false;
-	
+
 	if (m_card != NULL)
 	{
 		value = m_card->comx_screen_update(screen, bitmap, cliprect);
 	}
-	
+
 	return value;
 }
 

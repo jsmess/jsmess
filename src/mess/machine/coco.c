@@ -1167,7 +1167,7 @@ static void soundmux_update(running_machine &machine)
 		new_state = CASSETTE_SPEAKER_MUTED;
 		break;
 	}
-	
+
 	cococart_device(machine)->cart_set_line(
 		COCOCART_LINE_SOUND_ENABLE,
 		(soundmux_status == (SOUNDMUX_STATUS_ENABLE|SOUNDMUX_STATUS_SEL2)
@@ -2083,9 +2083,9 @@ static void setup_memory_map(running_machine &machine)
 			/* If we are in the BASIC rom area $8000-$BFFF, then we map to the bas_rom_bank */
 			/* as this may be in a different block of coco_rom, in the Dragon 64 and Alpha */
 			/* as these machines have mutiple bios roms that can ocupy this area */
-			if (block_index < 4) 
+			if (block_index < 4)
 				offset = &state->m_bas_rom_bank[0x1000*block_index];
-			else {					
+			else {
 				if (cart_rom) {
 					offset = &cart_rom[(0x1000*(block_index-4)) % 0x4000];
 				} else {
@@ -2735,7 +2735,7 @@ WRITE_LINE_DEVICE_HANDLER(coco_cart_w)
 -------------------------------------------------*/
 
 WRITE_LINE_DEVICE_HANDLER(coco3_cart_w)
-{	
+{
 	coco3_raise_interrupt(device->machine(), COCO3_INT_EI0, state ? ASSERT_LINE : CLEAR_LINE);
 	coco_cart_w(device, state);
 }

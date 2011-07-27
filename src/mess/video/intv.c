@@ -780,7 +780,7 @@ SCREEN_UPDATE( intvkbd )
 	UINT8 *videoram = state->m_videoram;
 	int x,y,offs;
 	int current_row;
-//	char c;
+//  char c;
 
 	/* Draw the underlying INTV screen first */
 	SCREEN_UPDATE_CALL(generic_bitmapped);

@@ -1,35 +1,35 @@
 /*
-	Apple "Egret" ADB/system controller MCU
-	Emulation by R. Belmont
+    Apple "Egret" ADB/system controller MCU
+    Emulation by R. Belmont
 
-	Port definitions, primarily from the schematics.
+    Port definitions, primarily from the schematics.
 
-	Port A:
+    Port A:
 
-	x-------  O  ADB data line out
-	-x------  I  ADB data line in
-	--x-----  I  System type.  0 = hardware power switch, 1 = Egret controls power on/off
-	---x----  O  DFAC latch
-	----x---  O  ? (asserted briefly when resetting 680x0)
-	-----x--  I  Keyboard power switch 
-	------x-  ?  PSU enable OUT for system type 0, otherwise chassis power switch IN
-	-------x  ?  Control panel enable IN for system type 0 (e.g. LC), power supply enable OUT for type 1
+    x-------  O  ADB data line out
+    -x------  I  ADB data line in
+    --x-----  I  System type.  0 = hardware power switch, 1 = Egret controls power on/off
+    ---x----  O  DFAC latch
+    ----x---  O  ? (asserted briefly when resetting 680x0)
+    -----x--  I  Keyboard power switch
+    ------x-  ?  PSU enable OUT for system type 0, otherwise chassis power switch IN
+    -------x  ?  Control panel enable IN for system type 0 (e.g. LC), power supply enable OUT for type 1
 
-	Port B:
+    Port B:
 
-	x-------  O  DFAC bit clock
-	-x------  ?  DFAC data I/O (used in both directions)
-	--x-----  ?  VIA shift register data (used in both directions)
-	---x----  O  VIA clock
-	----x---  I  VIA SYS_SESSION
-	-----x--  I  VIA VIA_FULL
-	------x-  O  VIA XCEIVER SESSION
-	-------x  I  +5v sense
+    x-------  O  DFAC bit clock
+    -x------  ?  DFAC data I/O (used in both directions)
+    --x-----  ?  VIA shift register data (used in both directions)
+    ---x----  O  VIA clock
+    ----x---  I  VIA SYS_SESSION
+    -----x--  I  VIA VIA_FULL
+    ------x-  O  VIA XCEIVER SESSION
+    -------x  I  +5v sense
 
-	Port C:
-	x---      O  680x0 reset
-	-x--      ?  680x0 IPL 2 (used in both directions)
-	--xx      ?  IPL 1/0 for hardware power switch, trickle sense (bit 1) and pulled up to +5v (bit 0) if Egret controls the PSU
+    Port C:
+    x---      O  680x0 reset
+    -x--      ?  680x0 IPL 2 (used in both directions)
+    --xx      ?  IPL 1/0 for hardware power switch, trickle sense (bit 1) and pulled up to +5v (bit 0) if Egret controls the PSU
 */
 
 #define ADDRESS_MAP_MODERN
@@ -110,21 +110,21 @@ void egret_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 	switch (offset)
 	{
 		case 0: // port A
-/*			printf("ADB:%d DFAC:%d PowerEnable:%d\n",
-				(data & 0x80) ? 1 : 0,
-				(data & 0x10) ? 1 : 0,
-				(data & 0x02) ? 1 : 0);*/
+/*          printf("ADB:%d DFAC:%d PowerEnable:%d\n",
+                (data & 0x80) ? 1 : 0,
+                (data & 0x10) ? 1 : 0,
+                (data & 0x02) ? 1 : 0);*/
 
 			if ((data & 0x80) != last_adb)
 			{
-/*				if (data & 0x80)
-				{
-					printf("EG ADB: 1->0 time %lld\n", m_maincpu->total_cycles()-last_adb_time);
-				}
-				else
-				{
-					printf("EG ADB: 0->1 time %lld\n", m_maincpu->total_cycles()-last_adb_time);
-				}*/
+/*              if (data & 0x80)
+                {
+                    printf("EG ADB: 1->0 time %lld\n", m_maincpu->total_cycles()-last_adb_time);
+                }
+                else
+                {
+                    printf("EG ADB: 0->1 time %lld\n", m_maincpu->total_cycles()-last_adb_time);
+                }*/
 				last_adb = data & 0x80;
 				last_adb_time = m_maincpu->total_cycles();
 			}
@@ -196,7 +196,7 @@ READ8_MEMBER( egret_device::ddr_r )
 
 WRITE8_MEMBER( egret_device::ddr_w )
 {
-/*	printf("%02x to DDR %c\n", data, 'A' + offset);*/
+/*  printf("%02x to DDR %c\n", data, 'A' + offset);*/
 
 	send_port(space, offset, ports[offset] & data);
 
@@ -209,8 +209,8 @@ READ8_MEMBER( egret_device::ports_r )
 
 	switch (offset)
 	{
-		case 0:   	// port A
-//			incoming |= adb_in ? 0x40 : 0;
+		case 0: 	// port A
+//          incoming |= adb_in ? 0x40 : 0;
 
 			if (egret_controls_power)
 			{
@@ -218,7 +218,7 @@ READ8_MEMBER( egret_device::ports_r )
 			}
 			else
 			{
-				//incoming |= 0x01;	// enable control panel enabled
+				//incoming |= 0x01; // enable control panel enabled
 			}
 			break;
 
@@ -238,7 +238,7 @@ READ8_MEMBER( egret_device::ports_r )
 			break;
 	}
 
-	// apply data direction registers							 
+	// apply data direction registers
 	incoming &= (ddrs[offset] ^ 0xff);
 	// add in ddr-masked version of port writes
 	incoming |= (ports[offset] & ddrs[offset]);
@@ -282,7 +282,7 @@ READ8_MEMBER( egret_device::timer_ctrl_r )
 
 WRITE8_MEMBER( egret_device::timer_ctrl_w )
 {
-//	printf("%02x to timer control\n", data);
+//  printf("%02x to timer control\n", data);
 	timer_ctrl = data;
 }
 
@@ -293,7 +293,7 @@ READ8_MEMBER( egret_device::timer_counter_r )
 
 WRITE8_MEMBER( egret_device::timer_counter_w )
 {
-//	printf("%02x to timer/counter\n", data);
+//  printf("%02x to timer/counter\n", data);
 	timer_counter = data;
 }
 
@@ -306,7 +306,7 @@ WRITE8_MEMBER( egret_device::onesec_w )
 {
 	static const float rates[4] = { 0.5f, 1.0f, 2.0f, 4.0f };
 
-//	printf("%02x to one-second control\n", data);
+//  printf("%02x to one-second control\n", data);
 
 	m_timer->adjust(attotime::from_hz(rates[data&3]), 0, attotime::from_hz(rates[data&3]));
 

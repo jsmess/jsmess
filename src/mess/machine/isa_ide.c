@@ -28,7 +28,7 @@ static void ide_interrupt(device_t *device, int state)
 
 static MACHINE_CONFIG_FRAGMENT( ide )
 	MCFG_HARDDISK_ADD("harddisk")
-	
+
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 MACHINE_CONFIG_END
 

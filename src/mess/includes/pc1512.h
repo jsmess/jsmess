@@ -102,9 +102,9 @@ public:
 	void update_fdc_tc();
 	void update_ack();
 	void set_fdc_dsr(UINT8 data);
-	
-//	DECLARE_READ8_MEMBER( videoram_r );
-//	DECLARE_WRITE8_MEMBER( videoram_w );
+
+//  DECLARE_READ8_MEMBER( videoram_r );
+//  DECLARE_WRITE8_MEMBER( videoram_w );
 	DECLARE_READ8_MEMBER( system_r );
 	DECLARE_WRITE8_MEMBER( system_w );
 	DECLARE_READ8_MEMBER( mouse_r );
@@ -115,8 +115,8 @@ public:
 	DECLARE_WRITE8_MEMBER( printer_w );
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
-//	DECLARE_READ8_MEMBER( vdu_r );
-//	DECLARE_WRITE8_MEMBER( vdu_w );
+//  DECLARE_READ8_MEMBER( vdu_r );
+//  DECLARE_WRITE8_MEMBER( vdu_w );
 	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
 	DECLARE_WRITE_LINE_MEMBER( kbclk_w );
 	DECLARE_WRITE_LINE_MEMBER( pit1_w );
@@ -135,14 +135,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( dack3_w );
-	
+
 	// system status register
 	int m_pit1;
 	int m_pit2;
 	UINT8 m_status1;
 	UINT8 m_status2;
 	UINT8 m_port61;
-	
+
 	// interrupt state
 	int m_nmi_enable;
 
@@ -151,7 +151,7 @@ public:
 	int m_kb_bits;
 	int m_kbclk;
 	int m_kbdata;
-	
+
 	// mouse state
 	UINT8 m_mouse_x;
 	UINT8 m_mouse_y;
@@ -160,25 +160,25 @@ public:
 	UINT8 m_dma_page[4];
 	int m_dma_channel;
 	int m_dreq0;
-	
+
 	// floppy state
 	int m_nden;
 	int m_dint;
 	int m_ddrq;
 	UINT8 m_fdc_dsr;
 	int m_neop;
-	
+
 	// printer state
 	int m_ack_int_enable;
 	int m_ack;
 	UINT8 m_printer_data;
 	UINT8 m_printer_control;
-	
+
 	// video state
 	UINT8 *m_video_ram;
 	UINT8 *m_char_rom;
 	int m_toggle;
-	
+
 	// sound state
 	int m_speaker_drive;
 };

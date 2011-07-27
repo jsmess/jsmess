@@ -72,7 +72,7 @@ private:
 	int m_drive;				// selected drive
 	int m_head;					// head loaded
 	int m_int_enbl;				// interrupt enable
-	
+
 	// S-100 bus state
 	UINT8 *m_rom;				// ROM
 	UINT8 *m_ram;				// RAM

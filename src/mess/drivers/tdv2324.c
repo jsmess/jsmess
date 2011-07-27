@@ -1,8 +1,8 @@
 /*
 
     Tandberg TDV2324
-	
-	Skeleton driver
+
+    Skeleton driver
 
 */
 
@@ -86,7 +86,7 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
-	
+
 	// devices
 	MCFG_S1410_ADD() // 104521-F ROM
 MACHINE_CONFIG_END

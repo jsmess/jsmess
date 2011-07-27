@@ -85,11 +85,11 @@ MACHINE_RESET_MEMBER( imds_state )
 
 //static const ins8250_interface imds_com_interface =
 //{
-//	1843200,
-//	DEVCB_NULL,
-//	NULL,
-//	NULL,
-//	NULL
+//  1843200,
+//  DEVCB_NULL,
+//  NULL,
+//  NULL,
+//  NULL
 //};
 
 static MACHINE_CONFIG_START( imds, imds_state )
@@ -98,7 +98,7 @@ static MACHINE_CONFIG_START( imds, imds_state )
 	MCFG_CPU_PROGRAM_MAP(imds_mem)
 	MCFG_CPU_IO_MAP(imds_io)
 
-//	MCFG_INS8250_ADD( "ins8250", imds_com_interface )
+//  MCFG_INS8250_ADD( "ins8250", imds_com_interface )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )

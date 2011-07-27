@@ -30,7 +30,7 @@ protected:
 		virtual DECLARE_WRITE8_MEMBER(write);
 private:
         // internal state
-		device_t *m_uart;		
+		device_t *m_uart;
 };
 
 

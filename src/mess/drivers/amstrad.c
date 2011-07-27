@@ -73,8 +73,8 @@
                To get rid of duplicated code the drivers have been changed to use the new mc6845 device
                implementation. As a result the (runtime) selection of CRTC type has been removed.
 
-	July 2011 - added basic expansion port interface, with support for both the Amstrad SSA-1 and DK'Tronics
-	            speech synthesisers.
+    July 2011 - added basic expansion port interface, with support for both the Amstrad SSA-1 and DK'Tronics
+                speech synthesisers.
 
 
 Some bugs left :

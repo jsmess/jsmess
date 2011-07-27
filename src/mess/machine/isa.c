@@ -144,7 +144,7 @@ void isa8_device::device_config_complete()
 isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, ISA8, "ISA8", tag, owner, clock)
 {
-}	
+}
 
 isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, type, name, tag, owner, clock)
@@ -371,7 +371,7 @@ void isa16_device::device_config_complete()
     	memset(&(isa8bus_interface::m_out_irq5_cb), 0, sizeof(isa8bus_interface::m_out_irq5_cb));
     	memset(&(isa8bus_interface::m_out_irq6_cb), 0, sizeof(isa8bus_interface::m_out_irq6_cb));
     	memset(&(isa8bus_interface::m_out_irq7_cb), 0, sizeof(isa8bus_interface::m_out_irq7_cb));
-		
+
 		memset(&m_out_irq10_cb, 0, sizeof(m_out_irq10_cb));
     	memset(&m_out_irq11_cb, 0, sizeof(m_out_irq11_cb));
     	memset(&m_out_irq12_cb, 0, sizeof(m_out_irq12_cb));
@@ -382,7 +382,7 @@ void isa16_device::device_config_complete()
     	memset(&(isa8bus_interface::m_out_drq1_cb), 0, sizeof(isa8bus_interface::m_out_drq1_cb));
     	memset(&(isa8bus_interface::m_out_drq2_cb), 0, sizeof(isa8bus_interface::m_out_drq2_cb));
     	memset(&(isa8bus_interface::m_out_drq3_cb), 0, sizeof(isa8bus_interface::m_out_drq3_cb));
-		
+
 		memset(&m_out_drq5_cb, 0, sizeof(m_out_drq5_cb));
     	memset(&m_out_drq6_cb, 0, sizeof(m_out_drq6_cb));
     	memset(&m_out_drq7_cb, 0, sizeof(m_out_drq7_cb));
@@ -403,7 +403,7 @@ void isa16_device::device_start()
 	m_out_irq12_func.resolve(m_out_irq12_cb, *this);
 	m_out_irq14_func.resolve(m_out_irq14_cb, *this);
 	m_out_irq15_func.resolve(m_out_irq15_cb, *this);
-	
+
 	m_out_drq0_func.resolve(m_out_drq0_cb, *this);
 	m_out_drq5_func.resolve(m_out_drq5_cb, *this);
 	m_out_drq6_func.resolve(m_out_drq6_cb, *this);

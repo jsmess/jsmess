@@ -35,7 +35,7 @@ ecbbus_slot_device::ecbbus_slot_device(const machine_config &mconfig, const char
 
 
 //-------------------------------------------------
-//  static_set_ecbbus_slot - 
+//  static_set_ecbbus_slot -
 //-------------------------------------------------
 
 void ecbbus_slot_device::static_set_ecbbus_slot(device_t &device, const char *tag, int num)
@@ -178,7 +178,7 @@ void ecbbus_device::add_ecbbus_card(device_ecbbus_card_interface *card, int pos)
 READ8_MEMBER( ecbbus_device::mem_r )
 {
 	UINT8 data = 0;
-	
+
 	for (int i = 0; i < MAX_ECBBUS_SLOTS; i++)
 	{
 		if (m_ecbbus_device[i] != NULL)
@@ -190,7 +190,7 @@ READ8_MEMBER( ecbbus_device::mem_r )
 	return data;
 }
 
-	
+
 //-------------------------------------------------
 //  mem_w -
 //-------------------------------------------------
@@ -214,7 +214,7 @@ WRITE8_MEMBER( ecbbus_device::mem_w )
 READ8_MEMBER( ecbbus_device::io_r )
 {
 	UINT8 data = 0;
-	
+
 	for (int i = 0; i < MAX_ECBBUS_SLOTS; i++)
 	{
 		if (m_ecbbus_device[i] != NULL)
@@ -226,7 +226,7 @@ READ8_MEMBER( ecbbus_device::io_r )
 	return data;
 }
 
-	
+
 //-------------------------------------------------
 //  io_w -
 //-------------------------------------------------
@@ -270,7 +270,7 @@ WRITE_LINE_MEMBER( ecbbus_device::nmi_w )
 bool ecbbus_device::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	bool value = false;
-	
+
 	for (int i = 0; i < MAX_ECBBUS_SLOTS; i++)
 	{
 		if (m_ecbbus_device[i] != NULL)
@@ -281,6 +281,6 @@ bool ecbbus_device::screen_update(screen_device &screen, bitmap_t &bitmap, const
 			}
 		}
 	}
-	
+
 	return value;
 }

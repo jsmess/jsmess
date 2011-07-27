@@ -64,12 +64,12 @@ void comx_ram_device::device_reset()
 UINT8 comx_ram_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
-	
+
 	if (offset >= 0xc000 && offset < 0xd000)
 	{
 		data = (m_ram_bank << 12) | m_ram[offset & 0xfff];
 	}
-	
+
 	return data;
 }
 

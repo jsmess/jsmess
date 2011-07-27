@@ -11,7 +11,7 @@ Hardware
     1 Kbyte RAM in the address range 5000-53ff
     6-digit 7-segment display
     Busy LED
-    Keyboard with 12 keys 
+    Keyboard with 12 keys
 
 ToDo:
 - Everything
@@ -65,12 +65,12 @@ public:
 WRITE8_MEMBER( slc1_state::io_w )
 {
 	UINT8 upper = offset >> 8;
-//	if (upper == 0x2f) return;
+//  if (upper == 0x2f) return;
 
 
 	speaker_level_w(m_speaker, (upper == 0x29));
 
-//	output_set_led_value(0, BIT(data, 4));
+//  output_set_led_value(0, BIT(data, 4));
 
 	// This computer sets each segment, one at a time. */
 

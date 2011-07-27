@@ -85,12 +85,12 @@ void comx_prn_device::device_reset()
 UINT8 comx_prn_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
-	
+
 	if (offset >= 0xc000 && offset < 0xd000)
 	{
 		data = m_rom[offset & 0xfff];
 	}
-	
+
 	return data;
 }
 
@@ -102,18 +102,18 @@ UINT8 comx_prn_device::comx_mrd_r(offs_t offset, int *extrom)
 UINT8 comx_prn_device::comx_io_r(offs_t offset)
 {
 	/*
-		Parallel:
-		
-		INP 2 for the printer status, where:
-		b0=1: Acknowledge Fault
-		b1=0: Device Busy
-		b2=0: Paper Empty
-		b3=1: Device Not Selected
-		
-		Serial:
-		
-		INP 2 for the printer status and to start a new range of bits for the next byte.
-	*/
+        Parallel:
+
+        INP 2 for the printer status, where:
+        b0=1: Acknowledge Fault
+        b1=0: Device Busy
+        b2=0: Paper Empty
+        b3=1: Device Not Selected
+
+        Serial:
+
+        INP 2 for the printer status and to start a new range of bits for the next byte.
+    */
 
 	return 0;
 }
@@ -126,12 +126,12 @@ UINT8 comx_prn_device::comx_io_r(offs_t offset)
 void comx_prn_device::comx_io_w(offs_t offset, UINT8 data)
 {
 	/*
-		Parallel:
-		
-		OUT 2 is used to send a byte to the printer
-	
-		Serial:
-		
-		OUT 2 is used to send a bit to the printer
-	*/
+        Parallel:
+
+        OUT 2 is used to send a byte to the printer
+
+        Serial:
+
+        OUT 2 is used to send a bit to the printer
+    */
 }

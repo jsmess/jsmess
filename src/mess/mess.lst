@@ -635,7 +635,7 @@ ibm5550
 dgone	 // 1984 Data General/One
 pcmda	 // 1987 PC with MDA
 pcherc	 // 1987 PC with Hercules (for testing hercules)
-pc	  	 // 1987 PC with CGA
+pc		 // 1987 PC with CGA
 pcega    // 1987 PC with EGA
 bw230	// 1985 Bondwell (CGA)
 europc	// 1988 Schneider Euro PC (CGA or Hercules)

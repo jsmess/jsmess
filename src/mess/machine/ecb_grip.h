@@ -35,7 +35,7 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
-	
+
 	// not really public
 	DECLARE_WRITE8_MEMBER( vol0_w );
 	DECLARE_WRITE8_MEMBER( vol1_w );
@@ -91,7 +91,7 @@ private:
 	int m_lps;				// light pen sense
 	int m_page;				// video page
 	int m_flash;			// flash
-	
+
 	// ECB bus state
 	UINT8 m_base;			// ECB base address
 	UINT8 m_ppi_pa;			// PPI port A data
@@ -103,14 +103,14 @@ private:
 
 
 	/*
-	required_device<hd6345_device> m_crtc;
-	DECLARE_WRITE8_MEMBER( eprom_w );
-	DECLARE_WRITE8_MEMBER( dpage_w );
+    required_device<hd6345_device> m_crtc;
+    DECLARE_WRITE8_MEMBER( eprom_w );
+    DECLARE_WRITE8_MEMBER( dpage_w );
 
-	// video state
-	int m_dpage;			// displayed video page
-	*/
-	
+    // video state
+    int m_dpage;            // displayed video page
+    */
+
 
 
 // device type definition

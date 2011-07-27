@@ -346,7 +346,7 @@ static BOOL ParseOpen(const char *pszFilename)
 		{
 			return FALSE;
 		}
-		
+
 		file_error err = fp->open(pszFilename);
 		if (err != FILERR_NONE)
 		{
@@ -354,7 +354,7 @@ static BOOL ParseOpen(const char *pszFilename)
 			fp = NULL;
 			return FALSE;
 		}
-        
+
         /* Otherwise, prepare! */
         dwFilePos = 0;
         return TRUE;
