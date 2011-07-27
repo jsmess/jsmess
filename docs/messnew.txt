@@ -1,4 +1,81 @@
-﻿0.143u1
+﻿0.143u2
+
+New System Drivers Supported:
+-----------------------------
+- Macintosh IIvx/IIvi [R. Belmont]
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- Zenith Z-100 [Minataku, Miodrag Milanovic]
+- Sharp PC-7000 [Minataku, Miodrag Milanovic]
+- Vegas 6809. [Frédéric Le Duigou]
+- Tandberg TDV 2324. [Tuxie, JonasP, ElBarto]
+- SLC1 [Robbbert]
+- Apricot Qi 300 (Rev D,E & F Motherboard) [Kaylee]
+- Apricot Qi 600 (Neptune Motherboard) [Kaylee]
+- Apricot Qi 900 (Scorpion Motherboard) [Kaylee]
+- Apricot XEN-S (Venus I Motherboard 286) [Kaylee]
+- Apricot XEN-S (Venus I Motherboard 386) [Kaylee]
+- Apricot FTs (Scorpion) [Kaylee]
+- Apricot LANstation (Krypton Motherboard) [Kaylee]
+- Apricot LANstation (Novell Remote Boot) [Kaylee]
+- Apricot VX FT server [Kaylee]
+- Apricot XEN-LS (Venus IV Motherboard) [Kaylee]
+- Apricot XEN-S (Venus II Motherboard 286) [Kaylee]
+- Apricot XEN-S (Venus II Motherboard 386) [Kaylee]
+- Apricot LS Pro (Caracal Motherboard) [Kaylee]
+- Apricot LS Pro (Bonsai Motherboard) [Kaylee]
+- Apricot XEN-LS II (Samurai Motherboard) [Kaylee]
+- Apricot XEN-i 386 (Leopard Motherboard) [Kaylee]
+- Apricot XEN PC (A1 Motherboard) [Kaylee]
+- Apricot XEN PC (P2 Motherboard) [Kaylee]
+
+System Driver Changes:
+----------------------
+- saturn: Implemented IRQ pending and SCU IRQ enable register mechanism, 
+	allowing Choice Cuts to boot up to the title screen [Angelo Salese]
+
+- saturn: Added cycle remainder for FRC in SH-2, fixes a tight loop in Astal [Angelo Salese]
+
+- mac: LC2, LC3 now start up [R. Belmont]
+
+- mac: LC now starts up, original Mac II switched to HMMU, preliminary IIfx support [R. Belmont]
+
+- mac: Upgraded maciihmu to working, lots of preliminary-ish PowerMac 6100 work.  
+	Boot chime + blank screen is all you get so far. [R. Belmont]
+
+- mac: rewrote RBV-and-descendants interrupt handling in fake VIA2; solves occasional 
+	interrupt storms.  Implemented another PMU command so PowerBook 140/170 can boot 7.5.5. [R. Belmont]
+	
+- mac: preliminary NuBus interface, not being used yet [R. Belmont]
+
+- mac: iici and iisi can handle 128MB of RAM, added as an option. [R. Belmont]
+
+- lisa: add Twiggy I/O board ROM [Bushing]
+
+- amstrad: added ROM box expansion device.  [Barry Rodewald]
+
+- pc1512: Rewrote most of the Amstrad PC1512 driver, except for the VDU which still 
+	crashes most software. Keyboard is now working and runs the MCU. 
+	Added a floppy software list. [Curt Coder]
+	
+- v6809: Added preliminary video, colour, keyboard. Added notes [Robbbert]
+
+Software Lists:
+----------------
+- lisa.xml : update for Lisa softlist [Kaylee]
+- nes.xml: added a new proto [Kaylee]
+- vic1001_cart.xml: completed the list with games P-W [K1W1]
+
+Source Changes:
+----------------
+- Fixed for rom auditing in core and winui [smf, Robbbert]
+
+0.143u1
 
 New System Drivers Supported:
 -----------------------------
