@@ -34850,7 +34850,7 @@ We should eventually add it to MESS as a separate driver with a NES CPU and a GB
 				<rom name="keyboard transformer (r)[!].chr" size="8192" crc="712db27b" sha1="e5aea760051fd3e7a8766aaedcd2a3af69873dac" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="keyboard transformer (r)[!].chr" size="32768" crc="224f2c39" sha1="14058a39b427a2490e3a7e7b2cb30a2946e59377" offset="00000" status="baddump" />
+				<rom name="keyboard transformer (r)[!].prg" size="32768" crc="224f2c39" sha1="14058a39b427a2490e3a7e7b2cb30a2946e59377" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
