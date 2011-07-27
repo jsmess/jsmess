@@ -1290,6 +1290,11 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 				partitions[bufnum].numblks -= sectnum;
 
+				if (freeblocks == 200)
+				{
+					sectorstore = 0;
+				}
+
 				cd_stat &= ~CD_STAT_TRANS;
 				cr_standard_return(cd_stat);
 				hirqreg |= (CMOK|EHST);
