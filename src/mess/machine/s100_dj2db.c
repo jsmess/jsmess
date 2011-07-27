@@ -9,9 +9,9 @@
 
 /*
 
-	TODO:
-	
-	- stall logic (read from fdc data register halts CPU until intrq/drq from FDC)
+    TODO:
+
+    - stall logic (read from fdc data register halts CPU until intrq/drq from FDC)
 
 */
 
@@ -81,7 +81,7 @@ static COM8116_INTERFACE( brg_intf )
 WRITE_LINE_MEMBER( s100_dj2db_device::fdc_intrq_w )
 {
 	if (state) m_s100->rdy_w(CLEAR_LINE);
-	
+
 	switch (input_port_read(this, "J1A"))
 	{
 	case 0: m_s100->vi0_w(state); break;
@@ -208,7 +208,7 @@ static INPUT_PORTS_START( dj2db )
 	PORT_DIPNAME( 0x01, 0x01, "Generate PHANTOM Signal" )
 	PORT_DIPSETTING(    0x01, "Disabled" )
 	PORT_DIPSETTING(    0x00, "Enabled" )
-	
+
 	PORT_START("J3A")
 	PORT_DIPNAME( 0xff, 0x00, "Bank Select" )
 	PORT_DIPSETTING(    0x00, "Disabled" )
@@ -220,7 +220,7 @@ static INPUT_PORTS_START( dj2db )
 	PORT_DIPSETTING(    0x20, "DATA 4" )
 	PORT_DIPSETTING(    0x40, "DATA 6" )
 	PORT_DIPSETTING(    0x80, "DATA 7" )
-	
+
 	PORT_START("J1A")
 	PORT_DIPNAME( 0x0f, 0x09, "Interrupt" )
 	PORT_DIPSETTING(    0x09, "Disabled")
@@ -281,7 +281,7 @@ void s100_dj2db_device::device_start()
 
 	m_rom = subregion("dj2db")->base();
 	m_ram = auto_alloc_array(machine(), UINT8, 0x400);
-	
+
 	// find floppy devices
 	m_floppy0 = machine().device(FLOPPY_0);
 	m_floppy1 = machine().device(FLOPPY_1);
@@ -308,8 +308,8 @@ void s100_dj2db_device::device_reset()
 UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 {
 	UINT8 data = 0;
-	
-//	if (!(m_board_enbl & m_phantom)) return 0;
+
+//  if (!(m_board_enbl & m_phantom)) return 0;
 
 	if ((offset >= 0xf800) && (offset < 0xfbf8))
 	{
@@ -322,41 +322,41 @@ UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 	else if (offset == 0xfbf9) // SERIAL STAT
 	{
 		/*
-		
-			bit		description
-			
-			0		PE
-			1		OE
-			2		DR
-			3		TBRE
-			4		FE
-			5		
-			6		
-			7		
-		
-		*/
+
+            bit     description
+
+            0       PE
+            1       OE
+            2       DR
+            3       TBRE
+            4       FE
+            5
+            6
+            7
+
+        */
 	}
 	else if (offset == 0xfbfa) // DISK STAT
 	{
 		/*
-		
-			bit		description
-			
-			0		HEAD
-			1		DATA RQ
-			2		INT RQ
-			3		_TWO SIDED
-			4		_INDEX
-			5		
-			6		
-			7		_READY
-		
-		*/
-		
+
+            bit     description
+
+            0       HEAD
+            1       DATA RQ
+            2       INT RQ
+            3       _TWO SIDED
+            4       _INDEX
+            5
+            6
+            7       _READY
+
+        */
+
 		data |= !m_head;
 		data |= !wd17xx_drq_r(m_fdc) << 1;
 		data |= !wd17xx_intrq_r(m_fdc) << 2;
-		
+
 		device_t *floppy = m_drive ? m_floppy1 : m_floppy0;
 		data |= floppy_twosid_r(floppy) << 3;
 		data |= floppy_index_r(floppy) << 4;
@@ -365,7 +365,7 @@ UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
 	{
 		m_s100->rdy_w(ASSERT_LINE);
-		
+
 		data = wd17xx_r(m_fdc, offset & 0x03);
 	}
 	else if ((offset >= 0xfc00) && (offset < 0x10000))
@@ -376,7 +376,7 @@ UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 	{
 		return 0;
 	}
-	
+
 	// LS241 inverts data
 	return data ^ 0xff;
 }
@@ -388,7 +388,7 @@ UINT8 s100_dj2db_device::s100_smemr_r(offs_t offset)
 
 void s100_dj2db_device::s100_mwrt_w(offs_t offset, UINT8 data)
 {
-//	if (!(m_board_enbl & m_phantom)) return;
+//  if (!(m_board_enbl & m_phantom)) return;
 
 	// LS96 inverts data
 	data ^= 0xff;
@@ -400,20 +400,20 @@ void s100_dj2db_device::s100_mwrt_w(offs_t offset, UINT8 data)
 	else if (offset == 0xfbf9) // DRIVE SEL
 	{
 		/*
-		
-			bit		description
-			
-			0		DRIVE 1
-			1		DRIVE 2
-			2		DRIVE 3
-			3		DRIVE 4
-			4		IN USE / SIDE SELECT
-			5		INT ENBL
-			6		_ACCESS ENBL
-			7		START
-		
-		*/
-		
+
+            bit     description
+
+            0       DRIVE 1
+            1       DRIVE 2
+            2       DRIVE 3
+            3       DRIVE 4
+            4       IN USE / SIDE SELECT
+            5       INT ENBL
+            6       _ACCESS ENBL
+            7       START
+
+        */
+
 		// drive select
 		if (BIT(data, 0)) m_drive = 0;
 		if (BIT(data, 1)) m_drive = 1;
@@ -422,36 +422,36 @@ void s100_dj2db_device::s100_mwrt_w(offs_t offset, UINT8 data)
 		wd17xx_set_drive(m_fdc, m_drive);
 		floppy_mon_w(m_floppy0, CLEAR_LINE);
 		floppy_mon_w(m_floppy1, CLEAR_LINE);
-		
+
 		// side select
 		wd17xx_set_side(m_fdc, BIT(data, 4));
-		
+
 		// interrupt enable
 		m_int_enbl = BIT(data, 5);
-		
+
 		// access enable
 		m_access_enbl = BIT(data, 6);
-		
+
 		// master reset
 		wd17xx_mr_w(m_fdc, BIT(data, 7));
 	}
 	else if (offset == 0xfbfa) // FUNCTION SEL
 	{
 		/*
-		
-			bit		description
-			
-			0		DOUBLE
-			1		8A SET
-			2		8A CLEAR
-			3		LEDOFF
-			4		
-			5		
-			6		
-			7		
-		
-		*/
-		
+
+            bit     description
+
+            0       DOUBLE
+            1       8A SET
+            2       8A CLEAR
+            3       LEDOFF
+            4
+            5
+            6
+            7
+
+        */
+
 		// density select
 		wd17xx_dden_w(m_fdc, BIT(data, 0));
 	}

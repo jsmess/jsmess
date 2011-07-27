@@ -82,7 +82,7 @@ private:
 	devcb_resolved_write_line	m_out_clock_func;
 
 	required_device<cpu_device> m_maincpu;
-	
+
 	int m_data_in;
 	int m_clock_in;
 	int m_kb_y;

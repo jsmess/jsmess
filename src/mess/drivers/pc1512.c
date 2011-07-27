@@ -1,16 +1,16 @@
 /*
 
-	Amstrad PC1512
+    Amstrad PC1512
 
-	TODO:
+    TODO:
 
-	- rewrite VDU
-	
-	http://git.redump.net/cgit.cgi/mess/commit/?id=94fd742c9f51970583806ed37c6b3d9815f73e1a
-	http://www.retroisle.com/amstrad/pcs/OriginalDocs/techmanual.php#1.11.2.2
-	http://www.reenigne.org/blog/crtc-emulation-for-mess/
-	http://www.seasip.info/AmstradXT/pc1512kbd.html
-	
+    - rewrite VDU
+
+    http://git.redump.net/cgit.cgi/mess/commit/?id=94fd742c9f51970583806ed37c6b3d9815f73e1a
+    http://www.retroisle.com/amstrad/pcs/OriginalDocs/techmanual.php#1.11.2.2
+    http://www.reenigne.org/blog/crtc-emulation-for-mess/
+    http://www.seasip.info/AmstradXT/pc1512kbd.html
+
 */
 
 #include "includes/pc1512.h"
@@ -28,7 +28,7 @@
 READ8_MEMBER( pc1512_state::system_r )
 {
 	UINT8 data = 0;
-	
+
 	switch (offset)
 	{
 	case 0:
@@ -36,19 +36,19 @@ READ8_MEMBER( pc1512_state::system_r )
 		{
 			/*
 
-				bit     description
+                bit     description
 
-				0       1
-				1       8087 NDP installed
-				2       1
-				3       1
-				4       DDM0
-				5       DDM1
-				6       second floppy disk drive installed
-				7       0
+                0       1
+                1       8087 NDP installed
+                2       1
+                3       1
+                4       DDM0
+                5       DDM1
+                6       second floppy disk drive installed
+                7       0
 
-			*/
-			
+            */
+
 			data = m_status1;
 		}
 		else
@@ -58,36 +58,36 @@ READ8_MEMBER( pc1512_state::system_r )
 			pic8259_ir1_w(m_pic, CLEAR_LINE);
 		}
 		break;
-		
+
 	case 1:
 		data = m_port61;
 		break;
-		
+
 	case 2:
 		/*
 
-			bit     description
+            bit     description
 
-			0       RAM0 / RAM4
-			1       RAM1
-			2       RAM2
-			3       RAM3
-			4       undefined
-			5       8253 PIT OUT2 output
-			6       external parity error (I/OCHCK from expansion bus)
-			7       on-board system RAM parity error
+            0       RAM0 / RAM4
+            1       RAM1
+            2       RAM2
+            3       RAM3
+            4       undefined
+            5       8253 PIT OUT2 output
+            6       external parity error (I/OCHCK from expansion bus)
+            7       on-board system RAM parity error
 
-		*/
-		
+        */
+
 		if (BIT(m_port61, 2))
 			data = m_status2 & 0x0f;
 		else
 			data = m_status2 >> 4;
-		
+
 		data |= m_pit2 << 5;
 		break;
 	}
-	
+
 	return data;
 }
 
@@ -103,21 +103,21 @@ WRITE8_MEMBER( pc1512_state::system_w )
 	case 1:
 		/*
 
-			bit     description
+            bit     description
 
-			0       8253 GATE 2 (speaker modulate)
-			1       speaker drive
-			2       enable port C LSB / disable MSB
-			3       undefined
-			4       disable parity checking of on-board RAM
-			5       prevent external parity errors from causing NMI
-			6       enable incoming Keyboard Clock
-			7       enable Status-1/Disable Keyboard Code on Port A
+            0       8253 GATE 2 (speaker modulate)
+            1       speaker drive
+            2       enable port C LSB / disable MSB
+            3       undefined
+            4       disable parity checking of on-board RAM
+            5       prevent external parity errors from causing NMI
+            6       enable incoming Keyboard Clock
+            7       enable Status-1/Disable Keyboard Code on Port A
 
-		*/
-		
+        */
+
 		m_port61 = data;
-		
+
 		pit8253_gate2_w(m_pit, BIT(data, 0));
 
 		m_speaker_drive = BIT(data, 1);
@@ -125,48 +125,48 @@ WRITE8_MEMBER( pc1512_state::system_w )
 
 		m_kb->data_w(BIT(data, 6));
 		break;
-		
+
 	case 4:
 		/*
 
-			bit     description
+            bit     description
 
-			0       
-			1       PA1 - 8087 NDP installed
-			2       
-			3       
-			4       PA4 - DDM0
-			5       PA5 - DDM1
-			6       PA6 - Second Floppy disk drive installed
-			7       
+            0
+            1       PA1 - 8087 NDP installed
+            2
+            3
+            4       PA4 - DDM0
+            5       PA5 - DDM1
+            6       PA6 - Second Floppy disk drive installed
+            7
 
-		*/
+        */
 
 		if (BIT(data, 7))
 			m_status1 = data ^ 0x8d;
 		else
 			m_status1 = data;
 		break;
-		
+
 	case 5:
 		/*
 
-			bit     description
+            bit     description
 
-			0       PC0 (LSB) - RAM0
-			1       PC1 (LSB) - RAM1
-			2       PC2 (LSB) - RAM2
-			3       PC3 (LSB) - RAM3
-			4       PC0 (MSB) - RAM4
-			5       PC1 (MSB) - Undefined
-			6       PC2 (MSB) - Undefined
-			7       PC3 (MSB) - Undefined
+            0       PC0 (LSB) - RAM0
+            1       PC1 (LSB) - RAM1
+            2       PC2 (LSB) - RAM2
+            3       PC3 (LSB) - RAM3
+            4       PC0 (MSB) - RAM4
+            5       PC1 (MSB) - Undefined
+            6       PC2 (MSB) - Undefined
+            7       PC3 (MSB) - Undefined
 
-		*/
+        */
 
 		m_status2 = data;
 		break;
-		
+
 	case 6:
 		machine_reset();
 		break;
@@ -186,18 +186,18 @@ WRITE8_MEMBER( pc1512_state::system_w )
 READ8_MEMBER( pc1512_state::mouse_r )
 {
 	UINT8 data = 0;
-	
+
 	switch (offset)
 	{
 	case 0:
 		data = m_mouse_x;
 		break;
-		
+
 	case 2:
 		data = m_mouse_y;
 		break;
 	}
-	
+
 	return data;
 }
 
@@ -213,7 +213,7 @@ WRITE8_MEMBER( pc1512_state::mouse_w )
 	case 0:
 		m_mouse_x = 0;
 		break;
-		
+
 	case 2:
 		m_mouse_y = 0;
 		break;
@@ -234,25 +234,25 @@ WRITE8_MEMBER( pc1512_state::dma_page_w )
 {
 	/*
 
-		bit     description
+        bit     description
 
-		0       Address bit A16
-		1       Address bit A17
-		2       Address bit A18
-		3       Address bit A19
-		4       
-		5       
-		6       
-		7       
+        0       Address bit A16
+        1       Address bit A17
+        2       Address bit A18
+        3       Address bit A19
+        4
+        5
+        6
+        7
 
-	*/
+    */
 
 	switch (offset)
 	{
 	case 1:
 		m_dma_page[2] = data & 0x0f;
 		break;
-		
+
 	case 2:
 		m_dma_page[3] = data & 0x0f;
 		break;
@@ -291,43 +291,43 @@ WRITE8_MEMBER( pc1512_state::nmi_mask_w )
 READ8_MEMBER( pc1512_state::printer_r )
 {
 	UINT8 data = 0;
-	
+
 	switch (offset)
 	{
 	case 0:
 		data = m_printer_data;
 		break;
-		
+
 	case 1:
 		/*
 
-			bit     description
+            bit     description
 
-			0       LK1 fitted
-			1       LK2 fitted
-			2       LK3 fitted
-			3       printer error
-			4       printer selected
-			5       paper out
-			6       printer acknowledge
-			7       printer busy
+            0       LK1 fitted
+            1       LK2 fitted
+            2       LK3 fitted
+            3       printer error
+            4       printer selected
+            5       paper out
+            6       printer acknowledge
+            7       printer busy
 
-		*/
-		
+        */
+
 		data |= input_port_read(machine(), "LK") & 0x07;
-		
+
 		data |= centronics_fault_r(m_centronics) << 3;
 		data |= centronics_vcc_r(m_centronics) << 4;
 		data |= centronics_pe_r(m_centronics) << 5;
 		data |= centronics_ack_r(m_centronics) << 6;
 		data |= centronics_busy_r(m_centronics) << 7;
 		break;
-	
+
 	case 2:
 		data = m_printer_control;
 		break;
 	}
-	
+
 	return data;
 }
 
@@ -344,29 +344,29 @@ WRITE8_MEMBER( pc1512_state::printer_w )
 		m_printer_data = data;
 		centronics_data_w(m_centronics, 0, data);
 		break;
-		
+
 	case 2:
 		/*
 
-			bit     description
+            bit     description
 
-			0       Data Strobe
-			1       Select Auto Feed
-			2       Reset Printer
-			3       Select Printer
-			4       Enable Int on ACK
-			5       
-			6       
-			7       
+            0       Data Strobe
+            1       Select Auto Feed
+            2       Reset Printer
+            3       Select Printer
+            4       Enable Int on ACK
+            5
+            6
+            7
 
-		*/
+        */
 
 		m_printer_control = data;
-		
+
 		centronics_strobe_w(m_centronics, BIT(data, 0));
 		centronics_autofeed_w(m_centronics, BIT(data, 1));
 		centronics_init_w(m_centronics, BIT(data, 2));
-		
+
 		m_ack_int_enable = BIT(data, 4);
 		update_ack();
 		break;
@@ -386,18 +386,18 @@ WRITE8_MEMBER( pc1512_state::printer_w )
 READ8_MEMBER( pc1512_state::fdc_r )
 {
 	UINT8 data = 0;
-	
+
 	switch (offset)
 	{
 	case 4:
 		data = upd765_status_r(m_fdc, 0);
 		break;
-		
+
 	case 5:
 		data = upd765_data_r(m_fdc, 0);
 		break;
 	}
-	
+
 	return data;
 }
 
@@ -410,26 +410,26 @@ void pc1512_state::set_fdc_dsr(UINT8 data)
 {
 	/*
 
-		bit     description
+        bit     description
 
-		0       Drive Select Bit 0 (DS0)
-		1       Drive Select Bit 1 (DS1)
-		2       765A reset
-		3       Allow 765A FDC to interrupt and request DMA
-		4       Switch motor(s) on and enable drive 0 selection
-		5       Switch motor(s) on and enable drive 1 selection
-		6       
-		7       
+        0       Drive Select Bit 0 (DS0)
+        1       Drive Select Bit 1 (DS1)
+        2       765A reset
+        3       Allow 765A FDC to interrupt and request DMA
+        4       Switch motor(s) on and enable drive 0 selection
+        5       Switch motor(s) on and enable drive 1 selection
+        6
+        7
 
-	*/
-	
+    */
+
 	m_fdc_dsr = data;
-	
+
 	m_nden = BIT(data, 3);
 	update_fdc_int();
 	update_fdc_drq();
 	update_fdc_tc();
-	
+
 	upd765_reset_w(m_fdc, BIT(data, 2));
 
 	floppy_mon_w(m_floppy0, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
@@ -443,7 +443,7 @@ WRITE8_MEMBER( pc1512_state::fdc_w )
 	case 2:
 		set_fdc_dsr(data);
 		break;
-		
+
 	case 5:
 		upd765_data_w(m_fdc, 0, data);
 		break;
@@ -462,7 +462,7 @@ WRITE8_MEMBER( pc1512_state::fdc_w )
 
 static ADDRESS_MAP_START( pc1512_mem, AS_PROGRAM, 16, pc1512_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
-//	AM_RANGE(0xb8000, 0xbffff) AM_READWRITE(videoram_r, videoram_w)
+//  AM_RANGE(0xb8000, 0xbffff) AM_READWRITE(videoram_r, videoram_w)
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
 
@@ -482,7 +482,7 @@ static ADDRESS_MAP_START( pc1512_io, AS_IO, 16, pc1512_state )
 	AM_RANGE(0x080, 0x083) AM_WRITE8(dma_page_w, 0xffff)
 	AM_RANGE(0x0a0, 0x0a1) AM_WRITE8(nmi_mask_w, 0xff00)
 	AM_RANGE(0x378, 0x37b) AM_READWRITE8(printer_r, printer_w, 0xffff)
-//	AM_RANGE(0x3d0, 0x3df) AM_READWRITE8(vdu_r, vdu_w, 0xffff)
+//  AM_RANGE(0x3d0, 0x3df) AM_READWRITE8(vdu_r, vdu_w, 0xffff)
 	AM_RANGE(0x3f0, 0x3f7) AM_READWRITE8(fdc_r, fdc_w, 0xffff)
 	AM_RANGE(0x3f8, 0x3ff) AM_DEVREADWRITE8_LEGACY(INS8250_TAG, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
@@ -500,7 +500,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( mouse_button_1_changed )
 {
 	pc1512_state *state = field.machine().driver_data<pc1512_state>();
-	
+
 	state->m_kb->m1_w(newval);
 }
 
@@ -512,7 +512,7 @@ static INPUT_CHANGED( mouse_button_1_changed )
 static INPUT_CHANGED( mouse_button_2_changed )
 {
 	pc1512_state *state = field.machine().driver_data<pc1512_state>();
-	
+
 	state->m_kb->m2_w(newval);
 }
 
@@ -524,8 +524,8 @@ static INPUT_CHANGED( mouse_button_2_changed )
 static INPUT_CHANGED( mouse_x_changed )
 {
 	pc1512_state *state = field.machine().driver_data<pc1512_state>();
-	
-	if (newval > oldval) 
+
+	if (newval > oldval)
 		state->m_mouse_x++;
 	else
 		state->m_mouse_x--;
@@ -539,8 +539,8 @@ static INPUT_CHANGED( mouse_x_changed )
 static INPUT_CHANGED( mouse_y_changed )
 {
 	pc1512_state *state = field.machine().driver_data<pc1512_state>();
-	
-	if (newval > oldval) 
+
+	if (newval > oldval)
 		state->m_mouse_y++;
 	else
 		state->m_mouse_y--;
@@ -578,11 +578,11 @@ static INPUT_PORTS_START( pc1512 )
 	PORT_DIPNAME( 0x10, 0x10, "ROM Size")
 	PORT_DIPSETTING( 0x10, "16 KB" )
 	PORT_DIPSETTING( 0x00, "32 KB" )
-/*	PORT_DIPNAME( 0x60, 0x60, "Character Set")
-	PORT_DIPSETTING( 0x60, "Default (Codepage 437)" )
-	PORT_DIPSETTING( 0x40, "Portugese (Codepage 865)" )
-	PORT_DIPSETTING( 0x20, "Norwegian (Codepage 860)" )
-	PORT_DIPSETTING( 0x00, "Greek")*/
+/*  PORT_DIPNAME( 0x60, 0x60, "Character Set")
+    PORT_DIPSETTING( 0x60, "Default (Codepage 437)" )
+    PORT_DIPSETTING( 0x40, "Portugese (Codepage 865)" )
+    PORT_DIPSETTING( 0x20, "Norwegian (Codepage 860)" )
+    PORT_DIPSETTING( 0x00, "Greek")*/
 	PORT_DIPNAME( 0x80, 0x80, "Floppy Ready Line")
 	PORT_DIPSETTING( 0x80, "Connected" )
 	PORT_DIPSETTING( 0x00, "Not connected" )
@@ -612,7 +612,7 @@ WRITE_LINE_MEMBER( pc1512_state::kbclk_w )
 		m_kbd <<= 1;
 		m_kbd |= m_kbdata;
 		m_kb_bits++;
-		
+
 		if (m_kb_bits == 8)
 		{
 			pic8259_ir1_w(m_pic, ASSERT_LINE);
@@ -644,7 +644,7 @@ void pc1512_state::update_fdc_tc()
 WRITE_LINE_MEMBER( pc1512_state::hrq_w )
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
-	
+
 	i8237_hlda_w(m_dmac, state);
 }
 
@@ -658,7 +658,7 @@ READ8_MEMBER( pc1512_state::memr_r )
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	offs_t page_offset = m_dma_page[m_dma_channel] << 16;
-	
+
 	return program->read_byte(page_offset + offset);
 }
 
@@ -679,9 +679,9 @@ WRITE8_MEMBER( pc1512_state::dma0_w )
 READ8_MEMBER( pc1512_state::fdc_dack_r )
 {
 	UINT8 data = 0;
-	
+
 	if (m_nden) data = upd765_dack_r(m_fdc, 0);
-		
+
 	return data;
 }
 
@@ -718,7 +718,7 @@ static I8237_INTERFACE( dmac_intf )
 	DEVCB_DRIVER_MEMBER(pc1512_state, memw_w),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc1512_state, fdc_dack_r), DEVCB_NULL },
 	{ DEVCB_DRIVER_MEMBER(pc1512_state, dma0_w), DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc1512_state, fdc_dack_w), DEVCB_NULL },
-	{ DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack0_w), DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack1_w), 
+	{ DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack0_w), DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack1_w),
 	  DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack2_w), DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack3_w) }
 };
 
@@ -730,7 +730,7 @@ static I8237_INTERFACE( dmac_intf )
 static IRQ_CALLBACK( pc1512_irq_callback )
 {
 	pc1512_state *state = device->machine().driver_data<pc1512_state>();
-	
+
 	return pic8259_acknowledge(state->m_pic);
 }
 
@@ -758,7 +758,7 @@ WRITE_LINE_MEMBER( pc1512_state::pit1_w )
 		m_dreq0 = 1;
 		i8237_dreq0_w(m_dmac, m_dreq0);
 	}
-	
+
 	m_pit1 = state;
 }
 
@@ -944,13 +944,13 @@ void pc1512_state::machine_start()
 
 	// set RAM size
 	size_t ram_size = ram_get_size(m_ram);
-	
+
 	if (ram_size < 640 * 1024)
 	{
 		address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 		program->unmap_readwrite(ram_size, 0x9ffff);
 	}
-	
+
 	// state saving
 	save_item(NAME(m_pit1));
 	save_item(NAME(m_pit2));
@@ -990,7 +990,7 @@ void pc1512_state::machine_reset()
 	m_nmi_enable = 0;
 	m_toggle = 0;
 	m_kb_bits = 0;
-	
+
 	set_fdc_dsr(0);
 }
 
@@ -1008,7 +1008,7 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc1512_mem)
 	MCFG_CPU_IO_MAP(pc1512_io)
-	
+
 	// video
 	MCFG_FRAGMENT_ADD( pcvideo_pc1512 )
 
@@ -1016,7 +1016,7 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-	
+
 	// devices
 	MCFG_PC1512_KEYBOARD_ADD(kb_intf)
 	MCFG_I8237_ADD(I8237A5_TAG, XTAL_24MHz/6, dmac_intf)
@@ -1027,13 +1027,13 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_INS8250_ADD(INS8250_TAG, uart_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
-	
+
 	// ISA8 bus
 	MCFG_ISA8_BUS_ADD("isa", I8086_TAG, isabus_intf)
 	MCFG_ISA8_SLOT_ADD("isa", "isa1", pc1512_isa8_cards, NULL, NULL)
 	MCFG_ISA8_SLOT_ADD("isa", "isa2", pc1512_isa8_cards, NULL, NULL)
 	MCFG_ISA8_SLOT_ADD("isa", "isa3", pc1512_isa8_cards, NULL, NULL)
-	
+
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")

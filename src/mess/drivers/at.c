@@ -293,7 +293,7 @@ static INPUT_PORTS_START( atcga )
 	PORT_DIPNAME( 0x01, 0x01, "Floppy installed")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
-	
+
 	PORT_INCLUDE( kb_keytronic_at )		/* IN4 - IN11 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
@@ -382,7 +382,7 @@ static const isa16bus_interface isabus_intf =
 	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir5_w),
 	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir6_w),
 	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w),
-	
+
 	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir3_w),
 	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir4_w),
 	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir5_w),
@@ -390,11 +390,11 @@ static const isa16bus_interface isabus_intf =
 	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir7_w),
 
 	// dma request
-	DEVCB_DEVICE_LINE("dma8237_1", i8237_dreq0_w),	
+	DEVCB_DEVICE_LINE("dma8237_1", i8237_dreq0_w),
 	DEVCB_DEVICE_LINE("dma8237_1", i8237_dreq1_w),
 	DEVCB_DEVICE_LINE("dma8237_1", i8237_dreq2_w),
 	DEVCB_DEVICE_LINE("dma8237_1", i8237_dreq3_w),
-	
+
 	DEVCB_DEVICE_LINE("dma8237_2", i8237_dreq1_w),
 	DEVCB_DEVICE_LINE("dma8237_2", i8237_dreq2_w),
 	DEVCB_DEVICE_LINE("dma8237_2", i8237_dreq3_w),
@@ -431,7 +431,7 @@ static MACHINE_CONFIG_FRAGMENT( at_motherboard )
 	MCFG_KB_KEYTRONIC_ADD("keyboard", at_keytronic_intf)
 
 	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, at_mc146818_config )
-    
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
@@ -451,7 +451,7 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
 	MCFG_ISA8_SLOT_ADD("isabus","isa1", pc_isa8_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
-	
+
 	MCFG_FRAGMENT_ADD( pcvideo_ega )
 
 	/* software lists */
@@ -489,7 +489,7 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
@@ -502,7 +502,7 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
 	MCFG_CPU_CONFIG(i286_address_mask)
-	
+
 	MCFG_FRAGMENT_ADD( at_motherboard )
 
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
@@ -553,7 +553,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
-	
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
@@ -906,7 +906,7 @@ ROM_START( xb42639 )
 	/* actual VGA BIOS not dumped*/
 	ROM_REGION(0x1000000, "maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
-	
+
 	// XEN-S (Venus I Motherboard)
     ROM_LOAD16_BYTE("3-10-17i.lo", 0xf0000, 0x8000, CRC(3786ca1e) SHA1(c682d7c76f234559d03bcf21010c13c4dbeafb69))
 	ROM_RELOAD(0xff0000,0x8000)
@@ -918,7 +918,7 @@ ROM_START( xb42639a )
 	/* actual VGA BIOS not dumped*/
 	ROM_REGION(0x1000000, "maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
-	
+
 	// XEN-S (Venus II Motherboard)
     ROM_LOAD16_BYTE("10217.lo", 0xf0000, 0x8000, CRC(ea53406f) SHA1(2958dfdbda14de4e6b9d6a8c3781131ab1e32bef))
 	ROM_RELOAD(0xff0000,0x8000)
@@ -930,7 +930,7 @@ ROM_START( xb42664 )
 	/* actual VGA BIOS not dumped */
     ROM_REGION(0x1000000, "maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
-	
+
 	// XEN-S (Venus I Motherboard)
     ROM_LOAD16_BYTE("3-10-17i.lo", 0xf0000, 0x8000, CRC(3786ca1e) SHA1(c682d7c76f234559d03bcf21010c13c4dbeafb69))
 	ROM_RELOAD(0xff0000,0x8000)
@@ -942,7 +942,7 @@ ROM_START( xb42664a )
 	/* actual VGA BIOS not dumped*/
 	ROM_REGION(0x1000000, "maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
-	
+
 	// XEN-S (Venus II Motherboard)
     ROM_LOAD16_BYTE("10217.lo", 0xf0000, 0x8000, CRC(ea53406f) SHA1(2958dfdbda14de4e6b9d6a8c3781131ab1e32bef))
 	ROM_RELOAD(0xff0000,0x8000)
@@ -1112,32 +1112,32 @@ ROM_START( xb42663 )
 	ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
 
-	ROM_LOAD16_BYTE( "qi310223.lo", 0xe0000, 0x10000, CRC(53047f49) SHA1(7b38e533f7f27295269549c63e5477d950239167)) 
-	ROM_LOAD16_BYTE( "qi310223.hi", 0xe0001, 0x10000, CRC(4852869f) SHA1(98599d4691d40b3fac2936034c70b386ce4caf77)) 
+	ROM_LOAD16_BYTE( "qi310223.lo", 0xe0000, 0x10000, CRC(53047f49) SHA1(7b38e533f7f27295269549c63e5477d950239167))
+	ROM_LOAD16_BYTE( "qi310223.hi", 0xe0001, 0x10000, CRC(4852869f) SHA1(98599d4691d40b3fac2936034c70b386ce4caf77))
 ROM_END
 
 ROM_START( qi600 )
 	ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
 
-	ROM_LOAD16_BYTE( "qi610223.lo", 0xe0000, 0x10000, CRC(563114a9) SHA1(62932b3bf0b5502ff708f604c21773f00afda58e)) 
-	ROM_LOAD16_BYTE( "qi610223.hi", 0xe0001, 0x10000, CRC(0ae133f6) SHA1(6039c366f7fe0ebf60b34c1a7d6b2d781b664001)) 
+	ROM_LOAD16_BYTE( "qi610223.lo", 0xe0000, 0x10000, CRC(563114a9) SHA1(62932b3bf0b5502ff708f604c21773f00afda58e))
+	ROM_LOAD16_BYTE( "qi610223.hi", 0xe0001, 0x10000, CRC(0ae133f6) SHA1(6039c366f7fe0ebf60b34c1a7d6b2d781b664001))
 ROM_END
 
 ROM_START( qi900 )
 	ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
 
-	ROM_LOAD16_BYTE( "qi910224.lo", 0xe0000, 0x10000, CRC(b012ad3c) SHA1(807e788a6bd03f5e983fe503af3d0b202c754b8a)) 
-	ROM_LOAD16_BYTE( "qi910224.hi", 0xe0001, 0x10000, CRC(36e66d56) SHA1(0900c5272ec3ced550f18fb08db59ab7f67a621e)) 
+	ROM_LOAD16_BYTE( "qi910224.lo", 0xe0000, 0x10000, CRC(b012ad3c) SHA1(807e788a6bd03f5e983fe503af3d0b202c754b8a))
+	ROM_LOAD16_BYTE( "qi910224.hi", 0xe0001, 0x10000, CRC(36e66d56) SHA1(0900c5272ec3ced550f18fb08db59ab7f67a621e))
 ROM_END
 
 ROM_START( ftsserv )
 	ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
 
-	ROM_LOAD16_BYTE( "fts10226.lo", 0xe0000, 0x10000, CRC(efbd738f) SHA1(d5258760bafdaf1bf13c4a49da76d4b5e7b4ccbd)) 
-	ROM_LOAD16_BYTE( "fts10226.hi", 0xe0001, 0x10000, CRC(2460853f) SHA1(a6bba8d2f800140afd129c4d5278f7ae8fe7e63a)) 
+	ROM_LOAD16_BYTE( "fts10226.lo", 0xe0000, 0x10000, CRC(efbd738f) SHA1(d5258760bafdaf1bf13c4a49da76d4b5e7b4ccbd))
+	ROM_LOAD16_BYTE( "fts10226.hi", 0xe0001, 0x10000, CRC(2460853f) SHA1(a6bba8d2f800140afd129c4d5278f7ae8fe7e63a))
 	/* FT Server series Front Panel */
 	ROM_REGION(0x10000,"front", 0)
 	ROM_LOAD( "fp10009.bin",	 0x0000, 0x8000, CRC(8aa7f718) SHA1(9ee6c6a5bb92622ea8d3805196d42ff68887d820))
@@ -1147,14 +1147,14 @@ ROM_START( apxenls3 )
 	ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
 
-	ROM_LOAD16_BYTE( "31020.lo", 0xf0000, 0x8000, CRC(a19678d2) SHA1(d13c12fa7e94333555eabf58b81bad421e21cd91)) 
-	ROM_LOAD16_BYTE( "31020.hi", 0xf0001, 0x8000, CRC(4922e020) SHA1(64e6448323dad2209e004cd93fa181582e768ed5)) 
+	ROM_LOAD16_BYTE( "31020.lo", 0xf0000, 0x8000, CRC(a19678d2) SHA1(d13c12fa7e94333555eabf58b81bad421e21cd91))
+	ROM_LOAD16_BYTE( "31020.hi", 0xf0001, 0x8000, CRC(4922e020) SHA1(64e6448323dad2209e004cd93fa181582e768ed5))
 ROM_END
 
 ROM_START( aplanst )
 	ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0x00000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
-	
+
 	ROM_SYSTEM_BIOS(0, "31024", "Bios 3-10-24")
     ROMX_LOAD("31024.lo", 0xf0000, 0x8000, CRC(e52b59e1) SHA1(cfcaa4d8d658df8df463108ef30695bd4ee7a617), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD("31024.hi", 0xf0001, 0x8000, CRC(7286aefa) SHA1(dfc0e3f4936780fa62ae9ec392ce17aa65e717cd), ROM_SKIP(1) | ROM_BIOS(1) )
@@ -1170,16 +1170,16 @@ ROM_START( aplannb )
 	ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
 
-	ROM_LOAD16_BYTE( "lsl31025.lo", 0xe0000, 0x10000, CRC(8bb7229b) SHA1(31449d12884ec4e7752e6c1ce7ce9e0d044eadf2)) 
-	ROM_LOAD16_BYTE( "lsh31025.hi", 0xe0001, 0x10000, CRC(09e5c1b9) SHA1(d42be83b4181d3733268c29df04a4d2918370f4e)) 
+	ROM_LOAD16_BYTE( "lsl31025.lo", 0xe0000, 0x10000, CRC(8bb7229b) SHA1(31449d12884ec4e7752e6c1ce7ce9e0d044eadf2))
+	ROM_LOAD16_BYTE( "lsh31025.hi", 0xe0001, 0x10000, CRC(09e5c1b9) SHA1(d42be83b4181d3733268c29df04a4d2918370f4e))
 ROM_END
 
 ROM_START( apvxft )
 	ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
 
-	ROM_LOAD16_BYTE( "ft10221.lo", 0xe0000, 0x10000, CRC(8f339de0) SHA1(a6542406746eaf1ff7f9e3678c5cbe5522fb314a)) 
-	ROM_LOAD16_BYTE( "ft10221.hi", 0xe0001, 0x10000, CRC(3b16bc31) SHA1(0592d1d81e7fd4715b0612083482db122d78c7f2)) 
+	ROM_LOAD16_BYTE( "ft10221.lo", 0xe0000, 0x10000, CRC(8f339de0) SHA1(a6542406746eaf1ff7f9e3678c5cbe5522fb314a))
+	ROM_LOAD16_BYTE( "ft10221.hi", 0xe0001, 0x10000, CRC(3b16bc31) SHA1(0592d1d81e7fd4715b0612083482db122d78c7f2))
 ROM_END
 
 ROM_START( aplscar )
@@ -1202,7 +1202,7 @@ ROM_START( apxenp2 )
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
 
 	ROM_SYSTEM_BIOS(0, "p2r02g2", "p2r02g2")
-    ROMX_LOAD("p2r02g2.bin",   0xe0000, 0x20000, CRC(311bcc5a) SHA1(be6fa144322077dcf66b065e7f4e61aab8c278b4), ROM_BIOS(1)) 
+    ROMX_LOAD("p2r02g2.bin",   0xe0000, 0x20000, CRC(311bcc5a) SHA1(be6fa144322077dcf66b065e7f4e61aab8c278b4), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "lep121s", "SCSI-Enabling ROMs")
     ROMX_LOAD("p2r01f0.bin",   0xe0000, 0x20000, CRC(bbc68f2e) SHA1(6954a52a7dda5521794151aff7a04225e9c7df77), ROM_BIOS(2))
 ROM_END
@@ -1212,7 +1212,7 @@ ROM_START( apxeni )
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
 
 	ROM_SYSTEM_BIOS(0, "lep121", "Rom Bios 1.2.1")
-    ROMX_LOAD( "lep121.bin", 0xf8000, 0x8000, CRC(948c1927) SHA1(d06bdbd6292db73c815ad1060daf055293dfddf5), ROM_BIOS(1)) 
+    ROMX_LOAD( "lep121.bin", 0xf8000, 0x8000, CRC(948c1927) SHA1(d06bdbd6292db73c815ad1060daf055293dfddf5), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "lep121s", "SCSI-Enabling ROMs")
     ROMX_LOAD( "lep121s.bin", 0xf8000, 0x8000, CRC(296118e4) SHA1(d1feaa9704e6ce3bc10c900bdd310d9494b02304), ROM_BIOS(2))
 ROM_END
@@ -1299,7 +1299,7 @@ ROM_END
 COMP ( 1984, ibm5170,  0,       ibm5150, ibm5170,   atcga,	atega,      "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
 COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,  atega,      "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
 COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,  atcga,      "International Business Machines",  "IBM PC/XT-286 5162", GAME_NOT_WORKING )
-COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,	atvga, 		"International Business Machines",  "IBM PS/2 Model 30-286", GAME_NOT_WORKING )
+COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,	atvga,		"International Business Machines",  "IBM PS/2 Model 30-286", GAME_NOT_WORKING )
 COMP ( 1989, i8555081, ibm5170, 0,       at386,		atvga,	atvga,		"International Business Machines",  "IBM PS/2 Model 55SX", GAME_NOT_WORKING )
 COMP ( 1987, at,       ibm5170, 0,       ibm5162,   atcga,	atcga,      "<generic>",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	atvga,      "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )

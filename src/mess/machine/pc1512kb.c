@@ -203,11 +203,11 @@ INPUT_PORTS_START( pc1512_keyboard )
 
 	PORT_START("Y10")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad Enter") PORT_CODE(KEYCODE_ENTER_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 6 "UTF8_RIGHT) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3 Pg Dn") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Del "UTF8_RIGHT) PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
 
@@ -220,16 +220,16 @@ INPUT_PORTS_START( pc1512_keyboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 0 Ins") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad . Del") PORT_CODE(KEYCODE_DEL_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad +") PORT_CODE(KEYCODE_PLUS_PAD)
-	
+
 	PORT_START("COM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -343,21 +343,21 @@ READ8_MEMBER( pc1512_keyboard_device::kb_bus_r )
 {
 	/*
 
-		bit     description
+        bit     description
 
-		0       X1
-		1       X2
-		2       X3
-		3       X4
-		4       X5
-		5       X6
-		6       X7
-		7       X8
+        0       X1
+        1       X2
+        2       X3
+        3       X4
+        4       X5
+        5       X6
+        6       X7
+        7       X8
 
-	*/
+    */
 
 	UINT8 data = 0xff;
-	
+
 	if (!BIT(m_kb_y, 0)) data &= input_port_read(this, "Y1");
 	if (!BIT(m_kb_y, 1)) data &= input_port_read(this, "Y2");
 	if (!BIT(m_kb_y, 2)) data &= input_port_read(this, "Y3");
@@ -370,7 +370,7 @@ READ8_MEMBER( pc1512_keyboard_device::kb_bus_r )
 	if (!BIT(m_kb_y, 9)) data &= input_port_read(this, "Y10");
 	if (!BIT(m_kb_y, 10)) data &= input_port_read(this, "Y11");
 	if (!m_joy_com) data &= input_port_read(this, "COM");
-	
+
 	return data;
 }
 
@@ -383,18 +383,18 @@ WRITE8_MEMBER( pc1512_keyboard_device::kb_p1_w )
 {
 	/*
 
-		bit     description
+        bit     description
 
-		0       Y1
-		1       Y2
-		2       Y3
-		3       Y4
-		4       Y5
-		5       Y6
-		6       Y7
-		7       Y8
+        0       Y1
+        1       Y2
+        2       Y3
+        3       Y4
+        4       Y5
+        5       Y6
+        6       Y7
+        7       Y8
 
-	*/
+    */
 
 	m_kb_y = (m_kb_y & 0xff00) | data;
 }
@@ -408,24 +408,24 @@ READ8_MEMBER( pc1512_keyboard_device::kb_p2_r )
 {
 	/*
 
-		bit     description
+        bit     description
 
-		0       SERIAL DATA
-		1       SERIAL CLOCK
-		2       
-		3       
-		4       
-		5       
-		6       
-		7       
+        0       SERIAL DATA
+        1       SERIAL CLOCK
+        2
+        3
+        4
+        5
+        6
+        7
 
-	*/
-	
+    */
+
 	UINT8 data = 0;
 
 	data |= m_data_in;
 	data |= m_clock_in << 1;
-	
+
 	return data;
 }
 
@@ -438,31 +438,31 @@ WRITE8_MEMBER( pc1512_keyboard_device::kb_p2_w )
 {
 	/*
 
-		bit     description
+        bit     description
 
-		0       SERIAL DATA
-		1       SERIAL CLOCK
-		2       CAPS LED
-		3       NUM LED
-		4       Y9
-		5       Y10
-		6       Y11
-		7       joystick COM
+        0       SERIAL DATA
+        1       SERIAL CLOCK
+        2       CAPS LED
+        3       NUM LED
+        4       Y9
+        5       Y10
+        6       Y11
+        7       joystick COM
 
-	*/
-	
+    */
+
 	// keyboard data
 	m_out_data_func(BIT(data, 0));
 
 	// keyboard clock
 	m_out_clock_func(BIT(data, 1));
-	
+
 	// CAPS LOCK
 	output_set_led_value(LED_CAPS, BIT(data, 2));
-	
+
 	// NUM LOCK
 	output_set_led_value(LED_NUM, BIT(data, 3));
-	
+
 	// keyboard row
 	m_kb_y = (((data >> 4) & 0x07) << 8) | (m_kb_y & 0xff);
 

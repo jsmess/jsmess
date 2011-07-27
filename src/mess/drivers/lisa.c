@@ -406,7 +406,7 @@ ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bo
 
 	ROM_REGION(0x2000,"fdccpu",0)		/* 6504 RAM and ROM */
 	/* note: other ?prototype? revisions of this rom for the lisa probably exist as well */
-    ROM_LOAD( "341-0138f.bin", 0x000000, 0x001000, CRC(edd8d560) SHA1(872211d21386cd9625b3735d7682e2b2ecff05b4) ) 
+    ROM_LOAD( "341-0138f.bin", 0x000000, 0x001000, CRC(edd8d560) SHA1(872211d21386cd9625b3735d7682e2b2ecff05b4) )
 
 	ROM_REGION(0x4000,"profile", 0)		/* Profile/5 HDD */
 	ROM_LOAD_OPTIONAL( "341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) /* 341-0080-B z8 mcu piggyback rom */

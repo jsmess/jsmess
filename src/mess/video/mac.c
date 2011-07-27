@@ -141,7 +141,7 @@ SCREEN_UPDATE( macpb140 )
 
 		for (x = 0; x < 640; x += 16)
 		{
-			word = video_ram[((y * 640)/16) + ((x/16)^1)]; 
+			word = video_ram[((y * 640)/16) + ((x/16)^1)];
 			for (b = 0; b < 16; b++)
 			{
 				line[x + b] = (word >> (15 - b)) & 0x0001;

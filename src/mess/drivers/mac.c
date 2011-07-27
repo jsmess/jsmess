@@ -76,7 +76,7 @@ static INTERRUPT_GEN( mac_rbv_vbl )
 	mac->m_rbv_regs[2] &= ~0x40;	// set vblank signal
 	mac->m_rbv_vbltime = 10;
 
-//	printf("RBV: raising VBL!\n");
+//  printf("RBV: raising VBL!\n");
 
 	if (mac->m_rbv_regs[0x12] & 0x40)
 	{
@@ -181,7 +181,7 @@ READ8_MEMBER( mac_state::mac_sonora_vctl_r )
 
 WRITE8_MEMBER( mac_state::mac_sonora_vctl_w )
 {
-//	printf("Sonora: %02x to vctl %x\n", data, offset);
+//  printf("Sonora: %02x to vctl %x\n", data, offset);
 	m_sonora_vctl[offset] = data;
 }
 
@@ -191,7 +191,7 @@ void mac_state::rbv_recalc_irqs()
 	UINT8 slot_irqs = (~m_rbv_regs[2]) & 0x78;
 	slot_irqs &= (m_rbv_regs[0x12] & 0x78);
 
-//	printf("slot_irqs = %02x\n", slot_irqs);
+//  printf("slot_irqs = %02x\n", slot_irqs);
 	if (slot_irqs)
 	{
 		m_rbv_regs[3] |= 2;	// any slot
@@ -203,18 +203,18 @@ void mac_state::rbv_recalc_irqs()
 
 	UINT8 ifr = (m_rbv_regs[3] & m_rbv_ier) & 0x1b; //m_rbv_regs[0x13]);
 
-//	printf("ifr = %02x (reg3 %02x reg13 %02x)\n", ifr, m_rbv_regs[3], m_rbv_regs[0x13]);
+//  printf("ifr = %02x (reg3 %02x reg13 %02x)\n", ifr, m_rbv_regs[3], m_rbv_regs[0x13]);
 	if (ifr != 0)
 	{
 		m_rbv_regs[3] = ifr | 0x80;
 		m_rbv_ifr = ifr | 0x80;
 
-//		printf("VIA2 raise\n");
+//      printf("VIA2 raise\n");
 		this->set_via2_interrupt(1);
 	}
 	else
 	{
-//		printf("VIA2 lower\n");
+//      printf("VIA2 lower\n");
 		this->set_via2_interrupt(0);
 	}
 }
@@ -247,12 +247,12 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		switch (offset)
 		{
 			case 13:	// IFR
-//				printf("Read IER = %02x (PC=%x) 2=%02x\n", m_rbv_ier, cpu_get_pc(m_maincpu), m_rbv_regs[2]);
+//              printf("Read IER = %02x (PC=%x) 2=%02x\n", m_rbv_ier, cpu_get_pc(m_maincpu), m_rbv_regs[2]);
 				return m_rbv_ifr;
 				break;
 
 			case 14:	// IER
-//				printf("Read IFR = %02x (PC=%x) 2=%02x\n", m_rbv_ifr, cpu_get_pc(m_maincpu), m_rbv_regs[2]);
+//              printf("Read IFR = %02x (PC=%x) 2=%02x\n", m_rbv_ifr, cpu_get_pc(m_maincpu), m_rbv_regs[2]);
 				return m_rbv_ier;
 				break;
 
@@ -262,7 +262,7 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		}
 	}
 
-//	printf("rbv_r: %x = %02x (PC=%x)\n", offset, data, cpu_get_pc(m_maincpu));
+//  printf("rbv_r: %x = %02x (PC=%x)\n", offset, data, cpu_get_pc(m_maincpu));
 
 	return data;
 }
@@ -272,7 +272,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 	if (offset < 0x100)
 	{
 //      if (offset == 0x10)
-//		printf("rbv_w: %02x to offset %x (PC=%x)\n", data, offset, cpu_get_pc(m_maincpu));
+//      printf("rbv_w: %02x to offset %x (PC=%x)\n", data, offset, cpu_get_pc(m_maincpu));
 		switch (offset)
 		{
 			case 0x00:
@@ -355,7 +355,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 		switch (offset)
 		{
 			case 13:	// IFR
-//				printf("%02x to IFR (PC=%x)\n", data, cpu_get_pc(m_maincpu));
+//              printf("%02x to IFR (PC=%x)\n", data, cpu_get_pc(m_maincpu));
 				if (data & 0x80)
 				{
 					data = 0x7f;
@@ -364,7 +364,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 				break;
 
 			case 14:	// IER
-//				printf("%02x to IER (PC=%x)\n", data, cpu_get_pc(m_maincpu));
+//              printf("%02x to IER (PC=%x)\n", data, cpu_get_pc(m_maincpu));
 				if (data & 0x80)	// 1 bits write 1s
 				{
 					m_rbv_ier |= data & 0x7f;
@@ -385,7 +385,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 
 READ32_MEMBER(mac_state::mac_read_id)
 {
-//	printf("Mac read ID reg @ PC=%x\n", cpu_get_pc(m_maincpu));
+//  printf("Mac read ID reg @ PC=%x\n", cpu_get_pc(m_maincpu));
 
 	switch (m_model)
 	{
@@ -431,29 +431,29 @@ READ16_MEMBER(mac_state::mac_config_r)
 // IIfx
 READ32_MEMBER(mac_state::biu_r)
 {
-//	printf("biu_r @ %x, mask %08x\n", offset, mem_mask);
+//  printf("biu_r @ %x, mask %08x\n", offset, mem_mask);
 	return 0;
 }
 
 WRITE32_MEMBER(mac_state::biu_w)
 {
-//	printf("biu_w %x @ %x, mask %08x\n", data, offset, mem_mask);
+//  printf("biu_w %x @ %x, mask %08x\n", data, offset, mem_mask);
 }
 
 READ8_MEMBER(mac_state::oss_r)
 {
-//	printf("oss_r @ %x\n", offset);
-//	if (offset <= 0xe)	// for interrupt mask registers, we're intended to return something different than is written in the low 3 bits (?)
-//	{
-//		return m_oss_regs[offset]<<4;
-//	}
+//  printf("oss_r @ %x\n", offset);
+//  if (offset <= 0xe)  // for interrupt mask registers, we're intended to return something different than is written in the low 3 bits (?)
+//  {
+//      return m_oss_regs[offset]<<4;
+//  }
 
 	return m_oss_regs[offset];
 }
 
 WRITE8_MEMBER(mac_state::oss_w)
 {
-//	printf("oss_w %x @ %x\n", data, offset);
+//  printf("oss_w %x @ %x\n", data, offset);
 	m_oss_regs[offset] = data;
 }
 
@@ -466,24 +466,24 @@ READ32_MEMBER(mac_state::buserror_r)
 
 READ8_MEMBER(mac_state::scciop_r)
 {
-//	printf("scciop_r @ %x (PC=%x)\n", offset, cpu_get_pc(m_maincpu));
+//  printf("scciop_r @ %x (PC=%x)\n", offset, cpu_get_pc(m_maincpu));
 	return 0;
 }
 
 WRITE8_MEMBER(mac_state::scciop_w)
 {
-//	printf("scciop_w %x @ %x (PC=%x)\n", data, offset, cpu_get_pc(m_maincpu));
+//  printf("scciop_w %x @ %x (PC=%x)\n", data, offset, cpu_get_pc(m_maincpu));
 }
 
 READ8_MEMBER(mac_state::swimiop_r)
 {
-//	printf("swimiop_r @ %x (PC=%x)\n", offset, cpu_get_pc(m_maincpu));
+//  printf("swimiop_r @ %x (PC=%x)\n", offset, cpu_get_pc(m_maincpu));
 	return 0;
 }
 
 WRITE8_MEMBER(mac_state::swimiop_w)
 {
-//	printf("swimiop_w %x @ %x (PC=%x)\n", data, offset, cpu_get_pc(m_maincpu));
+//  printf("swimiop_w %x @ %x (PC=%x)\n", data, offset, cpu_get_pc(m_maincpu));
 }
 
 READ8_MEMBER(mac_state::pmac_diag_r)
@@ -504,7 +504,7 @@ READ8_MEMBER(mac_state::amic_dma_r)
 
 WRITE8_MEMBER(mac_state::amic_dma_w)
 {
-//	printf("amic_dma_w: %02x at %x (PC=%x)\n", data, offset+0x1000, cpu_get_pc(m_maincpu));
+//  printf("amic_dma_w: %02x at %x (PC=%x)\n", data, offset+0x1000, cpu_get_pc(m_maincpu));
 }
 
 // HMC has one register: a 35-bit shift register which is accessed one bit at a time (see pmac6100 code at 4030383c which makes this obvious)
@@ -709,7 +709,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(macpb160_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
-																						
+
 	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
 	AM_RANGE(0x50f02000, 0x50f03fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)
 	AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
@@ -725,21 +725,21 @@ static ADDRESS_MAP_START(macpb160_map, AS_PROGRAM, 32, mac_state )
 ADDRESS_MAP_END
 /*
 static ADDRESS_MAP_START(macpb165c_map, AS_PROGRAM, 32, mac_state )
-	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
-																						
-	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
-	AM_RANGE(0x50f02000, 0x50f03fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)
-	AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
-	AM_RANGE(0x50f06000, 0x50f07fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w)
-	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
-	AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
-	AM_RANGE(0x50f14000, 0x50f15fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff)
-	AM_RANGE(0x50f16000, 0x50f17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
-	AM_RANGE(0x50f20000, 0x50f21fff) AM_READ(buserror_r)	// bus error here to detect we're not the grayscale 160/165/180
-	AM_RANGE(0x50f24000, 0x50f27fff) AM_READ(buserror_r)   // bus error here to make sure we aren't mistaken for another decoder
+    AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
-	AM_RANGE(0xfc040000, 0xfc07ffff) AM_RAM	AM_BASE(m_vram)
-	AM_RANGE(0xfcff0000, 0xfcffffff) AM_ROM AM_REGION("bootrom", 0xf0000)
+    AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
+    AM_RANGE(0x50f02000, 0x50f03fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)
+    AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
+    AM_RANGE(0x50f06000, 0x50f07fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w)
+    AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
+    AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
+    AM_RANGE(0x50f14000, 0x50f15fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff)
+    AM_RANGE(0x50f16000, 0x50f17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
+    AM_RANGE(0x50f20000, 0x50f21fff) AM_READ(buserror_r)    // bus error here to detect we're not the grayscale 160/165/180
+    AM_RANGE(0x50f24000, 0x50f27fff) AM_READ(buserror_r)   // bus error here to make sure we aren't mistaken for another decoder
+
+    AM_RANGE(0xfc040000, 0xfc07ffff) AM_RAM AM_BASE(m_vram)
+    AM_RANGE(0xfcff0000, 0xfcffffff) AM_ROM AM_REGION("bootrom", 0xf0000)
 ADDRESS_MAP_END
 */
 
@@ -761,9 +761,9 @@ static ADDRESS_MAP_START(pwrmac_map, AS_PROGRAM, 64, mac_state )
 	AM_RANGE(0x50028000, 0x50028007) AM_READWRITE8(mac_sonora_vctl_r, mac_sonora_vctl_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
 	// 5002a000 = interrupt controller
 	// 5002c000 = diagnostic registers
-	AM_RANGE(0x5002c000, 0x5002dfff) AM_READ8(pmac_diag_r, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000) 
-	AM_RANGE(0x50031000, 0x50032fff) AM_READWRITE8(amic_dma_r, amic_dma_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000) 
-	AM_RANGE(0x50040000, 0x5004000f) AM_READWRITE8(hmc_r, hmc_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)  
+	AM_RANGE(0x5002c000, 0x5002dfff) AM_READ8(pmac_diag_r, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50031000, 0x50032fff) AM_READWRITE8(amic_dma_r, amic_dma_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50040000, 0x5004000f) AM_READWRITE8(hmc_r, hmc_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x5ffffff8, 0x5fffffff) AM_READ32(mac_read_id, U64(0xffffffffffffffff))
 
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("bootrom", 0)
@@ -810,7 +810,7 @@ static const struct nbbus_interface nubus_intf =
 };
 
 static SLOT_INTERFACE_START(mac_nubus_cards)
-//	SLOT_INTERFACE("48gc", NUBUS_48GC)
+//  SLOT_INTERFACE("48gc", NUBUS_48GC)
 SLOT_INTERFACE_END
 
 /***************************************************************************
@@ -1004,7 +1004,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 
 	/* devices */
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
-//	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc", NULL)
+//  MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc", NULL)
 
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
@@ -1373,12 +1373,12 @@ static MACHINE_CONFIG_DERIVED( macpb180, macpb160 )
 MACHINE_CONFIG_END
 /*
 static MACHINE_CONFIG_DERIVED( macpb180c, macpb160 )
-	MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
-	MCFG_CPU_PROGRAM_MAP(macpb165c_map)
+    MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
+    MCFG_CPU_PROGRAM_MAP(macpb165c_map)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
+    MCFG_RAM_MODIFY(RAM_TAG)
+    MCFG_RAM_DEFAULT_SIZE("4M")
+    MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
 MACHINE_CONFIG_END
 */
 static MACHINE_CONFIG_DERIVED( macclas2, maclc )
@@ -1819,7 +1819,7 @@ ROM_START( macii )
 	ROM_SYSTEM_BIOS(0, "default", "rev. B")
 	ROMX_LOAD( "9779d2c4.rom", 0x000000, 0x040000, CRC(4df6d054) SHA1(db6b504744281369794e26ba71a6e385cf6227fa), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "original", "rev. A")
-	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(2) ) 
+	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(2) )
 
 	// RasterOps "ColorBoard 264" NuBus video card
 	ROM_REGION32_BE(0x8000, "rops264", 0)
@@ -1832,7 +1832,7 @@ ROM_START( maciihmu )
 	ROM_SYSTEM_BIOS(0, "default", "rev. B")
 	ROMX_LOAD( "9779d2c4.rom", 0x000000, 0x040000, CRC(4df6d054) SHA1(db6b504744281369794e26ba71a6e385cf6227fa), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "original", "rev. A")
-	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(2) ) 
+	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(2) )
 
 	// RasterOps "ColorBoard 264" NuBus video card
 	ROM_REGION32_BE(0x8000, "rops264", 0)
@@ -1880,7 +1880,7 @@ ROM_END
 
 ROM_START( maciifx )
 	ROM_REGION32_BE(0x80000, "bootrom", 0)
-	ROM_LOAD( "4147dd77.rom", 0x000000, 0x080000, CRC(ef441bbd) SHA1(9fba3d4f672a630745d65788b1d1119afa2c6728) ) 
+	ROM_LOAD( "4147dd77.rom", 0x000000, 0x080000, CRC(ef441bbd) SHA1(9fba3d4f672a630745d65788b1d1119afa2c6728) )
 
 	// RasterOps "ColorBoard 264" NuBus video card
 	ROM_REGION32_BE(0x8000, "rops264", 0)
@@ -1900,12 +1900,12 @@ ROM_END
 
 ROM_START( maciivx )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "4957eb49.rom", 0x000000, 0x100000, CRC(61be06e5) SHA1(560ce203d65178657ad09d03f532f86fa512bb40) ) 
+	ROM_LOAD( "4957eb49.rom", 0x000000, 0x100000, CRC(61be06e5) SHA1(560ce203d65178657ad09d03f532f86fa512bb40) )
 ROM_END
 
 ROM_START( maciivi )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "4957eb49.rom", 0x000000, 0x100000, CRC(61be06e5) SHA1(560ce203d65178657ad09d03f532f86fa512bb40) ) 
+	ROM_LOAD( "4957eb49.rom", 0x000000, 0x100000, CRC(61be06e5) SHA1(560ce203d65178657ad09d03f532f86fa512bb40) )
 ROM_END
 
 ROM_START( macclas2 )
@@ -1943,32 +1943,32 @@ ROM_END
 
 ROM_START( macpb140 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) ) 
+	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) )
 ROM_END
 
 ROM_START( macpb145 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) ) 
+	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) )
 ROM_END
 
 ROM_START( macpb145b )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) ) 
+	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) )
 ROM_END
 
 ROM_START( macpb170 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) ) 
+	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) )
 ROM_END
 
 ROM_START( macpb160 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "e33b2724.rom", 0x000000, 0x100000, CRC(536c60f4) SHA1(c0510682ae6d973652d7e17f3c3b27629c47afac) ) 
+	ROM_LOAD( "e33b2724.rom", 0x000000, 0x100000, CRC(536c60f4) SHA1(c0510682ae6d973652d7e17f3c3b27629c47afac) )
 ROM_END
 
 ROM_START( macpb180 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "e33b2724.rom", 0x000000, 0x100000, CRC(536c60f4) SHA1(c0510682ae6d973652d7e17f3c3b27629c47afac) ) 
+	ROM_LOAD( "e33b2724.rom", 0x000000, 0x100000, CRC(536c60f4) SHA1(c0510682ae6d973652d7e17f3c3b27629c47afac) )
 ROM_END
 
 ROM_START( maccclas )
@@ -1987,7 +1987,7 @@ COMP( 1987, macii,    0,		0,	macii,    macadb,   macii,	      "Apple Computer", 
 COMP( 1987, maciihmu, macii,	0,	maciihmu, macadb,   macii,	      "Apple Computer", "Macintosh II (w/o 68851 MMU)", 0 )
 COMP( 1988, mac2fdhd, 0,		0,	macii,    macadb,   maciifdhd,	  "Apple Computer", "Macintosh II (FDHD)",  0 )
 COMP( 1988, maciix,   mac2fdhd, 0,	maciix,   macadb,   maciix,	      "Apple Computer", "Macintosh IIx",  0 )
-COMP( 1989, macprtb,  0,        0,  macprtb,  macadb,   macprtb,  	  "Apple Computer", "Macintosh Portable", GAME_NOT_WORKING )
+COMP( 1989, macprtb,  0,        0,  macprtb,  macadb,   macprtb,	  "Apple Computer", "Macintosh Portable", GAME_NOT_WORKING )
 COMP( 1989, macse30,  mac2fdhd, 0,	macse30,  macadb,   macse30,	  "Apple Computer", "Macintosh SE/30",  0 )
 COMP( 1989, maciicx,  mac2fdhd, 0,	maciix,   macadb,   maciicx,	  "Apple Computer", "Macintosh IIcx",  0 )
 COMP( 1989, maciici,  0,		0,	maciici,  maciici,  maciici,	  "Apple Computer", "Macintosh IIci", 0 )
@@ -1995,17 +1995,17 @@ COMP( 1990, maciifx,  0,		0,	maciifx,  macadb,   maciifx,      "Apple Computer",
 COMP( 1990, macclasc, 0,		0,	macse,    macadb,   macclassic,	  "Apple Computer", "Macintosh Classic",  0 )
 COMP( 1990, maclc,    0,		0,	maclc,    maciici,  maclc,	      "Apple Computer", "Macintosh LC",  GAME_NOT_WORKING )
 COMP( 1990, maciisi,  0,		0,	maciisi,  maciici,  maciisi,	  "Apple Computer", "Macintosh IIsi",  GAME_NOT_WORKING )
-COMP( 1991, macpb100, 0,        0,  macprtb,  macadb,   macprtb,  	  "Apple Computer", "Macintosh PowerBook 100", GAME_NOT_WORKING )
-COMP( 1991, macpb140, 0,        0,  macpb140, macadb,   macpb140,  	  "Apple Computer", "Macintosh PowerBook 140", GAME_NOT_WORKING )
-COMP( 1991, macpb170, macpb140, 0,  macpb170, macadb,   macpb140,  	  "Apple Computer", "Macintosh PowerBook 170", GAME_NOT_WORKING )
+COMP( 1991, macpb100, 0,        0,  macprtb,  macadb,   macprtb,	  "Apple Computer", "Macintosh PowerBook 100", GAME_NOT_WORKING )
+COMP( 1991, macpb140, 0,        0,  macpb140, macadb,   macpb140,	  "Apple Computer", "Macintosh PowerBook 140", GAME_NOT_WORKING )
+COMP( 1991, macpb170, macpb140, 0,  macpb170, macadb,   macpb140,	  "Apple Computer", "Macintosh PowerBook 170", GAME_NOT_WORKING )
 COMP( 1991, macclas2, 0,		0,	macclas2, macadb,   macclassic2,  "Apple Computer", "Macintosh Classic II",  GAME_NOT_WORKING )
-COMP( 1991, maclc2,   0, 		0,	maclc2,   maciici,  maclc2,	      "Apple Computer", "Macintosh LC II",  GAME_NOT_WORKING )
-COMP( 1992, macpb145, macpb140, 0,  macpb145, macadb,   macpb140,  	  "Apple Computer", "Macintosh PowerBook 145", GAME_NOT_WORKING )
-COMP( 1992, macpb160, 0,        0,  macpb160, macadb,   macpb160,  	  "Apple Computer", "Macintosh PowerBook 160", GAME_NOT_WORKING )
-COMP( 1992, macpb180, macpb160, 0,  macpb180, macadb,   macpb160,  	  "Apple Computer", "Macintosh PowerBook 180", GAME_NOT_WORKING )
-//COMP( 1992, macp180c, macpb160, 0,  macpb180c,macadb,   macpb160,  	  "Apple Computer", "Macintosh PowerBook 180c", GAME_NOT_WORKING )
+COMP( 1991, maclc2,   0,		0,	maclc2,   maciici,  maclc2,	      "Apple Computer", "Macintosh LC II",  GAME_NOT_WORKING )
+COMP( 1992, macpb145, macpb140, 0,  macpb145, macadb,   macpb140,	  "Apple Computer", "Macintosh PowerBook 145", GAME_NOT_WORKING )
+COMP( 1992, macpb160, 0,        0,  macpb160, macadb,   macpb160,	  "Apple Computer", "Macintosh PowerBook 160", GAME_NOT_WORKING )
+COMP( 1992, macpb180, macpb160, 0,  macpb180, macadb,   macpb160,	  "Apple Computer", "Macintosh PowerBook 180", GAME_NOT_WORKING )
+//COMP( 1992, macp180c, macpb160, 0,  macpb180c,macadb,   macpb160,       "Apple Computer", "Macintosh PowerBook 180c", GAME_NOT_WORKING )
 COMP( 1993, maccclas, 0,        0,  maclc2,   macadb,   maclrcclassic,"Apple Computer", "Macintosh Color Classic", GAME_NOT_WORKING )
-COMP( 1992, macpb145b,macpb140, 0,  macpb170, macadb,   macpb140,  	  "Apple Computer", "Macintosh PowerBook 145B", GAME_NOT_WORKING )
+COMP( 1992, macpb145b,macpb140, 0,  macpb170, macadb,   macpb140,	  "Apple Computer", "Macintosh PowerBook 145B", GAME_NOT_WORKING )
 COMP( 1993, maclc3,   0,		0,	maclc3,   maciici,  maclc3,	      "Apple Computer", "Macintosh LC III",  GAME_NOT_WORKING )
 COMP( 1993, maciivx,  0,		0,	maciivx,  maciici,  maciivx,	  "Apple Computer", "Macintosh IIvx",  GAME_NOT_WORKING )
 COMP( 1993, maciivi,  maciivx,	0,	maciivi,  maciici,  maciivx,	  "Apple Computer", "Macintosh IIvi",  GAME_NOT_WORKING )

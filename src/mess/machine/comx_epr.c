@@ -26,7 +26,7 @@ ROM_START( comx_epr )
 	ROM_REGION( 0x10000, "eprom", 0 )
 	ROM_LOAD( "f&m.basic.bin",  	0x0000, 0x2000, CRC(22ab7b61) SHA1(68b5770bca37b1ba94083f944086884e612b5a1b) )
 	ROM_LOAD( "disk.utilities.bin", 0x2000, 0x2000, CRC(2576c945) SHA1(e80481054c6997a5f418d8a5872ac0110ae7b75a) )
-	ROM_LOAD( "tennismania.bin", 	0x4000, 0x2000, CRC(a956cc74) SHA1(8bc914f52f0dd2cf792da74ec4e9e333365619ef) )
+	ROM_LOAD( "tennismania.bin",	0x4000, 0x2000, CRC(a956cc74) SHA1(8bc914f52f0dd2cf792da74ec4e9e333365619ef) )
 ROM_END
 
 
@@ -67,7 +67,7 @@ void comx_epr_device::device_start()
 
 	m_rom = subregion("f800")->base();
 	m_eprom = subregion("eprom")->base();
-	
+
 	// state saving
 	save_item(NAME(m_select));
 }
@@ -89,7 +89,7 @@ void comx_epr_device::device_reset()
 UINT8 comx_epr_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
-	
+
 	if (offset >= 0xc000 && offset < 0xe000)
 	{
 		offs_t address = (m_select << 13) | (offset & 0x1fff);
@@ -99,7 +99,7 @@ UINT8 comx_epr_device::comx_mrd_r(offs_t offset, int *extrom)
 	{
 		data = m_rom[offset & 0x7ff];
 	}
-	
+
 	return data;
 }
 

@@ -138,7 +138,7 @@ machine_config_constructor comx_fd_device::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  update_ef4 - 
+//  update_ef4 -
 //-------------------------------------------------
 
 inline void comx_fd_device::update_ef4()
@@ -239,7 +239,7 @@ void comx_fd_device::comx_ds_w(int state)
 UINT8 comx_fd_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	UINT8 data = 0xff;
-	
+
 	if (offset >= 0x0dd0 && offset < 0x0de0)
 	{
 		data = m_rom[offset & 0x1fff];
@@ -249,7 +249,7 @@ UINT8 comx_fd_device::comx_mrd_r(offs_t offset, int *extrom)
 	{
 		data = m_rom[offset & 0x1fff];
 	}
-	
+
 	return data;
 }
 
@@ -290,16 +290,16 @@ void comx_fd_device::comx_io_w(offs_t offset, UINT8 data)
 		{
 			/*
 
-				bit     description
+                bit     description
 
-				0       A0
-				1       A1
-				2       DRIVE0
-				3       DRIVE1
-				4       F9 DISB
-				5       SIDE SELECT
+                0       A0
+                1       A1
+                2       DRIVE0
+                3       DRIVE1
+                4       F9 DISB
+                5       SIDE SELECT
 
-			*/
+            */
 
 			// latch data to F3
 			m_addr = data & 0x03;
@@ -315,7 +315,7 @@ void comx_fd_device::comx_io_w(offs_t offset, UINT8 data)
 
 			m_disb = !BIT(data, 4);
 			update_ef4();
-			
+
 			wd17xx_set_side(m_fdc, BIT(data, 5));
 		}
 		else

@@ -145,7 +145,7 @@ static int fdc_get_curpos( device_t *device, int drive )
 	int	bytes;
 	int pos;
 	amiga_fdc_t *fdc = get_safe_token(device);
-	
+
 	elapsed = fdc->fdc_status[drive].f->get_pos();
 	speed = ( CUSTOM_REG(REG_ADKCON) & 0x100 ) ? 2 : 4;
 
@@ -347,7 +347,7 @@ bail:
 static void setup_fdc_buffer( device_t *device,int drive )
 {
 	amiga_fdc_t *fdc = get_safe_token(device);
-	fdc->fdc_status[drive].mfm = fdc->fdc_status[drive].f->get_buffer();	
+	fdc->fdc_status[drive].mfm = fdc->fdc_status[drive].f->get_buffer();
 }
 
 
@@ -373,15 +373,15 @@ WRITE8_DEVICE_HANDLER( amiga_fdc_control_w )
 	amiga_fdc_t *fdc = get_safe_token(device);
 
 	if ( fdc->fdc_sel != ( ( data >> 3 ) & 15 ) )
-		fdc->fdc_rdy = 0;	
+		fdc->fdc_rdy = 0;
 	fdc->fdc_sel = ( data >> 3 ) & 15;
-	
+
 	for ( drive = 0; drive < NUM_DRIVES; drive++ ) {
 		if ( !( fdc->fdc_sel & ( 1 << drive ) ) ) {
-			fdc->fdc_status[drive].f->ss_w(( data >> 2 ) & 1); 
-			fdc->fdc_status[drive].f->dir_w(( data >> 1 ) & 1); 
+			fdc->fdc_status[drive].f->ss_w(( data >> 2 ) & 1);
+			fdc->fdc_status[drive].f->dir_w(( data >> 1 ) & 1);
 			fdc->fdc_status[drive].f->stp_w(data & 1);
-		
+
 			fdc->fdc_status[drive].f->mon_w((( data >> 7 ) & 1)  );
 			fdc_setup_leds( device,drive );
 		}
@@ -411,7 +411,7 @@ UINT8  amiga_fdc_status_r (device_t *device)
 
 			if ( fdc->fdc_status[drive].f->dskchg_r() == 0)
 				ret &= ~0x04;
-				
+
 			return ret;
 		}
 	}
@@ -420,7 +420,7 @@ UINT8  amiga_fdc_status_r (device_t *device)
 }
 
 WRITE_LINE_DEVICE_HANDLER(amiga_index_callback)
-{	
+{
 	/* Issue a index pulse when a disk revolution completes */
 	device_t *cia = device->machine().device("cia_1");
 	mos6526_flag_w(cia, state);

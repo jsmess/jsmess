@@ -794,9 +794,9 @@ static void listoptions(const option_guide *opt_guide, const char *opt_spec)
 			for (i = 0; range[i].max >= 0; i++)
 			{
 				if (range[i].min == range[i].max)
-					snprintf(buf, ARRAY_LENGTH(buf), "%i", range[i].min);	
+					snprintf(buf, ARRAY_LENGTH(buf), "%i", range[i].min);
 				else
-					snprintf(buf, ARRAY_LENGTH(buf), "%i-%i", range[i].min, range[i].max);	
+					snprintf(buf, ARRAY_LENGTH(buf), "%i-%i", range[i].min, range[i].max);
 
 				if (i > 0)
 					strncatz(range_buffer, "/", sizeof(range_buffer));

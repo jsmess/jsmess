@@ -57,7 +57,7 @@ protected:
 private:
 	// internal state
 	comx_expansion_slot_device *m_slot;
-	
+
 	required_device<mc6845_device> m_crtc;
 
 	int m_ds;				// device select

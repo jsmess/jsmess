@@ -45,11 +45,11 @@ typedef struct _coco_cartridge_line coco_cartridge_line;
 struct _coco_cartridge_line
 {
 	emu_timer					*timer[TIMER_POOL];
-	int                  		timer_index;
-	int					 		delay;
-	cococart_line_value	 		value;
-	int					 		line;
-	int					 		q_count;
+	int                 		timer_index;
+	int							delay;
+	cococart_line_value			value;
+	int							line;
+	int							q_count;
 	devcb_resolved_write_line	callback;
 };
 
@@ -74,11 +74,11 @@ public:
 	// construction/destruction
 	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~cococart_slot_device();
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete();
-	
+
 	// image-level overrides
 	virtual bool call_load();
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
@@ -93,10 +93,10 @@ public:
 	virtual const char *image_interface() const { return "coco_cart"; }
 	virtual const char *file_extensions() const { return "ccc,rom"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	// slot interface overrides
 	virtual const char * get_default_card(const device_list &devlist, emu_options &options) const;
-	
+
 	/* reading and writing to $FF40-$FF7F */
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -105,8 +105,8 @@ public:
     void cart_set_line(cococart_line line, cococart_line_value value);
 
 	/* hack to support twiddling the Q line */
-	void twiddle_q_lines();	
-	
+	void twiddle_q_lines();
+
 	UINT8* get_cart_base();
 protected:
 	static TIMER_CALLBACK( cart_timer_callback );
@@ -116,12 +116,12 @@ protected:
 	void set_line(const char *line_name, coco_cartridge_line *line, cococart_line_value value);
 	void set_line_timer(coco_cartridge_line *line, cococart_line_value value);
 	void twiddle_line_if_q(coco_cartridge_line *line);
-	
+
 	// configuration
 	coco_cartridge_line			m_cart_line;
 	coco_cartridge_line			m_nmi_line;
-	coco_cartridge_line			m_halt_line;	
-	
+	coco_cartridge_line			m_halt_line;
+
 	device_cococart_interface	*m_cart;
 };
 
@@ -139,7 +139,7 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);
-	
+
 	virtual UINT8* get_cart_base();
 };
 

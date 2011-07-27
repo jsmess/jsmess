@@ -101,6 +101,6 @@ UINT8 comx_joy_device::comx_io_r(offs_t offset)
 	{
 		data = input_port_read(this, "JOY2");
 	}
-	
+
 	return data;
 }

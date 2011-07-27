@@ -31,16 +31,16 @@ public:
 		// construction/destruction
         coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 		coco_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-		
+
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
 		virtual const rom_entry *device_rom_region() const;
-		
+
 		virtual UINT8* get_cart_base();
-		
+
 		virtual void update_lines();
 		virtual void dskreg_w(UINT8 data);
-		
+
 		void set_intrq(UINT8 val) { m_intrq = val; }
 		void set_drq(UINT8 val) { m_drq = val; }
 protected:
@@ -48,13 +48,13 @@ protected:
         virtual void device_start();
 		virtual void device_config_complete();
 		virtual DECLARE_READ8_MEMBER(read);
-		virtual DECLARE_WRITE8_MEMBER(write);		
+		virtual DECLARE_WRITE8_MEMBER(write);
 
 		coco_rtc_type_t real_time_clock();
-		
+
         // internal state
 		cococart_slot_device *m_owner;
-		
+
 		UINT8 m_dskreg;
 		UINT8 m_drq : 1;
 		UINT8 m_intrq : 1;
@@ -64,7 +64,7 @@ protected:
 
 		/* Disto RTC */
 		device_t *m_disto_msm6242;		/* 6242 RTC on Disto interface */
-		offs_t m_msm6242_rtc_address;		
+		offs_t m_msm6242_rtc_address;
 };
 
 
@@ -125,14 +125,14 @@ public:
 		virtual machine_config_constructor device_mconfig_additions() const;
 		virtual const rom_entry *device_rom_region() const;
 		virtual void update_lines();
-		virtual void dskreg_w(UINT8 data);				
+		virtual void dskreg_w(UINT8 data);
 protected:
         // device-level overrides
 		virtual void device_start();
 		virtual void device_config_complete();
 		virtual DECLARE_READ8_MEMBER(read);
-		virtual DECLARE_WRITE8_MEMBER(write);				
-private:		
+		virtual DECLARE_WRITE8_MEMBER(write);
+private:
 };
 
 

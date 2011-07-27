@@ -67,7 +67,7 @@ READ8_MEMBER( acrnsys1_state::ins8154_b1_port_a_r )
 	for (i = 0; i < 8; i++)
 	{
 		if (BIT(key_line, i))
-		{	
+		{
 			char kbdrow[6];
 			sprintf(kbdrow,"X%X",i);
 			data = (input_port_read(machine(), kbdrow) & 0x38) | m_digit;

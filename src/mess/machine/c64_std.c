@@ -93,7 +93,7 @@ void c64_standard_cartridge_device::device_reset()
 UINT8 c64_standard_cartridge_device::c64_cd_r(offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (offset >= 0x8000 && offset < 0xc000)
 	{
 		data = m_rom[offset & 0x3fff];

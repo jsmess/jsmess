@@ -26,7 +26,7 @@ public:
 	device_t *m_pit8254;
 	device_t *m_speaker;
 	isa16_device *m_isabus;
-	
+
 	int m_poll_delay;
 	UINT8 m_at_spkrdata;
 	UINT8 m_at_speaker_input;

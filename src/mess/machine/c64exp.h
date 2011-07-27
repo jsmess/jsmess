@@ -7,28 +7,28 @@
 
 **********************************************************************
 
-					GND		 1		A		GND
-					+5V		 2		B		_ROMH
-					+5V		 3		C		_RESET
-					_IRQ	 4		D		_NMI
-					_CR/W	 5		E		Sphi2
-					DOTCLK	 6		F		CA15
-					_I/O1	 7		H		CA14
-					_GAME	 8		J		CA13
-					_EXROM	 9		K		CA12
-					_I/O2	10		L		CA11
-					_ROML	11		M		CA10
-					BA		12		N		CA9
-					_DMA	13		P		CA8
-					CD7		14		R		CA7
-					CD6		15		S		CA6
-					CD5		16		T		CA5
-					CD4		17		U		CA4
-					CD3		18		V		CA3
-					CD2		19		W		CA2
-					CD1		20		X		CA1
-					CD0		21		Y		CA0
-					GND		22		Z		GND
+                    GND      1      A       GND
+                    +5V      2      B       _ROMH
+                    +5V      3      C       _RESET
+                    _IRQ     4      D       _NMI
+                    _CR/W    5      E       Sphi2
+                    DOTCLK   6      F       CA15
+                    _I/O1    7      H       CA14
+                    _GAME    8      J       CA13
+                    _EXROM   9      K       CA12
+                    _I/O2   10      L       CA11
+                    _ROML   11      M       CA10
+                    BA      12      N       CA9
+                    _DMA    13      P       CA8
+                    CD7     14      R       CA7
+                    CD6     15      S       CA6
+                    CD5     16      T       CA5
+                    CD4     17      U       CA4
+                    CD3     18      V       CA3
+                    CD2     19      W       CA2
+                    CD1     20      X       CA1
+                    CD0     21      Y       CA0
+                    GND     22      Z       GND
 
 **********************************************************************/
 
@@ -94,7 +94,7 @@ public:
 	// memory access
 	virtual UINT8 c64_cd_r(offs_t offset, int roml, int romh, int io1, int io2) { return 0; };
 	virtual void c64_cd_w(offs_t offset, UINT8 data, int roml, int romh, int io1, int io2) { };
-	
+
 	// memory banking
 	virtual int c64_game_r() { return 1; };
 	virtual int c64_exrom_r() { return 1; };
@@ -104,7 +104,7 @@ public:
 
 	// video
 	virtual bool c64_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect) { return false; }
-	
+
 	virtual UINT8* get_cart_base() { return NULL; }
 };
 
@@ -144,7 +144,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete();
-	
+
 	// image-level overrides
 	virtual bool call_load();
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
@@ -159,12 +159,12 @@ protected:
 	virtual const char *image_interface() const { return "c64_cart"; }
 	virtual const char *file_extensions() const { return "bin,rom,80"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	// slot interface overrides
 	virtual const char * get_default_card(const device_list &devlist, emu_options &options) const;
-	
+
 	virtual UINT8* get_cart_base();
-	
+
 	devcb_resolved_write_line	m_out_irq_func;
 	devcb_resolved_write_line	m_out_nmi_func;
 	devcb_resolved_write_line	m_out_dma_func;

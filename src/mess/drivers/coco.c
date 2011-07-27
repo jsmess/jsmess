@@ -777,14 +777,14 @@ static const cococart_interface coco3_cococart_interface =
 
 static SLOT_INTERFACE_START(dragon_cart)
 	SLOT_INTERFACE("dragon_fdc", DRAGON_FDC)
-	SLOT_INTERFACE("sdtandy_fdc", SDTANDY_FDC)	
+	SLOT_INTERFACE("sdtandy_fdc", SDTANDY_FDC)
 	SLOT_INTERFACE("pak", COCO_PAK)
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(coco_cart)
 	SLOT_INTERFACE("fdc", COCO_FDC)
 	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
-	SLOT_INTERFACE("cp400_fdc", CP400_FDC)	
+	SLOT_INTERFACE("cp400_fdc", CP400_FDC)
 	SLOT_INTERFACE("rs232", COCO_232)
 	SLOT_INTERFACE("orch90", COCO_ORCH90)
 	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
@@ -831,9 +831,9 @@ static MACHINE_CONFIG_START( dragon32, coco_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
-	
+
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dragon64, coco_state )
@@ -877,9 +877,9 @@ static MACHINE_CONFIG_START( dragon64, coco_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
-	
+
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( d64plus, coco_state )
@@ -924,9 +924,9 @@ static MACHINE_CONFIG_START( d64plus, coco_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
-	
+
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dgnalpha, coco_state )
@@ -981,9 +981,9 @@ static MACHINE_CONFIG_START( dgnalpha, coco_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
-	
+
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tanodr64, coco_state )
@@ -1028,9 +1028,9 @@ static MACHINE_CONFIG_START( tanodr64, coco_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
-	
+
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco, coco_state )
@@ -1074,9 +1074,9 @@ static MACHINE_CONFIG_START( coco, coco_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("4K,32K,64K")
-	
+
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco2, coco_state )
@@ -1120,9 +1120,9 @@ static MACHINE_CONFIG_START( coco2, coco_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("16K")
-	
+
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco2b, coco_state )
@@ -1166,9 +1166,9 @@ static MACHINE_CONFIG_START( coco2b, coco_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("16K")
-	
+
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( coco3, coco3_state )
@@ -1224,9 +1224,9 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("128K,2M,8M")
-	
+
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")		
+	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coco3p, coco3 )
@@ -1286,7 +1286,7 @@ ROM_END
 ROM_START(tanodr64)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
-	ROM_LOAD("d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))	
+	ROM_LOAD("d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
 ROM_END
 
 ROM_START(dgnalpha)

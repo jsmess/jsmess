@@ -49,7 +49,7 @@ protected:
 	virtual void device_start();
 
 	void coco_vhd_readwrite(UINT8 data);
-	
+
 	UINT32 m_logical_record_number;
 	UINT32 m_buffer_address;
 	UINT8  m_status;

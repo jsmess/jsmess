@@ -1,25 +1,25 @@
 /***************************************************************************
 
-	Zenith Z-100
+    Zenith Z-100
 
-	15/07/2011 Skeleton driver.
+    15/07/2011 Skeleton driver.
 
-	TODO:
-	- remove parity check IRQ patch (understand what it really wants there!)
-	- implement S-100 bus features;
-	- irqs needs 8259 "auto-ack"-ing in order to work properly;
-	- vertical scrolling isn't understood;
+    TODO:
+    - remove parity check IRQ patch (understand what it really wants there!)
+    - implement S-100 bus features;
+    - irqs needs 8259 "auto-ack"-ing in order to work properly;
+    - vertical scrolling isn't understood;
 
 ============================================================================
 
-Z207A		EQU 0B0H	; Z-207 disk controller base port
+Z207A       EQU 0B0H    ; Z-207 disk controller base port
   ; (See DEFZ207 to program controller)
-Z217A		EQU 0AEH	; Z-217 disk controller base port
+Z217A       EQU 0AEH    ; Z-217 disk controller base port
   ; (See DEFZ217 to program controller)
-ZGRNSEG		EQU 0E000H	; Segment of green video plane
-ZREDSEG		EQU 0D000H	; Segment of red video plane
-ZBLUSEG		EQU 0C000H	; Segment of blue video plane
-ZVIDEO		EQU 0D8H	; Video 68A21 port
+ZGRNSEG     EQU 0E000H  ; Segment of green video plane
+ZREDSEG     EQU 0D000H  ; Segment of red video plane
+ZBLUSEG     EQU 0C000H  ; Segment of blue video plane
+ZVIDEO      EQU 0D8H    ; Video 68A21 port
   ; PA0 -> enable red display
   ; PA1 -> enable green display
   ; PA2 -> enable blue display
@@ -34,12 +34,12 @@ ZVIDEO		EQU 0D8H	; Video 68A21 port
   ; CB1 - not used
   ; CB2 -> value to write (0 or 1) on clear screen
   ; (see DEF6821 to program the 6821)
-ZCRTC		EQU 0DCH	; Video 6845 CRT-C port
+ZCRTC       EQU 0DCH    ; Video 6845 CRT-C port
   ; (see DEF6845 to program the 6845)
-ZLPEN		EQU 0DEH	; Light pen latch
-  ZLPEN_BIT	  EQU 00000111B	  ; Bit hit by pen
-  ZLPEN_ROW	  EQU 11110000B	  ; Row hit by pen
-ZPIA		EQU 0E0H	; Parallel printer plus light pen and
+ZLPEN       EQU 0DEH    ; Light pen latch
+  ZLPEN_BIT   EQU 00000111B   ; Bit hit by pen
+  ZLPEN_ROW   EQU 11110000B   ; Row hit by pen
+ZPIA        EQU 0E0H    ; Parallel printer plus light pen and
                                 ;  video vertical retrace 68A21 port
   ; PA0 -> PDATA1
   ; PA1 -> PDATA2
@@ -62,79 +62,79 @@ ZPIA		EQU 0E0H	; Parallel printer plus light pen and
   ; CB1 <- not ACKNLG
   ; CB2 <- BUSY
   ; (See DEF6821 to program the PIA)
-ZTIMER		EQU 0E4H	; Timer 8253 port
-  ZTIMEVAL	  EQU 2500	  ; 100ms divide by N value
+ZTIMER      EQU 0E4H    ; Timer 8253 port
+  ZTIMEVAL    EQU 2500    ; 100ms divide by N value
   ; (See DEF8253 to program the 8253)
-ZTIMERS		EQU 0FBH	; Timer interrupt status port
-  ZTIMERS0	  EQU 001H	  ; Timer 0 interrupt
-  ZTIMERS2	  EQU 002H	  ; Timer 2 interrupt
-ZSERA		EQU 0E8H	; First 2661-2 serial port
-ZSERB		EQU 0ECH	; Second 2661-2 serial port
+ZTIMERS     EQU 0FBH    ; Timer interrupt status port
+  ZTIMERS0    EQU 001H    ; Timer 0 interrupt
+  ZTIMERS2    EQU 002H    ; Timer 2 interrupt
+ZSERA       EQU 0E8H    ; First 2661-2 serial port
+ZSERB       EQU 0ECH    ; Second 2661-2 serial port
   ; (See DEFEP2 to program 2661-2)
-ZM8259A		EQU 0F2H	; Master 8259A interrupt controller port
-  ZINTEI	  EQU 0		  ; Parity error or S-100 pin 98 interrupt
-  ZINTPS	  EQU 1		  ; Processor swap interrupt
-  ZINTTIM	  EQU 2		  ; Timer interrupt
-  ZINTSLV	  EQU 3		  ; Slave 8259A interrupt
-  ZINTSA	  EQU 4		  ; Serial port A interrupt
-  ZINTSB	  EQU 5		  ; Serial port B interrupt
-  ZINTKD	  EQU 6		  ; Keyboard, Display, or Light pen interrupt
-  ZINTPP	  EQU 7		  ; Parallel port interrupt
+ZM8259A     EQU 0F2H    ; Master 8259A interrupt controller port
+  ZINTEI      EQU 0       ; Parity error or S-100 pin 98 interrupt
+  ZINTPS      EQU 1       ; Processor swap interrupt
+  ZINTTIM     EQU 2       ; Timer interrupt
+  ZINTSLV     EQU 3       ; Slave 8259A interrupt
+  ZINTSA      EQU 4       ; Serial port A interrupt
+  ZINTSB      EQU 5       ; Serial port B interrupt
+  ZINTKD      EQU 6       ; Keyboard, Display, or Light pen interrupt
+  ZINTPP      EQU 7       ; Parallel port interrupt
   ; (See DEF8259A to program the 8259A)
-  ZM8259AI	  EQU 64	    ; Base interrupt number for master
-ZS8259A		EQU 0F0H	; Secondary 8259A interrupt controller port
-  ZS8259AI	  EQU 72	    ; Base interrupt number for slave
-  BIOSAI	  EQU ZS8259AI+8    ; Base of BIOS generated interrupts
-ZKEYBRD		EQU 0F4H	; Keyboard port
-  ZKEYBRDD	  EQU ZKEYBRD+0	  ; Keyboard data port
-  ZKEYBRDC	  EQU ZKEYBRD+1	  ; Keyboard command port
-    ZKEYRES	    EQU 0	    ; Reset command
-    ZKEYARD	    EQU 1	    ; Autorepeat on command
-    ZKEYARF	    EQU 2	    ; Autorepeat off command
-    ZKEYKCO	    EQU 3	    ; Key click on command
-    ZKEYKCF	    EQU 4	    ; Key click off command
-    ZKEYCF	    EQU 5	    ; Clear keyboard FIFO command
-    ZKEYCLK	    EQU 6	    ; Generate a click sound command
-    ZKEYBEP	    EQU 7	    ; Generate a beep sound command
-    ZKEYEK	    EQU 8	    ; Enable keyboard command
-    ZKEYDK	    EQU 9	    ; Disable keyboard command
-    ZKEYUDM	    EQU 10	    ; Enter UP/DOWN mode command
-    ZKEYNSM	    EQU 11	    ; Enter normal scan mode command
-    ZKEYEI	    EQU 12	    ; Enable keyboard interrupts command
-    ZKEYDI	    EQU 13	    ; Disable keyboard interrupts command
-  ZKEYBRDS	  EQU ZKEYBRD+1	  ; Keyboard status port
-    ZKEYOBF	    EQU 001H	    ; Output buffer not empty
-    ZKEYIBF	    EQU 002H	    ; Input buffer full
-ZMCL		EQU 0FCH	; Memory control latch
-  ZMCLMS	  EQU 00000011B	  ; Map select mask
-    ZSM0	    EQU 0	    ; Map select 0
-    ZSM1	    EQU 1	    ; Map select 1
-    ZSM2	    EQU 2	    ; Map select 2
-    ZSM3	    EQU 3	    ; Map select 3
-  ZMCLRM	  EQU 00001100B	  ; Monitor ROM mapping mask
-    ZRM0	    EQU 0*4 	    ; Power up mode - ROM everywhere on reads
-    ZRM1	    EQU 1*4 	    ; ROM at top of every 64K page
-    ZRM2	    EQU 2*4 	    ; ROM at top of 8088's addr space
-    ZRM3	    EQU 3*4 	    ; Disable ROM
-  ZMCLPZ	  EQU 00010000B	  ; 0=Set Parity to the zero state
-  ZMCLPK	  EQU 00100000B	  ; 0=Disable parity checking circuity
-  ZMCLPF	  EQU 01000000B	  ; 0=Disable parity error flag
-Z205BA		EQU 098H	; Base address for Z-205 boards
-  Z205BMC	  EQU 8		  ; Maximum of 8 Z-205 boards installed
-ZHAL		EQU 0FDH	; Hi-address latch
-  ZHAL85	  EQU 0FFH	  ; 8085 Mask
-  ZHAL88	  EQU 0F0H	  ; 8088 Mask
-ZPSP		EQU 0FEH	; Processor swap port
-  ZPSPPS	  EQU 10000000B   ; Processor select (0=8085, 1=8088)
-  ZPSPPS5	  EQU 00000000B	  ; Select 8085
-  ZPSPPS8	  EQU 10000000B   ; Select 8088
-  ZPSPSI	  EQU 00000010B   ; Generate interrupt on swapping
-  ZPSPI8	  EQU 00000001B	  ; 8088 processes all interrupts
-ZDIPSW		EQU 0FFH	; Configuration dip switches
-  ZDIPSWBOOT	  EQU 00000111B	  ; Boot device field
-  ZDIPSWAB	  EQU 00001000B	  ; 1=Auto boot(0=Manual boot)
-  ZDIPSWRES	  EQU 01110000B	  ; Reserved
-  ZDIPSWHZ	  EQU 10000000B	  ; 1=50Hz(0=60HZ)
+  ZM8259AI    EQU 64        ; Base interrupt number for master
+ZS8259A     EQU 0F0H    ; Secondary 8259A interrupt controller port
+  ZS8259AI    EQU 72        ; Base interrupt number for slave
+  BIOSAI      EQU ZS8259AI+8    ; Base of BIOS generated interrupts
+ZKEYBRD     EQU 0F4H    ; Keyboard port
+  ZKEYBRDD    EQU ZKEYBRD+0   ; Keyboard data port
+  ZKEYBRDC    EQU ZKEYBRD+1   ; Keyboard command port
+    ZKEYRES     EQU 0       ; Reset command
+    ZKEYARD     EQU 1       ; Autorepeat on command
+    ZKEYARF     EQU 2       ; Autorepeat off command
+    ZKEYKCO     EQU 3       ; Key click on command
+    ZKEYKCF     EQU 4       ; Key click off command
+    ZKEYCF      EQU 5       ; Clear keyboard FIFO command
+    ZKEYCLK     EQU 6       ; Generate a click sound command
+    ZKEYBEP     EQU 7       ; Generate a beep sound command
+    ZKEYEK      EQU 8       ; Enable keyboard command
+    ZKEYDK      EQU 9       ; Disable keyboard command
+    ZKEYUDM     EQU 10      ; Enter UP/DOWN mode command
+    ZKEYNSM     EQU 11      ; Enter normal scan mode command
+    ZKEYEI      EQU 12      ; Enable keyboard interrupts command
+    ZKEYDI      EQU 13      ; Disable keyboard interrupts command
+  ZKEYBRDS    EQU ZKEYBRD+1   ; Keyboard status port
+    ZKEYOBF     EQU 001H        ; Output buffer not empty
+    ZKEYIBF     EQU 002H        ; Input buffer full
+ZMCL        EQU 0FCH    ; Memory control latch
+  ZMCLMS      EQU 00000011B   ; Map select mask
+    ZSM0        EQU 0       ; Map select 0
+    ZSM1        EQU 1       ; Map select 1
+    ZSM2        EQU 2       ; Map select 2
+    ZSM3        EQU 3       ; Map select 3
+  ZMCLRM      EQU 00001100B   ; Monitor ROM mapping mask
+    ZRM0        EQU 0*4         ; Power up mode - ROM everywhere on reads
+    ZRM1        EQU 1*4         ; ROM at top of every 64K page
+    ZRM2        EQU 2*4         ; ROM at top of 8088's addr space
+    ZRM3        EQU 3*4         ; Disable ROM
+  ZMCLPZ      EQU 00010000B   ; 0=Set Parity to the zero state
+  ZMCLPK      EQU 00100000B   ; 0=Disable parity checking circuity
+  ZMCLPF      EQU 01000000B   ; 0=Disable parity error flag
+Z205BA      EQU 098H    ; Base address for Z-205 boards
+  Z205BMC     EQU 8       ; Maximum of 8 Z-205 boards installed
+ZHAL        EQU 0FDH    ; Hi-address latch
+  ZHAL85      EQU 0FFH    ; 8085 Mask
+  ZHAL88      EQU 0F0H    ; 8088 Mask
+ZPSP        EQU 0FEH    ; Processor swap port
+  ZPSPPS      EQU 10000000B   ; Processor select (0=8085, 1=8088)
+  ZPSPPS5     EQU 00000000B   ; Select 8085
+  ZPSPPS8     EQU 10000000B   ; Select 8088
+  ZPSPSI      EQU 00000010B   ; Generate interrupt on swapping
+  ZPSPI8      EQU 00000001B   ; 8088 processes all interrupts
+ZDIPSW      EQU 0FFH    ; Configuration dip switches
+  ZDIPSWBOOT      EQU 00000111B   ; Boot device field
+  ZDIPSWAB    EQU 00001000B   ; 1=Auto boot(0=Manual boot)
+  ZDIPSWRES   EQU 01110000B   ; Reserved
+  ZDIPSWHZ    EQU 10000000B   ; 1=50Hz(0=60HZ)
 
 ****************************************************************************/
 
@@ -263,11 +263,11 @@ static WRITE8_HANDLER( z100_vram_w )
 static ADDRESS_MAP_START(z100_mem, AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x3ffff) AM_RAM // 128*2 KB RAM
-//	AM_RANGE(0xb0000,0xbffff) AM_ROM // expansion ROM
+//  AM_RANGE(0xb0000,0xbffff) AM_ROM // expansion ROM
 	AM_RANGE(0xc0000,0xeffff) AM_READWRITE(z100_vram_r,z100_vram_w) // Blue / Red / Green
-//	AM_RANGE(0xf0000,0xf0fff) // network card (NET-100)
-//	AM_RANGE(0xf4000,0xf7fff) // MTRET-100 Firmware I expansion ROM
-//	AM_RANGE(0xf8000,0xfbfff) // MTRET-100 Firmware II expansion ROM check ID 0x4550
+//  AM_RANGE(0xf0000,0xf0fff) // network card (NET-100)
+//  AM_RANGE(0xf4000,0xf7fff) // MTRET-100 Firmware I expansion ROM
+//  AM_RANGE(0xf8000,0xfbfff) // MTRET-100 Firmware II expansion ROM check ID 0x4550
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
@@ -344,9 +344,9 @@ static WRITE8_HANDLER( z207_fdc_w )
 {
 	z100_state *state = space->machine().driver_data<z100_state>();
 	device_t* dev = space->machine().device("z207_fdc");
-//	UINT8 res;
+//  UINT8 res;
 
-//	res = 0;
+//  res = 0;
 
 	switch(offset)
 	{
@@ -368,36 +368,36 @@ static WRITE8_HANDLER( z207_fdc_w )
 
 static ADDRESS_MAP_START( z100_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE (0x00, 0x3f) reserved for non-ZDS vendors
-//	AM_RANGE (0x40, 0x5f) secondary Multiport card (Z-204)
-//	AM_RANGE (0x60, 0x7f) primary Multiport card (Z-204)
-//	AM_RANGE (0x80, 0x83) development board
-//	AM_RANGE (0x98, 0x9f) Z-205 expansion memory boards
-//	AM_RANGE (0xa0, 0xa3) network card (NET-100)
-//	AM_RANGE (0xa4, 0xa7) gateway (reserved)
-//	AM_RANGE (0xac, 0xad) Z-217 secondary disk controller (winchester)
-//	AM_RANGE (0xae, 0xaf) Z-217 primary disk controller (winchester)
+//  AM_RANGE (0x00, 0x3f) reserved for non-ZDS vendors
+//  AM_RANGE (0x40, 0x5f) secondary Multiport card (Z-204)
+//  AM_RANGE (0x60, 0x7f) primary Multiport card (Z-204)
+//  AM_RANGE (0x80, 0x83) development board
+//  AM_RANGE (0x98, 0x9f) Z-205 expansion memory boards
+//  AM_RANGE (0xa0, 0xa3) network card (NET-100)
+//  AM_RANGE (0xa4, 0xa7) gateway (reserved)
+//  AM_RANGE (0xac, 0xad) Z-217 secondary disk controller (winchester)
+//  AM_RANGE (0xae, 0xaf) Z-217 primary disk controller (winchester)
 	AM_RANGE (0xb0, 0xb7) AM_READWRITE(z207_fdc_r,z207_fdc_w) // primary (wd1797)
 //  z-207 secondary disk controller (wd1797)
-//	AM_RANGE (0xcd, 0xce) ET-100 CRT Controller
-//	AM_RANGE (0xd4, 0xd7) ET-100 Trainer Parallel I/O
+//  AM_RANGE (0xcd, 0xce) ET-100 CRT Controller
+//  AM_RANGE (0xd4, 0xd7) ET-100 Trainer Parallel I/O
 	AM_RANGE (0xd8, 0xdb) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write) //video board
 	AM_RANGE (0xdc, 0xdc) AM_WRITE(z100_6845_address_w)
 	AM_RANGE (0xdd, 0xdd) AM_WRITE(z100_6845_data_w)
-//	AM_RANGE (0xde, 0xde) light pen
+//  AM_RANGE (0xde, 0xde) light pen
 	AM_RANGE (0xe0, 0xe3) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write) //main board
-//	AM_RANGE (0xe4, 0xe7) 8253 PIT
-//	AM_RANGE (0xe8, 0xeb) First 2661-2 serial port (printer)
-//	AM_RANGE (0xec, 0xef) Second 2661-2 serial port (modem)
+//  AM_RANGE (0xe4, 0xe7) 8253 PIT
+//  AM_RANGE (0xe8, 0xeb) First 2661-2 serial port (printer)
+//  AM_RANGE (0xec, 0xef) Second 2661-2 serial port (modem)
 	AM_RANGE (0xf0, 0xf1) AM_DEVREADWRITE("pic8259_slave", pic8259_r, pic8259_w)
 	AM_RANGE (0xf2, 0xf3) AM_DEVREADWRITE("pic8259_master", pic8259_r, pic8259_w)
 	AM_RANGE (0xf4, 0xf4) AM_READ(keyb_data_r) // -> 8041 MCU
 	AM_RANGE (0xf5, 0xf5) AM_READWRITE(keyb_status_r,keyb_command_w)
-//	AM_RANGE (0xf6, 0xf6) expansion ROM is present (bit 0, active low)
-//	AM_RANGE (0xfb, 0xfb) timer irq status
-//	AM_RANGE (0xfc, 0xfc) memory latch
-//	AM_RANGE (0xfd, 0xfd) Hi-address latch
-//	AM_RANGE (0xfe, 0xfe) Processor swap port
+//  AM_RANGE (0xf6, 0xf6) expansion ROM is present (bit 0, active low)
+//  AM_RANGE (0xfb, 0xfb) timer irq status
+//  AM_RANGE (0xfc, 0xfc) memory latch
+//  AM_RANGE (0xfd, 0xfd) Hi-address latch
+//  AM_RANGE (0xfe, 0xfe) Processor swap port
 	AM_RANGE (0xff, 0xff) AM_READ_PORT("DSW101")
 ADDRESS_MAP_END
 
@@ -628,16 +628,16 @@ static WRITE8_DEVICE_HANDLER( video_pia_A_w )
 {
 	z100_state *state = device->machine().driver_data<z100_state>();
 
- 	/*
- 	all bits are active low
- 	x--- ---- -> disable video RAM
-	-x-- ---- -> not write multiple blue
+	/*
+    all bits are active low
+    x--- ---- -> disable video RAM
+    -x-- ---- -> not write multiple blue
     --x- ---- -> not write multiple green
     ---x ---- -> not write multiple red
     ---- x--- -> not flash screen
     ---- -x-- -> enable blue display
-  	---- --x- -> enable green display
- 	---- ---x -> enable red display
+    ---- --x- -> enable green display
+    ---- ---x -> enable red display
     */
 
 	state->m_vram_enable = ((data & 0x80) >> 7) ^ 1;
@@ -820,5 +820,5 @@ static DRIVER_INIT( z100 )
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, z100,  	0,       0, 		z100, 	z100, 	 z100,  	 "Zenith",   "Z-100",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, z100,	0,       0, 		z100,	z100,	 z100,  	 "Zenith",   "Z-100",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

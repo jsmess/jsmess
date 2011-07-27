@@ -6,9 +6,9 @@ XL 80 cartridge
 PCB Layout
 ----------
 
-		|==================================|
-		|   LS175    LS20    LS139         |
-		|   LS157                          |
+        |==================================|
+        |   LS175    LS20    LS139         |
+        |   LS157                          |
 |=======|                                  |
 |=|                          RAM           |
 |=|    LS157      LS157             LS165  |
@@ -19,18 +19,18 @@ PCB Layout
 |=|    ROM0          LS245   LS151         |
 |=|                             14.31818MHz|
 |=======|            LS174   LS00          |
-		|                           HCU04  |
-		|    LS74    LS161   LS74          |
-		|==================================|
+        |                           HCU04  |
+        |    LS74    LS161   LS74          |
+        |==================================|
 
 Notes:
     All IC's shown.
 
-	CRTC 	- Hitachi HD46505SP
-	RAM  	- Toshiba TMM2016AP-12 2Kx8 Static RAM
-	ROM0 	- GI 9433CS-0090 8Kx8 ROM?
-	ROM1 	- GI 9316CS-F67 2Kx8 ROM? "DTC"
-	CN1  	- RCA video output
+    CRTC    - Hitachi HD46505SP
+    RAM     - Toshiba TMM2016AP-12 2Kx8 Static RAM
+    ROM0    - GI 9433CS-0090 8Kx8 ROM?
+    ROM1    - GI 9316CS-F67 2Kx8 ROM? "DTC"
+    CN1     - RCA video output
 
 */
 
@@ -148,7 +148,7 @@ static MACHINE_CONFIG_FRAGMENT( c64_xl80 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(50)
-	
+
 	//MCFG_GFXDECODE(c64_xl80)
 
 	MCFG_MC6845_ADD(HD46505SP_TAG, H46505, XTAL_14_31818MHz, crtc_intf)
@@ -217,11 +217,11 @@ void c64_xl80_device::device_reset()
 UINT8 c64_xl80_device::c64_cd_r(offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!io2 && BIT(offset, 1))
 	{
 		address_space *space = machine().firstcpu->memory().space(AS_PROGRAM);
-		
+
 		if (offset & 0x01)
 		{
 			data = m_crtc->register_r(*space, 0);
@@ -249,7 +249,7 @@ void c64_xl80_device::c64_cd_w(offs_t offset, UINT8 data, int roml, int romh, in
 	if (!io2 && BIT(offset, 1))
 	{
 		address_space *space = machine().firstcpu->memory().space(AS_PROGRAM);
-		
+
 		if (offset & 0x01)
 		{
 			m_crtc->register_w(*space, 0, data);

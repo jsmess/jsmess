@@ -1,9 +1,9 @@
 /***************************************************************************
 
   nubus.c - NuBus bus and card emulation
- 
-  by R. Belmont, based heavily on Miodrag Milanovic's ISA8/16 implementation  
- 
+
+  by R. Belmont, based heavily on Miodrag Milanovic's ISA8/16 implementation
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -105,7 +105,7 @@ void nubus_device::device_config_complete()
 nubus_device::nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, NUBUS, "NUBUS", tag, owner, clock)
 {
-}	
+}
 
 nubus_device::nubus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, type, name, tag, owner, clock)

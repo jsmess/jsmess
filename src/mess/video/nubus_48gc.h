@@ -21,7 +21,7 @@ public:
         // construction/destruction
         nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 		nubus_48gc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-		
+
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
 		virtual const rom_entry *device_rom_region() const;

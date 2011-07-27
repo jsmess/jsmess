@@ -165,7 +165,7 @@ static MACHINE_CONFIG_FRAGMENT( comx_clm )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(50)
-	
+
 	//MCFG_GFXDECODE(comx_clm)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_14_31818MHz, crtc_intf)
@@ -248,7 +248,7 @@ UINT8 comx_clm_device::comx_mrd_r(offs_t offset, int *extrom)
 	address_space *space = machine().firstcpu->memory().space(AS_PROGRAM);
 
 	UINT8 data = 0xff;
-	
+
 	if (offset >= 0xc000 && offset < 0xc800)
 	{
 		data = m_rom[offset & 0x7ff];
@@ -261,7 +261,7 @@ UINT8 comx_clm_device::comx_mrd_r(offs_t offset, int *extrom)
 	{
 		data = m_crtc->register_r(*space, 0);
 	}
-	
+
 	return data;
 }
 
@@ -273,7 +273,7 @@ UINT8 comx_clm_device::comx_mrd_r(offs_t offset, int *extrom)
 void comx_clm_device::comx_mwr_w(offs_t offset, UINT8 data)
 {
 	address_space *space = machine().firstcpu->memory().space(AS_PROGRAM);
-	
+
 	if (offset >= 0xd000 && offset < 0xd800)
 	{
 		m_video_ram[offset & 0x7ff] = data;

@@ -29,7 +29,7 @@ READ8_MEMBER( comx35_state::mem_r )
 	int extrom = 1;
 
 	UINT8 data = m_expansion->mrd_r(offset, &extrom);
-	
+
 	if (offset < 0x4000)
 	{
 		if (extrom) data = rom[offset & 0x3fff];
@@ -42,7 +42,7 @@ READ8_MEMBER( comx35_state::mem_r )
 	{
 		data = m_vis->char_ram_r(space, offset & 0x3ff);
 	}
-	
+
 	return data;
 }
 
@@ -79,12 +79,12 @@ WRITE8_MEMBER( comx35_state::mem_w )
 READ8_MEMBER( comx35_state::io_r )
 {
 	UINT8 data = m_expansion->io_r(offset);
-	
+
 	if (offset == 3)
 	{
 		data = m_kbe->data_r(space, 0);
 	}
-	
+
 	return data;
 }
 
@@ -335,7 +335,7 @@ WRITE_LINE_MEMBER( comx35_state::q_w )
 
 	// cassette output
 	m_cassette->output(state ? +1.0 : -1.0);
-	
+
 	// expansion bus
 	m_expansion->q_w(state);
 }
@@ -519,7 +519,7 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	MCFG_PRINTER_ADD("printer")
 
 	MCFG_COMXPL80_ADD()
-	
+
 	// expansion bus
 	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb", NULL)
 
@@ -550,7 +550,7 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	MCFG_PRINTER_ADD("printer")
 
 	MCFG_COMXPL80_ADD()
-	
+
 	// expansion bus
 	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb", NULL)
 

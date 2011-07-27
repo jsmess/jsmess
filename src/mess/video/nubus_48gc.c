@@ -23,7 +23,7 @@ MACHINE_CONFIG_END
 
 ROM_START( gc48 )
 	ROM_REGION(0x8000, GC48_ROM_REGION, 0)
-	ROM_LOAD( "3410801.bin",  0x0000, 0x8000, CRC(e283da91) SHA1(4ae21d6d7bbaa6fc7aa301bee2b791ed33b1dcf9) ) 
+	ROM_LOAD( "3410801.bin",  0x0000, 0x8000, CRC(e283da91) SHA1(4ae21d6d7bbaa6fc7aa301bee2b791ed33b1dcf9) )
 ROM_END
 
 //**************************************************************************

@@ -169,18 +169,18 @@ machine_config_constructor comx_eb_device::device_mconfig_additions() const
 void comx_eb_device::set_int(const char *tag, int state)
 {
 	int slot = 0;
-	
+
 	for (slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
 		if (!strcmp(tag, m_slot[slot]->tag())) break;
 	}
 
 	assert(slot < MAX_EB_SLOTS);
-	
+
 	m_int[slot] = state;
 
 	int irq = CLEAR_LINE;
-	
+
 	for (slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
 		irq |= m_int[slot];
@@ -197,18 +197,18 @@ void comx_eb_device::set_int(const char *tag, int state)
 void comx_eb_device::set_ef4(const char *tag, int state)
 {
 	int slot = 0;
-	
+
 	for (slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
 		if (!strcmp(tag, m_slot[slot]->tag())) break;
 	}
 
 	assert(slot < MAX_EB_SLOTS);
-	
+
 	m_ef4[slot] = state;
-	
+
 	int ef4 = CLEAR_LINE;
-	
+
 	for (slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
 		ef4 |= m_ef4[slot];
@@ -248,13 +248,13 @@ void comx_eb_device::device_start()
 	m_slot[1] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT2_TAG));
 	m_slot[2] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT3_TAG));
 	m_slot[3] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT4_TAG));
-	
+
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
 		m_int[slot] = CLEAR_LINE;
 		m_ef4[slot] = CLEAR_LINE;
 	}
-	
+
 	m_rom = subregion("e000")->base();
 }
 
@@ -291,7 +291,7 @@ void comx_eb_device::comx_q_w(int state)
 UINT8 comx_eb_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
-	
+
 	if (offset >= 0x1000 && offset < 0x1800)
 	{
 		data = m_rom[offset & 0x7ff];
@@ -311,7 +311,7 @@ UINT8 comx_eb_device::comx_mrd_r(offs_t offset, int *extrom)
 			}
 		}
 	}
-	
+
 	return data;
 }
 
@@ -339,7 +339,7 @@ void comx_eb_device::comx_mwr_w(offs_t offset, UINT8 data)
 UINT8 comx_eb_device::comx_io_r(offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
 		if (BIT(m_select, slot) && m_slot[slot] != NULL)
@@ -361,7 +361,7 @@ void comx_eb_device::comx_io_w(offs_t offset, UINT8 data)
 	if (offset == 1)
 	{
 		m_select = data >> 1;
-		
+
 		for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 		{
 			if (m_slot[slot] != NULL)
@@ -370,7 +370,7 @@ void comx_eb_device::comx_io_w(offs_t offset, UINT8 data)
 			}
 		}
 	}
-	
+
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
 		if (BIT(m_select, slot) && m_slot[slot] != NULL)
@@ -388,7 +388,7 @@ void comx_eb_device::comx_io_w(offs_t offset, UINT8 data)
 bool comx_eb_device::comx_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	bool value = false;
-	
+
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
 		if (BIT(m_select, slot) && m_slot[slot] != NULL)

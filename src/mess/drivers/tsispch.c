@@ -204,10 +204,10 @@ READ8_MEMBER( tsispch_state::dsw_r )
 WRITE8_MEMBER( tsispch_state::peripheral_w )
 {
 	/* This controls the four LEDS, the RESET line for the upd77p20,
-	and (probably) the p0-to-ir0 masking of the upd77p20; there are two
-	unknown and seemingly unused bits as well.
-	see the top of the file for more info.
-	*/
+    and (probably) the p0-to-ir0 masking of the upd77p20; there are two
+    unknown and seemingly unused bits as well.
+    see the top of the file for more info.
+    */
 	tsispch_state *state = machine().driver_data<tsispch_state>();
 	state->m_paramReg = data;
 	cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, BIT(data,6)?CLEAR_LINE:ASSERT_LINE);

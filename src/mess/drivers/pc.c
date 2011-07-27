@@ -1591,7 +1591,7 @@ ROM_END
 ROM_START( t1000tl2 )
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "t10000tl2.bin", 0xf0000, 0x10000, CRC(e288f12c) SHA1(9d54ccf773cd7202c9906323f1b5a68b1b3a3a67))
-	
+
 		ROM_REGION(0x08000,"gfx1", 0)
 	// expects 8x9 charset!
 	/* Character rom located at U3 w/label "8079027 // NCR // 609-2495004 // F841030 A9025" */
@@ -1835,7 +1835,7 @@ COMP(  1987,	t1000hx,    ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Rad
 COMP(  1987,	t1000sx,    ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000 SX", GAME_NOT_WORKING)
 COMP(  1987,	t1000tx,    ibm5150,	0,	t1000_286,  tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000 TX", 0)
 COMP(  1989,	t1000rl,    ibm5150,	0,	t1000_16,   tandy1t,    t1000hx,    "Tandy Radio Shack",  "Tandy 1000 RL", 0)
-COMP ( 1989,	t1000tl2, 	ibm5150,	 0, t1000_286,	tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000 TL/2", 0)
+COMP ( 1989,	t1000tl2,	ibm5150,	 0, t1000_286,	tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000 TL/2", 0)
 
 COMP ( 1989,	iskr1031,   ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-1031" , GAME_NOT_WORKING)
 COMP ( 1989,	iskr1030m,  ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-1030M" , GAME_NOT_WORKING)
