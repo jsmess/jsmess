@@ -40,17 +40,23 @@ Thanks to Chris Schwartz who dumped his ROM for me way back in the old days.
 It's only taken 25 years to get around to emulating it...
 
 
+Differences between tec1 and tecjmon:
+
+On the tec1 a keypress is indicated by an NMI from the 74C923; but on
+the jmon it sets bit 6 of port 3 low instead. The NMI code is simply
+a 'retn' in the jmon rom, so we can use the same code.
+The jmon includes a cassette interface, a serial input connection,
+and an optional LCD, but the games of the tec1 have been removed.
+
+
 ToDo:
 - After a Soft Reset, pressing keys can crash the emulation.
 - The 74C923 code may need to be revisited to improve keyboard response.
   Sometimes have to press a key a few times before it registers.
 - The 10ms debounce is not emulated.
-- Needs proper artwork.
 
 
 JMON ToDo:
-- Add cassette circuitry
-- Fix keyboard
 - Add LCD display (2 rows by 16 characters)
 
 
@@ -60,6 +66,8 @@ JMON ToDo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
+#include "sound/wave.h"
+#include "imagedev/cassette.h"
 #include "tec1.lh"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
@@ -70,14 +78,20 @@ class tec1_state : public driver_device
 public:
 	tec1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_speaker(*this, SPEAKER_TAG)
+	m_maincpu(*this, "maincpu"),
+	m_speaker(*this, SPEAKER_TAG),
+	m_cass(*this, CASSETTE_TAG),
+	m_wave(*this, WAVE_TAG),
+	m_key_pressed(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_speaker;
+	optional_device<cassette_image_device> m_cass;
+	optional_device<device_t> m_wave;
 	emu_timer *m_kbd_timer;
 	DECLARE_READ8_MEMBER( tec1_kbd_r );
+	DECLARE_READ8_MEMBER( latch_r );
 	DECLARE_WRITE8_MEMBER( tec1_digit_w );
 	DECLARE_WRITE8_MEMBER( tec1_segment_w );
 	UINT8 m_kbd;
@@ -85,6 +99,7 @@ public:
 	UINT8 m_digit;
 	UINT8 m_kbd_row;
 	UINT8 m_refresh[6];
+	bool m_key_pressed;
 	UINT8 tec1_convert_col_to_bin( UINT8 col, UINT8 row );
 	virtual void machine_reset();
 	virtual void machine_start();
@@ -125,7 +140,7 @@ WRITE8_MEMBER( tec1_state::tec1_digit_w )
     d0 address digit 4 */
 
 	speaker_level_w(m_speaker, BIT(data, 7));
-
+	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
 	m_digit = data & 0x3f;
 }
 
@@ -135,6 +150,18 @@ WRITE8_MEMBER( tec1_state::tec1_digit_w )
     Keyboard
 
 ***************************************************************************/
+
+READ8_MEMBER( tec1_state::latch_r )
+{
+// bit 7 - cass in ; bit 6 low = key pressed
+	UINT8 data = (m_key_pressed) ? 0 : 0x40;
+
+	if (m_cass->input() > 0.03)
+		data |= 0x80;
+
+	return data;
+}
+
 
 READ8_MEMBER( tec1_state::tec1_kbd_r )
 {
@@ -201,7 +228,10 @@ static TIMER_CALLBACK( tec1_kbd_callback )
 	{
 		state->m_kbd = state->tec1_convert_col_to_bin(input_port_read(machine, keynames[state->m_kbd_row]), state->m_kbd_row);
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, HOLD_LINE);
+		state->m_key_pressed = TRUE;
 	}
+	else
+		state->m_key_pressed = FALSE;
 }
 
 
@@ -257,7 +287,7 @@ static ADDRESS_MAP_START( tecjmon_io, AS_IO, 8, tec1_state )
 	AM_RANGE(0x00, 0x00) AM_READ(tec1_kbd_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(tec1_digit_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(tec1_segment_w)
-	//AM_RANGE(0x03, 0x03) AM_READ(latch_r)
+	AM_RANGE(0x03, 0x03) AM_READ(latch_r)
 	//AM_RANGE(0x04, 0x04) AM_WRITE(lcd_en_w)
 	//AM_RANGE(0x84, 0x84) AM_WRITE(lcd_2nd_w)
 ADDRESS_MAP_END
@@ -339,6 +369,11 @@ static MACHINE_CONFIG_START( tecjmon, tec1_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* Devices */
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 MACHINE_CONFIG_END
 
 
@@ -366,4 +401,4 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT       COMPANY  FULLNAME */
 COMP( 1984, tec1,     0,      0,      tec1,       tec1,    0,		"Talking Electronics magazine",  "TEC-1" , 0 )
-COMP( 1984, tecjmon,  tec1,   0,      tecjmon,    tec1,    0,		"Talking Electronics magazine",  "TEC-1A with JMON" , GAME_NOT_WORKING )
+COMP( 1984, tecjmon,  tec1,   0,      tecjmon,    tec1,    0,		"Talking Electronics magazine",  "TEC-1A with JMON" , 0 )
