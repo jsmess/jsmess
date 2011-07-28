@@ -661,7 +661,7 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 
-	if(0)
+	if(state->m_scu.src_add[dma_ch] == 0)
 	{
 	if(LOG_SCU) printf("DMA lv %d transfer START\n"
 			             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu.src[dma_ch],state->m_scu.dst[dma_ch],state->m_scu.size[dma_ch]);
@@ -731,10 +731,11 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	for (; state->m_scu.size[dma_ch] > 0; state->m_scu.size[dma_ch]-=state->m_scu.dst_add[dma_ch])
 	{
 		/* Mahou Tsukai ni Naru Houhou directly accesses CD-rom register 0x05818000, it must be a dword access otherwise it won't work */
-		if(state->m_scu.src_add[dma_ch] == 0 && state->m_scu.dst_add[dma_ch] == 8)
+		if(state->m_scu.src_add[dma_ch] == 0)
 		{
 			space->write_dword(state->m_scu.dst[dma_ch],  space->read_dword(state->m_scu.src[dma_ch]  ));
-			space->write_dword(state->m_scu.dst[dma_ch]+4,space->read_dword(state->m_scu.src[dma_ch]  ));
+			if(state->m_scu.dst_add[dma_ch] == 8)
+				space->write_dword(state->m_scu.dst[dma_ch]+4,space->read_dword(state->m_scu.src[dma_ch]  ));
 		}
 		else if(state->m_scu.dst_add[dma_ch] == 2)
 			space->write_word(state->m_scu.dst[dma_ch],space->read_word(state->m_scu.src[dma_ch]));
@@ -803,7 +804,7 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 		if(indirect_src & 0x80000000)
 			job_done = 1;
 
-		if(0)
+		if(state->m_scu.src_add[dma_ch] == 0)
 		{
 			if(LOG_SCU) printf("DMA lv %d indirect mode transfer START\n"
 					           "Index %08x Start %08x End %08x Size %04x\n",dma_ch,tmp_src,indirect_src,indirect_dst,indirect_size);
