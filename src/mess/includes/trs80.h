@@ -7,23 +7,85 @@
 #ifndef TRS80_H_
 #define TRS80_H_
 
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "sound/speaker.h"
+#include "sound/wave.h"
+#include "machine/ay31015.h"
+#include "machine/ctronics.h"
 #include "machine/wd17xx.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/snapquik.h"
+#include "formats/trs_cas.h"
+#include "formats/trs_cmd.h"
+#include "formats/trs_dsk.h"
+
 
 #define FW 6
 #define FH 12
-
 
 class trs80_state : public driver_device
 {
 public:
 	trs80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_printer(*this, "centronics"),
+	m_ay31015(*this, "tr1602"),
+	m_fdc(*this, "wd179x"),
+	m_speaker(*this, SPEAKER_TAG),
+	m_cass(*this, CASSETTE_TAG)
+	{ }
 
-	UINT8 *m_videoram;
+	required_device<cpu_device> m_maincpu;
+	optional_device<device_t> m_printer;
+	optional_device<device_t> m_ay31015;
+	optional_device<device_t> m_fdc;
+	required_device<device_t> m_speaker;
+	required_device<cassette_image_device> m_cass;
+	DECLARE_WRITE8_MEMBER ( trs80_ff_w );
+	DECLARE_WRITE8_MEMBER ( lnw80_fe_w );
+	DECLARE_WRITE8_MEMBER ( sys80_fe_w );
+	DECLARE_WRITE8_MEMBER ( sys80_f8_w );
+	DECLARE_WRITE8_MEMBER ( trs80m4_ff_w );
+	DECLARE_WRITE8_MEMBER ( trs80m4_f4_w );
+	DECLARE_WRITE8_MEMBER ( trs80m4_ec_w );
+	DECLARE_WRITE8_MEMBER ( trs80m4_eb_w );
+	DECLARE_WRITE8_MEMBER ( trs80m4_ea_w );
+	DECLARE_WRITE8_MEMBER ( trs80m4_e9_w );
+	DECLARE_WRITE8_MEMBER ( trs80m4_e8_w );
+	DECLARE_WRITE8_MEMBER ( trs80m4_e4_w );
+	DECLARE_WRITE8_MEMBER ( trs80m4_e0_w );
+	DECLARE_WRITE8_MEMBER ( trs80m4p_9c_w );
+	DECLARE_WRITE8_MEMBER ( trs80m4_90_w );
+	DECLARE_WRITE8_MEMBER ( trs80m4_84_w );
+	DECLARE_READ8_MEMBER ( lnw80_fe_r );
+	DECLARE_READ8_MEMBER ( trs80_ff_r );
+	DECLARE_READ8_MEMBER ( sys80_f9_r );
+	DECLARE_READ8_MEMBER ( trs80m4_ff_r );
+	DECLARE_READ8_MEMBER ( trs80m4_ec_r );
+	DECLARE_READ8_MEMBER ( trs80m4_eb_r );
+	DECLARE_READ8_MEMBER ( trs80m4_ea_r );
+	DECLARE_READ8_MEMBER ( trs80m4_e8_r );
+	DECLARE_READ8_MEMBER ( trs80m4_e4_r );
+	DECLARE_READ8_MEMBER ( trs80m4_e0_r );
+	DECLARE_READ8_MEMBER( trs80_irq_status_r );
+	DECLARE_READ8_MEMBER( trs80_printer_r );
+	DECLARE_WRITE8_MEMBER( trs80_printer_w );
+	DECLARE_WRITE8_MEMBER( trs80_cassunit_w );
+	DECLARE_WRITE8_MEMBER( trs80_motor_w );
+	DECLARE_READ8_MEMBER( trs80_keyboard_r );
+	DECLARE_WRITE8_MEMBER ( trs80m4_88_w );
+	DECLARE_READ8_MEMBER( trs80_videoram_r );
+	DECLARE_WRITE8_MEMBER( trs80_videoram_w );
+	DECLARE_READ8_MEMBER( trs80_gfxram_r );
+	DECLARE_WRITE8_MEMBER( trs80_gfxram_w );
+	DECLARE_READ8_MEMBER (trs80_wd179x_r);
+	const UINT8 *m_p_chargen;
+	UINT8 *m_p_videoram;
+	UINT8 *m_p_gfxram;
 	UINT8 m_model4;
-	UINT8 *m_gfxram;
 	UINT8 m_mode;
 	UINT8 m_irq;
 	UINT8 m_mask;
@@ -41,11 +103,6 @@ public:
 #endif
 	UINT8 m_cassette_data;
 	emu_timer *m_cassette_data_timer;
-	device_t *m_printer;
-	device_t *m_ay31015;
-	cassette_image_device *m_cass;
-	device_t *m_speaker;
-	device_t *m_fdc;
 	double m_old_cassette_val;
 	UINT16 m_start_address;
 	UINT8 m_crtc_reg;
@@ -62,46 +119,10 @@ MACHINE_RESET( trs80 );
 MACHINE_RESET( trs80m4 );
 MACHINE_RESET( lnw80 );
 
-WRITE8_HANDLER ( trs80_ff_w );
-WRITE8_HANDLER ( lnw80_fe_w );
-WRITE8_HANDLER ( sys80_fe_w );
-WRITE8_HANDLER ( sys80_f8_w );
-WRITE8_HANDLER ( trs80m4_ff_w );
-WRITE8_HANDLER ( trs80m4_f4_w );
-WRITE8_HANDLER ( trs80m4_ec_w );
-WRITE8_HANDLER ( trs80m4_eb_w );
-WRITE8_HANDLER ( trs80m4_ea_w );
-WRITE8_HANDLER ( trs80m4_e9_w );
-WRITE8_HANDLER ( trs80m4_e8_w );
-WRITE8_HANDLER ( trs80m4_e4_w );
-WRITE8_HANDLER ( trs80m4_e0_w );
-WRITE8_HANDLER ( trs80m4p_9c_w );
-WRITE8_HANDLER ( trs80m4_90_w );
-WRITE8_HANDLER ( trs80m4_84_w );
-READ8_HANDLER ( lnw80_fe_r );
-READ8_HANDLER ( trs80_ff_r );
-READ8_HANDLER ( sys80_f9_r );
-READ8_HANDLER ( trs80m4_ff_r );
-READ8_HANDLER ( trs80m4_ec_r );
-READ8_HANDLER ( trs80m4_eb_r );
-READ8_HANDLER ( trs80m4_ea_r );
-READ8_HANDLER ( trs80m4_e8_r );
-READ8_HANDLER ( trs80m4_e4_r );
-READ8_HANDLER ( trs80m4_e0_r );
 
 INTERRUPT_GEN( trs80_rtc_interrupt );
 INTERRUPT_GEN( trs80_fdc_interrupt );
 
-READ8_HANDLER( trs80_irq_status_r );
-
-READ8_HANDLER( trs80_printer_r );
-WRITE8_HANDLER( trs80_printer_w );
-
-WRITE8_HANDLER( trs80_cassunit_w );
-WRITE8_HANDLER( trs80_motor_w );
-
-READ8_HANDLER( trs80_keyboard_r );
-READ8_DEVICE_HANDLER (trs80_wd179x_r);
 
 
 /*----------- defined in video/trs80.c -----------*/
@@ -113,12 +134,6 @@ SCREEN_UPDATE( lnw80 );
 SCREEN_UPDATE( radionic );
 SCREEN_UPDATE( trs80m4 );
 
-WRITE8_HANDLER ( trs80m4_88_w );
-
-READ8_HANDLER( trs80_videoram_r );
-WRITE8_HANDLER( trs80_videoram_w );
-READ8_HANDLER( trs80_gfxram_r );
-WRITE8_HANDLER( trs80_gfxram_w );
 
 PALETTE_INIT( lnw80 );
 
