@@ -93,6 +93,7 @@ public:
 	DECLARE_READ8_MEMBER( tec1_kbd_r );
 	DECLARE_READ8_MEMBER( latch_r );
 	DECLARE_WRITE8_MEMBER( tec1_digit_w );
+	DECLARE_WRITE8_MEMBER( tecjmon_digit_w );
 	DECLARE_WRITE8_MEMBER( tec1_segment_w );
 	UINT8 m_kbd;
 	UINT8 m_segment;
@@ -131,6 +132,22 @@ WRITE8_MEMBER( tec1_state::tec1_segment_w )
 WRITE8_MEMBER( tec1_state::tec1_digit_w )
 {
 /*  d7 speaker
+    d6 not used
+    d5 data digit 1
+    d4 data digit 2
+    d3 address digit 1
+    d2 address digit 2
+    d1 address digit 3
+    d0 address digit 4 */
+
+	speaker_level_w(m_speaker, BIT(data, 7));
+
+	m_digit = data & 0x3f;
+}
+
+WRITE8_MEMBER( tec1_state::tecjmon_digit_w )
+{
+/*  d7 speaker & cassout
     d6 not used
     d5 data digit 1
     d4 data digit 2
@@ -285,7 +302,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tecjmon_io, AS_IO, 8, tec1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(tec1_kbd_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(tec1_digit_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(tecjmon_digit_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(tec1_segment_w)
 	AM_RANGE(0x03, 0x03) AM_READ(latch_r)
 	//AM_RANGE(0x04, 0x04) AM_WRITE(lcd_en_w)
