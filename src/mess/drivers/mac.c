@@ -38,6 +38,8 @@
 
 #define ADDRESS_MAP_MODERN
 
+//#define TEST_SLOT_CARD
+
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
@@ -810,7 +812,9 @@ static const struct nbbus_interface nubus_intf =
 };
 
 static SLOT_INTERFACE_START(mac_nubus_cards)
-//  SLOT_INTERFACE("48gc", NUBUS_48GC)
+#ifdef TEST_SLOT_CARD
+	SLOT_INTERFACE("48gc", NUBUS_48GC)
+#endif
 SLOT_INTERFACE_END
 
 /***************************************************************************
@@ -1004,8 +1008,9 @@ static MACHINE_CONFIG_START( macii, mac_state )
 
 	/* devices */
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
-//  MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc", NULL)
-
+#ifdef TEST_SLOT_CARD
+	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc", NULL)
+#endif
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)

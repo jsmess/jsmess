@@ -239,6 +239,8 @@ void device_nubus_card_interface::set_nubus_device()
 void device_nubus_card_interface::install_declaration_rom(const char *romregion)
 {
 	char region_name[128];
+	bool inverted = false;
+	UINT8 *newrom = NULL;
 
 	sprintf(region_name, "%s:%s:%s", m_nubus_slottag, m_nubus_defslot, romregion);
 
@@ -246,5 +248,109 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion)
 	UINT32 romlen = device().machine().region(region_name)->bytes();
 
 	printf("ROM length is %x, last byte is %02x\n", romlen, rom[romlen-1]);
+
+	UINT8 byteLanes = rom[romlen-1];
+	// check if all bits are inverted
+	if (rom[romlen-2] == 0xff)
+	{
+		byteLanes ^= 0xff;
+		inverted = true;
+	}
+
+	switch (byteLanes)
+	{
+		case 0x0f:	// easy case: all 4 lanes (still must scramble for 32-bit BE bus though)
+			newrom = (UINT8 *)malloc(romlen);
+			memset(newrom, 0, romlen);
+			for (int i = 0; i < romlen; i++)
+			{
+				newrom[BYTE4_XOR_BE(i)] = rom[i];
+			}
+			break;
+
+		case 0xe1:	// lane 0 only
+			newrom = (UINT8 *)malloc(romlen*4);
+			memset(newrom, 0, romlen*4);
+			for (int i = 0; i < romlen; i++)
+			{
+				newrom[BYTE4_XOR_BE(i*4)] = rom[i];
+			}
+			romlen *= 4;
+			break;
+
+		case 0xd2:	// lane 1 only
+			newrom = (UINT8 *)malloc(romlen*4);
+			memset(newrom, 0, romlen*4);
+			for (int i = 0; i < romlen; i++)
+			{
+				newrom[BYTE4_XOR_BE((i*4)+1)] = rom[i];
+			}
+			romlen *= 4;
+			break;
+
+		case 0xb4:	// lane 2 only
+			newrom = (UINT8 *)malloc(romlen*4);
+			memset(newrom, 0, romlen*4);
+			for (int i = 0; i < romlen; i++)
+			{
+				newrom[BYTE4_XOR_BE((i*4)+2)] = rom[i];
+			}
+			romlen *= 4;
+			break;
+
+		case 0x78:	// lane 3 only
+			newrom = (UINT8 *)malloc(romlen*4);
+			memset(newrom, 0, romlen*4);
+			for (int i = 0; i < romlen; i++)
+			{
+				newrom[BYTE4_XOR_BE((i*4)+3)] = rom[i];
+			}
+			romlen *= 4;
+			break;
+
+		case 0xc3:	// lanes 0, 1
+			newrom = (UINT8 *)malloc(romlen*2);
+			memset(newrom, 0, romlen*2);
+			for (int i = 0; i < romlen; i+=2)
+			{
+				newrom[BYTE4_XOR_BE((i*4))] = rom[i];
+				newrom[BYTE4_XOR_BE((i*4)+1)] = rom[i+1];
+			}
+			romlen *= 4;
+			break;
+
+		case 0x3c:	// lanes 2,3
+			newrom = (UINT8 *)malloc(romlen*2);
+			memset(newrom, 0, romlen*2);
+			for (int i = 0; i < romlen; i+=2)
+			{
+				newrom[BYTE4_XOR_BE((i*4)+2)] = rom[i];
+				newrom[BYTE4_XOR_BE((i*4)+3)] = rom[i+1];
+			}
+			romlen *= 4;
+			break;
+
+		default:
+			fatalerror("NuBus: unhandled byteLanes value %02x\n", byteLanes);
+			break;
+	}
+
+	// the slot manager can supposedly handle inverted ROMs by itself, but let's do it for it anyway
+	if (inverted)
+	{
+		for (int i = 0; i < romlen; i++)
+		{
+			newrom[i] ^= 0xff;
+		}
+	}
+
+	// now install the ROM
+	UINT32 addr = get_slotspace() + 0x01000000;
+	char bankname[128];
+	strcpy(bankname, "rom_");
+	strcat(bankname, m_nubus_slottag);
+	addr -= romlen;
+	printf("Installing ROM bank [%s] at %08x\n", bankname, addr);
+	m_nubus->install_bank(addr, addr+romlen-1, addr+romlen-1, 0, bankname, newrom);
 }
 
