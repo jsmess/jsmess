@@ -1,7 +1,31 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pc1512" description="Amstrad PC1512 diskettes">
+	<!--
+	Missing software that supports PC1512 special features:
+
+	20,000 Leagues Under the Sea
+	Bob Morane: Science Fiction 1
+	The Carl Lewis Challenge
+	Die Hard 2: Die Harder
+	Dragonfly
+	Feud
+	Flags
+	Gnome Ranger
+	The Great Escape
+	Iznogoud
+	Legend of Djel
+	Lemmings
+	Maupiti Island
+	Metal Mutant
+	Nil Dieu Vivant
+	Oh No! More Lemmings
+	Prohibition
+	Time and Magik: The Trilogy
 	
+	Deluxe Paint II
+	Wordstar 1512
+	-->
 	<software name="amstcoll">
 		<description>The Amstrad PC Collection</description>
 		<year>1986</year>

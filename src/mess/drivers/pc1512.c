@@ -2,14 +2,17 @@
 
     Amstrad PC1512
 
+	http://www.seasip.info/AmstradXT
+	
+*/
+
+/*
+
     TODO:
 
-    - rewrite VDU
-
-    http://git.redump.net/cgit.cgi/mess/commit/?id=94fd742c9f51970583806ed37c6b3d9815f73e1a
-    http://www.retroisle.com/amstrad/pcs/OriginalDocs/techmanual.php#1.11.2.2
-    http://www.reenigne.org/blog/crtc-emulation-for-mess/
-    http://www.seasip.info/AmstradXT/pc1512kbd.html
+	- adjust mouse speed
+	- V2 keyboard error
+	- V3 VDU check goes crazy
 
 */
 
@@ -462,7 +465,7 @@ WRITE8_MEMBER( pc1512_state::fdc_w )
 
 static ADDRESS_MAP_START( pc1512_mem, AS_PROGRAM, 16, pc1512_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
-//  AM_RANGE(0xb8000, 0xbffff) AM_READWRITE(videoram_r, videoram_w)
+	AM_RANGE(0xb8000, 0xbbfff) AM_READWRITE8(video_ram_r, video_ram_w, 0xffff)
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
 
@@ -482,7 +485,7 @@ static ADDRESS_MAP_START( pc1512_io, AS_IO, 16, pc1512_state )
 	AM_RANGE(0x080, 0x083) AM_WRITE8(dma_page_w, 0xffff)
 	AM_RANGE(0x0a0, 0x0a1) AM_WRITE8(nmi_mask_w, 0xff00)
 	AM_RANGE(0x378, 0x37b) AM_READWRITE8(printer_r, printer_w, 0xffff)
-//  AM_RANGE(0x3d0, 0x3df) AM_READWRITE8(vdu_r, vdu_w, 0xffff)
+	AM_RANGE(0x3d0, 0x3df) AM_READWRITE8(vdu_r, vdu_w, 0xffff)
 	AM_RANGE(0x3f0, 0x3f7) AM_READWRITE8(fdc_r, fdc_w, 0xffff)
 	AM_RANGE(0x3f8, 0x3ff) AM_DEVREADWRITE8_LEGACY(INS8250_TAG, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
@@ -541,9 +544,9 @@ static INPUT_CHANGED( mouse_y_changed )
 	pc1512_state *state = field.machine().driver_data<pc1512_state>();
 
 	if (newval > oldval)
-		state->m_mouse_y++;
-	else
 		state->m_mouse_y--;
+	else
+		state->m_mouse_y++;
 }
 
 
@@ -578,16 +581,14 @@ static INPUT_PORTS_START( pc1512 )
 	PORT_DIPNAME( 0x10, 0x10, "ROM Size")
 	PORT_DIPSETTING( 0x10, "16 KB" )
 	PORT_DIPSETTING( 0x00, "32 KB" )
-/*  PORT_DIPNAME( 0x60, 0x60, "Character Set")
+	PORT_DIPNAME( 0x60, 0x60, "Character Set")
     PORT_DIPSETTING( 0x60, "Default (Codepage 437)" )
     PORT_DIPSETTING( 0x40, "Portugese (Codepage 865)" )
     PORT_DIPSETTING( 0x20, "Norwegian (Codepage 860)" )
-    PORT_DIPSETTING( 0x00, "Greek")*/
+    PORT_DIPSETTING( 0x00, "Greek")
 	PORT_DIPNAME( 0x80, 0x80, "Floppy Ready Line")
 	PORT_DIPSETTING( 0x80, "Connected" )
 	PORT_DIPSETTING( 0x00, "Not connected" )
-
-	PORT_INCLUDE( pcvideo_pc1512 )
 INPUT_PORTS_END
 
 
@@ -977,6 +978,15 @@ void pc1512_state::machine_start()
 	save_item(NAME(m_printer_data));
 	save_item(NAME(m_printer_control));
 	save_item(NAME(m_toggle));
+	save_item(NAME(m_lpen));
+	save_item(NAME(m_blink));
+	save_item(NAME(m_cursor));
+	save_item(NAME(m_blink_ctr));
+	save_item(NAME(m_vdu_mode));
+	save_item(NAME(m_vdu_color));
+	save_item(NAME(m_vdu_plane));
+	save_item(NAME(m_vdu_rdsel));
+	save_item(NAME(m_vdu_border));
 	save_item(NAME(m_speaker_drive));
 }
 
@@ -992,6 +1002,16 @@ void pc1512_state::machine_reset()
 	m_kb_bits = 0;
 
 	set_fdc_dsr(0);
+	
+	m_lpen = 0;
+	m_blink = 0;
+	m_cursor = 0;
+	m_blink_ctr = 0;
+	m_vdu_mode = 0;
+	m_vdu_color = 0;
+	m_vdu_rdsel = 0;
+	m_vdu_plane = 0x0f;
+	m_vdu_border = 0;
 }
 
 
@@ -1010,7 +1030,7 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_CPU_IO_MAP(pc1512_io)
 
 	// video
-	MCFG_FRAGMENT_ADD( pcvideo_pc1512 )
+	MCFG_FRAGMENT_ADD(pc1512_video)
 
 	// sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1058,8 +1078,8 @@ ROM_START( pc1512 )
 	ROM_LOAD16_BYTE( "40043.ic129", 0x0000, 0x2000, CRC(f72f1582) SHA1(7781d4717917262805d514b331ba113b1e05a247) )
 	ROM_LOAD16_BYTE( "40044.ic132", 0x0001, 0x2000, CRC(668fcc94) SHA1(74002f5cc542df442eec9e2e7a18db3598d8c482) )
 
-	ROM_REGION( 0x08100, "gfx1", 0 )
-	ROM_LOAD( "40045.ic127", 0x00000, 0x02000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7) )
+	ROM_REGION( 0x2000, AMS40041_TAG, 0 )
+	ROM_LOAD( "40045.ic127", 0x0000, 0x2000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7) )
 ROM_END
 
 
@@ -1072,8 +1092,8 @@ ROM_START( pc1512v2 )
 	ROM_LOAD16_BYTE( "40043v2.ic129", 0x0000, 0x2000, CRC(1aec54fa) SHA1(b12fd73cfc35a240ed6da4dcc4b6c9910be611e0) )
 	ROM_LOAD16_BYTE( "40044v2.ic132", 0x0001, 0x2000, CRC(d2d4d2de) SHA1(c376fd1ad23025081ae16c7949e88eea7f56e1bb) )
 
-	ROM_REGION( 0x08100, "gfx1", 0 )
-	ROM_LOAD( "40078.ic127", 0x00000, 0x02000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd) )
+	ROM_REGION( 0x2000, AMS40041_TAG, 0 )
+	ROM_LOAD( "40078.ic127", 0x0000, 0x2000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd) )
 ROM_END
 
 
@@ -1086,8 +1106,8 @@ ROM_START( pc1512v3 )
 	ROM_LOAD16_BYTE( "40043-2.ic129", 0x0000, 0x2000, CRC(ea527e6e) SHA1(b77fa44767a71a0b321a88bb0a394f1125b7c220) )
 	ROM_LOAD16_BYTE( "40044-2.ic130", 0x0001, 0x2000, CRC(532c3854) SHA1(18a17b710f9eb079d9d7216d07807030f904ceda) )
 
-	ROM_REGION( 0x08100, "gfx1", 0 )
-	ROM_LOAD( "40078.ic127", 0x00000, 0x02000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd) )
+	ROM_REGION( 0x2000, AMS40041_TAG, 0 )
+	ROM_LOAD( "40078.ic127", 0x0000, 0x2000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd) )
 ROM_END
 
 
@@ -1097,6 +1117,6 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME        FLAGS
-COMP( 1986, pc1512,		0,			0,		pc1512,		pc1512,		0,		"Amstrad plc",	"PC1512 (V1)",	GAME_IMPERFECT_GRAPHICS )
+COMP( 1986, pc1512,		0,			0,		pc1512,		pc1512,		0,		"Amstrad plc",	"PC1512 (V1)",	GAME_SUPPORTS_SAVE )
 COMP( 1987, pc1512v2,	pc1512,		0,		pc1512,		pc1512,		0,		"Amstrad plc",	"PC1512 (V2)",	GAME_NOT_WORKING )
 COMP( 1989, pc1512v3,	pc1512,		0,		pc1512,		pc1512,		0,		"Amstrad plc",	"PC1512 (V3)",	GAME_NOT_WORKING )
