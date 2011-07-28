@@ -70,6 +70,7 @@
 #include "winutf8.h"
 #include "winutil.h"
 #include "debugger.h"
+#include "winfile.h"
 
 #define DEBUG_SLOW_LOCKS	0
 
@@ -678,6 +679,9 @@ void windows_osd_interface::init(running_machine &machine)
 		profiler->start();
 	}
 
+	// initialize sockets
+	win_init_sockets();	
+	
 	// note the existence of a machine
 	g_current_machine = &machine;
 }
@@ -692,6 +696,9 @@ void windows_osd_interface::osd_exit(running_machine &machine)
 	// no longer have a machine
 	g_current_machine = NULL;
 
+	// cleanup sockets
+	win_cleanup_sockets();
+	
 	// take down the watchdog thread if it exists
 	if (watchdog_thread != NULL)
 	{
