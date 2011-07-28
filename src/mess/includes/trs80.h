@@ -22,9 +22,6 @@
 #include "formats/trs_dsk.h"
 
 
-#define FW 6
-#define FH 12
-
 class trs80_state : public driver_device
 {
 public:
