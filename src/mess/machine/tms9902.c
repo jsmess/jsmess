@@ -176,7 +176,7 @@ INLINE tms9902_t *get_token(device_t *device)
 static void field_interrupts(device_t *device)
 {
 	tms9902_t *tms9902 = get_token(device);
-	int new_int = (tms9902->DSCH && tms9902->DSCENB)
+	bool new_int = (tms9902->DSCH && tms9902->DSCENB)
 							|| (tms9902->RBRL && tms9902->RIENB)
 							|| (tms9902->XBRE && tms9902->XBIENB)
 							|| (tms9902->TIMELP && tms9902->TIMENB);

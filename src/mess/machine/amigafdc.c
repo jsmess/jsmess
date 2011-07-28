@@ -116,9 +116,9 @@ static DEVICE_START(amiga_fdc)
 		fdc->fdc_status[id].len = 0;
 		fdc->fdc_status[id].ptr = 0;
 		if (id==0) {
-			fdc->fdc_status[id].f = device->subdevice<floppy_image_device>(FLOPPY_0);
+			fdc->fdc_status[id].f =  downcast<floppy_image_device *>(device->subdevice(FLOPPY_0));
 		} else {
-			fdc->fdc_status[id].f = device->subdevice<floppy_image_device>(FLOPPY_1);
+			fdc->fdc_status[id].f =  downcast<floppy_image_device *>(device->subdevice(FLOPPY_1));
 		}
 		fdc->fdc_status[id].tracklen = MAX_TRACK_BYTES;
 		fdc->fdc_status[id].dma_timer->reset(  );
