@@ -781,12 +781,10 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 			break;
 
 		case MESS_COLUMN_CRC:
-		case MESS_COLUMN_MD5:
 		case MESS_COLUMN_SHA1:
 		switch (nColumn)
 			{
 				case MESS_COLUMN_CRC:	nHashFunction = hash_collection::HASH_CRC;	break;
-				case MESS_COLUMN_MD5:	nHashFunction = hash_collection::HASH_MD5;	break;
 				case MESS_COLUMN_SHA1:	nHashFunction = hash_collection::HASH_SHA1;	break;
 			}
 /*          if (hash_data_extract_printable_checksum(pFileInfo->hash_string, nHashFunction, szBuffer))
