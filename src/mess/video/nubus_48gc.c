@@ -11,8 +11,6 @@
 #define GC48_ROM_REGION		"48gc_rom"
 
 static SCREEN_UPDATE( mac_48gc );
-static READ32_DEVICE_HANDLER( mac_48gc_r );
-static WRITE32_DEVICE_HANDLER( mac_48gc_w );
 
 MACHINE_CONFIG_FRAGMENT( macvideo_48gc )
 	MCFG_SCREEN_ADD( GC48_SCREEN_NAME, RASTER)
@@ -90,10 +88,8 @@ void nubus_48gc_device::device_start()
 
 	slotspace = get_slotspace();
 
-	printf("slot %d, slotspace %08x\n", m_slot, slotspace);
-
 	m_vram = auto_alloc_array(machine(), UINT8, 0x7ffff);
-	m_nubus->install_device(this, slotspace+0x200000, slotspace+0x2003ff, 0, 0x180000, FUNC(mac_48gc_r), FUNC(mac_48gc_w) );
+	m_nubus->install_device(slotspace+0x200000, slotspace+0x2003ff, read32_delegate(FUNC(nubus_48gc_device::mac_48gc_r), this), write32_delegate(FUNC(nubus_48gc_device::mac_48gc_w), this));
 	m_nubus->install_bank(slotspace, slotspace+0x7ffff, 0, 0x07000, "bank_48gc", m_vram);
 
 	m_toggle = 0;
@@ -118,18 +114,20 @@ void nubus_48gc_device::device_reset()
 static SCREEN_UPDATE( mac_48gc )
 {
 	nubus_48gc_device *card = downcast<nubus_48gc_device *>(screen->owner());
-/*	UINT32 *scanline;
+	UINT32 *scanline;
 	int x, y;
 	UINT8 *vram8 = (UINT8 *)card->m_vram;
 	UINT8 pixels;
-	UINT32 stride = card->m_registers[0xc/4];
+//	UINT32 stride = card->m_registers[0xc/4]/4;
+
+	vram8 += 0xa00;
 
 	for (y = 0; y < 480; y++)
 	{
 		scanline = BITMAP_ADDR32(bitmap, y, 0);
 		for (x = 0; x < 640/8; x++)
 		{
-			pixels = vram8[(y * stride) + (BYTE4_XOR_BE(x))];
+			pixels = vram8[(y * 0x50) + (BYTE4_XOR_BE(x))];
 
 			*scanline++ = card->m_palette[pixels&0x80];
 			*scanline++ = card->m_palette[(pixels<<1)&0x80];
@@ -140,36 +138,32 @@ static SCREEN_UPDATE( mac_48gc )
 			*scanline++ = card->m_palette[(pixels<<6)&0x80];
 			*scanline++ = card->m_palette[(pixels<<7)&0x80];
 		}
-	}*/
-
-	printf("stride = %d bytes\n", card->m_registers[0xc/4]);
+	}
 
 	return 0;
 }
 
-WRITE32_DEVICE_HANDLER ( mac_48gc_w )
+WRITE32_MEMBER( nubus_48gc_device::mac_48gc_w )
 {
-	nubus_48gc_device *card = downcast<nubus_48gc_device *>(device->owner());
+	printf("48gc_w: %08x to %x, mask %08x\n", data, offset*4, mem_mask);
 
-//	printf("48gc_w: %08x to %x, mask %08x\n", data, offset, mem_mask);
-
-	COMBINE_DATA(&card->m_registers[offset&0xff]);
+	COMBINE_DATA(&m_registers[offset&0xff]);
 
 	switch (offset)
 	{
 		case 0x80:	// DAC control
-			card->m_clutoffs = data>>24;
-			card->m_count = 0;
+			m_clutoffs = data>>24;
+			m_count = 0;
 			break;
 
 		case 0x81:	// DAC data
-			card->m_colors[card->m_count++] = data>>24;
+			m_colors[m_count++] = data>>24;
 
-			if (card->m_count == 3)
+			if (m_count == 3)
 			{
-				card->m_palette[card->m_clutoffs] = MAKE_RGB(card->m_colors[0], card->m_colors[1], card->m_colors[2]);
-				card->m_clutoffs++;
-				card->m_count = 0;
+				m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
+				m_clutoffs++;
+				m_count = 0;
 			}
 			break;
 
@@ -178,7 +172,21 @@ WRITE32_DEVICE_HANDLER ( mac_48gc_w )
 	}
 }
 
-READ32_DEVICE_HANDLER ( mac_48gc_r )
+READ32_MEMBER( nubus_48gc_device::mac_48gc_r )
 {
+	printf("48gc_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, cpu_get_pc(machine().device("maincpu")));
+
+	switch (offset)
+	{
+		case 0:
+			return 0x0c00;	// sense 13" RGB for now
+			break;
+
+		case 0x1c0/4:
+			m_toggle ^= 0xffffffff;
+			return m_toggle;
+			break;
+	}
+
 	return 0;
 }

@@ -140,17 +140,17 @@ void nubus_device::add_nubus_card(device_nubus_card_interface *card)
 	m_device_list.append(*card);
 }
 
-void nubus_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read32_device_func rhandler, const char* rhandler_name, write32_device_func whandler, const char *whandler_name)
+void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler)
 {
 	m_maincpu = machine().device(m_cputag);
 	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 32:
-			m_maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
+			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
 			break;
 		case 64:
-			m_maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,U64(0xffffffffffffffff));
+			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, U64(0xffffffffffffffff));
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported", buswidth);
@@ -247,7 +247,7 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion)
 	UINT8 *rom = device().machine().region(region_name)->base();
 	UINT32 romlen = device().machine().region(region_name)->bytes();
 
-	printf("ROM length is %x, last byte is %02x\n", romlen, rom[romlen-1]);
+//	printf("ROM length is %x, last byte is %02x\n", romlen, rom[romlen-1]);
 
 	UINT8 byteLanes = rom[romlen-1];
 	// check if all bits are inverted
@@ -350,7 +350,7 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion)
 	strcpy(bankname, "rom_");
 	strcat(bankname, m_nubus_slottag);
 	addr -= romlen;
-	printf("Installing ROM bank [%s] at %08x\n", bankname, addr);
+//	printf("Installing ROM bank [%s] at %08x\n", bankname, addr);
 	m_nubus->install_bank(addr, addr+romlen-1, addr+romlen-1, 0, bankname, newrom);
 }
 
