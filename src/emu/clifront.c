@@ -1469,7 +1469,10 @@ void media_identifier::identify_file(const char *name)
 		void *data;
 		file_error filerr = core_fload(name, &data, &length);
 		if (filerr == FILERR_NONE && length > 0)
+		{
 			identify_data(name, reinterpret_cast<UINT8 *>(data), length);
+			osd_free(data);
+		}
 	}
 }
 
