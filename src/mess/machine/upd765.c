@@ -247,7 +247,11 @@ static int upd765_get_rdy(device_t *device)
 	if (fdc->intf->rdy_pin == UPD765_RDY_PIN_CONNECTED)
 	{
 		device_t *img = current_image(device);
-		return floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY);
+		if (img!=NULL) {
+			return floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY);
+		} else {
+			return 0;
+		}
 	}
 	else
 		return 1;
