@@ -118,8 +118,7 @@ static const LPCTSTR mess_column_names[] =
 	TEXT("Year"),
 	TEXT("Playable"),
 	TEXT("CRC"),
-	TEXT("SHA-1"),
-	TEXT("MD5")
+	TEXT("SHA-1")
 };
 
 static const LPCTSTR softlist_column_names[] =
@@ -130,8 +129,8 @@ static const LPCTSTR softlist_column_names[] =
 	TEXT("Year"),
 	TEXT("Publisher"),
 	TEXT("CRC"),
-	TEXT("SHA-1"),
-	TEXT("MD5")};
+	TEXT("SHA-1")
+};
 
 
 
