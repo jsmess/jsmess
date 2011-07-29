@@ -218,6 +218,7 @@ LIBS += \
 	-lcomctl32 \
 	-lshlwapi \
 	-lcomdlg32 \
+	-lwsock32 \
 
 ifeq ($(DIRECTINPUT),7)
 LIBS += -ldinput
@@ -251,6 +252,7 @@ OSDCOREOBJS = \
 	$(WINOBJ)/winutf8.o \
 	$(WINOBJ)/winutil.o \
 	$(WINOBJ)/winwork.o \
+	$(WINOBJ)/winsocket.o \
 
 # if malloc debugging is enabled, include the necessary code
 ifneq ($(findstring MALLOC_DEBUG,$(DEFS)),)
