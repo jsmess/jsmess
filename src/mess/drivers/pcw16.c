@@ -1302,6 +1302,7 @@ static const ins8250_interface pcw16_com_interface[2]=
 
 
 static ADDRESS_MAP_START(pcw16_io, AS_IO, 8)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* super i/o chip */
 	AM_RANGE(0x01a, 0x01a) AM_WRITE(pcw16_superio_fdc_digital_output_register_w)
     AM_RANGE(0x01c, 0x01c) AM_READ(pcw16_superio_fdc_main_status_register_r)
