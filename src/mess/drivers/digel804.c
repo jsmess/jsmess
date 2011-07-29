@@ -93,7 +93,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(z80_io, AS_IO, 8, digel804_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	// fill me in!
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	// so far: port 0x44 bit 0 may be the beeper bit
 ADDRESS_MAP_END
 
 
@@ -170,8 +171,8 @@ ROM_START(digel804) // address mapper 804-1-4
 	
 	ROM_LOAD("1-04__76f1.27128.j6", 0x0000, 0x4000, CRC(61b50b61) SHA1(ad717fcbf3387b0a8fb0546025d3c527792eb3f0))
 	// the second rom here is loaded bizarrely: the first 3/4 appears at e000-f7ff and the last 1/4 appears at d800-dfff
-	ROMX_LOAD("2-04__d6cc.2764a.k6", 0xd800, 0x0800, CRC(098cb008) SHA1(9f04e12489ab5f714d2fd4af8158969421557e75), ROM_SKIP(0x1800)) 
 	ROM_LOAD("2-04__d6cc.2764a.k6", 0xe000, 0x1800, CRC(098cb008) SHA1(9f04e12489ab5f714d2fd4af8158969421557e75)) 
+	ROM_CONTINUE(0xd800, 0x800)
 	ROM_REGION(0x20, "proms", 0)
 	ROM_LOAD("804-1-4.82s23a.j5", 0x0000, 0x0020, CRC(f961beb1) SHA1(f2ec89375e656eeabc30246d42741cf718fb0f91)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector
 ROM_END
