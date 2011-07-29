@@ -11,15 +11,15 @@ This computer depends on RAM just happening to be certain values at powerup.
 If the conditions are not met, it may crash.
 
 Monitor Commands:
-C
+C Call (address)
 D Dump memory, any key to dump more, Return to finish
-F Fill memory (start end withwhat)
-G Go
-L
-M
-R
+F Fill memory (start, end, withwhat)
+G Goto (address)
+L Cassette load
+M Move (source start, source end, destination)
+R Run
 S Edit memory
-W
+W Cassette save (start, end, goto (0 for null))
 X Display/Edit registers
 
 
@@ -36,6 +36,9 @@ ToDo:
 - Key beep sounds better if clock speed changed to 1MHz, but it is still
   highly annoying. Press Ctrl-G to hear the 2-tone bell.
 
+- Cassette support is tested only in the emulator (monitor, BASIC and AMOS),
+  needs to be tested with a real cassette dump.
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -45,6 +48,7 @@ ToDo:
 #include "machine/i8255.h"
 #include "sound/speaker.h"
 #include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
 #include "machine/upd765.h"
 #include "formats/basicdsk.h"
 
@@ -62,23 +66,28 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_pic(*this, "pic8259"),
 		  m_speaker(*this, SPEAKER_TAG),
-		  m_fdc(*this, "fdc")
+		  m_fdc(*this, "fdc"),
+		  m_cassette(*this, CASSETTE_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_pic;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_fdc;
+	required_device<cassette_image_device> m_cassette;
 
 	DECLARE_READ8_MEMBER(keyboard_row_r);
 	DECLARE_READ8_MEMBER(keyboard_column_r);
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_READ8_MEMBER(ppi_portc_r);
+	DECLARE_WRITE8_MEMBER(ppi_portc_w);
 	DECLARE_WRITE8_MEMBER(boot_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(pic_set_int_line);
 	UINT8 *m_p_videoram;
 	UINT8 m_vblank_irq_state;
 	const UINT8 *m_p_chargen;
 	UINT8 m_width;
+	UINT8 m_cassette_clk;
+	UINT8 m_cassette_data;
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
@@ -117,9 +126,31 @@ READ8_MEMBER(iq151_state::keyboard_column_r)
 	return data;
 }
 
-WRITE8_MEMBER(iq151_state::speaker_w)
+READ8_MEMBER(iq151_state::ppi_portc_r)
+{
+	UINT8 data = 0x00;
+
+	if (m_cassette_data & 0x06)
+	{
+		// cassette read
+		data |= ((m_cassette_clk & 1) << 5);
+		data |= (m_cassette->input() > 0.00 ? 0x80 : 0x00);
+	}
+	else
+	{
+		// kb read
+		data = input_port_read(machine(), "X8");
+	}
+
+	return (data & 0xf0) | (m_cassette_data & 0x0f);
+}
+
+
+WRITE8_MEMBER(iq151_state::ppi_portc_w)
 {
 	speaker_level_w(m_speaker, BIT(data, 3));
+
+	m_cassette_data = data;
 }
 
 WRITE8_MEMBER(iq151_state::boot_bank_w)
@@ -272,13 +303,22 @@ static IRQ_CALLBACK(iq151_irq_callback)
 	return pic8259_acknowledge(state->m_pic);
 }
 
+static TIMER_DEVICE_CALLBACK( cassette_timer )
+{
+	iq151_state *state = timer.machine().driver_data<iq151_state>();
+
+	state->m_cassette_clk ^= 1;
+
+	state->m_cassette->output((state->m_cassette_data & 1) ^ (state->m_cassette_clk & 1) ? +1 : -1);
+}
+
 DRIVER_INIT( iq151 )
 {
 	iq151_state *state = machine.driver_data<iq151_state>();
 
 	UINT8 *RAM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "boot", 0, 1, RAM + 0xf800, 0);
-	memory_configure_bank(machine, "boot", 1, 2, RAM + 0x0000, 0);
+	memory_configure_bank(machine, "boot", 1, 1, RAM + 0x0000, 0);
 
 	memset(state->m_amos_banks, 0, sizeof(state->m_amos_banks));
 
@@ -466,8 +506,8 @@ static I8255_INTERFACE( iq151_ppi8255_intf )
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(iq151_state, keyboard_column_r),
 	DEVCB_NULL,
-	DEVCB_INPUT_PORT("X8"),
-	DEVCB_DRIVER_MEMBER(iq151_state, speaker_w)
+	DEVCB_DRIVER_MEMBER(iq151_state, ppi_portc_r),
+	DEVCB_DRIVER_MEMBER(iq151_state, ppi_portc_w)
 };
 
 static LEGACY_FLOPPY_OPTIONS_START( iq151 )
@@ -501,6 +541,15 @@ static const upd765_interface iq151_fdc_intf =
 	{ NULL, FLOPPY_0, FLOPPY_1, NULL }
 };
 
+static const cassette_interface iq151_cassette_interface =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED),
+	"iq151_cass",
+	NULL
+};
+
 static MACHINE_CONFIG_START( iq151, iq151_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
@@ -530,6 +579,9 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 
 	MCFG_UPD72065_ADD("fdc", iq151_fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(iq151_floppy_intf)
+
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, iq151_cassette_interface )
+	MCFG_TIMER_ADD_PERIODIC("cassette_timer", cassette_timer, attotime::from_hz(2000))
 
 	/* cartridge */
 	// On real hardware only 4 slots are available, because one
