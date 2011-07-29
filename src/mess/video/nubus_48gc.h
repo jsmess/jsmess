@@ -31,6 +31,9 @@ protected:
         virtual void device_start();
         virtual void device_reset();
 
+        DECLARE_READ32_MEMBER(mac_48gc_r);
+        DECLARE_WRITE32_MEMBER(mac_48gc_w);
+
 public:
         UINT8  *m_vram;
         UINT32 m_mode, m_vbl_disable, m_toggle;

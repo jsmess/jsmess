@@ -88,7 +88,7 @@ public:
 	static void static_set_cputag(device_t &device, const char *tag);
 
 	void add_nubus_card(device_nubus_card_interface *card);
-	void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read32_device_func rhandler, const char* rhandler_name, write32_device_func whandler, const char *whandler_name);
+    void install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler);
 	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
 	void install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region);
 
