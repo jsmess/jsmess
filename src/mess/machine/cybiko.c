@@ -14,47 +14,13 @@
 #include "emuopts.h"
 #include "includes/cybiko.h"
 
-//#include "cpu/h8s2xxx/h8s2xxx.h"
+#include "cpu/h83002/h8.h"
 #include "video/hd66421.h"
 #include "sound/speaker.h"
 #include "machine/pcf8593.h"
 #include "machine/at45dbxx.h"
 #include "machine/sst39vfx.h"
 #include "machine/ram.h"
-
-#ifndef _H8S2XXX_H_
-#define H8S_IO(xxxx) ((xxxx) - 0xFE40)
-
-#define H8S_IO_PFDDR  H8S_IO(0xFEBE)
-
-#define H8S_IO_PORT1  H8S_IO(0xFF50)
-#define H8S_IO_PORT3  H8S_IO(0xFF52)
-#define H8S_IO_PORT5  H8S_IO(0xFF54)
-#define H8S_IO_PORTF  H8S_IO(0xFF5E)
-
-#define H8S_IO_P1DR   H8S_IO(0xFF60)
-#define H8S_IO_P3DR   H8S_IO(0xFF62)
-#define H8S_IO_P5DR   H8S_IO(0xFF64)
-#define H8S_IO_PFDR   H8S_IO(0xFF6E)
-#define H8S_IO_SSR2   H8S_IO(0xFF8C)
-
-#define H8S_P1_TIOCB1 0x20
-
-#define H8S_P3_SCK1 0x20
-#define H8S_P3_SCK0 0x10
-#define H8S_P3_RXD1 0x08
-#define H8S_P3_TXD1 0x02
-
-#define H8S_P5_SCK2 0x04
-#define H8S_P5_RXD2 0x02
-#define H8S_P5_TXD2 0x01
-
-#define H8S_PF_PF2 0x04
-#define H8S_PF_PF1 0x02
-#define H8S_PF_PF0 0x01
-
-#define H8S_SSR_RDRF 0x40 /* receive data register full */
-#endif
 
 #define LOG_LEVEL  1
 #define _logerror(level,x)  do { if (LOG_LEVEL > level) logerror x; } while (0)
@@ -108,8 +74,7 @@ DRIVER_INIT( cybikoxt )
 ////////////////////
 // NVRAM HANDLERS //
 ////////////////////
-
-#ifdef UNUSED_FUNCTION
+#if 0
 NVRAM_HANDLER( cybikov1 )
 {
 	_logerror( 0, ("nvram_handler_cybikov1 (%p/%d)\n", file, read_or_write));
@@ -132,7 +97,6 @@ NVRAM_HANDLER( cybikoxt )
 	nvram_handler_pcf8593( machine, file, read_or_write);
 }
 #endif
-
 ///////////////////
 // MACHINE START //
 ///////////////////
@@ -347,9 +311,7 @@ static void cybiko_rs232_reset( void)
 
 static void cybiko_rs232_write_byte( UINT8 data)
 {
-	#if 0
-	printf( "%c", data);
-	#endif
+//	printf( "%c", data);
 }
 
 static void cybiko_rs232_pin_sck(cybiko_state *state, int data)

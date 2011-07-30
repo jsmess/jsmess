@@ -16,13 +16,17 @@
 #include "includes/cybiko.h"
 
 /* Components */
-#include "cpu/h83002/h8.h"	// support
+#include "cpu/h83002/h8.h"
 #include "video/hd66421.h"
 #include "machine/pcf8593.h"
 #include "machine/at45dbxx.h"
 #include "machine/sst39vfx.h"
 #include "machine/ram.h"
 #include "rendlay.h"
+
+//extern NVRAM_HANDLER( cybikov1 );
+//extern NVRAM_HANDLER( cybikov2 );
+//extern NVRAM_HANDLER( cybikoxt );
 
 //  +------------------------------------------------------+
 //  | Cybiko Classic (CY6411)                         | V2 |
@@ -57,10 +61,6 @@
 ///////////////////////////
 // ADDRESS MAP - PROGRAM //
 ///////////////////////////
-
-/* These memory maps should be correct, but we miss a CPU core.
-Trying to hook up these system to a H8_3002 immediately hits an invalid
-opcode and MESS dies. */
 
 // 512 kbyte ram + no memory mapped flash
 static ADDRESS_MAP_START( cybikov1_mem, AS_PROGRAM, 16 )
@@ -250,7 +250,7 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	MCFG_MACHINE_START(cybikov1)
 	MCFG_MACHINE_RESET(cybikov1)
 	// non-volatile ram
-//  MCFG_NVRAM_HANDLER(cybikov1)
+//    MCFG_NVRAM_HANDLER(cybikov1)
 	/* rtc */
 	MCFG_PCF8593_ADD("rtc")
 	MCFG_AT45DB041_ADD("flash1")
@@ -270,7 +270,7 @@ static MACHINE_CONFIG_DERIVED( cybikov2, cybikov1)
 	MCFG_MACHINE_START(cybikov2)
 	MCFG_MACHINE_RESET(cybikov2)
 	// non-volatile ram
-//  MCFG_NVRAM_HANDLER(cybikov2)
+//    MCFG_NVRAM_HANDLER(cybikov2)
 	MCFG_SST39VF020_ADD("flash2", 16, ENDIANNESS_BIG)
 
 	/* internal ram */
@@ -291,7 +291,7 @@ static MACHINE_CONFIG_DERIVED( cybikoxt, cybikov1)
 	MCFG_MACHINE_START(cybikoxt)
 	MCFG_MACHINE_RESET(cybikoxt)
 	// non-volatile ram
-//  MCFG_NVRAM_HANDLER(cybikoxt)
+//    MCFG_NVRAM_HANDLER(cybikoxt)
 	MCFG_DEVICE_REMOVE("flash1")
 	MCFG_SST39VF020_ADD("flash2", 16, ENDIANNESS_BIG)
 
