@@ -215,17 +215,23 @@ static DRIVER_INIT(pyuuta)
 }
 
 
-static const TMS9928a_interface tms9929a_interface =
+static TMS9928A_INTERFACE(tutor_tms9928a_interface)
 {
-	TMS9929A,
+	"screen",
 	0x4000,
-	0, 0,
-	/*tms9901_set_int2*/NULL
+	DEVCB_NULL
 };
+
+static SCREEN_UPDATE( tutor )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
+}
 
 static MACHINE_START(tutor)
 {
-	TMS9928A_configure(&tms9929a_interface);
 }
 
 static MACHINE_RESET(tutor)
@@ -237,12 +243,6 @@ static MACHINE_RESET(tutor)
 
 	state->m_printer_data = 0;
 	state->m_printer_strobe = 0;
-}
-
-static INTERRUPT_GEN( tutor_vblank_interrupt )
-{
-	/* No vblank interrupt? */
-	TMS9928A_interrupt(device->machine());
 }
 
 /*
@@ -534,8 +534,8 @@ static ADDRESS_MAP_START(tutor_memmap, AS_PROGRAM, 8)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP /*BASIC ROM & cartridge ROM*/
 	AM_RANGE(0xc000, 0xdfff) AM_NOP	/*free for expansion, or cartridge ROM?*/
 
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)	/*VDP data*/
-	AM_RANGE(0xe002, 0xe002) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)/*VDP status*/
+	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, vram_read, vram_write)	/*VDP data*/
+	AM_RANGE(0xe002, 0xe002) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, register_read, register_write)/*VDP status*/
 	AM_RANGE(0xe100, 0xe1ff) AM_READWRITE(tutor_mapper_r, tutor_mapper_w)	/*cartridge mapper*/
 	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE("sn76489a", sn76496_w)	/*sound chip*/
 	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE("printer",tutor_printer_r, tutor_printer_w)	/*printer*/
@@ -691,16 +691,14 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 	MCFG_CPU_CONFIG(tutor_processor_config)
 	MCFG_CPU_PROGRAM_MAP(tutor_memmap)
 	MCFG_CPU_IO_MAP(tutor_io)
-	MCFG_CPU_VBLANK_INT("screen", tutor_vblank_interrupt)
 
 	MCFG_MACHINE_START( tutor )
 	MCFG_MACHINE_RESET( tutor )
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, tutor_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( tutor )
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

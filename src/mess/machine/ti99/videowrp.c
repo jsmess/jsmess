@@ -46,15 +46,16 @@ INLINE const ti99_video_config *get_config(device_t *device)
 READ16_DEVICE_HANDLER( ti_tms991x_r16 )
 {
 	ti99_video_state *video = get_safe_token(device);
+	tms9928a_device *tms9928a = device->machine().device<tms9928a_device>( TMS9928A_TAG );
 //  device_adjust_icount(video->cpu, -4);
 
 	if (offset & 1)
 	{	/* read VDP status */
-		return ((int) TMS9928A_register_r(video->space, 0)) << 8;
+		return ((int) tms9928a->register_read(*(video->space), 0)) << 8;
 	}
 	else
 	{	/* read VDP RAM */
-		return ((int) TMS9928A_vram_r(video->space, 0)) << 8;
+		return ((int) tms9928a->vram_read(*(video->space), 0)) << 8;
 	}
 }
 
@@ -64,15 +65,16 @@ READ16_DEVICE_HANDLER( ti_tms991x_r16 )
 READ8Z_DEVICE_HANDLER( ti8_tms991x_rz )
 {
 	ti99_video_state *video = get_safe_token(device);
+	tms9928a_device *tms9928a = device->machine().device<tms9928a_device>( TMS9928A_TAG );
 //  device_adjust_icount(video->cpu, -4);
 
 	if (offset & 2)
 	{	/* read VDP status */
-		*value = TMS9928A_register_r(video->space, 0);
+		*value = tms9928a->register_read(*(video->space), 0);
 	}
 	else
 	{	/* read VDP RAM */
-		*value = TMS9928A_vram_r(video->space, 0);
+		*value = tms9928a->vram_read(*(video->space), 0);
 	}
 }
 
@@ -100,15 +102,16 @@ READ16_DEVICE_HANDLER( ti_v9938_r16 )
 WRITE16_DEVICE_HANDLER( ti_tms991x_w16 )
 {
 	ti99_video_state *video = get_safe_token(device);
+	tms9928a_device *tms9928a = device->machine().device<tms9928a_device>( TMS9928A_TAG );
 //  device_adjust_icount(video->cpu, -4);
 
 	if (offset & 1)
 	{	/* write VDP address */
-		TMS9928A_register_w(video->space, 0, (data >> 8) & 0xff);
+		tms9928a->register_write(*(video->space), 0, (data >> 8) & 0xff);
 	}
 	else
 	{	/* write VDP data */
-		TMS9928A_vram_w(video->space, 0, (data >> 8) & 0xff);
+		tms9928a->vram_write(*(video->space), 0, (data >> 8) & 0xff);
 	}
 }
 
@@ -118,15 +121,16 @@ WRITE16_DEVICE_HANDLER( ti_tms991x_w16 )
 WRITE8_DEVICE_HANDLER( ti8_tms991x_w )
 {
 	ti99_video_state *video = get_safe_token(device);
+	tms9928a_device *tms9928a = device->machine().device<tms9928a_device>( TMS9928A_TAG );
 //  device_adjust_icount(video->cpu, -4);
 
 	if (offset & 2)
 	{	/* write VDP address */
-		TMS9928A_register_w(video->space, 0, data);
+		tms9928a->register_write(*(video->space), 0, data);
 	}
 	else
 	{	/* write VDP data */
-		TMS9928A_vram_w(video->space, 0, data);
+		tms9928a->vram_write(*(video->space), 0, data);
 	}
 }
 
@@ -241,11 +245,7 @@ static DEVICE_START( ti99_video )
 	video->space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	video->chip = conf->chip;
 
-	if (video->chip==TI_TMS991X)
-	{
-		TMS9928A_configure(conf->tmsparam);
-	}
-	else
+	if (video->chip!=TI_TMS991X)
 	{
 		running_machine &machine = device->machine();
 		VIDEO_START_CALL(generic_bitmapped);
@@ -259,11 +259,7 @@ static DEVICE_STOP( ti99_video )
 static DEVICE_RESET( ti99_video )
 {
 	const ti99_video_config* conf = (const ti99_video_config*)get_config(device);
-	if (conf->chip==TI_TMS991X)
-	{
-		TMS9928A_reset();
-	}
-	else
+	if (conf->chip!=TI_TMS991X)
 	{
 		running_machine &machine = device->machine();
 		int memsize = (input_port_read(machine, "V9938-MEM")==0)? 0x20000 : 0x30000;

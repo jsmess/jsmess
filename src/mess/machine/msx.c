@@ -19,7 +19,6 @@
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "video/tms9928a.h"
 #include "cpu/z80/z80.h"
 #include "video/v9938.h"
 #include "machine/ctronics.h"
@@ -322,17 +321,8 @@ static void msx_ch_reset_core (running_machine &machine)
 	msx_memory_map_all (machine);
 }
 
-static const TMS9928a_interface tms9928a_interface =
-{
-	TMS99x8A,
-	0x4000,
-	0, 0,
-	msx_vdp_interrupt
-};
-
 MACHINE_START( msx )
 {
-	TMS9928A_configure(&tms9928a_interface);
 	MACHINE_START_CALL( msx2 );
 }
 
@@ -345,7 +335,6 @@ MACHINE_START( msx2 )
 
 MACHINE_RESET( msx )
 {
-	TMS9928A_reset ();
 	msx_ch_reset_core (machine);
 }
 
@@ -512,9 +501,6 @@ INTERRUPT_GEN( msx_interrupt )
 		state->m_mouse[i] = input_port_read(device->machine(), i ? "MOUSE1" : "MOUSE0");
 		state->m_mouse_stat[i] = -1;
 	}
-
-	TMS9928A_set_spriteslimit (input_port_read(device->machine(), "DSW") & 0x20);
-	TMS9928A_interrupt(device->machine());
 }
 
 /*

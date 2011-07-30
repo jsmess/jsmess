@@ -389,16 +389,11 @@ static WRITE8_HANDLER( svi806_ram_enable_w )
 
 VIDEO_START( svi328_806 )
 {
-	VIDEO_START_CALL(tms9928a);
 }
 
 SCREEN_UPDATE( svi328_806 )
 {
-	if (!strcmp(screen->tag(), "screen"))
-	{
-		SCREEN_UPDATE_CALL(tms9928a);
-	}
-	else if (!strcmp(screen->tag(), "svi806"))
+	if (!strcmp(screen->tag(), "svi806"))
 	{
 		mc6845_device *mc6845 = screen->machine().device<mc6845_device>("crtc");
 		mc6845->update(bitmap, cliprect);
@@ -568,32 +563,12 @@ DRIVER_INIT( svi318 )
 	memset (state->m_svi.empty_bank, 0xff, 0x8000);
 }
 
-static const TMS9928a_interface svi318_tms9928a_interface =
-{
-	TMS99x8A,
-	0x4000,
-	15,
-	15,
-	svi318_vdp_interrupt
-};
-
-static const TMS9928a_interface svi318_tms9929a_interface =
-{
-	TMS9929A,
-	0x4000,
-	13,
-	13,
-	svi318_vdp_interrupt
-};
-
 MACHINE_START( svi318_ntsc )
 {
-	TMS9928A_configure(&svi318_tms9928a_interface);
 }
 
 MACHINE_START( svi318_pal )
 {
-	TMS9928A_configure(&svi318_tms9929a_interface);
 }
 
 static void svi318_load_proc(device_image_interface &image)
@@ -621,8 +596,6 @@ MACHINE_RESET( svi318 )
 {
 	svi318_state *state = machine.driver_data<svi318_state>();
 	int drive;
-	/* video stuff */
-	TMS9928A_reset();
 
 	state->m_svi.bank_switch = 0xff;
 	svi318_set_banks(machine);
@@ -631,15 +604,6 @@ MACHINE_RESET( svi318 )
 	{
 		floppy_install_load_proc(floppy_get_device(machine, drive), svi318_load_proc);
 	}
-}
-
-INTERRUPT_GEN( svi318_interrupt )
-{
-	int set;
-
-	set = input_port_read(device->machine(), "CONFIG");
-	TMS9928A_set_spriteslimit (set & 0x20);
-	TMS9928A_interrupt(device->machine());
 }
 
 /* Memory */

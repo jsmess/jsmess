@@ -254,8 +254,8 @@ static ADDRESS_MAP_START( m5_io, AS_IO, 8, m5_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_DEVWRITE_LEGACY(SN76489AN_TAG, sn76496_w)
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("Y0") // 64KBF bank select
 	AM_RANGE(0x31, 0x31) AM_READ_PORT("Y1")
@@ -434,9 +434,9 @@ static const cassette_interface cassette_intf =
 //  TMS9928a_interface vdp_intf
 //-------------------------------------------------
 
-static void sordm5_video_interrupt_callback(running_machine &machine, int state)
+static WRITE_LINE_DEVICE_HANDLER(sordm5_video_interrupt_callback)
 {
-	m5_state *driver_state = machine.driver_data<m5_state>();
+	m5_state *driver_state = device->machine().driver_data<m5_state>();
 
 	if (state)
 	{
@@ -445,26 +445,20 @@ static void sordm5_video_interrupt_callback(running_machine &machine, int state)
 	}
 }
 
-static INTERRUPT_GEN( sord_interrupt )
+static TMS9928A_INTERFACE(m5_tms9928a_interface)
 {
-	TMS9928A_interrupt(device->machine());
+	"screen",
+	0x4000,
+	DEVCB_LINE(sordm5_video_interrupt_callback)
+};
+
+static SCREEN_UPDATE( m5 )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
 }
-
-static const TMS9928a_interface ntsc_vdp_intf =
-{
-	TMS99x8A,
-	0x4000,
-	0, 0,
-	sordm5_video_interrupt_callback
-};
-
-static const TMS9928a_interface pal_vdp_intf =
-{
-	TMS9929A,
-	0x4000,
-	0, 0,
-	sordm5_video_interrupt_callback
-};
 
 //-------------------------------------------------
 //  I8255_INTERFACE( ppi_intf )
@@ -624,9 +618,6 @@ void m5_state::machine_start()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
-	// configure VDP
-	TMS9928A_configure(m_vdp_intf);
-
 	// configure RAM
 	switch (ram_get_size(m_ram))
 	{
@@ -656,7 +647,6 @@ void m5_state::machine_start()
 
 void m5_state::machine_reset()
 {
-	TMS9928A_reset();
 }
 
 
@@ -674,7 +664,6 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_14_31818MHz/4)
 	MCFG_CPU_PROGRAM_MAP(m5_mem)
 	MCFG_CPU_IO_MAP(m5_io)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, sord_interrupt)
 	MCFG_CPU_CONFIG(m5_daisy_chain)
 
 	MCFG_CPU_ADD(Z80_FD5_TAG, Z80, XTAL_14_31818MHz/4)
@@ -716,10 +705,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ntsc, m5 )
 	// video hardware
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, m5_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( m5 )
 MACHINE_CONFIG_END
 
 
@@ -729,10 +717,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pal, m5 )
 	// video hardware
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/313)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, m5_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE( m5 )
 MACHINE_CONFIG_END
 
 
@@ -780,9 +767,6 @@ ROM_END
 
 static DRIVER_INIT( ntsc )
 {
-	m5_state *state = machine.driver_data<m5_state>();
-
-	state->m_vdp_intf = &ntsc_vdp_intf;
 }
 
 
@@ -792,9 +776,6 @@ static DRIVER_INIT( ntsc )
 
 static DRIVER_INIT( pal )
 {
-	m5_state *state = machine.driver_data<m5_state>();
-
-	state->m_vdp_intf = &pal_vdp_intf;
 }
 
 

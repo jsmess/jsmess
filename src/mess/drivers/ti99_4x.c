@@ -762,37 +762,16 @@ static GFXDECODE_START( ti99b )
 	GFXDECODE_ENTRY( region_grom, 0x0998, ti99_c_charlayout, 2, 2 )
 GFXDECODE_END
 
-static const TMS9928a_interface tms9918_interface =
+static WRITE_LINE_DEVICE_HANDLER(set_int2)
 {
-	TMS99x8,
-	0x4000,
-	15, 15,
-	tms9901_set_int2
-};
+	tms9901_set_int2( device->machine(), state );
+}
 
-static const TMS9928a_interface tms9929_interface =
+static TMS9928A_INTERFACE(ti99_4_tms9928a_interface)
 {
-	TMS9929,
+	SCREEN_TAG,
 	0x4000,
-	13, 13,
-	tms9901_set_int2
-};
-
-static const TMS9928a_interface tms9918a_interface =
-{
-	TMS99x8A,
-	0x4000,
-	15, 15,
-	tms9901_set_int2
-};
-
-
-static const TMS9928a_interface tms9929a_interface =
-{
-	TMS9929A,
-	0x4000,
-	13, 13,
-	tms9901_set_int2
+	DEVCB_LINE(set_int2)
 };
 
 /*
@@ -834,6 +813,14 @@ MACHINE_RESET( ti99_4a )
 {
 }
 
+static SCREEN_UPDATE( ti99_4 )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( TMS9928A_TAG );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
+}
+
 static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
@@ -850,7 +837,7 @@ static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x_state )
 	// MCFG_SCREEN_REFRESH_RATE(60)
 	// MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-	MCFG_TI_TMS991x_ADD("video", tms9928a, 60, "screen", 2500, &tms9918_interface)
+	MCFG_TI_TMS991x_ADD_NTSC("video", TMS9118, ti99_4, ti99_4_tms9928a_interface)
 	MCFG_GFXDECODE(ti99)
 
 	/* sound hardware */
@@ -895,7 +882,7 @@ static MACHINE_CONFIG_START( ti99_4_50hz, ti99_4x_state )
 	MCFG_MACHINE_RESET( ti99_4 )
 
 	/* video hardware */
-	MCFG_TI_TMS991x_ADD("video", tms9928a, 50, "screen", 2500, &tms9929_interface)
+	MCFG_TI_TMS991x_ADD_PAL("video", TMS9929, ti99_4, ti99_4_tms9928a_interface)
 
 	MCFG_GFXDECODE(ti99)
 
@@ -941,7 +928,7 @@ static MACHINE_CONFIG_START( ti99_4a_60hz, ti99_4x_state )
 	MCFG_MACHINE_RESET( ti99_4a )
 
 	/* video hardware */
-	MCFG_TI_TMS991x_ADD("video", tms9928a, 60, "screen", 2500, &tms9918a_interface)
+	MCFG_TI_TMS991x_ADD_NTSC("video", TMS9918A, ti99_4, ti99_4_tms9928a_interface)
 	MCFG_GFXDECODE(ti99a)
 
 	/* sound hardware */
@@ -985,7 +972,7 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x_state )
 	MCFG_MACHINE_RESET( ti99_4a )
 
 	/* video hardware */
-	MCFG_TI_TMS991x_ADD("video", tms9928a, 50, "screen", 2500, &tms9929a_interface)
+	MCFG_TI_TMS991x_ADD_PAL("video", TMS9929A, ti99_4, ti99_4_tms9928a_interface)
 	MCFG_GFXDECODE(ti99a)
 
 	/* sound hardware */

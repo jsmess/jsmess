@@ -10,6 +10,9 @@
 #include "video/tms9928a.h"
 #include "video/v9938.h"
 
+#define TMS9928A_TAG	"tms9928a"
+#define SCREEN_TAG		"screen"
+
 #define READ8Z_DEVICE_HANDLER(name)		void name(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, UINT8 *value)
 
 #define TI_TMS991X 1
@@ -17,7 +20,6 @@
 
 typedef struct _ti99_video_config
 {
-	TMS9928a_interface			*tmsparam;
 	int							chip;
 	void						(*callback)(running_machine &, int);
 
@@ -38,28 +40,32 @@ void video_update_mouse( device_t *device, int delta_x, int delta_y, int buttons
 
 DECLARE_LEGACY_DEVICE( TIVIDEO, ti99_video );
 
-#define MCFG_TI_TMS991x_ADD(_tag, _chip, _rate, _screen, _blank, _tmsparam)		\
-	MCFG_DEVICE_ADD(_tag, TIVIDEO, 0)								\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_video_config, tmsparam, _tmsparam)	\
-	MCFG_DEVICE_CONFIG_DATA32(ti99_video_config, chip, TI_TMS991X)		\
-	MCFG_FRAGMENT_ADD(_chip)										\
-	MCFG_SCREEN_MODIFY(_screen)										\
-	MCFG_SCREEN_REFRESH_RATE(_rate)									\
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(_blank))
+#define MCFG_TI_TMS991x_ADD_NTSC(_tag, _chip, _screen_update, _tmsparam)	\
+	MCFG_DEVICE_ADD(_tag, TIVIDEO, 0)										\
+	MCFG_DEVICE_CONFIG_DATA32(ti99_video_config, chip, TI_TMS991X)			\
+	MCFG_TMS9928A_ADD( TMS9928A_TAG, _chip, _tmsparam ) 					\
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG ) 							\
+	MCFG_SCREEN_UPDATE( _screen_update )
+
+#define MCFG_TI_TMS991x_ADD_PAL(_tag, _chip, _screen_update, _tmsparam)		\
+	MCFG_DEVICE_ADD(_tag, TIVIDEO, 0)										\
+	MCFG_DEVICE_CONFIG_DATA32(ti99_video_config, chip, TI_TMS991X)			\
+	MCFG_TMS9928A_ADD( TMS9928A_TAG, _chip, _tmsparam )						\
+	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )								\
+	MCFG_SCREEN_UPDATE( _screen_update )
 
 #define MCFG_TI_V9938_ADD(_tag, _rate, _screen, _blank, _x, _y, _int)		\
-	MCFG_DEVICE_ADD(_tag, TIVIDEO, 0)								\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_video_config, tmsparam, NULL)	\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_video_config, callback, _int)	\
-	MCFG_DEVICE_CONFIG_DATA32(ti99_video_config, chip, TI_V9938)		\
-	MCFG_SCREEN_ADD(_screen, RASTER)	\
-	MCFG_SCREEN_REFRESH_RATE(_rate)									\
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)	\
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(_blank))	\
-	MCFG_SCREEN_SIZE(_x, _y)	\
-	MCFG_SCREEN_VISIBLE_AREA(0, _x - 1, 0, _y - 1)	\
-	MCFG_SCREEN_UPDATE(generic_bitmapped)	\
-	MCFG_PALETTE_LENGTH(512)	\
+	MCFG_DEVICE_ADD(_tag, TIVIDEO, 0)										\
+	MCFG_DEVICE_CONFIG_DATAPTR(ti99_video_config, callback, _int)			\
+	MCFG_DEVICE_CONFIG_DATA32(ti99_video_config, chip, TI_V9938)			\
+	MCFG_SCREEN_ADD(_screen, RASTER)										\
+	MCFG_SCREEN_REFRESH_RATE(_rate)											\
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)								\
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(_blank))					\
+	MCFG_SCREEN_SIZE(_x, _y)												\
+	MCFG_SCREEN_VISIBLE_AREA(0, _x - 1, 0, _y - 1)							\
+	MCFG_SCREEN_UPDATE(generic_bitmapped)									\
+	MCFG_PALETTE_LENGTH(512)												\
 	MCFG_PALETTE_INIT(v9938)
 
 #endif /* __TIVIDEO__ */

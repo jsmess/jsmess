@@ -45,10 +45,10 @@ static ADDRESS_MAP_START( svi318_io, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x38) AM_READWRITE( svi318_io_ext_r, svi318_io_ext_w )
-	AM_RANGE( 0x80, 0x80) AM_WRITE( TMS9928A_vram_w )
-	AM_RANGE( 0x81, 0x81) AM_WRITE( TMS9928A_register_w )
-	AM_RANGE( 0x84, 0x84) AM_READ( TMS9928A_vram_r )
-	AM_RANGE( 0x85, 0x85) AM_READ( TMS9928A_register_r )
+	AM_RANGE( 0x80, 0x80) AM_DEVWRITE_MODERN( "tms9928a", tms9928a_device, vram_write )
+	AM_RANGE( 0x81, 0x81) AM_DEVWRITE_MODERN( "tms9928a", tms9928a_device, register_write )
+	AM_RANGE( 0x84, 0x84) AM_DEVREAD_MODERN( "tms9928a", tms9928a_device, vram_read )
+	AM_RANGE( 0x85, 0x85) AM_DEVREAD_MODERN( "tms9928a", tms9928a_device, register_read )
 	AM_RANGE( 0x88, 0x88) AM_DEVWRITE("ay8910", ay8910_address_w )
 	AM_RANGE( 0x8c, 0x8c) AM_DEVWRITE("ay8910", ay8910_data_w )
 	AM_RANGE( 0x90, 0x90) AM_DEVREAD("ay8910", ay8910_r )
@@ -60,10 +60,10 @@ static ADDRESS_MAP_START( svi328_806_io, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x58) AM_READWRITE( svi318_io_ext_r, svi318_io_ext_w )
-	AM_RANGE( 0x80, 0x80) AM_WRITE( TMS9928A_vram_w )
-	AM_RANGE( 0x81, 0x81) AM_WRITE( TMS9928A_register_w )
-	AM_RANGE( 0x84, 0x84) AM_READ( TMS9928A_vram_r )
-	AM_RANGE( 0x85, 0x85) AM_READ( TMS9928A_register_r )
+	AM_RANGE( 0x80, 0x80) AM_DEVWRITE_MODERN( "tms9928a", tms9928a_device, vram_write )
+	AM_RANGE( 0x81, 0x81) AM_DEVWRITE_MODERN( "tms9928a", tms9928a_device, register_write )
+	AM_RANGE( 0x84, 0x84) AM_DEVREAD_MODERN( "tms9928a", tms9928a_device, vram_read )
+	AM_RANGE( 0x85, 0x85) AM_DEVREAD_MODERN( "tms9928a", tms9928a_device, register_read )
 	AM_RANGE( 0x88, 0x88) AM_DEVWRITE("ay8910", ay8910_address_w )
 	AM_RANGE( 0x8c, 0x8c) AM_DEVWRITE("ay8910", ay8910_data_w )
 	AM_RANGE( 0x90, 0x90) AM_DEVREAD("ay8910", ay8910_r )
@@ -265,6 +265,26 @@ static const ay8910_interface svi318_ay8910_interface =
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, svi318_psg_port_b_w)
 };
 
+static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
+{
+    cputag_set_input_line(device->machine(), "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
+}
+
+static TMS9928A_INTERFACE(svi318_tms9928a_interface)
+{
+	"screen",
+    0x4000,
+    DEVCB_LINE(vdp_interrupt)
+};
+
+static SCREEN_UPDATE( svi318 )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
+}
+
 static const cassette_interface svi318_cassette_interface =
 {
 	svi_cassette_formats,
@@ -305,7 +325,6 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_CPU_ADD( "maincpu", Z80, 3579545 )	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP( svi318_mem)
 	MCFG_CPU_IO_MAP( svi318_io)
-	MCFG_CPU_VBLANK_INT("screen", svi318_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( svi318_pal )
@@ -317,10 +336,9 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_INS8250_ADD( "ins8250_1", svi318_ins8250_interface[1] )
 
 	/* Video hardware */
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, svi318_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE( svi318 )
 
 	/* Sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -355,8 +373,11 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svi318n, svi318 )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_DEVICE_REMOVE("tms9928a")
+	MCFG_DEVICE_REMOVE("screen")
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, svi318_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( svi318 )
 
 	MCFG_MACHINE_START( svi318_ntsc )
 	MCFG_MACHINE_RESET( svi318 )
@@ -415,7 +436,6 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_CPU_ADD( "maincpu", Z80, 3579545 )	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP( svi328_806_mem)
 	MCFG_CPU_IO_MAP( svi328_806_io)
-	MCFG_CPU_VBLANK_INT("screen", svi318_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( svi318_pal )
@@ -429,11 +449,10 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	/* Video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_dualhsxs )
 
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, svi318_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE( svi318 )
 	MCFG_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE + 2)	/* 2 additional entries for monochrome svi806 output */
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	MCFG_SCREEN_ADD("svi806", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

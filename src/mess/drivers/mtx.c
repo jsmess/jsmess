@@ -57,8 +57,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mtx_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD(CENTRONICS_TAG, mtx_strobe_r) AM_WRITE(mtx_bankswitch_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_MODERN("tms9929a", tms9929a_device, vram_read, vram_write)
+	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE_MODERN("tms9929a", tms9929a_device, register_read, register_write)
 	AM_RANGE(0x03, 0x03) AM_DEVREAD(SN76489A_TAG, mtx_sound_strobe_r) AM_DEVWRITE(CASSETTE_TAG, mtx_cst_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CENTRONICS_TAG, mtx_prt_r, centronics_data_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(mtx_key_lo_r, mtx_sense_w)
@@ -319,6 +319,32 @@ static const cassette_interface mtx_cassette_interface =
 	NULL
 };
 
+/*-------------------------------------------------
+    mtx_tms9928a_interface
+-------------------------------------------------*/
+
+static WRITE_LINE_DEVICE_HANDLER(mtx_tms9929a_interrupt)
+{
+    mtx_state *drv_state = device->machine().driver_data<mtx_state>();
+
+    z80ctc_trg0_w(drv_state->m_z80ctc, state ? 0 : 1);
+}
+
+static TMS9928A_INTERFACE(mtx_tms9928a_interface)
+{
+	"screen",
+    0x4000,
+    DEVCB_LINE(mtx_tms9929a_interrupt)
+};
+
+static SCREEN_UPDATE( mtx )
+{
+	tms9929a_device *tms9929a = screen->machine().device<tms9929a_device>( "tms9929a" );
+
+	tms9929a->update( bitmap, cliprect );
+	return 0;
+}
+
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -333,17 +359,15 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mtx_mem)
 	MCFG_CPU_IO_MAP(mtx_io)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, mtx_interrupt)
 	MCFG_CPU_CONFIG(mtx_daisy_chain)
 
 	MCFG_MACHINE_START(mtx512)
 	MCFG_MACHINE_RESET(mtx512)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_TMS9928A_ADD( "tms9929a", TMS9929A, mtx_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE( mtx )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

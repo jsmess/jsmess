@@ -107,18 +107,17 @@ static MACHINE_START( tm990_189 )
 	tm990189_state *state = machine.driver_data<tm990189_state>();
 	state->m_displayena_timer = machine.scheduler().timer_alloc(FUNC_NULL);
 }
-static const TMS9928a_interface tms9918_interface =
+
+static TMS9928A_INTERFACE(tms9918_interface)
 {
-	TMS99x8,
+	"screen",
 	0x4000,
-	0, 0,
-	NULL
+	DEVCB_NULL
 };
 
 static MACHINE_START( tm990_189_v )
 {
 	tm990189_state *state = machine.driver_data<tm990189_state>();
-	TMS9928A_configure(&tms9918_interface);
 
 	state->m_displayena_timer = machine.scheduler().timer_alloc(FUNC_NULL);
 
@@ -131,8 +130,6 @@ static MACHINE_START( tm990_189_v )
 static MACHINE_RESET( tm990_189_v )
 {
 	hold_load(machine);
-
-	TMS9928A_reset();
 }
 
 
@@ -238,7 +235,9 @@ static VIDEO_START( tm990_189_v )
 static SCREEN_UPDATE( tm990_189_v )
 {
 	tm990189_state *state = screen->machine().driver_data<tm990189_state>();
-	SCREEN_UPDATE_CALL(tms9928a);
+	tms9918_device *tms9918 = screen->machine().device<tms9918_device>( "tms9918" );
+
+	tms9918->update( bitmap, cliprect );
 
 	plot_box(bitmap, state->m_LED_display_window_left, state->m_LED_display_window_top, state->m_LED_display_window_width, state->m_LED_display_window_height, screen->machine().pens[1]);
 	update_common(screen->machine(), bitmap,
@@ -515,6 +514,7 @@ static void idle_callback(device_t *device, int state)
 static  READ8_HANDLER(video_vdp_r)
 {
 	tm990189_state *state = space->machine().driver_data<tm990189_state>();
+	tms9918_device *tms9918 = space->machine().device<tms9918_device>( "tms9918" );
 	int reply = 0;
 
 	/* When the tms9980 reads @>2000 or @>2001, it actually does a word access:
@@ -532,9 +532,9 @@ static  READ8_HANDLER(video_vdp_r)
     it. */
 
 	if (offset & 2)
-		reply = TMS9928A_register_r(space, 0);
+		reply = tms9918->register_read(*space, 0);
 	else
-		reply = TMS9928A_vram_r(space, 0);
+		reply = tms9918->vram_read(*space, 0);
 
 	if (!(offset & 1))
 		state->m_bogus_read_save = reply;
@@ -548,10 +548,12 @@ static WRITE8_HANDLER(video_vdp_w)
 {
 	if (offset & 1)
 	{
+		tms9918_device *tms9918 = space->machine().device<tms9918_device>( "tms9918" );
+
 		if (offset & 2)
-			TMS9928A_register_w(space, 0, data);
+			tms9918->register_write(*space, 0, data);
 		else
-			TMS9928A_vram_w(space, 0, data);
+			tms9918->vram_write(*space, 0, data);
 	}
 }
 
@@ -853,12 +855,8 @@ static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 	MCFG_MACHINE_RESET( tm990_189_v )
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(LEFT_BORDER+32*8+RIGHT_BORDER, TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ + 32)
-	MCFG_SCREEN_VISIBLE_AREA(LEFT_BORDER-12, LEFT_BORDER+32*8+12-1, TOP_BORDER_60HZ-9, TOP_BORDER_60HZ+24*8+9-1 + 32)
+	MCFG_TMS9928A_ADD( "tms9918", TMS9918, tms9918_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE(tm990_189_v)
 	MCFG_SCREEN_EOF(tm990_189)
 

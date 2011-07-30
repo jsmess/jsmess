@@ -329,34 +329,6 @@ WRITE8_HANDLER( hrx_attr_w )
 }
 
 /***************************************************************************
-    DEVICE CONFIGURATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    TMS9928a_interface tms9928a_interface
--------------------------------------------------*/
-
-static void mtx_tms9929a_interrupt(running_machine &machine, int data)
-{
-	mtx_state *state = machine.driver_data<mtx_state>();
-
-	z80ctc_trg0_w(state->m_z80ctc, data ? 0 : 1);
-}
-
-static const TMS9928a_interface tms9928a_interface =
-{
-	TMS9929A,
-	0x4000,
-	0, 0,
-	mtx_tms9929a_interrupt
-};
-
-INTERRUPT_GEN( mtx_interrupt )
-{
-	TMS9928A_interrupt(device->machine());
-}
-
-/***************************************************************************
     SNAPSHOT
 ***************************************************************************/
 
@@ -416,9 +388,6 @@ MACHINE_START( mtx512 )
 	memory_configure_bank(machine, "bank2", 0, 8, machine.region("user2")->base(), 0x2000);
 	memory_configure_bank(machine, "bank3", 0, ram_get_size(messram)/0x4000/2, ram_get_ptr(messram), 0x4000);
 	memory_configure_bank(machine, "bank4", 0, ram_get_size(messram)/0x4000/2, ram_get_ptr(messram) + ram_get_size(messram)/2, 0x4000);
-
-	/* setup tms9928a */
-	TMS9928A_configure(&tms9928a_interface);
 }
 
 /*-------------------------------------------------
