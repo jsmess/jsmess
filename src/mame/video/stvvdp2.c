@@ -197,6 +197,10 @@ enum
        |    --    |    --    |    --    |    --    |    --    |    --    | DASEL    | EXBGEN   |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
+	#define STV_VDP2_EXTEN  ((state->m_vdp2_regs[0x000/4] >> 0)&0x0000ffff)
+
+	#define STV_VDP2_EXLTEN ((STV_VDP2_EXTEN & 0x0200) >> 9)
+
 /* 180004 - r/o - TVSTAT - Screen Status
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    | EXLTFG   | EXSYFG   |
@@ -3024,7 +3028,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitma
 	gfxdatalow = gfxdata + stv2_current_tilemap.bitmap_map * 0x20000;
 	gfxdata+=(
 	(stv2_current_tilemap.scrollx & (xlinesize-1)) +
-	((stv2_current_tilemap.scrolly & (ysize-1)) * (xlinesize)) + /* TODO: mask ysize, check me! */
+	((stv2_current_tilemap.scrolly) * (xlinesize)) + /* TODO: mask ysize, check me! */
 	(stv2_current_tilemap.bitmap_map * 0x20000)
 	);
 	gfxdatahigh = gfxdatalow + xlinesize*ysize;
@@ -5367,28 +5371,51 @@ WRITE32_HANDLER ( saturn_vdp2_vram_w )
 READ32_HANDLER ( saturn_vdp2_regs_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
-//  if (offset!=1) if(LOG_VDP2) logerror ("VDP2: Read from Registers, Offset %04x\n",offset);
 
 	switch(offset)
 	{
+		case 0x0/4:
+		{
+			/* latch h/v signals thru HV latch*/
+			if(!STV_VDP2_EXLTEN)
+			{
+				/* TODO: handle various h/v settings. */
+				state->m_vdp2.h_count = space->machine().primary_screen->hpos() & 0x3ff;
+				state->m_vdp2.v_count = space->machine().primary_screen->vpos() & (STV_VDP2_LSMD == 3 ? 0x7ff : 0x3ff);
+				/* latch flag */
+				state->m_vdp2.exltfg |= 1;
+			}
+
+			break;
+		}
 		case 0x4/4:
 		{
 			/*Screen Status Register*/
 								       /*VBLANK              HBLANK            ODD               PAL    */
-			state->m_vdp2_regs[offset] = (get_vblank(space->machine())<<19) | (get_hblank(space->machine())<<18) | (get_odd_bit(space->machine()) << 17) | (state->m_vdp2.pal << 16);
+			state->m_vdp2_regs[offset] = (state->m_vdp2.exltfg<<25) | (state->m_vdp2.exsyfg<<24) | (get_vblank(space->machine())<<19) | (get_hblank(space->machine())<<18) | (get_odd_bit(space->machine()) << 17) | (state->m_vdp2.pal << 16);
+
+			/* vblank bit is always 1 if DISP bit is disabled */
+			if(!STV_VDP2_DISP)
+				state->m_vdp2_regs[offset] |= 1 << 19;
+
+			/* HV latches clears if this register is read */
+			if(ACCESSING_BITS_16_31)
+			{
+				state->m_vdp2.exltfg &= ~1;
+				state->m_vdp2.exsyfg &= ~1;
+			}
 			break;
 		}
 		case 0x8/4:
 		/*H/V Counter Register*/
 		{
-			static UINT16 h_count,v_count;
-			/* TODO: handle various h/v settings. */
-			h_count = space->machine().primary_screen->hpos() & 0x3ff;
-			v_count = space->machine().primary_screen->vpos() & (STV_VDP2_LSMD == 3 ? 0x7ff : 0x3ff);
-			state->m_vdp2_regs[offset] = (h_count<<16)|(v_count);
-			if(LOG_VDP2) logerror("CPU %s PC(%08x) = VDP2: H/V counter read : %08x\n", space->device().tag(), cpu_get_pc(&space->device()),state->m_vdp2_regs[offset]);
+			state->m_vdp2_regs[offset] = (state->m_vdp2.h_count<<16)|(state->m_vdp2.v_count);
 			break;
 		}
+		default:
+			if(!space->debugger_access())
+				printf("VDP2: read from register %08x %08x\n",offset*4,mem_mask);
+			break;
 	}
 	return state->m_vdp2_regs[offset];
 }
@@ -5577,9 +5604,6 @@ UINT8 get_vblank(running_machine &machine)
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int cur_v,vblank;
 	cur_v = machine.primary_screen->vpos();
-
-	if(!STV_VDP2_DISP)
-		return 1;
 
 	vblank = (state->m_vdp2.pal) ? 288 : 240;
 
