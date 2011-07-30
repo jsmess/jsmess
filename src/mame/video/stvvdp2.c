@@ -4153,7 +4153,7 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
       at the very list throw up a few errors if the tilemaps want to do something we don't support yet */
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	int window_applied = 0;
+//	int window_applied = 0;
 	rectangle mycliprect;
 	mycliprect.min_x = cliprect->min_x;
 	mycliprect.max_x = cliprect->max_x;
@@ -4168,7 +4168,8 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		return;
 	}
 
-	window_applied = stv_vdp2_apply_window_on_layer(machine,&mycliprect);
+//	window_applied = 
+	stv_vdp2_apply_window_on_layer(machine,&mycliprect);
 
 	if (stv2_current_tilemap.bitmap_enable) // this layer is a bitmap
 	{
