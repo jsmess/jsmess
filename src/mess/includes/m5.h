@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER( fd5_tc_w );
 
 	// video state
-	const TMS9928a_interface *m_vdp_intf;
+//	const TMS9928a_interface *m_vdp_intf;
 
 	// floppy state
 	UINT8 m_fd5_data;
