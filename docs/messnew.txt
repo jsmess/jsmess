@@ -1,4 +1,27 @@
-﻿0.143u2
+﻿0.143u3
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+
+System Driver Changes:
+----------------------
+- cybiko: systems now start up and look for flash image [Tim Schuerewegen, R. Belmont]
+
+Software Lists:
+----------------
+
+Source Changes:
+----------------
+
+0.143u2
 
 New System Drivers Supported:
 -----------------------------
