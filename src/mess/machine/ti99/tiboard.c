@@ -69,8 +69,6 @@ INTERRUPT_GEN( ti99_vblank_interrupt )
 	device_t *dev = device->machine().device("ti_board");
 	tiboard_state *board = get_safe_token(dev);
 
-	TMS9928A_interrupt(device->machine());
-
 	if (board->handset != NULL)
 		ti99_handset_task(board->handset);
 	if (board->mecmouse != NULL)

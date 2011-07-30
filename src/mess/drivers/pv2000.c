@@ -171,8 +171,8 @@ static READ8_HANDLER(pv2000_keys_mod_r)
 static ADDRESS_MAP_START( pv2000_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3FFF) AM_ROM
 
-	AM_RANGE(0x4000, 0x4000) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0x4001, 0x4001) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, register_read, register_write)
 
 	AM_RANGE(0x7000, 0x7FFF) AM_RAM
   //AM_RANGE(0x8000, 0xBFFF) ext ram?
@@ -304,41 +304,36 @@ static INPUT_PORTS_START( pv2000 )
 INPUT_PORTS_END
 
 
-static INTERRUPT_GEN( pv2000_interrupt )
+static WRITE_LINE_DEVICE_HANDLER(pv2000_vdp_interrupt)
 {
-   TMS9928A_interrupt(device->machine());
-}
-
-static void pv2000_vdp_interrupt(running_machine &machine, int new_state)
-{
-	pv2000_state *state = machine.driver_data<pv2000_state>();
+	pv2000_state *pv_state = device->machine().driver_data<pv2000_state>();
 
     // only if it goes up
-	if (new_state && !state->m_last_state)
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	if (state && !pv_state->m_last_state)
+		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
-	state->m_last_state = new_state;
+	pv_state->m_last_state = state;
 
 	/* Check if irq triggering from keyboard presses is enabled */
-	if ( state->m_keyb_column == 0x0f )
+	if ( pv_state->m_keyb_column == 0x0f )
 	{
 		/* Check if a key is pressed */
 		UINT8 key_pressed;
 
-		key_pressed = input_port_read( machine, "IN0" )
-			| input_port_read( machine, "IN1" )
-			| input_port_read( machine, "IN2" )
-			| input_port_read( machine, "IN3" )
-			| input_port_read( machine, "IN4" )
-			| input_port_read( machine, "IN5" )
-			| input_port_read( machine, "IN6" )
-			| input_port_read( machine, "IN7" )
-			| input_port_read( machine, "IN8" );
+		key_pressed = input_port_read( device->machine(), "IN0" )
+			| input_port_read( device->machine(), "IN1" )
+			| input_port_read( device->machine(), "IN2" )
+			| input_port_read( device->machine(), "IN3" )
+			| input_port_read( device->machine(), "IN4" )
+			| input_port_read( device->machine(), "IN5" )
+			| input_port_read( device->machine(), "IN6" )
+			| input_port_read( device->machine(), "IN7" )
+			| input_port_read( device->machine(), "IN8" );
 
-		if ( key_pressed && state->m_key_pressed != key_pressed )
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+		if ( key_pressed && pv_state->m_key_pressed != key_pressed )
+			cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 
-		state->m_key_pressed = key_pressed;
+		pv_state->m_key_pressed = key_pressed;
 	}
 }
 
@@ -346,17 +341,15 @@ static void pv2000_vdp_interrupt(running_machine &machine, int new_state)
 
 /* Machine Initialization */
 
-static const TMS9928a_interface tms9928a_interface =
+static TMS9928A_INTERFACE(pv2000_tms9928a_interface)
 {
-	TMS99x8A,
+	"screen",
 	0x4000,
-	0, 0,
-	pv2000_vdp_interrupt
+	DEVCB_LINE(pv2000_vdp_interrupt)
 };
 
 static MACHINE_START( pv2000 )
 {
-	TMS9928A_configure(&tms9928a_interface);
 }
 
 static MACHINE_RESET( pv2000 )
@@ -411,6 +404,15 @@ static const cassette_interface pv2000_cassette_interface =
 };
 
 
+static SCREEN_UPDATE( pv2000 )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
+}
+
+
 /* Machine Drivers */
 static MACHINE_CONFIG_START( pv2000, pv2000_state )
 
@@ -418,16 +420,14 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
 	MCFG_CPU_PROGRAM_MAP(pv2000_map)
 	MCFG_CPU_IO_MAP(pv2000_io_map)
-	MCFG_CPU_VBLANK_INT("screen", pv2000_interrupt)
 
 	MCFG_MACHINE_START(pv2000)
 	MCFG_MACHINE_RESET(pv2000)
 
     // video hardware
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, pv2000_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( pv2000 )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

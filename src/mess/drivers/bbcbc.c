@@ -55,8 +55,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bbcbc_io, AS_IO, 8, bbcbc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0x81, 0x81) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("tms9129", tms9129_device, vram_read, vram_write)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("tms9129", tms9129_device, register_read, register_write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bbcbc )
@@ -97,22 +97,16 @@ static INPUT_PORTS_START( bbcbc )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Play, No") PORT_CODE(KEYCODE_B) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
-static void tms_interrupt(running_machine &machine, int irq_state)
+static WRITE_LINE_DEVICE_HANDLER(tms_interrupt)
 {
-	cputag_set_input_line(machine, "maincpu", 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static INTERRUPT_GEN( bbcbc_interrupt )
+static TMS9928A_INTERFACE(tms9129_interface)
 {
-	TMS9928A_interrupt(device->machine());
-}
-
-static const TMS9928a_interface tms9129_interface =
-{
-	TMS9929A,
+	"screen",
 	0x4000,
-	0, 0,
-	tms_interrupt
+	DEVCB_LINE(tms_interrupt)
 };
 
 /* TODO */
@@ -168,11 +162,19 @@ static DEVICE_IMAGE_LOAD( bbcbc_cart )
 
 static MACHINE_START( bbcbc )
 {
-	TMS9928A_configure(&tms9129_interface);
 }
 
 static MACHINE_RESET( bbcbc )
 {
+}
+
+
+static SCREEN_UPDATE( bbcbc )
+{
+	tms9928a_device *tms9129 = screen->machine().device<tms9928a_device>( "tms9129" );
+
+	tms9129->update( bitmap, cliprect );
+	return 0;
 }
 
 
@@ -181,16 +183,15 @@ static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
 	MCFG_CPU_PROGRAM_MAP( bbcbc_prg)
 	MCFG_CPU_IO_MAP( bbcbc_io)
 	MCFG_CPU_CONFIG(bbcbc_daisy_chain)
-	MCFG_CPU_VBLANK_INT("screen", bbcbc_interrupt)
 
 	MCFG_MACHINE_START( bbcbc )
 	MCFG_MACHINE_RESET( bbcbc )
 
 	MCFG_Z80PIO_ADD( "z80pio", MAIN_CLOCK / 8, bbcbc_z80pio_intf )
 
-	MCFG_FRAGMENT_ADD( tms9928a )
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE( 50 )
+	MCFG_TMS9928A_ADD( "tms9129", TMS9129, tms9129_interface )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE( bbcbc )
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_NOT_MANDATORY

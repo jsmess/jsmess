@@ -331,8 +331,8 @@ static ADDRESS_MAP_START (msx_io_map, AS_IO, 8)
 	AM_RANGE( 0x91, 0x91) AM_DEVWRITE("centronics", msx_printer_data_w)
 	AM_RANGE( 0xa0, 0xa7) AM_DEVREADWRITE("ay8910", ay8910_r, msx_ay8910_w )
 	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
-	AM_RANGE( 0x98, 0x98) AM_READWRITE( TMS9928A_vram_r, TMS9928A_vram_w )
-	AM_RANGE( 0x99, 0x99) AM_READWRITE( TMS9928A_register_r, TMS9928A_register_w )
+	AM_RANGE( 0x98, 0x98) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, vram_read, vram_write)
+	AM_RANGE( 0x99, 0x99) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, register_read, register_write)
 	AM_RANGE( 0xd8, 0xd9) AM_READWRITE( msx_kanji_r, msx_kanji_w )
 ADDRESS_MAP_END
 
@@ -1051,21 +1051,13 @@ static MACHINE_CONFIG_START( msx, msx_state )
 	MCFG_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(msx_memory_map)
 	MCFG_CPU_IO_MAP(msx_io_map)
-	MCFG_CPU_VBLANK_INT("screen", msx_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", msx_interrupt)	/* Needed for mouse updates */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( msx )
 	MCFG_MACHINE_RESET( msx )
 
 	MCFG_I8255_ADD( "ppi8255", msx_ppi8255_interface )
-
-	/* video hardware */
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(MSX_TOTAL_XRES_PIXELS, MSX_TOTAL_YRES_PIXELS)
-	MCFG_SCREEN_VISIBLE_AREA(MSX_XBORDER_PIXELS - MSX_VISIBLE_XBORDER_PIXELS, MSX_TOTAL_XRES_PIXELS - MSX_XBORDER_PIXELS + MSX_VISIBLE_XBORDER_PIXELS - 1, MSX_YBORDER_PIXELS - MSX_VISIBLE_YBORDER_PIXELS, MSX_TOTAL_YRES_PIXELS - MSX_YBORDER_PIXELS + MSX_VISIBLE_YBORDER_PIXELS - 1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1094,10 +1086,44 @@ static MACHINE_CONFIG_START( msx, msx_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( msx_pal, msx )
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
+static WRITE_LINE_DEVICE_HANDLER(tms9928a_interrupt)
+{
+	cputag_set_input_line(device->machine(), "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
+}
+
+
+static SCREEN_UPDATE( msx )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
+}
+
+
+static TMS9928A_INTERFACE(msx_tms9928a_interface)
+{
+	"screen",
+	0x4000,
+	DEVCB_LINE(tms9928a_interrupt)
+};
+
+
+static MACHINE_CONFIG_DERIVED( msx_ntsc, msx )
+	/* Video hardware */
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, msx_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( msx )
 MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( msx_pal, msx )
+	/* Video hardware */
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, msx_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE( msx )
+MACHINE_CONFIG_END
+
 
 #define MSX2_XBORDER_PIXELS		16
 #define MSX2_YBORDER_PIXELS		28
@@ -3812,40 +3838,40 @@ COMP(1983, msx,	     0,		0,	msx_pal,  msx,	    msx,      "ASCII & Microsoft", "M
 COMP(1983, ax170,	msx,	0,	msx_pal,  msx,      msx,     "Al Alamiah", "AX-170" , 0)
 COMP(1983, canonv10,  msx,	0,	msx_pal,  msx,      msx,     "Canon", "V-10" , 0)
 COMP(1983, canonv20,  msx,	0,	msx_pal,  msx,      msx,     "Canon", "V-20" , 0)
-COMP(1984, dpc100,   msx,	0,	msx,	  msxkr,    msx,     "Daewoo", "IQ-1000 DPC-100 (Korea)" , 0)
-COMP(1984, dpc180,   msx,	0,	msx,	  msxkr,    msx,     "Daewoo", "IQ-1000 DPC-180 (Korea)" , 0)
-COMP(1984, dpc200,   msx,	0,	msx,	  msxkr,    msx,     "Daewoo", "IQ-1000 DPC-200 (Korea)" , 0)
+COMP(1984, dpc100,   msx,	0,	msx_ntsc, msxkr,    msx,     "Daewoo", "IQ-1000 DPC-100 (Korea)" , 0)
+COMP(1984, dpc180,   msx,	0,	msx_ntsc, msxkr,    msx,     "Daewoo", "IQ-1000 DPC-180 (Korea)" , 0)
+COMP(1984, dpc200,   msx,	0,	msx_ntsc, msxkr,    msx,     "Daewoo", "IQ-1000 DPC-200 (Korea)" , 0)
 COMP(1983, gsfc200,   msx,	0,	msx_pal,  msx,      msx,     "Goldstar", "FC-200" , 0)
-COMP(1983, expert10, msx,	0,	msx,	  expert10, msx,     "Gradiente", "Expert 1.0 (Brazil)" , 0)
-COMP(1984, expert11, msx,	0,	msx,	  expert11, msx,     "Gradiente", "Expert 1.1 (Brazil)" , 0)
-COMP(1984, expert13, msx,	0,	msx,	  expert11, msx,     "Gradiente", "Expert 1.3 (Brazil)" , 0)
-COMP(1985, expertdp, msx,	0,	msx,	  expert11, msx,     "Gradiente", "Expert DDPlus (Brazil)", 0 )
-COMP(1984, expertpl, msx,	0,	msx,	  expert11, msx,     "Gradiente", "Expert Plus (Brazil)" , 0)
+COMP(1983, expert10, msx,	0,	msx_ntsc, expert10, msx,     "Gradiente", "Expert 1.0 (Brazil)" , 0)
+COMP(1984, expert11, msx,	0,	msx_ntsc, expert11, msx,     "Gradiente", "Expert 1.1 (Brazil)" , 0)
+COMP(1984, expert13, msx,	0,	msx_ntsc, expert11, msx,     "Gradiente", "Expert 1.3 (Brazil)" , 0)
+COMP(1985, expertdp, msx,	0,	msx_ntsc, expert11, msx,     "Gradiente", "Expert DDPlus (Brazil)", 0 )
+COMP(1984, expertpl, msx,	0,	msx_ntsc, expert11, msx,     "Gradiente", "Expert Plus (Brazil)" , 0)
 COMP(1983, jvchc7gb,  msx,	0,	msx_pal,  msx,      msx,     "JVC", "HC-7GB" , 0)
 COMP(1983, mlf80,	  msx,	0,	msx_pal,  msx,      msx,     "Mitsubishi", "ML-F80" , 0)
 COMP(1983, mlfx1,	  msx,	0,	msx_pal,  msx,      msx,     "Mitsubishi", "ML-FX1" , 0)
-COMP(1984, cf1200,   msx,	0,  msx,      msxjp,    msx,     "National / Matsushita", "CF-1200 (Japan)" , 0)
-COMP(1983, cf2000,   msx,	0,  msx,      msxjp,    msx,     "National / Matsushita", "CF-2000 (Japan)" , 0)
-COMP(1984, cf2700,   msx,	0,  msx,      msxjp,    msx,     "National / Matsushita", "CF-2700 (Japan)" , 0)
-COMP(1984, cf3000,   msx,	0,  msx,      msxjp,    msx,     "National / Matsushita", "CF-3000 (Japan)" , 0)
-COMP(1985, cf3300,   msx,	0,  msx,      msxjp,    msx,     "National / Matsushita", "CF-3300 (Japan)", 0 )
-COMP(1985, fs1300,   msx,	0,  msx,      msxjp,    msx,     "National / Matsushita", "FS-1300 (Japan)" , 0)
-COMP(1985, fs4000,   msx,	0,  msx,      msxjp,    msx,     "National / Matsushita", "FS-4000 (Japan)" , 0)
+COMP(1984, cf1200,   msx,	0,  msx_ntsc, msxjp,    msx,     "National / Matsushita", "CF-1200 (Japan)" , 0)
+COMP(1983, cf2000,   msx,	0,  msx_ntsc, msxjp,    msx,     "National / Matsushita", "CF-2000 (Japan)" , 0)
+COMP(1984, cf2700,   msx,	0,  msx_ntsc, msxjp,    msx,     "National / Matsushita", "CF-2700 (Japan)" , 0)
+COMP(1984, cf3000,   msx,	0,  msx_ntsc, msxjp,    msx,     "National / Matsushita", "CF-3000 (Japan)" , 0)
+COMP(1985, cf3300,   msx,	0,  msx_ntsc, msxjp,    msx,     "National / Matsushita", "CF-3300 (Japan)", 0 )
+COMP(1985, fs1300,   msx,	0,  msx_ntsc, msxjp,    msx,     "National / Matsushita", "FS-1300 (Japan)" , 0)
+COMP(1985, fs4000,   msx,	0,  msx_ntsc, msxjp,    msx,     "National / Matsushita", "FS-4000 (Japan)" , 0)
 COMP(1983, nms801,	  msx,	0,	msx_pal,  msx,      msx,     "Philips", "NMS-801" , 0)
-COMP(1984, vg8000,  msx,	0,	msx,	  msx,      msx,     "Philips",	 "VG-8000" , GAME_NOT_WORKING)
-COMP(1984, vg8010,  msx,	0,	msx,	  msx,      msx,     "Philips",	 "VG-8010" , GAME_NOT_WORKING)
-COMP(1984, vg8010f,  msx,	0,	msx,	  msx,      msx,     "Philips",	 "VG-8010F" , GAME_NOT_WORKING)
-COMP(1985, vg802000,  msx,	0,	msx,	  msx,      msx,     "Philips",	 "VG-8020-00" , 0)
-COMP(1985, vg802020, msx,	0,	msx,	  msx,      msx,     "Philips",	 "VG-8020-20" , 0)
+COMP(1984, vg8000,  msx,	0,	msx_ntsc, msx,      msx,     "Philips",	 "VG-8000" , GAME_NOT_WORKING)
+COMP(1984, vg8010,  msx,	0,	msx_ntsc, msx,      msx,     "Philips",	 "VG-8010" , GAME_NOT_WORKING)
+COMP(1984, vg8010f,  msx,	0,	msx_ntsc, msx,      msx,     "Philips",	 "VG-8010F" , GAME_NOT_WORKING)
+COMP(1985, vg802000,  msx,	0,	msx_ntsc, msx,      msx,     "Philips",	 "VG-8020-00" , 0)
+COMP(1985, vg802020, msx,	0,	msx_ntsc, msx,      msx,     "Philips",	 "VG-8020-20" , 0)
 COMP(1985, piopx7,	  msx,	0,	msx_pal,  msx,      msx,     "Pioneer",	 "PX-07" , 0)
 COMP(1985, mpc100,	  msx,	0,	msx_pal,  msx,      msx,     "Sanyo",	 "MPC-100" , 0)
-COMP(1985, hotbit11, msx,	0,	msx,	  hotbit,   msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 1.1" , 0)
-COMP(1985, hotbit12, msx,	0,	msx,	  hotbit,   msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 1.2" , 0)
-COMP(1985, hotbi13b, msx,	0,	msx,	  hotbit,   msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 1.3b" , 0)
-COMP(1985, hotbi13p, msx,	0,	msx,	  hotbit,   msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 1.3p" , 0)
+COMP(1985, hotbit11, msx,	0,	msx_ntsc, hotbit,   msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 1.1" , 0)
+COMP(1985, hotbit12, msx,	0,	msx_ntsc, hotbit,   msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 1.2" , 0)
+COMP(1985, hotbi13b, msx,	0,	msx_ntsc, hotbit,   msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 1.3b" , 0)
+COMP(1985, hotbi13p, msx,	0,	msx_ntsc, hotbit,   msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 1.3p" , 0)
 COMP(1985, hb10p,    msx,	0,  msx_pal,  msx,  	msx,     "Sony", "HB-10P" , 0)
 COMP(1985, hb20p,    msx,	0,  msx_pal,  msx,  	msx,     "Sony", "HB-20P (Spanish)" , 0)
-COMP(1985, hb201,    msx,	0,  msx,      msxjp,    msx,     "Sony", "HB-201 (Japan)" , 0)
+COMP(1985, hb201,    msx,	0,  msx_ntsc, msxjp,    msx,     "Sony", "HB-201 (Japan)" , 0)
 COMP(1985, hb201p,   msx,	0,	msx_pal,  msx,      msx,     "Sony", "HB-201P" , 0)
 COMP(1984, hb501p,   msx,	0,	msx_pal,  msx,      msx,     "Sony", "HB-501P" , 0)
 COMP(1983, hb55d,    msx,	0,	msx_pal,  msx,      msx,     "Sony", "HB-55D (Germany)" , 0)

@@ -2,7 +2,6 @@
 #define __SG1000__
 
 #include "machine/ram.h"
-#include "video/tms9928a.h"
 #include "imagedev/cassette.h"
 
 #define SCREEN_TAG		"screen"
@@ -14,6 +13,7 @@
 #define UPD9255_0_TAG	"upd9255_0"
 #define UPD9255_1_TAG	"upd9255_1"
 #define CENTRONICS_TAG	"centronics"
+#define TMS9918A_TAG	"tms9918a"
 
 #define IS_CARTRIDGE_TV_DRAW(ptr) \
 	(!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))
@@ -27,9 +27,7 @@
 #define IS_CARTRIDGE_MUSIC_EDITOR(ptr) \
 	(!strncmp("PIANO", (const char *)&ptr[0x0841], 5))
 
-extern const TMS9928a_interface tms9928a_interface;
 INPUT_PORTS_EXTERN( sk1100 );
-extern INTERRUPT_GEN( sg1000_int );
 extern const i8255_interface ( sc3000_ppi_intf );
 extern const cassette_interface sc3000_cassette_interface;
 

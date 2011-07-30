@@ -97,8 +97,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( coleco_io_map, AS_IO, 8, coleco_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_off_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(paddle_on_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1f) AM_DEVWRITE_LEGACY("sn76489a", sn76496_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1d) AM_READ(paddle_1_r)
@@ -114,8 +114,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( czz50_io_map, AS_IO, 8, coleco_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_off_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(paddle_on_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1f) AM_DEVWRITE_LEGACY("sn76489a", sn76496_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1d) AM_READ(paddle_1_r)
@@ -178,14 +178,9 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static INTERRUPT_GEN( coleco_interrupt )
+static WRITE_LINE_DEVICE_HANDLER(coleco_vdp_interrupt)
 {
-    TMS9928A_interrupt(device->machine());
-}
-
-static void coleco_vdp_interrupt(running_machine &machine, int state)
-{
-	coleco_state *drvstate = machine.driver_data<coleco_state>();
+	coleco_state *drvstate = device->machine().driver_data<coleco_state>();
 
     // only if it goes up
 	if (state && !drvstate->m_last_state)
@@ -208,17 +203,15 @@ static TIMER_DEVICE_CALLBACK( paddle_callback )
 
 /* Machine Initialization */
 
-static const TMS9928a_interface tms9928a_interface =
+static TMS9928A_INTERFACE(coleco_tms9928a_interface)
 {
-	TMS99x8A,
+	"screen",
 	0x4000,
-	0, 0,
-	coleco_vdp_interrupt
+	DEVCB_LINE(coleco_vdp_interrupt)
 };
 
 void coleco_state::machine_start()
 {
-	TMS9928A_configure(&tms9928a_interface);
 }
 
 void coleco_state::machine_reset()
@@ -262,6 +255,14 @@ static DEVICE_IMAGE_LOAD( czz50_cart )
 	}
 }
 
+static SCREEN_UPDATE( coleco )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
+}
+
 /* Machine Drivers */
 
 static MACHINE_CONFIG_START( coleco, coleco_state )
@@ -269,13 +270,11 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
 	MCFG_CPU_PROGRAM_MAP(coleco_map)
 	MCFG_CPU_IO_MAP(coleco_io_map)
-	MCFG_CPU_VBLANK_INT("screen", coleco_interrupt)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, coleco_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( coleco )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -299,13 +298,11 @@ static MACHINE_CONFIG_START( czz50, coleco_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_15909MHz/2)	// ???
 	MCFG_CPU_PROGRAM_MAP(czz50_map)
 	MCFG_CPU_IO_MAP(czz50_io_map)
-	MCFG_CPU_VBLANK_INT("screen", coleco_interrupt)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, coleco_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( coleco )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -326,8 +323,12 @@ static MACHINE_CONFIG_START( czz50, coleco_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dina, czz50 )
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/313)
+	MCFG_DEVICE_REMOVE("tms9928a")
+	MCFG_DEVICE_REMOVE("screen")
+
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, coleco_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE( coleco )
 MACHINE_CONFIG_END
 
 /* ROMs */

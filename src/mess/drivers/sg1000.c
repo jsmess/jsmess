@@ -76,6 +76,7 @@ Notes:
 #include "machine/i8255.h"
 #include "machine/msm8251.h"
 #include "machine/upd765.h"
+#include "video/tms9928a.h"
 #include "sound/sn76496.h"
 #include "crsshair.h"
 #include "includes/sg1000.h"
@@ -166,8 +167,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sg1000_io_map, AS_IO, 8, sg1000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
 	AM_RANGE(0xdc, 0xdc) AM_READ_PORT("PA7")
 	AM_RANGE(0xdd, 0xdd) AM_READ_PORT("PB7")
 	AM_RANGE(0xde, 0xde) AM_READ(joysel_r) AM_WRITENOP
@@ -191,8 +192,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( omv_io_map, AS_IO, 8, sg1000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x38) AM_READ_PORT("C0")
 	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x38) AM_READ_PORT("C1")
 	AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x38) AM_READ_PORT("C2")
@@ -218,8 +219,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sc3000_io_map, AS_IO, 8, sg1000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
-	AM_RANGE(0xbe, 0xbe) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0xbf, 0xbf) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
+	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
 	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(UPD9255_TAG, i8255_device, read, write)
 ADDRESS_MAP_END
 
@@ -228,8 +229,8 @@ static ADDRESS_MAP_START( sc3000_io_map, AS_IO, 8, sg1000_state )
     ADDRESS_MAP_GLOBAL_MASK(0xff)
     AM_RANGE(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE(UPD9255_TAG, i8255_device, read, write)
     AM_RANGE(0x00, 0x00) AM_MIRROR(0x7f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
-    AM_RANGE(0x00, 0x00) AM_MIRROR(0xae) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
-    AM_RANGE(0x01, 0x01) AM_MIRROR(0xae) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
+    AM_RANGE(0x00, 0x00) AM_MIRROR(0xae) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
+    AM_RANGE(0x01, 0x01) AM_MIRROR(0xae) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
     AM_RANGE(0x60, 0x60) AM_MIRROR(0x9f) AM_READ(sc3000_r_r)
 ADDRESS_MAP_END
 */
@@ -250,8 +251,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sf7000_io_map, AS_IO, 8, sf7000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
-	AM_RANGE(0xbe, 0xbe) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0xbf, 0xbf) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
+	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
 	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(UPD9255_0_TAG, i8255_device, read, write)
 	AM_RANGE(0xe0, 0xe0) AM_DEVREAD_LEGACY(UPD765_TAG, upd765_status_r)
 	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w)
@@ -531,23 +532,25 @@ INPUT_PORTS_END
     TMS9928a_interface tms9928a_interface
 -------------------------------------------------*/
 
-INTERRUPT_GEN( sg1000_int )
+static WRITE_LINE_DEVICE_HANDLER(sg1000_vdp_interrupt)
 {
-    TMS9928A_interrupt(device->machine());
+	cputag_set_input_line(device->machine(), Z80_TAG, INPUT_LINE_IRQ0, state);
 }
 
-static void sg1000_vdp_interrupt(running_machine &machine, int state)
+static TMS9928A_INTERFACE(sg1000_tms9918a_interface)
 {
-	cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_IRQ0, state);
-}
-
-const TMS9928a_interface tms9928a_interface =
-{
-	TMS99x8A,
+	"screen",
 	0x4000,
-	0, 0,
-	sg1000_vdp_interrupt
+	DEVCB_LINE(sg1000_vdp_interrupt)
 };
+
+static SCREEN_UPDATE( sg1000 )
+{
+	tms9918a_device *tms9918a = screen->machine().device<tms9918a_device>( TMS9918A_TAG );
+
+	tms9918a->update( bitmap, cliprect );
+	return 0;
+}
 
 /*-------------------------------------------------
     I8255_INTERFACE( sc3000_ppi_intf )
@@ -977,9 +980,6 @@ static TIMER_CALLBACK( lightgun_tick )
 
 void sg1000_state::machine_start()
 {
-	/* configure VDP */
-	TMS9928A_configure(&tms9928a_interface);
-
 	/* toggle light gun crosshair */
 	machine().scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
@@ -993,9 +993,6 @@ void sg1000_state::machine_start()
 
 void sc3000_state::machine_start()
 {
-	/* configure VDP */
-	TMS9928A_configure(&tms9928a_interface);
-
 	/* toggle light gun crosshair */
 	machine().scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 
@@ -1011,9 +1008,6 @@ void sc3000_state::machine_start()
 
 void sf7000_state::machine_start()
 {
-	/* configure VDP */
-	TMS9928A_configure(&tms9928a_interface);
-
 	/* configure memory banking */
 	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base(), 0);
 	memory_configure_bank(machine(), "bank1", 1, 1, ram_get_ptr(m_ram), 0);
@@ -1048,13 +1042,11 @@ static MACHINE_CONFIG_START( sg1000, sg1000_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3)
 	MCFG_CPU_PROGRAM_MAP(sg1000_map)
 	MCFG_CPU_IO_MAP(sg1000_io_map)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, sg1000_int)
 
     /* video hardware */
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( sg1000 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1103,13 +1095,11 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3) // LH0080A
 	MCFG_CPU_PROGRAM_MAP(sc3000_map)
 	MCFG_CPU_IO_MAP(sc3000_io_map)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, sg1000_int)
 
     /* video hardware */
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( sg1000 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1144,13 +1134,11 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3)
 	MCFG_CPU_PROGRAM_MAP(sf7000_map)
 	MCFG_CPU_IO_MAP(sf7000_io_map)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, sg1000_int)
 
     /* video hardware */
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( sg1000 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -1241,8 +1241,8 @@ static ADDRESS_MAP_START( adam_io, AS_IO, 8, adam_state )
 //  AM_RANGE(0x5f, 0x5f) Optional Modem Control Status
 	AM_RANGE(0x60, 0x60) AM_MIRROR(0x1f) AM_READWRITE(mioc_r, mioc_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(joystick_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1f) AM_DEVWRITE_LEGACY(SN76489A_TAG, sn76496_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1d) AM_READ(input1_r)
@@ -1495,30 +1495,32 @@ INPUT_PORTS_END
 //  TMS9928a_interface tms9928a_interface
 //-------------------------------------------------
 
-static INTERRUPT_GEN( adam_interrupt )
+static WRITE_LINE_DEVICE_HANDLER(adam_vdp_interrupt)
 {
-	TMS9928A_interrupt(device->machine());
-}
-
-static void adam_vdp_interrupt(running_machine &machine, int state)
-{
-	adam_state *driver_state = machine.driver_data<adam_state>();
+	adam_state *driver_state = device->machine().driver_data<adam_state>();
 
 	if (state && !driver_state->m_vdp_nmi)
 	{
-		cputag_set_input_line(machine, Z80_TAG, INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine(), Z80_TAG, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	driver_state->m_vdp_nmi = state;
 }
 
-static const TMS9928a_interface tms9928a_interface =
+static TMS9928A_INTERFACE(adam_tms9928a_interface)
 {
-	TMS99x8A,
+	"screen",
 	0x4000,
-	0, 0,
-	adam_vdp_interrupt
+	DEVCB_LINE(adam_vdp_interrupt)
 };
+
+static SCREEN_UPDATE( adam )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
+}
 
 
 //-------------------------------------------------
@@ -1615,9 +1617,6 @@ static M6801_INTERFACE( master6801_intf )
 
 void adam_state::machine_start()
 {
-	// configure VDP
-	TMS9928A_configure(&tms9928a_interface);
-
 	// register for state saving
 	state_save_register_global(machine(), m_mioc);
 	state_save_register_global(machine(), m_game);
@@ -1710,12 +1709,10 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_CPU_ADD(M6801_SPI_TAG, M6801, XTAL_4MHz)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, adam_interrupt)
-
 	// video hardware
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, adam_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( adam )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

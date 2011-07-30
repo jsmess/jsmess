@@ -401,17 +401,23 @@ static WRITE8_HANDLER( einstein_fire_int_w )
     MACHINE EMULATION
 ***************************************************************************/
 
-static const TMS9928a_interface tms9928a_interface =
+static TMS9928A_INTERFACE(einstein_tms9929a_interface)
 {
-	TMS9929A,
+	"screen",
 	0x4000, /* 16k RAM, provided by IC i040 and i041 */
-	0, 0,
-	NULL
+	DEVCB_NULL
 };
+
+static SCREEN_UPDATE( einstein )
+{
+	tms9929a_device *tms9929a = screen->machine().device<tms9929a_device>( "tms9929a" );
+
+	tms9929a->update( bitmap, cliprect );
+	return 0;
+}
 
 static MACHINE_START( einstein )
 {
-	TMS9928A_configure(&tms9928a_interface);
 }
 
 static MACHINE_RESET( einstein )
@@ -429,8 +435,6 @@ static MACHINE_RESET( einstein )
 	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine.device(RAM_TAG)) + 0x8000);
 	einstein->m_rom_enabled = 1;
 	einstein_page_rom(machine);
-
-	TMS9928A_reset();
 
 	/* a reset causes the fire int, adc int, keyboard int mask
     to be set to 1, which causes all these to be DISABLED */
@@ -485,7 +489,7 @@ static SCREEN_UPDATE( einstein2 )
 	einstein_state *einstein = screen->machine().driver_data<einstein_state>();
 
 	if (screen == einstein->m_color_screen)
-		SCREEN_UPDATE_CALL(tms9928a);
+		SCREEN_UPDATE_CALL(einstein);
 	else if (screen == einstein->m_crtc_screen)
 		einstein->m_mc6845->update( bitmap, cliprect);
 	else
@@ -510,8 +514,8 @@ static ADDRESS_MAP_START( einstein_io, AS_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I030, ay8910_r, ay8910_address_w)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff04) AM_DEVWRITE(IC_I030, ay8910_data_w)
 	/* block 1, tms9928a vdp */
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff06) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff06) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN("tms9929a", tms9929a_device, vram_read, vram_write)
+	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN("tms9929a", tms9929a_device, register_read, register_write)
 	/* block 2, msm8251 uart */
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0xff06) AM_DEVREADWRITE(IC_I060, msm8251_data_r, msm8251_data_w)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0xff06) AM_DEVREADWRITE(IC_I060, msm8251_status_r, msm8251_control_w)
@@ -801,10 +805,9 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_DEVICE_ADD("fire_daisy", EINSTEIN_FIRE_DAISY, 0)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_TMS9928A_ADD( "tms9929a", TMS9929A, einstein_tms9929a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE( einstein )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

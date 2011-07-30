@@ -164,10 +164,10 @@ WRITE8_MEMBER( crvision_state::centronics_ctrl_w )
 static ADDRESS_MAP_START( crvision_map, AS_PROGRAM, 8, crvision_state )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_READ_LEGACY(TMS9928A_vram_r)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_READ_LEGACY(TMS9928A_register_r)
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_WRITE_LEGACY(TMS9928A_vram_w)
-	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_WRITE_LEGACY(TMS9928A_register_w)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)
+	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_DEVREAD("tms9928a", tms9928a_device, register_read)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
+	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_DEVWRITE("tms9928a", tms9928a_device, register_write)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(BANK_ROM2)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(BANK_ROM1)
 //  AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(3)
@@ -184,10 +184,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lasr2001_map, AS_PROGRAM, 8, laser2001_state )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_READ_LEGACY(TMS9928A_vram_r)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_READ_LEGACY(TMS9928A_register_r)
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_WRITE_LEGACY(TMS9928A_vram_w)
-	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_WRITE_LEGACY(TMS9928A_register_w)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)
+	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_DEVREAD("tms9928a", tms9928a_device, register_read)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
+	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_DEVWRITE("tms9928a", tms9928a_device, register_write)
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(BANK_ROM2)
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(BANK_ROM1)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
@@ -499,47 +499,25 @@ INPUT_PORTS_END
     TMS9928a_interface tms9918_intf
 -------------------------------------------------*/
 
-static INTERRUPT_GEN( crvision_int )
+static WRITE_LINE_DEVICE_HANDLER(crvision_vdp_interrupt)
 {
-	TMS9928A_interrupt(device->machine());
+	cputag_set_input_line(device->machine(), M6502_TAG, INPUT_LINE_IRQ0, state);
 }
 
-static void crvision_vdp_interrupt(running_machine &machine, int state)
+static TMS9928A_INTERFACE(crvision_tms9928a_interface)
 {
-	cputag_set_input_line(machine, M6502_TAG, INPUT_LINE_IRQ0, state);
+	"screen",
+	0x4000,
+	DEVCB_LINE(crvision_vdp_interrupt)
+};
+
+static SCREEN_UPDATE( crvision )
+{
+	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+
+	tms9928a->update( bitmap, cliprect );
+	return 0;
 }
-
-static const TMS9928a_interface tms9918_intf =
-{
-	TMS99x8,
-	0x4000,
-	0, 0,
-	crvision_vdp_interrupt
-};
-
-/*-------------------------------------------------
-    TMS9928a_interface tms9929_intf
--------------------------------------------------*/
-
-static const TMS9928a_interface tms9929_intf =
-{
-	TMS9929,
-	0x4000,
-	0, 0,
-	crvision_vdp_interrupt
-};
-
-/*-------------------------------------------------
-    TMS9928a_interface tms9929a_intf
--------------------------------------------------*/
-
-static const TMS9928a_interface tms9929a_intf =
-{
-	TMS9929A,
-	0x4000,
-	0, 0,
-	crvision_vdp_interrupt
-};
 
 /*-------------------------------------------------
     pia6821_interface pia_intf
@@ -851,18 +829,12 @@ static const centronics_interface lasr2001_centronics_intf =
 
 void crvision_state::machine_start()
 {
-	// this totally needs to be a device
-	TMS9928A_configure(&tms9918_intf);
-
 	// state saving
 	save_item(NAME(m_keylatch));
 }
 
 void crvision_pal_state::machine_start()
 {
-	// this totally needs to be a device
-	TMS9928A_configure(&tms9929_intf);
-
 	// state saving
 	save_item(NAME(m_keylatch));
 }
@@ -873,9 +845,6 @@ void crvision_pal_state::machine_start()
 
 void laser2001_state::machine_start()
 {
-	// this totally needs to be a device
-	TMS9928A_configure(&tms9929a_intf);
-
 	// state saving
 	save_item(NAME(m_keylatch));
 }
@@ -1005,7 +974,6 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(crvision_map)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, crvision_int)
 
 	// devices
 	MCFG_PIA6821_ADD(PIA6821_TAG, pia_intf)
@@ -1042,10 +1010,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ntsc, creativision )
     // video hardware
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // inaccurate
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9918, crvision_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE( crvision )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1054,10 +1021,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( pal, creativision, crvision_pal_state )
 	// video hardware
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/313)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // inaccurate
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9929, crvision_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE( crvision )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1068,7 +1034,6 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, 17734470/9)
 	MCFG_CPU_PROGRAM_MAP(lasr2001_map)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, crvision_int)
 
 	// devices
 	MCFG_PIA6821_ADD(PIA6821_TAG, lasr2001_pia_intf)
@@ -1077,10 +1042,9 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, lasr2001_centronics_intf)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(tms9928a)
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE((float)10738000/2/342/313)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // inaccurate
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, crvision_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE( crvision )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

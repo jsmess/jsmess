@@ -50,7 +50,6 @@ public:
 
 MACHINE_START( mtx512 );
 MACHINE_RESET( mtx512 );
-INTERRUPT_GEN( mtx_interrupt );
 SNAPSHOT_LOAD( mtx );
 
 WRITE8_HANDLER( mtx_bankswitch_w );
