@@ -69,12 +69,11 @@ opcode and MESS dies. */
 
 // 512 kbyte ram + no memory mapped flash
 static ADDRESS_MAP_START( cybikov1_mem, AS_PROGRAM, 16 )
-#if 0
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
-#endif
 //  AM_RANGE( 0x200000, 0x207fff ) AM_RAM AM_MIRROR( 0x180000 )
 	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w )
 	AM_RANGE( 0xe00000, 0xe07fff ) AM_READ( cybiko_key_r )
+	AM_RANGE( 0xffdc00, 0xfffbff ) AM_RAM // on-chip ram
 ADDRESS_MAP_END
 
 //  +-------------------------------------+
@@ -96,26 +95,24 @@ ADDRESS_MAP_END
 
 // 256 kbyte ram + 256 kbyte memory mapped flash
 static ADDRESS_MAP_START( cybikov2_mem, AS_PROGRAM, 16 )
-#if 0
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
-#endif
 	AM_RANGE( 0x100000, 0x13ffff ) AM_READ_BANK("bank2") AM_MIRROR( 0x0c0000 )
 //  AM_RANGE( 0x200000, 0x23ffff ) AM_RAM AM_MIRROR( 0x1c0000 )
 	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w )
 	AM_RANGE( 0xe00000, 0xffdbff ) AM_READ( cybiko_key_r )
+	AM_RANGE( 0xffdc00, 0xfffbff ) AM_RAM // on-chip ram
 ADDRESS_MAP_END
 
 // 2048? kbyte ram + 512 kbyte memory mapped flash
 static ADDRESS_MAP_START( cybikoxt_mem, AS_PROGRAM, 16 )
-#if 0
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
-#endif
 	AM_RANGE( 0x100000, 0x100001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w )
 	AM_RANGE( 0x200000, 0x200003 ) AM_WRITE( cybiko_unk1_w )
 //  AM_RANGE( 0x400000, 0x5fffff ) AM_RAM
 	AM_RANGE( 0x600000, 0x67ffff ) AM_READ_BANK("bank2")
 	AM_RANGE( 0x7ff800, 0x7fffff ) AM_READ( cybiko_unk2_r )
 	AM_RANGE( 0xe00000, 0xffdbff ) AM_READ( cybiko_key_r )
+	AM_RANGE( 0xffdc00, 0xfffbff ) AM_RAM // on-chip ram
 ADDRESS_MAP_END
 
 //////////////////////
