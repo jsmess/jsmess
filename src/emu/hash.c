@@ -101,7 +101,7 @@ private:
 
 const char *hash_collection::HASH_TYPES_CRC = "R";
 const char *hash_collection::HASH_TYPES_CRC_SHA1 = "RS";
-const char *hash_collection::HASH_TYPES_ALL = "RSM";
+const char *hash_collection::HASH_TYPES_ALL = "RS";
 
 
 
