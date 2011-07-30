@@ -3059,7 +3059,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitma
 						if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 						if(t_pen)
 						{
-							if (((xcnt + 1) < screen_x) && (ycnt < screen_y))
+							if (((xcnt + 1) <= screen_x) && (ycnt <= screen_y))
 							{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
 								*BITMAP_ADDR16(bitmap, ycnt, xcnt+1) = machine.pens[((gfxdata[0] & 0x0f) >> 0) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
@@ -3075,7 +3075,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitma
 						if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 						if(t_pen)
 						{
-							if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+							if (((xcnt + 0) <= screen_x) && (ycnt <= screen_y))
 							{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
 								*BITMAP_ADDR16(bitmap, ycnt, xcnt) = machine.pens[((gfxdata[0] & 0xf0) >> 4) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
@@ -3110,7 +3110,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitma
 							if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 							if(t_pen)
 							{
-								if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+								if (((xcnt + 0) <= screen_x) && (ycnt <= screen_y))
 								{
 								if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
 									*BITMAP_ADDR16(bitmap, ycnt, xcnt) = machine.pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
@@ -3156,7 +3156,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitma
 							if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 							if(t_pen)
 							{
-								if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+								if (((xcnt + 0) <= screen_x) && (ycnt <= screen_y))
 								{
 								if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
 									*BITMAP_ADDR16(bitmap, ycnt, xcnt) = machine.pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
@@ -3184,7 +3184,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitma
 						if(stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE) t_pen = 1;
 						if(t_pen)
 						{
-							if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+							if (((xcnt + 0) <= screen_x) && (ycnt <= screen_y))
 							{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
 								*BITMAP_ADDR16(bitmap, ycnt, xcnt) = machine.pens[((gfxdata[0] & 0x07) * 0x100) | (gfxdata[1] & 0xff) | pal_color_offset];
@@ -3233,7 +3233,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitma
 							tw = stv_vdp2_window_process(machine,xcnt,ycnt);
 							if(tw == 0)
 							{
-								if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+								if (((xcnt + 0) <= screen_x) && (ycnt <= screen_y))
 								{
 								if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
 									destline[xcnt] = b | g << 5 | r << 10;
@@ -3279,7 +3279,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitma
 						{
 							if(t_pen)
 							{
-								if (((xcnt + 0) < screen_x) && (ycnt < screen_y))
+								if (((xcnt + 0) <= screen_x) && (ycnt <= screen_y))
 								{
 								if ( stv2_current_tilemap.colour_calculation_enabled == 1 )
 									destline[xcnt] = alpha_blend_r16( destline[xcnt], b | g << 5 | r << 10, stv2_current_tilemap.alpha );
