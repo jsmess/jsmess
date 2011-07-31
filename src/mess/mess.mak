@@ -644,6 +644,8 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_MACHINE)/apple3.o	\
 	$(MESS_DRIVERS)/apple3.o	\
     $(MESS_MACHINE)/egret.o     \
+	$(MESS_VIDEO)/nubus_48gc.o 	\
+	$(MESS_VIDEO)/nubus_cb264.o \
 
 $(MESSOBJ)/applied.a:			\
 	$(MESS_VIDEO)/mbee.o		\
