@@ -22,6 +22,11 @@
 #define SORCERER_USING_DISKS 0
 #define SORCERER_USING_RS232 0
 
+#if SORCERER_USING_DISKS
+#include "machine/micropolis.h"
+#endif
+
+
 typedef struct {
 	struct {
 		int length;		/* time cassette level is at input.level */
