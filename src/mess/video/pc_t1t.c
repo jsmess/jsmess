@@ -945,12 +945,12 @@ static VIDEO_START( pc_t1t )
 	switch(buswidth)
 	{
 		case 8:
-			space->install_legacy_readwrite_handler(0xb8000, 0xbbfff, FUNC(pc_t1t_videoram_r), FUNC(pc_t1t_videoram_w) );
+			space->install_legacy_readwrite_handler(0xb8000, 0xbffff, FUNC(pc_t1t_videoram_r), FUNC(pc_t1t_videoram_w) );
 			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T_r),FUNC(pc_T1T_w) );
 			break;
 
 		case 16:
-			space->install_legacy_readwrite_handler(0xb8000, 0xbbfff, FUNC(pc_t1t_videoram16le_r), FUNC(pc_t1t_videoram16le_w) );
+			space->install_legacy_readwrite_handler(0xb8000, 0xbffff, FUNC(pc_t1t_videoram16le_r), FUNC(pc_t1t_videoram16le_w) );
 			spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_T1T16le_r),FUNC(pc_T1T16le_w) );
 			break;
 
