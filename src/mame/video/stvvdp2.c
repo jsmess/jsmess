@@ -1403,9 +1403,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 	#define STV_VDP2_BKTA_UL (state->m_vdp2_regs[0x0ac/4])
 
 	#define STV_VDP2_BKCLMD ((STV_VDP2_BKTA_UL & 0x80000000) >> 31)
-	#define STV_VDP2_BKTA   ((STV_VDP2_BKTA_UL & 0x0003ffff) >> 0)
-	/*MSB of this register is used when the extra RAM cart is used,ignore it for now.*/
-	//  #define STV_VDP2_BKTA   ((STV_VDP2_BKTA_UL & 0x0007ffff) >> 0)
+	#define STV_VDP2_BKTA   ((STV_VDP2_BKTA_UL & 0x0007ffff) >> 0)
 
 /* 1800b0 - RPMD - Rotation Parameter Mode
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -5270,41 +5268,36 @@ static void stv_vdp2_draw_RBG0(running_machine &machine, bitmap_t *bitmap, const
 static void stv_vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	int xcnt,ycnt;
+	int x,y;
 	UINT8* gfxdata = state->m_vdp2.gfx_decode;
-	static UINT16 *destline;
-	int r,b,g;
-	UINT16 data;
+	UINT32 base_offs,base_mask;
 
-	if(!(STV_VDP2_BDCLMD & 1))
+	//popmessage("Back screen %08x %08x %08x",STV_VDP2_BDCLMD,STV_VDP2_BKCLMD,STV_VDP2_BKTA);
+
+	/* draw black if BDCLMD and DISP are cleared */
+	if(!(STV_VDP2_BDCLMD) && !(STV_VDP2_DISP))
 		bitmap_fill(bitmap, cliprect, get_black_pen(machine));
 	else
 	{
-		#if DEBUG_MODE
-		//popmessage("Back screen enabled %08x",STV_VDP2_BKTA);
-		#endif
-		gfxdata+=((STV_VDP2_BKTA)<<1);
+		base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
 
-		b = ((gfxdata[0] & 0x7c) >> 2);
-		g = ((gfxdata[0] & 0x03) << 3) | ((gfxdata[1] & 0xe0) >> 5);
-		r = ((gfxdata[1] & 0x1f));
-		data = b | g << 5 | r << 10;
-
-		for (ycnt = cliprect->min_y; ycnt <= cliprect->max_y;ycnt++)
+		for(y=cliprect->min_y;y<=cliprect->max_y;y++)
 		{
-			destline = BITMAP_ADDR16(bitmap, ycnt, 0);
-
-			for (xcnt = cliprect->min_x; xcnt <=cliprect->max_x;xcnt++)
-			{
-				destline[xcnt] = data;
-			}
+			base_offs = (STV_VDP2_BKTA & base_mask) << 1;
 			if(STV_VDP2_BKCLMD)
+				base_offs += (y << 1);
+
+			for(x=cliprect->min_x;x<=cliprect->max_x;x++)
 			{
-				gfxdata+=2;
-				b = ((gfxdata[0] & 0x7c) >> 2);
-				g = ((gfxdata[0] & 0x03) << 3) | ((gfxdata[1] & 0xe0) >> 5);
-				r = ((gfxdata[1] & 0x1f));
-				data = b | g << 5 | r << 10;
+				int r,g,b;
+				UINT16 dot;
+
+				dot = (gfxdata[base_offs+0]<<8)|gfxdata[base_offs+1];
+				b = (dot & 0x7c00) >> 10;
+				g = (dot & 0x03e0) >> 5;
+				r = (dot & 0x001f) >> 0;
+
+				*BITMAP_ADDR16(bitmap, y,x) = b | g << 5 | r << 10;
 			}
 		}
 	}
