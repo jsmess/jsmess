@@ -138,9 +138,6 @@ MSX_SLOT_RESET(ram)
 MSX_SLOT_INIT(rammm)
 {
 	int i, mask, nsize;
-#ifdef MONMSX
-	FILE *f;
-#endif
 
 	nsize = 0x10000; /* 64 kb */
 	mask = 3;
@@ -161,16 +158,6 @@ MSX_SLOT_INIT(rammm)
 	}
 	state->m_mem = auto_alloc_array(machine, UINT8, size);
 	memset (state->m_mem, 0, size);
-
-#ifdef MONMSX
-	f = fopen ("/home/sean/msx/hack/monmsx.bin", "r");
-	if (f)
-	{
-		fseek (f, 6L, SEEK_SET);
-		fread (state->m_mem, 1, 6151 - 6, f);
-		fclose (f);
-	}
-#endif
 
 	state->m_type = SLOT_RAM_MM;
 	state->m_start_page = page;
