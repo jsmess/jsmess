@@ -136,20 +136,20 @@ typedef struct _genboard_state
 	int 	keyAutoRepeatTimer;
 
 	/* Mode flags */
-	int		palvideo;
-	int		capslock;
-	int		keyboard_clock;
-	int		keep_keybuf;
-	int		zero_wait;
+	bool	palvideo;
+	bool	capslock;
+	bool	keyboard_clock;
+	bool	keep_keybuf;
+	bool	zero_wait;
 
-	int		genmod;
-	int 	turbo;
-	int		timode;
+	bool	genmod;
+	bool	turbo;
+	bool	timode;
 
 	/* GROM simulation */
 	int		grom_address;
-	int		gromraddr_LSB;
-	int		gromwaddr_LSB;
+	bool	gromraddr_LSB;
+	bool	gromwaddr_LSB;
 
 	/* Memory */
 	UINT8	*sram;
@@ -158,12 +158,12 @@ typedef struct _genboard_state
 	int		sram_mask, sram_val;
 
 	/* Mapper */
-	int 	geneve_mode;
-	int		direct_mode;
-	int		cartridge_size_8K;
-	int		cartridge_secondpage;
-	int		cartridge6_writable;
-	int		cartridge7_writable;
+	bool	geneve_mode;
+	bool	direct_mode;
+	bool	cartridge_size_8K;
+	bool	cartridge_secondpage;
+	bool	cartridge6_writable;
+	bool	cartridge7_writable;
 	int		map[8];
 
 	int		line_count;
@@ -171,7 +171,7 @@ typedef struct _genboard_state
 	/* Devices */
 	device_t	*cpu;
 	device_t	*video;
-	device_t  *tms9901;
+	device_t	*tms9901;
 	device_t	*clock;
 	device_t	*peribox;
 	device_t	*sound;
@@ -244,13 +244,13 @@ void set_gm_switches(device_t *board, int number, int value)
 	{
 		// Turbo switch. May be changed at any time.
 		logerror("Genmod: Setting turbo flag to %d\n", value);
-		((genboard_state*)board)->turbo = value;
+		((genboard_state*)board)->turbo = (value!=0);
 	}
 	else
 	{
 		// TIMode switch. Causes reset when changed.
 		logerror("Genmod: Setting timode flag to %d\n", value);
-		((genboard_state*)board)->timode = value;
+		((genboard_state*)board)->timode = (value!=0);
 		board->machine().schedule_hard_reset();
 	}
 }
@@ -271,17 +271,17 @@ static READ8_DEVICE_HANDLER( read_grom )
 	if (offset & 0x0002)
 	{
 		// GROM address handling
-		board->gromwaddr_LSB = FALSE;
+		board->gromwaddr_LSB = false;
 
 		if (board->gromraddr_LSB)
 		{
 			reply = board->grom_address & 0xff;
-			board->gromraddr_LSB = FALSE;
+			board->gromraddr_LSB = false;
 		}
 		else
 		{
 			reply = (board->grom_address >> 8) & 0xff;
-			board->gromraddr_LSB = TRUE;
+			board->gromraddr_LSB = true;
 		}
 	}
 	else
@@ -291,7 +291,7 @@ static READ8_DEVICE_HANDLER( read_grom )
 		int page = 0x38;
 		reply = board->dram[page*0x2000 + board->grom_address];
 		board->grom_address = (board->grom_address + 1) & 0xffff;
-		board->gromraddr_LSB = board->gromwaddr_LSB = FALSE;
+		board->gromraddr_LSB = board->gromwaddr_LSB = false;
 	}
 	return reply;
 }
@@ -306,24 +306,24 @@ static WRITE8_DEVICE_HANDLER( write_grom )
 	if (offset & 0x0002)
 	{
 		// set address
-		board->gromraddr_LSB = FALSE;
+		board->gromraddr_LSB = false;
 		if (board->gromwaddr_LSB)
 		{
 			board->grom_address = (board->grom_address & 0xff00) | data;
 			board->grom_address = (board->grom_address + 1) & 0xffff;
-			board->gromwaddr_LSB = FALSE;
+			board->gromwaddr_LSB = false;
 		}
 		else
 		{
 			board->grom_address = (board->grom_address & 0x00ff) | ((UINT16)data<<8);
-			board->gromwaddr_LSB = TRUE;
+			board->gromwaddr_LSB = true;
 		}
 	}
 	else
 	{	// write GPL data
 		// TODO: Check whether available in the real hardware.
 		board->grom_address = (board->grom_address + 1) & 0xffff;
-		board->gromraddr_LSB = board->gromwaddr_LSB = FALSE;
+		board->gromraddr_LSB = board->gromwaddr_LSB = false;
 		logerror("Geneve: GROM write ignored\n");
 	}
 }
@@ -356,8 +356,9 @@ READ8_DEVICE_HANDLER( geneve_r )
 	// Premature access. The CPU reads the start vector before RESET.
 	if (board->peribox==NULL) return 0;
 
+	// Add two wait states (checked with a real Geneve)
 	if (!board->zero_wait)
-		device_adjust_icount(board->cpu, -4);
+		device_adjust_icount(board->cpu, -8);
 
 	UINT32	physaddr;
 
@@ -372,6 +373,7 @@ READ8_DEVICE_HANDLER( geneve_r )
 			// 1111 0001 0000 0010
 			// 1111 0001 0000 1000
 			// 1111 0001 0000 1010
+			device_adjust_icount(board->cpu, -4);
 			gen_v9938_rz(board->video, offset, &value);
 			return value;
 		}
@@ -419,6 +421,7 @@ READ8_DEVICE_HANDLER( geneve_r )
 			// video
 			// ++++ ++-- ---- ---+
 			// 1000 1000 0000 00x0
+			device_adjust_icount(board->cpu, -4);
 			gen_v9938_rz(board->video, offset, &value);
 			return value;
 		}
@@ -551,7 +554,7 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 	if (board->peribox==NULL) return;
 
 	if (!board->zero_wait)
-		device_adjust_icount(board->cpu, -4);
+		device_adjust_icount(board->cpu, -8);
 
 	if (board->geneve_mode)
 	{
@@ -560,6 +563,7 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 			// video
 			// ++++ ++++ ++++ ---+
 			// 1111 0001 0000 .cc0
+			device_adjust_icount(board->cpu, -4);
 			gen_v9938_w(board->video, offset, data);
 			return;
 		}
@@ -613,6 +617,7 @@ WRITE8_DEVICE_HANDLER( geneve_w )
 			// video
 			// ++++ ++-- ---- ---+
 			// 1000 1100 0000 00c0
+			device_adjust_icount(board->cpu, -4);
 			gen_v9938_w(board->video, offset, data);
 			return;
 		}
@@ -769,30 +774,30 @@ WRITE8_DEVICE_HANDLER ( geneve_cru_w )
 	genboard_state *board = get_safe_token(device);
 
 	int addroff = offset << 1;
-	int rising_edge = FALSE;
-	int falling_edge = FALSE;
+	bool rising_edge = false;
+	bool falling_edge = false;
 
-	if ((addroff & 0x1fe0) == CRU_CONTROL_BASE)
+	if ((addroff & 0xffe0) == CRU_CONTROL_BASE)
 	{
 		int bit = (addroff & 0x0001e)>>1;
 		switch (bit)
 		{
 		case 5:
-			board->palvideo = data;
+			board->palvideo = (data!=0);
 			break;
 		case 7:
-			board->capslock = data;
+			board->capslock = (data!=0);
 			break;
 		case 8:
-			rising_edge = (!board->keyboard_clock && data);
-			board->keyboard_clock = data;
+			rising_edge = (!board->keyboard_clock && (data!=0));
+			board->keyboard_clock = (data!=0);
 			if (rising_edge)
 				read_key_if_possible(board);
 			break;
 		case 9:
-			rising_edge = (!board->keep_keybuf && data);
-			falling_edge = (board->keep_keybuf && !data);
-			board->keep_keybuf = data;
+			rising_edge = (!board->keep_keybuf && (data!=0));
+			falling_edge = (board->keep_keybuf && (data==0));
+			board->keep_keybuf = (data!=0);
 
 			if (rising_edge)
 				read_key_if_possible(board);
@@ -812,22 +817,22 @@ WRITE8_DEVICE_HANDLER ( geneve_cru_w )
 			}
 			break;
 		case 10:
-			board->geneve_mode = data;
+			board->geneve_mode = (data!=0);
 			break;
 		case 11:
-			board->direct_mode = data;
+			board->direct_mode = (data!=0);
 			break;
 		case 12:
-			board->cartridge_size_8K = data;
+			board->cartridge_size_8K = (data!=0);
 			break;
 		case 13:
-			board->cartridge6_writable = data;
+			board->cartridge6_writable = (data!=0);
 			break;
 		case 14:
-			board->cartridge7_writable = data;
+			board->cartridge7_writable = (data!=0);
 			break;
 		case 15:
-			board->zero_wait = data;
+			board->zero_wait = (data!=0);
 			break;
 		default:
 			logerror("geneve: set CRU address %04x=%02x ignored\n", addroff, data);
@@ -1207,6 +1212,7 @@ static READ8_DEVICE_HANDLER( R9901_3 )
 */
 static WRITE8_DEVICE_HANDLER( W9901_PE_bus_reset )
 {
+	logerror("genboard: PE bus reset request, ignoring.\n");
 }
 
 /*
@@ -1214,6 +1220,7 @@ static WRITE8_DEVICE_HANDLER( W9901_PE_bus_reset )
 */
 static WRITE8_DEVICE_HANDLER( W9901_VDP_reset )
 {
+	logerror("genboard: Video reset request, ignoring.\n");
 }
 
 /*
@@ -1255,6 +1262,7 @@ static WRITE8_DEVICE_HANDLER( W9901_keyboardReset )
 */
 static WRITE8_DEVICE_HANDLER( W9901_ext_mem_wait_states )
 {
+	logerror("genboard: external bus wait states set to %d, not implemented yet.\n", data);
 }
 
 /*
@@ -1262,6 +1270,7 @@ static WRITE8_DEVICE_HANDLER( W9901_ext_mem_wait_states )
 */
 static WRITE8_DEVICE_HANDLER( W9901_VDP_wait_states )
 {
+	logerror("genboard: vdp wait states set to %d, not implemented yet.\n", data);
 }
 
 /* tms9901 setup */
@@ -1367,8 +1376,8 @@ static DEVICE_START( genboard )
 	assert(board->peribox && board->cpu);
 	assert(board->sound && board->clock);
 	assert(board->eprom);
-	board->geneve_mode = 0;
-	board->direct_mode = 1;
+	board->geneve_mode = false;
+	board->direct_mode = true;
 
 	memset(board->sram, 0x00, SRAM_SIZE);
 	memset(board->dram, 0x00, DRAM_SIZE);
@@ -1402,21 +1411,21 @@ static DEVICE_RESET( genboard )
 	board->last_my = 0;
 	board->line_count = 0;
 
-	board->palvideo = 0;
-	board->capslock = 0;
-	board->keyboard_clock = 0;
-	board->keep_keybuf = 0;
-	board->zero_wait = 1;
+	board->palvideo = false;
+	board->capslock = false;
+	board->keyboard_clock = false;
+	board->keep_keybuf = false;
+	board->zero_wait = true;
 
-	board->geneve_mode = 0;
-	board->direct_mode = 1;
-	board->cartridge_size_8K = 0;
-	board->cartridge_secondpage = 0;
-	board->cartridge6_writable = 0;
-	board->cartridge7_writable = 0;
+	board->geneve_mode =false;
+	board->direct_mode = true;
+	board->cartridge_size_8K = false;
+	board->cartridge_secondpage = false;
+	board->cartridge6_writable = false;
+	board->cartridge7_writable = false;
 	for (int i=0; i < 8; i++) board->map[i] = 0;
 
-	board->genmod = FALSE;
+	board->genmod = false;
 	if (input_port_read(device->machine(), "MODE")==0)
 	{
 		switch (input_port_read(device->machine(), "BOOTROM"))
@@ -1439,9 +1448,9 @@ static DEVICE_RESET( genboard )
 		{
 			fatalerror("GenMod boot rom missing.\n");
 		}
-		board->genmod = TRUE;
-		board->turbo = input_port_read(device->machine(), "GENMODDIPS") & GM_TURBO;
-		board->timode = input_port_read(device->machine(), "GENMODDIPS") & GM_TIM;
+		board->genmod = true;
+		board->turbo = ((input_port_read(device->machine(), "GENMODDIPS") & GM_TURBO)!=0);
+		board->timode = ((input_port_read(device->machine(), "GENMODDIPS") & GM_TIM)!=0);
 	}
 
 	switch (input_port_read(device->machine(), "SRAM"))
