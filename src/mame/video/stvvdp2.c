@@ -5425,6 +5425,9 @@ READ32_HANDLER ( saturn_vdp2_vram_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
+	/* mirroring, Gale Racer relies on this */
+	offset &= 0x3ff;
+
 	return state->m_vdp2_vram[offset];
 }
 
@@ -5432,9 +5435,11 @@ WRITE32_HANDLER ( saturn_vdp2_cram_w )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 	int r,g,b;
-	COMBINE_DATA(&state->m_vdp2_cram[offset]);
 
-//  popmessage("%01x\n",STV_VDP2_CRMD);
+	/* mirroring, Gale Racer relies on this */
+	offset &= 0x3ff;
+
+	COMBINE_DATA(&state->m_vdp2_cram[offset]);
 
 	switch( STV_VDP2_CRMD )
 	{
