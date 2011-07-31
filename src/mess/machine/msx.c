@@ -175,10 +175,13 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	/* mapper type 0 always needs 64kB */
 	if (!type && size_aligned != 0x10000)
 	{
+		UINT8 *old_mem = mem;
+		int old_size_aligned = size_aligned;
+
 		size_aligned = 0x10000;
-		auto_free(image.device().machine(),mem);
 		mem = auto_alloc_array(image.device().machine(),UINT8, 0x10000);
 		if (!mem) {
+			auto_free(image.device().machine(),old_mem);
 			logerror ("cart #%d: error: cannot allocate memory\n", id);
 			return IMAGE_INIT_FAIL;
 		}
@@ -192,6 +195,9 @@ DEVICE_IMAGE_LOAD (msx_cart)
 
 			size = 0x10000;
 		}
+		/* Copy old contents to newly claimed memory */
+		memcpy(mem,old_mem,old_size_aligned);
+		auto_free(image.device().machine(),old_mem);
 	}
 
 	/* mapper type 0 (ROM) might need moving around a bit */
@@ -515,62 +521,50 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
 READ8_HANDLER ( msx_psg_port_a_r )
 {
 	msx_state *state = space->machine().driver_data<msx_state>();
-	int data, inp;
+	UINT8 data;
 
 	data = (cassette_device_image(space->machine())->input() > 0.0038 ? 0x80 : 0);
 
 	if ( (state->m_psg_b ^ input_port_read(space->machine(), "DSW") ) & 0x40)
-		{
+	{
 		/* game port 2 */
-		inp = input_port_read(space->machine(), "JOY1") & 0x7f;
-#if 0
+		UINT8 inp = input_port_read(space->machine(), "JOY1");
 		if ( !(inp & 0x80) )
-			{
-#endif
-			/* joystick */
-			return (inp & 0x7f) | data;
-#if 0
-			}
-		else
-			{
-			/* mouse */
-			data |= inp & 0x70;
-			if (state->m_mouse_stat[1] < 0)
-				inp = 0xf;
-			else
-				inp = ~(state->m_mouse[1] >> (4*state->m_mouse_stat[1]) ) & 15;
-
-			return data | inp;
-			}
-#endif
-		}
-	else
 		{
-		/* game port 1 */
-		inp = input_port_read(space->machine(), "JOY0") & 0x7f;
-#if 0
-		if ( !(inp & 0x80) )
-			{
-#endif
 			/* joystick */
-			return (inp & 0x7f) | data;
-#if 0
-			}
-		else
-			{
-			/* mouse */
-			data |= inp & 0x70;
-			if (state->m_mouse_stat[0] < 0)
-				inp = 0xf;
-			else
-				inp = ~(state->m_mouse[0] >> (4*state->m_mouse_stat[0]) ) & 15;
-
-			return data | inp;
-			}
-#endif
+			data |= ( inp & 0x7f );
 		}
+		else
+		{
+			/* mouse */
+			data |= ( inp & 0x70 );
+			if (state->m_mouse_stat[1] < 0)
+				data |= 0xf;
+			else
+				data |= ~(state->m_mouse[1] >> (4*state->m_mouse_stat[1]) ) & 15;
+		}
+	}
+	else
+	{
+		/* game port 1 */
+		UINT8 inp = input_port_read(space->machine(), "JOY0");
+		if ( !(inp & 0x80) )
+		{
+			/* joystick */
+			data |= ( inp & 0x7f );
+		}
+		else
+		{
+			/* mouse */
+			data |= ( inp & 0x70 );
+			if (state->m_mouse_stat[0] < 0)
+				data |= 0xf;
+			else
+				data |= ~(state->m_mouse[0] >> (4*state->m_mouse_stat[0]) ) & 15;
+		}
+	}
 
-	return 0;
+	return data;
 }
 
 READ8_HANDLER ( msx_psg_port_b_r )
