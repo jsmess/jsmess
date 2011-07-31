@@ -58,9 +58,9 @@
 
 typedef struct
 {
-	UINT8 idx, dat[32]; // index and data registers
-	UINT8 *ram;         // display ram
-	UINT32 pos;         // current position in ram
+	UINT8 cmd, reg[32];
+	UINT8 *ram;
+	int x, y;
 } HD66421;
 
 static HD66421 lcd;
@@ -68,29 +68,61 @@ static HD66421 lcd;
 UINT8 hd66421_reg_idx_r(void)
 {
 	_logerror( 2, ("hd66421_reg_idx_r\n"));
-	return lcd.idx;
+	return lcd.cmd;
 }
 
 void hd66421_reg_idx_w(UINT8 data)
 {
 	_logerror( 2, ("hd66421_reg_idx_w (%02X)\n", data));
-	lcd.idx = data;
+	lcd.cmd = data;
 }
 
 UINT8 hd66421_reg_dat_r(void)
 {
 	_logerror( 2, ("hd66421_reg_dat_r\n"));
-	return lcd.dat[lcd.idx];
+	return lcd.reg[lcd.cmd];
 }
 
 void hd66421_reg_dat_w(UINT8 data)
 {
 	_logerror( 2, ("hd66421_reg_dat_w (%02X)\n", data));
-	lcd.dat[lcd.idx] = data;
-	switch (lcd.idx)
+	lcd.reg[lcd.cmd] = data;
+	switch (lcd.cmd)
 	{
-		case LCD_REG_ADDR_Y : lcd.pos = data * HD66421_WIDTH / 4; break;
-		case LCD_REG_RAM    : lcd.ram[lcd.pos++] = data; break;
+		case LCD_REG_ADDR_X :
+		{
+			lcd.x = data;
+		}
+		break;
+		case LCD_REG_ADDR_Y :
+		{
+			lcd.y = data;
+		}
+		break;
+		case LCD_REG_RAM :
+		{
+			UINT8 r1;
+			*(lcd.ram + lcd.y * (HD66421_WIDTH / 4) + lcd.x) = data;
+			r1 = lcd.reg[LCD_REG_CONTROL_2];
+			if (r1 & 0x02)
+			{
+				lcd.x++;
+			}
+			else
+			{
+				lcd.y++;
+			}
+			if (lcd.x >= (HD66421_WIDTH / 4))
+			{
+				lcd.x = 0;
+				lcd.y++;
+			}
+			if (lcd.y >= HD66421_HEIGHT)
+			{
+				lcd.y = 0;
+			}
+		}
+		break;
 	}
 }
 
@@ -116,9 +148,10 @@ PALETTE_INIT( hd66421 )
 static void hd66421_state_save(running_machine &machine)
 {
 	const char *name = "hd66421";
-	state_save_register_item(machine, name, NULL, 0, lcd.idx);
-	state_save_register_item_array(machine, name, NULL, 0, lcd.dat);
-	state_save_register_item(machine, name, NULL, 0, lcd.pos);
+	state_save_register_item(machine, name, NULL, 0, lcd.cmd);
+	state_save_register_item_array(machine, name, NULL, 0, lcd.reg);
+	state_save_register_item(machine, name, NULL, 0, lcd.x);
+	state_save_register_item(machine, name, NULL, 0, lcd.y);
 	state_save_register_item_pointer(machine, name, NULL, 0, lcd.ram, HD66421_RAM_SIZE);
 }
 
@@ -140,7 +173,7 @@ SCREEN_UPDATE( hd66421 )
 	{
 		double bright;
 		int temp;
-		temp = 31 - (lcd.dat[LCD_REG_COLOR_1+i] - lcd.dat[LCD_REG_CONTRAST] + 0x03);
+		temp = 31 - (lcd.reg[LCD_REG_COLOR_1+i] - lcd.reg[LCD_REG_CONTRAST] + 0x03);
 		if (temp <  0) temp =  0;
 		if (temp > 31) temp = 31;
 		bright = 1.0 * temp / 31;
@@ -152,7 +185,7 @@ SCREEN_UPDATE( hd66421 )
 		#endif
 	}
 	// draw bitmap (bottom to top)
-	if (lcd.dat[0] & LCD_R0_DISP)
+	if (lcd.reg[0] & LCD_R0_DISP)
 	{
 		int x, y;
 		x = 0;
