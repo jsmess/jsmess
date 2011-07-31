@@ -7,12 +7,13 @@
 *  DONE:
 *  figure out z80 address space and hook up roms and rams (done)
 *  figure out where 10937 vfd controller lives (port 0x44 bits 7 and 0)
-*  figure out how keypresses are detected (/INT)
+*  figure out how keypresses are detected (/INT and port 0x43)
 *  tentatively figure out how flow control from ACIA works (/NMI)?
+*  hook up the speaker/beeper (port 0x45)
 *
 *  TODO:
 *  figure out the rest of the i/o map
-*  find and dump 4.3 firmware and figure out how the banked ram works
+*  figure out how the banked ram works on fw4.x
 *  actually hook up interrupts and nmi
 *  hook up r6551 serial and attach terminal to it
 *  correctly hook up 10937 vfd controller
@@ -45,19 +46,37 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_terminal;
 	required_device<device_t> m_speaker;
-	DECLARE_WRITE8_MEMBER( port_44_w );
+	DECLARE_WRITE8_MEMBER( port_43_w );
 	DECLARE_READ8_MEMBER( port_43_r );
+	DECLARE_WRITE8_MEMBER( port_44_w );
+	DECLARE_WRITE8_MEMBER( port_45_w );
+	// return for port 43 (mode/status reg)
+	UINT8 port43_rtn;
+	// vfd helper stuff for port 44, should be unnecessary after 10937 gets a proper device
 	UINT8 vfd_data;
 	UINT8 vfd_old;
 	UINT8 vfd_count;
+	// current speaker state for port 45
+	UINT8 speaker_state;
+	// ram stuff for future banking
 	UINT8 *m_main_ram;
 };
+
+/*static void digel804_set_ram_bank( running_machine &machine )
+{
+	digel804_state *state = machine.driver_data<digel804_state>();
+	memory_set_bankptr( machine, "bankedram", machine.region("user_ram")->base() + ( state->m_ram_bank * 0x10000 ));
+}*/
 
 static DRIVER_INIT( digel804 )
 {
 	digel804_state *state = machine.driver_data<digel804_state>();
 	ROC10937_init(0,0,0); // TODO: replace this with a proper device
 	state->vfd_old = state->vfd_data = state->vfd_count = 0;
+	state->speaker_state = 0;
+	state->port43_rtn = 0xEE;
+	//state->m_ram_bank = 0;
+	//memory_set_bankptr( machine, "bankedram", machine.region("user_ram")->base() + ( state->m_ram_bank * 0x10000 ));
 }
 
 static MACHINE_RESET( digel804 )
@@ -67,10 +86,41 @@ static MACHINE_RESET( digel804 )
 	state->vfd_old = state->vfd_data = state->vfd_count = 0;
 }
 
-READ8_MEMBER( digel804_state::port_43_r ) // HACK to dump display contents to stderr
+READ8_MEMBER( digel804_state::port_43_r )
 {
+	/* Register 0x43:
+	 bits 76543210
+	      |||||||\- unknown, always 0?
+	      ||||||\-- unknown, always 1?
+	      |||||\--- any key pressed on keypad (0 = one or more pressed, 1 = none pressed)
+	      |||\\---- mode selected? (01 = key, 10 = remote, 11 = sim)
+	      ||\------ ram enable for internal use? (not sure, clear in sim mode)
+	      |\------- power failure status (1 = power has failed, 0 = ok)
+	      \-------- unknown, always 1?
+	 after power failure (in key mode):
+	 0xEE 11101110 when no keypad key pressed
+	 0xEA 11101010 when keypad key pressed
+	 in key mode:
+	 0xAE 10101110 when no keypad key pressed
+	 0xAA 10101010 when keypad key pressed
+	 in remote mode:
+	 0xB6 10110110 when no keypad key pressed
+	 0xB2 10110010 when keypad key pressed
+	 in sim mode:
+	 0x9E 10011110 when no keypad key pressed
+	 0x9A 10011010 when keypad key pressed
+	*/
+	// HACK to dump display contents to stderr
 	fprintf(stderr,"%s\n",ROC10937_get_string(0));
-	return 0xFF;
+	logerror("Digel804: returning %02X for port 43 read\n", port43_rtn);
+	return port43_rtn;
+}
+
+WRITE8_MEMBER( digel804_state::port_43_w )
+{
+	//m_ram_bank = data&7;
+	//digel804_set_ram_bank( machine() );
+	//memory_set_bankptr( machine(), "bankedram", machine().region("user_ram")->base() + ( m_ram_bank * 0x10000 ));
 }
 
 WRITE8_MEMBER( digel804_state::port_44_w )
@@ -92,6 +142,13 @@ WRITE8_MEMBER( digel804_state::port_44_w )
 	vfd_old = data;
 }
 
+WRITE8_MEMBER( digel804_state::port_45_w )
+{
+	// it APPEARS all writes here invert the speaker state
+	speaker_state ^= 0xFF;
+	speaker_level_w(m_speaker, speaker_state);
+}
+
 /******************************************************************************
  Address Maps
 ******************************************************************************/
@@ -99,10 +156,11 @@ WRITE8_MEMBER( digel804_state::port_44_w )
 static ADDRESS_MAP_START(z80_mem_804_1_4, AS_PROGRAM, 8, digel804_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM // 3f in mapper = rom J3
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_main_ram) // 6f in mapper = RAM L3 (6164)
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(m_main_ram) // 77 in mapper = RAM M3 (6164)
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE(m_main_ram) // 7b in mapper = RAM N3 (6164)
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(m_main_ram) // 7d in mapper = RAM O3 (6164)
+	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_main_ram) // 6f in mapper = RAM L3 (6164)
+	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(m_main_ram) // 77 in mapper = RAM M3 (6164)
+	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE(m_main_ram) // 7b in mapper = RAM N3 (6164)
+	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(m_main_ram) // 7d in mapper = RAM O3 (6164)
+	AM_RANGE(0x4000,0xbfff) AM_RAMBANK("bankedram")
 	// c000-cfff is open bus in mapper, 7f
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM // 7e in mapper = RAM P3 (6116)
 	AM_RANGE(0xd800, 0xf7ff) AM_ROM // 5f in mapper = rom K3
@@ -113,10 +171,11 @@ static ADDRESS_MAP_START(z80_mem_804_1_2, AS_PROGRAM, 8, digel804_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM // 3f in mapper = rom J3
 	AM_RANGE(0x2000, 0x3fff) AM_ROM // 5f in mapper = rom K3
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_main_ram) // 6f in mapper = RAM L3 (6164)
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(m_main_ram) // 77 in mapper = RAM M3 (6164)
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE(m_main_ram) // 7b in mapper = RAM N3 (6164)
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(m_main_ram) // 7d in mapper = RAM O3 (6164)
+	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_main_ram) // 6f in mapper = RAM L3 (6164)
+	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(m_main_ram) // 77 in mapper = RAM M3 (6164)
+	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE(m_main_ram) // 7b in mapper = RAM N3 (6164)
+	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(m_main_ram) // 7d in mapper = RAM O3 (6164)
+	AM_RANGE(0x4000,0xbfff) AM_RAMBANK("bankedram")
 	// c000-cfff is open bus in mapper, 7f
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM // 7e in mapper = RAM P3 (6116)
 	// d800-ffff is open bus in mapper, 7f
@@ -126,9 +185,9 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, digel804_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x42, 0x42) AM_WRITE // gets 00 written to it
-	AM_RANGE(0x43, 0x43) AM_READ(port_43_r) // unknown read port, possibly ACIA, currently hacked to dump display contents
+	AM_RANGE(0x43, 0x43) AM_READWRITE(port_43_r, port_43_w) // mode and status register, also checks if keypad is pressed
 	AM_RANGE(0x44, 0x44) AM_WRITE(port_44_w) // 10937 vfd controller clock on d0, data on d8; other bits unknown
-	//AM_RANGE(0x45, 0x45) AM_WRITE // gets 01 written to it in a long chain. strongly suspect this is speaker beep but each write with bit 0 set generates a pulse
+	AM_RANGE(0x45, 0x45) AM_WRITE(port_45_w) // speaker bit; every write inverts state
 	//AM_RANGE(0x46, 0x46) AM_WRITE // gets 50 or 30 written to it
 	//AM_RANGE(0x47, 0x47) AM_WRITE // gets 00 written to it
 	//AM_RANGE(0x83, 0x83) AM_WRITE // may be acia?
@@ -153,7 +212,7 @@ static GENERIC_TERMINAL_INTERFACE( digel804_terminal_intf )
 
 static MACHINE_CONFIG_START( digel804, digel804_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz) /* Z80A, X1: 3.686Mhz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz/2) /* Z80A, X1: 3.686Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_4)
 	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -173,7 +232,7 @@ MACHINE_CONFIG_END
 /* TODO: make this copy the digel804 machine config and modify the program map! */
 static MACHINE_CONFIG_START( ep804, digel804_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz) /* Z80, X1: 3.686Mhz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz/2) /* Z80, X1: 3.686Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_2)
 	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -185,7 +244,7 @@ static MACHINE_CONFIG_START( ep804, digel804_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -215,8 +274,8 @@ prom d7 -> N/C? (unused?)
 */
 
 ROM_START(digel804) // address mapper 804-1-4
+	ROM_REGION(0x80000, "user_ram", ROMREGION_ERASEFF) 
 	ROM_REGION(0x10000, "maincpu", 0)
-	
 	ROM_LOAD("1-04__76f1.27128.j6", 0x0000, 0x4000, CRC(61b50b61) SHA1(ad717fcbf3387b0a8fb0546025d3c527792eb3f0))
 	// the second rom here is loaded bizarrely: the first 3/4 appears at e000-f7ff and the last 1/4 appears at d800-dfff
 	ROM_LOAD("2-04__d6cc.2764a.k6", 0xe000, 0x1800, CRC(098cb008) SHA1(9f04e12489ab5f714d2fd4af8158969421557e75)) 
@@ -226,6 +285,7 @@ ROM_START(digel804) // address mapper 804-1-4
 ROM_END
 
 ROM_START(ep804) // address mapper 804-1-2
+	ROM_REGION(0x80000, "user_ram", ROMREGION_ERASEFF) 
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("ep804_v1.6")
 	ROM_SYSTEM_BIOS( 0, "ep804_v1.6", "Wavetek/Digelec EP804 FWv1.6") // hardware 1.1
