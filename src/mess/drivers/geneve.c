@@ -529,6 +529,14 @@ static INPUT_PORTS_START(geneve)
 
 INPUT_PORTS_END
 
+static const struct tms9995reset_param geneve_processor_config =
+{
+	0,	/* disable automatic wait state generation */
+	0,	/* no IDLE callback */
+	0	/* no MP9537 mask */
+};
+
+
 static DRIVER_INIT( geneve )
 {
 }
@@ -548,6 +556,7 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
 	MCFG_CPU_ADD("maincpu", TMS9995, 12000000)
+	MCFG_CPU_CONFIG(geneve_processor_config)
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	MCFG_CPU_IO_MAP(cru_map)
 	MCFG_CPU_VBLANK_INT_HACK(geneve_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */

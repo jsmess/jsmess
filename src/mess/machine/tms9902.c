@@ -39,6 +39,7 @@
 #include "tms9902.h"
 
 #define VERBOSE 1
+#define LOG logerror
 
 // Polling frequency. We use a much higher value to allow for line state changes
 // happening between character transmissions (which happen in parallel in real
@@ -180,13 +181,13 @@ static void field_interrupts(device_t *device)
 							|| (tms9902->RBRL && tms9902->RIENB)
 							|| (tms9902->XBRE && tms9902->XBIENB)
 							|| (tms9902->TIMELP && tms9902->TIMENB);
-// if (VERBOSE>3) logerror("TMS9902: interrupt flags (DSCH = %02x, DSCENB = %02x), (RBRL = %02x, RIENB = %02x), (XBRE = %02x, XBIENB = %02x), (TIMELP = %02x, TIMENB = %02x)\n",
+// if (VERBOSE>3) LOG("TMS9902: interrupt flags (DSCH = %02x, DSCENB = %02x), (RBRL = %02x, RIENB = %02x), (XBRE = %02x, XBIENB = %02x), (TIMELP = %02x, TIMENB = %02x)\n",
 //  tms9902->DSCH, tms9902->DSCENB, tms9902->RBRL, tms9902->RIENB, tms9902->XBRE, tms9902->XBIENB, tms9902->TIMELP, tms9902->TIMENB);
 	if (new_int != tms9902->INT)
 	{
 		// Only consider edges
 		tms9902->INT = new_int;
-		if (VERBOSE>3) logerror("TMS9902: /INT = %s\n", (tms9902->INT)? "asserted" : "cleared");
+		if (VERBOSE>3) LOG("TMS9902: /INT = %s\n", (tms9902->INT)? "asserted" : "cleared");
 		if (tms9902->intf->int_callback)
 			(*tms9902->intf->int_callback)(device, tms9902->INT? ASSERT_LINE : CLEAR_LINE);
 	}
@@ -204,7 +205,7 @@ void tms9902_rcv_cts(device_t *device, line_state state)
 	tms9902->CTSflag = (state==ASSERT_LINE)? 1:0;
 	tms9902->DSCH = 1;
 
-	if (VERBOSE>3) logerror("TMS9902: CTS* = %s\n", (state==ASSERT_LINE)? "asserted" : "cleared");
+	if (VERBOSE>3) LOG("TMS9902: CTS* = %s\n", (state==ASSERT_LINE)? "asserted" : "cleared");
 
 	if (tms9902->CTSflag != previous)
 	{
@@ -237,7 +238,7 @@ void tms9902_rcv_dsr(device_t *device, line_state state)
 {
 	tms9902_t *tms9902 = get_token(device);
 	bool previous = tms9902->DSRflag;
-	if (VERBOSE>3) logerror("TMS9902: DSR* = %s\n", (state==ASSERT_LINE)? "asserted" : "cleared");
+	if (VERBOSE>3) LOG("TMS9902: DSR* = %s\n", (state==ASSERT_LINE)? "asserted" : "cleared");
 	tms9902->DSRflag = (state==ASSERT_LINE)? true:false;
 	tms9902->DSCH = 1;
 
@@ -267,14 +268,14 @@ void tms9902_rcv_data(device_t *device, UINT8 data)
 	{
 		// Receive buffer was empty
 		tms9902->RBRL = 1;
-		if (VERBOSE>3) logerror("TMS9902: Receive buffer loaded with byte %02x\n", data);
+		if (VERBOSE>3) LOG("TMS9902: Receive buffer loaded with byte %02x\n", data);
 		field_interrupts(device);
 	}
 	else
 	{
 		// Receive buffer was full
 		tms9902->ROVER = 1;
-		if (VERBOSE>1) logerror("TMS9902: Receive buffer still loaded; overflow error\n");
+		if (VERBOSE>1) LOG("TMS9902: Receive buffer still loaded; overflow error\n");
 	}
 }
 
@@ -289,7 +290,7 @@ void tms9902_rcv_data(device_t *device, UINT8 data)
 void tms9902_rcv_framing_error(device_t *device)
 {
 	tms9902_t *tms9902 = get_token(device);
-	if (VERBOSE>2) logerror("TMS9902: Detected framing error\n");
+	if (VERBOSE>2) LOG("TMS9902: Detected framing error\n");
 	tms9902->RFER = 1;
 }
 
@@ -302,7 +303,7 @@ void tms9902_rcv_framing_error(device_t *device)
 void tms9902_rcv_parity_error(device_t *device)
 {
 	tms9902_t *tms9902 = get_token(device);
-	if (VERBOSE>2) logerror("TMS9902: Detected parity error\n");
+	if (VERBOSE>2) LOG("TMS9902: Detected parity error\n");
 	tms9902->RPER = 1;
 }
 
@@ -314,7 +315,7 @@ void tms9902_rcv_parity_error(device_t *device)
 */
 void tms9902_rcv_break(device_t *device, bool value)
 {
-	if (VERBOSE>2) logerror("TMS9902: Receive BREAK=%d (no effect)\n", value? 1:0);
+	if (VERBOSE>2) LOG("TMS9902: Receive BREAK=%d (no effect)\n", value? 1:0);
 }
 
 //------------------------------------------------
@@ -403,7 +404,7 @@ static void set_receive_data_rate(device_t *device)
 {
 	tms9902_t *tms9902 = get_token(device);
 	int value = (tms9902->CLK4M? 0x800 : 0) | (tms9902->RDV8? 0x400 : 0) | tms9902->RDR;
-	if (VERBOSE>3) logerror("receive rate = %04x\n", value);
+	if (VERBOSE>3) LOG("receive rate = %04x\n", value);
 
 	// Calculate the ratio between receive baud rate and polling frequency
 	double fint = tms9902->clock_rate / ((tms9902->CLK4M) ? 4.0 : 3.0);
@@ -414,7 +415,7 @@ static void set_receive_data_rate(device_t *device)
 	// Thus the callback function should add up this value on each poll
 	// and deliver a data input not before it sums up to 1.
 	tms9902->baudpoll = (double)(baud / (10*POLLING_FREQ));
-	if (VERBOSE>3) logerror ("baudpoll = %lf\n", tms9902->baudpoll);
+	if (VERBOSE>3) LOG ("baudpoll = %lf\n", tms9902->baudpoll);
 
 	if (tms9902->intf->ctrl_callback)
 		(*tms9902->intf->ctrl_callback)(device, CONFIG, RATERECV, value);
@@ -428,7 +429,7 @@ static void set_transmit_data_rate(device_t *device)
 {
 	tms9902_t *tms9902 = get_token(device);
 	int value = (tms9902->CLK4M? 0x800 : 0) | (tms9902->XDV8? 0x400 : 0) | tms9902->XDR;
-	if (VERBOSE>3) logerror("transmit rate = %04x\n", value);
+	if (VERBOSE>3) LOG("transmit rate = %04x\n", value);
 	if (tms9902->intf->ctrl_callback)
 		(*tms9902->intf->ctrl_callback)(device, CONFIG, RATEXMIT, value);
 }
@@ -476,7 +477,7 @@ static void set_rts(device_t *device, line_state state)
 	if (lstate != tms9902->RTSflag)
 	{
 		// Signal RTS to the modem
-		if (VERBOSE>3) logerror("TMS9902: Set RTS=%d\n", lstate? 1:0);
+		if (VERBOSE>3) LOG("TMS9902: Set RTS=%d\n", lstate? 1:0);
 		tms9902->RTSflag = lstate;
 		transmit_line_state(device);
 	}
@@ -495,7 +496,7 @@ static void initiate_transmit(device_t *device)
 
 	field_interrupts(device);
 
-	if (VERBOSE>4) logerror("TMS9902: transmit XSR=%02x, RCL=%02x\n", tms9902->XSR, tms9902->RCL);
+	if (VERBOSE>4) LOG("TMS9902: transmit XSR=%02x, RCL=%02x\n", tms9902->XSR, tms9902->RCL);
 
 	if (tms9902->intf->xmit_callback)
 		(*tms9902->intf->xmit_callback)(device, tms9902->XSR & (0xff >> (3-tms9902->RCL)));
@@ -574,7 +575,7 @@ READ8_DEVICE_HANDLER( tms9902_cru_r )
 
 	case 0:
 		answer = tms9902->RBR;
-		if (VERBOSE>3) logerror("TMS9902: Reading receive buffer\n");
+		if (VERBOSE>3) LOG("TMS9902: Reading receive buffer\n");
 		break;
 	}
 	return answer;
@@ -646,7 +647,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 				set_stop_bits(device);
 				break;
 			default:
-				if (VERBOSE>1) logerror("tms9902: Invalid control register address %d\n", offset);
+				if (VERBOSE>1) LOG("tms9902: Invalid control register address %d\n", offset);
 			}
 		}
 		else if (tms9902->register_select & register_select_LDIR)
@@ -758,7 +759,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 
 	if (offset == 0x11)
 	{
-		if (VERBOSE>3) logerror("TMS9902: set BRKON=%d; BRK=%d\n", data, tms9902->BRKflag? 1:0);
+		if (VERBOSE>3) LOG("TMS9902: set BRKON=%d; BRK=%d\n", data, tms9902->BRKflag? 1:0);
 		tms9902->BRKON = (data!=0);
 		if (tms9902->BRKflag && data==0)
 		{
@@ -788,7 +789,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 		// (the only way to clear the flag!)
 		tms9902->RIENB = (data!=0);
 		tms9902->RBRL = false;
-		if (VERBOSE>4) logerror("TMS9902: set RBRL=0, set RIENB=%d\n", data);
+		if (VERBOSE>4) LOG("TMS9902: set RBRL=0, set RIENB=%d\n", data);
 		field_interrupts(device);
 		return;
 	}
@@ -797,7 +798,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 	{
 		/* Transmit Buffer Interrupt Enable */
 		tms9902->XBIENB = (data!=0);
-		if (VERBOSE>4) logerror("TMS9902: set XBIENB=%d\n", data);
+		if (VERBOSE>4) LOG("TMS9902: set XBIENB=%d\n", data);
 		field_interrupts(device);
 		return;
 	}
@@ -817,7 +818,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 		/* Data Set Change Interrupt Enable */
 		tms9902->DSCENB = (data!=0);
 		tms9902->DSCH = false;
-		if (VERBOSE>4) logerror("TMS9902: set DSCH=0, set DSCENB=%d\n", data);
+		if (VERBOSE>4) LOG("TMS9902: set DSCH=0, set DSCENB=%d\n", data);
 		field_interrupts(device);
 		return;
 	}
@@ -831,7 +832,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 		return;
 	}
 	else
-		if (VERBOSE>1) logerror("tms9902: Write to undefined address %0x ignored.\n", offset);
+		if (VERBOSE>1) LOG("tms9902: Write to undefined address %0x ignored.\n", offset);
 }
 
 
