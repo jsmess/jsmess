@@ -383,9 +383,37 @@ static UINT32 h8disasm_0(UINT32 pc, UINT32 opcode, char *buffer, const UINT8 *op
 			break;
 			// mulxs
 		case 0xc:
+			data16 = h8_mem_read16(2);
+			size = 4;
+			if ((data16&0xff00) == 0x5000)
+			{
+				sprintf(buffer, "mulxs.b %s, %s", reg_names16[(data16>>4)&0xf], reg_names16[data16&0xf]);
+			}
+			else if ((data16&0xff00) == 0x5200) 
+			{
+				sprintf(buffer, "mulxs.w %s, %s", reg_names16[(data16>>4)&0xf], reg_names16[data16&0xf]);
+			}
+			else
+			{
+				sprintf(buffer, "%04x %04x unknown\n", opcode, data16);
+			}
 			break;
 			// divxs
 		case 0xd:
+			data16 = h8_mem_read16(2);
+			size = 4;
+			if ((data16&0xff00) == 0x5100)
+			{
+				sprintf(buffer, "divxs.b %s, %s", reg_names16[(data16>>4)&0xf], reg_names16[data16&0xf]);
+			}
+			else if ((data16&0xff00) == 0x5300) 
+			{
+				sprintf(buffer, "divxs.w %s, %s", reg_names16[(data16>>4)&0xf], reg_names16[data16&0xf]);
+			}
+			else
+			{
+				sprintf(buffer, "%04x %04x unknown\n", opcode, data16);
+			}
 			break;
 			// 01f0 and.l prefix
 		case 0xf:
