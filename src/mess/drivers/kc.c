@@ -31,94 +31,19 @@
 #include "formats/basicdsk.h"
 #include "machine/ram.h"
 
-static READ8_HANDLER(kc85_4_port_r)
-{
-	int port;
-
-	port = offset & 0x0ff;
-
-	switch (port)
-	{
-//      case 0x080:
-//          return kc85_module_r(space, offset);
-
-		case 0x085:
-		case 0x084:
-			return kc85_4_84_r(space, offset);
-
-
-		case 0x086:
-		case 0x087:
-			return kc85_4_86_r(space, offset);
-
-		case 0x088:
-		case 0x089:
-			return kc85_pio_data_r(space, port-0x088);
-		case 0x08a:
-		case 0x08b:
-			return kc85_pio_control_r(space, port-0x08a);
-		case 0x08c:
-		case 0x08d:
-		case 0x08e:
-		case 0x08f:
-			return kc85_ctc_r(space->machine().device("z80ctc"), port&3);
-
-	}
-
-	logerror("unhandled port r: %04x\n",offset);
-	return 0x0ff;
-}
-
-static WRITE8_HANDLER(kc85_4_port_w)
-{
-	int port;
-
-	port = offset & 0x0ff;
-
-	switch (port)
-	{
-//      case 0x080:
-//          kc85_module_w(space, offset,data);
-//          return;
-
-		case 0x085:
-		case 0x084:
-			kc85_4_84_w(space, offset,data);
-			return;
-
-		case 0x086:
-		case 0x087:
-			kc85_4_86_w(space, offset,data);
-			return;
-
-		case 0x088:
-		case 0x089:
-			kc85_4_pio_data_w(space, port-0x088, data);
-			return;
-
-		case 0x08a:
-		case 0x08b:
-			kc85_pio_control_w(space, port-0x08a, data);
-			return;
-
-		case 0x08c:
-		case 0x08d:
-		case 0x08e:
-		case 0x08f:
-			kc85_ctc_w(space->machine().device("z80ctc"), port&3, data);
-			return;
-	}
-
-	logerror("unhandled port w: %04x\n",offset);
-}
-
-
 static ADDRESS_MAP_START(kc85_4_io, AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0ffff) AM_READWRITE( kc85_4_port_r, kc85_4_port_w )
+	ADDRESS_MAP_UNMAP_HIGH
+	//AM_RANGE(0x80, 0x80) AM_READWRITE(kc85_module_r, kc85_module_w)
+	AM_RANGE(0x84, 0x85) AM_READWRITE(kc85_4_84_r, kc85_4_84_w)
+	AM_RANGE(0x86, 0x87) AM_READWRITE(kc85_4_86_r, kc85_4_86_w)
+	AM_RANGE(0x88, 0x89) AM_DEVREADWRITE("z80pio", z80pio_d_r, z80pio_d_w)
+	AM_RANGE(0x8a, 0x8b) AM_DEVREADWRITE("z80pio", z80pio_c_r, z80pio_c_w)
+	AM_RANGE(0x8c, 0x8f) AM_DEVREADWRITE("z80ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(kc85_4_mem, AS_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank7")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank8")
 	AM_RANGE(0x8000, 0xa7ff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank9")
@@ -129,6 +54,7 @@ static ADDRESS_MAP_START(kc85_4_mem, AS_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(kc85_3_mem, AS_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank6")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank7")
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank8")
@@ -136,71 +62,13 @@ static ADDRESS_MAP_START(kc85_3_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bank5")
 ADDRESS_MAP_END
 
-static READ8_HANDLER(kc85_3_port_r)
-{
-	int port;
-
-	port = offset & 0x0ff;
-
-	switch (port)
-	{
-//      case 0x080:
-//          return kc85_module_r(offset);
-
-		case 0x088:
-		case 0x089:
-			return kc85_pio_data_r(space, port-0x088);
-		case 0x08a:
-		case 0x08b:
-			return kc85_pio_control_r(space, port-0x08a);
-		case 0x08c:
-		case 0x08d:
-		case 0x08e:
-		case 0x08f:
-			return kc85_ctc_r(space->machine().device("z80ctc"), port&3);
-	}
-
-	logerror("unhandled port r: %04x\n",offset);
-	return 0x0ff;
-}
-
-static WRITE8_HANDLER(kc85_3_port_w)
-{
-	int port;
-
-	port = offset & 0x0ff;
-
-	switch (port)
-	{
-//      case 0x080:
-//          kc85_module_w(space, offset,data);
-//          return;
-
-		case 0x088:
-		case 0x089:
-			kc85_3_pio_data_w(space, port-0x088, data);
-			return;
-
-		case 0x08a:
-		case 0x08b:
-			kc85_pio_control_w(space, port-0x08a, data);
-			return;
-
-		case 0x08c:
-		case 0x08d:
-		case 0x08e:
-		case 0x08f:
-			kc85_ctc_w(space->machine().device("z80ctc"), port&3, data);
-			return;
-	}
-
-	logerror("unhandled port w: %04x\n",offset);
-}
-
-
 static ADDRESS_MAP_START(kc85_3_io, AS_IO, 8)
+	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0ffff) AM_READWRITE(kc85_3_port_r, kc85_3_port_w)
+	//AM_RANGE(0x80, 0x80) AM_READWRITE(kc85_module_r, kc85_module_w)
+	AM_RANGE(0x88, 0x89) AM_DEVREADWRITE("z80pio", z80pio_d_r, z80pio_d_w)
+	AM_RANGE(0x8a, 0x8b) AM_DEVREADWRITE("z80pio", z80pio_c_r, z80pio_c_w)
+	AM_RANGE(0x8c, 0x8f) AM_DEVREADWRITE("z80ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 
@@ -391,7 +259,7 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	MCFG_MACHINE_START( kc85 )
 	MCFG_MACHINE_RESET( kc85_3 )
 
-	MCFG_Z80PIO_ADD( "z80pio", 1379310.344828, kc85_pio_intf )
+	MCFG_Z80PIO_ADD( "z80pio", 1379310.344828, kc85_2_pio_intf )
 	MCFG_Z80CTC_ADD( "z80ctc", 1379310.344828, kc85_ctc_intf )
 
 	/* video hardware */
@@ -431,10 +299,14 @@ static MACHINE_CONFIG_DERIVED( kc85_4, kc85_3 )
 	MCFG_CPU_REPLACE("maincpu", Z80, KC85_4_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(kc85_4_mem)
 	MCFG_CPU_IO_MAP(kc85_4_io)
+	MCFG_CPU_CONFIG(kc85_daisy_chain)
 
 	MCFG_MACHINE_RESET( kc85_4 )
 
 	MCFG_VIDEO_START( kc85_4 )
+
+	MCFG_DEVICE_REMOVE( "z80pio" )
+	MCFG_Z80PIO_ADD( "z80pio", 1379310.344828, kc85_4_pio_intf )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE( kc85_4 )

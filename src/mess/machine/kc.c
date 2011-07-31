@@ -1317,6 +1317,19 @@ bit 1: ACCESS RAM 0
 bit 0: CAOS ROM E
 */
 
+static WRITE8_DEVICE_HANDLER ( kc85_4_pio_porta_w )
+{
+	kc_state *state = device->machine().driver_data<kc_state>();
+	state->m_kc85_pio_data[0] = data;
+
+	kc85_4_update_0x0c000(device->machine());
+	kc85_4_update_0x0e000(device->machine());
+	kc85_4_update_0x08000(device->machine());
+	kc85_4_update_0x00000(device->machine());
+
+	kc_cassette_set_motor(device->machine(), (data>>6) & 0x01);
+}
+
 /* PIO PORT B: port 0x089:
 bit 7: BLINK
 bit 6: WRITE PROTECT RAM 8
@@ -1327,42 +1340,22 @@ bit 2: TONE 2
 bit 1: TONE 1
 bit 0: TRUCK */
 
-WRITE8_HANDLER ( kc85_4_pio_data_w )
+static WRITE8_DEVICE_HANDLER ( kc85_4_pio_portb_w )
 {
-	kc_state *state = space->machine().driver_data<kc_state>();
-	device_t *speaker = space->machine().device(SPEAKER_TAG);
-	state->m_kc85_pio_data[offset] = data;
-	z80pio_d_w(state->m_kc85_z80pio, offset, data);
+	kc_state *state = device->machine().driver_data<kc_state>();
+	device_t *speaker = device->machine().device(SPEAKER_TAG);
+	state->m_kc85_pio_data[1] = data;
 
-	switch (offset)
-	{
+	int speaker_level;
 
-		case 0:
-		{
-			kc85_4_update_0x0c000(space->machine());
-			kc85_4_update_0x0e000(space->machine());
-			kc85_4_update_0x08000(space->machine());
-			kc85_4_update_0x00000(space->machine());
+	kc85_4_update_0x08000(device->machine());
 
-			kc_cassette_set_motor(space->machine(), (data>>6) & 0x01);
-		}
-		break;
+	/* 16 speaker levels */
+	speaker_level = (data>>1) & 0x0f;
 
-		case 1:
-		{
-			int speaker_level;
-
-			kc85_4_update_0x08000(space->machine());
-
-			/* 16 speaker levels */
-			speaker_level = (data>>1) & 0x0f;
-
-			/* this might not be correct, the range might
-            be logarithmic and not linear! */
-			speaker_level_w(speaker, (speaker_level<<4));
-		}
-		break;
-	}
+	/* this might not be correct, the range might
+    be logarithmic and not linear! */
+	speaker_level_w(speaker, (speaker_level<<4));
 }
 
 
@@ -1555,6 +1548,19 @@ bit 1: ACCESS RAM 0
 bit 0: CAOS ROM E
 */
 
+static WRITE8_DEVICE_HANDLER ( kc85_3_pio_porta_w )
+{
+	kc_state *state = device->machine().driver_data<kc_state>();
+	state->m_kc85_pio_data[0] = data;
+
+	kc85_3_update_0x0c000(device->machine());
+	kc85_3_update_0x0e000(device->machine());
+	kc85_3_update_0x00000(device->machine());
+
+	kc_cassette_set_motor(device->machine(), (data>>6) & 0x01);
+}
+
+
 /* PIO PORT B: port 0x089:
 bit 7: BLINK ENABLE
 bit 6: WRITE PROTECT RAM 8
@@ -1565,52 +1571,26 @@ bit 2: TONE 2
 bit 1: TONE 1
 bit 0: TRUCK */
 
-WRITE8_HANDLER ( kc85_3_pio_data_w )
+static WRITE8_DEVICE_HANDLER ( kc85_3_pio_portb_w )
 {
-	kc_state *state = space->machine().driver_data<kc_state>();
-	device_t *speaker = space->machine().device(SPEAKER_TAG);
-	state->m_kc85_pio_data[offset] = data;
-	z80pio_d_w(state->m_kc85_z80pio, offset, data);
+	kc_state *state = device->machine().driver_data<kc_state>();
+	device_t *speaker = device->machine().device(SPEAKER_TAG);
+	state->m_kc85_pio_data[1] = data;
 
-	switch (offset)
-	{
+	int speaker_level;
 
-		case 0:
-		{
-			kc85_3_update_0x0c000(space->machine());
-			kc85_3_update_0x0e000(space->machine());
-			kc85_3_update_0x00000(space->machine());
+	kc85_3_update_0x08000(device->machine());
 
-			kc_cassette_set_motor(space->machine(), (data>>6) & 0x01);
-		}
-		break;
+	/* 16 speaker levels */
+	speaker_level = (data>>1) & 0x0f;
 
-		case 1:
-		{
-			int speaker_level;
-
-			kc85_3_update_0x08000(space->machine());
-
-			/* 16 speaker levels */
-			speaker_level = (data>>1) & 0x0f;
-
-			/* this might not be correct, the range might
-            be logarithmic and not linear! */
-			speaker_level_w(speaker, (speaker_level<<4));
-		}
-		break;
-	}
+	/* this might not be correct, the range might
+    be logarithmic and not linear! */
+	speaker_level_w(speaker, (speaker_level<<4));
 }
 
 
 /*****************************************************************/
-
-/* used by KC85/4 and KC85/3 */
-
- READ8_HANDLER ( kc85_unmapped_r )
-{
-	return 0x0ff;
-}
 
 #if 0
 DIRECT_UPDATE_HANDLER( kc85_3_opbaseoverride )
@@ -1639,47 +1619,6 @@ static TIMER_CALLBACK(kc85_reset_timer_callback)
 	cpu_set_reg(machine.device("maincpu"), STATE_GENPC, 0x0f000);
 }
 
- READ8_HANDLER ( kc85_pio_data_r )
-{
-	kc_state *state = space->machine().driver_data<kc_state>();
-	return z80pio_d_r(state->m_kc85_z80pio,offset);
-}
-
- READ8_HANDLER ( kc85_pio_control_r )
-{
-	kc_state *state = space->machine().driver_data<kc_state>();
-	return z80pio_c_r(state->m_kc85_z80pio,offset);
-}
-
-
-
-WRITE8_HANDLER ( kc85_pio_control_w )
-{
-	kc_state *state = space->machine().driver_data<kc_state>();
-   z80pio_c_w(state->m_kc85_z80pio, offset, data);
-}
-
-
- READ8_DEVICE_HANDLER ( kc85_ctc_r )
-{
-	unsigned char data;
-
-	data = z80ctc_r(device, offset);
-	//LOG_KBD(("ctc data r:%02x\n",data));
-	return data;
-}
-
-WRITE8_DEVICE_HANDLER ( kc85_ctc_w )
-{
-	//logerror("ctc data w:%02x\n",data);
-
-	z80ctc_w(device, offset,data);
-}
-
-static void kc85_pio_interrupt(device_t *device, int state)
-{
-	cputag_set_input_line(device->machine(), "maincpu", 0, state);
-}
 
 /* callback for ardy output from PIO */
 /* used in KC85/4 & KC85/3 cassette interface */
@@ -1707,17 +1646,27 @@ static void kc85_pio_brdy_callback(device_t *device, int state)
 	}
 }
 
-const z80pio_interface kc85_pio_intf =
+Z80PIO_INTERFACE( kc85_2_pio_intf )
 {
-	DEVCB_LINE(kc85_pio_interrupt),		/* callback when change interrupt status */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_LINE(kc85_pio_ardy_callback),	/* portA ready active callback */
-	DEVCB_LINE(kc85_pio_brdy_callback)	/* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),						/* callback when change interrupt status */
+	DEVCB_NULL,												/* port A read callback */
+	DEVCB_HANDLER(kc85_3_pio_porta_w),						/* port A write callback */
+	DEVCB_LINE(kc85_pio_ardy_callback),						/* portA ready active callback */
+	DEVCB_NULL,												/* port B read callback */
+	DEVCB_HANDLER(kc85_3_pio_portb_w),						/* port B write callback */
+	DEVCB_LINE(kc85_pio_brdy_callback)						/* portB ready active callback */
 };
 
+Z80PIO_INTERFACE( kc85_4_pio_intf )
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),						/* callback when change interrupt status */
+	DEVCB_NULL,												/* port A read callback */
+	DEVCB_HANDLER(kc85_4_pio_porta_w),						/* port A write callback */
+	DEVCB_LINE(kc85_pio_ardy_callback),						/* portA ready active callback */
+	DEVCB_NULL,												/* port B read callback */
+	DEVCB_HANDLER(kc85_4_pio_portb_w),						/* port B write callback */
+	DEVCB_LINE(kc85_pio_brdy_callback)						/* portB ready active callback */
+};
 
 /* used in cassette write -> K0 */
 static WRITE_LINE_DEVICE_HANDLER(kc85_zc0_callback)
@@ -1776,7 +1725,7 @@ static WRITE_LINE_DEVICE_HANDLER( kc85_zc2_callback )
 Z80CTC_INTERFACE( kc85_ctc_intf )
 {
 	0,
-    DEVCB_CPU_INPUT_LINE("maincpu", 1),
+    DEVCB_CPU_INPUT_LINE("maincpu", 0),
 	DEVCB_LINE(kc85_zc0_callback),
 	DEVCB_LINE(kc85_zc1_callback),
     DEVCB_LINE(kc85_zc2_callback)
