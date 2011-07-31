@@ -5416,6 +5416,10 @@ READ32_HANDLER ( saturn_vdp2_regs_r )
 READ32_HANDLER ( saturn_vdp2_cram_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
+	UINT8 cmode0;
+
+	cmode0 = ((STV_VDP2_CRMD & 3) == 0) || (STV_VDP2_CRMD & 2);
+	offset &= (0xfff) >> (cmode0+2);
 
 	return state->m_vdp2_cram[offset];
 }
@@ -5425,9 +5429,6 @@ READ32_HANDLER ( saturn_vdp2_vram_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
-	/* mirroring, Gale Racer relies on this */
-	offset &= 0x3ff;
-
 	return state->m_vdp2_vram[offset];
 }
 
@@ -5435,11 +5436,9 @@ WRITE32_HANDLER ( saturn_vdp2_cram_w )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 	int r,g,b;
+	UINT8 cmode0;
 
-	/* mirroring, Gale Racer relies on this */
-	offset &= 0x3ff;
-
-	COMBINE_DATA(&state->m_vdp2_cram[offset]);
+	cmode0 = (STV_VDP2_CRMD & 3) == 0;
 
 	switch( STV_VDP2_CRMD )
 	{
@@ -5447,6 +5446,10 @@ WRITE32_HANDLER ( saturn_vdp2_cram_w )
 		case 2:
 		case 3:
 		{
+			offset &= (0xfff) >> 3;
+
+			COMBINE_DATA(&state->m_vdp2_cram[offset]);
+
 			b = ((state->m_vdp2_cram[offset] & 0x00ff0000) >> 16);
 			g = ((state->m_vdp2_cram[offset] & 0x0000ff00) >> 8);
 			r = ((state->m_vdp2_cram[offset] & 0x000000ff) >> 0);
@@ -5457,16 +5460,22 @@ WRITE32_HANDLER ( saturn_vdp2_cram_w )
 		case 0:
 		case 1:
 		{
-			offset &= (0x3ff | ((offset & 1) << 10));
+			offset &= (0xfff) >> (cmode0+2);
+
+			COMBINE_DATA(&state->m_vdp2_cram[offset]);
 
 			b = ((state->m_vdp2_cram[offset] & 0x00007c00) >> 10);
 			g = ((state->m_vdp2_cram[offset] & 0x000003e0) >> 5);
 			r = ((state->m_vdp2_cram[offset] & 0x0000001f) >> 0);
 			palette_set_color_rgb(space->machine(),(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+			if(cmode0)
+				palette_set_color_rgb(space->machine(),((offset*2)+1)^0x400,pal5bit(r),pal5bit(g),pal5bit(b));
 			b = ((state->m_vdp2_cram[offset] & 0x7c000000) >> 26);
 			g = ((state->m_vdp2_cram[offset] & 0x03e00000) >> 21);
 			r = ((state->m_vdp2_cram[offset] & 0x001f0000) >> 16);
 			palette_set_color_rgb(space->machine(),offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
+			if(cmode0)
+				palette_set_color_rgb(space->machine(),(offset*2)^0x400,pal5bit(r),pal5bit(g),pal5bit(b));
 		}
 		break;
 	}
@@ -5478,26 +5487,44 @@ static void refresh_palette_data(running_machine &machine)
 	int r,g,b;
 	int c_i;
 
-	for(c_i=0;c_i<0x800;c_i++)
+	switch( STV_VDP2_CRMD )
 	{
-		switch( STV_VDP2_CRMD )
+		case 2:
+		case 3:
 		{
-			/*Mode 2/3*/
-			case 2:
-			case 3:
+			for(c_i=0;c_i<0x400;c_i++)
 			{
 				b = ((state->m_vdp2_cram[c_i] & 0x00ff0000) >> 16);
 				g = ((state->m_vdp2_cram[c_i] & 0x0000ff00) >> 8);
 				r = ((state->m_vdp2_cram[c_i] & 0x000000ff) >> 0);
 				palette_set_color(machine,c_i,MAKE_RGB(r,g,b));
 			}
-			break;
-			/*Mode 0*/
-			case 0:
-			case 1:
-			{
-				//c_i &= 0x3ff;
+		}
+		break;
+		case 0:
+		{
+			UINT8 bank;
 
+			for(bank=0;bank<2;bank++)
+			{
+				for(c_i=0;c_i<0x400;c_i++)
+				{
+					b = ((state->m_vdp2_cram[c_i] & 0x00007c00) >> 10);
+					g = ((state->m_vdp2_cram[c_i] & 0x000003e0) >> 5);
+					r = ((state->m_vdp2_cram[c_i] & 0x0000001f) >> 0);
+					palette_set_color_rgb(machine,(c_i*2)+1+bank*0x400,pal5bit(r),pal5bit(g),pal5bit(b));
+					b = ((state->m_vdp2_cram[c_i] & 0x7c000000) >> 26);
+					g = ((state->m_vdp2_cram[c_i] & 0x03e00000) >> 21);
+					r = ((state->m_vdp2_cram[c_i] & 0x001f0000) >> 16);
+					palette_set_color_rgb(machine,c_i*2+bank*0x400,pal5bit(r),pal5bit(g),pal5bit(b));
+				}
+			}
+		}
+		break;
+		case 1:
+		{
+			for(c_i=0;c_i<0x800;c_i++)
+			{
 				b = ((state->m_vdp2_cram[c_i] & 0x00007c00) >> 10);
 				g = ((state->m_vdp2_cram[c_i] & 0x000003e0) >> 5);
 				r = ((state->m_vdp2_cram[c_i] & 0x0000001f) >> 0);
@@ -5507,8 +5534,8 @@ static void refresh_palette_data(running_machine &machine)
 				r = ((state->m_vdp2_cram[c_i] & 0x001f0000) >> 16);
 				palette_set_color_rgb(machine,c_i*2,pal5bit(r),pal5bit(g),pal5bit(b));
 			}
-			break;
 		}
+		break;
 	}
 }
 
