@@ -36,12 +36,11 @@ nubus_slot_device::nubus_slot_device(const machine_config &mconfig, device_type 
 {
 }
 
-void nubus_slot_device::static_set_nubus_slot(device_t &device, const char *tag, const char *slottag, const char *defslot)
+void nubus_slot_device::static_set_nubus_slot(device_t &device, const char *tag, const char *slottag)
 {
 	nubus_slot_device &nubus_card = dynamic_cast<nubus_slot_device &>(device);
 	nubus_card.m_nubus_tag = tag;
 	nubus_card.m_nubus_slottag = slottag;
-	nubus_card.m_nubus_defslot = defslot;
 }
 
 //-------------------------------------------------
@@ -52,7 +51,7 @@ void nubus_slot_device::device_start()
 {
 	device_nubus_card_interface *dev = dynamic_cast<device_nubus_card_interface *>(get_card_device());
 
-	if (dev) device_nubus_card_interface::static_set_nubus_tag(*dev, m_nubus_tag, m_nubus_slottag, m_nubus_defslot);
+	if (dev) device_nubus_card_interface::static_set_nubus_tag(*dev, m_nubus_tag, m_nubus_slottag);
 }
 
 //**************************************************************************
@@ -160,20 +159,24 @@ void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhan
 
 void nubus_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
+//	printf("install_bank: %s @ %x->%x mask %x mirror %x\n", tag, start, end, mask, mirror);
 	m_maincpu = machine().device(m_cputag);
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	space->install_readwrite_bank(start, end, mask, mirror, tag );
 	memory_set_bankptr(machine(), tag, data);
 }
 
-void nubus_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region)
+void nubus_device::set_irq_line(int slot, int state)
 {
-	m_maincpu = machine().device(m_cputag);
-	astring tempstring;
-	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
-	space->install_read_bank(start, end, mask, mirror, tag);
-	space->unmap_write(start, end, mask, mirror);
-	memory_set_bankptr(machine(), tag, machine().region(dev->subtag(tempstring, region))->base());
+	switch (slot)
+	{
+		case 0x9:	irq9_w(state);	break;
+		case 0xa:	irqa_w(state);	break;
+		case 0xb:	irqb_w(state);	break;
+		case 0xc:	irqc_w(state);	break;
+		case 0xd:	irqd_w(state);	break;
+		case 0xe:	irqe_w(state);	break;
+	}
 }
 
 // interrupt request from nubus card
@@ -213,19 +216,26 @@ device_nubus_card_interface::~device_nubus_card_interface()
 {
 }
 
-void device_nubus_card_interface::static_set_nubus_tag(device_t &device, const char *tag, const char *slottag, const char *defslot)
+void device_nubus_card_interface::static_set_nubus_tag(device_t &device, const char *tag, const char *slottag)
 {
 	device_nubus_card_interface &nubus_card = dynamic_cast<device_nubus_card_interface &>(device);
 	nubus_card.m_nubus_tag = tag;
 	nubus_card.m_nubus_slottag = slottag;
-	nubus_card.m_nubus_defslot = defslot;
 }
 
 void device_nubus_card_interface::set_nubus_device()
 {
 	// extract the slot number from the last digit of the slot tag
 	int tlen = strlen(m_nubus_slottag);
-	m_slot = (m_nubus_slottag[tlen-1] - '9') + 9;
+
+	if (m_nubus_slottag[tlen-1] == '9')
+	{
+		m_slot = (m_nubus_slottag[tlen-1] - '9') + 9;
+	}
+	else
+	{
+		m_slot = (m_nubus_slottag[tlen-1] - 'a') + 0xa;
+	}
 
 	if (m_slot < 9 || m_slot > 0xe)
 	{
@@ -236,18 +246,28 @@ void device_nubus_card_interface::set_nubus_device()
 	m_nubus->add_nubus_card(this);
 }
 
-void device_nubus_card_interface::install_declaration_rom(const char *romregion)
+void device_nubus_card_interface::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
-	char region_name[128];
+	char bank[256];
+
+	// append an underscore and the slot name to the bank so it's guaranteed unique
+	strcpy(bank, tag);
+	strcat(bank, "_");
+	strcat(bank, m_nubus_slottag);
+
+	m_nubus->install_bank(start, end, mask, mirror, bank, data);
+}
+
+void device_nubus_card_interface::install_declaration_rom(device_t *dev, const char *romregion)
+{
 	bool inverted = false;
 	UINT8 *newrom = NULL;
 
-	sprintf(region_name, "%s:%s:%s", m_nubus_slottag, m_nubus_defslot, romregion);
+	astring tempstring;
+	UINT8 *rom = device().machine().region(dev->subtag(tempstring, romregion))->base();
+	UINT32 romlen = device().machine().region(dev->subtag(tempstring, romregion))->bytes(); 
 
-	UINT8 *rom = device().machine().region(region_name)->base();
-	UINT32 romlen = device().machine().region(region_name)->bytes();
-
-//	printf("ROM length is %x, last byte is %02x\n", romlen, rom[romlen-1]);
+//	printf("ROM length is %x, last bytes are %02x %02x\n", romlen, rom[romlen-2], rom[romlen-1]);
 
 	UINT8 byteLanes = rom[romlen-1];
 	// check if all bits are inverted
@@ -311,23 +331,23 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion)
 		case 0xc3:	// lanes 0, 1
 			newrom = (UINT8 *)malloc(romlen*2);
 			memset(newrom, 0, romlen*2);
-			for (int i = 0; i < romlen; i+=2)
+			for (int i = 0; i < romlen/2; i++)
 			{
-				newrom[BYTE4_XOR_BE((i*4))] = rom[i];
-				newrom[BYTE4_XOR_BE((i*4)+1)] = rom[i+1];
+				newrom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
+				newrom[BYTE4_XOR_BE((i*4)+1)] = rom[(i*2)+1];
 			}
-			romlen *= 4;
+			romlen *= 2;
 			break;
 
 		case 0x3c:	// lanes 2,3
 			newrom = (UINT8 *)malloc(romlen*2);
 			memset(newrom, 0, romlen*2);
-			for (int i = 0; i < romlen; i+=2)
+			for (int i = 0; i < romlen/2; i++)
 			{
-				newrom[BYTE4_XOR_BE((i*4)+2)] = rom[i];
-				newrom[BYTE4_XOR_BE((i*4)+3)] = rom[i+1];
+				newrom[BYTE4_XOR_BE((i*4)+2)] = rom[(i*2)];
+				newrom[BYTE4_XOR_BE((i*4)+3)] = rom[(i*2)+1];
 			}
-			romlen *= 4;
+			romlen *= 2;
 			break;
 
 		default:
@@ -350,7 +370,7 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion)
 	strcpy(bankname, "rom_");
 	strcat(bankname, m_nubus_slottag);
 	addr -= romlen;
-//	printf("Installing ROM bank [%s] at %08x\n", bankname, addr);
-	m_nubus->install_bank(addr, addr+romlen-1, addr+romlen-1, 0, bankname, newrom);
+//	printf("Installing ROM at %x\n", addr);
+	m_nubus->install_bank(addr, addr+romlen-1, 0, 0, bankname, newrom);
 }
 

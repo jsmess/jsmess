@@ -38,8 +38,6 @@
 
 #define ADDRESS_MAP_MODERN
 
-//#define TEST_SLOT_CARD
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
@@ -56,6 +54,7 @@
 #include "sound/awacs.h"
 #include "sound/cdda.h"
 #include "video/nubus_48gc.h"
+#include "video/nubus_cb264.h"
 #include "includes/mac.h"
 
 #define C7M	(7833600)
@@ -629,12 +628,6 @@ static ADDRESS_MAP_START(macii_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
-
-	// RasterOps 264 640x480 fixed-res color video card (8, 16, or 24 bit)
-	AM_RANGE(0xfe000000, 0xfe1fffff) AM_RAM	AM_BASE(m_vram) // supposed to be 1.5 megs of VRAM, but every other word?
-	AM_RANGE(0xfeff6000, 0xfeff60ff) AM_READWRITE( mac_cb264_r, mac_cb264_w )
-	AM_RANGE(0xfeff7000, 0xfeff7fff) AM_WRITE( mac_cb264_ramdac_w )
-	AM_RANGE(0xfeff8000, 0xfeffffff) AM_ROM AM_REGION("rops264", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(maciici_map, AS_PROGRAM, 32, mac_state )
@@ -684,12 +677,6 @@ static ADDRESS_MAP_START(maciifx_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x5001a000, 0x5001bfff) AM_READWRITE8(oss_r, oss_w, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50024000, 0x50027fff) AM_READ(buserror_r) AM_MIRROR(0x00f00000)   // must bus error on access here so ROM can determine we're an FMC
 	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
-
-	// RasterOps 264 640x480 fixed-res color video card (8, 16, or 24 bit)
-	AM_RANGE(0xfe000000, 0xfe1fffff) AM_RAM	AM_BASE(m_vram) // supposed to be 1.5 megs of VRAM, but every other word?
-	AM_RANGE(0xfeff6000, 0xfeff60ff) AM_READWRITE( mac_cb264_r, mac_cb264_w )
-	AM_RANGE(0xfeff7000, 0xfeff7fff) AM_WRITE( mac_cb264_ramdac_w )
-	AM_RANGE(0xfeff8000, 0xfeffffff) AM_ROM AM_REGION("rops264", 0)
 ADDRESS_MAP_END
 
 // ROM detects the "Jaws" ASIC by checking for I/O space mirrored at 0x01000000 boundries
@@ -812,9 +799,8 @@ static const struct nbbus_interface nubus_intf =
 };
 
 static SLOT_INTERFACE_START(mac_nubus_cards)
-#ifdef TEST_SLOT_CARD
 	SLOT_INTERFACE("48gc", NUBUS_48GC)
-#endif
+	SLOT_INTERFACE("cb264", NUBUS_CB264)
 SLOT_INTERFACE_END
 
 /***************************************************************************
@@ -980,22 +966,6 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020PMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
-	MCFG_CPU_VBLANK_INT("screen", mac_cb264_vbl)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-
-    /* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(1024, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE(mac_cb264)
-
-	MCFG_PALETTE_LENGTH(256)
-
-	MCFG_VIDEO_START(mac_cb264)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1008,9 +978,13 @@ static MACHINE_CONFIG_START( macii, mac_state )
 
 	/* devices */
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
-#ifdef TEST_SLOT_CARD
-	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc", NULL)
-#endif
+	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "cb264", NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nba", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbb", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbc", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL, NULL)
+
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
@@ -1034,7 +1008,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( maciihmu, macii )
 	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
-	MCFG_CPU_VBLANK_INT("screen", mac_cb264_vbl)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( maciifx, mac_state )
@@ -1042,22 +1015,6 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 40000000)
 	MCFG_CPU_PROGRAM_MAP(maciifx_map)
-	MCFG_CPU_VBLANK_INT("screen", mac_cb264_vbl)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-
-        /* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(1024, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE(mac_cb264)
-
-	MCFG_PALETTE_LENGTH(256)
-
-	MCFG_VIDEO_START(mac_cb264)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1070,6 +1027,13 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 
 	/* devices */
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
+	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "48gc", NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nba", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbb", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbc", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL, NULL)
+
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
@@ -1100,13 +1064,23 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_VIDEO_START(macv8)
 	MCFG_VIDEO_RESET(macrbv)
 
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+	MCFG_SCREEN_SIZE(1024,768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE(macrbvvram)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,6M,8M,10M")
 
+	MCFG_NUBUS_SLOT_REMOVE("nb9")
+	MCFG_NUBUS_SLOT_REMOVE("nba")
+	MCFG_NUBUS_SLOT_REMOVE("nbb")
+	MCFG_NUBUS_SLOT_REMOVE("nbc")
+	MCFG_NUBUS_SLOT_REMOVE("nbd")
+	MCFG_NUBUS_SLOT_REMOVE("nbe")
 	MCFG_NUBUS_BUS_REMOVE("nubus")
 
 	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_V8, mac_asc_irq)
@@ -1162,6 +1136,9 @@ static MACHINE_CONFIG_DERIVED( maciivx, maclc )
 	MCFG_SCREEN_UPDATE(macrbvvram)
 
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbc", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL, NULL)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1181,6 +1158,9 @@ static MACHINE_CONFIG_DERIVED( maciivi, maclc )
 	MCFG_SCREEN_UPDATE(macrbvvram)
 
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbc", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL, NULL)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1191,11 +1171,16 @@ static MACHINE_CONFIG_DERIVED( maciix, macii )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
-	MCFG_CPU_VBLANK_INT("screen", mac_cb264_vbl)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,32M,64M,96M,128M")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( maciicx, maciix )	// IIcx is a IIx with only slots 9/a/b
+	MCFG_NUBUS_SLOT_REMOVE("nbc")
+	MCFG_NUBUS_SLOT_REMOVE("nbd")
+	MCFG_NUBUS_SLOT_REMOVE("nbe")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( macse30, mac_state )
@@ -1416,10 +1401,17 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 
 	MCFG_PALETTE_LENGTH(256)
 
+	// IIci only has slots c/d/e
+	MCFG_NUBUS_SLOT_REMOVE("nb9")
+	MCFG_NUBUS_SLOT_REMOVE("nba")
+	MCFG_NUBUS_SLOT_REMOVE("nbb")
+
 	MCFG_VIDEO_START(macrbv)
 	MCFG_VIDEO_RESET(macrbv)
 
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 	MCFG_SCREEN_SIZE(640, 870)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE(macrbv)
@@ -1438,10 +1430,20 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 
 	MCFG_PALETTE_LENGTH(256)
 
+	MCFG_NUBUS_SLOT_REMOVE("nb9")
+	MCFG_NUBUS_SLOT_REMOVE("nba")
+	MCFG_NUBUS_SLOT_REMOVE("nbb")
+	MCFG_NUBUS_SLOT_REMOVE("nbc")
+	MCFG_NUBUS_SLOT_REMOVE("nbd")
+	MCFG_NUBUS_SLOT_REMOVE("nbe")
+	MCFG_NUBUS_BUS_REMOVE("nubus")
+
 	MCFG_VIDEO_START(macrbv)
 	MCFG_VIDEO_RESET(macrbv)
 
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 	MCFG_SCREEN_SIZE(640, 870)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE(macrbv)
@@ -1485,8 +1487,6 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
-	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
-
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
@@ -1825,11 +1825,6 @@ ROM_START( macii )
 	ROMX_LOAD( "9779d2c4.rom", 0x000000, 0x040000, CRC(4df6d054) SHA1(db6b504744281369794e26ba71a6e385cf6227fa), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "original", "rev. A")
 	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(2) )
-
-	// RasterOps "ColorBoard 264" NuBus video card
-	ROM_REGION32_BE(0x8000, "rops264", 0)
-	ROM_LOAD32_BYTE( "264-1914.bin", 0x000003, 0x002000, CRC(d5fbd5ad) SHA1(98d35ed3fb0bca4a9bee1cdb2af0d3f22b379386) )
-	ROM_LOAD32_BYTE( "264-1915.bin", 0x000002, 0x002000, CRC(26c19ee5) SHA1(2b2853d04cc6b0258e85eccd23ebfd4f4f63a084) )
 ROM_END
 
 ROM_START( maciihmu )
@@ -1838,41 +1833,21 @@ ROM_START( maciihmu )
 	ROMX_LOAD( "9779d2c4.rom", 0x000000, 0x040000, CRC(4df6d054) SHA1(db6b504744281369794e26ba71a6e385cf6227fa), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "original", "rev. A")
 	ROMX_LOAD( "97851db6.rom", 0x000000, 0x040000, CRC(8c8b9d03) SHA1(5c264fe976f1e8495d364947c932a5e8309b4300), ROM_BIOS(2) )
-
-	// RasterOps "ColorBoard 264" NuBus video card
-	ROM_REGION32_BE(0x8000, "rops264", 0)
-	ROM_LOAD32_BYTE( "264-1914.bin", 0x000003, 0x002000, CRC(d5fbd5ad) SHA1(98d35ed3fb0bca4a9bee1cdb2af0d3f22b379386) )
-	ROM_LOAD32_BYTE( "264-1915.bin", 0x000002, 0x002000, CRC(26c19ee5) SHA1(2b2853d04cc6b0258e85eccd23ebfd4f4f63a084) )
 ROM_END
 
 ROM_START( mac2fdhd )	// same ROM for II FDHD, IIx, IIcx, and SE/30
 	ROM_REGION32_BE(0x40000, "bootrom", 0)
 	ROM_LOAD( "97221136.rom", 0x000000, 0x040000, CRC(ce3b966f) SHA1(753b94351d94c369616c2c87b19d568dc5e2764e) )
-
-	// RasterOps "ColorBoard 264" NuBus video card
-	ROM_REGION32_BE(0x8000, "rops264", 0)
-	ROM_LOAD32_BYTE( "264-1914.bin", 0x000003, 0x002000, CRC(d5fbd5ad) SHA1(98d35ed3fb0bca4a9bee1cdb2af0d3f22b379386) )
-	ROM_LOAD32_BYTE( "264-1915.bin", 0x000002, 0x002000, CRC(26c19ee5) SHA1(2b2853d04cc6b0258e85eccd23ebfd4f4f63a084) )
 ROM_END
 
 ROM_START( maciix )
 	ROM_REGION32_BE(0x40000, "bootrom", 0)
 	ROM_LOAD( "97221136.rom", 0x000000, 0x040000, CRC(ce3b966f) SHA1(753b94351d94c369616c2c87b19d568dc5e2764e) )
-
-	// RasterOps "ColorBoard 264" NuBus video card
-	ROM_REGION32_BE(0x8000, "rops264", 0)
-	ROM_LOAD32_BYTE( "264-1914.bin", 0x000003, 0x002000, CRC(d5fbd5ad) SHA1(98d35ed3fb0bca4a9bee1cdb2af0d3f22b379386) )
-	ROM_LOAD32_BYTE( "264-1915.bin", 0x000002, 0x002000, CRC(26c19ee5) SHA1(2b2853d04cc6b0258e85eccd23ebfd4f4f63a084) )
 ROM_END
 
 ROM_START( maciicx )
 	ROM_REGION32_BE(0x40000, "bootrom", 0)
 	ROM_LOAD( "97221136.rom", 0x000000, 0x040000, CRC(ce3b966f) SHA1(753b94351d94c369616c2c87b19d568dc5e2764e) )
-
-	// RasterOps "ColorBoard 264" NuBus video card
-	ROM_REGION32_BE(0x8000, "rops264", 0)
-	ROM_LOAD32_BYTE( "264-1914.bin", 0x000003, 0x002000, CRC(d5fbd5ad) SHA1(98d35ed3fb0bca4a9bee1cdb2af0d3f22b379386) )
-	ROM_LOAD32_BYTE( "264-1915.bin", 0x000002, 0x002000, CRC(26c19ee5) SHA1(2b2853d04cc6b0258e85eccd23ebfd4f4f63a084) )
 ROM_END
 
 ROM_START( macse30 )
@@ -1886,11 +1861,6 @@ ROM_END
 ROM_START( maciifx )
 	ROM_REGION32_BE(0x80000, "bootrom", 0)
 	ROM_LOAD( "4147dd77.rom", 0x000000, 0x080000, CRC(ef441bbd) SHA1(9fba3d4f672a630745d65788b1d1119afa2c6728) )
-
-	// RasterOps "ColorBoard 264" NuBus video card
-	ROM_REGION32_BE(0x8000, "rops264", 0)
-	ROM_LOAD32_BYTE( "264-1914.bin", 0x000003, 0x002000, CRC(d5fbd5ad) SHA1(98d35ed3fb0bca4a9bee1cdb2af0d3f22b379386) )
-	ROM_LOAD32_BYTE( "264-1915.bin", 0x000002, 0x002000, CRC(26c19ee5) SHA1(2b2853d04cc6b0258e85eccd23ebfd4f4f63a084) )
 ROM_END
 
 ROM_START( maciici )
@@ -1994,7 +1964,7 @@ COMP( 1988, mac2fdhd, 0,		0,	macii,    macadb,   maciifdhd,	  "Apple Computer", 
 COMP( 1988, maciix,   mac2fdhd, 0,	maciix,   macadb,   maciix,	      "Apple Computer", "Macintosh IIx",  0 )
 COMP( 1989, macprtb,  0,        0,  macprtb,  macadb,   macprtb,	  "Apple Computer", "Macintosh Portable", GAME_NOT_WORKING )
 COMP( 1989, macse30,  mac2fdhd, 0,	macse30,  macadb,   macse30,	  "Apple Computer", "Macintosh SE/30",  0 )
-COMP( 1989, maciicx,  mac2fdhd, 0,	maciix,   macadb,   maciicx,	  "Apple Computer", "Macintosh IIcx",  0 )
+COMP( 1989, maciicx,  mac2fdhd, 0,	maciicx,  macadb,   maciicx,	  "Apple Computer", "Macintosh IIcx",  0 )
 COMP( 1989, maciici,  0,		0,	maciici,  maciici,  maciici,	  "Apple Computer", "Macintosh IIci", 0 )
 COMP( 1990, maciifx,  0,		0,	maciifx,  macadb,   maciifx,      "Apple Computer", "Macintosh IIfx",  GAME_NOT_WORKING )
 COMP( 1990, macclasc, 0,		0,	macse,    macadb,   macclassic,	  "Apple Computer", "Macintosh Classic",  0 )
