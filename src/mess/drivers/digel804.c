@@ -4,25 +4,21 @@
 *  By balrog and Jonathan Gevaryahu AKA Lord Nightmare
 *  Code adapted from zexall.c
 *
-* mem map: (controlled by mapper prom)
-*  digelec model 804 (804-1-4 prom):
-*   fill me in!
-*  wavetek/digelec ep804 (804-1-2 prom):
-*   fill me in!
-*
 *  DONE:
-*  figure out and hook up rams
+*  figure out z80 address space and hook up roms and rams (done)
+*  figure out where 10937 vfd controller lives (port 0x44 bits 7 and 0)
+*  figure out how keypresses are detected (/INT)
+*  tentatively figure out how flow control from ACIA works (/NMI)?
 *
 *  TODO:
-*  fix the digel804 rom load code for the second rom so it doesn't always fail verify
+*  figure out the rest of the i/o map
 *  find and dump 4.3 firmware and figure out how the banked ram works
-*  find and hook up interrupts
+*  actually hook up interrupts and nmi
 *  hook up r6551 serial and attach terminal to it
-*  hook up 10937 vfd controller
-*  hook up keypad
-*  hook up mode selects (nmi?)
-*  hook up beeper
+*  correctly hook up 10937 vfd controller
+*  hook up keypad and mode buttons
 *  hook up leds on front panel
+*  artwork
 *
 ******************************************************************************/
 
@@ -32,6 +28,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
+#include "sound/speaker.h"
+#include "machine/roc10937.h"
 
 
 class digel804_state : public driver_device
@@ -40,26 +38,59 @@ public:
 	digel804_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_terminal(*this, TERMINAL_TAG)
+		  m_terminal(*this, TERMINAL_TAG),
+		  m_speaker(*this, "speaker")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_terminal;
-
+	required_device<device_t> m_speaker;
+	DECLARE_WRITE8_MEMBER( port_44_w );
+	DECLARE_READ8_MEMBER( port_43_r );
+	UINT8 vfd_data;
+	UINT8 vfd_old;
+	UINT8 vfd_count;
 	UINT8 *m_main_ram;
 };
 
 static DRIVER_INIT( digel804 )
 {
-	//digel804_state *state = machine.driver_data<digel804_state>();
-
+	digel804_state *state = machine.driver_data<digel804_state>();
+	ROC10937_init(0,0,0); // TODO: replace this with a proper device
+	state->vfd_old = state->vfd_data = state->vfd_count = 0;
 }
 
 static MACHINE_RESET( digel804 )
 {
-	//digel804_state *state = machine.driver_data<digel804_state>();
+	digel804_state *state = machine.driver_data<digel804_state>();
+	ROC10937_reset(0); // TODO: replace this with a proper device
+	state->vfd_old = state->vfd_data = state->vfd_count = 0;
 }
 
+READ8_MEMBER( digel804_state::port_43_r ) // HACK to dump display contents to stderr
+{
+	fprintf(stderr,"%s\n",ROC10937_get_string(0));
+	return 0xFF;
+}
+
+WRITE8_MEMBER( digel804_state::port_44_w )
+{
+	// latch vfd data on falling edge of clock only; this should really be part of the 10937 device, not here!
+	if ((vfd_old&1) && ((data&1)==0))
+	{
+		vfd_data <<= 1;
+		vfd_data |= (data&0x80)?1:0;
+		vfd_count++;
+		if (vfd_count == 8)
+		{
+			logerror("Digel804: Full byte written to port 44 vfd: %02X '%c'\n", vfd_data, vfd_data);
+			ROC10937_newdata(0,vfd_data);
+			vfd_data = 0;
+			vfd_count = 0;
+		}
+	}
+	vfd_old = data;
+}
 
 /******************************************************************************
  Address Maps
@@ -94,7 +125,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(z80_io, AS_IO, 8, digel804_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	// so far: port 0x44 bit 0 may be the beeper bit
+	//AM_RANGE(0x42, 0x42) AM_WRITE // gets 00 written to it
+	AM_RANGE(0x43, 0x43) AM_READ(port_43_r) // unknown read port, possibly ACIA, currently hacked to dump display contents
+	AM_RANGE(0x44, 0x44) AM_WRITE(port_44_w) // 10937 vfd controller clock on d0, data on d8; other bits unknown
+	//AM_RANGE(0x45, 0x45) AM_WRITE // gets 01 written to it in a long chain. strongly suspect this is speaker beep but each write with bit 0 set generates a pulse
+	//AM_RANGE(0x46, 0x46) AM_WRITE // gets 50 or 30 written to it
+	//AM_RANGE(0x47, 0x47) AM_WRITE // gets 00 written to it
+	//AM_RANGE(0x83, 0x83) AM_WRITE // may be acia?
 ADDRESS_MAP_END
 
 
@@ -125,6 +162,12 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, digel804_terminal_intf)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_CONFIG_END
 
 /* TODO: make this copy the digel804 machine config and modify the program map! */
@@ -139,6 +182,11 @@ static MACHINE_CONFIG_START( ep804, digel804_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, digel804_terminal_intf)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
