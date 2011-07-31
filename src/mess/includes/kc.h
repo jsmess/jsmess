@@ -112,20 +112,8 @@ WRITE8_HANDLER(kc85_4_84_w);
 READ8_HANDLER(kc85_4_86_r);
 WRITE8_HANDLER(kc85_4_86_w);
 
-READ8_HANDLER(kc85_unmapped_r);
-
-READ8_HANDLER(kc85_pio_data_r);
-
-WRITE8_HANDLER(kc85_4_pio_data_w);
-WRITE8_HANDLER(kc85_3_pio_data_w);
-
-READ8_HANDLER(kc85_pio_control_r);
-WRITE8_HANDLER(kc85_pio_control_w);
-
-READ8_DEVICE_HANDLER(kc85_ctc_r);
-WRITE8_DEVICE_HANDLER(kc85_ctc_w);
-
-extern const z80pio_interface kc85_pio_intf;
+extern const z80pio_interface kc85_2_pio_intf;
+extern const z80pio_interface kc85_4_pio_intf;
 extern const z80ctc_interface kc85_ctc_intf;
 
 
