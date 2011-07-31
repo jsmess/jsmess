@@ -31,7 +31,7 @@ Year + Game                    PCB         Notes
     Blaze On                   Z02AT-002   2 VU-002 Sprites Chips (Atlus PCB ID: ATL-67140)
     Shogun Warriors            ZO1DK-002   CALC3 MCU protection (EEPROM handling, 68k code snippet, data - palettes, tilemaps, fighters)
     B.Rap Boys                 ZO1DK-002   CALC3 MCU protection (EEPROM handling, 68k code snippet, data - palettes, tilemaps, fighters)
-94  Great 1000 Miles Rally                 TBSOP01 MCU protection (EEPROM handling etc.)
+94  Great 1000 Miles Rally     Z09AF-005   TBSOP01 MCU protection (EEPROM handling etc.)
     Bonk's Adventure           Z09AF-003   TBSOP01 MCU protection (EEPROM handling, 68k code snippet, data)
     Blood Warrior              Z09AF-005   TBSOP01 MCU protection (EEPROM handling etc.)
 95  Great 1000 Miles Rally 2   M201F00138  TBSOP02 MCU protection (EEPROM handling etc.)
@@ -2790,6 +2790,25 @@ ROM_END
 /***************************************************************************
 
                             Great 1000 Miles Rally
+
+Kaneko 1994
+
+TOP BOARD: Z09AF-005
+
+CPU - Toshiba TMP68HC000N - 16
+SOUND - OKI M6295  x2
+QUARTZ OSCILLATORS AT 27.0000MHz, 16.0000MHz, 20.0000MHz and 33.3330MHz
+RAM - LC3664 x6, 424260 x2, LH52B256D x6, D42101C x2
+
+Custom Chips
+
+231609-509 View2-Chip x2
+KC-002 L0002 023 9321EK702
+9343T - 44 pin PQFP (NEAR JAMMMA CONNECTOR)
+
+BOTTOM BOARD: Z09AF-ROM5
+
+TBS0P01 452 9339PK001 - 74 pin PQFP (NEC uPD78324 series MCU)
 
 GMMU2+1 512K * 2    68k
 GMMU23  1M      OKI6295: 00000-2ffff + chunks of 0x10000 with headers
