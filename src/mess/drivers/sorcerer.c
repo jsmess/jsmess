@@ -460,7 +460,7 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
 
 #if SORCERER_USING_DISKS
-	MCFG_xx_ADD("micropolis", default_micropolis_interface ) // custom micropolis controller
+	MCFG_MICROPOLIS_ADD("micropolis", default_micropolis_interface ) // custom micropolis controller
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
 #endif
 MACHINE_CONFIG_END
@@ -491,6 +491,5 @@ ROM_START(sorcerer)
 	ROM_LOAD_OPTIONAL("diskboot.dat",0xbc00, 0x0100, BAD_DUMP CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT      MACHINE INPUT   INIT    COMPANY        FULLNAME */
-COMP(1979, sorcerer, 0,		0,	sorcerer, sorcerer, sorcerer, "Exidy Inc", "Sorcerer", 0 )
-
+/*   YEAR  NAME      PARENT  COMPAT    MACHINE   INPUT     INIT        COMPANY     FULLNAME */
+COMP(1979, sorcerer, 0,      0,        sorcerer, sorcerer, sorcerer, "Exidy Inc", "Sorcerer", 0 )
