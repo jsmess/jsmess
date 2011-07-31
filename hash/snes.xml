@@ -375,6 +375,23 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="addamfam">
+		<!-- Serial: SNSP-AF-NOE -->
+		<description>The Addams Family (Euro)</description>
+		<year>1992</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-NOE" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-af-0.u1" size="1048576" crc="82497f19" sha1="bc67e9a2632f751472e9f91e7e8ed2046a043dac" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="advbatru" cloneof="advbatr">
 		<!-- Serial: SNS-ABTE-USA - Release Date: 1994-12 -->
 		<description>The Adventures of Batman &amp; Robin (USA)</description>
@@ -388,6 +405,23 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sns-abte-0.u1" size="2097152" crc="b3ef81f5" sha1="5452c639c49906679cad640aaf60d7f4749f84d3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aero2">
+		<!-- Serial: SNSP-AE2P-FAH -->
+		<description>Aero the Acro-Bat 2 (Euro)</description>
+		<year>1994</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-FAH" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-ae2p-0.u1" size="2097152" crc="242b8181" sha1="1597e2cfdfdb0ab4671c4f3549208a5b11d52a8a" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1093,6 +1127,7 @@ The software list will be divided in four categories:
 		<year>1996</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="S-RTC" />
 			<feature name="pcb" value="SHVC-BJ3M-20" />
 			<feature name="u1" value="U1 P0" />
 			<feature name="u2" value="U2 P1" />
@@ -1192,6 +1227,7 @@ The software list will be divided in four categories:
 		<year>1995</year>
 		<publisher>Elite Systems</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<feature name="pcb" value="SHVC-1CA0N5S-01" />
 			<feature name="u1" value="U1 8M MASK ROM" /> <!-- MASK ROM is actually 4M -->
 			<feature name="u2" value="U2 256K SRAM" />
@@ -1205,6 +1241,30 @@ The software list will be divided in four categories:
 				<rom name="spal-adip-0.u1" size="524288" crc="0354f4b1" sha1="5e38dd23cdd68754b6469da0725688d0af34f867" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dirttrax">
+		<!-- Serial: SNSP-AF9P-EUR -->
+		<description>Dirt Trax FX (Euro)</description>
+		<year>1995</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
+			<feature name="pcb" value="SHVC-1CA0N6S-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 512K SRAM" />
+			<feature name="u3" value="U3 GSU-1" />
+			<feature name="u4" value="U4 HCU04" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="none" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="524288">
+				<rom name="spal-af9p-0.u1" size="524288" crc="9dbc2330" sha1="d2940767de799fcd7a2ee0995f072930475ab88f" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -1374,6 +1434,7 @@ The software list will be divided in four categories:
 		<year>1996</year>
 		<publisher>Williams Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-2" />
 			<feature name="pcb" value="SHVC-1CB0N7S-01" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 512K/1M SRAM" />
@@ -1544,6 +1605,26 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 <!-- wip-e -->
+	<software name="ejim">
+		<!-- Serial: SNSP-AEJP-EUR -->
+		<description>Earthworm Jim (Euro)</description>
+		<year>1994</year>
+		<publisher>Playmates Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="3145728">
+				<rom name="spal-aejp-0 p0.u1" size="2097152" crc="77e0d3f4" sha1="cbac7e78fe7bd19c100b21083f2d6c4cb2d03002" offset="0x000000" />
+				<rom name="spal-aejp-0 p3.u2" size="1048576" crc="9099ccfa" sha1="88d4dc0d5e99459db74f92c05a0566d9d16f8e40" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ejimu" cloneof="ejim">
 		<!-- Serial: SNS-AEJE-USA - Release Date: 1994-10 -->
 		<description>Earthworm Jim (USA)</description>
@@ -1736,9 +1817,10 @@ The software list will be divided in four categories:
 		<year>1993</year>
 		<publisher>Seta</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="ST010" />
 			<feature name="pcb" value="SHVC-1DS0B-01" />
 			<feature name="u1" value="U1 MASK ROM" />
-			<feature name="u2" value="U2 ST-010" />
+			<feature name="u2" value="U2 ST-010" /> <!-- ST010 -->
 			<feature name="u3" value="U3 HCU04" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="CR2032" />
@@ -2224,6 +2306,23 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="ffight3">
+		<!-- Serial: SNSP-AFZP-EUR -->
+		<description>Final Fight 3 (Euro)</description>
+		<year>1995</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J0N-20" />
+			<feature name="u1" value="U1 MASKROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="3145728">
+				<rom name="spal-afzp-0.u1" size="3145728" crc="aa58a166" sha1="30cc3abb60f6037918017725139f4a3074800b64" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ffight3u" cloneof="ffight3">
 		<!-- Serial: SNS-AFZE-USA - Release Date: 1996-01 -->
 		<description>Final Fight 3 (USA)</description>
@@ -2471,9 +2570,10 @@ The software list will be divided in four categories:
 		<year>1993</year>
 		<publisher>Seta</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="ST011" />
 			<feature name="pcb" value="SHVC-1DS0B-10" />
 			<feature name="u1" value="U1 MASK ROM" />
-			<feature name="u2" value="U2 ST [ST011]" />
+			<feature name="u2" value="U2 ST" /> <!-- ST011 -->
 			<feature name="u3" value="U3 HCU04" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="u4" value="U5 Ω" />
@@ -2492,10 +2592,11 @@ The software list will be divided in four categories:
 		<year>1995</year>
 		<publisher>Seta</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="ST018" />
 			<feature name="pcb" value="SHVC-1DE3B-01" />
 			<feature name="u1" value="U1 4/8/16/32M MASKROM" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3 ST0018/ST0019" />
+			<feature name="u3" value="U3 ST0018/ST0019" /> <!-- ST0018 -->
 			<feature name="u4" value="U4 LS139" />
 			<feature name="u5" value="" /> <!-- U5 doesn't appear in the PCB front, need to check PCB back -->
 			<feature name="u6" value="U6 CIC" />
@@ -2561,6 +2662,28 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="kirbysdb" cloneof="kirbyfun" supported="no">
+		<!-- Serial: SHVC-AKFJ-JPN - Release Date: 1996-03-21 - Alt. Title: 星のカービィ スーパーデラック ス -->
+		<description>Hoshi no Kirby - Super Deluxe (Jpn)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
+			<feature name="pcb" value="SHVC-1L3B-02" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 SA1" />
+			<feature name="u4" value="U4 MM1026A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shvc-akfj-0.u1" size="4194304" crc="151bd470" sha1="2f2ff2c75eafa705363feb435a88d2c914d301cf" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hungryd">
 		<!-- Serial: SNSP-ABKP-EUR -->
 		<description>Hungry Dinosaurs (Euro)</description>
@@ -2622,6 +2745,23 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="incanta">
+		<!-- Serial: SNSP-AIYP-EUR -->
+		<description>Incantation (Euro)</description>
+		<year>1996</year>
+		<publisher>Titus</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="524288">
+				<rom name="span-aiyp-0.u1" size="524288" crc="34fad701" sha1="2fdca97be96c4d9ee79e28aca8be64a7d43cb233" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="incrhulk">
 		<!-- Serial: SNSP-8U-UKV -->
 		<description>The Incredible Hulk (Euro)</description>
@@ -2652,6 +2792,23 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sns-8u-0.u1" size="2097152" crc="36b5a429" sha1="a93d160327b87e4bc48e093928851076533aa1ec" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indyadv">
+		<!-- Serial: SNSP-AIJP-EUR -->
+		<description>Indiana Jones' Greatest Adventures (Euro)</description>
+		<year>1994</year>
+		<publisher>JVC</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-aijp-0.u1" size="2097152" crc="fa4560c3" sha1="f08be42140cad072529d4ddf5472beb447228e00" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2748,6 +2905,7 @@ The software list will be divided in four categories:
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<feature name="pcb" value="BSC-1L3B-01" />
 			<feature name="u1" value="U1 MASKROM" />
 			<feature name="u2" value="U2 64K SRAM" />
@@ -3067,27 +3225,6 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
 				<rom name="spal-ei-0.u1" size="2097152" crc="78f0820b" sha1="e65eaa67dbc227fead5ecc15e23771c29050eecd" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kirbyss" cloneof="kirbyfun" supported="no">
-		<!-- Serial: M/SNS-AKFE-USA - Release Date: 1996-09 -->
-		<description>Kirby Super Star (USA)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-1L3B-11" />
-			<feature name="u1" value="U1 MASKROM" />
-			<feature name="u2" value="U2 SRAM" /> <!-- not printed: 64K -->
-			<feature name="u3" value="U3 SA1" />
-			<feature name="u4" value="U4 MM1026AF" />
-			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="" />
-			<dataarea name="rom" size="4194304">
-				<rom name="sns-akfe-0.u1" size="4194304" crc="89d0f7dc" sha1="cca1e67fa230bf4f60154f5ea55d06568229dc5d" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -3642,6 +3779,7 @@ The software list will be divided in four categories:
 		<year>1996</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SPC7110" />
 			<feature name="pcb" value="SHVC-BDH3D-01" />
 			<feature name="u1" value="U1 P MASK ROM" />
 			<feature name="u2" value="U2 D MASK ROM" />
@@ -3908,6 +4046,28 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="nhl97">
+		<!-- Serial: SNSP-AH7P-EUR -->
+		<description>NHL '97 (Euro, Rev. A)</description>
+		<year>1996</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-ah7p-1.u1" size="2097152" crc="d1eda2b9" sha1="30c8fbd1db019242d59123739a8baaa16200cbba" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="guts">
 		<!-- Serial: SNS-ANGE-USA - Release Date: 1994-11 -->
 		<description>Nickelodeon GUTS (USA)</description>
@@ -4069,6 +4229,7 @@ The software list will be divided in four categories:
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<feature name="pcb" value="SHVC-1B0N-02" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2" /> <!-- Not printed: DSP1 -->
@@ -4133,28 +4294,6 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="SNS-USA/CAN-1-M" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sns-p-appe-0.u1" size="2097152" crc="f09e91a1" sha1="ef20e4ce1b4b6a25aac14613d4bed949017edfc9" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="przeo" supported="no">
-		<!-- Serial: SNSP-A4RP-EUR -->
-		<description>Power Rangers Zeo - Battle Racers (Euro)</description>
-		<year>1996</year>
-		<publisher>Bandai</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SNSP-1L3B-10" /> <!-- not SHVC -->
-			<feature name="u1" value="U1 MASKROM" />
-			<feature name="u2" value="U2 SRAM" />
-			<feature name="u3" value="U3 SA1" />
-			<feature name="u4" value="U4 MM1026AF" />
-			<feature name="battery" value="CR2032" />
-			<feature name="cart_model" value="SNSP-006(-02)" />
-			<feature name="cart_back_label" value="SNSP-EUR" />
-			<dataarea name="rom" size="1048576">
-				<rom name="spal-a4rp-0.u1" size="1048576" crc="6aa46cfc" sha1="bdafd8414e832acb4f85c2f3a539ba9b9af8bcc9" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4338,6 +4477,7 @@ The software list will be divided in four categories:
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="CX4" />
 			<feature name="pcb" value="SHVC-2DC0N-01" />
 			<feature name="u1" value="U1 P0 8M MASK ROM" />
 			<feature name="u2" value="U2 P1 4/8 MASK ROM" />
@@ -4358,6 +4498,7 @@ The software list will be divided in four categories:
 		<year>1995</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="CX4" />
 			<feature name="pcb" value="SHVC-1DC0N-01" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CX4" />
@@ -4634,6 +4775,7 @@ The software list will be divided in four categories:
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<feature name="pcb" value="BSC-1L5B-01" />
 			<feature name="u1" value="U1 MASKROM" />
 			<feature name="u2" value="U2 256K SRAM" />
@@ -4657,10 +4799,11 @@ The software list will be divided in four categories:
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP3" />
 			<feature name="pcb" value="SHVC-1B3B-01" />
 			<feature name="u1" value="U1 MASKROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3µPD77C25 " />
+			<feature name="u3" value="U3µPD77C25 " /> <!-- DSP3 -->
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 74HCU04" />
 			<feature name="u6" value="U6 CIC" />
@@ -4669,6 +4812,28 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="" /> <!-- to do -->
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-x2-0.u1" size="1048576" crc="4dc3d903" sha1="a504b74d1e256f97bc05a7dd836a2457ae6f525e" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="evermoreg" cloneof="evermore">
+		<!-- Serial: SNSP-AEOD-NOE -->
+		<description>Secret of Evermore (Ger)</description>
+		<year>1995</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="3145728">
+				<rom name="spal-aeod-0.u1" size="3145728" crc="27f60e77" sha1="5e5c2082526690d05f962c3ffbd7e080c681bfa4" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -5071,6 +5236,7 @@ The software list will be divided in four categories:
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<feature name="pcb" value="SHVC-1C0N5S-01" /> <!-- also found with SHVC-1C0N5S-02 pcb -->
 			<feature name="u1" value="U1 8M/4M MASKROM" />
 			<feature name="u2" value="U2 256K S-RAM" />
@@ -5080,6 +5246,7 @@ The software list will be divided in four categories:
 			<feature name="battery" value="none" />
 <!-- epoxy version -->
 <!--
+			<feature name="enhancement" value="GSU-1" />
 			<feature name="pcb" value="SHVC-1C0N" />
 			<feature name="u1 epoxy" value="U1 ROM" />
 			<feature name="u2 epoxy" value="U2 RAM" />
@@ -5099,19 +5266,37 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="starfoxa" cloneof="starwing">
+		<!-- Serial: SNS-FO-USA - Release Date: 1993-05 -->
+		<description>Star Fox (USA)</description>
+		<year>1993</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-fo-0.u1" size="1048576" crc="0bae0941" sha1="1f5355534ccfaf26ae6c8f055f3e4768f9d72a7e" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starfox" cloneof="starwing">
 		<!-- Serial: SNS-FO-USA - Release Date: 1993-05 -->
 		<description>Star Fox (USA, Rev. B)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<!-- epoxy version -->
+			<feature name="enhancement" value="GSU-1" />
 			<feature name="pcb" value="LR0G1807" /> <!-- confimation needed -->
-			<feature name="u1" value="U1 ROM" /> <!-- epoxy -->
-			<feature name="u2" value="U2 RAM" /> <!-- epoxy -->
-			<feature name="u3" value="U3 1992 A/N Inc MARIO CHIP 1" /> <!-- epoxy -->
-			<feature name="u4" value="U4 139" /> <!-- epoxy -->
-			<feature name="u5" value="U5 CIC F411A" /> <!-- epoxy -->
+			<feature name="u1" value="U1 ROM" />
+			<feature name="u2" value="U2 RAM" />
+			<feature name="u3" value="U3 1992 A/N Inc MARIO CHIP 1" />
+			<feature name="u4" value="U4 139" />
+			<feature name="u5" value="U5 CIC F411A" />
 			<feature name="battery" value="none" />
+			<!-- end of epoxy version -->
 			<feature name="cart_model" value="SNSP-006(-02)" />
 			<feature name="cart_back_label" value="02-SNSP-FAH" />
 			<dataarea name="rom" size="1048576">
@@ -5128,6 +5313,7 @@ The software list will be divided in four categories:
 		<year>1996</year>
 		<publisher>Enix</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="S-DD1" />
 			<feature name="pcb" value="SHVC-LN3B-01" />
 			<feature name="u1" value="U1 P0 MASKROM" />
 			<feature name="u2" value="U2 P1 MASKROM" />
@@ -5146,12 +5332,30 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="stargate">
+		<!-- Serial: SHVC-AGTP-EUR -->
+		<description>Stargate (Euro)</description>
+		<year>1995</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-agtp-0.u1" size="2097152" crc="af4d4439" sha1="d2a5e71e75b4d3cde71c5cca19403155d1dae4d3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starwinga" cloneof="starwing">
 		<!-- Serial: SNSP-FO-FAH -->
 		<description>Starwing (Euro)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<feature name="pcb" value="SNSP-1C0N5S-01" /> <!-- not SHVC -->
 			<feature name="u1" value="U1 8M/4M MASK ROM(N)" />
 			<feature name="u2" value="U2 256K S-RAM" />
@@ -5175,6 +5379,7 @@ The software list will be divided in four categories:
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<feature name="pcb" value="SNSP-1C0N5S-01" /> <!-- not SHVC -->
 			<feature name="u1" value="U1 8M/4M MASK ROM(N)" />
 			<feature name="u2" value="U2 256K S-RAM" />
@@ -5199,6 +5404,7 @@ The software list will be divided in four categories:
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="S-DD1" />
 			<feature name="pcb" value="SHVC-1N0N-01" /> <!-- not SHVC -->
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 SDD-1" />
@@ -5324,6 +5530,28 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="sf2tua" cloneof="sf2t">
+		<!-- Serial: SNS-TI-USA - Release Date: 1993-08 -->
+		<description>Street Fighter II Turbo - Hyper Fighting (USA, Alt)</description>
+		<year>1993</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-3J0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 P2" />
+			<feature name="u4" value="U4 LS139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2621440">
+				<rom name="sns-ti-0 p1.u1" size="1048576" crc="2e14314d" sha1="ea70b5b5788444ea60adf8b08c57ffc19c519e09" offset="0x000000" />
+				<rom name="sns-ti-0 p2.u1" size="1048576" crc="20ace25a" sha1="55757c35bb51cb5974586cea4e732e74de7988a0" offset="0x100000" />
+				<rom name="sns-ti-0 p3.u2" size="524288"  crc="6056387f" sha1="31d0f2276b124bee206695ac6b2048918c25efcc" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sf2tj" cloneof="sf2t">
 		<!-- Serial: SHVC-TI - Release Date: 1993-07-10 - Alt. Title: ストリートファイターII ターボ - Notes: Also re-released through Nintendo Power -->
 		<description>Street Fighter II Turbo - Hyper Fighting (Jpn)</description>
@@ -5427,6 +5655,7 @@ The software list will be divided in four categories:
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<feature name="pcb" value="SHVC-1CA6B-01" />
 			<feature name="u1" value="U1 8M MASK ROM" />
 			<feature name="u2" value="U2 512K-SRAM" />
@@ -5881,17 +6110,18 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-<!-- Revision A uses an upgraded DSP 1 (DSP 1 B) -->
 	<software name="smkart">
 		<!-- Serial: SNSP-MK-EUR -->
+		<!-- Revision A uses an upgraded DSP (DSP1B) -->
 		<description>Super Mario Kart (Euro, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1K1X-10" />
+			<feature name="enhancement" value="DSP1 B" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 16K SRAM" />
-			<feature name="u3" value="U3 uPD77C25" />
+			<feature name="u3" value="U3 uPD77C25" /> <!-- DSP1 B -->
 			<feature name="u4" value="U4 MAD-2" />
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="CR2032" />
@@ -5912,16 +6142,17 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<feature name="pcb" value="SHVC-1K1B-01" />
 			<feature name="u1" value="U1 MASKROM(N)" />
 			<feature name="u2" value="U2 16K SRAM" />
-			<feature name="u3" value="U3 uPD77C25" />
+			<feature name="u3" value="U3 uPD77C25" /> <!-- DSP1 -->
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 74HCU04" />
 			<feature name="u6" value="U6 CIC" />
 			<feature name="battery" value="CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="" />
+			<feature name="cart_back_label" value="SNSP-NOE, SNSP-FAH" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-mk-0.u1" size="524288" crc="56410e5e" sha1="27d9b4f30d39af75075691344b7bdeedbd32ac19" offset="0x000000" />
 			</dataarea>
@@ -5936,10 +6167,11 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<feature name="pcb" value="SHVC-1K1B-01" />
 			<feature name="u1" value="U1 MASKROM(N)" />
 			<feature name="u2" value="U2 16K SRAM" />
-			<feature name="u3" value="U3 uPD77C25" />
+			<feature name="u3" value="U3 uPD77C25" /> <!-- DSP1 -->
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 74HCU04" />
 			<feature name="u6" value="U6 CIC" />
@@ -5950,28 +6182,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 				<rom name="sns-mk-0.u1" size="524288" crc="cd80db86" sha1="47e103d8398cf5b7cbb42b95df3a3c270691163b" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smrpg" supported="no">
-		<!-- Serial: SNS-ARWE-USA - Release Date: 1996-05 -->
-		<description>Super Mario RPG - Legend of the Seven Stars (USA)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-1L5B-10" />
-			<feature name="u1" value="U1 MASKROM" />
-			<feature name="u2" value="U2 SRAM" />
-			<feature name="u3" value="U3 SA1" />
-			<feature name="u4" value="U4 MM1026AF" />
-			<feature name="battery" value="CR2032" />
-			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="" />
-			<dataarea name="rom" size="4194304">
-				<rom name="sns-arwe-0.u1" size="4194304" crc="1b8a0625" sha1="a4f7539054c359fe3f360b0e6b72e394439fe9df" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -6163,6 +6373,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SPC7110" />
 			<feature name="pcb" value="SHVC-BDH3D-01" />
 			<feature name="u1" value="U1 P MASK ROM" />
 			<feature name="u2" value="U2 D MASK ROM" />
@@ -6251,6 +6462,23 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sns-p-arje-1.u1" size="2097152" crc="4a5f30d8" sha1="b8dca1cd8b2ac99e46078fc91fd42ee336e761e4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superesb">
+		<!-- Serial: SNSP-E5-EUR -->
+		<description>Super Star Wars - The Empire Strikes Back (Euro, Rev. A)</description>
+		<year>1993</year>
+		<publisher>JVC</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-e5-1.u1" size="2097152" crc="a820caff" sha1="11e5e7c00a51c93e1f480be93650e52c37cfeaa2" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6394,6 +6622,23 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-5l-0.u1" size="524288" crc="943328ba" sha1="0005a7ea368694ed6ec54f1619cb6c5799098a85" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="syndicat">
+		<!-- Serial: SNSP-AFYP-NOE -->
+		<description>Syndicate (Euro)</description>
+		<year>1995</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-NOE" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-afyp-0.u1" size="1048576" crc="fd851819" sha1="98319448aebe93872eb318d6844caa0bfdf401e1" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6545,6 +6790,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SPC7110" />
 			<feature name="pcb" value="SHVC-LDH3C-01" />
 			<feature name="u1" value="U1 8M MASK ROM" />
 			<feature name="u2" value="U2 16/32M MROM" />
@@ -6746,9 +6992,10 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP4" />
 			<feature name="pcb" value="SHVC-1B0N-03" />
 			<feature name="u1" value="U1 MASK ROM" />
-			<feature name="u2" value="U2" /> <!-- Not printed: DSP4 -->
+			<feature name="u2" value="U2" /> <!-- DSP4 -->
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 74HCU04" />
 			<feature name="u5" value="U5 CIC" />
@@ -6956,6 +7203,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<feature name="pcb" value="SHVC-1CA0N5S-01" />
 			<feature name="u1" value="U1 8M MASK ROM" /> <!-- MASK ROM is actually 4M -->
 			<feature name="u2" value="U2 256K SRAM" />
@@ -7052,6 +7300,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<feature name="pcb" value="SHVC-1CA6B-01" />
 			<feature name="u1" value="U1 8M MASK ROM" />
 			<feature name="u2" value="U2 512K-SRAM" />
@@ -7290,6 +7539,28 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
+	<software name="kirbysd" cloneof="kirbyfun" supported="no">
+		<!-- Serial: SHVC-AKFJ-JPN - Release Date: 1996-03-21 - Alt. Title: 星のカービィ スーパーデラック ス -->
+		<description>Hoshi no Kirby - Super Deluxe (Jpn, Rev. B)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
+			<feature name="pcb" value="SHVC-1L3B-10" /> <!-- also found with SHVC-1L3B-11 pcb -->
+			<feature name="u1" value="U1 MASKROM" />
+			<feature name="u2" value="U2 SRAM" /> <!-- not printed: 64K -->
+			<feature name="u3" value="U3 SA1" />
+			<feature name="u4" value="U4 MM1026AF" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shvc-akfj-2.u1" size="4194304" crc="1f35f230" sha1="9ae2db3bcb2699394937bc007cd6835609b7e18f" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="humansg" cloneof="humans">
 		<!-- Serial: SNSP-U9-NOE/SFRG -->
 		<description>The Humans (Ger)</description>
@@ -7303,6 +7574,28 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sfrg-u9-0.u1" size="1048576" crc="e83a092b" sha1="e74725e4eb14757c898007b9766090074c91b731" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kirbyss" cloneof="kirbyfun" supported="no">
+		<!-- Serial: M/SNS-AKFE-USA - Release Date: 1996-09 -->
+		<description>Kirby Super Star (USA)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
+			<feature name="pcb" value="SHVC-1L3B-11" />
+			<feature name="u1" value="U1 MASKROM" />
+			<feature name="u2" value="U2 SRAM" /> <!-- not printed: 64K -->
+			<feature name="u3" value="U3 SA1" />
+			<feature name="u4" value="U4 MM1026AF" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="4194304">
+				<rom name="sns-akfe-0.u1" size="4194304" crc="89d0f7dc" sha1="cca1e67fa230bf4f60154f5ea55d06568229dc5d" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -7337,6 +7630,29 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="524288">
 				<rom name="sns-mr-0.u1" size="524288" crc="99331ecb" sha1="9abed3a02b0692b1613475b31e16df62d1c8e558" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="przeo" supported="no">
+		<!-- Serial: SNSP-A4RP-EUR -->
+		<description>Power Rangers Zeo - Battle Racers (Euro)</description>
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
+			<feature name="pcb" value="SNSP-1L3B-10" /> <!-- not SHVC -->
+			<feature name="u1" value="U1 MASKROM" />
+			<feature name="u2" value="U2 SRAM" />
+			<feature name="u3" value="U3 SA1" />
+			<feature name="u4" value="U4 MM1026AF" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_model" value="SNSP-006(-02)" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-a4rp-0.u1" size="1048576" crc="6aa46cfc" sha1="bdafd8414e832acb4f85c2f3a539ba9b9af8bcc9" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -7471,6 +7787,29 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
+	<software name="smrpg" supported="no">
+		<!-- Serial: SNS-ARWE-USA - Release Date: 1996-05 -->
+		<description>Super Mario RPG - Legend of the Seven Stars (USA)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
+			<feature name="pcb" value="SHVC-1L5B-10" />
+			<feature name="u1" value="U1 MASKROM" />
+			<feature name="u2" value="U2 SRAM" />
+			<feature name="u3" value="U3 SA1" />
+			<feature name="u4" value="U4 MM1026AF" />
+			<feature name="battery" value="CR2032" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="4194304">
+				<rom name="sns-arwe-0.u1" size="4194304" crc="1b8a0625" sha1="a4f7539054c359fe3f360b0e6b72e394439fe9df" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sshogi">
 		<!-- Serial: SHVC-SD - Release Date: 1992-06-19 - Alt. Title: スーパー将棋 -->
 		<description>Super Shougi (Jpn, Rev. A)</description>
@@ -7512,13 +7851,13 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 	</software>
 
 	<software name="xterm">
-		<!-- Serial:  - Release Date:  -->
+		<!-- Serial: F-002 -->
 		<description>X-Terminator (World)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="gm76c256all-70" size="32768" crc="243c4a53" sha1="2f0bc91d8d59bc0533433a4a7501d5e59e4ce44e" offset="0x000000" />
+				<rom name="k9513918" size="32768" crc="243c4a53" sha1="2f0bc91d8d59bc0533433a4a7501d5e59e4ce44e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7546,6 +7885,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-fo-1.ic20" size="1048576" crc="ad668a41" sha1="39ff7354a7fa02295c899b7a7ec3556998ac2636" offset="0x000000" />
 			</dataarea>
@@ -8059,6 +8399,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Nippon Telenet</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1 A" />
 			<dataarea name="rom" size="1048576">
 				<rom name="ace o nerae! (japan).sfc" size="1048576" crc="6c5f1a18" sha1="065bf1bbf4662383e2e42105ad76e0ed93213a57" offset="0x000000" />
 			</dataarea>
@@ -8173,17 +8514,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="addams family values (usa) (en,fr,de).sfc" size="2097152" crc="98b07db8" sha1="24848e53e32cc16a30acce48d40ce09c37b669c4" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="addamfam">
-		<description>The Addams Family (Euro)</description>
-		<year>1992</year>
-		<publisher>Ocean</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="addams family, the (europe) (en,fr,de).sfc" size="1048576" crc="82497f19" sha1="bc67e9a2632f751472e9f91e7e8ed2046a043dac" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8370,17 +8700,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="aero the acro-bat (usa).sfc" size="1048576" crc="919f23cb" sha1="4d7dc1c4dc0c0756412a83eb5e5c1ac104c67831" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="aero2">
-		<description>Aero the Acro-Bat 2 (Euro)</description>
-		<year>1994</year>
-		<publisher>Sunsoft</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="aero the acro-bat 2 (europe).sfc" size="2097152" crc="242b8181" sha1="1597e2cfdfdb0ab4671c4f3549208a5b11d52a8a" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9489,6 +9808,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1994</year>
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1 B" />
 			<dataarea name="rom" size="1048576">
 				<rom name="ballz 3d (usa).sfc" size="1048576" crc="1c058b7d" sha1="236a466af4e05061b06d48bae637bb29f86672ad" offset="0x000000" />
 			</dataarea>
@@ -10252,6 +10572,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1994</year>
 		<publisher>Masaya</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="524288">
 				<rom name="bike daisuki! hashiriya tamashii (japan).sfc" size="524288" crc="b363fc99" sha1="d0457fc27adff1b0ad236535f60f91711b15f0db" offset="0x000000" />
 			</dataarea>
@@ -13001,6 +13322,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1997</year>
 		<publisher>ASCII Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="daisenryaku expert wwii - war in europe (japan).sfc" size="2097152" crc="4cd45939" sha1="142d2529d9045856d554c567baef27e4668bb2ad" offset="0x000000" />
 			</dataarea>
@@ -13361,6 +13683,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Asmik</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="1572864">
 				<rom name="derby jockey 2 (japan).sfc" size="1572864" crc="32129967" sha1="ed4c6764b8b9dc2ac4d3584d0ba9f4d66f5e12e0" offset="0x000000" />
 			</dataarea>
@@ -13626,25 +13949,13 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="dirttrax">
-		<description>Dirt Trax FX (Euro)</description>
-		<year>1995</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="dirt trax fx (europe).sfc" size="524288" crc="9dbc2330" sha1="d2940767de799fcd7a2ee0995f072930475ab88f" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="65536">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dirttraxu" cloneof="dirttrax">
 		<!-- Serial:  - Release Date: 1995-11 -->
 		<description>Dirt Trax FX (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<dataarea name="rom" size="524288">
 				<rom name="dirt trax fx (usa).sfc" size="524288" crc="61a86c7f" sha1="d36e3e949c46939029c82b19b2f99a098efdab76" offset="0x000000" />
 			</dataarea>
@@ -13862,6 +14173,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Imagineer</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="doom (japan).sfc" size="2097152" crc="e5d722b2" sha1="78d3f9346dc861f216063e2259ed17a9dbd85087" offset="0x000000" />
 			</dataarea>
@@ -13876,6 +14188,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="doom (usa).sfc" size="2097152" crc="09e85ea6" sha1="736b9b994f506de0893ceb181f942739da089b05" offset="0x000000" />
 			</dataarea>
@@ -14087,6 +14400,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="3145728">
 				<rom name="dragon ball z - hyper dimension (france).sfc" size="3145728" crc="a6dc166b" sha1="bf132f963c8e09e7f106b6106ce47bad593b2a48" offset="0x000000" />
 			</dataarea>
@@ -14101,6 +14415,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="3145728">
 				<rom name="dragon ball z - hyper dimension (japan).sfc" size="3145728" crc="f4ab1557" sha1="f52ad7eae80ebd5d102adc554a7b1fbb76fff61b" offset="0x000000" />
 			</dataarea>
@@ -14494,6 +14809,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1994</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="1572864">
 				<rom name="drift king shutokou battle '94 - tsuchiya keiichi &amp; bandou masaaki (japan).sfc" size="1572864" crc="33ce298f" sha1="719599ce4acbc1b790cb09506183bc2a9121671f" offset="0x000000" />
 			</dataarea>
@@ -14508,6 +14824,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="1572864">
 				<rom name="drift king shutokou battle 2 - tsuchiya keiichi &amp; bandou masaaki (japan).sfc" size="1572864" crc="87aab79a" sha1="8d510935b6bf3a1ac42ef3501dca3477cc4cab5c" offset="0x000000" />
 			</dataarea>
@@ -14586,6 +14903,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1992</year>
 		<publisher>JVC</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP2" />
 			<dataarea name="rom" size="1048576">
 				<rom name="dungeon master (europe).sfc" size="1048576" crc="89a67adf" sha1="30fc660fb1e78d0533f424da750112dcd615050a" offset="0x000000" />
 			</dataarea>
@@ -14600,6 +14918,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1991</year>
 		<publisher>Victor Musical Industries</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP2" />
 			<dataarea name="rom" size="1048576">
 				<rom name="dungeon master (japan) (rev 1).sfc" size="1048576" crc="aa79fa33" sha1="e6d33ef74366333999ea11495c7a62d4ba07df0f" offset="0x000000" />
 			</dataarea>
@@ -14614,6 +14933,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1991</year>
 		<publisher>Victor Musical Industries</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP2" />
 			<dataarea name="rom" size="1048576">
 				<rom name="dungeon master (japan).sfc" size="1048576" crc="7a1ba194" sha1="aef7699a42c63016874755bbccbd107daefffca5" offset="0x000000" />
 			</dataarea>
@@ -14628,6 +14948,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>JVC</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP2" />
 			<dataarea name="rom" size="1048576">
 				<rom name="dungeon master (usa).sfc" size="1048576" crc="0dfd9ceb" sha1="e65ae62ec9a1c48a3512db66f929c7b0055ae2c3" offset="0x000000" />
 			</dataarea>
@@ -14737,17 +15058,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 				<rom name="earthbound (usa).sfc" size="3145728" crc="dc9bb451" sha1="d67a8ef36ef616bc39306aa1b486e1bd3047815a" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ejim">
-		<description>Earthworm Jim (Euro)</description>
-		<year>1994</year>
-		<publisher>Playmates Interactive</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="earthworm jim (europe).sfc" size="3145728" crc="84ab251b" sha1="56840e992021dda27d230430de39293c6660ff6c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -15348,6 +15658,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1994</year>
 		<publisher>Seta</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="ST010" />
 			<dataarea name="rom" size="1048576">
 				<rom name="f1 roc ii - race of champions (usa).sfc" size="1048576" crc="3447609e" sha1="fb81dd15b8a9ddf8f5564d3d2fb934c6f8bfb392" offset="0x000000" />
 			</dataarea>
@@ -15772,17 +16083,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="ffight3">
-		<description>Final Fight 3 (Euro)</description>
-		<year>1995</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="final fight 3 (europe).sfc" size="3145728" crc="aa58a166" sha1="30cc3abb60f6037918017725139f4a3074800b64" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ffight3up" cloneof="ffight3">
 		<description>Final Fight 3 (USA, Prototype)</description>
 		<year>1996</year>
@@ -15848,6 +16148,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>LOZC</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="1572864">
 				<rom name="final stretch (japan).sfc" size="1572864" crc="8d29f41f" sha1="3c8e37271d995d9507d733864ab79b43ab531e96" offset="0x000000" />
 			</dataarea>
@@ -18866,36 +19167,9 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="4194304">
 				<rom name="hoshi no kirby - super deluxe (japan) (rev 1).sfc" size="4194304" crc="dbbcd010" sha1="63f47b5f47bec60147b9e75a71b3f038e5e0969e" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kirbysd" cloneof="kirbyfun" supported="no">
-		<!-- Serial: SHVC-AKFJ - Release Date: 1996-03-21 - Alt. Title: 星のカービィ スーパーデラック ス -->
-		<description>Hoshi no Kirby - Super Deluxe (Jpn, Rev. B)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="hoshi no kirby - super deluxe (japan) (rev 2).sfc" size="4194304" crc="1f35f230" sha1="9ae2db3bcb2699394937bc007cd6835609b7e18f" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kirbysdb" cloneof="kirbyfun" supported="no">
-		<!-- Serial: SHVC-AKFJ - Release Date: 1996-03-21 - Alt. Title: 星のカービィ スーパーデラック ス -->
-		<description>Hoshi no Kirby - Super Deluxe (Jpn)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="hoshi no kirby - super deluxe (japan).sfc" size="4194304" crc="151bd470" sha1="2f2ff2c75eafa705363feb435a88d2c914d301cf" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -18908,6 +19182,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="4194304">
 				<rom name="hoshi no kirby 3 (japan).sfc" size="4194304" crc="43373aee" sha1="5038596a1ec450d8f1d7cc07759737bfd996e87f" offset="0x000000" />
 			</dataarea>
@@ -19342,17 +19617,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="incanta">
-		<description>Incantation (Euro)</description>
-		<year>1996</year>
-		<publisher>Titus</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="incantation (europe).sfc" size="524288" crc="34fad701" sha1="2fdca97be96c4d9ee79e28aca8be64a7d43cb233" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="incantau" cloneof="incanta">
 		<!-- Serial:  - Release Date: 1996-12 -->
 		<description>Incantation (USA)</description>
@@ -19407,17 +19671,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="incredible crash dummies, the - dr. zabu o sukuidase (japan).sfc" size="1048576" crc="c3bc16d5" sha1="8eb6827c4ca660233f52567559b72f611fe39fe2" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="indyadv">
-		<description>Indiana Jones' Greatest Adventures (Euro)</description>
-		<year>1994</year>
-		<publisher>JVC</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="indiana jones' greatest adventures (europe).sfc" size="2097152" crc="fa4560c3" sha1="f08be42140cad072529d4ddf5472beb447228e00" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -19705,6 +19958,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="2621440">
 				<rom name="j.league '96 dream stadium (japan).sfc" size="2621440" crc="93a0a25c" sha1="bcb2756c42e52b2035c93f4aa33057a74d63e74c" offset="0x000000" />
 			</dataarea>
@@ -20089,6 +20343,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="3145728">
 				<rom name="jikkyou oshaberi parodius (japan).sfc" size="3145728" crc="177937ab" sha1="5d0bf1a3dd8a2ae65eb79adb8eb4a4e3c34e01a3" offset="0x000000" />
 			</dataarea>
@@ -20798,6 +21053,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Naxat Soft</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="jumpin' derby (japan).sfc" size="2097152" crc="a473b7e4" sha1="95556edb63fe27c0042a5fed789666d1e51a37f2" offset="0x000000" />
 			</dataarea>
@@ -21183,6 +21439,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>ASCII Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="1572864">
 				<rom name="kakinoki shougi (japan).sfc" size="1572864" crc="bc1a265f" sha1="659db940bb26a655972e4d62d00c5c6d3fdae76c" offset="0x000000" />
 			</dataarea>
@@ -21931,6 +22188,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="4194304">
 				<rom name="kirby's dream land 3 (usa).sfc" size="4194304" crc="ec8a48f6" sha1="12aff7538f43641a1e2bf424593df5b49fe150f6" offset="0x000000" />
 			</dataarea>
@@ -21945,6 +22203,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="4194304">
 				<rom name="kirby's fun pak (europe).sfc" size="4194304" crc="ce33dcfb" sha1="ce325ad271e91735ce19e9c2b8e0ad04dc103ae1" offset="0x000000" />
 			</dataarea>
@@ -23045,6 +23304,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="524288">
 				<rom name="lock on (usa).sfc" size="524288" crc="84f7e078" sha1="1f5e53a0391a902de6ee9407ed10803c84e23cc3" offset="0x000000" />
 			</dataarea>
@@ -24089,6 +24349,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="3145728">
 				<rom name="marvelous - mou hitotsu no takarajima (japan).sfc" size="3145728" crc="cedf3ba7" sha1="46fe42f195d43b71ba0608356eb7c2b65bff70ac" offset="0x000000" />
 			</dataarea>
@@ -24186,6 +24447,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>T&amp;E Soft</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="masters new - harukanaru augusta 3 (japan) (rev 1).sfc" size="2097152" crc="c1281f9b" sha1="f417a523e79ff0d6fc36fe8940011705fc3b346a" offset="0x000000" />
 			</dataarea>
@@ -24194,12 +24456,13 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="haruaug3a" cloneof="haruaug3">
+	<software name="haruaug3a" cloneof="haruaug3" supported="no">
 		<!-- Serial: SHVC-AO3J - Release Date: 1995-12-08 - Alt. Title: 遥かなるオーガスタ3 マスターズ ニュー -->
 		<description>Masters New - Harukanaru Augusta 3 (Jpn)</description>
 		<year>1995</year>
 		<publisher>T&amp;E Soft</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="masters new - harukanaru augusta 3 (japan).sfc" size="2097152" crc="e5612567" sha1="7212c255f0800bde41fd351bb71511ee83c6e77b" offset="0x000000" />
 			</dataarea>
@@ -24461,6 +24724,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="CX4" />
 			<dataarea name="rom" size="1572864">
 				<rom name="megaman x2 (europe).sfc" size="1572864" crc="3c49c39c" sha1="5c767285da713de2bc883a6291d32adc9b2d13fa" offset="0x000000" />
 			</dataarea>
@@ -24473,6 +24737,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="CX4" />
 			<dataarea name="rom" size="1572864">
 				<rom name="megaman x2 (usa).sfc" size="1572864" crc="947b0355" sha1="637079014421563283cded6aeaa0604597b2e33c" offset="0x000000" />
 			</dataarea>
@@ -24484,6 +24749,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="CX4" />
 			<dataarea name="rom" size="2097152">
 				<rom name="megaman x3 (europe).sfc" size="2097152" crc="c504ddfd" sha1="69a11324aeb57d005800771d6147603d5479b282" offset="0x000000" />
 			</dataarea>
@@ -24496,6 +24762,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="CX4" />
 			<dataarea name="rom" size="2097152">
 				<rom name="megaman x3 (usa).sfc" size="2097152" crc="fa0fe671" sha1="b226f7ec59283b05c1e276e2f433893f45027cac" offset="0x000000" />
 			</dataarea>
@@ -24519,6 +24786,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="OBC1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="metal combat - falcon's revenge (europe).sfc" size="2097152" crc="eb0039c4" sha1="1d92ec65457c4e1bb984162412f2530cbaf13156" offset="0x000000" />
 			</dataarea>
@@ -24533,6 +24801,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="OBC1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="metal combat - falcon's revenge (usa).sfc" size="2097152" crc="c3131b49" sha1="da88fc5830ddb0cdf8ffc2e8340a607d0ad8eaa1" offset="0x000000" />
 			</dataarea>
@@ -24634,6 +24903,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="michael andretti's indycar challenge (japan).sfc" size="1048576" crc="1128572b" sha1="ec07f7e81f13193805c3cd4b486118d218653da3" offset="0x000000" />
 			</dataarea>
@@ -24646,6 +24916,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1994</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="michael andretti's indycar challenge (usa).sfc" size="1048576" crc="0fdb210e" sha1="20b7fd6a8604fa36f75edf9ccb24380b13d8c905" offset="0x000000" />
 			</dataarea>
@@ -25040,6 +25311,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>ASCII Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="4194304">
 				<rom name="mini yonku shining scorpion - let's &amp; go!! (japan).sfc" size="4194304" crc="b17e95d4" sha1="b1f27592546e5d6029843cbe8cd6f09fc3752106" offset="0x000000" />
 			</dataarea>
@@ -26548,19 +26820,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
 				<rom name="nhl '96 (usa).sfc" size="1572864" crc="b6c6e7f3" sha1="e6114c7580398a07ada26d740348b95756fc2858" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nhl97">
-		<description>NHL '97 (Euro, Rev. A)</description>
-		<year>1996</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="nhl '97 (europe) (rev 1).sfc" size="1572864" crc="1a53b7a8" sha1="1fbcc5acbf07206bf4c7ee67b8bd1caad0416501" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -28279,6 +28538,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>T&amp;E Soft</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="pebble beach no hatou new - tournament edition (japan).sfc" size="2097152" crc="0b6fb2f8" sha1="7c84674ce5bed9de224c07d0d99d19c92a39e942" offset="0x000000" />
 			</dataarea>
@@ -28292,6 +28552,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pga european tour (europe).sfc" size="1048576" crc="be94e60d" sha1="cc1e7ddde84a6c7b8998d5be0555a79f10bcce52" offset="0x000000" />
 			</dataarea>
@@ -28306,6 +28567,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pga european tour (usa).sfc" size="1048576" crc="914f2ea3" sha1="b962d72c943d33a9cb55c5a05d779f0a836c46c3" offset="0x000000" />
 			</dataarea>
@@ -28319,6 +28581,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="pga tour 96 (europe).sfc" size="2097152" crc="c5ac2e72" sha1="207b0b37f4dcc11afd5d6caf7877d8408399fd3e" offset="0x000000" />
 			</dataarea>
@@ -28333,6 +28596,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="pga tour 96 (usa).sfc" size="2097152" crc="bc5df071" sha1="090c312c9b305e423d099cf16dc4fad08c2d513a" offset="0x000000" />
 			</dataarea>
@@ -28341,11 +28605,12 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="pgatglf">
+	<software name="pgatglf" supported="no">
 		<description>PGA Tour Golf (Euro)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="524288">
 				<rom name="pga tour golf (europe).sfc" size="524288" crc="5daf9dbd" sha1="df453ef9222af3d6cb77b37091e9677d9d2b9b54" offset="0x000000" />
 			</dataarea>
@@ -28646,6 +28911,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="524288">
 				<rom name="pilotwings (europe).sfc" size="524288" crc="def45776" sha1="d450d6d580d163fdfcc4f58d5bf8fafd7f510750" offset="0x000000" />
 			</dataarea>
@@ -28658,6 +28924,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="524288">
 				<rom name="pilotwings (japan).sfc" size="524288" crc="77871727" sha1="76832034269723dc0aa7b9019faa5e8f39181e9d" offset="0x000000" />
 			</dataarea>
@@ -28926,6 +29193,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP4" />
 			<dataarea name="rom" size="1048576">
 				<rom name="planet's champ tg 3000, the (japan).sfc" size="1048576" crc="b9b9df06" sha1="3e7f10e13065424a28c93871b4a1e458817d754c" offset="0x000000" />
 			</dataarea>
@@ -29374,6 +29642,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="power rangers zeo - battle racers (usa).sfc" size="1048576" crc="389300cf" sha1="f83f07f2a6de60ed5e96e7f08de42ed69b9f6e62" offset="0x000000" />
 			</dataarea>
@@ -31376,6 +31645,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Video System</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sd f-1 grand prix (japan) (sample).sfc" size="2097152" crc="e846f7a1" sha1="ada4e36fa44c98576697783e2db7a1ab0129413b" offset="0x000000" />
 			</dataarea>
@@ -31390,6 +31660,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Video System</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sd f-1 grand prix (japan).sfc" size="2097152" crc="2fee01ad" sha1="d3ef6b754ae4f8bbbe915a8b82824c6b62da58c7" offset="0x000000" />
 			</dataarea>
@@ -31659,19 +31930,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="secret of evermore (france).sfc" size="3145728" crc="7425bb91" sha1="8a430c9d6a3dcef974252fe8d946a0d619bb1a61" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="evermoreg" cloneof="evermore">
-		<description>Secret of Evermore (Ger)</description>
-		<year>1995</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="secret of evermore (germany).sfc" size="3145728" crc="27f60e77" sha1="5e5c2082526690d05f962c3ffbd7e080c681bfa4" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -32349,6 +32607,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Hect</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="524288">
 				<rom name="shin shougi club (japan).sfc" size="524288" crc="e0273e0e" sha1="44c13e3147a107a8b3248f3a389144b29638b91a" offset="0x000000" />
 			</dataarea>
@@ -32563,6 +32822,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Magical</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shougi saikyou (japan).sfc" size="1048576" crc="12c42bc0" sha1="8a4e90551877f43011e2773be8e04acb5696e718" offset="0x000000" />
 			</dataarea>
@@ -32577,6 +32837,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Magical</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="524288">
 				<rom name="shougi saikyou ii - jissen taikyoku hen (japan).sfc" size="524288" crc="e57505d8" sha1="09ac9e227911c381562a3498114cac850a421c19" offset="0x000000" />
 			</dataarea>
@@ -33383,6 +33644,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="soukou kihei votoms - the battling road (japan).sfc" size="1048576" crc="c00f0bc9" sha1="bf1f8c6abb074dc70b36cb2504a232e2e045bf34" offset="0x000000" />
 			</dataarea>
@@ -33980,6 +34242,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="star fox (usa) (super weekend competition).sfc" size="1048576" crc="cd1f04b8" sha1="2ba5f446dcb56d1164e28b337ae7b4833278b6d9" offset="0x000000" />
 			</dataarea>
@@ -33988,25 +34251,12 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="starfoxa" cloneof="starwing">
-		<!-- Serial:  - Release Date: 1993-05 -->
-		<description>Star Fox (USA)</description>
-		<year>1993</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="star fox (usa).sfc" size="1048576" crc="0bae0941" sha1="1f5355534ccfaf26ae6c8f055f3e4768f9d72a7e" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="131072">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="starfox2a" cloneof="starfox2">
-		<description>Star Fox 2 (Jpn, Prototype, Alt)</description>
+		<description>Star Fox 2 (Jpn, Prototype, Alt)</description> <!-- homebrew hack -->
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-2" />
 			<dataarea name="rom" size="1048576">
 				<rom name="star fox 2 (japan) (proto) (alt 1).sfc" size="1048576" crc="79f3433d" sha1="aea7a00c52c0f4e102b98cd5fa6710e6282e0dee" offset="0x000000" />
 			</dataarea>
@@ -34016,10 +34266,11 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 	</software>
 
 	<software name="starfox2">
-		<description>Star Fox 2 (Jpn, Prototype)</description>
+		<description>Star Fox 2 (Jpn, Prototype)</description> <!-- leaked corrupt image, not a real cart -->
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-2" />
 			<dataarea name="rom" size="945507">
 				<rom name="star fox 2 (japan) (proto).sfc" size="945507" crc="70d7ad50" sha1="69a2f9be8f2ac3e17671935904c68cb269ea0486" offset="0x000000" />
 			</dataarea>
@@ -34131,17 +34382,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="stargate">
-		<description>Stargate (Euro)</description>
-		<year>1995</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="stargate (europe) (en,fr,de).sfc" size="2097152" crc="af4d4439" sha1="d2a5e71e75b4d3cde71c5cca19403155d1dae4d3" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="stargatej" cloneof="stargate">
 		<!-- Serial: SHVC-AGTJ - Release Date: 1995-05-26 - Alt. Title: スターゲイト -->
 		<description>Stargate (Jpn)</description>
@@ -34182,6 +34422,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="starwing (europe) (super weekend competition).sfc" size="1048576" crc="17c8fe56" sha1="c7d4f1a7a5261fc3b95280f302056226fd8aa68a" offset="0x000000" />
 			</dataarea>
@@ -34195,6 +34436,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="starwing (germany) (competition edition).sfc" size="1048576" crc="b25f606a" sha1="daf6c7bdbf8c9733705b1c586c85be9edd864a23" offset="0x000000" />
 			</dataarea>
@@ -34208,6 +34450,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="starwing (germany).sfc" size="1048576" crc="b48ca238" sha1="7c365c325b3ce27a17fc88744b6928741fab1996" offset="0x000000" />
 			</dataarea>
@@ -34317,6 +34560,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="S-DD1" />
 			<dataarea name="rom" size="4194304">
 				<rom name="street fighter alpha 2 (europe).sfc" size="4194304" crc="2f109101" sha1="73b3c0af2f169423cbbf2a672e6414f35388e04e" offset="0x000000" />
 			</dataarea>
@@ -34351,6 +34595,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="S-DD1" />
 			<dataarea name="rom" size="4194304">
 				<rom name="street fighter zero 2 (japan).sfc" size="4194304" crc="7455a7cf" sha1="a0db1045fb308d6a2975a4d305b69f877be727a4" offset="0x000000" />
 			</dataarea>
@@ -34453,6 +34698,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="stunt race fx (usa) (rev 1).sfc" size="1048576" crc="380c2635" sha1="781e376ff453a83c7bcf72339abe6b842efd9c86" offset="0x000000" />
 			</dataarea>
@@ -34552,6 +34798,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="1572864">
 				<rom name="super 3d baseball (japan).sfc" size="1572864" crc="304123c2" sha1="124ee1ee5bae9268095037abd7d51045de6ac55e" offset="0x000000" />
 			</dataarea>
@@ -34639,6 +34886,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="524288">
 				<rom name="super air diver (europe).sfc" size="524288" crc="0b57c764" sha1="f70567b9dc858bdb66d73d539390b7f74f00ff8a" offset="0x000000" />
 			</dataarea>
@@ -34651,6 +34899,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Asmik</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="524288">
 				<rom name="super air diver (japan).sfc" size="524288" crc="971e74ba" sha1="ffb81b82ea027673cbfc26f6ebd9f05c2d60d6c8" offset="0x000000" />
 			</dataarea>
@@ -34663,6 +34912,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Asmik</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="1310720">
 				<rom name="super air diver 2 (japan).sfc" size="1310720" crc="a6ad6b0f" sha1="acaec55441b7d894d33540d905e47e5fb0dacbcc" offset="0x000000" />
 			</dataarea>
@@ -34824,6 +35074,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1994</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="1572864">
 				<rom name="super bases loaded ii (usa).sfc" size="1572864" crc="e14128ca" sha1="d7d29e9a6a4820f2df03eeb80fdbc2b7df37f481" offset="0x000000" />
 			</dataarea>
@@ -35093,6 +35344,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="super bomberman - panic bomber w (japan).sfc" size="1048576" crc="fc633ecb" sha1="3a8793c4e03f457d7cfc3c0ade6c67edf091f74b" offset="0x000000" />
 			</dataarea>
@@ -35750,6 +36002,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1992</year>
 		<publisher>Nichibutsu</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="super f1 circus (japan).sfc" size="1048576" crc="7c94c86c" sha1="9d60d55b690c02413aa668ed9da196b4f1449e81" offset="0x000000" />
 			</dataarea>
@@ -36943,6 +37196,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="super mario - yossy island (japan) (rev 1).sfc" size="2097152" crc="0f66698b" sha1="e1279e5701e4880b666982c9c056419500835952" offset="0x000000" />
 			</dataarea>
@@ -36957,6 +37211,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="super mario - yossy island (japan) (rev 2).sfc" size="2097152" crc="f1063fad" sha1="53188bc4623f5b8c9df5c1c54bd187347a2ad969" offset="0x000000" />
 			</dataarea>
@@ -36971,6 +37226,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="super mario - yossy island (japan).sfc" size="2097152" crc="343e0dfb" sha1="abacca9b1be88b082e7dd8a50e809aef6ab4d0ef" offset="0x000000" />
 			</dataarea>
@@ -37023,10 +37279,26 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 
 	<software name="smkartj" cloneof="smkart">
 		<!-- Serial: SHVC-MK - Release Date: 1992-08-27 - Alt. Title: スーパーマリオカート -->
+		<description>Super Mario Kart (Jpn, Rev A)</description>
+		<year>1992</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1 B" />
+			<dataarea name="rom" size="524288">
+				<rom name="super mario kart (japan).sfc" size="524288" crc="c8002453" sha1="cbb853bf911255c1d8eb27cd34fc7855a0dda218" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smkartja" cloneof="smkart">
+		<!-- Serial: SHVC-MK - Release Date: 1992-08-27 - Alt. Title: スーパーマリオカート -->
 		<description>Super Mario Kart (Jpn)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="524288">
 				<rom name="super mario kart (japan).sfc" size="524288" crc="c8002453" sha1="cbb853bf911255c1d8eb27cd34fc7855a0dda218" offset="0x000000" />
 			</dataarea>
@@ -37041,6 +37313,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="4194304">
 				<rom name="super mario rpg (japan).sfc" size="4194304" crc="5527071e" sha1="a9cd97041c4f8acf135d1ffb0a172748b5b976de" offset="0x000000" />
 			</dataarea>
@@ -37068,6 +37341,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="super mario world 2 - yoshi's island (europe) (en,fr,de) (rev 1).sfc" size="2097152" crc="07e01ef9" sha1="1e1dc02c684652f9e927f3873af65ea4b374bb80" offset="0x000000" />
 			</dataarea>
@@ -37081,6 +37355,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="super mario world 2 - yoshi's island (europe) (en,fr,de).sfc" size="2097152" crc="857980b2" sha1="512e0b2ab74081fda5ff5459162948d28226fc0b" offset="0x000000" />
 			</dataarea>
@@ -37095,6 +37370,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="super mario world 2 - yoshi's island (usa) (rev 1).sfc" size="2097152" crc="cf98ddaa" sha1="34612a93741f156d6e497462ab7f253cb8a959a0" offset="0x000000" />
 			</dataarea>
@@ -37109,6 +37385,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="super mario world 2 - yoshi's island (usa).sfc" size="2097152" crc="d138f224" sha1="c807f2856f44fb84326fac5b462340dcdd0471f8" offset="0x000000" />
 			</dataarea>
@@ -37908,6 +38185,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Banpresto</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
 			<dataarea name="rom" size="3145728">
 				<rom name="super robot taisen gaiden - masou kishin - the lord of elemental (japan).sfc" size="3145728" crc="ebadc924" sha1="3fa8b1edeb9a42916a1b59634d7eeac0a5b26966" offset="0x000000" />
 			</dataarea>
@@ -38306,17 +38584,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
 				<rom name="super star wars - the empire strikes back (europe) (beta).sfc" size="1572864" crc="101d2dfa" sha1="e634f992bc7b41ca00eef0e91f218289ac7110c9" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="superesb">
-		<description>Super Star Wars - The Empire Strikes Back (Euro, Rev. A)</description>
-		<year>1993</year>
-		<publisher>JVC</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="super star wars - the empire strikes back (europe) (rev 1).sfc" size="1572864" crc="d308aa3e" sha1="5f0ddc911e9c10597c28ffb3a07b66caf2c0645d" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38913,6 +39180,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="suzuka 8 hours (japan).sfc" size="1048576" crc="b846b00d" sha1="d110e337a49f6a635236c9bf485759e48411cb69" offset="0x000000" />
 			</dataarea>
@@ -38927,6 +39195,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1994</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="suzuka 8 hours (usa).sfc" size="1048576" crc="54740b9b" sha1="90a418a1d0a65c32ea8945c6496602f0d11514a5" offset="0x000000" />
 			</dataarea>
@@ -39039,17 +39308,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="syndicate (europe) (en,fr,de) (beta).sfc" size="1048576" crc="181cae99" sha1="d0f4eb03ed823ec05e1df6e0ed406e638f343b54" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="syndicat">
-		<description>Syndicate (Euro)</description>
-		<year>1995</year>
-		<publisher>Ocean</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="syndicate (europe) (en,fr,de).sfc" size="1048576" crc="fd851819" sha1="98319448aebe93872eb318d6844caa0bfdf401e1" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -39907,6 +40165,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SPC7110" />
 			<dataarea name="rom" size="5242880">
 				<rom name="tengai makyou zero (japan) (shounen jump no shou).sfc" size="5242880" crc="bf8fef7a" sha1="36e5099128088b95623ff77f8196fcecd3f26731" offset="0x000000" />
 			</dataarea>
@@ -40720,6 +40979,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP4" />
 			<dataarea name="rom" size="1048576">
 				<rom name="top gear 3000 (usa).sfc" size="1048576" crc="a20be998" sha1="058aadf1ee719cb9e0c7333e665797f990a6381d" offset="0x000000" />
 			</dataarea>
@@ -40867,6 +41127,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
 			<dataarea name="rom" size="3145728">
 				<rom name="touge densetsu - saisoku battle (japan).sfc" size="3145728" crc="03fd7ad4" sha1="d72c79911eb1ed54a22010ed29a37748bc3334cd" offset="0x000000" />
 			</dataarea>
@@ -42109,6 +42370,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1994</year>
 		<publisher>Pack-In-Video</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<dataarea name="rom" size="524288">
 				<rom name="vortex (japan) (en,ja).sfc" size="524288" crc="51e8a19c" sha1="1479432ea185db8ecb109f6e5422e1464b5bdf3c" offset="0x000000" />
 			</dataarea>
@@ -42123,6 +42385,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1994</year>
 		<publisher>Electro Brain</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-1" />
 			<dataarea name="rom" size="524288">
 				<rom name="vortex (usa) (en,es).sfc" size="524288" crc="31b1ad00" sha1="3a71b63605ddecf827d60554c2ddaccdd85b9624" offset="0x000000" />
 			</dataarea>
@@ -42759,6 +43022,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="winter gold (europe).sfc" size="2097152" crc="0f8378a6" sha1="dc7f33e6bb587d7290f6a2587bb31af15724dfa3" offset="0x000000" />
 			</dataarea>
