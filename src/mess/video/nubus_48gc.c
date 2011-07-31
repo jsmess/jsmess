@@ -10,6 +10,8 @@
 #define GC48_SCREEN_NAME	"48gc_screen"
 #define GC48_ROM_REGION		"48gc_rom"
 
+#define VRAM_SIZE	(0x200000)	// 2 megs, maxed out
+
 static SCREEN_UPDATE( mac_48gc );
 
 MACHINE_CONFIG_FRAGMENT( macvideo_48gc )
@@ -17,6 +19,10 @@ MACHINE_CONFIG_FRAGMENT( macvideo_48gc )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_UPDATE( mac_48gc )
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+//	MCFG_SCREEN_SIZE(1152, 870)
+//	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
+//	MCFG_SCREEN_REFRESH_RATE(75)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
 MACHINE_CONFIG_END
 
 ROM_START( gc48 )
@@ -84,17 +90,16 @@ void nubus_48gc_device::device_start()
 
 	// set_nubus_device makes m_slot valid
 	set_nubus_device();
-	install_declaration_rom(GC48_ROM_REGION);
+	install_declaration_rom(this, GC48_ROM_REGION);
 
 	slotspace = get_slotspace();
 
-	m_vram = auto_alloc_array(machine(), UINT8, 0x7ffff);
-	m_nubus->install_device(slotspace+0x200000, slotspace+0x2003ff, read32_delegate(FUNC(nubus_48gc_device::mac_48gc_r), this), write32_delegate(FUNC(nubus_48gc_device::mac_48gc_w), this));
-	m_nubus->install_bank(slotspace, slotspace+0x7ffff, 0, 0x07000, "bank_48gc", m_vram);
+//	printf("[4*8gc %p] slotspace = %x\n", this, slotspace);
 
-	m_toggle = 0;
-	m_clutoffs = 0;
-	m_count = 0;
+	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
+	install_bank(slotspace, slotspace+VRAM_SIZE-1, 0, 0, "bank_48gc", m_vram);
+
+	m_nubus->install_device(slotspace+0x200000, slotspace+0x2003ff, read32_delegate(FUNC(nubus_48gc_device::mac_48gc_r), this), write32_delegate(FUNC(nubus_48gc_device::mac_48gc_w), this));
 }
 
 //-------------------------------------------------
@@ -103,41 +108,115 @@ void nubus_48gc_device::device_start()
 
 void nubus_48gc_device::device_reset()
 {
+	m_toggle = 0;
+	m_clutoffs = 0;
+	m_count = 0;
+	m_vbl_disable = 1;
+	m_stride = 80;
+	m_base = 0;
+	m_xres = 640;
+	m_yres = 480;
+	memset(m_vram, 0, VRAM_SIZE);
 }
 
 /***************************************************************************
 
-  Monochrome Display Adapter (MDA) section
+  Apple 4*8 Graphics Card section
 
 ***************************************************************************/
 
 static SCREEN_UPDATE( mac_48gc )
 {
 	nubus_48gc_device *card = downcast<nubus_48gc_device *>(screen->owner());
-	UINT32 *scanline;
+	UINT32 *scanline, *base;
 	int x, y;
 	UINT8 *vram8 = (UINT8 *)card->m_vram;
 	UINT8 pixels;
-//	UINT32 stride = card->m_registers[0xc/4]/4;
+
+	if (!card->m_vbl_disable)
+	{
+		card->m_nubus->set_irq_line(card->m_slot, ASSERT_LINE);
+	}
 
 	vram8 += 0xa00;
 
-	for (y = 0; y < 480; y++)
+	switch (card->m_mode)
 	{
-		scanline = BITMAP_ADDR32(bitmap, y, 0);
-		for (x = 0; x < 640/8; x++)
-		{
-			pixels = vram8[(y * 0x50) + (BYTE4_XOR_BE(x))];
+		case 0:	// 1bpp
+			for (y = 0; y < card->m_yres; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				for (x = 0; x < card->m_xres/8; x++)
+				{
+					pixels = vram8[(y * card->m_stride) + (BYTE4_XOR_BE(x))];
 
-			*scanline++ = card->m_palette[pixels&0x80];
-			*scanline++ = card->m_palette[(pixels<<1)&0x80];
-			*scanline++ = card->m_palette[(pixels<<2)&0x80];
-			*scanline++ = card->m_palette[(pixels<<3)&0x80];
-			*scanline++ = card->m_palette[(pixels<<4)&0x80];
-			*scanline++ = card->m_palette[(pixels<<5)&0x80];
-			*scanline++ = card->m_palette[(pixels<<6)&0x80];
-			*scanline++ = card->m_palette[(pixels<<7)&0x80];
-		}
+					*scanline++ = card->m_palette[(pixels>>7)&1];
+					*scanline++ = card->m_palette[(pixels>>6)&1];
+					*scanline++ = card->m_palette[(pixels>>5)&1];
+					*scanline++ = card->m_palette[(pixels>>4)&1];
+					*scanline++ = card->m_palette[(pixels>>3)&1];
+					*scanline++ = card->m_palette[(pixels>>2)&1];
+					*scanline++ = card->m_palette[(pixels>>1)&1];
+					*scanline++ = card->m_palette[pixels&1];
+				}
+			}
+			break;
+
+		case 1:	// 2bpp
+			for (y = 0; y < card->m_yres; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				for (x = 0; x < card->m_xres/4; x++)
+				{
+					pixels = vram8[(y * card->m_stride) + (BYTE4_XOR_BE(x))];
+
+					*scanline++ = card->m_palette[(pixels>>6)&0x3];
+					*scanline++ = card->m_palette[(pixels>>4)&0x3];
+					*scanline++ = card->m_palette[(pixels>>2)&0x3];
+					*scanline++ = card->m_palette[pixels&3];
+				}
+			}
+			break;
+
+		case 2: // 4 bpp
+			for (y = 0; y < card->m_yres; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+
+				for (x = 0; x < card->m_xres/2; x++)
+				{
+					pixels = vram8[(y * card->m_stride) + (BYTE4_XOR_BE(x))];
+
+					*scanline++ = card->m_palette[(pixels>>4)&0xf];
+					*scanline++ = card->m_palette[pixels&0xf];
+				}
+			}
+			break;
+
+		case 3: // 8 bpp
+			for (y = 0; y < card->m_yres; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+
+				for (x = 0; x < card->m_xres; x++)
+				{
+					pixels = vram8[(y * card->m_stride) + (BYTE4_XOR_BE(x))];
+					*scanline++ = card->m_palette[pixels];
+				}
+			}
+			break;
+
+		case 4: // 24 bpp
+			for (y = 0; y < card->m_yres; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				base = (UINT32 *)&card->m_vram[y * card->m_stride];
+				for (x = 0; x < card->m_xres; x++)
+				{
+					*scanline++ = *base++;
+				}
+			}
+			break;
 	}
 
 	return 0;
@@ -145,18 +224,36 @@ static SCREEN_UPDATE( mac_48gc )
 
 WRITE32_MEMBER( nubus_48gc_device::mac_48gc_w )
 {
-	printf("48gc_w: %08x to %x, mask %08x\n", data, offset*4, mem_mask);
+//	printf("48gc_w: %08x to %x, mask %08x\n", data, offset*4, mem_mask);
 
 	COMBINE_DATA(&m_registers[offset&0xff]);
 
 	switch (offset)
 	{
-		case 0x80:	// DAC control
+		case 0x8/4:	// base
+//			printf("%x to base\n", data);
+			m_base = (data*2)<<4;
+			break;
+
+		case 0xc/4:	// stride
+//			printf("%x to stride\n", data);
+			// this value is in DWORDs for 1-8 bpp and, uhh, strange for 24bpp
+			if (m_mode < 4)
+			{
+				m_stride = data*4;
+			}
+			else
+			{
+				m_stride = (data*32)/3;
+			}
+			break;
+
+		case 0x200/4:	// DAC control
 			m_clutoffs = data>>24;
 			m_count = 0;
 			break;
 
-		case 0x81:	// DAC data
+		case 0x204/4:	// DAC data
 			m_colors[m_count++] = data>>24;
 
 			if (m_count == 3)
@@ -167,6 +264,30 @@ WRITE32_MEMBER( nubus_48gc_device::mac_48gc_w )
 			}
 			break;
 
+		case 0x208/4:	// mode control
+			m_mode = (data>>3)&3;
+			if (m_mode == 3)	// this can be 8 or 24 bpp
+			{
+				// check pixel format for 24bpp
+				if (((data>>5)&3) == 0)
+				{
+					m_mode = 4;	// 24bpp
+				}
+			}
+//			printf("%02x to mode (m_mode = %d)\n", data, m_mode);
+			break;
+
+		case 0x13c/4:	// bit 1 = VBL disable (1=no interrupts)
+			m_vbl_disable = (data & 2) ? 1 : 0;
+			break;
+
+		case 0x148/4:	// write 1 here to clear interrupt
+			if (data == 1)
+			{
+				m_nubus->set_irq_line(m_slot, CLEAR_LINE);
+			}
+			break;
+
 		default:
 			break;
 	}
@@ -174,12 +295,13 @@ WRITE32_MEMBER( nubus_48gc_device::mac_48gc_w )
 
 READ32_MEMBER( nubus_48gc_device::mac_48gc_r )
 {
-	printf("48gc_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, cpu_get_pc(machine().device("maincpu")));
+//	printf("48gc_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, cpu_get_pc(machine().device("maincpu")));
 
 	switch (offset)
 	{
 		case 0:
 			return 0x0c00;	// sense 13" RGB for now
+//			return 0x0000;	// sense "RGB Kong" monitor
 			break;
 
 		case 0x1c0/4:

@@ -168,10 +168,6 @@ VIDEO_RESET(macrbv);
 VIDEO_RESET(maceagle);
 VIDEO_RESET(macsonora);
 
-VIDEO_START( mac_cb264 );
-SCREEN_UPDATE( mac_cb264 );
-INTERRUPT_GEN( mac_cb264_vbl );
-
 /*----------- defined in audio/mac.c -----------*/
 
 DECLARE_LEGACY_SOUND_DEVICE(MAC_SOUND, mac_sound);
@@ -297,9 +293,6 @@ public:
     // this is shared among all video setups with vram
 	UINT32 *m_vram;
 
-	UINT32 m_cb264_mode, m_cb264_vbl_disable, m_cb264_toggle;
-	UINT32 m_cb264_palette[256], m_cb264_colors[3], m_cb264_count, m_cb264_clutoffs;
-
 	// Egret/Caboose/Cuda stuff
 	UINT8 m_egregs[0x20];
 
@@ -351,10 +344,6 @@ public:
 	DECLARE_READ32_MEMBER(mac_read_id);
 
 	DECLARE_READ16_MEMBER(mac_config_r);
-
-	DECLARE_READ32_MEMBER( mac_cb264_r );
-	DECLARE_WRITE32_MEMBER( mac_cb264_w );
-	DECLARE_WRITE32_MEMBER( mac_cb264_ramdac_w );
 
     DECLARE_READ32_MEMBER(biu_r);
     DECLARE_WRITE32_MEMBER(biu_w);

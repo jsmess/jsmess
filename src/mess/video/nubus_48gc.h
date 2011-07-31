@@ -10,7 +10,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> nubus_mda_device
+// ======================> nubus_48gc_device
 
 class nubus_48gc_device :
 		public device_t,
@@ -36,9 +36,10 @@ protected:
 
 public:
         UINT8  *m_vram;
-        UINT32 m_mode, m_vbl_disable, m_toggle;
+        UINT32 m_mode, m_vbl_disable, m_toggle, m_stride, m_base;
         UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
         UINT32 m_registers[0x100];
+        int m_xres, m_yres;
 };
 
 
