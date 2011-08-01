@@ -68,11 +68,12 @@ READ16_HANDLER( cybiko_lcd_r );
 WRITE16_HANDLER( cybiko_lcd_w );
 
 // key read
-READ16_HANDLER( cybiko_key_r );
+READ16_HANDLER( cybikov1_key_r );
+READ16_HANDLER( cybikov2_key_r );
+READ16_HANDLER( cybikoxt_key_r );
 
-// unknown
-WRITE16_HANDLER( cybiko_unk1_w );
-READ16_HANDLER( cybiko_unk2_r );
+// usb
+WRITE16_HANDLER( cybiko_usb_w );
 
 // onchip registers read/write
 READ8_HANDLER( cybikov1_io_reg_r );
