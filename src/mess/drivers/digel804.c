@@ -7,9 +7,11 @@
 *  DONE:
 *  figure out z80 address space and hook up roms and rams (done)
 *  figure out where 10937 vfd controller lives (port 0x44 bits 7 and 0)
-*  figure out how keypresses are detected (/INT and port 0x43)
+*  figure out how keypresses are detected (/INT, port 0x43, and port 0x46)
 *  tentatively figure out how flow control from ACIA works (/NMI)?
 *  hook up the speaker/beeper (port 0x45)
+*  hook up vfd controller (done to stderr, no artwork)
+*  hook up leds on front panel (done to stderr)
 *
 *  TODO:
 *  figure out the rest of the i/o map
@@ -18,7 +20,7 @@
 *  hook up r6551 serial and attach terminal to it
 *  correctly hook up 10937 vfd controller
 *  hook up keypad and mode buttons
-*  hook up leds on front panel
+
 *  artwork
 *
 ******************************************************************************/
@@ -49,7 +51,9 @@ public:
 	DECLARE_WRITE8_MEMBER( port_43_w );
 	DECLARE_READ8_MEMBER( port_43_r );
 	DECLARE_WRITE8_MEMBER( port_44_w );
-	DECLARE_WRITE8_MEMBER( port_45_w );
+	DECLARE_WRITE8_MEMBER( speaker_w );
+	DECLARE_WRITE8_MEMBER( led_control_w );
+	DECLARE_READ8_MEMBER( keypad_r );
 	// return for port 43 (mode/status reg)
 	UINT8 port43_rtn;
 	// vfd helper stuff for port 44, should be unnecessary after 10937 gets a proper device
@@ -88,11 +92,11 @@ static MACHINE_RESET( digel804 )
 
 READ8_MEMBER( digel804_state::port_43_r )
 {
-	/* Register 0x43:
+	/* Register 0x43: status/mode register
 	 bits 76543210
 	      |||||||\- unknown, always 0?
 	      ||||||\-- unknown, always 1?
-	      |||||\--- any key pressed on keypad (0 = one or more pressed, 1 = none pressed)
+	      |||||\--- any key pressed on keypad (0 = one or more pressed, 1 = none pressed) * if upper byte is 0xF and this bit is set, unit is about to turn off
 	      |||\\---- mode selected? (01 = key, 10 = remote, 11 = sim)
 	      ||\------ ram enable for internal use? (not sure, clear in sim mode)
 	      |\------- power failure status (1 = power has failed, 0 = ok)
@@ -109,10 +113,13 @@ READ8_MEMBER( digel804_state::port_43_r )
 	 in sim mode:
 	 0x9E 10011110 when no keypad key pressed
 	 0x9A 10011010 when keypad key pressed
+	 in off mode (before z80 is powered down):
+	 0xFE 11111110
+	 
 	*/
 	// HACK to dump display contents to stderr
 	fprintf(stderr,"%s\n",ROC10937_get_string(0));
-	logerror("Digel804: returning %02X for port 43 read\n", port43_rtn);
+	logerror("Digel804: returning %02X for port 43 status read\n", port43_rtn);
 	return port43_rtn;
 }
 
@@ -121,10 +128,20 @@ WRITE8_MEMBER( digel804_state::port_43_w )
 	//m_ram_bank = data&7;
 	//digel804_set_ram_bank( machine() );
 	//memory_set_bankptr( machine(), "bankedram", machine().region("user_ram")->base() + ( m_ram_bank * 0x10000 ));
+	logerror("Digel804: port 0x43 unknown had %02x written to it!\n", data);
 }
 
 WRITE8_MEMBER( digel804_state::port_44_w )
 {
+	/* writes to 0x44 control the 10937 vfd chip
+	 * bits:76543210
+	 *      |||||||\- VFD chip clock
+	 *      ||||||\-- unknown, always 1?
+	 *      |\\\\\--- unknown, always 0?
+	 *      \-------- VFD chip data
+	 */
+	if (data%0x7E != 0x02)
+		logerror("Digel804: port 0x44 vfd control had %02x written to it!\n", data);
 	// latch vfd data on falling edge of clock only; this should really be part of the 10937 device, not here!
 	if ((vfd_old&1) && ((data&1)==0))
 	{
@@ -142,11 +159,47 @@ WRITE8_MEMBER( digel804_state::port_44_w )
 	vfd_old = data;
 }
 
-WRITE8_MEMBER( digel804_state::port_45_w )
+WRITE8_MEMBER( digel804_state::speaker_w )
 {
-	// it APPEARS all writes here invert the speaker state
+	// it APPEARS all writes here invert the speaker state, but not certain!
+	if ((data != 0x00) && (data != 0x01))
+		logerror("Digel804: port 0x45 speaker control had %02x written to it!\n", data);
 	speaker_state ^= 0xFF;
 	speaker_level_w(m_speaker, speaker_state);
+}
+
+WRITE8_MEMBER( digel804_state::led_control_w )
+{
+	/* writes to 0x46 control the LEDS on the front panel
+	 * bits:76543210
+	 *      ||||\\\\- these four bits choose which of the 16 function leds is lit; the number is INVERTED first
+	 *      |||\----- if this bit is 1, the function leds are disabled
+	 *      ||\------ this bit controls the 'error' led; 1 = on
+	 *      |\------- this bit controls the 'busy' led; 1 = on
+	 *      \-------- this bit controls the 'input' led; 1 = on
+	 */
+	 logerror("Digel804: port 0x46 LED control had %02x written to it!\n", data);
+	 fprintf(stderr,"LEDS: ");
+	 if (data&0x80) fprintf(stderr,"INPUT "); else fprintf(stderr,"----- ");
+	 if (data&0x40) fprintf(stderr,"BUSY "); else fprintf(stderr,"---- ");
+	 if (data&0x20) fprintf(stderr,"ERROR "); else fprintf(stderr,"----- ");
+	 fprintf(stderr,"  function selected: ");
+	 if (data&0x10) fprintf(stderr,"none\n"); else fprintf(stderr,"%01X\n", ~data&0xF);
+}
+
+READ8_MEMBER( digel804_state::keypad_r )
+{
+	/* reads E* for a keypad number 0-F
+	 * reads F0 for enter
+	 * reads F4 for next
+	 * reads F8 for rept
+	 * reads FC for clear
+	 * F* takes precedence over E*
+	 * higher numbers take precedence over lower ones
+	 * this value auto-latches on a key press and remains through multiple reads
+	*/
+	logerror("Digel804: returning 0xF0 for port 46 keypad read\n");
+	return 0xF0; // enter
 }
 
 /******************************************************************************
@@ -184,11 +237,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(z80_io, AS_IO, 8, digel804_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x42, 0x42) AM_WRITE // gets 00 written to it
-	AM_RANGE(0x43, 0x43) AM_READWRITE(port_43_r, port_43_w) // mode and status register, also checks if keypad is pressed
-	AM_RANGE(0x44, 0x44) AM_WRITE(port_44_w) // 10937 vfd controller clock on d0, data on d8; other bits unknown
-	AM_RANGE(0x45, 0x45) AM_WRITE(port_45_w) // speaker bit; every write inverts state
-	//AM_RANGE(0x46, 0x46) AM_WRITE // gets 50 or 30 written to it
+	//AM_RANGE(0x40, 0x40) AM_WRITE // W, unknown
+	//AM_RANGE(0x41, 0x41) AM_WRITE // W, unknown
+	//AM_RANGE(0x42, 0x42) AM_WRITE // W, gets 00 written to it
+	AM_RANGE(0x43, 0x43) AM_READWRITE(port_43_r, port_43_w) // RW, mode and status register, also checks if keypad is pressed
+	AM_RANGE(0x44, 0x44) AM_WRITE(port_44_w) // W, 10937 vfd controller clock on d0, data on d8; other bits unknown
+	AM_RANGE(0x45, 0x45) AM_WRITE(speaker_w) // W, speaker bit; every write inverts state
+	AM_RANGE(0x46, 0x46) AM_READWRITE(keypad_r, led_control_w) // RW, reads keypad, writes controls the front panel leds.
 	//AM_RANGE(0x47, 0x47) AM_WRITE // gets 00 written to it
 	//AM_RANGE(0x83, 0x83) AM_WRITE // may be acia?
 ADDRESS_MAP_END
