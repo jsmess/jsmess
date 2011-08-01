@@ -1,0 +1,177 @@
+/***************************************************************************
+
+  Viking 1024x768 fixed-resolution monochrome board
+ 
+  Apparently incompatible with System 7.0 and later(!)
+ 
+***************************************************************************/
+
+#include "emu.h"
+#include "video/nubus_vikbw.h"
+
+#define VIKBW_SCREEN_NAME	"vikbw_screen"
+#define VIKBW_ROM_REGION   	"vikbw_rom"
+
+#define VRAM_SIZE	(0x18000)  // 1024x768 @ 1bpp is 98,304 bytes (0x18000)
+
+static SCREEN_UPDATE( vikbw );
+
+MACHINE_CONFIG_FRAGMENT( vikbw )
+	MCFG_SCREEN_ADD( VIKBW_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_UPDATE(vikbw)
+	MCFG_SCREEN_SIZE(1024,768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
+	MCFG_SCREEN_REFRESH_RATE(70)
+MACHINE_CONFIG_END
+
+ROM_START( vikbw )
+	ROM_REGION(0x2000, VIKBW_ROM_REGION, 0)
+	ROM_LOAD( "viking.bin",   0x000000, 0x002000, CRC(92cf04d1) SHA1(d08349edfc82a0bd5ea848e053e1712092308f74) ) 
+ROM_END
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+const device_type NUBUS_VIKBW = &device_creator<nubus_vikbw_device>;
+
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor nubus_vikbw_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( vikbw );
+}
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *nubus_vikbw_device::device_rom_region() const
+{
+	return ROM_NAME( vikbw );
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  nubus_vikbw_device - constructor
+//-------------------------------------------------
+
+nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, NUBUS_VIKBW, "NUBUS_VIKBW", tag, owner, clock),
+		device_nubus_card_interface(mconfig, *this),
+		device_slot_card_interface(mconfig, *this)
+{
+	m_shortname = "nb_vikbw";
+}
+
+nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, type, name, tag, owner, clock),
+		device_nubus_card_interface(mconfig, *this),
+		device_slot_card_interface(mconfig, *this)
+{
+	m_shortname = "nb_vikbw";
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void nubus_vikbw_device::device_start()
+{
+	UINT32 slotspace;
+
+	// set_nubus_device makes m_slot valid
+	set_nubus_device();
+	install_declaration_rom(this, VIKBW_ROM_REGION);
+
+	slotspace = get_slotspace();
+
+//	printf("[vikbw %p] slotspace = %x\n", this, slotspace);
+
+	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
+	install_bank(slotspace, slotspace+VRAM_SIZE-1, 0, 0, "bank_vikbw1", m_vram);
+	install_bank(slotspace+0x40000, slotspace+0x40000+VRAM_SIZE-1, 0, 0, "bank_vikbw", m_vram);
+
+	m_nubus->install_device(slotspace+0x40000+VRAM_SIZE, slotspace+0x40000+VRAM_SIZE+0x3ffff, read32_delegate(FUNC(nubus_vikbw_device::viking_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_w), this));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void nubus_vikbw_device::device_reset()
+{
+	m_vbl_disable = 1;
+	memset(m_vram, 0, VRAM_SIZE);
+
+	m_palette[0] = MAKE_RGB(255, 255, 255);
+	m_palette[1] = MAKE_RGB(0, 0, 0);
+}
+
+/***************************************************************************
+
+  Viking 1024x768 B&W card section
+
+***************************************************************************/
+
+static SCREEN_UPDATE( vikbw )
+{
+	UINT32 *scanline;
+	int x, y;
+	nubus_vikbw_device *card = downcast<nubus_vikbw_device *>(screen->owner());
+	UINT8 pixels;
+
+	if (!card->m_vbl_disable)
+	{
+		card->m_nubus->set_irq_line(card->m_slot, ASSERT_LINE);
+	}
+
+	for (y = 0; y < 768; y++)
+	{
+		scanline = BITMAP_ADDR32(bitmap, y, 0);
+		for (x = 0; x < 1024/8; x++)
+		{
+			pixels = card->m_vram[(y * 128) + (BYTE4_XOR_BE(x))];
+
+			*scanline++ = card->m_palette[(pixels>>7)&1];
+			*scanline++ = card->m_palette[(pixels>>6)&1];
+			*scanline++ = card->m_palette[(pixels>>5)&1];
+			*scanline++ = card->m_palette[(pixels>>4)&1];
+			*scanline++ = card->m_palette[(pixels>>3)&1];
+			*scanline++ = card->m_palette[(pixels>>2)&1];
+			*scanline++ = card->m_palette[(pixels>>1)&1];
+			*scanline++ = card->m_palette[(pixels&1)];
+		}
+	}
+
+	return 0;
+}
+
+WRITE32_MEMBER( nubus_vikbw_device::viking_w )
+{
+//	printf("viking_w: %08x @ %x (mask %08x)\n", data, offset, mem_mask);
+
+	if (offset == 0 && data == 0)
+	{
+		m_vbl_disable = 0;
+	}
+	else if (offset == 0xa000)
+	{
+		m_nubus->set_irq_line(m_slot, CLEAR_LINE);
+	}
+}
+
+READ32_MEMBER( nubus_vikbw_device::viking_r )
+{
+//	printf("viking_r: @ %x (mask %08x)\n", offset, mem_mask);
+	return 0;
+}
+
