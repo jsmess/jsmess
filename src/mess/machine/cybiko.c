@@ -25,6 +25,8 @@
 #define LOG_LEVEL  1
 #define _logerror(level,x)  do { if (LOG_LEVEL > level) logerror x; } while (0)
 
+#define RAMDISK_SIZE (512 * 1024)
+
 /////////////////////////
 // FUNCTION PROTOTYPES //
 /////////////////////////
@@ -181,14 +183,36 @@ static void cybiko_sst39vfx_save(running_machine &machine, emu_file *file)
 
 static void cybiko_ramdisk_load(running_machine &machine, emu_file *file)
 {
-	void *ptr = ram_get_ptr(machine.device(RAM_TAG));
-	file->read( ptr, 512 * 1024);
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	#ifdef LSB_FIRST
+	UINT8 *temp = (UINT8*)malloc( RAMDISK_SIZE);
+	file->read( temp, RAMDISK_SIZE);
+	for (int i = 0; i < RAMDISK_SIZE; i += 2)
+	{
+		ram[i+0] = temp[i+1];
+		ram[i+1] = temp[i+0];
+	}
+	free( temp);
+	#else
+	file->read( ram, RAMDISK_SIZE);
+	#endif
 }
 
 static void cybiko_ramdisk_save(running_machine &machine, emu_file *file)
 {
-	void *ptr = ram_get_ptr(machine.device(RAM_TAG));
-	file->write( ptr, 512 * 1024);
+	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	#ifdef LSB_FIRST
+	UINT8 *temp = (UINT8*)malloc( RAMDISK_SIZE);
+	for (int i = 0; i < RAMDISK_SIZE; i += 2)
+	{
+		temp[i+0] = ram[i+1];
+		temp[i+1] = ram[i+0];
+	}
+	file->write( temp, RAMDISK_SIZE);
+	free( temp);
+	#else
+	file->write( ram, RAMDISK_SIZE);
+	#endif
 }
 
 MACHINE_START( cybikov1 )
