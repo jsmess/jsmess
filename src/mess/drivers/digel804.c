@@ -140,7 +140,7 @@ WRITE8_MEMBER( digel804_state::port_44_w )
 	 *      |\\\\\--- unknown, always 0?
 	 *      \-------- VFD chip data
 	 */
-	if (data&0x7E != 0x02)
+	if ((data&0x7E) != 0x02)
 		logerror("Digel804: port 0x44 vfd control had %02x written to it!\n", data);
 	// latch vfd data on falling edge of clock only; this should really be part of the 10937 device, not here!
 	if ((vfd_old&1) && ((data&1)==0))
