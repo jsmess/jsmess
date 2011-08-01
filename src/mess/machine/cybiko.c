@@ -179,6 +179,18 @@ static void cybiko_sst39vfx_save(running_machine &machine, emu_file *file)
 	sst39vfx_save(device, file);
 }
 
+static void cybiko_ramdisk_load(running_machine &machine, emu_file *file)
+{
+	void *ptr = ram_get_ptr(machine.device(RAM_TAG));
+	file->read( ptr, 512 * 1024);
+}
+
+static void cybiko_ramdisk_save(running_machine &machine, emu_file *file)
+{
+	void *ptr = ram_get_ptr(machine.device(RAM_TAG));
+	file->write( ptr, 512 * 1024);
+}
+
 MACHINE_START( cybikov1 )
 {
 	_logerror( 0, ("machine_start_cybikov1\n"));
@@ -219,6 +231,8 @@ MACHINE_START( cybikoxt )
 	// multi-purpose flash
 	nvram_system_load( machine, "flash2", cybiko_sst39vfx_load, 1);
 	memory_set_bankptr( machine, "bank2", sst39vfx_get_base(flash2));
+	// ramdisk
+	nvram_system_load( machine, "ramdisk", cybiko_ramdisk_load, 0);
 	// serial port
 	cybiko_rs232_init(machine);
 	// other
@@ -282,6 +296,8 @@ MACHINE_STOP( cybikoxt )
 	nvram_system_save( machine, "rtc", cybiko_pcf8593_save);
 	// multi-purpose flash
 	nvram_system_save( machine, "flash2", cybiko_sst39vfx_save);
+	// ramdisk
+	nvram_system_save( machine, "ramdisk", cybiko_ramdisk_save);
 	// serial port
 	cybiko_rs232_exit();
 }
