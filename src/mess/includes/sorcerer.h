@@ -46,15 +46,18 @@ class sorcerer_state : public driver_device
 public:
 	sorcerer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_cass1(*this, CASSETTE_TAG),
-		  m_cass2(*this, CASSETTE2_TAG),
-		  m_wave1(*this, WAVE_TAG),
-		  m_wave2(*this, WAVE2_TAG),
-		  m_dac(*this, "dac"),
-		  m_uart(*this, "uart"),
-		  m_printer(*this, "centronics"),
-		  m_ram(*this, RAM_TAG)
+	m_maincpu(*this, "maincpu"),
+	m_cass1(*this, CASSETTE_TAG),
+	m_cass2(*this, CASSETTE2_TAG),
+	m_wave1(*this, WAVE_TAG),
+	m_wave2(*this, WAVE2_TAG),
+	m_dac(*this, "dac"),
+	m_uart(*this, "uart"),
+	m_printer(*this, "centronics"),
+#if SORCERER_USING_DISKS
+	m_fdc(*this, "fdc"),
+#endif
+	m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -65,6 +68,9 @@ public:
 	required_device<device_t> m_dac;
 	required_device<device_t> m_uart;
 	required_device<device_t> m_printer;
+#if SORCERER_USING_DISKS
+	optional_device<device_t> m_fdc;
+#endif
 	required_device<device_t> m_ram;
 	DECLARE_READ8_MEMBER(sorcerer_fc_r);
 	DECLARE_READ8_MEMBER(sorcerer_fd_r);

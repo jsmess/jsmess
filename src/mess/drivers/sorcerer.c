@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( sorcerer_mem, AS_PROGRAM, 8, sorcerer_state)
 #if SORCERER_USING_DISKS
 	AM_RANGE(0x0800, 0xbbff) AM_RAM
 	AM_RANGE(0xbc00, 0xbcff) AM_ROM //micropolis boot code
-	AM_RANGE(0xbe00, 0xbe03) //micropolis memory-mapped disk controller
+	AM_RANGE(0xbe00, 0xbe03) AM_DEVREADWRITE_LEGACY("fdc", micropolis_r, micropolis_w)
 #else
 	AM_RANGE(0x0800, 0xbfff) AM_RAM
 #endif
@@ -460,7 +460,7 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
 
 #if SORCERER_USING_DISKS
-	MCFG_MICROPOLIS_ADD("micropolis", default_micropolis_interface ) // custom micropolis controller
+	MCFG_MICROPOLIS_ADD("fdc", default_micropolis_interface )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
 #endif
 MACHINE_CONFIG_END
@@ -486,9 +486,9 @@ ROM_START(sorcerer)
 	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
 	ROM_CART_LOAD("cart", 0xc000, 0x2000, ROM_OPTIONAL)
 
-	ROM_REGION( 0x10000, "proms", 0 )
+	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD_OPTIONAL("bruce.dat",   0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1)) /* video prom */
-	ROM_LOAD_OPTIONAL("diskboot.dat",0xbc00, 0x0100, BAD_DUMP CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b))
+	ROM_LOAD_OPTIONAL("diskboot.dat",0x0100, 0x0100, CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b))
 ROM_END
 
 /*   YEAR  NAME      PARENT  COMPAT    MACHINE   INPUT     INIT        COMPANY     FULLNAME */
