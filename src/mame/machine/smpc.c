@@ -690,7 +690,7 @@ WRITE8_HANDLER( saturn_SMPC_w )
 					timing = 200;
 
 				if(state->m_smpc_ram[3] & 8) // peripheral data
-					timing = 1500;
+					timing = 15000;
 
 				space->machine().scheduler().timer_set(attotime::from_usec(timing), FUNC(smpc_intback),0); //TODO: is variable time correct
 				break;
