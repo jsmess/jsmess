@@ -11,7 +11,6 @@
     TODO:
 
 	- adjust mouse speed
-	- V2 keyboard error
 	- V3 VDU check goes crazy
 
 */
@@ -58,6 +57,7 @@ READ8_MEMBER( pc1512_state::system_r )
 		{
 			data = m_kbd;
 			m_kb_bits = 0;
+			m_kb->data_w(1);
 			pic8259_ir1_w(m_pic, CLEAR_LINE);
 		}
 		break;
@@ -126,7 +126,7 @@ WRITE8_MEMBER( pc1512_state::system_w )
 		m_speaker_drive = BIT(data, 1);
 		update_speaker();
 
-		m_kb->data_w(BIT(data, 6));
+		m_kb->clock_w(BIT(data, 6));
 		break;
 
 	case 4:
@@ -327,7 +327,22 @@ READ8_MEMBER( pc1512_state::printer_r )
 		break;
 
 	case 2:
-		data = m_printer_control;
+		/*
+
+            bit     description
+
+            0       Data Strobe
+            1       Select Auto Feed
+            2       Reset Printer
+            3       Select Printer
+            4       Enable Int on ACK
+            5		1
+            6
+            7
+
+        */
+
+		data = m_printer_control | 0x20;
 		break;
 	}
 
@@ -358,13 +373,13 @@ WRITE8_MEMBER( pc1512_state::printer_w )
             2       Reset Printer
             3       Select Printer
             4       Enable Int on ACK
-            5
+            5		
             6
             7
 
         */
 
-		m_printer_control = data;
+		m_printer_control = data & 0x1f;
 
 		centronics_strobe_w(m_centronics, BIT(data, 0));
 		centronics_autofeed_w(m_centronics, BIT(data, 1));
@@ -480,7 +495,7 @@ static ADDRESS_MAP_START( pc1512_io, AS_IO, 16, pc1512_state )
 	AM_RANGE(0x020, 0x021) AM_DEVREADWRITE8_LEGACY(I8259A2_TAG, pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x040, 0x043) AM_DEVREADWRITE8_LEGACY(I8253_TAG, pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x060, 0x06f) AM_READWRITE8(system_r, system_w, 0xffff)
-	AM_RANGE(0x070, 0x071) AM_DEVREADWRITE8(MC146818_TAG, mc146818_device, read, write, 0xffff)
+	AM_RANGE(0x070, 0x071) AM_MIRROR(0x02) AM_DEVREADWRITE8(MC146818_TAG, mc146818_device, read, write, 0xffff)
 	AM_RANGE(0x078, 0x07f) AM_READWRITE8(mouse_r, mouse_w, 0xffff)
 	AM_RANGE(0x080, 0x083) AM_WRITE8(dma_page_w, 0xffff)
 	AM_RANGE(0x0a0, 0x0a1) AM_WRITE8(nmi_mask_w, 0xff00)
@@ -608,7 +623,7 @@ WRITE_LINE_MEMBER( pc1512_state::kbdata_w )
 
 WRITE_LINE_MEMBER( pc1512_state::kbclk_w )
 {
-	if (m_kbclk && !state)
+	if (!BIT(m_port61, 7) && m_kbclk && !state)
 	{
 		m_kbd <<= 1;
 		m_kbd |= m_kbdata;
@@ -616,6 +631,7 @@ WRITE_LINE_MEMBER( pc1512_state::kbclk_w )
 
 		if (m_kb_bits == 8)
 		{
+			m_kb->data_w(0);
 			pic8259_ir1_w(m_pic, ASSERT_LINE);
 		}
 	}
@@ -1012,6 +1028,8 @@ void pc1512_state::machine_reset()
 	m_vdu_rdsel = 0;
 	m_vdu_plane = 0x0f;
 	m_vdu_border = 0;
+	
+	m_kb->clock_w(0);
 }
 
 

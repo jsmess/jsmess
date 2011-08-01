@@ -255,7 +255,7 @@ ioport_constructor pc1512_keyboard_device::device_input_ports() const
 pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, PC1512_KEYBOARD, "Amstrad PC1512 Keyboard", tag, owner, clock),
 	  m_maincpu(*this, I8048_TAG),
-	  m_data_in(0),
+	  m_data_in(1),
 	  m_clock_in(1),
 	  m_kb_y(0xffff),
 	  m_joy_com(1),
@@ -271,6 +271,9 @@ pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, co
 
 void pc1512_keyboard_device::device_start()
 {
+	// allocate timers
+	m_reset_timer = timer_alloc();
+	
 	// resolve callbacks
     m_out_data_func.resolve(m_out_data_cb, *this);
     m_out_clock_func.resolve(m_out_clock_cb, *this);
@@ -296,6 +299,19 @@ void pc1512_keyboard_device::device_reset()
 
 
 //-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void pc1512_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (!m_clock_in)
+	{
+		device_set_input_line(m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
+	}
+}
+
+
+//-------------------------------------------------
 //  data_w - keyboard data input
 //-------------------------------------------------
 
@@ -311,6 +327,18 @@ WRITE_LINE_MEMBER( pc1512_keyboard_device::data_w )
 
 WRITE_LINE_MEMBER( pc1512_keyboard_device::clock_w )
 {
+	if (m_clock_in != state)
+	{
+		if (!state)
+		{
+			m_reset_timer->adjust(attotime::from_msec(10));	
+		}
+		else
+		{
+			device_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
+		}
+	}
+	
 	m_clock_in = state;
 }
 
