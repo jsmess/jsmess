@@ -6,26 +6,31 @@
 *
 *  DONE:
 *  figure out z80 address space and hook up roms and rams (done)
-*  figure out where 10937 vfd controller lives (port 0x44 bits 7 and 0)
+*  figure out where 10937 vfd controller lives (port 0x44 bits 7 and 0, POR has not been found yet)
 *  figure out how keypresses are detected (/INT, port 0x43, and port 0x46)
+*  figure out how the banked ram works on fw4.x (writes to port 0x43 select a ram bank)
 *  tentatively figure out how flow control from ACIA works (/NMI)?
 *  hook up the speaker/beeper (port 0x45)
 *  hook up vfd controller (done to stderr, no artwork)
 *  hook up leds on front panel (done to stderr)
+*  hook up r6551 serial
 *
 *  TODO:
 *  figure out the rest of the i/o map
-*  figure out how the banked ram works on fw4.x
+*  figure out why banked ram on 4.x causes glitches/sys errors; it works on 2.2
 *  actually hook up interrupts and nmi
-*  hook up r6551 serial and attach terminal to it
+*  attach terminal to 6551 serial
 *  correctly hook up 10937 vfd controller
 *  hook up keypad and mode buttons
-
 *  artwork
 *
 ******************************************************************************/
 
 #define ADDRESS_MAP_MODERN
+
+#define VFD_SERIAL_VERBOSE 1
+#undef VFD_VERBOSE
+#undef LED_VERBOSE
 
 /* Core includes */
 #include "emu.h"
@@ -33,6 +38,7 @@
 #include "machine/terminal.h"
 #include "sound/speaker.h"
 #include "machine/roc10937.h"
+#include "machine/6551.h"
 
 
 class digel804_state : public driver_device
@@ -42,18 +48,28 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_terminal(*this, TERMINAL_TAG),
-		  m_speaker(*this, "speaker")
+		  m_speaker(*this, "speaker"),
+		  m_acia(*this, "acia")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_terminal;
 	required_device<device_t> m_speaker;
+	required_device<device_t> m_acia;
 	DECLARE_WRITE8_MEMBER( port_43_w );
 	DECLARE_READ8_MEMBER( port_43_r );
 	DECLARE_WRITE8_MEMBER( port_44_w );
 	DECLARE_WRITE8_MEMBER( speaker_w );
 	DECLARE_WRITE8_MEMBER( led_control_w );
 	DECLARE_READ8_MEMBER( keypad_r );
+	DECLARE_READ8_MEMBER( acia_rxd_r );
+	DECLARE_WRITE8_MEMBER( acia_txd_w );
+	DECLARE_READ8_MEMBER( acia_status_r );
+	DECLARE_WRITE8_MEMBER( acia_reset_w );
+	DECLARE_READ8_MEMBER( acia_command_r );
+	DECLARE_WRITE8_MEMBER( acia_command_w );
+	DECLARE_READ8_MEMBER( acia_control_r );
+	DECLARE_WRITE8_MEMBER( acia_control_w );
 	// return for port 43 (mode/status reg)
 	UINT8 port43_rtn;
 	// vfd helper stuff for port 44, should be unnecessary after 10937 gets a proper device
@@ -63,6 +79,7 @@ public:
 	// current speaker state for port 45
 	UINT8 speaker_state;
 	// ram stuff for future banking
+	UINT8 m_ram_bank;
 	UINT8 *m_main_ram;
 };
 
@@ -78,9 +95,9 @@ static DRIVER_INIT( digel804 )
 	ROC10937_init(0,0,0); // TODO: replace this with a proper device
 	state->vfd_old = state->vfd_data = state->vfd_count = 0;
 	state->speaker_state = 0;
-	state->port43_rtn = 0xEE;
-	//state->m_ram_bank = 0;
-	//memory_set_bankptr( machine, "bankedram", machine.region("user_ram")->base() + ( state->m_ram_bank * 0x10000 ));
+	state->port43_rtn = 0xEE;//0xB6;
+	state->m_ram_bank = 0;
+	memory_set_bankptr( machine, "bankedram", machine.region("user_ram")->base() + ( state->m_ram_bank * 0x10000 ));
 }
 
 static MACHINE_RESET( digel804 )
@@ -92,15 +109,16 @@ static MACHINE_RESET( digel804 )
 
 READ8_MEMBER( digel804_state::port_43_r )
 {
-	/* Register 0x43: status/mode register
+	/* Register 0x43: status/mode register read
 	 bits 76543210
-	      |||||||\- unknown, always 0?
-	      ||||||\-- unknown, always 1?
-	      |||||\--- any key pressed on keypad (0 = one or more pressed, 1 = none pressed) * if upper byte is 0xF and this bit is set, unit is about to turn off
-	      |||\\---- mode selected? (01 = key, 10 = remote, 11 = sim)
-	      ||\------ ram enable for internal use? (not sure, clear in sim mode)
+	      |||||||\- overload state (0 = not overloaded; 1 = overload detected, led on and power disconnected to ic)
+	      ||||||\-- unknown, always 1? may be acia related
+	      |||||\--- any key pressed on keypad (0 = one or more pressed, 1 = none pressed or unit is about to go to standby)
+	      ||||\---- remote mode selected (0 = selected, 1 = not) \
+	      |||\----- key mode selected (0 = selected, 1 = not)     > if all 3 of these are 1, unit is going to standby
+	      ||\------ sim mode selected (0 = selected, 1 = not)    /
 	      |\------- power failure status (1 = power has failed, 0 = ok)
-	      \-------- unknown, always 1?
+	      \-------- chip insert detect state (1 = no chip or cmos chip which ammeter cannot detect; 0 = nmos or detectable chip inserted)
 	 after power failure (in key mode):
 	 0xEE 11101110 when no keypad key pressed
 	 0xEA 11101010 when keypad key pressed
@@ -125,23 +143,29 @@ READ8_MEMBER( digel804_state::port_43_r )
 
 WRITE8_MEMBER( digel804_state::port_43_w )
 {
-	//m_ram_bank = data&7;
+	m_ram_bank = data&7;
 	//digel804_set_ram_bank( machine() );
-	//memory_set_bankptr( machine(), "bankedram", machine().region("user_ram")->base() + ( m_ram_bank * 0x10000 ));
-	logerror("Digel804: port 0x43 unknown had %02x written to it!\n", data);
+	memory_set_bankptr( machine(), "bankedram", machine().region("user_ram")->base() + ( m_ram_bank * 0x10000 ));
+	logerror("Digel804: port 0x43 ram bank had %02x written to it!\n", data);
 }
 
 WRITE8_MEMBER( digel804_state::port_44_w )
 {
-	/* writes to 0x44 control the 10937 vfd chip
+	/* writes to 0x44 control the 10937 vfd chip and z80 power and related stuff
 	 * bits:76543210
-	 *      |||||||\- VFD chip clock
-	 *      ||||||\-- unknown, always 1?
-	 *      |\\\\\--- unknown, always 0?
-	 *      \-------- VFD chip data
+	 *      |||||||\- 10937 VFDC '/SCK' serial clock
+	 *      ||||||\-- unknown, is sometimes written 1 and sometimes 0, purpose unclear. is NOT /RES for ACIA and is NOT apparently POR on the VFDC
+	 *      |||||\--- z80 and system power control (0 = power on, 1 = power off/standby)
+	 *      ||||\---- controls, somehow, the z80 /BUSRQ line (0 = idle/high, 1 = asserted/low)
+	 *      |||\----- unknown, always 0?
+	 *      ||\------ unknown, always 0?
+	 *      |\------- unknown, is sometimes written 1 but usually 0, purpose unclear, but implied to have something to do with eprom socket power
+	 *      \-------- 10937 VFDC 'DATA' serial data
+	 
 	 */
-	if ((data&0x7E) != 0x02)
-		logerror("Digel804: port 0x44 vfd control had %02x written to it!\n", data);
+#ifdef VFD_SERIAL_VERBOSE
+	logerror("Digel804: port 0x44 vfd control had %02x written to it!\n", data);
+#endif
 	// latch vfd data on falling edge of clock only; this should really be part of the 10937 device, not here!
 	if ((vfd_old&1) && ((data&1)==0))
 	{
@@ -150,7 +174,9 @@ WRITE8_MEMBER( digel804_state::port_44_w )
 		vfd_count++;
 		if (vfd_count == 8)
 		{
+#ifdef VFD_VERBOSE
 			logerror("Digel804: Full byte written to port 44 vfd: %02X '%c'\n", vfd_data, vfd_data);
+#endif
 			ROC10937_newdata(0,vfd_data);
 			vfd_data = 0;
 			vfd_count = 0;
@@ -162,7 +188,7 @@ WRITE8_MEMBER( digel804_state::port_44_w )
 WRITE8_MEMBER( digel804_state::speaker_w )
 {
 	// it APPEARS all writes here invert the speaker state, but not certain!
-	if ((data != 0x00) && (data != 0x01))
+	if ((data != 0x00) && (data != 0x01) && (data != 0x03))
 		logerror("Digel804: port 0x45 speaker control had %02x written to it!\n", data);
 	speaker_state ^= 0xFF;
 	speaker_level_w(m_speaker, speaker_state);
@@ -178,7 +204,9 @@ WRITE8_MEMBER( digel804_state::led_control_w )
 	 *      |\------- this bit controls the 'busy' led; 1 = on
 	 *      \-------- this bit controls the 'input' led; 1 = on
 	 */
+#ifdef LED_VERBOSE
 	 logerror("Digel804: port 0x46 LED control had %02x written to it!\n", data);
+#endif
 	 fprintf(stderr,"LEDS: ");
 	 if (data&0x80) fprintf(stderr,"INPUT "); else fprintf(stderr,"----- ");
 	 if (data&0x40) fprintf(stderr,"BUSY "); else fprintf(stderr,"---- ");
@@ -200,6 +228,47 @@ READ8_MEMBER( digel804_state::keypad_r )
 	*/
 	logerror("Digel804: returning 0xF0 for port 46 keypad read\n");
 	return 0xF0; // enter
+}
+
+/* ACIA Trampolines */
+READ8_MEMBER( digel804_state::acia_rxd_r )
+{
+	return acia_6551_r(m_acia, 0);
+}
+
+WRITE8_MEMBER( digel804_state::acia_txd_w )
+{
+	acia_6551_w(m_acia, 0, data);
+}
+
+READ8_MEMBER( digel804_state::acia_status_r )
+{
+	return acia_6551_r(m_acia, 1);
+}
+
+WRITE8_MEMBER( digel804_state::acia_reset_w )
+{
+	acia_6551_w(m_acia, 1, data);
+}
+
+READ8_MEMBER( digel804_state::acia_command_r )
+{
+	return acia_6551_r(m_acia, 2);
+}
+
+WRITE8_MEMBER( digel804_state::acia_command_w )
+{
+	acia_6551_w(m_acia, 2, data);
+}
+
+READ8_MEMBER( digel804_state::acia_control_r )
+{
+	return acia_6551_r(m_acia, 3);
+}
+
+WRITE8_MEMBER( digel804_state::acia_control_w )
+{
+	acia_6551_w(m_acia, 3, data);
 }
 
 /******************************************************************************
@@ -230,6 +299,7 @@ static ADDRESS_MAP_START(z80_mem_804_1_2, AS_PROGRAM, 8, digel804_state)
 	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(m_main_ram) // 7d in mapper = RAM O3 (6164)
 	AM_RANGE(0x4000,0xbfff) AM_RAMBANK("bankedram")
 	// c000-cfff is open bus in mapper, 7f
+	//AM_RANGE(0xc000, 0xc7ff) AM_RAM // hack for now to test, since sometimes it writes to c3ff
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM // 7e in mapper = RAM P3 (6116)
 	// d800-ffff is open bus in mapper, 7f
 ADDRESS_MAP_END
@@ -237,15 +307,28 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(z80_io, AS_IO, 8, digel804_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x40, 0x40) AM_WRITE // W, unknown
-	//AM_RANGE(0x41, 0x41) AM_WRITE // W, unknown
-	//AM_RANGE(0x42, 0x42) AM_WRITE // W, gets 00 written to it
-	AM_RANGE(0x43, 0x43) AM_READWRITE(port_43_r, port_43_w) // RW, mode and status register, also checks if keypad is pressed
-	AM_RANGE(0x44, 0x44) AM_WRITE(port_44_w) // W, 10937 vfd controller clock on d0, data on d8; other bits unknown
-	AM_RANGE(0x45, 0x45) AM_WRITE(speaker_w) // W, speaker bit; every write inverts state
-	AM_RANGE(0x46, 0x46) AM_READWRITE(keypad_r, led_control_w) // RW, reads keypad, writes controls the front panel leds.
-	//AM_RANGE(0x47, 0x47) AM_WRITE // gets 00 written to it
-	//AM_RANGE(0x83, 0x83) AM_WRITE // may be acia?
+	// io bits: x 1 x x x * * *
+	// writes to 47, 4e, 57, 5e, 67, 6e, 77, 7e, c7, ce, d7, de, e7, ee, f7, fe all go to 47, same with reads
+	//AM_RANGE(0x40, 0x40) AM_MIRROR(0xB8) AM_WRITE // W, unknown
+	//AM_RANGE(0x41, 0x41) AM_MIRROR(0xB8) AM_WRITE // W, unknown
+	//AM_RANGE(0x42, 0x42) AM_MIRROR(0xB8) AM_WRITE // W, gets 00 written to it
+	AM_RANGE(0x43, 0x43) AM_MIRROR(0xB8) AM_READWRITE(port_43_r, port_43_w) // RW, mode and status register, also checks if keypad is pressed; write is unknown
+	AM_RANGE(0x44, 0x44) AM_MIRROR(0xB8) AM_WRITE(port_44_w) // W, 10937 vfd controller and z80 power control reg
+	AM_RANGE(0x45, 0x45) AM_MIRROR(0xB8) AM_WRITE(speaker_w) // W, speaker bit; every write inverts state, values written are 00, 01, 03
+	AM_RANGE(0x46, 0x46) AM_MIRROR(0xB8) AM_READWRITE(keypad_r, led_control_w) // RW, reads keypad, writes controls the front panel leds.
+	//AM_RANGE(0x47, 0x47) AM_MIRROR(0xB8) AM_WRITE // W gets 00 written to it
+	// io bits: 1 0 x x x * * *
+	// writes to 80, 88, 90, 98, a0, a8, b0, b8 all go to 80, same with reads
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x38) AM_WRITE(acia_txd_w) // (ACIA xmit reg)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0x38) AM_READ(acia_rxd_r) // (ACIA rcv reg)
+	AM_RANGE(0x82, 0x82) AM_MIRROR(0x38) AM_WRITE(acia_reset_w) // (ACIA reset reg)
+	AM_RANGE(0x83, 0x83) AM_MIRROR(0x38) AM_READ(acia_status_r) // (ACIA status reg)
+	AM_RANGE(0x84, 0x84) AM_MIRROR(0x38) AM_WRITE(acia_command_w) // (ACIA command reg)
+	AM_RANGE(0x85, 0x85) AM_MIRROR(0x38) AM_READ(acia_command_r) // (ACIA command reg)
+	AM_RANGE(0x86, 0x86) AM_MIRROR(0x38) AM_WRITE(acia_control_w) // (ACIA control reg)
+	AM_RANGE(0x87, 0x87) AM_MIRROR(0x38) AM_READ(acia_control_r) // (ACIA control reg)*/
+	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE_LEGACY("acia", acia_6551_r, acia_6551_w) // this doesn't work since we lack an AM_SHIFT command
+	
 ADDRESS_MAP_END
 
 
@@ -277,6 +360,9 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, digel804_terminal_intf)
 
+	/* acia */
+	MCFG_ACIA6551_ADD("acia")
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -296,6 +382,9 @@ static MACHINE_CONFIG_START( ep804, digel804_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, digel804_terminal_intf)
+
+	/* acia */
+	MCFG_ACIA6551_ADD("acia")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
