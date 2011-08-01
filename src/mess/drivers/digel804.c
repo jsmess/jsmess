@@ -326,7 +326,7 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, digel804_state)
 	AM_RANGE(0x84, 0x84) AM_MIRROR(0x38) AM_WRITE(acia_command_w) // (ACIA command reg)
 	AM_RANGE(0x85, 0x85) AM_MIRROR(0x38) AM_READ(acia_command_r) // (ACIA command reg)
 	AM_RANGE(0x86, 0x86) AM_MIRROR(0x38) AM_WRITE(acia_control_w) // (ACIA control reg)
-	AM_RANGE(0x87, 0x87) AM_MIRROR(0x38) AM_READ(acia_control_r) // (ACIA control reg)*/
+	AM_RANGE(0x87, 0x87) AM_MIRROR(0x38) AM_READ(acia_control_r) // (ACIA control reg)
 	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE_LEGACY("acia", acia_6551_r, acia_6551_w) // this doesn't work since we lack an AM_SHIFT command
 	
 ADDRESS_MAP_END
