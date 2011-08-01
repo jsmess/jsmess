@@ -1256,7 +1256,7 @@ static void kc85_4_update_0x0c000(running_machine &machine)
 		/* CAOS rom takes priority */
 		LOG(("CAOS rom 0x0c000\n"));
 
-		memory_set_bankptr(machine, "bank5",machine.region("maincpu")->base() + 0x012000);
+		memory_set_bankptr(machine, "bank5",machine.region("caos")->base());
 		space->install_read_bank(0xc000, 0xdfff, "bank5");
 	}
 	else if (state->m_kc85_pio_data[0] & (1<<7))
@@ -1264,7 +1264,7 @@ static void kc85_4_update_0x0c000(running_machine &machine)
 		/* BASIC takes next priority */
         	LOG(("BASIC rom 0x0c000\n"));
 
-        memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() + 0x010000);
+        memory_set_bankptr(machine, "bank5", machine.region("basic")->base());
 		space->install_read_bank(0xc000, 0xdfff, "bank5");
 	}
 	else
@@ -1295,7 +1295,7 @@ static void kc85_4_update_0x0e000(running_machine &machine)
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
 		LOG(("CAOS rom 0x0e000\n"));
 		/* read will access the rom */
-		memory_set_bankptr(machine, "bank6",machine.region("maincpu")->base() + 0x013000);
+		memory_set_bankptr(machine, "bank6",machine.region("caos")->base() + 0x2000);
 		space->install_read_bank(0xe000, 0xffff,"bank6");
 	}
 	else
@@ -1407,7 +1407,7 @@ static void kc85_3_update_0x0c000(running_machine &machine)
 		/* BASIC takes next priority */
 		LOG(("BASIC rom 0x0c000\n"));
 
-		memory_set_bankptr(machine, "bank4", machine.region("maincpu")->base() + 0x010000);
+		memory_set_bankptr(machine, "bank4", machine.region("basic")->base());
 		space->install_read_bank(0xc000, 0xdfff, "bank4");
 	}
 	else
@@ -1429,7 +1429,7 @@ static void kc85_3_update_0x0e000(running_machine &machine)
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
 		LOG(("CAOS rom 0x0e000\n"));
 
-		memory_set_bankptr(machine, "bank5",machine.region("maincpu")->base() + 0x012000);
+		memory_set_bankptr(machine, "bank5",machine.region("caos")->base());
 		space->install_read_bank(0xe000, 0xffff, "bank5");
 	}
 	else
