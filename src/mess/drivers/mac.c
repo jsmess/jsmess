@@ -55,6 +55,7 @@
 #include "sound/cdda.h"
 #include "video/nubus_48gc.h"
 #include "video/nubus_cb264.h"
+#include "video/nubus_vikbw.h"
 #include "includes/mac.h"
 
 #define C7M	(7833600)
@@ -801,6 +802,7 @@ static const struct nbbus_interface nubus_intf =
 static SLOT_INTERFACE_START(mac_nubus_cards)
 	SLOT_INTERFACE("48gc", NUBUS_48GC)
 	SLOT_INTERFACE("cb264", NUBUS_CB264)
+	SLOT_INTERFACE("vikbw", NUBUS_VIKBW)
 SLOT_INTERFACE_END
 
 /***************************************************************************
