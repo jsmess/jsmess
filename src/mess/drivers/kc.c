@@ -284,7 +284,7 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", kc, "kcc", 0)
+	MCFG_QUICKLOAD_ADD("quickload", kc, "kcc", 1)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
