@@ -57,7 +57,7 @@ static int kc_load(device_image_interface &image, unsigned char **ptr)
 	if (datasize!=0)
 	{
 		/* malloc memory for this data */
-		data = (unsigned char *)malloc(datasize);
+		data = (unsigned char *)auto_alloc_array(image.device().machine(), unsigned char, datasize);
 
 		if (data!=NULL)
 		{
@@ -83,9 +83,10 @@ struct kcc_header
 	unsigned char	anzahl;
 	unsigned char	load_address_l;
 	unsigned char	load_address_h;
-	unsigned char	length_l;
-	unsigned char	length_h;
-	unsigned short	execution_address;
+	unsigned char	end_address_l;
+	unsigned char	end_address_h;
+	unsigned char	execution_address_l;
+	unsigned char	execution_address_h;
 	unsigned char	pad[128-2-2-2-1-16];
 };
 
@@ -100,18 +101,30 @@ QUICKLOAD_LOAD(kc)
 	struct kcc_header *header;
 	int addr;
 	int datasize;
+	int execution_address;
 	int i;
 
 	if (!kc_load(image, &data))
 		return IMAGE_INIT_FAIL;
 
 	header = (struct kcc_header *) data;
-	datasize = (header->length_l & 0x0ff) | ((header->length_h & 0x0ff)<<8);
-	datasize = datasize-128;
 	addr = (header->load_address_l & 0x0ff) | ((header->load_address_h & 0x0ff)<<8);
+	datasize = ((header->end_address_l & 0x0ff) | ((header->end_address_h & 0x0ff)<<8)) - addr;
+	execution_address = (header->execution_address_l & 0x0ff) | ((header->execution_address_h & 0x0ff)<<8);
+
+	if (datasize + 128 > image.length())
+	{
+		mame_printf_info("Invalid snapshot size: expected 0x%04x, found 0x%04x\n", datasize, (UINT32)image.length() - 128);
+		datasize = image.length() - 128;
+	}
 
 	for (i=0; i<datasize; i++)
 		ram_get_ptr(image.device().machine().device(RAM_TAG))[(addr+i) & 0x0ffff] = data[i+128];
+
+	auto_free(image.device().machine(), data);
+
+	logerror("Snapshot loaded at: 0x%04x-0x%04x, execution address: 0x%04x\n", addr, addr + datasize - 1, execution_address);
+
 	return IMAGE_INIT_PASS;
 }
 
