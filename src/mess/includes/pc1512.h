@@ -200,9 +200,30 @@ public:
 	int m_speaker_drive;
 };
 
+class pc1640_state : public pc1512_state
+{
+public:
+	pc1640_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc1512_state(mconfig, type, tag)
+	{ }
+
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER( video_ram_r );
+	DECLARE_WRITE8_MEMBER( video_ram_w );
+	DECLARE_READ8_MEMBER( printer_r );
+};
 
 // ---------- defined in video/pc1512.c ----------
 
 MACHINE_CONFIG_EXTERN( pc1512_video );
+
+// ---------- defined in video/pc1640.c ----------
+
+MACHINE_CONFIG_EXTERN( pc1640_video );
 
 #endif
