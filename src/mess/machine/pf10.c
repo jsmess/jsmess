@@ -81,7 +81,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( pf10 )
-	ROM_REGION(0x2000, "pf10", ROMREGION_LOADBYNAME)
+	ROM_REGION(0x2000, "pf10", 0)
 	ROM_LOAD("k3pf1.bin", 0x0000, 0x2000, CRC(eef4593a) SHA1(bb176e4baf938fe58c2d32f7c46d7bb7b0627755))
 ROM_END
 

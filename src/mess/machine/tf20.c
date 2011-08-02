@@ -315,7 +315,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( tf20 )
-	ROM_REGION(0x0800, "tf20", ROMREGION_LOADBYNAME)
+	ROM_REGION(0x0800, "tf20", 0)
 	ROM_LOAD("tfx.15e", 0x0000, 0x0800, CRC(af34f084) SHA1(c9bdf393f757ba5d8f838108ceb2b079be1d616e))
 ROM_END
 

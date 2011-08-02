@@ -589,7 +589,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( kb_keytr )
-	ROM_REGION(0x2000, "kb_keytr", ROMREGION_LOADBYNAME)
+	ROM_REGION(0x2000, "kb_keytr", 0)
 	ROM_LOAD("14166.bin", 0x0000, 0x2000, CRC(1aea1b53) SHA1(b75b6d4509036406052157bc34159f7039cdc72e))
 ROM_END
 

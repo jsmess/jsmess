@@ -31,7 +31,7 @@ MACHINE_CONFIG_END
 
 // rom definition for the 8042 internal rom
 ROM_START( at_keybc )
-	ROM_REGION(0x800, "at_keybc", ROMREGION_LOADBYNAME)
+	ROM_REGION(0x800, "at_keybc", 0)
 
 	// unknown controller bios, (c) 1985, 1986 PTL
 	ROM_LOAD("yan25d05.bin", 0x000, 0x800, CRC(70c798f1) SHA1(ae9a79c7184a17331b70a50035ff63c757df094c))
