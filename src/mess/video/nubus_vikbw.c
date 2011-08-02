@@ -4,6 +4,10 @@
  
   Apparently incompatible with System 7.0 and later(!)
  
+  VRAM from Fs040000 to Fs0517FF
+  Read from Fs000000 enables VBL, write to Fs000000 disables VBL
+  Write to Fs080000 acks VBL
+ 
 ***************************************************************************/
 
 #include "emu.h"
@@ -97,13 +101,13 @@ void nubus_vikbw_device::device_start()
 //	printf("[vikbw %p] slotspace = %x\n", this, slotspace);
 
 	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
-	install_bank(slotspace, slotspace+VRAM_SIZE-1, 0, 0, "bank_vikbw1", m_vram);
 	install_bank(slotspace+0x40000, slotspace+0x40000+VRAM_SIZE-1, 0, 0, "bank_vikbw", m_vram);
 
-	m_nubus->install_device(slotspace+0x40000+VRAM_SIZE, slotspace+0x40000+VRAM_SIZE+0x3ffff, read32_delegate(FUNC(nubus_vikbw_device::viking_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_w), this));
+	m_nubus->install_device(slotspace, slotspace+3, read32_delegate(FUNC(nubus_vikbw_device::viking_enable_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_disable_w), this));
+	m_nubus->install_device(slotspace+0x80000, slotspace+0x80000+3, read32_delegate(FUNC(nubus_vikbw_device::viking_ack_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_ack_w), this));
 }
 
-//-------------------------------------------------
+//-------------------------------------------------         
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
@@ -155,23 +159,24 @@ static SCREEN_UPDATE( vikbw )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_vikbw_device::viking_w )
+WRITE32_MEMBER( nubus_vikbw_device::viking_ack_w )
 {
-//	printf("viking_w: %08x @ %x (mask %08x)\n", data, offset, mem_mask);
-
-	if (offset == 0 && data == 0)
-	{
-		m_vbl_disable = 0;
-	}
-	else if (offset == 0xa000)
-	{
-		m_nubus->set_irq_line(m_slot, CLEAR_LINE);
-	}
+	m_nubus->set_irq_line(m_slot, CLEAR_LINE);
 }
 
-READ32_MEMBER( nubus_vikbw_device::viking_r )
+READ32_MEMBER( nubus_vikbw_device::viking_ack_r )
 {
-//	printf("viking_r: @ %x (mask %08x)\n", offset, mem_mask);
+	return 0;
+}
+
+WRITE32_MEMBER( nubus_vikbw_device::viking_disable_w )
+{
+	m_vbl_disable = 1;
+}
+
+READ32_MEMBER( nubus_vikbw_device::viking_enable_r )
+{
+	m_vbl_disable = 0;
 	return 0;
 }
 
