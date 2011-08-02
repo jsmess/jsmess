@@ -167,21 +167,20 @@ const device_type C1541II = &device_creator<c1541ii_device>;
 const device_type SX1541 = &device_creator<sx1541_device>;
 const device_type OC118 = &device_creator<oc118_device>;
 
-
 c1540_device::c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:c1541_device(mconfig, tag, owner, clock) { }
+	:c1541_device(mconfig, C1540, "C1540", tag, owner, clock) { m_variant = TYPE_1540; }
 
 c1541c_device::c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:c1541_device(mconfig, tag, owner, clock) { }
+	:c1541_device(mconfig, C1541C, "C1541C", tag, owner, clock) { m_variant = TYPE_1541C; }
 
 c1541ii_device::c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:c1541_device(mconfig, tag, owner, clock) { }
+	:c1541_device(mconfig, C1541II, "C1541II", tag, owner, clock) { m_variant = TYPE_1541II; }
 
 sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:c1541_device(mconfig, tag, owner, clock) { }
+	:c1541_device(mconfig, SX1541, "SX1541", tag, owner, clock) { m_variant = TYPE_SX1541; }
 
 oc118_device::oc118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:c1541_device(mconfig, tag, owner, clock) { }
+	:c1541_device(mconfig, OC118, "OC118", tag, owner, clock) { m_variant = TYPE_OC118; }
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
@@ -224,14 +223,13 @@ void c1541_device::device_config_complete()
 //  static_set_config - configuration helper
 //-------------------------------------------------
 
-void c1541_device::static_set_config(device_t &device, int address, int variant)
+void c1541_device::static_set_config(device_t &device, int address)
 {
 	c1541_device &c1541 = downcast<c1541_device &>(device);
 
 	assert((address > 7) && (address < 12));
 
 	c1541.m_address = address - 8;
-	c1541.m_variant = variant;
 }
 
 
@@ -740,8 +738,23 @@ c1541_device::c1541_device(const machine_config &mconfig, const char *tag, devic
 	  m_via0_irq(0),
 	  m_via1_irq(0)
 {
+	m_variant = TYPE_1541; 
 }
 
+c1541_device::c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, type, name, tag, owner, clock),
+	  device_cbm_iec_interface(mconfig, *this),
+	  m_maincpu(*this, M6502_TAG),
+	  m_via0(*this, M6522_0_TAG),
+	  m_via1(*this, M6522_1_TAG),
+	  m_ga(*this, C64H156_TAG),
+	  m_image(*this, FLOPPY_0),
+	  m_bus(NULL),
+	  m_data_out(1),
+	  m_via0_irq(0),
+	  m_via1_irq(0)
+{
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
