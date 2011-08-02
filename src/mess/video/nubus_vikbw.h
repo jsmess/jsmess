@@ -31,8 +31,10 @@ protected:
         virtual void device_start();
         virtual void device_reset();
 
-        DECLARE_READ32_MEMBER(viking_r);
-        DECLARE_WRITE32_MEMBER(viking_w);
+        DECLARE_READ32_MEMBER(viking_ack_r);
+        DECLARE_WRITE32_MEMBER(viking_ack_w);
+        DECLARE_READ32_MEMBER(viking_enable_r);
+        DECLARE_WRITE32_MEMBER(viking_disable_w);
 
 public:
         UINT8 *m_vram;
