@@ -599,7 +599,7 @@ static ADDRESS_MAP_START( pc1640_io, AS_IO, 16, pc1640_state )
 	AM_RANGE(0x080, 0x083) AM_WRITE8(dma_page_w, 0xffff)
 	AM_RANGE(0x0a0, 0x0a1) AM_WRITE8(nmi_mask_w, 0xff00)
 	AM_RANGE(0x378, 0x37b) AM_READWRITE8(printer_r, printer_w, 0xffff)
-	AM_RANGE(0x3d0, 0x3df) AM_READWRITE8(vdu_r, vdu_w, 0xffff)
+	AM_RANGE(0x3b0, 0x3df) AM_READWRITE8(iga_r, iga_w, 0xffff)
 	AM_RANGE(0x3f0, 0x3f7) AM_READWRITE8(fdc_r, fdc_w, 0xffff)
 	AM_RANGE(0x3f8, 0x3ff) AM_DEVREADWRITE8_LEGACY(INS8250_TAG, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
