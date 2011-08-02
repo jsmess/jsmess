@@ -215,7 +215,21 @@ public:
 
 	DECLARE_READ8_MEMBER( video_ram_r );
 	DECLARE_WRITE8_MEMBER( video_ram_w );
+	DECLARE_READ8_MEMBER( iga_r );
+	DECLARE_WRITE8_MEMBER( iga_w );
 	DECLARE_READ8_MEMBER( printer_r );
+	
+	// video state
+	UINT8 m_egc_ctrl;
+	UINT8 m_emcr;			// extended mode control register
+	UINT8 m_emcrp;			// extended mode control register protection read counter
+	UINT8 m_sar;			// sequencer address register
+	UINT8 m_sdr[8];			// sequencer data registers
+	UINT8 m_gcar;			// graphics controller address register
+	UINT8 m_gcdr[16];		// graphics controller data registers
+	UINT8 m_crtcar;			// CRT controller address register
+	UINT8 m_crtcdr[32];		// CRT controller data registers
+	UINT8 m_plr;			// Plantronics mode register
 };
 
 // ---------- defined in video/pc1512.c ----------
