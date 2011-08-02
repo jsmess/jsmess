@@ -52,8 +52,8 @@ struct _acia6551_t
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void acia_6551_receive_char(device_t *device, unsigned char ch);
-static void acia_6551_refresh_ints(device_t *device);
+//static void acia_6551_receive_char(device_t *device, unsigned char ch);
+//static void acia_6551_refresh_ints(device_t *device);
 
 
 
@@ -164,7 +164,7 @@ static DEVICE_START( acia6551 )
     acia_6551_refresh_ints - update interrupt output
 -------------------------------------------------*/
 
-static void acia_6551_refresh_ints(device_t *device)
+extern void acia_6551_refresh_ints(device_t *device)
 {
 	acia6551_t *acia = get_token(device);
 	int interrupt_state;
@@ -202,7 +202,7 @@ static void acia_6551_refresh_ints(device_t *device)
     acia_6551_receive_char
 -------------------------------------------------*/
 
-static void acia_6551_receive_char(device_t *device, unsigned char ch)
+extern void acia_6551_receive_char(device_t *device, unsigned char ch)
 {
 	acia6551_t *acia = get_token(device);
 

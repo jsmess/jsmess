@@ -7,19 +7,19 @@
 *  DONE:
 *  figure out z80 address space and hook up roms and rams (done)
 *  figure out where 10937 vfd controller lives (port 0x44 bits 7 and 0, POR has not been found yet)
-*  figure out how keypresses are detected (/INT, port 0x43, and port 0x46)
-*  figure out how the banked ram works on fw4.x (writes to port 0x43 select a ram bank)
+*  figure out how keypresses are detected (/INT?, port 0x43, and port 0x46)
+*  figure out how the banked ram works (writes to port 0x43 select a ram bank, fw2.2 supports 64k and fw4.1 supports 256k)
 *  tentatively figure out how flow control from ACIA works (/NMI)?
 *  hook up the speaker/beeper (port 0x45)
 *  hook up vfd controller (done to stderr, no artwork)
 *  hook up leds on front panel (done to stderr)
-*  hook up r6551 serial
+*  hook up r6551 serial and attach terminal for sending to ep804
 *
 *  TODO:
 *  figure out the rest of the i/o map
 *  figure out why banked ram on 4.x causes glitches/sys errors; it works on 2.2
 *  actually hook up interrupts and nmi
-*  attach terminal to 6551 serial
+*  attach terminal to 6551 serial for recieving from ep804
 *  correctly hook up 10937 vfd controller
 *  hook up keypad and mode buttons
 *  artwork
@@ -28,9 +28,26 @@
 
 #define ADDRESS_MAP_MODERN
 
-#define VFD_SERIAL_VERBOSE 1
+// port 41 write is unknown
+
+// port 42 write is unknown
+
+// port 43 read is status/mode
+#undef PORT43_R_VERBOSE
+// port 43 write is ram banking
+#undef PORT43_W_VERBOSE
+// port 44 write is vfd serial, as well as power and z80 control
+#define PORT44_W_VERBOSE 1
+// port 45 write is speaker control
+#undef PORT45_W_VERBOSE
+// port 46 read is keypad
+
+// port 46 write is LED control
+#undef PORT46_W_VERBOSE
+
+// collated serial data sent to vfd
 #undef VFD_VERBOSE
-#undef LED_VERBOSE
+
 
 /* Core includes */
 #include "emu.h"
@@ -78,16 +95,11 @@ public:
 	UINT8 vfd_count;
 	// current speaker state for port 45
 	UINT8 speaker_state;
-	// ram stuff for future banking
+	// ram stuff for banking
 	UINT8 m_ram_bank;
 	UINT8 *m_main_ram;
 };
 
-/*static void digel804_set_ram_bank( running_machine &machine )
-{
-	digel804_state *state = machine.driver_data<digel804_state>();
-	memory_set_bankptr( machine, "bankedram", machine.region("user_ram")->base() + ( state->m_ram_bank * 0x10000 ));
-}*/
 
 static DRIVER_INIT( digel804 )
 {
@@ -113,7 +125,7 @@ READ8_MEMBER( digel804_state::port_43_r )
 	 bits 76543210
 	      |||||||\- overload state (0 = not overloaded; 1 = overload detected, led on and power disconnected to ic)
 	      ||||||\-- unknown, always 1? may be acia related
-	      |||||\--- any key pressed on keypad (0 = one or more pressed, 1 = none pressed or unit is about to go to standby)
+	      |||||\--- any key pressed on keypad (0 = one or more pressed, 1 = none pressed)
 	      ||||\---- remote mode selected (0 = selected, 1 = not) \
 	      |||\----- key mode selected (0 = selected, 1 = not)     > if all 3 of these are 1, unit is going to standby
 	      ||\------ sim mode selected (0 = selected, 1 = not)    /
@@ -137,16 +149,27 @@ READ8_MEMBER( digel804_state::port_43_r )
 	*/
 	// HACK to dump display contents to stderr
 	fprintf(stderr,"%s\n",ROC10937_get_string(0));
+#ifdef PORT43_R_VERBOSE
 	logerror("Digel804: returning %02X for port 43 status read\n", port43_rtn);
+#endif
 	return port43_rtn;
 }
 
 WRITE8_MEMBER( digel804_state::port_43_w )
 {
-	m_ram_bank = data&7;
-	//digel804_set_ram_bank( machine() );
-	memory_set_bankptr( machine(), "bankedram", machine().region("user_ram")->base() + ( m_ram_bank * 0x10000 ));
+	/* writes to 0x43 control the ram banking on firmware which supports it
+	 * bits:76543210
+	 *      |||||\\\- select ram bank for 4000-bfff area based on these bits
+	 *      \\\\\---- unknown, always 0?
+	 */
+#ifdef PORT43_W_VERBOSE
 	logerror("Digel804: port 0x43 ram bank had %02x written to it!\n", data);
+#endif
+	m_ram_bank = data&7;
+	if ((data&0xF8)!=0)
+		logerror("Digel804: port 0x43 ram bank had unexpected data %02x written to it!\n", data);
+	memory_set_bankptr( machine(), "bankedram", machine().region("user_ram")->base() + ( m_ram_bank * 0x10000 ));
+
 }
 
 WRITE8_MEMBER( digel804_state::port_44_w )
@@ -163,7 +186,7 @@ WRITE8_MEMBER( digel804_state::port_44_w )
 	 *      \-------- 10937 VFDC 'DATA' serial data
 	 
 	 */
-#ifdef VFD_SERIAL_VERBOSE
+#ifdef PORT44_W_VERBOSE
 	logerror("Digel804: port 0x44 vfd control had %02x written to it!\n", data);
 #endif
 	// latch vfd data on falling edge of clock only; this should really be part of the 10937 device, not here!
@@ -187,32 +210,14 @@ WRITE8_MEMBER( digel804_state::port_44_w )
 
 WRITE8_MEMBER( digel804_state::speaker_w )
 {
-	// it APPEARS all writes here invert the speaker state, but not certain!
+	// it APPEARS all writes here invert the speaker state, at least
+#ifdef PORT45_W_VERBOSE
+	logerror("Digel804: port 0x45 speaker had %02x written to it!\n", data);
+#endif
 	if ((data != 0x00) && (data != 0x01) && (data != 0x03))
-		logerror("Digel804: port 0x45 speaker control had %02x written to it!\n", data);
+		logerror("Digel804: port 0x45 speaker control had unexpected data %02x written to it!\n", data);
 	speaker_state ^= 0xFF;
 	speaker_level_w(m_speaker, speaker_state);
-}
-
-WRITE8_MEMBER( digel804_state::led_control_w )
-{
-	/* writes to 0x46 control the LEDS on the front panel
-	 * bits:76543210
-	 *      ||||\\\\- these four bits choose which of the 16 function leds is lit; the number is INVERTED first
-	 *      |||\----- if this bit is 1, the function leds are disabled
-	 *      ||\------ this bit controls the 'error' led; 1 = on
-	 *      |\------- this bit controls the 'busy' led; 1 = on
-	 *      \-------- this bit controls the 'input' led; 1 = on
-	 */
-#ifdef LED_VERBOSE
-	 logerror("Digel804: port 0x46 LED control had %02x written to it!\n", data);
-#endif
-	 fprintf(stderr,"LEDS: ");
-	 if (data&0x80) fprintf(stderr,"INPUT "); else fprintf(stderr,"----- ");
-	 if (data&0x40) fprintf(stderr,"BUSY "); else fprintf(stderr,"---- ");
-	 if (data&0x20) fprintf(stderr,"ERROR "); else fprintf(stderr,"----- ");
-	 fprintf(stderr,"  function selected: ");
-	 if (data&0x10) fprintf(stderr,"none\n"); else fprintf(stderr,"%01X\n", ~data&0xF);
 }
 
 READ8_MEMBER( digel804_state::keypad_r )
@@ -226,8 +231,31 @@ READ8_MEMBER( digel804_state::keypad_r )
 	 * higher numbers take precedence over lower ones
 	 * this value auto-latches on a key press and remains through multiple reads
 	*/
+#ifdef PORT46_R_VERBOSE
 	logerror("Digel804: returning 0xF0 for port 46 keypad read\n");
+#endif
 	return 0xF0; // enter
+}
+
+WRITE8_MEMBER( digel804_state::led_control_w )
+{
+	/* writes to 0x46 control the LEDS on the front panel
+	 * bits:76543210
+	 *      ||||\\\\- these four bits choose which of the 16 function leds is lit; the number is INVERTED first
+	 *      |||\----- if this bit is 1, the function leds are disabled
+	 *      ||\------ this bit controls the 'error' led; 1 = on
+	 *      |\------- this bit controls the 'busy' led; 1 = on
+	 *      \-------- this bit controls the 'input' led; 1 = on
+	 */
+#ifdef PORT46_W_VERBOSE
+	 logerror("Digel804: port 0x46 LED control had %02x written to it!\n", data);
+#endif
+	 fprintf(stderr,"LEDS: ");
+	 if (data&0x80) fprintf(stderr,"INPUT "); else fprintf(stderr,"----- ");
+	 if (data&0x40) fprintf(stderr,"BUSY "); else fprintf(stderr,"---- ");
+	 if (data&0x20) fprintf(stderr,"ERROR "); else fprintf(stderr,"----- ");
+	 fprintf(stderr,"  function selected: ");
+	 if (data&0x10) fprintf(stderr,"none\n"); else fprintf(stderr,"%01X\n", ~data&0xF);
 }
 
 /* ACIA Trampolines */
@@ -332,7 +360,6 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, digel804_state)
 ADDRESS_MAP_END
 
 
-
 /******************************************************************************
  Input Ports
 ******************************************************************************/
@@ -342,10 +369,14 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
+static WRITE8_DEVICE_HANDLER( digel804_serial_put )
+{
+	acia_6551_receive_char(device->machine().device("acia"), data);
+}
 
 static GENERIC_TERMINAL_INTERFACE( digel804_terminal_intf )
 {
-	DEVCB_NULL
+	DEVCB_HANDLER(digel804_serial_put)
 };
 
 static MACHINE_CONFIG_START( digel804, digel804_state )
@@ -367,7 +398,6 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
 MACHINE_CONFIG_END
 
 /* TODO: make this copy the digel804 machine config and modify the program map! */
