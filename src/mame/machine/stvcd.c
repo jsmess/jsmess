@@ -1548,31 +1548,31 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 		case 0x7400:	// Read File
 			CDROM_LOG(("%s:CD: Read File\n",   machine.describe_context()))
-			temp = (cr3&0xff)<<16;
-			temp |= cr4;
+			UINT16 file_offset,file_filter,file_id,file_size;
+
+			file_offset = ((cr1 & 0xff)<<8)|(cr2 & 0xff); /* correct? */
+			file_filter = cr3 >> 8;
+			file_id = ((cr3 & 0xff) << 16)|(cr4);
+			file_size = ((curdir[file_id].length + sectlenin - 1) / sectlenin) - file_offset;
 
 			cd_stat = CD_STAT_PLAY|0x80;	// set "cd-rom" bit
-			cur_track = cdrom_get_track(cdrom, curdir[temp].firstfad-150);
-			cr2 = cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track;
-			cr3 = (curdir[temp].firstfad>>16)&0xff;
-			cr4 = (curdir[temp].firstfad&0xffff);
-
-			cd_curfad = curdir[temp].firstfad;
-			if (curdir[temp].length / 2048)
-			{
-				fadstoplay = curdir[temp].length/2048;
-				fadstoplay++;
-			}
+			cd_curfad = (curdir[file_id].firstfad + file_offset);
+			fadstoplay = file_size;
+			if(file_filter < 0x24)
+				cddevice = &filters[file_filter];
 			else
-			{
-				fadstoplay = curdir[temp].length/2048;
-			}
+				cddevice = (filterT *)NULL;
 
-			hirqreg |= (CMOK|DRDY);
+			printf("Read file %08x (%08x %08x) %02x\n",curdir[file_id].firstfad,cd_curfad,fadstoplay,file_filter);
+
+			cr_standard_return(cd_stat);
+
 			oddframe = 0;
 			in_buffer = 0;
 
 			playtype = 1;
+
+			hirqreg |= (CMOK);
 
 			// and do the disc I/O
          	sector_timer->reset();

@@ -1817,7 +1817,6 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 		}
 		else
 			state->m_scu.ist |= (IRQ_VDP1_END);
-
 	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
 	{
