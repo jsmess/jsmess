@@ -4285,8 +4285,9 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 			popmessage("Line Colour screen enabled %04x %08x, contact MAMEdev",STV_VDP2_LNCLEN,STV_VDP2_LCTAU<<16|STV_VDP2_LCTAL);
 
 		/* Bio Hazard 0x400 = extended color calculation enabled */
+		/* Advanced World War 0x200 = color calculation ratio mode */
 		//if(STV_VDP2_CCCR & 0xf600)
-		if(STV_VDP2_CCCR & 0xf200)
+		if(STV_VDP2_CCCR & 0xf000)
 			popmessage("Gradation enabled %04x, contact MAMEdev",STV_VDP2_CCCR);
 
 		/* Advanced VG, Shining Force 3 */
@@ -4308,8 +4309,9 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 		if(STV_VDP2_WCTLD & 0x2606)
 			popmessage("Special window enabled %04x, contact MAMEdev",STV_VDP2_WCTLD);
 
+		/* Shining Force III, After Burner 2 (doesn't make a proper use tho?) */
 		if(STV_VDP2_W0LWE || STV_VDP2_W1LWE)
-			popmessage("Line Window %s enabled, contact MAMEdev",STV_VDP2_W0LWE ? "0" : "1");
+			popmessage("Line Window %s %08x enabled, contact MAMEdev",STV_VDP2_W0LWE ? "0" : "1",STV_VDP2_W0LWTA);
 
 		if(STV_VDP2_SFPRMD)
 			popmessage("Special Priority Mode enabled %04x, contact MAMEdev",STV_VDP2_SFPRMD);
@@ -5405,6 +5407,9 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const
 	int x,y;
 	UINT8* gfxdata = state->m_vdp2.gfx_decode;
 	UINT32 base_offs,base_mask;
+	UINT8 interlace;
+
+	interlace = (STV_VDP2_LSMD == 3)+1;
 
 	//popmessage("Back screen %08x %08x %08x",STV_VDP2_BDCLMD,STV_VDP2_BKCLMD,STV_VDP2_BKTA);
 
@@ -5419,7 +5424,7 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const
 		{
 			base_offs = (STV_VDP2_BKTA & base_mask) << 1;
 			if(STV_VDP2_BKCLMD)
-				base_offs += (y << 1);
+				base_offs += ((y / interlace) << 1);
 
 			for(x=cliprect->min_x;x<=cliprect->max_x;x++)
 			{
@@ -5583,12 +5588,13 @@ WRITE32_HANDLER ( saturn_vdp2_cram_w )
 		case 2:
 		case 3:
 		{
-			offset &= (0xfff) >> 3;
+			//offset &= (0xfff) >> 2;
 
 			b = ((state->m_vdp2_cram[offset] & 0x00ff0000) >> 16);
 			g = ((state->m_vdp2_cram[offset] & 0x0000ff00) >> 8);
 			r = ((state->m_vdp2_cram[offset] & 0x000000ff) >> 0);
 			palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
+			palette_set_color(space->machine(),offset^0x400,MAKE_RGB(r,g,b));
 		}
 		break;
 		/*Mode 0*/
@@ -5626,15 +5632,13 @@ static void refresh_palette_data(running_machine &machine)
 		case 2:
 		case 3:
 		{
-			for(bank=0;bank<2;bank++)
+			for(c_i=0;c_i<0x400;c_i++)
 			{
-				for(c_i=0;c_i<0x400;c_i++)
-				{
-					b = ((state->m_vdp2_cram[c_i] & 0x00ff0000) >> 16);
-					g = ((state->m_vdp2_cram[c_i] & 0x0000ff00) >> 8);
-					r = ((state->m_vdp2_cram[c_i] & 0x000000ff) >> 0);
-					palette_set_color(machine,c_i+bank*0x400,MAKE_RGB(r,g,b));
-				}
+				b = ((state->m_vdp2_cram[c_i] & 0x00ff0000) >> 16);
+				g = ((state->m_vdp2_cram[c_i] & 0x0000ff00) >> 8);
+				r = ((state->m_vdp2_cram[c_i] & 0x000000ff) >> 0);
+				palette_set_color(machine,c_i,MAKE_RGB(r,g,b));
+				palette_set_color(machine,c_i+0x400,MAKE_RGB(r,g,b));
 			}
 		}
 		break;
@@ -5678,18 +5682,17 @@ static void refresh_palette_data(running_machine &machine)
 WRITE32_HANDLER ( saturn_vdp2_regs_w )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
-	static UINT8 old_crmd;
-	static UINT16 old_tvmd;
 	COMBINE_DATA(&state->m_vdp2_regs[offset]);
 
-	if(old_crmd != STV_VDP2_CRMD)
+	if(state->m_vdp2.old_crmd != STV_VDP2_CRMD)
 	{
-		old_crmd = STV_VDP2_CRMD;
+		printf("%02x %02x\n",state->m_vdp2.old_crmd,STV_VDP2_CRMD);
+		state->m_vdp2.old_crmd = STV_VDP2_CRMD;
 		refresh_palette_data(space->machine());
 	}
-	if(old_tvmd != STV_VDP2_TVMD)
+	if(state->m_vdp2.old_tvmd != STV_VDP2_TVMD)
 	{
-		old_tvmd = STV_VDP2_TVMD;
+		state->m_vdp2.old_tvmd = STV_VDP2_TVMD;
 		stv_vdp2_dynamic_res_change(space->machine());
 	}
 }
