@@ -296,8 +296,6 @@ WRITE16_MEMBER( st_state::dma_mode_w )
 	{
 		if (LOG) logerror("DMA reset\n");
 
-		flush_dma_fifo();
-
 		m_dma_error = 1;
 		m_fdc_sectors = 0;
 		m_fdc_fifo_sel = 0;
@@ -320,12 +318,13 @@ READ8_MEMBER( st_state::dma_counter_r )
 	{
 	case 0:
 		data = (m_dma_base >> 16) & 0xff;
-
+		break;
 	case 1:
 		data = (m_dma_base >> 8) & 0xff;
-
+		break;
 	case 2:
 		data = m_dma_base & 0xff;
+		break;
 	}
 
 	return data;
@@ -1195,7 +1194,7 @@ static ADDRESS_MAP_START( st_map, AS_PROGRAM, 16, st_state )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(fdc_data_r, fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(dma_status_r, dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE8(dma_counter_r, dma_base_w, 0x00ff)
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8_LEGACY(YM2149_TAG, ay8910_r, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8_LEGACY(YM2149_TAG, ay8910_r, ay8910_address_w, 0xff00)
 	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8_LEGACY(YM2149_TAG, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
 	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
@@ -1238,7 +1237,7 @@ static ADDRESS_MAP_START( megast_map, AS_PROGRAM, 16, megast_state )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE_BASE(st_state, fdc_data_r, fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE_BASE(st_state, dma_status_r, dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE8_BASE(st_state, dma_counter_r, dma_base_w, 0x00ff)
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8_LEGACY(YM2149_TAG, ay8910_r, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8_LEGACY(YM2149_TAG, ay8910_r, ay8910_address_w, 0xff00)
 	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8_LEGACY(YM2149_TAG, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE_BASE(st_state, blitter_halftone_r, blitter_halftone_w)
 	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE_BASE(st_state, blitter_src_inc_x_r, blitter_src_inc_x_w)
@@ -1363,7 +1362,7 @@ static ADDRESS_MAP_START( stbook_map, AS_PROGRAM, 16, stbook_state )
     AM_RANGE(0xff8260, 0xff8261) AM_READWRITE8(stbook_shifter_mode_r, stbook_shifter_mode_w, 0xff00)
     AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(stbook_shifter_pixelofs_r, stbook_shifter_pixelofs_w)
     AM_RANGE(0xff827e, 0xff827f) AM_WRITE(lcd_control_w)*/
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8_LEGACY(YM3439_TAG, ay8910_r, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8_LEGACY(YM3439_TAG, ay8910_r, ay8910_address_w, 0xff00)
 	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8_LEGACY(YM3439_TAG, ay8910_data_w, 0xff00)
 /*  AM_RANGE(0xff8900, 0xff8901) AM_READWRITE8(sound_dma_control_r, sound_dma_control_w, 0x00ff)
     AM_RANGE(0xff8902, 0xff8907) AM_READWRITE8(sound_dma_base_r, sound_dma_base_w, 0x00ff)
