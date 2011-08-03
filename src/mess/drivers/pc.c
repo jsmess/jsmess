@@ -1704,6 +1704,15 @@ ROM_START( mk88 )
 	// Here CGA rom with cyrillic support should be added
 ROM_END
 
+ROM_START( iskr3104 )
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROMX_LOAD( "198.bin", 0xfc000, 0x2000, CRC(bcfd8e41) SHA1(e21ddf78839aa51fa5feb23f511ff5e2da31b433),ROM_SKIP(1))
+	ROMX_LOAD( "199.bin", 0xfc001, 0x2000, CRC(2da5fe79) SHA1(14d5dccc141a0b3367f7f8a7188306fdf03c2b6c),ROM_SKIP(1))
+	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
+	// need proper rom dump for this machine
+	ROM_LOAD( "iskra-1031_font.bin", 0x0000, 0x2000, CRC(f4d62e80) SHA1(ad7e81a0c9abc224671422bbcf6f6262da92b510))
+ROM_END
+  
 ROM_START( poisk1 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD( "b_hd_v11.rf2", 0xc8000, 0x0800, CRC(a19c39b2) SHA1(57faa56b320abf801fedbed578cf97d253e5b777)) // HDD controller ver 1.1
@@ -1839,6 +1848,7 @@ COMP ( 1989,	t1000tl2,	ibm5150,	 0, t1000_286,	tandy1t,	t1000hx,    "Tandy Radio
 
 COMP ( 1989,	iskr1031,   ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-1031" , GAME_NOT_WORKING)
 COMP ( 1989,	iskr1030m,  ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-1030M" , GAME_NOT_WORKING)
+COMP ( 19??,	iskr3104,   ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-3104" , GAME_NOT_WORKING)
 COMP ( 1987,	ec1840,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1840" , GAME_NOT_WORKING)
 COMP ( 1987,	ec1841,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1841" , GAME_NOT_WORKING)
 COMP ( 1989,	ec1845,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1845" , GAME_NOT_WORKING)
