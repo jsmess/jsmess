@@ -75,5 +75,73 @@ Four cartridges were made for this computer one of which was the "EPROM Burner P
 			</dataarea>
 		</part>
 	</software>
+</softwarelist>
+
+<softwarelist name="sorcerer" description="Exidy Sorcerer Snapshots">
+	<software name="breakout">
+		<description>Breakout</description>
+		<year>1980</year>
+		<publisher>Ray Bannon</publisher>
+		<part name="snap" interface="snapshot">
+			<dataarea name="snp" size="65534">
+				<rom name="breakout.snp" size="65534" crc="c758244a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess">
+		<description>Chess</description>
+		<year>19??</year>
+		<publisher>unknown</publisher>
+		<part name="snap" interface="snapshot">
+			<dataarea name="snp" size="65534">
+				<rom name="chess.snp" size="65534" crc="5d9f7caa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chomp">
+		<description>Chomp</description>
+		<year>1981</year>
+		<publisher>Global Software Network</publisher>
+		<part name="snap" interface="snapshot">
+			<dataarea name="snp" size="65534">
+				<rom name="chomp.snp" size="65534" crc="338bd4c5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxian">
+		<description>Galaxian</description>
+		<year>1978</year>
+		<publisher>Exidy Inc.</publisher>
+		<part name="snap" interface="snapshot">
+			<dataarea name="snp" size="65534">
+				<rom name="galaxian.snp" size="65534" crc="7908c146" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invaders">
+		<description>Invaders</description>
+		<year>1978</year>
+		<publisher>Digital Research</publisher>
+		<part name="snap" interface="snapshot">
+			<dataarea name="snp" size="65534">
+				<rom name="invaders.snp" size="65534" crc="7d9da712" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snake">
+		<description>Snake</description>
+		<year>1978</year>
+		<publisher>Digital Research</publisher>
+		<part name="snap" interface="snapshot">
+			<dataarea name="snp" size="65534">
+				<rom name="snake.snp" size="65534" crc="8cd145a7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
