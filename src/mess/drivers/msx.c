@@ -1033,12 +1033,14 @@ static MACHINE_CONFIG_FRAGMENT( msx_cartslot )
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("mx1,rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("msx_cart")
 	MCFG_CARTSLOT_LOAD(msx_cart)
 	MCFG_CARTSLOT_UNLOAD(msx_cart)
 
 	MCFG_CARTSLOT_ADD("cart2")
 	MCFG_CARTSLOT_EXTENSION_LIST("mx1,rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("msx_cart")
 	MCFG_CARTSLOT_LOAD(msx_cart)
 	MCFG_CARTSLOT_UNLOAD(msx_cart)
 MACHINE_CONFIG_END
@@ -1080,6 +1082,9 @@ static MACHINE_CONFIG_START( msx, msx_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(msx_floppy_interface)
 
 	MCFG_FRAGMENT_ADD(msx_cartslot)
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","msx1_cart")
 MACHINE_CONFIG_END
 
 
@@ -1190,6 +1195,9 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(msx_floppy_interface)
 
 	MCFG_FRAGMENT_ADD(msx_cartslot)
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","msx2_cart")
 MACHINE_CONFIG_END
 
 

@@ -111,65 +111,106 @@ DEVICE_IMAGE_LOAD (msx_cart)
 		return IMAGE_INIT_FAIL;
 	}
 
-	size = image.length ();
-	if (size < 0x2000) {
-		logerror ("cart #%d: error: file is smaller than 2kb, too small "
-				  "to be true!\n", id);
-		return IMAGE_INIT_FAIL;
-	}
-
-	/* allocate memory and load */
-	size_aligned = 0x2000;
-	while (size_aligned < size) {
-		size_aligned *= 2;
-	}
-	mem = auto_alloc_array(image.device().machine(),UINT8,size_aligned);
-	if (!mem) {
-		logerror ("cart #%d: error: failed to allocate memory for cartridge\n",
-						id);
-		return IMAGE_INIT_FAIL;
-	}
-	if (size < size_aligned) {
-		memset (mem, 0xff, size_aligned);
-	}
-	if (image.fread(mem, size) != size) {
-		logerror ("cart #%d: %s: can't read full %d bytes\n",
-						id, image.filename (), size);
-		return IMAGE_INIT_FAIL;
-	}
-
-	/* see if msx.crc will tell us more */
-	extra = hashfile_extrainfo(image);
-
-	if (!extra)
+	if ( image.software_entry() != NULL )
 	{
-		logerror("cart #%d: warning: no information in crc file\n", id);
-		type = -1;
-	}
-	else if ((1 != sscanf(extra, "%d", &type) ) ||
-			type < 0 || type > SLOT_LAST_CARTRIDGE_TYPE)
-	{
-		logerror("cart #%d: warning: information in crc file not valid\n", id);
-		type = -1;
+		/* Load software from software list */
+		/* TODO: Add proper SRAM (size) handling */
+
+		const char *mapper = software_part_get_feature( (software_part*)image.part_entry(), "mapper" );
+
+		if ( mapper != NULL )
+		{
+			static const struct { const char *mapper_name; int mapper_type; } mapper_types[] =
+			{
+				{ "M60002-0125SP", SLOT_ASCII8 },
+				{ "LZ93A13", SLOT_ASCII8 }
+			};
+
+			type = -1;
+			for ( int i = 0; i < ARRAY_LENGTH(mapper_types) && type < 0; i++ )
+			{
+				if ( !mame_stricmp( mapper, mapper_types[i].mapper_name ) )
+				{
+					type = mapper_types[i].mapper_type;
+				}
+			}
+
+			if ( -1 == type )
+			{
+				logerror( "Mapper '%s' not recognized!\n", mapper );
+			}
+		}
+
+		UINT8 *rom_region = image.get_software_region( "rom" );
+		size = size_aligned = image.get_software_region_length( "rom" );
+
+		mem = auto_alloc_array( image.device().machine(), UINT8, size_aligned );
+		memcpy( mem, rom_region, size_aligned );
 	}
 	else
 	{
-		logerror ("cart #%d: info: cart extra info: '%s' = %s\n", id, extra,
-						msx_slot_list[type].name);
-	}
+		/* Old style image loading */
 
-	/* if not, attempt autodetection */
-	if (type < 0)
-	{
-		type = msx_probe_type (mem, size);
-
-		if (mem[0] != 'A' || mem[1] != 'B') {
-			logerror("cart #%d: %s: May not be a valid ROM file\n",
-							id, image.filename ());
+		size = image.length ();
+		if (size < 0x2000) {
+			logerror ("cart #%d: error: file is smaller than 2kb, too small "
+					  "to be true!\n", id);
+			return IMAGE_INIT_FAIL;
 		}
 
-		logerror("cart #%d: Probed cartridge mapper %d/%s\n", id,
-						type, msx_slot_list[type].name);
+		/* allocate memory and load */
+		size_aligned = 0x2000;
+		while (size_aligned < size) {
+			size_aligned *= 2;
+		}
+		mem = auto_alloc_array(image.device().machine(),UINT8,size_aligned);
+		if (!mem) {
+			logerror ("cart #%d: error: failed to allocate memory for cartridge\n",
+							id);
+			return IMAGE_INIT_FAIL;
+		}
+		if (size < size_aligned) {
+			memset (mem, 0xff, size_aligned);
+		}
+		if (image.fread(mem, size) != size) {
+			logerror ("cart #%d: %s: can't read full %d bytes\n",
+							id, image.filename (), size);
+			return IMAGE_INIT_FAIL;
+		}
+
+		/* see if msx.crc will tell us more */
+		extra = hashfile_extrainfo(image);
+
+		if (!extra)
+		{
+			logerror("cart #%d: warning: no information in crc file\n", id);
+			type = -1;
+		}
+		else if ((1 != sscanf(extra, "%d", &type) ) ||
+				type < 0 || type > SLOT_LAST_CARTRIDGE_TYPE)
+		{
+			logerror("cart #%d: warning: information in crc file not valid\n", id);
+			type = -1;
+		}
+		else
+		{
+			logerror ("cart #%d: info: cart extra info: '%s' = %s\n", id, extra,
+							msx_slot_list[type].name);
+		}
+
+		/* if not, attempt autodetection */
+		if (type < 0)
+		{
+			type = msx_probe_type (mem, size);
+
+			if (mem[0] != 'A' || mem[1] != 'B') {
+				logerror("cart #%d: %s: May not be a valid ROM file\n",
+								id, image.filename ());
+			}
+
+			logerror("cart #%d: Probed cartridge mapper %d/%s\n", id,
+							type, msx_slot_list[type].name);
+		}
 	}
 
 	/* mapper type 0 always needs 64kB */
