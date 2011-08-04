@@ -452,7 +452,8 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_CARTSLOT_INTERFACE("sorcerer_cart")
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sorcerer")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sorcerer_cart")
+	//MCFG_SOFTWARE_LIST_ADD("snap_list","sorcerer_snap") not supported yet
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
