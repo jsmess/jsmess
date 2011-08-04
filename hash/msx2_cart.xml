@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="msx2_cart" description="MSX2 Cartridges">
+
+<!--
+Most of the information in this list was taken from: http://gigamix.jp/rom/rom.php
+
+Mappers:
+M60002-0125SP (48 pin) - 8KB banks
+LZ93A13 (32 pin) - 8KB banks
+
+-->
+
+	<software name="eidolon">
+		<!-- アイドロン -->
+		<description>Eidolon, The</description>
+		<year>1985</year>
+		<publisher>Lucasfilm</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="ponyca0l01" size="131072" crc="14913432" sha1="cd8ee800822ff0cd295621faafafc73be4bacad0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="">
+		- 蒼き狼と白き牝鹿 元朝秘史 -
+		<description>Blue Wolf and White Doe anecdote Dynasty</description>
+		<year>19??</year>
+		<publisher>Sakai Mitsuru</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-8M308-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK58257ASP-10L" /> - 28 pin, battery backed -
+			<dataarea name="rom" size="">
+				<rom name="lh538f96" size="" crc="" sha1="" offset="" /> - 42 pin, 8M -
+			</dataarea>
+			<dataarea name="sram" size="??" />	- battery backed -
+		</part>
+	</software>
+-->
+
+	<software name="genghis">
+		<!-- 蒼き狼と白き牝鹿 ジンギスカン -->
+		<description>Genghis Khan</description>
+		<year>1988</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M208-02A" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="524288">
+				<rom name="tc534000p" size="524288" crc="3b5b3fd8" sha1="8a4bcf0f38c9f243443a4d4865278f695bd83dc8" offset="0" />
+			</dataarea>
+			<dataarea name="sram" size="8192" />
+		</part>
+	</software>
+
+	<software name="ashguin2">
+		<!-- PANA-010 - アシュギーネ 虚空の牙城 -->
+		<description>Ashguine 2: Kokuu no Gajou</description>
+		<year>1987</year>
+		<publisher>Panasoft / T&amp;E Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532056" size="262144" crc="47a82d74" sha1="efdf63f01293251dc593163a42f31556fd042282" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ashguin3">
+		<!-- アシュギーネ 復讐の炎 -->
+		<description>Ashguine: Densetsu no Seisenshi</description>
+		<year>1987</year>
+		<publisher>Panasoft / Micro Cabin</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532064" size="262144" crc="353382ce" sha1="6fd90e7573abdb5a7bd6e4e8dc44db80fc163e30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="ashguin3a" cloneof="ashguin3">
+		- アシュギーネ 復讐の炎 -
+		<description>Ashguine: Densetsu no Seisenshi (Alt)</description>
+		<year>1987</year>
+		<publisher>Panasoft / Micro Cabin</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532064.0" size="131072" crc="" sha1="" offset="" />
+				<rom name="lh532064.1" size="131072" crc="" sha1="" offset="" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+	<software name="arkanoi2">
+		<!-- アルカノイドII -->
+		<description>Arkanoid 2</description>
+		<year>1987</year>
+		<publisher>Nidecom</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M008S" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh2310bl" size="131072" crc="00d36af6" sha1="1642891b693df616f27431299352e1d7750ac94b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="">
+		<description></description>
+		<year></year>
+		<publisher></publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="" />
+			<feature nmae="mapper" value="" />
+			<dataarea name="rom" size="">
+				<rom name="" size="" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+</softwarelist>
