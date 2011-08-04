@@ -735,7 +735,7 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 
 	for (; state->m_scu.size[dma_ch] > 0; state->m_scu.size[dma_ch]-=state->m_scu.dst_add[dma_ch])
 	{
-		/* Mahou Tsukai ni Naru Houhou directly accesses CD-rom register 0x05818000, it must be a dword access otherwise it won't work */
+		/* Many games directly accesses CD-ROM register 0x05818000, it must be a dword access with current implementation otherwise it won't work */
 		if(state->m_scu.src_add[dma_ch] == 0)
 		{
 			space->write_dword(state->m_scu.dst[dma_ch],  space->read_dword(state->m_scu.src[dma_ch]  ));
@@ -750,6 +750,18 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 			space->write_word(state->m_scu.dst[dma_ch]+2,space->read_word(state->m_scu.src[dma_ch]  ));
 			space->write_word(state->m_scu.dst[dma_ch]+4,space->read_word(state->m_scu.src[dma_ch]+2));
 			space->write_word(state->m_scu.dst[dma_ch]+6,space->read_word(state->m_scu.src[dma_ch]+2));
+		}
+		else if(state->m_scu.src[dma_ch] & 1) // odd address access? Road Blaster uses this for work-ram to color ram transfers ...
+		{
+			UINT16 src_data;
+
+			src_data = ((space->read_word(state->m_scu.src[dma_ch]-1) & 0xff) << 8);
+			src_data|= ((space->read_word(state->m_scu.src[dma_ch]+1) & 0xff00) >> 8);
+			space->write_word(state->m_scu.dst[dma_ch],  src_data);
+
+			src_data = ((space->read_word(state->m_scu.src[dma_ch]+1) & 0xff) << 8);
+			src_data|= ((space->read_word(state->m_scu.src[dma_ch]+3) & 0xff00) >> 8);
+			space->write_word(state->m_scu.dst[dma_ch]+2,src_data);
 		}
 		else
 		{
