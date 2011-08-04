@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="msx1_cart" description="MSX1 Cartridges">
+
+<!--
+Most of the information in this list was taken from http://gigamix.jp/rom/rom.php
+-->
+
+	<software name="genghis">
+		<!-- 蒼き狼と白き牝鹿 ジンギスカン -->
+		<description>Genghis Khan</description>
+		<year>19??</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-621 KAGA" />
+			<feature name="mapper" value="M60002-0125SP" /> <!-- 42 pin -->
+			<feature name="sram" value="LH5164L-15" /> <!-- battery backed -->
+			<feature name="other" value="HD74LS138P" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532077" size="262144" crc="4ead5098" sha1="12b3c31f0fd10ff5823dcc8bf6dfeb785a8af2f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animllnd">
+		<!-- アニマルランド殺人事件 -->
+		<description>Animal Land: Satsujin Jiken</description>
+		<year>1987</year>
+		<publisher>Enix</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh231077" size="131072" crc="15a0f98a" sha1="495876c504bdc4de24860ea15b25dda8f3b06c49" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="">
+		<description></description>
+		<year></year>
+		<publisher></publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="" />
+			<feature name="mapper" value="" />
+			<dataarea name="rom" size="">
+				<rom name="" size="" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+</softwarelist>
