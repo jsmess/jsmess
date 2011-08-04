@@ -714,7 +714,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			// clear the "transfer" flag
 			cd_stat &= ~CD_STAT_TRANS;
-			// hack for the bootloader (TODO: Falcom Classics doesn't want this!)
+			// hack for the bootloader
 			cd_stat |= CD_STAT_PERI;
 
 			if (xferdnum)
@@ -726,6 +726,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 			else
 			{
+				printf("No xferdnum error\n");
 				cr1 = (cd_stat) | (0xff);	// is this right?
 				cr2 = 0xffff;
 				cr3 = 0;
@@ -1433,6 +1434,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			/* TODO: After Burner 2 and Dungeon Master Nexus trips this */
 			// ...
 
+			popmessage("Put sector data command issued, contact MAMEdev");
 			hirqreg |= (CMOK|EHST);
 			break;
 
