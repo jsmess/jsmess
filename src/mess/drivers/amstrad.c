@@ -111,6 +111,7 @@ Some bugs left :
 #include "machine/cpcexp.h"
 #include "machine/cpc_ssa1.h"
 #include "machine/cpc_rom.h"
+#include "machine/mface2.h"
 
 #include "machine/ram.h"
 
@@ -122,7 +123,6 @@ Some bugs left :
 #define SYSTEM_CPC    0
 #define SYSTEM_PLUS   1
 #define SYSTEM_GX4000 2
-
 
 
 /* -----------------------------
@@ -389,13 +389,6 @@ As far as I know, the KC compact used HD6845S only.
 //  PORT_CONFSETTING(M6845_PERSONALITY_GENUINE, "Type 2 - MC6845")
 //  PORT_CONFSETTING(M6845_PERSONALITY_AMS40489, "Type 3 - AMS40489")
 //  PORT_CONFSETTING(M6845_PERSONALITY_PREASIC, "Type 4 - Pre-ASIC")
-
-	PORT_START("multiface")
-	PORT_CONFNAME(0x01, 0x00, "Multiface Two" )
-	PORT_CONFSETTING(0x00, DEF_STR( Off) )
-	PORT_CONFSETTING(0x01, DEF_STR( On) )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Multiface Two's Stop Button") PORT_CODE(KEYCODE_F1)
-//  PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Multiface Two's Reset Button") PORT_CODE(KEYCODE_F3)  Not implemented
 
 	PORT_START("green_display")
 	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED( cpc_monitor_changed, 0 )
@@ -775,8 +768,6 @@ static INPUT_PORTS_START( aleste )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("Funny looking Russian symbol")     PORT_CODE(KEYCODE_END)
 
 	PORT_INCLUDE(crtc_links)
-	PORT_MODIFY("multiface")  // move Multiface II stop to F6, as the Aleste has it's own F1-F5 keys.
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Multiface Two's Stop Button") PORT_CODE(KEYCODE_F6)
 INPUT_PORTS_END
 
 
@@ -875,10 +866,19 @@ static CPC_EXPANSION_INTERFACE(cpc_exp_intf)
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", 0),
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
-	DEVCB_NULL  // RESET
+	DEVCB_NULL,  // RESET
+	DEVCB_LINE(cpc_romdis),  // ROMDIS
+	DEVCB_LINE(cpc_romen)  // /ROMEN
 };
 
 static SLOT_INTERFACE_START(cpc_exp_cards)
+	SLOT_INTERFACE("ssa1", CPC_SSA1)
+	SLOT_INTERFACE("dkspeech", CPC_DKSPEECH)
+	SLOT_INTERFACE("rom", CPC_ROM)
+	SLOT_INTERFACE("multiface2", CPC_MFACE2)
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START(cpcplus_exp_cards)
 	SLOT_INTERFACE("ssa1", CPC_SSA1)
 	SLOT_INTERFACE("dkspeech", CPC_DKSPEECH)
 	SLOT_INTERFACE("rom", CPC_ROM)
@@ -1009,7 +1009,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_interface)
 
-	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL,NULL)
+	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpcplus_exp_cards,NULL,NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

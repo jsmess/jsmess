@@ -70,6 +70,8 @@ void cpc_expansion_slot_device::device_config_complete()
     	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
     	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
     	memset(&m_out_reset_cb, 0, sizeof(m_out_reset_cb));
+    	memset(&m_out_romdis_cb, 0, sizeof(m_out_romdis_cb));
+    	memset(&m_out_romen_cb, 0, sizeof(m_out_romen_cb));
 	}
 }
 
@@ -86,6 +88,8 @@ void cpc_expansion_slot_device::device_start()
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
 	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
 	m_out_reset_func.resolve(m_out_reset_cb, *this);
+	m_out_romdis_func.resolve(m_out_romdis_cb, *this);
+	m_out_romen_func.resolve(m_out_romen_cb, *this);
 }
 
 
@@ -101,3 +105,5 @@ void cpc_expansion_slot_device::device_reset()
 WRITE_LINE_MEMBER( cpc_expansion_slot_device::irq_w ) { m_out_irq_func(state); }
 WRITE_LINE_MEMBER( cpc_expansion_slot_device::nmi_w ) { m_out_nmi_func(state); }
 WRITE_LINE_MEMBER( cpc_expansion_slot_device::reset_w ) { m_out_reset_func(state); }
+WRITE_LINE_MEMBER( cpc_expansion_slot_device::romdis_w ) { m_out_romdis_func(state); }
+WRITE_LINE_MEMBER( cpc_expansion_slot_device::romen_w ) { m_out_romen_func(state); }

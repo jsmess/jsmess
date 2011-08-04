@@ -42,6 +42,7 @@ This gives a total of 19968 NOPs per frame.
 #include "machine/upd765.h"
 #include "machine/ctronics.h"
 #include "machine/cpc_rom.h"
+#include "machine/mface2.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "includes/amstrad.h"
@@ -1100,295 +1101,23 @@ const mc6845_interface amstrad_plus_mc6845_intf =
 	NULL
 };
 
-
-/******************************************************************************************
-    Multiface emulation
-  ****************************************************************************************/
-
-
-/* stop button has been pressed */
-#define MULTIFACE_STOP_BUTTON_PRESSED	0x0001
-/* ram/rom is paged into memory space */
-#define MULTIFACE_RAM_ROM_ENABLED		0x0002
-/* when visible OUT commands are performed! */
-#define MULTIFACE_VISIBLE				0x0004
-
-/* multiface traps calls to 0x0065 when it is active.
-This address has a RET and so executes no code.
-
-It is believed that it is used to make multiface invisible to programs */
-
-/*#define MULTIFACE_0065_TOGGLE                   0x0008*/
-
-DIRECT_UPDATE_HANDLER( amstrad_default )
+WRITE_LINE_DEVICE_HANDLER(cpc_romdis)
 {
-	return address;
+   	amstrad_state *tstate = device->machine().driver_data<amstrad_state>();
+
+	tstate->m_gate_array.romdis = state;
+	amstrad_rethinkMemory(device->machine());
 }
 
-/* used to setup computer if a snapshot was specified */
-DIRECT_UPDATE_HANDLER( amstrad_multiface_directoverride )
+WRITE_LINE_DEVICE_HANDLER(cpc_romen)
 {
-	amstrad_state *state = machine.driver_data<amstrad_state>();
-		int pc;
+   	amstrad_state *tstate = device->machine().driver_data<amstrad_state>();
 
-		pc = cpu_get_pc(machine.device("maincpu"));
-
-		/* there are two places where CALL &0065 can be found
-        in the multiface rom. At this address there is a RET.
-
-        To disable the multiface from being detected, the multiface
-        stop button must be pressed, then the program that was stopped
-        must be returned to. When this is done, the multiface cannot
-        be detected and the out operations to page the multiface
-        ram/rom into the address space will not work! */
-
-		/* I assume that the hardware in the multiface detects
-        the PC set to 0x065 and uses this to enable/disable the multiface
-        */
-
-		/* I also use this to allow the stop button to be pressed again */
-		if (pc==0x0164)
-		{
-			/* first call? */
-			state->m_multiface_flags |= MULTIFACE_VISIBLE;
-		}
-		else if (pc==0x0c98)
-		{
-		  /* second call */
-
-		  /* no longer visible */
-		  state->m_multiface_flags &= ~(MULTIFACE_VISIBLE|MULTIFACE_STOP_BUTTON_PRESSED);
-
-		 /* clear op base override */
-		  machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(amstrad_default), &machine));
-		}
-
-		return pc;
-}
-
-static void multiface_init(running_machine &machine)
-{
-	amstrad_state *state = machine.driver_data<amstrad_state>();
-	/* after a reset the multiface is visible */
-	state->m_multiface_flags = MULTIFACE_VISIBLE;
-
-	/* allocate ram */
-	state->m_multiface_ram = auto_alloc_array(machine, UINT8, 8192);
-}
-
-/* call when a system reset is done */
-static void multiface_reset(amstrad_state *state)
-{
-		/* stop button not pressed and ram/rom disabled */
-		state->m_multiface_flags &= ~(MULTIFACE_STOP_BUTTON_PRESSED |
-						MULTIFACE_RAM_ROM_ENABLED);
-		/* as on the real hardware the multiface is visible after a reset! */
-		state->m_multiface_flags |= MULTIFACE_VISIBLE;
-}
-
-static int multiface_hardware_enabled(running_machine &machine)
-{
-	amstrad_state *state = machine.driver_data<amstrad_state>();
-		if (state->m_multiface_ram!=NULL)
-		{
-				if ((input_port_read(machine, "multiface") & 0x01)!=0)
-				{
-						return 1;
-				}
-		}
-
-		return 0;
-}
-
-
-static void multiface_rethink_memory(running_machine &machine)
-{
-	amstrad_state *state = machine.driver_data<amstrad_state>();
-	unsigned char *multiface_rom;
-
-	/* multiface hardware enabled? */
-	if (!multiface_hardware_enabled(machine))
-		return;
-
-	multiface_rom = &machine.region("maincpu")->base()[0x01C000];
-
-	if (
-		((state->m_multiface_flags & MULTIFACE_RAM_ROM_ENABLED)!=0) &&
-		((state->m_gate_array.mrer & 0x04) == 0)
-		)
-	{
-
-		/* set bank addressess */
-		memory_set_bankptr(machine,"bank1", multiface_rom);
-		memory_set_bankptr(machine,"bank2", state->m_multiface_ram);
-		memory_set_bankptr(machine,"bank9", multiface_rom);
-		memory_set_bankptr(machine,"bank10", state->m_multiface_ram);
-	}
-}
-
-
-/* simulate the stop button has been pressed */
-static void multiface_stop(running_machine &machine)
-{
-	amstrad_state *state = machine.driver_data<amstrad_state>();
-	/* multiface hardware enabled? */
-	if (!multiface_hardware_enabled(machine))
-		return;
-
-	/* if stop button not already pressed, do press action */
-	/* pressing stop button while multiface is running has no effect */
-	if ((state->m_multiface_flags & MULTIFACE_STOP_BUTTON_PRESSED)==0)
-	{
-		/* initialise 0065 toggle */
-				/*state->m_multiface_flags &= ~MULTIFACE_0065_TOGGLE;*/
-
-		state->m_multiface_flags |= MULTIFACE_RAM_ROM_ENABLED;
-
-		/* stop button has been pressed, furthur pressess will not issue a NMI */
-		state->m_multiface_flags |= MULTIFACE_STOP_BUTTON_PRESSED;
-
-		state->m_gate_array.mrer &=~0x04;
-
-		/* page rom into memory */
-		multiface_rethink_memory(machine);
-
-		/* pulse the nmi line */
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-
-		/* initialise 0065 override to monitor calls to 0065 */
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(amstrad_multiface_directoverride), &machine));
-	}
-
-}
-
-
-/* any io writes are passed through here */
-static WRITE8_HANDLER(multiface_io_write)
-{
-	amstrad_state *state = space->machine().driver_data<amstrad_state>();
-	/* multiface hardware enabled? */
-		if (!multiface_hardware_enabled(space->machine()))
-		return;
-
-		/* visible? */
-	if (state->m_multiface_flags & MULTIFACE_VISIBLE)
-	{
-		if (offset==0x0fee8)
-		{
-			state->m_multiface_flags |= MULTIFACE_RAM_ROM_ENABLED;
-			amstrad_rethinkMemory(space->machine());
-		}
-
-		if (offset==0x0feea)
-		{
-			state->m_multiface_flags &= ~MULTIFACE_RAM_ROM_ENABLED;
-			amstrad_rethinkMemory(space->machine());
-		}
-	}
-
-	/* update multiface ram with data */
-		/* these are decoded fully! */
-		switch ((offset>>8) & 0x0ff)
-		{
-				/* gate array */
-				case 0x07f:
-				{
-						switch (data & 0x0c0)
-						{
-								/* pen index */
-								case 0x00:
-								{
-									state->m_multiface_ram[0x01fcf] = data;
-
-								}
-								break;
-
-								/* pen colour */
-								case 0x040:
-								{
-									int pen_index;
-
-									pen_index = state->m_multiface_ram[0x01fcf] & 0x0f;
-
-									if (state->m_multiface_ram[0x01fcf] & 0x010)
-									{
-
-										state->m_multiface_ram[0x01fdf + pen_index] = data;
-									}
-									else
-									{
-										state->m_multiface_ram[0x01f90 + pen_index] = data & 0x01f;
-									}
-
-								}
-								break;
-
-								/* rom/mode selection */
-								case 0x080:
-								{
-
-									state->m_multiface_ram[0x01fef] = data;
-
-								}
-								break;
-
-								/* ram configuration */
-								case 0x0c0:
-								{
-
-									state->m_multiface_ram[0x01fff] = data;
-
-								}
-								break;
-
-								default:
-								  break;
-
-						}
-
-				}
-				break;
-
-
-				/* crtc register index */
-				case 0x0bc:
-				{
-						state->m_multiface_ram[0x01cff] = data;
-				}
-				break;
-
-				/* crtc register write */
-				case 0x0bd:
-				{
-						int reg_index;
-
-						reg_index = state->m_multiface_ram[0x01cff] & 0x0f;
-
-						state->m_multiface_ram[0x01db0 + reg_index] = data;
-				}
-				break;
-
-
-				/* 8255 ppi control */
-				case 0x0f7:
-				{
-				  state->m_multiface_ram[0x017ff] = data;
-
-				}
-				break;
-
-				/* rom select */
-				case 0x0df:
-				{
-				   state->m_multiface_ram[0x01aac] = data;
-				}
-				break;
-
-				default:
-				   break;
-
-		}
-
+   	if(state != 0)
+   		tstate->m_gate_array.mrer &= ~0x04;
+   	else
+   		tstate->m_gate_array.mrer |= 0x04;
+	amstrad_rethinkMemory(device->machine());
 }
 
 
@@ -1406,7 +1135,7 @@ static void amstrad_setLowerRom(running_machine &machine)
 	/* b2 : "1" Lower rom area disable or "0" Lower rom area enable */
 	if ( state->m_system_type == SYSTEM_CPC || state->m_system_type == SYSTEM_ALESTE )
 	{
-		if ((state->m_gate_array.mrer & (1<<2)) == 0)
+		if ((state->m_gate_array.mrer & (1<<2)) == 0 && state->m_gate_array.romdis == 0)
 		{
 			bank_base = &machine.region("maincpu")->base()[0x010000];
 		}
@@ -1449,7 +1178,7 @@ static void amstrad_setLowerRom(running_machine &machine)
 			memory_set_bankptr(machine,"bank6", state->m_AmstradCPC_RamBanks[2]+0x2000);
 		}
 
-		if ( (state->m_gate_array.mrer & (1<<2)) == 0)
+		if ( (state->m_gate_array.mrer & (1<<2)) == 0 && state->m_gate_array.romdis == 0)
 		{  // ASIC secondary lower ROM selection (bit 5: 1 = enabled)
 			if ( state->m_asic.enabled )
 			{
@@ -1498,7 +1227,7 @@ static void amstrad_setUpperRom(running_machine &machine)
 	UINT8 *bank_base = NULL;
 
 	/* b3 : "1" Upper rom area disable or "0" Upper rom area enable */
-	if ( ! ( state->m_gate_array.mrer & 0x08 ) )
+	if ( ! ( state->m_gate_array.mrer & 0x08 ) && state->m_gate_array.romdis == 0)
 	{
 		bank_base = state->m_Amstrad_ROM_Table[ state->m_gate_array.upper_bank ];
 	}
@@ -2210,6 +1939,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 	amstrad_state *state = space->machine().driver_data<amstrad_state>();
 	device_t *fdc = space->machine().device("upd765");
 	mc6845_device *mc6845 = space->machine().device<mc6845_device>("mc6845");
+	cpc_multiface2_device* mface2;
 
 	if ((offset & (1<<15)) == 0)
 	{
@@ -2367,7 +2097,12 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 		mc6845->set_clock( ( state->m_aleste_mode & 0x02 ) ? ( XTAL_16MHz / 8 ) : ( XTAL_16MHz / 16 ) );
 	}
 
-	multiface_io_write(space, offset, data);
+	mface2 = space->machine().device<cpc_multiface2_device>("exp:multiface2");
+	if(mface2 != NULL)
+	{
+		if(mface2->multiface_io_write(offset, data) != 0)
+			amstrad_rethinkMemory(space->machine());
+	}
 }
 
 
@@ -2529,8 +2264,6 @@ static void amstrad_reset_machine(running_machine &machine)
 
 	if ( state->m_system_type == SYSTEM_PLUS || state->m_system_type == SYSTEM_GX4000 )
 		memset(state->m_asic.ram,0,16384);  // clear ASIC RAM
-
-	multiface_reset(state);
 }
 
 
@@ -2540,6 +2273,7 @@ static void amstrad_reset_machine(running_machine &machine)
 static void amstrad_rethinkMemory(running_machine &machine)
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
+	cpc_multiface2_device* mface2;
 	/* the following is used for banked memory read/writes and for setting up
      * opcode and opcode argument reads */
 
@@ -2597,9 +2331,14 @@ static void amstrad_rethinkMemory(running_machine &machine)
 	}
 
 	/* multiface hardware enabled? */
-	if (multiface_hardware_enabled(machine))
+	mface2 = machine.device<cpc_multiface2_device>("exp:multiface2");
+	if(mface2 != NULL)
 	{
-		multiface_rethink_memory(machine);
+		if (mface2->multiface_hardware_enabled())
+		{
+			if((state->m_gate_array.mrer & 0x04) == 0)
+				mface2->multiface_rethink_memory();
+		}
 	}
 }
 
@@ -2616,9 +2355,10 @@ static void kccomp_reset_machine(running_machine &machine)
 
 SCREEN_EOF( amstrad )
 {
-	if (input_port_read_safe(machine, "multiface", 0) & 0x02)
+	cpc_multiface2_device* mface2 = machine.device<cpc_multiface2_device>("exp:multiface2");
+	if(mface2 != NULL)
 	{
-		multiface_stop(machine);
+		mface2->check_button_state();
 	}
 }
 
@@ -3138,7 +2878,6 @@ static TIMER_CALLBACK( cb_set_resolution )
 MACHINE_START( amstrad )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	multiface_init(machine);
 	state->m_system_type = SYSTEM_CPC;
 }
 
@@ -3264,7 +3003,6 @@ MACHINE_RESET( gx4000 )
 MACHINE_START( kccomp )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	multiface_init(machine);
 	state->m_system_type = SYSTEM_CPC;
 }
 
@@ -3296,7 +3034,6 @@ MACHINE_RESET( kccomp )
 MACHINE_START( aleste )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	multiface_init(machine);
 	state->m_system_type = SYSTEM_ALESTE;
 }
 
