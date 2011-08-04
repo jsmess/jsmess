@@ -72,12 +72,14 @@ struct cpc_expansion_slot_interface
     devcb_write_line	m_out_irq_cb;
     devcb_write_line	m_out_nmi_cb;
     devcb_write_line	m_out_reset_cb;
+    devcb_write_line	m_out_romdis_cb;
+    devcb_write_line	m_out_romen_cb;
 };
 
 
-// ======================> device_c64_expansion_card_interface
+// ======================> device_cpc_expansion_card_interface
 
-// class representing interface-specific live c64_expansion card
+// class representing interface-specific live cpc_expansion card
 class device_cpc_expansion_card_interface : public device_interface
 {
 public:
@@ -90,7 +92,7 @@ public:
 };
 
 
-// ======================> c64_expansion_slot_device
+// ======================> cpc_expansion_slot_device
 
 class cpc_expansion_slot_device : public device_t,
 								  public cpc_expansion_slot_interface,
@@ -104,6 +106,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	DECLARE_WRITE_LINE_MEMBER( romdis_w );
+	DECLARE_WRITE_LINE_MEMBER( romen_w );
 
 protected:
 	// device-level overrides
@@ -114,6 +118,8 @@ protected:
 	devcb_resolved_write_line	m_out_irq_func;
 	devcb_resolved_write_line	m_out_nmi_func;
 	devcb_resolved_write_line	m_out_reset_func;
+    devcb_resolved_write_line	m_out_romdis_func;
+    devcb_resolved_write_line	m_out_romen_func;
 
 	device_cpc_expansion_card_interface *m_card;
 };

@@ -20,6 +20,7 @@ typedef struct
 	UINT8	pen_selected;		/* Pen selection */
 	UINT8	mrer;				/* Mode and ROM Enable Register */
 	UINT8	upper_bank;
+	UINT8	romdis;  // ROMDIS signal from the expansion port
 
 	/* input signals from CRTC */
 	int		vsync;
@@ -103,8 +104,6 @@ public:
 	UINT8 m_mode0_lookup[256];
 	UINT8 m_mode1_lookup[256];
 	UINT8 m_mode2_lookup[256];
-	unsigned char *m_multiface_ram;
-	unsigned long m_multiface_flags;
 	int m_prev_data;
 	int m_printer_bit8_selected;
 	unsigned char m_Psg_FunctionSelected;
@@ -130,6 +129,8 @@ WRITE8_DEVICE_HANDLER( amstrad_ppi_portc_w );
 READ8_HANDLER ( amstrad_psg_porta_read );
 
 WRITE_LINE_DEVICE_HANDLER( aleste_interrupt );
+WRITE_LINE_DEVICE_HANDLER( cpc_romdis );
+WRITE_LINE_DEVICE_HANDLER( cpc_romen );
 
 MACHINE_START( amstrad );
 MACHINE_RESET( amstrad );
