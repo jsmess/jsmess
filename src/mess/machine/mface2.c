@@ -56,7 +56,6 @@ DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_multiface_directoverride )
 
 		 /* clear op base override */
 		 machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(cpc_multiface2_device::amstrad_default),this));
-		 popmessage("DIRECT_UPDATE set to default");
 		}
 
 		return pc;
@@ -144,7 +143,6 @@ void cpc_multiface2_device::multiface_stop()
 
 		/* initialise 0065 override to monitor calls to 0065 */
 		machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(cpc_multiface2_device::amstrad_multiface_directoverride),this));
-		popmessage("DIRECT_UPDATE set to Multiface");
 	}
 }
 
