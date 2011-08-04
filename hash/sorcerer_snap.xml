@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="sorcerer_quick" description="Exidy Sorcerer Snapshots">
+	<software name="breakout">
+		<description>Breakout</description>
+		<year>1980</year>
+		<publisher>Ray Bannon</publisher>
+		<part name="quick" interface="sorcerer_quick">
+			<dataarea name="snp" size="65564">
+				<rom name="breakout.snp" size="65564" crc="c758244a" sha1="019706f221fa0628b3542e2f64b94a28e27c9c0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess">
+		<description>Chess</description>
+		<year>19??</year>
+		<publisher>unknown</publisher>
+		<part name="quick" interface="sorcerer_quick">
+			<dataarea name="snp" size="65564">
+				<rom name="chess.snp" size="65564" crc="5d9f7caa" sha1="3e31b7d661d46eb32dff80ab2c42ce0eb4897733" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chomp">
+		<description>Chomp</description>
+		<year>1981</year>
+		<publisher>Global Software Network</publisher>
+		<part name="quick" interface="sorcerer_quick">
+			<dataarea name="snp" size="65564">
+				<rom name="chomp.snp" size="65564" crc="338bd4c5" sha1="4af1778ee79ed15dcc4986ee4480c1aa2d842cdc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxian">
+		<description>Galaxian</description>
+		<year>1978</year>
+		<publisher>Exidy Inc.</publisher>
+		<part name="quick" interface="sorcerer_quick">
+			<dataarea name="snp" size="65564">
+				<rom name="galaxian.snp" size="65564" crc="7908c146" sha1="f2a7742056ded8c6b3bbc0edbf87b52fc3c196da" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invaders">
+		<description>Invaders</description>
+		<year>1978</year>
+		<publisher>Digital Research</publisher>
+		<part name="quick" interface="sorcerer_quick">
+			<dataarea name="snp" size="65564">
+				<rom name="invaders.snp" size="65564" crc="7d9da712" sha1="a19f1d99732a6aadf4bce0b915323c6691344f41" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snake">
+		<description>Snake</description>
+		<year>1978</year>
+		<publisher>Digital Research</publisher>
+		<part name="quick" interface="sorcerer_quick">
+			<dataarea name="snp" size="65564">
+				<rom name="snake.snp" size="65564" crc="8cd145a7" sha1="7114b7b94aadce0e7e4d70a800e90b8e69beb146" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
