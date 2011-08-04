@@ -63,6 +63,40 @@
 		</part>
 	</software>
 	
+	<software name="applicat">
+		<description>Applications (Fra)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Applications"/>
+			<dataarea name="flop" size="368640">
+				<rom name="applicat.img" size="368640" crc="c4b982a7" sha1="1b1c1cbf5a954b249b6efe1f9ff0fb08634a131f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Calcomat"/>
+			<dataarea name="flop" size="368640">
+				<rom name="calcomat.img" size="368640" crc="3082316c" sha1="ef29472dbe70d240747318656f5ebdb526d2e3a3" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Evolution"/>
+			<dataarea name="flop" size="368640">
+				<rom name="evolutio.img" size="368640" crc="7f451c23" sha1="79a0fc7c6820b3ea321705e31cdd99d0633fbafc" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Superbase"/>
+			<dataarea name="flop" size="368640">
+				<rom name="superbas.img" size="368640" crc="6f7b533b" sha1="447268862d37175e1a118fdddc9fe029d5bf48da" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="system">
 		<description>Amstrad PC1512 System Discs</description>
 		<year>1986</year>
@@ -96,5 +130,38 @@
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<software name="system_fr" cloneof="system">
+		<description>Amstrad PC1512 System Discs (Fra)</description>
+		<year>1986</year>
+		<publisher>Amstrad</publisher>
+		
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46001f.img" size="368640" crc="dab66cc5" sha1="831888c390829511e52d96c25e70907aa646132d" offset="0" />
+			</dataarea>
+		</part>
+		
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46002f.img" size="368640" crc="89aa0859" sha1="b5b913401d2dca6b20d8ce2d68ffd7a35a046778" offset="0" />
+			</dataarea>
+		</part>
+		
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 3"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46003f.img" size="368640" crc="068ffaab" sha1="f1525af95b7b1996517475490c4cc2ed27bebfae" offset="0" />
+			</dataarea>
+		</part>
+		
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 4"/>
+			<dataarea name="flop" size="368640">
+				<rom name="46004f.img" size="368640" crc="c9576eaa" sha1="7eb65b49838a4f284b38c83b7c0ea0e00bef41f9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

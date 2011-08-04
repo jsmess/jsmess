@@ -35,5 +35,39 @@
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="system_fr" cloneof="system">
+		<description>Amstrad PC1640 System Discs (Fra)</description>
+		<year>1987</year>
+		<publisher>Amstrad</publisher>
+		
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="47001f.img" size="368640" crc="17fdea8d" sha1="b7c9ddb0f44ca1df582382677d5810007aa4c91a" offset="0" />
+			</dataarea>
+		</part>
+		
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="47002f.img" size="368640" crc="1de13292" sha1="b416cbba207ef2de8b1270abc818d7675ff1f6e4" offset="0" />
+			</dataarea>
+		</part>
+		
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 3"/>
+			<dataarea name="flop" size="368640">
+				<rom name="47003f.img" size="368640" crc="a90a5bc2" sha1="51e71ef779e11738b7da0828cb6832c60d150556" offset="0" />
+			</dataarea>
+		</part>
+		
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 4"/>
+			<dataarea name="flop" size="368640">
+				<rom name="47004f.img" size="368640" crc="0a2bbad5" sha1="4ee3bb07e4fdf12ac8e480a3abaf2e07429fac4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
