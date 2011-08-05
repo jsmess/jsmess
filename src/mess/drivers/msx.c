@@ -44,13 +44,14 @@ National FS-4700 - MSX2 - fs4700
 National FS-5000F2 - MSX2 - fs5000
 National FS-5500F1 - MSX2 - fs5500
 National FS-5500F2 - MSX2 - fs5500
+Olympia PHC-2 - MSX1 - phc2
 Panasonic FS-A1 - MSX2 - fsa1 / fsa1a
 Panasonic FS-A1 MK2 - MSX2 - fsa1mk2
 Panasonic FS-A1F - MSX2 - fsa1f
 Panasonic FS-A1FM - MSX2 - fsa1fm
 Panasonic FS-A1FX - MSX2+ - fsa1fx
-Panasonic FS-A1GT
-Panasonic FS-A1ST
+Panasonic FS-A1GT - MSX Turbo-R - 
+Panasonic FS-A1ST - MSX Turbo-R - 
 Panasonic FS-A1WSX - MSX2+ - fsa1wsx
 Panasonic FS-A1WX - MSX2+ - fsa1wx / fsa1wxa
 Philips NMS-801 - MSX1 - nms801
@@ -139,6 +140,7 @@ Notes:
   CN8 - Expansion slot
 
 
+Sanyo MPC-64 - MSX1 - mpc64
 Sanyo MPC-100 - MSX1 - mpc100
 Sanyo PHC-28S
 Sanyo Wavy PHC-23 - MSX2 - phc23
@@ -274,6 +276,7 @@ Yamaha YIS-503II (Russian) - MSX1 - y503iir
 Yamaha YIS-503II (Estonian) - MSX1 - y503iir2
 Yamaha YIS-503M - MSX1 - yis503m
 Yashica YC-64 - MSX1 - yc64
+Yeno MX64 - MSX1 - mx64
 =============
 
 PCB Layouts missing
@@ -1557,6 +1560,20 @@ MSX_LAYOUT_INIT (fs4000)
 	MSX_LAYOUT_KANJI (0x18000)
 MSX_LAYOUT_END
 
+/*MSX - Olympia PHC-2*/
+
+ROM_START (phc2)
+	ROM_REGION (0x8000, "maincpu", 0)
+	ROM_LOAD ("phc2bios.rom", 0x0000, 0x8000, CRC(4f7bb04b) SHA1(ab0177624d46dd77ab4f50ffcb983c3ba88223f4))
+ROM_END
+
+MSX_LAYOUT_INIT (phc2)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+MSX_LAYOUT_END
+
 /* MSX - Philips NMS-801 */
 
 ROM_START (nms801)
@@ -1656,6 +1673,20 @@ MSX_LAYOUT_INIT (piopx7)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 1, 2, ROM, 0x4000, 0x8000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/*MSX - Sanyo MPC-64*/
+
+ROM_START (mpc64)
+	ROM_REGION (0x8000, "maincpu", 0)
+	ROM_LOAD ("mpc64bios.rom", 0x0000, 0x8000, CRC(d6e704ad) SHA1(d67be6d7d56d7229418f4e122f2ec27990db7d19))
+ROM_END
+
+MSX_LAYOUT_INIT (mpc64)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
 
 /* MSX - Sanyo MPC-100 */
@@ -2163,6 +2194,20 @@ MSX_LAYOUT_INIT (yc64)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+MSX_LAYOUT_END
+
+/* MSX - Yeno MX64 */
+
+ROM_START (mx64)
+	ROM_REGION (0x8000, "maincpu",0)
+	ROM_LOAD ("mx64bios.rom", 0x0000, 0x8000, CRC(e0e894b7) SHA1(d99eebded5db5fce1e072d08e642c0909bc7efdd))
+ROM_END
+
+MSX_LAYOUT_INIT (mx64)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 MSX_LAYOUT_END
 
 /* MSX - Frael Bruc 100-1 */
@@ -3736,10 +3781,12 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (cf3300)
 	MSX_DRIVER (fs1300)
 	MSX_DRIVER (fs4000)
+	MSX_DRIVER (phc2)
 	MSX_DRIVER (nms801)
 	MSX_DRIVER (vg802000)
 	MSX_DRIVER (vg802020)
 	MSX_DRIVER (piopx7)
+	MSX_DRIVER (mpc64)
 	MSX_DRIVER (mpc100)
 	MSX_DRIVER (hotbit11)
 	MSX_DRIVER (hotbit12)
@@ -3773,6 +3820,7 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (y503iir2)
 	MSX_DRIVER (yis503m)
 	MSX_DRIVER (yc64)
+	MSX_DRIVER (mx64)
 	MSX_DRIVER (bruc100)
 
 
@@ -3868,6 +3916,7 @@ COMP(1984, cf3000,   msx,	0,  msx_ntsc, msxjp,    msx,     "National / Matsushit
 COMP(1985, cf3300,   msx,	0,  msx_ntsc, msxjp,    msx,     "National / Matsushita", "CF-3300 (Japan)", 0 )
 COMP(1985, fs1300,   msx,	0,  msx_ntsc, msxjp,    msx,     "National / Matsushita", "FS-1300 (Japan)" , 0)
 COMP(1985, fs4000,   msx,	0,  msx_ntsc, msxjp,    msx,     "National / Matsushita", "FS-4000 (Japan)" , 0)
+COMP(1983, phc2,	 msx,	0,  msx_ntsc, msxjp,    msx,     "Olympia", "PHC-2" , 0)
 COMP(1983, nms801,	  msx,	0,	msx_pal,  msx,      msx,     "Philips", "NMS-801" , 0)
 COMP(1984, vg8000,  msx,	0,	msx_ntsc, msx,      msx,     "Philips",	 "VG-8000" , GAME_NOT_WORKING)
 COMP(1984, vg8010,  msx,	0,	msx_ntsc, msx,      msx,     "Philips",	 "VG-8010" , GAME_NOT_WORKING)
@@ -3875,6 +3924,7 @@ COMP(1984, vg8010f,  msx,	0,	msx_ntsc, msx,      msx,     "Philips",	 "VG-8010F"
 COMP(1985, vg802000,  msx,	0,	msx_ntsc, msx,      msx,     "Philips",	 "VG-8020-00" , 0)
 COMP(1985, vg802020, msx,	0,	msx_ntsc, msx,      msx,     "Philips",	 "VG-8020-20" , 0)
 COMP(1985, piopx7,	  msx,	0,	msx_pal,  msx,      msx,     "Pioneer",	 "PX-07" , 0)
+COMP(1985, mpc64,    msx,	0,  msx_ntsc, msxjp,    msx,     "Sanyo", "MPC-64" , 0)
 COMP(1985, mpc100,	  msx,	0,	msx_pal,  msx,      msx,     "Sanyo",	 "MPC-100" , 0)
 COMP(1985, hotbit11, msx,	0,	msx_ntsc, hotbit,   msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 1.1" , 0)
 COMP(1985, hotbit12, msx,	0,	msx_ntsc, hotbit,   msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 1.2" , 0)
@@ -3907,6 +3957,7 @@ COMP(1986, y503iir, msx,	0,	msx_pal,  msx,      msx,     "Yamaha",	 "YIS503IIR (
 COMP(1986, y503iir2, msx,	0,	msx_pal,  msx,      msx,     "Yamaha",	 "YIS503IIR (Estonian)" , 0)
 COMP(1984, yis503m, msx,	0,	msx_pal,  msx,      msx,     "Yamaha",	 "YIS503M" , GAME_NOT_WORKING)
 COMP(1984, yc64,	msx,	0,	msx_pal,  msx,      msx,     "Yashica", "YC-64" , 0)
+COMP(1984, mx64,    msx,	0,	msx_ntsc, msxkr,    msx,     "Yeno", "MX64" , 0)
 COMP(1984, bruc100, msx,	0,	msx_pal,  msx,      msx,     "Frael", "Bruc 100-1" , 0)
 
 COMP(1985, msx2,     0,		msx,msx2_pal, msx2,	    msx,     "ASCII & Microsoft", "MSX2", 0)

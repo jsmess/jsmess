@@ -1103,6 +1103,7 @@ cf3000	// 1984 MSX Japan
 cf3300	// 1985 MSX Japan
 fs1300	// 1985 MSX Japan
 fs4000	// 1985 MSX Japan
+phc2
 nms801
 vg8000
 vg8010
@@ -1110,6 +1111,7 @@ vg8010f
 vg802000
 vg802020  // 1985 MSX
 piopx7
+mpc64
 mpc100
 hotbit11  // 1985 MSX Brazil
 hotbit12  // 1985 MSX Brazil
@@ -1143,6 +1145,7 @@ y503iir
 y503iir2
 yis503m
 yc64
+mx64
 bruc100
 
 
