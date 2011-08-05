@@ -435,9 +435,9 @@ xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
 **********************************************************************************/
 /*
 DMA TODO:
+-fix src / dst add values
 -Add timings(but how fast are each DMA?).
 -Add level priority & DMA status register.
--Set boundaries.
 */
 
 #define DIRECT_MODE(_lv_)			(!(state->m_scu_regs[5+(_lv_*8)] & 0x01000000))
@@ -705,6 +705,18 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	if(single_dma_step == 2)
 		popmessage("Single DMA step == 2??? Contact MAMEdev");
 
+	/* Advanced World War screen */
+	if(state->m_scu.dst_add[dma_ch] == 0x40)
+	{
+		for (; state->m_scu.size[dma_ch] > 0; state->m_scu.size[dma_ch]-=2)
+		{
+			space->write_word(state->m_scu.dst[dma_ch],     space->read_word(state->m_scu.src[dma_ch]  ));
+			state->m_scu.dst[dma_ch]+=0x20;
+			state->m_scu.src[dma_ch]+=2;
+		}
+	}
+	else
+	{
 	for (; state->m_scu.size[dma_ch] > 0; state->m_scu.size[dma_ch]-=single_dma_step)
 	{
 		/* Many games directly accesses CD-ROM register 0x05818000, it must be a dword access with current implementation otherwise it won't work */
@@ -716,6 +728,10 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 		}
 		else if(state->m_scu.dst_add[dma_ch] == 2)
 			space->write_word(state->m_scu.dst[dma_ch],space->read_word(state->m_scu.src[dma_ch]));
+		else if(state->m_scu.dst_add[dma_ch] == 0x40)
+		{
+			space->write_word(state->m_scu.dst[dma_ch],     space->read_word(state->m_scu.src[dma_ch]  ));
+		}
 		else if(state->m_scu.dst_add[dma_ch] == 8)
 		{
 			/* TRUSTED, Battle Garegga and Batsugun graphics */
@@ -742,6 +758,7 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 
 		state->m_scu.dst[dma_ch]+=state->m_scu.dst_add[dma_ch];
 		state->m_scu.src[dma_ch]+=state->m_scu.src_add[dma_ch];
+	}
 	}
 
 	state->m_scu.size[dma_ch] = tmp_size;
