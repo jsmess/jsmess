@@ -6,76 +6,78 @@
 
 This following list is probably incomplete. Corrections are welcome.
 +
-Al Alamiah AX-170
-Al Alamiah AX-350
-Al Alamiah AX-370
-Canon V-10
-Canon V-20
+Al Alamiah AX-170 - MSX1 - ax170
+Al Alamiah AX-350 - MSX2 - ax350
+Al Alamiah AX-370 - MSX2 - ax370
+Canon V-10 - MSX1 - canonv10
+Canon V-20 - MSX1 - canonv20
 Ciel Expert 3 IDE
 Ciel Expert 3 Turbo
-Daewoo CPC-300
-Daewoo CPC-400
-Daewoo CPC-400S
-Daewoo DPC-100
-Daewoo DPC-180
-Daewoo DPC-200
-Goldstar FC-200
-Gradiente Expert 1.0
-Gradiente Expert 1.1
-Gradiente Expert 1.3
-Gradiente Expert 2.0
-Gradiente Expert DDPlus
-Gradiente Expert Plus
-JVC HC-7GB
-Mitsubishi ML-F80
-Mitsubishi ML-FX1
-National CF-1200
-National CF-2000
-National CF-2700
-National CF-3000
-National CF-3300
-National FS-1300
-National FS-4000
-National FS-4500
-National FS-4600
-National FS-4700
-National FS-5000
-National FS-5500F1
-National FS-5500F2
-Panasonic FS-A1
-Panasonic FS-A1 MK2
-Panasonic FS-A1F
-Panasonic FS-A1FM
-Panasonic FS-A1FX
+Daewoo CPC-300 - MSX2 - cpc300
+Daewoo CPC-300E - MSX2 - cpc300e
+Daewoo CPC-400 - MSX2 - cpc400
+Daewoo CPC-400S - MSX2 cpc400s
+Daewoo DPC-100 - MSX1 - dpc100
+Daewoo DPC-180 - MSX1 - dpc180
+Daewoo DPC-200 - MSX1 - dpc200
+Frael Bruc 100-1 - MSX1 - bruc100
+Goldstar FC-200 - MSX1 - gsfc200
+Gradiente Expert 1.0 - MSX1 - expert10
+Gradiente Expert 1.1 - MSX1 - expert11
+Gradiente Expert 1.3 - MSX1 - expert13
+Gradiente Expert 2.0 - MSX2 - expert20
+Gradiente Expert DDPlus - MSX1 - expertdp
+Gradiente Expert Plus - MSX1 - expertpl
+JVC HC-7GB - MSX1 -jvchc7gb
+Mitsubishi ML-F80 - MSX1 - mif80
+Mitsubishi ML-FX1 - MSX1 - mifx1
+National CF-1200 - MSX1 - cf1200
+National CF-2000 - MSX1 - cf2000
+National CF-2700 - MSX1 - cf2700
+National CF-3000 - MSX1 - cf3000
+National CF-3300 - MSX1 - cf3300
+National FS-1300 - MSX1 - fs1300
+National FS-4000 - MSX1 - fs4000
+National FS-4500 - MSX2 - fs4500
+National FS-4600 - MSX2 - fs4600
+National FS-4700 - MSX2 - fs4700
+National FS-5000F2 - MSX2 - fs5000
+National FS-5500F1 - MSX2 - fs5500
+National FS-5500F2 - MSX2 - fs5500
+Panasonic FS-A1 - MSX2 - fsa1 / fsa1a
+Panasonic FS-A1 MK2 - MSX2 - fsa1mk2
+Panasonic FS-A1F - MSX2 - fsa1f
+Panasonic FS-A1FM - MSX2 - fsa1fm
+Panasonic FS-A1FX - MSX2+ - fsa1fx
 Panasonic FS-A1GT
 Panasonic FS-A1ST
-Panasonic FS-A1WSX
-Panasonic FS-A1WX
-Philips NMS-801
-Philips NMS-8220
-Philips NMS-8245
-Philips NMS-8245F
-Philips NMS-8250
-Philips NMS-8255
-Philips NMS-8280
-Philips NMS-8280G
-Philips VG-8000
-Philips VG-8010
-Philips VG-8010F
-Philips VG-8020-00
-Philips VG-8020-20
-Philips VG-8020-40
-Philips VG-8230
-Philips VG-8235
-Philips VG-8235F
-Philips VG-8240
-===============
+Panasonic FS-A1WSX - MSX2+ - fsa1wsx
+Panasonic FS-A1WX - MSX2+ - fsa1wx / fsa1wxa
+Philips NMS-801 - MSX1 - nms801
+Philips NMS-8220 - MSX2 - nms8220 / nms8220a
+Philips NMS-8245 - MSX2 - nms8245
+Philips NMS-8245F - MSX2 - nms8245f
+Philips NMS-8250 - MSX2 - nms8250
+Philips NMS-8255 - MSX2 - nms8255
+Philips NMS-8280 - MSX2 - nms8280
+Philips NMS-8280G - MSX2 - nms8280g
+Philips VG-8000 - MSX1 - vg8000
+Philips VG-8010 - MSX1 - vg8010
+Philips VG-8010F - MSX1 - vg8010f
+Philips VG-8020-00 - MSX1 - vg802000
+Philips VG-8020-20 - MSX1 - vg802020
+Philips VG-8020-40 - MSX1 - 
+Philips VG-8230 - MSX2 - vg8230
+Philips VG-8235 - MSX2 - vg8235
+Philips VG-8235F - MSX2 - vg8235f
+Philips VG-8240 - MSX2 - vg8240
+===============================
 
 PCB Layout missing
 
 
-Pioneer PX-7
-============
+Pioneer PX-7 - MSX1 - piopx7
+============================
 
 |---------------------------------------|
 |  CN1     CN2                          |
@@ -137,56 +139,57 @@ Notes:
   CN8 - Expansion slot
 
 
-Sanyo MPC-100
+Sanyo MPC-100 - MSX1 - mpc100
 Sanyo PHC-28S
-Sanyo Wavy PHC-23
-Sanyo Wavy PHC-35J
-Sanyo Wavy PHC70FD1
-Sanyo Wavy PHC70FD2
-Sharp Epcom HotBit 1.1
-Sharp Epcom HotBit 1.2
-Sharp Epcom HotBit 1.3b
-Sharp Epcom HotBit 1.3p
-Sharp Epcom HotBit 2.0
-Sony HB-10P
-Sony HB-201
-Sony HB-201P
-Sony HB-501P
-Sony HB-55D
-Sony HB-55P
-Sony HB-75D
-Sony HB-75P
-Sony HB-F1
-Sony HB-F1II
-Sony HB-F1XD
-Sony HB-F1XD MK2
-Sony HB-F1XDJ
-Sony HB-F1XV
+Sanyo Wavy PHC-23 - MSX2 - phc23
+Sanyo Wavy PHC-35J - MSX2+ - phc35j
+Sanyo Wavy PHC70FD1 - MSX2+ - phc70fd
+Sanyo Wavy PHC70FD2 - MSX2+ - phc70fd2
+Sharp Epcom HotBit 1.1 - MSX1 - hotbit11
+Sharp Epcom HotBit 1.2 - MSX1 - hotbit12
+Sharp Epcom HotBit 1.3b - MSX1 - hotbi13b
+Sharp Epcom HotBit 1.3p - MSX1 - hotbi13p
+Sharp Epcom HotBit 2.0 - MSX2 - hotbit20
+Sony HB-10P - MSX1 - hb10p
+Sony HB-20P - MSX1 - hb20p
+Sony HB-201 - MSX1 - hp201
+Sony HB-201P - MSX1 - hp201p
+Sony HB-501P - MSX1 - hp501p
+Sony HB-55D - MSX1 - hp55d
+Sony HB-55P - MSX1 - hp55p
+Sony HB-75D - MSX1 - hb75d
+Sony HB-75P - MSX1 - hb75p
+Sony HB-F1 - MSX2 - hbf1
+Sony HB-F1II - MSX2 - hbf12
+Sony HB-F1XD - MSX2 - hbf1xd
+Sony HB-F1XD MK2 - MSX2 - hbf1xdm2
+Sony HB-F1XDJ - MSX2+ - hbf1xdj
+Sony HB-F1XV - MSX2+ - hbf1xv
 Sony HB-F5
-Sony HB-F500
-Sony HB-F500P
-Sony HB-F700D
-Sony HB-F700F
-Sony HB-F700P
-Sony HB-F700S
-Sony HB-F900
-Sony HB-F9P
-Sony HB-F9S
-Sony HB-G900AP
-Sony HB-G900P
+Sony HB-F500 - MSX2 - hbf500
+Sony HB-F500P - MSX2 - hbf500p
+Sony HB-F700D - MSX2 - hbf700d
+Sony HB-F700F - MSX2 - hbf700f
+Sony HB-F700P - MSX2 - hbf700p
+Sony HB-F700S - MSX2 - hbf700s
+Sony HB-F900 - MSX2 - hbf900 / hbf900a
+Sony HB-F9P - MSX2 - hbf9p
+Sony HB-F9S - MSX2 - hbf9s
+Sony HB-G900AP - MSX2 - hbg900ap
+Sony HB-G900P - MSX2 - hbg900p
 Sony HB-T7
-Spectravideo SVI-728
-Spectravideo SVI-738
-Talent DPC-200
-Talent DPC-200A
-Talent TPC-310
-==============
+Spectravideo SVI-728 - MSX1 - svi728
+Spectravideo SVI-738 - MSX1 - swi738 / swi738sw
+Talent DPC-200 - MSX1 - tadpc200
+Talent DPC-200A - MSX1 - tadpc20a
+Talent TPC-310 - MSX2 - tpc310
+==============================
 
 PCB Layouts missing
 
 
-Toshiba HX-10
-=============
+Toshiba HX-10 - MSX1 - hx10
+===========================
 
 Code on PCB: MSX TUK
         |---------------------------|-------------------|-------------|
@@ -255,19 +258,22 @@ Notes:
    L - LVA510
 
 
-Toshiba HX-10S
-Toshiba HX-20
-Toshiba HX-23
-Toshiba HX-23F
-Yamaha CX5M
-Yamaha CX5M-128
-Yamaha CX7M
-Yamaha CX7M-128
-Yamaha YIS-303
-Yamaha YIS-503
-Yamaha YIS-503M
-Yamaha YIS-503
-Yashica YC-64
+Toshiba HX-10S - MSX1 - hx10s
+Toshiba HX-20 - MSX1 - hx20
+Toshiba HX-23 - MSX2 - hx23
+Toshiba HX-23F - MSX2 - hx23f
+Yamaha CX5M - MSX1 - cx5m
+Yamaha CX5M-128 - MSX1 - cx5m128
+Yamaha CX5MII - MSX1 - cx5m2
+Yamaha CX7M - MSX2 - cx7m
+Yamaha CX7M-128 - MSX2 - cx7m128
+Yamaha YIS-303 - MSX1 - yis303
+Yamaha YIS-503 - MSX1 - yis503
+Yamaha YIS-503II - MSX1 - yis503ii
+Yamaha YIS-503II (Russian) - MSX1 - y503iir
+Yamaha YIS-503II (Estonian) - MSX1 - y503iir2
+Yamaha YIS-503M - MSX1 - yis503m
+Yashica YC-64 - MSX1 - yc64
 =============
 
 PCB Layouts missing
