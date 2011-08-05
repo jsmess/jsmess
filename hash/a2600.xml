@@ -904,7 +904,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="asteriod">
+	<software name="asteroid">
 		<description>Asteroids</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
@@ -917,7 +917,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="asteriodp" cloneof="asteriod">
+	<software name="asteroidp" cloneof="asteriod">
 		<description>Asteroids (PAL)</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
@@ -930,7 +930,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="asteriodp1" cloneof="asteriod">
+	<software name="asteroidp1" cloneof="asteriod">
 		<description>Asteroids (PAL, Older)</description>
 		<!-- According to the Programmer he didn't do the title screen, so it must have been added later on by another programmer -->
 		<year>1981</year>
