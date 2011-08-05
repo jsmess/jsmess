@@ -1431,8 +1431,14 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			break;
 
 		case 0x6400:    // put sector data
-			/* TODO: After Burner 2 and Dungeon Master Nexus trips this */
+			/* TODO: After Burner 2, Out Run, Fantasy Zone and Dungeon Master Nexus trips this */
 			// ...
+			{
+				//UINT8 sectnum = cr4 & 0xff;
+				//UINT8 filtnum = cr3>>8;
+
+
+			}
 
 			popmessage("Put sector data command issued, contact MAMEdev");
 			hirqreg |= (CMOK|EHST);
@@ -1978,7 +1984,7 @@ static partitionT *cd_filterdata(filterT *flt, int trktype)
 			{
 				if (curblock.chan != flt->chan)
 				{
-					logerror("channel number reject");
+					logerror("channel number reject\n");
 					match = 0;
 				}
 			}
@@ -1987,7 +1993,7 @@ static partitionT *cd_filterdata(filterT *flt, int trktype)
 			{
 				if((curblock.subm & flt->smmask) != flt->smval)
 				{
-					logerror("sub mode reject");
+					logerror("sub mode reject\n");
 					match = 0;
 				}
 			}
@@ -1996,7 +2002,7 @@ static partitionT *cd_filterdata(filterT *flt, int trktype)
 			{
 				if((curblock.cinf & flt->cimask) != flt->cival)
 				{
-					logerror("coding information reject");
+					logerror("coding information reject\n");
 					match = 0;
 				}
 			}
