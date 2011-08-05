@@ -1460,9 +1460,9 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 		case 0x7100:	// Read directory entry
 			CDROM_LOG(("%s:CD: Read Directory Entry\n",   machine.describe_context()))
-			UINT32 read_dir;
+//			UINT32 read_dir;
 
-			read_dir = ((cr3&0xff)<<16)|cr4;
+//			read_dir = ((cr3&0xff)<<16)|cr4;
 
 			if((cr3 >> 8) < 0x24)
 				cddevice = &filters[cr3 >> 8];
