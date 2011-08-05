@@ -660,7 +660,7 @@ WRITE8_HANDLER( saturn_SMPC_w )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 	system_time systime;
-	UINT8 last;
+//	UINT8 last;
 	running_machine &machine = space->machine();
 
 	/* get the current date/time from the core */
@@ -670,7 +670,7 @@ WRITE8_HANDLER( saturn_SMPC_w )
 
 //  if (offset == 0x7d) printf("IOSEL2 %d IOSEL1 %d\n", (data>>1)&1, data&1);
 
-	last = state->m_smpc_ram[offset];
+//	last = state->m_smpc_ram[offset];
 
 	if (offset == 1)
 	{
