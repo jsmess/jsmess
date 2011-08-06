@@ -246,6 +246,8 @@ void mb89352_device::set_phase(int phase)
 	{
 	case SCSI_PHASE_BUS_FREE:
 		m_line_status = 0;
+		if(m_int_enable != 0)
+			m_irq_func(1);
 		break;
 	case SCSI_PHASE_COMMAND:
 		m_line_status |= MB89352_LINE_REQ;
@@ -452,6 +454,8 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 			}
 			set_phase(SCSI_PHASE_COMMAND); // straight to command phase, may need a delay betweem selection and command phases
 			m_line_status |= MB89352_LINE_SEL;
+			if(m_int_enable != 0)
+				m_irq_func(1);
 			m_line_status |= MB89352_LINE_BSY;
 			m_spc_status &= ~SSTS_TARG_CONNECTED;
 			m_spc_status |= SSTS_INIT_CONNECTED;
