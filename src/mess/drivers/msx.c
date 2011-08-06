@@ -276,6 +276,7 @@ Yamaha YIS-503II (Russian) - MSX1 - y503iir
 Yamaha YIS-503II (Estonian) - MSX1 - y503iir2
 Yamaha YIS-503M - MSX1 - yis503m
 Yashica YC-64 - MSX1 - yc64
+Yeno DPC-64 (same bios as Olympia PHC-2)
 Yeno MX64 - MSX1 - mx64
 =============
 
