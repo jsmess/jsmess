@@ -1943,8 +1943,14 @@ static IRQ_CALLBACK(x68k_int_ack)
 
 static WRITE_LINE_DEVICE_HANDLER( x68k_scsi_irq )
 {
+	x68k_state *tstate = device->machine().driver_data<x68k_state>();
 	// TODO : Internal SCSI IRQ vector 0x6c, External SCSI IRQ vector 0xf6, IRQs go through the IOSC (IRQ line 1)
-	cputag_set_input_line_and_vector(device->machine(), "maincpu",1,state,0x6c);
+	if(state != 0)
+	{
+		tstate->m_current_vector[1] = 0x6c;
+		tstate->m_current_irq_line = 1;
+		cputag_set_input_line_and_vector(device->machine(), "maincpu",1,ASSERT_LINE,tstate->m_current_vector[1]);
+	}
 }
 
 static WRITE_LINE_DEVICE_HANDLER( x68k_scsi_drq )
