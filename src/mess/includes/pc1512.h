@@ -204,7 +204,8 @@ class pc1640_state : public pc1512_state
 {
 public:
 	pc1640_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc1512_state(mconfig, type, tag)
+		: pc1512_state(mconfig, type, tag),
+		  m_opt(0)
 	{ }
 
 	virtual void machine_start();
@@ -215,11 +216,13 @@ public:
 
 	DECLARE_READ8_MEMBER( video_ram_r );
 	DECLARE_WRITE8_MEMBER( video_ram_w );
+	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_READ8_MEMBER( iga_r );
 	DECLARE_WRITE8_MEMBER( iga_w );
 	DECLARE_READ8_MEMBER( printer_r );
 	
 	// video state
+	int m_opt;
 	UINT8 m_egc_ctrl;
 	UINT8 m_emcr;			// extended mode control register
 	UINT8 m_emcrp;			// extended mode control register protection read counter
