@@ -82,6 +82,7 @@ private:
 
     void mb89352_rescan(void);
     int get_scsi_cmd_len(UINT8 cbyte);
+    //void set_ints(UINT8 flag);
 
     devcb_resolved_write_line m_irq_func;
     devcb_resolved_write_line m_drq_func;

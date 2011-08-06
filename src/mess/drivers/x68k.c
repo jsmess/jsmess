@@ -1943,7 +1943,8 @@ static IRQ_CALLBACK(x68k_int_ack)
 
 static WRITE_LINE_DEVICE_HANDLER( x68k_scsi_irq )
 {
-	// TODO : Internal SCSI IRQ vector 0x6c, External SCSI IRQ vector 0xf6
+	// TODO : Internal SCSI IRQ vector 0x6c, External SCSI IRQ vector 0xf6, IRQs go through the IOSC (IRQ line 1)
+	cputag_set_input_line_and_vector(device->machine(), "maincpu",1,state,0x6c);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( x68k_scsi_drq )
