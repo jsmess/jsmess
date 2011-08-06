@@ -430,6 +430,7 @@ static TIMER_CALLBACK( saturn_smpc_intback )
 	{
 		state->m_smpc.intback_stage = (state->m_smpc_ram[3] & 8) >> 3; // first peripheral
 		state->m_smpc.smpcSR = 0x40;
+		state->m_smpc_ram[0x5f] = 0x10;
 		machine.scheduler().timer_set(attotime::from_usec(0), FUNC(intback_peripheral),0);
 	}
 	else
@@ -686,6 +687,7 @@ WRITE8_HANDLER( saturn_SMPC_w )
 			{
 				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request\n");
 				space->machine().scheduler().timer_set(attotime::from_usec(200), FUNC(intback_peripheral),0); /* TODO: is timing correct? */
+				state->m_smpc_ram[0x1f] = 0x10;
 				state->m_smpc_ram[0x63] = 0x01; //TODO: set hand-shake flag?
 			}
 		}
@@ -788,9 +790,11 @@ WRITE8_HANDLER( saturn_SMPC_w )
 		}
 
 		// we've processed the command, clear status flag
-		state->m_smpc_ram[0x5f] = data; //read-back for last command issued
 		if(data != 0x10)
+		{
+			state->m_smpc_ram[0x5f] = data; //read-back for last command issued
 			state->m_smpc_ram[0x63] = 0x00; //clear hand-shake flag
+		}
 		/*TODO:emulate the timing of each command...*/
 	}
 }
