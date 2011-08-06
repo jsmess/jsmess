@@ -1,6 +1,8 @@
 /***************************************************************************
 
   Apple 4*8 Graphics Card (model 630-0400) emulation
+  Apple 8*24 Graphics Card emulation (cards have the same framebuffer chip
+      w/different ROMs and RAMDACs, apparently)
 
 ***************************************************************************/
 
@@ -30,11 +32,17 @@ ROM_START( gc48 )
 	ROM_LOAD( "3410801.bin",  0x0000, 0x8000, CRC(e283da91) SHA1(4ae21d6d7bbaa6fc7aa301bee2b791ed33b1dcf9) )
 ROM_END
 
+ROM_START( gc824 )
+	ROM_REGION(0x8000, GC48_ROM_REGION, 0)
+    ROM_LOAD( "3410868.bin",  0x000000, 0x008000, CRC(57f925fa) SHA1(4d3c0632711b7b31c8e0c5cfdd7ec1904f178336) ) 
+ROM_END
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
 const device_type NUBUS_48GC = &device_creator<nubus_48gc_device>;
+const device_type NUBUS_824GC = &device_creator<nubus_824gc_device>;
 
 
 //-------------------------------------------------
@@ -42,7 +50,7 @@ const device_type NUBUS_48GC = &device_creator<nubus_48gc_device>;
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor nubus_48gc_device::device_mconfig_additions() const
+machine_config_constructor jmfb_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( macvideo_48gc );
 }
@@ -51,9 +59,14 @@ machine_config_constructor nubus_48gc_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *nubus_48gc_device::device_rom_region() const
+const rom_entry *jmfb_device::device_rom_region() const
 {
 	return ROM_NAME( gc48 );
+}
+
+const rom_entry *nubus_824gc_device::device_rom_region() const
+{
+	return ROM_NAME( gc824 );
 }
 
 //**************************************************************************
@@ -61,30 +74,42 @@ const rom_entry *nubus_48gc_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  nubus_48gc_device - constructor
+//  jmfb_device - constructor
 //-------------------------------------------------
 
-nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+jmfb_device::jmfb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, NUBUS_48GC, "NUBUS_48GC", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this),
 		device_slot_card_interface(mconfig, *this)
 {
-	m_shortname = "nb_48gc";
 }
 
-nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this),
 		device_slot_card_interface(mconfig, *this)
 {
+}
+
+nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	jmfb_device(mconfig, tag, owner, clock)
+{
 	m_shortname = "nb_48gc";
+	m_is824 = false;
+}
+
+nubus_824gc_device::nubus_824gc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	jmfb_device(mconfig, tag, owner, clock)
+{
+	m_shortname = "nb_824gc";
+	m_is824 = true;
 }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void nubus_48gc_device::device_start()
+void jmfb_device::device_start()
 {
 	UINT32 slotspace;
 
@@ -94,19 +119,19 @@ void nubus_48gc_device::device_start()
 
 	slotspace = get_slotspace();
 
-//	printf("[4*8gc %p] slotspace = %x\n", this, slotspace);
+//	printf("[JMFB %p] slotspace = %x\n", this, slotspace);
 
 	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, 0, 0, "bank_48gc", m_vram);
 
-	m_nubus->install_device(slotspace+0x200000, slotspace+0x2003ff, read32_delegate(FUNC(nubus_48gc_device::mac_48gc_r), this), write32_delegate(FUNC(nubus_48gc_device::mac_48gc_w), this));
+	m_nubus->install_device(slotspace+0x200000, slotspace+0x2003ff, read32_delegate(FUNC(jmfb_device::mac_48gc_r), this), write32_delegate(FUNC(jmfb_device::mac_48gc_w), this));
 }
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void nubus_48gc_device::device_reset()
+void jmfb_device::device_reset()
 {
 	m_toggle = 0;
 	m_clutoffs = 0;
@@ -127,7 +152,7 @@ void nubus_48gc_device::device_reset()
 
 static SCREEN_UPDATE( mac_48gc )
 {
-	nubus_48gc_device *card = downcast<nubus_48gc_device *>(screen->owner());
+	jmfb_device *card = downcast<jmfb_device *>(screen->owner());
 	UINT32 *scanline, *base;
 	int x, y;
 	UINT8 *vram8 = (UINT8 *)card->m_vram;
@@ -222,10 +247,8 @@ static SCREEN_UPDATE( mac_48gc )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_48gc_device::mac_48gc_w )
+WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 {
-//	printf("48gc_w: %08x to %x, mask %08x\n", data, offset*4, mem_mask);
-
 	COMBINE_DATA(&m_registers[offset&0xff]);
 
 	switch (offset)
@@ -249,15 +272,31 @@ WRITE32_MEMBER( nubus_48gc_device::mac_48gc_w )
 			break;
 
 		case 0x200/4:	// DAC control
-			m_clutoffs = data>>24;
+//			printf("%08x to DAC control\n", data);
+			if (m_is824)
+			{
+				m_clutoffs = data&0xff;
+			}
+			else
+			{
+				m_clutoffs = data>>24;
+			}
 			m_count = 0;
 			break;
 
 		case 0x204/4:	// DAC data
-			m_colors[m_count++] = data>>24;
+			if (m_is824)
+			{
+				m_colors[m_count++] = data&0xff;
+			}
+			else
+			{
+				m_colors[m_count++] = data>>24;
+			}
 
 			if (m_count == 3)
 			{
+//				printf("RAMDAC: color %d = %02x %02x %02x\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2]);
 				m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				m_count = 0;
@@ -269,9 +308,19 @@ WRITE32_MEMBER( nubus_48gc_device::mac_48gc_w )
 			if (m_mode == 3)	// this can be 8 or 24 bpp
 			{
 				// check pixel format for 24bpp
-				if (((data>>5)&3) == 0)
+				if (m_is824)
 				{
-					m_mode = 4;	// 24bpp
+					if (data & 2)
+					{
+						m_mode = 4;	// 24bpp
+					}
+				}
+				else
+				{
+					if (((data>>5)&3) == 0)
+					{
+						m_mode = 4;	// 24bpp
+					}
 				}
 			}
 //			printf("%02x to mode (m_mode = %d)\n", data, m_mode);
@@ -293,7 +342,7 @@ WRITE32_MEMBER( nubus_48gc_device::mac_48gc_w )
 	}
 }
 
-READ32_MEMBER( nubus_48gc_device::mac_48gc_r )
+READ32_MEMBER( jmfb_device::mac_48gc_r )
 {
 //	printf("48gc_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, cpu_get_pc(machine().device("maincpu")));
 
