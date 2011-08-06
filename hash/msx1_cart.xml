@@ -36,6 +36,21 @@ Most of the information in this list was taken from http://gigamix.jp/rom/rom.ph
 		</part>
 	</software>
 
+	<software name="rtype">
+		<description>R-Type</description>
+		<year>1988</year>
+		<publisher>Irem</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="MSX-004" />
+			<feature name="mapper" value="IREM TAM-S1" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh532163" size="262144" crc="c4c12176" sha1="07fb300ce49b2d50a99ea0a2a25148900d2035ea" offset="0" />
+				<rom name="lh2309hb" size="131072" crc="8a5c4661" sha1="1bdb41ecbbb9e5819380ab33dc473a57ffa9d254" offset="0x40000" />
+				<rom size="131072" offset="0x60000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>
