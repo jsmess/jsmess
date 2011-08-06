@@ -800,9 +800,10 @@ static const struct nbbus_interface nubus_intf =
 };
 
 static SLOT_INTERFACE_START(mac_nubus_cards)
-	SLOT_INTERFACE("48gc", NUBUS_48GC)
-	SLOT_INTERFACE("cb264", NUBUS_CB264)
-	SLOT_INTERFACE("vikbw", NUBUS_VIKBW)
+	SLOT_INTERFACE("48gc", NUBUS_48GC)		/* Apple 4*8 Graphics Card */
+	SLOT_INTERFACE("824gc", NUBUS_824GC)	/* Apple 8*24 Graphics Card */
+	SLOT_INTERFACE("cb264", NUBUS_CB264)	/* RasterOps ColorBoard 264 */
+	SLOT_INTERFACE("vikbw", NUBUS_VIKBW)	/* Moniterm Viking board */
 SLOT_INTERFACE_END
 
 /***************************************************************************
