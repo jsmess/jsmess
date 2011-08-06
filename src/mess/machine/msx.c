@@ -123,7 +123,8 @@ DEVICE_IMAGE_LOAD (msx_cart)
 			static const struct { const char *mapper_name; int mapper_type; } mapper_types[] =
 			{
 				{ "M60002-0125SP", SLOT_ASCII8 },
-				{ "LZ93A13", SLOT_ASCII8 }
+				{ "LZ93A13", SLOT_ASCII8 },
+				{ "IREM TAM-S1", SLOT_RTYPE }
 			};
 
 			type = -1;
