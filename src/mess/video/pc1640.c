@@ -64,6 +64,8 @@ READ8_MEMBER( pc1640_state::iga_r )
 {
 	UINT8 data = 0;
 	
+	//logerror("IGA read %03x\n", offset+0x3b0);
+	
 	switch (offset)
 	{
 	case 0x01:
@@ -73,6 +75,7 @@ READ8_MEMBER( pc1640_state::iga_r )
 	case 0x05: // Mono CRT Controller Data
 		if (!BIT(m_egc_ctrl, 0))
 		{
+			data = m_vdu->register_r(space, 0);
 		}
 		break;
 		
@@ -134,6 +137,7 @@ READ8_MEMBER( pc1640_state::iga_r )
 	case 0x25: // Color CRT Controller Data
 		if (BIT(m_egc_ctrl, 0))
 		{
+			data = m_vdu->register_r(space, 0);
 		}
 		break;
 
@@ -181,6 +185,8 @@ READ8_MEMBER( pc1640_state::iga_r )
 
 WRITE8_MEMBER( pc1640_state::iga_w )
 {
+	//logerror("IGA write %03x:%02x\n", offset+0x3b0, data);
+	
 	switch (offset)
 	{
 	case 0x00:
@@ -194,6 +200,7 @@ WRITE8_MEMBER( pc1640_state::iga_w )
 	case 0x04: // Mono CRT Controller Address
 		if (!BIT(m_egc_ctrl, 0))
 		{
+			m_vdu->address_w(space, 0, data);
 		}
 		break;
 		
@@ -273,14 +280,14 @@ WRITE8_MEMBER( pc1640_state::iga_w )
 	case 0x24: // Color CRT Controller Address
 		if (BIT(m_egc_ctrl, 0))
 		{
-			m_crtcar = data;
+			m_vdu->address_w(space, 0, data);
 		}
 		break;
 		
 	case 0x25: // Color CRT Controller Data
 		if (BIT(m_egc_ctrl, 0))
 		{
-			m_crtcdr[m_crtcar & 0x1f] = data;
+			m_vdu->register_w(space, 0, data);
 		}
 		break;
 		

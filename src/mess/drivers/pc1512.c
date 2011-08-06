@@ -401,9 +401,9 @@ READ8_MEMBER( pc1640_state::printer_r )
 		"1" is returned when the switch is on the "on" position and a logic "0" if the
 		switch is in the "off" position.
 		*/
-
 		data = m_printer_control;
-		data |= input_port_read(machine(), "SW") & 0xc0;
+		data |= m_opt << 5;
+		data |= (input_port_read(machine(), "SW") & 0x60) << 1;
 		break;
 		
 	default:
@@ -536,6 +536,60 @@ WRITE8_MEMBER( pc1512_state::fdc_w )
 
 
 //**************************************************************************
+//  PC1640 I/O ACCESS
+//**************************************************************************
+
+//-------------------------------------------------
+//  io_r -
+//-------------------------------------------------
+
+READ8_MEMBER( pc1640_state::io_r )
+{
+	UINT8 data = 0;
+	offs_t addr = offset & 0x3ff;
+	bool decoded = false;
+	
+	if 		(addr >= 0x000 && addr <= 0x00f) { data = i8237_r(m_dmac, offset & 0x0f); decoded = true; }
+	else if (addr >= 0x020 && addr <= 0x021) { data = pic8259_r(m_pic, offset & 0x01); decoded = true; }
+	else if (addr >= 0x040 && addr <= 0x043) { data = pit8253_r(m_pit, offset & 0x03); decoded = true; }
+	else if (addr >= 0x060 && addr <= 0x06f) { data = system_r(space, offset & 0x0f); decoded = true; }
+	else if (addr >= 0x070 && addr <= 0x073) { data = m_rtc->read(space, offset & 0x01); decoded = true; }
+	else if (addr >= 0x078 && addr <= 0x07f) { data = mouse_r(space, offset & 0x07); decoded = true; }
+	else if (addr >= 0x378 && addr <= 0x37b) { data = printer_r(space, offset & 0x03); decoded = true; }
+	else if (addr >= 0x3b0 && addr <= 0x3df) { data = iga_r(space, addr - 0x3b0); decoded = true; }
+	else if (addr >= 0x3f0 && addr <= 0x3f7) { data = fdc_r(space, offset & 0x07); decoded = true; }
+	else if (addr >= 0x3f8 && addr <= 0x3ff) { data = ins8250_r(m_uart, offset & 0x07); decoded = true; }
+	
+	if (decoded)
+	{
+		if (BIT(offset, 7))
+		{ 
+			m_opt = 0;
+			//logerror("OPT 0\n");
+		}
+	}
+	else if (!BIT(offset, 7))
+	{
+		UINT16 sw = input_port_read(machine(), "SW");
+		
+		if (!BIT(offset, 14))
+		{ 
+			m_opt = BIT(sw, 8);
+			logerror("OPT SW9 %u\n", m_opt);
+		}
+		else 
+		{
+			m_opt = BIT(sw, 9);
+			logerror("OPT SW10 %u\n", m_opt);
+		}
+	}
+	
+	return data;
+}
+
+
+
+//**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
@@ -577,9 +631,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc1640_mem, AS_PROGRAM, 16, pc1640_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
-	AM_RANGE(0xb8000, 0xbbfff) AM_READWRITE8(video_ram_r, video_ram_w, 0xffff)
+	AM_RANGE(0xa0000, 0xbffff) AM_READWRITE8(video_ram_r, video_ram_w, 0xffff)
 	AM_RANGE(0xc0000, 0xc7fff) AM_ROM AM_REGION("iga", 0)
-	AM_RANGE(0xc8000, 0xc9fff) AM_ROM AM_REGION("hdc", 0)
+//	AM_RANGE(0xc8000, 0xc9fff) AM_ROM AM_REGION("hdc", 0)
 	AM_RANGE(0xf0000, 0xf3fff) AM_MIRROR(0xc000) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
 
@@ -589,19 +643,19 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( pc1640_io, AS_IO, 16, pc1640_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x000, 0x00f) AM_DEVREADWRITE8_LEGACY(I8237A5_TAG, i8237_r, i8237_w, 0xffff)
-	AM_RANGE(0x020, 0x021) AM_DEVREADWRITE8_LEGACY(I8259A2_TAG, pic8259_r, pic8259_w, 0xffff)
-	AM_RANGE(0x040, 0x043) AM_DEVREADWRITE8_LEGACY(I8253_TAG, pit8253_r, pit8253_w, 0xffff)
-	AM_RANGE(0x060, 0x06f) AM_READWRITE8(system_r, system_w, 0xffff)
-	AM_RANGE(0x070, 0x071) AM_MIRROR(0x02) AM_DEVREADWRITE8(MC146818_TAG, mc146818_device, read, write, 0xffff)
-	AM_RANGE(0x078, 0x07f) AM_READWRITE8(mouse_r, mouse_w, 0xffff)
+	AM_RANGE(0x0000, 0xffff) AM_READ8(io_r, 0xffff)
+	AM_RANGE(0x000, 0x00f) AM_DEVWRITE8_LEGACY(I8237A5_TAG, i8237_w, 0xffff)
+	AM_RANGE(0x020, 0x021) AM_DEVWRITE8_LEGACY(I8259A2_TAG, pic8259_w, 0xffff)
+	AM_RANGE(0x040, 0x043) AM_DEVWRITE8_LEGACY(I8253_TAG, pit8253_w, 0xffff)
+	AM_RANGE(0x060, 0x06f) AM_WRITE8(system_w, 0xffff)
+	AM_RANGE(0x070, 0x071) AM_MIRROR(0x02) AM_DEVWRITE8(MC146818_TAG, mc146818_device, write, 0xffff)
+	AM_RANGE(0x078, 0x07f) AM_WRITE8(mouse_w, 0xffff)
 	AM_RANGE(0x080, 0x083) AM_WRITE8(dma_page_w, 0xffff)
 	AM_RANGE(0x0a0, 0x0a1) AM_WRITE8(nmi_mask_w, 0xff00)
-	AM_RANGE(0x378, 0x37b) AM_READWRITE8(printer_r, printer_w, 0xffff)
-	AM_RANGE(0x3b0, 0x3df) AM_READWRITE8(iga_r, iga_w, 0xffff)
-	AM_RANGE(0x3f0, 0x3f7) AM_READWRITE8(fdc_r, fdc_w, 0xffff)
-	AM_RANGE(0x3f8, 0x3ff) AM_DEVREADWRITE8_LEGACY(INS8250_TAG, ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x378, 0x37b) AM_WRITE8(printer_w, 0xffff)
+	AM_RANGE(0x3b0, 0x3df) AM_WRITE8(iga_w, 0xffff)
+	AM_RANGE(0x3f0, 0x3f7) AM_WRITE8(fdc_w, 0xffff)
+	AM_RANGE(0x3f8, 0x3ff) AM_DEVWRITE8_LEGACY(INS8250_TAG, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -734,7 +788,7 @@ static INPUT_PORTS_START( pc1640 )
 	PORT_DIPSETTING(	0x00, "Diagnostic Mode" )
 	
 	PORT_START("SW")
-	PORT_DIPNAME( 0x0f, 0x09, "Initial Display Mode" ) PORT_DIPLOCATION("SW:1,2,3,4") PORT_CONDITION("SW", 0x400, PORTCOND_EQUALS, 0x400)
+	PORT_DIPNAME( 0x0f, 0x09, "Initial Display Mode" ) PORT_DIPLOCATION("SW:1,2,3,4") PORT_CONDITION("SW", 0x200, PORTCOND_EQUALS, 0x200)
 	PORT_DIPSETTING(	0x0b, "Internal MD, External CGA80" )
 	PORT_DIPSETTING(	0x0a, "Internal MD, External CGA40" )
 	PORT_DIPSETTING(	0x09, "Internal ECD350, External MDA/HERC" )
@@ -747,27 +801,27 @@ static INPUT_PORTS_START( pc1640 )
 	PORT_DIPSETTING(	0x02, "External MDA/HERC, Internal ECD200" )
 	PORT_DIPSETTING(	0x01, "External MDA/HERC, Internal CD80" )
 	PORT_DIPSETTING(	0x00, "External MDA/HERC, Internal CD40" )
-	PORT_DIPNAME( 0x10, 0x10, "MC6845 Mode" ) PORT_DIPLOCATION("SW:5") PORT_CONDITION("SW", 0x400, PORTCOND_EQUALS, 0x400)
+	PORT_DIPNAME( 0x10, 0x10, "MC6845 Mode" ) PORT_DIPLOCATION("SW:5") PORT_CONDITION("SW", 0x200, PORTCOND_EQUALS, 0x200)
 	PORT_DIPSETTING(	0x10, "EGA" )
 	PORT_DIPSETTING(	0x00, "CGA/MDA/HERC" )
-	PORT_DIPNAME( 0xc0, 0x00, "Font" ) PORT_DIPLOCATION("SW:6,7") PORT_CONDITION("SW", 0x600, PORTCOND_EQUALS, 0x600)
+	PORT_DIPNAME( 0x60, 0x00, "Font" ) PORT_DIPLOCATION("SW:6,7") PORT_CONDITION("SW", 0x300, PORTCOND_EQUALS, 0x300)
 	PORT_DIPSETTING(	0x00, DEF_STR( English ) )
-	PORT_DIPSETTING(	0xc0, "Danish" )
-	PORT_DIPSETTING(	0x80, "Portuguese" )
-	PORT_DIPSETTING(	0x40, "Greek" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Default Display Mode" ) PORT_DIPLOCATION("SW:6,7") PORT_CONDITION("SW", 0x400, PORTCOND_EQUALS, 0x000)
-	PORT_DIPSETTING(	0xc0, "External EGA" )
-	PORT_DIPSETTING(	0x80, "External CGA in 40 Column Mode" )
-	PORT_DIPSETTING(	0x40, "External CGA in 80 Column Mode" )
+	PORT_DIPSETTING(	0x60, "Danish" )
+	PORT_DIPSETTING(	0x40, "Portuguese" )
+	PORT_DIPSETTING(	0x20, "Greek" )
+	PORT_DIPNAME( 0x60, 0x60, "Default Display Mode" ) PORT_DIPLOCATION("SW:6,7") PORT_CONDITION("SW", 0x200, PORTCOND_EQUALS, 0x000)
+	PORT_DIPSETTING(	0x60, "External EGA" )
+	PORT_DIPSETTING(	0x40, "External CGA in 40 Column Mode" )
+	PORT_DIPSETTING(	0x20, "External CGA in 80 Column Mode" )
 	PORT_DIPSETTING(	0x00, "External Monochrome Adapter" )
-	PORT_DIPNAME( 0x100, 0x000, "Monitor" ) PORT_DIPLOCATION("SW:8") PORT_CONDITION("SW", 0x400, PORTCOND_EQUALS, 0x400)
-	PORT_DIPSETTING(	 0x100, "CD (Standard RGB)" )
-	PORT_DIPSETTING(	 0x000, "ECD (Enhanced RGB)" )
-	PORT_DIPNAME( 0x200, 0x200, "Foreign Fonts" ) PORT_DIPLOCATION("SW:9") PORT_CONDITION("SW", 0x400, PORTCOND_EQUALS, 0x400)
-	PORT_DIPSETTING(	 0x200, "Enabled" )
+	PORT_DIPNAME( 0x80, 0x00, "Monitor" ) PORT_DIPLOCATION("SW:8") PORT_CONDITION("SW", 0x200, PORTCOND_EQUALS, 0x200)
+	PORT_DIPSETTING(	0x80, "CD (Standard RGB)" )
+	PORT_DIPSETTING(	0x00, "ECD (Enhanced RGB)" )
+	PORT_DIPNAME( 0x100, 0x100, "Foreign Fonts" ) PORT_DIPLOCATION("SW:9") PORT_CONDITION("SW", 0x200, PORTCOND_EQUALS, 0x200)
+	PORT_DIPSETTING(	 0x100, "Enabled" )
 	PORT_DIPSETTING(	 0x000, "Disabled" )
-	PORT_DIPNAME( 0x400, 0x400, "Internal Graphics Adapter" ) PORT_DIPLOCATION("SW:10")
-	PORT_DIPSETTING(	 0x400, "Enabled" )
+	PORT_DIPNAME( 0x200, 0x200, "Internal Graphics Adapter" ) PORT_DIPLOCATION("SW:10")
+	PORT_DIPSETTING(	 0x200, "Enabled" )
 	PORT_DIPSETTING(	 0x000, "Disabled" )
 INPUT_PORTS_END
 
@@ -1354,8 +1408,8 @@ MACHINE_CONFIG_END
 
 ROM_START( pc1512 )
 	ROM_REGION16_LE( 0x4000, I8086_TAG, 0)
-	ROM_LOAD16_BYTE( "40043.ic129", 0x0000, 0x2000, CRC(f72f1582) SHA1(7781d4717917262805d514b331ba113b1e05a247) )
-	ROM_LOAD16_BYTE( "40044.ic132", 0x0001, 0x2000, CRC(668fcc94) SHA1(74002f5cc542df442eec9e2e7a18db3598d8c482) )
+	ROM_LOAD16_BYTE( "40044.ic132", 0x0000, 0x2000, CRC(f72f1582) SHA1(7781d4717917262805d514b331ba113b1e05a247) )
+	ROM_LOAD16_BYTE( "40043.ic129", 0x0001, 0x2000, CRC(668fcc94) SHA1(74002f5cc542df442eec9e2e7a18db3598d8c482) )
 
 	ROM_REGION( 0x2000, AMS40041_TAG, 0 )
 	ROM_LOAD( "40045.ic127", 0x0000, 0x2000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7) )
@@ -1368,8 +1422,8 @@ ROM_END
 
 ROM_START( pc1512v2 )
 	ROM_REGION16_LE( 0x4000, I8086_TAG, 0)
-	ROM_LOAD16_BYTE( "40043v2.ic129", 0x0000, 0x2000, CRC(1aec54fa) SHA1(b12fd73cfc35a240ed6da4dcc4b6c9910be611e0) )
-	ROM_LOAD16_BYTE( "40044v2.ic132", 0x0001, 0x2000, CRC(d2d4d2de) SHA1(c376fd1ad23025081ae16c7949e88eea7f56e1bb) )
+	ROM_LOAD16_BYTE( "40044v2.ic132", 0x0000, 0x2000, CRC(1aec54fa) SHA1(b12fd73cfc35a240ed6da4dcc4b6c9910be611e0) )
+	ROM_LOAD16_BYTE( "40043v2.ic129", 0x0001, 0x2000, CRC(d2d4d2de) SHA1(c376fd1ad23025081ae16c7949e88eea7f56e1bb) )
 
 	ROM_REGION( 0x2000, AMS40041_TAG, 0 )
 	ROM_LOAD( "40078.ic127", 0x0000, 0x2000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd) )
@@ -1382,8 +1436,8 @@ ROM_END
 
 ROM_START( pc1512v3 )
 	ROM_REGION16_LE( 0x4000, I8086_TAG, 0)
-	ROM_LOAD16_BYTE( "40043-2.ic129", 0x0000, 0x2000, CRC(ea527e6e) SHA1(b77fa44767a71a0b321a88bb0a394f1125b7c220) )
-	ROM_LOAD16_BYTE( "40044-2.ic130", 0x0001, 0x2000, CRC(532c3854) SHA1(18a17b710f9eb079d9d7216d07807030f904ceda) )
+	ROM_LOAD16_BYTE( "40044-2.ic132", 0x0000, 0x2000, CRC(ea527e6e) SHA1(b77fa44767a71a0b321a88bb0a394f1125b7c220) )
+	ROM_LOAD16_BYTE( "40043-2.ic129", 0x0001, 0x2000, CRC(532c3854) SHA1(18a17b710f9eb079d9d7216d07807030f904ceda) )
 
 	ROM_REGION( 0x2000, AMS40041_TAG, 0 )
 	ROM_LOAD( "40078.ic127", 0x0000, 0x2000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd) )
@@ -1396,14 +1450,14 @@ ROM_END
 
 ROM_START( pc1640 )
 	ROM_REGION16_LE( 0x4000, I8086_TAG, 0)
-	ROM_LOAD16_BYTE( "40044.v3", 0x0000, 0x2000, CRC(f1c074f3) SHA1(a055ea7e933d137623c22fe24004e870653c7952) )
-	ROM_LOAD16_BYTE( "40043.v3", 0x0001, 0x2000, CRC(e40a1513) SHA1(447eff2057e682e51b1c7593cb6fad0e53879fa8) )
+	ROM_LOAD16_BYTE( "40044.ic132", 0x0000, 0x2000, CRC(f1c074f3) SHA1(a055ea7e933d137623c22fe24004e870653c7952) )
+	ROM_LOAD16_BYTE( "40043.ic129", 0x0001, 0x2000, CRC(e40a1513) SHA1(447eff2057e682e51b1c7593cb6fad0e53879fa8) )
 
-	ROM_LOAD16_BYTE( "40044.v3x", 0x0000, 0x2000, CRC(43832ea7) SHA1(eea4a8836f966940a88c88de6c5cc14852545f7d) )
-	ROM_LOAD16_BYTE( "40043.v3x", 0x0001, 0x2000, CRC(768498f9) SHA1(ac48cb892417d7998d604f3b79756140c554f476) )
+	ROM_LOAD16_BYTE( "40044x.ic132", 0x0000, 0x2000, CRC(43832ea7) SHA1(eea4a8836f966940a88c88de6c5cc14852545f7d) )
+	ROM_LOAD16_BYTE( "40043x.ic129", 0x0001, 0x2000, CRC(768498f9) SHA1(ac48cb892417d7998d604f3b79756140c554f476) )
 
 	ROM_REGION16_LE( 0x8000, "iga", 0)
-	ROM_LOAD( "40100", 0x0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33) )
+	ROM_LOAD( "40100.ic913", 0x0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33) )
 
 	ROM_REGION16_LE( 0x2000, "hdc", 0)
 	ROM_LOAD( "3.u13", 0x0000, 0x2000, CRC(fbcb5f91) SHA1(8c22bd664177eb6126f3011eda8c5655fffe0ef2) ) // Toshiba TMM2464AP
@@ -1419,4 +1473,4 @@ ROM_END
 COMP( 1986, pc1512,		0,			0,		pc1512,		pc1512,		0,		"Amstrad plc",	"PC1512 (V1)",	GAME_SUPPORTS_SAVE )
 COMP( 1987, pc1512v2,	pc1512,		0,		pc1512,		pc1512,		0,		"Amstrad plc",	"PC1512 (V2)",	GAME_SUPPORTS_SAVE )
 COMP( 1989, pc1512v3,	pc1512,		0,		pc1512,		pc1512,		0,		"Amstrad plc",	"PC1512 (V3)",	GAME_NOT_WORKING )
-COMP( 1986, pc1640,		0,			0,		pc1640,		pc1640,		0,		"Amstrad plc",	"PC1640",		GAME_NOT_WORKING )
+COMP( 1987, pc1640,		0,			0,		pc1640,		pc1640,		0,		"Amstrad plc",	"PC1640",		GAME_NOT_WORKING )
