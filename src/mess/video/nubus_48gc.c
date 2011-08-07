@@ -99,7 +99,7 @@ nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *
 }
 
 nubus_824gc_device::nubus_824gc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	jmfb_device(mconfig, tag, owner, clock)
+	jmfb_device(mconfig, NUBUS_824GC, "NUBUS_824GC", tag, owner, clock)
 {
 	m_shortname = "nb_824gc";
 	m_is824 = true;
