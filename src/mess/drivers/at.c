@@ -806,43 +806,41 @@ ROM_END
 
 ROM_START( at )
     ROM_REGION(0x1000000,"maincpu", 0)
-	ROM_SYSTEM_BIOS(0, "at", "PC 286")
+	ROM_SYSTEM_BIOS(0, "at", "PC 286") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 03-11-1987)*/
     ROMX_LOAD("at110387.1", 0xf0001, 0x8000, CRC(679296a7) SHA1(ae891314cac614dfece686d8e1d74f4763cf40e3),ROM_SKIP(1) | ROM_BIOS(1) )
     ROMX_LOAD("at110387.0", 0xf0000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "ami211", "AMI 21.1")
+	ROM_SYSTEM_BIOS(1, "ami211", "AMI 21.1") /*(Motherboard Manufacturer: Dataexpert Corp. Motherboard) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 09-04-1990)*/
 	ROMX_LOAD( "ami211.bin",	 0xf0000, 0x10000,CRC(a0b5d269) SHA1(44db8227d35a09e39b93ed944f85dcddb0dd0d39), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(2, "ami206", "AMI C 206.1")
+	ROM_SYSTEM_BIOS(2, "ami206", "AMI C 206.1")  /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 15-10-1990)*/
 	ROMX_LOAD( "amic206.bin",	 0xf0000, 0x10000,CRC(25a67c34) SHA1(91e9d8cdc2f1b40a601a23ceaff2189fd1245f3b), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1")
+	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1") /* might be bad dump, doesn't start */
 	ROMX_LOAD( "amic21-1.bin",  0xf0001, 0x8000, CRC(5644ed38) SHA1(963555ec77845defc3b42b433280908e1797076e),ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "amic21-2.bin",  0xf0000, 0x8000, CRC(8ffe7752) SHA1(68215f07a170ee7bdcb3e52b370d470af1741f7e),ROM_SKIP(1) | ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS(4, "amicg", "AMI CG")
-	ROMX_LOAD( "amicg.1",		 0xf0000, 0x10000,CRC(8408965a) SHA1(9893d3ac851e01b06a68a67d3721df36ca2c96f5), ROM_BIOS(5) )
-	ROM_SYSTEM_BIOS(5, "ami101", "AMI HT 101.1")
-	ROMX_LOAD( "amiht-h.bin",   0xf0001, 0x8000, CRC(8022545f) SHA1(42541d4392ad00b0e064b3a8ccf2786d875c7c19),ROM_SKIP(1) | ROM_BIOS(6) )
-	ROMX_LOAD( "amiht-l.bin",   0xf0000, 0x8000, CRC(285f6b8f) SHA1(2fce4ec53b68c9a7580858e16c926dc907820872),ROM_SKIP(1) | ROM_BIOS(6) )
-	ROM_SYSTEM_BIOS(6, "ami121", "AMI HT 12.1")
-	ROMX_LOAD( "ami2ev86.bin",  0xf0001, 0x8000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1),ROM_SKIP(1) | ROM_BIOS(7) )
-	ROMX_LOAD( "ami2od86.bin",  0xf0000, 0x8000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8),ROM_SKIP(1) | ROM_BIOS(7) )
-	ROM_SYSTEM_BIOS(7, "ami122", "AMI HT 12.2")
-	ROMX_LOAD( "ami2ev89.bin",  0xf0001, 0x8000, CRC(705d36e0) SHA1(0c9cfb71ced4587f109b9b6dfc2a9c92302fdb99),ROM_SKIP(1) | ROM_BIOS(8) )
-	ROMX_LOAD( "ami2od89.bin",  0xf0000, 0x8000, CRC(7c81bbe8) SHA1(a2c7eca586f6e2e76b9101191e080a1f1cb8b833),ROM_SKIP(1) | ROM_BIOS(8) )
-	ROM_SYSTEM_BIOS(8, "ami123", "AMI HT 12.3")
-	ROMX_LOAD( "ht12h.bin",     0xf0001, 0x8000, CRC(db8b471e) SHA1(7b5fa1c131061fa7719247db3e282f6d30226778),ROM_SKIP(1) | ROM_BIOS(9) )
-	ROMX_LOAD( "ht12l.bin",     0xf0000, 0x8000, CRC(74fd178a) SHA1(97c8283e574abbed962b701f3e8091fb82823b80),ROM_SKIP(1) | ROM_BIOS(9) )
-	ROM_SYSTEM_BIOS(9, "ami181", "AMI HT 18.1")
-	ROMX_LOAD( "ht18.bin",     0xf0000, 0x10000, CRC(f65a6f9a) SHA1(7dfdf7d243f9f645165dc009c5097dd515f86fbb), ROM_BIOS(10) )
-	ROM_SYSTEM_BIOS(10, "amiht21", "AMI HT 21.1")
-	ROMX_LOAD( "ht21e.bin",    0xf0000, 0x10000, CRC(e80f7fed) SHA1(62d958d98c95e9e4d1b290a6c1054ae98770f276), ROM_BIOS(11) )
-	ROM_SYSTEM_BIOS(11, "amip1", "AMI P.1")
-	ROMX_LOAD( "poisk-h.bin",   0xf0001, 0x8000, CRC(83fd3f8c) SHA1(ca94850bbd949b97b11710629886b0ee69489a81),ROM_SKIP(1) | ROM_BIOS(12) )
-	ROMX_LOAD( "poisk-l.bin",   0xf0000, 0x8000, CRC(0b2ed291) SHA1(bb51a3f317cf4d429a6cfb44a46ca0ac39d9aaa7),ROM_SKIP(1) | ROM_BIOS(12) )
-	ROM_SYSTEM_BIOS(12, "aw201", "Award 201")
-	ROMX_LOAD( "83201-5h.bin",  0xf0001, 0x8000, CRC(968d1fc0) SHA1(dc4122a6c696f0b43e7894dc1b669346eed755d5),ROM_SKIP(1) | ROM_BIOS(13) )
-	ROMX_LOAD( "83201-5l.bin",  0xf0000, 0x8000, CRC(bf50a89a) SHA1(2349a1db6017a7fb0673e99d3680c8753407be8d),ROM_SKIP(1) | ROM_BIOS(13) )
-	ROM_SYSTEM_BIOS(13, "aw303", "Award 303")
-	ROMX_LOAD( "aw303-hi.bin",  0xf8001, 0x4000, CRC(78f32d7e) SHA1(1c88398fb171b33b7e6191bad63704ae85bfed8b), ROM_SKIP(1) | ROM_BIOS(14) )
-	ROMX_LOAD( "aw303-lo.bin",  0xf8000, 0x4000, CRC(3d2a70c0) SHA1(1329113bec514ed2a6d803067b1132744ef534dd), ROM_SKIP(1) | ROM_BIOS(14) )
+	ROM_SYSTEM_BIOS(4, "ami101", "AMI HT 101.1") /* Quadtel Enhanced 286 Bios Version 3.04.02 */
+	ROMX_LOAD( "amiht-h.bin",   0xf0001, 0x8000, CRC(8022545f) SHA1(42541d4392ad00b0e064b3a8ccf2786d875c7c19),ROM_SKIP(1) | ROM_BIOS(5) )
+	ROMX_LOAD( "amiht-l.bin",   0xf0000, 0x8000, CRC(285f6b8f) SHA1(2fce4ec53b68c9a7580858e16c926dc907820872),ROM_SKIP(1) | ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS(5, "ami121", "AMI HT 12.1") /* might be bad dump, doesn't start */
+	ROMX_LOAD( "ami2ev86.bin",  0xf0001, 0x8000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1),ROM_SKIP(1) | ROM_BIOS(6) )
+	ROMX_LOAD( "ami2od86.bin",  0xf0000, 0x8000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8),ROM_SKIP(1) | ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS(6, "ami122", "AMI HT 12.2") /* might be bad dump, doesn't start */
+	ROMX_LOAD( "ami2ev89.bin",  0xf0001, 0x8000, CRC(705d36e0) SHA1(0c9cfb71ced4587f109b9b6dfc2a9c92302fdb99),ROM_SKIP(1) | ROM_BIOS(7) )
+	ROMX_LOAD( "ami2od89.bin",  0xf0000, 0x8000, CRC(7c81bbe8) SHA1(a2c7eca586f6e2e76b9101191e080a1f1cb8b833),ROM_SKIP(1) | ROM_BIOS(7) )
+	ROM_SYSTEM_BIOS(7, "ami123", "AMI HT 12.3") /*(Motherboard Manufacturer: Aquarius Systems USA Inc.) (BIOS release date:: 13-06-1990)*/
+	ROMX_LOAD( "ht12h.bin",     0xf0001, 0x8000, CRC(db8b471e) SHA1(7b5fa1c131061fa7719247db3e282f6d30226778),ROM_SKIP(1) | ROM_BIOS(8) )
+	ROMX_LOAD( "ht12l.bin",     0xf0000, 0x8000, CRC(74fd178a) SHA1(97c8283e574abbed962b701f3e8091fb82823b80),ROM_SKIP(1) | ROM_BIOS(8) )
+	ROM_SYSTEM_BIOS(8, "ami181", "AMI HT 18.1") /* might be bad dump, doesn't start */
+	ROMX_LOAD( "ht18.bin",     0xf0000, 0x10000, CRC(f65a6f9a) SHA1(7dfdf7d243f9f645165dc009c5097dd515f86fbb), ROM_BIOS(9) )
+	ROM_SYSTEM_BIOS(9, "amiht21", "AMI HT 21.1") /* might be bad dump, doesn't start */
+	ROMX_LOAD( "ht21e.bin",    0xf0000, 0x10000, CRC(e80f7fed) SHA1(62d958d98c95e9e4d1b290a6c1054ae98770f276), ROM_BIOS(10) )
+	ROM_SYSTEM_BIOS(10, "amip1", "AMI P.1") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 09-04-1990)*/
+	ROMX_LOAD( "poisk-h.bin",   0xf0001, 0x8000, CRC(83fd3f8c) SHA1(ca94850bbd949b97b11710629886b0ee69489a81),ROM_SKIP(1) | ROM_BIOS(11) )
+	ROMX_LOAD( "poisk-l.bin",   0xf0000, 0x8000, CRC(0b2ed291) SHA1(bb51a3f317cf4d429a6cfb44a46ca0ac39d9aaa7),ROM_SKIP(1) | ROM_BIOS(11) )
+	ROM_SYSTEM_BIOS(11, "aw201", "Award 201")
+	ROMX_LOAD( "83201-5h.bin",  0xf0001, 0x8000, CRC(968d1fc0) SHA1(dc4122a6c696f0b43e7894dc1b669346eed755d5),ROM_SKIP(1) | ROM_BIOS(12) )
+	ROMX_LOAD( "83201-5l.bin",  0xf0000, 0x8000, CRC(bf50a89a) SHA1(2349a1db6017a7fb0673e99d3680c8753407be8d),ROM_SKIP(1) | ROM_BIOS(12) )
+	ROM_SYSTEM_BIOS(12, "aw303", "Award 303")
+	ROMX_LOAD( "aw303-hi.bin",  0xf8001, 0x4000, CRC(78f32d7e) SHA1(1c88398fb171b33b7e6191bad63704ae85bfed8b), ROM_SKIP(1) | ROM_BIOS(13) )
+	ROMX_LOAD( "aw303-lo.bin",  0xf8000, 0x4000, CRC(3d2a70c0) SHA1(1329113bec514ed2a6d803067b1132744ef534dd), ROM_SKIP(1) | ROM_BIOS(13) )
 	/* Character rom */
 	ROM_REGION(0x2000,"gfx1", 0)
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
@@ -864,42 +862,40 @@ ROM_END
 ROM_START( atvga )
     ROM_REGION(0x1000000,"maincpu", 0)
     ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
-	ROM_SYSTEM_BIOS(0, "at", "PC 286")
+	ROM_SYSTEM_BIOS(0, "at", "PC 286") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 03-11-1987)*/
     ROMX_LOAD("at110387.1", 0xf0001, 0x8000, CRC(679296a7) SHA1(ae891314cac614dfece686d8e1d74f4763cf40e3),ROM_SKIP(1) | ROM_BIOS(1) )
     ROMX_LOAD("at110387.0", 0xf0000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "ami211", "AMI 21.1")
+	ROM_SYSTEM_BIOS(1, "ami211", "AMI 21.1") /*(Motherboard Manufacturer: Dataexpert Corp. Motherboard) (Neat 286 Bios, 82c21x Chipset ) (BIOS release date:: 09-04-1990)*/ 
 	ROMX_LOAD( "ami211.bin",	 0xf0000, 0x10000,CRC(a0b5d269) SHA1(44db8227d35a09e39b93ed944f85dcddb0dd0d39), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(2, "ami206", "AMI C 206.1")
+	ROM_SYSTEM_BIOS(2, "ami206", "AMI C 206.1") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 15-10-1990)*/
 	ROMX_LOAD( "amic206.bin",	 0xf0000, 0x10000,CRC(25a67c34) SHA1(91e9d8cdc2f1b40a601a23ceaff2189fd1245f3b), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1")
+	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1") /* might be bad dump, doesn't start */
 	ROMX_LOAD( "amic21-1.bin",  0xf0001, 0x8000, CRC(5644ed38) SHA1(963555ec77845defc3b42b433280908e1797076e),ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "amic21-2.bin",  0xf0000, 0x8000, CRC(8ffe7752) SHA1(68215f07a170ee7bdcb3e52b370d470af1741f7e),ROM_SKIP(1) | ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS(4, "amicg", "AMI CG")
-	ROMX_LOAD( "amicg.1",		 0xf0000, 0x10000,CRC(8408965a) SHA1(9893d3ac851e01b06a68a67d3721df36ca2c96f5), ROM_BIOS(5) )
-	ROM_SYSTEM_BIOS(5, "ami101", "AMI HT 101.1")
-	ROMX_LOAD( "amiht-h.bin",   0xf0001, 0x8000, CRC(8022545f) SHA1(42541d4392ad00b0e064b3a8ccf2786d875c7c19),ROM_SKIP(1) | ROM_BIOS(6) )
-	ROMX_LOAD( "amiht-l.bin",   0xf0000, 0x8000, CRC(285f6b8f) SHA1(2fce4ec53b68c9a7580858e16c926dc907820872),ROM_SKIP(1) | ROM_BIOS(6) )
-	ROM_SYSTEM_BIOS(6, "ami121", "AMI HT 12.1")
-	ROMX_LOAD( "ami2ev86.bin",  0xf0001, 0x8000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1),ROM_SKIP(1) | ROM_BIOS(7) )
-	ROMX_LOAD( "ami2od86.bin",  0xf0000, 0x8000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8),ROM_SKIP(1) | ROM_BIOS(7) )
-	ROM_SYSTEM_BIOS(7, "ami122", "AMI HT 12.2")
-	ROMX_LOAD( "ami2ev89.bin",  0xf0001, 0x8000, CRC(705d36e0) SHA1(0c9cfb71ced4587f109b9b6dfc2a9c92302fdb99),ROM_SKIP(1) | ROM_BIOS(8) )
-	ROMX_LOAD( "ami2od89.bin",  0xf0000, 0x8000, CRC(7c81bbe8) SHA1(a2c7eca586f6e2e76b9101191e080a1f1cb8b833),ROM_SKIP(1) | ROM_BIOS(8) )
-	ROM_SYSTEM_BIOS(8, "ami123", "AMI HT 12.3")
-	ROMX_LOAD( "ht12h.bin",     0xf0001, 0x8000, CRC(db8b471e) SHA1(7b5fa1c131061fa7719247db3e282f6d30226778),ROM_SKIP(1) | ROM_BIOS(9) )
-	ROMX_LOAD( "ht12l.bin",     0xf0000, 0x8000, CRC(74fd178a) SHA1(97c8283e574abbed962b701f3e8091fb82823b80),ROM_SKIP(1) | ROM_BIOS(9) )
-	ROM_SYSTEM_BIOS(9, "ami181", "AMI HT 18.1")
-	ROMX_LOAD( "ht18.bin",     0xf0000, 0x10000, CRC(f65a6f9a) SHA1(7dfdf7d243f9f645165dc009c5097dd515f86fbb), ROM_BIOS(10) )
-	ROM_SYSTEM_BIOS(10, "amiht21", "AMI HT 21.1")
-	ROMX_LOAD( "ht21e.bin",    0xf0000, 0x10000, CRC(e80f7fed) SHA1(62d958d98c95e9e4d1b290a6c1054ae98770f276), ROM_BIOS(11) )
-	ROM_SYSTEM_BIOS(11, "amip1", "AMI P.1")
-	ROMX_LOAD( "poisk-h.bin",   0xf0001, 0x8000, CRC(83fd3f8c) SHA1(ca94850bbd949b97b11710629886b0ee69489a81),ROM_SKIP(1) | ROM_BIOS(12) )
-	ROMX_LOAD( "poisk-l.bin",   0xf0000, 0x8000, CRC(0b2ed291) SHA1(bb51a3f317cf4d429a6cfb44a46ca0ac39d9aaa7),ROM_SKIP(1) | ROM_BIOS(12) )
-	ROM_SYSTEM_BIOS(12, "ami1131", "AMI-1131")
-	ROMX_LOAD( "2hlm003h.bin",   0xf0001, 0x8000, CRC(2babb42b) SHA1(3da6538f44b434cdec0cbdddd392ccfd34666f06),ROM_SKIP(1) | ROM_BIOS(13) )
-	ROMX_LOAD( "2hlm003l.bin",   0xf0000, 0x8000, CRC(317cbcbf) SHA1(1adad6280d8b07c2921fc5fc13ecaa10e6bfebdc),ROM_SKIP(1) | ROM_BIOS(13) )
-	ROM_SYSTEM_BIOS(13, "vl82c", "VL82C311L-FC4")
-	ROMX_LOAD( "2vlm001.bin",     0xf0000, 0x10000, CRC(f34d800a) SHA1(638aca592a0e525f957beb525e95ca666a994ee8), ROM_BIOS(14) )
+	ROM_SYSTEM_BIOS(4, "ami101", "AMI HT 101.1") /* Quadtel Enhanced 286 Bios Version 3.04.02 */
+	ROMX_LOAD( "amiht-h.bin",   0xf0001, 0x8000, CRC(8022545f) SHA1(42541d4392ad00b0e064b3a8ccf2786d875c7c19),ROM_SKIP(1) | ROM_BIOS(5) )
+	ROMX_LOAD( "amiht-l.bin",   0xf0000, 0x8000, CRC(285f6b8f) SHA1(2fce4ec53b68c9a7580858e16c926dc907820872),ROM_SKIP(1) | ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS(5, "ami121", "AMI HT 12.1") /* might be bad dump, doesn't start */
+	ROMX_LOAD( "ami2ev86.bin",  0xf0001, 0x8000, CRC(55deb5c2) SHA1(19ce1a7cc985b5895c585e39211475de2e3b0dd1),ROM_SKIP(1) | ROM_BIOS(6) )
+	ROMX_LOAD( "ami2od86.bin",  0xf0000, 0x8000, CRC(04a2cec4) SHA1(564d37a8b2c0f4d0e23cd1e280a09d47c9945da8),ROM_SKIP(1) | ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS(6, "ami122", "AMI HT 12.2") /* might be bad dump, doesn't start */
+	ROMX_LOAD( "ami2ev89.bin",  0xf0001, 0x8000, CRC(705d36e0) SHA1(0c9cfb71ced4587f109b9b6dfc2a9c92302fdb99),ROM_SKIP(1) | ROM_BIOS(7) )
+	ROMX_LOAD( "ami2od89.bin",  0xf0000, 0x8000, CRC(7c81bbe8) SHA1(a2c7eca586f6e2e76b9101191e080a1f1cb8b833),ROM_SKIP(1) | ROM_BIOS(7) )
+	ROM_SYSTEM_BIOS(7, "ami123", "AMI HT 12.3") /*(Motherboard Manufacturer: Aquarius Systems USA Inc.) (BIOS release date:: 13-06-1990)*/
+	ROMX_LOAD( "ht12h.bin",     0xf0001, 0x8000, CRC(db8b471e) SHA1(7b5fa1c131061fa7719247db3e282f6d30226778),ROM_SKIP(1) | ROM_BIOS(8) )
+	ROMX_LOAD( "ht12l.bin",     0xf0000, 0x8000, CRC(74fd178a) SHA1(97c8283e574abbed962b701f3e8091fb82823b80),ROM_SKIP(1) | ROM_BIOS(8) )
+	ROM_SYSTEM_BIOS(8, "ami181", "AMI HT 18.1") /* might be bad dump, doesn't start */
+	ROMX_LOAD( "ht18.bin",     0xf0000, 0x10000, CRC(f65a6f9a) SHA1(7dfdf7d243f9f645165dc009c5097dd515f86fbb), ROM_BIOS(9) )
+	ROM_SYSTEM_BIOS(9, "amiht21", "AMI HT 21.1") /* might be bad dump, doesn't start */
+	ROMX_LOAD( "ht21e.bin",    0xf0000, 0x10000, CRC(e80f7fed) SHA1(62d958d98c95e9e4d1b290a6c1054ae98770f276), ROM_BIOS(10) )
+	ROM_SYSTEM_BIOS(10, "amip1", "AMI P.1") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 09-04-1990)*/
+	ROMX_LOAD( "poisk-h.bin",   0xf0001, 0x8000, CRC(83fd3f8c) SHA1(ca94850bbd949b97b11710629886b0ee69489a81),ROM_SKIP(1) | ROM_BIOS(11) )
+	ROMX_LOAD( "poisk-l.bin",   0xf0000, 0x8000, CRC(0b2ed291) SHA1(bb51a3f317cf4d429a6cfb44a46ca0ac39d9aaa7),ROM_SKIP(1) | ROM_BIOS(11) )
+	ROM_SYSTEM_BIOS(11, "ami1131", "AMI-1131") /*(Motherboard Manufacturer: Elitegroup Computer Co., Ltd.) (BIOS release date:: 09-04-1990)*/
+	ROMX_LOAD( "2hlm003h.bin",   0xf0001, 0x8000, CRC(2babb42b) SHA1(3da6538f44b434cdec0cbdddd392ccfd34666f06),ROM_SKIP(1) | ROM_BIOS(12) )
+	ROMX_LOAD( "2hlm003l.bin",   0xf0000, 0x8000, CRC(317cbcbf) SHA1(1adad6280d8b07c2921fc5fc13ecaa10e6bfebdc),ROM_SKIP(1) | ROM_BIOS(12) )
+	ROM_SYSTEM_BIOS(12, "vl82c", "VL82C311L-FC4")/*(Motherboard Manufacturer: Biostar Microtech Corp.) (BIOS release date: 05-05-1991)*/
+	ROMX_LOAD( "2vlm001.bin",     0xf0000, 0x10000, CRC(f34d800a) SHA1(638aca592a0e525f957beb525e95ca666a994ee8), ROM_BIOS(13) )
 ROM_END
 
 ROM_START( xb42639 )
@@ -980,6 +976,8 @@ ROM_START( at386 )
 	//ROM_RELOAD(0xff0000,0x8000)
 	ROMX_LOAD("012h-u24.bin", 0xf0001, 0x8000, CRC(17472521) SHA1(7588C148FE53D9DC4CB2D0AB6E0FD51A39BB5D1A),ROM_SKIP(1) | ROM_BIOS(3) )
 	//ROM_RELOAD(0xff0000,0x8000)
+	ROM_SYSTEM_BIOS(3, "amicg", "AMI CG")
+	ROMX_LOAD( "amicg.1",		 0xf0000, 0x10000,CRC(8408965a) SHA1(9893d3ac851e01b06a68a67d3721df36ca2c96f5), ROM_BIOS(4) )	
 ROM_END
 
 
@@ -1304,8 +1302,8 @@ COMP ( 1989, i8555081, ibm5170, 0,       at386,		atvga,	atvga,		"International B
 COMP ( 1987, at,       ibm5170, 0,       ibm5162,   atcga,	atcga,      "<generic>",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,	atvga,      "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,	atvga,      "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,	atvga,      "<generic>",  "PC/AT 586 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga,	atvga,      "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,	atvga,      "<generic>",  "PC/AT 586 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       neat,  	atcga,	atcga,      "<generic>",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1993, ct486,    ibm5170, 0,       ct486,     atvga,	atvga,      "<unknown>",  "PC/AT 486 with C&T chipset", GAME_NOT_WORKING )
 COMP ( 1993, ec1849,   ibm5170, 0,       ec1849,    atcga,	atcga,      "<unknown>",  "EC-1849", GAME_NOT_WORKING )
