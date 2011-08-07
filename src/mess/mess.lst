@@ -1104,15 +1104,22 @@ cf3300	// 1985 MSX Japan
 fs1300	// 1985 MSX Japan
 fs4000	// 1985 MSX Japan
 phc2
+phc28
+cf2700g
 nms801
 vg8000
 vg8010
 vg8010f
 vg802000
 vg802020  // 1985 MSX
+vg8020f
 piopx7
+spc800
 mpc64
 mpc100
+phc28l
+phc28s
+mpc10
 hotbit11  // 1985 MSX Brazil
 hotbit12  // 1985 MSX Brazil
 hotbi13b  // 1985 MSX Brazil
@@ -1140,6 +1147,7 @@ cx5m128
 cx5m2
 yis303
 yis503
+yis503f
 yis503ii
 y503iir
 y503iir2
@@ -1153,6 +1161,7 @@ msx2	  // 1985 MSX2
 ax350
 ax370
 hbf9p	 // 1985 MSX2
+hbf9pr
 hbf9s	 // 1985 MSX2
 hbf500p   // 1985 MSX2
 hbf700d   // 1985 MSX2 Germany
@@ -1164,20 +1173,25 @@ hbg900p   // 1986 MSX2
 nms8220   // 1986 MSX2
 nms8220a  // 1986 MSX2
 vg8230	// 1986 MSX2
+vg8230j
 vg8235	// 1986 MSX2
 vg8235f	// 1986 MSX2
 vg8240 // 1986 MSX2
 nms8245   // 1986 MSX2
 nms8245f   // 1986 MSX2
 nms8250   // 1986 MSX2
+nms8250j
 nms8255   // 1986 MSX2
 nms8280   // 1986 MSX2
 nms8280g   // 1986 MSX2
 tpc310   // 1986 MSX2
+tpp311
+tps312
 hx23	   // 1986 MSX2
 hx23f	// 1986 MSX2
 cx7m	   // 1986 MSX2
 cx7m128	// 1986 MSX2
+mlg30
 fs5500	// 1985 MSX2 Japan
 fs4500	// 1986 MSX2 Japan
 fs4700	// 1986 MSX2 Japan
@@ -1188,6 +1202,7 @@ fsa1a	 // 1986 MSX2 Japan
 fsa1mk2   // 1987 MSX2 Japan
 fsa1f	 // 1987 MSX2 Japan
 fsa1fm	// 1988 MSX2 Japan
+hbf5
 hbf500	// 1986 MSX2 Japan
 hbf900	// 1986 MSX2 Japan
 hbf900a   // 1986 MSX2 Japan
@@ -1195,6 +1210,8 @@ hbf1	  // 1986 MSX2 Japan
 hbf12	 // 1987 MSX2 Japan
 hbf1xd	// 1987 MSX2 Japan
 hbf1xdm2  // 1988 MSX2 Japan
+mpc2300
+mpc25fd
 phc23	 // 1986 MSX2 Japan
 cpc300	// 1986 MSX2 Korea
 cpc300e   // 1986 MSX2 Korea
@@ -1203,6 +1220,10 @@ cpc400s   // 1986 MSX2 Korea
 expert20 // 1986 MSX2 Korea
 
 msx2p	 // 1988 MSX2+ Japan
+expert3i
+expert3t
+expertac
+expertdx
 fsa1fx	// 1988 MSX2+ Japan
 fsa1wx	// 1988 MSX2+ Japan
 fsa1wxa   // 1988 MSX2+ Japan
@@ -1212,7 +1233,10 @@ hbf1xv	// 1989 MSX2+ Japan
 phc70fd   // 1988 MSX2+ Japan
 phc70fd2  // 1988 MSX2+ Japan
 phc35j	// 1989 MSX2+ Japan
+hbf9sp
 
+fsa1gt
+fsa1st
 
 // NASCOM Microcomputers
 nascom1   // 1978 Nascom 1
