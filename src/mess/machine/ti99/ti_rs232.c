@@ -12,18 +12,6 @@
     interface on the host computer. However, using a socket connection it is
     possible to attach an external bridge which interacts with a real UART.
 
-    This implementation can make use of such an external bridge. Normal data
-    are forwarded to the bridge and back, while line control is organized via
-    special byte sequences. These sequences are introduced by a 0x1B byte (ESC).
-
-    ESC ESC = plain ESC byte
-    ESC length byte[length] = control sequence (length != 0x1b)
-
-    byte 0:
-    1ccc xaaa = configuration of parameter ccc; UART type aaaa
-    01ab cdef = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
-    00gh i000 = exception g=BRK, h=FRMERR, i=PARERR
-
     TI RS232 card wiring
     --------------------
     The card uses this wiring (inverters not included)
@@ -65,16 +53,46 @@
 
     If we want to use a PC serial interface to play the role of the TI
     interface we have to map the TI wiring to a suitable wiring for PC
-    interfaces which are designed as DTEs.
-
-    See the functions map_lines_in/out.
-
-    However, due to the way the board is designed, a proper hardware
-    handshaking between a real TI and the TI emulation is impossible.
+    interfaces which are designed as DTEs. This is achieved by the functions
+    map_lines_in, map_lines_out.
 
     Note that we now have to swap the cable types: Use a 1-1 cable to connect
     another TI or a modem on the other end, and use a crossover cable for
     another PC (the usual way of connecting).
+
+    RS232 Over IP protocol
+    ----------------------
+    This implementation can make use of such an external bridge. Normal data
+    are forwarded to the bridge and back, while line control is organized via
+    special byte sequences. These sequences are introduced by a 0x1B byte (ESC).
+
+    The protocol has two modes: normal and escape
+
+    normal mode: transmit byte (!= 0x1b) unchanged
+    escape mode: entered by ESC, bytes following:
+       ESC = plain ESC byte
+       length byte[length] = control sequence (length != 0x1b)
+
+       byte[]:
+          All configuration settings are related to a specified UART; UARTs may
+          differ in their capabilities and may require specific settings
+          (e.g. the TMS9902 specifies the line speed by a clock ratio, while
+          others may have indexed, fixed rates or use integers)
+
+          (x=unused)
+
+          1ccc xaaa = configuration of parameter ccc; UART type aaa
+             1111 xaaa rrrr rrrr rrrr 0000     = config receive rate on aaa
+             1110 xaaa rrrr rrrr rrrr 0000     = config transmit rate on aaa
+             1101 xaaa xxxx xxbb               = config databits bb (00=5 ... 11=8)
+             1100 xaaa xxxx xxss               = config stop bits ss (00=1.5, 01=2, 1x=1)
+             1011 xaaa xxxx xxpp               = config parity pp (1x=enable, x1=odd)
+
+          01ab cdef = line state of RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
+          00gh i000 = exception g=BRK, h=FRMERR, i=PARERR
+
+    The protocol changes back to normal mode after transmitting the control
+    sequence.
 */
 
 #include "emu.h"
@@ -529,7 +547,7 @@ static void transmit_data(device_t *tms9902, UINT8 value)
 }
 
 /*
-    Map the DCE-like wiring to a DTE-like wiring (and vice versa)
+    Map the DCE-like wiring to a DTE-like wiring (and vice versa), V1
 
        Emulated      PC serial
        TI RS232      interface
@@ -540,63 +558,119 @@ static void transmit_data(device_t *tms9902, UINT8 value)
   DSR+CTS 20 -----------( 6) <--- DSR
      +12V  6 -----------(20) ---> DTR
       RTS  8 -----------( 4) ---> RTS
+
+
+      Alternative mapping for the PORT emulator: (V2)
+
+       Emulated      PC serial
+       TI RS232      interface
+     XOUT  2 -----------( 3) ---> TXD
+      RIN  3 -----------( 2) <--- RXD
+  DSR+CTS 20 -----------( 5) <--- CTS  (cable)
+      RTS  8 -----------(20) ---> DTR
+      CRU  5 -----------( 4) ---> RTS
+      +12V 6 -|       |-( 6) <--- DSR
+        nc 4 -----------( 8) <--- DCD
 */
-static UINT8 map_lines_out(int uartind, UINT8 value)
+static UINT8 map_lines_out(device_t *carddev, int uartind, UINT8 value)
 {
 	UINT8 ret = 0;
+	int mapping = input_port_read(carddev->machine(), "SERIALMAP");
 
 	//    00ab cdef = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
 
 	if (VERBOSE>3) LOG("TI-RS232/%d: out connector pins = 0x%02x; translate for DTE\n", uartind+1, value);
 
-	if (value & CTS)
-	{
-		if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map CTS line, ignoring\n", uartind+1);
-	}
-	if (value & DSR)
-	{
-		ret |= DTR;
-		if (VERBOSE>5) LOG("TI-RS232/%d: ... setting DTR line\n", uartind+1);
-	}
-	if (value & DCD)
-	{
-		ret |= RTS;
-		if (VERBOSE>5) LOG("TI-RS232/%d: ... setting RTS line\n", uartind+1);
-	}
 	if (value & BRK)
 	{
 		if (VERBOSE>5) LOG("TI-RS232/%d: ... sending BRK\n", uartind+1);
 		ret |= EXCEPT | BRK;
+	}
+
+	if (mapping==0)
+	{
+		// V1
+		if (value & CTS)
+		{
+			if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map CTS line, ignoring\n", uartind+1);
+		}
+		if (value & DSR)
+		{
+			ret |= DTR;
+			if (VERBOSE>5) LOG("TI-RS232/%d: ... setting DTR line\n", uartind+1);
+		}
+		if (value & DCD)
+		{
+			ret |= RTS;
+			if (VERBOSE>5) LOG("TI-RS232/%d: ... setting RTS line\n", uartind+1);
+		}
+	}
+	else
+	{
+		// V2
+		if (value & CTS)
+		{
+			ret |= RTS;
+			if (VERBOSE>5) LOG("TI-RS232/%d: ... setting RTS line\n", uartind+1);
+		}
+		if (value & DCD)
+		{
+			ret |= DTR;
+			if (VERBOSE>5) LOG("TI-RS232/%d: ... setting DTR line\n", uartind+1);
+		}
 	}
 
 	return ret;
 }
 
-static UINT8 map_lines_in(int uartind, UINT8 value)
+static UINT8 map_lines_in(device_t *carddev, int uartind, UINT8 value)
 {
 	UINT8 ret = 0;
+	int mapping = input_port_read(carddev->machine(), "SERIALMAP");
 
 	//    00ab cdef = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
 
 	if (VERBOSE>3) LOG("TI-RS232/%d: in connector pins = 0x%02x; translate for DTE\n", uartind+1, value);
 
-	if (value & CTS)
-	{
-		if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map CTS line, ignoring\n", uartind+1);
-	}
-	if (value & DSR)
-	{
-		ret |= DTR;
-		if (VERBOSE>5) LOG("TI-RS232/%d: ... setting DTR line\n", uartind+1);
-	}
-	if (value & DCD)
-	{
-		if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map DCD line, ignoring\n", uartind+1);
-	}
 	if (value & BRK)
 	{
-		if (VERBOSE>5) LOG("TI-RS232/%d: ... sending BRK\n", uartind+1);
+		if (VERBOSE>5) LOG("TI-RS232/%d: ... getting BRK\n", uartind+1);
 		ret |= EXCEPT | BRK;
+	}
+
+	if (mapping==0)
+	{
+		// V1
+		if (value & CTS)
+		{
+			if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map CTS line, ignoring\n", uartind+1);
+		}
+		if (value & DSR)
+		{
+			ret |= DTR;
+			if (VERBOSE>5) LOG("TI-RS232/%d: ... setting DTR line\n", uartind+1);
+		}
+		if (value & DCD)
+		{
+			if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map DCD line, ignoring\n", uartind+1);
+		}
+	}
+	else
+	{
+		// V2 (PORT application)
+		if (value & CTS)
+		{
+			ret |= DTR;
+			if (VERBOSE>5) LOG("TI-RS232/%d: ... setting DTR line\n", uartind+1);
+		}
+		if (value & DSR)
+		{
+			if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map DSR line, ignoring\n", uartind+1);
+		}
+		if (value & DCD)
+		{
+			if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map DCD line, ignoring\n", uartind+1);
+		}
 	}
 
 	return ret;
@@ -614,6 +688,16 @@ static UINT8 map_lines_in(int uartind, UINT8 value)
     Whenever we receive a character that is passed to the UART, we have to
     pause for 1/baudpoll iterations before getting the next byte from the
     data source.
+
+    FIXME: This may fail when the emulated system tries to stop the remote
+    system by deactivating RTS or DTR, but there are still incoming
+    bytes in the socket or PC UART buffer. The buffered bytes may then cause
+    an overflow in the emulated UART, since the application program expects
+    the remote system to stop sending instantly.
+    The only way to handle this is to mirror the activity within the serial
+    bridge: Whenever a RTS=0 or DTR=0 is transmitted to the remote site, the
+    serial bridge must stop delivering data bytes until the handshake opens the
+    channel again.
 */
 static void receive_data_or_line_state(device_t *tms9902, double baudpoll)
 {
@@ -698,7 +782,7 @@ static void receive_data_or_line_state(device_t *tms9902, double baudpoll)
 		}
 		else
 		{
-			buffer = map_lines_in(uartind, buffer);
+			buffer = map_lines_in(tms9902->owner(), uartind, buffer);
 			if (VERBOSE>2) LOG("TI-RS232/%d: received (remapped) <%02x> in ESC mode\n", uartind+1, buffer);
 
 			// The DTR line on the RS232 connector of the board is wired to both the
@@ -881,7 +965,7 @@ static void output_line_state(device_t *tms9902, int mask, UINT8 value)
 	// Now translate the signals of the board to those of a DTE-like device
 	// so that we can pass the signal to the real PC serial interface
 	// (can be imagined as if we emulated the cable)
-	bufctrl[1] = map_lines_out(uartind, card->signals[uartind]);
+	bufctrl[1] = map_lines_out(tms9902->owner(), uartind, card->signals[uartind]);
 	serial->fwrite(bufctrl, 2);
 }
 
