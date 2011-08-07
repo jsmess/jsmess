@@ -1010,7 +1010,7 @@ static void cd_exec_command(running_machine &machine)
 				xfersectnum = sectnum;
 				transpart = &partitions[bufnum];
 
-				cd_stat &= ~CD_STAT_TRANS;
+				cd_stat |= CD_STAT_TRANS;
 				cr_standard_return(cd_stat);
 				hirqreg |= (CMOK|EHST|DRDY);
 			}
