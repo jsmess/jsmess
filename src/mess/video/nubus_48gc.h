@@ -19,7 +19,6 @@ class jmfb_device :
 {
 public:
         // construction/destruction
-        jmfb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 		jmfb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
