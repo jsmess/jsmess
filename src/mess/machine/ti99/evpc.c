@@ -351,7 +351,6 @@ static DEVICE_RESET( ti99_evpc )
 {
 	logerror("ti99_evpc: reset\n");
 	ti99_evpc_state *card = get_safe_token(device);
-	astring *region = new astring();
 
 	/* If the card is selected in the menu, register the card */
 	device_t *peb = device->owner();
@@ -364,9 +363,10 @@ static DEVICE_RESET( ti99_evpc )
 	card->RAMEN = 0;
 	card->dsr_page = 0;
 
-	astring_assemble_3(region, device->tag(), ":", evpc_region);
+	astring* region = astring_assemble_3(astring_alloc(), device->tag(), ":", evpc_region);
 
 	card->dsrrom = device->machine().region(astring_c(region))->base();
+	astring_free(region);
 }
 
 static DEVICE_NVRAM( ti99_evpc )
@@ -400,6 +400,7 @@ static DEVICE_NVRAM( ti99_evpc )
 				logerror("evpc: NOVRAM save error\n");
 		}
 	}
+	astring_free(hsname);
 }
 
 MACHINE_CONFIG_FRAGMENT( ti99_evpc )
