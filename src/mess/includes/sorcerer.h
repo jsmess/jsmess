@@ -7,24 +7,21 @@
 #ifndef SORCERER_H_
 #define SORCERER_H_
 
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/wave.h"
+#include "machine/ay31015.h"
 #include "machine/ctronics.h"
 #include "machine/ram.h"
+#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "imagedev/cartslot.h"
-#include "machine/ay31015.h"
 #include "imagedev/flopdrv.h"
 #include "formats/sorc_dsk.h"
-
-#define SORCERER_USING_DISKS 0
-#define SORCERER_USING_RS232 0
-
-#if SORCERER_USING_DISKS
 #include "machine/micropolis.h"
-#endif
+
+#define SORCERER_USING_RS232 0
 
 
 typedef struct {
@@ -54,9 +51,6 @@ public:
 	m_dac(*this, "dac"),
 	m_uart(*this, "uart"),
 	m_printer(*this, "centronics"),
-#if SORCERER_USING_DISKS
-	m_fdc(*this, "fdc"),
-#endif
 	m_ram(*this, RAM_TAG)
 	{ }
 
@@ -68,9 +62,6 @@ public:
 	required_device<device_t> m_dac;
 	required_device<device_t> m_uart;
 	required_device<device_t> m_printer;
-#if SORCERER_USING_DISKS
-	optional_device<device_t> m_fdc;
-#endif
 	required_device<device_t> m_ram;
 	DECLARE_READ8_MEMBER(sorcerer_fc_r);
 	DECLARE_READ8_MEMBER(sorcerer_fd_r);
@@ -91,6 +82,7 @@ public:
 /*----------- defined in machine/sorcerer.c -----------*/
 
 
+MACHINE_START( sorcererd );
 MACHINE_START( sorcerer );
 MACHINE_RESET( sorcerer );
 Z80BIN_EXECUTE( sorcerer );

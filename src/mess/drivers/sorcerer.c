@@ -122,8 +122,6 @@ for cassette unit 1 are duplicated on a set of phono plugs.
 We emulate the use of two cassette units. An option allows you to hear the sound
 of the tape during playback.
 
-An examination of the disk controller boot rom shows the controller is not a
-standard one; a custom implementation will need to be written.
 
 ********************************************************************************
 
@@ -145,23 +143,38 @@ NOTES (2011-01-09)
                          Note that the code within the defines has NOT been
                          compiled or tested. You are on your own!
 
+
+NOTES (2011-08-08)
+1. SORCERER_USING_DISKS removed, replaced with a new driver "sorcererd".
+                         This is disk-enabled, allowing CP/M to run.
+                         To initialise the disk system, you must enter
+                         GO BC00
+                         after the computer has booted. It is not particularly
+                         stable, so be prepared to cold boot whenever something
+                         goes wrong.
+
 ********************************************************************************/
 #define ADDRESS_MAP_MODERN
 
-#include "emu.h"
 #include "includes/sorcerer.h"
 
 
 static ADDRESS_MAP_START( sorcerer_mem, AS_PROGRAM, 8, sorcerer_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
-#if SORCERER_USING_DISKS
-	AM_RANGE(0x0800, 0xbbff) AM_RAM
-	AM_RANGE(0xbc00, 0xbcff) AM_ROM //micropolis boot code
-	AM_RANGE(0xbe00, 0xbe03) AM_DEVREADWRITE_LEGACY("fdc", micropolis_r, micropolis_w)
-#else
 	AM_RANGE(0x0800, 0xbfff) AM_RAM
-#endif
+	AM_RANGE(0xc000, 0xefff) AM_ROM						/* rom pac and bios */
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)		/* screen ram */
+	AM_RANGE(0xf800, 0xfbff) AM_ROM						/* char rom */
+	AM_RANGE(0xfc00, 0xffff) AM_RAM	AM_REGION("maincpu", 0xfc00)		/* programmable chars */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sorcererd_mem, AS_PROGRAM, 8, sorcerer_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
+	AM_RANGE(0x0800, 0xbbff) AM_RAM
+	AM_RANGE(0xbc00, 0xbcff) AM_ROM
+	AM_RANGE(0xbe00, 0xbe03) AM_DEVREADWRITE_LEGACY("fdc", micropolis_r, micropolis_w)
 	AM_RANGE(0xc000, 0xefff) AM_ROM						/* rom pac and bios */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_REGION("maincpu", 0xf000)		/* screen ram */
 	AM_RANGE(0xf800, 0xfbff) AM_ROM						/* char rom */
@@ -388,7 +401,6 @@ static const cassette_interface sorcerer_cassette_interface =
 	NULL
 };
 
-#if SORCERER_USING_DISKS
 static const floppy_interface sorcerer_floppy_interface =
 {
 	DEVCB_NULL,
@@ -396,12 +408,12 @@ static const floppy_interface sorcerer_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_8_SSSD,
 	LEGACY_FLOPPY_OPTIONS_NAME(sorcerer),
 	NULL,
 	NULL
 };
-#endif
+
 
 static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	/* basic machine hardware */
@@ -454,17 +466,23 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sorcerer_cart")
 	//MCFG_SOFTWARE_LIST_ADD("snap_list","sorcerer_snap") not supported yet
+	//MCFG_SOFTWARE_LIST_ADD("cass_list","sorcerer_cass") not created yet
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
 	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
+MACHINE_CONFIG_END
 
-#if SORCERER_USING_DISKS
+static MACHINE_CONFIG_DERIVED( sorcererd, sorcerer )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sorcererd_mem)
+	MCFG_MACHINE_START( sorcererd )
 	MCFG_MICROPOLIS_ADD("fdc", default_micropolis_interface )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
-#endif
+	//MCFG_SOFTWARE_LIST_ADD("flop_list","sorcerer_flop") not created yet
 MACHINE_CONFIG_END
+
 
 static DRIVER_INIT( sorcerer )
 {
@@ -479,18 +497,24 @@ static DRIVER_INIT( sorcerer )
 ***************************************************************************/
 ROM_START(sorcerer)
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-#if SORCERER_USING_DISKS
-	ROM_LOAD("diskboot.dat",0xbc00, 0x0100, BAD_DUMP CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b))
-#endif
 	ROM_LOAD("exmo1-1.dat", 0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1) ) /* monitor roms */
 	ROM_LOAD("exmo1-2.dat", 0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
 	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
-	ROM_CART_LOAD("cart", 0xc000, 0x2000, ROM_OPTIONAL)
-
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD_OPTIONAL("bruce.dat",   0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1)) /* video prom */
-	ROM_LOAD_OPTIONAL("diskboot.dat",0x0100, 0x0100, CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b))
+	ROM_CART_LOAD("cart",   0xc000, 0x2000, ROM_OPTIONAL)
 ROM_END
 
-/*   YEAR  NAME      PARENT  COMPAT    MACHINE   INPUT     INIT        COMPANY     FULLNAME */
-COMP(1979, sorcerer, 0,      0,        sorcerer, sorcerer, sorcerer, "Exidy Inc", "Sorcerer", 0 )
+ROM_START(sorcererd)
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("diskboot.dat",0xbc00, 0x0100, CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b) )
+	ROM_LOAD("exmo1-1.dat", 0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1) ) /* monitor roms */
+	ROM_LOAD("exmo1-2.dat", 0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
+	ROM_LOAD("exchr-1.dat", 0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
+	ROM_CART_LOAD("cart",   0xc000, 0x2000, ROM_OPTIONAL)
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD_OPTIONAL("bruce.dat",  0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1) ) /* video prom */
+ROM_END
+
+/*   YEAR  NAME       PARENT    COMPAT    MACHINE    INPUT     INIT        COMPANY     FULLNAME */
+COMP(1979, sorcerer,  0,        0,        sorcerer,  sorcerer, sorcerer, "Exidy Inc", "Sorcerer", 0 )
+COMP(1979, sorcererd, sorcerer, 0,        sorcererd, sorcerer, sorcerer, "Exidy Inc", "Sorcerer (with floppy disks)", 0 )
