@@ -975,7 +975,7 @@ static void cd_exec_command(running_machine &machine)
 					sectorstore = 0;
 				}
 
-				cd_stat |= CD_STAT_TRANS;
+				cd_stat &= ~CD_STAT_TRANS;
 				cr_standard_return(cd_stat);
 				hirqreg |= (CMOK|EHST);
 			}
@@ -1164,7 +1164,7 @@ static void cd_exec_command(running_machine &machine)
 
 			playtype = 1;
 
-			hirqreg |= (CMOK);
+			hirqreg |= (CMOK|EHST);
 
 			break;
 
@@ -1208,7 +1208,7 @@ TIMER_DEVICE_CALLBACK( stv_sh1_sim )
 {
 	sh1_timer->adjust(attotime::from_hz(16667));
 
-	if(cmd_pending)
+	if(cmd_pending && (!(hirqreg & CMOK)))
 	{
 		cd_exec_command(timer.machine());
 		return;
