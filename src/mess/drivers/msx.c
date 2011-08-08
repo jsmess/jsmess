@@ -3180,7 +3180,7 @@ MSX_LAYOUT_INIT (mpc2300)
 	MSX_LAYOUT_SLOT (3, 1, 0, 1, ROM, 0x4000, 0x8000)
 MSX_LAYOUT_END
 
-/* MSX2 - Sanyo Waby MPC-25FD */
+/* MSX2 - Sanyo Wavy MPC-25FD */
 
 ROM_START (mpc25fd)
 	ROM_REGION (0x20000, "maincpu", 0)
