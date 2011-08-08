@@ -31,6 +31,7 @@ Year + Game                     PCB         Video Chip    Issues / Notes
 
 94  Blazing Tornado             HUM-002-A-(B) 14220    Also has Konami 053936 gfx chip
 94  Dharma Doujou               MTR5260-A     14220
+94  Dharma Doujou (Korea)       MTR527        14220
 94  Gun Master                  MTR5260-A     14220
 94  Toride II Adauchi Gaiden    MTR5260-A     14220
 95  Daitoride                   MTR5260-A     14220
@@ -79,17 +80,6 @@ Notes:
 -   Sprite zoom in Mouja at the end of a match looks wrong, but it's been verified
     to be the same on the original board
 
-lastfort info from guru
----
-Master clock = 24.00MHz
-D7810 clock : 12.00MHz (24 / 2)
-M6295 clock: 1.200MHz (24 / 20), sample rate =  M6295 clock /165
-YM2413 clock: 3.579545MHz
-Vsync: 58Hz
-HSync: 15.16kHz
-
-Compared to the real PCB, MAME is too fast, so 60fps needs to be changed to 58fps (i.e 58Hz).
---
 driver modified by Eisuke Watanabe
 ***************************************************************************/
 
@@ -3502,7 +3492,7 @@ static const UPD7810_CONFIG metro_cpu_config =
 static MACHINE_CONFIG_START( balcube, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(balcube_map)
 	MCFG_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
@@ -3536,7 +3526,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( daitoa, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(daitoa_map)
 	MCFG_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
@@ -3570,7 +3560,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( msgogo, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(msgogo_map)
 	MCFG_CPU_VBLANK_INT_HACK(msgogo_interrupt,262)    /* ? */
 
@@ -3604,7 +3594,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( bangball, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(bangball_map)
 	MCFG_CPU_VBLANK_INT("screen", bangball_interrupt)
 
@@ -3638,7 +3628,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( batlbubl, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(batlbubl_map)
 	MCFG_CPU_VBLANK_INT("screen", bangball_interrupt)
 
@@ -3671,11 +3661,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( daitorid, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(daitorid_map)
 	MCFG_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_12MHz)
 	MCFG_CPU_CONFIG(metro_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(daitorid_sound_io_map)
@@ -3700,7 +3690,7 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz)
 	MCFG_SOUND_CONFIG(ym2151_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
@@ -3714,11 +3704,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( dharma, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(dharma_map)
 	MCFG_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
@@ -3743,11 +3733,11 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_CONFIG_END
@@ -3756,11 +3746,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( karatour, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(karatour_map)
 	MCFG_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
@@ -3785,11 +3775,11 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_CONFIG_END
@@ -3798,11 +3788,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( 3kokushi, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(kokushi_map)
 	MCFG_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
@@ -3827,11 +3817,11 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_CONFIG_END
@@ -3840,11 +3830,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( lastfort, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(lastfort_map)
 	MCFG_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
@@ -3869,11 +3859,11 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_CONFIG_END
@@ -3881,11 +3871,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( lastforg, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(lastforg_map)
 	MCFG_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
@@ -3895,7 +3885,7 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(360, 224)
@@ -3910,11 +3900,11 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_CONFIG_END
@@ -3922,7 +3912,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( dokyusei, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(dokyusei_map)
 	MCFG_CPU_VBLANK_INT_HACK(dokyusei_interrupt,2)	/* ? */
 
@@ -3950,7 +3940,7 @@ static MACHINE_CONFIG_START( dokyusei, metro_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 8000000)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_CONFIG_END
@@ -3958,7 +3948,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( dokyusp, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(dokyusp_map)
 	MCFG_CPU_VBLANK_INT("screen", gakusai_interrupt)
 
@@ -3987,7 +3977,7 @@ static MACHINE_CONFIG_START( dokyusp, metro_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 8000000)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_CONFIG_END
@@ -3996,7 +3986,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( gakusai, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(gakusai_map)
 	MCFG_CPU_VBLANK_INT("screen", gakusai_interrupt)
 
@@ -4025,7 +4015,7 @@ static MACHINE_CONFIG_START( gakusai, metro_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 8000000)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_CONFIG_END
@@ -4034,7 +4024,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( gakusai2, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(gakusai2_map)
 	MCFG_CPU_VBLANK_INT("screen", gakusai_interrupt)
 
@@ -4063,7 +4053,7 @@ static MACHINE_CONFIG_START( gakusai2, metro_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 8000000)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_CONFIG_END
@@ -4072,11 +4062,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( pangpoms, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(pangpoms_map)
 	MCFG_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
@@ -4101,11 +4091,11 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_CONFIG_END
@@ -4114,11 +4104,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( poitto, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(poitto_map)
 	MCFG_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
@@ -4143,11 +4133,11 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_CONFIG_END
@@ -4200,11 +4190,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( skyalert, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(skyalert_map)
 	MCFG_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
@@ -4229,11 +4219,11 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_CONFIG_END
@@ -4242,11 +4232,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( toride2g, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(toride2g_map)
 	MCFG_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_CPU_CONFIG(metro_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
@@ -4271,11 +4261,11 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_CONFIG_END
@@ -4284,7 +4274,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( mouja, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* ??? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(mouja_map)
 	MCFG_CPU_VBLANK_INT("screen", mouja_interrupt)
 
@@ -4307,11 +4297,11 @@ static MACHINE_CONFIG_START( mouja, metro_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_OKIM6295_ADD("oki", 16000000/1024*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/1024*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_CONFIG_END
@@ -4325,11 +4315,11 @@ static const k053936_interface blzntrnd_k053936_intf =
 static MACHINE_CONFIG_START( blzntrnd, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_map)
 	MCFG_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_sound_map)
 	MCFG_CPU_IO_MAP(blzntrnd_sound_io_map)
 
@@ -4355,7 +4345,7 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)
 	MCFG_SOUND_CONFIG(blzntrnd_ym2610_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -4373,11 +4363,11 @@ static const k053936_interface gstrik2_k053936_intf =
 static MACHINE_CONFIG_START( gstrik2, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_map)
 	MCFG_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_sound_map)
 	MCFG_CPU_IO_MAP(blzntrnd_sound_io_map)
 
@@ -4403,7 +4393,7 @@ static MACHINE_CONFIG_START( gstrik2, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)
 	MCFG_SOUND_CONFIG(blzntrnd_ym2610_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -4817,8 +4807,8 @@ Metro 1995
 
 MTR5260-A
 
-                                 12MHz  6116
-                   YM2151          DT7  DT8
+                      3.5759MHz  12MHz  6116
+   26.666MHz        YM2151          DT7  DT8
                             M6295
      7C199                             78C10
      7C199       Imagetek14220
@@ -4828,7 +4818,6 @@ MTR5260-A
                   32MHz    52258       DT2
    SW1                     52258       DT3
    SW2            DT6  DT5             DT4
-
 
 ********************************************************
 
@@ -4904,15 +4893,15 @@ MTR5260-A
 |-----------------------------------------------|
 |TA7222            3.579545MHz                  |
 |            YM3012                      6116   |
-|C3403  C3403      YM2151  M6295                |
+|C3403  C3403      YM2413  M6295                |
 |       26.666MHz             DD_JA-7  DD_JA-8  |
-|            6264                               |
-|J           6264           |--------|  D78C10  |
-|A           6264           |IMAGETEK|          |
+|            7C199                              |
+|J           7C199          |--------|  D78C10  |
+|A           7C199          |IMAGETEK|          |
 |M                          |14220   |          |
 |M               MM1035     |        |          |
 |A         |------------|   |--------|          |
-|          |    68000   |              DD_JB-1  |
+|          |  68000-12  |              DD_JB-1  |
 |          |------------|                       |
 |                                      DD_JB-2  |
 |              24MHz                            |
@@ -4924,7 +4913,7 @@ MTR5260-A
 Notes:
       68000 clock     - 12.000MHz [24/2]
       D78C10 clock    - 12.000MHz [24/2]
-      YM2151 clock    - 3.579545MHz
+      YM2413 clock    - 3.579545MHz
       Oki M6295 clock - 1.200MHz [24/20], sample rate = 1200000 / 132
       VSync - 60Hz
       HSync - 15.55kHz
@@ -5074,16 +5063,16 @@ ImageTek Inc.
 9227KK702
 
 Filename    Type        Location
-KT001.BIN   27C010      1I
-KT002.BIN   27C2001     8G
-KT003.BIN   27C2001     10G
-KT008.BIN   27C2001     1D
+KT001.1i    27C010      1I
+KT002.8g    27C2001     8G
+KT003.10g   27C2001     10G
+KT008.1d    27C2001     1D
 
-Filename    Chip Markings   Location
-KTMASK1.BIN 361A04 9241D    15F
-KTMASK2.BIN 361A05 9239D    17F
-KTMASK3.BIN 361A06 9239D    15D
-KTMASK4.BIN 361A07 9239D    17D
+Filename   Chip Markings   Location
+361a04.15f 361A04 9241D    15F
+361a05.17f 361A05 9239D    17F
+361a06.15d 361A06 9239D    15D
+361a07.17d 361A07 9239D    17D
 
 ***************************************************************************/
 
@@ -5097,10 +5086,10 @@ ROM_START( karatour )
 	ROM_CONTINUE(         0x010000, 0x01c000 )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
-	ROMX_LOAD( "ktmask.15f", 0x000000, 0x100000, CRC(f6bf20a5) SHA1(cb4cb249eb1c106fe7ef0ace735c0cc3106f1ab7) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "ktmask.17d", 0x000002, 0x100000, CRC(794cc1c0) SHA1(ecfdec5874a95846c0fb7966fdd1da625d85531f) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "ktmask.17f", 0x000004, 0x100000, CRC(ea9c11fc) SHA1(176c4419cfe13ff019654a93cd7b0befa238bbc3) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "ktmask.15d", 0x000006, 0x100000, CRC(7e15f058) SHA1(267f0a5acb874d4fff3556ffa405e24724174667) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "361a04.15f", 0x000000, 0x100000, CRC(f6bf20a5) SHA1(cb4cb249eb1c106fe7ef0ace735c0cc3106f1ab7) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "361a07.17d", 0x000002, 0x100000, CRC(794cc1c0) SHA1(ecfdec5874a95846c0fb7966fdd1da625d85531f) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "361a05.17f", 0x000004, 0x100000, CRC(ea9c11fc) SHA1(176c4419cfe13ff019654a93cd7b0befa238bbc3) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "361a06.15d", 0x000006, 0x100000, CRC(7e15f058) SHA1(267f0a5acb874d4fff3556ffa405e24724174667) , ROM_GROUPWORD | ROM_SKIP(6))
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "kt008.1d", 0x000000, 0x040000, CRC(47cf9fa1) SHA1(88923ace550154c58c066f859cadfa7864c5344c) )
@@ -5137,12 +5126,12 @@ Imagetek I4100 052 9330EK712
 
 ROM_START( ladykill )
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "e2.bin",    0x000000, 0x040000, CRC(211a4865) SHA1(4315c0a708383d357d8dd89a1820fe6cf7652adb) )
-	ROM_LOAD16_BYTE( "e3.bin",    0x000001, 0x040000, CRC(581a55ea) SHA1(41bfcaae84e583bf185948ab53ec39c05180a7a4) )
+	ROM_LOAD16_BYTE( "e2.8g",  0x000000, 0x040000, CRC(211a4865) SHA1(4315c0a708383d357d8dd89a1820fe6cf7652adb) )
+	ROM_LOAD16_BYTE( "e3.10g", 0x000001, 0x040000, CRC(581a55ea) SHA1(41bfcaae84e583bf185948ab53ec39c05180a7a4) )
 
 	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
-	ROM_LOAD( "e1.1i",    0x000000, 0x004000, CRC(a4d95cfb) SHA1(2fd8a5cbb0dc289bd5294519dbd5369bfb4c2d4d) )	// 11xxxxxxxxxxxxxxx = 0xFF
-	ROM_CONTINUE(         0x010000, 0x01c000 )
+	ROM_LOAD( "e1.1i", 0x000000, 0x004000, CRC(a4d95cfb) SHA1(2fd8a5cbb0dc289bd5294519dbd5369bfb4c2d4d) )	// 11xxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(      0x010000, 0x01c000 )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
 	ROMX_LOAD( "ladyj-4.15f", 0x000000, 0x100000, CRC(65e5906c) SHA1(cc3918c2094ca819ec4043055564e1dbff4a4750) , ROM_GROUPWORD | ROM_SKIP(6))
@@ -5151,17 +5140,17 @@ ROM_START( ladykill )
 	ROMX_LOAD( "ladyj-6.15d", 0x000006, 0x100000, CRC(3a34913a) SHA1(a55624ede7c368e61555ca7b9cd9e6948265b784) , ROM_GROUPWORD | ROM_SKIP(6))
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* Samples */
-	ROM_LOAD( "e8.bin",   0x000000, 0x040000, CRC(da88244d) SHA1(90c0cc275b69afffd9a0126985fd3fe16d44dced) )
+	ROM_LOAD( "e8.1d", 0x000000, 0x040000, CRC(da88244d) SHA1(90c0cc275b69afffd9a0126985fd3fe16d44dced) )
 ROM_END
 
 ROM_START( moegonta )
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "j2.8g",     0x000000, 0x040000, CRC(aa18d130) SHA1(6e0fd3b95d8589665b418bcae4fe64b288289c78) )
-	ROM_LOAD16_BYTE( "j3.10g",    0x000001, 0x040000, CRC(b555e6ab) SHA1(adfc6eafec612c8770b9f832a0a2574c53c3d047) )
+	ROM_LOAD16_BYTE( "j2.8g",  0x000000, 0x040000, CRC(aa18d130) SHA1(6e0fd3b95d8589665b418bcae4fe64b288289c78) )
+	ROM_LOAD16_BYTE( "j3.10g", 0x000001, 0x040000, CRC(b555e6ab) SHA1(adfc6eafec612c8770b9f832a0a2574c53c3d047) )
 
 	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
-	ROM_LOAD( "e1.1i",    0x000000, 0x004000, CRC(a4d95cfb) SHA1(2fd8a5cbb0dc289bd5294519dbd5369bfb4c2d4d) )	// 11xxxxxxxxxxxxxxx = 0xFF
-	ROM_CONTINUE(         0x010000, 0x01c000 )
+	ROM_LOAD( "e1.1i", 0x000000, 0x004000, CRC(a4d95cfb) SHA1(2fd8a5cbb0dc289bd5294519dbd5369bfb4c2d4d) )	// 11xxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(      0x010000, 0x01c000 )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
 	ROMX_LOAD( "ladyj-4.15f", 0x000000, 0x100000, CRC(65e5906c) SHA1(cc3918c2094ca819ec4043055564e1dbff4a4750) , ROM_GROUPWORD | ROM_SKIP(6))
@@ -5170,7 +5159,7 @@ ROM_START( moegonta )
 	ROMX_LOAD( "ladyj-6.15d", 0x000006, 0x100000, CRC(3a34913a) SHA1(a55624ede7c368e61555ca7b9cd9e6948265b784) , ROM_GROUPWORD | ROM_SKIP(6))
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* Samples */
-	ROM_LOAD( "e8j.1d",   0x000000, 0x040000, CRC(f66c2a80) SHA1(d95ddc8fe4144a6ad4a92385ff962d0b9391d53b) )
+	ROM_LOAD( "e8j.1d", 0x000000, 0x040000, CRC(f66c2a80) SHA1(d95ddc8fe4144a6ad4a92385ff962d0b9391d53b) )
 ROM_END
 
 
@@ -5193,6 +5182,20 @@ VG420
 
     TR_  TR_  TR_  TR_  TR_  TR_  TR_  TR_
     JC08 JC07 JC06 JC05 JC04 JC03 JC02 JC01
+
+CPU     :MC68000P12
+Sound   :Yamaha YM2413, OKI M6295
+OSC     :24.0000MHz, 3.579545MHz
+other   :D78C10ACW, Imagetek Inc 14100 052
+
+Clock measurements by the Guru:
+Master clock: 24.00MHz
+ D7810 clock: 12.00MHz (24 / 2)
+ M6295 clock: 1.200MHz (24 / 20), sample rate =  M6295 clock /165
+YM2413 clock: 3.579545MHz
+
+Vsync: 58Hz
+HSync: 15.16kHz
 
 ***************************************************************************/
 
@@ -5242,25 +5245,23 @@ ROM_START( lastfortk )
 	ROM_LOAD( "tr_jb11", 0x000000, 0x020000, CRC(83786a09) SHA1(910cf0ccf4493f2a80062149f6364dbb6a1c2a5d) )
 ROM_END
 
-/* German version on PCB VG460-(A) */
-
-ROM_START( lastfortg )
+ROM_START( lastfortg ) /* German version on PCB VG460-(A) */
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "trma02.bin",    0x000000, 0x020000, CRC(e6f40918) SHA1(c8c9369103530b2214c779c8a643ba9349b3eac5) )
-	ROM_LOAD16_BYTE( "trma03.bin",    0x000001, 0x020000, CRC(b00fb126) SHA1(7dd4b7a2d1c5401fde2275ef76fac1ccc586a0bd) )
+	ROM_LOAD16_BYTE( "tr_ma02.8g",  0x000000, 0x020000, CRC(e6f40918) SHA1(c8c9369103530b2214c779c8a643ba9349b3eac5) )
+	ROM_LOAD16_BYTE( "tr_ma03.10g", 0x000001, 0x020000, CRC(b00fb126) SHA1(7dd4b7a2d1c5401fde2275ef76fac1ccc586a0bd) )
 
 	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
-	ROM_LOAD( "trma01.bin",  0x000000, 0x004000,  CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) ) /* Same as parent set, but different label */
+	ROM_LOAD( "tr_ma01.1i",  0x000000, 0x004000,  CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) ) /* Same as parent set, but different label */
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
-	ROMX_LOAD( "trma04.bin", 0x000000, 0x080000, CRC(5feafc6f) SHA1(eb50905eb0d25eb342e08d591907f79b5eadff43) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "trma07.bin", 0x000002, 0x080000, CRC(7519d569) SHA1(c88932a19a48d45a19b777113a4719b18f42a297) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "trma05.bin", 0x000004, 0x080000, CRC(5d917ba5) SHA1(34fc72924fa2877c1038d7f61b22f7667af01e9f) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "trma06.bin", 0x000006, 0x080000, CRC(d366c04e) SHA1(e0a67688043cb45916860d32ff1076d9257e6ad9) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "tr_ma04.15f", 0x000000, 0x080000, CRC(5feafc6f) SHA1(eb50905eb0d25eb342e08d591907f79b5eadff43) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "tr_ma07.17d", 0x000002, 0x080000, CRC(7519d569) SHA1(c88932a19a48d45a19b777113a4719b18f42a297) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "tr_ma05.17f", 0x000004, 0x080000, CRC(5d917ba5) SHA1(34fc72924fa2877c1038d7f61b22f7667af01e9f) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "tr_ma06.15d", 0x000006, 0x080000, CRC(d366c04e) SHA1(e0a67688043cb45916860d32ff1076d9257e6ad9) , ROM_GROUPWORD | ROM_SKIP(6))
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
-	ROM_LOAD( "trma08.bin",   0x000000, 0x020000, CRC(83786a09) SHA1(910cf0ccf4493f2a80062149f6364dbb6a1c2a5d) ) /* Same as parent set, but different label */
+	ROM_LOAD( "tr_ma08.1d", 0x000000, 0x020000, CRC(83786a09) SHA1(910cf0ccf4493f2a80062149f6364dbb6a1c2a5d) ) /* Same as parent set, but different label */
 ROM_END
 
 /***************************************************************************
@@ -5307,11 +5308,12 @@ Mahjong Doukyuhsei (JPN Ver.)
 
 (c)1995 make software/elf/media trading corp.
 
-CPU   :68000 16MHz
-Sound :YM2413 custom
-OSC   :16.0000MHz 3.579545MHz 26.666MHz
+Board: VG330-B
 
-Board Name?:VG330-B
+CPU   : 68000 16MHz
+Sound : YM2413, M6295
+OSC   : 16.0000MHz 3.579545MHz 26.666MHz
+Custom: Imagetek Inc 14300
 
 ***************************************************************************/
 
@@ -5344,7 +5346,7 @@ Sound:  M6295
 OSC:    32.0000MHz
         3.579545MHz
 EEPROM: 93C46
-Custom: 14300 095
+Custom: Imagetek Inc 14300 095
 
 ***************************************************************************/
 
@@ -5445,28 +5447,50 @@ ROM_END
 
 Mouja (JPN Ver.)
 (c)1996 Etona / (c)1995 FPS/FWS
-VG410-B
 
-CPU     :TMP68H000P-12
-Sound   :YM2413,OKI M6295
-OSC     :16000.00KHz,3.579545MHz,26.666MHz
-other   :Imagetek Inc 14300 095
+VG410-B
++------------------------+
+|       SW2 SW1 68000-16 |
+|       SW4 SW3   10   9 |
+|             62256 62256|
+|J YM2413 ALTERA         |
+|A  3.579545MHz          |
+|M   M6295 16MHz LH53882B|
+|M LH538711              |
+|A 26.666MHz     LH53882C|
+|        14300           |
+|  61S256        LH53882D|
+|  61S256 61C64          |
+|                LH53882E|
++------------------------+
+
+CPU     :TMP68H000P-16
+Sound   :Yamaha YM2413, OKI M6295
+OSC     :16000.00KHz, 3.579545MHz, 26.666MHz
+other   :Imagetek Inc 14300 095, ALTERA EPM7032LC44-15T
+
+* SW3 & SW4 are unpopulated
+
+9, 10 Program roms, 27C020
+
+LH53882B - LH53882E are MASK roms
+LH53711 is a MASK rom
 
 ***************************************************************************/
 
 ROM_START( mouja )
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "10.bin",      0x000000, 0x040000, CRC(f9742b69) SHA1(f8c6508b227403a82413ceeb0651922759d7e0f4) )
-	ROM_LOAD16_BYTE( "9.bin",       0x000001, 0x040000, CRC(dc77216f) SHA1(3b73d29f4e8e385f45f2abfb38eaffc2d8406948) )
+	ROM_LOAD16_BYTE( "10.u38", 0x000000, 0x040000, CRC(f9742b69) SHA1(f8c6508b227403a82413ceeb0651922759d7e0f4) ) /* Silkscreened U38 and 10 */
+	ROM_LOAD16_BYTE( "9.u39",  0x000001, 0x040000, CRC(dc77216f) SHA1(3b73d29f4e8e385f45f2abfb38eaffc2d8406948) ) /* Silkscreened U39 and 9 */
 
 	ROM_REGION( 0x400000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
-	ROMX_LOAD( "42.bin",      0x000000, 0x100000, CRC(c4dd3194) SHA1(c9c88a8d2046224957b35de14763aa4bdf0d407f) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "86.bin",      0x000002, 0x100000, CRC(09530f9d) SHA1(03f2ec5ea694266808d245abe7f688de0ef6d853) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "31.bin",      0x000004, 0x100000, CRC(5dd7a7b2) SHA1(b0347e8951b29356a7d945b906d93c40b9abc19c) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "75.bin",      0x000006, 0x100000, CRC(430c3925) SHA1(41e5bd02a665eee87ef8f4ae9f4bee374c25e00b) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "lh53882c.u6", 0x000000, 0x100000, CRC(c4dd3194) SHA1(c9c88a8d2046224957b35de14763aa4bdf0d407f) , ROM_GROUPWORD | ROM_SKIP(6)) /* Silkscreened U6 and 42 */
+	ROMX_LOAD( "lh53882e.u5", 0x000002, 0x100000, CRC(09530f9d) SHA1(03f2ec5ea694266808d245abe7f688de0ef6d853) , ROM_GROUPWORD | ROM_SKIP(6)) /* Silkscreened U5 and 86 */
+	ROMX_LOAD( "lh53882b.u4", 0x000004, 0x100000, CRC(5dd7a7b2) SHA1(b0347e8951b29356a7d945b906d93c40b9abc19c) , ROM_GROUPWORD | ROM_SKIP(6)) /* Silkscreened U4 and 31 */
+	ROMX_LOAD( "lh53882d.u1", 0x000006, 0x100000, CRC(430c3925) SHA1(41e5bd02a665eee87ef8f4ae9f4bee374c25e00b) , ROM_GROUPWORD | ROM_SKIP(6)) /* Silkscreened U1 and 75 */
 
 	ROM_REGION( 0x100000, "user1", 0 )	/* Samples */
-	ROM_LOAD( "11.bin",     0x000000, 0x100000, CRC(fe3df432) SHA1(4fb7ad997ca6e91468d7516e5c4a94cde6e07104) )
+	ROM_LOAD( "lh538711.u53",     0x000000, 0x100000, CRC(fe3df432) SHA1(4fb7ad997ca6e91468d7516e5c4a94cde6e07104) ) /* Silkscreened U53 and 11 */
 
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
@@ -5723,38 +5747,38 @@ Metro/Banpresto 1995
 
 MTR5260-A                3.5759MHz  12MHz
                YM2151                         6116
-   26.666MHz           M6295    PZ.JB7  PZ.JB8
+   26.666MHz           M6295    PZ_JB7  PZ_JB8
                                      78C10
       7C199         Imagetek
       7C199           14220
       61C64
 
-                                          PZ.JB1
-           68000-16                       PZ.JB2
-               32MHz   6164               PZ.JB3
-                       6164               PZ.JB4
-    SW      PZ.JB6 PZ.JB5
-    SW
+                                          PZ_JB1
+           68000-16                       PZ_JB2
+               32MHz   6164               PZ_JB3
+                       6164               PZ_JB4
+    SW1     PZ_JB6 PZ_JB5
+    SW2
 
 ***************************************************************************/
 
 ROM_START( puzzli )
 	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "pz.jb5",       0x000000, 0x020000, CRC(33bbbd28) SHA1(41a98cfbdd60a638e4aa08f15f1730a2436106f9) )
-	ROM_LOAD16_BYTE( "pz.jb6",       0x000001, 0x020000, CRC(e0bdea18) SHA1(9941a2cd88d7a3c1a640f837d9f34c39ba643ee5) )
+	ROM_LOAD16_BYTE( "pz_jb5.20e", 0x000000, 0x020000, CRC(33bbbd28) SHA1(41a98cfbdd60a638e4aa08f15f1730a2436106f9) )
+	ROM_LOAD16_BYTE( "pz_jb6.20c", 0x000001, 0x020000, CRC(e0bdea18) SHA1(9941a2cd88d7a3c1a640f837d9f34c39ba643ee5) )
 
 	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
-	ROM_LOAD( "pz.jb8",      0x000000, 0x004000, CRC(c652da32) SHA1(907eba5103373ca6204f9d62c426ccdeef0a3791) )
-	ROM_CONTINUE(            0x010000, 0x01c000 )
+	ROM_LOAD( "pz_jb8.3i", 0x000000, 0x004000, CRC(c652da32) SHA1(907eba5103373ca6204f9d62c426ccdeef0a3791) )
+	ROM_CONTINUE(          0x010000, 0x01c000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
-	ROMX_LOAD( "pz.jb2",       0x000000, 0x080000, CRC(0c0997d4) SHA1(922d8553ef505f65238e5cc77b45861a80022d75) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "pz.jb4",       0x000002, 0x080000, CRC(576bc5c2) SHA1(08c10e0a3356ee1f79b78eff92395d8b18e43485) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "pz.jb1",       0x000004, 0x080000, CRC(29f01eb3) SHA1(1a56f0b8efb599ae4f3cd0a4f0b6a6152ea6b117) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "pz.jb3",       0x000006, 0x080000, CRC(6753e282) SHA1(49d092543db34f2cb54697897790df12ca3eda74) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "pz_jb2.14i", 0x000000, 0x080000, CRC(0c0997d4) SHA1(922d8553ef505f65238e5cc77b45861a80022d75) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "pz_jb4.18i", 0x000002, 0x080000, CRC(576bc5c2) SHA1(08c10e0a3356ee1f79b78eff92395d8b18e43485) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "pz_jb1.12i", 0x000004, 0x080000, CRC(29f01eb3) SHA1(1a56f0b8efb599ae4f3cd0a4f0b6a6152ea6b117) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "pz_jb3.16i", 0x000006, 0x080000, CRC(6753e282) SHA1(49d092543db34f2cb54697897790df12ca3eda74) , ROM_GROUPWORD | ROM_SKIP(6))
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* Samples */
-	ROM_LOAD( "pz.jb7",      0x000000, 0x040000, CRC(b3aab610) SHA1(9bcf1f98e19a7e26b22e152313dfbd43c882f008) )
+	ROM_LOAD( "pz_jb7.3g", 0x000000, 0x040000, CRC(b3aab610) SHA1(9bcf1f98e19a7e26b22e152313dfbd43c882f008) )
 ROM_END
 
 
@@ -5771,21 +5795,21 @@ sound: YM2413 + M6295
 
 ROM_START( 3kokushi )
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "5.bin",        0x000000, 0x040000, CRC(6104ea35) SHA1(efb4a9a98577894fac720028f18cb9877a00239a) )
-	ROM_LOAD16_BYTE( "6.bin",        0x000001, 0x040000, CRC(aac25540) SHA1(811de761bb1b3cc47d811b00f4b5c960c8f061d0) )
+	ROM_LOAD16_BYTE( "5.20e", 0x000000, 0x040000, CRC(6104ea35) SHA1(efb4a9a98577894fac720028f18cb9877a00239a) )
+	ROM_LOAD16_BYTE( "6.20c", 0x000001, 0x040000, CRC(aac25540) SHA1(811de761bb1b3cc47d811b00f4b5c960c8f061d0) )
 
 	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
-	ROM_LOAD( "8.bin",       0x000000, 0x004000, CRC(f56cca45) SHA1(4739b83b0b3a4235fac10def3d26b0bd190eb12a) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
-	ROM_CONTINUE(            0x010000, 0x01c000 )
+	ROM_LOAD( "8.3i", 0x000000, 0x004000, CRC(f56cca45) SHA1(4739b83b0b3a4235fac10def3d26b0bd190eb12a) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
+	ROM_CONTINUE(     0x010000, 0x01c000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
-	ROMX_LOAD( "2.bin",        0x000000, 0x080000, CRC(291f8149) SHA1(82f460517543ef544c21a81e51987fb2f5c6273d) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "4.bin",        0x000002, 0x080000, CRC(9317c359) SHA1(9756757fb5d2b298a2b1917a131f391ef0e31fb9) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "1.bin",        0x000004, 0x080000, CRC(d5495759) SHA1(9cbcb48915ec44a8026d88d96ab391e118e89df5) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "3.bin",        0x000006, 0x080000, CRC(3d76bdf3) SHA1(f621fcc8e6bde58077216b534c2e876ea9311e15) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "2.14i", 0x000000, 0x080000, CRC(291f8149) SHA1(82f460517543ef544c21a81e51987fb2f5c6273d) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "4.18i", 0x000002, 0x080000, CRC(9317c359) SHA1(9756757fb5d2b298a2b1917a131f391ef0e31fb9) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "1.12i", 0x000004, 0x080000, CRC(d5495759) SHA1(9cbcb48915ec44a8026d88d96ab391e118e89df5) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "3.16i", 0x000006, 0x080000, CRC(3d76bdf3) SHA1(f621fcc8e6bde58077216b534c2e876ea9311e15) , ROM_GROUPWORD | ROM_SKIP(6))
 
 	ROM_REGION( 0x040000, "oki", 0 )	/* Samples */
-	ROM_LOAD( "7.bin",       0x000000, 0x040000, CRC(78fe9d44) SHA1(365a2d51daa24741957fa619bbbbf96e8f370701) )
+	ROM_LOAD( "7.3g", 0x000000, 0x040000, CRC(78fe9d44) SHA1(365a2d51daa24741957fa619bbbbf96e8f370701) )
 ROM_END
 
 
@@ -5845,11 +5869,33 @@ ROM_END
 Sky Alert (JPN Ver.)
 (c)1992 Metro
 VG420
+                                     SA
+                     SW2 SW1         B12   4016
+                                           NEC78C10  3.579MHz
+
+                                                          6269
+                                                          SA
+                                                          A11
+  55328 55328 55328       24MHz
+
+                           4064   4064   SA   SA          68000-12
+       Imagetek                          C10  C09
+       14100
+
+
+    SA  SA  SA  SA  SA  SA  SA  SA 
+    A08 A07 A06 A05 A04 A03 A02 A01
 
 CPU     :MC68000P12
-Sound   :YM2413,OKI M6295
-OSC     :24.0000MHz,3.579545MHz
-other   :D78C10ACW,Imagetek Inc 14100 052
+Sound   :Yamaha YM2413, OKI M6295
+OSC     :24.0000MHz, 3.579545MHz
+other   :D78C10ACW, Imagetek Inc 14100 052
+
+Master clock: 24.00MHz
+ D7810 clock: 12.00MHz (24 / 2)
+ M6295 clock: 1.200MHz (24 / 20), sample rate =  M6295 clock /165
+YM2413 clock: 3.579545MHz
+
 
 ***************************************************************************/
 
@@ -5929,21 +5975,21 @@ ROM_END
 
 ROM_START( toride2gg )
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "trii_ge_5", 0x000000, 0x040000, CRC(5e0815a8) SHA1(574c1bf1149b7e98222876b402b20d824f207c79) )
-	ROM_LOAD16_BYTE( "trii_ge_6", 0x000001, 0x040000, CRC(55eba67d) SHA1(c12a11a98d49baf3643404a594d2b87b434acb01) )
+	ROM_LOAD16_BYTE( "trii_ge_5.20e", 0x000000, 0x040000, CRC(5e0815a8) SHA1(574c1bf1149b7e98222876b402b20d824f207c79) )
+	ROM_LOAD16_BYTE( "trii_ge_6.20c", 0x000001, 0x040000, CRC(55eba67d) SHA1(c12a11a98d49baf3643404a594d2b87b434acb01) )
 
 	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
-	ROM_LOAD( "trii_jb_8", 0x000000, 0x004000, CRC(0168f46f) SHA1(01bf4cc425d72936897c3c572f6c0b1366fe4041) )
+	ROM_LOAD( "tr2_jb-8.3i", 0x000000, 0x004000, CRC(0168f46f) SHA1(01bf4cc425d72936897c3c572f6c0b1366fe4041) )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
-	ROMX_LOAD( "trii_gb_2", 0x000000, 0x080000, CRC(5949e65f) SHA1(f51ff9590904e691b9ec91b22d3c52bf579deaff) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "trii_gb_4", 0x000002, 0x080000, CRC(adc84c7b) SHA1(fe0f2b6e3c586c427701e43fdd4827c8b183b42a) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "trii_gb_1", 0x000004, 0x080000, CRC(bcf30944) SHA1(c36fbffa6062a2443a47d8faf83baa903529ee97) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "trii_gb_3", 0x000006, 0x080000, CRC(138e68d0) SHA1(5a9655f31e2f2e2f16a5bdc334efa78b2cfc37d2) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "trii_gb_2.14i", 0x000000, 0x080000, CRC(5949e65f) SHA1(f51ff9590904e691b9ec91b22d3c52bf579deaff) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "trii_gb_4.18i", 0x000002, 0x080000, CRC(adc84c7b) SHA1(fe0f2b6e3c586c427701e43fdd4827c8b183b42a) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "trii_gb_1.12i", 0x000004, 0x080000, CRC(bcf30944) SHA1(c36fbffa6062a2443a47d8faf83baa903529ee97) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "trii_gb_3.16i", 0x000006, 0x080000, CRC(138e68d0) SHA1(5a9655f31e2f2e2f16a5bdc334efa78b2cfc37d2) , ROM_GROUPWORD | ROM_SKIP(6))
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
-	ROM_LOAD( "trii_ja_7", 0x000000, 0x020000, CRC(6ee32315) SHA1(ef4d59576929deab0aa459a67be21d97c2803dea) )
+	ROM_LOAD( "tr2_ja_7.3g", 0x000000, 0x020000, CRC(6ee32315) SHA1(ef4d59576929deab0aa459a67be21d97c2803dea) )
 ROM_END
 
 ROM_START( toride2j )
@@ -5962,7 +6008,7 @@ ROM_START( toride2j )
 	ROMX_LOAD( "tr2_jb-3.16i", 0x000006, 0x080000, CRC(78ba205f) SHA1(1069a362e60747aaa284c0d9bb7718013df347f3) , ROM_GROUPWORD | ROM_SKIP(6))
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
-	ROM_LOAD( "pcm.3g", 0x000000, 0x020000, CRC(6ee32315) SHA1(ef4d59576929deab0aa459a67be21d97c2803dea) )
+	ROM_LOAD( "tr2_ja_7.3g", 0x000000, 0x020000, CRC(6ee32315) SHA1(ef4d59576929deab0aa459a67be21d97c2803dea) )
 ROM_END
 
 
