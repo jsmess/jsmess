@@ -84,9 +84,9 @@ typedef struct
 	INT8 RR;
 
 	UINT32 step;	/* fixed-point frequency step */
-	UINT32 stepptr;	/* fixed-point pointer into the sample */
+	UINT64 stepptr;	/* fixed-point pointer into the sample */
 
-	INT8 active;		/* slot keyed on */
+	INT8 active;	/* slot keyed on */
 	INT8 bits;		/* width of the samples */
 	UINT32 startaddr;
 	UINT32 loopaddr;
@@ -100,12 +100,19 @@ typedef struct
 
 typedef struct
 {
+	UINT8 pcmregs[256];
 	YMF278BSlot slots[24];
 	INT8 lsitest0;
 	INT8 lsitest1;
 	INT8 wavetblhdr;
 	INT8 memmode;
 	INT32 memadr;
+
+	UINT8 busy;
+	UINT8 ld;
+	emu_timer *timer_busy;
+	emu_timer *timer_ld;
+	UINT8 exp;
 
 	INT32 fm_l, fm_r;
 	INT32 pcm_l, pcm_r;
@@ -119,6 +126,7 @@ typedef struct
 	device_t *device;
 
 	const UINT8 *rom;
+	UINT32 romsize;
 	int clock;
 
 	INT32 volume[256*4];			// precalculated attenuation values with some marging for enveloppe and pan levels
@@ -257,20 +265,24 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 	}
 }
 
+INLINE UINT8 ymf278b_read_sample(const UINT8* buffer, UINT32 buffersize, UINT32 offset)
+{
+	if (offset >= buffersize)
+		return 0;
+	return buffer[offset];
+}
+
 static STREAM_UPDATE( ymf278b_pcm_update )
 {
 	YMF278BChip *chip = (YMF278BChip *)param;
 	int i, j;
 	YMF278BSlot *slot = NULL;
 	INT16 sample = 0;
-	const UINT8 *rombase;
 	INT32 *mixp;
 	INT32 vl, vr;
 	INT32 mix[44100*2];
 
 	memset(mix, 0, sizeof(mix[0])*samples*2);
-
-	rombase = chip->rom;
 
 	for (i = 0; i < 24; i++)
 	{
@@ -299,20 +311,22 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 
 				switch (slot->bits)
 				{
-					case 8: 	// 8 bit
-						sample = rombase[slot->startaddr + (slot->stepptr>>16)]<<8;
+					case 8:
+						sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>16))<<8;
 						break;
 
-					case 12:	// 12 bit
+					case 12:
 						if (slot->stepptr & 1)
-							sample = rombase[slot->startaddr + (slot->stepptr>>17)*3 + 2]<<8 | ((rombase[slot->startaddr + (slot->stepptr>>17)*3 + 1] << 4) & 0xf0);
+							sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
+								(ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
 						else
-							sample = rombase[slot->startaddr + (slot->stepptr>>17)*3]<<8 | (rombase[slot->startaddr + (slot->stepptr>>17)*3 + 1] & 0xf0);
+							sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3)<<8 |
+								(ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
 						break;
 
-					case 16:	// 16 bit
-						sample = rombase[slot->startaddr + ((slot->stepptr>>16)*2)]<<8;
-						sample |= rombase[slot->startaddr + ((slot->stepptr>>16)*2) + 1];
+					case 16:
+						sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
+							ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + ((slot->stepptr>>16)*2)+1);
 						break;
 				}
 
@@ -402,14 +416,21 @@ static void ymf278b_A_w(running_machine &machine, YMF278BChip *chip, UINT8 reg, 
 {
 	switch(reg)
 	{
+		// LSI TEST
+		case 0x00:
+		case 0x01:
+			break;
+
 		case 0x02:
 			chip->timer_a_count = data;
 			ymf278b_timer_a_reset(chip);
 			break;
+
 		case 0x03:
 			chip->timer_b_count = data;
 			ymf278b_timer_b_reset(chip);
 			break;
+
 		case 0x04:
 			if(data & 0x80)
 				chip->current_irq = 0;
@@ -425,18 +446,48 @@ static void ymf278b_A_w(running_machine &machine, YMF278BChip *chip, UINT8 reg, 
 			}
 			ymf278b_irq_check(machine, chip);
 			break;
+
 		default:
 			logerror("YMF278B:  Port A write %02x, %02x\n", reg, data);
+			break;
 	}
 }
 
 static void ymf278b_B_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
-	logerror("YMF278B:  Port B write %02x, %02x\n", reg, data);
+	switch(reg)
+	{
+		// LSI TEST
+		case 0x00:
+		case 0x01:
+			break;
+
+		// expansion register (NEW2/NEW)
+		case 0x05:
+			chip->exp = data;
+			break;
+
+		default:
+			logerror("YMF278B:  Port B write %02x, %02x\n", reg, data);
+			break;
+	}
+}
+
+static TIMER_CALLBACK( ymf278b_timer_ld_clear )
+{
+	YMF278BChip *chip = (YMF278BChip *)ptr;
+	chip->ld = 0;
 }
 
 static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
+	// officially, these registers can't be accessed if NEW2 is 0
+	if (~chip->exp & 2)
+		logerror("YMF278B:  Port C illegal write %02x, %02x\n", reg, data);
+
+	chip->stream->update();
+	chip->pcmregs[reg] = data;
+
 	// Handle slot registers specifically
 	if (reg >= 0x08 && reg <= 0xf7)
 	{
@@ -448,10 +499,19 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 		{
 			case 0:
 			{
+				attotime period;
 				const UINT8 *p;
 
 				slot->wave &= 0x100;
 				slot->wave |= data;
+
+				// load wavetable header
+				// status register LD bit is on for approx 300us
+				chip->ld = 1;
+				period = attotime::from_usec(300);
+				if (chip->clock != YMF278B_STD_CLOCK)
+					period = (period * chip->clock) / YMF278B_STD_CLOCK;
+				chip->timer_ld->adjust(period);
 
 				if(slot->wave < 384 || !chip->wavetblhdr)
 					p = chip->rom + (slot->wave * 12);
@@ -468,6 +528,9 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 						break;
 					case 0x80:
 						slot->bits = 16;
+						break;
+					case 0xc0:
+						// prohibited
 						break;
 				}
 
@@ -569,32 +632,24 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 		// All non-slot registers
 		switch (reg)
 		{
-			case 0x00:  	// TEST
+			// LSI TEST
+			case 0x00:
 			case 0x01:
 				break;
 
 			case 0x02:
 				chip->wavetblhdr = (data>>2)&0x7;
-				chip->memmode = data&1;
-				break;
-
-			case 0x03:
-				chip->memadr &= 0xffff;
-				chip->memadr |= (data<<16);
-				break;
-
-			case 0x04:
-				chip->memadr &= 0xff00ff;
-				chip->memadr |= (data<<8);
+				chip->memmode = data&3;
 				break;
 
 			case 0x05:
-				chip->memadr &= 0xffff00;
-				chip->memadr |= data;
+				// set memory address
+				chip->memadr = (chip->pcmregs[3] & 0x3f) << 16 | chip->pcmregs[4] << 8 | data;
 				break;
 
-			case 0x06:  // memory data (ignored, we don't support RAM)
-			case 0x07:	// unused
+			case 0x06:
+				// memory data (ignored, we don't support RAM)
+				chip->memadr = (chip->memadr + 1) & 0x3fffff;
 				break;
 
 			case 0xf8:
@@ -610,20 +665,17 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 	}
 }
 
-READ8_DEVICE_HANDLER( ymf278b_r )
+static TIMER_CALLBACK( ymf278b_timer_busy_clear )
 {
-	YMF278BChip *chip = get_safe_token(device);
+	YMF278BChip *chip = (YMF278BChip *)ptr;
+	chip->busy = 0;
+}
 
-	switch (offset)
-	{
-		case 0:
-			return chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
-
-		default:
-			logerror("%s: unexpected read at offset %X from ymf278b\n", device->machine().describe_context(), offset);
-			break;
-	}
-	return 0xff;
+static void ymf278b_timer_busy_reset(YMF278BChip *chip, int is_pcm)
+{
+	// status register BUSY bit is on for 56(FM) or 88(PCM) cycles
+	chip->busy = 1;
+	chip->timer_busy->adjust(attotime::from_hz(chip->clock / (is_pcm ? 88 : 56)));
 }
 
 WRITE8_DEVICE_HANDLER( ymf278b_w )
@@ -633,26 +685,32 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 	switch (offset)
 	{
 		case 0:
+			ymf278b_timer_busy_reset(chip, 0);
 			chip->port_A = data;
 			break;
 
 		case 1:
+			ymf278b_timer_busy_reset(chip, 0);
 			ymf278b_A_w(device->machine(), chip, chip->port_A, data);
 			break;
 
 		case 2:
+			ymf278b_timer_busy_reset(chip, 0);
 			chip->port_B = data;
 			break;
 
 		case 3:
+			ymf278b_timer_busy_reset(chip, 0);
 			ymf278b_B_w(chip, chip->port_B, data);
 			break;
 
 		case 4:
+			ymf278b_timer_busy_reset(chip, 1);
 			chip->port_C = data;
 			break;
 
 		case 5:
+			ymf278b_timer_busy_reset(chip, 1);
 			ymf278b_C_w(chip, chip->port_C, data);
 			break;
 
@@ -662,25 +720,80 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 	}
 }
 
+
+READ8_DEVICE_HANDLER( ymf278b_r )
+{
+	YMF278BChip *chip = get_safe_token(device);
+
+	switch (offset)
+	{
+		// status register
+		case 0:
+		{
+			// bits 0 and 1 are only valid if NEW2 is set
+			UINT8 newbits = 0;
+			if (chip->exp & 2)
+				newbits = (chip->ld << 1) | chip->busy;
+
+			return newbits | chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
+		}
+
+		// PCM/mixer
+		case 5:
+			switch (chip->port_C)
+			{
+				// special cases
+				case 2:
+					return (chip->pcmregs[chip->port_C] & 0x1f) | 0x20; // device ID in upper bits
+				case 6:
+					logerror("YMF278B:  Read memory data at %06x\n", chip->memadr); // memory data (ignored, we don't support RAM)
+					chip->memadr = (chip->memadr + 1) & 0x3fffff;
+					break;
+
+				default:
+					return chip->pcmregs[chip->port_C];
+			}
+			break;
+
+		default:
+			logerror("%s: unexpected read at offset %X from ymf278b\n", device->machine().describe_context(), offset);
+			break;
+	}
+	return 0xff;
+}
+
+
 static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_t *, int))
 {
 	chip->rom = *device->region();
+	chip->romsize = device->region()->bytes();
 	chip->irq_callback = cb;
 	chip->timer_a = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_a_tick), chip);
 	chip->timer_b = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_b_tick), chip);
+	chip->timer_busy = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_busy_clear), chip);
+	chip->timer_ld = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_ld_clear), chip);
 	chip->irq_line = CLEAR_LINE;
 	chip->clock = device->clock();
+
+	chip->timer_a->reset();
+	chip->timer_b->reset();
+	chip->timer_busy->reset();
+	chip->timer_ld->reset();
 }
 
 static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 {
 	int i;
 
+	device->save_item(NAME(chip->pcmregs));
 	device->save_item(NAME(chip->lsitest0));
 	device->save_item(NAME(chip->lsitest1));
 	device->save_item(NAME(chip->wavetblhdr));
 	device->save_item(NAME(chip->memmode));
 	device->save_item(NAME(chip->memadr));
+	device->save_item(NAME(chip->busy));
+	device->save_item(NAME(chip->ld));
+	device->save_item(NAME(chip->exp));
 	device->save_item(NAME(chip->fm_l));
 	device->save_item(NAME(chip->fm_r));
 	device->save_item(NAME(chip->pcm_l));
@@ -784,10 +897,10 @@ DEVICE_GET_INFO( ymf278b )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "YMF278B");						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Yamaha FM");					break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Yamaha FM");					break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
