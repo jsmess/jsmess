@@ -138,7 +138,7 @@ public:
 	DECLARE_WRITE8_MEMBER( sol20_fb_w );
 	DECLARE_WRITE8_MEMBER( sol20_fd_w );
 	DECLARE_WRITE8_MEMBER( sol20_fe_w );
-	DECLARE_WRITE8_MEMBER( sol20_kbd_put );
+	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 m_sol20_fa;
 	UINT8 m_sol20_fc;
 	UINT8 m_sol20_fe;
@@ -603,6 +603,7 @@ SCREEN_UPDATE_MEMBER( sol20_state )
 					inv ^= 0xff;
 
 				chr &= 0x7f;
+				gfx = 0;
 
 				if ((ra == 0) || ((s1 & 4) && (chr < 0x20)))
 					gfx = inv;
@@ -657,15 +658,15 @@ static GFXDECODE_START( sol20 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sol20_charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE8_MEMBER( sol20_state::sol20_kbd_put )
+WRITE8_MEMBER( sol20_state::kbd_put )
 {
 	m_sol20_fa &= 0xfe;
 	m_sol20_fc = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( sol20_terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(sol20_state, sol20_kbd_put)
+	DEVCB_DRIVER_MEMBER(sol20_state, kbd_put)
 };
 
 static MACHINE_CONFIG_START( sol20, sol20_state )
@@ -697,7 +698,7 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_CASSETTE_ADD( CASSETTE2_TAG, sol20_cassette_interface )
 	MCFG_AY31015_ADD( "uart", sol20_ay31015_config )
 	MCFG_AY31015_ADD( "uart_s", sol20_ay31015_config )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, sol20_terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -717,4 +718,4 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT   COMPANY     FULLNAME   FLAGS */
-COMP( 1976, sol20,  0,      0,      sol20,   sol20, sol20, "Processor Technology Corporation",  "SOL-20", GAME_NOT_WORKING )
+COMP( 1976, sol20,  0,      0,      sol20,   sol20, sol20, "Processor Technology Corporation",  "SOL-20", 0 )
