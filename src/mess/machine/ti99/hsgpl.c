@@ -646,18 +646,21 @@ static DEVICE_NVRAM( hsgpl )
 		if (filerr != FILERR_NONE)
 		{
 			logerror("hsgpl: Could not restore NVRAM\n");
+			astring_free(hsname);
 			return;
 		}
 
 		if (nvfile.read(card->flashrom, FLROMSIZE) != FLROMSIZE)
 		{
 			logerror("hsgpl: Error loading NVRAM; unexpected EOF\n");
+			astring_free(hsname);
 			return;
 		}
 
 		if (card->flashrom[0] != NVVERSION)
 		{
 			logerror("hsgpl: Wrong NVRAM image version: %d\n", card->flashrom[0]);
+			astring_free(hsname);
 			return;
 		}
 	}
@@ -685,6 +688,7 @@ static DEVICE_NVRAM( hsgpl )
 					logerror("hsgpl: Error while saving contents of NVRAM.\n");
 				}
 			}
+			astring_free(hsname);
 			return;
 		}
 		else
@@ -692,6 +696,7 @@ static DEVICE_NVRAM( hsgpl )
 			logerror("hsgpl: No changes on card, leaving nvram file unchanged.\n");
 		}
 	}
+	astring_free(hsname);
 }
 
 /*

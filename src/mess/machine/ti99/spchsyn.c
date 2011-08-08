@@ -208,8 +208,7 @@ static DEVICE_RESET( ti99_speech )
 			return;
 		}
 
-		astring *region = new astring();
-		astring_assemble_3(region, device->tag(), ":", speech_region);
+		astring *region = astring_assemble_3(astring_alloc(), device->tag(), ":", speech_region);
 
 		adapter->speechrom_data = device->machine().region(astring_c(region))->base();
 		adapter->speechROMlen = device->machine().region(astring_c(region))->bytes();
@@ -226,6 +225,8 @@ static DEVICE_RESET( ti99_speech )
 			adapter->select_mask = 0x1ffc01;
 			adapter->select_value = 0x179000;
 		}
+		
+		astring_free(region);
 	}
 }
 
