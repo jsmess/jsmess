@@ -4,7 +4,6 @@
 
 *******************************************************************************/
 
-#include "emu.h"
 #include "includes/sorcerer.h"
 
 #if SORCERER_USING_RS232
@@ -411,11 +410,35 @@ MACHINE_START( sorcerer )
 	state->m_serial_timer = machine.scheduler().timer_alloc(FUNC(sorcerer_serial_tc));
 #endif
 
-#if SORCERER_USING_DISKS
-	UINT16 endmem = 0xbbff;
-#else
 	UINT16 endmem = 0xbfff;
+
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	/* configure RAM */
+	switch (ram_get_size(state->m_ram))
+	{
+	case 8*1024:
+		space->unmap_readwrite(0x2000, endmem);
+		break;
+
+	case 16*1024:
+		space->unmap_readwrite(0x4000, endmem);
+		break;
+
+	case 32*1024:
+		space->unmap_readwrite(0x8000, endmem);
+		break;
+	}
+}
+
+MACHINE_START( sorcererd )
+{
+	sorcerer_state *state = machine.driver_data<sorcerer_state>();
+	state->m_cassette_timer = machine.scheduler().timer_alloc(FUNC(sorcerer_cassette_tc));
+#if SORCERER_USING_RS232
+	state->m_serial_timer = machine.scheduler().timer_alloc(FUNC(sorcerer_serial_tc));
 #endif
+
+	UINT16 endmem = 0xbbff;
 
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	/* configure RAM */

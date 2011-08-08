@@ -963,6 +963,7 @@ $(MESSOBJ)/exeltel.a:			\
 $(MESSOBJ)/exidy.a:				\
 	$(MESS_MACHINE)/sorcerer.o	\
 	$(MESS_DRIVERS)/sorcerer.o	\
+	$(MESS_MACHINE)/micropolis.o	\
 
 $(MESSOBJ)/fairch.a:			\
 	$(MESS_VIDEO)/channelf.o	\
