@@ -1025,6 +1025,7 @@ $(MESSOBJ)/homebrew.a:			\
 	$(MESS_DRIVERS)/pimps.o		\
 	$(MESS_DRIVERS)/sbc6510.o	\
 	$(MESS_DRIVERS)/z80dev.o	\
+	$(MESS_DRIVERS)/uzebox.o	\
 
 $(MESSOBJ)/homelab.a:			\
 	$(MESS_DRIVERS)/homelab.o	\
