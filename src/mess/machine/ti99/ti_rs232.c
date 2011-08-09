@@ -1069,9 +1069,9 @@ static DEVICE_START( ti_rs232 )
 	ti_rs232_state *card = get_safe_token(device);
 	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
 
-	astring *region = new astring();
-	astring_assemble_3(region, device->tag(), ":", ser_region);
-	card->rom = device->machine().region(astring_c(region))->base();
+	astring region;
+	astring_assemble_3(&region, device->tag(), ":", ser_region);
+	card->rom = device->machine().region(astring_c(&region))->base();
 	card->lines.inta.resolve(topeb->inta, *device);
 	// READY and INTB are not used
 	card->uart[0] = device->subdevice("tms9902_0");

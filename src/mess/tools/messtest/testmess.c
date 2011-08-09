@@ -381,7 +381,7 @@ static messtest_result_t run_test(int flags, messtest_results *results)
 	messtest_result_t rc;
 	clock_t begin_time;
 	double real_run_time;
-	astring *fullpath = NULL;
+	astring fullpath;
 	const char *device_opt;
 	const char *fake_argv[2];
 	core_options *opts;
@@ -431,17 +431,13 @@ static messtest_result_t run_test(int flags, messtest_results *results)
 	while(current_command->command_type == MESSTEST_COMMAND_IMAGE_PRELOAD)
 	{
 		/* get the path */
-		fullpath = assemble_software_path(astring_alloc(), driver, current_command->u.image_args.filename);
+		assemble_software_path(&fullpath, driver, current_command->u.image_args.filename);
 
 		/* get the option name */
 		device_opt = device_config_image_interface::device_typename(current_command->u.image_args.device_ident.type);
 
 		/* set the option */
-		options_set_string(opts, device_opt, astring_c(fullpath), OPTION_PRIORITY_CMDLINE);
-
-		/* cleanup */
-		astring_free(fullpath);
-		fullpath = NULL;
+		options_set_string(opts, device_opt, astring_c(&fullpath), OPTION_PRIORITY_CMDLINE);
 
 		/* next command */
 		current_command++;
@@ -810,7 +806,7 @@ static void command_image_loadcreate(running_machine &machine)
 	const char *format_name;
 	char buf[128];
 	const char *file_extensions;
-	astring *filepath;
+	astring filepath;
 	int success;
 	const game_driver *gamedrv;
 	const image_device_format *format = NULL;
@@ -857,24 +853,23 @@ static void command_image_loadcreate(running_machine &machine)
 	for (gamedrv = machine.system(); !success && gamedrv; gamedrv = driver_get_compatible(gamedrv))
 	{
 		/* assemble the full path */
-		filepath = assemble_software_path(astring_alloc(), gamedrv, filename);
+		assemble_software_path(&filepath, gamedrv, filename);
 
 		/* actually create or load the image */
 		switch(current_command->command_type)
 		{
 			case MESSTEST_COMMAND_IMAGE_CREATE:
-				success = (image->create(astring_c(filepath), format, NULL) == IMAGE_INIT_PASS);
+				success = (image->create(astring_c(&filepath), format, NULL) == IMAGE_INIT_PASS);
 				break;
 
 			case MESSTEST_COMMAND_IMAGE_LOAD:
-				success = (image->load(astring_c(filepath)) == IMAGE_INIT_PASS);
+				success = (image->load(astring_c(&filepath)) == IMAGE_INIT_PASS);
 				break;
 
 			default:
 				fatalerror("Unexpected error");
 				break;
 		}
-		astring_free(filepath);
 	}
 	if (!success)
 	{
