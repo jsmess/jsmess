@@ -416,6 +416,6 @@ ROM_START(tecjmon)
 	ROM_LOAD("util.rom",    0x3800, 0x0800, CRC(7c19700d) SHA1(dc5b3ade66bb11c54430056966ed99cdd299d82b) )
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT       COMPANY  FULLNAME */
-COMP( 1984, tec1,     0,      0,      tec1,       tec1,    0,		"Talking Electronics magazine",  "TEC-1" , 0 )
-COMP( 1984, tecjmon,  tec1,   0,      tecjmon,    tec1,    0,		"Talking Electronics magazine",  "TEC-1A with JMON" , 0 )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT       COMPANY                     FULLNAME */
+COMP( 1984, tec1,     0,      0,      tec1,       tec1,    0,    "Talking Electronics magazine",  "TEC-1" , 0 )
+COMP( 1984, tecjmon,  tec1,   0,      tecjmon,    tec1,    0,    "Talking Electronics magazine",  "TEC-1A with JMON" , 0 )
