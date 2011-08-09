@@ -689,7 +689,7 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	UINT32 tmp_src,tmp_dst,tmp_size;
 	UINT8 cd_transfer_flag;
 
-	if(state->m_scu.src_add[dma_ch] == 0 || state->m_scu.dst_add[dma_ch] != 2)
+	if(state->m_scu.src_add[dma_ch] == 0 || (state->m_scu.dst_add[dma_ch] != 2 && state->m_scu.dst_add[dma_ch] != 4))
 	{
 	if(LOG_SCU) printf("DMA lv %d transfer START\n"
 			             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu.src[dma_ch],state->m_scu.dst[dma_ch],state->m_scu.size[dma_ch]);
