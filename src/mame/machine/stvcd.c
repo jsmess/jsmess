@@ -392,7 +392,6 @@ static void cd_exec_command(running_machine &machine)
 			if (!(cr3 & 0x8000))	// preserve current position if bit 7 set
 			{
 				start_pos = ((cr1&0xff)<<16) | cr2;
-				//fadstoplay = ((cr3&0xff)<<16) | cr4;
 				end_pos = ((cr3&0xff)<<16) | cr4;
 
 				if (start_pos & 0x800000)
@@ -551,12 +550,6 @@ static void cd_exec_command(running_machine &machine)
 					break;
 			}
 			hirqreg |= CMOK|DRDY;
-			break;
-
-		case 0x2100:
-		case 0x2300:
-			popmessage("%08x %08x",cd_curfad,fadstoplay);
-			hirqreg |= (CMOK);
 			break;
 
 		case 0x3000:	// Set CD Device connection
@@ -1225,8 +1218,7 @@ TIMER_DEVICE_CALLBACK( stv_sector_cb )
 
 	//popmessage("%08x %08x %d %d",cd_curfad,fadstoplay,cmd_pending,cd_speed);
 
-	if (fadstoplay)
-		cd_playdata();
+	cd_playdata();
 
 	if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) == CD_TRACK_AUDIO)
 		sector_timer->adjust(attotime::from_hz(75));	// 75 sectors / second = 150kBytes/second (cdda track ignores cd_speed setting)
