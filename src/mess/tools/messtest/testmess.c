@@ -437,7 +437,7 @@ static messtest_result_t run_test(int flags, messtest_results *results)
 		device_opt = device_config_image_interface::device_typename(current_command->u.image_args.device_ident.type);
 
 		/* set the option */
-		options_set_string(opts, device_opt, astring_c(&fullpath), OPTION_PRIORITY_CMDLINE);
+		options_set_string(opts, device_opt, fullpath.cstr(), OPTION_PRIORITY_CMDLINE);
 
 		/* next command */
 		current_command++;
@@ -859,11 +859,11 @@ static void command_image_loadcreate(running_machine &machine)
 		switch(current_command->command_type)
 		{
 			case MESSTEST_COMMAND_IMAGE_CREATE:
-				success = (image->create(astring_c(&filepath), format, NULL) == IMAGE_INIT_PASS);
+				success = (image->create(filepath.cstr(), format, NULL) == IMAGE_INIT_PASS);
 				break;
 
 			case MESSTEST_COMMAND_IMAGE_LOAD:
-				success = (image->load(astring_c(&filepath)) == IMAGE_INIT_PASS);
+				success = (image->load(filepath.cstr()) == IMAGE_INIT_PASS);
 				break;
 
 			default:

@@ -366,7 +366,7 @@ static DEVICE_RESET( ti99_evpc )
 	astring region;
 	astring_assemble_3(&region, device->tag(), ":", evpc_region);
 
-	card->dsrrom = device->machine().region(astring_c(&region))->base();
+	card->dsrrom = device->machine().region(region.cstr())->base();
 }
 
 static DEVICE_NVRAM( ti99_evpc )
@@ -379,10 +379,10 @@ static DEVICE_NVRAM( ti99_evpc )
 
 	if (read_or_write==0)
 	{
-		logerror("evpc: device nvram load %s\n", astring_c(&hsname));
+		logerror("evpc: device nvram load %s\n", hsname.cstr());
 
 		emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_READ);
-		filerr = nvfile.open(astring_c(&hsname));
+		filerr = nvfile.open(hsname.cstr());
 		if (filerr == FILERR_NONE)
 		{
 			if (nvfile.read(card->novram, 256) != 256)
@@ -391,9 +391,9 @@ static DEVICE_NVRAM( ti99_evpc )
 	}
 	else
 	{
-		logerror("evpc: device nvram save %s\n", astring_c(&hsname));
+		logerror("evpc: device nvram save %s\n", hsname.cstr());
 		emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		filerr = nvfile.open(astring_c(&hsname));
+		filerr = nvfile.open(hsname.cstr());
 
 		if (filerr == FILERR_NONE)
 		{

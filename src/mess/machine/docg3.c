@@ -819,7 +819,7 @@ static emu_file *nvram_system_fopen( running_machine &machine, UINT32 openflags,
 	file_error filerr;
 	emu_file *file;
 	astring_assemble_4(&fname, machine.system().name, PATH_SEPARATOR, name, ".nv");
-	filerr = mame_fopen( SEARCHPATH_NVRAM, astring_c(&fname), openflags, &file);
+	filerr = mame_fopen( SEARCHPATH_NVRAM, fname.cstr(), openflags, &file);
 	return (filerr == FILERR_NONE) ? file : NULL;
 }
 
