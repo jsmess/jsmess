@@ -32,6 +32,7 @@
     facility.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -46,7 +47,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START(sys2900_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(sys2900_mem, AS_PROGRAM, 8, sys2900_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("boot")
 	AM_RANGE( 0x0800, 0xefff ) AM_RAM
@@ -54,7 +55,7 @@ static ADDRESS_MAP_START(sys2900_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0xf800, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sys2900_io , AS_IO, 8)
+static ADDRESS_MAP_START(sys2900_io, AS_IO, 8, sys2900_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
@@ -122,6 +123,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1981, sys2900,  0,       0,    sys2900, sys2900, sys2900,  "Systems Group",   "System 2900", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT        COMPANY          FULLNAME       FLAGS */
+COMP( 1981, sys2900, 0,      0,       sys2900,   sys2900, sys2900, "Systems Group", "System 2900", GAME_NOT_WORKING | GAME_NO_SOUND)
 

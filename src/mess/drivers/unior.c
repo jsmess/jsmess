@@ -5,6 +5,7 @@
         12/05/2009 Skeleton driver.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -19,14 +20,15 @@ public:
 };
 
 
-static ADDRESS_MAP_START(unior_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(unior_mem, AS_PROGRAM, 8, unior_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0xf7ff) AM_RAM
 	AM_RANGE(0xf800,0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( unior_io , AS_IO, 8)
+static ADDRESS_MAP_START(unior_io, AS_IO, 8, unior_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -80,12 +82,11 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_VIDEO_START(unior)
 	MCFG_SCREEN_UPDATE(unior)
 	MCFG_GFXDECODE(unior)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(unior)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -99,5 +100,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 19??, unior,  radio86,       0,	unior,	unior,	 0, 	 "<unknown>",   "Unior",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT    COMPAT   MACHINE    INPUT    INIT    COMPANY      FULLNAME       FLAGS */
+COMP( 19??, unior,  radio86,  0,       unior,     unior,   0,    "<unknown>",   "Unior", GAME_NOT_WORKING | GAME_NO_SOUND)

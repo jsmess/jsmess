@@ -1,3 +1,5 @@
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
 #include "machine/avr8.h"
@@ -20,13 +22,13 @@ public:
 * Address maps                                       *
 \****************************************************/
 
-static ADDRESS_MAP_START( uzebox_prg_map, AS_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0xffff) AM_ROM // 64 KB internal eprom  ATmega644
+static ADDRESS_MAP_START( uzebox_prg_map, AS_PROGRAM, 8, uzebox_state )
+	AM_RANGE(0x0000, 0xffff) AM_ROM // 64 KB internal eprom  ATmega644
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( uzebox_io_map, AS_IO, 8 )
-    AM_RANGE(0x0000, 0x00ff) AM_RAM
-    AM_RANGE(0x0100, 0x0fff) AM_RAM //  4KB RAM
+static ADDRESS_MAP_START( uzebox_io_map, AS_IO, 8, uzebox_state )
+	AM_RANGE(0x0000, 0x00ff) AM_RAM
+	AM_RANGE(0x0100, 0x0fff) AM_RAM //  4KB RAM
 ADDRESS_MAP_END
 
 /****************************************************\
@@ -42,7 +44,7 @@ INPUT_PORTS_END
 
 static SCREEN_UPDATE( uzebox )
 {
-    return 0;
+	return 0;
 }
 
 /****************************************************\
@@ -59,30 +61,30 @@ static MACHINE_RESET( uzebox )
 
 static MACHINE_CONFIG_START( uzebox, uzebox_state )
 
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", ATMEGA644, MASTER_CLOCK)
-    MCFG_CPU_PROGRAM_MAP(uzebox_prg_map)
-    MCFG_CPU_IO_MAP(uzebox_io_map)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", ATMEGA644, MASTER_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(uzebox_prg_map)
+	MCFG_CPU_IO_MAP(uzebox_io_map)
 
-    MCFG_MACHINE_RESET(uzebox)
+	MCFG_MACHINE_RESET(uzebox)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(60.08)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1395))
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-    MCFG_SCREEN_SIZE(634, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 633, 0, 479)
-    MCFG_SCREEN_UPDATE(uzebox)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60.08)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1395))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(634, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 633, 0, 479)
+	MCFG_SCREEN_UPDATE(uzebox)
 
-    MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-    MCFG_VIDEO_START(generic_bitmapped)
+	MCFG_VIDEO_START(generic_bitmapped)
 
-    /* sound hardware */
-    MCFG_SPEAKER_STANDARD_MONO("avr8")
-    MCFG_SOUND_ADD("dac", DAC, 0)
-    MCFG_SOUND_ROUTE(0, "avr8", 1.00)
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("avr8")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(0, "avr8", 1.00)
 	
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_MANDATORY	
@@ -95,5 +97,5 @@ ROM_START( uzebox )
 	ROM_CART_LOAD("cart1", 0x0000, 0x10000, ROM_OPTIONAL)
 ROM_END
 
-/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY          FULLNAME */
-CONS(2010, uzebox,    0,        0,        uzebox,    uzebox,    uzebox,    "Belogic", "uzebox", GAME_NO_SOUND | GAME_NOT_WORKING)
+/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY   FULLNAME */
+CONS(2010, uzebox,   0,        0,        uzebox,   uzebox,   uzebox,  "Belogic", "Uzebox", GAME_NO_SOUND | GAME_NOT_WORKING)
