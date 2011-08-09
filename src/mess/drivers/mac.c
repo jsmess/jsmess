@@ -56,6 +56,7 @@
 #include "video/nubus_48gc.h"
 #include "video/nubus_cb264.h"
 #include "video/nubus_vikbw.h"
+#include "video/nubus_specpdq.h"
 #include "includes/mac.h"
 
 #define C7M	(7833600)
@@ -804,6 +805,7 @@ static SLOT_INTERFACE_START(mac_nubus_cards)
 	SLOT_INTERFACE("824gc", NUBUS_824GC)	/* Apple 8*24 Graphics Card */
 	SLOT_INTERFACE("cb264", NUBUS_CB264)	/* RasterOps ColorBoard 264 */
 	SLOT_INTERFACE("vikbw", NUBUS_VIKBW)	/* Moniterm Viking board */
+	SLOT_INTERFACE("specpdq", NUBUS_SPECPDQ)	/* SuperMac Spectrum 24 PDQ */
 SLOT_INTERFACE_END
 
 /***************************************************************************
@@ -969,6 +971,8 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020PMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
+
+	MCFG_PALETTE_LENGTH(256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
