@@ -93,7 +93,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	int size;
 	int size_aligned;
 	UINT8 *mem;
-	int type;
+	int type = -1;
 	const char *extra = NULL;
 	char *sramfile;
 	slot_state *st;
@@ -117,22 +117,31 @@ DEVICE_IMAGE_LOAD (msx_cart)
 		/* TODO: Add proper SRAM (size) handling */
 
 		const char *mapper = software_part_get_feature( (software_part*)image.part_entry(), "mapper" );
+		const char *sram = software_part_get_feature( (software_part*)image.part_entry(), "sram" );
 
 		if ( mapper != NULL )
 		{
-			static const struct { const char *mapper_name; int mapper_type; } mapper_types[] =
+			static const struct { const char *mapper_name; const char *sram_name; int mapper_type; } mapper_types[] =
 			{
-				{ "M60002-0125SP", SLOT_ASCII8 },
-				{ "LZ93A13", SLOT_ASCII8 },
-				{ "IREM TAM-S1", SLOT_RTYPE }
+				{ "M60002-0125SP",	NULL,				SLOT_ASCII8 },
+				{ "LZ93A13",		NULL,				SLOT_ASCII8 },
+				{ "LZ93A13",		"CXK5864BSP-10L",	SLOT_ASCII8_SRAM },
+				{ "LZ93A13",		"CXK5864PN-12L",	SLOT_ASCII8_SRAM },
+				{ "LZ93A13-16",		NULL,				SLOT_ASCII16 },
+				{ "IREM TAM-S1",	NULL,				SLOT_RTYPE },
+				{ "MR6401",			NULL,				SLOT_ASCII16 },
+				{ "NEOS MR6401",	NULL,				SLOT_ASCII8 },
 			};
 
-			type = -1;
 			for ( int i = 0; i < ARRAY_LENGTH(mapper_types) && type < 0; i++ )
 			{
 				if ( !mame_stricmp( mapper, mapper_types[i].mapper_name ) )
 				{
-					type = mapper_types[i].mapper_type;
+					if ( sram == NULL && mapper_types[i].sram_name == NULL )
+						type = mapper_types[i].mapper_type;
+
+					if ( sram != NULL && mapper_types[i].sram_name != NULL && !mame_stricmp( sram, mapper_types[i].sram_name ) )
+						type = mapper_types[i].mapper_type;
 				}
 			}
 
