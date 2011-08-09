@@ -1071,7 +1071,7 @@ static DEVICE_START( ti_rs232 )
 
 	astring region;
 	astring_assemble_3(&region, device->tag(), ":", ser_region);
-	card->rom = device->machine().region(astring_c(&region))->base();
+	card->rom = device->machine().region(region.cstr())->base();
 	card->lines.inta.resolve(topeb->inta, *device);
 	// READY and INTB are not used
 	card->uart[0] = device->subdevice("tms9902_0");

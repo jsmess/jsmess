@@ -660,7 +660,7 @@ static DEVICE_START( ti99_hfdc )
 	card->clock = device->subdevice("mm58274c");
 	astring region;
 	astring_assemble_3(&region, device->tag(), ":", hfdc_region);
-	card->rom = device->machine().region(astring_c(&region))->base();
+	card->rom = device->machine().region(region.cstr())->base();
 }
 
 static DEVICE_STOP( ti99_hfdc )

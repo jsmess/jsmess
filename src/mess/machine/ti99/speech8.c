@@ -179,8 +179,8 @@ static DEVICE_RESET( ti99_speech8 )
 	astring region;
 	astring_assemble_3(&region, device->tag(), ":", speech8_region);
 
-	spsys->speechrom_data = device->machine().region(astring_c(&region))->base();
-	spsys->speechROMlen = device->machine().region(astring_c(&region))->bytes();
+	spsys->speechrom_data = device->machine().region(region.cstr())->base();
+	spsys->speechROMlen = device->machine().region(region.cstr())->bytes();
 	spsys->speechROMaddr = 0;
 	spsys->load_pointer = 0;
 	spsys->ROM_bits_count = 0;

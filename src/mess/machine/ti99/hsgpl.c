@@ -640,10 +640,10 @@ static DEVICE_NVRAM( hsgpl )
 
 	if (read_or_write==0)
 	{
-		logerror("hsgpl: device nvram load %s\n", astring_c(&hsname));
+		logerror("hsgpl: device nvram load %s\n", hsname.cstr());
 
 		emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_READ);
-		filerr = nvfile.open(astring_c(&hsname));
+		filerr = nvfile.open(hsname.cstr());
 		if (filerr != FILERR_NONE)
 		{
 			logerror("hsgpl: Could not restore NVRAM\n");
@@ -664,7 +664,7 @@ static DEVICE_NVRAM( hsgpl )
 	}
 	else
 	{
-		logerror("hsgpl: device nvram save %s\n", astring_c(&hsname));
+		logerror("hsgpl: device nvram save %s\n", hsname.cstr());
 		// Check dirty flags
 		if (at29c040a_is_dirty(card->dsr) ||
 			at29c040a_is_dirty(card->rom6) ||
@@ -674,7 +674,7 @@ static DEVICE_NVRAM( hsgpl )
 			card->flashrom[0] = NVVERSION;
 
 			emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			filerr = nvfile.open(astring_c(&hsname));
+			filerr = nvfile.open(hsname.cstr());
 			if (filerr != FILERR_NONE)
 			{
 				logerror("hsgpl: Could not save NVRAM\n");

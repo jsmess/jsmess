@@ -492,7 +492,7 @@ static DEVICE_START( ti99_bwg )
 	card->clock = device->subdevice("mm58274c");
 	astring region;
 	astring_assemble_3(&region, device->tag(), ":", bwg_region);
-	card->rom = device->machine().region(astring_c(&region))->base();
+	card->rom = device->machine().region(region.cstr())->base();
 	card->ram = NULL;
 }
 

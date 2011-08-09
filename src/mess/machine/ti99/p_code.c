@@ -227,7 +227,7 @@ static DEVICE_RESET( ti99_pcoden )
 		astring region;
 		astring_assemble_3(&region, device->tag(), ":", pcode_region);
 
-		pcode->rom0 = device->machine().region(astring_c(&region))->base();
+		pcode->rom0 = device->machine().region(region.cstr())->base();
 		pcode->rom1 = pcode->rom0 + 0x1000;
 		pcode->rom2 = pcode->rom0 + 0x2000;
 		pcode->grom = pcode->rom0 + 0x3000;
@@ -238,7 +238,7 @@ static DEVICE_RESET( ti99_pcoden )
 		for (int i=0; i < 8; i++)
 		{
 			astring_printf(&gromname, "grom_%d", i);
-			pcode->gromdev[i] = device->subdevice(astring_c(&gromname));
+			pcode->gromdev[i] = device->subdevice(gromname.cstr());
 		}
 	}
 }

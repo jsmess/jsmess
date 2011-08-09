@@ -353,7 +353,7 @@ static DEVICE_START( ti99_fdc )
 
 	astring region;
 	astring_assemble_3(&region, device->tag(), ":", fdc_region);
-	card->rom = device->machine().region(astring_c(&region))->base();
+	card->rom = device->machine().region(region.cstr())->base();
 	card->controller = device->subdevice("fd1771");
 }
 
