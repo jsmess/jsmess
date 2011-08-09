@@ -176,15 +176,14 @@ static DEVICE_RESET( ti99_speech8 )
 {
 	ti99_speech8_state *spsys = get_safe_token(device);
 
-	astring *region = astring_assemble_3(astring_alloc(), device->tag(), ":", speech8_region);
+	astring region;
+	astring_assemble_3(&region, device->tag(), ":", speech8_region);
 
-	spsys->speechrom_data = device->machine().region(astring_c(region))->base();
-	spsys->speechROMlen = device->machine().region(astring_c(region))->bytes();
+	spsys->speechrom_data = device->machine().region(astring_c(&region))->base();
+	spsys->speechROMlen = device->machine().region(astring_c(&region))->bytes();
 	spsys->speechROMaddr = 0;
 	spsys->load_pointer = 0;
 	spsys->ROM_bits_count = 0;
-	
-	astring_free(region);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( speech8_ready )

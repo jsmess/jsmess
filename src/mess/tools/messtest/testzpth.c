@@ -52,7 +52,7 @@ void node_testzippath(xml_data_node *node)
 	xml_data_node *child_node;
 	const char *path;
 	const char *plus;
-	astring *apath = NULL;
+	astring apath;
 	zippath_directory *directory = NULL;
 	const osd_directory_entry *dirent;
 	const char *type_string;
@@ -75,20 +75,20 @@ void node_testzippath(xml_data_node *node)
 	if (attr_node != NULL)
 	{
 		plus = attr_node->value;
-		apath = zippath_combine(astring_alloc(), path, plus);
-		report_message(MSG_INFO, "Testing ZIP Path '%s' + '%s' ==> '%s'", path, plus, astring_c(apath));
+		zippath_combine(&apath, path, plus);
+		report_message(MSG_INFO, "Testing ZIP Path '%s' + '%s' ==> '%s'", path, plus, astring_c(&apath));
 	}
 	else
 	{
-		apath = astring_cpyc(astring_alloc(), path);
-		report_message(MSG_INFO, "Testing ZIP Path '%s'", astring_c(apath));
+		astring_cpyc(&apath, path);
+		report_message(MSG_INFO, "Testing ZIP Path '%s'", astring_c(&apath));
 	}
 
 	/* try doing a file compare */
 	messtest_get_data(node, &pile);
 	if (pile_size(&pile) > 0)
 	{
-		err = zippath_fopen(astring_c(apath), OPEN_FLAG_READ, &file, NULL);
+		err = zippath_fopen(astring_c(&apath), OPEN_FLAG_READ, &file, NULL);
 		if (err != FILERR_NONE)
 		{
 			report_message(MSG_FAILURE, "Error %d opening file", (int) err);
@@ -112,7 +112,7 @@ void node_testzippath(xml_data_node *node)
 	first_child_node = xml_get_sibling(node->child, "entry");
 	if (first_child_node != NULL)
 	{
-		err = zippath_opendir(astring_c(apath), &directory);
+		err = zippath_opendir(astring_c(&apath), &directory);
 		if (err != FILERR_NONE)
 		{
 			report_message(MSG_FAILURE, "Error %d opening directory", (int) err);
@@ -160,8 +160,6 @@ void node_testzippath(xml_data_node *node)
 
 done:
 	pile_delete(&pile);
-	if (apath != NULL)
-		astring_free(apath);
 	if (file != NULL)
 		core_fclose(file);
 	if (directory != NULL)

@@ -224,23 +224,22 @@ static DEVICE_RESET( ti99_pcoden )
 		int success = mount_card(peb, device, &pcode_ncard, get_pebcard_config(device)->slot);
 		if (!success) return;
 
-		astring *region = astring_assemble_3(astring_alloc(), device->tag(), ":", pcode_region);
+		astring region;
+		astring_assemble_3(&region, device->tag(), ":", pcode_region);
 
-		pcode->rom0 = device->machine().region(astring_c(region))->base();
+		pcode->rom0 = device->machine().region(astring_c(&region))->base();
 		pcode->rom1 = pcode->rom0 + 0x1000;
 		pcode->rom2 = pcode->rom0 + 0x2000;
 		pcode->grom = pcode->rom0 + 0x3000;
 		pcode->bank_select = 0;
 		pcode->selected = 0;
 
-		astring *gromname = new astring();
+		astring gromname;
 		for (int i=0; i < 8; i++)
 		{
-			astring_printf(gromname, "grom_%d", i);
-			pcode->gromdev[i] = device->subdevice(astring_c(gromname));
+			astring_printf(&gromname, "grom_%d", i);
+			pcode->gromdev[i] = device->subdevice(astring_c(&gromname));
 		}
-		
-		astring_free(region);
 	}
 }
 
