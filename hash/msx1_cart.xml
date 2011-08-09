@@ -51,6 +51,19 @@ Most of the information in this list was taken from http://gigamix.jp/rom/rom.ph
 		</part>
 	</software>
 
+	<software name="1942">
+		<description>1942</description>
+		<year>1986</year>
+		<publisher>Ascii</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="nc81820-g30" size="131072" crc="a27787af" sha1="0733cd627467a866846e15caf1770a5594eaf4cc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>
