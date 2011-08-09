@@ -877,47 +877,53 @@ static WRITE32_HANDLER( sinit_w )
 	sh2_set_frt_input(state->m_maincpu, PULSE_LINE);
 }
 
-static READ32_HANDLER(saturn_backupram_r)
+static READ8_HANDLER(saturn_backupram_r)
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
-	return state->m_backupram[offset] & 0x00ff00ff;	// yes, it makes sure the "holes" are there.
+	if(!(offset & 1))
+		return 0; // yes, it makes sure the "holes" are there.
+
+	return state->m_backupram[offset] & 0xff;
 }
 
-static WRITE32_HANDLER(saturn_backupram_w)
+static WRITE8_HANDLER(saturn_backupram_w)
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
-	COMBINE_DATA(&state->m_backupram[offset]);
+	state->m_backupram[offset] = data;
 }
 
 static NVRAM_HANDLER(saturn)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	static const UINT32 init[8] =
+	static const UINT32 init[32] =
 	{
-		0x420061, 0x63006b, 0x550070, 0x520061, 0x6d0020, 0x46006f, 0x72006d, 0x610074,
+		0x00, 0x42, 0x00, 0x61, 0x00, 0x63, 0x00, 0x6b, 0x00, 0x55, 0x00, 0x70,
+		0x00, 0x52, 0x00, 0x61, 0x00, 0x6d, 0x00, 0x20, 0x00, 0x46, 0x00, 0x6f,
+		0x00, 0x72, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x74
 	};
 	int i;
 
 	if (read_or_write)
-		file->write(state->m_backupram, 64*1024/4);
+		file->write(state->m_backupram, 64*1024);
 	else
 	{
 		if (file)
 		{
-			file->read(state->m_backupram, 64*1024/4);
+			printf("READ\n");
+			file->read(state->m_backupram, 64*1024);
 		}
 		else
 		{
-			memset(state->m_backupram, 0, 64*1024/4);
-			for (i = 0; i < 8; i++)
+			memset(state->m_backupram, 0, 64*1024);
+			for (i = 0; i < 32; i++)
 			{
-				state->m_backupram[i] = init[i];
-				state->m_backupram[i+8] = init[i];
-				state->m_backupram[i+16] = init[i];
-				state->m_backupram[i+24] = init[i];
+				state->m_backupram[i] =   init[i];
+				state->m_backupram[i+32] = init[i];
+				state->m_backupram[i+64] = init[i];
+				state->m_backupram[i+96] = init[i];
 			}
 		}
 	}
@@ -934,7 +940,7 @@ static READ8_HANDLER( saturn_cart_type_r )
 static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(saturn_SMPC_r, saturn_SMPC_w,0xffffffff)
-	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(saturn_backupram_r, saturn_backupram_w) AM_SHARE("share1") AM_BASE_MEMBER(saturn_state,m_backupram)
+	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r, saturn_backupram_w,0xffffffff) AM_SHARE("share1")
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("share2") AM_BASE_MEMBER(saturn_state,m_workram_l)
 	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(minit_w)
 	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
@@ -963,7 +969,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(stv_SMPC_r, stv_SMPC_w,0xffffffff)
-	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(saturn_backupram_r,saturn_backupram_w) AM_SHARE("share1") AM_BASE_MEMBER(saturn_state,m_backupram)
+	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r,saturn_backupram_w,0xffffffff) AM_SHARE("share1")
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("share2") AM_BASE_MEMBER(saturn_state,m_workram_l)
 	AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_io_r32, stv_io_w32) AM_BASE_MEMBER(saturn_state,m_ioga) AM_SHARE("share4") AM_MIRROR(0x20)
 //  AM_RANGE(0x01000000, 0x01000003) AM_MIRROR(0x7ffffc) AM_WRITE(minit_w)
@@ -1389,6 +1395,7 @@ DRIVER_INIT ( stv )
 	state->m_smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
 	state->m_scu_regs = auto_alloc_array(machine, UINT32, 0x100/4);
 	state->m_scsp_regs  = auto_alloc_array(machine, UINT16, 0x1000/2);
+	state->m_backupram = auto_alloc_array(machine, UINT8, 0x10000);
 
 	install_stvbios_speedups(machine);
 
@@ -1409,51 +1416,7 @@ DRIVER_INIT ( stv )
 	state->m_smpc_ram[0x5f] = 0x10;
 
 	state->m_vdp2.pal = 0;
-
-	#ifdef MAME_DEBUG
-	/*Uncomment this to enable header info*/
-	//print_game_info();
-	#endif
 }
-
-#define DATA_TRANSFER(_max_) \
-	for(dst_i=0;dst_i<_max_;dst_i++,src_i++)	\
-		STR[(dst_i & 0xfc) | (~dst_i & 3)] = ROM[src_i];
-
-#define DATA_DELETE \
-	for(dst_i=0;dst_i<0x100;dst_i++) \
-		STR[dst_i] = 0x00;
-
-#ifdef UNUSED_FUNCTION
-static void print_game_info(void)
-{
-	UINT8 *ROM = machine.region("game0")->base();
-	static FILE *print_file = NULL;
-	UINT8 STR[0x100];
-	UINT32 src_i,dst_i;
-
-	if(print_file == NULL)
-		print_file = fopen( "stvinfo.txt", "a" );
-
-	src_i = 0;
-
-	/*IC13?*/
-	if(ROM[src_i] == 0x00)
-		src_i+=0x200000;
-
-	DATA_TRANSFER(0x100);
-	for(src_i=0;src_i<0x100;src_i++)
-	{
-		if((src_i % 0x10) == 0) fprintf( print_file, "\n");
-		if(src_i < 0xc0)		fprintf( print_file, "%c",STR[src_i] );
-		else                    fprintf( print_file, "%02x",STR[src_i] );
-	}
-	DATA_DELETE;
-
-	fclose(print_file);
-	print_file = NULL;
-}
-#endif
 
 static const gfx_layout tiles8x8x4_layout =
 {
@@ -2205,6 +2168,9 @@ static void saturn_init_driver(running_machine &machine, int rgn)
 	state->m_smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
 //  state->m_smpc_ram[0x33] = input_port_read(machine, "???");
 	state->m_smpc_ram[0x5f] = 0x10;
+
+	state->m_backupram = auto_alloc_array(machine, UINT8, 0x10000);
+
 }
 
 static DRIVER_INIT( saturnus )
