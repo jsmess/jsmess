@@ -887,11 +887,12 @@ static WRITE8_HANDLER(saturn_backupram_w)
 	state->m_backupram[offset >> 1] = data;
 }
 
+/* TODO: if you change the driver configuration then NVRAM contents gets screwed, needs mods in MAME framework */
 static NVRAM_HANDLER(saturn)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	static const UINT32 BUP_SIZE = 32*1024;
-	static const UINT32 EBUP_SIZE = 0x100000; // TODO: can't support more than 8 Mbit
+	static const UINT32 EBUP_SIZE = 0;//0x100000; // TODO: can't support more than 8 Mbit
 	UINT8 backup_file[(BUP_SIZE)+EBUP_SIZE+4];
 	static const UINT8 init[16] =
 	{
@@ -903,8 +904,10 @@ static NVRAM_HANDLER(saturn)
 	{
 		for(i=0;i<BUP_SIZE;i++)
 			backup_file[i] = state->m_backupram[i];
+		#if 0
 		for(i=0;i<EBUP_SIZE;i++)
 			backup_file[i+BUP_SIZE] = state->m_cart_backupram[i];
+		#endif
 		for(i=0;i<4;i++)
 			backup_file[i+(BUP_SIZE)+EBUP_SIZE] = state->m_smpc.SMEM[i];
 
@@ -918,8 +921,10 @@ static NVRAM_HANDLER(saturn)
 
 			for(i=0;i<BUP_SIZE;i++)
 				state->m_backupram[i] = backup_file[i];
+			#if 0
 			for(i=0;i<EBUP_SIZE;i++)
 				state->m_cart_backupram[i] = backup_file[i+BUP_SIZE];
+			#endif
 			for(i=0;i<4;i++)
 				state->m_smpc.SMEM[i] = backup_file[i+BUP_SIZE+EBUP_SIZE];
 		}
@@ -932,12 +937,14 @@ static NVRAM_HANDLER(saturn)
 				for(j=0;j<16;j++)
 					state->m_backupram[i*16+j] = init[j];
 			}
+			#if 0
 			memset(state->m_cart_backupram, 0, EBUP_SIZE);
 			for (i = 0; i < 32; i++)
 			{
 				for(j=0;j<16;j++)
 					state->m_cart_backupram[i*16+j] = init[j];
 			}
+			#endif
 			memset(state->m_smpc.SMEM, 0, 4); // TODO: default for each region
 		}
 	}
@@ -1103,7 +1110,7 @@ static INPUT_PORTS_START( saturn )
 	PORT_CONFNAME( 0x07, 0x06, "Cart Type" )
 	PORT_CONFSETTING( 0x00, "None" )
 //	PORT_CONFSETTING( 0x01, "4 Mbit backup RAM" )
-	PORT_CONFSETTING( 0x02, "8 Mbit backup RAM" )
+//	PORT_CONFSETTING( 0x02, "8 Mbit backup RAM" )
 //	PORT_CONFSETTING( 0x03, "16 Mbit backup RAM" )
 //	PORT_CONFSETTING( 0x04, "32 Mbit backup RAM" )
 	PORT_CONFSETTING( 0x05, "8 Mbit Cart RAM" )
