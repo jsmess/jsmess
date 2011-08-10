@@ -123,14 +123,17 @@ DEVICE_IMAGE_LOAD (msx_cart)
 		{
 			static const struct { const char *mapper_name; const char *sram_name; int mapper_type; } mapper_types[] =
 			{
-				{ "M60002-0125SP",	NULL,				SLOT_ASCII8 },
-				{ "LZ93A13",		NULL,				SLOT_ASCII8 },
-				{ "LZ93A13",		"CXK5864BSP-10L",	SLOT_ASCII8_SRAM },
-				{ "LZ93A13",		"CXK5864PN-12L",	SLOT_ASCII8_SRAM },
-				{ "LZ93A13-16",		NULL,				SLOT_ASCII16 },
-				{ "IREM TAM-S1",	NULL,				SLOT_RTYPE },
-				{ "MR6401",			NULL,				SLOT_ASCII16 },
-				{ "NEOS MR6401",	NULL,				SLOT_ASCII8 },
+				{ "M60002-0125SP",		NULL,				SLOT_ASCII8 },
+				{ "LZ93A13",			NULL,				SLOT_ASCII8 },
+				{ "LZ93A13",			"CXK5864BSP-10L",	SLOT_ASCII8_SRAM },
+				{ "LZ93A13",			"CXK5864PN-12L",	SLOT_ASCII8_SRAM },
+				{ "LZ93A13",			"CXK5864PN-15L",	SLOT_ASCII8_SRAM },
+				{ "LZ93A13-16",			NULL,				SLOT_ASCII16 },
+				{ "LZ93A13-16",			"CXK5864PN-12L",	SLOT_ASCII16_SRAM },
+				{ "M60002-0125SP-16",	NULL,				SLOT_ASCII16 },
+				{ "IREM TAM-S1",		NULL,				SLOT_RTYPE },
+				{ "MR6401",				NULL,				SLOT_ASCII16 },
+				{ "NEOS MR6401",		NULL,				SLOT_ASCII8 },
 			};
 
 			for ( int i = 0; i < ARRAY_LENGTH(mapper_types) && type < 0; i++ )

@@ -64,6 +64,78 @@ Most of the information in this list was taken from http://gigamix.jp/rom/rom.ph
 		</part>
 	</software>
 
+	<software name="wingman2">
+		<!-- ウイングマン２ ダークキラーの復活 -->
+		<description>Wing Man 2</description>
+		<year>1987</year>
+		<publisher>ENIX</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<!-- ENIX WING2 RP231024D 0408 -->
+				<rom name="rp231024d" size="131072" crc="5c9d8f62" sha1="818d91505ad39bba2eaf7f4857c7d41e95fcb233" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eiwajite">
+		<!-- ＭＳＸ英和辞典 -->
+		<description>MSX Eiwa Jiten</description>
+		<year>1989</year>
+		<publisher>Hi-Score Software</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M008S" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh230927" size="131072" crc="1b10cf79" sha1="473bc0ea85ed1b218974796d819416e711ac193f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Fandom libraries 1-3 are not working at the moment -->
+	<software name="fandom1">
+		<!-- ＭＳＸプログラムコレクション ファンダムライブラリ１ -->
+		<description>MSX-FAN Fandom Library 1</description>
+		<year>1988</year>
+		<publisher>Tecnopolis</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA6228" />
+			<feature nmae="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532046" size="262144" crc="519be53e" sha1="8557dcdb4cf1e15180d17acc8e6d515bf7bf7e7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fandom2">
+		<!-- ＭＳＸプログラムコレクション ファンダムライブラリ２ -->
+		<description>MSX-Fan Fandom Library 2</description>
+		<year>1988</year>
+		<publisher>Tecnopolis</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature nmae="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532061" size="262144" crc="53c25b6b" sha1="7752b6624fb80d9499aaad28dd5776ec74565576" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fandom3">
+		<!-- ＭＳＸプログラムコレクション ファンダムライブラリ３ -->
+		<description>MSX-FAN Fandom Library 3</description>
+		<year>1988</year>
+		<publisher>Tecnopolis</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature nmae="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532075" size="262144" crc="790d5335" sha1="c2f4df1bd91f7dee1536774b9d7089086b9bf835" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>
