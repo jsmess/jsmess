@@ -10,6 +10,7 @@ public:
 	UINT32    *m_workram_h;
 	UINT8     *m_smpc_ram;
 	UINT8     *m_backupram;
+	UINT8     *m_cart_backupram;
 	UINT32    *m_scu_regs;
 	UINT16    *m_sound_ram;
 	UINT16    *m_scsp_regs;
