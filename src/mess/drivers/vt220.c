@@ -5,6 +5,7 @@
         30/06/2009 Skeleton driver.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
@@ -20,18 +21,18 @@ public:
 };
 
 
-static ADDRESS_MAP_START(vt220_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(vt220_mem, AS_PROGRAM, 8, vt220_state)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vt220_io , AS_IO, 8)
+static ADDRESS_MAP_START(vt220_io, AS_IO, 8, vt220_state)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( vt220 )
 INPUT_PORTS_END
 
-static MACHINE_RESET(vt220)
+static MACHINE_RESET( vt220 )
 {
 	memset(ram_get_ptr(machine.device(RAM_TAG)),0,16*1024);
 }
@@ -42,31 +43,29 @@ static VIDEO_START( vt220 )
 
 static SCREEN_UPDATE( vt220 )
 {
-    return 0;
+	return 0;
 }
 
 
 static MACHINE_CONFIG_START( vt220, vt220_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", I8051, XTAL_16MHz)
-    MCFG_CPU_PROGRAM_MAP(vt220_mem)
-    MCFG_CPU_IO_MAP(vt220_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I8051, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(vt220_mem)
+	MCFG_CPU_IO_MAP(vt220_io)
 
-    MCFG_MACHINE_RESET(vt220)
+	MCFG_MACHINE_RESET(vt220)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MCFG_SCREEN_UPDATE(vt220)
-
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
-
-    MCFG_VIDEO_START(vt220)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_VIDEO_START(vt220)
+	MCFG_SCREEN_UPDATE(vt220)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -81,6 +80,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1983, vt220,  0,       0, 	vt220,	vt220,	 0, 		 "Digital Equipment Corporation",   "VT220",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                      FULLNAME       FLAGS */
+COMP( 1983, vt220,  0,      0,       vt220,     vt220,   0,  "Digital Equipment Corporation", "VT220", GAME_NOT_WORKING | GAME_NO_SOUND)
