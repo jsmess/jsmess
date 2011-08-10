@@ -1573,58 +1573,58 @@ static TIMER_CALLBACK(stv_rtc_increment)
         state->m_smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
     */
 
-	state->m_smpc_ram[0x2f]++;
+	state->m_smpc.rtc_data[6]++;
 
 	/* seconds from 9 -> 10*/
-	if((state->m_smpc_ram[0x2f] & 0x0f) >= 0x0a)			{ state->m_smpc_ram[0x2f]+=0x10; state->m_smpc_ram[0x2f]&=0xf0; }
+	if((state->m_smpc.rtc_data[6] & 0x0f) >= 0x0a)			{ state->m_smpc.rtc_data[6]+=0x10; state->m_smpc.rtc_data[6]&=0xf0; }
 	/* seconds from 59 -> 0 */
-	if((state->m_smpc_ram[0x2f] & 0xf0) >= 0x60)			{ state->m_smpc_ram[0x2d]++;     state->m_smpc_ram[0x2f] = 0; }
+	if((state->m_smpc.rtc_data[6] & 0xf0) >= 0x60)			{ state->m_smpc.rtc_data[5]++;     state->m_smpc.rtc_data[6] = 0; }
 	/* minutes from 9 -> 10 */
-	if((state->m_smpc_ram[0x2d] & 0x0f) >= 0x0a)			{ state->m_smpc_ram[0x2d]+=0x10; state->m_smpc_ram[0x2d]&=0xf0; }
+	if((state->m_smpc.rtc_data[5] & 0x0f) >= 0x0a)			{ state->m_smpc.rtc_data[5]+=0x10; state->m_smpc.rtc_data[5]&=0xf0; }
 	/* minutes from 59 -> 0 */
-	if((state->m_smpc_ram[0x2d] & 0xf0) >= 0x60)			{ state->m_smpc_ram[0x2b]++;     state->m_smpc_ram[0x2d] = 0; }
+	if((state->m_smpc.rtc_data[5] & 0xf0) >= 0x60)			{ state->m_smpc.rtc_data[4]++;     state->m_smpc.rtc_data[5] = 0; }
 	/* hours from 9 -> 10 */
-	if((state->m_smpc_ram[0x2b] & 0x0f) >= 0x0a)			{ state->m_smpc_ram[0x2b]+=0x10; state->m_smpc_ram[0x2b]&=0xf0; }
+	if((state->m_smpc.rtc_data[4] & 0x0f) >= 0x0a)			{ state->m_smpc.rtc_data[4]+=0x10; state->m_smpc.rtc_data[4]&=0xf0; }
 	/* hours from 23 -> 0 */
-	if((state->m_smpc_ram[0x2b] & 0xff) >= 0x24)				{ state->m_smpc_ram[0x29]++; state->m_smpc_ram[0x27]+=0x10; state->m_smpc_ram[0x2b] = 0; }
+	if((state->m_smpc.rtc_data[4] & 0xff) >= 0x24)				{ state->m_smpc.rtc_data[3]++; state->m_smpc.rtc_data[2]+=0x10; state->m_smpc.rtc_data[4] = 0; }
 	/* week day name sunday -> monday */
-	if((state->m_smpc_ram[0x27] & 0xf0) >= 0x70)				{ state->m_smpc_ram[0x27]&=0x0f; }
+	if((state->m_smpc.rtc_data[2] & 0xf0) >= 0x70)				{ state->m_smpc.rtc_data[2]&=0x0f; }
 	/* day number 9 -> 10 */
-	if((state->m_smpc_ram[0x29] & 0x0f) >= 0x0a)				{ state->m_smpc_ram[0x29]+=0x10; state->m_smpc_ram[0x29]&=0xf0; }
+	if((state->m_smpc.rtc_data[3] & 0x0f) >= 0x0a)				{ state->m_smpc.rtc_data[3]+=0x10; state->m_smpc.rtc_data[3]&=0xf0; }
 
 	// year BCD to dec conversion (for the leap year stuff)
 	{
-		year_num = (state->m_smpc_ram[0x25] & 0xf);
+		year_num = (state->m_smpc.rtc_data[1] & 0xf);
 
-		for(year_count = 0; year_count < (state->m_smpc_ram[0x25] & 0xf0); year_count += 0x10)
+		for(year_count = 0; year_count < (state->m_smpc.rtc_data[1] & 0xf0); year_count += 0x10)
 			year_num += 0xa;
 
-		year_num += (state->m_smpc_ram[0x23] & 0xf)*0x64;
+		year_num += (state->m_smpc.rtc_data[0] & 0xf)*0x64;
 
-		for(year_count = 0; year_count < (state->m_smpc_ram[0x23] & 0xf0); year_count += 0x10)
+		for(year_count = 0; year_count < (state->m_smpc.rtc_data[0] & 0xf0); year_count += 0x10)
 			year_num += 0x3e8;
 	}
 
 	/* month +1 check */
 	/* the RTC have a range of 1980 - 2100, so we don't actually need to support the leap year special conditions */
-	if(((year_num % 4) == 0) && (state->m_smpc_ram[0x27] & 0xf) == 2)
+	if(((year_num % 4) == 0) && (state->m_smpc.rtc_data[2] & 0xf) == 2)
 	{
-		if((state->m_smpc_ram[0x29] & 0xff) >= dpm[(state->m_smpc_ram[0x27] & 0xf)-1]+1+1)
-			{ state->m_smpc_ram[0x27]++; state->m_smpc_ram[0x29] = 0x01; }
+		if((state->m_smpc.rtc_data[3] & 0xff) >= dpm[(state->m_smpc.rtc_data[2] & 0xf)-1]+1+1)
+			{ state->m_smpc.rtc_data[2]++; state->m_smpc.rtc_data[3] = 0x01; }
 	}
-	else if((state->m_smpc_ram[0x29] & 0xff) >= dpm[(state->m_smpc_ram[0x27] & 0xf)-1]+1){ state->m_smpc_ram[0x27]++; state->m_smpc_ram[0x29] = 0x01; }
+	else if((state->m_smpc.rtc_data[3] & 0xff) >= dpm[(state->m_smpc.rtc_data[2] & 0xf)-1]+1){ state->m_smpc.rtc_data[2]++; state->m_smpc.rtc_data[3] = 0x01; }
 	/* year +1 check */
-	if((state->m_smpc_ram[0x27] & 0x0f) > 12)				{ state->m_smpc_ram[0x25]++;  state->m_smpc_ram[0x27] = (state->m_smpc_ram[0x27] & 0xf0) | 0x01; }
+	if((state->m_smpc.rtc_data[2] & 0x0f) > 12)				{ state->m_smpc.rtc_data[1]++;  state->m_smpc.rtc_data[2] = (state->m_smpc.rtc_data[2] & 0xf0) | 0x01; }
 	/* year from 9 -> 10 */
-	if((state->m_smpc_ram[0x25] & 0x0f) >= 0x0a)				{ state->m_smpc_ram[0x25]+=0x10; state->m_smpc_ram[0x25]&=0xf0; }
+	if((state->m_smpc.rtc_data[1] & 0x0f) >= 0x0a)				{ state->m_smpc.rtc_data[1]+=0x10; state->m_smpc.rtc_data[1]&=0xf0; }
 	/* year from 99 -> 100 */
-	if((state->m_smpc_ram[0x25] & 0xf0) >= 0xa0)				{ state->m_smpc_ram[0x23]++; state->m_smpc_ram[0x25] = 0; }
+	if((state->m_smpc.rtc_data[1] & 0xf0) >= 0xa0)				{ state->m_smpc.rtc_data[0]++; state->m_smpc.rtc_data[1] = 0; }
 
 	// probably not SO precise, here just for reference ...
 	/* year from 999 -> 1000 */
-	//if((state->m_smpc_ram[0x23] & 0x0f) >= 0x0a)               { state->m_smpc_ram[0x23]+=0x10; state->m_smpc_ram[0x23]&=0xf0; }
+	//if((state->m_smpc.rtc_data[0] & 0x0f) >= 0x0a)               { state->m_smpc.rtc_data[0]+=0x10; state->m_smpc.rtc_data[0]&=0xf0; }
 	/* year from 9999 -> 0 */
-	//if((state->m_smpc_ram[0x23] & 0xf0) >= 0xa0)               { state->m_smpc_ram[0x23] = 0; } //roll over
+	//if((state->m_smpc.rtc_data[0] & 0xf0) >= 0xa0)               { state->m_smpc.rtc_data[0] = 0; } //roll over
 }
 
 static MACHINE_START( stv )
@@ -1660,13 +1660,13 @@ static MACHINE_START( stv )
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine));
 
-	state->m_smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
-    state->m_smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
-    state->m_smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-    state->m_smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
-    state->m_smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
-    state->m_smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
-    state->m_smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
+	state->m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
+    state->m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
+    state->m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+    state->m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
+    state->m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
+    state->m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
+    state->m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
 
 	state->m_stv_rtc_timer = machine.scheduler().timer_alloc(FUNC(stv_rtc_increment));
 }
@@ -1675,6 +1675,8 @@ static MACHINE_START( stv )
 static MACHINE_START( saturn )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
+	system_time systime;
+	machine.base_datetime(systime);
 
 	state->m_maincpu = downcast<legacy_cpu_device*>( machine.device("maincpu") );
 	state->m_slave = downcast<legacy_cpu_device*>( machine.device("slave") );
@@ -1704,6 +1706,16 @@ static MACHINE_START( saturn )
 	state_save_register_global_pointer(machine, state->m_cart_dram, 0x400000/4);
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine));
+
+	state->m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
+    state->m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
+    state->m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+    state->m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
+    state->m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
+    state->m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
+    state->m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
+
+	state->m_stv_rtc_timer = machine.scheduler().timer_alloc(FUNC(stv_rtc_increment));
 }
 
 
@@ -1964,6 +1976,8 @@ static MACHINE_RESET( saturn )
 
 	state->m_vdp2.old_crmd = -1;
 	state->m_vdp2.old_tvmd = -1;
+
+	state->m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
 
 

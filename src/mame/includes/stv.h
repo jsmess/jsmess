@@ -89,6 +89,7 @@ public:
         int   pmode;
         UINT8 SMEM[4];
         UINT8 intback;
+        UINT8 rtc_data[7];
 	}m_smpc;
 
 	/* Saturn specific*/
