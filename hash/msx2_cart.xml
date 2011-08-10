@@ -214,7 +214,113 @@ LZ93A13 (32 pin) - 8KB banks
 			<!-- LZ93A13 with 16KB banks?? -->
 			<feature name="mapper" value="LZ93A13-16" />
 			<dataarea name="rom" size="131072">
+				<!-- R58Y5151 8849 D -->
 				<rom name="r58y5151" size="131072" crc="f5174422" sha1="66508bbdc3b133b9a69ea96789bc134eea46796a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="woodypoc">
+		<!-- うっでぃぽこ -->
+		<description>Woody Poco</description>
+		<year>1987</year>
+		<publisher>dB-Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<!-- 16KB banks -->
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<!-- NEC D23C10101C W48 -->
+				<rom name="d23c1010c" size="131072" crc="aea8d064" sha1="ebe20c85c5314957fafc223c26bf393847e3bb03" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="urusei">
+		<!-- うる星やつら -->
+		<description>Urusei Yatsura</description>
+		<year>1987</year>
+		<publisher>Micro Cabin</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh534039" size="524288" crc="e564a25f" sha1="92bada2d019fcd6eee6d332a8068a9ddfa30d518" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultima">
+		<!-- ウルティマ 恐怖のエクソダス -->
+		<description>Ultima Exodus</description>
+		<year>1987</year>
+		<publisher>Pony Canyon</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-2M208-03M" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK5864PN-15L" />
+			<dataarea name="rom" size="262144">
+				<rom name="r68y5552" size="262144" crc="37b9e10f" sha1="18be429f8b5c7bc4775c99292110aa09341cd644" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atrain">
+		<!-- Ａ列車で行こう -->
+		<description>A-Train</description>
+		<year>1989</year>
+		<publisher>Pony Canyon</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M216A" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<feature name="sram" value="CXK5864PN-12L" />
+			<dataarea name="rom" size="131072">
+				<!-- PONY CANYON 8929E -->
+				<rom name="atrain.rom" size="131072" crc="c956e1df" sha1="5fd07ed5b7c0492d42ed91a54a0fe80ce6e4e40d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f15">
+		<!-- Ｆ－１５ストライクイーグル -->
+		<description>F-15 Strike Eagle</description>
+		<year>1987</year>
+		<publisher>System Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="1M-8KB" />
+			<feature name="mapper" value="NEOS MR6401" />
+			<dataarea name="rom" size="131072">
+				<rom name="sms_1026" size="131072" crc="53cce88d" sha1="39bc111c953bdf25683db7ff4c0bad79b5c49958" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="">
+		<!- お絵描きソフト 画楽多 ->
+		<description>multi screen easy drawing software??</description>
+		<year></year>
+		<publisher>electronic wati?</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M016S" />
+			<!- 16KB banks ->
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh31434" size="131072" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+	<software name="ogre">
+		<description>Ogre</description>
+		<year>1986</year>
+		<publisher>Systemsoft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh23105d" size="131072" crc="f2544e2e" sha1="c9c272ffa69d3e0af5be42e7636b02dc2af6ea8c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
