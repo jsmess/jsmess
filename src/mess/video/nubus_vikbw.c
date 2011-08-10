@@ -2,8 +2,6 @@
 
   Viking 1024x768 fixed-resolution monochrome board
  
-  Apparently incompatible with System 7.0 and later(!)
- 
   VRAM from Fs040000 to Fs0517FF
   Read from Fs000000 enables VBL, write to Fs000000 disables VBL
   Write to Fs080000 acks VBL
@@ -102,6 +100,7 @@ void nubus_vikbw_device::device_start()
 
 	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
 	install_bank(slotspace+0x40000, slotspace+0x40000+VRAM_SIZE-1, 0, 0, "bank_vikbw", m_vram);
+	install_bank(slotspace+0x940000, slotspace+0x940000+VRAM_SIZE-1, 0, 0, "bank_vikbw2", m_vram);
 
 	m_nubus->install_device(slotspace, slotspace+3, read32_delegate(FUNC(nubus_vikbw_device::viking_enable_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_disable_w), this));
 	m_nubus->install_device(slotspace+0x80000, slotspace+0x80000+3, read32_delegate(FUNC(nubus_vikbw_device::viking_ack_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_ack_w), this));
