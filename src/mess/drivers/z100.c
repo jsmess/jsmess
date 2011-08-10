@@ -4,6 +4,9 @@
 
     15/07/2011 Skeleton driver.
 
+    Commands:
+    Press H to list all the commands.
+
     TODO:
     - remove parity check IRQ patch (understand what it really wants there!)
     - implement S-100 bus features;
@@ -137,6 +140,7 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
   ZDIPSWHZ    EQU 10000000B   ; 1=50Hz(0=60HZ)
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -152,9 +156,38 @@ class z100_state : public driver_device
 {
 public:
 	z100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_pia0(*this, "pia0"),
+	m_pia1(*this, "pia1"),
+	m_picm(*this, "pic8259_master"),
+	m_pics(*this, "pic8259_slave"),
+	m_fdc(*this, "z207_fdc"),
+	m_crtc(*this, "crtc")
 	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_pia0;
+	required_device<device_t> m_pia1;
+	required_device<device_t> m_picm;
+	required_device<device_t> m_pics;
+	required_device<device_t> m_fdc;
+	required_device<mc6845_device> m_crtc;
+	DECLARE_READ8_MEMBER(z100_vram_r);
+	DECLARE_WRITE8_MEMBER(z100_vram_w);
+	DECLARE_READ8_MEMBER(keyb_data_r);
+	DECLARE_READ8_MEMBER(keyb_status_r);
+	DECLARE_WRITE8_MEMBER(keyb_command_w);
+	DECLARE_WRITE8_MEMBER(z100_6845_address_w);
+	DECLARE_WRITE8_MEMBER(z100_6845_data_w);
+	DECLARE_READ8_MEMBER(z207_fdc_r);
+	DECLARE_WRITE8_MEMBER(z207_fdc_w);
+	DECLARE_WRITE_LINE_MEMBER(z100_pic_irq);
+	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_WRITE8_MEMBER(video_pia_A_w);
+	DECLARE_WRITE8_MEMBER(video_pia_B_w);
+	DECLARE_WRITE_LINE_MEMBER(video_pia_CA2_w);
+	DECLARE_WRITE8_MEMBER(video_pia_CB2_w);
 	UINT8 *m_gvram;
 	UINT8 m_keyb_press,m_keyb_status;
 	UINT8 m_vram_enable;
@@ -232,35 +265,31 @@ static SCREEN_UPDATE( z100 )
 		}
 	}
 
-    return 0;
+	return 0;
 }
 
-static READ8_HANDLER( z100_vram_r )
+READ8_MEMBER( z100_state::z100_vram_r )
 {
-	z100_state *state = space->machine().driver_data<z100_state>();
-
-	return state->m_gvram[offset];
+	return m_gvram[offset];
 }
 
-static WRITE8_HANDLER( z100_vram_w )
+WRITE8_MEMBER( z100_state::z100_vram_w )
 {
-	z100_state *state = space->machine().driver_data<z100_state>();
-
-	if(state->m_vram_enable)
+	if(m_vram_enable)
 	{
 		int i;
 
-		state->m_gvram[offset] = data;
+		m_gvram[offset] = data;
 
 		for(i=0;i<3;i++)
 		{
-			if(state->m_gbank & (1 << i))
-				state->m_gvram[((offset) & 0xffff)+0x10000*i] = data;
+			if(m_gbank & (1 << i))
+				m_gvram[((offset) & 0xffff)+0x10000*i] = data;
 		}
 	}
 }
 
-static ADDRESS_MAP_START(z100_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(z100_mem, AS_PROGRAM, 8, z100_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x3ffff) AM_RAM // 128*2 KB RAM
 //  AM_RANGE(0xb0000,0xbffff) AM_ROM // expansion ROM
@@ -271,103 +300,90 @@ static ADDRESS_MAP_START(z100_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static READ8_HANDLER(keyb_data_r)
+READ8_MEMBER( z100_state::keyb_data_r )
 {
-	z100_state *state = space->machine().driver_data<z100_state>();
-
-	if(state->m_keyb_press)
+	if(m_keyb_press)
 	{
 		UINT8 res;
 
-		res = state->m_keyb_press;
+		res = m_keyb_press;
 
-		state->m_keyb_press = 0;
+		m_keyb_press = 0;
 		return res;
 	}
 
-	return state->m_keyb_press;
+	return m_keyb_press;
 }
 
-static READ8_HANDLER(keyb_status_r)
+READ8_MEMBER( z100_state::keyb_status_r )
 {
-	z100_state *state = space->machine().driver_data<z100_state>();
-
-	if(state->m_keyb_status)
+	if(m_keyb_status)
 	{
-		state->m_keyb_status = 0;
+		m_keyb_status = 0;
 		return 1;
 	}
 
-	return state->m_keyb_status;
+	return m_keyb_status;
 }
 
-static WRITE8_HANDLER(keyb_command_w)
+WRITE8_MEMBER( z100_state::keyb_command_w )
 {
 	// ...
 }
 
-static WRITE8_HANDLER( z100_6845_address_w )
+WRITE8_MEMBER( z100_state::z100_6845_address_w )
 {
-	z100_state *state = space->machine().driver_data<z100_state>();
-
-	state->m_crtc_index = data;
-	state->m_mc6845->address_w(*space, offset, data);
+	data &= 0x1f;
+	m_crtc_index = data;
+	m_crtc->address_w( space, offset, data );
 }
 
-static WRITE8_HANDLER( z100_6845_data_w )
+WRITE8_MEMBER( z100_state::z100_6845_data_w )
 {
-	z100_state *state = space->machine().driver_data<z100_state>();
-
-	state->m_crtc_vreg[state->m_crtc_index] = data;
-	state->m_mc6845->register_w(*space, offset, data);
+	m_crtc_vreg[m_crtc_index] = data;
+	m_crtc->register_w(space, offset, data);
 }
 
-static READ8_HANDLER( z207_fdc_r )
+READ8_MEMBER( z100_state::z207_fdc_r )
 {
-	device_t* dev = space->machine().device("z207_fdc");
 	UINT8 res;
 
 	res = 0;
 
 	switch(offset)
 	{
-		case 0: res = wd17xx_status_r(dev,offset); break;
-		case 1: res = wd17xx_track_r(dev,offset);  break;
-		case 2: res = wd17xx_sector_r(dev,offset); break;
-		case 3: res = wd17xx_data_r(dev,offset); break;
+		case 0: res = wd17xx_status_r(m_fdc,offset); break;
+		case 1: res = wd17xx_track_r(m_fdc,offset);  break;
+		case 2: res = wd17xx_sector_r(m_fdc,offset); break;
+		case 3: res = wd17xx_data_r(m_fdc,offset); break;
 	}
 
 	return res;
 }
 
-static WRITE8_HANDLER( z207_fdc_w )
+WRITE8_MEMBER( z100_state::z207_fdc_w )
 {
-	z100_state *state = space->machine().driver_data<z100_state>();
-	device_t* dev = space->machine().device("z207_fdc");
-//  UINT8 res;
-
-//  res = 0;
-
 	switch(offset)
 	{
-		case 0: wd17xx_command_w(dev,offset,data); break;
-		case 1: wd17xx_track_w(dev,offset,data); break;
-		case 2: wd17xx_sector_w(dev,offset,data); break;
-		case 3: wd17xx_data_w(dev,offset,data); break;
+		case 0: wd17xx_command_w(m_fdc,offset,data); break;
+		case 1: wd17xx_track_w(m_fdc,offset,data); break;
+		case 2: wd17xx_sector_w(m_fdc,offset,data); break;
+		case 3: wd17xx_data_w(m_fdc,offset,data); break;
 		case 4: // disk control
-			wd17xx_set_drive(dev,data & 3);
-			state->m_z207_cur_drive = data & 3;
+			wd17xx_set_drive(m_fdc,data & 3);
+			m_z207_cur_drive = data & 3;
 			break;
 		case 5: // aux control
-			floppy_mon_w(floppy_get_device(space->machine(), state->m_z207_cur_drive), !BIT(data, 1));
-			floppy_drive_set_ready_state(floppy_get_device(space->machine(), state->m_z207_cur_drive), data & 2,0);
+			floppy_mon_w(floppy_get_device(machine(), m_z207_cur_drive), !BIT(data, 1));
+			floppy_drive_set_ready_state(floppy_get_device(machine(), m_z207_cur_drive), data & 2,0);
 			break;
 
 	}
 }
 
-static ADDRESS_MAP_START( z100_io , AS_IO, 8)
+static ADDRESS_MAP_START(z100_io, AS_IO, 8, z100_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE (0x00, 0x3f) reserved for non-ZDS vendors
 //  AM_RANGE (0x40, 0x5f) secondary Multiport card (Z-204)
 //  AM_RANGE (0x60, 0x7f) primary Multiport card (Z-204)
@@ -381,16 +397,16 @@ static ADDRESS_MAP_START( z100_io , AS_IO, 8)
 //  z-207 secondary disk controller (wd1797)
 //  AM_RANGE (0xcd, 0xce) ET-100 CRT Controller
 //  AM_RANGE (0xd4, 0xd7) ET-100 Trainer Parallel I/O
-	AM_RANGE (0xd8, 0xdb) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write) //video board
+	AM_RANGE (0xd8, 0xdb) AM_DEVREADWRITE("pia0", pia6821_device, read, write) //video board
 	AM_RANGE (0xdc, 0xdc) AM_WRITE(z100_6845_address_w)
 	AM_RANGE (0xdd, 0xdd) AM_WRITE(z100_6845_data_w)
 //  AM_RANGE (0xde, 0xde) light pen
-	AM_RANGE (0xe0, 0xe3) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write) //main board
+	AM_RANGE (0xe0, 0xe3) AM_DEVREADWRITE("pia1", pia6821_device, read, write) //main board
 //  AM_RANGE (0xe4, 0xe7) 8253 PIT
 //  AM_RANGE (0xe8, 0xeb) First 2661-2 serial port (printer)
 //  AM_RANGE (0xec, 0xef) Second 2661-2 serial port (modem)
-	AM_RANGE (0xf0, 0xf1) AM_DEVREADWRITE("pic8259_slave", pic8259_r, pic8259_w)
-	AM_RANGE (0xf2, 0xf3) AM_DEVREADWRITE("pic8259_master", pic8259_r, pic8259_w)
+	AM_RANGE (0xf0, 0xf1) AM_DEVREADWRITE_LEGACY("pic8259_slave", pic8259_r, pic8259_w)
+	AM_RANGE (0xf2, 0xf3) AM_DEVREADWRITE_LEGACY("pic8259_master", pic8259_r, pic8259_w)
 	AM_RANGE (0xf4, 0xf4) AM_READ(keyb_data_r) // -> 8041 MCU
 	AM_RANGE (0xf5, 0xf5) AM_READWRITE(keyb_status_r,keyb_command_w)
 //  AM_RANGE (0xf6, 0xf6) expansion ROM is present (bit 0, active low)
@@ -409,7 +425,7 @@ static INPUT_CHANGED( key_stroke )
 	{
 		/* TODO: table */
 		state->m_keyb_press = (UINT8)(FPTR)(param) & 0xff;
-		//pic8259_ir6_w(field.machine().device("pic8259_master"), 1);
+		//pic8259_ir6_w(state->m_picm, 1);
 		state->m_keyb_status = 1;
 	}
 
@@ -582,25 +598,25 @@ static IRQ_CALLBACK(z100_irq_callback)
 	return pic8259_acknowledge( device->machine().device( "pic8259_master" ) );
 }
 
-static WRITE_LINE_DEVICE_HANDLER( z100_pic_irq )
+WRITE_LINE_MEMBER( z100_state::z100_pic_irq )
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 //  logerror("PIC#1: set IRQ line to %i\n",interrupt);
 }
 
-static READ8_DEVICE_HANDLER( get_slave_ack )
+READ8_MEMBER( z100_state::get_slave_ack )
 {
 	if (offset==7) { // IRQ = 7
-		return pic8259_acknowledge(device->machine().device( "pic8259_slave"));
+		return pic8259_acknowledge(m_pics);
 	}
-	return 0x00;
+	return 0;
 }
 
 static const struct pic8259_interface z100_pic8259_master_config =
 {
-	DEVCB_LINE(z100_pic_irq),
+	DEVCB_DRIVER_LINE_MEMBER(z100_state, z100_pic_irq),
 	DEVCB_LINE_VCC,
-	DEVCB_HANDLER(get_slave_ack)
+	DEVCB_DRIVER_MEMBER(z100_state, get_slave_ack)
 };
 
 static const struct pic8259_interface z100_pic8259_slave_config =
@@ -624,10 +640,8 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static WRITE8_DEVICE_HANDLER( video_pia_A_w )
+WRITE8_MEMBER( z100_state::video_pia_A_w )
 {
-	z100_state *state = device->machine().driver_data<z100_state>();
-
 	/*
     all bits are active low
     x--- ---- -> disable video RAM
@@ -640,34 +654,29 @@ static WRITE8_DEVICE_HANDLER( video_pia_A_w )
     ---- ---x -> enable red display
     */
 
-	state->m_vram_enable = ((data & 0x80) >> 7) ^ 1;
-    state->m_gbank = BITSWAP8(((data & 0x70) >> 4) ^ 0x7,7,6,5,4,3,1,0,2);
-	state->m_flash = ((data & 8) >> 3) ^ 1;
-	state->m_display_mask = BITSWAP8((data & 7) ^ 7,7,6,5,4,3,1,0,2);
+	m_vram_enable = ((data & 0x80) >> 7) ^ 1;
+	m_gbank = BITSWAP8(((data & 0x70) >> 4) ^ 0x7,7,6,5,4,3,1,0,2);
+	m_flash = ((data & 8) >> 3) ^ 1;
+	m_display_mask = BITSWAP8((data & 7) ^ 7,7,6,5,4,3,1,0,2);
 }
 
-static WRITE8_DEVICE_HANDLER( video_pia_B_w )
+WRITE8_MEMBER( z100_state::video_pia_B_w )
 {
-	z100_state *state = device->machine().driver_data<z100_state>();
-
-	state->m_start_addr = data << 4; //<- TODO
+	m_start_addr = data << 4; //<- TODO
 }
 
 /* clear screen */
-static WRITE_LINE_DEVICE_HANDLER( video_pia_CA2_w )
+WRITE_LINE_MEMBER( z100_state::video_pia_CA2_w )
 {
-	z100_state *drvstate = device->machine().driver_data<z100_state>();
 	int i;
 
-	for(i=0;i<0x30000;i++)
-		drvstate->m_gvram[i] = drvstate->m_clr_val;
+	for(i=0; i<0x30000; i++)
+		m_gvram[i] = m_clr_val;
 }
 
-static WRITE8_DEVICE_HANDLER( video_pia_CB2_w )
+WRITE8_MEMBER( z100_state::video_pia_CB2_w )
 {
-	z100_state *state = device->machine().driver_data<z100_state>();
-
-	state->m_clr_val = (data & 1) ? 0x00 : 0xff;
+	m_clr_val = (data & 1) ? 0x00 : 0xff;
 }
 
 static const pia6821_interface pia0_intf =
@@ -678,10 +687,10 @@ static const pia6821_interface pia0_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(video_pia_A_w),		/* port A out */
-	DEVCB_HANDLER(video_pia_B_w),		/* port B out */
-	DEVCB_LINE(video_pia_CA2_w),		/* line CA2 out */
-	DEVCB_HANDLER(video_pia_CB2_w),		/* port CB2 out */
+	DEVCB_DRIVER_MEMBER(z100_state, video_pia_A_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(z100_state, video_pia_B_w),		/* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(z100_state, video_pia_CA2_w),		/* line CA2 out */
+	DEVCB_DRIVER_MEMBER(z100_state, video_pia_CB2_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_NULL		/* IRQB */
 };
@@ -763,13 +772,28 @@ static MACHINE_RESET(z100)
 }
 
 static MACHINE_CONFIG_START( z100, z100_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I8088, XTAL_14_31818MHz/3)
-    MCFG_CPU_PROGRAM_MAP(z100_mem)
-    MCFG_CPU_IO_MAP(z100_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",I8088, XTAL_14_31818MHz/3)
+	MCFG_CPU_PROGRAM_MAP(z100_mem)
+	MCFG_CPU_IO_MAP(z100_io)
 
-    MCFG_MACHINE_START(z100)
-    MCFG_MACHINE_RESET(z100)
+	MCFG_MACHINE_START(z100)
+	MCFG_MACHINE_RESET(z100)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_VIDEO_START(z100)
+	MCFG_SCREEN_UPDATE(z100)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(z100)
+
+	/* Devices */
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_14_31818MHz/8, mc6845_intf)	/* unknown clock, hand tuned to get ~50/~60 fps */
 
 	MCFG_PIC8259_ADD( "pic8259_master", z100_pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", z100_pic8259_slave_config )
@@ -779,22 +803,6 @@ static MACHINE_CONFIG_START( z100, z100_state )
 
 	MCFG_FD1797_ADD("z207_fdc",z207_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(z100_floppy_interface)
-
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MCFG_SCREEN_UPDATE(z100)
-
-	MCFG_MC6845_ADD("crtc", MC6845, XTAL_14_31818MHz/8, mc6845_intf)	/* unknown clock, hand tuned to get ~50/~60 fps */
-
-    MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(z100)
-
-    MCFG_VIDEO_START(z100)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -820,5 +828,4 @@ static DRIVER_INIT( z100 )
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, z100,	0,       0, 		z100,	z100,	 z100,  	 "Zenith",   "Z-100",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+COMP( 1982, z100,   0,      0,       z100,      z100,    z100,  "Zenith", "Z-100", GAME_NOT_WORKING | GAME_NO_SOUND)
