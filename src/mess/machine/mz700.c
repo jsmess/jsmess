@@ -440,8 +440,8 @@ static WRITE_LINE_DEVICE_HANDLER( pit_irq_2 )
 {
 	mz_state *mz = device->machine().driver_data<mz_state>();
 
-	if (mz->m_intmsk)
-		cputag_set_input_line(device->machine(), "maincpu", 0, ASSERT_LINE);
+	if (!mz->m_intmsk)
+		cputag_set_input_line(device->machine(), "maincpu", 0, state);
 }
 
 
