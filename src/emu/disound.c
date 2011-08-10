@@ -229,7 +229,7 @@ bool device_sound_interface::interface_validity_check(emu_options &options, cons
 	for (const sound_route *route = first_route(); route != NULL; route = route->next())
 	{
 		// find a device with the requested tag
-		const device_t *target = device().mconfig().devicelist().find(route->m_target);
+		const device_t *target = device().mconfig().devicelist().find(route->m_target.cstr());
 		if (target == NULL)
 		{
 			mame_printf_error("%s: %s attempting to route sound to non-existant device '%s'\n", driver.source_file, driver.name, route->m_target.cstr());
