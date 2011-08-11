@@ -57,6 +57,7 @@
 #include "video/nubus_cb264.h"
 #include "video/nubus_vikbw.h"
 #include "video/nubus_specpdq.h"
+#include "video/nubus_m2hires.h"
 #include "includes/mac.h"
 
 #define C7M	(7833600)
@@ -805,7 +806,8 @@ static SLOT_INTERFACE_START(mac_nubus_cards)
 	SLOT_INTERFACE("824gc", NUBUS_824GC)	/* Apple 8*24 Graphics Card */
 	SLOT_INTERFACE("cb264", NUBUS_CB264)	/* RasterOps ColorBoard 264 */
 	SLOT_INTERFACE("vikbw", NUBUS_VIKBW)	/* Moniterm Viking board */
-	SLOT_INTERFACE("specpdq", NUBUS_SPECPDQ)	/* SuperMac Spectrum 24 PDQ */
+	SLOT_INTERFACE("specpdq", NUBUS_SPECPDQ)	/* SuperMac Spectrum PDQ */
+	SLOT_INTERFACE("m2hires", NUBUS_M2HIRES)	/* Apple Macintosh II Hi-Resolution Card */
 SLOT_INTERFACE_END
 
 /***************************************************************************
@@ -825,7 +827,7 @@ static const floppy_interface mac128512_floppy_interface = //SONY_FLOPPY_ALLOW40
 };
 
 
-static const floppy_interface mac_floppy_interface = //SONY_FLOPPY_ALLOW400K | SONY_FLOPPY_ALLOW800K
+static const floppy_interface mac_floppy_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
