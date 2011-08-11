@@ -71,7 +71,6 @@ TODO :
     not used at all: the ROM area where these vectors should be defined is used
     by a ROM branch table.
 
-**** Added by Robbbert, Jan 2009 ****
 
 Memory Map found at http://www.floodgap.com/retrobits/tomy/mmap.html
 
@@ -158,6 +157,8 @@ FFFF
 
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/wave.h"
@@ -172,8 +173,22 @@ class tutor_state : public driver_device
 {
 public:
 	tutor_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_cass(*this, CASSETTE_TAG),
+	m_printer(*this, "printer")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cass;
+	required_device<device_t> m_printer;
+	DECLARE_READ8_MEMBER(read_keyboard);
+	DECLARE_READ8_MEMBER(tutor_mapper_r);
+	DECLARE_WRITE8_MEMBER(tutor_mapper_w);
+	DECLARE_READ8_MEMBER(tutor_cassette_r);
+	DECLARE_WRITE8_MEMBER(tutor_cassette_w);
+	DECLARE_READ8_MEMBER(tutor_printer_r);
+	DECLARE_WRITE8_MEMBER(tutor_printer_w);
 	char m_cartridge_enable;
 	char m_tape_interrupt_enable;
 	emu_timer *m_tape_interrupt_timer;
@@ -225,7 +240,6 @@ static TMS9928A_INTERFACE(tutor_tms9928a_interface)
 static SCREEN_UPDATE( tutor )
 {
 	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
-
 	tms9928a->update( bitmap, cliprect );
 	return 0;
 }
@@ -259,19 +273,19 @@ static MACHINE_RESET(tutor)
     mapped to both a keyboard key and a joystick switch.
 */
 
-static READ8_HANDLER(read_keyboard)
+READ8_MEMBER( tutor_state::read_keyboard )
 {
 	char port[12];
 	UINT8 value;
 
 	snprintf(port, ARRAY_LENGTH(port), "LINE%d", offset);
-	value = input_port_read(space->machine(), port);
+	value = input_port_read(machine(), port);
 
 	/* hack for ports overlapping with joystick */
 	if (offset == 4 || offset == 5)
 	{
 		snprintf(port, ARRAY_LENGTH(port), "LINE%d_alt", offset);
-		value |= input_port_read(space->machine(), port);
+		value |= input_port_read(machine(), port);
 	}
 
 	return value;
@@ -316,7 +330,7 @@ static DEVICE_IMAGE_UNLOAD( tutor_cart )
     Cartridge may also define a boot ROM at base >0000 (see below).
 */
 
-static  READ8_HANDLER(tutor_mapper_r)
+READ8_MEMBER( tutor_state::tutor_mapper_r )
 {
 	int reply;
 
@@ -336,9 +350,8 @@ static  READ8_HANDLER(tutor_mapper_r)
 	return reply;
 }
 
-static WRITE8_HANDLER(tutor_mapper_w)
+WRITE8_MEMBER( tutor_state::tutor_mapper_w )
 {
-	tutor_state *state = space->machine().driver_data<tutor_state>();
 	switch (offset)
 	{
 	case 0x00:
@@ -347,14 +360,14 @@ static WRITE8_HANDLER(tutor_mapper_w)
 
 	case 0x08:
 		/* disable cartridge ROM, enable BASIC ROM at base >8000 */
-		state->m_cartridge_enable = 0;
-		memory_set_bank(space->machine(), "bank1", 0);
+		m_cartridge_enable = 0;
+		memory_set_bank(machine(), "bank1", 0);
 		break;
 
 	case 0x0c:
 		/* enable cartridge ROM, disable BASIC ROM at base >8000 */
-		state->m_cartridge_enable = 1;
-		memory_set_bank(space->machine(), "bank1", 1);
+		m_cartridge_enable = 1;
+		memory_set_bank(machine(), "bank1", 1);
 		break;
 
 	default:
@@ -385,21 +398,20 @@ static WRITE8_HANDLER(tutor_mapper_w)
 
 static TIMER_CALLBACK(tape_interrupt_handler)
 {
-	//tutor_state *state = machine.driver_data<tutor_state>();
+	tutor_state *state = machine.driver_data<tutor_state>();
 	//assert(state->m_tape_interrupt_enable);
-	cputag_set_input_line(machine, "maincpu", 1, ((machine.device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, (state->m_cass->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* CRU handler */
-static  READ8_HANDLER(tutor_cassette_r)
+READ8_MEMBER( tutor_state::tutor_cassette_r )
 {
-	return ((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0) ? 1 : 0;
+	return (m_cass->input() > 0.0) ? 1 : 0;
 }
 
 /* memory handler */
-static WRITE8_HANDLER(tutor_cassette_w)
+WRITE8_MEMBER( tutor_state::tutor_cassette_w )
 {
-	tutor_state *state = space->machine().driver_data<tutor_state>();
 	if (offset & /*0x1f*/0x1e)
 		logerror("unknown port in %s %d\n", __FILE__, __LINE__);
 
@@ -411,20 +423,20 @@ static WRITE8_HANDLER(tutor_cassette_w)
 		{
 		case 0:
 			/* data out */
-			space->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data) ? +1.0 : -1.0);
+			m_cass->output((data) ? +1.0 : -1.0);
 			break;
 		case 1:
 			/* interrupt control??? */
 			//logerror("ignoring write of %d to cassette port 1\n", data);
-			if (state->m_tape_interrupt_enable != ! data)
+			if (m_tape_interrupt_enable != ! data)
 			{
-				state->m_tape_interrupt_enable = ! data;
-				if (state->m_tape_interrupt_enable)
-					state->m_tape_interrupt_timer->adjust(/*attotime::from_hz(44100)*/attotime::zero, 0, attotime::from_hz(44100));
+				m_tape_interrupt_enable = ! data;
+				if (m_tape_interrupt_enable)
+					m_tape_interrupt_timer->adjust(/*attotime::from_hz(44100)*/attotime::zero, 0, attotime::from_hz(44100));
 				else
 				{
-					state->m_tape_interrupt_timer->adjust(attotime::never);
-					cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE);
+					m_tape_interrupt_timer->adjust(attotime::never);
+					cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
 				}
 			}
 			break;
@@ -441,7 +453,7 @@ static WRITE8_HANDLER(tutor_cassette_w)
 }
 
 /* memory handlers */
-static  READ8_DEVICE_HANDLER(tutor_printer_r)
+READ8_MEMBER( tutor_state::tutor_printer_r )
 {
 	int reply;
 
@@ -449,7 +461,7 @@ static  READ8_DEVICE_HANDLER(tutor_printer_r)
 	{
 	case 0x20:
 		/* busy */
-		reply = centronics_busy_r(device) ? 0x00 : 0xff;
+		reply = centronics_busy_r(m_printer) ? 0x00 : 0xff;
 		break;
 
 	default:
@@ -462,18 +474,18 @@ static  READ8_DEVICE_HANDLER(tutor_printer_r)
 	return reply;
 }
 
-static WRITE8_DEVICE_HANDLER(tutor_printer_w)
+WRITE8_MEMBER( tutor_state::tutor_printer_w )
 {
 	switch (offset)
 	{
 	case 0x10:
 		/* data */
-		centronics_data_w(device, 0, data);
+		centronics_data_w(m_printer, 0, data);
 		break;
 
 	case 0x40:
 		/* strobe */
-		centronics_strobe_w(device, BIT(data, 7));
+		centronics_strobe_w(m_printer, BIT(data, 7));
 		break;
 
 	default:
@@ -517,7 +529,7 @@ static WRITE8_DEVICE_HANDLER(tutor_printer_w)
 */
 
 #ifdef UNUSED_FUNCTION
-static WRITE8_HANDLER(test_w)
+WRITE8_MEMBER( tutor_state::test_w )
 {
     switch (offset)
     {
@@ -528,21 +540,19 @@ static WRITE8_HANDLER(test_w)
 }
 #endif
 
-static ADDRESS_MAP_START(tutor_memmap, AS_PROGRAM, 8)
-
+static ADDRESS_MAP_START(tutor_memmap, AS_PROGRAM, 8, tutor_state)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	/*system ROM*/
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP /*BASIC ROM & cartridge ROM*/
 	AM_RANGE(0xc000, 0xdfff) AM_NOP	/*free for expansion, or cartridge ROM?*/
 
-	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, vram_read, vram_write)	/*VDP data*/
-	AM_RANGE(0xe002, 0xe002) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, register_read, register_write)/*VDP status*/
+	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)	/*VDP data*/
+	AM_RANGE(0xe002, 0xe002) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)/*VDP status*/
 	AM_RANGE(0xe100, 0xe1ff) AM_READWRITE(tutor_mapper_r, tutor_mapper_w)	/*cartridge mapper*/
-	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE("sn76489a", sn76496_w)	/*sound chip*/
-	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE("printer",tutor_printer_r, tutor_printer_w)	/*printer*/
+	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE_LEGACY("sn76489a", sn76496_w)	/*sound chip*/
+	AM_RANGE(0xe800, 0xe8ff) AM_READWRITE(tutor_printer_r, tutor_printer_w)	/*printer*/
 	AM_RANGE(0xee00, 0xeeff) AM_READNOP AM_WRITE( tutor_cassette_w)		/*cassette interface*/
 
 	AM_RANGE(0xf000, 0xffff) AM_NOP	/*free for expansion (and internal processor RAM)*/
-
 ADDRESS_MAP_END
 
 /*
@@ -555,7 +565,7 @@ ADDRESS_MAP_END
     >ed00(r): tape input
 */
 
-static ADDRESS_MAP_START(tutor_io, AS_IO, 8)
+static ADDRESS_MAP_START(tutor_io, AS_IO, 8, tutor_state)
 	AM_RANGE(0xec0, 0xec7) AM_READ(read_keyboard)			/*keyboard interface*/
 	AM_RANGE(0xed0, 0xed0) AM_READ(tutor_cassette_r)		/*cassette interface*/
 ADDRESS_MAP_END
@@ -566,7 +576,7 @@ ADDRESS_MAP_END
 Small note about natural keyboard support: currently,
 - "MON" is mapped to 'F1'
 - "MOD" is mapped to 'F2'
-- A, S, D, F seem to have problems in natural mode
+- A, S, D, F, G, R seem to have problems in natural mode
 */
 
 static INPUT_PORTS_START(tutor)
@@ -652,8 +662,7 @@ static INPUT_PORTS_START(tutor)
 		PORT_BIT(0x21, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-		/* only one shift key located on the left, but we support both for
-        emulation to be friendlier */
+		/* only one shift key located on the left, but we support both for emulation to be friendlier */
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Mon") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RT") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
@@ -662,10 +671,10 @@ static INPUT_PORTS_START(tutor)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)			PORT_CHAR(' ')
 
 	PORT_START("LINE7")    /* col 7 */
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 		/* Unused? */
 		PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -720,7 +729,6 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tutor")
-
 MACHINE_CONFIG_END
 
 
@@ -742,7 +750,6 @@ ROM_START(pyuuta)
 ROM_END
 
 
-/*      YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY     FULLNAME */
-COMP(	1983?,	tutor,	0,			0,		tutor,		tutor,	tutor,	"Tomy",		"Tomy Tutor" , 0)
-COMP(	1982,	pyuuta,	tutor,		0,		tutor,		tutor,	pyuuta,	"Tomy",		"Tomy Pyuuta" , 0)
-
+/*   YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY     FULLNAME */
+COMP(1983?,  tutor,  0,          0,      tutor,      tutor,  tutor,  "Tomy",   "Tomy Tutor" , 0)
+COMP(1982,   pyuuta, tutor,      0,      tutor,      tutor,  pyuuta, "Tomy",   "Tomy Pyuuta" , 0)
