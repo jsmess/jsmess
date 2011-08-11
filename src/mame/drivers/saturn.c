@@ -1861,6 +1861,17 @@ static TIMER_DEVICE_CALLBACK( saturn_slave_scanline )
 		device_set_input_line_and_vector(state->m_slave, 0x2, HOLD_LINE, 0x41);
 }
 
+/* Die Hard Trilogy tests RAM address 0x25e7ffe bit 2 with Slave during FRT minit irq, in-development tool for breaking execution of it? */
+static READ32_HANDLER( saturn_null_ram_r )
+{
+	return 0xffffffff;
+}
+
+static WRITE32_HANDLER( saturn_null_ram_w )
+{
+
+}
+
 static READ32_HANDLER( saturn_cart_dram0_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
@@ -1938,12 +1949,15 @@ static MACHINE_RESET( saturn )
 
 	state->m_cart_type = input_port_read(machine,"CART_AREA") & 7;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
-	machine.device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x027fffff, FUNC(saturn_null_ram_r), FUNC(saturn_null_ram_w));
+	machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x027fffff, FUNC(saturn_null_ram_r), FUNC(saturn_null_ram_w));
 
 	if(state->m_cart_type == 5)
 	{
 		//  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
+		machine.device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
+
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
 		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
@@ -1953,6 +1967,9 @@ static MACHINE_RESET( saturn )
 	if(state->m_cart_type == 6)
 	{
 		//  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
+		machine.device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
+
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
 		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
