@@ -318,7 +318,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Systemsoft</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
-			<feature name="mapper" value="M60002-125SP" />
+			<!-- 16KB banks -->
+			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh23105d" size="131072" crc="f2544e2e" sha1="c9c272ffa69d3e0af5be42e7636b02dc2af6ea8c" offset="0" />
 			</dataarea>
@@ -332,7 +333,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher></publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="" />
-			<feature nmae="mapper" value="" />
+			<feature name="mapper" value="" />
 			<dataarea name="rom" size="">
 				<rom name="" size="" crc="" sha1="" offset="0" />
 			</dataarea>
