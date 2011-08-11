@@ -1050,12 +1050,26 @@ static void cd_exec_command(running_machine &machine)
 
 			}
 
-			popmessage("Put sector data command issued, contact MAMEdev");
+			//popmessage("Put sector data command issued, contact MAMEdev");
 			hirqreg |= (CMOK|EHST);
+			cr_standard_return(cd_stat);
 			break;
+
+		case 0x6600:    // move sector data
+			/* TODO: Sword & Sorcery */
+			{
+				//UINT8 src_filter = (cr3>>8)&0xff;
+				//UINT8 dst_filter = cr4;
+			}
+
+			hirqreg |= (CMOK|ECPY);
+			cr_standard_return(cd_stat);
+			break;
+
 
 		case 0x6700:	// get copy error
 			CDROM_LOG(("%s:CD: Get copy error\n",   machine.describe_context()))
+			printf("Get copy error\n");
 			cr1 = cd_stat;
 			cr2 = 0;
 			cr3 = 0;
@@ -2069,7 +2083,7 @@ static partitionT *cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok)
 		{
 			if ((cd_curfad < flt->fad) || (cd_curfad > (flt->fad + flt->range)))
 			{
-				logerror("curfad reject\n");
+				printf("curfad reject %08x %08x %08x %08x\n",cd_curfad,fadstoplay,flt->fad,flt->fad+flt->range);
 				match = 0;
 			}
 		}
