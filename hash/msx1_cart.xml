@@ -93,7 +93,6 @@ Most of the information in this list was taken from http://gigamix.jp/rom/rom.ph
 		</part>
 	</software>
 
-	<!-- Fandom libraries 1-3 are not working at the moment -->
 	<software name="fandom1">
 		<!-- ＭＳＸプログラムコレクション ファンダムライブラリ１ -->
 		<description>MSX-FAN Fandom Library 1</description>
