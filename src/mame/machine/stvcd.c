@@ -39,7 +39,7 @@ static cdrom_file *cdrom = (cdrom_file *)NULL;
 
 static void cd_readTOC(void);
 static void cd_readblock(UINT32 fad, UINT8 *dat);
-static void cd_playdata(void);
+static void cd_playdata(running_machine &machine);
 
 #define MAX_FILTERS	(24)
 #define MAX_BLOCKS	(200)
@@ -133,13 +133,15 @@ static UINT16 cr1, cr2, cr3, cr4;
 static UINT16 hirqmask, hirqreg;
 static UINT16 cd_stat;
 static UINT32 cd_curfad = 0;
+static UINT32 fadstoplay = 0;
 static UINT32 in_buffer = 0;	// amount of data in the buffer
 static int oddframe = 0;
-static UINT32 fadstoplay = 0;
 static int buffull, sectorstore, freeblocks;
 static int cur_track;
 static UINT8 cmd_pending;
 static UINT8 cd_speed;
+static UINT8 cdda_maxrepeat;
+static UINT8 cdda_repeat_count;
 
 // iso9660 utilities
 static void read_new_dir(running_machine &machine, UINT32 fileno);
@@ -186,7 +188,7 @@ static int firstfile;			// first non-directory file
 
 static void cr_standard_return(UINT16 cur_status)
 {
-	cr1 = cur_status | (playtype << 7) | 0x00; //options << 4 | repeat & 0xf
+	cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
 	cr2 = (cur_track == 0xff) ? 0xffff : (cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track);
 	cr3 = (0x01<<8) | (cd_curfad>>16); //index & 0xff00
 	cr4 = cd_curfad;
@@ -372,8 +374,6 @@ static void cd_exec_command(running_machine &machine)
 					break;
 			}
 
-			// and kick the CD if there's more to read
-			//cd_playdata();
 
 			xferdnum = 0;
 			hirqreg |= CMOK;
@@ -383,11 +383,12 @@ static void cd_exec_command(running_machine &machine)
 
 		case 0x1000: // Play Disc.  FAD is in lowest 7 bits of cr1 and all of cr2.
 			UINT32 start_pos,end_pos;
+			UINT8 play_mode;
 
 			CDROM_LOG(("%s:CD: Play Disc\n",   machine.describe_context()))
 			cd_stat = CD_STAT_PLAY;
 
-			//play_mode = cr3 >> 8;
+			play_mode = cr3 >> 8;
 
 			if (!(cr3 & 0x8000))	// preserve current position if bit 7 set
 			{
@@ -437,7 +438,12 @@ static void cd_exec_command(running_machine &machine)
 					if(end_pos & 0x800000)
 						fadstoplay = end_pos & 0xfffff;
 					else
-						fadstoplay = (cdrom_get_track_start(cdrom, 0xaa)) - cd_curfad;
+					{
+						if(end_pos == 0)
+							fadstoplay = (cdrom_get_track_start(cdrom, 0xaa)) - cd_curfad;
+						else
+							fadstoplay = (cdrom_get_track_start(cdrom, (end_pos & 0xff00) >> 8)) - cd_curfad;
+					}
 					printf("track mode %08x %08x\n",cd_curfad,fadstoplay);
 				}
 				else
@@ -468,12 +474,16 @@ static void cd_exec_command(running_machine &machine)
 			if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) == CD_TRACK_AUDIO)
 			{
 				cdda_pause_audio( machine.device( "cdda" ), 0 );
-				cdda_start_audio( machine.device( "cdda" ), cd_curfad, fadstoplay  );
+				//cdda_start_audio( machine.device( "cdda" ), cd_curfad, fadstoplay  );
+				//cdda_repeat_count = 0;
 			}
-			else
-			{
-				cdda_stop_audio( machine.device( "cdda" ) ); //stop any pending CD-DA
-			}
+
+			if(play_mode != 0x7f)
+				cdda_maxrepeat = play_mode & 0xf;
+
+			cdda_maxrepeat = 0;
+
+			cdda_repeat_count = 0;
 
 			break;
 
@@ -1256,7 +1266,7 @@ TIMER_DEVICE_CALLBACK( stv_sector_cb )
 
 	//popmessage("%08x %08x %d %d",cd_curfad,fadstoplay,cmd_pending,cd_speed);
 
-	cd_playdata();
+	cd_playdata(timer.machine());
 
 	if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) == CD_TRACK_AUDIO)
 		sector_timer->adjust(attotime::from_hz(75));	// 75 sectors / second = 150kBytes/second (cdda track ignores cd_speed setting)
@@ -1340,6 +1350,7 @@ void stvcd_reset(running_machine &machine)
 	}
 
 	cd_speed = 2;
+	cdda_repeat_count = 0;
 
 	sector_timer = machine.device<timer_device>("sector_timer");
 	sector_timer->adjust(attotime::from_hz(150));	// 150 sectors / second = 300kBytes/second
@@ -2221,7 +2232,7 @@ static partitionT *cd_read_filtered_sector(INT32 fad, UINT8 *p_ok)
 }
 
 // loads in data set up by a CD-block PLAY command
-static void cd_playdata(void)
+static void cd_playdata(running_machine &machine)
 {
 	if ((cd_stat & 0x0f00) == CD_STAT_PLAY)
 	{
@@ -2234,9 +2245,15 @@ static void cd_playdata(void)
 				UINT8 p_ok;
 
 				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
+				{
 					cd_read_filtered_sector(cd_curfad,&p_ok);
+					cdda_stop_audio( machine.device( "cdda" ) ); //stop any pending CD-DA
+				}
 				else
+				{
 					p_ok = 1; // TODO
+					cdda_start_audio( machine.device( "cdda" ), cd_curfad, 1  );
+				}
 
 				if(p_ok)
 				{
@@ -2247,19 +2264,29 @@ static void cd_playdata(void)
 
 					if (!fadstoplay)
 					{
-						CDROM_LOG(("cd_playdata: playback ended\n"))
-						cd_stat = CD_STAT_PAUSE;
-
-						hirqreg |= PEND;
-
-						if (playtype == 1)
+						if(cdda_repeat_count >= cdda_maxrepeat)
 						{
-							CDROM_LOG(("cd_playdata: setting EFLS\n"))
-							hirqreg |= EFLS;
+							CDROM_LOG(("cd_playdata: playback ended\n"))
+							cd_stat = CD_STAT_PAUSE;
+
+							hirqreg |= PEND;
+
+							if (playtype == 1)
+							{
+								CDROM_LOG(("cd_playdata: setting EFLS\n"))
+								hirqreg |= EFLS;
+							}
+						}
+						else
+						{
+							if(cdda_repeat_count < 0xe)
+								cdda_repeat_count++;
+
+							cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
+							fadstoplay = cdrom_get_track_start(cdrom, cur_track);
 						}
 					}
 				}
-
 			}
 		}
 	}
