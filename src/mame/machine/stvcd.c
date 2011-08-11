@@ -722,6 +722,18 @@ static void cd_exec_command(running_machine &machine)
 
 					partitions[bufnum].size = -1;
 					partitions[bufnum].numblks = 0;
+
+					/* guess for X-Men Children of the Atom, otherwise it trips a curfad reject error,
+					   sequence is 0x48->0x48->0x04(01)->0x04(00)->0x30 then 0x10 */
+					filters[bufnum].fad = 0;
+					filters[bufnum].range = 0xffffffff;
+					filters[bufnum].mode = 0;
+					filters[bufnum].chan = 0;
+					filters[bufnum].smmask = 0;
+					filters[bufnum].cimask = 0;
+					filters[bufnum].fid = 0;
+					filters[bufnum].smval = 0;
+					filters[bufnum].cival = 0;
 				}
 
 				// TODO: buffer full flag
