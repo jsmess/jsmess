@@ -610,6 +610,11 @@ static void cd_exec_command(running_machine &machine)
 			}
 			break;
 
+		case 0x3100:
+			popmessage("Get CD Device Connection, contact MAMEdev");
+			hirqreg |= CMOK;
+			break;
+
 		case 0x3200:	// Last Buffer Destination
 			cr1 = cd_stat | 0;
 			cr2 = 0;
@@ -1085,9 +1090,13 @@ static void cd_exec_command(running_machine &machine)
 
 			}
 
-			//popmessage("Put sector data command issued, contact MAMEdev");
 			hirqreg |= (CMOK|EHST);
 			cr_standard_return(cd_stat);
+			break;
+
+		case 0x6500:
+			popmessage("Copy Sector data, contact MAMEdev");
+			hirqreg |= (CMOK);
 			break;
 
 		case 0x6600:    // move sector data
