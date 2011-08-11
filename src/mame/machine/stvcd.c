@@ -511,8 +511,8 @@ static void cd_exec_command(running_machine &machine)
 
 			if(play_mode != 0x7f)
 				cdda_maxrepeat = play_mode & 0xf;
-
-			cdda_maxrepeat = 0;
+			else
+				cdda_maxrepeat = 0;
 
 			cdda_repeat_count = 0;
 
@@ -2368,8 +2368,8 @@ static void cd_playdata(running_machine &machine)
 							if(cdda_repeat_count < 0xe)
 								cdda_repeat_count++;
 
-							cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
-							fadstoplay = cdrom_get_track_start(cdrom, cur_track);
+							cd_curfad = cdrom_get_track_start(cdrom, cur_track-1) + 150;
+							fadstoplay = cdrom_get_track_start(cdrom, cur_track) - cd_curfad;
 						}
 					}
 				}
