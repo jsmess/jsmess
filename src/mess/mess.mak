@@ -650,6 +650,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_VIDEO)/nubus_cb264.o \
 	$(MESS_VIDEO)/nubus_vikbw.o \
 	$(MESS_VIDEO)/nubus_specpdq.o \
+	$(MESS_VIDEO)/nubus_m2hires.o \
 
 $(MESSOBJ)/applied.a:			\
 	$(MESS_VIDEO)/mbee.o		\
