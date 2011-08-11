@@ -271,7 +271,6 @@ WRITE32_MEMBER( nubus_m2hires_device::m2hires_w )
 			if (m_count == 3)
 			{
 //				printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], cpu_get_pc(&space.device()) );
-				palette_set_color(space.machine(), m_clutoffs, MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]));
 				m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)
