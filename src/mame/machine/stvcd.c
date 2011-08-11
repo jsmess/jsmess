@@ -47,9 +47,21 @@ static void cd_playdata(running_machine &machine);
 
 typedef struct
 {
-	UINT8 flags;		// iso9660 flags
-	UINT32 length;		// length of file
+	UINT8 record_size;
+	UINT8 xa_record_size;
 	UINT32 firstfad;		// first sector of file
+	UINT32 length;		// length of file
+	UINT8 year;
+	UINT8 month;
+	UINT8 day;
+	UINT8 hour;
+	UINT8 minute;
+	UINT8 second;
+	UINT8 gmt_offset;
+	UINT8 flags;		// iso9660 flags
+	UINT8 file_unit_size;
+	UINT8 interleave_gap_size;
+	UINT16 volume_sequencer_number;
 	UINT8 name[128];
 } direntryT;
 
@@ -1134,9 +1146,9 @@ static void cd_exec_command(running_machine &machine)
 
 		case 0x7100:	// Read directory entry
 			CDROM_LOG(("%s:CD: Read Directory Entry\n",   machine.describe_context()))
-//			UINT32 read_dir;
+			UINT32 read_dir;
 
-//			read_dir = ((cr3&0xff)<<16)|cr4;
+			read_dir = ((cr3&0xff)<<16)|cr4;
 
 			if((cr3 >> 8) < 0x24)
 				cddevice = &filters[cr3 >> 8];
@@ -1144,7 +1156,7 @@ static void cd_exec_command(running_machine &machine)
 				cddevice = (filterT *)NULL;
 
 			/* TODO:  */
-			//read_dir_current(machine,read_dir);
+			//read_new_dir(machine, read_dir - 2);
 
 			cr_standard_return(cd_stat);
 			hirqreg |= (CMOK|EFLS);
@@ -1153,15 +1165,19 @@ static void cd_exec_command(running_machine &machine)
 		case 0x7200:	// Get file system scope
 			CDROM_LOG(("CD: Get file system scope\n"))
 			hirqreg |= (CMOK|EFLS);
+			cr1 = cd_stat;
 			cr2 = numfiles;	// # of files in directory
 			cr3 = 0x0100;	// report directory held
 			cr4 = firstfile;	// first file id
+			printf("%04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
 			break;
 
 		case 0x7300:	// Get File Info
 			CDROM_LOG(("%s:CD: Get File Info\n",   machine.describe_context()))
 			cd_stat |= CD_STAT_TRANS;
 			cd_stat &= 0xff00;		// clear top byte of return value
+			playtype = 0;
+			cdda_repeat_count = 0;
 			hirqreg |= (CMOK|DRDY);
 
 			temp = (cr3&0xff)<<16;
@@ -1192,6 +1208,7 @@ static void cd_exec_command(running_machine &machine)
 				cr3 = 0;
 				cr4 = 0;
 
+				printf("%08x %08x\n",curdir[temp].firstfad,curdir[temp].length);
 				// first 4 bytes = FAD
 				finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
 				finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
@@ -1202,8 +1219,8 @@ static void cd_exec_command(running_machine &machine)
 				finfbuf[5] = (curdir[temp].length>>16)&0xff;
 				finfbuf[6] = (curdir[temp].length>>8)&0xff;
 				finfbuf[7] = (curdir[temp].length&0xff);
-				finfbuf[8] = 0x00;
-				finfbuf[9] = 0x00;
+				finfbuf[8] = curdir[temp].interleave_gap_size;
+				finfbuf[9] = curdir[temp].file_unit_size;
 				finfbuf[10] = temp;
 				finfbuf[11] = curdir[temp].flags;
 
@@ -1574,8 +1591,8 @@ static UINT16 cd_readWord(UINT32 addr)
 						finfbuf[5] = (curdir[temp].length>>16)&0xff;
 						finfbuf[6] = (curdir[temp].length>>8)&0xff;
 						finfbuf[7] = (curdir[temp].length&0xff);
-						finfbuf[8] = 0x00;
-						finfbuf[9] = 0x00;
+						finfbuf[8] = curdir[temp].interleave_gap_size;
+						finfbuf[9] = curdir[temp].file_unit_size;
 						finfbuf[10] = temp;
 						finfbuf[11] = curdir[temp].flags;
 					}
@@ -1935,14 +1952,49 @@ static void make_dir_current(running_machine &machine, UINT32 fad)
 	nextent = 0;
 	while (numentries)
 	{
+		// [0] record size
+		// [1] xa record size
+		// [2-5] lba
+		// [6-9] (lba?)
+		// [10-13] size
+		// [14-17] (size?)
+		// [18] year
+		// [19] month
+		// [20] day
+		// [21] hour
+		// [22] minute
+		// [23] second
+		// [24] gmt offset
+		// [25] flags
+		// [26] file unit size
+		// [27] interleave gap size
+		// [28-29] volume sequencer number
+		// [30-31] (volume sequencer number?)
+		// [32] name character size
+		// [33+ ...] file name
+
+		curentry->record_size = sect[nextent+0];
+		curentry->xa_record_size = sect[nextent+1];
 		curentry->firstfad = sect[nextent+2] | (sect[nextent+3]<<8) | (sect[nextent+4]<<16) | (sect[nextent+5]<<24);
 		curentry->firstfad += 150;
 		curentry->length = sect[nextent+10] | (sect[nextent+11]<<8) | (sect[nextent+12]<<16) | (sect[nextent+13]<<24);
+		curentry->year = sect[nextent+18];
+		curentry->month = sect[nextent+19];
+		curentry->day = sect[nextent+20];
+		curentry->hour = sect[nextent+21];
+		curentry->minute = sect[nextent+22];
+		curentry->second = sect[nextent+23];
+		curentry->gmt_offset = sect[nextent+24];
 		curentry->flags = sect[nextent+25];
+		curentry->file_unit_size = sect[nextent+26];
+		curentry->interleave_gap_size = sect[nextent+27];
+		curentry->volume_sequencer_number = sect[nextent+28] | (sect[nextent+29] << 8);
+
 		for (i = 0; i < sect[nextent+32]; i++)
 		{
 			curentry->name[i] = sect[nextent+33+i];
 		}
+		//printf("%08x %08x %s %d/%d/%d\n",curentry->firstfad,curentry->length,curentry->name,curentry->year,curentry->month,curentry->day);
 		curentry->name[i] = '\0';	// terminate
 
 		nextent += sect[nextent];
