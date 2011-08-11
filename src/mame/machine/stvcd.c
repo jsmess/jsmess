@@ -271,7 +271,6 @@ static void cd_exec_command(running_machine &machine)
 					break;
 
 				default:
-					/* TODO: Assault Suits Leynos 2 does spurious commands when does read file commands */
 					mame_printf_error("CD: Unknown request to Get Session Info %x\n", cr1 & 0xff);
 					cr1 = cd_stat;
 					cr2 = 0;
@@ -292,8 +291,9 @@ static void cd_exec_command(running_machine &machine)
 				// CR1 & 10 = force single-speed
 				// CR1 & 80 = no change flag (done by Assault Suit Leynos 2)
 			CDROM_LOG(("%s:CD: Initialize CD system\n", machine.describe_context()))
-			if((cr1 & 0x80) == 0x00)
+			if((cr1 & 0x81) == 0x00) //guess
 			{
+				int i;
 				cd_stat = CD_STAT_PAUSE;
 				cd_curfad = 150;
 				//cur_track = 1;
@@ -302,6 +302,25 @@ static void cd_exec_command(running_machine &machine)
 				buffull = 0;
 				hirqreg &= 0xffe5;
 				cd_speed = (cr1 & 0x10) ? 1 : 2;
+
+				/* reset filter connections */
+				/* Guess: X-Men COTA sequence is 0x48->0x48->0x04(01)->0x04(00)->0x30 then 0x10, without this game throws a FAD reject error */
+				/* X-Men vs. SF is even fussier, sequence is  0x04 (1) 0x04 (0) 0x03 (0) 0x03 (1) 0x30 */
+				for(i=0;i<MAX_FILTERS;i++)
+				{
+					filters[i].fad = 0;
+					filters[i].range = 0xffffffff;
+					filters[i].mode = 0;
+					filters[i].chan = 0;
+					filters[i].smmask = 0;
+					filters[i].cimask = 0;
+					filters[i].fid = 0;
+					filters[i].smval = 0;
+					filters[i].cival = 0;
+				}
+
+				/* reset CD device connection */
+				//cddevice = (filterT *)NULL;
 			}
 
 			hirqreg |= (CMOK|ESEL);
@@ -585,6 +604,7 @@ static void cd_exec_command(running_machine &machine)
 					}
 				}
 
+
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);
 			}
@@ -612,6 +632,11 @@ static void cd_exec_command(running_machine &machine)
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);
 			}
+			break;
+
+		case 0x4100:
+			popmessage("Get Filter Range, contact MAMEdev");
+			hirqreg |= CMOK;
 			break;
 
 		case 0x4200:	// Set Filter Subheader conditions
@@ -722,18 +747,6 @@ static void cd_exec_command(running_machine &machine)
 
 					partitions[bufnum].size = -1;
 					partitions[bufnum].numblks = 0;
-
-					/* guess for X-Men Children of the Atom, otherwise it trips a curfad reject error,
-					   sequence is 0x48->0x48->0x04(01)->0x04(00)->0x30 then 0x10 */
-					filters[bufnum].fad = 0;
-					filters[bufnum].range = 0xffffffff;
-					filters[bufnum].mode = 0;
-					filters[bufnum].chan = 0;
-					filters[bufnum].smmask = 0;
-					filters[bufnum].cimask = 0;
-					filters[bufnum].fid = 0;
-					filters[bufnum].smval = 0;
-					filters[bufnum].cival = 0;
 				}
 
 				// TODO: buffer full flag
