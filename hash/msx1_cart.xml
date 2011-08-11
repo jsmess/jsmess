@@ -101,7 +101,7 @@ Most of the information in this list was taken from http://gigamix.jp/rom/rom.ph
 		<publisher>Tecnopolis</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
-			<feature nmae="mapper" value="M60002-0125SP" />
+			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh532046" size="262144" crc="519be53e" sha1="8557dcdb4cf1e15180d17acc8e6d515bf7bf7e7c" offset="0" />
 			</dataarea>
@@ -115,7 +115,7 @@ Most of the information in this list was taken from http://gigamix.jp/rom/rom.ph
 		<publisher>Tecnopolis</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
-			<feature nmae="mapper" value="LZ93A13" />
+			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh532061" size="262144" crc="53c25b6b" sha1="7752b6624fb80d9499aaad28dd5776ec74565576" offset="0" />
 			</dataarea>
@@ -129,7 +129,7 @@ Most of the information in this list was taken from http://gigamix.jp/rom/rom.ph
 		<publisher>Tecnopolis</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
-			<feature nmae="mapper" value="LZ93A13" />
+			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh532075" size="262144" crc="790d5335" sha1="c2f4df1bd91f7dee1536774b9d7089086b9bf835" offset="0" />
 			</dataarea>
