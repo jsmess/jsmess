@@ -8,6 +8,8 @@ READ16_HANDLER( intv_stic_r )
 {
 	intv_state *state = space->machine().driver_data<intv_state>();
 	//logerror("%x = stic_r(%x)\n",0,offset);
+	if (state->m_bus_copy_mode || !state->m_stic_handshake)
+	{
 	switch (offset)
 	{
 		case STIC_MXR + STIC_MOB0:
@@ -68,6 +70,8 @@ READ16_HANDLER( intv_stic_r )
 			//logerror("unmapped read from STIC register %02X\n", offset);
 			return 0x3FFF;
 	}
+	}
+	else { return (offset); }
 }
 
 WRITE16_HANDLER( intv_stic_w )
@@ -76,6 +80,8 @@ WRITE16_HANDLER( intv_stic_w )
 	intv_sprite_type *s;
 
 	//logerror("stic_w(%x) = %x\n",offset,data);
+	if (state->m_bus_copy_mode || !state->m_stic_handshake)
+	{
 	switch (offset)
 	{
 		/* X Positions */
@@ -177,4 +183,5 @@ WRITE16_HANDLER( intv_stic_w )
 
 	if (offset < sizeof(state->m_stic_registers) / sizeof(state->m_stic_registers[0]))
 		state->m_stic_registers[offset] = data;
+	}
 }

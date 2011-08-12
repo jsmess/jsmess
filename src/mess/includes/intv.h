@@ -36,6 +36,9 @@ public:
 	UINT8 *m_videoram;
 	intv_sprite_type m_sprite[STIC_MOBS];
 	UINT8 m_sprite_buffers[STIC_MOBS][STIC_CARD_WIDTH*2][STIC_CARD_HEIGHT*4*2*2];
+	UINT16 m_backtab_buffer[STIC_BACKTAB_HEIGHT][STIC_BACKTAB_WIDTH];
+	UINT8 m_backtab_row;
+	UINT8 m_bus_copy_mode;
 	int m_color_stack_mode;
 	int m_stic_registers[STIC_REGISTERS];
 	int m_color_stack_offset;
