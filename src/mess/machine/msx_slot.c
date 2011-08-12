@@ -572,7 +572,7 @@ MSX_SLOT_RESET(ascii16)
 {
 	int i;
 
-	for (i=0; i<2; i++) state->m_banks[i] = i;
+	for (i=0; i<2; i++) state->m_banks[i] = 0;
 }
 
 MSX_SLOT_MAP(ascii16)
