@@ -249,7 +249,7 @@ static void render_color_stack_mode(running_machine &machine, bitmap_t *bitmap)
 			 w < STIC_BACKTAB_WIDTH;
 			 w++, nextx += STIC_CARD_WIDTH * STIC_X_SCALE)
 		{
-			nextCard = state->m_ram16[w + h * STIC_BACKTAB_WIDTH];
+			nextCard = state->m_backtab_buffer[h][w];
 
 			// colored squares mode
 			if ((nextCard & (STIC_CSTM_FG3|STIC_CSTM_SEL)) == STIC_CSTM_FG3)
@@ -320,7 +320,7 @@ static void render_fg_bg_mode(running_machine &machine, bitmap_t *bitmap)
 			 w < STIC_BACKTAB_WIDTH;
 			 w++, nextx += STIC_CARD_WIDTH * STIC_X_SCALE)
 		{
-			nextCard = state->m_ram16[w + h * STIC_BACKTAB_WIDTH];
+			nextCard = state->m_backtab_buffer[h][w];
 			fgcolor = (nextCard & STIC_FBM_FG) | FOREGROUND_BIT;
 			bgcolor = ((nextCard & STIC_FBM_BG2) >> 11) |
 					((nextCard & STIC_FBM_BG310) >> 9);
