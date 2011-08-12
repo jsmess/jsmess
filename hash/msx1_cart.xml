@@ -135,6 +135,34 @@ Most of the information in this list was taken from http://gigamix.jp/rom/rom.ph
 		</part>
 	</software>
 
+	<software name="karuizaw">
+		<!-- 軽井沢誘拐案内 -->
+		<description>Karuizawa</description>
+		<year>1985</year>
+		<publisher>Enix</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh231024" size="131072" crc="6a30c707" sha1="1c462c3629d43297a006ba9055b39a2dccba9f6c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galforce">
+		<!-- ガルフォース カオスの攻防 -->
+		<description>Gall Force - Defense of Chaos</description>
+		<year>1986</year>
+		<publisher>Sony</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh31434" size="131072" crc="99ef860e" sha1="e8ab46785e75e19dac497c4a82ac2f5b37ac0580" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>
