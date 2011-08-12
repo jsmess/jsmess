@@ -3,7 +3,7 @@
 <softwarelist name="msx2_cart" description="MSX2 Cartridges">
 
 <!--
-Most of the information in this list was taken from: http://gigamix.jp/rom/rom.php
+Information in this list was taken from sources like: the GOODTools, http://gigamix.jp/rom/rom.php
 
 Mappers:
 M60002-0125SP (48 pin) - 8KB banks
@@ -27,7 +27,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 <!--
 	<software name="">
-		- 蒼き狼と白き牝鹿 元朝秘史 -
+		<!- 蒼き狼と白き牝鹿 元朝秘史 ->
 		<description>Blue Wolf and White Doe anecdote Dynasty</description>
 		<year>19??</year>
 		<publisher>Sakai Mitsuru</publisher>
@@ -295,22 +295,22 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-<!--
-	<software name="">
-		<!- お絵描きソフト 画楽多 ->
-		<description>multi screen easy drawing software??</description>
-		<year></year>
-		<publisher>electronic wati?</publisher>
+	<software name="garakuta">
+		<!-- お絵描きソフト 画楽多 -->
+		<description>Garakuta</description>
+		<year>1988</year>
+		<publisher>Wachi Software</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
-			<!- 16KB banks ->
+			<!-- 16KB banks -->
 			<feature name="mapper" value="LZ93A13-16" />
 			<dataarea name="rom" size="131072">
-				<rom name="lh31434" size="131072" crc="" sha1="" offset="0" />
+				<!-- Is likely to be a single 1Mbit ROM -->
+				<rom name="lh31434" size="65536" crc="33c37313" sha1="f4da2be2ee712ba2e7cccf56fcd15483fe0023ed" offset="0" />
+				<rom size="65536" offset="0x10000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
--->
 
 	<software name="ogre">
 		<description>Ogre</description>
@@ -322,6 +322,94 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh23105d" size="131072" crc="f2544e2e" sha1="c9c272ffa69d3e0af5be42e7636b02dc2af6ea8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grlyblok">
+		<!-- ガーリーブロック -->
+		<description>Girly Block</description>
+		<year>1988</year>
+		<publisher>Telenet</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M016S" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh230965" size="131072" crc="28094960" sha1="bb99fe7702733ab0f9e8856e91f5ddcb55d30b5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Game doesn't boot on regular msx2 driver -->
+	<software name="kikikaik">
+		<!-- 奇々怪界 -->
+		<description>Kikikaikai</description>
+		<year>1986</year>
+		<publisher>Sony</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="IS-02-030-0" />
+			<feature name="mapper" value="BS6202" />
+			<dataarea name="rom" size="131072">
+				<!-- RP231024D 0856 -->
+				<rom name="rp231024d" size="131072" crc="5c859406" sha1="6dd28797f9d1fe7cc041077ebe77d08f2ccc0937" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kisei">
+		<!-- 棋聖 -->
+		<description>Kisei</description>
+		<year>1987</year>
+		<publisher>Sony</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-621-8K" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<feature name="sram" value="HBS-G057C" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh5116-15" size="131072" crc="167a53da" sha1="2e2543ac99193f76b4f35463142294c016f0cf3d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jikochu2">
+		<!-- ぎゅわんぶらあ自己中心派２ 自称！強豪雀士編 -->
+		<description>Gambler Jikochuushinha 2</description>
+		<year>1988</year>
+		<publisher>Gamearts</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="2M-8KB" />
+			<feature name="mapper" value="NEOS MR6401" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh53210b" size="262144" crc="eb67d4d6" sha1="1f3f586255dd49b0f912bf41e07e88fe3eb3fb61" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quinpl">
+		<!-- クインプル -->
+		<description>Quinpl</description>
+		<year>1988</year>
+		<publisher>Bit2</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-2M008-E2M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="hn27512p-25" size="131072" crc="8a39b738" sha1="58ad36c600ba8da36796440051df81d54036b0c4" offset="0" />
+				<rom name="m27512zb" size="131072" crc="3c242580" sha1="3d9d0356242a6b5395f4fa9e8473184797d55fe6" offset="0x20000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crimson">
+		<!-- クリムゾン -->
+		<description>Crimson</description>
+		<year>1987</year>
+		<publisher>Xtal Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532079" size="262144" crc="8528a795" sha1="a21adba681956ec35816af673a9d4f6c7743253a" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -163,6 +163,34 @@ Most of the information in this list was taken from http://gigamix.jp/rom/rom.ph
 		</part>
 	</software>
 
+	<software name="jikochuu">
+		<!-- ぎゅわんぶらあ自己中心派 -->
+		<description>Gambler Jikochuushinha</description>
+		<year>1988</year>
+		<publisher>Game Arts</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="2M-8KB" />
+			<feature name="mapper" value="NEOS MR6401" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh53210a" size="262144" crc="91955bcd" sha1="89073c052b0fe29b6de077c8bdf5373474081edf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kngknght">
+		<!-- キングスナイト -->
+		<description>King Knight</description>
+		<year>1986</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="643103" size="131072" crc="a0481321" sha1="122f659250a0ae10ce0be0dde626dd3e384affa7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>

@@ -124,6 +124,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 			static const struct { const char *mapper_name; const char *sram_name; int mapper_type; } mapper_types[] =
 			{
 				{ "M60002-0125SP",		NULL,				SLOT_ASCII8 },
+				{ "M60002-0125SP",		"HBS-G057C",		SLOT_ASCII8_SRAM },
 				{ "LZ93A13",			NULL,				SLOT_ASCII8 },
 				{ "LZ93A13",			"CXK5864BSP-10L",	SLOT_ASCII8_SRAM },
 				{ "LZ93A13",			"CXK5864PN-12L",	SLOT_ASCII8_SRAM },
@@ -134,6 +135,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 				{ "IREM TAM-S1",		NULL,				SLOT_RTYPE },
 				{ "MR6401",				NULL,				SLOT_ASCII16 },
 				{ "NEOS MR6401",		NULL,				SLOT_ASCII8 },
+				{ "BS6202",				NULL,				SLOT_ASCII8 },
 			};
 
 			for ( int i = 0; i < ARRAY_LENGTH(mapper_types) && type < 0; i++ )
@@ -142,6 +144,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 				{
 					if ( sram == NULL && mapper_types[i].sram_name == NULL )
 						type = mapper_types[i].mapper_type;
+					
 
 					if ( sram != NULL && mapper_types[i].sram_name != NULL && !mame_stricmp( sram, mapper_types[i].sram_name ) )
 						type = mapper_types[i].mapper_type;
