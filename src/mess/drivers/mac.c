@@ -58,6 +58,7 @@
 #include "video/nubus_vikbw.h"
 #include "video/nubus_specpdq.h"
 #include "video/nubus_m2hires.h"
+#include "video/nubus_spec8.h"
 #include "includes/mac.h"
 
 #define C7M	(7833600)
@@ -808,6 +809,7 @@ static SLOT_INTERFACE_START(mac_nubus_cards)
 	SLOT_INTERFACE("vikbw", NUBUS_VIKBW)	/* Moniterm Viking board */
 	SLOT_INTERFACE("specpdq", NUBUS_SPECPDQ)	/* SuperMac Spectrum PDQ */
 	SLOT_INTERFACE("m2hires", NUBUS_M2HIRES)	/* Apple Macintosh II Hi-Resolution Card */
+	SLOT_INTERFACE("spec8s3", NUBUS_SPEC8S3)	/* SuperMac Spectrum/8 Series III */
 SLOT_INTERFACE_END
 
 /***************************************************************************
