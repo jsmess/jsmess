@@ -153,7 +153,7 @@ static SCREEN_UPDATE( mac_48gc )
 
 	if (!card->m_vbl_disable)
 	{
-		card->m_nubus->set_irq_line(card->m_slot, ASSERT_LINE);
+		card->raise_slot_irq();
 	}
 
 	vram8 += 0xa00;
@@ -326,7 +326,7 @@ WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 		case 0x148/4:	// write 1 here to clear interrupt
 			if (data == 1)
 			{
-				m_nubus->set_irq_line(m_slot, CLEAR_LINE);
+				lower_slot_irq();
 			}
 			break;
 

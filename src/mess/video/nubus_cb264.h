@@ -39,7 +39,7 @@ protected:
 public:
         UINT8 *m_vram;
         UINT32 m_cb264_mode, m_cb264_vbl_disable, m_cb264_toggle;
-        UINT32 m_cb264_palette[256], m_cb264_colors[3], m_cb264_count, m_cb264_clutoffs;
+        UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
 };
 
 

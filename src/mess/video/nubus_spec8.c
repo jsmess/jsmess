@@ -134,7 +134,7 @@ void nubus_spec8s3_device::device_timer(emu_timer &timer, device_timer_id tid, i
 {
 	if (!m_vbl_disable)
 	{
-		m_nubus->set_irq_line(m_slot, ASSERT_LINE);
+		raise_slot_irq();
 		m_vbl_pending = true;
 	}
 
@@ -172,14 +172,14 @@ static SCREEN_UPDATE( spec8s3 )
 				{
 					pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[((pixels>>7)&0x1)];
-					*scanline++ = card->m_palette[((pixels>>6)&0x1)];
-					*scanline++ = card->m_palette[((pixels>>5)&0x1)];
-					*scanline++ = card->m_palette[((pixels>>4)&0x1)];
-					*scanline++ = card->m_palette[((pixels>>3)&0x1)];
-					*scanline++ = card->m_palette[((pixels>>2)&0x1)];
-					*scanline++ = card->m_palette[((pixels>>1)&0x1)];
-					*scanline++ = card->m_palette[(pixels&1)];
+					*scanline++ = card->m_palette[pixels&0x80];
+					*scanline++ = card->m_palette[(pixels<<1)&0x80];
+					*scanline++ = card->m_palette[(pixels<<2)&0x80];
+					*scanline++ = card->m_palette[(pixels<<3)&0x80];
+					*scanline++ = card->m_palette[(pixels<<4)&0x80];
+					*scanline++ = card->m_palette[(pixels<<5)&0x80];
+					*scanline++ = card->m_palette[(pixels<<6)&0x80];
+					*scanline++ = card->m_palette[(pixels<<7)&0x80];
 				}
 			}
 			break;
@@ -192,10 +192,10 @@ static SCREEN_UPDATE( spec8s3 )
 				{
 					pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[((pixels>>6)&3)];
-					*scanline++ = card->m_palette[((pixels>>4)&3)];
-					*scanline++ = card->m_palette[((pixels>>2)&3)];
-					*scanline++ = card->m_palette[(pixels&3)];
+					*scanline++ = card->m_palette[pixels&0xc0];
+					*scanline++ = card->m_palette[(pixels<<2)&0xc0];
+					*scanline++ = card->m_palette[(pixels<<4)&0xc0];
+					*scanline++ = card->m_palette[(pixels<<6)&0xc0];
 				}
 			}
 			break;
@@ -209,8 +209,8 @@ static SCREEN_UPDATE( spec8s3 )
 				{
 					pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_palette[((pixels&0xf0)>>4)];
-					*scanline++ = card->m_palette[(pixels&0xf)];
+					*scanline++ = card->m_palette[pixels&0xf0];
+					*scanline++ = card->m_palette[(pixels<<4)&0xf0];
 				}
 			}
 			break;
@@ -238,16 +238,13 @@ static SCREEN_UPDATE( spec8s3 )
 
 WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
 {
-	static const int scramble_4[4] = { 0, 2, 1, 3 };
-	static const int scramble_16[16] = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15 };
-
 	switch (offset)
 	{
 		case 0x385c:	// IRQ enable
 			if (data & 0x10)
 			{
 				m_vbl_disable = 1;
-				m_nubus->set_irq_line(m_slot, CLEAR_LINE);
+				lower_slot_irq();
 				m_vbl_pending = false;
 			}
 			else
@@ -272,20 +269,8 @@ WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
 
 			if (m_count == 3)
 			{
-				int actual_color = m_clutoffs;
+				int actual_color = BITSWAP8(m_clutoffs, 0, 1, 2, 3, 4, 5, 6, 7); 
 
-				if ((m_mode == 1) && (actual_color < 4))
-				{
-					actual_color = scramble_4[actual_color];
-				}
-				else if ((m_mode == 2) && (actual_color < 16))
-				{
-					actual_color = scramble_16[actual_color];
-				}
-				else if (m_mode == 3)
-				{
-					actual_color = BITSWAP8(m_clutoffs, 0, 1, 2, 3, 4, 5, 6, 7);
-				}
 //				printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", actual_color, m_colors[0], m_colors[1], m_colors[2], cpu_get_pc(&space.device()) );
 				palette_set_color(space.machine(), actual_color, MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]));
 				m_palette[actual_color] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);

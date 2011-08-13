@@ -116,12 +116,12 @@ void nubus_cb264_device::device_start()
 void nubus_cb264_device::device_reset()
 {
 	m_cb264_toggle = 0;
-	m_cb264_count = 0;
-	m_cb264_clutoffs = 0;
+	m_count = 0;
+	m_clutoffs = 0;
 	m_cb264_vbl_disable = 1;
 	m_cb264_mode = 0;
 	memset(m_vram, 0, VRAM_SIZE);
-	memset(m_cb264_palette, 0, sizeof(m_cb264_palette));
+	memset(m_palette, 0, sizeof(m_palette));
 }
 
 /***************************************************************************
@@ -139,7 +139,7 @@ static SCREEN_UPDATE( cb264 )
 
 	if (!card->m_cb264_vbl_disable)
 	{
-		card->m_nubus->set_irq_line(card->m_slot, ASSERT_LINE);
+		card->raise_slot_irq();
 	}
 
 	switch (card->m_cb264_mode)
@@ -152,14 +152,14 @@ static SCREEN_UPDATE( cb264 )
 				{
 					pixels = card->m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_cb264_palette[pixels&0x80];
-					*scanline++ = card->m_cb264_palette[(pixels<<1)&0x80];
-					*scanline++ = card->m_cb264_palette[(pixels<<2)&0x80];
-					*scanline++ = card->m_cb264_palette[(pixels<<3)&0x80];
-					*scanline++ = card->m_cb264_palette[(pixels<<4)&0x80];
-					*scanline++ = card->m_cb264_palette[(pixels<<5)&0x80];
-					*scanline++ = card->m_cb264_palette[(pixels<<6)&0x80];
-					*scanline++ = card->m_cb264_palette[(pixels<<7)&0x80];
+					*scanline++ = card->m_palette[pixels&0x80];
+					*scanline++ = card->m_palette[(pixels<<1)&0x80];
+					*scanline++ = card->m_palette[(pixels<<2)&0x80];
+					*scanline++ = card->m_palette[(pixels<<3)&0x80];
+					*scanline++ = card->m_palette[(pixels<<4)&0x80];
+					*scanline++ = card->m_palette[(pixels<<5)&0x80];
+					*scanline++ = card->m_palette[(pixels<<6)&0x80];
+					*scanline++ = card->m_palette[(pixels<<7)&0x80];
 				}
 			}
 			break;
@@ -172,10 +172,10 @@ static SCREEN_UPDATE( cb264 )
 				{
 					pixels = card->m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_cb264_palette[pixels&0xc0];
-					*scanline++ = card->m_cb264_palette[(pixels<<2)&0xc0];
-					*scanline++ = card->m_cb264_palette[(pixels<<4)&0xc0];
-					*scanline++ = card->m_cb264_palette[(pixels<<6)&0xc0];
+					*scanline++ = card->m_palette[pixels&0xc0];
+					*scanline++ = card->m_palette[(pixels<<2)&0xc0];
+					*scanline++ = card->m_palette[(pixels<<4)&0xc0];
+					*scanline++ = card->m_palette[(pixels<<6)&0xc0];
 				}
 			}
 			break;
@@ -189,8 +189,8 @@ static SCREEN_UPDATE( cb264 )
 				{
 					pixels = card->m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = card->m_cb264_palette[pixels&0xf0];
-					*scanline++ = card->m_cb264_palette[(pixels<<4)&0xf0];
+					*scanline++ = card->m_palette[pixels&0xf0];
+					*scanline++ = card->m_palette[(pixels<<4)&0xf0];
 				}
 			}
 			break;
@@ -203,7 +203,7 @@ static SCREEN_UPDATE( cb264 )
 				for (x = 0; x < 640; x++)
 				{
 					pixels = card->m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
-					*scanline++ = card->m_cb264_palette[pixels];
+					*scanline++ = card->m_palette[pixels];
 				}
 			}
 			break;
@@ -243,7 +243,7 @@ WRITE32_MEMBER( nubus_cb264_device::cb264_w )
 			break;
 
 		case 0x14/4:	// VBL ack
-			m_nubus->set_irq_line(m_slot, CLEAR_LINE);
+			lower_slot_irq();
 			break;
 
 		case 0x3c/4:	// VBL disable
@@ -281,18 +281,18 @@ WRITE32_MEMBER( nubus_cb264_device::cb264_ramdac_w )
 	switch (offset)
 	{
 		case 0:
-			m_cb264_clutoffs = data>>24;
-			m_cb264_count = 0;
+			m_clutoffs = data>>24;
+			m_count = 0;
 			break;
 
 		case 1:
-			m_cb264_colors[m_cb264_count++] = data>>24;
+			m_colors[m_count++] = data>>24;
 
-			if (m_cb264_count == 3)
+			if (m_count == 3)
 			{
-				m_cb264_palette[m_cb264_clutoffs] = MAKE_RGB(m_cb264_colors[0], m_cb264_colors[1], m_cb264_colors[2]);
-				m_cb264_clutoffs++;
-				m_cb264_count = 0;
+				m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
+				m_clutoffs++;
+				m_count = 0;
 			}
 			break;
 
