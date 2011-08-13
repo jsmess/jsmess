@@ -484,6 +484,10 @@ static PALETTE_INIT( samcoupe )
 		UINT8 r = BIT(i, 1) * 2 + BIT(i, 5) * 4 + BIT(i, 3);
 		UINT8 g = BIT(i, 2) * 2 + BIT(i, 6) * 4 + BIT(i, 3);
 
+		r <<= 5;
+		g <<= 5;
+		b <<= 5;
+
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 
