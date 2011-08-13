@@ -121,14 +121,18 @@ DEVICE_IMAGE_LOAD (msx_cart)
 
 		if ( mapper != NULL )
 		{
+			/* TODO: Split out the SRAM recognition code and 8KB/16KB bank configuration */
 			static const struct { const char *mapper_name; const char *sram_name; int mapper_type; } mapper_types[] =
 			{
 				{ "M60002-0125SP",		NULL,				SLOT_ASCII8 },
 				{ "M60002-0125SP",		"HBS-G057C",		SLOT_ASCII8_SRAM },
+				{ "M60002-0125SP",		"SRAM",				SLOT_ASCII8_SRAM },
 				{ "LZ93A13",			NULL,				SLOT_ASCII8 },
 				{ "LZ93A13",			"CXK5864BSP-10L",	SLOT_ASCII8_SRAM },
 				{ "LZ93A13",			"CXK5864PN-12L",	SLOT_ASCII8_SRAM },
 				{ "LZ93A13",			"CXK5864PN-15L",	SLOT_ASCII8_SRAM },
+				{ "LZ93A13",			"CXK58257SP-12L",	SLOT_ASCII8_SRAM },
+				{ "LZ93A13",			"LH5164L-10",		SLOT_ASCII8_SRAM },
 				{ "LZ93A13-16",			NULL,				SLOT_ASCII16 },
 				{ "LZ93A13-16",			"CXK5864PN-12L",	SLOT_ASCII16_SRAM },
 				{ "M60002-0125SP-16",	NULL,				SLOT_ASCII16 },

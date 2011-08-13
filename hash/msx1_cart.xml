@@ -191,6 +191,96 @@ Most of the information in this list was taken from http://gigamix.jp/rom/rom.ph
 		</part>
 	</software>
 
+	<software name="xanadu">
+		<!-- ザナドゥ -->
+		<description>Xanadu</description>
+		<year>1987</year>
+		<publisher>Falcom</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-621 KAGA" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<feature name="sram" value="SRAM" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532051" size="262144" crc="d640deaf" sha1="6c1814c70d69a50ec60e39ef281f0b8cd7bf8598" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blackon2">
+		<!-- ザ・ブラックオニキスII -->
+		<description>Black Onyx 2, The</description>
+		<year>1986</year>
+		<publisher>Ascii</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh231013" size="131072" crc="67bf8337" sha1="2588b9ade775b93f03fd4b17fd3f78ba70b556d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sangokus">
+		<!-- 三國志 -->
+		<description>Sangokushi</description>
+		<year>1986</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA6228" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532033" size="262144" crc="10621440" sha1="14ff6fe464362c6b7dbb47b2ecda3a8c5f05ef79" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sangokusa" cloneof="sangokus">
+		<!-- 三國志 -->
+		<description>Sangokushi (alt)</description>
+		<year>1986</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-2M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="262144">
+				<!-- Rom labels are likely to be wrong -->
+				<rom name="cxk381000" size="131072" crc="6441bb28" sha1="481f5ceafc56085babaa021b52b4aab182a80e3d" offset="0" />
+				<rom name="cxk38100" size="131072" crc="851f71fb" sha1="004bca21757d55951f1a1211128c69982f7a91b8" offset="0x20000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jagur5">
+		<!-- ジャガー５ -->
+		<description>Jagur 5</description>
+		<year>1987</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="rp231024d" size="131072" crc="d6465702" sha1="6fefbe448674b6ea846d0c6b9c8a0d57a11aa410" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="shougun">
+		<!- 将軍 ->
+		<description>Shougun</description>
+		<year></year>
+		<publisher>Dexter Nippon</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-621-64K" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<feature name="sram" value="SRAM" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh23100y" size="131072" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
 <!--
 	<software name="">
 		<description></description>
