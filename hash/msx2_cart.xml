@@ -86,9 +86,8 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-<!--
 	<software name="ashguin3a" cloneof="ashguin3">
-		- アシュギーネ 復讐の炎 -
+		<!-- アシュギーネ 復讐の炎 -->
 		<description>Ashguine: Densetsu no Seisenshi (Alt)</description>
 		<year>1987</year>
 		<publisher>Panasoft / Micro Cabin</publisher>
@@ -96,12 +95,11 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="262144">
-				<rom name="lh532064.0" size="131072" crc="" sha1="" offset="" />
-				<rom name="lh532064.1" size="131072" crc="" sha1="" offset="" />
+				<rom name="lh532064.0" size="131072" crc="4b3fcd15" sha1="edc60b3cea0d07a642ee8a6af9f885253775602f" offset="0" />
+				<rom name="lh532064.1" size="131072" crc="2e2c013e" sha1="29c50e5ea62613a3a936573ceeeb205d8e19f5d9" offset="0x20000" />
 			</dataarea>
 		</part>
 	</software>
--->
 
 	<software name="arkanoi2">
 		<!-- アルカノイドII -->
@@ -340,7 +338,7 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- Game doesn't boot on regular msx2 driver -->
+	<!-- Game doesn't boot on regular msx2 driver. Reported to work on hbf700p driver. -->
 	<software name="kikikaik">
 		<!-- 奇々怪界 -->
 		<description>Kikikaikai</description>
@@ -410,6 +408,100 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="262144">
 				<rom name="lh532079" size="262144" crc="8528a795" sha1="a21adba681956ec35816af673a9d4f6c7743253a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cockpit">
+		<!-- ザ・コックピット -->
+		<description>Cockpit, The</description>
+		<year>1987</year>
+		<publisher>Nidecom</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="1M-16KB" />
+			<!-- NEOS MR6401 -->
+			<feature name="mapper" value="MR6401" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh2310bd" size="131072" crc="5f354e65" sha1="e36e16acfdfa76fa72b218da2bebc668db39d21e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- doesn't seem to boot in msx2 driver -->
+	<software name="murdercl" supported="no">
+		<!-- 殺人倶楽部 -->
+		<description>final Mystery Murder Club - Satsujin Club</description>
+		<year>1988</year>
+		<publisher>Micro Cabin</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh534060" size="524288" crc="fe797d88" sha1="c1923ab5c5dcaf67af3e23fd1ac42e2d4c61aca7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zanacex">
+		<!-- ザナック EX -->
+		<description>Zanac EX</description>
+		<year>1986</year>
+		<publisher>Pony</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="r58y5093" size="131072" crc="d153b2f2" sha1="23e702084e3031158a50a0560746767bbc1b7bee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sangoku2">
+		<!-- 三国志II -->
+		<description>Sangokushi 2</description>
+		<year>1991</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-8M308-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK58257SP-12L" />
+			<dataarea name="rom" size="1048576">
+				<rom name="lh538056" size="1048576" crc="c89b93b5" sha1="25ffc7e8ca90274566c31e10b5998cca6522673a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="jrmate">
+		<!- ジュニアメイト ->
+		<description>Jr. Mate</description>
+		<year></year>
+		<publisher>Panasoft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="JCI-N1S" />
+			<feature name="mapper" value="M60002-0115FP" />
+			<feature name="sram" value="D4464C-20L" />
+			<dataarea name="rom" size="">
+				<rom name="jr_mate_1_v1.0" size="131072" crc="" sha1="" offset="0" />
+				<rom name="jr_mate_2_v1.0" size="131072" crc="" sha1="" offset="0x20000" />
+				<!- Kanji rom ->
+				<rom name="tc531000p-6616" size="131072" crc="" sha1="" offset="0x40000" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+	<software name="shiryous">
+		<!-- 死霊戦線 -->
+		<description>Shiryou Sensen - War of the Dead</description>
+		<year>1987</year>
+		<publisher>Victor</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-2M208-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="LH5164L-10" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532053" size="262144" crc="39e1c37a" sha1="3194153a9c93aa24b37804a764f112bdef091bf8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
