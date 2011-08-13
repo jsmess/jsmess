@@ -91,6 +91,8 @@ public:
 	static void static_set_cputag(device_t &device, const char *tag);
 
 	void add_nubus_card(device_nubus_card_interface *card);
+    void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
+    void install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
     void install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler);
 	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
     void set_irq_line(int slot, int state);

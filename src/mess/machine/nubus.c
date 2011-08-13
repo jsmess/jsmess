@@ -139,6 +139,42 @@ void nubus_device::add_nubus_card(device_nubus_card_interface *card)
 	m_device_list.append(*card);
 }
 
+void nubus_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
+{
+	m_maincpu = machine().device(m_cputag);
+	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	switch(buswidth)
+	{
+		case 32:
+			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
+			break;
+		case 64:
+			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, U64(0xffffffffffffffff));
+			break;
+		default:
+			fatalerror("NUBUS: Bus width %d not supported", buswidth);
+			break;
+	}
+}
+
+void nubus_device::install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler)
+{
+	m_maincpu = machine().device(m_cputag);
+	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	switch(buswidth)
+	{
+		case 32:
+			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
+			break;
+		case 64:
+			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, U64(0xffffffffffffffff));
+			break;
+		default:
+			fatalerror("NUBUS: Bus width %d not supported", buswidth);
+			break;
+	}
+}
+
 void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler)
 {
 	m_maincpu = machine().device(m_cputag);
@@ -339,6 +375,17 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			romlen *= 2;
 			break;
 
+		case 0xa5:	// lanes 0, 2
+			newrom = (UINT8 *)malloc(romlen*2);
+			memset(newrom, 0, romlen*2);
+			for (int i = 0; i < romlen/2; i++)
+			{
+				newrom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
+				newrom[BYTE4_XOR_BE((i*4)+2)] = rom[(i*2)+1];
+			}
+			romlen *= 2;
+			break;
+
 		case 0x3c:	// lanes 2,3
 			newrom = (UINT8 *)malloc(romlen*2);
 			memset(newrom, 0, romlen*2);
@@ -370,7 +417,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 	strcpy(bankname, "rom_");
 	strcat(bankname, m_nubus_slottag);
 	addr -= romlen;
-//	printf("Installing ROM at %x\n", addr);
+//	printf("Installing ROM at %x, length %x\n", addr, romlen);
 	m_nubus->install_bank(addr, addr+romlen-1, 0, 0, bankname, newrom);
 }
 
