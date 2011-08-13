@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  SuperMac SpecPDQ video card
+  SuperMac Spectrum PDQ video card
  
   Accelerated only in 256 color mode.  Accleration is not yet emulated
   properly (pattern fill works but has glitches).  Use in B&W or 16 colors
@@ -144,7 +144,7 @@ void nubus_specpdq_device::device_timer(emu_timer &timer, device_timer_id tid, i
 {
 	if (!m_vbl_disable)
 	{
-		m_nubus->set_irq_line(m_slot, ASSERT_LINE);
+		raise_slot_irq();
 	}
 
 	m_timer->adjust(m_screen->time_until_pos(843, 0), 0);
@@ -266,7 +266,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			else
 			{
 				m_vbl_disable = 0;
-				m_nubus->set_irq_line(m_slot, CLEAR_LINE);
+				lower_slot_irq();
 			}
 			break;
 

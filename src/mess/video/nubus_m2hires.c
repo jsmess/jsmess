@@ -131,7 +131,7 @@ void nubus_m2hires_device::device_timer(emu_timer &timer, device_timer_id tid, i
 {
 	if (!m_vbl_disable)
 	{
-		m_nubus->set_irq_line(m_slot, ASSERT_LINE);
+		raise_slot_irq();
 	}
 
 	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
@@ -283,7 +283,7 @@ WRITE32_MEMBER( nubus_m2hires_device::m2hires_w )
 
 		case 0x8000:	// enable and ack VBL
 			m_vbl_disable = 0;
-			m_nubus->set_irq_line(m_slot, CLEAR_LINE);
+			lower_slot_irq();
 			break;
 
 		case 0x8001:	// disable VBL

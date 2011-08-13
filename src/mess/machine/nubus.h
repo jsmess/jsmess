@@ -141,11 +141,15 @@ public:
 
 	void set_nubus_device();
 
+    // helper functions for card devices
     void install_declaration_rom(device_t *dev, const char *romregion);
     void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
 
     UINT32 get_slotspace() { return 0xf0000000 | (m_slot<<24); }
     UINT32 get_super_slotspace() { return m_slot<<28; }
+
+    void raise_slot_irq() { m_nubus->set_irq_line(m_slot, ASSERT_LINE); }
+    void lower_slot_irq() { m_nubus->set_irq_line(m_slot, CLEAR_LINE); }
 
     // inline configuration
     static void static_set_nubus_tag(device_t &device, const char *tag, const char *slottag);

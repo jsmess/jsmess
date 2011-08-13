@@ -134,7 +134,7 @@ static SCREEN_UPDATE( vikbw )
 
 	if (!card->m_vbl_disable)
 	{
-		card->m_nubus->set_irq_line(card->m_slot, ASSERT_LINE);
+		card->raise_slot_irq();
 	}
 
 	for (y = 0; y < 768; y++)
@@ -160,7 +160,7 @@ static SCREEN_UPDATE( vikbw )
 
 WRITE32_MEMBER( nubus_vikbw_device::viking_ack_w )
 {
-	m_nubus->set_irq_line(m_slot, CLEAR_LINE);
+	lower_slot_irq();
 }
 
 READ32_MEMBER( nubus_vikbw_device::viking_ack_r )
