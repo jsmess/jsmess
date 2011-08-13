@@ -294,6 +294,7 @@ static TIMER_CALLBACK( stv_smpc_intback )
 	    0xf1 peripheral is connected
 	[1] Peripheral ID (note: lowest four bits determines the size of the input packet)
 		0x02 digital pad
+		0x25 (tested by Game Basic?)
 		0x34 keyboard
 */
 
@@ -317,16 +318,19 @@ static void smpc_keyboard(running_machine &machine, UINT8 pad_num, UINT8 offset)
 
 	game_key = 0xffff;
 
-	// right
-	// left
-	// down
-	// up
-	// start
-	game_key ^= ((input_port_read(machine, "KEYF") & 0x80) << 4); // bit 3 ESC -> START
-	// Z / A trigger
-	// ...
-
-	popmessage("%04x",game_key);
+	game_key ^= ((input_port_read(machine, "KEYS_1") & 0x80) << 8); // right
+	game_key ^= ((input_port_read(machine, "KEYS_1") & 0x40) << 8); // left
+	game_key ^= ((input_port_read(machine, "KEYS_1") & 0x20) << 8); // down
+	game_key ^= ((input_port_read(machine, "KEYS_1") & 0x10) << 8); // up
+	game_key ^= ((input_port_read(machine, "KEYF") & 0x80) << 4); // ESC -> START
+	game_key ^= ((input_port_read(machine, "KEY3") & 0x04) << 8); // Z / A trigger
+	game_key ^= ((input_port_read(machine, "KEY4") & 0x02) << 8); // C / C trigger
+	game_key ^= ((input_port_read(machine, "KEY6") & 0x04) << 6); // X / B trigger
+	game_key ^= ((input_port_read(machine, "KEY2") & 0x20) << 2); // Q / R trigger
+	game_key ^= ((input_port_read(machine, "KEY3") & 0x10) << 2); // A / X trigger
+	game_key ^= ((input_port_read(machine, "KEY3") & 0x08) << 2); // S / Y trigger
+	game_key ^= ((input_port_read(machine, "KEY4") & 0x08) << 1); // D / Z trigger
+	game_key ^= ((input_port_read(machine, "KEY4") & 0x10) >> 1); // E / L trigger
 
 	state->m_smpc.OREG[0+pad_num*offset] = 0xf1;
 	state->m_smpc.OREG[1+pad_num*offset] = 0x34;
