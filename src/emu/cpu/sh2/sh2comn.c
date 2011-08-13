@@ -693,7 +693,7 @@ READ32_HANDLER( sh2_internal_r )
 #ifdef USE_SH2DRC
 	offset &= 0x7f;
 #endif
-	logerror("sh2_internal_r:  Read %08x (%x) @ %08x\n", 0xfffffe00+offset*4, offset, mem_mask);
+//	logerror("sh2_internal_r:  Read %08x (%x) @ %08x\n", 0xfffffe00+offset*4, offset, mem_mask);
 	switch( offset )
 	{
 	case 0x04: // TIER, FTCSR, FRC
