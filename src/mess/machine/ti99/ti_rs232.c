@@ -111,7 +111,6 @@
 #define RECV_MODE_ESC_LINES 3
 
 #define VERBOSE 1
-
 #define LOG logerror
 
 // Second card: Change CRU base to 0x1500
@@ -560,7 +559,7 @@ static void transmit_data(device_t *tms9902, UINT8 value)
       RTS  8 -----------( 4) ---> RTS
 
 
-      Alternative mapping for the PORT emulator: (V2)
+      Alternative mapping for the PORT terminal emulator: (V2)
 
        Emulated      PC serial
        TI RS232      interface
@@ -569,6 +568,18 @@ static void transmit_data(device_t *tms9902, UINT8 value)
   DSR+CTS 20 -----------( 5) <--- CTS  (cable)
       RTS  8 -----------(20) ---> DTR
       CRU  5 -----------( 4) ---> RTS
+      +12V 6 -|       |-( 6) <--- DSR
+        nc 4 -----------( 8) <--- DCD
+
+      Yet another mapping for the PORT terminal emulator: (V3)
+
+       Emulated      PC serial
+       TI RS232      interface
+     XOUT  2 -----------( 3) ---> TXD
+      RIN  3 -----------( 2) <--- RXD
+  DSR+CTS 20 -----------( 5) <--- CTS  (cable)
+      CRU  5 -----------(20) ---> DTR
+      RTS  8 -----------( 4) ---> RTS
       +12V 6 -|       |-( 6) <--- DSR
         nc 4 -----------( 8) <--- DCD
 */
@@ -607,16 +618,37 @@ static UINT8 map_lines_out(device_t *carddev, int uartind, UINT8 value)
 	}
 	else
 	{
-		// V2
-		if (value & CTS)
+		if (mapping==1)
 		{
-			ret |= RTS;
-			if (VERBOSE>5) LOG("TI-RS232/%d: ... setting RTS line\n", uartind+1);
+			// V2
+			if (value & CTS)
+			{
+				ret |= RTS;
+				if (VERBOSE>5) LOG("TI-RS232/%d: ... setting RTS line\n", uartind+1);
+			}
+			if (value & DCD)
+			{
+				ret |= DTR;
+				if (VERBOSE>5) LOG("TI-RS232/%d: ... setting DTR line\n", uartind+1);
+			}
 		}
-		if (value & DCD)
+		else
 		{
-			ret |= DTR;
-			if (VERBOSE>5) LOG("TI-RS232/%d: ... setting DTR line\n", uartind+1);
+			// v3
+			if (value & CTS)
+			{
+				ret |= DTR;
+				if (VERBOSE>5) LOG("TI-RS232/%d: ... setting DTR line\n", uartind+1);
+			}
+			if (value & DSR)
+			{
+				if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map DSR line, ignoring\n", uartind+1);
+			}
+			if (value & DCD)
+			{
+				ret |= RTS;
+				if (VERBOSE>5) LOG("TI-RS232/%d: ... setting RTS line\n", uartind+1);
+			}
 		}
 	}
 
@@ -657,19 +689,38 @@ static UINT8 map_lines_in(device_t *carddev, int uartind, UINT8 value)
 	}
 	else
 	{
-		// V2 (PORT application)
-		if (value & CTS)
+		if (mapping==1)
 		{
-			ret |= DTR;
-			if (VERBOSE>5) LOG("TI-RS232/%d: ... setting DTR line\n", uartind+1);
+			// V2 (PORT application)
+			if (value & CTS)
+			{
+				ret |= DTR;
+				if (VERBOSE>5) LOG("TI-RS232/%d: ... setting DTR line\n", uartind+1);
+			}
+			if (value & DSR)
+			{
+				if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map DSR line, ignoring\n", uartind+1);
+			}
+			if (value & DCD)
+			{
+				if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map DCD line, ignoring\n", uartind+1);
+			}
 		}
-		if (value & DSR)
+		else
 		{
-			if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map DSR line, ignoring\n", uartind+1);
-		}
-		if (value & DCD)
-		{
-			if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map DCD line, ignoring\n", uartind+1);
+			if (value & CTS)
+			{
+				ret |= DTR;
+				if (VERBOSE>5) LOG("TI-RS232/%d: ... setting DTR line\n", uartind+1);
+			}
+			if (value & DSR)
+			{
+				if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map DSR line, ignoring\n", uartind+1);
+			}
+			if (value & DCD)
+			{
+				if (VERBOSE>5) LOG("TI-RS232/%d: ... cannot map DCD line, ignoring\n", uartind+1);
+			}
 		}
 	}
 

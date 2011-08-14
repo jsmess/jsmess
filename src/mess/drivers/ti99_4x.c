@@ -141,6 +141,7 @@ static INPUT_PORTS_START(ti99_4a)
 	PORT_CONFNAME( 0x03, 0x00, "Serial cable pin mapping" ) PORT_CONDITION( "SERIAL", 0x03, PORTCOND_NOTEQUALS, 0x00 )
 		PORT_CONFSETTING(    0x00, "6-20" )
 		PORT_CONFSETTING(    0x01, "8-20" )
+		PORT_CONFSETTING(    0x02, "5-20" )
 
 	/* Flash setting is used to flash an empty HSGPL DSR ROM */
 	PORT_START( "EXTCARD" )
@@ -394,6 +395,12 @@ static INPUT_PORTS_START(ti99_4)
 	PORT_CONFNAME( 0x03, 0x00, "Serial/Parallel interface" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
+
+	PORT_START( "SERIALMAP" )
+	PORT_CONFNAME( 0x03, 0x00, "Serial cable pin mapping" ) PORT_CONDITION( "SERIAL", 0x03, PORTCOND_NOTEQUALS, 0x00 )
+		PORT_CONFSETTING(    0x00, "6-20" )
+		PORT_CONFSETTING(    0x01, "8-20" )
+		PORT_CONFSETTING(    0x02, "5-20" )
 
 	PORT_START( "EXTCARD" )
 	PORT_CONFNAME( 0x03, 0x00, "HSGPL extension" )
