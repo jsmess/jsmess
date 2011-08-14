@@ -17,13 +17,16 @@
     - Applied NTSC timings to pc8300 only, all others depend on the diode.
     - Many keyboard fixes, and descriptions added to keys.
     - Fixed .O files from causing an access violation.
-    - Enabled cassette saving (wav only).
+    - Enabled cassette saving.
     - Many general fixes to pow3000/lambda.
     - Added sound to pc8300/pow3000/lambda.
 
     24/12/2009 (Robbbert)
     - Added rom mirror, this fixes ringo470
     - Added back the F4 character display
+
+    14/08/2011 (Robbbert)
+    - Modernised.
 
     To do / problems:
     - Some memory areas are not mirrored as they should.
@@ -32,41 +35,34 @@
     - lambda/pow3000 32k memory pack is unemulated, because where is the upper 16k mirror going to be?
     - h4th and tree4th need their address maps worked out (eg, the stack is set to FB80)
     - lambda/pow3000 joystick, connected in parallel with the 4,R,F,7,U keys, but the directions are unknown.
-    - Currently, cassettes will be saved in .wav format, even if you choose something else.
     - Many games don't work.
 
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
 #include "includes/zx.h"
-#include "imagedev/cassette.h"
-#include "formats/zx81_p.h"
-#include "machine/ram.h"
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( zx80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( zx80_map, AS_PROGRAM, 8, zx_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_MIRROR(0x2000)
 	AM_RANGE(0xc000, 0xffff) AM_RAM_READ(zx_ram_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zx80_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( zx80_io_map, AS_IO, 8, zx_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(zx80_io_r, zx80_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zx81_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( zx81_io_map, AS_IO, 8, zx_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(zx81_io_r, zx81_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8300_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pc8300_io_map, AS_IO, 8, zx_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pc8300_io_r, zx81_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pow3000_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pow3000_io_map, AS_IO, 8, zx_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pow3000_io_r, zx81_io_w)
 ADDRESS_MAP_END
 
@@ -565,9 +561,9 @@ COMP( 1980, zx80,       0,      0,      zx80,       zx80,       zx,     "Sinclai
 COMP( 1981, zx81,       0,      0,      zx81,       zx81,       zx,     "Sinclair Research Ltd",    "ZX-81",               0 )
 COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,       zx,     "Timex Sinclair",           "Timex Sinclair 1000", 0 )
 COMP( 1983, ts1500,     zx81,   0,      ts1500,     zx81,       zx,     "Timex Sinclair",           "Timex Sinclair 1500", 0 )
-COMP( 1983, tk85,   	zx81,   0,      ts1000,     zx81,       zx,     "Microdigital",             "TK85",                0 )
+COMP( 1983, tk85,       zx81,   0,      ts1000,     zx81,       zx,     "Microdigital",             "TK85",                0 )
 COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,       zx,     "Ritas do Brasil Ltda",     "Ringo 470",           0 )
 COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,     zx,     "Your Computer",            "PC8300",              0 )
 COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000,    zx,     "Creon Enterprises",        "Power 3000",          0 )
 COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000,    zx,     "Lambda Electronics Ltd",   "Lambda 8300",         0 )
-COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,   	zx,     "Wilf Rigter",              "ZX97",	  GAME_NOT_WORKING | GAME_UNOFFICIAL )
+COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,       zx,     "Wilf Rigter",              "ZX97", GAME_NOT_WORKING | GAME_UNOFFICIAL )

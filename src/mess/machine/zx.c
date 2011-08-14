@@ -6,12 +6,7 @@
 
 ****************************************************************************/
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/zx.h"
-#include "imagedev/cassette.h"
-#include "sound/speaker.h"
-#include "machine/ram.h"
 
 #define video_screen_get_refresh(screen)	(((screen_config *)(screen)->inline_config)->refresh)
 
@@ -41,13 +36,13 @@ static WRITE8_HANDLER( zx_ram_w )
 }
 
 /* I know this looks really pointless... but it has to be here */
-READ8_HANDLER( zx_ram_r )
+READ8_MEMBER( zx_state::zx_ram_r )
 {
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 	return RAM[offset | 0xc000];
 }
 
-DRIVER_INIT ( zx )
+DRIVER_INIT( zx )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
@@ -56,42 +51,42 @@ DRIVER_INIT ( zx )
 	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x4000);
 }
 
-DIRECT_UPDATE_HANDLER ( zx_setdirect )
+DIRECT_UPDATE_HANDLER( zx_setdirect )
 {
 	if (address & 0xc000)
 		zx_ula_r(machine, address, "maincpu", 0);
 	return address;
 }
 
-DIRECT_UPDATE_HANDLER ( pc8300_setdirect )
+DIRECT_UPDATE_HANDLER( pc8300_setdirect )
 {
 	if (address & 0xc000)
 		zx_ula_r(machine, address, "gfx1", 0);
 	return address;
 }
 
-DIRECT_UPDATE_HANDLER ( pow3000_setdirect )
+DIRECT_UPDATE_HANDLER( pow3000_setdirect )
 {
 	if (address & 0xc000)
 		zx_ula_r(machine, address, "gfx1", 1);
 	return address;
 }
 
-MACHINE_RESET ( zx80 )
+MACHINE_RESET( zx80 )
 {
 	zx_state *state = machine.driver_data<zx_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(zx_setdirect), &machine));
 	state->m_tape_bit = 0x80;
 }
 
-MACHINE_RESET ( pow3000 )
+MACHINE_RESET( pow3000 )
 {
 	zx_state *state = machine.driver_data<zx_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(pow3000_setdirect), &machine));
 	state->m_tape_bit = 0x80;
 }
 
-MACHINE_RESET ( pc8300 )
+MACHINE_RESET( pc8300 )
 {
 	zx_state *state = machine.driver_data<zx_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(pc8300_setdirect), &machine));
@@ -104,13 +99,10 @@ static TIMER_CALLBACK(zx_tape_pulse)
 	state->m_tape_bit = 0x80;
 }
 
-READ8_HANDLER ( zx80_io_r )
+READ8_MEMBER( zx_state::zx80_io_r )
 {
-	zx_state *state = space->machine().driver_data<zx_state>();
 /* port FE = read keyboard, NTSC/PAL diode, and cass bit; turn off HSYNC-generator/cass-out
-    The upper 8 bits are used to select a keyboard scan line
-
-    The diode doesn't make any visual difference, but it's in the schematic, and used by the code. */
+    The upper 8 bits are used to select a keyboard scan line */
 
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
@@ -118,61 +110,53 @@ READ8_HANDLER ( zx80_io_r )
 	if (offs == 0xfe)
 	{
 		if ((offset & 0x0100) == 0)
-			data &= input_port_read(space->machine(), "ROW0");
+			data &= input_port_read(machine(), "ROW0");
 		if ((offset & 0x0200) == 0)
-			data &= input_port_read(space->machine(), "ROW1");
+			data &= input_port_read(machine(), "ROW1");
 		if ((offset & 0x0400) == 0)
-			data &= input_port_read(space->machine(), "ROW2");
+			data &= input_port_read(machine(), "ROW2");
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(space->machine(), "ROW3");
+			data &= input_port_read(machine(), "ROW3");
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(space->machine(), "ROW4");
+			data &= input_port_read(machine(), "ROW4");
 		if ((offset & 0x2000) == 0)
-			data &= input_port_read(space->machine(), "ROW5");
+			data &= input_port_read(machine(), "ROW5");
 		if ((offset & 0x4000) == 0)
-			data &= input_port_read(space->machine(), "ROW6");
+			data &= input_port_read(machine(), "ROW6");
 		if ((offset & 0x8000) == 0)
-			data &= input_port_read(space->machine(), "ROW7");
+			data &= input_port_read(machine(), "ROW7");
 
-		if (!input_port_read(space->machine(), "CONFIG"))
+		if (!input_port_read(machine(), "CONFIG"))
 			data &= ~0x40;
 
-		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
+		machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
 
-		if (state->m_ula_irq_active)
+		if (m_ula_irq_active)
 		{
-			zx_ula_bkgnd(space->machine(), 0);
-			state->m_ula_irq_active = 0;
-
-//          LOG_ZX81_IOR("ULA IRQs off");
+			zx_ula_bkgnd(0);
+			m_ula_irq_active = 0;
 		}
 //      else
 //      {
-			if (((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() < -0.75) && state->m_tape_bit)
+			if (((machine().device<cassette_image_device>(CASSETTE_TAG))->input() < -0.75) && m_tape_bit)
 			{
-				state->m_tape_bit = 0x00;
-				space->machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
+				m_tape_bit = 0x00;
+				machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
 			}
 
-			data &= ~state->m_tape_bit;
-
-//          LOG_ZX81_IOR("Tape");
+			data &= ~m_tape_bit;
 //      }
-		if (state->m_ula_frame_vsync == 3)
+		if (m_ula_frame_vsync == 3)
 		{
-			state->m_ula_frame_vsync = 2;
-//          LOG_ZX81_VSYNC;
+			m_ula_frame_vsync = 2;
 		}
 	}
-	else
-		LOG_ZX81_IOR("Unmapped port");
 
 	return data;
 }
 
-READ8_HANDLER ( zx81_io_r )
+READ8_MEMBER( zx_state::zx81_io_r )
 {
-	zx_state *state = space->machine().driver_data<zx_state>();
 /* port FB = read printer status, not emulated
     FE = read keyboard, NTSC/PAL diode, and cass bit; turn off HSYNC-generator/cass-out
     The upper 8 bits are used to select a keyboard scan line */
@@ -183,61 +167,53 @@ READ8_HANDLER ( zx81_io_r )
 	if (offs == 0xfe)
 	{
 		if ((offset & 0x0100) == 0)
-			data &= input_port_read(space->machine(), "ROW0");
+			data &= input_port_read(machine(), "ROW0");
 		if ((offset & 0x0200) == 0)
-			data &= input_port_read(space->machine(), "ROW1");
+			data &= input_port_read(machine(), "ROW1");
 		if ((offset & 0x0400) == 0)
-			data &= input_port_read(space->machine(), "ROW2");
+			data &= input_port_read(machine(), "ROW2");
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(space->machine(), "ROW3");
+			data &= input_port_read(machine(), "ROW3");
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(space->machine(), "ROW4");
+			data &= input_port_read(machine(), "ROW4");
 		if ((offset & 0x2000) == 0)
-			data &= input_port_read(space->machine(), "ROW5");
+			data &= input_port_read(machine(), "ROW5");
 		if ((offset & 0x4000) == 0)
-			data &= input_port_read(space->machine(), "ROW6");
+			data &= input_port_read(machine(), "ROW6");
 		if ((offset & 0x8000) == 0)
-			data &= input_port_read(space->machine(), "ROW7");
+			data &= input_port_read(machine(), "ROW7");
 
-		if (!input_port_read(space->machine(), "CONFIG"))
+		if (!input_port_read(machine(), "CONFIG"))
 			data &= ~0x40;
 
-		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
+		machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
 
-		if (state->m_ula_irq_active)
+		if (m_ula_irq_active)
 		{
-			zx_ula_bkgnd(space->machine(), 0);
-			state->m_ula_irq_active = 0;
-
-//          LOG_ZX81_IOR("ULA IRQs off");
+			zx_ula_bkgnd(0);
+			m_ula_irq_active = 0;
 		}
 		else
 		{
-			if (((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() < -0.75) && state->m_tape_bit)
+			if (((machine().device<cassette_image_device>(CASSETTE_TAG))->input() < -0.75) && m_tape_bit)
 			{
-				state->m_tape_bit = 0x00;
-				space->machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
+				m_tape_bit = 0x00;
+				machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
 			}
 
-			data &= ~state->m_tape_bit;
-
-//          LOG_ZX81_IOR("Tape");
+			data &= ~m_tape_bit;
 		}
-		if (state->m_ula_frame_vsync == 3)
+		if (m_ula_frame_vsync == 3)
 		{
-			state->m_ula_frame_vsync = 2;
-//          LOG_ZX81_VSYNC;
+			m_ula_frame_vsync = 2;
 		}
 	}
-	else
-		LOG_ZX81_IOR("Unmapped port");
 
 	return data;
 }
 
-READ8_HANDLER ( pc8300_io_r )
+READ8_MEMBER( zx_state::pc8300_io_r )
 {
-	zx_state *state = space->machine().driver_data<zx_state>();
 /* port F5 = sound
     F6 = unknown
     FB = read printer status, not emulated
@@ -247,69 +223,61 @@ READ8_HANDLER ( pc8300_io_r )
 
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
-	device_t *speaker = space->machine().device(SPEAKER_TAG);
+	device_t *speaker = machine().device(SPEAKER_TAG);
 
 	if (offs == 0xf5)
 	{
-		state->m_speaker_state ^= 1;
-		speaker_level_w(speaker, state->m_speaker_state);
+		m_speaker_state ^= 1;
+		speaker_level_w(speaker, m_speaker_state);
 	}
 	else
 	if (offs == 0xfe)
 	{
 		if ((offset & 0x0100) == 0)
-			data &= input_port_read(space->machine(), "ROW0");
+			data &= input_port_read(machine(), "ROW0");
 		if ((offset & 0x0200) == 0)
-			data &= input_port_read(space->machine(), "ROW1");
+			data &= input_port_read(machine(), "ROW1");
 		if ((offset & 0x0400) == 0)
-			data &= input_port_read(space->machine(), "ROW2");
+			data &= input_port_read(machine(), "ROW2");
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(space->machine(), "ROW3");
+			data &= input_port_read(machine(), "ROW3");
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(space->machine(), "ROW4");
+			data &= input_port_read(machine(), "ROW4");
 		if ((offset & 0x2000) == 0)
-			data &= input_port_read(space->machine(), "ROW5");
+			data &= input_port_read(machine(), "ROW5");
 		if ((offset & 0x4000) == 0)
-			data &= input_port_read(space->machine(), "ROW6");
+			data &= input_port_read(machine(), "ROW6");
 		if ((offset & 0x8000) == 0)
-			data &= input_port_read(space->machine(), "ROW7");
+			data &= input_port_read(machine(), "ROW7");
 
-		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
+		machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
 
-		if (state->m_ula_irq_active)
+		if (m_ula_irq_active)
 		{
-			zx_ula_bkgnd(space->machine(), 0);
-			state->m_ula_irq_active = 0;
-
-//          LOG_ZX81_IOR("ULA IRQs off");
+			zx_ula_bkgnd(0);
+			m_ula_irq_active = 0;
 		}
 		else
 		{
-			if (((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() < -0.75) && state->m_tape_bit)
+			if (((machine().device<cassette_image_device>(CASSETTE_TAG))->input() < -0.75) && m_tape_bit)
 			{
-				state->m_tape_bit = 0x00;
-				space->machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
+				m_tape_bit = 0x00;
+				machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
 			}
 
-			data &= ~state->m_tape_bit;
-
-//          LOG_ZX81_IOR("Tape");
+			data &= ~m_tape_bit;
 		}
-		if (state->m_ula_frame_vsync == 3)
+		if (m_ula_frame_vsync == 3)
 		{
-			state->m_ula_frame_vsync = 2;
-//          LOG_ZX81_VSYNC;
+			m_ula_frame_vsync = 2;
 		}
 	}
-	else
-		LOG_ZX81_IOR("Unmapped port");
 
 	return data;
 }
 
-READ8_HANDLER ( pow3000_io_r )
+READ8_MEMBER( zx_state::pow3000_io_r )
 {
-	zx_state *state = space->machine().driver_data<zx_state>();
 /* port 7E = read NTSC/PAL diode
     F5 = sound
     F6 = unknown
@@ -319,85 +287,77 @@ READ8_HANDLER ( pow3000_io_r )
 
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
-	device_t *speaker = space->machine().device(SPEAKER_TAG);
+	device_t *speaker = machine().device(SPEAKER_TAG);
 
 	if (offs == 0x7e)
 	{
-		data = (input_port_read(space->machine(), "CONFIG"));
+		data = (input_port_read(machine(), "CONFIG"));
 	}
 	else
 	if (offs == 0xf5)
 	{
-		state->m_speaker_state ^= 1;
-		speaker_level_w(speaker, state->m_speaker_state);
+		m_speaker_state ^= 1;
+		speaker_level_w(speaker, m_speaker_state);
 	}
 	else
 	if (offs == 0xfe)
 	{
 		if ((offset & 0x0100) == 0)
-			data &= input_port_read(space->machine(), "ROW0");
+			data &= input_port_read(machine(), "ROW0");
 		if ((offset & 0x0200) == 0)
-			data &= input_port_read(space->machine(), "ROW1");
+			data &= input_port_read(machine(), "ROW1");
 		if ((offset & 0x0400) == 0)
-			data &= input_port_read(space->machine(), "ROW2");
+			data &= input_port_read(machine(), "ROW2");
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(space->machine(), "ROW3");
+			data &= input_port_read(machine(), "ROW3");
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(space->machine(), "ROW4");
+			data &= input_port_read(machine(), "ROW4");
 		if ((offset & 0x2000) == 0)
-			data &= input_port_read(space->machine(), "ROW5");
+			data &= input_port_read(machine(), "ROW5");
 		if ((offset & 0x4000) == 0)
-			data &= input_port_read(space->machine(), "ROW6");
+			data &= input_port_read(machine(), "ROW6");
 		if ((offset & 0x8000) == 0)
-			data &= input_port_read(space->machine(), "ROW7");
+			data &= input_port_read(machine(), "ROW7");
 
-		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
+		machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
 
-		if (state->m_ula_irq_active)
+		if (m_ula_irq_active)
 		{
-			zx_ula_bkgnd(space->machine(), 0);
-			state->m_ula_irq_active = 0;
-			LOG_ZX81_IOR("ULA IRQs off");
+			zx_ula_bkgnd(0);
+			m_ula_irq_active = 0;
 		}
 		else
 		{
-			if (((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() < -0.75) && state->m_tape_bit)
+			if (((machine().device<cassette_image_device>(CASSETTE_TAG))->input() < -0.75) && m_tape_bit)
 			{
-				state->m_tape_bit = 0x00;
-				space->machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
+				m_tape_bit = 0x00;
+				machine().scheduler().timer_set(attotime::from_usec(362), FUNC(zx_tape_pulse));
 			}
 
-			data &= ~state->m_tape_bit;
-
-//          LOG_ZX81_IOR("Tape");
+			data &= ~m_tape_bit;
 		}
-		if (state->m_ula_frame_vsync == 3)
+		if (m_ula_frame_vsync == 3)
 		{
-			state->m_ula_frame_vsync = 2;
-//          LOG_ZX81_VSYNC;
+			m_ula_frame_vsync = 2;
 		}
 	}
-	else
-		LOG_ZX81_IOR("Unknown port");
 
 	return data;
 }
 
-WRITE8_HANDLER( zx80_io_w )
+WRITE8_MEMBER( zx_state::zx80_io_w )
 {
 /* port FF = write HSYNC and cass data */
 
 	UINT8 offs = offset & 0xff;
 
 	if (offs == 0xff)
-		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(-1.0);
-	else
-		LOG_ZX81_IOR("Unmapped port");
+		machine().device<cassette_image_device>(CASSETTE_TAG)->output(-1.0);
 }
 
-WRITE8_HANDLER ( zx81_io_w )
+WRITE8_MEMBER( zx_state::zx81_io_w )
 {
-	zx_state *state = space->machine().driver_data<zx_state>();
+	address_space *mem = machine().device("maincpu")->memory().space(AS_PROGRAM);
 /* port F5 = unknown, pc8300/pow3000/lambda only
     F6 = unknown, pc8300/pow3000/lambda only
     FB = write data to printer, not emulated
@@ -405,41 +365,33 @@ WRITE8_HANDLER ( zx81_io_w )
     FE = turn on NMI generator
     FF = write HSYNC and cass data */
 
-	screen_device *screen = space->machine().first_screen();
+	screen_device *screen = machine().first_screen();
 	int height = screen->height();
 	UINT8 offs = offset & 0xff;
 
 	if (offs == 0xfd)
 	{
-		state->m_ula_nmi->reset();
-
-		LOG_ZX81_IOW("ULA NMIs off");
+		m_ula_nmi->reset();
 	}
 	else
 	if (offs == 0xfe)
 	{
-		state->m_ula_nmi->adjust(attotime::zero, 0, space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(207));
-
-		LOG_ZX81_IOW("ULA NMIs on");
+		m_ula_nmi->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(207));
 
 		/* remove the IRQ */
-		state->m_ula_irq_active = 0;
+		m_ula_irq_active = 0;
 	}
 	else
 	if (offs == 0xff)
 	{
-		space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(-1.0);
-		zx_ula_bkgnd(space->machine(), 1);
-		if (state->m_ula_frame_vsync == 2)
+		machine().device<cassette_image_device>(CASSETTE_TAG)->output(-1.0);
+		zx_ula_bkgnd(1);
+		if (m_ula_frame_vsync == 2)
 		{
-			device_spin_until_time(&space->device(),space->machine().primary_screen->time_until_pos(height - 1, 0));
-			state->m_ula_scanline_count = height - 1;
-			logerror ("S: %d B: %d\n", space->machine().primary_screen->vpos(), space->machine().primary_screen->hpos());
+			device_spin_until_time(&mem->device(),machine().primary_screen->time_until_pos(height - 1, 0));
+			m_ula_scanline_count = height - 1;
+			logerror ("S: %d B: %d\n", machine().primary_screen->vpos(), machine().primary_screen->hpos());
 		}
-
-		LOG_ZX81_IOW("ULA IRQs on");
 	}
-	else
-		LOG_ZX81_IOR("Unmapped port");
 }
 

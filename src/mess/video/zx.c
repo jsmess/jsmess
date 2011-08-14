@@ -16,10 +16,7 @@
 
 ****************************************************************************/
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/zx.h"
-#include "sound/dac.h"
 
 emu_timer *ula_nmi = NULL;
 //emu_timer *ula_irq = NULL;
@@ -36,29 +33,28 @@ int ula_scanline_count = 0;
  * (during tape IO or sound output) zx_ula_bkgnd() is used to
  * simulate the display of a ZX80/ZX81.
  */
-void zx_ula_bkgnd(running_machine &machine, int color)
+void zx_state::zx_ula_bkgnd(UINT8 color)
 {
-	zx_state *state = machine.driver_data<zx_state>();
-	screen_device *screen = machine.first_screen();
+	screen_device *screen = machine().first_screen();
 	int width = screen->width();
 	int height = screen->height();
 	const rectangle &visarea = screen->visible_area();
 
-	if (state->m_ula_frame_vsync == 0 && color != state->m_old_c)
+	if (m_ula_frame_vsync == 0 && color != m_old_c)
 	{
 		int y, new_x, new_y;
 		rectangle r;
-		bitmap_t *bitmap = machine.generic.tmpbitmap;
+		bitmap_t *bitmap = machine().generic.tmpbitmap;
 
-		new_y = machine.primary_screen->vpos();
-		new_x = machine.primary_screen->hpos();
+		new_y = machine().primary_screen->vpos();
+		new_x = machine().primary_screen->hpos();
 /*      logerror("zx_ula_bkgnd: %3d,%3d - %3d,%3d\n", state->m_old_x, state->m_old_y, new_x, new_y);*/
-		y = state->m_old_y;
+		y = m_old_y;
 		for (;;)
 		{
 			if (y == new_y)
 			{
-				r.min_x = state->m_old_x;
+				r.min_x = m_old_x;
 				r.max_x = new_x;
 				r.min_y = r.max_y = y;
 				bitmap_fill(bitmap, &r, color);
@@ -66,18 +62,18 @@ void zx_ula_bkgnd(running_machine &machine, int color)
 			}
 			else
 			{
-				r.min_x = state->m_old_x;
+				r.min_x = m_old_x;
 				r.max_x = visarea.max_x;
 				r.min_y = r.max_y = y;
 				bitmap_fill(bitmap, &r, color);
-				state->m_old_x = 0;
+				m_old_x = 0;
 			}
 			if (++y == height)
 				y = 0;
 		}
-		state->m_old_x = (new_x + 1) % width;
-		state->m_old_y = new_y;
-		state->m_old_c = color;
+		m_old_x = (new_x + 1) % width;
+		m_old_y = new_y;
+		m_old_c = color;
 	}
 }
 

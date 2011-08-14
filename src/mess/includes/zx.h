@@ -7,6 +7,14 @@
 #ifndef ZX_H_
 #define ZX_H_
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "sound/speaker.h"
+#include "sound/wave.h"
+#include "imagedev/cassette.h"
+#include "formats/zx81_p.h"
+#include "machine/ram.h"
+
 
 class zx_state : public driver_device
 {
@@ -14,6 +22,13 @@ public:
 	zx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_READ8_MEMBER(zx_ram_r);
+	DECLARE_READ8_MEMBER(zx80_io_r);
+	DECLARE_READ8_MEMBER(zx81_io_r);
+	DECLARE_READ8_MEMBER(pc8300_io_r);
+	DECLARE_READ8_MEMBER(pow3000_io_r);
+	DECLARE_WRITE8_MEMBER(zx80_io_w);
+	DECLARE_WRITE8_MEMBER(zx81_io_w);
 	emu_timer *m_ula_nmi;
 	int m_ula_irq_active;
 	int m_ula_frame_vsync;
@@ -22,10 +37,11 @@ public:
 	UINT8 m_speaker_state;
 	int m_old_x;
 	int m_old_y;
-	int m_old_c;
+	UINT8 m_old_c;
 	UINT8 m_charline[32];
 	UINT8 m_charline_ptr;
 	int m_offs1;
+	void zx_ula_bkgnd(UINT8 color);
 };
 
 
@@ -35,14 +51,6 @@ DRIVER_INIT( zx );
 MACHINE_RESET( zx80 );
 MACHINE_RESET( pow3000 );
 MACHINE_RESET( pc8300 );
-
-READ8_HANDLER( zx_ram_r );
-READ8_HANDLER ( pc8300_io_r );
-READ8_HANDLER ( pow3000_io_r );
-READ8_HANDLER ( zx80_io_r );
-WRITE8_HANDLER ( zx80_io_w );
-READ8_HANDLER ( zx81_io_r );
-WRITE8_HANDLER ( zx81_io_w );
 
 /*----------- defined in video/zx.c -----------*/
 
