@@ -197,7 +197,8 @@ Compiled by K1W1
 		<info name="serial" value="26-3089" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="canyon climber (1982)(26-3089)(datasoft)[!].rom" size="8192" crc="aa214e43" sha1="ac5d771b3fd692de72d69945ae1fa4788db54538" offset="0" />
+				<!--rom name="canyon climber (1982)(26-3089)(datasoft)[!].rom" size="8192" crc="aa214e43" sha1="ac5d771b3fd692de72d69945ae1fa4788db54538" offset="0" /-->
+				<rom name="canyon climber.rom" size="8192" crc="41dd5a1a" sha1="2c20412111d315228b8ada24c3b4b02ad1a608c2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
