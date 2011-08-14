@@ -122,35 +122,30 @@ DEVICE_IMAGE_LOAD (msx_cart)
 		if ( mapper != NULL )
 		{
 			/* TODO: Split out the SRAM recognition code and 8KB/16KB bank configuration */
-			static const struct { const char *mapper_name; const char *sram_name; int mapper_type; } mapper_types[] =
+			static const struct { const char *mapper_name; bool sram_present; int mapper_type; } mapper_types[] =
 			{
-				{ "M60002-0125SP",		NULL,				SLOT_ASCII8 },
-				{ "M60002-0125SP",		"HBS-G057C",		SLOT_ASCII8_SRAM },
-				{ "M60002-0125SP",		"SRAM",				SLOT_ASCII8_SRAM },
-				{ "LZ93A13",			NULL,				SLOT_ASCII8 },
-				{ "LZ93A13",			"CXK5864BSP-10L",	SLOT_ASCII8_SRAM },
-				{ "LZ93A13",			"CXK5864PN-12L",	SLOT_ASCII8_SRAM },
-				{ "LZ93A13",			"CXK5864PN-15L",	SLOT_ASCII8_SRAM },
-				{ "LZ93A13",			"CXK58257SP-12L",	SLOT_ASCII8_SRAM },
-				{ "LZ93A13",			"LH5164L-10",		SLOT_ASCII8_SRAM },
-				{ "LZ93A13-16",			NULL,				SLOT_ASCII16 },
-				{ "LZ93A13-16",			"CXK5864PN-12L",	SLOT_ASCII16_SRAM },
-				{ "M60002-0125SP-16",	NULL,				SLOT_ASCII16 },
-				{ "IREM TAM-S1",		NULL,				SLOT_RTYPE },
-				{ "MR6401",				NULL,				SLOT_ASCII16 },
-				{ "NEOS MR6401",		NULL,				SLOT_ASCII8 },
-				{ "BS6202",				NULL,				SLOT_ASCII8 },
+				{ "M60002-0125SP",		false,		SLOT_ASCII8 },
+				{ "M60002-0125SP",		true,		SLOT_ASCII8_SRAM },
+				{ "LZ93A13",			false,		SLOT_ASCII8 },
+				{ "LZ93A13",			true,		SLOT_ASCII8_SRAM },
+				{ "LZ93A13-16",			false,		SLOT_ASCII16 },
+				{ "LZ93A13-16",			true,		SLOT_ASCII16_SRAM },
+				{ "M60002-0125SP-16",	false,		SLOT_ASCII16 },
+				{ "IREM TAM-S1",		false,		SLOT_RTYPE },
+				{ "MR6401",				false,		SLOT_ASCII16 },
+				{ "NEOS MR6401",		false,		SLOT_ASCII8 },
+				{ "BS6202",				false,		SLOT_ASCII8 },
 			};
 
 			for ( int i = 0; i < ARRAY_LENGTH(mapper_types) && type < 0; i++ )
 			{
 				if ( !mame_stricmp( mapper, mapper_types[i].mapper_name ) )
 				{
-					if ( sram == NULL && mapper_types[i].sram_name == NULL )
+					if ( sram == NULL && ! mapper_types[i].sram_present )
 						type = mapper_types[i].mapper_type;
 					
 
-					if ( sram != NULL && mapper_types[i].sram_name != NULL && !mame_stricmp( sram, mapper_types[i].sram_name ) )
+					if ( sram != NULL && mapper_types[i].sram_present )
 						type = mapper_types[i].mapper_type;
 				}
 			}
