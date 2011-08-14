@@ -110,6 +110,9 @@ static const unif unif_list[] =
 	{ "UNL-TF1201",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD /*UNL_TF1201*/},
 	{ "UNL-DRIPGAME",               0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // [by Quietust - we need more info]}
 	{ "UNL-OneBus",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
+	{ "UNL-YOKO",                   0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// similar to mapper 83, but not the same
+	{ "UNL-FS304",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// used in Zelda 3 by Waixing (support missing atm)
+	{ "UNL-43272",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// used in Gaau Hok Gwong Cheung (support missing atm)
 	{ "BTL-MARIO1-MALEE2",          0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// mapper 55?
 	{ "BMC-FK23C",                  0,    0, CHRRAM_0,  BMC_FK23C},
 	{ "BMC-FK23CA",                 0,    0, CHRRAM_0,  BMC_FK23CA},

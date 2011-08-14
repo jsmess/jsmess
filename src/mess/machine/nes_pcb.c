@@ -470,6 +470,7 @@ static const nes_pcb pcb_list[] =
 	{ "SUBOR-BOARD-1",    SUBOR_TYPE1 },
 	{ "SOMERITEAM-SL-12", SOMERI_SL12 }, // mapper 116
 	{ "UNL-CONY",         CONY_BOARD },
+	{ "UNL-YOKO",         CONY_BOARD },	// not exactly the same, needs better support
 	{ "UNL-GOUDER",       GOUDER_37017 },
 	{ "UNL-NITRA",        NITRA_TDA },
 	{ "UNL-HOSENKAN",     HOSENKAN_BOARD },
@@ -524,6 +525,8 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-T-230",        UNL_T230 },
 	{ "UNL-STUDYNGAME",   UNL_STUDYNGAME },	// mapper 39
 	{ "UNL-OneBus",       UNSUPPORTED_BOARD },
+	{ "UNL-FS304",        UNSUPPORTED_BOARD },	// used in Zelda 3 by Waixing (support missing atm)
+	{ "UNL-43272",        UNSUPPORTED_BOARD },	// used in Gaau Hok Gwong Cheung (support missing atm)
 //
 	{ "BTL-SMB2A",         BTL_SMB2A },
 	{ "BTL-MARIOBABY",     BTL_MARIOBABY },
