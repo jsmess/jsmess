@@ -500,6 +500,7 @@ $(MAMEOBJ)/atlus.a: \
 	$(DRIVERS)/powerins.o $(VIDEO)/powerins.o \
 
 $(MAMEOBJ)/barcrest.a: \
+	$(DRIVERS)/mpu2.o \
 	$(DRIVERS)/mpu3.o \
 	$(DRIVERS)/mpu4.o \
 	$(DRIVERS)/mpu4vid.o \
@@ -1645,11 +1646,13 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/ampoker2.o $(VIDEO)/ampoker2.o \
 	$(DRIVERS)/amspdwy.o $(VIDEO)/amspdwy.o \
 	$(DRIVERS)/artmagic.o $(VIDEO)/artmagic.o \
+	$(DRIVERS)/astrafr.o \
 	$(DRIVERS)/astrocorp.o \
 	$(DRIVERS)/attckufo.o \
 	$(DRIVERS)/avt.o \
 	$(DRIVERS)/aztarac.o $(AUDIO)/aztarac.o $(VIDEO)/aztarac.o \
 	$(DRIVERS)/beaminv.o \
+	$(DRIVERS)/bgt.o \
 	$(DRIVERS)/bingor.o \
 	$(DRIVERS)/blitz.o \
 	$(DRIVERS)/blitz68k.o \
@@ -1683,6 +1686,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/drw80pkr.o \
 	$(DRIVERS)/dwarfd.o \
 	$(DRIVERS)/dynadice.o \
+	$(DRIVERS)/ecoinfr.o \
 	$(DRIVERS)/epos.o $(VIDEO)/epos.o \
 	$(DRIVERS)/esd16.o $(VIDEO)/esd16.o \
 	$(DRIVERS)/esh.o \
@@ -1795,6 +1799,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/ssingles.o \
 	$(DRIVERS)/sstrangr.o \
 	$(DRIVERS)/statriv2.o \
+	$(DRIVERS)/stellafr.o \
 	$(DRIVERS)/supertnk.o \
 	$(DRIVERS)/superwng.o \
 	$(DRIVERS)/tapatune.o \
@@ -1811,6 +1816,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/trvquest.o \
 	$(DRIVERS)/ttchamp.o \
 	$(DRIVERS)/tugboat.o \
+	$(DRIVERS)/unkpcp.o \
 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
 	$(DRIVERS)/vamphalf.o \
 	$(DRIVERS)/vcombat.o \
@@ -1822,6 +1828,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xtom3d.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
+	
 
 
 
@@ -2086,6 +2093,8 @@ $(DRIVERS)/warpwarp.o:	$(LAYOUT)/geebee.lh \
 $(DRIVERS)/wecleman.o:	$(LAYOUT)/wecleman.lh
 
 $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
+
+$(DRIVERS)/peyper.o:    $(LAYOUT)/peyper.lh
 
 #-------------------------------------------------
 # misc dependencies

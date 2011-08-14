@@ -1788,7 +1788,14 @@ ROM_START( sc1gtime )
 	ROM_LOAD( "goodtimesound2.bin", 0x010000, 0x010000, CRC(e6c53e20) SHA1(30cb83d03fe873b4ec822d3aa1001b7fed9571ff) )
 ROM_END
 
+ROM_START( sc1tiara )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tiara_prg1u.bin", 0x0000, 0x010000, CRC(963fc838) SHA1(375bc2fb72c89095d1afae77762e94d7adb79133) )
 
+	ROM_REGION( 0x40000, "upd", 0 ) // same sound roms as good times?
+	ROM_LOAD( "tiara_snd1.bin", 0x0000, 0x010000, CRC(554d1157) SHA1(ae802338b40a0b35dcdf788c19ef42c2ed7e9a37) )
+	ROM_LOAD( "tiara_snd2.bin", 0x010000, 0x010000, CRC(e6c53e20) SHA1(30cb83d03fe873b4ec822d3aa1001b7fed9571ff) )
+ROM_END
 
 
 
@@ -2216,103 +2223,557 @@ ROM_START( sc1zep )
 	ROM_LOAD( "zepp1.bin", 0x0000, 0x008000, CRC(bfbbbc35) SHA1(5c28b6359d79c96d53319408fbc2d7cb2629185d) )
 ROM_END
 
+ROM_START( sc1wthn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wildthingprogamm1.bin", 0x0000, 0x010000, CRC(80157a9c) SHA1(ec8e217e17ac7f4c5bc05d9848bf5f37b2d82fac) )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "wildthingsound1.bin", 0x00000, 0x010000, CRC(85389209) SHA1(029dda285b035525b730b4c72ff182554f5dbe47) )
+	ROM_LOAD( "wildthingsound2.bin", 0x010000, 0x010000, CRC(664ab695) SHA1(d4148ebffbe41eb1d265548991ad3cb984205497) )
+ROM_END
+
+
+ROM_START( sc1days )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "all2-5n.p2", 0x0000, 0x008000, CRC(fa75d835) SHA1(78e6b48bea8f1297530f08dff6bada4d228e090d) )
+	ROM_LOAD( "all2-5n.p1", 0x8000, 0x008000, CRC(7d58a415) SHA1(8bd0d23ac825ba0294f2fd26e9acb87eb1f3d10c) )
+
+	ROM_REGION( 0x20000, "altrevs", 0 )
+	ROM_LOAD( "allinv1-6b.bin", 0x0000, 0x008000, CRC(59589a00) SHA1(c73b45f383f908d1257f6d031f359f73e5b2f966) )
+	ROM_LOAD( "allinv1-6a.bin", 0x8000, 0x008000, CRC(36a83181) SHA1(a2cb6493efb00e9bcf76388f65098af9346f855e) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 ) // not upd?
+	/* missing? */
+ROM_END
+
+
+ROM_START( sc1cscl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cldl1-8n.p1", 0x8000, 0x008000, CRC(4cb5239d) SHA1(a0f22440a5453ea28093f32856ab5417a6c82037) )
+	ROM_LOAD( "cldl1-8n.p2", 0x0000, 0x008000, CRC(8feee244) SHA1(50c7eab298078def5d82bc3bebbe3e08b612bc47) )
+
+	ROM_REGION( 0x20000, "altrevs", 0 )
+	ROM_LOAD( "cash classic 2p sa1-083.bin", 0x0000, 0x010000, CRC(36a45c0d) SHA1(51eb91e42297894ae575502903833e219ac5add9) )
+	ROM_LOAD( "cash classic sa1-082 5p.bin", 0x0000, 0x010000, CRC(42d68675) SHA1(ed191e03bc7b42ae1884657b4559588eeedbdf31) )
+	ROM_LOAD( "clas2-0n.p2", 0x0000, 0x008000, CRC(45d40f1e) SHA1(03388a8ea809b088850865cb288af3181d3dd962) )
+	ROM_LOAD( "clas2-0n.p1", 0x8000, 0x008000, CRC(ebd514b1) SHA1(5267b49de98f8a93ac206f68d56ee12e1d228a7d) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 ) // not upd?
+	/* missing? */
+ROM_END
+
+ROM_START( sc1driv )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ddslb1-3.p2", 0x0000, 0x008000, CRC(32896702) SHA1(1ef36daca6bf3f45dfff5edc401bdbd313ad9121) )
+	ROM_LOAD( "ddslb1-3.p1", 0x8000, 0x008000, CRC(81fc84a7) SHA1(f0d5a181d4ca027df2c5ca11573eb7687b3abf29) )
+
+	ROM_REGION( 0x20000, "altrevs", 0 )
+	ROM_LOAD( "ddsnl1-3.p1", 0x0000, 0x008000, CRC(96f8bc52) SHA1(de0d180d4640eef451984f466be8732d0a08cee8) )
+	ROM_LOAD( "ddsnl1-3.p2", 0x0000, 0x008000, CRC(a5b663c8) SHA1(5b6675874ff4e3a5c74dbd66c4a47c34d36f1222) )
+	ROM_LOAD( "dslb1-5.p1", 0x0000, 0x008000, CRC(6adaf17b) SHA1(8930daac71fbe3f7eb91358d7101f2b8d05d224e) )
+	ROM_LOAD( "dslb1-5.p2", 0x0000, 0x008000, CRC(193e6aaa) SHA1(f083747a9cad72690b01181cc46ae7bdc3de6ea6) )
+	ROM_LOAD( "dsnl1-6.p1", 0x0000, 0x008000, CRC(174c4432) SHA1(82519ede8220d3d717ee0ebe57374357afe38949) )
+	ROM_LOAD( "dsnl1-6.p2", 0x0000, 0x008000, CRC(0eb10c01) SHA1(16456ec1e32bfbd873bdebd6a760041bc9cd8648) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 ) // not upd?
+	ROM_LOAD( "ds_snd1.bin", 0x000000, 0x020000, CRC(a9d7e8ec) SHA1(5b1d459d378e23d3108a1190b5988eebedf95667) )
+	ROM_LOAD( "ds_snd2.bin", 0x020000, 0x020000, CRC(3b67c1b3) SHA1(8b9dbff45955f72a73fb739b5e74aa2f9c23dd08) )
+	ROM_LOAD( "ds_snd3.bin", 0x040000, 0x020000, CRC(00c252ec) SHA1(5de2e70f142a71f22eeb28a271ca9d7809322faa) )
+ROM_END
+
+ROM_START( sc1vsd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "supd1-4n.p1", 0x8000, 0x008000, CRC(ad581f7d) SHA1(99b9bf1016cd52467f5c9f6e427305e81033e82f) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 ) // not upd?
+	/* missing? */
+ROM_END
+
+
+ROM_START( sc1moonl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "moon lite 5p 86var v5.1.bin", 0x8000, 0x008000, CRC(31db928a) SHA1(0e07c11bf85a13df62bb704a03a42712d6e7ff62) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1ltdv )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "little devil v4 arcade.bin", 0x8000, 0x008000, CRC(ff32cdcf) SHA1(84bb86e30ace57aa8f591a3778801d44fb3f8fe1) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1t1k )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "top1000b.bin", 0x8000, 0x008000, CRC(0124b7c0) SHA1(620196e7580f44423ede6644f76e37091fdf30b6) )
+	ROM_LOAD( "top1000a.bin", 0x0000, 0x008000, CRC(c986ee8b) SHA1(e5a600942e725d0ad6be10fbac7fb05eb0d2b07f) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	/* missing? */
+ROM_END
+
+ROM_START( sc1dip )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dip0111.bin", 0x0000, 0x010000, CRC(19632509) SHA1(69c9947da11892b99e9936675d0b1bdabdc16ae8) )
+
+	ROM_REGION( 0x200000, "ram", ROMREGION_ERASE00 ) // is this just some default settings?
+	ROM_LOAD( "ram.bin", 0x0000, 0x002000, CRC(3962d8cf) SHA1(b893a92d467e8f5ffc2cffa8a7121d92fe2492eb) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	/* missing? */	
+ROM_END
+
+ROM_START( sc1lamb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lambada.bin", 0x0000, 0x010000, CRC(4321495c) SHA1(d3ef15d2a1b2c7aec33ac226c89a7a0c0a18884a) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	/* missing? */	
+ROM_END
+
+ROM_START( sc1reply )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "repl0110.bin", 0x0000, 0x010000, CRC(b2bfa2fb) SHA1(9c704321428c05f97593ea7541ba1a08ff448571) )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "repl0110snd.bin", 0x0000, 0x010000, CRC(86547dc7) SHA1(4bf64f22e84c0ee82d961b0ba64932b8bf6a521f) )
+ROM_END
+
+
+ROM_START( sc1smoke )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "sb6-3_0b.bin", 0x0000, 0x008000, CRC(31647e2f) SHA1(35dd1bef0dd72fd45c063f181cd190f8d21df207) )
+	ROM_LOAD( "sb6-3_0a.bin", 0x8000, 0x008000, CRC(45ca0067) SHA1(be1947d055320c101ea75c669733b19d2f61a0f9) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "sb8-5_0a.bin", 0x0000, 0x008000, CRC(eafe5fac) SHA1(4798a37ada523d078f2e10976c5f90cccab1c406) )
+	ROM_LOAD( "sb8-5_0b.bin", 0x0000, 0x008000, CRC(0aac6b91) SHA1(85b4dfe15d456b7d808295c890264163bc6115f1) )
+	ROM_LOAD( "svb58pa", 0x0000, 0x008000, CRC(4496ce3d) SHA1(400dee4249fd930473cb003d85b25bb991041bc6) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1ccroc )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "cc6-4_0b.bin", 0x0000, 0x008000, CRC(4093cbe6) SHA1(6ea678d0e288bb075d58ef72089ae387d6285477) )
+	ROM_LOAD( "cc6-4_0a.bin", 0x8000, 0x008000, CRC(c3d963e8) SHA1(35688841e102c264124c23de526417db618ea898) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "cc8-7_0a.bin", 0x0000, 0x008000, CRC(4a6cd887) SHA1(27f394a63bdb68d35d6eecb6b0f6b3f3f61d36b5) )
+	ROM_LOAD( "cc8-7_0b.bin", 0x0000, 0x008000, CRC(a638c58a) SHA1(0a5d53a9c0f772263c7a726f90943a1ccfe5db20) )
+	ROM_LOAD( "cct-8_0a.bin", 0x0000, 0x008000, CRC(a90a5f23) SHA1(befb389cc6ff045462f02c2aa9025d92c47da0fa) )
+	ROM_LOAD( "cct-8_0b.bin", 0x0000, 0x008000, CRC(1e0e93f3) SHA1(e5ceef529bd406d2b395b6e24cff370422b0e1f2) )
+	ROM_LOAD( "crocs6a.bin", 0x0000, 0x008000, CRC(087330cb) SHA1(f143a8a44024f0f851a8b677f42b9d4011ab92d4) )
+	ROM_LOAD( "crocs6b.bin", 0x0000, 0x008000, CRC(42ad6fb0) SHA1(d60961d9993a8458668177013d7561d0b7423cda) )
+	ROM_LOAD( "cs1_1.rom", 0x0000, 0x040000, CRC(f4c6f9f1) SHA1(4277ff51dc91c35d4c6e9ab1c16e087ef7e8d140) )
+	ROM_LOAD( "cs1_2.rom", 0x0000, 0x040000, CRC(ba4dad49) SHA1(795342d5fd3deaa058a20d491206c028c529fd55) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1crocr )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "croc58pb", 0x0000, 0x010000, CRC(95d2b0ac) SHA1(369a2f5efc981aa03780b80e0b14d5171c25e72b) ) // 2nd half empty
+	ROM_LOAD( "croc58pa", 0x8000, 0x010000, CRC(39501e80) SHA1(f03bc602df839374adf7722af295cee562353782) ) // 2nd half empty
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1btclk )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bc6-4_0b.bin", 0x0000, 0x008000, CRC(106265c8) SHA1(6465f7e868c5b04776fee69295a52197abb45ad0) )
+	ROM_LOAD( "bc6-4_0a.bin", 0x8000, 0x008000, CRC(750645e7) SHA1(65eee2a00a1914bb8dc989b131eaa39d2881105d) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "bc8-5_0a.bin", 0x0000, 0x008000, CRC(f8fafc49) SHA1(7d8109fdabe37c7e958696512d3c2c35f9890bee) )
+	ROM_LOAD( "bc8-5_0b.bin", 0x0000, 0x008000, CRC(4be7220f) SHA1(5eb2b3fd05ff06b645f16bf95f6766b8bea82525) )
+	ROM_LOAD( "btc58pa", 0x0000, 0x010000, CRC(d21e5ed9) SHA1(99c189fde84f5abbdcd85d1f816c61f8fe72554e) )
+	ROM_LOAD( "btc58pb", 0x0000, 0x010000, CRC(4cfde48a) SHA1(8567667f4af96fd00a807380a65fe809cd051c76) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+
+
+ROM_START( sc1btbc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "beatb34", 0x8000, 0x008000, CRC(0791f889) SHA1(f090b9aacdbb33cc0934f53621e43520b970d789) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1bee )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "beeint12", 0x8000, 0x008000, CRC(0a77d0be) SHA1(8e55e7b4eb85cc2521d8fdf7ede02131ed80372e) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc1boncl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cb_v91.bin", 0x8000, 0x008000, CRC(a1b902f4) SHA1(47bff5f0921800052ac99fd7b945ea05fc5951d6) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+
+ROM_START( sc1clins )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cashlines5p2.40p1 9.3.90.bin", 0x8000, 0x008000, CRC(cb69c335) SHA1(8fe302274d01e98f8636fbc44eb4736180345b16) )
+	ROM_LOAD( "cashlines5p2.40p2 9.3.90.bin", 0x0000, 0x008000, CRC(068959a2) SHA1(6c212ceb756024662ed880b66b4c6aac21b0c726) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc1clinsa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cashlines2p2.40p1 9.3.90.bin", 0x8000, 0x008000, CRC(4dcdfcd1) SHA1(38b67a2450ededd9cf27b9f5d5fffe45f4e4b80d) )
+	ROM_LOAD( "cashlines2p2.40p2 9.3.90.bin", 0x0000, 0x008000, CRC(0a4d6692) SHA1(9437a0ed1fb9eb706dede7a6b1670e2bd873d7fe) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1clinsb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+//	ROM_LOAD( "95718066 proto.bin", 0x0000, 0x008000, CRC(0977e287) SHA1(e937a3787d4cd056c5f9944bca1532b84ed335f6) )
+	ROM_LOAD( "clines proto a.bin", 0x8000, 0x008000, CRC(0977e287) SHA1(e937a3787d4cd056c5f9944bca1532b84ed335f6) )
+	ROM_LOAD( "clines proto b.bin", 0x0000, 0x008000, CRC(fca396e1) SHA1(3304a58a30fd0c79e8d1decd4bd8792d3acbad3e) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1clinsc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "39370028a.bin", 0x8000, 0x008000, CRC(e0250ea4) SHA1(01cc9013c37bc22f5ab69565d453ece99f739e6b) )
+	ROM_LOAD( "39370028b.bin", 0x0000, 0x008000, CRC(fca396e1) SHA1(3304a58a30fd0c79e8d1decd4bd8792d3acbad3e) )
+//	ROM_LOAD( "95717067b.bin", 0x0000, 0x008000, CRC(fca396e1) SHA1(3304a58a30fd0c79e8d1decd4bd8792d3acbad3e) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1clinsd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "957172.00 all cash.bin", 0x8000, 0x008000, CRC(cafc2409) SHA1(125f7c1826e58619a53b56ecd4f5b0b7f607aeef) )
+	ROM_LOAD( "957172.01 all cash.bin", 0x0000, 0x008000, CRC(27d941cf) SHA1(797d47c15d6a52f5647a566eb8ad1985324d81cb) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1clinse ) // bad? (SUMCHECK ERROR)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "957171.11 var% a.bin", 0x8000, 0x008000, CRC(1e74ef1a) SHA1(6c70f9b7f3caf6a5e9734b2e4ee74985c2b169d6) )
+	ROM_LOAD( "957171.12 var% b.bin", 0x0000, 0x008000, CRC(80243558) SHA1(6b7cc811998d11397e5fa03a50154d165997ae7b) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc1clb3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cl3000.bin", 0x0000, 0x010000, CRC(998b58fa) SHA1(73b2837d6287667f16c64edada1e3ec5ffa54c74) )
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "95000593.ic7", 0x000000, 0x010000, CRC(743d4ecd) SHA1(23c2a3673d6b09bc829297751c283de444d32fa3) )
+	ROM_LOAD( "95000594.ic8", 0x010000, 0x010000, CRC(9e143e49) SHA1(28547cc2f271f76a29d332f670e47a8bb836593e) )
+ROM_END
+
+
+
+
+ROM_START( sc1czbrk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "crazybreakp1.bin", 0x0000, 0x008000, CRC(47cbb5fd) SHA1(b5a7a20f9874f1010f7fc973d0cc5fcb87beaaf5) )
+	ROM_LOAD( "crazybreakp2.bin", 0x8000, 0x008000, CRC(71bfb2fe) SHA1(3371421268a1e0a4518eafd27b2c23a0c7475e11) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc1dyncl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dyn1-6nss.p1", 0x8000, 0x008000, CRC(9cb42e58) SHA1(bb92e7618efb9a95e96d55d6ee46ba4f08cb825b) )
+	ROM_LOAD( "dyn1-6nss.p2", 0x0000, 0x008000, CRC(425b8cf6) SHA1(8b3dd294ff965103b5621da462b39629445456b9) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1energ )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "energy_v109_u2.bin", 0x8000, 0x008000, CRC(ce5da71b) SHA1(c0cb687523bf7a8f42740dd3f54999eaa1db3cd0) )
+	ROM_LOAD( "energy_v109_u4.bin", 0x0000, 0x008000, CRC(bde92e45) SHA1(ae1b73ecd59131a11202487ecb4d34fc68e4101d) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc1frpus )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95750025.p1", 0x0000, 0x010000, CRC(75d21cbf) SHA1(8161dec9b0533383acc6172da564f1353e4367c1) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "95752025.p1", 0x0000, 0x010000, CRC(0d223a7d) SHA1(7b110989b988f5fc57eac2b21b9f0cdb326174a0) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc1esc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bfm_esc.bin", 0x8000, 0x008000, CRC(27acb5a5) SHA1(da50d650ab6456d61d0fb7f89247f2040b4bb9a8) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1hipt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "high point 6 b 20p.bin", 0x0000, 0x008000, CRC(535c1df1) SHA1(99d3033ee708c27134d461591eb7d19a573768d4) )
+	ROM_LOAD( "high point 6 a 20p.bin", 0x8000, 0x008000, CRC(228c3eef) SHA1(c60da857fa5630809b072c20cf1f24ee26c38d0b) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1hipta )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "high point 69 6.bin", 0x8000, 0x008000, CRC(82564d75) SHA1(436b75e6617a6c2bb89ea0994696928b8452317d) )
+	ROM_LOAD( "high point 70 6.bin", 0x0000, 0x008000, CRC(752b4c6e) SHA1(30503128ccca5c88e66174bd3e54b115eded1db6) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+
+ROM_START( sc1satse )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "satellitese.bin", 0x0000, 0x010000, CRC(de88d59c) SHA1(0df9ff2aa4be2634bc66e8f5539a7aa8c71b340a) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1strk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "strike.bin", 0x0000, 0x010000, CRC(8bfae942) SHA1(325b74e3df527ad56e68b58b206fb3a491a44305) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "strikesoundp1.bin", 0x0000, 0x010000, CRC(bca5518c) SHA1(1b66e72e110702754eb3991f351cce689d6ad41c) )
+	ROM_LOAD( "strikesoundp2.bin", 0x0000, 0x010000, CRC(50d6c506) SHA1(cb9851ebad21c0b14cf3d57159034a8660a32f74) )
+ROM_END
+
+ROM_START( sc1supfl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "superflushse.bin", 0x0000, 0x010000, CRC(50f890d1) SHA1(6edad44aaba069b2a3cc2bd16ed4cf383d6f7029) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc1ofs56 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ofs56cp1", 0x8000, 0x008000, CRC(928c0a32) SHA1(1c83e497d62112850ff1607f9b20a12fe07a88cc) )
+	ROM_LOAD( "ofs56cp2", 0x0000, 0x008000, CRC(c3af2861) SHA1(4fe47355ea9431360f17ff4004a7529111aa1d50) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+
+ROM_START( sc1wof )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "frds1-4n.p1", 0x8000, 0x008000, CRC(add2f2f8) SHA1(6c9852493b5e13cc694deacb96fe6d04f49e5c30) )
+	ROM_LOAD( "frds1-4n.p2", 0x0000, 0x008000, CRC(60e56657) SHA1(4f02be663cfb36beeaa47be37fca7447d6ff9ebc) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1wofa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wfor3-3n.p1", 0x8000, 0x008000, CRC(a6bb27bd) SHA1(abe240ecb5ceee1012d0ff547380e2d122380efc) )
+	ROM_LOAD( "wfor3-3n.p2", 0x0000, 0x008000, CRC(610f5700) SHA1(1752604a2ea3ac658d86b5a5baea03d67b8a6e99) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1wofb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wof.bin", 0x0000, 0x010000, CRC(6aa9ccce) SHA1(d8781e225c97ccf2fd847ead1ae8e200358f8a96) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc1crzyc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "craz1-5n.p1", 0x8000, 0x008000, CRC(943166ce) SHA1(9fbc97a1ede5ef18d5d5c544484b4a63f9a9901b) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc1crzyca )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ccds1-2n.p1", 0x8000, 0x008000, CRC(62d75b51) SHA1(82c9a211e9465c04cbf7597481ee4fb3cbac9a94) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1clbdy )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ddpv1-1a.gg", 0x8000, 0x008000, CRC(1614ee7b) SHA1(e777a122062f24a18fbe827371e359bbdd4298e7) )
+	ROM_LOAD( "ddpv1-1b.gg", 0x0000, 0x008000, CRC(692d4347) SHA1(6cdf3dbbaffe47fc026debaa74303d4ad36a5b63) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1clbdya )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dyn1-6n.p1", 0x8000, 0x008000, CRC(9cb42e58) SHA1(bb92e7618efb9a95e96d55d6ee46ba4f08cb825b) )
+	ROM_LOAD( "dyn1-6n.p2", 0x0000, 0x008000, CRC(425b8cf6) SHA1(8b3dd294ff965103b5621da462b39629445456b9) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( sc1chqfl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cflg1-5n.p1", 0x8000, 0x008000, CRC(2337b8ed) SHA1(c27b3b91ca52dd7edb05743753b4510c05f29055) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( sc1s1000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "super1000.bin", 0x8000, 0x008000, CRC(879e56e6) SHA1(5c0a08375a30213142e1d3835ea46462d882982d) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
 
 
 
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-GAME( 1988, sc1lotus, 0,        scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Lotus SE (Dutch)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 1988, sc1roul, 0,        scorpion1			, scorpion1	, rou029		, 0,       "BFM/ELAM", "Roulette (Dutch, Game Card 39-360-129?)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 1990, sc1clatt, 0,        scorpion1			, clatt		, clatt			, 0,       "BFM",      "Club Attraction (UK, Game Card 39-370-196)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 1990, sc1clatta,sc1clatt, scorpion1			, clatt		, clatt			, 0,       "BFM",      "Club Attraction (set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
-GAME( 198?, sc1actv8, 0,        scorpion1_viper		, scorpion1	, nocrypt		, 0,       "BFM",      "Active 8 (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1armad, 0,        scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Armada (Bellfruit) (Dutch) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1bartk, 0,        scorpion1_viper		, clatt		, lotse			, 0,       "BFM",      "Bar Trek (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1barcd, 0,        scorpion1_viper		, clatt		, lotse			, 0,       "BFM",      "Barcode (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1bigmt, 0,        scorpion1_viper		, clatt		, nocrypt		, 0,       "BFM",      "The Big Match (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1calyp, 0,        scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Calypso (Bellfruit) (Dutch) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1carro, 0,        scorpion1			, scorpion1	, nocrypt_bank0	, 0,       "BFM/ELAM", "Carrousel (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1cshat, 0,        scorpion1			, scorpion1 , lotse  		, 0,       "BFM",      "Cash Attraction (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1cshcd, 0,        scorpion1			, scorpion1,  lotse			, 0,       "BFM/ELAM", "Cash Card (Bellfruit) (Dutch) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1cshcda,sc1cshcd, scorpion1			, scorpion1,  lotse			, 0,       "BFM",    "Cash Card (Bellfruit) (Scorpion 1, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1cshcdb,sc1cshcd, scorpion1			, scorpion1,  lotse			, 0,       "BFM",    "Cash Card (Bellfruit) (Scorpion 1, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1ccoin, 0,        scorpion1			, scorpion1,  lotse			, 0,       "BFM",    "Cash Coin (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1cexpd, 0,        scorpion1			, scorpion1,  lotse			, 0,       "BFM/ELAM","Cash Explosion (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1cexpl, 0,        scorpion1			, scorpion1,  lotse			, 0,       "BFM",    "Cash Explosion (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1cshwz, 0,        scorpion1			, scorpion1,  lotse			, 0,       "BFM",    "Cash Wise (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1cshin, 0,        scorpion1			, scorpion1,  lotse			, 0,       "BFM/ELAM",    "Cashino (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1china, 0,        scorpion1_viper		, scorpion1,  lotse			, 0,       "BFM",    "China Town Club (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1class, 0,        scorpion1			, scorpion1,  nocrypt		, 0,       "BFM/ELAM",    "Classic (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1cwcl, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Clockwise Club (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1clown, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Clown Around (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1cl2k, 0,        scorpion1,	 scorpion1,  nocrypt,	0,       "BFM/ELAM",    "Club 2000 (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1cl2k1, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Club 2001 (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1cl65, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Club 65 Special (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1clbdm, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Club Diamond (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1clbxp, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Club Explosion (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1clbrn, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Club Runner (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1clbsp, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Club Spinner (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1clbtm, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Club Temptation (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1clbw, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Club Wise (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1copdd, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Cops 'n' Robbers Deluxe (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1copdx, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Cops 'n' Robbers Deluxe (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // is this really sc1? it does nothing
-GAME( 198?, sc1count, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Count Cash Club (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1dago, 0,        scorpion1,	 scorpion1,  lotse,	0,       "ELAM",    "Dagobert's Vault (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1disc, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Discovey (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1dblch, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Double Chance (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1dream, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Dream Machine (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1final, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Final Touch (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1flash, 0,        scorpion1,	 scorpion1,  nocrypt,	0,       "BFM/ELAM",    "Flash (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1fruit, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Fruit Lines (Bellfruit) (Scorpion 1, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1frtln, sc1fruit, scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Fruit Lines (Bellfruit) (Scorpion 1, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1funh, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Fun House Club (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1gtime, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Good Times (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1gprix, 0,        scorpion1,	 scorpion1,  nocrypt,	0,       "BFM/ELAM",    "Grand Prix (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1gslam, 0,        scorpion1,	 scorpion1,  nocrypt,	0,       "BFM",    "Grand Slam (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1happy, 0,        scorpion1,	 scorpion1,  nocrypt,	0,       "BFM",    "Happy Hour (Bellfruit - Elam) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1impc, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Impact (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1kings, 0,        scorpion1,	 scorpion1,  lotse_bank0,	0,       "BFM/ELAM",    "Kings Club (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1linx, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Linx (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1magc, 0,        scorpion1,	 scorpion1,  nocrypt,	0,       "BFM/ELAM",    "Magic Circle (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1manha, 0,        scorpion1,	 scorpion1,  lotse_bank0,	0,       "BFM/ELAM",    "Manhattan (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1mast, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Master Club (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1quat, 0,        scorpion1,	 scorpion1,  nocrypt,	0,       "BFM/ELAM",    "Quatro (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1mist, 0,        scorpion1,	 scorpion1,  lotse_bank0,	0,       "BFM/ELAM",    "Mistral (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1olym, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Olympia (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1orac, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Oracle (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1pwrl, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Power Lines (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1rain, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Rainbow (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1re, 0,        scorpion1,	 scorpion1,  nocrypt,	0,       "BFM/ELAM",    "Reel Cash (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1rese, sc1re,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Reel Cash SE (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // doesn't say 'SE'
-GAME( 198?, sc1revo, 0,        scorpion1,	 scorpion1,  nocrypt,	0,       "BFM/ELAM",    "Revolution (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1rose, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Rose 'n' Crown (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1sant, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Santana (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1sat, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Satellite (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1shan, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Shanghai (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1spct, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Spectre (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1spit, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Spitfire (Elam) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1ster, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Sterling (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1str4, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Strike 4 (Bellfruit) (Scorpion 1, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1str4a, sc1str4,        scorpion1,	 scorpion1,  nocrypt,	0,       "BFM/ELAM",    "Strike 4 (Bellfruit) (Scorpion 1, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1sir, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Strike It Rich (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1sups, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Superstar (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1torn, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Tornado (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1tri, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Tri Star (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1typ, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Typhoon Club (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1ult, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Ultimate (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1vent, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Ventura (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1vict, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Victory (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1voy, 0,        scorpion1,	 scorpion1,  lotse,	0,       "ELAM",    "Voyager (Bellfruit) (Scorpion 1, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1voya, sc1voy,        scorpion1,	 scorpion1,  lotse,	0,       "ELAM",    "Voyager (Bellfruit) (Scorpion 1, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1winfl, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Winfalls [Dutch] (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1winst, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM",    "Winning Streak (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
-GAME( 198?, sc1zep, 0,        scorpion1,	 scorpion1,  lotse,	0,       "ELAM",    "Zeppelin (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1988, sc1lotus		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Lotus SE (Dutch)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1988, sc1roul			, 0			, scorpion1			, scorpion1	, rou029		, 0,       "BFM/ELAM", "Roulette (Dutch, Game Card 39-360-129?)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1990, sc1clatt		, 0			, scorpion1			, clatt		, clatt			, 0,       "BFM",      "Club Attraction (UK, Game Card 39-370-196)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1990, sc1clatta		, sc1clatt	, scorpion1			, clatt		, clatt			, 0,       "BFM",      "Club Attraction (set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1actv8		, 0			, scorpion1_viper	, scorpion1	, nocrypt		, 0,       "BFM",      "Active 8 (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1armad		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Armada (Bellfruit) (Dutch) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1bartk		, 0			, scorpion1_viper	, clatt		, lotse			, 0,       "BFM",      "Bar Trek (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1barcd		, 0			, scorpion1_viper	, clatt		, lotse			, 0,       "BFM",      "Barcode (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1bigmt		, 0			, scorpion1_viper	, clatt		, nocrypt		, 0,       "BFM",      "The Big Match (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1calyp		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Calypso (Bellfruit) (Dutch) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1carro		, 0			, scorpion1			, scorpion1	, nocrypt_bank0	, 0,       "BFM/ELAM", "Carrousel (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cshat		, 0			, scorpion1			, scorpion1 , lotse  		, 0,       "BFM",      "Cash Attraction (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cshcd		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Cash Card (Bellfruit) (Dutch) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cshcda		, sc1cshcd	, scorpion1			, scorpion1	, lotse			, 0,       "BFM", 	   "Cash Card (Bellfruit) (Scorpion 1, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cshcdb		, sc1cshcd	, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Cash Card (Bellfruit) (Scorpion 1, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1ccoin		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Cash Coin (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cexpd		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Cash Explosion (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cexpl		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Cash Explosion (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cshwz		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Cash Wise (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cshin		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Cashino (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1china		, 0			, scorpion1_viper	, scorpion1	, lotse			, 0,       "BFM",      "China Town Club (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1class		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,       "BFM/ELAM", "Classic (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cwcl			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Clockwise Club (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1clown		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Clown Around (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cl2k			, 0			, scorpion1			, scorpion1	, nocrypt		, 0,       "BFM/ELAM", "Club 2000 (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cl2k1		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Club 2001 (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1cl65			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1clbdm		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Club Diamond (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1clbxp		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Club Explosion (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1clbrn		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Club Runner (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1clbsp		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Club Spinner (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1clbtm		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Club Temptation (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1clbw			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Club Wise (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1copdd		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Cops 'n' Robbers Deluxe (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1copdx		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Cops 'n' Robbers Deluxe (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // is this really sc1? it does nothing
+GAME( 198?, sc1count		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Count Cash Club (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1dago			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "ELAM",     "Dagobert's Vault (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1disc			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Discovey (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1dblch		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Double Chance (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1dream		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Dream Machine (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1final		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Final Touch (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1flash		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,       "BFM/ELAM", "Flash (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1fruit		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Fruit Lines (Bellfruit) (Scorpion 1, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1frtln		, sc1fruit	, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Fruit Lines (Bellfruit) (Scorpion 1, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1funh			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Fun House Club (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1gtime		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Good Times (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1tiara		, 0			, scorpion1			, scorpion1	, nocrypt       , 0,       "ELAM",     "Tiara (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1gprix		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,       "BFM/ELAM", "Grand Prix (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1gslam		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,       "BFM",      "Grand Slam (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1happy		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,       "BFM",      "Happy Hour (Bellfruit - Elam) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1impc			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Impact (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1kings		, 0			, scorpion1			, scorpion1	, lotse_bank0	, 0,       "BFM/ELAM", "Kings Club (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1linx			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Linx (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1magc			, 0			, scorpion1			, scorpion1	, nocrypt		, 0,       "BFM/ELAM", "Magic Circle (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1manha		, 0			, scorpion1			, scorpion1	, lotse_bank0	, 0,       "BFM/ELAM", "Manhattan (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1mast			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Master Club (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1quat			, 0			, scorpion1			, scorpion1	, nocrypt		, 0,       "BFM/ELAM", "Quatro (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1mist			, 0			, scorpion1			, scorpion1	, lotse_bank0	, 0,       "BFM/ELAM", "Mistral (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1olym			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Olympia (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1orac			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Oracle (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1pwrl			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Power Lines (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1rain			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Rainbow (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1re			, 0			, scorpion1			, scorpion1	, nocrypt		, 0,       "BFM/ELAM", "Reel Cash (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1rese			, sc1re		, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Reel Cash SE (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL ) // doesn't say 'SE'
+GAME( 198?, sc1revo			, 0			, scorpion1			, scorpion1	, nocrypt		, 0,       "BFM/ELAM", "Revolution (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1rose			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Rose 'n' Crown (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1sant			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Santana (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1sat			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Satellite (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1shan			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Shanghai (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1spct			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Spectre (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1spit			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Spitfire (Elam) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1ster			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Sterling (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1str4			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Strike 4 (Bellfruit) (Scorpion 1, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1str4a		, sc1str4	, scorpion1			, scorpion1	, nocrypt		, 0,       "BFM/ELAM", "Strike 4 (Bellfruit) (Scorpion 1, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1sir			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Strike It Rich (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1sups			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Superstar (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1torn			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Tornado (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1tri			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Tri Star (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1typ			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Typhoon Club (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1ult			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Ultimate (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1vent			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Ventura (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1vict			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Victory (Bellfruit) [Dutch] (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1voy			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "ELAM",     "Voyager (Bellfruit) (Scorpion 1, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1voya			, sc1voy	, scorpion1			, scorpion1	, lotse			, 0,       "ELAM",     "Voyager (Bellfruit) (Scorpion 1, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1winfl		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Winfalls [Dutch] (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1winst		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1zep			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "ELAM",     "Zeppelin (Bellfruit) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, sc1wthn			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "Eurocoin", "Wild Thing (Eurocoin) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, sc1moonl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Bwb",      "Moon Lite (Bwb)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1ltdv			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Pcp",      "Little Devil (Pcp)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 198?, sc1t1k			, 0			, scorpion1			, scorpion1	, lotse			, 0,       "Eurocoin", "Top 1000 (Eurocoin) (Scorpion 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 199?, sc1smoke		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Mdm",      "Smokey Vs The Bandit (Mdm) (Scorpion 2/3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME( 199?, sc1ccroc		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Mdm",      "Crazy Crocs (Mdm) (Scorpion 2/3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME( 199?, sc1crocr		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Mdm",      "Croc And Roll (Mdm) (Scorpion 2/3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME( 199?, sc1btclk		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Mdm",      "Beat The Clock (Mdm) (Scorpion 2/3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME( 199?, sc1clins		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/PCP",  "Cash Lines (Bellfruit) (Scorpion 1) (set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1clinsa		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/PCP",  "Cash Lines (Bellfruit) (Scorpion 1) (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1clinsb		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1clinsc		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1clinsd		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 5)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1clinse		, sc1clins	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 6)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1clb3			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Club 3000 (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1czbrk		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Crazy Break (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // Battery Defect
+GAME( 199?, sc1dyncl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Dynamite Club (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1energ		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Energy (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // Battery Defect
+GAME( 199?, sc1hipt			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "High Point (Bellfruit) (Scorpion 1) (set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1hipta		, sc1hipt	, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "High Point (Bellfruit) (Scorpion 1) (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1satse		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/ELAM", "Satellite SE (Bellfruit) (Dutch) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1strk			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/ELAM", "Strike (Bellfruit) (Dutch) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1supfl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/ELAM", "Super Flush (Bellfruit) (Dutch) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+// are they really SC1?
+GAME( 199?, sc1btbc			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Beat The Bank Club (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // behaves like sc1dyncl, but then locks up
+GAME( 199?, sc1bee			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Bee Line (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1frpus		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Fruit Pursuit (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1esc			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Every Second Counts (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1ofs56		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Unknown 'ofs56cp' (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // OFAH - Phoenix 1
+GAME( 199?, sc1boncl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Bonanza Club (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+// are these really SC1? they do more here than in SC2 at least!
+GAME( 199?, sc1days			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "All In A Days Work (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1cscl			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "Cash Classic (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1driv			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "Driving School (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1vsd			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "Vegas Super Deal (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+
+GAME( 199?, sc1wof			, 0			, scorpion1			, scorpion1	, lotse	  	    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1wofa			, sc1wof	, scorpion1			, scorpion1	, lotse	  	    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1wofb			, sc1wof	, scorpion1			, scorpion1	, nocrypt	    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1crzyc		, 0			, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Crazy Cash (Global) (set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1crzyca		, sc1crzyc	, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Crazy Cash (Global) (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1clbdy		, 0			, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Club Dynamite (Global) (set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1clbdya		, sc1clbdy	, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Club Dynamite (Global) (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 199?, sc1chqfl		, 0			, scorpion1			, scorpion1	, lotse	        , 0,	   "Global",   "Chequered Flag (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 1992, sc1s1000		, 0			, scorpion1			, scorpion1	, lotse	        , 0,	   "Deltasoft",   "Super 1000 (Deltasoft)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // JT/Deltasoft Nov 1992
+
+
+
+
+GAME( 199?, sc1dip			, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Eurocoin", "Diplomat (Eurocoin) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // S3 RY error (Scorpion 3?)
+GAME( 199?, sc1lamb			, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Eurocoin", "Lambada (Eurocoin) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //
+GAME( 199?, sc1reply		, 0			, scorpion1			, scorpion1	, nocrypt		, 0,	   "Eurocoin", "Replay (Eurocoin) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) //
 
 
 //Adder 2
 GAME( 1996, m_tppokr, 0,        scorpion1_adder2	, toppoker	, toppoker		, 0,       "BFM/ELAM",    "Top Poker (Dutch, Game Card 95-750-899)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+
+
+
 
 
 
