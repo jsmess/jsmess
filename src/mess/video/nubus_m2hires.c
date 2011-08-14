@@ -92,7 +92,7 @@ void nubus_m2hires_device::device_start()
 
 	// set_nubus_device makes m_slot valid
 	set_nubus_device();
-	install_declaration_rom(this, M2HIRES_ROM_REGION);
+	install_declaration_rom(this, M2HIRES_ROM_REGION, true);
 
 	slotspace = get_slotspace();
 
@@ -103,7 +103,7 @@ void nubus_m2hires_device::device_start()
 
 	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_m2hires_device::vram_r), this), write32_delegate(FUNC(nubus_m2hires_device::vram_w), this));
 	m_nubus->install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_m2hires_device::vram_r), this), write32_delegate(FUNC(nubus_m2hires_device::vram_w), this));
-	m_nubus->install_device(slotspace+0x80000, slotspace+0x8fffff, read32_delegate(FUNC(nubus_m2hires_device::m2hires_r), this), write32_delegate(FUNC(nubus_m2hires_device::m2hires_w), this));
+	m_nubus->install_device(slotspace+0x80000, slotspace+0xeffff, read32_delegate(FUNC(nubus_m2hires_device::m2hires_r), this), write32_delegate(FUNC(nubus_m2hires_device::m2hires_w), this));
 
 	m_timer = timer_alloc(0, NULL);
 	m_screen = NULL;	// can we look this up now?

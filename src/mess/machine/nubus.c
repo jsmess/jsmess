@@ -139,17 +139,17 @@ void nubus_device::add_nubus_card(device_nubus_card_interface *card)
 	m_device_list.append(*card);
 }
 
-void nubus_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
+void nubus_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, UINT32 mask)
 {
 	m_maincpu = machine().device(m_cputag);
 	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 32:
-			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
+			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, U64(0xffffffffffffffff));
+			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported", buswidth);
@@ -157,17 +157,17 @@ void nubus_device::install_device(offs_t start, offs_t end, read8_delegate rhand
 	}
 }
 
-void nubus_device::install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler)
+void nubus_device::install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, UINT32 mask)
 {
 	m_maincpu = machine().device(m_cputag);
 	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 32:
-			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
+			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, U64(0xffffffffffffffff));
+			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported", buswidth);
@@ -175,17 +175,17 @@ void nubus_device::install_device(offs_t start, offs_t end, read16_delegate rhan
 	}
 }
 
-void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler)
+void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, UINT32 mask)
 {
 	m_maincpu = machine().device(m_cputag);
 	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 32:
-			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
+			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, U64(0xffffffffffffffff));
+			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported", buswidth);
@@ -294,7 +294,7 @@ void device_nubus_card_interface::install_bank(offs_t start, offs_t end, offs_t 
 	m_nubus->install_bank(start, end, mask, mirror, bank, data);
 }
 
-void device_nubus_card_interface::install_declaration_rom(device_t *dev, const char *romregion)
+void device_nubus_card_interface::install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb)
 {
 	bool inverted = false;
 	UINT8 *newrom = NULL;
@@ -418,6 +418,13 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 	strcat(bankname, m_nubus_slottag);
 	addr -= romlen;
 //	printf("Installing ROM at %x, length %x\n", addr, romlen);
-	m_nubus->install_bank(addr, addr+romlen-1, 0, 0, bankname, newrom);
+	if (mirror_all_mb)	// mirror the declaration ROM across all 16 megs of the slot space
+	{
+		m_nubus->install_bank(addr, addr+romlen-1, 0, 0x00f00000, bankname, newrom);
+	}
+	else
+	{
+		m_nubus->install_bank(addr, addr+romlen-1, 0, 0, bankname, newrom);
+	}
 }
 
