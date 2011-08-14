@@ -576,6 +576,17 @@
 		</part>
 	</software>
 
+	<software name="asyndromp" cloneof="asyndrom">
+		<description>Alien Syndrome (Prototype)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="alien syndrome (proto).bin" size="262144" crc="c148868c" sha1="dddee03096314881d53946051ece26db0dd742e0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Serial: 9011 -->
 	<software name="ayrton">
 		<description>Ayrton Senna's Super Monaco GP II (Euro, Bra, Kor)</description>
@@ -1226,6 +1237,18 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="cyborg hunter (usa, europe).bin" size="131072" crc="908e7524" sha1="b6131585cb944d7fae69ad609802a1b5d51b442f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Note: This dump should work also in a MSX1 -->
+	<software name="cyborgz">
+		<description>Cyborg Z (Kor)</description>
+		<year>1991</year>
+		<publisher>Zemina</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="cyborg z (kr).bin" size="131072" crc="77efe84a" sha1="c2e661e9b68a78e5a5fae5ae297b5d964d82491e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

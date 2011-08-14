@@ -46982,6 +46982,23 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+<!-- TODO: Add support for proper pcb type -->
+	<software name="zelda3c" supported="no">
+		<!-- Serial: ES-1096 - Release Date:  - Alternative Title:  -->
+		<description>Zelda - A Link to the Past (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-FS304" />
+			<dataarea name="prg" size="2097152">
+				<rom name="zelda (es-1096) (ch).prg" size="2097152" crc="f5d34c8e" sha1="aae48d38fc4c2eb1cdafe98d1bf686b19e84883a" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dongfang" cloneof="zelda" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Dong Fang De Chuan Shuo - The Hyrule Fantasy (Chi, Decrypted)</description>
@@ -55576,6 +55593,19 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
+	<software name="ghgc">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Gaau Hok Gwong Cheung (Chi)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-43272" />
+			<dataarea name="prg" size="262144">
+				<rom name="gaau hok gwong cheung (ch) [u][!].prg" size="262144" crc="3eee9ad8" sha1="662adb1d4714a0e2cf0a1da714b9c03e6086d2e8" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dongshen">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Dong Sheng English Sound-Word Blaster (Chi)</description>
@@ -56605,6 +56635,22 @@ Other
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="aobocco wars [p1][!].prg" size="262144" crc="4ff64765" sha1="a340f5e92905466434149e82457b4b5e4447fd84" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backtof4" cloneof="bmaster">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Back to the Future 4 (Blaster Master pirate)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="back to the future iv (unl).chr" size="131072" crc="23f192b3" sha1="291ef6d8983f69919dc312c2ade5ea975bf9fa93" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="back to the future iv (unl).prg" size="131072" crc="72924076" sha1="878886ee4a46dfffcf7413df54d7be848f976e67" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -59778,6 +59824,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mstrfgt6" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Master Fighter VI' (Asia)</description>
+		<year>1993</year>
+		<publisher>Yoko</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-YOKO" />
+			<dataarea name="chr" size="524288">
+				<rom name="master fighter vi' (yoko-y1) [u][!].chr" size="524288" crc="db9710e4" sha1="8e39f36d5bb360182b1c05fbc01dcd6f0d440d47" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="master fighter vi' (yoko-y1) [u][!].prg" size="131072" crc="d3e3e457" sha1="e6c8bfcdbe68868132e767fa7b0a3ee150aa3d94" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mk2b" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Mortal Kombat 2 (Asia)</description>
@@ -60035,6 +60097,23 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="mortal kombat ii special (pirate original)[p1][!].prg" size="131072" crc="1ac7c1dd" sha1="751d1f3a4462139bfecfc0c9cef717626287dbcc" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- These carts use the same prg/chr but different dip settings, to choose between the two games -->
+	<software name="mk2y" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Mortal Kombat II ~ Mortal Kombat V Pro (Asia)</description>
+		<year>1994</year>
+		<publisher>Yoko</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-YOKO" />
+			<dataarea name="chr" size="262144">
+				<rom name="mortal kombat ii (yoko) [u][!].chr" size="262144" crc="338d8317" sha1="4847c8da198dd87880f1c33111604031285d4f2b" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="mortal kombat ii (yoko) [u][!].prg" size="262144" crc="893b02ec" sha1="396d56aa018a43d42bb045f827b792c464a96457" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -60523,6 +60602,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="umk3a">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Ultimate Mortal Kombat 3 (Asia, 14 Characters)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-H2288" />
+			<dataarea name="chr" size="262144">
+				<rom name="ultimate mortal kombat 3 14 people (unl) [!].chr" size="262144" crc="8b8019ac" sha1="5e03fe23af2be17175735d3b072f3561382773d3" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="ultimate mortal kombat 3 14 people (unl) [!].prg" size="131072" crc="33408263" sha1="4d8e598bc43cebd2f833aca379b8d0495b3719fa" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="umk4" supported="no">
 		<!-- Serial: NT-873 - Release Date:  - Alternative Title:  -->
 		<description>Ultimate Mortal Kombat 4 (Asia)</description>
@@ -60871,6 +60966,22 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_12ctv">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>12 in 1 Console TV Game Cartridge</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-XZY" />
+			<dataarea name="chr" size="1048576">
+				<rom name="12-in-1 console tv game cartridge (unl) [!].chr" size="1048576" crc="ce50a0ef" sha1="cc2dbf94d94b60ae7b77dceaddbf4405c2991b37" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="1048576">
+				<rom name="12-in-1 console tv game cartridge (unl) [!].prg" size="1048576" crc="9e6b57b8" sha1="4479844c315570c6cb187799fc5d20b891520f2a" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

@@ -489,7 +489,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="congo1" cloneof="congo">
+	<software name="congoa" cloneof="congo">
+		<description>Congo Bongo (Euro, Jpn, v1 Alt)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="congo bongo [v1] [40k map].bin" size="40960" crc="f1506565" sha1="4ea22b9a655c4cfe13500beb97e84da451752148" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="congob" cloneof="congo">
 		<description>Congo Bongo (Jpn, v0)</description>
         <!-- other 32k dumps floating around are overdumps, as verified by Bock! -->
 		<year>1983</year>
@@ -918,6 +929,17 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="james bond 007 (japan) (v2.7) (om).bin" size="16384" crc="90160849" sha1="88d8c1f56f06ec76be285c29f41322a748f7c4db" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jb007a" cloneof="jb007">
+		<description>007 James Bond (Jpn, v2.6, OMV)</description>
+		<year>1984</year>
+		<publisher>Tsukuda Original</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="007 james bond [v2.6] [40k map].bin" size="40960" crc="a8b5b57f" sha1="c4c947a00155412c4e8b492e19ac229cc61fb401" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1536,24 +1558,35 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="spacearm">
 		<!-- Serial: OM-G007 - Alt Title: スペースアーマー -->
-		<description>Space Armor (Jpn, OMV, v1)</description>
+		<description>Space Armor (Jpn, v20, OMV)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="space armor [v1].bin" size="16384" crc="ac4f0a5c" sha1="a968b1debb39909cd83203244cc60da1e0003f71" offset="000000" />
+				<rom name="space armor [v2].bin" size="16384" crc="ac4f0a5c" sha1="a968b1debb39909cd83203244cc60da1e0003f71" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spacearma" cloneof="spacearm">
 		<!-- Serial: OM-G007, also W-016 (Tw, by Aaronix) - Alt Title: スペースアーマー, Dìguó dà fǎnjí ~ 帝國大反擊 -->
-		<description>Space Armor (Jpn, OMV, v0)</description>
+		<description>Space Armor (Jpn, v20 Alt, OMV)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="space armor [v0].bin" size="16384" crc="d5fdb4a3" sha1="3c3b59321321061642f8cf609ae3e2cab56eb83b" offset="000000" />
+				<rom name="space armor [v1].bin" size="16384" crc="d5fdb4a3" sha1="3c3b59321321061642f8cf609ae3e2cab56eb83b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacearmb" cloneof="spacearm">
+		<description>Space Armor (Jpn, v10, OMV)</description>
+		<year>1984</year>
+		<publisher>Tsukuda Original</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="space armor [v0] [40k map].bin" size="40960" crc="d23b0e3e" sha1="bbffe62f8f851e3c4a62981437facb518054a8ab" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1744,6 +1777,17 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="yamato (japan, europe).bin" size="16384" crc="e2fd5201" sha1="4d746558fb699c5cb480ba26130518105b2e2031" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yamatoa" cloneof="yamato">
+		<description>Yamato (Euro, Jpn, Alt)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="yamato [40k map].bin" size="40960" crc="9c7497ff" sha1="fe86e669f3e4b808236d7b80aeb5a83172edb9ac" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
