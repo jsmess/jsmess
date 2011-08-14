@@ -392,7 +392,9 @@ READ8_DEVICE_HANDLER( geneve_r )
 		if ((offset & 0xfff0)==0xf130)
 		{
 			// clock
-			value = mm58274c_r(board->clock, offset & 0x00f);
+			// tests on the real machine showed that
+			// upper nibble is 0xf (probably because of the location at 0xf130?)
+			value = mm58274c_r(board->clock, offset & 0x000f) | 0xf0;
 			return value;
 		}
 	}
@@ -413,7 +415,15 @@ READ8_DEVICE_HANDLER( geneve_r )
 		if ((offset & 0xfff0)==0x8010)
 		{
 			// clock
-			value = mm58274c_r(board->clock, offset & 0x00f);
+			// upper nibble is 1, only last byte gets a 2
+			// probably because of the location at 8010...8020?
+			// (TI mode used swapped byte order)
+			// unless we use a workspace at >F000, in which case we get 8x values
+			// Obscure, needs more investigation. We might as well ignore this,
+			// as the high nibble is obviously undefined and takes some past
+			// value floating around.
+			value = mm58274c_r(board->clock, offset & 0x000f);
+			value |= ((offset & 0x000f)==0x000f)? 0x20 : 0x10;
 			return value;
 		}
 		if ((offset & 0xfc01)==0x8800)
