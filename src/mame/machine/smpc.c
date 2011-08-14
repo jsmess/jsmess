@@ -387,7 +387,7 @@ static TIMER_CALLBACK( intback_peripheral )
 	/* doesn't work? */
 	//pad_num = state->m_smpc.intback_stage - 1;
 
-	if(LOG_PAD_CMD) printf("%d\n",state->m_smpc.intback_stage - 1);
+	if(LOG_PAD_CMD) printf("%d %d %d\n",state->m_smpc.intback_stage - 1,machine.primary_screen->vpos(),(int)machine.primary_screen->frame_number());
 
 	offset = 0;
 
@@ -791,14 +791,14 @@ static void saturn_comreg_exec(address_space *space,UINT8 data)
 			timing = 100;
 
 			if(state->m_smpc.IREG[0] != 0) // non-peripheral data
-				timing = 200;
+				timing += 100;
 
 			if(state->m_smpc.IREG[1] & 8) // peripheral data
-				timing = 15000;
+				timing += 700;
 
 			/* TODO: check if IREG[2] is setted to 0xf0 */
 
-			if(LOG_PAD_CMD) printf("INTBACK %02x %02x\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1]);
+			if(LOG_PAD_CMD) printf("INTBACK %02x %02x %d %d\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1],space->machine().primary_screen->vpos(),(int)space->machine().primary_screen->frame_number());
 			space->machine().scheduler().timer_set(attotime::from_usec(timing), FUNC(saturn_smpc_intback),0); //TODO: is variable time correct?
 			break;
 		/* RTC write*/
@@ -850,9 +850,9 @@ WRITE8_HANDLER( saturn_SMPC_w )
 			else if(data & 0x80)
 			{
 				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request\n");
-				space->machine().scheduler().timer_set(attotime::from_usec(200), FUNC(intback_peripheral),0); /* TODO: is timing correct? */
+				space->machine().scheduler().timer_set(attotime::from_usec(700), FUNC(intback_peripheral),0); /* TODO: is timing correct? */
 				state->m_smpc.OREG[31] = 0x10;
-				//state->m_smpc.SF = 0x01; //TODO: set hand-shake flag?
+				state->m_smpc.SF = 0x01; //TODO: set hand-shake flag?
 			}
 		}
 	}
