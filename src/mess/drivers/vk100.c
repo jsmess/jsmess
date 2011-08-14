@@ -48,6 +48,8 @@ Notes:
       ROM4 - TP-01 (C) DEC 1980 23-190E2-00 P8316E AMD 35517 8117DPP
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 
@@ -58,17 +60,18 @@ public:
 	vk100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+
 };
 
 
-static ADDRESS_MAP_START(vk100_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(vk100_mem, AS_PROGRAM, 8, vk100_state)
 	ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE( 0x0000, 0x67ff ) AM_ROM
+	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	//AM_RANGE( 0x7000, 0x700f) AM_DEVREADWRITE(vk100_keyboard) AM_MIRROR(0x0ff0)
 	AM_RANGE( 0x8000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vk100_io , AS_IO, 8)
+static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	// Comments are from page 118 (5-14) of http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf
 	//AM_RANGE (0x40, 0x40) AM_WRITE(X_low)  //LD X LO \_ 12 bits
@@ -110,7 +113,7 @@ static INPUT_PORTS_START( vk100 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(vk100)
+static MACHINE_RESET( vk100 )
 {
 }
 
@@ -120,31 +123,29 @@ static VIDEO_START( vk100 )
 
 static SCREEN_UPDATE( vk100 )
 {
-    return 0;
+	return 0;
 }
 
 static MACHINE_CONFIG_START( vk100, vk100_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
-    MCFG_CPU_PROGRAM_MAP(vk100_mem)
-    MCFG_CPU_IO_MAP(vk100_io)
-    //MCFG_CPU_VBLANK_INT("screen", vk100_vertical_interrupt) // hook me up please
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
+	MCFG_CPU_PROGRAM_MAP(vk100_mem)
+	MCFG_CPU_IO_MAP(vk100_io)
+	//MCFG_CPU_VBLANK_INT("screen", vk100_vertical_interrupt) // hook me up please
 
-    MCFG_MACHINE_RESET(vk100)
+	MCFG_MACHINE_RESET(vk100)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MCFG_SCREEN_UPDATE(vk100)
-
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
-
-    MCFG_VIDEO_START(vk100)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_VIDEO_START(vk100)
+	MCFG_SCREEN_UPDATE(vk100)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -152,21 +153,20 @@ MACHINE_CONFIG_END
 The 4 firmware roms should go from 0x0000-0x1fff, 0x2000-0x3fff, 0x4000-0x5fff and 0x6000-0x63ff; The last rom is actually a little bit longer and goes to 67ff.
 */
 ROM_START( vk100 )
-  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-  ROM_LOAD( "23-031e4-00.rom1", 0x0000, 0x2000, CRC(c8596398) SHA1(a8dc833dcdfb7550c030ac3d4143e266b1eab03a))
-  ROM_LOAD( "23-017e4-00.rom2", 0x2000, 0x2000, CRC(e857a01e) SHA1(914b2c51c43d0d181ffb74e3ea59d74e70ab0813))
-  ROM_LOAD( "23-018e4-00.rom3", 0x4000, 0x2000, CRC(b3e7903b) SHA1(8ad6ed25cd9b04a9968aa09ab69ba526d35ca550))
-  ROM_LOAD( "23-190e2-00.rom4", 0x6000, 0x1000, CRC(ad596fa5) SHA1(b30a24155640d32c1b47a3a16ea33cd8df2624f6))
-  ROM_REGION( 0x10000, "proms", ROMREGION_ERASEFF )
-  ROM_LOAD( "6301.pr3", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // this is either the "SYNC ROM" or the "VECTOR ROM" which handles timing related stuff. or possibly both. (256*4)
-  ROM_LOAD( "6309.pr1", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf)) // this is probably the "DIRECTION ROM", but might not be. (256*8)
-  ROM_LOAD( "6309.pr2", 0x0200, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // this is definitely the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8)
-  ROM_LOAD( "7643.pr4", 0x0300, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // this is definitely the "PATTERN ROM", (1k*4)
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "23-031e4-00.rom1", 0x0000, 0x2000, CRC(c8596398) SHA1(a8dc833dcdfb7550c030ac3d4143e266b1eab03a))
+	ROM_LOAD( "23-017e4-00.rom2", 0x2000, 0x2000, CRC(e857a01e) SHA1(914b2c51c43d0d181ffb74e3ea59d74e70ab0813))
+	ROM_LOAD( "23-018e4-00.rom3", 0x4000, 0x2000, CRC(b3e7903b) SHA1(8ad6ed25cd9b04a9968aa09ab69ba526d35ca550))
+	ROM_LOAD( "23-190e2-00.rom4", 0x6000, 0x1000, CRC(ad596fa5) SHA1(b30a24155640d32c1b47a3a16ea33cd8df2624f6))
 
+	ROM_REGION( 0x10000, "proms", ROMREGION_ERASEFF )
+	ROM_LOAD( "6301.pr3", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // this is either the "SYNC ROM" or the "VECTOR ROM" which handles timing related stuff. or possibly both. (256*4)
+	ROM_LOAD( "6309.pr1", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf)) // this is probably the "DIRECTION ROM", but might not be. (256*8)
+	ROM_LOAD( "6309.pr2", 0x0200, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // this is definitely the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8)
+	ROM_LOAD( "7643.pr4", 0x0300, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // this is definitely the "PATTERN ROM", (1k*4)
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1980, vk100,  0,       0, 	vk100,	vk100,	 0, 		 "Digital Equipment Corporation",   "VK 100",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                       FULLNAME       FLAGS */
+COMP( 1980, vk100,  0,      0,       vk100,     vk100,   0,  "Digital Equipment Corporation", "VK 100", GAME_NOT_WORKING | GAME_NO_SOUND)

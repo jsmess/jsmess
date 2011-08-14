@@ -14,7 +14,7 @@ S - Save Cassette
 
 There are others which just hang or reboot the system, due to no input checking.
 
-Unable to test the cassette due to a core bug.
+
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
