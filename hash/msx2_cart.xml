@@ -506,6 +506,49 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="suikoden">
+		<!-- 水滸伝 天命の誓い -->
+		<description>Suikoden - Tenmei no Chikai</description>
+		<year>1989</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M208-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK5864BP-12L" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh534a1b" size="524288" crc="187d3a21" sha1="de251a0af1df3be18469578dc00d414e572ee33e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scramble">
+		<!-- スクランブルフォーメーション -->
+		<description>Scramble Formation</description>
+		<year>1987</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA6228" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532044" size="262144" crc="226795e0" sha1="24384e63bfe450bce6abd327eae3e27969025379" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zukkoke">
+		<!-- ずっこけやじきた隠密道中 -->
+		<description>Zukkoke Yajikita Onmitsu Douchuu</description>
+		<year>1987</year>
+		<publisher>HAL</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh23108j" size="131072" crc="d0ececc6" sha1="094d11ebf8a20b6bfc07902c7f136bdd18b1e7ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>

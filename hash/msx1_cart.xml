@@ -282,6 +282,39 @@ Most of the information in this list was taken from http://gigamix.jp/rom/rom.ph
 -->
 
 <!--
+	<software name="synthsau">
+		<!- シンセサウルス ->
+		<description>Synth Saurus</description>
+		<year></year>
+		<publisher>Bit2</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M-008S" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="131072">
+				<rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+<!--
+	<software name="synthsaua">
+		<!- シンセサウルス ->
+		<description>Synth Saurus (alt)</description>
+		<year></year>
+		<publisher>Bit2</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-2M008-E2M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
+				<rom name="a27512zb" size="65536" crc="" sha1="" offset="0x20000" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+<!--
 	<software name="">
 		<description></description>
 		<year></year>
