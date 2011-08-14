@@ -134,7 +134,8 @@ struct _tms9902_t
 
 	/* clock registers */
 	emu_timer *dectimer;			/* MESS timer, used to emulate the decrementer register */
-	emu_timer *optimer;
+	emu_timer *recvtimer;
+	emu_timer *sendtimer;
 
 	// This value is the ratio of data input versus the poll rate. The
 	// data source should deliver data bytes at every 1/baudpoll call.
@@ -225,9 +226,9 @@ void tms9902_clock(device_t *device, bool state)
 {
 	tms9902_t *tms9902 = get_token(device);
 	if (state)
-		tms9902->optimer->adjust(attotime::from_msec(1), 0, attotime::from_hz(POLLING_FREQ));
+		tms9902->recvtimer->adjust(attotime::from_msec(1), 0, attotime::from_hz(POLLING_FREQ));
 	else
-		tms9902->optimer->reset();
+		tms9902->recvtimer->reset();
 }
 
 /*
@@ -351,6 +352,21 @@ static TIMER_CALLBACK(op_callback)
 
 	if (tms9902->intf->rcv_callback)
 		(*tms9902->intf->rcv_callback)(device, tms9902->baudpoll);
+}
+
+static TIMER_CALLBACK(sender_callback)
+{
+	device_t *device = (device_t *) ptr;
+	tms9902_t *tms9902 = get_token(device);
+	// Byte has been sent
+	tms9902->XSRE = true;
+
+	// In the meantime, the CPU may have pushed a new byte into the XBR
+	// so we loop until all data are transferred
+	if (!tms9902->XBRE && tms9902->CTSflag)
+	{
+		initiate_transmit(device);
+	}
 }
 
 /*
@@ -489,29 +505,45 @@ static void initiate_transmit(device_t *device)
 {
 	tms9902_t *tms9902 = get_token(device);
 
-	/* Load transmit register */
-	tms9902->XSR = tms9902->XBR;
-	tms9902->XSRE = false;
-	tms9902->XBRE = true;
-
-	field_interrupts(device);
-
-	if (VERBOSE>4) LOG("TMS9902: transmit XSR=%02x, RCL=%02x\n", tms9902->XSR, tms9902->RCL);
-
-	if (tms9902->intf->xmit_callback)
-		(*tms9902->intf->xmit_callback)(device, tms9902->XSR & (0xff >> (3-tms9902->RCL)));
-
-	tms9902->XSRE = true;
-
-	if ((!tms9902->XBRE) /*&& tms9902->RTS*/ && tms9902->CTSflag /*&& ! tms9902->BRK*/)
-		/* load next byte */
-		initiate_transmit(device);
-	else if (tms9902->BRKON /*&& tms9902->RTS*/ && tms9902->CTSflag)
+	if (tms9902->BRKON && tms9902->CTSflag)
 		/* enter break mode */
 		send_break(device, true);
-	else if ((! tms9902->RTSON) && ((! tms9902->CTSflag) || (tms9902->XBRE && !tms9902->BRKflag)))
-		/* clear RTS output */
-		set_rts(device, CLEAR_LINE);
+	else
+	{
+		if (!tms9902->RTSON && (!tms9902->CTSflag || (tms9902->XBRE && !tms9902->BRKflag)))
+			/* clear RTS output */
+			set_rts(device, CLEAR_LINE);
+		else
+		{
+			tms9902->XSR = tms9902->XBR;
+			tms9902->XSRE = false;
+			tms9902->XBRE = true;
+
+			field_interrupts(device);
+
+			if (VERBOSE>4) LOG("TMS9902: transmit XSR=%02x, RCL=%02x\n", tms9902->XSR, tms9902->RCL);
+
+			if (tms9902->intf->xmit_callback)
+				(*tms9902->intf->xmit_callback)(device, tms9902->XSR & (0xff >> (3-tms9902->RCL)));
+
+			// Should store that somewhere (but the CPU is fast enough, can afford to recalc :-) )
+			double fint = tms9902->clock_rate / ((tms9902->CLK4M) ? 4.0 : 3.0);
+			double baud = fint / (2.0 * ((tms9902->RDV8)? 8:1) * tms9902->RDR);
+
+			// Time for transmitting 10 bit (8 bit + start + stop)
+			tms9902->sendtimer->adjust(attotime::from_hz(baud/10.0));
+		}
+	}
+
+	// if ((!tms9902->XBRE) /*&& tms9902->RTS*/ && tms9902->CTSflag /*&& ! tms9902->BRK*/)
+		// /* load next byte */
+		// initiate_transmit(device);
+	// else if (tms9902->BRKON /*&& tms9902->RTS*/ && tms9902->CTSflag)
+		// /* enter break mode */
+		// send_break(device, true);
+	// else if ((! tms9902->RTSON) && ((! tms9902->CTSflag) || (tms9902->XBRE && !tms9902->BRKflag)))
+		// /* clear RTS output */
+		// set_rts(device, CLEAR_LINE);
 }
 
 
@@ -904,7 +936,8 @@ static DEVICE_START( tms9902 )
 	tms9902->clock_rate = tms9902->intf->clock_rate;
 
 	tms9902->dectimer = device->machine().scheduler().timer_alloc(FUNC(decrementer_callback), (void *) device);
-	tms9902->optimer = device->machine().scheduler().timer_alloc(FUNC(op_callback), (void *) device);
+	tms9902->recvtimer = device->machine().scheduler().timer_alloc(FUNC(op_callback), (void *) device);
+	tms9902->sendtimer = device->machine().scheduler().timer_alloc(FUNC(sender_callback), (void *) device);
 }
 
 
