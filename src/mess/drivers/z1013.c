@@ -290,6 +290,17 @@ const z80pio_interface z1013k7659_z80pio_intf =
 
 SNAPSHOT_LOAD( z1013 )
 {
+/* header layout
+0000,0001 - load address
+0002,0003 - end address
+0004,0005 - exec address
+0006-000B - unknown
+000C      - Filetype (appears B=Basic, C=Machine Language, I=?, could be more)
+000D-000F - bytes D3, D3, D3
+0010-001F - Filename
+0020 up   - Program to load
+*/
+
 	UINT8* data= auto_alloc_array(image.device().machine(), UINT8, snapshot_size);
 	UINT16 startaddr,endaddr,runaddr;
 
@@ -299,15 +310,25 @@ SNAPSHOT_LOAD( z1013 )
 	endaddr   = data[2] + data[3]*256;
 	runaddr   = data[4] + data[5]*256;
 
-	if ((data[12]=='C') && (data[13]==0xD3) && (data[14]==0xD3))
+	if ((data[13]==data[14]) && (data[14]==data[15]))
 	{ }
 	else
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Not a Z1013 image");
+		image.message(" Not a Z1013 image");
 		return IMAGE_INIT_FAIL;
+	}
 
 	memcpy (image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(startaddr),
 		 data+0x20, endaddr - startaddr + 1);
 
-	cpu_set_reg(image.device().machine().device("maincpu"), Z80_PC, runaddr);
+	if (runaddr)	
+		cpu_set_reg(image.device().machine().device("maincpu"), Z80_PC, runaddr);
+	else
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Loaded but cannot run");
+		image.message(" Loaded but cannot run");
+	}
 
 	return IMAGE_INIT_PASS;
 }
