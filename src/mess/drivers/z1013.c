@@ -4,65 +4,102 @@
 
         22/04/2009 Preliminary driver.
 
-****************************************************************************/
+Monitor commands
+B - Registers
+D - Dump memory
+E - Registers
+L - Load Cassette
+M - Modify Memory
+S - Save Cassette
 
+There are others which just hang or reboot the system, due to no input checking.
+
+Unable to test the cassette due to a core bug.
+
+****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
-#include "includes/z1013.h"
+#include "imagedev/snapquik.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
+
+
+class z1013_state : public driver_device
+{
+public:
+	z1013_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_cass(*this, CASSETTE_TAG)
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cass;
+	DECLARE_WRITE8_MEMBER(z1013_keyboard_w);
+	DECLARE_READ8_MEMBER(z1013_port_b_r);
+	DECLARE_WRITE8_MEMBER(z1013_port_b_w);
+	DECLARE_READ8_MEMBER(z1013k7659_port_b_r);
+	UINT8 *m_p_videoram;
+	const UINT8 *m_p_chargen;
+	UINT8 m_keyboard_line;
+	bool m_keyboard_part;
+};
+
 
 /* Address maps */
-static ADDRESS_MAP_START(z1013_mem, AS_PROGRAM, 8)
-    AM_RANGE( 0x0000, 0xefff ) AM_RAM
-    AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_BASE_MEMBER(z1013_state, m_video_ram)
-    AM_RANGE( 0xf000, 0xffff ) AM_ROM //  ROM
+static ADDRESS_MAP_START(z1013_mem, AS_PROGRAM, 8, z1013_state)
+	AM_RANGE( 0x0000, 0xebff ) AM_RAM
+	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE( 0xf000, 0xffff ) AM_ROM //  ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z1013_io, AS_IO, 8 )
+static ADDRESS_MAP_START(z1013_io, AS_IO, 8, z1013_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE( 0x08, 0x08 ) AM_WRITE(z1013_keyboard_w)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( z1013_8x4 )
-	PORT_START("LINE0")
+	PORT_START("X0")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_TAB)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S1") PORT_CODE(KEYCODE_LSHIFT)
-	PORT_START("LINE1")
+	PORT_START("X1")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S2") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_START("LINE2")
+	PORT_START("X2")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S3") PORT_CODE(KEYCODE_RSHIFT)
-	PORT_START("LINE3")
+	PORT_START("X3")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S4") PORT_CODE(KEYCODE_RCONTROL)
-	PORT_START("LINE4")
+	PORT_START("X4")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
-	PORT_START("LINE5")
+	PORT_START("X5")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE)
-	PORT_START("LINE6")
+	PORT_START("X6")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
-	PORT_START("LINE7")
+	PORT_START("X7")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)
@@ -70,7 +107,7 @@ static INPUT_PORTS_START( z1013_8x4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( z1013_8x8 )
-	PORT_START("LINE0")
+	PORT_START("X0")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
@@ -79,7 +116,7 @@ static INPUT_PORTS_START( z1013_8x8 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)
-	PORT_START("LINE1")
+	PORT_START("X1")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
@@ -88,7 +125,7 @@ static INPUT_PORTS_START( z1013_8x8 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)
-	PORT_START("LINE2")
+	PORT_START("X2")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)
@@ -96,8 +133,8 @@ static INPUT_PORTS_START( z1013_8x8 )
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_V)
-	PORT_START("LINE3")
+		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N)
+	PORT_START("X3")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J)
@@ -106,7 +143,7 @@ static INPUT_PORTS_START( z1013_8x8 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
-	PORT_START("LINE4")
+	PORT_START("X4")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)
@@ -115,7 +152,7 @@ static INPUT_PORTS_START( z1013_8x8 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+") PORT_CODE(KEYCODE_COLON)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
-	PORT_START("LINE5")
+	PORT_START("X5")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_EQUALS)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_TILDE)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_OPENBRACE)
@@ -124,7 +161,7 @@ static INPUT_PORTS_START( z1013_8x8 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_CLOSEBRACE)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("_") PORT_CODE(KEYCODE_MINUS)
-	PORT_START("LINE6")
+	PORT_START("X6")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Graph") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ent") PORT_CODE(KEYCODE_ENTER)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
@@ -133,7 +170,7 @@ static INPUT_PORTS_START( z1013_8x8 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
-	PORT_START("LINE7")
+	PORT_START("X7")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -146,6 +183,135 @@ INPUT_PORTS_END
 
 INPUT_PORTS_EXTERN( k7659 );
 
+
+VIDEO_START( z1013 )
+{
+	z1013_state *state = machine.driver_data<z1013_state>();
+	state->m_p_chargen = machine.region("chargen")->base();
+}
+
+SCREEN_UPDATE( z1013 )
+{
+	z1013_state *state = screen->machine().driver_data<z1013_state>();
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
+
+	for (y = 0; y < 32; y++)
+	{
+		for (ra = 0; ra < 8; ra++)
+		{
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = ma; x < ma+32; x++)
+			{
+				chr = state->m_p_videoram[x];
+
+				/* get pattern of pixels for that character scanline */
+				gfx = state->m_p_chargen[(chr<<3) | ra];
+
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
+			}
+		}
+		ma+=32;
+	}
+	return 0;
+}
+
+MACHINE_RESET( z1013 )
+{
+	z1013_state *state = machine.driver_data<z1013_state>();
+	cpu_set_reg(machine.device("maincpu"), Z80_PC, 0xF000);
+	state->m_keyboard_part = 0;
+	state->m_keyboard_line = 0;
+}
+
+WRITE8_MEMBER( z1013_state::z1013_keyboard_w )
+{
+	m_keyboard_line = data;
+}
+
+READ8_MEMBER( z1013_state::z1013_port_b_r )
+{
+	char kbdrow[6];
+	sprintf(kbdrow,"X%d", m_keyboard_line & 7);
+	UINT8 data = input_port_read(machine(), kbdrow);
+
+	if (m_keyboard_part)
+		data >>= 4;
+
+	data &= 0x0f;
+
+	if (m_cass->input() > 0.03)
+		data |= 0x40;
+
+	return data;
+}
+
+WRITE8_MEMBER( z1013_state::z1013_port_b_w )
+{
+	m_keyboard_part = BIT(data, 4); // for z1013a2 only
+	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
+}
+
+const z80pio_interface z1013_z80pio_intf =
+{
+	DEVCB_NULL,	/* callback when change interrupt status */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(z1013_state, z1013_port_b_r),
+	DEVCB_DRIVER_MEMBER(z1013_state, z1013_port_b_w),
+	DEVCB_NULL
+};
+
+READ8_MEMBER( z1013_state::z1013k7659_port_b_r )
+{
+	return 0xff;
+}
+
+const z80pio_interface z1013k7659_z80pio_intf =
+{
+	DEVCB_NULL,	/* callback when change interrupt status */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(z1013_state, z1013k7659_port_b_r),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+SNAPSHOT_LOAD( z1013 )
+{
+	UINT8* data= auto_alloc_array(image.device().machine(), UINT8, snapshot_size);
+	UINT16 startaddr,endaddr,runaddr;
+
+	image.fread( data, snapshot_size);
+
+	startaddr = data[0] + data[1]*256;
+	endaddr   = data[2] + data[3]*256;
+	runaddr   = data[4] + data[5]*256;
+
+	if ((data[12]=='C') && (data[13]==0xD3) && (data[14]==0xD3))
+	{ }
+	else
+		return IMAGE_INIT_FAIL;
+
+	memcpy (image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(startaddr),
+		 data+0x20, endaddr - startaddr + 1);
+
+	cpu_set_reg(image.device().machine().device("maincpu"), Z80_PC, runaddr);
+
+	return IMAGE_INIT_PASS;
+}
+
 /* F4 Character Displayer */
 static const gfx_layout z1013_charlayout =
 {
@@ -156,13 +322,22 @@ static const gfx_layout z1013_charlayout =
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
-	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8 },
 	8*8					/* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( z1013 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, z1013_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, z1013_charlayout, 0, 1 )
 GFXDECODE_END
+
+static const cassette_interface z1013_cassette_interface =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
+	NULL
+};
 
 
 /* Machine driver */
@@ -181,17 +356,20 @@ static MACHINE_CONFIG_START( z1013, z1013_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
+	MCFG_VIDEO_START(z1013)
 	MCFG_SCREEN_UPDATE(z1013)
-
 	MCFG_GFXDECODE(z1013)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(z1013)
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
+	/* Devices */
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_1MHz, z1013_z80pio_intf )
-
-	/* snapshot */
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, z1013_cassette_interface )
 	MCFG_SNAPSHOT_ADD("snapshot", z1013, "z80", 0)
 MACHINE_CONFIG_END
 
@@ -205,9 +383,11 @@ ROM_START( z1013 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "202", "Original" )
 	ROMX_LOAD( "mon_202.bin", 0xf000, 0x0800, CRC(5884edab) SHA1(c3a45ea5cc4da2b7c270068ba1e2d75916960709), ROM_BIOS(1))
+
 	ROM_SYSTEM_BIOS( 1, "jm", "Jens Muller version" )
 	ROMX_LOAD( "mon_jm_1992.bin", 0xf000, 0x0800, CRC(186d2888) SHA1(b52ccb557c41c96bace7db4c4f5031a0cd736168), ROM_BIOS(2))
-	ROM_REGION(0x1000, "gfx1",0)
+
+	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
 	ROM_LOAD ("altfont.bin",     0x0800, 0x0800, CRC(2dc96f9c) SHA1(d0b9b0751cc1e91be731547f6442c649b6dd6979))
 ROM_END
@@ -215,7 +395,8 @@ ROM_END
 ROM_START( z1013a2 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "mon_a2.bin", 0xf000, 0x0800, CRC(98b19b10) SHA1(97e158f589198cb96aae1567ee0aa6e47824027e))
-	ROM_REGION(0x1000, "gfx1",0)
+
+	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
 	ROM_LOAD ("altfont.bin",     0x0800, 0x0800, CRC(2dc96f9c) SHA1(d0b9b0751cc1e91be731547f6442c649b6dd6979))
 ROM_END
@@ -223,9 +404,11 @@ ROM_END
 ROM_START( z1013k76 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "mon_rb_k7659.bin", 0xf000, 0x1000, CRC(b3d88c45) SHA1(0bcd20338cf0706b384f40901b7f8498c6f6c320))
-	ROM_REGION(0x1000, "gfx1",0)
+
+	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
 	ROM_LOAD ("altfont.bin",     0x0800, 0x0800, CRC(2dc96f9c) SHA1(d0b9b0751cc1e91be731547f6442c649b6dd6979))
+
 	ROM_REGION(0x1000, "k7659",0)
 	ROM_LOAD ("k7659n.bin", 0x0000, 0x0800, CRC(7454bf0a) SHA1(b97e7df93778fa371b96b6f4fb1a5b1c8b89d7ba) )
 ROM_END
@@ -234,9 +417,11 @@ ROM_START( z1013s60 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
 	ROMX_LOAD( "mon_rb_s6009.bin", 0xf000, 0x1000, CRC(b37faeed) SHA1(ce2e69af5378d39284e8b3be23da50416a0b0fbe), ROM_BIOS(1))
+
 	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
 	ROMX_LOAD( "4k-moni-k7652.bin", 0xf000, 0x1000, CRC(a1625fce) SHA1(f0847399502b38a73ad26b38ee2d85ba04ab85ec), ROM_BIOS(2))
-	ROM_REGION(0x1000, "gfx1",0)
+
+	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
 	ROM_LOAD ("altfont.bin",     0x0800, 0x0800, CRC(2dc96f9c) SHA1(d0b9b0751cc1e91be731547f6442c649b6dd6979))
 ROM_END
@@ -244,15 +429,16 @@ ROM_END
 ROM_START( z1013k69 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "4k-moni-k7669.bin", 0xf000, 0x1000, CRC(09cd2a7a) SHA1(0b8500320d464469868a6b48db31105f34710c41))
-	ROM_REGION(0x1000, "gfx1",0)
+
+	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
 	ROM_LOAD ("altfont.bin",     0x0800, 0x0800, CRC(2dc96f9c) SHA1(d0b9b0751cc1e91be731547f6442c649b6dd6979))
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE      INPUT       INIT   COMPANY                 FULLNAME   FLAGS */
-COMP( 1985, z1013,     0,      0,	z1013,		z1013_8x4,	z1013, "VEB Robotron Electronics Riesa",	 "Z1013 (matrix 8x4)",		 GAME_NO_SOUND)
-COMP( 1985, z1013a2,   z1013,  0,	z1013,		z1013_8x8,	z1013, "VEB Robotron Electronics Riesa",	 "Z1013 (matrix 8x8)",		 GAME_NO_SOUND)
-COMP( 1985, z1013k76,  z1013,  0,	z1013k76,	k7659,		z1013, "VEB Robotron Electronics Riesa",	 "Z1013 (K7659)",		 GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1985, z1013s60,  z1013,  0,	z1013k76,	z1013_8x8,  z1013, "VEB Robotron Electronics Riesa",	 "Z1013 (K7652/S6009)",	 GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1985, z1013k69,  z1013,  0,	z1013k76,	k7659,		z1013, "VEB Robotron Electronics Riesa",	 "Z1013 (K7669)",		 GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME       PARENT  COMPAT  MACHINE      INPUT       INIT             COMPANY                       FULLNAME        FLAGS */
+COMP( 1985, z1013,     0,      0,      z1013,       z1013_8x4,  0, "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x4)", 0 )
+COMP( 1985, z1013a2,   z1013,  0,      z1013,       z1013_8x8,  0, "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x8)", 0 )
+COMP( 1985, z1013k76,  z1013,  0,      z1013k76,    k7659,      0, "VEB Robotron Electronics Riesa", "Z1013 (K7659)", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1985, z1013s60,  z1013,  0,      z1013k76,    z1013_8x8,  0, "VEB Robotron Electronics Riesa", "Z1013 (K7652/S6009)", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1985, z1013k69,  z1013,  0,      z1013k76,    k7659,      0, "VEB Robotron Electronics Riesa", "Z1013 (K7669)", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
