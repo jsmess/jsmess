@@ -46,7 +46,7 @@
    You may read the LGPL at http://www.gnu.org/licenses/lgpl.html
 
    Changelog:
-   Sep. 8, 2002 - fixed ymf278b_compute_rate when OCT is negative (RB)
+   Sep. 8, 2002 - fixed ymf278b_compute_rate when octave is negative (RB)
    Dec. 11, 2002 - added ability to set non-standard clock rates (RB)
                    fixed envelope target for release (fixes missing
            instruments in hotdebut).
@@ -55,6 +55,13 @@
    June 4, 2003 -  Changed to dual-license with LGPL for use in OpenMSX.
                    OpenMSX contributed a bugfix where looped samples were
             not being addressed properly, causing pitch fluctuation.
+   ......
+
+   TODO:
+   - accurate timing of envelopes
+   - LFO (vibrato, tremolo)
+   - integrate YMF262 (used by Fuuki games, not used by Psikyo and Metro games)
+   - able to hook up "Moonsound", supporting mixed ROM+RAM (for MSX driver in MESS)
 */
 
 #include "emu.h"
@@ -66,27 +73,30 @@
 typedef struct
 {
 	INT16 wave;		/* wavetable number */
-	INT16 FN;		/* f-number */
-	INT8 OCT;		/* octave */
-	INT8 PRVB;		/* pseudo-reverb */
+	INT16 F_NUMBER;	/* frequency */
+	INT8 octave;	/* octave */
+	INT8 preverb;	/* pseudo-reverb */
+	INT8 DAMP;		/* damping */
+	INT8 CH;		/* output channel */
 	INT8 LD;		/* level direct */
 	INT8 TL;		/* total level */
 	INT8 pan;		/* panpot */
-	INT8 lfo;		/* LFO */
-	INT8 vib;		/* vibrato */
-	INT8 AM;		/* AM level */
+	INT8 LFO;		/* LFO */
+	INT8 VIB;		/* vibrato */
+	INT8 AM;		/* tremolo */
 
-	INT8 AR;
-	INT8 D1R;
-	INT8 DL;
-	INT8 D2R;
+	INT8 AR;		/* attack rate */
+	INT8 D1R;		/* decay 1 rate */
+	INT8 DL;		/* decay level */
+	INT8 D2R;		/* decay 2 rate */
 	INT8 RC;		/* rate correction */
-	INT8 RR;
+	INT8 RR;		/* release rate */
 
 	UINT32 step;	/* fixed-point frequency step */
 	UINT64 stepptr;	/* fixed-point pointer into the sample */
 
-	INT8 active;	/* slot keyed on */
+	INT8 active;	/* channel is playing */
+	INT8 KEY_ON;	/* slot keyed on */
 	INT8 bits;		/* width of the samples */
 	UINT32 startaddr;
 	UINT32 loopaddr;
@@ -96,6 +106,7 @@ typedef struct
 	UINT32 env_vol;
 	UINT32 env_vol_step;
 	UINT32 env_vol_lim;
+	INT8 env_preverb;
 } YMF278BSlot;
 
 typedef struct
@@ -108,8 +119,7 @@ typedef struct
 	INT8 memmode;
 	INT32 memadr;
 
-	UINT8 busy;
-	UINT8 ld;
+	UINT8 status_busy, status_ld;
 	emu_timer *timer_busy;
 	emu_timer *timer_ld;
 	UINT8 exp;
@@ -117,11 +127,13 @@ typedef struct
 	INT32 fm_l, fm_r;
 	INT32 pcm_l, pcm_r;
 
-	UINT8 timer_a_count, timer_b_count, enable, current_irq;
+	attotime timer_base;
+	UINT8 timer_a_count, timer_b_count;
+	UINT8 enable, current_irq;
 	emu_timer *timer_a, *timer_b;
 	int irq_line;
 
-	UINT8 port_A, port_B, port_C;
+	UINT8 port_C, port_AB, lastport;
 	void (*irq_callback)(device_t *, int);
 	device_t *device;
 
@@ -129,8 +141,8 @@ typedef struct
 	UINT32 romsize;
 	int clock;
 
-	INT32 volume[256*4];			// precalculated attenuation values with some marging for enveloppe and pan levels
-	int pan_left[16], pan_right[16];	// pan volume offsets
+	INT32 volume[256*4];			// precalculated attenuation values with some margin for envelope and pan levels
+	int pan_left[16],pan_right[16];	// pan volume offsets
 	INT32 mix_level[8];
 
 	sound_stream * stream;
@@ -143,6 +155,22 @@ INLINE YMF278BChip *get_safe_token(device_t *device)
 	return (YMF278BChip *)downcast<legacy_device_base *>(device)->token();
 }
 
+static void ymf278b_write_memory(YMF278BChip *chip, UINT32 offset, UINT8 data)
+{
+	logerror("YMF278B:  Memory write %02x to %x\n", data, offset);
+}
+
+INLINE UINT8 ymf278b_read_memory(YMF278BChip *chip, UINT32 offset)
+{
+	if (offset >= chip->romsize)
+	{
+		// logerror("YMF278B:  Memory read overflow %x\n", offset);
+		return 0xff;
+	}
+	return chip->rom[offset];
+}
+
+
 static int ymf278b_compute_rate(YMF278BSlot *slot, int val)
 {
 	int res, oct;
@@ -153,10 +181,11 @@ static int ymf278b_compute_rate(YMF278BSlot *slot, int val)
 		return 63;
 	if(slot->RC != 15)
 	{
-		oct = slot->OCT;
-		if (oct & 8) oct |= -8;
+		oct = slot->octave;
+		if (oct & 8)
+			oct |= -8;
 
-		res = (oct+slot->RC)*2 + (slot->FN & 0x200 ? 1 : 0) + val*4;
+		res = (oct+slot->RC)*2 + (slot->F_NUMBER & 0x200 ? 1 : 0) + val*4;
 	}
 	else
 		res = val * 4;
@@ -164,112 +193,163 @@ static int ymf278b_compute_rate(YMF278BSlot *slot, int val)
 		res = 0;
 	else if(res > 63)
 		res = 63;
+
 	return res;
+}
+
+INLINE UINT32 ymf278_compute_attack_rate(int num)
+{
+	// estimated (less accurate on high rates)
+	UINT32 samples;
+
+	if (num <= 3 || num == 63)
+		samples = 0;
+	else if (num >= 60)
+		samples = 17;
+	else
+		samples = (67 << (15 - num / 4)) / (4 + num % 4);
+
+	return samples;
 }
 
 static UINT32 ymf278_compute_decay_rate(int num)
 {
-	int samples;
+	// estimated
+	UINT32 samples;
 
 	if (num <= 3)
 		samples = 0;
 	else if (num >= 60)
 		samples = 15 << 4;
 	else
-	{
 		samples = (15 << (21 - num / 4)) / (4 + num % 4);
-		if (num % 4 && num / 4 <= 11)
-			samples += 2;
-		else if (num == 51)
-			samples += 2;
-	}
 
 	return samples;
 }
 
-static void ymf278b_envelope_next(YMF278BSlot *slot)
+static UINT32 ymf278_compute_decay_env_vol_step(YMF278BSlot *slot, int val)
 {
-	if(slot->env_step == 0)
-	{
-		// Attack
-		slot->env_vol = (256U << 23) - 1;
-		slot->env_vol_lim = 256U<<23;
-		LOG(("YMF278B: Skipping attack (rate = %d)\n", slot->AR));
-		slot->env_step++;
-	}
-	if(slot->env_step == 1)
-	{
-		// Decay 1
-		slot->env_vol = 0;
-		slot->env_step++;
-		if(slot->DL)
-		{
-			int rate = ymf278b_compute_rate(slot, slot->D1R);
-			LOG(("YMF278B: Decay step 1, dl=%d, val = %d rate = %d, delay = %g\n", slot->DL, slot->D1R, rate, ymf278_compute_decay_rate(rate)*1000.0));
+	int rate;
+	UINT32 res;
 
-			if(rate<4)
-				slot->env_vol_step = 0;
-			else
-				slot->env_vol_step = ((slot->DL*8)<<23) / ymf278_compute_decay_rate(rate);
-			slot->env_vol_lim = (slot->DL*8)<<23;
-			return;
-		}
-	}
-	if(slot->env_step == 2)
+	// rate override with damping/pseudo reverb
+	if (slot->DAMP)
+		rate = 56; // approximate, datasheet says it's slightly curved though
+	else if (slot->preverb && slot->env_vol > ((6*8)<<23))
 	{
-		// Decay 2
-		int rate = ymf278b_compute_rate(slot, slot->D2R);
+		// pseudo reverb starts at -18dB (6 in voltab)
+		slot->env_preverb = 1;
+		rate = 5;
+	}
+	else
+		rate = ymf278b_compute_rate(slot, val);
 
-		LOG(("YMF278B: Decay step 2, val = %d, rate = %d, delay = %g, current vol = %d\n", slot->D2R, rate, ymf278_compute_decay_rate(rate)*1000.0, slot->env_vol >> 23));
-		if(rate<4)
-			slot->env_vol_step = 0;
-		else
-			slot->env_vol_step = ((256U-slot->DL*8)<<23) / ymf278_compute_decay_rate(rate);
-		slot->env_vol_lim = 256U<<23;
-		slot->env_step++;
-		return;
-	}
-	if(slot->env_step == 3)
-	{
-		// Decay 2 reached -96dB
-		LOG(("YMF278B: Voice cleared because of decay 2\n"));
-		slot->env_vol = 256U<<23;
-		slot->env_vol_step = 0;
-		slot->env_vol_lim = 0;
-		slot->active = 0;
-		return;
-	}
-	if(slot->env_step == 4)
-	{
-		// Release
-		int rate = ymf278b_compute_rate(slot, slot->RR);
+	if (rate < 4)
+		res = 0;
+	else
+		res = (256U<<23) / ymf278_compute_decay_rate(rate);
 
-		LOG(("YMF278B: Release, val = %d, rate = %d, delay = %g\n", slot->RR, rate, ymf278_compute_decay_rate(rate)*1000.0));
-		if(rate<4)
-			slot->env_vol_step = 0;
-		else
-			slot->env_vol_step = ((256U<<23)-slot->env_vol) / ymf278_compute_decay_rate(rate);
-		slot->env_vol_lim = 256U<<23;
-		slot->env_step++;
-		return;
-	}
-	if(slot->env_step == 5)
-	{
-		// Release reached -96dB
-		LOG(("YMF278B: Release ends\n"));
-		slot->env_vol = 256U<<23;
-		slot->env_vol_step = 0;
-		slot->env_vol_lim = 0;
-		slot->active = 0;
-		return;
-	}
+	return res;
 }
 
-INLINE UINT8 ymf278b_read_sample(const UINT8* buffer, UINT32 buffersize, UINT32 offset)
+static void ymf278b_compute_freq_step(YMF278BSlot *slot)
 {
-	if (offset >= buffersize)
-		return 0;
-	return buffer[offset];
+	UINT32 step;
+	int oct;
+
+	oct = slot->octave;
+	if(oct & 8)
+		oct |= -8;
+
+	step = (slot->F_NUMBER | 1024) << (oct + 8);
+	slot->step = step >> 3;
+}
+
+static void ymf278b_compute_envelope(YMF278BSlot *slot)
+{
+	switch (slot->env_step)
+	{
+		// Attack
+		case 0:
+		{
+			// Attack
+			int rate = ymf278b_compute_rate(slot, slot->AR);
+			slot->env_vol = 256U<<23;
+			slot->env_vol_lim = (256U<<23) - 1;
+
+			if (rate==63)
+			{
+				// immediate
+				LOG(("YMF278B: Attack skipped - "));
+				slot->env_vol = 0;
+				slot->env_step++;
+				ymf278b_compute_envelope(slot);
+			}
+			else if (rate<4)
+			{
+				slot->env_vol_step = 0;
+			}
+			else
+			{
+				// NOTE: attack rate is linear here, but datasheet shows a smooth curve
+				LOG(("YMF278B: Attack, val = %d, rate = %d, delay = %g\n", slot->AR, rate, ymf278_compute_attack_rate(rate)*1000.0));
+				slot->env_vol_step = ~((256U<<23) / ymf278_compute_attack_rate(rate));
+			}
+
+			break;
+		}
+
+		// Decay 1
+		case 1:
+			if(slot->DL)
+			{
+				LOG(("YMF278B: Decay step 1, dl=%d, val = %d rate = %d, delay = %g, PRVB = %d, DAMP = %d\n", slot->DL, slot->D1R, ymf278b_compute_rate(slot, slot->D1R), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->D1R))*1000.0, slot->preverb, slot->DAMP));
+				slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->D1R);
+				slot->env_vol_lim = (slot->DL*8)<<23;
+			}
+			else
+			{
+				LOG(("YMF278B: Decay 1 skipped - "));
+				slot->env_step++;
+				ymf278b_compute_envelope(slot);
+			}
+
+			break;
+
+		// Decay 2
+		case 2:
+			LOG(("YMF278B: Decay step 2, val = %d, rate = %d, delay = %g, , PRVB = %d, DAMP = %d, current vol = %d\n", slot->D2R, ymf278b_compute_rate(slot, slot->D2R), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->D2R))*1000.0, slot->preverb, slot->DAMP, slot->env_vol >> 23));
+			slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->D2R);
+			slot->env_vol_lim = 256U<<23;
+			break;
+
+		// Decay 2 reached -96dB
+		case 3:
+			LOG(("YMF278B: Voice cleared because of decay 2\n"));
+			slot->env_vol = 256U<<23;
+			slot->env_vol_step = 0;
+			slot->env_vol_lim = 0;
+			slot->active = 0;
+			break;
+
+		// Release
+		case 4:
+			LOG(("YMF278B: Release, val = %d, rate = %d, delay = %g, PRVB = %d, DAMP = %d\n", slot->RR, ymf278b_compute_rate(slot, slot->RR), ymf278_compute_decay_rate(ymf278b_compute_rate(slot, slot->RR))*1000.0, slot->preverb, slot->DAMP));
+			slot->env_vol_step = ymf278_compute_decay_env_vol_step(slot, slot->RR);
+			slot->env_vol_lim = 256U<<23;
+			break;
+
+		// Release reached -96dB
+		case 5:
+			LOG(("YMF278B: Release ends\n"));
+			slot->env_vol = 256U<<23;
+			slot->env_vol_step = 0;
+			slot->env_vol_lim = 0;
+			slot->active = 0;
+			break;
+
+		default: break;
+	}
 }
 
 static STREAM_UPDATE( ymf278b_pcm_update )
@@ -294,39 +374,39 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 
 			for (j = 0; j < samples; j++)
 			{
-				if(slot->stepptr >= slot->endaddr)
+				if (slot->stepptr >= slot->endaddr)
 				{
 					slot->stepptr = slot->stepptr - slot->endaddr + slot->loopaddr;
-					// If the step is bigger than the loop, finish the sample forcibly
-					if(slot->stepptr >= slot->endaddr)
-					{
-						slot->env_vol = 256U<<23;
-						slot->env_vol_step = 0;
-						slot->env_vol_lim = 0;
-						slot->active = 0;
-						slot->stepptr = 0;
-						slot->step = 0;
-					}
+					if (slot->stepptr >= slot->endaddr)
+						slot->stepptr = slot->loopaddr; // loop overflow
 				}
 
 				switch (slot->bits)
 				{
-					case 8:
-						sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>16))<<8;
+					// 8 bit
+					case 0:
+						sample = ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>16))<<8;
 						break;
 
-					case 12:
-						if (slot->stepptr & 1)
-							sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
-								(ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
+					// 12 bit
+					case 1:
+						if (slot->stepptr & 0x10000)
+							sample = ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
+								(ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
 						else
-							sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3)<<8 |
-								(ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
+							sample = ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>17)*3)<<8 |
+								(ymf278b_read_memory(chip, slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
 						break;
 
-					case 16:
-						sample = ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
-							ymf278b_read_sample(chip->rom, chip->romsize, slot->startaddr + ((slot->stepptr>>16)*2)+1);
+					// 16 bit
+					case 2:
+						sample = ymf278b_read_memory(chip, slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
+							ymf278b_read_memory(chip, slot->startaddr + ((slot->stepptr>>16)*2)+1);
+						break;
+
+					// ?? bit, effect is unknown, datasheet says it's prohibited
+					case 3:
+						sample = 0;
 						break;
 				}
 
@@ -338,8 +418,13 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 
 				// update envelope
 				slot->env_vol += slot->env_vol_step;
-				if(((INT32)(slot->env_vol - slot->env_vol_lim)) >= 0)
-					ymf278b_envelope_next(slot);
+				if (((INT32)(slot->env_vol - slot->env_vol_lim)) >= 0)
+				{
+					slot->env_step++;
+					ymf278b_compute_envelope(slot);
+				}
+				else if (slot->preverb && !slot->env_preverb && slot->env_step && slot->env_vol > ((6*8)<<23))
+					ymf278b_compute_envelope(slot);
 			}
 		}
 	}
@@ -382,38 +467,9 @@ static TIMER_CALLBACK( ymf278b_timer_b_tick )
 	}
 }
 
-static void ymf278b_timer_a_reset(YMF278BChip *chip)
-{
-	if(chip->enable & 1)
-	{
-		attotime period = attotime::from_nsec((256-chip->timer_a_count) * 80800);
-
-		if (chip->clock != YMF278B_STD_CLOCK)
-			period = (period * chip->clock) / YMF278B_STD_CLOCK;
-
-		chip->timer_a->adjust(period, 0, period);
-	}
-	else
-		chip->timer_a->adjust(attotime::never);
-}
-
-static void ymf278b_timer_b_reset(YMF278BChip *chip)
-{
-	if(chip->enable & 2)
-	{
-		attotime period = attotime::from_nsec((256-chip->timer_b_count) * 323100);
-
-		if (chip->clock != YMF278B_STD_CLOCK)
-			period = (period * chip->clock) / YMF278B_STD_CLOCK;
-
-		chip->timer_b->adjust(period, 0, period);
-	}
-	else
-		chip->timer_b->adjust(attotime::never);
-}
-
 static void ymf278b_A_w(running_machine &machine, YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
+	// FM register array 0 (compatible with YMF262)
 	switch(reg)
 	{
 		// LSI TEST
@@ -421,28 +477,50 @@ static void ymf278b_A_w(running_machine &machine, YMF278BChip *chip, UINT8 reg, 
 		case 0x01:
 			break;
 
+		// timer a count
 		case 0x02:
-			chip->timer_a_count = data;
-			ymf278b_timer_a_reset(chip);
+			if (data != chip->timer_a_count)
+			{
+				chip->timer_a_count = data;
+
+				// change period, ~80.8us * t
+				if (chip->enable & 1)
+					chip->timer_a->adjust(chip->timer_a->remaining(), 0, chip->timer_base * (256-data) * 4);
+			}
 			break;
 
+		// timer b count
 		case 0x03:
-			chip->timer_b_count = data;
-			ymf278b_timer_b_reset(chip);
+			if (data != chip->timer_b_count)
+			{
+				chip->timer_b_count = data;
+
+				// change period, ~323.1us * t
+				if (chip->enable & 2)
+					chip->timer_b->adjust(chip->timer_b->remaining(), 0, chip->timer_base * (256-data) * 16);
+			}
 			break;
 
+		// timer control
 		case 0x04:
 			if(data & 0x80)
 				chip->current_irq = 0;
 			else
 			{
-				UINT8 old_enable = chip->enable;
+				// reset timers
+				if((chip->enable ^ data) & 1)
+				{
+					attotime period = (data & 1) ? chip->timer_base * (256-chip->timer_a_count) * 4 : attotime::never;
+					chip->timer_a->adjust(period, 0, period);
+				}
+				if((chip->enable ^ data) & 2)
+				{
+					attotime period = (data & 2) ? chip->timer_base * (256-chip->timer_b_count) * 16 : attotime::never;
+					chip->timer_b->adjust(period, 0, period);
+				}
+
 				chip->enable = data;
 				chip->current_irq &= ~data;
-				if((old_enable ^ data) & 1)
-					ymf278b_timer_a_reset(chip);
-				if((old_enable ^ data) & 2)
-					ymf278b_timer_b_reset(chip);
 			}
 			ymf278b_irq_check(machine, chip);
 			break;
@@ -455,6 +533,7 @@ static void ymf278b_A_w(running_machine &machine, YMF278BChip *chip, UINT8 reg, 
 
 static void ymf278b_B_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
+	// FM register array 1 (compatible with YMF262)
 	switch(reg)
 	{
 		// LSI TEST
@@ -476,17 +555,34 @@ static void ymf278b_B_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 static TIMER_CALLBACK( ymf278b_timer_ld_clear )
 {
 	YMF278BChip *chip = (YMF278BChip *)ptr;
-	chip->ld = 0;
+	chip->status_ld = 0;
 }
 
-static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
+static void ymf278b_retrigger_note(YMF278BSlot *slot)
 {
-	// officially, these registers can't be accessed if NEW2 is 0
-	if (~chip->exp & 2)
-		logerror("YMF278B:  Port C illegal write %02x, %02x\n", reg, data);
+	// activate channel
+	if (slot->octave != 8)
+		slot->active = 1;
 
-	chip->stream->update();
-	chip->pcmregs[reg] = data;
+	// reset sample pos and go to attack stage
+	slot->stepptr = 0;
+	slot->env_step = 0;
+	slot->env_preverb = 0;
+
+	ymf278b_compute_freq_step(slot);
+	ymf278b_compute_envelope(slot);
+}
+
+static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data, int init)
+{
+	if (!init)
+	{
+		// PCM regs are only accessible if NEW2 is set
+		if (~chip->exp & 2)
+			return;
+
+		chip->stream->update();
+	}
 
 	// Handle slot registers specifically
 	if (reg >= 0x08 && reg <= 0xf7)
@@ -500,129 +596,149 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 			case 0:
 			{
 				attotime period;
-				const UINT8 *p;
+				UINT32 offset;
+				UINT8 p[12];
+				int i;
 
 				slot->wave &= 0x100;
 				slot->wave |= data;
 
 				// load wavetable header
-				// status register LD bit is on for approx 300us
-				chip->ld = 1;
-				period = attotime::from_usec(300);
-				if (chip->clock != YMF278B_STD_CLOCK)
-					period = (period * chip->clock) / YMF278B_STD_CLOCK;
-				chip->timer_ld->adjust(period);
-
 				if(slot->wave < 384 || !chip->wavetblhdr)
-					p = chip->rom + (slot->wave * 12);
+					offset = slot->wave * 12;
 				else
-					p = chip->rom + chip->wavetblhdr*0x80000 + ((slot->wave - 384) * 12);
+					offset = chip->wavetblhdr*0x80000 + (slot->wave - 384) * 12;
+				for (i = 0; i < 12; i++)
+					p[i] = ymf278b_read_memory(chip, offset+i);
 
-				switch (p[0]&0xc0)
-				{
-					case 0:
-						slot->bits = 8;
-						break;
-					case 0x40:
-						slot->bits = 12;
-						break;
-					case 0x80:
-						slot->bits = 16;
-						break;
-					case 0xc0:
-						// prohibited
-						break;
-				}
-
-				slot->lfo = (p[7] >> 2) & 7;
-				slot->vib = p[7] & 7;
-				slot->AR = p[8] >> 4;
-				slot->D1R = p[8] & 0xf;
-				slot->DL = p[9] >> 4;
-				slot->D2R = p[9] & 0xf;
-				slot->RC = p[10] >> 4;
-				slot->RR = p[10] & 0xf;
-				slot->AM = p[11] & 7;
-
+				slot->bits = (p[0]&0xc0)>>6;
 				slot->startaddr = (p[2] | (p[1]<<8) | ((p[0]&0x3f)<<16));
 				slot->loopaddr = (p[4]<<16) | (p[3]<<24);
 				slot->endaddr = (p[6]<<16) | (p[5]<<24);
 				slot->endaddr -= 0x00010000U;
 				slot->endaddr ^= 0xffff0000U;
+
+				// copy internal registers data
+				for (i = 7; i < 12; i++)
+					ymf278b_C_w(chip, 8 + snum + (i-2) * 24, p[i], 1);
+
+				// status register LD bit is on for approx 300us
+				chip->status_ld = 1;
+				period = attotime::from_usec(300);
+				if (chip->clock != YMF278B_STD_CLOCK)
+					period = (period * chip->clock) / YMF278B_STD_CLOCK;
+				chip->timer_ld->adjust(period);
+
+				// retrigger if key is on
+				if (slot->KEY_ON)
+					ymf278b_retrigger_note(slot);
+				else if (slot->active)
+				{
+					// deactivate channel
+					slot->env_step = 5;
+					ymf278b_compute_envelope(slot);
+				}
+
 				break;
 			}
+
 			case 1:
 				slot->wave &= 0xff;
 				slot->wave |= ((data&0x1)<<8);
-				slot->FN &= 0x380;
-				slot->FN |= (data>>1);
-				break;
-			case 2:
-				slot->FN &= 0x07f;
-				slot->FN |= ((data&0x07)<<7);
-				slot->PRVB = ((data&0x4)>>3);
-				slot->OCT = ((data&0xf0)>>4);
-				break;
-			case 3:
-				slot->TL = (data>>1);
-				slot->LD = data&0x1;
-				break;
-			case 4:
-				slot->pan = data&0xf;
-				if (data & 0x80)
+				slot->F_NUMBER &= 0x380;
+				slot->F_NUMBER |= (data>>1);
+				if (slot->active && (data ^ chip->pcmregs[reg]) & 0xfe)
 				{
-					unsigned int step;
-					int oct;
-
-					slot->active = 1;
-
-					oct = slot->OCT;
-					if(oct & 8)
-						oct |= -8;
-
-					slot->env_step = 0;
-					slot->env_vol = 256U<<23;
-					slot->env_vol_step = 0;
-					slot->env_vol_lim = 256U<<23;
-					slot->stepptr = 0;
-					slot->step = 0;
-
-					step = (slot->FN | 1024) << (oct + 7);
-					slot->step = step / 4;
-
-					ymf278b_envelope_next(slot);
-
-					LOG(("YMF278B: slot %2d wave %3d lfo=%d vib=%d ar=%d d1r=%d dl=%d d2r=%d rc=%d rr=%d am=%d\n", snum, slot->wave,
-							 slot->lfo, slot->vib, slot->AR, slot->D1R, slot->DL, slot->D2R, slot->RC, slot->RR, slot->AM));
-					LOG(("                  b=%d, start=%x, loop=%x, end=%x, oct=%d, fn=%d, step=%x\n", slot->bits, slot->startaddr, slot->loopaddr>>16, slot->endaddr>>16, oct, slot->FN, slot->step));
+					ymf278b_compute_freq_step(slot);
+					ymf278b_compute_envelope(slot);
 				}
-				else
+				break;
+
+			case 2:
+				slot->F_NUMBER &= 0x07f;
+				slot->F_NUMBER |= ((data&0x07)<<7);
+				slot->preverb = (data&0x8)>>3;
+				slot->octave = (data&0xf0)>>4;
+				if (data != chip->pcmregs[reg])
 				{
-					LOG(("YMF278B: slot %2d off\n", snum));
-					if(slot->active)
+					// channel goes off if octave is set to -8 (datasheet says it's prohibited)
+					// (it is ok if this activates the channel while it was off: ymf278b_compute_envelope will reset it again if needed)
+					slot->active = (slot->octave != 8);
+
+					if (slot->active)
 					{
-						slot->env_step = 4;
-						ymf278b_envelope_next(slot);
+						slot->env_preverb = 0;
+						ymf278b_compute_freq_step(slot);
+						ymf278b_compute_envelope(slot);
 					}
 				}
 				break;
+
+			case 3:
+				slot->TL = data>>1;
+				slot->LD = data&0x1;
+				break;
+
+			case 4:
+				slot->CH = (data&0x10)>>4;
+				// CH bit note: output to DO1 pin (1) or DO2 pin (0), this may
+				// silence the channel depending on how it's wired up on the PCB.
+				// For now, it's always enabled.
+				// (bit 5 (LFO reset) is also not hooked up yet)
+
+				slot->pan = data&0xf;
+				slot->DAMP = (data&0x40)>>6;
+				if (data & 0x80)
+				{
+					// don't retrigger if key was already on
+					if (slot->KEY_ON)
+					{
+						if ((data ^ chip->pcmregs[reg]) & 0x40)
+							ymf278b_compute_envelope(slot);
+
+						break;
+					}
+
+					ymf278b_retrigger_note(slot);
+				}
+				else if (slot->active)
+				{
+					// release
+					slot->env_step = 4;
+					ymf278b_compute_envelope(slot);
+				}
+				slot->KEY_ON = (data&0x80)>>7;
+				break;
+
 			case 5:
-				slot->vib = data&0x7;
-				slot->lfo = (data>>3)&0x7;
+				// LFO and vibrato level, not hooked up yet
+				slot->LFO = (data>>3)&0x7;
+				slot->VIB = data&0x7;
 		    	break;
+
 			case 6:
 				slot->AR = data>>4;
 				slot->D1R = data&0xf;
+				if (slot->active && data != chip->pcmregs[reg])
+					ymf278b_compute_envelope(slot);
 				break;
+
 			case 7:
 				slot->DL = data>>4;
 				slot->D2R = data&0xf;
+				if (slot->active && data != chip->pcmregs[reg])
+					ymf278b_compute_envelope(slot);
 				break;
+
 			case 8:
 				slot->RC = data>>4;
 				slot->RR = data&0xf;
+				if (slot->active && data != chip->pcmregs[reg])
+					ymf278b_compute_envelope(slot);
 				break;
+
 			case 9:
+				// tremolo level, not hooked up yet
 				slot->AM = data & 0x7;
 				break;
 		}
@@ -642,6 +758,9 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 				chip->memmode = data&3;
 				break;
 
+			case 0x03:
+			case 0x04:
+				break;
 			case 0x05:
 				// set memory address
 				chip->memadr = (chip->pcmregs[3] & 0x3f) << 16 | chip->pcmregs[4] << 8 | data;
@@ -649,8 +768,12 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 
 			case 0x06:
 				// memory data (ignored, we don't support RAM)
+				ymf278b_write_memory(chip, chip->memadr, data);
 				chip->memadr = (chip->memadr + 1) & 0x3fffff;
 				break;
+
+			case 0x07:
+				break; // unused
 
 			case 0xf8:
 				chip->fm_l = data & 0x7;
@@ -661,20 +784,26 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 				chip->pcm_l = data & 0x7;
 				chip->pcm_r = (data>>3)&0x7;
 				break;
+
+			default:
+				logerror("YMF278B:  Port C write %02x, %02x\n", reg, data);
+				break;
 		}
 	}
+
+	chip->pcmregs[reg] = data;
 }
 
 static TIMER_CALLBACK( ymf278b_timer_busy_clear )
 {
 	YMF278BChip *chip = (YMF278BChip *)ptr;
-	chip->busy = 0;
+	chip->status_busy = 0;
 }
 
-static void ymf278b_timer_busy_reset(YMF278BChip *chip, int is_pcm)
+static void ymf278b_timer_busy_start(YMF278BChip *chip, int is_pcm)
 {
 	// status register BUSY bit is on for 56(FM) or 88(PCM) cycles
-	chip->busy = 1;
+	chip->status_busy = 1;
 	chip->timer_busy->adjust(attotime::from_hz(chip->clock / (is_pcm ? 88 : 56)));
 }
 
@@ -685,33 +814,27 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 	switch (offset)
 	{
 		case 0:
-			ymf278b_timer_busy_reset(chip, 0);
-			chip->port_A = data;
+		case 2:
+			ymf278b_timer_busy_start(chip, 0);
+			chip->port_AB = data;
+			chip->lastport = offset>>1 & 1;
 			break;
 
 		case 1:
-			ymf278b_timer_busy_reset(chip, 0);
-			ymf278b_A_w(device->machine(), chip, chip->port_A, data);
-			break;
-
-		case 2:
-			ymf278b_timer_busy_reset(chip, 0);
-			chip->port_B = data;
-			break;
-
 		case 3:
-			ymf278b_timer_busy_reset(chip, 0);
-			ymf278b_B_w(chip, chip->port_B, data);
+			ymf278b_timer_busy_start(chip, 0);
+			if (chip->lastport) ymf278b_B_w(chip, chip->port_AB, data);
+			else ymf278b_A_w(device->machine(), chip, chip->port_AB, data);
 			break;
 
 		case 4:
-			ymf278b_timer_busy_reset(chip, 1);
+			ymf278b_timer_busy_start(chip, 1);
 			chip->port_C = data;
 			break;
 
 		case 5:
-			ymf278b_timer_busy_reset(chip, 1);
-			ymf278b_C_w(chip, chip->port_C, data);
+			ymf278b_timer_busy_start(chip, 1);
+			ymf278b_C_w(chip, chip->port_C, data, 0);
 			break;
 
 		default:
@@ -724,6 +847,7 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 READ8_DEVICE_HANDLER( ymf278b_r )
 {
 	YMF278BChip *chip = get_safe_token(device);
+	UINT8 ret = 0;
 
 	switch (offset)
 	{
@@ -733,25 +857,38 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 			// bits 0 and 1 are only valid if NEW2 is set
 			UINT8 newbits = 0;
 			if (chip->exp & 2)
-				newbits = (chip->ld << 1) | chip->busy;
+				newbits = (chip->status_ld << 1) | chip->status_busy;
 
-			return newbits | chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
+			ret = newbits | chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
+			break;
 		}
 
-		// PCM/mixer
+		// FM regs can be read too (on contrary to what the datasheet says)
+		case 1:
+		case 3:
+			// but they're not implemented here yet
+			break;
+
+		// PCM regs
 		case 5:
+			// only accessible if NEW2 is set
+			if (~chip->exp & 2)
+				break;
+
 			switch (chip->port_C)
 			{
 				// special cases
 				case 2:
-					return (chip->pcmregs[chip->port_C] & 0x1f) | 0x20; // device ID in upper bits
+					ret = (chip->pcmregs[chip->port_C] & 0x1f) | 0x20; // device ID in upper bits
+					break;
 				case 6:
-					logerror("YMF278B:  Read memory data at %06x\n", chip->memadr); // memory data (ignored, we don't support RAM)
+					ret = ymf278b_read_memory(chip, chip->memadr);
 					chip->memadr = (chip->memadr + 1) & 0x3fffff;
 					break;
 
 				default:
-					return chip->pcmregs[chip->port_C];
+					ret = chip->pcmregs[chip->port_C];
+					break;
 			}
 			break;
 
@@ -759,26 +896,73 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 			logerror("%s: unexpected read at offset %X from ymf278b\n", device->machine().describe_context(), offset);
 			break;
 	}
-	return 0xff;
+
+	return ret;
 }
 
+
+static DEVICE_RESET( ymf278b )
+{
+	YMF278BChip *chip = get_safe_token(device);
+	int i;
+
+	// clear registers
+	for (i = 0; i <= 4; i++)
+		ymf278b_A_w(device->machine(), chip, i, 0);
+	ymf278b_B_w(chip, 5, 0);
+	for (i = 0; i < 8; i++)
+		ymf278b_C_w(chip, i, 0, 1);
+	for (i = 0xff; i >= 8; i--)
+		ymf278b_C_w(chip, i, 0, 1);
+	ymf278b_C_w(chip, 0xf8, 0x1b, 1);
+
+	chip->port_AB = chip->port_C = 0;
+	chip->lastport = 0;
+	chip->memadr = 0;
+
+	// init/silence channels
+	for (i = 0; i < 24 ; i++)
+	{
+		YMF278BSlot *slot = &chip->slots[i];
+
+		slot->LFO = 0;
+		slot->VIB = 0;
+		slot->AR = 0;
+		slot->D1R = 0;
+		slot->DL = 0;
+		slot->D2R = 0;
+		slot->RC = 0;
+		slot->RR = 0;
+		slot->AM = 0;
+
+		slot->startaddr = 0;
+		slot->loopaddr = 0;
+		slot->endaddr = 0;
+
+		slot->env_step = 5;
+		ymf278b_compute_envelope(slot);
+	}
+
+	chip->timer_a->reset();
+	chip->timer_b->reset();
+	chip->timer_busy->reset();	chip->status_busy = 0;
+	chip->timer_ld->reset();	chip->status_ld = 0;
+
+	chip->irq_line = CLEAR_LINE;
+}
 
 static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_t *, int))
 {
 	chip->rom = *device->region();
 	chip->romsize = device->region()->bytes();
+	chip->clock = device->clock();
 	chip->irq_callback = cb;
+
+	chip->timer_base = attotime::from_hz(chip->clock) * (19*36);
 	chip->timer_a = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_a_tick), chip);
 	chip->timer_b = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_b_tick), chip);
 	chip->timer_busy = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_busy_clear), chip);
 	chip->timer_ld = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_ld_clear), chip);
-	chip->irq_line = CLEAR_LINE;
-	chip->clock = device->clock();
-
-	chip->timer_a->reset();
-	chip->timer_b->reset();
-	chip->timer_busy->reset();
-	chip->timer_ld->reset();
 }
 
 static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
@@ -791,8 +975,8 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 	device->save_item(NAME(chip->wavetblhdr));
 	device->save_item(NAME(chip->memmode));
 	device->save_item(NAME(chip->memadr));
-	device->save_item(NAME(chip->busy));
-	device->save_item(NAME(chip->ld));
+	device->save_item(NAME(chip->status_busy));
+	device->save_item(NAME(chip->status_ld));
 	device->save_item(NAME(chip->exp));
 	device->save_item(NAME(chip->fm_l));
 	device->save_item(NAME(chip->fm_r));
@@ -803,21 +987,23 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 	device->save_item(NAME(chip->enable));
 	device->save_item(NAME(chip->current_irq));
 	device->save_item(NAME(chip->irq_line));
-	device->save_item(NAME(chip->port_A));
-	device->save_item(NAME(chip->port_B));
+	device->save_item(NAME(chip->port_AB));
 	device->save_item(NAME(chip->port_C));
+	device->save_item(NAME(chip->lastport));
 
 	for (i = 0; i < 24; ++i)
 	{
 		device->save_item(NAME(chip->slots[i].wave), i);
-		device->save_item(NAME(chip->slots[i].FN), i);
-		device->save_item(NAME(chip->slots[i].OCT), i);
-		device->save_item(NAME(chip->slots[i].PRVB), i);
+		device->save_item(NAME(chip->slots[i].F_NUMBER), i);
+		device->save_item(NAME(chip->slots[i].octave), i);
+		device->save_item(NAME(chip->slots[i].preverb), i);
+		device->save_item(NAME(chip->slots[i].DAMP), i);
+		device->save_item(NAME(chip->slots[i].CH), i);
 		device->save_item(NAME(chip->slots[i].LD), i);
 		device->save_item(NAME(chip->slots[i].TL), i);
 		device->save_item(NAME(chip->slots[i].pan), i);
-		device->save_item(NAME(chip->slots[i].lfo), i);
-		device->save_item(NAME(chip->slots[i].vib), i);
+		device->save_item(NAME(chip->slots[i].LFO), i);
+		device->save_item(NAME(chip->slots[i].VIB), i);
 		device->save_item(NAME(chip->slots[i].AM), i);
 
 		device->save_item(NAME(chip->slots[i].AR), i);
@@ -831,6 +1017,7 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 		device->save_item(NAME(chip->slots[i].stepptr), i);
 
 		device->save_item(NAME(chip->slots[i].active), i);
+		device->save_item(NAME(chip->slots[i].KEY_ON), i);
 		device->save_item(NAME(chip->slots[i].bits), i);
 		device->save_item(NAME(chip->slots[i].startaddr), i);
 		device->save_item(NAME(chip->slots[i].loopaddr), i);
@@ -840,6 +1027,7 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 		device->save_item(NAME(chip->slots[i].env_vol), i);
 		device->save_item(NAME(chip->slots[i].env_vol_step), i);
 		device->save_item(NAME(chip->slots[i].env_vol_lim), i);
+		device->save_item(NAME(chip->slots[i].env_preverb), i);
 	}
 }
 
@@ -869,9 +1057,9 @@ static DEVICE_START( ymf278b )
 		chip->pan_right[i] = i < 8 ? 0 : i < 10 ? 256 : (16-i)*8;
 	}
 
-	// Mixing levels, units are -3dB, and add some marging to avoid clipping
+	// Mixing levels, units are -3dB, and add some margin to avoid clipping
 	for(i=0; i<7; i++)
-		chip->mix_level[i] = chip->volume[8*i+8];
+		chip->mix_level[i] = chip->volume[8*i+13];
 	chip->mix_level[7] = 0;
 
 	// Register state for saving
@@ -893,7 +1081,7 @@ DEVICE_GET_INFO( ymf278b )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ymf278b );		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */									break;
-		case DEVINFO_FCT_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							info->start = DEVICE_RESET_NAME( ymf278b );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "YMF278B");						break;
