@@ -350,6 +350,27 @@ static void smpc_keyboard(running_machine &machine, UINT8 pad_num, UINT8 offset)
 	state->m_smpc.OREG[5+pad_num*offset] = state->m_keyb.data;
 }
 
+static void smpc_mouse(running_machine &machine, UINT8 pad_num, UINT8 offset, UINT8 id)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	static const char *const mousenames[2][3] = { { "MOUSEB1", "MOUSEX1", "MOUSEY1" },
+												  { "MOUSEB2", "MOUSEX2", "MOUSEY2" }};
+	/* TODO: xy over / sign flags */
+
+	state->m_smpc.OREG[0+pad_num*offset] = 0xf1;
+	state->m_smpc.OREG[1+pad_num*offset] = id; // 0x23 / 0xe3
+	state->m_smpc.OREG[2+pad_num*offset] = input_port_read(machine, mousenames[pad_num][0]);
+	state->m_smpc.OREG[3+pad_num*offset] = input_port_read(machine, mousenames[pad_num][1]);
+	state->m_smpc.OREG[4+pad_num*offset] = input_port_read(machine, mousenames[pad_num][2]);
+}
+
+static void smpc_unconnected(running_machine &machine, UINT8 pad_num, UINT8 offset)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+
+	state->m_smpc.OREG[0+pad_num*offset] = 0xf0;
+}
+
 static TIMER_CALLBACK( intback_peripheral )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
@@ -375,10 +396,13 @@ static TIMER_CALLBACK( intback_peripheral )
 		switch(read_id[pad_num])
 		{
 			case 0: smpc_digital_pad(machine,pad_num,offset); break;
+			case 4: smpc_mouse(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* Pointing Device */
 			case 5: smpc_keyboard(machine,pad_num,offset); break;
+			case 8: smpc_mouse(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* Saturn Mouse */
+			case 9: smpc_unconnected(machine,pad_num,offset); break;
 		}
 
-		offset += (peri_id[read_id[pad_num]] & 0xf) + 2; /* offset for pad 2 */
+		offset += (peri_id[read_id[pad_num]] & 0xf) + 2; /* offset for port 2 */
 	}
 
 	if (state->m_smpc.intback_stage == 2)
