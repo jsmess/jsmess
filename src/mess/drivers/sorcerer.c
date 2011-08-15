@@ -465,7 +465,6 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sorcerer_cart")
-	//MCFG_SOFTWARE_LIST_ADD("snap_list","sorcerer_snap") not supported yet
 	//MCFG_SOFTWARE_LIST_ADD("cass_list","sorcerer_cass") not created yet
 
 	// internal ram
