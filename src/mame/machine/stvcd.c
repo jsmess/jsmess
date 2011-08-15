@@ -419,7 +419,7 @@ static void cd_exec_command(running_machine &machine)
 			CDROM_LOG(("%s:CD: Play Disc\n",   machine.describe_context()))
 			cd_stat = CD_STAT_PLAY;
 
-			play_mode = cr3 >> 8;
+			play_mode = (cr3 >> 8) & 0x7f;
 
 			if (!(cr3 & 0x8000))	// preserve current position if bit 7 set
 			{
@@ -437,12 +437,22 @@ static void cd_exec_command(running_machine &machine)
 				else
 				{
 					// track mode
-					cur_track = (start_pos)>>8;
-					printf("track mode %d\n",cur_track);
-					if(cur_track == 0)
-						cur_track = 1;
+					if(((start_pos)>>8) != 0)
+					{
+						cur_track = (start_pos)>>8;
+						cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
+					}
+					else
+					{
+						/* TODO: Waku Waku 7 sets up track 0, that basically doesn't make any sense. Just skip it for now. */
+						popmessage("Warning: track mode == 0, contact MAMEdev");
+						cr_standard_return(cd_stat);
+						hirqreg |= (CMOK);
+						return;
+					}
 
-					cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
+					printf("track mode %d\n",cur_track);
+
 				}
 
 				if (end_pos & 0x800000)
@@ -857,6 +867,7 @@ static void cd_exec_command(running_machine &machine)
 				{
 					cr4 = partitions[bufnum].numblks;
 				}
+
 				hirqreg |= (CMOK|DRDY);
 			}
 			break;
