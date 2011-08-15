@@ -355,13 +355,31 @@ static void smpc_mouse(running_machine &machine, UINT8 pad_num, UINT8 offset, UI
 	saturn_state *state = machine.driver_data<saturn_state>();
 	static const char *const mousenames[2][3] = { { "MOUSEB1", "MOUSEX1", "MOUSEY1" },
 												  { "MOUSEB2", "MOUSEX2", "MOUSEY2" }};
+	UINT8 mouse_ctrl;
+	INT16 mouse_x, mouse_y;
 	/* TODO: xy over / sign flags */
+
+	mouse_ctrl = input_port_read(machine, mousenames[pad_num][0]);
+	mouse_x = input_port_read(machine, mousenames[pad_num][1]);
+	mouse_y = input_port_read(machine, mousenames[pad_num][2]);
+
+	if(mouse_x < 0)
+		mouse_ctrl |= 0x10;
+
+	if(mouse_y < 0)
+		mouse_ctrl |= 0x20;
+
+	if((mouse_x & 0xff00) != 0xff00 && (mouse_x & 0xff00) != 0x0000)
+		mouse_ctrl |= 0x40;
+
+	if((mouse_y & 0xff00) != 0xff00 && (mouse_y & 0xff00) != 0x0000)
+		mouse_ctrl |= 0x80;
 
 	state->m_smpc.OREG[0+pad_num*offset] = 0xf1;
 	state->m_smpc.OREG[1+pad_num*offset] = id; // 0x23 / 0xe3
-	state->m_smpc.OREG[2+pad_num*offset] = input_port_read(machine, mousenames[pad_num][0]);
-	state->m_smpc.OREG[3+pad_num*offset] = input_port_read(machine, mousenames[pad_num][1]);
-	state->m_smpc.OREG[4+pad_num*offset] = input_port_read(machine, mousenames[pad_num][2]);
+	state->m_smpc.OREG[2+pad_num*offset] = mouse_ctrl;
+	state->m_smpc.OREG[3+pad_num*offset] = mouse_x & 0xff;
+	state->m_smpc.OREG[4+pad_num*offset] = mouse_y & 0xff;
 }
 
 static void smpc_unconnected(running_machine &machine, UINT8 pad_num, UINT8 offset)

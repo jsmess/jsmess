@@ -1123,7 +1123,7 @@ static void cd_exec_command(running_machine &machine)
 			break;
 
 		case 0x6600:    // move sector data
-			/* TODO: Sword & Sorcery */
+			/* TODO: Sword & Sorcery / Riglord Saga 2 */
 			{
 				//UINT8 src_filter = (cr3>>8)&0xff;
 				//UINT8 dst_filter = cr4;
