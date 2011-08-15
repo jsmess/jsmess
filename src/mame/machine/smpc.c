@@ -402,6 +402,21 @@ static void smpc_mouse(running_machine &machine, UINT8 pad_num, UINT8 offset, UI
 	state->m_smpc.OREG[4+pad_num*offset] = mouse_y & 0xff;
 }
 
+/* TODO: is there ANY game on which the MD pad works? */
+static void smpc_md_pad(running_machine &machine, UINT8 pad_num, UINT8 offset, UINT8 id)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	static const char *const padnames[] = { "MD_JOY1", "MD_JOY2" };
+	UINT16 pad_data;
+
+	pad_data = input_port_read(machine, padnames[pad_num]);
+	state->m_smpc.OREG[0+pad_num*offset] = 0xf1;
+	state->m_smpc.OREG[1+pad_num*offset] = id;
+	state->m_smpc.OREG[2+pad_num*offset] = pad_data>>8;
+	if(id == 0xe2) // MD 6 Button PAD
+		state->m_smpc.OREG[3+pad_num*offset] = pad_data & 0xff;
+}
+
 static void smpc_unconnected(running_machine &machine, UINT8 pad_num, UINT8 offset)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
@@ -438,6 +453,8 @@ static TIMER_CALLBACK( intback_peripheral )
 			case 2: smpc_analog_pad(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* Analog Pad */
 			case 4: smpc_mouse(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* Pointing Device */
 			case 5: smpc_keyboard(machine,pad_num,offset); break;
+			case 6: smpc_md_pad(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* MD 3B PAD */
+			case 7: smpc_md_pad(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* MD 6B PAD */
 			case 8: smpc_mouse(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* Saturn Mouse */
 			case 9: smpc_unconnected(machine,pad_num,offset); break;
 		}
