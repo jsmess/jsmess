@@ -4,7 +4,9 @@ Initial version was based on the Wiping sound driver, which was based on the old
 TODO:
 - timing (see main driver file), but also of samplerate and effects counter
 - what do the unknown bits in soundregs do?
-- are channel effects correct? currently mostly guesswork
+- Are channel effects correct? It's currently mostly guesswork, the pitch effects sound pretty convincing though.
+  Considering that the game sound hardware isn't complicated (no dedicated soundchip) these bits are possibly
+  for something way simpler, such as a length counter. PCB sound recordings would be useful!
 
 */
 
@@ -13,7 +15,7 @@ TODO:
 
 #define FLOWER_VERBOSE		0		// show register writes
 
-#define MIXER_SAMPLERATE	48000	/* ? (native freq is probably in the MHz range: note the >>7 when reading a sample) */
+#define MIXER_SAMPLERATE	48000	/* ? (native freq is probably in the MHz range) */
 #define MIXER_DEFGAIN		48
 
 
@@ -131,24 +133,26 @@ static STREAM_UPDATE( flower_update_mono )
 
 		for (i = 0; i < samples; i++)
 		{
-			voice->pos += f;
-
+			// add sample
 			if (voice->oneshot)
 			{
-				if (voice->active)
+				UINT8 sample = state->m_sample_rom[(voice->start + voice->pos) >> 7 & 0x7fff];
+				if (sample == 0xff)
 				{
-					UINT8 sample = state->m_sample_rom[(voice->start + voice->pos) >> 7 & 0x7fff];
-					if (sample == 0xff)
-						voice->active = 0;
-					else
-						*mix++ += state->m_volume_rom[v << 8 | sample] - 0x80;
+					voice->active = 0;
+					break;
 				}
+				else
+					*mix++ += state->m_volume_rom[v << 8 | sample] - 0x80;
 			}
 			else
 			{
 				UINT8 sample = state->m_sample_rom[(voice->start >> 7 & 0x7e00) | (voice->pos >> 7 & 0x1ff)];
 				*mix++ += state->m_volume_rom[v << 8 | sample] - 0x80;
 			}
+
+			// update counter
+			voice->pos += f;
 		}
 	}
 
@@ -271,7 +275,7 @@ static void show_soundregs(device_t *device)
 		{
 			sprintf(text,"R%d%d:",set+1,reg);
 			strcat(message,text);
-		
+
 			for (chan=0;chan<8;chan++)
 			{
 				sprintf(text," %02X",base[reg + 8*chan]);
@@ -289,31 +293,31 @@ static void show_soundregs(device_t *device)
 
 
 /* register functions (preliminary):
-offset: cccrrr		c=channel, r=register
+offset: cccrrr      c=channel, r=register
 
 set 1:
 R  76543210
-0  xxxxxxxx			frequency (which nibble?)
-1  xxxxxxxx			*
-2  xxxxxxxx			*
-3  xxxxxxxx			*
-4  ...x....			one-shot sample
-5  ...x....			??? same as R4?
-6  ........			unused
-7  xxxx....			volume
+0  xxxxxxxx         frequency (which nibble?)
+1  xxxxxxxx         *
+2  xxxxxxxx         *
+3  xxxxxxxx         *
+4  ...x....         one-shot sample
+5  ...x....         ??? same as R4?
+6  ........         unused
+7  xxxx....         volume
 
 set 2:
 R  76543210
-0  ....xxxx			start address
-1  ....xxxx			*
-2  ....xxxx			*
-3  ....xxxx			*
-4  xxxx    			assume it's channel pitch/volume effects
-       xxxx			start address
-5  x...    			???
-       xxxx			start address
-6  ........			unused
-7  ......xx			volume table + start trigger
+0  ....xxxx         start address
+1  ....xxxx         *
+2  ....xxxx         *
+3  ....xxxx         *
+4  xxxx             assume it's channel pitch/volume effects
+       xxxx         start address
+5  x...             ???
+       xxxx         start address
+6  ........         unused
+7  ......xx         volume table + start trigger
 
 */
 
@@ -323,7 +327,7 @@ WRITE8_DEVICE_HANDLER( flower_sound1_w )
 	sound_channel *voice = &state->m_channel_list[offset >> 3 & 7];
 	int c = offset & 0xf8;
 	UINT8 *base1 = state->m_soundregs1;
-//	UINT8 *base2 = state->m_soundregs2;
+//  UINT8 *base2 = state->m_soundregs2;
 
 	state->m_stream->update();
 	base1[offset] = data;
