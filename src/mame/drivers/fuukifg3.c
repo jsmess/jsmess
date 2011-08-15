@@ -301,7 +301,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fuuki32_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki32_sound_bw_w)
-	AM_RANGE(0x30, 0x30) AM_WRITENOP
+	AM_RANGE(0x30, 0x30) AM_WRITENOP // leftover/unused nmi handler related
 	AM_RANGE(0x40, 0x45) AM_DEVREAD("ymf1", ymf278b_r) AM_WRITE(snd_ymf278b_w)
 ADDRESS_MAP_END
 
@@ -409,7 +409,7 @@ static INPUT_PORTS_START( asurabld )
 	PORT_DIPSETTING(      0x0000, "1" )						/* Service Mode Shows 1 */
 	PORT_DIPSETTING(      0x00c0, "3" )						/* Service Mode Shows 3, Service Mode has 2 & 3 reversed compared to game play */
 	PORT_DIPSETTING(      0x0080, "5" )						/* Service Mode Shows 2, Service Mode has 2 & 3 reversed compared to game play */
-//	PORT_DIPSETTING(      0x0040, "Error!!" )				/* Service Mode Shows "Error" */
+//  PORT_DIPSETTING(      0x0040, "Error!!" )               /* Service Mode Shows "Error" */
 	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW4:1,2,3,4") /* Service Mode Shows Player 2 */
 	PORT_DIPSETTING(      0x8000, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(      0x9000, DEF_STR( 7C_1C ) )
@@ -424,9 +424,10 @@ static INPUT_PORTS_START( asurabld )
 	PORT_DIPSETTING(      0x4000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x3000, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x2000, "2C Start / 1C Continue" )
-//	PORT_DIPSETTING(      0x7000, "Error!!" )				// Causes graphics issues - Service Mode shows "Error"
-//	PORT_DIPSETTING(      0x1000, DEF_STR( 2C_1C ) )		// Duplicate 2C_1C
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )	// Set both for Free Play
+//  PORT_DIPSETTING(      0x7000, "Error!!" )               // Causes graphics issues - Service Mode shows "Error"
+//  PORT_DIPSETTING(      0x1000, DEF_STR( 2C_1C ) )        // Duplicate 2C_1C
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW2",0x0f00,PORTCOND_NOTEQUALS,0x0000)
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )		PORT_CONDITION("DSW2",0x0f00,PORTCOND_EQUALS,0x0000)	// Set both for Free Play
 	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW4:5,6,7,8") /* Service Mode Shows Player 1 */
 	PORT_DIPSETTING(      0x0800, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(      0x0900, DEF_STR( 7C_1C ) )
@@ -441,9 +442,10 @@ static INPUT_PORTS_START( asurabld )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0200, "2C Start / 1C Continue" )
-//	PORT_DIPSETTING(      0x0700, "Error!!" )				// Causes graphics issues - Service Mode shows "Error"
-//	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )		// Duplicate 2C_1C
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )	// Set both for Free Play
+//  PORT_DIPSETTING(      0x0700, "Error!!" )               // Causes graphics issues - Service Mode shows "Error"
+//  PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )        // Duplicate 2C_1C
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW2",0xf000,PORTCOND_NOTEQUALS,0x0000)
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )		PORT_CONDITION("DSW2",0xf000,PORTCOND_EQUALS,0x0000)	// Set both for Free Play
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( asurabus )
@@ -551,7 +553,7 @@ static MACHINE_START( fuuki32 )
 	fuuki32_state *state = machine.driver_data<fuuki32_state>();
 	UINT8 *ROM = machine.region("soundcpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 0x3e, &ROM[0x10000], 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 0x10, &ROM[0x10000], 0x8000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("soundcpu");
@@ -627,12 +629,12 @@ static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("ymf2", YMF262, 14180000) // should be YMF278B_STD_CLOCK/2? but that makes music very off-tune
+	MCFG_SOUND_ADD("ymf2", YMF262, 14318180) // 14.31818MHz is the standard OPL3 clock, YMF278B_STD_CLOCK/2 makes music off-tune
 	MCFG_SOUND_CONFIG(fuuki32_ymf262_interface)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.35)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 0.40)
 
 MACHINE_CONFIG_END
 
@@ -705,7 +707,7 @@ ROM_START( asurabus )
 	ROM_LOAD32_BYTE( "pgm0.u4", 0x000003, 0x80000, CRC(9b71e9d8) SHA1(9b705b5b6fff549f5679890422b481b5cf1d7bd7) )
 
 	ROM_REGION( 0x090000, "soundcpu", 0 ) /* Z80 */
-	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
+	ROM_LOAD( "srom.u7", 0x00000, 0x80000, BAD_DUMP CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) ) // BAD_DUMP note: 2 same halves, and many songs off-tune
 	ROM_RELOAD(          0x10000, 0x80000) /* for banks */
 
 	ROM_REGION( 0x2000000, "gfx1", 0 )
