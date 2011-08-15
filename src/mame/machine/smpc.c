@@ -311,6 +311,27 @@ static void smpc_digital_pad(running_machine &machine, UINT8 pad_num, UINT8 offs
 	state->m_smpc.OREG[3+pad_num*offset] = pad_data & 0xff;
 }
 
+static void smpc_analog_pad(running_machine &machine, UINT8 pad_num, UINT8 offset, UINT8 id)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	static const char *const padnames[] = { "AN_JOY1", "AN_JOY2" };
+	static const char *const annames[2][3] = { { "AN_X1", "AN_Y1", "AN_Z1" },
+											   { "AN_X2", "AN_Y2", "AN_Z2" }};
+	UINT16 pad_data;
+
+	pad_data = input_port_read(machine, padnames[pad_num]);
+	state->m_smpc.OREG[0+pad_num*offset] = 0xf1;
+	state->m_smpc.OREG[1+pad_num*offset] = id;
+	state->m_smpc.OREG[2+pad_num*offset] = pad_data>>8;
+	state->m_smpc.OREG[3+pad_num*offset] = pad_data & 0xff;
+	state->m_smpc.OREG[4+pad_num*offset] = input_port_read(machine, annames[pad_num][0]);
+	if(id == 0x15)
+	{
+		state->m_smpc.OREG[5+pad_num*offset] = input_port_read(machine, annames[pad_num][1]);
+		state->m_smpc.OREG[6+pad_num*offset] = input_port_read(machine, annames[pad_num][2]);
+	}
+}
+
 static void smpc_keyboard(running_machine &machine, UINT8 pad_num, UINT8 offset)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
@@ -357,7 +378,6 @@ static void smpc_mouse(running_machine &machine, UINT8 pad_num, UINT8 offset, UI
 												  { "MOUSEB2", "MOUSEX2", "MOUSEY2" }};
 	UINT8 mouse_ctrl;
 	INT16 mouse_x, mouse_y;
-	/* TODO: xy over / sign flags */
 
 	mouse_ctrl = input_port_read(machine, mousenames[pad_num][0]);
 	mouse_x = input_port_read(machine, mousenames[pad_num][1]);
@@ -414,6 +434,8 @@ static TIMER_CALLBACK( intback_peripheral )
 		switch(read_id[pad_num])
 		{
 			case 0: smpc_digital_pad(machine,pad_num,offset); break;
+			case 1: smpc_analog_pad(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* Steering Wheel */
+			case 2: smpc_analog_pad(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* Analog Pad */
 			case 4: smpc_mouse(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* Pointing Device */
 			case 5: smpc_keyboard(machine,pad_num,offset); break;
 			case 8: smpc_mouse(machine,pad_num,offset,peri_id[read_id[pad_num]]); break; /* Saturn Mouse */
