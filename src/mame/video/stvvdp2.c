@@ -5627,8 +5627,8 @@ READ32_HANDLER ( saturn_vdp2_regs_r )
 			break;
 		}
 		default:
-			if(!space->debugger_access())
-				printf("VDP2: read from register %08x %08x\n",offset*4,mem_mask);
+			//if(!space->debugger_access())
+			//	printf("VDP2: read from register %08x %08x\n",offset*4,mem_mask);
 			break;
 	}
 	return state->m_vdp2_regs[offset];
