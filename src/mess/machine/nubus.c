@@ -316,8 +316,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 	switch (byteLanes)
 	{
 		case 0x0f:	// easy case: all 4 lanes (still must scramble for 32-bit BE bus though)
-			newrom = (UINT8 *)malloc(romlen);
-			memset(newrom, 0, romlen);
+			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen);
 			for (int i = 0; i < romlen; i++)
 			{
 				newrom[BYTE4_XOR_BE(i)] = rom[i];
@@ -325,8 +324,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			break;
 
 		case 0xe1:	// lane 0 only
-			newrom = (UINT8 *)malloc(romlen*4);
-			memset(newrom, 0, romlen*4);
+			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*4);
 			for (int i = 0; i < romlen; i++)
 			{
 				newrom[BYTE4_XOR_BE(i*4)] = rom[i];
@@ -335,8 +333,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			break;
 
 		case 0xd2:	// lane 1 only
-			newrom = (UINT8 *)malloc(romlen*4);
-			memset(newrom, 0, romlen*4);
+			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*4);
 			for (int i = 0; i < romlen; i++)
 			{
 				newrom[BYTE4_XOR_BE((i*4)+1)] = rom[i];
@@ -345,8 +342,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			break;
 
 		case 0xb4:	// lane 2 only
-			newrom = (UINT8 *)malloc(romlen*4);
-			memset(newrom, 0, romlen*4);
+			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*4);
 			for (int i = 0; i < romlen; i++)
 			{
 				newrom[BYTE4_XOR_BE((i*4)+2)] = rom[i];
@@ -355,8 +351,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			break;
 
 		case 0x78:	// lane 3 only
-			newrom = (UINT8 *)malloc(romlen*4);
-			memset(newrom, 0, romlen*4);
+			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*4);
 			for (int i = 0; i < romlen; i++)
 			{
 				newrom[BYTE4_XOR_BE((i*4)+3)] = rom[i];
@@ -365,8 +360,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			break;
 
 		case 0xc3:	// lanes 0, 1
-			newrom = (UINT8 *)malloc(romlen*2);
-			memset(newrom, 0, romlen*2);
+			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
 				newrom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
@@ -376,8 +370,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			break;
 
 		case 0xa5:	// lanes 0, 2
-			newrom = (UINT8 *)malloc(romlen*2);
-			memset(newrom, 0, romlen*2);
+			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
 				newrom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
@@ -387,8 +380,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 			break;
 
 		case 0x3c:	// lanes 2,3
-			newrom = (UINT8 *)malloc(romlen*2);
-			memset(newrom, 0, romlen*2);
+			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
 				newrom[BYTE4_XOR_BE((i*4)+2)] = rom[(i*2)];
