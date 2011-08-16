@@ -489,7 +489,7 @@ static void nes_read_input_device( running_machine &machine, int cfg, nes_input 
 				vals->i0 = (UINT8) ((UINT8) input_port_read(machine, "PADDLE") + (UINT8)0x52) ^ 0xff;
 			break;
 
-		case 0x05:	/* crazy climber controller */
+		case 0x06:	/* crazy climber controller */
 			if (pad_port == 0)
 			{
 				state->m_in_0.i0 = input_port_read(machine, padnames[4]);

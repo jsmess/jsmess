@@ -42,7 +42,7 @@ static WRITE8_HANDLER( sms_input_write )
 	case 0:
 		switch (input_port_read_safe(space->machine(), "CTRLSEL", 0x00) & 0x0f)
 		{
-		case 0x03:	/* Sports Pad */
+		case 0x04:	/* Sports Pad */
 			if (data != state->m_sports_pad_last_data_1)
 			{
 				UINT32 cpu_cycles = downcast<cpu_device *>(&space->device())->total_cycles();
@@ -62,9 +62,9 @@ static WRITE8_HANDLER( sms_input_write )
 		break;
 
 	case 1:
-		switch (input_port_read_safe(space->machine(), "CTRLSEL", 0x00) >> 4)
+		switch (input_port_read_safe(space->machine(), "CTRLSEL", 0x00) & 0xf0)
 		{
-		case 0x03:	/* Sports Pad */
+		case 0x40:	/* Sports Pad */
 			if (data != state->m_sports_pad_last_data_2)
 			{
 				UINT32 cpu_cycles = downcast<cpu_device *>(&space->device())->total_cycles();
@@ -398,7 +398,7 @@ static void sms_get_inputs( address_space *space )
 		                | ((input_port_read(machine, "CTRLIPT") & 0x02) << 3);
 		break;
 
-	case 0x03:	/* Sega Sports Pad */
+	case 0x04:	/* Sega Sports Pad */
 		switch (state->m_sports_pad_state_1)
 		{
 		case 0:
@@ -460,7 +460,7 @@ static void sms_get_inputs( address_space *space )
 		                | ((input_port_read(machine, "CTRLIPT") & 0x20) >> 3);
 		break;
 
-	case 0x30:	/* Sega Sports Pad */
+	case 0x40:	/* Sega Sports Pad */
 		switch (state->m_sports_pad_state_2)
 		{
 		case 0:
