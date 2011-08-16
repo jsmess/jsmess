@@ -66,7 +66,7 @@ const int TM_SEARCH_TRANSFER	= 0x03;
 //  MACROS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 #define DMA_LOG 0
 
 #define REGNUM(_m, _s)			(((_m)<<3) + (_s))
@@ -399,7 +399,6 @@ void z80dma_device::do_read()
 					m_latch = m_in_iorq_func(m_addressA);
 
 				if (DMA_LOG) logerror("Z80DMA '%s' A src: %04x %s -> data: %02x\n", tag(), m_addressA, PORTA_MEMORY ? "mem" : "i/o", m_latch);
-				m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
 			}
 			else
 			{
@@ -409,7 +408,6 @@ void z80dma_device::do_read()
 					m_latch = m_in_iorq_func(m_addressB);
 
 				if (DMA_LOG) logerror("Z80DMA '%s' B src: %04x %s -> data: %02x\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o", m_latch);
-				m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
 			}
 			break;
 		case TM_SEARCH_TRANSFER:
@@ -446,7 +444,6 @@ int z80dma_device::do_write()
 					m_out_iorq_func(m_addressB, m_latch);
 
 				if (DMA_LOG) logerror("Z80DMA '%s' B dst: %04x %s\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o");
-				m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
 			}
 			else
 			{
@@ -456,10 +453,8 @@ int z80dma_device::do_write()
 					m_out_iorq_func(m_addressA, m_latch);
 
 				if (DMA_LOG) logerror("Z80DMA '%s' A dst: %04x %s\n", tag(), m_addressA, PORTA_MEMORY ? "mem" : "i/o");
-				m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
 			}
-			m_count--;
-			done = (m_count == 0xFFFF);
+
 			break;
 
 		case TM_SEARCH:
@@ -476,8 +471,6 @@ int z80dma_device::do_write()
 					}
 				}
 
-				m_count--;
-				done = (m_count == 0xFFFF); //correct?
 			}
 			break;
 
@@ -489,6 +482,13 @@ int z80dma_device::do_write()
 			logerror("z80dma_do_operation: invalid mode %d!\n", mode);
 			break;
 	}
+
+	m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
+	m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
+
+	m_count--;
+	done = (m_count == 0xFFFF); //correct?
+
 	if (done)
 	{
 		//FIXME: interrupt ?
@@ -514,6 +514,7 @@ void z80dma_device::timerproc()
 
 	if (m_is_read)
 	{
+		/* TODO: there's a nasty recursion bug with Alpha for Sharp X1 Turbo on the transfers with this function! */
 		do_read();
 		done = 0;
 		m_is_read = false;
