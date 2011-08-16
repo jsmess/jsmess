@@ -1377,7 +1377,7 @@ static INPUT_PORTS_START( saturn )
 	PORT_CONFSETTING(0x01,"Racing Device") /* steering wheel only */
 	PORT_CONFSETTING(0x02,"Analog Device") //Nights pad?
 //  PORT_CONFSETTING(0x03,"Lightgun Device")
-	PORT_CONFSETTING(0x04,"Pointing Device") // TODO: what's this? trackball?
+	PORT_CONFSETTING(0x04,"Trackball") // TODO: according to the docs this ID is labeled "Pointing Device"
 	PORT_CONFSETTING(0x05,"Keyboard Device")
   	PORT_CONFSETTING(0x06,"Megadrive 3B Pad")
 	PORT_CONFSETTING(0x07,"Megadrive 6B Pad")
@@ -1676,10 +1676,6 @@ static WRITE32_HANDLER ( w60ffc48_write )
 	logerror("cpu %s (PC=%08X): 60ffc48_write write = %08X & %08X\n", space->device().tag(), cpu_get_pc(&space->device()), data, mem_mask);
 	//minit_w(offset,data,mem_mask);
 }
-#endif
-
-#ifdef UNUSED_FUNCTION
-static void print_game_info(void);
 #endif
 
 DRIVER_INIT ( stv )

@@ -3900,9 +3900,6 @@ static void stv_vdp2_draw_basic_tilemap(running_machine &machine, bitmap_t *bitm
 			}
 /* WE'VE GOT THE TILE INFO ... */
 
-			if(!STV_VDP2_VRAMSZ)
-				tilecode &= 0x3fff;
-
 			if ( tilecode < tilecodemin ) tilecodemin = tilecode;
 			if ( tilecode > tilecodemax ) tilecodemax = tilecode;
 
@@ -3932,6 +3929,9 @@ static void stv_vdp2_draw_basic_tilemap(running_machine &machine, bitmap_t *bitm
 				tilecodespacing = 1;
 			}
 /* TILES ARE NOW DECODED */
+
+			if(!STV_VDP2_VRAMSZ)
+				tilecode &= 0x3fff;
 
 /* DRAW! */
 			if(stv2_current_tilemap.incx != 0x10000 ||
