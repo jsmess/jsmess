@@ -2,14 +2,21 @@
 
 New System Drivers Supported:
 -----------------------------
-(none)
+- Olympia PHC-2 [Kaylee Smith]
+- Sanyo MPC-64 [Kaylee Smith]
+- Yeno MX64  [Kaylee Smith]
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
-(none)
+- tk80: added LED display, i8255, keyboard, marked as working. [Robbbert]
+- pc1512: Rewrote the VDU, driver is now fully working. [Curt Coder]
+- cybiko: Promoted Cybiko V1/V2/Xtreme from GAME_NOT_WORKING. [Tim Schuerewegen]
 
 Skeleton drivers:
 -----------------
+- Digelec/Wavetek model 804/EP804 [balrog, Lord Nightmare]
+- Iskra-3104 [temaperm,anasana]
+- Uzebox [Miodrag Milanovic]
 
 System Driver Changes:
 ----------------------
@@ -17,12 +24,57 @@ System Driver Changes:
 - ti99: RS232 connection working with hardware handshaking, up to 38400 baud in
         both directions. Added configuration option for different cable layouts.
         [Michael Zapf]
+- msx.c: Fixed loading of regular cartridges.  [Wilbert Pol]
+- digel804: fix rom loading to pass verify; add a note about the beeper. 
+  mask i/o address area to 8 bits. [Lord Nightmare, smf]
+- mac: Working NuBus.  2 working cards are available initially: 
+	the existing RasterOps board is now a proper NuBus device, 
+	and the Apple 4*8 Graphics Card is available for faster booting. [R. Belmont]
+- ep804/digel804: fixed clock (was at double speed), hooked up speaker, 
+	figured out most of what reading i/o 0x43 does. [Lord Nightmare]
+- digel804: Figured out LED outputs, figured out keypad inputs [Lord Nightmare]
+- mac: added emulation of Moniterm Viking 1024x758 monochrome video card [R. Belmont]
+- digel804: Hook up ACIA; add proper mirrors to i/o areas; hook up ram banking 
+	(still has some issues needing to be worked out); document what a whole 
+	lot more of the i/o bits do. [Lord Nightmare]
+- kc: Updated bankswitch to allow the kc85_5 to boot. [Sandro Ronco]
+- pc1512: Fixed keyboard interface, pc1512v2 boots now. [Curt Coder]
+- amstrad.c: Refactored Multiface II support to be an expansion device. [Barry Rodewald]
+- msx.c: Added support for software lists.  [Wilbert Pol]
+- mac: add 824gc NuBus video card (Apple 8*24 unaccelerated) [R. Belmont]
+- mac: Fixed constructor weirdness for 48gc/824gc, gave video cards human-readable names [R. Belmont]
+- sorcerer: Added floppy-disk support. CP/M works. [Robbbert]
+- mac: WIP on accelerated SuperMac Spectrum PDQ video card.  
+	This card works fine in B&W and 16 color modes (where it is not accelerated).  
+	256 colors w/ acceleration partially works but the blitter is not all figured out yet. [R. Belmont]
+- mac: added VRAM mirror to fix the vikbw card under System 7 [R. Belmont]
+- mac: Added full emulation of Apple Hi-Resolution video card [R. Belmont]
+- mac: Preliminary emulation of SuperMac Spectrum 8 Series III video card [Jonathan Gevaryahu, R. Belmont]
+- intv : Added stic background buffering [Huygens]
+        Added bus hiding during active display
+- mac: m2hires and vikbw ignore the top 4 address bits and thus are compatible with macii -bios 1 [R. Belmont]
+- mac: Preliminary work on Asante MC3B Ethernet card and DP8390x chip [R. Belmont]
+- intv: Minor timing changes [Huygens]
+        Hooked up the Intellivoice module
 
 Software Lists:
 ----------------
+- snes.xml: Added more dumps. Moved special chip description to an 'enhancement' feature.  [Messfan]
+- pc1512/1640: Added some French floppies to softlist. [philippe]
+- msx1_cart.xml, msx2_cart.xml: Created initial cartridge software lists. [Wilbert Pol]
+- Added Apple Lisa 2 softlist [Kaylee]
+- coco_cart.xml: added better dump for canyon climber [Tim Lindner]
+
 
 Source Changes:
 ----------------
+- Fix for the hlsl scanline jitter effect [nimitz]
+- Fix hlsl phosphor decay [nimitz]
+- H8: many more "S" opcodes, Lost in Labyrinth now runs [R. Belmont]
+- Add preliminary hookup of 10937 VFD controller chip, which very badly needs to be rewritten 
+  as a proper device. Add notes about i/o map. [Lord Nightmare]
+- h8: rewrote H8S/2xxx 8-bit and 16-bit timers. [Tim Schuerewegen]
+- hashfile.h: fixed parent .hsi files not being used by clones [Fabio Priuli]
 
 0.143u2
 
