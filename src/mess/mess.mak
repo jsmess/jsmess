@@ -1389,8 +1389,8 @@ $(MESSOBJ)/sega.a:				\
 	$(MAME_MACHINE)/gdrom.o 	\
 	$(MESS_MACHINE)/dccons.o	\
 	$(MESS_VIDEO)/smsvdp.o		\
-	$(MESS_MACHINE)/segasms.o	\
-	$(MESS_DRIVERS)/segasms.o	\
+	$(MESS_MACHINE)/sms.o	\
+	$(MESS_DRIVERS)/sms.o	\
 	$(MESS_DRIVERS)/sg1000.o	\
 
 $(MESSOBJ)/sgi.a:				\
@@ -1889,7 +1889,7 @@ $(MESS_DRIVERS)/sdk85.o:	$(MESS_LAYOUT)/sdk85.lh
 $(MESS_DRIVERS)/sdk86.o:	$(MESS_LAYOUT)/sdk86.lh
 $(MESS_DRIVERS)/selz80.o:	$(MESS_LAYOUT)/selz80.lh
 $(MESS_DRIVERS)/slc1.o:		$(MESS_LAYOUT)/slc1.lh
-$(MESS_DRIVERS)/segasms.o:	$(MAME_LAYOUT)/sms1.lh
+$(MESS_DRIVERS)/sms.o:		$(MAME_LAYOUT)/sms1.lh
 $(MESS_DRIVERS)/stopthie.o:	$(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:	$(MESS_LAYOUT)/super80.lh
 $(MESS_DRIVERS)/supercon.o:	$(MESS_LAYOUT)/supercon.lh
