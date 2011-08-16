@@ -272,7 +272,6 @@ WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
 				int actual_color = BITSWAP8(m_clutoffs, 0, 1, 2, 3, 4, 5, 6, 7); 
 
 //				printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", actual_color, m_colors[0], m_colors[1], m_colors[2], cpu_get_pc(&space.device()) );
-				palette_set_color(space.machine(), actual_color, MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]));
 				m_palette[actual_color] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)
