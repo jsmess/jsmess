@@ -433,11 +433,12 @@ static int intv_load_rom_file(device_image_interface &image)
 			{
 				logerror("RAM banks not yet implemented! \n");
 			}
-
+			/* For now intellivoice always active
 			if (extra & INTELLIVOICE_MASK)
 			{
-				logerror("Intellivoice support not yet implemented! \n");
+				// tbd
 			}
+			*/
 
 			if (extra & ECS_MASK)
 			{
@@ -509,7 +510,7 @@ static TIMER_CALLBACK(intv_btb_fill)
 	intv_state *state = machine.driver_data<intv_state>();
 	UINT8 column;
 	UINT8 row = state->m_backtab_row;
-	device_adjust_icount(machine.device("maincpu"), -110);
+	//device_adjust_icount(machine.device("maincpu"), -110);
 	for(column=0; column < STIC_BACKTAB_WIDTH; column++)
 	{
 		state->m_backtab_buffer[row][column] = state->m_ram16[column + row * STIC_BACKTAB_WIDTH];
@@ -526,10 +527,11 @@ INTERRUPT_GEN( intv_interrupt )
 	state->m_bus_copy_mode = 1;
 	state->m_backtab_row = 0;
 	UINT8 row;
+	device_adjust_icount(device->machine().device("maincpu"), -1416); // Acount for cycle stealing during stic backtab fetches
 	device->machine().scheduler().timer_set(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(3791), FUNC(intv_interrupt_complete));
 	for (row=0; row < STIC_BACKTAB_HEIGHT; row++)
 	{
-		device->machine().scheduler().timer_set(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(3933+114*state->m_row_delay + 802*row), FUNC(intv_btb_fill));
+		device->machine().scheduler().timer_set(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(3905+114*state->m_row_delay + 798*row), FUNC(intv_btb_fill));
 	}
 	
 	if (state->m_row_delay == 0) 
