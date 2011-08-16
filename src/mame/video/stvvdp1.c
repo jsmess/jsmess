@@ -2171,8 +2171,11 @@ int stv_vdp1_start ( running_machine &machine )
 
 	state->m_vdp1.system_cliprect.min_x = state->m_vdp1.system_cliprect.max_x = 0;
 	state->m_vdp1.system_cliprect.min_y = state->m_vdp1.system_cliprect.max_y = 0;
-	state->m_vdp1.user_cliprect.min_x = state->m_vdp1.user_cliprect.max_x = 0;
-	state->m_vdp1.user_cliprect.min_y = state->m_vdp1.user_cliprect.max_y = 0;
+	/* Kidou Senshi Z Gundam - Zenpen Zeta no Kodou loves to use the user cliprect vars in an undefined state ... */
+	state->m_vdp1.user_cliprect.min_x = 0;
+	state->m_vdp1.user_cliprect.min_y = 0;
+	state->m_vdp1.user_cliprect.max_x = 512;
+	state->m_vdp1.user_cliprect.max_y = 256;
 
 	// save state
 	state_save_register_global_pointer(machine, state->m_vdp1_regs, 0x020/2);
