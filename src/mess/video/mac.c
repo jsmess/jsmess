@@ -159,7 +159,7 @@ SCREEN_UPDATE( macpb160 )
 	mac_state *state = screen->machine().driver_data<mac_state>();
 	UINT8 *vram8 = (UINT8 *)state->m_vram;
 
-	for (y = 0; y < 480; y++)
+	for (y = 0; y < 400; y++)
 	{
 		line = BITMAP_ADDR16(bitmap, y, 0);
 
