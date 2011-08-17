@@ -922,10 +922,17 @@ pc100
 
 pc9801f	// 1983
 pc9801rs  // 1989
+pc9801rx  // 1988
+pc9801ux  // 1987
+pc9801vm  // 1985
 
 pc9821
+pc9821as
+pc9821ce2
 pc9821ne
-pc9821a
+pc9821v13
+pc9821v20
+pc9821xs
 
 // Cantab
 ace   // Jupiter Ace
