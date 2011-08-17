@@ -58,7 +58,6 @@ nes       // Nintendo Entertainment System
 nespal	// Nintendo Entertainment System PAL
 m82       // Nintendo M82 Display Unit
 famicom   // Nintendo Family Computer (a.k.a. Famicom) + Disk System add-on
-fami_key  // Nintendo Family Computer (a.k.a. Famicom) + Disk System add-on + Keyboard add-on
 famitwin  // Sharp Famicom Twin System
 drpcjr    // Bung Doctor PC Jr
 dendy     // Dendy (Classic russian famiclone)
