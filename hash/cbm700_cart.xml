@@ -12,8 +12,8 @@
 			</dataarea>
 		</part>
 		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="1066496">
-				<rom name="calc_result_sfd1001.d82" size="1066496" offset="0" status="nodump" />
+			<dataarea name="flop" size="1070662">
+				<rom name="calc_result_700_bx_single_version_v1.0.d82" size="1070662" crc="244a2122" sha1="44661ed8e3307bb967f97ce1f5a247ca3cded0b3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
