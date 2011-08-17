@@ -5,6 +5,8 @@
 <!--
 Information in this list was taken from sources like: the GOODTools, http://gigamix.jp/rom/rom.php
 
+Unless otherwise noted, the information in this list has not been verified by opening cartridges and redumping all the chips.
+
 Mappers:
 M60002-0125SP (48 pin) - 8KB banks
 LZ93A13 (32 pin) - 8KB banks
@@ -545,6 +547,93 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="131072">
 				<rom name="lh23108j" size="131072" crc="d0ececc6" sha1="094d11ebf8a20b6bfc07902c7f136bdd18b1e7ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdaisenr">
+		<!-- ＳＵＰＥＲ大戦略 -->
+		<description>Super Daisenryaku</description>
+		<year>1988</year>
+		<publisher>Micro Cabin</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M116-03A" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<feature name="sram" value="HM6116LP-3" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532097" size="262144" crc="8df9945a" sha1="d1cc2a77fb17608d542c50e2a1404cf5b4231521" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="striton">
+		<!-- スーパートリトーン -->
+		<description>Super Triton</description>
+		<year>1986</year>
+		<publisher>Xain soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="831000-20" size="131072" crc="cbb00ef1" sha1="795d47c6aae378d0d5bedc9f104a597bcc1ee16b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srunner">
+		<!-- スーパーランナー -->
+		<description>Super Runner</description>
+		<year>1987</year>
+		<publisher>Pony Canyon</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="1M-8KB" />
+			<feature name="mapper" value="NEOS MR6401" />	<!-- MR6401 -->
+			<dataarea name="rom" size="131072">
+				<rom name="r59y5111-w82" size="131072" crc="5a5be701" sha1="3202af113265e67e130a0b948dc167a9f9e9cc79" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seikima2">
+		<!-- 聖飢魔IIスペシャル 悪魔の逆襲 -->
+		<description>Seikima 2 Special</description>
+		<year>1987</year>
+		<publisher>Sony</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<!-- LH231083 8729 D -->
+				<rom name="lh231083" size="131072" crc="e37b681e" sha1="c74a5a6164536750d6b3ea90e19798ab6fad79d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xeviousf">
+		<!-- ゼビウス ファードラウト伝説 -->
+		<description>Xevious - Fardraut Saga</description>
+		<year>1989</year>
+		<publisher>Namco</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M016-03M" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="262144">
+				<!-- SHARP MSX2 XV-F 8852 D -->
+				<rom name="msx2_xv-f" size="262144" crc="97591725" sha1="f84d7fc089b31440cac1f4fbee3d45b2f6c90e37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoids">
+		<!-- ゾイド 中央大陸の戦い -->
+		<description>Zoids</description>
+		<year>1988</year>
+		<publisher>Toshiba EMI</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M016S" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh230956" size="131072" crc="2605031e" sha1="d526249c1a35cf1174300df75bc28662f579290a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
