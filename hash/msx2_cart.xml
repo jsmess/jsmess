@@ -638,6 +638,110 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="daikouka">
+		<!-- 大航海時代 -->
+		<description>Daikoukai Jidai</description>
+		<year>1990</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M208-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="LH5160-10L" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh534g63" size="524288" crc="ec7a8012" sha1="2a4aef32db28c059c30f5f972f1c09708ef6ce62" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daisenry">
+		<!-- 大戦略 -->
+		<description>Daisenryaku</description>
+		<year>1986</year>
+		<publisher>Micro Cabin</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-621N" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<feature name="sram" value="LH5116-15" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh531073" size="131072" crc="a987a0d8" sha1="10c38f91d8f5db2438414ea58f26dcac78352088" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- doesn't seem to work -->
+	<software name="dynabowl" supported="no">
+		<!-- ダイナマイトボウル -->
+		<description>Dynamite Bowl</description>
+		<year>1987</year>
+		<publisher>Toshiba EMI</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="ps-2021g" size="131072" crc="9935e9bd" sha1="bd70b00ccb8fafca883c7160585e9c5920cca58f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteka2">
+		<!-- 太陽の神殿 アステカII -->
+		<description>Taiyou no Shinden - Asteka II</description>
+		<year>1987</year>
+		<publisher>Falcom</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-2M208-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK5864PN-15LL" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532057" size="262144" crc="ae82a874" sha1="414fd2a22076f45502c2329b45bda9f8730dcaae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- doesn't seem to work -->
+	<software name="dires" supported="no">
+		<!-- ＤＩＲＥＳ ネットワーク・バージョン -->
+		<description>Dires</description>
+		<year>1988</year>
+		<publisher>Bothtec</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-621-8K" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<feature name="sram" value="CXK5816PS-12L" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh531090" size="131072" crc="5acbd591" sha1="1ba6b699b4e34c23ee60db4e58e1265dc03f0b50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drwn4078">
+		<!-- ダーウィン４０７８ -->
+		<description>Darwin 4078</description>
+		<year>1987</year>
+		<publisher>Hudsonsoft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="rp231024" size="131072" crc="7098faf0" sha1="d4da7236bd09d735dcb92127c73e43b3ca94dd7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doublevi">
+		<!-- ダブル・ヴィジョン -->
+		<description>Double Vision</description>
+		<year>1988</year>
+		<publisher>Hard</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA6228" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532048" size="262144" crc="e1148738" sha1="87a7fa43602f74c47151e79f1aaf7f641331ba51" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>
