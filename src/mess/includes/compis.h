@@ -13,9 +13,18 @@
 #define COMPIS_H_
 
 #include "emu.h"
-#include "machine/msm8251.h"
-#include "machine/upd765.h"
+#include "cpu/i86/i86.h"
+#include "cpu/mcs48/mcs48.h"
 #include "video/upd7220.h"
+#include "machine/ctronics.h"
+#include "machine/msm8251.h"
+#include "machine/pit8253.h"
+#include "machine/i8255.h"
+#include "machine/pic8259.h"
+#include "machine/mm58274c.h"
+#include "machine/upd765.h"
+#include "imagedev/flopdrv.h"
+#include "formats/cpis_dsk.h"
 
 
 struct mem_state
@@ -71,11 +80,6 @@ typedef struct
 	struct mem_state	mem;
 } i186_state;
 
-typedef struct
-{
-	device_t *pic8259_master;
-	device_t *pic8259_slave;
-} compis_devices_t;
 
 /* Keyboard */
 typedef struct
@@ -125,18 +129,57 @@ class compis_state : public driver_device
 public:
 	compis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_hgdc(*this, "upd7220")
-		  { }
+	m_maincpu(*this, "maincpu"),
+	m_8253(*this, "pit8253"),
+	m_8254(*this, "pit8254"),
+	m_8259m(*this, "pic8259_master"),
+	m_8259s(*this, "pic8259_slave"),
+	m_8255(*this, "ppi8255"),
+	m_cent(*this, "centronics"),
+	m_uart(*this, "uart"),
+	m_rtc(*this, "mm58274c"),
+	m_fdc(*this, "upd765"),
+	m_crtc(*this, "upd7220")
+	{ }
 
-	required_device<upd7220_device> m_hgdc;
-
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_8253;
+	required_device<device_t> m_8254;
+	required_device<device_t> m_8259m;
+	required_device<device_t> m_8259s;
+	required_device<i8255_device> m_8255;
+	required_device<device_t> m_cent;
+	required_device<device_t> m_uart;
+	required_device<device_t> m_rtc;
+	required_device<device_t> m_fdc;
+	required_device<upd7220_device> m_crtc;
+	DECLARE_READ16_MEMBER(compis_fdc_dack_r);
+	DECLARE_READ16_MEMBER(compis_usart_r);
+	DECLARE_WRITE16_MEMBER(compis_usart_w);
+	DECLARE_READ16_MEMBER(compis_i186_internal_port_r);
+	DECLARE_WRITE16_MEMBER(compis_i186_internal_port_w);
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_WRITE8_MEMBER(compis_fdc_w);
+	DECLARE_READ8_MEMBER(compis_fdc_r);
+	DECLARE_WRITE_LINE_MEMBER(compis_fdc_int);
+	DECLARE_WRITE_LINE_MEMBER(compis_fdc_dma_drq);
+	DECLARE_READ8_MEMBER(compis_ppi_port_b_r);
+	DECLARE_WRITE8_MEMBER(compis_ppi_port_c_w);
+	DECLARE_READ16_MEMBER(compis_osp_pit_r);
+	DECLARE_WRITE16_MEMBER(compis_osp_pit_w);
+	DECLARE_WRITE_LINE_MEMBER(compis_usart_rxready);
+	DECLARE_WRITE_LINE_MEMBER(compis_pic8259_master_set_int_line);
+	DECLARE_WRITE_LINE_MEMBER(compis_pic8259_slave_set_int_line);
+	DECLARE_READ8_MEMBER(get_slave_ack);
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-	UINT8 *m_char_rom;
-
 	i186_state m_i186;
-	compis_devices_t m_devices;
 	TYP_COMPIS m_compis;
+	UINT8 *m_p_videoram;
+	void update_dma_control(int which, int new_control);
+	void internal_timer_update(int which, int new_count, int new_maxA, int new_maxB, int new_control);
+	void internal_timer_sync(int which);
+	void handle_eoi(int data);
+	void compis_fdc_tc(int state);
 };
 
 
@@ -154,23 +197,5 @@ DRIVER_INIT(compis);
 MACHINE_START(compis);
 MACHINE_RESET(compis);
 INTERRUPT_GEN(compis_vblank_int);
-
-/* PIT 8254 (80150/80130) */
-READ16_DEVICE_HANDLER (compis_osp_pit_r);
-WRITE16_DEVICE_HANDLER (compis_osp_pit_w);
-
-/* USART 8251 */
-READ16_HANDLER (compis_usart_r);
-WRITE16_HANDLER (compis_usart_w);
-
-/* 80186 Internal */
-READ16_HANDLER (compis_i186_internal_port_r);
-WRITE16_HANDLER (compis_i186_internal_port_w);
-
-/* FDC 8272 */
-READ16_HANDLER (compis_fdc_dack_r);
-READ8_HANDLER (compis_fdc_r);
-WRITE8_HANDLER (compis_fdc_w);
-
 
 #endif /* COMPIS_H_ */
