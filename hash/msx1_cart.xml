@@ -375,6 +375,48 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
+	<software name="dngnhntr">
+		<!-- ダンジョンハンター -->
+		<description>Dungeon Hunter</description>
+		<year>1989</year>
+		<publisher>Ascii</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M016S" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="rp231026d" size="131072" crc="2526e568" sha1="d1fbdbdf2e830139584d7dc796806aa3327720dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsumego">
+		<!-- 詰碁１２０ -->
+		<description>Tsumego 120</description>
+		<year>1987</year>
+		<publisher>Champion Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="rp231024d" size="131072" crc="b9b69a43" sha1="bfe8046f8ccc6d6016d7752c04f0654420ef81e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daiva4">
+		<!-- ディーヴァ アスラの血流 -->
+		<description>Daiva Story 4</description>
+		<year>1987</year>
+		<publisher>T&amp;E Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA6228" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532020" size="262144" crc="99198ed9" sha1="2418c0302abbce8b0f8556b63169c60a849f60ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>
