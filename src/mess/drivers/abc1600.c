@@ -11,6 +11,7 @@
     TODO:
 
     - floppy
+		- FW0 should be written non-0 to select drive
         - sector 0 not boot
     - BUS0I/0X/1/2
     - short/long reset (RSTBUT)
@@ -241,6 +242,20 @@ UINT8 abc1600_state::read_io(offs_t offset)
 	else
 	{
 		// BUS0I, BUS0X, BUS1, BUS2
+		//UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
+		
+		switch ((offset >> 1) & 0x07)
+		{
+		case 0: // INP
+			break;
+		
+		case 1: // STAT
+			break;
+		
+		case 2: // OPS
+			break;
+		}
+
 		logerror("Unmapped read from virtual I/O %06x\n", offset);
 	}
 
@@ -340,6 +355,31 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 				break;
 			}
 		}
+	}
+	else
+	{
+		//UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
+		
+		switch ((offset >> 1) & 0x07)
+		{
+		case 0: // OUT
+			break;
+		
+		case 2: // C1
+			break;
+		
+		case 3: // C2
+			break;
+		
+		case 4: // C3
+			break;
+		
+		case 5: // C4
+			break;
+		}
+
+		// BUS0I, BUS0X, BUS1, BUS2
+		logerror("Unmapped write %02x to virtual I/O %06x\n", data, offset);
 	}
 }
 
@@ -866,6 +906,8 @@ WRITE8_MEMBER( abc1600_state::dmamap_w )
 
     */
 
+	logerror("DMAMAP %u %02x\n", offset & 7, data);
+	
 	m_dmamap[offset & 7] = data;
 }
 
