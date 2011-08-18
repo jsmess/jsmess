@@ -29,22 +29,21 @@
     80000-EFFFF NOP
     F0000-FFFFF ROM UMCS (Upper Memory Chip Select)
 
+18/08/2011 -[Robbbert]
+- Modernised
+- Removed F4 display, as the gfx is in different places per bios.
+- Changed to monochrome, it usually had a greenscreen monitor, although some
+  were amber.
+- Still doesn't work.
+- Added a nasty hack to get a display on compis2 (wait 20 seconds)
+
+
  ******************************************************************************/
+#define ADDRESS_MAP_MODERN
 
-#include "emu.h"
-#include "cpu/i86/i86.h"
-#include "cpu/mcs48/mcs48.h"
-#include "machine/i8255.h"
-#include "machine/ctronics.h"
 #include "includes/compis.h"
-#include "imagedev/flopdrv.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/mm58274c.h"
-#include "machine/upd765.h"
-#include "formats/cpis_dsk.h"
-#include "video/upd7220.h"
 
+#if 0
 /* TODO: this is likely to come from a RAMdac ... */
 static const unsigned char COMPIS_palette[16*3] =
 {
@@ -74,37 +73,80 @@ static PALETTE_INIT( compis_gdc )
 		palette_set_color_rgb(machine, i, COMPIS_palette[i*3], COMPIS_palette[i*3+1], COMPIS_palette[i*3+2]);
 	}
 }
+#endif
+
+
+static PALETTE_INIT( compis )
+{
+	palette_set_color(machine, 0, RGB_BLACK); // black
+	palette_set_color(machine, 1, MAKE_RGB(0x00, 0xc0, 0x00)); // green
+	palette_set_color(machine, 2, MAKE_RGB(0x00, 0xff, 0x00)); // highlight
+}
 
 void compis_state::video_start()
 {
 	// find memory regions
-//  m_char_rom = machine.region("pcg")->base();
 
 	VIDEO_START_NAME(generic_bitmapped)(machine());
 }
 
-bool compis_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+static SCREEN_UPDATE( compis )
 {
+	compis_state *state = screen->machine().driver_data<compis_state>();
 	/* graphics */
-	m_hgdc->update_screen(&bitmap, &cliprect);
+	state->m_crtc->update_screen(bitmap, cliprect);
+
+	return 0;
+}
+
+static SCREEN_UPDATE( compis2 ) // temporary
+{
+	UINT8 *m_p_videoram, *m_p_chargen;
+	m_p_videoram = screen->machine().region("vram")->base();
+	m_p_chargen = screen->machine().region("maincpu")->base()+0xca70; //bios0
+	if (m_p_chargen[0x214] != 0x08) m_p_chargen+= 0x10; //bios1
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
+
+	for (y = 0; y < 25; y++)
+	{
+		for (ra = 0; ra < 16; ra++)
+		{
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = ma; x < ma + 240; x+=3)
+			{
+				chr = m_p_videoram[x];
+
+				if (chr < 0x20)
+					gfx = 0;
+				else
+					gfx = m_p_chargen[(chr<<4) | ra ];
+
+				*p++ = BIT(gfx, 0);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 7);
+			}
+		}
+		ma+=240;
+	}
 
 	return 0;
 }
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
-	int xi,gfx;
-	UINT8 pen;
+	UINT8 i,gfx = vram[address];
 
-	gfx = vram[address];
-
-	for(xi=0;xi<8;xi++)
-	{
-		pen = ((gfx >> xi) & 1) ? 15 : 0;
-
-		*BITMAP_ADDR16(bitmap, y, x + xi) = pen;
-	}
+	for(i=0; i<8; i++)
+		*BITMAP_ADDR16(bitmap, y, x + i) = BIT((gfx >> i), 0);
 }
+
 
 static UPD7220_INTERFACE( hgdc_intf )
 {
@@ -117,33 +159,31 @@ static UPD7220_INTERFACE( hgdc_intf )
 };
 
 /* TODO: why it writes to ROM region? */
-static WRITE8_HANDLER( vram_w )
+WRITE8_MEMBER( compis_state::vram_w )
 {
-	UINT8 *vram = space->machine().region("vram")->base();
+	UINT8 *vram = machine().region("vram")->base();
 
 	vram[offset] = data;
 }
 
-static ADDRESS_MAP_START( compis_mem , AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( compis_mem , AS_PROGRAM, 16, compis_state )
 	AM_RANGE( 0x00000, 0x3ffff) AM_RAM
 	AM_RANGE( 0x40000, 0x4ffff) AM_RAM
 	AM_RANGE( 0x50000, 0x5ffff) AM_RAM
 	AM_RANGE( 0x60000, 0x6ffff) AM_RAM
 	AM_RANGE( 0x70000, 0x7ffff) AM_RAM
-
-//  AM_RANGE( 0x80000, 0xeffff) AM_NOP
-	AM_RANGE( 0xe8000, 0xeffff) AM_ROM AM_REGION("bios",0) AM_WRITE8(vram_w,0xffff)
-	AM_RANGE( 0xf0000, 0xfffff) AM_ROM AM_REGION("bios",0) AM_WRITE8(vram_w,0xffff)
+	AM_RANGE( 0xe8000, 0xeffff) AM_ROM AM_REGION("maincpu",0) AM_WRITE8(vram_w, 0xffff)
+	AM_RANGE( 0xf0000, 0xfffff) AM_ROM AM_REGION("maincpu",0) AM_WRITE8(vram_w, 0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( compis_io, AS_IO, 16 )
-	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE8_MODERN("ppi8255", i8255_device, read, write, 0xff00)
-	AM_RANGE( 0x0080, 0x0087) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
-	AM_RANGE( 0x0100, 0x011b) AM_DEVREADWRITE8("mm58274c", mm58274c_r, mm58274c_w, 0xffff)
-	AM_RANGE( 0x0280, 0x0283) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0xffff) /* 80150/80130 */
-//  AM_RANGE( 0x0288, 0x028e) AM_DEVREADWRITE("pit8254", compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)  */
+static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
+	AM_RANGE( 0x0000, 0x0007) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xff00)
+	AM_RANGE( 0x0080, 0x0087) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
+	AM_RANGE( 0x0100, 0x011b) AM_DEVREADWRITE8_LEGACY("mm58274c", mm58274c_r, mm58274c_w, 0xffff)
+	AM_RANGE( 0x0280, 0x0283) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffff) /* 80150/80130 */
+  //AM_RANGE( 0x0288, 0x028f) AM_DEVREADWRITE_LEGACY("pit8254", compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)  */
 	AM_RANGE( 0x0310, 0x031f) AM_READWRITE( compis_usart_r, compis_usart_w )	/* USART 8251 Keyboard      */
-	AM_RANGE( 0x0330, 0x0333) AM_DEVREADWRITE8_MODERN("upd7220", upd7220_device, read, write, 0x00ff) /* GDC 82720 PCS6:6     */
+	AM_RANGE( 0x0330, 0x0333) AM_DEVREADWRITE8("upd7220", upd7220_device, read, write, 0x00ff) /* GDC 82720 PCS6:6     */
 	AM_RANGE( 0x0340, 0x0343) AM_READWRITE8( compis_fdc_r, compis_fdc_w, 0xffff )	/* iSBX0 (J8) FDC 8272      */
 	AM_RANGE( 0x0350, 0x0351) AM_READ(compis_fdc_dack_r)	/* iSBX0 (J8) DMA ACK       */
 	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( compis_i186_internal_port_r, compis_i186_internal_port_w)/* CPU 80186         */
@@ -167,11 +207,11 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16 )
 ADDRESS_MAP_END
 
 /* TODO */
-static ADDRESS_MAP_START( keyboard_io, AS_IO, 8 )
-  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_NOP
-  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_NOP
-  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_NOP
-  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_NOP
+static ADDRESS_MAP_START( keyboard_io, AS_IO, 8, compis_state )
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_NOP
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_NOP
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_NOP
+	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_NOP
 ADDRESS_MAP_END
 
 /* COMPIS Keyboard */
@@ -334,26 +374,8 @@ static const floppy_interface compis_floppy_interface =
 	NULL
 };
 
-/* F4 Character Displayer */
-static const gfx_layout compis_charlayout =
-{
-	8, 16,					/* 8 x 16 characters */
-	RGN_FRAC(1,1),			/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	/* y offsets */
-	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16					/* every char takes 16 bytes */
-};
-
-static GFXDECODE_START( compis )
-	GFXDECODE_ENTRY( "bios", 0x0000, compis_charlayout, 1, 7 )
-GFXDECODE_END
-
-static ADDRESS_MAP_START( upd7220_map, AS_0, 8 )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_MODERN("upd7220", upd7220_device, vram_r, vram_w)
+static ADDRESS_MAP_START( upd7220_map, AS_0, 8, compis_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220", upd7220_device, vram_r, vram_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( compis, compis_state )
@@ -367,20 +389,10 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_CPU_ADD("i8749", I8749, 1000000)
 	MCFG_CPU_IO_MAP(keyboard_io)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	//MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(compis)
 	MCFG_MACHINE_RESET(compis)
-
-	MCFG_PIT8253_ADD( "pit8253", compis_pit8253_config )
-
-	MCFG_PIT8254_ADD( "pit8254", compis_pit8254_config )
-
-	MCFG_PIC8259_ADD( "pic8259_master", compis_pic8259_master_config )
-
-	MCFG_PIC8259_ADD( "pic8259_slave", compis_pic8259_slave_config )
-
-	MCFG_I8255_ADD( "ppi8255", compis_ppi_interface )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -390,25 +402,71 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(compis)
+#if 0
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(compis_gdc)
-	MCFG_GFXDECODE(compis)
+#endif
+	MCFG_PALETTE_LENGTH(3)
+	MCFG_PALETTE_INIT(compis)
 
+	/* Devices */
+	MCFG_PIT8253_ADD( "pit8253", compis_pit8253_config )
+	MCFG_PIT8254_ADD( "pit8254", compis_pit8254_config )
+	MCFG_PIC8259_ADD( "pic8259_master", compis_pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", compis_pic8259_slave_config )
+	MCFG_I8255_ADD( "ppi8255", compis_ppi_interface )
 	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, upd7220_map) //unknown clock
-
-	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
-
-	/* uart */
 	MCFG_MSM8251_ADD("uart", compis_usart_interface)
-
-	/* rtc */
 	MCFG_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
-
 	MCFG_UPD765A_ADD("upd765", compis_fdc_interface)
-
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(compis_floppy_interface)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( compis2, compis_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I80186, 8000000)	/* 8 MHz */
+	MCFG_CPU_PROGRAM_MAP(compis_mem)
+	MCFG_CPU_IO_MAP(compis_io)
+	MCFG_CPU_VBLANK_INT("screen", compis_vblank_int)
+	MCFG_CPU_CONFIG(i86_address_mask)
+
+	MCFG_CPU_ADD("i8749", I8749, 1000000)
+	MCFG_CPU_IO_MAP(keyboard_io)
+
+	//MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	MCFG_MACHINE_START(compis)
+	MCFG_MACHINE_RESET(compis)
+
+	/* video hardware */
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
+	MCFG_SCREEN_UPDATE(compis2)
+	MCFG_PALETTE_LENGTH(3)
+	MCFG_PALETTE_INIT(compis)
+
+	/* Devices */
+	MCFG_PIT8253_ADD( "pit8253", compis_pit8253_config )
+	MCFG_PIT8254_ADD( "pit8254", compis_pit8254_config )
+	MCFG_PIC8259_ADD( "pic8259_master", compis_pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", compis_pic8259_slave_config )
+	MCFG_I8255_ADD( "ppi8255", compis_ppi_interface )
+	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, upd7220_map) //unknown clock
+	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_MSM8251_ADD("uart", compis_usart_interface)
+	MCFG_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
+	MCFG_UPD765A_ADD("upd765", compis_fdc_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(compis_floppy_interface)
+MACHINE_CONFIG_END
+
+
 
 /***************************************************************************
 
@@ -417,7 +475,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( compis )
-	ROM_REGION16_LE( 0x10000, "bios", 0 )
+	ROM_REGION16_LE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sa883003.u40", 0x0000, 0x4000, CRC(195ef6bf) SHA1(eaf8ae897e1a4b62d3038ff23777ce8741b766ef) )
 	ROM_LOAD16_BYTE( "sa883003.u36", 0x0001, 0x4000, CRC(7c918f56) SHA1(8ba33d206351c52f44f1aa76cc4d7f292dcef761) )
 	ROM_LOAD16_BYTE( "sa883003.u39", 0x8000, 0x4000, CRC(3cca66db) SHA1(cac36c9caa2f5bb42d7a6d5b84f419318628935f) )
@@ -427,15 +485,16 @@ ROM_START( compis )
 	ROM_LOAD( "cmpkey13.u1", 0x0000, 0x0800, CRC(3f87d138) SHA1(c04e2d325b9c04818bc7c47c3bf32b13862b11ec) )
 
 	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
-
 ROM_END
 
 ROM_START( compis2 )
-	ROM_REGION16_LE( 0x10000, "bios", 0 )
+	ROM_REGION16_LE( 0x10000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS( "v303" )
+
 	ROM_SYSTEM_BIOS( 0, "v302", "Compis II v3.02 (1986-09-09)" )
 	ROMX_LOAD( "comp302.u39", 0x0000, 0x8000, CRC(16a7651e) SHA1(4cbd4ba6c6c915c04dfc913ec49f87c1dd7344e3), ROM_BIOS(1) | ROM_SKIP(1) )
 	ROMX_LOAD( "comp302.u35", 0x0001, 0x8000, CRC(ae546bef) SHA1(572e45030de552bb1949a7facbc885b8bf033fc6), ROM_BIOS(1) | ROM_SKIP(1) )
+
 	ROM_SYSTEM_BIOS( 1, "v303", "Compis II v3.03 (1987-03-09)" )
 	ROMX_LOAD( "rysa094.u39", 0x0000, 0x8000, CRC(e7302bff) SHA1(44ea20ef4008849af036c1a945bc4f27431048fb), ROM_BIOS(2) | ROM_SKIP(1) )
 	ROMX_LOAD( "rysa094.u35", 0x0001, 0x8000, CRC(b0694026) SHA1(eb6b2e3cb0f42fd5ffdf44f70e652ecb9714ce30), ROM_BIOS(2) | ROM_SKIP(1) )
@@ -446,6 +505,6 @@ ROM_START( compis2 )
 	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
-/*   YEAR   NAME        PARENT  COMPAT MACHINE  INPUT   INIT    COMPANY     FULLNAME */
-COMP(1985,	compis,		0,		0,     compis,	compis,	compis,	"Telenova", "Compis" , GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP(1986,	compis2,	compis,	0,     compis,	compis,	compis,	"Telenova", "Compis II" , GAME_NOT_WORKING | GAME_NO_SOUND)
+/*   YEAR   NAME        PARENT  COMPAT MACHINE  INPUT   INIT     COMPANY     FULLNAME */
+COMP(1985,  compis,     0,      0,     compis,  compis, compis, "Telenova", "Compis" , GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP(1986,  compis2,    compis, 0,     compis2, compis, compis, "Telenova", "Compis II" , GAME_NOT_WORKING | GAME_NO_SOUND)
