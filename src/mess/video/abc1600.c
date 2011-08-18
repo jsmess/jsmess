@@ -195,7 +195,7 @@ READ8_MEMBER( abc1600_state::iord0_r )
 //  data |= 0x02;
 
 	// vertical sync
-	data |= m_vs << 6;
+	data |= m_crtc->vsync_r() << 6;
 
 	return data;
 }
@@ -975,11 +975,6 @@ static MC6845_UPDATE_ROW( abc1600_update_row )
 	state->crtc_update_row(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
 }
 
-WRITE_LINE_MEMBER( abc1600_state::vs_w )
-{
-	m_vs = state;
-}
-
 static MC6845_ON_UPDATE_ADDR_CHANGED( crtc_update )
 {
 }
@@ -994,7 +989,7 @@ static const mc6845_interface crtc_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, vs_w),
+	DEVCB_NULL,
 	crtc_update
 };
 
@@ -1022,7 +1017,6 @@ void abc1600_state::video_start()
 	save_pointer(NAME(m_video_ram), VIDEORAM_SIZE);
 	save_item(NAME(m_endisp));
 	save_item(NAME(m_clocks_disabled));
-	save_item(NAME(m_vs));
 	save_item(NAME(m_gmdi));
 	save_item(NAME(m_wrm));
 	save_item(NAME(m_ms));

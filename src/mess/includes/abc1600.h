@@ -129,8 +129,6 @@ public:
 	DECLARE_READ8_MEMBER( cio_pc_r );
 	DECLARE_WRITE8_MEMBER( cio_pc_w );
 
-	DECLARE_WRITE_LINE_MEMBER( vs_w );
-
 	UINT8 read_ram(offs_t offset);
 	void write_ram(offs_t offset, UINT8 data);
 	UINT8 read_io(offs_t offset);
@@ -194,7 +192,6 @@ public:
 	UINT16 *m_video_ram;		// video RAM
 	int m_endisp;				// enable display
 	int m_clocks_disabled;		// clocks disabled
-	int m_vs;					// vertical sync
 	UINT16 m_gmdi;				// video RAM data latch
 	UINT16 m_wrm;				// write mask latch
 	UINT8 m_ms[16];				// mover sequence control
