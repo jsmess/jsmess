@@ -13,7 +13,6 @@
     - floppy
         - sector 0 not boot
     - BUS0I/0X/1/2
-    - M68K bus errors
     - short/long reset (RSTBUT)
     - SCC interrupt
     - CIO (interrupt controller)
@@ -112,7 +111,7 @@ enum
 	IOWR2,
 	FW,
 	DMAMAP = 5,
-	SPEC_CONTR_REG = 7
+	SPEC_CONTR_REG
 };
 
 
@@ -946,7 +945,7 @@ WRITE8_MEMBER( abc1600_state::fw1_w )
 
 WRITE8_MEMBER( abc1600_state::spec_contr_reg_w )
 {
-	int state = !BIT(data, 3);
+	int state = BIT(data, 3);
 
 	switch (data & 0x07)
 	{
@@ -1501,7 +1500,7 @@ ROM_START( abc1600 )
 	ROM_LOAD( "1023 6490352-01.11e", 0x410, 0x104, CRC(a2f350ac) SHA1(77e08654a197080fa2111bc3031cd2c7699bf82b) ) // interrupt acknowledge
 	ROM_LOAD( "1024 6490353-01.12e", 0x514, 0x104, CRC(67f1328a) SHA1(b585495fe14a7ae2fbb29f722dca106d59325002) ) // expansion bus timing and control
 	ROM_LOAD( "1025 6490354-01.6e",  0x618, 0x104, CRC(9bda0468) SHA1(ad373995dcc18532274efad76fa80bd13c23df25) ) // DMA transfer
-	//ROM_LOAD( "pal16r4.10c", 0x71c, 0x104, NO_DUMP ) // SCC read/write, does this exist on the PCB?
+	//ROM_LOAD( "pal16r4.10c", 0x71c, 0x104, NO_DUMP ) // SCC read/write, mentioned in the preliminary service manual, but not present on the PCB
 ROM_END
 
 
