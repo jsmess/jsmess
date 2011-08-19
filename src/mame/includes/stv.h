@@ -1,4 +1,5 @@
 /*----------- defined in drivers/stv.c -----------*/
+#define NEW_VIDEO_CODE 0
 
 class saturn_state : public driver_device
 {
@@ -13,7 +14,7 @@ public:
 	UINT32    *m_scu_regs;
 	UINT16    *m_sound_ram;
 	UINT16    *m_scsp_regs;
-	UINT32    *m_vdp2_regs;
+	UINT16    *m_vdp2_regs;
 	UINT32    *m_vdp2_vram;
 	UINT32    *m_vdp2_cram;
     UINT32    *m_vdp1_vram;
@@ -110,7 +111,9 @@ public:
 	UINT8     m_stv_multi_bank;
 	UINT8     m_prev_bankswitch;
     emu_timer *m_stv_rtc_timer;
-	UINT32    *m_ioga;
+	UINT8     m_port_sel,m_mux_data;
+	UINT8     m_system_output;
+	UINT16    m_serial_tx;
 
 	legacy_cpu_device* m_maincpu;
 	legacy_cpu_device* m_slave;
@@ -146,7 +149,7 @@ public:
 DRIVER_INIT ( stv );
 
 
-/*----------- defined in drivers/stvinit.c -----------*/
+/*----------- defined in drivers/stv.c -----------*/
 
 void install_stvbios_speedups(running_machine &machine);
 DRIVER_INIT(mausuke);
@@ -212,11 +215,14 @@ WRITE32_HANDLER ( saturn_vdp1_framebuffer0_w );
 
 READ32_HANDLER ( saturn_vdp2_vram_r );
 READ32_HANDLER ( saturn_vdp2_cram_r );
-READ32_HANDLER ( saturn_vdp2_regs_r );
+READ16_HANDLER ( saturn_vdp2_regs_r );
 
 WRITE32_HANDLER ( saturn_vdp2_vram_w );
 WRITE32_HANDLER ( saturn_vdp2_cram_w );
-WRITE32_HANDLER ( saturn_vdp2_regs_w );
+WRITE16_HANDLER ( saturn_vdp2_regs_w );
 
 VIDEO_START ( stv_vdp2 );
 SCREEN_UPDATE( stv_vdp2 );
+#if NEW_VIDEO_CODE
+SCREEN_UPDATE( saturn );
+#endif

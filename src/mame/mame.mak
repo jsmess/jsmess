@@ -516,6 +516,8 @@ $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
 	$(DRIVERS)/bfm_sc4.o \
 	$(DRIVERS)/bfm_sc5.o \
+	$(DRIVERS)/bfm_swp.o \
+	$(DRIVERS)/bfmsys83.o \
 	$(DRIVERS)/bfmsys85.o \
 	$(MACHINE)/bfm_bd1.o $(VIDEO)/bfm_dm01.o \
 
@@ -919,6 +921,8 @@ $(MAMEOBJ)/maygay.a: \
 	$(DRIVERS)/maygay1b.o \
 	$(DRIVERS)/maygayv1.o \
 	$(DRIVERS)/maygayep.o \
+	$(DRIVERS)/maygaysw.o \
+	$(DRIVERS)/mmm.o \
 
 $(MAMEOBJ)/meadows.a: \
 	$(DRIVERS)/lazercmd.o $(VIDEO)/lazercmd.o \
@@ -1207,7 +1211,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/segaybd.o $(VIDEO)/segaybd.o \
 	$(DRIVERS)/sg1000a.o \
 	$(DRIVERS)/stactics.o $(VIDEO)/stactics.o \
-	$(DRIVERS)/saturn.o $(DRIVERS)/stvinit.o $(MACHINE)/stvprot.o $(MACHINE)/stvcd.o $(MACHINE)/smpc.o $(VIDEO)/stvvdp1.o $(VIDEO)/stvvdp2.o \
+	$(DRIVERS)/saturn.o $(MACHINE)/stvprot.o $(MACHINE)/stvcd.o $(MACHINE)/smpc.o $(VIDEO)/stvvdp1.o $(VIDEO)/stvvdp2.o \
 	$(DRIVERS)/suprloco.o $(VIDEO)/suprloco.o \
 	$(DRIVERS)/system1.o $(VIDEO)/system1.o \
 	$(DRIVERS)/system16.o $(VIDEO)/system16.o \
@@ -1467,7 +1471,7 @@ $(MAMEOBJ)/tehkan.a: \
 	$(DRIVERS)/tbowl.o $(VIDEO)/tbowl.o \
 	$(DRIVERS)/tecmo.o $(VIDEO)/tecmo.o \
 	$(DRIVERS)/tecmo16.o $(VIDEO)/tecmo16.o \
-	$(DRIVERS)/tecmosys.o $(MACHINE)/tecmosys.o \
+	$(DRIVERS)/tecmosys.o $(MACHINE)/tecmosys.o $(VIDEO)/tecmosys.o \
 	$(DRIVERS)/tehkanwc.o $(VIDEO)/tehkanwc.o \
 	$(DRIVERS)/wc90.o $(VIDEO)/wc90.o \
 	$(DRIVERS)/wc90b.o $(VIDEO)/wc90b.o \
@@ -1699,6 +1703,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/galaxi.o \
 	$(DRIVERS)/gamecstl.o \
 	$(DRIVERS)/gei.o \
+	$(DRIVERS)/globalfr.o \
 	$(DRIVERS)/goldngam.o \
 	$(DRIVERS)/goldnpkr.o \
 	$(DRIVERS)/good.o \
@@ -1706,6 +1711,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/gstream.o \
 	$(DRIVERS)/gumbo.o $(VIDEO)/gumbo.o \
 	$(DRIVERS)/gunpey.o \
+	$(DRIVERS)/hazelgr.o \
 	$(DRIVERS)/highvdeo.o \
 	$(DRIVERS)/himesiki.o $(VIDEO)/himesiki.o \
 	$(DRIVERS)/hitpoker.o \
@@ -1794,6 +1800,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/slotcarn.o \
 	$(DRIVERS)/sms.o \
 	$(DRIVERS)/sothello.o \
+	$(DRIVERS)/splus.o \
 	$(DRIVERS)/spool99.o \
 	$(DRIVERS)/sprcros2.o $(VIDEO)/sprcros2.o \
 	$(DRIVERS)/ssingles.o \
@@ -2029,6 +2036,8 @@ $(DRIVERS)/segaybd.o:	$(LAYOUT)/pdrift.lh
 
 $(DRIVERS)/snookr10.o:	$(LAYOUT)/snookr10.lh
 
+$(DRIVERS)/splus.o:	$(LAYOUT)/splus.lh
+
 $(DRIVERS)/sspeedr.o:	$(LAYOUT)/sspeedr.lh
 
 $(DRIVERS)/stactics.o:	$(LAYOUT)/stactics.lh
@@ -2102,6 +2111,7 @@ $(DRIVERS)/peyper.o:    $(LAYOUT)/peyper.lh
 
 $(DRIVERS)/galaxian.o:	$(MAMESRC)/drivers/galdrvr.c
 $(DRIVERS)/neogeo.o:	$(MAMESRC)/drivers/neodrvr.c
+$(DRIVERS)/saturn.o:	$(MAMESRC)/drivers/stv.c
 $(MACHINE)/snes.o:  	$(MAMESRC)/machine/snesobc1.c \
 			$(MAMESRC)/machine/snescx4.c \
 			$(MAMESRC)/machine/cx4ops.c \

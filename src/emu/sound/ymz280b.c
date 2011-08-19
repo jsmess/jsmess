@@ -79,6 +79,7 @@ struct _ymz280b_state
 {
 	sound_stream * stream;			/* which stream are we using */
 	UINT8 *region_base;				/* pointer to the base of the region */
+	UINT32 region_size;
 	UINT8 current_register;			/* currently accessible register */
 	UINT8 status_register;			/* current status register */
 	UINT8 irq_state;				/* current IRQ state */
@@ -86,19 +87,22 @@ struct _ymz280b_state
 	UINT8 irq_enable;				/* current IRQ enable */
 	UINT8 keyon_enable;				/* key on enable */
 	double master_clock;			/* master clock frequency */
-	void (*irq_callback)(device_t *, int);		/* IRQ callback */
+	void (*irq_callback)(device_t *, int);	/* IRQ callback */
 	struct YMZ280BVoice	voice[8];	/* the 8 voices */
 	UINT32 rom_readback_addr;		/* where the CPU can read the ROM */
 	devcb_resolved_read8 ext_ram_read;		/* external RAM read handler */
 	devcb_resolved_write8 ext_ram_write;	/* external RAM write handler */
 
 #if MAKE_WAVS
-	void *		wavresample;			/* resampled waveform */
+	void * wavresample;				/* resampled waveform */
 #endif
 
 	INT16 *scratch;
 	device_t *device;
 };
+
+static void write_to_register(ymz280b_state *, int);
+
 
 /* step size index shift table */
 static const int index_scale[8] = { 0x0e6, 0x0e6, 0x0e6, 0x0e6, 0x133, 0x199, 0x200, 0x266 };
@@ -134,6 +138,20 @@ INLINE ymz280b_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == YMZ280B);
 	return (ymz280b_state *)downcast<legacy_device_base *>(device)->token();
+}
+
+
+INLINE UINT8 ymz280b_read_memory(UINT8 *base, UINT32 size, UINT32 offset)
+{
+	if (offset < size)
+		return base[offset];
+
+	/* 16MB chip limit (shouldn't happen) */
+	else if (offset > 0xffffff)
+		return base[offset & 0xffffff];
+
+	else
+		return 0;
 }
 
 
@@ -186,11 +204,13 @@ INLINE void update_volumes(struct YMZ280BVoice *voice)
 	else if (voice->pan < 8)
 	{
 		voice->output_left = voice->level;
-		voice->output_right = voice->level * voice->pan / 8;
+
+		/* pan 1 is hard-left, what's pan 0? for now assume same as pan 1 */
+		voice->output_right = (voice->pan == 0) ? 0 : voice->level * (voice->pan - 1) / 7;
 	}
 	else
 	{
-		voice->output_left = voice->level * (15 - voice->pan) / 8;
+		voice->output_left = voice->level * (15 - voice->pan) / 7;
 		voice->output_right = voice->level;
 	}
 }
@@ -258,7 +278,7 @@ static void compute_tables(void)
 
 ***********************************************************************************************/
 
-static int generate_adpcm(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer, int samples)
+static int generate_adpcm(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, INT16 *buffer, int samples)
 {
 	int position = voice->position;
 	int signal = voice->signal;
@@ -272,7 +292,7 @@ static int generate_adpcm(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 		while (samples)
 		{
 			/* compute the new amplitude and update the current step */
-			val = base[position / 2] >> ((~position & 1) << 2);
+			val = ymz280b_read_memory(base, size, position / 2) >> ((~position & 1) << 2);
 			signal += (step * diff_lookup[val & 15]) / 8;
 
 			/* clamp to the maximum */
@@ -295,7 +315,12 @@ static int generate_adpcm(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 			/* next! */
 			position++;
 			if (position >= voice->stop)
+			{
+				if (!samples)
+					samples |= 0x10000;
+
 				break;
+			}
 		}
 	}
 
@@ -306,7 +331,7 @@ static int generate_adpcm(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 		while (samples)
 		{
 			/* compute the new amplitude and update the current step */
-			val = base[position / 2] >> ((~position & 1) << 2);
+			val = ymz280b_read_memory(base, size, position / 2) >> ((~position & 1) << 2);
 			signal += (step * diff_lookup[val & 15]) / 8;
 
 			/* clamp to the maximum */
@@ -344,7 +369,12 @@ static int generate_adpcm(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 				}
 			}
 			if (position >= voice->stop)
+			{
+				if (!samples)
+					samples |= 0x10000;
+
 				break;
+			}
 		}
 	}
 
@@ -364,7 +394,7 @@ static int generate_adpcm(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 
 ***********************************************************************************************/
 
-static int generate_pcm8(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer, int samples)
+static int generate_pcm8(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, INT16 *buffer, int samples)
 {
 	int position = voice->position;
 	int val;
@@ -376,7 +406,7 @@ static int generate_pcm8(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer,
 		while (samples)
 		{
 			/* fetch the current value */
-			val = base[position / 2];
+			val = ymz280b_read_memory(base, size, position / 2);
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = (INT8)val * 256;
@@ -385,7 +415,12 @@ static int generate_pcm8(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer,
 			/* next! */
 			position += 2;
 			if (position >= voice->stop)
+			{
+				if (!samples)
+					samples |= 0x10000;
+
 				break;
+			}
 		}
 	}
 
@@ -396,7 +431,7 @@ static int generate_pcm8(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer,
 		while (samples)
 		{
 			/* fetch the current value */
-			val = base[position / 2];
+			val = ymz280b_read_memory(base, size, position / 2);
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = (INT8)val * 256;
@@ -410,7 +445,12 @@ static int generate_pcm8(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer,
 					position = voice->loop_start;
 			}
 			if (position >= voice->stop)
+			{
+				if (!samples)
+					samples |= 0x10000;
+
 				break;
+			}
 		}
 	}
 
@@ -428,10 +468,13 @@ static int generate_pcm8(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer,
 
 ***********************************************************************************************/
 
-static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer, int samples)
+static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, INT16 *buffer, int samples)
 {
 	int position = voice->position;
 	int val;
+
+	/* is it even used in any MAME game? */
+	popmessage("YMZ280B 16-bit PCM contact MAMEDEV");
 
 	/* two cases: first cases is non-looping */
 	if (!voice->looping)
@@ -440,7 +483,7 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 		while (samples)
 		{
 			/* fetch the current value */
-			val = (INT16)((base[position / 2 + 1] << 8) + base[position / 2]);
+			val = (INT16)((ymz280b_read_memory(base, size, position / 2 + 0) << 8) + ymz280b_read_memory(base, size, position / 2 + 1));
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = val;
@@ -449,7 +492,12 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 			/* next! */
 			position += 4;
 			if (position >= voice->stop)
+			{
+				if (!samples)
+					samples |= 0x10000;
+
 				break;
+			}
 		}
 	}
 
@@ -460,7 +508,7 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 		while (samples)
 		{
 			/* fetch the current value */
-			val = (INT16)((base[position / 2 + 1] << 8) + base[position / 2]);
+			val = (INT16)((ymz280b_read_memory(base, size, position / 2 + 0) << 8) + ymz280b_read_memory(base, size, position / 2 + 1));
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = val;
@@ -474,7 +522,12 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 					position = voice->loop_start;
 			}
 			if (position >= voice->stop)
+			{
+				if (!samples)
+					samples |= 0x10000;
+
 				break;
+			}
 		}
 	}
 
@@ -519,28 +572,30 @@ static STREAM_UPDATE( ymz280b_update )
 		int rvol = voice->output_right;
 
 		/* quick out if we're not playing and we're at 0 */
-		if (!voice->playing && curr == 0)
+		if (!voice->playing && curr == 0 && prev == 0)
+		{
+			/* make sure next sound plays immediately */
+			voice->output_pos = FRAC_ONE;
+
 			continue;
+		}
 
 		/* finish off the current sample */
-//      if (voice->output_pos > 0)
+		/* interpolate */
+		while (remaining > 0 && voice->output_pos < FRAC_ONE)
 		{
-			/* interpolate */
-			while (remaining > 0 && voice->output_pos < FRAC_ONE)
-			{
-				int interp_sample = (((INT32)prev * (FRAC_ONE - voice->output_pos)) + ((INT32)curr * voice->output_pos)) >> FRAC_BITS;
-				*ldest++ += interp_sample * lvol;
-				*rdest++ += interp_sample * rvol;
-				voice->output_pos += voice->output_step;
-				remaining--;
-			}
-
-			/* if we're over, continue; otherwise, we're done */
-			if (voice->output_pos >= FRAC_ONE)
-				voice->output_pos -= FRAC_ONE;
-			else
-				continue;
+			int interp_sample = (((INT32)prev * (FRAC_ONE - voice->output_pos)) + ((INT32)curr * voice->output_pos)) >> FRAC_BITS;
+			*ldest++ += interp_sample * lvol;
+			*rdest++ += interp_sample * rvol;
+			voice->output_pos += voice->output_step;
+			remaining--;
 		}
+
+		/* if we're over, continue; otherwise, we're done */
+		if (voice->output_pos >= FRAC_ONE)
+			voice->output_pos -= FRAC_ONE;
+		else
+			continue;
 
 		/* compute how many new samples we need */
 		final_pos = voice->output_pos + remaining * voice->output_step;
@@ -550,24 +605,21 @@ static STREAM_UPDATE( ymz280b_update )
 		samples_left = new_samples;
 
 		/* generate them into our buffer */
-		if (voice->playing)
+		switch (voice->playing << 7 | voice->mode)
 		{
-			switch (voice->mode)
-			{
-				case 1:	samples_left = generate_adpcm(voice, chip->region_base, chip->scratch, new_samples);	break;
-				case 2:	samples_left = generate_pcm8(voice, chip->region_base, chip->scratch, new_samples);	break;
-				case 3:	samples_left = generate_pcm16(voice, chip->region_base, chip->scratch, new_samples);	break;
-				default:
-				case 0:	samples_left = 0; memset(chip->scratch, 0, new_samples * sizeof(chip->scratch[0]));			break;
-			}
+			case 0x81:	samples_left = generate_adpcm(voice, chip->region_base, chip->region_size, chip->scratch, new_samples);		break;
+			case 0x82:	samples_left = generate_pcm8(voice, chip->region_base, chip->region_size, chip->scratch, new_samples);		break;
+			case 0x83:	samples_left = generate_pcm16(voice, chip->region_base, chip->region_size, chip->scratch, new_samples);		break;
+			default:	samples_left = 0; memset(chip->scratch, 0, new_samples * sizeof(chip->scratch[0]));							break;
 		}
 
 		/* if there are leftovers, ramp back to 0 */
 		if (samples_left)
 		{
-			int base = new_samples - samples_left;
+			/* note: samples_left bit 16 is set if the voice was finished at the same time the function ended */
+			int base = new_samples - (samples_left & 0xffff);
 			int i, t = (base == 0) ? curr : chip->scratch[base - 1];
-			for (i = 0; i < samples_left; i++)
+			for (i = 0; i < (samples_left & 0xffff); i++)
 			{
 				if (t < 0) t = -((-t * 15) >> 4);
 				else if (t > 0) t = (t * 15) >> 4;
@@ -627,7 +679,7 @@ static STREAM_UPDATE( ymz280b_update )
 
 /**********************************************************************************************
 
-     DEVICE_START( ymz280b ) -- start emulation of the YMZ280B
+     DEVICE_START/RESET( ymz280b ) -- start/reset emulation of the YMZ280B
 
 ***********************************************************************************************/
 
@@ -647,12 +699,14 @@ static DEVICE_START( ymz280b )
 	/* initialize the rest of the structure */
 	chip->master_clock = (double)device->clock() / 384.0;
 	chip->region_base = *device->region();
+	chip->region_size = device->region()->bytes();
 	chip->irq_callback = intf->irq_callback;
 
 	/* create the stream */
 	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, INTERNAL_SAMPLE_RATE, chip, ymz280b_update);
 
 	/* allocate memory */
+	assert(MAX_SAMPLE_CHUNK < 0x10000);
 	chip->scratch = auto_alloc_array(device->machine(), INT16, MAX_SAMPLE_CHUNK);
 
 	/* state save */
@@ -700,6 +754,33 @@ static DEVICE_START( ymz280b )
 #endif
 }
 
+static DEVICE_RESET( ymz280b )
+{
+	int i;
+	ymz280b_state *chip = get_safe_token(device);
+
+	/* initial clear registers */
+	for (i = 0xff; i >= 0; i--)
+	{
+		chip->current_register = i;
+		write_to_register(chip, 0);
+	}
+
+	chip->current_register = 0;
+	chip->status_register = 0;
+
+	/* clear other voice parameters */
+	for (i = 0; i < 8; i++)
+	{
+		struct YMZ280BVoice *voice = &chip->voice[i];
+
+		voice->curr_sample = 0;
+		voice->last_sample = 0;
+		voice->output_pos = FRAC_ONE;
+		voice->playing = 0;
+	}
+}
+
 
 
 /**********************************************************************************************
@@ -712,9 +793,6 @@ static void write_to_register(ymz280b_state *chip, int data)
 {
 	struct YMZ280BVoice *voice;
 	int i;
-
-	/* force an update */
-	chip->stream->update();
 
 	/* lower registers follow a pattern */
 	if (chip->current_register < 0x80)
@@ -731,7 +809,8 @@ static void write_to_register(ymz280b_state *chip, int data)
 			case 0x01:		/* pitch upper 1 bit, loop, key on, mode */
 				voice->fnum = (voice->fnum & 0xff) | ((data & 0x01) << 8);
 				voice->looping = (data & 0x10) >> 4;
-				voice->mode = (data & 0x60) >> 5;
+				if ((data & 0x60) == 0) data &= 0x7f; /* ignore mode setting and set to same state as KON=0 */
+				else voice->mode = (data & 0x60) >> 5;
 				if (!voice->keyon && (data & 0x80) && chip->keyon_enable)
 				{
 					voice->playing = 1;
@@ -743,7 +822,7 @@ static void write_to_register(ymz280b_state *chip, int data)
 					/* if update_irq_state_timer is set, cancel it. */
 					voice->irq_schedule = 0;
 				}
-				if (voice->keyon && !(data & 0x80) && !voice->looping)
+				else if (voice->keyon && !(data & 0x80))
 				{
 					voice->playing = 0;
 
@@ -823,6 +902,13 @@ static void write_to_register(ymz280b_state *chip, int data)
 	{
 		switch (chip->current_register)
 		{
+			/* DSP related (not implemented yet) */
+			case 0x80: // d0-2: DSP Rch, d3: enable Rch (0: yes, 1: no), d4-6: DSP Lch, d7: enable Lch (0: yes, 1: no)
+			case 0x81: // d0: enable control of $82 (0: yes, 1: no)
+			case 0x82: // DSP data
+				logerror("YMZ280B: DSP register write %02X = %02X\n", chip->current_register, data);
+				break;
+
 			case 0x84:		/* ROM readback / RAM write (high) */
 				chip->rom_readback_addr &= 0xffff;
 				chip->rom_readback_addr |= (data<<16);
@@ -843,6 +929,7 @@ static void write_to_register(ymz280b_state *chip, int data)
 					chip->ext_ram_write(chip->rom_readback_addr, data);
 				else
 					logerror("YMZ280B attempted RAM write to %X\n", chip->rom_readback_addr);
+				chip->rom_readback_addr = (chip->rom_readback_addr + 1) & 0xffffff;
 				break;
 
 			case 0xfe:		/* IRQ mask */
@@ -897,7 +984,9 @@ static int compute_status(ymz280b_state *chip)
 	/* ROM/RAM readback? */
 	if (chip->current_register == 0x86)
 	{
-		return chip->region_base[chip->rom_readback_addr];
+		result = ymz280b_read_memory(chip->region_base, chip->region_size, chip->rom_readback_addr);
+		chip->rom_readback_addr = (chip->rom_readback_addr + 1) & 0xffffff;
+		return result;
 	}
 
 	/* force an update */
@@ -916,7 +1005,7 @@ static int compute_status(ymz280b_state *chip)
 
 /**********************************************************************************************
 
-     ymz280b_status_0_r/ymz280b_status_1_r -- handle a read from the status register
+     ymz280b_r/ymz280b_w -- handle external accesses
 
 ***********************************************************************************************/
 
@@ -925,7 +1014,17 @@ READ8_DEVICE_HANDLER( ymz280b_r )
 	ymz280b_state *chip = get_safe_token(device);
 
 	if ((offset & 1) == 0)
-		return chip->ext_ram_read(chip->rom_readback_addr++ - 1);
+	{
+		/* read from external memory */
+		UINT8 result;
+		if (chip->ext_ram_read.isnull())
+			result = chip->ext_ram_read(chip->rom_readback_addr);
+		else
+			result = ymz280b_read_memory(chip->region_base, chip->region_size, chip->rom_readback_addr);
+
+		chip->rom_readback_addr = (chip->rom_readback_addr + 1) & 0xffffff;
+		return result;
+	}
 	else
 		return compute_status(chip);
 }
@@ -938,7 +1037,12 @@ WRITE8_DEVICE_HANDLER( ymz280b_w )
 	if ((offset & 1) == 0)
 		chip->current_register = data;
 	else
+	{
+		/* force an update */
+		chip->stream->update();
+
 		write_to_register(chip, data);
+	}
 }
 
 
@@ -952,19 +1056,19 @@ DEVICE_GET_INFO( ymz280b )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ymz280b_state);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ymz280b_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ymz280b );		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */									break;
-		case DEVINFO_FCT_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							info->start = DEVICE_RESET_NAME( ymz280b );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "YMZ280B");						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Yamaha Wavetable");			break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Yamaha Wavetable");			break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
