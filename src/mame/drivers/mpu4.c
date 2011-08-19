@@ -9900,7 +9900,7 @@ ROM_START( m4wta )
 	ROM_LOAD( "wn5s.chr", 0x0000, 0x000048, CRC(b90e5068) SHA1(14c57dcd7242104eb48a9be36192170b97bc5110) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "wta_5p4c.bin", 0x0000, 0x080000, CRC(0516acad) SHA1(cfecd089c7250cb19c9e4ca251591f820acefd88) ) // no 1st part?
+	//ROM_LOAD( "wta_5p4c.bin", 0x0000, 0x080000, CRC(0516acad) SHA1(cfecd089c7250cb19c9e4ca251591f820acefd88) ) // no 1st part? this appears to belong to wacky weekend club (global)
 
 	ROM_LOAD( "winsnd.p1", 0x000000, 0x080000, CRC(a913ad0d) SHA1(5f39b661912da903ce8d6658b7848081b191ea56) )
 	ROM_LOAD( "winsnd.p2", 0x080000, 0x080000, CRC(6a22b39f) SHA1(0e0dbeac4310e03490b665fff514392481ad265f) )
@@ -11463,6 +11463,44 @@ ROM_START( m4banginb )
 ROM_END
 
 
+ROM_START( m4wwc )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "wack1-9n.p1", 0x0000, 0x020000, CRC(7ba6fd92) SHA1(3a5c7f9b3ebd8593c76132b46163c9d1299e210e) )
+
+	ROM_REGION( 0x020000, "altrevs", 0 )
+	ROM_LOAD( "wack1-9p.p1", 0x0000, 0x020000, CRC(4046b5eb) SHA1(e1ec9158810387b41b574202e9f27e7b741ac81c) )
+	ROM_LOAD( "wacky.hex", 0x0000, 0x020000, CRC(a94a06fd) SHA1(a5856b6903fdd35f9dca19b114ca56c106a308f2) )
+
+	ROM_REGION( 0x180000, "msm6376", 0 )
+	/* 2 sets of sound roms, one contains an extra sample */
+	ROM_LOAD( "wacky1.hex", 0x000000, 0x080000, CRC(379d7af6) SHA1(3b1988c1ab570c075572d0e9bf03fcb331ea4a2c) )
+	/* rom 2? should it match? */
+	ROM_LOAD( "wacky3.hex", 0x100000, 0x080000, CRC(c7def11a) SHA1(6aab2b7f7e4c852891ee09e91a8a085e9b28803f) )
+
+	ROM_LOAD( "wacky1snd.bin", 0x000000, 0x080000, CRC(45d6869a) SHA1(c1294522d190d22852b5c6006c92911f9e89cfac) )
+	ROM_LOAD( "wacky2snd.bin", 0x080000, 0x080000, CRC(18b5f8c8) SHA1(e4dc312eea777c2375ba8c2be2f3c2be71bea5c4) )
+	ROM_LOAD( "wacky3snd.bin", 0x100000, 0x080000, CRC(0516acad) SHA1(cfecd089c7250cb19c9e4ca251591f820acefd88) )
+ROM_END
+
+
+ROM_START( m4screw )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "scre0-8n.p1", 0x0000, 0x020000, CRC(5e07b33a) SHA1(6e8835edb61bd0777751bfdfe66d729554a9d6eb) )
+
+	ROM_REGION( 0x020000, "altrevs", 0 )
+	ROM_LOAD( "scre0-8p.p1", 0x0000, 0x020000, CRC(34a70a77) SHA1(f76de47f6919d380eb0d0eeffc0e5dda72345038) )
+	ROM_LOAD( "screwinaroundv0-7.bin", 0x0000, 0x020000, CRC(78a1e3ca) SHA1(a3d6e76a474a3a5cd74e4b527aa575f21825a7aa) )
+	//ROM_LOAD( "screwing.bin", 0x0000, 0x020000, CRC(5e07b33a) SHA1(6e8835edb61bd0777751bfdfe66d729554a9d6eb) )
+
+	ROM_REGION( 0x180000, "msm6376", 0 )
+	ROM_LOAD( "screwsnd.p1", 0x000000, 0x080000, CRC(6fe4888c) SHA1(b02b7f322d22080123e8b18326910031aa9d39b4) )
+	ROM_LOAD( "screwsnd.p2", 0x080000, 0x080000, CRC(29e842ee) SHA1(3325b137361c69244fffaa0d0e39e60106eaa5f9) )
+	ROM_LOAD( "screwsnd.p3", 0x100000, 0x080000, CRC(91ef193f) SHA1(a356642ae1093cf69486c434673531042ae27be7) )
+ROM_END
+
+
+
+
 ROM_START( m4bankrd )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "br3_1x.bin", 0x0000, 0x010000, CRC(a7bc60b3) SHA1(73fc3c0f775b88ce4f8ccf7d60399371656c2144) )
@@ -12991,7 +13029,99 @@ ROM_END
 ROM_START( m4sbx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbx-2.1-cash.bin", 0x8000, 0x008000, CRC(2dca703e) SHA1(aef398f4ed38ba34f28009058c9486a570f64e0f) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "b_sbx23.bin", 0x8000, 0x008000, CRC(8188e94f) SHA1(dfbfc549d12c8f7c7db6c12ba766c28f1cf0873f) )
+	ROM_LOAD( "s bears v1-4 20p po.bin", 0x8000, 0x008000, CRC(03486714) SHA1(91c237956bbec58cc08a3e92543488d8e2daa673) )
+	ROM_LOAD( "s bears v2-4 10p 8.bin", 0x8000, 0x008000, CRC(9b94f8d0) SHA1(9808386def14c8a058730e90135a4d6506e6ed3d) )
+	ROM_LOAD( "s bears v2-4 20p po.bin", 0x8000, 0x008000, CRC(ad8f8d9d) SHA1(abd808f95b587a84e8b3aad1af9fe1cb613c9821) )
+	ROM_LOAD( "superbea.10p", 0x8000, 0x008000, CRC(70020466) SHA1(473c9feb9ce0024b870612af19ec8a47a7798506) )	
+
+	ROM_REGION( 0x40000, "upd", 0 ) // not oki at least...
+	ROM_LOAD( "sbsnd", 0x0000, 0x040000, CRC(27fd9fe6) SHA1(856fdc95a833affde0ada7041c68a4b6b729b715) )
 ROM_END
+
+ROM_START( m4bclimb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bc8pv4.bin", 0x8000, 0x008000, CRC(229a7607) SHA1(b20b2c9f9d19ccd6146affdf519fa4bc0322c971) )
+
+	ROM_REGION( 0x40000, "upd", 0 ) // not oki at least...
+	ROM_LOAD( "sbsnd", 0x0000, 0x040000, CRC(27fd9fe6) SHA1(856fdc95a833affde0ada7041c68a4b6b729b715) )
+ROM_END
+
+ROM_START( m4captb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "c_bear21.rom", 0x8000, 0x008000, CRC(2e9a42e9) SHA1(0c3f33311f1543daf2ff5c0443dc8c000d49c26d) )
+
+	ROM_REGION( 0x40000, "upd", ROMREGION_ERASE00 ) // not oki at least...
+//	ROM_LOAD( "sbsnd", 0x0000, 0x040000, CRC(27fd9fe6) SHA1(856fdc95a833affde0ada7041c68a4b6b729b715) )
+ROM_END
+
+ROM_START( m4jungj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jj2410p.bin", 0x8000, 0x008000, CRC(490838c6) SHA1(a1e9963df9a429ae594592312e977f22f96c6073) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "jj2420p.bin", 0x8000, 0x008000, CRC(39329ccf) SHA1(6b79e4fc553bad935ec9989ad5ef3e186e720633) )
+	ROM_LOAD( "jjv2_4p.bin", 0x8000, 0x008000, CRC(125a8138) SHA1(18c62df5b331bd09d6dcda6280351e94b7b816fd) )
+	ROM_LOAD( "jjv4.bin", 0x8000, 0x008000, CRC(bf583156) SHA1(084c5ed3d96c92f265ad08cc7aed7fe6092217a5) )
+
+	ROM_REGION( 0x40000, "upd", ROMREGION_ERASE00 ) // not oki at least...
+ROM_END
+
+
+ROM_START( m4fsx )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "funspotx.10p", 0x8000, 0x008000, CRC(55199f36) SHA1(7af376781e381582b06972725a2022cc28ba60b3) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )
+	ROM_LOAD( "funspotx.20p", 0x8000, 0x008000, CRC(08d1eb6e) SHA1(7c7c02d9c34696d75490df8596ffe64fba93dcc4) )
+	ROM_LOAD( "b_fsv1.bin", 0x8000, 0x008000, CRC(b077f944) SHA1(97d96594b8d2d7232bad087cc55912dec02d7484) )
+
+	ROM_REGION( 0x40000, "upd", ROMREGION_ERASE00 ) // not oki at least...
+ROM_END
+
+
+ROM_START( m4ccop )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cashcop9.bin", 0x0000, 0x010000, CRC(5f993207) SHA1(ab0614e6a1355d275158b1a32f65086e40c2f890) )
+
+	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_LOAD( "cash-cops_v4-de.bin", 0x0000, 0x010000, CRC(df3da824) SHA1(c275a33e4a89f1b9ecbae80cb7b62007b29b9fd2) )
+	ROM_LOAD( "cashcop8.bin", 0x0000, 0x010000, CRC(165603df) SHA1(d301696a340ed136a43c5753c8bf73283a925fd7) )
+
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	// 3 different sets of samples(!)
+	ROM_LOAD( "cash-copssnd1-de.bin", 0x000000, 0x080000, CRC(cd03f7f7) SHA1(4c09a86bcdf9a9eb224b19b932b75c9db3784fad) )
+	ROM_LOAD( "cash-copssnd2-de.bin", 0x080000, 0x080000, CRC(107816a2) SHA1(f5d4a0390b85a665a3536da4689ec91b1a2da3ae) )
+
+	ROM_LOAD( "cash-copssnd1.bin", 0x000000, 0x080000, CRC(776a303d) SHA1(a5a282674674f25bc6ca169eeebee7309239871f) )
+	ROM_LOAD( "cash-copssnd2.bin", 0x080000, 0x080000, CRC(107816a2) SHA1(f5d4a0390b85a665a3536da4689ec91b1a2da3ae) )
+
+	ROM_LOAD( "cashcops.p1", 0x000000, 0x080000, CRC(9a59a3a1) SHA1(72cfc99b22ec5fb89714c6d2d66760d86dc19f2f) )
+	ROM_LOAD( "cashcops.p2", 0x080000, 0x080000, CRC(deb3e755) SHA1(01f92881c451919be549a1c58afa1fa4630bf171) )
+ROM_END
+
+ROM_START( m4ccc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ccc12.bin", 0x8000, 0x008000, CRC(570cc766) SHA1(036c95ff6428ab38cceb0537dcc990be78fb331a) )
+
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "criss cross crazy sound (27c2001)", 0x0000, 0x040000, CRC(1994c509) SHA1(2bbe91a43aa9953b7776faf67e81e30a4f7b7cb2) )
+ROM_END
+
+
+ROM_START( m4treel )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "trgv1.1s", 0x0000, 0x010000, CRC(a9c76b08) SHA1(a5b3bc980eb58e346cb02d8ca43401f304e5b6de) )
+
+	ROM_REGION( 0x20000, "altrevs", 0 )
+	ROM_LOAD( "trgv1.1b", 0x0000, 0x020000, CRC(7eaebef6) SHA1(5ab86329041e7df09cc2e3ce8d5afd44d88c246c) )
+
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+ROM_END
+
+
 
 ROM_START( m4unkjok )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -13102,7 +13232,7 @@ ROM_START( m4bagcsh )
 	ROM_LOAD( "cg27p.bin", 0x8000, 0x008000, CRC(775384ac) SHA1(3cff28d2e5c01e84e3d01334cb0ac6e451664726) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */	
 ROM_END
 
 
@@ -13118,7 +13248,7 @@ ROM_START( m4bucclb )
 	ROM_LOAD( "er14p.bin", 0x0000, 0x010000, CRC(c2e34901) SHA1(5811e9b3d49e9a5fa32c764c00d10202aa89455a) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */	
 ROM_END
 
 
@@ -13133,7 +13263,7 @@ ROM_START( m4bullio )
 	ROM_LOAD( "clbu-v16.bin", 0x0000, 0x010000, CRC(58d2fed8) SHA1(f9680b61505dea88ee62cc40dc6c375845d768dd) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */	
 ROM_END
 
 
@@ -13167,7 +13297,7 @@ ROM_START( m4cclimb )
 	ROM_LOAD( "fu204p.bin", 0x0000, 0x010000, CRC(af0dd470) SHA1(d62bdd347130fa34c1f7f46ac9ddaaf6d035dd1c) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */	
 ROM_END
 
 
@@ -13183,7 +13313,7 @@ ROM_START( m4crzcl )
 	ROM_LOAD( "fu105p.bin", 0x0000, 0x010000, CRC(dfff65c9) SHA1(c962e5c159301daae952bb7a5b3393aea206a4b1) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */	
 ROM_END
 
 
@@ -13194,7 +13324,7 @@ ROM_START( m4crzclc )
 	ROM_LOAD( "cc106.bin", 0x0000, 0x010000, CRC(ff9a5f7f) SHA1(672e8b0fc0d6e985d0862e5f474bc49e1bb0c56c) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */	
 ROM_END
 
 
@@ -13208,7 +13338,7 @@ ROM_START( m4elitc )
 	ROM_LOAD( "ed16p.bin", 0x0000, 0x010000, CRC(3251c0b4) SHA1(30483a67a4c363fa154e3912b4f834b97d955cc2) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */	
 ROM_END
 
 
@@ -13239,7 +13369,7 @@ ROM_START( m4frmani )
 	ROM_LOAD( "fo23sp.bin", 0x0000, 0x010000, CRC(f3f24d6d) SHA1(251c5bac250fc5e854004f16858884f3905ab26e) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */		
 ROM_END
 
 
@@ -13257,7 +13387,7 @@ ROM_START( m4goldxc )
 	ROM_LOAD( "gx207b.b8", 0x0000, 0x010000, CRC(b91efda9) SHA1(cf8aa37cee983ebc73b6aa1606e7404d0f323d17) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */		
 ROM_END
 
 
@@ -13272,7 +13402,7 @@ ROM_START( m4goldfc )
 	ROM_LOAD( "goldfevergamev1.1.bin", 0x0000, 0x010000, CRC(7e5f90e5) SHA1(7e4fc6d07e9b9ff0b4c6ef59d494438c2ee0c27b) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "goldfeversamplesound.bin", 0x0000, 0x080000, CRC(eb7d3c7b) SHA1(53b7c048e78506f0188b4dd2750c8dc31a625523) )
+	ROM_LOAD( "goldfeversamplesound.bin", 0x0000, 0x080000, CRC(eb7d3c7b) SHA1(53b7c048e78506f0188b4dd2750c8dc31a625523) )	
 ROM_END
 
 
@@ -13289,7 +13419,7 @@ ROM_START( m4hirol )
 	ROM_LOAD( "fv105p.bin", 0x0000, 0x010000, CRC(facd8625) SHA1(2ace151546a9f8f191713c798cd1f26f4c69ded2) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */			
 ROM_END
 
 
@@ -13317,7 +13447,7 @@ ROM_START( m4lotclb )
 	ROM_LOAD( "ds14p.bin", 0x0000, 0x010000, CRC(2199396a) SHA1(070bca2951261f83baf1a21bf740fd12d1d8daa5) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */				
 ROM_END
 
 
@@ -13337,7 +13467,7 @@ ROM_START( m4montrl )
 	ROM_LOAD( "moneytrail.bin", 0x0000, 0x010000, CRC(e5533728) SHA1(f1abd59d57a5eca42640992bc543990a3ee8058d) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "moneytrailsnd.bin", 0x0000, 0x040000, CRC(0f0d52dc) SHA1(79e1a89858f95006a1d2a0dd18d677c84a3087c6) )
+	ROM_LOAD( "moneytrailsnd.bin", 0x0000, 0x040000, CRC(0f0d52dc) SHA1(79e1a89858f95006a1d2a0dd18d677c84a3087c6) )	
 ROM_END
 
 
@@ -13353,7 +13483,7 @@ ROM_START( m4mystiq )
 	ROM_LOAD( "fw103fpd.p1", 0x0000, 0x010000, CRC(919a1616) SHA1(15e5db55ecdf1151090401c46a0379d339d9c615) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */					
 ROM_END
 
 
@@ -13367,7 +13497,7 @@ ROM_START( m4nudwin )
 	ROM_LOAD( "dn56p.bin", 0x8000, 0x008000, CRC(1640a1ef) SHA1(70d573746244166b358457710e6e2c9437ea2745) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */				
 ROM_END
 
 
@@ -13381,7 +13511,7 @@ ROM_START( m4paracl )
 	ROM_LOAD( "dl12p.bin", 0x0000, 0x010000, CRC(e5e8013e) SHA1(8b6cb5aed1b82c8a298c9e798f89ab07ff330caf) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */					
 ROM_END
 
 
@@ -13397,7 +13527,7 @@ ROM_START( m4rlpick )
 	ROM_LOAD( "fh15s.bin", 0x0000, 0x010000, CRC(55b0a7e7) SHA1(d4568f82040de0fc6eb08fe90754d2b33e427ab0) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */					
 ROM_END
 
 
@@ -13411,8 +13541,9 @@ ROM_START( m4twstr )
 	ROM_LOAD( "fds103p.bin", 0x0000, 0x010000, CRC(764bd0a8) SHA1(cea826c94ce28ab3e47071846756a7e1effa5d1b) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */					
 ROM_END
+
 
 
 ROM_START( m4twstcl )
@@ -13424,9 +13555,17 @@ ROM_START( m4twstcl )
 	ROM_LOAD( "fl106p.bin", 0x0000, 0x010000, CRC(93dd36e7) SHA1(eded1b5748cb24af80ab392a5fd4d2cc312a66a2) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	/* missing? */					
 ROM_END
 
+
+ROM_START( m4dz )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dangerzone1_2.bin", 0x8000, 0x08000, CRC(eb4582f8) SHA1(df4cbbbb927b512b1ace34986ce29b17d7815e49) )
+
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "dangerzonesnd.bin", 0x0000, 0x080000, CRC(bdfcffa2) SHA1(9e3be8fd1c42fd19afcde682662bef82f7e0f7e9) )
+ROM_END
 
 
 ROM_START( m4blkgd )
@@ -13440,9 +13579,9 @@ ROM_START( m4blkgd )
 	ROM_LOAD( "blackgoldsnd1.bin", 0x000000, 0x080000, CRC(d251b59e) SHA1(960b81b87f0fb5000028c863892a273362cb897f) )
 	ROM_LOAD( "blackgoldsnd2.bin", 0x080000, 0x080000, CRC(87cbcd1e) SHA1(a6cd186af7c5682e216f549b77735b9bf1b985ae) )
 	ROM_LOAD( "blackgoldsnd3.bin", 0x100000, 0x080000, CRC(258f7b83) SHA1(a6df577d98ade8c5c5ff68ef891667e65e83ac17) )
-//  ROM_LOAD( "blackgoldsound 1.bin", 0x0000, 0x080000, CRC(d251b59e) SHA1(960b81b87f0fb5000028c863892a273362cb897f) )
-//  ROM_LOAD( "blackgoldsound 2.bin", 0x0000, 0x080000, CRC(87cbcd1e) SHA1(a6cd186af7c5682e216f549b77735b9bf1b985ae) )
-//  ROM_LOAD( "blackgoldsound 3.bin", 0x0000, 0x080000, CRC(258f7b83) SHA1(a6df577d98ade8c5c5ff68ef891667e65e83ac17) )
+//	ROM_LOAD( "blackgoldsound 1.bin", 0x0000, 0x080000, CRC(d251b59e) SHA1(960b81b87f0fb5000028c863892a273362cb897f) )
+//	ROM_LOAD( "blackgoldsound 2.bin", 0x0000, 0x080000, CRC(87cbcd1e) SHA1(a6cd186af7c5682e216f549b77735b9bf1b985ae) )
+//	ROM_LOAD( "blackgoldsound 3.bin", 0x0000, 0x080000, CRC(258f7b83) SHA1(a6df577d98ade8c5c5ff68ef891667e65e83ac17) )
 ROM_END
 
 
@@ -13486,7 +13625,7 @@ ROM_START( m4safar )
 	ROM_LOAD( "saf4_1.bin", 0x0000, 0x010000, CRC(ad726457) SHA1(4104be61d179024fae9fb9c631677b1ba56d3f00) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-
+	
 ROM_END
 
 ROM_START( m4snowbl )
@@ -13625,6 +13764,13 @@ ROM_START( m4supsl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "s2v1.0.lp2.64k.bin", 0x6000, 0x002000, CRC(8c622799) SHA1(ffe8a59d37c21c32fd16c812baff2c83b241a43d) )
 	ROM_LOAD( "s2v1.0.lp1.256k.bin", 0x8000, 0x008000, CRC(4d963ad0) SHA1(8ec45a33243868afb66d1ea1863124c005bad221) )
+ROM_END
+
+ROM_START( m4nod )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nod.bin", 0x0000, 0x010000, CRC(bc738af5) SHA1(8df436139554ccfb48c4db0a32e3333dbf3c4f46) )
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "nodsnd.bin", 0x0000, 0x080000, CRC(2134494a) SHA1(3b665bf79567a71195b20e76c50b02707d15b78d) )
 ROM_END
 
 
@@ -14249,6 +14395,8 @@ GAME(199?, m4bandgd,  0,		mod4oki, mpu4, m4default, ROT0,   "Eurogames","Bands O
 GAME(199?, m4bangin,  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bangina, m4bangin,	mod4oki, mpu4, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4banginb, m4bangin,	mod4oki, mpu4, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4wwc,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4screw,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigben,  0,		mod4oki, mpu4, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigbena, m4bigben,	mod4oki, mpu4, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigbenb, m4bigben,	mod4oki, mpu4, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
@@ -14277,7 +14425,6 @@ GAME(199?, m4dnj	,  0,		mod4oki	,mpu4, m4default, ROT0,   "unknown","Double Nudg
 GAME(199?, m4matdr	,  0,		mod4oki	,mpu4, m4default, ROT0,   "unknown","Matador (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4ttak	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Tic Tac Take (unknown) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4hslo	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'HOT 3.0' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4sbx	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'SBX' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4unkjok	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'Joker' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4remag	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'ZTP 0.7' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4rmg	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 'CTP 0.4' (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
@@ -14286,33 +14433,46 @@ GAME(199?, m4t266	,  0,		mod2	,mpu4, m4default, ROT0,   "unknown","Unknown MPU4 
 GAME(199?, m4brnze	,  0,		mod4oki, mpu4, m4default, ROT0,   "unknown","Bronze Voyage (unknown) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4riotrp	,  0,		mod4oki, mpu4, m4default, ROT0,   "unknown","Rio Tropico (unknown) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 
+/* *if* these are MPU4 they have a different sound system at least - The copyright strings in them are 'AET' tho (Ace?) - Could be related to the Crystal stuff? */
+GAME(199?, m4sbx	,  0,		mpu4crys	,mpu4, m_frkstn, ROT0,   "AET/Coinworld","Super Bear X (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bclimb	,  0,		mpu4crys	,mpu4, m_frkstn, ROT0,   "AET/Coinworld","Bear Climber (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4captb	,  0,		mpu4crys	,mpu4, m_frkstn, ROT0,   "AET/Coinworld","Captain Bear (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4jungj	,  0,		mpu4crys	,mpu4, m_frkstn, ROT0,   "AET/Coinworld","Jungle Japes (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4fsx	,  0,		mpu4crys	,mpu4, m_frkstn, ROT0,   "AET/Coinworld","Fun Spot X (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4ccop	,  0,		mod4oki		,mpu4, m4default, ROT0,   "Coinworld","Cash Cops (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4ccc	,  0,		mod4oki		,mpu4, m4default, ROT0,   "Coinworld","Criss Cross Crazy (Coinworld) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4treel	,  0,		mod2		,mpu4, m4default, ROT0,   "Jpm","Turbo Reels (Jpm) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+
+
+
 
 GAME(199?, m4frkstn	,0			,mpu4crys	,mpu4		,m_frkstn,	ROT0,   "Crystal","Frank 'n' Stein (Crystal) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4frkstna,m4frkstn	,mpu4crys	,mpu4		,m_frkstn,	ROT0,   "Crystal","Frank 'n' Stein (Crystal) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4frkstnb,m4frkstn	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Frank 'n' Stein (Crystal) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // this set is encrypted
-GAME(199?, m4aladn	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Aladdin's Cave (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4bagcsh	,0      	,mpu4crys	,mpu4		,m_frkstn,	ROT0,   "Crystal","Bags Of Cash Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4bucclb	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Buccaneer Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4bullio	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Bullion Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4carou	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Carousel Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4cclimb	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Crazy Climber (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4crzcl	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Crazy Climber Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4crzclc	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Crazy Club Climber (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4elitc	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Elite Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4fairg	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Fairground (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4frmani	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Fruit Mania (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4goldxc	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Gold Exchange Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4goldfc	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Gold Fever (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4hirol	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Hi Roller Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4kingqn	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Kings & Queens Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4lotclb	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Lottery Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4montrl	,0      	,mpu4crys	,mpu4		,crystali,	ROT0,   "Crystal","Money Trail (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // encryption is inverted!
-GAME(199?, m4mystiq	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Mystique Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4nudwin	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Nudge & Win (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4paracl	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Paradise Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4rlpick	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Reel Picks (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4twstr	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Twister (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4twstcl	,0      	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Twister Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4aladn	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Aladdin's Cave (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bagcsh	,0       	,mpu4crys	,mpu4		,m_frkstn,	ROT0,   "Crystal","Bags Of Cash Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bucclb	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Buccaneer Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4bullio	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Bullion Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4carou	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Carousel Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4cclimb	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Crazy Climber (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4crzcl	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Crazy Climber Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4crzclc	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Crazy Club Climber (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4elitc	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Elite Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4fairg	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Fairground (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4frmani	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Fruit Mania (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4goldxc	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Gold Exchange Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4goldfc	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Gold Fever (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4hirol	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Hi Roller Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4kingqn	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Kings & Queens Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4lotclb	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Lottery Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4montrl	,0       	,mpu4crys	,mpu4		,crystali,	ROT0,   "Crystal","Money Trail (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // encryption is inverted!
+GAME(199?, m4mystiq	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Mystique Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4nudwin	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Nudge & Win (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4paracl	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Paradise Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4rlpick	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Reel Picks (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4twstr	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Twister (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4twstcl	,0       	,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Twister Club (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4dz		,0			,mpu4crys	,mpu4		,crystal,	ROT0,   "Crystal","Danger Zone (Crystal) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 
 //SWP
 GAMEL(1989?,  m4conn4,        0, mod2    ,   connect4,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
@@ -14341,4 +14501,8 @@ GAME(199?, m4booze, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Extreme","Booze C
 GAME(199?, m4cbing, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Redpoint Systems","Cherry Bingo (Redpoint Systems) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // custom sound system
 
 
-GAME( 1986, m4supsl	, 0			, mod2, mpu4,		m4default		,	  ROT0,       "Unknown",   "Supa Silva (Bellfruit?) (MPU4)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1986, m4supsl	, 0			, mod2, mpu4, 		m4default		,	  ROT0,       "Unknown",   "Supa Silva (Bellfruit?) (MPU4)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 199?, m4nod		, 0			,  mod4oki		, mpu4		, m4default		, 0,		 "Eurotech",   "Nod And A Wink (Eurotech) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
+
+
+
