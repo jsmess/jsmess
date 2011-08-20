@@ -122,31 +122,31 @@ static MACHINE_RESET( digel804 )
 READ8_MEMBER( digel804_state::port_43_r )
 {
 	/* Register 0x43: status/mode register read
-	 bits 76543210
-	      |||||||\- overload state (0 = not overloaded; 1 = overload detected, led on and power disconnected to ic)
-	      ||||||\-- unknown, always 1? may be acia related
-	      |||||\--- any key pressed on keypad (0 = one or more pressed, 1 = none pressed)
-	      ||||\---- remote mode selected (0 = selected, 1 = not) \
-	      |||\----- key mode selected (0 = selected, 1 = not)     > if all 3 of these are 1, unit is going to standby
-	      ||\------ sim mode selected (0 = selected, 1 = not)    /
-	      |\------- power failure status (1 = power has failed, 0 = ok)
-	      \-------- chip insert detect state (1 = no chip or cmos chip which ammeter cannot detect; 0 = nmos or detectable chip inserted)
-	 after power failure (in key mode):
-	 0xEE 11101110 when no keypad key pressed
-	 0xEA 11101010 when keypad key pressed
-	 in key mode:
-	 0xAE 10101110 when no keypad key pressed
-	 0xAA 10101010 when keypad key pressed
-	 in remote mode:
-	 0xB6 10110110 when no keypad key pressed
-	 0xB2 10110010 when keypad key pressed
-	 in sim mode:
-	 0x9E 10011110 when no keypad key pressed
-	 0x9A 10011010 when keypad key pressed
-	 in off mode (before z80 is powered down):
-	 0xFE 11111110
-	 
-	*/
+     bits 76543210
+          |||||||\- overload state (0 = not overloaded; 1 = overload detected, led on and power disconnected to ic)
+          ||||||\-- unknown, always 1? may be acia related
+          |||||\--- any key pressed on keypad (0 = one or more pressed, 1 = none pressed)
+          ||||\---- remote mode selected (0 = selected, 1 = not) \
+          |||\----- key mode selected (0 = selected, 1 = not)     > if all 3 of these are 1, unit is going to standby
+          ||\------ sim mode selected (0 = selected, 1 = not)    /
+          |\------- power failure status (1 = power has failed, 0 = ok)
+          \-------- chip insert detect state (1 = no chip or cmos chip which ammeter cannot detect; 0 = nmos or detectable chip inserted)
+     after power failure (in key mode):
+     0xEE 11101110 when no keypad key pressed
+     0xEA 11101010 when keypad key pressed
+     in key mode:
+     0xAE 10101110 when no keypad key pressed
+     0xAA 10101010 when keypad key pressed
+     in remote mode:
+     0xB6 10110110 when no keypad key pressed
+     0xB2 10110010 when keypad key pressed
+     in sim mode:
+     0x9E 10011110 when no keypad key pressed
+     0x9A 10011010 when keypad key pressed
+     in off mode (before z80 is powered down):
+     0xFE 11111110
+
+    */
 	// HACK to dump display contents to stderr
 	fprintf(stderr,"%s\n",ROC10937_get_string(0));
 #ifdef PORT43_R_VERBOSE
@@ -158,10 +158,10 @@ READ8_MEMBER( digel804_state::port_43_r )
 WRITE8_MEMBER( digel804_state::port_43_w )
 {
 	/* writes to 0x43 control the ram banking on firmware which supports it
-	 * bits:76543210
-	 *      |||||\\\- select ram bank for 4000-bfff area based on these bits
-	 *      \\\\\---- unknown, always 0?
-	 */
+     * bits:76543210
+     *      |||||\\\- select ram bank for 4000-bfff area based on these bits
+     *      \\\\\---- unknown, always 0?
+     */
 #ifdef PORT43_W_VERBOSE
 	logerror("Digel804: port 0x43 ram bank had %02x written to it!\n", data);
 #endif
@@ -175,17 +175,17 @@ WRITE8_MEMBER( digel804_state::port_43_w )
 WRITE8_MEMBER( digel804_state::port_44_w )
 {
 	/* writes to 0x44 control the 10937 vfd chip and z80 power and related stuff
-	 * bits:76543210
-	 *      |||||||\- 10937 VFDC '/SCK' serial clock
-	 *      ||||||\-- unknown, is sometimes written 1 and sometimes 0, purpose unclear. is NOT /RES for ACIA and is NOT apparently POR on the VFDC
-	 *      |||||\--- z80 and system power control (0 = power on, 1 = power off/standby)
-	 *      ||||\---- controls, somehow, the z80 /BUSRQ line (0 = idle/high, 1 = asserted/low)
-	 *      |||\----- unknown, always 0?
-	 *      ||\------ unknown, always 0?
-	 *      |\------- unknown, is sometimes written 1 but usually 0, purpose unclear, but implied to have something to do with eprom socket power
-	 *      \-------- 10937 VFDC 'DATA' serial data
-	 
-	 */
+     * bits:76543210
+     *      |||||||\- 10937 VFDC '/SCK' serial clock
+     *      ||||||\-- unknown, is sometimes written 1 and sometimes 0, purpose unclear. is NOT /RES for ACIA and is NOT apparently POR on the VFDC
+     *      |||||\--- z80 and system power control (0 = power on, 1 = power off/standby)
+     *      ||||\---- controls, somehow, the z80 /BUSRQ line (0 = idle/high, 1 = asserted/low)
+     *      |||\----- unknown, always 0?
+     *      ||\------ unknown, always 0?
+     *      |\------- unknown, is sometimes written 1 but usually 0, purpose unclear, but implied to have something to do with eprom socket power
+     *      \-------- 10937 VFDC 'DATA' serial data
+
+     */
 #ifdef PORT44_W_VERBOSE
 	logerror("Digel804: port 0x44 vfd control had %02x written to it!\n", data);
 #endif
@@ -223,14 +223,14 @@ WRITE8_MEMBER( digel804_state::speaker_w )
 READ8_MEMBER( digel804_state::keypad_r )
 {
 	/* reads E* for a keypad number 0-F
-	 * reads F0 for enter
-	 * reads F4 for next
-	 * reads F8 for rept
-	 * reads FC for clear
-	 * F* takes precedence over E*
-	 * higher numbers take precedence over lower ones
-	 * this value auto-latches on a key press and remains through multiple reads
-	*/
+     * reads F0 for enter
+     * reads F4 for next
+     * reads F8 for rept
+     * reads FC for clear
+     * F* takes precedence over E*
+     * higher numbers take precedence over lower ones
+     * this value auto-latches on a key press and remains through multiple reads
+    */
 #ifdef PORT46_R_VERBOSE
 	logerror("Digel804: returning 0xF0 for port 46 keypad read\n");
 #endif
@@ -240,13 +240,13 @@ READ8_MEMBER( digel804_state::keypad_r )
 WRITE8_MEMBER( digel804_state::led_control_w )
 {
 	/* writes to 0x46 control the LEDS on the front panel
-	 * bits:76543210
-	 *      ||||\\\\- these four bits choose which of the 16 function leds is lit; the number is INVERTED first
-	 *      |||\----- if this bit is 1, the function leds are disabled
-	 *      ||\------ this bit controls the 'error' led; 1 = on
-	 *      |\------- this bit controls the 'busy' led; 1 = on
-	 *      \-------- this bit controls the 'input' led; 1 = on
-	 */
+     * bits:76543210
+     *      ||||\\\\- these four bits choose which of the 16 function leds is lit; the number is INVERTED first
+     *      |||\----- if this bit is 1, the function leds are disabled
+     *      ||\------ this bit controls the 'error' led; 1 = on
+     *      |\------- this bit controls the 'busy' led; 1 = on
+     *      \-------- this bit controls the 'input' led; 1 = on
+     */
 #ifdef PORT46_W_VERBOSE
 	 logerror("Digel804: port 0x46 LED control had %02x written to it!\n", data);
 #endif
@@ -356,7 +356,7 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, digel804_state)
 	AM_RANGE(0x86, 0x86) AM_MIRROR(0x38) AM_WRITE(acia_control_w) // (ACIA control reg)
 	AM_RANGE(0x87, 0x87) AM_MIRROR(0x38) AM_READ(acia_control_r) // (ACIA control reg)
 	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE_LEGACY("acia", acia_6551_r, acia_6551_w) // this doesn't work since we lack an AM_SHIFT command
-	
+
 ADDRESS_MAP_END
 
 
@@ -448,18 +448,18 @@ prom d7 -> N/C? (unused?)
 */
 
 ROM_START(digel804) // address mapper 804-1-4
-	ROM_REGION(0x80000, "user_ram", ROMREGION_ERASEFF) 
+	ROM_REGION(0x80000, "user_ram", ROMREGION_ERASEFF)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("1-04__76f1.27128.j6", 0x0000, 0x4000, CRC(61b50b61) SHA1(ad717fcbf3387b0a8fb0546025d3c527792eb3f0))
 	// the second rom here is loaded bizarrely: the first 3/4 appears at e000-f7ff and the last 1/4 appears at d800-dfff
-	ROM_LOAD("2-04__d6cc.2764a.k6", 0xe000, 0x1800, CRC(098cb008) SHA1(9f04e12489ab5f714d2fd4af8158969421557e75)) 
+	ROM_LOAD("2-04__d6cc.2764a.k6", 0xe000, 0x1800, CRC(098cb008) SHA1(9f04e12489ab5f714d2fd4af8158969421557e75))
 	ROM_CONTINUE(0xd800, 0x800)
 	ROM_REGION(0x20, "proms", 0)
 	ROM_LOAD("804-1-4.82s23a.j5", 0x0000, 0x0020, CRC(f961beb1) SHA1(f2ec89375e656eeabc30246d42741cf718fb0f91)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector
 ROM_END
 
 ROM_START(ep804) // address mapper 804-1-2
-	ROM_REGION(0x80000, "user_ram", ROMREGION_ERASEFF) 
+	ROM_REGION(0x80000, "user_ram", ROMREGION_ERASEFF)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("ep804_v1.6")
 	ROM_SYSTEM_BIOS( 0, "ep804_v1.6", "Wavetek/Digelec EP804 FWv1.6") // hardware 1.1

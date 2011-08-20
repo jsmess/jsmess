@@ -844,7 +844,7 @@ void compis_state::update_dma_control(int which, int new_control)
 		/* otherwise, set a timer */
 		else
 		{
-//			int count = d->count;
+//          int count = d->count;
 
 			/* adjust for redline racer */
         	// int dacnum = (d->dest & 0x3f) / 2;

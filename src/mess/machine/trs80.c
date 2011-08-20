@@ -5,9 +5,9 @@
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
 
-MAX_LUMPS	192		crude storage units - don't know much about it
-MAX_GRANULES	8		lumps consisted of granules.. aha
-MAX_SECTORS 	5		and granules of sectors
+MAX_LUMPS   192     crude storage units - don't know much about it
+MAX_GRANULES    8       lumps consisted of granules.. aha
+MAX_SECTORS     5       and granules of sectors
 
 ***************************************************************************/
 

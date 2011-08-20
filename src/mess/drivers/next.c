@@ -59,7 +59,7 @@ READ8_MEMBER( next_state::io_r )
 
 	if(offset == 0xc0)
 		return 0;
- 
+
 	return 0xff;
 }
 
@@ -102,8 +102,8 @@ READ32_MEMBER( next_state::scr2_r )
     ---- ---- ---- ---- ---- ---- --x- ---- mem en
     ---- ---- ---- ---- ---- ---- ---- ---x led
 
-	68040-25, 100ns, 32M: 00000c80
-	68040-25, 100ns, 20M: 00ff0c80
+    68040-25, 100ns, 32M: 00000c80
+    68040-25, 100ns, 20M: 00ff0c80
 
     */
 
@@ -136,8 +136,8 @@ READ32_MEMBER( next_state::scr1_r )
         ---- ---- ---- ---- ---- ---- ---x x--- mem speed
         ---- ---- ---- ---- ---- ---- ---- -xxx cpu speed
 
-		68040-25: 00011102
-		68040-25: 00013002 (non-turbo, color)
+        68040-25: 00011102
+        68040-25: 00013002 (non-turbo, color)
     */
 
 	return 0x00012002; // TODO
@@ -238,33 +238,33 @@ static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
 //  AM_RANGE(0x0200f000, 0x0200f003) AM_MIRROR(0x300000) printer
 //  AM_RANGE(0x02010000, 0x02010003) AM_MIRROR(0x300000) brightness
 	AM_RANGE(0x02012004, 0x02012007) AM_MIRROR(0x300000) AM_READ(modisk_r)
-//	AM_RANGE(0x02014000, 0x02014003) AM_MIRROR(0x300000) SCSI
+//  AM_RANGE(0x02014000, 0x02014003) AM_MIRROR(0x300000) SCSI
 	AM_RANGE(0x02014100, 0x02014107) AM_MIRROR(0x300000) AM_DEVICE8("fdc", n82077aa_device, amap, 0xffffffff)
-//	AM_RANGE(0x02016000, 0x02016003) AM_MIRROR(0x300000) timer
-//	AM_RANGE(0x02016004, 0x02016007) AM_MIRROR(0x300000) timer CSR
+//  AM_RANGE(0x02016000, 0x02016003) AM_MIRROR(0x300000) timer
+//  AM_RANGE(0x02016004, 0x02016007) AM_MIRROR(0x300000) timer CSR
 	AM_RANGE(0x02018000, 0x02018003) AM_MIRROR(0x300000) AM_DEVREADWRITE8("scc", am8530h_device, ca_r, ca_w, 0xff000000)
 	AM_RANGE(0x02018000, 0x02018003) AM_MIRROR(0x300000) AM_DEVREADWRITE8("scc", am8530h_device, cb_r, cb_w, 0x00ff0000)
 	AM_RANGE(0x02018000, 0x02018003) AM_MIRROR(0x300000) AM_DEVREADWRITE8("scc", am8530h_device, da_r, da_w, 0x0000ff00)
 	AM_RANGE(0x02018000, 0x02018003) AM_MIRROR(0x300000) AM_DEVREADWRITE8("scc", am8530h_device, db_r, db_w, 0x000000ff)
-//	AM_RANGE(0x02018004, 0x02018007) AM_MIRROR(0x300000) SCC CLK
-//	AM_RANGE(0x02018100, 0x02018103) AM_MIRROR(0x300000) Color RAMDAC
-//	AM_RANGE(0x02018104, 0x02018107) AM_MIRROR(0x300000) Color CSR
-//	AM_RANGE(0x02018190, 0x02018197) AM_MIRROR(0x300000) warp 9c DRAM timing
-//	AM_RANGE(0x02018198, 0x0201819f) AM_MIRROR(0x300000) warp 9c VRAM timing
+//  AM_RANGE(0x02018004, 0x02018007) AM_MIRROR(0x300000) SCC CLK
+//  AM_RANGE(0x02018100, 0x02018103) AM_MIRROR(0x300000) Color RAMDAC
+//  AM_RANGE(0x02018104, 0x02018107) AM_MIRROR(0x300000) Color CSR
+//  AM_RANGE(0x02018190, 0x02018197) AM_MIRROR(0x300000) warp 9c DRAM timing
+//  AM_RANGE(0x02018198, 0x0201819f) AM_MIRROR(0x300000) warp 9c VRAM timing
 	AM_RANGE(0x0201a000, 0x0201a003) AM_MIRROR(0x300000) AM_READ(event_counter_r) // EVENTC
 //  AM_RANGE(0x020c0000, 0x020c0004) AM_MIRROR(0x300000) BMAP
-//	AM_RANGE(0x02000000, 0x0201ffff) AM_MIRROR(0x300000) AM_READWRITE8(io_r,io_w,0xffffffff) //intentional fall-through
+//  AM_RANGE(0x02000000, 0x0201ffff) AM_MIRROR(0x300000) AM_READWRITE8(io_r,io_w,0xffffffff) //intentional fall-through
 	AM_RANGE(0x04000000, 0x07ffffff) AM_RAM //work ram
 	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_BASE(vram) //vram
-//	AM_RANGE(0x0c000000, 0x0c03ffff) video RAM w A+B-AB function
-//	AM_RANGE(0x0d000000, 0x0d03ffff) video RAM w (1-A)B function
-//	AM_RANGE(0x0e000000, 0x0e03ffff) video RAM w ceil(A+B) function
-//	AM_RANGE(0x0f000000, 0x0f03ffff) video RAM w AB function
-//	AM_RANGE(0x10000000, 0x1003ffff) main RAM w A+B-AB function
-//	AM_RANGE(0x14000000, 0x1403ffff) main RAM w (1-A)B function
-//	AM_RANGE(0x18000000, 0x1803ffff) main RAM w ceil(A+B) function
-//	AM_RANGE(0x1c000000, 0x1c03ffff) main RAM w AB function
-//	AM_RANGE(0x2c000000, 0x2c1fffff) Color VRAM
+//  AM_RANGE(0x0c000000, 0x0c03ffff) video RAM w A+B-AB function
+//  AM_RANGE(0x0d000000, 0x0d03ffff) video RAM w (1-A)B function
+//  AM_RANGE(0x0e000000, 0x0e03ffff) video RAM w ceil(A+B) function
+//  AM_RANGE(0x0f000000, 0x0f03ffff) video RAM w AB function
+//  AM_RANGE(0x10000000, 0x1003ffff) main RAM w A+B-AB function
+//  AM_RANGE(0x14000000, 0x1403ffff) main RAM w (1-A)B function
+//  AM_RANGE(0x18000000, 0x1803ffff) main RAM w ceil(A+B) function
+//  AM_RANGE(0x1c000000, 0x1c03ffff) main RAM w AB function
+//  AM_RANGE(0x2c000000, 0x2c1fffff) Color VRAM
 ADDRESS_MAP_END
 
 /* Input ports */

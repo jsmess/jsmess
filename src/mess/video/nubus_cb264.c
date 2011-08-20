@@ -1,21 +1,21 @@
 /***************************************************************************
 
   RasterOps ColorBoard 264 NuBus video card emulation
- 
+
   fixed resolution 640x480 NuBus video card, 1/4/8/16/24 bit color
   1.5? MB of VRAM (tests up to 0x1fffff), Bt473 RAMDAC, and two custom gate arrays.
 
   0xfsff6004 is color depth: 0 for 1bpp, 1 for 2bpp, 2 for 4bpp, 3 for 8bpp, 4 for 24bpp
   0xfsff6014 is VBL ack: write 1 to ack
   0xfsff603c is VBL disable: write 1 to disable, 0 to enable
- 
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "video/nubus_cb264.h"
 
 #define CB264_SCREEN_NAME	"cb264_screen"
-#define CB264_ROM_REGION   	"cb264_rom"
+#define CB264_ROM_REGION	"cb264_rom"
 
 #define VRAM_SIZE	(0x200000)	// 2 megs, maxed out
 
@@ -100,7 +100,7 @@ void nubus_cb264_device::device_start()
 
 	slotspace = get_slotspace();
 
-//	printf("[cb264 %p] slotspace = %x\n", this, slotspace);
+//  printf("[cb264 %p] slotspace = %x\n", this, slotspace);
 
 	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, 0, 0, "bank_cb264", m_vram);

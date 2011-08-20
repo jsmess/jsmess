@@ -1,11 +1,11 @@
 /***************************************************************************
- 
+
   Apple Hi-Resolution Video Card emulation
- 
+
   RAMDAC: control at Fs0940e0, data at Fs0940e4
   Fs090010 bit 16 is vbl status, bit 17 must be "1" for proper operation
   Fs08000x are the control registers
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -29,8 +29,8 @@ MACHINE_CONFIG_END
 
 ROM_START( m2hires )
 	ROM_REGION(0x2000, M2HIRES_ROM_REGION, 0)
-	ROM_LOAD( "341-0660.bin", 0x0000, 0x2000, CRC(ea6f7913) SHA1(37c59f38ae34021d0cb86c2e76a598b7e6077c0d) ) 
-ROM_END 									
+	ROM_LOAD( "341-0660.bin", 0x0000, 0x2000, CRC(ea6f7913) SHA1(37c59f38ae34021d0cb86c2e76a598b7e6077c0d) )
+ROM_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -96,7 +96,7 @@ void nubus_m2hires_device::device_start()
 
 	slotspace = get_slotspace();
 
-//	printf("[m2hires %p] slotspace = %x\n", this, slotspace);
+//  printf("[m2hires %p] slotspace = %x\n", this, slotspace);
 
 	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
 	m_vram32 = (UINT32 *)m_vram;
@@ -261,7 +261,7 @@ WRITE32_MEMBER( nubus_m2hires_device::m2hires_w )
 			break;
 
 		case 0x5038:	// DAC control
-//			printf("%08x to DAC control (PC=%x)\n", data, cpu_get_pc(&space.device()));
+//          printf("%08x to DAC control (PC=%x)\n", data, cpu_get_pc(&space.device()));
 			m_clutoffs = (data>>24)&0xff;
 			break;
 
@@ -270,7 +270,7 @@ WRITE32_MEMBER( nubus_m2hires_device::m2hires_w )
 
 			if (m_count == 3)
 			{
-//				printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], cpu_get_pc(&space.device()) );
+//              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], cpu_get_pc(&space.device()) );
 				m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)
@@ -291,7 +291,7 @@ WRITE32_MEMBER( nubus_m2hires_device::m2hires_w )
 			break;
 
 		default:
-//			printf("m2hires_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
+//          printf("m2hires_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
 			break;
 	}
 }
@@ -303,10 +303,10 @@ READ32_MEMBER( nubus_m2hires_device::m2hires_r )
 		m_toggle ^= (1<<16);
 		return m_toggle | (1<<17);	// bit 17 indicates a 4/8bpp capable ASIC apparently; the firmware won't enter those modes otherwise (although they show in the list)
 	}
-/*	else
-	{
-		printf("m2hires_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, cpu_get_pc(&space.device()));
-	}*/
+/*  else
+    {
+        printf("m2hires_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, cpu_get_pc(&space.device()));
+    }*/
 
 	return 0;
 }

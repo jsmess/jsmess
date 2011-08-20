@@ -220,7 +220,7 @@ public:
 	DECLARE_READ8_MEMBER( iga_r );
 	DECLARE_WRITE8_MEMBER( iga_w );
 	DECLARE_READ8_MEMBER( printer_r );
-	
+
 	// video state
 	int m_opt;
 	UINT8 m_egc_ctrl;

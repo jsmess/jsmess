@@ -1712,7 +1712,7 @@ ROM_START( iskr3104 )
 	// need proper rom dump for this machine
 	ROM_LOAD( "iskra-1031_font.bin", 0x0000, 0x2000, CRC(f4d62e80) SHA1(ad7e81a0c9abc224671422bbcf6f6262da92b510))
 ROM_END
-  
+
 ROM_START( poisk1 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD( "b_hd_v11.rf2", 0xc8000, 0x0800, CRC(a19c39b2) SHA1(57faa56b320abf801fedbed578cf97d253e5b777)) // HDD controller ver 1.1

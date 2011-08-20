@@ -738,7 +738,7 @@ c1541_device::c1541_device(const machine_config &mconfig, const char *tag, devic
 	  m_via0_irq(0),
 	  m_via1_irq(0)
 {
-	m_variant = TYPE_1541; 
+	m_variant = TYPE_1541;
 }
 
 c1541_device::c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)

@@ -21,10 +21,10 @@ MACHINE_CONFIG_FRAGMENT( macvideo_48gc )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_UPDATE( mac_48gc )
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-//	MCFG_SCREEN_SIZE(1152, 870)
-//	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
-//	MCFG_SCREEN_REFRESH_RATE(75)
-//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
+//  MCFG_SCREEN_SIZE(1152, 870)
+//  MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
+//  MCFG_SCREEN_REFRESH_RATE(75)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
 MACHINE_CONFIG_END
 
 ROM_START( gc48 )
@@ -34,7 +34,7 @@ ROM_END
 
 ROM_START( gc824 )
 	ROM_REGION(0x8000, GC48_ROM_REGION, 0)
-    ROM_LOAD( "3410868.bin",  0x000000, 0x008000, CRC(57f925fa) SHA1(4d3c0632711b7b31c8e0c5cfdd7ec1904f178336) ) 
+    ROM_LOAD( "3410868.bin",  0x000000, 0x008000, CRC(57f925fa) SHA1(4d3c0632711b7b31c8e0c5cfdd7ec1904f178336) )
 ROM_END
 
 //**************************************************************************
@@ -112,7 +112,7 @@ void jmfb_device::device_start()
 
 	slotspace = get_slotspace();
 
-//	printf("[JMFB %p] slotspace = %x\n", this, slotspace);
+//  printf("[JMFB %p] slotspace = %x\n", this, slotspace);
 
 	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, 0, 0, "bank_48gc", m_vram);
@@ -247,12 +247,12 @@ WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 	switch (offset)
 	{
 		case 0x8/4:	// base
-//			printf("%x to base\n", data);
+//          printf("%x to base\n", data);
 			m_base = (data*2)<<4;
 			break;
 
 		case 0xc/4:	// stride
-//			printf("%x to stride\n", data);
+//          printf("%x to stride\n", data);
 			// this value is in DWORDs for 1-8 bpp and, uhh, strange for 24bpp
 			if (m_mode < 4)
 			{
@@ -265,7 +265,7 @@ WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 			break;
 
 		case 0x200/4:	// DAC control
-//			printf("%08x to DAC control\n", data);
+//          printf("%08x to DAC control\n", data);
 			if (m_is824)
 			{
 				m_clutoffs = data&0xff;
@@ -289,7 +289,7 @@ WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 
 			if (m_count == 3)
 			{
-//				printf("RAMDAC: color %d = %02x %02x %02x\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2]);
+//              printf("RAMDAC: color %d = %02x %02x %02x\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2]);
 				m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				m_count = 0;
@@ -316,7 +316,7 @@ WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 					}
 				}
 			}
-//			printf("%02x to mode (m_mode = %d)\n", data, m_mode);
+//          printf("%02x to mode (m_mode = %d)\n", data, m_mode);
 			break;
 
 		case 0x13c/4:	// bit 1 = VBL disable (1=no interrupts)
@@ -337,13 +337,13 @@ WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 
 READ32_MEMBER( jmfb_device::mac_48gc_r )
 {
-//	printf("48gc_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, cpu_get_pc(machine().device("maincpu")));
+//  printf("48gc_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, cpu_get_pc(machine().device("maincpu")));
 
 	switch (offset)
 	{
 		case 0:
 			return 0x0c00;	// sense 13" RGB for now
-//			return 0x0000;	// sense "RGB Kong" monitor
+//          return 0x0000;  // sense "RGB Kong" monitor
 			break;
 
 		case 0x1c0/4:

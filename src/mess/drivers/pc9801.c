@@ -1466,7 +1466,7 @@ static READ8_HANDLER( pc980ux_memory_r )
 	//printf("%08x %d\n",offset,state->m_gate_a20);
 
 	//if(state->m_gate_a20 == 0)
-	//	offset &= 0xfffff;
+	//  offset &= 0xfffff;
 
 	if	   (                        offset <= 0x0009ffff)                   { return pc9801rs_wram_r(space,offset);               }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { return pc9801_tvram_r(space,offset-0xa0000);        }
@@ -1485,7 +1485,7 @@ static WRITE8_HANDLER( pc9801ux_memory_w )
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
 	//if(state->m_gate_a20 == 0)
-	//	offset &= 0xfffff;
+	//  offset &= 0xfffff;
 
 	if	   (                        offset <= 0x0009ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { pc9801_tvram_w(space,offset-0xa0000,data);           }
@@ -2923,7 +2923,7 @@ ROM_END
 ROM_START( pc9821v20 )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf_v20.rom",  0x18000, 0x08000, CRC(10e52302) SHA1(f95b8648e3f5a23e507a9fbda8ab2e317d8e5151) )
-   	ROM_LOAD( "bios_v20.rom",     0x000000, 0x018000, BAD_DUMP CRC(d5d1f13b) SHA1(bf44b5f4e138e036f1b848d6616fbd41b5549764) )
+	ROM_LOAD( "bios_v20.rom",     0x000000, 0x018000, BAD_DUMP CRC(d5d1f13b) SHA1(bf44b5f4e138e036f1b848d6616fbd41b5549764) )
 
 	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
 

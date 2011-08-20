@@ -29,7 +29,7 @@
 #define MULTIFACE_VISIBLE				0x0004
 
 
-class cpc_multiface2_device : 	public device_t,
+class cpc_multiface2_device :	public device_t,
 								public device_cpc_expansion_card_interface,
 								public device_slot_card_interface
 {

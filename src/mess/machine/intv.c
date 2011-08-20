@@ -434,11 +434,11 @@ static int intv_load_rom_file(device_image_interface &image)
 				logerror("RAM banks not yet implemented! \n");
 			}
 			/* For now intellivoice always active
-			if (extra & INTELLIVOICE_MASK)
-			{
-				// tbd
-			}
-			*/
+            if (extra & INTELLIVOICE_MASK)
+            {
+                // tbd
+            }
+            */
 
 			if (extra & ECS_MASK)
 			{
@@ -515,7 +515,7 @@ static TIMER_CALLBACK(intv_btb_fill)
 	{
 		state->m_backtab_buffer[row][column] = state->m_ram16[column + row * STIC_BACKTAB_WIDTH];
 	}
-	
+
 	state->m_backtab_row += 1;
 }
 
@@ -533,12 +533,12 @@ INTERRUPT_GEN( intv_interrupt )
 	{
 		device->machine().scheduler().timer_set(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(3905+114*state->m_row_delay + 798*row), FUNC(intv_btb_fill));
 	}
-	
-	if (state->m_row_delay == 0) 
+
+	if (state->m_row_delay == 0)
 	{
 		device_adjust_icount(device->machine().device("maincpu"), -110); // extra row fetch occurs if vertical delay == 0
 	}
-	
+
 	intv_stic_screenrefresh(device->machine());
 }
 

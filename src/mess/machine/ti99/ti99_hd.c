@@ -417,8 +417,8 @@ void ti99_mfm_harddisk_write_track(device_t *harddisk, int head, UINT8 *track_im
 
 UINT8 ti99_mfm_harddisk_status(device_t *harddisk)
 {
-	UINT8 status = 0;	
-	mfmhd_state *hd = get_safe_token(harddisk);	
+	UINT8 status = 0;
+	mfmhd_state *hd = get_safe_token(harddisk);
 	harddisk_image_device *drive = downcast<harddisk_image_device *>(harddisk->subdevice("drive"));
 	hard_disk_file *file = drive->get_hard_disk_file();
 

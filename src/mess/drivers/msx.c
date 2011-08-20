@@ -92,7 +92,7 @@ Philips VG-8010 - MSX1 - vg8010
 Philips VG-8010F - MSX1 - vg8010f
 Philips VG-8020-00 - MSX1 - vg802000
 Philips VG-8020-20 - MSX1 - vg802020
-Philips VG-8020-40 - MSX1 - 
+Philips VG-8020-40 - MSX1 -
 Philips VG-8020F - MSX1 - vg8020f
 Philips VG-8230 - MSX2 - vg8230
 Philips VG-8230J - MSX2 - vg8230j
