@@ -4325,6 +4325,9 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, c
 
 
 	{
+		if(stv2_current_tilemap.colour_depth == 2 && !stv2_current_tilemap.bitmap_enable)
+			popmessage("2048 color mode used on a non-bitmap plane");
+
 		/* Pukunpa */
 		//if(STV_VDP2_SPWINEN)
 		//	popmessage("Sprite Window enabled");
