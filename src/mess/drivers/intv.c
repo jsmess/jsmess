@@ -474,7 +474,7 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_SOUND_CONFIG(intellivoice_sp0256)
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
+
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("int,rom,bin,itv")
@@ -515,7 +515,7 @@ ROM_START(intv)
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD( "exec.bin", (0x1000<<1)+0, 0x2000, CRC(cbce86f7) SHA1(5a65b922b562cb1f57dab51b73151283f0e20c7a))
 	ROM_LOAD16_BYTE( "grom.bin", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
-	
+
 	ROM_REGION( 0x10000<<1, "sp0256_speech", 0 )
 	/* SP0256-012 Speech chip w/2KiB mask rom */
 	ROM_LOAD( "sp0256-012.bin",   0x1000, 0x0800, CRC(8bd786ec) SHA1(f98b3024cb87b21dc3ba48ecbc0e8713e9f70219) )
@@ -525,7 +525,7 @@ ROM_START(intvsrs)
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD( "searsexc.bin", (0x1000<<1)+0, 0x2000, CRC(ea552a22) SHA1(834339de056d42a35571cae7fd5b04d1344001e9))
 	ROM_LOAD16_BYTE( "grom.bin", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
-	
+
 	ROM_REGION( 0x10000<<1, "sp0256_speech", 0 )
 	/* SP0256-012 Speech chip w/2KiB mask rom */
 	ROM_LOAD( "sp0256-012.bin",   0x1000, 0x0800, CRC(8bd786ec) SHA1(f98b3024cb87b21dc3ba48ecbc0e8713e9f70219) )

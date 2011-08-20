@@ -351,7 +351,7 @@ static void cybiko_rs232_reset( void)
 
 static void cybiko_rs232_write_byte( UINT8 data)
 {
-//	printf( "%c", data);
+//  printf( "%c", data);
 }
 
 static void cybiko_rs232_pin_sck(cybiko_state *state, int data)

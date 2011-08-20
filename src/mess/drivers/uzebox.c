@@ -9,7 +9,7 @@
 // overclocked to 8 * NTSC burst frequency
 
 #define MASTER_CLOCK 28618180
-					 
+
 class uzebox_state : public driver_device
 {
 public:
@@ -85,15 +85,15 @@ static MACHINE_CONFIG_START( uzebox, uzebox_state )
 	MCFG_SPEAKER_STANDARD_MONO("avr8")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(0, "avr8", 1.00)
-	
+
 	MCFG_CARTSLOT_ADD("cart1")
-	MCFG_CARTSLOT_MANDATORY	
+	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("uzebox")
-	MCFG_SOFTWARE_LIST_ADD("eprom_list","uzebox")	
+	MCFG_SOFTWARE_LIST_ADD("eprom_list","uzebox")
 MACHINE_CONFIG_END
 
 ROM_START( uzebox )
-	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main program store */	
+	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main program store */
 	ROM_CART_LOAD("cart1", 0x0000, 0x10000, ROM_OPTIONAL)
 ROM_END
 

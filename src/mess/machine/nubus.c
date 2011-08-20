@@ -195,7 +195,7 @@ void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhan
 
 void nubus_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
-//	printf("install_bank: %s @ %x->%x mask %x mirror %x\n", tag, start, end, mask, mirror);
+//  printf("install_bank: %s @ %x->%x mask %x mirror %x\n", tag, start, end, mask, mirror);
 	m_maincpu = machine().device(m_cputag);
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	space->install_readwrite_bank(start, end, mask, mirror, tag );
@@ -301,9 +301,9 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 
 	astring tempstring;
 	UINT8 *rom = device().machine().region(dev->subtag(tempstring, romregion))->base();
-	UINT32 romlen = device().machine().region(dev->subtag(tempstring, romregion))->bytes(); 
+	UINT32 romlen = device().machine().region(dev->subtag(tempstring, romregion))->bytes();
 
-//	printf("ROM length is %x, last bytes are %02x %02x\n", romlen, rom[romlen-2], rom[romlen-1]);
+//  printf("ROM length is %x, last bytes are %02x %02x\n", romlen, rom[romlen-2], rom[romlen-1]);
 
 	UINT8 byteLanes = rom[romlen-1];
 	// check if all bits are inverted
@@ -409,7 +409,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 	strcpy(bankname, "rom_");
 	strcat(bankname, m_nubus_slottag);
 	addr -= romlen;
-//	printf("Installing ROM at %x, length %x\n", addr, romlen);
+//  printf("Installing ROM at %x, length %x\n", addr, romlen);
 	if (mirror_all_mb)	// mirror the declaration ROM across all 16 megs of the slot space
 	{
 		m_nubus->install_bank(addr, addr+romlen-1, 0, 0x00f00000, bankname, newrom);

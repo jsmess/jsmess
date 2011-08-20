@@ -1103,7 +1103,7 @@ const mc6845_interface amstrad_plus_mc6845_intf =
 
 WRITE_LINE_DEVICE_HANDLER(cpc_romdis)
 {
-   	amstrad_state *tstate = device->machine().driver_data<amstrad_state>();
+	amstrad_state *tstate = device->machine().driver_data<amstrad_state>();
 
 	tstate->m_gate_array.romdis = state;
 	amstrad_rethinkMemory(device->machine());
@@ -1111,12 +1111,12 @@ WRITE_LINE_DEVICE_HANDLER(cpc_romdis)
 
 WRITE_LINE_DEVICE_HANDLER(cpc_romen)
 {
-   	amstrad_state *tstate = device->machine().driver_data<amstrad_state>();
+	amstrad_state *tstate = device->machine().driver_data<amstrad_state>();
 
-   	if(state != 0)
-   		tstate->m_gate_array.mrer &= ~0x04;
-   	else
-   		tstate->m_gate_array.mrer |= 0x04;
+	if(state != 0)
+		tstate->m_gate_array.mrer &= ~0x04;
+	else
+		tstate->m_gate_array.mrer |= 0x04;
 	amstrad_rethinkMemory(device->machine());
 }
 

@@ -1,13 +1,13 @@
 /***************************************************************************
 
   SuperMac Spectrum PDQ video card
- 
+
   Accelerated only in 256 color mode.  Accleration is not yet emulated
   properly (pattern fill works but has glitches).  Use in B&W or 16 colors
   for full functionality right now.
- 
+
   blitter info:
- 
+
   ctrl 1 = ?
   ctrl 2 = low 3 bits of Y position in bits 3-5, low 3 bits of X position in bits 0-2
   ctrl 3 = width
@@ -15,12 +15,12 @@
   ctrl 5 = ?
   ctrl 6 = VRAM offset * 4
   ctrl 7 = command/execute (00000002 for pattern fill, 00000100 for copy)
- 
+
   Busy flag at Fs800000 (bit 8)
- 
+
   There is 256 bytes of pattern RAM arranged as 32 pixels horizontally by 8
   vertically.
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -44,7 +44,7 @@ MACHINE_CONFIG_END
 
 ROM_START( specpdq )
 	ROM_REGION(0x10000, SPECPDQ_ROM_REGION, 0)
-	ROM_LOAD( "specpdq.bin",  0x000000, 0x010000, CRC(82a35f78) SHA1(9511c2df47140f4279196d3b8836b53429879dd9) ) 
+	ROM_LOAD( "specpdq.bin",  0x000000, 0x010000, CRC(82a35f78) SHA1(9511c2df47140f4279196d3b8836b53429879dd9) )
 ROM_END
 
 //**************************************************************************
@@ -111,7 +111,7 @@ void nubus_specpdq_device::device_start()
 
 	slotspace = get_slotspace();
 
-//	printf("[specpdq %p] slotspace = %x\n", this, slotspace);
+//  printf("[specpdq %p] slotspace = %x\n", this, slotspace);
 
 	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
 	m_vram32 = (UINT32 *)m_vram;
@@ -255,7 +255,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 	switch (offset)
 	{
 		case 0xc0054:	// mode 1
-//			printf("%x to mode1\n", data);
+//          printf("%x to mode1\n", data);
 			break;
 
 		case 0xc005c:	// interrupt control
@@ -274,7 +274,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			break;
 
 		case 0xc007a:
-//			printf("%x to mode2\n", data);
+//          printf("%x to mode2\n", data);
 
 			switch (data)
 			{
@@ -291,11 +291,11 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 					break;
 			}
 
-//			printf("m_mode = %d\n", m_mode);
+//          printf("m_mode = %d\n", m_mode);
 			break;
 
 		case 0x120000:	// DAC address
-//			printf("%08x to DAC control (PC=%x)\n", data, cpu_get_pc(&space.device()));
+//          printf("%08x to DAC control (PC=%x)\n", data, cpu_get_pc(&space.device()));
 			m_clutoffs = ((data>>8)&0xff)^0xff;
 			break;
 
@@ -304,7 +304,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 
 			if (m_count == 3)
 			{
-//				printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], cpu_get_pc(&space.device()) );
+//              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], cpu_get_pc(&space.device()) );
 				palette_set_color(space.machine(), m_clutoffs, MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]));
 				m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
@@ -381,7 +381,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 		case 0x18103d:
 		case 0x18103e:
 		case 0x18103f:
-//			printf("Pattern %08x @ %x\n", data ^ 0xffffffff, offset);
+//          printf("Pattern %08x @ %x\n", data ^ 0xffffffff, offset);
 			m_fillbytes[((offset&0x3f)*4)] = ((data>>24) & 0xff) ^ 0xff;
 			m_fillbytes[((offset&0x3f)*4)+1] = ((data>>16) & 0xff) ^ 0xff;
 			m_fillbytes[((offset&0x3f)*4)+2] = ((data>>8) & 0xff) ^ 0xff;
@@ -390,40 +390,40 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 
 		// blitter control
 		case 0x182006:
-//			printf("%08x (%d) to blitter ctrl 1 (PC=%x)\n", data^0xffffffff, data^0xffffffff, cpu_get_pc(&space.device()));
+//          printf("%08x (%d) to blitter ctrl 1 (PC=%x)\n", data^0xffffffff, data^0xffffffff, cpu_get_pc(&space.device()));
 			break;
 
 		case 0x182008:
-//			printf("%08x (%d) to blitter ctrl 2 (PC=%x)\n", data^0xffffffff, data^0xffffffff, cpu_get_pc(&space.device()));
+//          printf("%08x (%d) to blitter ctrl 2 (PC=%x)\n", data^0xffffffff, data^0xffffffff, cpu_get_pc(&space.device()));
 			m_patofsx = (data ^ 0xffffffff) & 7;
-			m_patofsy = ((data ^ 0xffffffff)>>3) & 7; 
+			m_patofsy = ((data ^ 0xffffffff)>>3) & 7;
 			break;
 
 		case 0x18200e:
-//			printf("%08x (%d) to blitter ctrl 3 (PC=%x)\n", data^0xffffffff, data^0xffffffff, cpu_get_pc(&space.device()));
+//          printf("%08x (%d) to blitter ctrl 3 (PC=%x)\n", data^0xffffffff, data^0xffffffff, cpu_get_pc(&space.device()));
 			m_width = data ^ 0xffffffff;
 			break;
 
 		case 0x18200b:
-//			printf("%08x (%d) to blitter ctrl 4 (PC=%x)\n", data^0xffffffff, data^0xffffffff, cpu_get_pc(&space.device()));
+//          printf("%08x (%d) to blitter ctrl 4 (PC=%x)\n", data^0xffffffff, data^0xffffffff, cpu_get_pc(&space.device()));
 			m_height = (data ^ 0xffffffff) & 0xffff;
 			break;
 
 		case 0x18200a:
 			data ^= 0xffffffff;
-//			printf("%08x to blitter ctrl 5 (PC=%x)\n", data, cpu_get_pc(&space.device()));
+//          printf("%08x to blitter ctrl 5 (PC=%x)\n", data, cpu_get_pc(&space.device()));
 			m_vram_src = data>>2;
 			break;
 
 		case 0x182009:
 			data ^= 0xffffffff;
-//			printf("%08x to blitter ctrl 6 (PC=%x)\n", data, cpu_get_pc(&space.device()));
+//          printf("%08x to blitter ctrl 6 (PC=%x)\n", data, cpu_get_pc(&space.device()));
 			m_vram_addr = data>>2;
 			break;
 
 		case 0x182007:
 			data ^= 0xffffffff;
-//			printf("%08x to blitter ctrl 7 (PC=%x)\n", data, cpu_get_pc(&space.device()));
+//          printf("%08x to blitter ctrl 7 (PC=%x)\n", data, cpu_get_pc(&space.device()));
 
 			// fill rectangle
 			if (data == 2)
@@ -431,7 +431,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 				int x, y;
 				UINT8 *vram = m_vram + m_vram_addr + m_patofsx;	// m_vram_addr is missing the low 2 bits, we add them back here
 
-//				printf("Fill rectangle with %02x %02x %02x %02x, width %d height %d\n", m_fillbytes[0], m_fillbytes[1], m_fillbytes[2], m_fillbytes[3], m_width, m_height);
+//              printf("Fill rectangle with %02x %02x %02x %02x, width %d height %d\n", m_fillbytes[0], m_fillbytes[1], m_fillbytes[2], m_fillbytes[3], m_width, m_height);
 
 				for (y = 0; y < m_height; y++)
 				{
@@ -447,7 +447,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 				UINT8 *vram = m_vram + m_vram_addr;
 				UINT8 *vramsrc = m_vram + m_vram_src;
 
-//				printf("Copy rectangle, width %d height %d  src %x dst %x\n", m_width, m_height, m_vram_addr, m_vram_src);
+//              printf("Copy rectangle, width %d height %d  src %x dst %x\n", m_width, m_height, m_vram_addr, m_vram_src);
 
 				for (y = 0; y < m_height; y++)
 				{
@@ -464,14 +464,14 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			break;
 
 		default:
-//			printf("specpdq_w: %08x @ %x (mask %08x  PC=%x)\n", data^0xffffffff, offset, mem_mask, cpu_get_pc(&space.device()));
+//          printf("specpdq_w: %08x @ %x (mask %08x  PC=%x)\n", data^0xffffffff, offset, mem_mask, cpu_get_pc(&space.device()));
 			break;
 	}
 }
 
 READ32_MEMBER( nubus_specpdq_device::specpdq_r )
 {
-//	if (offset != 0xc005c && offset != 0xc005e) printf("specpdq_r: @ %x (mask %08x  PC=%x)\n", offset, mem_mask, cpu_get_pc(&space.device()));
+//  if (offset != 0xc005c && offset != 0xc005e) printf("specpdq_r: @ %x (mask %08x  PC=%x)\n", offset, mem_mask, cpu_get_pc(&space.device()));
 
 	if (offset >= 0xc0000 && offset < 0x100000)
 	{

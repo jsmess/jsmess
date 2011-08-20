@@ -459,7 +459,7 @@ READ16_MEMBER( st_state::shifter_palette_r )
 WRITE16_MEMBER( st_state::shifter_palette_w )
 {
 	m_shifter_palette[offset] = data;
-	//	logerror("SHIFTER Palette[%x] = %x\n", offset, data);
+	//  logerror("SHIFTER Palette[%x] = %x\n", offset, data);
 
 	palette_set_color_rgb(machine(), offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
 }

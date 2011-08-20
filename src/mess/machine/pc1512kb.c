@@ -133,7 +133,7 @@ INPUT_PORTS_START( pc1512_keyboard )
 
 	PORT_START("Y3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('£')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('?')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
@@ -273,7 +273,7 @@ void pc1512_keyboard_device::device_start()
 {
 	// allocate timers
 	m_reset_timer = timer_alloc();
-	
+
 	// resolve callbacks
     m_out_data_func.resolve(m_out_data_cb, *this);
     m_out_clock_func.resolve(m_out_clock_cb, *this);
@@ -331,14 +331,14 @@ WRITE_LINE_MEMBER( pc1512_keyboard_device::clock_w )
 	{
 		if (!state)
 		{
-			m_reset_timer->adjust(attotime::from_msec(10));	
+			m_reset_timer->adjust(attotime::from_msec(10));
 		}
 		else
 		{
 			device_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
 		}
 	}
-	
+
 	m_clock_in = state;
 }
 

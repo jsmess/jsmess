@@ -1,12 +1,12 @@
 /***************************************************************************
 
   Asante MC3B NuBus Ethernet card
- 
+
   Based on National Semiconductor DP83902 "ST-NIC"
- 
+
   Fs*D0000 - 64k RAM buffer (used as DP83902 DMA target)
   Fs*E0000 - DP83902 registers
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -90,7 +90,7 @@ void nubus_asntm3b_device::device_start()
 
 	slotspace = get_slotspace();
 
-//	printf("[ASNTMC3B %p] slotspace = %x\n", this, slotspace);
+//  printf("[ASNTMC3B %p] slotspace = %x\n", this, slotspace);
 
 	m_nubus->install_device(slotspace+0xd0000, slotspace+0xdffff, read8_delegate(FUNC(nubus_asntm3b_device::asntm3b_ram_r), this), write8_delegate(FUNC(nubus_asntm3b_device::asntm3b_ram_w), this));
 	m_nubus->install_device(slotspace+0xbd0000, slotspace+0xbdffff, read8_delegate(FUNC(nubus_asntm3b_device::asntm3b_ram_r), this), write8_delegate(FUNC(nubus_asntm3b_device::asntm3b_ram_w), this));
@@ -108,7 +108,7 @@ void nubus_asntm3b_device::device_reset()
 
 WRITE8_MEMBER( nubus_asntm3b_device::asntm3b_ram_w )
 {
-	m_ram[offset] = data; 
+	m_ram[offset] = data;
 }
 
 READ8_MEMBER( nubus_asntm3b_device::asntm3b_ram_r )

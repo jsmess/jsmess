@@ -1,13 +1,13 @@
 /***************************************************************************
 
   SuperMac Spectrum/8 Series III video card
- 
+
   There is no sign of acceleration or blitting in any mode, and the acceleration
   code from the Spectrum PDQ ROM is absent on this one.
- 
+
   On first boot / with clean PRAM, press SPACE repeatedly when it shows the frame
   that fills the entire screen.  If you get it wrong, delete PRAM and try again.
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -31,7 +31,7 @@ MACHINE_CONFIG_END
 
 ROM_START( spec8s3 )
 	ROM_REGION(0x8000, SPEC8S3_ROM_REGION, 0)
-	ROM_LOAD( "1003067-0001d.11b.bin", 0x000000, 0x008000, CRC(12188e2b) SHA1(6552d40364eae99b449842a79843d8c0114c4c70) ) 
+	ROM_LOAD( "1003067-0001d.11b.bin", 0x000000, 0x008000, CRC(12188e2b) SHA1(6552d40364eae99b449842a79843d8c0114c4c70) )
 ROM_END
 
 //**************************************************************************
@@ -98,7 +98,7 @@ void nubus_spec8s3_device::device_start()
 
 	slotspace = get_slotspace();
 
-//	printf("[SPEC8S3 %p] slotspace = %x\n", this, slotspace);
+//  printf("[SPEC8S3 %p] slotspace = %x\n", this, slotspace);
 
 	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
 	m_vram32 = (UINT32 *)m_vram;
@@ -264,14 +264,14 @@ WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
 			break;
 
 		case 0x3a01:
-//			printf("%08x to color (%08x invert)\n", data, data ^ 0xffffffff);
+//          printf("%08x to color (%08x invert)\n", data, data ^ 0xffffffff);
 			m_colors[m_count++] = (data & 0xff) ^ 0xff;
 
 			if (m_count == 3)
 			{
-				int actual_color = BITSWAP8(m_clutoffs, 0, 1, 2, 3, 4, 5, 6, 7); 
+				int actual_color = BITSWAP8(m_clutoffs, 0, 1, 2, 3, 4, 5, 6, 7);
 
-//				printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", actual_color, m_colors[0], m_colors[1], m_colors[2], cpu_get_pc(&space.device()) );
+//              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", actual_color, m_colors[0], m_colors[1], m_colors[2], cpu_get_pc(&space.device()) );
 				m_palette[actual_color] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)
@@ -286,7 +286,7 @@ WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
 			if ((m_parameter == 2) && (data != 0xffffffff))
 			{
 				data &= 0xff;
-//				printf("%x to mode\n", data);
+//              printf("%x to mode\n", data);
 				switch (data)
 				{
 					case 0x5f:
@@ -317,7 +317,7 @@ WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
 			break;
 
 		default:
-//			if (offset >= 0x3800) printf("spec8s3_w: %08x @ %x (mask %08x  PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
+//          if (offset >= 0x3800) printf("spec8s3_w: %08x @ %x (mask %08x  PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
 			break;
 	}
 }
@@ -345,7 +345,7 @@ READ32_MEMBER( nubus_spec8s3_device::spec8s3_r )
 			return 0;
 
 		default:
-//			if (offset >= 0x3800) printf("spec8s3_r: @ %x (mask %08x  PC=%x)\n", offset, mem_mask, cpu_get_pc(&space.device()));
+//          if (offset >= 0x3800) printf("spec8s3_r: @ %x (mask %08x  PC=%x)\n", offset, mem_mask, cpu_get_pc(&space.device()));
 			break;
 	}
 	return 0;

@@ -144,7 +144,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 				{
 					if ( sram == NULL && ! mapper_types[i].sram_present )
 						type = mapper_types[i].mapper_type;
-					
+
 
 					if ( sram != NULL && mapper_types[i].sram_present )
 						type = mapper_types[i].mapper_type;

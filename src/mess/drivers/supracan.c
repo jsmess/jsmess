@@ -627,7 +627,7 @@ static void mark_active_tilemap_all_dirty(running_machine &machine, int layer)
 
 	which_tilemap_size = get_tilemap_dimensions(machine, xsize, ysize, layer);
 //  for (int i=0;i<4;i++)
-//	  tilemap_mark_all_tiles_dirty(state->m_tilemap_sizes[layer][i]);
+//    tilemap_mark_all_tiles_dirty(state->m_tilemap_sizes[layer][i]);
 	tilemap_mark_all_tiles_dirty(state->m_tilemap_sizes[layer][which_tilemap_size]);
 }
 
@@ -722,8 +722,8 @@ static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_t* bitma
 				cy += incxy;
 				x++;
 				dest++;
-//			  destflags++;
-//			  pri++;
+//            destflags++;
+//            pri++;
 			}
 
 			/* advance in Y */
@@ -824,7 +824,7 @@ static SCREEN_UPDATE( supracan )
 
 			if (priority==pri)
 			{
-//			  tilemap_num = layer;
+//            tilemap_num = layer;
 				which_tilemap_size = get_tilemap_dimensions(screen->machine(), xsize, ysize, layer);
 				src_bitmap = tilemap_get_pixmap(state->m_tilemap_sizes[layer][which_tilemap_size]);
 				int gfx_region = supracan_tilemap_get_region(screen->machine(), layer);
@@ -1029,8 +1029,8 @@ WRITE16_MEMBER( supracan_state::supracan_dma_w )
 			verboselog("maincpu", machine(), 0, "supracan_dma_w: control %d: %04x\n", ch, data);
 			if(data & 0x8800)
 			{
-//			  if(data & 0x2000)
-//				  acan_dma_regs->source-=2;
+//            if(data & 0x2000)
+//                acan_dma_regs->source-=2;
 				logerror("supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs->source[ch], acan_dma_regs->dest[ch], acan_dma_regs->count[ch] + 1, data);
 
 				for(int i = 0; i <= acan_dma_regs->count[ch]; i++)

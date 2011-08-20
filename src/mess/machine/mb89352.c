@@ -331,12 +331,12 @@ READ8_MEMBER( mb89352_device::mb89352_r )
 	case 0x06:  // SSTS - SPC Status
 		return m_spc_status;
 	case 0x07:  // SERR - SPC Error Status
-		/*	#define SERR_SCSI_PAR   0x80
-			#define SERR_SPC_PAR    0x40
-			#define SERR_TC_PAR     0x08
-			#define SERR_PHASE_ERR  0x04
-			#define SERR_SHORT_XFR  0x02
-			#define SERR_OFFSET     0x01*/
+		/*  #define SERR_SCSI_PAR   0x80
+            #define SERR_SPC_PAR    0x40
+            #define SERR_TC_PAR     0x08
+            #define SERR_PHASE_ERR  0x04
+            #define SERR_SHORT_XFR  0x02
+            #define SERR_OFFSET     0x01*/
 		return 0;
 	case 0x08:  // PCTL - Phase Control
 		return ((m_busfree_int_enable) ? 0x80 : 0x00);
@@ -432,15 +432,15 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 		break;
 	case 0x02:  // SCMD - Command
 		/* From NetBSD source
-		#define SCMD_BUS_REL    0x00
-		#define SCMD_SELECT     0x20
-		#define SCMD_RST_ATN    0x40
-		#define SCMD_SET_ATN    0x60
-		#define SCMD_XFR        0x80
-		#define SCMD_XFR_PAUSE  0xa0
-		#define SCMD_RST_ACK    0xc0
-		#define SCMD_SET_ACK    0xe0
-		 */
+        #define SCMD_BUS_REL    0x00
+        #define SCMD_SELECT     0x20
+        #define SCMD_RST_ATN    0x40
+        #define SCMD_SET_ATN    0x60
+        #define SCMD_XFR        0x80
+        #define SCMD_XFR_PAUSE  0xa0
+        #define SCMD_RST_ACK    0xc0
+        #define SCMD_SET_ACK    0xe0
+         */
 		m_scmd = data;
 		switch((data & 0xe0) >> 5)
 		{

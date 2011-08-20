@@ -52,7 +52,7 @@ static const UINT8 track_SD[][2] = {
 	{ 1, 0x00}, 	/*  1 byte, track number (00-4C)         */
 	{ 1, 0x01}, 	/*  1 byte, sector number (00-0F)        */
 	{10, 0x00},     /*  10 bytes of zeroes                   */
-	{256, 0xe5}, 	/*  256 bytes of sector data             */
+	{256, 0xe5},	/*  256 bytes of sector data             */
 	{ 1, 0xb7}, 	/*  1 byte, CRC                          */
 };
 #endif

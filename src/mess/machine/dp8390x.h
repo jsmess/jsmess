@@ -30,7 +30,7 @@ public:
 
         DECLARE_READ8_MEMBER(reg_r);
         DECLARE_WRITE8_MEMBER(reg_w);
-        
+
 protected:
         // device-level overrides
         virtual void device_start();

@@ -1,7 +1,7 @@
 /*
-	Manchester Small-Scale Experimental Machine (SSEM)
+    Manchester Small-Scale Experimental Machine (SSEM)
 
-	Driver by MooglyGuy
+    Driver by MooglyGuy
 */
 
 #define ADDRESS_MAP_MODERN

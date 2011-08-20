@@ -1593,7 +1593,7 @@ static unsigned long detect_2600controllers(running_machine &machine)
 #define AMSE 0x200
 #define CX22 0x400
 #define CX80 0x800
-	
+
 	unsigned int left,right;
 	int i,j,foundkeypad = 0;
 	UINT8 *cart;
@@ -1627,7 +1627,7 @@ static unsigned long detect_2600controllers(running_machine &machine)
 	left = JOYS+PADD; right = JOYS+PADD;
 	// default for bad dumps and roms too large to have special controllers
 	if ((state->m_cart_size > 0x4000) || (state->m_cart_size & 0x7ff)) return (left << 16) + right;
-	
+
 	cart = CART;
 	for (i = 0; i < state->m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 	{

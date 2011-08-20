@@ -1,18 +1,18 @@
 /***************************************************************************
 
   Viking 1024x768 fixed-resolution monochrome board
- 
+
   VRAM from Fs040000 to Fs0517FF
   Read from Fs000000 enables VBL, write to Fs000000 disables VBL
   Write to Fs080000 acks VBL
- 
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "video/nubus_vikbw.h"
 
 #define VIKBW_SCREEN_NAME	"vikbw_screen"
-#define VIKBW_ROM_REGION   	"vikbw_rom"
+#define VIKBW_ROM_REGION	"vikbw_rom"
 
 #define VRAM_SIZE	(0x18000)  // 1024x768 @ 1bpp is 98,304 bytes (0x18000)
 
@@ -29,7 +29,7 @@ MACHINE_CONFIG_END
 
 ROM_START( vikbw )
 	ROM_REGION(0x2000, VIKBW_ROM_REGION, 0)
-	ROM_LOAD( "viking.bin",   0x000000, 0x002000, CRC(92cf04d1) SHA1(d08349edfc82a0bd5ea848e053e1712092308f74) ) 
+	ROM_LOAD( "viking.bin",   0x000000, 0x002000, CRC(92cf04d1) SHA1(d08349edfc82a0bd5ea848e053e1712092308f74) )
 ROM_END
 
 //**************************************************************************
@@ -96,7 +96,7 @@ void nubus_vikbw_device::device_start()
 
 	slotspace = get_slotspace();
 
-//	printf("[vikbw %p] slotspace = %x\n", this, slotspace);
+//  printf("[vikbw %p] slotspace = %x\n", this, slotspace);
 
 	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
 	install_bank(slotspace+0x40000, slotspace+0x40000+VRAM_SIZE-1, 0, 0, "bank_vikbw", m_vram);
@@ -106,7 +106,7 @@ void nubus_vikbw_device::device_start()
 	m_nubus->install_device(slotspace+0x80000, slotspace+0x80000+3, read32_delegate(FUNC(nubus_vikbw_device::viking_ack_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_ack_w), this));
 }
 
-//-------------------------------------------------         
+//-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
