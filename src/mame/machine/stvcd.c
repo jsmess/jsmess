@@ -27,6 +27,7 @@
 #include "stvcd.h"
 #include "sound/cdda.h"
 #include "debugger.h"
+#include "coreutil.h"
 
 // super-verbose
 #if 0
@@ -105,7 +106,8 @@ typedef enum
 	XFERTYPE_INVALID,
 	XFERTYPE_TOC,
 	XFERTYPE_FILEINFO_1,
-	XFERTYPE_FILEINFO_254
+	XFERTYPE_FILEINFO_254,
+	XFERTYPE_SUBQ
 } transT;
 
 // 32-bit transfer types
@@ -126,6 +128,7 @@ static blockT blocks[MAX_BLOCKS];
 static blockT curblock;
 
 static UINT8 tocbuf[102*4];
+static UINT8 subqbuf[5*2];
 static UINT8 finfbuf[256];
 
 static INT32 sectlenin, sectlenout;
@@ -201,7 +204,7 @@ static int firstfile;			// first non-directory file
 static void cr_standard_return(UINT16 cur_status)
 {
 	cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
-	cr2 = (cur_track == 0xff) ? 0xffff : (cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track);
+	cr2 = (cur_track == 0xff) ? 0xffff : (cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track); // TODO: fix current track
 	cr3 = (0x01<<8) | (cd_curfad>>16); //index & 0xff00
 	cr4 = cd_curfad;
 }
@@ -585,8 +588,11 @@ static void cd_exec_command(running_machine &machine)
 			switch(cr1 & 0xff)
 			{
 				case 0: // Get Q
+				{
+					UINT32 msf_abs,msf_rel;
+					UINT8 track;
 					cr1 = cd_stat | 0;
-					cr2 = 5;
+					cr2 = 10/2;
 					cr3 = 0;
 					cr4 = 0;
 
@@ -608,8 +614,25 @@ static void cd_exec_command(running_machine &machine)
 					xxxx xxxx [10] CRCC
 					xxxx xxxx [11] CRCC
 					*/
-					// ...
-					break;
+
+					msf_abs = lba_to_msf( cd_curfad + 150 );
+					track = cdrom_get_track( cdrom, cd_curfad + 150 );
+					msf_rel = lba_to_msf( cd_curfad + 150 - cdrom_get_track_start( cdrom, track ) );
+
+					xfertype = XFERTYPE_SUBQ;
+					xfercount = 0;
+					subqbuf[0] = 0x01;
+					subqbuf[1] = dec_2_bcd(track+1);
+					subqbuf[2] = 0x01;
+					subqbuf[3] = (msf_rel >> 16) & 0xff;
+					subqbuf[4] = (msf_rel >> 8) & 0xff;
+					subqbuf[5] = (msf_rel >> 0) & 0xff;
+					subqbuf[6] = 0;
+					subqbuf[7] = (msf_abs >> 16) & 0xff;
+					subqbuf[8] = (msf_abs >> 8) & 0xff;
+					subqbuf[9] = (msf_abs >> 0) & 0xff;
+				}
+				break;
 
 				case 1: // Get RW
 					cr1 = cd_stat | 0;
@@ -1642,8 +1665,21 @@ static UINT16 cd_readWord(UINT32 addr)
 					}
 					break;
 
+				case XFERTYPE_SUBQ:
+					rv = subqbuf[xfercount]<<8 | subqbuf[xfercount+1];
+
+					xfercount += 2;
+					xferdnum += 2;
+
+					if (xfercount > 5*2)
+					{
+						xfercount = 0;
+						xfertype = XFERTYPE_INVALID;
+					}
+					break;
+
 				default:
-					CDROM_LOG(("STVCD: Unhandled xfer type %d\n", (int)xfertype))
+					printf("STVCD: Unhandled xfer type %d\n", (int)xfertype);
 					rv = 0;
 					break;
 			}
@@ -1718,7 +1754,7 @@ static UINT32 cd_readLong(UINT32 addr)
 					break;
 
 				default:
-					CDROM_LOG(("CD: unhandled 32-bit transfer type\n"))
+					printf("CD: unhandled 32-bit transfer type\n");
 					break;
 			}
 
