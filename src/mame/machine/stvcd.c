@@ -590,6 +590,24 @@ static void cd_exec_command(running_machine &machine)
 					cr3 = 0;
 					cr4 = 0;
 
+					/*
+					Subcode Q info should be:
+					---- --x- S0
+					---- ---x S1
+					xxxx ---- [0] Control (bit 7 Pre-emphasis, bit 6: copy permitted, bit 5 undefined, bit 4 number of channels)
+					---- xxxx [0] address (0x0001 Mode 1)
+					xxxx xxxx [1] track number (1-99, AA lead-out), BCD format
+					xxxx xxxx [2] index (01 lead-out), BCD format
+					xxxx xxxx [3] Time within' track M
+					xxxx xxxx [4] Time within' track S
+					xxxx xxxx [5] Time within' track F
+					xxxx xxxx [6] Zero
+					xxxx xxxx [7] Absolute M
+					xxxx xxxx [8] Absolute S
+					xxxx xxxx [9] Absolute F
+					xxxx xxxx [10] CRCC
+					xxxx xxxx [11] CRCC
+					*/
 					// ...
 					break;
 
