@@ -107,7 +107,8 @@ typedef enum
 	XFERTYPE_TOC,
 	XFERTYPE_FILEINFO_1,
 	XFERTYPE_FILEINFO_254,
-	XFERTYPE_SUBQ
+	XFERTYPE_SUBQ,
+	XFERTYPE_SUBRW
 } transT;
 
 // 32-bit transfer types
@@ -129,6 +130,7 @@ static blockT curblock;
 
 static UINT8 tocbuf[102*4];
 static UINT8 subqbuf[5*2];
+static UINT8 subrwbuf[12*2];
 static UINT8 finfbuf[256];
 
 static INT32 sectlenin, sectlenout;
@@ -201,11 +203,30 @@ static int firstfile;			// first non-directory file
 #define CD_STAT_WAIT     0x8000		// waiting for command if set, else executed immediately
 #define CD_STAT_REJECT   0xff00		// ultra-fatal error.
 
+/* FIXME: assume Saturn CD-ROMs to have a 2 secs pre-gap for now. */
+static int get_track_index(void)
+{
+	UINT32 rel_fad;
+	UINT8 track;
+
+	if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
+		return 1;
+
+	track = cdrom_get_track( cdrom, cd_curfad );
+
+	rel_fad = cd_curfad - cdrom_get_track_start( cdrom, track );
+
+	if(rel_fad < 150)
+		return 0;
+
+	return 1;
+}
+
 static void cr_standard_return(UINT16 cur_status)
 {
 	cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
 	cr2 = (cur_track == 0xff) ? 0xffff : (cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track); // TODO: fix current track
-	cr3 = (0x01<<8) | (cd_curfad>>16); //index & 0xff00
+	cr3 = (get_track_index()<<8) | (cd_curfad>>16); //index & 0xff00
 	cr4 = cd_curfad;
 }
 
@@ -623,7 +644,7 @@ static void cd_exec_command(running_machine &machine)
 					xfercount = 0;
 					subqbuf[0] = 0x01 | ((cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, track+1)) == CD_TRACK_AUDIO) ? 0x00 : 0x40);
 					subqbuf[1] = dec_2_bcd(track+1);
-					subqbuf[2] = 0x01;
+					subqbuf[2] = dec_2_bcd(get_track_index());
 					subqbuf[3] = dec_2_bcd((msf_rel >> 16) & 0xff);
 					subqbuf[4] = dec_2_bcd((msf_rel >> 8) & 0xff);
 					subqbuf[5] = dec_2_bcd((msf_rel >> 0) & 0xff);
@@ -640,7 +661,16 @@ static void cd_exec_command(running_machine &machine)
 					cr3 = 0;
 					cr4 = 0;
 
-					// ...
+					xfertype = XFERTYPE_SUBRW;
+					xfercount = 0;
+
+					/* return null data for now */
+					{
+						int i;
+
+						for(i=0;i<12*2;i++)
+							subrwbuf[i] = 0;
+					}
 					break;
 			}
 			hirqreg |= CMOK|DRDY;
@@ -1672,6 +1702,20 @@ static UINT16 cd_readWord(UINT32 addr)
 					xferdnum += 2;
 
 					if (xfercount > 5*2)
+					{
+						xfercount = 0;
+						xfertype = XFERTYPE_INVALID;
+					}
+					break;
+
+
+				case XFERTYPE_SUBRW:
+					rv = subrwbuf[xfercount]<<8 | subrwbuf[xfercount+1];
+
+					xfercount += 2;
+					xferdnum += 2;
+
+					if (xfercount > 12*2)
 					{
 						xfercount = 0;
 						xfertype = XFERTYPE_INVALID;
