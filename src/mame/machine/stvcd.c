@@ -616,12 +616,12 @@ static void cd_exec_command(running_machine &machine)
 					*/
 
 					msf_abs = lba_to_msf_alt( cd_curfad - 150 );
-					track = cdrom_get_track( cdrom, cd_curfad - 150 );
+					track = cdrom_get_track( cdrom, cd_curfad );
 					msf_rel = lba_to_msf_alt( cd_curfad - 150 - cdrom_get_track_start( cdrom, track ) );
 
 					xfertype = XFERTYPE_SUBQ;
 					xfercount = 0;
-					subqbuf[0] = 0x01;
+					subqbuf[0] = 0x01 | ((cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, track+1)) == CD_TRACK_AUDIO) ? 0x00 : 0x40);
 					subqbuf[1] = dec_2_bcd(track+1);
 					subqbuf[2] = 0x01;
 					subqbuf[3] = dec_2_bcd((msf_rel >> 16) & 0xff);
