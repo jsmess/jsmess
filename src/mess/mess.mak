@@ -1197,7 +1197,7 @@ $(MESSOBJ)/nec.a:				\
 	$(MESS_DRIVERS)/pc8001.o	\
 	$(MESS_DRIVERS)/pc8801.o	\
 	$(MESS_DRIVERS)/pc88va.o	\
-	$(MESS_DRIVERS)/pc100.o         \
+	$(MESS_DRIVERS)/pc100.o		\
 	$(MESS_DRIVERS)/pc9801.o	\
 	$(MESS_DRIVERS)/tk80bs.o	\
 
@@ -1207,6 +1207,8 @@ $(MESSOBJ)/netronic.a:			\
 
 $(MESSOBJ)/next.a:				\
 	$(MESS_DRIVERS)/next.o		\
+	$(MESS_MACHINE)/nextkbd.o	\
+	$(MESS_MACHINE)/n82077aa.o	\
 
 $(MESSOBJ)/nintendo.a:			\
 	$(MESS_MACHINE)/nes_mmc.o	\
@@ -1224,7 +1226,7 @@ $(MESSOBJ)/nintendo.a:			\
 	$(MESS_DRIVERS)/pokemini.o	\
 	$(MESS_DRIVERS)/vboy.o		\
 	$(MESS_DRIVERS)/gba.o		\
-	$(MESS_VIDEO)/gba.o		\
+	$(MESS_VIDEO)/gba.o			\
 
 $(MESSOBJ)/nokia.a:				\
 	$(MESS_DRIVERS)/mikromik.o	\
