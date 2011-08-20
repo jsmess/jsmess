@@ -159,6 +159,7 @@ static UINT8 cmd_pending;
 static UINT8 cd_speed;
 static UINT8 cdda_maxrepeat;
 static UINT8 cdda_repeat_count;
+static UINT8 tray_is_closed;
 
 // iso9660 utilities
 static void read_new_dir(running_machine &machine, UINT32 fileno);
@@ -237,17 +238,6 @@ static void cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectn
 static void cd_exec_command(running_machine &machine)
 {
 	UINT32 temp;
-
-	if (!cdrom)
-	{
-		cd_stat = CD_STAT_OPEN;
-		cr1 = cd_stat | 0xff;
-		cr2 = 0xffff;
-		cr3 = 0xffff;
-		cr4 = 0xffff;
-		hirqreg |= CMOK;
-		return;
-	}
 
 	if(cr1 != 0 && ((cr1 & 0xff00) != 0x5100) && 1)
    		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
@@ -329,11 +319,13 @@ static void cd_exec_command(running_machine &machine)
 			CDROM_LOG(("%s:CD: Initialize CD system\n", machine.describe_context()))
 			if((cr1 & 0x81) == 0x00) //guess
 			{
-				//int i;
-				cd_stat = CD_STAT_PAUSE;
-				cd_curfad = 150;
-				//cur_track = 1;
-				fadstoplay = 0;
+				if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
+				{
+					cd_stat = CD_STAT_PAUSE;
+					cd_curfad = 150;
+					//cur_track = 1;
+					fadstoplay = 0;
+				}
 				in_buffer = 0;
 				buffull = 0;
 				hirqreg &= 0xffe5;
@@ -1353,13 +1345,15 @@ static void cd_exec_command(running_machine &machine)
 			sectorstore = 0;
 			xfertype32 = XFERTYPE32_INVALID;
 			xferdnum = 0;
-			cd_stat = CD_STAT_PAUSE;	// force to pause
+			if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
+				cd_stat = CD_STAT_PAUSE;	// force to pause
 			cr_standard_return(cd_stat);
 			break;
 
 		case 0xe000:	// appears to be copy protection check.  needs only to return OK.
 			CDROM_LOG(("%s:CD: Verify copy protection\n",   machine.describe_context()))
-			cd_stat = CD_STAT_PAUSE;
+			if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
+				cd_stat = CD_STAT_PAUSE;
 			cr1 = cd_stat;	// necessary to pass
 			cr2 = 0x4;
 //          hirqreg |= (CMOK|EFLS|CSCT);
@@ -1369,7 +1363,8 @@ static void cd_exec_command(running_machine &machine)
 
 		case 0xe100:	// get disc region
 			CDROM_LOG(("%s:CD: Get disc region\n",   machine.describe_context()))
-			cd_stat = CD_STAT_PAUSE;
+			if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
+				cd_stat = CD_STAT_PAUSE;
 			cr1 = cd_stat;	// necessary to pass
 			cr2 = 0x4;		// (must return this value to pass bios checks)
 			hirqreg |= (CMOK);
@@ -1393,8 +1388,11 @@ TIMER_DEVICE_CALLBACK( stv_sh1_sim )
 	}
 
 	cd_stat |= CD_STAT_PERI;
+
+	if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
+		hirqreg |= SCDQ;
+
 	cr_standard_return(cd_stat);
-	hirqreg |= SCDQ;
 }
 
 TIMER_DEVICE_CALLBACK( stv_sector_cb )
@@ -1483,11 +1481,12 @@ void stvcd_reset(running_machine &machine)
 	}
 	else
 	{
-		cd_stat = CD_STAT_OPEN;
+		cd_stat = CD_STAT_NODISC;
 	}
 
 	cd_speed = 2;
 	cdda_repeat_count = 0;
+	tray_is_closed = 1;
 
 	sector_timer = machine.device<timer_device>("sector_timer");
 	sector_timer->adjust(attotime::from_hz(150));	// 150 sectors / second = 300kBytes/second
@@ -2505,4 +2504,50 @@ static void cd_readblock(UINT32 fad, UINT8 *dat)
 	}
 }
 
+void stvcd_set_tray_open(running_machine &machine)
+{
+	if(!tray_is_closed)
+		return;
 
+	hirqreg |= DCHG;
+	cd_stat = CD_STAT_OPEN;
+
+	cdrom = (cdrom_file *)NULL;
+	tray_is_closed = 0;
+
+	popmessage("Tray Open");
+}
+
+void stvcd_set_tray_close(running_machine &machine)
+{
+	/* avoid user attempts to load a CD-ROM without opening the tray first (emulation asserts anyway with current framework) */
+	if(tray_is_closed)
+		return;
+
+	hirqreg |= DCHG;
+
+	#ifdef MESS
+	cdrom = machine.device<cdrom_image_device>("cdrom")->get_cdrom_file();
+	#else
+	cdrom = cdrom_open(get_disk_handle(machine, "cdrom"));
+	#endif
+
+	cdda_set_cdrom( machine.device("cdda"), cdrom );
+
+	if (cdrom)
+	{
+		CDROM_LOG(("Opened CD-ROM successfully, reading root directory\n"))
+		//read_new_dir(machine, 0xffffff);	// read root directory
+		cd_stat = CD_STAT_PAUSE;
+	}
+	else
+	{
+		cd_stat = CD_STAT_NODISC;
+	}
+
+	cd_speed = 2;
+	cdda_repeat_count = 0;
+	tray_is_closed = 1;
+
+	popmessage("Tray Close");
+}
