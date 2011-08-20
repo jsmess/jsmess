@@ -752,19 +752,19 @@ static void pce_cd_nec_get_subq( running_machine &machine )
 		break;
 	}
 
-	msf_abs = lba_to_msf( frame );
+	msf_abs = lba_to_msf_alt( frame );
 	track = cdrom_get_track( pce_cd.cd, frame );
-	msf_rel = lba_to_msf( frame - cdrom_get_track_start( pce_cd.cd, track ) );
+	msf_rel = lba_to_msf_alt( frame - cdrom_get_track_start( pce_cd.cd, track ) );
 
-	pce_cd.data_buffer[1] = 0;
+	pce_cd.data_buffer[1] = 0x01 | ((cdrom_get_track_type(pce_cd.cd, cdrom_get_track(pce_cd.cd, track+1)) == CD_TRACK_AUDIO) ? 0x00 : 0x40);
 	pce_cd.data_buffer[2] = dec_2_bcd( track+1 );		/* track */
 	pce_cd.data_buffer[3] = 1;							/* index */
-	pce_cd.data_buffer[4] = ( msf_rel >> 16 ) & 0xFF;	/* M (relative) */
-	pce_cd.data_buffer[5] = ( msf_rel >> 8 ) & 0xFF;	/* S (relative) */
-	pce_cd.data_buffer[6] = msf_rel & 0xFF;				/* F (relative) */
-	pce_cd.data_buffer[7] = ( msf_abs >> 16 ) & 0xFF;	/* M (absolute) */
-	pce_cd.data_buffer[8] = ( msf_abs >> 8 ) & 0xFF;	/* S (absolute) */
-	pce_cd.data_buffer[9] = msf_abs & 0xFF;				/* F (absolute) */
+	pce_cd.data_buffer[4] = dec_2_bcd(( msf_rel >> 16 ) & 0xFF);/* M (relative) */
+	pce_cd.data_buffer[5] = dec_2_bcd(( msf_rel >> 8 ) & 0xFF);	/* S (relative) */
+	pce_cd.data_buffer[6] = dec_2_bcd(msf_rel & 0xFF);			/* F (relative) */
+	pce_cd.data_buffer[7] = dec_2_bcd(( msf_abs >> 16 ) & 0xFF);/* M (absolute) */
+	pce_cd.data_buffer[8] = dec_2_bcd(( msf_abs >> 8 ) & 0xFF); /* S (absolute) */
+	pce_cd.data_buffer[9] = dec_2_bcd(msf_abs & 0xFF);			/* F (absolute) */
 	pce_cd.data_buffer_size = 10;
 
 	pce_cd.data_buffer_index = 0;
