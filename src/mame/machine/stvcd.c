@@ -615,22 +615,22 @@ static void cd_exec_command(running_machine &machine)
 					xxxx xxxx [11] CRCC
 					*/
 
-					msf_abs = lba_to_msf( cd_curfad + 150 );
-					track = cdrom_get_track( cdrom, cd_curfad + 150 );
-					msf_rel = lba_to_msf( cd_curfad + 150 - cdrom_get_track_start( cdrom, track ) );
+					msf_abs = lba_to_msf_alt( cd_curfad - 150 );
+					track = cdrom_get_track( cdrom, cd_curfad - 150 );
+					msf_rel = lba_to_msf_alt( cd_curfad - 150 - cdrom_get_track_start( cdrom, track ) );
 
 					xfertype = XFERTYPE_SUBQ;
 					xfercount = 0;
 					subqbuf[0] = 0x01;
 					subqbuf[1] = dec_2_bcd(track+1);
 					subqbuf[2] = 0x01;
-					subqbuf[3] = (msf_rel >> 16) & 0xff;
-					subqbuf[4] = (msf_rel >> 8) & 0xff;
-					subqbuf[5] = (msf_rel >> 0) & 0xff;
+					subqbuf[3] = dec_2_bcd((msf_rel >> 16) & 0xff);
+					subqbuf[4] = dec_2_bcd((msf_rel >> 8) & 0xff);
+					subqbuf[5] = dec_2_bcd((msf_rel >> 0) & 0xff);
 					subqbuf[6] = 0;
-					subqbuf[7] = (msf_abs >> 16) & 0xff;
-					subqbuf[8] = (msf_abs >> 8) & 0xff;
-					subqbuf[9] = (msf_abs >> 0) & 0xff;
+					subqbuf[7] = dec_2_bcd((msf_abs >> 16) & 0xff);
+					subqbuf[8] = dec_2_bcd((msf_abs >> 8) & 0xff);
+					subqbuf[9] = dec_2_bcd((msf_abs >> 0) & 0xff);
 				}
 				break;
 
