@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- Based on MAME 0.143 (r13010) Neo Geo driver -->
+<!-- Based on MAME 0.143u3 (r13515) Neo Geo driver -->
 
-<softwarelist name="aes" description="SNK Neo Geo AES cartridges">
+<softwarelist name="aes" description="SNK Neo-Geo AES cartridges">
 <!-- ID 001 (MGH-001) -->
 <!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="nam1975">
@@ -226,7 +226,7 @@
 		</part>
 	</software>
 
-<!-- ID 007 (MGH-007) -->
+<!-- ID 007 (NGH-007) -->
 <!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="alpham2">
 		<description>Alpha Mission II / ASO II - Last Guardian</description>
@@ -357,7 +357,7 @@
 		</part>
 	</software>
 
-<!-- ID 016 -->
+<!-- ID 016 (NGH-016) -->
 <!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="kotm">
 		<description>King of the Monsters</description>
@@ -365,25 +365,25 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
-				<rom name="016-hp1.bin" size="524288" crc="b774621e" sha1="7684b2e07163aec68cd083ef1d8900f855f6cb42" offset="0x000000" />
-				<rom name="016-p2.bin" size="131072" crc="12afdc2b" sha1="3a95f5910cbb9f17e63ddece995c6e120fa2f622" offset="0x080000" />
+				<rom name="016-hp1.p1" size="524288" crc="b774621e" sha1="7684b2e07163aec68cd083ef1d8900f855f6cb42" offset="0x000000" />
+				<rom name="016-p2.p2" size="131072" crc="12afdc2b" sha1="3a95f5910cbb9f17e63ddece995c6e120fa2f622" offset="0x080000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-				<rom name="016-s1.bin" size="131072" crc="1a2eeeb3" sha1="8d2b96d395020197bc59294b6b0c8d62b1d8d4dd" offset="0x000000" />
+				<rom name="016-s1.s1" size="131072" crc="1a2eeeb3" sha1="8d2b96d395020197bc59294b6b0c8d62b1d8d4dd" offset="0x000000" />
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="016-m1.bin" size="131072" crc="9da9ca10" sha1="88b915827d529f39c365d3e41197d5461e07a085" offset="0x000000" />
+                <rom name="016-m1.m1" size="131072" crc="9da9ca10" sha1="88b915827d529f39c365d3e41197d5461e07a085" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="2097152">
-				<rom name="016-v1.bin" size="1048576" crc="86c0a502" sha1="7fe2db0c64aefdd14d6c36f7fcd6442591e9a014" offset="0x000000" />
-				<rom name="016-v2.bin" size="1048576" crc="5bc23ec5" sha1="f4ff5d20587469daa026d5c812739335ce53cfdf" offset="0x100000" />
+				<rom name="016-v1.v1" size="1048576" crc="86c0a502" sha1="7fe2db0c64aefdd14d6c36f7fcd6442591e9a014" offset="0x000000" />
+				<rom name="016-v2.v2" size="1048576" crc="5bc23ec5" sha1="f4ff5d20587469daa026d5c812739335ce53cfdf" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sprites" size="4194304">
-				<rom name="016-c1.bin" size="1048576" crc="71471c25" sha1="bc8e3fee56b33ef2bac5b4b852339d2fbcd09b7c" offset="0x000000" loadflag="load16_byte" />
-				<rom name="016-c2.bin" size="1048576" crc="320db048" sha1="d6b43834de6f5442e23ca8fb26b3a36e96790d8d" offset="0x000001" loadflag="load16_byte" />
-				<rom name="016-c3.bin" size="1048576" crc="98de7995" sha1="e33edf4d36c82196d2b474e37be180a05976f558" offset="0x200000" loadflag="load16_byte" />
-				<rom name="016-c4.bin" size="1048576" crc="070506e2" sha1="3a2ec365e1d87a9c5ce1ee9bea88402a8eef4ed7" offset="0x200001" loadflag="load16_byte" />
+				<rom name="016-c1.c1" size="1048576" crc="71471c25" sha1="bc8e3fee56b33ef2bac5b4b852339d2fbcd09b7c" offset="0x000000" loadflag="load16_byte" />
+				<rom name="016-c2.c2" size="1048576" crc="320db048" sha1="d6b43834de6f5442e23ca8fb26b3a36e96790d8d" offset="0x000001" loadflag="load16_byte" />
+				<rom name="016-c3.c3" size="1048576" crc="98de7995" sha1="e33edf4d36c82196d2b474e37be180a05976f558" offset="0x200000" loadflag="load16_byte" />
+				<rom name="016-c4.c4" size="1048576" crc="070506e2" sha1="3a2ec365e1d87a9c5ce1ee9bea88402a8eef4ed7" offset="0x200001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
@@ -692,7 +692,7 @@
 		</part>
 	</software>
 
-<!-- ID 025 -->
+<!-- ID 025 (NGH-025) -->
 <!-- Release Date - Japan: 11/10/1991 USA: 11/10/1991 -->
 	<software name="eightman">
 		<description>Eight Man</description>
@@ -700,29 +700,29 @@
 		<publisher>SNK / Pallas</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
-                <rom name="025-p1.bin" size="524288" crc="43344cb0" sha1="29dfd699f35b0a74e20fedd6c9174c289f0ef6e0" offset="0x000000" />
+                <rom name="025-p1.p1" size="524288" crc="43344cb0" sha1="29dfd699f35b0a74e20fedd6c9174c289f0ef6e0" offset="0x000000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="025-s1.bin" size="131072" crc="a402202b" sha1="75c44e1af459af155f5b892fd18706268dd5e602" offset="0x000000"/>
+                <rom name="025-s1.s1" size="131072" crc="a402202b" sha1="75c44e1af459af155f5b892fd18706268dd5e602" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="025-m1.bin" size="131072" crc="9927034c" sha1="205665361c5b2ab4f01ec480dd3c9b69db858d09" offset="0x000000" />
+                <rom name="025-m1.m1" size="131072" crc="9927034c" sha1="205665361c5b2ab4f01ec480dd3c9b69db858d09" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="2097152">
-                <rom name="025-v1.bin" size="1048576" crc="4558558a" sha1="a4b277703ed67225c652be0d618daeca65a27b88" offset="0x000000" />
-                <rom name="025-v2.bin" size="1048576" crc="c5e052e9" sha1="fa1119c90ce4c706a6aa0c17d7bc06aa3068d9b2" offset="0x100000" />
+                <rom name="025-v1.v1" size="1048576" crc="4558558a" sha1="a4b277703ed67225c652be0d618daeca65a27b88" offset="0x000000" />
+                <rom name="025-v2.v2" size="1048576" crc="c5e052e9" sha1="fa1119c90ce4c706a6aa0c17d7bc06aa3068d9b2" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sprites" size="3145728">
-                <rom name="025-c1.bin" size="1048576" crc="555e16a4" sha1="1c96f3d2fd0991680fbf627a6cdd26ad2cd60319" offset="0x000000" loadflag="load16_byte" />
-                <rom name="025-c2.bin" size="1048576" crc="e1ee51c3" sha1="da8d074bb4e923ed7b8a154fd31b42f2d65b8e96" offset="0x000001" loadflag="load16_byte" />
-                <rom name="025-c3.bin" size="524288" crc="0923d5b0" sha1="ab72ba1e3ebf56dd356f9ad181f986b1360a1089" offset="0x200000" loadflag="load16_byte" />
-                <rom name="025-c4.bin" size="524288" crc="e3eca67b" sha1="88154cbc1a261c2f425430119ebc08a30adc9675" offset="0x200001" loadflag="load16_byte" />
+                <rom name="025-c1.c1" size="1048576" crc="555e16a4" sha1="1c96f3d2fd0991680fbf627a6cdd26ad2cd60319" offset="0x000000" loadflag="load16_byte" />
+                <rom name="025-c2.c2" size="1048576" crc="e1ee51c3" sha1="da8d074bb4e923ed7b8a154fd31b42f2d65b8e96" offset="0x000001" loadflag="load16_byte" />
+                <rom name="025-c3.c3" size="524288" crc="0923d5b0" sha1="ab72ba1e3ebf56dd356f9ad181f986b1360a1089" offset="0x200000" loadflag="load16_byte" />
+                <rom name="025-c4.c4" size="524288" crc="e3eca67b" sha1="88154cbc1a261c2f425430119ebc08a30adc9675" offset="0x200001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 027 (MOH-001)-->
+<!-- ID 027 (MOH-001) -->
 	<software name="minasan">
 		<description>Minasanno Okagesamadesu! Daisugorokutaikai</description>
 		<year>1990</year>
@@ -753,7 +753,7 @@
 		</part>
 	</software>
 
-<!-- ID 030 -->
+<!-- ID 030 (NGH-030) -->
 <!-- Release Date - Japan: 25/10/1991 USA: 25/10/1991 -->
 	<software name="2020bb">
 		<description>2020 Super Baseball</description>
@@ -761,29 +761,29 @@
 		<publisher>SNK / Pallas</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
-                <rom name="030-p1h.bin" size="524288" crc="12d048d7" sha1="ee0d03a565b11ca3bee2d24f62ff46a85ef18d90" offset="0x000000" />
+                <rom name="030-p1h.p1" size="524288" crc="12d048d7" sha1="ee0d03a565b11ca3bee2d24f62ff46a85ef18d90" offset="0x000000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="030-s1.bin" size="131072" crc="7015b8fc" sha1="8c09bc3e6c62e0f7c9557c1e10c901be325bae7f" offset="0x000000"/>
+                <rom name="030-s1.s1" size="131072" crc="7015b8fc" sha1="8c09bc3e6c62e0f7c9557c1e10c901be325bae7f" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="030-m1.bin" size="131072" crc="4cf466ec" sha1="6a003b53c7a4af9d7529e2c10f27ffc4e58dcda5" offset="0x000000" />
+                <rom name="030-m1.m1" size="131072" crc="4cf466ec" sha1="6a003b53c7a4af9d7529e2c10f27ffc4e58dcda5" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="2097152">
-                <rom name="030-v1.bin" size="1048576" crc="d4ca364e" sha1="b0573744b0ea2ef1e2167a225f0d254883f5af04" offset="0x000000" />
-                <rom name="030-v2.bin" size="1048576" crc="54994455" sha1="76eb62b86e8ed51a77f44313d5cc8091b3f58d57" offset="0x100000" />
+                <rom name="030-v1.v1" size="1048576" crc="d4ca364e" sha1="b0573744b0ea2ef1e2167a225f0d254883f5af04" offset="0x000000" />
+                <rom name="030-v2.v2" size="1048576" crc="54994455" sha1="76eb62b86e8ed51a77f44313d5cc8091b3f58d57" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sprites" size="4194304">
-                <rom name="030-c1.bin" size="1048576" crc="4f5e19bd" sha1="ef7975c4b33a7aea4a25a385f604799f054d3200" offset="0x000000" loadflag="load16_byte" />
-                <rom name="030-c2.bin" size="1048576" crc="d6314bf0" sha1="0920cc580d7997fcb0170dd619af2f305d635577" offset="0x000001" loadflag="load16_byte" />
-                <rom name="030-c3.bin" size="1048576" crc="47fddfee" sha1="297c505a63448c999a2510c27bf4549102134db8" offset="0x200000" loadflag="load16_byte" />
-                <rom name="030-c4.bin" size="1048576" crc="780d1c4e" sha1="2e2cf9de828e3b48642dd2203637103438c62142" offset="0x200001" loadflag="load16_byte" />
+                <rom name="030-c1.c1" size="1048576" crc="4f5e19bd" sha1="ef7975c4b33a7aea4a25a385f604799f054d3200" offset="0x000000" loadflag="load16_byte" />
+                <rom name="030-c2.c2" size="1048576" crc="d6314bf0" sha1="0920cc580d7997fcb0170dd619af2f305d635577" offset="0x000001" loadflag="load16_byte" />
+                <rom name="030-c3.c3" size="1048576" crc="47fddfee" sha1="297c505a63448c999a2510c27bf4549102134db8" offset="0x200000" loadflag="load16_byte" />
+                <rom name="030-c4.c4" size="1048576" crc="780d1c4e" sha1="2e2cf9de828e3b48642dd2203637103438c62142" offset="0x200001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 031 -->
+<!-- ID 031 (NGH-031) -->
 <!-- Release Date - Japan: 13/0731992 USA: 13/03/1992 -->
 	<software name="socbrawl">
 		<description>Soccer Brawl</description>
@@ -791,29 +791,29 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
-				<rom name="031-p1.bin" size="524288" crc="a2801c24" sha1="627d76ff0740ca29586f37b268f47fb469822529" offset="0x000000" />
+				<rom name="031-p1.p1" size="524288" crc="a2801c24" sha1="627d76ff0740ca29586f37b268f47fb469822529" offset="0x000000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-				<rom name="031-s1.bin" size="131072" crc="4c117174" sha1="26e52c4f628338a9aa1c159517cdf873f738fb98" offset="0x000000" />
+				<rom name="031-s1.s1" size="131072" crc="4c117174" sha1="26e52c4f628338a9aa1c159517cdf873f738fb98" offset="0x000000" />
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-				<rom name="031-m1.bin" size="131072" crc="cb37427c" sha1="99efe9600ebeda48331f396e3203c7588bdb7d24" offset="0x000000" />
+				<rom name="031-m1.m1" size="131072" crc="cb37427c" sha1="99efe9600ebeda48331f396e3203c7588bdb7d24" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="2097152">
-				<rom name="031-v1.bin" size="1048576" crc="cc78497e" sha1="895bd647150fae9b2259ef043ed681f4c4de66ea" offset="0x000000" />
-				<rom name="031-v2.bin" size="1048576" crc="dda043c6" sha1="08165a59700ab6b1e523079dd2a3549e520cc594" offset="0x100000" />
+				<rom name="031-v1.v1" size="1048576" crc="cc78497e" sha1="895bd647150fae9b2259ef043ed681f4c4de66ea" offset="0x000000" />
+				<rom name="031-v2.v2" size="1048576" crc="dda043c6" sha1="08165a59700ab6b1e523079dd2a3549e520cc594" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sprites" size="3145728">
-				<rom name="031-c1.bin" size="1048576" crc="bd0a4eb8" sha1="b67988cb3e550d083e81c9bd436da55b242785ed" offset="0x000000" loadflag="load16_byte" />
-				<rom name="031-c2.bin" size="1048576" crc="efde5382" sha1="e42789c8d87ee3d4549d0a903e990c03338cbbd8" offset="0x000001" loadflag="load16_byte" />
-				<rom name="031-c3.bin" size="524288" crc="580f7f33" sha1="f4f95a7c8de00e1366a723fc4cd0e8c1905af636" offset="0x200000" loadflag="load16_byte" />
-				<rom name="031-c4.bin" size="524288" crc="ed297de8" sha1="616f8fa4c86231f3e79faf9f69f8bb909cbc35f0" offset="0x200001" loadflag="load16_byte" />
+				<rom name="031-c1.c1" size="1048576" crc="bd0a4eb8" sha1="b67988cb3e550d083e81c9bd436da55b242785ed" offset="0x000000" loadflag="load16_byte" />
+				<rom name="031-c2.c2" size="1048576" crc="efde5382" sha1="e42789c8d87ee3d4549d0a903e990c03338cbbd8" offset="0x000001" loadflag="load16_byte" />
+				<rom name="031-c3.c3" size="524288" crc="580f7f33" sha1="f4f95a7c8de00e1366a723fc4cd0e8c1905af636" offset="0x200000" loadflag="load16_byte" />
+				<rom name="031-c4.c4" size="524288" crc="ed297de8" sha1="616f8fa4c86231f3e79faf9f69f8bb909cbc35f0" offset="0x200001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 034 -->
+<!-- ID 034 (NGH-034) -->
 <!-- Release Date - Japan: 21/02/1992 USA: 21/02/1992 -->
 	<software name="fbfrenzy">
 		<description>Football Frenzy</description>
@@ -821,24 +821,24 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
-				<rom name="034-p1.bin" size="524288" crc="cdef6b19" sha1="97482db0dffc6d625fb41fa38449c0a74d741a72" offset="0x000000" />
+				<rom name="034-p1.p1" size="524288" crc="cdef6b19" sha1="97482db0dffc6d625fb41fa38449c0a74d741a72" offset="0x000000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-				<rom name="034-s1.bin" size="131072" crc="8472ed44" sha1="42e1a9671dddd090d2a634cff986f6c73ba08b70" offset="0x000000" />
+				<rom name="034-s1.s1" size="131072" crc="8472ed44" sha1="42e1a9671dddd090d2a634cff986f6c73ba08b70" offset="0x000000" />
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-				<rom name="034-m1.bin" size="131072" crc="f41b16b8" sha1="f3e1cfc4cd2c5baece176f169906aa796367d303" offset="0x000000" />
+				<rom name="034-m1.m1" size="131072" crc="f41b16b8" sha1="f3e1cfc4cd2c5baece176f169906aa796367d303" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="2097152">
-				<rom name="034-v1.bin" size="1048576" crc="50c9d0dd" sha1="2b3f2875b00e5f307d274128bd73c1521a7d901b" offset="0x000000" />
-				<rom name="034-v2.bin" size="1048576" crc="5aa15686" sha1="efe47954827a98d539ba719347c5f8aa60e6338b" offset="0x100000" />
+				<rom name="034-v1.v1" size="1048576" crc="50c9d0dd" sha1="2b3f2875b00e5f307d274128bd73c1521a7d901b" offset="0x000000" />
+				<rom name="034-v2.v2" size="1048576" crc="5aa15686" sha1="efe47954827a98d539ba719347c5f8aa60e6338b" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sprites" size="3145728">
-				<rom name="034-c1.bin" size="1048576" crc="91c56e78" sha1="2944d49ebfc71239d345209ca7f25993c2cc5a77" offset="0x000000" loadflag="load16_byte" />
-				<rom name="034-c2.bin" size="1048576" crc="9743ea2f" sha1="cf4fccdf10d521d555e92bc24123142393c2b3bb" offset="0x000001" loadflag="load16_byte" />
-				<rom name="034-c3.bin" size="524288" crc="e5aa65f5" sha1="714356a2cee976ec0f515b1034ce971018e5c02e" offset="0x200000" loadflag="load16_byte" />
-				<rom name="034-c4.bin" size="524288" crc="0eb138cc" sha1="21d31e1f136c674caa6dd44073281cd07b72ea9b" offset="0x200001" loadflag="load16_byte" />
+				<rom name="034-c1.c1" size="1048576" crc="91c56e78" sha1="2944d49ebfc71239d345209ca7f25993c2cc5a77" offset="0x000000" loadflag="load16_byte" />
+				<rom name="034-c2.c2" size="1048576" crc="9743ea2f" sha1="cf4fccdf10d521d555e92bc24123142393c2b3bb" offset="0x000001" loadflag="load16_byte" />
+				<rom name="034-c3.c3" size="524288" crc="e5aa65f5" sha1="714356a2cee976ec0f515b1034ce971018e5c02e" offset="0x200000" loadflag="load16_byte" />
+				<rom name="034-c4.c4" size="524288" crc="0eb138cc" sha1="21d31e1f136c674caa6dd44073281cd07b72ea9b" offset="0x200001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
@@ -933,7 +933,7 @@
 		</part>
 	</software>
 
-<!-- ID 039 -->
+<!-- ID 039 (NGH-039) -->
 <!-- Release Date - Japan: 01/07/1991 USA: 01/07/1991 -->
 	<software name="kotm2">
 		<description>King of the Monsters 2 - The Next Thing</description>
@@ -941,32 +941,61 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
-				<rom name="039-p1.bin" size="524288" crc="b372d54c" sha1="b70fc6f72e16a66b6e144cc01370548e3398b8b8" offset="0x000000" />
-				<rom name="039-p2.bin" size="524288" crc="28661afe" sha1="6c85ff6ab334b1ca744f726f42dac211537e7315" offset="0x080000" />
+				<rom name="039-p1.p1" size="524288" crc="b372d54c" sha1="b70fc6f72e16a66b6e144cc01370548e3398b8b8" offset="0x000000" />
+				<rom name="039-p2.p2" size="524288" crc="28661afe" sha1="6c85ff6ab334b1ca744f726f42dac211537e7315" offset="0x080000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-				<rom name="039-s1.bin" size="131072" crc="63ee053a" sha1="7d4b92bd022708975b1470e8f24d1f5a712e1b94" offset="0x000000" />
+				<rom name="039-s1.s1" size="131072" crc="63ee053a" sha1="7d4b92bd022708975b1470e8f24d1f5a712e1b94" offset="0x000000" />
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-				<rom name="039-m1.bin" size="131072" crc="0c5b2ad5" sha1="15eb5ea10fecdbdbcfd06225ae6d88bb239592e7" offset="0x000000" />
+				<rom name="039-m1.m1" size="131072" crc="0c5b2ad5" sha1="15eb5ea10fecdbdbcfd06225ae6d88bb239592e7" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="3145728">
-				<rom name="039-v2.bin" size="2097152" crc="86d34b25" sha1="89bdb614b0c63d678962da52e2f596750d20828c" offset="0x000000" />
-				<rom name="039-v4.bin" size="1048576" crc="8fa62a0b" sha1="58ac2fdd73c542eb8178cfc4adfa0e5940183283" offset="0x200000" />
+				<rom name="039-v2.v2" size="2097152" crc="86d34b25" sha1="89bdb614b0c63d678962da52e2f596750d20828c" offset="0x000000" />
+				<rom name="039-v4.v4" size="1048576" crc="8fa62a0b" sha1="58ac2fdd73c542eb8178cfc4adfa0e5940183283" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sprites" size="6291456">
-				<rom name="039-c1.bin" size="1048576" crc="6d1c4aa9" sha1="4fbc9d7cb37522ec298eefbe38c75a2d050fbb4a" offset="0x000000" loadflag="load16_byte" />
+				<rom name="039-c1.c1" size="1048576" crc="6d1c4aa9" sha1="4fbc9d7cb37522ec298eefbe38c75a2d050fbb4a" offset="0x000000" loadflag="load16_byte" />
 				<rom size="1048576" offset="0x400000" loadflag="continue" />
-				<rom name="039-c2.bin" size="1048576" crc="f7b75337" sha1="4d85f85948c3e6ed38b0b0ccda79de3ce026e2d9" offset="0x000001" loadflag="load16_byte" />
+				<rom name="039-c2.c2" size="1048576" crc="f7b75337" sha1="4d85f85948c3e6ed38b0b0ccda79de3ce026e2d9" offset="0x000001" loadflag="load16_byte" />
 				<rom size="1048576" offset="0x400001" loadflag="continue" />
-				<rom name="039-c3.bin" size="524288" crc="bfc4f0b2" sha1="f4abe2b52882b966412f3b503b8f2c8f49b57968" offset="0x200000" loadflag="load16_byte" />
-				<rom name="039-c4.bin" size="524288" crc="81c9c250" sha1="e3a34ff69081a8681b5ca895915892dcdccfa7aa" offset="0x200001" loadflag="load16_byte" />
+				<rom name="039-c3.c3" size="524288" crc="bfc4f0b2" sha1="f4abe2b52882b966412f3b503b8f2c8f49b57968" offset="0x200000" loadflag="load16_byte" />
+				<rom name="039-c4.c4" size="524288" crc="81c9c250" sha1="e3a34ff69081a8681b5ca895915892dcdccfa7aa" offset="0x200001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 043 -->
+<!-- ID 042 (NGH-042) -->
+	<software name="quizdai2">
+		<description>Quiz Meitantei Neo &amp; Geo - Quiz Daisousa Sen part 2</description>
+		<year>1992</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="042-p1.p1" size="1048576" crc="ed719dcf" sha1="12baf2601e86c0e4358517b9fa1c55f2f5835f1d" offset="0x000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="042-s1.s1" size="131072" crc="164fd6e6" sha1="dad35bedc33d502a5ae745a45a972af8d901b160" offset="0x000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+				<rom name="042-m1.m1" size="131072" crc="bb19995d" sha1="ed458fad5a23c6bd0d099927d98c31e1e6562d1b" offset="0x000000" />
+				<rom size="131072" offset="0x010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="2097152">
+				<rom name="042-v1.v1" size="1048576" crc="af7f8247" sha1="99a47014017c20e4e22010c60612b6b7f6efc9e5" offset="0x000000" />
+				<rom name="042-v2.v2" size="1048576" crc="c6474b59" sha1="a6c5054032b698116247b2f09a8b94a1b588c4f1" offset="0x100000" />
+			</dataarea>
+			<dataarea name="sprites" size="3145728">
+				<rom name="042-c1.c1" size="1048576" crc="cb5809a1" sha1="b53d06685246dd51b82b5c1d54d639d10e2ec26d" offset="0x000000" loadflag="load16_byte" />
+				<rom name="042-c2.c2" size="1048576" crc="1436dfeb" sha1="27d136fb1be793bd345a741f5e55a977275fff86" offset="0x000001" loadflag="load16_byte" />
+				<rom name="042-c3.c3" size="524288" crc="bcd4a518" sha1="f355298fe0f2cf50ddcc0d613db56a5c04d7230f" offset="0x200000" loadflag="load16_byte" />
+				<rom name="042-c4.c4" size="524288" crc="d602219b" sha1="34cf0f16db1e224396464ac838f4cd2e6d1c640e" offset="0x200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 043 (NGH-043) -->
 <!-- Release Date - Japan: 23/04/1993 USA: 23/04/1993 -->
 	<software name="3countb">
 		<description>3 Count Bout / Fire Suplex</description>
@@ -974,33 +1003,33 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
-				<rom name="043-p1.bin" size="1048576" crc="ffbdd928" sha1="05b24655ca32723661adc5509b450824deb0c176" offset="0x000000" />
+				<rom name="043-p1.p1" size="1048576" crc="ffbdd928" sha1="05b24655ca32723661adc5509b450824deb0c176" offset="0x000000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-				<rom name="043-s1.bin" size="131072" crc="c362d484" sha1="a3c029292572842feabe9aa8c3372628fb63978d" offset="0x000000" />
+				<rom name="043-s1.s1" size="131072" crc="c362d484" sha1="a3c029292572842feabe9aa8c3372628fb63978d" offset="0x000000" />
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-				<rom name="043-m1.bin" size="131072" crc="7eab59cb" sha1="5ae4107457e091f73960bfba39b589ae36d51ca3" offset="0x000000" />
+				<rom name="043-m1.m1" size="131072" crc="7eab59cb" sha1="5ae4107457e091f73960bfba39b589ae36d51ca3" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="4194304">
-				<rom name="043-v1.bin" size="2097152" crc="63688ce8" sha1="5c6ac29a0cc0655a87cfe3ada8706838b86b86e4" offset="0x000000" />
-				<rom name="043-v2.bin" size="2097152" crc="c69a827b" sha1="f5197ea87bb6573fa6aef3a1713c3679c58c1e74" offset="0x200000" />
+				<rom name="043-v1.v1" size="2097152" crc="63688ce8" sha1="5c6ac29a0cc0655a87cfe3ada8706838b86b86e4" offset="0x000000" />
+				<rom name="043-v2.v2" size="2097152" crc="c69a827b" sha1="f5197ea87bb6573fa6aef3a1713c3679c58c1e74" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sprites" size="8388608">
-				<rom name="043-c1.bin" size="1048576" crc="bad2d67f" sha1="04928e50ca75b7fbc52b64e816ec5701901f5893" offset="0x000000" loadflag="load16_byte" />
+				<rom name="043-c1.c1" size="1048576" crc="bad2d67f" sha1="04928e50ca75b7fbc52b64e816ec5701901f5893" offset="0x000000" loadflag="load16_byte" />
 				<rom size="1048576" offset="0x400000" loadflag="continue" />
-				<rom name="043-c2.bin" size="1048576" crc="a7fbda95" sha1="9da3c5faf22592a7eaf8df9fa6454f48c2a927ae" offset="0x000001" loadflag="load16_byte" />
+				<rom name="043-c2.c2" size="1048576" crc="a7fbda95" sha1="9da3c5faf22592a7eaf8df9fa6454f48c2a927ae" offset="0x000001" loadflag="load16_byte" />
 				<rom size="1048576" offset="0x400001" loadflag="continue" />
-				<rom name="043-c3.bin" size="1048576" crc="f00be011" sha1="2721cdba37a511a966a2a53b9bd6240f181d920c" offset="0x200000" loadflag="load16_byte" />
+				<rom name="043-c3.c3" size="1048576" crc="f00be011" sha1="2721cdba37a511a966a2a53b9bd6240f181d920c" offset="0x200000" loadflag="load16_byte" />
 				<rom size="1048576" offset="0x600000" loadflag="continue" />
-				<rom name="043-c4.bin" size="1048576" crc="1887e5c0" sha1="9b915359add7c10c78d8b281b4084eceea8f0499" offset="0x200001" loadflag="load16_byte" />
+				<rom name="043-c4.c4" size="1048576" crc="1887e5c0" sha1="9b915359add7c10c78d8b281b4084eceea8f0499" offset="0x200001" loadflag="load16_byte" />
 				<rom size="1048576" offset="0x600001" loadflag="continue" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 044 -->
+<!-- ID 044 (NGH-044) -->
 <!-- Release Date - Japan: 11/12/1992 USA: 11/12/1992 -->
 	<software name="aof">
 		<description>Art of Fighting / Ryuuko no Ken</description>
@@ -1008,33 +1037,33 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
-                <rom name="044-p1.bin" size="524288" crc="ca9f7a6d" sha1="4d28ef86696f7e832510a66d3e8eb6c93b5b91a1" offset="0x000000" />
+                <rom name="044-p1.p1" size="524288" crc="ca9f7a6d" sha1="4d28ef86696f7e832510a66d3e8eb6c93b5b91a1" offset="0x000000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="044-s1.bin" size="131072" crc="89903f39" sha1="a04a0c244a5d5c7a595fcf649107969635a6a8b6" offset="0x000000"/>
+                <rom name="044-s1.s1" size="131072" crc="89903f39" sha1="a04a0c244a5d5c7a595fcf649107969635a6a8b6" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="044-m1.bin" size="131072" crc="0987e4bb" sha1="8fae4b7fac09d46d4727928e609ed9d3711dbded" offset="0x000000" />
+                <rom name="044-m1.m1" size="131072" crc="0987e4bb" sha1="8fae4b7fac09d46d4727928e609ed9d3711dbded" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="4194304">
-                <rom name="044-v2.bin" size="2097152" crc="3ec632ea" sha1="e3f413f580b57f70d2dae16dbdacb797884d3fce" offset="0x000000" />
-                <rom name="044-v4.bin" size="2097152" crc="4b0f8e23" sha1="105da0cc5ba19869c7147fba8b177500758c232b" offset="0x200000" />
+                <rom name="044-v2.v2" size="2097152" crc="3ec632ea" sha1="e3f413f580b57f70d2dae16dbdacb797884d3fce" offset="0x000000" />
+                <rom name="044-v4.v4" size="2097152" crc="4b0f8e23" sha1="105da0cc5ba19869c7147fba8b177500758c232b" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sprites" size="8388608">
-                <rom name="044-c1.bin" size="1048576" crc="ddab98a7" sha1="f20eb81ec431268798c142c482146c1545af1c24" offset="0x000000" loadflag="load16_byte" />
+                <rom name="044-c1.c1" size="1048576" crc="ddab98a7" sha1="f20eb81ec431268798c142c482146c1545af1c24" offset="0x000000" loadflag="load16_byte" />
                 <rom size="1048576" offset="0x400000" loadflag="continue" />
-                <rom name="044-c2.bin" size="1048576" crc="d8ccd575" sha1="f697263fe92164e274bf34c55327b3d4a158b332" offset="0x000001" loadflag="load16_byte" />
+                <rom name="044-c2.c2" size="1048576" crc="d8ccd575" sha1="f697263fe92164e274bf34c55327b3d4a158b332" offset="0x000001" loadflag="load16_byte" />
                 <rom size="1048576" offset="0x400001" loadflag="continue" />
-                <rom name="044-c3.bin" size="1048576" crc="403e898a" sha1="dd5888f8b24a33b2c1f483316fe80c17849ccfc4" offset="0x200000" loadflag="load16_byte" />
+                <rom name="044-c3.c3" size="1048576" crc="403e898a" sha1="dd5888f8b24a33b2c1f483316fe80c17849ccfc4" offset="0x200000" loadflag="load16_byte" />
                 <rom size="1048576" offset="0x600000" loadflag="continue" />
-                <rom name="044-c4.bin" size="1048576" crc="6235fbaa" sha1="9090e337d7beed25ba81ae0708d0aeb57e6cf405" offset="0x200001" loadflag="load16_byte" />
+                <rom name="044-c4.c4" size="1048576" crc="6235fbaa" sha1="9090e337d7beed25ba81ae0708d0aeb57e6cf405" offset="0x200001" loadflag="load16_byte" />
                 <rom size="1048576" offset="0x600001" loadflag="continue" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 045 -->
+<!-- ID 045 (NGH-045) -->
 <!-- Release Date - Japan: 11/08/1993 USA: 11/08/1993 -->
 	<software name="samsho">
 		<description>Samurai Shodown / Samurai Spirits</description>
@@ -1042,32 +1071,32 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1572864">
-                <rom name="045-p1.bin" size="1048576" crc="dfe51bf0" sha1="2243af3770a516ae698b69bcd9daf53632d9128d" offset="0x000000" />
-                <rom name="045-p2.bin" size="524288" crc="38ee9ba9" sha1="48190699a6be83cb6257365ae81f93fdd23abe09" offset="0x100000" />
+                <rom name="045-p1.p1" size="1048576" crc="dfe51bf0" sha1="2243af3770a516ae698b69bcd9daf53632d9128d" offset="0x000000" />
+                <rom name="045-p2.sp2" size="524288" crc="38ee9ba9" sha1="48190699a6be83cb6257365ae81f93fdd23abe09" offset="0x100000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="045-s1.bin" size="131072" crc="9142a4d3" sha1="54088e99fcfd75fd0f94852890a56350066a05a3" offset="0x000000"/>
+                <rom name="045-s1.s1" size="131072" crc="9142a4d3" sha1="54088e99fcfd75fd0f94852890a56350066a05a3" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="045-m1.bin" size="131072" crc="95170640" sha1="125c502db0693e8d11cef619b090081c14a9a300" offset="0x000000" />
+                <rom name="045-m1.m1" size="131072" crc="95170640" sha1="125c502db0693e8d11cef619b090081c14a9a300" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="4194304">
-                <rom name="045-v1.bin" size="2097152" crc="37f78a9b" sha1="6279b497d12fa90b49ab5ac3aae20fb302ec8b81" offset="0x000000" />
-                <rom name="045-v2.bin" size="2097152" crc="568b20cf" sha1="61af858685472a1fad608e230cccc2b108509ddb" offset="0x200000" />
+                <rom name="045-v1.v1" size="2097152" crc="37f78a9b" sha1="6279b497d12fa90b49ab5ac3aae20fb302ec8b81" offset="0x000000" />
+                <rom name="045-v2.v2" size="2097152" crc="568b20cf" sha1="61af858685472a1fad608e230cccc2b108509ddb" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sprites" size="9437184">
-                <rom name="045-c1.bin" size="2097152" crc="2e5873a4" sha1="65c74c1e2d34390666bbb630df7d1f4c9570c3db" offset="0x000000" loadflag="load16_byte" />
-                <rom name="045-c2.bin" size="2097152" crc="04febb10" sha1="16a8cbf0fd9468e81bf9eab6dbe7a8e3623a843e" offset="0x000001" loadflag="load16_byte" />
-                <rom name="045-c3.bin" size="2097152" crc="f3dabd1e" sha1="c80e52df42be9f8b2e89b467b11ab140a480cee8" offset="0x400000" loadflag="load16_byte" />
-                <rom name="045-c4.bin" size="2097152" crc="935c62f0" sha1="0053d40085fac14096b683f4341f65e543b71dc1" offset="0x400001" loadflag="load16_byte" />
-                <rom name="045-c5.bin" size="524288" crc="a2bb8284" sha1="aa118e3b8c062daa219b36758b9a3814c08c69dc" offset="0x800000" loadflag="load16_byte" />
-                <rom name="045-c6.bin" size="524288" crc="4fa71252" sha1="afe374a9d1f2d955a59efe7b6196b89e021b164c" offset="0x800001" loadflag="load16_byte" />
+                <rom name="045-c1.c1" size="2097152" crc="2e5873a4" sha1="65c74c1e2d34390666bbb630df7d1f4c9570c3db" offset="0x000000" loadflag="load16_byte" />
+                <rom name="045-c2.c2" size="2097152" crc="04febb10" sha1="16a8cbf0fd9468e81bf9eab6dbe7a8e3623a843e" offset="0x000001" loadflag="load16_byte" />
+                <rom name="045-c3.c3" size="2097152" crc="f3dabd1e" sha1="c80e52df42be9f8b2e89b467b11ab140a480cee8" offset="0x400000" loadflag="load16_byte" />
+                <rom name="045-c4.c4" size="2097152" crc="935c62f0" sha1="0053d40085fac14096b683f4341f65e543b71dc1" offset="0x400001" loadflag="load16_byte" />
+                <rom name="045-c5.c5" size="524288" crc="a2bb8284" sha1="aa118e3b8c062daa219b36758b9a3814c08c69dc" offset="0x800000" loadflag="load16_byte" />
+                <rom name="045-c6.c6" size="524288" crc="4fa71252" sha1="afe374a9d1f2d955a59efe7b6196b89e021b164c" offset="0x800001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 046 -->
+<!-- ID 046 (NGH-046) -->
 <!-- Release Date - Japan: 24/06/1994 USA: 24/06/1994 -->
 	<software name="tophuntr">
 		<description>Top Hunter - Roddy and Cathy</description>
@@ -1075,36 +1104,36 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="2097152">
-                <rom name="046-pg1.bin" size="1048576" crc="771e39bc" sha1="c0e05fd1ca81926438bb75e2fa6894e40ab6521e" offset="0x000000" />
-                <rom name="046-p2.bin" size="1048576" crc="f182cb3e" sha1="6b4e0af5d4e623f0682f37ff5c69e5b705e20028" offset="0x100000" />
+                <rom name="046-pg1.p1" size="1048576" crc="771e39bc" sha1="c0e05fd1ca81926438bb75e2fa6894e40ab6521e" offset="0x000000" />
+                <rom name="046-p2.sp2" size="1048576" crc="f182cb3e" sha1="6b4e0af5d4e623f0682f37ff5c69e5b705e20028" offset="0x100000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="046-s1.bin" size="131072" crc="92e9ac8c" sha1="cab5c77c091e8d12d9c3a2cc8d741b74e4386efb" offset="0x000000"/>
+                <rom name="046-s1.s1" size="131072" crc="92e9ac8c" sha1="cab5c77c091e8d12d9c3a2cc8d741b74e4386efb" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="046-m1.bin" size="131072" crc="3f84bb9f" sha1="07446040871d11da3c2217ee9d1faf8c3cae7420" offset="0x000000" />
+                <rom name="046-m1.m1" size="131072" crc="3f84bb9f" sha1="07446040871d11da3c2217ee9d1faf8c3cae7420" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="4194304">
-                <rom name="046-v1.bin" size="1048576" crc="c1f9c2db" sha1="bed95a76afefa46503a12e0f0a9787c4c967ac50" offset="0x000000" />
-                <rom name="046-v2.bin" size="1048576" crc="56254a64" sha1="1cf049cb4c414419859d2c8ee714317a35a85251" offset="0x100000" />
-                <rom name="046-v3.bin" size="1048576" crc="58113fb1" sha1="40972982a63c7adecef840f9882f4165da723ab6" offset="0x200000" />
-                <rom name="046-v4.bin" size="1048576" crc="4f54c187" sha1="63a76949301b83bdd44aa1a4462f642ab9ca3c0b" offset="0x300000" />
+                <rom name="046-v1.v1" size="1048576" crc="c1f9c2db" sha1="bed95a76afefa46503a12e0f0a9787c4c967ac50" offset="0x000000" />
+                <rom name="046-v2.v2" size="1048576" crc="56254a64" sha1="1cf049cb4c414419859d2c8ee714317a35a85251" offset="0x100000" />
+                <rom name="046-v3.v3" size="1048576" crc="58113fb1" sha1="40972982a63c7adecef840f9882f4165da723ab6" offset="0x200000" />
+                <rom name="046-v4.v4" size="1048576" crc="4f54c187" sha1="63a76949301b83bdd44aa1a4462f642ab9ca3c0b" offset="0x300000" />
 			</dataarea>
 			<dataarea name="sprites" size="8388608">
-                <rom name="046-c1.bin" size="1048576" crc="fa720a4a" sha1="364913b9fa40d46e4e39ae3cdae914cfd0de137d" offset="0x000000" loadflag="load16_byte" />
-                <rom name="046-c2.bin" size="1048576" crc="c900c205" sha1="50274e79aa26f334eb806288688b30720bade883" offset="0x000001" loadflag="load16_byte" />
-                <rom name="046-c3.bin" size="1048576" crc="880e3c25" sha1="b6974af0c833b766866919b6f15b6f8cef82530d" offset="0x200000" loadflag="load16_byte" />
-                <rom name="046-c4.bin" size="1048576" crc="7a2248aa" sha1="8af0b26025a54e3b91604dd24a3c1c518fbd8536" offset="0x200001" loadflag="load16_byte" />
-                <rom name="046-c5.bin" size="1048576" crc="4b735e45" sha1="2f8b46388c4696aee6a97e1e21cdadf6b142b01a" offset="0x400000" loadflag="load16_byte" />
-                <rom name="046-c6.bin" size="1048576" crc="273171df" sha1="9c35832221e016c12ef1ed71da167f565daaf86c" offset="0x400001" loadflag="load16_byte" />
-                <rom name="046-c7.bin" size="1048576" crc="12829c4c" sha1="ac5f3d848d7116fc35c97f53a72c85e049dd3a2f" offset="0x600000" loadflag="load16_byte" />
-                <rom name="046-c8.bin" size="1048576" crc="c944e03d" sha1="be23999b8ce09ee15ba500ce4d5e2a82a4f58d9b" offset="0x600001" loadflag="load16_byte" />
+                <rom name="046-c1.c1" size="1048576" crc="fa720a4a" sha1="364913b9fa40d46e4e39ae3cdae914cfd0de137d" offset="0x000000" loadflag="load16_byte" />
+                <rom name="046-c2.c2" size="1048576" crc="c900c205" sha1="50274e79aa26f334eb806288688b30720bade883" offset="0x000001" loadflag="load16_byte" />
+                <rom name="046-c3.c3" size="1048576" crc="880e3c25" sha1="b6974af0c833b766866919b6f15b6f8cef82530d" offset="0x200000" loadflag="load16_byte" />
+                <rom name="046-c4.c4" size="1048576" crc="7a2248aa" sha1="8af0b26025a54e3b91604dd24a3c1c518fbd8536" offset="0x200001" loadflag="load16_byte" />
+                <rom name="046-c5.c5" size="1048576" crc="4b735e45" sha1="2f8b46388c4696aee6a97e1e21cdadf6b142b01a" offset="0x400000" loadflag="load16_byte" />
+                <rom name="046-c6.c6" size="1048576" crc="273171df" sha1="9c35832221e016c12ef1ed71da167f565daaf86c" offset="0x400001" loadflag="load16_byte" />
+                <rom name="046-c7.c7" size="1048576" crc="12829c4c" sha1="ac5f3d848d7116fc35c97f53a72c85e049dd3a2f" offset="0x600000" loadflag="load16_byte" />
+                <rom name="046-c8.c8" size="1048576" crc="c944e03d" sha1="be23999b8ce09ee15ba500ce4d5e2a82a4f58d9b" offset="0x600001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 047 -->
+<!-- ID 047 (NGH-047) -->
 <!-- Release Date - Japan: 05/03/1993 USA: 05/03/1993 -->
 	<software name="fatfury2">
 		<description>Fatal Fury 2 / Garou Densetsu 2 - arata-naru tatakai</description>
@@ -1113,34 +1142,34 @@
 		<part name="cart" interface="aes_cart">
 			<feature name="crypt" value="fatfury2_prot" />
 			<dataarea name="maincpu" size="1048576">
-                <rom name="047-p1.bin" size="524288" crc="be40ea92" sha1="958b891bb8beb6af122d5467257ab20cbc6cf574" offset="0x000000" />
-                <rom name="047-p2.bin" size="524288" crc="2a9beac5" sha1="61378f89d64fef4c172825694f83229c2ab1a7af" offset="0x080000" />
+                <rom name="047-p1.p1" size="1048576" crc="ecfdbb69" sha1="59e2f137c6eaf043df4ddae865a9159a10265c60" offset="0x000000" />
+                <!-- The original p1 is 8mbit; also found sets with p1 / p2 4mbit on eprom. -->
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="047-s1.bin" size="131072" crc="d7dbbf39" sha1="29253e596f475ebd41a6e3bb53952e3a0ccd2eed" offset="0x000000"/>
+                <rom name="047-s1.s1" size="131072" crc="d7dbbf39" sha1="29253e596f475ebd41a6e3bb53952e3a0ccd2eed" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="047-m1.bin" size="131072" crc="820b0ba7" sha1="5708248d89446e49184eaadb52f7c61b2b6c13c5" offset="0x000000" />
+                <rom name="047-m1.m1" size="131072" crc="820b0ba7" sha1="5708248d89446e49184eaadb52f7c61b2b6c13c5" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="4194304">
-                <rom name="047-v1.bin" size="2097152" crc="d9d00784" sha1="f6a91eada8c23aa4518c4b82eeebca69f79d845c" offset="0x000000" />
-                <rom name="047-v2.bin" size="2097152" crc="2c9a4b33" sha1="d4a1c0951c02c8919b3ec32ed96933634ff9e54c" offset="0x200000" />
+                <rom name="047-v1.v1" size="2097152" crc="d9d00784" sha1="f6a91eada8c23aa4518c4b82eeebca69f79d845c" offset="0x000000" />
+                <rom name="047-v2.v2" size="2097152" crc="2c9a4b33" sha1="d4a1c0951c02c8919b3ec32ed96933634ff9e54c" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sprites" size="8388608">
-                <rom name="047-c1.bin" size="1048576" crc="f72a939e" sha1="67fc398ec28061adca0d3be82bbe7297015800da" offset="0x000000" loadflag="load16_byte" />
+                <rom name="047-c1.c1" size="1048576" crc="f72a939e" sha1="67fc398ec28061adca0d3be82bbe7297015800da" offset="0x000000" loadflag="load16_byte" />
                 <rom size="1048576" offset="0x400000" loadflag="continue" />
-                <rom name="047-c2.bin" size="1048576" crc="05119a0d" sha1="c2f100b73eb04f65b6ba6089d49aceb51b470ec6" offset="0x000001" loadflag="load16_byte" />
+                <rom name="047-c2.c2" size="1048576" crc="05119a0d" sha1="c2f100b73eb04f65b6ba6089d49aceb51b470ec6" offset="0x000001" loadflag="load16_byte" />
                 <rom size="1048576" offset="0x400001" loadflag="continue" />
-                <rom name="047-c3.bin" size="1048576" crc="01e00738" sha1="79654f24d777dd5eb68bafc3b8cb9db71d5822e2" offset="0x200000" loadflag="load16_byte" />
+                <rom name="047-c3.c3" size="1048576" crc="01e00738" sha1="79654f24d777dd5eb68bafc3b8cb9db71d5822e2" offset="0x200000" loadflag="load16_byte" />
                 <rom size="1048576" offset="0x600000" loadflag="continue" />
-                <rom name="047-c4.bin" size="1048576" crc="9fe27432" sha1="89d22d77ba8bc6d1f6c974195c34ad61b9010de7" offset="0x200001" loadflag="load16_byte" />
+                <rom name="047-c4.c4" size="1048576" crc="9fe27432" sha1="89d22d77ba8bc6d1f6c974195c34ad61b9010de7" offset="0x200001" loadflag="load16_byte" />
                 <rom size="1048576" offset="0x600001" loadflag="continue" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 049 -->
+<!-- ID 049 (NGH-049) -->
 <!-- Release Date - Japan: 17/07/1992 USA: 17/07/1992 -->
 	<software name="androdun">
 		<description>Andro Dunos</description>
@@ -1148,27 +1177,27 @@
 		<publisher>Visco</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
-                <rom name="049-p1.bin" size="524288" crc="3b857da2" sha1="4dd86c739944696c16c3cdd85935d6dfa9fdc276" offset="0x000000" />
-                <rom name="049-p2.bin" size="524288" crc="2f062209" sha1="991cf3e3677929b2cc0b2787b0c7b6ad3700f618" offset="0x080000" />
+                <rom name="049-p1.p1" size="524288" crc="3b857da2" sha1="4dd86c739944696c16c3cdd85935d6dfa9fdc276" offset="0x000000" />
+                <rom name="049-p2.p2" size="524288" crc="2f062209" sha1="991cf3e3677929b2cc0b2787b0c7b6ad3700f618" offset="0x080000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="049-s1.bin" size="131072" crc="6349de5d" sha1="bcc44b9576d7bedd9a39294530bb66f707690c72" offset="0x000000"/>
+                <rom name="049-s1.s1" size="131072" crc="6349de5d" sha1="bcc44b9576d7bedd9a39294530bb66f707690c72" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="049-m1.bin" size="131072" crc="edd2acf4" sha1="c4ee6ba834d54b9fc5a854dbc41a05877e090371" offset="0x000000" />
+                <rom name="049-m1.m1" size="131072" crc="edd2acf4" sha1="c4ee6ba834d54b9fc5a854dbc41a05877e090371" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="1048576">
-                <rom name="049-v1.bin" size="1048576" crc="ce43cb89" sha1="47f82e077abb6efc6b1b0490412ae147d5d2acef" offset="0x000000" />
+                <rom name="049-v1.v1" size="1048576" crc="ce43cb89" sha1="47f82e077abb6efc6b1b0490412ae147d5d2acef" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sprites" size="2097152">
-                <rom name="049-c1.bin" size="1048576" crc="7ace6db3" sha1="c41cc9de8c0788dcc49ca494fd3bb3124062d9dd" offset="0x000000" loadflag="load16_byte" />
-                <rom name="049-c2.bin" size="1048576" crc="b17024f7" sha1="fcf7efae48fcdccaf5255c145de414fb246128f0" offset="0x000001" loadflag="load16_byte" />
+                <rom name="049-c1.c1" size="1048576" crc="7ace6db3" sha1="c41cc9de8c0788dcc49ca494fd3bb3124062d9dd" offset="0x000000" loadflag="load16_byte" />
+                <rom name="049-c2.c2" size="1048576" crc="b17024f7" sha1="fcf7efae48fcdccaf5255c145de414fb246128f0" offset="0x000001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 053 -->
+<!-- ID 053 (ALH-005) -->
 <!-- Release Date - Japan: 11/09/1992 USA: 11/09/1992 -->
 	<software name="wh1">
 		<description>World Heroes</description>
@@ -1176,32 +1205,32 @@
 		<publisher>Alpha Denshi</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
-                <rom name="053-p1.bin" size="524288" crc="95b574cb" sha1="b7b7af6a04c3d902e7f8852897741ecaf0b1062c" offset="0x000000" />
-                <rom name="053-p2.bin" size="524288" crc="f198ed45" sha1="24ccc091e97f63796562bb5b30df51f39bd504ef" offset="0x080000" />
+                <rom name="053-p1.p1" size="524288" crc="95b574cb" sha1="b7b7af6a04c3d902e7f8852897741ecaf0b1062c" offset="0x000000" />
+                <rom name="053-p2.p2" size="524288" crc="f198ed45" sha1="24ccc091e97f63796562bb5b30df51f39bd504ef" offset="0x080000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="053-s1.bin" size="131072" crc="8c2c2d6b" sha1="87fa79611c6f8886dcc8766814829c669c65b40f" offset="0x000000"/>
+                <rom name="053-s1.s1" size="131072" crc="8c2c2d6b" sha1="87fa79611c6f8886dcc8766814829c669c65b40f" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="053-m1.bin" size="131072" crc="1bd9d04b" sha1="65cd7b002123ed1a3111e3d942608d0082799ff3" offset="0x000000" />
+                <rom name="053-m1.m1" size="131072" crc="1bd9d04b" sha1="65cd7b002123ed1a3111e3d942608d0082799ff3" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="3145728">
-                <rom name="053-v2.bin" size="2097152" crc="a68df485" sha1="007fa715423fba72c899cd3db3f4bec13281cf7a" offset="0x000000" />
-                <rom name="053-v4.bin" size="1048576" crc="7bea8f66" sha1="428e8721bd87f7faa756adb1e12672219be46c1d" offset="0x200000" />
+                <rom name="053-v2.v2" size="2097152" crc="a68df485" sha1="007fa715423fba72c899cd3db3f4bec13281cf7a" offset="0x000000" />
+                <rom name="053-v4.v4" size="1048576" crc="7bea8f66" sha1="428e8721bd87f7faa756adb1e12672219be46c1d" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sprites" size="6291456">
-                <rom name="053-c1.bin" size="1048576" crc="85eb5bce" sha1="3d03d29296ca6e6b5106aac4aaeec9d4b4ed1313" offset="0x000000" loadflag="load16_byte" />
+                <rom name="053-c1.c1" size="1048576" crc="85eb5bce" sha1="3d03d29296ca6e6b5106aac4aaeec9d4b4ed1313" offset="0x000000" loadflag="load16_byte" />
                 <rom size="1048576" offset="0x400000" loadflag="continue" />
-                <rom name="053-c2.bin" size="1048576" crc="ec93b048" sha1="d4159210df94e259f874a4671d271ec27be13451" offset="0x000001" loadflag="load16_byte" />
+                <rom name="053-c2.c2" size="1048576" crc="ec93b048" sha1="d4159210df94e259f874a4671d271ec27be13451" offset="0x000001" loadflag="load16_byte" />
                 <rom size="1048576" offset="0x400001" loadflag="continue" />
-                <rom name="053-c3.bin" size="1048576" crc="0dd64965" sha1="e97b3b8a461da5e8861b3dfdacb25e007ced37a1" offset="0x200000" loadflag="load16_byte" />
-                <rom name="053-c4.bin" size="1048576" crc="9270d954" sha1="a2ef909868f6b06cdcc22a63ddf6c96be12b999c" offset="0x200001" loadflag="load16_byte" />
+                <rom name="053-c3.c3" size="1048576" crc="0dd64965" sha1="e97b3b8a461da5e8861b3dfdacb25e007ced37a1" offset="0x200000" loadflag="load16_byte" />
+                <rom name="053-c4.c4" size="1048576" crc="9270d954" sha1="a2ef909868f6b06cdcc22a63ddf6c96be12b999c" offset="0x200001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 055 -->
+<!-- ID 055 (NGH-055) -->
 <!-- Release Date - Japan: 01/10/1994 USA: 01/10/1994 -->
 	<software name="kof94">
 		<description>The King of Fighters '94</description>
@@ -1209,105 +1238,72 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="2097152">
-                <rom name="055-pg1.bin" size="1048576" crc="f10a2042" sha1="d08a3f3c28be4b1793de7d362456281329fe1828" offset="0x100000" />
+                <rom name="055-pg1.p1" size="1048576" crc="f10a2042" sha1="d08a3f3c28be4b1793de7d362456281329fe1828" offset="0x100000" />
                 <rom size="1048576" offset="0x000000" loadflag="continue" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="055-s1.bin" size="131072" crc="825976c1" sha1="cb6a70bdd95d449d25196ca269b621c362db6743" offset="0x000000"/>
+                <rom name="055-s1.s1" size="131072" crc="825976c1" sha1="cb6a70bdd95d449d25196ca269b621c362db6743" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="055-m1.bin" size="131072" crc="f6e77cf5" sha1="292a3e3a4918ffe72bd1c41acb927b91844e035e" offset="0x000000" />
+                <rom name="055-m1.m1" size="131072" crc="f6e77cf5" sha1="292a3e3a4918ffe72bd1c41acb927b91844e035e" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="6291456">
-                <rom name="055-v1.bin" size="2097152" crc="8889596d" sha1="c9ce713b720511438dbd3fe3bcc7c246f475c6a2" offset="0x000000" />
-                <rom name="055-v2.bin" size="2097152" crc="25022b27" sha1="2b040a831c3c92ac6e4719de38009a0d55b64f6b" offset="0x200000" />
-                <rom name="055-v3.bin" size="2097152" crc="83cf32c0" sha1="34a31a37eb10945b5169e96321bcea06eec33a00" offset="0x400000" />
+                <rom name="055-v1.v1" size="2097152" crc="8889596d" sha1="c9ce713b720511438dbd3fe3bcc7c246f475c6a2" offset="0x000000" />
+                <rom name="055-v2.v2" size="2097152" crc="25022b27" sha1="2b040a831c3c92ac6e4719de38009a0d55b64f6b" offset="0x200000" />
+                <rom name="055-v3.v3" size="2097152" crc="83cf32c0" sha1="34a31a37eb10945b5169e96321bcea06eec33a00" offset="0x400000" />
 			</dataarea>
 			<dataarea name="sprites" size="16777216">
-                <rom name="055-c1.bin" size="2097152" crc="b96ef460" sha1="e52f5303c17b50ce165c008be2837336369c110b" offset="0x000000" loadflag="load16_byte" />
-                <rom name="055-c2.bin" size="2097152" crc="15e096a7" sha1="237c2a3d059de00bfca66e0016ed325d7a32bfec" offset="0x000001" loadflag="load16_byte" />
-                <rom name="055-c3.bin" size="2097152" crc="54f66254" sha1="c594384bcd8b03beb8c595591505fecc44b185ac" offset="0x400000" loadflag="load16_byte" />
-                <rom name="055-c4.bin" size="2097152" crc="0b01765f" sha1="ec1fdcc944611408367bf5023d4ebe7edd9dfa88" offset="0x400001" loadflag="load16_byte" />
-                <rom name="055-c5.bin" size="2097152" crc="ee759363" sha1="8a5621c1b1f8267b9b9b6a14ab4944de542e1945" offset="0x800000" loadflag="load16_byte" />
-                <rom name="055-c6.bin" size="2097152" crc="498da52c" sha1="1e6e6202ee053a5261db889177ce3a087e078bda" offset="0x800001" loadflag="load16_byte" />
-                <rom name="055-c7.bin" size="2097152" crc="62f66888" sha1="ac91a0eab0753bee175ad40213a4ae5d38ed5b87" offset="0xc00000" loadflag="load16_byte" />
-                <rom name="055-c8.bin" size="2097152" crc="fe0a235d" sha1="a45c66836e4e3c77dfef9d4c6cc422cb59169149" offset="0xc00001" loadflag="load16_byte" />
+                <rom name="055-c1.c1" size="2097152" crc="b96ef460" sha1="e52f5303c17b50ce165c008be2837336369c110b" offset="0x000000" loadflag="load16_byte" />
+                <rom name="055-c2.c2" size="2097152" crc="15e096a7" sha1="237c2a3d059de00bfca66e0016ed325d7a32bfec" offset="0x000001" loadflag="load16_byte" />
+                <rom name="055-c3.c3" size="2097152" crc="54f66254" sha1="c594384bcd8b03beb8c595591505fecc44b185ac" offset="0x400000" loadflag="load16_byte" />
+                <rom name="055-c4.c4" size="2097152" crc="0b01765f" sha1="ec1fdcc944611408367bf5023d4ebe7edd9dfa88" offset="0x400001" loadflag="load16_byte" />
+                <rom name="055-c5.c5" size="2097152" crc="ee759363" sha1="8a5621c1b1f8267b9b9b6a14ab4944de542e1945" offset="0x800000" loadflag="load16_byte" />
+                <rom name="055-c6.c6" size="2097152" crc="498da52c" sha1="1e6e6202ee053a5261db889177ce3a087e078bda" offset="0x800001" loadflag="load16_byte" />
+                <rom name="055-c7.c7" size="2097152" crc="62f66888" sha1="ac91a0eab0753bee175ad40213a4ae5d38ed5b87" offset="0xc00000" loadflag="load16_byte" />
+                <rom name="055-c8.c8" size="2097152" crc="fe0a235d" sha1="a45c66836e4e3c77dfef9d4c6cc422cb59169149" offset="0xc00001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 056 -->
+<!-- ID 056 (NGH-056) -->
 <!-- Release Date - Japan: 11/03/1994 USA: 11/03/1994 -->
 	<software name="aof2">
-		<description>Art of Fighting 2 / Ryuuko no Ken 2</description>
-		<year>1994</year>
-		<publisher>SNK</publisher>
-		<part name="cart" interface="aes_cart">
-			<dataarea name="maincpu" size="1048576">
-                <rom name="056-p1.bin" size="1048576" crc="a3b1d021" sha1="ee42f3ca4516226b0088d0303ed28e3ecdabcd71" offset="0x000000" />
-			</dataarea>
-			<dataarea name="fixed" size="262144">
-                <rom name="056-s1.bin" size="131072" crc="8b02638e" sha1="aa4d28804ca602da776948b5f223ea89e427906b" offset="0x000000"/>
-			</dataarea>
-			<dataarea name="audiocpu" size="196608">
-                <rom name="056-m1.bin" size="131072" crc="f27e9d52" sha1="dddae733d87ce7c88ad2580a8f64cb6ff9572e67" offset="0x000000" />
-				<rom size="131072" offset="0x010000" loadflag="reload" />
-			</dataarea>
-			<dataarea name="ymsnd" size="5242880">
-                <rom name="056-v1.bin" size="2097152" crc="4628fde0" sha1="ece2a50f5270d844d58401b1447d1d856d78ea45" offset="0x000000" />
-                <rom name="056-v2.bin" size="2097152" crc="b710e2f2" sha1="df4da585203eea7554d3ce718eb107e9cb6a0254" offset="0x200000" />
-                <rom name="056-v3.bin" size="1048576" crc="d168c301" sha1="969273d1d11943e81560959359a2c4e69522af0e" offset="0x400000" />
-			</dataarea>
-			<dataarea name="sprites" size="16777216">
-                <rom name="056-c1.bin" size="2097152" crc="17b9cbd2" sha1="1eee81e02763d384bd1c10a6012473ca931e4093" offset="0x000000" loadflag="load16_byte" />
-                <rom name="056-c2.bin" size="2097152" crc="5fd76b67" sha1="11925a41a53b53c6df4a5ebd28f98300950f743b" offset="0x000001" loadflag="load16_byte" />
-                <rom name="056-c3.bin" size="2097152" crc="d2c88768" sha1="22e2d84aa0c095944190e249ce87ef50d3f7b8ce" offset="0x400000" loadflag="load16_byte" />
-                <rom name="056-c4.bin" size="2097152" crc="db39b883" sha1="59de86c513dc4e230ae25d9e3b7e84621b657b54" offset="0x400001" loadflag="load16_byte" />
-                <rom name="056-c5.bin" size="2097152" crc="c3074137" sha1="9a75e3d63cb98d54f900dcfb3a03e21f3148d32f" offset="0x800000" loadflag="load16_byte" />
-                <rom name="056-c6.bin" size="2097152" crc="31de68d3" sha1="13ba7046cdd6863125f8284e60f102d4720af5a4" offset="0x800001" loadflag="load16_byte" />
-                <rom name="056-c7.bin" size="2097152" crc="3f36df57" sha1="79ee97e9ae811a51141b535633f90e1491209d54" offset="0xc00000" loadflag="load16_byte" />
-                <rom name="056-c8.bin" size="2097152" crc="e546d7a8" sha1="74a2fca994a5a93a5784a46c0f68193122456a09" offset="0xc00001" loadflag="load16_byte" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="aof2a" cloneof="aof2">
 		<description>Art of Fighting 2 / Ryuuko no Ken 2 (set 2)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
-                <rom name="056-p1.bin" size="1048576" crc="a3b1d021" sha1="ee42f3ca4516226b0088d0303ed28e3ecdabcd71" offset="0x000000" />
+                <rom name="056-p1.p1" size="1048576" crc="a3b1d021" sha1="ee42f3ca4516226b0088d0303ed28e3ecdabcd71" offset="0x000000" />
                 <!-- patch ROM -->
-                <rom name="056-ep1.bin" size="524288" crc="75d6301c" sha1="e72d15fba55f96be7b4fa29e705a7b78f56edf7d" offset="0x000000" />
+                <rom name="056-epr.ep1" size="524288" crc="75d6301c" sha1="e72d15fba55f96be7b4fa29e705a7b78f56edf7d" offset="0x000000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="056-s1.bin" size="131072" crc="8b02638e" sha1="aa4d28804ca602da776948b5f223ea89e427906b" offset="0x000000"/>
+                <rom name="056-s1.s1" size="131072" crc="8b02638e" sha1="aa4d28804ca602da776948b5f223ea89e427906b" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="056-m1.bin" size="131072" crc="f27e9d52" sha1="dddae733d87ce7c88ad2580a8f64cb6ff9572e67" offset="0x000000" />
+                <rom name="056-m1.m1" size="131072" crc="f27e9d52" sha1="dddae733d87ce7c88ad2580a8f64cb6ff9572e67" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="5242880">
-                <rom name="056-v1.bin" size="2097152" crc="4628fde0" sha1="ece2a50f5270d844d58401b1447d1d856d78ea45" offset="0x000000" />
-                <rom name="056-v2.bin" size="2097152" crc="b710e2f2" sha1="df4da585203eea7554d3ce718eb107e9cb6a0254" offset="0x200000" />
-                <rom name="056-v3.bin" size="1048576" crc="d168c301" sha1="969273d1d11943e81560959359a2c4e69522af0e" offset="0x400000" />
+                <rom name="056-v1.v1" size="2097152" crc="4628fde0" sha1="ece2a50f5270d844d58401b1447d1d856d78ea45" offset="0x000000" />
+                <rom name="056-v2.v2" size="2097152" crc="b710e2f2" sha1="df4da585203eea7554d3ce718eb107e9cb6a0254" offset="0x200000" />
+                <rom name="056-v3.v3" size="1048576" crc="d168c301" sha1="969273d1d11943e81560959359a2c4e69522af0e" offset="0x400000" />
 			</dataarea>
 			<dataarea name="sprites" size="16777216">
-                <rom name="056-c1.bin" size="2097152" crc="17b9cbd2" sha1="1eee81e02763d384bd1c10a6012473ca931e4093" offset="0x000000" loadflag="load16_byte" />
-                <rom name="056-c2.bin" size="2097152" crc="5fd76b67" sha1="11925a41a53b53c6df4a5ebd28f98300950f743b" offset="0x000001" loadflag="load16_byte" />
-                <rom name="056-c3.bin" size="2097152" crc="d2c88768" sha1="22e2d84aa0c095944190e249ce87ef50d3f7b8ce" offset="0x400000" loadflag="load16_byte" />
-                <rom name="056-c4.bin" size="2097152" crc="db39b883" sha1="59de86c513dc4e230ae25d9e3b7e84621b657b54" offset="0x400001" loadflag="load16_byte" />
-                <rom name="056-c5.bin" size="2097152" crc="c3074137" sha1="9a75e3d63cb98d54f900dcfb3a03e21f3148d32f" offset="0x800000" loadflag="load16_byte" />
-                <rom name="056-c6.bin" size="2097152" crc="31de68d3" sha1="13ba7046cdd6863125f8284e60f102d4720af5a4" offset="0x800001" loadflag="load16_byte" />
-                <rom name="056-c7.bin" size="2097152" crc="3f36df57" sha1="79ee97e9ae811a51141b535633f90e1491209d54" offset="0xc00000" loadflag="load16_byte" />
-                <rom name="056-c8.bin" size="2097152" crc="e546d7a8" sha1="74a2fca994a5a93a5784a46c0f68193122456a09" offset="0xc00001" loadflag="load16_byte" />
+                <rom name="056-c1.c1" size="2097152" crc="17b9cbd2" sha1="1eee81e02763d384bd1c10a6012473ca931e4093" offset="0x000000" loadflag="load16_byte" />
+                <rom name="056-c2.c2" size="2097152" crc="5fd76b67" sha1="11925a41a53b53c6df4a5ebd28f98300950f743b" offset="0x000001" loadflag="load16_byte" />
+                <rom name="056-c3.c3" size="2097152" crc="d2c88768" sha1="22e2d84aa0c095944190e249ce87ef50d3f7b8ce" offset="0x400000" loadflag="load16_byte" />
+                <rom name="056-c4.c4" size="2097152" crc="db39b883" sha1="59de86c513dc4e230ae25d9e3b7e84621b657b54" offset="0x400001" loadflag="load16_byte" />
+                <rom name="056-c5.c5" size="2097152" crc="c3074137" sha1="9a75e3d63cb98d54f900dcfb3a03e21f3148d32f" offset="0x800000" loadflag="load16_byte" />
+                <rom name="056-c6.c6" size="2097152" crc="31de68d3" sha1="13ba7046cdd6863125f8284e60f102d4720af5a4" offset="0x800001" loadflag="load16_byte" />
+                <rom name="056-c7.c7" size="2097152" crc="3f36df57" sha1="79ee97e9ae811a51141b535633f90e1491209d54" offset="0xc00000" loadflag="load16_byte" />
+                <rom name="056-c8.c8" size="2097152" crc="e546d7a8" sha1="74a2fca994a5a93a5784a46c0f68193122456a09" offset="0xc00001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 057 -->
+<!-- ID 057 (ALH-006) -->
 <!-- Release Date - Japan: 04/06/1993 USA: 04/06/1993 -->
 	<software name="wh2">
 		<description>World Heroes 2</description>
@@ -1315,32 +1311,32 @@
 		<publisher>ADK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="2097152">
-                <rom name="057-p1.bin" size="1048576" crc="65a891d9" sha1="ff8d5ccb0dd22c523902bb3db3c645583a335056" offset="0x100000" />
+                <rom name="057-p1.p1" size="1048576" crc="65a891d9" sha1="ff8d5ccb0dd22c523902bb3db3c645583a335056" offset="0x100000" />
                 <rom size="1048576" offset="0x000000" loadflag="continue" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="057-s1.bin" size="131072" crc="fcaeb3a4" sha1="1f3f85e38b8552333261c04ae5af0d6e3b310622" offset="0x000000"/>
+                <rom name="057-s1.s1" size="131072" crc="fcaeb3a4" sha1="1f3f85e38b8552333261c04ae5af0d6e3b310622" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="057-m1.bin" size="131072" crc="8fa3bc77" sha1="982f92978671e4ee66630948e6bb7565b37b5dc0" offset="0x000000" />
+                <rom name="057-m1.m1" size="131072" crc="8fa3bc77" sha1="982f92978671e4ee66630948e6bb7565b37b5dc0" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="4194304">
-                <rom name="057-v1.bin" size="2097152" crc="8877e301" sha1="1bab988d74ea8fd12db201c257ec844622cf5f4e" offset="0x000000" />
-                <rom name="057-v2.bin" size="2097152" crc="c1317ff4" sha1="4c28b2b5998abaeaa5143f2f3a9ba52c6041f4f3" offset="0x200000" />
+                <rom name="057-v1.v1" size="2097152" crc="8877e301" sha1="1bab988d74ea8fd12db201c257ec844622cf5f4e" offset="0x000000" />
+                <rom name="057-v2.v2" size="2097152" crc="c1317ff4" sha1="4c28b2b5998abaeaa5143f2f3a9ba52c6041f4f3" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sprites" size="12582912">
-                <rom name="057-c1.bin" size="2097152" crc="21c6bb91" sha1="a2c17d0c91dd59528d8fa7fe110af8b20b25ff99" offset="0x000000" loadflag="load16_byte" />
-                <rom name="057-c2.bin" size="2097152" crc="a3999925" sha1="0ee861a77850d378d03c1bf00b9692abd860c759" offset="0x000001" loadflag="load16_byte" />
-                <rom name="057-c3.bin" size="2097152" crc="b725a219" sha1="4857687d156a9150a69b97d2729245a51c144a0c" offset="0x400000" loadflag="load16_byte" />
-                <rom name="057-c4.bin" size="2097152" crc="8d96425e" sha1="0f79c868a6a33ad25e38d842f30ec4440d809033" offset="0x400001" loadflag="load16_byte" />
-                <rom name="057-c5.bin" size="2097152" crc="b20354af" sha1="da7609fd467f2f4d71d92970f438a04d11ab1cc1" offset="0x800000" loadflag="load16_byte" />
-                <rom name="057-c6.bin" size="2097152" crc="b13d1de3" sha1="7d749c23a33d90fe50279e884540d71cf1aaaa6b" offset="0x800001" loadflag="load16_byte" />
+                <rom name="057-c1.c1" size="2097152" crc="21c6bb91" sha1="a2c17d0c91dd59528d8fa7fe110af8b20b25ff99" offset="0x000000" loadflag="load16_byte" />
+                <rom name="057-c2.c2" size="2097152" crc="a3999925" sha1="0ee861a77850d378d03c1bf00b9692abd860c759" offset="0x000001" loadflag="load16_byte" />
+                <rom name="057-c3.c3" size="2097152" crc="b725a219" sha1="4857687d156a9150a69b97d2729245a51c144a0c" offset="0x400000" loadflag="load16_byte" />
+                <rom name="057-c4.c4" size="2097152" crc="8d96425e" sha1="0f79c868a6a33ad25e38d842f30ec4440d809033" offset="0x400001" loadflag="load16_byte" />
+                <rom name="057-c5.c5" size="2097152" crc="b20354af" sha1="da7609fd467f2f4d71d92970f438a04d11ab1cc1" offset="0x800000" loadflag="load16_byte" />
+                <rom name="057-c6.c6" size="2097152" crc="b13d1de3" sha1="7d749c23a33d90fe50279e884540d71cf1aaaa6b" offset="0x800001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 058 -->
+<!-- ID 058 (NGH-058) -->
 <!-- Release Date - Japan: 22/12/1993 USA: 22/12/1993 -->
 	<software name="fatfursp">
 		<description>Fatal Fury Special / Garou Densetsu Special</description>
@@ -1348,28 +1344,28 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1572864">
-                <rom name="058-p1.bin" size="1048576" crc="2f585ba2" sha1="429b4bf43fb9b1082c15d645ca328f9d175b976b" offset="0x000000" />
-                <rom name="058-p2.bin" size="524288" crc="d7c71a6b" sha1="b3428063031a2e5857da40a5d2ffa87fb550c1bb" offset="0x100000" />
+                <rom name="058-p1.p1" size="1048576" crc="2f585ba2" sha1="429b4bf43fb9b1082c15d645ca328f9d175b976b" offset="0x000000" />
+                <rom name="058-p2.sp2" size="524288" crc="d7c71a6b" sha1="b3428063031a2e5857da40a5d2ffa87fb550c1bb" offset="0x100000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="058-s1.bin" size="131072" crc="2df03197" sha1="24083cfc97e720ac9e131c9fe37df57e27c49294" offset="0x000000"/>
+                <rom name="058-s1.s1" size="131072" crc="2df03197" sha1="24083cfc97e720ac9e131c9fe37df57e27c49294" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="058-m1.bin" size="131072" crc="ccc5186e" sha1="cf9091c523c182aebfb928c91640b2d72fd70123" offset="0x000000" />
+                <rom name="058-m1.m1" size="131072" crc="ccc5186e" sha1="cf9091c523c182aebfb928c91640b2d72fd70123" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="5242880">
-                <rom name="058-v1.bin" size="2097152" crc="55d7ce84" sha1="05ac6a395d9bf9166925acca176a8d6129f533c8" offset="0x000000" />
-                <rom name="058-v2.bin" size="2097152" crc="ee080b10" sha1="29814fc21bbe30d37745c8918fab00c83a309be4" offset="0x200000" />
-                <rom name="058-v3.bin" size="1048576" crc="f9eb3d4a" sha1="d1747f9460b965f6daf4f881ed4ecd04c5253434" offset="0x400000" />
+                <rom name="058-v1.v1" size="2097152" crc="55d7ce84" sha1="05ac6a395d9bf9166925acca176a8d6129f533c8" offset="0x000000" />
+                <rom name="058-v2.v2" size="2097152" crc="ee080b10" sha1="29814fc21bbe30d37745c8918fab00c83a309be4" offset="0x200000" />
+                <rom name="058-v3.v3" size="1048576" crc="f9eb3d4a" sha1="d1747f9460b965f6daf4f881ed4ecd04c5253434" offset="0x400000" />
 			</dataarea>
 			<dataarea name="sprites" size="12582912">
-                <rom name="058-c1.bin" size="2097152" crc="044ab13c" sha1="569d283638a132bc163faac2a9055497017ee0d2" offset="0x000000" loadflag="load16_byte" />
-                <rom name="058-c2.bin" size="2097152" crc="11e6bf96" sha1="c093a4f93f13e07b276e28b30c2a14dda9135d8f" offset="0x000001" loadflag="load16_byte" />
-                <rom name="058-c3.bin" size="2097152" crc="6f7938d5" sha1="be057b0a3faeb76d5fff161d3e6fea8a26e11d2c" offset="0x400000" loadflag="load16_byte" />
-                <rom name="058-c4.bin" size="2097152" crc="4ad066ff" sha1="4e304646d954d5f7bbabc5d068e85de31d38830f" offset="0x400001" loadflag="load16_byte" />
-                <rom name="058-c5.bin" size="2097152" crc="49c5e0bf" sha1="f3784178f90751990ea47a082a6aa869ee3566c9" offset="0x800000" loadflag="load16_byte" />
-                <rom name="058-c6.bin" size="2097152" crc="8ff1f43d" sha1="6180ceb5412a3e2e34e9513a3283b9f63087f747" offset="0x800001" loadflag="load16_byte" />
+                <rom name="058-c1.c1" size="2097152" crc="044ab13c" sha1="569d283638a132bc163faac2a9055497017ee0d2" offset="0x000000" loadflag="load16_byte" />
+                <rom name="058-c2.c2" size="2097152" crc="11e6bf96" sha1="c093a4f93f13e07b276e28b30c2a14dda9135d8f" offset="0x000001" loadflag="load16_byte" />
+                <rom name="058-c3.c3" size="2097152" crc="6f7938d5" sha1="be057b0a3faeb76d5fff161d3e6fea8a26e11d2c" offset="0x400000" loadflag="load16_byte" />
+                <rom name="058-c4.c4" size="2097152" crc="4ad066ff" sha1="4e304646d954d5f7bbabc5d068e85de31d38830f" offset="0x400001" loadflag="load16_byte" />
+                <rom name="058-c5.c5" size="2097152" crc="49c5e0bf" sha1="f3784178f90751990ea47a082a6aa869ee3566c9" offset="0x800000" loadflag="load16_byte" />
+                <rom name="058-c6.c6" size="2097152" crc="8ff1f43d" sha1="6180ceb5412a3e2e34e9513a3283b9f63087f747" offset="0x800001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
@@ -1380,35 +1376,35 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1572864">
-                <rom name="058-p1.bin" size="1048576" crc="2f585ba2" sha1="429b4bf43fb9b1082c15d645ca328f9d175b976b" offset="0x000000" />
-                <rom name="058-p2.bin" size="524288" crc="d7c71a6b" sha1="b3428063031a2e5857da40a5d2ffa87fb550c1bb" offset="0x100000" />
+                <rom name="058-p1.p1" size="1048576" crc="2f585ba2" sha1="429b4bf43fb9b1082c15d645ca328f9d175b976b" offset="0x000000" />
+                <rom name="058-p2.sp2" size="524288" crc="d7c71a6b" sha1="b3428063031a2e5857da40a5d2ffa87fb550c1bb" offset="0x100000" />
 				<!-- patch ROM -->
-                <rom name="058-ep1.bin" size="524288" crc="9f0c1e1a" sha1="02861b0f230541becccc3df6a2c85dbe8733e7ce" offset="0x000000" />
+                <rom name="058-epr.ep1" size="524288" crc="9f0c1e1a" sha1="02861b0f230541becccc3df6a2c85dbe8733e7ce" offset="0x000000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="058-s1.bin" size="131072" crc="2df03197" sha1="24083cfc97e720ac9e131c9fe37df57e27c49294" offset="0x000000"/>
+                <rom name="058-s1.s1" size="131072" crc="2df03197" sha1="24083cfc97e720ac9e131c9fe37df57e27c49294" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="058-m1.bin" size="131072" crc="ccc5186e" sha1="cf9091c523c182aebfb928c91640b2d72fd70123" offset="0x000000" />
+                <rom name="058-m1.m1" size="131072" crc="ccc5186e" sha1="cf9091c523c182aebfb928c91640b2d72fd70123" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="5242880">
-                <rom name="058-v1.bin" size="2097152" crc="55d7ce84" sha1="05ac6a395d9bf9166925acca176a8d6129f533c8" offset="0x000000" />
-                <rom name="058-v2.bin" size="2097152" crc="ee080b10" sha1="29814fc21bbe30d37745c8918fab00c83a309be4" offset="0x200000" />
-                <rom name="058-v3.bin" size="1048576" crc="f9eb3d4a" sha1="d1747f9460b965f6daf4f881ed4ecd04c5253434" offset="0x400000" />
+                <rom name="058-v1.v1" size="2097152" crc="55d7ce84" sha1="05ac6a395d9bf9166925acca176a8d6129f533c8" offset="0x000000" />
+                <rom name="058-v2.v2" size="2097152" crc="ee080b10" sha1="29814fc21bbe30d37745c8918fab00c83a309be4" offset="0x200000" />
+                <rom name="058-v3.v3" size="1048576" crc="f9eb3d4a" sha1="d1747f9460b965f6daf4f881ed4ecd04c5253434" offset="0x400000" />
 			</dataarea>
 			<dataarea name="sprites" size="12582912">
-                <rom name="058-c1.bin" size="2097152" crc="044ab13c" sha1="569d283638a132bc163faac2a9055497017ee0d2" offset="0x000000" loadflag="load16_byte" />
-                <rom name="058-c2.bin" size="2097152" crc="11e6bf96" sha1="c093a4f93f13e07b276e28b30c2a14dda9135d8f" offset="0x000001" loadflag="load16_byte" />
-                <rom name="058-c3.bin" size="2097152" crc="6f7938d5" sha1="be057b0a3faeb76d5fff161d3e6fea8a26e11d2c" offset="0x400000" loadflag="load16_byte" />
-                <rom name="058-c4.bin" size="2097152" crc="4ad066ff" sha1="4e304646d954d5f7bbabc5d068e85de31d38830f" offset="0x400001" loadflag="load16_byte" />
-                <rom name="058-c5.bin" size="2097152" crc="49c5e0bf" sha1="f3784178f90751990ea47a082a6aa869ee3566c9" offset="0x800000" loadflag="load16_byte" />
-                <rom name="058-c6.bin" size="2097152" crc="8ff1f43d" sha1="6180ceb5412a3e2e34e9513a3283b9f63087f747" offset="0x800001" loadflag="load16_byte" />
+                <rom name="058-c1.c1" size="2097152" crc="044ab13c" sha1="569d283638a132bc163faac2a9055497017ee0d2" offset="0x000000" loadflag="load16_byte" />
+                <rom name="058-c2.c2" size="2097152" crc="11e6bf96" sha1="c093a4f93f13e07b276e28b30c2a14dda9135d8f" offset="0x000001" loadflag="load16_byte" />
+                <rom name="058-c3.c3" size="2097152" crc="6f7938d5" sha1="be057b0a3faeb76d5fff161d3e6fea8a26e11d2c" offset="0x400000" loadflag="load16_byte" />
+                <rom name="058-c4.c4" size="2097152" crc="4ad066ff" sha1="4e304646d954d5f7bbabc5d068e85de31d38830f" offset="0x400001" loadflag="load16_byte" />
+                <rom name="058-c5.c5" size="2097152" crc="49c5e0bf" sha1="f3784178f90751990ea47a082a6aa869ee3566c9" offset="0x800000" loadflag="load16_byte" />
+                <rom name="058-c6.c6" size="2097152" crc="8ff1f43d" sha1="6180ceb5412a3e2e34e9513a3283b9f63087f747" offset="0x800001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 061 -->
+<!-- ID 061 (NGH-061) -->
 <!-- Release Date - Japan: 27/05/1994 USA: 27/05/1994 -->
 	<software name="ssideki2">
 		<description>Super Sidekicks 2 - The World Championship / Tokuten Ou 2 - real fight football</description>
@@ -1416,29 +1412,29 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
-                <rom name="061-p1.bin" size="1048576" crc="5969e0dc" sha1="78abea880c125ec5a85bef6404478512a34b5513" offset="0x000000" />
+                <rom name="061-p1.p1" size="1048576" crc="5969e0dc" sha1="78abea880c125ec5a85bef6404478512a34b5513" offset="0x000000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="061-s1.bin" size="131072" crc="226d1b68" sha1="de010f6fda3ddadb181fe37daa6105f22e78b970" offset="0x000000"/>
+                <rom name="061-s1.s1" size="131072" crc="226d1b68" sha1="de010f6fda3ddadb181fe37daa6105f22e78b970" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="061-m1.bin" size="131072" crc="156f6951" sha1="49686f615f109a02b4f23931f1c84fee13872ffd" offset="0x000000" />
+                <rom name="061-m1.m1" size="131072" crc="156f6951" sha1="49686f615f109a02b4f23931f1c84fee13872ffd" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="4194304">
-                <rom name="061-v1.bin" size="2097152" crc="f081c8d3" sha1="fc9da0ddc1ddd1f9ae1443a726815c25e9dc38ae" offset="0x000000" />
-                <rom name="061-v2.bin" size="2097152" crc="7cd63302" sha1="c39984c0ae0a8e76f1fc036344bbb83635c18937" offset="0x200000" />
+                <rom name="061-v1.v1" size="2097152" crc="f081c8d3" sha1="fc9da0ddc1ddd1f9ae1443a726815c25e9dc38ae" offset="0x000000" />
+                <rom name="061-v2.v1" size="2097152" crc="7cd63302" sha1="c39984c0ae0a8e76f1fc036344bbb83635c18937" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sprites" size="8388608">
-                <rom name="061-c1.bin" size="2097152" crc="a626474f" sha1="d695f0dcb9480088b3a7c1488bd541b4c159528a" offset="0x000000" loadflag="load16_byte" />
-                <rom name="061-c2.bin" size="2097152" crc="c3be42ae" sha1="7fa65538bd0a0a162e4d3e9f49913da59d915e02" offset="0x000001" loadflag="load16_byte" />
-                <rom name="061-c3.bin" size="2097152" crc="2a7b98b9" sha1="75e1019dca8a8583afcc53651ac856cba3a96315" offset="0x400000" loadflag="load16_byte" />
-                <rom name="061-c4.bin" size="2097152" crc="c0be9a1f" sha1="228f41eaefdf3e147761f8ef849e3b5f321877d4" offset="0x400001" loadflag="load16_byte" />
+                <rom name="061-c1.c1" size="2097152" crc="a626474f" sha1="d695f0dcb9480088b3a7c1488bd541b4c159528a" offset="0x000000" loadflag="load16_byte" />
+                <rom name="061-c2.c2" size="2097152" crc="c3be42ae" sha1="7fa65538bd0a0a162e4d3e9f49913da59d915e02" offset="0x000001" loadflag="load16_byte" />
+                <rom name="061-c3.c3" size="2097152" crc="2a7b98b9" sha1="75e1019dca8a8583afcc53651ac856cba3a96315" offset="0x400000" loadflag="load16_byte" />
+                <rom name="061-c4.c4" size="2097152" crc="c0be9a1f" sha1="228f41eaefdf3e147761f8ef849e3b5f321877d4" offset="0x400001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 063 -->
+<!-- ID 063 (NGH-063) -->
 <!-- Release Date - Japan: 02/12/1994 USA: 02/12/1994 -->
 	<software name="samsho2">
 		<description>Samurai Shodown II / Shin Samurai Spirits - Haohmaru jigokuhen</description>
@@ -1446,36 +1442,36 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="2097152">
-                <rom name="063-p1.bin" size="1048576" crc="22368892" sha1="0997f8284aa0f57a333be8a0fdea777d0d01afd6" offset="0x100000" />
+                <rom name="063-p1.p1" size="1048576" crc="22368892" sha1="0997f8284aa0f57a333be8a0fdea777d0d01afd6" offset="0x100000" />
                 <rom size="1048576" offset="0x000000" loadflag="continue" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="063-s1.bin" size="131072" crc="64a5cd66" sha1="12cdfb27bf9ccd5a8df6ddd4628ef7cf2c6d4964" offset="0x000000"/>
+                <rom name="063-s1.s1" size="131072" crc="64a5cd66" sha1="12cdfb27bf9ccd5a8df6ddd4628ef7cf2c6d4964" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="063-m1.bin" size="131072" crc="56675098" sha1="90429fc40d056d480d0e2bbefbc691d9fa260fc4" offset="0x000000" />
+                <rom name="063-m1.m1" size="131072" crc="56675098" sha1="90429fc40d056d480d0e2bbefbc691d9fa260fc4" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="7340032">
-                <rom name="063-v1.bin" size="2097152" crc="37703f91" sha1="a373ebef4c33ba1d8340e826981a58769aada238" offset="0x000000" />
-                <rom name="063-v2.bin" size="2097152" crc="0142bde8" sha1="0be6c53acac44802bf70b6925452f70289a139d9" offset="0x200000" />
-                <rom name="063-v3.bin" size="2097152" crc="d07fa5ca" sha1="1da7f081f8b8fc86a91feacf900f573218d82676" offset="0x400000" />
-                <rom name="063-v4.bin" size="1048576" crc="24aab4bb" sha1="10ee4c5b3579865b93dcc1e4079963276aa700a6" offset="0x600000" />
+                <rom name="063-v1.v1" size="2097152" crc="37703f91" sha1="a373ebef4c33ba1d8340e826981a58769aada238" offset="0x000000" />
+                <rom name="063-v2.v2" size="2097152" crc="0142bde8" sha1="0be6c53acac44802bf70b6925452f70289a139d9" offset="0x200000" />
+                <rom name="063-v3.v3" size="2097152" crc="d07fa5ca" sha1="1da7f081f8b8fc86a91feacf900f573218d82676" offset="0x400000" />
+                <rom name="063-v4.v4" size="1048576" crc="24aab4bb" sha1="10ee4c5b3579865b93dcc1e4079963276aa700a6" offset="0x600000" />
 			</dataarea>
 			<dataarea name="sprites" size="16777216">
-                <rom name="063-c1.bin" size="2097152" crc="86cd307c" sha1="0d04336f7c436d74638d8c1cd8651faf436a6bec" offset="0x000000" loadflag="load16_byte" />
-                <rom name="063-c2.bin" size="2097152" crc="cdfcc4ca" sha1="179dc81432424d68cefedd20cc1c4b2a95deb891" offset="0x000001" loadflag="load16_byte" />
-                <rom name="063-c3.bin" size="2097152" crc="7a63ccc7" sha1="49d97c543bc2860d493a353ab0d059088c6fbd21" offset="0x400000" loadflag="load16_byte" />
-                <rom name="063-c4.bin" size="2097152" crc="751025ce" sha1="e1bbaa7cd67fd04e4aab7f7ea77f63ae1cbc90d0" offset="0x400001" loadflag="load16_byte" />
-                <rom name="063-c5.bin" size="2097152" crc="20d3a475" sha1="28da44a136bd14c73c62c147c3f6e6bcfa1066de" offset="0x800000" loadflag="load16_byte" />
-                <rom name="063-c6.bin" size="2097152" crc="ae4c0a88" sha1="cc8a7d11daa3821f83a6fd0942534706f939e576" offset="0x800001" loadflag="load16_byte" />
-                <rom name="063-c7.bin" size="2097152" crc="2df3cbcf" sha1="e54f9022359963711451c2025825b862d36c6975" offset="0xc00000" loadflag="load16_byte" />
-                <rom name="063-c8.bin" size="2097152" crc="1ffc6dfa" sha1="acea18aca76c072e0bac2a364fc96d49cfc86e77" offset="0xc00001" loadflag="load16_byte" />
+                <rom name="063-c1.c1" size="2097152" crc="86cd307c" sha1="0d04336f7c436d74638d8c1cd8651faf436a6bec" offset="0x000000" loadflag="load16_byte" />
+                <rom name="063-c2.c2" size="2097152" crc="cdfcc4ca" sha1="179dc81432424d68cefedd20cc1c4b2a95deb891" offset="0x000001" loadflag="load16_byte" />
+                <rom name="063-c3.c3" size="2097152" crc="7a63ccc7" sha1="49d97c543bc2860d493a353ab0d059088c6fbd21" offset="0x400000" loadflag="load16_byte" />
+                <rom name="063-c4.c4" size="2097152" crc="751025ce" sha1="e1bbaa7cd67fd04e4aab7f7ea77f63ae1cbc90d0" offset="0x400001" loadflag="load16_byte" />
+                <rom name="063-c5.c5" size="2097152" crc="20d3a475" sha1="28da44a136bd14c73c62c147c3f6e6bcfa1066de" offset="0x800000" loadflag="load16_byte" />
+                <rom name="063-c6.c6" size="2097152" crc="ae4c0a88" sha1="cc8a7d11daa3821f83a6fd0942534706f939e576" offset="0x800001" loadflag="load16_byte" />
+                <rom name="063-c7.c7" size="2097152" crc="2df3cbcf" sha1="e54f9022359963711451c2025825b862d36c6975" offset="0xc00000" loadflag="load16_byte" />
+                <rom name="063-c8.c8" size="2097152" crc="1ffc6dfa" sha1="acea18aca76c072e0bac2a364fc96d49cfc86e77" offset="0xc00001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 064 -->
+<!-- ID 064 (ADH-007) -->
 <!-- Release Date - Japan: 04/06/1994 USA: 04/06/1994 -->
 	<software name="wh2j">
 		<description>World Heroes 2 Jet</description>
@@ -1483,34 +1479,34 @@
 		<publisher>ADK / SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="2097152">
-                <rom name="064-p1.bin" size="1048576" crc="385a2e86" sha1="cfde4a1aeae038a3d6ca9946065624f097682d3d" offset="0x100000" />
+                <rom name="064-p1.p1" size="1048576" crc="385a2e86" sha1="cfde4a1aeae038a3d6ca9946065624f097682d3d" offset="0x100000" />
                 <rom size="1048576" offset="0x000000" loadflag="continue" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="064-s1.bin" size="131072" crc="2a03998a" sha1="5e33f469982f12d4622a06d323a345f192bf88e6" offset="0x000000"/>
+                <rom name="064-s1.s1" size="131072" crc="2a03998a" sha1="5e33f469982f12d4622a06d323a345f192bf88e6" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="064-m1.bin" size="131072" crc="d2eec9d3" sha1="09478787045f1448d19d064dd3d540d1741fd619" offset="0x000000" />
+                <rom name="064-m1.m1" size="131072" crc="d2eec9d3" sha1="09478787045f1448d19d064dd3d540d1741fd619" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="7340032">
-                <rom name="064-v1.bin" size="2097152" crc="aa277109" sha1="35c22b15bb0a4d0ab118cb22a2d450d03995a17c" offset="0x000000" />
-                <rom name="064-v2.bin" size="2097152" crc="b6527edd" sha1="2bcf5bfa6e117cf4a3728a5e5f5771313c93f22a" offset="0x200000" />
+                <rom name="064-v1.v1" size="2097152" crc="aa277109" sha1="35c22b15bb0a4d0ab118cb22a2d450d03995a17c" offset="0x000000" />
+                <rom name="064-v2.v2" size="2097152" crc="b6527edd" sha1="2bcf5bfa6e117cf4a3728a5e5f5771313c93f22a" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sprites" size="16777216">
-                <rom name="064-c1.bin" size="2097152" crc="2ec87cea" sha1="e713ec7839a7665edee6ee3f82a6e530b3b4bd7c" offset="0x000000" loadflag="load16_byte" />
-                <rom name="064-c2.bin" size="2097152" crc="526b81ab" sha1="b5f0a2f04489539ed6b9d0810b12787356c64b23" offset="0x000001" loadflag="load16_byte" />
-                <rom name="064-c3.bin" size="2097152" crc="436d1b31" sha1="059776d77b91377ed0bcfc278802d659c917fc0f" offset="0x400000" loadflag="load16_byte" />
-                <rom name="064-c4.bin" size="2097152" crc="f9c8dd26" sha1="25a9eea1d49b21b4a988beb32c25bf2f7796f227" offset="0x400001" loadflag="load16_byte" />
-                <rom name="064-c5.bin" size="2097152" crc="8e34a9f4" sha1="67b839b426ef3fad0a85d951fdd44c0a45c55226" offset="0x800000" loadflag="load16_byte" />
-                <rom name="064-c6.bin" size="2097152" crc="a43e4766" sha1="54f282f2b1ff2934cca7acbb4386a2b99a29df3a" offset="0x800001" loadflag="load16_byte" />
-                <rom name="064-c7.bin" size="2097152" crc="59d97215" sha1="85a960dc7f364df13ee0c2f99a4c53aefb081486" offset="0xc00000" loadflag="load16_byte" />
-                <rom name="064-c8.bin" size="2097152" crc="fc092367" sha1="69ff4ae909dd857de3ca8645d63f8b4bde117448" offset="0xc00001" loadflag="load16_byte" />
+                <rom name="064-c1.c1" size="2097152" crc="2ec87cea" sha1="e713ec7839a7665edee6ee3f82a6e530b3b4bd7c" offset="0x000000" loadflag="load16_byte" />
+                <rom name="064-c2.c2" size="2097152" crc="526b81ab" sha1="b5f0a2f04489539ed6b9d0810b12787356c64b23" offset="0x000001" loadflag="load16_byte" />
+                <rom name="064-c3.c3" size="2097152" crc="436d1b31" sha1="059776d77b91377ed0bcfc278802d659c917fc0f" offset="0x400000" loadflag="load16_byte" />
+                <rom name="064-c4.c4" size="2097152" crc="f9c8dd26" sha1="25a9eea1d49b21b4a988beb32c25bf2f7796f227" offset="0x400001" loadflag="load16_byte" />
+                <rom name="064-c5.c5" size="2097152" crc="8e34a9f4" sha1="67b839b426ef3fad0a85d951fdd44c0a45c55226" offset="0x800000" loadflag="load16_byte" />
+                <rom name="064-c6.c6" size="2097152" crc="a43e4766" sha1="54f282f2b1ff2934cca7acbb4386a2b99a29df3a" offset="0x800001" loadflag="load16_byte" />
+                <rom name="064-c7.c7" size="2097152" crc="59d97215" sha1="85a960dc7f364df13ee0c2f99a4c53aefb081486" offset="0xc00000" loadflag="load16_byte" />
+                <rom name="064-c8.c8" size="2097152" crc="fc092367" sha1="69ff4ae909dd857de3ca8645d63f8b4bde117448" offset="0xc00001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 069 -->
+<!-- ID 069 (NGH-069) -->
 <!-- Release Date - Japan: 21/04/1995 USA: 21/04/1995 -->
 	<software name="fatfury3">
 		<description>Fatal Fury 3 - Road to the Final Victory / Garou Densetsu 3 - haruka-naru tatakai</description>
@@ -1518,33 +1514,33 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="3145728">
-                <rom name="069-p1.bin" size="1048576" crc="a8bcfbbc" sha1="519c4861151797e5f4d4f33432b83dfabed8e7c4" offset="0x000000" />
-                <rom name="069-sp2.bin" size="2097152" crc="dbe963ed" sha1="8ece7f663cfe8e563576a397e41161d392cee67e" offset="0x100000" />
+                <rom name="069-p1.p1" size="1048576" crc="a8bcfbbc" sha1="519c4861151797e5f4d4f33432b83dfabed8e7c4" offset="0x000000" />
+                <rom name="069-sp2.sp2" size="2097152" crc="dbe963ed" sha1="8ece7f663cfe8e563576a397e41161d392cee67e" offset="0x100000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="069-s1.bin" size="131072" crc="0b33a800" sha1="b7d2cc97da4f30ddebc7b801f5e1d17d2306b2db" offset="0x000000"/>
+                <rom name="069-s1.s1" size="131072" crc="0b33a800" sha1="b7d2cc97da4f30ddebc7b801f5e1d17d2306b2db" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="069-m1.bin" size="131072" crc="fce72926" sha1="a40c74f793900b8542f0b8383ce4bf46fca112d4" offset="0x000000" />
+                <rom name="069-m1.m1" size="131072" crc="fce72926" sha1="a40c74f793900b8542f0b8383ce4bf46fca112d4" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="10485760">
-                <rom name="069-v1.bin" size="4194304" crc="2bdbd4db" sha1="5f4fecf69c2329d699cbd45829c19303b1e2a80e" offset="0x000000" />
-                <rom name="069-v2.bin" size="4194304" crc="a698a487" sha1="11b8bc53bc26a51f4a408e900e3769958625c4ed" offset="0x400000" />
-                <rom name="069-v3.bin" size="2097152" crc="581c5304" sha1="e9550ec547b4f605afed996b22d711f49b48fa92" offset="0x800000" />
+                <rom name="069-v1.v1" size="4194304" crc="2bdbd4db" sha1="5f4fecf69c2329d699cbd45829c19303b1e2a80e" offset="0x000000" />
+                <rom name="069-v2.v2" size="4194304" crc="a698a487" sha1="11b8bc53bc26a51f4a408e900e3769958625c4ed" offset="0x400000" />
+                <rom name="069-v3.v3" size="2097152" crc="581c5304" sha1="e9550ec547b4f605afed996b22d711f49b48fa92" offset="0x800000" />
 			</dataarea>
 			<dataarea name="sprites" size="20971520">
-                <rom name="069-c1.bin" size="4194304" crc="e302f93c" sha1="d8610b14900b2b8fe691b67ca9b1abb335dbff74" offset="0x000000" loadflag="load16_byte" />
-                <rom name="069-c2.bin" size="4194304" crc="1053a455" sha1="69501bfac68739e63d798045b812badd251d57b8" offset="0x000001" loadflag="load16_byte" />
-                <rom name="069-c3.bin" size="4194304" crc="1c0fde2f" sha1="cf6c2ef56c03a861de3b0b6dc0d7c9204d947f9d" offset="0x800000" loadflag="load16_byte" />
-                <rom name="069-c4.bin" size="4194304" crc="a25fc3d0" sha1="83cb349e2f1032652060b233e741fb893be5af16" offset="0x800001" loadflag="load16_byte" />
-                <rom name="069-c5.bin" size="2097152" crc="b3ec6fa6" sha1="7e4c8ee9dd8d9a25ff183d9d8b05f38769348bc7" offset="0x1000000" loadflag="load16_byte" />
-                <rom name="069-c6.bin" size="2097152" crc="69210441" sha1="6d496c549dba65caabeaffe5b762e86f9d648a26" offset="0x1000001" loadflag="load16_byte" />
+                <rom name="069-c1.c1" size="4194304" crc="e302f93c" sha1="d8610b14900b2b8fe691b67ca9b1abb335dbff74" offset="0x000000" loadflag="load16_byte" />
+                <rom name="069-c2.c2" size="4194304" crc="1053a455" sha1="69501bfac68739e63d798045b812badd251d57b8" offset="0x000001" loadflag="load16_byte" />
+                <rom name="069-c3.c3" size="4194304" crc="1c0fde2f" sha1="cf6c2ef56c03a861de3b0b6dc0d7c9204d947f9d" offset="0x800000" loadflag="load16_byte" />
+                <rom name="069-c4.c4" size="4194304" crc="a25fc3d0" sha1="83cb349e2f1032652060b233e741fb893be5af16" offset="0x800001" loadflag="load16_byte" />
+                <rom name="069-c5.c5" size="2097152" crc="b3ec6fa6" sha1="7e4c8ee9dd8d9a25ff183d9d8b05f38769348bc7" offset="0x1000000" loadflag="load16_byte" />
+                <rom name="069-c6.c6" size="2097152" crc="69210441" sha1="6d496c549dba65caabeaffe5b762e86f9d648a26" offset="0x1000001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 074 -->
+<!-- ID 074 (ADH-008) -->
 <!-- Release Date - Japan: 26/08/1994 USA: 26/08/1994 -->
 	<software name="aodk">
 		<description>Aggressors of Dark Kombat / Tsuukai GANGAN Koushinkyoku</description>
@@ -1552,29 +1548,29 @@
 		<publisher>ADK / SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="2097152">
-                <rom name="074-pg1.bin" size="1048576" crc="62369553" sha1="ca4d561ee08d16fe6804249d1ba49188eb3bd606" offset="0x100000" />
+                <rom name="074-pg1.p1" size="1048576" crc="62369553" sha1="ca4d561ee08d16fe6804249d1ba49188eb3bd606" offset="0x100000" />
                 <rom size="1048576" offset="0x000000" loadflag="continue" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="074-s1.bin" size="131072" crc="96148d2b" sha1="47725a8059346ebe5639bbdbf62a2ac8028756a9" offset="0x000000"/>
+                <rom name="074-s1.s1" size="131072" crc="96148d2b" sha1="47725a8059346ebe5639bbdbf62a2ac8028756a9" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="074-m1.bin" size="131072" crc="5a52a9d1" sha1="ef913a9a55d29d5dd3beab1ce6039d64ce9b1a5b" offset="0x000000" />
+                <rom name="074-m1.m1" size="131072" crc="5a52a9d1" sha1="ef913a9a55d29d5dd3beab1ce6039d64ce9b1a5b" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="4194304">
-                <rom name="074-v1.bin" size="2097152" crc="7675b8fa" sha1="29f4facf89d551237b31bf779693cbbbc94e1ede" offset="0x000000" />
-                <rom name="074-v2.bin" size="2097152" crc="a9da86e9" sha1="ff65af61e42b79a75060a352b24077d1fa28c83f" offset="0x200000" />
+                <rom name="074-v1.v1" size="2097152" crc="7675b8fa" sha1="29f4facf89d551237b31bf779693cbbbc94e1ede" offset="0x000000" />
+                <rom name="074-v2.v2" size="2097152" crc="a9da86e9" sha1="ff65af61e42b79a75060a352b24077d1fa28c83f" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sprites" size="16777216">
-                <rom name="074-c1.bin" size="2097152" crc="a0b39344" sha1="adfff7b8836347abf030611563e6068a91164d0a" offset="0x000000" loadflag="load16_byte" />
-                <rom name="074-c2.bin" size="2097152" crc="203f6074" sha1="737f2d707d504df1da1ca5c5cf61cf489a33eb56" offset="0x000001" loadflag="load16_byte" />
-                <rom name="074-c3.bin" size="2097152" crc="7fff4d41" sha1="bebd18a75adeb34c3bbd49cfc8fd3d8c2bf9e475" offset="0x400000" loadflag="load16_byte" />
-                <rom name="074-c4.bin" size="2097152" crc="48db3e0a" sha1="a88505e001e01bb45fb26beda5af24943d02552a" offset="0x400001" loadflag="load16_byte" />
-                <rom name="074-c5.bin" size="2097152" crc="c74c5e51" sha1="0399c53e2a3d721901dddc073fda6ec22e02dfd4" offset="0x800000" loadflag="load16_byte" />
-                <rom name="074-c6.bin" size="2097152" crc="73e8e7e0" sha1="dd6580227743e6a3db4950456ebe870008e022b2" offset="0x800001" loadflag="load16_byte" />
-                <rom name="074-c7.bin" size="2097152" crc="ac7daa01" sha1="78407a464f67d949933ce2ccaa23fbed80dff1ea" offset="0xc00000" loadflag="load16_byte" />
-                <rom name="074-c8.bin" size="2097152" crc="14e7ad71" sha1="d4583fbce361fd1a11ac6c1a27b0b669e8a5c718" offset="0xc00001" loadflag="load16_byte" />
+                <rom name="074-c1.c1" size="2097152" crc="a0b39344" sha1="adfff7b8836347abf030611563e6068a91164d0a" offset="0x000000" loadflag="load16_byte" />
+                <rom name="074-c2.c2" size="2097152" crc="203f6074" sha1="737f2d707d504df1da1ca5c5cf61cf489a33eb56" offset="0x000001" loadflag="load16_byte" />
+                <rom name="074-c3.c3" size="2097152" crc="7fff4d41" sha1="bebd18a75adeb34c3bbd49cfc8fd3d8c2bf9e475" offset="0x400000" loadflag="load16_byte" />
+                <rom name="074-c4.c4" size="2097152" crc="48db3e0a" sha1="a88505e001e01bb45fb26beda5af24943d02552a" offset="0x400001" loadflag="load16_byte" />
+                <rom name="074-c5.c5" size="2097152" crc="c74c5e51" sha1="0399c53e2a3d721901dddc073fda6ec22e02dfd4" offset="0x800000" loadflag="load16_byte" />
+                <rom name="074-c6.c6" size="2097152" crc="73e8e7e0" sha1="dd6580227743e6a3db4950456ebe870008e022b2" offset="0x800001" loadflag="load16_byte" />
+                <rom name="074-c7.c7" size="2097152" crc="ac7daa01" sha1="78407a464f67d949933ce2ccaa23fbed80dff1ea" offset="0xc00000" loadflag="load16_byte" />
+                <rom name="074-c8.c8" size="2097152" crc="14e7ad71" sha1="d4583fbce361fd1a11ac6c1a27b0b669e8a5c718" offset="0xc00001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
@@ -1609,7 +1605,7 @@
 		</part>
 	</software>
 
-<!-- ID 084 -->
+<!-- ID 084 (NGH-084) -->
 <!-- Release Date - Japan: 01/09/1995 USA: 01/09/1995 -->
 	<software name="kof95">
 		<description>The King of Fighters '95</description>
@@ -1617,37 +1613,37 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="2097152">
-                <rom name="084-pg1.bin" size="1048576" crc="5e54cf95" sha1="41abe2042fdbb1526e92a0789976a9b1ac5e60f0" offset="0x100000" />
+                <rom name="084-pg1.p1" size="1048576" crc="5e54cf95" sha1="41abe2042fdbb1526e92a0789976a9b1ac5e60f0" offset="0x100000" />
                 <rom size="1048576" offset="0x000000" loadflag="continue" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="084-s1.bin" size="131072" crc="de716f8a" sha1="f7386454a943ed5caf625f67ee1d0197b1c6fa13" offset="0x000000"/>
+                <rom name="084-s1.s1" size="131072" crc="de716f8a" sha1="f7386454a943ed5caf625f67ee1d0197b1c6fa13" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="084-m1.bin" size="131072" crc="6f2d7429" sha1="6f8462e4f07af82a5ca3197895d5dcbb67bdaa61" offset="0x000000" />
+                <rom name="084-m1.m1" size="131072" crc="6f2d7429" sha1="6f8462e4f07af82a5ca3197895d5dcbb67bdaa61" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="9437184">
-                <rom name="084-v1.bin" size="4194304" crc="84861b56" sha1="1b6c91ddaed01f45eb9b7e49d9c2b9b479d50da6" offset="0x000000" />
-                <rom name="084-v2.bin" size="2097152" crc="b38a2803" sha1="dbc2c8606ca09ed7ff20906b022da3cf053b2f09" offset="0x400000" />
+                <rom name="084-v1.v1" size="4194304" crc="84861b56" sha1="1b6c91ddaed01f45eb9b7e49d9c2b9b479d50da6" offset="0x000000" />
+                <rom name="084-v2.v2" size="2097152" crc="b38a2803" sha1="dbc2c8606ca09ed7ff20906b022da3cf053b2f09" offset="0x400000" />
                 <!-- 0x600000 - 0x7fffff empty -->
-                <rom name="084-v3.bin" size="1048576" crc="d683a338" sha1="eb9866b4b286edc09963cb96c43ce0a8fb09adbb" offset="0x800000" />
+                <rom name="084-v3.v3" size="1048576" crc="d683a338" sha1="eb9866b4b286edc09963cb96c43ce0a8fb09adbb" offset="0x800000" />
 			</dataarea>
 			<dataarea name="sprites" size="27262976">
-                <rom name="084-c1.bin" size="4194304" crc="fe087e32" sha1="e8e89faa616027e4fb9b8a865c1a67f409c93bdf" offset="0x000000" loadflag="load16_byte" />
-                <rom name="084-c2.bin" size="4194304" crc="07864e09" sha1="0817fcfd75d0735fd8ff27561eaec371e4ff5829" offset="0x000001" loadflag="load16_byte" />
-                <rom name="084-c3.bin" size="4194304" crc="a4e65d1b" sha1="740a405b40b3a4b324697d2652cae29ffe0ac0bd" offset="0x800000" loadflag="load16_byte" />
-                <rom name="084-c4.bin" size="4194304" crc="c1ace468" sha1="74ea2a3cfd7b744f0988a05baaff10016ca8f625" offset="0x800001" loadflag="load16_byte" />
-                <rom name="084-c5.bin" size="2097152" crc="8a2c1edc" sha1="67866651bc0ce27122285a66b0aab108acf3d065" offset="0x1000000" loadflag="load16_byte" />
-                <rom name="084-c6.bin" size="2097152" crc="f593ac35" sha1="302c92c63f092a8d49429c3331e5e5678f0ea48d" offset="0x1000001" loadflag="load16_byte" />
+                <rom name="084-c1.c1" size="4194304" crc="fe087e32" sha1="e8e89faa616027e4fb9b8a865c1a67f409c93bdf" offset="0x000000" loadflag="load16_byte" />
+                <rom name="084-c2.c2" size="4194304" crc="07864e09" sha1="0817fcfd75d0735fd8ff27561eaec371e4ff5829" offset="0x000001" loadflag="load16_byte" />
+                <rom name="084-c3.c3" size="4194304" crc="a4e65d1b" sha1="740a405b40b3a4b324697d2652cae29ffe0ac0bd" offset="0x800000" loadflag="load16_byte" />
+                <rom name="084-c4.c4" size="4194304" crc="c1ace468" sha1="74ea2a3cfd7b744f0988a05baaff10016ca8f625" offset="0x800001" loadflag="load16_byte" />
+                <rom name="084-c5.c5" size="2097152" crc="8a2c1edc" sha1="67866651bc0ce27122285a66b0aab108acf3d065" offset="0x1000000" loadflag="load16_byte" />
+                <rom name="084-c6.c6" size="2097152" crc="f593ac35" sha1="302c92c63f092a8d49429c3331e5e5678f0ea48d" offset="0x1000001" loadflag="load16_byte" />
 				<!-- 0x1400000-0x17fffff empty -->
-                <rom name="084-c7.bin" size="1048576" crc="9904025f" sha1="eec770746a0ad073f7d353ab16a2cc3a5278d307" offset="0x1800000" loadflag="load16_byte" />
-                <rom name="084-c8.bin" size="1048576" crc="78eb0f9b" sha1="2925ea21ed2ce167f08a25589e94f28643379034" offset="0x1800001" loadflag="load16_byte" />
+                <rom name="084-c7.c7" size="1048576" crc="9904025f" sha1="eec770746a0ad073f7d353ab16a2cc3a5278d307" offset="0x1800000" loadflag="load16_byte" />
+                <rom name="084-c8.c8" size="1048576" crc="78eb0f9b" sha1="2925ea21ed2ce167f08a25589e94f28643379034" offset="0x1800001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 087 -->
+<!-- ID 087 (NGH-087) -->
 <!-- Release Date - Japan: 01/12/1995 USA: 01/12/1995 -->
 	<software name="samsho3">
 		<description>Samurai Showdown III / Samurai Spirits - Zankurou Musouken / Fighters Swords</description>
@@ -1655,34 +1651,34 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="3145728">
-                <rom name="087-pg1.bin" size="1048576" crc="282a336e" sha1="e062f1939d36a45f185b5dbd726cdd833dc7c28c" offset="0x000000" />
-                <rom name="087-p2.bin" size="2097152" crc="9bbe27e0" sha1="b18117102159903c8e8f4e4226e1cc91a400e816" offset="0x100000" />
+                <rom name="087-pg1.p1" size="1048576" crc="282a336e" sha1="e062f1939d36a45f185b5dbd726cdd833dc7c28c" offset="0x000000" />
+                <rom name="087-p2.sp2" size="2097152" crc="9bbe27e0" sha1="b18117102159903c8e8f4e4226e1cc91a400e816" offset="0x100000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="087-s1.bin" size="131072" crc="74ec7d9f" sha1="d79c479838a7ca51735a44f91f1968ec5b3c6b91" offset="0x000000"/>
+                <rom name="087-s1.s1" size="131072" crc="74ec7d9f" sha1="d79c479838a7ca51735a44f91f1968ec5b3c6b91" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="087-m1.bin" size="131072" crc="8e6440eb" sha1="e3f72150af4e326543b29df71cda27d73ec087c1" offset="0x000000" />
+                <rom name="087-m1.m1" size="131072" crc="8e6440eb" sha1="e3f72150af4e326543b29df71cda27d73ec087c1" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="6291456">
-                <rom name="087-v1.bin" size="4194304" crc="84bdd9a0" sha1="adceceb00569eca13fcc2e0f0d9f0d9b06a06851" offset="0x000000" />
-                <rom name="087-v2.bin" size="2097152" crc="ac0f261a" sha1="5411bdff24cba7fdbc3397d45a70fb468d7a44b3" offset="0x400000" />
+                <rom name="087-v1.v1" size="4194304" crc="84bdd9a0" sha1="adceceb00569eca13fcc2e0f0d9f0d9b06a06851" offset="0x000000" />
+                <rom name="087-v2.v2" size="2097152" crc="ac0f261a" sha1="5411bdff24cba7fdbc3397d45a70fb468d7a44b3" offset="0x400000" />
 			</dataarea>
 			<dataarea name="sprites" size="27262976">
-                <rom name="087-c1.bin" size="4194304" crc="07a233bc" sha1="654cb56cfd6eeebe6745c0b8b730317fb8ccd3d9" offset="0x000000" loadflag="load16_byte" />
-                <rom name="087-c2.bin" size="4194304" crc="7a413592" sha1="b8c7a2d0d7a8b14d6cab94d7a5f347e73c6ab7a4" offset="0x000001" loadflag="load16_byte" />
-                <rom name="087-c3.bin" size="4194304" crc="8b793796" sha1="053acc129ea56691607a5d255845703e61fd3ada" offset="0x800000" loadflag="load16_byte" />
-                <rom name="087-c4.bin" size="4194304" crc="728fbf11" sha1="daa319d455f759bfc08a37b43218bdb48dc1c9e5" offset="0x800001" loadflag="load16_byte" />
-                <rom name="087-c5.bin" size="4194304" crc="172ab180" sha1="a6122f683bdb78d0079e1e360c1b96ba28def7b7" offset="0x1000000" loadflag="load16_byte" />
-                <rom name="087-c6.bin" size="4194304" crc="002ff8f3" sha1="3a378708697d727796c4f702dd5bbf1c9eb4daec" offset="0x1000001" loadflag="load16_byte" />
-                <rom name="087-c7.bin" size="1048576" crc="ae450e3d" sha1="ec482632cc347ec3f9e68df0ebcaa16ebe41b9f9" offset="0x1800000" loadflag="load16_byte" />
-                <rom name="087-c8.bin" size="1048576" crc="a9e82717" sha1="e39ee15d5140dbe7f06eea945cce9984a5e8b06a" offset="0x1800001" loadflag="load16_byte" />
+                <rom name="087-c1.c1" size="4194304" crc="07a233bc" sha1="654cb56cfd6eeebe6745c0b8b730317fb8ccd3d9" offset="0x000000" loadflag="load16_byte" />
+                <rom name="087-c2.c2" size="4194304" crc="7a413592" sha1="b8c7a2d0d7a8b14d6cab94d7a5f347e73c6ab7a4" offset="0x000001" loadflag="load16_byte" />
+                <rom name="087-c3.c3" size="4194304" crc="8b793796" sha1="053acc129ea56691607a5d255845703e61fd3ada" offset="0x800000" loadflag="load16_byte" />
+                <rom name="087-c4.c4" size="4194304" crc="728fbf11" sha1="daa319d455f759bfc08a37b43218bdb48dc1c9e5" offset="0x800001" loadflag="load16_byte" />
+                <rom name="087-c5.c5" size="4194304" crc="172ab180" sha1="a6122f683bdb78d0079e1e360c1b96ba28def7b7" offset="0x1000000" loadflag="load16_byte" />
+                <rom name="087-c6.c6" size="4194304" crc="002ff8f3" sha1="3a378708697d727796c4f702dd5bbf1c9eb4daec" offset="0x1000001" loadflag="load16_byte" />
+                <rom name="087-c7.c7" size="1048576" crc="ae450e3d" sha1="ec482632cc347ec3f9e68df0ebcaa16ebe41b9f9" offset="0x1800000" loadflag="load16_byte" />
+                <rom name="087-c8.c8" size="1048576" crc="a9e82717" sha1="e39ee15d5140dbe7f06eea945cce9984a5e8b06a" offset="0x1800001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 095 -->
+<!-- ID 095 (NGH-095) -->
 <!-- Release Date - Japan: 26/01/1996 USA: 26/01/1996 -->
 	<software name="rbff1">
 		<description>Real Bout Fatal Fury / Real Bout Garou Densetsu</description>
@@ -1690,30 +1686,30 @@
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="3145728">
-                <rom name="095-p1.bin" size="1048576" crc="63b4d8ae" sha1="03aa9f6bab6aee685d1b57a52823797704eea845" offset="0x000000" />
-                <rom name="095-p2.bin" size="2097152" crc="cc15826e" sha1="44d6ac6c0ca697a6f367dcfd809b1e1771cb0635" offset="0x100000" />
+                <rom name="095-p1.p1" size="1048576" crc="63b4d8ae" sha1="03aa9f6bab6aee685d1b57a52823797704eea845" offset="0x000000" />
+                <rom name="095-p2.sp2" size="2097152" crc="cc15826e" sha1="44d6ac6c0ca697a6f367dcfd809b1e1771cb0635" offset="0x100000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
-                <rom name="095-s1.bin" size="131072" crc="b6bf5e08" sha1="b527355c35ea097f3448676f2ffa65b8e56ae30c" offset="0x000000"/>
+                <rom name="095-s1.s1" size="131072" crc="b6bf5e08" sha1="b527355c35ea097f3448676f2ffa65b8e56ae30c" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="audiocpu" size="196608">
-                <rom name="095-m1.bin" size="131072" crc="653492a7" sha1="39e511fb9ed5d2135dc8428a31d0baafb2ab36e0" offset="0x000000" />
+                <rom name="095-m1.m1" size="131072" crc="653492a7" sha1="39e511fb9ed5d2135dc8428a31d0baafb2ab36e0" offset="0x000000" />
 				<rom size="131072" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="12582912">
-                <rom name="069-v1.bin" size="4194304" crc="2bdbd4db" sha1="5f4fecf69c2329d699cbd45829c19303b1e2a80e" offset="0x000000" />
-                <rom name="069-v2.bin" size="4194304" crc="a698a487" sha1="11b8bc53bc26a51f4a408e900e3769958625c4ed" offset="0x400000" />
-                <rom name="095-v3.bin" size="4194304" crc="189d1c6c" sha1="f0b8cd1ee40ea3feeb2800f0723b451ec8240203" offset="0x800000" />
+                <rom name="069-v1.v1" size="4194304" crc="2bdbd4db" sha1="5f4fecf69c2329d699cbd45829c19303b1e2a80e" offset="0x000000" />
+                <rom name="069-v2.v2" size="4194304" crc="a698a487" sha1="11b8bc53bc26a51f4a408e900e3769958625c4ed" offset="0x400000" />
+                <rom name="095-v3.v3" size="4194304" crc="189d1c6c" sha1="f0b8cd1ee40ea3feeb2800f0723b451ec8240203" offset="0x800000" />
 			</dataarea>
 			<dataarea name="sprites" size="29360128">
-                <rom name="069-c1.bin" size="4194304" crc="e302f93c" sha1="d8610b14900b2b8fe691b67ca9b1abb335dbff74" offset="0x000000" loadflag="load16_byte" />
-                <rom name="069-c2.bin" size="4194304" crc="1053a455" sha1="69501bfac68739e63d798045b812badd251d57b8" offset="0x000001" loadflag="load16_byte" />
-                <rom name="069-c3.bin" size="4194304" crc="1c0fde2f" sha1="cf6c2ef56c03a861de3b0b6dc0d7c9204d947f9d" offset="0x800000" loadflag="load16_byte" />
-                <rom name="069-c4.bin" size="4194304" crc="a25fc3d0" sha1="83cb349e2f1032652060b233e741fb893be5af16" offset="0x800001" loadflag="load16_byte" />
-                <rom name="095-c5.bin" size="4194304" crc="8b9b65df" sha1="e2a7e20855501f240bcd22f5cc92fcb4a9806abe" offset="0x1000000" loadflag="load16_byte" />
-                <rom name="095-c6.bin" size="4194304" crc="3e164718" sha1="53217f938c8964c1ca68a6fd5249c4169a5ac8e6" offset="0x1000001" loadflag="load16_byte" />
-                <rom name="095-c7.bin" size="2097152" crc="ca605e12" sha1="5150b835247fd705bc1dece97d423d9c20a51416" offset="0x1800000" loadflag="load16_byte" />
-                <rom name="095-c8.bin" size="2097152" crc="4e6beb6c" sha1="c0ac7cfc832ace6ad52c58f5da3a8101baead749" offset="0x1800001" loadflag="load16_byte" />
+                <rom name="069-c1.c1" size="4194304" crc="e302f93c" sha1="d8610b14900b2b8fe691b67ca9b1abb335dbff74" offset="0x000000" loadflag="load16_byte" />
+                <rom name="069-c2.c2" size="4194304" crc="1053a455" sha1="69501bfac68739e63d798045b812badd251d57b8" offset="0x000001" loadflag="load16_byte" />
+                <rom name="069-c3.c3" size="4194304" crc="1c0fde2f" sha1="cf6c2ef56c03a861de3b0b6dc0d7c9204d947f9d" offset="0x800000" loadflag="load16_byte" />
+                <rom name="069-c4.c4" size="4194304" crc="a25fc3d0" sha1="83cb349e2f1032652060b233e741fb893be5af16" offset="0x800001" loadflag="load16_byte" />
+                <rom name="095-c5.c5" size="4194304" crc="8b9b65df" sha1="e2a7e20855501f240bcd22f5cc92fcb4a9806abe" offset="0x1000000" loadflag="load16_byte" />
+                <rom name="095-c6.c6" size="4194304" crc="3e164718" sha1="53217f938c8964c1ca68a6fd5249c4169a5ac8e6" offset="0x1000001" loadflag="load16_byte" />
+                <rom name="095-c7.c7" size="2097152" crc="ca605e12" sha1="5150b835247fd705bc1dece97d423d9c20a51416" offset="0x1800000" loadflag="load16_byte" />
+                <rom name="095-c8.c8" size="2097152" crc="4e6beb6c" sha1="c0ac7cfc832ace6ad52c58f5da3a8101baead749" offset="0x1800001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
@@ -1933,7 +1929,7 @@
 		</part>
 	</software>
 
-<!-- ID 256 -->
+<!-- ID 256 (NGH-2560) -->
 <!-- Release Date - Japan: 01/06/2000 USA: 17/09/2001 -->
 	<software name="mslug3">
 		<description>Metal Slug 3</description>
@@ -1942,36 +1938,36 @@
 		<part name="cart" interface="aes_cart">
 			<feature name="crypt" value="mslug3_crypt" />
 			<dataarea name="maincpu" size="5242880">
-                <rom name="256-ph1.bin" size="1048576" crc="9c42ca85" sha1="7a8f77a89867b889295ae9b9dfd4ba28f02d234d" offset="0x000000" />
-                <rom name="256-ph2.bin" size="4194304" crc="1f3d8ce8" sha1="08b05a8abfb86ec09a5e758d6273acf1489961f9" offset="0x100000" />
+                <rom name="256-ph1.p1" size="1048576" crc="9c42ca85" sha1="7a8f77a89867b889295ae9b9dfd4ba28f02d234d" offset="0x000000" />
+                <rom name="256-ph2.sp2" size="4194304" crc="1f3d8ce8" sha1="08b05a8abfb86ec09a5e758d6273acf1489961f9" offset="0x100000" />
 			</dataarea>
 			<dataarea name="fixed" size="524288">
                 <rom value="0" length="524288" offset="0x000000" loadflag="fill" />
 			</dataarea>
 			<dataarea name="audiocpu" size="589824">
-                <rom name="256-m1.bin" size="524288" crc="eaeec116" sha1="54419dbb21edc8c4b37eaac2e7ad9496d2de037a" offset="0x000000" />
+                <rom name="256-m1.m1" size="524288" crc="eaeec116" sha1="54419dbb21edc8c4b37eaac2e7ad9496d2de037a" offset="0x000000" />
 				<rom size="524288" offset="0x010000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="ymsnd" size="16777216">
-                <rom name="256-v1.bin" size="4194304" crc="f2690241" sha1="fd56babc1934d10e0d27c32f032f9edda7ca8ce9" offset="0x000000" />
-                <rom name="256-v2.bin" size="4194304" crc="7e2a10bd" sha1="0d587fb9f64cba0315ce2d8a03e2b8fe34936dff" offset="0x400000" />
-                <rom name="256-v3.bin" size="4194304" crc="0eaec17c" sha1="c3ed613cc6993edd6fc0d62a90bcd85de8e21915" offset="0x800000" />
-                <rom name="256-v4.bin" size="4194304" crc="9b4b22d4" sha1="9764fbf8453e52f80aa97a46fb9cf5937ef15a31" offset="0xc00000" />
+                <rom name="256-v1.v1" size="4194304" crc="f2690241" sha1="fd56babc1934d10e0d27c32f032f9edda7ca8ce9" offset="0x000000" />
+                <rom name="256-v2.v2" size="4194304" crc="7e2a10bd" sha1="0d587fb9f64cba0315ce2d8a03e2b8fe34936dff" offset="0x400000" />
+                <rom name="256-v3.v3" size="4194304" crc="0eaec17c" sha1="c3ed613cc6993edd6fc0d62a90bcd85de8e21915" offset="0x800000" />
+                <rom name="256-v4.v4" size="4194304" crc="9b4b22d4" sha1="9764fbf8453e52f80aa97a46fb9cf5937ef15a31" offset="0xc00000" />
 			</dataarea>
 			<dataarea name="sprites" size="67108864">
-                <rom name="256-c1.bin" size="8388608" crc="5a79c34e" sha1="b8aa51fa50935cae62ab3d125b723ab888691e60" offset="0x000000" loadflag="load16_byte" />
-                <rom name="256-c2.bin" size="8388608" crc="944c362c" sha1="3843ab300f956280475469caee70135658f67089" offset="0x000001" loadflag="load16_byte" />
-                <rom name="256-c3.bin" size="8388608" crc="6e69d36f" sha1="94e8cf42e999114b4bd8b30e0aa2f365578c4c9a" offset="0x1000000" loadflag="load16_byte" />
-                <rom name="256-c4.bin" size="8388608" crc="b755b4eb" sha1="804700a0966a48f130c434ede3f970792ea74fa5" offset="0x1000001" loadflag="load16_byte" />
-                <rom name="256-c5.bin" size="8388608" crc="7aacab47" sha1="312c1c9846175fe1a3cad51d5ae230cf674fc93d" offset="0x2000000" loadflag="load16_byte" />
-                <rom name="256-c6.bin" size="8388608" crc="c698fd5d" sha1="16818883b06849ba2f8d61bdd5e21aaf99bd8408" offset="0x2000001" loadflag="load16_byte" />
-                <rom name="256-c7.bin" size="8388608" crc="cfceddd2" sha1="7def666adf8bd1703f40c61f182fc040b6362dc9" offset="0x3000000" loadflag="load16_byte" />
-                <rom name="256-c8.bin" size="8388608" crc="4d9be34c" sha1="a737bdfa2b815aea7067e7af2636e83a9409c414" offset="0x3000001" loadflag="load16_byte" />
+                <rom name="256-c1.c1" size="8388608" crc="5a79c34e" sha1="b8aa51fa50935cae62ab3d125b723ab888691e60" offset="0x000000" loadflag="load16_byte" />
+                <rom name="256-c2.c2" size="8388608" crc="944c362c" sha1="3843ab300f956280475469caee70135658f67089" offset="0x000001" loadflag="load16_byte" />
+                <rom name="256-c3.c3" size="8388608" crc="6e69d36f" sha1="94e8cf42e999114b4bd8b30e0aa2f365578c4c9a" offset="0x1000000" loadflag="load16_byte" />
+                <rom name="256-c4.c4" size="8388608" crc="b755b4eb" sha1="804700a0966a48f130c434ede3f970792ea74fa5" offset="0x1000001" loadflag="load16_byte" />
+                <rom name="256-c5.c5" size="8388608" crc="7aacab47" sha1="312c1c9846175fe1a3cad51d5ae230cf674fc93d" offset="0x2000000" loadflag="load16_byte" />
+                <rom name="256-c6.c6" size="8388608" crc="c698fd5d" sha1="16818883b06849ba2f8d61bdd5e21aaf99bd8408" offset="0x2000001" loadflag="load16_byte" />
+                <rom name="256-c7.c7" size="8388608" crc="cfceddd2" sha1="7def666adf8bd1703f40c61f182fc040b6362dc9" offset="0x3000000" loadflag="load16_byte" />
+                <rom name="256-c8.c8" size="8388608" crc="4d9be34c" sha1="a737bdfa2b815aea7067e7af2636e83a9409c414" offset="0x3000001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- ID 257 -->
+<!-- ID 257 (NGH-2570) -->
 <!-- Release Date - Japan: 21/12/2000 -->
 	<software name="kof2000">
 		<description>The King of Fighters 2000</description>
@@ -1980,9 +1976,9 @@
 		<part name="cart" interface="aes_cart">
 			<feature name="crypt" value="kof2000_crypt" />
 			<dataarea name="maincpu" size="9437184">
-                <rom name="257-sma.bin" size="262144" crc="71c6e6bb" sha1="1bd29ded4c6b29780db8e8b772c452189699ca89" offset="0x0c0000" />
-                <rom name="257-p1.bin" size="4194304" crc="60947b4c" sha1="5faa0a7ac7734d6c8e276589bd12dd574264647d" offset="0x100000" />
-                <rom name="257-p2.bin" size="4194304" crc="1b7ec415" sha1="f19fa44e9ee5b5a6eb4a051349d6bc4acc3bbbdb" offset="0x500000" />
+                <rom name="neo-sma" size="262144" crc="71c6e6bb" sha1="1bd29ded4c6b29780db8e8b772c452189699ca89" offset="0x0c0000" />
+                <rom name="257-p1.p1" size="4194304" crc="60947b4c" sha1="5faa0a7ac7734d6c8e276589bd12dd574264647d" offset="0x100000" />
+                <rom name="257-p2.p2" size="4194304" crc="1b7ec415" sha1="f19fa44e9ee5b5a6eb4a051349d6bc4acc3bbbdb" offset="0x500000" />
 			</dataarea>
 			<dataarea name="fixed" size="524288">
                 <rom value="0" length="524288" offset="0x000000" loadflag="fill" />
@@ -1991,23 +1987,23 @@
                 <rom value="ff" length="589824" offset="0x000000" loadflag="fill" />
 			</dataarea>
 			<dataarea name="audiocrypt" size="524288">
-                <rom name="257-m1.bin" size="262144" crc="4b749113" sha1="2af2361146edd0ce3966614d90165a5c1afb8de4" offset="0x000000" />
+                <rom name="257-m1.m1" size="262144" crc="4b749113" sha1="2af2361146edd0ce3966614d90165a5c1afb8de4" offset="0x000000" />
 			</dataarea>
 			<dataarea name="ymsnd" size="16777216">
-                <rom name="257-v1.bin" size="4194304" crc="17cde847" sha1="4bcc0205b70dc6d9216b29025450c9c5b08cb65d" offset="0x000000" />
-                <rom name="257-v2.bin" size="4194304" crc="1afb20ff" sha1="57dfd2de058139345ff2b744a225790baaecd5a2" offset="0x400000" />
-                <rom name="257-v3.bin" size="4194304" crc="4605036a" sha1="51b228a0600d38a6ec37aec4822879ec3b0ee106" offset="0x800000" />
-                <rom name="257-v4.bin" size="4194304" crc="764bbd6b" sha1="df23c09ca6cf7d0ae5e11ff16e30c159725106b3" offset="0xc00000" />
+                <rom name="257-v1.v1" size="4194304" crc="17cde847" sha1="4bcc0205b70dc6d9216b29025450c9c5b08cb65d" offset="0x000000" />
+                <rom name="257-v2.v2" size="4194304" crc="1afb20ff" sha1="57dfd2de058139345ff2b744a225790baaecd5a2" offset="0x400000" />
+                <rom name="257-v3.v3" size="4194304" crc="4605036a" sha1="51b228a0600d38a6ec37aec4822879ec3b0ee106" offset="0x800000" />
+                <rom name="257-v4.v4" size="4194304" crc="764bbd6b" sha1="df23c09ca6cf7d0ae5e11ff16e30c159725106b3" offset="0xc00000" />
 			</dataarea>
 			<dataarea name="sprites" size="67108864">
-                <rom name="257-c1.bin" size="8388608" crc="cef1cdfa" sha1="6135080f3a6b4712b76cc217edcc58e72b55c2b9" offset="0x000000" loadflag="load16_byte" />
-                <rom name="257-c2.bin" size="8388608" crc="f7bf0003" sha1="9f7b19a2100cf7d12867e742f440dd5277b4f895" offset="0x000001" loadflag="load16_byte" />
-                <rom name="257-c3.bin" size="8388608" crc="101e6560" sha1="8073ae1139e215d1167f8d32c14079a46ce3ee1c" offset="0x1000000" loadflag="load16_byte" />
-                <rom name="257-c4.bin" size="8388608" crc="bd2fc1b1" sha1="da0006761923ad49b404a08d7a151193ee307a69" offset="0x1000001" loadflag="load16_byte" />
-                <rom name="257-c5.bin" size="8388608" crc="89775412" sha1="b221b30224bc4239f1b3c2d2fd1cd4fa84e3523c" offset="0x2000000" loadflag="load16_byte" />
-                <rom name="257-c6.bin" size="8388608" crc="fa7200d5" sha1="6f2b0d38af34e280d56a58955400e5c679906871" offset="0x2000001" loadflag="load16_byte" />
-                <rom name="257-c7.bin" size="8388608" crc="7da11fe4" sha1="065336cf166807acb6c8569d59d3bf37a19b0a42" offset="0x3000000" loadflag="load16_byte" />
-                <rom name="257-c8.bin" size="8388608" crc="b1afa60b" sha1="b916184f5cfe4121752270f4f65abf35d8eb0519" offset="0x3000001" loadflag="load16_byte" />
+                <rom name="257-c1.c1" size="8388608" crc="cef1cdfa" sha1="6135080f3a6b4712b76cc217edcc58e72b55c2b9" offset="0x000000" loadflag="load16_byte" />
+                <rom name="257-c2.c2" size="8388608" crc="f7bf0003" sha1="9f7b19a2100cf7d12867e742f440dd5277b4f895" offset="0x000001" loadflag="load16_byte" />
+                <rom name="257-c3.c3" size="8388608" crc="101e6560" sha1="8073ae1139e215d1167f8d32c14079a46ce3ee1c" offset="0x1000000" loadflag="load16_byte" />
+                <rom name="257-c4.c4" size="8388608" crc="bd2fc1b1" sha1="da0006761923ad49b404a08d7a151193ee307a69" offset="0x1000001" loadflag="load16_byte" />
+                <rom name="257-c5.c5" size="8388608" crc="89775412" sha1="b221b30224bc4239f1b3c2d2fd1cd4fa84e3523c" offset="0x2000000" loadflag="load16_byte" />
+                <rom name="257-c6.c6" size="8388608" crc="fa7200d5" sha1="6f2b0d38af34e280d56a58955400e5c679906871" offset="0x2000001" loadflag="load16_byte" />
+                <rom name="257-c7.c7" size="8388608" crc="7da11fe4" sha1="065336cf166807acb6c8569d59d3bf37a19b0a42" offset="0x3000000" loadflag="load16_byte" />
+                <rom name="257-c8.c8" size="8388608" crc="b1afa60b" sha1="b916184f5cfe4121752270f4f65abf35d8eb0519" offset="0x3000001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
@@ -2127,7 +2123,7 @@
 	</software>
 
 
-<!-- ID 266 -->
+<!-- ID 266 (NGH-2660) -->
 <!-- Release Date - Japan: 29/05/2003 USA: 29/05/2003 -->
 	<software name="matrim">
 		<description>Matrimelee / Shin Gouketsuji Ichizoku Toukon</description>
@@ -2136,8 +2132,8 @@
 		<part name="cart" interface="aes_cart">
 			<feature name="crypt" value="matrim_crypt" />
 			<dataarea name="maincpu" size="5242880">
-                <rom name="266-p1.bin" size="1048576" crc="5d4c2dc7" sha1="8d723b0d28ec344eef26009b361a2b97d300dd51" offset="0x000000" />
-                <rom name="266-p2.bin" size="4194304" crc="a14b1906" sha1="1daa14d73512f760ef569b06f9facb279437d1db" offset="0x100000" />
+                <rom name="266-p1.p1" size="1048576" crc="5d4c2dc7" sha1="8d723b0d28ec344eef26009b361a2b97d300dd51" offset="0x000000" />
+                <rom name="266-p2.sp2" size="4194304" crc="a14b1906" sha1="1daa14d73512f760ef569b06f9facb279437d1db" offset="0x100000" />
 			</dataarea>
 			<dataarea name="fixed" size="524288">
                 <rom value="0" length="524288" offset="0x000000" loadflag="fill" />
@@ -2146,21 +2142,21 @@
                 <rom value="ff" length="589824" offset="0x000000" loadflag="fill" />
 			</dataarea>
 			<dataarea name="audiocrypt" size="524288">
-                <rom name="266-m1.bin" size="131072" crc="456c3e6c" sha1="5a07d0186198a18d2dda1331093cf29b0b9b2984" offset="0x000000" />
+                <rom name="266-m1.m1" size="131072" crc="456c3e6c" sha1="5a07d0186198a18d2dda1331093cf29b0b9b2984" offset="0x000000" />
 			</dataarea>
 			<dataarea name="ymsnd" size="16777216">
-                <rom name="266-v1.bin" size="8388608" crc="a4f83690" sha1="200d683d8c30ebc6d0ed331aa5bbba39b4e07160" offset="0x000000" />
-                <rom name="266-v2.bin" size="8388608" crc="d0f69eda" sha1="9d7e98976ad433ed8a35d7afffa38130444ba7db" offset="0x800000" />
+                <rom name="266-v1.v1" size="8388608" crc="a4f83690" sha1="200d683d8c30ebc6d0ed331aa5bbba39b4e07160" offset="0x000000" />
+                <rom name="266-v2.v2" size="8388608" crc="d0f69eda" sha1="9d7e98976ad433ed8a35d7afffa38130444ba7db" offset="0x800000" />
 			</dataarea>
 			<dataarea name="sprites" size="67108864">
-                <rom name="266-c1.bin" size="8388608" crc="505f4e30" sha1="f22b6f76fc0cad963555dc89d072967c8dc8b79a" offset="0x000000" loadflag="load16_byte" />
-                <rom name="266-c2.bin" size="8388608" crc="3cb57482" sha1="dab15bc24391f9a5173de76af48b612fb9636ccf" offset="0x000001" loadflag="load16_byte" />
-                <rom name="266-c3.bin" size="8388608" crc="f1cc6ad0" sha1="66c1cccc0332ffd2d3064f06330c41f95ca09ced" offset="0x1000000" loadflag="load16_byte" />
-                <rom name="266-c4.bin" size="8388608" crc="45b806b7" sha1="c2bb866fded53d62fad0fc88d89d5e7d4cb1894f" offset="0x1000001" loadflag="load16_byte" />
-                <rom name="266-c5.bin" size="8388608" crc="9a15dd6b" sha1="194a6973a7a9e3847efe1bdbaeaeb16e74aff2dd" offset="0x2000000" loadflag="load16_byte" />
-                <rom name="266-c6.bin" size="8388608" crc="281cb939" sha1="bdb7766cfde581ccfaee2be7fe48445f360a2301" offset="0x2000001" loadflag="load16_byte" />
-                <rom name="266-c7.bin" size="8388608" crc="4b71f780" sha1="d5611a6f6b730db58613b48f2b0174661ccfb7bb" offset="0x3000000" loadflag="load16_byte" />
-                <rom name="266-c8.bin" size="8388608" crc="29873d33" sha1="dc77f129ed49b8d40d0d4241feef3f6c2f19a987" offset="0x3000001" loadflag="load16_byte" />
+                <rom name="266-c1.c1" size="8388608" crc="505f4e30" sha1="f22b6f76fc0cad963555dc89d072967c8dc8b79a" offset="0x000000" loadflag="load16_byte" />
+                <rom name="266-c2.c2" size="8388608" crc="3cb57482" sha1="dab15bc24391f9a5173de76af48b612fb9636ccf" offset="0x000001" loadflag="load16_byte" />
+                <rom name="266-c3.c3" size="8388608" crc="f1cc6ad0" sha1="66c1cccc0332ffd2d3064f06330c41f95ca09ced" offset="0x1000000" loadflag="load16_byte" />
+                <rom name="266-c4.c4" size="8388608" crc="45b806b7" sha1="c2bb866fded53d62fad0fc88d89d5e7d4cb1894f" offset="0x1000001" loadflag="load16_byte" />
+                <rom name="266-c5.c5" size="8388608" crc="9a15dd6b" sha1="194a6973a7a9e3847efe1bdbaeaeb16e74aff2dd" offset="0x2000000" loadflag="load16_byte" />
+                <rom name="266-c6.c6" size="8388608" crc="281cb939" sha1="bdb7766cfde581ccfaee2be7fe48445f360a2301" offset="0x2000001" loadflag="load16_byte" />
+                <rom name="266-c7.c7" size="8388608" crc="4b71f780" sha1="d5611a6f6b730db58613b48f2b0174661ccfb7bb" offset="0x3000000" loadflag="load16_byte" />
+                <rom name="266-c8.c8" size="8388608" crc="29873d33" sha1="dc77f129ed49b8d40d0d4241feef3f6c2f19a987" offset="0x3000001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
@@ -2240,7 +2236,8 @@
 			</dataarea>
 		</part>
 	</software>
-<!-- ID 270 -->
+	
+<!-- ID 270 (NGH-2700) -->
 	<software name="samsho5">
 	<!-- Release Date - Japan: 11/12/2003 USA: 11/12/2003 -->
 		<description>Samurai Shodown V / Samurai Spirits Zero</description>
@@ -2249,8 +2246,8 @@
 		<part name="cart" interface="aes_cart">
 			<feature name="crypt" value="samsho5_crypt" />
 			<dataarea name="maincpu" size="8388608">
-                <rom name="270-p1c.bin" size="4194304" crc="bf956089" sha1="c538289069bf338b9fa7ecc5c9143763dbb776a8" offset="0x000000" />
-                <rom name="270-p2c.bin" size="4194304" crc="943a6b1d" sha1="12bd02fc197456da6ee86f066086094cef0f4bf9" offset="0x400000" />
+                <rom name="270-p1c.p1" size="4194304" crc="bf956089" sha1="c538289069bf338b9fa7ecc5c9143763dbb776a8" offset="0x000000" />
+                <rom name="270-p2c.sp2" size="4194304" crc="943a6b1d" sha1="12bd02fc197456da6ee86f066086094cef0f4bf9" offset="0x400000" />
 			</dataarea>
 			<dataarea name="fixed" size="524288">
                 <rom value="0" length="524288" offset="0x000000" loadflag="fill" />
@@ -2259,21 +2256,21 @@
                 <rom value="ff" length="589824" offset="0x000000" loadflag="fill" />
 			</dataarea>
 			<dataarea name="audiocrypt" size="524288">
-                <rom name="270-m1.bin" size="524288" crc="49c9901a" sha1="2623e9765a0eba58fee2de72851e9dc502344a3d" offset="0x000000" />
+                <rom name="270-m1.m1" size="524288" crc="49c9901a" sha1="2623e9765a0eba58fee2de72851e9dc502344a3d" offset="0x000000" />
 			</dataarea>
 			<dataarea name="ymsnd" size="16777216">
-                <rom name="270-v1.bin" size="8388608" crc="62e434eb" sha1="1985f5e88f8e866f9683b6cea901aa28c04b80bf" offset="0x000000" />
-                <rom name="270-v2.bin" size="8388608" crc="180f3c9a" sha1="6d7dc2605ead6e78704efa127e7e0dfe621e2c54" offset="0x800000" />
+                <rom name="270-v1.v1" size="8388608" crc="62e434eb" sha1="1985f5e88f8e866f9683b6cea901aa28c04b80bf" offset="0x000000" />
+                <rom name="270-v2.v2" size="8388608" crc="180f3c9a" sha1="6d7dc2605ead6e78704efa127e7e0dfe621e2c54" offset="0x800000" />
 			</dataarea>
 			<dataarea name="sprites" size="67108864">
-                <rom name="270-c1.bin" size="8388608" crc="14ffffac" sha1="2ccebfdd0c7907679ae95bf6eca85b8d322441e2" offset="0x000000" loadflag="load16_byte" />
-                <rom name="270-c2.bin" size="8388608" crc="401f7299" sha1="94e48cdf1682b1250f53c59f3f71d995e928d17b" offset="0x000001" loadflag="load16_byte" />
-                <rom name="270-c3.bin" size="8388608" crc="838f0260" sha1="d5c8d3c6e7221d04e0b20882a847752e5ba95635" offset="0x1000000" loadflag="load16_byte" />
-                <rom name="270-c4.bin" size="8388608" crc="041560a5" sha1="d165e533699f15b1e079c82f97db3542b3a7dd66" offset="0x1000001" loadflag="load16_byte" />
-                <rom name="270-c5.bin" size="8388608" crc="bd30b52d" sha1="9f8282e684415b4045218cf764ef7d75a70e3240" offset="0x2000000" loadflag="load16_byte" />
-                <rom name="270-c6.bin" size="8388608" crc="86a69c70" sha1="526732cdb408cf680af9da39057bce6a4dfb5e13" offset="0x2000001" loadflag="load16_byte" />
-                <rom name="270-c7.bin" size="8388608" crc="d28fbc3c" sha1="a82a6ba6760fad14d9309f9147cb7d80bd6f70fc" offset="0x3000000" loadflag="load16_byte" />
-                <rom name="270-c8.bin" size="8388608" crc="02c530a6" sha1="7a3fafa6075506c6ef78cc4ec2cb72118ec83cb9" offset="0x3000001" loadflag="load16_byte" />
+                <rom name="270-c1.c1" size="8388608" crc="14ffffac" sha1="2ccebfdd0c7907679ae95bf6eca85b8d322441e2" offset="0x000000" loadflag="load16_byte" />
+                <rom name="270-c2.c2" size="8388608" crc="401f7299" sha1="94e48cdf1682b1250f53c59f3f71d995e928d17b" offset="0x000001" loadflag="load16_byte" />
+                <rom name="270-c3.c3" size="8388608" crc="838f0260" sha1="d5c8d3c6e7221d04e0b20882a847752e5ba95635" offset="0x1000000" loadflag="load16_byte" />
+                <rom name="270-c4.c4" size="8388608" crc="041560a5" sha1="d165e533699f15b1e079c82f97db3542b3a7dd66" offset="0x1000001" loadflag="load16_byte" />
+                <rom name="270-c5.c5" size="8388608" crc="bd30b52d" sha1="9f8282e684415b4045218cf764ef7d75a70e3240" offset="0x2000000" loadflag="load16_byte" />
+                <rom name="270-c6.c6" size="8388608" crc="86a69c70" sha1="526732cdb408cf680af9da39057bce6a4dfb5e13" offset="0x2000001" loadflag="load16_byte" />
+                <rom name="270-c7.c7" size="8388608" crc="d28fbc3c" sha1="a82a6ba6760fad14d9309f9147cb7d80bd6f70fc" offset="0x3000000" loadflag="load16_byte" />
+                <rom name="270-c8.c8" size="8388608" crc="02c530a6" sha1="7a3fafa6075506c6ef78cc4ec2cb72118ec83cb9" offset="0x3000001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
