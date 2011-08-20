@@ -2,29 +2,24 @@
 
     NeXT
 
-    05/11/2009 Skeleton driver.
-
     TODO:
 
     - SCC
-    - keyboard
     - mouse
     - network
     - optical drive
     - floppy
     - hdd
 
-    DASM notes:
-    - Jumping to 0x21ee means that the system POST failed
-    - 0x258c: ROM test (check with 0x1a)
-    - currently fails at 0xfee sub-routine (jumping it starts the MO disk check)
-
     Memory map and other bits can be found here:
     http://fxr.watson.org/fxr/source/arch/next68k/include/cpu.h?v=NETBSD5#L366
 
 ****************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "includes/next.h"
+#include "machine/pc_fdc.h"
 
 bool next_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
@@ -39,7 +34,7 @@ bool next_state::screen_update(screen_device &screen, bitmap_t &bitmap, const re
 		{
 			for(xi=0;xi<16;xi++)
 			{
-				UINT8 pen = (m_vram[count] >> (30-(xi*2))) & 0x3;
+				UINT8 pen = (vram[count] >> (30-(xi*2))) & 0x3;
 
 				pen ^= 3;
 
@@ -60,28 +55,31 @@ bool next_state::screen_update(screen_device &screen, bitmap_t &bitmap, const re
 READ8_MEMBER( next_state::io_r )
 {
 	if(!space.debugger_access())
-		printf("Read I/O register %08x\n",offset+0x02000000);
+		printf("io_r %08x (%08x)\n",offset+0x02000000, cpu_get_pc(&space.device()));
 
+	if(offset == 0xc0)
+		return 0;
+ 
 	return 0xff;
 }
 
 WRITE8_MEMBER( next_state::io_w )
 {
 	if(!space.debugger_access())
-		printf("Write I/O register %08x %02x\n",offset+0x02000000,data);
+		printf("io_w %08x, %02x (%08x)\n",offset+0x02000000,data, cpu_get_pc(&space.device()));
 }
 
 /* map ROM at 0x01000000-0x0101ffff? */
 READ32_MEMBER( next_state::rom_map_r )
 {
-	if(!space.debugger_access())
+	if(0 && !space.debugger_access())
 		printf("%08x ROM MAP?\n",cpu_get_pc(&space.device()));
 	return 0x01000000;
 }
 
 READ32_MEMBER( next_state::scr2_r )
 {
-	if(!space.debugger_access())
+	if(0 && !space.debugger_access())
 		printf("%08x\n",cpu_get_pc(&space.device()));
 	/*
     x--- ---- ---- ---- ---- ---- ---- ---- dsp reset
@@ -103,24 +101,28 @@ READ32_MEMBER( next_state::scr2_r )
     ---- ---- ---- ---- ---- ---- -x-- ---- dsp ie
     ---- ---- ---- ---- ---- ---- --x- ---- mem en
     ---- ---- ---- ---- ---- ---- ---- ---x led
+
+	68040-25, 100ns, 32M: 00000c80
+	68040-25, 100ns, 20M: 00ff0c80
+
     */
 
-	UINT32 data = m_scr2 & 0xfffffbff;
+	UINT32 data = scr2 & 0xfffffbff;
 
-	data |= m_rtc->sdo_r() << 10;
+	data |= rtc->sdo_r() << 10;
 
 	return data;
 }
 
 WRITE32_MEMBER( next_state::scr2_w )
 {
-	if(!space.debugger_access())
-		printf("%08x %08x\n",cpu_get_pc(&space.device()),data);
-	COMBINE_DATA(&m_scr2);
+	if(0 && !space.debugger_access())
+		printf("scr2_w %08x (%08x)\n", data, cpu_get_pc(&space.device()));
+	COMBINE_DATA(&scr2);
 
-	m_rtc->ce_w(BIT(m_scr2, 8));
-	m_rtc->sdi_w(BIT(m_scr2, 10));
-	m_rtc->sck_w(BIT(m_scr2, 9));
+	rtc->ce_w(BIT(scr2, 8));
+	rtc->sdi_w(BIT(scr2, 10));
+	rtc->sck_w(BIT(scr2, 9));
 }
 
 READ32_MEMBER( next_state::scr1_r )
@@ -133,6 +135,9 @@ READ32_MEMBER( next_state::scr1_r )
         ---- ---- ---- ---- ---- ---- -xx- ---- video mem speed
         ---- ---- ---- ---- ---- ---- ---x x--- mem speed
         ---- ---- ---- ---- ---- ---- ---- -xxx cpu speed
+
+		68040-25: 00011102
+		68040-25: 00013002 (non-turbo, color)
     */
 
 	return 0x00012002; // TODO
@@ -140,22 +145,22 @@ READ32_MEMBER( next_state::scr1_r )
 
 READ32_MEMBER( next_state::irq_status_r )
 {
-	return m_irq_status;
+	return irq_status;
 }
 
 WRITE32_MEMBER( next_state::irq_status_w )
 {
-	COMBINE_DATA(&m_irq_status);
+	COMBINE_DATA(&irq_status);
 }
 
 READ32_MEMBER( next_state::irq_mask_r )
 {
-	return m_irq_mask;
+	return irq_mask;
 }
 
 WRITE32_MEMBER( next_state::irq_mask_w )
 {
-	COMBINE_DATA(&m_irq_mask);
+	COMBINE_DATA(&irq_mask);
 }
 
 READ32_MEMBER( next_state::modisk_r)
@@ -163,68 +168,103 @@ READ32_MEMBER( next_state::modisk_r)
 	return 0; // return 0 atm
 }
 
-READ32_MEMBER( next_state::network_r)
+READ32_MEMBER( next_state::event_counter_r)
 {
-	return 0xffffffff;//machine().rand(); // return 0 atm
+	// Event counters, around that time, are usually fixed-frequency counters.
+	// This one being 1MHz seems to make sense
+
+	// The nexttrb rom seems pretty convinced that it's 20 bits only.
+
+	return machine().time().as_ticks(1000000) & 0xfffff;
 }
 
-READ32_MEMBER( next_state::unk_r)
+READ32_MEMBER( next_state::network_r)
 {
-	return 0xffffffff;//machine().rand(); // return 0 atm
+	return 0xffffffff;
+}
+
+READ32_MEMBER( next_state::dsp_r)
+{
+	return 0xffffffff;
+}
+
+void next_state::scc_int()
+{
+}
+
+void next_state::keyboard_int()
+{
+}
+
+void next_state::machine_start()
+{
+	save_item(NAME(scr2));
+	save_item(NAME(irq_status));
+	save_item(NAME(irq_mask));
+}
+
+void next_state::machine_reset()
+{
+	scr2 = 0;
+	irq_status = 0;
+	irq_mask = 0;
 }
 
 static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x01000000, 0x0101ffff) AM_ROM AM_REGION("user1", 0)
-//  AM_RANGE(0x02000010, 0x02000010) AM_MIRROR(0x100000) SCSI DMA CSR
-//  AM_RANGE(0x02000040, 0x02000040) AM_MIRROR(0x100000) SOUNDOUT DMA CSR
-//  AM_RANGE(0x02000050, 0x02000050) AM_MIRROR(0x100000) DISK DMA CSR
-//  AM_RANGE(0x02000080, 0x02000080) AM_MIRROR(0x100000) SOUNDIN DMA CSR
-//  AM_RANGE(0x02000090, 0x02000090) AM_MIRROR(0x100000) PRINTER DMA CSR
-//  AM_RANGE(0x020000c0, 0x020000c0) AM_MIRROR(0x100000) SCC DMA CSR
-//  AM_RANGE(0x020000d0, 0x020000d0) AM_MIRROR(0x100000) DSP DMA CSR
-//  AM_RANGE(0x02000110, 0x02000110) AM_MIRROR(0x100000) ENETX DMA CSR
-//  AM_RANGE(0x02000150, 0x02000150) AM_MIRROR(0x100000) ENETR DMA CSR
-//  AM_RANGE(0x02000180, 0x02000180) AM_MIRROR(0x100000) VIDEO DMA CSR
-//  AM_RANGE(0x020001c0, 0x020001c0) AM_MIRROR(0x100000) R2M DMA CSR
-//  AM_RANGE(0x020001d0, 0x020001d0) AM_MIRROR(0x100000) M2R DMA CSR
-	AM_RANGE(0x02006000, 0x02006003) AM_MIRROR(0x100000) AM_READ(unk_r) // ethernet
-//  AM_RANGE(0x02006010, 0x02006013) AM_MIRROR(0x100000) memory timing
-	AM_RANGE(0x02007000, 0x02007003) AM_MIRROR(0x100000) AM_READWRITE(irq_status_r,irq_status_w)
-	AM_RANGE(0x02007800, 0x02007803) AM_MIRROR(0x100000) AM_READWRITE(irq_mask_r,irq_mask_w)
-//  AM_RANGE(0x02008000, 0x02008003) AM_MIRROR(0x100000) DSP
-	AM_RANGE(0x0200c000, 0x0200c003) AM_MIRROR(0x100000) AM_READ(scr1_r)
-	AM_RANGE(0x0200c800, 0x0200c803) AM_MIRROR(0x100000) AM_READ(rom_map_r)
-	AM_RANGE(0x0200d000, 0x0200d003) AM_MIRROR(0x100000) AM_READWRITE(scr2_r,scr2_w)
-//  AM_RANGE(0x0200d800, 0x0200d803) AM_MIRROR(0x100000) RMTINT
-	AM_RANGE(0x0200e000, 0x0200e00f) AM_MIRROR(0x100000) AM_READ(unk_r) //keyboard
-//  AM_RANGE(0x0200f000, 0x0200f003) AM_MIRROR(0x100000) printer
-//  AM_RANGE(0x02010000, 0x02010003) AM_MIRROR(0x100000) brightness
-	AM_RANGE(0x02012004, 0x02012007) AM_MIRROR(0x100000) AM_READ(modisk_r)
-//  AM_RANGE(0x02014000, 0x02014003) AM_MIRROR(0x100000) SCSI
-//  AM_RANGE(0x02014100, 0x02014103) AM_MIRROR(0x100000) floppy
-//  AM_RANGE(0x02016000, 0x02016003) AM_MIRROR(0x100000) timer
-//  AM_RANGE(0x02016004, 0x02016007) AM_MIRROR(0x100000) timer CSR
-//  AM_RANGE(0x02018000, 0x02018003) AM_MIRROR(0x100000) SCC
-//  AM_RANGE(0x02018004, 0x02018007) AM_MIRROR(0x100000) SCC CLK
-//  AM_RANGE(0x02018100, 0x02018103) AM_MIRROR(0x100000) Color RAMDAC
-//  AM_RANGE(0x02018104, 0x02018107) AM_MIRROR(0x100000) Color CSR
-//  AM_RANGE(0x02018190, 0x02018197) AM_MIRROR(0x100000) warp 9c DRAM timing
-//  AM_RANGE(0x02018198, 0x0201819f) AM_MIRROR(0x100000) warp 9c VRAM timing
-	AM_RANGE(0x0201a000, 0x0201a003) AM_MIRROR(0x100000) AM_READ(network_r) // EVENTC
-//  AM_RANGE(0x020c0000, 0x020c0004) AM_MIRROR(0x100000) BMAP
-	AM_RANGE(0x02000000, 0x0201ffff) AM_MIRROR(0x100000) AM_READWRITE8(io_r,io_w,0xffffffff) //intentional fall-through
+//  AM_RANGE(0x02000010, 0x02000010) AM_MIRROR(0x300000) SCSI DMA CSR
+//  AM_RANGE(0x02000040, 0x02000040) AM_MIRROR(0x300000) SOUNDOUT DMA CSR
+//  AM_RANGE(0x02000050, 0x02000050) AM_MIRROR(0x300000) DISK DMA CSR
+//  AM_RANGE(0x02000080, 0x02000080) AM_MIRROR(0x300000) SOUNDIN DMA CSR
+//  AM_RANGE(0x02000090, 0x02000090) AM_MIRROR(0x300000) PRINTER DMA CSR
+//  AM_RANGE(0x020000c0, 0x020000c0) AM_MIRROR(0x300000) SCC DMA CSR
+//  AM_RANGE(0x020000d0, 0x020000d0) AM_MIRROR(0x300000) DSP DMA CSR
+//  AM_RANGE(0x02000110, 0x02000110) AM_MIRROR(0x300000) ENETX DMA CSR
+//  AM_RANGE(0x02000150, 0x02000150) AM_MIRROR(0x300000) ENETR DMA CSR
+//  AM_RANGE(0x02000180, 0x02000180) AM_MIRROR(0x300000) VIDEO DMA CSR
+//  AM_RANGE(0x020001c0, 0x020001c0) AM_MIRROR(0x300000) R2M DMA CSR
+//  AM_RANGE(0x020001d0, 0x020001d0) AM_MIRROR(0x300000) M2R DMA CSR
+	AM_RANGE(0x02006000, 0x02006003) AM_MIRROR(0x300000) AM_READ(network_r) // ethernet
+//  AM_RANGE(0x02006010, 0x02006013) AM_MIRROR(0x300000) memory timing
+	AM_RANGE(0x02007000, 0x02007003) AM_MIRROR(0x300000) AM_READWRITE(irq_status_r,irq_status_w)
+	AM_RANGE(0x02007800, 0x02007803) AM_MIRROR(0x300000) AM_READWRITE(irq_mask_r,irq_mask_w)
+	AM_RANGE(0x02008000, 0x02008003) AM_MIRROR(0x300000) AM_READ(dsp_r)
+	AM_RANGE(0x0200c000, 0x0200c003) AM_MIRROR(0x300000) AM_READ(scr1_r)
+	AM_RANGE(0x0200c800, 0x0200c803) AM_MIRROR(0x300000) AM_READ(rom_map_r)
+	AM_RANGE(0x0200d000, 0x0200d003) AM_MIRROR(0x300000) AM_READWRITE(scr2_r,scr2_w)
+//  AM_RANGE(0x0200d800, 0x0200d803) AM_MIRROR(0x300000) RMTINT
+	AM_RANGE(0x0200e000, 0x0200e00b) AM_MIRROR(0x300000) AM_DEVICE("keyboard", nextkbd_device, amap)
+//  AM_RANGE(0x0200f000, 0x0200f003) AM_MIRROR(0x300000) printer
+//  AM_RANGE(0x02010000, 0x02010003) AM_MIRROR(0x300000) brightness
+	AM_RANGE(0x02012004, 0x02012007) AM_MIRROR(0x300000) AM_READ(modisk_r)
+//	AM_RANGE(0x02014000, 0x02014003) AM_MIRROR(0x300000) SCSI
+	AM_RANGE(0x02014100, 0x02014107) AM_MIRROR(0x300000) AM_DEVICE8("fdc", n82077aa_device, amap, 0xffffffff)
+//	AM_RANGE(0x02016000, 0x02016003) AM_MIRROR(0x300000) timer
+//	AM_RANGE(0x02016004, 0x02016007) AM_MIRROR(0x300000) timer CSR
+	AM_RANGE(0x02018000, 0x02018003) AM_MIRROR(0x300000) AM_DEVREADWRITE8("scc", am8530h_device, ca_r, ca_w, 0xff000000)
+	AM_RANGE(0x02018000, 0x02018003) AM_MIRROR(0x300000) AM_DEVREADWRITE8("scc", am8530h_device, cb_r, cb_w, 0x00ff0000)
+	AM_RANGE(0x02018000, 0x02018003) AM_MIRROR(0x300000) AM_DEVREADWRITE8("scc", am8530h_device, da_r, da_w, 0x0000ff00)
+	AM_RANGE(0x02018000, 0x02018003) AM_MIRROR(0x300000) AM_DEVREADWRITE8("scc", am8530h_device, db_r, db_w, 0x000000ff)
+//	AM_RANGE(0x02018004, 0x02018007) AM_MIRROR(0x300000) SCC CLK
+//	AM_RANGE(0x02018100, 0x02018103) AM_MIRROR(0x300000) Color RAMDAC
+//	AM_RANGE(0x02018104, 0x02018107) AM_MIRROR(0x300000) Color CSR
+//	AM_RANGE(0x02018190, 0x02018197) AM_MIRROR(0x300000) warp 9c DRAM timing
+//	AM_RANGE(0x02018198, 0x0201819f) AM_MIRROR(0x300000) warp 9c VRAM timing
+	AM_RANGE(0x0201a000, 0x0201a003) AM_MIRROR(0x300000) AM_READ(event_counter_r) // EVENTC
+//  AM_RANGE(0x020c0000, 0x020c0004) AM_MIRROR(0x300000) BMAP
+//	AM_RANGE(0x02000000, 0x0201ffff) AM_MIRROR(0x300000) AM_READWRITE8(io_r,io_w,0xffffffff) //intentional fall-through
 	AM_RANGE(0x04000000, 0x07ffffff) AM_RAM //work ram
-	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_BASE(m_vram) //vram
-//  AM_RANGE(0x0c000000, 0x0c03ffff) video RAM w A+B-AB function
-//  AM_RANGE(0x0d000000, 0x0d03ffff) video RAM w (1-A)B function
-//  AM_RANGE(0x0e000000, 0x0e03ffff) video RAM w ceil(A+B) function
-//  AM_RANGE(0x0f000000, 0x0f03ffff) video RAM w AB function
-//  AM_RANGE(0x10000000, 0x1003ffff) main RAM w A+B-AB function
-//  AM_RANGE(0x14000000, 0x1403ffff) main RAM w (1-A)B function
-//  AM_RANGE(0x18000000, 0x1803ffff) main RAM w ceil(A+B) function
-//  AM_RANGE(0x1c000000, 0x1c03ffff) main RAM w AB function
-//  AM_RANGE(0x2c000000, 0x2c1fffff) Color VRAM
+	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_BASE(vram) //vram
+//	AM_RANGE(0x0c000000, 0x0c03ffff) video RAM w A+B-AB function
+//	AM_RANGE(0x0d000000, 0x0d03ffff) video RAM w (1-A)B function
+//	AM_RANGE(0x0e000000, 0x0e03ffff) video RAM w ceil(A+B) function
+//	AM_RANGE(0x0f000000, 0x0f03ffff) video RAM w AB function
+//	AM_RANGE(0x10000000, 0x1003ffff) main RAM w A+B-AB function
+//	AM_RANGE(0x14000000, 0x1403ffff) main RAM w (1-A)B function
+//	AM_RANGE(0x18000000, 0x1803ffff) main RAM w ceil(A+B) function
+//	AM_RANGE(0x1c000000, 0x1c03ffff) main RAM w AB function
+//	AM_RANGE(0x2c000000, 0x2c1fffff) Color VRAM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -277,8 +317,11 @@ static MACHINE_CONFIG_START( next, next_state )
     MCFG_PALETTE_INIT(next)
 
 	// devices
-	MCFG_MCCS1850_ADD(MCCS1850_TAG, XTAL_32_768kHz, rtc_intf)
+	MCFG_MCCS1850_ADD("rtc", XTAL_32_768kHz, rtc_intf)
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, next_floppy_interface)
+	MCFG_AM8530H_ADD("scc", am8530h_device::int_cb_t(FUNC(next_state::scc_int), static_cast<next_state *>(owner)))
+	MCFG_NEXTKBD_ADD("keyboard", nextkbd_device::int_cb_t(FUNC(next_state::keyboard_int), static_cast<next_state *>(owner)))
+	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")
@@ -299,7 +342,7 @@ ROM_START( next ) // 68030
 	ROM_SYSTEM_BIOS( 2, "v10p", "v1.0 prototype?" ) // version? word at 0xC: 23D9
 	ROMX_LOAD( "rev_1.0_proto.bin", 0x0000, 0x10000, CRC(F44974F9) SHA1(09EAF9F5D47E379CFA0E4DC377758A97D2869DDC), ROM_BIOS(3)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", no underlabel */
 
-	ROM_REGION( 0x20, MCCS1850_TAG, 0 )
+	ROM_REGION( 0x20, "rtc", 0 )
 	ROM_LOAD( "nvram.bin", 0x00, 0x20, BAD_DUMP CRC(7cb74196) SHA1(faa2177c2a08a6b76a6242761a9c0a8b64c4da6e) )
 ROM_END
 
@@ -316,7 +359,7 @@ ROM_START( nextnt ) // 68040 non-turbo
 	ROM_SYSTEM_BIOS( 4, "v12", "v1.2 v58" ) // version? word at 0xC: 6372
 	ROMX_LOAD( "rev_1.2_v58.bin", 0x0000, 0x20000, CRC(B815B6A4) SHA1(97D8B09D03616E1487E69D26609487486DB28090), ROM_BIOS(5)) /* Label: "V58 // (C) 1990 NeXT, Inc. // All Rights Reserved // Release 1.2 // 1142.02" */
 
-	ROM_REGION( 0x20, MCCS1850_TAG, 0 )
+	ROM_REGION( 0x20, "rtc", 0 )
 	ROM_LOAD( "nvram.bin", 0x00, 0x20, BAD_DUMP CRC(7cb74196) SHA1(faa2177c2a08a6b76a6242761a9c0a8b64c4da6e) )
 ROM_END
 
@@ -329,22 +372,13 @@ ROM_START( nexttrb ) // 68040 turbo
 	ROM_SYSTEM_BIOS( 2, "v30", "v3.0 v70" ) // version? word at 0xC: (01)06e8
 	ROMX_LOAD( "rev_3.0_v70.bin", 0x0000, 0x20000, CRC(37250453) SHA1(a7e42bd6a25c61903c8ca113d0b9a624325ee6cf), ROM_BIOS(3))
 
-	ROM_REGION( 0x20, MCCS1850_TAG, 0 )
-	ROM_LOAD( "nvram.bin", 0x00, 0x20, BAD_DUMP CRC(7cb74196) SHA1(faa2177c2a08a6b76a6242761a9c0a8b64c4da6e) )
+	ROM_REGION( 0x20, "rtc", 0 )
+	ROM_LOAD( "nvram-trb.bin", 0x00, 0x20, CRC(2516dd08) SHA1(b20afe82efee5b625fb8afda14a1d14aabc8e07e) )
 ROM_END
-
-static DRIVER_INIT( next )
-{
-	//UINT32 *ROM = (UINT32 *)machine.region("user1")->base();
-
-	//ROM[0x61dc/4] = (0x6604 << 16) | (ROM[0x61dc/4] & 0xffff); //hack until I understand ...
-
-	//ROM[0x00b8/4] = (ROM[0x00b8/4] << 16) | (0x67ff & 0xffff); //patch ROM checksum
-}
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                 FULLNAME               FLAGS */
-COMP( 1987, next,   0,          0,   next,      next,    next,   "Next Software Inc",   "NeXT Computer",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1987, next,   0,          0,   next,      next,    0,      "Next Software Inc",   "NeXT Computer",		GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1990, nextnt, next,       0,   next040,   next,    0,      "Next Software Inc",   "NeXT (Non Turbo)",		GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1992, nexttrb,next,       0,   next040,   next,    0,      "Next Software Inc",   "NeXT (Turbo)",			GAME_NOT_WORKING | GAME_NO_SOUND)
