@@ -224,6 +224,10 @@ void st_state::glue_tick()
 		shifter_load();
 	}
 
+	if(!de) {
+		m_shifter_shift = 0;
+	}
+
 	if ((y == m_shifter_vblank_start) && (x == 0))
 	{
 		device_set_input_line(m_maincpu, M68K_IRQ_4, HOLD_LINE);
@@ -243,16 +247,35 @@ void st_state::glue_tick()
 	case 0:
 		pen = shift_mode_0();
 		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x) = pen;
-		pen = shift_mode_0();
 		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+1) = pen;
 		pen = shift_mode_0();
 		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+2) = pen;
-		pen = shift_mode_0();
 		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+3) = pen;
+		pen = shift_mode_0();
+		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+4) = pen;
+		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+5) = pen;
+		pen = shift_mode_0();
+		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+6) = pen;
+		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+7) = pen;
 		break;
 
 	case 1:
 		pen = shift_mode_1();
+		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x) = pen;
+		pen = shift_mode_1();
+		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+1) = pen;
+		pen = shift_mode_1();
+		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+2) = pen;
+		pen = shift_mode_1();
+		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+3) = pen;
+		pen = shift_mode_1();
+		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+4) = pen;
+		pen = shift_mode_1();
+		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+5) = pen;
+		pen = shift_mode_1();
+		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+6) = pen;
+		pen = shift_mode_1();
+		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+7) = pen;
 		break;
 
 	case 2:
@@ -286,20 +309,20 @@ void st_state::set_screen_parameters()
 {
 	if (m_shifter_sync & 0x02)
 	{
-		m_shifter_x_start = ATARIST_HBDEND_PAL;
-		m_shifter_x_end = ATARIST_HBDSTART_PAL;
+		m_shifter_x_start = ATARIST_HBDEND_PAL*2;
+		m_shifter_x_end = ATARIST_HBDSTART_PAL*2;
 		m_shifter_y_start = ATARIST_VBDEND_PAL;
 		m_shifter_y_end = ATARIST_VBDSTART_PAL;
-		m_shifter_hblank_start = ATARIST_HBSTART_PAL;
+		m_shifter_hblank_start = ATARIST_HBSTART_PAL*2;
 		m_shifter_vblank_start = ATARIST_VBSTART_PAL;
 	}
 	else
 	{
-		m_shifter_x_start = ATARIST_HBDEND_NTSC;
-		m_shifter_x_end = ATARIST_HBDSTART_NTSC;
+		m_shifter_x_start = ATARIST_HBDEND_NTSC*2;
+		m_shifter_x_end = ATARIST_HBDSTART_NTSC*2;
 		m_shifter_y_start = ATARIST_VBDEND_NTSC;
 		m_shifter_y_end = ATARIST_VBDSTART_NTSC;
-		m_shifter_hblank_start = ATARIST_HBSTART_NTSC;
+		m_shifter_hblank_start = ATARIST_HBSTART_NTSC*2;
 		m_shifter_vblank_start = ATARIST_VBSTART_NTSC;
 	}
 }
@@ -436,7 +459,7 @@ READ16_MEMBER( st_state::shifter_palette_r )
 WRITE16_MEMBER( st_state::shifter_palette_w )
 {
 	m_shifter_palette[offset] = data;
-	logerror("SHIFTER Palette[%x] = %x\n", offset, data);
+	//	logerror("SHIFTER Palette[%x] = %x\n", offset, data);
 
 	palette_set_color_rgb(machine(), offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
 }
