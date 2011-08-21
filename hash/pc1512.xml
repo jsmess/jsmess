@@ -22,7 +22,7 @@
 	Oh No! More Lemmings
 	Prohibition
 	Time and Magik: The Trilogy
-	
+
 	Deluxe Paint II
 	GEM 1st Word Plus
 	GEM Write
@@ -32,14 +32,14 @@
 		<description>The Amstrad PC Collection</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="The Dam Busters"/>
 			<dataarea name="flop" size="163840">
 				<rom name="the dam busters.img" size="163840" crc="3e71ae20" sha1="0f5cad41a0f089acabab54a00cf6fe66ef3ed08c" offset="0" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop2" interface="floppy_5_25">
 			<!-- has unemulated on-disk protection -->
 			<feature name="part_id" value="Bruce Lee"/>
@@ -47,14 +47,14 @@
 				<rom name="bruce lee.img" size="184320" crc="7b9059bb" sha1="2651c7a5c35b6c449e0d74167c3813ca27f10169" offset="0" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="PSI-5 Trading Company"/>
 			<dataarea name="flop" size="368640">
 				<rom name="psi-5 trading company.img" size="368640" crc="172e3c60" sha1="cb5308e47acc7e146747a2e2a014381860392b05" offset="0" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Tag-Team Wrestling"/>
 			<dataarea name="flop" size="163840">
@@ -62,7 +62,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="applicat">
 		<description>Applications (Fra)</description>
 		<year>198?</year>
@@ -101,28 +101,28 @@
 		<description>Amstrad PC1512 System Discs</description>
 		<year>1986</year>
 		<publisher>Amstrad</publisher>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disc 1"/>
 			<dataarea name="flop" size="368640">
 				<rom name="46001.img" size="368640" crc="d8090373" sha1="4dbe5b78196389546410ad136d815456bc4593f3" offset="0" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="System Disc 2"/>
 			<dataarea name="flop" size="368640">
 				<rom name="46002.img" size="368640" crc="801c6584" sha1="20e1b46eda0a24c89127e4dd6f46a203b4f3a091" offset="0" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="System Disc 3"/>
 			<dataarea name="flop" size="368640">
 				<rom name="46003.img" size="368640" crc="b8b5338b" sha1="28d6a6af565a222573c42cb615d398775c908ee2" offset="0" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="System Disc 4"/>
 			<dataarea name="flop" size="368640">
@@ -130,33 +130,33 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="system_fr" cloneof="system">
 		<description>Amstrad PC1512 System Discs (Fra)</description>
 		<year>1986</year>
 		<publisher>Amstrad</publisher>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disc 1"/>
 			<dataarea name="flop" size="368640">
 				<rom name="46001f.img" size="368640" crc="dab66cc5" sha1="831888c390829511e52d96c25e70907aa646132d" offset="0" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="System Disc 2"/>
 			<dataarea name="flop" size="368640">
 				<rom name="46002f.img" size="368640" crc="89aa0859" sha1="b5b913401d2dca6b20d8ce2d68ffd7a35a046778" offset="0" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="System Disc 3"/>
 			<dataarea name="flop" size="368640">
 				<rom name="46003f.img" size="368640" crc="068ffaab" sha1="f1525af95b7b1996517475490c4cc2ed27bebfae" offset="0" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="System Disc 4"/>
 			<dataarea name="flop" size="368640">

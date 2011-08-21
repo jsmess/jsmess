@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="c128_rom" description="Commodore 128 Function ROMs">
-	
+
 	<software name="basic8">
 		<description>BASIC 8.0: The Enhanced Graphics System for the C128</description>
 		<year>1986</year>
@@ -12,7 +12,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="keydos">
 		<description>KeyDOS v2.3</description>
 		<year>1992</year>
@@ -23,7 +23,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ramdos">
 		<description>RamDOS 128 v4.5</description>
 		<year>1991</year>
@@ -34,7 +34,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="superchp">
 		<description>Super Chip</description>
 		<year>198?</year>
@@ -45,7 +45,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="superchpb">
 		<description>Super Chip B</description>
 		<year>1988</year>
@@ -56,7 +56,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="servant">
 		<description>The Servant v4.84</description>
 		<year>1992</year>
@@ -67,7 +67,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="geos1581">
 		<description>GEOS 128 v2.0 (1581)</description>
 		<year>1999</year>
@@ -78,7 +78,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="geos1581de" cloneof="geos1581">
 		<description>GEOS 128 v2.0 (1581) (Ger)</description>
 		<year>1999</year>
@@ -89,7 +89,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="geos128">
 		<description>GEOS 128 v2.0 (1571)</description>
 		<year>1999</year>

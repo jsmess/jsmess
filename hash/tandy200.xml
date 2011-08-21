@@ -18,7 +18,7 @@ Option ROM booting instructions:
       </dataarea>
     </part>
   </software>
-  
+
   <software name="tword">
     <description>T-Word with Sardine v1.33</description>
     <year>1986</year>
