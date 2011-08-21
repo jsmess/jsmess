@@ -307,7 +307,7 @@ READ8_MEMBER( wswan_state::wswan_port_r )
 	UINT8 value = m_ws_portram[offset];
 
 	if ( offset != 2 )
-	//logerror( "PC=%X: port read %02X\n", cpu_get_pc( &space->device() ), offset );
+		logerror( "PC=%X: port read %02X\n", cpu_get_pc( machine().device("maincpu") ), offset );
 	switch( offset )
 	{
 		case 0x02:		/* Current line */
@@ -852,7 +852,7 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
                    Bit 0-3 - Master volume
                    Bit 4-7 - Unknown
                 */
-			wswan_sound_port_w( mem->machine().device("custom"), offset, data );
+			wswan_sound_port_w( machine().device("custom"), offset, data );
 			break;
 		case 0xa0:	/* Hardware type - this is probably read only
                    Bit 0   - Enable cartridge slot and/or disable bios
@@ -862,7 +862,7 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 			if ( ( data & 0x01 ) && !m_bios_disabled )
 			{
 				m_bios_disabled = 1;
-				memory_set_bankptr( mem->machine(), "bank15", m_ROMMap[ ( ( ( m_ws_portram[0xc0] & 0x0F ) << 4 ) | 15 ) & ( m_ROMBanks - 1 ) ] );
+				memory_set_bankptr( machine(), "bank15", m_ROMMap[ ( ( ( m_ws_portram[0xc0] & 0x0F ) << 4 ) | 15 ) & ( m_ROMBanks - 1 ) ] );
 			}
 			break;
 		case 0xa2:	/* Timer control
@@ -971,13 +971,13 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 			switch( data )
 			{
 			case 0x10:	/* Read Y cursors: Y1 - Y2 - Y3 - Y4 */
-				data = data | input_port_read(mem->machine(), "CURSY");
+				data = data | input_port_read(machine(), "CURSY");
 				break;
 			case 0x20:	/* Read X cursors: X1 - X2 - X3 - X4 */
-				data = data | input_port_read(mem->machine(), "CURSX");
+				data = data | input_port_read(machine(), "CURSX");
 				break;
 			case 0x40:	/* Read buttons: START - A - B */
-				data = data | input_port_read(mem->machine(), "BUTTONS");
+				data = data | input_port_read(machine(), "BUTTONS");
 				break;
 			}
 			break;
