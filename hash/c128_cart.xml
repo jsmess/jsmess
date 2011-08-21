@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="c128_cart" description="Commodore 128 cartridges">
-	
+
 	<software name="c128diag" supported="no">
 		<description>C128 Diagnostic v1.1</description>
 		<year>1987</year>
@@ -15,7 +15,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="warpspd" supported="no">
 		<description>C128 Warp Speed v1</description>
 		<year>1987</year>
@@ -34,7 +34,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="warpspd2" cloneof="warpspd" supported="no">
 		<description>C128 Warp Speed v2</description>
 		<year>1987</year>
@@ -53,7 +53,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mach128" supported="no">
 		<description>MACH 128 v.1A</description>
 		<year>1985</year>
@@ -73,7 +73,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mach128_2a" cloneof="mach128" supported="no">
 		<description>MACH 128 v.2A</description>
 		<year>1985</year>

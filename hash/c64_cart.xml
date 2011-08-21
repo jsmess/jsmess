@@ -205,7 +205,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ps64" supported="no">
 		<description>PS-64 puhemoduli v2.0 (Fin)</description>
 		<year>1988</year>
@@ -322,14 +322,14 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<dataarea name="roml" size="0x2000">
 				<rom name="ecrblk" size="0x2000" crc="f617bec4" sha1="c5ef2418cf9dba3e14f586d5d6997f271b521a24" offset="0x0000" />
 			</dataarea>
-			
+
 			<dataarea name="romh" size="0x4000">
 				<rom name="ecrblu" size="0x2000" crc="db0b4295" sha1="557769a9b8b6d6f71d8450d55d669b8cbf499c4b" offset="0x0000" />
 				<rom name="ecrgrn" size="0x2000" crc="ca7917c0" sha1="2b54658dcec78e365ace3d61cac26b82568fa03a" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sshelp64">
 		<description>Stack Super Help 64</description>
 		<year>19??</year>
@@ -412,7 +412,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		ROM4  - not populated
 		ROM5  - not populated
 		ROM6  - not populated
-		
+
 		bankswitching latch at I/O2 ($DF00..$DFFF) (write $0D -> RAM @8000)
 		-->
 		<part name="cart" interface="c64_cart">
@@ -558,7 +558,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="xl80" supported="no">
 		<description>XL 80</description>
 		<year>1984</year>
@@ -580,7 +580,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		        |                           HCU04  |
 		        |    LS74    LS161   LS74          |
 		        |==================================|
-		
+
 		CRTC - Hitachi HD46505SP
 		RAM  - Toshiba TMM2016AP-12 2Kx8 Static RAM
 		ROM0 - GI 9433CS-0090 4Kx8 ROM
@@ -606,7 +606,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="btx" supported="no">
 		<description>Btx Decoder Modul (Ger)</description>
 		<year>198?</year>
@@ -623,7 +623,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="btx2" supported="no">
 		<description>Btx Decoder Modul II v3.1 (Ger)</description>
 		<year>198?</year>
@@ -640,7 +640,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="btx2v33" supported="no">
 		<description>Btx Decoder Modul II v3.3 (Ger)</description>
 		<year>198?</year>
@@ -657,7 +657,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="capture2" supported="no">
 		<description>Capture 2</description>
 		<year>1987</year>
@@ -666,13 +666,13 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="cart_type" value="capture2" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-			
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="capture 2 (usa, europe) (program).bin" size="0x2000" crc="f25640c4" sha1="ebfa440401aebf3d09a43995dd87999d2982cb6a" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="expert" supported="no">
 		<description>The Expert Cartridge</description>
 		<year>198?</year>
@@ -681,7 +681,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="cart_type" value="expert" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
-			
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="expert.bin" size="0x2000" crc="f4162c86" sha1="5d0efb42aaa9002ea70facc1b3050ce6041455b7" offset="0x0000" />
 			</dataarea>
@@ -732,7 +732,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ieee488" supported="no">
 		<description>IEEE-488</description>
 		<year>198?</year>
@@ -741,13 +741,13 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="cart_type" value="ieee488" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-			
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="ieee488.bin" size="0x1000" crc="e894e448" sha1="c62b88b73d79b485ebb250d56065dfa54b8baf4c" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="magicvce" supported="no">
 		<description>Magic Voice</description>
 		<year>1984</year>
@@ -757,13 +757,13 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="cart_type" value="magic_voice" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
-			
+
 			<dataarea name="roml" size="0x4000">
 				<rom name="251476" size="0x4000" crc="c741fa77" sha1="2044028d42def60df79b8ab57d005721b41190fa" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="spdsaver" supported="no">
 		<description>Speedsaver $C000 (Nld)</description>
 		<year>1984</year>
@@ -772,13 +772,13 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="cart_type" value="speedsaver_c000" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-			
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="speedsaver.c000.bin" size="0x1000" crc="a4dfd70d" sha1="5ec699e70dc8aa3c52f8167f1d22f9be61d78f44" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="spdsavrc" supported="no">
 		<description>Speedsaver Combi</description>
 		<year>1984</year>
@@ -787,13 +787,13 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="cart_type" value="speedsaver_combi" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-			
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="speedsaver.combi.bin" size="0x2000" crc="74567cd6" sha1="8ac3899514307ff469a0f117d6017fa84a9346c0" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="superexp" supported="no">
 		<description>Super Expander 64</description>
 		<year>198?</year>
@@ -802,20 +802,20 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="cart_type" value="super_expander_64" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-			
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="superexpander64.bin" size="0x2000" crc="41aa1b1e" sha1="67c36dec74154838f0a029785fbaa5ee22d4a1f1" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sprexp50">
 		<description>Super Explode! v5.0</description>
 		<year>1989</year>
 		<publisher>The Soft Group</publisher>
 		<!--
 		Bankswitch register at $DF00, then executes code from the I/O2 area:
-		
+
 		0193: lda  #$80
 		0195: sta  $DF00
 		0198: jsr  $DF15
@@ -824,13 +824,13 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="cart_type" value="super_explode" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-			
+
 			<dataarea name="roml" size="0x4000">
 				<rom name="superexplode.bin" size="0x4000" crc="365cca2c" sha1="79b3a5b44978bfb4c1a2cae9083db770b0beffa7" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="vidmate" supported="no">
 		<description>Video Mate</description>
 		<year>1992</year>
@@ -839,13 +839,13 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="cart_type" value="video_mate" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-			
+
 			<dataarea name="roml" size="0x4000">
 				<rom name="videomate.bin" size="0x4000" crc="f7a18c23" sha1="08784738026ec1525d45d5c9b4ee029fbcf6bc37" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="turborom">
 		<description>Turbo ROM v.2 (Pol)</description>
 		<year>1983</year>
@@ -858,7 +858,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="turboroma" cloneof="turborom">
 		<description>Turbo ROM v.2 (Pol) (Alt)</description>
 		<year>1983</year>
@@ -871,7 +871,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="gamekilr" supported="no">
 		<description>Game Killer</description>
 		<year>1986</year>
@@ -880,7 +880,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="cart_type" value="game_killer" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
-			
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="gamekiller.bin" size="0x2000" crc="bdee8a63" sha1="75e44ed5fa34921af924d2b8ee27585bfdb331c4" offset="0x0000" />
 			</dataarea>
@@ -931,7 +931,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mach5_v2a" cloneof="mach5" supported="no">
 		<description>MACH 5 v.2A</description>
 		<year>1985</year>
@@ -977,7 +977,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 		|=|                         |
 		|=|                      SW1|
 		|===========================|
-		
+
 		ROM     - Toshiba TMM271128D-25 16Kx8 EPROM
 		-->
 		<part name="cart" interface="c64_cart">
@@ -990,9 +990,9 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Games Added by k1w1 -->
-	
+
 	<software name="advcrtor">
 		<description>Adventure Creator</description>
 		<year>1984</year>
@@ -1006,7 +1006,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="vikingr">
 		<description>Action Adventure Series: Viking Raider</description>
 		<year>1984</year>
@@ -1024,7 +1024,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="aegeanv">
 		<description>Aegean Voyage</description>
 		<year>1984</year>
@@ -1039,7 +1039,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="alfclrcv">
 		<description>Alf in the Color Caves</description>
 		<year>1984</year>
@@ -1054,7 +1054,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="aliensid">
 		<description>Alien Sidestep</description>
 		<year>19??</year>
@@ -1067,7 +1067,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="alphabld">
 		<description>Alpha Build</description>
 		<year>1984</year>
@@ -1082,7 +1082,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="alphazoo">
 		<description>Alphabet Zoo</description>
 			<year>1983</year>
@@ -1096,7 +1096,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="amaze">
 		<description>Amazing Maze</description>
 		<year>1983</year>
@@ -1109,7 +1109,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="acricket">
 		<description>Arnie Armchairs Howzat Cricket Game</description>
 		<year>1984</year>
@@ -1122,7 +1122,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ablitz" supported="no">
 		<description>Astro Blitz</description>
 		<year>1983</year>
@@ -1135,7 +1135,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="aotmc">
 		<description>Gridrunner II: Attack of the Mutant Camels</description>
 		<year>1983</year>
@@ -1149,7 +1149,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="bzone" supported="partial">
 		<description>BattleZone</description>
 		<year>1983</year>
@@ -1163,7 +1163,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bcquest">
 		<description>BC's Quest for Tires</description>
 		<year>1983</year>
@@ -1177,7 +1177,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="beamridr">
 		<description>Beamrider</description>
 		<year>1984</year>
@@ -1191,7 +1191,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bigbrdfh">
 		<description>Big Bird's Funhouse</description>
 		<year>1984</year>
@@ -1205,7 +1205,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bigbrdsd">
 		<description>Big Bird's Special Delivery</description>
 		<year>1984</year>
@@ -1219,7 +1219,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="blockhop">
 		<description>Block Hopper</description>
 		<year>1983</year>
@@ -1232,7 +1232,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="blueprnt">
 		<description>Blue-Print</description>
 		<year>1983</year>
@@ -1246,7 +1246,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bridge">
 		<description>Bridge</description>
 		<year>1983</year>
@@ -1259,7 +1259,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bblburst">
 		<description>Bubble Burst</description>
 		<year>1984</year>
@@ -1274,7 +1274,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="buckrog" supported="no">
 		<description>Buck Rogers: Planet of Zoom</description>
 		<year>1983</year>
@@ -1288,7 +1288,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bugcrshr">
 		<description>Bug Crusher</description>
 		<year>1983</year>
@@ -1301,7 +1301,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="castlhas">
 		<description>Castle Hassle</description>
 		<year>1983</year>
@@ -1314,7 +1314,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="centiped">
 		<description>Centipede</description>
 		<year>1983</year>
@@ -1327,7 +1327,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="checkers">
 		<description>Checkers</description>
 		<year>1984</year>
@@ -1341,7 +1341,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="choplift">
 		<description>Choplifter!</description>
 		<year>1982</year>
@@ -1355,7 +1355,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="clsenctr">
 		<description>Close Encounters of the Worst Kind</description>
 		<year>1994</year>
@@ -1368,7 +1368,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="coccinel">
 		<description>Coccinelle cherche dessinateur (Fra)</description>
 		<year>1983</year>
@@ -1381,7 +1381,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="coconots">
 		<description>Coco-Notes featuring... the Jazz Scats!</description>
 		<year>1984</year>
@@ -1396,7 +1396,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="congo">
 		<description>Congo Bongo</description>
 		<year>1983</year>
@@ -1410,7 +1410,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cosmiclf">
 		<description>Cosmic Life</description>
 		<year>1983</year>
@@ -1424,7 +1424,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="crisismt">
 		<description>Crisis Mountain</description>
 		<year>1983</year>
@@ -1437,7 +1437,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ccastles">
 		<description>Crystal Castles</description>
 		<year>1984</year>
@@ -1450,7 +1450,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dncfntsy">
 		<description>Dance Fantasy</description>
 		<year>1984</year>
@@ -1465,7 +1465,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dncfeats">
 		<description>Dancing Feats</description>
 		<year>1983</year>
@@ -1478,7 +1478,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="decathln">
 		<description>The Activision Decathlon</description>
 		<year>1983</year>
@@ -1492,7 +1492,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="defender">
 		<description>Defender</description>
 		<year>1983</year>
@@ -1505,7 +1505,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="diamondm">
 		<description>Diamond Mine</description>
 		<year>1983</year>
@@ -1518,7 +1518,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="digdug">
 		<description>Dig Dug</description>
 		<year>1983</year>
@@ -1531,7 +1531,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="digduga" cloneof="digdug">
 		<description>Dig Dug (Alt)</description>
 		<year>1983</year>
@@ -1544,7 +1544,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dnkykong">
 		<description>Donkey Kong</description>
 		<year>1983</year>
@@ -1557,7 +1557,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dotgblr2">
 		<description>Dot Gobbler v.2</description>
 		<year>1983</year>
@@ -1570,7 +1570,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dotgoblr" cloneof="dotgblr2">
 		<description>Dot Gobbler</description>
 		<year>1983</year>
@@ -1583,7 +1583,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="drgnsden">
 		<description>Dragon's Den</description>
 		<year>1983</year>
@@ -1597,7 +1597,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="duckahoy">
 		<description>Ducks Ahoy!</description>
 		<year>1984</year>
@@ -1612,7 +1612,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mgcshaps">
 		<description>Ernie's Magic Shapes</description>
 		<year>1984</year>
@@ -1626,7 +1626,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="espial" supported="partial">
 		<description>Espial</description>
 		<year>1984</year>
@@ -1639,7 +1639,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="facemakr">
 		<description>FaceMaker</description>
 		<year>1983</year>
@@ -1653,7 +1653,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="flcninvd">
 		<description>Falconian Invaders</description>
 		<year>1983</year>
@@ -1667,7 +1667,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="4thsarc">
 		<description>Adventure 3: The Fourth Sarcophagus</description>
 		<year>1983</year>
@@ -1680,7 +1680,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="fracfevr">
 		<description>Fraction Fever</description>
 		<year>1983</year>
@@ -1694,7 +1694,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="frogmstr">
 		<description>Frog Master</description>
 		<year>1983</year>
@@ -1708,7 +1708,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="frogger" supported="partial">
 		<description>Frogger</description>
 		<year>1983</year>
@@ -1721,7 +1721,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="frogger2">
 		<description>Frogger II: Threedeep!</description>
 		<year>1984</year>
@@ -1734,7 +1734,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="galaxian">
 		<description>Galaxian</description>
 		<year>1983</year>
@@ -1747,7 +1747,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="galaxman" supported="partial">
 		<description>Galaxions + Munch Man</description>
 		<year>1983</year>
@@ -1760,7 +1760,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="apshai">
 		<description>Gateway to Apshai</description>
 		<year>1983</year>
@@ -1774,7 +1774,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="gorf">
 		<description>Gorf</description>
 		<year>1983</year>
@@ -1788,7 +1788,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="gridrunr">
 		<description>Gridrunner</description>
 		<year>1983</year>
@@ -1802,7 +1802,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="gyruss">
 		<description>Gyruss</description>
 		<year>1984</year>
@@ -1815,7 +1815,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hero">
 		<description>H.E.R.O.: Helicopter Emergency Rescue Operation</description>
 		<year>1984</year>
@@ -1829,7 +1829,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="batlband">
 		<description>Halftime Battlin' Bands featuring... the Jazz Scats!</description>
 		<year>1984</year>
@@ -1844,7 +1844,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hopalong">
 		<description>Hop Along Counting</description>
 		<year>1984</year>
@@ -1858,7 +1858,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="skeleton">
 		<description>Human Skeleton Tutorial</description>
 		<year>1984</year>
@@ -1871,7 +1871,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="isoccer">
 		<description>International Soccer</description>
 		<year>1983</year>
@@ -1898,17 +1898,17 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-			
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="317017-01.u1" size="0x2000" crc="4639431d" sha1="983c91a88dea4d0f05b6ff69ed7692b2651cb3fa" offset="0x0000" />
 			</dataarea>
-			
+
 			<dataarea name="romh" size="0x2000">
 				<rom name="317018-01.u2" size="0x2000" crc="c98d99bf" sha1="aeb865b3e8bcd76b5526c847c77278f94232d380" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jackattk">
 		<description>Jack Attack</description>
 		<year>1983</year>
@@ -1935,17 +1935,17 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-			
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="317038-01.u1" size="0x2000" crc="63e6daf6" sha1="deff113bed94119880643ba34966527d9fc55909" offset="0x0000" />
 			</dataarea>
-			
+
 			<dataarea name="romh" size="0x2000">
 				<rom name="317039-01.u2" size="0x2000" crc="50797bbd" sha1="2c2c9eb4fed9b7df2f8c21198f2f3db0cef526a1" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jamsbond">
 		<description>James Bond</description>
 		<year>1984</year>
@@ -1958,7 +1958,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jawbreak">
 		<description>Jaw Breaker</description>
 		<year>1983</year>
@@ -1971,7 +1971,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="juice">
 		<description>Juice!</description>
 		<year>1983</year>
@@ -1984,7 +1984,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jukebox">
 		<description>Juke Box</description>
 		<year>1984</year>
@@ -1999,7 +1999,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jmpmanjr">
 		<description>Jumpman Junior</description>
 		<year>1983</year>
@@ -2012,7 +2012,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jnglhunt">
 		<description>Jungle Hunt</description>
 		<year>1983</year>
@@ -2025,7 +2025,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="kidskeys">
 		<description>Kids on Keys</description>
 		<year>1983</year>
@@ -2039,7 +2039,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="kindcomp">
 		<description>KinderComp</description>
 		<year>1983</year>
@@ -2053,7 +2053,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="lazarian">
 		<description>Lazarian</description>
 		<year>1983</year>
@@ -2067,7 +2067,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lazrzone">
 		<description>Lazer Zone</description>
 		<year>1983</year>
@@ -2081,7 +2081,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="leeper">
 		<description>Learning with Leeper</description>
 		<year>1983</year>
@@ -2095,7 +2095,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="linklogc">
 		<description>Linking Logic</description>
 		<year>1984</year>
@@ -2109,7 +2109,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="loderunr">
 		<description>Lode Runner</description>
 		<year>1983</year>
@@ -2123,7 +2123,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="logclvls">
 		<description>Logic Levels</description>
 		<year>1984</year>
@@ -2137,7 +2137,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lleeper">
 		<description>Lunar Leeper</description>
 		<year>1982</year>
@@ -2150,7 +2150,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mbrewery">
 		<description>Mario's Brewery</description>
 		<year>1983</year>
@@ -2163,7 +2163,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mstrtype">
 		<description>MasterType</description>
 		<year>1983</year>
@@ -2176,7 +2176,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mileage">
 		<description>Math Mileage</description>
 		<year>1984</year>
@@ -2190,7 +2190,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mazeman">
 		<description>Maze Man</description>
 		<year>1983</year>
@@ -2203,7 +2203,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mazemstr">
 		<description>Maze Master</description>
 		<year>1983</year>
@@ -2216,7 +2216,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="memmanor">
 		<description>Memory Manor</description>
 		<year>1984</year>
@@ -2230,7 +2230,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mine2049">
 		<description>Miner 2049er</description>
 		<year>1982</year>
@@ -2243,7 +2243,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="minfats">
 		<description>Minnesota Fat's Pool Challenger</description>
 		<year>1983</year>
@@ -2256,7 +2256,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="moondust" supported="no">
 		<description>Moon Dust</description>
 		<year>1983</year>
@@ -2269,7 +2269,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="moonptrl">
 		<description>Moon Patrol</description>
 		<year>1983</year>
@@ -2283,7 +2283,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="motorman">
 		<description>Motor Mania</description>
 		<year>1982</year>
@@ -2296,7 +2296,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mntnking">
 		<description>Mountain King</description>
 		<year>1983</year>
@@ -2309,11 +2309,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="madness">
 		<description>Movie Musical Madness starring the Jazz Scats</description>
 		<year>1984</year>
-		<publisher>CBS Software</publisher>		
+		<publisher>CBS Software</publisher>
 		<info name="developer" value="The Dovetail Group" />
 		<info name="serial" value="55060" />
 		<part name="cart" interface="c64_cart">
@@ -2324,7 +2324,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mrcool">
 		<description>Mr. Cool</description>
 		<year>1983</year>
@@ -2337,7 +2337,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mrtnt">
 		<description>Mr. TNT</description>
 		<year>1984</year>
@@ -2351,7 +2351,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mspacman">
 		<description>Ms. Pac-Man</description>
 		<year>1983</year>
@@ -2376,17 +2376,17 @@ http://www.retroport.de/C64_C128_Hardware.html
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-			
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="mspacmnau2" size="0x2000" crc="d43eba17" sha1="28f8fc76197f0043536b008ac480e3bfafb26c00" offset="0x0000" />
 			</dataarea>
-			
+
 			<dataarea name="romh" size="0x2000">
 				<rom name="mspacmnbu1" size="0x2000" crc="d126526e" sha1="fb1198e97f0a1b84a1e0ebf968c3288f57e9c4ba" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mspiders">
 		<description>Adventure 1: The Mutant Spiders</description>
 		<year>1983</year>
@@ -2399,7 +2399,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="novablst">
 		<description>Nova Blast</description>
 		<year>1984</year>
@@ -2412,7 +2412,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="nmbrnabr">
 		<description>Number Nabber + Shape Grabber</description>
 		<year>1983</year>
@@ -2426,7 +2426,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="nbrtmblr">
 		<description>Number Tumblers</description>
 		<year>1984</year>
@@ -2441,7 +2441,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="oilswell">
 		<description>Oils Well</description>
 		<year>1983</year>
@@ -2455,7 +2455,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="omegarce">
 		<description>Omega Race</description>
 		<year>1982</year>
@@ -2469,7 +2469,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pacman">
 		<description>Pac-Man</description>
 		<year>1983</year>
@@ -2482,7 +2482,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="paintbrs">
 		<description>Paint Brush</description>
 		<year>1983</year>
@@ -2497,7 +2497,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pancho">
 		<description>Pancho (Fra)</description>
 		<year>1984</year>
@@ -2510,7 +2510,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pastfndr">
 		<description>Pastfinder</description>
 		<year>1984</year>
@@ -2524,7 +2524,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pnutpanc">
 		<description>Peanut Butter Panic</description>
 		<year>1984</year>
@@ -2538,7 +2538,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pipes">
 		<description>Pipes</description>
 		<year>1983</year>
@@ -2551,7 +2551,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="thepit">
 		<description>The Pit</description>
 		<year>1983</year>
@@ -2564,7 +2564,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pitfall2">
 		<description>Pitfall II: The Lost Caverns</description>
 		<year>1984</year>
@@ -2578,7 +2578,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pitfall2a" cloneof="pitfall2">
 		<description>Pitfall II: The Lost Caverns (Alt)</description>
 		<year>1984</year>
@@ -2592,7 +2592,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pitfall">
 		<description>Pitfall!</description>
 		<year>1984</year>
@@ -2606,7 +2606,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pitstop" supported="partial">
 		<description>Pitstop</description>
 		<year>1983</year>
@@ -2619,7 +2619,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pitstop1" cloneof="pitstop">
 		<description>Pitstop (Alt)</description>
 		<year>1983</year>
@@ -2632,7 +2632,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="polepstn">
 		<description>Pole Position</description>
 		<year>1983</year>
@@ -2646,7 +2646,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="popeye">
 		<description>Popeye</description>
 		<year>1983</year>
@@ -2659,7 +2659,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="princess">
 		<description>Princess and the Frog</description>
 		<year>1983</year>
@@ -2672,7 +2672,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="qbert">
 		<description>Q*bert</description>
 		<year>1983</year>
@@ -2686,7 +2686,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="qbert1" cloneof="qbert">
 		<description>Q*bert (Alt)</description>
 		<year>1983</year>
@@ -2700,7 +2700,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="qbert2" cloneof="qbert">
 		<description>Q*bert (Alt 2)</description>
 		<year>1983</year>
@@ -2714,7 +2714,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="rackemup">
 		<description>Rack'em Up</description>
 		<year>1983</year>
@@ -2727,7 +2727,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ranch">
 		<description>Ranch</description>
 		<year>1984</year>
@@ -2741,7 +2741,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="addsub23" supported="no">
 		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 2.-3. Schuljahr (Ger)</description>
 		<year>1984</year>
@@ -2755,7 +2755,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="addsub34" supported="no">
 		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 3.-4. Schuljahr (Ger)</description>
 		<year>1983</year>
@@ -2769,7 +2769,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="geomet34" supported="no">
 		<description>Der Rechenlöwe: Fit in Geometrie - 3.-4. Schuljahr (Ger)</description>
 		<year>1983</year>
@@ -2783,7 +2783,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="math1" supported="no">
 		<description>Der Rechenlöwe: Fit in Mathematik - 1. Schuljahr (Ger)</description>
 		<year>1984</year>
@@ -2797,7 +2797,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="muldiv23" supported="no">
 		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 2.-3. Schuljahr (Ger)</description>
 		<year>1984</year>
@@ -2811,7 +2811,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="muldiv34" supported="no">
 		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 3.-4. Schuljahr (Ger)</description>
 		<year>1983</year>
@@ -2825,7 +2825,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="recht34" supported="no">
 		<description>Der Rechtschreiblöwe: Fit in Rechtschreibung - 3.-4. Schuljahr (Ger)</description>
 		<year>1983</year>
@@ -2854,7 +2854,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="retrobal">
 		<description>Retro Ball</description>
 		<year>1982</year>
@@ -2868,7 +2868,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="rivrraid">
 		<description>River Raid</description>
 		<year>1984</year>
@@ -2881,7 +2881,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="robo2084">
 		<description>Robotron 2084</description>
 		<year>1983</year>
@@ -2894,7 +2894,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="roottoot">
 		<description>Rootin' Tootin'</description>
 		<year>1983</year>
@@ -2907,7 +2907,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="salescrt">
 		<description>Sales Cartridge</description>
 		<year>1982</year>
@@ -2920,7 +2920,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sammyl">
 		<description>Sammy Lightfoot</description>
 		<year>1983</year>
@@ -2933,7 +2933,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="saveny">
 		<description>Save New York</description>
 		<year>1983</year>
@@ -2946,7 +2946,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="seaspell">
 		<description>Sea Speller</description>
 		<year>1984</year>
@@ -2960,7 +2960,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="seafox">
 		<description>Seafox</description>
 		<year>1982</year>
@@ -2974,7 +2974,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="seahorse">
 		<description>Seahorse Hide'n Seek</description>
 		<year>1984</year>
@@ -2989,7 +2989,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="serptine" supported="no">
 		<description>Serpentine</description>
 		<year>1982</year>
@@ -3002,7 +3002,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="letter">
 		<description>Sesame Street: Letter-Go-Round</description>
 		<year>1984</year>
@@ -3015,7 +3015,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="solarfox">
 		<description>Solar Fox</description>
 		<year>1983</year>
@@ -3029,7 +3029,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="songmakr">
 		<description>Song Maker</description>
 		<year>1985</year>
@@ -3043,7 +3043,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="spaceact">
 		<description>Space Action</description>
 		<year>1983</year>
@@ -3056,7 +3056,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="spaceric">
 		<description>Space Ric-o-Shay</description>
 		<year>1983</year>
@@ -3069,7 +3069,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="shuttle">
 		<description>Space Shuttle: A Journey into Space</description>
 		<year>1983</year>
@@ -3082,7 +3082,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="spitball">
 		<description>Spitball</description>
 		<year>1983</year>
@@ -3096,7 +3096,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="spyhuntr">
 		<description>Spy Hunter</description>
 		<year>1983</year>
@@ -3109,7 +3109,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="starpost">
 		<description>Star Post</description>
 		<year>1983</year>
@@ -3123,7 +3123,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="starrngr">
 		<description>Star Ranger</description>
 		<year>1983</year>
@@ -3137,7 +3137,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="startrek">
 		<description>Star Trek: Strategic Operations Simulator</description>
 		<year>1983</year>
@@ -3151,7 +3151,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="swarcade">
 		<description>Star Wars: The Arcade Game</description>
 		<year>1983</year>
@@ -3164,7 +3164,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="states">
 		<description>States and Capitals Tutorial</description>
 		<year>1984</year>
@@ -3177,7 +3177,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="stix">
 		<description>Stix</description>
 		<year>1983</year>
@@ -3190,7 +3190,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="storymac">
 		<description>Story Machine</description>
 		<year>1983</year>
@@ -3204,7 +3204,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sprsmash">
 		<description>Super Smash</description>
 		<year>1983</year>
@@ -3218,7 +3218,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tankwars">
 		<description>Tank Wars</description>
 		<year>1983</year>
@@ -3231,7 +3231,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tapper">
 		<description>Tapper</description>
 		<year>1984</year>
@@ -3244,7 +3244,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tenpins">
 		<description>Tenpins</description>
 		<year>1989</year>
@@ -3257,7 +3257,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="threshld">
 		<description>Threshold</description>
 		<year>1983</year>
@@ -3270,7 +3270,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="timbound">
 		<description>Timebound</description>
 		<year>1984</year>
@@ -3283,7 +3283,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="toothinv">
 		<description>Tooth Invaders</description>
 		<year>1982</year>
@@ -3297,7 +3297,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="toybzr" supported="partial">
 		<description>Toy Bizarre</description>
 		<year>1984</year>
@@ -3311,7 +3311,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="trashman">
 		<description>Trashman</description>
 		<year>1983</year>
@@ -3324,7 +3324,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="tsicycle">
 		<description>TSI Cycles</description>
 		<year>1983</year>
@@ -3337,7 +3337,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="turbomaz">
 		<description>Turbo Maze Man</description>
 		<year>1983</year>
@@ -3350,7 +3350,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tylrdngn">
 		<description>Tyler's Dungeons</description>
 		<year>1984</year>
@@ -3363,7 +3363,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ultrex">
 		<description>Ultrex Quadro Maze</description>
 		<year>1983</year>
@@ -3376,7 +3376,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="upnaddem">
 		<description>Up'n Add'em</description>
 		<year>1984</year>
@@ -3391,7 +3391,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="upndown">
 		<description>Up'n Down</description>
 		<year>1984</year>
@@ -3405,7 +3405,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="upgrabs">
 		<description>Up for Grabs</description>
 		<year>1983</year>
@@ -3418,7 +3418,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="utahtut">
 		<description>Utah Counties Tutorial</description>
 		<year>1984</year>
@@ -3431,7 +3431,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="viduzzle">
 		<description>Viduzzles: Computerized Jigsaw Puzzles</description>
 		<year>1983</year>
@@ -3446,7 +3446,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="webster">
 		<description>Webster: The Word Game</description>
 		<year>1983</year>
@@ -3460,7 +3460,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="wiztype">
 		<description>The Wizard of Id's Wiztype</description>
 		<year>1984</year>
@@ -3474,7 +3474,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="wow">
 		<description>Wizard of Wor</description>
 		<year>1984</year>
@@ -3487,8 +3487,8 @@ http://www.retroport.de/C64_C128_Hardware.html
 				<rom name="wizard of wor (1984)(commodore).80" size="0x4000" crc="2717b789" sha1="1dc18920c9c3869f321da3fec1e29e7483487808" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>	
-		
+	</software>
+
 	<software name="zenji">
 		<description>Zenji</description>
 		<year>1984</year>
@@ -3501,8 +3501,8 @@ http://www.retroport.de/C64_C128_Hardware.html
 				<rom name="zenji (1984)(activision).80" size="0x4000" crc="4969f343" sha1="d6fb969bfdbd4a150189845665258ca099a52e05" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>		
-		
+	</software>
+
 	<software name="zonerngr">
 		<description>Zone Ranger</description>
 		<year>1984</year>
@@ -3515,8 +3515,8 @@ http://www.retroport.de/C64_C128_Hardware.html
 				<rom name="zone ranger (1984)(activision).80" size="0x4000" crc="2beb55aa" sha1="2a620fb4c2daeee7927e65032d11ca0131368269" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>		
-	
+	</software>
+
 	<software name="afterwar">
 		<description>After The War</description>
 		<year>1990</year>
@@ -3586,7 +3586,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="battlcmd">
 		<description>Battle Command</description>
 		<year>1991</year>
@@ -3600,7 +3600,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="c64gscrt">
 		<description>Commodore 64 Game System Cartridge</description>
 		<!-- This cartridge came packaged with the C64 Game System. -->
@@ -3615,7 +3615,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cybrball">
 		<description>Cyberball: Football in the 21st Century</description>
 		<year>1990</year>
@@ -3629,7 +3629,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dbldrgn">
 		<description>Double Dragon (Ocean)</description>
 		<year>1991</year>
@@ -3643,7 +3643,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dbldrgm" cloneof="dbldrgn">
 		<description>Double Dragon (Melbourne House)</description>
 		<year>1989</year>
@@ -3657,7 +3657,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="fortapoc">
 		<description>Fort Apocalypse (Pirate)</description>
 		<year>1982</year>
@@ -3671,7 +3671,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="funplay">
 		<description>Fun Play 3-in-1</description>
 		<year>1990</year>
@@ -3699,7 +3699,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="kungfu">
 		<description>Kung-Fu Master</description>
 		<year>1985</year>
@@ -3713,7 +3713,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lstninja">
 		<description>The Last Ninja Remix</description>
 		<year>1990</year>
@@ -3727,7 +3727,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ldrboard">
 		<description>Leaderboard Golf</description>
 		<year>1986</year>
@@ -3741,7 +3741,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="megafun">
 		<description>Megafun</description>
 		<year>2004</year>
@@ -3755,7 +3755,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="myth">
 		<description>Myth: History in the Making</description>
 		<year>1990</year>
@@ -3769,7 +3769,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="narco">
 		<description>Narco Police</description>
 		<year>19??</year>
@@ -3783,7 +3783,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="navyseal">
 		<description>Navy SEALs</description>
 		<year>1990</year>
@@ -3797,7 +3797,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pang">
 		<description>Pang</description>
 		<year>1991</year>
@@ -3811,7 +3811,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="parkptrl">
 		<description>Park Patrol</description>
 		<year>1984</year>
@@ -4007,9 +4007,9 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<!-- Applications Added by k1w1 -->
-	
+
 	<software name="128qload">
 		<description>128er Quickload</description>
 		<year>19??</year>
@@ -4022,7 +4022,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="256eprom">
 		<description>256k Eprom System r.5</description>
 		<year>19??</year>
@@ -4035,7 +4035,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="64doctor">
 		<description>64 Doctor</description>
 		<year>1988</year>
@@ -4048,7 +4048,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="64diary">
 		<description>64-Diary</description>
 		<year>1983</year>
@@ -4061,7 +4061,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="64forth">
 		<description>64 Forth v1.2</description>
 		<year>1983</year>
@@ -4074,7 +4074,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="64mon">
 		<description>64 Mon v1.03</description>
 		<year>19??</year>
@@ -4087,7 +4087,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="basex">
 		<description>Basex</description>
 		<year>1989</year>
@@ -4100,7 +4100,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bcopybox">
 		<description>Black Copy Box</description>
 		<year>19??</year>
@@ -4113,7 +4113,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="c64diag">
 		<description>C-64 Diagnostic r.586220</description>
 		<year>19??</year>
@@ -4126,7 +4126,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="c64idiag">
 		<description>C-64 Import Test Diagnostic</description>
 		<year>198?</year>
@@ -4139,7 +4139,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="warpspd" supported="no">
 		<description>Warp Speed v2.0</description>
 		<year>1988</year>
@@ -4156,11 +4156,11 @@ http://www.retroport.de/C64_C128_Hardware.html
 		|=|            LS109|
 		|=|                 |
 		|===================|
-		
+
 		ROM     - "DEI-356NR-WRPIIDA1 (C) NCR A8847 609-2415038 F833071" 16Kx8 ROM
 		SW1     - mode switch (C64/C128)
 		SW2     - reset button
-		
+
 		data = BITSWAP8(data,7,6,5,2,0,1,3,4)
 		address = BITSWAP14(address,12,13,5,2,7,9,11,10,8,6,4,3,1,0)
 		-->
@@ -4173,7 +4173,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="warpspd1" cloneof="warpspd" supported="no">
 		<description>Warp Speed v1.0</description>
 		<year>1987</year>
@@ -4188,7 +4188,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ccsmon">
 		<description>C.C.S. Mon</description>
 		<year>1986</year>
@@ -4201,7 +4201,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="c64diagn">
 		<description>C64 Diagnostic</description>
 		<year>19??</year>
@@ -4214,7 +4214,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="calcres">
 		<description>Calc Result</description>
 		<year>1983</year>
@@ -4232,7 +4232,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="c64stat">
 		<description>CBM 64 Stat</description>
 		<year>1983</year>
@@ -4245,7 +4245,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="c64statg" cloneof="c64stat">
 		<description>CBM 64 Stat (Ger)</description>
 		<year>1982</year>
@@ -4258,7 +4258,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="muistio">
 		<description>Muistio 64 (Fin)</description>
 		<year>19??</year>
@@ -4271,7 +4271,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="conraddb">
 		<description>Conrad Disk Booster (Ger)</description>
 		<year>19??</year>
@@ -4284,7 +4284,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="copycard" supported="no">
 		<description>Copy Card</description>
 		<year>1988</year>
@@ -4298,7 +4298,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="delas4">
 		<description>Dela S-4-Modul</description>
 		<year>19??</year>
@@ -4311,7 +4311,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="delta323" supported="no">
 		<description>Delta Drawing v3.23</description>
 		<year>1983</year>
@@ -4324,7 +4324,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="designer" supported="partial">
 		<description>The Designer's Pencil</description>
 		<year>1984</year>
@@ -4337,7 +4337,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="doc6422">
 		<description>Doc '64 v2.2</description>
 		<year>19??</year>
@@ -4350,7 +4350,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dolphin">
 		<description>Dolphin DOS Copy Rom</description>
 		<year>19??</year>
@@ -4363,7 +4363,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="email64">
 		<description>Electronic Mailbox-64</description>
 		<year>1984</year>
@@ -4376,7 +4376,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="emon23" supported="no">
 		<description>Emon v2.3</description>
 		<year>1988</year>
@@ -4390,7 +4390,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="exbasl2">
 		<description>ExBASIC Level II v64.1</description>
 		<year>1988</year>
@@ -4403,7 +4403,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="finalcdr" supported="no">
 		<description>The Final Coder</description>
 		<year>19??</year>
@@ -4417,7 +4417,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="finadv">
 		<description>The Financial Advisor</description>
 		<year>1983</year>
@@ -4430,7 +4430,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="formatm" supported="no">
 		<description>Format- und Hardcopymodul (Ger)</description>
 		<year>19??</year>
@@ -4444,7 +4444,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="graf64">
 		<description>Graf 64</description>
 		<year>19??</year>
@@ -4457,7 +4457,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="happypac" supported="no">
 		<description>Happy-Packer (Ger)</description>
 		<year>1987</year>
@@ -4471,7 +4471,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hesmon">
 		<description>HES Mon 2</description>
 		<year>1983</year>
@@ -4484,7 +4484,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hesmonp" cloneof="hesmon">
 		<description>HES Mon (Prototype)</description>
 		<year>1983</year>
@@ -4497,7 +4497,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="heswrite">
 		<description>HES Writer 64</description>
 		<year>1982</year>
@@ -4510,7 +4510,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="heswrit1" cloneof="heswrite">
 		<description>HES Writer 64 (Alt)</description>
 		<year>1982</year>
@@ -4523,7 +4523,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hsback3">
 		<description>High Speed Sektor Backup v3.0 (Ger)</description>
 		<year>1987</year>
@@ -4536,7 +4536,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ripper11" supported="no">
 		<description>Hires Ripper v1.1</description>
 		<year>19??</year>
@@ -4550,7 +4550,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hypra3">
 		<description>Hypra-Disk-Modul II v3.0 (Ger)</description>
 		<year>19??</year>
@@ -4563,7 +4563,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="magicmon">
 		<description>Magic-Mon</description>
 		<year>19??</year>
@@ -4576,7 +4576,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pwrcart" supported="no">
 		<description>Power Cartridge</description>
 		<year>1985</year>
@@ -4593,7 +4593,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ramflop4">
 		<description>Ram Floppy v4.0</description>
 		<year>1988</year>
@@ -4606,7 +4606,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="simonbas">
 		<description>Simons' BASIC</description>
 		<year>198?</year>
@@ -4623,7 +4623,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="speeddos">
 		<description>Speed DOS Copy ROM</description>
 		<year>19??</year>
@@ -4636,7 +4636,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="superhcm">
 		<description>Das Super Hard-Copy-Modul (Ger)</description>
 		<year>1987</year>
@@ -4649,7 +4649,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sprsktch">
 		<description>Super Sketch</description>
 		<year>1984</year>
@@ -4662,7 +4662,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="systemm1">
 		<description>System-M1.0 (Ger)</description>
 		<year>1983</year>
@@ -4675,7 +4675,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="teledata">
 		<description>Teledata (Swe)</description>
 		<year>1983</year>
@@ -4688,7 +4688,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tfgmodul" supported="no">
 		<description>TFG Module</description>
 		<year>1986</year>
@@ -4702,7 +4702,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tool64">
 		<description>The Tool-64</description>
 		<year>1983</year>
@@ -4715,7 +4715,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tsieprom" supported="no">
 		<description>TSI-Eprom Module</description>
 		<year>19??</year>
@@ -4729,7 +4729,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tysim64">
 		<description>Tysim 64 (Ger)</description>
 		<year>1987</year>
@@ -4742,7 +4742,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="victxt64">
 		<description>Vic-Text 64 (Swe)</description>
 		<year>1983</year>
@@ -4755,7 +4755,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="videotex">
 		<description>Videotex</description>
 		<year>1984</year>
@@ -4768,7 +4768,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="writenow">
 		<description>Write Now! 64</description>
 		<year>1983</year>
@@ -4795,7 +4795,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ar42pro">
 		<description>Action Replay v4.2 Professional</description>
 		<year>1988</year>
@@ -4949,7 +4949,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="comal80">
 		<description>COMAL 80 (Commodore)</description>
 		<year>1985</year>
@@ -4991,7 +4991,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="final">
 		<description>The Final Cartridge (v4)</description>
 		<year>1986</year>
@@ -5004,8 +5004,8 @@ http://www.retroport.de/C64_C128_Hardware.html
 				<rom name="final_cartridge_1_v4_1986.bin" size="0x4000" crc="fb4c9356" sha1="d6391d5e3da908f53905f86190ad30dfaa615d39" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="finalint" cloneof="final">
 		<description>The Final Cartridge (Proto)</description>
 		<year>198?</year>
@@ -5020,7 +5020,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="finalv1" cloneof="final">
 		<description>The Final Cartridge (v1)</description>
 		<year>1986</year>
@@ -5034,7 +5034,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="finalv2" cloneof="final">
 		<description>The Final Cartridge (v2)</description>
 		<year>1986</year>
@@ -5048,7 +5048,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="finalv3" cloneof="final">
 		<description>The Final Cartridge (v3)</description>
 		<year>1986</year>
@@ -5062,7 +5062,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="killer" cloneof="final">
 		<description>Killercart</description>
 		<year>1986</year>
@@ -5076,7 +5076,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="icemchne">
 		<description>The Ice Machine</description>
 		<year>1986</year>
@@ -5090,7 +5090,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="finalpls">
 		<description>Final Cartridge Plus (v2)</description>
 		<year>1986</year>
@@ -5104,7 +5104,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="finalplsv1" cloneof="finalpls">
 		<description>Final Cartridge Plus (v1)</description>
 		<year>1986</year>
@@ -5118,7 +5118,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="finalplsv1a" cloneof="finalpls">
 		<description>Final Cartridge Plus (v1, Alt)</description>
 		<year>1986</year>
@@ -5132,7 +5132,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="final2">
 		<description>The Final Cartridge II</description>
 		<year>1987</year>
@@ -5145,7 +5145,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 				<rom name="final_cartridge_2_1987.bin" size="0x4000" crc="57717f60" sha1="07315ec80a0c67907c3f3803bce733b3dc722981" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="final2pl">
 		<description>The Final Cartridge II (Pol)</description>
@@ -5159,8 +5159,8 @@ http://www.retroport.de/C64_C128_Hardware.html
 				<rom name="final_cartridge_2_1986_polish.bin" size="0x4000" crc="99303e17" sha1="4114d1fee4e5db18ad5df188a0f16e4646698b98" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="final3">
 		<description>The Final Cartridge III (1988-12)</description>
 		<year>1988</year>
@@ -5188,7 +5188,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="final3_8711" cloneof="final">
 		<description>The Final Cartridge III (1987-11)</description>
 		<year>1987</year>
@@ -5202,7 +5202,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="final3_8709" cloneof="final">
 		<description>The Final Cartridge III (1987-09)</description>
 		<year>1987</year>
@@ -5216,7 +5216,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="magicdsk">
 		<description>Magic Desk I</description>
 		<year>1983</year>
@@ -5231,7 +5231,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="magicf">
 		<description>Magic Formel</description>
 		<year>1984</year>
@@ -5245,7 +5245,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="nordic72">
 		<description>Nordic Power: Action Cartridge v7.2</description>
 		<year>1991</year>
@@ -5259,7 +5259,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="atomic" cloneof="nordic72">
 		<description>Atomic Power Cartridge v1.1</description>
 		<year>1990</year>
@@ -5273,7 +5273,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="nordic10" cloneof="nordic72">
 		<description>Nordic Power v1.0</description>
 		<year>1989</year>
@@ -5287,7 +5287,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sprsnap5">
 		<description>Super Snapshot 5 (NTSC)</description>
 		<year>1989</year>
@@ -5301,7 +5301,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sprsnp5p" cloneof="sprsnap5">
 		<description>Super Snapshot 5 (PAL)</description>
 		<year>1989</year>
@@ -5315,7 +5315,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sprsn5pa" cloneof="sprsnap5">
 		<description>Super Snapshot 5 (PAL) (Alt)</description>
 		<year>1989</year>
@@ -5329,5 +5329,5 @@ http://www.retroport.de/C64_C128_Hardware.html
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

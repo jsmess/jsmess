@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="cbm700_cart" description="Commodore 700 cartridges">
-		
+
 	<software name="calcresu" supported="no">
 		<description>Calc Result</description>
 		<year>198?</year>

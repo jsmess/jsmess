@@ -127,7 +127,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lpw39upda" cloneof="lpw39upd">
 	<!--Disks might be bad. I marked it as bad, but it will be evident once Emulation of the System gets up and running in MESS-->
 		<description>Lisa Pascal Workshop V3.9 Update (Alt)</description>
@@ -170,7 +170,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lpwsupa" cloneof="lpwsup">
 	<!--Disks might be bad. I marked it as bad, but it will be evident once Emulation of the System gets up and running in MESS-->
 		<description>Lisa Pascal Workshop Supplement (Alt)</description>
@@ -231,7 +231,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lpw2a" cloneof="lpw2">
 		<description>Lisa Pascal Workshop V2 (Alt)</description>
 		<year>1983</year>
@@ -321,7 +321,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lpw3a" cloneof="lpw3">
 		<description>Lisa Pascal Workshop V3 (Alt)</description>
 		<year>1983</year>
@@ -597,7 +597,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="macwrk3a" cloneof="macwrk3">
 		<description>Lisa Macworks XL 3.0 (Alt)</description>
 		<year>1985</year>
@@ -786,20 +786,20 @@
 				<rom name="toolkitd3.image" size="419284" crc="cb1d22c9" sha1="4058b03378711e9ee9abc2bf38d1981877abee62" offset="000000" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="419284">
 				<rom name="toolkitd4.image" size="419284" crc="cd508c8b" sha1="d52b97c3897f2cd04c515f2733095784d7f16ffb" offset="000000" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="419284">
 				<rom name="toolkitd5.image" size="419284" crc="f287fcbd" sha1="6c46fab0d7342874f24bf35e64b395fddd5b22fc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ltk3src">
 		<description>Lisa Toolkit 3.0 Source</description>
 		<year>1984</year>
@@ -821,14 +821,14 @@
 				<rom name="toolkit source d3.image" size="419284" crc="b67deee0" sha1="e6bcdc704739c6a04cce68ca2977530e385d4c52" offset="000000" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="419284">
 				<rom name="toolkit source d4.image" size="419284" crc="d861701c" sha1="4c73dddc9b28402b38cbaa6e5fa3e967e1d242e1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ltkclas">
 		<description>Lisa Toolkit 3.0 Classes</description>
 		<!--Not 100% sure about it's name Image says: Clascal-->
@@ -841,7 +841,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cobol">
 		<description>Lisa Cobol 2.0</description>
 		<year>198?</year>
@@ -863,14 +863,14 @@
 				<rom name="cobold3.image" size="419284" crc="945dd1fb" sha1="c0032b49163f18721277be8b50fc6c741116e94c" offset="000000" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="419284">
 				<rom name="cobold4.image" size="419284" crc="d972949b" sha1="231dd56b72a1e785c808dd980856a33c01159983" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="basicpl">
 		<description>Lisa Basic Plus 2.0</description>
 		<year>1983</year>
@@ -892,14 +892,14 @@
 				<rom name="basic plus d3.image" size="419284" crc="9b799542" sha1="6b950b2d82d9ab31f2565bf0a8fa0081cf59fda9" offset="000000" />
 			</dataarea>
 		</part>
-		
+
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="419284">
 				<rom name="basic plus d4.image" size="419284" crc="2b7a6b0b" sha1="91223eb06f7a4b1aa3479270c224ee7df7ec1a8e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="quickprt">
 		<description>QuickPort V2</description>
 		<year>198?</year>

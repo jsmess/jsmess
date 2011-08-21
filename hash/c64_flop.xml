@@ -3,7 +3,7 @@
 <softwarelist name="c64_flop" description="Commodore 64 diskettes">
 
 	<!-- Games -->
-	
+
 	<software name="aztecchl">
 		<description>Aztec Challenge</description>
 		<year>1983</year>
@@ -15,7 +15,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="barbaria">
 		<description>Barbarian: The Ultimate Warrior</description>
 		<year>1988</year>
@@ -26,7 +26,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="basilgrt" supported="no">
 		<description>Basil: The Great Mouse Detective</description>
 		<year>1987</year>
@@ -38,7 +38,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bionicco">
 		<description>Bionic Commando</description>
 		<year>1988</year>
@@ -50,7 +50,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bldrdash">
 		<description>Boulder Dash</description>
 		<year>1984</year>
@@ -62,7 +62,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="commando">
 		<description>Commando</description>
 		<year>1985</year>
@@ -74,7 +74,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="grnberet">
 		<description>Green Beret</description>
 		<year>1986</year>
@@ -86,7 +86,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="impmiss">
 		<description>Impossible Mission</description>
 		<year>1984</year>
@@ -98,7 +98,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jacknpr" supported="no">
 		<description>Jack the Nipper</description>
 		<year>1986</year>
@@ -111,7 +111,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="miamivic" supported="no">
 		<description>Miami Vice</description>
 		<year>1986</year>
@@ -124,7 +124,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mule">
 		<description>M.U.L.E.</description>
 		<year>1983</year>
@@ -136,7 +136,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="rambo2" supported="no">
 		<description>Rambo: First Blood Part II</description>
 		<year>1985</year>
@@ -149,7 +149,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="rambo2n" cloneof="rambo2" supported="no">
 		<description>Rambo: First Blood Part II (NTSC)</description>
 		<year>1985</year>
@@ -162,7 +162,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="rambo3" supported="no">
 		<description>Rambo III</description>
 		<year>1988</year>
@@ -182,7 +182,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="rambo3n" cloneof="rambo3" supported="no">
 		<description>Rambo III (NTSC)</description>
 		<year>1989</year>
@@ -195,7 +195,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sthassle">
 		<description>Street Hassle</description>
 		<year>1987</year>
@@ -207,7 +207,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="strippkr">
 		<description>Strip Poker</description>
 		<year>1984</year>
@@ -219,7 +219,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="terramex" supported="no">
 		<description>Terramex</description>
 		<year>1988</year>
@@ -239,7 +239,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="toutrun" supported="no">
 		<description>Turbo Out Run</description>
 		<year>1989</year>
@@ -259,9 +259,9 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Compilations -->
-	
+
 	<software name="gameset">
 		<description>Game Set and Match</description>
 		<year>1987</year>
@@ -291,9 +291,9 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Applications -->
-	
+
 	<software name="basickaa">
 		<description>BASIC-kääntäjä (Fin)</description>
 		<year>1984</year>
@@ -304,7 +304,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sprbas64">
 		<description>SuperBase 64 (Fin)</description>
 		<year>1983</year>
@@ -315,5 +315,5 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

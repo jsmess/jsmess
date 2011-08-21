@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="mpz80" description="Morrow MPZ80 diskettes">
-	
+
 	<software name="509">
 		<description>509</description>
 		<year>1979</year>
@@ -10,9 +10,9 @@
 		<!--
 		CP/M Ver 2.2 Cbios Rev 3.1         #509
 		Disk Jockey 2D @ F800h
-		
+
 		@ 1979 Digital Research  @ 1979 Morrow Designs
-		
+
 					                              #509
 		-->
 		<part name="flop" interface="floppy_8">
@@ -21,7 +21,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="805">
 		<description>805</description>
 		<year>1979</year>
@@ -31,7 +31,7 @@
 		48K CP/M Version 2.2, Cbios revision 2.9.20       #805
 		For a Disk Jockey 2D/B @ F800 + Fujitsu M20 MICROSOFT BASIC
 		Decision 1 as console                          Vers 5.21
-		Serial port 3 with CTS protocall as LST:        © 1979   
+		Serial port 3 with CTS protocall as LST:        © 1979
 		@ 1979 Digital Research   @ 1979 Morrow Designs Microsoft
 		                                           #805
 		-->
@@ -41,7 +41,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="817">
 		<description>817</description>
 		<year>1979</year>
@@ -51,7 +51,7 @@
 		48K CP/M Version 2.2, Cbios revision 2.9.20       #817
 		For a Disk Jockey 2D/B @ F800 + Fujitsu M20
 		Multio console
-		Serial port 3 with CTS protocal as LST:           
+		Serial port 3 with CTS protocal as LST:
 		@ 1979 Digital Research   @ 1979 Morrow Designs
 		                                           #817
 		-->
@@ -61,7 +61,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="901">
 		<description>901</description>
 		<year>1983</year>
@@ -71,14 +71,14 @@
 		48K CP/M version 2.2, CBIOS revision E.4     #901
 		MOVCPM;   AB: DJ/DMA 8,    CD: DJ/DMA 5,  E: HDC/DMA
 		MOVCPM5;   A: HDC/DMA M5,  BC: DJ/DMA 8, DE: DJ/DMA 5
-		MOVCPM10; AB: HDC/DMA M10, CD: DJ/DMA 8, EF: DJ/DMA 5     
+		MOVCPM10; AB: HDC/DMA M10, CD: DJ/DMA 8, EF: DJ/DMA 5
 		MOVCPM16; AB: HDC/DMA M16, CD: DJ/DMA 8, EF: DJ/DMA 5
 		DJ/DMA as console, blank list, blank punch
-		
-		
-		
-		
-		
+
+
+
+
+
 		(c) 1980 Digital Research, (c) 1983 Morrow Designs
 		-->
 		<part name="flop" interface="floppy_8">
@@ -87,7 +87,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="902">
 		<description>902</description>
 		<year>1983</year>
@@ -97,7 +97,7 @@
 		@ @ @48K CP/M version 2.2, CBIOS REVISION E.4        #902
 		MOVCPM;   AB: DJ/DMA 8,   CD: DJ/DMA 5, E: HDC/DMA M5
 		MOVCPM5;   A: HDC/DMA M5  BC: DJ/DMA 8, DE: DJ/DMA 5
-		MOVCPM10; AB: HDC/DMA M10 CD: DJ/DMA 8, EF: DJ/DMA 5     
+		MOVCPM10; AB: HDC/DMA M10 CD: DJ/DMA 8, EF: DJ/DMA 5
 		MOVCPM16; AB: HDC/DMA M16 CD: DJ/DMA 8, EF: DJ7DMA 5
 		MULTI/O (9600) console; MULTI/O (9600 CTS) LIST;
 		MULTI/O (Centronics) PUNCH
@@ -109,7 +109,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="908">
 		<description>908</description>
 		<year>1979</year>
@@ -129,7 +129,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="909">
 		<description>909</description>
 		<year>1979</year>
@@ -150,7 +150,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="910">
 		<description>910</description>
 		<year>1982</year>
@@ -161,9 +161,9 @@
 		MOVCPM; AB: DJDMA 8, CD: DJDMA 5, EF: HDCA M10
 		MOVCPM10; AB: HDCA M10, BC: DJDMA 8, DE: DJDMA 5
 		Multio (9600) as console; Multio (1200 CTS) as list
-		
-		
-		
+
+
+
 		(c) 1980 Digital Research, (c) 1982 Morrow Designs
 		-->
 		<part name="flop" interface="floppy_8">
@@ -172,7 +172,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="911">
 		<description>911</description>
 		<year>1979</year>
@@ -192,7 +192,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="921">
 		<description>921</description>
 		<year>1980</year>
@@ -214,7 +214,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="922">
 		<description>922</description>
 		<year>1982</year>
@@ -236,7 +236,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="925">
 		<description>925</description>
 		<year>1982</year>
@@ -259,7 +259,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="926">
 		<description>926</description>
 		<year>1982</year>
@@ -282,7 +282,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="930">
 		<description>930</description>
 		<year>1983</year>
@@ -295,10 +295,10 @@
 		MOVCPM10;  A: HDDMA M10, BCDE: DJ2D/B @ F800
 		MOVCPM16;  A: HDDMA M16, BCDE: DJ2D/B @ F800
 		Multio (9600) as console, Multio (1200 CTS) as list
-		
-		
-		
-		
+
+
+
+
 		(c) 1980 Digital Research, (c) 1983 Morrow Designs
 		-->
 		<part name="flop" interface="floppy_8">
@@ -307,7 +307,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="931">
 		<description>931</description>
 		<year>1982</year>
@@ -317,8 +317,8 @@
 		48K CP/M ver 2.2, CBIOS rev E.31  #931
 		MOVCPM; ABCD: DJ2D/B @ E000
 		DJ2D/B as console; blank list
-		
-		
+
+
 		(c) 1980 Digital Research
 		(c) 1982 Morrow Designs
 		-->
@@ -328,7 +328,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="935">
 		<description>935</description>
 		<year>1982</year>
@@ -338,11 +338,11 @@
 		48K CP/M version 2.2, CBIOS revision E.31       #935
 		MOVCPM; ABCD: DJ2D/B @F800
 		DJ2D/B as console, blank list
-		
-		
-		
-		
-		
+
+
+
+
+
 		(c) 1980 Digital Research, (c) 1982 Morrow Designs
 		-->
 		<part name="flop" interface="floppy_8">
@@ -351,7 +351,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="941">
 		<description>Install Package for the HDDMA</description>
 		<year>1982</year>
@@ -361,8 +361,8 @@
 		INSTALL PACKAGE for the HDDMA                   #941-8
 		PRL files supplied: M5, (4)M5, M10, (4)M10,
 		                    M16, (4)M16
-							
-							
+
+
 		(c) 1982 Morrow Designs
 		-->
 		<part name="flop8" interface="floppy_8">
@@ -371,7 +371,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="942">
 		<description>Install Package for the HDCA</description>
 		<year>1982</year>
@@ -381,8 +381,8 @@
 		INSTALL PACKAGE for the HDCA                 #942
 		PRL files supplied: HDCAM10F, HDCAM10M, HDCAM20,
 		                    HDCAM26
-							
-							
+
+
 		(c) 1982 Morrow Designs
 		-->
 		<part name="flop" interface="floppy_8">
@@ -391,7 +391,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="943">
 		<description>Install Package for the DJ2D/B</description>
 		<year>1982</year>
@@ -400,9 +400,9 @@
 		<!--
 		I N S T A L L   P A C K A G E  f o r  t h e   D J 2 D / B                             #943
 		P R L   f i l e s  s u p p l i e d :  D J 2 D / B 4
-		
-		
-		
+
+
+
 		( c )  1 9 8 2  M o r r o w  D e s i g n s
 		-->
 		<part name="flop" interface="floppy_8">
@@ -411,7 +411,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="947">
 		<description>Single Density CP/M with MBASIC</description>
 		<year>1982</year>
@@ -419,9 +419,9 @@
 		<info name="serial" value="34-54510" />
 		<!--
 		Single Density CP/M with MBASIC           #947
-		
+
 		____ NOT A BOOT DISKETTE ____        1 of 2
-		
+
 		CP/M (c) '76, '77, '78, '79, '80
 		   Digital Research
 		(c) 1982 Morrow Designs
@@ -433,9 +433,9 @@
 		</part>
 		<!--
 		Single Density CP/M with MBASIC           #947
-		
+
 		____ NOT A BOOT DISKETTE ____        2 of 2
-		
+
 		MBASIC Rev 5.21 (c) 1979 Microsoft, Inc.
 		CP/M (c) '76, '77, '78, '79, '80
 		   Digital Research
@@ -464,5 +464,5 @@
 				<rom name="traptest.imd" size="485190" crc="584da78d" sha1="72fe3d9e0c117949de152b389db2face839df85b" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 </softwarelist>

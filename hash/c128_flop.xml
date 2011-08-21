@@ -22,7 +22,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="byondzrk">
 		<description>Beyond Zork: The Coconut of Quendor (R47)</description>
 		<year>1987</year>
@@ -41,7 +41,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bureaucr">
 		<description>Bureaucracy: A Paranoid Fantasy (R116)</description>
 		<year>1987</year>
@@ -60,7 +60,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bureaucra" cloneof="bureaucr">
 		<description>Bureaucracy: A Paranoid Fantasy (R86)</description>
 		<year>1987</year>
@@ -79,7 +79,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lastv8">
 		<description>The Last V-8</description>
 		<year>1985</year>
@@ -91,7 +91,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="rockyhor">
 		<description>The Rocky Horror Show</description>
 		<year>1987</year>
@@ -103,7 +103,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="thaibxng">
 		<description>Thai Boxing</description>
 		<year>1986</year>
@@ -115,9 +115,9 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Applications -->
-	
+
 	<software name="basic128">
 		<description>BASIC-128 v1.03</description>
 		<year>1985</year>
@@ -141,7 +141,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="c128tutr">
 		<description>Commodore 128 Tutorial</description>
 		<year>1985</year>
@@ -153,7 +153,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cadpak">
 		<description>CADPAK-128</description>
 		<year>1986</year>
@@ -172,7 +172,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="commterm">
 		<description>Comm Term 64/128</description>
 		<year>1986</year>
@@ -184,7 +184,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="datamgr">
 		<description>Data Manager 128</description>
 		<year>1984</year>
@@ -203,7 +203,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="enhsidpl">
 		<description>Enhanced SidPlayer (128 Version)</description>
 		<year>198?</year>
@@ -215,7 +215,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="fasthack">
 		<description>Fast Hack&apos;em 128 v6.00</description>
 		<year>1988</year>
@@ -227,7 +227,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="geos20">
 		<description>GEOS 128 v2.0</description>
 		<year>1988</year>
@@ -270,7 +270,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jane">
 		<description>Jane</description>
 		<year>1985</year>
@@ -289,7 +289,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mach128">
 		<description>MACH 128 Utility Disk</description>
 		<year>1985</year>
@@ -301,7 +301,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="merlin">
 		<description>Merlin 128 Macro Assembler v1.10</description>
 		<year>1987</year>
@@ -313,7 +313,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="petspeed">
 		<description>Petspeed 128 v2.2</description>
 		<year>1986</year>
@@ -325,7 +325,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="spascal">
 		<description>Super Pascal 128 v6.1</description>
 		<year>19??</year>
@@ -337,7 +337,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="superc">
 		<description>Super C 128 v3.02</description>
 		<year>1985</year>
