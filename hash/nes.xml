@@ -35786,22 +35786,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="bowling">
-		<!-- Serial:  - Release Date:  - Alternative Title: -->
-		<description>Bowling! (USA, Prototype)</description>
-		<year>1989</year>
-		<publisher>Coconuts Japan</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="bowling (usa, prototype).prg" size="131072" crc="beff6ec2" sha1="11d4034a805415ce93a55793f58d0c2300ef1f86" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="bowling (usa, prototype).chr" size="131072" crc="fe332485" sha1="90941ca4949a869db56d2bcc675bdfe6ad02270c" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="boynbloba" cloneof="boynblob">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>David Crane's A Boy and His Blob: Trouble on Blobolonia (Euro)</description>
@@ -36992,6 +36976,23 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="dragon's lair (japan).prg" size="131072" crc="98aa7cab" sha1="b6169e1e2bda5c530096a0a902f83b7ff6592f2d" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pogie" supported="no">
+		<!-- This has been compiled from the source code -->
+		<description>Dreamworld Pogie (Prototype)</description>
+		<year>198?</year>
+		<publisher>Camerica</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="CAMERICA-BF9093" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="dreamworld pogie (prototype).prg" size="131072" crc="63d38b86" sha1="2a5c1d05518a1ae1a13bde19c904c8bdb772fbf8" offset="00000" status="baddump"/>
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -46947,6 +46948,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="dhh7">
+		<!-- Serial:  - Release Date:  - Alternative Title: 大航海7 -->
+		<description>Da Hang Hai VII</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-SGZLZ" />
+			<dataarea name="prg" size="524288">
+				<rom name="da hang hai vii (c).prg" size="524288" crc="97b945f6" sha1="ee32e57122256925af045584b063050938408ab3" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dzl" cloneof="daisenr">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Dai Zhan Lue (Chi)</description>
@@ -46975,23 +46992,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="di 4 ci - ji qi ren dai zhan (ch).prg" size="524288" crc="8497b11f" sha1="171fe225bbd3460f09531a55e2354df2a61129e4" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-<!-- TODO: Add support for proper pcb type -->
-	<software name="zelda3c" supported="no">
-		<!-- Serial: ES-1096 - Release Date:  - Alternative Title:  -->
-		<description>Zelda - A Link to the Past (Chi)</description>
-		<year>19??</year>
-		<publisher>Waixing</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNL-FS304" />
-			<dataarea name="prg" size="2097152">
-				<rom name="zelda (es-1096) (ch).prg" size="2097152" crc="f5d34c8e" sha1="aae48d38fc4c2eb1cdafe98d1bf686b19e84883a" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -47049,6 +47049,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dknife">
+		<description>Dragon Knife (Chi)</description>
+		<year>198?</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TBROM" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="262144">
+				<rom name="dragon knife (chi).prg" size="262144" crc="077f6a0f" sha1="dd2da92cbd245dd5b68817673dd07e0e233a41c4" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="dragon knife (chi).chr" size="262144" crc="990f8fea" sha1="5af1ddf12a5e630425e2db38135c32176780e8c7" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47622,6 +47638,23 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="prg" size="524288">
 				<rom name="yu zhou zhan jiang - space general (ch) [a1].prg" size="524288" crc="6242c14a" sha1="434c4ad7d3f8f7b25b6b6d8a2981f79e043d222f" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- TODO: Add support for proper pcb type -->
+	<software name="zelda3c" supported="no">
+		<!-- Serial: ES-1096 - Release Date:  - Alternative Title:  -->
+		<description>Zelda - A Link to the Past (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-FS304" />
+			<dataarea name="prg" size="2097152">
+				<rom name="zelda (es-1096) (ch).prg" size="2097152" crc="f5d34c8e" sha1="aae48d38fc4c2eb1cdafe98d1bf686b19e84883a" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -50374,6 +50407,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="supfight" cloneof="nekkakud">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Super Fighters (Asia, Ripped from multicart XB-F865)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="super fighters (from multicart xb-f865).chr" size="131072" crc="98bc4877" sha1="5edc6aad77bec1b2bf4da20cbfc1192f8316adf6" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="super fighters (from multicart xb-f865).prg" size="131072" crc="0003aa05" sha1="f6bd86c4e1839709a29c116c3f9a1fd6fa589f64" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="slking2" supported="partial">
 		<!-- Serial: DH-1000 - Release Date:  - Alternative Title:  -->
 		<description>Super The Lion King 2</description>
@@ -51410,9 +51459,9 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="kartfght">
+	<software name="kartfghta" cloneof="kartfght">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Kart Fighter (Asia)</description>
+		<description>Kart Fighter (Asia, Hacked?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -51422,6 +51471,22 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="kart fighter (unl).prg" size="131072" crc="37140aa7" sha1="0dad358f76b239532a3aa0a0da47c1a2448b1072" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kartfght">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Kart Fighter (Asia, SOMARI-W)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="SOMERITEAM-SL-12" />
+			<dataarea name="chr" size="262144">
+				<rom name="kart fighter (somari-w).chr" size="262144" crc="e7398edb" sha1="08d7e54482ea967923076f8f4c31fbd83c873a5d" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="kart fighter (somari-w).prg" size="131072" crc="6cd28583" sha1="dc741212559a0b46fa13f85f9bf682eb462fac5e" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -52008,12 +52073,28 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="somari" supported="no">
-		<!-- Serial: NT-616 - Release Date:  - Alternative Title:  -->
-		<description>Somari (Asia)</description>
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Somari (Asia, SOMARI-W)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" /> <!-- is this board correct?!? -->
+			<feature name="pcb" value="SOMERITEAM-SL-12" />
+			<dataarea name="chr" size="262144">
+				<rom name="somari (somari-w).chr" size="262144" crc="a0e5e4dd" sha1="2bc8424ed01f51a891c69c34d09118207fb50426" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="somari (somari-w).prg" size="262144" crc="9a24f6a8" sha1="9ee9e22c6e757d278ae51f52e4489dc3e694cdd3" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="somari1" cloneof="somari" supported="no">
+		<!-- Serial: NT-616 - Release Date:  - Alternative Title:  -->
+		<description>Somari (Asia, SOMARI-P)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="SOMERITEAM-SL-12" />
 			<dataarea name="chr" size="262144">
 				<rom name="somari (nt-616) (unl).chr" size="262144" crc="a0e5e4dd" sha1="2bc8424ed01f51a891c69c34d09118207fb50426" offset="00000" status="baddump" />
 			</dataarea>
@@ -52023,9 +52104,9 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="somaria" cloneof="somari">
+	<software name="somarib" cloneof="somari">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Somari (Asia, Alt)</description>
+		<description>Somari (Asia, Hacked?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -59564,9 +59645,9 @@ be better to redump them properly. -->
 
 <!-- Pirate fighting games -->
 
-	<software name="garousp">
+	<software name="garousp2" cloneof="garousp">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Garou Densetsu Special (Asia)</description>
+		<description>Garou Densetsu Special (Asia, Alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -59576,6 +59657,38 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="garou densetsu special (unl).prg" size="262144" crc="08fe3b15" sha1="524a29f11851a379443ffcc5bb41e40c0211e01c" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garousp">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Garou Densetsu Special (Asia, SOMARI-W)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="SOMERITEAM-SL-12" />
+			<dataarea name="chr" size="262144">
+				<rom name="garou densetsu special (unl)[!].chr" size="262144" crc="09817b25" sha1="a07c8754b8a3017d2544527a12b6683969e2de62" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="garou densetsu special (unl)[!].prg" size="131072" crc="a677d64e" sha1="801bb21042ef9e910bced9fea0571ccef55cac2a" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garousp1" cloneof="garousp">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Garou Densetsu Special (Asia, Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-KOF96" />
+			<dataarea name="chr" size="262144">
+				<rom name="garou densetsu special (unl)[!].chr" size="262144" crc="09817b25" sha1="a07c8754b8a3017d2544527a12b6683969e2de62" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="garou densetsu special (unl)[a1][!].prg" size="131072" crc="5618e180" sha1="64f5f87a733f44c29da9f8a2ffc794b11f664930" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -62423,6 +62536,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_fcy54">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Famicom Yarou 54</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
+			<dataarea name="chr" size="1048576">
+				<rom name="famicon yarou 54 (unl).chr" size="1048576" crc="d6dec8e0" sha1="bcc337c46e0acf6cc45b2111150ac14ca2618631" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="1048576">
+				<rom name="famicon yarou 54 (unl).prg" size="1048576" crc="26185277" sha1="4748993335f26e80355069eb66fdc9e2c7f537bd" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_gk47">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>GK 47 in 1</description>
@@ -63174,18 +63303,18 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-
 	<software name="mc_14">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>14 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNL-OneBus" />
-			<dataarea name="prg" size="4194304">
-				<rom name="100-in-1 arcade action ii (at-103)(unl)[!].prg" size="4194304" crc="33923995" sha1="a206e8c0ee6e86adb800cf66697defabcbd01902" offset="00000" status="baddump" />
+			<feature name="pcb" value="TXC-MXMDHTWO" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="14-in-1[p1].prg" size="524288" crc="04ee9e40" sha1="b02c4d9fd4b852466c5f59d2c9e9b8dee241bb97" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k VRAM on cartridge? -->
+			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
@@ -63197,92 +63326,12 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNL-OneBus" />
-			<dataarea name="prg" size="4194304">
-				<rom name="100-in-1 arcade action ii (at-103)(unl)[!].prg" size="4194304" crc="33923995" sha1="a206e8c0ee6e86adb800cf66697defabcbd01902" offset="00000" status="baddump" />
+			<feature name="pcb" value="BMC-SUPERHIK-300IN1" />
+			<dataarea name="chr" size="16384">
+				<rom name="999-in-1 [p1].chr" size="16384" crc="1710d0d2" sha1="43b388e47aa8caa64451acfcfa32769a63780c50" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k VRAM on cartridge? -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dhh7">
-		<!-- Serial:  - Release Date:  - Alternative Title: 大航海7 -->
-		<description>Dai Hang Hai VII</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNL-OneBus" />
-			<dataarea name="prg" size="4194304">
-				<rom name="100-in-1 arcade action ii (at-103)(unl)[!].prg" size="4194304" crc="33923995" sha1="a206e8c0ee6e86adb800cf66697defabcbd01902" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge? -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="supfight">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Super Fighter (Asia, Ripped from multicart XB-F865)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNL-OneBus" />
-			<dataarea name="prg" size="4194304">
-				<rom name="100-in-1 arcade action ii (at-103)(unl)[!].prg" size="4194304" crc="33923995" sha1="a206e8c0ee6e86adb800cf66697defabcbd01902" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge? -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pogie" supported="no">
-		<description>Dreamworld Pogie (Prototype)</description>
-		<year>198?</year>
-		<publisher>Unknown</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="CAMERICA-BF9093" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="131072">
-				<rom name="dreamworld pogie (prototype).prg" size="131072" crc="63d38b86" sha1="2a5c1d05518a1ae1a13bde19c904c8bdb772fbf8" offset="00000" status="baddump"/>
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="arcadia6">
-		<description>Arcadia VI (Prototype)</description>
-		<year>198?</year>
-		<publisher>Unknown</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="HVC-SAROM" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="131072">
-				<rom name="arcadia vi (proto).prg" size="131072" crc="25974957" sha1="cb12efbf4dc60faf53f1fb6ba961d65d0d005e2f" offset="00000" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="arcadia vi (proto).chr" size="131072" crc="c96a177a" sha1="ecd32a155c4dc8f723231eeb2b973f823766ddb6" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dknife">
-		<description>Dragon Knife (Chi)</description>
-		<year>198?</year>
-		<publisher>Waixing</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="HVC-TBROM" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="prg" size="262144">
-				<rom name="dragon knife (chi).prg" size="262144" crc="077f6a0f" sha1="dd2da92cbd245dd5b68817673dd07e0e233a41c4" offset="00000" />
-			</dataarea>
-			<dataarea name="chr" size="262144">
-				<rom name="dragon knife (chi).chr" size="262144" crc="990f8fea" sha1="5af1ddf12a5e630425e2db38135c32176780e8c7" offset="00000" />
+			<dataarea name="prg" size="32768">
+				<rom name="999-in-1 [p1].prg" size="32768" crc="a5579e50" sha1="60f160ae1d5679d0384c63d89114247b087d72f6" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -63450,6 +63499,38 @@ that the real dumps might surface -->
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="exerion 2 (na hack) [b].prg" size="32768" crc="f9ff4f04" sha1="2de6a20af24bf22832cd14c178ef38e1867beb52" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcadia6">
+		<description>Arcadia VI (Prototype)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SAROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="arcadia vi (proto).prg" size="131072" crc="25974957" sha1="cb12efbf4dc60faf53f1fb6ba961d65d0d005e2f" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="arcadia vi (proto).chr" size="131072" crc="c96a177a" sha1="ecd32a155c4dc8f723231eeb2b973f823766ddb6" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bowling">
+		<!-- Serial:  - Release Date:  - Alternative Title: -->
+		<description>Bowling! (USA, Prototype)</description>
+		<year>1989</year>
+		<publisher>Coconuts Japan</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="bowling (usa, prototype).prg" size="131072" crc="beff6ec2" sha1="11d4034a805415ce93a55793f58d0c2300ef1f86" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="bowling (usa, prototype).chr" size="131072" crc="fe332485" sha1="90941ca4949a869db56d2bcc675bdfe6ad02270c" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
