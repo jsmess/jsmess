@@ -36,6 +36,11 @@
 
 #define INTERNAL_EEPROM_SIZE	1024
 
+#include "emu.h"
+#include "image.h"
+#include "cpu/v30mz/nec.h"
+#include "imagedev/cartslot.h"
+
 
 typedef struct
 {
@@ -117,13 +122,19 @@ typedef struct
 	emu_timer *timer;
 } VDP;
 
-
 class wswan_state : public driver_device
 {
 public:
 	wswan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	DECLARE_READ8_MEMBER(wswan_port_r);
+	DECLARE_WRITE8_MEMBER(wswan_port_w);
+	DECLARE_READ8_MEMBER(wswan_sram_r);
+	DECLARE_WRITE8_MEMBER(wswan_sram_w);
 	VDP m_vdp;
 	UINT8 m_ws_portram[256];
 	UINT8 *m_ROMMap[256];
@@ -137,6 +148,7 @@ public:
 	UINT8 *m_ws_bios_bank;
 	UINT8 m_bios_disabled;
 	int m_pal[16][16];
+	void wswan_clear_irq_line(int irq);
 };
 
 
@@ -146,10 +158,6 @@ NVRAM_HANDLER( wswan );
 MACHINE_START( wswan );
 MACHINE_START( wscolor );
 MACHINE_RESET( wswan );
-READ8_HANDLER( wswan_port_r );
-WRITE8_HANDLER( wswan_port_w );
-READ8_HANDLER( wswan_sram_r );
-WRITE8_HANDLER( wswan_sram_w );
 DEVICE_START(wswan_cart);
 DEVICE_IMAGE_LOAD(wswan_cart);
 

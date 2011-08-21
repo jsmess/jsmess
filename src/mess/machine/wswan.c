@@ -15,10 +15,7 @@ TODO:
 
 ***************************************************************************/
 
-#include "emu.h"
 #include "includes/wswan.h"
-#include "imagedev/cartslot.h"
-#include "image.h"
 
 #define INTERNAL_EEPROM_SIZE	1024
 
@@ -59,7 +56,7 @@ static const UINT8 ws_portram_init[256] =
 
     f000:ffc0
     FC             cld
-        BC 00 20       mov sp,2000h
+    BC 00 20       mov sp,2000h
     68 00 00       push 0000h
     07             pop es
     68 00 F0       push F000h
@@ -120,11 +117,10 @@ static void wswan_set_irq_line( running_machine &machine, int irq)
 	}
 }
 
-static void wswan_clear_irq_line( running_machine &machine, int irq)
+void wswan_state::wswan_clear_irq_line(int irq)
 {
-	wswan_state *state = machine.driver_data<wswan_state>();
-	state->m_ws_portram[0xb6] &= ~irq;
-	wswan_handle_irqs( machine );
+	m_ws_portram[0xb6] &= ~irq;
+	wswan_handle_irqs( machine() );
 }
 
 static TIMER_CALLBACK(wswan_rtc_callback)
@@ -288,102 +284,99 @@ NVRAM_HANDLER( wswan )
 	}
 }
 
-READ8_HANDLER( wswan_sram_r )
+READ8_MEMBER( wswan_state::wswan_sram_r )
 {
-	wswan_state *state = space->machine().driver_data<wswan_state>();
-	if ( state->m_eeprom.data == NULL )
+	if ( m_eeprom.data == NULL )
 	{
 		return 0xFF;
 	}
-	return state->m_eeprom.page[ offset & ( state->m_eeprom.size - 1 ) ];
+	return m_eeprom.page[ offset & ( m_eeprom.size - 1 ) ];
 }
 
-WRITE8_HANDLER( wswan_sram_w )
+WRITE8_MEMBER( wswan_state::wswan_sram_w )
 {
-	wswan_state *state = space->machine().driver_data<wswan_state>();
-	if ( state->m_eeprom.data == NULL )
+	if ( m_eeprom.data == NULL )
 	{
 		return;
 	}
-	state->m_eeprom.page[ offset & ( state->m_eeprom.size - 1 ) ] = data;
+	m_eeprom.page[ offset & ( m_eeprom.size - 1 ) ] = data;
 }
 
-READ8_HANDLER( wswan_port_r )
+READ8_MEMBER( wswan_state::wswan_port_r )
 {
-	wswan_state *state = space->machine().driver_data<wswan_state>();
-	UINT8 value = state->m_ws_portram[offset];
+	UINT8 value = m_ws_portram[offset];
 
 	if ( offset != 2 )
-	logerror( "PC=%X: port read %02X\n", cpu_get_pc( &space->device() ), offset );
+	//logerror( "PC=%X: port read %02X\n", cpu_get_pc( &space->device() ), offset );
 	switch( offset )
 	{
 		case 0x02:		/* Current line */
-			value = state->m_vdp.current_line;
+			value = m_vdp.current_line;
 			break;
 		case 0x4A:		/* Sound DMA source address (low) */
-			value = state->m_sound_dma.source & 0xFF;
+			value = m_sound_dma.source & 0xFF;
 			break;
 		case 0x4B:		/* Sound DMA source address (high) */
-			value = ( state->m_sound_dma.source >> 8 ) & 0xFF;
+			value = ( m_sound_dma.source >> 8 ) & 0xFF;
 			break;
 		case 0x4C:		/* Sound DMA source memory segment */
-			value = ( state->m_sound_dma.source >> 16 ) & 0xFF;
+			value = ( m_sound_dma.source >> 16 ) & 0xFF;
 			break;
 		case 0x4E:		/* Sound DMA transfer size (low) */
-			value = state->m_sound_dma.size & 0xFF;
+			value = m_sound_dma.size & 0xFF;
 			break;
 		case 0x4F:		/* Sound DMA transfer size (high) */
-			value = ( state->m_sound_dma.size >> 8 ) & 0xFF;
+			value = ( m_sound_dma.size >> 8 ) & 0xFF;
 			break;
 		case 0x52:		/* Sound DMA start/stop */
-			value = state->m_sound_dma.enable;
+			value = m_sound_dma.enable;
 			break;
 		case 0xA0:		/* Hardware type */
 					/* Bit 0 - Disable/enable Bios */
 					/* Bit 1 - Determine mono/color */
 					/* Bit 2 - Determine color/crystal */
 			value = value & ~ 0x02;
-			if ( state->m_system_type == TYPE_WSC )
+			if ( m_system_type == TYPE_WSC )
 			{
 				value |= 2;
 			}
 			break;
 		case 0xA8:
-			value = state->m_vdp.timer_hblank_count & 0xFF;
+			value = m_vdp.timer_hblank_count & 0xFF;
 			break;
 		case 0xA9:
-			value = state->m_vdp.timer_hblank_count >> 8;
+			value = m_vdp.timer_hblank_count >> 8;
 			break;
 		case 0xAA:
-			value = state->m_vdp.timer_vblank_count & 0xFF;
+			value = m_vdp.timer_vblank_count & 0xFF;
 			break;
 		case 0xAB:
-			value = state->m_vdp.timer_vblank_count >> 8;
+			value = m_vdp.timer_vblank_count >> 8;
 			break;
 		case 0xCB:		/* RTC data */
-			if ( state->m_ws_portram[0xca] == 0x95 && ( state->m_rtc.index < 7 ) )
+			if ( m_ws_portram[0xca] == 0x95 && ( m_rtc.index < 7 ) )
 			{
-				switch( state->m_rtc.index )
+				switch( m_rtc.index )
 				{
-				case 0: value = state->m_rtc.year; break;
-				case 1: value = state->m_rtc.month; break;
-				case 2: value = state->m_rtc.day; break;
-				case 3: value = state->m_rtc.day_of_week; break;
-				case 4: value = state->m_rtc.hour; break;
-				case 5: value = state->m_rtc.minute; break;
-				case 6: value = state->m_rtc.second; break;
+				case 0: value = m_rtc.year; break;
+				case 1: value = m_rtc.month; break;
+				case 2: value = m_rtc.day; break;
+				case 3: value = m_rtc.day_of_week; break;
+				case 4: value = m_rtc.hour; break;
+				case 5: value = m_rtc.minute; break;
+				case 6: value = m_rtc.second; break;
 				}
-				state->m_rtc.index++;
+				m_rtc.index++;
 			}
 	}
 
 	return value;
 }
 
-WRITE8_HANDLER( wswan_port_w )
+WRITE8_MEMBER( wswan_state::wswan_port_w )
 {
-	wswan_state *state = space->machine().driver_data<wswan_state>();
-	logerror( "PC=%X: port write %02X <- %02X\n", cpu_get_pc( &space->device() ), offset, data );
+	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	logerror( "PC=%X: port write %02X <- %02X\n", cpu_get_pc( &mem->device() ), offset, data );
 	switch( offset )
 	{
 		case 0x00:	/* Display control
@@ -398,11 +391,11 @@ WRITE8_HANDLER( wswan_port_w )
                              11 - Foreground layer is displayed outside foreground window area
                    Bit 6-7 - Unknown
                 */
-			state->m_vdp.layer_bg_enable = data & 0x1;
-			state->m_vdp.layer_fg_enable = (data & 0x2) >> 1;
-			state->m_vdp.sprites_enable = (data & 0x4) >> 2;
-			state->m_vdp.window_sprites_enable = (data & 0x8) >> 3;
-			state->m_vdp.window_fg_mode = (data & 0x30) >> 4;
+			m_vdp.layer_bg_enable = data & 0x1;
+			m_vdp.layer_fg_enable = (data & 0x2) >> 1;
+			m_vdp.sprites_enable = (data & 0x4) >> 2;
+			m_vdp.window_sprites_enable = (data & 0x8) >> 3;
+			m_vdp.window_fg_mode = (data & 0x30) >> 4;
 			break;
 		case 0x01:	/* Background colour
                    In 16 colour mode:
@@ -416,30 +409,30 @@ WRITE8_HANDLER( wswan_port_w )
 		case 0x02:	/* Current scanline
                    Bit 0-7 - Current scanline (Most likely read-only)
                 */
-			logerror( "Write to current scanline! Current value: %d  Data to write: %d\n", state->m_vdp.current_line, data );
+			logerror( "Write to current scanline! Current value: %d  Data to write: %d\n", m_vdp.current_line, data );
 			/* Returning so we don't overwrite the value here, not that it
              * really matters */
 			return;
 		case 0x03:	/* Line compare
                    Bit 0-7 - Line compare
                 */
-			state->m_vdp.line_compare = data;
+			m_vdp.line_compare = data;
 			break;
 		case 0x04:	/* Sprite table base address
                    Bit 0-5 - Determine sprite table base address 0 0xxxxxx0 00000000
                    Bit 6-7 - Unknown
                 */
-			state->m_vdp.sprite_table_address = ( data & 0x3F ) << 9;
+			m_vdp.sprite_table_address = ( data & 0x3F ) << 9;
 			break;
 		case 0x05:	/* Number of sprite to start drawing with
                    Bit 0-7 - First sprite number
                 */
-			state->m_vdp.sprite_first = data;
+			m_vdp.sprite_first = data;
 			break;
 		case 0x06:	/* Number of sprites to draw
                    Bit 0-7 - Number of sprites to draw
                 */
-			state->m_vdp.sprite_count = data;
+			m_vdp.sprite_count = data;
 			break;
 		case 0x07:	/* Background/Foreground table base addresses
                    Bit 0-2 - Determine background table base address 00xxx000 00000000
@@ -447,74 +440,74 @@ WRITE8_HANDLER( wswan_port_w )
                    Bit 4-6 - Determine foreground table base address 00xxx000 00000000
                    Bit 7   - Unknown
                 */
-			state->m_vdp.layer_bg_address = (data & 0x7) << 11;
-			state->m_vdp.layer_fg_address = (data & 0x70) << 7;
+			m_vdp.layer_bg_address = (data & 0x7) << 11;
+			m_vdp.layer_fg_address = (data & 0x70) << 7;
 			break;
 		case 0x08:	/* Left coordinate of foreground window
                    Bit 0-7 - Left coordinate of foreground window area
                 */
-			state->m_vdp.window_fg_left = data;
+			m_vdp.window_fg_left = data;
 			break;
 		case 0x09:	/* Top coordinate of foreground window
                    Bit 0-7 - Top coordinatte of foreground window area
                 */
-			state->m_vdp.window_fg_top = data;
+			m_vdp.window_fg_top = data;
 			break;
 		case 0x0A:	/* Right coordinate of foreground window
                    Bit 0-7 - Right coordinate of foreground window area
                 */
-			state->m_vdp.window_fg_right = data;
+			m_vdp.window_fg_right = data;
 			break;
 		case 0x0B:	/* Bottom coordinate of foreground window
                    Bit 0-7 - Bottom coordinate of foreground window area
                 */
-			state->m_vdp.window_fg_bottom = data;
+			m_vdp.window_fg_bottom = data;
 			break;
 		case 0x0C:	/* Left coordinate of sprite window
                    Bit 0-7 - Left coordinate of sprite window area
                 */
-			state->m_vdp.window_sprites_left = data;
+			m_vdp.window_sprites_left = data;
 			break;
 		case 0x0D:	/* Top coordinate of sprite window
                    Bit 0-7 - Top coordinate of sprite window area
                 */
-			state->m_vdp.window_sprites_top = data;
+			m_vdp.window_sprites_top = data;
 			break;
 		case 0x0E:	/* Right coordinate of sprite window
                    Bit 0-7 - Right coordinate of sprite window area
                 */
-			state->m_vdp.window_sprites_right = data;
+			m_vdp.window_sprites_right = data;
 			break;
 		case 0x0F:	/* Bottom coordinate of sprite window
                    Bit 0-7 - Bottom coordiante of sprite window area
                 */
-			state->m_vdp.window_sprites_bottom = data;
+			m_vdp.window_sprites_bottom = data;
 			break;
 		case 0x10:	/* Background layer X scroll
                    Bit 0-7 - Background layer X scroll
                 */
-			state->m_vdp.layer_bg_scroll_x = data;
+			m_vdp.layer_bg_scroll_x = data;
 			break;
 		case 0x11:	/* Background layer Y scroll
                    Bit 0-7 - Background layer Y scroll
                 */
-			state->m_vdp.layer_bg_scroll_y = data;
+			m_vdp.layer_bg_scroll_y = data;
 			break;
 		case 0x12:	/* Foreground layer X scroll
                    Bit 0-7 - Foreground layer X scroll
                 */
-			state->m_vdp.layer_fg_scroll_x = data;
+			m_vdp.layer_fg_scroll_x = data;
 			break;
 		case 0x13:	/* Foreground layer Y scroll
                    Bit 0-7 - Foreground layer Y scroll
                 */
-			state->m_vdp.layer_fg_scroll_y = data;
+			m_vdp.layer_fg_scroll_y = data;
 			break;
 		case 0x14:	/* LCD control
                    Bit 0   - LCD enable
                    Bit 1-7 - Unknown
                 */
-			state->m_vdp.lcd_enable = data & 0x1;
+			m_vdp.lcd_enable = data & 0x1;
 			break;
 		case 0x15:	/* LCD icons
                    Bit 0   - LCD sleep icon enable
@@ -525,74 +518,74 @@ WRITE8_HANDLER( wswan_port_w )
                    Bit 5   - Dot 3 icon enable
                    Bit 6-7 - Unknown
                 */
-			state->m_vdp.icons = data;	/* ummmmm */
+			m_vdp.icons = data;	/* ummmmm */
 			break;
 		case 0x1c:	/* Palette colors 0 and 1
                    Bit 0-3 - Gray tone setting for main palette index 0
                    Bit 4-7 - Gray tone setting for main palette index 1
                 */
-			if ( state->m_system_type == TYPE_WSC )
+			if ( m_system_type == TYPE_WSC )
 			{
 				int i = 15 - ( data & 0x0F );
 				int j = 15 - ( ( data & 0xF0 ) >> 4 );
-				state->m_vdp.main_palette[0] = ( i << 8 ) | ( i << 4 ) | i;
-				state->m_vdp.main_palette[1] = ( j << 8 ) | ( j << 4 ) | j;
+				m_vdp.main_palette[0] = ( i << 8 ) | ( i << 4 ) | i;
+				m_vdp.main_palette[1] = ( j << 8 ) | ( j << 4 ) | j;
 			}
 			else
 			{
-				state->m_vdp.main_palette[0] = data & 0x0F;
-				state->m_vdp.main_palette[1] = ( data & 0xF0 ) >> 4;
+				m_vdp.main_palette[0] = data & 0x0F;
+				m_vdp.main_palette[1] = ( data & 0xF0 ) >> 4;
 			}
 			break;
 		case 0x1d:	/* Palette colors 2 and 3
                    Bit 0-3 - Gray tone setting for main palette index 2
                    Bit 4-7 - Gray tone setting for main palette index 3
                 */
-			if ( state->m_system_type == TYPE_WSC )
+			if ( m_system_type == TYPE_WSC )
 			{
 				int i = 15 - ( data & 0x0F );
 				int j = 15 - ( ( data & 0xF0 ) >> 4 );
-				state->m_vdp.main_palette[2] = ( i << 8 ) | ( i << 4 ) | i;
-				state->m_vdp.main_palette[3] = ( j << 8 ) | ( j << 4 ) | j;
+				m_vdp.main_palette[2] = ( i << 8 ) | ( i << 4 ) | i;
+				m_vdp.main_palette[3] = ( j << 8 ) | ( j << 4 ) | j;
 			}
 			else
 			{
-				state->m_vdp.main_palette[2] = data & 0x0F;
-				state->m_vdp.main_palette[3] = ( data & 0xF0 ) >> 4;
+				m_vdp.main_palette[2] = data & 0x0F;
+				m_vdp.main_palette[3] = ( data & 0xF0 ) >> 4;
 			}
 			break;
 		case 0x1e:	/* Palette colors 4 and 5
                    Bit 0-3 - Gray tone setting for main palette index 4
                    Bit 4-7 - Gray tone setting for main paeltte index 5
                 */
-			if ( state->m_system_type == TYPE_WSC )
+			if ( m_system_type == TYPE_WSC )
 			{
 				int i = 15 - ( data & 0x0F );
 				int j = 15 - ( ( data & 0xF0 ) >> 4 );
-				state->m_vdp.main_palette[4] = ( i << 8 ) | ( i << 4 ) | i;
-				state->m_vdp.main_palette[5] = ( j << 8 ) | ( j << 4 ) | j;
+				m_vdp.main_palette[4] = ( i << 8 ) | ( i << 4 ) | i;
+				m_vdp.main_palette[5] = ( j << 8 ) | ( j << 4 ) | j;
 			}
 			else
 			{
-				state->m_vdp.main_palette[4] = data & 0x0F;
-				state->m_vdp.main_palette[5] = ( data & 0xF0 ) >> 4;
+				m_vdp.main_palette[4] = data & 0x0F;
+				m_vdp.main_palette[5] = ( data & 0xF0 ) >> 4;
 			}
 			break;
 		case 0x1f:	/* Palette colors 6 and 7
                    Bit 0-3 - Gray tone setting for main palette index 6
                    Bit 4-7 - Gray tone setting for main palette index 7
                 */
-			if ( state->m_system_type == TYPE_WSC )
+			if ( m_system_type == TYPE_WSC )
 			{
 				int i = 15 - ( data & 0x0F );
 				int j = 15 - ( ( data & 0xF0 ) >> 4 );
-				state->m_vdp.main_palette[6] = ( i << 8 ) | ( i << 4 ) | i;
-				state->m_vdp.main_palette[7] = ( j << 8 ) | ( j << 4 ) | j;
+				m_vdp.main_palette[6] = ( i << 8 ) | ( i << 4 ) | i;
+				m_vdp.main_palette[7] = ( j << 8 ) | ( j << 4 ) | j;
 			}
 			else
 			{
-				state->m_vdp.main_palette[6] = data & 0x0F;
-				state->m_vdp.main_palette[7] = ( data & 0xF0 ) >> 4;
+				m_vdp.main_palette[6] = data & 0x0F;
+				m_vdp.main_palette[7] = ( data & 0xF0 ) >> 4;
 			}
 			break;
 		case 0x20:	/* tile/sprite palette settings
@@ -695,54 +688,54 @@ WRITE8_HANDLER( wswan_port_w )
 				UINT32 src, dst;
 				UINT16 length;
 
-				src = state->m_ws_portram[0x40] + (state->m_ws_portram[0x41] << 8) + (state->m_ws_portram[0x42] << 16);
-				dst = state->m_ws_portram[0x44] + (state->m_ws_portram[0x45] << 8) + (state->m_ws_portram[0x43] << 16);
-				length = state->m_ws_portram[0x46] + (state->m_ws_portram[0x47] << 8);
+				src = m_ws_portram[0x40] + (m_ws_portram[0x41] << 8) + (m_ws_portram[0x42] << 16);
+				dst = m_ws_portram[0x44] + (m_ws_portram[0x45] << 8) + (m_ws_portram[0x43] << 16);
+				length = m_ws_portram[0x46] + (m_ws_portram[0x47] << 8);
 				for( ; length > 0; length-- )
 				{
-					space->write_byte(dst, space->read_byte(src ) );
+					mem->write_byte(dst, mem->read_byte(src ) );
 					src++;
 					dst++;
 				}
 #ifdef DEBUG
 					logerror( "DMA  src:%X dst:%X length:%d\n", src, dst, length );
 #endif
-				state->m_ws_portram[0x40] = src & 0xFF;
-				state->m_ws_portram[0x41] = ( src >> 8 ) & 0xFF;
-				state->m_ws_portram[0x44] = dst & 0xFF;
-				state->m_ws_portram[0x45] = ( dst >> 8 ) & 0xFF;
-				state->m_ws_portram[0x46] = length & 0xFF;
-				state->m_ws_portram[0x47] = ( length >> 8 ) & 0xFF;
+				m_ws_portram[0x40] = src & 0xFF;
+				m_ws_portram[0x41] = ( src >> 8 ) & 0xFF;
+				m_ws_portram[0x44] = dst & 0xFF;
+				m_ws_portram[0x45] = ( dst >> 8 ) & 0xFF;
+				m_ws_portram[0x46] = length & 0xFF;
+				m_ws_portram[0x47] = ( length >> 8 ) & 0xFF;
 				data &= 0x7F;
 			}
 			break;
 		case 0x4A:	/* Sound DMA source address (low)
                    Bit 0-7 - Sound DMA source address bit 0-7
                 */
-			state->m_sound_dma.source = ( state->m_sound_dma.source & 0x0FFF00 ) | data;
+			m_sound_dma.source = ( m_sound_dma.source & 0x0FFF00 ) | data;
 			break;
 		case 0x4B:	/* Sound DMA source address (high)
                    Bit 0-7 - Sound DMA source address bit 8-15
                 */
-			state->m_sound_dma.source = ( state->m_sound_dma.source & 0x0F00FF ) | ( data << 8 );
+			m_sound_dma.source = ( m_sound_dma.source & 0x0F00FF ) | ( data << 8 );
 			break;
 		case 0x4C:	/* Sound DMA source memory segment
                    Bit 0-3 - Sound DMA source address segment
                    Bit 4-7 - Unknown
                 */
-			state->m_sound_dma.source = ( state->m_sound_dma.source & 0xFFFF ) | ( ( data & 0x0F ) << 16 );
+			m_sound_dma.source = ( m_sound_dma.source & 0xFFFF ) | ( ( data & 0x0F ) << 16 );
 			break;
 		case 0x4D:	/* Unknown */
 			break;
 		case 0x4E:	/* Sound DMA transfer size (low)
                    Bit 0-7 - Sound DMA transfer size bit 0-7
                 */
-			state->m_sound_dma.size = ( state->m_sound_dma.size & 0xFF00 ) | data;
+			m_sound_dma.size = ( m_sound_dma.size & 0xFF00 ) | data;
 			break;
 		case 0x4F:	/* Sound DMA transfer size (high)
                    Bit 0-7 - Sound DMA transfer size bit 8-15
                 */
-			state->m_sound_dma.size = ( state->m_sound_dma.size & 0xFF ) | ( data << 8 );
+			m_sound_dma.size = ( m_sound_dma.size & 0xFF ) | ( data << 8 );
 			break;
 		case 0x50:	/* Unknown */
 		case 0x51:	/* Unknown */
@@ -751,7 +744,7 @@ WRITE8_HANDLER( wswan_port_w )
                    Bit 0-6 - Unknown
                    Bit 7   - Sound DMA stop/start
                 */
-			state->m_sound_dma.enable = data;
+			m_sound_dma.enable = data;
 			break;
 		case 0x60:	/* Video mode
                    Bit 0-4 - Unknown
@@ -769,11 +762,11 @@ WRITE8_HANDLER( wswan_port_w )
              * 001  - packed, 4 color, use 2000, monochrome
              * 000  - not packed, 4 color, use 2000, monochrome - Regular WS monochrome
              */
-			if ( state->m_system_type == TYPE_WSC )
+			if ( m_system_type == TYPE_WSC )
 			{
-				state->m_vdp.color_mode = data & 0x80;
-				state->m_vdp.colors_16 = data & 0x40;
-				state->m_vdp.tile_packed = data & 0x20;
+				m_vdp.color_mode = data & 0x80;
+				m_vdp.colors_16 = data & 0x40;
+				m_vdp.tile_packed = data & 0x20;
 			}
 			break;
 		case 0x80:	/* Audio 1 freq (lo)
@@ -859,17 +852,17 @@ WRITE8_HANDLER( wswan_port_w )
                    Bit 0-3 - Master volume
                    Bit 4-7 - Unknown
                 */
-			wswan_sound_port_w( space->machine().device("custom"), offset, data );
+			wswan_sound_port_w( mem->machine().device("custom"), offset, data );
 			break;
 		case 0xa0:	/* Hardware type - this is probably read only
                    Bit 0   - Enable cartridge slot and/or disable bios
                    Bit 1   - Hardware type: 0 = WS, 1 = WSC
                    Bit 2-7 - Unknown
                 */
-			if ( ( data & 0x01 ) && !state->m_bios_disabled )
+			if ( ( data & 0x01 ) && !m_bios_disabled )
 			{
-				state->m_bios_disabled = 1;
-				memory_set_bankptr( space->machine(), "bank15", state->m_ROMMap[ ( ( ( state->m_ws_portram[0xc0] & 0x0F ) << 4 ) | 15 ) & ( state->m_ROMBanks - 1 ) ] );
+				m_bios_disabled = 1;
+				memory_set_bankptr( mem->machine(), "bank15", m_ROMMap[ ( ( ( m_ws_portram[0xc0] & 0x0F ) << 4 ) | 15 ) & ( m_ROMBanks - 1 ) ] );
 			}
 			break;
 		case 0xa2:	/* Timer control
@@ -879,38 +872,38 @@ WRITE8_HANDLER( wswan_port_w )
                    Bit 3   - VBlank Timer mode: 0 = one shot, 1 = auto reset
                    Bit 4-7 - Unknown
                 */
-			state->m_vdp.timer_hblank_enable = data & 0x1;
-			state->m_vdp.timer_hblank_mode = (data & 0x2) >> 1;
-			state->m_vdp.timer_vblank_enable = (data & 0x4) >> 2;
-			state->m_vdp.timer_vblank_mode = (data & 0x8) >> 3;
+			m_vdp.timer_hblank_enable = data & 0x1;
+			m_vdp.timer_hblank_mode = (data & 0x2) >> 1;
+			m_vdp.timer_vblank_enable = (data & 0x4) >> 2;
+			m_vdp.timer_vblank_mode = (data & 0x8) >> 3;
 			break;
 		case 0xa4:	/* HBlank timer frequency (low) - reload value
                    Bit 0-7 - HBlank timer reload value bit 0-7
                 */
-			state->m_vdp.timer_hblank_reload &= 0xff00;
-			state->m_vdp.timer_hblank_reload += data;
-			state->m_vdp.timer_hblank_count = state->m_vdp.timer_hblank_reload;
+			m_vdp.timer_hblank_reload &= 0xff00;
+			m_vdp.timer_hblank_reload += data;
+			m_vdp.timer_hblank_count = m_vdp.timer_hblank_reload;
 			break;
 		case 0xa5:	/* HBlank timer frequency (high) - reload value
                    Bit 8-15 - HBlank timer reload value bit 8-15
                 */
-			state->m_vdp.timer_hblank_reload &= 0xff;
-			state->m_vdp.timer_hblank_reload += data << 8;
-			state->m_vdp.timer_hblank_count = state->m_vdp.timer_hblank_reload;
+			m_vdp.timer_hblank_reload &= 0xff;
+			m_vdp.timer_hblank_reload += data << 8;
+			m_vdp.timer_hblank_count = m_vdp.timer_hblank_reload;
 			break;
 		case 0xa6:	/* VBlank timer frequency (low) - reload value
                    Bit 0-7 - VBlank timer reload value bit 0-7
                 */
-			state->m_vdp.timer_vblank_reload &= 0xff00;
-			state->m_vdp.timer_vblank_reload += data;
-			state->m_vdp.timer_vblank_count = state->m_vdp.timer_vblank_reload;
+			m_vdp.timer_vblank_reload &= 0xff00;
+			m_vdp.timer_vblank_reload += data;
+			m_vdp.timer_vblank_count = m_vdp.timer_vblank_reload;
 			break;
 		case 0xa7:	/* VBlank timer frequency (high) - reload value
                    Bit 0-7 - VBlank timer reload value bit 8-15
                 */
-			state->m_vdp.timer_vblank_reload &= 0xff;
-			state->m_vdp.timer_vblank_reload += data << 8;
-			state->m_vdp.timer_vblank_count = state->m_vdp.timer_vblank_reload;
+			m_vdp.timer_vblank_reload &= 0xff;
+			m_vdp.timer_vblank_reload += data << 8;
+			m_vdp.timer_vblank_count = m_vdp.timer_vblank_reload;
 			break;
 		case 0xa8:	/* HBlank counter (low)
                    Bit 0-7 - HBlank counter bit 0-7
@@ -955,10 +948,10 @@ WRITE8_HANDLER( wswan_port_w )
                    bit 7   - Receive data interrupt generation
                 */
 //          data |= 0x02;
-			state->m_ws_portram[0xb1] = 0xFF;
+			m_ws_portram[0xb1] = 0xFF;
 			if ( data & 0x80 )
 			{
-//              state->m_ws_portram[0xb1] = 0x00;
+//              m_ws_portram[0xb1] = 0x00;
 				data |= 0x04;
 			}
 			if (data & 0x20 )
@@ -978,13 +971,13 @@ WRITE8_HANDLER( wswan_port_w )
 			switch( data )
 			{
 			case 0x10:	/* Read Y cursors: Y1 - Y2 - Y3 - Y4 */
-				data = data | input_port_read(space->machine(), "CURSY");
+				data = data | input_port_read(mem->machine(), "CURSY");
 				break;
 			case 0x20:	/* Read X cursors: X1 - X2 - X3 - X4 */
-				data = data | input_port_read(space->machine(), "CURSX");
+				data = data | input_port_read(mem->machine(), "CURSX");
 				break;
 			case 0x40:	/* Read buttons: START - A - B */
-				data = data | input_port_read(space->machine(), "BUTTONS");
+				data = data | input_port_read(mem->machine(), "BUTTONS");
 				break;
 			}
 			break;
@@ -998,8 +991,8 @@ WRITE8_HANDLER( wswan_port_w )
                    Bit 6   - VBlank interrupt acknowledge
                    Bit 7   - HBlank timer interrupt acknowledge
                 */
-			wswan_clear_irq_line( space->machine(), data );
-			data = state->m_ws_portram[0xB6];
+			wswan_clear_irq_line(data);
+			data = m_ws_portram[0xB6];
 			break;
 		case 0xba:	/* Internal EEPROM data (low)
                    Bit 0-7 - Internal EEPROM data transfer bit 0-7
@@ -1028,16 +1021,16 @@ WRITE8_HANDLER( wswan_port_w )
                 */
 			if ( data & 0x20 )
 			{
-				UINT16 addr = ( ( ( state->m_ws_portram[0xbd] << 8 ) | state->m_ws_portram[0xbc] ) << 1 ) & 0x1FF;
-				state->m_internal_eeprom[ addr ] = state->m_ws_portram[0xba];
-				state->m_internal_eeprom[ addr + 1 ] = state->m_ws_portram[0xbb];
+				UINT16 addr = ( ( ( m_ws_portram[0xbd] << 8 ) | m_ws_portram[0xbc] ) << 1 ) & 0x1FF;
+				m_internal_eeprom[ addr ] = m_ws_portram[0xba];
+				m_internal_eeprom[ addr + 1 ] = m_ws_portram[0xbb];
 				data |= 0x02;
 			}
 			else if ( data & 0x10 )
 			{
-				UINT16 addr = ( ( ( state->m_ws_portram[0xbd] << 8 ) | state->m_ws_portram[0xbc] ) << 1 ) & 0x1FF;
-				state->m_ws_portram[0xba] = state->m_internal_eeprom[ addr ];
-				state->m_ws_portram[0xbb] = state->m_internal_eeprom[ addr + 1];
+				UINT16 addr = ( ( ( m_ws_portram[0xbd] << 8 ) | m_ws_portram[0xbc] ) << 1 ) & 0x1FF;
+				m_ws_portram[0xba] = m_internal_eeprom[ addr ];
+				m_ws_portram[0xbb] = m_internal_eeprom[ addr + 1];
 				data |= 0x01;
 			}
 			else
@@ -1049,39 +1042,39 @@ WRITE8_HANDLER( wswan_port_w )
                    Bit 0-3 - ROM bank base register for banks 4-15
                    Bit 4-7 - Unknown
                 */
-			memory_set_bankptr( space->machine(), "bank4", state->m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 4 ) & ( state->m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine(), "bank5", state->m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 5 ) & ( state->m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine(), "bank6", state->m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 6 ) & ( state->m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine(), "bank7", state->m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 7 ) & ( state->m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine(), "bank8", state->m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 8 ) & ( state->m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine(), "bank9", state->m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 9 ) & ( state->m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine(), "bank10", state->m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 10 ) & ( state->m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine(), "bank11", state->m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 11 ) & ( state->m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine(), "bank12", state->m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 12 ) & ( state->m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine(), "bank13", state->m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 13 ) & ( state->m_ROMBanks - 1 ) ] );
-			memory_set_bankptr( space->machine(), "bank14", state->m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 14 ) & ( state->m_ROMBanks - 1 ) ] );
-			if ( state->m_bios_disabled )
+			memory_set_bankptr( machine(), "bank4", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 4 ) & ( m_ROMBanks - 1 ) ] );
+			memory_set_bankptr( machine(), "bank5", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 5 ) & ( m_ROMBanks - 1 ) ] );
+			memory_set_bankptr( machine(), "bank6", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 6 ) & ( m_ROMBanks - 1 ) ] );
+			memory_set_bankptr( machine(), "bank7", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 7 ) & ( m_ROMBanks - 1 ) ] );
+			memory_set_bankptr( machine(), "bank8", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 8 ) & ( m_ROMBanks - 1 ) ] );
+			memory_set_bankptr( machine(), "bank9", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 9 ) & ( m_ROMBanks - 1 ) ] );
+			memory_set_bankptr( machine(), "bank10", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 10 ) & ( m_ROMBanks - 1 ) ] );
+			memory_set_bankptr( machine(), "bank11", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 11 ) & ( m_ROMBanks - 1 ) ] );
+			memory_set_bankptr( machine(), "bank12", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 12 ) & ( m_ROMBanks - 1 ) ] );
+			memory_set_bankptr( machine(), "bank13", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 13 ) & ( m_ROMBanks - 1 ) ] );
+			memory_set_bankptr( machine(), "bank14", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 14 ) & ( m_ROMBanks - 1 ) ] );
+			if ( m_bios_disabled )
 			{
-				memory_set_bankptr( space->machine(), "bank15", state->m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 15 ) & ( state->m_ROMBanks - 1 ) ] );
+				memory_set_bankptr( machine(), "bank15", m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 15 ) & ( m_ROMBanks - 1 ) ] );
 			}
 			break;
 		case 0xc1:	/* SRAM bank select
                    Bit 0-7 - SRAM bank to select
                 */
-			if ( state->m_eeprom.mode == SRAM_64K || state->m_eeprom.mode == SRAM_256K || state->m_eeprom.mode == SRAM_512K || state->m_eeprom.mode == SRAM_1M || state->m_eeprom.mode == SRAM_2M )
+			if ( m_eeprom.mode == SRAM_64K || m_eeprom.mode == SRAM_256K || m_eeprom.mode == SRAM_512K || m_eeprom.mode == SRAM_1M || m_eeprom.mode == SRAM_2M )
 			{
-				state->m_eeprom.page = &state->m_eeprom.data[ ( data * 64 * 1024 ) & ( state->m_eeprom.size - 1 ) ];
+				m_eeprom.page = &m_eeprom.data[ ( data * 64 * 1024 ) & ( m_eeprom.size - 1 ) ];
 			}
 			break;
 		case 0xc2:	/* ROM bank select for segment 2 (0x20000 - 0x2ffff)
                    Bit 0-7 - ROM bank for segment 2
                 */
-			memory_set_bankptr( space->machine(), "bank2", state->m_ROMMap[ data & ( state->m_ROMBanks - 1 ) ]);
+			memory_set_bankptr( machine(), "bank2", m_ROMMap[ data & ( m_ROMBanks - 1 ) ]);
 			break;
 		case 0xc3:	/* ROM bank select for segment 3 (0x30000-0x3ffff)
                    Bit 0-7 - ROM bank for segment 3
                 */
-			memory_set_bankptr( space->machine(), "bank3", state->m_ROMMap[ data & ( state->m_ROMBanks - 1 ) ]);
+			memory_set_bankptr( machine(), "bank3", m_ROMMap[ data & ( m_ROMBanks - 1 ) ]);
 			break;
 		case 0xc6:	/* EEPROM address lower bits port/EEPROM address and command port
                    1KBit EEPROM:
@@ -1098,18 +1091,18 @@ WRITE8_HANDLER( wswan_port_w )
                    16KBit EEPROM:
                    Bit 0-7 - EEPROM address bit 1-8
                 */
-			switch( state->m_eeprom.mode )
+			switch( m_eeprom.mode )
 			{
 			case EEPROM_1K:
-				state->m_eeprom.address = data & 0x3F;
-				state->m_eeprom.command = data >> 4;
-				if ( ( state->m_eeprom.command & 0x0C ) != 0x00 )
+				m_eeprom.address = data & 0x3F;
+				m_eeprom.command = data >> 4;
+				if ( ( m_eeprom.command & 0x0C ) != 0x00 )
 				{
-					state->m_eeprom.command = state->m_eeprom.command & 0x0C;
+					m_eeprom.command = m_eeprom.command & 0x0C;
 				}
 				break;
 			case EEPROM_16K:
-				state->m_eeprom.address = ( state->m_eeprom.address & 0xFF00 ) | data;
+				m_eeprom.address = ( m_eeprom.address & 0xFF00 ) | data;
 				break;
 			default:
 				logerror( "Write EEPROM address/register register C6 for unsupported EEPROM type\n" );
@@ -1134,19 +1127,19 @@ WRITE8_HANDLER( wswan_port_w )
                    Bit 4   - Start
                    Bit 5-7 - Unknown
                 */
-			switch( state->m_eeprom.mode )
+			switch( m_eeprom.mode )
 			{
 			case EEPROM_1K:
-				state->m_eeprom.start = data & 0x01;
+				m_eeprom.start = data & 0x01;
 				break;
 			case EEPROM_16K:
-				state->m_eeprom.address = ( ( data & 0x03 ) << 8 ) | ( state->m_eeprom.address & 0xFF );
-				state->m_eeprom.command = data & 0x0F;
-				if ( ( state->m_eeprom.command & 0x0C ) != 0x00 )
+				m_eeprom.address = ( ( data & 0x03 ) << 8 ) | ( m_eeprom.address & 0xFF );
+				m_eeprom.command = data & 0x0F;
+				if ( ( m_eeprom.command & 0x0C ) != 0x00 )
 				{
-					state->m_eeprom.command = state->m_eeprom.command & 0x0C;
+					m_eeprom.command = m_eeprom.command & 0x0C;
 				}
-				state->m_eeprom.start = ( data >> 4 ) & 0x01;
+				m_eeprom.start = ( data >> 4 ) & 0x01;
 				break;
 			default:
 				logerror( "Write EEPROM address/command register C7 for unsupported EEPROM type\n" );
@@ -1162,7 +1155,7 @@ WRITE8_HANDLER( wswan_port_w )
                    Bit 6   - Protect
                    Bit 7   - Initialize
                 */
-			if ( state->m_eeprom.mode == EEPROM_1K || state->m_eeprom.mode == EEPROM_16K )
+			if ( m_eeprom.mode == EEPROM_1K || m_eeprom.mode == EEPROM_16K )
 			{
 				if ( data & 0x80 )
 				{	/* Initialize */
@@ -1170,40 +1163,40 @@ WRITE8_HANDLER( wswan_port_w )
 				}
 				if ( data & 0x40 )
 				{	/* Protect */
-					switch( state->m_eeprom.command )
+					switch( m_eeprom.command )
 					{
 					case 0x00:
-						state->m_eeprom.write_enabled = 0;
+						m_eeprom.write_enabled = 0;
 						data |= 0x02;
 						break;
 					case 0x03:
-						state->m_eeprom.write_enabled = 1;
+						m_eeprom.write_enabled = 1;
 						data |= 0x02;
 						break;
 					default:
-						logerror( "Unsupported 'Protect' command %X\n", state->m_eeprom.command );
+						logerror( "Unsupported 'Protect' command %X\n", m_eeprom.command );
 					}
 				}
 				if ( data & 0x20 )
 				{	/* Write */
-					if ( state->m_eeprom.write_enabled )
+					if ( m_eeprom.write_enabled )
 					{
-						switch( state->m_eeprom.command )
+						switch( m_eeprom.command )
 						{
 						case 0x04:
-							state->m_eeprom.data[ ( state->m_eeprom.address << 1 ) + 1 ] = state->m_ws_portram[0xc4];
-							state->m_eeprom.data[ state->m_eeprom.address << 1 ] = state->m_ws_portram[0xc5];
+							m_eeprom.data[ ( m_eeprom.address << 1 ) + 1 ] = m_ws_portram[0xc4];
+							m_eeprom.data[ m_eeprom.address << 1 ] = m_ws_portram[0xc5];
 							data |= 0x02;
 							break;
 						default:
-							logerror( "Unsupported 'Write' command %X\n", state->m_eeprom.command );
+							logerror( "Unsupported 'Write' command %X\n", m_eeprom.command );
 						}
 					}
 				}
 				if ( data & 0x10 )
 				{	/* Read */
-					state->m_ws_portram[0xc4] = state->m_eeprom.data[ ( state->m_eeprom.address << 1 ) + 1 ];
-					state->m_ws_portram[0xc5] = state->m_eeprom.data[ state->m_eeprom.address << 1 ];
+					m_ws_portram[0xc4] = m_eeprom.data[ ( m_eeprom.address << 1 ) + 1 ];
+					m_ws_portram[0xc5] = m_eeprom.data[ m_eeprom.address << 1 ];
 					data |= 0x01;
 				}
 			}
@@ -1225,55 +1218,55 @@ WRITE8_HANDLER( wswan_port_w )
 			switch( data )
 			{
 			case 0x10:	/* Reset */
-				state->m_rtc.index = 8;
-				state->m_rtc.year = 0;
-				state->m_rtc.month = 1;
-				state->m_rtc.day = 1;
-				state->m_rtc.day_of_week = 0;
-				state->m_rtc.hour = 0;
-				state->m_rtc.minute = 0;
-				state->m_rtc.second = 0;
-				state->m_rtc.setting = 0xFF;
+				m_rtc.index = 8;
+				m_rtc.year = 0;
+				m_rtc.month = 1;
+				m_rtc.day = 1;
+				m_rtc.day_of_week = 0;
+				m_rtc.hour = 0;
+				m_rtc.minute = 0;
+				m_rtc.second = 0;
+				m_rtc.setting = 0xFF;
 				data |= 0x80;
 				break;
 			case 0x12:	/* Write Timer Settings (Alarm) */
-				state->m_rtc.index = 8;
-				state->m_rtc.setting = state->m_ws_portram[0xcb];
+				m_rtc.index = 8;
+				m_rtc.setting = m_ws_portram[0xcb];
 				data |= 0x80;
 				break;
 			case 0x13:	/* Read Timer Settings (Alarm) */
-				state->m_rtc.index = 8;
-				state->m_ws_portram[0xcb] = state->m_rtc.setting;
+				m_rtc.index = 8;
+				m_ws_portram[0xcb] = m_rtc.setting;
 				data |= 0x80;
 				break;
 			case 0x14:	/* Set Time/Date */
-				state->m_rtc.year = state->m_ws_portram[0xcb];
-				state->m_rtc.index = 1;
+				m_rtc.year = m_ws_portram[0xcb];
+				m_rtc.index = 1;
 				data |= 0x80;
 				break;
 			case 0x15:	/* Get Time/Date */
-				state->m_rtc.index = 0;
+				m_rtc.index = 0;
 				data |= 0x80;
-				state->m_ws_portram[0xcb] = state->m_rtc.year;
+				m_ws_portram[0xcb] = m_rtc.year;
 				break;
 			default:
-				logerror( "%X: Unknown RTC command (%X) requested\n", cpu_get_pc( &space->device() ), data );
+				logerror( "%X: Unknown RTC command (%X) requested\n", cpu_get_pc( &mem->device() ), data );
 			}
 			break;
 		case 0xcb:	/* RTC Data */
-			if ( state->m_ws_portram[0xca] == 0x94 && state->m_rtc.index < 7 )
+			if ( m_ws_portram[0xca] == 0x94 && m_rtc.index < 7 )
 			{
-				switch( state->m_rtc.index )
+				switch( m_rtc.index )
 				{
-				case 0:	state->m_rtc.year = data; break;
-				case 1: state->m_rtc.month = data; break;
-				case 2: state->m_rtc.day = data; break;
-				case 3: state->m_rtc.day_of_week = data; break;
-				case 4: state->m_rtc.hour = data; break;
-				case 5: state->m_rtc.minute = data; break;
-				case 6: state->m_rtc.second = data; break;
+				case 0:	m_rtc.year = data; break;
+				case 1: m_rtc.month = data; break;
+				case 2: m_rtc.day = data; break;
+				case 3: m_rtc.day_of_week = data; break;
+				case 4: m_rtc.hour = data; break;
+				case 5: m_rtc.minute = data; break;
+				case 6: m_rtc.second = data; break;
 				}
-				state->m_rtc.index++;
+				m_rtc.index++;
 			}
 			break;
 		default:
@@ -1282,7 +1275,7 @@ WRITE8_HANDLER( wswan_port_w )
 	}
 
 	/* Update the port value */
-	state->m_ws_portram[offset] = data;
+	m_ws_portram[offset] = data;
 }
 
 static const char* wswan_determine_sram( wswan_state *state, UINT8 data )
@@ -1368,6 +1361,8 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 			{
 				if (image.fread( state->m_ROMMap[ii], 0x10000) != 0x10000)
 				{
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Wrongly sized ROM");
+					image.message(" Wrongly sized ROM");
 					logerror("Error while reading loading rom!\n");
 					return IMAGE_INIT_FAIL;
 				}
@@ -1377,6 +1372,8 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 		}
 		else
 		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to allocate memory for ROM");
+			image.message(" Unable to allocate memory for ROM");
 			logerror("Memory allocation failed reading rom!\n");
 			return IMAGE_INIT_FAIL;
 		}
@@ -1462,7 +1459,7 @@ static TIMER_CALLBACK(wswan_scanline_interrupt)
 	{
 		address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM );
 		/* TODO: Output sound DMA byte */
-		wswan_port_w( space, 0x89, space->read_byte(state->m_sound_dma.source ) );
+		state->wswan_port_w( *space, 0x89, space->read_byte(state->m_sound_dma.source ) );
 		state->m_sound_dma.size--;
 		state->m_sound_dma.source = ( state->m_sound_dma.source + 1 ) & 0x0FFFFF;
 		if ( state->m_sound_dma.size == 0 )
