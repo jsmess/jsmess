@@ -8,6 +8,10 @@
 
         29/11/2010 Skeleton driver.
 
+Better known on the net as BTA2000-15m.
+It is a green-screen terminal, using RS232, and supposedly VT100 compatible.
+The top line is a status line.
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -51,24 +55,18 @@ static VIDEO_START( vta2000 )
 {
 	vta2000_state *state = machine.driver_data<vta2000_state>();
 	state->m_p_chargen = machine.region("chargen")->base();
-	state->m_p_videoram = machine.region("maincpu")->base()+0x80a0;
+	state->m_p_videoram = machine.region("maincpu")->base()+0x8000;
 }
 
 static SCREEN_UPDATE( vta2000 )
-/* Video is 80A0 to B21F, this resolves to 48 lines of 132 character pairs.
-There should therefore be hardware scroll registers, for down and sideways.
-Each character pair consists of a data byte followed by an attribute.
-
-Here we just show the first 80x25, with no scrolling. */
+/* Cursor is missing. */
 {
 	vta2000_state *state = screen->machine().driver_data<vta2000_state>();
-	//static UINT8 framecnt=0;
-	UINT8 y,ra,gfx; //,attr;
+	static UINT8 framecnt=0;
+	UINT8 y,ra,gfx,attr,fg,bg;
 	UINT16 sy=0,ma=0,x,xx=0,chr;
 
-	//framecnt++;
-
-	//ma = (scroll-down * 132) + scroll-sideways;
+	framecnt++;
 
 	for (y = 0; y < 25; y++)
 	{
@@ -80,26 +78,47 @@ Here we just show the first 80x25, with no scrolling. */
 			for (x = ma; x < ma + 80; x++)
 			{
 				chr = state->m_p_videoram[xx++];
-//              attr = state->m_p_videoram[xx++];
-				xx++;
+				attr = state->m_p_videoram[xx++];
 
 				if ((chr & 0x60)==0x60)
 					chr+=256;
 
 				gfx = state->m_p_chargen[(chr<<4) | ra ];
+				bg = 0;
+
+				/* Process attributes */
+				if (BIT(attr, 4))
+				{
+					gfx ^= 0xff; // reverse video
+					bg = 3;
+				}
+				if (BIT(attr, 0))
+					fg = 2; // highlight
+				else
+					fg = 1;
+				if ((BIT(attr, 1)) && (BIT(framecnt, 5)))
+					gfx = 0; // blink
+				if ((BIT(attr, 5)) && (ra == 10))
+				{
+					gfx = 0xff; // underline
+					fg = 2;
+				}
 
 				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
+				*p++ = BIT(gfx, 7) ? fg : bg;
+				*p++ = BIT(gfx, 6) ? fg : bg;
+				*p++ = BIT(gfx, 5) ? fg : bg;
+				*p++ = BIT(gfx, 4) ? fg : bg;
+				*p++ = BIT(gfx, 3) ? fg : bg;
+				*p++ = BIT(gfx, 2) ? fg : bg;
+				*p++ = BIT(gfx, 1) ? fg : bg;
+				*p++ = BIT(gfx, 0) ? fg : bg;
 			}
 		}
-		ma+=132;
+		if (y)
+			ma+=132;
+		else
+			ma+=80;
 	}
 	return 0;
 }
@@ -123,6 +142,13 @@ static GFXDECODE_START( vta2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vta2000_charlayout, 0, 1 )
 GFXDECODE_END
 
+static PALETTE_INIT( vta2000 )
+{
+	palette_set_color(machine, 0, RGB_BLACK); // black
+	palette_set_color_rgb(machine, 1, 0x00, 0xc0, 0x00); // green
+	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00); // highlight
+}
+
 static MACHINE_CONFIG_START( vta2000, vta2000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_4MHz / 4)
@@ -138,13 +164,11 @@ static MACHINE_CONFIG_START( vta2000, vta2000_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(80*8, 25*12)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*12-1)
-	MCFG_SCREEN_UPDATE(vta2000)
-
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
-	MCFG_GFXDECODE(vta2000)
-
 	MCFG_VIDEO_START(vta2000)
+	MCFG_SCREEN_UPDATE(vta2000)
+	MCFG_PALETTE_LENGTH(3)
+	MCFG_PALETTE_INIT(vta2000)
+	MCFG_GFXDECODE(vta2000)
 MACHINE_CONFIG_END
 
 
