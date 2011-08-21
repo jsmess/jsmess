@@ -417,6 +417,62 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
+	<software name="megamite">
+		<!-- デジタルデビル物語 女神転生 -->
+		<description>Megamitensei</description>
+		<year>1987</year>
+		<publisher>Telenet</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh231089" size="131072" crc="25fc11fa" sha1="7dc7f7e3966943280f34836656a7d1bd3ace67cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragonqu">
+		<!-- ドラゴンクエスト -->
+		<description>Dragon Quest</description>
+		<year>1986</year>
+		<publisher>enix</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="cxk381000" size="131072" crc="49f5478b" sha1="7b94a728a5945a53d518c18994e1e09a09ec3c1b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragonq2">
+		<!-- ドラゴンクエストII 悪霊の神々 -->
+		<description>Dragon Quest 2</description>
+		<year>1987</year>
+		<publisher>Enix</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532060" size="262144" crc="8076fec6" sha1="3df7c19f739d74d6efdfd8151343e5a55d4ac842" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragons4">
+		<!-- ドラゴンスレイヤーIV -->
+		<description>Dragon Slayer 4</description>
+		<year>1987</year>
+		<publisher>Falcom</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA6228" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh5320z5" size="262144" crc="87dcd309" sha1="f100a76117e95ab0335e89a901e47d844bbc0ab6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>
