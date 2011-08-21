@@ -1193,6 +1193,18 @@
 		</part>
 	</software>
 
+	<!-- Serial:  - Alt. Title: Komedi Gwonchongsa Jyo - 코메디권총사죠 -->
+	<software name="comicalk" cloneof="comical">
+		<description>Comical Machine Gun Joe (Kor)</description>
+		<year>198?</year>
+		<publisher>Samsung</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="comical machine gun joe (kr).bin" size="32768" crc="643f6bfc" sha1="0180c9b26c5a211bea8b85ac4ad21c52a09c7972" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Serial: MK-27068-50 -->
 	<software name="coolspot">
 		<description>Cool Spot (Euro)</description>
@@ -1297,6 +1309,18 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="double dragon (world).bin" size="262144" crc="a55d89f3" sha1="cad5532af94ed75c0ada8820a83fa04d22f7bef5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Serial:  - Alt Title: 더블드래곤 -->
+	<software name="ddragonk" cloneof="ddragon">
+		<description>Double Dragon (Kor)</description>
+		<year>198?</year>
+		<publisher>Samsung</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="double dragon (kr).bin" size="262144" crc="aeacfca7" sha1="20f209bef33d7c864710736131608213d25559ac" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2172,6 +2196,18 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="ghost house (j) [hack].bin" size="32768" crc="dabcc054" sha1="4f93c7185c9ebdd70d9f7be56761bf9031934c6a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Alt. Title: Yuyryeong-ui Jip - 유령의 집 -->
+	<software name="ghosthk" cloneof="ghosth">
+		<description>Ghost House (Kor)</description>
+		<year>198?</year>
+		<publisher>Samsung</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="ghost house (kr).bin" size="32768" crc="1203afc9" sha1="8d286d46312171608d6a769a7181cb7f73acb728" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3762,12 +3798,23 @@
 
 	<!-- Serial: MK-27026-50 -->
 	<software name="predator">
-		<description>Predator 2 (Euro, Bra)</description>
+		<description>Predator 2 (Euro)</description>
 		<year>1992</year>
 		<publisher>Arena</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="predator 2 (europe).bin" size="262144" crc="0047b615" sha1="ee26c9f5fd08ac73b5e28b20f35889d24c88c6db" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="predatorb" cloneof="predator">
+		<description>Predator 2 (Bra)</description>
+		<year>1992?</year>
+		<publisher>Tec Toy</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="predator 2 (br).bin" size="262144" crc="2b54c82b" sha1="98c453f6bd397fbae5e728d095e0541ff51306df" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4150,6 +4197,17 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="r-type (world).bin" size="524288" crc="bb54b6b0" sha1="08ec70a2cd98fcb2645f59857f845d41b0045115" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rtypep" cloneof="rtype">
+		<description>R-Type (Prototype)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="r-type (proto).bin" size="524288" crc="0d0840d5" sha1="3e0bfd3b22740ddea718027b59cf9322bf5297d8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

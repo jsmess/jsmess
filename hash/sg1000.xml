@@ -344,6 +344,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="champglfk" cloneof="champglf">
+		<!-- Serial: G-35 - Alt Title: 참피온 골프 -->
+		<description>Champion Golf (Kor)</description>
+		<year>198?</year>
+		<publisher>Samsung</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="champion golf (kr).bin" size="32768" crc="35af42ad" sha1="40ac48ef0ba23653d1763cd04774b00abc49f9a4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="champice">
 		<!-- Serial: C-59 - Alt Title: チャンピオン アイスホッケー -->
 		<description>Champion Ice Hockey (Jpn)</description>
@@ -352,6 +364,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="champion ice hockey (japan).bin" size="32768" crc="bdc05652" sha1="ff6440fc7e5c5faa0b9868d5cb5110d1d8635284" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champicek" cloneof="champice">
+		<!-- Serial:  - Alt Title: 아이스 하키 -->
+		<description>Champion Ice Hockey (Kor)</description>
+		<year>198?</year>
+		<publisher>Samsung</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="champion ice hockey (kr).bin" size="32768" crc="ec0b862c" sha1="3efbef93040fffbecb8e1d00b8470ac92f002c9b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -633,6 +657,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="drolk" cloneof="drol">
+		<!-- Serial:  - Alt Title: 드롤 -->
+		<description>Drol (Kor)</description>
+		<year>198?</year>
+		<publisher>Samsung</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="drol (kr).bin" size="32768" crc="1d7c53bb" sha1="37baf9aac77436b4939c80d6a575e23a7d5cd76d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elevator">
 		<!-- Serial: C-55 - Alt Title: エレベーター アクション -->
 		<description>Elevator Action (Jpn)</description>
@@ -677,6 +713,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="exerion (tw).bin" size="16384" crc="b5c84a32" sha1="75555c1a05a14401e4136bffb9fb52f88a17ecfc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exerionk" cloneof="exerion">
+		<!-- Serial:  - Alt Title: 엑스리온 -->
+		<description>Exerion (Kor)</description>
+		<year>198?</year>
+		<publisher>Samsung</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="exerion (kr).bin" size="32768" crc="fc628d0d" sha1="3f569c9d95bc83896bc44dba7c469356961d659c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -917,6 +965,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="hyper sports (tw).bin" size="32768" crc="87619ac2" sha1="bf4218aebc07aa7179cc52853a55436db985b81e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hyperspk" cloneof="hypersp">
+		<!-- Serial:  - Alt Title: 하이퍼스포츠 -->
+		<description>Hyper Sports (Kor)</description>
+		<year>198?</year>
+		<publisher>Samsung</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="hyper sports (kr).bin" size="32768" crc="3157ef9c" sha1="43d67e8c386012d0694f09a2fe31a46d32d39f17" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1468,6 +1528,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="sega-galaga (japan).bin" size="16384" crc="981e36c1" sha1="32e776b3a17f7c0df0fa9eb49a3e451cfe702bfd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="segagala1" cloneof="segagala">
+		<!-- Serial: G-1022 - Alt Title: セガ・ギャラガ -->
+		<description>Sega-Galaga (Jpn, Alt)</description>
+		<year>1983</year>
+		<publisher>Sega / Namco</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="sega-galaga [40k map].bin" size="40960" crc="31283003" sha1="9b093878f92ce8b918beaa44dcc8a41282f9f267" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
