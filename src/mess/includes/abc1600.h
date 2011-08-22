@@ -168,6 +168,7 @@ public:
 	void crtc_update_row(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 
 	// memory access controller
+	int m_ifc2;
 	UINT8 m_task;
 	UINT8 m_segment_ram[0x400];
 	UINT16 m_page_ram[0x400];
