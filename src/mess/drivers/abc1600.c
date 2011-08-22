@@ -14,6 +14,21 @@
 		- MAGIC bit (disable IFC2?)
     - floppy
 		- "rderr no /boot"
+		
+			'3f' (001764): wd17xx_data_w $25
+			old track: $00 new track: $25
+			direction: +1
+			'3f' (001788): wd17xx_command_w $19 SEEK (data_reg is $25)
+			'3f' (00193E): wd17xx_status_r: $00 (data_count 0)
+			'3f' (0017A0): wd17xx_track_r: $25
+			'3f' (001844): wd17xx_sector_w $03
+			'3f' (00184C): wd17xx_command_w $8A READ_SEC (cmd=80, trk=25, sec=03, dat=25)
+			'3f' (00193E): wd17xx_status_r: $01 (data_count 0)
+			'3f' (00193E): wd17xx_status_r: $01 (data_count 0)
+			wd179x: Read Sector callback.
+			track 37 sector 3 not found!
+			
+		- internal floppy is really drive 2, but wd17xx.c doesn't like having NULL drives
     - BUS0I/0X/1/2
     - short/long reset (RSTBUT)
     - SCC interrupt
@@ -543,12 +558,12 @@ READ8_MEMBER( abc1600_state::mac_r )
 
 	if (fc == M68K_FC_SUPERVISOR_DATA || fc == M68K_FC_SUPERVISOR_PROGRAM)
 	{
-		m_ifc2 = 1;
+		m_ifc2 = 0 ^ MAGIC;
 		data = read_supervisor_memory(offset);
 	}
 	else
 	{
-		m_ifc2 = 0;
+		m_ifc2 = 1 ^ MAGIC;
 		data = read_user_memory(offset);
 	}
 
@@ -566,12 +581,12 @@ WRITE8_MEMBER( abc1600_state::mac_w )
 
 	if (fc == M68K_FC_SUPERVISOR_DATA || fc == M68K_FC_SUPERVISOR_PROGRAM)
 	{
-		m_ifc2 = 1;
+		m_ifc2 = 0 ^ MAGIC;
 		write_supervisor_memory(offset, data);
 	}
 	else
 	{
-		m_ifc2 = 0;
+		m_ifc2 = 1 ^ MAGIC;
 		write_user_memory(offset, data);
 	}
 }
@@ -1391,7 +1406,7 @@ static const floppy_interface abc1600_floppy_interface =
     DEVCB_NULL,
     DEVCB_NULL,
     DEVCB_NULL,
-    FLOPPY_STANDARD_5_25_DSQD,
+    FLOPPY_STANDARD_5_25_DSDD,
     LEGACY_FLOPPY_OPTIONS_NAME(default),
     "floppy_5_25",
 	NULL
@@ -1407,7 +1422,7 @@ static const wd17xx_interface fdc_intf =
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pb7_w),
 	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, drq_w),
-	{ FLOPPY_0, NULL, NULL, NULL }
+	{ FLOPPY_0, NULL, NULL, NULL } // TODO should be { NULL, NULL, FLOPPY_2, NULL }	
 };
 
 
