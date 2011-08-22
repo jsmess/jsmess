@@ -4365,7 +4365,7 @@ M68KMAKE_OP(cpbcc, 32, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
-		logerror( "%s at %08x: called unimplemented instruction %04x (cpbcc)\n",
+		logerror("%s at %08x: called unimplemented instruction %04x (cpbcc)\n",
 					 m68k->device->tag(), REG_PC - 2, m68k->ir);
 		return;
 	}
