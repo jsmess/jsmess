@@ -90,7 +90,7 @@ static SCREEN_UPDATE( vta2000 )
 				if (BIT(attr, 4))
 				{
 					gfx ^= 0xff; // reverse video
-					bg = 3;
+					bg = 2;
 				}
 				if (BIT(attr, 0))
 					fg = 2; // highlight
