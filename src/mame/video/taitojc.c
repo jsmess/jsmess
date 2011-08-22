@@ -77,7 +77,25 @@ WRITE32_HANDLER(taitojc_char_w)
 // 0x00:   -------- -------- ------xx xxxxxxxx   X
 // 0x01:   ---xxxxx xx------ -------- --------   Palette
 // 0x01:   -------- --x----- -------- --------   Priority (0 = below 3D, 1 = above 3D)
+// 0x01:   -------- -------x -------- --------   Color depth (0) 4bpp / (1) 8bpp
 // 0x01:   -------- -------- -xxxxxxx xxxxxxxx   VRAM data address
+
+/*
+	Object RAM is grouped in three different banks (0-0x400 / 0x400-0x800 / 0x800-0xc00),
+	Initial 6 dwords aren't surely for object stuff (setting global object flags?)
+	0xd00-0xdff seems to be a per-bank vregister. Usage of this is mostly unknown, the only
+	clue we have so far is this config change in dendeg:
+	0x2000db3f 0x3f3f3f3f 0xfec00090 0x403f00ff 0xd20-0xd2f on Taito logo
+	0x2000db3f 0x3f3f3f3f 0xff600090 0x207f00ff 0xd20-0xd2f on intro FMV
+
+	dword 0 bits 14-15 looks up to the object RAM for the given bank. (it's mostly fixed to 0,
+	1 and 2 for each bank). Then dwords 2 and 3 should presumably configure bank 1 to a bigger
+	(doubled?) height and width and a different x/y start point.
+
+	0xfc0-0xfff is global vregs. 0xfc6 bit 13 is used to swap between bank 0 and bank 1.
+	It's unknown at current time how bank 2 should show up.
+
+*/
 
 static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 w1, UINT32 w2)
 {
@@ -88,6 +106,9 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 	int ix, iy;
 	UINT32 address;
 	UINT8 *v;
+	UINT8 color_depth;
+
+	color_depth = (w2 & 0x10000) >> 16;
 
 	address		= (w2 & 0x7fff) * 0x20;
 	if (w2 & 0x4000)
@@ -146,22 +167,50 @@ static void draw_object(running_machine &machine, bitmap_t *bitmap, const rectan
 		y2 = cliprect->max_y;
 	}
 
-	for (j=y1; j < y2; j++)
+	if(!color_depth) // Densya de Go 2X "credit text", 4bpp
 	{
-		UINT16 *d = BITMAP_ADDR16(bitmap, j,  0);
-		int index = (iy * width) + ix;
-
-		for (i=x1; i < x2; i++)
+		for (j=y1; j < y2; j++)
 		{
-			UINT8 pen = v[BYTE4_XOR_BE(index)];
-			if (pen != 0)
-			{
-				d[i] = palette + pen;
-			}
-			index++;
-		}
+			UINT16 *d = BITMAP_ADDR16(bitmap, j,  0);
+			int index = (iy * (width / 2)) + ix;
 
-		iy++;
+			for (i=x1; i < x2; i+=2)
+			{
+				UINT8 pen = (v[BYTE4_XOR_BE(index)] & 0xf0) >> 4;
+				if (pen != 0)
+				{
+					d[i] = palette + pen;
+				}
+				pen = (v[BYTE4_XOR_BE(index)] & 0x0f);
+				if (pen != 0)
+				{
+					d[i+1] = palette + pen;
+				}
+				index++;
+			}
+
+			iy++;
+		}
+	}
+	else // 8bpp
+	{
+		for (j=y1; j < y2; j++)
+		{
+			UINT16 *d = BITMAP_ADDR16(bitmap, j,  0);
+			int index = (iy * width) + ix;
+
+			for (i=x1; i < x2; i++)
+			{
+				UINT8 pen = v[BYTE4_XOR_BE(index)];
+				if (pen != 0)
+				{
+					d[i] = palette + pen;
+				}
+				index++;
+			}
+
+			iy++;
+		}
 	}
 }
 
@@ -210,6 +259,7 @@ SCREEN_UPDATE( taitojc )
 {
 	taitojc_state *state = screen->machine().driver_data<taitojc_state>();
 	int i;
+	UINT16 start_offs;
 
 #if 0
     tick++;
@@ -228,7 +278,15 @@ SCREEN_UPDATE( taitojc )
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	for (i=(0xc00/4)-2; i >= 0; i-=2)
+	start_offs = state->m_objlist[0xfc4/4] & 0x2000 ? (0x800/4) : (0x400/4);
+
+	/* 0xf000 used on Densya de Go disclaimer screen(s) (disable object RAM?) */
+	if((state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x0000 && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0x2000  && (state->m_objlist[0xfc4/4] & 0x0000ffff) != 0xf000 )
+		popmessage("%08x, contact MAMEdev",state->m_objlist[0xfc4/4]);
+
+	//popmessage("%08x %08x %08x %08x",state->m_objlist[0xd20/4],state->m_objlist[0xd24/4],state->m_objlist[0xd28/4],state->m_objlist[0xd2c/4]);
+
+	for (i=start_offs-2; i >= (start_offs-0x400/4); i-=2)
 	{
 		UINT32 w1 = state->m_objlist[i + 0];
 		UINT32 w2 = state->m_objlist[i + 1];
@@ -241,7 +299,7 @@ SCREEN_UPDATE( taitojc )
 
 	copybitmap_trans(bitmap, state->m_framebuffer, 0, 0, 0, 0, cliprect, 0);
 
-	for (i=(0xc00/4)-2; i >= 0; i-=2)
+	for (i=start_offs-2; i >= (start_offs-0x400/4); i-=2)
 	{
 		UINT32 w1 = state->m_objlist[i + 0];
 		UINT32 w2 = state->m_objlist[i + 1];
