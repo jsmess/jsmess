@@ -228,9 +228,9 @@ UINT8 abc1600_state::read_io(offs_t offset)
 
 			case CRT:
 				if (A0)
-					data = m_crtc->register_r( *program, offset );
+					data = m_crtc->register_r(*program, offset);
 				else
-					data = m_crtc->status_r( *program, offset );
+					data = m_crtc->status_r(*program, offset);
 				break;
 
 			case DRT:
@@ -1064,40 +1064,6 @@ static ADDRESS_MAP_START( abc1600_mem, AS_PROGRAM, 8, abc1600_state )
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mac_r, mac_w)
 ADDRESS_MAP_END
 
-/*
-
-    Supervisor Data map
-
-    AM_RANGE(0x00000, 0x03fff) AM_ROM AM_REGION(MC68008P8_TAG, 0)
-    AM_RANGE(0x80000, 0x80001) AM_MIRROR(0x7f800) AM_MASK(0x7f801) AM_READWRITE(page_r, page_w)
-    AM_RANGE(0x80002, 0x80002) AM_MIRROR(0x7f800) AM_NOP
-    AM_RANGE(0x80003, 0x80003) AM_MIRROR(0x7f800) AM_MASK(0x7f800) AM_READWRITE(segment_r, segment_w)
-    AM_RANGE(0x80007, 0x80007) AM_READWRITE(cause_r, task_w)
-
-    Virtual Address Map
-
-    AM_RANGE(0x000000, 0x0fffff) AM_RAM
-    AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_MEMBER(m_video_ram)
-    AM_RANGE(0x1ff000, 0x1ff007) AM_DEVREADWRITE_LEGACY(SAB1797_02P_TAG, wd17xx_r, wd17xx_w) // A2,A1
-    AM_RANGE(0x1ff100, 0x1ff100) AM_DEVWRITE(SY6845E_TAG, mc6845_device, address_w)
-    AM_RANGE(0x1ff101, 0x1ff101) AM_DEVREADWRITE(SY6845E_TAG, mc6845_device, register_r, register_w)
-    AM_RANGE(0x1ff200, 0x1ff207) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w) // A2,A1
-    AM_RANGE(0x1ff300, 0x1ff300) AM_DEVREADWRITE_LEGACY(Z8410AB1_0_TAG, z80dma_r, z80dma_w)
-    AM_RANGE(0x1ff400, 0x1ff400) AM_DEVREADWRITE_LEGACY(Z8410AB1_1_TAG, z80dma_r, z80dma_w)
-    AM_RANGE(0x1ff500, 0x1ff500) AM_DEVREADWRITE_LEGACY(Z8410AB1_2_TAG, z80dma_r, z80dma_w)
-    AM_RANGE(0x1ff600, 0x1ff607) AM_DEVREADWRITE(Z8530B1_TAG, scc8530_r, scc8530_w) // A2,A1
-    AM_RANGE(0x1ff700, 0x1ff707) AM_DEVREADWRITE(Z8536B1_TAG, z8536_r, z8536_w) // A2,A1
-    AM_RANGE(0x1ff800, 0x1ff800) AM_READ(iord0_w)
-    AM_RANGE(0x1ff800, 0x1ff807) AM_WRITE(iowr0_w)
-    AM_RANGE(0x1ff900, 0x1ff907) AM_WRITE(iowr1_w)
-    AM_RANGE(0x1ffa00, 0x1ffa07) AM_WRITE(iowr2_w)
-    AM_RANGE(0x1ffb00, 0x1ffb00) AM_WRITE(fw0_w)
-    AM_RANGE(0x1ffb01, 0x1ffb01) AM_WRITE(fw1_w)
-    AM_RANGE(0x1ffd00, 0x1ffd07) AM_WRITE(dmamap_w)
-    AM_RANGE(0x1ffe00, 0x1ffe00) AM_WRITE(spec_contr_reg_w)
-
-*/
-
 
 
 //**************************************************************************
@@ -1399,6 +1365,15 @@ static Z8536_INTERFACE( cio_intf )
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
+static LEGACY_FLOPPY_OPTIONS_START( abc1600 )
+	LEGACY_FLOPPY_OPTION(abc1600, "dsk", "Luxor ABC 1600", basicdsk_identify_default, basicdsk_construct_default, NULL,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+LEGACY_FLOPPY_OPTIONS_END
+
 static const floppy_interface abc1600_floppy_interface =
 {
     DEVCB_NULL,
@@ -1407,7 +1382,7 @@ static const floppy_interface abc1600_floppy_interface =
     DEVCB_NULL,
     DEVCB_NULL,
     FLOPPY_STANDARD_5_25_DSDD,
-    LEGACY_FLOPPY_OPTIONS_NAME(default),
+    LEGACY_FLOPPY_OPTIONS_NAME(abc1600),
     "floppy_5_25",
 	NULL
 };
