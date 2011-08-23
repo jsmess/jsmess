@@ -34,10 +34,6 @@
 
 static LEGACY_FLOPPY_OPTIONS_START( abc830 )
 	// NOTE: Real ABC 830 (160KB) disks use a 7:1 sector interleave.
-	//
-	// The controller ROM is patched to remove the interleaving so
-	// you can use disk images with logical sector layout instead.
-	//
 	// Specify INTERLEAVE([7]) below if you prefer the physical layout.
 	LEGACY_FLOPPY_OPTION(abc830, "dsk", "Luxor ABC 830", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
@@ -81,7 +77,7 @@ const floppy_interface abc832_floppy_interface =
     DEVCB_NULL,
     DEVCB_NULL,
     DEVCB_NULL,
-    FLOPPY_STANDARD_5_25_DSQD,
+    FLOPPY_STANDARD_5_25_DSDD,
     LEGACY_FLOPPY_OPTIONS_NAME(abc832),
     "abc832",
 	NULL

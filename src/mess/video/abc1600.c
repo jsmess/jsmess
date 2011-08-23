@@ -18,7 +18,12 @@
 
 #define LOG 0
 
-#define VIDEORAM_SIZE	256*1024
+
+// video RAM
+#define VIDEORAM_SIZE		0x40000
+#define VIDEORAM16_MASK		0x3ffff
+#define VIDEORAM8_MASK		0x7fffe
+
 
 // flag register
 #define L_P			BIT(m_flag, 0)
@@ -79,7 +84,7 @@ enum
 
 inline UINT16 abc1600_state::read_videoram(UINT32 offset)
 {
-	return m_video_ram[offset & 0x3ffff];
+	return m_video_ram[offset & VIDEORAM16_MASK];
 }
 
 
@@ -89,9 +94,9 @@ inline UINT16 abc1600_state::read_videoram(UINT32 offset)
 
 inline void abc1600_state::write_videoram(UINT32 offset, UINT16 data, UINT16 mask)
 {
-	UINT16 old_data = m_video_ram[offset & 0x3ffff];
+	UINT16 old_data = m_video_ram[offset & VIDEORAM16_MASK];
 
-	m_video_ram[offset & 0x3ffff] = (data & mask) | (old_data & (mask ^ 0xffff));
+	m_video_ram[offset & VIDEORAM16_MASK] = (data & mask) | (old_data & (mask ^ 0xffff));
 }
 
 
@@ -101,7 +106,7 @@ inline void abc1600_state::write_videoram(UINT32 offset, UINT16 data, UINT16 mas
 
 READ8_MEMBER( abc1600_state::video_ram_r )
 {
-	UINT32 addr = (offset & 0x7fffe) >> 1;
+	UINT32 addr = (offset & VIDEORAM8_MASK) >> 1;
 	UINT8 data = 0;
 
 	if (offset & 0x01)
@@ -123,7 +128,7 @@ READ8_MEMBER( abc1600_state::video_ram_r )
 
 WRITE8_MEMBER( abc1600_state::video_ram_w )
 {
-	UINT32 addr = (offset & 0x7fffe) >> 1;
+	UINT32 addr = (offset & VIDEORAM8_MASK) >> 1;
 
 	if (offset & 0x01)
 	{
@@ -140,7 +145,6 @@ WRITE8_MEMBER( abc1600_state::video_ram_w )
 			if (LOG) logerror("GMDI LB %02x -> %04x\n", data, m_gmdi);
 		}
 
-//      m_wrm = 0xffff;
 		write_videoram(addr, m_gmdi, m_wrm & 0x00ff);
 
 		if (LOG) logerror("Video RAM write LB to %05x : %04x\n", addr, m_video_ram[addr]);
@@ -160,7 +164,6 @@ WRITE8_MEMBER( abc1600_state::video_ram_w )
 			if (LOG) logerror("GMDI HB %02x -> %04x\n", data, m_gmdi);
 		}
 
-//      m_wrm = 0xffff;
 		write_videoram(addr, m_gmdi, m_wrm & 0xff00);
 
 		if (LOG) logerror("Video RAM write HB to %05x : %04x\n", addr, m_video_ram[addr]);
@@ -254,10 +257,10 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 
             bit     description
 
-            0       Y size 8
-            1       Y size 9
-            2       Y size 10
-            3       Y size 11
+            0       YSIZE8
+            1       YSIZE9
+            2       YSIZE10
+            3       YSIZE11
             4
             5
             6
@@ -273,14 +276,14 @@ WRITE8_MEMBER( abc1600_state::iowr0_w )
 
             bit     description
 
-            0       Y size 0
-            1       Y size 1
-            2       Y size 2
-            3       Y size 3
-            4       Y size 4
-            5       Y size 5
-            6       Y size 6
-            7       Y size 7
+            0       YSIZE0
+            1       YSIZE1
+            2       YSIZE2
+            3       YSIZE3
+            4       YSIZE4
+            5       YSIZE5
+            6       YSIZE6
+            7       YSIZE7
 
         */
 
