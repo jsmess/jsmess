@@ -5,43 +5,32 @@
         10/07/2008 Preliminary driver.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
-#include "machine/i8255.h"
-#include "machine/wd17xx.h"
-#include "imagedev/cassette.h"
-#include "imagedev/cartslot.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
 #include "includes/vector06.h"
-#include "machine/ram.h"
+
 
 /* Address maps */
-static ADDRESS_MAP_START(vector06_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(vector06_mem, AS_PROGRAM, 8, vector06_state)
 	AM_RANGE( 0x0000, 0x7fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vector06_io , AS_IO, 8)
+static ADDRESS_MAP_START(vector06_io, AS_IO, 8, vector06_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0x03) AM_READWRITE(vector06_8255_1_r, vector06_8255_1_w )
 	AM_RANGE( 0x04, 0x07) AM_READWRITE(vector06_8255_2_r, vector06_8255_2_w )
-	AM_RANGE( 0x0C, 0x0C) AM_WRITE ( vector06_color_set )
-	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", wd17xx_data_r,wd17xx_data_w)
-	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", wd17xx_sector_r,wd17xx_sector_w)
-	AM_RANGE( 0x1A, 0x1A) AM_DEVREADWRITE("wd1793", wd17xx_track_r,wd17xx_track_w)
-	AM_RANGE( 0x1B, 0x1B) AM_DEVREADWRITE("wd1793", wd17xx_status_r,wd17xx_command_w)
+	AM_RANGE( 0x0C, 0x0C) AM_WRITE(vector06_color_set)
+	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_data_r,wd17xx_data_w)
+	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_sector_r,wd17xx_sector_w)
+	AM_RANGE( 0x1A, 0x1A) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_track_r,wd17xx_track_w)
+	AM_RANGE( 0x1B, 0x1B) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_status_r,wd17xx_command_w)
 	AM_RANGE( 0x1C, 0x1C) AM_WRITE(vector06_disc_w)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( vector06 )
-
 	PORT_START("LINE0")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB)
 		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del") PORT_CODE(KEYCODE_DEL)
@@ -170,7 +159,7 @@ const wd17xx_interface vector06_wd17xx_interface =
 
 /* Machine driver */
 static MACHINE_CONFIG_START( vector06, vector06_state )
-  /* basic machine hardware */
+	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 3000000)
 //  MCFG_CPU_ADD("maincpu", Z80, 3000000)
 	MCFG_CPU_PROGRAM_MAP(vector06_mem)
@@ -180,11 +169,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_MACHINE_START( vector06 )
 	MCFG_MACHINE_RESET( vector06 )
 
-	MCFG_I8255_ADD( "ppi8255", vector06_ppi8255_interface )
-
-	MCFG_I8255_ADD( "ppi8255_2", vector06_ppi8255_2_interface )
-
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -192,18 +177,18 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_SCREEN_SIZE(256+64, 256+64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256+64-1, 0, 256+64-1)
 	MCFG_SCREEN_UPDATE(vector06)
-
+	MCFG_VIDEO_START(vector06)
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(vector06)
-
-	MCFG_VIDEO_START(vector06)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, vector_cassette_interface )
-
+	/* Devices */
+	MCFG_I8255_ADD("ppi8255", vector06_ppi8255_interface)
+	MCFG_I8255_ADD("ppi8255_2", vector06_ppi8255_2_interface)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, vector_cassette_interface)
 	MCFG_FD1793_ADD("wd1793", vector06_wd17xx_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(vector_floppy_interface)
 
@@ -215,44 +200,46 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 
 ROM_START( vector06 )
-    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
-    ROM_SYSTEM_BIOS(0, "unboot32k", "Universal Boot 32K")
-    ROMX_LOAD( "unboot32k.rt", 0x10000, 0x8000, CRC(28c9b5cd) SHA1(8cd7fb658896a7066ae93b10eaafa0f12139ad81), ROM_BIOS(1))
-    ROM_SYSTEM_BIOS(1, "unboot2k", "Universal Boot 2K")
-    ROMX_LOAD( "unboot2k.rt",  0x10000, 0x0800, CRC(4c80dc31) SHA1(7e5e3acfdbea2e52b0d64c5868821deaec383815), ROM_BIOS(2))
-    ROM_SYSTEM_BIOS(2, "coman", "Boot Coman")
-    ROMX_LOAD( "coman.rt",     0x10000, 0x0800, CRC(f8c4a85a) SHA1(47fa8b02f09a1d06aa63a2b90b2597b1d93d976f), ROM_BIOS(3))
-    ROM_SYSTEM_BIOS(3, "bootbyte", "Boot Byte")
-    ROMX_LOAD( "bootbyte.rt",  0x10000, 0x0800, CRC(3b42fd9d) SHA1(a112f4fe519bc3dbee85b09040d4804a17c9eda2), ROM_BIOS(4))
-    ROM_SYSTEM_BIOS(4, "bootos", "Boot OS")
-    ROMX_LOAD( "bootos.rt",    0x10000, 0x0200, CRC(46bef038) SHA1(6732f4a360cd38112c53c458842d31f5b035cf59), ROM_BIOS(5))
-    ROM_SYSTEM_BIOS(5, "boot512", "Boot 512")
-    ROMX_LOAD( "boot512.rt",   0x10000, 0x0200, CRC(a0b1c6b2) SHA1(f6fe15cb0974aed30f9b7aa72133324a66d1ed3f), ROM_BIOS(6))
-    ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_OPTIONAL)
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS(0, "unboot32k", "Universal Boot 32K")
+	ROMX_LOAD( "unboot32k.rt", 0x10000, 0x8000, CRC(28c9b5cd) SHA1(8cd7fb658896a7066ae93b10eaafa0f12139ad81), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "unboot2k", "Universal Boot 2K")
+	ROMX_LOAD( "unboot2k.rt",  0x10000, 0x0800, CRC(4c80dc31) SHA1(7e5e3acfdbea2e52b0d64c5868821deaec383815), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "coman", "Boot Coman")
+	ROMX_LOAD( "coman.rt",     0x10000, 0x0800, CRC(f8c4a85a) SHA1(47fa8b02f09a1d06aa63a2b90b2597b1d93d976f), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "bootbyte", "Boot Byte")
+	ROMX_LOAD( "bootbyte.rt",  0x10000, 0x0800, CRC(3b42fd9d) SHA1(a112f4fe519bc3dbee85b09040d4804a17c9eda2), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "bootos", "Boot OS")
+	ROMX_LOAD( "bootos.rt",    0x10000, 0x0200, CRC(46bef038) SHA1(6732f4a360cd38112c53c458842d31f5b035cf59), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(5, "boot512", "Boot 512")
+	ROMX_LOAD( "boot512.rt",   0x10000, 0x0200, CRC(a0b1c6b2) SHA1(f6fe15cb0974aed30f9b7aa72133324a66d1ed3f), ROM_BIOS(6))
+	ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_OPTIONAL)
 ROM_END
 
 ROM_START( vec1200 )
-    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "vec1200.bin", 0x10000, 0x2000, CRC(37349224) SHA1(060fbb2c1a89040c929521cfd58cb6f1431a8b75))
 	ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_OPTIONAL)
-    ROM_REGION( 0x0200, "palette", 0 )
+
+	ROM_REGION( 0x0200, "palette", 0 )
 	ROM_LOAD( "palette.bin", 0x0000, 0x0200, CRC(74b7376b) SHA1(fb56b60babd7e6ed68e5f4e791ad2800d7ef6729))
 ROM_END
+
 ROM_START( pk6128c )
-    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "6128.bin", 0x10000, 0x4000, CRC(d4f68433) SHA1(ef5ac75f9240ca8996689c23642d4e47e5e774d8))
 	ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_OPTIONAL)
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME         PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1987, vector06,	 0, 		0,	vector06,	vector06,	0,      "<unknown>",		"Vector 06c",	 GAME_NOT_WORKING)
-COMP( 1987, vec1200,	 vector06,	0,	vector06,	vector06,	0,      "<unknown>",		"Vector 1200",	 GAME_NOT_WORKING)
-COMP( 1987, pk6128c,	 vector06,  0,	vector06,	vector06,	0,      "<unknown>",		"PK-6128c",		 GAME_NOT_WORKING)
+/*    YEAR  NAME         PARENT    COMPAT  MACHINE     INPUT       INIT     COMPANY    FULLNAME      FLAGS */
+COMP( 1987, vector06,    0,        0,      vector06,   vector06,   0,    "<unknown>", "Vector 06c",  GAME_NOT_WORKING)
+COMP( 1987, vec1200,     vector06, 0,      vector06,   vector06,   0,    "<unknown>", "Vector 1200", GAME_NOT_WORKING)
+COMP( 1987, pk6128c,     vector06, 0,      vector06,   vector06,   0,    "<unknown>", "PK-6128c",    GAME_NOT_WORKING)
