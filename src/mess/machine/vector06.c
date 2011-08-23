@@ -7,135 +7,124 @@
 ****************************************************************************/
 
 
-#include "emu.h"
-#include "cpu/i8085/i8085.h"
-#include "machine/i8255.h"
-#include "machine/wd17xx.h"
-#include "imagedev/cassette.h"
 #include "includes/vector06.h"
-#include "machine/ram.h"
 
 
-
-static READ8_DEVICE_HANDLER( vector06_8255_portb_r )
+READ8_MEMBER( vector06_state::vector06_8255_portb_r )
 {
-	vector06_state *state = device->machine().driver_data<vector06_state>();
 	UINT8 key = 0xff;
-	if ((state->m_keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine(),"LINE0"); }
-	if ((state->m_keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine(),"LINE1"); }
-	if ((state->m_keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine(),"LINE2"); }
-	if ((state->m_keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine(),"LINE3"); }
-	if ((state->m_keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine(),"LINE4"); }
-	if ((state->m_keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine(),"LINE5"); }
-	if ((state->m_keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine(),"LINE6"); }
-	if ((state->m_keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine(),"LINE7"); }
+	if (BIT(m_keyboard_mask, 0)) key &= input_port_read(machine(),"LINE0");
+	if (BIT(m_keyboard_mask, 1)) key &= input_port_read(machine(),"LINE1");
+	if (BIT(m_keyboard_mask, 2)) key &= input_port_read(machine(),"LINE2");
+	if (BIT(m_keyboard_mask, 3)) key &= input_port_read(machine(),"LINE3");
+	if (BIT(m_keyboard_mask, 4)) key &= input_port_read(machine(),"LINE4");
+	if (BIT(m_keyboard_mask, 5)) key &= input_port_read(machine(),"LINE5");
+	if (BIT(m_keyboard_mask, 6)) key &= input_port_read(machine(),"LINE6");
+	if (BIT(m_keyboard_mask, 7)) key &= input_port_read(machine(),"LINE7");
 	return key;
 }
 
-static READ8_DEVICE_HANDLER (vector06_8255_portc_r )
+READ8_MEMBER( vector06_state::vector06_8255_portc_r )
 {
-	double level = device->machine().device<cassette_image_device>(CASSETTE_TAG)->input();
-	UINT8 retVal = input_port_read(device->machine(), "LINE8");
-	if (level >  0) {
-		retVal |= 0x10;
-	}
-	return retVal;
+	UINT8 ret = input_port_read(machine(), "LINE8");
+
+	if (m_cass->input() > 0)
+		ret |= 0x10;
+
+	return ret;
 }
 
-static WRITE8_DEVICE_HANDLER (vector06_8255_porta_w )
+WRITE8_MEMBER( vector06_state::vector06_8255_porta_w )
 {
-	vector06_state *state = device->machine().driver_data<vector06_state>();
-	state->m_keyboard_mask = data ^ 0xff;
+	m_keyboard_mask = data ^ 0xff;
 }
 
-static void vector06_set_video_mode(running_machine &machine, int width) {
+void vector06_state::vector06_set_video_mode(int width)
+{
 	rectangle visarea;
 
 	visarea.min_x = 0;
 	visarea.min_y = 0;
 	visarea.max_x = width+64-1;
 	visarea.max_y = 256+64-1;
-	machine.primary_screen->configure(width+64, 256+64, visarea, machine.primary_screen->frame_period().attoseconds);
+	machine().primary_screen->configure(width+64, 256+64, visarea, machine().primary_screen->frame_period().attoseconds);
 }
 
-static WRITE8_DEVICE_HANDLER (vector06_8255_portb_w )
+WRITE8_MEMBER( vector06_state::vector06_8255_portb_w )
 {
-	vector06_state *state = device->machine().driver_data<vector06_state>();
-	state->m_color_index = data & 0x0f;
-	if ((data & 0x10) != state->m_video_mode)
+	m_color_index = data & 0x0f;
+	if ((data & 0x10) != m_video_mode)
 	{
-		state->m_video_mode = data & 0x10;
-		vector06_set_video_mode(device->machine(),(state->m_video_mode==0x10) ? 512 : 256);
+		m_video_mode = data & 0x10;
+		vector06_set_video_mode((m_video_mode==0x10) ? 512 : 256);
 	}
 }
 
-WRITE8_HANDLER(vector06_color_set)
+WRITE8_MEMBER( vector06_state::vector06_color_set )
 {
-	vector06_state *state = space->machine().driver_data<vector06_state>();
 	UINT8 r = (data & 7) << 5;
 	UINT8 g = ((data >> 3) & 7) << 5;
 	UINT8 b = ((data >>6) & 3) << 6;
-	palette_set_color( space->machine(), state->m_color_index, MAKE_RGB(r,g,b) );
+	palette_set_color( machine(), m_color_index, MAKE_RGB(r,g,b) );
 }
 
 
-static READ8_DEVICE_HANDLER (vector06_romdisk_portb_r )
+READ8_MEMBER( vector06_state::vector06_romdisk_portb_r )
 {
-	vector06_state *state = device->machine().driver_data<vector06_state>();
-	UINT8 *romdisk = device->machine().region("maincpu")->base() + 0x18000;
-	UINT16 addr = (state->m_romdisk_msb*256+state->m_romdisk_lsb) & 0x7fff;
+	UINT8 *romdisk = machine().region("maincpu")->base() + 0x18000;
+	UINT16 addr = (m_romdisk_msb | m_romdisk_lsb) & 0x7fff;
 	return romdisk[addr];
 }
 
-static WRITE8_DEVICE_HANDLER (vector06_romdisk_porta_w )
+WRITE8_MEMBER( vector06_state::vector06_romdisk_porta_w )
 {
-	vector06_state *state = device->machine().driver_data<vector06_state>();
-	state->m_romdisk_lsb = data;
+	m_romdisk_lsb = data;
 }
 
-static WRITE8_DEVICE_HANDLER (vector06_romdisk_portc_w )
+WRITE8_MEMBER( vector06_state::vector06_romdisk_portc_w )
 {
-	vector06_state *state = device->machine().driver_data<vector06_state>();
-	state->m_romdisk_msb = data;
+	m_romdisk_msb = data << 8;
 }
 
 I8255A_INTERFACE( vector06_ppi8255_2_interface )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(vector06_romdisk_porta_w),
-	DEVCB_HANDLER(vector06_romdisk_portb_r),
+	DEVCB_DRIVER_MEMBER(vector06_state, vector06_romdisk_porta_w),
+	DEVCB_DRIVER_MEMBER(vector06_state, vector06_romdisk_portb_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(vector06_romdisk_portc_w)
+	DEVCB_DRIVER_MEMBER(vector06_state, vector06_romdisk_portc_w)
 };
 
 
 I8255A_INTERFACE( vector06_ppi8255_interface )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(vector06_8255_porta_w),
-	DEVCB_HANDLER(vector06_8255_portb_r),
-	DEVCB_HANDLER(vector06_8255_portb_w),
-	DEVCB_HANDLER(vector06_8255_portc_r),
+	DEVCB_DRIVER_MEMBER(vector06_state, vector06_8255_porta_w),
+	DEVCB_DRIVER_MEMBER(vector06_state, vector06_8255_portb_r),
+	DEVCB_DRIVER_MEMBER(vector06_state, vector06_8255_portb_w),
+	DEVCB_DRIVER_MEMBER(vector06_state, vector06_8255_portc_r),
 	DEVCB_NULL
 };
 
-READ8_HANDLER(vector06_8255_1_r) {
-	return space->machine().device<i8255_device>("ppi8255")->read(*space, (offset ^ 0x03));
+READ8_MEMBER( vector06_state::vector06_8255_1_r )
+{
+	return m_ppi->read(space, offset^3);
 }
 
-WRITE8_HANDLER(vector06_8255_1_w) {
-	return space->machine().device<i8255_device>("ppi8255")->write(*space, (offset ^0x03) , data );
-
+WRITE8_MEMBER( vector06_state::vector06_8255_1_w )
+{
+	m_ppi->write(space, offset^3, data);
 }
 
-READ8_HANDLER(vector06_8255_2_r) {
-	return space->machine().device<i8255_device>("ppi8255_2")->read(*space, (offset ^ 0x03));
+READ8_MEMBER( vector06_state::vector06_8255_2_r )
+{
+	return m_ppi2->read(space, offset^3);
 }
 
-WRITE8_HANDLER(vector06_8255_2_w) {
-	return space->machine().device<i8255_device>("ppi8255_2")->write(*space, (offset ^0x03) , data );
-
+WRITE8_MEMBER( vector06_state::vector06_8255_2_w )
+{
+	m_ppi2->write(space, offset^3, data);
 }
 
 INTERRUPT_GEN( vector06_interrupt )
@@ -147,30 +136,35 @@ INTERRUPT_GEN( vector06_interrupt )
 
 }
 
-static IRQ_CALLBACK (  vector06_irq_callback )
+static IRQ_CALLBACK( vector06_irq_callback )
 {
 	// Interupt is RST 7
 	return 0xff;
 }
 
-static TIMER_CALLBACK(reset_check_callback)
+static TIMER_CALLBACK( reset_check_callback )
 {
 	UINT8 val = input_port_read(machine, "RESET");
-	if ((val & 1)==1) {
+
+	if (BIT(val, 0))
+	{
 		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x10000);
 		machine.device("maincpu")->reset();
 	}
-	if ((val & 2)==2) {
+
+	if (BIT(val, 1))
+	{
 		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x0000);
 		machine.device("maincpu")->reset();
 	}
 }
 
-WRITE8_HANDLER(vector06_disc_w)
+WRITE8_MEMBER( vector06_state::vector06_disc_w )
 {
-	device_t *fdc = space->machine().device("wd1793");
-	wd17xx_set_side (fdc,((data & 4) >> 2) ^ 1);
-	wd17xx_set_drive(fdc,data & 1);
+// something here needs to turn the motor on
+
+	wd17xx_set_side (m_fdc,BIT(data, 2) ^ 1);
+	wd17xx_set_drive(m_fdc,BIT(data, 0));
 }
 
 MACHINE_START( vector06 )

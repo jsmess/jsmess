@@ -7,9 +7,8 @@
 ****************************************************************************/
 
 
-#include "emu.h"
 #include "includes/vector06.h"
-#include "machine/ram.h"
+
 
 VIDEO_START( vector06 )
 {
@@ -33,7 +32,7 @@ SCREEN_UPDATE( vector06 )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			// port A form 8255 also used as scroll
+			// port A of 8255 also used as scroll
 			draw_y = ((255-y-state->m_keyboard_mask) & 0xff) +32;
 			code1 = ram[0x8000 + x*256 + y];
 			code2 = ram[0xa000 + x*256 + y];
@@ -56,8 +55,6 @@ SCREEN_UPDATE( vector06 )
 
 PALETTE_INIT( vector06 )
 {
-	int i;
-	for(i=0;i<16;i++) {
-		palette_set_color( machine, i, MAKE_RGB(0,0,0) );
-	}
+	for (UINT8 i=0; i<16; i++)
+		palette_set_color( machine, i, RGB_BLACK );
 }
