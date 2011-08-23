@@ -291,7 +291,7 @@ Cosmic Smash                                    840-0044C  23428    8 (64Mb)   ?
 Cosmic Smash (Rev A)                            840-0044C  23428A   8 (64Mb)   ?        315-6213  317-0289-COM   joystick + 2 buttons
 Crazy Taxi                                      840-0002C  21684   13 (64Mb)   ?        315-6213  317-0248-COM
 Dead Or Alive 2                                 841-0003C  22121   21 (64Mb)   present  315-6213  317-5048-COM   joystick + 3 buttons
-Dead Or Alive 2 Millenium                       841-0003C  DOA2 M  21 (64Mb)   present  315-6213  317-5048-COM   joystick + 3 buttons
+Dead Or Alive 2 Millennium                      841-0003C  DOA2 M  21 (64Mb)   present  315-6213  317-5048-COM   joystick + 3 buttons
 Death Crimson OX                                841-0016C  23524   10 (64Mb)   present  315-6213  317-5066-COM
 Dengen Tenshi Taisen Janshi Shangri-La          841-0004C  22060   12 (64Mb)   ?        315-6213  317-5050-JPN
 Derby Owners Club (Rev B)                       840-0016C  22099B  14 (64Mb)   ?        315-6213  317-0262-JPN   touch panel + 2 buttons + card reader
@@ -7224,6 +7224,7 @@ static const UINT32 mslug6_key   = 0x53627;
 static const UINT32 samsptk_key  = 0xe935f;
 static const UINT32 ggx15_key    = 0x91257;
 static const UINT32 rumblef2_key = 0xd674a;
+static const UINT32 anmlbskt_key = 0x12c3e;
 
 static DRIVER_INIT( atomiswave )
 {
@@ -7277,6 +7278,7 @@ AW_DRIVER_INIT(mslug6)
 AW_DRIVER_INIT(samsptk)
 AW_DRIVER_INIT(ggx15)
 AW_DRIVER_INIT(rumblef2)
+AW_DRIVER_INIT(anmlbskt)
 
 ROM_START( fotns )
 	ROM_REGION( 0x200000, "awflash", 0)
@@ -7349,6 +7351,21 @@ ROM_START( xtrmhnt2 )
 	ROM_REGION( 0x1400000, "network", 0)	// network board
         ROM_LOAD( "fpr-24330a.ic2", 0x000000, 0x400000, CRC(8d89877e) SHA1(6caafc49114eb0358e217bc2d1a3ab58a93c8d19) )
         ROM_LOAD( "flash128.ic4s", 0x400000, 0x1000000, CRC(866ed675) SHA1(2c4c06935b7ab1876e640cede51713b841833567) )
+ROM_END
+
+ROM_START( anmlbskt )
+	ROM_REGION( 0x200000, "awflash", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
+	ROM_LOAD( "vm2001f01.u3",  0x0000000, 0x800000, CRC(4fb33380) SHA1(9070990515544e6e9a1d24b1e0597cdea926a4c9) ) 
+	ROM_LOAD( "vm2001f01.u1",  0x1000000, 0x800000, CRC(3de23e27) SHA1(d3aae2a7e5c78fc3bf8e296392d8f893961d946f) ) 
+	ROM_LOAD( "vm2001f01.u2",  0x2000000, 0x800000, CRC(386070a1) SHA1(bf46980ea822b4cfe67c622f0104bf793031f4ad) ) 
+	ROM_LOAD( "vm2001f01.u4",  0x3000000, 0x800000, CRC(7cb2e7c3) SHA1(8b4e46cf19fbc1d613af75c52faebefb2776280b) ) 
+	ROM_LOAD( "vm2001f01.u14", 0x4000000, 0x800000, CRC(3de23e27) SHA1(d3aae2a7e5c78fc3bf8e296392d8f893961d946f) ) 
+	ROM_LOAD( "vm2001f01.u15", 0x5000000, 0x800000, CRC(2bb1be28) SHA1(fda7967d6c0341a608c52087ae3d461554760435) ) 
+	ROM_LOAD( "vm2001f01.u16", 0x6000000, 0x800000, CRC(3de23e27) SHA1(d3aae2a7e5c78fc3bf8e296392d8f893961d946f) ) 
+	ROM_LOAD( "vm2001f01.u17", 0x7000000, 0x800000, CRC(3de23e27) SHA1(d3aae2a7e5c78fc3bf8e296392d8f893961d946f) ) 
 ROM_END
 
 ROM_START( dolphin )
@@ -7831,12 +7848,12 @@ ROM_END
 /* 0001  */ GAME( 2001, gundmgd,   naomigd,  naomigd, naomi,    naomigd,  ROT0,   "Capcom / Banpresto", "Mobile Suit Gundam: Federation Vs. Zeon (GDL-0001)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0002  */ GAME( 2001, sfz3ugd,   naomigd,  naomigd, naomi,    sfz3ugd,  ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (GDL-0002)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0003
-/* 0004  */ GAME( 2001, cvsgd,     naomigd,  naomigd, naomi,    naomigd,  ROT0,   "Capcom / SNK", "Capcom Vs. SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0004  */ GAME( 2001, cvsgd,     naomigd,  naomigd, naomi,    naomigd,  ROT0,   "Capcom / SNK", "Capcom Vs. SNK Millennium Fight 2000 Pro (GDL-0004)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0005  */ GAME( 2001, starseek,  naomigd,  naomigd, naomi,    naomigd,  ROT0,   "G-Rev",        "Doki Doki Idol Star Seeker (GDL-0005)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 /* 0006  */ GAME( 2001, gundmxgd,  naomigd,  naomigd, naomi,    naomigd,  ROT0,   "Capcom",       "Mobile Suit Gundam: Federation Vs. Zeon DX  (GDL-0006)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0007  Capcom Vs. SNK 2
 /* 0007A */ GAME( 2001, cvs2gd,    naomigd,  naomigd, naomi,    naomigd,  ROT0,   "Capcom / SNK", "Capcom Vs. SNK 2 Millionaire Fighting 2001 (Rev A) (GDL-0007A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-// 0008  Capcom Vs. SNK 2 Mark Of The Millenium 2001 (Export)
+// 0008  Capcom Vs. SNK 2 Mark Of The Millennium 2001 (Export)
 // 0009
 /* 0010  */ GAME( 2001, ikaruga,   naomigd,  naomigd, naomi,    naomigd,  ROT270, "Treasure",     "Ikaruga (GDL-0010)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0011  */ GAME( 2002, ggxx,      naomigd,  naomigd, naomi,    ggxx,     ROT0,"Arc System Works","Guilty Gear XX (GDL-0011)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -7901,6 +7918,7 @@ GAME( 2004, ftspeed,  awbios,   aw1c,    aw1w,  ftspeed,    ROT0, "Sammy",      
 GAME( 2004, kov7sprt, awbios,   aw2c,    aw2c,  kov7sprt,   ROT0, "Sammy / IGS",              "Knights of Valour - The Seven Spirits", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 2005, vfurlong, awbios,   aw2c,    aw2c,  vfurlong,   ROT0, "Sammy",                    "Net Select Keiba Victory Furlong", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2004, rumblef2, awbios,   aw2c,    aw2c,  rumblef2,   ROT0, "Sammy / Dimps",            "The Rumble Fish 2", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2005, anmlbskt, awbios,   aw2c,    aw2c,  anmlbskt,   ROT0, "Sammy / Moss",             "Animal Basket", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ngbc,     awbios,   aw2c,    aw2c,  ngbc,       ROT0, "Sammy / SNK Playmore",     "Neo-Geo Battle Coliseum", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, samsptk,  awbios,   aw2c,    aw2c,  samsptk,    ROT0, "Sammy / SNK Playmore",     "Samurai Spirits Tenkaichi Kenkakuden", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, kofxi,    awbios,   aw2c,    aw2c,  kofxi,      ROT0, "Sammy / SNK Playmore",     "The King of Fighters XI", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
