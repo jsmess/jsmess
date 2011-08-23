@@ -3212,6 +3212,9 @@ ROM_END
 ROM_START( m4actclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "abcs.p1", 0x0000, 0x010000, CRC(cf730606) SHA1(35b95b924a24b306428c6c81136c14d7732e2356) )
+
+	ROM_REGION( 0x10000, "altrevs", 0 )// also contains what looks like 68k code?
+	ROM_LOAD( "a2c1-1mkii.bin", 0x0000, 0x010000, CRC(4c8ee662) SHA1(17e710c2bda21db609b619dfc0c9280a211da151) )
 ROM_END
 
 ROM_START( m4actnot )
@@ -3310,6 +3313,7 @@ ROM_START( m4addrc )
 	ROM_LOAD( "add55", 0x0000, 0x010000, CRC(48c5bc73) SHA1(18c9f70bad6141cca95b6bbcb4fc621e71f87700) )
 	ROM_LOAD( "alddr20", 0x0000, 0x010000, CRC(19cf4437) SHA1(b528823c476bebd1a9a6c720a4144294743693d2) )
 	ROM_LOAD( "classic adders & ladders (labelled - nudge w 5p 10p 1p10).bin", 0x0000, 0x010000, CRC(ac948903) SHA1(e07023efd7722a661a2bbf93c0a168af70ad6c20) )
+	ROM_LOAD( "classic adders & ladders (labelled connect 4 v1-9 (27512) 15-3-90)", 0x0000, 0x010000, CRC(843ed53d) SHA1(b1dff249df37800744e3fc9c32be20a62bd130a1) )
 
 	ROM_REGION( 0x10000, "altbwb", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "ad_05s___183.bin", 0x0000, 0x010000, CRC(8d9e0f5d) SHA1(fecc844908876e161d0134ce3cc098e79e74e0b1) )
@@ -3322,7 +3326,6 @@ ROM_START( m4addrc )
 	ROM_LOAD( "nik56c", 0x0000, 0x010000, CRC(05fa11d1) SHA1(01d3d0c504489f1513a0c3aa26e910c9604f5366) )
 
 ROM_END
-
 
 ROM_START( m4addrcc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -10080,9 +10083,13 @@ ROM_START( m4csoc )
 	ROM_LOAD( "so_sjs__.b_0", 0x0000, 0x040000, CRC(2f50675e) SHA1(baed8e3a455ec5bfa810e64dc4c66996d6746bbc) )
 	ROM_LOAD( "so_vc___.c_0", 0x0000, 0x040000, CRC(d683b202) SHA1(95803008a50229bc85ed177b587fdf05cb152df3) )
 	ROM_LOAD( "so_vc_d_.c_0", 0x0000, 0x040000, CRC(ed2fb31b) SHA1(de72d8abbb4a22125ed312e6ccfcab6b3e591ec2) )
+	ROM_LOAD( "ch_socc", 0x0000, 0x040000, CRC(ea9af5bd) SHA1(99319995ee886196ddd540bf37960a4e5b9d4f34) )
+	ROM_LOAD( "ch_socc.5", 0x0000, 0x040000, CRC(1b2ea78d) SHA1(209534ccd537c0ca9d02301830a52ebc29b93cb7) )
 
 	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	ROM_LOAD( "ch_socc.s1", 0x000000, 0x080000, CRC(abaea3f3) SHA1(cf3b6e4ee99680726efd2a839b49b4d86e2bd270) )
+	ROM_LOAD( "ch_socc.s2", 0x080000, 0x080000, CRC(2048f5b2) SHA1(b07addfd9d861b1d19d4db248e16c597cf79b159) )
+	ROM_LOAD( "ch_socc.s3", 0x100000, 0x080000, CRC(064224b0) SHA1(99a8bacfd3a42f72e40b93d1f7eeea633c3cf366) )
 ROM_END
 
 
@@ -11205,14 +11212,6 @@ ROM_START( m4trex )
 ROM_END
 
 
-
-ROM_START( m4twzone )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tz_x6s__.2_2", 0x0000, 0x010000, CRC(303e40ac) SHA1(fa8f6f33c142909b8d407533768d79157fbe67cd) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
-	ROM_LOAD( "tz______.2_1", 0x0000, 0x010000, CRC(8f6f5895) SHA1(8caedfd10b20cc7885893d07aeef8ff317bd7e40) )
-ROM_END
 
 
 
@@ -13889,6 +13888,10 @@ ROM_START( m4cfinln )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cfd_7_1.bin", 0x0000, 0x020000, CRC(e42ec2aa) SHA1(6495448c1d11ce0ab9ad794bc3a0981432e22945) )
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x20000, "altrevs", 0 )
+	// 'Jackpot Version'
+	ROM_LOAD( "cfd_d0.bin", 0x0000, 0x020000, CRC(179fcf13) SHA1(abd18ed28118ba0a62ab321a9d963105946d5eef) )	
 ROM_END
 
 
@@ -14286,6 +14289,33 @@ ROM_START( m4ndup )
 ROM_END
 
 
+ROM_START( m4abra )
+	ROM_REGION( 0x040000, "maincpu", 0 )
+	ROM_LOAD( "nn_sj___.4_0", 0x0000, 0x040000, CRC(48437d29) SHA1(72a2e9337fc0a004c382931f3af856253c44ed61) )
+
+	ROM_REGION( 0x040000, "altrevs", 0 )
+	ROM_LOAD( "nn_sja__.4_0", 0x0000, 0x040000, CRC(766cd4ae) SHA1(4d630b967ede615d325f524c2e4c92c7e7a60886) )
+	ROM_LOAD( "nn_sjb__.4_0", 0x0000, 0x040000, CRC(ca77a68a) SHA1(e753c065d299038bae4c451e647b9bcda36421d9) )
+	ROM_LOAD( "nn_sjk__.4_0", 0x0000, 0x040000, CRC(19018556) SHA1(6df993939e70a24621d4e732d0670d64fac1cf56) )
+	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( m4wcnov )
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD( "wcdsxh__.5_0", 0x0000, 0x080000, CRC(a82d11de) SHA1(ece14fd5f56da8cc788c53d5c1404275e9000b65) )
+	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( m4excaln )
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD( "exdsx___.6_0", 0x0000, 0x080000, CRC(fcdc703c) SHA1(927870723106aebbb2b492ce9bfebe4aa25d0325) )
+
+	ROM_REGION( 0x080000, "altrevs", 0 )
+	ROM_LOAD( "exdsx_e_.6_0", 0x0000, 0x080000, CRC(f6421feb) SHA1(5b3cf7fa4bf9711097ed1c9d2d5689329d73193d) )
+	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 )
+ROM_END
+
+
 
 
 // thanks to Project Amber for descramble information
@@ -14470,7 +14500,7 @@ GAME(199?, m4jpgemc	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Jac
 GAME(199?, m4jpjmp	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Jackpot Jump (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4jwlcwn	,0			,mod4oki	,mpu4jackpot8tkn	,m4default_bigbank	,ROT0,   "Barcrest","Jewel In the Crown (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4jok300	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Jokers 300 (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME(199?, m4jokmil	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Jokers Millenium (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME(199?, m4jokmil	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Jokers Millennium (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4jolgem	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Barcrest","Jolly Gems (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )  // gives WRONG SOUND, NEEDS V1 (can be skipped with 1) (hangs)
 GAME(199?, m4joljok	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Jolly Joker (Barcrest) (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME(199?, m4joljokd,m4joljok	,mod4oki	,mpu4				,m4default			,ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4)",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
@@ -14713,7 +14743,6 @@ GAME(199?, m4ticgld	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Tic Tac 
 GAME(199?, m4ticglc	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Tic Tac Toe Gold Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4topdog	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Top Dog (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4trex	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Trex (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4twzone	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Twilight Zone (Bwb) (MPU4?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // wrong hw? (is this the ACE game mislabeled?)
 GAME(199?, m4volcan	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Volcano (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4vdexpr	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Voodoo Express (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4xch	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","X-change (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
@@ -15060,6 +15089,9 @@ GAME( 199?, m4tornad		, 0			,  mod4oki		, mpu4		, m4default		, 0,		 "Qps",   "To
 GAME( 199?, m4vivan		, 0			,  mod4oki		, mpu4		, m4default		, 0,		 "Nova",   "Viva Las Vegas (Nova) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, m4ftladn		, 0			,  mod4oki		, mpu4		, m4default		, 0,		 "Nova",   "Find the Lady (Nova)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
-
+// these don't contain a valid vector in the first bank?
+GAME(199?, m4abra	,0			,bwboki		,mpu4				,m_blsbys			,ROT0,	 "Bwb","Abracadabra (Bwb) (MPU4?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME(199?, m4wcnov	,0			,bwboki		,mpu4				,m_blsbys			,ROT0,	 "Nova","World Cup (Nova) (MPU4?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) 
+GAME(199?, m4excaln	,0			,bwboki		,mpu4				,m_blsbys			,ROT0,	 "Nova","Excalibur (Nova) (MPU4?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 

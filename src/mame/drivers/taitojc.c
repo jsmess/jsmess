@@ -339,14 +339,12 @@ Notes:
 
 
     TODO:
-        - dendeg2 hangs on init step 10.
         - dendeg intro object RAM usage has various gfx bugs (check video file)
         - dendeg title screen builds up and it shouldn't
-        - dendeg doesn't show credit display
+  		- dendeg/dendeg2 doesn't show the odometer (btanb, thanks ANY);
         - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
         - landgear has huge 3d problems on gameplay (CPU comms?)
-        - dendeg2x usually crashes when starting the game (lots of read and writes to invalid addresses).
-        - All dendeg games have random wrong textures/palettes. (can't see any ... -AS)
+		- dendeg2 shows a debug string during gameplay?
         - Train board (external sound board with OKI6295) is not emulated.
         - dangcurv DSP program crashes very soon, so no 3d is currently shown.
         - add idle skips if possible
@@ -1155,6 +1153,25 @@ static INPUT_PORTS_START( taitojc )
 INPUT_PORTS_END
 #endif
 
+/* Mascon must always be in a defined state, Densya de Go 2 in particular returns black screen if the Mascon input is undefined
+   We convert the 6 lever "shifter" into a fake analog port for now. */
+static CUSTOM_INPUT( mascon_state_r )
+{
+	static const UINT8 mascon_table[6] = { 0x01, 0x10, 0x02, 0x20, 0x04, 0x40 };
+	UINT8 res = input_port_read(field.machine(), "MASCON");
+	int i;
+
+	//popmessage("%02x",res);
+
+	for(i=0;i<6;i++)
+	{
+		if((res & 0x70) == (0x10*i))
+			return mascon_table[i];
+	}
+
+	return mascon_table[5];
+}
+
 static INPUT_PORTS_START( dendeg )
 	PORT_START("COINS")
 	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1174,22 +1191,25 @@ static INPUT_PORTS_START( dendeg )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
 
 	PORT_START("UNUSED")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Horn")		// Horn
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Horn")		// Horn
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
 	/* TODO: fix this */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Mascon 5")		// Mascon 5
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Mascon 3")		// Mascon 3
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mascon 1")		// Mascon 1
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Mascon 4")		// Mascon 4
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mascon 2")		// Mascon 2
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mascon 0")		// Mascon 0
+	PORT_BIT( 0x88, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x77, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(mascon_state_r,NULL)
+//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Mascon 5")		// Mascon 5
+//	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Mascon 3")		// Mascon 3
+//	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mascon 1")		// Mascon 1
+//	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Mascon 4")		// Mascon 4
+//	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mascon 2")		// Mascon 2
+//	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mascon 0")		// Mascon 0
+
+	PORT_START("MASCON")
+	PORT_BIT( 0x7f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(0x60) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_CENTERDELTA(5)
 
 	PORT_START("ANALOG1")		// Brake
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Brake")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_CENTERDELTA(5) PORT_NAME("Brake")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( landgear )
@@ -1695,10 +1715,10 @@ ROM_START( dendeg2 )
 	ROM_FILL( 0x0000, 0x0080, 0 )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
-	ROM_LOAD32_WORD_SWAP( "e52-17.052",  0x0000002, 0x200000, CRC(4ac11921) SHA1(c4816e1d68bb52ee59e7a2e6de617c1093020944) )
-	ROM_LOAD32_WORD_SWAP( "e52-18.053",  0x0000000, 0x200000, CRC(7f3e4af7) SHA1(ab35744014175a802e73c8b70de4e7508f0a1cd1) )
-	ROM_LOAD32_WORD_SWAP( "e52-19.054",  0x0400002, 0x200000, CRC(2e5ff408) SHA1(91f95721b98198082e950c50f33324820719e9ed) )
-	ROM_LOAD32_WORD_SWAP( "e52-20.055",  0x0400000, 0x200000, CRC(e90eb71e) SHA1(f07518c718f773e20412393c0ebb3243f9b1d96c) )
+	ROM_LOAD32_WORD( "e52-17.052",  0x0000002, 0x200000, CRC(4ac11921) SHA1(c4816e1d68bb52ee59e7a2e6de617c1093020944) )
+	ROM_LOAD32_WORD( "e52-18.053",  0x0000000, 0x200000, CRC(7f3e4af7) SHA1(ab35744014175a802e73c8b70de4e7508f0a1cd1) )
+	ROM_LOAD32_WORD( "e52-19.054",  0x0400002, 0x200000, CRC(2e5ff408) SHA1(91f95721b98198082e950c50f33324820719e9ed) )
+	ROM_LOAD32_WORD( "e52-20.055",  0x0400000, 0x200000, CRC(e90eb71e) SHA1(f07518c718f773e20412393c0ebb3243f9b1d96c) )
 	ROM_LOAD32_WORD( "e52-05.009",  0x0800002, 0x200000, CRC(1ad0c612) SHA1(4ffc373fca8c1e1a5edbad3305b08f0867e9809c) )
 	ROM_LOAD32_WORD( "e52-13.022",  0x0800000, 0x200000, CRC(943af3f4) SHA1(bfc81aa5e5c22e44601428b9e980f09d0c65e38e) )
 	ROM_LOAD32_WORD( "e52-06.010",  0x0c00002, 0x200000, CRC(aa35e536) SHA1(2c1b2ee0d2587db6d6dd60b081bfcef3bb0dd9fa) )
@@ -1881,10 +1901,10 @@ ROM_END
 
 GAME( 1996, dendeg,   0,       taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, dendegx,  dendeg,  taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go Ex (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, dendeg2,  0,       taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go 2 (Japan)", GAME_NOT_WORKING )
-GAME( 1998, dendeg2x, dendeg2, taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go 2 Ex (Japan)", GAME_NOT_WORKING )
+GAME( 1998, dendeg2,  0,       taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, dendeg2x, dendeg2, taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go 2 Ex (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, sidebs,   0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sidebs2,  0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2 (North/South America)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sidebs2j, sidebs2, taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, landgear, 0,       taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear", GAME_NOT_WORKING )
+GAME( 1995, landgear, 0,       taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear", GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, dangcurv, 0,       taitojc, dangcurv, dangcurv, ROT0, "Taito", "Dangerous Curves", GAME_NOT_WORKING )
