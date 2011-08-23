@@ -12,6 +12,7 @@
     - understand irqs on this HW;
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/v810/v810.h"
@@ -56,6 +57,20 @@ public:
 	vboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_READ32_MEMBER(port_02_read);
+	DECLARE_WRITE32_MEMBER(port_02_write);
+	DECLARE_READ16_MEMBER(vip_r);
+	DECLARE_WRITE16_MEMBER(vip_w);
+	DECLARE_WRITE16_MEMBER(vboy_font0_w);
+	DECLARE_WRITE16_MEMBER(vboy_font1_w);
+	DECLARE_WRITE16_MEMBER(vboy_font2_w);
+	DECLARE_WRITE16_MEMBER(vboy_font3_w);
+	DECLARE_READ16_MEMBER(vboy_font0_r);
+	DECLARE_READ16_MEMBER(vboy_font1_r);
+	DECLARE_READ16_MEMBER(vboy_font2_r);
+	DECLARE_READ16_MEMBER(vboy_font3_r);
+	DECLARE_WRITE16_MEMBER(vboy_bgmap_w);
+	DECLARE_READ16_MEMBER(vboy_bgmap_r);
 	UINT16 *m_font;
 	UINT16 *m_bgmap;
 	UINT16 *m_l_frame_0;
@@ -72,27 +87,26 @@ public:
 	bitmap_t *m_screen_output;
 };
 
-static READ32_HANDLER( port_02_read )
+READ32_MEMBER( vboy_state::port_02_read )
 {
-	vboy_state *state = space->machine().driver_data<vboy_state>();
 	UINT32 value = 0x00;
 
 	switch ((offset << 2))
 	{
 		case 0x10:	// KLB (Keypad Low Byte)
-			value = state->m_vboy_regs.klb;	// 0x02 is always 1
+			value = m_vboy_regs.klb;	// 0x02 is always 1
 			break;
 		case 0x14:	// KHB (Keypad High Byte)
-			value = state->m_vboy_regs.khb;
+			value = m_vboy_regs.khb;
 			break;
 		case 0x20:	// TCR (Timer Control Reg)
-			value = state->m_vboy_regs.tcr;
+			value = m_vboy_regs.tcr;
 			break;
 		case 0x24:	// WCR (Wait State Control Reg)
-			value = state->m_vboy_regs.wcr;
+			value = m_vboy_regs.wcr;
 			break;
 		case 0x28:	// KCR (Keypad Control Reg)
-			value = state->m_vboy_regs.kcr;
+			value = m_vboy_regs.kcr;
 			break;
 		case 0x00:	// LPC (Link Port Control Reg)
 		case 0x04:	// LPC2 (Link Port Control Reg)
@@ -106,11 +120,8 @@ static READ32_HANDLER( port_02_read )
 	}
 	return value;
 }
-
-static WRITE32_HANDLER( port_02_write )
+WRITE32_MEMBER( vboy_state::port_02_write )
 {
-	vboy_state *state = space->machine().driver_data<vboy_state>();
-
 	switch (offset<<2)
 	{
 		case 0x0c:	// LPR (Link Port Receive)
@@ -119,23 +130,23 @@ static WRITE32_HANDLER( port_02_write )
 			//logerror("Ilegal write: offset %02x should be only read\n", offset);
 			break;
 		case 0x20:	// TCR (Timer Control Reg)
-			state->m_vboy_regs.kcr = (data | 0xe0) & 0xfd;	// according to docs: bits 5, 6 & 7 are unused and set to 1, bit 1 is read only.
+			m_vboy_regs.kcr = (data | 0xe0) & 0xfd;	// according to docs: bits 5, 6 & 7 are unused and set to 1, bit 1 is read only.
 			break;
 		case 0x24:	// WCR (Wait State Control Reg)
-			state->m_vboy_regs.wcr = data | 0xfc;	// according to docs: bits 2 to 7 are unused and set to 1.
+			m_vboy_regs.wcr = data | 0xfc;	// according to docs: bits 2 to 7 are unused and set to 1.
 			break;
 		case 0x28:	// KCR (Keypad Control Reg)
 			if (data & 0x04 )
 			{
-				state->m_vboy_regs.klb = (data & 0x01) ? 0 : (input_port_read(space->machine(), "INPUT") & 0x00ff);
-				state->m_vboy_regs.khb = (data & 0x01) ? 0 : (input_port_read(space->machine(), "INPUT") & 0xff00) >> 8;
+				m_vboy_regs.klb = (data & 0x01) ? 0 : (input_port_read(machine(), "INPUT") & 0x00ff);
+				m_vboy_regs.khb = (data & 0x01) ? 0 : (input_port_read(machine(), "INPUT") & 0xff00) >> 8;
 			}
 			else if (data & 0x20)
 			{
-				state->m_vboy_regs.klb = input_port_read(space->machine(), "INPUT") & 0x00ff;
-				state->m_vboy_regs.khb = (input_port_read(space->machine(), "INPUT") & 0xff00) >> 8;
+				m_vboy_regs.klb = input_port_read(machine(), "INPUT") & 0x00ff;
+				m_vboy_regs.khb = (input_port_read(machine(), "INPUT") & 0xff00) >> 8;
 			}
-			state->m_vboy_regs.kcr = (data | 0x48) & 0xfd;	// according to docs: bit 6 & bit 3 are unused and set to 1, bit 1 is read only.
+			m_vboy_regs.kcr = (data | 0x48) & 0xfd;	// according to docs: bit 6 & bit 3 are unused and set to 1, bit 1 is read only.
 			break;
 		case 0x00:	// LPC (Link Port Control Reg)
 		case 0x04:	// LPC2 (Link Port Control Reg)
@@ -148,66 +159,64 @@ static WRITE32_HANDLER( port_02_write )
 	}
 }
 
-static READ16_HANDLER( vip_r )
+READ16_MEMBER( vboy_state::vip_r )
 {
-	vboy_state *state = space->machine().driver_data<vboy_state>();
-
 	switch(offset << 1) {
 		case 0x00:	//INTPND
-					return state->m_vip_regs.INTPND & state->m_vip_regs.INTENB;
+					return m_vip_regs.INTPND & m_vip_regs.INTENB;
 		case 0x02:	//INTENB
-					return state->m_vip_regs.INTENB;
+					return m_vip_regs.INTENB;
 		case 0x04:	//INTCLR
 					logerror("Error reading INTCLR\n");
 					break;
 		case 0x20:	//DPSTTS
-					return state->m_vip_regs.DPSTTS;
+					return m_vip_regs.DPSTTS;
 		case 0x22:	//DPCTRL
-					return state->m_vip_regs.DPCTRL;
+					return m_vip_regs.DPCTRL;
 		case 0x24:	//BRTA
-					return state->m_vip_regs.BRTA;
+					return m_vip_regs.BRTA;
 		case 0x26:	//BRTB
-					return state->m_vip_regs.BRTB;
+					return m_vip_regs.BRTB;
 		case 0x28:	//BRTC
-					return state->m_vip_regs.BRTC;
+					return m_vip_regs.BRTC;
 		case 0x2A:	//REST
-					return state->m_vip_regs.REST;
+					return m_vip_regs.REST;
 		case 0x2E:	//FRMCYC
-					return state->m_vip_regs.FRMCYC;
+					return m_vip_regs.FRMCYC;
 		case 0x30:	//CTA
-					return state->m_vip_regs.CTA;
+					return m_vip_regs.CTA;
 		case 0x40:	//XPSTTS
-					return state->m_vip_regs.XPSTTS;
+					return m_vip_regs.XPSTTS;
 		case 0x42:	//XPCTRL
-					return state->m_vip_regs.XPCTRL;
+					return m_vip_regs.XPCTRL;
 		case 0x44:	//VER
-					return state->m_vip_regs.VER;
+					return m_vip_regs.VER;
 		case 0x48:	//SPT0
-					return state->m_vip_regs.SPT[0];
+					return m_vip_regs.SPT[0];
 		case 0x4A:	//SPT1
-					return state->m_vip_regs.SPT[1];
+					return m_vip_regs.SPT[1];
 		case 0x4C:	//SPT2
-					return state->m_vip_regs.SPT[2];
+					return m_vip_regs.SPT[2];
 		case 0x4E:	//SPT3
-					return state->m_vip_regs.SPT[3];
+					return m_vip_regs.SPT[3];
 		case 0x60:	//GPLT0
-					return state->m_vip_regs.GPLT[0];
+					return m_vip_regs.GPLT[0];
 		case 0x62:	//GPLT1
-					return state->m_vip_regs.GPLT[1];
+					return m_vip_regs.GPLT[1];
 		case 0x64:	//GPLT2
-					return state->m_vip_regs.GPLT[2];
+					return m_vip_regs.GPLT[2];
 		case 0x66:	//GPLT3
-					return state->m_vip_regs.GPLT[3];
+					return m_vip_regs.GPLT[3];
 		case 0x68:	//JPLT0
-					return state->m_vip_regs.JPLT[0];
+					return m_vip_regs.JPLT[0];
 		case 0x6A:	//JPLT1
-					return state->m_vip_regs.JPLT[1];
+					return m_vip_regs.JPLT[1];
 		case 0x6C:	//JPLT2
-					return state->m_vip_regs.JPLT[2];
+					return m_vip_regs.JPLT[2];
 		case 0x6E:	//JPLT3
-					return state->m_vip_regs.JPLT[3];
+					return m_vip_regs.JPLT[3];
 		case 0x70:	//BKCOL
-					return state->m_vip_regs.BKCOL;
+					return m_vip_regs.BKCOL;
 		default:
 					logerror("Unemulated read: addr %08x\n", offset * 2 + 0x0005f800);
 					break;
@@ -215,97 +224,95 @@ static READ16_HANDLER( vip_r )
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( vip_w )
+WRITE16_MEMBER( vboy_state::vip_w )
 {
-	vboy_state *state = space->machine().driver_data<vboy_state>();
-
 	switch(offset << 1) {
 		case 0x00:	//INTPND
 					logerror("Error writing INTPND\n");
 					break;
 		case 0x02:	//INTENB
-					state->m_vip_regs.INTENB = data;
+					m_vip_regs.INTENB = data;
 					//printf("%04x ENB\n",data);
 					break;
 		case 0x04:	//INTCLR
-					state->m_vip_regs.INTPND &= ~data;
-					cputag_set_input_line(space->machine(), "maincpu", 4, CLEAR_LINE);
+					m_vip_regs.INTPND &= ~data;
+					cputag_set_input_line(machine(), "maincpu", 4, CLEAR_LINE);
 					//printf("%04x ACK\n",data);
 					break;
 		case 0x20:	//DPSTTS
 					logerror("Error writing DPSTTS\n");
 					break;
 		case 0x22:	//DPCTRL
-					state->m_vip_regs.DPCTRL = data;
+					m_vip_regs.DPCTRL = data;
 					break;
 		case 0x24:	//BRTA
-					state->m_vip_regs.BRTA = data;
-					palette_set_color_rgb(space->machine(), 1,(state->m_vip_regs.BRTA) & 0xff,0,0);
+					m_vip_regs.BRTA = data;
+					palette_set_color_rgb(machine(), 1,(m_vip_regs.BRTA) & 0xff,0,0);
 					break;
 		case 0x26:	//BRTB
-					state->m_vip_regs.BRTB = data;
-					palette_set_color_rgb(space->machine(), 2,(state->m_vip_regs.BRTA + state->m_vip_regs.BRTB) & 0xff,0,0);
+					m_vip_regs.BRTB = data;
+					palette_set_color_rgb(machine(), 2,(m_vip_regs.BRTA + m_vip_regs.BRTB) & 0xff,0,0);
 					break;
 		case 0x28:	//BRTC
-					state->m_vip_regs.BRTC = data;
-					palette_set_color_rgb(space->machine(), 3,(state->m_vip_regs.BRTA + state->m_vip_regs.BRTB + state->m_vip_regs.BRTC) & 0xff,0,0);
+					m_vip_regs.BRTC = data;
+					palette_set_color_rgb(machine(), 3,(m_vip_regs.BRTA + m_vip_regs.BRTB + m_vip_regs.BRTC) & 0xff,0,0);
 					break;
 		case 0x2A:	//REST
-					state->m_vip_regs.REST = data;
+					m_vip_regs.REST = data;
 					break;
 		case 0x2E:	//FRMCYC
-					state->m_vip_regs.FRMCYC = data;
+					m_vip_regs.FRMCYC = data;
 					break;
 		case 0x30:	//CTA
-					state->m_vip_regs.CTA = data;
+					m_vip_regs.CTA = data;
 					break;
 		case 0x40:	//XPSTTS
 					logerror("Error writing XPSTTS\n");
 					break;
 		case 0x42:	//XPCTRL
-					state->m_vip_regs.XPCTRL = data;
+					m_vip_regs.XPCTRL = data;
 					break;
 		case 0x44:	//VER
-					state->m_vip_regs.VER = data;
+					m_vip_regs.VER = data;
 					break;
 		case 0x48:	//SPT0
-					state->m_vip_regs.SPT[0] = data;
+					m_vip_regs.SPT[0] = data;
 					break;
 		case 0x4A:	//SPT1
-					state->m_vip_regs.SPT[1] = data;
+					m_vip_regs.SPT[1] = data;
 					break;
 		case 0x4C:	//SPT2
-					state->m_vip_regs.SPT[2] = data;
+					m_vip_regs.SPT[2] = data;
 					break;
 		case 0x4E:	//SPT3
-					state->m_vip_regs.SPT[3] = data;
+					m_vip_regs.SPT[3] = data;
 					break;
 		case 0x60:	//GPLT0
-					state->m_vip_regs.GPLT[0] = data;
+					m_vip_regs.GPLT[0] = data;
 					break;
 		case 0x62:	//GPLT1
-					state->m_vip_regs.GPLT[1] = data;
+					m_vip_regs.GPLT[1] = data;
 					break;
 		case 0x64:	//GPLT2
-					state->m_vip_regs.GPLT[2] = data;
+					m_vip_regs.GPLT[2] = data;
 					break;
 		case 0x66:	//GPLT3
-					state->m_vip_regs.GPLT[3] = data;
+					m_vip_regs.GPLT[3] = data;
 					break;
 		case 0x68:	//JPLT0
-					state->m_vip_regs.JPLT[0] = data;
+					m_vip_regs.JPLT[0] = data;
 					break;
 		case 0x6A:	//JPLT1
-					state->m_vip_regs.JPLT[1] = data;
+					m_vip_regs.JPLT[1] = data;
 					break;
 		case 0x6C:	//JPLT2
-					state->m_vip_regs.JPLT[2] = data;
+					m_vip_regs.JPLT[2] = data;
 					break;
 		case 0x6E:	//JPLT3
-					state->m_vip_regs.JPLT[3] = data;
+					m_vip_regs.JPLT[3] = data;
 					break;
 		case 0x70:	//BKCOL
-					state->m_vip_regs.BKCOL = data;
+					m_vip_regs.BKCOL = data;
 					break;
 		default:
 					logerror("Unemulated write: addr %08x, data %04x\n", offset * 2 + 0x0005f800, data);
@@ -313,123 +320,71 @@ static WRITE16_HANDLER( vip_w )
 	}
 }
 
-static WRITE16_HANDLER( vboy_font0_w )
+WRITE16_MEMBER( vboy_state::vboy_font0_w )
 {
-	vboy_state *state = space->machine().driver_data<vboy_state>();
-
-	state->m_font[offset] = data | (state->m_font[offset] & (mem_mask ^ 0xffff));
+	m_font[offset] = data | (m_font[offset] & (mem_mask ^ 0xffff));
 }
 
-static WRITE16_HANDLER( vboy_font1_w )
+WRITE16_MEMBER( vboy_state::vboy_font1_w )
 {
-	vboy_state *state = space->machine().driver_data<vboy_state>();
-
-	state->m_font[offset + 0x1000] = data | (state->m_font[offset + 0x1000] & (mem_mask ^ 0xffff));
+	m_font[offset + 0x1000] = data | (m_font[offset + 0x1000] & (mem_mask ^ 0xffff));
 }
 
-static WRITE16_HANDLER( vboy_font2_w )
+WRITE16_MEMBER( vboy_state::vboy_font2_w )
 {
-	vboy_state *state = space->machine().driver_data<vboy_state>();
-
-	state->m_font[offset + 0x2000] = data | (state->m_font[offset + 0x2000] & (mem_mask ^ 0xffff));
+	m_font[offset + 0x2000] = data | (m_font[offset + 0x2000] & (mem_mask ^ 0xffff));
 }
 
-static WRITE16_HANDLER( vboy_font3_w )
+WRITE16_MEMBER( vboy_state::vboy_font3_w )
 {
-	vboy_state *state = space->machine().driver_data<vboy_state>();
-
-	state->m_font[offset + 0x3000] = data | (state->m_font[offset + 0x3000] & (mem_mask ^ 0xffff));
+	m_font[offset + 0x3000] = data | (m_font[offset + 0x3000] & (mem_mask ^ 0xffff));
 }
 
-static READ16_HANDLER( vboy_font0_r )
+READ16_MEMBER( vboy_state::vboy_font0_r )
 {
-	vboy_state *state = space->machine().driver_data<vboy_state>();
-
-	return state->m_font[offset];
+	return m_font[offset];
 }
 
-static READ16_HANDLER( vboy_font1_r )
+READ16_MEMBER( vboy_state::vboy_font1_r )
 {
-	vboy_state *state = space->machine().driver_data<vboy_state>();
-
-	return state->m_font[offset + 0x1000];
+	return m_font[offset + 0x1000];
 }
 
-static READ16_HANDLER( vboy_font2_r )
+READ16_MEMBER( vboy_state::vboy_font2_r )
 {
-	vboy_state *state = space->machine().driver_data<vboy_state>();
-
-	return state->m_font[offset + 0x2000];
+	return m_font[offset + 0x2000];
 }
 
-static READ16_HANDLER( vboy_font3_r )
+READ16_MEMBER( vboy_state::vboy_font3_r )
 {
-	vboy_state *state = space->machine().driver_data<vboy_state>();
-
-	return state->m_font[offset + 0x3000];
+	return m_font[offset + 0x3000];
 }
 
-static void put_char(vboy_state *state, bitmap_t *bitmap, int x, int y, UINT16 ch, int flipx, int flipy, int trans, UINT8 pal)
+WRITE16_MEMBER( vboy_state::vboy_bgmap_w )
 {
-	UINT16 code = ch;
-	int i, b;
-
-	for(i = 0; i < 8; i++)
-	{
-		UINT16  data;
-		if(flipy==0) {
-			 data = state->m_font[code * 8 + i];
-		} else {
-			 data = state->m_font[code * 8 + (7-i)];
-		}
-		for (b = 0; b < 8; b++)
-		{
-			UINT8 dat,col;
-			if(flipx==0) {
-				dat = ((data >> (b << 1)) & 0x03);
-			} else {
-				dat = ((data >> ((7-b) << 1)) & 0x03);
-			}
-			col = (pal >> (dat*2)) & 3;
-			// This is how emulator works, but need to check
-			if (dat==0) col=0;
-
-			if (!trans || ( trans && col!=0)) {
-				*BITMAP_ADDR16(bitmap, (y + i) & 0x1ff, (x + b) & 0x1ff) =  col;
-			}
-		}
-	}
+	m_bgmap[offset] = data | (m_bgmap[offset] & (mem_mask ^ 0xffff));
 }
 
-static WRITE16_HANDLER( vboy_bgmap_w )
+READ16_MEMBER( vboy_state::vboy_bgmap_r )
 {
-	vboy_state *state = space->machine().driver_data<vboy_state>();
-
-	state->m_bgmap[offset] = data | (state->m_bgmap[offset] & (mem_mask ^ 0xffff));
+	return m_bgmap[offset];
 }
 
-static READ16_HANDLER( vboy_bgmap_r )
-{
-	vboy_state *state = space->machine().driver_data<vboy_state>();
-
-	return state->m_bgmap[offset];
-}
-
-static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
-	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_BASE_MEMBER(vboy_state,m_l_frame_0) // L frame buffer 0
+	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_BASE(m_l_frame_0) // L frame buffer 0
 	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511
-	AM_RANGE( 0x00008000, 0x0000dfff ) AM_RAM AM_BASE_MEMBER(vboy_state,m_l_frame_1) // L frame buffer 1
+	AM_RANGE( 0x00008000, 0x0000dfff ) AM_RAM AM_BASE(m_l_frame_1) // L frame buffer 1
 	AM_RANGE( 0x0000e000, 0x0000ffff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023
-	AM_RANGE( 0x00010000, 0x00015fff ) AM_RAM AM_BASE_MEMBER(vboy_state,m_r_frame_0) // R frame buffer 0
+	AM_RANGE( 0x00010000, 0x00015fff ) AM_RAM AM_BASE(m_r_frame_0) // R frame buffer 0
 	AM_RANGE( 0x00016000, 0x00017fff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535
-	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_BASE_MEMBER(vboy_state,m_r_frame_1) // R frame buffer 1
+	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_BASE(m_r_frame_1) // R frame buffer 1
 	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047
 
 	AM_RANGE( 0x00020000, 0x0003ffff ) AM_READWRITE16(vboy_bgmap_r,vboy_bgmap_w, 0xffffffff) // VIPC memory
 
 	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC
-	AM_RANGE( 0x0005f800, 0x0005f87f )	AM_READWRITE16(vip_r, vip_w, 0xffffffff)
+	AM_RANGE( 0x0005f800, 0x0005f87f ) AM_READWRITE16(vip_r, vip_w, 0xffffffff)
 
 	AM_RANGE( 0x00078000, 0x00079fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511 mirror
 	AM_RANGE( 0x0007a000, 0x0007bfff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023 mirror
@@ -444,21 +399,21 @@ static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32 )
 	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("user1", 0) /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vboy_io, AS_IO, 32 )
+static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
-	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_BASE_MEMBER(vboy_state,m_l_frame_0) // L frame buffer 0
+	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_BASE(m_l_frame_0) // L frame buffer 0
 	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511
-	AM_RANGE( 0x00008000, 0x0000dfff ) AM_RAM AM_BASE_MEMBER(vboy_state,m_l_frame_1) // L frame buffer 1
+	AM_RANGE( 0x00008000, 0x0000dfff ) AM_RAM AM_BASE(m_l_frame_1) // L frame buffer 1
 	AM_RANGE( 0x0000e000, 0x0000ffff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023
-	AM_RANGE( 0x00010000, 0x00015fff ) AM_RAM AM_BASE_MEMBER(vboy_state,m_r_frame_0) // R frame buffer 0
+	AM_RANGE( 0x00010000, 0x00015fff ) AM_RAM AM_BASE(m_r_frame_0) // R frame buffer 0
 	AM_RANGE( 0x00016000, 0x00017fff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535
-	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_BASE_MEMBER(vboy_state,m_r_frame_1) // R frame buffer 1
+	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_BASE(m_r_frame_1) // R frame buffer 1
 	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047
 
 	AM_RANGE( 0x00020000, 0x0003ffff ) AM_READWRITE16(vboy_bgmap_r,vboy_bgmap_w, 0xffffffff) // VIPC memory
 
 	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC
-	AM_RANGE( 0x0005f800, 0x0005f87f )	AM_READWRITE16(vip_r, vip_w, 0xffffffff)
+	AM_RANGE( 0x0005f800, 0x0005f87f ) AM_READWRITE16(vip_r, vip_w, 0xffffffff)
 
 	AM_RANGE( 0x00078000, 0x00079fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511 mirror
 	AM_RANGE( 0x0007a000, 0x0007bfff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023 mirror
@@ -532,6 +487,38 @@ static VIDEO_START( vboy )
 	state->m_columntab1 = state->m_bgmap + (0x1dc00 >> 1);
 	state->m_columntab2 = state->m_bgmap + (0x1de00 >> 1);
 	state->m_world = state->m_bgmap + (0x1d800 >> 1);
+}
+
+static void put_char(vboy_state *state, bitmap_t *bitmap, int x, int y, UINT16 ch, int flipx, int flipy, int trans, UINT8 pal)
+{
+	UINT16 code = ch;
+	int i, b;
+
+	for(i = 0; i < 8; i++)
+	{
+		UINT16  data;
+		if(flipy==0) {
+			 data = state->m_font[code * 8 + i];
+		} else {
+			 data = state->m_font[code * 8 + (7-i)];
+		}
+		for (b = 0; b < 8; b++)
+		{
+			UINT8 dat,col;
+			if(flipx==0) {
+				dat = ((data >> (b << 1)) & 0x03);
+			} else {
+				dat = ((data >> ((7-b) << 1)) & 0x03);
+			}
+			col = (pal >> (dat*2)) & 3;
+			// This is how emulator works, but need to check
+			if (dat==0) col=0;
+
+			if (!trans || ( trans && col!=0)) {
+				*BITMAP_ADDR16(bitmap, (y + i) & 0x1ff, (x + b) & 0x1ff) =  col;
+			}
+		}
+	}
 }
 
 static void fill_bg_map(vboy_state *state, int num, bitmap_t *bitmap)
@@ -700,11 +687,9 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_vboy)
-
+	MCFG_VIDEO_START(vboy)
 	MCFG_PALETTE_LENGTH(4)
 	MCFG_PALETTE_INIT(vboy)
-
-	MCFG_VIDEO_START(vboy)
 
 	/* Left screen */
 	MCFG_SCREEN_ADD("3dleft", RASTER)
@@ -743,4 +728,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-CONS( 1995, vboy,   0,      0,		 vboy,		vboy,	 0, 	 "Nintendo", "Virtual Boy", GAME_NOT_WORKING | GAME_NO_SOUND)
+CONS( 1995, vboy,   0,      0,       vboy,      vboy,    0,    "Nintendo", "Virtual Boy", GAME_NOT_WORKING | GAME_NO_SOUND)
