@@ -476,11 +476,9 @@ static VIDEO_START( vboy )
 
 	// Allocate memory for temporary screens
 	for(i = 0; i < 16; i++)
-	{
 		state->m_bg_map[i] = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
-	}
-	state->m_screen_output = auto_bitmap_alloc(machine, 384, 224, BITMAP_FORMAT_INDEXED16);
 
+	state->m_screen_output = auto_bitmap_alloc(machine, 384, 224, BITMAP_FORMAT_INDEXED16);
 	state->m_font  = auto_alloc_array(machine, UINT16, 2048 * 8);
 	state->m_bgmap = auto_alloc_array(machine, UINT16, 0x20000 >> 1);
 	state->m_objects = state->m_bgmap + (0x1E000 >> 1);
@@ -489,34 +487,31 @@ static VIDEO_START( vboy )
 	state->m_world = state->m_bgmap + (0x1d800 >> 1);
 }
 
-static void put_char(vboy_state *state, bitmap_t *bitmap, int x, int y, UINT16 ch, int flipx, int flipy, int trans, UINT8 pal)
+static void put_char(vboy_state *state, bitmap_t *bitmap, int x, int y, UINT16 ch, bool flipx, bool flipy, bool trans, UINT8 pal)
 {
-	UINT16 code = ch;
-	int i, b;
+	UINT16 data, code = ch;
+	UINT8 i, b, dat, col;
 
-	for(i = 0; i < 8; i++)
+	for (i = 0; i < 8; i++)
 	{
-		UINT16  data;
-		if(flipy==0) {
+		if (!flipy)
 			 data = state->m_font[code * 8 + i];
-		} else {
+		else
 			 data = state->m_font[code * 8 + (7-i)];
-		}
+
 		for (b = 0; b < 8; b++)
 		{
-			UINT8 dat,col;
-			if(flipx==0) {
+			if (!flipx)
 				dat = ((data >> (b << 1)) & 0x03);
-			} else {
+			else
 				dat = ((data >> ((7-b) << 1)) & 0x03);
-			}
+
 			col = (pal >> (dat*2)) & 3;
 			// This is how emulator works, but need to check
-			if (dat==0) col=0;
+			if (!dat) col=0;
 
-			if (!trans || ( trans && col!=0)) {
+			if (!trans || ( trans && col ))
 				*BITMAP_ADDR16(bitmap, (y + i) & 0x1ff, (x + b) & 0x1ff) =  col;
-			}
 		}
 	}
 }
@@ -536,109 +531,123 @@ static void fill_bg_map(vboy_state *state, int num, bitmap_t *bitmap)
 	}
 }
 
-static UINT8 display_world(vboy_state *state, int num, bitmap_t *bitmap, UINT8 right)
+static UINT8 display_world(vboy_state *state, int num, bitmap_t *bitmap, bool right)
 {
-	UINT16 def = state->m_world[num*16];
-	INT16 gx  = state->m_world[num*16+1];
-	INT16 gp  = state->m_world[num*16+2];
-	INT16 gy  = state->m_world[num*16+3];
-	INT16 mx  = state->m_world[num*16+4];
-	INT16 mp  = state->m_world[num*16+5];
-	INT16 my  = state->m_world[num*16+6];
-	UINT16 w  = state->m_world[num*16+7];
-	UINT16 h = state->m_world[num*16+8];
-	UINT16 param_base  = state->m_world[num*16+9] & 0xfff0;
-//  UINT16 overplane = state->m_world[num*16+10];
+	num <<= 4;
+	UINT16 def = state->m_world[num];
+	INT16 gx  = state->m_world[num+1];
+	INT16 gp  = state->m_world[num+2];
+	INT16 gy  = state->m_world[num+3];
+	INT16 mx  = state->m_world[num+4];
+	INT16 mp  = state->m_world[num+5];
+	INT16 my  = state->m_world[num+6];
+	UINT16 w  = state->m_world[num+7];
+	UINT16 h  = state->m_world[num+8];
+	UINT16 param_base = state->m_world[num+9] & 0xfff0;
+//  UINT16 overplane = state->m_world[num+10];
 	UINT8 bg_map_num = def & 0x0f;
 	INT16 x,y,i;
-	UINT8 mode	= (def >> 12) & 3;
+	UINT8 mode = (def >> 12) & 3;
 	UINT16 *vboy_paramtab;
 
 	vboy_paramtab = state->m_bgmap + param_base;
-	if ((mode==0) || (mode==1)) {
+
+	if (mode < 2)
+	{
 		fill_bg_map(state, bg_map_num, state->m_bg_map[bg_map_num]);
-		if (BIT(def,15) && (right==0)) {
+		if (BIT(def,15) && (!right))
+		{
 			// Left screen
-			for(y=0;y<=h;y++) {
-				for(x=0;x<=w;x++) {
+			for(y=0;y<=h;y++)
+			{
+				for(x=0;x<=w;x++)
+				{
 					INT16 y1 = (y+gy);
 					INT16 x1 = (x+gx-gp);
 					UINT16 pix = 0;
-					if (mode==1) {
+					if (mode==1)
 						x1 += vboy_paramtab[y*2];
-					}
+
 					pix = *BITMAP_ADDR16(state->m_bg_map[bg_map_num], (y+my) & 0x1ff, (x+mx-mp) & 0x1ff);
-					if (pix!=0) {
-						if (y1>=0 && y1<224) {
-							if (x1>=0 && x1<384) {
+					if (pix)
+						if (y1>=0 && y1<224)
+							if (x1>=0 && x1<384)
 								*BITMAP_ADDR16(bitmap, y1, x1) = pix;
-							}
-						}
-					}
 				}
 			}
 		}
-		if (BIT(def,14) && (right==1)) {
+
+		if (BIT(def,14) && (right))
+		{
 			// Right screen
-			for(y=0;y<=h;y++) {
-				for(x=0;x<=w;x++) {
+			for(y=0;y<=h;y++)
+			{
+				for(x=0; x<=w; x++)
+				{
 					INT16 y1 = (y+gy);
 					INT16 x1 = (x+gx+gp);
 					UINT16 pix = 0;
-					if (mode==1) {
+					if (mode==1)
 						x1 += vboy_paramtab[y*2+1];
-					}
+
 					pix = *BITMAP_ADDR16(state->m_bg_map[bg_map_num], (y+my) & 0x1ff, (x+mx+mp) & 0x1ff);
-					if (pix!=0) {
-						if (y1>=0 && y1<224) {
-							if (x1>=0 && x1<384) {
+					if (pix)
+						if (y1>=0 && y1<224)
+							if (x1>=0 && x1<384)
 								*BITMAP_ADDR16(bitmap, y1, x1) = pix;
-							}
-						}
-					}
 				}
 			}
 		}
 	}
-	if(mode==2) {
+	else
+	if (mode==2)
+	{
 
 	}
-	if(mode==3) {
+	else
+	if (mode==3)
+	{
 		// just for test
-		for(i=state->m_vip_regs.SPT[3];i>=state->m_vip_regs.SPT[2];i--) {
+		for(i=state->m_vip_regs.SPT[3];i>=state->m_vip_regs.SPT[2];i--)
+		{
 			UINT16 start_ndx = i * 4;
 			INT16 jx = state->m_objects[start_ndx+0];
 			INT16 jp = state->m_objects[start_ndx+1] & 0x3fff;
 			INT16 jy = state->m_objects[start_ndx+2] & 0x1ff;
 			UINT16 val = state->m_objects[start_ndx+3];
 
-			if (!right) {
-				put_char(state, bitmap, (jx-jp) & 0x1ff,jy, val & 0x7ff, BIT(val,13), BIT(val,12), 1, state->m_vip_regs.JPLT[(val>>14) & 3]);
-			} else {
-				put_char(state, bitmap, (jx+jp) & 0x1ff,jy, val & 0x7ff, BIT(val,13), BIT(val,12), 1, state->m_vip_regs.JPLT[(val>>14) & 3]);
-			}
+			if (!right)
+				put_char(state, bitmap, (jx-jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), 1, state->m_vip_regs.JPLT[(val>>14) & 3]);
+			else
+				put_char(state, bitmap, (jx+jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), 1, state->m_vip_regs.JPLT[(val>>14) & 3]);
 		}
 	}
 	// Return END world status
 	return BIT(def,6);
 }
 
-static SCREEN_UPDATE( vboy )
+static SCREEN_UPDATE( vboy_left )
 {
 	vboy_state *state = screen->machine().driver_data<vboy_state>();
-	int i;
-	UINT8 right = 0;
-	device_t *_3d_right_screen = screen->machine().device("3dright");
-
 	bitmap_fill(state->m_screen_output, cliprect, state->m_vip_regs.BKCOL);
 
-	if (screen == _3d_right_screen) right = 1;
+	for(int i=31; i>=0; i--)
+		if (display_world(state, i, state->m_screen_output, 0)) break;
 
-	for(i=31;i>=0;i--) {
-		if (display_world(state,i,state->m_screen_output,right)) break;
-	}
 	copybitmap(bitmap, state->m_screen_output, 0, 0, 0, 0, cliprect);
+	state->m_vip_regs.DPSTTS = ((state->m_vip_regs.DPCTRL&0x0302)|0x7c);
+	return 0;
+}
 
+static SCREEN_UPDATE( vboy_right )
+{
+	vboy_state *state = screen->machine().driver_data<vboy_state>();
+	bitmap_fill(state->m_screen_output, cliprect, state->m_vip_regs.BKCOL);
+
+	for(int i=31; i>=0; i--)
+		if (display_world(state, i, state->m_screen_output, 1)) break;
+
+	copybitmap(bitmap, state->m_screen_output, 0, 0, 0, 0, cliprect);
 	state->m_vip_regs.DPSTTS = ((state->m_vip_regs.DPCTRL&0x0302)|0x7c);
 	return 0;
 }
@@ -650,16 +659,12 @@ static TIMER_DEVICE_CALLBACK( video_tick )
 	state->m_vip_regs.XPSTTS = (state->m_vip_regs.XPSTTS==0) ? 0x0c : 0x00;
 }
 
-static const rgb_t vboy_palette[18] = {
-	MAKE_RGB(0x00, 0x00, 0x00), // 0
-	MAKE_RGB(0x00, 0x00, 0x00), // 1
-	MAKE_RGB(0x00, 0x00, 0x00), // 2
-	MAKE_RGB(0x00, 0x00, 0x00)  // 3
-};
-
 static PALETTE_INIT( vboy )
 {
-	palette_set_colors(machine, 0, vboy_palette, ARRAY_LENGTH(vboy_palette));
+	palette_set_color(machine, 0, RGB_BLACK);
+	palette_set_color(machine, 1, RGB_BLACK);
+	palette_set_color(machine, 2, RGB_BLACK);
+	palette_set_color(machine, 3, RGB_BLACK);
 }
 
 static INTERRUPT_GEN( vboy_interrupt )
@@ -698,7 +703,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE(vboy)
+	MCFG_SCREEN_UPDATE(vboy_left)
 
 	/* Right screen */
 	MCFG_SCREEN_ADD("3dright", RASTER)
@@ -707,7 +712,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE(vboy)
+	MCFG_SCREEN_UPDATE(vboy_right)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

@@ -38,6 +38,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(unior)
 {
+	cpu_set_reg(machine.device("maincpu"), I8085_PC, 0xF800);
 }
 
 static VIDEO_START( unior )
@@ -64,7 +65,7 @@ static const gfx_layout unior_charlayout =
 };
 
 static GFXDECODE_START( unior )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, unior_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, unior_charlayout, 0, 1 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( unior, unior_state )
@@ -93,7 +94,8 @@ MACHINE_CONFIG_END
 ROM_START( unior )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "unior.rom", 0xf800, 0x0800, CRC(23a347e8) SHA1(2ef3134e2f4a696c3b52a145fa5a2d4c3487194b))
-	ROM_REGION( 0x0840, "gfx1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x0840, "chargen", ROMREGION_ERASEFF )
 	ROM_LOAD( "unior.fnt",   0x0000, 0x0800, CRC(4f654828) SHA1(8c0ac11ea9679a439587952e4908940b67c4105e))
 	ROM_LOAD( "palette.rom", 0x0800, 0x0040, CRC(b4574ceb) SHA1(f7a82c61ab137de8f6a99b0c5acf3ac79291f26a))
 ROM_END
