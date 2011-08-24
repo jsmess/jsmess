@@ -473,6 +473,37 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
+	<!-- Does not seem to work at the moment -->
+	<software name="msxwritj" supported="no">
+		<!-- 日本語ＭＳＸ－Ｗｒｉｔｅ -->
+		<description>Japanese MSX-Write</description>
+		<year>1986</year>
+		<publisher>Ascii</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="MSX WRITE 900178B" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="524288">
+				<!-- 225 AA 8716 ZOO -->
+				<rom name="225_aa_8716_zoo" size="524288" crc="ef02e4f3" sha1="4180544158a57c99162269e33e4f2c77c9fce84e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nobuzenk">
+		<!-- 信長の野望 全国版 -->
+		<description>Nobunaga no Yabou - Zenkokuban</description>
+		<year>1987</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-621 KAGA" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<feature name="sram" value="LH5164L-15" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532038" size="262144" crc="3aa33a30" sha1="e6de8bbd60123444de2a90928853985ceb0b4cbf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>
