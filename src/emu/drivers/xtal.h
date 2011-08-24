@@ -32,6 +32,10 @@
     tolerance so be sure to reference existing parts only and not just
     accept direct readings as 100% true.
 
+    MAME doesn't yet support fractions in crystal frequencies. For example,
+    XTAL_3_579545MHz should actually be 3579545.454545...Hz (39375000/11).
+    This is no problem though: see above note about tolerance.
+
     (Thanks to Guru for starting this documentation.)
 
 **************************************************************************/
@@ -113,7 +117,7 @@ enum
 	XTAL_13_4952MHz		= 13495200,		/* Used on Shadow Force pcb and maybe other Technos pcbs? */
 	XTAL_14MHz  		= 14000000,
 	XTAL_14_112MHz  	= 14112000,		/* Timex/Sinclair TS2068 */
-	XTAL_14_31818MHz	= 14318180,		/* Extremely common, used on 100's of PCBs */
+	XTAL_14_31818MHz	= 14318181,		/* Extremely common, used on 100's of PCBs */
 	XTAL_14_705882MHz	= 14705882,		/* Aleck64 */
 	XTAL_14_7456MHz 	= 14745600,		/* Namco System 12 & System Super 22/23 for H8/3002 CPU */
 	XTAL_15MHz			= 15000000,		/* Sinclair QL */
@@ -135,8 +139,7 @@ enum
 	XTAL_20_079MHz		= 20790000,		/* Blockade-hardware Gremlin games */
 	XTAL_21MHz  		= 21000000,		/* Lock-On pixel clock */
 	XTAL_21_3MHz		= 21300000,
-	XTAL_21_477MHz		= 21477000,		/* Super Othello */
-	XTAL_21_4772MHz 	= 21477270,		/* BMC bowling, some Data East 90's games, Vtech Socrates; NTSC color subcarrier * 6 */
+	XTAL_21_4772MHz 	= 21477272,		/* BMC bowling, some Data East 90's games, Vtech Socrates; NTSC color subcarrier * 6 */
 	XTAL_22MHz  		= 22000000,
 	XTAL_22_1184MHz		= 22118400,
 	XTAL_23_9616MHz		= 23961600,		/* Osborne 4 (Vixen) */
@@ -149,7 +152,7 @@ enum
 	XTAL_25_590906MHz	= 25590906,		/* Atari Jaguar NTSC */
 	XTAL_25_593900MHz	= 25593900,		/* Atari Jaguar PAL */
 	XTAL_25_601712MHz	= 25601712,		/* Astro Corp.'s Show Hand */
-	XTAL_26_66666MHz	= 26666660,		/* Irem M92 but most use 27MHz */
+	XTAL_26_66666MHz	= 26666666,		/* Irem M92 but most use 27MHz */
 	XTAL_26_686MHz		= 26686000,		/* Typically used on 90's Taito PCBs to drive the custom chips */
 	XTAL_27MHz  		= 27000000,		/* Some Banpresto games macrossp, Irem M92 and 90's Toaplan games */
 	XTAL_27_164MHz  	= 27164000,		/* Typically used on 90's Taito PCBs to drive the custom chips */
@@ -157,7 +160,7 @@ enum
 	XTAL_28MHz  		= 28000000,
 	XTAL_28_37516MHz	= 28375160,		/* Amiga PAL systems */
 	XTAL_28_48MHz		= 28480000,		/* Chromatics CGC-7900 */
-	XTAL_28_63636MHz	= 28636360,		/* Later Leland games and Atari GT, Amiga NTSC , Raiden2 h/w */
+	XTAL_28_63636MHz	= 28636363,		/* Later Leland games and Atari GT, Amiga NTSC , Raiden2 h/w */
 	XTAL_30MHz  		= 30000000,		/* Impera Magic Card */
 	XTAL_30_4761MHz 	= 30476100,		/* Taito JC */
 	XTAL_32MHz  		= 32000000,
@@ -169,7 +172,7 @@ enum
 	XTAL_36MHz  		= 36000000,		/* Sega Model 1 video board */
 	XTAL_38_76922MHz	= 38769220,		/* Namco System 21 video board */
 	XTAL_40MHz  		= 40000000,
-	XTAL_42_9545MHz 	= 42954500,		/* CPS3 */
+	XTAL_42_9545MHz 	= 42954545,		/* CPS3 */
 	XTAL_44_1MHz		= 44100000,		/* Subsino's Bishou Jan */
 	XTAL_45MHz  		= 45000000,		/* Eolith with Hyperstone CPUs */
 	XTAL_45_158MHz  	= 45158000,		/* Sega Model 2A video board, Model 3 CPU board */
@@ -181,7 +184,7 @@ enum
 	XTAL_52MHz  		= 52000000,		/* Cojag */
 	XTAL_53_693175MHz	= 53693175,		/* PSX-based h/w, Sony ZN1-2-based */
 	XTAL_54MHz  		= 54000000,		/* Taito JC */
-	XTAL_57_2727MHz 	= 57272700,		/* Psikyo SH2 with /2 divider */
+	XTAL_57_2727MHz 	= 57272727,		/* Psikyo SH2 with /2 divider */
 	XTAL_60MHz  		= 60000000,
 	XTAL_61_44MHz		= 61440000,		/* dkong */
 	XTAL_64MHz  		= 64000000,		/* BattleToads */
