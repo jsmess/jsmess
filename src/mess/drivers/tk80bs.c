@@ -13,7 +13,7 @@ TK80 (Training Kit 80) considered to be Japan's first home computer.
 It consisted of 25 keys and 8 LED digits, and was programmed in hex.
 
 The later TK80BS (Basic Station) has a plugin keyboard, BASIC in rom,
-and plugged into a tv.
+and connected to a tv.
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
