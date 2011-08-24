@@ -56,6 +56,10 @@ public:
 	UINT16 m_debug_dsp_ram[0x8000];
 
 	UINT8 m_has_dsp_hack;
+
+	double m_speed_meter;
+	UINT16 m_break_meter;
+	UINT32 m_outputs;
 };
 
 

@@ -465,14 +465,23 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/pcshare.o	\
 	$(MAME_MACHINE)/megadriv.o  \
 	$(MAME_MACHINE)/dc.o		\
-	$(MAME_MACHINE)/naomibd.o	\
-	$(MAME_MACHINE)/naomim4decoder.o \
-	$(MAME_MACHINE)/gdcrypt.o	\
-	$(MAME_MACHINE)/mie.o		\
-	$(MAME_MACHINE)/maple-dc.o	\
-	$(MAME_MACHINE)/mapledev.o	\
-	$(MAME_MACHINE)/dc-ctrl.o	\
-	$(MAME_MACHINE)/jvs13551.o	\
+	$(MAME_DRIVERS)/naomi.o 	\
+	$(MAME_MACHINE)/dc.o 		\
+	$(MAME_VIDEO)/dc.o 			\
+	$(MAME_MACHINE)/naomi.o 	\
+	$(MAME_MACHINE)/naomig1.o 	\
+	$(MAME_MACHINE)/naomibd.o 	\
+	$(MAME_MACHINE)/naomirom.o 	\
+	$(MAME_MACHINE)/naomigd.o 	\
+	$(MAME_MACHINE)/naomim1.o 	\
+	$(MAME_MACHINE)/naomim2.o 	\
+	$(MAME_MACHINE)/naomim4.o 	\
+	$(MAME_MACHINE)/awboard.o 	\
+	$(MAME_MACHINE)/mie.o 		\
+	$(MAME_MACHINE)/maple-dc.o 	\
+	$(MAME_MACHINE)/mapledev.o 	\
+	$(MAME_MACHINE)/dc-ctrl.o 	\
+	$(MAME_MACHINE)/jvs13551.o 	\
 	$(MAME_VIDEO)/dc.o			\
 	$(MAME_VIDEO)/neogeo.o		\
 	$(MAME_MACHINE)/neoprot.o	\
