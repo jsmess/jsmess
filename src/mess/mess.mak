@@ -1493,6 +1493,8 @@ $(MESSOBJ)/special.a:			\
 
 $(MESSOBJ)/sun.a:				\
 	$(MESS_DRIVERS)/sun1.o		\
+	$(MESS_DRIVERS)/sun2.o		\
+	$(MESS_DRIVERS)/sun3.o		\
 
 $(MESSOBJ)/svi.a:				\
 	$(MESS_MACHINE)/svi318.o	\
