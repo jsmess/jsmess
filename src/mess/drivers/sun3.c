@@ -225,7 +225,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset();
-	
+
 	UINT16* m_p_ram;
 };
 
@@ -261,18 +261,18 @@ MACHINE_CONFIG_END
 ROM_START( sun3_50 )
     ROM_REGION32_BE( 0x10000, "user1", ROMREGION_ERASEFF )
 /*
-Sun 3/50 V1.2 Bootprom 
-Sun 3/50 V1.4 Bootprom 
-Sun 3/50 V1.6 Bootprom 
-Sun 3/50 V1.8 Bootprom (Req. to load SunOS QIC-24 1/4" tapes) 
-Sun 3/50 V2.0 Bootprom 
-Sun 3/50 V2.1 Bootprom 
-Sun 3/50 V2.3 Bootprom 
-Sun 3/50 V2.5 Bootprom (Req. to load SunOS QIC-24 1/4" tapes from a Sun-2 Shoebox) 
-Sun 3/50 V2.6 Bootprom 
-Sun 3/50 V2.7 Bootprom 
-Sun 3/50 V2.8 Bootprom 
-*/	
+Sun 3/50 V1.2 Bootprom
+Sun 3/50 V1.4 Bootprom
+Sun 3/50 V1.6 Bootprom
+Sun 3/50 V1.8 Bootprom (Req. to load SunOS QIC-24 1/4" tapes)
+Sun 3/50 V2.0 Bootprom
+Sun 3/50 V2.1 Bootprom
+Sun 3/50 V2.3 Bootprom
+Sun 3/50 V2.5 Bootprom (Req. to load SunOS QIC-24 1/4" tapes from a Sun-2 Shoebox)
+Sun 3/50 V2.6 Bootprom
+Sun 3/50 V2.7 Bootprom
+Sun 3/50 V2.8 Bootprom
+*/
 	ROM_SYSTEM_BIOS(0, "rev28", "Rev 2.8")
 	ROMX_LOAD( "sun3_50_v2.8", 0x0000, 0x10000, CRC(1ca6b0e8) SHA1(5773ac1c46399501d29d1758aa342862b03ec472), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "rev27", "Rev 2.7")
@@ -288,13 +288,13 @@ ROM_END
 ROM_START( sun3_60 )
     ROM_REGION32_BE( 0x10000, "user1", ROMREGION_ERASEFF )
 /*
-Sun 3/60 V1.0 Bootprom 
-Sun 3/60 V1.3 Bootprom 
-Sun 3/60 V1.5 Bootprom 
-Sun 3/60 V1.6 Bootprom (Req. to load SunOS QIC-24 1/4" tapes 
-Sun 3/60 V1.9 Bootprom 
-Sun 3/60 V2.8.3 Bootprom 
-Sun 3/60 V3.0.1 Bootprom 
+Sun 3/60 V1.0 Bootprom
+Sun 3/60 V1.3 Bootprom
+Sun 3/60 V1.5 Bootprom
+Sun 3/60 V1.6 Bootprom (Req. to load SunOS QIC-24 1/4" tapes
+Sun 3/60 V1.9 Bootprom
+Sun 3/60 V2.8.3 Bootprom
+Sun 3/60 V3.0.1 Bootprom
 */
 	ROM_SYSTEM_BIOS(0, "rev301", "Rev 3.0.1")
 	ROMX_LOAD( "sun_3.60v3.0.1", 0x0000, 0x10000, CRC(e55dc1d8) SHA1(6e48414ce2139282e69f57612b20f7d5c475e74c), ROM_BIOS(1))
@@ -307,14 +307,14 @@ ROM_END
 ROM_START( sun3_110 )
     ROM_REGION32_BE( 0x10000, "user1", ROMREGION_ERASEFF )
 /*
-Sun 3/110 V1.8 Bootprom 
-Sun 3/110 V2.1 Bootprom 
-Sun 3/110 V2.3 Bootprom 
-Sun 3/110 V2.6 Bootprom 
-Sun 3/110 V2.7 Bootprom 
-Sun 3/110 V2.8 Bootprom 
-Sun 3/110 V3.0 Bootprom 
-*/	
+Sun 3/110 V1.8 Bootprom
+Sun 3/110 V2.1 Bootprom
+Sun 3/110 V2.3 Bootprom
+Sun 3/110 V2.6 Bootprom
+Sun 3/110 V2.7 Bootprom
+Sun 3/110 V2.8 Bootprom
+Sun 3/110 V3.0 Bootprom
+*/
 	ROM_SYSTEM_BIOS(0, "rev30", "Rev 3.0")
 	ROMX_LOAD( "sun3_110_v3.0", 0x0000, 0x10000, CRC(a193b26b) SHA1(0f54212ee3a5709f70e921069cca1ddb8c143b1b), ROM_BIOS(1))
 ROM_END
@@ -322,19 +322,19 @@ ROM_END
 ROM_START( sun3_150 )
 	ROM_REGION32_BE( 0x10000, "user1", ROMREGION_ERASEFF )
 /*
-Sun 3/1[4,5,6,8]0 V1.3 Bootprom 
-Sun 3/1[4,5,6,8]0 V1.4 Bootprom 
-Sun 3/1[4,5,6,8]0 V1.5 Bootprom 
-Sun 3/1[4,5,6,8]0 V1.8 Bootprom (Req. to load SunOS QIC-24 1/4" tapes) 
-Sun 3/1[4,5,6,8]0 V2.1 Bootprom 
-Sun 3/1[4,5,6,8]0 V2.1 Bootprom with Capricot Rimfire 3200/3400 support (b rf(0,0,0) works) 
-Sun 3/1[4,5,6,8]0 V2.3 Bootprom 
-Sun 3/1[4,5,6,8]0 V2.6 Bootprom (Req. to load SunOS QIC-24 1/4" tapes from a Sun-2 Shoebox and for Xylogics 7053) 
-Sun 3/1[4,5,6,8]0 V2.7 Bootprom 
-Sun 3/1[4,5,6,8]0 V2.8 Bootprom 
-Sun 3/1[4,5,6,8]0 V2.8.4 Bootprom 
-Sun 3/1[4,5,6,8]0 V3.0 Bootprom 
-*/	
+Sun 3/1[4,5,6,8]0 V1.3 Bootprom
+Sun 3/1[4,5,6,8]0 V1.4 Bootprom
+Sun 3/1[4,5,6,8]0 V1.5 Bootprom
+Sun 3/1[4,5,6,8]0 V1.8 Bootprom (Req. to load SunOS QIC-24 1/4" tapes)
+Sun 3/1[4,5,6,8]0 V2.1 Bootprom
+Sun 3/1[4,5,6,8]0 V2.1 Bootprom with Capricot Rimfire 3200/3400 support (b rf(0,0,0) works)
+Sun 3/1[4,5,6,8]0 V2.3 Bootprom
+Sun 3/1[4,5,6,8]0 V2.6 Bootprom (Req. to load SunOS QIC-24 1/4" tapes from a Sun-2 Shoebox and for Xylogics 7053)
+Sun 3/1[4,5,6,8]0 V2.7 Bootprom
+Sun 3/1[4,5,6,8]0 V2.8 Bootprom
+Sun 3/1[4,5,6,8]0 V2.8.4 Bootprom
+Sun 3/1[4,5,6,8]0 V3.0 Bootprom
+*/
 	ROM_SYSTEM_BIOS(0, "rev30", "Rev 3.0")
 	ROMX_LOAD( "sun3_160_v3.0",   0x0000, 0x10000, CRC(fee6e4d6) SHA1(440d532e1848298dba0f043de710bb0b001fb675), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "rev284", "Rev 2.8.4")
@@ -350,15 +350,15 @@ ROM_END
 ROM_START( sun3_260 )
     ROM_REGION32_BE( 0x10000, "user1", ROMREGION_ERASEFF )
 /*
-Sun 3/260/280 V1.8 Bootprom 
-Sun 3/260/280 V2.1 Bootprom ( 2x^G cause system to beep 'till reset) 
-Sun 3/260/280 V2.3 Bootprom 
-Sun 3/260/280 V2.6 Bootprom (Req. for Xylogics 7053) 
-Sun 3/260/280 V2.7 Bootprom 
-Sun 3/260/280 V2.8 Bootprom 
-Sun 3/260/280 V2.8.4 Bootprom 
-Sun 3/260/280 V3.0 Bootprom 
-*/	
+Sun 3/260/280 V1.8 Bootprom
+Sun 3/260/280 V2.1 Bootprom ( 2x^G cause system to beep 'till reset)
+Sun 3/260/280 V2.3 Bootprom
+Sun 3/260/280 V2.6 Bootprom (Req. for Xylogics 7053)
+Sun 3/260/280 V2.7 Bootprom
+Sun 3/260/280 V2.8 Bootprom
+Sun 3/260/280 V2.8.4 Bootprom
+Sun 3/260/280 V3.0 Bootprom
+*/
 	ROM_SYSTEM_BIOS(0, "rev30", "Rev 3.0")
 	ROMX_LOAD( "sun3_260_v3.0", 0x0000, 0x10000, CRC(f43ed1d3) SHA1(204880436bd087ede136f853610403d75e60bd75), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "rev27", "Rev 2.7")
@@ -376,13 +376,13 @@ ROM_END
 ROM_START( sun3_80 )
     ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )
 /*
-Sun 3/80 V1.0 Bootprom 
-Sun 3/80 V2.2 Bootprom 
-Sun 3/80 V2.3 Bootprom 
-Sun 3/80 V2.9.2 Bootprom 
-Sun 3/80 V3.0 Bootprom 
-Sun 3/80 V3.0.2 Bootprom 
-Sun 3/80 V3.0.3 Bootprom 
+Sun 3/80 V1.0 Bootprom
+Sun 3/80 V2.2 Bootprom
+Sun 3/80 V2.3 Bootprom
+Sun 3/80 V2.9.2 Bootprom
+Sun 3/80 V3.0 Bootprom
+Sun 3/80 V3.0.2 Bootprom
+Sun 3/80 V3.0.3 Bootprom
 */
   ROM_SYSTEM_BIOS(0, "rev303", "Rev 3.0.3")
   ROMX_LOAD( "sun3_80_v3.0.3", 0x0000, 0x20000, CRC(8f983115) SHA1(e4be2dcbb29fc5c60ed9d838ab241c634fdd24e5), ROM_BIOS(1))
@@ -397,12 +397,12 @@ ROM_END
 ROM_START( sun3_460 )
     ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )
 /*
-Sun 3/460/480 V1.2.3 Bootprom 
-Sun 3/460/480 V2.9.1 Bootprom (2 Files, one for odd and one for even addresses) 
-Sun 3/460/480 V2.9.2 Bootprom 
-Sun 3/460/480 V2.9.3 Bootprom 
-Sun 3/460/480 V3.0 Bootprom (2 Files, one for odd and one for even addresses) 
-*/	
+Sun 3/460/480 V1.2.3 Bootprom
+Sun 3/460/480 V2.9.1 Bootprom (2 Files, one for odd and one for even addresses)
+Sun 3/460/480 V2.9.2 Bootprom
+Sun 3/460/480 V2.9.3 Bootprom
+Sun 3/460/480 V3.0 Bootprom (2 Files, one for odd and one for even addresses)
+*/
 	ROM_SYSTEM_BIOS(0, "rev291", "Rev 2.9.1")
 	ROMX_LOAD( "sun3_460_v2.9.1_0", 0x00000, 0x10000, CRC(d62dbf09) SHA1(4a6b5fd7840b44fe93c9058a8973d8dd3c9f7d24), ROM_BIOS(1))
 	ROMX_LOAD( "sun3_460_v2.9.1_1", 0x10000, 0x10000, CRC(3b5a5942) SHA1(ed6250e3c07d7cb62d4dd517a8637c8d37e16dc5), ROM_BIOS(1))
