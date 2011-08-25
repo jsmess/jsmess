@@ -22,7 +22,7 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |           (QFP208)   E23-30.40             E23-34.72      93C46.87              |
 |E23-26.4                                                                         |
 |                              MC68040RC25            CXD1178Q    TCO640FIO       |
-|424260     TMS320C31          (PGA TYPE)                         (QFP120)        |
+|424260     TMS320C51          (PGA TYPE)                         (QFP120)        |
 |           (QFP132)                                                              |
 |           labelled                                              TEST_SW         |
 |424260     "Taito E07-11"                                      MB3771   RESET_SW |
@@ -108,21 +108,21 @@ SIDE BY SIDE  / 2       JC-SYSTEM TYPE-C
  ROMKIT : E38-01 to 21 , 23* to 26*
 
 --------------------------------------------------------------------------
-DENSYA DE GO (E35)     JC-SYSTEM TYPE-C with TRAIN BOARD (Ext.Sound)
+DENSHA DE GO! (E35)     JC-SYSTEM TYPE-C with TRAIN BOARD (Ext.Sound)
 --------------------------------------------------------------------------
- DENSYA DE GO VER 2.2J 1997/2/4
+ DENSHA DE GO! VER 2.2J 1997/2/4
  E35-01 to 26 + E35-28(TRAIN BOARD) + E17-23(BIOS?)
 
- DENSYA DE GO EX VER 2.4J 1997/4/18 13:38:34
+ DENSHA DE GO! EX VER 2.4J 1997/4/18 13:38:34
  ROMKIT : E35-30 to 33
 
 --------------------------------------------------------------------------
-DENSYA DE GO 2 (E52)   JC-SYSTEM TYPE-C with TRAIN BOARD (Ext.Sound)
+DENSHA DE GO! 2 (E52)   JC-SYSTEM TYPE-C with TRAIN BOARD (Ext.Sound)
 --------------------------------------------------------------------------
- DENSYA DE GO 2 (KOUSOKUHEN RYOUSANSYA) VER 2.5 J 1998/3/2 15:30:55
+ DENSHA DE GO! 2 (KOUSOKUHEN RYOUSANSYA) VER 2.5 J 1998/3/2 15:30:55
  E52-01 to 24 , 25-1 to 28-1, 29, 30 + E35-28(TRAIN BOARD) + E17-23(BIOS?)
 
- DENSYA DE GO! 2 EX (3000BANDAI KOUSOKUHEN) VER 2.20 J 1998/7/15 17:42:38
+ DENSHA DE GO! 2 (3000BANDAI KOUSOKUHEN) VER 2.20 J 1998/7/15 17:42:38
  ROMKIT :  E52-31 to 38
 
 ----
@@ -158,7 +158,7 @@ Top board: MOTHER PCB  K11X0835A  M43E0304A
 |TC514260 (QFP208)   uPD424210             E07-08.65              (QFP120)        |
 |E07-02.4                                                                         |
 |                                                                                 |
-|TMS320C31  43256                                                                 |
+|TMS320C51  43256                                                                 |
 |(QFP132)   43256              MC68040RC25          E07-10.116  93C46.91          |
 |labelled          TCO770CMU   (PGA TYPE)                    E07-04.115  TEST_SW  |
 |"Taito E07-11"    (QFP208)                         E07-09.82      MB3771         |
@@ -252,7 +252,7 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |           (QFP208)   E23-30.40             E23-34.72      93C46.87              |
 |E23-26.4                                                                         |
 |                              MC68040RC25            CXD1178Q    TCO640FIO       |
-|424260     TMS320C31          (PGA TYPE)                         (QFP120)        |
+|424260     TMS320C51          (PGA TYPE)                         (QFP120)        |
 |           (QFP132)                                                              |
 |           labelled                                              TEST_SW         |
 |424260     "Taito E07-11"                                      MB3771   RESET_SW |
@@ -339,17 +339,17 @@ Notes:
 
 
     TODO:
-        - dendeg intro object RAM usage has various gfx bugs (check video file)
-        - dendeg title screen builds up and it shouldn't
-  		- dendeg/dendeg2 doesn't show the odometer (btanb, thanks ANY);
+        - dendego intro object RAM usage has various gfx bugs (check video file)
+        - dendego title screen builds up and it shouldn't
+        - dendego/dendego2 doesn't show the odometer (btanb, thanks ANY);
         - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
         - landgear has huge 3d problems on gameplay (CPU comms?)
-		- dendeg2 shows a debug string during gameplay?
+        - dendego2 shows a debug string during gameplay?
         - Train board (external sound board with OKI6295) is not emulated.
         - dangcurv DSP program crashes very soon, so no 3d is currently shown.
         - add idle skips if possible
-		- dendeg and clones needs output lamps and an artwork for the inputs (helps with the playability);
-		- POST has a PCB ID (shown at top of screen) that can't be faked without a proper reference.
+        - dendego and clones needs output lamps and an artwork for the inputs (helps with the playability);
+        - POST has a PCB ID (shown at top of screen) that can't be faked without a proper reference.
 */
 
 #include "emu.h"
@@ -777,15 +777,15 @@ static WRITE32_HANDLER(dsp_shared_w)
 		if ((data & 0x80000) == 0)
 		{
 			/*
-			All games minus Dangerous Curves tests if the DSP is alive with this code snippet:
+            All games minus Dangerous Curves tests if the DSP is alive with this code snippet:
 
-			0008C370: 4A79 1000 1FC0                                      tst.w   $10001fc0.l
-			0008C376: 33FC 0000 0660 0000                                 move.w  #$0, $6600000.l
-			0008C37E: 66F0                                                bne     $8c370
+            0008C370: 4A79 1000 1FC0                                      tst.w   $10001fc0.l
+            0008C376: 33FC 0000 0660 0000                                 move.w  #$0, $6600000.l
+            0008C37E: 66F0                                                bne     $8c370
 
-			Problem is: that move.w in the middle makes the SR to always return a zero flag result,
-			hence it never branches like it should. CPU bug?
-			*/
+            Problem is: that move.w in the middle makes the SR to always return a zero flag result,
+            hence it never branches like it should. CPU bug?
+            */
 			if (!state->m_first_dsp_reset || !state->m_has_dsp_hack)
 			{
 				cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_RESET, CLEAR_LINE);
@@ -830,38 +830,18 @@ static WRITE32_HANDLER(f3_share_w)
 static WRITE32_HANDLER(jc_meters_w)
 {
 	taitojc_state *state = space->machine().driver_data<taitojc_state>();
-	static const double odometer_table[0x100] =
-	{
-		0.0,   0.3,   0.7,   1.0,   1.4,   1.7,   2.1,   2.4,   2.8,   3.1,   3.4,   3.8,   4.1,   4.5,   4.8,   5.2,
-		5.5,   5.9,   6.2,   6.6,   6.9,   7.2,   7.6,   7.9,   8.3,   8.6,   9.0,   9.3,   9.7,  10.0,  10.5,  11.1,
-		11.6,  12.1,  12.6,  13.2,  13.7,  14.2,  14.7,  15.3,  15.8,  16.3,  16.8,  17.4,  17.9,  18.4,  18.9,  19.5,
-		20.0,  20.6,  21.1,  21.7,  22.2,  22.8,  23.3,  23.9,  24.4,  25.0,  25.6,  26.1,  26.7,  27.2,  27.8,  28.3,
-		28.9,  29.4,  30.0,  30.6,  31.1,  31.7,  32.2,  32.8,  33.3,  33.9,  34.4,  35.0,  35.6,  36.1,  36.7,  37.2,
-		37.8,  38.3,  38.9,  39.4,  40.0,  40.6,  41.2,  41.8,  42.4,  42.9,  43.5,  44.1,  44.7,  45.3,  45.9,  46.5,
-		47.1,  47.6,  48.2,  48.8,  49.4,  50.0,  50.5,  51.1,  51.6,  52.1,  52.6,  53.2,  53.7,  54.2,  54.7,  55.3,
-		55.8,  56.3,  56.8,  57.4,  57.9,  58.4,  58.9,  59.5,  60.0,  60.7,  61.3,  62.0,  62.7,  63.3,  64.0,  64.7,
-		65.3,  66.0,  66.7,  67.3,  68.0,  68.7,  69.3,  70.0,  70.5,  71.1,  71.6,  72.1,  72.6,  73.2,  73.7,  74.2,
-		74.7,  75.3,  75.8,  76.3,  76.8,  77.4,  77.9,  78.4,  78.9,  79.5,  80.0,  80.6,  81.2,  81.8,  82.4,  82.9,
-		83.5,  84.1,  84.7,  85.3,  85.9,  86.5,  87.1,  87.6,  88.2,  88.8,  89.4,  90.0,  90.6,  91.1,  91.7,  92.2,
-		92.8,  93.3,  93.9,  94.4,  95.0,  95.6,  96.1,  96.7,  97.2,  97.8,  98.3,  98.9,  99.4, 100.0, 100.5, 101.1,
-		101.6, 102.1, 102.6, 103.2, 103.7, 104.2, 104.7, 105.3, 105.8, 106.3, 106.8, 107.4, 107.9, 108.4, 108.9, 109.5,
-		110.0, 110.7, 111.3, 112.0, 112.7, 113.3, 114.0, 114.7, 115.3, 116.0, 116.7, 117.3, 118.0, 118.7, 119.3, 120.0,
-		120.3, 120.6, 120.9, 121.2, 121.6, 121.9, 122.2, 122.5, 122.8, 123.1, 123.4, 123.8, 124.1, 124.4, 124.7, 125.0,
-		125.3, 125.6, 125.9, 126.2, 126.6, 126.9, 127.2, 127.5, 127.8, 128.1, 128.4, 128.8, 129.1, 129.4, 129.7, 130.0,
-	};
-
 
 	// printf("jc_output_w: %08x, %08x %08x\n", offset, data,mem_mask);
 	if(offset == 0 && ACCESSING_BITS_16_31)
-		state->m_speed_meter = odometer_table[(data >> 16) & 0xff];
+		state->m_speed_meter = taitojc_odometer_table[(data >> 16) & 0xff];
 	else if(offset == 1 && ACCESSING_BITS_16_31)
-		state->m_break_meter = data >> 16; //TODO
+		state->m_brake_meter = taitojc_brake_table[(data >> 16) & 0xff];
 
 	if(input_port_read_safe(space->machine(), "METER", 0))
 	{
 		UINT8 mascon_lv = (input_port_read(space->machine(), "MASCON") & 0x70) >> 4;
 
-		popmessage("%d %02f",mascon_lv,state->m_speed_meter);
+		popmessage("%d %.02f km/h %.02f MPa",mascon_lv,state->m_speed_meter,state->m_brake_meter/10);
 	}
 }
 
@@ -886,7 +866,7 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x06600000, 0x06600003) AM_WRITE(jc_control1_w) // watchdog
 	AM_RANGE(0x06600010, 0x06600013) AM_WRITE(jc_coin_counters_w)
 	AM_RANGE(0x06600040, 0x0660004f) AM_WRITE(jc_control_w)
-	//AM_RANGE(0x06800000, 0x06801fff) AM_NOP		// unknown
+	//AM_RANGE(0x06800000, 0x06801fff) AM_NOP       // unknown
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(f3_share_r, f3_share_w) AM_SHARE("f3_shared") AM_BASE_MEMBER(taitojc_state,m_f3_shared_ram)
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ(jc_lan_r) AM_WRITENOP // Dangerous Curves
 	AM_RANGE(0x06e00000, 0x06e00007) AM_WRITE(jc_meters_w)
@@ -1141,6 +1121,7 @@ static WRITE16_HANDLER( dsp_to_main_w )
 }
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16 )
+//  AM_RANGE(0x0000, 0x1fff) AM_READ(dsp_internal_rom_r) // TODO: Dangerous Curves tries to access 0x207?
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1206,7 +1187,7 @@ static INPUT_PORTS_START( taitojc )
 INPUT_PORTS_END
 #endif
 
-/* Mascon must always be in a defined state, Densya de Go 2 in particular returns black screen if the Mascon input is undefined
+/* Mascon must always be in a defined state, Densha de Go 2 in particular returns black screen if the Mascon input is undefined
    We convert the 6 lever "shifter" into a fake analog port for now. */
 static CUSTOM_INPUT( mascon_state_r )
 {
@@ -1225,7 +1206,7 @@ static CUSTOM_INPUT( mascon_state_r )
 	return mascon_table[5];
 }
 
-static INPUT_PORTS_START( dendeg )
+static INPUT_PORTS_START( dendego )
 	PORT_START("COINS")
 	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1251,12 +1232,12 @@ static INPUT_PORTS_START( dendeg )
 	/* TODO: fix this */
 	PORT_BIT( 0x88, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x77, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(mascon_state_r,NULL)
-//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Mascon 5")		// Mascon 5
-//	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Mascon 3")		// Mascon 3
-//	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mascon 1")		// Mascon 1
-//	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Mascon 4")		// Mascon 4
-//	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mascon 2")		// Mascon 2
-//	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mascon 0")		// Mascon 0
+//  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Mascon 5")      // Mascon 5
+//  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Mascon 3")      // Mascon 3
+//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mascon 1")      // Mascon 1
+//  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Mascon 4")      // Mascon 4
+//  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mascon 2")      // Mascon 2
+//  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mascon 0")      // Mascon 0
 
 	PORT_START("MASCON")
 	PORT_BIT( 0x7f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(0x60) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
@@ -1430,7 +1411,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_CPU_ADD("maincpu", M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(taitojc_map)
 	MCFG_CPU_VBLANK_INT("screen", taitojc_vblank)
-//	MCFG_CPU_PERIODIC_INT(taitojc_int6, 1000)
+//  MCFG_CPU_PERIODIC_INT(taitojc_int6, 1000)
 
 	MCFG_CPU_ADD("sub", MC68HC11, 4000000) //MC68HC11M0
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
@@ -1462,7 +1443,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_FRAGMENT_ADD(taito_f3_sound)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dendeg, taitojc )
+static MACHINE_CONFIG_DERIVED( dendego, taitojc )
 	MCFG_OKIM6295_ADD("oki", 32000000/32, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
@@ -1478,7 +1459,7 @@ static READ16_HANDLER( taitojc_dsp_idle_skip_r )
 	return state->m_dsp_shared_ram[0x7f0];
 }
 
-static READ16_HANDLER( dendeg2_dsp_idle_skip_r )
+static READ16_HANDLER( dendego2_dsp_idle_skip_r )
 {
 	taitojc_state *state = space->machine().driver_data<taitojc_state>();
 
@@ -1506,11 +1487,11 @@ static DRIVER_INIT( taitojc )
 	machine.device("dsp")->memory().space(AS_DATA)->install_legacy_readwrite_handler(0x7ff0, 0x7ff0, FUNC(taitojc_dsp_idle_skip_r), FUNC(dsp_idle_skip_w));
 }
 
-static DRIVER_INIT( dendeg2 )
+static DRIVER_INIT( dendego2 )
 {
 	DRIVER_INIT_CALL( taitojc );
 
-	machine.device("dsp")->memory().space(AS_DATA)->install_legacy_readwrite_handler(0x7ff0, 0x7ff0, FUNC(dendeg2_dsp_idle_skip_r), FUNC(dsp_idle_skip_w));
+	machine.device("dsp")->memory().space(AS_DATA)->install_legacy_readwrite_handler(0x7ff0, 0x7ff0, FUNC(dendego2_dsp_idle_skip_r), FUNC(dsp_idle_skip_w));
 }
 
 
@@ -1697,7 +1678,7 @@ ROM_START( sidebs2j )
     */
 ROM_END
 
-ROM_START( dendeg )
+ROM_START( dendego )
 	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
 	ROM_LOAD32_BYTE( "e35-21.036", 0x000000, 0x80000, CRC(bc70ca97) SHA1(724a24da9d6f163c26e7528ee2c15bd06f2c4382) )
 	ROM_LOAD32_BYTE( "e35-22.037", 0x000001, 0x80000, CRC(83b17de8) SHA1(538ddc16727e08e9a2a8ff6b4f030dc044993aa0) )
@@ -1744,7 +1725,7 @@ ROM_START( dendeg )
 	ROM_LOAD16_BYTE( "e35-20.035",  0xc00000, 0x200000, CRC(a1d4b30d) SHA1(e02f613b93d3b3ee1eb23f5b7f62c5448ed3966d) )
 ROM_END
 
-ROM_START( dendegx )
+ROM_START( dendegox )
 	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
 	ROM_LOAD32_BYTE( "e35-30.036", 0x000000, 0x80000, CRC(57ee0975) SHA1(c7741a7e0e9c1fdebc6b942587d7ac5a6f26f66d) )//ex
 	ROM_LOAD32_BYTE( "e35-31.037", 0x000001, 0x80000, CRC(bd5f2651) SHA1(73b760df351170ace019e4b61c82d8c6296a3632) )//ex
@@ -1791,7 +1772,7 @@ ROM_START( dendegx )
 	ROM_LOAD16_BYTE( "e35-20.035",  0xc00000, 0x200000, CRC(a1d4b30d) SHA1(e02f613b93d3b3ee1eb23f5b7f62c5448ed3966d) )
 ROM_END
 
-ROM_START( dendeg2 )
+ROM_START( dendego2 )
 	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
 	ROM_LOAD32_BYTE( "e52-25-1.036", 0x000000, 0x80000, CRC(fadf5b4c) SHA1(48f3e1425bb9552d472a2720e1c9a752db2b43ed) )
 	ROM_LOAD32_BYTE( "e52-26-1.037", 0x000001, 0x80000, CRC(7cf5230d) SHA1(b3416886d7cfc88520f6bf378529086bf0095db5) )
@@ -1838,11 +1819,11 @@ ROM_START( dendeg2 )
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e52-21.032",  0x000000, 0x200000, CRC(ba58081d) SHA1(bcb6c8781191d48f906ed404a3e7388097a64781) )
 	ROM_LOAD16_BYTE( "e52-22.033",  0x400000, 0x200000, CRC(dda281b1) SHA1(4851a6bf7902548c5033090a0e5c15f74c00ef58) )
-	ROM_LOAD16_BYTE( "e52-23.034",  0x800000, 0x200000, CRC(ebe2dcef) SHA1(16ae41e0f3bb242cbc2922f53cacbd99961a3f97) ) // same as e35-19.034 from dendeg
+	ROM_LOAD16_BYTE( "e52-23.034",  0x800000, 0x200000, CRC(ebe2dcef) SHA1(16ae41e0f3bb242cbc2922f53cacbd99961a3f97) ) // same as e35-19.034 from dendego
 	ROM_LOAD16_BYTE( "e52-24.035",  0xc00000, 0x200000, CRC(a9a678da) SHA1(b980ae644ef0312acd63b017028af9bf2b084c29) )
 ROM_END
 
-ROM_START( dendeg2x )
+ROM_START( dendego23k )
 	ROM_REGION(0x200000, "maincpu", 0)		/* 68040 code */
 	ROM_LOAD32_BYTE( "e52-35.036", 0x000000, 0x80000, CRC(d5b33eb8) SHA1(e05ad73986741827b7bbeac72af0a8324384bf6b) ) //2ex
 	ROM_LOAD32_BYTE( "e52-36.037", 0x000001, 0x80000, CRC(f3f3fabd) SHA1(4f88080091af2208d671c491284d992b5036908c) ) //2ex
@@ -1889,7 +1870,7 @@ ROM_START( dendeg2x )
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
 	ROM_LOAD16_BYTE( "e52-21.032",  0x000000, 0x200000, CRC(ba58081d) SHA1(bcb6c8781191d48f906ed404a3e7388097a64781) )
 	ROM_LOAD16_BYTE( "e52-22.033",  0x400000, 0x200000, CRC(dda281b1) SHA1(4851a6bf7902548c5033090a0e5c15f74c00ef58) )
-	ROM_LOAD16_BYTE( "e52-23.034",  0x800000, 0x200000, CRC(ebe2dcef) SHA1(16ae41e0f3bb242cbc2922f53cacbd99961a3f97) ) // same as e35-19.034 from dendeg
+	ROM_LOAD16_BYTE( "e52-23.034",  0x800000, 0x200000, CRC(ebe2dcef) SHA1(16ae41e0f3bb242cbc2922f53cacbd99961a3f97) ) // same as e35-19.034 from dendego
 	ROM_LOAD16_BYTE( "e52-24.035",  0xc00000, 0x200000, CRC(a9a678da) SHA1(b980ae644ef0312acd63b017028af9bf2b084c29) )
 ROM_END
 
@@ -1965,6 +1946,9 @@ ROM_START( dangcurv )
 	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
 	ROM_FILL( 0x0000, 0x0080, 0 )
 
+	ROM_REGION( 0x2000, "dsprom", ROMREGION_ERASE00 ) /* this almost likely uses an internal ROM :/ */
+	ROM_LOAD( "tms320lc51", 0x0000, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e09-05.009",  0x0800002, 0x200000, CRC(a948782f) SHA1(2a2b0d2955e036ddf424c54131435a20dbba3dd4) )
 	ROM_LOAD32_WORD( "e09-13.022",  0x0800000, 0x200000, CRC(985859e2) SHA1(8af9a73eba2151a5ef60799682fe667663a42743) )
@@ -1993,12 +1977,12 @@ ROM_START( dangcurv )
 ROM_END
 
 
-GAME( 1996, dendeg,   0,       dendeg, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, dendegx,  dendeg,  dendeg, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go Ex (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, dendeg2,  0,       dendeg, dendeg,   dendeg2,  ROT0, "Taito", "Densya De Go 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, dendeg2x, dendeg2, dendeg, dendeg,   dendeg2,  ROT0, "Taito", "Densya De Go 2 Ex (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, sidebs,   0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sidebs2,  0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2 (North/South America)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sidebs2j, sidebs2, taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, landgear, 0,       taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, dangcurv, 0,       taitojc, dangcurv, dangcurv, ROT0, "Taito", "Dangerous Curves", GAME_NOT_WORKING )
+GAME( 1996, dendego,   0,       dendego, dendego,  taitojc,  ROT0, "Taito", "Densha de GO!", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, dendegox,  dendego, dendego, dendego,  taitojc,  ROT0, "Taito", "Densha de GO! EX", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, dendego2,  0,       dendego, dendego,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, dendego23k,dendego2,dendego, dendego,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, sidebs,    0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sidebs2,   0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side 2 (North/South America)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sidebs2j,  sidebs2, taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side by Side 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, landgear,  0,       taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, dangcurv,  0,       taitojc, dangcurv, dangcurv, ROT0, "Taito", "Dangerous Curves", GAME_NOT_WORKING )
