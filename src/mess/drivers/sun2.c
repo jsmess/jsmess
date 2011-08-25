@@ -64,7 +64,7 @@
                         the CPU board. No information on the differences
                         between the 2/130 and the 2/160.
 
-			
+
         25/08/2009 Skeleton driver.
 
 ****************************************************************************/
@@ -85,7 +85,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset();
-	
+
 	UINT16* m_p_ram;
 };
 
@@ -127,7 +127,7 @@ ROM_START( sun2_50)
 	ROM_LOAD16_BYTE( "250_q_8.rom", 0x0001, 0x4000, CRC(5bfacb5c) SHA1(ec7fb3fb0217b0138ba4748b7c79b8ff0cad896b))
 	ROM_LOAD16_BYTE( "250_q_0.rom", 0x0000, 0x4000, CRC(2ee29abe) SHA1(82f52b9f25e92387329581f7c8ba50a171784968))
 ROM_END
-  
+
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY         FULLNAME       FLAGS */

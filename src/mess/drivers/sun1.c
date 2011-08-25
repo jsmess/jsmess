@@ -36,7 +36,7 @@
         Notes:          Server. Slightly different chassis design than
                         2/170's
 
-		
+
         Documentation:
             http://www.bitsavers.org/pdf/sun/sun1/800-0345_Sun-1_System_Ref_Man_Jul82.pdf
             (page 39,40 of pdf contain memory map)
