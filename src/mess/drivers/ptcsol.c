@@ -79,6 +79,26 @@
       - The remaining formats (OPN, PL, PRN, SMU, SOL, ASM and LIB) appear
         at first glance to be more specialised, and probably not worth being
         supported.
+
+    System Setup (to play games etc).
+      - In the Dipswitches (not the Configuration), turn cursor flashing OFF.
+      - Loading via wav files works, so load a tape image in the file manager
+      - In UPPER CASE, enter XE press enter, cassette will load.
+      - At the end, the program will start by itself.
+      - When it says use 2,4,6,8 keys, you can use the keyboard arrow keys.
+
+    Monitor Commands:
+      - TE - ?
+      - DU - dump memory
+      - EN - modify memory
+      - EX - Go (execute)
+      - CU - ?
+      - SE - Set parameters (eg tape speed)
+      - SA - Save
+      - GE - Load
+      - XE - Load and run
+      - CA - List the files on a tape
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -294,7 +314,10 @@ READ8_MEMBER( sol20_state::sol20_fa_r )
 	data |= ay31015_get_output_pin( m_uart, AY31015_FE   ) ? 0x08 : 0;
 	ay31015_set_input_pin( m_uart, AY31015_SWE, 1 );
 
-	return data | (m_sol20_fa & 1);
+	bool arrowkey = input_port_read(machine(), "ARROWS") ? 0 : 1;
+	bool keydown = m_sol20_fa & 1;
+
+	return data | (arrowkey & keydown);
 }
 
 READ8_MEMBER( sol20_state::sol20_fb_r)
@@ -307,6 +330,12 @@ READ8_MEMBER( sol20_state::sol20_fb_r)
 
 READ8_MEMBER( sol20_state::sol20_fc_r )
 {
+	UINT8 data = input_port_read(machine(), "ARROWS");
+	if (BIT(data, 0)) return 0x32;
+	if (BIT(data, 1)) return 0x34;
+	if (BIT(data, 2)) return 0x36;
+	if (BIT(data, 3)) return 0x38;
+
 	m_sol20_fa |= 1;
 	return m_sol20_fc;
 }
@@ -397,6 +426,13 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( sol20 )
+	PORT_START("ARROWS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
+
 	PORT_START("S1")
 	PORT_DIPNAME( 0x04, 0x00, "Ctrl Chars")
 	PORT_DIPSETTING(    0x04, DEF_STR(Off))
@@ -462,7 +498,6 @@ static INPUT_PORTS_START( sol20 )
 	PORT_DIPNAME( 0x20, 0x00, "Duplex")
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x20, "Full")
-
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x01, 0x01, "High Baud Rate") // jumper on the board
@@ -717,5 +752,5 @@ ROM_START( sol20 )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT   COMPANY     FULLNAME   FLAGS */
-COMP( 1976, sol20,  0,      0,      sol20,   sol20, sol20, "Processor Technology Corporation",  "SOL-20", 0 )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT               COMPANY                 FULLNAME  FLAGS */
+COMP( 1976, sol20,  0,      0,      sol20,   sol20, sol20, "Processor Technology Corporation", "SOL-20", 0 )
