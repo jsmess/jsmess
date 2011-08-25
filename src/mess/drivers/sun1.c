@@ -1,7 +1,42 @@
 /***************************************************************************
 
-        Sun-1
+        Sun-1 Models
+        ------------
 
+    Sun-1
+
+        Processor(s):   68000
+        Notes:          Large black desktop boxes with 17" monitors.
+                        Uses the original Stanford-designed video board
+                        and a parallel microswitch keyboard (type 1) and
+                        parallel mouse (Sun-1).
+
+    100
+        Processor(s):   68000 @ 10MHz
+        Bus:            Multibus, serial
+        Notes:          Uses a design similar to original SUN (Stanford
+                        University Network) CPU. The version 1.5 CPU can
+                        take larger RAMs.
+
+    100U
+        Processor(s):   68010 @ 10MHz
+        CPU:            501-1007
+        Bus:            Multibus, serial
+        Notes:          "Brain transplant" for 100 series. Replaced CPU
+                        and memory boards with first-generation Sun-2
+                        CPU and memory boards so original customers
+                        could run SunOS 1.x. Still has parallel kb/mouse
+                        interface so type 1 keyboards and Sun-1 mice
+                        could be connected.
+
+    170
+        Processor(s):   68010?
+        Bus:            Multibus?
+        Chassis type:   rackmount
+        Notes:          Server. Slightly different chassis design than
+                        2/170's
+
+		
         Documentation:
             http://www.bitsavers.org/pdf/sun/sun1/800-0345_Sun-1_System_Ref_Man_Jul82.pdf
             (page 39,40 of pdf contain memory map)
