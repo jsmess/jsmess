@@ -33,11 +33,6 @@ Notes:
   - pullout plunger for shot power (there's no on-screen power indicator in the game)
   - dial for aiming
   - button (fire M powerup, high score initials)
-  They are mapped a bit differently in MAME. BUTTON1 simlates pulling out the
-  plunger and releasing it. The plunger strength is controlled by an analog input
-  (by default mapped to up/down arrows) and shown on screen. The dial is mapped
-  as expected. The button is mapped on BUTTON2. BUTTON3 is also recognized by the
-  game when entering initials, but was probably not present in the cabinet.
 
 
 TODO:
@@ -312,7 +307,7 @@ static WRITE8_HANDLER( sqixu_mcu_p2_w )
 	// bit 7 = clock latch from port 3 to Z80
 	if ((state->m_port2 & 0x80) != 0 && (data & 0x80) == 0)
 	{
-//              logerror("%04x: MCU -> Z80 %02x\n",cpu_get_pc(&space->device()),state->m_port3);
+//      logerror("%04x: MCU -> Z80 %02x\n",cpu_get_pc(&space->device()),state->m_port3);
 		state->m_from_mcu = state->m_port3;
 		state->m_from_mcu_pending = 1;
 		state->m_from_z80_pending = 0;	// ????
@@ -324,7 +319,7 @@ static WRITE8_HANDLER( sqixu_mcu_p2_w )
 static READ8_HANDLER( sqixu_mcu_p3_r )
 {
 	superqix_state *state = space->machine().driver_data<superqix_state>();
-//      logerror("%04x: read Z80 command %02x\n",cpu_get_pc(&space->device()),state->m_from_z80);
+//  logerror("%04x: read Z80 command %02x\n",cpu_get_pc(&space->device()),state->m_from_z80);
 	state->m_from_z80_pending = 0;
 	return state->m_from_z80;
 }
@@ -383,7 +378,7 @@ static int read_dial(running_machine &machine, int player)
 static TIMER_CALLBACK( delayed_z80_mcu_w )
 {
 	superqix_state *state = machine.driver_data<superqix_state>();
-logerror("Z80 sends command %02x\n",param);
+//  logerror("Z80 sends command %02x\n",param);
 	state->m_from_z80 = param;
 	state->m_from_mcu_pending = 0;
 	cputag_set_input_line(machine, "mcu", 0, HOLD_LINE);
@@ -393,7 +388,7 @@ logerror("Z80 sends command %02x\n",param);
 static TIMER_CALLBACK( delayed_mcu_z80_w )
 {
 	superqix_state *state = machine.driver_data<superqix_state>();
-logerror("68705 sends answer %02x\n",param);
+//  logerror("68705 sends answer %02x\n",param);
 	state->m_from_mcu = param;
 	state->m_from_mcu_pending = 1;
 }
@@ -420,7 +415,7 @@ logerror("68705 sends answer %02x\n",param);
 static READ8_HANDLER( hotsmash_68705_portA_r )
 {
 	superqix_state *state = space->machine().driver_data<superqix_state>();
-//logerror("%04x: 68705 reads port A = %02x\n",cpu_get_pc(&space->device()),state->m_portA_in);
+//  logerror("%04x: 68705 reads port A = %02x\n",cpu_get_pc(&space->device()),state->m_portA_in);
 	return state->m_portA_in;
 }
 
@@ -458,7 +453,7 @@ static WRITE8_HANDLER( hotsmash_68705_portC_w )
 
 			case 0x3:	// command from Z80
 				state->m_portA_in = state->m_from_z80;
-logerror("%04x: z80 reads command %02x\n",cpu_get_pc(&space->device()),state->m_from_z80);
+//              logerror("%04x: z80 reads command %02x\n",cpu_get_pc(&space->device()),state->m_from_z80);
 				break;
 
 			case 0x4:
@@ -487,7 +482,7 @@ static WRITE8_HANDLER( hotsmash_z80_mcu_w )
 static READ8_HANDLER(hotsmash_from_mcu_r)
 {
 	superqix_state *state = space->machine().driver_data<superqix_state>();
-logerror("%04x: z80 reads answer %02x\n",cpu_get_pc(&space->device()),state->m_from_mcu);
+//  logerror("%04x: z80 reads answer %02x\n",cpu_get_pc(&space->device()),state->m_from_mcu);
 	state->m_from_mcu_pending = 0;
 	return state->m_from_mcu;
 }
@@ -495,7 +490,7 @@ logerror("%04x: z80 reads answer %02x\n",cpu_get_pc(&space->device()),state->m_f
 static READ8_DEVICE_HANDLER(hotsmash_ay_port_a_r)
 {
 	superqix_state *state = device->machine().driver_data<superqix_state>();
-//logerror("%04x: ay_port_a_r and mcu_pending is %d\n",cpu_get_pc(&space->device()),state->m_from_mcu_pending);
+//  logerror("%04x: ay_port_a_r and mcu_pending is %d\n",cpu_get_pc(&space->device()),state->m_from_mcu_pending);
 	return input_port_read(device->machine(), "SYSTEM") | ((state->m_from_mcu_pending^1) << 7);
 }
 
@@ -517,22 +512,30 @@ static READ8_HANDLER(pbillian_from_mcu_r)
 
 	switch (state->m_from_z80)
 	{
-		case 0x01: return input_port_read(space->machine(), state->m_curr_player ? "PADDLE2" : "PADDLE1");
+		case 0x01:
+		{
+			UINT8 p = input_port_read(space->machine(), state->m_curr_player ? "PLUNGER2" : "PLUNGER1") & 0xbf;
+			if ((p & 0x3f) == 0) p |= 0x40;
+			return p;
+		}
+
 		case 0x02: return input_port_read(space->machine(), state->m_curr_player ? "DIAL2" : "DIAL1");
+
 		case 0x04: return input_port_read(space->machine(), "DSW1");
 		case 0x08: return input_port_read(space->machine(), "DSW2");
+
 		case 0x80: state->m_curr_player = 0; return 0;
 		case 0x81: state->m_curr_player = 1; return 0;
 	}
 
-	logerror("408[%x] r at %x\n",state->m_from_z80,cpu_get_pc(&space->device()));
+//  logerror("408[%x] r at %x\n",state->m_from_z80,cpu_get_pc(&space->device()));
 	return 0;
 }
 
 static READ8_DEVICE_HANDLER(pbillian_ay_port_a_r)
 {
 //  logerror("%04x: ay_port_a_r\n",cpu_get_pc(&space->device()));
-	 /* bits 76------  MCU status bits */
+	/* bits 76------  MCU status bits */
 	return (device->machine().rand() & 0xc0) | input_port_read(device->machine(), "BUTTONS");
 }
 
@@ -664,7 +667,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pbillian )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(	0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(	0x05, DEF_STR( 3C_1C ) )
@@ -673,7 +676,7 @@ static INPUT_PORTS_START( pbillian )
 	PORT_DIPSETTING(	0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(	0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(	0x18, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(	0x28, DEF_STR( 3C_1C ) )
@@ -682,33 +685,33 @@ static INPUT_PORTS_START( pbillian )
 	PORT_DIPSETTING(	0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(	0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(	0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )					PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(	0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(	0x03, "2" )
 	PORT_DIPSETTING(	0x02, "3" )
 	PORT_DIPSETTING(	0x01, "4" )
 	PORT_DIPSETTING(	0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(	0x0c, "10/20/300K Points" )
 	PORT_DIPSETTING(	0x00, "10/30/500K Points" )
 	PORT_DIPSETTING(	0x08, "20/30/400K Points" )
 	PORT_DIPSETTING(	0x04, "30/40/500K Points" )
-	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(	0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(	0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(	0x30, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
@@ -723,28 +726,28 @@ static INPUT_PORTS_START( pbillian )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
 
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )	// high score initials
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	// fire (M powerup) + high score initials
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL	// high score initials
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL	// fire (M powerup) + high score initials
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )		// N/C
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	// P1 fire (M powerup) + high score initials
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		// N/C
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL	// P2 fire (M powerup) + high score initials
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )	// mcu status (pending mcu->z80)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	// mcu status (pending z80->mcu)
 
-	PORT_START("PADDLE1")
-	PORT_BIT( 0x3f, 0x00, IPT_PADDLE_V  ) PORT_MINMAX(0,0x3f) PORT_SENSITIVITY(30) PORT_KEYDELTA(3) PORT_CENTERDELTA(0) PORT_REVERSE
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_START("PLUNGER1")	// plunger mechanism for shot (BUTTON1 and PEDAL mapped to the same key in MAME)
+	PORT_BIT( 0x3f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x3f) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("DIAL1")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8)
 
-	PORT_START("PADDLE2")
-	PORT_BIT( 0x3f, 0x00, IPT_PADDLE_V  ) PORT_MINMAX(0,0x3f) PORT_SENSITIVITY(30) PORT_KEYDELTA(3) PORT_CENTERDELTA(0) PORT_REVERSE  PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_START("PLUNGER2")
+	PORT_BIT( 0x3f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x3f) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DIAL2")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_COCKTAIL
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_COCKTAIL
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hotsmash )
@@ -817,46 +820,46 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( superqix )
 	PORT_START("DSW1")	/* DSW1 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Freeze" )
+	PORT_DIPNAME( 0x04, 0x04, "Freeze" )					PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(	0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 2C_3C ))
 	PORT_DIPSETTING(	0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(	0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 2C_3C ))
 	PORT_DIPSETTING(	0x80, DEF_STR( 1C_2C ) )
 
 	PORT_START("DSW2")	/* DSW2 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(	0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(	0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(	0x08, "20000 50000" )
 	PORT_DIPSETTING(	0x0c, "30000 100000" )
 	PORT_DIPSETTING(	0x04, "50000 100000" )
 	PORT_DIPSETTING(	0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(	0x20, "2" )
 	PORT_DIPSETTING(	0x30, "3" )
 	PORT_DIPSETTING(	0x10, "4" )
 	PORT_DIPSETTING(	0x00, "5" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Fill Area" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Fill Area" )					PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(	0x80, "70%" )
 	PORT_DIPSETTING(	0xc0, "75%" )
 	PORT_DIPSETTING(	0x40, "80%" )
@@ -955,7 +958,7 @@ static const ay8910_interface pbillian_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(pbillian_ay_port_a_r),			/* port Aread */
+	DEVCB_HANDLER(pbillian_ay_port_a_r),	/* port Aread */
 	DEVCB_INPUT_PORT("SYSTEM"),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -965,7 +968,7 @@ static const ay8910_interface hotsmash_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(hotsmash_ay_port_a_r),			/* port Aread */
+	DEVCB_HANDLER(hotsmash_ay_port_a_r),	/* port Aread */
 	DEVCB_INPUT_PORT("SYSTEM"),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -987,8 +990,8 @@ static const ay8910_interface sqix_ay8910_interface_2 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("DSW2"),
 	DEVCB_HANDLER(sqix_from_mcu_r),	/* port Bread */
-	DEVCB_NULL,				/* port Awrite */
-	DEVCB_HANDLER(sqix_z80_mcu_w)		/* port Bwrite */
+	DEVCB_NULL,						/* port Awrite */
+	DEVCB_HANDLER(sqix_z80_mcu_w)	/* port Bwrite */
 };
 
 static const ay8910_interface bootleg_ay8910_interface_1 =
@@ -1006,7 +1009,7 @@ static const ay8910_interface bootleg_ay8910_interface_2 =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_HANDLER(bootleg_in0_r),		/* port Bread */
+	DEVCB_HANDLER(bootleg_in0_r),	/* port Bread */
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1349,18 +1352,6 @@ ROM_END
 
 
 
-static DRIVER_INIT( pbillian )
-{
-	superqix_state *state = machine.driver_data<superqix_state>();
-	state->m_pbillian_show_power = 1;
-}
-
-static DRIVER_INIT( hotsmash )
-{
-	superqix_state *state = machine.driver_data<superqix_state>();
-	state->m_pbillian_show_power = 0;
-}
-
 static DRIVER_INIT( sqix )
 {
 	superqix_state *state = machine.driver_data<superqix_state>();
@@ -1437,11 +1428,11 @@ static DRIVER_INIT( perestro )
 
 
 
-GAME( 1986, pbillian, 0,        pbillian, pbillian, pbillian, ROT0,  "Taito", "Prebillian", GAME_SUPPORTS_SAVE )
-GAME( 1987, hotsmash, 0,        hotsmash, hotsmash, hotsmash, ROT90, "Taito", "Vs. Hot Smash", GAME_SUPPORTS_SAVE )
-GAME( 1987, sqix,     0,        sqix,     superqix, sqix,     ROT90, "Taito", "Super Qix (World, Rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sqixr1,   sqix,     sqix,     superqix, sqix,     ROT90, "Taito", "Super Qix (World, Rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sqixu,    sqix,     sqixu,    superqix, 0,        ROT90, "Taito (Romstar License)", "Super Qix (US)", GAME_SUPPORTS_SAVE )
+GAME( 1986, pbillian, 0,        pbillian, pbillian, 0,        ROT0,  "Kaneko / Taito", "Prebillian", GAME_SUPPORTS_SAVE )
+GAME( 1987, hotsmash, 0,        hotsmash, hotsmash, 0,        ROT90, "Kaneko / Taito", "Vs. Hot Smash", GAME_SUPPORTS_SAVE )
+GAME( 1987, sqix,     0,        sqix,     superqix, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sqixr1,   sqix,     sqix,     superqix, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World, Rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sqixu,    sqix,     sqixu,    superqix, 0,        ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", GAME_SUPPORTS_SAVE )
 GAME( 1987, sqixb1,   sqix,     sqix,     superqix, sqixa,    ROT90, "bootleg", "Super Qix (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1987, sqixb2,   sqix,     sqixbl,   superqix, 0,        ROT90, "bootleg", "Super Qix (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1994, perestro, 0,        sqixbl,   superqix, perestro, ROT90, "Promat", "Perestroika Girls", GAME_SUPPORTS_SAVE )

@@ -241,20 +241,21 @@ static CPU_RESET( tms )
 
 	CHANGE_PC(cpustate, dst);
 
-	for (i=0; i < length; i++)
+	/* TODO: if you soft reset on Taito JC it tries to do a 0x7802->0x9007 (0xff00) transfer. */
+	for (i=0; i < (length & 0x7ff); i++)
 	{
 		UINT16 data = DM_READ16(cpustate, src++);
 		PM_WRITE16(cpustate, dst++, data);
 	}
 
 	cpustate->st0.intm	= 1;
-	cpustate->st0.ov		= 0;
+	cpustate->st0.ov	= 0;
 	cpustate->st1.c		= 1;
-	cpustate->st1.cnf		= 0;
-	cpustate->st1.hm		= 1;
-	cpustate->st1.pm		= 0;
-	cpustate->st1.sxm		= 1;
-	cpustate->st1.xf		= 1;
+	cpustate->st1.cnf	= 0;
+	cpustate->st1.hm	= 1;
+	cpustate->st1.pm	= 0;
+	cpustate->st1.sxm	= 1;
+	cpustate->st1.xf	= 1;
 	cpustate->pmst.avis	= 0;
 	cpustate->pmst.braf	= 0;
 	cpustate->pmst.iptr	= 0;
@@ -262,7 +263,7 @@ static CPU_RESET( tms )
 	cpustate->pmst.ovly	= 0;
 	cpustate->pmst.ram	= 0;
 	cpustate->pmst.trm	= 0;
-	cpustate->ifr			= 0;
+	cpustate->ifr		= 0;
 	cpustate->cbcr		= 0;
 	cpustate->rptc		= -1;
 }
@@ -446,7 +447,9 @@ static READ16_HANDLER( cpuregs_r )
 		}
 
 		case 0x28:	return 0;	// PDWSR
-		default:	fatalerror("32051: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, cpustate->pc-1);
+		default:
+		if(!space->debugger_access())
+			fatalerror("32051: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, cpustate->pc-1);
 	}
 
 	return 0;
@@ -522,7 +525,9 @@ static WRITE16_HANDLER( cpuregs_w )
 		}
 
 		case 0x28:	break;		// PDWSR
-		default:	fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, cpustate->pc-1);
+		default:
+		if(!space->debugger_access())
+			fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, cpustate->pc-1);
 	}
 }
 
@@ -531,15 +536,16 @@ static WRITE16_HANDLER( cpuregs_w )
  **************************************************************************/
 
 static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 16 )
-	AM_RANGE(0x2000, 0x23ff) AM_RAM					// SARAM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("share11")	// DARAM B0
+	AM_RANGE(0x2000, 0x23ff) AM_RAM	AM_SHARE("saram")		// SARAM
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("daram_b0")	// DARAM B0
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( internal_data, AS_DATA, 16 )
 	AM_RANGE(0x0000, 0x005f) AM_READWRITE(cpuregs_r, cpuregs_w)
-	AM_RANGE(0x0060, 0x007f) AM_RAM					// DARAM B2
-	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("share11")	// DARAM B0
-	AM_RANGE(0x0300, 0x04ff) AM_RAM					// DARAM B1
+	AM_RANGE(0x0060, 0x007f) AM_RAM							// DARAM B2
+	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("daram_b0")	// DARAM B0
+	AM_RANGE(0x0300, 0x04ff) AM_RAM							// DARAM B1
+	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("saram")
 ADDRESS_MAP_END
 
 /**************************************************************************
@@ -560,13 +566,14 @@ static CPU_SET_INFO( tms )
 static CPU_READ( tms )
 {
 	tms32051_state *cpustate = get_safe_token(device);
+	/* TODO: alignment if offset is odd */
 	if (space == AS_PROGRAM)
 	{
-		*value = (PM_READ16(cpustate, offset>>1) >> ((offset & 1) ? 0 : 8)) & 0xff;
+		*value = (PM_READ16(cpustate, offset>>1));
 	}
 	else if (space == AS_DATA)
 	{
-		*value = (DM_READ16(cpustate, offset>>1) >> ((offset & 1) ? 0 : 8)) & 0xff;
+		*value = (DM_READ16(cpustate, offset>>1));
 	}
 	return 1;
 }
