@@ -234,7 +234,7 @@ struct cdrom_interface dc_cdrom =
 
 static MACHINE_CONFIG_START( dc, driver_device )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4, CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
 	MCFG_CPU_CONFIG(sh4cpu_config)
 	MCFG_CPU_PROGRAM_MAP(dc_map)
 	MCFG_CPU_IO_MAP(dc_port)
