@@ -1,4 +1,48 @@
-﻿0.143u3
+﻿0.143u4
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- Sun 2/50
+- Sun 2/120
+
+- Sun 3/50
+- Sun 3/60
+- Sun 3/110
+- Sun 3/75/140/150/160/180
+- Sun 3/260/280
+- Sun 3/E
+
+- Sun 3x/80
+- Sun 3x/460/470/480
+
+System Driver Changes:
+----------------------
+- saturn: inputs to use PORT_CONDITION instead of PORT_CATEGORY [Fabio Priuli]
+- pet: Added support for D80/D82 disk images with error information. [Curt Coder]
+- NES: Attached emulated keyboards (Famicom and Subor) directly to famicom driver now 
+ that keyboard emulation does not affect the emulation if only gamepad are attached to the 
+ system. Removed accordingly the fami_key driver, which became redundant. [Fabio Priuli]
+- pc1640: Added another BIOS version. [philippe]
+- next: Add the keyboard [O. Galibert]
+- st: Make it better [O. Galibert]
+
+Software Lists:
+----------------
+- a800.xml: added some more dumps and done some cleanup [K1W1]
+
+Source Changes:
+----------------
+- floppy: Add generic track data descriptors [O. Galibert]
+
+0.143u3
 
 New System Drivers Supported:
 -----------------------------
