@@ -929,6 +929,266 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<!-- does not seem to work in the generic msx2 driver -->
+	<software name="hardball" supported="no">
+		<description>Hardball</description>
+		<year>1987</year>
+		<publisher>Sony</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<!-- G 060CA 8737 D or G 060C 8744 D -->
+				<rom name="g_060c" size="131072" crc="1d7040af" sha1="32151ddc4303290c09889bf8107493dd34296043" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hydlide3">
+		<!-- ハイドライド３ -->
+		<description>Hydlide 3</description>
+		<year>1987</year>
+		<publisher>T&amp;E Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="524288">
+				<rom name="hydlide3_4m-rom" size="524288" crc="00db86c8" sha1="f182d4785e3eed00292f7ff4795c9dcc6c990a0a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Looks like a bad dump: contains "mega rom loader" messages -->
+	<software name="pacmania" supported="no">
+		<description>Pac-Mania</description>
+		<year>1989</year>
+		<publisher>Namco</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M016-03M" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="262144">
+				<!-- SHARP MSX2 PN 8929 D -->
+				<rom name="msx2_pn" size="262144" crc="7df16fc8" sha1="d5902afbd8dfb1ea96fc8cf4d62cf6e4fa40d4f7" offset="0" flags="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bublbobl">
+		<!-- バブルボブル -->
+		<description>Bubble Bobble</description>
+		<year>1987</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh231596" size="131072" crc="6524d9fc" sha1="e73946f1f26589d77926276ca4f9dbee60c53fde" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Does not work in the generic msx2 driver -->
+	<software name="victnin2" supported="no">
+		<!-- ビクトリアス・ナインII 高校野球編 -->
+		<description>Victorious Nine II</description>
+		<year>1987</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-!M016S" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh23109h" size="131072" crc="94ebc319" sha1="7ed1308179c41ae62cfb46124ab0ce22d8b0513b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fireball">
+		<!-- ファイア・ボール -->
+		<description>Fireball</description>
+		<year>1987</year>
+		<publisher>Hummingbird Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M-008S" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh230941" size="131072" crc="cdcdc6c0" sha1="cdeadd6cf7bf5b53aa7d901446b0ce586542c580" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="famiparo">
+		<!-- ファミクルパロディック -->
+		<description>Famicle Parodic</description>
+		<year>1988</year>
+		<publisher>Bit2</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532074" size="262144" crc="0e03847b" sha1="f12ad34dc3b4279da0fc7094f3d50d6b8bb517dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="famibill">
+		<!-- ファミリービリヤード -->
+		<description>Family Billiards</description>
+		<year>1987</year>
+		<publisher>Pack-in-Video</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="1M-8K" />
+			<feature name="mapper" value="NEOS MR6401" />
+			<dataarea name="rom" size="131072">
+				<!-- Not sure if dump is correct?? -->
+				<rom name="m27512zb" size="65536" crc="7c867d98" sha1="924fcf87b3747dae06e621975903ee73c42016f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="famiboxi">
+		<!-- ファミリーボクシング -->
+		<description>Family Boxing</description>
+		<year>1988</year>
+		<publisher>Sony</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="IS-03-001-0" />
+			<feature name="mapper" value="BS6202" />
+			<dataarea name="rom" size="262144">
+				<!-- HBS-G066C SHARP 8822 D -->
+				<rom name="hbs-g066c" size="262144" crc="7030f2ab" sha1="d78d763e72e23418f31dc3ce91deea1e8ee10490" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantzon2">
+		<!-- ファンタジーゾーンII ～オパオパの涙～ -->
+		<description>Fantasy Zone II</description>
+		<year>1987</year>
+		<publisher>Pony Canyon</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-2M" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="262144">
+				<rom name="r68y-5815" size="262144" crc="1bdfaeeb" sha1="a58ca651f4c12bf07cf3840d5e37b534f5fc075e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fleetco2">
+		<!-- フリートコマンダーII 黄昏の海域 -->
+		<description>Fleet Commander II</description>
+		<year>1990</year>
+		<publisher>Ascii</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="FLEET COMMANDER II" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="fleetco2.bin" size="262144" crc="9f152e9b" sha1="8cbfd94324f297a418e7eec6920dfead7b9bed08" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="projcta2">
+		<!-- プロジェクトＡ２ 史上最大の決戦 -->
+		<description>Project A2</description>
+		<year>1987</year>
+		<publisher>Pony</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<!-- PONYCA R58Y5109 RP231024D -->
+				<rom name="rp231024d" size="131072" crc="1b285fe3" sha1="418f6248221c79039fe6c44fc5a9514842e3ec71" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Does not work in generic msx2 driver -->
+	<software name="profmahj" supported="no">
+		<!-- プロフェッショナル麻雀悟空 -->
+		<description>Professional Mahjong Gokuh</description>
+		<year>1988</year>
+		<publisher>Ascii</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-621N" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<feature name="sram" value="CXK5861PS-12L" />
+			<dataarea name="rom" size="131072">
+				<rom name="rp231024d" size="131072" crc="2abb1ec4" sha1="81143d2a8ef7cc593a604f3cc890312b42bdff01" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="famistad">
+		<!-- プロ野球ファミリースタジアム ペナントレース -->
+		<description>Pro Yakyuu Family Stadium - Pennant Race</description>
+		<year>1989</year>
+		<publisher>Namco</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M016-03M" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="262144">
+				<rom name="msx2_fs" size="262144" crc="356b7d2a" sha1="970e26f3c2c085e39267115991add6ccc6e9ff80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bballfan">
+		<!-- プロ野球ＦＡＮ -->
+		<description>Pro Yakyuu Fan</description>
+		<year>1987</year>
+		<publisher>Telenet</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M016-03M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532055" size="262144" crc="c065bc29" sha1="f52690157a51c662ffdf4ae3592ada93d7be4032" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holein1s">
+		<!-- ホール・イン・ワン スペシャル -->
+		<description>Hole in One Special</description>
+		<year>1987</year>
+		<publisher>Hal</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="m5m231001_219p" size="131072" crc="f35df283" sha1="facb967717c21fed9b375481908aa337b3361c45" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="borfesu">
+		<!-- ボルフェスと５人の悪魔 -->
+		<description>Borfesu and Five Evil Spirits</description>
+		<year>1987</year>
+		<publisher>Xtal Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh231066" size="131072" crc="e040e8a1" sha1="16c3ced0fb2e360bc7c43d372a0a30eb6bd3963d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kitahei">
+		<!-- 本格将棋 棋太平 -->
+		<description>Kitahei</description>
+		<year>1986</year>
+		<publisher>Micro Cabin</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="rp231024d" size="131072" crc="0767af40" sha1="b74f759ba3837968a04e9b64321b47cf087e76ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>
