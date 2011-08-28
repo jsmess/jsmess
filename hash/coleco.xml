@@ -1920,8 +1920,7 @@
 		<description>The Heist</description>
 		<year>1983</year>
 		<publisher>Micro Fun</publisher>
-		<info name="serial" value="MCL520" />k1w1
-
+		<info name="serial" value="MCL520" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="24576">
 				<rom name="heist.1" size="8192" crc="34080665" sha1="380f7b5a85ef1483e15ec589c85b7a91e9167f68" offset="0x0000" />
