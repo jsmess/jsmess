@@ -11,6 +11,7 @@
     - keyboard
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -24,17 +25,40 @@ class multi8_state : public driver_device
 {
 public:
 	multi8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_ppi(*this, "ppi8255_0"),
+	m_crtc(*this, "crtc"),
+	m_beep(*this, BEEPER_TAG)
+	{ }
 
-	mc6845_device *m_mc6845;
-
+	required_device<cpu_device> m_maincpu;
+	required_device<i8255_device> m_ppi;
+	required_device<mc6845_device> m_crtc;
+	required_device<device_t> m_beep;
+	DECLARE_WRITE8_MEMBER(multi8_6845_w);
+	DECLARE_READ8_MEMBER(key_input_r);
+	DECLARE_READ8_MEMBER(key_status_r);
+	DECLARE_READ8_MEMBER(multi8_vram_r);
+	DECLARE_WRITE8_MEMBER(multi8_vram_w);
+	DECLARE_READ8_MEMBER(pal_r);
+	DECLARE_WRITE8_MEMBER(pal_w);
+	DECLARE_READ8_MEMBER(multi8_kanji_r);
+	DECLARE_WRITE8_MEMBER(multi8_kanji_w);
+	DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_WRITE8_MEMBER(portb_w);
+	DECLARE_WRITE8_MEMBER(portc_w);
+	DECLARE_WRITE8_MEMBER(ym2203_porta_w);
+	UINT8 *m_p_vram;
+	UINT8 *m_p_wram;
+	UINT8 *m_p_kanji;
+	UINT8 *m_p_chargen;
 	UINT8 m_mcu_init;
 	UINT8 m_keyb_press;
 	UINT8 m_keyb_press_flag;
 	UINT8 m_shift_press_flag;
 	UINT8 m_display_reg;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
-
 	UINT8 m_vram_bank;
 	UINT8 m_pen_clut[8];
 	UINT8 m_bw_mode;
@@ -61,52 +85,55 @@ public:
 static VIDEO_START( multi8 )
 {
 	multi8_state *state = machine.driver_data<multi8_state>();
+
 	state->m_keyb_press = state->m_keyb_press_flag = state->m_shift_press_flag = state->m_display_reg = 0;
-	for (state->m_bw_mode = 0; state->m_bw_mode < 8; state->m_bw_mode++) state->m_pen_clut[state->m_bw_mode]=0;
+
+	for (state->m_bw_mode = 0; state->m_bw_mode < 8; state->m_bw_mode++)
+		state->m_pen_clut[state->m_bw_mode]=0;
+
 	state->m_vram_bank = 8;
 	state->m_bw_mode = 0;
+	state->m_p_chargen = machine.region("chargen")->base();
 }
 
-static void multi8_draw_pixel(running_machine &machine, bitmap_t *bitmap,int y,int x,UINT16	pen,UINT8 width)
+static void multi8_draw_pixel(running_machine &machine, bitmap_t *bitmap,int y,int x,UINT8 pen,UINT8 width)
 {
 	if((x)>machine.primary_screen->visible_area().max_x || (y)>machine.primary_screen->visible_area().max_y)
 		return;
 
 	if(width)
 	{
-		*BITMAP_ADDR16(bitmap, y, x*2+0) = machine.pens[pen];
-		*BITMAP_ADDR16(bitmap, y, x*2+1) = machine.pens[pen];
+		*BITMAP_ADDR16(bitmap, y, x*2+0) = pen;
+		*BITMAP_ADDR16(bitmap, y, x*2+1) = pen;
 	}
 	else
-		*BITMAP_ADDR16(bitmap, y, x) = machine.pens[pen];
+		*BITMAP_ADDR16(bitmap, y, x) = pen;
 }
 
 static SCREEN_UPDATE( multi8 )
 {
 	multi8_state *state = screen->machine().driver_data<multi8_state>();
 	int x,y,count;
-	int x_width;
-	int xi,yi;
-	UINT8 *vram = screen->machine().region("vram")->base();
-	UINT8 *gfx_rom = screen->machine().region("chargen")->base();
+	UINT8 x_width;
+	UINT8 xi,yi;
 
 	count = 0x0000;
 
 	x_width = (state->m_display_reg & 0x40) ? 80 : 40;
 
-	for(y=0;y<200;y++)
+	for(y=0; y<200; y++)
 	{
-		for(x=0;x<80;x++)
+		for(x=0; x<80; x++)
 		{
-			for(xi=0;xi<8;xi++)
+			for(xi=0; xi<8; xi++)
 			{
 				int pen_r,pen_g,pen_b,color;
 
-				pen_b = (vram[count | 0x0000] >> (7-xi)) & 1;
-				pen_r = (vram[count | 0x4000] >> (7-xi)) & 1;
-				pen_g = (vram[count | 0x8000] >> (7-xi)) & 1;
+				pen_b = (state->m_p_vram[count | 0x0000] >> (7-xi)) & 1;
+				pen_r = (state->m_p_vram[count | 0x4000] >> (7-xi)) & 1;
+				pen_g = (state->m_p_vram[count | 0x8000] >> (7-xi)) & 1;
 
-				if(state->m_bw_mode)
+				if (state->m_bw_mode)
 				{
 					pen_b = (state->m_display_reg & 1) ? pen_b : 0;
 					pen_r = (state->m_display_reg & 2) ? pen_r : 0;
@@ -117,7 +144,7 @@ static SCREEN_UPDATE( multi8 )
 				else
 					color = (pen_b) | (pen_r << 1) | (pen_g << 2);
 
-				multi8_draw_pixel(screen->machine(),bitmap, y, x*8+xi,state->m_pen_clut[color],0);
+				multi8_draw_pixel(screen->machine(),bitmap, y, x*8+xi,state->m_pen_clut[color], 0);
 			}
 			count++;
 		}
@@ -127,25 +154,25 @@ static SCREEN_UPDATE( multi8 )
 
 	for(y=0;y<25;y++)
 	{
-		for(x=0;x<x_width;x++)
+		for(x=0; x<x_width; x++)
 		{
-			int tile = vram[count];
-			int attr = vram[count+0x800];
+			int tile = state->m_p_vram[count];
+			int attr = state->m_p_vram[count+0x800];
 			int color = (state->m_display_reg & 0x80) ? 7 : (attr & 0x07);
 
-			for(yi=0;yi<8;yi++)
+			for (yi=0; yi<8; yi++)
 			{
 				for(xi=0;xi<8;xi++)
 				{
 					int pen;
 
 					if(attr & 0x20)
-						pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? 0 : color;
+						pen = (state->m_p_chargen[tile*8+yi] >> (7-xi) & 1) ? 0 : color;
 					else
-						pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? color : 0;
+						pen = (state->m_p_chargen[tile*8+yi] >> (7-xi) & 1) ? color : 0;
 
 					if(pen)
-						multi8_draw_pixel(screen->machine(),bitmap, y*mc6845_tile_height+yi, x*8+xi,pen,(state->m_display_reg & 0x40) == 0x00);
+						multi8_draw_pixel(screen->machine(),bitmap, y*mc6845_tile_height+yi, x*8+xi, pen, (state->m_display_reg & 0x40) == 0x00);
 				}
 			}
 
@@ -167,9 +194,9 @@ static SCREEN_UPDATE( multi8 )
 
 				if(cursor_on)
 				{
-					for(yc=0;yc<(mc6845_tile_height-(mc6845_cursor_y_start & 7));yc++)
+					for (yc=0; yc<(mc6845_tile_height-(mc6845_cursor_y_start & 7)); yc++)
 					{
-						for(xc=0;xc<8;xc++)
+						for (xc=0; xc<8; xc++)
 							multi8_draw_pixel(screen->machine(),bitmap, y*mc6845_tile_height+yc, x*8+xc,0x07,(state->m_display_reg & 0x40) == 0x00);
 
 					}
@@ -179,139 +206,154 @@ static SCREEN_UPDATE( multi8 )
 			(state->m_display_reg & 0x40) ? count++ : count+=2;
 		}
 	}
-    return 0;
+	return 0;
 }
 
-static WRITE8_HANDLER( multi8_6845_w )
+WRITE8_MEMBER( multi8_state::multi8_6845_w )
 {
-	multi8_state *state = space->machine().driver_data<multi8_state>();
-	if(offset == 0)
+	if (!offset)
 	{
-		state->m_crtc_index = data;
-		state->m_mc6845->address_w(*space, offset, data);
+		m_crtc_index = data;
+		m_crtc->address_w(space, offset, data);
 	}
 	else
 	{
-		state->m_crtc_vreg[state->m_crtc_index] = data;
-		state->m_mc6845->register_w(*space, offset, data);
+		m_crtc_vreg[m_crtc_index] = data;
+		m_crtc->register_w(space, offset, data);
 	}
 }
 
-static READ8_HANDLER( key_input_r )
+READ8_MEMBER( multi8_state::key_input_r )
 {
-	multi8_state *state = space->machine().driver_data<multi8_state>();
-	if(state->m_mcu_init == 0){ state->m_mcu_init++;	return 3; }
+	if (m_mcu_init == 0)
+	{
+		m_mcu_init++;
+		return 3;
+	}
 
-	state->m_keyb_press_flag &= 0xfe;
+	m_keyb_press_flag &= 0xfe;
 
-	return state->m_keyb_press;
+	return m_keyb_press;
 }
 
-static READ8_HANDLER( key_status_r )
+READ8_MEMBER( multi8_state::key_status_r )
 {
-	multi8_state *state = space->machine().driver_data<multi8_state>();
-	if(state->m_mcu_init == 0){                       return 1; }
-	if(state->m_mcu_init == 1){ state->m_mcu_init++;    return 1; }
-	if(state->m_mcu_init == 2){ state->m_mcu_init++;    return 0; }
+	if (m_mcu_init == 0)
+		return 1;
+	else
+	if (m_mcu_init == 1)
+	{
+		m_mcu_init++;
+		return 1;
+	}
+	else
+	if (m_mcu_init == 2)
+	{
+		m_mcu_init++;
+		return 0;
+	}
 
-	return state->m_keyb_press_flag | (state->m_shift_press_flag << 7);
+	return m_keyb_press_flag | (m_shift_press_flag << 7);
 }
 
-static READ8_HANDLER( multi8_vram_r )
+READ8_MEMBER( multi8_state::multi8_vram_r )
 {
-	multi8_state *state = space->machine().driver_data<multi8_state>();
-	UINT8 *vram = space->machine().region("vram")->base();
-	UINT8 *wram = space->machine().region("wram")->base();
 	UINT8 res;
 
-	if(!(state->m_vram_bank & 0x10)) //select plain work ram
-		return wram[offset];
+	if (!BIT(m_vram_bank, 4)) //select plain work ram
+		return m_p_wram[offset];
 
 	res = 0xff;
-	if(!(state->m_vram_bank & 1)) { res &= vram[offset | 0x0000]; }
-	if(!(state->m_vram_bank & 2)) { res &= vram[offset | 0x4000]; }
-	if(!(state->m_vram_bank & 4)) { res &= vram[offset | 0x8000]; }
-	if(!(state->m_vram_bank & 8)) { res &= vram[offset | 0xc000]; }
+
+	if (!BIT(m_vram_bank, 0))
+		res &= m_p_vram[offset | 0x0000];
+
+	if (!BIT(m_vram_bank, 1))
+		res &= m_p_vram[offset | 0x4000];
+
+	if (!BIT(m_vram_bank, 2))
+		res &= m_p_vram[offset | 0x8000];
+
+	if (!BIT(m_vram_bank, 3))
+		res &= m_p_vram[offset | 0xc000];
 
 	return res;
 }
 
-static WRITE8_HANDLER( multi8_vram_w )
+WRITE8_MEMBER( multi8_state::multi8_vram_w )
 {
-	multi8_state *state = space->machine().driver_data<multi8_state>();
-	UINT8 *vram = space->machine().region("vram")->base();
-	UINT8 *wram = space->machine().region("wram")->base();
-
-	if(!(state->m_vram_bank & 0x10)) //select plain work ram
+	if (!BIT(m_vram_bank, 4)) //select plain work ram
 	{
-		wram[offset] = data;
+		m_p_wram[offset] = data;
 		return;
 	}
 
-	if(!(state->m_vram_bank & 1)) { vram[offset | 0x0000] = data; }
-	if(!(state->m_vram_bank & 2)) { vram[offset | 0x4000] = data; }
-	if(!(state->m_vram_bank & 4)) { vram[offset | 0x8000] = data; }
-	if(!(state->m_vram_bank & 8)) { vram[offset | 0xc000] = data; }
+	if (!BIT(m_vram_bank, 0))
+		m_p_vram[offset | 0x0000] = data;
+
+	if (!BIT(m_vram_bank, 1))
+		m_p_vram[offset | 0x4000] = data;
+
+	if (!BIT(m_vram_bank, 2))
+		m_p_vram[offset | 0x8000] = data;
+
+	if (!BIT(m_vram_bank, 3))
+		m_p_vram[offset | 0xc000] = data;
 }
 
-static READ8_HANDLER( pal_r )
+READ8_MEMBER( multi8_state::pal_r )
 {
-	multi8_state *state = space->machine().driver_data<multi8_state>();
-	return state->m_pen_clut[offset];
+	return m_pen_clut[offset];
 }
 
-static WRITE8_HANDLER( pal_w )
+WRITE8_MEMBER( multi8_state::pal_w )
 {
-	multi8_state *state = space->machine().driver_data<multi8_state>();
-	state->m_pen_clut[offset] = data;
+	m_pen_clut[offset] = data;
 
+	UINT8 i;
+	for(i=0;i<8;i++)
 	{
-		int i;
-		for(i=0;i<8;i++)
+		if (m_pen_clut[i])
 		{
-			if(state->m_pen_clut[i]) { state->m_bw_mode = 0; return; }
+			m_bw_mode = 0;
+			return;
 		}
-		state->m_bw_mode = 1;
+		m_bw_mode = 1;
 	}
 }
 
 static READ8_HANDLER( ay8912_0_r ) { return ay8910_r(space->machine().device("aysnd"),0); }
 static READ8_HANDLER( ay8912_1_r ) { return ay8910_r(space->machine().device("aysnd"),1); }
 
-static READ8_HANDLER( multi8_kanji_r )
+READ8_MEMBER( multi8_state::multi8_kanji_r )
 {
-	multi8_state *state = space->machine().driver_data<multi8_state>();
-	UINT8 *knj_rom = space->machine().region("kanji")->base();
-
-	return knj_rom[(state->m_knj_addr << 1) | (offset & 1)];
+	return m_p_kanji[(m_knj_addr << 1) | (offset & 1)];
 }
 
-static WRITE8_HANDLER( multi8_kanji_w )
+WRITE8_MEMBER( multi8_state::multi8_kanji_w )
 {
-	multi8_state *state = space->machine().driver_data<multi8_state>();
-
-	state->m_knj_addr = (offset == 0) ? (state->m_knj_addr & 0xff00) | (data & 0xff) : (state->m_knj_addr & 0x00ff) | (data << 8);
+	m_knj_addr = (offset == 0) ? (m_knj_addr & 0xff00) | (data & 0xff) : (m_knj_addr & 0x00ff) | (data << 8);
 }
 
-static ADDRESS_MAP_START(multi8_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(multi8_mem, AS_PROGRAM, 8, multi8_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE( multi8_vram_r, multi8_vram_w )
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( multi8_io , AS_IO, 8)
+static ADDRESS_MAP_START(multi8_io, AS_IO, 8, multi8_state)
 //  ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(key_input_r) AM_WRITENOP//keyboard
 	AM_RANGE(0x01, 0x01) AM_READ(key_status_r) AM_WRITENOP//keyboard
-	AM_RANGE(0x18, 0x19) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x18, 0x18) AM_READ(ay8912_0_r)
-	AM_RANGE(0x1a, 0x1a) AM_READ(ay8912_1_r)
+	AM_RANGE(0x18, 0x19) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x18, 0x18) AM_READ_LEGACY(ay8912_0_r)
+	AM_RANGE(0x1a, 0x1a) AM_READ_LEGACY(ay8912_1_r)
 	AM_RANGE(0x1c, 0x1d) AM_WRITE(multi8_6845_w)
 //  AM_RANGE(0x20, 0x21) //sio, cmt
 //  AM_RANGE(0x24, 0x27) //pit
-	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE_MODERN("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 //  AM_RANGE(0x2c, 0x2d) //i8259
 	AM_RANGE(0x30, 0x37) AM_READWRITE(pal_r,pal_w)
 	AM_RANGE(0x40, 0x41) AM_READWRITE(multi8_kanji_r,multi8_kanji_w) //kanji regs
@@ -527,15 +569,15 @@ static const mc6845_interface mc6845_intf =
 
 static PALETTE_INIT( multi8 )
 {
-	int i;
+	UINT8 i;
 
-	for(i=0;i<8;i++)
+	for(i=0; i<8; i++)
 		palette_set_color_rgb(machine, i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 }
 
-static READ8_DEVICE_HANDLER( porta_r )
+READ8_MEMBER( multi8_state::porta_r )
 {
-	int vsync = (input_port_read(device->machine(), "VBLANK") & 0x1) << 5;
+	int vsync = (input_port_read(machine(), "VBLANK") & 0x1) << 5;
 	/*
     -x-- ---- kanji rom is present (0) yes
     --x- ---- vsync
@@ -546,29 +588,24 @@ static READ8_DEVICE_HANDLER( porta_r )
 }
 
 
-static WRITE8_DEVICE_HANDLER( portb_w )
+WRITE8_MEMBER( multi8_state::portb_w )
 {
-	multi8_state *state = device->machine().driver_data<multi8_state>();
 	/*
         x--- ---- color mode
         -x-- ---- screen width (80 / 40)
         ---- x--- memory bank status
         ---- -xxx page screen graphics in B/W mode
     */
-//  address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-//  printf("Port B w = %02x %04x\n",data,cpu_get_pc(&space->device()));
-
-	state->m_display_reg = data;
+	m_display_reg = data;
 }
 
-static WRITE8_DEVICE_HANDLER( portc_w )
+WRITE8_MEMBER( multi8_state::portc_w )
 {
-	multi8_state *state = device->machine().driver_data<multi8_state>();
 //  printf("Port C w = %02x\n",data);
-	state->m_vram_bank = data & 0x1f;
+	m_vram_bank = data & 0x1f;
 
-	if(data & 0x20 && data != 0xff)
+	if (data & 0x20 && data != 0xff)
 		printf("Work RAM bank selected!\n");
 //      fatalerror("Work RAM bank selected");
 }
@@ -576,17 +613,17 @@ static WRITE8_DEVICE_HANDLER( portc_w )
 
 static I8255_INTERFACE( ppi8255_intf_0 )
 {
-	DEVCB_HANDLER(porta_r),			/* Port A read */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(portb_w),			/* Port B write */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_HANDLER(portc_w)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(multi8_state, porta_r),	/* Port A read */
+	DEVCB_NULL,					/* Port B read */
+	DEVCB_NULL,					/* Port C read */
+	DEVCB_DRIVER_MEMBER(multi8_state, portb_w),	/* Port B write */
+	DEVCB_NULL,					/* Port A write */
+	DEVCB_DRIVER_MEMBER(multi8_state, portc_w)	/* Port C write */
 };
 
-static WRITE8_DEVICE_HANDLER( ym2203_porta_w )
+WRITE8_MEMBER( multi8_state::ym2203_porta_w )
 {
-	beep_set_state(device->machine().device(BEEPER_TAG),(data & 0x08));
+	beep_set_state(m_beep, (data & 0x08));
 }
 
 static const ym2203_interface ym2203_config =
@@ -594,7 +631,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER( ym2203_porta_w ), DEVCB_NULL
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_DRIVER_MEMBER(multi8_state, ym2203_porta_w ),
+		DEVCB_NULL
 	},
 	NULL
 };
@@ -603,7 +643,9 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START(multi8)
 {
 	multi8_state *state = machine.driver_data<multi8_state>();
-	state->m_mc6845 = machine.device<mc6845_device>("crtc");
+	state->m_p_vram = machine.region("vram")->base();
+	state->m_p_wram = machine.region("wram")->base();
+	state->m_p_kanji = machine.region("kanji")->base();
 }
 
 static MACHINE_RESET(multi8)
@@ -615,48 +657,44 @@ static MACHINE_RESET(multi8)
 }
 
 static MACHINE_CONFIG_START( multi8, multi8_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MCFG_CPU_PROGRAM_MAP(multi8_mem)
-    MCFG_CPU_IO_MAP(multi8_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(multi8_mem)
+	MCFG_CPU_IO_MAP(multi8_io)
 
-    MCFG_MACHINE_START(multi8)
-    MCFG_MACHINE_RESET(multi8)
+	MCFG_MACHINE_START(multi8)
+	MCFG_MACHINE_RESET(multi8)
 
-	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
-
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(60)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(640, 200)
-    MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-    MCFG_SCREEN_UPDATE(multi8)
-
-    MCFG_PALETTE_LENGTH(8)
-    MCFG_PALETTE_INIT(multi8)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_VIDEO_START(multi8)
+	MCFG_SCREEN_UPDATE(multi8)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(multi8)
 	MCFG_GFXDECODE(multi8)
 
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/2, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
-
-    MCFG_VIDEO_START(multi8)
-
+	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
 	MCFG_SOUND_ADD("aysnd", AY8912, 1500000) //unknown clock / divider
 	MCFG_SOUND_CONFIG(ym2203_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
+	/* Devices */
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/32))
+	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/2, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( multi8 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "basic.rom", 0x0000, 0x8000, CRC(2131a3a8) SHA1(0f5a565ecfbf79237badbf9011dcb374abe74a57))
 
 	ROM_REGION( 0x0800, "chargen", 0 )
@@ -678,6 +716,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, multi8,  0,       0,	multi8, 	multi8, 	 0,   "Mitsubishi",   "Multi 8",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY      FULLNAME       FLAGS */
+COMP( 1983, multi8, 0,      0,       multi8,    multi8,  0,     "Mitsubishi", "Multi 8", GAME_NOT_WORKING | GAME_NO_SOUND)
