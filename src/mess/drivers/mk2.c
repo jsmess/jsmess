@@ -1,34 +1,6 @@
 /******************************************************************************
  PeT mess@utanet.at September 2000
-******************************************************************************/
 
-#include "emu.h"
-#include "machine/mos6530.h"
-#include "cpu/m6502/m6502.h"
-#include "sound/dac.h"
-#include "mk2.lh"
-
-
-class mk2_state : public driver_device
-{
-public:
-	mk2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
-	UINT8 m_led[5];
-};
-
-
-/* usage:
-
-   under the black keys are operations to be added as first sign
-   black and white box are only changing the player
-
-   for the computer to start as white
-    switch to black (h enter)
-    swap players (g enter)
-*/
-/*
 chess champion mk II
 
 MOS MPS 6504 2179
@@ -46,16 +18,69 @@ MOS MPS 6332 005 2179
 4x 7 segment led display (each with dot)
 4 single leds
 21 keys
-*/
 
-/*
-  83, 84 contains display variables
- */
+
+83, 84 contains display variables
+
+
+port a
+   0..7 led output
+   0..6 keyboard input
+
+port b
+   0..5 outputs
+   0 speaker out
+   6 as chipselect used!?
+   7 interrupt out?
+
+   c4, c5, keyboard polling
+   c0, c1, c2, c3 led output
+
+Usage:
+
+   under the black keys are operations to be added as first sign
+   black and white box are only changing the player
+
+   for the computer to start as white
+    switch to black (h enter)
+    swap players (g enter)
+
+******************************************************************************/
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "machine/mos6530.h"
+#include "cpu/m6502/m6502.h"
+#include "sound/speaker.h"
+#include "mk2.lh"
+
+
+class mk2_state : public driver_device
+{
+public:
+	mk2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_speaker(*this, SPEAKER_TAG),
+	m_miot(*this, "miot")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_speaker;
+	required_device<device_t> m_miot;
+	DECLARE_READ8_MEMBER(mk2_read_a);
+	DECLARE_WRITE8_MEMBER(mk2_write_a);
+	DECLARE_READ8_MEMBER(mk2_read_b);
+	DECLARE_WRITE8_MEMBER(mk2_write_b);
+	UINT8 m_led[5];
+};
+
+
 // only lower 12 address bits on bus!
-static ADDRESS_MAP_START(mk2_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START(mk2_mem , AS_PROGRAM, 8, mk2_state)
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFF) // m6504
 	AM_RANGE( 0x0000, 0x01ff) AM_RAM // 2 2111, should be mirrored
-	AM_RANGE( 0x0b00, 0x0b0f) AM_DEVREADWRITE("miot", mos6530_r, mos6530_w)
+	AM_RANGE( 0x0b00, 0x0b0f) AM_DEVREADWRITE_LEGACY("miot", mos6530_r, mos6530_w)
 	AM_RANGE( 0x0b80, 0x0bbf) AM_RAM // rriot ram
 	AM_RANGE( 0x0c00, 0x0fff) AM_ROM // rriot rom
 	AM_RANGE( 0x1000, 0x1fff) AM_ROM
@@ -93,11 +118,12 @@ static TIMER_DEVICE_CALLBACK( update_leds )
 	int i;
 
 	for (i=0; i<4; i++)
-	output_set_digit_value(i, state->m_led[i]);
-	output_set_led_value(0, state->m_led[4]&8?1:0);
-	output_set_led_value(1, state->m_led[4]&0x20?1:0);
-	output_set_led_value(2, state->m_led[4]&0x10?1:0);
-	output_set_led_value(3, state->m_led[4]&0x10?0:1);
+		output_set_digit_value(i, state->m_led[i]);
+
+	output_set_led_value(0, BIT(state->m_led[4], 3));
+	output_set_led_value(1, BIT(state->m_led[4], 5));
+	output_set_led_value(2, BIT(state->m_led[4], 4));
+	output_set_led_value(3, BIT(state->m_led[4], 4) ? 0 : 1);
 
 	state->m_led[0]= state->m_led[1]= state->m_led[2]= state->m_led[3]= state->m_led[4]= 0;
 }
@@ -106,74 +132,61 @@ static MACHINE_START( mk2 )
 {
 }
 
-static READ8_DEVICE_HANDLER( mk2_read_a )
+READ8_MEMBER( mk2_state::mk2_read_a )
 {
 	int data=0xff;
-	int help=input_port_read(device->machine(), "BLACK")|input_port_read(device->machine(), "WHITE"); // looks like white and black keys are the same!
+	int help=input_port_read(machine(), "BLACK") | input_port_read(machine(), "WHITE"); // looks like white and black keys are the same!
 
-	switch (mos6530_portb_out_get(device)&0x7) {
+	switch (mos6530_portb_out_get(m_miot)&0x7)
+	{
 	case 4:
-		if (help&0x20) data&=~0x1; //F
-		if (help&0x10) data&=~0x2; //E
-		if (help&8) data&=~0x4; //D
-		if (help&4) data&=~0x8; // C
-		if (help&2) data&=~0x10; // B
-		if (help&1) data&=~0x20; // A
-#if 0
-		if (input_port_read(device->machine(), "???")&1) data&=~0x40; //?
-#endif
+		if (BIT(help, 5)) data&=~0x1; //F
+		if (BIT(help, 4)) data&=~0x2; //E
+		if (BIT(help, 3)) data&=~0x4; //D
+		if (BIT(help, 2)) data&=~0x8; // C
+		if (BIT(help, 1)) data&=~0x10; // B
+		if (BIT(help, 0)) data&=~0x20; // A
 		break;
 	case 5:
-#if 0
-		if (input_port_read(device->machine(), "???")&2) data&=~0x1; //?
-		if (input_port_read(device->machine(), "???")&4) data&=~0x2; //?
-		if (input_port_read(device->machine(), "???")&8) data&=~0x4; //?
-#endif
-		if (input_port_read(device->machine(), "EXTRA")&4) data&=~0x8; // Enter
-		if (input_port_read(device->machine(), "EXTRA")&2) data&=~0x10; // Clear
-		if (help&0x80) data&=~0x20; // H
-		if (help&0x40) data&=~0x40; // G
+		if (BIT(input_port_read(machine(), "EXTRA"), 2)) data&=~0x8; // Enter
+		if (BIT(input_port_read(machine(), "EXTRA"), 1)) data&=~0x10; // Clear
+		if (BIT(help, 7)) data&=~0x20; // H
+		if (BIT(help, 6)) data&=~0x40; // G
 		break;
 	}
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( mk2_write_a )
+WRITE8_MEMBER( mk2_state::mk2_write_a )
 {
-	mk2_state *state = device->machine().driver_data<mk2_state>();
-	int temp = mos6530_portb_out_get(device);
+	UINT8 temp = mos6530_portb_out_get(m_miot);
 
-	switch(temp&0x3) {
-	case 0: case 1: case 2: case 3:
-		state->m_led[temp&3]|=data;
-	}
+	m_led[temp & 3] |= data;
 }
 
 
-static READ8_DEVICE_HANDLER( mk2_read_b )
+READ8_MEMBER( mk2_state::mk2_read_b )
 {
 	return 0xff&~0x40; // chip select mapped to pb6
 }
 
 
-static WRITE8_DEVICE_HANDLER( mk2_write_b )
+WRITE8_MEMBER( mk2_state::mk2_write_b )
 {
-	mk2_state *state = device->machine().driver_data<mk2_state>();
-	device_t *dac_device = device->machine().device("dac");
+	if ((data&0x06) == 0x06)
+			speaker_level_w(m_speaker, BIT(data, 0));
 
-	if ((data&0x06)==0x06)
-		dac_data_w(dac_device,data&1?80:0);
-	state->m_led[4]|=data;
+	m_led[4]|=data;
 
-	cputag_set_input_line( device->machine(), "maincpu", M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE );
+	cputag_set_input_line(machine(), "maincpu", M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 static MOS6530_INTERFACE( mk2_mos6530_interface )
 {
-	DEVCB_HANDLER(mk2_read_a),
-	DEVCB_HANDLER(mk2_write_a),
-	DEVCB_HANDLER(mk2_read_b),
-	DEVCB_HANDLER(mk2_write_b)
+	DEVCB_DRIVER_MEMBER(mk2_state, mk2_read_a),
+	DEVCB_DRIVER_MEMBER(mk2_state, mk2_write_a),
+	DEVCB_DRIVER_MEMBER(mk2_state, mk2_read_b),
+	DEVCB_DRIVER_MEMBER(mk2_state, mk2_write_b)
 };
 
 
@@ -185,16 +198,15 @@ static MACHINE_CONFIG_START( mk2, mk2_state )
 
 	MCFG_MACHINE_START( mk2 )
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mk2)
 
 	MCFG_MOS6530_ADD( "miot", 1000000, mk2_mos6530_interface )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_ADD_PERIODIC("led_timer", update_leds, attotime::from_hz(60))
 MACHINE_CONFIG_END
@@ -212,23 +224,7 @@ ROM_END
 
 ***************************************************************************/
 
-/*
-   port a
-   0..7 led output
-   0..6 keyboard input
 
-   port b
-    0..5 outputs
-    0 speaker out
-    6 as chipselect used!?
-    7 interrupt out?
-
-    c4, c5, keyboard polling
-    c0, c1, c2, c3 led output
-
-*/
-
-
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY   FULLNAME */
-CONS( 1979,	mk2,	0,		0,		mk2,	mk2,	0,		"Quelle International",  "Chess Champion MK II", 0)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY               FULLNAME */
+CONS( 1979, mk2,    0,      0,      mk2,    mk2,    0, "Quelle International", "Chess Champion MK II", 0)
 // second design sold (same computer/program?)

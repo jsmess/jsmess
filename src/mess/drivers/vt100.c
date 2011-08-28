@@ -131,15 +131,15 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 
 WRITE8_MEMBER( vt100_state::vt100_keyboard_w )
 {
-	output_set_value("online_led",BIT(data,5) ? 0 : 1);
-	output_set_value("local_led", BIT(data,5));
-	output_set_value("locked_led",BIT(data,4) ? 0 : 1);
-	output_set_value("l1_led", BIT(data,3) ? 0 : 1);
-	output_set_value("l2_led", BIT(data,2) ? 0 : 1);
-	output_set_value("l3_led", BIT(data,1) ? 0 : 1);
-	output_set_value("l4_led", BIT(data,0) ? 0 : 1);
-	m_key_scan = BIT(data,6);
-	speaker_level_w(m_speaker, BIT(data,7));
+	output_set_value("online_led",BIT(data, 5) ? 0 : 1);
+	output_set_value("local_led", BIT(data, 5));
+	output_set_value("locked_led",BIT(data, 4) ? 0 : 1);
+	output_set_value("l1_led", BIT(data, 3) ? 0 : 1);
+	output_set_value("l2_led", BIT(data, 2) ? 0 : 1);
+	output_set_value("l3_led", BIT(data, 1) ? 0 : 1);
+	output_set_value("l4_led", BIT(data, 0) ? 0 : 1);
+	m_key_scan = BIT(data, 6);
+	speaker_level_w(m_speaker, BIT(data, 7));
 }
 
 READ8_MEMBER( vt100_state::vt100_keyboard_r )
@@ -429,7 +429,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(800))
 MACHINE_CONFIG_END
