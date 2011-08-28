@@ -9,12 +9,12 @@
       hooked up.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
 #include "machine/wd17xx.h"
-
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 
@@ -22,13 +22,22 @@ class myb3k_state : public driver_device
 {
 public:
 	myb3k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_fdc(*this, "fdc"),
+	m_crtc(*this, "crtc")
+	{ }
 
-	UINT8 *m_vram;
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_fdc;
+	required_device<mc6845_device> m_crtc;
+	DECLARE_WRITE8_MEMBER(myb3k_6845_address_w);
+	DECLARE_WRITE8_MEMBER(myb3k_6845_data_w);
+	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
+	DECLARE_WRITE8_MEMBER(myb3k_fdc_output_w);
+	UINT8 *m_p_vram;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 	UINT8 m_vmode;
-
-	mc6845_device *m_mc6845;
 };
 
 static VIDEO_START( myb3k )
@@ -74,7 +83,7 @@ static SCREEN_UPDATE( myb3k )
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					dot = (state->m_vram[(x+y*mc6845_h_display)*h_step+yi+0x8000] >> (7-xi)) & 1;
+					dot = (state->m_p_vram[(x+y*mc6845_h_display)*h_step+yi+0x8000] >> (7-xi)) & 1;
 					if((yi & ~7 && (!(state->m_vmode & 4))) || (yi & ~0xf && (state->m_vmode & 4)))
 						dot = 0;
 
@@ -88,51 +97,45 @@ static SCREEN_UPDATE( myb3k )
 	return 0;
 }
 
-static WRITE8_HANDLER( myb3k_6845_address_w )
+WRITE8_MEMBER( myb3k_state::myb3k_6845_address_w )
 {
-	myb3k_state *state = space->machine().driver_data<myb3k_state>();
-
-	state->m_crtc_index = data;
-	state->m_mc6845->address_w(*space, offset, data);
+	m_crtc_index = data;
+	m_crtc->address_w(space, offset, data);
 }
 
-static WRITE8_HANDLER( myb3k_6845_data_w )
+WRITE8_MEMBER( myb3k_state::myb3k_6845_data_w )
 {
-	myb3k_state *state = space->machine().driver_data<myb3k_state>();
-
-	state->m_crtc_vreg[state->m_crtc_index] = data;
-	state->m_mc6845->register_w(*space, offset, data);
+	m_crtc_vreg[m_crtc_index] = data;
+	m_crtc->register_w(space, offset, data);
 }
 
-static WRITE8_HANDLER( myb3k_video_mode_w )
+WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 {
-	myb3k_state *state = space->machine().driver_data<myb3k_state>();
-
 	/* ---- -x-- interlace mode */
 	/* ---- --xx horizontal step count (number of offsets of vram RAM data to skip, 64 >> n) */
 
-	state->m_vmode = data;
+	m_vmode = data;
 }
 
-static WRITE8_DEVICE_HANDLER( myb3k_fdc_output_w )
+WRITE8_MEMBER( myb3k_state::myb3k_fdc_output_w )
 {
 	/* TODO: complete guesswork! (it just does a 0x24 -> 0x20 in there) */
-	wd17xx_set_drive(device,data & 3);
-	floppy_mon_w(floppy_get_device(device->machine(), data & 3), !(data & 4) ? 1: 0);
-	floppy_drive_set_ready_state(floppy_get_device(device->machine(), data & 3), data & 0x4,0);
-	//wd17xx_set_side(dev,(data & 0x10)>>4);
+	wd17xx_set_drive(m_fdc, data & 3);
+	floppy_mon_w(floppy_get_device(machine(), data & 3), !(data & 4) ? 1: 0);
+	floppy_drive_set_ready_state(floppy_get_device(machine(), data & 3), data & 0x4,0);
+	//wd17xx_set_side(m_fdc, (data & 0x10)>>4);
 }
 
-static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8, myb3k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x7ffff) AM_RAM
 	AM_RANGE(0x80000,0x8ffff) AM_NOP
-	AM_RANGE(0xd0000,0xdffff) AM_RAM AM_BASE_MEMBER(myb3k_state,m_vram)
+	AM_RANGE(0xd0000,0xdffff) AM_RAM AM_BASE(m_p_vram)
 //  AM_RANGE(0xe0000,0xexxxx) option ROM board
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(myb3k_io, AS_IO, 8)
+static ADDRESS_MAP_START(myb3k_io, AS_IO, 8, myb3k_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW1")
 	AM_RANGE(0x03, 0x03) AM_WRITENOP
@@ -140,8 +143,8 @@ static ADDRESS_MAP_START(myb3k_io, AS_IO, 8)
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1c, 0x1c) AM_WRITE(myb3k_6845_address_w)
 	AM_RANGE(0x1d, 0x1d) AM_WRITE(myb3k_6845_data_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("fdc",wd17xx_r,wd17xx_w) //FDC, almost likely wd17xx
-	AM_RANGE(0x24, 0x24) AM_DEVWRITE("fdc",myb3k_fdc_output_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("fdc",wd17xx_r,wd17xx_w) //FDC, almost likely wd17xx
+	AM_RANGE(0x24, 0x24) AM_WRITE(myb3k_fdc_output_w)
 //  AM_RANGE(0x520,0x524) mirror of above
 ADDRESS_MAP_END
 
@@ -202,9 +205,6 @@ INPUT_PORTS_END
 
 static MACHINE_START(myb3k)
 {
-	myb3k_state *state = machine.driver_data<myb3k_state>();
-
-	state->m_mc6845 = machine.device<mc6845_device>("crtc");
 }
 
 static MACHINE_RESET(myb3k)
@@ -215,7 +215,7 @@ static MACHINE_RESET(myb3k)
 static const gfx_layout myb3k_charlayout =
 {
 	8, 8,
-	RGN_FRAC(1,1),
+	0x400,
 	1,
 	{ 0 },
 	{ STEP8(0,1) },
@@ -273,9 +273,6 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_MACHINE_START(myb3k)
 	MCFG_MACHINE_RESET(myb3k)
 
-	MCFG_MB8877_ADD("fdc", myb3k_wd17xx_interface ) //unknown type
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(myb3k_floppy_interface)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -283,15 +280,16 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_VIDEO_START(myb3k)
 	MCFG_SCREEN_UPDATE(myb3k)
 	MCFG_GFXDECODE(myb3k)
-
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
-
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(myb3k)
+	/* Devices */
+	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MB8877_ADD("fdc", myb3k_wd17xx_interface ) //unknown type
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(myb3k_floppy_interface)
 MACHINE_CONFIG_END
 
 /* ROM definition */
