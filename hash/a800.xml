@@ -3951,7 +3951,7 @@ Compiled by K1W1
 
 	<software name="smart41" cloneof="smart50">
 		<description>Smart Terminal v4.1</description>
-		<year>1983</year>ab
+		<year>1983</year>
 		<publisher>MPP</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
@@ -4593,7 +4593,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="right slot 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="the monkey wrench 2 xl.rom" ize="8192" crc="69fd5f8b" sha1="a352188014b06e86ab353cc7fefbcbc49c5c010c" offset="0" />
+				<rom name="the monkey wrench 2 xl.rom" size="8192" crc="69fd5f8b" sha1="a352188014b06e86ab353cc7fefbcbc49c5c010c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
