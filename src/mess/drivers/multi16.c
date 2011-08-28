@@ -3,6 +3,7 @@
     Mitsubishi Multi 16
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -14,12 +15,20 @@ class multi16_state : public driver_device
 {
 public:
 	multi16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_pic(*this, "pic8259"),
+	m_crtc(*this, "crtc")
+	{ }
 
-	UINT16 *m_vram;
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_pic;
+	required_device<mc6845_device> m_crtc;
+	DECLARE_WRITE8_MEMBER(multi16_6845_address_w);
+	DECLARE_WRITE8_MEMBER(multi16_6845_data_w);
+	DECLARE_WRITE_LINE_MEMBER(multi16_set_int_line);
+	UINT16 *m_p_vram;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
-
-	mc6845_device *m_mc6845;
 };
 
 
@@ -60,7 +69,7 @@ static SCREEN_UPDATE( multi16 )
 		{
 			for(xi=0;xi<16;xi++)
 			{
-				int dot = (BITSWAP16(state->m_vram[count],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-xi)) & 0x1;
+				int dot = (BITSWAP16(state->m_p_vram[count],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-xi)) & 0x1;
 
 				if(y < screen->machine().primary_screen->visible_area().max_y && x*16+xi < screen->machine().primary_screen->visible_area().max_x) /* TODO: safety check */
 					*BITMAP_ADDR16(bitmap, y, x*16+xi) = screen->machine().pens[dot];
@@ -73,35 +82,31 @@ static SCREEN_UPDATE( multi16 )
 	return 0;
 }
 
-static ADDRESS_MAP_START(multi16_map, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(multi16_map, AS_PROGRAM, 16, multi16_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x7ffff) AM_RAM
-	AM_RANGE(0xd8000,0xdffff) AM_RAM AM_BASE_MEMBER(multi16_state,m_vram)
+	AM_RANGE(0xd8000,0xdffff) AM_RAM AM_BASE(m_p_vram)
 	AM_RANGE(0xe0000,0xeffff) AM_RAM
 	AM_RANGE(0xf0000,0xf3fff) AM_MIRROR(0xc000) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( multi16_6845_address_w )
+WRITE8_MEMBER( multi16_state::multi16_6845_address_w )
 {
-	multi16_state *state = space->machine().driver_data<multi16_state>();
-
-	state->m_crtc_index = data;
-	state->m_mc6845->address_w(*space, offset, data);
+	m_crtc_index = data;
+	m_crtc->address_w(space, offset, data);
 }
 
-static WRITE8_HANDLER( multi16_6845_data_w )
+WRITE8_MEMBER( multi16_state::multi16_6845_data_w )
 {
-	multi16_state *state = space->machine().driver_data<multi16_state>();
-
-	state->m_crtc_vreg[state->m_crtc_index] = data;
-	state->m_mc6845->register_w(*space, offset, data);
+	m_crtc_vreg[m_crtc_index] = data;
+	m_crtc->register_w(space, offset, data);
 }
 
-static ADDRESS_MAP_START(multi16_io, AS_IO, 16)
+static ADDRESS_MAP_START(multi16_io, AS_IO, 16, multi16_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff) // i8259
-	AM_RANGE(0x40, 0x41) AM_WRITE8(multi16_6845_address_w,0x00ff)
-	AM_RANGE(0x40, 0x41) AM_WRITE8(multi16_6845_data_w,0xff00)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff) // i8259
+	AM_RANGE(0x40, 0x41) AM_WRITE8(multi16_6845_address_w, 0x00ff)
+	AM_RANGE(0x40, 0x41) AM_WRITE8(multi16_6845_data_w, 0xff00)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -110,28 +115,24 @@ INPUT_PORTS_END
 
 static IRQ_CALLBACK(multi16_irq_callback)
 {
-	return pic8259_acknowledge( device->machine().device( "pic8259" ) );
+	return pic8259_acknowledge( device->machine().device("pic8259") );
 }
 
-static WRITE_LINE_DEVICE_HANDLER( multi16_set_int_line )
+WRITE_LINE_MEMBER( multi16_state::multi16_set_int_line )
 {
 	//printf("%02x\n",interrupt);
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface multi16_pic8259_config =
 {
-	DEVCB_LINE(multi16_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(multi16_state, multi16_set_int_line),
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };
 
 static MACHINE_START(multi16)
 {
-	multi16_state *state = machine.driver_data<multi16_state>();
-
-	state->m_mc6845 = machine.device<mc6845_device>("crtc");
-
 	device_set_irq_callback(machine.device("maincpu"), multi16_irq_callback);
 }
 
@@ -163,8 +164,6 @@ static MACHINE_CONFIG_START( multi16, multi16_state )
 	MCFG_MACHINE_START(multi16)
 	MCFG_MACHINE_RESET(multi16)
 
-	MCFG_PIC8259_ADD( "pic8259", multi16_pic8259_config )
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -172,14 +171,13 @@ static MACHINE_CONFIG_START( multi16, multi16_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE(multi16)
-
-	MCFG_MC6845_ADD("crtc", H46505, 16000000/5, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
-
-	MCFG_PALETTE_LENGTH(8)
-//  MCFG_PALETTE_INIT(black_and_white)
-
 	MCFG_VIDEO_START(multi16)
+	MCFG_SCREEN_UPDATE(multi16)
+	MCFG_PALETTE_LENGTH(8)
+
+	/* Devices */
+	MCFG_MC6845_ADD("crtc", H46505, 16000000/5, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_PIC8259_ADD( "pic8259", multi16_pic8259_config )
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -190,5 +188,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1986, multi16,  0,      0,       multi16,     multi16,    0,     "Mitsubishi",   "Multi 16", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
+COMP( 1986, multi16, 0,      0,       multi16,   multi16, 0,   "Mitsubishi", "Multi 16", GAME_NOT_WORKING | GAME_NO_SOUND)
