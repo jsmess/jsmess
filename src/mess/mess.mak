@@ -1673,6 +1673,9 @@ $(MESSOBJ)/veb.a:				\
 	$(MESS_VIDEO)/kc.o			\
 	$(MESS_DRIVERS)/kc.o		\
 	$(MESS_MACHINE)/kc.o		\
+	$(MESS_MACHINE)/kcexp.o		\
+	$(MESS_MACHINE)/kc_ram.o	\
+	$(MESS_MACHINE)/kc_rom.o	\
 	$(MESS_DRIVERS)/lc80.o		\
 	$(MESS_DRIVERS)/mc80.o		\
 	$(MESS_VIDEO)/mc80.o		\

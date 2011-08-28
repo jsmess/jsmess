@@ -12,6 +12,9 @@
 #include "machine/z80pio.h"
 #include "imagedev/snapquik.h"
 #include "machine/upd765.h"
+#include "machine/kcexp.h"
+#include "machine/kc_ram.h"
+#include "machine/kc_rom.h"
 
 #define KC85_4_CLOCK 1750000
 #define KC85_3_CLOCK 1750000
@@ -59,7 +62,6 @@ public:
 	int m_kc85_pio_data[2];
 	device_t *m_kc85_z80pio;
 	unsigned char m_kc85_disc_hw_input_gate;
-	unsigned char *m_kc85_module_rom;
 	emu_timer *m_cassette_timer;
 	int m_cassette_motor_state;
 	unsigned char m_ardy;
@@ -74,7 +76,8 @@ public:
 	int m_kc85_blink_state;
 	unsigned char *m_kc85_4_display_video_ram;
 	unsigned char *m_kc85_4_video_ram;
-	const struct kc85_module *m_modules[256>>2];
+
+	kcexp_slot_device *m_expansions[3];
 };
 
 
@@ -118,11 +121,9 @@ extern const z80ctc_interface kc85_ctc_intf;
 
 
 /*** MODULE SYSTEM ***/
-/* read from xx80 port */
-READ8_HANDLER(kc85_module_r);
-/* write to xx80 port */
-WRITE8_HANDLER(kc85_module_w);
 
+READ8_HANDLER ( kc_expansion_io_read );
+WRITE8_HANDLER ( kc_expansion_io_write );
 
 /*** DISC INTERFACE **/
 
