@@ -15,6 +15,7 @@
 #include "machine/kcexp.h"
 #include "machine/kc_ram.h"
 #include "machine/kc_rom.h"
+#include "machine/kc_d002.h"
 
 #define KC85_4_CLOCK 1750000
 #define KC85_3_CLOCK 1750000
