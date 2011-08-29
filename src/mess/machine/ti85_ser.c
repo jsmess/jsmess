@@ -1485,7 +1485,7 @@ DEVICE_GET_INFO( ti85serial )
 	case DEVINFO_FCT_IMAGE_UNLOAD:					info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME( ti85serial );						break;
 	case DEVINFO_PTR_INPUT_PORTS:					info->ipt = INPUT_PORTS_NAME( ti85serial );										break;
 	case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:		strcpy(info->s, "ser");															break;
-	case DEVINFO_STR_IMAGE_INSTANCE_NAME:
+	case DEVINFO_STR_IMAGE_INSTANCE_NAME:			strcpy(info->s, "serial");														break;
 	case DEVINFO_STR_NAME:							strcpy(info->s, "TI85 Serial");													break;
 	case DEVINFO_STR_FAMILY:						strcpy(info->s, "serial protocol");												break;
 	case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);														break;
