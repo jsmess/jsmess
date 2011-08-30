@@ -46,7 +46,7 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 #include "machine/pc_joy.h"
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
-#include "includes/pc_mouse.h"
+#include "machine/pc_mouse.h"
 
 #include "includes/amstr_pc.h"
 

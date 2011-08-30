@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "machine/ins8250.h"
-#include "includes/pc_mouse.h"
+#include "machine/pc_mouse.h"
 
 
 static struct {

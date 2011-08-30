@@ -43,7 +43,7 @@
 #include "sound/cdda.h"
 #include "machine/sgi.h"
 #include "machine/pckeybrd.h"
-#include "includes/pc_mouse.h"
+#include "machine/pc_mouse.h"
 #include "machine/pc_lpt.h"
 #include "includes/at.h"
 #include "machine/8042kbdc.h"

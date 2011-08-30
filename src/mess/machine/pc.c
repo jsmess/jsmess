@@ -26,7 +26,7 @@
 
 #include "machine/pit8253.h"
 
-#include "includes/pc_mouse.h"
+#include "machine/pc_mouse.h"
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
 #include "machine/pc_fdc.h"
