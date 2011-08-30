@@ -16,11 +16,12 @@
 #include "imagedev/floppy.h"
 #include "formats/ami_dsk.h"
 #include "formats/hxcmfm_dsk.h"
+#include "formats/mfi_dsk.h"
 #include "amigafdc.h"
 #include "machine/6526cia.h"
 
 static floppy_format_type floppy_formats[] = {
-	FLOPPY_ADF_FORMAT, FLOPPY_MFM_FORMAT,
+	FLOPPY_ADF_FORMAT, FLOPPY_MFM_FORMAT, FLOPPY_MFI_FORMAT,
 	NULL
 };
 
