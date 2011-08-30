@@ -19,10 +19,10 @@
 #include "amigafdc.h"
 #include "machine/6526cia.h"
 
-static FLOPPY_OPTIONS_START( amiga_only )
-	FLOPPY_OPTION( adf, "adf", "Amiga ADF floppy disk image", FLOPPY_ADF_FORMAT, NULL )
-	FLOPPY_OPTION( mfm, "mfm", "HxCFloppyEmulator floppy disk image", FLOPPY_MFM_FORMAT, NULL )
-FLOPPY_OPTIONS_END
+static floppy_format_type floppy_formats[] = {
+	FLOPPY_ADF_FORMAT, FLOPPY_MFM_FORMAT,
+	NULL
+};
 
 #define MAX_TRACK_BYTES			12500
 #define ACTUAL_TRACK_BYTES		11968
@@ -429,7 +429,7 @@ WRITE_LINE_DEVICE_HANDLER(amiga_index_callback)
 static const floppy_interface amiga_floppy_interface =
 {
 	DEVCB_LINE(amiga_index_callback),
-	FLOPPY_OPTIONS_NAME(amiga_only),
+	floppy_formats,
 	NULL,
 	NULL,
 	amiga_load_proc,
