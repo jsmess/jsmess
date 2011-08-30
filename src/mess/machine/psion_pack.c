@@ -4,6 +4,18 @@
 
     Psion Organiser II Datapack emulation
 
+
+    Datapack pinout from Psion's documentation
+              __  __
+    SD1    1 |  \/  | 2  SD0
+    SD3    3 |      | 4  SD2
+    SD5    5 |      | 6  SD4
+    SD7    7 |      | 8  SD6
+    SMR    9 |      | 10 SCLK
+    SOE_B 11 |      | 12 SS_B
+    GND   13 |      | 14 SPGM_B
+    SVCC  15 |______| 16 SVPP
+
 ****************************************************************************/
 
 #include "emu.h"

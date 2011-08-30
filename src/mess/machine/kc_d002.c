@@ -69,7 +69,7 @@ WRITE_LINE_MEMBER(kc_d002_device::out_halt_w)
 	m_slot->m_out_halt_func(state);
 }
 
-static const kcexp_interface kcexp_interface =
+static const kcexp_interface kc_d002_interface =
 {
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, kc_d002_device, out_irq_w),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, kc_d002_device, out_nmi_w),
@@ -77,13 +77,13 @@ static const kcexp_interface kcexp_interface =
 };
 
 static MACHINE_CONFIG_FRAGMENT( kc_d002 )
-	MCFG_KC85_CARTRIDGE_ADD("m1", "m2", kcexp_interface, kc_d002_cart, NULL, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("m2", "m3", kcexp_interface, kc_d002_cart, NULL, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("m3", "m4", kcexp_interface, kc_d002_cart, NULL, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("m4", "exp", kcexp_interface, kc_d002_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m1", "m2", kc_d002_interface, kc_d002_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m2", "m3", kc_d002_interface, kc_d002_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m3", "m4", kc_d002_interface, kc_d002_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m4", "exp", kc_d002_interface, kc_d002_cart, NULL, NULL)
 
 	// expansion interface
-	MCFG_KC85_EXPANSION_ADD("exp", NULL, kcexp_interface, kc_d002_exp , NULL, NULL)
+	MCFG_KC85_EXPANSION_ADD("exp", NULL, kc_d002_interface, kc_d002_exp , NULL, NULL)
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -115,11 +115,11 @@ void kc_d002_device::device_start()
 {
 	m_slot = dynamic_cast<kcexp_slot_device *>(owner());
 
-	m_expansions[0] = subdevice<kcexp_slot_device>("m1");
-	m_expansions[1] = subdevice<kcexp_slot_device>("m2");
-	m_expansions[2] = subdevice<kcexp_slot_device>("m3");
-	m_expansions[3] = subdevice<kcexp_slot_device>("m4");
-	m_expansions[4] = subdevice<kcexp_slot_device>("exp");
+	m_expansions[0] = downcast<kcexp_slot_device *>(subdevice("m1"));
+	m_expansions[1] = downcast<kcexp_slot_device *>(subdevice("m2"));
+	m_expansions[2] = downcast<kcexp_slot_device *>(subdevice("m3"));
+	m_expansions[3] = downcast<kcexp_slot_device *>(subdevice("m4"));
+	m_expansions[4] = downcast<kcexp_slot_device *>(subdevice("exp"));
 }
 
 //-------------------------------------------------
