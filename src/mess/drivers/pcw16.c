@@ -1364,8 +1364,8 @@ static MACHINE_START( pcw16 )
 	pc_fdc_init(machine, &pcw16_fdc_interface);
 
 	/* initialise mouse */
-	pc_mouse_initialise(machine);
-	pc_mouse_set_serial_port( machine.device("ns16550_0") );
+	//pc_mouse_initialise(machine);
+	//pc_mouse_set_serial_port( machine.device("ns16550_0") );
 
 	/* initialise keyboard */
 	at_keyboard_init(machine, AT_KEYBOARD_TYPE_AT);
