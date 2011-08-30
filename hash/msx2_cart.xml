@@ -30,7 +30,7 @@ LZ93A13 (32 pin) - 8KB banks
 <!--
 	<software name="">
 		<!- 蒼き狼と白き牝鹿 元朝秘史 ->
-		<description>Blue Wolf and White Doe anecdote Dynasty</description>
+		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi</description>
 		<year>19??</year>
 		<publisher>Sakai Mitsuru</publisher>
 		<part name="cart" interface="msx_cart">
@@ -47,7 +47,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="genghis">
 		<!-- 蒼き狼と白き牝鹿 ジンギスカン -->
-		<description>Genghis Khan</description>
+		<description>Aoki Ookami to Shiroki Mejika - Genghis Khan</description>
 		<year>1988</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="msx_cart">
@@ -76,7 +76,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="ashguin3">
 		<!-- アシュギーネ 復讐の炎 -->
-		<description>Ashguine: Densetsu no Seisenshi</description>
+		<description>Ashguine: Fukushuu no Honoo</description>
 		<year>1987</year>
 		<publisher>Panasoft / Micro Cabin</publisher>
 		<part name="cart" interface="msx_cart">
@@ -90,7 +90,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="ashguin3a" cloneof="ashguin3">
 		<!-- アシュギーネ 復讐の炎 -->
-		<description>Ashguine: Densetsu no Seisenshi (Alt)</description>
+		<description>Ashguine: Fukushuu no Honoo (Alt)</description>
 		<year>1987</year>
 		<publisher>Panasoft / Micro Cabin</publisher>
 		<part name="cart" interface="msx_cart">
@@ -132,7 +132,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="androgyn">
 		<!-- アンドロギュヌス -->
-		<description>Androgynous</description>
+		<description>Androgynus</description>
 		<year>1988</year>
 		<publisher>Telenet Japan</publisher>
 		<part name="cart" interface="msx_cart">
@@ -177,7 +177,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="idemjong">
 		<!-- 井出洋介名人の実戦麻雀 -->
-		<description>Ide Yousuke No Jissen Mahjong</description>
+		<description>Ide Yousuke Meijin no Jissen Mahjong</description>
 		<year>1988</year>
 		<publisher>Pack in Video</publisher>
 		<part name="cart" interface="msx_cart">
@@ -205,8 +205,8 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="aclassmj">
-		<!-- 居眠り流 阿佐田哲也のＡ級麻雀 -->
-		<description>A-Class Mahjong</description>
+		<!-- 居眠り流 阿佐田哲也のA級麻雀 -->
+		<description>Inemuri-ryuu Asada Tetsuya no A-kyuu Mahjong</description>
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<part name="cart" interface="msx_cart">
@@ -266,8 +266,8 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="atrain">
-		<!-- Ａ列車で行こう -->
-		<description>A-Train</description>
+		<!-- A列車で行こう -->
+		<description>A Ressha de Ikou - Take the A Train.</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<part name="cart" interface="msx_cart">
@@ -282,7 +282,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="f15">
-		<!-- Ｆ－１５ストライクイーグル -->
+		<!-- F-15ストライクイーグル -->
 		<description>F-15 Strike Eagle</description>
 		<year>1987</year>
 		<publisher>System Soft</publisher>
@@ -341,9 +341,9 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<!-- Game doesn't boot on regular msx2 driver. Reported to work on hbf700p driver. -->
-	<software name="kikikaik">
+	<software name="kikikai">
 		<!-- 奇々怪界 -->
-		<description>Kikikaikai</description>
+		<description>KiKi KaiKai</description>
 		<year>1986</year>
 		<publisher>Sony</publisher>
 		<part name="cart" interface="msx_cart">
@@ -372,8 +372,8 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="jikochu2">
-		<!-- ぎゅわんぶらあ自己中心派２ 自称！強豪雀士編 -->
-		<description>Gambler Jikochuushinha 2</description>
+		<!-- ぎゅわんぶらあ自己中心派2 自称! 強豪雀士編 -->
+		<description>Gambler Jikochuushinha 2 - Jishou! Kyougou Janshi Hen</description>
 		<year>1988</year>
 		<publisher>Gamearts</publisher>
 		<part name="cart" interface="msx_cart">
@@ -430,9 +430,9 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<!-- doesn't seem to boot in msx2 driver -->
-	<software name="murdercl" supported="no">
+	<software name="sjclub" supported="no">
 		<!-- 殺人倶楽部 -->
-		<description>final Mystery Murder Club - Satsujin Club</description>
+		<description>Satsujin Club</description>
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
 		<part name="cart" interface="msx_cart">
@@ -552,7 +552,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="sdaisenr">
-		<!-- ＳＵＰＥＲ大戦略 -->
+		<!-- SUPER大戦略 -->
 		<description>Super Daisenryaku</description>
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
@@ -596,7 +596,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="seikima2">
 		<!-- 聖飢魔IIスペシャル 悪魔の逆襲 -->
-		<description>Seikima 2 Special</description>
+		<description>Seikima II Special - Akuma no Gyakushuu</description>
 		<year>1987</year>
 		<publisher>Sony</publisher>
 		<part name="cart" interface="msx_cart">
@@ -626,7 +626,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="zoids">
 		<!-- ゾイド 中央大陸の戦い -->
-		<description>Zoids</description>
+		<description>Zoids - Chuuou Tairiku no Tatakai</description>
 		<year>1988</year>
 		<publisher>Toshiba EMI</publisher>
 		<part name="cart" interface="msx_cart">
@@ -700,7 +700,6 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- doesn't seem to work -->
 	<software name="dires" supported="no">
-		<!-- ＤＩＲＥＳ ネットワーク・バージョン -->
 		<description>Dires</description>
 		<year>1988</year>
 		<publisher>Bothtec</publisher>
@@ -715,7 +714,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="drwn4078">
-		<!-- ダーウィン４０７８ -->
+		<!-- ダーウィン4078 -->
 		<description>Darwin 4078</description>
 		<year>1987</year>
 		<publisher>Hudsonsoft</publisher>
@@ -788,7 +787,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="ashguine">
 		<!-- 伝説の聖戦士 アシュギーネ -->
-		<description>Ashguine</description>
+		<description>Densetsu no Seisenshi Ashguine</description>
 		<year>1987</year>
 		<publisher>Bit2</publisher>
 		<part name="cart" interface="msx_cart">
@@ -829,7 +828,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="dragonq2">
 		<!-- ドラゴンクエストII 悪霊の神々 -->
-		<description>Dragon Quest 2</description>
+		<description>Dragon Quest II - Akuryou no Kamigami</description>
 		<year>1987</year>
 		<publisher>Enix</publisher>
 		<part name="cart" interface="msx_cart">
@@ -872,7 +871,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="ninjakun">
 		<!-- 忍者くん 阿修羅の章 -->
-		<description>Ninja Kun</description>
+		<description>Ninja Kun - Ashura no Shou</description>
 		<year>1987</year>
 		<publisher>HAL</publisher>
 		<part name="cart" interface="msx_cart">
@@ -886,7 +885,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="nobuseng">
 		<!-- 信長の野望　戦国群雄伝 -->
-		<description>Nobunaga no Yabou - Sengoku Gunyuuden</description>
+		<description>Nobunaga no Yabou - Sengoku Gun'yuu Den</description>
 		<year>1989</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="msx_cart">
@@ -945,7 +944,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="hydlide3">
-		<!-- ハイドライド３ -->
+		<!-- ハイドライド3 -->
 		<description>Hydlide 3</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -990,7 +989,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- Does not work in the generic msx2 driver -->
 	<software name="victnin2" supported="no">
 		<!-- ビクトリアス・ナインII 高校野球編 -->
-		<description>Victorious Nine II</description>
+		<description>Victorious Nine II - Koukou Yakyuu Hen</description>
 		<year>1987</year>
 		<publisher>Taito</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1004,7 +1003,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="fireball">
 		<!-- ファイア・ボール -->
-		<description>Fireball</description>
+		<description>Fire Ball</description>
 		<year>1987</year>
 		<publisher>Hummingbird Soft</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1062,7 +1061,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="fantzon2">
 		<!-- ファンタジーゾーンII ～オパオパの涙～ -->
-		<description>Fantasy Zone II</description>
+		<description>Fantasy Zone II - The Tears of OPA-OPA</description>
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1076,7 +1075,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="fleetco2">
 		<!-- フリートコマンダーII 黄昏の海域 -->
-		<description>Fleet Commander II</description>
+		<description>Fleet Commander II - Tasogare no Kaiiki</description>
 		<year>1990</year>
 		<publisher>Ascii</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1089,8 +1088,8 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="projcta2">
-		<!-- プロジェクトＡ２ 史上最大の決戦 -->
-		<description>Project A2</description>
+		<!-- プロジェクトA2 史上最大の標的 -->
+		<description>Project A2 - Shijou Saidai no Hyouteki</description>
 		<year>1987</year>
 		<publisher>Pony</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1106,7 +1105,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- Does not work in generic msx2 driver -->
 	<software name="profmahj" supported="no">
 		<!-- プロフェッショナル麻雀悟空 -->
-		<description>Professional Mahjong Gokuh</description>
+		<description>Professional Mahjong Gokuu</description>
 		<year>1988</year>
 		<publisher>Ascii</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1134,7 +1133,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="bballfan">
-		<!-- プロ野球ＦＡＮ -->
+		<!-- プロ野球FAN -->
 		<description>Pro Yakyuu Fan</description>
 		<year>1987</year>
 		<publisher>Telenet</publisher>
@@ -1162,8 +1161,8 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="borfesu">
-		<!-- ボルフェスと５人の悪魔 -->
-		<description>Borfesu and Five Evil Spirits</description>
+		<!-- ボルフェスと5人の悪魔 -->
+		<description>Borfesu to Gonin no Akuma - An Adventure Story</description>
 		<year>1987</year>
 		<publisher>Xtal Soft</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1177,7 +1176,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="kitahei">
 		<!-- 本格将棋 棋太平 -->
-		<description>Kitahei</description>
+		<description>Honkaku Shougi Kitahei</description>
 		<year>1986</year>
 		<publisher>Micro Cabin</publisher>
 		<part name="cart" interface="msx_cart">
