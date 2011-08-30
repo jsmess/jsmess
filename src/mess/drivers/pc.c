@@ -80,7 +80,7 @@ video HW too.
 #include "machine/pc_joy.h"
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
-#include "includes/pc_mouse.h"
+#include "machine/pc_mouse.h"
 
 #include "includes/europc.h"
 #include "includes/tandy1t.h"
