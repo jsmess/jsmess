@@ -362,8 +362,8 @@ are connected */
 static void pc_com_refresh_connected_common(device_t *device, int n, int data)
 {
 	/* mouse connected to this port? */
-	if (input_port_read(device->machine(), "DSW2") & (0x80>>n))
-		pc_mouse_handshake_in(device,data);
+	//if (input_port_read(device->machine(), "DSW2") & (0x80>>n))
+//		pc_mouse_handshake_in(device,data);
 }
 
 static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_0 ) { pc_com_refresh_connected_common( device, 0, data ); }
@@ -975,7 +975,7 @@ void mess_init_pc_common(running_machine &machine, UINT32 flags, void (*set_keyb
 		memory_set_bankptr( machine, "bank10", ram_get_ptr(machine.device(RAM_TAG)) );
 
 	/* serial mouse */
-	pc_mouse_initialise(machine);
+	//pc_mouse_initialise(machine);
 }
 
 
@@ -1151,7 +1151,7 @@ MACHINE_RESET( pc )
 	st->m_ppi_shift_register = 0;
 	st->m_ppi_shift_enable = 0;
 
-	pc_mouse_set_serial_port( machine.device("ins8250_0") );
+	//pc_mouse_set_serial_port( machine.device("ins8250_0") );
 	speaker_level_w( speaker, 0 );
 }
 
@@ -1190,7 +1190,7 @@ MACHINE_RESET( pcjr )
 	st->m_ppi_data_signal = 0;
 	st->m_ppi_shift_register = 0;
 	st->m_ppi_shift_enable = 0;
-	pc_mouse_set_serial_port( machine.device("ins8250_0") );
+	//pc_mouse_set_serial_port( machine.device("ins8250_0") );
 	speaker_level_w( speaker, 0 );
 
 	pcjr_keyb_init(machine);

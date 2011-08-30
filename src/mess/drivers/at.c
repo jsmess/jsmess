@@ -45,6 +45,7 @@
 
 #include "machine/isa_adlib.h"
 #include "machine/isa_com.h"
+#include "machine/isa_comat.h"
 #include "machine/isa_fdc.h"
 #include "machine/isa_gblaster.h"
 #include "machine/isa_hdc.h"
@@ -403,6 +404,7 @@ static const isa16bus_interface isabus_intf =
 static SLOT_INTERFACE_START(pc_isa8_cards)
 	SLOT_INTERFACE("mda", ISA8_MDA)
 	SLOT_INTERFACE("com", ISA8_COM)
+	SLOT_INTERFACE("comat", ISA8_COM_AT)
 	SLOT_INTERFACE("fdc", ISA8_FDC)
 	SLOT_INTERFACE("hdc", ISA8_HDC)
 	SLOT_INTERFACE("adlib", ISA8_ADLIB)
@@ -451,6 +453,7 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
 	MCFG_ISA8_SLOT_ADD("isabus","isa1", pc_isa8_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
+	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_ega )
 
@@ -487,7 +490,8 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
 	MCFG_ISA8_SLOT_ADD("isabus","isa1", pc_isa8_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
-
+	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
+	
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 
 	/* internal ram */
@@ -508,6 +512,7 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
 	MCFG_ISA8_SLOT_ADD("isabus", "isa1", pc_isa8_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
+	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
@@ -529,6 +534,7 @@ static MACHINE_CONFIG_START( neat, at_state )
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
 	MCFG_ISA8_SLOT_ADD("isabus", "isa1", pc_isa8_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus", "isa2", pc_isa16_cards, "ide", NULL)
+	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 
@@ -551,6 +557,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
 	MCFG_ISA8_SLOT_ADD("isabus", "isa1", pc_isa8_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
+	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
@@ -571,6 +578,7 @@ static MACHINE_CONFIG_START( xb42639, at_state )
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
 	MCFG_ISA8_SLOT_ADD("isabus", "isa1", pc_isa8_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
+	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
@@ -589,6 +597,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
 	MCFG_ISA_ONBOARD_ADD("isabus", "fdc", ISA8_FDC, NULL)
+	MCFG_ISA_ONBOARD_ADD("isabus", "com", ISA8_COM_AT, NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
