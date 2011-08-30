@@ -11,7 +11,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 	<software name="genghis">
 		<!-- 蒼き狼と白き牝鹿 ジンギスカン -->
-		<description>Genghis Khan</description>
+		<description>Aoki Ookami to Shiroki Mejika - Genghis Khan</description>
 		<year>19??</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="msx_cart">
@@ -68,8 +68,8 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="wingman2">
-		<!-- ウイングマン２ ダークキラーの復活 -->
-		<description>Wing Man 2</description>
+		<!-- ウイングマン2 キータクラーの復活 -->
+		<description>Wing Man 2 - Kitakura no Fukkatsu</description>
 		<year>1987</year>
 		<publisher>ENIX</publisher>
 		<part name="cart" interface="msx_cart">
@@ -83,7 +83,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="eiwajite">
-		<!-- ＭＳＸ英和辞典 -->
+		<!-- MSX英和辞典 -->
 		<description>MSX Eiwa Jiten</description>
 		<year>1989</year>
 		<publisher>Hi-Score Software</publisher>
@@ -97,7 +97,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="fandom1">
-		<!-- ＭＳＸプログラムコレクション ファンダムライブラリ１ -->
+		<!-- MSXプログラムコレクション ファンダムライブラリ1 -->
 		<description>MSX-FAN Fandom Library 1</description>
 		<year>1988</year>
 		<publisher>Tecnopolis</publisher>
@@ -111,8 +111,8 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="fandom2">
-		<!-- ＭＳＸプログラムコレクション ファンダムライブラリ２ -->
-		<description>MSX-Fan Fandom Library 2</description>
+		<!-- MSXプログラムコレクション ファンダムライブラリ2 -->
+		<description>MSX-FAN Fandom Library 2</description>
 		<year>1988</year>
 		<publisher>Tecnopolis</publisher>
 		<part name="cart" interface="msx_cart">
@@ -125,7 +125,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="fandom3">
-		<!-- ＭＳＸプログラムコレクション ファンダムライブラリ３ -->
+		<!-- MSXプログラムコレクション ファンダムライブラリ3 -->
 		<description>MSX-FAN Fandom Library 3</description>
 		<year>1988</year>
 		<publisher>Tecnopolis</publisher>
@@ -140,7 +140,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 	<software name="karuizaw">
 		<!-- 軽井沢誘拐案内 -->
-		<description>Karuizawa</description>
+		<description>Karuizawa Yuukai Annai</description>
 		<year>1985</year>
 		<publisher>Enix</publisher>
 		<part name="cart" interface="msx_cart">
@@ -182,7 +182,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 	<software name="kngknght">
 		<!-- キングスナイト -->
-		<description>King Knight</description>
+		<description>King's Knight</description>
 		<year>1986</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="msx_cart">
@@ -254,7 +254,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="jagur5">
-		<!-- ジャガー５ -->
+		<!-- ジャガー5 -->
 		<description>Jagur 5</description>
 		<year>1987</year>
 		<publisher>Hudson Soft</publisher>
@@ -363,7 +363,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 	<software name="senjokam">
 		<!-- 戦場の狼 -->
-		<description>Senjo no Ookami</description>
+		<description>Senjou no Ookami</description>
 		<year>1987</year>
 		<publisher>Ascii</publisher>
 		<part name="cart" interface="msx_cart">
@@ -390,7 +390,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="tsumego">
-		<!-- 詰碁１２０ -->
+		<!-- 詰碁120 -->
 		<description>Tsumego 120</description>
 		<year>1987</year>
 		<publisher>Champion Soft</publisher>
@@ -405,7 +405,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 	<software name="daiva4">
 		<!-- ディーヴァ アスラの血流 -->
-		<description>Daiva Story 4</description>
+		<description>Daiva Story 4 - Asura's Bloodfeud</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
 		<part name="cart" interface="msx_cart">
@@ -417,9 +417,9 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="megamite">
+	<software name="megaten">
 		<!-- デジタルデビル物語 女神転生 -->
-		<description>Megamitensei</description>
+		<description>Digital Devil Monogatari - Megami Tensei</description>
 		<year>1987</year>
 		<publisher>Telenet</publisher>
 		<part name="cart" interface="msx_cart">
@@ -447,7 +447,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 	<software name="dragonq2">
 		<!-- ドラゴンクエストII 悪霊の神々 -->
-		<description>Dragon Quest 2</description>
+		<description>Dragon Quest II - Akuryou no Kamigami</description>
 		<year>1987</year>
 		<publisher>Enix</publisher>
 		<part name="cart" interface="msx_cart">
@@ -461,7 +461,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 	<software name="dragons4">
 		<!-- ドラゴンスレイヤーIV -->
-		<description>Dragon Slayer 4</description>
+		<description>Dragon Slayer 4 - Drasle Family</description>
 		<year>1987</year>
 		<publisher>Falcom</publisher>
 		<part name="cart" interface="msx_cart">
@@ -475,7 +475,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 	<!-- Does not seem to work at the moment -->
 	<software name="msxwritj" supported="no">
-		<!-- 日本語ＭＳＸ－Ｗｒｉｔｅ -->
+		<!-- 日本語MSX-Write -->
 		<description>Japanese MSX-Write</description>
 		<year>1986</year>
 		<publisher>Ascii</publisher>
@@ -534,7 +534,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="hydlide3">
-		<!-- ハイドライド３ -->
+		<!-- ハイドライド3 -->
 		<description>Hydlide 3</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -549,7 +549,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 	<software name="hajafuin">
 		<!-- 覇邪の封印 -->
-		<description>Hajya no Fuin</description>
+		<description>Haja no Fuuin</description>
 		<year>1987</year>
 		<publisher>Kagado</publisher>
 		<part name="cart" interface="msx_cart">
@@ -590,7 +590,8 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="flightsi">
-		<description>Flight Simulater with Torpedo Attack</description>
+	    <!-- Flight Simulator 魚雷攻撃 -->
+		<description>Flight Simulator - Gyorai Kougeki</description>
 		<year>1988</year>
 		<publisher>subLOGIC</publisher>
 		<part name="cart" interface="msx_cart">
