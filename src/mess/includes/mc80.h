@@ -7,6 +7,8 @@
 #ifndef MC80_H_
 #define MC80_H_
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
@@ -17,8 +19,24 @@ public:
 	mc80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT8* m_mc8020_video_ram;
-	UINT8 *m_mc8030_video_mem;
+	DECLARE_WRITE8_MEMBER(mc8030_zve_write_protect_w);
+	DECLARE_WRITE8_MEMBER(mc8030_vis_w);
+	DECLARE_WRITE8_MEMBER(mc8030_eprom_prog_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
+	DECLARE_READ8_MEMBER(mc80_port_b_r);
+	DECLARE_READ8_MEMBER(mc80_port_a_r);
+	DECLARE_WRITE8_MEMBER(mc80_port_a_w);
+	DECLARE_WRITE8_MEMBER(mc80_port_b_w);
+	DECLARE_READ8_MEMBER(zve_port_a_r);
+	DECLARE_READ8_MEMBER(zve_port_b_r);
+	DECLARE_WRITE8_MEMBER(zve_port_a_w);
+	DECLARE_WRITE8_MEMBER(zve_port_b_w);
+	DECLARE_READ8_MEMBER(asp_port_a_r);
+	DECLARE_READ8_MEMBER(asp_port_b_r);
+	DECLARE_WRITE8_MEMBER(asp_port_a_w);
+	DECLARE_WRITE8_MEMBER(asp_port_b_w);
+	UINT8 *m_p_videoram;
 };
 
 
@@ -36,9 +54,7 @@ extern const z80pio_interface mc8020_z80pio_intf;
 /*                            Implementation for MC80.3x                     */
 /*****************************************************************************/
 
-extern WRITE8_HANDLER( mc8030_zve_write_protect_w );
-extern WRITE8_HANDLER( mc8030_vis_w );
-extern WRITE8_HANDLER( mc8030_eprom_prog_w );
+
 extern MACHINE_RESET(mc8030);
 extern const z80pio_interface mc8030_zve_z80pio_intf;
 extern const z80pio_interface mc8030_asp_z80pio_intf;

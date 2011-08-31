@@ -74,8 +74,8 @@ static ADDRESS_MAP_START(mbc55x_io, AS_IO, 8, mbc55x_state)
 	AM_RANGE( 0x0018, 0x001F) AM_READWRITE( ppi8255_r, ppi8255_w)
 	AM_RANGE( 0X0020, 0X0027) AM_READWRITE_LEGACY( pit8253_r, pit8253_w)
 	AM_RANGE( 0x0028, 0x002B) AM_READWRITE( mbc55x_usart_r, mbc55x_usart_w)
-	AM_RANGE( 0x0030, 0x0030) AM_DEVREADWRITE(VID_MC6845_NAME, mc6845_device, status_r, address_w )
-	AM_RANGE( 0x0032, 0x0032) AM_DEVREADWRITE(VID_MC6845_NAME, mc6845_device, register_r, register_w )
+	AM_RANGE( 0x0030, 0x0031) AM_DEVREADWRITE(VID_MC6845_NAME, mc6845_device, status_r, address_w )
+	AM_RANGE( 0x0032, 0x0033) AM_DEVREADWRITE(VID_MC6845_NAME, mc6845_device, register_r, register_w )
 	AM_RANGE( 0x0038, 0x003B) AM_READWRITE_LEGACY( mbc55x_kb_usart_r, mbc55x_kb_usart_w)
 ADDRESS_MAP_END
 
