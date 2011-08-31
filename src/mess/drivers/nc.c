@@ -1739,7 +1739,10 @@ ROM_END
 
 ROM_START(nc150)
 	ROM_REGION(((64*1024)+(512*1024)), "maincpu",0)
-	ROM_LOAD("nc150_fr_b2.rom", 0x010000, 0x080000, CRC(be442d14) SHA1(f141d409dc72dc1e6662c21a147231c4df3be6b8))	/* French */
+	ROM_SYSTEM_BIOS(0, "b2", "French B2")
+	ROMX_LOAD("nc150_fr_b2.rom", 0x010000, 0x080000, CRC(be442d14) SHA1(f141d409dc72dc1e6662c21a147231c4df3be6b8), ROM_BIOS(1))	/* French */
+	ROM_SYSTEM_BIOS(1, "b1", "Italian B1")
+	ROMX_LOAD("nc150_it_b1.rom", 0x010000, 0x080000, CRC(1b2fe2fd) SHA1(67eb6bce0b0d4668401d9c8f5a900dc6bd135c21), ROM_BIOS(2))	/* Italian */
 ROM_END
 
 
