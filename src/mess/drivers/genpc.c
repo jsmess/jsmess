@@ -31,6 +31,8 @@
 
 #include "machine/kb_keytro.h"
 
+#include "machine/pc_mouse.h"
+
 class genpc_state : public driver_device
 {
 public:
@@ -71,11 +73,13 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pcgen )
 	PORT_INCLUDE( kb_keytronic_pc )
+	PORT_INCLUDE( pc_mouse_microsoft )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pccga )
 	PORT_INCLUDE( kb_keytronic_pc )
 	PORT_INCLUDE( pcvideo_cga )
+	PORT_INCLUDE( pc_mouse_microsoft )
 INPUT_PORTS_END
 
 static const unsigned i86_address_mask = 0x000fffff;
