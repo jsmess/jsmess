@@ -7,7 +7,6 @@
 
 ****************************************************************************/
 
-#include "emu.h"
 #include "includes/mc80.h"
 
 // This is not a content of U402 510
@@ -54,7 +53,7 @@ static const UINT8 prom[] = {
 	0x04,0x04,0x04,0x04,0x04,0x00,0x04,0x00, // !
 	0x0a,0x0a,0x0a,0x00,0x00,0x00,0x00,0x00, // "
 	0x0a,0x0a,0x1f,0x0a,0x1f,0x0a,0x0a,0x00, // #
-	0x00,0x11,0x0e,0x0a,0x0e,0x11,0x00,0x00, //
+	0x00,0x11,0x0e,0x0a,0x0e,0x11,0x00,0x00, // $
 	0x18,0x19,0x02,0x04,0x08,0x13,0x03,0x00, // %
 	0x04,0x0a,0x0a,0x0c,0x15,0x12,0x0d,0x00, // &
 	0x04,0x04,0x08,0x00,0x00,0x00,0x00,0x00, // '
@@ -110,7 +109,7 @@ SCREEN_UPDATE( mc8020 )
 		xpos = 0;
 		for(x = 0; x < 32; x++ )
 		{
-			UINT8 code = state->m_mc8020_video_ram[addr + x] & 0x3f;
+			UINT8 code = state->m_p_videoram[addr + x] & 0x3f;
 			for(j = 0; j < 8; j++ )
 			{
 			  for(b = 0; b < 6; b++ )
@@ -132,7 +131,7 @@ SCREEN_UPDATE( mc8020 )
 VIDEO_START( mc8030 )
 {
 	mc80_state *state = machine.driver_data<mc80_state>();
-	state->m_mc8030_video_mem = auto_alloc_array_clear(machine, UINT8, 16*1024);
+	state->m_p_videoram = machine.region("vram")->base();
 }
 
 SCREEN_UPDATE( mc8030 )
@@ -147,7 +146,7 @@ SCREEN_UPDATE( mc8030 )
 		int horpos = 0;
 		for (x = 0; x < 64; x++)
 		{
-			code = state->m_mc8030_video_mem[addr++];
+			code = state->m_p_videoram[addr++];
 			for (b = 0; b < 8; b++)
 			{
 				*BITMAP_ADDR16(bitmap, 255-y, horpos++) =  (code >> b) & 0x01;
