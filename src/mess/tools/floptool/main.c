@@ -19,9 +19,10 @@
 
 #include "formats/hxcmfm_dsk.h"
 
-static FLOPPY_OPTIONS_START( supported )
-	FLOPPY_OPTION( mfm, "mfm", "HxCFloppyEmulator floppy disk image", FLOPPY_MFM_FORMAT, NULL )
-FLOPPY_OPTIONS_END
+static floppy_format_type floppy_formats[] = {
+	FLOPPY_MFM_FORMAT,
+	NULL
+};
 
 static void display_usage(void)
 {
@@ -31,11 +32,12 @@ static void display_usage(void)
 
 static void display_formats(void)
 {
-	int i;
 	fprintf(stderr, "Supported formats:\n\n");
-	for (i = 0; floppyoptions_supported[i].name; i++) {
-		fprintf(stderr, "%15s - %s\n",floppyoptions_supported[i].name,floppyoptions_supported[i].description);
-		fprintf(stderr, "%20s [%s]\n","",floppyoptions_supported[i].extensions);
+	for(int i = 0; floppy_formats[i]; i++)
+	{
+		floppy_image_format_t *fif = floppy_formats[i]();
+		fprintf(stderr, "%15s - %s\n", fif->name(), fif->description());
+		fprintf(stderr, "%20s [%s]\n", "", fif->extensions());
 	}
 }
 
@@ -58,12 +60,12 @@ int CLIB_DECL main(int argc, char *argv[])
 					fprintf(stderr, "File %s not found.\n",argv[2]);
 					return -1;
 				}
-				floppy_image *image = new floppy_image(f, &stdio_ioprocs_noclose, FLOPPY_OPTIONS_NAME(supported));
+				floppy_image *image = new floppy_image(f, &stdio_ioprocs_noclose, floppy_formats);
 				int best;
-				const struct floppy_format_def *format = image->identify(&best);
+				floppy_image_format_t *format = image->identify(&best);
 				if (format) {
-					fprintf(stderr, "File identified as %s\n",format->description);
-					image->load(best);
+					fprintf(stderr, "File identified as %s\n",format->description());
+					format->load(image);
 				} else {
 					fprintf(stderr, "Unable to identified file type\n");
 				}
