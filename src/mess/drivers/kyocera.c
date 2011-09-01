@@ -1093,7 +1093,7 @@ static I8155_INTERFACE( tandy200_8155_intf )
 	DEVCB_DRIVER_LINE_MEMBER(tandy200_state, i8155_to_w)	/* timer output */
 };
 
-/* MSM8251 Interface */
+/* I8251 Interface */
 
 static const i8251_interface tandy200_uart_intf =
 {

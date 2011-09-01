@@ -17,7 +17,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "video/upd7220.h"
 #include "machine/ctronics.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"

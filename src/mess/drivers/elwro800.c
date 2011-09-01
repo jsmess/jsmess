@@ -22,7 +22,7 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "machine/ctronics.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 
 /* Devices */
 #include "imagedev/flopdrv.h"
@@ -296,7 +296,7 @@ static READ8_HANDLER(elwro800jr_io_r)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		i8251_device *usart = space->machine().device<i8251_device>("msm8251");
+		i8251_device *usart = space->machine().device<i8251_device>("i8251");
 		if (offset & 1)
 		{
 			return usart->status_r(*space, 0);
@@ -350,7 +350,7 @@ static WRITE8_HANDLER(elwro800jr_io_w)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		i8251_device *usart = space->machine().device<i8251_device>("msm8251");
+		i8251_device *usart = space->machine().device<i8251_device>("i8251");
 		if (offset & 1)
 		{
 			usart->control_w(*space, 0, data);
@@ -602,7 +602,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", elwro800jr_centronics_interface)
 
-	MCFG_I8251_ADD("msm8251", default_i8251_interface)
+	MCFG_I8251_ADD("i8251", default_i8251_interface)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

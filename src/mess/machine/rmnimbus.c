@@ -60,7 +60,7 @@ even if you have to use unusual geometry to do so !
 #include "machine/er59256.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "machine/ctronics.h"
 #include "machine/6522via.h"
 #include "machine/scsi.h"

@@ -11,7 +11,7 @@
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "machine/pf10.h"
 #include "sound/wave.h"
 

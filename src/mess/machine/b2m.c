@@ -14,7 +14,7 @@
 #include "machine/pit8253.h"
 #include "machine/wd17xx.h"
 #include "machine/pic8259.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "includes/b2m.h"
 #include "machine/ram.h"
 #include "imagedev/flopdrv.h"

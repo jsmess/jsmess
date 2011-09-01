@@ -124,7 +124,7 @@ irq vector 0x26:                                                                
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "video/m6847.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"

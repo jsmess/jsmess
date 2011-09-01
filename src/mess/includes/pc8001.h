@@ -11,7 +11,7 @@
 #include "machine/ctronics.h"
 #include "machine/8257dma.h"
 #include "machine/i8255.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/upd1990a.h"
 #include "sound/speaker.h"

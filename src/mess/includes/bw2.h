@@ -9,7 +9,7 @@
 #include "formats/basicdsk.h"
 #include "machine/i8255.h"
 #include "machine/ctronics.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/wd17xx.h"

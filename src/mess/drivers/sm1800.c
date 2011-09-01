@@ -17,7 +17,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "video/i8275.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()

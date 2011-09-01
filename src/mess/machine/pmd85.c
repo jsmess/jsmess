@@ -14,7 +14,7 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "includes/pmd85.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 
@@ -419,7 +419,7 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_2_portc_w )
         CLK0    - external interfaces connector (K2)
         GATE0   - external interfaces connector (K2), default = 1
     Timer 1:
-        OUT0    - external interfaces connector (K2), msm8251 (for V24 only)
+        OUT0    - external interfaces connector (K2), i8251 (for V24 only)
         CLK0    - hardwired to 2 MHz system clock
         GATE0   - external interfaces connector (K2), default = 1
     Timer 2:

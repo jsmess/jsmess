@@ -74,7 +74,7 @@ Notes:
 #include "formats/basicdsk.h"
 #include "machine/ctronics.h"
 #include "machine/i8255.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "machine/upd765.h"
 #include "video/tms9928a.h"
 #include "sound/sn76496.h"

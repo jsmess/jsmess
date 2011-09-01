@@ -176,7 +176,7 @@ I/O ports
 #include "includes/pmd85.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "formats/pmd_pmd.h"
 #include "machine/ram.h"
 

@@ -578,7 +578,7 @@ static UPD1990A_INTERFACE( rtc_intf )
 	DEVCB_NULL
 };
 
-/* MSM8251 Interface */
+/* I8251 Interface */
 
 static const i8251_interface uart_intf =
 {

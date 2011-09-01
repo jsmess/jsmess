@@ -41,7 +41,7 @@
 #include "machine/com8116.h"
 #include "machine/ctronics.h"
 #include "machine/i8255.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "machine/terminal.h"
 #include "machine/wd17xx.h"
 #include "machine/z80ctc.h"

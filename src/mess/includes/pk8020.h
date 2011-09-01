@@ -10,7 +10,7 @@
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
