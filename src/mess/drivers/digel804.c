@@ -261,42 +261,42 @@ WRITE8_MEMBER( digel804_state::led_control_w )
 /* ACIA Trampolines */
 READ8_MEMBER( digel804_state::acia_rxd_r )
 {
-	return m_acia->data_r(space, 0);
+	return m_acia->read(space, 0);
 }
 
 WRITE8_MEMBER( digel804_state::acia_txd_w )
 {
-	m_acia->data_w(space, 0, data);
+	m_acia->write(space, 0, data);
 }
 
 READ8_MEMBER( digel804_state::acia_status_r )
 {
-	return m_acia->data_r(space, 1);
+	return m_acia->read(space, 1);
 }
 
 WRITE8_MEMBER( digel804_state::acia_reset_w )
 {
-	m_acia->data_w(space, 1, data);
+	m_acia->write(space, 1, data);
 }
 
 READ8_MEMBER( digel804_state::acia_command_r )
 {
-	return m_acia->data_r(space, 2);
+	return m_acia->read(space, 2);
 }
 
 WRITE8_MEMBER( digel804_state::acia_command_w )
 {
-	m_acia->data_w(space, 2, data);
+	m_acia->write(space, 2, data);
 }
 
 READ8_MEMBER( digel804_state::acia_control_r )
 {
-	return m_acia->data_r(space, 3);
+	return m_acia->read(space, 3);
 }
 
 WRITE8_MEMBER( digel804_state::acia_control_w )
 {
-	m_acia->data_w(space, 3, data);
+	m_acia->write(space, 3, data);
 }
 
 /******************************************************************************
@@ -355,7 +355,7 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, digel804_state)
 	AM_RANGE(0x85, 0x85) AM_MIRROR(0x38) AM_READ(acia_command_r) // (ACIA command reg)
 	AM_RANGE(0x86, 0x86) AM_MIRROR(0x38) AM_WRITE(acia_control_w) // (ACIA control reg)
 	AM_RANGE(0x87, 0x87) AM_MIRROR(0x38) AM_READ(acia_control_r) // (ACIA control reg)
-	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", acia6551_device, data_r, data_w) // this doesn't work since we lack an AM_SHIFT command
+	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", acia6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
 
 ADDRESS_MAP_END
 

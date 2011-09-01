@@ -179,7 +179,7 @@ static READ8_HANDLER( apple3_c0xx_r )
 		case 0xF1:
 		case 0xF2:
 		case 0xF3:
-			result = acia->data_r(*space, offset & 0x03);
+			result = acia->read(*space, offset & 0x03);
 			break;
 	}
 	return result;
@@ -243,7 +243,7 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 		case 0xF1:
 		case 0xF2:
 		case 0xF3:
-			acia->data_w(*space, offset & 0x03, data);
+			acia->write(*space, offset & 0x03, data);
 			break;
 	}
 }

@@ -329,7 +329,7 @@ static ADDRESS_MAP_START ( to7, AS_PROGRAM, 8 )
      AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE_MODERN( "pia_1", pia6821_device, read_alt, write_alt )
      AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE ( to7_floppy_r, to7_floppy_w )
      AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_DEVREADWRITE_MODERN( "pia_2", pia6821_device, read_alt, write_alt )
-     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, data_r, data_w )
+     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, read, write )
      AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
      AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE_MODERN( "pia_3", pia6821_device, read_alt, write_alt )
      AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE ( to7_modem_mea8000_r,
@@ -773,7 +773,7 @@ static ADDRESS_MAP_START ( to770, AS_PROGRAM, 8 )
      AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_DEVREADWRITE_MODERN( "pia_2", pia6821_device, read_alt, write_alt )
      AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE ( to770_gatearray_r,
                                                 to770_gatearray_w )
-     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, data_r, data_w )
+     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, read, write )
      AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
      AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE_MODERN( "pia_3", pia6821_device, read_alt, write_alt )
      AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE ( to7_modem_mea8000_r,
@@ -961,7 +961,7 @@ static ADDRESS_MAP_START ( mo5, AS_PROGRAM, 8 )
      AM_RANGE ( 0xa7e0, 0xa7e3 ) AM_DEVREADWRITE_MODERN( "pia_2", pia6821_device, read_alt, write_alt )
      AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE ( mo5_gatearray_r,
 						mo5_gatearray_w )
-     AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, data_r, data_w )
+     AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, read, write )
      AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
      AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE("mea8000", mea8000_r, mea8000_w)
      AM_RANGE ( 0xb000, 0xefff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE( mo5_cartridge_w )
@@ -1163,7 +1163,7 @@ static ADDRESS_MAP_START ( to9, AS_PROGRAM, 8 )
      AM_RANGE ( 0xe7de, 0xe7df ) AM_READWRITE ( to9_kbd_r, to9_kbd_w )
      AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE ( to9_gatearray_r,
 						to9_gatearray_w )
-     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, data_r, data_w )
+     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, read, write )
 /*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE ( to9_ieee_r, to9_ieee_w ) */
      AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
      AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE_MODERN( "pia_3", pia6821_device, read_alt, write_alt)
@@ -1488,7 +1488,7 @@ static ADDRESS_MAP_START ( to8, AS_PROGRAM, 8 )
      AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE ( to8_vreg_r, to8_vreg_w )
      AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE ( to8_gatearray_r,
 						to8_gatearray_w )
-     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, data_r, data_w )
+     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, read, write )
 /*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE ( to9_ieee_r, to9_ieee_w ) */
      AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
      AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE_MODERN( "pia_3", pia6821_device, read_alt, write_alt)
@@ -1686,7 +1686,7 @@ static ADDRESS_MAP_START ( to9p, AS_PROGRAM, 8 )
      AM_RANGE ( 0xe7de, 0xe7df ) AM_READWRITE ( to9_kbd_r, to9_kbd_w )
      AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE ( to8_gatearray_r,
 						to8_gatearray_w )
-     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, data_r, data_w )
+     AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, read, write )
 /*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE ( to9_ieee_r, to9_ieee_w ) */
      AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
      AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE_MODERN( "pia_3", pia6821_device, read_alt, write_alt)
@@ -1848,7 +1848,7 @@ static ADDRESS_MAP_START ( mo6, AS_PROGRAM, 8 )
      AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE ( mo6_vreg_r, mo6_vreg_w )
      AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE ( mo6_gatearray_r,
 						mo6_gatearray_w )
-     AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, data_r, data_w )
+     AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, read, write )
 /*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE ( to9_ieee_r, to9_ieee_w )*/
      AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
      AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE("mea8000", mea8000_r, mea8000_w)
@@ -2162,7 +2162,7 @@ static ADDRESS_MAP_START ( mo5nr, AS_PROGRAM, 8 )
      AM_RANGE ( 0xa7e3, 0xa7e3 ) AM_READWRITE ( mo5nr_prn_r, mo5nr_prn_w )
      AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE ( mo6_gatearray_r,
 						mo6_gatearray_w )
-     AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, data_r, data_w )
+     AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE_MODERN( "acia",  acia6551_device, read, write )
 /*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE ( to9_ieee_r, to9_ieee_w ) */
      AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE ( to7_midi_r, to7_midi_w )
      AM_RANGE ( 0xa7f8, 0xa7fb ) AM_DEVREADWRITE_MODERN( "pia_3", pia6821_device, read_alt, write_alt)

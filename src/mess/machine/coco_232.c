@@ -73,7 +73,7 @@ READ8_MEMBER(coco_232_device::read)
 	UINT8 result = 0x00;
 
 	if ((offset >= 0x28) && (offset <= 0x2F))
-		result = m_uart->data_r(space, offset - 0x28);
+		result = m_uart->read(space, offset - 0x28);
 
 	return result;
 }
@@ -86,5 +86,5 @@ READ8_MEMBER(coco_232_device::read)
 WRITE8_MEMBER(coco_232_device::write)
 {
 	if ((offset >= 0x28) && (offset <= 0x2F))
-		m_uart->data_w(space, offset - 0x28, data);
+		m_uart->write(space, offset - 0x28, data);
 }
