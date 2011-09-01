@@ -104,7 +104,7 @@ static void apple3_profile_w(apple3_state *state, offs_t offset, UINT8 data)
 static READ8_HANDLER( apple3_c0xx_r )
 {
 	apple3_state *state = space->machine().driver_data<apple3_state>();
-	device_t *acia = space->machine().device("acia");
+	acia6551_device *acia = space->machine().device<acia6551_device>("acia");
 	device_t *fdc = space->machine().device("fdc");
 	UINT8 result = 0xFF;
 
@@ -179,7 +179,7 @@ static READ8_HANDLER( apple3_c0xx_r )
 		case 0xF1:
 		case 0xF2:
 		case 0xF3:
-			result = acia_6551_r(acia, offset & 0x03);
+			result = acia->data_r(*space, offset & 0x03);
 			break;
 	}
 	return result;
@@ -190,7 +190,7 @@ static READ8_HANDLER( apple3_c0xx_r )
 static WRITE8_HANDLER( apple3_c0xx_w )
 {
 	apple3_state *state = space->machine().driver_data<apple3_state>();
-	device_t *acia = space->machine().device("acia");
+	acia6551_device *acia = space->machine().device<acia6551_device>("acia");
 	device_t *fdc = space->machine().device("fdc");
 	switch(offset)
 	{
@@ -243,7 +243,7 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 		case 0xF1:
 		case 0xF2:
 		case 0xF3:
-			acia_6551_w(acia, offset & 0x03, data);
+			acia->data_w(*space, offset & 0x03, data);
 			break;
 	}
 }

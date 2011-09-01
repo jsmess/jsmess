@@ -72,7 +72,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_terminal;
 	required_device<device_t> m_speaker;
-	required_device<device_t> m_acia;
+	required_device<acia6551_device> m_acia;
 	DECLARE_WRITE8_MEMBER( port_43_w );
 	DECLARE_READ8_MEMBER( port_43_r );
 	DECLARE_WRITE8_MEMBER( port_44_w );
@@ -261,42 +261,42 @@ WRITE8_MEMBER( digel804_state::led_control_w )
 /* ACIA Trampolines */
 READ8_MEMBER( digel804_state::acia_rxd_r )
 {
-	return acia_6551_r(m_acia, 0);
+	return m_acia->data_r(space, 0);
 }
 
 WRITE8_MEMBER( digel804_state::acia_txd_w )
 {
-	acia_6551_w(m_acia, 0, data);
+	m_acia->data_w(space, 0, data);
 }
 
 READ8_MEMBER( digel804_state::acia_status_r )
 {
-	return acia_6551_r(m_acia, 1);
+	return m_acia->data_r(space, 1);
 }
 
 WRITE8_MEMBER( digel804_state::acia_reset_w )
 {
-	acia_6551_w(m_acia, 1, data);
+	m_acia->data_w(space, 1, data);
 }
 
 READ8_MEMBER( digel804_state::acia_command_r )
 {
-	return acia_6551_r(m_acia, 2);
+	return m_acia->data_r(space, 2);
 }
 
 WRITE8_MEMBER( digel804_state::acia_command_w )
 {
-	acia_6551_w(m_acia, 2, data);
+	m_acia->data_w(space, 2, data);
 }
 
 READ8_MEMBER( digel804_state::acia_control_r )
 {
-	return acia_6551_r(m_acia, 3);
+	return m_acia->data_r(space, 3);
 }
 
 WRITE8_MEMBER( digel804_state::acia_control_w )
 {
-	acia_6551_w(m_acia, 3, data);
+	m_acia->data_w(space, 3, data);
 }
 
 /******************************************************************************
@@ -355,7 +355,7 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, digel804_state)
 	AM_RANGE(0x85, 0x85) AM_MIRROR(0x38) AM_READ(acia_command_r) // (ACIA command reg)
 	AM_RANGE(0x86, 0x86) AM_MIRROR(0x38) AM_WRITE(acia_control_w) // (ACIA control reg)
 	AM_RANGE(0x87, 0x87) AM_MIRROR(0x38) AM_READ(acia_control_r) // (ACIA control reg)
-	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE_LEGACY("acia", acia_6551_r, acia_6551_w) // this doesn't work since we lack an AM_SHIFT command
+	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", acia6551_device, data_r, data_w) // this doesn't work since we lack an AM_SHIFT command
 
 ADDRESS_MAP_END
 
@@ -371,7 +371,8 @@ INPUT_PORTS_END
 ******************************************************************************/
 static WRITE8_DEVICE_HANDLER( digel804_serial_put )
 {
-	acia_6551_receive_char(device->machine().device("acia"), data);
+	digel804_state *state = device->machine().driver_data<digel804_state>();
+	state->m_acia->receive_character(data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( digel804_terminal_intf )
