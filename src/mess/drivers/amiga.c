@@ -317,7 +317,7 @@ static const mos6526_interface cia_1_intf =
 	DEVCB_DEVICE_HANDLER("centronics", amiga_cia_1_porta_r),
 	DEVCB_NULL,												/* port A */
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("fdc", amiga_fdc_control_w)		/* port B */
+	DEVCB_DEVICE_MEMBER("fdc", amiga_fdc, control_w)		/* port B */
 };
 
 static const mos6526_interface cia_0_cdtv_intf =
@@ -498,7 +498,7 @@ MACHINE_CONFIG_END
 static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r )
 {
 	UINT8 ret = input_port_read(device->machine(), "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
-	ret |= amiga_fdc_status_r(device->machine().device("fdc"));
+	ret |= device->machine().device<amiga_fdc>("fdc")->status_r();
 	return ret;
 }
 
@@ -568,7 +568,7 @@ static UINT16 amiga_read_joy1dat(running_machine &machine)
 
 static UINT16 amiga_read_dskbytr(running_machine &machine)
 {
-	return amiga_fdc_get_byte(machine.device("fdc"));
+	return machine.device<amiga_fdc>("fdc")->get_byte();
 }
 
 static void amiga_write_dsklen(running_machine &machine, UINT16 data)
@@ -576,7 +576,7 @@ static void amiga_write_dsklen(running_machine &machine, UINT16 data)
 	amiga_state *state = machine.driver_data<amiga_state>();
 	if ( data & 0x8000 ) {
 		if ( CUSTOM_REG(REG_DSKLEN) & 0x8000 )
-			amiga_fdc_setup_dma(machine.device("fdc"));
+			machine.device<amiga_fdc>("fdc")->setup_dma();
 	}
 }
 
