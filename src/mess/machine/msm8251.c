@@ -155,7 +155,7 @@ void i8251_device::receive_clock()
 	/* receive enable? */
 	if (m_command & (1<<2))
 	{
-		//logerror("MSM8251\n");
+		//logerror("I8251\n");
 		/* get bit received from other side and update receive register */
 		receive_register_update_bit(&m_receive_reg, get_in_data_bit(m_connection.input_state));
 
@@ -200,7 +200,7 @@ void i8251_device::transmit_clock()
 		/* if transmit is not empty... transmit data */
 		if ((m_transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)==0)
 		{
-	//      logerror("MSM8251\n");
+	//      logerror("I8251\n");
 			transmit_register_send_bit(machine(),&m_transmit_reg, &m_connection);
 		}
 	}
@@ -340,7 +340,7 @@ WRITE8_MEMBER(i8251_device::control_w)
 	{
 		if (m_flags & I8251_EXPECTING_SYNC_BYTE)
 		{
-			LOG(("MSM8251: Sync byte\n"));
+			LOG(("I8251: Sync byte\n"));
 
 			LOG(("Sync byte: %02x\n", data));
 			/* store sync byte written */
@@ -357,7 +357,7 @@ WRITE8_MEMBER(i8251_device::control_w)
 		}
 		else
 		{
-			LOG(("MSM8251: Mode byte\n"));
+			LOG(("I8251: Mode byte\n"));
 
 			m_mode_byte = data;
 
@@ -389,7 +389,7 @@ WRITE8_MEMBER(i8251_device::control_w)
                         3 = x64
                 */
 
-				LOG(("MSM8251: Asynchronous operation\n"));
+				LOG(("I8251: Asynchronous operation\n"));
 
 				LOG(("Character length: %d\n", (((data>>2) & 0x03)+5)));
 
@@ -505,7 +505,7 @@ WRITE8_MEMBER(i8251_device::control_w)
                         3 = 8 bits
                     bit 1,0 = 0
                 */
-				LOG(("MSM8251: Synchronous operation\n"));
+				LOG(("I8251: Synchronous operation\n"));
 
 				/* setup for sync byte(s) */
 				m_flags |= I8251_EXPECTING_SYNC_BYTE;
@@ -525,7 +525,7 @@ WRITE8_MEMBER(i8251_device::control_w)
 	else
 	{
 		/* command */
-		LOG(("MSM8251: Command byte\n"));
+		LOG(("I8251: Command byte\n"));
 
 		m_command = data;
 
