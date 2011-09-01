@@ -112,7 +112,7 @@ void acia6551_device::device_start()
 
 
 /*-------------------------------------------------
-    acia_6551_refresh_ints - update interrupt output
+    refresh_ints - update interrupt output
 -------------------------------------------------*/
 
 void acia6551_device::refresh_ints()
@@ -173,10 +173,10 @@ void acia6551_device::receive_character(UINT8 ch)
 
 
 /*-------------------------------------------------
-    acia_6551_r
+    read
 -------------------------------------------------*/
 
-READ8_MEMBER(acia6551_device::data_r)
+READ8_MEMBER(acia6551_device::read)
 {
 	unsigned char data;
 
@@ -234,7 +234,7 @@ READ8_MEMBER(acia6551_device::data_r)
 
 
 /*-------------------------------------------------
-    acia_6551_update_data_form
+    update_data_form
 -------------------------------------------------*/
 
 void acia6551_device::update_data_form()
@@ -257,10 +257,10 @@ void acia6551_device::update_data_form()
 
 
 /*-------------------------------------------------
-    acia_6551_w
+    write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(acia6551_device::data_w)
+WRITE8_MEMBER(acia6551_device::write)
 {
 	logerror("6551 W %04x %02x\n",offset & 0x03, data);
 

@@ -60,7 +60,7 @@ static ADDRESS_MAP_START( microtan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xbc02, 0xbc02) AM_DEVWRITE("ay8910.2", ay8910_address_w)
 	AM_RANGE(0xbc03, 0xbc03) AM_DEVREADWRITE("ay8910.2", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xbfc0, 0xbfcf) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
-	AM_RANGE(0xbfd0, 0xbfd3) AM_DEVREADWRITE_MODERN("acia", acia6551_device, data_r, data_w)
+	AM_RANGE(0xbfd0, 0xbfd3) AM_DEVREADWRITE_MODERN("acia", acia6551_device, read, write)
 	AM_RANGE(0xbfe0, 0xbfef) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)
 	AM_RANGE(0xbff0, 0xbfff) AM_READWRITE(microtan_bffx_r, microtan_bffx_w)
 	AM_RANGE(0xc000, 0xe7ff) AM_ROM

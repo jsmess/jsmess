@@ -32,10 +32,10 @@ public:
     acia6551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	/* read data register */
-	DECLARE_READ8_MEMBER(data_r);
+	DECLARE_READ8_MEMBER(read);
 	
 	/* write data register */
-	DECLARE_WRITE8_MEMBER(data_w);
+	DECLARE_WRITE8_MEMBER(write);
 	
 	/* connecting to serial output */
 	void connect_to_serial_device(device_t *image);
