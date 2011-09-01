@@ -104,7 +104,7 @@
 #include "includes/tsispch.h"
 #include "cpu/upd7725/upd7725.h"
 #include "cpu/i86/i86.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "machine/pic8259.h"
 #include "machine/terminal.h"
 
@@ -143,9 +143,9 @@ static WRITE_LINE_DEVICE_HANDLER( i8251_txrdy_int )
 	pic8259_ir3_w(device->machine().device("pic8259"), state);
 }
 
-const i8251_interface msm8251_config =
+const i8251_interface i8251_config =
 {
-	DEVCB_NULL, // in rxd, serial (todo: proper hookup, currently using hack w/msm8251_recieve_character())
+	DEVCB_NULL, // in rxd, serial (todo: proper hookup, currently using hack w/i8251_recieve_character())
 	DEVCB_NULL, // out txd, serial
 	DEVCB_NULL, // in dsr
 	DEVCB_NULL, // out dtr
@@ -424,7 +424,7 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
     MCFG_PIC8259_ADD("pic8259", pic8259_config)
 
     /* uarts */
-    MCFG_I8251_ADD("i8251a_u15", msm8251_config)
+    MCFG_I8251_ADD("i8251a_u15", i8251_config)
 
     /* sound hardware */
     //MCFG_SPEAKER_STANDARD_MONO("mono")

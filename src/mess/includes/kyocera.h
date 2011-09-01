@@ -11,7 +11,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ctronics.h"
 #include "machine/i8155.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
 #include "machine/upd1990a.h"

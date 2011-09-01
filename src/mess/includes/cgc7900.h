@@ -10,7 +10,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "formats/basicdsk.h"
 #include "machine/ram.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "sound/ay8910.h"
 
 #define M68000_TAG		"uh8"

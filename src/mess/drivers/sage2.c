@@ -13,7 +13,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "machine/terminal.h"
 
 

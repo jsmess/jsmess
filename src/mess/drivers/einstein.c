@@ -63,7 +63,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/wd17xx.h"
 #include "machine/ctronics.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "imagedev/flopdrv.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
@@ -516,7 +516,7 @@ static ADDRESS_MAP_START( einstein_io, AS_IO, 8 )
 	/* block 1, tms9928a vdp */
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN("tms9929a", tms9929a_device, vram_read, vram_write)
 	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN("tms9929a", tms9929a_device, register_read, register_write)
-	/* block 2, msm8251 uart */
+	/* block 2, i8251 uart */
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN(IC_I060, i8251_device, data_r, data_w)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN(IC_I060, i8251_device, status_r, control_w)
 	/* block 3, wd1770 floppy controller */

@@ -9,7 +9,7 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cartslot.h"
 #include "machine/i8255.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/upd1990a.h"
 #include "video/mc6845.h"
@@ -24,7 +24,7 @@
 #define AY8910_TAG		"ay8910"
 #define SED1330_TAG		"sed1330"
 #define MC6845_TAG		"mc6845"
-#define I8251_TAG		"msm8251"
+#define I8251_TAG		"i8251"
 
 #define PC8401A_CRT_VIDEORAM_SIZE	0x2000
 

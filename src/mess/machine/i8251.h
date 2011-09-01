@@ -16,15 +16,15 @@
     CONSTANTS
 ***************************************************************************/
 
-#define I8251_EXPECTING_MODE 0x01
-#define I8251_EXPECTING_SYNC_BYTE 0x02
+#define I8251_EXPECTING_MODE 		0x01
+#define I8251_EXPECTING_SYNC_BYTE 	0x02
 
-#define I8251_STATUS_FRAMING_ERROR 0x020
-#define I8251_STATUS_OVERRUN_ERROR 0x010
-#define I8251_STATUS_PARITY_ERROR 0x08
+#define I8251_STATUS_FRAMING_ERROR 	0x20
+#define I8251_STATUS_OVERRUN_ERROR 	0x10
+#define I8251_STATUS_PARITY_ERROR 	0x08
 #define I8251_STATUS_TX_EMPTY		0x04
-#define I8251_STATUS_RX_READY	0x02
-#define I8251_STATUS_TX_READY	0x01
+#define I8251_STATUS_RX_READY		0x02
+#define I8251_STATUS_TX_READY		0x01
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -143,10 +143,6 @@ private:
 
 // device type definition
 extern const device_type I8251;
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
 
 extern const i8251_interface default_i8251_interface;
 

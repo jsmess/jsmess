@@ -13,7 +13,7 @@ setup serial interface software in driver and let the transfer begin */
     This therefore signals that data is following.
     When all data bits have been received, stop bits are transmitted with a value of 1.
 
-    msm8251 expects this in asynchronous mode:
+    i8251 expects this in asynchronous mode:
     packet format:
 
     bit count           function        value

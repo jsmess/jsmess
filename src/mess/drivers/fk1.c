@@ -11,7 +11,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "machine/ram.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()

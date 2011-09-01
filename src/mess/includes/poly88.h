@@ -8,7 +8,7 @@
 #define POLY88_H_
 
 #include "machine/serial.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "imagedev/snapquik.h"
 
 class poly88_state : public driver_device

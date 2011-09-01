@@ -527,6 +527,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/hd63450.o	\
 	$(MESS_MACHINE)/i82371ab.o	\
 	$(MESS_MACHINE)/i82439tx.o	\
+	$(MESS_MACHINE)/i8251.o		\
 	$(MESS_MACHINE)/i8271.o		\
 	$(MESS_MACHINE)/ieee488.o	\
 	$(MESS_MACHINE)/ieeestub.o	\
@@ -539,7 +540,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/mm58274c.o	\
 	$(MESS_MACHINE)/mpc105.o	\
 	$(MESS_MACHINE)/mos6530.o	\
-	$(MESS_MACHINE)/msm8251.o	\
 	$(MESS_MACHINE)/s100.o		\
 	$(MESS_MACHINE)/serial.o	\
 	$(MESS_MACHINE)/upd765.o	\

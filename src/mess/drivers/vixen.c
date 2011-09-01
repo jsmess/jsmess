@@ -61,7 +61,7 @@ Notes:
 #include "machine/ram.h"
 #include "machine/i8155.h"
 #include "machine/ieee488.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "machine/wd17xx.h"
 #include "sound/discrete.h"
 #include "includes/vixen.h"

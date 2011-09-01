@@ -67,7 +67,7 @@
 //#include "sound/votrax.h"
 //#include "machine/i8255.h"
 //#include "machine/pit8253.h"
-//#include "machine/msm8251.h"
+//#include "machine/i8251.h"
 
 /* For testing */
 #include "machine/terminal.h"
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START(votrpss_io, AS_IO, 8, votrpss_state)
 	AM_RANGE(0x41, 0x41) AM_READ(votrpss_41_r)
 	//AM_RANGE(0x00, 0xff) AM_NOP /* temporary */
 	//AM_RANGE(0x00, 0x03) AM_READWRITE(8255ppi_r, 8255ppi_w) AM_MIRROR (0x3c)
-	//AM_RANGE(0x40, 0x41) AM_READWRITE(msm8251_r, msm8251_w) AM_MIRROR (0x3e)
+	//AM_RANGE(0x40, 0x41) AM_READWRITE(i8251_r, i8251_w) AM_MIRROR (0x3e)
 	//AM_RANGE(0x80, 0x83) AM_READWRITE(pit8253_r, pit8253_w) AM_MIRROR (0x3c)
 	//AM_RANGE(0xc0, 0xc3) AM_READWRITE(ay8910_r, ay8910_W) AM_MIRROR (0x3c)
 ADDRESS_MAP_END

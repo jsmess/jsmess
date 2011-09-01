@@ -296,9 +296,9 @@ static TIMER_CALLBACK(keyscan_callback)
 	scan_keyboard(machine);
 }
 
-/* msm8251 serial */
+/* i8251 serial */
 
-const i8251_interface mbc55x_msm8251a_interface =
+const i8251_interface mbc55x_i8251a_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,

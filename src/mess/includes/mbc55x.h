@@ -14,7 +14,7 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/wd17xx.h"
-#include "machine/msm8251.h"
+#include "machine/i8251.h"
 #include "sound/speaker.h"
 #include "video/mc6845.h"
 #include "imagedev/flopdrv.h"
@@ -71,7 +71,7 @@
 #define PIT_C2_CLOCK	1789770
 
 #define MONO_TAG                "mono"
-#define MSM8251A_KB_TAG		"msm8251a_kb"
+#define I8251A_KB_TAG			"i8251a_kb"
 #define FDC_TAG                 "wd1793"
 
 
@@ -91,7 +91,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, MAINCPU_TAG),
 	m_crtc(*this, VID_MC6845_NAME),
-	m_kb_uart(*this, MSM8251A_KB_TAG),
+	m_kb_uart(*this, I8251A_KB_TAG),
 	m_pit(*this, PIT8253_TAG),
 	m_ppi(*this, PPI8255_TAG),
 	m_pic(*this, PIC8259_TAG),
@@ -161,8 +161,8 @@ extern const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3];
 extern const struct pit8253_config mbc55x_pit8253_config;
 extern const struct pic8259_interface mbc55x_pic8259_config;
 extern const i8255_interface mbc55x_ppi8255_interface;
-extern const i8251_interface mbc55x_msm8251a_interface;
-extern const i8251_interface mbc55x_msm8251b_interface;
+extern const i8251_interface mbc55x_i8251a_interface;
+extern const i8251_interface mbc55x_i8251b_interface;
 
 DRIVER_INIT(mbc55x);
 MACHINE_RESET(mbc55x);
