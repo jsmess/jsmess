@@ -247,7 +247,7 @@ INPUT_PORTS_END
 static READ8_DEVICE_HANDLER( a1200_cia_0_portA_r )
 {
 	UINT8 ret = input_port_read(device->machine(), "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
-	ret |= amiga_fdc_status_r(device->machine().device("fdc"));
+	ret |= device->machine().device<amiga_fdc>("fdc")->status_r();
 	return ret;
 }
 
@@ -275,7 +275,7 @@ static const mos6526_interface a1200_cia_1_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,									/* port A */
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("fdc", amiga_fdc_control_w)			/* port B */
+	DEVCB_DEVICE_MEMBER("fdc", amiga_fdc, control_w)			/* port B */
 };
 
 
@@ -372,7 +372,7 @@ ROM_END
 
 static UINT16 a1200_read_dskbytr(running_machine &machine)
 {
-	return amiga_fdc_get_byte(machine.device("fdc"));
+	return machine.device<amiga_fdc>("fdc")->get_byte();
 }
 
 static void a1200_write_dsklen(running_machine &machine, UINT16 data)
@@ -381,7 +381,7 @@ static void a1200_write_dsklen(running_machine &machine, UINT16 data)
 	if ( data & 0x8000 )
 	{
 		if ( CUSTOM_REG(REG_DSKLEN) & 0x8000 )
-			amiga_fdc_setup_dma(machine.device("fdc"));
+			machine.device<amiga_fdc>("fdc")->setup_dma();
 	}
 }
 
