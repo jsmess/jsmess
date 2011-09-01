@@ -29,6 +29,5 @@ WRITE8_DEVICE_HANDLER(acia_6551_w);
 
 void acia_6551_connect_to_serial_device(device_t *device, device_t *image);
 void acia_6551_receive_char(device_t *device, unsigned char ch);
-void acia_6551_refresh_ints(device_t *device);
 
 #endif /* __6551_H__ */
