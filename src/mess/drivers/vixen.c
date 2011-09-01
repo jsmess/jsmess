@@ -286,8 +286,8 @@ static ADDRESS_MAP_START( vixen_io, AS_IO, 8, vixen_state )
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0x07) AM_READ(ieee488_r)
 	AM_RANGE(0x20, 0x21) AM_MIRROR(0x04) AM_DEVWRITE(P8155H_IO_TAG, i8155_device, ale_w)
 	AM_RANGE(0x28, 0x28) AM_MIRROR(0x05) AM_DEVREADWRITE(P8155H_IO_TAG, i8155_device, read, write)
-	AM_RANGE(0x30, 0x30) AM_MIRROR(0x06) AM_DEVREADWRITE_LEGACY(P8251A_TAG, msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREADWRITE_LEGACY(P8251A_TAG, msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0x30, 0x30) AM_MIRROR(0x06) AM_DEVREADWRITE(P8251A_TAG, i8251_device, data_r, data_w)
+	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREADWRITE(P8251A_TAG, i8251_device, status_r, control_w)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x07) AM_READ(port3_r)
 //  AM_RANGE(0xf0, 0xff) Hard Disk?
 ADDRESS_MAP_END
@@ -648,8 +648,8 @@ WRITE_LINE_MEMBER( vixen_state::io_i8155_to_w )
 {
 	if (m_int_clk && !state)
 	{
-		msm8251_transmit_clock(m_usart);
-		msm8251_receive_clock(m_usart);
+		m_usart->transmit_clock();
+		m_usart->receive_clock();
 	}
 }
 
@@ -666,7 +666,7 @@ static I8155_INTERFACE( io_i8155_intf )
 
 
 //-------------------------------------------------
-//  msm8251_interface usart_intf
+//  i8251_interface usart_intf
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( vixen_state::rxrdy_w )
@@ -681,7 +681,7 @@ WRITE_LINE_MEMBER( vixen_state::txrdy_w )
 	update_interrupt();
 }
 
-static const msm8251_interface usart_intf =
+static const i8251_interface usart_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -866,7 +866,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	// devices
 	MCFG_I8155_ADD(P8155H_TAG, XTAL_23_9616MHz/6, i8155_intf)
 	MCFG_I8155_ADD(P8155H_IO_TAG, XTAL_23_9616MHz/6, io_i8155_intf)
-	MCFG_MSM8251_ADD(P8251A_TAG, usart_intf)
+	MCFG_I8251_ADD(P8251A_TAG, usart_intf)
 	MCFG_FD1797_ADD(FDC1797_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(vixen_floppy_interface)
 	MCFG_IEEE488_CONFIG_ADD(ieee488_daisy, ieee488_intf)

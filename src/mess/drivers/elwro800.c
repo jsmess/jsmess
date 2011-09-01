@@ -296,14 +296,14 @@ static READ8_HANDLER(elwro800jr_io_r)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		device_t *usart = space->machine().device("msm8251");
+		i8251_device *usart = space->machine().device<i8251_device>("msm8251");
 		if (offset & 1)
 		{
-			return msm8251_status_r(usart, 0);
+			return usart->status_r(*space, 0);
 		}
 		else
 		{
-			return msm8251_data_r(usart, 0);
+			return usart->data_r(*space, 0);
 		}
 	}
 	else if (!BIT(cs,5))
@@ -350,14 +350,14 @@ static WRITE8_HANDLER(elwro800jr_io_w)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		device_t *usart = space->machine().device("msm8251");
+		i8251_device *usart = space->machine().device<i8251_device>("msm8251");
 		if (offset & 1)
 		{
-			msm8251_control_w(usart, 0, data);
+			usart->control_w(*space, 0, data);
 		}
 		else
 		{
-			msm8251_data_w(usart, 0, data);
+			usart->data_w(*space, 0, data);
 		}
 	}
 	else if (!BIT(cs,5))
@@ -602,7 +602,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", elwro800jr_centronics_interface)
 
-	MCFG_MSM8251_ADD("msm8251", default_msm8251_interface)
+	MCFG_I8251_ADD("msm8251", default_i8251_interface)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

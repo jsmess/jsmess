@@ -248,8 +248,8 @@ static ADDRESS_MAP_START( bw2_io, AS_IO, 8, bw2_state )
 	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE_LEGACY(PIT8253_TAG, pit8253_r, pit8253_w)
 	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE(MSM6255_TAG, msm6255_device, read, write)
 //  AM_RANGE( 0x30, 0x3f ) SLOT
-	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE_LEGACY(MSM8251_TAG, msm8251_data_r, msm8251_data_w)
-	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE_LEGACY(MSM8251_TAG, msm8251_status_r, msm8251_control_w)
+	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
+	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
 	AM_RANGE( 0x50, 0x50 ) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
 	AM_RANGE( 0x60, 0x63 ) AM_DEVREADWRITE_LEGACY(WD2797_TAG, wd17xx_r, wd17xx_w)
 //  AM_RANGE( 0x70, 0x7f ) MODEMSEL
@@ -517,8 +517,8 @@ static I8255A_INTERFACE( ppi_intf )
 
 WRITE_LINE_MEMBER( bw2_state::pit_out0_w )
 {
-	msm8251_transmit_clock(m_uart);
-	msm8251_receive_clock(m_uart);
+	m_uart->transmit_clock();
+	m_uart->receive_clock();
 }
 
 WRITE_LINE_MEMBER( bw2_state::mtron_w )
@@ -694,7 +694,7 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, lcdc_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_MSM8251_ADD(MSM8251_TAG, default_msm8251_interface)
+	MCFG_I8251_ADD(I8251_TAG, default_i8251_interface)
 	MCFG_WD2797_ADD(WD2797_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bw2_floppy_interface)
 

@@ -38,8 +38,8 @@ static ADDRESS_MAP_START( b2m_io, AS_IO, 8 )
     AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w)
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w )
-	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
-	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
+	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0x19, 0x19)  AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("wd1793", wd17xx_status_r,wd17xx_command_w)
 	AM_RANGE(0x1d, 0x1d) AM_DEVREADWRITE("wd1793", wd17xx_track_r,wd17xx_track_w)
 	AM_RANGE(0x1e, 0x1e) AM_DEVREADWRITE("wd1793", wd17xx_sector_r,wd17xx_sector_w)
@@ -54,8 +54,8 @@ static ADDRESS_MAP_START( b2m_rom_io, AS_IO, 8 )
     AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w)
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w )
-	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("uart", msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)
 ADDRESS_MAP_END
 
 
@@ -239,7 +239,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* uart */
-	MCFG_MSM8251_ADD("uart", default_msm8251_interface)
+	MCFG_I8251_ADD("uart", default_i8251_interface)
 
 	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
 

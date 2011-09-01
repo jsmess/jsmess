@@ -43,7 +43,7 @@
 //#define MC14412_TAG   "m8"
 #define RP5C01A_TAG		"m301"
 #define TCM5089_TAG		"m11"
-#define MSM8251_TAG		"m20"
+#define I8251_TAG		"m20"
 #define HD61830_TAG		"m18"
 
 class kc85_state : public driver_device

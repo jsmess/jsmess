@@ -356,8 +356,8 @@ static ADDRESS_MAP_START( pc8500_io, AS_IO, 8, pc8401a_state )
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("KEY8")
 	AM_RANGE(0x09, 0x09) AM_READ_PORT("KEY9")
 	AM_RANGE(0x10, 0x10) AM_WRITE(rtc_cmd_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_LEGACY(MSM8251_TAG, msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE_LEGACY(MSM8251_TAG, msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
+	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(mmr_r, mmr_w)
 //  AM_RANGE(0x31, 0x31)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(rtc_r, rtc_ctrl_w)
@@ -580,7 +580,7 @@ static UPD1990A_INTERFACE( rtc_intf )
 
 /* MSM8251 Interface */
 
-static const msm8251_interface uart_intf =
+static const i8251_interface uart_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -607,7 +607,7 @@ static MACHINE_CONFIG_START( pc8401a, pc8401a_state )
 	/* devices */
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
-	MCFG_MSM8251_ADD(MSM8251_TAG, uart_intf)
+	MCFG_I8251_ADD(I8251_TAG, uart_intf)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(pc8401a_video)
@@ -640,7 +640,7 @@ static MACHINE_CONFIG_START( pc8500, pc8500_state )
 	/* devices */
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
-	MCFG_MSM8251_ADD(MSM8251_TAG, uart_intf)
+	MCFG_I8251_ADD(I8251_TAG, uart_intf)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(pc8500_video)

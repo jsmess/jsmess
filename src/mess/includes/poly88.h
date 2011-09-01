@@ -40,7 +40,7 @@ READ8_HANDLER(poly88_keyboard_r);
 WRITE8_HANDLER(poly88_intr_w);
 WRITE8_HANDLER(poly88_baud_rate_w);
 
-extern const msm8251_interface poly88_usart_interface;
+extern const i8251_interface poly88_usart_interface;
 
 extern SNAPSHOT_LOAD( poly88 );
 

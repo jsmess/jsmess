@@ -26,8 +26,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( poly88_io, AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(poly88_baud_rate_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(poly88_intr_w)
 	AM_RANGE(0xf8, 0xf8) AM_READ(poly88_keyboard_r)
@@ -197,7 +197,7 @@ static MACHINE_CONFIG_START( poly88, poly88_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, poly88_cassette_interface )
 
 	/* uart */
-	MCFG_MSM8251_ADD("uart", poly88_usart_interface)
+	MCFG_I8251_ADD("uart", poly88_usart_interface)
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", poly88, "img", 0)

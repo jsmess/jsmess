@@ -38,7 +38,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_io_i8155;
-	required_device<device_t> m_usart;
+	required_device<i8251_device> m_usart;
 	required_device<device_t> m_discrete;
 	required_device<ieee488_device> m_ieee488;
 	required_device<device_t> m_ram;

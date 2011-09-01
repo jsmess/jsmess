@@ -162,8 +162,8 @@ static READ8_HANDLER(devices_r)
 	i8255_device *ppi3 = space->machine().device<i8255_device>("ppi8255_3");
 	device_t *pit = space->machine().device("pit8253");
 	device_t *pic = space->machine().device("pic8259");
-	device_t *rs232 = space->machine().device("rs232");
-	device_t *lan = space->machine().device("lan");
+	i8251_device *rs232 = space->machine().device<i8251_device>("rs232");
+	i8251_device *lan = space->machine().device<i8251_device>("lan");
 	device_t *fdc = space->machine().device("wd1793");
 
 	switch(offset & 0x38)
@@ -171,8 +171,8 @@ static READ8_HANDLER(devices_r)
 		case 0x00: return pit8253_r(pit,offset & 3);
 		case 0x08: return ppi3->read(*space,offset & 3);
 		case 0x10: switch(offset & 1) {
-						case 0 : return msm8251_data_r(rs232,0);
-						case 1 : return msm8251_status_r(rs232,0);
+						case 0 : return rs232->data_r(*space,0);
+						case 1 : return rs232->status_r(*space,0);
 				   }
 				   break;
 		case 0x18: switch(offset & 3) {
@@ -183,8 +183,8 @@ static READ8_HANDLER(devices_r)
 					}
 					break;
 		case 0x20: switch(offset & 1) {
-						case 0 : return msm8251_data_r(lan,0);
-						case 1 : return msm8251_status_r(lan,0);
+						case 0 : return lan->data_r(*space,0);
+						case 1 : return lan->status_r(*space,0);
 				   }
 				   break;
 		case 0x28: return pic8259_r(pic,offset & 1);
@@ -201,8 +201,8 @@ static WRITE8_HANDLER(devices_w)
 	i8255_device *ppi3 = space->machine().device<i8255_device>("ppi8255_3");
 	device_t *pit = space->machine().device("pit8253");
 	device_t *pic = space->machine().device("pic8259");
-	device_t *rs232 = space->machine().device("rs232");
-	device_t *lan = space->machine().device("lan");
+	i8251_device *rs232 = space->machine().device<i8251_device>("rs232");
+	i8251_device *lan = space->machine().device<i8251_device>("lan");
 	device_t *fdc = space->machine().device("wd1793");
 
 	switch(offset & 0x38)
@@ -210,8 +210,8 @@ static WRITE8_HANDLER(devices_w)
 		case 0x00: pit8253_w(pit,offset & 3,data); break;
 		case 0x08: ppi3->write(*space,offset & 3,data); break;
 		case 0x10: switch(offset & 1) {
-						case 0 : msm8251_data_w(rs232,0,data); break;
-						case 1 : msm8251_control_w(rs232,0,data); break;
+						case 0 : rs232->data_w(*space,0,data); break;
+						case 1 : rs232->control_w(*space,0,data); break;
 				   }
 				   break;
 		case 0x18: switch(offset & 3) {
@@ -222,8 +222,8 @@ static WRITE8_HANDLER(devices_w)
 					}
 					break;
 		case 0x20: switch(offset & 1) {
-						case 0 : msm8251_data_w(lan,0,data); break;
-						case 1 : msm8251_control_w(lan,0,data); break;
+						case 0 : lan->data_w(*space,0,data); break;
+						case 1 : lan->control_w(*space,0,data); break;
 				   }
 				   break;
 		case 0x28: pic8259_w(pic,offset & 1,data);break;

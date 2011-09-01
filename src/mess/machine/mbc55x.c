@@ -171,8 +171,8 @@ WRITE8_HANDLER( pit8253_w )
 
 WRITE_LINE_MEMBER( mbc55x_state::pit8253_t2 )
 {
-	msm8251_transmit_clock(m_kb_uart);
-	msm8251_receive_clock(m_kb_uart);
+	m_kb_uart->transmit_clock();
+	m_kb_uart->receive_clock();
 }
 
 /* Video ram page register */
@@ -283,7 +283,7 @@ static void scan_keyboard(running_machine &machine)
 					key=keyvalues_normal[row][bitno];
 
 				if (LOG_KEYBOARD) logerror("keypress %c\n",key);
-				msm8251_receive_character(state->m_kb_uart, key);
+				state->m_kb_uart->receive_character(key);
 			}
 		}
 
@@ -298,7 +298,7 @@ static TIMER_CALLBACK(keyscan_callback)
 
 /* msm8251 serial */
 
-const msm8251_interface mbc55x_msm8251a_interface =
+const i8251_interface mbc55x_msm8251a_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -320,12 +320,12 @@ READ8_HANDLER( mbc55x_kb_usart_r )
 	switch (offset)
 	{
 		case 0	: //logerror("%s read kb_uart\n",space->machine().describe_context());
-				result = msm8251_data_r(state->m_kb_uart, 0); break;
+				result = state->m_kb_uart->data_r(*space,0); break;
 
-		case 1	: 	result = msm8251_status_r(state->m_kb_uart, 0);
+		case 1	: 	result = state->m_kb_uart->status_r(*space,0);
 
 				if (state->m_keyboard.key_special & KEY_BIT_CTRL)	// Parity error used to flag control down
-					result |= MSM8251_STATUS_PARITY_ERROR;
+					result |= I8251_STATUS_PARITY_ERROR;
 				break;
 	}
 
@@ -339,8 +339,8 @@ WRITE8_HANDLER( mbc55x_kb_usart_w )
 
 	switch (offset)
 	{
-		case 0	: msm8251_data_w(state->m_kb_uart, 0, data); break;
-		case 1	: msm8251_control_w(state->m_kb_uart, 0, data); break;
+		case 0	: state->m_kb_uart->data_w(*space, 0, data); break;
+		case 1	: state->m_kb_uart->control_w(*space, 0, data); break;
 	}
 }
 

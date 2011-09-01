@@ -1,8 +1,8 @@
 /*********************************************************************
 
-    msm8251.c
+    i8251.c
 
-    MSM/Intel 8251 Universal Synchronous/Asynchronous Receiver Transmitter code
+	Intel 8251 Universal Synchronous/Asynchronous Receiver Transmitter code
 
 *********************************************************************/
 
@@ -18,92 +18,17 @@
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef struct _msm8251_t msm8251_t;
-struct _msm8251_t
-{
-	devcb_resolved_read_line	in_rxd_func;
-	devcb_resolved_write_line	out_txd_func;
-	devcb_resolved_read_line	in_dsr_func;
-	devcb_resolved_write_line	out_dtr_func;
-	devcb_resolved_write_line	out_rts_func;
-	devcb_resolved_write_line	out_rxrdy_func;
-	devcb_resolved_write_line	out_txrdy_func;
-	devcb_resolved_write_line	out_txempty_func;
-	devcb_resolved_write_line	out_syndet_func;
-
-	/* flags controlling how msm8251_control_w operates */
-	UINT8 flags;
-	/* offset into sync_bytes used during sync byte transfer */
-	UINT8 sync_byte_offset;
-	/* number of sync bytes written so far */
-	UINT8 sync_byte_count;
-	/* the sync bytes written */
-	UINT8 sync_bytes[2];
-	/* status of msm8251 */
-	UINT8 status;
-	UINT8 command;
-	/* mode byte - bit definitions depend on mode - e.g. synchronous, asynchronous */
-	UINT8 mode_byte;
-
-	/* data being received */
-	UINT8 data;
-
-	/* receive reg */
-	serial_receive_register receive_reg;
-	/* transmit reg */
-	serial_transmit_register transmit_reg;
-
-	data_form form;
-
-	/* the serial connection that data is transfered over */
-	/* this is usually connected to the serial device */
-	serial_connection connection;
-};
-
-
-
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
 
-static void msm8251_in_callback(running_machine &machine, int id, unsigned long state);
-static void msm8251_update_tx_empty(device_t *device);
-static void msm8251_update_tx_ready(device_t *device);
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE msm8251_t *get_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == MSM8251);
-
-	return (msm8251_t *) downcast<legacy_device_base *>(device)->token();
-}
-
-
-INLINE const msm8251_interface *get_interface(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == MSM8251);
-
-	return (const msm8251_interface *) device->static_config();
-}
-
+static void i8251_in_callback(running_machine &machine, int id, unsigned long state);
 
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
 
-const msm8251_interface default_msm8251_interface = { DEVCB_NULL, };
+const i8251_interface default_i8251_interface = { DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL };
 
 
 /***************************************************************************
@@ -111,99 +36,133 @@ const msm8251_interface default_msm8251_interface = { DEVCB_NULL, };
 ***************************************************************************/
 
 /*-------------------------------------------------
-    msm8251_in_callback
+    i8251_in_callback
 -------------------------------------------------*/
 
-static void msm8251_in_callback(running_machine &machine, int id, unsigned long state)
+static void i8251_in_callback(running_machine &machine, int id, unsigned long state)
 {
-	device_t *device;
-	msm8251_t *uart;
 	int changed;
 
 	/* NPW 29-Nov-2008 - These two lines are a hack and indicate why our "serial" infrastructure needs to be updated */
-	device = machine.device("uart");
-	uart = get_token(device);
+	i8251_device *device = machine.device<i8251_device>("uart");
+	
 
-	changed = uart->connection.input_state^state;
+	changed = device->get_connection()->input_state^state;
 
-	uart->connection.input_state = state;
+	device->get_connection()->input_state = state;
 
 	/* did cts change state? */
 	if (changed & SERIAL_STATE_CTS)
 	{
 		/* yes */
 		/* update tx ready */
-		/* msm8251_update_tx_ready(device); */
+		/* update_tx_ready(); */
 	}
 }
 
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
 
+const device_type I8251 = &device_creator<i8251_device>;
 
-/*-------------------------------------------------
-    DEVICE_START( msm8251 )
--------------------------------------------------*/
+//-------------------------------------------------
+//  i8251_device - constructor
+//-------------------------------------------------
 
-static DEVICE_START( msm8251 )
+i8251_device::i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, I8251, "I8251", tag, owner, clock)
 {
-	msm8251_t *uart = get_token(device);
-	const msm8251_interface *intf = get_interface(device);
+}
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void i8251_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const i8251_interface *intf = reinterpret_cast<const i8251_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<i8251_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_in_rxd_cb, 0, sizeof(m_in_rxd_cb));
+		memset(&m_out_txd_cb, 0, sizeof(m_out_txd_cb));
+		memset(&m_in_dsr_cb, 0, sizeof(m_in_dsr_cb));
+		memset(&m_out_dtr_cb, 0, sizeof(m_out_dtr_cb));
+		memset(&m_out_rts_cb, 0, sizeof(m_out_rts_cb));
+		memset(&m_out_rxrdy_cb, 0, sizeof(m_out_rxrdy_cb));
+		memset(&m_out_txrdy_cb, 0, sizeof(m_out_txrdy_cb));
+		memset(&m_out_txempty_cb, 0, sizeof(m_out_txempty_cb));
+		memset(&m_out_syndet_cb, 0, sizeof(m_out_syndet_cb));
+	}
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void i8251_device::device_start()
+{
 	serial_helper_setup();
 
 	// resolve callbacks
-	uart->out_rxrdy_func.resolve(intf->out_rxrdy_func, *device);
-	uart->out_txrdy_func.resolve(intf->out_txrdy_func, *device);
-	uart->out_txempty_func.resolve(intf->out_txempty_func, *device);
+	m_out_rxrdy_func.resolve(m_out_rxrdy_cb, *this);
+	m_out_txrdy_func.resolve(m_out_txrdy_cb, *this);
+	m_out_txempty_func.resolve(m_out_txempty_cb, *this);
 
 	/* setup this side of the serial connection */
-	serial_connection_init(device->machine(),&uart->connection);
-	serial_connection_set_in_callback(device->machine(),&uart->connection, msm8251_in_callback);
-	uart->connection.input_state = 0;
+	serial_connection_init(machine(),&m_connection);
+	serial_connection_set_in_callback(machine(),&m_connection, i8251_in_callback);
+	m_connection.input_state = 0;
 }
 
 
 
+
 /*-------------------------------------------------
-    msm8251_update_rx_ready
+    update_rx_ready
 -------------------------------------------------*/
 
-static void msm8251_update_rx_ready(device_t *device)
+void i8251_device::update_rx_ready()
 {
-	msm8251_t *uart = get_token(device);
 	int state;
 
-	state = uart->status & MSM8251_STATUS_RX_READY;
+	state = m_status & I8251_STATUS_RX_READY;
 
 	/* masked? */
-	if ((uart->command & (1<<2))==0)
+	if ((m_command & (1<<2))==0)
 	{
 		state = 0;
 	}
 
-	uart->out_rxrdy_func(state != 0);
+	m_out_rxrdy_func(state != 0);
 }
 
 
 
 /*-------------------------------------------------
-    msm8251_receive_clock
+    receive_clock
 -------------------------------------------------*/
 
-void msm8251_receive_clock(device_t *device)
+void i8251_device::receive_clock()
 {
-	msm8251_t *uart = get_token(device);
-
 	/* receive enable? */
-	if (uart->command & (1<<2))
+	if (m_command & (1<<2))
 	{
 		//logerror("MSM8251\n");
 		/* get bit received from other side and update receive register */
-		receive_register_update_bit(&uart->receive_reg, get_in_data_bit(uart->connection.input_state));
+		receive_register_update_bit(&m_receive_reg, get_in_data_bit(m_connection.input_state));
 
-		if (uart->receive_reg.flags & RECEIVE_REGISTER_FULL)
+		if (m_receive_reg.flags & RECEIVE_REGISTER_FULL)
 		{
-			receive_register_extract(&uart->receive_reg, &uart->form);
-			msm8251_receive_character(device, uart->receive_reg.byte_received);
+			receive_register_extract(&m_receive_reg, &m_form);
+			receive_character(m_receive_reg.byte_received);
 		}
 	}
 }
@@ -211,66 +170,64 @@ void msm8251_receive_clock(device_t *device)
 
 
 /*-------------------------------------------------
-    msm8251_transmit_clock
+    transmit_clock
 -------------------------------------------------*/
 
-void msm8251_transmit_clock(device_t *device)
+void i8251_device::transmit_clock()
 {
-	msm8251_t *uart = get_token(device);
-
 	/* transmit enable? */
-	if (uart->command & (1<<0))
+	if (m_command & (1<<0))
 	{
 
 		/* transmit register full? */
-		if ((uart->status & MSM8251_STATUS_TX_READY)==0)
+		if ((m_status & I8251_STATUS_TX_READY)==0)
 		{
 			/* if transmit reg is empty */
-			if ((uart->transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)!=0)
+			if ((m_transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)!=0)
 			{
 				/* set it up */
-				transmit_register_setup(&uart->transmit_reg, &uart->form, uart->data);
-				/* msm8251 transmit reg now empty */
-				uart->status |=MSM8251_STATUS_TX_EMPTY;
+				transmit_register_setup(&m_transmit_reg, &m_form, m_data);
+				/* i8251 transmit reg now empty */
+				m_status |=I8251_STATUS_TX_EMPTY;
 				/* ready for next transmit */
-				uart->status |=MSM8251_STATUS_TX_READY;
+				m_status |=I8251_STATUS_TX_READY;
 
-				msm8251_update_tx_empty(device);
-				msm8251_update_tx_ready(device);
+				update_tx_empty();
+				update_tx_ready();
 			}
 		}
 
 		/* if transmit is not empty... transmit data */
-		if ((uart->transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)==0)
+		if ((m_transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)==0)
 		{
 	//      logerror("MSM8251\n");
-			transmit_register_send_bit(device->machine(),&uart->transmit_reg, &uart->connection);
+			transmit_register_send_bit(machine(),&m_transmit_reg, &m_connection);
 		}
 	}
 
 #if 0
 	/* hunt mode? */
 	/* after each bit has been shifted in, it is compared against the current sync byte */
-	if (uart->command & (1<<7))
+	if (m_command & (1<<7))
 	{
 		/* data matches sync byte? */
-		if (uart->data == uart->sync_bytes[uart->sync_byte_offset])
+		if (m_data == m_sync_bytes[m_sync_byte_offset])
 		{
 			/* sync byte matches */
 			/* update for next sync byte? */
-			uart->sync_byte_offset++;
+			m_sync_byte_offset++;
 
 			/* do all sync bytes match? */
-			if (uart->sync_byte_offset == uart->sync_byte_count)
+			if (m_sync_byte_offset == m_sync_byte_count)
 			{
 				/* ent hunt mode */
-				uart->command &=~(1<<7);
+				m_command &=~(1<<7);
 			}
 		}
 		else
 		{
 			/* if there is no match, reset */
-			uart->sync_byte_offset = 0;
+			m_sync_byte_offset = 0;
 		}
 	}
 #endif
@@ -279,13 +236,11 @@ void msm8251_transmit_clock(device_t *device)
 
 
 /*-------------------------------------------------
-    msm8251_update_tx_ready
+    update_tx_ready
 -------------------------------------------------*/
 
-static void msm8251_update_tx_ready(device_t *device)
+void i8251_device::update_tx_ready()
 {
-	msm8251_t *uart = get_token(device);
-
 	/* clear tx ready state */
 	int tx_ready;
 
@@ -298,12 +253,12 @@ static void msm8251_update_tx_ready(device_t *device)
 	tx_ready = 0;
 
 	/* transmit enable? */
-	if ((uart->command & (1<<0))!=0)
+	if ((m_command & (1<<0))!=0)
 	{
 		/* other side has rts set (comes in as CTS at this side) */
-		if (uart->connection.input_state & SERIAL_STATE_CTS)
+		if (m_connection.input_state & SERIAL_STATE_CTS)
 		{
-			if (uart->status & MSM8251_STATUS_TX_EMPTY)
+			if (m_status & I8251_STATUS_TX_EMPTY)
 			{
 				/* enable transfer */
 				tx_ready = 1;
@@ -311,106 +266,100 @@ static void msm8251_update_tx_ready(device_t *device)
 		}
 	}
 
-	uart->out_txrdy_func(tx_ready);
+	m_out_txrdy_func(tx_ready);
 }
 
 
 
 /*-------------------------------------------------
-    msm8251_update_tx_empty
+    update_tx_empty
 -------------------------------------------------*/
 
-static void msm8251_update_tx_empty(device_t *device)
+void i8251_device::update_tx_empty()
 {
-	msm8251_t *uart = get_token(device);
-
-	if (uart->status & MSM8251_STATUS_TX_EMPTY)
+	if (m_status & I8251_STATUS_TX_EMPTY)
 	{
 		/* tx is in marking state (high) when tx empty! */
-		set_out_data_bit(uart->connection.State, 1);
-		serial_connection_out(device->machine(),&uart->connection);
+		set_out_data_bit(m_connection.State, 1);
+		serial_connection_out(machine(),&m_connection);
 	}
 
-	uart->out_txempty_func((uart->status & MSM8251_STATUS_TX_EMPTY) != 0);
+	m_out_txempty_func((m_status & I8251_STATUS_TX_EMPTY) != 0);
 }
 
 
 
-/*-------------------------------------------------
-    DEVICE_RESET( msm8251 )
--------------------------------------------------*/
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
 
-static DEVICE_RESET( msm8251 )
-{
-	msm8251_t *uart = get_token(device);
-
-	LOG(("MSM8251: Reset\n"));
+void i8251_device::device_reset()
+{ 
+	LOG(("I8251: Reset\n"));
 
 	/* what is the default setup when the 8251 has been reset??? */
 
-	/* msm8251 datasheet explains the state of tx pin at reset */
+	/* i8251 datasheet explains the state of tx pin at reset */
 	/* tx is set to 1 */
-	set_out_data_bit(uart->connection.State,1);
+	set_out_data_bit(m_connection.State,1);
 
 	/* assumption, rts is set to 1 */
-	uart->connection.State &= ~SERIAL_STATE_RTS;
-	serial_connection_out(device->machine(), &uart->connection);
+	m_connection.State &= ~SERIAL_STATE_RTS;
+	serial_connection_out(machine(), &m_connection);
 
-	transmit_register_reset(&uart->transmit_reg);
-	receive_register_reset(&uart->receive_reg);
+	transmit_register_reset(&m_transmit_reg);
+	receive_register_reset(&m_receive_reg);
 	/* expecting mode byte */
-	uart->flags |= MSM8251_EXPECTING_MODE;
+	m_flags |= I8251_EXPECTING_MODE;
 	/* not expecting a sync byte */
-	uart->flags &= ~MSM8251_EXPECTING_SYNC_BYTE;
+	m_flags &= ~I8251_EXPECTING_SYNC_BYTE;
 
 	/* no character to read by cpu */
 	/* transmitter is ready and is empty */
-	uart->status = MSM8251_STATUS_TX_EMPTY | MSM8251_STATUS_TX_READY;
-	uart->mode_byte = 0;
-	uart->command = 0;
+	m_status = I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY;
+	m_mode_byte = 0;
+	m_command = 0;
 
 	/* update tx empty pin output */
-	msm8251_update_tx_empty(device);
+	update_tx_empty();
 	/* update rx ready pin output */
-	msm8251_update_rx_ready(device);
+	update_rx_ready();
 	/* update tx ready pin output */
-	msm8251_update_tx_ready(device);
+	update_tx_ready();
 }
 
 
 
 /*-------------------------------------------------
-    WRITE8_DEVICE_HANDLER(msm8251_control_w)
+    control_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(msm8251_control_w)
+WRITE8_MEMBER(i8251_device::control_w)
 {
-	msm8251_t *uart = get_token(device);
-
-	if (uart->flags & MSM8251_EXPECTING_MODE)
+	if (m_flags & I8251_EXPECTING_MODE)
 	{
-		if (uart->flags & MSM8251_EXPECTING_SYNC_BYTE)
+		if (m_flags & I8251_EXPECTING_SYNC_BYTE)
 		{
 			LOG(("MSM8251: Sync byte\n"));
 
 			LOG(("Sync byte: %02x\n", data));
 			/* store sync byte written */
-			uart->sync_bytes[uart->sync_byte_offset] = data;
-			uart->sync_byte_offset++;
+			m_sync_bytes[m_sync_byte_offset] = data;
+			m_sync_byte_offset++;
 
-			if (uart->sync_byte_offset == uart->sync_byte_count)
+			if (m_sync_byte_offset == m_sync_byte_count)
 			{
 				/* finished transfering sync bytes, now expecting command */
-				uart->flags &= ~(MSM8251_EXPECTING_MODE | MSM8251_EXPECTING_SYNC_BYTE);
-				uart->sync_byte_offset = 0;
-			//  uart->status = MSM8251_STATUS_TX_EMPTY | MSM8251_STATUS_TX_READY;
+				m_flags &= ~(I8251_EXPECTING_MODE | I8251_EXPECTING_SYNC_BYTE);
+				m_sync_byte_offset = 0;
+			//  m_status = I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY;
 			}
 		}
 		else
 		{
 			LOG(("MSM8251: Mode byte\n"));
 
-			uart->mode_byte = data;
+			m_mode_byte = data;
 
 			/* Synchronous or Asynchronous? */
 			if ((data & 0x03)!=0)
@@ -499,41 +448,41 @@ WRITE8_DEVICE_HANDLER(msm8251_control_w)
 					}
 				}
 
-				uart->form.word_length = ((data>>2) & 0x03)+5;
-				uart->form.parity = SERIAL_PARITY_NONE;
+				m_form.word_length = ((data>>2) & 0x03)+5;
+				m_form.parity = SERIAL_PARITY_NONE;
 				switch ((data>>6) & 0x03)
 				{
 					case 0:
 					case 1:
-						uart->form.stop_bit_count =  1;
+						m_form.stop_bit_count =  1;
 						break;
 					case 2:
 					case 3:
-						uart->form.stop_bit_count =  2;
+						m_form.stop_bit_count =  2;
 						break;
 				}
-				receive_register_setup(&uart->receive_reg, &uart->form);
+				receive_register_setup(&m_receive_reg, &m_form);
 
 
 #if 0
 				/* data bits */
-				uart->receive_char_length = (((data>>2) & 0x03)+5);
+				m_receive_char_length = (((data>>2) & 0x03)+5);
 
 				if (data & (1<<4))
 				{
 					/* parity */
-					uart->receive_char_length++;
+					m_receive_char_length++;
 				}
 
 				/* stop bits */
-				uart->receive_char_length++;
+				m_receive_char_length++;
 
-				uart->receive_flags &=~MSM8251_TRANSFER_RECEIVE_SYNCHRONISED;
-				uart->receive_flags |= MSM8251_TRANSFER_RECEIVE_WAITING_FOR_START_BIT;
+				m_receive_flags &=~I8251_TRANSFER_RECEIVE_SYNCHRONISED;
+				m_receive_flags |= I8251_TRANSFER_RECEIVE_WAITING_FOR_START_BIT;
 #endif
 				/* not expecting mode byte now */
-				uart->flags &= ~MSM8251_EXPECTING_MODE;
-//              uart->status = MSM8251_STATUS_TX_EMPTY | MSM8251_STATUS_TX_READY;
+				m_flags &= ~I8251_EXPECTING_MODE;
+//              m_status = I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY;
 			}
 			else
 			{
@@ -559,15 +508,15 @@ WRITE8_DEVICE_HANDLER(msm8251_control_w)
 				LOG(("MSM8251: Synchronous operation\n"));
 
 				/* setup for sync byte(s) */
-				uart->flags |= MSM8251_EXPECTING_SYNC_BYTE;
-				uart->sync_byte_offset = 0;
+				m_flags |= I8251_EXPECTING_SYNC_BYTE;
+				m_sync_byte_offset = 0;
 				if (data & 0x07)
 				{
-					uart->sync_byte_count = 1;
+					m_sync_byte_count = 1;
 				}
 				else
 				{
-					uart->sync_byte_count = 2;
+					m_sync_byte_count = 2;
 				}
 
 			}
@@ -578,7 +527,7 @@ WRITE8_DEVICE_HANDLER(msm8251_control_w)
 		/* command */
 		LOG(("MSM8251: Command byte\n"));
 
-		uart->command = data;
+		m_command = data;
 
 		LOG(("Command byte: %02x\n", data));
 
@@ -650,41 +599,41 @@ WRITE8_DEVICE_HANDLER(msm8251_control_w)
                 1 = transmit enable
         */
 
-		uart->connection.State &=~SERIAL_STATE_RTS;
+		m_connection.State &=~SERIAL_STATE_RTS;
 		if (data & (1<<5))
 		{
 			/* rts set to 0 */
-			uart->connection.State |= SERIAL_STATE_RTS;
+			m_connection.State |= SERIAL_STATE_RTS;
 		}
 
-		uart->connection.State &=~SERIAL_STATE_DTR;
+		m_connection.State &=~SERIAL_STATE_DTR;
 		if (data & (1<<1))
 		{
-			uart->connection.State |= SERIAL_STATE_DTR;
+			m_connection.State |= SERIAL_STATE_DTR;
 		}
 
 		if ((data & (1<<0))==0)
 		{
 			/* held in high state when transmit disable */
-			set_out_data_bit(uart->connection.State,1);
+			set_out_data_bit(m_connection.State,1);
 		}
 
 
 		/* refresh outputs */
-		serial_connection_out(device->machine(), &uart->connection);
+		serial_connection_out(machine(), &m_connection);
 
 		if (data & (1<<4))
 		{
-			uart->status &= ~(MSM8251_STATUS_PARITY_ERROR | MSM8251_STATUS_OVERRUN_ERROR | MSM8251_STATUS_FRAMING_ERROR);
+			m_status &= ~(I8251_STATUS_PARITY_ERROR | I8251_STATUS_OVERRUN_ERROR | I8251_STATUS_FRAMING_ERROR);
 		}
 
 		if (data & (1<<6))
 		{
-			device->reset();
+			reset();
 		}
 
-		msm8251_update_rx_ready(device);
-		msm8251_update_tx_ready(device);
+		update_rx_ready();
+		update_tx_ready();
 
 	}
 }
@@ -692,134 +641,95 @@ WRITE8_DEVICE_HANDLER(msm8251_control_w)
 
 
 /*-------------------------------------------------
-    READ8_DEVICE_HANDLER(msm8251_status_r)
+    status_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(msm8251_status_r)
+READ8_MEMBER(i8251_device::status_r)
 {
-	msm8251_t *uart = get_token(device);
-
-	LOG(("status: %02x\n", uart->status));
-	return uart->status;
+	LOG(("status: %02x\n", m_status));
+	return m_status;
 }
 
 
 
 /*-------------------------------------------------
-    WRITE8_DEVICE_HANDLER(msm8251_data_w)
+    data_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(msm8251_data_w)
+WRITE8_MEMBER(i8251_device::data_w)
 {
-	msm8251_t *uart = get_token(device);
-
-	uart->data = data;
+	m_data = data;
 
 	logerror("write data: %02x\n",data);
 
 	/* writing clears */
-	uart->status &=~MSM8251_STATUS_TX_READY;
+	m_status &=~I8251_STATUS_TX_READY;
 
 	/* if transmitter is active, then tx empty will be signalled */
 
-	msm8251_update_tx_ready(device);
+	update_tx_ready();
 }
 
 
 
 /*-------------------------------------------------
-    msm8251_receive_character - called when last
+    receive_character - called when last
     bit of data has been received
 -------------------------------------------------*/
 
-void msm8251_receive_character(device_t *device, UINT8 ch)
+void i8251_device::receive_character(UINT8 ch)
 {
-	msm8251_t *uart = get_token(device);
+	logerror("i8251 receive char: %02x\n",ch);
 
-	logerror("msm8251 receive char: %02x\n",ch);
-
-	uart->data = ch;
+	m_data = ch;
 
 	/* char has not been read and another has arrived! */
-	if (uart->status & MSM8251_STATUS_RX_READY)
+	if (m_status & I8251_STATUS_RX_READY)
 	{
-		uart->status |= MSM8251_STATUS_OVERRUN_ERROR;
+		m_status |= I8251_STATUS_OVERRUN_ERROR;
 	}
-	uart->status |= MSM8251_STATUS_RX_READY;
+	m_status |= I8251_STATUS_RX_READY;
 
-	msm8251_update_rx_ready(device);
+	update_rx_ready();
 }
 
 
 
 /*-------------------------------------------------
-    READ8_DEVICE_HANDLER(msm8251_data_r) - read data
+    data_r - read data
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(msm8251_data_r)
+READ8_MEMBER(i8251_device::data_r)
 {
-	msm8251_t *uart = get_token(device);
-
-	logerror("read data: %02x, STATUS=%02x\n",uart->data,uart->status);
+	logerror("read data: %02x, STATUS=%02x\n",m_data,m_status);
 	/* reading clears */
-	uart->status &= ~MSM8251_STATUS_RX_READY;
+	m_status &= ~I8251_STATUS_RX_READY;
 
-	msm8251_update_rx_ready(device);
-	return uart->data;
+	update_rx_ready();
+	return m_data;
 }
 
 
 
 /*-------------------------------------------------
-    msm8251_connect_to_serial_device - initialise
+    connect_to_serial_device - initialise
     transfer using serial device - set the callback
     which will be called when serial device has
     updated it's state
 -------------------------------------------------*/
 
-void msm8251_connect_to_serial_device(device_t *device, device_t *image)
+void i8251_device::connect_to_serial_device(device_t *image)
 {
-	msm8251_t *uart = get_token(device);
-	serial_device_connect(image, &uart->connection);
+	serial_device_connect(image, &m_connection);
 }
 
 
 
 /*-------------------------------------------------
-    msm8251_connect
+    connect
 -------------------------------------------------*/
 
-void msm8251_connect(device_t *device, serial_connection *other_connection)
+void i8251_device::connect(serial_connection *other_connection)
 {
-	msm8251_t *uart = get_token(device);
-	serial_connection_link(device->machine(), &uart->connection, other_connection);
+	serial_connection_link(machine(), &m_connection, other_connection);
 }
-
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( msm8251 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( msm8251 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(msm8251_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(msm8251);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(msm8251);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Intel 8251 UART");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel 8251 UART");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
-		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
-	}
-}
-
-DEFINE_LEGACY_DEVICE(MSM8251, msm8251);

@@ -277,14 +277,14 @@ static TIMER_DEVICE_CALLBACK( einstein_ctc_trigger_callback )
 
 static WRITE_LINE_DEVICE_HANDLER( einstein_serial_transmit_clock )
 {
-	device_t *uart = device->machine().device(IC_I060);
-	msm8251_transmit_clock(uart);
+	i8251_device *uart = device->machine().device<i8251_device>(IC_I060);
+	uart->transmit_clock();
 }
 
 static WRITE_LINE_DEVICE_HANDLER( einstein_serial_receive_clock )
 {
-	device_t *uart = device->machine().device(IC_I060);
-	msm8251_receive_clock(uart);
+	i8251_device *uart = device->machine().device<i8251_device>(IC_I060);
+	uart->receive_clock();
 }
 
 
@@ -517,8 +517,8 @@ static ADDRESS_MAP_START( einstein_io, AS_IO, 8 )
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN("tms9929a", tms9929a_device, vram_read, vram_write)
 	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN("tms9929a", tms9929a_device, register_read, register_write)
 	/* block 2, msm8251 uart */
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0xff06) AM_DEVREADWRITE(IC_I060, msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0xff06) AM_DEVREADWRITE(IC_I060, msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN(IC_I060, i8251_device, data_r, data_w)
+	AM_RANGE(0x11, 0x11) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN(IC_I060, i8251_device, status_r, control_w)
 	/* block 3, wd1770 floppy controller */
 	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I042, wd17xx_r, wd17xx_w)
 	/* block 4, internal controls */
@@ -819,7 +819,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_CENTRONICS_ADD("centronics", einstein_centronics_config)
 
 	/* uart */
-	MCFG_MSM8251_ADD(IC_I060, default_msm8251_interface)
+	MCFG_I8251_ADD(IC_I060, default_i8251_interface)
 
 	MCFG_WD1770_ADD(IC_I042, default_wd17xx_interface)
 

@@ -368,7 +368,7 @@ WRITE_LINE_MEMBER( compis_state::compis_usart_rxready )
 #endif
 }
 
-const msm8251_interface compis_usart_interface=
+const i8251_interface compis_usart_interface=
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -383,7 +383,7 @@ const msm8251_interface compis_usart_interface=
 
 READ16_MEMBER( compis_state::compis_usart_r )
 {
-	return msm8251_data_r(m_uart, offset);
+	return m_uart->data_r(space, offset);
 }
 
 WRITE16_MEMBER( compis_state::compis_usart_w )
@@ -391,10 +391,10 @@ WRITE16_MEMBER( compis_state::compis_usart_w )
 	switch (offset)
 	{
 		case 0x00:
-			msm8251_data_w(m_uart, 0, data);
+			m_uart->data_w(space, 0, data);
 			break;
 		case 0x01:
-			msm8251_control_w(m_uart, 0, data);
+			m_uart->control_w(space, 0, data);
 			break;
 		default:
 			logerror("USART Unknown Port Write %04X = %04X\n", offset, data);

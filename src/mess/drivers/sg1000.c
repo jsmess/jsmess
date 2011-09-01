@@ -257,8 +257,8 @@ static ADDRESS_MAP_START( sf7000_io_map, AS_IO, 8, sf7000_state )
 	AM_RANGE(0xe0, 0xe0) AM_DEVREAD_LEGACY(UPD765_TAG, upd765_status_r)
 	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w)
 	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(UPD9255_1_TAG, i8255_device, read, write)
-	AM_RANGE(0xe8, 0xe8) AM_DEVREADWRITE_LEGACY(UPD8251_TAG, msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0xe9, 0xe9) AM_DEVREADWRITE_LEGACY(UPD8251_TAG, msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0xe8, 0xe8) AM_DEVREADWRITE(UPD8251_TAG, i8251_device, data_r, data_w)
+	AM_RANGE(0xe9, 0xe9) AM_DEVREADWRITE(UPD8251_TAG, i8251_device, status_r, control_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1148,7 +1148,7 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	/* devices */
 	MCFG_I8255_ADD(UPD9255_0_TAG, sc3000_ppi_intf)
 	MCFG_I8255_ADD(UPD9255_1_TAG, sf7000_ppi_intf)
-	MCFG_MSM8251_ADD(UPD8251_TAG, default_msm8251_interface)
+	MCFG_I8251_ADD(UPD8251_TAG, default_i8251_interface)
 	MCFG_UPD765A_ADD(UPD765_TAG, sf7000_upd765_interface)
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, sf7000_floppy_interface)
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
