@@ -532,4 +532,101 @@
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="cpm22e">
+		<!-- to be sorted -->
+		<description>48K CP/M v2.2 CBIOS E</description>
+		<year>19??</year>
+		<publisher>Morrow Designs</publisher>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="349991">
+				<rom name="00.imd" size="349991" crc="84cd5ef2" sha1="87412118b0e3b72d62ce2f44697923a3ac57e329" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_8">
+			<dataarea name="flop" size="519809">
+				<rom name="01.imd" size="519809" crc="788ee9d9" sha1="0178bd3c102907f9d2071e738743000e749bfb18" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_8">
+			<dataarea name="flop" size="524924">
+				<rom name="02.imd" size="524924" crc="13fd652b" sha1="d9581bc1f4ad6a1cc4a64f54bf7a1036fbe901ed" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_8">
+			<dataarea name="flop" size="519809">
+				<rom name="03.imd" size="519809" crc="d9c78b57" sha1="c25b0a25abcb840de91a586356299aa6c3f7dd4e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_8">
+			<dataarea name="flop" size="519809">
+				<rom name="04.imd" size="519809" crc="ba749d80" sha1="991a7a81238111156c7c706facca570aaa5bc439" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_8">
+			<dataarea name="flop" size="516740">
+				<rom name="05.imd" size="516740" crc="100d56f7" sha1="7044050dd1333eb7b6b3a9219f2246bb25f8818f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_8">
+			<dataarea name="flop" size="533108">
+				<rom name="06.imd" size="533108" crc="f79b31e6" sha1="44a73c1bc72ab5ac69484d8faaedd98dbb28de3b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_8">
+			<dataarea name="flop" size="516740">
+				<rom name="07.imd" size="516740" crc="4c7fdbd9" sha1="2b60dd179b5fcc1f5a183fe038eead77d220ebc1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_8">
+			<dataarea name="flop" size="516740">
+				<rom name="08.imd" size="516740" crc="ed22265f" sha1="b84a53e87bce3ee405578683cac20ba0015b1198" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_8">
+			<dataarea name="flop" size="533108">
+				<rom name="09.imd" size="533108" crc="21f84ee7" sha1="517f997923031655a424e8ff32d8b309a5c346af" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_8">
+			<dataarea name="flop" size="566867">
+				<rom name="10.imd" size="566867" crc="2da9829a" sha1="667363d0f0c0ba67ea74c9c306151300904adc92" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_8">
+			<dataarea name="flop" size="566867">
+				<rom name="11.imd" size="566867" crc="ef8107f7" sha1="5f39ce3c1351426a5bbacb91e8801771a0055900" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_8">
+			<dataarea name="flop" size="566867">
+				<rom name="12.imd" size="566867" crc="19d317d4" sha1="9483dd7020e066664b9d5877b94db884fe8a4403" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_8">
+			<dataarea name="flop" size="503441">
+				<rom name="13.imd" size="503441" crc="2e3d8b31" sha1="3cf3bf721f4eae92563eae598d03dad4bc2d5c86" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_8">
+			<dataarea name="flop" size="503441">
+				<rom name="14.imd" size="503441" crc="7fc04e5f" sha1="a85e32f05c637a4379cfbad237fd70b6eb1eb336" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_8">
+			<dataarea name="flop" size="503441">
+				<rom name="15.imd" size="503441" crc="1afeca2d" sha1="93e96496798ba7c89a46bad048185c1c1bda7437" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_8">
+			<dataarea name="flop" size="503441">
+				<rom name="16.imd" size="503441" crc="8fe41b08" sha1="6936797f650b070e17bba84a535cdc4b4871faa4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_8">
+			<dataarea name="flop" size="477866">
+				<rom name="17.imd" size="477866" crc="3d44bacd" sha1="92679ac149b0f5fb71844db9d6aff3f1c6564ba7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
