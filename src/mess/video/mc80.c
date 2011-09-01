@@ -53,7 +53,7 @@ static const UINT8 prom[] = {
 	0x04,0x04,0x04,0x04,0x04,0x00,0x04,0x00, // !
 	0x0a,0x0a,0x0a,0x00,0x00,0x00,0x00,0x00, // "
 	0x0a,0x0a,0x1f,0x0a,0x1f,0x0a,0x0a,0x00, // #
-	0x00,0x11,0x0e,0x0a,0x0e,0x11,0x00,0x00, // $
+	0x00,0x11,0x0e,0x0a,0x0e,0x11,0x00,0x00, // []
 	0x18,0x19,0x02,0x04,0x08,0x13,0x03,0x00, // %
 	0x04,0x0a,0x0a,0x0c,0x15,0x12,0x0d,0x00, // &
 	0x04,0x04,0x08,0x00,0x00,0x00,0x00,0x00, // '
@@ -99,26 +99,35 @@ VIDEO_START( mc8020 )
 SCREEN_UPDATE( mc8020 )
 {
 	mc80_state *state = screen->machine().driver_data<mc80_state>();
-	int x,y,j,b;
-	UINT16 addr;
-	int xpos;
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
 
 	for(y = 0; y < 8; y++ )
 	{
-		addr = y*32;
-		xpos = 0;
-		for(x = 0; x < 32; x++ )
+		for (ra = 0; ra < 16; ra++)
 		{
-			UINT8 code = state->m_p_videoram[addr + x] & 0x3f;
-			for(j = 0; j < 8; j++ )
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = ma; x < ma + 32; x++)
 			{
-			  for(b = 0; b < 6; b++ )
-			  {
-				*BITMAP_ADDR16(bitmap, y*16+j, xpos+b ) = (prom[code*8 + j] >> (5-b)) & 1;
-			  }
+				if (ra > 3 && ra < 12)
+				{
+					chr = state->m_p_videoram[x];
+					gfx = prom[(chr<<3) | (ra-4)];
+				}
+				else
+					gfx = 0;
+
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
-			xpos += 6;
 		}
+		ma+=32;
 	}
 	return 0;
 }
@@ -137,21 +146,29 @@ VIDEO_START( mc8030 )
 SCREEN_UPDATE( mc8030 )
 {
 	mc80_state *state = screen->machine().driver_data<mc80_state>();
-	UINT8 code;
-	int y, x, b;
+	UINT8 gfx;
+	UINT16 y=0,ma=0,x;
 
-	int addr = 0;
-	for (y = 0; y < 256; y++)
+	for(y = 0; y < 256; y++ )
 	{
-		int horpos = 0;
-		for (x = 0; x < 64; x++)
+		UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
 		{
-			code = state->m_p_videoram[addr++];
-			for (b = 0; b < 8; b++)
+			for (x = ma; x < ma + 64; x++)
 			{
-				*BITMAP_ADDR16(bitmap, 255-y, horpos++) =  (code >> b) & 0x01;
+				gfx = state->m_p_videoram[x^0x3fff];
+
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
 			}
 		}
+		ma+=64;
 	}
 	return 0;
 }
