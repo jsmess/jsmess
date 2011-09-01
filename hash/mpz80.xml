@@ -465,4 +465,71 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="micrnx13">
+		<description>Micronix v1.3</description>
+		<year>19??</year>
+		<publisher>Morrow Designs</publisher>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="303015">
+				<rom name="1009-8_cold-boot.imd" size="303015" crc="9c21528f" sha1="105ef93c4bceb891a483b5b5c164215b1f1f11a5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_8">
+			<dataarea name="flop" size="290832">
+				<rom name="1010-8_stand-alone.imd" size="290832" crc="f5657880" sha1="5792d1d78f7fa5c763a3d29161a699428745ba22" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_8">
+			<dataarea name="flop" size="543079">
+				<rom name="1011-8_dist_1.imd" size="543079" crc="6c771eea" sha1="17b558383f67bf99296502337f8c80a30514e999" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_8">
+			<dataarea name="flop" size="530815">
+				<rom name="1012-8_dist_2.imd" size="530815" crc="9e49d85a" sha1="768c12c56a2763338f0a8b3c434d2384d6cb8677" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_8">
+			<dataarea name="flop" size="464385">
+				<rom name="1013-8_dist_3.imd" size="464385" crc="a2474def" sha1="68014cf0bf9f1aef14f5bc6ffb22381f66465e23" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_8">
+			<dataarea name="flop" size="566578">
+				<rom name="1014-8_c_1.imd" size="566578" crc="b7c67308" sha1="1db52602688ed2e6488716242ce95400799a4f76" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_8">
+			<dataarea name="flop" size="185883">
+				<rom name="1016-8_c_2.imd" size="185883" crc="4ff7206c" sha1="7ccd396e2adbd7af4e3d98574fd86d09ec443ddf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_8">
+			<dataarea name="flop" size="142955">
+				<rom name="1070-8_pascal.imd" size="142955" crc="43afbbb1" sha1="83bea3d5fd8201b80d495cac3b5ff92aa9de3729" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micrnx14" cloneof="micrnx13">
+		<description>Micronix v1.4</description>
+		<year>19??</year>
+		<publisher>Morrow Designs</publisher>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="329049">
+				<rom name="ux141_sa.imd" size="329049" crc="a32ed5d8" sha1="41d7d307d79ea840a0bde948f7bfb0e4f19239fc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_8">
+			<dataarea name="flop" size="543045">
+				<rom name="ux14_d1.imd" size="543045" crc="6f55e165" sha1="53e9d6f363f4a0415203780f35d1a6f05b506604"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_8">
+			<dataarea name="flop" size="530781">
+				<rom name="ux14_d2.imd" size="530781" crc="9e35739f" sha1="5f35b977e20535ae62108e8bd1f08776d52cff87"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
