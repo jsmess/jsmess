@@ -5,6 +5,7 @@
 
 #include "emu.h"
 #include "machine/cococart.h"
+#include "machine/6551.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -30,7 +31,7 @@ protected:
 		virtual DECLARE_WRITE8_MEMBER(write);
 private:
         // internal state
-		device_t *m_uart;
+		acia6551_device *m_uart;
 };
 
 

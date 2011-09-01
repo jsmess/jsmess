@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "coco_232.h"
-#include "machine/6551.h"
 
 
 /***************************************************************************
@@ -52,7 +51,7 @@ coco_232_device::coco_232_device(const machine_config &mconfig, const char *tag,
 
 void coco_232_device::device_start()
 {
-	m_uart = subdevice(UART_TAG);
+	m_uart = subdevice<acia6551_device>(UART_TAG);
 }
 
 //-------------------------------------------------
@@ -74,7 +73,7 @@ READ8_MEMBER(coco_232_device::read)
 	UINT8 result = 0x00;
 
 	if ((offset >= 0x28) && (offset <= 0x2F))
-		result = acia_6551_r(m_uart, offset - 0x28);
+		result = m_uart->data_r(space, offset - 0x28);
 
 	return result;
 }
@@ -87,5 +86,5 @@ READ8_MEMBER(coco_232_device::read)
 WRITE8_MEMBER(coco_232_device::write)
 {
 	if ((offset >= 0x28) && (offset <= 0x2F))
-		acia_6551_w(m_uart, offset - 0x28, data);
+		m_uart->data_w(space, offset - 0x28, data);
 }

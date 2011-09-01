@@ -46,7 +46,7 @@ static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8, ec65_state)
 	AM_RANGE(0xe011, 0xe011) AM_DEVREADWRITE(ACIA6850_TAG, acia6850_device, data_read, data_write)
 	AM_RANGE(0xe100, 0xe10f) AM_DEVREADWRITE(VIA6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0xe110, 0xe11f) AM_DEVREADWRITE(VIA6522_1_TAG, via6522_device, read, write)
-	AM_RANGE(0xe130, 0xe133) AM_DEVREADWRITE_LEGACY(ACIA6551_TAG,  acia_6551_r, acia_6551_w )
+	AM_RANGE(0xe130, 0xe133) AM_DEVREADWRITE(ACIA6551_TAG,  acia6551_device, data_r, data_w)
 	AM_RANGE(0xe140, 0xe140) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 	AM_RANGE(0xe141, 0xe141) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r , register_w)
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM // 1KB on-board RAM

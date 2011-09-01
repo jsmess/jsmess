@@ -68,7 +68,7 @@ READ8_MEMBER( mits680b_state::terminal_r )
 static ADDRESS_MAP_START(mits680b_mem, AS_PROGRAM, 8, mits680b_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff ) AM_RAM // 1024 bytes RAM
-	//AM_RANGE( 0xf000, 0xf003 ) AM_DEVREADWRITE("acia",  acia_6551_r, acia_6551_w )
+	//AM_RANGE( 0xf000, 0xf003 ) AM_DEVREADWRITE("acia",  acia6551_device, data_r, data_w )
 	AM_RANGE( 0xf000, 0xf000 ) AM_READ(terminal_status_r)
 	AM_RANGE( 0xf001, 0xf001 ) AM_READ(terminal_r) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
 	AM_RANGE( 0xf002, 0xf002 ) AM_READ(status_check_r)
