@@ -253,10 +253,10 @@ static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16, cgc7900_state )
 //  AM_RANGE(0xefc446, 0xefc447) HVG Load dY
 //  AM_RANGE(0xefc448, 0xefc449) HVG Load Pixel Color
 //  AM_RANGE(0xefc44a, 0xefc44b) HVG Load Trip
-	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8_LEGACY(INS8251_0_TAG, msm8251_data_r, msm8251_data_w, 0xff00)
-	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8_LEGACY(INS8251_0_TAG, msm8251_status_r, msm8251_control_w, 0xff00)
-	AM_RANGE(0xff8040, 0xff8041) AM_DEVREADWRITE8_LEGACY(INS8251_1_TAG, msm8251_data_r, msm8251_data_w, 0xff00)
-	AM_RANGE(0xff8042, 0xff8043) AM_DEVREADWRITE8_LEGACY(INS8251_1_TAG, msm8251_status_r, msm8251_control_w, 0xff00)
+	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8(INS8251_0_TAG, i8251_device, data_r, data_w, 0xff00)
+	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8(INS8251_0_TAG, i8251_device, status_r, control_w, 0xff00)
+	AM_RANGE(0xff8040, 0xff8041) AM_DEVREADWRITE8(INS8251_1_TAG, i8251_device, data_r, data_w, 0xff00)
+	AM_RANGE(0xff8042, 0xff8043) AM_DEVREADWRITE8(INS8251_1_TAG, i8251_device, status_r, control_w, 0xff00)
 	AM_RANGE(0xff8080, 0xff8081) AM_READWRITE(keyboard_r, keyboard_w)
 //  AM_RANGE(0xff80c6, 0xff80c7) Joystick X axis
 //  AM_RANGE(0xff80ca, 0xff80cb) Joystick Y axis
@@ -340,10 +340,10 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    msm8251_interface rs232_intf
+    i8251_interface rs232_intf
 -------------------------------------------------*/
 
-static const msm8251_interface rs232_intf =
+static const i8251_interface rs232_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -357,10 +357,10 @@ static const msm8251_interface rs232_intf =
 };
 
 /*-------------------------------------------------
-    msm8251_interface rs449_intf
+    i8251_interface rs449_intf
 -------------------------------------------------*/
 
-static const msm8251_interface rs449_intf =
+static const i8251_interface rs449_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -440,8 +440,8 @@ static MACHINE_CONFIG_START( cgc7900, cgc7900_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_MSM8251_ADD(INS8251_0_TAG, rs232_intf)
-	MCFG_MSM8251_ADD(INS8251_1_TAG, rs449_intf)
+	MCFG_I8251_ADD(INS8251_0_TAG, rs232_intf)
+	MCFG_I8251_ADD(INS8251_1_TAG, rs449_intf)
 MACHINE_CONFIG_END
 
 /***************************************************************************

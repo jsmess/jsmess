@@ -143,7 +143,7 @@ static WRITE_LINE_DEVICE_HANDLER( i8251_txrdy_int )
 	pic8259_ir3_w(device->machine().device("pic8259"), state);
 }
 
-const msm8251_interface msm8251_config =
+const i8251_interface msm8251_config =
 {
 	DEVCB_NULL, // in rxd, serial (todo: proper hookup, currently using hack w/msm8251_recieve_character())
 	DEVCB_NULL, // out txd, serial
@@ -158,7 +158,8 @@ const msm8251_interface msm8251_config =
 
 WRITE8_MEMBER( tsispch_state::i8251_rxd )
 {
-	msm8251_receive_character(machine().device("i8251a_u15"), data);
+	i8251_device *uart = machine().device<i8251_device>("i8251a_u15");
+	uart->receive_character(data);
 }
 static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
 {
@@ -347,8 +348,8 @@ DRIVER_INIT( prose2k )
 static ADDRESS_MAP_START(i8086_mem, AS_PROGRAM, 16, tsispch_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x02FFF) AM_MIRROR(0x34000) AM_RAM // verified; 6264*2 sram, only first 3/4 used
-	AM_RANGE(0x03000, 0x03001) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_data_r, msm8251_data_w, 0x00FF)
-	AM_RANGE(0x03002, 0x03003) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("i8251a_u15", msm8251_status_r, msm8251_control_w, 0x00FF)
+	AM_RANGE(0x03000, 0x03001) AM_MIRROR(0x341FC) AM_DEVREADWRITE8("i8251a_u15", i8251_device, data_r, data_w, 0x00FF)
+	AM_RANGE(0x03002, 0x03003) AM_MIRROR(0x341FC) AM_DEVREADWRITE8("i8251a_u15", i8251_device, status_r, control_w, 0x00FF)
 	AM_RANGE(0x03200, 0x03203) AM_MIRROR(0x341FC) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0x00FF) // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
 	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_READ8(dsw_r, 0x00FF) // verified, read from dipswitch s4
 	AM_RANGE(0x03400, 0x03401) AM_MIRROR(0x341FE) AM_WRITE8(peripheral_w, 0xFF00) // verified, write to the 4 leds, plus 4 control bits
@@ -423,7 +424,7 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
     MCFG_PIC8259_ADD("pic8259", pic8259_config)
 
     /* uarts */
-    MCFG_MSM8251_ADD("i8251a_u15", msm8251_config)
+    MCFG_I8251_ADD("i8251a_u15", msm8251_config)
 
     /* sound hardware */
     //MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -102,7 +102,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
-	required_device<device_t> m_kb_uart;
+	required_device<i8251_device> m_kb_uart;
 	required_device<device_t> m_pit;
 	required_device<i8255_device> m_ppi;
 	required_device<device_t> m_pic;
@@ -161,8 +161,8 @@ extern const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3];
 extern const struct pit8253_config mbc55x_pit8253_config;
 extern const struct pic8259_interface mbc55x_pic8259_config;
 extern const i8255_interface mbc55x_ppi8255_interface;
-extern const msm8251_interface mbc55x_msm8251a_interface;
-extern const msm8251_interface mbc55x_msm8251b_interface;
+extern const i8251_interface mbc55x_msm8251a_interface;
+extern const i8251_interface mbc55x_msm8251b_interface;
 
 DRIVER_INIT(mbc55x);
 MACHINE_RESET(mbc55x);

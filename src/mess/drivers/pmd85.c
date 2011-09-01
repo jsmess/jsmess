@@ -578,7 +578,7 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, pmd85_cassette_interface )
 
 	/* uart */
-	MCFG_MSM8251_ADD("uart", default_msm8251_interface)
+	MCFG_I8251_ADD("uart", default_i8251_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

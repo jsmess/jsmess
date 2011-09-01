@@ -346,7 +346,7 @@ static ADDRESS_MAP_START( tandy2k_io, AS_IO, 16, tandy2k_state )
 	AM_RANGE(0x00000, 0x00001) AM_READWRITE8(enable_r, enable_w, 0x00ff)
 	AM_RANGE(0x00002, 0x00003) AM_WRITE8(dma_mux_w, 0x00ff)
 	AM_RANGE(0x00004, 0x00005) AM_DEVREADWRITE8_LEGACY(I8272A_TAG, fldtc_r, fldtc_w, 0x00ff)
-	AM_RANGE(0x00010, 0x00013) AM_DEVREADWRITE8_LEGACY(I8251A_TAG, msm8251_data_r, msm8251_data_w, 0x00ff)
+	AM_RANGE(0x00010, 0x00013) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x00030, 0x00031) AM_DEVREAD8_LEGACY(I8272A_TAG, upd765_status_r, 0x00ff)
 	AM_RANGE(0x00032, 0x00033) AM_DEVREADWRITE8_LEGACY(I8272A_TAG, upd765_data_r, upd765_data_w, 0x00ff)
 	AM_RANGE(0x00040, 0x00047) AM_DEVREADWRITE8_LEGACY(I8253_TAG, pit8253_r, pit8253_w, 0x00ff)
@@ -608,7 +608,7 @@ WRITE_LINE_MEMBER( tandy2k_state::txrdy_w )
 	pic8259_ir2_w(m_pic0, m_rxrdy | m_txrdy);
 }
 
-static const msm8251_interface i8251_intf =
+static const i8251_interface i8251_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -633,8 +633,8 @@ WRITE_LINE_MEMBER( tandy2k_state::intbrclk_w )
 {
 	if (!m_extclk && state)
 	{
-		msm8251_transmit_clock(m_uart);
-		msm8251_receive_clock(m_uart);
+		m_uart->transmit_clock();
+		m_uart->receive_clock();
 	}
 }
 
@@ -907,7 +907,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 
 	/* devices */
 	MCFG_I8255A_ADD(I8255A_TAG, i8255_intf)
-	MCFG_MSM8251_ADD(I8251A_TAG, i8251_intf)
+	MCFG_I8251_ADD(I8251A_TAG, i8251_intf)
 	MCFG_PIT8253_ADD(I8253_TAG, i8253_intf)
 	MCFG_PIC8259_ADD(I8259A_0_TAG, i8259_0_intf)
 	MCFG_PIC8259_ADD(I8259A_1_TAG, i8259_1_intf)

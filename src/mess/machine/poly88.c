@@ -145,7 +145,7 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 	poly88_state *state = machine.driver_data<poly88_state>();
 	int data;
 	int current_level;
-
+	i8251_device *uart = machine.device<i8251_device>("uart");
 
 //  if (!(input_port_read(machine, "DSW0") & 0x02)) /* V.24 / Tape Switch */
 	//{
@@ -167,7 +167,7 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 //data = current_level;
 							set_out_data_bit(state->m_cassette_serial_connection.State, data);
 							serial_connection_out(machine, &state->m_cassette_serial_connection);
-							msm8251_receive_clock(machine.device("uart"));
+							uart->receive_clock();
 
 							state->m_clk_level_tape = 1;
 						}
@@ -182,7 +182,7 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 			machine.device<cassette_image_device>(CASSETTE_TAG)->output(data&0x01 ? 1 : -1);
 
 			if (!state->m_clk_level_tape)
-				msm8251_transmit_clock(machine.device("uart"));
+				uart->transmit_clock();
 
 			state->m_clk_level_tape = state->m_clk_level_tape ? 0 : 1;
 
@@ -192,7 +192,7 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 		state->m_clk_level_tape = 1;
 
 		if (!state->m_clk_level)
-			msm8251_transmit_clock(machine.device("uart"));
+			uart->transmit_clock();
 		state->m_clk_level = state->m_clk_level ? 0 : 1;
 //  }
 }
@@ -201,7 +201,8 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 static TIMER_CALLBACK( setup_machine_state )
 {
 	poly88_state *state = machine.driver_data<poly88_state>();
-	msm8251_connect(machine.device("uart"), &state->m_cassette_serial_connection);
+	i8251_device *uart = machine.device<i8251_device>("uart");
+	uart->connect(&state->m_cassette_serial_connection);
 }
 
 DRIVER_INIT ( poly88 )
@@ -242,7 +243,7 @@ static WRITE_LINE_DEVICE_HANDLER( poly88_usart_rxready )
 	//device_set_input_line(device, 0, HOLD_LINE);
 }
 
-const msm8251_interface poly88_usart_interface=
+const i8251_interface poly88_usart_interface=
 {
 	DEVCB_NULL,
 	DEVCB_NULL,

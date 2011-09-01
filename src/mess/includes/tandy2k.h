@@ -42,7 +42,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_uart;
+	required_device<i8251_device> m_uart;
 	required_device<device_t> m_pit;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_pic0;

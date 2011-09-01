@@ -777,10 +777,10 @@ static const unsigned long baud_rate_table[]=
 
 static TIMER_CALLBACK(nc_serial_timer_callback)
 {
-	device_t *uart = machine.device("uart");
+	i8251_device *uart = machine.device<i8251_device>("uart");
 
-	msm8251_transmit_clock(uart);
-	msm8251_receive_clock(uart);
+	uart->transmit_clock();
+	uart->receive_clock();
 }
 
 static WRITE8_HANDLER(nc_uart_control_w)
@@ -896,7 +896,7 @@ static RP5C01_INTERFACE( rtc_intf )
 	DEVCB_LINE(nc100_tc8521_alarm_callback)
 };
 
-static const msm8251_interface nc100_uart_interface =
+static const i8251_interface nc100_uart_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1037,8 +1037,8 @@ static ADDRESS_MAP_START(nc100_io, AS_IO, 8)
 	AM_RANGE(0x91, 0x9f) AM_READ(nc_irq_status_r)
 	AM_RANGE(0xa0, 0xaf) AM_READ(nc100_card_battery_status_r)
 	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("uart", msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE_MODERN("uart",i8251_device, data_r, data_w)
+	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0xd0, 0xdf) AM_DEVREADWRITE_MODERN("rtc", rp5c01_device, read, write)
 ADDRESS_MAP_END
 
@@ -1268,7 +1268,7 @@ static WRITE_LINE_DEVICE_HANDLER( nc200_rxrdy_callback )
 	nc200_refresh_uart_interrupt(device->machine());
 }
 
-static const msm8251_interface nc200_uart_interface=
+static const i8251_interface nc200_uart_interface=
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1495,8 +1495,8 @@ static ADDRESS_MAP_START(nc200_io, AS_IO, 8)
 	AM_RANGE(0x90, 0x90) AM_READWRITE(nc_irq_status_r, nc_irq_status_w)
 	AM_RANGE(0xa0, 0xa0) AM_READ(nc200_card_battery_status_r)
 	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("uart", msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("uart", msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE_MODERN("uart",i8251_device, data_r, data_w)
+	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE_MODERN("mc", mc146818_device, read, write)
 	AM_RANGE(0xe0, 0xe0) AM_DEVREAD("upd765", upd765_status_r)
 	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("upd765",upd765_data_r, upd765_data_w)
@@ -1650,7 +1650,7 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_CENTRONICS_ADD("centronics", nc100_centronics_config)
 
 	/* uart */
-	MCFG_MSM8251_ADD("uart", nc100_uart_interface)
+	MCFG_I8251_ADD("uart", nc100_uart_interface)
 
 	/* rtc */
 	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
@@ -1704,7 +1704,7 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 
 	/* uart */
 	MCFG_DEVICE_REMOVE("uart")
-	MCFG_MSM8251_ADD("uart", nc200_uart_interface)
+	MCFG_I8251_ADD("uart", nc200_uart_interface)
 
 	/* no rtc */
 	MCFG_DEVICE_REMOVE("rtc")

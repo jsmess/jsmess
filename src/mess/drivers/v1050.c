@@ -284,7 +284,7 @@ READ8_MEMBER( v1050_state::kb_data_r )
 
 READ8_MEMBER( v1050_state::kb_status_r )
 {
-	UINT8 val =	msm8251_status_r(m_uart_kb, 0);
+	UINT8 val =	m_uart_kb->status_r(space, 0);
 
 	return val | (m_keyavail ? 0x02 : 0x00);
 }
@@ -396,12 +396,12 @@ static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(I8255A_DISP_TAG, i8255_device, read, write)
-//  AM_RANGE(0x88, 0x88) AM_DEVREADWRITE_LEGACY(I8251A_KB_TAG, msm8251_data_r, msm8251_data_w)
-//  AM_RANGE(0x89, 0x89) AM_DEVREADWRITE_LEGACY(I8251A_KB_TAG, msm8251_status_r, msm8251_control_w)
-	AM_RANGE(0x88, 0x88) AM_READ(kb_data_r) AM_DEVWRITE_LEGACY(I8251A_KB_TAG, msm8251_data_w)
-	AM_RANGE(0x89, 0x89) AM_READ(kb_status_r) AM_DEVWRITE_LEGACY(I8251A_KB_TAG, msm8251_control_w)
-	AM_RANGE(0x8c, 0x8c) AM_DEVREADWRITE_LEGACY(I8251A_SIO_TAG, msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0x8d, 0x8d) AM_DEVREADWRITE_LEGACY(I8251A_SIO_TAG, msm8251_status_r, msm8251_control_w)
+//  AM_RANGE(0x88, 0x88) AM_DEVREADWRITE_LEGACY(I8251A_KB_TAG, i8251_device, data_r, data_w)
+//  AM_RANGE(0x89, 0x89) AM_DEVREADWRITE_LEGACY(I8251A_KB_TAG, i8251_device, status_r, control_w)
+	AM_RANGE(0x88, 0x88) AM_READ(kb_data_r) AM_DEVWRITE(I8251A_KB_TAG, i8251_device, data_w)
+	AM_RANGE(0x89, 0x89) AM_READ(kb_status_r) AM_DEVWRITE(I8251A_KB_TAG, i8251_device, control_w)
+	AM_RANGE(0x8c, 0x8c) AM_DEVREADWRITE(I8251A_SIO_TAG, i8251_device, data_r, data_w)
+	AM_RANGE(0x8d, 0x8d) AM_DEVREADWRITE(I8251A_SIO_TAG, i8251_device, status_r, control_w)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE(I8255A_MISC_TAG, i8255_device, read, write)
 	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE_LEGACY(MB8877_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x9c, 0x9f) AM_DEVREADWRITE(I8255A_RTC_TAG, i8255_device, read, write)
@@ -968,8 +968,8 @@ static TIMER_DEVICE_CALLBACK( kb_8251_tick )
 {
 	v1050_state *state = timer.machine().driver_data<v1050_state>();
 
-	msm8251_transmit_clock(state->m_uart_kb);
-	msm8251_receive_clock(state->m_uart_kb);
+	state->m_uart_kb->transmit_clock();
+	state->m_uart_kb->receive_clock();
 }
 
 WRITE_LINE_MEMBER( v1050_state::kb_rxrdy_w )
@@ -977,7 +977,7 @@ WRITE_LINE_MEMBER( v1050_state::kb_rxrdy_w )
 	set_interrupt(INT_KEYBOARD, state);
 }
 
-static const msm8251_interface kb_8251_intf =
+static const i8251_interface kb_8251_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -996,8 +996,8 @@ static TIMER_DEVICE_CALLBACK( sio_8251_tick )
 {
 	v1050_state *state = timer.machine().driver_data<v1050_state>();
 
-	msm8251_transmit_clock(state->m_uart_sio);
-	msm8251_receive_clock(state->m_uart_sio);
+	state->m_uart_sio->transmit_clock();
+	state->m_uart_sio->receive_clock();
 }
 
 WRITE_LINE_MEMBER( v1050_state::sio_rxrdy_w )
@@ -1014,7 +1014,7 @@ WRITE_LINE_MEMBER( v1050_state::sio_txrdy_w )
 	set_interrupt(INT_RS_232, m_rxrdy | m_txrdy);
 }
 
-static const msm8251_interface sio_8251_intf =
+static const i8251_interface sio_8251_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1193,8 +1193,8 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_I8255A_ADD(I8255A_MISC_TAG, misc_ppi_intf)
 	MCFG_I8255A_ADD(I8255A_RTC_TAG, rtc_ppi_intf)
 	MCFG_I8255A_ADD(I8255A_M6502_TAG, m6502_ppi_intf)
-	MCFG_MSM8251_ADD(I8251A_KB_TAG, /*XTAL_16MHz/8,*/ kb_8251_intf)
-	MCFG_MSM8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
+	MCFG_I8251_ADD(I8251A_KB_TAG, /*XTAL_16MHz/8,*/ kb_8251_intf)
+	MCFG_I8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
 	MCFG_MB8877_ADD(MB8877_TAG, /*XTAL_16MHz/16,*/ fdc_intf )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(v1050_floppy_interface)
 	MCFG_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, attotime::from_hz((double)XTAL_16MHz/4/13/8))

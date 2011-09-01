@@ -516,8 +516,8 @@ static ADDRESS_MAP_START( px8_io, AS_IO, 8, px8_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(gah40m_r, gah40m_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVREADWRITE_LEGACY(I8251_TAG, msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0x0d, 0x0d) AM_DEVREADWRITE_LEGACY(I8251_TAG, msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
+	AM_RANGE(0x0d, 0x0d) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
 //  AM_RANGE(0x0e, 0x0e) AM_DEVREADWRITE_LEGACY(SED1320_TAG, sed1330_status_r, sed1330_data_w)
 //  AM_RANGE(0x0f, 0x0f) AM_DEVREADWRITE_LEGACY(SED1320_TAG, sed1330_data_r, sed1330_command_w)
 ADDRESS_MAP_END
@@ -731,10 +731,10 @@ GFXDECODE_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    msm8251_interface i8251_intf
+    i8251_interface i8251_intf
 -------------------------------------------------*/
 
-static const msm8251_interface i8251_intf =
+static const i8251_interface i8251_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -834,7 +834,7 @@ static MACHINE_CONFIG_START( px8, px8_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
 
 	/* devices */
-	MCFG_MSM8251_ADD(I8251_TAG, i8251_intf)
+	MCFG_I8251_ADD(I8251_TAG, i8251_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, px8_cassette_interface)
 
 	/* internal ram */

@@ -22,7 +22,7 @@
 #define I8255A_TAG		"ic4"
 #define WD2797_TAG		"ic5"
 #define PIT8253_TAG		"ic6"
-#define MSM8251_TAG		"ic7"
+#define I8251_TAG		"ic7"
 #define MSM6255_TAG		"ic49"
 #define CENTRONICS_TAG	"centronics"
 
@@ -46,7 +46,7 @@ public:
 	bw2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
-		  m_uart(*this, MSM8251_TAG),
+		  m_uart(*this, I8251_TAG),
 		  m_fdc(*this, WD2797_TAG),
 		  m_lcdc(*this, MSM6255_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
@@ -56,7 +56,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_uart;
+	required_device<i8251_device> m_uart;
 	required_device<device_t> m_fdc;
 	required_device<msm6255_device> m_lcdc;
 	required_device<device_t> m_centronics;

@@ -168,7 +168,7 @@ WRITE8_MEMBER( xor100_state::baud_w )
 
 WRITE8_MEMBER( xor100_state::i8251_b_data_w )
 {
-	msm8251_data_w(m_uart_b, 0, data);
+	m_uart_b->data_w(space, 0, data);
 	terminal_write(m_terminal, 0, data);
 }
 
@@ -263,10 +263,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xor100_io, AS_IO, 8, xor100_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY(I8251_A_TAG, msm8251_data_r, msm8251_data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY(I8251_A_TAG, msm8251_status_r, msm8251_control_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY(I8251_B_TAG, msm8251_data_r) AM_WRITE(i8251_b_data_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE_LEGACY(I8251_B_TAG, msm8251_status_r, msm8251_control_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(I8251_A_TAG, i8251_device, data_r, data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(I8251_A_TAG, i8251_device, status_r, control_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD(I8251_B_TAG, i8251_device, data_r) AM_WRITE(i8251_b_data_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE(I8251_B_TAG, i8251_device, status_r, control_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 	AM_RANGE(0x08, 0x08) AM_WRITE(mmu_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(prom_toggle_w)
@@ -363,14 +363,16 @@ INPUT_PORTS_END
 
 static WRITE_LINE_DEVICE_HANDLER( com5016_fr_w )
 {
-	msm8251_transmit_clock(device);
-	msm8251_receive_clock(device);
+	i8251_device* uart = dynamic_cast<i8251_device*>(device);
+	uart->transmit_clock();	
+	uart->receive_clock();
 }
 
 static WRITE_LINE_DEVICE_HANDLER( com5016_ft_w )
 {
-	msm8251_transmit_clock(device);
-	msm8251_receive_clock(device);
+	i8251_device* uart = dynamic_cast<i8251_device*>(device);
+	uart->transmit_clock();
+	uart->receive_clock();
 }
 
 static COM8116_INTERFACE( com5016_intf )
@@ -384,7 +386,7 @@ static COM8116_INTERFACE( com5016_intf )
 
 /* Printer 8251A Interface */
 
-static const msm8251_interface printer_8251_intf =
+static const i8251_interface printer_8251_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -399,7 +401,7 @@ static const msm8251_interface printer_8251_intf =
 
 /* Terminal 8251A Interface */
 
-static const msm8251_interface terminal_8251_intf =
+static const i8251_interface terminal_8251_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -520,7 +522,8 @@ static const wd17xx_interface fdc_intf =
 
 static WRITE8_DEVICE_HANDLER( xor100_kbd_put )
 {
-	msm8251_receive_character(device, data);
+	i8251_device* uart = dynamic_cast<i8251_device*>(device);
+	uart->receive_character(data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( xor100_terminal_intf )
@@ -583,8 +586,8 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_FRAGMENT_ADD( generic_terminal )
 
 	/* devices */
-	MCFG_MSM8251_ADD(I8251_A_TAG, /*XTAL_8MHz/2,*/ printer_8251_intf)
-	MCFG_MSM8251_ADD(I8251_B_TAG, /*XTAL_8MHz/2,*/ terminal_8251_intf)
+	MCFG_I8251_ADD(I8251_A_TAG, /*XTAL_8MHz/2,*/ printer_8251_intf)
+	MCFG_I8251_ADD(I8251_B_TAG, /*XTAL_8MHz/2,*/ terminal_8251_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, printer_8255_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MCFG_COM8116_ADD(COM5016_TAG, 5000000, com5016_intf)

@@ -33,7 +33,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
-	required_device<device_t> m_uart_b;
+	required_device<i8251_device> m_uart_b;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_ctc;
 	required_device<device_t> m_ram;

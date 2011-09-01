@@ -783,8 +783,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pc6001_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, nec_ppi8255_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_address_w)
 	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_data_w)
@@ -1347,8 +1347,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pc6001m2_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)
 
 	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necmk2_ppi8255_w)
 
@@ -1390,8 +1390,8 @@ static WRITE8_HANDLER( pc6601_fdc_w )
 static ADDRESS_MAP_START( pc6601_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)
 
 	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necmk2_ppi8255_w)
 
@@ -1609,8 +1609,8 @@ static ADDRESS_MAP_START( pc6001sr_io , AS_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x60, 0x67) AM_READWRITE(pc6001sr_bank_rn_r,pc6001sr_bank_rn_w)
 	AM_RANGE(0x68, 0x6f) AM_READWRITE(pc6001sr_bank_wn_r,pc6001sr_bank_wn_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)
 
 	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necsr_ppi8255_w)
 
@@ -1863,7 +1863,7 @@ static I8255_INTERFACE( pc6001_ppi8255_interface )
 	DEVCB_HANDLER(pc6001_8255_portc_w)
 };
 
-static const msm8251_interface pc6001_usart_interface=
+static const i8251_interface pc6001_usart_interface=
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -2301,7 +2301,7 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 
 	MCFG_I8255_ADD( "ppi8255", pc6001_ppi8255_interface )
 	/* uart */
-	MCFG_MSM8251_ADD("uart", pc6001_usart_interface)
+	MCFG_I8251_ADD("uart", pc6001_usart_interface)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")

@@ -149,7 +149,7 @@ public:
 	required_device<device_t> m_8259s;
 	required_device<i8255_device> m_8255;
 	required_device<device_t> m_cent;
-	required_device<device_t> m_uart;
+	required_device<i8251_device> m_uart;
 	required_device<device_t> m_rtc;
 	required_device<device_t> m_fdc;
 	required_device<upd7220_device> m_crtc;
@@ -190,7 +190,7 @@ extern const struct pit8253_config compis_pit8253_config;
 extern const struct pit8253_config compis_pit8254_config;
 extern const struct pic8259_interface compis_pic8259_master_config;
 extern const struct pic8259_interface compis_pic8259_slave_config;
-extern const msm8251_interface compis_usart_interface;
+extern const i8251_interface compis_usart_interface;
 extern const upd765_interface compis_fdc_interface;
 
 DRIVER_INIT(compis);
