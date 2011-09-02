@@ -10,6 +10,7 @@
 #define APPLE2GS_H_
 
 #include "includes/apple2.h"
+#include "sound/es5503.h"
 
 // IIgs clocks as marked on the schematics
 #define APPLE2GS_28M  (XTAL_28_63636MHz) // IIGS master clock
@@ -44,8 +45,11 @@ class apple2gs_state : public apple2_state
 {
 public:
 	apple2gs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: apple2_state(mconfig, type, tag) { }
+		: apple2_state(mconfig, type, tag),
+		  m_es5503(*this, "es5503")
+		  { }
 
+	required_device<es5503_device> m_es5503;
 	UINT8 *m_slowmem;
 	UINT8 m_newvideo;
 	UINT8 m_docram[64*1024];
