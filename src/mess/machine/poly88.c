@@ -192,7 +192,7 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 
 static TIMER_CALLBACK( setup_machine_state )
 {
-	poly88_state *state = machine.driver_data<poly88_state>();
+//	poly88_state *state = machine.driver_data<poly88_state>();
 	i8251_device *uart = machine.device<i8251_device>("uart");
 	serial_source_device *ser = machine.device<serial_source_device>("sercas");
 	uart->connect(ser);
