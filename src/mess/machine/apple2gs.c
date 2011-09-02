@@ -838,12 +838,12 @@ static READ8_HANDLER( gssnd_r )
 
 			if (state->m_sndglu_ctrl & 0x40)	// docram access
 			{
-				state->m_sndglu_dummy_read = state->m_docram[state->m_sndglu_addr];
+				UINT8 *docram = space->machine().region("es5503")->base();
+				state->m_sndglu_dummy_read = docram[state->m_sndglu_addr];
 			}
 			else
 			{
-				device_t *es5503 = space->machine().device("es5503");
-				state->m_sndglu_dummy_read = es5503_r(es5503, state->m_sndglu_addr);
+				state->m_sndglu_dummy_read = state->m_es5503->read(*space, state->m_sndglu_addr);
 			}
 
 			if (state->m_sndglu_ctrl & 0x20)	// auto-increment
@@ -879,12 +879,12 @@ static WRITE8_HANDLER( gssnd_w )
 		case 1:	// data write
 			if (state->m_sndglu_ctrl & 0x40)	// docram access
 			{
-				state->m_docram[state->m_sndglu_addr] = data;
+				UINT8 *docram = space->machine().region("es5503")->base();
+				docram[state->m_sndglu_addr] = data;
 			}
 			else
 			{
-				device_t *es5503 = space->machine().device("es5503");
-				es5503_w(es5503, state->m_sndglu_addr, data);
+				state->m_es5503->write(*space, state->m_sndglu_addr, data);
 			}
 
 			if (state->m_sndglu_ctrl & 0x20)	// auto-increment

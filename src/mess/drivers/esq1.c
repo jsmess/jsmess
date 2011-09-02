@@ -73,17 +73,10 @@ static void esq1_doc_irq(device_t *device, int state)
 {
 }
 
-static READ8_DEVICE_HANDLER( esq1_adc_read )
+static UINT8 esq1_adc_read(device_t *device)
 {
 	return 0x80;
 }
-
-static const es5503_interface esq1_es5503_interface =
-{
-	esq1_doc_irq,
-	esq1_adc_read,
-	NULL
-};
 
 static VIDEO_START( esq1 )
 {
@@ -96,8 +89,6 @@ static SCREEN_UPDATE( esq1 )
 
 static MACHINE_RESET( esq1 )
 {
-	es5503_set_base(machine.device("es5503"), machine.region("ensoniq")->base());
-
 	// set default OSROM banking
 	memory_set_bankptr(machine, "osbank", machine.region("osrom")->base() );
 }
@@ -105,7 +96,7 @@ static MACHINE_RESET( esq1 )
 static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM					// OSRAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM					// SEQRAM
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE_LEGACY("es5503", es5503_r, es5503_w)
+	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
 	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE_LEGACY("duart", duart68681_r, duart68681_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)	// OS "high" ROM is always mapped here
@@ -179,8 +170,7 @@ static MACHINE_CONFIG_START( esq1, esq1_state )
 	MCFG_VIDEO_START(esq1)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("es5503", ES5503, 7000000)
-	MCFG_SOUND_CONFIG(esq1_es5503_interface)
+	MCFG_ES5503_ADD("es5503", 7000000, esq1_doc_irq, esq1_adc_read)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -189,13 +179,13 @@ static INPUT_PORTS_START( esq1 )
 INPUT_PORTS_END
 
 ROM_START( esq1 )
-	ROM_REGION(0x10000, "osrom", 0)
-        ROM_LOAD( "3p5lo.bin",    0x0000, 0x8000, CRC(ed001ad8) SHA1(14d1150bccdbc15d90567cf1812aacdb3b6ee882) )
-        ROM_LOAD( "3p5hi.bin",    0x8000, 0x8000, CRC(332c572f) SHA1(ddb4f62807eb2ab29e5ac6b5d209d2ecc74cf806) )
+    ROM_REGION(0x10000, "osrom", 0)
+    ROM_LOAD( "3p5lo.bin",    0x0000, 0x8000, CRC(ed001ad8) SHA1(14d1150bccdbc15d90567cf1812aacdb3b6ee882) )
+    ROM_LOAD( "3p5hi.bin",    0x8000, 0x8000, CRC(332c572f) SHA1(ddb4f62807eb2ab29e5ac6b5d209d2ecc74cf806) )
 
-	ROM_REGION(0x20000, "ensoniq", 0)
-        ROM_LOAD( "esq1wavlo.bin", 0x0000, 0x8000, CRC(4d04ac87) SHA1(867b51229b0a82c886bf3b216aa8893748236d8b) )
-        ROM_LOAD( "esq1wavhi.bin", 0x8000, 0x8000, CRC(94c554a3) SHA1(ed0318e5253637585559e8cf24c06d6115bd18f6) )
+    ROM_REGION(0x20000, "es5503", 0)
+    ROM_LOAD( "esq1wavlo.bin", 0x0000, 0x8000, CRC(4d04ac87) SHA1(867b51229b0a82c886bf3b216aa8893748236d8b) )
+    ROM_LOAD( "esq1wavhi.bin", 0x8000, 0x8000, CRC(94c554a3) SHA1(ed0318e5253637585559e8cf24c06d6115bd18f6) )
 ROM_END
 
 CONS( 1986, esq1, 0, 0, esq1, esq1, 0, "Ensoniq", "ESQ-1", GAME_NOT_WORKING )
