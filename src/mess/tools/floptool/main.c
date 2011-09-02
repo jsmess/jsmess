@@ -17,64 +17,35 @@
 
 #include "corestr.h"
 
+#include "formats/mfi_dsk.h"
 #include "formats/hxcmfm_dsk.h"
+#include "formats/ami_dsk.h"
 
 static floppy_format_type floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
 	FLOPPY_MFM_FORMAT,
+	FLOPPY_ADF_FORMAT,
 	NULL
 };
 
-static void display_usage(void)
+static void display_usage()
 {
 	fprintf(stderr, "Usage: \n");
-	fprintf(stderr, "		floptool.exe identify <inputfile>\n");
+	fprintf(stderr, "		floptool.exe identify <inputfile> [<inputfile> ...]\n");
 }
 
-static void display_formats(void)
+static void display_formats()
 {
 	fprintf(stderr, "Supported formats:\n\n");
 	for(int i = 0; floppy_formats[i]; i++)
 	{
 		floppy_image_format_t *fif = floppy_formats[i]();
-		fprintf(stderr, "%15s - %s\n", fif->name(), fif->description());
-		fprintf(stderr, "%20s [%s]\n", "", fif->extensions());
+		fprintf(stderr, "%15s - %s [%s]\n", fif->name(), fif->description(), fif->extensions());
 	}
 }
 
-int CLIB_DECL main(int argc, char *argv[])
+static void display_full_usage()
 {
-	FILE *f;
-
-	if (argc > 1)
-	{
-		if (!core_stricmp("identify", argv[1]))
-		{
-			// convert command
-			if (argc!=3) {
-				fprintf(stderr, "Wrong parameter number.\n\n");
-				display_usage();
-				return -1;
-			} else {
-				f = fopen(argv[2], "rb");
-				if (!f) {
-					fprintf(stderr, "File %s not found.\n",argv[2]);
-					return -1;
-				}
-				floppy_image *image = new floppy_image(f, &stdio_ioprocs_noclose, floppy_formats);
-				int best;
-				floppy_image_format_t *format = image->identify(&best);
-				if (format) {
-					fprintf(stderr, "File identified as %s\n",format->description());
-					format->load(image);
-				} else {
-					fprintf(stderr, "Unable to identified file type\n");
-				}
-				fclose(f);
-				goto theend;
-			}
-		}
-	}
-
 	/* Usage */
 	fprintf(stderr, "floptool - Generic floppy image manipulation tool for use with MESS\n\n");
 	display_usage();
@@ -83,6 +54,50 @@ int CLIB_DECL main(int argc, char *argv[])
 	fprintf(stderr, "\nExample usage:\n");
 	fprintf(stderr, "        floptool.exe identify image.dsk\n\n");
 
-theend :
+}
+
+static int identify(int argc, char *argv[])
+{
+	if (argc<3) {
+		fprintf(stderr, "Missing name of file to identify.\n\n");
+		display_usage();
+		return 1;
+	}
+
+	for(int i=2; argv[i]; i++) {
+		char msg[4096];
+		sprintf(msg, "Error opening %s for reading", argv[i]);
+		FILE *f = fopen(argv[i], "rb");
+		if (!f) {
+			perror(msg);
+			return 1;
+		}
+
+		floppy_image *image = new floppy_image(f, &stdio_ioprocs_noclose, floppy_formats);
+		int best;
+		floppy_image_format_t *format = image->identify(&best);
+		if (format)
+			printf("%s : %s\n", argv[i], format->description());
+		else
+			printf("%s : Unknown format\n", argv[i]);
+		fclose(f);
+	}
 	return 0;
+}
+
+int CLIB_DECL main(int argc, char *argv[])
+{
+
+	if (argc == 1) {
+		display_full_usage();
+		return 0;
+	}
+
+	if (!core_stricmp("identify", argv[1]))
+		return identify(argc, argv);
+	else {
+		fprintf(stderr, "Unknown command '%s'\n\n", argv[1]);
+		display_usage();
+		return 1;
+	}
 }
