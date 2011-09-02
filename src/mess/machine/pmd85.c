@@ -792,16 +792,11 @@ I8255_INTERFACE( mato_ppi8255_interface )
 };
 
 
-static void pmd85_cassette_write(running_machine &machine, int id, unsigned long state)
-{
-	pmd85_state *drvstate = machine.driver_data<pmd85_state>();
-	drvstate->m_cassette_serial_connection.input_state = state;
-}
-
 static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 {
 	pmd85_state *state = machine.driver_data<pmd85_state>();
 	i8251_device *uart = machine.device<i8251_device>("uart");
+	serial_source_device *ser = machine.device<serial_source_device>("sercas");
 	int data;
 	int current_level;
 
@@ -826,8 +821,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 						{
 							data = (!state->m_previous_level && current_level) ? 1 : 0;
 
-							set_out_data_bit(state->m_cassette_serial_connection.State, data);
-							serial_connection_out(machine, &state->m_cassette_serial_connection);
+							ser->send_bit(data);
 							uart->receive_clock();
 
 							state->m_clk_level_tape = 1;
@@ -847,7 +841,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 		/* tape writing */
 		if (machine.device<cassette_image_device>(CASSETTE_TAG)->get_state()&CASSETTE_RECORD)
 		{
-			data = get_in_data_bit(state->m_cassette_serial_connection.input_state);
+			data = ser->get_in_data_bit();
 			data ^= state->m_clk_level_tape;
 			machine.device<cassette_image_device>(CASSETTE_TAG)->output(data&0x01 ? 1 : -1);
 
@@ -886,9 +880,6 @@ static void pmd85_common_driver_init (running_machine &machine)
 	state->m_clk_level = state->m_clk_level_tape = 1;
 	state->m_cassette_timer = machine.scheduler().timer_alloc(FUNC(pmd85_cassette_timer_callback));
 	state->m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(2400));
-
-	serial_connection_init(machine, &state->m_cassette_serial_connection);
-	serial_connection_set_in_callback(machine, &state->m_cassette_serial_connection, pmd85_cassette_write);
 }
 
 DRIVER_INIT ( pmd851 )
@@ -944,7 +935,8 @@ static TIMER_CALLBACK( setup_machine_state )
 	if (state->m_model != MATO)
 	{
 		i8251_device *uart = machine.device<i8251_device>("uart");
-		uart->connect(&state->m_cassette_serial_connection);
+		serial_source_device *ser = machine.device<serial_source_device>("sercas");
+		uart->connect(ser);
 	}
 }
 

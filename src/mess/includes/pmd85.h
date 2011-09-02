@@ -7,7 +7,6 @@
 #ifndef PMD85_H_
 #define PMD85_H_
 
-#include "machine/serial.h"
 #include "machine/i8255.h"
 
 class pmd85_state : public driver_device
@@ -26,7 +25,6 @@ public:
 	UINT8 m_model;
 	emu_timer * m_cassette_timer;
 	void (*update_memory)(running_machine &);
-	serial_connection m_cassette_serial_connection;
 };
 
 

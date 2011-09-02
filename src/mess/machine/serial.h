@@ -24,78 +24,6 @@
 #define SERIAL_H_
 
 
-/*
-    CTS = Clear to Send. (INPUT)
-    Other end of connection is ready to accept data
-
-
-    NOTE:
-
-      This output is active low on serial chips (e.g. 0 is CTS is set),
-      but here it is active high!
-*/
-#define SERIAL_STATE_CTS	0x0001
-
-/*
-    RTS = Request to Send. (OUTPUT)
-    This end is ready to send data, and requests if the other
-    end is ready to accept it
-
-    NOTE:
-
-      This output is active low on serial chips (e.g. 0 is RTS is set),
-      but here it is active high!
-*/
-#define SERIAL_STATE_RTS	0x0002
-
-/*
-    DSR = Data Set ready. (INPUT)
-    Other end of connection has data
-
-
-    NOTE:
-
-      This output is active low on serial chips (e.g. 0 is DSR is set),
-      but here it is active high!
-*/
-#define SERIAL_STATE_DSR	0x0004
-
-/*
-    DTR = Data terminal Ready. (OUTPUT)
-    TX contains new data.
-
-    NOTE:
-
-      This output is active low on serial chips (e.g. 0 is DTR is set),
-      but here it is active high!
-*/
-#define SERIAL_STATE_DTR	0x0008
-/* RX = Recieve data. (INPUT) */
-#define SERIAL_STATE_RX_DATA	0x00010
-/* TX = Transmit data. (OUTPUT) */
-#define SERIAL_STATE_TX_DATA	0x00020
-
-/* parity selections */
-/* if all the bits are added in a byte, if the result is:
-    even -> parity is even
-    odd -> parity is odd
-*/
-enum
-{
-	SERIAL_PARITY_NONE,		/* no parity. a parity bit will not be in the transmitted/received data */
-	SERIAL_PARITY_ODD,		/* odd parity */
-	SERIAL_PARITY_EVEN		/* even parity */
-};
-
-/* this macro is used to extract the received data from the status */
-#define get_in_data_bit(x) ((x & SERIAL_STATE_RX_DATA)>>4)
-
-/* this macro is used to set the transmitted data in the status */
-#define set_out_data_bit(x, data) \
-	x&=~SERIAL_STATE_TX_DATA; \
-	x|=(data<<5)
-
-
 /*******************************************************************************/
 /**** SERIAL CONNECTION ***/
 
@@ -118,6 +46,17 @@ struct _serial_connection
     to let the other end know */
 	void	(*in_callback)(running_machine &machine, int id, unsigned long state);
 };
+
+/* this macro is used to extract the received data from the status */
+#define get_in_data_bit(x) ((x & SERIAL_STATE_RX_DATA)>>4)
+
+/* this macro is used to set the transmitted data in the status */
+#define set_out_data_bit(x, data) \
+	x&=~SERIAL_STATE_TX_DATA; \
+	x|=(data<<5)
+
+
+
 
 /*----------- defined in machine/serial.c -----------*/
 

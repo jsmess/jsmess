@@ -7,7 +7,6 @@
 #ifndef POLY88_H_
 #define POLY88_H_
 
-#include "machine/serial.h"
 #include "machine/i8251.h"
 #include "imagedev/snapquik.h"
 
@@ -27,7 +26,6 @@ public:
 	int m_previous_level;
 	int m_clk_level;
 	int m_clk_level_tape;
-	serial_connection m_cassette_serial_connection;
 };
 
 

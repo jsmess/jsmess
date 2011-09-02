@@ -9,8 +9,6 @@
 #ifndef __I8251_H__
 #define __I8251_H__
 
-#include "machine/serial.h"
-
 
 /***************************************************************************
     CONSTANTS
@@ -59,6 +57,7 @@ struct i8251_interface
 // ======================> i8251_device
 
 class i8251_device :  public device_t,
+  					  public device_serial_interface,
 					  public i8251_interface
 {
 public:
@@ -83,13 +82,9 @@ public:
 	void transmit_clock();
 	void receive_clock();
 
-	/* connecting to serial output */
-	void connect_to_serial_device(device_t *image);
-	void connect(serial_connection *other_connection);
-
 	void receive_character(UINT8 ch);
 	
-	serial_connection *get_connection() { return &m_connection; }
+	virtual void input_callback(UINT8 state);
 protected:
     // device-level overrides
     virtual void device_start();
@@ -126,20 +121,7 @@ private:
 
 	/* data being received */
 	UINT8 m_data;
-
-	/* receive reg */
-	serial_receive_register m_receive_reg;
-	/* transmit reg */
-	serial_transmit_register m_transmit_reg;
-
-	data_form m_form;
-
-	/* the serial connection that data is transfered over */
-	/* this is usually connected to the serial device */
-	serial_connection m_connection;	
 };
-
-
 
 // device type definition
 extern const device_type I8251;

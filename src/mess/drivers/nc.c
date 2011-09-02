@@ -97,7 +97,6 @@
 #include "emuopts.h"
 #include "cpu/z80/z80.h"
 #include "includes/nc.h"
-#include "machine/serial.h"	/* for serial data transfers */
 #include "machine/ctronics.h"
 #include "machine/i8251.h"	/* for NC100 uart */
 #include "machine/mc146818.h"	/* for NC200 real time clock */

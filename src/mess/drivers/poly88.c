@@ -198,7 +198,8 @@ static MACHINE_CONFIG_START( poly88, poly88_state )
 
 	/* uart */
 	MCFG_I8251_ADD("uart", poly88_usart_interface)
-
+	MCFG_SERIAL_SOURCE_ADD("sercas")
+	
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", poly88, "img", 0)
 MACHINE_CONFIG_END

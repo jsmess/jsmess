@@ -9,8 +9,6 @@
 #ifndef __6551_H__
 #define __6551_H__
 
-#include "machine/serial.h"
-
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
@@ -25,7 +23,8 @@
 
 // ======================> acia6551_device
 
-class acia6551_device :  public device_t
+class acia6551_device :  public device_t,
+						 public device_serial_interface
 {
 public:
     // construction/destruction
@@ -36,15 +35,12 @@ public:
 	
 	/* write data register */
 	DECLARE_WRITE8_MEMBER(write);
-	
-	/* connecting to serial output */
-	void connect_to_serial_device(device_t *image);
-	
+		
 	void receive_character(UINT8 ch);
 	
 	void timer_callback();
 	
-	serial_connection *get_connection() { return &m_connection; }
+	virtual void input_callback(UINT8 state);
 protected:
     // device-level overrides
     virtual void device_start();
@@ -61,15 +57,6 @@ private:
 
 	/* internal baud rate timer */
 	emu_timer	*m_timer;
-
-	data_form m_form;
-
-	/* receive register */
-	serial_receive_register	m_receive_reg;
-	/* transmit register */
-	serial_transmit_register m_transmit_reg;
-
-	serial_connection m_connection;
 };
 
 // device type definition
