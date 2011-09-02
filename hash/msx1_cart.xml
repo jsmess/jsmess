@@ -603,6 +603,78 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
+	<software name="golvelli">
+		<!-- 魔王ゴルベリアス -->
+		<description>Golvellius</description>
+		<year>1987</year>
+		<publisher>Compile</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="131072">
+				<!-- COMPILE IA-8701 -->
+				<rom name="compile_ia" size="131072" crc="5eac55df" sha1="7a4126934f9e68c34bf00dd3d9a9e753c05ee73f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mirai">
+		<!-- 未来 -->
+		<description>Mirai</description>
+		<year>1987</year>
+		<publisher>Xain Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="rp231024d" size="131072" crc="72eb9d0e" sha1="7abf89652396a648a84ae06e6dabc09735a75798" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="valis">
+		<!-- 夢幻戦士ヴァリス -->
+		<description>Mugen Senshi Valis</description>
+		<year>1986</year>
+		<publisher>Telenet</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<!-- 831000-440 20 BK Z86 -->
+				<rom name="831000" size="131072" crc="309d996c" sha1="2b10234debd2a6a9a02e0750ba6563768bc4a2f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="henotobi">
+		<!-- 迷宮への扉 -->
+		<description>Meikyuu Heno Tobirah</description>
+		<year>1987</year>
+		<publisher>Dempa Publications</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="1M-16KB" />
+			<feature name="mapper" value="MR6401" />	<!-- NEOS MR6401 -->
+			<dataarea name="rom" size="131072">
+				<rom name="dempa_labyrinth_rp231024d" size="131072" crc="2c2020a0" sha1="0cb11c766bd357d203879bd6bee041a4690cc3df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marcveil">
+		<!-- メルヘン・ヴェール I -->
+		<description>Marchen Veil</description>
+		<year>1987</year>
+		<publisher>System Sacom</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="cxk381000" size="131072" crc="44aa5422" sha1="f7dd6841d280cbffa9f0f2da7af3549f23270ddb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>
