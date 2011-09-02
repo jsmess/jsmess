@@ -19,12 +19,6 @@
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 /***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-static void i8251_in_callback(running_machine &machine, int id, unsigned long state);
-
-/***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
 
@@ -39,17 +33,11 @@ const i8251_interface default_i8251_interface = { DEVCB_NULL, DEVCB_NULL, DEVCB_
     i8251_in_callback
 -------------------------------------------------*/
 
-static void i8251_in_callback(running_machine &machine, int id, unsigned long state)
+void i8251_device::input_callback(UINT8 state)
 {
-	int changed;
+	int changed = m_input_state^state;
 
-	/* NPW 29-Nov-2008 - These two lines are a hack and indicate why our "serial" infrastructure needs to be updated */
-	i8251_device *device = machine.device<i8251_device>("uart");
-	
-
-	changed = device->get_connection()->input_state^state;
-
-	device->get_connection()->input_state = state;
+	m_input_state = state;
 
 	/* did cts change state? */
 	if (changed & SERIAL_STATE_CTS)
@@ -71,7 +59,8 @@ const device_type I8251 = &device_creator<i8251_device>;
 //-------------------------------------------------
 
 i8251_device::i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, I8251, "I8251", tag, owner, clock)
+    : device_t(mconfig, I8251, "I8251", tag, owner, clock),
+	  device_serial_interface(mconfig, *this)
 {
 }
 
@@ -109,17 +98,12 @@ void i8251_device::device_config_complete()
 
 void i8251_device::device_start()
 {
-	serial_helper_setup();
-
 	// resolve callbacks
 	m_out_rxrdy_func.resolve(m_out_rxrdy_cb, *this);
 	m_out_txrdy_func.resolve(m_out_txrdy_cb, *this);
 	m_out_txempty_func.resolve(m_out_txempty_cb, *this);
 
-	/* setup this side of the serial connection */
-	serial_connection_init(machine(),&m_connection);
-	serial_connection_set_in_callback(machine(),&m_connection, i8251_in_callback);
-	m_connection.input_state = 0;
+	m_input_state = 0;
 }
 
 
@@ -157,12 +141,12 @@ void i8251_device::receive_clock()
 	{
 		//logerror("I8251\n");
 		/* get bit received from other side and update receive register */
-		receive_register_update_bit(&m_receive_reg, get_in_data_bit(m_connection.input_state));
+		receive_register_update_bit(get_in_data_bit());
 
-		if (m_receive_reg.flags & RECEIVE_REGISTER_FULL)
+		if (is_receive_register_full())
 		{
-			receive_register_extract(&m_receive_reg, &m_form);
-			receive_character(m_receive_reg.byte_received);
+			receive_register_extract();
+			receive_character(get_received_char());
 		}
 	}
 }
@@ -183,10 +167,10 @@ void i8251_device::transmit_clock()
 		if ((m_status & I8251_STATUS_TX_READY)==0)
 		{
 			/* if transmit reg is empty */
-			if ((m_transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)!=0)
+			if (is_transmit_register_empty())
 			{
 				/* set it up */
-				transmit_register_setup(&m_transmit_reg, &m_form, m_data);
+				transmit_register_setup(m_data);
 				/* i8251 transmit reg now empty */
 				m_status |=I8251_STATUS_TX_EMPTY;
 				/* ready for next transmit */
@@ -198,10 +182,10 @@ void i8251_device::transmit_clock()
 		}
 
 		/* if transmit is not empty... transmit data */
-		if ((m_transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)==0)
+		if (!is_transmit_register_empty())
 		{
 	//      logerror("I8251\n");
-			transmit_register_send_bit(machine(),&m_transmit_reg, &m_connection);
+			transmit_register_send_bit();
 		}
 	}
 
@@ -256,7 +240,7 @@ void i8251_device::update_tx_ready()
 	if ((m_command & (1<<0))!=0)
 	{
 		/* other side has rts set (comes in as CTS at this side) */
-		if (m_connection.input_state & SERIAL_STATE_CTS)
+		if (m_input_state & SERIAL_STATE_CTS)
 		{
 			if (m_status & I8251_STATUS_TX_EMPTY)
 			{
@@ -280,8 +264,8 @@ void i8251_device::update_tx_empty()
 	if (m_status & I8251_STATUS_TX_EMPTY)
 	{
 		/* tx is in marking state (high) when tx empty! */
-		set_out_data_bit(m_connection.State, 1);
-		serial_connection_out(machine(),&m_connection);
+		set_out_data_bit(1);
+		serial_connection_out();
 	}
 
 	m_out_txempty_func((m_status & I8251_STATUS_TX_EMPTY) != 0);
@@ -301,14 +285,14 @@ void i8251_device::device_reset()
 
 	/* i8251 datasheet explains the state of tx pin at reset */
 	/* tx is set to 1 */
-	set_out_data_bit(m_connection.State,1);
+	set_out_data_bit(1);
 
 	/* assumption, rts is set to 1 */
-	m_connection.State &= ~SERIAL_STATE_RTS;
-	serial_connection_out(machine(), &m_connection);
+	m_connection_state &= ~SERIAL_STATE_RTS;
+	serial_connection_out();
 
-	transmit_register_reset(&m_transmit_reg);
-	receive_register_reset(&m_receive_reg);
+	transmit_register_reset();
+	receive_register_reset();
 	/* expecting mode byte */
 	m_flags |= I8251_EXPECTING_MODE;
 	/* not expecting a sync byte */
@@ -448,21 +432,21 @@ WRITE8_MEMBER(i8251_device::control_w)
 					}
 				}
 
-				m_form.word_length = ((data>>2) & 0x03)+5;
-				m_form.parity = SERIAL_PARITY_NONE;
+				int word_length = ((data>>2) & 0x03)+5;
+				int parity = SERIAL_PARITY_NONE;
+				int stop_bit_count = 1;
 				switch ((data>>6) & 0x03)
 				{
 					case 0:
 					case 1:
-						m_form.stop_bit_count =  1;
+						stop_bit_count =  1;
 						break;
 					case 2:
 					case 3:
-						m_form.stop_bit_count =  2;
+						stop_bit_count =  2;
 						break;
 				}
-				receive_register_setup(&m_receive_reg, &m_form);
-
+				set_data_frame(word_length,stop_bit_count,parity);
 
 #if 0
 				/* data bits */
@@ -599,28 +583,28 @@ WRITE8_MEMBER(i8251_device::control_w)
                 1 = transmit enable
         */
 
-		m_connection.State &=~SERIAL_STATE_RTS;
+		m_connection_state &=~SERIAL_STATE_RTS;
 		if (data & (1<<5))
 		{
 			/* rts set to 0 */
-			m_connection.State |= SERIAL_STATE_RTS;
+			m_connection_state |= SERIAL_STATE_RTS;
 		}
 
-		m_connection.State &=~SERIAL_STATE_DTR;
+		m_connection_state &=~SERIAL_STATE_DTR;
 		if (data & (1<<1))
 		{
-			m_connection.State |= SERIAL_STATE_DTR;
+			m_connection_state |= SERIAL_STATE_DTR;
 		}
 
 		if ((data & (1<<0))==0)
 		{
 			/* held in high state when transmit disable */
-			set_out_data_bit(m_connection.State,1);
+			set_out_data_bit(1);
 		}
 
 
 		/* refresh outputs */
-		serial_connection_out(machine(), &m_connection);
+		serial_connection_out();
 
 		if (data & (1<<4))
 		{
@@ -707,29 +691,4 @@ READ8_MEMBER(i8251_device::data_r)
 
 	update_rx_ready();
 	return m_data;
-}
-
-
-
-/*-------------------------------------------------
-    connect_to_serial_device - initialise
-    transfer using serial device - set the callback
-    which will be called when serial device has
-    updated it's state
--------------------------------------------------*/
-
-void i8251_device::connect_to_serial_device(device_t *image)
-{
-	serial_device_connect(image, &m_connection);
-}
-
-
-
-/*-------------------------------------------------
-    connect
--------------------------------------------------*/
-
-void i8251_device::connect(serial_connection *other_connection)
-{
-	serial_connection_link(machine(), &m_connection, other_connection);
 }

@@ -393,10 +393,10 @@ static DEVICE_START( thom_serial_cc90323 )
 
 static DEVICE_START( thom_serial_rf57232 )
 {
-	acia6551_device *acia = device->machine().device<acia6551_device>("acia");
+	//acia6551_device *acia = device->machine().device<acia6551_device>("acia");
 	DEVICE_START_CALL(serial);
 	LOG(( "thom_serial_init: init RF 57-232 RS232 device\n" ));
-	acia->connect_to_serial_device(device);
+	//acia->connect_to_serial_device(device);
 	serial_device_setup( device, 2400, 7, 2, SERIAL_PARITY_NONE );
 	serial_device_set_transmit_state( device, 1 );
 }

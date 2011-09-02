@@ -27,7 +27,8 @@ const device_type ACIA6551 = &device_creator<acia6551_device>;
 //-------------------------------------------------
 
 acia6551_device::acia6551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, ACIA6551, "MOS Technology 6551 ACIA", tag, owner, clock)
+    : device_t(mconfig, ACIA6551, "MOS Technology 6551 ACIA", tag, owner, clock),
+	  device_serial_interface(mconfig, *this)
 {
 }
 
@@ -36,18 +37,13 @@ acia6551_device::acia6551_device(const machine_config &mconfig, const char *tag,
 ***************************************************************************/
 
 /*-------------------------------------------------
-    acia_6551_in_callback - called when other side
+    input_callback - called when other side
     has updated state
 -------------------------------------------------*/
-
-static void acia_6551_in_callback(running_machine &machine, int id, unsigned long state)
+void acia6551_device::input_callback(UINT8 state)
 {	
-	/* NPW 29-Nov-2008 - These two lines are a hack and indicate why our "serial" infrastructure needs to be updated */
-	acia6551_device *acia = machine.device<acia6551_device>("acia");
-	acia->get_connection()->input_state = state;
+	m_input_state = state;
 }
-
-
 
 /*-------------------------------------------------
     timer_callback
@@ -55,22 +51,22 @@ static void acia_6551_in_callback(running_machine &machine, int id, unsigned lon
 void acia6551_device::timer_callback()
 {
 	/* get bit received from other side and update receive register */
-	receive_register_update_bit(&m_receive_reg, get_in_data_bit(m_connection.input_state));
+	receive_register_update_bit(get_in_data_bit());
 
-	if (m_receive_reg.flags & RECEIVE_REGISTER_FULL)
+	if (is_receive_register_full())
 	{
-		receive_register_extract(&m_receive_reg, &m_form);
-		receive_character(m_receive_reg.byte_received);
+		receive_register_extract();
+		receive_character(get_received_char());
 	}
 
 	/* transmit register full? */
 	if ((m_status_register & (1<<4))==0)
 	{
 		/* if transmit reg is empty */
-		if (m_transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)
+		if (is_transmit_register_empty())
 		{
 			/* set it up */
-			transmit_register_setup(&m_transmit_reg, &m_form, m_transmit_data_register);
+			transmit_register_setup(m_transmit_data_register);
 			/* acia transmit reg now empty */
 			m_status_register |=(1<<4);
 			/* and refresh ints */
@@ -79,10 +75,10 @@ void acia6551_device::timer_callback()
 	}
 
 	/* if transmit is not empty... transmit data */
-	if ((m_transmit_reg.flags & TRANSMIT_REGISTER_EMPTY)==0)
+	if (!is_transmit_register_empty())
 	{
 	//  logerror("UART6551\n");
-		transmit_register_send_bit(machine(), &m_transmit_reg, &m_connection);
+		transmit_register_send_bit();
 	}
 }
 
@@ -97,16 +93,12 @@ static TIMER_CALLBACK(acia_6551_timer_callback)
 
 void acia6551_device::device_start()
 {
-	serial_helper_setup();
-
 	/* transmit data reg is empty */
 	m_status_register |= (1<<4);
 	m_timer = machine().scheduler().timer_alloc(FUNC(acia_6551_timer_callback), (void *) this);
 
-	serial_connection_init(machine(), &m_connection);
-	serial_connection_set_in_callback(machine(), &m_connection, acia_6551_in_callback);
-	transmit_register_reset(&m_transmit_reg);
-	receive_register_reset(&m_receive_reg);
+	transmit_register_reset();
+	receive_register_reset();
 }
 
 
@@ -239,19 +231,19 @@ READ8_MEMBER(acia6551_device::read)
 
 void acia6551_device::update_data_form()
 {	
-	m_form.word_length = 8-((m_control_register>>5) & 0x03);
-	m_form.stop_bit_count = (m_control_register>>7)+1;
-
+	int word_length = 8-((m_control_register>>5) & 0x03);
+	int stop_bit_count = (m_control_register>>7)+1;
+	int parity = 0;
 	if (m_command_register & (1<<5))
 	{
-		m_form.parity = SERIAL_PARITY_ODD;
+		parity = SERIAL_PARITY_ODD;
 	}
 	else
 	{
-		m_form.parity = SERIAL_PARITY_NONE;
+		parity = SERIAL_PARITY_NONE;
 	}
-
-	receive_register_setup(&m_receive_reg, &m_form);
+	
+	set_data_frame(word_length, stop_bit_count, parity);
 }
 
 
@@ -316,10 +308,10 @@ WRITE8_MEMBER(acia6551_device::write)
 			m_command_register = data;
 
 			/* update state of dtr */
-			m_connection.State &=~SERIAL_STATE_DTR;
+			m_connection_state &=~SERIAL_STATE_DTR;
 			if (m_command_register & (1<<0))
 			{
-				m_connection.State |=SERIAL_STATE_DTR;
+				m_connection_state |=SERIAL_STATE_DTR;
 			}
 
 			/* update state of rts */
@@ -327,7 +319,7 @@ WRITE8_MEMBER(acia6551_device::write)
 			{
 				case 0:
 				{
-					m_connection.State &=~SERIAL_STATE_RTS;
+					m_connection_state &=~SERIAL_STATE_RTS;
 				}
 				break;
 
@@ -335,13 +327,12 @@ WRITE8_MEMBER(acia6551_device::write)
 				case 2:
 				case 3:
 				{
-					m_connection.State |=SERIAL_STATE_RTS;
+					m_connection_state |=SERIAL_STATE_RTS;
 				}
 				break;
 			}
 
-			serial_connection_out(machine(), &m_connection);
-
+			serial_connection_out();
 			update_data_form();
 		}
 		break;
@@ -512,14 +503,4 @@ WRITE8_MEMBER(acia6551_device::write)
 			break;
 	}
 
-}
-
-
-/*-------------------------------------------------
-    connect_to_serial_device
--------------------------------------------------*/
-
-void acia6551_device::connect_to_serial_device(device_t *image)
-{
-	serial_device_connect(image, &m_connection);
 }

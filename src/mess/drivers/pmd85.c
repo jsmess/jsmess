@@ -579,6 +579,7 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 
 	/* uart */
 	MCFG_I8251_ADD("uart", default_i8251_interface)
+	MCFG_SERIAL_SOURCE_ADD("sercas")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
