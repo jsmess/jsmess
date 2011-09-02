@@ -238,7 +238,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	<software name="champbas">
 		<!-- Serial: G-1011 - Alt Title: チャンピオンベースボール -->
 		<description>Champion Baseball (Jpn)</description>
-        <!-- according to Bock this comes from Small Boxed cart -->
+		<!-- according to Bock this comes from Small Boxed cart -->
 		<year>1983</year>
 		<publisher>Sega / Alpha Denshi</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -250,7 +250,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="champbasa" cloneof="champbas">
 		<description>Champion Baseball (Jpn, Older)</description>
-        <!-- only 16k out of 40k are the game data, according to Bock this comes from Big Boxed cart (older than the Small Boxed cart above) -->
+		<!-- only 16k out of 40k are the game data, according to Bock this comes from Big Boxed cart (older than the Small Boxed cart above) -->
 		<year>1983</year>
 		<publisher>Sega / Alpha Denshi</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -466,7 +466,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	<software name="feilang" cloneof="choplift">
 		<!-- Serial: R-048 - Alt Title: Fēi láng ~ 飛狼 -->
 		<description>Fei Lang (Tw)</description>
-        <!-- This version has the Chinese title screen after the Chinese title -->
+		<!-- This version has the Chinese title screen after the Chinese title -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -479,7 +479,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	<software name="feilanga" cloneof="choplift">
 		<!-- Serial: R-048 - Alt Title: Fēi láng ~ 飛狼 -->
 		<description>Fei Lang (Tw, Alt)</description>
-        <!-- This version has the English title screen after the Chinese title -->
+		<!-- This version has the English title screen after the Chinese title -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -526,7 +526,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="congob" cloneof="congo">
 		<description>Congo Bongo (Jpn, v0)</description>
-        <!-- other 32k dumps floating around are overdumps, as verified by Bock! -->
+		<!-- other 32k dumps floating around are overdumps, as verified by Bock! -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -597,9 +597,9 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="jingwumn" cloneof="dragwang"> <!-- based on Jpn v0 release -->
-        <!-- Serial: R-046 - Alt Title: 精武門 -->
+		<!-- Serial: R-046 - Alt Title: 精武門 -->
 		<description>Jing Wu Men (Tw)</description>
-        <!-- This version has Chinese title screen after the Chinese title -->
+		<!-- This version has Chinese title screen after the Chinese title -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -610,9 +610,9 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="jingwumna" cloneof="dragwang"> <!-- based on Jpn v0 release -->
-        <!-- Serial: R-046 - Alt Title: 精武門 -->
+		<!-- Serial: R-046 - Alt Title: 精武門 -->
 		<description>Jing Wu Men (Tw, Alt)</description>
-        <!-- This version has English title screen after the Chinese title -->
+		<!-- This version has English title screen after the Chinese title -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1043,7 +1043,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	<software name="mahjong">
 		<!-- Serial: G-1004 - Alt Title: 麻雀 -->
 		<description>Mahjong (Jpn)</description>
-        <!-- This version has smaller 1983 and Japanese instructions in the title screen -->
+		<!-- This version has smaller 1983 and Japanese instructions in the title screen -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1055,7 +1055,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="mahjonga" cloneof="mahjong">
 		<description>Mahjong (Jpn, Alt)</description>
-        <!-- This version has bigger 1983 and English instructions in the title screen -->
+		<!-- This version has bigger 1983 and English instructions in the title screen -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1103,8 +1103,8 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="monacogpb" cloneof="monacogp">
 		<description>Monaco GP (Jpn, v0)</description>
-        <!-- 16kb of data + 16kb of trash + 8kb of data, Bock verified that this only came in the earlier Big Boxed carts
-        (afterwards only the 32k was used, even in carts with "24k" advertise on the box) -->
+		<!-- 16kb of data + 16kb of trash + 8kb of data, Bock verified that this only came in the earlier Big Boxed carts
+		(afterwards only the 32k was used, even in carts with "24k" advertise on the box) -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1163,7 +1163,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="nsubb" cloneof="nsub">
 		<description>N-Sub (Jpn, Alt)</description>
-        <!-- only 16k out of 40k are the game data, also one between nsuba and nsubb has a gameover glitch (bg color is not reset properly in certain cases), the other is fixed -->
+		<!-- only 16k out of 40k are the game data, also one between nsuba and nsubb has a gameover glitch (bg color is not reset properly in certain cases), the other is fixed -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1354,7 +1354,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	<software name="faguiqib" cloneof="pitfall2">
 		<!-- Serial: R-049 - Alt Title: Fǎ guì qíbīng ~ 法櫃奇兵 -->
 		<description>Fa Gui Qibing (Tw)</description>
-        <!-- This version has the Chinese title screen -->
+		<!-- This version has the Chinese title screen -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1367,7 +1367,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	<software name="faguiqiba" cloneof="pitfall2">
 		<!-- Serial: R-049 - Alt Title: Fǎ guì qíbīng ~ 法櫃奇兵 -->
 		<description>Fa Gui Qibing (Tw, Alt)</description>
-        <!-- This version has the English title screen -->
+		<!-- This version has the English title screen -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1724,7 +1724,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="starforct" cloneof="starforc">
-         <!-- Serial: B-043 - Alt Title: Star Wars ~ Xīngjì dàzhàn ~ 星際大戰 -->
+		 <!-- Serial: B-043 - Alt Title: Star Wars ~ Xīngjì dàzhàn ~ 星際大戰 -->
 		<description>Star Force (Tw)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -1736,7 +1736,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="starforcta" cloneof="starforc">
-        <!-- Serial: B-043 - Alt Title: Star Wars ~ Xīngjì dàzhàn ~ 星際大戰 -->
+		<!-- Serial: B-043 - Alt Title: Star Wars ~ Xīngjì dàzhàn ~ 星際大戰 -->
 		<description>Star Force (Tw, Alt)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -2017,17 +2017,6 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="musicj" cloneof="music">
-		<description>Sega Music Editor (Jpn)</description>
-		<year>198?</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="musicj.bin" size="32768" crc="2ec28526" sha1="a2137e818242e8b361d5d5677797034c55fb1a2d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="music">
 		<description>Sega Music Editor (Euro?)</description>
 		<year>198?</year>
@@ -2039,32 +2028,71 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="tansansu">
-		<description>Tanoshii Sansu (Jpn)</description>
-		<year>198?</year>
+<!-- SC-3000 Educational carts -->
+
+	<software name="musicj" cloneof="music">
+		<description>Music (Jpn)</description>
+		<!-- Serial: E-101 - Alt Title: ミュージック -->
+		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="tansansu.bin" size="16384" crc="6a96978d" sha1="751d82119e19d46a20165c8debbfe95b3241a701" offset="000000" />
+			<dataarea name="rom" size="32768">
+				<rom name="music (jp).bin" size="32768" crc="2ec28526" sha1="a2137e818242e8b361d5d5677797034c55fb1a2d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="chuhis1n">
+	<software name="chueit1n">
+		<description>Chuugaku Hisshuu Eitango ~ Chuugaku 1-Nen (Jpn)</description>
+		<!-- Serial: E-103 - Alt Title: 中学必修英単語 (中学一年) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="chuugaku hisshuu eitango (chuugaku 1-nen) (jp).bin" size="16384" crc="6ccb297a" sha1="63cf03f62516d4228a023fff496f2ffa6581d3dc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueis1n">
 		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 1-Nen (Jpn)</description>
-        <!-- Serial: E-104 - Alt Title: 中学必修英作文(中学一年) -->
+		<!-- Serial: E-104 - Alt Title: 中学必修英作文 (中学一年) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="chuugaku hisshuu eisakubun (chuugaku 1-nen) (jp).bin" size="16384" crc="9bafd9e9" sha1="0081205a3e2fa9322a348ab8a096c282bbbbcc21" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueis1na" cloneof="chueis1n">
+		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 1-Nen (Jpn, Alt)</description>
+		<!-- Serial: E-104 - Alt Title: 中学必修英作文(中学一年) -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="40960">
-				<rom name="chuugaku hisshuu eisakubun (chuugaku 1-nen) (jp).bin" size="40960" crc="975106b6" sha1="ebc8544bf8a36840a639bb7a2698f984429f4762" offset="000000" />
+				<rom name="chuugaku hisshuu eisakubun (chuugaku 1-nen) (jp) [40k map].bin" size="40960" crc="975106b6" sha1="ebc8544bf8a36840a639bb7a2698f984429f4762" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueib1n">
+		<description>Chuugaku Hisshuu Eibunpou ~ Chuugaku 1-Nen (Jpn)</description>
+		<!-- Serial: E-105 - Alt Title: 中学必修英文法 (中学一年) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="chuugaku hisshuu eibunpou (chuugaku 1-nen) (jp).bin" size="8192" crc="345c8bc8" sha1="eaab51616a87fd29f0383a8b3ea365971bceb56b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="tansan4j">
 		<description>Tanoshii Sansu ~ Shougaku 4-Nen Jou (Jpn)</description>
-        <!-- Serial: E-106 - Alt Title: 楽しい算数 (小学四年上) -->
+		<!-- Serial: E-106 - Alt Title: 楽しい算数 (小学四年上) -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2074,21 +2102,45 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="tansan4ja" cloneof="tansan4j">
+		<description>Tanoshii Sansu ~ Shougaku 4-Nen Jou (Jpn, Alt)</description>
+		<!-- Serial: E-106 - Alt Title: 楽しい算数 (小学四年上) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="tanoshii sansuu (shougaku 4-nen jou) [40k map] (jp).bin" size="40960" crc="7c400e3b" sha1="8a693531a3cfd0cef01d6b2ac900a2c95ff4f75e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kagaku">
+		<description>Kagaku ~ Gensokigou Master (Jpn)</description>
+		<!-- Serial: E-107 - Alt Title: 化学 (元素記号マスター) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="kagaku (gensokigou master) (jp).bin" size="8192" crc="f9c81fe1" sha1="6b35016742db0a06947c679f41b8130c28d2de7d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nihonshi">
 		<description>Nihonshi Nenpyou (Jpn)</description>
-        <!-- Serial: E-108 - Alt Title: 日本史年表 -->
+		<!-- Serial: E-108 - Alt Title: 日本史年表 -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="nihonshi.bin" size="16384" crc="22f4f92a" sha1="972cf86f8f627c7b8e1ac9c5a837bd4673be6e54" offset="000000" />
+				<rom name="nihonshi nenpyou (jp).bin" size="16384" crc="129d6359" sha1="9a9363004d77037a0bbc9a8bcae1bb05138ffc36" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="sekaishi">
 		<description>Sekaishi Nenpyou ~ Monbushou Shidouyouryou Junkyo (Jpn)</description>
-        <!-- Serial: E-109 - Alt Title: 世界史年表 (文部省指導要領準拠) -->
+		<!-- Serial: E-109 - Alt Title: 世界史年表 (文部省指導要領準拠) -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2098,14 +2150,122 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="chueit2n">
+		<description>Chuugaku Hisshuu Eitango ~ Chuugaku 2-Nen (Jpn)</description>
+		<!-- Serial: E-110 - Alt Title: 中学必修英単語 (中学二年) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="chuugaku hisshuu eitango (chuugaku 2-nen) (jp).bin" size="16384" crc="8507216b" sha1="931b404c809b39a68cdc4b74ad905a008d46143d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueit2na" cloneof="chueit2n">
+		<description>Chuugaku Hisshuu Eitango ~ Chuugaku 2-Nen (Jpn, Alt)</description>
+		<!-- Serial: E-110 - Alt Title: 中学必修英単語 (中学二年) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="chuugaku hisshuu eitango (chuugaku 2-nen) [40k map] (jp).bin" size="40960" crc="4f599483" sha1="09515ce5c8b598020f4c6b97540a7020abb6f596" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueis2n">
+		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 2-Nen (Jpn)</description>
+		<!-- Serial: E-111 - Alt Title: 中学必修英作文 (中学二年) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="chuugaku hisshuu eisakubun (chuugaku 2-nen) (jp).bin" size="16384" crc="581dce41" sha1="058f3efd1ae2a0dde4ee2b327a2faea663354411" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueis2na" cloneof="chueis2n">
+		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 2-Nen (Jpn, Alt)</description>
+		<!-- Serial: E-111 - Alt Title: 中学必修英作文 (中学二年) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="chuugaku hisshuu eisakubun (chuugaku 2-nen) [40k map] (jp).bin" size="40960" crc="3657b285" sha1="312ce1b510a90a96bca63d028e96ed732ab6a043" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chueib2n">
+		<description>Chuugaku Hisshuu Eibunpou ~ Chuugaku 2-Nen (Jpn)</description>
+		<!-- Serial: E-112 - Alt Title: 中学必修英文法 (中学二年) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="chuugaku hisshuu eibunpou (chuugaku 2-nen) (jp).bin" size="8192" crc="d4c473b2" sha1="efe8a2852344f094806039019314ebe9c49e53f9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tansan4g">
 		<description>Tanoshii Sansu ~ Shougaku 4-Nen Ge (Jpn)</description>
-        <!-- Serial: E-113 - Alt Title: 楽しい算数 (小学四年下) -->
+		<!-- Serial: E-113 - Alt Title: 楽しい算数 (小学四年下) -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="tanoshii sansuu (shougaku 4-nen ge) (jp).bin" size="16384" crc="5fde25bb" sha1="5500a59f4474833687e7d2d7bbd09cf0fb925684" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tansan5g">
+		<description>Tanoshii Sansu ~ Shougaku 5-Nen Ge (Jpn)</description>
+		<!-- Serial: E-114 - Alt Title: 楽しい算数 (小学五年下) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="tanoshii sansuu (shougaku 5-nen ge) (jp).bin" size="16384" crc="6a96978d" sha1="751d82119e19d46a20165c8debbfe95b3241a701" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tansan6g">
+		<description>Tanoshii Sansu ~ Shougaku 6-Nen Ge (Jpn)</description>
+		<!-- Serial: E-115 - Alt Title: 楽しい算数 (小学六年下) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="tanoshii sansuu (shougaku 6-nen ge) (jp).bin" size="32768" crc="d0d18e70" sha1="c3428ec915a172992a7c643da662eb1469cd37d4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tansan5j">
+		<description>Tanoshii Sansuu ~ Shougaku 5-Nen Jou (Jpn)</description>
+		<!-- Serial: E-116 - Alt Title: 楽しい算数 (小学五年上) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="tanoshii sansuu (shougaku 5-nen jou) (jp).bin" size="32768" crc="419d75d5" sha1="3d99878e901e0095df7fc6ae2ef0915c9b00dcfb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tansan6j">
+		<description>Tanoshii Sansuu ~ Shougaku 6-Nen Jou (Jpn)</description>
+		<!-- Serial: E-117 - Alt Title: 楽しい算数 (小学六年上) -->
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="tanoshii sansuu (shougaku 6-nen jou) (jp).bin" size="32768" crc="8b5e6e1b" sha1="103fcb058b6f9671e5ca969a5cbd4bd171caddc3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
