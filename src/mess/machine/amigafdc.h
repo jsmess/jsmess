@@ -44,7 +44,7 @@ private:
 	struct fdc_def {
 		floppy_image_device *f;
 		int tracklen;
-		UINT8 *mfm;
+		UINT8 mfm[MAX_MFM_TRACK_LEN];
 		emu_timer *dma_timer;
 		int pos;
 		int len;
@@ -65,6 +65,8 @@ private:
 	int load_proc(floppy_image_device *floppy);
 	void unload_proc(floppy_image_device *floppy);
 	void index_callback(floppy_image_device *floppy, int state);
+	void advance(const UINT32 *trackbuf, UINT32 &cur_cell, UINT32 cell_count, UINT32 time);
+	UINT32 get_next_edge(const UINT32 *trackbuf, UINT32 cur_cell, UINT32 cell_count);
 };
 	
 extern const device_type AMIGA_FDC;

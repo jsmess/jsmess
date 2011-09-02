@@ -284,9 +284,78 @@ bail:
 	fdc_status[drive].dma_timer->reset();
 }
 
+void amiga_fdc::advance(const UINT32 *trackbuf, UINT32 &cur_cell, UINT32 cell_count, UINT32 time)
+{
+	if(time >= 200000000) {
+		cur_cell = cell_count;
+		return;
+	}
+
+	while(cur_cell != cell_count-1 && (trackbuf[cur_cell+1] & floppy_image::TIME_MASK) < time)
+		cur_cell++;
+}
+
+UINT32 amiga_fdc::get_next_edge(const UINT32 *trackbuf, UINT32 cur_cell, UINT32 cell_count)
+{
+	if(cur_cell == cell_count)
+		return 200000000;
+	UINT32 cur_bit = trackbuf[cur_cell] & floppy_image::MG_MASK;
+	cur_cell++;
+	while(cur_cell != cell_count) {
+		UINT32 next_bit = trackbuf[cur_cell] & floppy_image::MG_MASK;
+		if(next_bit != cur_bit)
+			break;
+	}
+	return cur_cell == cell_count ? 200000000 : trackbuf[cur_cell] & floppy_image::TIME_MASK;
+}
+
 void amiga_fdc::setup_fdc_buffer(int drive)
 {
-	fdc_status[drive].mfm = fdc_status[drive].f->get_buffer();
+	UINT8 *mfm = fdc_status[drive].mfm;
+	const UINT32 *trackbuf = fdc_status[drive].f->get_buffer();
+
+	UINT32 cur_cell = 0;
+	UINT32 cell_count = fdc_status[drive].f->get_len();
+	UINT32 pll_period = 2000;
+	UINT32 pll_phase = 0;
+	int bit = 0;
+	memset(mfm, 0, MAX_MFM_TRACK_LEN);
+
+	for(;;) {
+		advance(trackbuf, cur_cell, cell_count, pll_phase);
+		if(cur_cell == cell_count)
+			break;
+		
+#if 0
+		printf("%09d: (%d, %09d) - (%d, %09d) - (%d, %09d)\n",
+			   pll_phase,
+			   trackbuf[cur_cell] >> floppy_image::MG_SHIFT, trackbuf[cur_cell] & floppy_image::TIME_MASK,
+			   trackbuf[cur_cell+1] >> floppy_image::MG_SHIFT, trackbuf[cur_cell+1] & floppy_image::TIME_MASK,
+			   trackbuf[cur_cell+2] >> floppy_image::MG_SHIFT, trackbuf[cur_cell+2] & floppy_image::TIME_MASK);
+#endif
+
+		UINT32 next_edge = get_next_edge(trackbuf, cur_cell, cell_count);
+		
+		if(next_edge > pll_phase + pll_period) {
+			// free run, zero bit
+			// printf("%09d: %4d - Free run\n", pll_phase, pll_period);
+			pll_phase += pll_period;
+		} else {
+			// Transition in the window, one bit, adjust the period
+
+			mfm[bit >> 3] |= 0x80 >> (bit & 7);
+
+			INT32 delta = next_edge - (pll_phase + pll_period/2);
+			// printf("%09d: %4d - Delta = %d\n", pll_phase, pll_period, delta);
+
+			// The deltas should be lowpassed, the amplification factor tuned...
+			pll_period += delta/2;
+			pll_phase += pll_period;
+		}
+
+		bit++;
+	}
+	fdc_status[drive].tracklen = (bit+7)/8;
 }
 
 
