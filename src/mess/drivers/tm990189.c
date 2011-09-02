@@ -45,7 +45,6 @@
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-#include "machine/serial.h"
 
 
 class tm990189_state : public driver_device
@@ -418,18 +417,34 @@ static DEVICE_IMAGE_UNLOAD( tm990_189_rs232 )
 	state->m_rs232_input_timer->reset();	/* FIXME - timers should only be allocated once */
 }
 
+static DEVICE_START(tm990_189_rs232)
+{
+}
+
+static DEVICE_RESET(tm990_189_rs232)
+{
+}
 DEVICE_GET_INFO( tm990_189_rs232 )
 {
 	switch ( state )
 	{
-		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( tm990_189_rs232 );    break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:		        info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME( tm990_189_rs232 );    break;
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "TM990/189 RS232 port");	                    break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "");                                         break;
+		case DEVINFO_INT_TOKEN_BYTES:				info->i = 0;											break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;											break;
+		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_SERIAL;                                	break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                        	break;
 		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 1;                                        	break;
-		default:									DEVICE_GET_INFO_CALL(serial);	break;
+
+		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( tm990_189_rs232 );   	break;
+		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( tm990_189_rs232 );		break;
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( tm990_189_rs232 );    break;
+		case DEVINFO_FCT_IMAGE_UNLOAD:		        info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME( tm990_189_rs232 );    break;
+		case DEVINFO_STR_NAME:		                strcpy(info->s, "TM990/189 RS232 port");	            break;
+		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "Serial port");	                        break;
+		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "");                                    break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");									break;
+		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);								break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright the MESS Team"); 			break;
 	}
 }
 
