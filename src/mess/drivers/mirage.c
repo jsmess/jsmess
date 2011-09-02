@@ -62,17 +62,10 @@ static void mirage_doc_irq(device_t *device, int state)
 {
 }
 
-static READ8_DEVICE_HANDLER( mirage_adc_read )
+static UINT8 mirage_adc_read(device_t *device)
 {
 	return 0x80;
 }
-
-static const es5503_interface mirage_es5503_interface =
-{
-	mirage_doc_irq,
-	mirage_adc_read,
-	NULL
-};
 
 static VIDEO_START( mirage )
 {
@@ -85,8 +78,6 @@ static SCREEN_UPDATE( mirage )
 
 void mirage_state::machine_reset()
 {
-	es5503_set_base(machine().device("es5503"), machine().region("ensoniq")->base());
-
 	last_sndram_bank = 0;
 	memory_set_bankptr(machine(), "sndbank", machine().region("ensoniq")->base() );
 }
@@ -101,7 +92,7 @@ static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 8, mirage_state )
 	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_track_r,wd17xx_track_w)
 	AM_RANGE(0xe802, 0xe802) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_sector_r,wd17xx_sector_w)
 	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE_LEGACY("wd177x", wd17xx_data_r,wd17xx_data_w)
-//  AM_RANGE(0xec00, 0xecef) AM_DEVREADWRITE_LEGACY("es5503", es5503_r, es5503_w)
+//  AM_RANGE(0xec00, 0xecef) AM_DEVREADWRITE("es5503", es5503_device, read, write)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("osrom", 0)
 ADDRESS_MAP_END
 
@@ -245,8 +236,7 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("es5503", ES5503, 7000000)
-	MCFG_SOUND_CONFIG(mirage_es5503_interface)
+	MCFG_ES5503_ADD("es5503", 7000000, mirage_doc_irq, mirage_adc_read)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -265,7 +255,7 @@ ROM_START( mirage )
 	ROM_REGION(0x1000, "osrom", 0)
 	ROM_LOAD( "mirage.bin",   0x0000, 0x1000, CRC(9fc7553c) SHA1(ec6ea5613eeafd21d8f3a7431a35a6ff16eed56d) )
 
-	ROM_REGION(0x20000, "ensoniq", ROMREGION_ERASE)
+	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE)
 ROM_END
 
 CONS( 1984, mirage, 0, 0, mirage, mirage, 0, "Ensoniq", "Mirage", GAME_NOT_WORKING )

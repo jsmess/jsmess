@@ -141,17 +141,10 @@ static PALETTE_INIT( apple2gs )
 	}
 }
 
-static READ8_DEVICE_HANDLER( apple2gs_adc_read )
+UINT8 apple2gs_adc_read(device_t *device)
 {
 	return 0x80;
 }
-
-static const es5503_interface apple2gs_es5503_interface =
-{
-	apple2gs_doc_irq,
-	apple2gs_adc_read,
-	NULL
-};
 
 static const floppy_interface apple2gs_floppy35_floppy_interface =
 {
@@ -228,8 +221,7 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_SOUND_CONFIG(apple2_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_ADD("es5503", ES5503, APPLE2GS_7M)
-	MCFG_SOUND_CONFIG(apple2gs_es5503_interface)
+	MCFG_ES5503_ADD("es5503", APPLE2GS_7M, apple2gs_doc_irq, apple2gs_adc_read)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -286,6 +278,8 @@ ROM_START(apple2gs)
 	ROM_REGION(0x40000,"maincpu",0)
 	ROM_LOAD("341-0737", 0x0000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27)) /* Needs verification; 341-0737: IIgs ROM03 FC-FD */
 	ROM_LOAD("341-0748", 0x20000, 0x20000, CRC(d4c50550) SHA1(2784cdd7ac7094b3e494409db3e72b4e6d2d9e81)) /* Needs verification; 341-0748: IIgs ROM03 FE-FF */
+
+    ROM_REGION(0x20000, "es5503", 0)
 ROM_END
 
 ROM_START(apple2gsr3p)
@@ -298,6 +292,8 @@ ROM_START(apple2gsr3p)
 	ROM_REGION(0x40000,"maincpu",0)
 	ROM_LOAD("341-0728", 0x0000, 0x20000, NO_DUMP) /* 341-0728: IIgs ROM03 prototype FC-FD */
 	ROM_LOAD("341-0729", 0x20000, 0x20000, NO_DUMP) /* 341-0729: IIgs ROM03 prototype FE-FF */
+
+    ROM_REGION(0x20000, "es5503", 0)
 ROM_END
 
 ROM_START(apple2gsr3lp)
@@ -310,6 +306,8 @@ ROM_START(apple2gsr3lp)
 	ROM_REGION(0x40000,"maincpu",0)
 	ROM_LOAD("341-0737", 0x0000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27)) /* 341-0737: IIgs ROM03 FC-FD */
 	ROM_LOAD("341-0749", 0x20000, 0x20000, NO_DUMP) /* 341-0749: unknown ?post? ROM03 IIgs prototype? FE-FF */
+
+    ROM_REGION(0x20000, "es5503", 0)
 ROM_END
 
 ROM_START(apple2gsr1)
@@ -321,6 +319,8 @@ ROM_START(apple2gsr1)
 
 	ROM_REGION(0x20000,"maincpu",0)
 	ROM_LOAD("342-0077-b", 0x0000, 0x20000, CRC(42f124b0) SHA1(e4fc7560b69d062cb2da5b1ffbe11cd1ca03cc37)) /* 342-0077-B: IIgs ROM01 */
+
+    ROM_REGION(0x20000, "es5503", 0)
 ROM_END
 
 ROM_START(apple2gsr0)
@@ -336,18 +336,13 @@ ROM_START(apple2gsr0)
 	ROM_LOAD("rom0b.bin", 0x8000,  0x8000, CRC(8baf2a79) SHA1(91beeb11827932fe10475252d8036a63a2edbb1c))
 	ROM_LOAD("rom0c.bin", 0x10000, 0x8000, CRC(94c32caa) SHA1(4806d50d676b06f5213b181693fc1585956b98bb))
 	ROM_LOAD("rom0d.bin", 0x18000, 0x8000, CRC(200a15b8) SHA1(0c2890bb169ead63369738bbd5f33b869f24c42a))
+
+    ROM_REGION(0x20000, "es5503", 0)
 ROM_END
 
-static DRIVER_INIT(apple2gs)
-{
-	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-	es5503_set_base(machine.device("es5503"), state->m_docram);
-	state->save_item(NAME(state->m_docram));
-}
-
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      COMPANY            FULLNAME */
-COMP( 1989, apple2gs, 0,        apple2, apple2gs, apple2gs,   apple2gs, "Apple Computer", "Apple IIgs (ROM03)", 0 )
-COMP( 198?, apple2gsr3p, apple2gs, 0,   apple2gs, apple2gs,   apple2gs, "Apple Computer", "Apple IIgs (ROM03 prototype)", GAME_NOT_WORKING )
-COMP( 1989, apple2gsr3lp, apple2gs, 0,  apple2gs, apple2gs,   apple2gs, "Apple Computer", "Apple IIgs (ROM03 late prototype?)", GAME_NOT_WORKING )
-COMP( 1987, apple2gsr1, apple2gs, 0,    apple2gsr1, apple2gs,   apple2gs, "Apple Computer", "Apple IIgs (ROM01)", 0 )
-COMP( 1986, apple2gsr0, apple2gs, 0,    apple2gsr1, apple2gs,   apple2gs, "Apple Computer", "Apple IIgs (ROM00)", 0 )
+COMP( 1989, apple2gs, 0,        apple2, apple2gs, apple2gs,   0, "Apple Computer", "Apple IIgs (ROM03)", 0 )
+COMP( 198?, apple2gsr3p, apple2gs, 0,   apple2gs, apple2gs,   0, "Apple Computer", "Apple IIgs (ROM03 prototype)", GAME_NOT_WORKING )
+COMP( 1989, apple2gsr3lp, apple2gs, 0,  apple2gs, apple2gs,   0, "Apple Computer", "Apple IIgs (ROM03 late prototype?)", GAME_NOT_WORKING )
+COMP( 1987, apple2gsr1, apple2gs, 0,    apple2gsr1, apple2gs, 0, "Apple Computer", "Apple IIgs (ROM01)", 0 )
+COMP( 1986, apple2gsr0, apple2gs, 0,    apple2gsr1, apple2gs, 0, "Apple Computer", "Apple IIgs (ROM00)", 0 )
