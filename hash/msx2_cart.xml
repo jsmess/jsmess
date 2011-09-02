@@ -1188,6 +1188,106 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="stramars">
+		<description>Strategic Mars</description>
+		<year>1989</year>
+		<publisher>db-Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M016S" />
+			<feature name="mapper" value="LZ93A13-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh230949" size="131072" crc="4a3abb65" sha1="dc56cff1211bacd94f59e188e44a58d6f40a0c26" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<!- see http://msx.jpn.org/tagoo/s_check.cgi?LINE=1026 (disk version of this software?) ->
+	<software name="">
+		<!- ミケランジェロⅡ ->
+		<description>Michelangelo 2</description>
+		<year>1987</year>
+		<publisher></publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="1M-8KB" />
+			<feature name="mapper" value="NEOS MR6401" />
+			<dataarea name="rom" size="131072">
+				<rom name="rp231024d" size="131072" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+	<software name="mississi">
+		<!-- ミシシッピー殺人事件 -->
+		<description>Mississippi Satsujinjiken</description>
+		<year>1987</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M008S" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh2310aa" size="131072" crc="3f69a464" sha1="d53a8efefe3714269538a91e5256c2938fe13239" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ikkoku">
+		<!-- めぞん一刻 -->
+		<description>Maison Ikkoku</description>
+		<year>1987</year>
+		<publisher>Micro Cabin</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA6228" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh5320z1" size="262144" crc="f4d127c0" sha1="ee501fde62b25ddd1c82798ee1b233b8813e717b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ikkokuf">
+		<!-- めぞん一刻 完結篇 -->
+		<description>Maison Ikkoku Final</description>
+		<year>1988</year>
+		<publisher>Micro Cabin</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh534082" size="524288" crc="94191aae" sha1="55fb4e3d3a762b613b635ee9745d92f0f3711272" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moeronet">
+		<!-- 燃えろ！！熱闘野球’８８ -->
+		<description>Moero! Nettou Yakyuu'88</description>
+		<year>1988</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="JX-16" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="d23c2001c" size="262144" crc="68745c64" sha1="1cbd5c7849f97dea1e3375a842f784ff9283310c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monmonmo">
+		<!-- ンモンモンスター -->
+		<description>Mon Mon Monster</description>
+		<year>1989</year>
+		<publisher>Hot-B</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="IS-02-030-0" />
+			<feature name="mapper" value="BS6202" />
+			<dataarea name="rom" size="131072">
+				<rom name="monmonmonster.bin" size="131072" crc="ebccb796" sha1="ab087d04eb5c2c8894758c7cee32ccafd80989a7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>
