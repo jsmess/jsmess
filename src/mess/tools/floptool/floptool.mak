@@ -33,6 +33,6 @@ FLOPTOOL_OBJS = \
 # rules to build the floptool executable
 #-------------------------------------------------
 
-$(FLOPTOOL): $(FLOPTOOL_OBJS) $(FORMATS_LIB) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE)
+$(FLOPTOOL): $(FLOPTOOL_OBJS) $(FORMATS_LIB) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBEMU) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
