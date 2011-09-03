@@ -48,7 +48,7 @@ The source code there implies that *maybe* ff7e and ff7f are also open bus.
 #include "includes/aim65_40.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
-#include "machine/6551.h"
+#include "machine/6551acia.h"
 #include "aim65_40.lh"
 
 /***************************************************************************

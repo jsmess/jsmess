@@ -13,7 +13,7 @@
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
-#include "machine/6551.h"
+#include "machine/6551acia.h"
 #include "machine/6850acia.h"
 
 #define PIA6821_TAG "pia6821"

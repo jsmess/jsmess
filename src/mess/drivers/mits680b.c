@@ -23,7 +23,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "machine/6551.h"
+#include "machine/6551acia.h"
 #include "machine/terminal.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()

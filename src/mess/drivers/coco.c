@@ -32,7 +32,7 @@
 #include "machine/6883sam.h"
 #include "includes/coco.h"
 #include "machine/wd17xx.h"
-#include "machine/6551.h"
+#include "machine/6551acia.h"
 #include "formats/coco_dsk.h"
 #include "formats/coco_cas.h"
 #include "imagedev/printer.h"

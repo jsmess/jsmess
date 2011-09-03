@@ -23,7 +23,7 @@
 #include "machine/wd17xx.h"
 #include "machine/6522via.h"
 #include "machine/applefdc.h"
-#include "machine/6551.h"
+#include "machine/6551acia.h"
 #include "machine/ctronics.h"
 #include "imagedev/cassette.h"
 #include "sound/ay8910.h"

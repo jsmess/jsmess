@@ -16,7 +16,7 @@
 #include "includes/apple2.h"
 #include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
-#include "machine/6551.h"
+#include "machine/6551acia.h"
 #include "machine/6522via.h"
 #include "machine/ram.h"
 #include "devices/appldriv.h"

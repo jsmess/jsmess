@@ -518,7 +518,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_AUDIO)/mea8000.o		\
 	$(MESS_AUDIO)/spchroms.o	\
 	$(MESS_DEVICES)/microdrv.o	\
-	$(MESS_MACHINE)/6551.o		\
 	$(MESS_MACHINE)/74145.o		\
 	$(MESS_MACHINE)/8530scc.o	\
 	$(MESS_MACHINE)/at45dbxx.o	\
@@ -527,7 +526,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/hd63450.o	\
 	$(MESS_MACHINE)/i82371ab.o	\
 	$(MESS_MACHINE)/i82439tx.o	\
-	$(MESS_MACHINE)/i8251.o		\
 	$(MESS_MACHINE)/i8271.o		\
 	$(MESS_MACHINE)/ieee488.o	\
 	$(MESS_MACHINE)/ieeestub.o	\

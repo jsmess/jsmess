@@ -5,7 +5,7 @@
 
 #include "emu.h"
 #include "machine/cococart.h"
-#include "machine/6551.h"
+#include "machine/6551acia.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

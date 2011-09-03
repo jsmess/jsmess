@@ -19,7 +19,7 @@
 /* Components */
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
-#include "machine/6551.h"
+#include "machine/6551acia.h"
 #include "sound/ay8910.h"
 
 /* Devices */

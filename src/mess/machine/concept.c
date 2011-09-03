@@ -8,7 +8,7 @@
 #include "includes/concept.h"
 #include "machine/6522via.h"
 #include "machine/mm58274c.h"	/* mm58274 seems to be compatible with mm58174 */
-//#include "machine/6551.h"
+//#include "machine/6551acia.h"
 #include "machine/wd17xx.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/corvushd.h"
