@@ -13,7 +13,6 @@
 #include <assert.h>
 #include <limits.h>
 
-#include "emu.h"
 #include "osdcore.h"
 #include "ioprocs.h"
 #include "flopimg.h"
@@ -972,10 +971,10 @@ void floppy_image::ensure_alloc(UINT16 track, UINT8 side)
 	int idx = (track << 1) + side;
 	if(track_size[idx] > track_alloc_size[idx]) {
 		UINT32 new_size = track_size[idx]*11/10;
-		UINT32 *new_array = global_alloc_array(UINT32, new_size);
+		UINT32 *new_array = (UINT32*)malloc(sizeof(UINT32)*new_size);
 		if(track_alloc_size[idx]) {
 			memcpy(new_array, cell_data[idx], track_alloc_size[idx]*4);
-			global_free(cell_data[idx]);
+			free(cell_data[idx]);
 		}
 		cell_data[idx] = new_array;
 		track_alloc_size[idx] = new_size;
@@ -1199,8 +1198,8 @@ void floppy_image_format_t::fixup_crcs(UINT8 *buffer, gen_crc_info *crcs)
 
 void floppy_image_format_t::generate_track(const desc_e *desc, UINT8 track, UINT8 head, const desc_s *sect, int sect_count, int track_size, floppy_image *image)
 {
-	UINT8 *buffer = global_alloc_array_clear(UINT8, (track_size+7)/8);
-
+	UINT8 *buffer = (UINT8*)malloc((track_size+7)/8);
+	memset(buffer,0,(track_size+7)/8);
 	gen_crc_info crcs[MAX_CRC_COUNT];
 	collect_crcs(desc, crcs);
 
@@ -1335,7 +1334,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, UINT8 track, UINT
 	fixup_crcs(buffer, crcs);
 
 	generate_track_from_bitstream(track, head, buffer, track_size, image);
-	global_free(buffer);
+	free(buffer);
 }
 
 void floppy_image_format_t::normalize_times(UINT32 *buffer, int bitlen)
