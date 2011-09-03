@@ -236,6 +236,8 @@ READ8_MEMBER(towns_state::towns_system_r)
 			//logerror("SYS: (0x26) timer read\n");
 			m_ftimer -= 0x13;
 			return m_ftimer;
+		case 0x07:
+			return m_ftimer >> 8;
 		case 0x08:
 			//logerror("SYS: (0x28) NMI mask read\n");
 			return m_nmi_mask & 0x01;
@@ -292,10 +294,55 @@ WRITE8_MEMBER(towns_state::towns_system_w)
 	}
 }
 
+WRITE8_MEMBER(towns_state::towns_intervaltimer2_w)
+{
+	switch(offset)
+	{
+	case 0x00:
+		m_intervaltimer2_irqmask = data & 0x80;
+		break;
+	case 0x02:
+		m_intervaltimer2_period = (m_intervaltimer2_period & 0xff00) | data;
+		popmessage("Interval Timer 2 period changed to %04x",m_intervaltimer2_period);
+		break;
+	case 0x03:
+		m_intervaltimer2_period = (data << 8) | (m_intervaltimer2_period & 0x00ff);
+		popmessage("Interval Timer 2 period changed to %04x",m_intervaltimer2_period);
+		break;
+	}
+}
+
+READ8_MEMBER(towns_state::towns_intervaltimer2_r)
+{
+	UINT8 ret = 0;
+
+	switch(offset)
+	{
+	case 0x00:
+		if(m_intervaltimer2_timeout_flag != 0)
+			ret |= 0x40;
+		if(m_intervaltimer2_irqmask != 0)
+			ret |= 0x80;
+		m_intervaltimer2_timeout_flag = 0;  // flag reset on read
+		return ret;
+	case 0x02:
+		return m_intervaltimer2_period & 0x00ff;
+	case 0x03:
+		return m_intervaltimer2_period >> 8;
+	}
+	return 0xff;
+}
+
 static TIMER_CALLBACK(towns_freerun_inc)
 {
 	towns_state* state = machine.driver_data<towns_state>();
 	state->m_freerun_timer++;
+}
+
+static TIMER_CALLBACK(towns_intervaltimer2_timeout)
+{
+	towns_state* state = machine.driver_data<towns_state>();
+	state->m_intervaltimer2_timeout_flag = 1;
 }
 
 static TIMER_CALLBACK(towns_wait_end)
@@ -823,6 +870,70 @@ READ32_MEMBER(towns_state::towns_padport_r)
 			ret &= ~0x00100000;
 		if((extra2 & 0x20) && (m_towns_pad_mask & 0x08))
 			ret &= ~0x00200000;
+	}
+	if((porttype & 0x0f) == 0x04)  // 6-button joystick
+	{
+		extra1 = input_port_read(space.machine(),"6b_joy1_ex");
+
+		if(m_towns_pad_mask & 0x10)
+			ret |= 0x0000007f;
+		else
+			ret |= (input_port_read(space.machine(),"6b_joy1") & 0x0f) | 0x00000070;
+
+		if(!(m_towns_pad_mask & 0x10))
+		{
+			if(extra1 & 0x01) // Run button = left+right
+				ret &= ~0x0000000c;
+			if(extra1 & 0x02) // Select button = up+down
+				ret &= ~0x00000003;
+			if((extra1 & 0x04) && (m_towns_pad_mask & 0x01))
+				ret &= ~0x00000010;
+			if((extra1 & 0x08) && (m_towns_pad_mask & 0x02))
+				ret &= ~0x00000020;
+		}
+		if(m_towns_pad_mask & 0x10)
+		{
+			if(extra1 & 0x10)
+				ret &= ~0x00000008;
+			if(extra1 & 0x20)
+				ret &= ~0x00000004;
+			if(extra1 & 0x40)
+				ret &= ~0x00000002;
+			if(extra1 & 0x80)
+				ret &= ~0x00000001;
+		}
+	}
+	if((porttype & 0xf0) == 0x40)  // 6-button joystick
+	{
+		extra2 = input_port_read(space.machine(),"6b_joy2_ex");
+
+		if(m_towns_pad_mask & 0x20)
+			ret |= 0x007f0000;
+		else
+			ret |= ((input_port_read(space.machine(),"6b_joy2") & 0x0f) << 16) | 0x00700000;
+
+		if(!(m_towns_pad_mask & 0x10))
+		{
+			if(extra2 & 0x01)
+				ret &= ~0x000c0000;
+			if(extra2 & 0x02)
+				ret &= ~0x00030000;
+			if((extra2 & 0x10) && (m_towns_pad_mask & 0x04))
+				ret &= ~0x00100000;
+			if((extra2 & 0x20) && (m_towns_pad_mask & 0x08))
+				ret &= ~0x00200000;
+		}
+		if(m_towns_pad_mask & 0x20)
+		{
+			if(extra2 & 0x10)
+				ret &= ~0x00080000;
+			if(extra2 & 0x20)
+				ret &= ~0x00040000;
+			if(extra2 & 0x40)
+				ret &= ~0x00020000;
+			if(extra2 & 0x80)
+				ret &= ~0x00010000;
+		}
 	}
 	if((porttype & 0x0f) == 0x02)  // mouse
 	{
@@ -2006,6 +2117,7 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
   AM_RANGE(0x0020,0x0033) AM_READWRITE8(towns_system_r,towns_system_w, 0xffffffff)
   AM_RANGE(0x0040,0x0047) AM_DEVREADWRITE8_LEGACY("pit",pit8253_r, pit8253_w, 0x00ff00ff)
   AM_RANGE(0x0060,0x0063) AM_READWRITE8(towns_port60_r, towns_port60_w, 0x000000ff)
+  AM_RANGE(0x0068,0x006b) AM_READWRITE8(towns_intervaltimer2_r, towns_intervaltimer2_w, 0xffffffff)
   AM_RANGE(0x006c,0x006f) AM_READWRITE8(towns_sys6c_r,towns_sys6c_w, 0x000000ff)
   // 0x0070/0x0080 - CMOS RTC
   AM_RANGE(0x0070,0x0073) AM_READWRITE(towns_rtc_r,towns_rtc_w)
@@ -2056,10 +2168,12 @@ static INPUT_PORTS_START( towns )
     PORT_CONFSETTING(0x00, "Nothing")
     PORT_CONFSETTING(0x01, "Standard 2-button joystick")
     PORT_CONFSETTING(0x02, "Mouse")
+    PORT_CONFSETTING(0x04, "6-button joystick")
     PORT_CONFNAME(0xf0, 0x20, "Joystick port 2")
     PORT_CONFSETTING(0x00, "Nothing")
     PORT_CONFSETTING(0x10, "Standard 2-button joystick")
     PORT_CONFSETTING(0x20, "Mouse")
+    PORT_CONFSETTING(0x40, "6-button joystick")
 
 // Keyboard
   PORT_START( "key1" )  // scancodes 0x00-0x1f
@@ -2236,6 +2350,46 @@ static INPUT_PORTS_START( towns )
     PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
     PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
 
+    PORT_START("6b_joy1")
+      PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+
+    PORT_START("6b_joy1_ex")
+      PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("1P Run") PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("1P Select") PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000004,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000008,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+      PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x04)
+
+    PORT_START("6b_joy2")
+      PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+
+    PORT_START("6b_joy2_ex")
+      PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("2P Run") PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("2P Select") PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000004,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000008,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+      PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x40)
+
   PORT_START("mouse1")  // buttons
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
@@ -2277,6 +2431,7 @@ void towns_state::driver_start()
 	m_towns_mouse_timer = machine().scheduler().timer_alloc(FUNC(towns_mouse_timeout));
 	m_towns_wait_timer = machine().scheduler().timer_alloc(FUNC(towns_wait_end));
 	m_towns_freerun_counter = machine().scheduler().timer_alloc(FUNC(towns_freerun_inc));
+	m_towns_intervaltimer2 = machine().scheduler().timer_alloc(FUNC(towns_intervaltimer2_timeout));
 
 	// CD-ROM init
 	m_towns_cd.read_timer = machine().scheduler().timer_alloc(FUNC(towns_cdrom_read_byte), (void*)machine().device("dma_1"));
@@ -2331,10 +2486,14 @@ void towns_state::machine_reset()
 	m_towns_cd.status = 0x01;  // CDROM controller ready
 	m_towns_cd.buffer_ptr = -1;
 	m_towns_volume_select = 0;
+	m_intervaltimer2_period = 0;
+	m_intervaltimer2_timeout_flag = 0;
+	m_intervaltimer2_timeout_flag2 = 0;
+	m_intervaltimer2_irqmask = 1;  // masked
 	m_towns_rtc_timer->adjust(attotime::zero,0,attotime::from_hz(1));
 	m_towns_kb_timer->adjust(attotime::zero,0,attotime::from_msec(10));
 	/* Why does enabling this timer break the driver? */
-//  m_towns_freerun_counter->adjust(attotime::zero,0,attotime::from_usec(1));
+	//m_towns_freerun_counter->adjust(attotime::zero,0,attotime::from_usec(1));
 }
 
 static const struct pit8253_config towns_pit8253_config =
@@ -2600,6 +2759,8 @@ static MACHINE_CONFIG_START( marty, marty_state )
 MACHINE_CONFIG_END
 
 /* ROM definitions */
+/* It is unknown exactly what model these ROM were dumped from, but it is certainly a newer model, as it won't
+ * boot without the freerun timer, which was added in the FM-Towns II HG, HR, UG and later. */
 ROM_START( fmtowns )
   ROM_REGION32_LE( 0x280000, "user", 0)
 	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(112872ee) SHA1(57fd146478226f7f215caf63154c763a6d52165e) )
@@ -2609,6 +2770,7 @@ ROM_START( fmtowns )
 	ROM_LOAD("fmt_sys.rom",  0x200000, 0x040000, CRC(afe4ebcf) SHA1(4cd51de4fca9bd7a3d91d09ad636fa6b47a41df5) )
 ROM_END
 
+/* likely an older set, as it runs without needing the freerun timer.  Font ROM appears to be corrupt, though. */
 ROM_START( fmtownsa )
   ROM_REGION32_LE( 0x280000, "user", 0)
 	ROM_LOAD("fmt_dos_a.rom",  0x000000, 0x080000, CRC(22270e9f) SHA1(a7e97b25ff72b14121146137db8b45d6c66af2ae) )
