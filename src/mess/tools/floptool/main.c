@@ -20,11 +20,17 @@
 #include "formats/mfi_dsk.h"
 #include "formats/hxcmfm_dsk.h"
 #include "formats/ami_dsk.h"
+#include "formats/st_dsk.h"
 
 static floppy_format_type floppy_formats[] = {
 	FLOPPY_MFI_FORMAT,
+
 	FLOPPY_MFM_FORMAT,
 	FLOPPY_ADF_FORMAT,
+
+	FLOPPY_ST_FORMAT,
+	FLOPPY_MSA_FORMAT,
+
 	NULL
 };
 
