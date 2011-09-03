@@ -541,7 +541,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/mpc105.o	\
 	$(MESS_MACHINE)/mos6530.o	\
 	$(MESS_MACHINE)/s100.o		\
-	$(MESS_MACHINE)/serial.o	\
 	$(MESS_MACHINE)/upd765.o	\
 	$(MESS_MACHINE)/ncr5380.o	\
 	$(MESS_MACHINE)/pc_lpt.o	\

@@ -374,89 +374,6 @@ static void thom_set_caps_led ( running_machine &machine, int led )
 	output_set_value( "led0", led );
 }
 
-
-
-/* ------------ serial (not functionnal yet) ------------ */
-
-
-
-static serial_connection to7_io_line;
-
-static DEVICE_START( thom_serial_cc90323 )
-{
-	DEVICE_START_CALL(serial);
-	LOG(( "thom_serial_init: init CD 90-320 RS232 device\n" ));
-	serial_device_connect( device, &to7_io_line );
-	serial_device_setup( device, 2400, 7, 2, SERIAL_PARITY_NONE );
-	serial_device_set_transmit_state( device, 1 );
-}
-
-static DEVICE_START( thom_serial_rf57232 )
-{
-	//acia6551_device *acia = device->machine().device<acia6551_device>("acia");
-	DEVICE_START_CALL(serial);
-	LOG(( "thom_serial_init: init RF 57-232 RS232 device\n" ));
-	//acia->connect_to_serial_device(device);
-	serial_device_setup( device, 2400, 7, 2, SERIAL_PARITY_NONE );
-	serial_device_set_transmit_state( device, 1 );
-}
-
-static DEVICE_START( thom_serial_modem )
-{
-	DEVICE_START_CALL(serial);
-	LOG(( "thom_serial_init: init MODEM (MD 90-120) device\n" ));
-	serial_device_setup( device, 2400, 7, 2, SERIAL_PARITY_NONE );
-	serial_device_set_transmit_state( device, 1 );
-}
-
-static DEVICE_IMAGE_LOAD( thom_serial )
-{
-	if ( device_load_serial( image ) != IMAGE_INIT_PASS )
-	{
-		logerror( "thom_serial_load: could not load serial image in device\n");
-		return IMAGE_INIT_FAIL;
-	}
-
-	return IMAGE_INIT_PASS;
-}
-
-DEVICE_GET_INFO( thom_serial_cc90323 )
-{
-	switch ( state )
-	{
-		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( thom_serial_cc90323 );    break;
-		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( thom_serial );break;
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "CD 90-320 RS232");	                 break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                  break;
-		default:									DEVICE_GET_INFO_CALL(serial);	break;
-	}
-}
-
-DEVICE_GET_INFO( thom_serial_rf57232 )
-{
-	switch ( state )
-	{
-		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( thom_serial_rf57232 );    break;
-		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( thom_serial );break;
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "RF 57-232 RS232");	                 break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                  break;
-		default:									DEVICE_GET_INFO_CALL(serial);	break;
-	}
-}
-
-
-DEVICE_GET_INFO( thom_serial_modem )
-{
-	switch ( state )
-	{
-		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( thom_serial_modem );    break;
-		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( thom_serial );break;
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "MODEM (MD 90-120)");	                 break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                  break;
-		default:									DEVICE_GET_INFO_CALL(serial);	break;
-	}
-}
-
 /* ------------ 6850 defines ------------ */
 
 #define ACIA_6850_RDRF  0x01    /* Receive data register full */
@@ -789,38 +706,52 @@ static WRITE_LINE_DEVICE_HANDLER( to7_io_ack )
 	//LOG_IO (( "%f to7_io_ack: CENTRONICS new state $%02X (ack=%i)\n", machine.time().as_double(), data, ack ));
 }
 
+const device_type TO7_IO_LINE = &device_creator<to7_io_line_device>;
 
+//-------------------------------------------------
+//  to7_io_line_device - constructor
+//-------------------------------------------------
 
-static WRITE8_DEVICE_HANDLER ( to7_io_porta_out )
+to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, TO7_IO_LINE, "Serial source", tag, owner, clock),
+	  device_serial_interface(mconfig, *this)
+{
+}
+
+void to7_io_line_device::device_start()
+{
+}
+
+WRITE8_MEMBER( to7_io_line_device::porta_out )
 {
 	int tx  = data & 1;
 	int dtr = ( data & 2 ) ? 1 : 0;
 
-	LOG_IO(( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double(), tx, dtr ));
+	LOG_IO(( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  cpu_get_previouspc(machine().device("maincpu")), machine().time().as_double(), tx, dtr ));
 	if ( dtr )
-		to7_io_line.State |=  SERIAL_STATE_DTR;
+		m_connection_state |=  SERIAL_STATE_DTR;
 	else
-		to7_io_line.State &= ~SERIAL_STATE_DTR;
+		m_connection_state &= ~SERIAL_STATE_DTR;
 
-	set_out_data_bit( to7_io_line.State, tx );
-	serial_connection_out( device->machine(), &to7_io_line );
+	set_out_data_bit(tx);
+	serial_connection_out();
 }
 
 
 
-static READ8_DEVICE_HANDLER( to7_io_porta_in )
+READ8_MEMBER( to7_io_line_device::porta_in )
 {
-	device_t *printer = device->machine().device("centronics");
+	device_t *printer = machine().device("centronics");
 	int cts = 1;
-	int dsr = ( to7_io_line.input_state & SERIAL_STATE_DSR ) ? 0 : 1;
-	int rd  = get_in_data_bit( to7_io_line.input_state );
+	int dsr = ( m_input_state & SERIAL_STATE_DSR ) ? 0 : 1;
+	int rd  = get_in_data_bit();
 
-	if ( to7_io_mode(device->machine()) == TO7_IO_RS232 )
-		cts = to7_io_line.input_state & SERIAL_STATE_CTS ? 0 : 1;
+	if ( to7_io_mode(machine()) == TO7_IO_RS232 )
+		cts = m_input_state & SERIAL_STATE_CTS ? 0 : 1;
 	else
 		cts = !centronics_busy_r(printer);
 
-	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double(), to7_io_mode(device->machine()), cts, dsr, rd ));
+	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", cpu_get_previouspc(machine().device("maincpu")), machine().time().as_double(), to7_io_mode(machine()), cts, dsr, rd ));
 
 	return (dsr ? 0x20 : 0) | (cts ? 0x40 : 0) | (rd ? 0x80: 0);
 }
@@ -850,26 +781,24 @@ static WRITE8_DEVICE_HANDLER( to7_io_cb2_out )
 }
 
 
+void to7_io_line_device::input_callback(UINT8 state)
+{	
+	m_input_state = state;
 
-static void to7_io_in_cb ( running_machine &machine, int id, unsigned long state )
-{
-	/* our peer's state has changed */
-	to7_io_line.input_state = state;
-
-	LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", machine.time().as_double(), (state & SERIAL_STATE_CTS) ? 1 : 0, (state & SERIAL_STATE_DSR) ? 1 : 0, (int)get_in_data_bit( state ) ));
+	LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", machine().time().as_double(), (state & SERIAL_STATE_CTS) ? 1 : 0, (state & SERIAL_STATE_DSR) ? 1 : 0, (int)get_in_data_bit() ));
 }
 
 
 
 const pia6821_interface to7_pia6821_io =
 {
-	DEVCB_HANDLER(to7_io_porta_in),
+	DEVCB_DEVICE_MEMBER("to7_io", to7_io_line_device, porta_in),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(to7_io_porta_out),
+	DEVCB_DEVICE_MEMBER("to7_io", to7_io_line_device, porta_out),
 	DEVCB_HANDLER(to7_io_portb_out),
 	DEVCB_NULL,
 	DEVCB_HANDLER(to7_io_cb2_out),
@@ -887,30 +816,19 @@ const centronics_interface to7_centronics_config =
 };
 
 
-static void to7_io_reset( running_machine &machine )
+void to7_io_line_device::device_reset()
 {
-	pia6821_device *io_pia = machine.device<pia6821_device>(THOM_PIA_IO);
+	pia6821_device *io_pia = machine().device<pia6821_device>(THOM_PIA_IO);
 
 	LOG (( "to7_io_reset called\n" ));
 
 	io_pia->set_port_a_z_mask(0x03 );
-	to7_io_line.input_state = SERIAL_STATE_CTS;
-	to7_io_line.State &= ~SERIAL_STATE_DTR;
-	to7_io_line.State |=  SERIAL_STATE_RTS;  /* always ready to send */
-	set_out_data_bit( to7_io_line.State, 1 );
-	serial_connection_out( machine, &to7_io_line );
+	m_input_state = SERIAL_STATE_CTS;
+	m_connection_state &= ~SERIAL_STATE_DTR;
+	m_connection_state |=  SERIAL_STATE_RTS;  /* always ready to send */
+	set_out_data_bit(1);
+	serial_connection_out();
 }
-
-
-
-static void to7_io_init( running_machine &machine )
-{
-	LOG (( "to7_io_init: CC 90-323 serial / parallel extension\n" ));
-	serial_connection_init( machine, &to7_io_line );
-	serial_connection_set_in_callback( machine, &to7_io_line, to7_io_in_cb );
-}
-
-
 
 /* ------------ RF 57-932 RS232 extension ------------ */
 
@@ -1531,7 +1449,6 @@ MACHINE_RESET ( to7 )
 	thom_irq_reset(machine);
 	to7_game_reset(machine);
 	to7_floppy_reset(machine);
-	to7_io_reset(machine);
 	to7_modem_reset(machine);
 	to7_midi_reset(machine);
 
@@ -1566,7 +1483,6 @@ MACHINE_START ( to7 )
 	thom_irq_init(machine);
 	to7_game_init(machine);
 	to7_floppy_init(machine, mem + 0x20000);
-	to7_io_init(machine);
 	to7_modem_init(machine);
 	to7_midi_init(machine);
 
@@ -1788,7 +1704,6 @@ MACHINE_RESET( to770 )
 	thom_irq_reset(machine);
 	to7_game_reset(machine);
 	to7_floppy_reset(machine);
-	to7_io_reset(machine);
 	to7_modem_reset(machine);
 	to7_midi_reset(machine);
 
@@ -1824,7 +1739,6 @@ MACHINE_START ( to770 )
 	thom_irq_init(machine);
 	to7_game_init(machine);
 	to7_floppy_init( machine, mem + 0x20000 );
-	to7_io_init(machine);
 	to7_modem_init(machine);
 	to7_midi_init(machine);
 
@@ -2163,7 +2077,6 @@ MACHINE_RESET( mo5 )
 	sys_pia->set_port_a_z_mask(0x5f );
 	to7_game_reset(machine);
 	to7_floppy_reset(machine);
-	to7_io_reset(machine);
 	to7_modem_reset(machine);
 	to7_midi_reset(machine);
 	mo5_init_timer(machine);
@@ -2198,7 +2111,6 @@ MACHINE_START ( mo5 )
 	thom_irq_init(machine);
 	to7_game_init(machine);
 	to7_floppy_init( machine, mem + 0x20000 );
-	to7_io_init(machine);
 	to7_modem_init(machine);
 	to7_midi_init(machine);
 	mo5_periodic_timer = machine.scheduler().timer_alloc(FUNC(mo5_periodic_cb));
