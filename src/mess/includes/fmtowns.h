@@ -124,9 +124,14 @@ class towns_state : public driver_device
 	device_t* m_hd4;
 	device_t* m_ram;
 
-	UINT8 m_ftimer;
+	UINT16 m_ftimer;
 	UINT16 m_freerun_timer;
 	emu_timer* m_towns_freerun_counter;
+	UINT16 m_intervaltimer2_period;
+	UINT8 m_intervaltimer2_irqmask;
+	UINT8 m_intervaltimer2_timeout_flag;
+	UINT8 m_intervaltimer2_timeout_flag2;
+	emu_timer* m_towns_intervaltimer2;
 	UINT8 m_nmi_mask;
 	UINT8 m_compat_mode;
 	UINT8 m_towns_system_port;
@@ -187,6 +192,8 @@ class towns_state : public driver_device
 
 	DECLARE_READ8_MEMBER(towns_system_r);
 	DECLARE_WRITE8_MEMBER(towns_system_w);
+	DECLARE_READ8_MEMBER(towns_intervaltimer2_r);
+	DECLARE_WRITE8_MEMBER(towns_intervaltimer2_w);
 	DECLARE_READ8_MEMBER(towns_sys6c_r);
 	DECLARE_WRITE8_MEMBER(towns_sys6c_w);
 	DECLARE_READ8_MEMBER(towns_dma1_r);
