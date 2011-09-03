@@ -353,12 +353,10 @@ static READ8_HANDLER (konami_scc_bank5)
 {
 	if (offset & 0x80)
 	{
-#if 0
 		if ((offset & 0xff) >= 0xe0)
 		{
-			/* write 0xff to deformation register */
+			return k051649_test_r (space->machine().device("k051649"), offset & 0xff);
 		}
-#endif
 		return 0xff;
 	}
 	else
@@ -451,12 +449,10 @@ MSX_SLOT_WRITE(konami_scc)
 				k051649_keyonoff_w (k051649, 0, val);
 			}
 		}
-#if 0
 		else if (offset >= 0xe0)
 		{
-			/* deformation register */
+			k051649_test_w (k051649, offset, val);
 		}
-#endif
 	}
 	else if (addr >= 0xb000 && addr < 0xb800)
 	{
@@ -2215,12 +2211,10 @@ static  READ8_HANDLER (soundcartridge_scc)
 		/* read wave 5 */
 		return k051649_waveform_r (space->machine().device("k051649"), 0x80 + (reg & 0x1f));
 	}
-#if 0
 	else if (reg < 0xe0)
 	{
-		/* write 0xff to deformation register */
+		return k051649_test_r (space->machine().device("k051649"), reg);
 	}
-#endif
 
 	return 0xff;
 }
@@ -2240,14 +2234,12 @@ static  READ8_HANDLER (soundcartridge_sccp)
 
 	if (reg < 0xa0)
 	{
-		return k051649_waveform_r (space->machine().device("k051649"), reg);
+		return k052539_waveform_r (space->machine().device("k051649"), reg);
 	}
-#if 0
 	else if (reg >= 0xc0 && reg < 0xe0)
 	{
-		/* write 0xff to deformation register */
+		return k051649_test_r (space->machine().device("k051649"), reg);
 	}
-#endif
 
 	return 0xff;
 }
@@ -2375,12 +2367,10 @@ MSX_SLOT_WRITE(soundcartridge)
 					k051649_keyonoff_w (k051649, 0, val);
 				}
 			}
-#if 0
 			else if (offset < 0xe0)
 			{
-				/* write to deformation register */
+				k051649_test_w (k051649, offset, val);
 			}
-#endif
 		}
 	}
 	else if (addr < 0xbffe)
@@ -2427,12 +2417,10 @@ MSX_SLOT_WRITE(soundcartridge)
 					k051649_keyonoff_w (k051649, 0, val);
 				}
 			}
-#if 0
 			else if (offset < 0xe0)
 			{
-				/* write to deformation register */
+				k051649_test_w (k051649, offset, val);
 			}
-#endif
 		}
 	}
 	else if (addr < 0xc000)
