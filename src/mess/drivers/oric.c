@@ -28,7 +28,7 @@
 #include "formats/oric_tap.h"
 #include "sound/ay8910.h"
 #include "machine/6522via.h"
-#include "machine/6551.h"
+#include "machine/6551acia.h"
 #include "machine/wd17xx.h"
 
 /*

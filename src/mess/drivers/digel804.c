@@ -55,7 +55,7 @@
 #include "machine/terminal.h"
 #include "sound/speaker.h"
 #include "machine/roc10937.h"
-#include "machine/6551.h"
+#include "machine/6551acia.h"
 
 
 class digel804_state : public driver_device

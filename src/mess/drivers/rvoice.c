@@ -10,7 +10,7 @@
 /* Core includes */
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "machine/6551.h"
+#include "machine/6551acia.h"
 //#include "dectalk.lh" //  hack to avoid screenless system crash
 #include "machine/terminal.h"
 

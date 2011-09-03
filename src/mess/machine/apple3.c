@@ -21,7 +21,7 @@
 #include "machine/ay3600.h"
 #include "machine/applefdc.h"
 #include "devices/appldriv.h"
-#include "machine/6551.h"
+#include "machine/6551acia.h"
 #include "machine/ram.h"
 
 

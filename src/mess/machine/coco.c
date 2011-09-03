@@ -92,7 +92,7 @@ DAC and bitbanger values written should be reflected in the read.
 #include "includes/coco.h"
 #include "includes/cococart.h"
 #include "machine/6883sam.h"
-#include "machine/6551.h"
+#include "machine/6551acia.h"
 #include "video/coco6847.h"
 #include "formats/cocopak.h"
 #include "imagedev/bitbngr.h"
