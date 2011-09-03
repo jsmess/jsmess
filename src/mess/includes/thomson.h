@@ -19,7 +19,6 @@
 #include "audio/mea8000.h"
 #include "machine/ctronics.h"
 #include "imagedev/cartslot.h"
-#include "machine/serial.h"
 #include "imagedev/cassette.h"
 #include "machine/mc6843.h"
 #include "machine/mc6846.h"
@@ -365,5 +364,31 @@ WRITE8_HANDLER ( to8_data_hi_w );
 /* write to video memory page through cartridge addresses space */
 WRITE8_HANDLER ( to8_vcart_w );
 
+
+
+class to7_io_line_device :  public device_t,
+					  		public device_serial_interface
+{
+public:
+    // construction/destruction
+    to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual void input_callback(UINT8 state);
+	
+	/* read data register */
+	DECLARE_READ8_MEMBER(porta_in);
+	
+	/* write data register */
+	DECLARE_WRITE8_MEMBER(porta_out);	
+protected:
+    // device-level overrides
+    virtual void device_start();
+	virtual void device_reset();
+};
+
+extern const device_type TO7_IO_LINE;
+
+#define MCFG_TO7_IO_LINE_ADD(_tag)	\
+	MCFG_DEVICE_ADD((_tag), TO7_IO_LINE, 0)
 
 #endif /* _THOMSON_H_ */

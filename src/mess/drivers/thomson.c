@@ -73,9 +73,9 @@
 #include "machine/wd17xx.h"
 #include "machine/ctronics.h"
 #include "imagedev/flopdrv.h"
+#include "imagedev/serial.h"
 #include "formats/basicdsk.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 
 
 /**************************** common *******************************/
@@ -197,26 +197,6 @@ static INPUT_PORTS_START( thom_lightpen )
      PORT_CODE( MOUSECODE_BUTTON1 )
 
 INPUT_PORTS_END
-
-/* ------------ serial ------------ */
-
-DECLARE_LEGACY_IMAGE_DEVICE(THOM_SERIAL_CC90323, thom_serial_cc90323);
-DEFINE_LEGACY_IMAGE_DEVICE(THOM_SERIAL_CC90323, thom_serial_cc90323);
-
-#define MCFG_THOM_SERIAL_CC90323_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, THOM_SERIAL_CC90323, 0)
-
-DECLARE_LEGACY_IMAGE_DEVICE(THOM_SERIAL_RF57232, thom_serial_rf57232);
-DEFINE_LEGACY_IMAGE_DEVICE(THOM_SERIAL_RF57232, thom_serial_rf57232);
-
-#define MCFG_THOM_SERIAL_RF57232_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, THOM_SERIAL_RF57232, 0)
-
-DECLARE_LEGACY_IMAGE_DEVICE(THOM_SERIAL_MODEM, thom_serial_modem);
-DEFINE_LEGACY_IMAGE_DEVICE(THOM_SERIAL_MODEM, thom_serial_modem);
-
-#define MCFG_THOM_SERIAL_MODEM_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, THOM_SERIAL_MODEM, 0)
 
 /************************** T9000 / TO7 *******************************
 
@@ -618,6 +598,21 @@ const cassette_interface mo5_cassette_interface =
 	NULL
 };
 
+const serial_image_interface to7_cc90232_config =
+{
+	2400, 7, 2, SERIAL_PARITY_NONE, 1, "to7_io"
+};
+
+const serial_image_interface to7_rf57932_config =
+{
+	2400, 7, 2, SERIAL_PARITY_NONE, 1, "acia"
+};
+
+const serial_image_interface to7_modem_config =
+{
+	2400, 7, 2, SERIAL_PARITY_NONE, 1, NULL
+};
+
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_START( to7, driver_device )
@@ -682,6 +677,9 @@ static MACHINE_CONFIG_START( to7, driver_device )
 /* acia */
      MCFG_ACIA6551_ADD("acia")
 
+/* to7 serial io line */	 
+	 MCFG_TO7_IO_LINE_ADD("to7_io")
+
 /* modem */
      MCFG_ACIA6850_ADD( "acia6850", to7_modem )
 
@@ -696,9 +694,9 @@ static MACHINE_CONFIG_START( to7, driver_device )
 	MCFG_RAM_DEFAULT_SIZE("40K")
 	MCFG_RAM_EXTRA_OPTIONS("24K,48K")
 
-	MCFG_THOM_SERIAL_CC90323_ADD("cc90232")
-	MCFG_THOM_SERIAL_RF57232_ADD("rf57932")
-	MCFG_THOM_SERIAL_MODEM_ADD("modem")
+	MCFG_SERIAL_ADD("cc90232", to7_cc90232_config)
+	MCFG_SERIAL_ADD("rf57932", to7_rf57932_config)
+	MCFG_SERIAL_ADD("modem"  , to7_modem_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( t9000, to7 )
