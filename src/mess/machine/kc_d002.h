@@ -7,7 +7,7 @@
 #include "machine/kcexp.h"
 #include "machine/kc_ram.h"
 #include "machine/kc_rom.h"
-#include "machine/kc_d002.h"
+#include "machine/kc_d004.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

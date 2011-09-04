@@ -116,4 +116,5 @@ CPC_SSA1  // uses internal SP0256 ROM
 CPC_DKSPEECH  // uses internal SP0256 ROM
 CPC_MFACE2
 C64_XL80
+KC_D004
 

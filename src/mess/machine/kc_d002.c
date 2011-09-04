@@ -52,6 +52,7 @@ SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(kc_d002_exp)
 	SLOT_INTERFACE("d002", KC_D002)			// D002 Bus Driver
+	SLOT_INTERFACE("d004", KC_D004)			// D004 Floppy Disk Interface
 SLOT_INTERFACE_END
 
 WRITE_LINE_MEMBER(kc_d002_device::out_irq_w)
