@@ -4726,6 +4726,7 @@ ROM_START( m4clbcnt )
 
 	ROM_REGION( 0x10000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "con1_0.bin", 0x0000, 0x010000, CRC(2a758619) SHA1(77f993090b7d01901635c56fd9256f57d2371c6d) )
+	ROM_LOAD( "con1-1.bin", 0x0000, 0x010000, CRC(9fc1fefc) SHA1(5638c978687526858cbcb105bdb499dce2d234d3) )
 	ROM_LOAD( "conf.p1", 0x0000, 0x010000, CRC(7900cee0) SHA1(afcd77e5bc05a21b5eb7b26c66d94ce21f2ce501) )
 	ROM_LOAD( "cons.p1", 0x0000, 0x010000, CRC(afe71a40) SHA1(b0065e131eb8fcf7a2fd420f60e2174d927db450) )
 ROM_END
@@ -5015,6 +5016,7 @@ ROM_START( m4denmen )
 	ROM_LOAD( "dmts.p1", 0x0000, 0x010000, CRC(1a2776e3) SHA1(4d5029a5abafb3945d533ca5ca23b32c036fbb31) )
 	ROM_LOAD( "dmty.p1", 0x0000, 0x010000, CRC(dbfa78a5) SHA1(edd9a1f286f3aa56a919e9e0c0013e9940d139ac) )
 	ROM_LOAD( "dtm205", 0x0000, 0x010000, CRC(af76a460) SHA1(325021a92042c87e804bc17d6a7ccfda8bf865b8) )
+	ROM_LOAD( "denm2010", 0x0000, 0x010000, CRC(dbed5e48) SHA1(f374f01aeefca7cc19fc46c93e2ca7a10606b183) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "densnd1.hex", 0x000000, 0x080000, CRC(468a8ec7) SHA1(ec450cd86fda09bc94caf913e9ee7900cfeaa0f2) )
@@ -10283,6 +10285,11 @@ ROM_START( m4firice )
 	ROM_LOAD( "fi_sj_d_.e_0", 0x0000, 0x040000, CRC(61822af2) SHA1(8c721229a5ce9f491cbc638b8c5fa5c0c3032700) )
 	ROM_LOAD( "fi_sj_k_.e_0", 0x0000, 0x040000, CRC(2b57036b) SHA1(60cec130770ff643af1148f16a3afe3b102e94e2) )
 	ROM_LOAD( "fi_sja__.e_0", 0x0000, 0x040000, CRC(da5e0eff) SHA1(9f5ddce366786bdf898c9410be417c8028cebeb4) )
+
+	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "fire_ice.s1", 0x000000, 0x080000, CRC(74ee37c1) SHA1(bc9b419dd1fd1c66090f8946247e754c0267baa3) )
+	ROM_LOAD( "fire_ice.s2", 0x080000, 0x080000, CRC(b86bafeb) SHA1(ee237f601b970dc5be8096a4018cb6a3edac500f) )
+	ROM_LOAD( "fire_ice.s3", 0x100000, 0x080000, CRC(75f349b3) SHA1(1505bec7b69e1eabd679b70d95ae58fd264ca698) )
 ROM_END
 
 ROM_START( m4flshlt )
@@ -10357,6 +10364,7 @@ ROM_START( m4hvhel )
 	ROM_LOAD( "hh_sjs__.f_0", 0x0000, 0x040000, CRC(8854763d) SHA1(323bd76a014e52e3b12427998b0e2851463246c8) )
 	ROM_LOAD( "hh_vc___.g_0", 0x0000, 0x040000, CRC(db338fb7) SHA1(e7e92293374721e7360493e9ef189991dad0a1ee) )
 	ROM_LOAD( "hh_vc_d_.g_0", 0x0000, 0x040000, CRC(292468bd) SHA1(f9b19f57a49c1afd670c68b7acd85d4141adfce1) )
+	ROM_LOAD( "h_hell._pound5", 0x0000, 0x040000, CRC(cd59c0d0) SHA1(8caad9043a277fa39a3ad2d5ec3388c121e7f697) )
 
 	ROM_REGION( 0x180000, "msm6376", 0 )
 	ROM_LOAD( "hh___snd.1_1", 0x000000, 0x080000, CRC(afa7ba60) SHA1(25278046252e49364d4a51de79295b87baf6018e) )
@@ -12133,6 +12141,23 @@ ROM_START( m4frightc )
 	ROM_LOAD( "fnsnd3.bin", 0x100000, 0x080000, CRC(7ad8aecc) SHA1(8d10a27efbde41af8e04ebe7e8b4b921443bd560) )
 ROM_END
 
+ROM_START( m4frightd )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "frite.nig",  0x000000, 0x020000, CRC(57febdc0) SHA1(001b134be59367c332df4df14930045d9437111a) )
+	ROM_REGION( 0x180000, "msm6376", 0 )
+	ROM_LOAD( "fnsnd1.bin", 0x000000, 0x080000, CRC(0f7a6d97) SHA1(f812631af8eb46e188d457d567f42aecceb9e5d2) )
+	ROM_LOAD( "fnsnd2.bin", 0x080000, 0x080000, CRC(f2d0c27c) SHA1(4d18049a926898f7fbca54dd30519199fe39f8ea) )
+	ROM_LOAD( "fnsnd3.bin", 0x100000, 0x080000, CRC(7ad8aecc) SHA1(8d10a27efbde41af8e04ebe7e8b4b921443bd560) )
+ROM_END
+
+ROM_START( m4frighte )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "fr_ngt._pound5", 0x0000, 0x020000, CRC(3f2570c2) SHA1(98cc2438eb3fbf07481e2f68cac744e9e0a63e0b) )
+	ROM_REGION( 0x180000, "msm6376", 0 )
+	ROM_LOAD( "fnsnd1.bin", 0x000000, 0x080000, CRC(0f7a6d97) SHA1(f812631af8eb46e188d457d567f42aecceb9e5d2) )
+	ROM_LOAD( "fnsnd2.bin", 0x080000, 0x080000, CRC(f2d0c27c) SHA1(4d18049a926898f7fbca54dd30519199fe39f8ea) )
+	ROM_LOAD( "fnsnd3.bin", 0x100000, 0x080000, CRC(7ad8aecc) SHA1(8d10a27efbde41af8e04ebe7e8b4b921443bd560) )
+ROM_END
 
 ROM_START( m4frdrop )
 	ROM_REGION( 0x010000, "maincpu", 0 )
@@ -13607,6 +13632,19 @@ ROM_END
 
 
 
+ROM_START( m4surf )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "s_surfin._pound5", 0x0000, 0x020000, CRC(5f800636) SHA1(5b1789890eea44e5275e13f360876374d862935f) )
+
+	ROM_REGION( 0x40000, "altrevs", 0 )
+	ROM_LOAD( "s_surfin.upd", 0x0000, 0x020000, CRC(d0bef9cd) SHA1(9d53bfe8d928b190202bf747c0d7bb4cc0ae0efd) )
+	ROM_LOAD( "s_surfin._pound15", 0x0000, 0x020000, CRC(eabce7fd) SHA1(4bb2bbcc7d2917eca72385a21ab85d2d94a882ec) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "s_surf.sn1", 0x000000, 0x080000, CRC(f20a7d69) SHA1(7887230613b497dc71a60125dd1e265ebbc8eb23) )
+	ROM_LOAD( "s_surf.sn2", 0x080000, 0x080000, CRC(6c4a9074) SHA1(3b993120156677de893e5dc1e0c5d6e0285c5570) )
+ROM_END
+
 ROM_START( m4blkgd )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "blackgoldprg.bin", 0x0000, 0x080000, CRC(a04736b2) SHA1(9e060cc79e7922b38115f1412ed76f8c76deb917) )
@@ -13928,11 +13966,12 @@ ROM_START( m4jungjk )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "jjsoft_v550_1346_e7a3_lv.bin", 0x0000, 0x040000, CRC(c5315a0c) SHA1(5fd2115e033e0310ded3cfb39f31dc31b4d6bb5a) )
 
-	ROM_REGION( 0x40000, "altrevs", 0 )
+	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "70000102.bin", 0x0000, 0x040000, CRC(e5f03540) SHA1(9a14cb4eade9f6b1c6d6cf78306259dbc108f1a5) )
 	ROM_LOAD( "jj.bin", 0x0000, 0x040000, CRC(9e15c1b6) SHA1(9d4f3707f2cc2f0e8eb9051181bf8b368be3cbcf) )
 	ROM_LOAD( "jjlump_v400_19a3.bin", 0x0000, 0x040000, CRC(bc86c415) SHA1(6cd828578835dafe5d8d46810dc70d47abd4e8b2) )
 	ROM_LOAD( "70000092.bin", 0x0000, 0x040000, CRC(6530bc6c) SHA1(27819e760c84fbb40f354e87910fb15b3058e2a8) )
+	ROM_LOAD( "jungle.p1", 0x0000, 0x080000, CRC(ed0eb72c) SHA1(e32590cb3eb7d07fb210bee1be3c0ee01554cb47) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "71000080.lo.hex", 0x0000, 0x134084, CRC(f3866082) SHA1(f33f6d7e078d7072cc7c67672b3afa3e90e1f805) )
@@ -14314,6 +14353,13 @@ ROM_START( m4excaln )
 	ROM_LOAD( "exdsx_e_.6_0", 0x0000, 0x080000, CRC(f6421feb) SHA1(5b3cf7fa4bf9711097ed1c9d2d5689329d73193d) )
 	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 )
 ROM_END
+
+ROM_START( m4vfm )
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD( "v_f_mon", 0x0000, 0x020000, CRC(e4add02c) SHA1(5ef1bdd532ef0801b96ceae941f3da789039811c) )
+	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 )
+ROM_END
+
 
 
 
@@ -14791,10 +14837,12 @@ GAME(199?, m4crfirea, m4crfire,	mod4oki, mpu4, m4default, ROT0,   "Empire","Cros
 GAME(199?, m4eureka,  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","Eureka (Empire) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4eurekaa, m4eureka,	mod4oki, mpu4, m4default, ROT0,   "Empire","Eureka (Empire) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4eurekab, m4eureka,	mod4oki, mpu4, m4default, ROT0,   "Empire","Eureka (Empire) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4fright,  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4frighta, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4frightb, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4frightc, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, set 4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // bad dump
+GAME(199?, m4fright,  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, v4.1X)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4frighta, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, v4.1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4frightb, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, v4.1i)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4frightc, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, v?.?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND ) // bad dump
+GAME(199?, m4frightd, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, v3.3)",GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4frighte, m4fright,	mod4oki, mpu4, m4default, ROT0,   "Empire","Fright Night (Empire) (MPU4, v3.0)",GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4gamblr,  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","The Gambler (Empire) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4gamblra, m4gamblr, mod4oki, mpu4, m4default, ROT0,   "Empire","The Gambler (Empire) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4gamblrb, m4gamblr, mod4oki, mpu4, m4default, ROT0,   "Empire","The Gambler (Empire) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
@@ -14944,6 +14992,7 @@ GAME(199?, m4bangina, m4bangin,	mod4oki, mpu4, m4default, ROT0,   "Global","Bang
 GAME(199?, m4banginb, m4bangin,	mod4oki, mpu4, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4wwc,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4screw,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4vfm,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Value For Money (Global) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigben,  0,		mod4oki, mpu4, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigbena, m4bigben,	mod4oki, mpu4, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigbenb, m4bigben,	mod4oki, mpu4, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
@@ -15029,7 +15078,7 @@ GAME(199?, m4ndup	,0			,mod4oki	,mpu4		,m4default,	ROT0,   "Crystal","Nudge Doub
 //SWP
 GAMEL(1989?,  m4conn4,        0, mod2    ,   connect4,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
 
-
+GAME(199?, m4surf, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Gemini","Super Surfin' (Gemini) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4blkgd, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Gemini","Black Gold (Gemini) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4excam, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Mdm","Excalibur (Mdm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4front, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Mdm","Final Frontier (Mdm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )

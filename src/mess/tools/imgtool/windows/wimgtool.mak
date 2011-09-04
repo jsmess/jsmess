@@ -57,6 +57,6 @@ $(WIMGTOOLOBJ)/%.res: $(WIMGTOOLSRC)/%.rc | $(OSPREBUILD)
 	@echo Compiling resources $<...
 	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir $(WIMGTOOLSRC) -o $@ -i $<
 
-$(WIMGTOOL): $(VERSIONOBJ) $(WIMGTOOL_OBJS) $(LIBIMGTOOL) $(LIBUTIL) $(EXPAT) $(ZLIB) $(FORMATS_LIB) $(LIBOCORE_NOMAIN)
+$(WIMGTOOL): $(VERSIONOBJ) $(WIMGTOOL_OBJS) $(LIBIMGTOOL) $(FORMATS_LIB) $(LIBEMU) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE_NOMAIN)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS_WIN) -municode -mwindows $^ $(LIBS_WIN) -o $@

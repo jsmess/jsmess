@@ -838,6 +838,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/bottom9.o $(VIDEO)/bottom9.o \
 	$(DRIVERS)/chqflag.o $(VIDEO)/chqflag.o \
 	$(DRIVERS)/circusc.o $(VIDEO)/circusc.o \
+    $(DRIVERS)/cobra.o \
 	$(DRIVERS)/combatsc.o $(VIDEO)/combatsc.o \
 	$(DRIVERS)/contra.o $(VIDEO)/contra.o \
 	$(DRIVERS)/crimfght.o $(VIDEO)/crimfght.o \
@@ -1587,6 +1588,7 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/hankin.o  \
 	$(DRIVERS)/icecold.o  \
 	$(DRIVERS)/inder.o  \
+	$(DRIVERS)/jeutel.o  \
 	$(DRIVERS)/jp.o  \
 	$(DRIVERS)/jvh.o  \
 	$(DRIVERS)/kissproto.o  \
@@ -1613,6 +1615,7 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/s8.o  \
 	$(DRIVERS)/s9.o  \
 	$(DRIVERS)/sleic.o  \
+	$(DRIVERS)/spectra.o  \
 	$(DRIVERS)/spinb.o  \
 	$(DRIVERS)/st_mp100.o  \
 	$(DRIVERS)/st_mp200.o  \
@@ -1692,6 +1695,9 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/dwarfd.o \
 	$(DRIVERS)/dynadice.o \
 	$(DRIVERS)/ecoinfr.o \
+	$(DRIVERS)/ecoinf1.o \
+	$(DRIVERS)/ecoinf2.o \
+	$(DRIVERS)/ecoinf3.o \
 	$(DRIVERS)/epos.o $(VIDEO)/epos.o \
 	$(DRIVERS)/esd16.o $(VIDEO)/esd16.o \
 	$(DRIVERS)/esh.o \
@@ -1825,6 +1831,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/trvquest.o \
 	$(DRIVERS)/ttchamp.o \
 	$(DRIVERS)/tugboat.o \
+	$(DRIVERS)/unkfr.o \
 	$(DRIVERS)/unkpcp.o \
 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
 	$(DRIVERS)/vamphalf.o \

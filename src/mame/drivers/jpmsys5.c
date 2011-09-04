@@ -1877,13 +1877,6 @@ ROM_START( j5slvreea )
 	J5SLVREE_SOUND
 ROM_END
 
-ROM_START( j5slvreeb )
-	ROM_REGION( 0x300000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "silver_137501.b8", 0x000000, 0x010000, CRC(e84d6437) SHA1(565b625ddb0693cd59ca1b1e07cd25ff1cb5c8f6) ) // 0x81 = FD
-	ROM_LOAD16_BYTE( "silver_137502.b8", 0x000001, 0x010000, CRC(e7db2018) SHA1(163fd4e58da0a224e7a93619621efa4390960bc2) ) // == silver_133002.b8
-	J5SLVREE_SOUND
-ROM_END
-
 
 #define J5SLVSTR_SOUND \
 	ROM_REGION( 0x80000, "upd7759", 0 ) \
@@ -2290,6 +2283,16 @@ ROM_START( j5sizl )
 	ROM_LOAD16_BYTE( "sizzling_s_1a4.bin", 0x10001, 0x008000, CRC(acb7c535) SHA1(78a1fbc05f26be1cb85ed4a75d0fe91f86776557) )
 ROM_END
 
+ROM_START( j5hilos )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "hihosilver1.1.bin", 0x00000, 0x008000, CRC(e8b5532d) SHA1(45a62028649cde884f313cfabadee994e13f1ea3) )
+	ROM_LOAD16_BYTE( "hihosilver1.2.bin", 0x00001, 0x008000, CRC(8cffe4ac) SHA1(c81ea16fca08f6f2daa8ff629a0f53e7a641c792) )
+	ROM_LOAD16_BYTE( "hihosilver1.3.bin", 0x10000, 0x008000, CRC(ea18c31f) SHA1(a6ac9e2e70cb156e453821723f3eed23b4ade3c4) )
+	ROM_LOAD16_BYTE( "hihosilver1.4.bin", 0x10001, 0x008000, NO_DUMP ) // seems to be missing
+ROM_END
+
+
+
 
 
 /* Video based titles */
@@ -2437,7 +2440,6 @@ GAME( 199?, j5roulclb	, j5roulcl	, jpmsys5, popeye, 0, ROT0, "JPM", "Roulette Cl
 GAME( 199?, j5roulclc	, j5roulcl	, jpmsys5, popeye, 0, ROT0, "JPM", "Roulette Club (Jpm) (SYSTEM5, set 4)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5slvree	, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Silver Reels (Jpm) (SYSTEM5, set 1)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5slvreea	, j5slvree	, jpmsys5, popeye, 0, ROT0, "JPM", "Silver Reels (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
-GAME( 199?, j5slvreeb	, j5slvree	, jpmsys5, popeye, 0, ROT0, "JPM", "Silver Reels (Jpm) (SYSTEM5, set 3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5slvstr	, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Silver Streak (Jpm) (SYSTEM5, set 1)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5slvstra	, j5slvstr	, jpmsys5, popeye, 0, ROT0, "JPM", "Silver Streak (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5slvstrb	, j5slvstr	, jpmsys5, popeye, 0, ROT0, "JPM", "Silver Streak (Jpm) (SYSTEM5, set 3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
@@ -2465,6 +2467,7 @@ GAME( 199?, j5nudfic	, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Nudge Fiction (Jp
 GAME( 199?, j5revo		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Revolver (Jpm) (SYSTEM5, set 1)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5revoa		, j5revo	, jpmsys5, popeye, 0, ROT0, "JPM", "Revolver (Jpm) (SYSTEM5, set 2)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 GAME( 199?, j5sizl		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Sizzling (Jpm) (SYSTEM5)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
+GAME( 199?, j5hilos		, 0			, jpmsys5, popeye, 0, ROT0, "JPM", "Hi Lo Silver (Jpm) (SYSTEM5)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND )
 
 
 

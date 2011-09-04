@@ -256,6 +256,9 @@ static WRITE16_HANDLER( lineram_w )
 
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 		state->m_line_ram[offset] = data;
+
+	//if(offset == 0x3fff)
+	//	printf("LineRAM go %d\n",(int)space->machine().primary_screen->frame_number());
 }
 
 static READ16_HANDLER( dspram_r )
@@ -305,8 +308,10 @@ static WRITE16_HANDLER( airsys_gradram_w )
 	taitoair_state *state = space->machine().driver_data<taitoair_state>();
 	UINT32 pen;
 	int r,g,b;
+	//int pal_r,pal_g,pal_b;
 
 	COMBINE_DATA(&state->m_gradram[offset]);
+	offset &= 0x1fff;
 
 	pen = (state->m_gradram[offset])|(state->m_gradram[(offset+0x2000)]<<16);
 	/* TODO: correct? */
@@ -317,6 +322,15 @@ static WRITE16_HANDLER( airsys_gradram_w )
 	r = (r << 1) | (r & 1);
 	g = (g << 1) | (g & 1);
 	b = (b << 1) | (b & 1);
+
+	/* TODO: I'm sure that normal paletteram and gradiation ram mixes in some way ... */
+	//pal_r = ((state->m_paletteram[(offset >> 7) + 0x300] & 0x000f) >> 0) * 0x11;
+	//pal_g = ((state->m_paletteram[(offset >> 7) + 0x300] & 0x01e0) >> 5) * 0x11;
+	//pal_b = ((state->m_paletteram[(offset >> 7) + 0x300] & 0x7c00) >> 10) * 0x11;
+
+	//if(r == 0) { r = (pal_r); }
+	//if(g == 0) { g = (pal_g); }
+	//if(b == 0) { b = (pal_b); }
 
 	palette_set_color_rgb(space->machine(), offset+0x2000, r, g, b);
 }
@@ -341,7 +355,10 @@ static READ16_HANDLER( stick_input_r )
 			return input_port_read(space->machine(), STICK2_PORT_TAG);
 
 		case 0x02:	/* "counter 1" hi */
-			return (input_port_read(space->machine(), STICK1_PORT_TAG) & 0xff00) >> 8;
+			if(input_port_read(space->machine(), STICK1_PORT_TAG) & 0x80)
+				return 0xff;
+
+			return 0;
 
 		case 0x03:	/* "counter 2" hi */
 			return (input_port_read(space->machine(), STICK2_PORT_TAG) & 0xff00) >> 8;
@@ -392,6 +409,7 @@ static ADDRESS_MAP_START( airsys_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(airsys_gradram_w) AM_BASE_MEMBER(taitoair_state, m_gradram)           		/* "gradiation ram (0/1)" */
 	AM_RANGE(0x188000, 0x189fff) AM_MIRROR(0x2000) AM_RAM_WRITE(airsys_paletteram16_w) AM_BASE_MEMBER(taitoair_state, m_paletteram)
 	AM_RANGE(0x800000, 0x820fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_word_r, tc0080vco_word_w)	/* tilemaps, sprites */
+	AM_RANGE(0x906000, 0x906007) AM_RAM // DMA?
 	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_BASE_MEMBER(taitoair_state, m_line_ram)	/* "line ram" */
 	AM_RANGE(0x910000, 0x91ffff) AM_RAM	AM_BASE_MEMBER(taitoair_state, m_dsp_ram)	/* "dsp common ram" (TMS320C25) */
 	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE_MEMBER(taitoair_state, m_backregs)
@@ -420,12 +438,54 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /********************************** TMS32025 ********************************/
+
+/*
+Air Inferno:
+
+write to 0x3404 - almost always 0x00fd / 0xff38  (253, -200)
+write to 0x3408 /
+
+write to 0x341b - May not be numeric - it's weird.  stays stable, 
+                  then freaks out just before "quad: unknown value 0066"
+                  This function seems to break things up into different polygon
+                  'classes'
+
+write to 0x3418 - X value
+write to 0x3419 - Y value
+write to 0x341a - Z value
+read to 0x341b, puts data to internal RAM 0x380 - 0x384 - 0x388 - 0x38c
+
+checks 0x341c - if != to 0 then skip ... ?
+checks 0x341d - if == to 0 then skip ... ?
+
+write to 0x3405 ; X value
+write to 0x3409 ; Y value
+write to 0x3406 ; Z value
+write to 0x340a ; Z value
+read to 0x340b, puts to line RAM (y) with offset + 0x160
+read to 0x3407, puts to line RAM (x) with offset + 0x5d
+
+*/
+
 static ADDRESS_MAP_START( DSP_map_program, AS_PROGRAM, 16 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16 )
+	AM_RANGE(0x2003, 0x2003) AM_READNOP //bit 0 DMA status flag or vblank
 	AM_RANGE(0x3000, 0x3002) AM_WRITE(dsp_flags_w)
+	AM_RANGE(0x3404, 0x3404) AM_WRITE(dsp_frustum_left_w)
+	AM_RANGE(0x3405, 0x3405) AM_WRITE(dsp_x_eyecoord_w)
+	AM_RANGE(0x3406, 0x3406) AM_WRITE(dsp_z_eyecoord_w)
+//	AM_RANGE(0x3407, 0x3407) AM_READ(?)
+	AM_RANGE(0x3408, 0x3408) AM_WRITE(dsp_frustum_bottom_w)
+	AM_RANGE(0x3409, 0x3409) AM_WRITE(dsp_y_eyecoord_w)
+	AM_RANGE(0x340a, 0x340a) AM_WRITE(dsp_rasterize_w)      /* Just a (lame) guess */
+//	AM_RANGE(0x340b, 0x340b) AM_READ(dsp_projection_y_r)
+//	AM_RANGE(0x3418, 0x341a) AM_WRITE(dsp_sqrt_w)
+//	AM_RANGE(0x341b, 0x341b) AM_WRITE(dsp_sqrt_r)
+//	AM_RANGE(0x341c, 0x341c) AM_READ(dsp_sqrt_flags1_r)
+//	AM_RANGE(0x341d, 0x341d) AM_READ(dsp_sqrt_flags2_r)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(lineram_r, lineram_w)
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(dspram_r, dspram_w)
 ADDRESS_MAP_END
@@ -475,19 +535,14 @@ static INPUT_PORTS_START( topland )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // DMA status flag
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
 
-	/* The range of these sticks reflects the range test mode displays.
-       Eventually we want standard 0-0xff input range and a scale-up later
-       in the stick_r routines.  And fake DSW with self-centering option
-       to make keyboard control feasible! */
-
 	PORT_START(STICK1_PORT_TAG)
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0000,0xffff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1) PORT_REVERSE
+	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START(STICK2_PORT_TAG)
 	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0xf800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1)
@@ -540,18 +595,12 @@ static INPUT_PORTS_START( ainferno )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_PLAYER(1)	/* fire */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON6 ) PORT_PLAYER(1)	/* pedal r */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1)	/* pedal l */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // DMA status flag
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
 
-	/* The range of these sticks reflects the range test mode displays.
-       Eventually we want standard 0-0xff input range and a scale-up later
-       in the stick_r routines. And fake DSW with self-centering option
-       to make keyboard control feasible! */
-
-	/* TODO: these are mostly likely wrong (needs some working video to understand) */
 	PORT_START(STICK1_PORT_TAG)
 	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1) PORT_REVERSE
 
