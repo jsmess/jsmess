@@ -306,6 +306,15 @@ void kc_d004_device::io_write(offs_t offset, UINT8 data)
 
 READ8_MEMBER(kc_d004_device::hw_input_gate_r)
 {
+	/*
+
+        bit 7: DMA Request (DRQ from FDC)
+        bit 6: Interrupt (INT from FDC)
+        bit 5: Drive Ready
+        bit 4: Index pulse from disc
+
+    */
+
 	if (floppy_ready_r(m_floppy))
 		m_hw_input_gate |= 0x20;
 	else

@@ -11,7 +11,6 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "imagedev/snapquik.h"
-#include "machine/upd765.h"
 #include "machine/kcexp.h"
 #include "machine/kc_ram.h"
 #include "machine/kc_rom.h"
@@ -63,7 +62,6 @@ public:
 
 	int m_kc85_pio_data[2];
 	device_t *m_kc85_z80pio;
-	unsigned char m_kc85_disc_hw_input_gate;
 	emu_timer *m_cassette_timer;
 	int m_cassette_motor_state;
 	unsigned char m_ardy;
@@ -102,13 +100,11 @@ unsigned char *kc85_4_get_video_ram_base(running_machine &machine, int bank, int
 
 /*----------- defined in machine/kc.c -----------*/
 
-extern const upd765_interface kc_fdc_interface;
 QUICKLOAD_LOAD( kc );
 
 MACHINE_START( kc85 );
 MACHINE_RESET( kc85_3 );
 MACHINE_RESET( kc85_4 );
-MACHINE_RESET( kc85_4d );
 
 /* cassette */
 READ8_HANDLER(kc85_4_84_r);
@@ -126,42 +122,5 @@ extern const z80ctc_interface kc85_ctc_intf;
 
 READ8_HANDLER ( kc_expansion_io_read );
 WRITE8_HANDLER ( kc_expansion_io_write );
-
-/*** DISC INTERFACE **/
-
-/* IO_FLOPPY device */
-
-/* used to setup machine */
-
-#define KC_DISC_INTERFACE_PORT_R \
-	{0x0f0, 0x0f3, kc85_disc_interface_ram_r},
-
-#define KC_DISC_INTERFACE_PORT_W \
-	{0x0f0, 0x0f3, kc85_disc_interface_ram_w}, \
-	{0x0f4, 0x0f4, kc85_disc_interface_latch_w},
-
-#define KC_DISC_INTERFACE_ROM
-
-
-
-/* these are internal to the disc interface */
-
-/* disc hardware internal i/o */
-READ8_DEVICE_HANDLER(kc85_disk_hw_ctc_r);
-/* disc hardware internal i/o */
-WRITE8_DEVICE_HANDLER(kc85_disk_hw_ctc_w);
-/* 4-bit input latch: DMA Data Request, FDC Int, FDD Ready.. */
-READ8_HANDLER(kc85_disc_hw_input_gate_r);
-/* output port to set UPD765 terminal count input */
-WRITE8_HANDLER(kc85_disc_hw_terminal_count_w);
-
-/* these are used by the kc85 to control the disc interface */
-/* xxf4 - latch used to reset cpu in disc interface */
-WRITE8_HANDLER(kc85_disc_interface_latch_w);
-/* xxf0-xxf3 write to kc85 disc interface ram */
-WRITE8_HANDLER(kc85_disc_interface_ram_w);
-/* xxf0-xxf3 read from kc85 disc interface ram */
-READ8_HANDLER(kc85_disc_interface_ram_r);
-
 
 #endif /* KC_H_ */
