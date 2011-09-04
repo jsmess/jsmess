@@ -10,7 +10,6 @@
   Issues:
    Random draw list corruption in soul edge v2 & dunkmania.
    soul edge, dunk mania & prime goal ex try to access joypads/memory cards. It is unknown what they would do if they found one.
-   Pocket Racer can't enter service menus with proper C76 hookup, runs 60 FPS when it looks like it should be 30
 
 Known Dumps
 -----------
@@ -274,6 +273,7 @@ Notes:
 #include "machine/at28c16.h"
 #include "sound/c352.h"
 
+#define C76_SPEEDUP   ( 1 ) /* sound cpu idle skipping */
 #define VERBOSE_LEVEL ( 0 )
 
 class namcos11_state : public psx_state
@@ -570,7 +570,7 @@ static READ32_HANDLER( keycus_c443_r )
 		{
 			data = ( data & 0x0000ffff ) | 0x56580000;
 		}
-		if( ( data & 0xffff0000 ) == 0xa9880000 ) /* ptblank2a */
+		if( ( data & 0xffff0000 ) == 0xa9880000 ) /* ptblank2ua */
 		{
 			data = ( data & 0x0000ffff ) | 0xc4430000;
 		}
@@ -582,23 +582,6 @@ static READ32_HANDLER( keycus_c443_r )
 	}
 	verboselog( space->machine(), 1, "keycus_c443_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
-}
-
-void namcos11_vblank(namcos11_state *state, screen_device &screen, bool vblank_state)
-{
-	if( strcmp( screen.machine().system().name, "pocketrc" ) == 0 )
-	{
-		UINT32 *p_n_psxram = state->m_p_n_psxram;
-
-		if( p_n_psxram[ 0x12c74 / 4 ] == 0x1440fff9 )
-		{
-			p_n_psxram[ 0x12c74 / 4 ] = 0;
-		}
-		if( p_n_psxram[ 0x64694 / 4 ] == 0x1443000c )
-		{
-			p_n_psxram[ 0x64694 / 4 ] = 0;
-		}
-	}
 }
 
 INLINE void bankswitch_rom8( address_space *space, const char *bank, int n_data )
@@ -730,25 +713,6 @@ static WRITE16_HANDLER( c76_shared_w )
 	COMBINE_DATA(&share16[offset]);
 }
 
-static READ16_HANDLER( c76_speedup_r )
-{
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
-
-	if ((cpu_get_pc(&space->device()) == 0xc153) && (!(state->m_su_83 & 0xff00)))
-	{
-		device_spin_until_interrupt(&space->device());
-	}
-
-	return state->m_su_83;
-}
-
-static WRITE16_HANDLER( c76_speedup_w )
-{
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
-
-	COMBINE_DATA(&state->m_su_83);
-}
-
 static READ16_HANDLER( c76_inputs_r )
 {
 //  logerror("'c76' Read port %d @ %06X\n", offset, cpu_get_pc(&space->device()));
@@ -864,111 +828,146 @@ static INTERRUPT_GEN( c76_interrupt )
 	}
 }
 
-static const struct
+static READ16_HANDLER( c76_speedup_r )
 {
-	const char *s_name;
-	read32_space_func keycus_r;
-	const char *keycus_r_name;
-	int n_daughterboard;
-} namcos11_config_table[] =
-{
-	{ "tekken", FUNC_NULL, 32 },
-	{ "tekkenac", FUNC_NULL, 32 },
-	{ "tekkenab", FUNC_NULL, 32 },
-	{ "tekkenjbc", FUNC_NULL, 32 },
-	{ "tekken2", FUNC(keycus_c406_r), 32 },
-	{ "tekken2ub", FUNC(keycus_c406_r), 32 },
-	{ "tekken2ab", FUNC(keycus_c406_r), 32 },
-	{ "tekken2aa", FUNC(keycus_c406_r), 32 },
-	{ "souledge", FUNC(keycus_c409_r), 32 },
-	{ "souledgeuc", FUNC(keycus_c409_r), 32 },
-	{ "souledgeua", FUNC(keycus_c409_r), 32 },
-	{ "souledgeaa", FUNC(keycus_c409_r), 32 },
-	{ "souledgeja", FUNC(keycus_c409_r), 32 },
-	{ "dunkmnia", FUNC(keycus_c410_r), 32 },
-	{ "dunkmniajc", FUNC(keycus_c410_r), 32 },
-	{ "xevi3dg",  FUNC(keycus_c430_r), 32 },
-	{ "primglex", FUNC(keycus_c411_r), 32 },
-	{ "danceyes", FUNC(keycus_c431_r), 32 },
-	{ "pocketrc", FUNC(keycus_c432_r), 32 },
-	{ "starswep", FUNC(keycus_c442_r), 0 },
-	{ "myangel3", FUNC(keycus_c443_r), 64 },
-	{ "ptblank2ua",FUNC(keycus_c443_r), 64 },
-	{ NULL, NULL }
-};
+	namcos11_state *state = space->machine().driver_data<namcos11_state>();
 
-static DRIVER_INIT( namcos11 )
+	if ((cpu_get_pc(&space->device()) == 0xc153) && (!(state->m_su_83 & 0xff00)))
+	{
+		device_spin_until_interrupt(&space->device());
+	}
+
+	return state->m_su_83;
+}
+
+static WRITE16_HANDLER( c76_speedup_w )
+{
+	namcos11_state *state = space->machine().driver_data<namcos11_state>();
+
+	COMBINE_DATA(&state->m_su_83);
+}
+
+static void namcos11_init_common(running_machine &machine, int n_daughterboard, int c76_speedup)
 {
 	namcos11_state *state = machine.driver_data<namcos11_state>();
-	int n_game;
-
-	machine.device("c76")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(c76_speedup_r), FUNC(c76_speedup_w));
-
-	if( strcmp( machine.system().name, "pocketrc" ) == 0 )
-	{
-		machine.device("c76")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC0_L, FUNC(pocketrc_steer_r));
-		machine.device("c76")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC1_L, M37710_ADC1_L, FUNC(pocketrc_gas_r));
-	}
-
 	psx_driver_init(machine);
 
-	n_game = 0;
-	while( namcos11_config_table[ n_game ].s_name != NULL )
+	// C76 idle skipping, large speedboost
+	if (c76_speedup && C76_SPEEDUP)
 	{
-		if( strcmp( machine.system().name, namcos11_config_table[ n_game ].s_name ) == 0 )
-		{
-			if( namcos11_config_table[ n_game ].keycus_r != NULL )
-			{
-				machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, namcos11_config_table[ n_game ].keycus_r, namcos11_config_table[ n_game ].keycus_r_name );
-			}
-			if( namcos11_config_table[ n_game ].n_daughterboard != 0 )
-			{
-				int bank;
-				UINT32 len = machine.region( "user2" )->bytes();
-				UINT8 *rgn = machine.region( "user2" )->base();
-
-				machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f000000, 0x1f0fffff, "bank1" );
-				machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f100000, 0x1f1fffff, "bank2" );
-				machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f200000, 0x1f2fffff, "bank3" );
-				machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f300000, 0x1f3fffff, "bank4" );
-				machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f400000, 0x1f4fffff, "bank5" );
-				machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f500000, 0x1f5fffff, "bank6" );
-				machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f600000, 0x1f6fffff, "bank7" );
-				machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f700000, 0x1f7fffff, "bank8" );
-
-				for( bank = 0; bank < 8; bank++ )
-				{
-					memory_configure_bank(machine, bankname[bank], 0, len / ( 1024 * 1024 ), rgn, 1024 * 1024 );
-					memory_set_bank(machine, bankname[bank], 0 );
-				}
-
-				if( namcos11_config_table[ n_game ].n_daughterboard == 32 )
-				{
-					machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1fa10020, 0x1fa1002f, FUNC(bankswitch_rom32_w) );
-				}
-				if( namcos11_config_table[ n_game ].n_daughterboard == 64 )
-				{
-					state->m_n_bankoffset = 0;
-					machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f080000, 0x1f080003, FUNC(bankswitch_rom64_upper_w) );
-					machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x1fa10020, 0x1fa1002f);
-					machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1fa10020, 0x1fa1002f, FUNC(bankswitch_rom64_w) );
-					state->save_item( NAME(state->m_n_bankoffset) );
-				}
-			}
-			else
-			{
-				machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x1fa10020, 0x1fa1002f);
-			}
-			break;
-		}
-		n_game++;
+		state->save_item( NAME(state->m_su_83) );
+		machine.device("c76")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(c76_speedup_r), FUNC(c76_speedup_w));
 	}
 
-	if( strcmp( machine.system().name, "ptblank2ua" ) == 0 )
+	if (!n_daughterboard)
 	{
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f788000, 0x1f788003, FUNC(lightgun_w) );
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x1f780000, 0x1f78000f, FUNC(lightgun_r) );
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x1fa10020, 0x1fa1002f);
+		return;
 	}
+
+	// init banks
+	int bank;
+	UINT32 len = machine.region( "user2" )->bytes();
+	UINT8 *rgn = machine.region( "user2" )->base();
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f000000, 0x1f0fffff, "bank1" );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f100000, 0x1f1fffff, "bank2" );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f200000, 0x1f2fffff, "bank3" );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f300000, 0x1f3fffff, "bank4" );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f400000, 0x1f4fffff, "bank5" );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f500000, 0x1f5fffff, "bank6" );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f600000, 0x1f6fffff, "bank7" );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f700000, 0x1f7fffff, "bank8" );
+
+	for (bank = 0; bank < 8; bank++)
+	{
+		memory_configure_bank(machine, bankname[bank], 0, len / ( 1024 * 1024 ), rgn, 1024 * 1024 );
+		memory_set_bank(machine, bankname[bank], 0 );
+	}
+
+	if (n_daughterboard == 32)
+	{
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1fa10020, 0x1fa1002f, FUNC(bankswitch_rom32_w) );
+	}
+	if (n_daughterboard == 64)
+	{
+		state->m_n_bankoffset = 0;
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f080000, 0x1f080003, FUNC(bankswitch_rom64_upper_w) );
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x1fa10020, 0x1fa1002f);
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1fa10020, 0x1fa1002f, FUNC(bankswitch_rom64_w) );
+		state->save_item( NAME(state->m_n_bankoffset) );
+	}
+}
+
+static DRIVER_INIT( tekken )
+{
+	namcos11_init_common(machine, 32, 1);
+}
+
+static DRIVER_INIT( tekken2 )
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c406_r) );
+	namcos11_init_common(machine, 32, 1);
+}
+
+static DRIVER_INIT( souledge )
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c409_r) );
+	namcos11_init_common(machine, 32, 1);
+}
+
+static DRIVER_INIT( dunkmnia )
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c410_r) );
+	namcos11_init_common(machine, 32, 1);
+}
+
+static DRIVER_INIT( primglex )
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c411_r) );
+	namcos11_init_common(machine, 32, 1);
+}
+
+static DRIVER_INIT( xevi3dg )
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c430_r) );
+	namcos11_init_common(machine, 32, 1);
+}
+
+static DRIVER_INIT( danceyes )
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c431_r) );
+	namcos11_init_common(machine, 32, 1);
+}
+
+static DRIVER_INIT( pocketrc )
+{
+	machine.device("c76")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC0_L, FUNC(pocketrc_steer_r));
+	machine.device("c76")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC1_L, M37710_ADC1_L, FUNC(pocketrc_gas_r));
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c432_r) );
+	namcos11_init_common(machine, 32, 0); // (speedup hack breaks testmode and analog steering)
+}
+
+static DRIVER_INIT( starswep )
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c442_r) );
+	namcos11_init_common(machine, 0, 1);
+}
+
+static DRIVER_INIT( myangel3 )
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c443_r) );
+	namcos11_init_common(machine, 64, 1);
+}
+
+static DRIVER_INIT( ptblank2ua )
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c443_r) );
+	namcos11_init_common(machine, 64, 1);
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f788000, 0x1f788003, FUNC(lightgun_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x1f780000, 0x1f78000f, FUNC(lightgun_r) );
 }
 
 static MACHINE_RESET( namcos11 )
@@ -991,7 +990,6 @@ static MACHINE_CONFIG_START( coh100, namcos11_state )
 	MCFG_MACHINE_RESET( namcos11 )
 
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL_53_693175MHz )
-	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( namcos11_vblank ), (namcos11_state *) owner ) )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_C352_ADD("c352", 16384000)
@@ -1008,11 +1006,6 @@ static MACHINE_CONFIG_DERIVED( coh110, coh100 )
 	MCFG_CPU_PROGRAM_MAP( namcos11_map )
 
 	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
-	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( namcos11_vblank ), (namcos11_state *) owner ) )
-
-	/// TODO: figure out why pocketrc runs too fast
-//  MCFG_SCREEN_MODIFY("screen")
-//  MCFG_SCREEN_REFRESH_RATE( 30 )
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( namcos11 )
@@ -1191,7 +1184,7 @@ static INPUT_PORTS_START( myangel3 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( ptblank2a )
+static INPUT_PORTS_START( ptblank2ua )
 	PORT_INCLUDE( namcos11 )
 
 	PORT_MODIFY( "PLAYER1" )
@@ -1247,6 +1240,7 @@ static INPUT_PORTS_START( pocketrc )
 	PORT_INCLUDE( namcos11 )
 
 	PORT_MODIFY( "SWITCH" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1285,16 +1279,16 @@ static INPUT_PORTS_START( pocketrc )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2) // toggle view
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "STEERING" )
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX( 0x00, 0xff ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 3 ) PORT_CENTERDELTA( 128 ) PORT_PLAYER( 1 ) PORT_REVERSE
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX( 0x00, 0xff ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 10 ) PORT_CENTERDELTA( 15 ) PORT_REVERSE
 
 	PORT_START( "GAS" )
-	PORT_BIT( 0x00ff, 0x0000, IPT_PEDAL ) PORT_MINMAX( 0x0000, 0x00ff ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 15 ) PORT_PLAYER( 1 ) PORT_REVERSE
+	PORT_BIT( 0x00ff, 0x0000, IPT_PEDAL ) PORT_MINMAX( 0x0000, 0x00ff ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 15 ) PORT_REVERSE
 INPUT_PORTS_END
 
 ROM_START( danceyes )
@@ -1817,25 +1811,25 @@ ROM_START( xevi3dg )
 	ROM_RELOAD( 0x800000, 0x400000 )
 ROM_END
 
-GAME( 1994, tekken,    0,        coh100, tekken,   namcos11, ROT0, "Namco", "Tekken (World, TE4/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1994, tekkenac,  tekken,   coh100, tekken,   namcos11, ROT0, "Namco", "Tekken (Asia, TE2/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1994, tekkenab,  tekken,   coh100, tekken,   namcos11, ROT0, "Namco", "Tekken (Asia, TE2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1994, tekkenjb,  tekken,   coh100, tekken,   namcos11, ROT0, "Namco", "Tekken (Japan, TE1/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, tekken2,   0,        coh110, tekken,   namcos11, ROT0, "Namco", "Tekken 2 Ver.B (US, TES3/VER.D)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, tekken2ub, tekken2,  coh100, tekken,   namcos11, ROT0, "Namco", "Tekken 2 Ver.B (US, TES3/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, tekken2ab, tekken2,  coh100, tekken,   namcos11, ROT0, "Namco", "Tekken 2 Ver.B (Asia, TES2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, tekken2aa, tekken2,  coh100, tekken,   namcos11, ROT0, "Namco", "Tekken 2 (Asia, TES2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, souledge,  0,        coh110, souledge, namcos11, ROT0, "Namco", "Soul Edge Ver. II (World, SO4/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, souledgeuc,souledge, coh110, souledge, namcos11, ROT0, "Namco", "Soul Edge Ver. II (US, SO3/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, souledgeua,souledge, coh110, souledge, namcos11, ROT0, "Namco", "Soul Edge (US, SO3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, souledgeaa,souledge, coh110, souledge, namcos11, ROT0, "Namco", "Soul Edge (Asia, SO2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, souledgeja,souledge, coh110, souledge, namcos11, ROT0, "Namco", "Soul Edge (Japan, SO1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, dunkmnia,  0,        coh110, namcos11, namcos11, ROT0, "Namco", "Dunk Mania (Asia, DM2/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, dunkmniajc,dunkmnia, coh110, namcos11, namcos11, ROT0, "Namco", "Dunk Mania (Japan, DM1/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, xevi3dg,   0,        coh110, namcos11, namcos11, ROT0, "Namco", "Xevious 3D/G (Japan, XV31/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, primglex,  0,        coh110, tekken,   namcos11, ROT0, "Namco", "Prime Goal EX (Japan, PG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, danceyes,  0,        coh110, namcos11, namcos11, ROT0, "Namco", "Dancing Eyes (Japan, DC1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, pocketrc,  0,        coh110, pocketrc, namcos11, ROT0, "Namco", "Pocket Racer (Japan, PKR1/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, starswep,  0,        coh110, namcos11, namcos11, ROT0, "Axela/Namco", "Star Sweep (Japan, STP1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, myangel3,  0,        coh110, myangel3, namcos11, ROT0, "Namco", "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, ptblank2ua,ptblank2, coh110, ptblank2a,namcos11, ROT0, "Namco", "Point Blank 2 (US, GNB3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1994, tekken,    0,        coh100, tekken,    tekken,    ROT0, "Namco", "Tekken (World, TE4/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1994, tekkenac,  tekken,   coh100, tekken,    tekken,    ROT0, "Namco", "Tekken (Asia, TE2/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1994, tekkenab,  tekken,   coh100, tekken,    tekken,    ROT0, "Namco", "Tekken (Asia, TE2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1994, tekkenjb,  tekken,   coh100, tekken,    tekken,    ROT0, "Namco", "Tekken (Japan, TE1/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, tekken2,   0,        coh110, tekken,    tekken2,   ROT0, "Namco", "Tekken 2 Ver.B (US, TES3/VER.D)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, tekken2ub, tekken2,  coh100, tekken,    tekken2,   ROT0, "Namco", "Tekken 2 Ver.B (US, TES3/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, tekken2ab, tekken2,  coh100, tekken,    tekken2,   ROT0, "Namco", "Tekken 2 Ver.B (Asia, TES2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, tekken2aa, tekken2,  coh100, tekken,    tekken2,   ROT0, "Namco", "Tekken 2 (Asia, TES2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, souledge,  0,        coh110, souledge,  souledge,  ROT0, "Namco", "Soul Edge Ver. II (World, SO4/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, souledgeuc,souledge, coh110, souledge,  souledge,  ROT0, "Namco", "Soul Edge Ver. II (US, SO3/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, souledgeua,souledge, coh110, souledge,  souledge,  ROT0, "Namco", "Soul Edge (US, SO3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, souledgeaa,souledge, coh110, souledge,  souledge,  ROT0, "Namco", "Soul Edge (Asia, SO2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, souledgeja,souledge, coh110, souledge,  souledge,  ROT0, "Namco", "Soul Edge (Japan, SO1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, dunkmnia,  0,        coh110, namcos11,  dunkmnia,  ROT0, "Namco", "Dunk Mania (Asia, DM2/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, dunkmniajc,dunkmnia, coh110, namcos11,  dunkmnia,  ROT0, "Namco", "Dunk Mania (Japan, DM1/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, xevi3dg,   0,        coh110, namcos11,  xevi3dg,   ROT0, "Namco", "Xevious 3D/G (Japan, XV31/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, primglex,  0,        coh110, tekken,    primglex,  ROT0, "Namco", "Prime Goal EX (Japan, PG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, danceyes,  0,        coh110, namcos11,  danceyes,  ROT0, "Namco", "Dancing Eyes (Japan, DC1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, pocketrc,  0,        coh110, pocketrc,  pocketrc,  ROT0, "Namco", "Pocket Racer (Japan, PKR1/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, starswep,  0,        coh110, namcos11,  starswep,  ROT0, "Axela/Namco", "Star Sweep (Japan, STP1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, myangel3,  0,        coh110, myangel3,  myangel3,  ROT0, "Namco", "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ptblank2ua,ptblank2, coh110, ptblank2ua,ptblank2ua,ROT0, "Namco", "Point Blank 2 (US, GNB3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

@@ -128,7 +128,7 @@ m_searchpath = combinedpath;
 				if (record != NULL)
 				{
 					// count the number of files that are found.
-					if (record->status() == audit_record::STATUS_GOOD || (record->status() == audit_record::STATUS_FOUND_INVALID && find_shared_source(source,record->actual_hashes(), record->actual_length()) != NULL))
+					if (record->status() == audit_record::STATUS_GOOD || (record->status() == audit_record::STATUS_FOUND_INVALID && find_shared_source(source, record->actual_hashes(), record->actual_length()) == NULL))
 					{
 						found++;
 						if (shared_source != NULL)
@@ -148,6 +148,10 @@ m_searchpath = combinedpath;
 	{
 		m_record_list.reset();
 		return NOTFOUND;
+	}
+	else if (found == 0 && m_record_list.count() == 0)
+	{
+		return NONE_NEEDED;
 	}
 
 	// return a summary
@@ -206,6 +210,10 @@ media_auditor::summary media_auditor::audit_device(device_t *device, const char 
 		m_record_list.reset();
 		return NOTFOUND;
 	}
+	else if (found == 0 && m_record_list.count() == 0)
+	{
+		return NONE_NEEDED;
+	}
 
 	// return a summary
 	return summarize(device->shortname());
@@ -221,6 +229,9 @@ media_auditor::summary media_auditor::audit_samples()
 {
 	// start fresh
 	m_record_list.reset();
+
+	int required = 0;
+	int found = 0;
 
 	// iterate over sample entries
 	for (const device_t *device = m_enumerator.config().first_device(); device != NULL; device = device->next())
@@ -242,6 +253,8 @@ media_auditor::summary media_auditor::audit_samples()
 						continue;
 					}
 
+					required++;
+
 					// create a new record
 					audit_record &record = m_record_list.append(*global_alloc(audit_record(intf->samplenames[sampnum], audit_record::MEDIA_SAMPLE)));
 
@@ -254,7 +267,10 @@ media_auditor::summary media_auditor::audit_samples()
 						// attempt to access the file
 						file_error filerr = file.open(curpath);
 						if (filerr == FILERR_NONE)
+						{
 							record.set_status(audit_record::STATUS_GOOD, audit_record::SUBSTATUS_GOOD);
+							found++;
+						}
 						else
 							record.set_status(audit_record::STATUS_NOT_FOUND, audit_record::SUBSTATUS_NOT_FOUND);
 					}
@@ -262,9 +278,15 @@ media_auditor::summary media_auditor::audit_samples()
 			}
 		}
 
-	// no count AND no records means not found
-	if (m_record_list.count() == 0)
+	if (found == 0 && required > 0)
+	{
+		m_record_list.reset();
 		return NOTFOUND;
+	}
+	else if (found == 0 && m_record_list.count() == 0)
+	{
+		return NONE_NEEDED;
+	}
 
 	// return a summary
 	return summarize(m_enumerator.driver().name);
@@ -534,7 +556,8 @@ audit_record::audit_record(const rom_entry &media, media_type type)
 	  m_substatus(SUBSTATUS_ERROR),
 	  m_name(ROM_GETNAME(&media)),
 	  m_explength(rom_file_size(&media)),
-	  m_length(0)
+	  m_length(0),
+	  m_shared_source(NULL)
 {
 	m_exphashes.from_internal_string(ROM_GETHASHDATA(&media));
 }
@@ -546,6 +569,7 @@ audit_record::audit_record(const char *name, media_type type)
 	  m_substatus(SUBSTATUS_ERROR),
 	  m_name(name),
 	  m_explength(0),
-	  m_length(0)
+	  m_length(0),
+	  m_shared_source(NULL)
 {
 }

@@ -761,7 +761,7 @@ void cli_frontend::verifyroms(const char *gamename)
 			notfound++;
 
 		// else display information about what we discovered
-		else
+		else if (summary != media_auditor::NONE_NEEDED)
 		{
 			// output the summary of the audit
 			astring summary_string;
@@ -803,7 +803,7 @@ void cli_frontend::verifyroms(const char *gamename)
 	machine_config &config = dummy_drivlist.config();
 	device_t *owner = config.devicelist().first();
 	// check if all are listed, note that empty one is included
-	for (int i=0;i<m_device_count;i++)
+	for (int i = 0; i < m_device_count; i++)
 	{
 		device_type type = *s_devices_sorted[i];
 		device_t *dev = (*type)(config, "dummy", owner, 0);
@@ -862,16 +862,16 @@ void cli_frontend::verifyroms(const char *gamename)
 	zip_file_cache_clear();
 
 	// return an error if none found
-	if (matched==0)
+	if (matched == 0)
 		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// if we didn't get anything at all, display a generic end message
-	if (correct + incorrect == 0)
+	if (matched == 1 && correct == 0 && incorrect == 0)
 	{
 		if (notfound > 0)
 			throw emu_fatalerror(MAMERR_MISSING_FILES, "romset \"%s\" not found!\n", gamename);
 		else
-			throw emu_fatalerror(MAMERR_MISSING_FILES, "romset \"%s\" not supported!\n", gamename);
+			throw emu_fatalerror(MAMERR_MISSING_FILES, "romset \"%s\" has no roms!\n", gamename);
 	}
 
 	// otherwise, print a summary
@@ -893,35 +893,33 @@ void cli_frontend::verifysamples(const char *gamename)
 {
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
-	if (drivlist.count() == 0)
-		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	int correct = 0;
 	int incorrect = 0;
 	int notfound = 0;
+	int matched = 0;
 
 	// iterate over drivers
 	media_auditor auditor(drivlist);
 	while (drivlist.next())
 	{
+		matched++;
+
 		// audit the samples in this set
 		media_auditor::summary summary = auditor.audit_samples();
 
-		// output the summary of the audit
-		astring summary_string;
-		auditor.summarize(drivlist.driver().name,&summary_string);
-		mame_printf_info("%s", summary_string.cstr());
-
-		// if not found, print a message and set the flag
+		// if not found, count that and leave it at that
 		if (summary == media_auditor::NOTFOUND)
-		{
-			mame_printf_error("sampleset \"%s\" not found!\n", drivlist.driver().name);
 			notfound++;
-		}
 
 		// else display information about what we discovered
-		else
+		else if (summary != media_auditor::NONE_NEEDED)
 		{
+			// output the summary of the audit
+			astring summary_string;
+			auditor.summarize(drivlist.driver().name,&summary_string);
+			mame_printf_info("%s", summary_string.cstr());
+
 			// output the name of the driver and its clone
 			mame_printf_info("sampleset %s ", drivlist.driver().name);
 			int clone_of = drivlist.clone();
@@ -955,13 +953,17 @@ void cli_frontend::verifysamples(const char *gamename)
 	// clear out any cached files
 	zip_file_cache_clear();
 
+	// return an error if none found
+	if (matched == 0)
+		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+
 	// if we didn't get anything at all, display a generic end message
-	if (correct + incorrect == 0)
+	if (matched == 1 && correct == 0 && incorrect == 0)
 	{
 		if (notfound > 0)
-			throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "sampleset \"%s\" not found!\n", gamename);
+			throw emu_fatalerror(MAMERR_MISSING_FILES, "sampleset \"%s\" not found!\n", gamename);
 		else
-			throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "sampleset \"%s\" not supported!\n", gamename);
+			throw emu_fatalerror(MAMERR_MISSING_FILES, "sampleset \"%s\" not required!\n", gamename);
 	}
 
 	// otherwise, print a summary
