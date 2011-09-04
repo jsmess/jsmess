@@ -1288,6 +1288,62 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="yaksa">
+		<description>Yaksa</description>
+		<year>1987</year>
+		<publisher>Wolf Team</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="wolf_07" size="262144" crc="ff974ee3" sha1="3e57fad130be79223068ab29f1e77ecb7f2ad237" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kyuotory">
+		<!-- 山村美砂 京都龍の寺殺人事件 -->
+		<description>Kyouto Ryu No Tera Satsujin Jiken</description>
+		<year>1988</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532065" size="262144" crc="dcb1a61e" sha1="f9486dd810d6321bad4bc9d7703a67d630167f98" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yuureikn">
+		<!-- 幽霊君 -->
+		<description>Yuureikun</description>
+		<year>1988</year>
+		<publisher>system Sacom</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh53201l" size="262144" crc="712ae3c6" sha1="efed48854beb2803d9f2b5644edff2aacf7c6af9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="europewr">
+		<!-- ヨーロッパ戦線 -->
+		<description>Europe War</description>
+		<year>1992</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-8M308-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="CXK58257SP-10L" />
+			<dataarea name="rom" size="1048576">
+				<rom name="lh538a36" size="1048576" crc="413d4700" sha1="475c3af7495922759a5f424d2e22d7e4073d5992" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>
