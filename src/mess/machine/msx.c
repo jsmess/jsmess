@@ -136,6 +136,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 				{ "MR6401",				false,		SLOT_ASCII16 },
 				{ "NEOS MR6401",		false,		SLOT_ASCII8 },
 				{ "BS6202",				false,		SLOT_ASCII8 },
+				{ "BS6101",				false,		SLOT_ASCII8 },
 			};
 
 			for ( int i = 0; i < ARRAY_LENGTH(mapper_types) && type < 0; i++ )
