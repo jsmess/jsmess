@@ -4,15 +4,28 @@
 
         22/11/2008 Preliminary driver.
 
-****************************************************************************/
+MZ80K Monitor - no commands seem to do anything
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
-#include "imagedev/cassette.h"
+MZ80A Monitor Commands:
+B - turn key beep on/off
+F - boot from Floppy (press enter at the question)
+L - load a cassette
+could be more
+
+MZ80A ToDo:
+- System writes CF to D800-DFFF
+- System uses E200-E2FF (contents are read then discarded)
+- SYstem uses E800
+- Disk uses ports D8-DC
+- Keyboard issues listed below
+
+MZ80B
+- Makes extensive use of io ports
+- D000-FFFF is banked ram
+
+****************************************************************************/
+#define ADDRESS_MAP_MODERN
+
 #include "includes/mz80.h"
 
 
@@ -217,35 +230,35 @@ static INPUT_PORTS_START( mz80a )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused?")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused?")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( mz80k_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( mz80k_mem, AS_PROGRAM, 8, mz80_state )
 	ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE(0x0000, 0x0fff) AM_ROM
-    AM_RANGE(0x1000, 0xcfff) AM_RAM // 48 KB of RAM
-    AM_RANGE(0xd000, 0xd3ff) AM_RAM // Video RAM
-    AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write) /* PPIA 8255 */
-    AM_RANGE(0xe004, 0xe007) AM_DEVREADWRITE("pit8253", pit8253_r,pit8253_w)  /* PIT 8253  */
-    AM_RANGE(0xe008, 0xe00b) AM_READWRITE( mz80k_strobe_r, mz80k_strobe_w)
-    AM_RANGE(0xf000, 0xf3ff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x1000, 0xcfff) AM_RAM AM_BASE(m_p_ram) // 48 KB of RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(m_p_videoram) // Video RAM
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) /* PPIA 8255 */
+	AM_RANGE(0xe004, 0xe007) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r,pit8253_w)  /* PIT 8253  */
+	AM_RANGE(0xe008, 0xe00b) AM_READWRITE( mz80k_strobe_r, mz80k_strobe_w)
+	AM_RANGE(0xf000, 0xf3ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mz80k_io, AS_IO, 8)
+static ADDRESS_MAP_START( mz80k_io, AS_IO, 8, mz80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
 static GFXDECODE_START( mz80k )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, mz80k_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, mz80k_charlayout, 0, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( mz80kj )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, mz80kj_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, mz80kj_charlayout, 0, 1 )
 GFXDECODE_END
 
 static const cassette_interface mz80k_cassette_interface =
@@ -273,37 +286,41 @@ static MACHINE_CONFIG_START( mz80k, mz80_state )
 
 	MCFG_MACHINE_RESET( mz80k )
 
-	MCFG_I8255_ADD( "ppi8255", mz80k_8255_int )
-
-	MCFG_PIT8253_ADD( "pit8253", mz80k_pit8253_config )
-
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 199)
-	MCFG_SCREEN_UPDATE(mz80k)
-
 	MCFG_VIDEO_START(mz80k)
-
-	MCFG_GFXDECODE( mz80k )
+	MCFG_SCREEN_UPDATE(mz80k)
+	MCFG_GFXDECODE(mz80k)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
+	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
+	/* Devices */
+	MCFG_I8255_ADD( "ppi8255", mz80k_8255_int )
+	MCFG_PIT8253_ADD( "pit8253", mz80k_pit8253_config )
 	MCFG_TIMER_ADD_PERIODIC("tempo", ne555_tempo_callback, attotime::from_hz(34)) // 33.5Hz - 34.3Hz
-
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, mz80k_cassette_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mz80kj, mz80k )
-	MCFG_GFXDECODE( mz80kj )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(mz80kj)
+	MCFG_GFXDECODE(mz80kj)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( mz80a, mz80k )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(mz80a)
 MACHINE_CONFIG_END
 
 
@@ -315,7 +332,7 @@ ROM_START( mz80k )
 	ROMX_LOAD( "80ktc.rom",     0x0000, 0x1000, CRC(19ed6546) SHA1(2bbeff916c2fa8991e718070ca4195beb45e0848), ROM_BIOS(2) )
 	ROM_LOAD( "mz80kfdif.rom",  0xf000, 0x0400, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49) )
 
-	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD ( "80kcg.rom", 0x0000, 0x0800, CRC(9b2fb88b) SHA1(6d4d120bd0e3a8c781c581e3c379a39db610a4d2) )
 ROM_END
 
@@ -325,7 +342,7 @@ ROM_START( mz80kj )
 	// TC monitor not possible to be used on japanese version since chargen doesn't have upcase/lowecase, but japanese letters
 	ROM_LOAD( "mz80kfdif.rom", 0xf000, 0x0400, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "mz80k.jpn", 0x0000, 0x0800, CRC(bffe3312) SHA1(7058e565f338f5ec2bba85c19c9671e5c4fe258e) )
 ROM_END
 
@@ -334,7 +351,7 @@ ROM_START( mz80a )
 	ROM_LOAD( "sa1510.rom",  0x0000, 0x1000, CRC(ae63ab39) SHA1(3c2180c52fc470131ba668a6c16e77656adeccf8) )
 	ROM_LOAD( "mz80afi.rom", 0xf000, 0x0800, CRC(e3b3ddfb) SHA1(ec94cc3d236716f53e747f0c8ac9186d72bf9c10) )
 
-	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "mz80acg.rom", 0x0000, 0x0800, CRC(a87c2e2b) SHA1(e8aefbdb48a63e5f96692af868c353ca7e1bfcd2) )
 ROM_END
 
@@ -342,7 +359,7 @@ ROM_START( mz80b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ipl.rom",  0x0000, 0x0800, CRC(80beeec0) SHA1(d2b8167cc77ad023a807198993cb5e7a94c9e19e) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) )
 ROM_END
 
@@ -351,5 +368,5 @@ COMP( 1979, mz80kj,   0,        0,      mz80kj,  mz80k,  mz80k, "Sharp",   "MZ-8
 COMP( 1979, mz80k,    mz80kj,   0,      mz80k,   mz80k,  mz80k, "Sharp",   "MZ-80K", 0 )
 
 // These may need a separate driver!
-COMP( 1982, mz80a,    0,        0,      mz80k,   mz80a,  mz80k, "Sharp",   "MZ-80A", GAME_NOT_WORKING )
+COMP( 1982, mz80a,    0,        0,      mz80a,   mz80a,  mz80k, "Sharp",   "MZ-80A", 0 )
 COMP( 1981, mz80b,    0,        0,      mz80k,   mz80k,  mz80k, "Sharp",   "MZ-80B", GAME_NOT_WORKING )
