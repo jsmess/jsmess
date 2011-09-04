@@ -7,7 +7,6 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "cpu/z80/z80.h"
-#include "machine/upd765.h"
 #include "sound/speaker.h"
 
 /* Devices */
@@ -128,126 +127,6 @@ QUICKLOAD_LOAD(kc)
 	return IMAGE_INIT_PASS;
 }
 
-
-/******************/
-/* DISK EMULATION */
-/******************/
-/* used by KC85/2, KC85/3 and KC85/4 */
-/* floppy disc interface has:
-- Z80 at 4 MHz
-- Z80 CTC
-- 1k ram
-- UPD765 floppy disc controller
-*/
-
-/* bit 7: DMA Request (DRQ from FDC) */
-/* bit 6: Interrupt (INT from FDC) */
-/* bit 5: Drive Ready */
-/* bit 4: Index pulse from disc */
-
-#if 0
-static void kc85_disc_hw_ctc_interrupt(int state)
-{
-	cputag_set_input_line(machine, "disc", 0, state);
-}
-#endif
-
-READ8_DEVICE_HANDLER(kc85_disk_hw_ctc_r)
-{
-	return z80ctc_r(device, offset);
-}
-
-WRITE8_DEVICE_HANDLER(kc85_disk_hw_ctc_w)
-{
-	z80ctc_w(device, offset, data);
-}
-
-WRITE8_HANDLER(kc85_disc_interface_ram_w)
-{
-	int addr;
-
-
-	/* bits 1,0 of i/o address define 256 byte block to access.
-    bits 15-8 define the byte offset in the 256 byte block selected */
-	addr = ((offset & 0x03)<<8) | ((offset>>8) & 0x0ff);
-
-	logerror("interface ram w: %04x %02x\n",addr,data);
-
-	space->write_byte(addr|0x0f000,data);
-}
-
-READ8_HANDLER(kc85_disc_interface_ram_r)
-{
-	int addr;
-
-
-	addr = ((offset & 0x03)<<8) | ((offset>>8) & 0x0ff);
-
-	logerror("interface ram r: %04x\n",addr);
-
-	return space->read_byte(addr|0x0f000);
-}
-
-/* 4-bit latch used to reset disc interface etc */
-WRITE8_HANDLER(kc85_disc_interface_latch_w)
-{
-	logerror("kc85 disc interface latch w\n");
-}
-
- READ8_HANDLER(kc85_disc_hw_input_gate_r)
-{
-	kc_state *state = space->machine().driver_data<kc_state>();
-	return state->m_kc85_disc_hw_input_gate;
-}
-
-WRITE8_HANDLER(kc85_disc_hw_terminal_count_w)
-{
-	device_t *fdc = space->machine().device("upd765");
-	logerror("kc85 disc hw tc w: %02x\n",data);
-	upd765_tc_w(fdc, data & 0x01);
-}
-
-
-/* callback for /INT output from FDC */
-static WRITE_LINE_DEVICE_HANDLER( kc85_fdc_interrupt )
-{
-	kc_state *drvstate = device->machine().driver_data<kc_state>();
-	drvstate->m_kc85_disc_hw_input_gate &=~(1<<6);
-	if (state)
-		drvstate->m_kc85_disc_hw_input_gate |=(1<<6);
-}
-
-/* callback for /DRQ output from FDC */
-static WRITE_LINE_DEVICE_HANDLER( kc85_fdc_dma_drq )
-{
-	kc_state *drvstate = device->machine().driver_data<kc_state>();
-	drvstate->m_kc85_disc_hw_input_gate &=~(1<<7);
-	if (state)
-		drvstate->m_kc85_disc_hw_input_gate |=(1<<7);
-}
-
-const upd765_interface kc_fdc_interface=
-{
-	DEVCB_LINE(kc85_fdc_interrupt),
-	DEVCB_LINE(kc85_fdc_dma_drq),
-	NULL,
-	UPD765_RDY_PIN_CONNECTED,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
-
-static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
-{
-	cpu_set_reg(machine.device("disc"), STATE_GENPC, 0x0f000);
-	cpu_set_reg(machine.device("maincpu"), STATE_GENPC, 0x0f000);
-}
-
-static void kc_disc_interface_init(running_machine &machine)
-{
-	machine.scheduler().timer_set(attotime::zero, FUNC(kc85_disk_reset_timer_callback));
-
-	/* hold cpu at reset */
-	cputag_set_input_line(machine, "disc", INPUT_LINE_RESET, ASSERT_LINE);
-}
 
 /*****************/
 /* MODULE SYSTEM */
@@ -1850,12 +1729,6 @@ MACHINE_RESET( kc85_4 )
     here will be a override */
 	memory_set_direct_update_handler(0, kc85_4_opbaseoverride);
 #endif
-}
-
-MACHINE_RESET( kc85_4d )
-{
-	MACHINE_RESET_CALL(kc85_4);
-	kc_disc_interface_init(machine);
 }
 
 MACHINE_RESET( kc85_3 )
