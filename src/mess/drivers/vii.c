@@ -572,9 +572,9 @@ static READ16_HANDLER( vii_io_r )
 	static const char gpioports[] = { 'A', 'B', 'C' };
 
 	vii_state *state = space->machine().driver_data<vii_state>();
-	UINT16 val = state->m_io_regs[offset];
-
 	offset -= 0x500;
+
+	UINT16 val = state->m_io_regs[offset];
 
 	switch(offset)
 	{
@@ -595,8 +595,11 @@ static READ16_HANDLER( vii_io_r )
 			verboselog(space->machine(), 3, "vii_io_r: Random = %04x (%04x)\n", val, mem_mask);
 			break;
 
+		case 0x21: // IRQ Control
+			verboselog(space->machine(), 3, "vii_io_r: Controller IRQ Control = %04x (%04x)\n", val, mem_mask);
+			break;
+
 		case 0x22: // IRQ Status
-			val = state->m_io_regs[0x21];
 			verboselog(space->machine(), 3, "vii_io_r: Controller IRQ Status = %04x (%04x)\n", val, mem_mask);
 			break;
 
@@ -630,7 +633,7 @@ static READ16_HANDLER( vii_io_r )
 			break;
 
 		default:
-			verboselog(space->machine(), 3, "vii_io_r: Unknown register %04x\n", 0x3800 + offset);
+			verboselog(space->machine(), 3, "vii_io_r: Unknown register %04x\n", 0x3d00 + offset);
 			break;
 	}
 
@@ -667,7 +670,7 @@ static WRITE16_HANDLER( vii_io_w )
 			break;
 
 		case 0x21: // IRQ Enable
-			verboselog(space->machine(), 3, "vii_io_w: Controller IRQ Enable = %04x (%04x)\n", data, mem_mask);
+			verboselog(space->machine(), 3, "vii_io_w: Controller IRQ Control = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&VII_CTLR_IRQ_ENABLE);
 			if(!VII_CTLR_IRQ_ENABLE)
 			{
@@ -761,7 +764,7 @@ static WRITE16_HANDLER( vii_io_w )
 			break;
 
 		default:
-			verboselog(space->machine(), 3, "vii_io_w: Unknown register %04x = %04x (%04x)\n", 0x3800 + offset, data, mem_mask);
+			verboselog(space->machine(), 3, "vii_io_w: Unknown register %04x = %04x (%04x)\n", 0x3d00 + offset, data, mem_mask);
 			COMBINE_DATA(&state->m_io_regs[offset]);
 			break;
 	}
@@ -933,12 +936,6 @@ static INTERRUPT_GEN( vii_vblank )
 	UINT32 y = device->machine().rand() & 0x3ff;
 	UINT32 z = device->machine().rand() & 0x3ff;
 
-	VII_VIDEO_IRQ_STATUS = VII_VIDEO_IRQ_ENABLE & 1;
-	if(VII_VIDEO_IRQ_STATUS)
-	{
-		verboselog(device->machine(), 0, "Video IRQ\n");
-		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ0_LINE, ASSERT_LINE);
-	}
 
 	state->m_controller_input[0] = input_port_read(device->machine(), "P1");
 	state->m_controller_input[1] = (UINT8)x;
@@ -954,11 +951,63 @@ static INTERRUPT_GEN( vii_vblank )
 
 	state->m_uart_rx_count = 0;
 
+	VII_VIDEO_IRQ_STATUS = VII_VIDEO_IRQ_ENABLE & 1;
+	if(VII_VIDEO_IRQ_STATUS)
+	{
+		verboselog(device->machine(), 0, "Video IRQ\n");
+		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ0_LINE, ASSERT_LINE);
+	}
+
+//	{
+//		verboselog(device->machine(), 0, "audio 1 IRQ\n");
+//		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ1_LINE, ASSERT_LINE);
+//  }
+	if(state->m_io_regs[0x22] & state->m_io_regs[0x22] & 0x0c00)
+	{
+		verboselog(device->machine(), 0, "timerA, timer B IRQ\n");
+		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ2_LINE, ASSERT_LINE);
+	}
+	
+	//if(state->m_io_regs[0x22] & state->m_io_regs[0x22] & 0x2100)
+	// For now trigger always if any enabled
 	if(VII_CTLR_IRQ_ENABLE)
 	{
-		verboselog(device->machine(), 0, "Controller IRQ\n");
+		verboselog(device->machine(), 0, "UART, ADC IRQ\n");
 		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ3_LINE, ASSERT_LINE);
 	}
+//	{
+//		verboselog(device->machine(), 0, "audio 4 IRQ\n");
+//		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ4_LINE, ASSERT_LINE);
+//  }
+	
+	if(state->m_io_regs[0x22] & state->m_io_regs[0x22] & 0x1200)
+	{
+		verboselog(device->machine(), 0, "External IRQ\n");
+		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ5_LINE, ASSERT_LINE);
+	}
+	if(state->m_io_regs[0x22] & state->m_io_regs[0x22] & 0x0070)
+	{
+		verboselog(device->machine(), 0, "1024Hz, 2048HZ, 4096HZ IRQ\n");
+		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ6_LINE, ASSERT_LINE);
+	}
+	if(state->m_io_regs[0x22] & state->m_io_regs[0x22] & 0x008b)
+	{
+		verboselog(device->machine(), 0, "TMB1, TMB2, 4Hz, key change IRQ\n");
+		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ7_LINE, ASSERT_LINE);
+	}
+	
+}
+
+static TIMER_DEVICE_CALLBACK( tmb1_tick )
+{
+	vii_state *state = timer.machine().driver_data<vii_state>();
+	state->m_io_regs[0x22] |= 1;
+}
+
+static TIMER_DEVICE_CALLBACK( tmb2_tick )
+{
+	vii_state *state = timer.machine().driver_data<vii_state>();
+	state->m_io_regs[0x22] |= 2;
 }
 
 static MACHINE_CONFIG_START( vii, vii_state )
@@ -966,6 +1015,9 @@ static MACHINE_CONFIG_START( vii, vii_state )
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
 	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
+	
+	MCFG_TIMER_ADD_PERIODIC("tmb1", tmb1_tick, attotime::from_hz(XTAL_27MHz/8))
+	MCFG_TIMER_ADD_PERIODIC("tmb2", tmb2_tick, attotime::from_hz(XTAL_27MHz/128))
 
 	MCFG_MACHINE_START( vii )
 	MCFG_MACHINE_RESET( vii )
@@ -994,6 +1046,9 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
 	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
+
+	MCFG_TIMER_ADD_PERIODIC("tmb1", tmb1_tick, attotime::from_hz(XTAL_27MHz/8))
+	MCFG_TIMER_ADD_PERIODIC("tmb2", tmb2_tick, attotime::from_hz(XTAL_27MHz/128))
 
 	MCFG_MACHINE_START( vii )
 	MCFG_MACHINE_RESET( vii )
@@ -1025,6 +1080,9 @@ static MACHINE_CONFIG_START( batman, vii_state )
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
 	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
+
+	MCFG_TIMER_ADD_PERIODIC("tmb1", tmb1_tick, attotime::from_hz(XTAL_27MHz/8))
+	MCFG_TIMER_ADD_PERIODIC("tmb2", tmb2_tick, attotime::from_hz(XTAL_27MHz/128))
 
 	MCFG_MACHINE_START( vii )
 	MCFG_MACHINE_RESET( vii )
