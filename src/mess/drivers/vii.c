@@ -401,6 +401,7 @@ static void vii_do_dma(running_machine &machine, UINT32 len)
 	}
 
 	state->m_video_regs[0x72] = 0;
+	state->m_video_regs[0x63] |= 4;
 }
 
 static READ16_HANDLER( vii_video_r )
@@ -430,6 +431,20 @@ static WRITE16_HANDLER( vii_video_w )
 
 	switch(offset)
 	{
+		case 0x10: case 0x16:	// page 1,2 X scroll
+			data &= 0x01ff;
+			COMBINE_DATA(&state->m_video_regs[offset]);
+			break;
+
+		case 0x11: case 0x17:	// page 1,2 Y scroll
+			data &= 0x00ff;
+			COMBINE_DATA(&state->m_video_regs[offset]);
+			break;
+		case 0x36:		// IRQ pos V
+		case 0x37:		// IRQ pos H
+			data &= 0x01ff;
+			COMBINE_DATA(&state->m_video_regs[offset]);
+			break;			
 		case 0x62: // Video IRQ Enable
 			verboselog(space->machine(), 0, "vii_video_w: Video IRQ Enable = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&VII_VIDEO_IRQ_ENABLE);
@@ -1153,6 +1168,7 @@ ROM_START( vii )
 
 	ROM_REGION( 0x2000000, "cart", ROMREGION_ERASE00 )
 	ROM_LOAD( "vii.bin", 0x0000, 0x2000000, CRC(04627639) SHA1(f883a92d31b53c9a5b0cdb112d07cd793c95fc43))
+	ROM_CART_LOAD("cart", 0x0000, 0x2000000, ROM_MIRROR)
 ROM_END
 
 ROM_START( batmantv )
@@ -1164,6 +1180,7 @@ ROM_START( vsmile )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 
 	ROM_REGION( 0x2000000, "cart", ROMREGION_ERASE00 )
+	ROM_CART_LOAD("cart", 0x0000, 0x2000000, ROM_MIRROR)
 ROM_END
 
 ROM_START( walle )
