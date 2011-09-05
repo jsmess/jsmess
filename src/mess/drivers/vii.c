@@ -81,6 +81,9 @@ public:
 	UINT16 m_uart_rx_count;
 	UINT8 m_controller_input[8];
 	UINT32 m_spg243_mode;
+	
+	emu_timer *m_tmb1;
+	emu_timer *m_tmb2;
 };
 
 enum
@@ -669,6 +672,19 @@ static WRITE16_HANDLER( vii_io_w )
 			vii_do_gpio(space->machine(), offset);
 			break;
 
+		case 0x10:		// timebase control
+			if ((state->m_io_regs[offset] & 0x0003) != (data & 0x0003)) {
+				UINT16 hz = 8 << (data & 0x0003);
+				verboselog(space->machine(), 3, "*** TMB1 FREQ set to %dHz\n", hz);
+				state->m_tmb1->adjust(attotime::zero, 0, attotime::from_hz( hz ));
+			}
+			if ((state->m_io_regs[offset] & 0x000c) != (data & 0x000c)) {
+				UINT16 hz = 128 << ((data & 0x000c) >> 2);
+				verboselog(space->machine(), 3, "*** TMB2 FREQ set to %dHz\n", hz);
+				state->m_tmb2->adjust(attotime::zero, 0, attotime::from_hz( hz ));
+			}
+			COMBINE_DATA(&state->m_io_regs[offset]);
+			break;			
 		case 0x21: // IRQ Enable
 			verboselog(space->machine(), 3, "vii_io_w: Controller IRQ Control = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&VII_CTLR_IRQ_ENABLE);
@@ -906,6 +922,18 @@ static DEVICE_IMAGE_LOAD( vsmile_cart )
 	return IMAGE_INIT_PASS;
 }
 
+static TIMER_CALLBACK( tmb1_tick )
+{
+	vii_state *state = machine.driver_data<vii_state>();
+	state->m_io_regs[0x22] |= 1;
+}
+
+static TIMER_CALLBACK( tmb2_tick )
+{
+	vii_state *state = machine.driver_data<vii_state>();
+	state->m_io_regs[0x22] |= 2;
+}
+
 static MACHINE_START( vii )
 {
 	vii_state *state = machine.driver_data<vii_state>();
@@ -923,6 +951,14 @@ static MACHINE_START( vii )
 	if (rom) { // to prevent batman crash
 		memcpy(state->m_cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
 	}
+	
+	state->m_video_regs[0x36] = 0xffff;
+	state->m_video_regs[0x37] = 0xffff;
+	
+	state->m_tmb1 = machine.scheduler().timer_alloc(FUNC(tmb1_tick));
+	state->m_tmb2 = machine.scheduler().timer_alloc(FUNC(tmb2_tick));
+	state->m_tmb1->reset();
+	state->m_tmb2->reset();
 }
 
 static MACHINE_RESET( vii )
@@ -998,27 +1034,12 @@ static INTERRUPT_GEN( vii_vblank )
 	
 }
 
-static TIMER_DEVICE_CALLBACK( tmb1_tick )
-{
-	vii_state *state = timer.machine().driver_data<vii_state>();
-	state->m_io_regs[0x22] |= 1;
-}
-
-static TIMER_DEVICE_CALLBACK( tmb2_tick )
-{
-	vii_state *state = timer.machine().driver_data<vii_state>();
-	state->m_io_regs[0x22] |= 2;
-}
-
 static MACHINE_CONFIG_START( vii, vii_state )
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
 	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
 	
-	MCFG_TIMER_ADD_PERIODIC("tmb1", tmb1_tick, attotime::from_hz(XTAL_27MHz/8))
-	MCFG_TIMER_ADD_PERIODIC("tmb2", tmb2_tick, attotime::from_hz(XTAL_27MHz/128))
-
 	MCFG_MACHINE_START( vii )
 	MCFG_MACHINE_RESET( vii )
 
@@ -1046,9 +1067,6 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
 	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
-
-	MCFG_TIMER_ADD_PERIODIC("tmb1", tmb1_tick, attotime::from_hz(XTAL_27MHz/8))
-	MCFG_TIMER_ADD_PERIODIC("tmb2", tmb2_tick, attotime::from_hz(XTAL_27MHz/128))
 
 	MCFG_MACHINE_START( vii )
 	MCFG_MACHINE_RESET( vii )
@@ -1080,9 +1098,6 @@ static MACHINE_CONFIG_START( batman, vii_state )
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
 	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
-
-	MCFG_TIMER_ADD_PERIODIC("tmb1", tmb1_tick, attotime::from_hz(XTAL_27MHz/8))
-	MCFG_TIMER_ADD_PERIODIC("tmb2", tmb2_tick, attotime::from_hz(XTAL_27MHz/128))
 
 	MCFG_MACHINE_START( vii )
 	MCFG_MACHINE_RESET( vii )
