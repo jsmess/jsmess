@@ -33,23 +33,15 @@ TODO:
   - Verify frequency of the beep/audio alarm.
 
 ***************************************************************************/
+#define ADDRESS_MAP_MODERN
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "sound/beep.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
-#include "machine/wd17xx.h"
-#include "machine/6821pia.h"
-#include "machine/ram.h"
 #include "includes/osborne1.h"
 
 
 #define MAIN_CLOCK	15974400
 
 
-static ADDRESS_MAP_START( osborne1_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( osborne1_mem, AS_PROGRAM, 8, osborne1_state )
 	AM_RANGE( 0x0000, 0x0FFF ) AM_READ_BANK("bank1") AM_WRITE( osborne1_0000_w )
 	AM_RANGE( 0x1000, 0x1FFF ) AM_READ_BANK("bank2") AM_WRITE( osborne1_1000_w )
 	AM_RANGE( 0x2000, 0x2FFF ) AM_READWRITE( osborne1_2000_r, osborne1_2000_w )
@@ -59,7 +51,7 @@ static ADDRESS_MAP_START( osborne1_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( osborne1_io, AS_IO, 8 )
+static ADDRESS_MAP_START( osborne1_io, AS_IO, 8, osborne1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x03 ) AM_WRITE( osborne1_bankswitch_w )
@@ -236,7 +228,7 @@ static const gfx_layout osborne1_charlayout =
 };
 
 static GFXDECODE_START( osborne1 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, osborne1_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, osborne1_charlayout, 0, 1 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( osborne1, osborne1_state )
@@ -252,10 +244,8 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 512, 0, 416, 260, 0, 240 )
-	MCFG_SCREEN_UPDATE( generic_bitmapped )
-
 	MCFG_VIDEO_START( generic_bitmapped )
-
+	MCFG_SCREEN_UPDATE( generic_bitmapped )
 	MCFG_GFXDECODE(osborne1)
 	MCFG_PALETTE_LENGTH( 3 )
 	MCFG_PALETTE_INIT( osborne1 )
@@ -293,7 +283,7 @@ ROM_START( osborne1 )
 	ROMX_LOAD( "osb14.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 6, "ver143", "BIOS version 1.43" )
 	ROMX_LOAD( "osb143.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(7) )
-	ROM_REGION( 0x800, "gfx1", 0 )
+	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "osbchr.bin", 0x0000, 0x800, BAD_DUMP CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
 ROM_END
 
