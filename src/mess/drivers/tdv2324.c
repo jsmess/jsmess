@@ -89,6 +89,9 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 
 	// devices
 	MCFG_S1410_ADD() // 104521-F ROM
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "tdv2324")
 MACHINE_CONFIG_END
 
 /* ROMs */
