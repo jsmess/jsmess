@@ -62,11 +62,11 @@
     "fphysrecs".
 
     Programs do normally not access file physical records directly.  They may
-    call high-level file routines that enable to create either fixed-lenght
-    logical records of any size from 1 through 255, or variable-lenght records
+    call high-level file routines that enable to create either fixed-length
+    logical records of any size from 1 through 255, or variable-length records
     of any size from 0 through 254: logical records are grouped by file
     managers into 256-byte physical records.  Some disk managers (HFDC and
-    SCSI) allow programs to create fixed-lenght records larger than 255 bytes,
+    SCSI) allow programs to create fixed-length records larger than 255 bytes,
     too, but few programs use this possibility.  Additionally, program files
     can be created: program files do not implement any logical record, and can
     be seen as a flat byte stream, not unlike files under MSDOS, UNIX and the C
@@ -91,11 +91,11 @@
                                                                 \_/
                                                                unused
 
-        Variable lenght records are grouped like this:
+        Variable length records are grouped like this:
                              fphysrec 0:
             byte:
                     ------------------------------
-                  0 |l0 = lenght of record 0 data|
+                  0 |l0 = length of record 0 data|
                     |----------------------------|
                   1 |                            |
                     |                            |
@@ -103,7 +103,7 @@
                     |                            |
                  l0 |                            |
                     |----------------------------|
-               l0+1 |l1 = lenght of record 1 data|
+               l0+1 |l1 = length of record 1 data|
                     |----------------------------|
                l0+2 |                            |
                     |                            |
@@ -114,7 +114,7 @@
                   : :                            :
                   : :                            :
                     |----------------------------|
-                  n |lm = lenght of record m data|
+                  n |lm = length of record m data|
                     |----------------------------|
                 n+1 |                            |
                     |                            |
@@ -135,7 +135,7 @@
                              fphysrec 1:
             byte:
                     ------------------------------
-                  0 |lm+1=lenght of record 0 data|
+                  0 |lm+1=length of record 0 data|
                     |----------------------------|
                   1 |                            |
                     |                            |
@@ -201,7 +201,7 @@
     Remaining AUs are used for fdr and data (and subdirectory FDIR if
     applicable).  There is one FDIR record per directory; the FDIR points to
     the FDR for each file in the directory.  The FDR (File Descriptor Record)
-    contains the file information (name, format, lenght, pointers to data
+    contains the file information (name, format, length, pointers to data
     physrecs/AUs, etc).
 
 
@@ -251,7 +251,7 @@
 /* Since string length is encoded with a byte, the maximum length of a string
 is 255.  Since we need to add a device name (1 char minimum, typically 4 chars)
 and a '.' separator, we chose a practical value of 250 (though few applications
-will accept paths of such lenght). */
+will accept paths of such length). */
 #define MAX_PATH_LEN 253
 #define MAX_SAFE_PATH_LEN 250
 
@@ -332,7 +332,7 @@ static void str_to_fname(char dst[10], const char *src)
 
     dst (O): destination C string
     src (I): source 10-character array
-    n (I): lenght of dst buffer (string may be truncated if less than 11)
+    n (I): length of dst buffer (string may be truncated if less than 11)
 */
 static void fname_to_str(char *dst, const char src[10], int n)
 {
@@ -419,7 +419,7 @@ static int check_fpath(const char *fpath)
 	if ((strlen(fpath) > MAX_PATH_LEN) || strchr(fpath, ' '))
 		return 1;
 
-	/* check that each path element has an acceptable lenght */
+	/* check that each path element has an acceptable length */
 	element_start = fpath;
 	do
 	{
@@ -546,7 +546,7 @@ typedef struct ti99_lvl1_imgref
 	imgtool_stream *file_handle;		/* imgtool file handle */
 	struct mess_hard_disk_file harddisk_handle;		/* MAME harddisk handle (harddisk format) */
 	ti99_geometry geometry;		/* geometry */
-	unsigned pc99_track_len;		/* unformatted track lenght (pc99 format) */
+	unsigned pc99_track_len;		/* unformatted track length (pc99 format) */
 	UINT32 *pc99_data_offset_array;	/* offset for each sector (pc99 format) */
 } ti99_lvl1_imgref;
 
@@ -589,7 +589,7 @@ static void calc_crc(UINT16 *crc, UINT8 value)
     vib (O): buffer where the vib should be stored (first pass)
     geometry (O): disk image geometry (second pass)
     data_offset_array (O): array of data offset to generate (second pass)
-    out_track_len (O): track lenght is returned there
+    out_track_len (O): track length is returned there
 
     Return imgtool error code
 */
@@ -597,7 +597,7 @@ static void calc_crc(UINT16 *crc, UINT8 value)
 #define DATA_OFFSET_NONE 0xffffffff
 static int parse_pc99_image(imgtool_stream *file_handle, int fm_format, int pass, dsk_vib *vib, const ti99_geometry *geometry, UINT32 *data_offset_array, unsigned *out_track_len)
 {
-	int track_len, num_tracks;	/* lenght of a track in bytes, and number of tracks */
+	int track_len, num_tracks;	/* length of a track in bytes, and number of tracks */
 	int phys_track;
 	int expected_cylinder, expected_head;
 	int track_start_pos, track_pos;
@@ -1572,7 +1572,7 @@ typedef struct dsk_fdr
 								/* chain (i.e. rounded on the next AU */
 								/* boundary), so level-3 routines should use */
 								/* the fixrecs field instead to determine the */
-								/* logical lenght of field.  IIRC, the HFDC */
+								/* logical length of field.  IIRC, the HFDC */
 								/* implementation is regarded as a bug because */
 								/* program files do not define the fixrecs field */
 								/* field, so program field saved by the HFDC */
@@ -1618,7 +1618,7 @@ typedef struct win_fdr
 								/* chain (i.e. rounded on the next AU */
 								/* boundary), so level-3 routines should use */
 								/* the fixrecs field instead to determine the */
-								/* logical lenght of field.  IIRC, the HFDC */
+								/* logical length of field.  IIRC, the HFDC */
 								/* implementation is regarded as a bug because */
 								/* program files do not define the fixrecs field */
 								/* field, so program field saved by the HFDC */
@@ -2503,14 +2503,14 @@ static int dsk_alloc_file_physrecs(ti99_lvl2_fileref_dsk *dsk_file, int nb_alloc
 	search_start = dsk_file->l2_img->data_offset;	/* initially, search for free space only in data space */
 	while (nb_alloc_physrecs)
 	{
-		/* find smallest data block at least nb_alloc_physrecs in lenght, and largest data block less than nb_alloc_physrecs in lenght */
+		/* find smallest data block at least nb_alloc_physrecs in length, and largest data block less than nb_alloc_physrecs in length */
 		first_best_block_seclen = INT_MAX;
 		second_best_block_seclen = 0;
 		for (i=search_start; i<totAUs; i++)
 		{
 			if (! (dsk_file->l2_img->abm[i >> 3] & (1 << (i & 7))))
 			{	/* found one free block */
-				/* compute its lenght */
+				/* compute its length */
 				cluster_baseAU = i;
 				cur_block_seclen = 0;
 				while ((i<totAUs) && (! (dsk_file->l2_img->abm[i >> 3] & (1 << (i & 7)))))
@@ -2687,14 +2687,14 @@ static int win_alloc_file_physrecs(ti99_lvl2_fileref_win *win_file, int nb_alloc
 	search_start = win_file->l2_img->data_offset;	/* initially, search for free space only in data space */
 	while (nb_alloc_physrecs)
 	{
-		/* find smallest data block at least nb_alloc_physrecs in lenght, and largest data block less than nb_alloc_physrecs in lenght */
+		/* find smallest data block at least nb_alloc_physrecs in length, and largest data block less than nb_alloc_physrecs in length */
 		first_best_block_seclen = INT_MAX;
 		second_best_block_seclen = 0;
 		for (i=search_start; i<totAUs; i++)
 		{
 			if (! (win_file->l2_img->abm[i >> 3] & (1 << (i & 7))))
 			{	/* found one free block */
-				/* compute its lenght */
+				/* compute its length */
 				cluster_baseAU = i;
 				cur_block_seclen = 0;
 				while ((i<totAUs) && (! (win_file->l2_img->abm[i >> 3] & (1 << (i & 7)))))
@@ -3763,7 +3763,7 @@ static int read_next_record(ti99_lvl3_fileref *l3_file, void *dest, int *out_rec
 	}
 	else if (flags & fdr99_f_var)
 	{
-		/* variable-lenght records */
+		/* variable-length records */
 		if (is_eof(l3_file))
 			return IMGTOOLERR_UNEXPECTED;
 		errorcode = read_file_physrec(&l3_file->l2_file, l3_file->cur_phys_rec, physrec_buf);

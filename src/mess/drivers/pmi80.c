@@ -14,7 +14,7 @@ ToDo:
 
 Notes:
 - Keyboard consists of 16 black hex keys, and 9 blue function keys
-- The hex keys are 0 thru 9, A thru F on our keyboard
+- The hex keys are 0 through 9, A through F on our keyboard
 - The function keys are mostly not worked out although I've guessed a few
 - The function key labels are RE, I, EX, R, BR, M, L, S, =
 - The letter M shows as an inverted U in the display

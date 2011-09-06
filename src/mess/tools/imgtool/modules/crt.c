@@ -581,7 +581,7 @@ static int crt_image_writefile(imgtool_image *img, const char *fname, imgtool_st
 		image->size+=size+sizeof(crt_packet);
 	} else {
 		int oldsize=GET_ULONG(PACKET(image,pos)->packet_length);
-		// overwritting
+		// overwriting
 		if (!(image->data=realloc(image->data, image->size+size+sizeof(crt_packet)-oldsize) ) )
 			return IMGTOOLERR_OUTOFMEMORY;
 		if (image->size-pos-oldsize!=0) {

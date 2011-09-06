@@ -7,7 +7,7 @@
     chip
 
     The IWM chip was used as the floppy disk controller for early Macs and the
-    Apple IIgs, and was eventually superceded by the SWIM chp.
+    Apple IIgs, and was eventually superseded by the SWIM chp.
 
     Nate Woods
     Raphael Nabet

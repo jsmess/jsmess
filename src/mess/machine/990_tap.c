@@ -315,7 +315,7 @@ static void cmd_read_binary_forward(device_t *device)
 		goto update_registers;
 	}
 
-	logerror("read binary forward: rec lenght %d, requested %d\n", reclen, char_count);
+	logerror("read binary forward: rec length %d, requested %d\n", reclen, char_count);
 
 	rec_count = reclen;
 

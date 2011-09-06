@@ -12,7 +12,7 @@
 #include <limits.h>
 #include "imgtoolx.h"
 
-/* Max sector lenght is bytes.  Generally 256, except for a few older disk
+/* Max sector length is bytes.  Generally 256, except for a few older disk
 units which use 288-byte-long sectors, and SCSI units which generally use
 standard 512-byte-long sectors. */
 /* I chose a limit of 512.  No need to use more until someone creates CD-ROMs
@@ -527,7 +527,7 @@ static unsigned phys_address_to_offset(const ti990_phys_sec_address *address, co
     address: physical sector address
     geometry: disk geometry (sectors per track, tracks per side, sides)
     dest: pointer to destination buffer
-    len: lenght of data to read
+    len: length of data to read
 */
 static int read_sector_physical_len(imgtool_stream *file_handle, const ti990_phys_sec_address *address, const ti990_geometry *geometry, void *dest, int len)
 {
@@ -570,7 +570,7 @@ static int read_sector_physical(imgtool_stream *file_handle, const ti990_phys_se
     address: physical sector address
     geometry: disk geometry (sectors per track, tracks per side, sides)
     src: pointer to source buffer
-    len: lenght of source buffer
+    len: length of source buffer
 */
 static int write_sector_physical_len(imgtool_stream *file_handle, const ti990_phys_sec_address *address, const ti990_geometry *geometry, const void *src, int len)
 {
@@ -632,7 +632,7 @@ static void log_address_to_phys_address(int secnum, const ti990_geometry *geomet
     secnum: logical sector address
     geometry: disk geometry (sectors per track, tracks per side, sides)
     dest: pointer to destination buffer
-    len: lenght of data to read
+    len: length of data to read
 */
 static int read_sector_logical_len(imgtool_stream *file_handle, int secnum, const ti990_geometry *geometry, void *dest, int len)
 {
@@ -666,7 +666,7 @@ static int read_sector_logical(imgtool_stream *file_handle, int secnum, const ti
     secnum: logical sector address
     geometry: disk geometry (sectors per track, tracks per side, sides)
     src: pointer to source buffer
-    len: lenght of source buffer
+    len: length of source buffer
 */
 static int write_sector_logical_len(imgtool_stream *file_handle, int secnum, const ti990_geometry *geometry, const void *src, int len)
 {
@@ -955,14 +955,14 @@ static int alloc_file_sectors(ti99_image *image, ti99_fdr *fdr, int nb_alloc_sec
 	search_start = image->data_offset;	/* initially, search for free space only in data space */
 	while (nb_alloc_sectors)
 	{
-		/* find smallest data block at least nb_alloc_sectors in lenght, and largest data block less than nb_alloc_sectors in lenght */
+		/* find smallest data block at least nb_alloc_sectors in length, and largest data block less than nb_alloc_sectors in length */
 		first_best_block_len = INT_MAX;
 		second_best_block_len = 0;
 		for (i=search_start; i<totsecs; i++)
 		{
 			if (! (image->sec0.abm[i >> 3] & (1 << (i & 7))))
 			{	/* found one free block */
-				/* compute its lenght */
+				/* compute its length */
 				cur_block_start = i;
 				cur_block_len = 0;
 				while ((i<totsecs) && (! (image->sec0.abm[i >> 3] & (1 << (i & 7)))))

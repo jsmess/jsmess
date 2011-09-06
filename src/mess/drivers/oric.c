@@ -32,7 +32,7 @@
 #include "machine/wd17xx.h"
 
 /*
-    Explaination of memory regions:
+    Explanation of memory regions:
 
     I have split the memory region &c000-&ffff in this way because:
 

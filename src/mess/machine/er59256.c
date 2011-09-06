@@ -38,7 +38,7 @@ struct _er59256_t
     UINT16  in_shifter;
     UINT32  out_shifter;
 
-    /* Count of bits recieved since last CS low->high */
+    /* Count of bits received since last CS low->high */
     UINT8   bitcount;
 
     /* Command & addresss */

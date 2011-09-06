@@ -390,9 +390,9 @@ ROM_START( ibm5150 )
 
 	/* Xebec 1210 and 1220 Z80-based ST409/ST412 MFM controllers */
 //  ROM_LOAD("5000059.12d", 0xc8000, 0x02000, CRC(03e0ee9a) SHA1(6691be4f6a8d690c696ad8b259708d3e7e87ad89)) /* Xebec 1210 IBM OEM Fixed Disk Adapter - Revision 1, supplied with rev1 and rev2 XT, and PC/3270. supports 4 hdd types, selectable by jumpers (which on the older XTs were usually soldered to one setting) */
-//  ROM_LOAD("62x0822.12d", 0xc8000, 0x02000, CRC(4cdd2193) SHA1(fe8f88333b5e13e170bf637a9a0090383dee454d)) /* Xebec 1210 IBM OEM Fixed Disk Adapter 62X0822__(M)_AMI_8621MAB__S68B364-P__(C)IBM_CORP_1982,1985__PHILIPPINES.12D.2364.bin - Revision 2, supplied with rev3 and rev4 XT. supports 4 hdd types, selectable by jumpers (which unlike the older XTs, were changable without requiring soldering )*/
-//  ROM_LOAD("unknown.12d", 0xc8000, 0x02000, NO_DUMP ) /* Xebec 1210 Non-IBM/Retail Fixed Disk Adapter - supports 4 hdd types, selectable by jumpers (changable without soldering) */
-//  ROM_LOAD("unknown.???", 0xc8000, 0x02000, NO_DUMP ) /* Xebec 1220 Non-IBM/Retail Fixed Disk Adapter plus Floppy Disk Adapter - supports 4 hdd types, selectable by jumpers (changable without soldering) */
+//  ROM_LOAD("62x0822.12d", 0xc8000, 0x02000, CRC(4cdd2193) SHA1(fe8f88333b5e13e170bf637a9a0090383dee454d)) /* Xebec 1210 IBM OEM Fixed Disk Adapter 62X0822__(M)_AMI_8621MAB__S68B364-P__(C)IBM_CORP_1982,1985__PHILIPPINES.12D.2364.bin - Revision 2, supplied with rev3 and rev4 XT. supports 4 hdd types, selectable by jumpers (which unlike the older XTs, were changeable without requiring soldering )*/
+//  ROM_LOAD("unknown.12d", 0xc8000, 0x02000, NO_DUMP ) /* Xebec 1210 Non-IBM/Retail Fixed Disk Adapter - supports 4 hdd types, selectable by jumpers (changeable without soldering) */
+//  ROM_LOAD("unknown.???", 0xc8000, 0x02000, NO_DUMP ) /* Xebec 1220 Non-IBM/Retail Fixed Disk Adapter plus Floppy Disk Adapter - supports 4 hdd types, selectable by jumpers (changeable without soldering) */
 
 	/* IBM PC 5150 (rev 3: 1501-476 10/27/82) 5-screw case 64-256k MB w/1501981 CGA Card, ROM Basic 1.1 */
 	ROM_DEFAULT_BIOS( "rev3" )
@@ -483,9 +483,9 @@ ROM_START( ibm5160 )
 
 	/* Xebec 1210 and 1220 Z80-based ST409/ST412 MFM controllers */
 //  ROM_LOAD("5000059.12d", 0xc8000, 0x02000, CRC(03e0ee9a) SHA1(6691be4f6a8d690c696ad8b259708d3e7e87ad89)) /* Xebec 1210 IBM OEM Fixed Disk Adapter - Revision 1, supplied with rev1 and rev2 XT, and PC/3270. supports 4 hdd types, selectable by jumpers (which on the older XTs were usually soldered to one setting) */
-//  ROM_LOAD("62x0822.12d", 0xc8000, 0x02000, CRC(4cdd2193) SHA1(fe8f88333b5e13e170bf637a9a0090383dee454d)) /* Xebec 1210 IBM OEM Fixed Disk Adapter 62X0822__(M)_AMI_8621MAB__S68B364-P__(C)IBM_CORP_1982,1985__PHILIPPINES.12D.2364.bin - Revision 2, supplied with rev3 and rev4 XT. supports 4 hdd types, selectable by jumpers (which unlike the older XTs, were changable without requiring soldering )*/
-//  ROM_LOAD("unknown.12d", 0xc8000, 0x02000, NO_DUMP ) /* Xebec 1210 Non-IBM/Retail Fixed Disk Adapter - supports 4 hdd types, selectable by jumpers (changable without soldering) */
-//  ROM_LOAD("unknown.???", 0xc8000, 0x02000, NO_DUMP ) /* Xebec 1220 Non-IBM/Retail Fixed Disk Adapter plus Floppy Disk Adapter - supports 4 hdd types, selectable by jumpers (changable without soldering) */
+//  ROM_LOAD("62x0822.12d", 0xc8000, 0x02000, CRC(4cdd2193) SHA1(fe8f88333b5e13e170bf637a9a0090383dee454d)) /* Xebec 1210 IBM OEM Fixed Disk Adapter 62X0822__(M)_AMI_8621MAB__S68B364-P__(C)IBM_CORP_1982,1985__PHILIPPINES.12D.2364.bin - Revision 2, supplied with rev3 and rev4 XT. supports 4 hdd types, selectable by jumpers (which unlike the older XTs, were changeable without requiring soldering )*/
+//  ROM_LOAD("unknown.12d", 0xc8000, 0x02000, NO_DUMP ) /* Xebec 1210 Non-IBM/Retail Fixed Disk Adapter - supports 4 hdd types, selectable by jumpers (changeable without soldering) */
+//  ROM_LOAD("unknown.???", 0xc8000, 0x02000, NO_DUMP ) /* Xebec 1220 Non-IBM/Retail Fixed Disk Adapter plus Floppy Disk Adapter - supports 4 hdd types, selectable by jumpers (changeable without soldering) */
 
 
 	ROM_DEFAULT_BIOS( "rev4" )
@@ -572,7 +572,7 @@ ROM_START( ibm5160 )
            and trace-marked "|||CIM0286 ECA2466 // 94V-O" on the back.
     */
 //  ROM_REGION(0x4000,"gfx2", 0)
-//      ROM_LOAD("1504161.u11", 0x00000, 0x2000, CRC(d9246cf5) SHA1(2eaed495893a4e6649b04d10dada7b5ef4abd140)) /* silkscreen: "AMI 8613MAJ // 9591-041 // S2364B // 1504161 // PHILIPPINES" - Purpose: Pixels 0 thru 7 of built-in 3270 terminal font*/
+//      ROM_LOAD("1504161.u11", 0x00000, 0x2000, CRC(d9246cf5) SHA1(2eaed495893a4e6649b04d10dada7b5ef4abd140)) /* silkscreen: "AMI 8613MAJ // 9591-041 // S2364B // 1504161 // PHILIPPINES" - Purpose: Pixels 0 through 7 of built-in 3270 terminal font*/
 //      ROM_LOAD("1504162.u26", 0x02000, 0x2000, CRC(59e1dc32) SHA1(337b5cced203345a5acfb02532d6b5f526902ee7)) /* silkscreen: "AMI 8607MAH // 9591-042 // S2364B // 1504162 // PHILIPPINES" - Purpose: Pixel 8 of built-in 3270 terminal font*/
 ROM_END
 

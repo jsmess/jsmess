@@ -536,13 +536,13 @@ static MACHINE_START( vic20 )
 	{
 	case 32*1024:
 		program->install_ram(0x6000, 0x7fff, NULL);
-		/* fallthru */
+		/* fall through */
 	case 24*1024:
 		program->install_ram(0x4000, 0x5fff, NULL);
-		/* fallthru */
+		/* fall through */
 	case 16*1024:
 		program->install_ram(0x2000, 0x3fff, NULL);
-		/* fallthru */
+		/* fall through */
 	case 8*1024:
 		program->install_ram(0x0400, 0x0fff, NULL);
 	}

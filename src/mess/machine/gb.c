@@ -617,7 +617,7 @@ static WRITE8_HANDLER( gb_mem_mode_select_mbc3 )
 		state->m_MBC3RTCMap[1] = 40;    /* Minutes */
 		state->m_MBC3RTCMap[2] = 15;    /* Hours */
 		state->m_MBC3RTCMap[3] = 25;    /* Day counter lowest 8 bits */
-		state->m_MBC3RTCMap[4] = 0x01;  /* Day counter upper bit, timer off, no day overflow occured (bit7) */
+		state->m_MBC3RTCMap[4] = 0x01;  /* Day counter upper bit, timer off, no day overflow occurred (bit7) */
 	}
 }
 

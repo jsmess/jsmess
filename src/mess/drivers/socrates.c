@@ -412,7 +412,7 @@ end hd38880 info.*/
 			logerror("speech command 0xF%x is unknown!\n",data&0xF);
 			}
 			break;
-		default: // 00 thru 70 are packets without the write bit set, ignore them
+		default: // 00 through 70 are packets without the write bit set, ignore them
 			break;
 	}
 	state->m_io40_latch = data;
@@ -526,7 +526,7 @@ static rgb_t socrates_create_color(UINT8 color)
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
   };
   /* chroma colors and phases:
-     0: black-thru-grey (0 assumed chroma)
+     0: black-through-grey (0 assumed chroma)
      1: purple (90 chroma seems correct)
      2: light blue/green (210 or 240 chroma, 210 seems slightly closer)
      3: bright blue (150 seems correct)
@@ -541,7 +541,7 @@ static rgb_t socrates_create_color(UINT8 color)
      C: yellow-orange (330 is close but this conflicts with color 7, and is not quite the same; color 7 has more green in it than color C)
      D: magenta (60 is closest)
      E: blue-purple (more blue than color 1, 120 is closest)
-     F: grey-thru-white (0 assumed chroma)
+     F: grey-through-white (0 assumed chroma)
   */
   static const double phaseangle[16] = { 0, 90, 220, 150, 270, 40, 0, 315, 180, 210, 240, 300, 330, 60, 120, 0 }; // note: these are guessed, not measured yet!
   int chromaindex = color&0x0F;
@@ -658,7 +658,7 @@ static WRITE8_HANDLER(socrates_sound_w)
 static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8)
     ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x0000, 0x3fff) AM_ROM /* system rom, bank 0 (fixed) */
-    AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") /* banked rom space; system rom is banks 0 thru F, cartridge rom is banks 10 onward, usually banks 10 thru 17. area past the end of the cartridge, and the whole 10-ff area when no cartridge is inserted, reads as 0xF3 */
+    AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") /* banked rom space; system rom is banks 0 through F, cartridge rom is banks 10 onward, usually banks 10 through 17. area past the end of the cartridge, and the whole 10-ff area when no cartridge is inserted, reads as 0xF3 */
     AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank2") /* banked ram 'window' 0 */
     AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank3") /* banked ram 'window' 1 */
 ADDRESS_MAP_END
@@ -769,8 +769,8 @@ keycode low
 50  80  SHIFT
 // socrates mouse pad (separate from keyboard)
 8x  8y  mouse movement
-x: down = 1 (small) thru 7 (large), up = 8 (small) thru F (large)
-y: right = 1 (small) thru 7 (large), left = 8 (small) thru F (large)
+x: down = 1 (small) through 7 (large), up = 8 (small) through F (large)
+y: right = 1 (small) through 7 (large), left = 8 (small) through F (large)
 90  80  right click
 A0  80  left click
 B0  80  both buttons click

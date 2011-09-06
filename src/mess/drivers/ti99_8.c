@@ -49,7 +49,7 @@ Mapper:
     Mapper has 4kb page size (-> 16 pages per map file), 32 bits per page
     entry.  Address bits A0-A3 are the page index, whereas bits A4-A15 are the
     offset in the page.  Physical address space is 16Mbytes.  All pages are 4
-    kBytes in lenght, and they can start anywhere in the 24-bit physical
+    kBytes in length, and they can start anywhere in the 24-bit physical
     address space.  The mapper can load any of 4 map files from SRAM by DMA.
     Map file 0 is used by BIOS, file 1 by memory XOPs(?), file 2 by P-code
     interpreter(???).

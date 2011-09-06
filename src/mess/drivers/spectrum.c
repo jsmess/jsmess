@@ -103,7 +103,7 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
                 70908 cycles for each frame.
             Remaped some Spectrum+ keys.
                 Presing F3 to reset was seting 0xf7 on keyboard
-                input port. Problem occured for snapshots of
+                input port. Problem occurred for snapshots of
                 some programms where it was readed as pressing
                 key 4 (which is exit in Tapecopy by R. Dannhoefer
                 for example).
@@ -252,7 +252,7 @@ Kempston Mouse
     Schematics and test software at http://8bit.yarek.pl/hardware/zx.mouse/
 
 Currah uSpeech
-    Speech synthesis thru allophones (SP0256-AL2)
+    Speech synthesis through allophones (SP0256-AL2)
 
 MGT Messenger
     Allows connection between ZX Spectrum and SAM Coup??

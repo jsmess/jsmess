@@ -1398,7 +1398,7 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 
 		if (size != image.fread( image.device().machine().region("maincpu")->base() + 0x2100, size))
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error occured while reading ROM image");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error occurred while reading ROM image");
 			return IMAGE_INIT_FAIL;
 		}
 	}

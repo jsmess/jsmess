@@ -108,7 +108,7 @@ static MACHINE_RESET( rvoicepc )
 	state->m_hd63701y0.TCSR2 = 0x10;
 	state->m_hd63701y0.RMCR = 0xC0;
 	state->m_hd63701y0.TRCSR1 = 0x20;
-	state->m_hd63701y0.RDR = 0x00; // Recieve Data Reg, R
+	state->m_hd63701y0.RDR = 0x00; // Receive Data Reg, R
 	state->m_hd63701y0.TDR = 0x00; // Transmit Data Reg, W
 	state->m_hd63701y0.RP5CR = 0x78; // or 0xF8; Ram/Port5 Control Reg, R/W
 	state->m_hd63701y0.PORT5 = 0x00; // port 5, R/W

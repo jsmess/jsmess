@@ -920,7 +920,7 @@ static MICRODRIVE_CONFIG( mdv2_config )
 //
 // The 896K option is dealt with once the machine is up and running as
 // the Trump Card ROM is initally mapped in at $C0000-$C8000, as this is
-// oficially the expansion card rom area. Once the Trump Card has initialised
+// officially the expansion card rom area. Once the Trump Card has initialised
 // it maps the last 256K of ram into this area (asuming that it has 768K
 // onboard).
 //

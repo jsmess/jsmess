@@ -71,7 +71,7 @@ PB.5 - digit 3 (W)
 PB.6 - enable language switches (W, see below)
 PB.7 - TSI DONE line (R)
 
-(button rows pulled up to 5V thru 2.2K resistors)
+(button rows pulled up to 5V through 2.2K resistors)
 PC.0 - button row 0, german language jumper (R)
 PC.1 - button row 1, french language jumper (R)
 PC.2 - button row 2, spanish language jumper (R)
@@ -105,7 +105,7 @@ to keep the inputs pulled up), solder a piggybacked ROM to the existing english
 speech ROM, and finally install a 7474 dual flipflop.
 
 This way, the game can then detect which secondary language is present, and then it can
-automatically select the correct ROM(s).  I have to test wether it will do automatic
+automatically select the correct ROM(s).  I have to test whether it will do automatic
 determination and give you a language option on power up or something.
 
 ***********************************************************************
@@ -139,7 +139,7 @@ PB.5 - digit 3 (W)
 PB.6 - NC
 PB.7 - Mode select (cc3 vs cc10, R)
 
-(button rows pulled up to 5V thru 2.2K resistors)
+(button rows pulled up to 5V through 2.2K resistors)
 PC.0 - button row 0 (R)
 PC.1 - button row 1 (R)
 PC.2 - button row 2 (R)
@@ -494,7 +494,7 @@ enable line will be low.
 
 This sequence repeats every 16 addresses.  So to recap:
 
-00-03: both chips enabled (prolly not used)
+00-03: both chips enabled (probably not used)
 04-07: PIO enabled
 08-0B: 8255 enabled
 0C-0F: neither enabled
@@ -502,7 +502,7 @@ This sequence repeats every 16 addresses.  So to recap:
 10-FF: mirrors of 00-0F.
 
 
-Refer to the Sensory Champ. Chess Chall. above for explainations of the below
+Refer to the Sensory Champ. Chess Chall. above for explanations of the below
 I/O names and labels.  It's the same.
 
 8255:

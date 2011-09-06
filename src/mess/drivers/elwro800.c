@@ -203,7 +203,7 @@ static const centronics_interface elwro800jr_centronics_interface =
  *  I/O reads and writes
  *
  *  I/O accesses are decoded by prom which uses 8 low address lines (A0-A8) as input
- *  and outputs chip select signals for system components. Standard adresses are:
+ *  and outputs chip select signals for system components. Standard addresses are:
  *
  *  0x1F: 8255 port A (joystick)
  *  0xBE: 8251 data (Junet network)

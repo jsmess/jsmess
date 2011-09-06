@@ -294,7 +294,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 					sasi->io = 1;  // Output
 					sasi->status_port |= 0x04;  // C/D remains the same
 					sasi->status = 0x02;
-					logerror("SASI: Invalid or unimplemented SASI command (0x%02x) recieved.\n",sasi->command[0]);
+					logerror("SASI: Invalid or unimplemented SASI command (0x%02x) received.\n",sasi->command[0]);
 				}
 			}
 		}

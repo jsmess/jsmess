@@ -53,7 +53,7 @@ static void z88_update_rtc_interrupt(running_machine &machine)
 	{
 		/* yes */
 
-		/* any ints occured? */
+		/* any ints occurred? */
 		if (state->m_blink.tsta & 0x07)
 		{
 			/* yes, set time int */
@@ -108,7 +108,7 @@ static TIMER_DEVICE_CALLBACK(z88_rtc_timer_callback)
 		/* tick */
 		if ((state->m_blink.tim[0]%10)==0)
 		{
-			/* set tick int has occured */
+			/* set tick int has occurred */
 			state->m_blink.tsta |= RTC_TICK_INT;
 			refresh_ints = TRUE;
 		}
@@ -117,7 +117,7 @@ static TIMER_DEVICE_CALLBACK(z88_rtc_timer_callback)
 		{
 			state->m_blink.tim[0] = 0;
 
-			/* set seconds int has occured */
+			/* set seconds int has occurred */
 			state->m_blink.tsta |= RTC_SEC_INT;
 			refresh_ints = TRUE;
 
@@ -125,7 +125,7 @@ static TIMER_DEVICE_CALLBACK(z88_rtc_timer_callback)
 
 			if (state->m_blink.tim[1]==60)
 			{
-				/* set minutes int has occured */
+				/* set minutes int has occurred */
 				state->m_blink.tsta |=RTC_MIN_INT;
 				state->m_blink.tim[1]=0;
 				state->m_blink.tim[2]++;
@@ -323,7 +323,7 @@ WRITE8_MEMBER( z88_state::z88_port_w )
 
 			/* set acknowledge */
 			m_blink.tack = data & 0x07;
-			/* clear ints that have occured */
+			/* clear ints that have occurred */
 			m_blink.tsta &= ~m_blink.tack;
 
 			/* refresh ints */

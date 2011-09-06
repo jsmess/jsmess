@@ -26,7 +26,7 @@
     Error values:
 
      0 = no error
-    -1 = power-on state (before the first command is recieved)
+    -1 = power-on state (before the first command is received)
     -2 = invalid command
      2 = VHD image does not exist
      4 = Unable to open VHD image file

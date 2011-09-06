@@ -71,7 +71,7 @@ READ8_MEMBER( trs80_state::trs80m4_e0_r )
     bit takes precedence. We take this opportunity to clear the
     cpu INT line.
 
-    d6 RS232 Error (Any of {FE, PE, OR} errors has occured)
+    d6 RS232 Error (Any of {FE, PE, OR} errors has occurred)
     d5 RS232 Rcv (DAV indicates a char ready to be picked up from uart)
     d4 RS232 Xmit (TBMT indicates ready to accept another char from cpu)
     d3 I/O Bus

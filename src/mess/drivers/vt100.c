@@ -451,8 +451,8 @@ MACHINE_CONFIG_END
  *     VT100-WA/WB - has special LA120 AVO board preinstalled, WP romset?,
         English WP keyboard, no alt charset rom, LA120? 23-069E2 AVO rom.
        (The WA and WB variants are called the '-02' variant on the schematics)
- *    VT100-WC thru WZ: foreign language word processing series:
-      (The WC thru WK variants are called the '-03' variant on the schematics)
+ *    VT100-WC through WZ: foreign language word processing series:
+      (The WC through WK variants are called the '-03' variant on the schematics)
  *     VT100-WC/WD - has AVO board preinstalled, WP romset?, French Canadian
         WP keyboard, has 23-094E2 alt charset rom, 23-093E2 AVO rom.
  *     VT100-WE/WF - has AVO board preinstalled, WP romset?, French
@@ -550,7 +550,7 @@ MACHINE_CONFIG_END
  * No roms - normal vt100 system with AVO installed
  * 23-069E2 (location e21) - meant for vt100-wa and -wb 'LA120' 'word processing' systems (the mapping of the rom for this system is different than for the ones below)
  * 23-099E2 (location e21) and 23-100E2 (location e17) - meant for vt132
- * 23-093E2 (location e21) - meant for vt100 wc thru wz 'foreign language' word processing systems
+ * 23-093E2 (location e21) - meant for vt100 wc through wz 'foreign language' word processing systems
  * 23-184E2 and 23-185E2 - meant for vt100 with STP printer option board installed, version 1, comes with vt1xx-ac kit
  * 23-186E2 and 23-187E2 - meant for vt100 with STP printer option board installed, version 2, comes with vt1xx-ac kit
  */

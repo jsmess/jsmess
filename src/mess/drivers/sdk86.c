@@ -225,7 +225,7 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( sdk86 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF ) // all are Intel D2616 ?eproms with the windows painted over? (factory programmed eproms? this would match the 'i8642' marking on the factory programmed eprom version of the AT keyboard mcu...)
-	// Note that the rom pairs at FE000-FEFFF and FF000-FFFFF are interchangable; the ones at FF000-FFFFF are the ones which start on bootup, and the other ones live at FE000-FEFFF and can be switched in by the user. One pair is the Serial RS232 Monitor and the other is the Keypad/front panel monitor. On the SDK-86 I (LN) dumped, the Keypad monitor was primary, but the other SDK-86 I know of has the roms in the opposite arrangement (Serial primary).
+	// Note that the rom pairs at FE000-FEFFF and FF000-FFFFF are interchangeable; the ones at FF000-FFFFF are the ones which start on bootup, and the other ones live at FE000-FEFFF and can be switched in by the user. One pair is the Serial RS232 Monitor and the other is the Keypad/front panel monitor. On the SDK-86 I (LN) dumped, the Keypad monitor was primary, but the other SDK-86 I know of has the roms in the opposite arrangement (Serial primary).
 	// Serial Monitor Version 1.2 (says "  86   1.2" on LED display at startup, and sends a data prompt over serial)
 	ROM_LOAD16_BYTE( "0456_104531-001.a36", 0xfe000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93)) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
 	ROM_LOAD16_BYTE( "0457_104532-001.a37", 0xfe001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3)) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
@@ -234,7 +234,7 @@ ROM_START( sdk86 )
 	ROM_LOAD16_BYTE( "0170_102043-001.a30", 0xff001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b)) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
 
 	/* proms:
-     * dumped 11/21/09 thru 11/29/09 by LN
+     * dumped 11/21/09 through 11/29/09 by LN
      * purposes: (according to sdk-86 user manual from http://www.bitsavers.org/pdf/intel/8086/9800698A_SDK-86_Users_Man_Apr79.pdf)
      * A12: main address decoding (selects ram or rom or open bus/offboard, see page 2-7)
      * A22: I/O decoding for 8251, 8279 and optional pair of 8255 chips (in the FFE8-FFFF I/O area; see page 2-6)

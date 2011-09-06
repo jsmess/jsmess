@@ -28,7 +28,7 @@
                Soft scroll registers (only byte-by-byre horizontally for now),
                Analogue controls (may well be completely wrong, I have no idea on how these should work),
                Vectored interrupts for Z80 interrupt mode 2 (used by Pang),
-               DMA sound channels (may still be some issues, noticable in Navy Seals and Copter 271)
+               DMA sound channels (may still be some issues, noticeable in Navy Seals and Copter 271)
                04/07/06:  Added interrupt vector support for IM 2.
                           Added soft scroll register implementation.  Vertical adjustments are a bit shaky.
                05/07/06:  Fixed hardware sprite offsets
@@ -42,7 +42,7 @@
                           Fixed DMA pause function when the prescaler is set to 0.
 
                Tested with the Arnold 5 Diagnostic Cartridge.  Mostly works fine, but the soft scroll test is
-               noticably wrong.
+               noticeably wrong.
 
                Known issues with some games (as at 12/01/08):
                Robocop 2:  playable, but sprites should be cut off outside the playing area (partial updates should be able to fix this).
@@ -378,7 +378,7 @@ lk4     Frequency
    UM6845R     UMC          1
    MC6845      Motorola     2
    AMS40489    Amstrad      3
-   Pre-ASIC??? Amstrad?     4 In the "cost-down" CPC6128, the CRTC functionality is integrated into a single ASIC IC. This ASIC is often refered to as the "Pre-ASIC" because it preceeded the CPC+ ASIC
+   Pre-ASIC??? Amstrad?     4 In the "cost-down" CPC6128, the CRTC functionality is integrated into a single ASIC IC. This ASIC is often referred to as the "Pre-ASIC" because it preceded the CPC+ ASIC
 As far as I know, the KC compact used HD6845S only.
 */
 //  PORT_START("crtc")

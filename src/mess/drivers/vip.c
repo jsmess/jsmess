@@ -660,7 +660,7 @@ void vip_state::machine_reset()
 		break;
 	}
 
-	/* enable ROM all thru address space */
+	/* enable ROM all through address space */
 	program->install_rom(0x0000, 0x01ff, 0, 0xfe00, machine().region(CDP1802_TAG)->base());
 }
 

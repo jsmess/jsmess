@@ -558,7 +558,7 @@ static imgtoolerr_t vzdos_diskimage_deletefile(imgtool_partition *partition, con
 
 	} else if (ret) {
 
-		/* an error occured */
+		/* an error occurred */
 		return ret;
 
 	} else {
@@ -631,7 +631,7 @@ static imgtoolerr_t vzdos_writefile(imgtool_partition *partition, int offset, im
 		ret = vzdos_diskimage_deletefile(partition, filename);
 		if (ret) return ret;
 	} else if (ret != IMGTOOLERR_FILENOTFOUND) {
-		/* another error occured, return it */
+		/* another error occurred, return it */
 		return ret;
 	}
 

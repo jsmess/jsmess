@@ -29,7 +29,7 @@ static void update_interrupt(running_machine &machine);
 overriden if more than one controller is used */
 #define MAX_DISK_UNIT 4
 
-/* Max sector lenght is bytes.  Generally 256, except for a few older disk
+/* Max sector length is bytes.  Generally 256, except for a few older disk
 units which use 288-byte-long sectors, and SCSI units which generally use
 standard 512-byte-long sectors. */
 /* I chose a limit of 512.  No need to use more until someone writes CD-ROMs
@@ -39,7 +39,7 @@ for TI990. */
 /* Description of custom format */
 /* We can use MAME's harddisk.c image format instead. */
 
-/* machine-independant big-endian 32-bit integer */
+/* machine-independent big-endian 32-bit integer */
 typedef struct UINT32BE
 {
 	UINT8 bytes[4];

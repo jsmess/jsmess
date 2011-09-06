@@ -2109,7 +2109,7 @@ static void pmu_exec(mac_state *mac)
 {
 	mac->m_pm_sptr = 0;	// clear send pointer
 	mac->m_pm_slen = 0;	// and send length
-	mac->m_pm_dptr = 0;	// and recieve pointer
+	mac->m_pm_dptr = 0;	// and receive pointer
 
 	printf("PMU: Command %02x\n", mac->m_pm_cmd[0]);
 	switch (mac->m_pm_cmd[0])

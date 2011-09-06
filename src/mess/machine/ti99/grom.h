@@ -49,7 +49,7 @@ Some details:
 GPL ports:
 
     When accessing the GROMs registers, 8 address bits (cpu_addr & 0x03FC) may
-    be used as a port number, which permits the use of up to 256 independant
+    be used as a port number, which permits the use of up to 256 independent
     GROM ports, with 64kb of address space in each.  TI99/4(a) ROMs can take
     advantage of the first 16 ports: it will look for GPL programs in every
     GROM of the 16 first ports.  Additionally, while the other 240 ports cannot
