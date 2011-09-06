@@ -104,7 +104,7 @@ static TIMER_CALLBACK( Callback_DMA_irq )
 	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
 	/* To generate the NMI signal (late) when uPD DMA request*/
 	cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_NMI, ASSERT_LINE);  //NMI...
-	state->m_hector_nb_cde =0; // clear the cde lenght
+	state->m_hector_nb_cde =0; // clear the cde length
 }
 
 static TIMER_CALLBACK( Callback_INT_irq )
@@ -127,7 +127,7 @@ static WRITE_LINE_DEVICE_HANDLER( hector_disc2_fdc_dma_irq )
 	hec2hrp_state *drvstate = device->machine().driver_data<hec2hrp_state>();
 	/* upd765 DRQ is connected to NMI of Z80 within a RNMI hardware authorization*/
 	/* Here the most difficult on this machine :
-    The DMA request come with the uPD765 "soft" imediately,
+    The DMA request come with the uPD765 "soft" immediately,
     against the true hard uPD765. In the real life, the uPD had
     to seach for the sector before !
     So, we had to memorize the signal (the DMA is a pulse)
@@ -273,7 +273,7 @@ READ8_HANDLER( hector_disc2_io61_port_r)
 	if (state->m_print==1)
 		printf(" _%x",data);
 	#endif
-	state->m_hector_nb_cde =0; // clear the cde lenght
+	state->m_hector_nb_cde =0; // clear the cde length
 	return data;
 }
 WRITE8_HANDLER( hector_disc2_io61_port_w)
@@ -290,7 +290,7 @@ WRITE8_HANDLER( hector_disc2_io61_port_w)
 	state->m_hector_cmd[2]=state->m_hector_cmd[1];  //hector_cmd_1 = GPL
 	state->m_hector_cmd[1]=state->m_hector_cmd[0];  //hector_cmd_0 = DTL
 	state->m_hector_cmd[0] = data;
-	// Increase the lenght cde!
+	// Increase the length cde!
 	state->m_hector_nb_cde++;
 
 	// check if current commande is write cmde.

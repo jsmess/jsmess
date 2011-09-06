@@ -292,7 +292,7 @@ void ti99_mfm_harddisk_read_track(device_t *harddisk, int head, UINT8 **pbuffer,
 
 	*pbuffer = trackdata;
 
-	// Remember to free the buffer! Except when an error has occured,
+	// Remember to free the buffer! Except when an error has occurred,
 	// the function returns a newly allocated buffer.
 	// Errors are indicated by READY=FALSE.
 }

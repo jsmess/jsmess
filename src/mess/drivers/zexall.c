@@ -1,6 +1,6 @@
 /******************************************************************************
 *
-*  Self Contained zexall 'Z80 instruction exercizer' test driver
+*  Self Contained zexall 'Z80 instruction exerciser' test driver
 *  By Jonathan Gevaryahu AKA Lord Nightmare
 *  Zexall originally written by Frank Cringle for ZX Spectrum
 *  Modularized Spectrum-independent Zexall binary supplied by Blargg

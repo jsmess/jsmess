@@ -25,7 +25,7 @@
 
 #define MAX_SMARTMEDIA	1
 
-/* machine-independant big-endian 32-bit integer */
+/* machine-independent big-endian 32-bit integer */
 typedef struct UINT32BE
 {
 	UINT8 bytes[4];

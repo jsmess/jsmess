@@ -329,7 +329,7 @@ void hd63450_single_transfer(device_t* device, int x)
 				{
 					data = dmac->intf->dma_read[x](device->machine(),dmac->reg[x].mar);
 					if(data == -1)
-						return;  // not ready to recieve data
+						return;  // not ready to receive data
 					space->write_byte(dmac->reg[x].mar,data);
 					datasize = 1;
 				}

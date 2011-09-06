@@ -1176,7 +1176,7 @@ ADDRESS_MAP_END
     INPUT PORTS
 ***************************************************************************/
 
-/* The PX-4 has an exchangable keyboard. Available is a standard ASCII
+/* The PX-4 has an exchangeable keyboard. Available is a standard ASCII
  * keyboard and an "item" keyboard, as well as regional variants for
  * UK, France, Germany, Denmark, Sweden, Norway, Italy and Spain.
  */

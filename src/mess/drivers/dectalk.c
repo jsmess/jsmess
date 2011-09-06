@@ -17,7 +17,7 @@
 *    * pins IP0, IP2, and IP3 are connected to the primary serial port:
 *      * IP0 is CTS
 *      * IP2 is DSR
-*      * IP3 is RLS (recieved line signal, this pin is rarely used on rs232)
+*      * IP3 is RLS (received line signal, this pin is rarely used on rs232)
 *    * <DONE> pins IP4, IP5 and IP6 are on jumpers on the DUART, tied high normally but jumperable low, should be handled as dipswitches:
 *      * IP4 low: skip hardware self tests
 *      * IP5 low: unknown

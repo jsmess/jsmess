@@ -55,7 +55,7 @@ Start bit (low), Bit 0, Bit 1... highest bit, Parity bit (if enabled), 1-2 stop 
 -- Pin 16 - SWE - Status word enable - causes the status bits (PE, FE, OR, DAV, TBMT) to appear at the pins.
 -- Pin 19 - DAV - "1" indicates that a byte has been received by the UART, and should now be accepted by the computer
 -- Pin 18 - RDAV - "0" will force DAV low.
--- Pin 13 - PE - Parity error - "1" indicates that a parity error occured
+-- Pin 13 - PE - Parity error - "1" indicates that a parity error occurred
 -- Pin 14 - FE - Framing error - "1" Indicates that the stop bit was missing
 -- Pin 15 - OR - overrun - "1" indicates that a new character has become available before the computer had accepted the previous character
 

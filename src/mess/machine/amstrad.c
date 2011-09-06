@@ -927,7 +927,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_hsync_changed )
 			{
 				if ( drvstate->m_asic.ram[0x2801] == drvstate->m_asic.vpos - 1 )	// split occurs here (hopefully)
 				{
-					logerror("SSCR: Split screen occured at scanline %d\n",drvstate->m_asic.ram[0x2801]);
+					logerror("SSCR: Split screen occurred at scanline %d\n",drvstate->m_asic.ram[0x2801]);
 				}
 			}
 			// CPC+/GX4000 DMA channels

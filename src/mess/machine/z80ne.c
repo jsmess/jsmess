@@ -495,7 +495,7 @@ WRITE8_HANDLER( lx383_w )
 /*
  * NE555 is connected to a 74LS93 binary counter
  * 74LS93 output:
- *   QA-QC: colum index for LEDs and keyboard
+ *   QA-QC: column index for LEDs and keyboard
  *   QD:    keyboard row select
  *
  * Port EE: UART Data Read/Write

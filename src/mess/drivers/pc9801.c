@@ -2628,7 +2628,7 @@ ROM_START( pc9801f )
 	ROM_LOAD( "2hdif.rom", 0x10000, 0x1000, BAD_DUMP CRC(9652011b) SHA1(b607707d74b5a7d3ba211825de31a8f32aec8146) ) // needs dumping from a board
 
 	ROM_REGION( 0x800, "kbd_mcu", ROMREGION_ERASEFF)
-	ROM_LOAD( "mcu.bin", 0x0000, 0x0800, NO_DUMP ) //connected thru a i8251 UART, needs decapping
+	ROM_LOAD( "mcu.bin", 0x0000, 0x0800, NO_DUMP ) //connected through a i8251 UART, needs decapping
 
 	/* note: ROM names of following two might be swapped */
 	ROM_REGION( 0x1800, "chargen", 0 )

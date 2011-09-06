@@ -311,7 +311,7 @@ static int snes_validate_infoblock( UINT8 *infoblock, UINT32 offset )
 	UINT16 checksum     = infoblock[offset + 0x1e] | (infoblock[offset + 0x1f] << 8);
 	UINT16 ichecksum    = infoblock[offset + 0x1c] | (infoblock[offset + 0x1d] << 8);
 	UINT8 reset_opcode  = infoblock[(offset & ~0x7fff) | (reset_vector & 0x7fff)];	//first opcode executed upon reset
-	UINT8 mapper        = infoblock[offset + 0x15] & ~0x10;							//mask off irrelevent FastROM-capable bit
+	UINT8 mapper        = infoblock[offset + 0x15] & ~0x10;							//mask off irrelevant FastROM-capable bit
 
 	/* $00:[000-7fff] contains uninitialized RAM and MMIO.
     reset vector must point to ROM at $00:[8000-ffff] to be considered valid. */

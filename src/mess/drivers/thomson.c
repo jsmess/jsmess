@@ -895,7 +895,7 @@ MO5 (1984)
 
 The MO5 is Thomson's attempt to provide a less costly micro-computer, using
 the same technology as the TO7/70.
-It has less memory and is less expandable. The MC6846 timer has disapeared.
+It has less memory and is less expandable. The MC6846 timer has disappeared.
 The BIOS has been throughly rewritten and uses a more compact call scheme.
 This, and the fact that the address map has changed, makes the MO5 completely
 TO7 software incompatible (except for pure BASIC programs).

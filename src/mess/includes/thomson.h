@@ -41,7 +41,7 @@
 /* sound ports */
 #define THOM_SOUND_BUZ    0 /* 1-bit buzzer */
 #define THOM_SOUND_GAME   1 /* 6-bit game port DAC */
-#define THOM_SOUND_SPEECH 2 /* speach synthesis */
+#define THOM_SOUND_SPEECH 2 /* speech synthesis */
 
 /* bank-switching */
 #define THOM_CART_BANK  "bank2" /* cartridge ROM */

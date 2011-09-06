@@ -1324,7 +1324,7 @@ fe55c
    f096d
     disk related
     feca0
-     prueft kanal 0 adress register (memory refresh!?)
+     prueft kanal 0 address register (memory refresh!?)
 
 ibm pc bios
 -----------
@@ -1344,7 +1344,7 @@ fe4a1 call ff979 tape!!! test
 */
 
 
-// damned old checkit doesn't test at standard adresses
+// damned old checkit doesn't test at standard addresses
 // will do more when I have a program supporting it
 static struct {
 	int data[0x18];

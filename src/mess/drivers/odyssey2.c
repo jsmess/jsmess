@@ -281,7 +281,7 @@ ROM_START (odyssey2)
 	ROM_LOAD( "sp0256b-019.bin",   0x1000, 0x0800, CRC(19355075) SHA1(13bc08f08d161c30ff386d1f0d15676d82afde63) )
 
 	/* A note about "The Voice": Two versions of "The Voice" exist:
-       * An earlier version with eight 2KiB speech roms, spr016-??? thru spr016-??? on a small daughterboard
+       * An earlier version with eight 2KiB speech roms, spr016-??? through spr016-??? on a small daughterboard
        <note to self: fill in numbers later>
        * A later version with one 16KiB speech rom, spr128-003, mounted directly on the mainboard
        The rom contents of these two versions are EXACTLY the same.

@@ -731,7 +731,7 @@ but it is not a msx standard !
 
 WD1793 or wd2793 registers
 
-adress
+address
 
 7FF8H read  status register
       write command register
@@ -742,7 +742,7 @@ adress
 
 hardware registers
 
-adress
+address
 
 7FFCH r/w  bit 0 side select
 7FFDH r/w  b7>M-on , b6>in-use , b1>ds1 , b0>ds0  (all neg. logic)

@@ -285,7 +285,7 @@ void tms9902_rcv_data(device_t *device, UINT8 data)
 /*
     Framing error. This can only be detected by a remotely attached real UART;
     if we get a report on a framing error we use it to announce the framing error
-    as if it occured here.
+    as if it occurred here.
     The flag is reset by the next correctly received byte.
 */
 void tms9902_rcv_framing_error(device_t *device)
@@ -298,7 +298,7 @@ void tms9902_rcv_framing_error(device_t *device)
 /*
     Parity error. This can only be detected by a remotely attached real UART;
     if we get a report on a parity error we use it to announce the parity error
-    as if it occured here.
+    as if it occurred here.
     The flag is reset by the next correctly received byte.
 */
 void tms9902_rcv_parity_error(device_t *device)

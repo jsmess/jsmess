@@ -32,7 +32,7 @@
      AUDOUT      11        18        D0
      NC          12        17        GND
      AUDOUT(inv) 13        16        VCC
-     GND         14        15        ? tied to pin 16 (VCC) thru a resistor (pullup?)
+     GND         14        15        ? tied to pin 16 (VCC) through a resistor (pullup?)
 
     In the SCV:
     pin  5 is tied to the !SCPU pin on the Epoch TV chip pin 29 (0x3600 writes)
@@ -54,7 +54,7 @@
     All NC pins are unknown, maybe some are  "test" pins.
 
     All non PCM writes are made through address 0x3600 on the upD7801
-    Instead of useing register=value, this chip require sending multiple
+    Instead of using register=value, this chip require sending multiple
     bytes for each command, one after the other.
 
 **********************************************************************/

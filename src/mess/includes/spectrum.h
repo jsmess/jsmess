@@ -57,7 +57,7 @@ typedef struct
 	int	Event_ID;
 	/* driver defined data for this write */
 	int	Event_Data;
-	/* time at which this write occured */
+	/* time at which this write occurred */
 	int Event_Time;
 } EVENT_LIST_ITEM;
 

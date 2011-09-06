@@ -327,7 +327,7 @@ static int t64_image_writefile(imgtool_image *img, const char *fname, imgtool_st
 			t=GET_ULONG(ENTRY(image,i)->offset)-size;
 			SET_ULONG( ENTRY(image,i)->offset, t);
 		}
-		// overwritting
+		// overwriting
 		if (!(image->data=realloc(image->data, image->size+fsize-2-size)))
 			return IMGTOOLERR_OUTOFMEMORY;
 		pos=image->size;

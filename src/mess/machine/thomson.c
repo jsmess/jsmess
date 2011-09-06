@@ -3515,7 +3515,7 @@ static void to8_update_ram_bank (running_machine &machine)
 			LOG_BANK(( "to8_update_ram_bank: select bank %i (old style)\n", bank  ));
 	}
 
-	/*  due to adressing distortion, the 16 KB banked memory space is
+	/*  due to addressing distortion, the 16 KB banked memory space is
         split into two 8 KB spaces:
         - 0xa000-0xbfff maps to 0x2000-0x3fff in 16 KB bank
         - 0xc000-0xdfff maps to 0x0000-0x1fff in 16 KB bank

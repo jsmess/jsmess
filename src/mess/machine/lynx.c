@@ -72,7 +72,7 @@ enum {
 };
 
 
-/* The pen numbers range from '0' to 'F. Pen numbers '1' thru 'D' are always collidable and opaque. The other
+/* The pen numbers range from '0' to 'F. Pen numbers '1' through 'D' are always collidable and opaque. The other
 ones have different behavior depending on the sprite type: there are 8 types of sprites, each has different
 characteristics relating to some or all of their pen numbers.
 

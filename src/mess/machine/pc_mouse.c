@@ -149,7 +149,7 @@ static TIMER_CALLBACK(pc_mouse_scan)
                 Y7'-Y0' movement in Y direction since sending of Y7-Y0 in signed byte
                       format (-128..+127), positive direction up
 
-                The last two bytes in the packet (bytes 4 and 5) contains information about movement data changes which have occured after data butes 2 and 3 have been sent. */
+                The last two bytes in the packet (bytes 4 and 5) contains information about movement data changes which have occurred after data butes 2 and 3 have been sent. */
 
 				case TYPE_MOUSE_SYSTEMS:
 				{

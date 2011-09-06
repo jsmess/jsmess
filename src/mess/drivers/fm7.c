@@ -661,19 +661,19 @@ static void fm77av_encoder_handle_command(fm7_state *state)
 		case 1:  // get keyboard scancode mode
 			state->m_encoder.buffer[0] = state->m_key_scan_mode;
 			state->m_encoder.rx_count = 1;
-			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
+			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
 			break;
 		case 2:  // set LEDs
 			state->m_encoder.rx_count = 0;
-			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
+			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
 			break;
 		case 3:  // get LEDs
 			state->m_encoder.rx_count = 1;
-			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
+			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
 			break;
 		case 4:  // enable key repeat
 			state->m_encoder.rx_count = 0;
-			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
+			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
 			break;
 		case 5:  // set key repeat rate
 			state->m_key_repeat = state->m_encoder.buffer[2] * 10;
@@ -686,23 +686,23 @@ static void fm77av_encoder_handle_command(fm7_state *state)
 				state->m_encoder.rx_count = 0;
 			else
 				state->m_encoder.rx_count = 7;
-			logerror("ENC: Command %02x %02x recieved\n",state->m_encoder.buffer[0],state->m_encoder.buffer[1]);
+			logerror("ENC: Command %02x %02x received\n",state->m_encoder.buffer[0],state->m_encoder.buffer[1]);
 			break;
 		case 0x81:  // digitise
 			state->m_encoder.rx_count = 0;
-			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
+			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
 			break;
 		case 0x82:  // set screen mode
 			state->m_encoder.rx_count = 0;
-			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
+			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
 			break;
 		case 0x83:  // get screen mode
 			state->m_encoder.rx_count = 1;
-			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
+			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
 			break;
 		case 0x84:  // set monitor brightness
 			state->m_encoder.rx_count = 0;
-			logerror("ENC: Command %02x recieved\n",state->m_encoder.buffer[0]);
+			logerror("ENC: Command %02x received\n",state->m_encoder.buffer[0]);
 			break;
 	}
 	state->m_encoder.position = 0;

@@ -405,7 +405,7 @@ INPUT_PORTS_END
 static const gfx_layout arcadia_charlayout =
 {
 	8,						/*width*/
-	1,						/*heigth*/
+	1,						/*height*/
 	256,					/* 256 characters */
 	1,						/* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes; 1 bit per pixel */

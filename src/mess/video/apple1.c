@@ -47,7 +47,7 @@
   A special CLEAR SCREEN switch on the keyboard, directly connected to
   the video hardware, could be used to clear the video memory and
   return the cursor to the home position.  This was completely
-  independant of the processor.
+  independent of the processor.
 
   A schematic of the Apple I video hardware can be found in the
   Apple-1 Operation Manual; look for the schematic titled "Terminal

@@ -2006,7 +2006,7 @@ static void upd765_setup_command(device_t *device)
 							fdc->upd765_status[1] |= 1;
 					}
 
-					/* at this point, we have seen a id or two index pulses have occured! */
+					/* at this point, we have seen a id or two index pulses have occurred! */
 					fdc->upd765_result_bytes[0] = fdc->upd765_status[0];
 					fdc->upd765_result_bytes[1] = fdc->upd765_status[1];
 					fdc->upd765_result_bytes[2] = fdc->upd765_status[2];

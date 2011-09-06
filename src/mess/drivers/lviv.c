@@ -176,7 +176,7 @@ Video:
     10   R = PB0 == PB4; G = PB5; B = !PB6;
     11   R = !PB4; G = PB1 == PB5; B = PB6;
 
-    Bit combinations are result of concatenation of approprate bits of
+    Bit combinations are result of concatenation of appropriate bits of
     high and low byte halfs.
 
     Example:

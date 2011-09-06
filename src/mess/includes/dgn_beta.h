@@ -39,7 +39,7 @@
 
 #define RAMPageValue		0x00		/* page with RAM at power on */
 #define VideoPageValue		0x1F		/* Default page for video ram */
-#define NoMemPageValue		0xC0		/* Page garanteed not to have memory in */
+#define NoMemPageValue		0xC0		/* Page guaranteed not to have memory in */
 #define ROMPageValue		0xFE		/* Page with boot ROM */
 #define IOPageValue			0xFF		/* Page with I/O & Boot ROM */
 

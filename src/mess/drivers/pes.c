@@ -25,7 +25,7 @@ Hardware consists of:
 27c64 rom (holds less than 256 bytes of code)
 unpopulated 6164 sram, which isn't used
 TSP5220C speech chip (aka tms5220c)
-mc145406 RS232 driver/reciever (+-24v to 0-5v converter for serial i/o)
+mc145406 RS232 driver/receiver (+-24v to 0-5v converter for serial i/o)
 74hc573b1 octal tri-state D-latch (part of bus interface for ROM)
 74hc74b1 dual d-flipflop with set/reset, positive edge trigger (?)
 74hc02b1 quad 2-input NOR gate (wired up to decode address 0, and data 0 and 1 to produce /RS and /WS)
@@ -41,7 +41,7 @@ Address map:
   00 W: d0 and d1 are the /RS and /WS bits
   port 1.x: tms5220 bus
   port 2.x: unused
-  port 3.0: RxD serial recieve
+  port 3.0: RxD serial receive
   port 3.1: TxD serial send
   port 3.2: read, from /INT on tms5220c
   port 3.3: read, from /READY on tms5220c

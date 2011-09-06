@@ -90,11 +90,11 @@ static int thom_update_screen_size( running_machine &machine )
 
 
 
-static emu_timer* thom_video_timer; /* time elapsed from begining of frame */
+static emu_timer* thom_video_timer; /* time elapsed from beginning of frame */
 
 
 
-/* elapsed time from begining of frame, in us */
+/* elapsed time from beginning of frame, in us */
 INLINE unsigned thom_video_elapsed ( running_machine &machine )
 {
 	unsigned u;
@@ -1033,7 +1033,7 @@ static TIMER_CALLBACK( thom_set_init )
 		thom_init_timer->adjust(attotime::from_usec( 64 * THOM_ACTIVE_HEIGHT - 24 ), 1-init);
 }
 
-/* call this at the very begining of each new frame */
+/* call this at the very beginning of each new frame */
 SCREEN_EOF ( thom )
 {
 	int fnew, fold = FLOP_STATE;

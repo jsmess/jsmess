@@ -10,9 +10,9 @@
 <kevtris> timer0 = baud clock
 <kevtris> timer1 = pitch (duty cycle output to modify RC)
 <kevtris> timer2 = volume (duty cycle output to control trans. gate which does vol. control)
-<kevtris> portb: pin 6 thru pin 13 of parallel port
-<kevtris> portc 0 = NC, 1 = GND, 2 = pin 5, 3 = /RXINTEN, 4 = pin 15, 5 = pin 14 thru inverter, 6 = 8910 enable, 7 = from pin 4 thru inverter (I believe that's for the parallel port)
-<kevtris> porta: pin 16 thru 23 of parallel port
+<kevtris> portb: pin 6 through pin 13 of parallel port
+<kevtris> portc 0 = NC, 1 = GND, 2 = pin 5, 3 = /RXINTEN, 4 = pin 15, 5 = pin 14 through inverter, 6 = 8910 enable, 7 = from pin 4 through inverter (I believe that's for the parallel port)
+<kevtris> porta: pin 16 through 23 of parallel port
 <kevtris> that's the 8255
 <kevtris> on the AY-3-8910:
 <kevtris> IOA0-A5 = phoneme #

@@ -126,7 +126,7 @@ static const unsigned char dgnbeta_palette[] =
 
     2005-11-28
 
-    The value $C0 is garanteed not to have any memory in it acording to the os9 headers,
+    The value $C0 is guaranteed not to have any memory in it acording to the os9 headers,
     quite how the MMU deals with this is still unknown to me.
 
     Bit 7 of $FCC0, sets maps in the system task which has fixed values for some pages,

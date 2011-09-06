@@ -407,7 +407,7 @@ static imgtoolerr_t concept_image_freespace(imgtool_partition *partition, UINT64
 	free_blocks = get_UINT16xE(image->dev_dir.vol_hdr.disk_flipped, image->dev_dir.vol_hdr.last_block)
 					- get_UINT16xE(image->dev_dir.vol_hdr.disk_flipped, image->dev_dir.vol_hdr.next_block);
 
-	/* next substract lenght of each file */
+	/* next substract length of each file */
 	for (i=0; (image->dev_dir.file_dir[i].filename[0] != 0) && (i <= 77); i++)
 	{
 		free_blocks -= get_UINT16xE(image->dev_dir.vol_hdr.disk_flipped, image->dev_dir.file_dir[i].next_block)

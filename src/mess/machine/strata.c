@@ -51,7 +51,7 @@ typedef struct
 	int status;			// current status
 	int master_lock;	// master lock flag
 	offs_t wrbuf_base;	// start address in write buffer command
-	int wrbuf_len;		// count converted into byte lenght in write buffer command
+	int wrbuf_len;		// count converted into byte length in write buffer command
 	int wrbuf_count;	// current count in write buffer command
 	UINT8 *wrbuf;		// write buffer used by write buffer command
 	UINT8 *data_ptr;	// main FEEPROM area

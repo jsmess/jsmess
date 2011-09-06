@@ -2231,6 +2231,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_CPU_PROGRAM_MAP(pc8801fdc_mem)
 	MCFG_CPU_IO_MAP(pc8801fdc_io)
 
+
 	//MCFG_QUANTUM_TIME(attotime::from_hz(300000))
 
 	MCFG_MACHINE_START( pc8801 )
@@ -2249,6 +2250,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pc88_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc8801_flop")
+
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

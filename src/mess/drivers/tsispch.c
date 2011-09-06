@@ -145,7 +145,7 @@ static WRITE_LINE_DEVICE_HANDLER( i8251_txrdy_int )
 
 const i8251_interface i8251_config =
 {
-	DEVCB_NULL, // in rxd, serial (todo: proper hookup, currently using hack w/i8251_recieve_character())
+	DEVCB_NULL, // in rxd, serial (todo: proper hookup, currently using hack w/i8251_receive_character())
 	DEVCB_NULL, // out txd, serial
 	DEVCB_NULL, // in dsr
 	DEVCB_NULL, // out dtr
@@ -484,7 +484,7 @@ ROM_START( prose2k )
 	//              /Y1 - /CS (pin 1) of AMD 8259A at U4
 	//              /Y2 - pins 1, 4, 9 (1A, 2A, 3A inputs) of 74HCT32 Quad OR gate at U58 <wip, this is the 'peripheral' register, which deals with upd7720 control lines, LEDS and dipswitches>
 	//              /Y3 - pin 26 (/CS) of UPD77P20 at U29
-	//              /Y4 thru /Y7 - seem unconnected SO FAR? <wip>
+	//              /Y4 through /Y7 - seem unconnected SO FAR? <wip>
 	//          The 74S138N at U78: <wip>
 	//              /EN3 - ? (TODO: figure these out)
 	//              /EN2 - ?
