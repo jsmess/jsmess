@@ -1220,7 +1220,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="mississi">
 		<!-- ミシシッピー殺人事件 -->
-		<description>Mississippi Satsujinjiken</description>
+		<description>Mississippi Satsujin Jiken</description>
 		<year>1987</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1248,7 +1248,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="ikkokuf">
 		<!-- めぞん一刻 完結篇 -->
-		<description>Maison Ikkoku Final</description>
+		<description>Maison Ikkoku Kanketsu Hen</description>
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1302,8 +1302,8 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="kyuotory">
-		<!-- 山村美砂 京都龍の寺殺人事件 -->
-		<description>Kyouto Ryu No Tera Satsujin Jiken</description>
+		<!-- 京都龍の寺殺人事件 -->
+		<description>Kyouto Ryuu no Tera Satsujin Jiken</description>
 		<year>1988</year>
 		<publisher>Taito</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1317,7 +1317,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="yuureikn">
 		<!-- 幽霊君 -->
-		<description>Yuureikun</description>
+		<description>Yuurei-kun</description>
 		<year>1988</year>
 		<publisher>system Sacom</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1331,7 +1331,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="europewr">
 		<!-- ヨーロッパ戦線 -->
-		<description>Europe War</description>
+		<description>Europe Sensen</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="msx_cart">

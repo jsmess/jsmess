@@ -647,9 +647,9 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="henotobi">
+	<software name="meikyuu">
 		<!-- 迷宮への扉 -->
-		<description>Meikyuu Heno Tobirah</description>
+		<description>Meikyuu e no Tobira</description>
 		<year>1987</year>
 		<publisher>Dempa Publications</publisher>
 		<part name="cart" interface="msx_cart">
@@ -663,7 +663,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 	<software name="marcveil">
 		<!-- メルヘン・ヴェール I -->
-		<description>Marchen Veil</description>
+		<description>Maerchen Veil I</description>
 		<year>1987</year>
 		<publisher>System Sacom</publisher>
 		<part name="cart" interface="msx_cart">
@@ -677,7 +677,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 	<software name="ysherlck">
 		<!-- ヤングシャーロック・ドイルの遺産 -->
-		<description>Young Sherlock</description>
+		<description>Young Sherlock - Doyle no Isan</description>
 		<year>1985</year>
 		<publisher>Pack-in-Video</publisher>
 		<part name="cart" interface="msx_cart">
