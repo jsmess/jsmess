@@ -25,6 +25,7 @@ Software Lists:
 ----------------
 - mpz80: Added Micronix 1.3/1.4 to softlist. [Al Kossow]
 - vsmile.xml: added a new softlist for some v.disc dumps [Team Europe]
+- tdv2324: Added floppy softlist. [JonasP]
 
 Source Changes:
 ----------------
