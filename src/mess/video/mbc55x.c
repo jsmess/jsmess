@@ -196,7 +196,7 @@ VIDEO_RESET( mbc55x )
 
 SCREEN_EOF( mbc55x )
 {
-//	logerror("SCREEN_EOF( mbc55x )\n");
+//  logerror("SCREEN_EOF( mbc55x )\n");
 }
 
 SCREEN_UPDATE( mbc55x )

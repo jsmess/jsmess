@@ -218,7 +218,7 @@ WRITE8_MEMBER( osborne1_state::video_pia_port_a_w )
 	wd17xx_dden_w(m_fdc, BIT(data, 0));
 
 	data -= 0xea; // remove bias
- 
+
 	m_new_start_x = (data >> 1);
 	if (m_new_start_x)
 		m_new_start_x--;

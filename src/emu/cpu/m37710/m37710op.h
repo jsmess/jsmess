@@ -289,26 +289,13 @@ INLINE void m37710i_set_reg_ipl(m37710i_cpu_struct *cpustate, uint value)
 /* =============================== INTERRUPTS ============================= */
 /* ======================================================================== */
 
-INLINE void m37710i_interrupt_hardware(m37710i_cpu_struct *cpustate, uint vector)
-{
-	CLK(8);
-	m37710i_push_8(cpustate, REG_PB>>16);
-	m37710i_push_16(cpustate, REG_PC);
-	m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate));
-	FLAG_D = DFLAG_CLEAR;
-	m37710i_set_flag_i(cpustate, IFLAG_SET);
-	REG_PB = 0;
-	m37710i_jump_16(cpustate, m37710i_read_16_normal(cpustate, vector));
-	if(INT_ACK) INT_ACK(cpustate->device, 0);
-}
-
 INLINE void m37710i_interrupt_software(m37710i_cpu_struct *cpustate, uint vector)
 {
-	CLK(8);
+	CLK(13);
 	m37710i_push_8(cpustate, REG_PB>>16);
 	m37710i_push_16(cpustate, REG_PC);
+	m37710i_push_8(cpustate, cpustate->ipl);
 	m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate));
-	FLAG_D = DFLAG_CLEAR;
 	m37710i_set_flag_i(cpustate, IFLAG_SET);
 	REG_PB = 0;
 	m37710i_jump_16(cpustate, m37710i_read_16_normal(cpustate, vector));
@@ -533,7 +520,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 	if (SRC&0x40)	\
 		{ m37710i_push_8(cpustate, REG_PB>>16); CLK(1); }  \
 	if (SRC&0x80)	\
-		{ m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); } 
+		{ m37710i_push_8(cpustate, cpustate->ipl); m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); }
 #else	// FLAG_SET_X
 #define OP_PSH(MODE)	\
 	SRC	= OPER_8_##MODE(cpustate);	\
@@ -553,7 +540,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 	if (SRC&0x40)	\
 		{ m37710i_push_8(cpustate, REG_PB>>16); CLK(1); }  \
 	if (SRC&0x80)	\
-		{ m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); } 
+		{ m37710i_push_8(cpustate, cpustate->ipl); m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); }
 #endif	// FLAG_SET_X
 #else	// FLAG_SET_M
 #if FLAG_SET_X
@@ -575,7 +562,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 	if (SRC&0x40)	\
 		{ m37710i_push_8(cpustate, REG_PB>>16); CLK(1); }  \
 	if (SRC&0x80)	\
-		{ m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); } 
+		{ m37710i_push_8(cpustate, cpustate->ipl); m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); }
 #else	// FLAG_SET_X
 #define OP_PSH(MODE)	\
 	SRC	= OPER_8_##MODE(cpustate);	\
@@ -595,7 +582,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 	if (SRC&0x40)	\
 		{ m37710i_push_8(cpustate, REG_PB>>16); CLK(1); }  \
 	if (SRC&0x80)	\
-		{ m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); } 
+		{ m37710i_push_8(cpustate, cpustate->ipl); m37710i_push_8(cpustate, m37710i_get_reg_p(cpustate)); CLK(2); }
 #endif	// FLAG_SET_X
 #endif	// FLAG_SET_M
 
@@ -605,7 +592,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 	SRC	= OPER_8_##MODE(cpustate);	\
 	CLK(14); \
 	if (SRC&0x80)	\
-		{ m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate)); CLK(3); } \
+		{ m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate)); m37710i_set_reg_ipl(cpustate, m37710i_pull_8(cpustate)); CLK(3); } \
 	if (SRC&0x40)	\
 		{ REG_PB = m37710i_pull_8(cpustate) << 16; CLK(3); }   \
 	if (SRC&0x20)	\
@@ -639,7 +626,8 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			{ REG_BA = m37710i_pull_16(cpustate); CLK(3); } \
 		if (SRC&0x1)	\
 			{ REG_A = m37710i_pull_16(cpustate); CLK(3); } \
-	}
+	}	\
+	m37710i_update_irqs(cpustate)
 
 /* M37710   Multiply */
 #undef OP_MPY
@@ -647,34 +635,44 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_MPY(MODE)														\
 	CLK(CLK_OP + CLK_R8 + CLK_##MODE);	\
 	SRC = OPER_8_##MODE(cpustate);			\
-	{ int temp = SRC * REG_A;  REG_A = temp & 0xff; REG_BA = (temp>>8)&0xff; FLAG_Z = temp; FLAG_N = (temp & 0x8000) ? 1 : 0; FLAG_C = 0; }
+	{ UINT16 temp = SRC * (REG_A&0xff);  REG_A = temp & 0xff; REG_BA = (temp>>8)&0xff; FLAG_Z = temp; FLAG_N = (temp & 0x8000) ? 1 : 0; FLAG_C = 0; }
 #else
 #define OP_MPY(MODE)														\
 	CLK(CLK_OP + CLK_R16 + CLK_##MODE);	\
 	SRC = OPER_16_##MODE(cpustate);			\
-	{ int temp = SRC * REG_A;  REG_A = temp & 0xffff;  REG_BA = (temp>>16)&0xffff; FLAG_Z = temp; FLAG_N = (temp & 0x80000000) ? 1 : 0; FLAG_C = 0; }
+	{ UINT32 temp = SRC * REG_A;  REG_A = temp & 0xffff;  REG_BA = (temp>>16)&0xffff; FLAG_Z = temp; FLAG_N = (temp & 0x80000000) ? 1 : 0; FLAG_C = 0; }
 #endif
 
 /* M37710   Divide */
 #undef OP_DIV
 #if FLAG_SET_M
 #define OP_DIV(MODE)	\
-	CLK(CLK_OP + CLK_R8 + CLK_##MODE + 25);	\
+	CLK(CLK_OP + CLK_R8 + CLK_##MODE + 17);	\
 	SRC = (REG_BA&0xff)<<8 | (REG_A & 0xff);	\
 	DST = OPER_8_##MODE(cpustate);			\
-	if (DST != 0) {	REG_A = SRC / DST; REG_BA = SRC % DST; SRC /= DST; }		\
-	FLAG_N = (SRC & 0x80) ? 1 : 0;	\
-	FLAG_Z = MAKE_UINT_8(SRC);	\
-	if (DST != 0) {	FLAG_V = 0; FLAG_C = 0; }
+	if (DST != 0)	\
+	{		\
+		UINT16 tempa = SRC / DST; UINT16 tempb = SRC % DST;		\
+		FLAG_V = ((tempa | tempb) & 0xff00) ? VFLAG_SET : 0;	\
+		FLAG_C = FLAG_V ? CFLAG_SET : 0;	\
+		if (!FLAG_V) { FLAG_N = (tempa & 0x80) ? 1 : 0; }		\
+		FLAG_Z = REG_A = tempa & 0xff; REG_BA = tempb & 0xff;	\
+		CLK(8);		\
+	} else m37710i_interrupt_software(cpustate, 0xfffc)
 #else
 #define OP_DIV(MODE)	\
-	CLK(CLK_OP + CLK_R16 + CLK_##MODE + 25);	\
+	CLK(CLK_OP + CLK_R16 + CLK_##MODE + 17);	\
 	SRC = (REG_BA<<16) | REG_A;	\
 	DST = OPER_16_##MODE(cpustate);		\
-	if (DST != 0) { REG_A = SRC / DST; REG_BA = SRC % DST; SRC /= DST; }	\
-	FLAG_N = (SRC & 0x8000) ? 1 : 0;	\
-	FLAG_Z = SRC;	\
-	if (DST != 0) {	FLAG_V = 0; FLAG_C = 0; }
+	if (DST != 0)	\
+	{		\
+		UINT32 tempa = SRC / DST; UINT32 tempb = SRC % DST;		\
+		FLAG_V = ((tempa | tempb) & 0xffff0000) ? VFLAG_SET : 0;	\
+		FLAG_C = FLAG_V ? CFLAG_SET : 0;	\
+		if (!FLAG_V) { FLAG_N = (tempa & 0x8000) ? 1 : 0; }		\
+		FLAG_Z = REG_A = tempa & 0xffff; REG_BA = tempb & 0xffff;	\
+		CLK(8+15);	\
+	} else m37710i_interrupt_software(cpustate, 0xfffc)
 #endif
 
 /* M37710   Add With Carry */
@@ -861,40 +859,11 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			}																\
 			CLK(CLK_OP + CLK_RELATIVE_8);									\
 
-/* M37710   Set flags according to bits */
-#undef OP_BIT
-#if FLAG_SET_M
-#define OP_BIT(MODE)														\
-			CLK(CLK_OP + CLK_R8 + CLK_##MODE);								\
-			FLAG_N = OPER_8_##MODE(cpustate);										\
-			FLAG_Z = FLAG_N & REG_A;										\
-			FLAG_V = FLAG_N << 1
-#else
-#define OP_BIT(MODE)														\
-			CLK(CLK_OP + CLK_R16 + CLK_##MODE);								\
-			FLAG_N = OPER_16_##MODE(cpustate);										\
-			FLAG_Z = FLAG_N & REG_A;										\
-			FLAG_N = NFLAG_16(FLAG_N);										\
-			FLAG_V = FLAG_N << 1
-#endif
-
-/* M37710  Set flags according to bits (immediate addressing mode) */
-#undef OP_BITI
-#if FLAG_SET_M
-#define OP_BITI()															\
-			CLK(CLK_OP + CLK_R8 + CLK_IMM);									\
-			FLAG_Z = REG_A & OPER_8_IMM(cpustate)
-#else
-#define OP_BITI()															\
-			CLK(CLK_OP + CLK_R16 + CLK_IMM);								\
-			FLAG_Z = REG_A & OPER_16_IMM(cpustate)
-#endif
-
 /* M37710   Cause a Break interrupt */
 #undef OP_BRK
 #define OP_BRK()															\
-			REG_PC++;													\
-			logerror("fatalerror M37710: BRK at PC=%06x", REG_PB|REG_PC);									\
+			REG_PC++; CLK(CLK_OP + CLK_R8 + CLK_IMM);						\
+			logerror("error M37710: BRK at PC=%06x\n", REG_PB|REG_PC);		\
 			m37710i_interrupt_software(cpustate, 0xfffa)
 
 /* M37710  Branch Always */
@@ -915,17 +884,12 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_C = CFLAG_CLEAR
 
-/* M37710   Clear Decimal flag */
-#undef OP_CLD
-#define OP_CLD()															\
-			CLK(CLK_OP + CLK_IMPLIED);										\
-			FLAG_D = DFLAG_CLEAR
-
 /* M37710   Clear Interrupt Mask flag */
 #undef OP_CLI
 #define OP_CLI()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
-			m37710i_set_flag_i(cpustate, IFLAG_CLEAR)
+			m37710i_set_flag_i(cpustate, IFLAG_CLEAR);						\
+			m37710i_update_irqs(cpustate)
 
 /* M37710   Clear oVerflow flag */
 #undef OP_CLV
@@ -986,12 +950,6 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			FLAG_N = NFLAG_16(FLAG_C);										\
 			FLAG_C = ~CFLAG_16(FLAG_C)
 #endif
-
-/* M37710  Coprocessor operation */
-#undef OP_COP
-#define OP_COP()															\
-			REG_PC++;														\
-			m37710i_interrupt_software(cpustate, VECTOR_COP)
 
 /* M37710   Decrement accumulator */
 #undef OP_DEC
@@ -1230,7 +1188,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_BBS(MODE)														\
 			CLK(CLK_OP + CLK_R8 + CLK_##MODE);	\
 			REG_IM2 = read_8_NORM(EA_##MODE(cpustate)); 	\
-			REG_IM = read_8_NORM(REG_PC);		\
+			REG_IM = read_8_NORM(REG_PB | REG_PC);		\
 			REG_PC++;				\
 			DST = OPER_8_IMM(cpustate);			\
 			if ((REG_IM2 & REG_IM) == REG_IM)	\
@@ -1243,7 +1201,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_BBS(MODE)														\
 			CLK(CLK_OP + CLK_R16 + CLK_##MODE);	\
 			REG_IM2 = read_16_NORM(EA_##MODE(cpustate));	\
-			REG_IM = read_16_NORM(REG_PC);		\
+			REG_IM = read_16_NORM(REG_PB | REG_PC);		\
 			REG_PC++;				\
 			REG_PC++;				\
 			DST = OPER_8_IMM(cpustate);			\
@@ -1261,7 +1219,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_BBC(MODE)														\
 			CLK(CLK_OP + CLK_R8 + CLK_##MODE);	\
 			REG_IM2 = read_8_NORM(EA_##MODE(cpustate)); 	\
-			REG_IM = read_8_NORM(REG_PC);		\
+			REG_IM = read_8_NORM(REG_PB | REG_PC);		\
 			REG_PC++;				\
 			DST = OPER_8_IMM(cpustate);			\
 			if ((REG_IM2 & REG_IM) == 0)		\
@@ -1274,7 +1232,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_BBC(MODE)														\
 			CLK(CLK_OP + CLK_R16 + CLK_##MODE);	\
 			REG_IM2 = read_16_NORM(EA_##MODE(cpustate));	\
-			REG_IM = read_16_NORM(REG_PC);		\
+			REG_IM = read_16_NORM(REG_PB | REG_PC);		\
 			REG_PC++;				\
 			REG_PC++;				\
 			DST = OPER_8_IMM(cpustate);			\
@@ -1659,21 +1617,22 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #undef OP_PLD
 #define OP_PLD()															\
 			CLK(CLK_OP + CLK_R16 + 2);										\
-			FLAG_Z = REG_D = m37710i_pull_16(cpustate);								\
-			FLAG_N = NFLAG_16(FLAG_Z)
+			REG_D = m37710i_pull_16(cpustate)
 
 /* M37710   Pull the Processor Status Register from the stack */
 #undef OP_PLP
 #define OP_PLP()															\
 			CLK(CLK_OP + CLK_R8 + 2);										\
-			m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate));									\
-			m37710i_set_reg_ipl(cpustate, m37710i_pull_8(cpustate))
+			m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate));			\
+			m37710i_set_reg_ipl(cpustate, m37710i_pull_8(cpustate));		\
+			m37710i_update_irqs(cpustate)
 
 /* M37710  Reset Program status word */
 #undef OP_REP
 #define OP_REP()															\
 			CLK(CLK_OP + CLK_R8 + 1);										\
-			m37710i_set_reg_p(cpustate, m37710i_get_reg_p(cpustate) & ~OPER_8_IMM(cpustate))
+			m37710i_set_reg_p(cpustate, m37710i_get_reg_p(cpustate) & ~OPER_8_IMM(cpustate));	\
+			m37710i_update_irqs(cpustate)
 
 /* M37710  Clear "M" status bit */
 #undef OP_CLM
@@ -1717,10 +1676,10 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #undef OP_RLA
 #if FLAG_SET_M
 #define OP_RLA(MODE)														\
-	{ int cnt = OPER_8_##MODE(cpustate); int tmp; while (cnt > 0) { CLK(6); tmp = REG_A; REG_A=(REG_A<<1)&0xff; REG_A |= (tmp>>7); cnt--; } }
+	{ int cnt = OPER_8_##MODE(cpustate); while (cnt > 0) { CLK(6); REG_A=((REG_A<<1)|(REG_A>>7&1))&0xff; cnt--; } }
 #else
 #define OP_RLA(MODE)														\
-	{ int cnt = OPER_16_##MODE(cpustate); int tmp; while (cnt > 0) { CLK(6); tmp = REG_A; REG_A=(REG_A<<1)&0xffff; REG_A |= (tmp>>15); cnt--; } }
+	{ int cnt = OPER_16_##MODE(cpustate); while (cnt > 0) { CLK(6); REG_A=((REG_A<<1)|(REG_A>>15&1))&0xffff; cnt--; } }
 #endif
 
 /* M37710   Rotate Left an operand */
@@ -1806,7 +1765,8 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			m37710i_set_reg_ipl(cpustate, m37710i_pull_8(cpustate));					\
 			m37710i_jump_16(cpustate, m37710i_pull_16(cpustate));					\
 			REG_PB = m37710i_pull_8(cpustate) << 16;					\
-			m37710i_jumping(REG_PB | REG_PC)
+			m37710i_jumping(REG_PB | REG_PC);							\
+			m37710i_update_irqs(cpustate)
 
 /* M37710  Return from Subroutine Long */
 #undef OP_RTL
@@ -1945,12 +1905,6 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_C = CFLAG_SET
 
-/* M37710   Set Decimal flag */
-#undef OP_SED
-#define OP_SED()															\
-			CLK(CLK_OP + CLK_IMPLIED);										\
-			FLAG_D = DFLAG_SET
-
 /* M37710   Set Interrupt Mask flag */
 #undef OP_SEI
 #define OP_SEI()															\
@@ -2003,18 +1957,6 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #define OP_STX(REG, MODE)													\
 			CLK(CLK_OP + CLK_W16 + CLK_W_##MODE);								\
 			write_16_##MODE(EA_##MODE(cpustate), REG)
-#endif
-
-/* M37710   Store zero to memory */
-#undef OP_STZ
-#if FLAG_SET_M
-#define OP_STZ(MODE)														\
-			CLK(CLK_OP + CLK_W8 + CLK_W_##MODE);								\
-			write_8_##MODE(EA_##MODE(cpustate), 0)
-#else
-#define OP_STZ(MODE)														\
-			CLK(CLK_OP + CLK_W16 + CLK_W_##MODE);								\
-			write_16_##MODE(EA_##MODE(cpustate), 0)
 #endif
 
 /* M37710  Stop the clock */
@@ -2088,13 +2030,20 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			FLAG_Z = REG_A = MAKE_UINT_8(REG);								\
 			FLAG_N = NFLAG_8(FLAG_Z)
 #else
+#if FLAG_SET_X
+#define OP_TXA(REG)															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			FLAG_Z = REG_A = MAKE_UINT_8(REG);								\
+			FLAG_N = NFLAG_16(FLAG_Z)
+#else
 #define OP_TXA(REG)															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_A = REG;											\
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
+#endif /* FLAG_SET_M */
 
-/* M37710   Transfer index to accumulator */
+/* M37710   Transfer index to accumulator B */
 #undef OP_TXB
 #if FLAG_SET_M
 #define OP_TXB(REG)															\
@@ -2102,61 +2051,128 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			FLAG_Z = REG_BA = MAKE_UINT_8(REG);								\
 			FLAG_N = NFLAG_8(FLAG_Z)
 #else
+#if FLAG_SET_X
+#define OP_TXB(REG)															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			FLAG_Z = REG_BA = MAKE_UINT_8(REG);								\
+			FLAG_N = NFLAG_16(FLAG_Z)
+#else
 #define OP_TXB(REG)															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_BA = REG;											\
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
+#endif /* FLAG_SET_M */
 
-/* M37710  Transfer C to direct register */
-#undef OP_TCD
+/* M37710  Transfer accumulator to direct register */
+#undef OP_TAD
 #if FLAG_SET_M
-#define OP_TCD()															\
+#define OP_TAD()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
-			FLAG_Z = REG_D = REG_A | REG_B;									\
-			FLAG_N = NFLAG_16(FLAG_Z)
+			REG_D = REG_A | REG_B
 #else
-#define OP_TCD()															\
+#define OP_TAD()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
-			FLAG_Z = REG_D = REG_A;											\
-			FLAG_N = NFLAG_16(FLAG_Z)
+			REG_D = REG_A
 #endif
 
-/* M37710  Transfer direct register to C */
-#undef OP_TDC
+/* M37710  Transfer accumulator B to direct register */
+#undef OP_TBD
 #if FLAG_SET_M
-#define OP_TDC()															\
+#define OP_TBD()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			REG_D = REG_BA | REG_BB
+#else
+#define OP_TBD()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			REG_D = REG_BA
+#endif
+
+/* M37710  Transfer direct register to accumulator */
+#undef OP_TDA
+#if FLAG_SET_M
+#define OP_TDA()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_D;													\
 			FLAG_N = NFLAG_16(FLAG_Z);										\
 			REG_A = MAKE_UINT_8(REG_D);										\
 			REG_B = REG_D & 0xff00
 #else
-#define OP_TDC()															\
+#define OP_TDA()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_A = REG_D;											\
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
 
-/* M37710  Transfer C to stack pointer */
-#undef OP_TCS
-#define OP_TCS()															\
+/* M37710  Transfer direct register to accumulator B */
+#undef OP_TDB
+#if FLAG_SET_M
+#define OP_TDB()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			FLAG_Z = REG_D;													\
+			FLAG_N = NFLAG_16(FLAG_Z);										\
+			REG_BA = MAKE_UINT_8(REG_D);									\
+			REG_BB = REG_D & 0xff00
+#else
+#define OP_TDB()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			FLAG_Z = REG_BA = REG_D;										\
+			FLAG_N = NFLAG_16(FLAG_Z)
+#endif
+
+/* M37710  Transfer accumulator to stack pointer */
+#undef OP_TAS
+#if FLAG_SET_M
+#define OP_TAS()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			REG_S = REG_A | REG_B
+#else
+#define OP_TAS()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			REG_S = REG_A
+#endif
 
-/* M37710  Transfer stack pointer to C */
-#undef OP_TSC
+/* M37710  Transfer accumulator B to stack pointer */
+#undef OP_TBS
 #if FLAG_SET_M
-#define OP_TSC()															\
+#define OP_TBS()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			REG_S = REG_BA | REG_BB
+#else
+#define OP_TBS()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			REG_S = REG_BA
+#endif
+
+/* M37710  Transfer stack pointer to accumulator */
+#undef OP_TSA
+#if FLAG_SET_M
+#define OP_TSA()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_S;													\
 			FLAG_N = NFLAG_16(FLAG_Z);										\
 			REG_A = MAKE_UINT_8(REG_S);										\
 			REG_B = REG_S & 0xff00
 #else
-#define OP_TSC()															\
+#define OP_TSA()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_A = REG_S;											\
+			FLAG_N = NFLAG_16(FLAG_Z)
+#endif
+
+/* M37710  Transfer stack pointer to accumulator B */
+#undef OP_TSB
+#if FLAG_SET_M
+#define OP_TSB()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			FLAG_Z = REG_S;													\
+			FLAG_N = NFLAG_16(FLAG_Z);										\
+			REG_BA = MAKE_UINT_8(REG_S);									\
+			REG_BB = REG_S & 0xff00
+#else
+#define OP_TSB()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			FLAG_Z = REG_BA = REG_S;										\
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
 
@@ -2176,9 +2192,15 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 
 /* M37710   Transfer X to stack pointer */
 #undef OP_TXS
+#if FLAG_SET_X
+#define OP_TXS()															\
+			CLK(CLK_OP + CLK_IMPLIED);										\
+			REG_S = MAKE_UINT_8(REG_X)
+#else
 #define OP_TXS()															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			REG_S = REG_X
+#endif
 
 /* M37710  Transfer X to Y */
 #undef OP_TXY
@@ -2275,7 +2297,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 /* M37710 unimplemented opcode */
 #undef OP_UNIMP
 #define OP_UNIMP()															\
-	logerror("fatalerror: M37710: UNIMPLEMENTED OPCODE!  K=%x PC=%x", REG_PB, REG_PPC);
+	logerror("error M37710: UNIMPLEMENTED OPCODE!  K=%x PC=%x\n", REG_PB, REG_PPC);
 
 /* M37710 load data bank register */
 #undef OP_LDTAAA
@@ -2359,7 +2381,7 @@ OP(17, OP_ORA  ( DLIY        ) ) /* ORA dliy(C) */
 OP(18, OP_CLC  (             ) ) /* CLC         */
 OP(19, OP_ORA  ( AY          ) ) /* ORA ay      */
 OP(1a, OP_DEC  (             ) ) /* DEA     (C) */
-OP(1b, OP_TCS  (             ) ) /* TCS     (G) */
+OP(1b, OP_TAS  (             ) ) /* TAS     (G) */
 OP(1c, OP_CLB  ( A           ) ) /* CLB a   (C) */
 OP(1d, OP_ORA  ( AX          ) ) /* ORA ax      */
 OP(1e, OP_ASLM ( AX          ) ) /* ASL ax      */
@@ -2391,7 +2413,7 @@ OP(37, OP_AND  ( DLIY        ) ) /* AND dliy(G) */
 OP(38, OP_SEC  (             ) ) /* SEC         */
 OP(39, OP_AND  ( AY          ) ) /* AND ay      */
 OP(3a, OP_INC  (             ) ) /* INA     (C) */
-OP(3b, OP_TSC  (             ) ) /* TSC     (G) */
+OP(3b, OP_TSA  (             ) ) /* TSA     (G) */
 OP(3c, OP_BBC  ( A           ) ) /* BBC a       */
 OP(3d, OP_AND  ( AX          ) ) /* AND ax      */
 OP(3e, OP_ROLM ( AX          ) ) /* ROL ax      */
@@ -2423,7 +2445,7 @@ OP(57, OP_EOR  ( DLIY        ) ) /* EOR dliy(G) */
 OP(58, OP_CLI  (             ) ) /* CLI         */
 OP(59, OP_EOR  ( AY          ) ) /* EOR ay      */
 OP(5a, OP_PHX  ( REG_Y       ) ) /* PHY     (C) */
-OP(5b, OP_TCD  (             ) ) /* TCD     (G) */
+OP(5b, OP_TAD  (             ) ) /* TAD     (G) */
 OP(5c, OP_JMPAL(             ) ) /* JMP al  (G) */
 OP(5d, OP_EOR  ( AX          ) ) /* EOR ax      */
 OP(5e, OP_LSRM ( AX          ) ) /* LSR ax      */
@@ -2455,7 +2477,7 @@ OP(77, OP_ADC  ( DLIY        ) ) /* ADC dliy(G) */
 OP(78, OP_SEI  (             ) ) /* SEI         */
 OP(79, OP_ADC  ( AY          ) ) /* ADC ay      */
 OP(7a, OP_PLX  ( REG_Y       ) ) /* PLY     (C) */
-OP(7b, OP_TDC  (             ) ) /* TDC     (G) */
+OP(7b, OP_TDA  (             ) ) /* TDA     (G) */
 OP(7c, OP_JMPAXI(            ) ) /* JMP axi (C) */
 OP(7d, OP_ADC  ( AX          ) ) /* ADC ax      */
 OP(7e, OP_RORM ( AX          ) ) /* ROR ax      */
@@ -2588,186 +2610,273 @@ OP(fc, OP_JSRAXI(            ) ) /* JSR axi (G) */
 OP(fd, OP_SBC  ( AX          ) ) /* SBC ax      */
 OP(fe, OP_INCM ( AX          ) ) /* INC ax      */
 OP(ff, OP_SBC  ( ALX         ) ) /* SBC alx (G) */
-OP(101, OP_ORB   ( DXI         ) ) /* ORB dxi     */
-OP(103, OP_ORB   ( S           ) ) /* ORB s   (G) */
-OP(105, OP_ORB   ( D           ) ) /* ORB d       */
-OP(107, OP_ORB   ( DLI         ) ) /* ORB dli (G) */
-OP(109, OP_ORB   ( IMM         ) ) /* ORB imm     */
-OP(10a, OP_BSL   (             ) ) /* BSL acc     */
-OP(10d, OP_ORB   ( A           ) ) /* ORB a       */
-OP(10f, OP_ORB   ( AL          ) ) /* ORB al  (G) */
-OP(111, OP_ORB   ( DIY         ) ) /* ORB diy     */
-OP(112, OP_ORB   ( DI          ) ) /* ORB di  (C) */
-OP(113, OP_ORB   ( SIY         ) ) /* ORB siy (G) */
-OP(115, OP_ORB   ( DX          ) ) /* ORB dx      */
-OP(117, OP_ORB   ( DLIY        ) ) /* ORB dliy(C) */
-OP(119, OP_ORB   ( AY          ) ) /* ORB ay      */
-OP(11a, OP_DECB  (             ) ) /* DEB     (C) */
-OP(11d, OP_ORB   ( AX          ) ) /* ORB ax      */
-OP(11f, OP_ORB   ( ALX         ) ) /* ORB alx (G) */
-OP(129, OP_ANDB  ( IMM         ) ) /* ANDB imm     */
-OP(12a, OP_ROLB  (	       ) ) /* ROL Bacc    */
-OP(13a, OP_INCB  (             ) ) /* INB     (C) */
-OP(148, OP_PHAB  (             ) ) /* PHB          */
-OP(149, OP_EORB  ( IMM         ) ) /* EORB imm     */
-OP(14a, OP_LSRB  (             ) ) /* LSRB acc     */
-OP(161, OP_ADCB  ( DXI         ) ) /* ADCB dxi     */
-OP(163, OP_ADCB  ( S           ) ) /* ADCB s   (G) */
-OP(165, OP_ADCB  ( D           ) ) /* ADCB d       */
-OP(167, OP_ADCB  ( DLI         ) ) /* ADCB dli (G) */
-OP(168, OP_PLAB  (             ) ) /* PLB          */
-OP(169, OP_ADCB  ( IMM         ) ) /* ADCB imm     */
-OP(16a, OP_RORB  (             ) ) /* ROR Bacc     */
-OP(16d, OP_ADCB  ( A           ) ) /* ADCB a       */
-OP(16f, OP_ADCB  ( AL          ) ) /* ADCB al  (G) */
-OP(171, OP_ADCB  ( DIY         ) ) /* ADCB diy     */
-OP(172, OP_ADCB  ( DI          ) ) /* ADCB di  (G) */
-OP(173, OP_ADCB  ( SIY         ) ) /* ADCB siy (G) */
-OP(175, OP_ADCB  ( DX          ) ) /* ADCB dx      */
-OP(177, OP_ADCB  ( DLIY        ) ) /* ADCB dliy(G) */
-OP(179, OP_ADCB  ( AY          ) ) /* ADCB ay      */
-OP(17d, OP_ADCB  ( AX          ) ) /* ADCB ax      */
-OP(17f, OP_ADCB  ( ALX         ) ) /* ADCB alx (G) */
-OP(181, OP_STB   ( DXI         ) ) /* STB dxi     */
-OP(183, OP_STB   ( S           ) ) /* STB s   (G) */
-OP(185, OP_STB   ( D           ) ) /* STB d       */
-OP(187, OP_STB   ( DLI         ) ) /* STB dli (G) */
-OP(18a, OP_TXB   ( REG_X       ) ) /* TXB         */
-OP(18d, OP_STB   ( A           ) ) /* STB a       */
-OP(18f, OP_STB   ( AL          ) ) /* STB al  (G) */
-OP(191, OP_STB   ( DIY         ) ) /* STB diy     */
-OP(192, OP_STB   ( DI          ) ) /* STB di  (C) */
-OP(193, OP_STB   ( SIY         ) ) /* STB siy (G) */
-OP(195, OP_STB   ( DX          ) ) /* STB dx      */
-OP(197, OP_STB   ( DLIY        ) ) /* STB dliy(G) */
-OP(198, OP_TXB   ( REG_Y       ) ) /* TYB         */
-OP(199, OP_STB   ( AY          ) ) /* STB ay      */
-OP(19d, OP_STB   ( AX          ) ) /* STB ax      */
-OP(19f, OP_STB   ( ALX         ) ) /* STB alx (G) */
-OP(1a1, OP_LDB   ( DXI         ) ) /* LDB dxi     */
-OP(1a5, OP_LDB   ( D           ) ) /* LDB d       */
-OP(1a8, OP_TBX   ( REG_Y       ) ) /* TBY         */
-OP(1a9, OP_LDB   ( IMM         ) ) /* LDB imm     */
-OP(1aa, OP_TBX   ( REG_X       ) ) /* TBX         */
-OP(1ad, OP_LDB   ( A           ) ) /* LDB a       */
-OP(1b2, OP_LDB   ( DI          ) ) /* LDB di  (C) */
-OP(1b5, OP_LDB   ( DX          ) ) /* LDB dx      */
-OP(1b9, OP_LDB   ( AY          ) ) /* LDB ay      */
-OP(1bd, OP_LDB   ( AX          ) ) /* LDB ax      */
-OP(1c1, OP_CMPB  ( DXI         ) ) /* CMPB dxi     */
-OP(1c3, OP_CMPB  ( S           ) ) /* CMPB s   (G) */
-OP(1c5, OP_CMPB  ( D           ) ) /* CMPB d       */
-OP(1c7, OP_CMPB  ( DLI         ) ) /* CMPB dli (G) */
-OP(1c9, OP_CMPB  ( IMM         ) ) /* CMPB imm     */
-OP(1cd, OP_CMPB  ( A           ) ) /* CMPB a       */
-OP(1cf, OP_CMPB  ( AL          ) ) /* CMPB al  (G) */
-OP(1d1, OP_CMPB  ( DIY         ) ) /* CMPB diy     */
-OP(1d2, OP_CMPB  ( DI          ) ) /* CMPB di  (C) */
-OP(1d3, OP_CMPB  ( SIY         ) ) /* CMPB siy (G) */
-OP(1d5, OP_CMPB  ( DX          ) ) /* CMPB dx      */
-OP(1d7, OP_CMPB  ( DLIY        ) ) /* CMPB dliy(G) */
-OP(1d9, OP_CMPB  ( AY          ) ) /* CMPB ay      */
-OP(1dd, OP_CMPB  ( AX          ) ) /* CMPB ax      */
-OP(1df, OP_CMPB  ( ALX         ) ) /* CMPB alx (G) */
-OP(1e9, OP_SBCB  ( IMM         ) ) /* SBCB imm     */
-OP(1f5, OP_SBCB  ( DX          ) ) /* SBCB dx      */
-OP(200, OP_UNIMP (             ) ) /* unimplemented */
-OP(203, OP_MPY   ( S           ) ) /* MPY s       */
-OP(205, OP_MPY   ( D           ) ) /* MPY d       */
-OP(209, OP_MPY   ( IMM         ) ) /* MPY imm     */
-OP(215, OP_MPY   ( DX          ) ) /* MPY dx      */
-OP(219, OP_MPY   ( AY	       ) ) /* MPY ay      */
-OP(225, OP_DIV   ( D           ) ) /* DIV d       */
-OP(228, OP_XAB   (             ) ) /* XAB         */
-OP(235, OP_DIV   ( DX          ) ) /* DIV dx      */
-OP(249, OP_RLA   ( IMM         ) ) /* RLA imm     */
-OP(2c2, OP_LDT   ( IMM         ) ) /* LDT imm     */
+
+/* B accumulator */
+OP(101,OP_ORB  ( DXI         ) ) /* ORB dxi     */
+OP(103,OP_ORB  ( S           ) ) /* ORB s       */
+OP(105,OP_ORB  ( D           ) ) /* ORB d       */
+OP(107,OP_ORB  ( DLI         ) ) /* ORB dli     */
+OP(109,OP_ORB  ( IMM         ) ) /* ORB imm     */
+OP(10a,OP_BSL  (             ) ) /* BSL acc     */
+OP(10d,OP_ORB  ( A           ) ) /* ORB a       */
+OP(10f,OP_ORB  ( AL          ) ) /* ORB al      */
+OP(111,OP_ORB  ( DIY         ) ) /* ORB diy     */
+OP(112,OP_ORB  ( DI          ) ) /* ORB di      */
+OP(113,OP_ORB  ( SIY         ) ) /* ORB siy     */
+OP(115,OP_ORB  ( DX          ) ) /* ORB dx      */
+OP(117,OP_ORB  ( DLIY        ) ) /* ORB dliy    */
+OP(119,OP_ORB  ( AY          ) ) /* ORB ay      */
+OP(11a,OP_DECB (             ) ) /* DEB         */
+OP(11b,OP_TBS  (             ) ) /* TBS         */
+OP(11d,OP_ORB  ( AX          ) ) /* ORB ax      */
+OP(11f,OP_ORB  ( ALX         ) ) /* ORB alx     */
+OP(121,OP_ANDB ( DXI         ) ) /* ANDB dxi    */
+OP(123,OP_ANDB ( S           ) ) /* ANDB s      */
+OP(125,OP_ANDB ( D           ) ) /* ANDB d      */
+OP(127,OP_ANDB ( DLI         ) ) /* ANDB dli    */
+OP(129,OP_ANDB ( IMM         ) ) /* ANDB imm    */
+OP(12a,OP_ROLB (             ) ) /* ROL Bacc    */
+OP(12d,OP_ANDB ( A           ) ) /* ANDB a      */
+OP(12f,OP_ANDB ( AL          ) ) /* ANDB al     */
+OP(131,OP_ANDB ( DIY         ) ) /* ANDB diy    */
+OP(132,OP_ANDB ( DI          ) ) /* ANDB di     */
+OP(133,OP_ANDB ( SIY         ) ) /* ANDB siy    */
+OP(135,OP_ANDB ( DX          ) ) /* ANDB dx     */
+OP(137,OP_ANDB ( DLIY        ) ) /* ANDB dliy   */
+OP(139,OP_ANDB ( AY          ) ) /* ANDB ay     */
+OP(13a,OP_INCB (             ) ) /* INB         */
+OP(13b,OP_TSB  (             ) ) /* TSB         */
+OP(13d,OP_ANDB ( AX          ) ) /* ANDB ax     */
+OP(13f,OP_ANDB ( ALX         ) ) /* ANDB alx    */
+OP(141,OP_EORB ( DXI         ) ) /* EORB dxi    */
+OP(143,OP_EORB ( S           ) ) /* EORB s      */
+OP(145,OP_EORB ( D           ) ) /* EORB d      */
+OP(147,OP_EORB ( DLI         ) ) /* EORB dli    */
+OP(148,OP_PHAB (             ) ) /* PHB         */
+OP(149,OP_EORB ( IMM         ) ) /* EORB imm    */
+OP(14a,OP_LSRB (             ) ) /* LSRB acc    */
+OP(14d,OP_EORB ( A           ) ) /* EORB a      */
+OP(14f,OP_EORB ( AL          ) ) /* EORB al     */
+OP(151,OP_EORB ( DIY         ) ) /* EORB diy    */
+OP(152,OP_EORB ( DI          ) ) /* EORB di     */
+OP(153,OP_EORB ( SIY         ) ) /* EORB siy    */
+OP(155,OP_EORB ( DX          ) ) /* EORB dx     */
+OP(157,OP_EORB ( DLIY        ) ) /* EORB dliy   */
+OP(159,OP_EORB ( AY          ) ) /* EORB ay     */
+OP(15b,OP_TBD  (             ) ) /* TBD         */
+OP(15d,OP_EORB ( AX          ) ) /* EORB ax     */
+OP(15f,OP_EORB ( ALX         ) ) /* EORB alx    */
+OP(161,OP_ADCB ( DXI         ) ) /* ADCB dxi    */
+OP(163,OP_ADCB ( S           ) ) /* ADCB s      */
+OP(165,OP_ADCB ( D           ) ) /* ADCB d      */
+OP(167,OP_ADCB ( DLI         ) ) /* ADCB dli    */
+OP(168,OP_PLAB (             ) ) /* PLB         */
+OP(169,OP_ADCB ( IMM         ) ) /* ADCB imm    */
+OP(16a,OP_RORB (             ) ) /* ROR Bacc    */
+OP(16d,OP_ADCB ( A           ) ) /* ADCB a      */
+OP(16f,OP_ADCB ( AL          ) ) /* ADCB al     */
+OP(171,OP_ADCB ( DIY         ) ) /* ADCB diy    */
+OP(172,OP_ADCB ( DI          ) ) /* ADCB di     */
+OP(173,OP_ADCB ( SIY         ) ) /* ADCB siy    */
+OP(175,OP_ADCB ( DX          ) ) /* ADCB dx     */
+OP(177,OP_ADCB ( DLIY        ) ) /* ADCB dliy   */
+OP(179,OP_ADCB ( AY          ) ) /* ADCB ay     */
+OP(17b,OP_TDB  (             ) ) /* TDB         */
+OP(17d,OP_ADCB ( AX          ) ) /* ADCB ax     */
+OP(17f,OP_ADCB ( ALX         ) ) /* ADCB alx    */
+OP(181,OP_STB  ( DXI         ) ) /* STB dxi     */
+OP(183,OP_STB  ( S           ) ) /* STB s       */
+OP(185,OP_STB  ( D           ) ) /* STB d       */
+OP(187,OP_STB  ( DLI         ) ) /* STB dli     */
+OP(18a,OP_TXB  ( REG_X       ) ) /* TXB         */
+OP(18d,OP_STB  ( A           ) ) /* STB a       */
+OP(18f,OP_STB  ( AL          ) ) /* STB al      */
+OP(191,OP_STB  ( DIY         ) ) /* STB diy     */
+OP(192,OP_STB  ( DI          ) ) /* STB di      */
+OP(193,OP_STB  ( SIY         ) ) /* STB siy     */
+OP(195,OP_STB  ( DX          ) ) /* STB dx      */
+OP(197,OP_STB  ( DLIY        ) ) /* STB dliy    */
+OP(198,OP_TXB  ( REG_Y       ) ) /* TYB         */
+OP(199,OP_STB  ( AY          ) ) /* STB ay      */
+OP(19d,OP_STB  ( AX          ) ) /* STB ax      */
+OP(19f,OP_STB  ( ALX         ) ) /* STB alx     */
+OP(1a1,OP_LDB  ( DXI         ) ) /* LDB dxi     */
+OP(1a3,OP_LDB  ( S           ) ) /* LDB s       */
+OP(1a5,OP_LDB  ( D           ) ) /* LDB d       */
+OP(1a7,OP_LDB  ( DLI         ) ) /* LDB dli     */
+OP(1a8,OP_TBX  ( REG_Y       ) ) /* TBY         */
+OP(1a9,OP_LDB  ( IMM         ) ) /* LDB imm     */
+OP(1aa,OP_TBX  ( REG_X       ) ) /* TBX         */
+OP(1ad,OP_LDB  ( A           ) ) /* LDB a       */
+OP(1af,OP_LDB  ( AL          ) ) /* LDB al      */
+OP(1b1,OP_LDB  ( DIY         ) ) /* LDB diy     */
+OP(1b2,OP_LDB  ( DI          ) ) /* LDB di      */
+OP(1b3,OP_LDB  ( SIY         ) ) /* LDB siy     */
+OP(1b5,OP_LDB  ( DX          ) ) /* LDB dx      */
+OP(1b7,OP_LDB  ( DLIY        ) ) /* LDB dliy    */
+OP(1b9,OP_LDB  ( AY          ) ) /* LDB ay      */
+OP(1bd,OP_LDB  ( AX          ) ) /* LDB ax      */
+OP(1bf,OP_LDB  ( ALX         ) ) /* LDB alx     */
+OP(1c1,OP_CMPB ( DXI         ) ) /* CMPB dxi    */
+OP(1c3,OP_CMPB ( S           ) ) /* CMPB s      */
+OP(1c5,OP_CMPB ( D           ) ) /* CMPB d      */
+OP(1c7,OP_CMPB ( DLI         ) ) /* CMPB dli    */
+OP(1c9,OP_CMPB ( IMM         ) ) /* CMPB imm    */
+OP(1cd,OP_CMPB ( A           ) ) /* CMPB a      */
+OP(1cf,OP_CMPB ( AL          ) ) /* CMPB al     */
+OP(1d1,OP_CMPB ( DIY         ) ) /* CMPB diy    */
+OP(1d2,OP_CMPB ( DI          ) ) /* CMPB di     */
+OP(1d3,OP_CMPB ( SIY         ) ) /* CMPB siy    */
+OP(1d5,OP_CMPB ( DX          ) ) /* CMPB dx     */
+OP(1d7,OP_CMPB ( DLIY        ) ) /* CMPB dliy   */
+OP(1d9,OP_CMPB ( AY          ) ) /* CMPB ay     */
+OP(1dd,OP_CMPB ( AX          ) ) /* CMPB ax     */
+OP(1df,OP_CMPB ( ALX         ) ) /* CMPB alx    */
+OP(1e1,OP_SBCB ( DXI         ) ) /* SBCB dxi    */
+OP(1e3,OP_SBCB ( S           ) ) /* SBCB s      */
+OP(1e5,OP_SBCB ( D           ) ) /* SBCB d      */
+OP(1e7,OP_SBCB ( DLI         ) ) /* SBCB dli    */
+OP(1e9,OP_SBCB ( IMM         ) ) /* SBCB imm    */
+OP(1ed,OP_SBCB ( A           ) ) /* SBCB a      */
+OP(1ef,OP_SBCB ( AL          ) ) /* SBCB al     */
+OP(1f1,OP_SBCB ( DIY         ) ) /* SBCB diy    */
+OP(1f2,OP_SBCB ( DI          ) ) /* SBCB di     */
+OP(1f3,OP_SBCB ( SIY         ) ) /* SBCB siy    */
+OP(1f5,OP_SBCB ( DX          ) ) /* SBCB dx     */
+OP(1f7,OP_SBCB ( DLIY        ) ) /* SBCB dliy   */
+OP(1f9,OP_SBCB ( AY          ) ) /* SBCB ay     */
+OP(1fd,OP_SBCB ( AX          ) ) /* SBCB ax     */
+OP(1ff,OP_SBCB ( ALX         ) ) /* SBCB alx    */
+
+OP(200,OP_UNIMP(             ) ) /* unimplemented */
+
+/* multiply/divide */
+OP(201,OP_MPY  ( DXI         ) ) /* MPY dxi     */
+OP(203,OP_MPY  ( S           ) ) /* MPY s       */
+OP(205,OP_MPY  ( D           ) ) /* MPY d       */
+OP(207,OP_MPY  ( DLI         ) ) /* MPY dli     */
+OP(209,OP_MPY  ( IMM         ) ) /* MPY imm     */
+OP(20d,OP_MPY  ( A           ) ) /* MPY a       */
+OP(20f,OP_MPY  ( AL          ) ) /* MPY al      */
+OP(211,OP_MPY  ( DIY         ) ) /* MPY diy     */
+OP(212,OP_MPY  ( DI          ) ) /* MPY di      */
+OP(213,OP_MPY  ( SIY         ) ) /* MPY siy     */
+OP(215,OP_MPY  ( DX          ) ) /* MPY dx      */
+OP(217,OP_MPY  ( DLIY        ) ) /* MPY dliy    */
+OP(219,OP_MPY  ( AY          ) ) /* MPY ay      */
+OP(21d,OP_MPY  ( AX          ) ) /* MPY ax      */
+OP(21f,OP_MPY  ( ALX         ) ) /* MPY alx     */
+OP(221,OP_DIV  ( DXI         ) ) /* DIV dxi     */
+OP(223,OP_DIV  ( S           ) ) /* DIV s       */
+OP(225,OP_DIV  ( D           ) ) /* DIV d       */
+OP(227,OP_DIV  ( DLI         ) ) /* DIV dli     */
+OP(228,OP_XAB  (             ) ) /* XAB         */
+OP(229,OP_DIV  ( IMM         ) ) /* DIV imm     */
+OP(22d,OP_DIV  ( A           ) ) /* DIV a       */
+OP(22f,OP_DIV  ( AL          ) ) /* DIV al      */
+OP(231,OP_DIV  ( DIY         ) ) /* DIV diy     */
+OP(232,OP_DIV  ( DI          ) ) /* DIV di      */
+OP(233,OP_DIV  ( SIY         ) ) /* DIV siy     */
+OP(235,OP_DIV  ( DX          ) ) /* DIV dx      */
+OP(237,OP_DIV  ( DLIY        ) ) /* DIV dliy    */
+OP(239,OP_DIV  ( AY          ) ) /* DIV ay      */
+OP(23d,OP_DIV  ( AX          ) ) /* DIV ax      */
+OP(23f,OP_DIV  ( ALX         ) ) /* DIV alx     */
+OP(249,OP_RLA  ( IMM         ) ) /* RLA imm     */
+OP(2c2,OP_LDT  ( IMM         ) ) /* LDT imm     */
+// note: block 28x-2bx is for 7750 opcodes, not implemented yet
 
 extern TABLE_OPCODES;
 TABLE_OPCODES =
+//    00     01     02     03     04     05     06     07
+//    08     09     0a     0b     0c     0d     0e     0f
 {
-	O(00),O(01),O(02),O(03),O(04),O(05),O(06),O(07),
-	O(08),O(09),O(0a),O(0b),O(0c),O(0d),O(0e),O(0f),
-	O(10),O(11),O(12),O(13),O(14),O(15),O(16),O(17),
-	O(18),O(19),O(1a),O(1b),O(1c),O(1d),O(1e),O(1f),
-	O(20),O(21),O(22),O(23),O(24),O(25),O(26),O(27),
-	O(28),O(29),O(2a),O(2b),O(2c),O(2d),O(2e),O(2f),
-	O(30),O(31),O(32),O(33),O(34),O(35),O(36),O(37),
-	O(38),O(39),O(3a),O(3b),O(3c),O(3d),O(3e),O(3f),
-	O(40),O(41),O(42),O(43),O(44),O(45),O(46),O(47),
-	O(48),O(49),O(4a),O(4b),O(4c),O(4d),O(4e),O(4f),
-	O(50),O(51),O(52),O(53),O(54),O(55),O(56),O(57),
-	O(58),O(59),O(5a),O(5b),O(5c),O(5d),O(5e),O(5f),
-	O(60),O(61),O(62),O(63),O(64),O(65),O(66),O(67),
-	O(68),O(69),O(6a),O(6b),O(6c),O(6d),O(6e),O(6f),
-	O(70),O(71),O(72),O(73),O(74),O(75),O(76),O(77),
-	O(78),O(79),O(7a),O(7b),O(7c),O(7d),O(7e),O(7f),
-	O(80),O(81),O(82),O(83),O(84),O(85),O(86),O(87),
-	O(88),O(89),O(8a),O(8b),O(8c),O(8d),O(8e),O(8f),
-	O(90),O(91),O(92),O(93),O(94),O(95),O(96),O(97),
-	O(98),O(99),O(9a),O(9b),O(9c),O(9d),O(9e),O(9f),
-	O(a0),O(a1),O(a2),O(a3),O(a4),O(a5),O(a6),O(a7),
-	O(a8),O(a9),O(aa),O(ab),O(ac),O(ad),O(ae),O(af),
-	O(b0),O(b1),O(b2),O(b3),O(b4),O(b5),O(b6),O(b7),
-	O(b8),O(b9),O(ba),O(bb),O(bc),O(bd),O(be),O(bf),
-	O(c0),O(c1),O(c2),O(c3),O(c4),O(c5),O(c6),O(c7),
-	O(c8),O(c9),O(ca),O(cb),O(cc),O(cd),O(ce),O(cf),
-	O(d0),O(d1),O(d2),O(d3),O(d4),O(d5),O(d6),O(d7),
-	O(d8),O(d9),O(da),O(db),O(dc),O(dd),O(de),O(df),
-	O(e0),O(e1),O(e2),O(e3),O(e4),O(e5),O(e6),O(e7),
-	O(e8),O(e9),O(ea),O(eb),O(ec),O(ed),O(ee),O(ef),
-	O(f0),O(f1),O(f2),O(f3),O(f4),O(f5),O(f6),O(f7),
-	O(f8),O(f9),O(fa),O(fb),O(fc),O(fd),O(fe),O(ff)
+	O(00), O(01), O(02), O(03), O(04), O(05), O(06), O(07), 	// 00
+	O(08), O(09), O(0a), O(0b), O(0c), O(0d), O(0e), O(0f),
+	O(10), O(11), O(12), O(13), O(14), O(15), O(16), O(17), 	// 10
+	O(18), O(19), O(1a), O(1b), O(1c), O(1d), O(1e), O(1f),
+	O(20), O(21), O(22), O(23), O(24), O(25), O(26), O(27), 	// 20
+	O(28), O(29), O(2a), O(2b), O(2c), O(2d), O(2e), O(2f),
+	O(30), O(31), O(32), O(33), O(34), O(35), O(36), O(37), 	// 30
+	O(38), O(39), O(3a), O(3b), O(3c), O(3d), O(3e), O(3f),
+	O(40), O(41), O(42), O(43), O(44), O(45), O(46), O(47), 	// 40
+	O(48), O(49), O(4a), O(4b), O(4c), O(4d), O(4e), O(4f),
+	O(50), O(51), O(52), O(53), O(54), O(55), O(56), O(57), 	// 50
+	O(58), O(59), O(5a), O(5b), O(5c), O(5d), O(5e), O(5f),
+	O(60), O(61), O(62), O(63), O(64), O(65), O(66), O(67), 	// 60
+	O(68), O(69), O(6a), O(6b), O(6c), O(6d), O(6e), O(6f),
+	O(70), O(71), O(72), O(73), O(74), O(75), O(76), O(77), 	// 70
+	O(78), O(79), O(7a), O(7b), O(7c), O(7d), O(7e), O(7f),
+	O(80), O(81), O(82), O(83), O(84), O(85), O(86), O(87), 	// 80
+	O(88), O(89), O(8a), O(8b), O(8c), O(8d), O(8e), O(8f),
+	O(90), O(91), O(92), O(93), O(94), O(95), O(96), O(97), 	// 90
+	O(98), O(99), O(9a), O(9b), O(9c), O(9d), O(9e), O(9f),
+	O(a0), O(a1), O(a2), O(a3), O(a4), O(a5), O(a6), O(a7), 	// a0
+	O(a8), O(a9), O(aa), O(ab), O(ac), O(ad), O(ae), O(af),
+	O(b0), O(b1), O(b2), O(b3), O(b4), O(b5), O(b6), O(b7), 	// b0
+	O(b8), O(b9), O(ba), O(bb), O(bc), O(bd), O(be), O(bf),
+	O(c0), O(c1), O(c2), O(c3), O(c4), O(c5), O(c6), O(c7), 	// c0
+	O(c8), O(c9), O(ca), O(cb), O(cc), O(cd), O(ce), O(cf),
+	O(d0), O(d1), O(d2), O(d3), O(d4), O(d5), O(d6), O(d7), 	// d0
+	O(d8), O(d9), O(da), O(db), O(dc), O(dd), O(de), O(df),
+	O(e0), O(e1), O(e2), O(e3), O(e4), O(e5), O(e6), O(e7), 	// e0
+	O(e8), O(e9), O(ea), O(eb), O(ec), O(ed), O(ee), O(ef),
+	O(f0), O(f1), O(f2), O(f3), O(f4), O(f5), O(f6), O(f7), 	// f0
+	O(f8), O(f9), O(fa), O(fb), O(fc), O(fd), O(fe), O(ff)
 };
 
 extern TABLE_OPCODES2;
 TABLE_OPCODES2 =
+//    00     01     02     03     04     05     06     07
+//    08     09     0a     0b     0c     0d     0e     0f
 {
-	O(200),O(101),O(200),O(103),O(200),O(105),O(200),O(107),
+	O(200),O(101),O(200),O(103),O(200),O(105),O(200),O(107),	// 00
 	O(200),O(109),O(10a),O(200),O(200),O(10d),O(200),O(10f),
 	O(200),O(111),O(112),O(113),O(200),O(115),O(200),O(117),	// 10
-	O(200),O(119),O(11a),O(200),O(200),O(11d),O(200),O(11f),
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),	// 20
-	O(200),O(129),O(12a),O(200),O(200),O(200),O(200),O(200),
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),	// 30
-	O(200),O(200),O(13a),O(200),O(200),O(200),O(200),O(200),
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),	// 40
-	O(148),O(149),O(14a),O(200),O(200),O(200),O(200),O(200),
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),	// 50
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),
+	O(200),O(119),O(11a),O(11b),O(200),O(11d),O(200),O(11f),
+	O(200),O(121),O(200),O(123),O(200),O(125),O(200),O(127),	// 20
+	O(200),O(129),O(12a),O(200),O(200),O(12d),O(200),O(12f),
+	O(200),O(131),O(132),O(133),O(200),O(135),O(200),O(137),	// 30
+	O(200),O(139),O(13a),O(13b),O(200),O(13d),O(200),O(13f),
+	O(200),O(141),O(200),O(143),O(200),O(145),O(200),O(147),	// 40
+	O(148),O(149),O(14a),O(200),O(200),O(14d),O(200),O(14f),
+	O(200),O(151),O(152),O(153),O(200),O(155),O(200),O(157),	// 50
+	O(200),O(159),O(200),O(15b),O(200),O(15d),O(200),O(15f),
 	O(200),O(161),O(200),O(163),O(200),O(165),O(200),O(167),	// 60
 	O(168),O(169),O(16a),O(200),O(200),O(16d),O(200),O(16f),
 	O(200),O(171),O(172),O(173),O(200),O(175),O(200),O(177),	// 70
-	O(200),O(179),O(200),O(200),O(200),O(17d),O(200),O(17f),
+	O(200),O(179),O(200),O(17b),O(200),O(17d),O(200),O(17f),
 	O(200),O(181),O(200),O(183),O(200),O(185),O(200),O(187),	// 80
 	O(200),O(200),O(18a),O(200),O(200),O(18d),O(200),O(18f),
 	O(200),O(191),O(192),O(193),O(200),O(195),O(200),O(197),	// 90
 	O(198),O(199),O(200),O(200),O(200),O(19d),O(200),O(19f),
-	O(200),O(1a1),O(200),O(200),O(200),O(1a5),O(200),O(200),	// a0
-	O(1a8),O(1a9),O(1aa),O(200),O(200),O(1ad),O(200),O(200),
-	O(200),O(200),O(1b2),O(200),O(200),O(1b5),O(200),O(200),	// b0
-	O(200),O(1b9),O(200),O(200),O(200),O(1bd),O(200),O(200),
+	O(200),O(1a1),O(200),O(1a3),O(200),O(1a5),O(200),O(1a7),	// a0
+	O(1a8),O(1a9),O(1aa),O(200),O(200),O(1ad),O(200),O(1af),
+	O(200),O(1b1),O(1b2),O(1b3),O(200),O(1b5),O(200),O(1b7),	// b0
+	O(200),O(1b9),O(200),O(200),O(200),O(1bd),O(200),O(1bf),
 	O(200),O(1c1),O(200),O(1c3),O(200),O(1c5),O(200),O(1c7),	// c0
 	O(200),O(1c9),O(200),O(200),O(200),O(1cd),O(200),O(1cf),
 	O(200),O(1d1),O(1d2),O(1d3),O(200),O(1d5),O(200),O(1d7),	// d0
 	O(200),O(1d9),O(200),O(200),O(200),O(1dd),O(200),O(1df),
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),	// e0
-	O(200),O(1e9),O(200),O(200),O(200),O(200),O(200),O(200),
-	O(200),O(200),O(200),O(200),O(200),O(1f5),O(200),O(200),	// f0
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200)
+	O(200),O(1e1),O(200),O(1e3),O(200),O(1e5),O(200),O(1e7),	// e0
+	O(200),O(1e9),O(200),O(200),O(200),O(1ed),O(200),O(1ef),
+	O(200),O(1f1),O(1f2),O(1f3),O(200),O(1f5),O(200),O(1f7),	// f0
+	O(200),O(1f9),O(200),O(200),O(200),O(1fd),O(200),O(1ff)
 };
 
 extern TABLE_OPCODES3;
 TABLE_OPCODES3 =
+//    00     01     02     03     04     05     06     07
+//    08     09     0a     0b     0c     0d     0e     0f
 {
-	O(200),O(200),O(200),O(203),O(200),O(205),O(200),O(200),
-	O(200),O(209),O(200),O(200),O(200),O(200),O(200),O(200),
-	O(200),O(200),O(200),O(200),O(200),O(215),O(200),O(200),	// 10
-	O(200),O(219),O(200),O(200),O(200),O(200),O(200),O(200),
-	O(200),O(200),O(200),O(200),O(200),O(225),O(200),O(200),	// 20
-	O(228),O(200),O(200),O(200),O(200),O(200),O(200),O(200),
-	O(200),O(200),O(200),O(200),O(200),O(235),O(200),O(200),	// 30
-	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),
+	O(200),O(201),O(200),O(203),O(200),O(205),O(200),O(207),	// 00
+	O(200),O(209),O(200),O(200),O(200),O(20d),O(200),O(20f),
+	O(200),O(211),O(212),O(213),O(200),O(215),O(200),O(217),	// 10
+	O(200),O(219),O(200),O(200),O(200),O(21d),O(200),O(21f),
+	O(200),O(221),O(200),O(223),O(200),O(225),O(200),O(227),	// 20
+	O(228),O(229),O(200),O(200),O(200),O(22d),O(200),O(22f),
+	O(200),O(231),O(232),O(233),O(200),O(235),O(200),O(237),	// 30
+	O(200),O(239),O(200),O(200),O(200),O(23d),O(200),O(23f),
 	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),	// 40
 	O(200),O(249),O(200),O(200),O(200),O(200),O(200),O(200),
 	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200),	// 50
@@ -2824,28 +2933,25 @@ TABLE_FUNCTION(void, set_line, (m37710i_cpu_struct *cpustate, int line, int stat
 					LINE_IRQ &= ~(1 << line);
 					if (m37710_irq_levels[line])
 					{
-						cpustate->m37710_regs[m37710_irq_levels[line]] |= 8;
+						cpustate->m37710_regs[m37710_irq_levels[line]] &= ~8;
 					}
-					return;
+					break;
+
 				case ASSERT_LINE:
 				case PULSE_LINE:
 				case HOLD_LINE:
 					LINE_IRQ |= (1 << line);
 					if (m37710_irq_levels[line])
 					{
-						cpustate->m37710_regs[m37710_irq_levels[line]] &= ~8;
+						cpustate->m37710_regs[m37710_irq_levels[line]] |= 8;
 					}
 					break;
-			}
 
-			// if I flag is set, trip the WAI mechanism only (may not be totally accurate)
-			if(FLAG_I)
-			{
-				if(CPU_STOPPED & STOP_LEVEL_WAI)
-					CPU_STOPPED &= ~STOP_LEVEL_WAI;
-				return;
+				default: break;
 			}
-			return;
+			break;
+
+		default: break;
 	}
 }
 
@@ -2905,7 +3011,7 @@ TABLE_FUNCTION(int, execute, (m37710i_cpu_struct *cpustate, int clocks))
 		do
 		{
 			REG_PPC = REG_PC;
-			M37710_CALL_DEBUGGER(REG_PC);
+			M37710_CALL_DEBUGGER(REG_PB | REG_PC);
 			REG_PC++;
 			REG_IR = read_8_IMM(REG_PB | REG_PPC);
 			cpustate->opcodes[REG_IR](cpustate);

@@ -68,7 +68,7 @@ private:
 	void advance(const UINT32 *trackbuf, UINT32 &cur_cell, UINT32 cell_count, UINT32 time);
 	UINT32 get_next_edge(const UINT32 *trackbuf, UINT32 cur_cell, UINT32 cell_count);
 };
-	
+
 extern const device_type AMIGA_FDC;
 
 #endif /* AMIGAFDC_H */

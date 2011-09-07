@@ -782,7 +782,7 @@ static WRITE8_DEVICE_HANDLER( to7_io_cb2_out )
 
 
 void to7_io_line_device::input_callback(UINT8 state)
-{	
+{
 	m_input_state = state;
 
 	LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", machine().time().as_double(), (state & SERIAL_STATE_CTS) ? 1 : 0, (state & SERIAL_STATE_DSR) ? 1 : 0, (int)get_in_data_bit() ));

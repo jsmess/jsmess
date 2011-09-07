@@ -364,7 +364,7 @@ INPUT_PORTS_END
 static WRITE_LINE_DEVICE_HANDLER( com5016_fr_w )
 {
 	i8251_device* uart = dynamic_cast<i8251_device*>(device);
-	uart->transmit_clock();	
+	uart->transmit_clock();
 	uart->receive_clock();
 }
 

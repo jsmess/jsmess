@@ -325,7 +325,7 @@ void amiga_fdc::setup_fdc_buffer(int drive)
 		advance(trackbuf, cur_cell, cell_count, pll_phase);
 		if(cur_cell == cell_count)
 			break;
-		
+
 #if 0
 		printf("%09d: (%d, %09d) - (%d, %09d) - (%d, %09d)\n",
 			   pll_phase,
@@ -335,7 +335,7 @@ void amiga_fdc::setup_fdc_buffer(int drive)
 #endif
 
 		UINT32 next_edge = get_next_edge(trackbuf, cur_cell, cell_count);
-		
+
 		if(next_edge > pll_phase + pll_period) {
 			// free run, zero bit
 			// printf("%09d: %4d - Free run\n", pll_phase, pll_period);

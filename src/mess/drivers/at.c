@@ -494,7 +494,7 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_ISA8_SLOT_ADD("isabus","isa1", pc_isa8_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
 	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
-	
+
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 
 	/* internal ram */

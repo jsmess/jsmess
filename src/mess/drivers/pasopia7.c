@@ -891,8 +891,8 @@ WRITE8_MEMBER( paso7_state::video_misc_w )
     */
 //  if(data & 2)
 //  {
-//	  printf("VIDEO MISC %02x\n",data);
-//	  debugger_break(device->machine());
+//    printf("VIDEO MISC %02x\n",data);
+//    debugger_break(device->machine());
 //  }
 	m_cursor_blink = data & 0x20;
 	m_attr_wrap = data & 0x10;
