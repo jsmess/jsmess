@@ -153,7 +153,7 @@ READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
 {
 	if (m_kbd < 9)
 	{
-		char kbdrow[4];
+		char kbdrow[6];
 		sprintf(kbdrow,"X%d",m_kbd);
 		return input_port_read(machine(), kbdrow);
 	}

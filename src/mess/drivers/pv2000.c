@@ -26,6 +26,7 @@ http://www2.odn.ne.jp/~haf09260/Pv2000/EnrPV.htm
 For BIOS CRC confirmation
 */
 
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -33,146 +34,143 @@ For BIOS CRC confirmation
 #include "video/tms9928a.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
+#include "sound/wave.h"
 
 
 class pv2000_state : public driver_device
 {
 public:
 	pv2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { m_last_state = 0; }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_cass(*this, CASSETTE_TAG),
+	m_last_state(0)
+	{ }
 
-	int		m_last_state;
-	UINT8	m_keyb_column;
-	UINT8	m_cass_conf;
-	UINT8	m_key_pressed;
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cass;
+	DECLARE_WRITE8_MEMBER(pv2000_cass_conf_w);
+	DECLARE_WRITE8_MEMBER(pv2000_keys_w);
+	DECLARE_READ8_MEMBER(pv2000_keys_hi_r);
+	DECLARE_READ8_MEMBER(pv2000_keys_lo_r);
+	DECLARE_READ8_MEMBER(pv2000_keys_mod_r);
+	DECLARE_WRITE_LINE_MEMBER(pv2000_vdp_interrupt);
+	DECLARE_READ8_MEMBER(cass_in);
+	DECLARE_WRITE8_MEMBER(cass_out);
+	bool m_last_state;
+	UINT8 m_key_pressed;
+	UINT8 m_keyb_column;
+	UINT8 m_cass_conf;
 };
 
 
-static WRITE8_HANDLER( pv2000_cass_conf_w )
+WRITE8_MEMBER( pv2000_state::pv2000_cass_conf_w )
 {
-	pv2000_state *state = space->machine().driver_data<pv2000_state>();
+	logerror( "%s: pv2000_cass_conf_w %02x\n", machine().describe_context(), data );
 
-	logerror( "%s: pv2000_cass_conf_w %02x\n", space->machine().describe_context(), data );
+	m_cass_conf = data & 0x0f;
 
-	state->m_cass_conf = data & 0x0f;
-
-	if ( state->m_cass_conf & 0x01 )
-		space->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
+	if ( m_cass_conf & 0x01 )
+		m_cass->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
 	else
-		space->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 }
 
 
-static WRITE8_HANDLER( pv2000_keys_w )
+WRITE8_MEMBER( pv2000_state::pv2000_keys_w )
 {
-	pv2000_state *state = space->machine().driver_data<pv2000_state>();
+	logerror( "%s: pv2000_keys_w %02x\n", machine().describe_context(), data );
 
-	logerror( "%s: pv2000_keys_w %02x\n", space->machine().describe_context(), data );
+	m_keyb_column = data & 0x0f;
 
-	state->m_keyb_column = data & 0x0f;
-
-	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 
-static READ8_HANDLER( pv2000_keys_hi_r )
+READ8_MEMBER( pv2000_state::pv2000_keys_hi_r )
 {
-	pv2000_state *state = space->machine().driver_data<pv2000_state>();
 	UINT8 data = 0;
+	char kbdrow[6];
 
-	switch ( state->m_keyb_column )
+	switch ( m_keyb_column )
 	{
 	case 0:
-		data = input_port_read( space->machine(), "IN0" ) >> 4;
-		break;
 	case 1:
-		data = input_port_read( space->machine(), "IN1" ) >> 4;
-		break;
 	case 2:
-		data = input_port_read( space->machine(), "IN2" ) >> 4;
-		break;
 	case 3:
-		data = input_port_read( space->machine(), "IN3" ) >> 4;
-		break;
 	case 4:
-		data = input_port_read( space->machine(), "IN4" ) >> 4;
-		break;
 	case 5:
-		data = input_port_read( space->machine(), "IN5" ) >> 4;
-		break;
 	case 6:
-		data = input_port_read( space->machine(), "IN6" ) >> 4;
-		break;
 	case 7:
-		data = input_port_read( space->machine(), "IN7" ) >> 4;
-		break;
 	case 8:
-		data = input_port_read( space->machine(), "IN8" ) >> 4;
-		break;
+		sprintf(kbdrow,"IN%d",m_keyb_column);
+		data = input_port_read( machine(), kbdrow ) >> 4;
 	}
 
 	return data;
 }
 
 
-static READ8_HANDLER( pv2000_keys_lo_r )
+READ8_MEMBER( pv2000_state::pv2000_keys_lo_r )
 {
-	pv2000_state *state = space->machine().driver_data<pv2000_state>();
 	UINT8 data = 0;
+	char kbdrow[6];
 
-	logerror("%s: pv2000_keys_r\n", space->machine().describe_context() );
+	logerror("%s: pv2000_keys_r\n", machine().describe_context() );
 
-	switch ( state->m_keyb_column )
+	switch ( m_keyb_column )
 	{
 	case 0:
-		data = input_port_read( space->machine(), "IN0" ) & 0x0f;
-		break;
 	case 1:
-		data = input_port_read( space->machine(), "IN1" ) & 0x0f;
-		break;
 	case 2:
-		data = input_port_read( space->machine(), "IN2" ) & 0x0f;
-		break;
 	case 3:
-		data = input_port_read( space->machine(), "IN3" ) & 0x0f;
-		break;
 	case 4:
-		data = input_port_read( space->machine(), "IN4" ) & 0x0f;
-		break;
 	case 5:
-		data = input_port_read( space->machine(), "IN5" ) & 0x0f;
-		break;
 	case 6:
-		data = input_port_read( space->machine(), "IN6" ) & 0x0f;
-		break;
 	case 7:
-		data = input_port_read( space->machine(), "IN7" ) & 0x0f;
-		break;
 	case 8:
-		data = input_port_read( space->machine(), "IN8" ) & 0x0f;
-		break;
 	case 9:
-		data = input_port_read( space->machine(), "IN9" ) & 0x0f;
-		break;
+		sprintf(kbdrow,"IN%d",m_keyb_column);
+		data = input_port_read( machine(), kbdrow ) & 0x0f;
 	}
 
 	return 0xf0 | data;
 }
 
 
-static READ8_HANDLER(pv2000_keys_mod_r)
+READ8_MEMBER( pv2000_state::pv2000_keys_mod_r )
 {
-	return 0xf0 | input_port_read( space->machine(), "MOD" );
+	return 0xf0 | input_port_read( machine(), "MOD" );
+}
+
+READ8_MEMBER( pv2000_state::cass_in )
+{
+    // from what i can tell,
+    // 0 = data in
+    // 1 = must be high
+    // 2 = must be low
+    // bits 1 & 2 are checked while reading and writing tapes
+    // Press STOP key (F1) to cancel LOAD or SAVE
+
+	return 2 | ((m_cass->input() > +0.03) ? 1 : 0);
+}
+
+WRITE8_MEMBER( pv2000_state::cass_out )
+{
+    // it outputs 8-bit values here which are not the bytes in the file
+    // result is not readable
+
+	m_cass->output( BIT(data, 0) ? -1.0 : +1.0);
 }
 
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( pv2000_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pv2000_map, AS_PROGRAM, 8, pv2000_state )
 	AM_RANGE(0x0000, 0x3FFF) AM_ROM
 
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, register_read, register_write)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
 
 	AM_RANGE(0x7000, 0x7FFF) AM_RAM
   //AM_RANGE(0x8000, 0xBFFF) ext ram?
@@ -180,7 +178,7 @@ static ADDRESS_MAP_START( pv2000_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pv2000_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pv2000_io_map, AS_IO, 8, pv2000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	//theres also printer and tape I/O (TODO)
@@ -191,10 +189,10 @@ static ADDRESS_MAP_START( pv2000_io_map, AS_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_READWRITE(pv2000_keys_lo_r, pv2000_keys_w)
 
 	//sn76489a
-	AM_RANGE(0x40, 0x40) AM_READ(pv2000_keys_mod_r) AM_DEVWRITE("sn76489a", sn76496_w)
+	AM_RANGE(0x40, 0x40) AM_READ(pv2000_keys_mod_r) AM_DEVWRITE_LEGACY("sn76489a", sn76496_w)
 
 	/* Cassette input. Gets hit a lot after a GLOAD command */
-//  AM_RANGE(0x60, 0x60)
+	AM_RANGE(0x60, 0x60) AM_READWRITE(cass_in,cass_out)
 ADDRESS_MAP_END
 
 
@@ -304,36 +302,34 @@ static INPUT_PORTS_START( pv2000 )
 INPUT_PORTS_END
 
 
-static WRITE_LINE_DEVICE_HANDLER(pv2000_vdp_interrupt)
+WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 {
-	pv2000_state *pv_state = device->machine().driver_data<pv2000_state>();
-
     // only if it goes up
-	if (state && !pv_state->m_last_state)
-		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	if (state && !m_last_state)
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
-	pv_state->m_last_state = state;
+	m_last_state = state;
 
 	/* Check if irq triggering from keyboard presses is enabled */
-	if ( pv_state->m_keyb_column == 0x0f )
+	if ( m_keyb_column == 0x0f )
 	{
 		/* Check if a key is pressed */
 		UINT8 key_pressed;
 
-		key_pressed = input_port_read( device->machine(), "IN0" )
-			| input_port_read( device->machine(), "IN1" )
-			| input_port_read( device->machine(), "IN2" )
-			| input_port_read( device->machine(), "IN3" )
-			| input_port_read( device->machine(), "IN4" )
-			| input_port_read( device->machine(), "IN5" )
-			| input_port_read( device->machine(), "IN6" )
-			| input_port_read( device->machine(), "IN7" )
-			| input_port_read( device->machine(), "IN8" );
+		key_pressed = input_port_read( machine(), "IN0" )
+			| input_port_read( machine(), "IN1" )
+			| input_port_read( machine(), "IN2" )
+			| input_port_read( machine(), "IN3" )
+			| input_port_read( machine(), "IN4" )
+			| input_port_read( machine(), "IN5" )
+			| input_port_read( machine(), "IN6" )
+			| input_port_read( machine(), "IN7" )
+			| input_port_read( machine(), "IN8" );
 
-		if ( key_pressed && pv_state->m_key_pressed != key_pressed )
-			cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+		if ( key_pressed && m_key_pressed != key_pressed )
+			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 
-		pv_state->m_key_pressed = key_pressed;
+		m_key_pressed = key_pressed;
 	}
 }
 
@@ -345,7 +341,7 @@ static TMS9928A_INTERFACE(pv2000_tms9928a_interface)
 {
 	"screen",
 	0x4000,
-	DEVCB_LINE(pv2000_vdp_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(pv2000_state, pv2000_vdp_interrupt)
 };
 
 static MACHINE_START( pv2000 )
@@ -424,7 +420,7 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 	MCFG_MACHINE_START(pv2000)
 	MCFG_MACHINE_RESET(pv2000)
 
-    // video hardware
+	// video hardware
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, pv2000_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE( pv2000 )
@@ -433,6 +429,8 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, pv2000_cassette_interface )
