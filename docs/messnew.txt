@@ -1,4 +1,44 @@
-﻿0.143u4
+﻿0.143u5
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+
+System Driver Changes:
+----------------------
+- kc: Added emulation of D002 BUS Driver expansion. [Sandro Ronco]
+- kc: Added emulation of D004 Floppy Disk Interface. [Sandro Ronco]
+- fmtowns: Added interval timer 2, and 6-button controller support.  [Barry Rodewald]
+- amigafdc: Modernize, but don't change a thing (yet) [O. Galibert]
+- nc: Added NC150 Italian bios.  [Roberto Carlos Fernandez Gerhardt]
+
+Software Lists:
+----------------
+- mpz80: Added Micronix 1.3/1.4 to softlist. [Al Kossow]
+- vsmile.xml: added a new softlist for some v.disc dumps [Team Europe]
+
+Source Changes:
+----------------
+- floppy: Refactor slightly.  Name, descrition, etc are now an 
+	intrinsic property of converters. [O. Galibert]
+
+- floppy: Add brand-new MFI (MESS floppy image) support. [O. Galibert]
+
+- floppy: Change the internal format to use magnetic cells.  Temporarily
+        move the full-track pll bit extraction in the amiga fdc. [O. Galibert]
+
+- st_dsk: Add the easy ST formats [O. Galibert]
+
+0.143u4
 
 New System Drivers Supported:
 -----------------------------
@@ -25,7 +65,6 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
-- saturn: inputs to use PORT_CONDITION instead of PORT_CATEGORY [Fabio Priuli]
 - pet: Added support for D80/D82 disk images with error information. [Curt Coder]
 - NES: Attached emulated keyboards (Famicom and Subor) directly to famicom driver now 
  that keyboard emulation does not affect the emulation if only gamepad are attached to the 
@@ -41,6 +80,10 @@ Software Lists:
 Source Changes:
 ----------------
 - floppy: Add generic track data descriptors [O. Galibert]
+- Removed support for PORT_CATEGORY from the core. If you want to choose
+  the controller type (for systems which support multiple controllers),
+  you now have to enter the 'Driver Configurations' menu and not the
+  'Categories' menu anymore. [Fabio Priuli]
 
 0.143u3
 
