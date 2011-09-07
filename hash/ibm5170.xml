@@ -178,4 +178,73 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="msdos5">
+		<description>MS-Dos 5.0</description>
+		<year>1991</year>
+		<publisher>Microsoft Corporation</publisher>
+		<info name="OEM" value="MECER" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="msds5d1.img" size="737280" crc="c54fe610" sha1="27756a10edbe33f76ff2239062af05dbfdc93979" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="msds5d2.img" size="737280" crc="9aa5c1a4" sha1="15cc58e267601b30a594372aea1ff3dbb73ea335" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="msds5d3.img" size="737280" crc="6248317a" sha1="c7ff3a04eb01cab3efb05b6b52ec8b8a36b9b269" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indycar">
+		<description>IndyCar Racing</description>
+		<year>1993</year>
+		<publisher>Papyrus Publishing Inc.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="c2006f5c" sha1="cf599de208d42bc6b87d1d0fa30a02a43209cef2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="e3498668" sha1="a19f16c825b10105a6fce21f10176eccc23af520" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="3e6fc1d5" sha1="45ee9c088ebee47ebc6be7e7d4337962c42a5887" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcgps">
+		<description>World Circuit: Grand Prix Simulation</description>
+		<year>1992</year>
+		<publisher>MicroProse Ltd.</publisher>
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_5_25">
+			<info name="Disc Code" value="4861A" />
+			<dataarea name="flop" size="1474560">
+				<rom name="diska.img" size="1474560" crc="02ced55a" sha1="0f96038f1552bff33747dea41c0ac6c0a1486ad3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<info name="Disc Code" value="4861B" />
+			<dataarea name="flop" size="1474560">
+				<rom name="diskb.img" size="1474560" crc="e7ff6515" sha1="6378a6d1d461015890f73d0dc5799acd412a3630" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<info name="Disc Code" value="4861C" />
+			<dataarea name="flop" size="1474560">
+				<rom name="diskc.img" size="1474560" crc="9ad130ca" sha1="a3414cb53382402b5cb8908983a0e10dc4542e3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+
 </softwarelist>
