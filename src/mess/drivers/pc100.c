@@ -15,6 +15,7 @@
     F8219: 74 15                     je      0F8230h
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -27,6 +28,23 @@ public:
 	pc100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_READ16_MEMBER(pc100_vram_r);
+	DECLARE_WRITE16_MEMBER(pc100_vram_w);
+	DECLARE_READ16_MEMBER(pc100_kanji_r);
+	DECLARE_WRITE16_MEMBER(pc100_kanji_w);
+	DECLARE_READ8_MEMBER(pc100_key_r);
+	DECLARE_WRITE8_MEMBER(pc100_output_w);
+	DECLARE_WRITE16_MEMBER(pc100_paletteram_w);
+	DECLARE_READ8_MEMBER(pc100_shift_r);
+	DECLARE_WRITE8_MEMBER(pc100_shift_w);
+	DECLARE_READ8_MEMBER(pc100_vs_vreg_r);
+	DECLARE_WRITE8_MEMBER(pc100_vs_vreg_w);
+	DECLARE_WRITE8_MEMBER(pc100_crtc_addr_w);
+	DECLARE_WRITE8_MEMBER(pc100_crtc_data_w);
+	DECLARE_WRITE8_MEMBER(lower_mask_w);
+	DECLARE_WRITE8_MEMBER(upper_mask_w);
+	DECLARE_WRITE8_MEMBER(crtc_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(pc100_set_int_line);
 	UINT16 *m_kanji_rom;
 	UINT16 *m_vram;
 	UINT16 *m_palram;
@@ -85,149 +103,127 @@ static SCREEN_UPDATE( pc100 )
 	return 0;
 }
 
-static READ16_HANDLER( pc100_vram_r )
+READ16_MEMBER( pc100_state::pc100_vram_r )
 {
-	pc100_state *state = space->machine().driver_data<pc100_state>();
-
-	return state->m_vram[offset+state->m_bank_r*0x10000];
+	return m_vram[offset+m_bank_r*0x10000];
 }
 
-static WRITE16_HANDLER( pc100_vram_w )
+WRITE16_MEMBER( pc100_state::pc100_vram_w )
 {
-	pc100_state *state = space->machine().driver_data<pc100_state>();
 	UINT16 old_vram;
 	int i;
 
 	for(i=0;i<4;i++)
 	{
-		if((state->m_bank_w >> i) & 1)
+		if((m_bank_w >> i) & 1)
 		{
-			old_vram = state->m_vram[offset+i*0x10000];
-			COMBINE_DATA(&state->m_vram[offset+i*0x10000]);
-			state->m_vram[offset+i*0x10000] = ((state->m_vram[offset+i*0x10000]|(state->m_vram[offset+i*0x10000]<<16)) >> state->m_crtc.shift);
+			old_vram = m_vram[offset+i*0x10000];
+			COMBINE_DATA(&m_vram[offset+i*0x10000]);
+			m_vram[offset+i*0x10000] = ((m_vram[offset+i*0x10000]|(m_vram[offset+i*0x10000]<<16)) >> m_crtc.shift);
 			if(ACCESSING_BITS_0_15)
-				state->m_vram[offset+i*0x10000] = (state->m_vram[offset+i*0x10000] & ~state->m_crtc.mask) | (old_vram & state->m_crtc.mask);
+				m_vram[offset+i*0x10000] = (m_vram[offset+i*0x10000] & ~m_crtc.mask) | (old_vram & m_crtc.mask);
 			else if(ACCESSING_BITS_8_15)
-				state->m_vram[offset+i*0x10000] = (state->m_vram[offset+i*0x10000] & ((~state->m_crtc.mask) & 0xff00)) | (old_vram & (state->m_crtc.mask|0xff));
+				m_vram[offset+i*0x10000] = (m_vram[offset+i*0x10000] & ((~m_crtc.mask) & 0xff00)) | (old_vram & (m_crtc.mask|0xff));
 			else if(ACCESSING_BITS_0_7)
-				state->m_vram[offset+i*0x10000] = (state->m_vram[offset+i*0x10000] & ((~state->m_crtc.mask) & 0xff)) | (old_vram & (state->m_crtc.mask|0xff00));
+				m_vram[offset+i*0x10000] = (m_vram[offset+i*0x10000] & ((~m_crtc.mask) & 0xff)) | (old_vram & (m_crtc.mask|0xff00));
 
 		}
 	}
 }
 
-static ADDRESS_MAP_START(pc100_map, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(pc100_map, AS_PROGRAM, 16, pc100_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xbffff) AM_RAM // work ram
 	AM_RANGE(0xc0000,0xdffff) AM_READWRITE(pc100_vram_r,pc100_vram_w) // vram, blitter based!
 	AM_RANGE(0xf8000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static READ16_HANDLER( pc100_kanji_r )
+READ16_MEMBER( pc100_state::pc100_kanji_r )
 {
-	pc100_state *state = space->machine().driver_data<pc100_state>();
-
-	return state->m_kanji_rom[state->m_kanji_addr];
+	return m_kanji_rom[m_kanji_addr];
 }
 
 
-static WRITE16_HANDLER( pc100_kanji_w )
+WRITE16_MEMBER( pc100_state::pc100_kanji_w )
 {
-	pc100_state *state = space->machine().driver_data<pc100_state>();
-
-	COMBINE_DATA(&state->m_kanji_addr);
+	COMBINE_DATA(&m_kanji_addr);
 }
 
-static READ8_HANDLER( pc100_key_r )
+READ8_MEMBER( pc100_state::pc100_key_r )
 {
 	if(offset)
-		return input_port_read(space->machine(), "DSW"); // bit 5: horizontal/vertical monitor dsw
+		return input_port_read(machine(), "DSW"); // bit 5: horizontal/vertical monitor dsw
 
 	return 0;
 }
 
-static WRITE8_HANDLER( pc100_output_w )
+WRITE8_MEMBER( pc100_state::pc100_output_w )
 {
-	pc100_state *state = space->machine().driver_data<pc100_state>();
-
 	if(offset == 0)
-		state->m_timer_mode = (data & 0x18) >> 3;
+		m_timer_mode = (data & 0x18) >> 3;
 }
 
-static WRITE16_HANDLER( pc100_paletteram_w )
+WRITE16_MEMBER( pc100_state::pc100_paletteram_w )
 {
-	pc100_state *state = space->machine().driver_data<pc100_state>();
-
-	COMBINE_DATA(&state->m_palram[offset]);
+	COMBINE_DATA(&m_palram[offset]);
 
 	{
 		int r,g,b;
 
-		r = (state->m_palram[offset] >> 0) & 7;
-		g = (state->m_palram[offset] >> 3) & 7;
-		b = (state->m_palram[offset] >> 6) & 7;
+		r = (m_palram[offset] >> 0) & 7;
+		g = (m_palram[offset] >> 3) & 7;
+		b = (m_palram[offset] >> 6) & 7;
 
-		palette_set_color_rgb(space->machine(), offset, pal3bit(r),pal3bit(g),pal3bit(b));
+		palette_set_color_rgb(machine(), offset, pal3bit(r),pal3bit(g),pal3bit(b));
 	}
 }
 
-static READ8_HANDLER( pc100_shift_r )
+READ8_MEMBER( pc100_state::pc100_shift_r )
 {
-	pc100_state *state = space->machine().driver_data<pc100_state>();
-
-	return state->m_crtc.shift;
+	return m_crtc.shift;
 }
 
 
-static WRITE8_HANDLER( pc100_shift_w )
+WRITE8_MEMBER( pc100_state::pc100_shift_w )
 {
-	pc100_state *state = space->machine().driver_data<pc100_state>();
-
-	state->m_crtc.shift = data & 0xf;
+	m_crtc.shift = data & 0xf;
 }
 
-static READ8_HANDLER( pc100_vs_vreg_r )
+READ8_MEMBER( pc100_state::pc100_vs_vreg_r )
 {
-	pc100_state *state = space->machine().driver_data<pc100_state>();
-
 	if(offset)
-		return state->m_crtc.vstart >> 8;
+		return m_crtc.vstart >> 8;
 
-	return state->m_crtc.vstart & 0xff;
+	return m_crtc.vstart & 0xff;
 }
 
-static WRITE8_HANDLER( pc100_vs_vreg_w )
+WRITE8_MEMBER( pc100_state::pc100_vs_vreg_w )
 {
-	pc100_state *state = space->machine().driver_data<pc100_state>();
-
 	if(offset)
-		state->m_crtc.vstart = (state->m_crtc.vstart & 0xff) | (data << 8);
+		m_crtc.vstart = (m_crtc.vstart & 0xff) | (data << 8);
 	else
-		state->m_crtc.vstart = (state->m_crtc.vstart & 0xff00) | (data & 0xff);
+		m_crtc.vstart = (m_crtc.vstart & 0xff00) | (data & 0xff);
 }
 
-static WRITE8_HANDLER( pc100_crtc_addr_w )
+WRITE8_MEMBER( pc100_state::pc100_crtc_addr_w )
 {
-	pc100_state *state = space->machine().driver_data<pc100_state>();
-
-	state->m_crtc.addr = data & 7;
+	m_crtc.addr = data & 7;
 }
 
-static WRITE8_HANDLER( pc100_crtc_data_w )
+WRITE8_MEMBER( pc100_state::pc100_crtc_data_w )
 {
-	pc100_state *state = space->machine().driver_data<pc100_state>();
-
-	state->m_crtc.reg[state->m_crtc.addr] = data;
+	m_crtc.reg[m_crtc.addr] = data;
 }
 
 
 /* everything is 8-bit bus wide */
-static ADDRESS_MAP_START(pc100_io, AS_IO, 16)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0x00ff) // i8259
+static ADDRESS_MAP_START(pc100_io, AS_IO, 16, pc100_state)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0x00ff) // i8259
 //  AM_RANGE(0x04, 0x07) i8237?
 //  AM_RANGE(0x08, 0x0b) upd765
 //  AM_RANGE(0x10, 0x17) i8255 #1
-	AM_RANGE(0x18, 0x1f) AM_DEVREADWRITE8_MODERN("ppi8255_2", i8255_device, read, write,0x00ff) // i8255 #2
+	AM_RANGE(0x18, 0x1f) AM_DEVREADWRITE8("ppi8255_2", i8255_device, read, write,0x00ff) // i8255 #2
 	AM_RANGE(0x20, 0x23) AM_READ8(pc100_key_r,0x00ff) //i/o, keyboard, mouse
 	AM_RANGE(0x22, 0x25) AM_WRITE8(pc100_output_w,0x00ff) //i/o, keyboard, mouse
 //  AM_RANGE(0x28, 0x2b) i8251
@@ -235,7 +231,7 @@ static ADDRESS_MAP_START(pc100_io, AS_IO, 16)
 	AM_RANGE(0x38, 0x39) AM_WRITE8(pc100_crtc_addr_w,0x00ff) //crtc address reg
 	AM_RANGE(0x3a, 0x3b) AM_WRITE8(pc100_crtc_data_w,0x00ff) //crtc data reg
 	AM_RANGE(0x3c, 0x3f) AM_READWRITE8(pc100_vs_vreg_r,pc100_vs_vreg_w,0x00ff) //crtc vertical start position
-	AM_RANGE(0x40, 0x5f) AM_RAM_WRITE(pc100_paletteram_w) AM_BASE_MEMBER(pc100_state,m_palram)
+	AM_RANGE(0x40, 0x5f) AM_RAM_WRITE(pc100_paletteram_w) AM_BASE(m_palram)
 //  AM_RANGE(0x60, 0x61) crtc command (16-bit wide)
 	AM_RANGE(0x80, 0x81) AM_READWRITE(pc100_kanji_r,pc100_kanji_w)
 	AM_RANGE(0x82, 0x83) AM_WRITENOP //kanji-related?
@@ -284,39 +280,33 @@ static const gfx_layout kanji_layout =
 };
 
 static GFXDECODE_START( pc100 )
-	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 0, 1 )
+	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 8, 1 )
 GFXDECODE_END
 
-static WRITE8_DEVICE_HANDLER( lower_mask_w )
+WRITE8_MEMBER( pc100_state::lower_mask_w )
 {
-	pc100_state *state = device->machine().driver_data<pc100_state>();
-
-	state->m_crtc.mask = (state->m_crtc.mask & 0xff00) | (data & 0xff);
+	m_crtc.mask = (m_crtc.mask & 0xff00) | data;
 }
 
-static WRITE8_DEVICE_HANDLER( upper_mask_w )
+WRITE8_MEMBER( pc100_state::upper_mask_w )
 {
-	pc100_state *state = device->machine().driver_data<pc100_state>();
-
-	state->m_crtc.mask = (state->m_crtc.mask & 0xff) | (data << 8);
+	m_crtc.mask = (m_crtc.mask & 0xff) | (data << 8);
 }
 
-static WRITE8_DEVICE_HANDLER( crtc_bank_w )
+WRITE8_MEMBER( pc100_state::crtc_bank_w )
 {
-	pc100_state *state = device->machine().driver_data<pc100_state>();
-
-	state->m_bank_w = data & 0xf;
-	state->m_bank_r = (data & 0x30) >> 4;
+	m_bank_w = data & 0xf;
+	m_bank_r = (data & 0x30) >> 4;
 }
 
 static I8255A_INTERFACE( pc100_ppi8255_interface_2 )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(lower_mask_w),
+	DEVCB_DRIVER_MEMBER(pc100_state, lower_mask_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(upper_mask_w),
+	DEVCB_DRIVER_MEMBER(pc100_state, upper_mask_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(crtc_bank_w)
+	DEVCB_DRIVER_MEMBER(pc100_state, crtc_bank_w)
 };
 
 static IRQ_CALLBACK(pc100_irq_callback)
@@ -324,15 +314,15 @@ static IRQ_CALLBACK(pc100_irq_callback)
 	return pic8259_acknowledge( device->machine().device( "pic8259" ) );
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pc100_set_int_line )
+WRITE_LINE_MEMBER( pc100_state::pc100_set_int_line )
 {
 	//printf("%02x\n",interrupt);
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface pc100_pic8259_config =
 {
-	DEVCB_LINE(pc100_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(pc100_state, pc100_set_int_line),
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };
@@ -348,7 +338,6 @@ static MACHINE_START(pc100)
 
 static MACHINE_RESET(pc100)
 {
-
 }
 
 static INTERRUPT_GEN(pc100_vblank_irq)
@@ -400,9 +389,6 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_MACHINE_START(pc100)
 	MCFG_MACHINE_RESET(pc100)
 
-    MCFG_I8255_ADD( "ppi8255_2", pc100_ppi8255_interface_2 )
-	MCFG_PIC8259_ADD( "pic8259", pc100_pic8259_config )
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -410,19 +396,18 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
+	MCFG_VIDEO_START(pc100)
 	MCFG_SCREEN_UPDATE(pc100)
+	MCFG_GFXDECODE(pc100)
+	MCFG_PALETTE_LENGTH(16)
+//  MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_TIMER_ADD_PERIODIC("600hz", pc100_600hz_irq, attotime::from_hz(MASTER_CLOCK/600))
 	MCFG_TIMER_ADD_PERIODIC("100hz", pc100_100hz_irq, attotime::from_hz(MASTER_CLOCK/100))
 	MCFG_TIMER_ADD_PERIODIC("50hz", pc100_50hz_irq, attotime::from_hz(MASTER_CLOCK/50))
 	MCFG_TIMER_ADD_PERIODIC("10hz", pc100_10hz_irq, attotime::from_hz(MASTER_CLOCK/10))
-
-	MCFG_PALETTE_LENGTH(16)
-//  MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_GFXDECODE(pc100)
-
-	MCFG_VIDEO_START(pc100)
+	MCFG_I8255_ADD( "ppi8255_2", pc100_ppi8255_interface_2 )
+	MCFG_PIC8259_ADD( "pic8259", pc100_pic8259_config )
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -438,5 +423,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 198?, pc100,  0,      0,       pc100,     pc100,    0,     "NEC",   "PC-100", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY  FULLNAME       FLAGS */
+COMP( 198?, pc100,  0,      0,       pc100,     pc100,   0,      "NEC",   "PC-100", GAME_NOT_WORKING | GAME_NO_SOUND)
