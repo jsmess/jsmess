@@ -118,6 +118,18 @@ void isa8_fdc_device::device_reset()
 	upd765_reset_w(m_upd765, 1);
 }
 
+static device_t *get_floppy_subdevice(device_t *device, int drive)
+{
+	switch(drive) {
+		case 0 : return device->subdevice(FLOPPY_0);
+		case 1 : return device->subdevice(FLOPPY_1);
+		case 2 : return device->subdevice(FLOPPY_2);
+		case 3 : return device->subdevice(FLOPPY_3);
+	}
+	return NULL;
+}
+
+
 static WRITE_LINE_DEVICE_HANDLER( pc_fdc_set_tc_state)
 {
 	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device);
@@ -203,7 +215,7 @@ static WRITE8_DEVICE_HANDLER( pc_fdc_dor_w )
 	floppy_count = floppy_get_count(device->machine());
 
 	if (floppy_count > (fdc->digital_output_register & 0x03))
-		floppy_drive_set_ready_state(floppy_get_device(device->machine(), fdc->digital_output_register & 0x03), 1, 0);
+		floppy_drive_set_ready_state(get_floppy_subdevice(device, fdc->digital_output_register & 0x03), 1, 0);
 
 	fdc->digital_output_register = data;
 
@@ -211,18 +223,18 @@ static WRITE8_DEVICE_HANDLER( pc_fdc_dor_w )
 
 	/* set floppy drive motor state */
 	if (floppy_count > 0)
-		floppy_mon_w(floppy_get_device(device->machine(), 0), !BIT(data, 4));
+		floppy_mon_w(get_floppy_subdevice(device, 0), !BIT(data, 4));
 	if (floppy_count > 1)
-		floppy_mon_w(floppy_get_device(device->machine(), 1), !BIT(data, 5));
+		floppy_mon_w(get_floppy_subdevice(device, 1), !BIT(data, 5));
 	if (floppy_count > 2)
-		floppy_mon_w(floppy_get_device(device->machine(), 2), !BIT(data, 6));
+		floppy_mon_w(get_floppy_subdevice(device, 2), !BIT(data, 6));
 	if (floppy_count > 3)
-		floppy_mon_w(floppy_get_device(device->machine(), 3), !BIT(data, 7));
+		floppy_mon_w(get_floppy_subdevice(device, 3), !BIT(data, 7));
 
 	if ((data>>4) & (1<<selected_drive))
 	{
 		if (floppy_count > selected_drive)
-			floppy_drive_set_ready_state(floppy_get_device(device->machine(), selected_drive), 1, 0);
+			floppy_drive_set_ready_state(get_floppy_subdevice(device, selected_drive), 1, 0);
 	}
 
 	/* changing the DMA enable bit, will affect the terminal count state
@@ -275,6 +287,40 @@ static WRITE8_DEVICE_HANDLER( pc_fdc_dor_w )
 	}
 }
 
+#define RATE_250  2
+#define RATE_300  1
+#define RATE_500  0
+#define RATE_1000 3
+
+static void pc_fdc_check_data_rate(isa8_fdc_device *fdc, running_machine &machine)
+{
+	device_t *device = get_floppy_subdevice(fdc, fdc->digital_output_register & 0x03);
+	floppy_image_legacy *image;
+	int tracks, sectors, rate;
+
+	upd765_set_bad(fdc->m_upd765, 0); // unset in case format is unknown
+	if (!device) return;
+	image = flopimg_get_image(device);
+	if (!image) return;
+	tracks = floppy_get_tracks_per_disk(image);
+	tracks -= (tracks % 10); // ignore extra tracks
+	floppy_get_sector_count(image, 0, 0, &sectors);
+
+	if (tracks == 40) {
+		if ((fdc->data_rate_register != RATE_250) && (fdc->data_rate_register != RATE_300))
+			upd765_set_bad(fdc->m_upd765, 1);
+		return;
+	} else if (tracks == 80) {
+		if (sectors <= 14)      rate = RATE_250;    // 720KB 5 1/4 and 3 1/2
+		else if (sectors <= 24) rate = RATE_500;    // 1.2MB 5 1/4 and 1.44MB 3 1/2
+		else                    rate = RATE_1000;   // 2.88MB 3 1/2
+	} else return;
+
+	if (rate != (fdc->data_rate_register & 3))
+		upd765_set_bad(fdc->m_upd765, 1);
+}
+
+
 static READ8_DEVICE_HANDLER ( pc_fdc_r )
 {
 	UINT8 data = 0xff;
@@ -300,7 +346,9 @@ static READ8_DEVICE_HANDLER ( pc_fdc_r )
 		case 6: /* FDC reserved */
 			break;
 		case 7:
+			device_t *dev = get_floppy_subdevice(device, fdc->digital_output_register & 0x03);
 			data = fdc->digital_input_register;
+			if(dev!=NULL) data |= (!floppy_dskchg_r(dev)<<7);
 			break;
     }
 
@@ -317,6 +365,7 @@ static WRITE8_DEVICE_HANDLER ( pc_fdc_w )
 
 	if (LOG_FDC)
 		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(device->machine().firstcpu,STATE_GENPC), offset, data);
+	pc_fdc_check_data_rate(fdc,device->machine());  // check every time a command may start
 
 	switch(offset)
 	{
@@ -348,6 +397,7 @@ static WRITE8_DEVICE_HANDLER ( pc_fdc_w )
              *      1 0      250 kbps
              *      1 1     1000 kbps
              */
+			pc_fdc_data_rate_w(device, 0, data & 3);
 			break;
 	}
 }
