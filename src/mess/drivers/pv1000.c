@@ -3,6 +3,7 @@
     Driver for Casio PV-1000
 
 ***************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -13,12 +14,15 @@ DECLARE_LEGACY_SOUND_DEVICE(PV1000,pv1000_sound);
 DEFINE_LEGACY_SOUND_DEVICE(PV1000,pv1000_sound);
 
 
-class d65010_state : public driver_device
+class pv1000_state : public driver_device
 {
 public:
-	d65010_state(const machine_config &mconfig, device_type type, const char *tag)
+	pv1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_WRITE8_MEMBER(pv1000_io_w);
+	DECLARE_READ8_MEMBER(pv1000_io_r);
+	DECLARE_WRITE8_MEMBER(pv1000_gfxram_w);
 	UINT8	m_io_regs[8];
 	UINT8	m_fd_data;
 	struct
@@ -34,48 +38,41 @@ public:
 
 	device_t *m_maincpu;
 	screen_device *m_screen;
-	UINT8 *m_ram;
+	UINT8 *m_p_videoram;
 };
 
 
-static WRITE8_HANDLER( pv1000_io_w );
-static READ8_HANDLER( pv1000_io_r );
-static WRITE8_HANDLER( pv1000_gfxram_w );
-
-
-static ADDRESS_MAP_START( pv1000, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pv1000, AS_PROGRAM, 8, pv1000_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_MIRROR( 0x4000 ) AM_ROM AM_REGION( "cart", 0 )
-	AM_RANGE( 0xb800, 0xbbff ) AM_RAM AM_BASE_MEMBER( d65010_state, m_ram )
+	AM_RANGE( 0xb800, 0xbbff ) AM_RAM AM_BASE( m_p_videoram )
 	AM_RANGE( 0xbc00, 0xbfff ) AM_RAM_WRITE( pv1000_gfxram_w ) AM_REGION( "gfxram", 0 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pv1000_io, AS_IO, 8 )
+static ADDRESS_MAP_START( pv1000_io, AS_IO, 8, pv1000_state )
 	ADDRESS_MAP_GLOBAL_MASK( 0xff )
 	AM_RANGE( 0xf8, 0xff ) AM_READWRITE( pv1000_io_r, pv1000_io_w )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( pv1000_gfxram_w )
+WRITE8_MEMBER( pv1000_state::pv1000_gfxram_w )
 {
-	UINT8 *gfxram = space->machine().region( "gfxram" )->base();
+	UINT8 *gfxram = machine().region( "gfxram" )->base();
 
 	gfxram[ offset ] = data;
-	gfx_element_mark_dirty(space->machine().gfx[1], offset/32);
+	gfx_element_mark_dirty(machine().gfx[1], offset/32);
 }
 
 
-static WRITE8_HANDLER( pv1000_io_w )
+WRITE8_MEMBER( pv1000_state::pv1000_io_w )
 {
-	d65010_state *state = space->machine().driver_data<d65010_state>();
-
 	switch ( offset )
 	{
 	case 0x00:
 	case 0x01:
 	case 0x02:
 		//logerror("pv1000_io_w offset=%02x, data=%02x (%03d)\n", offset, data , data);
-		state->m_voice[offset].period = data;
+		m_voice[offset].period = data;
 	break;
 
 	case 0x03:
@@ -83,18 +80,17 @@ static WRITE8_HANDLER( pv1000_io_w )
 	break;
 
 	case 0x05:
-		state->m_fd_data = 1;
+		m_fd_data = 1;
 		break;
 	}
 
-	state->m_io_regs[offset] = data;
+	m_io_regs[offset] = data;
 }
 
 
-static READ8_HANDLER( pv1000_io_r )
+READ8_MEMBER( pv1000_state::pv1000_io_r )
 {
-	d65010_state *state = space->machine().driver_data<d65010_state>();
-	UINT8 data = state->m_io_regs[offset];
+	UINT8 data = m_io_regs[offset];
 
 //  logerror("pv1000_io_r offset=%02x\n", offset );
 
@@ -103,28 +99,28 @@ static READ8_HANDLER( pv1000_io_r )
 	case 0x04:
 		/* Bit 1 = 1 => Data is available in port FD */
 		/* Bit 0 = 1 => Buffer at port FD is empty */
-		data = ( state->m_screen->vpos() >= 212 && state->m_screen->vpos() <= 220 ) ? 0x01 : 0x00;
-		data |= state->m_fd_data ? 0x02 : 0x00;
+		data = ( m_screen->vpos() >= 212 && m_screen->vpos() <= 220 ) ? 1 : 0;
+		data |= m_fd_data ? 2 : 0;
 		break;
 	case 0x05:
 		data = 0;
-		if ( state->m_io_regs[5] & 0x08 )
+		if ( m_io_regs[5] & 0x08 )
 		{
-			data = input_port_read( space->machine(), "IN3" );
+			data = input_port_read( machine(), "IN3" );
 		}
-		if ( state->m_io_regs[5] & 0x04 )
+		if ( m_io_regs[5] & 0x04 )
 		{
-			data = input_port_read( space->machine(), "IN2" );
+			data = input_port_read( machine(), "IN2" );
 		}
-		if ( state->m_io_regs[5] & 0x02 )
+		if ( m_io_regs[5] & 0x02 )
 		{
-			data = input_port_read( space->machine(), "IN1" );
+			data = input_port_read( machine(), "IN1" );
 		}
-		if ( state->m_io_regs[5] & 0x01 )
+		if ( m_io_regs[5] & 0x01 )
 		{
-			data = input_port_read( space->machine(), "IN0" );
+			data = input_port_read( machine(), "IN0" );
 		}
-		state->m_fd_data = 0;
+		m_fd_data = 0;
 		break;
 	}
 
@@ -211,14 +207,14 @@ static DEVICE_IMAGE_LOAD( pv1000_cart )
 
 static SCREEN_UPDATE( pv1000 )
 {
-	d65010_state *state = screen->machine().driver_data<d65010_state>();
+	pv1000_state *state = screen->machine().driver_data<pv1000_state>();
 	int x, y;
 
 	for ( y = 0; y < 24; y++ )
 	{
 		for ( x = 0; x < 32; x++ )
 		{
-			UINT16 tile = state->m_ram[ y * 32 + x ];
+			UINT16 tile = state->m_p_videoram[ y * 32 + x ];
 
 			if ( tile < 0xe0 )
 			{
@@ -249,7 +245,7 @@ static SCREEN_UPDATE( pv1000 )
 
 static STREAM_UPDATE( pv1000_sound_update )
 {
-	d65010_state *state = device->machine().driver_data<d65010_state>();
+	pv1000_state *state = device->machine().driver_data<pv1000_state>();
 	stream_sample_t *buffer = outputs[0];
 
 	while ( samples > 0 )
@@ -282,7 +278,7 @@ static STREAM_UPDATE( pv1000_sound_update )
 
 static DEVICE_START( pv1000_sound )
 {
-	d65010_state *state = device->machine().driver_data<d65010_state>();
+	pv1000_state *state = device->machine().driver_data<pv1000_state>();
 	state->m_sh_channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock()/1024, 0, pv1000_sound_update );
 }
 
@@ -305,7 +301,7 @@ DEVICE_GET_INFO( pv1000_sound )
 /* we have chosen to trigger on scanlines 195, 199, 203, 207, 211, 215, 219, 223, 227, 231, 235, 239, 243, 247, 251, 255 */
 static TIMER_CALLBACK( d65010_irq_on_cb )
 {
-	d65010_state *state = machine.driver_data<d65010_state>();
+	pv1000_state *state = machine.driver_data<pv1000_state>();
 	int vpos = state->m_screen->vpos();
 	int next_vpos = vpos + 12;
 
@@ -324,7 +320,7 @@ static TIMER_CALLBACK( d65010_irq_on_cb )
 
 static TIMER_CALLBACK( d65010_irq_off_cb )
 {
-	d65010_state *state = machine.driver_data<d65010_state>();
+	pv1000_state *state = machine.driver_data<pv1000_state>();
 
 	device_set_input_line( state->m_maincpu, 0, CLEAR_LINE );
 }
@@ -332,7 +328,7 @@ static TIMER_CALLBACK( d65010_irq_off_cb )
 
 static MACHINE_START( pv1000 )
 {
-	d65010_state *state = machine.driver_data<d65010_state>();
+	pv1000_state *state = machine.driver_data<pv1000_state>();
 
 	state->m_irq_on_timer = machine.scheduler().timer_alloc(FUNC(d65010_irq_on_cb));
 	state->m_irq_off_timer = machine.scheduler().timer_alloc(FUNC(d65010_irq_off_cb));
@@ -343,7 +339,7 @@ static MACHINE_START( pv1000 )
 
 static MACHINE_RESET( pv1000 )
 {
-	d65010_state *state = machine.driver_data<d65010_state>();
+	pv1000_state *state = machine.driver_data<pv1000_state>();
 
 	state->m_io_regs[5] = 0;
 	state->m_fd_data = 0;
@@ -370,7 +366,7 @@ static GFXDECODE_START( pv1000 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( pv1000, d65010_state )
+static MACHINE_CONFIG_START( pv1000, pv1000_state )
 
 	MCFG_CPU_ADD( "maincpu", Z80, 17897725/5 )
 	MCFG_CPU_PROGRAM_MAP( pv1000 )
@@ -413,4 +409,3 @@ ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT    COMPANY   FULLNAME    FLAGS */
 CONS( 1983, pv1000,  0,      0,      pv1000,  pv1000,   0,   "Casio",  "PV-1000",  GAME_NOT_WORKING )
-
