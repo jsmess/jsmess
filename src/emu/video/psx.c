@@ -3641,22 +3641,28 @@ void psxgpu_device::vblank(screen_device &screen, bool vblank_state)
 		DebugCheckKeys();
 #endif
 
-#if 0
-		/* HACK for sianniv
-		OG: sianniv does the bios startup, then loads the main program, clears the bss zone,
-		then starts it.  More or less.  Meanwhile, it somehow forgets to disable vblank,
-		and the vblank routine happens to be in said bss zone. 2-3 vbls happen during that
-		initialization, with insta-crash effects.
-		What happens on the real hardware?  Screen turned off disabling vbl indirectly perhaps?
-		*/
-		UINT32 pc = cpu_get_pc(screen.machine().device("maincpu"));
-		if((pc >= 0x80010018 && pc <= 0x80010028) || pc == 0x8002a4f0)
-			return;
-#endif
+		// It seems like disabling the screen disables the vbl irq,
+		// but with a one vbl delay.
 
-		n_gpustatus ^= ( 1L << 31 );
+		// Fixes sianniv (which breaks without the delay, too).
+		// Perhaps breaks other things, there are 1e6 psx-based games..
 
-		psx_irq_set( machine(), 0x0001 );
+		// Needs to be checked throughly and if it's ok implemented
+		// way more cleanly.
+
+		static int delay = 0;
+		if(( n_gpustatus & ( 1 << 0x17 ) ) != 0)
+		{
+			if(delay < 2)
+				delay++;
+		}
+		else
+			delay = 0;
+		if( delay != 2 )
+		{
+			n_gpustatus ^= ( 1L << 31 );
+			psx_irq_set( machine(), 0x0001 );
+		}
 	}
 }
 

@@ -45,13 +45,13 @@ public:
 	UINT16 *      m_backregs;
 
 	bitmap_t *m_framebuffer[2];
-    
+
     /* 3d info */
     INT16 m_frustumLeft;
     INT16 m_frustumBottom;
     INT16 m_eyecoordBuffer[4];  /* homogeneous */
 
-    bitmap_t *m_buffer3d;
+    //bitmap_t *m_buffer3d;
 };
 
 
@@ -67,3 +67,6 @@ WRITE16_HANDLER( dsp_z_eyecoord_w );
 WRITE16_HANDLER( dsp_rasterize_w );
 WRITE16_HANDLER( dsp_frustum_left_w );
 WRITE16_HANDLER( dsp_frustum_bottom_w );
+READ16_HANDLER( dsp_x_return_r );
+READ16_HANDLER( dsp_y_return_r );
+

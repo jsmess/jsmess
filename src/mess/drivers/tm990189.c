@@ -435,7 +435,7 @@ DEVICE_GET_INFO( tm990_189_rs232 )
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                        	break;
 		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 1;                                        	break;
 
-		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( tm990_189_rs232 );   	break;
+		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( tm990_189_rs232 ); 	break;
 		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( tm990_189_rs232 );		break;
 		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( tm990_189_rs232 );    break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:		        info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME( tm990_189_rs232 );    break;

@@ -677,7 +677,7 @@ static MACHINE_CONFIG_START( to7, driver_device )
 /* acia */
      MCFG_ACIA6551_ADD("acia")
 
-/* to7 serial io line */	 
+/* to7 serial io line */
 	 MCFG_TO7_IO_LINE_ADD("to7_io")
 
 /* modem */

@@ -2707,8 +2707,9 @@ bionicc1		//  3/1987 (c) 1987 (US)
 bionicc2		//  3/1987 (c) 1987 (US)
 topsecrt		//  3/1987 (c) 1987 (Japan)
 1943			//  6/1987 (c) 1987 (Euro)
-1943u			//  6/1987 (c) 1987 (US)
-1943j			//  6/1987 (c) 1987 (Japan)
+1943u			//  6/1987 (c) 1987 (US) Rev C
+1943j			//  6/1987 (c) 1987 (Japan) Rev B
+1943ja			//  6/1987 (c) 1987 (Japan)
 1943b			// bootleg
 blktiger		//  8/1987 (c) 1987 (US)
 blktigera		//  8/1987 (c) 1987 (US)
@@ -4325,7 +4326,7 @@ radmu			// 1991.03 Rad Mobile (US)
 				// 1991.02 Rad Mobile (Japan)
 radr			// 1991.?? Rad Rally (World)
 radru			// 1991.09 Rad Rally (US)
-				// 1991.07 Rad Rally (Japan)
+radrj			// 1991.07 Rad Rally (Japan)
 spidman			// 1991.?? Spiderman (World)
 spidmanu		// 1991.09 Spiderman (US)
 				// 1991.09 Spiderman (Japan)
@@ -6192,9 +6193,10 @@ bzonec			// 0364xx           (c) 1980
 bradley			//     ??           (c) 1980
 redbaron		// 036995-037007    (c) 1980
 tempest			// 136002           (c) 1980
-tempest1		// 136002           (c) 1980
-tempest2		// 136002           (c) 1980
 tempest3		// 136002           (c) 1980
+tempest2		// 136002           (c) 1980
+tempest1		// 136002           (c) 1980
+tempest1r		// 136002           (c) 1980
 temptube		// (hack)
 spacduel		// 136006           (c) 1980
 gravitar		// 136010           (c) 1982
@@ -6855,8 +6857,9 @@ breakers		// 0230 (c) 1996 Visco
 miexchng		// 0231 (c) 1997 Face
 kof97			// 0232 (c) 1997 SNK
 kof97h			// 0232 (c) 1997 SNK
+kof97k			// 0232 (c) 1997 SNK
 kof97pls		// bootleg of kof97
-kog				// bootleg of kof97
+kog			// bootleg of kof97
 magdrop3		// 0233 (c) 1997 Data East Corporation
 lastblad		// 0234 (c) 1997 SNK
 lastbladh		// 0234 (c) 1997 SNK
@@ -9571,6 +9574,7 @@ j6framft	// Frame & Fortune Club (Jpm)
 j6frtmch	// Fruit Machine, The (Jpm)
 j6frtpot	// Fruitpots (Qps)
 j6gforce	// G Force (Jpm)
+j6gforceb	// G Force (Jpm) 15GBP
 j6gidogh	// G.I. Dough (Ace)
 j6guab		// Give Us A Break (Jpm)
 j6guabcl	// Give Us A Break Club (Jpm)
@@ -9583,6 +9587,7 @@ j6goldgl	// Golden Goal (Jpm)
 j6hapyhr	// Happy Hour (Jpm)
 j6hifly		// Hi Flyer (Ace)
 j6impact	// Hi Impact (Jpm)
+j6impactb	// Hi Impact (Jpm) 15GBP
 j6hilosv	// Hi Lo Silver (Jpm)
 j6hirol		// Hi Roller (Jpm)
 j6hirlcl	// Hi Roller Club (Jpm)
@@ -9611,8 +9616,11 @@ j6monmad	// Money Madness (Ace)
 j6monspd	// Money Spider (Ace)
 j6montlk	// Money Talks (Jpm)
 j6mono60	// Monopoly 60th Anniversary Edition (Jpm)
+j6mono60a	//
 j6monobn	// Monopoly Bingo (Jpm)
 j6outlaw	// Outlaw (Jpm)
+j6outlawc	// Outlaw (Jpm) Club?
+j6outlawd	// Outlaw (Jpm) Protocol
 j6oxo		// Oxo (Jpm)
 j6oxobin	// Oxo Bingo (Jpm)
 j6pacman	// Pac Man Plus (Qps)
@@ -9633,6 +9641,7 @@ j6rager		// Red Alert (Jpm) [German]
 j6ra		// Red Alert (Jpm)
 j6raclb		// Red Alert Club (Jpm)
 j6redarw	// Red Arrow (Jpm)
+j6redarww	// Red Arrow (Whitbread / Jpm)
 j6reddmn	// Red Demon (Jpm)
 j6rh6		// Red Hot 6 (Jpm)
 j6rhchil	// Red Hot Chili Stepper (Ace)
@@ -9719,6 +9728,8 @@ j6sl		// Snakes & Ladders (Crystal)
 j6sla		// Snakes & Ladders Slides Again (Crystal)
 j6thril		// Thriller (Crystal)
 j6tqust		// Treasure Quest (Crystal)
+j6gldpl		// Golden Palace (QPS / Mazooma)
+j6shoot		// ShootOut
 j6milln		// Millionaire / Who Wants To Be A Millionaire (Jpm)?
 
 // JPM Impact + Video Board
@@ -9727,13 +9738,14 @@ cluedod			// (c) 1995
 cluedo2c		// (c) 1995
 cluedo2			// (c) 1995
 trivialp		// (c) 1996
-trivalpd		// (c) 1996
+trivialpd		// (c) 1996
+trivialpo		// (c) 1996
 scrabble		// (c) 1997
-scrabbld		// (c) 1997
+scrabbled		// (c) 1997
 hngmnjpm		// (c) 1998
-hngmjpmd		// (c) 1998
+hngmnjpmd		// (c) 1998
 coronatn		// (c) 1999
-corontnd		// (c) 1999
+coronatnd		// (c) 1999
 tqst			// (c) ACE?
 snlad			// (c) 199?
 
@@ -11509,7 +11521,7 @@ sc1twice	//
 sc1chain	//
 sc1potp		//
 sc1potpa	//
-
+sc1scunk	//
 
 // Scorpion 1 + Adder Video board
 
@@ -12456,6 +12468,7 @@ mg_kf		// Krypton Factor
 ep_simp		// The Simpsons (Maygay)
 ep_dblim	// Double Impact (Maygay - Impulse)
 ep_itjb3	// Italian Job 3 (Maygay)
+ep_itj3a	//
 ep_merln	// Merlin's Magic (Maygay)
 ep_wipeo	// Wipeout (Maygay)
 ep_bingb	// Bingo Belle (Maygay)
@@ -12522,7 +12535,8 @@ ep_icebg	// Ice Burger (Maygay)
 ep_inca		// Inca Dinka Do (Maygay - Extreme)
 ep_itjb2	// Italian Job 2 (Maygay)
 ep_ijcl		// Italian Job Club (Maygay)
-ep_ijob		// Italian Job (Maygay)
+ep_ijob		// Italian Job (Maygay) v2.1
+ep_ijoba	// Italian Job (Maygay) v1.1
 ep_jakbn	// Jackpot & The Beanstreak (Extreme)
 ep_jsttt	// Just The Ticket (Maygay)
 ep_loadd	// Loaded (Maygay)
@@ -12646,6 +12660,7 @@ ep_cascz	// Casino Crazy (Global)
 ep_wside	// Wildside (Global)
 ep_goldf	// Gold Fever (Impulse)
 ep_imj		// I'm A Jackpot (Global)
+ep_party
 
 // MPU2
 
@@ -13103,6 +13118,7 @@ m4hvhel		// Heaven & Hell (Bwb)
 m4holywd	// Hollywood (Bwb)
 m4indycr	// Indy Cars (Bwb)
 m4jakjok	// Jackpot Jokers (Bwb)
+m4jakjoka
 m4jflash	// Jumping Jack Flash (Bwb)
 m4kingq		// Kings & Queens (Bwb)
 m4kingqc	// Kings & Queens Classic (Bwb)
@@ -13336,6 +13352,9 @@ m4bangina	//
 m4banginb	//
 m4wwc		// Wacky Weekend Club (Global)
 m4screw		// Screwin' Around (Global)
+m4screwp
+m4screwa
+m4screwb
 m4bigben	// Big Ben (Coinworld)
 m4bigbena	//
 m4bigbenb	//
@@ -13453,6 +13472,7 @@ m4blsbys	// Blues Boys (Version 6)
 m4conn4     // Connect 4
 
 m4surf		// Super Surfin' (Gemini)
+m4wife		// Money Or Yer Wife (Gemini)
 m4blkgd		// Black Gold (Gemini)
 m4excam		// Excalibur (Mdm)
 m4front		// Final Frontier (Mdm)
@@ -13687,6 +13707,7 @@ m5rwb		// Red White & Blue (Barcrest)
 m5revo		// Revolution (Barcrest)
 m5rgclb		// Rio Grande Club (Barcrest)
 m5rcx		// Royal Exchange Club (Barcrest)
+m5rcxa		//
 m5rub		// Rubies & Diamonds (Barcrest)
 m5ritj		// Rumble In The Jungle (Barcrest)
 m5rfymc		// Run For Your Money Club (Barcrest)
@@ -13695,6 +13716,7 @@ m5sheik		// Sheik Yer Money (Barcrest)
 m5showtm	// Showtime (Barcrest)
 m5silver	// Silver Screen (Barcrest)
 m5sondr		// Son Of Dracula (Barcrest)
+m5sondra
 m5spicer	// The Spice Is Right (Barcrest)
 m5spiker	// Spiker The Biker (Barcrest)
 m5spins		// Spinsation (Barcrest)
@@ -13705,6 +13727,7 @@ m5supstr	// Super Star (Barcrest)
 m5sstrk		// Super Streak (Barcrest)
 m5supnov	// Supernova (Barcrest)
 m5tempt		// Temple Of Treasure (Barcrest)
+m5tempt2	// Temple Of Treasure 2 (Barcrest)
 m5tempcl	// Temple Of Treasure Club (Barcrest)
 m5tbird		// Thunderbird (Barcrest)
 m5topdog	// Top Dog (Barcrest)
@@ -13715,6 +13738,8 @@ m5vampup	// Vamp It Up (Barcrest)
 m5wking		// Wild King (Barcrest)
 m5costa		// Costa Del Cash (Barcrest)
 m5ttwo		// Take Two (Barcrest)
+m5horn		// Horn Of Plenty (Barcrest)
+m5hotrk		// Hot Rocks (Barcrest)
 
 /* Barcrest / Red Gaming */
 
@@ -13725,24 +13750,35 @@ m5bbank		// Break The Bank (Barcrest - Red Gaming)
 m5casfev	// Casino Fever (Red Gaming)
 m5dmnstr	// Demon Streak (Barcrest - Red Gaming)
 m5dmnstra	//
+m5dbubl		// Double Bubble (Barcrest - Red Gaming)
+m5dragnd	// Dragon Drop (Barcrest - Red Gaming)
+m5dragnda
+m5fnfair	// Funfair (Barcrest - Red Gaming)
+m5fnfaird	//
 m5fusir		// Fruits U Sir (Barcrest - Red Gaming)
 m5fusira	//
 m5hypalx	// Hypalinx (Barcrest - Red Gaming)
 m5invad		// Invaders (Barcrest - Red Gaming)
+m5jcptgn	// Jackpot Genie (Barcrest - Red Gaming)
+m5jlstrk	// Jewel Strike (Barcrest - Red Gaming)
 m5lock		// Lock 'n' Load (Barcrest - Red Gaming)
 m5locka		//
 m5lockcl	// Lock 'n' Load Club (Barcrest - Red Gaming)
 m5lockcla	//
 m5nitro		// Nitro (Barcrest - Red Gaming)
 m5paint		// Paint The Town Red (Barcrest - Red Gaming)
+m5quake		// Quake (Barcrest - Red Gaming)
 m5rainrn	// Rainbow Runner (Barcrest - Red Gaming)
 m5rainrna	//
 m5rampg		// Rampage (Barcrest - Red Gaming)
 m5rdwarf	// Red Dwarf (Barcrest - Red Gaming)
 m5redx		// Red X (Barcrest - Red Gaming)
+m5thtsmg	// That's Magic (Barcrest - Red Gaming)
 m5topdol	// Top Dollar (Barcrest - Red Gaming)
-m5dbubl		// Double Bubble (Barcrest - Red Gaming)
-m5ddrag		// Double Dragon (Barcrest - Red Gaming)
+m5zigzag	// Zig Zag
+m5cmass		// Critical Mass (Barcrest - Red Gaming)
+m5sblz		// Snail Blazer (Barcrest - Red Gaming)
+m5slide		// Slider (Barcrest - Red Gaming)
 
 /* Vivid */
 
@@ -13797,7 +13833,9 @@ m5supro		// Super Roulette (Vivid)
 m5tempp		// Temple Of Pleasure (Vivid)
 m5tictac	// Tic Tac Tut (Vivid)
 m5tictaca	//
+m5whdres	// Who Dares Spins (Vivid)
 m5winway	// Winning Ways (Vivid)
+m5rawin		// Reel A Win (Vivid)
 
 /* Empire */
 
@@ -14091,6 +14129,8 @@ as_partya		//
 as_partyb		//
 as_partyc		//
 as_partyd		//
+as_partye		//
+as_partyf		//
 as_letsp		// Let's Party (Astra)
 as_topsl		// Top Slot (Astra)
 as_topsla		//
@@ -14187,6 +14227,7 @@ as_otra			//
 as_ptf			//
 as_ptfa			//
 as_ptfb			//
+as_ptfc			//
 as_pia			//
 as_piaa			//
 as_piab			//
@@ -14337,6 +14378,7 @@ hb_cashc	// Cash Crusade (Qps)
 hb_cashx	// Cash X (Fairgames)
 hb_cwf		// Cherry Win Falls (Fairgames)
 hb_dac		// Dough & Arrow Club (Qps) [c]
+hb_daca		//
 hb_frtcl	// Fruitopia Club (Qps) [c]
 hb_gpal		// G' Palace (Qps)
 hb_gldpl	// Golden Palace (Mazooma)

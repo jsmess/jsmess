@@ -322,7 +322,7 @@ READ8_HANDLER( mbc55x_kb_usart_r )
 		case 0	: //logerror("%s read kb_uart\n",space->machine().describe_context());
 				result = state->m_kb_uart->data_r(*space,0); break;
 
-		case 1	: 	result = state->m_kb_uart->status_r(*space,0);
+		case 1	:	result = state->m_kb_uart->status_r(*space,0);
 
 				if (state->m_keyboard.key_special & KEY_BIT_CTRL)	// Parity error used to flag control down
 					result |= I8251_STATUS_PARITY_ERROR;
@@ -403,7 +403,7 @@ MACHINE_START( mbc55x )
 {
 	mbc55x_state *state = machine.driver_data<mbc55x_state>();
 	/* init cpu */
-//	mbc55x_cpu_init(machine);
+//  mbc55x_cpu_init(machine);
 
 
 	/* setup debug commands */
@@ -450,7 +450,7 @@ static int instruction_hook(device_t &device, offs_t curpc)
 
 	if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD))
 	{
-//		logerror("int %02X called\n",addr_ptr[1]);
+//      logerror("int %02X called\n",addr_ptr[1]);
 
 		if(DEBUG_SET(DECODE_DOS21) && (addr_ptr[1]==0x21))
 			decode_dos21(&device,curpc);

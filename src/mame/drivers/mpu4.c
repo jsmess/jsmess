@@ -3546,6 +3546,7 @@ ROM_START( m4andybt )
 	ROM_REGION( 0x20000, "altrevs", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "abt18f.p1", 0x0000, 0x020000, CRC(cdd756af) SHA1(b1bb851ad2a2ba631e13509a476fe60cb8a24e69) )
 	ROM_LOAD( "abt18s.p1", 0x0000, 0x020000, CRC(625263e4) SHA1(23fa0547164cc1f9b7c6cd26e06b0d779bf0329d) )
+	ROM_LOAD( "abt1.5",	   0x0000, 0x020000, CRC(05303209) SHA1(6a9eba19e7138ede122ec04c062556763b80f6c0) )//earlier revision
 
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "abt18s.chr", 0x0000, 0x000048, CRC(68007536) SHA1(72f7a76a1ba1c8ac94de425892780ffe78269513) )
@@ -6701,6 +6702,7 @@ ROM_START( m4mag7s )
 	ROM_LOAD( "mas13r.p1", 0x0000, 0x020000, CRC(884e2878) SHA1(c4f070019116543f4683c088d915709c040145ff) )
 	ROM_LOAD( "mas13s.p1", 0x0000, 0x020000, CRC(80ca53c0) SHA1(19e67a259fca2fca3990f032d7825d67309d47d3) )
 	ROM_LOAD( "mas13y.p1", 0x0000, 0x020000, CRC(bca2b3b7) SHA1(ff48b91578230bc77529cb59fbcb7e3bd77b946d) )
+	ROM_LOAD( "mas10w.p1", 0x0000, 0x020000, CRC(e2fcc14a) SHA1(69b37a2d130b34636d5ff8e646d2be6d7e8b19f9) )//Whitbread
 
 	ROM_REGION( 0x20000, "altbwb", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
 	ROM_LOAD( "m7_sj_dc.2r1", 0x0000, 0x020000, CRC(0eefd40c) SHA1(2c30bc42d23c7cfb0a382b47f7ed865865341e2f) )
@@ -9215,6 +9217,7 @@ ROM_START( m4topten )
 	ROM_LOAD( "tts04k.p1", 0x0000, 0x020000, CRC(9aefa0d7) SHA1(f90be825c58ac6e443822f7c8f5da74dcf18c652) )
 	ROM_LOAD( "tts04r.p1", 0x0000, 0x020000, CRC(29e01be6) SHA1(59ee4baf1f48dbd703e94c7a8e45d841f196ec54) )
 	ROM_LOAD( "tts04y.p1", 0x0000, 0x020000, CRC(1d0c8029) SHA1(9ddc7a3d92715bfd4b24470f3d5ba2d9047be967) )
+	ROM_LOAD( "tth11s.p1", 0x0000, 0x020000, CRC(c46b2866) SHA1(26d9ee1f25e6a0f708a48ce91c7e9ed9ad3bee7a) )
 
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "tri98.chr", 0x0000, 0x000048, CRC(8a4532a8) SHA1(c128fd513bbcba68a1c75a11e09a54ba1d23d6f4) )
@@ -10418,8 +10421,15 @@ ROM_START( m4jakjok )
 	ROM_LOAD( "jj_____.1_3", 0x100000, 0x080000, CRC(03c0ffc3) SHA1(2572f62362325df8b235b487d4a764218e7f1589) )
 ROM_END
 
+ROM_START( m4jakjoka )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "j_joker", 0x0000, 0x040000, CRC(4f0c7ab8) SHA1(af962863ee55f6c2752bbe8a997e3b2102e42431) )
 
-
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "j_joker.s1", 0x0000, 0x080000, CRC(4ad711d2) SHA1(500381ac2a5075acd606a131cd1b382342cc3a80) )
+	ROM_LOAD( "j_joker.s2", 0x0000, 0x080000, CRC(840ba491) SHA1(f7f43d5d8e521a59fdccbd5f22935c525c3d43c2) )
+	ROM_LOAD( "j_joker.s3", 0x0000, 0x080000, CRC(2ed74890) SHA1(a3d039b4c3c9dd792300eb045e542a212d4d50ae) )
+ROM_END
 
 ROM_START( m4jflash )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -11004,6 +11014,9 @@ ROM_START( m4supleg )
 	ROM_LOAD( "sl_vc.hex", 0x0000, 0x040000, CRC(1940d117) SHA1(ae7338483ac39e9e1973dde5eb837443512630dd) )
 	ROM_LOAD( "sl_vcd.hex", 0x0000, 0x040000, CRC(7aab16d1) SHA1(6da4e0d9883a48937d00bfc5929b3557de51f60e) )
 	ROM_LOAD( "sls.hex", 0x0000, 0x040000, CRC(5ad6dbb9) SHA1(ff6f9dcf14df22c7bb2b949fcd5c70f31d4c1928) )
+	ROM_LOAD( "s_leag._pound5", 0x0000, 0x040000, CRC(4c6bd78e) SHA1(f67793a2a16adacc8d92b57050f02cffa50a1283) ) //Whitbread?
+	ROM_REGION( 0x80000, "altsnd", 0 ) /* alternate revisions - to be sorted / split into clones in the future */
+	ROM_LOAD( "s_leag.s1", 0x0000, 0x080000, CRC(e8d90896) SHA1(4c67507f18b5dc966e2df3685dc6c257f5053e61) ) //alt first sound rom, connected to whitbread set
 
 	ROM_REGION( 0x200000, "msm6376", 0 )
 	ROM_LOAD( "sls1.hex", 0x000000, 0x080000, CRC(341e3d3e) SHA1(b42ec737e95e766b1b26d6225416ee0c5cad2663) )
@@ -11512,14 +11525,42 @@ ROM_START( m4screw )
 	ROM_LOAD( "screwinaroundv0-7.bin", 0x0000, 0x020000, CRC(78a1e3ca) SHA1(a3d6e76a474a3a5cd74e4b527aa575f21825a7aa) )
 	//ROM_LOAD( "screwing.bin", 0x0000, 0x020000, CRC(5e07b33a) SHA1(6e8835edb61bd0777751bfdfe66d729554a9d6eb) )
 
+
 	ROM_REGION( 0x180000, "msm6376", 0 )
 	ROM_LOAD( "screwsnd.p1", 0x000000, 0x080000, CRC(6fe4888c) SHA1(b02b7f322d22080123e8b18326910031aa9d39b4) )
 	ROM_LOAD( "screwsnd.p2", 0x080000, 0x080000, CRC(29e842ee) SHA1(3325b137361c69244fffaa0d0e39e60106eaa5f9) )
 	ROM_LOAD( "screwsnd.p3", 0x100000, 0x080000, CRC(91ef193f) SHA1(a356642ae1093cf69486c434673531042ae27be7) )
 ROM_END
 
+ROM_START( m4screwp )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "scre0-8p.p1", 0x0000, 0x020000, CRC(34a70a77) SHA1(f76de47f6919d380eb0d0eeffc0e5dda72345038) )
 
+	ROM_REGION( 0x180000, "msm6376", 0 )
+	ROM_LOAD( "screwsnd.p1", 0x000000, 0x080000, CRC(6fe4888c) SHA1(b02b7f322d22080123e8b18326910031aa9d39b4) )
+	ROM_LOAD( "screwsnd.p2", 0x080000, 0x080000, CRC(29e842ee) SHA1(3325b137361c69244fffaa0d0e39e60106eaa5f9) )
+	ROM_LOAD( "screwsnd.p3", 0x100000, 0x080000, CRC(91ef193f) SHA1(a356642ae1093cf69486c434673531042ae27be7) )
+ROM_END
 
+ROM_START( m4screwa )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "screwinaroundv0-7.bin", 0x0000, 0x020000, CRC(78a1e3ca) SHA1(a3d6e76a474a3a5cd74e4b527aa575f21825a7aa) )
+
+	ROM_REGION( 0x180000, "msm6376", 0 )
+	ROM_LOAD( "screwsnd.p1", 0x000000, 0x080000, CRC(6fe4888c) SHA1(b02b7f322d22080123e8b18326910031aa9d39b4) )
+	ROM_LOAD( "screwsnd.p2", 0x080000, 0x080000, CRC(29e842ee) SHA1(3325b137361c69244fffaa0d0e39e60106eaa5f9) )
+	ROM_LOAD( "screwsnd.p3", 0x100000, 0x080000, CRC(91ef193f) SHA1(a356642ae1093cf69486c434673531042ae27be7) )
+ROM_END
+
+ROM_START( m4screwb )
+	ROM_REGION( 0x020000, "maincpu", 0 )
+	ROM_LOAD( "screw0_5.p1", 0x000000, 0x020000, CRC(4c0e8300) SHA1(1fea75f3cb1a96c14bd0e56a95bafd22996d002d) )
+
+	ROM_REGION( 0x180000, "msm6376", 0 )
+	ROM_LOAD( "screwsnd.p1", 0x000000, 0x080000, CRC(6fe4888c) SHA1(b02b7f322d22080123e8b18326910031aa9d39b4) )
+	ROM_LOAD( "screwsnd.p2", 0x080000, 0x080000, CRC(29e842ee) SHA1(3325b137361c69244fffaa0d0e39e60106eaa5f9) )
+	ROM_LOAD( "screwsnd.p3", 0x100000, 0x080000, CRC(91ef193f) SHA1(a356642ae1093cf69486c434673531042ae27be7) )
+ROM_END
 
 ROM_START( m4bankrd )
 	ROM_REGION( 0x010000, "maincpu", 0 )
@@ -13645,6 +13686,16 @@ ROM_START( m4surf )
 	ROM_LOAD( "s_surf.sn2", 0x080000, 0x080000, CRC(6c4a9074) SHA1(3b993120156677de893e5dc1e0c5d6e0285c5570) )
 ROM_END
 
+ROM_START( m4wife )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "moy_wife.p1", 0x0000, 0x020000, CRC(293d35a6) SHA1(980a28ca5e9ec3ca2e1a5b34f658b622dca4cf50) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	// missing?
+ROM_END
+
+
+
 ROM_START( m4blkgd )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "blackgoldprg.bin", 0x0000, 0x080000, CRC(a04736b2) SHA1(9e060cc79e7922b38115f1412ed76f8c76deb917) )
@@ -14145,10 +14196,12 @@ ROM_START( m4shoknr )
 	ROM_LOAD( "snr_v300_1221_c8ff_nlv.bin", 0x0000, 0x040000, CRC(d191b361) SHA1(4146e509e77878a51e32de877768504b3c85e6f8) )
 	ROM_LOAD( "snr_v200_1145_047f_lv.bin", 0x0000, 0x040000, CRC(73ef1e1a) SHA1(6ccaf64daa5acacfba4df576281bb5478f2fbd29) )
 	ROM_LOAD( "snr_v200_1655_5a69_nlv.bin", 0x0000, 0x040000, CRC(50ba0c6b) SHA1(767fd59858fc55ae95f096f00c54bd619369a56c) )
+	ROM_LOAD( "shock.p1", 0x0000, 0x080000, CRC(65fb2f47) SHA1(33b997843a705fc446f33beb127b672a282286c4) ) // check if it's just an overdump of above sets
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "snrsnd.p1", 0x000000, 0x080000, CRC(985c7c8c) SHA1(d2740ff6192c21af3a8a8a9a92b6fd604b40e9d1) )
 	ROM_LOAD( "snrsnd.p2", 0x080000, 0x080000, CRC(6a3a57ce) SHA1(3aaa0a761e17a2a14196cb023b10a49b44ba1046) )
+	ROM_LOAD( "shock.s2", 0x080000, 0x080000, CRC(10e9912f) SHA1(833d2b125bf30bdb8de71f6c9d8a9fe92701f741) ) // alt snd2
 ROM_END
 
 
@@ -14752,6 +14805,7 @@ GAME(199?, m4hvhel	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Hea
 GAME(199?, m4holywd	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Bwb","Hollywood (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4indycr	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Indy Cars (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4jakjok	,0			,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Jackpot Jokers (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4jakjoka,m4jakjok	,mod4oki    ,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Jackpot Jokers (Bwb) (MPU4, alternate)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4jflash	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","Jumping Jack Flash (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4kingq	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Kings & Queens (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4kingqc	,0			,mod4oki	,mpu4				,m4default			,ROT0,   "Bwb","Kings & Queens Classic (Bwb) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
@@ -14991,7 +15045,10 @@ GAME(199?, m4bangin,  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Bangin' Aw
 GAME(199?, m4bangina, m4bangin,	mod4oki, mpu4, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4banginb, m4bangin,	mod4oki, mpu4, m4default, ROT0,   "Global","Bangin' Away (Global) (MPU4, set 3)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4wwc,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Wacky Weekend Club (Global) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME(199?, m4screw,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4screw,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.8)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4screwp,  m4screw,	mod4oki, mpu4, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.8) (Protocol)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4screwa,  m4screw,	mod4oki, mpu4, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.7)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4screwb,  m4screw,	mod4oki, mpu4, m4default, ROT0,   "Global","Screwin' Around (Global) (MPU4, v0.5)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4vfm,	  0,		mod4oki, mpu4, m4default, ROT0,   "Global","Value For Money (Global) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigben,  0,		mod4oki, mpu4, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 1)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4bigbena, m4bigben,	mod4oki, mpu4, m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 2)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
@@ -15079,6 +15136,7 @@ GAME(199?, m4ndup	,0			,mod4oki	,mpu4		,m4default,	ROT0,   "Crystal","Nudge Doub
 GAMEL(1989?,  m4conn4,        0, mod2    ,   connect4,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
 
 GAME(199?, m4surf, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Gemini","Super Surfin' (Gemini) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+GAME(199?, m4wife, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Gemini","Money Or Yer Wife (Gemini) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4blkgd, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Gemini","Black Gold (Gemini) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4excam, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Mdm","Excalibur (Mdm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME(199?, m4front, 0,			mod4oki    ,mpu4, m4default, ROT0,   "Mdm","Final Frontier (Mdm) (MPU4)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )

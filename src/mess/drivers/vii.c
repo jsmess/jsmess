@@ -81,7 +81,7 @@ public:
 	UINT16 m_uart_rx_count;
 	UINT8 m_controller_input[8];
 	UINT32 m_spg243_mode;
-	
+
 	emu_timer *m_tmb1;
 	emu_timer *m_tmb2;
 };
@@ -444,7 +444,7 @@ static WRITE16_HANDLER( vii_video_w )
 		case 0x37:		// IRQ pos H
 			data &= 0x01ff;
 			COMBINE_DATA(&state->m_video_regs[offset]);
-			break;			
+			break;
 		case 0x62: // Video IRQ Enable
 			verboselog(space->machine(), 0, "vii_video_w: Video IRQ Enable = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&VII_VIDEO_IRQ_ENABLE);
@@ -699,7 +699,7 @@ static WRITE16_HANDLER( vii_io_w )
 				state->m_tmb2->adjust(attotime::zero, 0, attotime::from_hz( hz ));
 			}
 			COMBINE_DATA(&state->m_io_regs[offset]);
-			break;			
+			break;
 		case 0x21: // IRQ Enable
 			verboselog(space->machine(), 3, "vii_io_w: Controller IRQ Control = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&VII_CTLR_IRQ_ENABLE);
@@ -966,10 +966,10 @@ static MACHINE_START( vii )
 	if (rom) { // to prevent batman crash
 		memcpy(state->m_cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
 	}
-	
+
 	state->m_video_regs[0x36] = 0xffff;
 	state->m_video_regs[0x37] = 0xffff;
-	
+
 	state->m_tmb1 = machine.scheduler().timer_alloc(FUNC(tmb1_tick));
 	state->m_tmb2 = machine.scheduler().timer_alloc(FUNC(tmb2_tick));
 	state->m_tmb1->reset();
@@ -1009,16 +1009,16 @@ static INTERRUPT_GEN( vii_vblank )
 		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ0_LINE, ASSERT_LINE);
 	}
 
-//	{
-//		verboselog(device->machine(), 0, "audio 1 IRQ\n");
-//		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ1_LINE, ASSERT_LINE);
+//  {
+//      verboselog(device->machine(), 0, "audio 1 IRQ\n");
+//      cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ1_LINE, ASSERT_LINE);
 //  }
 	if(state->m_io_regs[0x22] & state->m_io_regs[0x22] & 0x0c00)
 	{
 		verboselog(device->machine(), 0, "timerA, timer B IRQ\n");
 		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ2_LINE, ASSERT_LINE);
 	}
-	
+
 	//if(state->m_io_regs[0x22] & state->m_io_regs[0x22] & 0x2100)
 	// For now trigger always if any enabled
 	if(VII_CTLR_IRQ_ENABLE)
@@ -1026,11 +1026,11 @@ static INTERRUPT_GEN( vii_vblank )
 		verboselog(device->machine(), 0, "UART, ADC IRQ\n");
 		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ3_LINE, ASSERT_LINE);
 	}
-//	{
-//		verboselog(device->machine(), 0, "audio 4 IRQ\n");
-//		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ4_LINE, ASSERT_LINE);
+//  {
+//      verboselog(device->machine(), 0, "audio 4 IRQ\n");
+//      cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ4_LINE, ASSERT_LINE);
 //  }
-	
+
 	if(state->m_io_regs[0x22] & state->m_io_regs[0x22] & 0x1200)
 	{
 		verboselog(device->machine(), 0, "External IRQ\n");
@@ -1046,7 +1046,7 @@ static INTERRUPT_GEN( vii_vblank )
 		verboselog(device->machine(), 0, "TMB1, TMB2, 4Hz, key change IRQ\n");
 		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ7_LINE, ASSERT_LINE);
 	}
-	
+
 }
 
 static MACHINE_CONFIG_START( vii, vii_state )
@@ -1054,7 +1054,7 @@ static MACHINE_CONFIG_START( vii, vii_state )
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
 	MCFG_CPU_VBLANK_INT("screen", vii_vblank)
-	
+
 	MCFG_MACHINE_START( vii )
 	MCFG_MACHINE_RESET( vii )
 

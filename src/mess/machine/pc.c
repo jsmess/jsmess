@@ -363,7 +363,7 @@ static void pc_com_refresh_connected_common(device_t *device, int n, int data)
 {
 	/* mouse connected to this port? */
 	//if (input_port_read(device->machine(), "DSW2") & (0x80>>n))
-//		pc_mouse_handshake_in(device,data);
+//      pc_mouse_handshake_in(device,data);
 }
 
 static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_0 ) { pc_com_refresh_connected_common( device, 0, data ); }
