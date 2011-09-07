@@ -594,27 +594,27 @@ ROM_START( vt100stp ) // This is from the VT180 technical manual at http://www.b
 // This is the standard vt100 cpu board, but with the rom set included with the VT1xx-AC kit
 // which is only used when the STP 'printer port expansion' card is installed into the terminal board.
 // This romset adds the Set-up C page to the setup menu (press keypad 5 twice once you hit set-up)
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "23-095e2-00.e56", 0x0000, 0x0800, NO_DUMP)
-    ROM_LOAD( "23-096e2-00.e52", 0x0800, 0x0800, NO_DUMP)
-    ROM_LOAD( "23-139e2-00.e45", 0x1000, 0x0800, NO_DUMP) // revision 2?; revision 1 is 23-097e2
-    ROM_LOAD( "23-140e2-00.e40", 0x1800, 0x0800, NO_DUMP) // revision 2?; revision 1 is 23-098e2
-    ROM_REGION(0x1000, "chargen",0)
-    ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
-    ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set rom
-    ROM_REGION(0x10000, "stpcpu",ROMREGION_ERASEFF)
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "23-095e2-00.e56", 0x0000, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-096e2-00.e52", 0x0800, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-139e2-00.e45", 0x1000, 0x0800, NO_DUMP) // revision 2?; revision 1 is 23-097e2
+	ROM_LOAD( "23-140e2-00.e40", 0x1800, 0x0800, NO_DUMP) // revision 2?; revision 1 is 23-098e2
+	ROM_REGION(0x1000, "chargen",0)
+	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set rom
+	ROM_REGION(0x10000, "stpcpu",ROMREGION_ERASEFF)
 // expansion board for a vt100 with a processor on it and dma, intended to act as a ram/send buffer for the STP printer board.
 // It can be populated with two banks of two eproms each, each bank either contains 2k or 4k eproms depending on the w2/w3 and w4/w5 jumpers.
 // It also has two proms on the cpu board. I don't know if it is technically necessary to have this board installed if an STP module is installed, but due to the alt stp romset, it probably is.
-    ROM_LOAD( "23-003e3-00.e10", 0x0000, 0x1000, NO_DUMP) // "EPROM 0" bank 0
-    ROM_LOAD( "23-004e3-00.e4", 0x1000, 0x1000, NO_DUMP) // "EPROM 1" bank 0
-    ROM_LOAD( "23-005e3-00.e9", 0x2000, 0x1000, NO_DUMP) // "EPROM 2" bank 1
-    ROM_LOAD( "23-006e3-00.e3", 0x3000, 0x1000, NO_DUMP) // "EPROM 3" bank 1
-    //ROM_REGION(0x0800, "chargen",0)
-    //ROM_LOAD( "23-???e2-00.e34", 0x0000, 0x0800, NO_DUMP) // ? second gfx rom?
-    ROM_REGION(0x0400, "proms",0)
-    ROM_LOAD( "23-312a1-07.e26", 0x0000, 0x0200, NO_DUMP) // "PROM A"; handles 8085 i/o? mapping (usart, timer, dma, comm, etc)
-    ROM_LOAD( "23-313a1-07.e15", 0x0200, 0x0200, NO_DUMP) // "PROM B"; handles firmware rom mapping and memory size/page select; bit 0 = ram page, bits 1-3 unused, bits 4-7 select one eprom each
+	ROM_LOAD( "23-003e3-00.e10", 0x0000, 0x1000, NO_DUMP) // "EPROM 0" bank 0
+	ROM_LOAD( "23-004e3-00.e4", 0x1000, 0x1000, NO_DUMP) // "EPROM 1" bank 0
+	ROM_LOAD( "23-005e3-00.e9", 0x2000, 0x1000, NO_DUMP) // "EPROM 2" bank 1
+	ROM_LOAD( "23-006e3-00.e3", 0x3000, 0x1000, NO_DUMP) // "EPROM 3" bank 1
+	//ROM_REGION(0x0800, "chargen",0)
+	//ROM_LOAD( "23-???e2-00.e34", 0x0000, 0x0800, NO_DUMP) // ? second gfx rom?
+	ROM_REGION(0x0400, "proms",0)
+	ROM_LOAD( "23-312a1-07.e26", 0x0000, 0x0200, NO_DUMP) // "PROM A"; handles 8085 i/o? mapping (usart, timer, dma, comm, etc)
+	ROM_LOAD( "23-313a1-07.e15", 0x0200, 0x0200, NO_DUMP) // "PROM B"; handles firmware rom mapping and memory size/page select; bit 0 = ram page, bits 1-3 unused, bits 4-7 select one eprom each
 ROM_END
 */
 
@@ -731,15 +731,15 @@ ROM_END
 ROM_START( vt132 ) // This is from anecdotal evidence and vt100.net, as the vt132 schematics are not scanned
 // VT100 board with ? roms, AVO, STP, custom firmware with block serial mode; dunnington insists these roms
 // should be the 23-180e2/181e2/182e2/183e2 set, but I'm not convinced.
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "23-???e2-00.e56", 0x0000, 0x0800, NO_DUMP)
-    ROM_LOAD( "23-???e2-00.e52", 0x0800, 0x0800, NO_DUMP)
-    ROM_LOAD( "23-???e2-00.e45", 0x1000, 0x0800, NO_DUMP)
-    ROM_LOAD( "23-???e2-00.e40", 0x1800, 0x0800, NO_DUMP)
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "23-???e2-00.e56", 0x0000, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-???e2-00.e52", 0x0800, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-???e2-00.e45", 0x1000, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-???e2-00.e40", 0x1800, 0x0800, NO_DUMP)
 
-    ROM_REGION(0x1000, "chargen", 0)
-    ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
-    ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
+	ROM_REGION(0x1000, "chargen", 0)
+	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
+	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
 */
 ROM_START( vt180 )
