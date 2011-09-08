@@ -240,7 +240,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1/R" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1572864">
@@ -280,7 +280,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 256K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-NOE" />
 			<dataarea name="rom" size="1048576">
@@ -302,7 +302,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U374LS139 " />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -324,7 +324,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -531,6 +531,23 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="applesed">
+		<!-- Serial: SHVC-7X - Release Date: 1994-08-26 - Alt. Title: アップルシード プロメテウスの神託 -->
+		<description>Appleseed - Prometheus no Shintaku (Jpn)</description>
+		<year>1994</year>
+		<publisher>Visit</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-7x-0.u1" size="2097152" crc="c0e62c02" sha1="c331838c774b14a01a81d0d057af658e2a0feefb" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aofu" cloneof="aof">
 		<!-- Serial: SNS-RW-USA - Release Date: 1993-12 -->
 		<description>Art of Fighting (USA)</description>
@@ -557,7 +574,7 @@ The software list will be divided in four categories:
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-xe-0.u1" size="524288" crc="5ddedc28" sha1="d684958da04b909661371d7d5b657a6beb213629" offset="0x000000" />
@@ -566,8 +583,8 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="asterxob">
-		<!-- Serial: SNSP-AXOP-FAH -->
-		<description>Astérix &amp; Obelix (Euro)</description>
+		<!-- Serial: SNSP-AXOP-NOE, SNSP-AXOP-FAH -->
+		<description>Astérix &amp; Obélix (Euro)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="snes_cart">
@@ -577,7 +594,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-FAH" />
+			<feature name="cart_back_label" value="SNSP-NOE, SNSP-FAH" />
 			<dataarea name="rom" size="1572864">
 				<rom name="spal-axop-0 p0.u1" size="1048576" crc="2131d946" sha1="0446176192536b72c77a7783a4f374af6bdb44d6" offset="0x000000" />
 				<rom name="spal-axop-0 p1.u2" size="524288"  crc="2383509b" sha1="a4a01278572a9ebf543f6d6e19fabe7d123f4688" offset="0x100000" />
@@ -585,6 +602,22 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="axelay">
+		<!-- Serial: SNSP-AX-NOE -->
+		<description>Axelay (Euro)</description>
+		<year>1992</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-NOE" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-ax-0.u1" size="1048576" crc="f43f6743" sha1="8bfa0b57ab1ed3331ab8fdc34b5639cea1d1ccb1" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
 <!-- wip-b -->
 	<software name="bahamut">
 		<!-- Serial: SHVC-AXBJ-JPN - Release Date: 1996-02-09 - Alt. Title: バハムート ラグーン -->
@@ -597,7 +630,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="3145728">
@@ -620,12 +653,34 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="3145728">
 				<rom name="shvc-axbj-0 p0.u1" size="2097152" crc="196e9a8d" sha1="e25fcd539b2a2996a29eb8bed3bcb37e79cdf067" offset="0x000000" />
 				<rom name="shvc-axbj-0 p3.u2" size="1048576" crc="50fc1757" sha1="16acdc879d9e37e7e49239e8cf11c7aead9e9094" offset="0x200000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bakukyuu">
+		<!-- Serial: SHVC-AAIJ-JPN - Release Date: 1997-12-19 - Alt. Title: 爆球連発!!スーパービーダマン -->
+		<description>Bakukyuu Renpatsu!! Super B-Daman (Jpn)</description>
+		<year>1997</year>
+		<publisher>Hudson</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-aaij-0.u1" size="2097152" crc="5613f172" sha1="5670308f143087f1ca6e19978e3fe1e776cdf249" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -685,6 +740,23 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sns-a9be-0.u1" size="2097152" crc="c5058634" sha1="50f3592e22cdff8560761d1ff1b728f28fed83dc" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlclsh">
+		<!-- Serial: SNSP-BT-ESP -->
+		<description>Battle Clash (Euro)</description>
+		<year>1992</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-ESP" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-bt-0.u1" size="1048576" crc="11e5bc5e" sha1="d514520660de9939d7d30de9219ed9bcf21f7a15" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -757,6 +829,48 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="battlety">
+		<!-- Serial: SHVC-AFHJ-JPN - Release Date: 1995-05-19 -->
+		<description>Battle Tycoon - Flash Hiders SFX (Jpn)</description>
+		<year>1995</year>
+		<publisher>Right Stuff</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J1M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-afhj-0.u1" size="3145728" crc="e38c4a5b" sha1="0e2a2f7e2b88a9853d7ff5ec37d78f7bfcc658cb" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btoads">
+		<!-- Serial: SNSP-NX-NOE, SNSP-NX-FAH -->
+		<description>Battletoads in Battlemaniacs (Euro)</description>
+		<year>1993</year>
+		<publisher>Tradewest</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-YA0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-NOE, SNSP-FAH" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-nx-0 p0.u1" size="524288" crc="cca324c0" sha1="824ddc2c8d14286c4da54eb0d2a700d082c15194" offset="0x000000" />
+				<rom name="spal-nx-0 p1.u2" size="524288" crc="b5f6f86b" sha1="ec498366b1e185079d3c016400e63b6cd6b2fecd" offset="0x080000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="btoadsddu" cloneof="btoadsdd"> <!-- supported="no" ? -->
 		<!-- Serial: SNS-UL-USA - Release Date: 1993-10 -->
 		<description>Battletoads &amp; Double Dragon - The Ultimate Team (USA)</description>
@@ -825,6 +939,40 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="blazeonj" cloneof="blazeon">
+		<!-- Serial: SHVC-BL - Release Date: 1992-07-24 - Alt. Title: ブレイゾン -->
+		<description>BlaZeon (Jpn)</description>
+		<year>1992</year>
+		<publisher>Atlus</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-02" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-NOE" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-bl-0.u1" size="1048576" crc="ad2effc3" sha1="b59e45c1b885fb67c9e0964e3daccc69d809ed63" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bluesb">
+		<!-- Serial: SNSP-B6-NOE -->
+		<description>The Blues Brothers (Euro)</description>
+		<year>1993</year>
+		<publisher>Titus</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-NOE" />
+			<dataarea name="rom" size="524288">
+				<rom name="spal-b6-0.u1" size="524288" crc="4a62057d" sha1="4ca07bc7319303952bc4b036eb3322dff3212d29" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="boxinglgu" cloneof="boxinglg">
 		<!-- Serial: SNS-LL-USA - Release Date: 1993-09 -->
 		<description>Boxing Legends of the Ring (USA)</description>
@@ -854,7 +1002,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64KSRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="1572864">
@@ -877,7 +1025,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="3145728">
@@ -901,7 +1049,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 4M PSRAM" />
 			<feature name="u4" value="U4 256K SRAM" />
 			<feature name="u5" value="U5 MM1134" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" /> <!-- also found with revision B -->
 			<feature name="cart_model" value="SHVC-028" />
 			<feature name="cart_back_label" value="G728389 SHVC-ZBSJ-JPN" />
@@ -950,6 +1098,23 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 <!-- wip-c -->
+	<software name="calripkn">
+		<!-- Serial: SNSP-CJ-NOE -->
+		<description>Cal Ripken Jr. Baseball (Euro)</description>
+		<year>1992</year>
+		<publisher>Mindscape</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-NOE" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-cj-0.u1" size="1048576" crc="c1357473" sha1="6c6cf19d7ab33a9248ab57dd264d4a6de0ec276a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="captavenu" cloneof="captaven">
 		<!-- Serial: SNS-6A-USA - Release Date: 1993-09 -->
 		<description>Captain America and the Avengers (USA)</description>
@@ -967,6 +1132,23 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="casper">
+		<!-- Serial: SNSP-AXCP-EUR -->
+		<description>Casper (Euro)</description>
+		<year>1997</year>
+		<publisher>Natsume</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-axcp-0.u1" size="1048576" crc="a7677e65" sha1="43ce76773f2bd1232aae3268325b0daebcfb29c0" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="champwcs">
 		<description>Champions - World Class Soccer (Euro)</description>
 		<!-- Serial: SNSP-8W-FAH - Champions World Class Soccer Endorsed by Paris Saint-Germain -->
@@ -978,7 +1160,7 @@ The software list will be divided in four categories:
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="" />
+			<feature name="cart_back_label" value="SNSP-FAH, SNSP-UKV" />
 			<dataarea name="rom" size="1048576">
 				<rom name="spal-8w-0.u1" size="1048576" crc="d89c8156" sha1="7cb016ae25d4377f9aabc1825ab5ecab05bf28e3" offset="0x000000" />
 			</dataarea>
@@ -1030,7 +1212,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="4194304">
@@ -1052,7 +1234,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="4194304">
@@ -1075,7 +1257,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="4194304">
@@ -1100,6 +1282,23 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="1048576">
 				<rom name="spal-c8-0.u1" size="1048576" crc="281244b0" sha1="af97daee852340d9d14e5e9bb633bec870420b1c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cybernat">
+		<!-- Serial: SNSP-AV-NOE -->
+		<description>Cybernator (Euro)</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-NOE" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-av-0.u1" size="1048576" crc="f493414b" sha1="31030745abb1d407859a2184398c08868eae9658" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1135,7 +1334,7 @@ The software list will be divided in four categories:
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 S-RTC" />
 			<feature name="u6" value="U6 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="5242880">
@@ -1210,11 +1409,57 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 256K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-040" />
 			<feature name="cart_back_label" value="G744238 BSC-JPN-1" />
 			<dataarea name="rom" size="3145728">
 				<rom name="shvc-zdbj-0.u1" size="3145728" crc="19bdcb19" sha1="24af9a5a78635ec493bbbc2540ab98bd161c5798" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dstall3c" cloneof="dstall3">
+		<!-- Serial: SHVC-AD3J-JPN - Release Date: 1995-01-20 - Alt. Title: ダービースタリオンIII -->
+		<description>Derby Stallion III (Jpn)</description>
+		<year>1995</year>
+		<publisher>ASCII Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A5M-11" /> <!-- also found with SHVC-1A5M-20 pcb -->
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 256K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-ad3j-0.u1" size="3145728" crc="75eeeb3f" sha1="2fc2925151290e792e8cc99e46b06ac19e3e2aef" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dstall3ca" cloneof="dstall3">
+		<!-- Serial: SHVC-AD3J-JPN - Release Date: 1995-01-20 - Alt. Title: ダービースタリオンIII -->
+		<description>Derby Stallion III (Jpn, Alt)</description>
+		<year>1995</year>
+		<publisher>ASCII Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BA5M-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 256K SRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-ad3j-0 p0.u1" size="2097152" crc="ad36d3d2" sha1="b1528c77b069e918929d1b122eedcf1c0f6f7a67" offset="0x000000" />
+				<rom name="shvc-ad3j-0 p3.u2" size="1048576" crc="87e5d531" sha1="162c748d43a8f0c048ba70b3d812668b3a48b942" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sram" size="32768">
 			</dataarea>
@@ -1281,7 +1526,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 16K SRAM" />
 			<feature name="u4" value="U5 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-8X-NOE, SNSP-FAH" />
 			<dataarea name="rom" size="4194304">
@@ -1304,7 +1549,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -1327,7 +1572,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
@@ -1340,7 +1585,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="dkongc2">
-		<!-- Serial: SNSP-ADND-EUR -->
+		<!-- Serial: SNSP-ADNP-FAH -->
 		<description>Donkey Kong Country 2 - Diddy's Kong Quest (Euro, Rev. A)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -1350,11 +1595,33 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-FAH" />
+			<dataarea name="rom" size="4194304">
+				<rom name="spal-adnp-1.u1" size="4194304" crc="2ea6b7e8" sha1="29601b586c57c1f5da8956b640e5fc48dcc4364f" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkongc2g" cloneof="dkongc2">
+		<!-- Serial: SNSP-ADND-EUR -->
+		<description>Donkey Kong Country 2 - Diddy's Kong Quest (Ger, Rev. A)</description>
+		<year>1995</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J1M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
 			<dataarea name="rom" size="4194304">
-				<rom name="spal-adnd-1.u1" size="4194304" crc="2ea6b7e8" sha1="29601b586c57c1f5da8956b640e5fc48dcc4364f" offset="0x000000" />
+				<rom name="spal-adnd-1.u1" size="4194304" crc="2eb33785" sha1="5a5ee7c1e3d36530c3ebf98bdced2c9c3a0313ab" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
 			</dataarea>
@@ -1373,7 +1640,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="4194304">
@@ -1395,7 +1662,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
 			<dataarea name="rom" size="4194304">
@@ -1417,7 +1684,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="M/SNS-USA/CAN-1" />
 			<dataarea name="rom" size="4194304">
@@ -1429,7 +1696,7 @@ The software list will be divided in four categories:
 	</software>
 
 	<software name="doom">
-		<!-- Serial: SNSP-AD8P-NOE -->
+		<!-- Serial: SNSP-AD8P-NOE, SNSP-AD8P-FAH -->
 		<description>Doom (Euro)</description>
 		<year>1996</year>
 		<publisher>Williams Entertainment</publisher>
@@ -1443,7 +1710,7 @@ The software list will be divided in four categories:
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="none" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-NOE" />
+			<feature name="cart_back_label" value="SNSP-NOE, SNSP-FAH" />
 			<dataarea name="rom" size="2097152">
 				<rom name="spal-ad8p-0.u1" size="2097152" crc="360243e4" sha1="3ffb94cdd6a47683980999d723a93bee9ba156f8" offset="0x000000" />
 			</dataarea>
@@ -1489,6 +1756,23 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="dbzbuto3" cloneof="dbzmenac">
+		<!-- Serial: SHVC-AZ4J-JPN - Release Date: 1994-09-29 - Alt. Title: ドラゴンボールZ 超武闘伝3 -->
+		<description>Dragon Ball Z - Super Butouden 3 (Jpn)</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-az4j-0.u1" size="2097152" crc="cbfde2d0" sha1="d4bbf593338be7e495a306b3980ef1ef45a251f4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dquest12">
 		<!-- Serial: SHVC-DQ - Release Date: 1993-12-18 - Alt. Title: ドラゴンクエストI・II -->
 		<description>Dragon Quest I &amp; II (Jpn)</description>
@@ -1501,7 +1785,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1/R" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1572864">
@@ -1524,7 +1808,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="4194304">
@@ -1547,7 +1831,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1572864">
@@ -1571,7 +1855,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="4194304">
@@ -1594,7 +1878,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="4194304">
@@ -1679,6 +1963,30 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="elfaria">
+		<!-- Serial: SHVC-H5 - Release Date: 1993-01-03 - Alt. Title: エルファリア -->
+		<description>Elfaria - The Isle of the Blest (Jpn)</description>
+		<year>1993</year>
+		<publisher>Hudson</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A3B-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 74LS139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1572864">
+				<rom name="shvc-h5-0 p0.u1" size="1048576" crc="e0ee288b" sha1="2e616345fa740f93ef10da37a83622be8555ad6f" offset="0x000000" />
+				<rom name="shvc-h5-0 p1.u2" size="524288"  crc="9317c76e" sha1="d9e58ea5bf2093d235c35eb39dac2d21da70cb1a" offset="0x100000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elnard" cloneof="7thsaga">
 		<!-- Serial: SHVC-EL - Release Date: 1993-04-23 - Alt. Title: エルナード -->
 		<description>Elnard (Jpn)</description>
@@ -1692,7 +2000,7 @@ The software list will be divided in four categories:
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 74LS00" />
 			<feature name="u6" value="U6 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1572864">
@@ -1715,7 +2023,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-UKV" />
 			<dataarea name="rom" size="1048576">
@@ -1754,7 +2062,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1048576">
@@ -1777,7 +2085,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2621440">
@@ -1800,7 +2108,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -1823,7 +2131,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 ST-010" /> <!-- ST010 -->
 			<feature name="u3" value="U3 HCU04" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -1843,7 +2151,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -1936,7 +2244,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006(-01)" />
 			<feature name="cart_back_label" value="820661" />
 			<dataarea name="rom" size="2097152">
@@ -1958,7 +2266,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-005(-01)" /> <!-- probably a typo, this is a controller serial -->
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -1980,7 +2288,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006(-01)" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
 			<dataarea name="rom" size="2097152">
@@ -2022,7 +2330,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -2044,7 +2352,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA" />
 			<dataarea name="rom" size="1048576">
@@ -2066,7 +2374,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="901121" />
@@ -2090,7 +2398,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="3145728">
@@ -2113,7 +2421,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="901121" />
@@ -2136,7 +2444,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="901121" />
 			<dataarea name="rom" size="1048576">
@@ -2158,7 +2466,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1048576">
@@ -2180,7 +2488,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
@@ -2204,7 +2512,7 @@ The software list will be divided in four categories:
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 74LS00" />
 			<feature name="u6" value="U6 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
@@ -2228,7 +2536,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="3145728">
@@ -2254,7 +2562,7 @@ The software list will be divided in four categories:
 			<feature name="u5" value="U5 74LS139" />
 			<feature name="u6" value="U6 MAD-1" />
 			<feature name="u7" value="U7 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="3145728 ">
@@ -2278,7 +2586,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="524288">
@@ -2406,7 +2714,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="3145728">
@@ -2429,7 +2737,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="3145728">
@@ -2451,7 +2759,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="524288">
@@ -2473,11 +2781,44 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
 				<rom name="sns-fz-0.u1" size="524288" crc="aa0e31de" sha1="d3efd32b68f1fe37a82db9d9929b7ca7cc1a3af4" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fzeroj" cloneof="fzero">
+		<!-- Serial: SHVC-FZ - Release Date: 1990-11-21 - Alt. Title: エフゼロ - Notes: Also re-released through Nintendo Power -->
+		<description>F-Zero (Jpn)</description>
+		<year>1990</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A1B-01" /> <!-- also found with SHVC-1A1B-02 pcb -->
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="901121" />
+<!--
+The revision A of the cartridge has the same ROM as the initial release.
+			<feature name="pcb" value="SHVC-1A1B-03" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="901121" />
+-->
+			<dataarea name="rom" size="524288">
+				<rom name="shvc-fz-0.u1" size="524288" crc="7681efc1" sha1="54d06d143383de0354788b07314c7dc238575dd0" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
 			</dataarea>
@@ -2495,13 +2836,30 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
 				<rom name="shvc-jg-0.u1" size="2097152" crc="b344e9a0" sha1="01bd54e220d5208433ecfdf0b9fa1a08b2260a89" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genocid2">
+		<!-- Serial: SHVC-2I - Release Date: 1994-08-05 - Alt. Title: ジェノサイド 2 -->
+		<description>Genocide 2 (Jpn)</description>
+		<year>1994</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-2i-0.u1" size="2097152" crc="de40aa12" sha1="947f72ebb7f3b19244103fa5a55c0a5a21267f23" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2518,7 +2876,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1572864">
@@ -2577,7 +2935,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 HCU04" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="u4" value="U5 Ω" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="524288">
@@ -2600,7 +2958,7 @@ The software list will be divided in four categories:
 			<feature name="u4" value="U4 LS139" />
 			<feature name="u5" value="" /> <!-- U5 doesn't appear in the PCB front, need to check PCB back -->
 			<feature name="u6" value="U6 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -2712,11 +3070,33 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sns-jg-0.u1" size="2097152" crc="1c3848c0" sha1="38de0c84dd2bc3bdfc0a3d7ab0220c79b70887c3" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="illtimef" cloneof="illtime">
+		<!-- Serial: SNSP-JG-FRA/SFRA -->
+		<description>Illusion of Time (Fra)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-FAH" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sfra-jg-0.u1" size="2097152" crc="63f6f934" sha1="025ed8b698b66100dbbeb66b8a91af2ea9d742f9" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -2734,7 +3114,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-NOE" />
 			<dataarea name="rom" size="2097152">
@@ -2824,7 +3204,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -2846,7 +3226,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -2874,6 +3254,23 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="issdx">
+		<!-- Serial: SNSP-AWJP-EUR -->
+		<description>International Superstar Soccer Deluxe (Euro)</description>
+		<year>1995</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-awjp-0.u1" size="2097152" crc="cba724ba" sha1="abdbf30d0987aca99183c451b7b9567e2ff67980" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="itadaki2">
 		<!-- Serial: SHVC-I2 - Release Date: 1994-02-26 - Alt. Title: いただきストリート2 ネオンサインはバラ色に -->
 		<description>Itadaki Street 2 - Neon Sign wa Barairo ni (Jpn)</description>
@@ -2886,7 +3283,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1572864">
@@ -2915,6 +3312,23 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="4194304">
 				<rom name="shvc-zbpj-0.u1" size="4194304" crc="b9ba8544" sha1="357ac4826297a6496035e3951cacda55dcae4b1b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="izzyqst">
+		<!-- Serial: SHVC-AIZP-EUR -->
+		<description>Izzy's Quest for the Olympic Rings (Euro)</description>
+		<year>1995</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-aizp-0.u1" size="2097152" crc="b096e82e" sha1="9b3c5a6887ba722ac29de0ea13afc38cd2091e33" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2985,7 +3399,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
@@ -3025,7 +3439,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-028" />
 			<feature name="cart_back_label" value="G736879 BSC-JPN" />
 			<dataarea name="rom" size="1048576">
@@ -3049,6 +3463,23 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sns-7k-0.u1" size="2097152" crc="3511efb3" sha1="f9dbb76fb1a62d47f8de4e7db46bfbcb1a038ca5" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jstrike">
+		<!-- Serial: SNSP-AJGP-EUR -->
+		<description>Jungle Strike (Euro)</description>
+		<year>1995</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-ajgp-0.u1" size="2097152" crc="fb770320" sha1="07d155903f8d7cfa0b66f5e379163282987a635f" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3100,7 +3531,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64KSRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1572864">
@@ -3123,7 +3554,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 512K/1M SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="524288">
@@ -3145,7 +3576,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="2097152">
@@ -3167,7 +3598,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="4194304">
@@ -3257,7 +3688,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-UKV" />
 			<dataarea name="rom" size="1048576">
@@ -3280,7 +3711,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64KSRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1572864">
@@ -3355,7 +3786,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -3365,6 +3796,29 @@ The software list will be divided in four categories:
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="zelda3f" cloneof="zelda3">
+		<!-- Serial: SNSP-ZL-FRA/SFRA -->
+		<description>The Legend of Zelda - A Link to the Past (Fra)</description>
+		<year>1992</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-13" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-FAH" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sfra-zl-0.u1" size="1048576" crc="1f8c30e8" sha1="229364a1b92a05167cd38609b1aa98f7041987cc" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="zelda3u" cloneof="zelda3">
 		<!-- Serial: SNS-ZL-USA - Release Date: 1992-04 -->
@@ -3377,7 +3831,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -3400,7 +3854,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -3435,13 +3889,30 @@ The software list will be divided in four categories:
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J0N-20" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-FAH" />
+			<dataarea name="rom" size="3145728">
+				<rom name="spal-alkp-0.u1" size="3145728" crc="8a46ed37" sha1="45c59fd06b00f6c7222e6a5904e66dac9cf0be07" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkinga" cloneof="lionking">
+		<!-- Serial: SNSP-ALKP-EUR  -->
+		<description>The Lion King (Euro, Alt)</description>
+		<year>1994</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-BJ0N-01" />
 			<feature name="u1" value="U1 P0" />
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 LS00" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-FAH" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
 			<dataarea name="rom" size="3145728">
 				<rom name="spal-alkp-0 p0.u1" size="2097152" crc="31394bcf" sha1="1028d5c0bb4b9411080d5418f81c124dd2bf27d7" offset="0x000000" />
 				<rom name="spal-alkp-0 p3.u2" size="1048576" crc="7a2b62c0" sha1="e5968e5ed6cd21dfe3c6f2ee7de5abb5c7d1cbed" offset="0x200000" />
@@ -3478,7 +3949,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
@@ -3506,6 +3977,23 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="looneybb">
+		<!-- Serial: SNSP-ALTP-NOE -->
+		<description>Looney Tunes Basketball (Euro)</description>
+		<year>1995</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-NOE" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-altp-0.u1" size="2097152" crc="fdf2f478" sha1="100afca042722209352682d705e3ae73bbb91ca8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lufia">
 		<!-- Serial: SNS-ES-USA - Release Date: 1993-12 -->
 		<description>Lufia &amp; The Fortress of Doom (USA)</description>
@@ -3517,7 +4005,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="1048576">
@@ -3539,7 +4027,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="M/SNS-USA/CAN-1" />
 			<dataarea name="rom" size="3145728">
@@ -3561,7 +4049,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="not identified" /> <!-- Identical to model SNSP-006 -->
 			<feature name="cart_back_label" value="SNSP-EUR" />
 			<dataarea name="rom" size="3145728">
@@ -3583,7 +4071,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -3605,7 +4093,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="2097152">
@@ -3627,7 +4115,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
@@ -3649,7 +4137,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="3145728">
@@ -3673,6 +4161,28 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-mu-0.u1" size="1048576" crc="e51a3fcd" sha1="93fdfdbef3f44c89881c64eb76146ee09328f245" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mariopic">
+		<!-- Serial: SHVC-ACXJ-JPN - Release Date: 1995-09-14 - Alt. Title: マリオのスーパーピクロス -->
+		<description>Mario no Super Picross (Jpn)</description>
+		<year>1995</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-acxj-0.u1" size="1048576" crc="f64c5aa0" sha1="c4200b9886b16c148b32d2c75d02f2a875d997cc" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -3745,7 +4255,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -3787,7 +4297,7 @@ The software list will be divided in four categories:
 			<feature name="u4" value="U4 SPC7110" />
 			<feature name="u5" value="U5 MM1026AF" />
 			<feature name="u6" value="U6 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="3145728">
@@ -3937,7 +4447,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="4194304">
@@ -3982,6 +4492,30 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="nbajamte">
+		<!-- Serial: SNSP-AJTP-EUR  -->
+		<description>NBA Jam - Tournament Edition (Euro)</description>
+		<year>1995</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BA1M-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 16K SRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="3145728">
+				<rom name="spal-ajtp-0 p0.u1" size="2097152" crc="238ca19c" sha1="6523ef95aefeba2ea0a7bde26fd670d6ab9bdd9f" offset="0x000000" />
+				<rom name="spal-ajtp-0 p3.u2" size="1048576" crc="68468198" sha1="1e84810d8a4889ffe0ad1c3f65542ab096b89714" offset="0x200000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nbaliv97u" cloneof="nbaliv97">
 		<!-- Serial: SNS-A7LE-USA - Release Date: 1996-12 -->
 		<description>NBA Live 97 (USA)</description>
@@ -3993,7 +4527,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -4024,6 +4558,28 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="nhl95">
+		<!-- Serial: SNS-ANHP-NOE -->
+		<description>NHL '95 (Euro)</description>
+		<year>1994</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-11" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-NOE" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-anhp-0" size="1048576" crc="6930b67a" sha1="b7b8b974f970c39576ecc3612da727947fc2fb85" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nhl95u" cloneof="nhl95">
 		<!-- Serial: SNS-ANHE-USA - Release Date: 1994-11 -->
 		<description>NHL '95 (USA)</description>
@@ -4035,7 +4591,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -4057,7 +4613,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
 			<dataarea name="rom" size="2097152">
@@ -4171,7 +4727,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 256K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-040" />
 			<feature name="cart_back_label" value="G744238 BSC-JPN-1" />
 			<dataarea name="rom" size="1048576">
@@ -4194,7 +4750,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1/R" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1572864">
@@ -4240,6 +4796,23 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
 				<rom name="sns-pw-0.u1" size="524288" crc="266c44ed" sha1="fe941ba251acf329f028a1603a43562db2c75e51" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitfall">
+		<!-- Serial: SNSP-APAP-EUR -->
+		<description>Pitfall - The Mayan Adventure (Euro)</description>
+		<year>1994</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-apap-0.u1" size="2097152" crc="7e9bc944" sha1="634b545e4ccaccc454a2e9eb256a8e96b4e75bb7" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4298,6 +4871,45 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="powrsoko">
+		<!-- Serial: SHVC-BPSJ-JPN - Release Date: 1999-01-01 / 1999-06-25 - Alt. Title: パワー倉庫番 -->
+		<description>Power Soukoban (Jpn)</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-bpsj-0.u1" size="1048576" crc="39fbaa1e" sha1="4b69363051df75089169cb76e5abc6364ecbabf5" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppersia2">
+		<!-- Serial: SNSP-AUPP-EUR -->
+		<description>Prince of Persia 2 - The Shadow &amp; The Flame (Euro)</description>
+		<year>1996</year>
+		<publisher>Titus</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-aupp-0.u1" size="2097152" crc="2d25a9e1" sha1="5d1b73634baa29462ab878a8aa6e75facec96ffb" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mjkiwamea" cloneof="mjkiwame">
 		<!-- Serial: SHVC-ZZ - Release Date: 1993-06-11 - Alt. Title: プロ麻雀 極 -->
 		<description>Pro Mahjong Kiwame (Jpn)</description>
@@ -4314,7 +4926,7 @@ The software list will be divided in four categories:
 			</dataarea>
 		</part>
 	</software>
-
+<!-- wip-q -->
 <!-- wip-r -->
 	<software name="rtype3">
 		<!-- Serial: SNSP-ER-FAH -->
@@ -4400,7 +5012,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64KSRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="1572864">
@@ -4440,7 +5052,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="4194304">
@@ -4522,7 +5134,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
@@ -4545,7 +5157,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="901121" />
 			<dataarea name="rom" size="1048576">
@@ -4567,7 +5179,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
@@ -4590,7 +5202,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1/R" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
@@ -4613,7 +5225,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
@@ -4636,7 +5248,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="4194304">
@@ -4659,7 +5271,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 512K/1M SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-028" />
 			<feature name="cart_back_label" value="G736879 BSC-JPN" />
 			<dataarea name="rom" size="2097152">
@@ -4681,7 +5293,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="4194304">
@@ -4721,7 +5333,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-028" />
 			<feature name="cart_back_label" value="G736879 BSC-JPN" />
 			<dataarea name="rom" size="1048576">
@@ -4781,7 +5393,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 256K SRAM" />
 			<feature name="u3" value="U3 SA1" />
 			<feature name="u4" value="U4 MM1026 AF" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SHVC-040" />
 			<feature name="cart_back_label" value="G744238 BSC-JPN-1" />
@@ -4807,11 +5419,33 @@ The software list will be divided in four categories:
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 74HCU04" />
 			<feature name="u6" value="U6 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" /> <!-- to do -->
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-x2-0.u1" size="1048576" crc="4dc3d903" sha1="a504b74d1e256f97bc05a7dd836a2457ae6f525e" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="evermoref" cloneof="evermore">
+		<!-- Serial: SNSP-AEOF-FRA -->
+		<description>Secret of Evermore (Fra)</description>
+		<year>1995</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="3145728">
+				<rom name="spal-aeof-0.u1" size="3145728" crc="7425bb91" sha1="8a430c9d6a3dcef974252fe8d946a0d619bb1a61" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -4829,7 +5463,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="3145728">
@@ -4851,7 +5485,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="3145728">
@@ -4873,7 +5507,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -4896,7 +5530,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1/R" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -4919,7 +5553,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
@@ -4942,7 +5576,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1/R" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
@@ -4965,7 +5599,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="4194304">
@@ -4988,7 +5622,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="4194304">
@@ -5011,13 +5645,30 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-8s-0.u1" size="524288" crc="dcc702d4" sha1="99d9c978cc54817bb57bfb60d9b5493f6af01750" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shaqfu">
+		<!-- Serial: SNS-AQFP-FAH -->
+		<description>Shaq Fu (Euro)</description>
+		<year>1994</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J0N-10" />
+			<feature name="u1" value="U1 MASKROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-FAH" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-aqfp-0.u1" size="2097152" crc="ddd55e27" sha1="b612314468f18009b98c165ca90a49332a532e93" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5067,7 +5718,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 256K SRAM(B)" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -5089,11 +5740,33 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 256K SRAM(B)" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="524288">
 				<rom name="sfra-sc-0.u1" size="524288" crc="5d026339" sha1="af13de6ddf7d33a2d29e9d1b40cec58823edcf42" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcit2k">
+		<!-- Serial: SNS-AWWP-EUR -->
+		<description>SimCity 2000 (Euro)</description>
+		<year>1996</year>
+		<publisher>Black Pearl</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J5M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 256K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-awwp-0.u1" size="2097152" crc="a1c28940" sha1="56ebb8c7e7ee6aad62b9e8a4bdc5c6d89dae40c2" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="32768">
 			</dataarea>
@@ -5162,7 +5835,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="901121" />
 			<dataarea name="rom" size="1048576">
@@ -5185,7 +5858,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 512K/1M SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-040" />
 			<feature name="cart_back_label" value="G744238 BSC-JPN-1" />
 			<dataarea name="rom" size="3145728">
@@ -5209,6 +5882,23 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-at-0.u1" size="1048576" crc="11202781" sha1="a5f8b381c3abe29ddb6c5513fb14a905227a6984" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidmaxc">
+		<!-- Serial: SNSP-AMCP-EUR -->
+		<description>Spider-Man &amp; Venom - Maximum Carnage (Euro)</description>
+		<year>1994</year>
+		<publisher>LJN</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006(-01)" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-amcp-0.u1" size="2097152" crc="d2b0d5fe" sha1="cc83ec37d7669834047510d6bbde1e0eee4667c9" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5320,7 +6010,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 SDD-1" />
 			<feature name="u5" value="U5 MM1026AF" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="6291456">
@@ -5398,6 +6088,24 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="sfa2">
+		<!-- Serial: SNSP-AUZP-EUR -->
+		<description>Street Fighter Alpha 2 (Euro)</description>
+		<year>1996</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="S-DD1" />
+			<feature name="pcb" value="SHVC-1N0N-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 S-DD1" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="4194304">
+				<rom name="spal-auzp-0.u1" size="4194304" crc="2f109101" sha1="73b3c0af2f169423cbbf2a672e6414f35388e04e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sfa2u" cloneof="sfa2" supported="no">
 		<!-- Serial: SNS-AUZE-USA - Release Date: 1996-11 -->
 		<description>Street Fighter Alpha 2 (USA)</description>
@@ -5405,9 +6113,9 @@ The software list will be divided in four categories:
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="S-DD1" />
-			<feature name="pcb" value="SHVC-1N0N-01" /> <!-- not SHVC -->
+			<feature name="pcb" value="SHVC-1N0N-01" />
 			<feature name="u1" value="U1 MASK ROM" />
-			<feature name="u2" value="U2 SDD-1" />
+			<feature name="u2" value="U2 S-DD1" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="4194304">
@@ -5663,7 +6371,7 @@ The software list will be divided in four categories:
 			<feature name="u4" value="U4 MM1026AF" />
 			<feature name="u5" value="U5 HCU04" />
 			<feature name="u6" value="U6 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006(-03)" />
 			<feature name="cart_back_label" value="03-SNSP-FAH" />
 			<dataarea name="rom" size="1048576">
@@ -5674,6 +6382,27 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 <!-- wip-su -->
+	<software name="airdiver">
+		<!-- Serial: SNSP-AZ-UKV -->
+		<description>Super Air Diver (Euro)</description>
+		<year>1993</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1" />
+			<feature name="pcb" value="SHVC-1K0N-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 uPD77C25" /> <!-- DSP1 -->
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 74HCU04" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-UKV" />
+			<dataarea name="rom" size="524288">
+				<rom name="spal-az-0.u1" size="524288" crc="0b57c764" sha1="f70567b9dc858bdb66d73d539390b7f74f00ff8a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batlshipu" cloneof="batlship" supported="no">
 		<!-- Serial: SNS-8B-USA - Release Date: 1993-11 -->
 		<description>Super Battleship (USA)</description>
@@ -5704,6 +6433,23 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-bq-0.u1" size="1048576" crc="57d9fd61" sha1="653711065aaa24a4216e359c1e1c2c23ec028912" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbombmanj" cloneof="sbombman">
+		<!-- Serial: SHVC-H6 - Release Date: 1993-04-28 - Alt. Title: スーパーボンバーマン -->
+		<description>Super Bomberman (Jpn)</description>
+		<year>1993</year>
+		<publisher>Hudson</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J0N-01" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="524288">
+				<rom name="shvc-h6-0.u1" size="524288" crc="7989891a" sha1="843364a881edf3d8cd8f799801a2a6d8f05d7a7d" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5883,7 +6629,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 16K SRAM" />
 			<feature name="u4" value="U4 MAD-1/R" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
@@ -5908,7 +6654,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 16K SRAM" />
 			<feature name="u4" value="U4 MAD-1/R" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1310720">
@@ -5932,7 +6678,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 16K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1310720">
@@ -5955,7 +6701,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-NOE" />
 			<dataarea name="rom" size="2097152">
@@ -5980,7 +6726,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="2097152">
@@ -6004,7 +6750,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1/R" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="2097152">
@@ -6027,7 +6773,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA" />
 			<dataarea name="rom" size="2097152">
@@ -6052,7 +6798,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="M/SNS-USA/CAN-1" />
 			<dataarea name="rom" size="2097152">
@@ -6076,7 +6822,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u3" value="U3 64KSRAM" />
 			<feature name="u4" value="U4 MAD-1/R" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -6099,7 +6845,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
 			<dataarea name="rom" size="3145728">
@@ -6124,7 +6870,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u3" value="U3 uPD77C25" /> <!-- DSP1 B -->
 			<feature name="u4" value="U4 MAD-2" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
@@ -6150,7 +6896,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 74HCU04" />
 			<feature name="u6" value="U6 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-NOE, SNSP-FAH" />
 			<dataarea name="rom" size="524288">
@@ -6175,7 +6921,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 74HCU04" />
 			<feature name="u6" value="U6 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -6197,7 +6943,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="524288">
@@ -6219,12 +6965,46 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-mw-1.u1" size="524288" crc="b47f5f20" sha1="46bf36be1c3a2ce9de7581323370bd2d891ad5a1" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smwj" cloneof="smw">
+		<!-- Serial: SHVC-MW - Release Date: 1990-11-21 - Alt. Title: スーパーマリオワールド - Notes: Also re-released through Nintendo Power -->
+		<description>Super Mario World - Super Mario Bros. 4 (Jpn)</description>
+		<year>1990</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A1B-01" /> <!-- also found with SHVC-1A1B-02 pcb -->
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 16K S-RAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="901121" />
+<!--
+The revision A of the cartridge has the same ROM as the initial release.
+			<feature name="pcb" value="SHVC-1A1B-02" /> also found with SHVC-1A1B-03, SHVC-1A1B-05 or SHVC-1A1B-06 pcb
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="901121" />
+-->
+			<dataarea name="rom" size="524288">
+				<rom name="shvc-mw-0.u1" size="524288" crc="0ec0ddac" sha1="f977afabf24ed269d86366209a460450bbc37e76" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
 			</dataarea>
@@ -6242,7 +7022,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA" /> <!-- also found with SNS-USA/CAN-1 back label -->
 			<dataarea name="rom" size="524288">
@@ -6267,7 +7047,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -6293,7 +7073,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u5" value="U5 74LS139" />
 			<feature name="u6" value="U6 MAD-1" />
 			<feature name="u7" value="U7 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="3145728">
@@ -6319,7 +7099,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006 (Japan), SNS-006 (USA)" />
 			<feature name="cart_back_label" value="920214 (Japan)" />
 			<dataarea name="rom" size="3145728">
@@ -6381,7 +7161,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u4" value="U4 SPC7110" />
 			<feature name="u5" value="U5 MM1026AF" />
 			<feature name="u6" value="U6 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -6394,7 +7174,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 	</software>
 
 	<software name="suppunch">
-		<!-- Serial: SNSP-4Q-NOE -->
+		<!-- Serial: SNSP-4Q-NOE, SNSP-4Q-FAH -->
 		<description>Super Punch-Out!! (Euro)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -6404,9 +7184,9 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-NOE" />
+			<feature name="cart_back_label" value="SNSP-NOE, SNSP-FAH" />
 			<dataarea name="rom" size="2097152">
 				<rom name="spal-4q-0.u1" size="2097152" crc="c6906f5f" sha1="658c4a3dd0b62577781df2e05a28c43806b6dbc5" offset="0x000000" />
 			</dataarea>
@@ -6675,7 +7455,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="6291456">
@@ -6716,7 +7496,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1/R" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="1572864">
@@ -6739,7 +7519,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -6799,7 +7579,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u5" value="U5 RTC-4513" />
 			<feature name="u6" value="U6 MM1026AF" />
 			<feature name="u7" value="U7 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="5242880">
@@ -6828,19 +7608,41 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="tetris2ua" cloneof="tetris2">
-		<!-- Serial: SNS-27-USA - Release Date: 1994-08 -->
-		<description>Tetris 2 (USA)</description>
+	<software name="terranigf" cloneof="terranig">
+		<!-- Serial: SNSP-AQTF-FRA -->
+		<description>Terranigma (Fra)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-FAH" />
+			<dataarea name="rom" size="4194304">
+				<rom name="spal-aqtf-0.u1" size="4194304" crc="614a7090" sha1="4f8a5771cb11757a31a026e5892b9434a3a405cb" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetrisdr">
+		<!-- Serial: SNSP-ATPF-EUR -->
+		<description>Tetris &amp; Dr. Mario (Euro)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
 			<dataarea name="rom" size="1048576">
-				<rom name="sns-27-0.u1" size="1048576" crc="ce3392b1" sha1="43ce6065dfa9d3fbd3c6bcae9e23d160ae738eae" offset="0x000000" />
+				<rom name="spal-atfp-0.u1" size="1048576" crc="523e4153" sha1="97acf69826f035e8530568763f55432c40898cf3" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6862,6 +7664,40 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
+	<software name="tetris2ua" cloneof="tetris2">
+		<!-- Serial: SNS-27-USA - Release Date: 1994-08 -->
+		<description>Tetris 2 (USA)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-27-0.u1" size="1048576" crc="ce3392b1" sha1="43ce6065dfa9d3fbd3c6bcae9e23d160ae738eae" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetrisat">
+		<!-- Serial: SNSP-AYLP-EUR -->
+		<description>Tetris Attack (Euro)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-aylp-0.u1" size="1048576" crc="7417e83b" sha1="08e01f9ad5b6148e1a4355c80e2b23d8b2463443" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="themeprkj" cloneof="themeprk">
 		<!-- Serial: SHVC-ATQJ-JPN - Release Date: 1995-12-15 - Alt. Title: テーマパーク -->
 		<description>Theme Park (Jpn)</description>
@@ -6873,7 +7709,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 256K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="2097152">
@@ -7007,6 +7843,23 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
+	<software name="toystory" supported="no">
+		<!-- Serial: SNSP-AQHP-EUR -->
+		<description>Toy Story (Euro)</description>
+		<year>1995</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J0N-20" />
+			<feature name="u1" value="U1 MASKROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="4194304">
+				<rom name="spal-aqhp-0.u1" size="4194304" crc="b144d588" sha1="ccf547dd741bd98762662fdffd964df5b5791092" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="toystoryu" cloneof="toystory">
 		<!-- Serial: M/SNS-AQHE-USA - Release Date: 1995-12 -->
 		<description>Toy Story (USA)</description>
@@ -7035,7 +7888,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="3145728">
@@ -7091,7 +7944,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -7113,7 +7966,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 256K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -7152,7 +8005,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -7232,13 +8085,30 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-65-0.u1" size="1048576" crc="2d1004f1" sha1="1d814276114bd5cafb6ab041305ce83e8093dc10" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warlock">
+		<!-- Serial: SNSP-AWKP-EUR -->
+		<description>Warlock (Euro)</description>
+		<year>1995</year>
+		<publisher>LJN</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-awkp-0.u1" size="2097152" crc="d90530ac" sha1="50e581458ae7643d2ff950e88a3d3461b0576946" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7294,6 +8164,23 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
+	<software name="whizz">
+		<!-- Serial: SNSP-AZWP-EUR -->
+		<description>Whizz (Euro)</description>
+		<year>1996</year>
+		<publisher>Titus</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-azwp-0.u1" size="1048576" crc="762d214f" sha1="de8a253d1282841e9037e7208323687fc86ed5c6" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wildtrax" cloneof="stuntfx">
 		<!-- Serial: SHVC-CQ - Release Date: 1994-06-04 - Alt. Title: ワイルドトラックス -->
 		<description>Wild Trax (Jpn, v1.1)</description> <!-- Initial release is a v1.1 -->
@@ -7308,7 +8195,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u4" value="U4 MM1026AF" />
 			<feature name="u5" value="U5 HCU04" />
 			<feature name="u6" value="U6 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -7330,7 +8217,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 256K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
@@ -7338,6 +8225,31 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 				<rom name="shvc-wj-1.u1" size="2097152" crc="5b30edd9" sha1="1f32446666090ca2d1b63ca06c39848ca2f5e324" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wgold" supported="no">
+		<!-- Serial: SNSP-AXSP-EUR -->
+		<description>Winter Gold (Euro)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="GSU-2" />
+			<feature name="pcb" value="SHVC-1CB7B-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 SRAM" />
+			<feature name="u3" value="U3 GSU-2" />
+			<feature name="u4" value="U4 74HCU04" />
+			<feature name="u5" value="U5 MM1026AF" />
+			<feature name="u6" value="U6 CIC" />
+			<feature name="battery" value="none" />
+			<feature name="cart_model" value="SNSP-006(-03)" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-axsp-0.u1" size="2097152" crc="0f8378a6" sha1="dc7f33e6bb587d7290f6a2587bb31af15724dfa3" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -7353,7 +8265,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -7375,7 +8287,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -7466,7 +8378,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -7476,6 +8388,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			</dataarea>
 		</part>
 	</software>
+<!-- wip-z -->
 
 <!-- End of perfect dumps -->
 
@@ -7600,6 +8513,45 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
+	<software name="kirbyfun" supported="no">
+		<!-- Serial: SNSP-AKFP-EUR - Release Date: 1996 -->
+		<description>Kirby's Fun Pak (Euro)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
+			<feature name="pcb" value="SNSP-1L3B-20" /> <!-- not SHVC -->
+			<feature name="u1" value="U1 MASKROM" />
+			<feature name="u2" value="U2 SRAM" />
+			<feature name="u3" value="U3 SA1" />
+			<feature name="u4" value="U4 MM1026AF" />
+			<feature name="cart_model" value="SNSP-006(-03)" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="4194304">
+				<rom name="spal-akfp-0.u1" size="4194304" crc="ce33dcfb" sha1="ce325ad271e91735ce19e9c2b8e0ad04dc103ae1" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickeymq">
+		<!-- Serial: SNSP-MI-FAH -->
+		<description>The Magical Quest Starring Mickey Mouse (Euro, Rev. A)</description>
+		<year>1992</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-FAH" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-mi-1.u1" size="1048576" crc="d5caf96a" sha1="54c1bbf80b12c17983b830383f6bf79e2cbdc99e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mickeymqi" cloneof="mickeymq">
 		<!-- Serial: SNSP-MI-ITA/SITA -->
 		<description>The Magical Quest con Topolino (Ita)</description>
@@ -7634,6 +8586,41 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
+	<software name="mk">
+		<!-- Serial: SNSP-A4RP-EUR -->
+		<description>Mortal Kombat (Euro, Rev. A)</description>
+		<year>1993</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="mortal kombat (europe) (rev 1).sfc" size="2097152" crc="047b3d88" sha1="2b820cf5ea310db54cef4a1c0918023fec986ee4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pga" supported="no">
+		<!-- Serial: SNSP-AEPP-EUR -->
+		<description>PGA European Tour (Euro)</description>
+		<year>1996</year>
+		<publisher>Black Pearl</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="SA1" />
+			<feature name="pcb" value="SNSP-1L3B-20" /> <!-- not SHVC -->
+			<feature name="u1" value="U1 MASKROM" />
+			<feature name="u2" value="U2 SRAM" />
+			<feature name="u3" value="U3 SA1" />
+			<feature name="u4" value="U4 MM1026AF" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006(-01)" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-aepp-0.u1" size="1048576" crc="be94e60d" sha1="cc1e7ddde84a6c7b8998d5be0555a79f10bcce52" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="przeo" supported="no">
 		<!-- Serial: SNSP-A4RP-EUR -->
 		<description>Power Rangers Zeo - Battle Racers (Euro)</description>
@@ -7646,7 +8633,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 SRAM" />
 			<feature name="u3" value="U3 SA1" />
 			<feature name="u4" value="U4 MM1026AF" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006(-02)" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
 			<dataarea name="rom" size="1048576">
@@ -7671,6 +8658,28 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
 				<rom name="shvc-zz-1.u1" size="524288" crc="59b6b116" sha1="9717e310aa3c83f8e2081e93f7a008764a5cbd55" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manaf" cloneof="mana">
+		<!-- Serial: SNSP-K2-FRA/SFRA -->
+		<description>Secret of Mana (Fra, Rev. A)</description>
+		<year>1993</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sfra-k2-1.u1" size="2097152" crc="e9334b9e" sha1="c1ff73ea67833748dbd4ecd393d3565e3ae1925d" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -7717,7 +8726,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-4PV5B-01" /> <!-- confirmation needed -->
+			<feature name="pcb" value="SHVC-4PV5B-01" />
 			<feature name="u1" value="U1 EPROM" />
 			<feature name="u2" value="U2 EPROM" />
 			<feature name="u3" value="U3 EPROM" />
@@ -7726,7 +8735,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u6" value="U6 PLD" />
 			<feature name="u7" value="U7 74LS157" />
 			<feature name="u8" value="U8 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="none" /> <!-- similar to a standard JPN cart -->
 			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="1572864">
@@ -7750,7 +8759,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="B" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
@@ -7774,7 +8783,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
@@ -7799,7 +8808,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 SRAM" />
 			<feature name="u3" value="U3 SA1" />
 			<feature name="u4" value="U4 MM1026AF" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="4194304">
@@ -7821,7 +8830,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
 			<feature name="u4" value="U4 CIC" />
-			<feature name="battery" value="CR2032" />
+			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="" />
@@ -9308,18 +10317,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="applesed">
-		<!-- Serial: SHVC-7X - Release Date: 1994-08-26 - Alt. Title: アップルシード プロメテウスの神託 -->
-		<description>Appleseed - Prometheus no Shintaku (Jpn)</description>
-		<year>1994</year>
-		<publisher>Visit</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="appleseed - prometheus no shintaku (japan).sfc" size="2097152" crc="c0e62c02" sha1="c331838c774b14a01a81d0d057af658e2a0feefb" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="aqutal" cloneof="secretst">
 		<!-- Serial: SHVC-AQ - Release Date: 1993-11-05 - Alt. Title: アクタリオン -->
 		<description>Aqutallion (Jpn)</description>
@@ -9679,17 +10676,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="axelay">
-		<description>Axelay (Euro)</description>
-		<year>1992</year>
-		<publisher>Konami</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="axelay (europe).sfc" size="1048576" crc="f43f6743" sha1="8bfa0b57ab1ed3331ab8fdc34b5639cea1d1ccb1" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="axelayj" cloneof="axelay">
 		<!-- Serial: SHVC-AX - Release Date: 1992-09-11 - Alt. Title: アクスレイ - Notes: Also re-released through Nintendo Power -->
 		<description>Axelay (Jpn)</description>
@@ -9744,20 +10730,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="b.o.b. (usa).sfc" size="1048576" crc="4f593c46" sha1="8b9efe5107285c776b24241a0a93f54f23a46e09" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bakukyuu">
-		<!-- Serial: SHVC-AAIJ - Release Date: 1997-12-19 - Alt. Title: 爆球連発!!スーパービーダマン -->
-		<description>Bakukyuu Renpatsu!! Super B-Daman (Jpn)</description>
-		<year>1997</year>
-		<publisher>Hudson</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="bakukyuu renpatsu!! super b-daman (japan).sfc" size="2097152" crc="5613f172" sha1="5670308f143087f1ca6e19978e3fe1e776cdf249" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -10006,17 +10978,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="batlclsh">
-		<description>Battle Clash (Euro)</description>
-		<year>1992</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="battle clash (europe).sfc" size="1048576" crc="11e5bc5e" sha1="d514520660de9939d7d30de9219ed9bcf21f7a15" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="batlclshu" cloneof="batlclsh">
 		<!-- Serial:  - Release Date: 1992-10 -->
 		<description>Battle Clash (USA)</description>
@@ -10221,20 +11182,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="battlety">
-		<!-- Serial:  - Release Date: 1995-05-19 -->
-		<description>Battle Tycoon - Flash Hiders SFX (Jpn)</description>
-		<year>1995</year>
-		<publisher>Right Stuff</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="battle tycoon - flash hiders sfx (japan).sfc" size="3145728" crc="e38c4a5b" sha1="0e2a2f7e2b88a9853d7ff5ec37d78f7bfcc658cb" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="batlzequ">
 		<!-- Serial: SHVC-ZQ - Release Date: 1994-07-15 - Alt. Title: バトルゼクウ伝 -->
 		<description>Battle Zeque Den (Jpn)</description>
@@ -10280,17 +11227,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="battletoads &amp; double dragon - the ultimate team (europe).sfc" size="1048576" crc="043f3773" sha1="1302d74caf3db924510e58868b095066abdf74f1" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="btoads">
-		<description>Battletoads in Battlemaniacs (Euro)</description>
-		<year>1993</year>
-		<publisher>Tradewest</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="battletoads in battlemaniacs (europe).sfc" size="1048576" crc="bbf1cf8d" sha1="26d8297d8b9b09a61125fe9906ad1c2a7c38ac11" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10873,18 +11809,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="blazeonj" cloneof="blazeon">
-		<!-- Serial: SHVC-BL - Release Date: 1992-07-24 - Alt. Title: ブレイゾン -->
-		<description>BlaZeon (Jpn)</description>
-		<year>1992</year>
-		<publisher>Atlus</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="blazeon (japan).sfc" size="1048576" crc="ad2effc3" sha1="b59e45c1b885fb67c9e0964e3daccc69d809ed63" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="blazeon">
 		<!-- Serial:  - Release Date: 1992-10 -->
 		<description>BlaZeon - The Bio-Cyborg Challenge (USA)</description>
@@ -10941,17 +11865,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="blues brothers, the (europe) (beta).sfc" size="524288" crc="1351da2a" sha1="e97b319729bb8fdf0883c349c009b76f01210e68" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bluesb">
-		<description>The Blues Brothers (Euro)</description>
-		<year>1993</year>
-		<publisher>Titus</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="blues brothers, the (europe).sfc" size="524288" crc="4a62057d" sha1="4ca07bc7319303952bc4b036eb3322dff3212d29" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11657,17 +12570,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="calripkn">
-		<description>Cal Ripken Jr. Baseball (Euro)</description>
-		<year>1992</year>
-		<publisher>Mindscape</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="cal ripken jr. baseball (europe).sfc" size="1048576" crc="c1357473" sha1="6c6cf19d7ab33a9248ab57dd264d4a6de0ec276a" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="calripknup" cloneof="calripkn">
 		<description>Cal Ripken Jr. Baseball (USA, Prototype)</description>
 		<year>1992</year>
@@ -11969,17 +12871,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="carrier aces (usa).sfc" size="2097152" crc="8bc5b8de" sha1="10e4754153e22116bcf3f9082fe6fe193748732e" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="casper">
-		<description>Casper (Euro)</description>
-		<year>1997</year>
-		<publisher>Natsume</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="casper (europe).sfc" size="1048576" crc="a7677e65" sha1="43ce76773f2bd1232aae3268325b0daebcfb29c0" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -13060,17 +13951,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="cybernat">
-		<description>Cybernator (Euro)</description>
-		<year>1993</year>
-		<publisher>Konami</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="cybernator (europe).sfc" size="1048576" crc="f493414b" sha1="31030745abb1d407859a2184398c08868eae9658" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cybernatup" cloneof="cybernat">
 		<description>Cybernator (USA, Prototype)</description>
 		<year>1993</year>
@@ -13762,20 +14642,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="dstall3c" cloneof="dstall3">
-		<!-- Serial: SHVC-AD3J - Release Date: 1995-01-20 - Alt. Title: ダービースタリオンIII -->
-		<description>Derby Stallion III (Jpn)</description>
-		<year>1995</year>
-		<publisher>ASCII Entertainment</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="derby stallion iii (japan).sfc" size="3145728" crc="75eeeb3f" sha1="2fc2925151290e792e8cc99e46b06ac19e3e2aef" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="desertfp" cloneof="desertf">
 		<description>Desert Fighter (Euro, Prototype)</description>
 		<year>1995</year>
@@ -14127,19 +14993,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="dkongc2g" cloneof="dkongc2">
-		<description>Donkey Kong Country 2 - Diddy's Kong Quest (Ger, Rev. A)</description>
-		<year>1995</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="donkey kong country 2 - diddy's kong quest (germany) (en,de) (rev 1).sfc" size="4194304" crc="2eb33785" sha1="5a5ee7c1e3d36530c3ebf98bdced2c9c3a0313ab" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dkongc2ga" cloneof="dkongc2">
 		<description>Donkey Kong Country 2 - Diddy's Kong Quest (Ger)</description>
 		<year>1995</year>
@@ -14477,18 +15330,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="dragon ball z - super butouden 2 (japan).sfc" size="2097152" crc="a5e37609" sha1="d5148a5cb1e7b01aac23fbe03bb735a2c29c4012" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dbzbuto3" cloneof="dbzmenac">
-		<!-- Serial: SHVC-AZ4J - Release Date: 1994-09-29 - Alt. Title: ドラゴンボールZ 超武闘伝3 -->
-		<description>Dragon Ball Z - Super Butouden 3 (Jpn)</description>
-		<year>1994</year>
-		<publisher>Bandai</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="dragon ball z - super butouden 3 (japan).sfc" size="2097152" crc="cbfde2d0" sha1="d4bbf593338be7e495a306b3980ef1ef45a251f4" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -15145,20 +15986,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="elfaria">
-		<!-- Serial: SHVC-H5 - Release Date: 1993-01-03 - Alt. Title: エルファリア -->
-		<description>Elfaria - The Isle of the Blest (Jpn)</description>
-		<year>1993</year>
-		<publisher>Hudson</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="elfaria - the isle of the blest (japan).sfc" size="1572864" crc="75993355" sha1="7c47b2f47969d6f0e6ce100ed5e915d964c8bd02" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="elfaria2">
 		<!-- Serial: SHVC-AEFJ - Release Date: 1995-06-09 - Alt. Title: エルファリアII ザ・クエスト・オ ブ・ザ・メルト -->
 		<description>Elfaria II - The Quest of the Meld (Jpn)</description>
@@ -15580,20 +16407,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="f-15 super strike eagle (japan).sfc" size="1048576" crc="f0202e26" sha1="40b6dd3958edc0e39c9c40ebee7675419b9b2fa6" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fzeroj" cloneof="fzero">
-		<!-- Serial: SHVC-FZ - Release Date: 1990-11-21 - Alt. Title: エフゼロ - Notes: Also re-released through Nintendo Power -->
-		<description>F-Zero (Jpn)</description> <!-- Revision A has the same ROM as the initial release -->
-		<year>1990</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="f-zero (japan).sfc" size="524288" crc="7681efc1" sha1="54d06d143383de0354788b07314c7dc238575dd0" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -17383,18 +18196,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="genocide 2 (japan) (beta).sfc" size="262144" crc="f8876331" sha1="646b4bb9df4ce9ba1f285f61fe6535f0cbe87833" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="genocid2">
-		<!-- Serial: SHVC-2I - Release Date: 1994-08-05 - Alt. Title: ジェノサイド 2 -->
-		<description>Genocide 2 (Jpn)</description>
-		<year>1994</year>
-		<publisher>Kemco</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="genocide 2 (japan).sfc" size="2097152" crc="de40aa12" sha1="947f72ebb7f3b19244103fa5a55c0a5a21267f23" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -19540,19 +20341,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="illtimef" cloneof="illtime">
-		<description>Illusion of Time (Fra)</description>
-		<year>1994</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="illusion of time (france).sfc" size="2097152" crc="63f6f934" sha1="025ed8b698b66100dbbeb66b8a91af2ea9d742f9" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="illtimeg" cloneof="illtime">
 		<description>Illusion of Time (Ger, Rev. A)</description>
 		<year>1994</year>
@@ -19719,17 +20507,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="international superstar soccer (usa).sfc" size="1048576" crc="49627238" sha1="93273a81b24473a0b72cbccbd90b96623033b8c8" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="issdx">
-		<description>International Superstar Soccer Deluxe (Euro)</description>
-		<year>1995</year>
-		<publisher>Konami</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="international superstar soccer deluxe (europe).sfc" size="2097152" crc="cba724ba" sha1="abdbf30d0987aca99183c451b7b9567e2ff67980" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -19914,17 +20691,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 				<rom name="itou hatasu rokudan no shougi doujou (japan).sfc" size="1048576" crc="bffce7c6" sha1="0c3f7f10748de085dd73e43522f69efa1f5cff4f" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="izzyqst">
-		<description>Izzy's Quest for the Olympic Rings (Euro)</description>
-		<year>1995</year>
-		<publisher>U.S. Gold</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="izzy's quest for the olympic rings (europe).sfc" size="2097152" crc="b096e82e" sha1="9b3c5a6887ba722ac29de0ea13afc38cd2091e33" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21108,17 +21874,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="jstrike">
-		<description>Jungle Strike (Euro)</description>
-		<year>1995</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="jungle strike (europe).sfc" size="2097152" crc="fb770320" sha1="07d155903f8d7cfa0b66f5e379163282987a635f" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="jstrikeu">
 		<!-- Serial:  - Release Date: 1995-06 -->
 		<description>Jungle Strike (USA)</description>
@@ -22197,21 +22952,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="kirbyfun" supported="no">
-		<!-- Serial:  - Release Date: 1996 -->
-		<description>Kirby's Fun Pak (Euro)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="SA1" />
-			<dataarea name="rom" size="4194304">
-				<rom name="kirby's fun pak (europe).sfc" size="4194304" crc="ce33dcfb" sha1="ce325ad271e91735ce19e9c2b8e0ad04dc103ae1" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kirbygt">
 		<description>Kirby's Ghost Trap (Euro)</description>
 		<year>1995</year>
@@ -22984,19 +23724,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="zelda3f" cloneof="zelda3">
-		<description>The Legend of Zelda - A Link to the Past (Fra)</description>
-		<year>1992</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="legend of zelda, the - a link to the past (france).sfc" size="1048576" crc="1f8c30e8" sha1="229364a1b92a05167cd38609b1aa98f7041987cc" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="zelda3g" cloneof="zelda3">
 		<description>The Legend of Zelda - A Link to the Past (Ger)</description>
 		<year>1992</year>
@@ -23345,17 +24072,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1310720">
 				<rom name="logos panic goaisatsu (japan).sfc" size="1310720" crc="4808e2b2" sha1="73d817b43224c3fa5e1bee697d25b7090c23b099" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="looneybb">
-		<description>Looney Tunes Basketball (Euro)</description>
-		<year>1995</year>
-		<publisher>Sunsoft</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="looney tunes basketball (europe).sfc" size="2097152" crc="fdf2f478" sha1="100afca042722209352682d705e3ae73bbb91ca8" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23775,17 +24491,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="mickeymq">
-		<description>The Magical Quest Starring Mickey Mouse (Euro, Rev. A)</description>
-		<year>1992</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="magical quest starring mickey mouse, the (europe) (rev 1).sfc" size="1048576" crc="d5caf96a" sha1="54c1bbf80b12c17983b830383f6bf79e2cbdc99e" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mickeymq1" cloneof="mickeymq">
 		<description>The Magical Quest Starring Mickey Mouse (Euro)</description>
 		<year>1992</year>
@@ -24131,20 +24836,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="mario is missing! (germany).sfc" size="1048576" crc="f6f739a9" sha1="fcd4a8c83efe83e8e15b03d83eb8f3f04a7d532f" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mariopic">
-		<!-- Serial: SHVC-ACXJ - Release Date: 1995-09-14 - Alt. Title: マリオのスーパーピクロス -->
-		<description>Mario no Super Picross (Jpn)</description>
-		<year>1995</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mario no super picross (japan).sfc" size="1048576" crc="f64c5aa0" sha1="c4200b9886b16c148b32d2c75d02f2a875d997cc" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -25476,17 +26167,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="mk">
-		<description>Mortal Kombat (Euro, Rev. A)</description>
-		<year>1993</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="mortal kombat (europe) (rev 1).sfc" size="2097152" crc="047b3d88" sha1="2b820cf5ea310db54cef4a1c0918023fec986ee4" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mka" cloneof="mk">
 		<description>Mortal Kombat (Euro)</description>
 		<year>1993</year>
@@ -26151,19 +26831,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="nbajamte">
-		<description>NBA Jam - Tournament Edition (Euro)</description>
-		<year>1995</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="nba jam - tournament edition (europe).sfc" size="3145728" crc="d48c8041" sha1="e22186ce64ae3c20152744157fdfc8b65a483e70" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="nbajamtej" cloneof="nbajamte">
 		<!-- Serial: SHVC-AJTJ - Release Date: 1995-02-24 - Alt. Title: NBA ジャム トーナメントエディション -->
 		<description>NBA Jam - Tournament Edition (Jpn)</description>
@@ -26782,19 +27449,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="nhl '94 (usa).sfc" size="1048576" crc="42212a77" sha1="10dcd21be9c5542e82b0b94473bf5ff569b36cf5" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nhl95">
-		<description>NHL '95 (Euro)</description>
-		<year>1994</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="nhl '95 (europe).sfc" size="1048576" crc="6930b67a" sha1="b7b8b974f970c39576ecc3612da727947fc2fb85" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -27541,8 +28195,22 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<year>1993</year>
 		<publisher>Pony Canyon</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" /> <!-- empty slot -->
+			<feature name="u5" value="U5 SRAM" />
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="none" /> <!-- similar to a standard JPN cart -->
+			<feature name="cart_back_label" value="none" />
 			<dataarea name="rom" size="1572864">
-				<rom name="oonita atsushi fmw (japan) (beta).sfc" size="1572864" crc="55581328" sha1="ce9d80233a978e3d29d54cabd8bf1555d813a4ff" offset="0x000000" />
+				<rom name="eprom.u1" size="524288" crc="8e95b72f" sha1="0fc6359ef462bfae0389ee3552d75ac41fb1df80" offset="0x000000" />
+				<rom name="eprom.u2" size="524288" crc="8fc77187" sha1="d02bb52ee5d020a145df4627b83bf2cd6a1224e0" offset="0x080000" />
+				<rom name="eprom.u3" size="524288" crc="0274f099" sha1="e3a9621a08402bb8931108aec8b069d03871b580" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28547,20 +29215,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="pga" supported="no">
-		<description>PGA European Tour (Euro)</description>
-		<year>1996</year>
-		<publisher>Black Pearl</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="SA1" />
-			<dataarea name="rom" size="1048576">
-				<rom name="pga european tour (europe).sfc" size="1048576" crc="be94e60d" sha1="cc1e7ddde84a6c7b8998d5be0555a79f10bcce52" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pgau" cloneof="pga" supported="no">
 		<!-- Serial:  - Release Date: 1996-09 -->
 		<description>PGA European Tour (USA)</description>
@@ -29153,17 +29807,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="pitfall">
-		<description>Pitfall - The Mayan Adventure (Euro)</description>
-		<year>1994</year>
-		<publisher>Activision</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="pitfall - the mayan adventure (europe).sfc" size="2097152" crc="7e9bc944" sha1="634b545e4ccaccc454a2e9eb256a8e96b4e75bb7" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pitfallup" cloneof="pitfall">
 		<description>Pitfall - The Mayan Adventure (USA, Prototype)</description>
 		<year>1994</year>
@@ -29664,20 +30307,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="powrsoko">
-		<!-- Serial: SHVC-BPSJ - Release Date: 1999-01-01 / 1999-06-25 - Alt. Title: パワー倉庫番 -->
-		<description>Power Soukoban (Jpn)</description>
-		<year>1999</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="power soukoban (japan).sfc" size="1048576" crc="39fbaa1e" sha1="4b69363051df75089169cb76e5abc6364ecbabf5" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="powermon">
 		<description>PowerMonger (Euro)</description>
 		<year>1993</year>
@@ -29801,17 +30430,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="prince of persia (usa).sfc" size="1048576" crc="891bb2bb" sha1="29ce1e32cf57d8284d0670949045c0d9128c3e1b" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ppersia2">
-		<description>Prince of Persia 2 - The Shadow &amp; The Flame (Euro)</description>
-		<year>1996</year>
-		<publisher>Titus</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="prince of persia 2 - the shadow &amp; the flame (europe).sfc" size="2097152" crc="2d25a9e1" sha1="5d1b73634baa29462ab878a8aa6e75facec96ffb" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -31923,19 +32541,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="evermoref" cloneof="evermore">
-		<description>Secret of Evermore (Fra)</description>
-		<year>1995</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="secret of evermore (france).sfc" size="3145728" crc="7425bb91" sha1="8a430c9d6a3dcef974252fe8d946a0d619bb1a61" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="evermores" cloneof="evermore">
 		<description>Secret of Evermore (Spa)</description>
 		<year>1995</year>
@@ -31969,19 +32574,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="secret of mana (europe).sfc" size="2097152" crc="c5cb2f26" sha1="d9aaf3119784887475da9548000738e1da84bee6" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="manaf" cloneof="mana">
-		<description>Secret of Mana (Fra, Rev. A)</description>
-		<year>1993</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="secret of mana (france) (rev 1).sfc" size="2097152" crc="e9334b9e" sha1="c1ff73ea67833748dbd4ecd393d3565e3ae1925d" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -32302,17 +32894,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="shanghai iii (japan).sfc" size="1048576" crc="dee271af" sha1="b12acf4078e2ade9769b8fead71c17a313565d1f" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shaqfu">
-		<description>Shaq Fu (Euro)</description>
-		<year>1994</year>
-		<publisher>Ocean</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="shaq fu (europe).sfc" size="2097152" crc="ddd55e27" sha1="b612314468f18009b98c165ca90a49332a532e93" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -33026,19 +33607,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="simcity (usa).sfc" size="524288" crc="8aedd3a1" sha1="9140ae08d62a562ccb98576ba89f381f9f4f1439" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="simcit2k">
-		<description>SimCity 2000 (Euro)</description>
-		<year>1996</year>
-		<publisher>Black Pearl</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="simcity 2000 (europe).sfc" size="2097152" crc="a1c28940" sha1="56ebb8c7e7ee6aad62b9e8a4bdc5c6d89dae40c2" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="32768">
 			</dataarea>
@@ -34031,17 +34599,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="spidmaxc">
-		<description>Spider-Man &amp; Venom - Maximum Carnage (Euro)</description>
-		<year>1994</year>
-		<publisher>LJN</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="spider-man &amp; venom - maximum carnage (europe).sfc" size="2097152" crc="d2b0d5fe" sha1="cc83ec37d7669834047510d6bbde1e0eee4667c9" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="spidmaxcu" cloneof="spidmaxc">
 		<!-- Serial:  - Release Date: 1994-09 -->
 		<description>Spider-Man &amp; Venom - Maximum Carnage (USA)</description>
@@ -34555,18 +35112,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="sfa2">
-		<description>Street Fighter Alpha 2 (Euro)</description>
-		<year>1996</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="S-DD1" />
-			<dataarea name="rom" size="4194304">
-				<rom name="street fighter alpha 2 (europe).sfc" size="4194304" crc="2f109101" sha1="73b3c0af2f169423cbbf2a672e6414f35388e04e" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sf2t">
 		<description>Street Fighter II Turbo (Euro, Rev. A)</description>
 		<year>1993</year>
@@ -34877,18 +35422,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 				<rom name="super adventure island ii (usa).sfc" size="1572864" crc="52fe16fd" sha1="06776efd3cc3997513f90fbe2507939a1c61bb87" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="airdiver">
-		<description>Super Air Diver (Euro)</description>
-		<year>1993</year>
-		<publisher>Sunsoft</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="DSP1" />
-			<dataarea name="rom" size="524288">
-				<rom name="super air diver (europe).sfc" size="524288" crc="0b57c764" sha1="f70567b9dc858bdb66d73d539390b7f74f00ff8a" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35310,18 +35843,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="super bomberman (europe).sfc" size="524288" crc="678501f2" sha1="82ea3a8a5a049e5b3813b884f2e8b8dbb585f065" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sbombmanj" cloneof="sbombman">
-		<!-- Serial: SHVC-H6 - Release Date: 1993-04-28 - Alt. Title: スーパーボンバーマン -->
-		<description>Super Bomberman (Jpn)</description>
-		<year>1993</year>
-		<publisher>Hudson</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="super bomberman (japan).sfc" size="524288" crc="7989891a" sha1="843364a881edf3d8cd8f799801a2a6d8f05d7a7d" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -37318,20 +37839,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 				<rom name="super mario rpg (japan).sfc" size="4194304" crc="5527071e" sha1="a9cd97041c4f8acf135d1ffb0a172748b5b976de" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smwj" cloneof="smw">
-		<!-- Serial: SHVC-MW - Release Date: 1990-11-21 - Alt. Title: スーパーマリオワールド - Notes: Also re-released through Nintendo Power -->
-		<description>Super Mario World - Super Mario Bros. 4 (Jpn)</description> <!-- Revision A has the same ROM as the initial release -->
-		<year>1990</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="super mario world (japan).sfc" size="524288" crc="0ec0ddac" sha1="f977afabf24ed269d86366209a460450bbc37e76" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -40270,19 +40777,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="terranigf" cloneof="terranig">
-		<description>Terranigma (Fra)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="terranigma (france).sfc" size="4194304" crc="614a7090" sha1="4f8a5771cb11757a31a026e5892b9434a3a405cb" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="terranigg" cloneof="terranig">
 		<description>Terranigma (Ger, Rev. A)</description>
 		<year>1996</year>
@@ -40322,17 +40816,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="tetrisdr">
-		<description>Tetris &amp; Dr. Mario (Euro)</description>
-		<year>1994</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="tetris &amp; dr. mario (europe).sfc" size="1048576" crc="523e4153" sha1="97acf69826f035e8530568763f55432c40898cf3" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tetris2">
 		<description>Tetris 2 (Euro)</description>
 		<year>1994</year>
@@ -40352,17 +40835,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="tetris 2 (usa) (rev 1).sfc" size="1048576" crc="3bc7054a" sha1="3d1545911ad024bac0ac7c68e8f77984fb25d278" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tetrisat">
-		<description>Tetris Attack (Euro)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="tetris attack (europe) (en,ja).sfc" size="1048576" crc="7417e83b" sha1="08e01f9ad5b6148e1a4355c80e2b23d8b2463443" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -41146,17 +41618,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 				<rom name="tower dream (japan).sfc" size="2097152" crc="aa2d5c55" sha1="7d9ead50fbad57d785b41e1136966ea8494bbd1d" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="toystory">
-		<description>Toy Story (Euro)</description>
-		<year>1995</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="toy story (europe) (en,fr,de).sfc" size="4194304" crc="b144d588" sha1="ccf547dd741bd98762662fdffd964df5b5791092" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -42509,17 +42970,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="warlock">
-		<description>Warlock (Euro)</description>
-		<year>1995</year>
-		<publisher>LJN</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="warlock (europe).sfc" size="2097152" crc="d90530ac" sha1="50e581458ae7643d2ff950e88a3d3461b0576946" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="warlockj" cloneof="warlock">
 		<!-- Serial: SHVC-AWKJ - Release Date: 1995-05-26 - Alt. Title: ウォーロック -->
 		<description>Warlock (Jpn)</description>
@@ -42751,17 +43201,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="whirlo (europe).sfc" size="1048576" crc="7379e3b3" sha1="9f3c77d02c7c476a460540cd5b72353a33e6d614" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="whizz">
-		<description>Whizz (Euro)</description>
-		<year>1996</year>
-		<publisher>Titus</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="whizz (europe).sfc" size="1048576" crc="762d214f" sha1="de8a253d1282841e9037e7208323687fc86ed5c6" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -43013,20 +43452,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 				<rom name="winning post 2 - program '96 (japan).sfc" size="3145728" crc="92954723" sha1="2528bb8524b12fb74140838e49640cf989a5b79f" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wgold">
-		<description>Winter Gold (Euro)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="GSU-2" />
-			<dataarea name="rom" size="2097152">
-				<rom name="winter gold (europe).sfc" size="2097152" crc="0f8378a6" sha1="dc7f33e6bb587d7290f6a2587bb31af15724dfa3" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
