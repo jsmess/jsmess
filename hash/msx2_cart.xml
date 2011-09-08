@@ -1344,6 +1344,122 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="rastansa">
+		<!-- ラスタン・サーガ -->
+		<description>Rastan Saga</description>
+		<year>1988</year>
+		<publisher>Tatio</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M-008M" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="262144">
+				<rom name="lh532069" size="262144" crc="84461e73" sha1="f787271597abbcb1297e4e8a4a9561959a195649" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="empereur">
+		<!-- ランペルール -->
+		<description>L'Empereur</description>
+		<year>1990</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-4M208-03A" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="LH5160-10L" />
+			<dataarea name="rom" size="524288">
+				<rom name="lh534g2s" size="524288" crc="c7521809" sha1="22f5998b4de47bf2ccc077d5881ac448e6b0484d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="retjelda">
+		<!-- リターン・オブ・ジェルダ -->
+		<description>Return of Jelda</description>
+		<year>1987</year>
+		<publisher>Carry Lab</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-1M008S" />
+			<feature name="mapper" value="LZ93A13" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh23109y" size="131072" crc="5ccc09ab" sha1="59f679c5ebf75de98b5e909da9182dbd80413364" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lupin3ca">
+		<!-- ルパン三世 カリオストロの城 -->
+		<description>Arsene Lupin 3rd - Cariostoro No Siro</description>
+		<year>1987</year>
+		<publisher>toho</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="lh231062" size="131072" crc="c4096e6b" sha1="e89fc7437d8f9aed1640689a32ebbf047699b147" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="replicar">
+		<!-- レプリカート -->
+		<description>Replicart</description>
+		<year>1987</year>
+		<publisher>Sony</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="MSX-2MX" />
+			<feature name="mapper" value="BS6101" />
+			<dataarea name="rom" size="131072">
+				<rom name="rp231024d" size="131072" crc="6eee12c4" sha1="afb693fd0a138cfc59a2bf81eabd7ca2abd4e162" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- does not seem to work in the generic msx2 driver -->
+	<software name="relics" supported="no">
+		<!-- レリクス -->
+		<description>Relics</description>
+		<year>1986</year>
+		<publisher>Bothtec</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP-16" />
+			<dataarea name="rom" size="262144">
+				<rom name="cxkk381000" size="262144" crc="babc68f2" sha1="02c3ec94190c6fce6fa4984d92be48b2697e7706" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="royalbld">
+		<!-- ロイヤルブラッド -->
+		<description>Royal Blood</description>
+		<year>1991</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TAS-8M308-64" />
+			<feature name="mapper" value="LZ93A13" />
+			<feature name="sram" value="LH5168D-10L" />
+			<dataarea name="rom" size="1048576">
+				<rom name="lh538a01" size="1048576" crc="fb9e42e1" sha1="522a53034cf40448d441683f3308fcb4b65e6d7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="romancia">
+		<!-- ロマンシア -->
+		<description>Romancia</description>
+		<year>1986</year>
+		<publisher>Falcom</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="MSX-2MX" />
+			<feature name="mapper" value="BS6101-16" />
+			<dataarea name="rom" size="131072">
+				<!-- CXK831000 and 831000-20 seen -->
+				<rom name="cxk831000" size="131072" crc="17f9ee7f" sha1="b63fc17c1d004ca4d7f3b1ef8962210a779ca665" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>

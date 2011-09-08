@@ -689,6 +689,34 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
+	<software name="relics">
+		<!-- レリクス -->
+		<description>Relics</description>
+		<year>1986</year>
+		<publisher>Bothtec</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="cxk381000" size="131072" crc="b612d79a" sha1="74ae85d44cb8ef1bae428c90200cb74be6d56d3a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="romancia">
+		<!-- ロマンシア -->
+		<description>Romancia</description>
+		<year>1987</year>
+		<publisher>Falcom</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="" />
+			<feature name="mapper" value="BS6101-16" />
+			<dataarea name="rom" size="131072">
+				<rom name="831000_20" size="131072" crc="387c1de7" sha1="2f0db48fbcf3444f52b9c7c76ba9c4bd38bc2a15" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="">
 		<description></description>
