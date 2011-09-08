@@ -17,14 +17,15 @@
 		<description>BDS-C-COMPILER v1.50A</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<!-- non-original disks -->
 		<part name="flop1" interface="floppy_8">
-			<dataarea name="flop" size="269568">
-				<rom name="bdsc1.img" size="269568" crc="9fc8ed2d" sha1="fe18e5c143b266d433a57cbcea6e4ecd8b5e2979" offset="0" />
+			<dataarea name="flop" size="256256">
+				<rom name="bdsc1.img" size="256256" crc="af9df302" sha1="55c8d79ea6e6e4caecda453dab059e3ad730c417" offset="0" flags="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_8">
-			<dataarea name="flop" size="269568">
-				<rom name="bdsc2.img" size="269568" crc="5e4263f0" sha1="6ea443d0ff7c9b320321b4a97992e794b7734dd8" offset="0" />
+			<dataarea name="flop" size="256256">
+				<rom name="bdsc2.img" size="256256" crc="8906f2fc" sha1="21108ec4970eece3f68626d4a489824e583a8641" offset="0" flags="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -67,8 +68,8 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop" interface="floppy_8">
-			<dataarea name="flop" size="269568">
-				<rom name="tos1.img" size="269568" crc="f5247f92" sha1="7fdd82237a16bb78ab8a96c04fb15833fa11b39b" offset="0" flags="baddump" />
+			<dataarea name="flop" size="256256">
+				<rom name="tos1.img" size="256256" crc="9dddec91" sha1="87be8fd481b7c4ff027221463c2193b4297a0744" offset="0" flags="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -78,8 +79,8 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop" interface="floppy_8">
-			<dataarea name="flop" size="269568">
-				<rom name="tos11.img" size="269568" crc="0b08d3b2" sha1="0016b08fa8ea3703cfe6965041f7a88fa3a92816" offset="0" flags="baddump" />
+			<dataarea name="flop" size="256256">
+				<rom name="tos11.img" size="256256" crc="fa13b53f" sha1="aac3949e40a4a594de64f264f329f2ff2f5a2f20" offset="0" flags="baddump" />
 			</dataarea>
 		</part>
 	</software>
