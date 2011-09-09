@@ -232,6 +232,13 @@ void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mir
 	memory_set_bankptr(machine(), tag, data);
 }
 
+void isa8_device::unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror)
+{
+	m_maincpu = machine().device(m_cputag);
+	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
+	space->unmap_readwrite(start, end, mask, mirror);
+}
+
 void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region)
 {
 	m_maincpu = machine().device(m_cputag);
@@ -240,6 +247,13 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t ma
 	space->install_read_bank(start, end, mask, mirror, tag);
 	space->unmap_write(start, end, mask, mirror);
 	memory_set_bankptr(machine(), tag, machine().region(dev->subtag(tempstring, region))->base());
+}
+
+void isa8_device::unmap_rom(offs_t start, offs_t end, offs_t mask, offs_t mirror)
+{
+	m_maincpu = machine().device(m_cputag);
+	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
+	space->unmap_read(start, end, mask, mirror);
 }
 
 // interrupt request from isa card
@@ -442,6 +456,24 @@ void isa16_device::install16_device(device_t *dev, offs_t start, offs_t end, off
 			break;
 		case 32:
 			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
+			break;
+		default:
+			fatalerror("ISA16: Bus width %d not supported", buswidth);
+			break;
+	}
+}
+
+void isa16_device::install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler)
+{
+	m_maincpu = machine().device(m_cputag);
+	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	switch(buswidth)
+	{
+		case 16:
+			m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0);
+			break;
+		case 32:
+			m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffffffff);
 			break;
 		default:
 			fatalerror("ISA16: Bus width %d not supported", buswidth);

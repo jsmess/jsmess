@@ -49,6 +49,8 @@
 #include "machine/isa_gblaster.h"
 #include "machine/isa_hdc.h"
 #include "machine/isa_sblaster.h"
+#include "machine/ne1000.h"
+#include "machine/ne2000.h"
 #include "video/isa_mda.h"
 
 #include "machine/isa_ide.h"
@@ -414,10 +416,12 @@ static SLOT_INTERFACE_START(pc_isa8_cards)
 	SLOT_INTERFACE("hercules", ISA8_HERCULES)
 	SLOT_INTERFACE("gblaster", ISA8_GAME_BLASTER)
 	SLOT_INTERFACE("sblaster", ISA8_SOUND_BLASTER_1_0)
+	SLOT_INTERFACE("ne1000", NE1000)
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(pc_isa16_cards)
 	SLOT_INTERFACE("ide", ISA16_IDE)
+	SLOT_INTERFACE("ne2000", NE2000)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( at_motherboard )
@@ -561,7 +565,8 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_ISA8_SLOT_ADD("isabus", "isa1", pc_isa8_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
 	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
-
+	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, "ne2000", NULL)
+	
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
 	/* internal ram */

@@ -562,6 +562,9 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/applefdc.o	\
 	$(MESS_DEVICES)/sonydriv.o	\
 	$(MESS_DEVICES)/appldriv.o	\
+	$(MESS_MACHINE)/dp8390.o	\
+	$(MESS_MACHINE)/ne1000.o	\
+	$(MESS_MACHINE)/ne2000.o	\
 
 
 

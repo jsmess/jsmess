@@ -158,6 +158,9 @@ public:
 	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
 	void install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region);
 
+	void unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror);
+	void unmap_rom(offs_t start, offs_t end, offs_t mask, offs_t mirror);
+
 	DECLARE_WRITE_LINE_MEMBER( irq2_w );
 	DECLARE_WRITE_LINE_MEMBER( irq3_w );
 	DECLARE_WRITE_LINE_MEMBER( irq4_w );
@@ -282,6 +285,7 @@ public:
 	isa16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void install16_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_device_func rhandler, const char* rhandler_name, write16_device_func whandler, const char *whandler_name);
+	void install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler);
 
 	DECLARE_WRITE_LINE_MEMBER( irq10_w );
 	DECLARE_WRITE_LINE_MEMBER( irq11_w );
