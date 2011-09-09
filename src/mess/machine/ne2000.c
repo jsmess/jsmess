@@ -29,7 +29,7 @@ ne2000_device::ne2000_device(const machine_config &mconfig, const char *tag, dev
 void ne2000_device::device_start() {
 	char mac[7];
 	UINT32 num = rand();
-	m_dp8390->set_interface("\\Device\\NPF_{E3865CFF-820F-404E-A930-5E12997AC8CF}"); // XXX make user configurable
+	m_dp8390->set_interface(0); // XXX make user configurable
 	memset(m_prom, 0x57, 16);
 	sprintf(mac+2, "\x1b%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
 	mac[0] = 0; mac[1] = 0;  // avoid gcc warning
