@@ -1,7 +1,7 @@
 #include "emu.h"
 #include "dp8390.h"
 
-#define BYTE_ORDER(w) ((m_regs.dcr & 3) == 3 ? ((data << 8) | (data >> 8)) : data)
+#define DP8390_BYTE_ORDER(w) ((m_regs.dcr & 3) == 3 ? ((data << 8) | (data >> 8)) : data)
 #define LOOPBACK (!(m_regs.dcr & 8) && (m_regs.tcr & 6))
 
 const device_type DP8390D = &device_creator<dp8390d_device>;
@@ -185,7 +185,7 @@ READ16_MEMBER(dp8390_device::dp8390_r) {
 			data |= mem_read(high16 + m_regs.crda++) << 8;
 			m_regs.rbcr -= (m_regs.rbcr < 2)?m_regs.rbcr:2;
 			check_dma_complete();
-			return BYTE_ORDER(data);
+			return DP8390_BYTE_ORDER(data);
 		} else {
 			m_regs.rbcr -= (m_regs.rbcr)?1:0;
 			data = mem_read(high16 + m_regs.crda++);
@@ -348,7 +348,7 @@ WRITE16_MEMBER(dp8390_device::dp8390_w) {
 	if(m_cs) {
 		UINT32 high16 = (m_regs.dcr & 4)?m_regs.rsar<<16:0;
 		if(m_regs.dcr & 1) {
-			data = BYTE_ORDER(data);
+			data = DP8390_BYTE_ORDER(data);
 			m_regs.crda &= ~1;
 			mem_write(high16 + m_regs.crda++, data & 0xff);
 			mem_write(high16 + m_regs.crda++, data >> 8);
