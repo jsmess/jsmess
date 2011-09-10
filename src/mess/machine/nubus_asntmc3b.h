@@ -5,7 +5,7 @@
 
 #include "emu.h"
 #include "machine/nubus.h"
-#include "machine/dp8390x.h"
+#include "machine/dp8390.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -27,6 +27,10 @@ public:
 		virtual machine_config_constructor device_mconfig_additions() const;
 		virtual const rom_entry *device_rom_region() const;
 
+        void dp_irq_w(int state);
+        DECLARE_READ8_MEMBER(dp_mem_read);
+        DECLARE_WRITE8_MEMBER(dp_mem_write);
+
 protected:
         // device-level overrides
         virtual void device_start();
@@ -37,12 +41,11 @@ protected:
         DECLARE_READ32_MEMBER(en_r);
         DECLARE_WRITE32_MEMBER(en_w);
 
-        required_device<dp8390x_device> m_dp83902;
-
-public:
-        UINT8 m_ram[0x20000];
+        required_device<dp8390_device> m_dp83902;
 
 private:
+        UINT8 m_ram[0x20000];
+        UINT8 m_prom[16];
 };
 
 

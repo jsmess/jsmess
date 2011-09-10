@@ -15,8 +15,16 @@
 #define ASNTMC3B_ROM_REGION  "asntm3b_rom"
 #define ASNTMC3B_DP83902  "dp83902"
 
+static const dp8390_interface dp8390_interface =
+{
+	DEVCB_LINE_MEMBER(nubus_asntm3b_device, dp_irq_w),
+	DEVCB_NULL,
+	DEVCB_MEMBER(nubus_asntm3b_device, dp_mem_read),
+	DEVCB_MEMBER(nubus_asntm3b_device, dp_mem_write)
+};
+
 MACHINE_CONFIG_FRAGMENT( asntm3b )
-	MCFG_DP8390X_ADD(ASNTMC3B_DP83902, 10000000)
+	MCFG_DP8390D_ADD(ASNTMC3B_DP83902, dp8390_interface)
 MACHINE_CONFIG_END
 
 ROM_START( asntm3b )
@@ -83,6 +91,13 @@ nubus_asntm3b_device::nubus_asntm3b_device(const machine_config &mconfig, device
 void nubus_asntm3b_device::device_start()
 {
 	UINT32 slotspace;
+	char mac[7];
+	UINT32 num = rand();
+	m_dp83902->set_interface(0); // XXX make user configurable
+	memset(m_prom, 0x57, 16);
+	sprintf(mac+2, "\x1b%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
+	mac[0] = mac[1] = 0;  // avoid gcc warning
+	memcpy(m_prom, mac, 6);
 
 	// set_nubus_device makes m_slot valid
 	set_nubus_device();
@@ -104,6 +119,8 @@ void nubus_asntm3b_device::device_start()
 
 void nubus_asntm3b_device::device_reset()
 {
+    m_dp83902->dp8390_reset(0);
+    m_dp83902->dp8390_cs(0);    // clear CS, we don't access RAM that way
 }
 
 WRITE8_MEMBER( nubus_asntm3b_device::asntm3b_ram_w )
@@ -120,12 +137,12 @@ WRITE32_MEMBER( nubus_asntm3b_device::en_w )
 {
     if (mem_mask == 0xff000000)
     {
-        m_dp83902->reg_w(space, offset, data>>24);
+        m_dp83902->dp8390_w(space, offset, data>>24);
     }
     else if (mem_mask == 0xffff0000)
     {
-        m_dp83902->reg_w(space, offset, data>>24);
-        m_dp83902->reg_w(space, offset+1, (data>>16)&0xff);
+        m_dp83902->dp8390_w(space, offset, data>>24);
+        m_dp83902->dp8390_w(space, offset+1, (data>>16)&0xff);
     }
     else
     {
@@ -137,7 +154,7 @@ READ32_MEMBER( nubus_asntm3b_device::en_r )
 {
     if (mem_mask == 0xff000000)
     {
-        return (m_dp83902->reg_r(space, offset)<<24);
+        return (m_dp83902->dp8390_r(space, offset)<<24);
     }
     else
     {
@@ -145,5 +162,42 @@ READ32_MEMBER( nubus_asntm3b_device::en_r )
     }
 
     return 0;
+}
+
+WRITE_LINE_MEMBER( nubus_asntm3b_device::dp_irq_w )
+{
+    if (state)
+    {
+        raise_slot_irq();
+    }
+    else
+    {
+        lower_slot_irq();
+    }
+}
+
+READ8_MEMBER( nubus_asntm3b_device::dp_mem_read ) 
+{
+	if(offset < 32) 
+    {
+        return m_prom[offset>>1];
+    }
+
+    if((offset < (16*1024)) || (offset >= ((16+64)*1024))) 
+    {
+		logerror("asntmc3b: invalid memory read %04X\n", offset);
+		return 0xff;
+	}
+	return m_ram[offset - (16*1024)];
+}
+
+WRITE8_MEMBER( nubus_asntm3b_device::dp_mem_write ) 
+{
+	if((offset < (16*1024)) || (offset >= ((16+64)*1024)))
+    {
+		logerror("asntmc3b: invalid memory write %04X\n", offset);
+		return;
+	}
+	m_ram[offset - (16*1024)] = data;
 }
 
