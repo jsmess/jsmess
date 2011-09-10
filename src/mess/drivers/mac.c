@@ -59,6 +59,8 @@
 #include "video/nubus_specpdq.h"
 #include "video/nubus_m2hires.h"
 #include "video/nubus_spec8.h"
+//#include "video/nubus_thundergx.h"
+#include "video/nubus_radiustpd.h"
 #include "machine/nubus_asntmc3b.h"
 #include "includes/mac.h"
 
@@ -736,6 +738,24 @@ static ADDRESS_MAP_START(macpb165c_map, AS_PROGRAM, 32, mac_state )
     AM_RANGE(0xfcff0000, 0xfcffffff) AM_ROM AM_REGION("bootrom", 0xf0000)
 ADDRESS_MAP_END
 */
+#if 0
+static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
+	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
+
+	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50002000, 0x50003fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff) AM_MIRROR(0x00f00000)
+// 50008000 = Ethernet MAC ID PROM
+// 5000a000 = Sonic (DP83932) ethernet
+// 5000f000 = SCSI cf96, 5000f402 = SCSI #2 cf96
+	AM_RANGE(0x5000c000, 0x5000dfff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x5001e000, 0x5001ffff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00f00000)
+
+	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	// f9800000 = VDAC / DAFB
+	AM_RANGE(0xf9000000, 0xf91fffff) AM_RAM	AM_BASE(m_vram)
+ADDRESS_MAP_END
+#endif
 
 static ADDRESS_MAP_START(pwrmac_map, AS_PROGRAM, 64, mac_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	// 8 MB standard
@@ -811,6 +831,8 @@ static SLOT_INTERFACE_START(mac_nubus_cards)
 	SLOT_INTERFACE("specpdq", NUBUS_SPECPDQ)	/* SuperMac Spectrum PDQ */
 	SLOT_INTERFACE("m2hires", NUBUS_M2HIRES)	/* Apple Macintosh II Hi-Resolution Card */
 	SLOT_INTERFACE("spec8s3", NUBUS_SPEC8S3)	/* SuperMac Spectrum/8 Series III */
+//	SLOT_INTERFACE("thundergx", NUBUS_THUNDERGX)		/* Radius Thunder GX (not yet) */
+	SLOT_INTERFACE("radiustpd", NUBUS_RADIUSTPD)		/* Radius Two Page Display */
 	SLOT_INTERFACE("asmc3b", NUBUS_ASNTMC3B)	/* Asante MC3B Ethernet card */
 SLOT_INTERFACE_END
 
@@ -1519,7 +1541,53 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_RAM_DEFAULT_SIZE("8M")
 	MCFG_RAM_EXTRA_OPTIONS("16M,32M,64M,128M")
 MACHINE_CONFIG_END
+#if 0
+static MACHINE_CONFIG_START( macqd700, mac_state )
 
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68040, 25000000)
+	MCFG_CPU_PROGRAM_MAP(quadra700_map)
+
+	MCFG_PALETTE_LENGTH(256)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, mac_asc_irq)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	/* nvram */
+	MCFG_NVRAM_HANDLER(mac)
+
+	/* devices */
+	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
+	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "cb264", NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nba", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbb", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbc", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL, NULL)
+	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL, NULL)
+
+	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
+
+	MCFG_IWM_ADD("fdc", mac_iwm_interface)
+	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
+
+	MCFG_SCC8530_ADD("scc", C7M)
+	MCFG_SCC8530_IRQ(mac_scc_irq)
+
+	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
+	MCFG_VIA6522_ADD("via6522_1", C7M/10, mac_via6522_2_intf)
+
+	MCFG_HARDDISK_ADD( "harddisk1" )
+	MCFG_HARDDISK_ADD( "harddisk2" )
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("8M,32M,64M,96M,128M,160M,192M,256M")
+MACHINE_CONFIG_END
+#endif
 static INPUT_PORTS_START( macplus )
 	PORT_START("MOUSE0") /* Mouse - button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
@@ -1948,7 +2016,12 @@ ROM_START( macpb170 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) )
 ROM_END
-
+#if 0
+ROM_START( macqd700 )
+	ROM_REGION32_BE(0x100000, "bootrom", 0)
+	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) )
+ROM_END
+#endif
 ROM_START( macpb160 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "e33b2724.rom", 0x000000, 0x100000, CRC(536c60f4) SHA1(c0510682ae6d973652d7e17f3c3b27629c47afac) )
@@ -1986,6 +2059,7 @@ COMP( 1990, maciisi,  0,		0,	maciisi,  maciici,  maciisi,	  "Apple Computer", "M
 COMP( 1991, macpb100, 0,        0,  macprtb,  macadb,   macprtb,	  "Apple Computer", "Macintosh PowerBook 100", GAME_NOT_WORKING )
 COMP( 1991, macpb140, 0,        0,  macpb140, macadb,   macpb140,	  "Apple Computer", "Macintosh PowerBook 140", GAME_NOT_WORKING )
 COMP( 1991, macpb170, macpb140, 0,  macpb170, macadb,   macpb140,	  "Apple Computer", "Macintosh PowerBook 170", GAME_NOT_WORKING )
+//COMP( 1991, macqd700, macpb140, 0,  macqd700, macadb,   macquadra700, "Apple Computer", "Macintosh Quadra 700", GAME_NOT_WORKING )
 COMP( 1991, macclas2, 0,		0,	macclas2, macadb,   macclassic2,  "Apple Computer", "Macintosh Classic II",  GAME_NOT_WORKING )
 COMP( 1991, maclc2,   0,		0,	maclc2,   maciici,  maclc2,	      "Apple Computer", "Macintosh LC II",  GAME_NOT_WORKING )
 COMP( 1992, macpb145, macpb140, 0,  macpb145, macadb,   macpb140,	  "Apple Computer", "Macintosh PowerBook 145", GAME_NOT_WORKING )

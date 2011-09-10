@@ -661,6 +661,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_VIDEO)/nubus_specpdq.o \
 	$(MESS_VIDEO)/nubus_m2hires.o \
 	$(MESS_VIDEO)/nubus_spec8.o \
+	$(MESS_VIDEO)/nubus_radiustpd.o \
     $(MESS_MACHINE)/nubus_asntmc3b.o \
     $(MESS_MACHINE)/dp8390x.o \
 
