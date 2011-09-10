@@ -92,7 +92,7 @@ void nubus_radiustpd_device::device_start()
 
 	// set_nubus_device makes m_slot valid
 	set_nubus_device();
-	install_declaration_rom(this, RADIUSTPD_ROM_REGION, true, true);
+	install_declaration_rom(this, RADIUSTPD_ROM_REGION, true);
 
 	slotspace = get_slotspace();
 
