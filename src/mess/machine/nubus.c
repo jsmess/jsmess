@@ -3,7 +3,7 @@
   nubus.c - NuBus bus and card emulation
 
   by R. Belmont, based heavily on Miodrag Milanovic's ISA8/16 implementation
-
+ 
 ***************************************************************************/
 
 #include "emu.h"
@@ -193,6 +193,42 @@ void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhan
 	}
 }
 
+void nubus_device::install_readonly_device(offs_t start, offs_t end, read32_delegate rhandler, UINT32 mask)
+{
+	m_maincpu = machine().device(m_cputag);
+	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	switch(buswidth)
+	{
+		case 32:
+			m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(start, end, rhandler, mask);
+			break;
+		case 64:
+			m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(start, end, rhandler, ((UINT64)mask<<32)|mask);
+			break;
+		default:
+			fatalerror("NUBUS: Bus width %d not supported", buswidth);
+			break;
+	}
+}
+
+void nubus_device::install_writeonly_device(offs_t start, offs_t end, write32_delegate whandler, UINT32 mask)
+{
+	m_maincpu = machine().device(m_cputag);
+	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	switch(buswidth)
+	{
+		case 32:
+			m_maincpu->memory().space(AS_PROGRAM)->install_write_handler(start, end, whandler, mask);
+			break;
+		case 64:
+			m_maincpu->memory().space(AS_PROGRAM)->install_write_handler(start, end, whandler, ((UINT64)mask<<32)|mask);
+			break;
+		default:
+			fatalerror("NUBUS: Bus width %d not supported", buswidth);
+			break;
+	}
+}
+
 void nubus_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
 //  printf("install_bank: %s @ %x->%x mask %x mirror %x\n", tag, start, end, mask, mirror);
@@ -294,7 +330,7 @@ void device_nubus_card_interface::install_bank(offs_t start, offs_t end, offs_t 
 	m_nubus->install_bank(start, end, mask, mirror, bank, data);
 }
 
-void device_nubus_card_interface::install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb)
+void device_nubus_card_interface::install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb, bool reverse_rom)
 {
 	bool inverted = false;
 	UINT8 *newrom = NULL;
@@ -305,6 +341,20 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 
 //  printf("ROM length is %x, last bytes are %02x %02x\n", romlen, rom[romlen-2], rom[romlen-1]);
 
+	if (reverse_rom)
+	{
+		UINT8 temp;
+		UINT32 endptr = romlen-1;
+
+		for (UINT32 idx = 0; idx < romlen / 2; idx++)
+		{
+			temp = rom[idx];
+			rom[idx] = rom[endptr];
+			rom[endptr] = temp;
+			endptr--;
+		}
+	}
+
 	UINT8 byteLanes = rom[romlen-1];
 	// check if all bits are inverted
 	if (rom[romlen-2] == 0xff)
@@ -312,6 +362,13 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 		byteLanes ^= 0xff;
 		inverted = true;
 	}
+
+	#if 0
+	FILE *f;
+	f = fopen("romout.bin", "wb");
+	fwrite(rom, romlen, 1, f);
+	fclose(f);
+	#endif
 
 	switch (byteLanes)
 	{
