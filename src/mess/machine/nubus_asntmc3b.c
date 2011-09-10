@@ -137,12 +137,12 @@ WRITE32_MEMBER( nubus_asntm3b_device::en_w )
 {
     if (mem_mask == 0xff000000)
     {
-        m_dp83902->dp8390_w(space, offset, data>>24);
+        m_dp83902->dp8390_w(space, 0xf-offset, data>>24);
     }
     else if (mem_mask == 0xffff0000)
     {
-        m_dp83902->dp8390_w(space, offset, data>>24);
-        m_dp83902->dp8390_w(space, offset+1, (data>>16)&0xff);
+        m_dp83902->dp8390_w(space, 0xf-offset, data>>24);
+        m_dp83902->dp8390_w(space, 0xf-(offset+1), (data>>16)&0xff);    // todo: is this correct?  or are 16-bit accesses to RAM (cs=1)?
     }
     else
     {
@@ -154,7 +154,11 @@ READ32_MEMBER( nubus_asntm3b_device::en_r )
 {
     if (mem_mask == 0xff000000)
     {
-        return (m_dp83902->dp8390_r(space, offset)<<24);
+        return (m_dp83902->dp8390_r(space, 0xf-offset)<<24);
+    }
+    else if (mem_mask == 0xffff0000)
+    {
+        return ((m_dp83902->dp8390_r(space, 0xf-offset)<<24)||(m_dp83902->dp8390_r(space, 0xf-(offset+1))<<16));
     }
     else
     {
