@@ -15,7 +15,7 @@
 #define RADIUSTPD_ROM_REGION  "tpd_rom"
 
 #define VRAM_SIZE	(0x40000)	// 256k.  1152x880 1 bit per pixel fits nicely.
-
+						  
 static SCREEN_UPDATE( radiustpd );
 
 MACHINE_CONFIG_FRAGMENT( radiustpd )
@@ -92,7 +92,7 @@ void nubus_radiustpd_device::device_start()
 
 	// set_nubus_device makes m_slot valid
 	set_nubus_device();
-	install_declaration_rom(this, RADIUSTPD_ROM_REGION, true);
+	install_declaration_rom(this, RADIUSTPD_ROM_REGION, true, true);
 
 	slotspace = get_slotspace();
 
