@@ -88,8 +88,8 @@
              1100 xaaa xxxx xxss               = config stop bits ss (00=1.5, 01=2, 1x=1)
              1011 xaaa xxxx xxpp               = config parity pp (1x=enable, x1=odd)
 
-          01ab cdef = line state of RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
-          00gh i000 = exception g=BRK, h=FRMERR, i=PARERR
+          00ab cdef = line state of RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
+          01gh i000 = exception g=BRK, h=FRMERR, i=PARERR
 
     The protocol changes back to normal mode after transmitting the control
     sequence.
@@ -417,14 +417,14 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 
 		case 5:
 			// Set the CTS line for RS232/1
-			LOG("TI-RS232/1: Setting CTS via CRU to %d\n", data);
-			output_line_state(card->uart[0], CTS, (data)? CTS : 0);
+			LOG("TI-RS232/1: Setting CTS* via CRU to %d\n", data);
+			output_line_state(card->uart[0], CTS, (data==0)? CTS : 0);
 			break;
 
 		case 6:
 			// Set the CTS line for RS232/2
-			LOG("TI-RS232/2: Setting CTS via CRU to %d\n", data);
-			output_line_state(card->uart[1], CTS, (data)? CTS : 0);
+			LOG("TI-RS232/2: Setting CTS* via CRU to %d\n", data);
+			output_line_state(card->uart[1], CTS, (data==0)? CTS : 0);
 			break;
 
 		case 7:
@@ -662,7 +662,7 @@ static UINT8 map_lines_in(device_t *carddev, int uartind, UINT8 value)
 
 	//    00ab cdef = setting line RTS=a, CTS=b, DSR=c, DCD=d, DTR=e, RI=f
 
-	if (VERBOSE>3) LOG("TI-RS232/%d: in connector pins = 0x%02x; translate for DTE\n", uartind+1, value);
+	if (VERBOSE>3) LOG("TI-RS232/%d: in connector pins = 0x%02x; translate from DTE\n", uartind+1, value);
 
 	if (value & BRK)
 	{

@@ -20,6 +20,7 @@ System Driver Changes:
 - fmtowns: Added interval timer 2, and 6-button controller support.  [Barry Rodewald]
 - amigafdc: Modernize, but don't change a thing (yet) [O. Galibert]
 - nc: Added NC150 Italian bios.  [Roberto Carlos Fernandez Gerhardt]
+- ti99: Fixed various glitches in TMS9902, improved documentation [Michael Zapf]
 
 Software Lists:
 ----------------
