@@ -3,6 +3,29 @@
     Tandberg TDV2324
 
     Skeleton driver
+	
+	Mainboard (pictures P1010036 & P1010038)
+	*28-pin: D27128, L4267096S,...(occluded by sticker: "965268 1")
+	*40-pin: TMS9937NL, DB 336, ENGLAND
+	*40-pin: P8085AH-2, F4265030, C INTEL '80 (there are 2 of these)
+	*28-pin: JAPAN 8442, 00009SS0, HN4827128G-25 (sticker: "962107")
+	*22-pin: ER3400, GI 8401HHA
+	*  -pin: MOSTEK C 8424, MK3887N-4 (Z80 Serial I/O Controller)
+	*20-pin: (sticker: "961420 0")
+	*24-pin: D2716, L3263271, INTEL '77 (sticker: "962058 1")
+	*3 tiny 16-pins which look socketed
+	*+B8412, DMPAL10L8NC
+	*PAL... (can't remove the sticker to read the rest since there's electrical components soldered above the chip)
+	*Am27S21DC, 835IDmm
+	*AM27S13DC, 8402DM (x2)
+	*TBP28L22N, GERMANY 406 A (x2)
+	*PAL16L6CNS, 8406
+
+	FD/HD Interface Board (pictures P1010031 & P1010033)
+	*28-pin: TMS, 2764JL-25, GHP8414
+	*40-pin: MC68802P, R1H 8340
+	*40-pin: WDC '79, FD1797PL-02, 8342 16
+	*14-pin: MC4024P, MG 8341
 
 */
 
@@ -10,6 +33,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "cpu/m6800/m6800.h"
 #include "machine/s1410.h"
 
 
@@ -31,6 +55,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tdv2324_sub_mem, AS_PROGRAM, 8, tdv2324_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("subcpu", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tdv2324_fdc_mem, AS_PROGRAM, 8, tdv2324_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("fdccpu", 0)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -77,6 +105,9 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 	MCFG_CPU_PROGRAM_MAP(tdv2324_sub_mem)
 	MCFG_CPU_CONFIG(i8085_sub_intf)
 
+	MCFG_CPU_ADD("fdccpu", M6802, 4000000)
+	MCFG_CPU_PROGRAM_MAP(tdv2324_fdc_mem)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_REFRESH_RATE( 50 )
@@ -103,7 +134,7 @@ ROM_START( tdv2324 )
 	ROM_REGION( 0x4000, "subcpu", 0 )
 	ROM_LOAD( "962107-1.bin", 0x0000, 0x4000, CRC(29c1a139) SHA1(f55fa9075fdbfa6a3e94e5120270179f754d0ea5) )
 
-	ROM_REGION( 0x2000, "unknown", 0 )
+	ROM_REGION( 0x2000, "fdccpu", 0 )
 	ROM_LOAD( "962014-1.bin", 0x0000, 0x2000, CRC(d01c32cd) SHA1(1f00f5f5ff0c035eec6af820b5acb6d0c207b6db) )
 
 	ROM_REGION( 0x4000, "chargen", 0 )
