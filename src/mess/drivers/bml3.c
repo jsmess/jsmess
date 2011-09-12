@@ -27,6 +27,7 @@
         16-31: same as above plus shows the bar at the bottom
 
 **************************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
@@ -38,8 +39,25 @@ class bml3_state : public driver_device
 {
 public:
 	bml3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_crtc(*this, "crtc"),
+	//m_cass(*this, CASSETTE_TAG),
+	m_beep(*this, BEEPER_TAG)
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
+	//required_device<cassette_image_device> m_cass;
+	required_device<device_t> m_beep;
+	DECLARE_WRITE8_MEMBER(bml3_6845_w);
+	DECLARE_READ8_MEMBER(bml3_keyboard_r);
+	DECLARE_READ8_MEMBER(bml3_io_r);
+	DECLARE_WRITE8_MEMBER(bml3_hres_reg_w);
+	DECLARE_WRITE8_MEMBER(bml3_vres_reg_w);
+	DECLARE_WRITE8_MEMBER(bml3_io_w);
+	DECLARE_READ8_MEMBER(bml3_vram_r);
+	DECLARE_WRITE8_MEMBER(bml3_vram_w);
 	UINT16 m_cursor_addr;
 	UINT16 m_cursor_raster;
 	UINT8 m_attr_latch;
@@ -49,12 +67,16 @@ public:
 	UINT8 m_keyb_press;
 	UINT8 m_keyb_press_flag;
 	int m_addr_latch;
+	UINT8 *m_p_chargen;
+	void m6845_change_clock(UINT8 setting);
 };
 
 
 
 static VIDEO_START( bml3 )
 {
+	bml3_state *state = machine.driver_data<bml3_state>();
+	state->m_p_chargen = machine.region("chargen")->base();
 }
 
 static SCREEN_UPDATE( bml3 )
@@ -63,7 +85,6 @@ static SCREEN_UPDATE( bml3 )
 	int x,y,count;
 	int xi,yi;
 	int width,height;
-	UINT8 *gfx_rom = screen->machine().region("char")->base();
 	UINT8 *vram = screen->machine().region("vram")->base();
 
 	count = 0x0000;
@@ -89,17 +110,17 @@ static SCREEN_UPDATE( bml3 )
 					int pen;
 
 					if(reverse)
-						pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? 0 : color;
+						pen = (state->m_p_chargen[tile*8+yi] >> (7-xi) & 1) ? 0 : color;
 					else
-						pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? color : 0;
+						pen = (state->m_p_chargen[tile*8+yi] >> (7-xi) & 1) ? color : 0;
 
 					if(height)
 					{
-						*BITMAP_ADDR16(bitmap, (y*8+yi)*2+0, x*8+xi) = screen->machine().pens[pen];
-						*BITMAP_ADDR16(bitmap, (y*8+yi)*2+1, x*8+xi) = screen->machine().pens[pen];
+						*BITMAP_ADDR16(bitmap, (y*8+yi)*2+0, x*8+xi) = pen;
+						*BITMAP_ADDR16(bitmap, (y*8+yi)*2+1, x*8+xi) = pen;
 					}
 					else
-						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine().pens[pen];
+						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = pen;
 				}
 			}
 
@@ -124,11 +145,11 @@ static SCREEN_UPDATE( bml3 )
 						{
 							if(height)
 							{
-								*BITMAP_ADDR16(bitmap, (y*8+yc+7)*2+0, x*8+xc) = screen->machine().pens[0x7];
-								*BITMAP_ADDR16(bitmap, (y*8+yc+7)*2+1, x*8+xc) = screen->machine().pens[0x7];
+								*BITMAP_ADDR16(bitmap, (y*8+yc+7)*2+0, x*8+xc) = 7;
+								*BITMAP_ADDR16(bitmap, (y*8+yc+7)*2+1, x*8+xc) = 7;
 							}
 							else
-								*BITMAP_ADDR16(bitmap, y*8+yc+7, x*8+xc) = screen->machine().pens[0x7];
+								*BITMAP_ADDR16(bitmap, y*8+yc+7, x*8+xc) = 7;
 						}
 					}
 				}
@@ -138,38 +159,36 @@ static SCREEN_UPDATE( bml3 )
 		}
 	}
 
-    return 0;
+	return 0;
 }
 
-static WRITE8_HANDLER( bml3_6845_w )
+WRITE8_MEMBER( bml3_state::bml3_6845_w )
 {
-	bml3_state *state = space->machine().driver_data<bml3_state>();
 	if(offset == 0)
 	{
-		state->m_addr_latch = data;
-		space->machine().device<mc6845_device>("crtc")->address_w(*space, 0, data);
+		m_addr_latch = data;
+		m_crtc->address_w(space, 0, data);
 	}
 	else
 	{
-		if(state->m_addr_latch == 0x0a)
-			state->m_cursor_raster = data;
-		if(state->m_addr_latch == 0x0e)
-			state->m_cursor_addr = ((data<<8) & 0x3f00) | (state->m_cursor_addr & 0xff);
-		else if(state->m_addr_latch == 0x0f)
-			state->m_cursor_addr = (state->m_cursor_addr & 0x3f00) | (data & 0xff);
+		if(m_addr_latch == 0x0a)
+			m_cursor_raster = data;
+		if(m_addr_latch == 0x0e)
+			m_cursor_addr = ((data<<8) & 0x3f00) | (m_cursor_addr & 0xff);
+		else if(m_addr_latch == 0x0f)
+			m_cursor_addr = (m_cursor_addr & 0x3f00) | (data & 0xff);
 
-		space->machine().device<mc6845_device>("crtc")->register_w(*space, 0, data);
+		m_crtc->register_w(space, 0, data);
 	}
 }
 
-static READ8_HANDLER( bml3_keyboard_r )
+READ8_MEMBER( bml3_state::bml3_keyboard_r )
 {
-	bml3_state *state = space->machine().driver_data<bml3_state>();
-	if(state->m_keyb_press_flag)
+	if(m_keyb_press_flag)
 	{
 		int res;
-		res = state->m_keyb_press;
-		state->m_keyb_press = state->m_keyb_press_flag = 0;
+		res = m_keyb_press;
+		m_keyb_press = m_keyb_press_flag = 0;
 		return res | 0x80;
 	}
 
@@ -177,14 +196,13 @@ static READ8_HANDLER( bml3_keyboard_r )
 }
 
 /* Note: this custom code is there just for simplicity, it'll be nuked in the end */
-static READ8_HANDLER( bml3_io_r )
+READ8_MEMBER( bml3_state::bml3_io_r )
 {
-	bml3_state *state = space->machine().driver_data<bml3_state>();
-	UINT8 *rom = space->machine().region("maincpu")->base();
+	UINT8 *rom = machine().region("maincpu")->base();
 
-	if(offset == 0x19) return state->m_io_latch;
+	if(offset == 0x19) return m_io_latch;
 	if(offset == 0xc4) return 0xff; //some video modes wants this to be high
-//  if(offset == 0xc5 || offset == 0xca) return space->machine().rand(); //tape related
+//  if(offset == 0xc5 || offset == 0xca) return machine().rand(); //tape related
 	if(offset == 0xc8) return 0; //??? checks bit 7, scrolls vertically if active high
 	if(offset == 0xc9) return 0x11; //0x01 put 320 x 200 mode, 0x07 = 640 x 375
 
@@ -194,7 +212,7 @@ static READ8_HANDLER( bml3_io_r )
 //  if(offset == 0x44) return 0 ? 0xff : 0x00;
 //  if(offset == 0x46) return 0 ? 0xff : 0x00;
 
-	if(offset == 0xd8) return state->m_attr_latch;
+	if(offset == 0xd8) return m_attr_latch;
 	if(offset == 0xe0) return bml3_keyboard_r(space,0);
 
 //  if(offset == 0xcb)
@@ -203,17 +221,17 @@ static READ8_HANDLER( bml3_io_r )
 
 	if(offset < 0xf0)
 	{
-		//if(cpu_get_pc(&space->device()) != 0xf838 && cpu_get_pc(&space->device()) != 0xfac4 && cpu_get_pc(&space->device()) != 0xf83c)
+		//if(cpu_get_pc(m_maincpu) != 0xf838 && cpu_get_pc(m_maincpu) != 0xfac4 && cpu_get_pc(m_maincpu) != 0xf83c)
 		if(offset >= 0xd0 && offset < 0xe0)
-			logerror("I/O read [%02x] at PC=%04x\n",offset,cpu_get_pc(&space->device()));
-		return 0;//space->machine().rand();
+			logerror("I/O read [%02x] at PC=%04x\n",offset,cpu_get_pc(m_maincpu));
+		return 0;//machine().rand();
 	}
 
 	/* TODO: pretty sure that there's a bankswitch for this */
 	return rom[offset+0xff00];
 }
 
-static void m6845_change_clock(running_machine &machine, UINT8 setting)
+void bml3_state::m6845_change_clock(UINT8 setting)
 {
 	int m6845_clock = XTAL_3_579545MHz;
 
@@ -225,71 +243,77 @@ static void m6845_change_clock(running_machine &machine, UINT8 setting)
 		case 0x88: m6845_clock = XTAL_3_579545MHz/1; break; //640 x 375
 	}
 
-	machine.device<mc6845_device>("crtc")->set_clock(m6845_clock);
+	m_crtc->set_clock(m6845_clock);
 }
 
-static WRITE8_HANDLER( bml3_hres_reg_w )
+WRITE8_MEMBER( bml3_state::bml3_hres_reg_w )
 {
-	bml3_state *state = space->machine().driver_data<bml3_state>();
 	/*
     x--- ---- width (1) 80 / (0) 40
     -x-- ---- used in some modes, unknown purpose
     --x- ---- used in some modes, unknown purpose (also wants $ffc4 to be 0xff), color / monochrome switch?
     */
 
-	state->m_hres_reg = data;
+	m_hres_reg = data;
 
-	m6845_change_clock(space->machine(),(state->m_hres_reg & 0x80) | (state->m_vres_reg & 0x08));
+	m6845_change_clock((m_hres_reg & 0x80) | (m_vres_reg & 0x08));
 }
 
-static WRITE8_HANDLER( bml3_vres_reg_w )
+WRITE8_MEMBER( bml3_state::bml3_vres_reg_w )
 {
-	bml3_state *state = space->machine().driver_data<bml3_state>();
 	/*
     ---- x--- char height
     */
-	state->m_vres_reg = data;
+	m_vres_reg = data;
 
-	m6845_change_clock(space->machine(),(state->m_hres_reg & 0x80) | (state->m_vres_reg & 0x08));
+	m6845_change_clock((m_hres_reg & 0x80) | (m_vres_reg & 0x08));
 }
 
-static WRITE8_HANDLER( bml3_io_w )
+WRITE8_MEMBER( bml3_state::bml3_io_w )
 {
-	bml3_state *state = space->machine().driver_data<bml3_state>();
-	if(offset == 0x19)							{ state->m_io_latch = data; } //???
-//  else if(offset == 0xc4)                     { /* system latch, writes 0x53 -> 0x51 when a tape is loaded */}
-	else if(offset == 0xc6 || offset == 0xc7)	{ bml3_6845_w(space,offset-0xc6,data); }
-	else if(offset == 0xd0)						{ bml3_hres_reg_w(space,0,data);  }
-	else if(offset == 0xd3)						{ beep_set_state(space->machine().device(BEEPER_TAG),!(data & 0x80)); }
-	else if(offset == 0xd6)						{ bml3_vres_reg_w(space,0,data); }
-	else if(offset == 0xd8)						{ state->m_attr_latch = data; }
+	if(offset == 0x19)
+		m_io_latch = data; //???
+//	else
+	if(offset == 0xc4)
+		{/* system latch, writes 0x53 -> 0x51 when a tape is loaded */}
 	else
-	{
-		logerror("I/O write %02x -> [%02x] at PC=%04x\n",data,offset,cpu_get_pc(&space->device()));
-	}
+	if(offset == 0xc6 || offset == 0xc7)
+		bml3_6845_w(space,offset-0xc6,data);
+	else
+	if(offset == 0xd0)
+		bml3_hres_reg_w(space,0,data);
+	else
+	if(offset == 0xd3)
+		beep_set_state(m_beep,!BIT(data, 7));
+	else
+	if(offset == 0xd6)
+		bml3_vres_reg_w(space,0,data);
+	else
+	if(offset == 0xd8)
+		m_attr_latch = data;
+	else
+		logerror("I/O write %02x -> [%02x] at PC=%04x\n",data,offset,cpu_get_pc(m_maincpu));
 }
 
-static READ8_HANDLER( bml3_vram_r )
+READ8_MEMBER( bml3_state::bml3_vram_r )
 {
-	bml3_state *state = space->machine().driver_data<bml3_state>();
-	UINT8 *vram = space->machine().region("vram")->base();
+	UINT8 *vram = machine().region("vram")->base();
 
 	/* TODO: this presumably also triggers an attr latch read, unsure yet */
-	state->m_attr_latch = vram[offset+0x4000];
+	m_attr_latch = vram[offset+0x4000];
 
 	return vram[offset];
 }
 
-static WRITE8_HANDLER( bml3_vram_w )
+WRITE8_MEMBER( bml3_state::bml3_vram_w )
 {
-	bml3_state *state = space->machine().driver_data<bml3_state>();
-	UINT8 *vram = space->machine().region("vram")->base();
+	UINT8 *vram = machine().region("vram")->base();
 
 	vram[offset] = data;
-	vram[offset+0x4000] = state->m_attr_latch;
+	vram[offset+0x4000] = m_attr_latch;
 }
 
-static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x43ff) AM_READWRITE(bml3_vram_r,bml3_vram_w)
@@ -481,11 +505,11 @@ static const gfx_layout bml3_charlayout =
 };
 
 static GFXDECODE_START( bml3 )
-	GFXDECODE_ENTRY( "char", 0, bml3_charlayout, 0, 4 )
+	GFXDECODE_ENTRY( "chargen", 0, bml3_charlayout, 0, 4 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( bml3, bml3_state )
-    /* basic machine hardware */
+	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(bml3_mem)
 //  MCFG_CPU_VBLANK_INT("screen", bml3_irq )
@@ -502,41 +526,38 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE(bml3)
-
+	MCFG_VIDEO_START(bml3)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(bml3)
 	MCFG_GFXDECODE(bml3)
-
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
-
-	MCFG_VIDEO_START(bml3)
-
+	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
+	/* Devices */
+	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/8))
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( bml3 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 //  ROM_LOAD( "l3bas.rom", 0xa000, 0x6000, BAD_DUMP CRC(d81baa07) SHA1(a8fd6b29d8c505b756dbf5354341c48f9ac1d24d)) //original, 24k isn't a proper rom size!
 	/* Handcrafted ROMs, rom labels and contents might not match */
 	ROM_LOAD( "598 p16611.ic3", 0xa000, 0x2000, BAD_DUMP CRC(954b9bad) SHA1(047948fac6808717c60a1d0ac9205a5725362430))
 	ROM_LOAD( "599 p16561.ic4", 0xc000, 0x2000, BAD_DUMP CRC(b27a48f5) SHA1(94cb616df4caa6415c5076f9acdf675acb7453e2))
 	ROM_LOAD( "600 p16681.ic5", 0xe000, 0x2000, BAD_DUMP CRC(fe3988a5) SHA1(edc732f1cd421e0cf45ffcfc71c5589958ceaae7))
 
-    ROM_REGION( 0x800, "char", 0 )
+	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD("char.rom", 0x00000, 0x00800, BAD_DUMP CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) ) //Taken from Sharp X1
 	ROM_FILL( 0x0000, 0x0008, 0x00)
 
-    ROM_REGION( 0x8000, "vram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "vram", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1980, bml3,	0,       0, 		bml3,	bml3,	 0, 	   "Hitachi",   "Basic Master Level 3",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY         FULLNAME           FLAGS */
+COMP( 1980, bml3,   0,      0,       bml3,      bml3,    0,      "Hitachi", "Basic Master Level 3", GAME_NOT_WORKING | GAME_NO_SOUND)
 
