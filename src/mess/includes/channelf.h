@@ -7,6 +7,11 @@
 #ifndef CHANNELF_H_
 #define CHANNELF_H_
 
+#include "emu.h"
+#include "cpu/f8/f8.h"
+#include "imagedev/cartslot.h"
+
+
 /* SKR - 2102 RAM chip on carts 10 and 18 I/O ports */
 typedef struct
 {
@@ -24,12 +29,25 @@ public:
 	channelf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT8 *m_videoram;
+	DECLARE_READ8_MEMBER(channelf_port_0_r);
+	DECLARE_READ8_MEMBER(channelf_port_1_r);
+	DECLARE_READ8_MEMBER(channelf_port_4_r);
+	DECLARE_READ8_MEMBER(channelf_port_5_r);
+	DECLARE_READ8_MEMBER(channelf_2102A_r);
+	DECLARE_READ8_MEMBER(channelf_2102B_r);
+	DECLARE_WRITE8_MEMBER(channelf_port_0_w);
+	DECLARE_WRITE8_MEMBER(channelf_port_1_w);
+	DECLARE_WRITE8_MEMBER(channelf_port_4_w);
+	DECLARE_WRITE8_MEMBER(channelf_port_5_w);
+	DECLARE_WRITE8_MEMBER(channelf_2102A_w);
+	DECLARE_WRITE8_MEMBER(channelf_2102B_w);
+	UINT8 *m_p_videoram;
 	UINT8 m_latch[6];
 	r2102_t m_r2102;
 	UINT8 m_val_reg;
 	UINT8 m_row_reg;
 	UINT8 m_col_reg;
+	UINT8 port_read_with_latch(UINT8 ext, UINT8 latch_state);
 };
 
 

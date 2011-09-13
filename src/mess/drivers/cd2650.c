@@ -187,6 +187,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1977, cd2650,  0,       0,	cd2650, 	cd2650, 	 0,   "Central Data",   "CD 2650",		GAME_NOT_WORKING | GAME_NO_SOUND )
-
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY        FULLNAME       FLAGS */
+COMP( 1977, cd2650, 0,      0,       cd2650,    cd2650,  0,   "Central Data",   "CD 2650", GAME_NOT_WORKING | GAME_NO_SOUND )

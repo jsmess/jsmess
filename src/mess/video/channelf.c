@@ -1,4 +1,3 @@
-#include "emu.h"
 #include "includes/channelf.h"
 
 static const rgb_t channelf_palette[] =
@@ -38,7 +37,7 @@ PALETTE_INIT( channelf )
 VIDEO_START( channelf )
 {
 	channelf_state *state = machine.driver_data<channelf_state>();
-	state->m_videoram = auto_alloc_array(machine, UINT8, 0x2000);
+	state->m_p_videoram = machine.region("vram")->base();
 }
 
 static int recalc_palette_offset(int reg1, int reg2)
@@ -52,21 +51,21 @@ static int recalc_palette_offset(int reg1, int reg2)
 SCREEN_UPDATE( channelf )
 {
 	channelf_state *state = screen->machine().driver_data<channelf_state>();
-	UINT8 *videoram = state->m_videoram;
-	int x,y,offset, palette_offset;
-	int color;
-	UINT16 pen;
+	UINT8 y,col;
+	UINT16 ma=0,x;
+	int palette_offset;
 
-	for(y=0;y<64;y++)
+	for(y = 0; y < 64; y++ )
 	{
-		palette_offset = recalc_palette_offset(videoram[y*128+125]&3,videoram[y*128+126]&3);
-		for (x=0;x<128;x++)
+		UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+		palette_offset = recalc_palette_offset(state->m_p_videoram[y*128+125]&3, state->m_p_videoram[y*128+126]&3);
+
+		for (x = ma; x < ma + 128; x++)
 		{
-			offset = y*128+x;
-			color = palette_offset+(videoram[offset]&3);
-			pen = colormap[color];
-			*BITMAP_ADDR16(bitmap, y, x) = pen;
+			col = palette_offset+(state->m_p_videoram[x|(y<<7)]&3);
+			*p++ = colormap[col];
 		}
+		ma+=128;
 	}
 	return 0;
 }
