@@ -11,6 +11,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "imagedev/snapquik.h"
+#include "machine/kc_keyb.h"
 #include "machine/kcexp.h"
 #include "machine/kc_ram.h"
 #include "machine/kc_rom.h"
@@ -27,32 +28,6 @@
 #define KC85_SCREEN_WIDTH 320
 #define KC85_SCREEN_HEIGHT 256
 
-/* number of keycodes that can be stored in queue */
-#define KC_KEYCODE_QUEUE_LENGTH 256
-
-#define KC_KEYBOARD_NUM_LINES	9
-
-typedef struct kc_keyboard
-{
-	/* list of stored keys */
-	unsigned char keycodes[KC_KEYCODE_QUEUE_LENGTH];
-	/* index of start of list */
-	int head;
-	/* index of end of list */
-	int tail;
-
-	/* transmitting state */
-	int transmit_state;
-
-	/* number of pulses remaining to be transmitted */
-	int	transmit_pulse_count_remaining;
-	/* count of pulses transmitted so far */
-	int transmit_pulse_count;
-
-	/* pulses to transmit */
-	unsigned char transmit_buffer[32];
-} kc_keyboard;
-
 
 class kc_state : public driver_device
 {
@@ -65,9 +40,7 @@ public:
 	emu_timer *m_cassette_timer;
 	int m_cassette_motor_state;
 	unsigned char m_ardy;
-	int m_previous_keyboard[KC_KEYBOARD_NUM_LINES-1];
 	unsigned char m_brdy;
-	kc_keyboard m_keyboard_data;
 	int m_kc85_84_data;
 	int m_kc85_86_data;
 	int m_kc85_50hz_state;
@@ -116,6 +89,7 @@ WRITE8_HANDLER(kc85_4_86_w);
 extern const z80pio_interface kc85_2_pio_intf;
 extern const z80pio_interface kc85_4_pio_intf;
 extern const z80ctc_interface kc85_ctc_intf;
+extern const kc_keyb_interface kc85_keyboard_interface;
 
 
 /*** MODULE SYSTEM ***/
