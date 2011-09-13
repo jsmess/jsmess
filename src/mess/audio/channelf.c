@@ -1,6 +1,3 @@
-#include <math.h>
-
-#include "emu.h"
 #include "includes/channelf.h"
 
 
