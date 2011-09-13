@@ -32,7 +32,7 @@
 #define I8085A_1_TAG		"subcpu"
 #define TMS9937NL_TAG		"tms9937"
 
-#define MC68802P_TAG		"12b"
+#define MC68B02P_TAG		"12b"
 #define FD1797PL02_TAG		"fd1797"
 
 #define SCREEN_TAG			"screen"
@@ -50,7 +50,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, I8085A_0_TAG),
 		  m_subcpu(*this, I8085A_1_TAG),
-		  m_fdccpu(*this, MC68802P_TAG)
+		  m_fdccpu(*this, MC68B02P_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
