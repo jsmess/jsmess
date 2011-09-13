@@ -93,6 +93,7 @@
 #include "cpu/i8085/i8085.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/s1410.h"
+#include "video/tms9927.h"
 
 
 class tdv2324_state : public driver_device
@@ -149,8 +150,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tdv2324_sub_io, AS_IO, 8, tdv2324_state )
 	//ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* 20, 23, 30-36, 38, 3a, 3c, 3e, 60, 70 are written to */
-	/* 30-36 may be tms9937 */
 	/* 60 may be a shared ram semaphore as it writes it immediately before reading the 5000 area */
+	AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE_LEGACY("tms9937", tms9927_r, tms9927_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tdv2324_fdc_mem, AS_PROGRAM, 8, tdv2324_state )
@@ -176,6 +177,13 @@ bool tdv2324_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	return 0;
 }
 
+static const tms9927_interface vtac_intf =
+{
+	"screen",
+	8,
+	NULL
+};
+
 static I8085_CONFIG( i8085_intf )
 {
 	DEVCB_NULL,			/* STATUS changed callback */
@@ -196,12 +204,12 @@ static I8085_CONFIG( i8085_sub_intf )
 
 static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 	/* basic system hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, 4000000)
+	MCFG_CPU_ADD("maincpu", I8085A, 8700000/2) // ???
 	MCFG_CPU_PROGRAM_MAP(tdv2324_mem)
 	MCFG_CPU_IO_MAP(tdv2324_io)
 	MCFG_CPU_CONFIG(i8085_intf)
 
-	MCFG_CPU_ADD("subcpu", I8085A, 4000000)
+	MCFG_CPU_ADD("subcpu", I8085A, 8000000/2) // ???
 	MCFG_CPU_PROGRAM_MAP(tdv2324_sub_mem)
 	MCFG_CPU_IO_MAP(tdv2324_sub_io)
 	MCFG_CPU_CONFIG(i8085_sub_intf)
@@ -218,6 +226,8 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
+	
+	MCFG_TMS9927_ADD("tms9937", XTAL_25_39836MHz, vtac_intf)
 
 	// devices
 	MCFG_S1410_ADD() // 104521-F ROM
