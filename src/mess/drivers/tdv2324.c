@@ -3,7 +3,23 @@
     Tandberg TDV2324
 
     Skeleton driver
+    By Curt Coder with some work by Lord Nightmare
+
+	Status:
+	* Main cpu is currently hacked to read i/o port 0xE6 as 0x10;
+	  it then seems to copy code to a ram area then jumps there
+	  (there may be some sort of overlay/banking mess going on to allow full 64kb of ram)
+	  The cpu gets stuck reading i/o port 0x30 in a loop.
+	  - interrupts and sio lines are not hooked up
+	* Sub cpu does a bunch of unknown i/o accesses and also tries to
+	  sequentially read chunk of address space which it never writes to;
+	  this seems likely to be a shared ram or i/o mapped area especially since it seems
+	  to write to i/o port 0x60 before trying to read there.
+	  - interrupts and sio lines are not hooked up
+	* Fdc cpu starts, does a rom checksum (which passes) and tests a ram area
+	  
 	
+	Board Notes:
 	Mainboard (pictures P1010036 & P1010038)
 	*28-pin: D27128, L4267096S,...(occluded by sticker: "965268 1")
 	*40-pin: TMS9937NL, DB 336, ENGLAND
@@ -27,7 +43,49 @@
 	*40-pin: WDC '79, FD1797PL-02, 8342 16
 	*14-pin: MC4024P, MG 8341
 
+
 */
+/*
+'subcpu' (17CD): unmapped i/o memory write to 23 = 36 & FF
+'subcpu' (17D1): unmapped i/o memory write to 23 = 76 & FF
+'subcpu' (17D5): unmapped i/o memory write to 23 = B6 & FF
+'subcpu' (17DB): unmapped i/o memory write to 20 = 1A & FF
+'subcpu' (17DE): unmapped i/o memory write to 20 = 00 & FF
+'subcpu' (17E0): unmapped i/o memory write to 3E = 00 & FF
+'subcpu' (17E2): unmapped i/o memory write to 3A = 00 & FF
+'subcpu' (17E6): unmapped i/o memory write to 30 = 74 & FF
+'subcpu' (17EA): unmapped i/o memory write to 31 = 7F & FF
+'subcpu' (17EE): unmapped i/o memory write to 32 = 6D & FF
+'subcpu' (17F2): unmapped i/o memory write to 33 = 18 & FF
+'subcpu' (17F6): unmapped i/o memory write to 34 = 49 & FF
+'subcpu' (17FA): unmapped i/o memory write to 35 = 20 & FF
+'subcpu' (17FE): unmapped i/o memory write to 36 = 18 & FF
+'subcpu' (1801): unmapped i/o memory write to 3C = 00 & FF
+'subcpu' (1803): unmapped i/o memory write to 3C = 00 & FF
+'subcpu' (1805): unmapped i/o memory write to 3E = 00 & FF
+'subcpu' (0884): unmapped i/o memory write to 10 = 97 & FF
+'subcpu' (0888): unmapped i/o memory write to 10 = 96 & FF
+
+'fdccpu' (E004): unmapped program memory read from 3C05 & FF
+'fdccpu' (E007): unmapped program memory read from C000 & FF
+'fdccpu' (E00A): unmapped program memory read from A000 & FF
+'fdccpu' (E012): unmapped program memory write to F000 = D0 & FF
+'fdccpu' (E015): unmapped program memory read from 3801 & FF
+'fdccpu' (E018): unmapped program memory read from 3C06 & FF
+'fdccpu' (E01B): unmapped program memory read from 3C04 & FF
+
+'fdccpu' (E070): unmapped program memory write to 2101 = 01 & FF
+'fdccpu' (E07C): unmapped program memory read from 6000 & FF
+'fdccpu' (E07F): unmapped program memory read from 380D & FF
+'fdccpu' (E082): unmapped program memory read from 380F & FF
+'fdccpu' (E085): unmapped program memory read from 3803 & FF
+'fdccpu' (E08B): unmapped program memory write to 6000 = 08 & FF
+'fdccpu' (E08E): unmapped program memory write to 8000 = 08 & FF
+'fdccpu' (E091): unmapped program memory write to 6000 = 00 & FF
+'fdccpu' (E099): unmapped program memory write to F800 = 55 & FF
+...
+*/
+
 
 #define ADDRESS_MAP_MODERN
 
@@ -41,24 +99,65 @@ class tdv2324_state : public driver_device
 {
 public:
 	tdv2324_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
+		  m_subcpu(*this, "subcpu"),
+		  m_fdccpu(*this, "fdccpu")
+		{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_fdccpu;
+	DECLARE_READ8_MEMBER( tdv2324_main_io_e6 );
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
+/* Read/Write handlers */
+
+// Not sure what this is for, i/o read at 0xE6 on maincpu, post fails if it does not return bit 4 set
+READ8_MEMBER( tdv2324_state::tdv2324_main_io_e6 )
+{
+	return 0x10; // TODO: this should actually return something meaningful, for now is enough to pass early boot test
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( tdv2324_mem, AS_PROGRAM, 8, tdv2324_state )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("maincpu", 0)
+	/* when copying code to 4000 area it runs right off the end of rom;
+	 * I'm not sure if its supposed to mirror or read as open bus */
+	AM_RANGE(0x4000, 0x5fff) AM_RAM // 0x4000 has the boot code copied to it, 5fff and down are the stack
+	AM_RANGE(0x6000, 0x6fff) AM_RAM // used by the relocated boot code; shared?
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tdv2324_io, AS_IO, 8, tdv2324_state )
+	//ADDRESS_MAP_GLOBAL_MASK(0xff)
+	/* 0x30 is read by main code and if high bit isn't set at some point it will never get anywhere */
+	/* e0, e2, e8, ea are written to */
+	/* 30, e6 and e2 are readable */
+	AM_RANGE(0xE6,0xE6) AM_READ(tdv2324_main_io_e6) // bit 4 is a status for something, post will not continue until it returns 1
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tdv2324_sub_mem, AS_PROGRAM, 8, tdv2324_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("subcpu", 0)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM // ram exists at least here, acts as stack?
+	AM_RANGE(0x5000, 0x503f) AM_RAM // subcpu reads here (5000-5021) without writing first, implies this ram is shared
+	AM_RANGE(0x6000, 0x7fff) AM_RAM // it floodfills this area with 0; is this a framebuffer? or shared ram?
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tdv2324_sub_io, AS_IO, 8, tdv2324_state )
+	//ADDRESS_MAP_GLOBAL_MASK(0xff)
+	/* 20, 23, 30-36, 38, 3a, 3c, 3e, 60, 70 are written to */
+	/* 30-36 may be tms9937 */
+	/* 60 may be a shared ram semaphore as it writes it immediately before reading the 5000 area */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tdv2324_fdc_mem, AS_PROGRAM, 8, tdv2324_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("fdccpu", 0)
+	AM_RANGE(0x0000, 0x001f) AM_RAM // on-6802-die ram (optinally battery backed)
+	AM_RANGE(0x0020, 0x007f) AM_RAM // on-6802-die ram
+	AM_RANGE(0x0080, 0x07ff) AM_RAM // the fdc cpu explicitly tests this area with A5,5A pattern after the rom check
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("fdccpu", 0)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -99,10 +198,12 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 	/* basic system hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, 4000000)
 	MCFG_CPU_PROGRAM_MAP(tdv2324_mem)
+	MCFG_CPU_IO_MAP(tdv2324_io)
 	MCFG_CPU_CONFIG(i8085_intf)
 
 	MCFG_CPU_ADD("subcpu", I8085A, 4000000)
 	MCFG_CPU_PROGRAM_MAP(tdv2324_sub_mem)
+	MCFG_CPU_IO_MAP(tdv2324_sub_io)
 	MCFG_CPU_CONFIG(i8085_sub_intf)
 
 	MCFG_CPU_ADD("fdccpu", M6802, 4000000)
