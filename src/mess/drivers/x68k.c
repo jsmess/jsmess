@@ -138,6 +138,8 @@
 #include "includes/x68k.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
+#include "machine/x68kexp.h"
+#include "machine/x68k_neptunex.h"
 #include "x68000.lh"
 
 
@@ -1986,7 +1988,7 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16)
 	AM_RANGE(0xeafa80, 0xeafa89) AM_READWRITE(x68k_areaset_r, x68k_enh_areaset_w)
 	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE(x68k_spritereg_r, x68k_spritereg_w)
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE(x68k_spriteram_r, x68k_spriteram_w)
-	AM_RANGE(0xec0000, 0xecffff) AM_NOP  // User I/O
+	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // User I/O
 //  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
@@ -2024,7 +2026,7 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16)
 	AM_RANGE(0xeafa80, 0xeafa89) AM_READWRITE(x68k_areaset_r, x68k_enh_areaset_w)
 	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE(x68k_spritereg_r, x68k_spritereg_w)
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE(x68k_spriteram_r, x68k_spriteram_w)
-	AM_RANGE(0xec0000, 0xecffff) AM_NOP  // User I/O
+	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // User I/O
 //  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
@@ -2062,7 +2064,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32)
 	AM_RANGE(0xeafa80, 0xeafa8b) AM_READWRITE16(x68k_areaset_r, x68k_enh_areaset_w,0xffffffff)
 	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE16(x68k_spritereg_r, x68k_spritereg_w,0xffffffff)
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE16(x68k_spriteram_r, x68k_spriteram_w,0xffffffff)
-	AM_RANGE(0xec0000, 0xecffff) AM_NOP  // User I/O
+	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)  // User I/O
 //  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
@@ -2480,6 +2482,19 @@ static void x68k_unload_proc(device_image_interface &image)
 	state->m_fdc.disk_inserted[floppy_get_drive(&image.device())] = 0;
 }
 
+static void x68k_irq2_line(device_t* device,int state)
+{
+	x68k_state *tstate = device->machine().driver_data<x68k_state>();
+	if(state==ASSERT_LINE)
+	{
+		tstate->m_current_vector[2] = 0xf9;
+		tstate->m_current_irq_line = 2;
+		cputag_set_input_line_and_vector(device->machine(), "maincpu",2,ASSERT_LINE,tstate->m_current_vector[2]);  // Disk insert/eject interrupt
+	}
+	logerror("EXP: IRQ2 set to %i\n",state);
+
+}
+
 static LEGACY_FLOPPY_OPTIONS_START( x68k )
 	LEGACY_FLOPPY_OPTION( img2d, "xdf,hdm,2hd", "XDF disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
@@ -2524,6 +2539,18 @@ static const mb89352_interface x68k_scsi_intf =
 	DEVCB_LINE(x68k_scsi_irq),
 	DEVCB_LINE(x68k_scsi_drq)
 };
+
+static X68K_EXPANSION_INTERFACE(x68k_exp_intf)
+{
+	DEVCB_LINE(x68k_irq2_line),
+	DEVCB_CPU_INPUT_LINE("maincpu", M68K_IRQ_4),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
+	DEVCB_NULL  // RESET
+};
+
+static SLOT_INTERFACE_START(x68000_exp_cards)
+	SLOT_INTERFACE("neptunex",X68K_NEPTUNEX)
+SLOT_INTERFACE_END
 
 static MACHINE_RESET( x68000 )
 {
@@ -2773,6 +2800,8 @@ static MACHINE_CONFIG_START( x68000_base, x68k_state )
 	MCFG_UPD72065_ADD("upd72065", fdc_interface)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(x68k_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x68k_flop")
+
+	MCFG_X68K_EXPANSION_SLOT_ADD("exp",x68k_exp_intf,x68000_exp_cards,NULL,NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
