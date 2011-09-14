@@ -565,6 +565,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/dp8390.o	\
 	$(MESS_MACHINE)/ne1000.o	\
 	$(MESS_MACHINE)/ne2000.o	\
+	$(MESS_MACHINE)/wd1772.o	\
 
 
 

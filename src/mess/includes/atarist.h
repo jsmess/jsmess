@@ -8,9 +8,8 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6800/m6800.h"
-#include "formats/atarist_dsk.h"
 #include "imagedev/cartslot.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/6850acia.h"
 #include "machine/8530scc.h"
@@ -19,7 +18,7 @@
 #include "machine/rescap.h"
 #include "machine/rp5c15.h"
 #include "machine/rs232.h"
-#include "machine/wd17xx.h"
+#include "machine/wd1772.h"
 #include "sound/ay8910.h"
 #include "sound/lmc1992.h"
 
@@ -93,7 +92,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_fdc;
+	required_device<wd1772_t> m_fdc;
 	required_device<mc68901_device> m_mfp;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_rs232;
@@ -170,8 +169,8 @@ public:
 	DECLARE_READ8_MEMBER( ikbd_port4_r );
 	DECLARE_WRITE8_MEMBER( ikbd_port4_w );
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(bool state);
+	void fdc_drq_w(bool state);
 
 	DECLARE_WRITE8_MEMBER( psg_pa_w );
 
@@ -268,6 +267,8 @@ public:
 	emu_timer *m_mouse_timer;
 	emu_timer *m_glue_timer;
 	emu_timer *m_shifter_timer;
+
+	static const floppy_format_type floppy_formats[];
 };
 
 class megast_state : public st_state

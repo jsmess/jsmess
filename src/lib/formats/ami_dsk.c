@@ -32,9 +32,9 @@ bool adf_format::supports_save() const
 	return false;
 }
 
-int adf_format::identify(floppy_image *image)
+int adf_format::identify(io_generic *io)
 {
-	UINT64 size = image->image_size();
+	UINT64 size = io_generic_size(io);
 	if ((size == 901120) || (size == 1802240))
 	{
 		return 50;
@@ -68,7 +68,7 @@ const floppy_image_format_t::desc_e adf_format::desc[] = {
 	{ END }
 };
 
-bool adf_format::load(floppy_image *image)
+bool adf_format::load(io_generic *io, floppy_image *image)
 {
 	desc_s sectors[11];
 	UINT8 sectdata[512*11];
@@ -77,11 +77,9 @@ bool adf_format::load(floppy_image *image)
 		sectors[i].size = 512;
 	}
 
-//  UINT8 *mfm = NULL;
-	image->set_meta_data(80, 2);
 	for(int track=0; track < 80; track++) {
 		for(int side=0; side < 2; side++) {
-			image->image_read(sectdata, (track*2 + side)*512*11, 512*11);
+			io_generic_read(io, sectdata, (track*2 + side)*512*11, 512*11);
 			generate_track(desc, track, side, sectors, 11, 100000, image);
 		}
 	}

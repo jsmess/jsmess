@@ -654,9 +654,9 @@ bool st_format::supports_save() const
 	return false;
 }
 
-void st_format::find_size(floppy_image *image, int &track_count, int &head_count, int &sector_count)
+void st_format::find_size(io_generic *io, int &track_count, int &head_count, int &sector_count)
 {
-	int size = image->image_size();
+	int size = io_generic_size(io);
 	for(track_count=80; track_count <= 82; track_count++)
 		for(head_count=1; head_count <= 2; head_count++)
 			for(sector_count=9; sector_count <= 11; sector_count++)
@@ -665,27 +665,26 @@ void st_format::find_size(floppy_image *image, int &track_count, int &head_count
 	track_count = head_count = sector_count = 0;
 }
 
-int st_format::identify(floppy_image *image)
+int st_format::identify(io_generic *io)
 {
 	int track_count, head_count, sector_count;
-	find_size(image, track_count, head_count, sector_count);
+	find_size(io, track_count, head_count, sector_count);
 
 	if(track_count)
 		return 50;
 	return 0;
 }
 
-bool st_format::load(floppy_image *image)
+bool st_format::load(io_generic *io, floppy_image *image)
 {
 	UINT8 sectdata[11*512];
 	int track_count, head_count, sector_count;
-	find_size(image, track_count, head_count, sector_count);
+	find_size(io, track_count, head_count, sector_count);
 
-	image->set_meta_data(track_count, head_count);
 	int track_size = sector_count*512;
 	for(int track=0; track < track_count; track++) {
 		for(int side=0; side < head_count; side++) {
-			image->image_read(sectdata, (track*head_count + side)*track_size, track_size);
+			io_generic_read(io, sectdata, (track*head_count + side)*track_size, track_size);
 			generate(track, side, track_count, head_count, sectdata, sector_count, image);
 		}
 	}
@@ -717,10 +716,10 @@ bool msa_format::supports_save() const
 	return false;
 }
 
-void msa_format::read_header(floppy_image *image, UINT16 &sign, UINT16 &sect, UINT16 &head, UINT16 &strack, UINT16 &etrack)
+void msa_format::read_header(io_generic *io, UINT16 &sign, UINT16 &sect, UINT16 &head, UINT16 &strack, UINT16 &etrack)
 {
 	UINT8 h[10];
-	image->image_read(h, 0, 10);
+	io_generic_read(io, h, 0, 10);
 	sign = (h[0] << 8) | h[1];
 	sect = (h[2] << 8) | h[3];
 	head = (h[4] << 8) | h[5];
@@ -739,6 +738,7 @@ bool msa_format::uncompress(UINT8 *buffer, int csize, int usize)
 				return false;
 			c = buffer[src++];
 			int count = (buffer[src] << 8) | buffer[src+1];
+			src += 2;
 			if(usize-dst < count)
 				return false;
 			for(int i=0; i<count; i++)
@@ -746,16 +746,17 @@ bool msa_format::uncompress(UINT8 *buffer, int csize, int usize)
 		} else
 			sectdata[dst++] = c;
 	}
+
 	if(src != csize || dst != usize)
 		return false;
 	memcpy(buffer, sectdata, usize);
 	return true;
 }
 
-int msa_format::identify(floppy_image *image)
+int msa_format::identify(io_generic *io)
 {
 	UINT16 sign, sect, head, strack, etrack;
-	read_header(image, sign, sect, head, strack, etrack);
+	read_header(io, sign, sect, head, strack, etrack);
 
 	if(sign == 0x0e0f &&
 	   (sect >=9 && sect <= 11) &&
@@ -766,11 +767,10 @@ int msa_format::identify(floppy_image *image)
 	return 0;
 }
 
-bool msa_format::load(floppy_image *image)
+bool msa_format::load(io_generic *io, floppy_image *image)
 {
 	UINT16 sign, sect, head, strack, etrack;
-	read_header(image, sign, sect, head, strack, etrack);
-	image->set_meta_data(etrack+1, head+1);
+	read_header(io, sign, sect, head, strack, etrack);
 
 	UINT8 sectdata[11*512];
 	UINT8 th[2];
@@ -780,10 +780,10 @@ bool msa_format::load(floppy_image *image)
 
 	for(int track=strack; track <= etrack; track++) {
 		for(int side=0; side <= head; side++) {
-			image->image_read(th, pos, 2);
+			io_generic_read(io, th, pos, 2);
 			pos += 2;
 			int tsize = (th[0] << 8) | th[1];
-			image->image_read(sectdata, pos, tsize);
+			io_generic_read(io, sectdata, pos, tsize);
 			pos += tsize;
 			if(tsize < track_size) {
 				if(!uncompress(sectdata, tsize, track_size))

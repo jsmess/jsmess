@@ -1,6 +1,7 @@
 #ifndef _VIDEO_ATARIST_H_
 #define _VIDEO_ATARIST_H_
 
+// 32028400 also exists
 #define Y2		32084988.0
 #define Y2_NTSC	32042400.0
 

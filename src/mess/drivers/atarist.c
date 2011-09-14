@@ -22,6 +22,8 @@
 
 */
 
+#include "formats/st_dsk.h"
+#include "formats/mfi_dsk.h"
 
 
 //**************************************************************************
@@ -114,7 +116,7 @@ void st_state::fdc_dma_transfer()
 		if (m_fdc_fifo_msb)
 		{
 			// write LSB to disk
-			wd17xx_data_w(m_fdc, 0, data & 0xff);
+			m_fdc->data_w(data & 0xff);
 
 			if (LOG) logerror("DMA Write to FDC %02x\n", data & 0xff);
 
@@ -123,7 +125,7 @@ void st_state::fdc_dma_transfer()
 		else
 		{
 			// write MSB to disk
-			wd17xx_data_w(m_fdc, 0, data >> 8);
+			m_fdc->data_w(data >> 8);
 
 			if (LOG) logerror("DMA Write to FDC %02x\n", data >> 8);
 		}
@@ -147,7 +149,7 @@ void st_state::fdc_dma_transfer()
 	else
 	{
 		// read from controller to FIFO
-		UINT8 data = wd17xx_data_r(m_fdc, 0);
+		UINT8 data = m_fdc->data_r();
 
 		m_fdc_fifo_empty[m_fdc_fifo_sel] = 0;
 
@@ -211,7 +213,7 @@ READ16_MEMBER( st_state::fdc_data_r )
 			// floppy controller
 			int offset = (m_fdc_mode & DMA_MODE_ADDRESS_MASK) >> 1;
 
-			data = wd17xx_r(m_fdc, offset);
+			data = m_fdc->gen_r(offset);
 
 			if (LOG) logerror("FDC Register %u Read %02x\n", offset, data);
 		}
@@ -257,7 +259,7 @@ WRITE16_MEMBER( st_state::fdc_data_w )
 
 			if (LOG) logerror("FDC Register %u Write %02x\n", offset, data);
 
-			wd17xx_w(m_fdc, offset, data);
+			m_fdc->gen_w(offset, data);
 		}
 	}
 }
@@ -278,7 +280,7 @@ READ16_MEMBER( st_state::dma_status_r )
 	data |= !(m_fdc_sectors == 0) << 1;
 
 	// DRQ state
-	data |= wd17xx_drq_r(m_fdc) << 2;
+	data |= m_fdc->drq_r() << 2;
 
 	return data;
 }
@@ -1195,7 +1197,7 @@ static ADDRESS_MAP_START( st_map, AS_PROGRAM, 16, st_state )
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(dma_status_r, dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE8(dma_counter_r, dma_base_w, 0x00ff)
 	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8_LEGACY(YM2149_TAG, ay8910_r, ay8910_address_w, 0xff00) AM_MIRROR(0xfc)
-	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8_LEGACY(YM2149_TAG, ay8910_data_w, 0xff00) AM_MIRROR(0xfc)
+	AM_RANGE(0xff8802, 0xff8803) AM_DEVREADWRITE8_LEGACY(YM2149_TAG, ay8910_r, ay8910_data_w, 0xff00) AM_MIRROR(0xfc)
 #if 0
 	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
 	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
@@ -1694,12 +1696,18 @@ WRITE8_MEMBER( st_state::psg_pa_w )
 
     */
 
-	// side select
-	wd17xx_set_side(m_fdc, BIT(data, 0) ? 0 : 1);
-
 	// drive select
-	if (!BIT(data, 1)) wd17xx_set_drive(m_fdc, 0);
-	if (!BIT(data, 2)) wd17xx_set_drive(m_fdc, 1);
+	floppy_image_device *floppy = 0;
+	if (!BIT(data, 1))
+		floppy = machine().device<floppy_image_device>("fd0");
+	else if(!BIT(data, 2))
+		floppy = machine().device<floppy_image_device>("fd1");
+
+	// side select
+	if(floppy)
+		floppy->ss_w(BIT(data, 0) ? 0 : 1);
+
+	m_fdc->set_floppy(floppy);
 
 	// request to send
 	rs232_rts_w(m_rs232, BIT(data, 3));
@@ -1743,12 +1751,18 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 
     */
 
-	// side select
-	wd17xx_set_side(m_fdc, BIT(data, 0) ? 0 : 1);
-
 	// drive select
-	if (!BIT(data, 1)) wd17xx_set_drive(m_fdc, 0);
-	if (!BIT(data, 2)) wd17xx_set_drive(m_fdc, 1);
+	floppy_image_device *floppy = 0;
+	if (!BIT(data, 1))
+		floppy = machine().device<floppy_image_device>("fd0");
+	else if(!BIT(data, 2))
+		floppy = machine().device<floppy_image_device>("fd1");
+
+	// side select
+	if(floppy)
+		floppy->ss_w(BIT(data, 0) ? 0 : 1);
+
+	m_fdc->set_floppy(floppy);
 
 	// request to send
 	rs232_rts_w(m_rs232, BIT(data, 3));
@@ -1760,7 +1774,7 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 	centronics_strobe_w(m_centronics, BIT(data, 5));
 
 	// density select
-	wd17xx_dden_w(m_fdc, BIT(data, 7));
+	m_fdc->dden_w(BIT(data, 7));
 }
 
 static const ay8910_interface stbook_psg_intf =
@@ -1887,8 +1901,8 @@ READ8_MEMBER( st_state::mfp_gpio_r )
 	// keyboard/MIDI interrupt
 	data |= (m_acia_ikbd_irq & m_acia_midi_irq) << 4;
 
-	// floppy data request
-	data |= !wd17xx_intrq_r(m_fdc) << 5;
+	// floppy interrupt request
+	data |= !m_fdc->intrq_r() << 5;
 
 	// ring indicator
 	data |= rs232_ri_r(m_rs232) << 6;
@@ -1965,8 +1979,8 @@ READ8_MEMBER( ste_state::mfp_gpio_r )
 	// keyboard/MIDI interrupt
 	data |= (m_acia_ikbd_irq & m_acia_midi_irq) << 4;
 
-	// floppy data request
-	data |= !wd17xx_intrq_r(m_fdc) << 5;
+	// floppy interrupt request
+	data |= !m_fdc->intrq_r() << 5;
 
 	// ring indicator
 	data |= rs232_ri_r(m_rs232) << 6;
@@ -2033,7 +2047,7 @@ READ8_MEMBER( stbook_state::mfp_gpio_r )
 	data |= (m_acia_ikbd_irq & m_acia_midi_irq) << 4;
 
 	// floppy data request
-	data |= !wd17xx_intrq_r(m_fdc) << 5;
+	data |= !m_fdc->intrq_r() << 5;
 
 	// ring indicator
 	data |= rs232_ri_r(m_rs232) << 6;
@@ -2059,71 +2073,18 @@ static MC68901_INTERFACE( stbook_mfp_intf )
 	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_so_w)		/* serial output */
 };
 
-
-
-//-------------------------------------------------
-//  wd17xx_interface fdc_intf
-//-------------------------------------------------
-
-static const floppy_interface atarist_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_3_5_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(atarist),
-	NULL,
-	NULL
-};
-
-static const floppy_interface megaste_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_3_5_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(atarist),
-	NULL,
-	NULL
-};
-
-WRITE_LINE_MEMBER( st_state::fdc_intrq_w )
+void st_state::fdc_intrq_w(bool state)
 {
 	m_mfp->i5_w(!state);
 }
 
-WRITE_LINE_MEMBER( st_state::fdc_drq_w )
+void st_state::fdc_drq_w(bool state)
 {
 	if (state && (!(m_fdc_mode & DMA_MODE_ENABLED)) && (m_fdc_mode & DMA_MODE_FDC_HDC_ACK))
 	{
 		fdc_dma_transfer();
 	}
 }
-
-static const wd17xx_interface fdc_intf =
-{
-	DEVCB_LINE_GND,
-	DEVCB_DRIVER_LINE_MEMBER(st_state, fdc_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(st_state, fdc_drq_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
-
-
-//-------------------------------------------------
-//  wd17xx_interface stbook_fdc_intf
-//-------------------------------------------------
-
-static const wd17xx_interface stbook_fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(st_state, fdc_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(st_state, fdc_drq_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
 
 
 //-------------------------------------------------
@@ -2260,6 +2221,11 @@ void st_state::machine_start()
 
 	// register for state saving
 	state_save();
+
+	machine().device<floppy_image_device>("fd0")->set_rpm(300);
+	machine().device<floppy_image_device>("fd1")->set_rpm(300);
+	m_fdc->setup_drq_cb(wd1772_t::line_cb(FUNC(st_state::fdc_drq_w), this));
+	m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(st_state::fdc_intrq_w), this));
 }
 
 
@@ -2343,7 +2309,10 @@ void stbook_state::machine_start()
 	ste_state::state_save();
 }
 
-
+const floppy_format_type st_state::floppy_formats[] = {
+	FLOPPY_ST_FORMAT, FLOPPY_MSA_FORMAT, FLOPPY_MFI_FORMAT,
+	NULL
+};
 
 //**************************************************************************
 //  MACHINE CONFIGURATION
@@ -2380,8 +2349,9 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_ACIA6850_ADD(MC6850_0_TAG, acia_ikbd_intf)
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
-	MCFG_WD1772_ADD(WD1772_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(atarist_floppy_interface)
+	MCFG_WD1772x_ADD(WD1772_TAG, 8000000)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 
@@ -2430,8 +2400,9 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_ACIA6850_ADD(MC6850_0_TAG, acia_ikbd_intf)
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
-	MCFG_WD1772_ADD(WD1772_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(atarist_floppy_interface)
+	MCFG_WD1772x_ADD(WD1772_TAG, 8000000)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
@@ -2489,8 +2460,9 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_ACIA6850_ADD(MC6850_0_TAG, acia_ikbd_intf)
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, atariste_mfp_intf)
-	MCFG_WD1772_ADD(WD1772_TAG, fdc_intf )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(atarist_floppy_interface)
+	MCFG_WD1772x_ADD(WD1772_TAG, 8000000)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 
@@ -2517,8 +2489,6 @@ static MACHINE_CONFIG_DERIVED( megaste, ste )
 	MCFG_CPU_PROGRAM_MAP(megaste_map)
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_SCC8530_ADD(Z8530_TAG, Y2/4)
-
-	MCFG_LEGACY_FLOPPY_2_DRIVES_MODIFY(megaste_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -2560,8 +2530,9 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_ACIA6850_ADD(MC6850_0_TAG, stbook_acia_ikbd_intf)
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, U517/8, stbook_mfp_intf)
-	MCFG_WD1772_ADD(WD1772_TAG, stbook_fdc_intf )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(megaste_floppy_interface)
+	MCFG_WD1772x_ADD(WD1772_TAG, 8000000)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 

@@ -942,20 +942,10 @@ LEGACY_FLOPPY_OPTIONS_END
 /// New implementation
 //////////////////////////////////////////////////////////
 
-floppy_image::floppy_image(void *fp, const struct io_procs *procs, const floppy_format_type *formats)
+floppy_image::floppy_image(UINT16 _tracks, UINT8 _sides)
 {
-	m_io.file = fp;
-	m_io.procs = procs;
-	m_io.filler = 0xFF;
-	m_formats = 0;
-	for(int i=0; formats[i]; i++)
-	{
-		floppy_image_format_t *fif = formats[i]();
-		if(m_formats)
-			m_formats->append(fif);
-		else
-			m_formats = fif;
-	}
+	tracks = _tracks;
+	sides = _sides;
 
 	memset(cell_data, 0, sizeof(cell_data));
 	memset(track_size, 0, sizeof(track_size));
@@ -964,7 +954,6 @@ floppy_image::floppy_image(void *fp, const struct io_procs *procs, const floppy_
 
 floppy_image::~floppy_image()
 {
-	close();
 }
 
 void floppy_image::ensure_alloc(UINT16 track, UINT8 side)
@@ -980,64 +969,6 @@ void floppy_image::ensure_alloc(UINT16 track, UINT8 side)
 		cell_data[idx] = new_array;
 		track_alloc_size[idx] = new_size;
 	}
-}
-
-void floppy_image::image_read(void *buffer, UINT64 offset, size_t length)
-{
-	io_generic_read(&m_io, buffer, offset, length);
-}
-
-void floppy_image::image_write(const void *buffer, UINT64 offset, size_t length)
-{
-	io_generic_write(&m_io, buffer, offset, length);
-}
-
-void floppy_image::image_write_filler(UINT8 filler, UINT64 offset, size_t length)
-{
-	io_generic_write_filler(&m_io, filler, offset, length);
-}
-
-UINT64 floppy_image::image_size()
-{
-	return io_generic_size(&m_io);
-}
-
-void floppy_image::close_internal(bool close_file)
-{
-	if (close_file)
-		io_generic_close(&m_io);
-}
-
-void floppy_image::close()
-{
-	close_internal(TRUE);
-}
-
-void floppy_image::set_meta_data(UINT16 _tracks, UINT8 _sides)
-{
-	tracks = _tracks;
-	sides  = _sides;
-}
-
-floppy_image_format_t *floppy_image::identify(int *best)
-{
-	floppy_image_format_t *retVal = NULL;
-	int best_vote = 0;
-	*best = -1;
-	int id = 0;
-	for(floppy_image_format_t *fif = m_formats; fif; fif = fif->next)
-	{
-		int vote = fif->identify(this);
-		/* is this option a better one? */
-		if (vote > best_vote)
-		{
-			best_vote = vote;
-			*best = id;
-			retVal = fif;
-		}
-		id++;
-	}
-	return retVal;
 }
 
 floppy_image_format_t::floppy_image_format_t()
@@ -1057,7 +988,7 @@ void floppy_image_format_t::append(floppy_image_format_t *_next)
 		next = _next;
 }
 
-bool floppy_image_format_t::save(floppy_image *)
+bool floppy_image_format_t::save(io_generic *, floppy_image *)
 {
 	return false;
 }

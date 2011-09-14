@@ -17,7 +17,7 @@ public:
 	UINT16 get_byte();
 	void setup_dma();
 
-	static const floppy_interface amiga_floppy_interface;
+	static const floppy_format_type floppy_formats[];
 
 protected:
     virtual void device_start();
@@ -38,8 +38,6 @@ private:
 		MAX_MFM_TRACK_LEN       = 16384,
 		NUM_DRIVES              = 2
 	};
-
-	static const floppy_format_type floppy_formats[];
 
 	struct fdc_def {
 		floppy_image_device *f;

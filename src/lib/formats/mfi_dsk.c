@@ -77,11 +77,11 @@ bool mfi_format::supports_save() const
 	return false;
 }
 
-int mfi_format::identify(floppy_image *image)
+int mfi_format::identify(io_generic *io)
 {
 	header h;
 
-	image->image_read(&h, 0, sizeof(header));
+	io_generic_read(io, &h, 0, sizeof(header));
 	if(memcmp( h.sign, sign, 16 ) == 0 &&
 	   h.cyl_count > 0 && h.cyl_count <= 84 &&
 	   h.head_count > 0 && h.head_count <= 2)
@@ -89,13 +89,12 @@ int mfi_format::identify(floppy_image *image)
 	return 0;
 }
 
-bool mfi_format::load(floppy_image *image)
+bool mfi_format::load(io_generic *io, floppy_image *image)
 {
 	header h;
 	entry entries[84*2];
-	image->image_read(&h, 0, sizeof(header));
-	image->image_read(&entries, sizeof(header), h.cyl_count*h.head_count*sizeof(entry));
-	image->set_meta_data(h.cyl_count, h.head_count);
+	io_generic_read(io, &h, 0, sizeof(header));
+	io_generic_read(io, &entries, sizeof(header), h.cyl_count*h.head_count*sizeof(entry));
 
 	UINT8 *compressed = 0;
 	int compressed_size = 0;
@@ -116,7 +115,7 @@ bool mfi_format::load(floppy_image *image)
 				compressed = global_alloc_array(UINT8, compressed_size);
 			}
 
-			image->image_read(compressed, ent->offset, ent->compressed_size);
+			io_generic_read(io, compressed, ent->offset, ent->compressed_size);
 
 			unsigned int cell_count = ent->uncompressed_size/4;
 			image->set_track_size(cyl, head, cell_count);
