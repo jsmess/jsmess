@@ -225,9 +225,9 @@ public:
 	floppy_image_format_t();
 	virtual ~floppy_image_format_t();
 
-	virtual int identify(floppy_image *image) = 0;
-	virtual bool load(floppy_image *image) = 0;
-	virtual bool save(floppy_image *image);
+	virtual int identify(io_generic *io) = 0;
+	virtual bool load(io_generic *io, floppy_image *image) = 0;
+	virtual bool save(io_generic *io, floppy_image *image);
 
 	virtual const char *name() const = 0;
 	virtual const char *description() const = 0;
@@ -360,18 +360,10 @@ public:
 	};
 
 	// construction/destruction
-	floppy_image(void *fp, const struct io_procs *procs, const floppy_format_type *formats);
+	floppy_image(UINT16 tracks, UINT8 sides);
 	virtual ~floppy_image();
 
-	void image_read(void *buffer, UINT64 offset, size_t length);
-	void image_write(const void *buffer, UINT64 offset, size_t length);
-	void image_write_filler(UINT8 filler, UINT64 offset, size_t length);
-	UINT64 image_size();
-	void close();
-
-	void set_meta_data(UINT16 tracks, UINT8 sides);
 	void set_track_size(UINT16 track, UINT8 side, UINT32 size) { track_size[(track << 1) + side] = size; ensure_alloc(track, side); }
-	floppy_image_format_t *identify(int *best);
 	UINT32 *get_buffer(UINT16 track, UINT8 side) { return cell_data[(track << 1) + side]; }
 	UINT32 get_track_size(UINT16 track, UINT8 side) { return track_size[(track << 1) + side]; }
 
@@ -380,10 +372,6 @@ private:
 		MAX_FLOPPY_SIDES = 2,
 		MAX_FLOPPY_TRACKS = 84
 	};
-
-	void close_internal(bool close_file);
-	struct io_generic		m_io;
-	floppy_image_format_t *m_formats;
 
 	UINT16 tracks;
 	UINT8  sides;

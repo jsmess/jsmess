@@ -64,7 +64,7 @@ void amiga_fdc::device_start()
 		fdc_status[id].pos = 0;
 		fdc_status[id].len = 0;
 		fdc_status[id].ptr = 0;
-		fdc_status[id].f = downcast<floppy_image_device *>(subdevice(id ? FLOPPY_1 : FLOPPY_0));
+		fdc_status[id].f = downcast<floppy_image_device *>(subdevice(id ? "fd1" : "fd0"));
 		fdc_status[id].f->setup_load_cb(floppy_image_device::load_cb(FUNC(amiga_fdc::load_proc), this));
 		fdc_status[id].f->setup_unload_cb(floppy_image_device::unload_cb(FUNC(amiga_fdc::unload_proc), this));
 		fdc_status[id].f->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(amiga_fdc::index_callback), this));
@@ -430,18 +430,9 @@ void amiga_fdc::index_callback(floppy_image_device *floppy, int state)
 	mos6526_flag_w(cia, state);
 }
 
-const floppy_interface amiga_fdc::amiga_floppy_interface =
-{
-	DEVCB_NULL,
-	floppy_formats,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
 static MACHINE_CONFIG_FRAGMENT( amiga_fdc )
-	MCFG_FLOPPY_2_DRIVES_ADD(amiga_fdc::amiga_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_35_DD, 82, 2, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_35_DD, 82, 2, amiga_fdc::floppy_formats)
 MACHINE_CONFIG_END
 
 machine_config_constructor amiga_fdc::device_mconfig_additions() const

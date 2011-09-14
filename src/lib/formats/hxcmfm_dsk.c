@@ -54,18 +54,18 @@ bool mfm_format::supports_save() const
 	return false;
 }
 
-int mfm_format::identify(floppy_image *image)
+int mfm_format::identify(io_generic *io)
 {
 	UINT8 header[7];
 
-	image->image_read(&header, 0, sizeof(header));
+	io_generic_read(io, &header, 0, sizeof(header));
 	if ( memcmp( header, MFM_FORMAT_HEADER, 6 ) ==0) {
 		return 100;
 	}
 	return 0;
 }
 
-bool mfm_format::load(floppy_image *image)
+bool mfm_format::load(io_generic *io, floppy_image *image)
 {
 	MFMIMG header;
 	MFMTRACKIMG trackdesc;
@@ -73,14 +73,12 @@ bool mfm_format::load(floppy_image *image)
 	int trackbuf_size = 0;
 
 	// read header
-	image->image_read(&header,0, sizeof(header));
-
-	image->set_meta_data(header.number_of_track, header.number_of_side);
+	io_generic_read(io, &header, 0, sizeof(header));
 
 	for(int track=0; track < header.number_of_track; track++) {
 		for(int side=0; side < header.number_of_side; side++) {
 			// read location of
-			image->image_read(&trackdesc,(header.mfmtracklistoffset)+((( track << 1 ) + side)*sizeof(trackdesc)),sizeof(trackdesc));
+			io_generic_read(io, &trackdesc,(header.mfmtracklistoffset)+((( track << 1 ) + side)*sizeof(trackdesc)),sizeof(trackdesc));
 
 			if(trackdesc.mfmtracksize > trackbuf_size) {
 				if(trackbuf)
@@ -90,7 +88,7 @@ bool mfm_format::load(floppy_image *image)
 			}
 
 			// actual data read
-			image->image_read(trackbuf, trackdesc.mfmtrackoffset, trackdesc.mfmtracksize);
+			io_generic_read(io, trackbuf, trackdesc.mfmtrackoffset, trackdesc.mfmtracksize);
 
 			generate_track_from_bitstream(track, side, trackbuf, trackdesc.mfmtracksize*8, image);
 		}
