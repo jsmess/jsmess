@@ -109,7 +109,7 @@ READ8_MEMBER( tdv2324_state::tdv2324_main_io_e6 )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( tdv2324_mem, AS_PROGRAM, 8, tdv2324_state )
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION(I8085A_0_TAG, 0)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION(P8085AH_0_TAG, 0)
 	/* when copying code to 4000 area it runs right off the end of rom;
 	 * I'm not sure if its supposed to mirror or read as open bus */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM // 0x4000 has the boot code copied to it, 5fff and down are the stack
@@ -135,7 +135,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( tdv2324_sub_mem, AS_PROGRAM, 8, tdv2324_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION(I8085A_1_TAG, 0)
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION(P8085AH_1_TAG, 0)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM // ram exists at least here, acts as stack?
 	AM_RANGE(0x5000, 0x503f) AM_RAM // subcpu reads here (5000-5021) without writing first, implies this ram is shared
 	AM_RANGE(0x6000, 0x7fff) AM_RAM // it floodfills this area with 0; is this a framebuffer? or shared ram?
@@ -351,12 +351,12 @@ static const tms9927_interface vtac_intf =
 
 static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 	// basic system hardware
-	MCFG_CPU_ADD(I8085A_0_TAG, I8085A, 8700000/2) // ???
+	MCFG_CPU_ADD(P8085AH_0_TAG, I8085A, 8700000/2) // ???
 	MCFG_CPU_PROGRAM_MAP(tdv2324_mem)
 	MCFG_CPU_IO_MAP(tdv2324_io)
 	MCFG_CPU_CONFIG(i8085_intf)
 
-	MCFG_CPU_ADD(I8085A_1_TAG, I8085A, 8000000/2) // ???
+	MCFG_CPU_ADD(P8085AH_1_TAG, I8085A, 8000000/2) // ???
 	MCFG_CPU_PROGRAM_MAP(tdv2324_sub_mem)
 	MCFG_CPU_IO_MAP(tdv2324_sub_io)
 	MCFG_CPU_CONFIG(i8085_sub_intf)
@@ -400,20 +400,31 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( tdv2324 )
-	ROM_REGION( 0x800, I8085A_0_TAG, 0 )
+	ROM_REGION( 0x800, P8085AH_0_TAG, 0 )
 	ROM_LOAD( "962058-1.21g", 0x000, 0x800, CRC(3771aece) SHA1(36d3f03235f327d6c8682e5c167aed6dddfaa6ec) )
 
-	ROM_REGION( 0x4000, I8085A_1_TAG, 0 )
-	ROM_LOAD( "962107-1.bin", 0x0000, 0x4000, CRC(29c1a139) SHA1(f55fa9075fdbfa6a3e94e5120270179f754d0ea5) )
+	ROM_REGION( 0x4000, P8085AH_1_TAG, 0 )
+	ROM_LOAD( "962107-1.12c", 0x0000, 0x4000, CRC(29c1a139) SHA1(f55fa9075fdbfa6a3e94e5120270179f754d0ea5) )
 
 	ROM_REGION( 0x2000, MC68B02P_TAG, 0 )
 	ROM_LOAD( "962014-4.13c", 0x0000, 0x2000, CRC(d01c32cd) SHA1(1f00f5f5ff0c035eec6af820b5acb6d0c207b6db) )
 
 	ROM_REGION( 0x4000, "chargen", 0 )
-	ROM_LOAD( "965268-1.bin", 0x0000, 0x4000, CRC(7222a85f) SHA1(e94074b68d90698734ab1fc38d156407846df47c) )
-ROM_END
+	ROM_LOAD( "965268-1.4g", 0x0000, 0x4000, CRC(7222a85f) SHA1(e94074b68d90698734ab1fc38d156407846df47c) )
 
-#define rom_tdv2324m7 rom_tdv2324
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "961487-1.3f", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "prom.4f", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "prom.8g", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "prom.10f", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "961420-0.16f", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "962103-0.15g", 0x0000, 0x0200, NO_DUMP )
+
+	ROM_REGION( 0x200, "plds", 0 )
+	ROM_LOAD( "962108-0.2g", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "pal.12d", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "pal.13d", 0x0000, 0x0200, NO_DUMP )
+ROM_END
 
 
 
