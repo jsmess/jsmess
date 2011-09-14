@@ -23,14 +23,15 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define I8085A_0_TAG		"17f"
+#define P8085AH_0_TAG		"17f"
 #define MK3887N4_TAG		"15d"
 #define P8259A_TAG			"17d"
 #define P8253_5_0_TAG		"17c"
 #define P8253_5_1_TAG		"18c"
+#define ER3400_TAG			"12a"
 
-#define I8085A_1_TAG		"subcpu"
-#define TMS9937NL_TAG		"tms9937"
+#define P8085AH_1_TAG		"6c"
+#define TMS9937NL_TAG		"7e"
 
 #define MC68B02P_TAG		"12b"
 #define FD1797PL02_TAG		"fd1797"
@@ -48,8 +49,8 @@ class tdv2324_state : public driver_device
 public:
 	tdv2324_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, I8085A_0_TAG),
-		  m_subcpu(*this, I8085A_1_TAG),
+		  m_maincpu(*this, P8085AH_0_TAG),
+		  m_subcpu(*this, P8085AH_1_TAG),
 		  m_fdccpu(*this, MC68B02P_TAG)
 	{ }
 
