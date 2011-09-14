@@ -213,6 +213,12 @@ void st_state::glue_tick()
 
 	int de = h && v;
 
+	if (x < m_shifter_x_start && y < m_shifter_y_start)
+	{
+		m_shifter_bitplane = 0;
+		m_shifter_shift = 0;
+	}
+
 	if (de != m_shifter_de)
 	{
 		m_mfp->tbi_w(de);
@@ -222,10 +228,6 @@ void st_state::glue_tick()
 	if (de)
 	{
 		shifter_load();
-	}
-
-	if(!de) {
-		m_shifter_shift = 0;
 	}
 
 	if ((y == m_shifter_vblank_start) && (x == 0))
