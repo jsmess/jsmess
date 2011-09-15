@@ -62,7 +62,7 @@ public:
 	int m_tape_interrupts_enabled;
 	int m_tape_unknown_write[6];
 	int m_tape_motor_mode;
-	unsigned char m_ram8[256];
+	UINT8 m_ram8[256];
 	UINT8 m_tms9927_num_rows;
 	UINT8 m_tms9927_cursor_col;
 	UINT8 m_tms9927_cursor_row;
@@ -116,12 +116,6 @@ READ8_HANDLER ( intvkbd_dualport8_lsb_r );
 WRITE8_HANDLER ( intvkbd_dualport8_lsb_w );
 READ8_HANDLER ( intvkbd_dualport8_msb_r );
 WRITE8_HANDLER ( intvkbd_dualport8_msb_w );
-
-
-/*----------- defined in audio/intv.c -----------*/
-
-READ16_DEVICE_HANDLER( AY8914_directread_port_0_lsb_r );
-WRITE16_DEVICE_HANDLER( AY8914_directwrite_port_0_lsb_w );
 
 
 #endif /* INTV_H_ */

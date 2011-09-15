@@ -278,7 +278,7 @@ ROM_START (odyssey2)
 
 	ROM_REGION( 0x10000, "sp0256_speech", 0 )
 	/* SP0256B-019 Speech chip w/2KiB mask rom */
-	ROM_LOAD( "sp0256b-019.bin",   0x1000, 0x0800, CRC(19355075) SHA1(13bc08f08d161c30ff386d1f0d15676d82afde63) )
+	ROM_LOAD( "sp0256b-019.bin",   0x1000, 0x0800, CRC(4bb43724) SHA1(49f5326ad45392dc96c89d1d4e089a20bd21e609) )
 
 	/* A note about "The Voice": Two versions of "The Voice" exist:
        * An earlier version with eight 2KiB speech roms, spr016-??? through spr016-??? on a small daughterboard
@@ -289,9 +289,9 @@ ROM_START (odyssey2)
        Thanks to kevtris for this info. - LN
     */
 	/* External 16KiB speech ROM (spr128-003) from "The Voice" */
-	ROM_LOAD( "spr128-003.bin",   0x4000, 0x4000, CRC(66041b03) SHA1(31acbaf1ae92b3efbb5093d63b0472170699da85) )
+	ROM_LOAD( "spr128-003.bin",   0x4000, 0x4000, CRC(509367b5) SHA1(0f31f46bc02e9272885779a6dd7102c78b18895b) )
 	/* Additional External 16KiB ROM (spr128-004) from S.I.D. the Spellbinder */
-	ROM_LOAD( "spr128-004.bin",   0x8000, 0x4000, CRC(6780c7d3) SHA1(2e44233f25d07e35500ef79c9c542e974c94390a) )
+	ROM_LOAD( "spr128-004.bin",   0x8000, 0x4000, CRC(e79dfb75) SHA1(37f33d79ffd1739d7c2f226b010a1eac28d74ca0) )
 ROM_END
 
 ROM_START (videopac)
@@ -307,11 +307,11 @@ ROM_START (videopac)
 
 	ROM_REGION( 0x10000, "sp0256_speech", 0 )
 	/* SP0256B-019 Speech chip w/2KiB mask rom */
-	ROM_LOAD( "sp0256b-019.bin",   0x1000, 0x0800, CRC(19355075) SHA1(13bc08f08d161c30ff386d1f0d15676d82afde63) )
+	ROM_LOAD( "sp0256b-019.bin",   0x1000, 0x0800, CRC(4bb43724) SHA1(49f5326ad45392dc96c89d1d4e089a20bd21e609) )
 	/* External 16KiB speech ROM (spr128-003) from "The Voice" */
-	ROM_LOAD( "spr128-003.bin",   0x4000, 0x4000, CRC(66041b03) SHA1(31acbaf1ae92b3efbb5093d63b0472170699da85) )
+	ROM_LOAD( "spr128-003.bin",   0x4000, 0x4000, CRC(509367b5) SHA1(0f31f46bc02e9272885779a6dd7102c78b18895b) )
 	/* Additional External 16KiB speech ROM (spr128-004) from S.I.D. the Spellbinder */
-	ROM_LOAD( "spr128-004.bin",   0x8000, 0x4000, CRC(6780c7d3) SHA1(2e44233f25d07e35500ef79c9c542e974c94390a) )
+	ROM_LOAD( "spr128-004.bin",   0x8000, 0x4000, CRC(e79dfb75) SHA1(37f33d79ffd1739d7c2f226b010a1eac28d74ca0) )
 ROM_END
 
 ROM_START (g7400)

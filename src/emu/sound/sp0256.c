@@ -1212,7 +1212,7 @@ static DEVICE_START( sp0256 )
     /*  Setup the ROM.                                                      */
     /* -------------------------------------------------------------------- */
 	sp->rom = *device->region();
-	sp0256_bitrevbuff(sp->rom, 0, 0xffff);
+	//sp0256_bitrevbuff(sp->rom, 0, 0xffff);
 }
 
 static void sp0256_reset(sp0256_state *sp)

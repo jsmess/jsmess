@@ -1090,7 +1090,6 @@ $(MESSOBJ)/intv.a:				\
 	$(MESS_VIDEO)/intv.o		\
 	$(MESS_VIDEO)/stic.o		\
 	$(MESS_MACHINE)/intv.o		\
-	$(MESS_AUDIO)/intv.o		\
 	$(MESS_DRIVERS)/intv.o		\
 
 $(MESSOBJ)/kaypro.a:			\

@@ -390,24 +390,24 @@ INPUT_PORTS_END
 
 static ADDRESS_MAP_START( intv_mem , AS_PROGRAM, 16)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE( intv_stic_r, intv_stic_w )
-	AM_RANGE(0x0080, 0x0081) AM_DEVREADWRITE("sp0256_speech", spb640_r, spb640_w )
+	AM_RANGE(0x0080, 0x0081) AM_DEVREADWRITE("sp0256_speech", spb640_r, spb640_w ) /* Intellivoice */
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
-	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE("ay8910", AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
+	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914", ay8914_r, ay8914_w, 0x00ff )
 	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
-	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_REGION("maincpu", 0x1000<<1)	/* Exec ROM, 10-bits wide */
+	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000<<1)	/* Exec ROM, 10-bits wide */
 	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("maincpu", 0x3000<<1)	/* GROM,     8-bits wide */
 	AM_RANGE(0x3800, 0x39ff) AM_READWRITE( intv_gram_r, intv_gram_w )		/* GRAM,     8-bits wide */
 	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE( intv_gram_r, intv_gram_w )		/* GRAM Alias,     8-bits wide */
-	AM_RANGE(0x4800, 0x7fff) AM_ROM		/* Cartridges? */
-	AM_RANGE(0x8000, 0xBfff) AM_ROM		/* Cartridges? */
-	AM_RANGE(0xD000, 0xFfff) AM_ROM		/* Cartridges? */
+	AM_RANGE(0x4800, 0x7fff) AM_ROM AM_REGION("maincpu", 0x4800<<1)
+	AM_RANGE(0x9000, 0xBfff) AM_ROM AM_REGION("maincpu", 0x9000<<1)
+	AM_RANGE(0xD000, 0xFfff) AM_ROM AM_REGION("maincpu", 0xD000<<1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( intvkbd_mem , AS_PROGRAM, 16)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE( intv_stic_r, intv_stic_w )
 	AM_RANGE(0x0080, 0x0081) AM_DEVREADWRITE("sp0256_speech", spb640_r, spb640_w )
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
-	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE("ay8910", AY8914_directread_port_0_lsb_r, AY8914_directwrite_port_0_lsb_w )
+	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914", ay8914_r, ay8914_w, 0x00ff )
 	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM	AM_REGION("maincpu", 0x1000<<1)	/* Exec ROM, 10-bits wide */
 	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("maincpu", 0x3000<<1)	/* GROM,     8-bits wide */
@@ -466,7 +466,7 @@ static MACHINE_CONFIG_START( intv, intv_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_3_579545MHz/2)
+	MCFG_SOUND_ADD("ay8914", AY8914, XTAL_3_579545MHz/2)
 	MCFG_SOUND_CONFIG(intv_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -479,6 +479,9 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("int,rom,bin,itv")
 	MCFG_CARTSLOT_LOAD(intv_cart)
+	MCFG_CARTSLOT_INTERFACE("intv_cart")
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","intv")	
 MACHINE_CONFIG_END
 
 
@@ -518,7 +521,7 @@ ROM_START(intv)
 
 	ROM_REGION( 0x10000<<1, "sp0256_speech", 0 )
 	/* SP0256-012 Speech chip w/2KiB mask rom */
-	ROM_LOAD( "sp0256-012.bin",   0x1000, 0x0800, CRC(8bd786ec) SHA1(f98b3024cb87b21dc3ba48ecbc0e8713e9f70219) )
+	ROM_LOAD( "sp0256-012.bin",   0x1000, 0x0800, CRC(0de7579d) SHA1(618563e512ff5665183664f52270fa9606c9d289) )
 ROM_END
 
 ROM_START(intvsrs)
@@ -528,7 +531,7 @@ ROM_START(intvsrs)
 
 	ROM_REGION( 0x10000<<1, "sp0256_speech", 0 )
 	/* SP0256-012 Speech chip w/2KiB mask rom */
-	ROM_LOAD( "sp0256-012.bin",   0x1000, 0x0800, CRC(8bd786ec) SHA1(f98b3024cb87b21dc3ba48ecbc0e8713e9f70219) )
+	ROM_LOAD( "sp0256-012.bin",   0x1000, 0x0800, CRC(0de7579d) SHA1(618563e512ff5665183664f52270fa9606c9d289) )
 ROM_END
 
 ROM_START(intvkbd)

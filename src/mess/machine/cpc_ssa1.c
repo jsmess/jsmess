@@ -99,12 +99,12 @@ static sp0256_interface sp0256_dk_intf =
 // Has no actual ROM, just that internal to the SP0256
 ROM_START( cpc_ssa1 )
 	ROM_REGION( 0x10000, "sp0256", 0 )
-	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(df8de0b0) SHA1(86fb6d9fef955ac0bc76e0c45c66585946d278a1) )
+	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 ROM_END
 
 ROM_START( cpc_dkspeech )
 	ROM_REGION( 0x10000, "sp0256", 0 )
-	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(df8de0b0) SHA1(86fb6d9fef955ac0bc76e0c45c66585946d278a1) )
+	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 	// TODO: Add expansion ROM
 ROM_END
 
