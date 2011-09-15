@@ -47,8 +47,48 @@ protected:
 private:
 	enum { TM_GEN, TM_CMD, TM_TRACK, TM_SECTOR };
 
+	//  State machine general behaviour:
+	//
+	//  There are three levels of state.
+	//
+	//  Main state is associated to (groups of) commands.  They're set
+	//  by a *_start() function below, and the associated _continue()
+	//  function can then be called at pretty much any time.
+	//
+	//  Sub state is the state of execution within a command.  The
+	//  principle is that the *_start() function selects the initial
+	//  substate, then the *_continue() function decides what to do,
+	//  possibly changing state.  Eventually it can:
+	//  - decide to wait for an event (timer, index)
+	//  - end the command with command_end()
+	//  - start a live state (see below)
+	//
+	//  In the first case, it must first switch to a waiting
+	//  sub-state, then return.  The waiting sub-state must just
+	//  return immediatly when *_continue is called.  Eventually the
+	//  event handler function will advance the state machine to
+	//  another sub-state, and things will continue synchronously.
+	//
+	//  On command end it's also supposed to return immediatly.
+	//
+	//  The last option is to switch to the next sub-state, start a
+	//  live state with live_start() then return.  The next sub-state
+	//  will only be called once the live state is finished.
+	//
+	//  Live states change continually depending on the disk contents
+	//  until the next externally discernable event is found.  They
+	//  are checkpointing, run until an event is found, then they wait
+	//  for it.  When an event eventually happen the the changes are
+	//  either committed or replayed until the sync event time.
+	//
+	//  The transition to IDLE is only done on a synced event.  Some
+	//  other transitions, such as activating drq, are also done after
+	//  syncing without exiting live mode.  Syncing in live mode is
+	//  done by calling live_delay() with the state to change to after
+	//  syncing.
+
 	enum {
-		// General "nothing doing" state
+		// General "doing nothing" state
 		IDLE,
 
 		// Main states - the commands
@@ -57,11 +97,10 @@ private:
 		STEP,
 		READ_SECTOR,
 
-		// Sub states - steps within the commands, which change only
-		// on globally synchronizing event, such as timers or index
-		// callback (which is timer-triggered)
+		// Sub states
 
 		SPINUP,
+		SPINUP_WAIT,
 		SPINUP_DONE,
 
 		SEEK_MOVE,
@@ -76,16 +115,7 @@ private:
 
 		SECTOR_READ,
 
-		COMMAND_DONE,
-
-		// Live states - steps withing the sub-states, which change
-		// continually depending on the disk contents until the next
-		// externally discernable event is found.  Requires
-		// checkpointing, running until an event is found, then
-		// waiting for it.  Then the changes are either committed or
-		// replayed until the sync event time.
-
-		// The transition to LIVE_DONE is only done on a synced event.
+		// Live states
 
 		SEARCH_ADDRESS_MARK,
 		READ_BLOCK_HEADER,
@@ -93,7 +123,6 @@ private:
 		READ_SECTOR_DATA,
 		READ_SECTOR_DATA_BYTE,
 		READ_SECTOR_DATA_BYTE_DONE,
-		LIVE_DONE,
 	};
 
 	struct pll_t {
@@ -161,11 +190,14 @@ private:
 
 	void delay_cycles(emu_timer *tm, int cycles);
 
+	// Device timer subfunctions
 	void do_cmd_w();
 	void do_track_w();
 	void do_sector_w();
-	void command_end();
+	void do_generic();
 
+
+	// Main-state handling functions
 	void seek_start(int state);
 	void seek_continue();
 
@@ -175,18 +207,18 @@ private:
 	void interrupt_start();
 
 	void general_continue();
-	void do_generic();
+	void command_end();
+
 
 	void spinup();
 	void index_callback(floppy_image_device *floppy, int state);
 
-	void start_io(int live_state);
-	void end_io();
+	void live_start(int live_state);
 	void checkpoint();
 	void rollback();
 	void live_delay(int state);
+	void live_sync();
 	void live_run(attotime limit = attotime::never);
-	bool live_running();
 	bool read_one_bit(attotime limit);
 	void drop_drq();
 	void set_drq();
