@@ -38,6 +38,7 @@ void wd1772_t::device_reset()
 	command = 0x00;
 	main_state = IDLE;
 	sub_state = IDLE;
+	cur_live.state = IDLE;
 	track = 0x00;
 	sector = 0x00;
 	status = 0x00;
@@ -97,20 +98,7 @@ astring wd1772_t::ttsn()
 
 void wd1772_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	//	fprintf(stderr, "%s: device_timer\n", ttsn().cstr());
-	if(!cur_live.tm.is_never()) {
-		if(cur_live.tm > machine().time()) {
-			//			fprintf(stderr, "%s: Rolling back and replaying (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
-			rollback();
-			live_run(machine().time());
-		} else {
-			//			fprintf(stderr, "%s: Committing (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
-			if(cur_live.next_state != -1)
-				cur_live.state = cur_live.next_state;
-		}
-		cur_live.next_state = -1;
-		checkpoint();
-	}
+	live_sync();
 
 	switch(id) {
 	case TM_GEN: do_generic(); break;
@@ -128,13 +116,13 @@ void wd1772_t::command_end()
 	status &= ~S_BUSY;
 	intrq = true;
 	motor_timeout = 0;
+	//	fprintf(stderr, "%s: command status %02x\n", ttsn().cstr(), status);
 	if(!intrq_cb.isnull())
 		intrq_cb(intrq);
 }
 
 void wd1772_t::seek_start(int state)
 {
-	//	fprintf(stderr, "%s: seek type %s, cmd=%02x\n", ttsn().cstr(), state == RESTORE ? "restore" : state == SEEK ? "seek" : "step", command);
 	main_state = state;
 	status = (status & ~(S_CRC|S_RNF|S_SPIN)) | S_BUSY;
 	sub_state = SPINUP;
@@ -146,16 +134,16 @@ void wd1772_t::seek_continue()
 {
 	for(;;) {
 		switch(sub_state) {
-		case IDLE:
-			return;
-
 		case SPINUP:
 			if(!(status & S_MON)) {
 				spinup();
 				return;
-			} else
-				sub_state = SPINUP_DONE;
+			}
+			sub_state = SPINUP_DONE;
 			break;
+
+		case SPINUP_WAIT:
+			return;
 
 		case SPINUP_DONE:
 			if(main_state == RESTORE && floppy && !floppy->trk00_r())
@@ -232,36 +220,31 @@ void wd1772_t::seek_continue()
 
 		case SEEK_DONE:
 			if(command & 0x04) {
-				start_io(SEARCH_ADDRESS_MARK);
 				sub_state = SCAN_ID;
-			} else
-				command_end();
-			break;
+				counter = 0;
+				live_start(SEARCH_ADDRESS_MARK);
+				return;
+			}
+			command_end();
+			return;
 
 		case SCAN_ID:
-			live_run();
-			if(cur_live.state != LIVE_DONE)
-				return;
-
-			end_io();
-
 			if(cur_live.idbuf[0] != track) {
-				start_io(SEARCH_ADDRESS_MARK);
-				break;
+				live_start(SEARCH_ADDRESS_MARK);
+				return;
 			}
 			if(cur_live.crc) {
 				status |= S_CRC;
-				start_io(SEARCH_ADDRESS_MARK);
-				break;
+				live_start(SEARCH_ADDRESS_MARK);
+				return;
 			}
 			command_end();
 			return;
 
 		case SCAN_ID_FAILED:
-			end_io();
 			status |= S_RNF;
 			command_end();
-			break;
+			return;
 
 		default:
 			logerror("%s: seek unknown sub-state %d\n", ttsn().cstr(), sub_state);
@@ -284,64 +267,58 @@ void wd1772_t::read_sector_continue()
 {
 	for(;;) {
 		switch(sub_state) {
-		case IDLE:
-			return;
-
 		case SPINUP:
 			if(!(status & S_MON)) {
 				spinup();
 				return;
-			} else
-				sub_state = SPINUP_DONE;
+			}
+			sub_state = SPINUP_DONE;
 			break;
+
+		case SPINUP_WAIT:
+			return;
 
 		case SPINUP_DONE:
-			start_io(SEARCH_ADDRESS_MARK);
 			sub_state = SCAN_ID;
 			counter = 0;
-			break;
+			live_start(SEARCH_ADDRESS_MARK);
+			return;
 
 		case SCAN_ID:
-			live_run();
-			if(cur_live.state != LIVE_DONE)
+			if(cur_live.state != IDLE)
 				return;
-			end_io();
 
 			if(cur_live.idbuf[0] != track || cur_live.idbuf[2] != sector) {
-				start_io(SEARCH_ADDRESS_MARK);
-				break;
+				live_start(SEARCH_ADDRESS_MARK);
+				return;
 			}
 			if(cur_live.crc) {
 				status |= S_CRC;
-				start_io(SEARCH_ADDRESS_MARK);
-				break;
+				live_start(SEARCH_ADDRESS_MARK);
+				return;
 			}
 			static int size_codes[4] = { 128, 256, 512, 1024 };
 			sector_size = cur_live.idbuf[3] < 4 ? size_codes[cur_live.idbuf[3]] : 512;
-			start_io(SEARCH_ADDRESS_MARK);
 			sub_state = SECTOR_READ;
-			break;
+			live_start(SEARCH_ADDRESS_MARK);
+			return;
 
 		case SCAN_ID_FAILED:
-			end_io();
 			status |= S_RNF;
 			command_end();
-			break;
+			return;
 
 		case SECTOR_READ:
-			live_run();
-			if(cur_live.state != LIVE_DONE)
-				return;
-			end_io();
-
 			if(cur_live.crc)
 				status |= S_CRC;
 
 			if(command & 0x10) {
 				sector++;
 				sub_state = SPINUP_DONE;
-			} else
+			} else {
 				command_end();
+				return;
+			}
 			break;
 
 		default:
@@ -354,7 +331,8 @@ void wd1772_t::read_sector_continue()
 void wd1772_t::interrupt_start()
 {
 	if(status & S_BUSY) {
-		main_state = sub_state = IDLE;
+		main_state = sub_state = cur_live.state = IDLE;
+		cur_live.tm = attotime::never;
 		status &= ~S_BUSY;
 		motor_timeout = 0;
 	}
@@ -365,6 +343,11 @@ void wd1772_t::interrupt_start()
 
 void wd1772_t::general_continue()
 {
+	if(cur_live.state != IDLE) {
+		live_run();
+		return;
+	}
+
 	switch(main_state) {
 	case IDLE:
 		break;
@@ -400,6 +383,8 @@ void wd1772_t::do_generic()
 
 void wd1772_t::do_cmd_w()
 {
+	//	fprintf(stderr, "%s: command %02x\n", ttsn().cstr(), cmd_buffer);
+
 	// Only available command when busy is interrupt
 	if(main_state != IDLE && (cmd_buffer & 0xf0) != 0xd0) {
 		cmd_buffer = -1;
@@ -544,7 +529,7 @@ void wd1772_t::spinup()
 	if(command & 0x08)
 		sub_state = SPINUP_DONE;
 	else {
-		sub_state = SPINUP;
+		sub_state = SPINUP_WAIT;
 		counter = 0;
 	}
 
@@ -556,6 +541,8 @@ void wd1772_t::spinup()
 
 void wd1772_t::index_callback(floppy_image_device *floppy, int state)
 {
+	live_sync();
+
 	if(status_type_1) {
 		if(state)
 			status |= S_IP;
@@ -563,8 +550,10 @@ void wd1772_t::index_callback(floppy_image_device *floppy, int state)
 			status &= ~S_IP;
 	}
 
-	if(!state)
+	if(!state) {
+		general_continue();
 		return;
+	}
 
 	switch(sub_state) {
 	case IDLE:
@@ -577,11 +566,13 @@ void wd1772_t::index_callback(floppy_image_device *floppy, int state)
 		break;
 
 	case SPINUP:
+		break;
+
+	case SPINUP_WAIT:
 		counter++;
 		if(counter == 6) {
 			sub_state = SPINUP_DONE;
 			status |= S_SPIN;
-			general_continue();
 		}
 		break;
 
@@ -594,20 +585,20 @@ void wd1772_t::index_callback(floppy_image_device *floppy, int state)
 	case SEEK_DONE:
 	case SCAN_ID_FAILED:
 	case SECTOR_READ:
-	case COMMAND_DONE:
 		break;
 
 	case SCAN_ID:
 		counter++;
 		if(counter == 5)
 			sub_state = SCAN_ID_FAILED;
-		general_continue();
 		break;
 
 	default:
 		logerror("%s: Index pulse on unknown sub-state %d\n", ttsn().cstr(), sub_state);
 		break;
 	}
+
+	general_continue();
 }
 
 bool wd1772_t::intrq_r()
@@ -620,7 +611,7 @@ bool wd1772_t::drq_r()
 	return drq;
 }
 
-void wd1772_t::start_io(int state)
+void wd1772_t::live_start(int state)
 {
 	cur_live.tm = machine().time();
 	cur_live.state = state;
@@ -633,12 +624,8 @@ void wd1772_t::start_io(int state)
 	cur_live.pll.reset(cur_live.tm);
 	cur_live.pll.set_clock(attotime::from_usec(2));
 	checkpoint_live = cur_live;
-}
 
-void wd1772_t::end_io()
-{
-	cur_live.tm = attotime::never;
-	checkpoint_live.tm = attotime::never;
+	live_run();
 }
 
 void wd1772_t::checkpoint()
@@ -655,6 +642,25 @@ void wd1772_t::live_delay(int state)
 {
 	cur_live.next_state = state;
 	t_gen->adjust(cur_live.tm - machine().time());
+}
+
+void wd1772_t::live_sync()
+{
+	if(!cur_live.tm.is_never()) {
+		if(cur_live.tm > machine().time()) {
+			//			fprintf(stderr, "%s: Rolling back and replaying (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
+			rollback();
+			live_run(machine().time());
+		} else {
+			//			fprintf(stderr, "%s: Committing (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
+			if(cur_live.next_state != -1)
+				cur_live.state = cur_live.next_state;
+			if(cur_live.state == IDLE)
+				cur_live.tm = attotime::never;
+		}
+		cur_live.next_state = -1;
+		checkpoint();
+	}
 }
 
 bool wd1772_t::read_one_bit(attotime limit)
@@ -677,11 +683,13 @@ bool wd1772_t::read_one_bit(attotime limit)
 
 void wd1772_t::live_run(attotime limit)
 {
-	if(cur_live.state == LIVE_DONE || cur_live.next_state != -1)
+	if(cur_live.state == IDLE || cur_live.next_state != -1)
 		return;
 
 	if(limit == attotime::never)
 		limit = floppy->time_next_index();
+
+	//	fprintf(stderr, "%s: live_run(%s)\n", ttsn().cstr(), tts(limit).cstr());
 
 	for(;;) {
 		switch(cur_live.state) {
@@ -772,7 +780,7 @@ void wd1772_t::live_run(attotime limit)
 			int slot = (cur_live.bit_counter >> 4)-1;
 			cur_live.idbuf[slot] = cur_live.data_reg;
 			if(slot == 5) {
-				live_delay(LIVE_DONE);
+				live_delay(IDLE);
 				return;
 			}
 			break;
@@ -792,7 +800,7 @@ void wd1772_t::live_run(attotime limit)
 			} else if(slot < sector_size+2) {
 				// CRC
 				if(slot == sector_size+1) {
-					live_delay(LIVE_DONE);
+					live_delay(IDLE);
 					return;
 				}
 			}
