@@ -260,6 +260,7 @@ static WRITE8_DEVICE_HANDLER( einstein_drsel_w )
 		/* bit 4 selects the side then */
 		//floppy->ss_w(BIT(data, 4));
 	}
+	if (floppy) floppy->ss_w(0);
 	einstein->m_fdc->set_floppy(floppy);
 }
 
