@@ -23,7 +23,8 @@ class floppy_image_device :	public device_t,
 {
 public:
 	enum {
-		TYPE_35_SD, TYPE_35_DD, TYPE_35_HD, TYPE_35_ED
+		TYPE_35_SD, TYPE_35_DD, TYPE_35_HD, TYPE_35_ED,
+		TYPE_525_SD, TYPE_525_DD, TYPE_525_HD
 	};
 
 	typedef delegate<int (floppy_image_device *)> load_cb;

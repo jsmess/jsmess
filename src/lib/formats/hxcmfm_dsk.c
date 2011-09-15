@@ -74,11 +74,11 @@ bool mfm_format::load(io_generic *io, floppy_image *image)
 
 	// read header
 	io_generic_read(io, &header, 0, sizeof(header));
-
+	int counter = 0;
 	for(int track=0; track < header.number_of_track; track++) {
 		for(int side=0; side < header.number_of_side; side++) {
 			// read location of
-			io_generic_read(io, &trackdesc,(header.mfmtracklistoffset)+((( track << 1 ) + side)*sizeof(trackdesc)),sizeof(trackdesc));
+			io_generic_read(io, &trackdesc,(header.mfmtracklistoffset)+( counter *sizeof(trackdesc)),sizeof(trackdesc));
 
 			if(trackdesc.mfmtracksize > trackbuf_size) {
 				if(trackbuf)
@@ -91,6 +91,8 @@ bool mfm_format::load(io_generic *io, floppy_image *image)
 			io_generic_read(io, trackbuf, trackdesc.mfmtrackoffset, trackdesc.mfmtracksize);
 
 			generate_track_from_bitstream(track, side, trackbuf, trackdesc.mfmtracksize*8, image);
+
+			counter++;
 		}
 	}
 	if(trackbuf)
