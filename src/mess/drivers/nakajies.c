@@ -102,6 +102,19 @@ I/O Map:
 0015 - unknown
        0x1c written during boot sequence
 
+0012-0015 - banking? 
+T450:
+Regular boot: 12 - 1f; 13 - 1e; 14 - 1d; 15 - 1c
+Typing game: 15 - 02; call B100:0;
+Edit Text: 12 - 07; 13 - 06; 14 - 05; 15 - 04; call 4000:0000
+c000:0000 - ffff:ffff = not banked?
+
+T400, wales210:
+Regular boot: 12 - 1f; 13 - 1e; 14 - 1d; 15 - 1c
+Next step during boot: 12 - 17; 13 - 3; 14 - 2; jump to 3000:0000
+writing 17 to port 12 maps rom offset 30000 to 3000:0000?
+
+
 0016 - unknown
        0x01 written during boot sequence
 
@@ -129,6 +142,8 @@ I/O Map:
 
 0061 - unknown
        0xFE written in irq 0xFB handler
+
+0070 - uknown 0x01 is written when going to terminal mode (enable rs232 receive?)
 
 0090 - Interrupt source clear
        b7 - 1 = clear interrupt source for irq vector 0xf8
@@ -312,9 +327,15 @@ WRITE8_MEMBER( nakajies_state::irq_enable_w )
 }
 
 
+/*
+  I/O Port a0:
+  bit 7-4 - unknown
+  bit 3   - battery low (when set)
+  bit 2-0 - unknown
+*/
 READ8_MEMBER( nakajies_state::unk_a0_r )
 {
-	return 0xff;
+	return 0xf7;
 }
 
 WRITE8_MEMBER( nakajies_state::lcd_memory_start_w )
