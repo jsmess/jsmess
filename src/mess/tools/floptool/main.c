@@ -78,12 +78,25 @@ static int identify(int argc, char *argv[])
 			perror(msg);
 			return 1;
 		}
+		io_generic io;
+		io.file = f;
+		io.procs = &stdio_ioprocs_noclose;
+		io.filler = 0xff;
 
-		floppy_image *image = new floppy_image(f, &stdio_ioprocs_noclose, floppy_formats);
-		int best;
-		floppy_image_format_t *format = image->identify(&best);
-		if (format)
-			printf("%s : %s\n", argv[i], format->description());
+		int best = 0;
+		floppy_image_format_t *best_fif = 0;
+
+		for(int j = 0; floppy_formats[j]; j++)
+		{
+			floppy_image_format_t *fif = floppy_formats[j]();
+			int score = fif->identify(&io);
+			if(score > best) {
+				best = score;
+				best_fif = fif;
+			}
+		}
+		if (best_fif)
+			printf("%s : %s\n", argv[i], best_fif->description());
 		else
 			printf("%s : Unknown format\n", argv[i]);
 		fclose(f);
