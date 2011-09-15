@@ -822,7 +822,7 @@ void to7_io_line_device::device_reset()
 
 	LOG (( "to7_io_reset called\n" ));
 
-	io_pia->set_port_a_z_mask(0x03 );
+	if (io_pia) io_pia->set_port_a_z_mask(0x03 );
 	m_input_state = SERIAL_STATE_CTS;
 	m_connection_state &= ~SERIAL_STATE_DTR;
 	m_connection_state |=  SERIAL_STATE_RTS;  /* always ready to send */
