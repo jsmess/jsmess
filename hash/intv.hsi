@@ -224,6 +224,7 @@
 	</hash>
 	<hash crc32="7217ca7b" name="IMI Test Cart (Mattel) [!]">
 		<year>1978</year>
+		<extrainfo>0 114 0 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="c99e7554" name="Intellivision - Intelligent Television Demo #1682 (Prototype) (Mattel)">
 		<year>1978</year>
@@ -233,6 +234,7 @@
 	</hash>
 	<hash crc32="a3acd160" name="Intellivision - Intelligent Television Demo #5853 (Mattel)">
 		<year>1983</year>
+		<extrainfo>0 84 212 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="8401f0db" name="Intellivision - Intelligent Television Demo #5932 Revised (Mattel) [o1]">
 		<year>1978</year>
@@ -248,6 +250,7 @@
 	</hash>
 	<hash crc32="6a02c7e8" name="Intellivision - Intelligent Television Demo International #5859 (Mattel)">
 		<year>1982</year>
+		<extrainfo>0 84 210 0 0 0 0</extrainfo>
 	</hash>
 	<hash crc32="c83eea4c" name="Intellivision Test Cartridge and Baseball (Mattel)">
 		<year>1978</year>

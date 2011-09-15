@@ -473,7 +473,32 @@ static int intv_load_rom_file(device_image_interface &image)
 
 DEVICE_IMAGE_LOAD( intv_cart )
 {
-	return intv_load_rom_file(image);
+	if (image.software_entry() == NULL)
+		return intv_load_rom_file(image);
+	else
+	{
+		UINT16 offset[] = {0x4800, 0x5000, 0x6000, 0x7000, 0x9000, 0xa000, 0xc000, 0xd000, 0xf000};
+		const char* region_name[] = {"4800", "5000", "6000", "7000", "9000", "A000", "C000", "D000", "F000"};  
+		UINT8 *memory = image.device().machine().region("maincpu")->base();
+		UINT32 size=0;
+		UINT16 address;
+		UINT8 *region;
+		for(int i = 0; i < 9; i++)
+		{
+			address = offset[i];
+			size = image.get_software_region_length(region_name[i]);
+			if (size)
+			{
+				region = image.get_software_region(region_name[i]);
+				for (int j = 0; j < (size>>1); j++)
+				{
+					memory[((address + j) << 1) + 1] = region[2*j];
+					memory[(address + j) << 1] = region[2*j+1];
+				}
+			}
+		}
+		return IMAGE_INIT_PASS;
+	}
 }
 
 #ifdef UNUSED_FUNCTION
