@@ -103,6 +103,11 @@ I/O Map:
        0x1c written during boot sequence
 
 0012-0015 - banking? 
+T200:
+Time: 15 - 02; call ADxxx
+Database: 15 - 02; call B3xxx
+Spreadsheet: 15 - 02; call B9xxx
+
 T450:
 Regular boot: 12 - 1f; 13 - 1e; 14 - 1d; 15 - 1c
 Typing game: 15 - 02; call B100:0;
@@ -113,6 +118,28 @@ T400, wales210:
 Regular boot: 12 - 1f; 13 - 1e; 14 - 1d; 15 - 1c
 Next step during boot: 12 - 17; 13 - 3; 14 - 2; jump to 3000:0000
 writing 17 to port 12 maps rom offset 30000 to 3000:0000?
+
+1f, 1e, 1d, 1c is banked RAM ??
+
+banking possibility:
+0010-0017 - control banking:
+0010 - 00000 - 1ffff
+0011 - 20000 - 3ffff
+0012 - 40000 - 5ffff
+0013 - 60000 - 7ffff
+0014 - 80000 - 9ffff
+0015 - a0000 - bffff
+0016 - c0000 - dffff
+0017 - e0000 - fffff
+
+values 00-0f select a rom bank
+      00 - selects last 20000h region of rom
+      01 - 20000h region before last
+      02 - etc
+
+values 10-1f select a ram bank
+
+on reset 0017 is set to 0, pointing to last 20000h bytes of ROM containing the boot setup code
 
 
 0016 - unknown
