@@ -347,6 +347,17 @@
 		</part>
 	</software>
 	
+	<software name="demonatk">
+		<description>Demon Attack</description>
+		<year>1982</year>
+		<publisher>Imagic</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="4800" size="0x4000">
+					<rom name="demon attack.48" size="0x4000" crc="5e6a8cd8" sha1="d6054e8ead16f3e076c26880fe641543e8519e18" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="demoblue">
 		<description>Demonstration Cartridge (blue)</description>
 		<year>1978</year>
@@ -445,7 +456,7 @@
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="intv_cart">
 			<dataarea name="5000" size="0x4000">
-					<rom name="donkey kong jr.50" size="0x4000" crc="6df61a9f" sha1="93807afeee023ce6c787b073705c8bf32bbd8abf" offset="0000" />
+					<rom name="donkey kong jr.50" size="0x4000" crc="6df61a9f" sha1="9d983308ef7051eef0c324e696776a6f9b9c38d4" offset="0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -968,8 +979,8 @@
 		<year>1982</year>
 		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="intv_cart">
-			<dataarea name="5000" size="0x4000">
-					<rom name="sharp shot.50" size="0x4000" crc="ff7cb79e" sha1="0a0230a5c06f3593d683458aec3d81654904f16d" offset="0000" />
+			<dataarea name="5000" size="0x2000">
+					<rom name="sharp shot.50" size="0x2000" crc="ff7cb79e" sha1="0a0230a5c06f3593d683458aec3d81654904f16d" offset="0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -979,8 +990,8 @@
 		<year>1980</year>
 		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="intv_cart">
-			<dataarea name="5000" size="0x4000">
-					<rom name="skiing.50" size="0x4000" crc="f093e801" sha1="f93df55f45ee9b589db5763cefe6742860b38e79" offset="0000" />
+			<dataarea name="5000" size="0x2000">
+					<rom name="skiing.50" size="0x2000" crc="f093e801" sha1="f93df55f45ee9b589db5763cefe6742860b38e79" offset="0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1723,4 +1734,4 @@
 			</dataarea>
 		</part>
 	</software>
-</softwarelist>	
+</softwarelist>
