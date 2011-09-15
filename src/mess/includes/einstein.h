@@ -9,35 +9,8 @@
 
 #include "video/mc6845.h"
 #include "cpu/z80/z80daisy.h"
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-class einstein_state : public driver_device
-{
-public:
-	einstein_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
-	device_t *m_color_screen;
-	device_t *m_ctc;
-
-	int m_rom_enabled;
-	int m_interrupt;
-	int m_interrupt_mask;
-	int m_ctc_trigger;
-
-	/* keyboard */
-	UINT8 m_keyboard_line;
-	UINT8 m_keyboard_data;
-
-	/* 80 column device */
-	mc6845_device *m_mc6845;
-	screen_device *m_crtc_screen;
-	UINT8 *m_crtc_ram;
-	UINT8	m_de;
-};
+#include "imagedev/floppy.h"
+#include "machine/wd1772.h"
 
 /***************************************************************************
     CONSTANTS
@@ -61,6 +34,41 @@ public:
 #define EINSTEIN_KEY_INT   (1<<0)
 #define EINSTEIN_ADC_INT   (1<<1)
 #define EINSTEIN_FIRE_INT  (1<<2)
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+class einstein_state : public driver_device
+{
+public:
+	einstein_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		  m_fdc(*this, IC_I042)
+		  { }
+
+	required_device<wd1772_t> m_fdc;
+	device_t *m_color_screen;
+	device_t *m_ctc;
+
+	int m_rom_enabled;
+	int m_interrupt;
+	int m_interrupt_mask;
+	int m_ctc_trigger;
+
+	/* keyboard */
+	UINT8 m_keyboard_line;
+	UINT8 m_keyboard_data;
+
+	/* 80 column device */
+	mc6845_device *m_mc6845;
+	screen_device *m_crtc_screen;
+	UINT8 *m_crtc_ram;
+	UINT8	m_de;
+
+	static const floppy_format_type floppy_formats[];	
+};
+
 
 // ======================> einstein_keyboard_daisy_device
 

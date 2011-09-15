@@ -35,6 +35,9 @@ public:
 
 	bool intrq_r();
 	bool drq_r();
+	
+	DECLARE_READ8_MEMBER( read ) { return gen_r(offset);}
+	DECLARE_WRITE8_MEMBER( write ) { gen_w(offset,data); }
 
 protected:
 	virtual void device_start();

@@ -61,7 +61,9 @@
 #include "video/tms9928a.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "machine/wd17xx.h"
+#include "machine/wd1772.h"
+#include "formats/hxcmfm_dsk.h"
+#include "formats/mfi_dsk.h"
 #include "machine/ctronics.h"
 #include "machine/i8251.h"
 #include "imagedev/flopdrv.h"
@@ -73,6 +75,11 @@
 
 #define VERBOSE_KEYBOARD	0
 #define VERBOSE_DISK		0
+
+const floppy_format_type einstein_state::floppy_formats[] = {
+	FLOPPY_MFM_FORMAT, FLOPPY_MFI_FORMAT,
+	NULL
+};
 
 /***************************************************************************
     80 COLUMN DEVICE
@@ -236,21 +243,24 @@ static READ8_HANDLER( einstein_keyboard_data_read )
 
 static WRITE8_DEVICE_HANDLER( einstein_drsel_w )
 {
+	einstein_state *einstein = device->machine().driver_data<einstein_state>();
 	if(VERBOSE_DISK)
 		logerror("%s: einstein_drsel_w %02x\n", device->machine().describe_context(), data);
 
 	/* bit 0 to 3 select the drive */
-	if (BIT(data, 0)) wd17xx_set_drive(device, 0);
-	if (BIT(data, 1)) wd17xx_set_drive(device, 1);
-	if (BIT(data, 2)) wd17xx_set_drive(device, 2);
-	if (BIT(data, 3)) wd17xx_set_drive(device, 3);
+	floppy_image_device *floppy = 0;
+	if (BIT(data, 0)) floppy = device->machine().device<floppy_image_device>("fd0");
+	if (BIT(data, 1)) floppy = device->machine().device<floppy_image_device>("fd1");
+	if (BIT(data, 2)) floppy = device->machine().device<floppy_image_device>("fd2");
+	if (BIT(data, 3)) floppy = device->machine().device<floppy_image_device>("fd3");
 
 	/* double sided drive connected? */
 	if (input_port_read(device->machine(), "config") & data)
 	{
 		/* bit 4 selects the side then */
-		wd17xx_set_side(device, BIT(data, 4));
+		//floppy->ss_w(BIT(data, 4));
 	}
+	einstein->m_fdc->set_floppy(floppy);
 }
 
 
@@ -418,13 +428,17 @@ static SCREEN_UPDATE( einstein )
 
 static MACHINE_START( einstein )
 {
+	machine.device<floppy_image_device>("fd0")->set_rpm(300);
+	machine.device<floppy_image_device>("fd1")->set_rpm(300);
+	machine.device<floppy_image_device>("fd2")->set_rpm(300);
+	machine.device<floppy_image_device>("fd3")->set_rpm(300);
 }
 
 static MACHINE_RESET( einstein )
 {
 	einstein_state *einstein = machine.driver_data<einstein_state>();
-	device_t *floppy;
-	UINT8 config = input_port_read(machine, "config");
+	//device_t *floppy;
+	//UINT8 config = input_port_read(machine, "config");
 
 	/* save pointers to our devices */
 	einstein->m_color_screen = machine.device("screen");
@@ -444,7 +458,7 @@ static MACHINE_RESET( einstein )
 	einstein->m_ctc_trigger = 0;
 
 	/* configure floppy drives */
-	floppy_type_t type_80 = FLOPPY_STANDARD_5_25_DSHD;
+/*	floppy_type_t type_80 = FLOPPY_STANDARD_5_25_DSHD;
 	floppy_type_t type_40 = FLOPPY_STANDARD_5_25_SSDD_40;
 	floppy = machine.device("floppy0");
 	floppy_drive_set_geometry(floppy, config & 0x01 ? type_80 : type_40);
@@ -453,7 +467,7 @@ static MACHINE_RESET( einstein )
 	floppy = machine.device("floppy2");
 	floppy_drive_set_geometry(floppy, config & 0x04 ? type_80 : type_40);
 	floppy = machine.device("floppy3");
-	floppy_drive_set_geometry(floppy, config & 0x08 ? type_80 : type_40);
+	floppy_drive_set_geometry(floppy, config & 0x08 ? type_80 : type_40);*/
 }
 
 static MACHINE_RESET( einstein2 )
@@ -520,7 +534,7 @@ static ADDRESS_MAP_START( einstein_io, AS_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN(IC_I060, i8251_device, data_r, data_w)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN(IC_I060, i8251_device, status_r, control_w)
 	/* block 3, wd1770 floppy controller */
-	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I042, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff04) AM_DEVREADWRITE_MODERN(IC_I042, wd1772_t, read, write)
 	/* block 4, internal controls */
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_READWRITE(einstein_kybintmsk_r, einstein_kybintmsk_w)
 	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_WRITE(einstein_adcintmsk_w)
@@ -745,20 +759,6 @@ static const mc6845_interface einstein_crtc6845_interface =
 	NULL
 };
 
-static const floppy_interface einstein_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_SSDD_40,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25",
-	NULL
-};
-
-
 /* F4 Character Displayer */
 static const gfx_layout einstei2_charlayout =
 {
@@ -821,9 +821,12 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	/* uart */
 	MCFG_I8251_ADD(IC_I060, default_i8251_interface)
 
-	MCFG_WD1770_ADD(IC_I042, default_wd17xx_interface)
+	MCFG_WD1772x_ADD(IC_I042, 8000000)
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(einstein_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_525_DD, 42, 1, einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_525_DD, 42, 1, einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd2", floppy_image_device::TYPE_525_DD, 42, 1, einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd3", floppy_image_device::TYPE_525_DD, 42, 1, einstein_state::floppy_formats)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","einstein")
