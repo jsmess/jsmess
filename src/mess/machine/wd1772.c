@@ -885,6 +885,11 @@ int wd1772_t::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, att
 				counter += 34;
 			else
 				counter += increment;
+
+			if((freq_add & mask) && increment < 159)
+				increment++;
+			else if((freq_sub & mask) && increment > 134)
+				increment--;
 		} else
 			counter += increment;
 
@@ -893,16 +898,37 @@ int wd1772_t::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, att
 		if(counter & 0x800)
 			break;
 	}
-	//	fprintf(stderr, "first transition, time=%03x\n", transition_time);
+	//	fprintf(stderr, "first transition, time=%03x, inc=%3d\n", transition_time, increment);
 	int bit = transition_time != 0xffff;
 
 	if(transition_time != 0xffff) {
 		static const UINT8 pha[8] = { 0xf, 0x7, 0x3, 0x1, 0, 0, 0, 0 };
 		static const UINT8 phs[8] = { 0, 0, 0, 0, 0x1, 0x3, 0x7, 0xf };
+		static const UINT8 freqa[4][8] = {
+			{ 0xf, 0x7, 0x3, 0x1, 0, 0, 0, 0 },
+			{ 0x7, 0x3, 0x1, 0, 0, 0, 0, 0 },
+			{ 0x7, 0x3, 0x1, 0, 0, 0, 0, 0 },
+			{ 0, 0, 0, 0, 0, 0, 0, 0 }
+		};
+		static const UINT8 freqs[4][8] = {
+			{ 0, 0, 0, 0, 0, 0, 0, 0 },
+			{ 0, 0, 0, 0, 0, 0x1, 0x3, 0x7 },
+			{ 0, 0, 0, 0, 0, 0x1, 0x3, 0x7 },
+			{ 0, 0, 0, 0, 0x1, 0x3, 0x7, 0xf },
+		};
 
 		int cslot = transition_time >> 8;
 		phase_add = pha[cslot];
 		phase_sub = phs[cslot];
+		int way = transition_time & 0x400 ? 1 : 0;
+		if(history & 0x80)
+			history = way ? 0x80 : 0x83;
+		else if(history & 0x40)
+			history = way ? history & 2 : (history & 2) | 1;
+		freq_add = freqa[history & 3][cslot];
+		freq_sub = freqs[history & 3][cslot];
+		history = way ? (history >> 1) | 2 : history >> 1;
+
 	} else
 		phase_add = phase_sub = freq_add = freq_sub = 0;
 
