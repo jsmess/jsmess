@@ -44,6 +44,12 @@
 	*14-pin: MC4024P, MG 8341 (dual voltage controlled multivibrator)
 	*24-pin: TMM2016AP-12 (@U14 and @U80, 120ns 2kx8 SRAM)
 
+	Main CPU:
+	- PIT, SIO
+	
+	Sub CPU:
+	- PIC, PIT, VTAC
+	
 */
 /*
 'subcpu' (17CD): unmapped i/o memory write to 23 = 36 & FF
@@ -91,6 +97,10 @@
 #include "includes/tdv2324.h"
 
 
+READ8_MEMBER( tdv2324_state::tdv2324_main_io_30 )
+{
+	return 0xff;
+}
 
 // Not sure what this is for, i/o read at 0xE6 on maincpu, post fails if it does not return bit 4 set
 READ8_MEMBER( tdv2324_state::tdv2324_main_io_e6 )
@@ -98,6 +108,10 @@ READ8_MEMBER( tdv2324_state::tdv2324_main_io_e6 )
 	return 0x10; // TODO: this should actually return something meaningful, for now is enough to pass early boot test
 }
 
+WRITE8_MEMBER( tdv2324_state::tdv2324_main_io_e2 )
+{
+	printf("%c\n", data);
+}
 
 
 //**************************************************************************
@@ -112,8 +126,9 @@ static ADDRESS_MAP_START( tdv2324_mem, AS_PROGRAM, 8, tdv2324_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION(P8085AH_0_TAG, 0)
 	/* when copying code to 4000 area it runs right off the end of rom;
 	 * I'm not sure if its supposed to mirror or read as open bus */
-	AM_RANGE(0x4000, 0x5fff) AM_RAM // 0x4000 has the boot code copied to it, 5fff and down are the stack
-	AM_RANGE(0x6000, 0x6fff) AM_RAM // used by the relocated boot code; shared?
+//	AM_RANGE(0x4000, 0x5fff) AM_RAM // 0x4000 has the boot code copied to it, 5fff and down are the stack
+//	AM_RANGE(0x6000, 0x6fff) AM_RAM // used by the relocated boot code; shared?
+	AM_RANGE(0x0800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -126,7 +141,12 @@ static ADDRESS_MAP_START( tdv2324_io, AS_IO, 8, tdv2324_state )
 	/* 0x30 is read by main code and if high bit isn't set at some point it will never get anywhere */
 	/* e0, e2, e8, ea are written to */
 	/* 30, e6 and e2 are readable */
-	AM_RANGE(0xE6,0xE6) AM_READ(tdv2324_main_io_e6) // bit 4 is a status for something, post will not continue until it returns 1
+	AM_RANGE(0x30, 0x30) AM_READ(tdv2324_main_io_30)
+//	AM_RANGE(0xe2, 0xe2) AM_WRITE(tdv2324_main_io_e2) console output
+	AM_RANGE(0xe6, 0xe6) AM_READ(tdv2324_main_io_e6)
+//	AM_RANGE(0x, 0x) AM_DEVREADWRITE_LEGACY(P8253_5_0_TAG, pit8253_r, pit8253_w)
+//	AM_RANGE(0x, 0x) AM_DEVREADWRITE_LEGACY(MK3887N4_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
+//	AM_RANGE(0x, 0x) AM_DEVREADWRITE_LEGACY(P8259A_TAG, pic8259_r, pic8259_w)
 ADDRESS_MAP_END
 
 
@@ -136,9 +156,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tdv2324_sub_mem, AS_PROGRAM, 8, tdv2324_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION(P8085AH_1_TAG, 0)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM // ram exists at least here, acts as stack?
-	AM_RANGE(0x5000, 0x503f) AM_RAM // subcpu reads here (5000-5021) without writing first, implies this ram is shared
-	AM_RANGE(0x6000, 0x7fff) AM_RAM // it floodfills this area with 0; is this a framebuffer? or shared ram?
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x5000, 0x53ff) AM_RAM // EAROM
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(m_video_ram)
 ADDRESS_MAP_END
 
 
@@ -149,8 +169,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tdv2324_sub_io, AS_IO, 8, tdv2324_state )
 	//ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* 20, 23, 30-36, 38, 3a, 3c, 3e, 60, 70 are written to */
-	/* 60 may be a shared ram semaphore as it writes it immediately before reading the 5000 area */
-	AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE_LEGACY("tms9937", tms9927_r, tms9927_w) // TODO: this is supposed to be a 9937, which is not quite the same as 9927
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY(P8253_5_1_TAG, pit8253_r, pit8253_w)
+	AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE_LEGACY(TMS9937NL_TAG, tms9927_r, tms9927_w) // TODO: this is supposed to be a 9937, which is not quite the same as 9927
 ADDRESS_MAP_END
 
 
@@ -201,6 +221,7 @@ void tdv2324_state::video_start()
 {
 }
 
+
 //-------------------------------------------------
 //  SCREEN_UPDATE( tdv2324 )
 //-------------------------------------------------
@@ -222,8 +243,8 @@ bool tdv2324_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 
 static I8085_CONFIG( i8085_intf )
 {
-	DEVCB_NULL,			/* STATUS changed callback */
-	DEVCB_NULL,			/* INTE changed callback */
+	DEVCB_NULL,	/* STATUS changed callback */
+	DEVCB_NULL,	/* INTE changed callback */
 	DEVCB_NULL,	/* SID changed callback (I8085A only) */
 	DEVCB_NULL	/* SOD changed callback (I8085A only) */
 };
@@ -235,8 +256,8 @@ static I8085_CONFIG( i8085_intf )
 
 static I8085_CONFIG( i8085_sub_intf )
 {
-	DEVCB_NULL,			/* STATUS changed callback */
-	DEVCB_NULL,			/* INTE changed callback */
+	DEVCB_NULL,	/* STATUS changed callback */
+	DEVCB_NULL,	/* INTE changed callback */
 	DEVCB_NULL,	/* SID changed callback (I8085A only) */
 	DEVCB_NULL	/* SOD changed callback (I8085A only) */
 };
@@ -303,6 +324,32 @@ static const struct pit8253_config pit1_intf =
 
 
 //-------------------------------------------------
+//  Z80DART_INTERFACE( sio_intf )
+//-------------------------------------------------
+
+static Z80DART_INTERFACE( sio_intf )
+{
+	0, 0, 0, 0,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
@@ -361,7 +408,7 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 	MCFG_CPU_IO_MAP(tdv2324_sub_io)
 	MCFG_CPU_CONFIG(i8085_sub_intf)
 
-	MCFG_CPU_ADD(MC68B02P_TAG, M6802, 4000000)
+	MCFG_CPU_ADD(MC68B02P_TAG, M6802, 8000000/2) // ???
 	MCFG_CPU_PROGRAM_MAP(tdv2324_fdc_mem)
 
 	// video hardware
@@ -374,16 +421,21 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
 	
-	MCFG_TMS9927_ADD("tms9937", XTAL_25_39836MHz, vtac_intf)
+	MCFG_TMS9927_ADD(TMS9937NL_TAG, XTAL_25_39836MHz, vtac_intf)
 
 	// devices
 	MCFG_PIC8259_ADD(P8259A_TAG, pic_intf)
 	MCFG_PIT8253_ADD(P8253_5_0_TAG, pit0_intf)
 	MCFG_PIT8253_ADD(P8253_5_1_TAG, pit1_intf)
+	MCFG_Z80SIO2_ADD(MK3887N4_TAG, 8000000/2, sio_intf)
 	MCFG_FD1797_ADD(FD1797PL02_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, tdv2324_floppy_interface)
 	MCFG_HARDDISK_ADD("harddisk0")
 	MCFG_S1410_ADD() // 104521-F ROM
+
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "tdv2324")
