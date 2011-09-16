@@ -139,6 +139,8 @@ void wd1772_t::seek_continue()
 				spinup();
 				return;
 			}
+			if(!(command & 0x08))
+				status |= S_SPIN;
 			sub_state = SPINUP_DONE;
 			break;
 
@@ -334,6 +336,7 @@ void wd1772_t::interrupt_start()
 		main_state = sub_state = cur_live.state = IDLE;
 		cur_live.tm = attotime::never;
 		status &= ~S_BUSY;
+		drop_drq();
 		motor_timeout = 0;
 	}
 	if(command & 0x0f) {
@@ -432,6 +435,7 @@ UINT8 wd1772_t::status_r()
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
 	}
+
 	if(status_type_1) {
 		status &= ~(S_TR00|S_WP);
 		if(floppy) {
@@ -441,6 +445,19 @@ UINT8 wd1772_t::status_r()
 				status |= S_TR00;
 		}
 	}
+
+	if(main_state == IDLE || status_type_1) {
+		if(floppy && floppy->idx_r())
+			status |= S_IP;
+		else
+			status &= ~S_IP;
+	} else {
+		if(drq)
+			status |= S_DRQ;
+		else
+			status &= ~S_DRQ;
+	}
+
 	return status;
 }
 
@@ -543,13 +560,6 @@ void wd1772_t::index_callback(floppy_image_device *floppy, int state)
 {
 	live_sync();
 
-	if(status_type_1) {
-		if(state)
-			status |= S_IP;
-		else
-			status &= ~S_IP;
-	}
-
 	if(!state) {
 		general_continue();
 		return;
@@ -572,7 +582,8 @@ void wd1772_t::index_callback(floppy_image_device *floppy, int state)
 		counter++;
 		if(counter == 6) {
 			sub_state = SPINUP_DONE;
-			status |= S_SPIN;
+			if(status_type_1)
+				status |= S_SPIN;
 		}
 		break;
 
