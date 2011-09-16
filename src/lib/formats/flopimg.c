@@ -954,6 +954,11 @@ floppy_image::floppy_image(UINT16 _tracks, UINT8 _sides)
 
 floppy_image::~floppy_image()
 {
+	for (int i=0;i<tracks;i++) {
+		for (int j=0;j<sides;j++) {
+			global_free(cell_data[(i<<1) + j]);
+		}
+	}
 }
 
 void floppy_image::ensure_alloc(UINT16 track, UINT8 side)
