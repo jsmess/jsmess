@@ -255,3 +255,55 @@ FLOPPY_CONSTRUCT( dsk_dsk_construct )
 	callbacks->get_indexed_sector_info = dsk_get_indexed_sector_info;
 	return FLOPPY_ERROR_SUCCESS;
 }
+
+#include "emu.h"
+#include "dsk_dsk.h"
+
+#define DSK_FORMAT_HEADER	"MV - CPC"
+#define EXT_FORMAT_HEADER	"EXTENDED CPC DSK"
+
+dsk_format::dsk_format() : floppy_image_format_t()
+{
+}
+
+const char *dsk_format::name() const
+{
+	return "dsk";
+}
+
+const char *dsk_format::description() const
+{
+	return "CPC DSK Format";
+}
+
+const char *dsk_format::extensions() const
+{
+	return "dsk";
+}
+
+bool dsk_format::supports_save() const
+{
+	return false;
+}
+
+int dsk_format::identify(io_generic *io)
+{
+	UINT8 header[16];
+
+	io_generic_read(io, &header, 0, sizeof(header));
+	if ( memcmp( header, DSK_FORMAT_HEADER, 8 ) ==0) {
+		return 100;
+	}
+	if ( memcmp( header, EXT_FORMAT_HEADER, 16 ) ==0) {
+		return 100;
+	}
+	return 0;
+}
+
+bool dsk_format::load(io_generic *io, floppy_image *image)
+{
+	return FALSE;
+}
+
+const floppy_format_type FLOPPY_DSK_FORMAT = &floppy_image_format_creator<dsk_format>;
+
