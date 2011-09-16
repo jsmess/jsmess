@@ -44,6 +44,10 @@
 	*14-pin: MC4024P, MG 8341 (dual voltage controlled multivibrator)
 	*24-pin: TMM2016AP-12 (@U14 and @U80, 120ns 2kx8 SRAM)
 
+	Keyboard:
+	*40-pin: NEC D8035LC (mcs-48 cpu)
+	*24-pin: NEC D2716 (eprom)
+
 	Main CPU:
 	- PIT, SIO
 	
@@ -460,6 +464,9 @@ ROM_START( tdv2324 )
 
 	ROM_REGION( 0x2000, MC68B02P_TAG, 0 )
 	ROM_LOAD( "962014-4.13c", 0x0000, 0x2000, CRC(d01c32cd) SHA1(1f00f5f5ff0c035eec6af820b5acb6d0c207b6db) )
+
+	ROM_REGION( 0x800, "keyboard_8035", 0 )
+	ROM_LOAD( "961294-3.u8", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x4000, "chargen", 0 )
 	ROM_LOAD( "965268-1.4g", 0x0000, 0x4000, CRC(7222a85f) SHA1(e94074b68d90698734ab1fc38d156407846df47c) )
