@@ -369,6 +369,11 @@ void wd1772_t::general_continue()
 void wd1772_t::do_generic()
 {
 	switch(sub_state) {
+	case IDLE:
+	case SCAN_ID:
+	case SECTOR_READ:
+		break;
+
 	case SEEK_WAIT_STEP_TIME:
 		sub_state = SEEK_WAIT_STEP_TIME_DONE;
 		break;
@@ -697,9 +702,19 @@ void wd1772_t::live_run(attotime limit)
 	if(cur_live.state == IDLE || cur_live.next_state != -1)
 		return;
 
-	if(limit == attotime::never)
+	if(limit == attotime::never) {
 		limit = floppy->time_next_index();
+		if(limit == attotime::never) {
+			// Happens when there's no disk, hence no index pulse
+			// Force a sync from time to time in that case, so that
+			// the main cpu timeout isn't too painful.  Avoid looping
+			// into infinity looking for data too.
 
+			limit = machine().time() + attotime::from_msec(1);
+			t_gen->adjust(attotime::from_msec(1));
+		}
+	}			
+	
 	//	fprintf(stderr, "%s: live_run(%s)\n", ttsn().cstr(), tts(limit).cstr());
 
 	for(;;) {
