@@ -4,6 +4,11 @@
 
         31/03/2010 Skeleton driver.
 
+	TODO:
+	- understand how PCG works, it should be a funky i/o $30 to uPD7220 DMA
+	  transfer;
+	- hook-up T11, rst65 irq + $20 reads are latches for that
+
 	ROM POST notes:
 	0x0139: ROM test
 	0x015f: RAM test
@@ -27,10 +32,19 @@ class vt240_state : public driver_device
 public:
 	vt240_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_hgdc(*this, "upd7220")
 		{ }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<upd7220_device> m_hgdc;
+	DECLARE_READ8_MEMBER( test_r );
+	DECLARE_READ8_MEMBER( pcg_r );
+	DECLARE_WRITE8_MEMBER( pcg_w );
+
+	//UINT16 m_pcg_addr;
+	//UINT8 m_pcg_internal_addr;
+	//UINT8 *m_char_rom;
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
@@ -95,6 +109,13 @@ SCREEN_UPDATE_MEMBER( vt240_state )
 	return 0;
 }
 
+/* presumably communication with T11 */
+READ8_MEMBER( vt240_state::test_r )
+{
+	//cputag_set_input_line(machine(), "maincpu", I8085_RST65_LINE, CLEAR_LINE);
+
+	return rand();
+}
 
 
 static ADDRESS_MAP_START(vt240_mem, AS_PROGRAM, 8, vt240_state)
@@ -108,6 +129,8 @@ static ADDRESS_MAP_START(vt240_io, AS_IO, 8, vt240_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
+	AM_RANGE(0x20, 0x20) AM_READ(test_r)
+	//AM_RANGE(0x30, 0x30) AM_READWRITE(pcg_r,pcg_w) //	0x30 PCG
 ADDRESS_MAP_END
 
 
@@ -136,9 +159,23 @@ static UPD7220_INTERFACE( hgdc_intf )
 
 static INTERRUPT_GEN( vt240_irq )
 {
-	device_set_input_line(device, I8085_RST65_LINE, ASSERT_LINE);
-	device_set_input_line(device, I8085_RST65_LINE, CLEAR_LINE);
+	//device_set_input_line(device, I8085_RST65_LINE, ASSERT_LINE);
 }
+
+static const gfx_layout vt240_chars_8x8 =
+{
+	8,10,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
+	8*16
+};
+
+static GFXDECODE_START( vt240 )
+	GFXDECODE_ENTRY( "ipl", 0x0000, vt240_chars_8x8, 0, 8 )
+GFXDECODE_END
 
 static MACHINE_CONFIG_START( vt240, vt240_state )
 	/* basic machine hardware */
@@ -158,8 +195,9 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 //	MCFG_VIDEO_START(vt240)
 //	MCFG_SCREEN_UPDATE(vt240)
-	MCFG_PALETTE_LENGTH(8)
-	//MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_GFXDECODE(vt240)
 
 	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, upd7220_map) //unknown clock
 MACHINE_CONFIG_END
@@ -178,9 +216,23 @@ ROM_START( mc7105 )
 ROM_END
 
 /* Driver */
+static DRIVER_INIT( vt240 )
+{
+	UINT8 *ROM = machine.region("ipl")->base();
+
+	/* patch T11 check */
+	ROM[0x09d] = 0x00;
+	ROM[0x09e] = 0x00;
+	ROM[0x09f] = 0x00;
+
+	/* ROM checksum*/
+	ROM[0x15c] = 0x00;
+	ROM[0x15d] = 0x00;
+	ROM[0x15e] = 0x00;
+}
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                      FULLNAME       FLAGS */
 //COMP( 1983, vt240,  0,      0,       vt220,     vt220,   0,  "Digital Equipment Corporation", "VT240", GAME_NOT_WORKING | GAME_NO_SOUND)
 //COMP( 1983, vt241,  0,      0,       vt220,     vt220,   0,  "Digital Equipment Corporation", "VT241", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1983, mc7105, 0,      0,       vt240,     vt240,   0,  "Elektronika",                  "MC7105", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, mc7105, 0,      0,       vt240,     vt240,   vt240,  "Elektronika",                  "MC7105", GAME_NOT_WORKING | GAME_NO_SOUND)
 
