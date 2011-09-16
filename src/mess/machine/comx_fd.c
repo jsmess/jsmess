@@ -145,7 +145,7 @@ inline void comx_fd_device::update_ef4()
 {
 	if (m_ds && !m_disb)
 	{
-		m_slot->ef4_w(m_drq);
+		m_slot->ef4_w(!m_drq);
 	}
 	else
 	{
