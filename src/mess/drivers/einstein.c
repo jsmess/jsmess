@@ -64,6 +64,7 @@
 #include "machine/wd1772.h"
 #include "formats/hxcmfm_dsk.h"
 #include "formats/mfi_dsk.h"
+#include "formats/dsk_dsk.h"
 #include "machine/ctronics.h"
 #include "machine/i8251.h"
 #include "imagedev/flopdrv.h"
@@ -77,7 +78,7 @@
 #define VERBOSE_DISK		0
 
 const floppy_format_type einstein_state::floppy_formats[] = {
-	FLOPPY_MFM_FORMAT, FLOPPY_MFI_FORMAT,
+	FLOPPY_DSK_FORMAT, FLOPPY_MFM_FORMAT, FLOPPY_MFI_FORMAT,
 	NULL
 };
 
