@@ -1637,8 +1637,10 @@ pc8500
 
 // Nakajima manufactured eletronic typewriters
 es210_es
+drwrt100  // 199? NTS DreamWriter T100
 drwrt200  // 199? NTS DreamWriter T200
 drwrt400  // 1996 NTS DreamWriter T400
+drwrt450  // 199? NTS DreamWriter 450
 wales210  // 199? Walther ES-210 (German)
 dator3k   // 199? Dator 3000 (Spanish)
 

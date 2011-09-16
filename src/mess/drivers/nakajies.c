@@ -253,6 +253,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
@@ -264,36 +265,98 @@ public:
 	DECLARE_READ8_MEMBER( unk_a0_r );
 	DECLARE_WRITE8_MEMBER( lcd_memory_start_w );
 	DECLARE_READ8_MEMBER( keyboard_r );
+	DECLARE_WRITE8_MEMBER( banking_w );
+	void update_banks();
+	void bank_w(UINT8 banknr, offs_t offset, UINT8 data);
+	DECLARE_WRITE8_MEMBER( bank0_w );
+	DECLARE_WRITE8_MEMBER( bank1_w );
+	DECLARE_WRITE8_MEMBER( bank2_w );
+	DECLARE_WRITE8_MEMBER( bank3_w );
+	DECLARE_WRITE8_MEMBER( bank4_w );
+	DECLARE_WRITE8_MEMBER( bank5_w );
+	DECLARE_WRITE8_MEMBER( bank6_w );
+	DECLARE_WRITE8_MEMBER( bank7_w );
 
 	/* IRQ handling */
 	UINT8	m_irq_enabled;
 	UINT8	m_irq_active;
 
 	UINT8	m_lcd_memory_start;
-	UINT8*	m_ram_base;
+	UINT8*	m_ram_base1;
 
 	UINT8	m_matrix;
+
+	/* ROM */
+	UINT8	*m_rom_base;
+	UINT32	m_rom_size;
+
+	/* RAM */
+	UINT8	*m_ram_base;
+	UINT32	m_ram_size;
+
+	/* Banking */
+	UINT8	m_bank[8];
+	UINT8	*m_bank_base[8];
 };
 
 
 #define X301	19660000
 
 
-static ADDRESS_MAP_START( nakajies210_map, AS_PROGRAM, 8, nakajies_state )
-	AM_RANGE( 0x00000, 0x1ffff ) AM_RAM	AM_BASE(m_ram_base)
-	AM_RANGE( 0x80000, 0xfffff ) AM_ROM AM_REGION( "bios", 0 )
-ADDRESS_MAP_END
+void nakajies_state::update_banks()
+{
+	for( int i = 0; i < 8; i++ )
+	{
+		if ( m_bank[i] & 0x10 )
+		{
+			/* RAM banking */
+			/* Not entirely sure if bank 0x1f refers to first or second ram bank ... */
+			m_bank_base[i] = m_ram_base + ( ( ( ( m_bank[i] & 0x0f ) ^ 0xf ) << 17 ) % m_ram_size );
+		}
+		else
+		{
+			/* ROM banking */
+			/* 0 is last bank, 1 bank before last, etc */
+			m_bank_base[i] = m_rom_base + ( ( ( ( m_bank[i] & 0x0f ) ^ 0xf ) << 17 ) % m_rom_size );
+		}
+	}
+	memory_set_bankptr( machine(), "bank0", m_bank_base[0] );
+	memory_set_bankptr( machine(), "bank1", m_bank_base[1] );
+	memory_set_bankptr( machine(), "bank2", m_bank_base[2] );
+	memory_set_bankptr( machine(), "bank3", m_bank_base[3] );
+	memory_set_bankptr( machine(), "bank4", m_bank_base[4] );
+	memory_set_bankptr( machine(), "bank5", m_bank_base[5] );
+	memory_set_bankptr( machine(), "bank6", m_bank_base[6] );
+	memory_set_bankptr( machine(), "bank7", m_bank_base[7] );
+}
+
+void nakajies_state::bank_w( UINT8 banknr, offs_t offset, UINT8 data )
+{
+	if ( m_bank[banknr] & 0x10 )
+	{
+		m_bank_base[banknr][offset] = data;
+	}
+}
+
+WRITE8_MEMBER( nakajies_state::bank0_w ) { bank_w( 0, offset, data ); }
+WRITE8_MEMBER( nakajies_state::bank1_w ) { bank_w( 1, offset, data ); }
+WRITE8_MEMBER( nakajies_state::bank2_w ) { bank_w( 2, offset, data ); }
+WRITE8_MEMBER( nakajies_state::bank3_w ) { bank_w( 3, offset, data ); }
+WRITE8_MEMBER( nakajies_state::bank4_w ) { bank_w( 4, offset, data ); }
+WRITE8_MEMBER( nakajies_state::bank5_w ) { bank_w( 5, offset, data ); }
+WRITE8_MEMBER( nakajies_state::bank6_w ) { bank_w( 6, offset, data ); }
+WRITE8_MEMBER( nakajies_state::bank7_w ) { bank_w( 7, offset, data ); }
 
 
-static ADDRESS_MAP_START( nakajies220_map, AS_PROGRAM, 8, nakajies_state )
-	AM_RANGE( 0x00000, 0x3ffff ) AM_RAM	AM_BASE(m_ram_base)
-	AM_RANGE( 0x80000, 0xfffff ) AM_ROM AM_REGION( "bios", 0x80000 )
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( nakajies250_map, AS_PROGRAM, 8, nakajies_state )
-	AM_RANGE( 0x00000, 0x3ffff ) AM_RAM	AM_BASE(m_ram_base)
-	AM_RANGE( 0x80000, 0xfffff ) AM_ROM AM_REGION( "bios", 0x80000 )
+static ADDRESS_MAP_START( nakajies_map, AS_PROGRAM, 8, nakajies_state )
+	AM_RANGE( 0x00000, 0x1ffff ) AM_READ_BANK( "bank0" ) AM_WRITE( bank0_w )
+	AM_RANGE( 0x20000, 0x3ffff ) AM_READ_BANK( "bank1" ) AM_WRITE( bank1_w )
+	AM_RANGE( 0x40000, 0x5ffff ) AM_READ_BANK( "bank2" ) AM_WRITE( bank2_w )
+	AM_RANGE( 0x60000, 0x7ffff ) AM_READ_BANK( "bank3" ) AM_WRITE( bank3_w )
+	AM_RANGE( 0x80000, 0x9ffff ) AM_READ_BANK( "bank4" ) AM_WRITE( bank4_w )
+	AM_RANGE( 0xa0000, 0xbffff ) AM_READ_BANK( "bank5" ) AM_WRITE( bank5_w )
+	AM_RANGE( 0xc0000, 0xdffff ) AM_READ_BANK( "bank6" ) AM_WRITE( bank6_w )
+	AM_RANGE( 0xe0000, 0xfffff ) AM_READ_BANK( "bank7" ) AM_WRITE( bank7_w )
 ADDRESS_MAP_END
 
 
@@ -371,6 +434,13 @@ WRITE8_MEMBER( nakajies_state::lcd_memory_start_w )
 }
 
 
+WRITE8_MEMBER( nakajies_state::banking_w )
+{
+	m_bank[offset] = data;
+	update_banks();
+}
+
+
 READ8_MEMBER( nakajies_state::keyboard_r )
 {
 	static const char *const bitnames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4",
@@ -382,6 +452,7 @@ READ8_MEMBER( nakajies_state::keyboard_r )
 
 static ADDRESS_MAP_START( nakajies_io_map, AS_IO, 8, nakajies_state )
 	AM_RANGE( 0x0000, 0x0000 ) AM_WRITE( lcd_memory_start_w )
+	AM_RANGE( 0x0010, 0x0017 ) AM_WRITE( banking_w )
 	AM_RANGE( 0x0060, 0x0060 ) AM_READWRITE( irq_enable_r, irq_enable_w )
 	AM_RANGE( 0x0090, 0x0090 ) AM_READWRITE( irq_clear_r, irq_clear_w )
 	AM_RANGE( 0x00a0, 0x00a0 ) AM_READ( unk_a0_r )
@@ -513,12 +584,35 @@ static INPUT_PORTS_START( nakajies )
 INPUT_PORTS_END
 
 
+void nakajies_state::machine_start()
+{
+	m_rom_base = machine().region("bios")->base();
+	m_rom_size = machine().region("bios")->bytes();
+
+	const char *gamename = machine().system().name;
+
+	m_ram_size = 128 * 1024;
+	if ( strcmp( gamename, "drwrt400" ) == 0 || strcmp( gamename, "drwrt200" ) == 0 )
+	{
+		m_ram_size = 256 * 1024;
+	}
+	m_ram_base = machine().region_alloc( "mainram", m_ram_size, 1, ENDIANNESS_LITTLE )->base();
+}
+
+
 void nakajies_state::machine_reset()
 {
 	m_irq_enabled = 0;
 	m_irq_active = 0;
 	m_lcd_memory_start = 0;
 	m_matrix = 0;
+
+	/* Initialize banks */
+	for ( int i = 0; i < 8; i++ )
+	{
+		m_bank[i] = 0;
+	}
+	update_banks();
 }
 
 bool nakajies_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
@@ -607,7 +701,7 @@ static RP5C01_INTERFACE( rtc_intf )
 
 static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	MCFG_CPU_ADD( "v20hl", V20, X301 / 2 )
-	MCFG_CPU_PROGRAM_MAP( nakajies210_map)
+	MCFG_CPU_PROGRAM_MAP( nakajies_map)
 	MCFG_CPU_IO_MAP( nakajies_io_map)
 
 	MCFG_SCREEN_ADD( "screen", LCD )
@@ -636,35 +730,15 @@ static MACHINE_CONFIG_DERIVED( dator3k, nakajies210 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nakajies220, nakajies210 )
-	MCFG_CPU_MODIFY( "v20hl" )
-	MCFG_CPU_PROGRAM_MAP( nakajies220_map)
-
 	MCFG_GFXDECODE(drwrt400)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nakajies250, nakajies210 )
-	MCFG_CPU_MODIFY( "v20hl" )
-	MCFG_CPU_PROGRAM_MAP( nakajies250_map)
-
 	MCFG_SCREEN_MODIFY( "screen" )
 	MCFG_SCREEN_SIZE( 80 * 6, 16 * 8 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 16 * 8 - 1 )
 	MCFG_GFXDECODE(drwrt200)
 MACHINE_CONFIG_END
-
-
-ROM_START(drwrt400)
-	ROM_REGION( 0x100000, "bios", 0 )
-
-	ROM_SYSTEM_BIOS( 0, "drwrt450", "DreamWriter 450" )
-	ROMX_LOAD("t4_ir_35ba308.ic303", 0x00000, 0x100000, CRC(3b5a580d) SHA1(72df34ece1e6d70adf953025d1c458e22ce819e1), ROM_BIOS(1))
-
-	ROM_SYSTEM_BIOS( 1, "drwrt400", "DreamWriter T400" )
-	ROMX_LOAD("t4_ir_2.1.ic303", 0x80000, 0x80000, CRC(f0f45fd2) SHA1(3b4d5722b3e32e202551a1be8ae36f34ad705ddd), ROM_BIOS(2))
-
-	ROM_SYSTEM_BIOS( 2, "drwrt100", "DreamWriter T100" )
-	ROMX_LOAD("t100_2.3.ic303", 0x80000, 0x80000, CRC(8a16f12f) SHA1(0a907186db3d1756566d767ee847a7ecf694e74b), ROM_BIOS(3))	/* Checksum 01F5 on label */
-ROM_END
 
 
 ROM_START(wales210)
@@ -684,19 +758,42 @@ ROM_START(dator3k)
 ROM_END
 
 
+ROM_START(drwrt100)
+	ROM_REGION( 0x80000, "bios", 0 )
+	ROM_LOAD("t100_2.3.ic303", 0x00000, 0x80000, CRC(8a16f12f) SHA1(0a907186db3d1756566d767ee847a7ecf694e74b))		/* Checksum 01F5 on label */
+ROM_END
+
+
 ROM_START(drwrt200)
 	ROM_REGION( 0x100000, "bios", 0 )
 	ROM_LOAD("drwrt200.bin", 0x000000, 0x100000, CRC(3c39483c) SHA1(48293e6bdb7e7322d76da7174b716243c0ab7c2c) )
 ROM_END
+
+
+ROM_START(drwrt400)
+	ROM_REGION( 0x80000, "bios", 0 )
+	ROM_LOAD("t4_ir_2.1.ic303", 0x00000, 0x80000, CRC(f0f45fd2) SHA1(3b4d5722b3e32e202551a1be8ae36f34ad705ddd))
+ROM_END
+
+
+ROM_START(drwrt450)
+	ROM_REGION( 0x100000, "bios", 0 )
+	ROM_LOAD("t4_ir_35ba308.ic303", 0x00000, 0x100000, CRC(3b5a580d) SHA1(72df34ece1e6d70adf953025d1c458e22ce819e1))
+ROM_END
+
 
 ROM_START( es210_es )
 	ROM_REGION( 0x80000, "bios", 0 )
 	ROM_LOAD("nakajima_es.ic303", 0x00000, 0x80000, CRC(214d73ce) SHA1(ce9967c5b2d122ebebe9401278d8ea374e8fb289))
 ROM_END
 
+
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     INIT    COMPANY    FULLNAME            FLAGS */
-COMP( 199?, wales210,        0, 0,      nakajies210, nakajies, 0,      "Walther", "ES-210",           GAME_NOT_WORKING )	/* German */
-COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, 0,      "Dator",   "Dator 3000",       GAME_NOT_WORKING )	/* Spanish */
-COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies, 0,      "Nakajima","ES-210 (Spain)",   GAME_NOT_WORKING )	/* Spanish */
-COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, 0,      "NTS",     "DreamWriter T400", GAME_NOT_WORKING )	/* English */
-COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, 0,      "NTS",     "DreamWriter T200", GAME_NOT_WORKING )	/* English */
+COMP( 199?, wales210,        0, 0,      nakajies210, nakajies, 0,      "Walther", "ES-210",           GAME_NOT_WORKING | GAME_NO_SOUND )	/* German, 128KB RAM */
+COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, 0,      "Dator",   "Dator 3000",       GAME_NOT_WORKING | GAME_NO_SOUND )	/* Spanish, 128KB RAM */
+COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies, 0,      "Nakajima","ES-210 (Spain)",   GAME_NOT_WORKING | GAME_NO_SOUND )	/* Spanish, 128KB RAM */
+COMP( 199?, drwrt100, wales210, 0,      nakajies220, nakajies, 0,      "NTS",     "DreamWriter T100", GAME_NOT_WORKING | GAME_NO_SOUND )	/* English, 128KB RAM */
+COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, 0,      "NTS",     "DreamWriter T400", GAME_NOT_WORKING | GAME_NO_SOUND )	/* English, 256KB RAM */
+COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies, 0,      "NTS",     "DreamWriter 450",  GAME_NOT_WORKING | GAME_NO_SOUND )	/* English, 128KB RAM */
+COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, 0,      "NTS",     "DreamWriter T200", GAME_NOT_WORKING | GAME_NO_SOUND )	/* English, 256KB? RAM */
+
