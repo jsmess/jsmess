@@ -288,8 +288,43 @@ protected:
 	// "track_size" is in _cells_, i.e. 100000 for a usual 2us-per-cell track at 300rpm
 
 	void generate_track(const desc_e *desc, UINT8 track, UINT8 head, const desc_s *sect, int sect_count, int track_size, floppy_image *image);
+
+	// Generate a track from cell binary values, MSB-first, size in cells and not bytes
 	void generate_track_from_bitstream(UINT8 track, UINT8 head, const UINT8 *trackbuf, int track_size, floppy_image *image);
+
+
 	void normalize_times(UINT32 *buffer, int bitlen);
+
+
+
+	// Some useful descriptions shared by multiple formats
+
+	// Atari ST formats (100K cells)
+	//   Standard TOS 9 sectors-per-track format
+	static const desc_e atari_st_9[];
+
+	//   Usual 10 sectors-per-track format
+	static const desc_e atari_st_10[];
+
+	//   Fastcopy Pro optimized formats, with fake sector header for
+	//   faster verify and skew/interleave where appropriate
+	static const desc_e atari_st_fcp_9[];
+	static const desc_e *const atari_st_fcp_10[10];
+	static const desc_e *const atari_st_fcp_11[11];
+
+	static const desc_e atari_st_fcp_10_0[], atari_st_fcp_10_1[], atari_st_fcp_10_2[], atari_st_fcp_10_3[];
+	static const desc_e atari_st_fcp_10_4[], atari_st_fcp_10_5[], atari_st_fcp_10_6[], atari_st_fcp_10_7[];
+	static const desc_e atari_st_fcp_10_8[], atari_st_fcp_10_9[];
+
+	static const desc_e atari_st_fcp_11_0[], atari_st_fcp_11_1[], atari_st_fcp_11_2[], atari_st_fcp_11_3[];
+	static const desc_e atari_st_fcp_11_4[], atari_st_fcp_11_5[], atari_st_fcp_11_6[], atari_st_fcp_11_7[];
+	static const desc_e atari_st_fcp_11_8[], atari_st_fcp_11_9[], atari_st_fcp_11_10[];
+
+	static const desc_e *atari_st_fcp_get_desc(UINT8 track, UINT8 head, UINT8 head_count, UINT8 sect_count);
+
+	// Amiga formats (100K cells)
+	//   Standard 11 sectors per track format
+	static const desc_e amiga_11[];
 
 private:
 	enum { CRC_NONE, CRC_AMIGA, CRC_CCITT };

@@ -42,32 +42,6 @@ int adf_format::identify(io_generic *io)
 	return 0;
 }
 
-const floppy_image_format_t::desc_e adf_format::desc[] = {
-	{ SECTOR_LOOP_START, 0, 10 },
-	{   MFM, 0x00, 2 },
-	{   RAW, 0x4489, 2 },
-	{   CRC_AMIGA_START, 1 },
-	{     MFMBITS, 0xf, 4 },
-	{     OFFSET_ID_O },
-	{     SECTOR_ID_O },
-	{     REMAIN_O, 11 },
-	{     MFMBITS, 0xf, 4 },
-	{     OFFSET_ID_E },
-	{     SECTOR_ID_E },
-	{     REMAIN_E, 11 },
-	{     MFM, 0x00, 16 },
-	{   CRC_END, 1 },
-	{   CRC, 1 },
-	{   CRC, 2 },
-	{   CRC_AMIGA_START, 2 },
-	{     SECTOR_DATA_O, -1 },
-	{     SECTOR_DATA_E, -1 },
-	{   CRC_END, 2 },
-	{ SECTOR_LOOP_END },
-	{ MFM, 0x00, 266 },
-	{ END }
-};
-
 bool adf_format::load(io_generic *io, floppy_image *image)
 {
 	desc_s sectors[11];
@@ -80,7 +54,7 @@ bool adf_format::load(io_generic *io, floppy_image *image)
 	for(int track=0; track < 80; track++) {
 		for(int side=0; side < 2; side++) {
 			io_generic_read(io, sectdata, (track*2 + side)*512*11, 512*11);
-			generate_track(desc, track, side, sectors, 11, 100000, image);
+			generate_track(amiga_11, track, side, sectors, 11, 100000, image);
 		}
 	}
 
