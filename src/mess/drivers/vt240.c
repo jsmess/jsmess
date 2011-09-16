@@ -17,22 +17,85 @@
 #include "cpu/i8085/i8085.h"
 #include "cpu/t11/t11.h"
 #include "machine/ram.h"
+#include "video/upd7220.h"
 
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 class vt240_state : public driver_device
 {
 public:
 	vt240_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_hgdc(*this, "upd7220")
+		{ }
 
-	DECLARE_READ8_MEMBER(v240_00_r);
+	required_device<upd7220_device> m_hgdc;
+
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
-
-READ8_MEMBER( vt240_state::v240_00_r )
+/* TODO */
+static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
-	return 4 | (machine().rand() & 0x20);
+	//vt240_state *state = device->machine().driver_data<a5105_state>();
+	//int x;
+	//int xi,yi;
+	//int tile,color;
+	//UINT8 tile_data;
+
+	#if 0
+	for( x = 0; x < pitch; x++ )
+	{
+		tile = (vram[(addr+x)*2] & 0xff);
+		color = (vram[(addr+x)*2+1] & 0x0f);
+
+		for( yi = 0; yi < lr; yi++)
+		{
+			tile_data = state->m_char_rom[(tile*8+yi) & 0x7ff];
+
+			if(cursor_on && cursor_addr == addr+x) //TODO
+				tile_data^=0xff;
+
+			for( xi = 0; xi < 8; xi++)
+			{
+				int res_x,res_y;
+				int pen = (tile_data >> xi) & 1 ? color : 0;
+
+				if(yi >= 8) { pen = 0; }
+
+				res_x = x * 8 + xi;
+				res_y = y * lr + yi;
+
+				if(res_x > screen_max_x || res_y > screen_max_y)
+					continue;
+
+				*BITMAP_ADDR16(bitmap, res_y, res_x) = pen;
+			}
+		}
+	}
+	#endif
 }
+
+
+VIDEO_START_MEMBER( vt240_state )
+{
+	// find memory regions
+	//m_char_rom = machine().region("pcg")->base();
+
+	VIDEO_START_NAME(generic_bitmapped)(machine());
+}
+
+SCREEN_UPDATE_MEMBER( vt240_state )
+{
+	/* graphics */
+	m_hgdc->update_screen(&bitmap, &cliprect);
+
+	return 0;
+}
+
+
 
 static ADDRESS_MAP_START(vt240_mem, AS_PROGRAM, 8, vt240_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -44,7 +107,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(vt240_io, AS_IO, 8, vt240_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(v240_00_r)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( upd7220_map, AS_0, 8, vt240_state)
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220", upd7220_device, vram_r, vram_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -56,13 +124,20 @@ static MACHINE_RESET(vt240)
 {
 }
 
-static VIDEO_START( vt240 )
+static UPD7220_INTERFACE( hgdc_intf )
 {
-}
+	"screen",
+	NULL,
+	hgdc_draw_text,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
-static SCREEN_UPDATE( vt240 )
+static INTERRUPT_GEN( vt240_irq )
 {
-	return 0;
+	device_set_input_line(device, I8085_RST65_LINE, ASSERT_LINE);
+	device_set_input_line(device, I8085_RST65_LINE, CLEAR_LINE);
 }
 
 static MACHINE_CONFIG_START( vt240, vt240_state )
@@ -70,6 +145,7 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(vt240_mem)
 	MCFG_CPU_IO_MAP(vt240_io)
+	MCFG_CPU_VBLANK_INT("screen",vt240_irq)
 
 	MCFG_MACHINE_RESET(vt240)
 
@@ -80,10 +156,12 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(vt240)
-	MCFG_SCREEN_UPDATE(vt240)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+//	MCFG_VIDEO_START(vt240)
+//	MCFG_SCREEN_UPDATE(vt240)
+	MCFG_PALETTE_LENGTH(8)
+	//MCFG_PALETTE_INIT(black_and_white)
+
+	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, upd7220_map) //unknown clock
 MACHINE_CONFIG_END
 
 /* ROM definition */
