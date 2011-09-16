@@ -4,8 +4,11 @@
 
         31/03/2010 Skeleton driver.
 
-
-    mc7105 - failing the rom check. If you skip that, it is waiting on i/o.
+	ROM POST notes:
+	0x0139: ROM test
+	0x015f: RAM test
+	0x0071: RAM fill to 0x00
+	0x1c8f: UPD7220
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -33,7 +36,8 @@ READ8_MEMBER( vt240_state::v240_00_r )
 
 static ADDRESS_MAP_START(vt240_mem, AS_PROGRAM, 8, vt240_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("ipl", 0)
+	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("ipl", 0x8000)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -84,10 +88,9 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mc7105 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "027.bin", 0x8000, 0x8000, CRC(a159b412) SHA1(956097ccc2652d494258b3682498cfd3096d7d4f))
 	ROM_LOAD( "028.bin", 0x0000, 0x8000, CRC(b253151f) SHA1(22ffeef8eb5df3c38bfe91266f26d1e7822cdb53))
-	ROM_FILL( 0x006e, 3, 0 )	// hack to skip the failing rom test
 
 	ROM_REGION( 0x20000, "subcpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "029.bin", 0x00000, 0x8000, CRC(4a6db217) SHA1(47637325609ea19ffab61fe31e2700d72fa50729))
