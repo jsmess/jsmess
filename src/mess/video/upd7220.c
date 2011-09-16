@@ -737,6 +737,7 @@ void upd7220_device::device_start()
 
 	// find screen
 	m_screen = machine().device<screen_device>(m_screen_tag);
+	m_vram = auto_alloc_array_clear(machine(), UINT8, 1 << 18);
 
 	// register for state saving
 	save_item(NAME(m_ra));

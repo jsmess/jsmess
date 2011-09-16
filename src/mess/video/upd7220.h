@@ -220,7 +220,7 @@ private:
 	emu_timer *m_hsync_timer;		// horizontal sync timer
 	emu_timer *m_blank_timer;		// CRT blanking timer
 
-	UINT8 m_vram[0x40000];
+	UINT8 *m_vram;
 	UINT32 m_vram_bank;
 
 	UINT8 m_bitmap_mod;
