@@ -62,13 +62,13 @@ public:
 	UINT32 get_len() { return image->get_track_size(cyl, ss ^ 1); }
 
 	void mon_w(int state);
-	void index_func();
 	int  ready_r();
 	double get_pos();
 
 	int wpt_r() { return wpt; }
 	int dskchg_r() { return dskchg; }
 	bool trk00_r() { return cyl != 0; }
+	int idx_r() { return idx; }
 
 	void stp_w(int state);
 	void dir_w(int state) { dir = state; }
