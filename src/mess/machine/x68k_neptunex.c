@@ -55,7 +55,7 @@ void x68k_neptune_device::device_start()
 	sprintf(mac+2, "\x1b%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
 	mac[0] = 0; mac[1] = 0;  // avoid gcc warning
 	memcpy(m_prom, mac, 6);
-	space->install_readwrite_handler(0xece000,0xece3ff,read16_delegate(FUNC(x68k_neptune_device::x68k_neptune_port_r),this),write16_delegate(FUNC(x68k_neptune_device::x68k_neptune_port_w),this),0);
+	space->install_readwrite_handler(0xece000,0xece3ff,read16_delegate(FUNC(x68k_neptune_device::x68k_neptune_port_r),this),write16_delegate(FUNC(x68k_neptune_device::x68k_neptune_port_w),this),0xffffffff);
 }
 
 READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
