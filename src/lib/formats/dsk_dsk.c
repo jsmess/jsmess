@@ -300,8 +300,83 @@ int dsk_format::identify(io_generic *io)
 	return 0;
 }
 
+
+#pragma pack(1)
+
+struct track_header
+{
+	UINT8 headertag[13];
+	UINT16 unused1;
+	UINT8 unused1b;
+	UINT8 track_number;
+	UINT8 side_number;
+	UINT8 datarate;
+	UINT8 rec_mode;
+	UINT8 sector_size_code;
+	UINT8 number_of_sector;
+	UINT8 gap3_length;
+	UINT8 filler_byte;
+};
+
+struct sector_header
+{
+	UINT8   track;
+	UINT8   side;
+	UINT8   sector_id;
+	UINT8   sector_size_code;
+	UINT8	fdc_status_reg1;
+	UINT8	fdc_status_reg2;
+	UINT16  data_lenght;
+};
+
+#pragma pack()
+
 bool dsk_format::load(io_generic *io, floppy_image *image)
 {
+	UINT8 header[100];
+	bool extendformat = FALSE;
+	
+	io_generic_read(io, &header, 0, sizeof(header));
+	if ( memcmp( header, EXT_FORMAT_HEADER, 16 ) ==0) {
+		extendformat = TRUE;
+	}
+	
+	int heads = header[0x31];
+	int skip = 1;
+	if (heads==1) {
+		skip = 2;
+	}
+	int tracks  = header[0x30];	
+	UINT64 track_offsets[84*2];
+	int cnt =0;
+	if (!extendformat) {
+		int tmp = 0x100;
+		for (int i=0; i<tracks * heads; i++)
+		{
+			track_offsets[cnt] = tmp;
+			tmp += pick_integer_le(header, 0x32, 2);
+			cnt += skip;
+		}
+	} else  {
+		int tmp = 0x100;
+		for (int i=0; i<tracks * heads; i++)
+		{
+			track_offsets[cnt] = tmp;
+			tmp += header[0x34 + i] << 8;
+			cnt += skip;
+		}
+	}
+	
+	int counter = 0;
+	for(int track=0; track < tracks; track++) {
+		for(int side=0; side < heads; side++) {
+			// read location of
+			track_header tr;
+			io_generic_read(io, &tr,track_offsets[(track<<1)+side],sizeof(tr));
+
+			counter++;
+		}
+	}
 	return FALSE;
 }
 
