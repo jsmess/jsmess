@@ -281,7 +281,7 @@ READ_LINE_MEMBER( comx35_state::ef2_r )
 
 READ_LINE_MEMBER( comx35_state::ef4_r )
 {
-	return (m_cassette->input() > 0.0f) | m_ef4;
+	return m_ef4; // | (m_cassette->input() > 0.0f);
 }
 
 static COSMAC_SC_WRITE( comx35_sc_w )
@@ -462,6 +462,10 @@ void comx35_state::machine_start()
 	// allocate reset timer
 	m_reset_timer = machine().scheduler().timer_alloc(FUNC(reset_tick));
 
+	// clear the RAM since DOS card will go crazy if RAM is not all zeroes
+	UINT8 *ram = ram_get_ptr(m_ram);
+	memset(ram, 0, 0x8000);
+	
 	// register for state saving
 	save_item(NAME(m_clear));
 	save_item(NAME(m_q));
