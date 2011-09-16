@@ -21,6 +21,7 @@
 #include "formats/hxcmfm_dsk.h"
 #include "formats/ami_dsk.h"
 #include "formats/st_dsk.h"
+#include "formats/dsk_dsk.h"
 
 static floppy_format_type floppy_formats[] = {
 	FLOPPY_MFI_FORMAT,
@@ -30,6 +31,8 @@ static floppy_format_type floppy_formats[] = {
 
 	FLOPPY_ST_FORMAT,
 	FLOPPY_MSA_FORMAT,
+	
+	FLOPPY_DSK_FORMAT,
 
 	NULL
 };
@@ -70,7 +73,7 @@ static int identify(int argc, char *argv[])
 		return 1;
 	}
 
-	for(int i=2; argv[i]; i++) {
+	for(int i=2; i<argc; i++) {	
 		char msg[4096];
 		sprintf(msg, "Error opening %s for reading", argv[i]);
 		FILE *f = fopen(argv[i], "rb");
