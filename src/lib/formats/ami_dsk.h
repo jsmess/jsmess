@@ -23,8 +23,6 @@ public:
 	virtual const char *description() const;
 	virtual const char *extensions() const;
 	virtual bool supports_save() const;
-
-	static const desc_e desc[];
 };
 
 extern const floppy_format_type FLOPPY_ADF_FORMAT;
