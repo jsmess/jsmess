@@ -224,6 +224,7 @@ public:
 	emu_timer* m_kb_timer;
 	emu_timer* m_mouse_timer;
 	emu_timer* m_led_timer;
+	emu_timer* m_net_timer;
 	unsigned char m_scc_prev;
 	UINT16 m_ppi_prev;
 	int m_mfp_prev;
