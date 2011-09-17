@@ -2482,15 +2482,24 @@ static void x68k_unload_proc(device_image_interface &image)
 	state->m_fdc.disk_inserted[floppy_get_drive(&image.device())] = 0;
 }
 
+static TIMER_CALLBACK( x68k_net_irq )
+{
+	x68k_state *state = machine.driver_data<x68k_state>();
+
+	state->m_current_vector[2] = 0xf9;
+	state->m_current_irq_line = 2;
+	cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,state->m_current_vector[2]);
+}
+
 static void x68k_irq2_line(device_t* device,int state)
 {
 	x68k_state *tstate = device->machine().driver_data<x68k_state>();
 	if(state==ASSERT_LINE)
 	{
-		tstate->m_current_vector[2] = 0xf9;
-		tstate->m_current_irq_line = 2;
-		cputag_set_input_line_and_vector(device->machine(), "maincpu",2,ASSERT_LINE,tstate->m_current_vector[2]);  // Disk insert/eject interrupt
+		tstate->m_net_timer->adjust(attotime::from_usec(16));
 	}
+	else
+		cputag_set_input_line_and_vector(device->machine(), "maincpu",2,CLEAR_LINE,tstate->m_current_vector[2]);
 	logerror("EXP: IRQ2 set to %i\n",state);
 
 }
@@ -2725,6 +2734,7 @@ static DRIVER_INIT( x68000 )
 	state->m_vblank_irq = machine.scheduler().timer_alloc(FUNC(x68k_crtc_vblank_irq));
 	state->m_mouse_timer = machine.scheduler().timer_alloc(FUNC(x68k_scc_ack));
 	state->m_led_timer = machine.scheduler().timer_alloc(FUNC(x68k_led_callback));
+	state->m_net_timer = machine.scheduler().timer_alloc(FUNC(x68k_net_irq));
 
 	// Initialise timers for 6-button MD controllers
 	md_6button_init(machine);
