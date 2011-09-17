@@ -42,6 +42,12 @@ unimplemented instruction: PER
 'sub' (06E4): unmapped i/o memory write to 00 = 47 & FF
 'sub' (06EA): unmapped program memory write to F000 = 70 & FF
 
+2011-09-18 Video (bitmapped) added. Notes:
+- The colour planes are a guess (r,g,b might need swapping around)
+- In "irq_mask_w" is a read of e800. Without this, no videoram writes occur.
+- In "fp1100_vram_w" the data is inverted. Without it, a flashing cursor can be seen.
+- The text mode is also present at 9000-97FF of the maincpu (not bitmapped).
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -55,8 +61,25 @@ class fp1100_state : public driver_device
 {
 public:
 	fp1100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_subcpu(*this, "sub"),
+	//m_cass(*this, CASSETTE_TAG),
+	//m_wave(*this, WAVE_TAG),
+	//m_speaker(*this, SPEAKER_TAG),
+	//m_printer(*this, "centronics"),
+	m_crtc(*this, "crtc")
+	//m_fdc(*this, "fdc")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	//required_device<cassette_image_device> m_cass;
+	//required_device<device_t> m_wave;
+	//required_device<device_t> m_speaker;
+	//required_device<device_t> m_printer;
+	required_device<mc6845_device> m_crtc;
+	//required_device<device_t> m_fdc;
 	DECLARE_READ8_MEMBER(fp1100_mem_r);
 	DECLARE_WRITE8_MEMBER(fp1100_mem_w);
 	DECLARE_WRITE8_MEMBER(main_bank_w);
@@ -72,7 +95,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sub_to_main_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	UINT8 *m_wram;
-	UINT8 *m_vram;
+	UINT8 *m_p_videoram;
 	UINT8 m_mem_bank;
 	UINT8 irq_mask;
 	UINT8 m_main_latch;
@@ -96,7 +119,32 @@ static VIDEO_START( fp1100 )
 
 static SCREEN_UPDATE( fp1100 )
 {
+	fp1100_state *state = screen->machine().driver_data<fp1100_state>();
+	state->m_crtc->update( bitmap, cliprect);
 	return 0;
+}
+
+static MC6845_UPDATE_ROW( fp1100_update_row )
+{
+	fp1100_state *state = device->machine().driver_data<fp1100_state>();
+	UINT8 r,g,b,col,i;
+	UINT16 mem,x;
+	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+
+	for (x = 0; x < x_count; x++)
+	{
+		mem = (((ma+x)<<3) + ra) & 0x3fff;
+		r = state->m_p_videoram[mem];
+		g = state->m_p_videoram[mem+0x4000];
+		b = state->m_p_videoram[mem+0x8000];
+
+		for (i = 0; i < 8; i++)
+		{
+			col = BIT(r, i) + (BIT(g, i) << 1) + (BIT(b, i) << 2);
+			if (x == cursor_x) col ^= 7;
+			*p++ = col;
+		}
+	}
 }
 
 READ8_MEMBER( fp1100_state::fp1100_mem_r )
@@ -128,7 +176,9 @@ WRITE8_MEMBER( fp1100_state::irq_mask_w )
 
 	irq_mask = data;
 	///printf("%02x\n",data);
-
+	// FIXME - the below 2 lines are needed, otherwise nothing ever gets written to videoram
+	address_space *mem = m_subcpu->memory().space(AS_PROGRAM);
+	data = mem->read_byte(0xe800);
 }
 
 WRITE8_MEMBER( fp1100_state::main_to_sub_w )
@@ -175,12 +225,12 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( fp1100_state::fp1100_vram_r )
 {
-	return m_vram[offset];
+	return m_p_videoram[offset];
 }
 
 WRITE8_MEMBER( fp1100_state::fp1100_vram_w )
 {
-	m_vram[offset] = data ^ 0xff;
+	m_p_videoram[offset] = ~data;
 }
 
 READ8_MEMBER( fp1100_state::main_to_sub_r )
@@ -201,7 +251,7 @@ static ADDRESS_MAP_START(fp1100_slave_map, AS_PROGRAM, 8, fp1100_state )
 	AM_RANGE(0xff80, 0xffff) AM_RAM		/* upd7801 internal RAM */
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("sub_ipl",0x0000)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("sub_ipl",0x1000)
-	AM_RANGE(0x2000, 0xdfff) AM_READWRITE(fp1100_vram_r,fp1100_vram_w) AM_BASE(m_vram) //vram B/R/G
+	AM_RANGE(0x2000, 0xdfff) AM_READWRITE(fp1100_vram_r,fp1100_vram_w) AM_BASE(m_p_videoram) //vram B/R/G
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe400, 0xe400) AM_READ_PORT("DSW") AM_WRITENOP // key mux write
@@ -343,7 +393,7 @@ static const mc6845_interface mc6845_intf =
 	"screen",	/* screen we are acting on */
 	8,			/* number of pixels per video memory address */
 	NULL,		/* before pixel update callback */
-	NULL,		/* row update callback */
+	fp1100_update_row,		/* row update callback */
 	NULL,		/* after pixel update callback */
 	DEVCB_NULL,	/* callback for display state changes */
 	DEVCB_NULL,	/* callback for cursor state changes */
@@ -375,8 +425,6 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_MACHINE_START(fp1100)
 	MCFG_MACHINE_RESET(fp1100)
 
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_4MHz/2, mc6845_intf)	/* hand tuned to get ~60 fps */
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -386,9 +434,11 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_VIDEO_START(fp1100)
 	MCFG_SCREEN_UPDATE(fp1100)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(8)
 	MCFG_GFXDECODE(fp1100)
+
+	/* Devices */
+	MCFG_MC6845_ADD("crtc", H46505, XTAL_4MHz/2, mc6845_intf)	/* hand tuned to get ~60 fps */
 MACHINE_CONFIG_END
 
 /* ROM definition */
