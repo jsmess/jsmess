@@ -61,9 +61,10 @@ void x68k_neptune_device::device_start()
 READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
 {
 	UINT16 data;
-	if(offset >= 32)
+
+	if(offset >= 0x100+32 || offset < 0x100)
 		return 0xffff;
-	if(offset < 16)
+	if(offset < 0x100+16)
 	{
 		m_dp8390->dp8390_cs(CLEAR_LINE);
 		return (m_dp8390->dp8390_r(space, offset, 0xff) << 8)|
@@ -72,12 +73,12 @@ READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
 	//if(mem_mask == 0x00ff) offset++;
 	switch(offset)
 	{
-	case 16:
+	case 0x100+16:
 		m_dp8390->dp8390_cs(ASSERT_LINE);
 		data = m_dp8390->dp8390_r(space, offset, mem_mask);
 		data = ((data & 0x00ff) << 8) | ((data & 0xff00) >> 8);
 		return data;
-	case 31:
+	case 0x100+31:
 		m_dp8390->dp8390_reset(CLEAR_LINE);
 		return 0;
 	default:
@@ -88,9 +89,9 @@ READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
 
 WRITE16_MEMBER(x68k_neptune_device::x68k_neptune_port_w)
 {
-	if(offset >= 32)
+	if(offset >= 0x100+32 || offset < 0x100)
 		return;
-	if(offset < 16)
+	if(offset < 0x100+16)
 	{
 		m_dp8390->dp8390_cs(CLEAR_LINE);
 		if(mem_mask == 0x00ff)
@@ -105,12 +106,12 @@ WRITE16_MEMBER(x68k_neptune_device::x68k_neptune_port_w)
 	//if(mem_mask == 0x00ff) offset++;
 	switch(offset)
 	{
-	case 16:
+	case 0x100+16:
 		m_dp8390->dp8390_cs(ASSERT_LINE);
 		data = ((data & 0x00ff) << 8) | ((data & 0xff00) >> 8);
 		m_dp8390->dp8390_w(space, offset, data, mem_mask);
 		return;
-	case 31:
+	case 0x100+31:
 		m_dp8390->dp8390_reset(ASSERT_LINE);
 		return;
 	default:
