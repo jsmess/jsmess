@@ -30,7 +30,7 @@ const char *st_format::extensions() const
 
 bool st_format::supports_save() const
 {
-	return false;
+	return true;
 }
 
 void st_format::find_size(io_generic *io, int &track_count, int &head_count, int &sector_count)
@@ -68,15 +68,48 @@ bool st_format::load(io_generic *io, floppy_image *image)
 
 	int track_size = sector_count*512;
 	for(int track=0; track < track_count; track++) {
-		for(int side=0; side < head_count; side++) {
-			io_generic_read(io, sectdata, (track*head_count + side)*track_size, track_size);
-			generate_track(atari_st_fcp_get_desc(track, side, head_count, sector_count),
-						   track, side, sectors, sector_count+1, 100000, image);
+		for(int head=0; head < head_count; head++) {
+			io_generic_read(io, sectdata, (track*head_count + head)*track_size, track_size);
+			generate_track(atari_st_fcp_get_desc(track, head, head_count, sector_count),
+						   track, head, sectors, sector_count+1, 100000, image);
 		}
 	}
 
-	return TRUE;
+	return true;
 }
+
+bool st_format::save(io_generic *io, floppy_image *image)
+{
+	int track_count, head_count, sector_count;
+	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);
+
+	if(track_count < 80)
+		track_count = 80;
+	else if(track_count > 82)
+		track_count = 82;
+
+	// Happens for a fully unformatted floppy
+	if(!head_count)
+		head_count = 1;
+
+	if(sector_count > 11)
+		sector_count = 11;
+	else if(sector_count < 9)
+		sector_count = 9;
+
+	UINT8 sectdata[11*512];
+	int track_size = sector_count*512;
+
+	for(int track=0; track < track_count; track++) {
+		for(int head=0; head < head_count; head++) {
+			get_track_data_mfm_pc(track, head, image, 2000, 512, sector_count, sectdata);
+			io_generic_write(io, sectdata, (track*head_count + head)*track_size, track_size);
+		}
+	}
+
+	return true;
+}
+
 
 msa_format::msa_format()
 {
@@ -99,7 +132,7 @@ const char *msa_format::extensions() const
 
 bool msa_format::supports_save() const
 {
-	return false;
+	return true;
 }
 
 void msa_format::read_header(io_generic *io, UINT16 &sign, UINT16 &sect, UINT16 &head, UINT16 &strack, UINT16 &etrack)
@@ -139,6 +172,34 @@ bool msa_format::uncompress(UINT8 *buffer, int csize, int usize)
 	return true;
 }
 
+bool msa_format::compress(const UINT8 *buffer, int usize, UINT8 *dest, int &csize)
+{
+	int src=0, dst=0;
+	while(src<usize && dst<usize) {
+		unsigned char c = buffer[src++];
+		int ncopy = 1;
+		while(src < usize && buffer[src] == c) {
+			src++;
+			ncopy++;
+		}
+		if(ncopy > 4 || c == 0xe5) {
+			if(dst+3 > usize)
+				return false;
+			dest[dst++] = 0xe5;
+			dest[dst++] = c;
+			dest[dst++] = ncopy >> 8;
+			dest[dst++] = ncopy;
+		} else {
+			src -= ncopy-1;
+			dest[dst++] = c;
+		}
+	}
+
+	csize = dst;
+
+	return dst < usize;
+}
+
 int msa_format::identify(io_generic *io)
 {
 	UINT16 sign, sect, head, strack, etrack;
@@ -155,8 +216,8 @@ int msa_format::identify(io_generic *io)
 
 bool msa_format::load(io_generic *io, floppy_image *image)
 {
-	UINT16 sign, sect, head, strack, etrack;
-	read_header(io, sign, sect, head, strack, etrack);
+	UINT16 sign, sect, heads, strack, etrack;
+	read_header(io, sign, sect, heads, strack, etrack);
 
 	UINT8 sectdata[11*512];
 	desc_s sectors[11];
@@ -169,7 +230,7 @@ bool msa_format::load(io_generic *io, floppy_image *image)
 	int track_size = sect*512;
 
 	for(int track=strack; track <= etrack; track++) {
-		for(int side=0; side <= head; side++) {
+		for(int head=0; head <= heads; head++) {
 			UINT8 th[2];
 			io_generic_read(io, th, pos, 2);
 			pos += 2;
@@ -180,8 +241,73 @@ bool msa_format::load(io_generic *io, floppy_image *image)
 				if(!uncompress(sectdata, tsize, track_size))
 					return false;
 			}
-			generate_track(atari_st_fcp_get_desc(track, side, head+1, sect),
-						   track, side, sectors, sect+1, 100000, image);
+			generate_track(atari_st_fcp_get_desc(track, head, head+1, sect),
+						   track, head, sectors, sect+1, 100000, image);
+		}
+	}
+
+	return true;
+}
+
+
+bool msa_format::save(io_generic *io, floppy_image *image)
+{
+	int track_count, head_count, sector_count;
+	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);
+
+	if(track_count < 80)
+		track_count = 80;
+	else if(track_count > 82)
+		track_count = 82;
+
+	// Happens for a fully unformatted floppy
+	if(!head_count)
+		head_count = 1;
+
+	if(sector_count > 11)
+		sector_count = 11;
+	else if(sector_count < 9)
+		sector_count = 9;
+
+	UINT8 header[10];
+	header[0] = 0x0e;
+	header[1] = 0x0f;
+	header[2] = 0;
+	header[3] = sector_count;
+	header[4] = 0;
+	header[5] = head_count-1;
+	header[6] = 0;
+	header[7] = 0;
+	header[8] = 0;
+	header[9] = track_count-1;
+
+	io_generic_write(io, header, 0, 10);
+
+	int pos = 10;
+
+	UINT8 sectdata[11*512];
+	UINT8 compdata[11*512];
+	int track_size = sector_count*512;
+
+	for(int track=0; track < track_count; track++) {
+		for(int head=0; head < head_count; head++) {
+			get_track_data_mfm_pc(track, head, image, 2000, 512, sector_count, sectdata);
+			int csize;
+			if(compress(sectdata, track_size, compdata, csize)) {
+				UINT8 th[2];
+				th[0] = csize >> 8;
+				th[1] = csize;
+				io_generic_write(io, th, pos, 2);
+				io_generic_write(io, compdata, pos+2, csize);
+				pos += 2+csize;
+			} else {
+				UINT8 th[2];
+				th[0] = track_size >> 8;
+				th[1] = track_size;
+				io_generic_write(io, th, pos, 2);
+				io_generic_write(io, sectdata, pos+2, track_size);
+				pos += 2+track_size;
+			}
 		}
 	}
 

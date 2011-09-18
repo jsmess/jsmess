@@ -2,7 +2,7 @@
 
     formats/st_dsk.h
 
-    Atari ST generic 9/10/11 sector-per-track formats
+    Atari ST 9/10/11 sector-per-track formats
 
 *********************************************************************/
 
@@ -18,6 +18,7 @@ public:
 
 	virtual int identify(io_generic *io);
 	virtual bool load(io_generic *io, floppy_image *image);
+	virtual bool save(io_generic *io, floppy_image *image);
 
 	virtual const char *name() const;
 	virtual const char *description() const;
@@ -35,6 +36,7 @@ public:
 
 	virtual int identify(io_generic *io);
 	virtual bool load(io_generic *io, floppy_image *image);
+	virtual bool save(io_generic *io, floppy_image *image);
 
 	virtual const char *name() const;
 	virtual const char *description() const;
@@ -43,6 +45,7 @@ public:
 
 private:
 	bool uncompress(UINT8 *buffer, int csize, int usize);
+	bool compress(const UINT8 *src, int usize, UINT8 *dest, int &csize);
 	void read_header(io_generic *io, UINT16 &sign, UINT16 &sect, UINT16 &head, UINT16 &strack, UINT16 &etrack);
 };
 
