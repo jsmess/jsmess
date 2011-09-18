@@ -13,21 +13,6 @@
     - MAC
         - MAGIC bit (disable IFC2?)
     - floppy
-        - "rderr no /boot"
-
-            '3f' (001764): wd17xx_data_w $25
-            old track: $00 new track: $25
-            direction: +1
-            '3f' (001788): wd17xx_command_w $19 SEEK (data_reg is $25)
-            '3f' (00193E): wd17xx_status_r: $00 (data_count 0)
-            '3f' (0017A0): wd17xx_track_r: $25
-            '3f' (001844): wd17xx_sector_w $03
-            '3f' (00184C): wd17xx_command_w $8A READ_SEC (cmd=80, trk=25, sec=03, dat=25)
-            '3f' (00193E): wd17xx_status_r: $01 (data_count 0)
-            '3f' (00193E): wd17xx_status_r: $01 (data_count 0)
-            wd179x: Read Sector callback.
-            track 37 sector 3 not found!
-
         - internal floppy is really drive 2, but wd17xx.c doesn't like having NULL drives
     - BUS0I/0X/1/2
     - short/long reset (RSTBUT)
@@ -1090,10 +1075,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER( abc1600_state::dbrq_w )
 {
-	if (!m_dmadis)
-	{
-		// TODO
-	}
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state & m_dmadis);
 }
 
 READ8_MEMBER( abc1600_state::dma0_mreq_r )
@@ -1381,7 +1363,7 @@ static const floppy_interface abc1600_floppy_interface =
     DEVCB_NULL,
     DEVCB_NULL,
     DEVCB_NULL,
-    FLOPPY_STANDARD_5_25_DSDD,
+    FLOPPY_STANDARD_5_25_DSQD,
     LEGACY_FLOPPY_OPTIONS_NAME(abc1600),
     "floppy_5_25",
 	NULL
