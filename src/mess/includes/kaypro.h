@@ -1,4 +1,4 @@
-
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
@@ -37,17 +37,25 @@ public:
 	required_device<device_t> m_fdc;
 	optional_device<mc6845_device> m_crtc;
 	required_device<device_t> m_beep;
-	DECLARE_READ8_MEMBER( kaypro2x_87_r );
-	DECLARE_READ8_MEMBER( kaypro2x_system_port_r );
-	DECLARE_READ8_MEMBER( kaypro2x_status_r );
-	DECLARE_READ8_MEMBER( kaypro2x_videoram_r );
-	DECLARE_WRITE8_MEMBER( kaypro_baud_a_w );
-	DECLARE_WRITE8_MEMBER( kayproii_baud_b_w );
-	DECLARE_WRITE8_MEMBER( kaypro2x_baud_a_w );
-	DECLARE_WRITE8_MEMBER( kaypro2x_system_port_w );
-	DECLARE_WRITE8_MEMBER( kaypro2x_index_w );
-	DECLARE_WRITE8_MEMBER( kaypro2x_register_w );
-	DECLARE_WRITE8_MEMBER( kaypro2x_videoram_w );
+	DECLARE_READ8_MEMBER(kaypro2x_87_r);
+	DECLARE_READ8_MEMBER(kaypro2x_system_port_r);
+	DECLARE_READ8_MEMBER(kaypro2x_status_r);
+	DECLARE_READ8_MEMBER(kaypro2x_videoram_r);
+	DECLARE_WRITE8_MEMBER(kaypro_baud_a_w);
+	DECLARE_WRITE8_MEMBER(kayproii_baud_b_w);
+	DECLARE_WRITE8_MEMBER(kaypro2x_baud_a_w);
+	DECLARE_WRITE8_MEMBER(kaypro2x_system_port_w);
+	DECLARE_WRITE8_MEMBER(kaypro2x_index_w);
+	DECLARE_WRITE8_MEMBER(kaypro2x_register_w);
+	DECLARE_WRITE8_MEMBER(kaypro2x_videoram_w);
+	DECLARE_READ8_MEMBER(pio_system_r);
+	DECLARE_WRITE8_MEMBER(common_pio_system_w);
+	DECLARE_WRITE8_MEMBER(kayproii_pio_system_w);
+	DECLARE_WRITE8_MEMBER(kaypro4_pio_system_w);
+	DECLARE_WRITE_LINE_MEMBER(kaypro_fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(kaypro_fdc_drq_w);
+	DECLARE_READ8_MEMBER(kaypro_videoram_r);
+	DECLARE_WRITE8_MEMBER(kaypro_videoram_w);
 	const UINT8 *m_p_chargen;
 	UINT8 *m_p_videoram;
 	UINT8 m_system_port;
@@ -101,7 +109,3 @@ VIDEO_START( kaypro );
 SCREEN_UPDATE( kayproii );
 SCREEN_UPDATE( omni2 );
 SCREEN_UPDATE( kaypro2x );
-
-READ8_HANDLER( kaypro_videoram_r );
-
-WRITE8_HANDLER( kaypro_videoram_w );

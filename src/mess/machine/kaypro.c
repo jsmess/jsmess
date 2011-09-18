@@ -1,5 +1,5 @@
 
-#include "emu.h"
+
 #include "includes/kaypro.h"
 
 
@@ -18,13 +18,12 @@ static void kaypro_interrupt(device_t *device, int state)
 	cputag_set_input_line(device->machine(), "maincpu", 0, state);
 }
 
-static READ8_DEVICE_HANDLER( pio_system_r )
+READ8_MEMBER( kaypro_state::pio_system_r )
 {
-	kaypro_state *state = device->machine().driver_data<kaypro_state>();
 	UINT8 data = 0;
 
 	/* centronics busy */
-	data |= centronics_not_busy_r(state->m_printer) << 3;
+	data |= centronics_not_busy_r(m_printer) << 3;
 
 	/* PA7 is pulled high */
 	data |= 0x80;
@@ -32,9 +31,8 @@ static READ8_DEVICE_HANDLER( pio_system_r )
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( common_pio_system_w )
+WRITE8_MEMBER( kaypro_state::common_pio_system_w )
 {
-	kaypro_state *state = device->machine().driver_data<kaypro_state>();
 /*  d7 bank select
     d6 disk drive motors - (0=on)
     d5 double-density enable (0=double density)
@@ -44,60 +42,58 @@ static WRITE8_DEVICE_HANDLER( common_pio_system_w )
     d0 drive A */
 
 	/* get address space */
-	address_space *mem = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
 
 	if (data & 0x80)
 	{
 		mem->unmap_readwrite (0x0000, 0x3fff);
 		mem->install_read_bank (0x0000, 0x0fff, "bank1");
-		memory_set_bankptr(mem->machine(), "bank1", mem->machine().region("maincpu")->base());
-		mem->install_legacy_readwrite_handler (0x3000, 0x3fff, FUNC(kaypro_videoram_r), FUNC(kaypro_videoram_w));
+		memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base());
+		mem->install_readwrite_handler (0x3000, 0x3fff, read8_delegate(FUNC(kaypro_state::kaypro_videoram_r), this), write8_delegate(FUNC(kaypro_state::kaypro_videoram_w), this));
 	}
 	else
 	{
 		mem->unmap_readwrite(0x0000, 0x3fff);
 		mem->install_read_bank (0x0000, 0x3fff, "bank2");
 		mem->install_write_bank (0x0000, 0x3fff, "bank3");
-		memory_set_bankptr(mem->machine(), "bank2", mem->machine().region("rambank")->base());
-		memory_set_bankptr(mem->machine(), "bank3", mem->machine().region("rambank")->base());
+		memory_set_bankptr(machine(), "bank2", machine().region("rambank")->base());
+		memory_set_bankptr(machine(), "bank3", machine().region("rambank")->base());
 	}
 
-	wd17xx_dden_w(state->m_fdc, BIT(data, 5));
+	wd17xx_dden_w(m_fdc, BIT(data, 5));
 
-	centronics_strobe_w(state->m_printer, BIT(data, 4));
+	centronics_strobe_w(m_printer, BIT(data, 4));
 
-	if (data & 1)
-		wd17xx_set_drive(state->m_fdc, 0);
-	else
-	if (data & 2)
-		wd17xx_set_drive(state->m_fdc, 1);
+	if (BIT(data, 0))
+		wd17xx_set_drive(m_fdc, 0);
 
-	output_set_value("ledA",(data & 1) ? 1 : 0);		/* LEDs in artwork */
-	output_set_value("ledB",(data & 2) ? 1 : 0);
+	if (BIT(data, 1))
+		wd17xx_set_drive(m_fdc, 1);
+
+	output_set_value("ledA", BIT(data, 0));		/* LEDs in artwork */
+	output_set_value("ledB", BIT(data, 1));
 
 	/* CLEAR_LINE means to turn motors on */
-	floppy_mon_w(floppy_get_device(mem->machine(), 0), (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	floppy_mon_w(floppy_get_device(mem->machine(), 1), (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	floppy_mon_w(floppy_get_device(machine(), 0), BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
+	floppy_mon_w(floppy_get_device(machine(), 1), BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 
-	state->m_system_port = data;
+	m_system_port = data;
 }
 
-static WRITE8_DEVICE_HANDLER( kayproii_pio_system_w )
+WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
 {
-	kaypro_state *state = device->machine().driver_data<kaypro_state>();
-	common_pio_system_w(device, offset, data);
+	common_pio_system_w(space, offset, data);
 
 	/* side select */
-	wd17xx_set_side(state->m_fdc, !BIT(data, 2));
+	wd17xx_set_side(m_fdc, !BIT(data, 2));
 }
 
-static WRITE8_DEVICE_HANDLER( kaypro4_pio_system_w )
+WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
 {
-	kaypro_state *state = device->machine().driver_data<kaypro_state>();
-	common_pio_system_w(device, offset, data);
+	common_pio_system_w(space, offset, data);
 
 	/* side select */
-	wd17xx_set_side(state->m_fdc, BIT(data, 2));
+	wd17xx_set_side(m_fdc, BIT(data, 2));
 }
 
 const z80pio_interface kayproii_pio_g_intf =
@@ -114,8 +110,8 @@ const z80pio_interface kayproii_pio_g_intf =
 const z80pio_interface kayproii_pio_s_intf =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_HANDLER(pio_system_r),	/* read printer status */
-	DEVCB_HANDLER(kayproii_pio_system_w),	/* activate various internal devices */
+	DEVCB_DRIVER_MEMBER(kaypro_state, pio_system_r),	/* read printer status */
+	DEVCB_DRIVER_MEMBER(kaypro_state, kayproii_pio_system_w),	/* activate various internal devices */
 	DEVCB_NULL,			/* portA ready active callback */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -125,8 +121,8 @@ const z80pio_interface kayproii_pio_s_intf =
 const z80pio_interface kaypro4_pio_s_intf =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_HANDLER(pio_system_r),	/* read printer status */
-	DEVCB_HANDLER(kaypro4_pio_system_w),	/* activate various internal devices */
+	DEVCB_DRIVER_MEMBER(kaypro_state, pio_system_r),	/* read printer status */
+	DEVCB_DRIVER_MEMBER(kaypro_state, kaypro4_pio_system_w),	/* activate various internal devices */
 	DEVCB_NULL,			/* portA ready active callback */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -314,28 +310,28 @@ static TIMER_CALLBACK( kaypro_timer_callback )
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( kaypro_fdc_intrq_w )
+WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_intrq_w )
 {
 	if (state)
-		device->machine().scheduler().timer_set(attotime::from_usec(25), FUNC(kaypro_timer_callback));
+		machine().scheduler().timer_set(attotime::from_usec(25), FUNC(kaypro_timer_callback));
 	else
-		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( kaypro_fdc_drq_w )
+WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_drq_w )
 {
 	if (state)
-		device->machine().scheduler().timer_set(attotime::from_usec(25), FUNC(kaypro_timer_callback));
+		machine().scheduler().timer_set(attotime::from_usec(25), FUNC(kaypro_timer_callback));
 	else
-		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 }
 
 const wd17xx_interface kaypro_wd1793_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(kaypro_fdc_intrq_w),
-	DEVCB_LINE(kaypro_fdc_drq_w),
+	DEVCB_DRIVER_LINE_MEMBER(kaypro_state, kaypro_fdc_intrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(kaypro_state, kaypro_fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
@@ -359,7 +355,7 @@ MACHINE_RESET( kayproii )
 MACHINE_RESET( kaypro2x )
 {
 	kaypro_state *state = machine.driver_data<kaypro_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	state->kaypro2x_system_port_w(*space, 0, 0x80);
 	MACHINE_RESET_CALL(kay_kbd);
 }
@@ -378,7 +374,7 @@ MACHINE_RESET( kaypro2x )
 QUICKLOAD_LOAD( kayproii )
 {
 	kaypro_state *state = image.device().machine().driver_data<kaypro_state>();
-	device_t *cpu = image.device().machine().device("maincpu");
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *RAM = image.device().machine().region("rambank")->base();
 	UINT16 i;
 	UINT8 data;
@@ -391,18 +387,17 @@ QUICKLOAD_LOAD( kayproii )
 		RAM[i+0x100] = data;
 	}
 
-	common_pio_system_w(state->m_pio_s, 0, state->m_system_port & 0x7f);	// switch TPA in
+	state->common_pio_system_w(*space, 0, state->m_system_port & 0x7f);	// switch TPA in
 	RAM[0x80]=0;							// clear out command tail
 	RAM[0x81]=0;
-	cpu_set_reg(cpu, STATE_GENPC, 0x100);				// start program
+	cpu_set_reg(state->m_maincpu, STATE_GENPC, 0x100);				// start program
 	return IMAGE_INIT_PASS;
 }
 
 QUICKLOAD_LOAD( kaypro2x )
 {
 	kaypro_state *state = image.device().machine().driver_data<kaypro_state>();
-	address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *cpu = image.device().machine().device("maincpu");
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *RAM = image.device().machine().region("rambank")->base();
 	UINT16 i;
 	UINT8 data;
@@ -417,6 +412,6 @@ QUICKLOAD_LOAD( kaypro2x )
 	state->kaypro2x_system_port_w(*space, 0, state->m_system_port & 0x7f);
 	RAM[0x80]=0;
 	RAM[0x81]=0;
-	cpu_set_reg(cpu, STATE_GENPC, 0x100);
+	cpu_set_reg(state->m_maincpu, STATE_GENPC, 0x100);
 	return IMAGE_INIT_PASS;
 }

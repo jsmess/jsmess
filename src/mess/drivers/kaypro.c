@@ -35,7 +35,6 @@
 **************************************************************************************************/
 #define ADDRESS_MAP_MODERN
 
-#include "emu.h"
 #include "includes/kaypro.h"
 
 
@@ -373,7 +372,7 @@ ROM_START(kaypro2x)
 	ROM_LOAD("81-817.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
-ROM_START(kaypro4a)
+ROM_START(kaypro4a) // same as kaypro2x ??
 	ROM_REGION(0x4000, "maincpu",0)
 	ROM_LOAD("81-292.u34",   0x0000, 0x2000, CRC(5eb69aec) SHA1(525f955ca002976e2e30ac7ee37e4a54f279fe96) )
 
@@ -395,12 +394,12 @@ ROM_START(kaypro10)
 	ROM_LOAD("81-817.u31",   0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT    COMPANY  FULLNAME */
-COMP( 1982, kayproii,   0,        0,    kayproii, kay_kbd, 0,      "Non Linear Systems",  "Kaypro II - 2/83" , GAME_NOT_WORKING )
-COMP( 1983, kaypro4,    kayproii, 0,    kaypro4,  kay_kbd, 0,      "Non Linear Systems",  "Kaypro 4 - 4/83" , GAME_NOT_WORKING ) // model 81-004
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT         COMPANY                 FULLNAME */
+COMP( 1982, kayproii,   0,        0,    kayproii, kay_kbd, 0,      "Non Linear Systems",  "Kaypro II - 2/83" , 0 )
+COMP( 1983, kaypro4,    kayproii, 0,    kaypro4,  kay_kbd, 0,      "Non Linear Systems",  "Kaypro 4 - 4/83" , 0 ) // model 81-004
 COMP( 1983, kaypro4p88, kayproii, 0,    kaypro4,  kay_kbd, 0,      "Non Linear Systems",  "Kaypro 4 plus88 - 4/83" , GAME_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
-COMP( 198?, omni2,      kayproii, 0,    omni2,    kay_kbd, 0,      "Non Linear Systems",  "Omni II" , GAME_NOT_WORKING )
+COMP( 198?, omni2,      kayproii, 0,    omni2,    kay_kbd, 0,      "Non Linear Systems",  "Omni II" , 0 )
 COMP( 1984, kaypro2x,   0,        0,    kaypro2x, kay_kbd, 0,      "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING ) // model 81-025
-COMP( 1984, kaypro4a,   0,        0,    kaypro2x, kay_kbd, 0,      "Non Linear Systems",  "Kaypro 4 - 4/84" , GAME_NOT_WORKING ) // model 81-015
+COMP( 1984, kaypro4a,   kaypro2x, 0,    kaypro2x, kay_kbd, 0,      "Non Linear Systems",  "Kaypro 4 - 4/84" , GAME_NOT_WORKING ) // model 81-015
 // Kaypro 4/84 plus 88 goes here, model 81-015 with an added 8088 daughterboard and rom
 COMP( 1983, kaypro10,   0,        0,    kaypro2x, kay_kbd, 0,      "Non Linear Systems",  "Kaypro 10" , GAME_NOT_WORKING ) // model 81-005
