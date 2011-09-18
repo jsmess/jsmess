@@ -117,6 +117,7 @@ public:
 	int 				m_pio_data[2];
 	emu_timer *			m_cassette_timer;
 	int 				m_cassette_motor_state;
+	int					m_high_resolution;
 	UINT8				m_ardy;
 	UINT8				m_brdy;
 	int 				m_kc85_50hz_state;
