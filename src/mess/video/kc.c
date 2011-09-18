@@ -116,50 +116,76 @@ void kc85_video_set_blink_state(running_machine &machine, int data)
 /* draw 8 pixels */
 static void kc85_draw_8_pixels(kc_state *state, bitmap_t *bitmap,int x,int y, unsigned char colour_byte, unsigned char gfx_byte)
 {
-	int a;
 	int background_pen;
 	int foreground_pen;
-	int pens[2];
+	int pens[4];
 	int px;
 
-	/* 16 foreground colours, 8 background colours */
-
-	/* bit 7 = 1: flash between foreground and background colour 0: no flash */
-	/* bit 6: adjusts foreground colours by adding half of another component */
-	/* bit 5,4,3 = foreground colour */
-		/* bit 5: background colour -> Green */
-		/* bit 4: background colour -> Red */
-		/* bit 3: background colour -> Blue */
-	/* bit 2,1,0 = background colour */
-		/* bit 2: background colour -> Green */
-		/* bit 1: background colour -> Red */
-		/* bit 0: background colour -> Blue */
-	background_pen = (colour_byte&7) + 16;
-	foreground_pen = ((colour_byte>>3) & 0x0f);
-
-	if (colour_byte & state->m_kc85_blink_state)
+	if (state->m_high_resolution)
 	{
-		foreground_pen = background_pen;
-	}
+		/* High resolution: 4 colors for block */
 
-	pens[0] = background_pen;
-	pens[1] = foreground_pen;
+		pens[0] = 0;	// black
+		pens[1] = 2;	// red
+		pens[2] = 5;	// cyan
+		pens[3] = 7;	// white
 
-	px = x;
+		px = x;
 
-	for (a=0; a<8; a++)
-	{
-		int pen;
-
-		pen = pens[(gfx_byte>>7) & 0x01];
-
-		if ((px >= 0) && (px < bitmap->width)
-			&& (y >= 0) && (y < bitmap->height))
+		for (int a=0; a<8; a++)
 		{
-			*BITMAP_ADDR16(bitmap, y, px) = pen;
+			int pen = pens[((gfx_byte>>7) & 0x07) | ((colour_byte>>6) & 0x02)];
+
+			if ((px >= 0) && (px < bitmap->width) && (y >= 0) && (y < bitmap->height))
+			{
+				*BITMAP_ADDR16(bitmap, y, px) = pen;
+			}
+
+			px++;
+			colour_byte <<= 1;
+			gfx_byte <<= 1;
 		}
-		px++;
-		gfx_byte = gfx_byte<<1;
+	}
+	else
+	{
+		/* Low resolution: 2 colors for block */
+		/* 16 foreground colours, 8 background colours */
+
+		/* bit 7 = 1: flash between foreground and background colour 0: no flash */
+		/* bit 6: adjusts foreground colours by adding half of another component */
+		/* bit 5,4,3 = foreground colour */
+			/* bit 5: background colour -> Green */
+			/* bit 4: background colour -> Red */
+			/* bit 3: background colour -> Blue */
+		/* bit 2,1,0 = background colour */
+			/* bit 2: background colour -> Green */
+			/* bit 1: background colour -> Red */
+			/* bit 0: background colour -> Blue */
+
+		background_pen = (colour_byte&7) + 16;
+		foreground_pen = ((colour_byte>>3) & 0x0f);
+
+		if (colour_byte & state->m_kc85_blink_state)
+		{
+			foreground_pen = background_pen;
+		}
+
+		pens[0] = background_pen;
+		pens[1] = foreground_pen;
+
+		px = x;
+
+		for (int a=0; a<8; a++)
+		{
+			int pen = pens[(gfx_byte>>7) & 0x01];
+
+			if ((px >= 0) && (px < bitmap->width) && (y >= 0) && (y < bitmap->height))
+			{
+				*BITMAP_ADDR16(bitmap, y, px) = pen;
+			}
+			px++;
+			gfx_byte = gfx_byte<<1;
+		}
 	}
 }
 

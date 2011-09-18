@@ -644,6 +644,8 @@ WRITE8_MEMBER( kc85_4_state::kc85_4_84_w )
 
 	kc85_4_video_ram_select_bank(machine(), data & 0x01);
 
+	m_high_resolution = (data & 0x08) ? 0 : 1;
+
 	update_0x08000();
 }
 
@@ -785,6 +787,9 @@ void kc_state::machine_reset()
 
 	m_kc85_50hz_state = 0;
 	m_kc85_15khz_state = 0;
+
+	// set low resolution at reset
+	m_high_resolution = 0;
 
 	/* this is temporary. Normally when a Z80 is reset, it will
     execute address 0. It appears the KC85 series pages the rom
