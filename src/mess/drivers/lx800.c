@@ -4,7 +4,16 @@
 
     Skeleton driver
 
+    - CPU type uPD7810HG
+    - CPU PORTD and PORTF are connected to the Gate Array
+    - CPU Analog Port (AN0-AN7) is not emulated (connects to DIPSW2 and
+      some other things).
+    - processing gets stuck in a loop, and never gets to scan the
+      input buttons and switches.
+    - CPU disassembly doesn't seem to indicate conditional JR or RET.
+
 ***************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/upd7810/upd7810.h"
@@ -21,9 +30,21 @@ class lx800_state : public driver_device
 {
 public:
 	lx800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_beep(*this, BEEPER_TAG)
+	{ }
 
-	device_t *m_speaker;
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_beep;
+	DECLARE_READ8_MEMBER(lx800_porta_r);
+	DECLARE_WRITE8_MEMBER(lx800_porta_w);
+	DECLARE_READ8_MEMBER(lx800_portc_r);
+	DECLARE_WRITE8_MEMBER(lx800_portc_w);
+	DECLARE_READ8_MEMBER(lx800_centronics_data_r);
+	DECLARE_WRITE_LINE_MEMBER(lx800_centronics_pe_w);
+	DECLARE_WRITE_LINE_MEMBER(lx800_paperempty_led_w);
+	DECLARE_WRITE_LINE_MEMBER(lx800_reset_w);
 };
 
 
@@ -40,14 +61,14 @@ public:
  * PA6             not used
  * PA7  R   P/S    P/S signal from the optional interface
  */
-static READ8_HANDLER( lx800_porta_r )
+READ8_MEMBER( lx800_state::lx800_porta_r )
 {
 	UINT8 result = 0;
 
-	logerror("%s: lx800_porta_r(%02x)\n", space->machine().describe_context(), offset);
+	logerror("%s: lx800_porta_r(%02x)\n", machine().describe_context(), offset);
 
-	result |= input_port_read(space->machine(), "LINEFEED") << 3;
-	result |= input_port_read(space->machine(), "FORMFEED") << 4;
+	result |= input_port_read(machine(), "LINEFEED") << 3;
+	result |= input_port_read(machine(), "FORMFEED") << 4;
 	result |= 1 << 5;
 
 	result |= 1 << 7;
@@ -55,9 +76,9 @@ static READ8_HANDLER( lx800_porta_r )
 	return result;
 }
 
-static WRITE8_HANDLER( lx800_porta_w )
+WRITE8_MEMBER( lx800_state::lx800_porta_w )
 {
-	logerror("%s: lx800_porta_w(%02x): %02x\n", space->machine().describe_context(), offset, data);
+	logerror("%s: lx800_porta_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> carriage: %d, paper feed: %d\n", BIT(data, 0), BIT(data, 2));
 }
 
@@ -70,26 +91,24 @@ static WRITE8_HANDLER( lx800_porta_w )
  * PC6   W  FIRE       drive pulse width signal
  * PC7   W  BUZZER     buzzer signal
  */
-static READ8_HANDLER( lx800_portc_r )
+READ8_MEMBER( lx800_state::lx800_portc_r )
 {
 	UINT8 result = 0;
 
-	logerror("%s: lx800_portc_r(%02x)\n", space->machine().describe_context(), offset);
+	logerror("%s: lx800_portc_r(%02x)\n", machine().describe_context(), offset);
 
-	result |= input_port_read(space->machine(), "ONLINE") << 3;
+	result |= input_port_read(machine(), "ONLINE") << 3;
 
 	return result;
 }
 
-static WRITE8_HANDLER( lx800_portc_w )
+WRITE8_MEMBER( lx800_state::lx800_portc_w )
 {
-	lx800_state *lx800 = space->machine().driver_data<lx800_state>();
-
-	logerror("%s: lx800_portc_w(%02x): %02x\n", space->machine().describe_context(), offset, data);
+	logerror("%s: lx800_portc_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
 
 	output_set_value("online_led", !BIT(data, 2));
-	beep_set_state(lx800->m_speaker, !BIT(data, 7));
+	beep_set_state(m_beep, !BIT(data, 7));
 }
 
 
@@ -97,25 +116,27 @@ static WRITE8_HANDLER( lx800_portc_w )
     GATE ARRAY
 ***************************************************************************/
 
-static READ8_DEVICE_HANDLER( lx800_centronics_data_r )
+READ8_MEMBER( lx800_state::lx800_centronics_data_r )
 {
 	logerror("centronics: data read\n");
 	return 0x55;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( lx800_centronics_pe_w )
+WRITE_LINE_MEMBER( lx800_state::lx800_centronics_pe_w )
 {
 	logerror("centronics: pe = %d\n", state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( lx800_paperempty_led_w )
+WRITE_LINE_MEMBER( lx800_state::lx800_paperempty_led_w )
 {
+	logerror("setting paperout led: %d\n", state);
 	output_set_value("paperout_led", state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( lx800_reset_w )
+WRITE_LINE_MEMBER( lx800_state::lx800_reset_w )
 {
-	device->machine().device("maincpu")->reset();
+	logerror("cpu reset");
+	m_maincpu->reset();
 }
 
 
@@ -127,10 +148,8 @@ static MACHINE_START( lx800 )
 {
 	lx800_state *lx800 = machine.driver_data<lx800_state>();
 
-	lx800->m_speaker = machine.device(BEEPER_TAG);
-
-	beep_set_state(lx800->m_speaker, 0);
-	beep_set_frequency(lx800->m_speaker, 4000); /* ? */
+	beep_set_state(lx800->m_beep, 0);
+	beep_set_frequency(lx800->m_beep, 4000); /* ? */
 }
 
 
@@ -138,16 +157,16 @@ static MACHINE_START( lx800 )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( lx800_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lx800_mem, AS_PROGRAM, 8, lx800_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* 32k firmware */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* 8k external RAM */
 	AM_RANGE(0xa000, 0xbfff) AM_NOP /* not used */
-	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x1ff8) AM_DEVREADWRITE("ic3b", e05a03_r, e05a03_w)
+	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x1ff8) AM_DEVREADWRITE_LEGACY("ic3b", e05a03_r, e05a03_w)
 	AM_RANGE(0xe000, 0xfeff) AM_NOP /* not used */
 	AM_RANGE(0xff00, 0xffff) AM_RAM /* internal CPU RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lx800_io, AS_IO, 8 )
+static ADDRESS_MAP_START( lx800_io, AS_IO, 8, lx800_state )
 	AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READWRITE(lx800_porta_r, lx800_porta_w)
 	AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_READ_PORT("DIPSW1")
 	AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_READWRITE(lx800_portc_r, lx800_portc_w)
@@ -226,17 +245,17 @@ INPUT_PORTS_END
 
 static const UPD7810_CONFIG lx800_cpu_config =
 {
-    TYPE_7810,
-    0
+	TYPE_7810,
+	0
 };
 
 static const e05a03_interface lx800_e05a03_intf =
 {
-	DEVCB_HANDLER(lx800_centronics_data_r),
+	DEVCB_DRIVER_MEMBER(lx800_state, lx800_centronics_data_r),
 	DEVCB_NULL,
-	DEVCB_LINE(lx800_paperempty_led_w),
-	DEVCB_LINE(lx800_centronics_pe_w),
-	DEVCB_LINE(lx800_reset_w)
+	DEVCB_DRIVER_LINE_MEMBER(lx800_state, lx800_paperempty_led_w),
+	DEVCB_DRIVER_LINE_MEMBER(lx800_state, lx800_centronics_pe_w),
+	DEVCB_DRIVER_LINE_MEMBER(lx800_state, lx800_reset_w)
 };
 
 static MACHINE_CONFIG_START( lx800, lx800_state )
@@ -265,8 +284,8 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( lx800 )
-    ROM_REGION(0x8000, "maincpu", 0)
-    ROM_LOAD("lx800.ic3c", 0x0000, 0x8000, CRC(da06c45b) SHA1(9618c940dd10d5b43cd1edd5763b90e6447de667))
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("lx800.ic3c", 0x0000, 0x8000, CRC(da06c45b) SHA1(9618c940dd10d5b43cd1edd5763b90e6447de667))
 ROM_END
 
 
@@ -275,4 +294,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY  FULLNAME  FLAGS */
-COMP( 1987, lx800, 0,      0,      lx800,   lx800, 0,    "Epson", "LX-800", GAME_NOT_WORKING )
+COMP( 1987, lx800, 0,      0,      lx800,   lx800, 0,    "Epson", "LX-800 Printer", GAME_NOT_WORKING )

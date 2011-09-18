@@ -47,6 +47,8 @@ unimplemented instruction: PER
 - In "irq_mask_w" is a read of e800. Without this, no videoram writes occur.
 - In "fp1100_vram_w" the data is inverted. Without it, a flashing cursor can be seen.
 - The text mode is also present at 9000-97FF of the maincpu (not bitmapped).
+- The display should keep scrolling, but it seems to crash after the first
+  scroll (as can be seen in the 9000-97FF area).
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
