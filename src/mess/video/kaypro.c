@@ -1,5 +1,4 @@
 
-#include "emu.h"
 #include "includes/kaypro.h"
 
 
@@ -247,17 +246,11 @@ void kaypro_state::mc6845_cursor_configure()
 
 void kaypro_state::mc6845_screen_configure()
 {
-//  rectangle visarea;
-
 	UINT16 width = m_mc6845_reg[1]*8-1;							// width in pixels
 	UINT16 height = m_mc6845_reg[6]*(m_mc6845_reg[9]+1)-1;					// height in pixels
 	UINT16 bytes = m_mc6845_reg[1]*m_mc6845_reg[6]-1;						// video ram needed -1
 
 	/* Resize the screen */
-//  visarea.min_x = 0;
-//  visarea.max_x = width-1;
-//  visarea.min_y = 0;
-//  visarea.max_y = height-1;
 	if ((width < 640) && (height < 400) && (bytes < 0x800))	/* bounds checking to prevent an assert or violation */
 		machine().primary_screen->set_visible_area(0, width, 0, height);
 }
@@ -299,16 +292,14 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_register_w )
 		m_mc6845_video_address = m_mc6845_reg[19] | ((m_mc6845_reg[18] & 0x3f) << 8);	/* internal ULA address */
 }
 
-READ8_HANDLER( kaypro_videoram_r )
+READ8_MEMBER( kaypro_state::kaypro_videoram_r )
 {
-	kaypro_state *state = space->machine().driver_data<kaypro_state>();
-	return state->m_p_videoram[offset];
+	return m_p_videoram[offset];
 }
 
-WRITE8_HANDLER( kaypro_videoram_w )
+WRITE8_MEMBER( kaypro_state::kaypro_videoram_w )
 {
-	kaypro_state *state = space->machine().driver_data<kaypro_state>();
-	state->m_p_videoram[offset] = data;
+	m_p_videoram[offset] = data;
 }
 
 READ8_MEMBER( kaypro_state::kaypro2x_videoram_r )
