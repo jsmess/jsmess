@@ -267,6 +267,8 @@ void wd1772_t::read_sector_start()
 
 void wd1772_t::read_sector_continue()
 {
+	static int size_codes[4] = { 128, 256, 512, 1024 };
+	
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
@@ -299,7 +301,6 @@ void wd1772_t::read_sector_continue()
 				live_start(SEARCH_ADDRESS_MARK);
 				return;
 			}
-			static int size_codes[4] = { 128, 256, 512, 1024 };
 			sector_size = cur_live.idbuf[3] < 4 ? size_codes[cur_live.idbuf[3]] : 512;
 			sub_state = SECTOR_READ;
 			live_start(SEARCH_ADDRESS_MARK);
