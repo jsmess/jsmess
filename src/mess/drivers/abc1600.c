@@ -18,6 +18,13 @@
     - short/long reset (RSTBUT)
     - SCC interrupt
     - CIO (interrupt controller)
+	
+		Task 15 BOOTE 1 MAGIC 1
+		Task 0 Segment 0 : 10
+		Z8536 '15b' Unimplemented write 20 to register 8
+		Task 0 BOOTE 1 MAGIC 1
+		Reset caused by the watchdog!!!
+		
         - RTC
         - NVRAM
     - hard disk (Xebec S1410)
@@ -842,6 +849,8 @@ inline offs_t abc1600_state::get_dma_address(int index, UINT16 offset)
 
 	m_cause = (dmamap & 0x1f) << 3;
 
+	logerror("virtual addr %06x\n", ((dmamap & 0x1f) << 16) | offset);
+	
 	return ((dmamap & 0x1f) << 16) | offset;
 }
 
