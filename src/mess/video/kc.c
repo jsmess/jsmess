@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "includes/kc.h"
-#include "machine/ram.h"
 
 /* KC85/4 and KC85/3 common graphics hardware */
 
@@ -564,25 +563,24 @@ static void kc85_common_vh_start(running_machine &machine)
 
 
 
-VIDEO_START( kc85_4 )
+void kc85_4_state::video_start()
 {
-	kc_state *state = machine.driver_data<kc_state>();
-	kc85_common_vh_start(machine);
+	kc85_common_vh_start(machine());
 
-	state->m_kc85_4_video_ram = auto_alloc_array(machine, UINT8,
+	m_video_ram = auto_alloc_array(machine(), UINT8,
 		(KC85_4_SCREEN_COLOUR_RAM_SIZE*2) +
 		(KC85_4_SCREEN_PIXEL_RAM_SIZE*2));
 
-	state->m_kc85_4_display_video_ram = state->m_kc85_4_video_ram;
+	m_display_video_ram = m_video_ram;
 }
 
 void kc85_4_video_ram_select_bank(running_machine &machine, int bank)
 {
-	kc_state *state = machine.driver_data<kc_state>();
+	kc85_4_state *state = machine.driver_data<kc85_4_state>();
 	/* calculate address of video ram to display */
 	unsigned char *video_ram;
 
-	video_ram = state->m_kc85_4_video_ram;
+	video_ram = state->m_video_ram;
 
 	if (bank!=0)
 	{
@@ -591,14 +589,14 @@ void kc85_4_video_ram_select_bank(running_machine &machine, int bank)
 				   KC85_4_SCREEN_COLOUR_RAM_SIZE);
 	}
 
-	state->m_kc85_4_display_video_ram = video_ram;
+	state->m_display_video_ram = video_ram;
 }
 
 unsigned char *kc85_4_get_video_ram_base(running_machine &machine, int bank, int colour)
 {
-	kc_state *state = machine.driver_data<kc_state>();
+	kc85_4_state *state = machine.driver_data<kc85_4_state>();
 	/* base address: screen 0 pixel data */
-	unsigned char *addr = state->m_kc85_4_video_ram;
+	unsigned char *addr = state->m_video_ram;
 
 	if (bank!=0)
 	{
@@ -635,9 +633,9 @@ static void kc85_4_pixel_grab_callback(struct grab_info *grab_data,int x,int y, 
 ***************************************************************************/
 SCREEN_UPDATE( kc85_4 )
 {
-	kc_state *state = screen->machine().driver_data<kc_state>();
+	kc85_4_state *state = screen->machine().driver_data<kc85_4_state>();
 #if 0
-	unsigned char *pixel_ram = state->m_kc85_4_display_video_ram;
+	unsigned char *pixel_ram = state->m_display_video_ram;
 	unsigned char *colour_ram = pixel_ram + 0x04000;
 
 	int x,y;
@@ -661,8 +659,8 @@ SCREEN_UPDATE( kc85_4 )
 #endif
 	struct grab_info grab_data;
 
-	grab_data.pixel_ram = state->m_kc85_4_display_video_ram;
-	grab_data.colour_ram = state->m_kc85_4_display_video_ram + 0x04000;
+	grab_data.pixel_ram = state->m_display_video_ram;
+	grab_data.colour_ram = state->m_display_video_ram + 0x04000;
 
 	kc85_common_process_frame(screen->machine(), bitmap, kc85_4_pixel_grab_callback,&grab_data);
 
@@ -673,9 +671,9 @@ SCREEN_UPDATE( kc85_4 )
  KC85/3 video
 ***************************************************************************/
 
-VIDEO_START( kc85_3 )
+void kc_state::video_start()
 {
-	kc85_common_vh_start(machine);
+	kc85_common_vh_start(machine());
 }
 
 
@@ -715,6 +713,8 @@ static void kc85_3_pixel_grab_callback(struct grab_info *grab_data,int x,int y, 
 ***************************************************************************/
 SCREEN_UPDATE( kc85_3 )
 {
+	kc_state *state = screen->machine().driver_data<kc_state>();
+
 #if 0
 	/* colour ram takes up 0x02800 bytes */
 	   unsigned char *pixel_ram = ram_get_ptr(machine.device(RAM_TAG))+0x08000;
@@ -758,8 +758,8 @@ SCREEN_UPDATE( kc85_3 )
 
 	struct grab_info grab_data;
 
-	grab_data.pixel_ram = ram_get_ptr(screen->machine().device(RAM_TAG))+0x08000;
-	grab_data.colour_ram = ram_get_ptr(screen->machine().device(RAM_TAG))+0x08000 + 0x02800;
+	grab_data.pixel_ram = state->m_ram_base + 0x04000;
+	grab_data.colour_ram = state->m_ram_base + 0x04000 + 0x02800;
 
 	kc85_common_process_frame(screen->machine(), bitmap, kc85_3_pixel_grab_callback,&grab_data);
 
