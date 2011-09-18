@@ -942,10 +942,10 @@ LEGACY_FLOPPY_OPTIONS_END
 /// New implementation
 //////////////////////////////////////////////////////////
 
-floppy_image::floppy_image(UINT16 _tracks, UINT8 _sides)
+floppy_image::floppy_image(int _tracks, int _heads)
 {
 	tracks = _tracks;
-	sides = _sides;
+	heads = _heads;
 
 	memset(cell_data, 0, sizeof(cell_data));
 	memset(track_size, 0, sizeof(track_size));
@@ -955,15 +955,43 @@ floppy_image::floppy_image(UINT16 _tracks, UINT8 _sides)
 floppy_image::~floppy_image()
 {
 	for (int i=0;i<tracks;i++) {
-		for (int j=0;j<sides;j++) {
+		for (int j=0;j<heads;j++) {
 			global_free(cell_data[(i<<1) + j]);
 		}
 	}
 }
 
-void floppy_image::ensure_alloc(UINT16 track, UINT8 side)
+void floppy_image::get_maximal_geometry(int &_tracks, int &_heads)
 {
-	int idx = (track << 1) + side;
+	_tracks = tracks;
+	_heads = heads;
+}
+
+void floppy_image::get_actual_geometry(int &_tracks, int &_heads)
+{
+	int maxt = tracks-1, maxh = heads-1;
+
+	while(maxt >= 0) {
+		for(int i=0; i<=maxh; i++)
+			if(get_track_size(maxt, i))
+				goto track_done;
+		maxt--;
+	}
+ track_done:
+	if(maxt >= 0)
+		while(maxh >= 0) {
+			for(int i=0; i<=maxt; i++)
+				if(get_track_size(i, maxh))
+					goto head_done;
+		}
+ head_done:
+	_tracks = maxt+1;
+	_heads = maxh+1;
+}
+
+void floppy_image::ensure_alloc(int track, int head)
+{
+	int idx = (track << 1) + head;
 	if(track_size[idx] > track_alloc_size[idx]) {
 		UINT32 new_size = track_size[idx]*11/10;
 		UINT32 *new_array = global_alloc_array(UINT32, new_size);
@@ -1949,3 +1977,288 @@ const floppy_image_format_t::desc_e floppy_image_format_t::amiga_11[] = {
 	{ MFM, 0x00, 266 },
 	{ END }
 };
+
+void floppy_image_format_t::generate_bitstream_from_track(UINT8 track, UINT8 head, int cell_size, UINT8 *trackbuf, int &track_size, floppy_image *image)
+{
+	int tsize = image->get_track_size(track, head);
+	if(!tsize || tsize == 1) {
+		// Unformatted track
+		track_size = 200000000/cell_size;
+		memset(trackbuf, 0, (track_size+7)/8);
+		return;
+	}
+
+	// Start a little before the end of the track to pre-synchronize
+	// the pll
+	const UINT32 *tbuf = image->get_buffer(track, head);
+	int cur_pos = 190000000;
+	int cur_entry = tsize-1;
+	while((tbuf[cur_entry] & floppy_image::TIME_MASK) > cur_pos)
+		cur_entry--;
+	cur_entry++;
+	if(cur_entry == tsize)
+		cur_entry = 0;
+
+	int cur_bit = -1;
+
+	int period = cell_size;
+	int period_adjust_base = period * 0.05;
+
+	int min_period = int(cell_size*0.75);
+	int max_period = int(cell_size*1.25);
+	int phase_adjust = 0;
+	int freq_hist = 0;
+
+	for(;;) {
+		// Note that all magnetic cell type changes are considered
+		// edges.  No randomness added for neutral/damaged cells
+		int edge = tbuf[cur_entry] & floppy_image::TIME_MASK;
+		if(edge < cur_pos)
+			edge += 200000000;
+		int next = cur_pos + period + phase_adjust;
+
+		if(0 && cur_bit != -1)
+			printf("cb=%d pos=%d edge=%d next=%d period=%d rdelta=%d\n", cur_bit, cur_pos, edge, next,
+				   period, ((next-period/2) % 2000) - 1000);
+
+		if(edge >= next) {
+			// No transition in the window means 0 and pll in free run mode
+			if(cur_bit >= 0) {
+				trackbuf[cur_bit >> 3] &= ~(0x80 >> (cur_bit & 7));
+				cur_bit++;
+			}
+			phase_adjust = 0;
+
+		} else {
+			// Transition in the window means 1, and the pll is adjusted
+			if(cur_bit >= 0) {
+				trackbuf[cur_bit >> 3] |= 0x80 >> (cur_bit & 7);
+				cur_bit++;
+			}
+
+			int delta = edge - (next - period/2);
+
+			phase_adjust = 0.65*delta;
+
+			if(delta < 0) {
+				if(freq_hist < 0)
+					freq_hist--;
+				else
+					freq_hist = -1;
+			} else if(delta > 0) {
+				if(freq_hist > 0)
+					freq_hist++;
+				else
+					freq_hist = 1;
+			} else
+				freq_hist = 0;
+
+			if(freq_hist) {
+				int afh = freq_hist < 0 ? -freq_hist : freq_hist;
+				if(afh > 1) {
+					int aper = period_adjust_base*delta/period;
+					if(!aper)
+						aper = freq_hist < 0 ? -1 : 1;
+					period += aper;
+
+					if(period < min_period)
+						period = min_period;
+					else if(period > max_period)
+						period = max_period;
+				}
+			}
+		}
+
+		cur_pos = next;
+		if(cur_pos >= 200000000) {
+			if(cur_bit >= 0)
+				break;
+			cur_bit = 0;
+			cur_pos -= 200000000;
+			cur_entry = 0;
+		}
+		while(cur_entry < tsize-1 && (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos) {
+			//			printf("e=%d pos=%d type=%d\n", cur_entry, tbuf[cur_entry] & floppy_image::TIME_MASK, (tbuf[cur_entry] & floppy_image::MG_MASK) >> floppy_image::MG_SHIFT);
+			cur_entry++;
+		}
+
+		// Wrap around
+		if(cur_entry == tsize-1 &&
+		   (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos) {
+			// Wrap to index 0 or 1 depending on whether there is a transition exactly at the index hole
+			cur_entry = (tbuf[tsize-1] & floppy_image::MG_MASK) != (tbuf[0] & floppy_image::MG_MASK) ?
+				0 : 1;
+		}
+	}
+	// Clean the leftover bottom bits just in case
+	trackbuf[cur_bit >> 3] &= ~(0x7f >> (cur_bit & 7));
+	track_size = cur_bit;
+}
+
+int floppy_image_format_t::sbit_r(const UINT8 *bitstream, int pos)
+{
+	return (bitstream[pos >> 3] & (0x80 >> (pos & 7))) != 0;
+}
+
+int floppy_image_format_t::sbit_rp(const UINT8 *bitstream, int &pos, int track_size)
+{
+	int res = sbit_r(bitstream, pos);
+	pos ++;
+	if(pos == track_size)
+		pos = 0;
+	return res;
+}
+
+UINT8 floppy_image_format_t::sbyte_mfm_r(const UINT8 *bitstream, int &pos, int track_size)
+{
+	UINT8 res = 0;
+	for(int i=0; i<8; i++) {
+		sbit_rp(bitstream, pos, track_size);
+		if(sbit_rp(bitstream, pos, track_size))
+			res |= 0x80 >> i;
+	}
+	return res;
+}
+
+
+void floppy_image_format_t::extract_sectors_from_bitstream_mfm_pc(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size)
+{
+	memset(sectors, 0, 256*sizeof(desc_xs));
+
+	// Don't bother if it's just too small
+	if(track_size < 100)
+		return;
+
+	// Start by detecting all id and data blocks
+
+	// If 100 is not enough, that track is too funky to be worth
+	// bothering anyway
+
+	int idblk[100], dblk[100];
+	int idblk_count = 0, dblk_count = 0;
+
+	// Precharge the shift register to detect over-the-index stuff
+	UINT16 shift_reg = 0;
+	for(int i=0; i<16; i++)
+		if(sbit_r(bitstream, track_size-16+i))
+			shift_reg |= 0x8000 >> i;
+
+	// Scan the bitstream for sync marks and follow them to check for
+	// blocks
+	for(int i=0; i<track_size; i++) {
+		shift_reg = (shift_reg << 1) | sbit_r(bitstream, i);
+		if(shift_reg == 0x4489) {
+			UINT16 header;
+			int pos = i+1;
+			do {
+				header = 0;
+				for(int j=0; j<16; j++)
+					if(sbit_rp(bitstream, pos, track_size))
+						header |= 0x8000 >> j;
+				// Accept strings of sync marks as long and they're not wrapping
+
+				// Wrapping ones have already been take into account
+				// thanks to the precharging
+			} while(header == 0x4489 && pos > i);
+
+			// fe, ff
+			if(header == 0x5554 || header == 0x5555) {
+				if(idblk_count < 100)
+					idblk[idblk_count++] = pos;
+				i = pos-1;
+			}
+			// fa, fb, fc, fd
+			if(header == 0x5544 || header == 0x5545 || header == 0x5553 || header == 0x5551) {
+				if(dblk_count < 100)
+					dblk[dblk_count++] = pos;
+				i = pos-1;
+			}
+		}
+	}
+
+	// Then extract the sectors
+	int sectdata_pos = 0;
+	for(int i=0; i<idblk_count; i++) {
+		int pos = idblk[i];
+		UINT8 track = sbyte_mfm_r(bitstream, pos, track_size);
+		UINT8 head = sbyte_mfm_r(bitstream, pos, track_size);
+		UINT8 sector = sbyte_mfm_r(bitstream, pos, track_size);
+		UINT8 size = sbyte_mfm_r(bitstream, pos, track_size);
+		if(size >= 8)
+			continue;
+		int ssize = 128 << size;
+
+		// If we don't have enough space for a sector's data, skip it
+		if(ssize + sectdata_pos > sectdata_size)
+			continue;
+
+		// Start of IDAM and DAM are supposed to be exactly 704 cells
+		// apart.  Of course the hardware is tolerant, but not that
+		// tolerant.  Accept +/- 32 cells of shift.
+
+		int d_index;
+		for(d_index = 0; d_index < dblk_count; d_index++) {
+			int delta = dblk[d_index] - idblk[i];
+			if(delta >= 704-32 && delta <= 704+32)
+				break;
+		}
+		if(d_index == dblk_count)
+			continue;
+
+		pos = dblk[d_index];
+
+		sectors[sector].track = track;
+		sectors[sector].head = head;
+		sectors[sector].size = ssize;
+		sectors[sector].data = sectdata + sectdata_pos;
+		for(int j=0; j<ssize; j++)
+			sectdata[sectdata_pos++] = sbyte_mfm_r(bitstream, pos, track_size);
+	}		
+}
+
+void floppy_image_format_t::get_geometry_mfm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count)
+{
+	image->get_actual_geometry(track_count, head_count);
+
+	UINT8 bitstream[500000/8];
+	UINT8 sectdata[50000];
+	desc_xs sectors[256];
+	int track_size;
+
+	// Extract an arbitrary track to get an idea of the number of
+	// sectors
+
+	// 20 was rarely used for protections, not near the start like
+	// 0-10, not near the end like 70+, no special effects on sync
+	// like 33
+
+	generate_bitstream_from_track(20, 0, cell_size, bitstream, track_size, image);
+	extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+
+	for(sector_count = 44; sector_count > 0 && !sectors[sector_count].data; sector_count--);
+}
+
+
+void floppy_image_format_t::get_track_data_mfm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, UINT8 *sectdata)
+{
+	UINT8 bitstream[500000/8];
+	UINT8 sectbuf[50000];
+	desc_xs sectors[256];
+	int track_size;
+
+	generate_bitstream_from_track(track, head, cell_size, bitstream, track_size, image);
+	extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sectbuf, sizeof(sectbuf));
+	for(int sector=1; sector <= sector_count; sector++) {
+		UINT8 *sd = sectdata + (sector-1)*sector_size;
+		if(sectors[sector].data && sectors[sector].track == track && sectors[sector].head == head) {
+			int asize = sectors[sector].size;
+			if(asize > sector_size)
+				asize = sector_size;
+			memcpy(sd, sectors[sector].data, asize);
+			if(asize < sector_size)
+				memset(sd+asize, 0, sector_size-asize);
+		} else
+			memset(sd, 0, sector_size);
+	}
+}
+
