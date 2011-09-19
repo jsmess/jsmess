@@ -1546,6 +1546,11 @@ ROM_START( sc1clbxp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "clubexplosion1.bin", 0x8000, 0x008000, CRC(876161db) SHA1(a6262d70870a6edb71469ec8cea317b185aec49e) )
 	ROM_LOAD( "clubexplosion2.bin", 0x0000, 0x008000, CRC(da56fbdd) SHA1(0ea35f6672a4a4b9236d8341733496450b64238e) )
+
+	ROM_REGION( 0x20000, "upd", 0 )//Did a version of this have a UPD sound board, if so, these seem to be ROMs for it
+	ROM_LOAD( "95000004.bin", 0x000000, 0x008000, CRC(6ed10c9b) SHA1(cd209e8f9e0a3fd41e4ed8b6c9387ee91c19704c) )
+	ROM_LOAD( "95000005.bin", 0x008000, 0x008000, CRC(9e16aee2) SHA1(25610fcd4c073ff7f20a3d24f96792913fa447f7) )
+	ROM_LOAD( "95000006.bin", 0x010000, 0x008000, CRC(41636b3d) SHA1(8bc4dfcd5bd56422e303c73d50c2e7afa2edef5a) )
 ROM_END
 
 
@@ -2807,7 +2812,7 @@ GAME( 199?, sc1supfl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM/ELA
 // are they really SC1?
 GAME( 199?, sc1btbc			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Beat The Bank Club (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // behaves like sc1dyncl, but then locks up
 GAME( 199?, sc1frpus		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Fruit Pursuit (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 199?, sc1ofs56		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Unknown 'ofs56cp' (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // OFAH - Phoenix 1
+GAME( 199?, sc1ofs56		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "unknown 'ofs56cp' (Bellfruit) (Scorpion 1?)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // OFAH - Phoenix 1
 GAME( 199?, sc1boncl		, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Bonanza Club (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 // are these really SC1? they do more here than in SC2 at least!
 GAME( 199?, sc1days			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "Global",   "All In A Days Work (Global)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
@@ -2841,7 +2846,7 @@ GAME( 199?, sc1potp			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",  
 GAME( 199?, sc1potpa			, sc1potp			, scorpion1			, scorpion1	, lotse			, 0,	   "BFM",      "Double Dealer (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // ^ with above.. seems the same game, but different name
 
 
-GAME( 199?, sc1scunk			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "unknown",      "Unknown Scorpion 1 'Super ?' (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // ^ with above.. seems the same game, but different name
+GAME( 199?, sc1scunk			, 0			, scorpion1			, scorpion1	, lotse			, 0,	   "<unknown>",      "unknown Scorpion 1 'Super ?' (Bellfruit) (Scorpion 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // ^ with above.. seems the same game, but different name
 
 
 //Adder 2

@@ -1,8 +1,6 @@
 #include "video/poly.h"
 
-#define USE_NAMCOS22_SPEED_HACK
-
-#define MAX_LIT_SURFACES 32
+#define MAX_LIT_SURFACES 0x80
 #define MAX_RENDER_CMD_SEQ 0x1c
 
 
@@ -63,13 +61,14 @@ public:
 	UINT16 m_mRenderBufData[MAX_RENDER_CMD_SEQ];
 	UINT32 m_mSys22PortBits;
 	int m_mFrameCount;
-	UINT8 m_stick_input;
-	UINT8 m_prev_stick_state;
 	int m_mDspUploadState;
 	int m_mUploadDestIdx;
 	UINT32 m_mAlpineSurferProtData;
+	int m_motor_status;
+	emu_timer *m_motor_timer;
 	int m_p4;
 	UINT16 m_su_82;
+	UINT16 m_keycus_id;
 	int m_gametype;
 	int m_mbSuperSystem22;
 	UINT32 *m_cgram;

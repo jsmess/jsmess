@@ -1248,6 +1248,13 @@ ROM_END
 ********************************************************************************************************************/
 
 // these are scrambled roms using 'MAB' hw.
+ROM_START( ec_bar7 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "b7tok.bin", 0x0000, 0x020000, CRC(c3913709) SHA1(73024a3bbfbe13477e4daae78f54c694d112b936) )
+	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_LOAD( "bar7", 0x0000, 0x008000, CRC(ce0429bc) SHA1(d9cda09589a6e7c72c4d777de2964abe6b4e18c3) ) //?
+ROM_END
+
 ROM_START( ec_barxmab )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "mab-bx15", 0x0000, 0x020000, CRC(a58dba57) SHA1(50131ac706c5b0baa793e79e7a0b42eb28c2c61d) )
@@ -1255,6 +1262,24 @@ ROM_START( ec_barxmab )
 	ROM_LOAD( "barx5p5", 0x0000, 0x020000, CRC(374a83a1) SHA1(6151e6d2e7cdd3997dc009dd4a11a1e8fd405ac5) )
 ROM_END
 
+ROM_START( ec_fltr )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "128.bin", 0x0000, 0x020000, CRC(a10a59a8) SHA1(967fc890daccc9cfc880404c37714391a71fe0db) )
+	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_LOAD( "226.bin", 0x0000, 0x020000, CRC(96a684e5) SHA1(0b699af7ab3719543ca6f9fa623a2658154ff79d) )
+	ROM_LOAD( "f131bx", 0x0000, 0x020000, CRC(80049e42) SHA1(d9d5d8bc115652db40e762df9adca81849475620) )
+	ROM_LOAD( "f132bx.bin", 0x0000, 0x020000, CRC(cbb76052) SHA1(f0888c7466dde33e9831d4e0130d49281ba2e7d0) )
+	ROM_LOAD( "f312.bin", 0x0000, 0x020000, CRC(dc3b60f0) SHA1(c76a59fb0996a5e1e014120a6efc756a96e1a976) )
+	ROM_LOAD( "f313bx.bin", 0x0000, 0x020000, CRC(6e957245) SHA1(a50d5f27fcadfdb3d0806b3ef5210422b16403ad) )
+	ROM_LOAD( "f314.bin", 0x0000, 0x020000, CRC(ea42b72d) SHA1(2dce355419f0a9118700034ae17c33afaf5a8b8a) )
+	ROM_LOAD( "f513b7.bin", 0x0000, 0x020000, CRC(691da0ef) SHA1(c7b3fdfed2008fd7e12934a86ea87a1025bbe7e0) )
+	ROM_LOAD( "f514.bin", 0x0000, 0x020000, CRC(fd77043f) SHA1(77e7e1b8d0cf90ebdad32e838002e273edcfb7eb) )
+	ROM_LOAD( "fb7228.bin", 0x0000, 0x020000, CRC(325abb4d) SHA1(ba0f4fca37e187724dd79f37e4128daa5a429921) )
+	ROM_LOAD( "fb7229.bin", 0x0000, 0x020000, CRC(3ae1e092) SHA1(840bcba60be4a102876d978d5b95ef44153f10a7) )
+	ROM_LOAD( "v133.bin", 0x0000, 0x020000, CRC(474f4fdc) SHA1(e86bcecfde72355b4a41d32532f4c7f439131e80) )
+	ROM_LOAD( "v230.bin", 0x0000, 0x020000, CRC(63954009) SHA1(0697de05ad8cbb10f1c93a005b160109e0420e8d) )
+	ROM_LOAD( "v512.bin", 0x0000, 0x020000, CRC(c2f4f566) SHA1(403a9a3d20c6f6d7e7e89f14e67f502200149e88) )
+ROM_END
 
 ROM_START( ec_supbxmab )
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -1285,7 +1310,169 @@ ROM_START( ec_spbg7mab )
 	ROM_LOAD( "sb73.9", 0x0000, 0x020000, CRC(f253f61d) SHA1(28bd8628681fef865e984b9284a5e445b3b0cce7) )
 ROM_END
 
+ROM_START( ec_casbxcon )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// MAB Scramble
+	ROM_LOAD( "v301.bin", 0x0000, 0x020000, CRC(706cef3c) SHA1(7aeb2885872493569cdb99cbe723c9318fc246ee) )
 
+	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_LOAD( "v302.bin", 0x0000, 0x020000, CRC(d3b5f24c) SHA1(c2f80fb8143fa9f45b38357d913593c8de3fa2da) )
+	ROM_LOAD( "v303.bin", 0x0000, 0x020000, CRC(008916e6) SHA1(144b3f02e5bfd4ed233d6ceae5a5662cfc66367f) )
+	ROM_LOAD( "v305.bin", 0x0000, 0x020000, CRC(f08f0ffa) SHA1(6a84442359f76087ac3fc2470438b9ef5e135cb6) )
+	ROM_LOAD( "v306.bin", 0x0000, 0x020000, CRC(dc9f96c6) SHA1(9d501ca3d5bde787a5271c198ed1cade4044275a) )
+	ROM_LOAD( "v307.bin", 0x0000, 0x020000, CRC(73c18cec) SHA1(65d89c03253d9251187cc6ca90841ebdcd35b604) )
+	ROM_LOAD( "v308.bin", 0x0000, 0x020000, CRC(e49860c3) SHA1(b0967e81fb16c53ff2caf10abf9ded546f18aae7) )
+ROM_END
+
+ROM_START( ec_multb )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// MAB Scramble
+	ROM_LOAD( "v214.bin", 0x0000, 0x020000, CRC(5bf0a838) SHA1(7e177444cc36f0ef6c6cb2be77978e92561690b0) )
+
+	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_LOAD( "v214.bin", 0x0000, 0x020000, CRC(5bf0a838) SHA1(7e177444cc36f0ef6c6cb2be77978e92561690b0) )
+	ROM_LOAD( "v217.bin", 0x0000, 0x020000, CRC(7b60f6b7) SHA1(c42aa42a5e6b7a193f842317d685a13395520533) )
+	ROM_LOAD( "v218.bin", 0x0000, 0x020000, CRC(1d5de902) SHA1(24407dd00df6e95ab1ee71473e2e3bef6d0657c6) )
+	ROM_LOAD( "v219.bin", 0x0000, 0x020000, CRC(13e92639) SHA1(d71e47639bffc8598c2549b78de6c8a44a691614) )
+	ROM_LOAD( "v220.bin", 0x0000, 0x020000, CRC(f9987122) SHA1(1e3c900f44b9e1d1f934e2fb17a892551b2d7413) )
+	ROM_LOAD( "v221.bin", 0x0000, 0x020000, CRC(f52ffe1a) SHA1(afdbab93d4428e6eab83177e3e181fad9afc83a8) )
+	ROM_LOAD( "v222.bin", 0x0000, 0x020000, CRC(5603554a) SHA1(e2ae5e81ee7d0bc3e7b1fcf150c250fa827bcdee) )
+	ROM_LOAD( "v229.bin", 0x0000, 0x020000, CRC(3ae1e092) SHA1(840bcba60be4a102876d978d5b95ef44153f10a7) )
+ROM_END
+
+ROM_START( ec_casmb )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// MAB Scramble
+	ROM_LOAD( "v501.bin", 0x0000, 0x020000, CRC(4cbe1fa7) SHA1(a7dfa2f193651c670102159560c2ab188ee1f006) )
+
+	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_LOAD( "v502.bin", 0x0000, 0x020000, CRC(2bc42175) SHA1(d9a154071247809ca6ca37ee1abb00883106a2ca) )
+	ROM_LOAD( "v505.bin", 0x0000, 0x020000, CRC(2bc42175) SHA1(d9a154071247809ca6ca37ee1abb00883106a2ca) )
+	ROM_LOAD( "v506.bin", 0x0000, 0x020000, CRC(e3232f70) SHA1(cb21a777d0f28ed80e00f2e6b310193000eef8a2) )
+	ROM_LOAD( "v507.bin", 0x0000, 0x020000, CRC(9aaf9dd6) SHA1(a98eae02f3b791a1db434077915c590e4614913e) )
+	ROM_LOAD( "v508.bin", 0x0000, 0x020000, CRC(de9dc5f4) SHA1(7b7fb6ffbac2d6e074d186f0b053e6e9f955139c) )
+ROM_END
+
+ROM_START( ec_stkex )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// MAB Scramble
+	ROM_LOAD( "stakex.bin", 0x0000, 0x020000, CRC(01fe1d8f) SHA1(540d23e33f7930237c91f4cd9c9938e4d203f5d4) )
+ROM_END
+
+
+ROM_START( ec_supmb )
+	//Slightly different ROM mapping
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// MAB Scramble
+	ROM_LOAD( "smb1v6", 0x0000, 0x020000, CRC(e0e9afa7) SHA1(0b0f47e5d9b5b538f23f37e4b279343308a87b94) )
+
+	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_LOAD( "smb1v7", 0x0000, 0x020000, CRC(76ec2100) SHA1(ac484b3235149dfd2561d78d5917c02ccd9be413) )
+	ROM_LOAD( "smb2v03.dat", 0x0000, 0x020000, CRC(e3a0ef84) SHA1(d979c03c11ea9252424e28da1ba4e8a44643ba52) )
+	ROM_LOAD( "smb2v16", 0x0000, 0x020000, CRC(49769761) SHA1(80dab199e69a43508347989654859be6ce2aaced) )
+	ROM_LOAD( "v116.bin", 0x0000, 0x020000, CRC(8da57cbc) SHA1(48f78e226c90bf51cce70ffd9251bcd9275ea091) )
+ROM_END
+
+ROM_START( ec_gold7 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// MAB Scramble
+	ROM_LOAD( "gsb.bin", 0x0000, 0x010000, CRC(3cd64b27) SHA1(af96dca68843afc4e0f55b238c32ae910bc40cf5) )
+	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_LOAD( "g7205.bin", 0x0000, 0x020000, CRC(59f33b96) SHA1(c5f5095e9ce14aedc6cb7048ab282523d3fed7f3) )
+	ROM_LOAD( "g7207.bin", 0x0000, 0x020000, CRC(b8f60d63) SHA1(69bbcedebd14e56372d3e7d27dd1590de6c046d9) )
+	ROM_REGION( 0x200000, "altsrec", 0 )
+	//The file extension implies these are SREC files, a cursory examination suggests the EPROMS they produce are unscrambled.
+	//Are these actual MAB files?
+	ROM_LOAD( "fg73v2.s28", 0x0000, 0x0697ca, CRC(57a64b60) SHA1(bcd7be5186902777b2ba550d17d73a11e0092777) )
+	ROM_LOAD( "fg73v3.s28", 0x0000, 0x0697a4, CRC(d738cf3b) SHA1(4d7b19e405533491bbac5ef418f9a88718ce7e30) )
+	ROM_LOAD( "fg73v4.s28", 0x0000, 0x06979c, CRC(476182c7) SHA1(95bf573a18185dadfe5937d62ee778ee9c6c3e71) )
+	ROM_LOAD( "fg73v5.s28", 0x0000, 0x069698, CRC(f5969193) SHA1(18805e5e27e821d82561d724b16b97df8b85740f) )
+	ROM_LOAD( "g72v2.s28", 0x0000, 0x067250, CRC(ee626bb0) SHA1(ece22831a5aa337265c54585308cd5bbac4d4f6e) )
+	ROM_LOAD( "g7show.s28", 0x0000, 0x0695fc, CRC(2af57c50) SHA1(5b630abee0afc2e6b59feb53fc7ae3f36b71fb09) )
+ROM_END
+
+
+ROM_START( ec_mgbel )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// MAB Scramble
+	ROM_LOAD( "mabx.bin", 0x0000, 0x010000, CRC(c504f7ca) SHA1(809e1ce7ed27a60bf430486018e3d05d57d4ae76) )
+	ROM_REGION( 0x200000, "altsrec", 0 )
+	ROM_LOAD( "code.s28", 0x0000, 0x06de64, CRC(857e0784) SHA1(eaea6c7589edd847645d47d53ada7cadc1d3420d) )
+	ROM_LOAD( "mb1v0a.s28", 0x0000, 0x067d70, CRC(68880e64) SHA1(a49075928e73f596159215f1337b68d72fe37af2) )
+	ROM_LOAD( "mb1v0b.s28", 0x0000, 0x068678, CRC(c8917fc6) SHA1(867ae9acb1e2cfdaec7684a63e6dbccdbb334833) )
+	ROM_LOAD( "mb1v0c.s28", 0x0000, 0x068608, CRC(3c72e18f) SHA1(57d4cc4bbb769f7800b9b1791cc35043c43780f4) )
+	ROM_LOAD( "mb1v0d.s28", 0x0000, 0x06953c, CRC(4b852a6f) SHA1(1d9b387308da3bac96632939e177cfdf7d855abe) )
+	ROM_LOAD( "mb1v1.s28", 0x0000, 0x06b128, CRC(62b294e8) SHA1(52b2e60a902d71a043e758a4cd716ffdd682135a) )
+	ROM_LOAD( "mb1v1a.s28", 0x0000, 0x06b128, CRC(27c94cb1) SHA1(4568fdc269318d7c0af85d42e5dd57d020ee00d2) )
+	ROM_LOAD( "mb1v1c.s28", 0x0000, 0x06b3a8, CRC(3bebc09f) SHA1(012b8b3f7e6d1c7f840820b9403c557ae7d28a26) )
+	ROM_LOAD( "mb1v2.s28", 0x0000, 0x06b952, CRC(8cef350b) SHA1(9bc7c3fb9ce45f0ad2273942299f8fd2e647aede) )
+	ROM_LOAD( "mb1v4.s28", 0x0000, 0x06bd50, CRC(dc8936ad) SHA1(40ce99bc9e20cbc45b76e7854a60af8de0481b83) )
+	ROM_LOAD( "mb1v5.s28", 0x0000, 0x06bce4, CRC(01bfd2fc) SHA1(2fa95a2fa6c3d421fa0b010c2200b36cc25d6559) )
+	ROM_LOAD( "mb1v6.s28", 0x0000, 0x06bce4, CRC(48095170) SHA1(ea12b1bdb5e8d4e607daf37a7297b2053b13dcca) )
+	ROM_LOAD( "mb1v7.s28", 0x0000, 0x06cb10, CRC(e869fb3a) SHA1(9f47528410fd6c4a5f983ec5128d6c1c7d42d246) )
+	ROM_LOAD( "mb1v8.s28", 0x0000, 0x06e0ac, CRC(f9b6fea2) SHA1(3d68f7e8ca2232949d94f8c0fffaa8b48bebb357) )
+	ROM_LOAD( "mb1v8p.s28", 0x0000, 0x06d0fa, CRC(74d80d9c) SHA1(9c7c76278e56a981c7d0841115c9c6439bf16bcd) )
+	ROM_LOAD( "mb1v9.s28", 0x0000, 0x06e0ac, CRC(c5b9b744) SHA1(282d73b7247e3268d479b531029673f85e8584a6) )
+	ROM_LOAD( "mb2v0.s28", 0x0000, 0x06e160, CRC(cddcff85) SHA1(b1e107cfc465eaf627b2ce943a30c48a0d4dfe32) )
+	ROM_LOAD( "mb2v1.s28", 0x0000, 0x06e18c, CRC(3872fbf6) SHA1(228310c862c9e7b2f6244ee33dfd45f204c0ba44) )
+	ROM_LOAD( "mbell1v0.s28", 0x0000, 0x067be8, CRC(952db007) SHA1(27753d86f3474b77c1d9c2f2dcf53d12740b5fde) )
+	ROM_LOAD( "tmb2v3.s28", 0x0000, 0x06e3d2, CRC(3eb47013) SHA1(b644c4047da6799aa4ea26aec62c21ca735e9064) )
+	ROM_LOAD( "tmb2v3p.s28", 0x0000, 0x06e3e2, CRC(a2985520) SHA1(c2673c1940af1b36b8e0af5b1728c431473dcd82) )
+ROM_END
+
+ROM_START( ec_supbxcon )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// MAB Scramble
+	ROM_LOAD( "sbsx.bin", 0x0000, 0x010000, CRC(fcbbd3ff) SHA1(ceb95c945f73b008a2d9dc3b48971d3f4721c88b) )
+	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_LOAD( "bxtok.bin", 0x0000, 0x020000, CRC(6bafbfa8) SHA1(8f36c0ff6ba0327f9ed51fc46a98959fdd2a41ac) )
+	ROM_LOAD( "scb1v11", 0x0000, 0x020000, CRC(264a7608) SHA1(0c94675ac8f6609dbb1ae8d4915fbd071cb9728b) )
+	ROM_LOAD( "scb1v12", 0x0000, 0x020000, CRC(1c995bc5) SHA1(bbb69f6c90b5f25832ad14f3066c732dbeba978c) )
+	ROM_LOAD( "v113.bin", 0x0000, 0x020000, CRC(b373f5f1) SHA1(1746557bafa5203dfdf702b92f3640516d0d510d) )
+	ROM_LOAD( "v114.bin", 0x0000, 0x020000, CRC(daef56d8) SHA1(e4f2b0edccd45b7e3876f57831d83ff5d60f0c41) )
+	ROM_LOAD( "v115.bin", 0x0000, 0x020000, CRC(3ef3d1a8) SHA1(8d7aee58c0477b8252e12b2fadb2da6b1ecef300) )
+	ROM_LOAD( "v116.bin", 0x0000, 0x020000, CRC(8da57cbc) SHA1(48f78e226c90bf51cce70ffd9251bcd9275ea091) )
+	ROM_LOAD( "v117.bin", 0x0000, 0x020000, CRC(3d45fd91) SHA1(69ed98b9b5c0493b938c1249f0aa22f326b845d1) )
+	ROM_LOAD( "v118.bin", 0x0000, 0x020000, CRC(fca522ed) SHA1(007f627f06ef511595007939fa57b861ec01659e) )
+	ROM_LOAD( "v119.bin", 0x0000, 0x020000, CRC(08d50628) SHA1(ae5a8bc6b548127c1a433886ecf65bd07b393e18) )
+	ROM_LOAD( "v120.bin", 0x0000, 0x020000, CRC(57ea3d86) SHA1(dbb12590aa735271b5f994f27726e61b6d52a1c0) )
+ROM_END
+
+ROM_START( ec_jackb )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// SREC file for ROM, needs converting later. Host it for now, convert later
+	ROM_LOAD( "jakx1v2.s28", 0x0000, 0x067738, CRC(e4f911dc) SHA1(fa521ff0c03e12848f51bf10e2bf8a5e43e03c80) )
+ROM_END
+
+ROM_START( ec_ndgxs )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// MAB Scramble
+	ROM_LOAD( "code.s28", 0x0000, 0x0671e8, CRC(e2eb55f5) SHA1(65cfec813f132de0142f20b0469f3673a8c54b01) )
+	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_LOAD( "nudex2v0.s28", 0x0000, 0x0663d4, CRC(590b23e1) SHA1(74fd550e69b071670b87e914a6609f68494b2d7b) )
+	ROM_LOAD( "nudex2v2.s28", 0x0000, 0x06bd04, CRC(100ac3bc) SHA1(88e7be77f4df2dfc2883270d582fbe80f739ad49) )
+	ROM_LOAD( "nudge2v4.s28", 0x0000, 0x0663c2, CRC(d9c77f3c) SHA1(1edd407d62d0b0ffad1e11109b02d6a12393f6a8) )
+	ROM_LOAD( "nudge2v5.s28", 0x0000, 0x066426, CRC(df7fbc8b) SHA1(ddcc548ad3b10a06022837e054281ad9e5ce945e) )
+	ROM_LOAD( "nudge2v6.s28", 0x0000, 0x067342, CRC(4a41380a) SHA1(17647f83bf682273c5e5b819cacfa80897a3db2d) )
+	ROM_LOAD( "nudge2v7.s28", 0x0000, 0x06733e, CRC(cd7afde8) SHA1(bdd6168c858223b8a014a7ab16f75da0f79bd837) )
+	ROM_LOAD( "nudge2v8.s28", 0x0000, 0x066ffa, CRC(1d62f8eb) SHA1(45a5bb3c8dbb5cc697fec57620491058278d5c94) )
+	ROM_LOAD( "nudge2v9.s28", 0x0000, 0x0675c8, CRC(e9957d6b) SHA1(dcfb1ea3b6ea325dd9947b1ce37b07ff68eae2ce) )
+	ROM_LOAD( "nudge2v9p", 0x0000, 0x0675e8, CRC(15faa9d8) SHA1(fdd0d64531a11a726014565b451337fcace36967) )
+	ROM_LOAD( "nudge3v0.p", 0x0000, 0x067714, CRC(b8aa212d) SHA1(afee8b13e9fb268d99726f3747f93680acbaf75a) )
+ROM_END
+
+ROM_START( ec_rdht7 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// SREC file for ROM, needs converting later. Host it for now, convert later
+	ROM_LOAD( "rh7m.s28", 0x0000, 0x0b8413, CRC(811525ae) SHA1(29f76548f6088939ce0a505ce7bea20597125be6) )
+ROM_END
+
+ROM_START( ec_unkt )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	//Strange data, possibly bad, but looks like some sort of linked board ROM
+	ROM_LOAD( "t.bin", 0x0000, 0x000789, CRC(ee41f048) SHA1(d9b0539ac822218f71cd85301e3da35b3dea783b) )
+	ROM_LOAD( "t2.bin", 0x0000, 0x000989, CRC(0992ffa6) SHA1(cffb6e0a9a72bb2bf9a6e262074062bd06cfa1fb) )
+ROM_END
 
 DRIVER_INIT( ecoinfr )
 {
@@ -1306,11 +1493,25 @@ GAME( 19??, ec_casbx,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electr
 GAME( 19??, ec_redbr,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Red Bar (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // a mix of REDBAR and 2001 REDBAR
 GAME( 19??, ec_supbx,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar X (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_spbxd,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Super Bar X Deluxe (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_unk1,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine '300615' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_unk5,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "Unknown 'Electrocoin' Fruit Machine(s) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_unk1,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "unknown 'Electrocoin' Fruit Machine '300615' (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_unk5,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfr,	ROT0,  "Electrocoin", "unknown 'Electrocoin' Fruit Machine(s) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 // 3rd party sets with MAB scrambling, game names might be incorrect, should be the same basic hardware as these tho.
 GAME( 19??, ec_barxmab, ec_barx	 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Electrocoin", "Bar X (MAB PCB) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // scrambled roms
 GAME( 19??, ec_spbg7mab,ec_big7  , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Electrocoin", "Super Big 7 (MAB PCB) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_supbxmab,ec_supbx , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Electrocoin", "Super Bar X (MAB PCB) (Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
+//Games using the MAB scrambling, but identified as being from Concept Gaming
+GAME( 19??, ec_casbxcon,ec_casbx , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Casino Bar X (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_multb,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Multi Bar (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_casmb,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Casino Multi Bar (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_supmb,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Super Multi Bar (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_stkex,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Stake X (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_fltr,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Flutter (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_gold7,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Golden 7 (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_mgbel,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Megabell (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_supbxcon,ec_supbx , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Super Bar X (MAB PCB) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_jackb,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Jackpot Bars (MAB PCB?) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_ndgxs,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Nudge Excess (MAB PCB?) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_rdht7,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Red Hot 7 (MAB PCB?) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_unkt,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept - Electrocoin", "Unknown 'T' (MAB PCB?) (Concept - Electrocoin) (?)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)

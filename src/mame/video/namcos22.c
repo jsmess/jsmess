@@ -3,14 +3,16 @@
  *
  * todo:
  *
+ * - hook up slave dsp!
  * - fog bugfixes
- *
+ * - high priority polygons (above textlayer, for example minimap and speeddial in raveracer)
+ * - shadow in textlayer (raveracer speeddial) + alpha blending fixes in textlayer
  * - SPOT
  *
  * - sprite
- *          xy offset
- *          clipping to window
- *          eliminate garbage (air combat)
+ *   + xy offset
+ *   + clipping to window
+ *   + eliminate garbage (air combat)
  *
  *
  *******************************
@@ -127,11 +129,7 @@ UpdateVideoMixer( running_machine &machine )
 		mixer.rFadeColor  = nthbyte( state->m_gamma, 0x0011 )*256 + nthbyte( state->m_gamma, 0x0012 );
 		mixer.gFadeColor  = nthbyte( state->m_gamma, 0x0013 )*256 + nthbyte( state->m_gamma, 0x0014 );
 		mixer.bFadeColor  = nthbyte( state->m_gamma, 0x0015 )*256 + nthbyte( state->m_gamma, 0x0016 );
-
-		mixer.fadeFactor  = 0x100 - mixer.rFadeColor; // hack
-		mixer.rFadeColor  = 0;
-		mixer.gFadeColor  = 0;
-		mixer.bFadeColor  = 0;
+		mixer.fadeFactor  = (mixer.rFadeColor == 0x100 && mixer.gFadeColor == 0x100 && mixer.bFadeColor == 0x100) ? 0 : 1;
 
 		mixer.rFogColor   = nthbyte( state->m_gamma, 0x0100 );
 		mixer.rFogColor2  = nthbyte( state->m_gamma, 0x0101 );
@@ -324,13 +322,18 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 			rgbint rgb;
 
 			rgb_to_rgbint(&rgb, pens[(pen >> penshift) & penmask]);
-			rgbint_scale_and_clamp(&rgb, shade << 2);
+			rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
 
 			if( fogFactor != 0xff )
 				rgbint_blend(&rgb, &fogColor, fogFactor);
 
 			if( fadeFactor != 0xff )
-				rgbint_blend(&rgb, &fadeColor, fadeFactor);
+			{
+				if (state->m_mbSuperSystem22)
+					rgbint_blend(&rgb, &fadeColor, fadeFactor);
+				else
+					rgbint_scale_channel_and_clamp(&rgb, &fadeColor);
+			}
 
 			if( transFactor != 0xff )
 			{
@@ -359,13 +362,18 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 				rgbint rgb;
 
 				rgb_to_rgbint(&rgb, pens[(pen >> penshift) & penmask]);
-				rgbint_scale_and_clamp(&rgb, shade << 2);
+				rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
 
 				if( fogFactor != 0xff )
 					rgbint_blend(&rgb, &fogColor, fogFactor);
 
 				if( fadeFactor != 0xff )
-					rgbint_blend(&rgb, &fadeColor, fadeFactor);
+				{
+					if (state->m_mbSuperSystem22)
+						rgbint_blend(&rgb, &fadeColor, fadeFactor);
+					else
+						rgbint_scale_channel_and_clamp(&rgb, &fadeColor);
+				}
 
 				pDest[x] = rgbint_to_rgb(&rgb);
 			}
@@ -498,19 +506,9 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 	const UINT8 *pCharPri = BITMAP_ADDR8(extra->priority_bitmap, scanline, 0);
 	int x;
 
-	int bFogEnable = 0;
-	INT16 fogDelta = 0;
+	int bFogEnable = nthword(state->m_czattr,4)&0x4000; /* ? */
+	INT16 fogDelta = nthword(state->m_czattr, 0 );
 	int fadeEnable = (mixer.target&2) && mixer.fadeFactor;
-
-	if( state->m_mbSuperSystem22 )
-	{
-		fogDelta = nthword(state->m_czattr, 0 );
-		bFogEnable = nthword(state->m_czattr,4)&0x4000; /* ? */
-	}
-	else
-	{
-		bFogEnable = 0;
-	}
 
 	for( x=extent->startx; x<extent->stopx; x++ )
 	{
@@ -1447,29 +1445,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	}
 } /* DrawSprites */
 
-static void UpdatePaletteS(running_machine &machine) /* for Super System22 - apply gamma correction and preliminary fader support */
-{
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	int i;
-	for( i=0; i<NAMCOS22_PALETTE_SIZE/4; i++ )
-	{
-		if( state->m_dirtypal[i] )
-		{
-			int j;
-			for( j=0; j<4; j++ )
-			{
-				int which = i*4+j;
-				int r = nthbyte(machine.generic.paletteram.u32,which+0x00000);
-				int g = nthbyte(machine.generic.paletteram.u32,which+0x08000);
-				int b = nthbyte(machine.generic.paletteram.u32,which+0x10000);
-				palette_set_color( machine,which,MAKE_RGB(r,g,b) );
-			}
-			state->m_dirtypal[i] = 0;
-		}
-	}
-} /* UpdatePaletteS */
-
-static void UpdatePalette(running_machine &machine) /* for System22 - ignore gamma/fader effects for now */
+static void UpdatePalette(running_machine &machine)
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int i,j;
@@ -1625,7 +1601,6 @@ BlitQuadHelper(
 	float zmax = 0.0f;
 	Poly3dVertex v[4];
 	int i;
-	int bBackFace = 0;
 
 	for( i=0; i<4; i++ )
 	{
@@ -1636,7 +1611,9 @@ BlitQuadHelper(
 		TransformPoint( &pVerTex->x, &pVerTex->y, &pVerTex->z, m );
 	} /* for( i=0; i<4; i++ ) */
 
-	if( (v[2].x*((v[0].z*v[1].y)-(v[0].y*v[1].z)))+
+	/* backface cull one-sided polygons */
+	if( flags&0x0020 &&
+		(v[2].x*((v[0].z*v[1].y)-(v[0].y*v[1].z)))+
 		(v[2].y*((v[0].x*v[1].z)-(v[0].z*v[1].x)))+
 		(v[2].z*((v[0].y*v[1].x)-(v[0].x*v[1].y))) >= 0 &&
 
@@ -1644,12 +1621,8 @@ BlitQuadHelper(
 		(v[0].y*((v[2].x*v[3].z)-(v[2].z*v[3].x)))+
 		(v[0].z*((v[2].y*v[3].x)-(v[2].x*v[3].y))) >= 0 )
 	{
-		bBackFace = 1;
-	}
-
-	/* backface cull one-sided polygons */
-	if( bBackFace && (flags&0x0020) )
 		return;
+	}
 
 	for( i=0; i<4; i++ )
 	{
@@ -2267,7 +2240,7 @@ SCREEN_UPDATE( namcos22s )
 	UpdateVideoMixer(screen->machine());
 	bgColor = (mixer.rBackColor<<16)|(mixer.gBackColor<<8)|mixer.bBackColor;
 	bitmap_fill( bitmap, cliprect , bgColor);
-	UpdatePaletteS(screen->machine());
+	UpdatePalette(screen->machine());
 	DrawCharacterLayer(screen->machine(), bitmap, cliprect );
 	DrawPolygons( screen->machine(), bitmap );
 	DrawSprites( screen->machine(), bitmap, cliprect );

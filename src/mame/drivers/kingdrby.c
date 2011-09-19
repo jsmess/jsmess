@@ -71,6 +71,7 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "sound/okim6295.h"
 #include "sound/2203intf.h"
 #include "machine/nvram.h"
+#include "kingdrby.lh"
 
 
 class kingdrby_state : public driver_device
@@ -158,6 +159,12 @@ static VIDEO_START(kingdrby)
 	tilemap_set_transparent_pen(state->m_sc1_tilemap,0);
 }
 
+static const UINT8 hw_sprite[16] =
+{
+	0x34, 0x34, 0x34, 0x34, 0x34, 0x34, 0x34, 0x22,
+	0x22, 0x22, 0x22, 0x22, 0x22, 0x11, 0x22, 0x22
+};
+
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	kingdrby_state *state = machine.driver_data<kingdrby_state>();
@@ -167,26 +174,26 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	/*sprites not fully understood.*/
 	for(count=0;count<0x48;count+=4)
 	{
-		int x,y,spr_offs,colour,fx,dx,dy,h,w,mode;
+		int x,y,spr_offs,colour,fx,dx,dy,h,w;
 
 		spr_offs = (spriteram[count]);
 		spr_offs &=0x7f;
-		mode = spr_offs;
 		spr_offs*=4;
 		colour = (spriteram[count+3] & 0xf0)>>4;
 		fx = spriteram[count] & 0x80;
-		if(spriteram[count+1] == 0)
-			y = 0;
-		else
-			y = 0x100-spriteram[count+1];
+		y = (spriteram[count+1] == 0) ? 0 : 0x100-spriteram[count+1];
 		x = spriteram[count+2] - ((spriteram[count+3] & 1)<<8);
 
-		/*TODO: I really believe that this is actually driven by a prom.*/
-		if((mode >= 0x168/4) && (mode <= 0x17f/4))     { h = 1; w = 1; }
-		else if((mode >= 0x18c/4) && (mode <= 0x18f/4)) { h = 1; w = 1; }
-		else if((mode >= 0x19c/4) && (mode <= 0x19f/4)) { h = 1; w = 1; }
-		else if((mode & 3) == 3 || (mode) >= 0x13c/4)  { h = 2; w = 2; }
-		else                                           { h = 3; w = 4; }
+		/* TODO: hardcoded via a table, there must be some other way to do this */
+		h = (hw_sprite[colour] & 0xf0) >> 4;
+		w = (hw_sprite[colour] & 0x0f) >> 0;
+
+		if(h == 1 && w == 1)
+		{
+			spr_offs /= 4;
+			/* TODO: horse number signs */
+			spr_offs  = 0x16c + (((spr_offs & 8) << 2) ^ 0x20) + ((spr_offs & 4) << 2) + (spr_offs & 3);
+		}
 
 		if(fx)
 		{
@@ -354,6 +361,9 @@ static READ8_DEVICE_HANDLER( sound_cmd_r )
 	return state->m_sound_cmd;
 }
 
+static const UINT8 led_map[16] =
+	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
+
 static WRITE8_HANDLER( led_array_w )
 {
 	/*
@@ -363,6 +373,9 @@ static WRITE8_HANDLER( led_array_w )
     they goes from 0 to 5, to indicate the number.
     If one player bets something, the other led will toggle between p1 and p2 bets.
     */
+	output_set_digit_value(0xf + offset, led_map[(data & 0xf0) >> 4]);
+	output_set_digit_value(0x0 + offset, led_map[(data & 0x0f) >> 0]);
+
 }
 
 /*************************************
@@ -385,7 +398,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom tested for the post check
+	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom, tested for the post check
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram") //backup ram
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
 	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* I/O Ports */
@@ -1174,6 +1187,6 @@ ROM_START( cowrace )
 ROM_END
 
 
-GAME( 1981, kingdrby,  0,             kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby (1981)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS| GAME_IMPERFECT_SOUND )
-GAME( 1986, kingdrbb,  kingdrby,      kingdrbb,   kingdrbb,   0,       ROT0,   "bootleg (Casino Electronics)",  "King Derby (Taiwan bootleg)",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
+GAMEL( 1981, kingdrby,  0,             kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby (1981)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND, layout_kingdrby )
+GAME( 1986, kingdrbb,  kingdrby,      kingdrbb,   kingdrbb,   0,       ROT0,   "bootleg (Casino Electronics)",  "King Derby (Taiwan bootleg)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
 GAME( 2000, cowrace,   kingdrby,      cowrace,    kingdrbb,   0,       ROT0,   "bootleg",  "Cow Race (1986 King Derby hack)", GAME_NOT_WORKING | GAME_WRONG_COLORS )

@@ -230,11 +230,19 @@ INLINE void m37710i_set_flag_mx(m37710i_cpu_struct *cpustate, uint value)
 #if FLAG_SET_X
 	if(!(value & FLAGPOS_X))
 	{
+		REG_X |= REG_XH;
+		REG_XH = 0;
+		REG_Y |= REG_YH;
+		REG_YH = 0;
 		FLAG_X = XFLAG_CLEAR;
 	}
 #else
 	if(value & FLAGPOS_X)
 	{
+		REG_XH = REG_X & 0xff00;
+		REG_X = MAKE_UINT_8(REG_X);
+		REG_YH = REG_Y & 0xff00;
+		REG_Y = MAKE_UINT_8(REG_Y);
 		FLAG_X = XFLAG_SET;
 	}
 #endif
@@ -587,14 +595,13 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #endif	// FLAG_SET_M
 
 /* M37710  Pull all */
+/* Unusual behavior: bit 6 has no effect */
 #undef OP_PUL
 #define OP_PUL(MODE)	\
 	SRC	= OPER_8_##MODE(cpustate);	\
 	CLK(14); \
 	if (SRC&0x80)	\
 		{ m37710i_set_reg_p(cpustate, m37710i_pull_8(cpustate)); m37710i_set_reg_ipl(cpustate, m37710i_pull_8(cpustate)); CLK(3); } \
-	if (SRC&0x40)	\
-		{ REG_PB = m37710i_pull_8(cpustate) << 16; CLK(3); }   \
 	if (SRC&0x20)	\
 		{ REG_DB = m37710i_pull_8(cpustate) << 16; CLK(3); }   \
 	if (SRC&0x10)	\
@@ -633,12 +640,12 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #undef OP_MPY
 #if FLAG_SET_M
 #define OP_MPY(MODE)														\
-	CLK(CLK_OP + CLK_R8 + CLK_##MODE);	\
+	CLK(CLK_OP + CLK_R8 + CLK_##MODE + 14);	\
 	SRC = OPER_8_##MODE(cpustate);			\
 	{ UINT16 temp = SRC * (REG_A&0xff);  REG_A = temp & 0xff; REG_BA = (temp>>8)&0xff; FLAG_Z = temp; FLAG_N = (temp & 0x8000) ? 1 : 0; FLAG_C = 0; }
 #else
 #define OP_MPY(MODE)														\
-	CLK(CLK_OP + CLK_R16 + CLK_##MODE);	\
+	CLK(CLK_OP + CLK_R16 + CLK_##MODE + 14+8);	\
 	SRC = OPER_16_##MODE(cpustate);			\
 	{ UINT32 temp = SRC * REG_A;  REG_A = temp & 0xffff;  REG_BA = (temp>>16)&0xffff; FLAG_Z = temp; FLAG_N = (temp & 0x80000000) ? 1 : 0; FLAG_C = 0; }
 #endif
@@ -2030,18 +2037,11 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			FLAG_Z = REG_A = MAKE_UINT_8(REG);								\
 			FLAG_N = NFLAG_8(FLAG_Z)
 #else
-#if FLAG_SET_X
-#define OP_TXA(REG)															\
-			CLK(CLK_OP + CLK_IMPLIED);										\
-			FLAG_Z = REG_A = MAKE_UINT_8(REG);								\
-			FLAG_N = NFLAG_16(FLAG_Z)
-#else
 #define OP_TXA(REG)															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_A = REG;											\
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
-#endif /* FLAG_SET_M */
 
 /* M37710   Transfer index to accumulator B */
 #undef OP_TXB
@@ -2051,18 +2051,11 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			FLAG_Z = REG_BA = MAKE_UINT_8(REG);								\
 			FLAG_N = NFLAG_8(FLAG_Z)
 #else
-#if FLAG_SET_X
-#define OP_TXB(REG)															\
-			CLK(CLK_OP + CLK_IMPLIED);										\
-			FLAG_Z = REG_BA = MAKE_UINT_8(REG);								\
-			FLAG_N = NFLAG_16(FLAG_Z)
-#else
 #define OP_TXB(REG)															\
 			CLK(CLK_OP + CLK_IMPLIED);										\
 			FLAG_Z = REG_BA = REG;											\
 			FLAG_N = NFLAG_16(FLAG_Z)
 #endif
-#endif /* FLAG_SET_M */
 
 /* M37710  Transfer accumulator to direct register */
 #undef OP_TAD
@@ -2276,6 +2269,13 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 			USE_ALL_CLKS();													\
 			CPU_STOPPED |= STOP_LEVEL_WAI
 
+/* M37710 load data bank register */
+#undef OP_LDT
+#define OP_LDT(MODE)	\
+	CLK(CLK_OP + CLK_R8 + CLK_##MODE);	\
+	REG_DB = OPER_8_##MODE(cpustate)<<16;
+
+
 /* M37710  prefix for B accumulator (0x42) */
 /* There is a 2 cycle penalty for all instructions using this prefix */
 #undef OP_PFB
@@ -2298,12 +2298,6 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 #undef OP_UNIMP
 #define OP_UNIMP()															\
 	logerror("error M37710: UNIMPLEMENTED OPCODE!  K=%x PC=%x\n", REG_PB, REG_PPC);
-
-/* M37710 load data bank register */
-#undef OP_LDTAAA
-#define OP_LDT(MODE)	\
-	CLK(CLK_OP + CLK_R8 + CLK_##MODE);	\
-	REG_DB = OPER_8_##MODE(cpustate)<<16;
 
 /* ======================================================================== */
 /* ======================== OPCODE & FUNCTION TABLES ====================== */
@@ -2792,35 +2786,35 @@ TABLE_OPCODES =
 //    08     09     0a     0b     0c     0d     0e     0f
 {
 	O(00), O(01), O(02), O(03), O(04), O(05), O(06), O(07), 	// 00
-	O(08), O(09), O(0a), O(0b), O(0c), O(0d), O(0e), O(0f),
+	O(08), O(09), O(0a), O(0b), O(0c), O(0d), O(0e), O(0f), 
 	O(10), O(11), O(12), O(13), O(14), O(15), O(16), O(17), 	// 10
-	O(18), O(19), O(1a), O(1b), O(1c), O(1d), O(1e), O(1f),
+	O(18), O(19), O(1a), O(1b), O(1c), O(1d), O(1e), O(1f), 
 	O(20), O(21), O(22), O(23), O(24), O(25), O(26), O(27), 	// 20
-	O(28), O(29), O(2a), O(2b), O(2c), O(2d), O(2e), O(2f),
+	O(28), O(29), O(2a), O(2b), O(2c), O(2d), O(2e), O(2f), 
 	O(30), O(31), O(32), O(33), O(34), O(35), O(36), O(37), 	// 30
-	O(38), O(39), O(3a), O(3b), O(3c), O(3d), O(3e), O(3f),
+	O(38), O(39), O(3a), O(3b), O(3c), O(3d), O(3e), O(3f), 
 	O(40), O(41), O(42), O(43), O(44), O(45), O(46), O(47), 	// 40
-	O(48), O(49), O(4a), O(4b), O(4c), O(4d), O(4e), O(4f),
+	O(48), O(49), O(4a), O(4b), O(4c), O(4d), O(4e), O(4f), 
 	O(50), O(51), O(52), O(53), O(54), O(55), O(56), O(57), 	// 50
-	O(58), O(59), O(5a), O(5b), O(5c), O(5d), O(5e), O(5f),
+	O(58), O(59), O(5a), O(5b), O(5c), O(5d), O(5e), O(5f), 
 	O(60), O(61), O(62), O(63), O(64), O(65), O(66), O(67), 	// 60
-	O(68), O(69), O(6a), O(6b), O(6c), O(6d), O(6e), O(6f),
+	O(68), O(69), O(6a), O(6b), O(6c), O(6d), O(6e), O(6f), 
 	O(70), O(71), O(72), O(73), O(74), O(75), O(76), O(77), 	// 70
-	O(78), O(79), O(7a), O(7b), O(7c), O(7d), O(7e), O(7f),
+	O(78), O(79), O(7a), O(7b), O(7c), O(7d), O(7e), O(7f), 
 	O(80), O(81), O(82), O(83), O(84), O(85), O(86), O(87), 	// 80
-	O(88), O(89), O(8a), O(8b), O(8c), O(8d), O(8e), O(8f),
+	O(88), O(89), O(8a), O(8b), O(8c), O(8d), O(8e), O(8f), 
 	O(90), O(91), O(92), O(93), O(94), O(95), O(96), O(97), 	// 90
-	O(98), O(99), O(9a), O(9b), O(9c), O(9d), O(9e), O(9f),
+	O(98), O(99), O(9a), O(9b), O(9c), O(9d), O(9e), O(9f), 
 	O(a0), O(a1), O(a2), O(a3), O(a4), O(a5), O(a6), O(a7), 	// a0
-	O(a8), O(a9), O(aa), O(ab), O(ac), O(ad), O(ae), O(af),
+	O(a8), O(a9), O(aa), O(ab), O(ac), O(ad), O(ae), O(af), 
 	O(b0), O(b1), O(b2), O(b3), O(b4), O(b5), O(b6), O(b7), 	// b0
-	O(b8), O(b9), O(ba), O(bb), O(bc), O(bd), O(be), O(bf),
+	O(b8), O(b9), O(ba), O(bb), O(bc), O(bd), O(be), O(bf), 
 	O(c0), O(c1), O(c2), O(c3), O(c4), O(c5), O(c6), O(c7), 	// c0
-	O(c8), O(c9), O(ca), O(cb), O(cc), O(cd), O(ce), O(cf),
+	O(c8), O(c9), O(ca), O(cb), O(cc), O(cd), O(ce), O(cf), 
 	O(d0), O(d1), O(d2), O(d3), O(d4), O(d5), O(d6), O(d7), 	// d0
-	O(d8), O(d9), O(da), O(db), O(dc), O(dd), O(de), O(df),
+	O(d8), O(d9), O(da), O(db), O(dc), O(dd), O(de), O(df), 
 	O(e0), O(e1), O(e2), O(e3), O(e4), O(e5), O(e6), O(e7), 	// e0
-	O(e8), O(e9), O(ea), O(eb), O(ec), O(ed), O(ee), O(ef),
+	O(e8), O(e9), O(ea), O(eb), O(ec), O(ed), O(ee), O(ef), 
 	O(f0), O(f1), O(f2), O(f3), O(f4), O(f5), O(f6), O(f7), 	// f0
 	O(f8), O(f9), O(fa), O(fb), O(fc), O(fd), O(fe), O(ff)
 };
