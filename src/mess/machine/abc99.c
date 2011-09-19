@@ -536,7 +536,11 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 	  m_so(1),
 	  m_so_z2(1),
 	  m_so_z5(1),
-	  m_keydown(0)
+	  m_keydown(0),
+	  m_t1_z2(0),
+	  m_t1_z5(0),
+	  m_led_en(0),
+	  m_reset(0)
 {
 }
 

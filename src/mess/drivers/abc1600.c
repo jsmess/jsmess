@@ -18,13 +18,6 @@
     - short/long reset (RSTBUT)
     - SCC interrupt
     - CIO (interrupt controller)
-	
-		Task 15 BOOTE 1 MAGIC 1
-		Task 0 Segment 0 : 10
-		Z8536 '15b' Unimplemented write 20 to register 8
-		Task 0 BOOTE 1 MAGIC 1
-		Reset caused by the watchdog!!!
-		
         - RTC
         - NVRAM
     - hard disk (Xebec S1410)
@@ -58,20 +51,9 @@
 #define A1_A2		((A1 << 1) | A2)
 #define A2_A1		((offset >> 1) & 0x03)
 
-#define CURRENT_TASK \
-	(m_ifc2 ? 0 : ((m_task ^ 0x0f) & 0x0f))
-
-#define SEGMENT_ADDRESS(_segment) \
-	((CURRENT_TASK << 5) | _segment)
-
-#define SEGMENT_DATA(_segment) \
-	m_segment_ram[SEGMENT_ADDRESS(_segment)]
-
-#define PAGE_ADDRESS(_segment, _page) \
-	((SEGMENT_DATA(_segment) << 4) | _page)
-
-#define PAGE_DATA(_segment, _page) \
-	m_page_ram[PAGE_ADDRESS(_segment, _page)]
+#define FC0			BIT(fc, 0)
+#define FC1			BIT(fc, 1)
+#define FC2			BIT(fc, 2)
 
 #define PAGE_WP		BIT(page_data, 14)
 #define PAGE_NONX	BIT(page_data, 15)
@@ -397,23 +379,87 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 
 
 //-------------------------------------------------
+//  get_current_task -
+//-------------------------------------------------
+
+int abc1600_state::get_current_task(offs_t offset)
+{
+	int force_task0 = !(m_ifc2 | A19);
+	int t0 = !(BIT(m_task, 0) | force_task0);
+	int t1 = !(BIT(m_task, 1) | force_task0);
+	int t2 = !(BIT(m_task, 2) | force_task0);
+	int t3 = !(BIT(m_task, 3) | force_task0);
+	
+	return (t3 << 3) | (t2 << 2) | (t1 << 1) | t0;
+}
+
+
+//-------------------------------------------------
+//  get_segment_address -
+//-------------------------------------------------
+
+offs_t abc1600_state::get_segment_address(offs_t offset)
+{
+	int sega19 = !(!(A8 | m_ifc2) | !A19);
+	int task = get_current_task(offset);
+	
+	return (task << 5) | (sega19 << 4) | ((offset >> 15) & 0x0f);
+}
+
+
+//-------------------------------------------------
+//  get_page_address -
+//-------------------------------------------------
+
+offs_t abc1600_state::get_page_address(offs_t offset, UINT8 segd)
+{
+	return ((segd & 0x3f) << 4) | ((offset >> 11) & 0x0f);
+}
+
+
+//-------------------------------------------------
+//  translate_address -
+//-------------------------------------------------
+
+offs_t abc1600_state::translate_address(offs_t offset, int *nonx, int *wp)
+{
+	if (offset == 0x4730)
+	{
+		logerror("virtuality %06x\n", 0);
+	}
+
+	// segment
+	offs_t sega = get_segment_address(offset);
+	UINT8 segd = m_segment_ram[sega];
+	
+	// page
+	offs_t pga = get_page_address(offset, segd);
+	UINT16 page_data = m_page_ram[pga];
+	
+	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
+	
+	if (PAGE_NONX)
+	{
+		logerror("Bus error %06x : %06x\n", offset, virtual_offset);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	}
+
+	*nonx = PAGE_NONX;
+	*wp = PAGE_WP;
+
+	return virtual_offset;
+}
+
+
+//-------------------------------------------------
 //  read_user_memory -
 //-------------------------------------------------
 
 UINT8 abc1600_state::read_user_memory(offs_t offset)
 {
-	int segment = (offset >> 15) & 0x1f;
-	int page = (offset >> 11) & 0x0f;
-	UINT16 page_data = PAGE_DATA(segment, page);
-
-	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
-
-	if (PAGE_NONX)
-	{
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	}
-
+	int nonx = 0, wp = 0;
+	offs_t virtual_offset = translate_address(offset, &nonx, &wp);
 	UINT8 data = 0;
 
 	if (virtual_offset < 0x1fe000)
@@ -435,20 +481,10 @@ UINT8 abc1600_state::read_user_memory(offs_t offset)
 
 void abc1600_state::write_user_memory(offs_t offset, UINT8 data)
 {
-	int segment = (offset >> 15) & 0x1f;
-	int page = (offset >> 11) & 0x0f;
-	UINT16 page_data = PAGE_DATA(segment, page);
+	int nonx = 0, wp = 0;
+	offs_t virtual_offset = translate_address(offset, &nonx, &wp);
 
-	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
-
-	if (!PAGE_WP) return;
-
-	if (PAGE_NONX)
-	{
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		return;
-	}
+	if (nonx || !wp) return;
 
 	if (virtual_offset < 0x1fe000)
 	{
@@ -472,16 +508,7 @@ UINT8 abc1600_state::read_supervisor_memory(offs_t offset)
 
 	if (!A19)
 	{
-		if (!BOOTE && !A18 && !A17)
-		{
-			// _BOOTCE
-			UINT8 *rom = machine().region(MC68008P8_TAG)->base();
-			data = rom[offset & 0x3fff];
-		}
-		else
-		{
-			data = read_user_memory(offset);
-		}
+		data = read_user_memory(offset);
 	}
 	else
 	{
@@ -540,22 +567,41 @@ void abc1600_state::write_supervisor_memory(offs_t offset, UINT8 data)
 
 
 //-------------------------------------------------
+//  get_fc -
+//-------------------------------------------------
+
+int abc1600_state::get_fc()
+{
+	UINT16 fc = m68k_get_fc(m_maincpu);
+
+	m_ifc2 = !(!(MAGIC | FC0) | FC2);
+
+	return fc;
+}
+
+
+//-------------------------------------------------
 //  mac_r -
 //-------------------------------------------------
 
 READ8_MEMBER( abc1600_state::mac_r )
 {
-	UINT16 fc = m68k_get_fc(m_maincpu);
+	int fc = get_fc();
+
 	UINT8 data = 0;
 
-	if (fc == M68K_FC_SUPERVISOR_DATA || fc == M68K_FC_SUPERVISOR_PROGRAM)
+	if (!BOOTE && !A19 && !A18 && !A17)
 	{
-		m_ifc2 = 0 ^ MAGIC;
+		// _BOOTCE
+		UINT8 *rom = machine().region(MC68008P8_TAG)->base();
+		data = rom[offset & 0x3fff];
+	}
+	else if (!m_ifc2 && !FC1)
+	{
 		data = read_supervisor_memory(offset);
 	}
 	else
 	{
-		m_ifc2 = 1 ^ MAGIC;
 		data = read_user_memory(offset);
 	}
 
@@ -569,16 +615,14 @@ READ8_MEMBER( abc1600_state::mac_r )
 
 WRITE8_MEMBER( abc1600_state::mac_w )
 {
-	UINT16 fc = m68k_get_fc(m_maincpu);
+	int fc = get_fc();
 
-	if (fc == M68K_FC_SUPERVISOR_DATA || fc == M68K_FC_SUPERVISOR_PROGRAM)
+	if (!m_ifc2 && !FC1)
 	{
-		m_ifc2 = 0 ^ MAGIC;
 		write_supervisor_memory(offset, data);
 	}
 	else
 	{
-		m_ifc2 = 1 ^ MAGIC;
 		write_user_memory(offset, data);
 	}
 }
@@ -639,7 +683,7 @@ WRITE8_MEMBER( abc1600_state::task_w )
 
 	m_task = data ^ 0xff;
 
-	if (LOG) logerror("Task %u BOOTE %u MAGIC %u\n", (m_task ^ 0x0f) & 0x0f, BOOTE, MAGIC);
+	if (LOG) logerror("%s: %06x Task %u BOOTE %u MAGIC %u\n", machine().describe_context(), offset, get_current_task(offset), BOOTE, MAGIC);
 }
 
 
@@ -664,10 +708,10 @@ READ8_MEMBER( abc1600_state::segment_r )
 
     */
 
-	int segment = (A8 << 4) | ((offset >> 15) & 0x0f);
-	UINT8 data = SEGMENT_DATA(segment);
+	offs_t sega = get_segment_address(offset);
+	UINT8 segd = m_segment_ram[sega];
 
-	return (READ_MAGIC << 7) | (data & 0x7f);
+	return (READ_MAGIC << 7) | (segd & 0x7f);
 }
 
 
@@ -692,10 +736,11 @@ WRITE8_MEMBER( abc1600_state::segment_w )
 
     */
 
-	int segment = (A8 << 4) | ((offset >> 15) & 0x0f);
-	SEGMENT_DATA(segment) = data & 0x7f;
+	offs_t sega = get_segment_address(offset);
 
-	if (LOG) logerror("Task %u Segment %u : %02x\n", CURRENT_TASK, segment, data);
+	m_segment_ram[sega] = data & 0x7f;
+
+	if (LOG) logerror("%s: %06x Task %u Segment %03x : %02x\n", machine().describe_context(), offset, get_current_task(offset), sega, data);
 }
 
 
@@ -729,9 +774,13 @@ READ8_MEMBER( abc1600_state::page_r )
 
     */
 
-	int segment = (A8 << 4) | ((offset >> 15) & 0x0f);
-	int page = (offset >> 11) & 0x0f;
-	UINT16 data = PAGE_DATA(segment, page);
+	// segment
+	offs_t sega = get_segment_address(offset);
+	UINT8 segd = m_segment_ram[sega];
+	
+	// page
+	offs_t pga = get_page_address(offset, segd);
+	UINT16 data = m_page_ram[pga];
 
 	return A0 ? (data & 0xff) : (data >> 8);
 }
@@ -767,19 +816,23 @@ WRITE8_MEMBER( abc1600_state::page_w )
 
     */
 
-	int segment = (A8 << 4) | ((offset >> 15) & 0x0f);
-	int page = (offset >> 11) & 0x0f;
+	// segment
+	offs_t sega = get_segment_address(offset);
+	UINT8 segd = m_segment_ram[sega];
+	
+	// page
+	offs_t pga = get_page_address(offset, segd);
 
 	if (A0)
 	{
-		PAGE_DATA(segment, page) = (PAGE_DATA(segment, page) & 0xff00) | data;
+		m_page_ram[pga] = (m_page_ram[pga] & 0xff00) | data;
 	}
 	else
 	{
-		PAGE_DATA(segment, page) = (data << 8) | (PAGE_DATA(segment, page) & 0xff);
+		m_page_ram[pga] = (data << 8) | (m_page_ram[pga] & 0xff);
 	}
 
-	if (LOG) logerror("Task %u Segment %u Page %u : %04x\n", CURRENT_TASK, segment, page, PAGE_DATA(segment, page));
+	if (LOG) logerror("%s: %06x Task %u Segment %03x Page %03x : %02x -> %04x\n", machine().describe_context(), offset, get_current_task(offset), sega, pga, data, m_page_ram[pga]);
 }
 
 
@@ -849,8 +902,6 @@ inline offs_t abc1600_state::get_dma_address(int index, UINT16 offset)
 
 	m_cause = (dmamap & 0x1f) << 3;
 
-	logerror("virtual addr %06x\n", ((dmamap & 0x1f) << 16) | offset);
-	
 	return ((dmamap & 0x1f) << 16) | offset;
 }
 
