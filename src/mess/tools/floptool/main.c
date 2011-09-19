@@ -206,13 +206,12 @@ static int convert(int argc, char *argv[])
 
 int CLIB_DECL main(int argc, char *argv[])
 {
+	init_formats();
 
 	if (argc == 1) {
 		display_full_usage();
 		return 0;
 	}
-
-	init_formats();
 
 	if (!core_stricmp("identify", argv[1]))
 		return identify(argc, argv);
