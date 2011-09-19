@@ -12,21 +12,7 @@ todo for apf m1000:
   (backgammon relies on exact video timing)
  support special cartridges (basic, space destroyer)
 
- ******************************************************************************/
-#include "emu.h"
-#include "cpu/m6800/m6800.h"
-#include "video/m6847.h"
 
-#include "machine/6821pia.h"
-#include "machine/wd17xx.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
-#include "imagedev/cassette.h"
-#include "imagedev/cartslot.h"
-#include "formats/apf_apt.h"
-#include "sound/speaker.h"
-
- /*
 0000- 2000-2003 PIA of M1000. is itself repeated until 3fff.
 She controls " keypads ", the way of video and the loudspeaker. Putting to 0 one of the 4 least
 significant bits of 2002, the corresponding line of keys is ***reflxed mng in 2000 (32 keys altogether).
@@ -43,47 +29,120 @@ additional (8 Kb) E000-FFFF ROM of M1000 (to see 4000-47FF) The interruption act
 the vertical synchronism of the video. routine that it executes is in the ROM of M1000
 and puts the video in way text during a short interval, so that the first line is seen of
 text screen in the superior part of the graphical screen.
-*/
 
-/* 6600, 6500-6503 wd179x disc controller? 6400, 6401 */
+
+6600, 6500-6503 wd179x disc controller? 6400, 6401
+
+Status 19-09-2011
+=================
+- apfimag
+-- Loads tapes but then the machine freezes
+-- Appears to be no error checking; some tapes load as garbage
+-- With wave-sound, the cassette sound is completely overdriven with lots of noise before the tape starts.
+   The problem is not evident when the wav is played with media player.
+
+
+- apfm1000
+-- About half of the carts have severe video problems.
+-- Of the remainder, some freeze at start
+
+******************************************************************************************************************/
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/m6800/m6800.h"
+#include "video/m6847.h"
+#include "sound/speaker.h"
+#include "sound/wave.h"
+#include "machine/6821pia.h"
+#include "machine/wd17xx.h"
+#include "imagedev/flopdrv.h"
+#include "formats/basicdsk.h"
+#include "imagedev/cassette.h"
+#include "imagedev/cartslot.h"
+#include "formats/apf_apt.h"
+
+
 class apf_state : public driver_device
 {
 public:
 	apf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_crtc(*this, "mc6847"),
+	m_speaker(*this, SPEAKER_TAG),
+	m_pia0(*this, "pia_0"),
+	m_pia1(*this, "pia_1"),
+	m_cass(*this, CASSETTE_TAG),
+	m_fdc(*this, "wd179x")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_crtc;
+	required_device<device_t> m_speaker;
+	required_device<device_t> m_pia0;
+	optional_device<device_t> m_pia1;
+	optional_device<cassette_image_device> m_cass;
+	optional_device<device_t> m_fdc;
+	DECLARE_READ8_MEMBER(apf_mc6847_videoram_r);
+	DECLARE_WRITE_LINE_MEMBER(apf_mc6847_fs_w);
+	DECLARE_READ8_MEMBER(apf_m1000_pia_in_a_func);
+	DECLARE_READ8_MEMBER(apf_m1000_pia_in_b_func);
+	DECLARE_READ8_MEMBER(apf_m1000_pia_in_ca1_func);
+	DECLARE_READ8_MEMBER(apf_m1000_pia_in_cb1_func);
+	DECLARE_READ8_MEMBER(apf_m1000_pia_in_ca2_func);
+	DECLARE_READ8_MEMBER(apf_m1000_pia_in_cb2_func);
+	DECLARE_WRITE8_MEMBER(apf_m1000_pia_out_a_func);
+	DECLARE_WRITE8_MEMBER(apf_m1000_pia_out_b_func);
+	DECLARE_WRITE_LINE_MEMBER(apf_m1000_pia_out_ca2_func);
+	DECLARE_WRITE8_MEMBER(apf_m1000_pia_out_cb2_func);
+	DECLARE_WRITE_LINE_MEMBER(apf_m1000_irq_a_func);
+	DECLARE_WRITE_LINE_MEMBER(apf_m1000_irq_b_func);
+	DECLARE_READ8_MEMBER(apf_imagination_pia_in_a_func);
+	DECLARE_READ8_MEMBER(apf_imagination_pia_in_b_func);
+	DECLARE_READ8_MEMBER(apf_imagination_pia_in_ca1_func);
+	DECLARE_READ8_MEMBER(apf_imagination_pia_in_cb1_func);
+	DECLARE_READ8_MEMBER(apf_imagination_pia_in_ca2_func);
+	DECLARE_READ8_MEMBER(apf_imagination_pia_in_cb2_func);
+	DECLARE_WRITE8_MEMBER(apf_imagination_pia_out_a_func);
+	DECLARE_WRITE8_MEMBER(apf_imagination_pia_out_b_func);
+	DECLARE_WRITE8_MEMBER(apf_imagination_pia_out_ca2_func);
+	DECLARE_WRITE8_MEMBER(apf_imagination_pia_out_cb2_func);
+	DECLARE_WRITE_LINE_MEMBER(apf_imagination_irq_a_func);
+	DECLARE_WRITE_LINE_MEMBER(apf_imagination_irq_b_func);
+	DECLARE_WRITE8_MEMBER(apf_dischw_w);
+	DECLARE_READ8_MEMBER(serial_r);
+	DECLARE_WRITE8_MEMBER(serial_w);
+	DECLARE_WRITE8_MEMBER(apf_wd179x_command_w);
+	DECLARE_WRITE8_MEMBER(apf_wd179x_track_w);
+	DECLARE_WRITE8_MEMBER(apf_wd179x_sector_w);
+	DECLARE_WRITE8_MEMBER(apf_wd179x_data_w);
+	DECLARE_READ8_MEMBER(apf_wd179x_status_r);
+	DECLARE_READ8_MEMBER(apf_wd179x_track_r);
+	DECLARE_READ8_MEMBER(apf_wd179x_sector_r);
+	DECLARE_READ8_MEMBER(apf_wd179x_data_r);
 	unsigned char m_keyboard_data;
 	unsigned char m_pad_data;
 	UINT8 m_mc6847_css;
-	UINT8 *m_videoram;
-
-	unsigned char m_apf_ints;
-
+	UINT8 *m_p_videoram;
+	UINT8 m_apf_ints;
+	void apf_update_ints(UINT8 intnum);
 };
 
-static void apf_update_ints(running_machine &machine);
 
 
-static READ8_DEVICE_HANDLER( apf_mc6847_videoram_r )
+READ8_MEMBER( apf_state::apf_mc6847_videoram_r )
 {
-	apf_state *state = device->machine().driver_data<apf_state>();
-	mc6847_css_w(device, state->m_mc6847_css && BIT(state->m_videoram[offset + 0x200], 6));
-	mc6847_inv_w(device, BIT(state->m_videoram[offset + 0x200], 6));
-	mc6847_as_w(device, BIT(state->m_videoram[offset + 0x200], 7));
+	mc6847_css_w(m_crtc, m_mc6847_css && BIT(m_p_videoram[offset + 0x200], 6));
+	mc6847_inv_w(m_crtc, BIT(m_p_videoram[offset + 0x200], 6));
+	mc6847_as_w(m_crtc, BIT(m_p_videoram[offset + 0x200], 7));
 
-	return state->m_videoram[offset + 0x200];
+	return m_p_videoram[offset + 0x200];
 }
 
-static WRITE_LINE_DEVICE_HANDLER( apf_mc6847_fs_w )
+WRITE_LINE_MEMBER( apf_state::apf_mc6847_fs_w )
 {
-	apf_state *state_ = device->machine().driver_data<apf_state>();
-
-	if (state)
-		state_->m_apf_ints |= 0x10;
-	else
-		state_->m_apf_ints &= ~0x10;
-
-	apf_update_ints(device->machine());
+	apf_update_ints(0x10);
 }
 
 static SCREEN_UPDATE( apf )
@@ -92,79 +151,72 @@ static SCREEN_UPDATE( apf )
 	return mc6847_update(mc6847, bitmap, cliprect);
 }
 
-static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_a_func)
+READ8_MEMBER( apf_state::apf_m1000_pia_in_a_func)
 {
-	apf_state *state = device->machine().driver_data<apf_state>();
 	UINT8 data=~0;
 
-	if (!(state->m_pad_data & 0x08))
-		data &= input_port_read(device->machine(), "joy3");
-	if (!(state->m_pad_data & 0x04))
-		data &= input_port_read(device->machine(), "joy2");
-	if (!(state->m_pad_data & 0x02))
-		data &= input_port_read(device->machine(), "joy1");
-	if (!(state->m_pad_data & 0x01))
-		data &= input_port_read(device->machine(), "joy0");
+	if (!BIT(m_pad_data, 3))
+		data &= input_port_read(machine(), "joy3");
+	if (!BIT(m_pad_data, 2))
+		data &= input_port_read(machine(), "joy2");
+	if (!BIT(m_pad_data, 1))
+		data &= input_port_read(machine(), "joy1");
+	if (!BIT(m_pad_data, 0))
+		data &= input_port_read(machine(), "joy0");
 
 	return data;
 }
 
-static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_b_func)
+READ8_MEMBER( apf_state::apf_m1000_pia_in_b_func)
 {
-	return 0x0ff;
+	return 0xff;
 }
 
-static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_ca1_func)
-{
-	return 0;
-}
-
-static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_cb1_func)
-{
-	return 0x00;
-}
-
-static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_ca2_func)
+READ8_MEMBER( apf_state::apf_m1000_pia_in_ca1_func)
 {
 	return 0;
 }
 
-static  READ8_DEVICE_HANDLER(apf_m1000_pia_in_cb2_func)
+READ8_MEMBER( apf_state::apf_m1000_pia_in_cb1_func)
 {
-	return 0x00;
+	return 0;
+}
+
+READ8_MEMBER( apf_state::apf_m1000_pia_in_ca2_func)
+{
+	return 0;
+}
+
+READ8_MEMBER( apf_state::apf_m1000_pia_in_cb2_func)
+{
+	return 0;
 }
 
 
-static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_a_func)
+WRITE8_MEMBER( apf_state::apf_m1000_pia_out_a_func)
 {
 }
 
 //static unsigned char previous_mode;
 
-static WRITE8_DEVICE_HANDLER( apf_m1000_pia_out_b_func )
+WRITE8_MEMBER( apf_state::apf_m1000_pia_out_b_func )
 {
-	apf_state *state = device->machine().driver_data<apf_state>();
-	device_t *mc6847 = device->machine().device("mc6847");
-
 	/* bit 7..4 video control -- TODO: bit 5 and 4? */
-	mc6847_ag_w(mc6847, BIT(data, 7));
-	mc6847_gm0_w(mc6847, BIT(data, 6));
+	mc6847_ag_w(m_crtc, BIT(data, 7));
+	mc6847_gm0_w(m_crtc, BIT(data, 6));
 
 	/* bit 3..0 keypad line select */
-	state->m_pad_data = data;
+	m_pad_data = data;
 }
 
-static WRITE_LINE_DEVICE_HANDLER(apf_m1000_pia_out_ca2_func)
+WRITE_LINE_MEMBER( apf_state::apf_m1000_pia_out_ca2_func)
 {
-	apf_state *state_ = device->machine().driver_data<apf_state>();
-
-	state_->m_mc6847_css = state;
+	m_mc6847_css = state;
 }
 
-static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_cb2_func)
+WRITE8_MEMBER( apf_state::apf_m1000_pia_out_cb2_func)
 {
-	device_t *speaker = device->machine().device(SPEAKER_TAG);
-	speaker_level_w(speaker, data);
+	speaker_level_w(m_speaker, data);
 }
 
 /* use bit 0 to identify state of irq from pia 0 */
@@ -173,114 +225,88 @@ static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_cb2_func)
 /* use bit 3 to identify state of irq from pia 1 */
 /* use bit 4 to identify state of irq from video */
 
-static void apf_update_ints(running_machine &machine)
+void apf_state::apf_update_ints(UINT8 intnum)
 {
-	apf_state *state = machine.driver_data<apf_state>();
-
-	cputag_set_input_line(machine, "maincpu", 0, state->m_apf_ints ? HOLD_LINE : CLEAR_LINE);
-}
-
-static WRITE_LINE_DEVICE_HANDLER( apf_m1000_irq_a_func )
-{
-	apf_state *state_ = device->machine().driver_data<apf_state>();
-
-	if (state)
-	{
-		state_->m_apf_ints |= 1;
-	}
+	if (intnum)
+		m_apf_ints |= intnum;
 	else
-	{
-		state_->m_apf_ints &= ~1;
-	}
+		m_apf_ints &= ~intnum;
 
-	apf_update_ints(device->machine());
+	cputag_set_input_line(machine(), "maincpu", 0, m_apf_ints ? HOLD_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( apf_state::apf_m1000_irq_a_func )
+{
+	apf_update_ints(0x01);
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( apf_m1000_irq_b_func )
+WRITE_LINE_MEMBER( apf_state::apf_m1000_irq_b_func )
 {
-	apf_state *state_ = device->machine().driver_data<apf_state>();
-
 	//logerror("pia 0 irq b %d\n",state);
 
-	if (state)
-	{
-		state_->m_apf_ints |= 2;
-	}
-	else
-	{
-		state_->m_apf_ints &= ~2;
-	}
-
-	apf_update_ints(device->machine());
-
+	apf_update_ints(0x02);
 }
 
 static const pia6821_interface apf_m1000_pia_interface=
 {
-	DEVCB_HANDLER(apf_m1000_pia_in_a_func),
-	DEVCB_HANDLER(apf_m1000_pia_in_b_func),
-	DEVCB_HANDLER(apf_m1000_pia_in_ca1_func),
-	DEVCB_HANDLER(apf_m1000_pia_in_cb1_func),
-	DEVCB_HANDLER(apf_m1000_pia_in_ca2_func),
-	DEVCB_HANDLER(apf_m1000_pia_in_cb2_func),
-	DEVCB_HANDLER(apf_m1000_pia_out_a_func),
-	DEVCB_HANDLER(apf_m1000_pia_out_b_func),
-	DEVCB_LINE(apf_m1000_pia_out_ca2_func),
-	DEVCB_HANDLER(apf_m1000_pia_out_cb2_func),
-	DEVCB_LINE(apf_m1000_irq_a_func),
-	DEVCB_LINE(apf_m1000_irq_b_func)
+	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_in_a_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_in_b_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_in_ca1_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_in_cb1_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_in_ca2_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_in_cb2_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_out_a_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_out_b_func),
+	DEVCB_DRIVER_LINE_MEMBER(apf_state, apf_m1000_pia_out_ca2_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_out_cb2_func),
+	DEVCB_DRIVER_LINE_MEMBER(apf_state, apf_m1000_irq_a_func),
+	DEVCB_DRIVER_LINE_MEMBER(apf_state, apf_m1000_irq_b_func)
 };
 
 
-static  READ8_DEVICE_HANDLER(apf_imagination_pia_in_a_func)
+READ8_MEMBER( apf_state::apf_imagination_pia_in_a_func)
 {
-	apf_state *state = device->machine().driver_data<apf_state>();
-
-	return state->m_keyboard_data;
+	return m_keyboard_data;
 }
 
-static READ8_DEVICE_HANDLER(apf_imagination_pia_in_b_func)
+READ8_MEMBER( apf_state::apf_imagination_pia_in_b_func)
 {
-	unsigned char data;
+	UINT8 data = 0;
 
-	data = 0x000;
-
-	if (device->machine().device<cassette_image_device>(CASSETTE_TAG)->input() > 0.0038)
+	if (m_cass->input() > 0.0038)
 		data =(1<<7);
 
 	return data;
 }
 
-static  READ8_DEVICE_HANDLER(apf_imagination_pia_in_ca1_func)
+READ8_MEMBER( apf_state::apf_imagination_pia_in_ca1_func)
 {
-	return 0x00;
+	return 0;
 }
 
-static  READ8_DEVICE_HANDLER(apf_imagination_pia_in_cb1_func)
+READ8_MEMBER( apf_state::apf_imagination_pia_in_cb1_func)
 {
-	return 0x00;
+	return 0;
 }
 
-static  READ8_DEVICE_HANDLER(apf_imagination_pia_in_ca2_func)
+READ8_MEMBER( apf_state::apf_imagination_pia_in_ca2_func)
 {
-	return 0x00;
+	return 0;
 }
 
-static  READ8_DEVICE_HANDLER(apf_imagination_pia_in_cb2_func)
+READ8_MEMBER( apf_state::apf_imagination_pia_in_cb2_func)
 {
-	return 0x00;
+	return 0;
 }
 
 
-static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_a_func)
+WRITE8_MEMBER( apf_state::apf_imagination_pia_out_a_func)
 {
 }
 
-static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_b_func)
+WRITE8_MEMBER( apf_state::apf_imagination_pia_out_b_func)
 {
-	apf_state *state = device->machine().driver_data<apf_state>();
-
 	/* bits 2..0 = keyboard line */
 	/* bit 3 = ??? */
 	/* bit 4 = cassette motor */
@@ -292,72 +318,47 @@ static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_b_func)
 	static const char *const keynames[] = { "key0", "key1", "key2", "key3", "key4", "key5", "key6", "key7" };
 
 	keyboard_line = data & 0x07;
-	state->m_keyboard_data = input_port_read(device->machine(), keynames[keyboard_line]);
+	m_keyboard_data = input_port_read(machine(), keynames[keyboard_line]);
 
 	/* bit 4: cassette motor control */
-	device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
-		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
-		CASSETTE_MASK_MOTOR);
+	m_cass->change_state(BIT(data, 4) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	/* bit 6: cassette write */
-	device->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x40) ? -1.0 : 1.0);
+	m_cass->output(BIT(data, 6) ? -1.0 : 1.0);
 }
 
-static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_ca2_func)
+WRITE8_MEMBER( apf_state::apf_imagination_pia_out_ca2_func)
 {
 }
 
-static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_cb2_func)
+WRITE8_MEMBER( apf_state::apf_imagination_pia_out_cb2_func)
 {
 }
 
-static WRITE_LINE_DEVICE_HANDLER( apf_imagination_irq_a_func )
+WRITE_LINE_MEMBER( apf_state::apf_imagination_irq_a_func )
 {
-	apf_state *state_ = device->machine().driver_data<apf_state>();
-
-	if (state)
-	{
-		state_->m_apf_ints |= 4;
-	}
-	else
-	{
-		state_->m_apf_ints &= ~4;
-	}
-
-	apf_update_ints(device->machine());
+	apf_update_ints(0x04);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( apf_imagination_irq_b_func )
+WRITE_LINE_MEMBER( apf_state::apf_imagination_irq_b_func )
 {
-	apf_state *state_ = device->machine().driver_data<apf_state>();
-
-	if (state)
-	{
-		state_->m_apf_ints |= 8;
-	}
-	else
-	{
-		state_->m_apf_ints &= ~8;
-	}
-
-	apf_update_ints(device->machine());
-
+	apf_update_ints(0x08);
 }
 
 static const pia6821_interface apf_imagination_pia_interface=
 {
-	DEVCB_HANDLER(apf_imagination_pia_in_a_func),
-	DEVCB_HANDLER(apf_imagination_pia_in_b_func),
-	DEVCB_HANDLER(apf_imagination_pia_in_ca1_func),
-	DEVCB_HANDLER(apf_imagination_pia_in_cb1_func),
-	DEVCB_HANDLER(apf_imagination_pia_in_ca2_func),
-	DEVCB_HANDLER(apf_imagination_pia_in_cb2_func),
-	DEVCB_HANDLER(apf_imagination_pia_out_a_func),
-	DEVCB_HANDLER(apf_imagination_pia_out_b_func),
-	DEVCB_HANDLER(apf_imagination_pia_out_ca2_func),
-	DEVCB_HANDLER(apf_imagination_pia_out_cb2_func),
-	DEVCB_LINE(apf_imagination_irq_a_func),
-	DEVCB_LINE(apf_imagination_irq_b_func)
+	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_in_a_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_in_b_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_in_ca1_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_in_cb1_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_in_ca2_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_in_cb2_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_out_a_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_out_b_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_out_ca2_func),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_out_cb2_func),
+	DEVCB_DRIVER_LINE_MEMBER(apf_state, apf_imagination_irq_a_func),
+	DEVCB_DRIVER_LINE_MEMBER(apf_state, apf_imagination_irq_b_func)
 };
 
 
@@ -366,83 +367,83 @@ static MACHINE_START( apf_imagination )
 	apf_state *state = machine.driver_data<apf_state>();
 
 	state->m_apf_ints = 0;
+
+	if (state->m_cass) // apfimag only
+		state->m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-static WRITE8_HANDLER(apf_dischw_w)
+WRITE8_MEMBER( apf_state::apf_dischw_w)
 {
-	int drive;
-	device_t *fdc = space->machine().device("wd179x");
-
 	/* bit 3 is index of drive to select */
-	drive = (data>>3) & 0x01;
+	UINT8 drive = (data>>3) & 0x01;
 
-	wd17xx_set_drive(fdc, drive);
+	wd17xx_set_drive(m_fdc, drive);
 
 	logerror("disc w %04x %04x\n",offset,data);
 }
 
-static  READ8_HANDLER(serial_r)
+READ8_MEMBER( apf_state::serial_r)
 {
 	logerror("serial r %04x\n",offset);
-	return 0x00;
+	return 0;
 }
 
-static WRITE8_HANDLER(serial_w)
+WRITE8_MEMBER( apf_state::serial_w)
 {
 	logerror("serial w %04x %04x\n",offset,data);
 }
 
-static WRITE8_HANDLER(apf_wd179x_command_w)
+WRITE8_MEMBER( apf_state::apf_wd179x_command_w)
 {
-	wd17xx_command_w(space->machine().device("wd179x"), offset,~data);
+	wd17xx_command_w(m_fdc, offset,~data);
 }
 
-static WRITE8_HANDLER(apf_wd179x_track_w)
+WRITE8_MEMBER( apf_state::apf_wd179x_track_w)
 {
-	wd17xx_track_w(space->machine().device("wd179x"), offset,~data);
+	wd17xx_track_w(m_fdc, offset,~data);
 }
 
-static WRITE8_HANDLER(apf_wd179x_sector_w)
+WRITE8_MEMBER( apf_state::apf_wd179x_sector_w)
 {
-	wd17xx_sector_w(space->machine().device("wd179x"), offset,~data);
+	wd17xx_sector_w(m_fdc, offset,~data);
 }
 
-static WRITE8_HANDLER(apf_wd179x_data_w)
+WRITE8_MEMBER( apf_state::apf_wd179x_data_w)
 {
-	wd17xx_data_w(space->machine().device("wd179x"), offset,~data);
+	wd17xx_data_w(m_fdc, offset,~data);
 }
 
-static READ8_HANDLER(apf_wd179x_status_r)
+READ8_MEMBER( apf_state::apf_wd179x_status_r)
 {
-	return ~wd17xx_status_r(space->machine().device("wd179x"), offset);
+	return ~wd17xx_status_r(m_fdc, offset);
 }
 
-static READ8_HANDLER(apf_wd179x_track_r)
+READ8_MEMBER( apf_state::apf_wd179x_track_r)
 {
-	return ~wd17xx_track_r(space->machine().device("wd179x"), offset);
+	return ~wd17xx_track_r(m_fdc, offset);
 }
 
-static READ8_HANDLER(apf_wd179x_sector_r)
+READ8_MEMBER( apf_state::apf_wd179x_sector_r)
 {
-	return ~wd17xx_sector_r(space->machine().device("wd179x"), offset);
+	return ~wd17xx_sector_r(m_fdc, offset);
 }
 
-static READ8_HANDLER(apf_wd179x_data_r)
+READ8_MEMBER( apf_state::apf_wd179x_data_r)
 {
-	return wd17xx_data_r(space->machine().device("wd179x"), offset);
+	return wd17xx_data_r(m_fdc, offset); // should this be inverted like the rest?
 }
 
-static ADDRESS_MAP_START(apf_imagination_map, AS_PROGRAM, 8)
-	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE_MEMBER(apf_state,m_videoram) AM_MIRROR(0x1c00)
-	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
+static ADDRESS_MAP_START( apf_imagination_map, AS_PROGRAM, 8, apf_state )
+	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE(m_p_videoram) AM_MIRROR(0x1c00)
+	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
-	AM_RANGE( 0x06000, 0x063ff) AM_DEVREADWRITE_MODERN("pia_1", pia6821_device, read, write)
+	AM_RANGE( 0x06000, 0x063ff) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
 	AM_RANGE( 0x06400, 0x064ff) AM_READWRITE(serial_r, serial_w)
 	AM_RANGE( 0x06500, 0x06500) AM_READWRITE(apf_wd179x_status_r, apf_wd179x_command_w)
 	AM_RANGE( 0x06501, 0x06501) AM_READWRITE(apf_wd179x_track_r, apf_wd179x_track_w)
 	AM_RANGE( 0x06502, 0x06502) AM_READWRITE(apf_wd179x_sector_r, apf_wd179x_sector_w)
 	AM_RANGE( 0x06503, 0x06503) AM_READWRITE(apf_wd179x_data_r, apf_wd179x_data_w)
-	AM_RANGE( 0x06600, 0x06600) AM_WRITE( apf_dischw_w)
+	AM_RANGE( 0x06600, 0x06600) AM_WRITE(apf_dischw_w)
 	AM_RANGE( 0x06800, 0x077ff) AM_ROM
 	AM_RANGE( 0x07800, 0x07fff) AM_NOP
 	AM_RANGE( 0x08000, 0x09fff) AM_ROM
@@ -450,9 +451,9 @@ static ADDRESS_MAP_START(apf_imagination_map, AS_PROGRAM, 8)
 	AM_RANGE( 0x0e000, 0x0e7ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(apf_m1000_map, AS_PROGRAM, 8)
-	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE_MEMBER(apf_state,m_videoram)  AM_MIRROR(0x1c00)
-	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
+static ADDRESS_MAP_START( apf_m1000_map, AS_PROGRAM, 8, apf_state )
+	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE(m_p_videoram)  AM_MIRROR(0x1c00)
+	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 	AM_RANGE( 0x06800, 0x077ff) AM_ROM
 	AM_RANGE( 0x08000, 0x09fff) AM_ROM AM_REGION("maincpu", 0x8000)
@@ -690,7 +691,7 @@ static const floppy_interface apfimag_floppy_interface =
 
 static const mc6847_interface apf_mc6847_intf =
 {
-	DEVCB_HANDLER(apf_mc6847_videoram_r),
+	DEVCB_DRIVER_MEMBER(apf_state, apf_mc6847_videoram_r),
 	DEVCB_LINE_VCC,
 	DEVCB_LINE_VCC,
 	DEVCB_NULL,
@@ -699,7 +700,7 @@ static const mc6847_interface apf_mc6847_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(apf_mc6847_fs_w),
+	DEVCB_DRIVER_LINE_MEMBER(apf_state, apf_mc6847_fs_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -722,20 +723,19 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 	MCFG_SCREEN_SIZE(320, 25+192+26)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
-	MCFG_MC6847_ADD("mc6847", apf_mc6847_intf)
-
-	MCFG_PIA6821_ADD( "pia_0", apf_m1000_pia_interface )
-	MCFG_PIA6821_ADD( "pia_1", apf_imagination_pia_interface )
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+	//MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
+	/* Devices */
+	MCFG_MC6847_ADD("mc6847", apf_mc6847_intf)
+	MCFG_PIA6821_ADD( "pia_0", apf_m1000_pia_interface )
+	MCFG_PIA6821_ADD( "pia_1", apf_imagination_pia_interface )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, apf_cassette_interface )
-
 	MCFG_FD1793_ADD("wd179x", default_wd17xx_interface ) // TODO confirm type
-
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(apfimag_floppy_interface)
 MACHINE_CONFIG_END
 
@@ -745,6 +745,7 @@ static MACHINE_CONFIG_DERIVED( apf_m1000, apf_imagination )
 
 	MCFG_DEVICE_REMOVE( "pia_1" )
 
+	MCFG_DEVICE_REMOVE( WAVE_TAG )
 	MCFG_DEVICE_REMOVE( CASSETTE_TAG )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_REMOVE()
 
@@ -782,6 +783,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE             INPUT               INIT         COMPANY               FULLNAME */
-COMP(1977, apfimag,	0,	0,	apf_imagination,	apf_imagination,	0,		"APF Electronics Inc",  "APF Imagination Machine" , 0 )
-CONS(1978, apfm1000,	0,	0,	apf_m1000,		apf_m1000,		0,			"APF Electronics Inc",  "APF M-1000" ,GAME_NOT_WORKING)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE             INPUT               INIT         COMPANY               FULLNAME */
+COMP(1977, apfimag,  0,      0,      apf_imagination,    apf_imagination,    0,   "APF Electronics Inc", "APF Imagination Machine" , GAME_NOT_WORKING )
+CONS(1978, apfm1000, 0,      0,      apf_m1000,          apf_m1000,          0,   "APF Electronics Inc", "APF M-1000" , GAME_NOT_WORKING)
