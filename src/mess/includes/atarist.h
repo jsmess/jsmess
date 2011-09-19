@@ -162,6 +162,7 @@ public:
 	DECLARE_WRITE8_MEMBER( dma_base_w );
 	DECLARE_READ8_MEMBER( mmu_r );
 	DECLARE_WRITE8_MEMBER( mmu_w );
+	DECLARE_WRITE16_MEMBER( berr_w );
 	DECLARE_READ8_MEMBER( ikbd_port1_r );
 	DECLARE_READ8_MEMBER( ikbd_port2_r );
 	DECLARE_WRITE8_MEMBER( ikbd_port2_w );
