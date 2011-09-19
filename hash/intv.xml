@@ -290,7 +290,7 @@
 		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="intv_cart">
 			<dataarea name="5000" size="0x4000">
-					<rom name="chess.50" size="0x4000" crc="752fd927" sha1="4ccf494f9664d5b9e05237d1bc2eee8a7830f067" offset="0000" />
+					<rom name="ro-3-9505-359 + ro-3-9506-011.50" size="0x4000" crc="752fd927" sha1="4ccf494f9664d5b9e05237d1bc2eee8a7830f067" offset="0000" />
 			</dataarea>
 			<dataarea name="ram" size="0x2000">
 			</dataarea>
