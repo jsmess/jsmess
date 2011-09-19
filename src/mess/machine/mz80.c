@@ -94,7 +94,7 @@ const struct pit8253_config mz80k_pit8253_config =
 
 READ8_MEMBER( mz80_state::mz80k_strobe_r )
 {
-	return(0x7e | m_mz80k_tempo_strobe);
+	return 0x7e | (UINT8)m_mz80k_tempo_strobe;
 }
 
 WRITE8_MEMBER( mz80_state::mz80k_strobe_w )
