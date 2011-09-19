@@ -51,7 +51,7 @@ const char *mfm_format::extensions() const
 
 bool mfm_format::supports_save() const
 {
-	return false;
+	return true;
 }
 
 int mfm_format::identify(io_generic *io)
@@ -98,7 +98,52 @@ bool mfm_format::load(io_generic *io, floppy_image *image)
 	if(trackbuf)
 		global_free(trackbuf);
 
-	return FALSE;
+	return true;
+}
+
+bool mfm_format::save(io_generic *io, floppy_image *image)
+{
+	// TODO: HD support
+	MFMIMG header;
+	int track_count, head_count;
+	image->get_actual_geometry(track_count, head_count);
+
+	memcpy(&header.headername, MFM_FORMAT_HEADER, 7);
+	header.number_of_track = track_count;
+	header.number_of_side = head_count;
+	header.floppyRPM = 0;
+	header.floppyBitRate = 250;
+	header.floppyiftype = 4;
+	header.mfmtracklistoffset = sizeof(MFMIMG);
+
+	io_generic_write(io, &header, 0, sizeof(MFMIMG));
+
+	int tpos = sizeof(MFMIMG);
+	int dpos = tpos + track_count*head_count*sizeof(MFMTRACKIMG);
+
+	UINT8 trackbuf[150000/8];
+	
+	for(int track=0; track < track_count; track++) {
+		for(int side=0; side < head_count; side++) {
+			int track_size;
+			generate_bitstream_from_track(track, side, 2000, trackbuf, track_size, image);
+			track_size = (track_size+7)/8;
+
+			MFMTRACKIMG trackdesc;
+			trackdesc.track_number = track;
+			trackdesc.side_number = side;
+			trackdesc.mfmtracksize = track_size;
+			trackdesc.mfmtrackoffset = dpos;
+
+			io_generic_write(io, &trackdesc, tpos, sizeof(MFMTRACKIMG));
+			io_generic_write(io, trackbuf, dpos, track_size);
+
+			tpos += sizeof(MFMTRACKIMG);
+			dpos += track_size;
+		}
+	}
+
+	return true;
 }
 
 const floppy_format_type FLOPPY_MFM_FORMAT = &floppy_image_format_creator<mfm_format>;

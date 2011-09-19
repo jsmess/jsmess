@@ -2017,10 +2017,6 @@ void floppy_image_format_t::generate_bitstream_from_track(UINT8 track, UINT8 hea
 			edge += 200000000;
 		int next = cur_pos + period + phase_adjust;
 
-		if(0 && cur_bit != -1)
-			printf("cb=%d pos=%d edge=%d next=%d period=%d rdelta=%d\n", cur_bit, cur_pos, edge, next,
-				   period, ((next-period/2) % 2000) - 1000);
-
 		if(edge >= next) {
 			// No transition in the window means 0 and pll in free run mode
 			if(cur_bit >= 0) {
@@ -2077,10 +2073,8 @@ void floppy_image_format_t::generate_bitstream_from_track(UINT8 track, UINT8 hea
 			cur_pos -= 200000000;
 			cur_entry = 0;
 		}
-		while(cur_entry < tsize-1 && (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos) {
-			//			printf("e=%d pos=%d type=%d\n", cur_entry, tbuf[cur_entry] & floppy_image::TIME_MASK, (tbuf[cur_entry] & floppy_image::MG_MASK) >> floppy_image::MG_SHIFT);
+		while(cur_entry < tsize-1 && (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos)
 			cur_entry++;
-		}
 
 		// Wrap around
 		if(cur_entry == tsize-1 &&
