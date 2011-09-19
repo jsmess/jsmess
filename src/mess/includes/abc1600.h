@@ -130,12 +130,17 @@ public:
 	DECLARE_READ8_MEMBER( cio_pc_r );
 	DECLARE_WRITE8_MEMBER( cio_pc_w );
 
+	int get_current_task(offs_t offset);
+	offs_t get_segment_address(offs_t offset);
+	offs_t get_page_address(offs_t offset, UINT8 segd);
+	offs_t translate_address(offs_t offset, int *nonx, int *wp);
 	UINT8 read_ram(offs_t offset);
 	void write_ram(offs_t offset, UINT8 data);
 	UINT8 read_io(offs_t offset);
 	void write_io(offs_t offset, UINT8 data);
 	UINT8 read_user_memory(offs_t offset);
 	void write_user_memory(offs_t offset, UINT8 data);
+	int get_fc();
 	UINT8 read_supervisor_memory(offs_t offset);
 	void write_supervisor_memory(offs_t offset, UINT8 data);
 
