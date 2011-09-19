@@ -495,7 +495,6 @@ static READ32_HANDLER( ioc_ctrl_r )
 		}
 
 		case KART:	// keyboard read
-			printf("R\n");
 			archimedes_request_irq_b(space->machine(), ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
 			break;
 
@@ -562,7 +561,6 @@ static WRITE32_HANDLER( ioc_ctrl_w )
 			break;
 
 		case KART:
-			printf("%02x\n",data);
 			#if 0
 			if(data == 0x0d)
 				printf("\n");

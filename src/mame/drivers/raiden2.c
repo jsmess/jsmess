@@ -1799,28 +1799,83 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 MACHINE_CONFIG_END
 
 /* ROM LOADING */
+/*
+Raiden II
 
-/* Raiden II  Seibu Kaihatsu 1993
+(C) 1993 RAIDEN II SEIBU KAIHATSU INC.,o
+|----------------------------------------------------------|
+|      1    2   3   4   5   6    7      8      9     10    |
+|LA4460    M6295  PCM  Z8400A  6116    BATTERY3.6v        A|
+|   YM2151 M6295   6    5      6116    28.6360 MHz        B|
+|     VOL   YM3014                                         |
+|HB-45A     YM3012 |------|                               C|
+|HB-2      NJM4560 |SIE150| LH5116    |---------|          |
+|RC220             |      | LH5116    | SEI252  |         D|
+|RC220             |------| LH5116    |SB05-106 |          |
+|RC220                      LH5116    |(QFP208) |         E|
+|J                                    |         |         F|
+|A                                    |---------|          |
+|M    DSW2(8)                                             G|
+|M    DSW1(8)                                   LH522258   |
+|A          |---------|OBJ-1    OBJ-2           LH522258  H|
+|           | SEI360  |                         LH522258  J|
+|           |SB06-1937|OBJ-3    OBJ-4           LH522258  K|
+|           |(QFP160) |                     |---------|   L|
+|           |         |      1              |SEI1000  |   M|
+| |------|  |---------|  1x      3x         |SB01-001 |   N|
+| |SEI200|         32MHz     2              |(QFP184) |    |
+| |      |CXK5863        2x      4x         |         |   P|
+| |------|CXK5863                           |---------|    |
+|                                                         Q|
+|                        PAL2 PAL1             |----|     R|
+|                                              |V30 |      |
+|      BG-1       BG-2   7   COPX-D2           |----|     S|
+|----------------------------------------------------------|
+Notes:
+      V30 clock    - 16.000MHz [32/2]. Chip is stamped "NEC D70116HG-16 V30 NEC '84" (QFP52)
+      Z80 clock    - 3.579545MHz [28.63636/8]
+      YM2151 clock - 3.579545MHz [28.63636/8]
+      Yamaha DAC   -
+        early boards: ym3014 mono dac, no NJM4560
+        later boards: ym3012 stereo dac plus NJM4560, each with a capacitor on top
+      M6295 clocks - 1.022MHz [28.63636/28] and pin 7 HIGH (both)
+      LH52258      - Sharp LH52258 32k x8 SRAM (= 62256)
+      CXK5863      - Sony CXK5863 8k x8 SRAM (= 6264)
+      6116         - 2k x8 SRAM
+      LH5116       - 2k x8 SRAM
+      HB-45A       - Seibu custom ceramic module sound DAC (SIP20)
+      HB-2         - Seibu custom ceramic module connected to coin counters (SIP10)
+      RC220        - Custom resistor network module used for inputs (SIP14)
+      VSync        - 55.4859Hz  \
+      HSync        - 15.5586kHz / not measured but assumed same as R2DX
+      PAL1         - MMIPAL16L8B stamped 'JJ4B01' (DIP20)
+      PAL2         - AMI 18CV8 stamped 'JJ4B02' (DIP20)
+      ROMs         - *PCM      - 2M MaskROM stamped 'RAIDEN 2 PCM' at location U1018 (DIP32), pcb labeled VOI2
+                     6         - 23C020 MASK ROM labelled 'SEIBU 6' at location U1017 (DIP32), pcb labeled VOI1
+                     5         - 27C512 EPROM labelled 'SEIBU 5' at location U1110 (DIP28)
+                     *OBJ-1     - 16M MaskROM stamped 'RAIDEN 2 OBJ-1' at location U0811 (DIP42)
+                     *OBJ-2     - 16M MaskROM stamped 'RAIDEN 2 OBJ-2' at location U082 (DIP42)
+                     *OBJ-3     - 16M MaskROM stamped 'RAIDEN 2 OBJ-3' at location U0837 (DIP42)
+                     *OBJ-4     - 16M MaskROM stamped 'RAIDEN 2 OBJ-4' at location U0836 (DIP42)
+                 /   1x        - 27C2001 EPROM labelled 'SEIBU 1' at location U1210 (DIP32)
+     Early boards|   2x        - 27C2001 EPROM labelled 'SEIBU 2' at location U1211 (DIP32)
+                 |   3x        - 27C2001 EPROM labelled 'SEIBU 3' at location U129 (DIP32)
+                 \   4x        - 27C2001 EPROM labelled 'SEIBU 4' at location U1212 (DIP32)
+     Later boards/   1         - 27C402 or 27C4096 EPROM labelled 'SEIBU 1' at location U0211 (DIP40)
+                 \   2         - 27C402 or 27C4096 EPROM labelled 'SEIBU 2' at location U0212 (DIP40)
+                     *BG-1      - 16M MaskROM stamped 'RAIDEN 2 BG-1' at location U075 (DIP42)
+                     *BG-2      - 16M MaskROM stamped 'RAIDEN 2 BG-2' at location U0714 (DIP42)
+                     7         - 27C210 EPROM labelled 'SEIBU 7' at location U0724 (DIP40)
+                     *COPX-D2  - 2M MaskROM stamped 'COPX-D2' at location U0313 (DIP40)
 
-YM2151   OKI M6295 VOI2  Z8400A
-         OKI M6295 VOI1  SND       2018
-                  5816-15          6116
-   YM3012         5816-15
-                  5816-15
-                  5816-15
-          SIE150       SEI252
+                     * = these ROMs are soldered-in
 
-             OBJ1 OBJ2            34256-20
-             OBJ3 OBJ4            34256-20
-                                  34256-20
-    SEI360                        34256-20
-                  PRG0
-                  PRG1
-          32MHz
- SEI0200   7C185-35            SEI1000
-           7C185-35
-                 JJ4B02 JJ4B01
-  BG1   BG2    7   COPX-D2      NEC V30
+      SEIBU Custom ICs -
+                        SIE150 (QFP100) - z80 interface
+                        SEI252 SB05-106 (QFP208) - fg/sprite gfx and its decryption
+                        SEI0200 TC110G21AF 0076 (QFP100) - bg gfx
+                        SEI360 SB06-1937 (QFP160) - logic and i/o array
+                        SEI1000 SB01-001 (QFP184) - main protection
 
 */
 
@@ -1829,6 +1884,37 @@ YM2151   OKI M6295 VOI2  Z8400A
     z80 sound rom as used in raiden2a instead of the
     ROM_LOAD( "snd.u1110",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )
     rom from raiden2. Slight version difference, and I don't know which is older/newer. - LN
+	
+ROMSET organization:
+Note: type numbers are NOT NECESSARILY in chronological version order YET.
+SETNAME   LONGNAME       PRG TYPES   SND(u1110) TYPE   VOICE(u1017) TYPE  FX0(u0724) TYPE  Notes
+raiden2   (set 1 fabtek) 1 1'        1(f51a28f9)       1(fb0fca23)        1(c9ec9469)      sepia fighter on hiscore
+raiden2a  (set 2 metro)  1 2'        2(8f130589)       1(fb0fca23)        1(c9ec9469)      sepia fighter on hiscore
+raiden2b  (set 3 japan)  1 3'        2(8f130589)       1(fb0fca23)        1(c9ec9469)      sepia fighter on hiscore
+raiden2c  (set 4 italy)  2 4'        3(5db9f922)       1(fb0fca23)        1(c9ec9469)      sepia fighter on hiscore
+(trap15: one of these four above has aama serial 0587600)
+raiden2d  (set 5 easy)   3 5'        4(6bad0a3e)       2(488d050f)        2(c709bdf6)      red fighter on hiscore
+raiden2e  (set 6 easy)   4 6'        5(f5f835af)       3(fab9f8e4)        3(c7aa4d00)      red fighter on hiscore
+raiden2f  (set 7 easy fabtek) 4 7'   5(f5f835af)       3(fab9f8e4)        3(c7aa4d00)      red fighter on hiscore
+raiden2g  (set 8 easy fabtek) 3 8'   6(6d362472)       3(fab9f8e4)        3(c7aa4d00)      red fighter on hiscore, sn 0003068, aama 0557135
+^ this set has 4 prg roms: 1 and 3 correspond to seibu1/prg0 and 2 and 4 correspond to seibu2/prg1
+balrog+ln (set x fabtek) 1 1'        2(8f130589)       1(fb0fca23)        1(c9ec9469)      sepia fighter on hiscore, sn 0012739, aama 0600565, not in mame yet due to roms matching mix of sets 1 and 2
+
+differences amongst SND/u1110 roms:
+   First half end, last byte before ff fill ending at 7fff
+   |     Last byte before ff fill ending at 8fff
+   |     |     Last byte before ff fill ending at ffff
+   |     |     |
+1: 62e8  8faf  f56b
+2: 62b8  8faf  f56b
+3: 62a9  8faf  f56b
+4: 623e  8ee7  f4dd
+5: 620a  8ee7  f4d7
+6: 64b8  8e1f  f4db
+<LordNlptp> btw my guess is the code versions go from newest to oldest, 1 to 6, though I need more serial numbers to be sure
+<LordNlptp> 6 has a larger main code chunk because i think they accidentally included some stuff they didn't actually use, which was removed on later versions
+<LordNlptp> and it would not surprise me in the least if the code/player data is ALMOST the same as the zt version but with support for the second msm6295
+
 */
 
 ROM_START( raiden2 )
@@ -2175,6 +2261,49 @@ ROM_START( raiden2f ) // same as raiden2e, different region
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_END
 
+ROM_START( raiden2g ) // sort of a mixture of raiden2d easy set with voice rom of raiden2e and 2f and a unique sound rom
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
+	ROM_LOAD32_BYTE("seibu__1.27c020j.u1210",   0x000000, 0x40000, CRC(ED1514E3) SHA1(296125BFE3C4F3033F7AA319DD8554BC978C4A00) )
+	ROM_RELOAD(0x100000, 0x40000)
+	ROM_LOAD32_BYTE("seibu__2.27c2001.u1211",   0x000001, 0x40000, CRC(BB6ECF2A) SHA1(D4F628E9D0ED2897654F05A8A2541E1ED3FAF8DD) )
+	ROM_RELOAD(0x100001, 0x40000)
+	ROM_LOAD32_BYTE("seibu__3.27c2001.u129",   0x000002, 0x40000, CRC(6A01D52C) SHA1(983B914592AB9D9C058BEBB5BCCF5C882E2B82DE) )
+	ROM_RELOAD(0x100002, 0x40000)
+	ROM_LOAD32_BYTE("seibu__4.27c2001.u1212",   0x000003, 0x40000, CRC(E54BFA37) SHA1(4FABB23503FD9245A10CDED15A6880415CA5FFD7) )
+	ROM_RELOAD(0x100003, 0x40000)
+
+	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered MASK ROM */
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_LOAD( "seibu__5.27c512.u1110", 0x000000, 0x08000, CRC(6d362472) SHA1(a362e500bb9492affde1f7a4da7e08dd16e755df) )
+	ROM_CONTINUE(0x10000,0x8000)
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "seibu__7.fx0.27c210.u0724", 0x000000, 0x020000, CRC(c7aa4d00) SHA1(9ad99d3891598c1ea3f12318400ee67666da56dd) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered MASK ROM */
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered MASK ROM */
+
+	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered MASK ROM */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered MASK ROM */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered MASK ROM */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered MASK ROM */
+
+	ROM_REGION( 0x100000, "oki1", 0 )	/* ADPCM samples */
+	ROM_LOAD( "seibu__6.voice1.23c020.u1017", 0x00000, 0x40000, CRC(fab9f8e4) SHA1(b1eff154c4f766b2d272ac6a57f8d54c9e39e3bb) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )	/* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered MASK ROM */
+
+	ROM_REGION( 0x10000, "pals", 0 )	/* PALS */
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x288, NO_DUMP)
+ROM_END
+
 
 /* Raiden DX sets */
 
@@ -2390,6 +2519,23 @@ ROM_END
 
 
 /* Zero Team sets */
+/* Zero team is slightly older hardware (early 93 instead of late 93) but
+almost identical to raiden 2 with a few key differences:
+Zero Team:                     Raiden 2:
+BG/FG roms marked MUSHA        BG/FG roms marked RAIDEN 2
+SEI251 fg/sprite gate array    SEI252 fg/sprite gate array
+about 15 74xx logic chips      SEI360 gate array
+3x dipswitch arrays            2x dipswitch arrays
+4x 8bit program roms           2x 16bit program roms (some older pcbs have 4x 8bit like zt)
+YM3812 plus Y3014              YM2151 plus Y3012 plus NJM4550 (some older pcbs have YM2151, Y3014)
+1x OKI M6295 & voice rom       2x OKI M6295s & 2x voice roms
+2x 8bit licensee bgroms        1x 16bit licensee bgrom
+2x fg/sprite mask roms         4x fg/sprite mask roms
+4x pals (two are stacked)      2x pals
+*/
+/* ZERO TEAM Seibu Kaihatsu 1993
+	TODO: guru-readme here
+*/
 
 ROM_START( zeroteam )
 	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
@@ -2484,7 +2630,10 @@ ROM_START( zeroteams )
 	ROM_LOAD( "6.4a", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.bin
 ROM_END
 
-/* set contained only program roms, was marked as 'non-encrytped' but program isn't encrypted anyway?! */
+/* this set, consisting of updated program roms, is a later version or hack of zero team to incorporate the writing
+of the fg sei251 'key data' to the pcb on bootup (like raiden 2 does) rather than relying on the sram to hold the
+keys as programmed from factory (or via the suicide revival kit below); hence this romset is immune to the common
+problem of the 3.6v lithium battery dying and the missing keys to cause the sprites to show up as gibberish */
 ROM_START( zeroteamb )
 	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("z1",   0x000000, 0x40000, CRC(157743d0) SHA1(f9c84c9025319f76807ef0e79f1ee1599f915b45) )
@@ -2688,8 +2837,10 @@ GAME( 1993, raiden2a, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaih
 GAME( 1993, raiden2b, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 3, Japan)",         GAME_NOT_WORKING) //  ^
 GAME( 1993, raiden2c, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 4, Italy)",         GAME_NOT_WORKING) // rev 2
 GAME( 1993, raiden2d, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 5, Easy Version)",  GAME_NOT_WORKING) // rev 3
-GAME( 1993, raiden2e, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 6)",                GAME_NOT_WORKING) // rev 4
-GAME( 1993, raiden2f, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden II (set 7, US Fabtek)",     GAME_NOT_WORKING) //  ^
+GAME( 1993, raiden2e, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 6, Easy Version)",  GAME_NOT_WORKING) // rev 4
+GAME( 1993, raiden2f, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden II (set 7, US Fabtek, Easy Version)",     GAME_NOT_WORKING) //  ^
+GAME( 1993, raiden2g, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden II (set 8, US Fabtek, Easy Version)",         GAME_NOT_WORKING) // rev 3 and 4 mix?
+
 
 GAME( 1994, raidndx,  0,       raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (UK)",                   GAME_NOT_WORKING)
 GAME( 1994, raidndxa1,raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Asia set 1)",           GAME_NOT_WORKING)

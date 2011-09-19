@@ -596,6 +596,7 @@ $(MAMEOBJ)/dataeast.a: \
 	$(DRIVERS)/deco_mlc.o $(VIDEO)/deco_mlc.o \
 	$(DRIVERS)/deco156.o $(MACHINE)/deco156.o \
 	$(DRIVERS)/deco32.o $(VIDEO)/deco32.o \
+    $(AUDIO)/decobsmt.o \
 	$(DRIVERS)/decocass.o $(MACHINE)/decocass.o $(VIDEO)/decocass.o \
 	$(DRIVERS)/deshoros.o \
 	$(DRIVERS)/dietgo.o $(VIDEO)/dietgo.o \
@@ -980,6 +981,7 @@ $(MAMEOBJ)/midway.a: \
 
 $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/20pacgal.o $(VIDEO)/20pacgal.o \
+	$(DRIVERS)/30test.o \
 	$(DRIVERS)/baraduke.o $(VIDEO)/baraduke.o \
 	$(DRIVERS)/dambustr.o \
 	$(DRIVERS)/gal3.o \
@@ -1815,6 +1817,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/statriv2.o \
 	$(DRIVERS)/stellafr.o \
 	$(DRIVERS)/summit.o \
+	$(DRIVERS)/sumt8035.o \
 	$(DRIVERS)/supertnk.o \
 	$(DRIVERS)/superwng.o \
 	$(DRIVERS)/tapatune.o \
@@ -1831,6 +1834,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/trvquest.o \
 	$(DRIVERS)/ttchamp.o \
 	$(DRIVERS)/tugboat.o \
+	$(DRIVERS)/umipoker.o \
 	$(DRIVERS)/unkfr.o \
 	$(DRIVERS)/unkpcp.o \
 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
@@ -1851,6 +1855,8 @@ $(MAMEOBJ)/misc.a: \
 #-------------------------------------------------
 # layout dependencies
 #-------------------------------------------------
+
+$(DRIVERS)/30test.o:	$(LAYOUT)/30test.lh
 
 $(DRIVERS)/8080bw.o:	$(LAYOUT)/invrvnge.lh \
 			$(LAYOUT)/shuttlei.lh \
@@ -1906,11 +1912,11 @@ $(DRIVERS)/blockade.o:	$(LAYOUT)/blockade.lh
 
 $(DRIVERS)/buggychl.o:	$(LAYOUT)/buggychl.lh
 
-$(DRIVERS)/bzone.o:		$(LAYOUT)/bzone.lh
+$(DRIVERS)/bzone.o:	$(LAYOUT)/bzone.lh
 
 $(DRIVERS)/cardline.o:	$(LAYOUT)/cardline.lh
 
-$(DRIVERS)/cdi.o:		$(LAYOUT)/cdi.lh
+$(DRIVERS)/cdi.o:	$(LAYOUT)/cdi.lh
 
 $(DRIVERS)/changela.o:	$(LAYOUT)/changela.lh
 
@@ -1935,7 +1941,7 @@ $(DRIVERS)/darius.o:	$(LAYOUT)/darius.lh
 
 $(DRIVERS)/destroyr.o:	$(LAYOUT)/destroyr.lh
 
-$(DRIVERS)/dlair.o:		$(LAYOUT)/dlair.lh
+$(DRIVERS)/dlair.o:	$(LAYOUT)/dlair.lh
 
 $(DRIVERS)/firebeat.o:	$(LAYOUT)/firebeat.lh
 
@@ -1951,13 +1957,16 @@ $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
 $(DRIVERS)/goldnpkr.o:	$(LAYOUT)/goldnpkr.lh \
 			$(LAYOUT)/pmpoker.lh
 
-$(DRIVERS)/goldstar.o:	$(LAYOUT)/lucky8.lh
+$(DRIVERS)/goldstar.o:	$(LAYOUT)/lucky8.lh \
+			$(LAYOUT)/bingowng.lh
 
 $(DRIVERS)/grchamp.o:	$(LAYOUT)/grchamp.lh
 
 $(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh
 
 $(DRIVERS)/igspoker.o:	$(LAYOUT)/igspoker.lh
+
+$(DRIVERS)/kingdrby.o:	$(LAYOUT)/kingdrby.lh
 
 $(DRIVERS)/lazercmd.o:	$(LAYOUT)/lazercmd.lh
 
@@ -1972,19 +1981,19 @@ $(DRIVERS)/majorpkr.o:	$(LAYOUT)/majorpkr.lh
 
 $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 
-$(DRIVERS)/mcr3.o:		$(LAYOUT)/turbotag.lh
+$(DRIVERS)/mcr3.o:	$(LAYOUT)/turbotag.lh
 
 $(DRIVERS)/mpoker.o:	$(LAYOUT)/mpoker.lh
 
-$(DRIVERS)/mpu4.o:		$(LAYOUT)/mpu4.lh \
-            $(LAYOUT)/connect4.lh \
-            $(LAYOUT)/mpu4ext.lh \
-            $(LAYOUT)/gamball.lh
+$(DRIVERS)/mpu4.o:	$(LAYOUT)/mpu4.lh \
+			$(LAYOUT)/connect4.lh \
+			$(LAYOUT)/mpu4ext.lh \
+			$(LAYOUT)/gamball.lh
 
 $(DRIVERS)/mpu4vid.o:	$(LAYOUT)/crmaze2p.lh \
-            $(LAYOUT)/crmaze4p.lh
+			$(LAYOUT)/crmaze4p.lh
 
-$(DRIVERS)/mw18w.o:		$(LAYOUT)/18w.lh
+$(DRIVERS)/mw18w.o:	$(LAYOUT)/18w.lh
 
 $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/280zzzap.lh \
 			$(LAYOUT)/clowns.lh \
@@ -2023,11 +2032,11 @@ $(DRIVERS)/peplus.o:	$(LAYOUT)/peplus.lh \
 $(DRIVERS)/polepos.o:	$(LAYOUT)/polepos.lh \
 			$(LAYOUT)/topracer.lh
 
-$(DRIVERS)/qix.o:		$(LAYOUT)/elecyoyo.lh
+$(DRIVERS)/qix.o:	$(LAYOUT)/elecyoyo.lh
 
-$(DRIVERS)/re900.o:		$(LAYOUT)/re900.lh
+$(DRIVERS)/re900.o:	$(LAYOUT)/re900.lh
 
-$(DRIVERS)/roul.o:		$(LAYOUT)/roul.lh
+$(DRIVERS)/roul.o:	$(LAYOUT)/roul.lh
 
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
@@ -2083,11 +2092,11 @@ $(DRIVERS)/thayers.o:	$(LAYOUT)/dlair.lh
 
 $(DRIVERS)/topspeed.o:	$(LAYOUT)/topspeed.lh
 
-$(DRIVERS)/turbo.o:		$(LAYOUT)/turbo.lh \
+$(DRIVERS)/turbo.o:	$(LAYOUT)/turbo.lh \
 			$(LAYOUT)/subroc3d.lh \
 			$(LAYOUT)/buckrog.lh
 
-$(DRIVERS)/tx1.o:		$(LAYOUT)/buggybjr.lh \
+$(DRIVERS)/tx1.o:	$(LAYOUT)/buggybjr.lh \
 			$(LAYOUT)/buggyboy.lh \
 			$(LAYOUT)/tx1.lh
 

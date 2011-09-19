@@ -3599,8 +3599,11 @@ ROM_START( f355 )
 	ROM_LOAD("mpr-21898.ic18",0x9000000, 0x0800000, CRC(cacea996) SHA1(df2b7ce00d8d6171806f676966f5f45d7fb76431) )
 	ROM_LOAD("mpr-21899.ic19",0x9800000, 0x0800000, CRC(14a4b87d) SHA1(33177dea88c6aec31e2c16c8d0d3f29c7ea772c5) )
 	ROM_LOAD("mpr-21900.ic20",0xa000000, 0x0800000, CRC(81901130) SHA1(1573b5c4360e29ba1a4b4901af49d5399fa1e635) )
-	ROM_LOAD("mpr-21901.ic21",0xa800000, 0x0800000, BAD_DUMP CRC(55dcbd6d) SHA1(9fec353f9e58016090e177f899a799e2e8fc7c9f) ) // returns bad in Naomi test mode
-ROM_END																// ROM reads different each time and fails test mode on real h/w, need a new cart
+	ROM_LOAD("mpr-21901.ic21",0xa800000, 0x0800000, BAD_DUMP CRC(55dcbd6d) SHA1(9fec353f9e58016090e177f899a799e2e8fc7c9f) ) // returns bad in Naomi test mode.  ROM reads different each time and fails test mode on real h/w, need a new cart
+
+	ROM_REGION( 0x10000, "drivebd", 0 )	/* drive board ROM */
+	ROM_LOAD( "epr-21867.bin", 0x000000, 0x010000, CRC(4f93a2a0) SHA1(875907e7fcfc44850e2c60c12268ac61c742f217) )
+ROM_END
 
 ROM_START( f355twin )
 	F355_BIOS
@@ -7574,7 +7577,8 @@ ROM_END
 /* 0126 */ GAME( 2003, oinori,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Oinori-daimyoujin Matsuri", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0128 */ GAME( 2002, shootpl,  naomi,    naomim1, naomi,    naomi,    ROT0, "Sega", "Shootout Pool (JPN, USA, KOR, AUS) / Shootout Pool Prize (EXP)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0140 */ GAME( 2004, kick4csh, naomi,    naomim1, naomi,    kick4csh, ROT0, "Sega", "Kick '4' Cash", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-// 0150 MushiKing - The King Of Beetle
+// 0150 MushiKing - The King Of Beetle 2K3 2ND
+// 0164 MushiKing - The King Of Beetle II ENG
 // 0166 Touch De Zunou (Japan)
 // 0166 Touch De Zunou (Japan) (Rev A)
 /* 0170 */ GAME( 2007, pokasuka, naomi,    naomim4, naomi,    naomi,    ROT0, "Sega", "Pokasuka Ghost", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
