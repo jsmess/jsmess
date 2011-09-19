@@ -18,6 +18,7 @@ public:
 
 	virtual int identify(io_generic *io);
 	virtual bool load(io_generic *io, floppy_image *image);
+	virtual bool save(io_generic *io, floppy_image *image);
 
 	virtual const char *name() const;
 	virtual const char *description() const;
