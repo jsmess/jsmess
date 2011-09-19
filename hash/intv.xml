@@ -60,7 +60,7 @@
 	<software name="atlantis">
 		<description>Atlantis</description>
 		<year>1982</year>
-		<publisher>Mattel Electronics</publisher>
+		<publisher>Imagic</publisher>
 		<part name="cart" interface="intv_cart">
 			<dataarea name="4800" size="0x4000">
 					<rom name="atlantis.48" size="0x4000" crc="13ff363c" sha1="094b207668c03a6d903270490f495ddc237cd8d7" offset="0000" />
@@ -71,7 +71,7 @@
 	<software name="autorace">
 		<description>Auto Racing</description>
 		<year>1979</year>
-		<publisher>Imagic</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="intv_cart">
 			<dataarea name="5000" size="0x2000">
 					<rom name="auto racing.50" size="0x2000" crc="b35c1101" sha1="2e3461853f60a1928c5c93bb23deb9229e0230c9" offset="0000" />
@@ -129,7 +129,7 @@
 	<software name="beutyatb">
 		<description>Beauty &amp; the Beast</description>
 		<year>1978</year>
-		<publisher>Mattel Electronics</publisher>
+		<publisher>Imagic</publisher>
 		<part name="cart" interface="intv_cart">
 			<dataarea name="4800" size="0x4000">
 					<rom name="beauty and the beast.48" size="0x4000" crc="c047d487" sha1="1b6fd19e745e50e8ea679bd5adfb719d1f276bc5" offset="0000" />
@@ -486,7 +486,7 @@
 	<software name="dfactor">
 		<description>Dreadnaught Factor, The</description>
 		<year>1982</year>
-		<publisher>Imagic</publisher>
+		<publisher>Activision</publisher>
 		<part name="cart" interface="intv_cart">
 			<dataarea name="5000" size="0x4000">
 					<rom name="dreadnaught factor.50" size="0x4000" crc="3b99b889" sha1="f8a3224023b0dd27bc4a38b722e2d8016b08ce73" offset="0000" />
@@ -687,6 +687,17 @@
 		</part>
 	</software>
 	
+	<software name="lnc2" cloneof="lnc">
+		<description>Lock 'N' Chase (later version)</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<dataarea name="5000" size="0x4000">
+					<rom name="lock n chase (later version).50" size="0x4000" crc="5c7e9848" sha1="ac889a1d76b40be1a7e7562c8cb8b3f9d00f3728" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="locomotn">
 		<description>Loco-Motion</description>
 		<year>1982</year>
@@ -1302,7 +1313,7 @@
 	</software>
 	
 	<software name="trondd">
-		<description>Tron Deadly Discs</description>
+		<description>TRON Deadly Discs</description>
 		<year>1981</year>
 		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="intv_cart">
@@ -1313,7 +1324,7 @@
 	</software>
 
 	<software name="tronmat">
-		<description>Tron Maze-A-Tron</description>
+		<description>TRON Maze-A-TRON</description>
 		<year>1981</year>
 		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="intv_cart">
@@ -1506,7 +1517,7 @@
 	</software>
 
 	<software name="gftgold">
-		<description>Go for the Gold! (partial dump)</description>
+		<description>Go for the Gold! (unreleased - partial dump)</description>
 		<year>1983</year>
 		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="intv_cart">
