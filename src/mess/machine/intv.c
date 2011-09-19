@@ -535,7 +535,7 @@ static TIMER_CALLBACK(intv_btb_fill)
 	intv_state *state = machine.driver_data<intv_state>();
 	UINT8 column;
 	UINT8 row = state->m_backtab_row;
-	//device_adjust_icount(machine.device("maincpu"), -110);
+	//device_adjust_icount(machine.device("maincpu"), -STIC_ROW_FETCH);
 	for(column=0; column < STIC_BACKTAB_WIDTH; column++)
 	{
 		state->m_backtab_buffer[row][column] = state->m_ram16[column + row * STIC_BACKTAB_WIDTH];
@@ -552,16 +552,18 @@ INTERRUPT_GEN( intv_interrupt )
 	state->m_bus_copy_mode = 1;
 	state->m_backtab_row = 0;
 	UINT8 row;
-	device_adjust_icount(device->machine().device("maincpu"), -1416); // Acount for cycle stealing during stic backtab fetches
-	device->machine().scheduler().timer_set(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(3791), FUNC(intv_interrupt_complete));
+	device_adjust_icount(device->machine().device("maincpu"), -(12*STIC_ROW_BUSRQ+STIC_FRAME_BUSRQ)); // Account for stic cycle stealing
+	device->machine().scheduler().timer_set(device->machine().device<cpu_device>("maincpu")
+		->cycles_to_attotime(STIC_VBLANK_END), FUNC(intv_interrupt_complete));
 	for (row=0; row < STIC_BACKTAB_HEIGHT; row++)
 	{
-		device->machine().scheduler().timer_set(device->machine().device<cpu_device>("maincpu")->cycles_to_attotime(3905+114*state->m_row_delay + 798*row), FUNC(intv_btb_fill));
+		device->machine().scheduler().timer_set(device->machine().device<cpu_device>("maincpu")
+			->cycles_to_attotime(STIC_FIRST_FETCH-STIC_FRAME_BUSRQ+STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*state->m_row_delay + (STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*STIC_CARD_HEIGHT - STIC_ROW_BUSRQ)*row), FUNC(intv_btb_fill));
 	}
 
 	if (state->m_row_delay == 0)
 	{
-		device_adjust_icount(device->machine().device("maincpu"), -110); // extra row fetch occurs if vertical delay == 0
+		device_adjust_icount(device->machine().device("maincpu"), -STIC_ROW_BUSRQ); // extra row fetch occurs if vertical delay == 0
 	}
 
 	intv_stic_screenrefresh(device->machine());

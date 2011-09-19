@@ -35,6 +35,13 @@
 #define STIC_OVERSCAN_TOP_HEIGHT	12
 #define STIC_OVERSCAN_BOTTOM_HEIGHT	12
 
+//Timing constants based on  Joe Zbiciak's documentation
+#define STIC_CYCLES_PER_SCANLINE 57
+#define STIC_ROW_BUSRQ 110 // CPU paused during backtab row buffering
+#define STIC_FRAME_BUSRQ 42 // CPU paused just after end of vblank and before first row fetch (approximate)
+#define STIC_VBLANK_END 3790
+#define STIC_FIRST_FETCH 3933
+
 /*** STIC registers *********************************************************/
 
 // number of STIC registers
