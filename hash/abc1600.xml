@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="abc1600" description="Luxor ABC 1600 disk images">
   <software name="abcenix">
-    <description>ABCenix 5.18</description>
+    <description>ABCenix 5.12</description>
     <year>198?</year>
     <publisher>Luxor</publisher>
     <part name="flop1" interface="floppy_5_25">

@@ -36,6 +36,7 @@
 #define __Z8536__
 
 #include "emu.h"
+#include "cpu/z80/z80daisy.h"
 
 
 
@@ -83,6 +84,7 @@ struct z8536_interface
 // ======================> z8536_device
 
 class z8536_device :  public device_t,
+					  public device_z80daisy_interface,
                       public z8536_interface
 {
 public:
@@ -92,7 +94,7 @@ public:
     DECLARE_READ8_MEMBER( read );
     DECLARE_WRITE8_MEMBER( write );
 
-	DECLARE_WRITE_LINE_MEMBER( intack_w );
+	UINT8 intack_r();
 
 	DECLARE_WRITE_LINE_MEMBER( pb0_w );
 	DECLARE_WRITE_LINE_MEMBER( pb1_w );
@@ -114,10 +116,17 @@ protected:
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	// device_z80daisy_interface overrides
+	virtual int z80daisy_irq_state();
+	virtual int z80daisy_irq_ack();
+	virtual void z80daisy_irq_reti();
+
 private:
 	static const device_timer_id TIMER_1 = 0;
 	static const device_timer_id TIMER_2 = 1;
 	static const device_timer_id TIMER_3 = 2;
+
+	inline void check_interrupt();
 
 	inline UINT8 read_register(offs_t offset);
 	inline UINT8 read_register(offs_t offset, UINT8 mask);
@@ -126,7 +135,7 @@ private:
 
 	inline void count(device_timer_id id);
 	inline void trigger(device_timer_id id);
-	inline void gate(device_timer_id id);
+	inline void gate(device_timer_id id, int state);
 
 	devcb_resolved_write_line		m_out_int_func;
 
@@ -145,9 +154,13 @@ private:
 	UINT8 m_input[3];
 	UINT8 m_output[3];
 	UINT8 m_buffer[3];
+	
+	int m_int;
 
 	// timers
-	emu_timer *m_timer[3];
+	emu_timer *m_timer;
+	UINT16 m_counter[3];
+	bool m_gate[3];
 };
 
 
