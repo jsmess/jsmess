@@ -10,8 +10,8 @@
 
     TODO:
 
-    - MAC
-        - MAGIC bit (disable IFC2?)
+	- keyboard
+		- "Bad command" on first enter after boot
     - floppy
         - internal floppy is really drive 2, but wd17xx.c doesn't like having NULL drives
     - BUS0I/0X/1/2
@@ -423,11 +423,6 @@ offs_t abc1600_state::get_page_address(offs_t offset, UINT8 segd)
 
 offs_t abc1600_state::translate_address(offs_t offset, int *nonx, int *wp)
 {
-	if (offset == 0x4730)
-	{
-		logerror("virtuality %06x\n", 0);
-	}
-
 	// segment
 	offs_t sega = get_segment_address(offset);
 	UINT8 segd = m_segment_ram[sega];
@@ -1461,11 +1456,37 @@ static ABC99_INTERFACE( abc99_intf )
 //**************************************************************************
 
 //-------------------------------------------------
+//  IRQ_CALLBACK( abc1600_int_ack )
+//-------------------------------------------------
+
+static IRQ_CALLBACK( abc1600_int_ack )
+{
+	abc1600_state *state = device->machine().driver_data<abc1600_state>();
+	UINT8 data = 0;
+
+	switch (irqline)
+	{
+	case 5:
+		data = state->m_cio->intack_r();
+		break;
+	}
+	
+	return data;
+}
+
+
+//-------------------------------------------------
 //  MACHINE_START( abc1600 )
 //-------------------------------------------------
 
 void abc1600_state::machine_start()
 {
+	// interrupt callback
+	device_set_irq_callback(m_maincpu, abc1600_int_ack);
+
+	// fill segment RAM with non-zero values or no boot
+	memset(m_segment_ram, 0xcd, 0x400);
+
 	// state saving
 	save_item(NAME(m_ifc2));
 	save_item(NAME(m_task));
