@@ -13,7 +13,7 @@
     All of the address and i/o decoding is done by a pair of XC9536
     mask-programmed custom devices.
 
-    The are some chips used for unclear purposes (GPI, GPO, LCD).
+    There are some chips used for unclear purposes (GPI, GPO, LCD).
 
     This computer has no sound, and no facility for saving or loading programs.
 
