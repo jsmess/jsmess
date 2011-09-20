@@ -14,6 +14,7 @@
     keyboard of C64 computer used
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -30,7 +31,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START(sbc6510_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START( sbc6510_mem, AS_PROGRAM, 8, sbc6510_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -51,7 +52,7 @@ static VIDEO_START( sbc6510 )
 
 static SCREEN_UPDATE( sbc6510 )
 {
-    return 0;
+	return 0;
 }
 
 static const m6502_interface sbc6510_m6510_interface =
@@ -83,26 +84,26 @@ const mos6526_interface sbc6510_ntsc_cia0 =
 };
 
 static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",M6510, XTAL_1MHz)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",M6510, XTAL_1MHz)
 	MCFG_CPU_CONFIG( sbc6510_m6510_interface )
-    MCFG_CPU_PROGRAM_MAP(sbc6510_mem)
+	MCFG_CPU_PROGRAM_MAP(sbc6510_mem)
 
-    MCFG_MACHINE_RESET(sbc6510)
+	MCFG_MACHINE_RESET(sbc6510)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MCFG_SCREEN_UPDATE(sbc6510)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(sbc6510)
 
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
-    MCFG_VIDEO_START(sbc6510)
+	MCFG_VIDEO_START(sbc6510)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -115,7 +116,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( sbc6510 )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "sbc6510.rom", 0xf000, 0x1000, CRC(e13a5e62) SHA1(1e7482e9b98b39d0cc456254fbe8fd0981e9377e))
 	ROM_REGION( 0x2000, "videocpu", ROMREGION_ERASEFF ) // ATMEGA8 at 16MHz
 	ROM_LOAD( "video.bin",   0x0000, 0x2000, CRC(809f31ce) SHA1(4639de5f7b8f6c036d74f217ba85e7e897039094))
@@ -125,6 +126,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 2009, sbc6510,  0,       0,	sbc6510,	sbc6510,	 0,   "Josip Perusanec",   "SBC6510",		GAME_NOT_WORKING)
-
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY          FULLNAME       FLAGS */
+COMP( 2009, sbc6510,  0,      0,       sbc6510,   sbc6510, 0,   "Josip Perusanec", "SBC6510", GAME_NOT_WORKING)

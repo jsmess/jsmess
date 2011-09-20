@@ -4,6 +4,12 @@
 
         08/04/2010 Skeleton driver.
 
+Similar to the VC4000. Created by Philips & 'Elektor' magazine.
+
+Chips
+- 2650A
+- 2636
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -63,12 +69,10 @@ static MACHINE_CONFIG_START( elektor, elektor_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_VIDEO_START(elektor)
 	MCFG_SCREEN_UPDATE(elektor)
-
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(elektor)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -79,6 +83,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1979, elektor,  0,    0,       elektor,   elektor,  0,   "Elektor", "Elektor TV Games Computer", GAME_NOT_WORKING | GAME_NO_SOUND )
-
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY    FULLNAME                     FLAGS */
+COMP( 1979, elektor,  0,      0,       elektor,   elektor,  0,   "Elektor", "Elektor TV Games Computer", GAME_NOT_WORKING | GAME_NO_SOUND )

@@ -94,18 +94,18 @@ INPUT_PORTS_START( mikrolab )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( mikrolab, mikrolab_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
-    MCFG_CPU_PROGRAM_MAP(mikrolab_mem)
-    MCFG_CPU_IO_MAP(mikrolab_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
+	MCFG_CPU_PROGRAM_MAP(mikrolab_mem)
+	MCFG_CPU_IO_MAP(mikrolab_io)
 
-    /* video hardware */
-    MCFG_DEFAULT_LAYOUT(layout_mikrolab)
+	/* video hardware */
+	MCFG_DEFAULT_LAYOUT(layout_mikrolab)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mikrolab )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	/* these dumps are taken from PDF so need check with real device */
 	ROM_LOAD( "rom-1.bin", 0x0000, 0x0200, BAD_DUMP CRC(eed5f23b) SHA1(c82f7a16ce44c4fcbcb333245555feae1fcdf058))
 	ROM_LOAD( "rom-2.bin", 0x0200, 0x0200, BAD_DUMP CRC(726a224f) SHA1(7ed8d2c6dd4fb7836475e207e1972e33a6a91d2f))
@@ -113,6 +113,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( ????, mikrolab,  0,       0,	mikrolab,	mikrolab,	 0,	 "<unknown>",   "Mikrolab KR580IK80",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+/*    YEAR  NAME       PARENT  COMPAT   MACHINE    INPUT     INIT   COMPANY       FULLNAME            FLAGS */
+COMP( ????, mikrolab,  0,      0,       mikrolab,  mikrolab, 0,   "<unknown>", "Mikrolab KR580IK80", GAME_NOT_WORKING | GAME_NO_SOUND)
