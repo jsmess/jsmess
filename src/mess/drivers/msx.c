@@ -215,7 +215,7 @@ Sony HB-G900AP - MSX2 - hbg900ap
 Sony HB-G900P - MSX2 - hbg900p
 Sony HB-T7
 Spectravideo SVI-728 - MSX1 - svi728
-Spectravideo SVI-738 - MSX1 - swi738 / swi738sw
+Spectravideo SVI-738 - MSX1 - svi738 / svi738sw / svi738pl
 Talent DPC-200 - MSX1 - tadpc200
 Talent DPC-200A - MSX1 - tadpc20a
 Talent TPC-310 - MSX2 - tpc310
@@ -2092,6 +2092,24 @@ MSX_LAYOUT_INIT (svi738sw)
 	MSX_LAYOUT_SLOT (3, 2, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 MSX_LAYOUT_END
 
+/* MSX - Spectravideo SVI-738 Poland*/
+
+ROM_START (svi738pl)
+	ROM_REGION (0x10000, "maincpu", 0)
+	ROM_LOAD ("738plbios.rom", 0x0000, 0x8000, CRC(431b8bf5) SHA1(c90077ed84133a947841e07856e71133ba779da6)) // IC51 on board
+	ROM_LOAD ("738disk.rom", 0x8000, 0x4000, CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4))
+	ROM_LOAD ("738232c.rom", 0xc000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
+	ROM_FILL (0xe000, 0x2000, 0xff)
+ROM_END
+
+MSX_LAYOUT_INIT (svi738pl)
+	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
+	MSX_LAYOUT_SLOT (1, 0, 0, 4, RAM, 0x10000, 0x0000)  /* 64KB RAM */
+	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT (3, 0, 1, 1, ROM, 0x4000, 0xc000)
+	MSX_LAYOUT_SLOT (3, 1, 1, 2, DISK_ROM2, 0x4000, 0x8000)
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
 
 /* MSX - Talent DPC-200 / Daewoo DPC-200E */
 
@@ -4289,6 +4307,7 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (svi728)
 	MSX_DRIVER (svi738)
 	MSX_DRIVER (svi738sw)
+	MSX_DRIVER (svi738pl)
 	MSX_DRIVER (tadpc200)
 	MSX_DRIVER (tadpc20a)
 	MSX_DRIVER (hx10)
@@ -4449,6 +4468,7 @@ COMP(1983, hb75p,    msx,	0,	msx_pal,  msx,      msx,     "Sony", "HB-75P" , 0)
 COMP(1985, svi728,   msx,	0,	msx_pal,  msx,      msx,     "Spectravideo", "SVI-728", 0 )
 COMP(1985, svi738,   msx,	0,	msx_pal,  msx,      msx,     "Spectravideo", "SVI-738", 0 )
 COMP(1985, svi738sw, msx,	0,	msx_pal,  msx,      msx,     "Spectravideo", "SVI-738 (Swedish)", 0 )
+COMP(1985, svi738pl, msx,	0,	msx_pal,  msx,      msx,     "Spectravideo", "SVI-738 (Poland)", 0 )
 COMP(1983, tadpc200,  msx,	0,	msx_pal,  msx,      msx,     "Talent", "DPC-200" , 0)
 COMP(1983, tadpc20a,  msx,	0,	msx_pal,  msx,      msx,     "Talent", "DPC-200A" , 0)
 COMP(1984, hx10,     msx,	0,	msx_pal,  msx,      msx,     "Toshiba",	 "HX-10" , 0)
