@@ -11413,7 +11413,7 @@ ROM_START( m4spnwnc )
 	ROM_LOAD( "saw01.bin", 0x0000, 0x010000, CRC(5350e50e) SHA1(0d7ba3280eddb4400545729c55bcfaff7918d553) )
 	ROM_LOAD( "saw02.bin", 0x0000, 0x010000, CRC(daf85100) SHA1(ff89adb0d6530bcf5ff0807f48c6008198948d50) )
 	ROM_LOAD( "saw03.bin", 0x0000, 0x010000, CRC(a891451d) SHA1(2c0a4b6b5c50e234715e103e72986a2bda1d4588) )
-	ROM_REGION( 0x080000, "msm6376", 0 )	
+	ROM_REGION( 0x080000, "msm6376", 0 )
 	ROM_LOAD( "sawsnd1", 0x0000, 0x080000, CRC(7957381f) SHA1(8fd45e5bf67248607f7d98032e08516ded493d74) )
 ROM_END
 
@@ -11603,11 +11603,6 @@ ROM_END
 ROM_START( m4screw )
 	ROM_REGION( 0x020000, "maincpu", 0 )
 	ROM_LOAD( "scre0-8n.p1", 0x0000, 0x020000, CRC(5e07b33a) SHA1(6e8835edb61bd0777751bfdfe66d729554a9d6eb) )
-
-	ROM_REGION( 0x020000, "altrevs", 0 )
-	ROM_LOAD( "scre0-8p.p1", 0x0000, 0x020000, CRC(34a70a77) SHA1(f76de47f6919d380eb0d0eeffc0e5dda72345038) )
-	ROM_LOAD( "screwinaroundv0-7.bin", 0x0000, 0x020000, CRC(78a1e3ca) SHA1(a3d6e76a474a3a5cd74e4b527aa575f21825a7aa) )
-	//ROM_LOAD( "screwing.bin", 0x0000, 0x020000, CRC(5e07b33a) SHA1(6e8835edb61bd0777751bfdfe66d729554a9d6eb) )
 
 	ROM_REGION( 0x180000, "msm6376", 0 )
 	ROM_LOAD( "screwsnd.p1", 0x000000, 0x080000, CRC(6fe4888c) SHA1(b02b7f322d22080123e8b18326910031aa9d39b4) )
@@ -12947,7 +12942,7 @@ ROM_START( m4spnwin )
 	ROM_LOAD( "saw.bin", 0x0000, 0x010000, CRC(f8aac65f) SHA1(2cf8402bffe1638bddc0c2dd145d7be3cc7bd02b) )
 	ROM_REGION( 0x10000, "altrevs", 0 )
 	//Found in a pile of ROMs for Concept's version of the game
-	ROM_LOAD( "spawv2.0", 0x0000, 0x008000, CRC(cc6eb567) SHA1(9293e0e72b1143f762cce80bf3b942e3958ddab7) )	
+	ROM_LOAD( "spawv2.0", 0x0000, 0x008000, CRC(cc6eb567) SHA1(9293e0e72b1143f762cce80bf3b942e3958ddab7) )
 ROM_END
 
 
@@ -14561,7 +14556,7 @@ ROM_START( m4robo )
 	ROM_LOAD( "ror1a302.bin", 0x0000, 0x010000, CRC(65ebbde0) SHA1(327af87323cb302c73cb39a07498befcecb0d34a) )
 	ROM_LOAD( "ror1b302.bin", 0x0000, 0x010000, CRC(35b943df) SHA1(b652a96c273e9c8857c4089c17a9f176c8a0f1ae) )
 	ROM_LOAD( "ror1a304.bin", 0x0000, 0x010000, CRC(1cc05eef) SHA1(949b6093ee340514177291ab1b4074a0ab72c37c) )
-	ROM_LOAD( "ror1b304.bin", 0x0000, 0x010000, CRC(0315a934) SHA1(2b9c07c104b9883d8a1ce0ca5cb918f5e6f80b1f) )	
+	ROM_LOAD( "ror1b304.bin", 0x0000, 0x010000, CRC(0315a934) SHA1(2b9c07c104b9883d8a1ce0ca5cb918f5e6f80b1f) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
 ROM_END
 
@@ -15642,7 +15637,7 @@ GAME(199?, m4xtrm	,0			,mod4oki	,mpu4				,m4default_bigbank	,ROT0,   "Bwb","X-tr
 GAME(199?, m4rhfevc	, 0			,mod4oki		,mpu4				,m4default			,ROT0,"Concept","Red Hot Fever (Concept) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME(199?, m4spnwnc	, 0			,mod4oki		,mpu4				,m4default			,ROT0,"Concept","Spin-A-Win (Concept) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME(199?, m4nudgwc	, 0			,mod4oki		,mpu4				,m4default			,ROT0,"Concept","Nudge-A-Win (Concept) (MPU4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
- 
+
 
 /* Empire
    most of these boot (after a single reset to initialize)

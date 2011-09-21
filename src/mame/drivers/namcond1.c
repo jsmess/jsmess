@@ -43,6 +43,7 @@ PCB Layout
 Notes:
       68000 clock  : 12.288MHz (49.152 / 4)
       H8/3002 clock: 16.384MHz (49.152 / 3)
+      C352 clock:    24.576MHz (49.152 / 2)
       VSync        : 60Hz
 
       POT1    : Master volume
