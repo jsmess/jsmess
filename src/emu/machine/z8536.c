@@ -7,6 +7,21 @@
 
 **********************************************************************/
 
+/*
+	
+	TODO:
+	
+	- interrupts
+		- vector
+		- status affects vector
+		- IE/IP/IUS
+		- acknowledge
+		- daisy chain
+	- port I/O
+	- counters/timers
+
+*/
+
 #include "emu.h"
 #include "z8536.h"
 #include "machine/devhelpr.h"
@@ -306,7 +321,7 @@ inline void z8536_device::check_interrupt()
 
 			if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_CT_VIS)
 			{
-				vector = (vector & 0xf9) | 1;
+				vector = (vector & 0xf9) | 2;
 			}
 		}
 		else if ((m_register[PORT_B_COMMAND_AND_STATUS] & (PCS_IP | PCS_IE)) == (PCS_IP | PCS_IE))
@@ -331,7 +346,7 @@ inline void z8536_device::check_interrupt()
 
 			if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_CT_VIS)
 			{
-				vector = (vector & 0xf9) | 2;
+				vector = (vector & 0xf9) | 4;
 			}
 		}
 		else
@@ -575,8 +590,6 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 		}
 
 		// gate command bit
-		gate(counter, (data & CTCS_GCB) ? 1 : 0);
-		
 		m_register[offset] = (m_register[offset] & ~CTCS_GCB) | (data & CTCS_GCB);
 		
 		// trigger command bit
@@ -685,6 +698,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 		
 	case PORT_A_HANDSHAKE_SPECIFICATION:
 	case PORT_B_HANDSHAKE_SPECIFICATION:
+		// TODO
 		break;
 		
 	case PORT_A_DATA_PATH_POLARITY:
@@ -770,34 +784,91 @@ inline bool z8536_device::counter_enabled(device_timer_id id)
 
 
 //-------------------------------------------------
+//   counter_external_output - 
+//-------------------------------------------------
+
+inline bool z8536_device::counter_external_output(device_timer_id id)
+{
+	return (m_register[COUNTER_TIMER_1_MODE_SPECIFICATION + id] & CTMS_EOE) ? true : false;
+}
+
+
+//-------------------------------------------------
+//   counter_external_count - 
+//-------------------------------------------------
+
+inline bool z8536_device::counter_external_count(device_timer_id id)
+{
+	return (m_register[COUNTER_TIMER_1_MODE_SPECIFICATION + id] & CTMS_ECE) ? true : false;
+}
+
+
+//-------------------------------------------------
+//   counter_external_trigger - 
+//-------------------------------------------------
+
+inline bool z8536_device::counter_external_trigger(device_timer_id id)
+{
+	return (m_register[COUNTER_TIMER_1_MODE_SPECIFICATION + id] & CTMS_ETE) ? true : false;
+}
+
+
+//-------------------------------------------------
+//   counter_external_gate - 
+//-------------------------------------------------
+
+inline bool z8536_device::counter_external_gate(device_timer_id id)
+{
+	return (m_register[COUNTER_TIMER_1_MODE_SPECIFICATION + id] & CTMS_EDE) ? true : false;
+}
+
+
+//-------------------------------------------------
+//   counter_gated - 
+//-------------------------------------------------
+
+inline bool z8536_device::counter_gated(device_timer_id id)
+{
+	return (m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] & CTCS_GCB) ? true : false;
+}
+
+
+//-------------------------------------------------
 //   count - count down
 //-------------------------------------------------
 
 inline void z8536_device::count(device_timer_id id)
 {
-	if (!m_gate[id]) return;
-
+	if (!counter_gated(id)) return;
+	if (!m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] & CTCS_CIP) return;
+	
 	// count down
 	m_counter[id]--;
 
-	if (m_counter == 0)
+	if (m_counter[id] == 0)
 	{
-		// clear count in progress bit
-		m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] &= ~CTCS_CIP;
-
 		if (m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] & CTCS_IP)
 		{
 			// set interrupt error bit
 			m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] |= CTCS_ERR;
 		}
-
-		// set interrupt pending bit
-		m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] |= CTCS_IP;
+		else
+		{
+			// set interrupt pending bit
+			m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] |= CTCS_IP;
+		}
 		
 		if (m_register[COUNTER_TIMER_1_MODE_SPECIFICATION + id] & CTMS_CSC)
 		{
-			// reload time constant
-			trigger(id);
+			// reload counter with time constant
+			m_counter[id] = (m_register[COUNTER_TIMER_1_TIME_CONSTANT_MS_BYTE + (id << 1)] << 8) | m_register[COUNTER_TIMER_1_TIME_CONSTANT_LS_BYTE + (id << 1)];
+		}
+		else
+		{
+			if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Terminal Count\n", machine().describe_context(), tag(), id + 1);
+			
+			// clear count in progress bit
+			m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] &= ~CTCS_CIP;
 		}
 		
 		check_interrupt();
@@ -814,6 +885,8 @@ inline void z8536_device::trigger(device_timer_id id)
 	// ignore triggers during countdown if retrigger is disabled
 	if (!(m_register[COUNTER_TIMER_1_MODE_SPECIFICATION + id] & CTMS_REB) && (m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] & CTCS_CIP)) return;
 	
+	if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Trigger\n", machine().describe_context(), tag(), id + 1);
+	
 	// load counter with time constant
 	m_counter[id] = (m_register[COUNTER_TIMER_1_TIME_CONSTANT_MS_BYTE + (id << 1)] << 8) | m_register[COUNTER_TIMER_1_TIME_CONSTANT_LS_BYTE + (id << 1)];
 
@@ -828,7 +901,7 @@ inline void z8536_device::trigger(device_timer_id id)
 
 inline void z8536_device::gate(device_timer_id id, int state)
 {
-	m_gate[id] = state;
+	// TODO
 }
 
 
@@ -927,17 +1000,17 @@ void z8536_device::device_reset()
 
 void z8536_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (counter_enabled(TIMER_1) &&	!(m_register[COUNTER_TIMER_1_MODE_SPECIFICATION] & CTMS_ECE))
+	if (counter_enabled(TIMER_1) &&	!counter_external_count(TIMER_1))
 	{
 		count(TIMER_1);
 	}
 
-	if (counter_enabled(TIMER_2) &&	!(m_register[COUNTER_TIMER_1_MODE_SPECIFICATION] & CTMS_ECE))
+	if (counter_enabled(TIMER_2) &&	!counter_external_count(TIMER_2))
 	{
 		count(TIMER_2);
 	}
 
-	if (counter_enabled(TIMER_3) &&	!(m_register[COUNTER_TIMER_1_MODE_SPECIFICATION] & CTMS_ECE))
+	if (counter_enabled(TIMER_3) &&	!counter_external_count(TIMER_3))
 	{
 		count(TIMER_3);
 	}

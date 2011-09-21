@@ -1468,10 +1468,10 @@ static IRQ_CALLBACK( abc1600_int_ack )
 {
 	abc1600_state *state = device->machine().driver_data<abc1600_state>();
 	UINT8 data = 0;
-
+	
 	switch (irqline)
 	{
-	case 5:
+	case M68K_IRQ_2:
 		data = state->m_cio->intack_r();
 		break;
 	}

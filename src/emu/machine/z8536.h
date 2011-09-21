@@ -144,6 +144,11 @@ private:
 	inline void write_register(offs_t offset, UINT8 data, UINT8 mask);
 
 	inline bool counter_enabled(device_timer_id id);
+	inline bool counter_external_output(device_timer_id id);
+	inline bool counter_external_count(device_timer_id id);
+	inline bool counter_external_trigger(device_timer_id id);
+	inline bool counter_external_gate(device_timer_id id);
+	inline bool counter_gated(device_timer_id id);
 	inline void count(device_timer_id id);
 	inline void trigger(device_timer_id id);
 	inline void gate(device_timer_id id, int state);
@@ -176,7 +181,6 @@ private:
 	// timers
 	emu_timer *m_timer;
 	UINT16 m_counter[3];
-	bool m_gate[3];
 };
 
 
