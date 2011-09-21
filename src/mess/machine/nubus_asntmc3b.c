@@ -180,14 +180,14 @@ WRITE_LINE_MEMBER( nubus_asntm3b_device::dp_irq_w )
     }
 }
 
-READ8_MEMBER( nubus_asntm3b_device::dp_mem_read ) 
+READ8_MEMBER( nubus_asntm3b_device::dp_mem_read )
 {
-	if(offset < 32) 
+	if(offset < 32)
     {
         return m_prom[offset>>1];
     }
 
-    if((offset < (16*1024)) || (offset >= ((16+64)*1024))) 
+    if((offset < (16*1024)) || (offset >= ((16+64)*1024)))
     {
 		logerror("asntmc3b: invalid memory read %04X\n", offset);
 		return 0xff;
@@ -195,7 +195,7 @@ READ8_MEMBER( nubus_asntm3b_device::dp_mem_read )
 	return m_ram[offset - (16*1024)];
 }
 
-WRITE8_MEMBER( nubus_asntm3b_device::dp_mem_write ) 
+WRITE8_MEMBER( nubus_asntm3b_device::dp_mem_write )
 {
 	if((offset < (16*1024)) || (offset >= ((16+64)*1024)))
     {

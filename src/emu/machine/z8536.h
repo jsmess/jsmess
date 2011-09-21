@@ -154,7 +154,7 @@ private:
 	UINT8 m_input[3];
 	UINT8 m_output[3];
 	UINT8 m_buffer[3];
-	
+
 	int m_int;
 
 	// timers

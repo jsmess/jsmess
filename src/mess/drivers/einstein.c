@@ -460,16 +460,16 @@ static MACHINE_RESET( einstein )
 	einstein->m_ctc_trigger = 0;
 
 	/* configure floppy drives */
-/*	floppy_type_t type_80 = FLOPPY_STANDARD_5_25_DSHD;
-	floppy_type_t type_40 = FLOPPY_STANDARD_5_25_SSDD_40;
-	floppy = machine.device("floppy0");
-	floppy_drive_set_geometry(floppy, config & 0x01 ? type_80 : type_40);
-	floppy = machine.device("floppy1");
-	floppy_drive_set_geometry(floppy, config & 0x02 ? type_80 : type_40);
-	floppy = machine.device("floppy2");
-	floppy_drive_set_geometry(floppy, config & 0x04 ? type_80 : type_40);
-	floppy = machine.device("floppy3");
-	floppy_drive_set_geometry(floppy, config & 0x08 ? type_80 : type_40);*/
+/*  floppy_type_t type_80 = FLOPPY_STANDARD_5_25_DSHD;
+    floppy_type_t type_40 = FLOPPY_STANDARD_5_25_SSDD_40;
+    floppy = machine.device("floppy0");
+    floppy_drive_set_geometry(floppy, config & 0x01 ? type_80 : type_40);
+    floppy = machine.device("floppy1");
+    floppy_drive_set_geometry(floppy, config & 0x02 ? type_80 : type_40);
+    floppy = machine.device("floppy2");
+    floppy_drive_set_geometry(floppy, config & 0x04 ? type_80 : type_40);
+    floppy = machine.device("floppy3");
+    floppy_drive_set_geometry(floppy, config & 0x08 ? type_80 : type_40);*/
 }
 
 static MACHINE_RESET( einstein2 )

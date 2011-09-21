@@ -193,7 +193,7 @@ READ16_MEMBER(dp8390_device::dp8390_r) {
 			return data;
 		}
 	}
- 
+
 	switch((offset & 0x0f)|(m_regs.cr & 0xc0)) {
 	case 0x00:
 	case 0x40:
@@ -362,7 +362,7 @@ WRITE16_MEMBER(dp8390_device::dp8390_w) {
 		}
 		return;
 	}
-	
+
 	data &= 0xff;
 	switch((offset & 0x0f)|(m_regs.cr & 0xc0)) {
 	case 0x00:

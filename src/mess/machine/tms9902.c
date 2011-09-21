@@ -66,7 +66,7 @@ struct _tms9902_t
 	bool LRDR;			// Load receive data register
 	bool LXDR;			// Load transmit data register
 	bool TSTMD;			// Test mode
-	
+
 	/* output pin */
 	bool RTSON;			// RTS-on request
 
@@ -75,10 +75,10 @@ struct _tms9902_t
 	bool BRKout;		// indicates the current BRK state
 
 	UINT8 XBR;			// transmit buffer register
-	UINT8 XSR;			// transmit shift register 
+	UINT8 XSR;			// transmit shift register
 
 	/* receiver registers */
-	UINT8 RBR;			// Receive buffer register 
+	UINT8 RBR;			// Receive buffer register
 
 	/* Interrupt enable flags */
 	bool DSCENB;		// Data set change interrupt enable
@@ -200,14 +200,14 @@ void tms9902_rcv_cts(device_t *device, line_state state)
 		tms9902->DSCH = true;
 		field_interrupts(device);
 
-		// If CTS becomes asserted and we have been sending 
+		// If CTS becomes asserted and we have been sending
 		if (state==ASSERT_LINE && tms9902->RTSout)
 		{
 			// and if the byte buffer is empty
 			if (tms9902->XBRE)
 			{
 				// and we want to have a BRK, send it
-				if (tms9902->BRKON) 
+				if (tms9902->BRKON)
 					send_break(device, true);
 			}
 			else
@@ -660,13 +660,13 @@ static void reset_uart(device_t *device)
 	tms9902->RTSout = true;		// Note we are doing this to ensure the state is sent to the interface
 	set_rts(device, CLEAR_LINE);
 	tms9902->RTSout = false;	// what we actually want
-	
+
 	/* set all register load flags to 1 */
 	tms9902->LDCTRL = true;
 	tms9902->LDIR = true;
 	tms9902->LRDR = true;
 	tms9902->LXDR = true;
-	
+
 	/* clear break condition */
 	tms9902->BRKON = false;
 	tms9902->BRKout = false;
@@ -691,7 +691,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 		UINT16 mask = (1 << offset);
 
 		if (tms9902->LDCTRL)
-		{	// Control Register mode. Values written to bits 0-7 are copied 
+		{	// Control Register mode. Values written to bits 0-7 are copied
 			// into the control register.
 			switch (offset)
 			{
@@ -733,7 +733,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 		}
 		else if (tms9902->LDIR)
 		{	// Interval Register mode. Values written to bits 0-7 are copied
-			// into the interval register. 
+			// into the interval register.
 			if (offset <= 7)
 			{
 				set_bits8(&tms9902->TMR, mask, (data!=0));
@@ -746,8 +746,8 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 				}
 			}
 		}
-		else if (tms9902->LRDR || tms9902->LXDR) 
-		{	
+		else if (tms9902->LRDR || tms9902->LXDR)
+		{
 			if (tms9902->LRDR)
 			{	// Receive rate register mode. Values written to bits 0-10 are copied
 				// into the receive rate register.
@@ -755,7 +755,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 				{
 					set_bits16(&tms9902->RDR, mask, (data!=0));
 				}
-				else 
+				else
 				{
 					// When bit 10 is written the receive register mode is automatically terminated.
 					tms9902->RDV8 = (data!=0);
@@ -792,7 +792,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 					// Spec: When the transmitter is active, the contents of the Transmit
 					// Buffer Register are transferred to the Transmit Shift Register
 					// each time the previous character has been completely transmitted
-					// We need to check XSRE=true as well, as the implementation 
+					// We need to check XSRE=true as well, as the implementation
 					// makes use of a timed transmission, during which XSRE=false
 					if (tms9902->XSRE && tms9902->RTSout && tms9902->CTSin && !tms9902->BRKout)
 					{
@@ -813,10 +813,10 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 			break;
 		case 13:
 			tms9902->LDIR = (data!=0);
-			// Spec: Each time LDIR is reset the contents of the Interval 
+			// Spec: Each time LDIR is reset the contents of the Interval
 			// Register are loaded into the Interval Timer, thus restarting
 			// the timer.
-			if (data==0) 
+			if (data==0)
 				reload_interval_timer(device);
 			break;
 		case 14:
@@ -869,7 +869,7 @@ WRITE8_DEVICE_HANDLER( tms9902_cru_w )
 			{
 				send_break(device, (data!=0));
 			}
-			return;	
+			return;
 		case 18:
 			// Receiver Interrupt Enable
 			// According to spec, (re)setting this flag clears the RBRL flag

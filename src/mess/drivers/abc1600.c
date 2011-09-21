@@ -10,8 +10,8 @@
 
     TODO:
 
-	- keyboard
-		- "Bad command" on first enter after boot
+    - keyboard
+        - "Bad command" on first enter after boot
     - floppy
         - internal floppy is really drive 2, but wd17xx.c doesn't like having NULL drives
     - BUS0I/0X/1/2
@@ -389,7 +389,7 @@ int abc1600_state::get_current_task(offs_t offset)
 	int t1 = !(BIT(m_task, 1) | force_task0);
 	int t2 = !(BIT(m_task, 2) | force_task0);
 	int t3 = !(BIT(m_task, 3) | force_task0);
-	
+
 	return (t3 << 3) | (t2 << 2) | (t1 << 1) | t0;
 }
 
@@ -402,7 +402,7 @@ offs_t abc1600_state::get_segment_address(offs_t offset)
 {
 	int sega19 = !(!(A8 | m_ifc2) | !A19);
 	int task = get_current_task(offset);
-	
+
 	return (task << 5) | (sega19 << 4) | ((offset >> 15) & 0x0f);
 }
 
@@ -426,13 +426,13 @@ offs_t abc1600_state::translate_address(offs_t offset, int *nonx, int *wp)
 	// segment
 	offs_t sega = get_segment_address(offset);
 	UINT8 segd = m_segment_ram[sega];
-	
+
 	// page
 	offs_t pga = get_page_address(offset, segd);
 	UINT16 page_data = m_page_ram[pga];
-	
+
 	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
-	
+
 	if (PAGE_NONX)
 	{
 		logerror("Bus error %06x : %06x\n", offset, virtual_offset);
@@ -772,7 +772,7 @@ READ8_MEMBER( abc1600_state::page_r )
 	// segment
 	offs_t sega = get_segment_address(offset);
 	UINT8 segd = m_segment_ram[sega];
-	
+
 	// page
 	offs_t pga = get_page_address(offset, segd);
 	UINT16 data = m_page_ram[pga];
@@ -814,7 +814,7 @@ WRITE8_MEMBER( abc1600_state::page_w )
 	// segment
 	offs_t sega = get_segment_address(offset);
 	UINT8 segd = m_segment_ram[sega];
-	
+
 	// page
 	offs_t pga = get_page_address(offset, segd);
 
@@ -1470,7 +1470,7 @@ static IRQ_CALLBACK( abc1600_int_ack )
 		data = state->m_cio->intack_r();
 		break;
 	}
-	
+
 	return data;
 }
 

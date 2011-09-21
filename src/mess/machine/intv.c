@@ -478,7 +478,7 @@ DEVICE_IMAGE_LOAD( intv_cart )
 	else
 	{
 		UINT16 offset[] = {0x4800, 0x5000, 0x6000, 0x7000, 0x9000, 0xa000, 0xc000, 0xd000, 0xf000};
-		const char* region_name[] = {"4800", "5000", "6000", "7000", "9000", "A000", "C000", "D000", "F000"};  
+		const char* region_name[] = {"4800", "5000", "6000", "7000", "9000", "A000", "C000", "D000", "F000"};
 		UINT8 *memory = image.device().machine().region("maincpu")->base();
 		UINT32 size=0;
 		UINT16 address;

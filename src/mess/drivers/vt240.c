@@ -4,16 +4,16 @@
 
         31/03/2010 Skeleton driver.
 
-	TODO:
-	- understand how PCG works, it should be a funky i/o $30 to uPD7220 DMA
-	  transfer;
-	- hook-up T11, rst65 irq + $20 reads are latches for that
+    TODO:
+    - understand how PCG works, it should be a funky i/o $30 to uPD7220 DMA
+      transfer;
+    - hook-up T11, rst65 irq + $20 reads are latches for that
 
-	ROM POST notes:
-	0x0139: ROM test
-	0x015f: RAM test
-	0x0071: RAM fill to 0x00
-	0x1c8f: UPD7220
+    ROM POST notes:
+    0x0139: ROM test
+    0x015f: RAM test
+    0x0071: RAM fill to 0x00
+    0x1c8f: UPD7220
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START(vt240_io, AS_IO, 8, vt240_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_READ(test_r)
-	//AM_RANGE(0x30, 0x30) AM_READWRITE(pcg_r,pcg_w) //	0x30 PCG
+	//AM_RANGE(0x30, 0x30) AM_READWRITE(pcg_r,pcg_w) // 0x30 PCG
 ADDRESS_MAP_END
 
 
@@ -193,8 +193,8 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-//	MCFG_VIDEO_START(vt240)
-//	MCFG_SCREEN_UPDATE(vt240)
+//  MCFG_VIDEO_START(vt240)
+//  MCFG_SCREEN_UPDATE(vt240)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(vt240)

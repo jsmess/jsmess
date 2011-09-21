@@ -3,7 +3,7 @@
   nubus.c - NuBus bus and card emulation
 
   by R. Belmont, based heavily on Miodrag Milanovic's ISA8/16 implementation
- 
+
 ***************************************************************************/
 
 #include "emu.h"

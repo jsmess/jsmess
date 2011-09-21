@@ -831,7 +831,7 @@ static SLOT_INTERFACE_START(mac_nubus_cards)
 	SLOT_INTERFACE("specpdq", NUBUS_SPECPDQ)	/* SuperMac Spectrum PDQ */
 	SLOT_INTERFACE("m2hires", NUBUS_M2HIRES)	/* Apple Macintosh II Hi-Resolution Card */
 	SLOT_INTERFACE("spec8s3", NUBUS_SPEC8S3)	/* SuperMac Spectrum/8 Series III */
-//	SLOT_INTERFACE("thundergx", NUBUS_THUNDERGX)		/* Radius Thunder GX (not yet) */
+//  SLOT_INTERFACE("thundergx", NUBUS_THUNDERGX)        /* Radius Thunder GX (not yet) */
 	SLOT_INTERFACE("radiustpd", NUBUS_RADIUSTPD)		/* Radius Two Page Display */
 	SLOT_INTERFACE("asmc3b", NUBUS_ASNTMC3B)	/* Asante MC3B Ethernet card */
 SLOT_INTERFACE_END

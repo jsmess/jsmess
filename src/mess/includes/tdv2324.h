@@ -67,17 +67,17 @@ public:
 	required_device<device_t> m_pic;
 	required_device<device_t> m_pit0;
 	required_device<device_t> m_pit1;
-	
+
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( tdv2324_main_io_30 );
 	DECLARE_READ8_MEMBER( tdv2324_main_io_e6 );
 	DECLARE_WRITE8_MEMBER( tdv2324_main_io_e2 );
-	
+
 	UINT8 m_sub_status;
 	UINT8 m_sub_data;
-	
+
 	// video state
 	UINT8 *m_video_ram;
 };

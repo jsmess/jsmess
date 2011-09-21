@@ -1,11 +1,11 @@
 /***************************************************************************
 
   Radius Two Page Display (1280x960?)
- 
+
   Fsx8000a = DAC data
   Fsx8000e = DAC control
   Fsx00000 = VRAM (offset 0x200, stride 0x1b0)
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -15,7 +15,7 @@
 #define RADIUSTPD_ROM_REGION  "tpd_rom"
 
 #define VRAM_SIZE	(0x40000)	// 256k.  1152x880 1 bit per pixel fits nicely.
-						  
+
 static SCREEN_UPDATE( radiustpd );
 
 MACHINE_CONFIG_FRAGMENT( radiustpd )
@@ -183,12 +183,12 @@ static SCREEN_UPDATE( radiustpd )
 
 WRITE32_MEMBER( nubus_radiustpd_device::radiustpd_w )
 {
-//	printf("TPD: write %08x to %x, mask %08x\n", data, offset, mem_mask);
+//  printf("TPD: write %08x to %x, mask %08x\n", data, offset, mem_mask);
 }
 
 READ32_MEMBER( nubus_radiustpd_device::radiustpd_r )
 {
-//	printf("TPD: read @ %x, mask %08x\n", offset, mem_mask);
+//  printf("TPD: read @ %x, mask %08x\n", offset, mem_mask);
 
 	if (offset == 0)
 	{
