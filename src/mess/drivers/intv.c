@@ -487,7 +487,7 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_CARTSLOT_LOAD(intv_cart)
 	MCFG_CARTSLOT_INTERFACE("intv_cart")
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","intv")	
+	MCFG_SOFTWARE_LIST_ADD("cart_list","intv")
 MACHINE_CONFIG_END
 
 

@@ -116,7 +116,7 @@ void wd1772_t::command_end()
 	status &= ~S_BUSY;
 	intrq = true;
 	motor_timeout = 0;
-	//	fprintf(stderr, "%s: command status %02x\n", ttsn().cstr(), status);
+	//  fprintf(stderr, "%s: command status %02x\n", ttsn().cstr(), status);
 	if(!intrq_cb.isnull())
 		intrq_cb(intrq);
 }
@@ -188,18 +188,18 @@ void wd1772_t::seek_continue()
 				done = true;
 				break;
 			}
-				
+
 			if(done || counter == 255) {
 				switch(main_state) {
 				case RESTORE:
 					track = 0;
 					break;
-				case STEP: 
+				case STEP:
 					if(command & 0x10)
 						track += last_dir ? -1 : 1;
 					break;
 				}
-				
+
 				if(command & 0x04) {
 					sub_state = SEEK_WAIT_STABILIZATION_TIME;
 					delay_cycles(t_gen, 120000);
@@ -252,7 +252,7 @@ void wd1772_t::seek_continue()
 			logerror("%s: seek unknown sub-state %d\n", ttsn().cstr(), sub_state);
 			return;
 		}
-	}			
+	}
 }
 
 void wd1772_t::read_sector_start()
@@ -268,7 +268,7 @@ void wd1772_t::read_sector_start()
 void wd1772_t::read_sector_continue()
 {
 	static int size_codes[4] = { 128, 256, 512, 1024 };
-	
+
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
@@ -382,9 +382,9 @@ void wd1772_t::do_generic()
 	case SEEK_WAIT_STABILIZATION_TIME:
 		sub_state = SEEK_WAIT_STABILIZATION_TIME_DONE;
 		break;
-		
+
 	default:
-		if(cur_live.tm.is_never())				
+		if(cur_live.tm.is_never())
 			logerror("%s: do_generic on unknown sub-state %d\n", ttsn().cstr(), sub_state);
 		break;
 	}
@@ -392,7 +392,7 @@ void wd1772_t::do_generic()
 
 void wd1772_t::do_cmd_w()
 {
-	//	fprintf(stderr, "%s: command %02x\n", ttsn().cstr(), cmd_buffer);
+	//  fprintf(stderr, "%s: command %02x\n", ttsn().cstr(), cmd_buffer);
 
 	// Only available command when busy is interrupt
 	if(main_state != IDLE && (cmd_buffer & 0xf0) != 0xd0) {
@@ -665,11 +665,11 @@ void wd1772_t::live_sync()
 {
 	if(!cur_live.tm.is_never()) {
 		if(cur_live.tm > machine().time()) {
-			//			fprintf(stderr, "%s: Rolling back and replaying (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
+			//          fprintf(stderr, "%s: Rolling back and replaying (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
 			rollback();
 			live_run(machine().time());
 		} else {
-			//			fprintf(stderr, "%s: Committing (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
+			//          fprintf(stderr, "%s: Committing (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
 			if(cur_live.next_state != -1)
 				cur_live.state = cur_live.next_state;
 			if(cur_live.state == IDLE)
@@ -714,9 +714,9 @@ void wd1772_t::live_run(attotime limit)
 			limit = machine().time() + attotime::from_msec(1);
 			t_gen->adjust(attotime::from_msec(1));
 		}
-	}			
-	
-	//	fprintf(stderr, "%s: live_run(%s)\n", ttsn().cstr(), tts(limit).cstr());
+	}
+
+	//  fprintf(stderr, "%s: live_run(%s)\n", ttsn().cstr(), tts(limit).cstr());
 
 	for(;;) {
 		switch(cur_live.state) {
@@ -831,7 +831,7 @@ void wd1772_t::live_run(attotime limit)
 					return;
 				}
 			}
-				
+
 			break;
 		}
 
@@ -897,9 +897,9 @@ int wd1772_t::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, att
 #endif
 
 	for(;;) {
-		//		fprintf(stderr, "slot=%2d, counter=%03x\n", slot, counter);
+		//      fprintf(stderr, "slot=%2d, counter=%03x\n", slot, counter);
 		attotime etime = ctime+delays[slot];
-		//		fprintf(stderr, "etime=%s\n", tts(etime).cstr());
+		//      fprintf(stderr, "etime=%s\n", tts(etime).cstr());
 		if(etime > limit)
 			return -1;
 		if(transition_time == 0xffff && !when.is_never() && etime >= when)
@@ -925,7 +925,7 @@ int wd1772_t::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, att
 		if(counter & 0x800)
 			break;
 	}
-	//	fprintf(stderr, "first transition, time=%03x, inc=%3d\n", transition_time, increment);
+	//  fprintf(stderr, "first transition, time=%03x, inc=%3d\n", transition_time, increment);
 	int bit = transition_time != 0xffff;
 
 	if(transition_time != 0xffff) {

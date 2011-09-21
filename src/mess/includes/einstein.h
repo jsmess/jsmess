@@ -66,7 +66,7 @@ public:
 	UINT8 *m_crtc_ram;
 	UINT8	m_de;
 
-	static const floppy_format_type floppy_formats[];	
+	static const floppy_format_type floppy_formats[];
 };
 
 

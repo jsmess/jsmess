@@ -5,55 +5,55 @@
     Skeleton driver
     By Curt Coder with some work by Lord Nightmare
 
-	Status:
-	* Main cpu is currently hacked to read i/o port 0xE6 as 0x10;
-	  it then seems to copy code to a ram area then jumps there
-	  (there may be some sort of overlay/banking mess going on to allow full 64kb of ram)
-	  The cpu gets stuck reading i/o port 0x30 in a loop.
-	  - interrupts and sio lines are not hooked up
-	* Sub cpu does a bunch of unknown i/o accesses and also tries to
-	  sequentially read chunk of address space which it never writes to;
-	  this seems likely to be a shared ram or i/o mapped area especially since it seems
-	  to write to i/o port 0x60 before trying to read there.
-	  - interrupts and sio lines are not hooked up
-	* Fdc cpu starts, does a rom checksum (which passes) and tests a ram area
-	  
-	
-	Board Notes:
-	Mainboard (pictures P1010036 & P1010038)
-	*28-pin: D27128, L4267096S,...(eprom, occluded by sticker: "965268 1", character set)
-	*40-pin: TMS9937NL, DB 336, ENGLAND (VTAC Video Chip)
-	*40-pin: P8085AH-2, F4265030, C INTEL '80 (cpus, there are 2 of these)
-	*28-pin: JAPAN 8442, 00009SS0, HN4827128G-25 (eprom, sticker: "962107")
-	*22-pin: ER3400, GI 8401HHA (EAROM)
-	*  -pin: MOSTEK C 8424, MK3887N-4 (Z80 Serial I/O Controller)
-	*20-pin: (pal, sticker: "961420 0")
-	*24-pin: D2716, L3263271, INTEL '77 (eprom, sticker: "962058 1")
-	*3 tiny 16-pins which look socketed (proms)
-	*+B8412, DMPAL10L8NC
-	*PAL... (can't remove the sticker to read the rest since there's electrical components soldered above the chip)
-	*Am27S21DC, 835IDmm
-	*AM27S13DC, 8402DM (x2)
-	*TBP28L22N, GERMANY 406 A (x2)
-	*PAL16L6CNS, 8406
+    Status:
+    * Main cpu is currently hacked to read i/o port 0xE6 as 0x10;
+      it then seems to copy code to a ram area then jumps there
+      (there may be some sort of overlay/banking mess going on to allow full 64kb of ram)
+      The cpu gets stuck reading i/o port 0x30 in a loop.
+      - interrupts and sio lines are not hooked up
+    * Sub cpu does a bunch of unknown i/o accesses and also tries to
+      sequentially read chunk of address space which it never writes to;
+      this seems likely to be a shared ram or i/o mapped area especially since it seems
+      to write to i/o port 0x60 before trying to read there.
+      - interrupts and sio lines are not hooked up
+    * Fdc cpu starts, does a rom checksum (which passes) and tests a ram area
 
-	FD/HD Interface Board P/N 962013 Rev14 (pictures P1010031 & P1010033)
-	*28-pin: TMS, 2764JL-25, GHP8414 (@U15, labeled "962014 // -4-", fdc cpu rom)
-	*40-pin: MC68B02P, R1H 8340 (fdc cpu)
-	*40-pin: WDC '79, FD1797PL-02, 8342 16 (fdc chip)
-	*14-pin: MC4024P, MG 8341 (dual voltage controlled multivibrator)
-	*24-pin: TMM2016AP-12 (@U14 and @U80, 120ns 2kx8 SRAM)
 
-	Keyboard:
-	*40-pin: NEC D8035LC (mcs-48 cpu)
-	*24-pin: NEC D2716 (eprom)
+    Board Notes:
+    Mainboard (pictures P1010036 & P1010038)
+    *28-pin: D27128, L4267096S,...(eprom, occluded by sticker: "965268 1", character set)
+    *40-pin: TMS9937NL, DB 336, ENGLAND (VTAC Video Chip)
+    *40-pin: P8085AH-2, F4265030, C INTEL '80 (cpus, there are 2 of these)
+    *28-pin: JAPAN 8442, 00009SS0, HN4827128G-25 (eprom, sticker: "962107")
+    *22-pin: ER3400, GI 8401HHA (EAROM)
+    *  -pin: MOSTEK C 8424, MK3887N-4 (Z80 Serial I/O Controller)
+    *20-pin: (pal, sticker: "961420 0")
+    *24-pin: D2716, L3263271, INTEL '77 (eprom, sticker: "962058 1")
+    *3 tiny 16-pins which look socketed (proms)
+    *+B8412, DMPAL10L8NC
+    *PAL... (can't remove the sticker to read the rest since there's electrical components soldered above the chip)
+    *Am27S21DC, 835IDmm
+    *AM27S13DC, 8402DM (x2)
+    *TBP28L22N, GERMANY 406 A (x2)
+    *PAL16L6CNS, 8406
 
-	Main CPU:
-	- PIT, SIO
-	
-	Sub CPU:
-	- PIC, PIT, VTAC
-	
+    FD/HD Interface Board P/N 962013 Rev14 (pictures P1010031 & P1010033)
+    *28-pin: TMS, 2764JL-25, GHP8414 (@U15, labeled "962014 // -4-", fdc cpu rom)
+    *40-pin: MC68B02P, R1H 8340 (fdc cpu)
+    *40-pin: WDC '79, FD1797PL-02, 8342 16 (fdc chip)
+    *14-pin: MC4024P, MG 8341 (dual voltage controlled multivibrator)
+    *24-pin: TMM2016AP-12 (@U14 and @U80, 120ns 2kx8 SRAM)
+
+    Keyboard:
+    *40-pin: NEC D8035LC (mcs-48 cpu)
+    *24-pin: NEC D2716 (eprom)
+
+    Main CPU:
+    - PIT, SIO
+
+    Sub CPU:
+    - PIC, PIT, VTAC
+
 */
 /*
 'subcpu' (17CD): unmapped i/o memory write to 23 = 36 & FF
@@ -129,9 +129,9 @@ WRITE8_MEMBER( tdv2324_state::tdv2324_main_io_e2 )
 static ADDRESS_MAP_START( tdv2324_mem, AS_PROGRAM, 8, tdv2324_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION(P8085AH_0_TAG, 0)
 	/* when copying code to 4000 area it runs right off the end of rom;
-	 * I'm not sure if its supposed to mirror or read as open bus */
-//	AM_RANGE(0x4000, 0x5fff) AM_RAM // 0x4000 has the boot code copied to it, 5fff and down are the stack
-//	AM_RANGE(0x6000, 0x6fff) AM_RAM // used by the relocated boot code; shared?
+     * I'm not sure if its supposed to mirror or read as open bus */
+//  AM_RANGE(0x4000, 0x5fff) AM_RAM // 0x4000 has the boot code copied to it, 5fff and down are the stack
+//  AM_RANGE(0x6000, 0x6fff) AM_RAM // used by the relocated boot code; shared?
 	AM_RANGE(0x0800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -146,11 +146,11 @@ static ADDRESS_MAP_START( tdv2324_io, AS_IO, 8, tdv2324_state )
 	/* e0, e2, e8, ea are written to */
 	/* 30, e6 and e2 are readable */
 	AM_RANGE(0x30, 0x30) AM_READ(tdv2324_main_io_30)
-//	AM_RANGE(0xe2, 0xe2) AM_WRITE(tdv2324_main_io_e2) console output
+//  AM_RANGE(0xe2, 0xe2) AM_WRITE(tdv2324_main_io_e2) console output
 	AM_RANGE(0xe6, 0xe6) AM_READ(tdv2324_main_io_e6)
-//	AM_RANGE(0x, 0x) AM_DEVREADWRITE_LEGACY(P8253_5_0_TAG, pit8253_r, pit8253_w)
-//	AM_RANGE(0x, 0x) AM_DEVREADWRITE_LEGACY(MK3887N4_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
-//	AM_RANGE(0x, 0x) AM_DEVREADWRITE_LEGACY(P8259A_TAG, pic8259_r, pic8259_w)
+//  AM_RANGE(0x, 0x) AM_DEVREADWRITE_LEGACY(P8253_5_0_TAG, pit8253_r, pit8253_w)
+//  AM_RANGE(0x, 0x) AM_DEVREADWRITE_LEGACY(MK3887N4_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
+//  AM_RANGE(0x, 0x) AM_DEVREADWRITE_LEGACY(P8259A_TAG, pic8259_r, pic8259_w)
 ADDRESS_MAP_END
 
 
@@ -424,7 +424,7 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
-	
+
 	MCFG_TMS9927_ADD(TMS9937NL_TAG, XTAL_25_39836MHz, vtac_intf)
 
 	// devices

@@ -102,7 +102,7 @@ I/O Map:
 0015 - unknown
        0x1c written during boot sequence
 
-0012-0015 - banking? 
+0012-0015 - banking?
 T200:
 Time: 15 - 02; call ADxxx
 Database: 15 - 02; call B3xxx

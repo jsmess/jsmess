@@ -273,7 +273,7 @@ WRITE8_MEMBER( bml3_state::bml3_io_w )
 {
 	if(offset == 0x19)
 		m_io_latch = data; //???
-//	else
+//  else
 	if(offset == 0xc4)
 		{/* system latch, writes 0x53 -> 0x51 when a tape is loaded */}
 	else

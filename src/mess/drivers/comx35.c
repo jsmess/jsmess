@@ -465,7 +465,7 @@ void comx35_state::machine_start()
 	// clear the RAM since DOS card will go crazy if RAM is not all zeroes
 	UINT8 *ram = ram_get_ptr(m_ram);
 	memset(ram, 0, 0x8000);
-	
+
 	// register for state saving
 	save_item(NAME(m_clear));
 	save_item(NAME(m_q));

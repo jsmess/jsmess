@@ -566,7 +566,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
 	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, "ne2000", NULL)
-	
+
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
 	/* internal ram */
@@ -912,7 +912,7 @@ ROM_START( atvga )
 	ROMX_LOAD( "2hlm003l.bin",   0xf0000, 0x8000, CRC(317cbcbf) SHA1(1adad6280d8b07c2921fc5fc13ecaa10e6bfebdc),ROM_SKIP(1) | ROM_BIOS(12) )
 	ROM_SYSTEM_BIOS(12, "at", "PC 286") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 03-11-1987)*/
     ROMX_LOAD("at110387.1", 0xf0001, 0x8000, CRC(679296a7) SHA1(ae891314cac614dfece686d8e1d74f4763cf40e3),ROM_SKIP(1) | ROM_BIOS(13) )
-    ROMX_LOAD("at110387.0", 0xf0000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(13) )	
+    ROMX_LOAD("at110387.0", 0xf0000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(13) )
 ROM_END
 
 ROM_START( xb42639 )

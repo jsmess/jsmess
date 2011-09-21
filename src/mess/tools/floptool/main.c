@@ -31,7 +31,7 @@ static floppy_format_type floppy_formats[] = {
 
 	FLOPPY_ST_FORMAT,
 	FLOPPY_MSA_FORMAT,
-	
+
 	FLOPPY_DSK_FORMAT
 };
 
@@ -106,7 +106,7 @@ static int identify(int argc, char *argv[])
 		return 1;
 	}
 
-	for(int i=2; i<argc; i++) {	
+	for(int i=2; i<argc; i++) {
 		char msg[4096];
 		sprintf(msg, "Error opening %s for reading", argv[i]);
 		FILE *f = fopen(argv[i], "rb");
@@ -163,7 +163,7 @@ static int convert(int argc, char *argv[])
 		if(!source_format) {
 			fprintf(stderr, "Error: Format '%s' unknown\n", argv[2]);
 			return 1;
-		}		
+		}
 	}
 
 	dest_format = find_format_by_name(argv[3]);
