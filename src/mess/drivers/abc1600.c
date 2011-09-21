@@ -17,9 +17,14 @@
     - BUS0I/0X/1/2
     - short/long reset (RSTBUT)
     - SCC interrupt
-    - CIO (interrupt controller)
-        - RTC
-        - NVRAM
+    - CIO
+		- vectored interrupts with status
+		- port A bit mode, OR-PEVM, interrupt when bit=1
+		- port B bit mode, OR-PEVM, interrupt when bit=1
+		- port C, open drain output bit PC1 (RTC, NVRAM)
+		- counter 1 disabled
+		- counter 2 enabled, TC=000d, IE=0, output to PB0
+		- counter 3 enabled, TC=9c40, IE=1
     - hard disk (Xebec S1410)
 
 */
