@@ -12,7 +12,6 @@
  * Input
  *      - input ports require manual calibration through built-in diagnostics (or canned EEPROM)
  *      - new input port type needed for bicycle pedal speed
- *      - new input port needed for multi-value stick shift
  *      - text layer row placement may be incorrect (emulated Prop Cycle differs from real game)
  *
  * Output Devices
@@ -2390,7 +2389,6 @@ static READ32_HANDLER( alpinesa_prot_r )
 static WRITE32_HANDLER( alpinesa_prot_w )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-#if 1
 	switch( data )
 	{
 	case 0:
@@ -2405,16 +2403,6 @@ static WRITE32_HANDLER( alpinesa_prot_w )
 	default:
 		break;
 	}
-#else
-	int i;
-	unsigned sptr = downcast<cpu_device *>(&space->device())->sp();
-	state->m_mAlpineSurferProtData = 0;
-	for(i=0;i<4;i++)
-	{
-		state->m_mAlpineSurferProtData<<=8;
-		state->m_mAlpineSurferProtData |= space->read_byte(sptr+4+i );
-	}
-#endif
 } /* alpinesa_prot_w */
 
 /* Namco Super System 22 */
@@ -2895,7 +2883,7 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/3) // should be SS22_MASTER_CLOCK/2, but relies on c352.c clockdivider implementation
+	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/2)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -3304,7 +3292,7 @@ static MACHINE_CONFIG_START( namcos22, namcos22_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/3)
+	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/2)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -5196,10 +5184,10 @@ static INPUT_PORTS_START( cybrcomm )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* Note(s)
-		The ranges here are based on the test mode which displays +-224
-		The nvram is calibrated using these settings.  If the SUBCPU handling changes then these might
-		end up needing to change again too
-		Default key arrangement is based on dual-joystick 'Tank' arrangement found in Assault and CyberSled
+        The ranges here are based on the test mode which displays +-224
+        The nvram is calibrated using these settings.  If the SUBCPU handling changes then these might
+        end up needing to change again too
+        Default key arrangement is based on dual-joystick 'Tank' arrangement found in Assault and CyberSled
     */
 	PORT_START("STICKY1")		/* VOLUME 0 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* right joystick: vertical */
@@ -5335,9 +5323,9 @@ INPUT_PORTS_END /* Ace Driver */
 
 static INPUT_PORTS_START( ridgera )
 	PORT_START("INPUTS")
-	/*	1 3 5	When the cabinet is set to Deluxe, the stick shift is basically
-		|-|-|	an 8-way joystick that locks into place.
-		2 4 6	Standard (default) setup uses a racing shifter like in Ace Driver. */
+	/*  1 3 5   When the cabinet is set to Deluxe, the stick shift is basically
+        |-|-|   an 8-way joystick that locks into place.
+        2 4 6   Standard (default) setup uses a racing shifter like in Ace Driver. */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Down")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Shift Up")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Shift Left")	// not used in Standard
@@ -5443,12 +5431,12 @@ static INPUT_PORTS_START( ridgera2 )
 	PORT_DIPSETTING(      0x2100, "Deluxe" )
 
 	/* Some dipswitches seem to be for debug purposes, for example:
-		2-4 : background drawing related
-		2-5 : background drawing related
-		2-6 : debug link-up
-		2-8 : no game over when time runs out (cheat)
-		3-7 : debug polygons
-	*/
+        2-4 : background drawing related
+        2-5 : background drawing related
+        2-6 : debug link-up
+        2-8 : no game over when time runs out (cheat)
+        3-7 : debug polygons
+    */
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x8000, 0x8000, "DIP3-8 (Test Mode)" )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
