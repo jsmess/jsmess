@@ -135,6 +135,10 @@ private:
 	static const device_timer_id TIMER_1 = 0;
 	static const device_timer_id TIMER_2 = 1;
 	static const device_timer_id TIMER_3 = 2;
+	
+	static const int PORT_A = 0;
+	static const int PORT_B = 1;
+	static const int PORT_C = 2;
 
 	inline void check_interrupt();
 
@@ -152,6 +156,7 @@ private:
 	inline void count(device_timer_id id);
 	inline void trigger(device_timer_id id);
 	inline void gate(device_timer_id id, int state);
+	inline void external_port_w(int port, int bit, int state);
 
 	devcb_resolved_write_line		m_out_int_func;
 
@@ -176,7 +181,7 @@ private:
 	UINT8 m_input[3];
 	UINT8 m_output[3];
 	UINT8 m_buffer[3];
-	int m_match[2];
+	UINT8 m_match[3];
 
 	// timers
 	emu_timer *m_timer;
