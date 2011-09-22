@@ -171,7 +171,7 @@ private:
 	int m_state;
 	UINT8 m_register[48];
 	UINT8 m_pointer;
-	
+
 	// input/output port state
 	UINT8 m_input[3];
 	UINT8 m_output[3];
