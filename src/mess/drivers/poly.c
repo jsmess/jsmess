@@ -19,14 +19,19 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "video/saa5050.h"
+#include "machine/terminal.h"
 
 
 class poly_state : public driver_device
 {
 public:
 	poly_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(kbd_put);
 };
 
 
@@ -46,7 +51,7 @@ static INPUT_PORTS_START( poly )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(poly)
+static MACHINE_RESET( poly )
 {
 }
 
@@ -67,6 +72,18 @@ static const saa5050_interface poly_saa5050_intf =
 	0	/* rev y order */
 };
 
+// temporary hack
+WRITE8_MEMBER( poly_state::kbd_put )
+{
+	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	mem->write_byte(0xebec, data);
+	mem->write_byte(0xebd0, 1); // any non-zero here
+}
+
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+{
+	DEVCB_DRIVER_MEMBER(poly_state, kbd_put)
+};
 
 static MACHINE_CONFIG_START( poly, poly_state )
 	/* basic machine hardware */
@@ -89,6 +106,9 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	MCFG_PALETTE_INIT(saa5050)
 
 	MCFG_SAA5050_ADD("saa5050", poly_saa5050_intf)
+
+	// temporary hack
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
