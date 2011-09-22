@@ -96,6 +96,7 @@ private:
 		SEEK,
 		STEP,
 		READ_SECTOR,
+		READ_TRACK,
 
 		// Sub states
 
@@ -110,10 +111,14 @@ private:
 		SEEK_WAIT_STABILIZATION_TIME_DONE,
 		SEEK_DONE,
 
+		WAIT_INDEX,
+		WAIT_INDEX_DONE,
+
 		SCAN_ID,
 		SCAN_ID_FAILED,
 
 		SECTOR_READ,
+		TRACK_DONE,
 
 		// Live states
 
@@ -122,7 +127,8 @@ private:
 		READ_ID_BLOCK_TO_LOCAL,
 		READ_SECTOR_DATA,
 		READ_SECTOR_DATA_BYTE,
-		READ_SECTOR_DATA_BYTE_DONE,
+		READ_TRACK_DATA,
+		READ_TRACK_DATA_BYTE,
 	};
 
 	struct pll_t {
@@ -204,6 +210,9 @@ private:
 	void read_sector_start();
 	void read_sector_continue();
 
+	void read_track_start();
+	void read_track_continue();
+
 	void interrupt_start();
 
 	void general_continue();
@@ -214,6 +223,7 @@ private:
 	void index_callback(floppy_image_device *floppy, int state);
 
 	void live_start(int live_state);
+	void live_abort();
 	void checkpoint();
 	void rollback();
 	void live_delay(int state);
