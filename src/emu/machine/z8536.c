@@ -290,6 +290,16 @@ inline void z8536_device::check_interrupt()
 
 	if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_MIE)
 	{
+		if ((m_register[COUNTER_TIMER_3_COMMAND_AND_STATUS] & CTCS_IUS) ||
+			(m_register[PORT_A_COMMAND_AND_STATUS] & PCS_IUS) ||
+			(m_register[COUNTER_TIMER_2_COMMAND_AND_STATUS] & CTCS_IUS) ||
+			(m_register[PORT_B_COMMAND_AND_STATUS] & PCS_IUS) ||
+			(m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS] & CTCS_IUS))
+		{
+			// interrupt under service
+			return;
+		}
+		
 		if ((m_register[COUNTER_TIMER_3_COMMAND_AND_STATUS] & (CTCS_IP | CTCS_IE)) == (CTCS_IP | CTCS_IE))
 		{
 			vector = m_register[COUNTER_TIMER_INTERRUPT_VECTOR];
@@ -303,15 +313,24 @@ inline void z8536_device::check_interrupt()
 		{
 			vector = m_register[PORT_A_INTERRUPT_VECTOR];
 
-			if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_CT_VIS)
+			if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_PA_VIS)
 			{
-				if ((m_register[PORT_A_MODE_SPECIFICATION] & PMS_PMS_MASK) == PMS_OR_PEV)
+				vector &= 0xf1;
+				
+				if (((m_register[PORT_A_MODE_SPECIFICATION] & PMS_PMS_MASK) >> 1) == PMS_OR_PEV)
 				{
-					vector = (vector & 0xf1) | (m_match[0] << 1);
+					if 		(m_match[PORT_A] & 0x80) vector |= 7;
+					else if (m_match[PORT_A] & 0x40) vector |= 6;
+					else if (m_match[PORT_A] & 0x20) vector |= 5;
+					else if (m_match[PORT_A] & 0x10) vector |= 4;
+					else if (m_match[PORT_A] & 0x08) vector |= 3;
+					else if (m_match[PORT_A] & 0x04) vector |= 2;
+					else if (m_match[PORT_A] & 0x02) vector |= 1;
+					else if (m_match[PORT_A] & 0x01) vector |= 0;
 				}
 				else
 				{
-					vector = (vector & 0xf1) | (m_register[PORT_A_COMMAND_AND_STATUS] & 0x0e);
+					vector |= (m_register[PORT_A_COMMAND_AND_STATUS] & 0x0e);
 				}
 			}
 		}
@@ -328,15 +347,24 @@ inline void z8536_device::check_interrupt()
 		{
 			vector = m_register[PORT_B_INTERRUPT_VECTOR];
 
-			if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_CT_VIS)
+			if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_PB_VIS)
 			{
-				if ((m_register[PORT_B_MODE_SPECIFICATION] & PMS_PMS_MASK) == PMS_OR_PEV)
+				vector &= 0xf1;
+				
+				if (((m_register[PORT_B_MODE_SPECIFICATION] & PMS_PMS_MASK) >> 1) == PMS_OR_PEV)
 				{
-					vector = (vector & 0xf1) | (m_match[1] << 1);
+					if 		(m_match[PORT_B] & 0x80) vector |= 7;
+					else if (m_match[PORT_B] & 0x40) vector |= 6;
+					else if (m_match[PORT_B] & 0x20) vector |= 5;
+					else if (m_match[PORT_B] & 0x10) vector |= 4;
+					else if (m_match[PORT_B] & 0x08) vector |= 3;
+					else if (m_match[PORT_B] & 0x04) vector |= 2;
+					else if (m_match[PORT_B] & 0x02) vector |= 1;
+					else if (m_match[PORT_B] & 0x01) vector |= 0;
 				}
 				else
 				{
-					vector = (vector & 0xf1) | (m_register[PORT_B_COMMAND_AND_STATUS] & 0x0e);
+					vector |= (m_register[PORT_B_COMMAND_AND_STATUS] & 0x0e);
 				}
 			}
 		}
@@ -905,6 +933,52 @@ inline void z8536_device::gate(device_timer_id id, int state)
 }
 
 
+//-------------------------------------------------
+//  external_port_w - external port write
+//-------------------------------------------------
+
+inline void z8536_device::external_port_w(int port, int bit, int state)
+{
+	switch (port)
+	{
+	case PORT_A:
+		break;
+		
+	case PORT_B:
+		{
+		UINT8 pms = m_register[PORT_B_MODE_SPECIFICATION];
+		UINT8 ddr = m_register[PORT_B_DATA_DIRECTION];
+		UINT8 pm = m_register[PORT_B_PATTERN_MASK];
+		
+		if (!BIT(ddr, bit)) return;
+	
+		m_input[port] = (m_input[port] & ~(1 << bit)) | (state << bit);
+		
+		switch ((pms & PMS_PMS_MASK) >> 1)
+		{
+		case PMS_OR_PEV:
+			m_match[port] = m_input[port] & ddr & pm;
+			
+			if (m_match[port])
+			{
+				if (LOG) logerror("%s Z8536 '%s' Port B Match on Bit %u\n", machine().describe_context(), tag(), bit);
+				m_register[PORT_B_COMMAND_AND_STATUS] |= PCS_IP;
+				check_interrupt();
+			}
+			break;
+			
+		default:
+			fatalerror("Unsupported pattern matching mode!\n");
+		}
+		}
+		break;
+		
+	case PORT_C:
+		break;
+	}
+}
+
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -955,6 +1029,14 @@ void z8536_device::device_config_complete()
 
 void z8536_device::device_start()
 {
+	for (int i = 0; i < 3; i++)
+	{
+		m_input[i] = 0;
+		m_output[i] = 0;
+		m_buffer[i] = 0;
+		m_match[i] = 0;
+	}
+	
 	// allocate timer
 	m_timer = timer_alloc();
 	m_timer->adjust(attotime::from_hz(clock() / 2), 0, attotime::from_hz(clock() / 2));
@@ -1197,35 +1279,35 @@ int z8536_device::intack_r()
 //  pa*_w - port A bits 0-7 write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z8536_device::pa0_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pa1_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pa2_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pa3_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pa4_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pa5_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pa6_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pa7_w ) { }
+WRITE_LINE_MEMBER( z8536_device::pa0_w ) { external_port_w(PORT_A, 0, state); }
+WRITE_LINE_MEMBER( z8536_device::pa1_w ) { external_port_w(PORT_A, 1, state); }
+WRITE_LINE_MEMBER( z8536_device::pa2_w ) { external_port_w(PORT_A, 2, state); }
+WRITE_LINE_MEMBER( z8536_device::pa3_w ) { external_port_w(PORT_A, 3, state); }
+WRITE_LINE_MEMBER( z8536_device::pa4_w ) { external_port_w(PORT_A, 4, state); }
+WRITE_LINE_MEMBER( z8536_device::pa5_w ) { external_port_w(PORT_A, 5, state); }
+WRITE_LINE_MEMBER( z8536_device::pa6_w ) { external_port_w(PORT_A, 6, state); }
+WRITE_LINE_MEMBER( z8536_device::pa7_w ) { external_port_w(PORT_A, 7, state); }
 
 
 //-------------------------------------------------
 //  pb*_w - port B bits 0-7 write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z8536_device::pb0_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pb1_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pb2_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pb3_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pb4_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pb5_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pb6_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pb7_w ) { }
+WRITE_LINE_MEMBER( z8536_device::pb0_w ) { external_port_w(PORT_B, 0, state); }
+WRITE_LINE_MEMBER( z8536_device::pb1_w ) { external_port_w(PORT_B, 1, state); }
+WRITE_LINE_MEMBER( z8536_device::pb2_w ) { external_port_w(PORT_B, 2, state); }
+WRITE_LINE_MEMBER( z8536_device::pb3_w ) { external_port_w(PORT_B, 3, state); }
+WRITE_LINE_MEMBER( z8536_device::pb4_w ) { external_port_w(PORT_B, 4, state); }
+WRITE_LINE_MEMBER( z8536_device::pb5_w ) { external_port_w(PORT_B, 5, state); }
+WRITE_LINE_MEMBER( z8536_device::pb6_w ) { external_port_w(PORT_B, 6, state); }
+WRITE_LINE_MEMBER( z8536_device::pb7_w ) { external_port_w(PORT_B, 7, state); }
 
 
 //-------------------------------------------------
 //  pc*_w - port C bits 0-3 write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z8536_device::pc0_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pc1_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pc2_w ) { }
-WRITE_LINE_MEMBER( z8536_device::pc3_w ) { }
+WRITE_LINE_MEMBER( z8536_device::pc0_w ) { external_port_w(PORT_C, 0, state); }
+WRITE_LINE_MEMBER( z8536_device::pc1_w ) { external_port_w(PORT_C, 1, state); }
+WRITE_LINE_MEMBER( z8536_device::pc2_w ) { external_port_w(PORT_C, 2, state); }
+WRITE_LINE_MEMBER( z8536_device::pc3_w ) { external_port_w(PORT_C, 3, state); }
