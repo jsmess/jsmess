@@ -450,7 +450,7 @@ WRITE8_MEMBER( st_state::shifter_mode_w )
 
 READ16_MEMBER( st_state::shifter_palette_r )
 {
-	return m_shifter_palette[offset];
+	return m_shifter_palette[offset] | 0xf888;
 }
 
 
