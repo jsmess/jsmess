@@ -8,17 +8,17 @@
 **********************************************************************/
 
 /*
-	
-	TODO:
-	
-	- interrupts
-		- vector
-		- status affects vector
-		- IE/IP/IUS
-		- acknowledge
-		- daisy chain
-	- port I/O
-	- counters/timers
+
+    TODO:
+
+    - interrupts
+        - vector
+        - status affects vector
+        - IE/IP/IUS
+        - acknowledge
+        - daisy chain
+    - port I/O
+    - counters/timers
 
 */
 
@@ -287,7 +287,7 @@ inline void z8536_device::check_interrupt()
 {
 	int state = ASSERT_LINE;
 	UINT8 vector = 0xff;
-	
+
 	if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_MIE)
 	{
 		if ((m_register[COUNTER_TIMER_3_COMMAND_AND_STATUS] & (CTCS_IP | CTCS_IE)) == (CTCS_IP | CTCS_IE))
@@ -359,7 +359,7 @@ inline void z8536_device::check_interrupt()
 	else
 	{
 		state = CLEAR_LINE;
-	}	
+	}
 
 	if (m_int != state)
 	{
@@ -391,13 +391,13 @@ inline UINT8 z8536_device::read_register(offs_t offset)
 	case PORT_C_DATA:
 		data = 0xf0 | (m_in_pc_func(0) & 0x0f);
 		break;
-		
+
 	case COUNTER_TIMER_1_CURRENT_COUNT_MS_BYTE:
 	case COUNTER_TIMER_2_CURRENT_COUNT_MS_BYTE:
 	case COUNTER_TIMER_3_CURRENT_COUNT_MS_BYTE:
 		{
 		int timer = (offset - COUNTER_TIMER_1_CURRENT_COUNT_MS_BYTE) >> 1;
-		
+
 		if (m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + timer] & CTCS_RCC)
 		{
 			// read frozen value
@@ -416,7 +416,7 @@ inline UINT8 z8536_device::read_register(offs_t offset)
 	case COUNTER_TIMER_3_CURRENT_COUNT_LS_BYTE:
 		{
 		int timer = (offset - COUNTER_TIMER_1_CURRENT_COUNT_MS_BYTE) >> 1;
-		
+
 		if (m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + timer] & CTCS_RCC)
 		{
 			// read frozen value
@@ -427,7 +427,7 @@ inline UINT8 z8536_device::read_register(offs_t offset)
 			// read current count
 			data = m_counter[timer] & 0xff;
 		}
-		
+
 		// clear RCC bit
 		m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + timer] &= ~CTCS_RCC;
 		}
@@ -485,7 +485,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 			}
 
 			m_register[offset] = data;
-			
+
 			check_interrupt();
 		}
 		break;
@@ -503,7 +503,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 		}
 
 		m_register[offset] = data;
-		
+
 		for (int counter = 0; counter < 3; counter++)
 		{
 			// clear RCC bit if counter disabled
@@ -525,7 +525,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 		if (LOG) logerror("%s Z8536 '%s' Counter/Timer Interrupt Vector: %02x\n", machine().describe_context(), tag(), data);
 		m_register[offset] = data;
 		break;
-		
+
 	case PORT_C_DATA_PATH_POLARITY:
 		if (LOG) logerror("%s Z8536 '%s' Port C Data Path Polarity: %02x\n", machine().describe_context(), tag(), data);
 		m_register[offset] = data;
@@ -535,7 +535,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 		if (LOG) logerror("%s Z8536 '%s' Port C Data Direction: %02x\n", machine().describe_context(), tag(), data);
 		m_register[offset] = data;
 		break;
-		
+
 	case PORT_C_SPECIAL_IO_CONTROL:
 		if (LOG) logerror("%s Z8536 '%s' Port C Special I/O Control: %02x\n", machine().describe_context(), tag(), data);
 		m_register[offset] = data;
@@ -564,7 +564,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 		check_interrupt();
 		}
 		break;
-		
+
 	case COUNTER_TIMER_1_COMMAND_AND_STATUS:
 	case COUNTER_TIMER_2_COMMAND_AND_STATUS:
 	case COUNTER_TIMER_3_COMMAND_AND_STATUS:
@@ -577,7 +577,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 			if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Gate Command Bit: %u\n", machine().describe_context(), tag(), counter + 1, (data & CTCS_GCB) ? 1 : 0);
 			if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Read Counter Control: %u\n", machine().describe_context(), tag(), counter + 1, (data & CTCS_RCC) ? 1 : 0);
 		}
-		
+
 		switch (data >> 5)
 		{
 		case IC_CLEAR_IP_IUS:	m_register[offset] &= ~(CTCS_IP | CTCS_IUS);if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Clear IP/IUS\n", machine().describe_context(), tag(), counter + 1);	break;
@@ -591,13 +591,13 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 
 		// gate command bit
 		m_register[offset] = (m_register[offset] & ~CTCS_GCB) | (data & CTCS_GCB);
-		
+
 		// trigger command bit
 		if (data & CTCS_TCB)
 		{
 			trigger(counter);
 		}
-		
+
 		// read counter control
 		if (counter_enabled(counter) && (data & CTCS_RCC))
 		{
@@ -606,7 +606,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 			m_register[COUNTER_TIMER_1_CURRENT_COUNT_MS_BYTE + (counter << 1)] = m_counter[counter] >> 8;
 			m_register[COUNTER_TIMER_1_CURRENT_COUNT_LS_BYTE + (counter << 1)] = m_counter[counter] & 0xff;
 		}
-		
+
 		check_interrupt();
 		}
 		break;
@@ -628,7 +628,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 		m_out_pc_func(0, m_output[PORT_C]);
 		}
 		break;
-		
+
 	case COUNTER_TIMER_1_TIME_CONSTANT_MS_BYTE:
 	case COUNTER_TIMER_2_TIME_CONSTANT_MS_BYTE:
 	case COUNTER_TIMER_3_TIME_CONSTANT_MS_BYTE:
@@ -637,7 +637,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 			int counter = (offset - COUNTER_TIMER_1_TIME_CONSTANT_MS_BYTE) >> 1;
 			if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Time Constant MSB: %02x\n", machine().describe_context(), tag(), counter + 1, data);
 		}
-		
+
 		m_register[offset] = data;
 		break;
 
@@ -649,7 +649,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 			int counter = (offset - COUNTER_TIMER_1_TIME_CONSTANT_LS_BYTE) >> 1;
 			if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Time Constant LSB: %02x\n", machine().describe_context(), tag(), counter + 1, data);
 		}
-		
+
 		m_register[offset] = data;
 		break;
 
@@ -680,27 +680,27 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 			char port = BIT(offset, 3) ? 'B' : 'A';
 			int pts = (data & PMS_PTS_MASK) >> 6;
 			int pms = (data & PMS_PMS_MASK) >> 1;
-			
+
 			logerror("%s Z8536 '%s' Port %c Port Type: %s\n", machine().describe_context(), tag(), port, PMS_PTS[pts]);
 			logerror("%s Z8536 '%s' Port %c Interrupt on 2 Bytes: %u\n", machine().describe_context(), tag(), port, (data & PMS_ITB) ? 1 : 0);
 			logerror("%s Z8536 '%s' Port %c Single Buffer: %u\n", machine().describe_context(), tag(), port, (data & PMS_SB) ? 1 : 0);
 			logerror("%s Z8536 '%s' Port %c Interrupt on Match Only: %u\n", machine().describe_context(), tag(), port, (data & PMS_IMO) ? 1 : 0);
 			logerror("%s Z8536 '%s' Port %c Pattern Mode: %s\n", machine().describe_context(), tag(), port, PMS_PMS[pms]);
-			
+
 			if (pts == PTS_BIT)
 				logerror("%s Z8536 '%s' Port %c Latch on Pattern Match: %u\n", machine().describe_context(), tag(), port, (data & PMS_LPM) ? 1 : 0);
 			else
 				logerror("%s Z8536 '%s' Port %c Deskew Timer Enable: %u\n", machine().describe_context(), tag(), port, (data & PMS_DTE) ? 1 : 0);
 		}
-		
+
 		m_register[offset] = data;
 		break;
-		
+
 	case PORT_A_HANDSHAKE_SPECIFICATION:
 	case PORT_B_HANDSHAKE_SPECIFICATION:
 		// TODO
 		break;
-		
+
 	case PORT_A_DATA_PATH_POLARITY:
 	case PORT_B_DATA_PATH_POLARITY:
 		if (LOG) logerror("%s Z8536 '%s' Port %c Data Path Polarity: %02x\n", machine().describe_context(), tag(), BIT(offset, 3) ? 'B' : 'A', data);
@@ -712,7 +712,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 		if (LOG) logerror("%s Z8536 '%s' Port %c Data Direction: %02x\n", machine().describe_context(), tag(), BIT(offset, 3) ? 'B' : 'A', data);
 		m_register[offset] = data;
 		break;
-		
+
 	case PORT_A_SPECIAL_IO_CONTROL:
 	case PORT_B_SPECIAL_IO_CONTROL:
 		if (LOG) logerror("%s Z8536 '%s' Port %c Special I/O Control: %02x\n", machine().describe_context(), tag(), BIT(offset, 3) ? 'B' : 'A', data);
@@ -724,19 +724,19 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 		if (LOG) logerror("%s Z8536 '%s' Port %c Pattern Polarity: %02x\n", machine().describe_context(), tag(), BIT(offset, 3) ? 'B' : 'A', data);
 		m_register[offset] = data;
 		break;
-		
+
 	case PORT_A_PATTERN_TRANSITION:
 	case PORT_B_PATTERN_TRANSITION:
 		if (LOG) logerror("%s Z8536 '%s' Port %c Pattern Transition: %02x\n", machine().describe_context(), tag(), BIT(offset, 3) ? 'B' : 'A', data);
 		m_register[offset] = data;
 		break;
-		
+
 	case PORT_A_PATTERN_MASK:
 	case PORT_B_PATTERN_MASK:
 		if (LOG) logerror("%s Z8536 '%s' Port %c Pattern Mask: %02x\n", machine().describe_context(), tag(), BIT(offset, 3) ? 'B' : 'A', data);
 		m_register[offset] = data;
 		break;
-			
+
 	default:
 		logerror("%s: Z8536 '%s' Unimplemented write %02x to register %u\n", machine().describe_context(), tag(), data, offset);
 		m_register[offset] = data;
@@ -763,28 +763,28 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data, UINT8 mask)
 inline bool z8536_device::counter_enabled(device_timer_id id)
 {
 	bool enabled = false;
-	
+
 	switch (id)
 	{
 	case TIMER_1:
 		enabled = (m_register[MASTER_CONFIGURATION_CONTROL] & MCCR_CT1E) ? true : false;
 		break;
-		
+
 	case TIMER_2:
 		enabled = (m_register[MASTER_CONFIGURATION_CONTROL] & MCCR_CT2E) ? true : false;
 		break;
-		
+
 	case TIMER_3:
 		enabled = (m_register[MASTER_CONFIGURATION_CONTROL] & MCCR_PCE_CT3E) ? true : false;
 		break;
 	}
-	
+
 	return enabled;
 }
 
 
 //-------------------------------------------------
-//   counter_external_output - 
+//   counter_external_output -
 //-------------------------------------------------
 
 inline bool z8536_device::counter_external_output(device_timer_id id)
@@ -794,7 +794,7 @@ inline bool z8536_device::counter_external_output(device_timer_id id)
 
 
 //-------------------------------------------------
-//   counter_external_count - 
+//   counter_external_count -
 //-------------------------------------------------
 
 inline bool z8536_device::counter_external_count(device_timer_id id)
@@ -804,7 +804,7 @@ inline bool z8536_device::counter_external_count(device_timer_id id)
 
 
 //-------------------------------------------------
-//   counter_external_trigger - 
+//   counter_external_trigger -
 //-------------------------------------------------
 
 inline bool z8536_device::counter_external_trigger(device_timer_id id)
@@ -814,7 +814,7 @@ inline bool z8536_device::counter_external_trigger(device_timer_id id)
 
 
 //-------------------------------------------------
-//   counter_external_gate - 
+//   counter_external_gate -
 //-------------------------------------------------
 
 inline bool z8536_device::counter_external_gate(device_timer_id id)
@@ -824,7 +824,7 @@ inline bool z8536_device::counter_external_gate(device_timer_id id)
 
 
 //-------------------------------------------------
-//   counter_gated - 
+//   counter_gated -
 //-------------------------------------------------
 
 inline bool z8536_device::counter_gated(device_timer_id id)
@@ -841,7 +841,7 @@ inline void z8536_device::count(device_timer_id id)
 {
 	if (!counter_gated(id)) return;
 	if (!m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] & CTCS_CIP) return;
-	
+
 	// count down
 	m_counter[id]--;
 
@@ -857,7 +857,7 @@ inline void z8536_device::count(device_timer_id id)
 			// set interrupt pending bit
 			m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] |= CTCS_IP;
 		}
-		
+
 		if (m_register[COUNTER_TIMER_1_MODE_SPECIFICATION + id] & CTMS_CSC)
 		{
 			// reload counter with time constant
@@ -866,11 +866,11 @@ inline void z8536_device::count(device_timer_id id)
 		else
 		{
 			if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Terminal Count\n", machine().describe_context(), tag(), id + 1);
-			
+
 			// clear count in progress bit
 			m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] &= ~CTCS_CIP;
 		}
-		
+
 		check_interrupt();
 	}
 }
@@ -884,9 +884,9 @@ inline void z8536_device::trigger(device_timer_id id)
 {
 	// ignore triggers during countdown if retrigger is disabled
 	if (!(m_register[COUNTER_TIMER_1_MODE_SPECIFICATION + id] & CTMS_REB) && (m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] & CTCS_CIP)) return;
-	
+
 	if (LOG) logerror("%s Z8536 '%s' Counter/Timer %u Trigger\n", machine().describe_context(), tag(), id + 1);
-	
+
 	// load counter with time constant
 	m_counter[id] = (m_register[COUNTER_TIMER_1_TIME_CONSTANT_MS_BYTE + (id << 1)] << 8) | m_register[COUNTER_TIMER_1_TIME_CONSTANT_LS_BYTE + (id << 1)];
 
@@ -1182,7 +1182,7 @@ int z8536_device::intack_r()
 	{
 		m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS] |= CTCS_IUS;
 	}
-	
+
 	if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_NV)
 	{
 		// no vector
