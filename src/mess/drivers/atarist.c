@@ -392,6 +392,15 @@ WRITE16_MEMBER( st_state::berr_w )
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
+READ16_MEMBER( st_state::berr_r )
+{
+	if(!space.debugger_access()) {
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	}
+	return 0xffff;
+}
+
 
 //**************************************************************************
 //  IKBD
@@ -1190,6 +1199,7 @@ static ADDRESS_MAP_START( st_map, AS_PROGRAM, 16, st_state )
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(M68000_TAG, 0) AM_WRITE(berr_w)
 	AM_RANGE(0x000008, 0x1fffff) AM_RAM
 	AM_RANGE(0x200000, 0x3fffff) AM_RAM
+	AM_RANGE(0x400000, 0xf9ffff) AM_READWRITE(berr_r, berr_w)
 	AM_RANGE(0xfa0000, 0xfbffff) AM_ROM AM_REGION("cart", 0)
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM AM_REGION(M68000_TAG, 0) AM_WRITE(berr_w)
 	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE8(mmu_r, mmu_w, 0x00ff)
