@@ -1,4 +1,67 @@
-﻿0.143u5
+﻿0.143u6
+
+New System Drivers Supported:
+-----------------------------
+- SVI-738 Poland [Roberto Carlos Fernandez Gerhardt]
+- Intellivision II [Kevtris]
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+
+System Driver Changes:
+----------------------
+- mac: add NuBus Radius Two-Page Display (1152x880 monochrome) card [R. Belmont]
+- Start to duct-tape some organs to the Tandberg skeleton driver and fix some 
+  memory maps (fdccpu in particular). It still doesn't do very much now but 
+  does more than it did before. [Lord Nightmare]
+- Some updated tandberg notes, nothing truly earth-shattering. [Lord Nightmare]
+- x68k: added basic expansion slot, and support for the Neptune-X NIC as 
+      a slot device. [Barry Rodewald]
+- atarist: Until the video emulation is *much* better, reset the shifter every frame [O. Galibert]
+- nakajies.c: Implemented banking.  [Wilbert Pol]
+- Add keyboard 8035 rom from tandberg as NO_DUMP for now. [JonteP, Lord Nightmare]
+- pc1640: Fixed ROM labels. [John Elliot]
+- abc1600: Fixed floppy, system now tries to boot from the mount disk. [Curt Coder]
+- kc: Implemented high resolution mode, fixes intro in SOKOBAN4. [Sandro Ronco]
+- d6809 - modernised, connected to terminal, added notes. [Robbbert]
+
+Software Lists:
+----------------
+- ibm5170 - Softlist update [Kaylee]
+- msx/msx2: Started creating a software list for MSX and MSX2 cartridges.  [Wilbert Pol]
+- Added softlist for Intellivision [Huygens]
+- Fixed items in intv.hsi [Huygens]
+
+Source Changes:
+----------------
+- Added DP8390 Network Interface Controller emulation [Carl] 
+- Implemented ISA devices for NE1000 and NE2000 network cards [Carl]
+- Created OSD network layer and added Windows implementation [Carl]
+- nubus: new read and write-only device support, support for ROMs 
+	with the address lines inverted (e.g. radiustpd) [R. Belmont]
+- wd1772: First prototype of a next-gen fdc implementation [O. Galibert]
+- Added AY8914 support [Huygens]
+- Fixed bitorder for SP0256 dumps[Huygens]
+- wd1772: Enhance, document, etc [O. Galibert]
+- wd1772: Add the frequency tracking to the dpll [O. Galibert]
+- wd1772: Fixes around the status register, einstein works now [O. Galibert]
+- floppy: Move the useful formats at the top [O. Galibert]
+- wd1772: Fix livelock when there no floppy in the reader [O. Galibert]
+- wd17xx: Connected Side Select Output for variants that support it. [Curt Coder]
+- floppy: Add save support to mfi/st/msa and convert support to floptool [O. Galibert]
+- m68k: Activate trace emulation and fix it [O. Galibert]
+- Documentation improvements for intellivision, renamed a few roms to 
+	match the actual ic labels and locations. [Kevtris, Lord Nightmare]
+- mfm: Add write support [O. Galibert]
+- atarist: Bus error on rom writes makes the Cuddly demos boot [O. Galibert]
+
+0.143u5
 
 New System Drivers Supported:
 -----------------------------
