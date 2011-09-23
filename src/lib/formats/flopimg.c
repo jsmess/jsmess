@@ -1161,6 +1161,25 @@ void floppy_image_format_t::fixup_crcs(UINT8 *buffer, gen_crc_info *crcs)
 		}
 }
 
+int floppy_image_format_t::calc_sector_index(int num, int interleave, int skew, int total_sectors, int track_head)
+{
+	int i = 0;
+	int sec = 0;
+	// use interleave
+	while (i != num)
+	{
+		i++;
+		i += interleave;
+		i %= total_sectors;
+		sec++;
+	}
+	// use skew param
+	sec -= track_head * skew;
+	sec %= total_sectors;	
+	if (sec < 0) sec += total_sectors;
+	return sec;
+}
+
 void floppy_image_format_t::generate_track(const desc_e *desc, UINT8 track, UINT8 head, const desc_s *sect, int sect_count, int track_size, floppy_image *image)
 {
 	UINT8 *buffer = global_alloc_array_clear(UINT8, (track_size+7)/8);
@@ -1172,8 +1191,11 @@ void floppy_image_format_t::generate_track(const desc_e *desc, UINT8 track, UINT
 	int index = 0;
 	int sector_loop_start = 0;
 	int sector_idx = 0;
+	int sector_cnt = 0;
 	int sector_limit = 0;
-
+	int sector_interleave = 0;
+	int sector_skew = 0;
+	
 	while(desc[index].type != END) {
 		//      printf("%d.%d.%d (%d) - %d %d\n", desc[index].type, desc[index].p1, desc[index].p2, index, offset, offset/8);
 		switch(desc[index].type) {
@@ -1243,17 +1265,25 @@ void floppy_image_format_t::generate_track(const desc_e *desc, UINT8 track, UINT
 			fixup_crcs(buffer, crcs);
 			sector_loop_start = index;
 			sector_idx = desc[index].p1;
+			sector_cnt = sector_idx;
 			sector_limit = desc[index].p2;
+			sector_idx = calc_sector_index(sector_cnt,sector_interleave,sector_skew,sector_limit+1,track*2 + head);
 			break;
 
 		case SECTOR_LOOP_END:
 			fixup_crcs(buffer, crcs);
-			if(sector_idx < sector_limit) {
-				sector_idx++;
+			if(sector_cnt < sector_limit) {
+				sector_cnt++;
+				sector_idx = calc_sector_index(sector_cnt,sector_interleave,sector_skew,sector_limit+1,track*2 + head);
 				index = sector_loop_start;
 			}
 			break;
 
+		case SECTOR_INTERLEAVE_SKEW:
+			sector_interleave = desc[index].p1;
+			sector_skew = desc[index].p2;
+			break;
+			
 		case CRC_AMIGA_START:
 		case CRC_CCITT_START:
 			crcs[desc[index].p1].start = offset;
@@ -1622,316 +1652,12 @@ const floppy_image_format_t::desc_e *const floppy_image_format_t::atari_st_fcp_1
 };
 
 
-const floppy_image_format_t::desc_e floppy_image_format_t::atari_st_fcp_11_0[] = {
-	{ MFM, 0x4e, 3 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  0,  0 }, NORMAL_SECTOR( 1), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  6,  6 }, NORMAL_SECTOR( 3), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  1,  1 }, NORMAL_SECTOR( 5), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  7,  7 }, NORMAL_SECTOR( 7), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  2,  2 }, NORMAL_SECTOR( 9), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  8,  8 }, NORMAL_SECTOR(11), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  3,  3 }, NORMAL_SECTOR(13), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  9,  9 }, NORMAL_SECTOR(15), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  4,  4 }, NORMAL_SECTOR(17), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START, 10, 10 }, NORMAL_SECTOR(19), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  5,  5 }, NORMAL_SECTOR(21), { SECTOR_LOOP_END },
+const floppy_image_format_t::desc_e floppy_image_format_t::atari_st_fcp_11[] = {
+	{ MFM, 0x4e, 1 },
+	{ SECTOR_INTERLEAVE_SKEW, 1, 1},
+	{ SECTOR_LOOP_START,  0,  10 }, { MFM, 0x4e, 2 }, { MFM, 0x00, 2 }, NORMAL_SECTOR( 1), { SECTOR_LOOP_END },
 	{ MFM, 0x4e, 23 },
 	{ END },
-};
-
-const floppy_image_format_t::desc_e floppy_image_format_t::atari_st_fcp_11_1[] = {
-	{ MFM, 0x4e, 3 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START, 10, 10 }, NORMAL_SECTOR(19), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  5,  5 }, NORMAL_SECTOR(21), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  0,  0 }, NORMAL_SECTOR( 1), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  6,  6 }, NORMAL_SECTOR( 3), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  1,  1 }, NORMAL_SECTOR( 5), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  7,  7 }, NORMAL_SECTOR( 7), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  2,  2 }, NORMAL_SECTOR( 9), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  8,  8 }, NORMAL_SECTOR(11), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  3,  3 }, NORMAL_SECTOR(13), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  9,  9 }, NORMAL_SECTOR(15), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  4,  4 }, NORMAL_SECTOR(17), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 23 },
-	{ END },
-};
-
-const floppy_image_format_t::desc_e floppy_image_format_t::atari_st_fcp_11_2[] = {
-	{ MFM, 0x4e, 3 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  9,  9 }, NORMAL_SECTOR(15), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  4,  4 }, NORMAL_SECTOR(17), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START, 10, 10 }, NORMAL_SECTOR(19), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  5,  5 }, NORMAL_SECTOR(21), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  0,  0 }, NORMAL_SECTOR( 1), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  6,  6 }, NORMAL_SECTOR( 3), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  1,  1 }, NORMAL_SECTOR( 5), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  7,  7 }, NORMAL_SECTOR( 7), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  2,  2 }, NORMAL_SECTOR( 9), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  8,  8 }, NORMAL_SECTOR(11), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  3,  3 }, NORMAL_SECTOR(13), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 23 },
-	{ END },
-};
-
-const floppy_image_format_t::desc_e floppy_image_format_t::atari_st_fcp_11_3[] = {
-	{ MFM, 0x4e, 3 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  8,  8 }, NORMAL_SECTOR(11), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  3,  3 }, NORMAL_SECTOR(13), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  9,  9 }, NORMAL_SECTOR(15), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  4,  4 }, NORMAL_SECTOR(17), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START, 10, 10 }, NORMAL_SECTOR(19), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  5,  5 }, NORMAL_SECTOR(21), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  0,  0 }, NORMAL_SECTOR( 1), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  6,  6 }, NORMAL_SECTOR( 3), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  1,  1 }, NORMAL_SECTOR( 5), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  7,  7 }, NORMAL_SECTOR( 7), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  2,  2 }, NORMAL_SECTOR( 9), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 23 },
-	{ END },
-};
-
-const floppy_image_format_t::desc_e floppy_image_format_t::atari_st_fcp_11_4[] = {
-	{ MFM, 0x4e, 3 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  7,  7 }, NORMAL_SECTOR( 7), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  2,  2 }, NORMAL_SECTOR( 9), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  8,  8 }, NORMAL_SECTOR(11), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  3,  3 }, NORMAL_SECTOR(13), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  9,  9 }, NORMAL_SECTOR(15), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  4,  4 }, NORMAL_SECTOR(17), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START, 10, 10 }, NORMAL_SECTOR(19), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  5,  5 }, NORMAL_SECTOR(21), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  0,  0 }, NORMAL_SECTOR( 1), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  6,  6 }, NORMAL_SECTOR( 3), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  1,  1 }, NORMAL_SECTOR( 5), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 23 },
-	{ END },
-};
-
-const floppy_image_format_t::desc_e floppy_image_format_t::atari_st_fcp_11_5[] = {
-	{ MFM, 0x4e, 3 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  6,  6 }, NORMAL_SECTOR( 3), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  1,  1 }, NORMAL_SECTOR( 5), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  7,  7 }, NORMAL_SECTOR( 7), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  2,  2 }, NORMAL_SECTOR( 9), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  8,  8 }, NORMAL_SECTOR(11), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  3,  3 }, NORMAL_SECTOR(13), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  9,  9 }, NORMAL_SECTOR(15), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  4,  4 }, NORMAL_SECTOR(17), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START, 10, 10 }, NORMAL_SECTOR(19), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  5,  5 }, NORMAL_SECTOR(21), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  0,  0 }, NORMAL_SECTOR( 1), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 23 },
-	{ END },
-};
-
-const floppy_image_format_t::desc_e floppy_image_format_t::atari_st_fcp_11_6[] = {
-	{ MFM, 0x4e, 3 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  5,  5 }, NORMAL_SECTOR(21), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  0,  0 }, NORMAL_SECTOR( 1), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  6,  6 }, NORMAL_SECTOR( 3), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  1,  1 }, NORMAL_SECTOR( 5), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  7,  7 }, NORMAL_SECTOR( 7), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  2,  2 }, NORMAL_SECTOR( 9), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  8,  8 }, NORMAL_SECTOR(11), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  3,  3 }, NORMAL_SECTOR(13), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  9,  9 }, NORMAL_SECTOR(15), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  4,  4 }, NORMAL_SECTOR(17), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START, 10, 10 }, NORMAL_SECTOR(19), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 23 },
-	{ END },
-};
-
-const floppy_image_format_t::desc_e floppy_image_format_t::atari_st_fcp_11_7[] = {
-	{ MFM, 0x4e, 3 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  4,  4 }, NORMAL_SECTOR(17), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START, 10, 10 }, NORMAL_SECTOR(19), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  5,  5 }, NORMAL_SECTOR(21), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  0,  0 }, NORMAL_SECTOR( 1), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  6,  6 }, NORMAL_SECTOR( 3), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  1,  1 }, NORMAL_SECTOR( 5), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  7,  7 }, NORMAL_SECTOR( 7), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  2,  2 }, NORMAL_SECTOR( 9), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  8,  8 }, NORMAL_SECTOR(11), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  3,  3 }, NORMAL_SECTOR(13), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  9,  9 }, NORMAL_SECTOR(15), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 23 },
-	{ END },
-};
-
-const floppy_image_format_t::desc_e floppy_image_format_t::atari_st_fcp_11_8[] = {
-	{ MFM, 0x4e, 3 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  3,  3 }, NORMAL_SECTOR(13), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  9,  9 }, NORMAL_SECTOR(15), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  4,  4 }, NORMAL_SECTOR(17), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START, 10, 10 }, NORMAL_SECTOR(19), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  5,  5 }, NORMAL_SECTOR(21), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  0,  0 }, NORMAL_SECTOR( 1), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  6,  6 }, NORMAL_SECTOR( 3), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  1,  1 }, NORMAL_SECTOR( 5), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  7,  7 }, NORMAL_SECTOR( 7), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  2,  2 }, NORMAL_SECTOR( 9), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  8,  8 }, NORMAL_SECTOR(11), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 23 },
-	{ END },
-};
-
-const floppy_image_format_t::desc_e floppy_image_format_t::atari_st_fcp_11_9[] = {
-	{ MFM, 0x4e, 3 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  2,  2 }, NORMAL_SECTOR( 9), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  8,  8 }, NORMAL_SECTOR(11), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  3,  3 }, NORMAL_SECTOR(13), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  9,  9 }, NORMAL_SECTOR(15), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  4,  4 }, NORMAL_SECTOR(17), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START, 10, 10 }, NORMAL_SECTOR(19), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  5,  5 }, NORMAL_SECTOR(21), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  0,  0 }, NORMAL_SECTOR( 1), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  6,  6 }, NORMAL_SECTOR( 3), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  1,  1 }, NORMAL_SECTOR( 5), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  7,  7 }, NORMAL_SECTOR( 7), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 23 },
-	{ END },
-};
-
-const floppy_image_format_t::desc_e floppy_image_format_t::atari_st_fcp_11_10[] = {
-	{ MFM, 0x4e, 3 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  1,  1 }, NORMAL_SECTOR( 5), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  7,  7 }, NORMAL_SECTOR( 7), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  2,  2 }, NORMAL_SECTOR( 9), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  8,  8 }, NORMAL_SECTOR(11), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  3,  3 }, NORMAL_SECTOR(13), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  9,  9 }, NORMAL_SECTOR(15), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  4,  4 }, NORMAL_SECTOR(17), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START, 10, 10 }, NORMAL_SECTOR(19), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  5,  5 }, NORMAL_SECTOR(21), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  0,  0 }, NORMAL_SECTOR( 1), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 2 }, { MFM, 0x00, 2 },
-	{ SECTOR_LOOP_START,  6,  6 }, NORMAL_SECTOR( 3), { SECTOR_LOOP_END },
-	{ MFM, 0x4e, 23 },
-	{ END },
-};
-
-
-const floppy_image_format_t::desc_e *const floppy_image_format_t::atari_st_fcp_11[11] = {
-	atari_st_fcp_11_0,
-	atari_st_fcp_11_1,
-	atari_st_fcp_11_2,
-	atari_st_fcp_11_3,
-	atari_st_fcp_11_4,
-	atari_st_fcp_11_5,
-	atari_st_fcp_11_6,
-	atari_st_fcp_11_7,
-	atari_st_fcp_11_8,
-	atari_st_fcp_11_9,
-	atari_st_fcp_11_10,
 };
 
 #undef SECTOR_42_HEADER
@@ -1945,7 +1671,7 @@ const floppy_image_format_t::desc_e *floppy_image_format_t::atari_st_fcp_get_des
 	case 10:
 		return atari_st_fcp_10[(track*head_count + head) % 10];
 	case 11:
-		return atari_st_fcp_11[(track*head_count + head) % 11];
+		return atari_st_fcp_11;
 	}
 	return 0;
 }
