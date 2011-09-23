@@ -213,8 +213,7 @@ void st_state::glue_tick()
 
 	int de = h && v;
 
-	if (x < m_shifter_x_start && y < m_shifter_y_start)
-	{
+	if(!x) {
 		m_shifter_bitplane = 0;
 		m_shifter_shift = 0;
 	}
