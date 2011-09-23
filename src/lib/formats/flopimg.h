@@ -282,6 +282,7 @@ protected:
 	struct desc_s {
 		int size;          // Sector size, int bytes
 		const UINT8 *data; // Sector data
+		UINT8 sector_id;   // Sector ID
 	};
 
 
