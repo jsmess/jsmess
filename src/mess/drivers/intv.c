@@ -409,6 +409,22 @@ static ADDRESS_MAP_START( intv_mem , AS_PROGRAM, 16)
 	AM_RANGE(0xD000, 0xFfff) AM_ROM AM_REGION("maincpu", 0xD000<<1)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( intv2_mem , AS_PROGRAM, 16)
+	AM_RANGE(0x0000, 0x003f) AM_READWRITE( intv_stic_r, intv_stic_w )
+	AM_RANGE(0x0080, 0x0081) AM_DEVREADWRITE("sp0256_speech", spb640_r, spb640_w ) /* Intellivoice */
+	AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
+	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914", ay8914_r, ay8914_w, 0x00ff )
+	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
+	AM_RANGE(0x0400, 0x04ff) AM_ROM AM_REGION("maincpu", 0x400<<1)	/* Exec ROM, 10-bits wide */
+	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000<<1)	/* Exec ROM, 10-bits wide */
+	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("maincpu", 0x3000<<1)	/* GROM,     8-bits wide */
+	AM_RANGE(0x3800, 0x39ff) AM_READWRITE( intv_gram_r, intv_gram_w )		/* GRAM,     8-bits wide */
+	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE( intv_gram_r, intv_gram_w )		/* GRAM Alias,     8-bits wide */
+	AM_RANGE(0x4800, 0x7fff) AM_ROM AM_REGION("maincpu", 0x4800<<1)
+	AM_RANGE(0x9000, 0xBfff) AM_ROM AM_REGION("maincpu", 0x9000<<1)
+	AM_RANGE(0xD000, 0xFfff) AM_ROM AM_REGION("maincpu", 0xD000<<1)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( intvkbd_mem , AS_PROGRAM, 16)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE( intv_stic_r, intv_stic_w )
 	AM_RANGE(0x0080, 0x0081) AM_DEVREADWRITE("sp0256_speech", spb640_r, spb640_w )
@@ -423,7 +439,7 @@ static ADDRESS_MAP_START( intvkbd_mem , AS_PROGRAM, 16)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE( intvkbd_dualport16_w ) AM_BASE_MEMBER(intv_state, m_intvkbd_dualport_ram)	/* Dual-port RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( intv2_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( intvkbd2_mem , AS_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH  /* Required because of probing */
 	AM_RANGE( 0x0000, 0x3fff) AM_READWRITE( intvkbd_dualport8_lsb_r, intvkbd_dualport8_lsb_w )	/* Dual-port RAM */
 	AM_RANGE( 0x4000, 0x7fff) AM_READWRITE( intvkbd_dualport8_msb_r, intvkbd_dualport8_msb_w )	/* Dual-port RAM */
@@ -490,13 +506,17 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","intv")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( intv2, intv )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(intv2_mem)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intvkbd_mem)
 
 	MCFG_CPU_ADD("keyboard", M6502, XTAL_3_579545MHz/2)	/* Colorburst/2 */
-	MCFG_CPU_PROGRAM_MAP(intv2_mem)
+	MCFG_CPU_PROGRAM_MAP(intvkbd2_mem)
 	MCFG_CPU_VBLANK_INT("screen", intv_interrupt2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -617,4 +637,4 @@ static DRIVER_INIT( intvkbd )
 CONS( 1979, intv,       0,      0,      intv,       intv,       intv,       "Mattel", "Intellivision", 0 )
 CONS( 1981, intvsrs,    intv,   0,      intv,       intv,       intv,       "Mattel", "Intellivision (Sears)", 0 )
 COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", GAME_NOT_WORKING)
-CONS( 1982, intv2,      intv,   0,      intv,       intv,       intv,       "Mattel", "Intellivision II", 0 )
+CONS( 1982, intv2,      intv,   0,      intv2,      intv,       intv,       "Mattel", "Intellivision II", 0 )
