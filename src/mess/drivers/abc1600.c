@@ -1549,7 +1549,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(MC68008P8_TAG, M68008, XTAL_64MHz/8)
 	MCFG_CPU_PROGRAM_MAP(abc1600_mem)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz((float)XTAL_64MHz/8/10/20000/8/8))
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1600)) // XTAL_64MHz/8/10/20000/8/8
 
 	// video hardware
 	MCFG_FRAGMENT_ADD(abc1600_video)
