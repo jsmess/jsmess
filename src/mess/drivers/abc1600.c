@@ -12,8 +12,10 @@
 
     - keyboard
         - "Bad command" on first enter after boot
+		- expose Z80DART interrupt acknowledge function
     - floppy
         - internal floppy is really drive 2, but wd17xx.c doesn't like having NULL drives
+		- mf: timeout several times while loading abcenix
     - BUS0I/0X/1/2
     - short/long reset (RSTBUT)
     - SCC interrupt
@@ -1086,11 +1088,13 @@ WRITE8_MEMBER( abc1600_state::spec_contr_reg_w )
 	case 6: // SYSSCC
 		m_sysscc = state;
 		update_drdy1();
+		m_cio->pb5_w(!m_sysscc);
 		break;
 
 	case 7: // SYSFS
 		m_sysfs = state;
 		update_drdy0();
+		m_cio->pb6_w(!m_sysfs);
 		break;
 	}
 }
@@ -1311,6 +1315,9 @@ READ8_MEMBER( abc1600_state::cio_pb_r )
 
 	UINT8 data = 0;
 
+	data |= !m_sysscc << 5;
+	data |= !m_sysfs << 6;
+	
 	// floppy interrupt
 	data |= wd17xx_intrq_r(m_fdc) << 7;
 
@@ -1473,6 +1480,10 @@ static IRQ_CALLBACK( abc1600_int_ack )
 	{
 	case M68K_IRQ_2:
 		data = state->m_cio->intack_r();
+		break;
+		
+	case M68K_IRQ_5:
+		//data = state->m_dart->z80daisy_irq_ack();
 		break;
 	}
 

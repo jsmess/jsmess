@@ -319,14 +319,14 @@ inline void z8536_device::check_interrupt()
 				
 				if (((m_register[PORT_A_MODE_SPECIFICATION] & PMS_PMS_MASK) >> 1) == PMS_OR_PEV)
 				{
-					if 		(m_match[PORT_A] & 0x80) vector |= 7;
-					else if (m_match[PORT_A] & 0x40) vector |= 6;
-					else if (m_match[PORT_A] & 0x20) vector |= 5;
-					else if (m_match[PORT_A] & 0x10) vector |= 4;
-					else if (m_match[PORT_A] & 0x08) vector |= 3;
-					else if (m_match[PORT_A] & 0x04) vector |= 2;
-					else if (m_match[PORT_A] & 0x02) vector |= 1;
-					else if (m_match[PORT_A] & 0x01) vector |= 0;
+					if 		(m_match[PORT_A] & 0x80) vector |= 7 << 1;
+					else if (m_match[PORT_A] & 0x40) vector |= 6 << 1;
+					else if (m_match[PORT_A] & 0x20) vector |= 5 << 1;
+					else if (m_match[PORT_A] & 0x10) vector |= 4 << 1;
+					else if (m_match[PORT_A] & 0x08) vector |= 3 << 1;
+					else if (m_match[PORT_A] & 0x04) vector |= 2 << 1;
+					else if (m_match[PORT_A] & 0x02) vector |= 1 << 1;
+					else if (m_match[PORT_A] & 0x01) vector |= 0 << 1;
 				}
 				else
 				{
@@ -353,14 +353,14 @@ inline void z8536_device::check_interrupt()
 				
 				if (((m_register[PORT_B_MODE_SPECIFICATION] & PMS_PMS_MASK) >> 1) == PMS_OR_PEV)
 				{
-					if 		(m_match[PORT_B] & 0x80) vector |= 7;
-					else if (m_match[PORT_B] & 0x40) vector |= 6;
-					else if (m_match[PORT_B] & 0x20) vector |= 5;
-					else if (m_match[PORT_B] & 0x10) vector |= 4;
-					else if (m_match[PORT_B] & 0x08) vector |= 3;
-					else if (m_match[PORT_B] & 0x04) vector |= 2;
-					else if (m_match[PORT_B] & 0x02) vector |= 1;
-					else if (m_match[PORT_B] & 0x01) vector |= 0;
+					if 		(m_match[PORT_B] & 0x80) vector |= 7 << 1;
+					else if (m_match[PORT_B] & 0x40) vector |= 6 << 1;
+					else if (m_match[PORT_B] & 0x20) vector |= 5 << 1;
+					else if (m_match[PORT_B] & 0x10) vector |= 4 << 1;
+					else if (m_match[PORT_B] & 0x08) vector |= 3 << 1;
+					else if (m_match[PORT_B] & 0x04) vector |= 2 << 1;
+					else if (m_match[PORT_B] & 0x02) vector |= 1 << 1;
+					else if (m_match[PORT_B] & 0x01) vector |= 0 << 1;
 				}
 				else
 				{
