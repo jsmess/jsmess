@@ -236,26 +236,19 @@ static TIMER_CALLBACK(kc_cassette_timer_callback)
 
 void kc_state::cassette_set_motor(int motor_state)
 {
-	/* state changed? */
-	if (((m_cassette_motor_state^motor_state)&0x01) != 0)
+	/* set new motor state in cassette device */
+	m_cassette->change_state(motor_state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+
+	if (motor_state)
 	{
-		/* set new motor state in cassette device */
-		m_cassette->change_state(motor_state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-
-		if (motor_state)
-		{
-			/* start timer */
-			m_cassette_timer->adjust(attotime::zero, 0, KC_CASSETTE_TIMER_FREQUENCY);
-		}
-		else
-		{
-			/* stop timer */
-			m_cassette_timer->reset();
-		}
+		/* start timer */
+		m_cassette_timer->adjust(attotime::zero, 0, KC_CASSETTE_TIMER_FREQUENCY);
 	}
-
-	/* store new state */
-	m_cassette_motor_state = motor_state;
+	else
+	{
+		/* stop timer */
+		m_cassette_timer->reset();
+	}
 }
 
 /*
@@ -617,11 +610,9 @@ WRITE8_MEMBER( kc_state::pio_portb_w )
 	update_0x08000();
 
 	/* 16 speaker levels */
-	int speaker_level = (data>>1) & 0x0f;
+	m_speaker_level = (data>>1) & 0x0f;
 
-	/* this might not be correct, the range might
-    be logarithmic and not linear! */
-	speaker_level_w(m_speaker, (speaker_level<<4));
+	speaker_update();
 }
 
 /* port 0x84/0x85:
@@ -700,12 +691,24 @@ WRITE_LINE_MEMBER( kc_state::pio_brdy_cb)
 /* used in cassette write -> K0 */
 WRITE_LINE_MEMBER( kc_state::ctc_zc0_callback )
 {
-
+	if (state)
+	{
+		m_k0_line^=1;
+		speaker_update();
+	}
 }
 
 /* used in cassette write -> K1 */
 WRITE_LINE_MEMBER( kc_state::ctc_zc1_callback)
 {
+	if (state)
+	{
+		m_k1_line^=1;
+		speaker_update();
+
+		// K1 line is also cassette output
+		m_cassette->output((m_k1_line & 1) ? +1 : -1);
+	}
 
 }
 
@@ -745,6 +748,11 @@ WRITE_LINE_MEMBER( kc_state::ctc_zc2_callback )
 	}
 }
 
+void kc_state::speaker_update()
+{
+	/* this might not be correct, the range might be logarithmic and not linear! */
+	speaker_level_w(m_speaker, m_k0_line ? (m_speaker_level | (m_k1_line ? 0x01 : 0)) : 0);
+}
 
 /* keyboard callback */
 WRITE_LINE_MEMBER( kc_state::keyboard_cb )
@@ -790,6 +798,8 @@ void kc_state::machine_reset()
 
 	// set low resolution at reset
 	m_high_resolution = 0;
+
+	cassette_set_motor(0);
 
 	/* this is temporary. Normally when a Z80 is reset, it will
     execute address 0. It appears the KC85 series pages the rom

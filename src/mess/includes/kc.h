@@ -109,6 +109,9 @@ public:
 	// cassette
 	void cassette_set_motor(int motor_state);
 
+	// speaker
+	void speaker_update();
+
 	// defined in video/kc.c
 	virtual void video_start();
 
@@ -116,13 +119,15 @@ public:
 	UINT8 *				m_ram_base;
 	int 				m_pio_data[2];
 	emu_timer *			m_cassette_timer;
-	int 				m_cassette_motor_state;
 	int					m_high_resolution;
 	UINT8				m_ardy;
 	UINT8				m_brdy;
 	int 				m_kc85_50hz_state;
 	int 				m_kc85_15khz_state;
 	int					m_kc85_blink_state;
+	int					m_k0_line;
+	int					m_k1_line;
+	UINT8				m_speaker_level;
 
 	kcexp_slot_device *	m_expansions[3];
 };
