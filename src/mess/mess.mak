@@ -644,7 +644,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_MACHINE)/a2cffa.o	\
 	$(MESS_MACHINE)/lisa.o		\
 	$(MESS_DRIVERS)/lisa.o		\
-    $(MESS_MACHINE)/nubus.o     \
+	$(MESS_MACHINE)/nubus.o     \
 	$(MESS_AUDIO)/mac.o			\
 	$(MESS_VIDEO)/mac.o			\
 	$(MESS_MACHINE)/mac.o		\
@@ -655,7 +655,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_VIDEO)/apple3.o		\
 	$(MESS_MACHINE)/apple3.o	\
 	$(MESS_DRIVERS)/apple3.o	\
-    $(MESS_MACHINE)/egret.o     \
+	$(MESS_MACHINE)/egret.o     \
 	$(MESS_VIDEO)/nubus_48gc.o	\
 	$(MESS_VIDEO)/nubus_cb264.o \
 	$(MESS_VIDEO)/nubus_vikbw.o \
@@ -663,7 +663,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_VIDEO)/nubus_m2hires.o \
 	$(MESS_VIDEO)/nubus_spec8.o \
 	$(MESS_VIDEO)/nubus_radiustpd.o \
-    $(MESS_MACHINE)/nubus_asntmc3b.o \
+	$(MESS_MACHINE)/nubus_asntmc3b.o \
 
 $(MESSOBJ)/applied.a:			\
 	$(MESS_VIDEO)/mbee.o		\
@@ -948,7 +948,7 @@ $(MESSOBJ)/elektor.a:			\
 
 $(MESSOBJ)/ensoniq.a:			\
 	$(MESS_DRIVERS)/esq1.o		\
-    $(MESS_DRIVERS)/mirage.o    \
+	$(MESS_DRIVERS)/mirage.o    \
 
 $(MESSOBJ)/entex.a:				\
 	$(MESS_VIDEO)/advision.o	\
@@ -1788,6 +1788,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/sage2.o		\
 	$(MESS_DRIVERS)/savia84.o	\
 	$(MESS_DRIVERS)/selz80.o	\
+	$(MESS_DRIVERS)/sitcom.o	\
 	$(MESS_DRIVERS)/slc1.o		\
 	$(MESS_DRIVERS)/super6.o	\
 	$(MESS_DRIVERS)/swtpc.o		\
@@ -1846,8 +1847,8 @@ $(MESS_MACHINE)/mac.o:		$(MESSSRC)/machine/mac.c \
 $(MESS_DRIVERS)/mac.o:		$(MESSSRC)/drivers/mac.c \
 				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h
 
-$(MESS_MACHINE)/egret.o:    $(MESSSRC)/machine/egret.c\
-                $(MESSSRC)/machine/egret.h
+$(MESS_MACHINE)/egret.o:	$(MESSSRC)/machine/egret.c\
+                        	$(MESSSRC)/machine/egret.h
 
 #-------------------------------------------------
 # layout dependencies
