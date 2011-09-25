@@ -9,8 +9,17 @@
     It uses a 6809 for all main functions. There is a Z80 for CP/M, but all
     of the roms are 6809 code.
 
+    The keyboard controller is one of those custom XR devices.
+    Will use the terminal keyboard instead.
+
     ToDo:
-    - Everything!
+    - Almost Everything!
+    - Connect up the device ports & lines
+    - Find out about graphics mode and how it is selected
+    - There is a beeper or speaker connected to the 6840 - how?
+    - Fix Keyboard so that the Enter key tells BASIC to do something
+    - Fix If ^G is pressed, emulation freezes
+    - Find out how to make 2nd teletext screen to display
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -18,6 +27,8 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
+#include "machine/6821pia.h"
+#include "machine/6840ptm.h"
 #include "video/saa5050.h"
 #include "machine/terminal.h"
 
@@ -27,11 +38,19 @@ class poly_state : public driver_device
 public:
 	poly_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+	m_maincpu(*this, "maincpu"),
+	m_pia0(*this, "pia0"),
+	m_pia1(*this, "pia1")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<pia6821_device> m_pia0;
+	required_device<pia6821_device> m_pia1;
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_READ8_MEMBER(pia1_b_in);
+	DECLARE_READ_LINE_MEMBER(pia1_cb1_in);
+	UINT8 m_term_data;
+	bool m_term_key;
 };
 
 
@@ -39,9 +58,20 @@ static ADDRESS_MAP_START(poly_mem, AS_PROGRAM, 8, poly_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x9fff) AM_RAM
 	AM_RANGE(0xa000,0xcfff) AM_ROM
-	AM_RANGE(0xd000,0xe7ff) AM_RAM
-	AM_RANGE(0xe800,0xebff) AM_DEVREADWRITE_LEGACY("saa5050", saa5050_videoram_r, saa5050_videoram_w)
-	AM_RANGE(0xec00,0xefff) AM_RAM
+	AM_RANGE(0xd000,0xdfff) AM_RAM
+	AM_RANGE(0xe000,0xe003) AM_DEVREADWRITE("pia0", pia6821_device, read, write) //video control PIA 6821
+	// AM_RANGE(0xe004,0xe006) optional RS232C interface
+	AM_RANGE(0xe00c,0xe00f) AM_DEVREADWRITE("pia1", pia6821_device, read, write) //keyboard PIA 6821
+	AM_RANGE(0xe020,0xe027) AM_DEVREADWRITE("ptm", ptm6840_device, read, write) //timer 6840
+	// AM_RANGE(0xe030,0xe037) Data Link Controller 6854
+	AM_RANGE(0xe040,0xe040) AM_NOP //Set protect flip-flop after 1 E-cycle
+	AM_RANGE(0xe050,0xe05f) AM_RAM //Dynamic Address Translater (arranges memory banks)
+	// AM_RANGE(0xe060,0xe060) Select Map 1
+	// AM_RANGE(0xe070,0xe070) Select Map 2
+	AM_RANGE(0xe800,0xebbf) AM_DEVREADWRITE_LEGACY("saa5050", saa5050_videoram_r, saa5050_videoram_w)
+	AM_RANGE(0xebc0,0xebff) AM_RAM
+	AM_RANGE(0xec00,0xefbf) AM_RAM // screen 2 AM_DEVREADWRITE_LEGACY("saa5050", saa5050_videoram_r, saa5050_videoram_w)
+	AM_RANGE(0xefc0,0xefff) AM_RAM
 	AM_RANGE(0xf000,0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -54,6 +84,61 @@ INPUT_PORTS_END
 static MACHINE_RESET( poly )
 {
 }
+
+static const pia6821_interface poly_pia0_intf=
+{
+	DEVCB_NULL,						/* port A input */
+	DEVCB_NULL,	/* port B input */
+	DEVCB_NULL, /* CA1 input */
+	DEVCB_NULL, /* CB1 input */
+	DEVCB_NULL,						/* CA2 input */
+	DEVCB_NULL,						/* CB2 input */
+	DEVCB_NULL,	/* port A output */
+	DEVCB_NULL,	/* port B output */
+	DEVCB_NULL, /* CA2 output */
+	DEVCB_NULL, /* CB2 output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),	/* IRQA output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)		/* IRQB output */
+};
+
+READ8_MEMBER( poly_state::pia1_b_in )
+{
+// return ascii key value, bit 7 is the strobe value
+	return m_term_data;
+}
+
+READ_LINE_MEMBER( poly_state::pia1_cb1_in )
+{
+// return kbd strobe value
+	return 0;
+}
+
+
+static const pia6821_interface poly_pia1_intf=
+{
+	DEVCB_NULL,		/* port A input */
+	DEVCB_DRIVER_MEMBER(poly_state, pia1_b_in),		/* port B input */
+	DEVCB_NULL,		/* CA1 input */
+	DEVCB_DRIVER_LINE_MEMBER(poly_state, pia1_cb1_in),		/* CB1 input */
+	DEVCB_NULL,		/* CA2 input */
+	DEVCB_NULL,		/* CB2 input */
+	DEVCB_NULL,		/* port A output */
+	DEVCB_NULL,		/* port B output */
+	DEVCB_NULL,		/* CA2 output */
+	DEVCB_NULL,		/* CB2 output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
+};
+
+static const ptm6840_interface poly_ptm_intf =
+{
+	XTAL_10MHz/10, // not correct
+	{ 0, 0, 0 },
+	{ DEVCB_NULL,
+	  DEVCB_NULL,
+	  DEVCB_NULL },
+	DEVCB_NULL
+};
 
 static SCREEN_UPDATE( poly )
 {
@@ -68,13 +153,15 @@ static const saa5050_interface poly_saa5050_intf =
 {
 	"screen",
 	0,	/* starting gfxnum */
-	40, 25, 40,  /* x, y, size */
+	40, 24, 40,  /* x, y, size */
 	0	/* rev y order */
 };
 
 // temporary hack
 WRITE8_MEMBER( poly_state::kbd_put )
 {
+	m_term_data = data;
+	//m_term_key = 1;
 	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
 	mem->write_byte(0xebec, data);
 	mem->write_byte(0xebd0, 1); // any non-zero here
@@ -100,12 +187,15 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	MCFG_SCREEN_SIZE(40 * 12, 24 * 20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 12 - 1, 0, 24 * 20 - 1)
 	MCFG_SCREEN_UPDATE(poly)
-
 	MCFG_GFXDECODE(saa5050)
 	MCFG_PALETTE_LENGTH(128)
 	MCFG_PALETTE_INIT(saa5050)
 
+	/* Devices */
 	MCFG_SAA5050_ADD("saa5050", poly_saa5050_intf)
+	MCFG_PIA6821_ADD( "pia0", poly_pia0_intf )
+	MCFG_PIA6821_ADD( "pia1", poly_pia1_intf )
+	MCFG_PTM6840_ADD("ptm", poly_ptm_intf)
 
 	// temporary hack
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
