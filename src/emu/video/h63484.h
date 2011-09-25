@@ -26,8 +26,8 @@
 #define H63484_INTERFACE(name) \
 	const h63484_interface (name) =
 
-typedef void (*h63484_display_pixels_func)(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data, UINT8 *vram);
-#define H63484_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data, UINT8 *vram)
+typedef void (*h63484_display_pixels_func)(device_t *device, bitmap_t *bitmap, int y, int x, UINT16 data);
+#define H63484_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_t *bitmap, int y, int x, UINT16 data)
 
 // ======================> h63484_interface
 
@@ -78,16 +78,18 @@ private:
 	inline void queue_r(UINT8 data);
 	inline void dequeue_r(UINT8 *data);
 	inline void recompute_parameters();
+	inline void command_end_seq();
 
-	void command_end_seq();
 	void command_wpr_exec();
 	void command_clr_exec();
 	void command_cpy_exec();
+	void command_rct_exec();
 	void process_fifo();
 	void exec_abort_sequence();
 	UINT16 video_registers_r(int offset);
 	void video_registers_w(int offset);
 	int translate_command(UINT16 data);
+	void draw_graphics_line(bitmap_t *bitmap, const rectangle *cliprect, int y, int layer_n);
 
 
 	screen_device *m_screen;
@@ -122,6 +124,9 @@ private:
 
 	UINT16 m_mwr[4];
 	UINT8  m_mwr_chr[4];
+
+	UINT32 m_sar[4];
+	UINT8 m_sda[4];
 
 	UINT16 m_pram[0x10];
 	UINT8 m_dn;
