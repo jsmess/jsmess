@@ -6,7 +6,6 @@
 
 **********************************************************************/
 
-#include "emu.h"
 #include "includes/p2000t.h"
 
 
@@ -22,7 +21,7 @@ VIDEO_START( p2000m )
 SCREEN_UPDATE( p2000m )
 {
 	p2000t_state *state = screen->machine().driver_data<p2000t_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_p_videoram;
 	int offs, sx, sy, code, loop;
 
 	for (offs = 0; offs < 80 * 24; offs++)
