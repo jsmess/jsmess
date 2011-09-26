@@ -140,6 +140,7 @@ private:
 	static const int PORT_B = 1;
 	static const int PORT_C = 2;
 
+	inline void get_interrupt_vector();
 	inline void check_interrupt();
 
 	inline UINT8 read_register(offs_t offset);
@@ -156,6 +157,7 @@ private:
 	inline void count(device_timer_id id);
 	inline void trigger(device_timer_id id);
 	inline void gate(device_timer_id id, int state);
+	inline void match_pattern(int port);
 	inline void external_port_w(int port, int bit, int state);
 
 	devcb_resolved_write_line		m_out_int_func;
