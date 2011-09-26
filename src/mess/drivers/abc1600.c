@@ -14,7 +14,6 @@
         - "Bad command" on first enter after boot
     - floppy
         - internal floppy is really drive 2, but wd17xx.c doesn't like having NULL drives
-		- mf: timeout several times while loading abcenix
     - BUS0I/0X/1/2
     - short/long reset (RSTBUT)
     - CIO
