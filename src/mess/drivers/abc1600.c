@@ -12,13 +12,11 @@
 
     - keyboard
         - "Bad command" on first enter after boot
-		- expose Z80DART interrupt acknowledge function
     - floppy
         - internal floppy is really drive 2, but wd17xx.c doesn't like having NULL drives
 		- mf: timeout several times while loading abcenix
     - BUS0I/0X/1/2
     - short/long reset (RSTBUT)
-    - SCC interrupt
     - CIO
         - vectored interrupts with status
         - port A bit mode, OR-PEVM, interrupt when bit=1
@@ -1273,6 +1271,18 @@ static Z80DART_INTERFACE( dart_intf )
 
 
 //-------------------------------------------------
+//  SCC8530_INTERFACE( sc_intf )
+//-------------------------------------------------
+
+static void scc_irq(device_t *device, int status)
+{
+	abc1600_state *state = device->machine().driver_data<abc1600_state>();
+
+	state->m_maincpu->set_input_line(M68K_IRQ_5, status);
+}
+
+
+//-------------------------------------------------
 //  Z8536_INTERFACE( cio_intf )
 //-------------------------------------------------
 
@@ -1483,7 +1493,7 @@ static IRQ_CALLBACK( abc1600_int_ack )
 		break;
 		
 	case M68K_IRQ_5:
-		//data = state->m_dart->z80daisy_irq_ack();
+		data = state->m_dart->m1_r();
 		break;
 	}
 
@@ -1571,6 +1581,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_Z80DMA_ADD(Z8410AB1_2_TAG, XTAL_64MHz/16, dma2_intf)
 	MCFG_Z80DART_ADD(Z8470AB1_TAG, XTAL_64MHz/16, dart_intf)
 	MCFG_SCC8530_ADD(Z8530B1_TAG, XTAL_64MHz/16)
+	MCFG_SCC8530_IRQ(scc_irq)
 	MCFG_Z8536_ADD(Z8536B1_TAG, XTAL_64MHz/16, cio_intf)
 	MCFG_NMC9306_ADD(NMC9306_TAG)
 	MCFG_E0516_ADD(E050_C16PC_TAG, XTAL_32_768kHz)
