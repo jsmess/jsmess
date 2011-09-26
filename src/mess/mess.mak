@@ -1910,6 +1910,7 @@ $(MESS_DRIVERS)/sc2.o:		$(MESS_LAYOUT)/sc2.lh
 $(MESS_DRIVERS)/sdk85.o:	$(MESS_LAYOUT)/sdk85.lh
 $(MESS_DRIVERS)/sdk86.o:	$(MESS_LAYOUT)/sdk86.lh
 $(MESS_DRIVERS)/selz80.o:	$(MESS_LAYOUT)/selz80.lh
+$(MESS_DRIVERS)/sitcom.o:	$(MESS_LAYOUT)/sitcom.lh
 $(MESS_DRIVERS)/slc1.o:		$(MESS_LAYOUT)/slc1.lh
 $(MESS_DRIVERS)/sms.o:		$(MAME_LAYOUT)/sms1.lh
 $(MESS_DRIVERS)/stopthie.o:	$(MESS_LAYOUT)/stopthie.lh
