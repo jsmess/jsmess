@@ -1,14 +1,14 @@
 /***************************************************************************
 
-    SITCOM
+    SITCOM (known as Sitcom, Sitcom85, Sitcom8085)
 
-    25/09/2011 Skeleton driver.
+    25/09/2011 Driver [Robbbert]
 
     http://www.izabella.me.uk/html/sitcom_.html
     http://www.sbprojects.com/sitcom/sitcom.htm
 
-    The display consists of a red LED connected to SOD,
-    and a pair of DL1414 intelligent alphanumeric displays (not emulated).
+    The display consists of a LED connected to SOD, and a pair of
+    DL1414 intelligent alphanumeric displays (not emulated).
 
     The DL1414 has its own character generator rom, and control logic
     to display 4 characters (choice of 64) on a tiny LED readout.
@@ -16,6 +16,22 @@
     The DL1414 is a slightly simplified version of the DL2416.
 
     To replace the displays, we use a small video screen of 1x8 chars.
+
+    The idea of this device is that you write a 8085 program with an
+    assembler on your PC. You then compile it, and then send it to
+    the SITCOM via a serial cable. The program then (hopefully) runs
+    on the SITCOM. With the 8255 expansion, you could wire up input
+    devices or other hardware for your program to use.
+
+    The SOD LED blinks slowly while waiting; stays on while downloading;
+    and blinks quickly if an error occurs.
+
+    After a successful download, the ROM is switched out and the RAM
+    mirrored to the lower 32k. The downloaded program is then executed.
+    This part is not emulated.
+
+    In MESS, start emulation. After about 10 seconds the display will
+    scroll sideways with a message and a weblink. There are no input keys.
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
