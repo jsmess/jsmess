@@ -237,7 +237,7 @@ WRITE8_DEVICE_HANDLER( dl1416_data_w )
 					int previous_digit = chip->cursor_ram[i];
 
 					/* Either set the cursor or restore the original character */
-					digit = data & i ? SEG_CURSOR : chip->cursor_ram[i];
+					digit = data & (1<<i) ? SEG_CURSOR : chip->cursor_ram[i];
 
 					/* Call update function if we changed something */
 					if (previous_digit != digit)
