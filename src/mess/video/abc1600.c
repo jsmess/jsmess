@@ -2,9 +2,7 @@
 
     TODO:
 
-    - FRAME POL
     - landscape/portrait mode
-    - position image based on vsync/hsync
 
 */
 
@@ -34,6 +32,11 @@
 #define HOLD_FX		BIT(m_flag, 5)
 #define COMP_MOVE	BIT(m_flag, 6)
 #define REPLACE		BIT(m_flag, 7)
+
+
+// image position
+#define HFP			96
+#define VFP			23
 
 
 // IOWR0 registers
@@ -949,7 +952,9 @@ inline UINT16 abc1600_state::get_crtca(UINT16 ma, UINT8 ra, UINT8 column)
 
 void abc1600_state::crtc_update_row(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
-	int x = 0;
+	if (y > 0x3ff) return;
+	
+	int x = HFP;
 
 	for (int column = 0; column < x_count; column += 2)
 	{
@@ -964,7 +969,7 @@ void abc1600_state::crtc_update_row(device_t *device, bitmap_t *bitmap, const re
 			{
 				int color = (BIT(data, 15) ^ PIX_POL) & !BLANK;
 
-				*BITMAP_ADDR16(bitmap, y, x++) = color;
+				*BITMAP_ADDR16(bitmap, y + VFP, x++) = color;
 
 				data <<= 1;
 			}
@@ -1050,8 +1055,12 @@ void abc1600_state::video_start()
 
 bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
+	// HACK expand visible area to workaround MC6845
+	screen.set_visible_area(0, 958, 0, 1067);
+
 	if (m_endisp)
 	{
+		bitmap_fill(&bitmap, &cliprect, FRAME_POL);
 		m_crtc->update(&bitmap, &cliprect);
 	}
 	else
