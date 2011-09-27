@@ -4,6 +4,31 @@
 
         30/08/2010 Skeleton driver
 
+The P112 is a stand-alone 8-bit CPU board. Typically running CP/M (tm) or a
+similar operating system, it provides a Z80182 (Z-80 upgrade) CPU with up to
+1MB of memory, serial, parallel and diskette IO, and realtime clock, in a
+3.5-inch drive form factor. Powered solely from 5V, it draws 150mA (nominal:
+not including disk drives) with a 16MHz CPU clock. Clock speeds up to 24.576MHz
+are possible.
+
+http://members.iinet.net.au/~daveb/p112/p112.html
+
+Some of the parts:
+ 32kHz crystal          1       Y2              (RTC crystal)
+ 16MHz crystal          1       Y1              Parallel resonant (CPU clock)
+ 24MHz crystal          1       Y3              Parallel resonant (IO chip clock)
+ 28F256A                1       U4              (Intel Flash ROM, programmed)
+ 74HCT00                1       U5
+ 74ACT02                1       U8
+ 74ACT139               1       U11
+ 62256                  2       U2      U3      (Static RAM, 32kB)
+ DS1202                 1       U6              (Dallas RTC chip)
+ FDC37C665IR            1       U9              (SMC Super-IO chip)
+ LT1133                 2       U7      U10     (Linear Technology RS232 Tx/Rx)
+ NMF0512S               1       U12             (Newport Components Flash ROM power)
+ TL7705ACP              1       U15             (Texas Insts. Reset genr.)
+ Z8018216               1       U1              (Zilog CPU chip)
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -96,5 +121,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1996, p112,    0,       0,     p112,      p112,     0,   "Dave Brooks", "P112", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
+COMP( 1996, p112,   0,      0,       p112,      p112,    0,   "Dave Brooks", "P112", GAME_NOT_WORKING | GAME_NO_SOUND)
