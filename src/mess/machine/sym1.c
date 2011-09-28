@@ -139,7 +139,7 @@ static WRITE8_DEVICE_HANDLER(sym1_riot_b_w)
 	state->m_riot_port_b = data;
 
 	/* first 4 pins are connected to the 74145 */
-	ttl74145_w(device->machine().device("ttl74145"), 0, data & 0x0f);
+	device->machine().device<ttl74145_device>("ttl74145")->write(data & 0x0f);
 }
 
 

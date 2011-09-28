@@ -46,29 +46,6 @@
 #include "74145.h"
 #include "coreutil.h"
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef struct _ttl74145_t ttl74145_t;
-struct _ttl74145_t
-{
-	devcb_resolved_write_line output_line_0;
-	devcb_resolved_write_line output_line_1;
-	devcb_resolved_write_line output_line_2;
-	devcb_resolved_write_line output_line_3;
-	devcb_resolved_write_line output_line_4;
-	devcb_resolved_write_line output_line_5;
-	devcb_resolved_write_line output_line_6;
-	devcb_resolved_write_line output_line_7;
-	devcb_resolved_write_line output_line_8;
-	devcb_resolved_write_line output_line_9;
-
-	/* decoded number */
-	int number;
-};
-
-
 /*****************************************************************************
     GLOBAL VARIABLES
 *****************************************************************************/
@@ -88,113 +65,114 @@ const ttl74145_interface default_ttl74145 =
 };
 
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-INLINE ttl74145_t *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == TTL74145);
-
-	return (ttl74145_t *)downcast<legacy_device_base *>(device)->token();
-}
-
-
-WRITE8_DEVICE_HANDLER( ttl74145_w )
-{
-	ttl74145_t *ttl74145 = get_safe_token(device);
-
-	/* decode number */
-	int new_number = bcd_2_dec(data & 0x0f);
-
-	/* call output callbacks if the number changed */
-	if (new_number != ttl74145->number)
-	{
-		ttl74145->output_line_0(new_number == 0);
-		ttl74145->output_line_1(new_number == 1);
-		ttl74145->output_line_2(new_number == 2);
-		ttl74145->output_line_3(new_number == 3);
-		ttl74145->output_line_4(new_number == 4);
-		ttl74145->output_line_5(new_number == 5);
-		ttl74145->output_line_6(new_number == 6);
-		ttl74145->output_line_7(new_number == 7);
-		ttl74145->output_line_8(new_number == 8);
-		ttl74145->output_line_9(new_number == 9);
-	}
-
-	/* update state */
-	ttl74145->number = new_number;
-}
-
-
-READ16_DEVICE_HANDLER( ttl74145_r )
-{
-	ttl74145_t *ttl74145 = get_safe_token(device);
-
-	return (1 << ttl74145->number) & 0x3ff;
-}
-
+const device_type TTL74145 = &device_creator<ttl74145_device>;
 
 /***************************************************************************
     DEVICE INTERFACE
 ***************************************************************************/
+//-------------------------------------------------
+//  ttl74145_device - constructor
+//-------------------------------------------------
 
-static DEVICE_START( ttl74145 )
+ttl74145_device::ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, TTL74145, "TTL74145", tag, owner, clock)
 {
-	const ttl74145_interface *intf = (const ttl74145_interface *)device->static_config();
-	ttl74145_t *ttl74145 = get_safe_token(device);
+}
 
-	/* validate arguments */
-	assert(device->static_config() != NULL);
 
-	/* initialize with 0 */
-	ttl74145->number = 0;
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
+void ttl74145_device::device_start()
+{
 	/* resolve callbacks */
-	ttl74145->output_line_0.resolve(intf->output_line_0, *device);
-	ttl74145->output_line_1.resolve(intf->output_line_1, *device);
-	ttl74145->output_line_2.resolve(intf->output_line_2, *device);
-	ttl74145->output_line_3.resolve(intf->output_line_3, *device);
-	ttl74145->output_line_4.resolve(intf->output_line_4, *device);
-	ttl74145->output_line_5.resolve(intf->output_line_5, *device);
-	ttl74145->output_line_6.resolve(intf->output_line_6, *device);
-	ttl74145->output_line_7.resolve(intf->output_line_7, *device);
-	ttl74145->output_line_8.resolve(intf->output_line_8, *device);
-	ttl74145->output_line_9.resolve(intf->output_line_9, *device);
+	m_output_line_0_func.resolve(m_output_line_0_cb, *this);
+	m_output_line_1_func.resolve(m_output_line_1_cb, *this);
+	m_output_line_2_func.resolve(m_output_line_2_cb, *this);
+	m_output_line_3_func.resolve(m_output_line_3_cb, *this);
+	m_output_line_4_func.resolve(m_output_line_4_cb, *this);
+	m_output_line_5_func.resolve(m_output_line_5_cb, *this);
+	m_output_line_6_func.resolve(m_output_line_6_cb, *this);
+	m_output_line_7_func.resolve(m_output_line_7_cb, *this);
+	m_output_line_8_func.resolve(m_output_line_8_cb, *this);
+	m_output_line_9_func.resolve(m_output_line_9_cb, *this);
 
-	/* register for state saving */
-	state_save_register_item(device->machine(), "ttl74145", device->tag(), 0, ttl74145->number);
+	// register for state saving
+	save_item(NAME(m_number));
 }
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
-static DEVICE_RESET( ttl74145 )
+void ttl74145_device::device_config_complete()
 {
-	ttl74145_t *ttl74145 = get_safe_token(device);
-	ttl74145->number = 0;
-}
+	// inherit a copy of the static data
+	const ttl74145_interface *intf = reinterpret_cast<const ttl74145_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<ttl74145_interface *>(this) = *intf;
 
-
-DEVICE_GET_INFO( ttl74145 )
-{
-	switch (state)
+	// or initialize to defaults if none provided
+	else
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ttl74145_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;								break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ttl74145);	break;
-		case DEVINFO_FCT_STOP:					/* Nothing */								break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(ttl74145);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "TTL74145");				break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "TTL74145");				break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.2");						break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MESS Team");		break;
+		memset(&m_output_line_0_cb, 0, sizeof(m_output_line_0_cb));
+		memset(&m_output_line_1_cb, 0, sizeof(m_output_line_1_cb));
+		memset(&m_output_line_2_cb, 0, sizeof(m_output_line_2_cb));
+		memset(&m_output_line_3_cb, 0, sizeof(m_output_line_3_cb));
+		memset(&m_output_line_4_cb, 0, sizeof(m_output_line_4_cb));
+		memset(&m_output_line_5_cb, 0, sizeof(m_output_line_5_cb));
+		memset(&m_output_line_6_cb, 0, sizeof(m_output_line_6_cb));
+		memset(&m_output_line_7_cb, 0, sizeof(m_output_line_7_cb));
+		memset(&m_output_line_8_cb, 0, sizeof(m_output_line_8_cb));
+		memset(&m_output_line_9_cb, 0, sizeof(m_output_line_9_cb));
 	}
 }
 
-DEFINE_LEGACY_DEVICE(TTL74145, ttl74145);
+//-------------------------------------------------
+//  device_start - device-specific reset
+//-------------------------------------------------
+
+void ttl74145_device::device_reset()
+{
+	m_number = 0;
+}
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+void ttl74145_device::write(UINT8 data)
+{
+	/* decode number */
+	UINT16 new_number = bcd_2_dec(data & 0x0f);
+
+	/* call output callbacks if the number changed */
+	if (new_number != m_number)
+	{
+		m_output_line_0_func(new_number == 0);
+		m_output_line_1_func(new_number == 1);
+		m_output_line_2_func(new_number == 2);
+		m_output_line_3_func(new_number == 3);
+		m_output_line_4_func(new_number == 4);
+		m_output_line_5_func(new_number == 5);
+		m_output_line_6_func(new_number == 6);
+		m_output_line_7_func(new_number == 7);
+		m_output_line_8_func(new_number == 8);
+		m_output_line_9_func(new_number == 9);
+	}
+
+	/* update state */
+	m_number = new_number;
+}
+
+
+UINT16 ttl74145_device::read()
+{
+	return (1 << m_number) & 0x3ff;
+}
+
+
+

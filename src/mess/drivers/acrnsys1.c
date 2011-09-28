@@ -47,7 +47,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ttl74145;
+	required_device<ttl74145_device> m_ttl74145;
 	DECLARE_READ8_MEMBER(ins8154_b1_port_a_r);
 	DECLARE_WRITE8_MEMBER(ins8154_b1_port_a_w);
 	DECLARE_WRITE8_MEMBER(acrnsys1_led_segment_w);
@@ -62,7 +62,7 @@ public:
 // bit 7 is cassin
 READ8_MEMBER( acrnsys1_state::ins8154_b1_port_a_r )
 {
-	UINT8 data = 0xff, i, key_line = ttl74145_r(m_ttl74145, 0, 0);
+	UINT8 data = 0xff, i, key_line = m_ttl74145->read();
 
 	for (i = 0; i < 8; i++)
 	{
@@ -82,7 +82,7 @@ READ8_MEMBER( acrnsys1_state::ins8154_b1_port_a_r )
 WRITE8_MEMBER( acrnsys1_state::ins8154_b1_port_a_w )
 {
 	m_digit = data & 0xc7;
-	ttl74145_w(m_ttl74145, 0, m_digit & 7);
+	m_ttl74145->write(m_digit & 7);
 }
 
 
@@ -92,7 +92,7 @@ WRITE8_MEMBER( acrnsys1_state::ins8154_b1_port_a_w )
 
 WRITE8_MEMBER( acrnsys1_state::acrnsys1_led_segment_w )
 {
-	UINT8 key_line = ttl74145_r(m_ttl74145, 0, 0);
+	UINT8 key_line = m_ttl74145->read();
 
 	output_set_digit_value(key_line, data);
 }
