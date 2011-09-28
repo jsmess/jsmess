@@ -983,6 +983,7 @@ void floppy_image::get_actual_geometry(int &_tracks, int &_heads)
 			for(int i=0; i<=maxt; i++)
 				if(get_track_size(i, maxh))
 					goto head_done;
+			maxh--;
 		}
  head_done:
 	_tracks = maxt+1;
