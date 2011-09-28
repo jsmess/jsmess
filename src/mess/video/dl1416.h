@@ -52,7 +52,7 @@ struct _dl1416_interface
 	MCFG_DEVICE_CONFIG_DATA32(dl1416_interface, type, _type) \
 	MCFG_DEVICE_CONFIG_DATAPTR(dl1416_interface, update, _update)
 
-#define MCFG_DL1416B_ADD(_tag, _update_) \
+#define MCFG_DL1416B_ADD(_tag, _update) \
 	MCFG_DL1416_ADD(_tag, DL1416B, _update)
 
 #define MCFG_DL1416T_ADD(_tag, _update) \
