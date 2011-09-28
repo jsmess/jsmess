@@ -967,7 +967,7 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="mapper" value="LZ93A13-16" />
 			<dataarea name="rom" size="262144">
 				<!-- SHARP MSX2 PN 8929 D -->
-				<rom name="msx2_pn" size="262144" crc="7df16fc8" sha1="d5902afbd8dfb1ea96fc8cf4d62cf6e4fa40d4f7" offset="0" flags="baddump" />
+				<rom name="msx2_pn" size="262144" crc="7df16fc8" sha1="d5902afbd8dfb1ea96fc8cf4d62cf6e4fa40d4f7" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
