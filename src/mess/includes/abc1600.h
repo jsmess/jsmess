@@ -166,6 +166,7 @@ public:
 	inline void load_mta_x();
 	inline void compare_mta_x();
 	inline void compare_mta_y();
+	inline void load_xy_reg();
 	void mover();
 
 	inline UINT16 read_videoram(UINT32 offset);
@@ -211,6 +212,7 @@ public:
 	UINT16 m_xfrom;				// X from
 	UINT16 m_xto;				// X to
 	UINT16 m_yto;				// Y to
+	UINT16 m_ty;				// to Y
 	UINT32 m_mfa;				// mover from address
 	UINT32 m_mta;				// mover to address
 	UINT8 m_sh;					//
