@@ -5,9 +5,12 @@
     preliminary driver by Angelo Salese
 
     TODO:
+    - Z80PIO keyboard irqs doesn't work at all, kludged keyboard inputs to work for now
     - floppy support (but floppy images are unobtainable at current time)
-    - Z80PIO keyboard irq doesn't work at all, kludged keyboard inputs to work for now
     - cassette device;
+    - beeper
+    - LCD version has gfx bugs, it must use a different ROM charset for instance (apparently a 8 x 4
+      one, 40/80 x 8 tilemap);
 
 ***************************************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -20,7 +23,7 @@
 #include "machine/upd765.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
-
+#include "rendlay.h"
 
 class pasopia7_state : public driver_device
 {
@@ -96,14 +99,13 @@ public:
 	UINT16 m_pac2_index[2];
 	UINT32 m_kanji_index;
 	UINT8 m_pac2_bank_select;
+	UINT8 m_screen_type;
 	int m_addr_latch;
 	void pasopia_nmi_trap();
 };
 
-
-
-
 #define VDP_CLOCK XTAL_3_579545MHz/4
+#define LCD_CLOCK VDP_CLOCK/10
 
 static VIDEO_START( pasopia7 )
 {
@@ -231,7 +233,8 @@ static void draw_tv_screen(running_machine &machine, bitmap_t *bitmap,const rect
 {
 	pasopia7_state *state = machine.driver_data<pasopia7_state>();
 	UINT8 *vram = machine.region("vram")->base();
-	int x,y/*,xi,yi*/;
+	UINT8 *gfx_data = machine.region("font")->base();
+	int x,y,xi,yi;
 	int count;
 
 	count = 0x0000;
@@ -244,7 +247,16 @@ static void draw_tv_screen(running_machine &machine, bitmap_t *bitmap,const rect
 			int attr = vram[count+0xc000];
 			int color = attr & 7;
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],tile,color & 7,0,0,x*8,y*8,0);
+			for(yi=0;yi<8;yi++)
+			{
+				for(xi=0;xi<8;xi++)
+				{
+					int pen;
+					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
+
+					*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = machine.pens[pen];
+				}
+			}
 
 			// draw cursor
 			if(state->m_cursor_addr*8 == count)
@@ -266,7 +278,7 @@ static void draw_tv_screen(running_machine &machine, bitmap_t *bitmap,const rect
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							*BITMAP_ADDR16(bitmap, y*8-yc+7, x*8+xc) = machine.pens[0x27];
+							*BITMAP_ADDR16(bitmap, y*8-yc+7, x*8+xc) = machine.pens[7];
 						}
 					}
 				}
@@ -308,7 +320,7 @@ static void draw_mixed_screen(running_machine &machine, bitmap_t *bitmap,const r
 
 						pen =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = machine.pens[pen+0x20];
+						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = machine.pens[pen];
 					}
 				}
 				else
@@ -320,9 +332,8 @@ static void draw_mixed_screen(running_machine &machine, bitmap_t *bitmap,const r
 						int pen;
 						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
 
-						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = machine.pens[pen+0x20];
+						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = machine.pens[pen];
 					}
-					//drawgfx_transpen(bitmap,cliprect,machine.gfx[0],tile,color & 7,0,0,x*8,y*8,0);
 				}
 			}
 
@@ -346,7 +357,7 @@ static void draw_mixed_screen(running_machine &machine, bitmap_t *bitmap,const r
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							*BITMAP_ADDR16(bitmap, y*8-yc+7, x*8+xc) = machine.pens[0x27];
+							*BITMAP_ADDR16(bitmap, y*8-yc+7, x*8+xc) = machine.pens[7];
 						}
 					}
 				}
@@ -582,7 +593,10 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_6845_w )
 		m_crtc->register_w(space, offset, data);
 
 		/* double pump the pixel clock if we are in 640 x 200 mode */
-		m_crtc->set_clock( (m_x_width) ? VDP_CLOCK*2 : VDP_CLOCK);
+		if(m_screen_type == 1) // raster
+			m_crtc->set_clock( (m_x_width) ? VDP_CLOCK*2 : VDP_CLOCK);
+		else // lcd
+			m_crtc->set_clock( (m_x_width) ? LCD_CLOCK*2 : LCD_CLOCK);
 	}
 }
 
@@ -753,10 +767,6 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( pasopia7 )
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "System type" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, "LCD" )
 INPUT_PORTS_END
 
 static const gfx_layout p7_chars_8x8 =
@@ -846,13 +856,12 @@ static const z80_daisy_config p7_daisy[] =
 READ8_MEMBER( pasopia7_state::crtc_portb_r )
 {
 	// --x- ---- vsync bit
-	// ---x ---- lcd dip-sw
+	// ---x ---- hardcoded bit, defines if the system screen is raster (1) or LCD (0)
 	// ---- x--- disp bit
-	UINT8 lcd_bit = input_port_read(machine(), "DSW") & 1;
-	UINT8 vdisp = (machine().primary_screen->vpos() < (lcd_bit ? 200 : 28)) ? 0x08 : 0x00; //TODO: check LCD vpos trigger
+	UINT8 vdisp = (machine().primary_screen->vpos() < (m_screen_type ? 200 : 28)) ? 0x08 : 0x00; //TODO: check LCD vpos trigger
 	UINT8 vsync = vdisp ? 0x00 : 0x20;
 
-	return 0x40 | (m_attr_latch & 0x87) | vsync | vdisp | (lcd_bit << 4);
+	return 0x40 | (m_attr_latch & 0x87) | vsync | vdisp | (m_screen_type << 4);
 }
 
 WRITE8_MEMBER( pasopia7_state::screen_mode_w )
@@ -993,24 +1002,23 @@ static MACHINE_RESET( pasopia7 )
 	state->m_nmi_reset |= 4;
 }
 
-static PALETTE_INIT( pasopia7 )
+static PALETTE_INIT( p7_raster )
 {
 	int i;
 
-	for (i = 0; i < 32; i++)
-	{
-		UINT8 r=0,g=0,b=0;
-
-		if(((i & 0x11) == 0x01) || ((i & 0x11) == 0x10))
-		{
-			r = ((i >> 2) & 1) ? 0xff : 0;
-			g = ((i >> 3) & 1) ? 0xff : 0;
-			b = ((i >> 1) & 1) ? 0xff : 0;
-		}
-		palette_set_color_rgb(machine, i, r,g,b);
-	}
 	for( i = 0; i < 8; i++)
-		palette_set_color_rgb(machine, i|32, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette_set_color_rgb(machine, i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+}
+
+/* TODO: palette values are mostly likely to be wrong in there */
+static PALETTE_INIT( p7_lcd )
+{
+	int i;
+
+	palette_set_color_rgb(machine, 0, 0xa0, 0xa8, 0xa0);
+
+	for( i = 1; i < 8; i++)
+		palette_set_color_rgb(machine, i, 0x30, 0x38, 0x10);
 }
 
 static const struct upd765_interface pasopia7_upd765_interface =
@@ -1035,28 +1043,14 @@ static const floppy_interface pasopia7_floppy_interface =
 	NULL
 };
 
-static MACHINE_CONFIG_START( pasopia7, pasopia7_state )
+static MACHINE_CONFIG_START( p7_base, pasopia7_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pasopia7_mem)
 	MCFG_CPU_IO_MAP(pasopia7_io)
-// MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MCFG_CPU_CONFIG(p7_daisy)
 
 	MCFG_MACHINE_RESET(pasopia7)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_VIDEO_START(pasopia7)
-	MCFG_SCREEN_UPDATE(pasopia7)
-	MCFG_PALETTE_LENGTH(0x28)
-	MCFG_PALETTE_INIT(pasopia7)
-	MCFG_GFXDECODE( pasopia7 )
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1066,7 +1060,6 @@ static MACHINE_CONFIG_START( pasopia7, pasopia7_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, VDP_CLOCK, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_4MHz, z80ctc_intf )
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_4MHz, z80pio_intf )
 	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
@@ -1074,6 +1067,40 @@ static MACHINE_CONFIG_START( pasopia7, pasopia7_state )
 	MCFG_I8255_ADD( "ppi8255_2", ppi8255_intf_2 )
 	MCFG_UPD765A_ADD("fdc", pasopia7_upd765_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pasopia7_floppy_interface)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 32-1)
+	MCFG_VIDEO_START(pasopia7)
+	MCFG_SCREEN_UPDATE(pasopia7)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(p7_raster)
+	MCFG_GFXDECODE( pasopia7 )
+
+	MCFG_MC6845_ADD("crtc", H46505, VDP_CLOCK, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( p7_lcd, p7_base )
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_VIDEO_START(pasopia7)
+	MCFG_SCREEN_UPDATE(pasopia7)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(p7_lcd)
+	MCFG_GFXDECODE( pasopia7 )
+
+	MCFG_MC6845_ADD("crtc", H46505, LCD_CLOCK, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_DEFAULT_LAYOUT( layout_lcd )
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -1099,11 +1126,46 @@ ROM_START( pasopia7 )
 	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
-static DRIVER_INIT( pasopia7 )
+/* using an identical ROMset from now, but the screen type is different */
+ROM_START( pasopia7lcd )
+	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "bios.rom", 0x10000, 0x4000, CRC(b8111407) SHA1(ac93ae62db4c67de815f45de98c79cfa1313857d))
+
+	ROM_REGION( 0x8000, "basic", ROMREGION_ERASEFF )
+	ROM_LOAD( "basic.rom", 0x0000, 0x8000, CRC(8a58fab6) SHA1(5e1a91dfb293bca5cf145b0a0c63217f04003ed1))
+
+	ROM_REGION( 0x800, "font", ROMREGION_ERASEFF )
+	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(a91c45a9) SHA1(a472adf791b9bac3dfa6437662e1a9e94a88b412))
+
+	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )
+	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, CRC(6109e308) SHA1(5c21cf1f241ef1fa0b41009ea41e81771729785f))
+
+	ROM_REGION( 0x8000, "rampac1", ROMREGION_ERASEFF )
+//  ROM_LOAD( "rampac1.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
+
+	ROM_REGION( 0x8000, "rampac2", ROMREGION_ERASEFF )
+//  ROM_LOAD( "rampac2.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
+
+	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
+ROM_END
+
+
+static DRIVER_INIT( p7_raster )
 {
+	pasopia7_state *state = machine.driver_data<pasopia7_state>();
+
+	state->m_screen_type = 1;
 }
+
+static DRIVER_INIT( p7_lcd )
+{
+	pasopia7_state *state = machine.driver_data<pasopia7_state>();
+
+	state->m_screen_type = 0;
+}
+
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT    INIT     COMPANY    FULLNAME       FLAGS */
-COMP( 1983, pasopia7,  0,       0,       pasopia7,     pasopia7,   pasopia7,  "Toshiba", "Pasopia 7", GAME_NOT_WORKING )
+COMP( 1983, pasopia7,    0,              0,       p7_raster,     pasopia7,   p7_raster,  "Toshiba", "Pasopia 7 (Raster)", GAME_NOT_WORKING )
+COMP( 1983, pasopia7lcd, pasopia7,       0,       p7_lcd,        pasopia7,   p7_lcd,     "Toshiba", "Pasopia 7 (LCD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
