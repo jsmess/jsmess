@@ -9,54 +9,75 @@
 #ifndef __TTL74145_H__
 #define __TTL74145_H__
 
-#include "devcb.h"
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef struct _ttl74145_interface ttl74145_interface;
-struct _ttl74145_interface
-{
-	devcb_write_line output_line_0;
-	devcb_write_line output_line_1;
-	devcb_write_line output_line_2;
-	devcb_write_line output_line_3;
-	devcb_write_line output_line_4;
-	devcb_write_line output_line_5;
-	devcb_write_line output_line_6;
-	devcb_write_line output_line_7;
-	devcb_write_line output_line_8;
-	devcb_write_line output_line_9;
-};
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-/* standard handlers */
-WRITE8_DEVICE_HANDLER( ttl74145_w );
-READ16_DEVICE_HANDLER( ttl74145_r );
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-DECLARE_LEGACY_DEVICE(TTL74145, ttl74145);
-
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 #define MCFG_TTL74145_ADD(_tag, _intf) \
 	MCFG_DEVICE_ADD(_tag, TTL74145, 0) \
 	MCFG_DEVICE_CONFIG(_intf)
+	
 
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-/***************************************************************************
-    DEFAULT INTERFACES
-***************************************************************************/
+// ======================> ttl74145_interface
+
+struct ttl74145_interface
+{
+	devcb_write_line m_output_line_0_cb;
+	devcb_write_line m_output_line_1_cb;
+	devcb_write_line m_output_line_2_cb;
+	devcb_write_line m_output_line_3_cb;
+	devcb_write_line m_output_line_4_cb;
+	devcb_write_line m_output_line_5_cb;
+	devcb_write_line m_output_line_6_cb;
+	devcb_write_line m_output_line_7_cb;
+	devcb_write_line m_output_line_8_cb;
+	devcb_write_line m_output_line_9_cb;
+};
+
+// ======================> ttl74145_device
+
+class ttl74145_device :  public device_t,
+						public ttl74145_interface
+{
+public:
+    // construction/destruction
+    ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	UINT16 read();
+	void write(UINT8 data);
+protected:
+    // device-level overrides
+    virtual void device_start();
+	virtual void device_reset();
+    virtual void device_config_complete();
+
+private:
+	devcb_resolved_write_line	m_output_line_0_func;
+	devcb_resolved_write_line	m_output_line_1_func;
+	devcb_resolved_write_line	m_output_line_2_func;
+	devcb_resolved_write_line	m_output_line_3_func;
+	devcb_resolved_write_line	m_output_line_4_func;
+	devcb_resolved_write_line	m_output_line_5_func;
+	devcb_resolved_write_line	m_output_line_6_func;
+	devcb_resolved_write_line	m_output_line_7_func;
+	devcb_resolved_write_line	m_output_line_8_func;
+	devcb_resolved_write_line	m_output_line_9_func;
+
+	/* decoded number */
+	UINT16 m_number;
+};
+
+// device type definition
+extern const device_type TTL74145;
+
+//**************************************************************************
+//  DEFAULT INTERFACES
+//**************************************************************************
 
 extern const ttl74145_interface default_ttl74145;
 
 
-#endif /* __TTL74145_H__ */
+#endif /* TTL74145 */

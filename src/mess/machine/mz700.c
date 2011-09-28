@@ -451,7 +451,7 @@ static WRITE_LINE_DEVICE_HANDLER( pit_irq_2 )
 
 static READ8_DEVICE_HANDLER( pio_port_b_r )
 {
-	int key_line = ttl74145_r(device, 0, 0);
+	int key_line = dynamic_cast<ttl74145_device *>(device)->read();
 
 	switch (key_line)
 	{
@@ -506,7 +506,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 	LOG(2,"mz700_pio_port_a_w",("%02X\n", data),device->machine());
 
 	/* the ls145 is connected to PA0-PA3 */
-	ttl74145_w(device, 0, data & 0x07);
+	dynamic_cast<ttl74145_device *>(device)->write(data & 0x07);
 
 	/* ne556 reset is connected to PA7 */
 	timer->enable(BIT(data, 7));
