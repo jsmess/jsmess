@@ -389,7 +389,7 @@ void wd1772_t::interrupt_start()
 		motor_timeout = 0;
 	}
 	if(command & 0x0f) {
-		logerror("%s: unhandled interrupt generation\n", ttsn().cstr());
+		logerror("%s: unhandled interrupt generation (%02x)\n", ttsn().cstr(), command);
 	}
 }
 
@@ -859,8 +859,10 @@ void wd1772_t::live_run(attotime limit)
 					cur_live.state = READ_ID_BLOCK_TO_LOCAL;
 					break;
 				}
-				cur_live.state = SEARCH_ADDRESS_MARK;
-				break;
+				if(sub_state == READ_ID) {
+					cur_live.state = READ_ID_BLOCK_TO_DMA;
+					break;
+				}
 
 			default:
 				cur_live.state = SEARCH_ADDRESS_MARK;
@@ -882,6 +884,28 @@ void wd1772_t::live_run(attotime limit)
 			}
 			break;
 		}
+
+		case READ_ID_BLOCK_TO_DMA: {
+			if(read_one_bit(limit))
+				return;
+			if(cur_live.bit_counter & 15)
+				break;
+			live_delay(READ_ID_BLOCK_TO_DMA_BYTE);
+			return;
+		}
+
+		case READ_ID_BLOCK_TO_DMA_BYTE:
+			data = cur_live.data_reg;
+			if(cur_live.bit_counter == 16)
+				sector = data;
+			set_drq();
+			if(cur_live.bit_counter == 16*6) {
+				live_delay(IDLE);
+				return;
+			}
+				
+			cur_live.state = READ_ID_BLOCK_TO_DMA;
+			break;
 
 		case READ_SECTOR_DATA: {
 			if(read_one_bit(limit))
@@ -929,7 +953,6 @@ void wd1772_t::live_run(attotime limit)
 			if(output_byte) {
 				live_delay(READ_TRACK_DATA_BYTE);
 				return;
-
 			}
 				
 			break;
