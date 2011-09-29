@@ -37,6 +37,7 @@
         ND - Likely many more
 
 *******************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/unsp/unsp.h"
@@ -58,13 +59,24 @@ class vii_state : public driver_device
 {
 public:
 	vii_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu")
+	{ }
 
-	UINT16 *m_ram;
-	UINT16 *m_cart;
-	UINT16 *m_rowscroll;
-	UINT16 *m_palette;
-	UINT16 *m_spriteram;
+	required_device<cpu_device> m_maincpu;
+	DECLARE_READ16_MEMBER(vii_video_r);
+	DECLARE_WRITE16_MEMBER(vii_video_w);
+	DECLARE_READ16_MEMBER(vii_audio_r);
+	DECLARE_WRITE16_MEMBER(vii_audio_w);
+	DECLARE_READ16_MEMBER(vii_io_r);
+	DECLARE_WRITE16_MEMBER(vii_io_w);
+	DECLARE_WRITE16_MEMBER(vii_rowscroll_w);
+	DECLARE_WRITE16_MEMBER(vii_spriteram_w);
+	UINT16 *m_p_ram;
+	UINT16 *m_p_cart;
+	UINT16 *m_p_rowscroll;
+	UINT16 *m_p_palette;
+	UINT16 *m_p_spriteram;
 
 	UINT32 m_current_bank;
 
@@ -84,6 +96,11 @@ public:
 
 	emu_timer *m_tmb1;
 	emu_timer *m_tmb2;
+	void vii_do_dma(UINT32 len);
+	void vii_do_gpio(UINT32 offset);
+	void vii_switch_bank(UINT32 bank);
+	void vii_do_i2c();
+	void spg_do_dma(UINT32 len);
 };
 
 enum
@@ -96,9 +113,9 @@ enum
 };
 
 
-#define VII_CTLR_IRQ_ENABLE		state->m_io_regs[0x21]
-#define VII_VIDEO_IRQ_ENABLE	state->m_video_regs[0x62]
-#define VII_VIDEO_IRQ_STATUS	state->m_video_regs[0x63]
+#define VII_CTLR_IRQ_ENABLE	m_io_regs[0x21]
+#define VII_VIDEO_IRQ_ENABLE	m_video_regs[0x62]
+#define VII_VIDEO_IRQ_STATUS	m_video_regs[0x63]
 
 
 #define VERBOSE_LEVEL	(3)
@@ -204,12 +221,12 @@ static void vii_blit(running_machine &machine, bitmap_t *bitmap, const rectangle
 
 			if((ctrl & 0x0010) && yy < 240)
 			{
-				xx = (xx - (INT16)state->m_rowscroll[yy]) & 0x01ff;
+				xx = (xx - (INT16)state->m_p_rowscroll[yy]) & 0x01ff;
 			}
 
 			if(xx < 320 && yy < 240)
 			{
-				UINT16 rgb = state->m_palette[pal];
+				UINT16 rgb = state->m_p_palette[pal];
 				if(!(rgb & 0x8000))
 				{
 					if (attr & 0x4000)
@@ -387,144 +404,135 @@ static SCREEN_UPDATE( vii )
 *    Machine Hardware    *
 *************************/
 
-static void vii_do_dma(running_machine &machine, UINT32 len)
+void vii_state::vii_do_dma(UINT32 len)
 {
-	vii_state *state = machine.driver_data<vii_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT32 src = state->m_video_regs[0x70];
-	UINT32 dst = state->m_video_regs[0x71] + 0x2c00;
+	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	UINT32 src = m_video_regs[0x70];
+	UINT32 dst = m_video_regs[0x71] + 0x2c00;
 	UINT32 j;
 
 	for(j = 0; j < len; j++)
 	{
-		space->write_word((dst+j) << 1, space->read_word((src+j) << 1));
+		mem->write_word((dst+j) << 1, mem->read_word((src+j) << 1));
 	}
 
-	state->m_video_regs[0x72] = 0;
-	state->m_video_regs[0x63] |= 4;
+	m_video_regs[0x72] = 0;
+	m_video_regs[0x63] |= 4;
 }
 
-static READ16_HANDLER( vii_video_r )
+READ16_MEMBER( vii_state::vii_video_r )
 {
-	vii_state *state = space->machine().driver_data<vii_state>();
-
 	switch(offset)
 	{
 		case 0x62: // Video IRQ Enable
-			verboselog(space->machine(), 0, "vii_video_r: Video IRQ Enable: %04x\n", VII_VIDEO_IRQ_ENABLE);
+			verboselog(machine(), 0, "vii_video_r: Video IRQ Enable: %04x\n", VII_VIDEO_IRQ_ENABLE);
 			return VII_VIDEO_IRQ_ENABLE;
 
 		case 0x63: // Video IRQ Status
-			verboselog(space->machine(), 0, "vii_video_r: Video IRQ Status: %04x\n", VII_VIDEO_IRQ_STATUS);
+			verboselog(machine(), 0, "vii_video_r: Video IRQ Status: %04x\n", VII_VIDEO_IRQ_STATUS);
 			return VII_VIDEO_IRQ_STATUS;
 
 		default:
-			verboselog(space->machine(), 0, "vii_video_r: Unknown register %04x = %04x\n", 0x2800 + offset, state->m_video_regs[offset]);
+			verboselog(machine(), 0, "vii_video_r: Unknown register %04x = %04x\n", 0x2800 + offset, m_video_regs[offset]);
 			break;
 	}
-	return state->m_video_regs[offset];
+	return m_video_regs[offset];
 }
 
-static WRITE16_HANDLER( vii_video_w )
+WRITE16_MEMBER( vii_state::vii_video_w )
 {
-	vii_state *state = space->machine().driver_data<vii_state>();
-
 	switch(offset)
 	{
 		case 0x10: case 0x16:	// page 1,2 X scroll
 			data &= 0x01ff;
-			COMBINE_DATA(&state->m_video_regs[offset]);
+			COMBINE_DATA(&m_video_regs[offset]);
 			break;
 
 		case 0x11: case 0x17:	// page 1,2 Y scroll
 			data &= 0x00ff;
-			COMBINE_DATA(&state->m_video_regs[offset]);
+			COMBINE_DATA(&m_video_regs[offset]);
 			break;
 		case 0x36:		// IRQ pos V
 		case 0x37:		// IRQ pos H
 			data &= 0x01ff;
-			COMBINE_DATA(&state->m_video_regs[offset]);
+			COMBINE_DATA(&m_video_regs[offset]);
 			break;
 		case 0x62: // Video IRQ Enable
-			verboselog(space->machine(), 0, "vii_video_w: Video IRQ Enable = %04x (%04x)\n", data, mem_mask);
+			verboselog(machine(), 0, "vii_video_w: Video IRQ Enable = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&VII_VIDEO_IRQ_ENABLE);
 			break;
 
 		case 0x63: // Video IRQ Acknowledge
-			verboselog(space->machine(), 0, "vii_video_w: Video IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
+			verboselog(machine(), 0, "vii_video_w: Video IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
 			VII_VIDEO_IRQ_STATUS &= ~data;
 			if(!VII_VIDEO_IRQ_STATUS)
 			{
-				cputag_set_input_line(space->machine(), "maincpu", UNSP_IRQ0_LINE, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", UNSP_IRQ0_LINE, CLEAR_LINE);
 			}
 			break;
 
 		case 0x70: // Video DMA Source
-			verboselog(space->machine(), 0, "vii_video_w: Video DMA Source = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&state->m_video_regs[offset]);
+			verboselog(machine(), 0, "vii_video_w: Video DMA Source = %04x (%04x)\n", data, mem_mask);
+			COMBINE_DATA(&m_video_regs[offset]);
 			break;
 
 		case 0x71: // Video DMA Dest
-			verboselog(space->machine(), 0, "vii_video_w: Video DMA Dest = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&state->m_video_regs[offset]);
+			verboselog(machine(), 0, "vii_video_w: Video DMA Dest = %04x (%04x)\n", data, mem_mask);
+			COMBINE_DATA(&m_video_regs[offset]);
 			break;
 
 		case 0x72: // Video DMA Length
-			verboselog(space->machine(), 0, "vii_video_w: Video DMA Length = %04x (%04x)\n", data, mem_mask);
-			vii_do_dma(space->machine(), data);
+			verboselog(machine(), 0, "vii_video_w: Video DMA Length = %04x (%04x)\n", data, mem_mask);
+			vii_do_dma(data);
 			break;
 
 		default:
-			verboselog(space->machine(), 0, "vii_video_w: Unknown register %04x = %04x (%04x)\n", 0x2800 + offset, data, mem_mask);
-			COMBINE_DATA(&state->m_video_regs[offset]);
+			verboselog(machine(), 0, "vii_video_w: Unknown register %04x = %04x (%04x)\n", 0x2800 + offset, data, mem_mask);
+			COMBINE_DATA(&m_video_regs[offset]);
 			break;
 	}
 }
 
-static READ16_HANDLER( vii_audio_r )
+READ16_MEMBER( vii_state::vii_audio_r )
 {
 	switch(offset)
 	{
 		default:
-			verboselog(space->machine(), 4, "vii_audio_r: Unknown register %04x\n", 0x3000 + offset);
+			verboselog(machine(), 4, "vii_audio_r: Unknown register %04x\n", 0x3000 + offset);
 			break;
 	}
 	return 0;
 }
 
-static WRITE16_HANDLER( vii_audio_w )
+WRITE16_MEMBER( vii_state::vii_audio_w )
 {
 	switch(offset)
 	{
 		default:
-			verboselog(space->machine(), 4, "vii_audio_w: Unknown register %04x = %04x (%04x)\n", 0x3000 + offset, data, mem_mask);
+			verboselog(machine(), 4, "vii_audio_w: Unknown register %04x = %04x (%04x)\n", 0x3000 + offset, data, mem_mask);
 			break;
 	}
 }
 
-static void vii_switch_bank(running_machine &machine, UINT32 bank)
+void vii_state::vii_switch_bank(UINT32 bank)
 {
-	vii_state *state = machine.driver_data<vii_state>();
-	UINT8 *cart = machine.region("cart")->base();
+	UINT8 *cart = machine().region("cart")->base();
 
-	if(bank == state->m_current_bank)
+	if(bank != m_current_bank)
 	{
-		return;
+		m_current_bank = bank;
+
+		memcpy(m_p_cart, cart + 0x400000 * bank * 2 + 0x4000*2, (0x400000 - 0x4000) * 2);
 	}
-
-	state->m_current_bank = bank;
-
-	memcpy(state->m_cart, cart + 0x400000 * bank * 2 + 0x4000*2, (0x400000 - 0x4000) * 2);
 }
 
-static void vii_do_gpio(running_machine &machine, UINT32 offset)
+void vii_state::vii_do_gpio(UINT32 offset)
 {
-	vii_state *state = machine.driver_data<vii_state>();
 	UINT32 index  = (offset - 1) / 5;
-	UINT16 buffer = state->m_io_regs[5*index + 2];
-	UINT16 dir    = state->m_io_regs[5*index + 3];
-	UINT16 attr   = state->m_io_regs[5*index + 4];
-	UINT16 special= state->m_io_regs[5*index + 5];
+	UINT16 buffer = m_io_regs[5*index + 2];
+	UINT16 dir    = m_io_regs[5*index + 3];
+	UINT16 attr   = m_io_regs[5*index + 4];
+	UINT16 special= m_io_regs[5*index + 5];
 
 	UINT16 push   = dir;
 	UINT16 pull   = (~dir) & (~attr);
@@ -532,19 +540,19 @@ static void vii_do_gpio(running_machine &machine, UINT32 offset)
 	what ^= (dir & ~attr);
 	what &= ~special;
 
-	if(state->m_spg243_mode == SPG243_VII)
+	if(m_spg243_mode == SPG243_VII)
 	{
 		if(index == 1)
 		{
 			UINT32 bank = ((what & 0x80) >> 7) | ((what & 0x20) >> 4);
-			vii_switch_bank(machine, bank);
+			vii_switch_bank(bank);
 		}
 	}
-	else if(state->m_spg243_mode == SPG243_BATMAN)
+	else if(m_spg243_mode == SPG243_BATMAN)
 	{
 		if(index == 0)
 		{
-			UINT16 temp = input_port_read(machine, "P1");
+			UINT16 temp = input_port_read(machine(), "P1");
 			what |= (temp & 0x0001) ? 0x8000 : 0;
 			what |= (temp & 0x0002) ? 0x4000 : 0;
 			what |= (temp & 0x0004) ? 0x2000 : 0;
@@ -552,7 +560,7 @@ static void vii_do_gpio(running_machine &machine, UINT32 offset)
 			what |= (temp & 0x0010) ? 0x0800 : 0;
 			what |= (temp & 0x0020) ? 0x0400 : 0;
 			what |= (temp & 0x0040) ? 0x0200 : 0;
-			what |= (temp & 0x0040) ? 0x0100 : 0;
+			what |= (temp & 0x0080) ? 0x0100 : 0;
 		}
 
 		if(index == 2)
@@ -560,110 +568,105 @@ static void vii_do_gpio(running_machine &machine, UINT32 offset)
 		}
 	}
 
-	state->m_io_regs[5*index + 1] = what;
+	m_io_regs[5*index + 1] = what;
 }
 
-static void vii_do_i2c(running_machine &machine)
+void vii_state::vii_do_i2c()
 {
 }
 
-static void spg_do_dma(running_machine &machine, UINT32 len)
+void vii_state::spg_do_dma(UINT32 len)
 {
-	vii_state *state = machine.driver_data<vii_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
 
-	UINT32 src = ((state->m_io_regs[0x101] & 0x3f) << 16) | state->m_io_regs[0x100];
-	UINT32 dst = state->m_io_regs[0x103] & 0x3fff;
+	UINT32 src = ((m_io_regs[0x101] & 0x3f) << 16) | m_io_regs[0x100];
+	UINT32 dst = m_io_regs[0x103] & 0x3fff;
 	UINT32 j;
 
 	for(j = 0; j < len; j++)
-	{
-		space->write_word((dst+j) << 1, space->read_word((src+j) << 1));
-	}
+		mem->write_word((dst+j) << 1, mem->read_word((src+j) << 1));
 
-	state->m_io_regs[0x102] = 0;
+	m_io_regs[0x102] = 0;
 }
 
-static READ16_HANDLER( vii_io_r )
+READ16_MEMBER( vii_state::vii_io_r )
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[] = { 'A', 'B', 'C' };
 
-	vii_state *state = space->machine().driver_data<vii_state>();
 	offset -= 0x500;
 
-	UINT16 val = state->m_io_regs[offset];
+	UINT16 val = m_io_regs[offset];
 
 	switch(offset)
 	{
 		case 0x01: case 0x06: case 0x0b: // GPIO Data Port A/B/C
-			vii_do_gpio(space->machine(), offset);
-			verboselog(space->machine(), 3, "vii_io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], state->m_io_regs[offset], mem_mask);
-			val = state->m_io_regs[offset];
+			vii_do_gpio(offset);
+			verboselog(machine(), 3, "vii_io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
+			val = m_io_regs[offset];
 			break;
 
 		case 0x02: case 0x03: case 0x04: case 0x05:
 		case 0x07: case 0x08: case 0x09: case 0x0a:
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Other GPIO regs
-			verboselog(space->machine(), 3, "vii_io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], state->m_io_regs[offset], mem_mask);
+			verboselog(machine(), 3, "vii_io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
 			break;
 
 		case 0x1c: // Random
-			val = space->machine().rand() & 0x00ff;
-			verboselog(space->machine(), 3, "vii_io_r: Random = %04x (%04x)\n", val, mem_mask);
+			val = machine().rand() & 0x00ff;
+			verboselog(machine(), 3, "vii_io_r: Random = %04x (%04x)\n", val, mem_mask);
 			break;
 
 		case 0x21: // IRQ Control
-			verboselog(space->machine(), 3, "vii_io_r: Controller IRQ Control = %04x (%04x)\n", val, mem_mask);
+			verboselog(machine(), 3, "vii_io_r: Controller IRQ Control = %04x (%04x)\n", val, mem_mask);
 			break;
 
 		case 0x22: // IRQ Status
-			verboselog(space->machine(), 3, "vii_io_r: Controller IRQ Status = %04x (%04x)\n", val, mem_mask);
+			verboselog(machine(), 3, "vii_io_r: Controller IRQ Status = %04x (%04x)\n", val, mem_mask);
 			break;
 
 		case 0x2c: case 0x2d: // Timers?
-			val = space->machine().rand() & 0x0000ffff;
-			verboselog(space->machine(), 3, "vii_io_r: Unknown Timer %d Register = %04x (%04x)\n", offset - 0x2c, val, mem_mask);
+			val = machine().rand() & 0x0000ffff;
+			verboselog(machine(), 3, "vii_io_r: Unknown Timer %d Register = %04x (%04x)\n", offset - 0x2c, val, mem_mask);
 			break;
 
 		case 0x2f: // Data Segment
-			val = cpu_get_reg(space->machine().device("maincpu"), UNSP_SR) >> 10;
-			verboselog(space->machine(), 3, "vii_io_r: Data Segment = %04x (%04x)\n", val, mem_mask);
+			val = cpu_get_reg(machine().device("maincpu"), UNSP_SR) >> 10;
+			verboselog(machine(), 3, "vii_io_r: Data Segment = %04x (%04x)\n", val, mem_mask);
 			break;
 
 		case 0x31: // Unknown, UART Status?
-			verboselog(space->machine(), 3, "vii_io_r: Unknown (UART Status?) = %04x (%04x)\n", 3, mem_mask);
+			verboselog(machine(), 3, "vii_io_r: Unknown (UART Status?) = %04x (%04x)\n", 3, mem_mask);
 			val = 3;
 			break;
 
 		case 0x36: // UART RX Data
-			val = state->m_controller_input[state->m_uart_rx_count];
-			state->m_uart_rx_count = (state->m_uart_rx_count + 1) % 8;
-			verboselog(space->machine(), 3, "vii_io_r: UART RX Data = %04x (%04x)\n", val, mem_mask);
+			val = m_controller_input[m_uart_rx_count];
+			m_uart_rx_count = (m_uart_rx_count + 1) % 8;
+			verboselog(machine(), 3, "vii_io_r: UART RX Data = %04x (%04x)\n", val, mem_mask);
 			break;
 
 		case 0x59: // I2C Status
-			verboselog(space->machine(), 3, "vii_io_r: I2C Status = %04x (%04x)\n", val, mem_mask);
+			verboselog(machine(), 3, "vii_io_r: I2C Status = %04x (%04x)\n", val, mem_mask);
 			break;
 
 		case 0x5e: // I2C Data In
-			verboselog(space->machine(), 3, "vii_io_r: I2C Data In = %04x (%04x)\n", val, mem_mask);
+			verboselog(machine(), 3, "vii_io_r: I2C Data In = %04x (%04x)\n", val, mem_mask);
 			break;
 
 		default:
-			verboselog(space->machine(), 3, "vii_io_r: Unknown register %04x\n", 0x3d00 + offset);
+			verboselog(machine(), 3, "vii_io_r: Unknown register %04x\n", 0x3d00 + offset);
 			break;
 	}
 
 	return val;
 }
 
-static WRITE16_HANDLER( vii_io_w )
+WRITE16_MEMBER( vii_state::vii_io_w )
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[3] = { 'A', 'B', 'C' };
 
-	vii_state *state = space->machine().driver_data<vii_state>();
 	UINT16 temp = 0;
 
 	offset -= 0x500;
@@ -671,8 +674,8 @@ static WRITE16_HANDLER( vii_io_w )
 	switch(offset)
 	{
 		case 0x00: // GPIO special function select
-			verboselog(space->machine(), 3, "vii_io_w: GPIO Function Select = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&state->m_io_regs[offset]);
+			verboselog(machine(), 3, "vii_io_w: GPIO Function Select = %04x (%04x)\n", data, mem_mask);
+			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x01: case 0x06: case 0x0b: // GPIO data, port A/B/C
@@ -682,156 +685,156 @@ static WRITE16_HANDLER( vii_io_w )
 		case 0x02: case 0x03: case 0x04: case 0x05: // Port A
 		case 0x07: case 0x08: case 0x09: case 0x0a: // Port B
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Port C
-			verboselog(space->machine(), 3, "vii_io_w: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], data, mem_mask);
-			COMBINE_DATA(&state->m_io_regs[offset]);
-			vii_do_gpio(space->machine(), offset);
+			verboselog(machine(), 3, "vii_io_w: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], data, mem_mask);
+			COMBINE_DATA(&m_io_regs[offset]);
+			vii_do_gpio(offset);
 			break;
 
 		case 0x10:		// timebase control
-			if ((state->m_io_regs[offset] & 0x0003) != (data & 0x0003)) {
+			if ((m_io_regs[offset] & 0x0003) != (data & 0x0003)) {
 				UINT16 hz = 8 << (data & 0x0003);
-				verboselog(space->machine(), 3, "*** TMB1 FREQ set to %dHz\n", hz);
-				state->m_tmb1->adjust(attotime::zero, 0, attotime::from_hz( hz ));
+				verboselog(machine(), 3, "*** TMB1 FREQ set to %dHz\n", hz);
+				m_tmb1->adjust(attotime::zero, 0, attotime::from_hz( hz ));
 			}
-			if ((state->m_io_regs[offset] & 0x000c) != (data & 0x000c)) {
+			if ((m_io_regs[offset] & 0x000c) != (data & 0x000c)) {
 				UINT16 hz = 128 << ((data & 0x000c) >> 2);
-				verboselog(space->machine(), 3, "*** TMB2 FREQ set to %dHz\n", hz);
-				state->m_tmb2->adjust(attotime::zero, 0, attotime::from_hz( hz ));
+				verboselog(machine(), 3, "*** TMB2 FREQ set to %dHz\n", hz);
+				m_tmb2->adjust(attotime::zero, 0, attotime::from_hz( hz ));
 			}
-			COMBINE_DATA(&state->m_io_regs[offset]);
+			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 		case 0x21: // IRQ Enable
-			verboselog(space->machine(), 3, "vii_io_w: Controller IRQ Control = %04x (%04x)\n", data, mem_mask);
+			verboselog(machine(), 3, "vii_io_w: Controller IRQ Control = %04x (%04x)\n", data, mem_mask);
 			COMBINE_DATA(&VII_CTLR_IRQ_ENABLE);
 			if(!VII_CTLR_IRQ_ENABLE)
 			{
-				cputag_set_input_line(space->machine(), "maincpu", UNSP_IRQ3_LINE, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", UNSP_IRQ3_LINE, CLEAR_LINE);
 			}
 			break;
 
 		case 0x22: // IRQ Acknowledge
-			verboselog(space->machine(), 3, "vii_io_w: Controller IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
-			state->m_io_regs[0x22] &= ~data;
-			if(!state->m_io_regs[0x22])
+			verboselog(machine(), 3, "vii_io_w: Controller IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
+			m_io_regs[0x22] &= ~data;
+			if(!m_io_regs[0x22])
 			{
-				cputag_set_input_line(space->machine(), "maincpu", UNSP_IRQ3_LINE, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", UNSP_IRQ3_LINE, CLEAR_LINE);
 			}
 			break;
 
 		case 0x2f: // Data Segment
-			temp = cpu_get_reg(space->machine().device("maincpu"), UNSP_SR);
-			cpu_set_reg(space->machine().device("maincpu"), UNSP_SR, (temp & 0x03ff) | ((data & 0x3f) << 10));
-			verboselog(space->machine(), 3, "vii_io_w: Data Segment = %04x (%04x)\n", data, mem_mask);
+			temp = cpu_get_reg(machine().device("maincpu"), UNSP_SR);
+			cpu_set_reg(machine().device("maincpu"), UNSP_SR, (temp & 0x03ff) | ((data & 0x3f) << 10));
+			verboselog(machine(), 3, "vii_io_w: Data Segment = %04x (%04x)\n", data, mem_mask);
 			break;
 
 		case 0x31: // Unknown UART
-			verboselog(space->machine(), 3, "vii_io_w: Unknown UART = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&state->m_io_regs[offset]);
+			verboselog(machine(), 3, "vii_io_w: Unknown UART = %04x (%04x)\n", data, mem_mask);
+			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x32: // UART Reset
-			verboselog(space->machine(), 3, "vii_io_r: UART Reset\n");
+			verboselog(machine(), 3, "vii_io_r: UART Reset\n");
 			break;
 
 		case 0x33: // UART Baud Rate
-			verboselog(space->machine(), 3, "vii_io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (state->m_io_regs[0x34] << 8) - data));
-			COMBINE_DATA(&state->m_io_regs[offset]);
+			verboselog(machine(), 3, "vii_io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (m_io_regs[0x34] << 8) - data));
+			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x35: // UART TX Data
-			verboselog(space->machine(), 3, "vii_io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (data << 8) - state->m_io_regs[0x33]));
-			COMBINE_DATA(&state->m_io_regs[offset]);
+			verboselog(machine(), 3, "vii_io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (data << 8) - m_io_regs[0x33]));
+			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x5a: // I2C Access Mode
-			verboselog(space->machine(), 3, "vii_io_w: I2C Access Mode = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&state->m_io_regs[offset]);
+			verboselog(machine(), 3, "vii_io_w: I2C Access Mode = %04x (%04x)\n", data, mem_mask);
+			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x5b: // I2C Device Address
-			verboselog(space->machine(), 3, "vii_io_w: I2C Device Address = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&state->m_io_regs[offset]);
+			verboselog(machine(), 3, "vii_io_w: I2C Device Address = %04x (%04x)\n", data, mem_mask);
+			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x5c: // I2C Sub-Address
-			verboselog(space->machine(), 3, "vii_io_w: I2C Sub-Address = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&state->m_io_regs[offset]);
+			verboselog(machine(), 3, "vii_io_w: I2C Sub-Address = %04x (%04x)\n", data, mem_mask);
+			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x5d: // I2C Data Out
-			verboselog(space->machine(), 3, "vii_io_w: I2C Data Out = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&state->m_io_regs[offset]);
+			verboselog(machine(), 3, "vii_io_w: I2C Data Out = %04x (%04x)\n", data, mem_mask);
+			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x5e: // I2C Data In
-			verboselog(space->machine(), 3, "vii_io_w: I2C Data In = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&state->m_io_regs[offset]);
+			verboselog(machine(), 3, "vii_io_w: I2C Data In = %04x (%04x)\n", data, mem_mask);
+			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x5f: // I2C Controller Mode
-			verboselog(space->machine(), 3, "vii_io_w: I2C Controller Mode = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&state->m_io_regs[offset]);
+			verboselog(machine(), 3, "vii_io_w: I2C Controller Mode = %04x (%04x)\n", data, mem_mask);
+			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x58: // I2C Command
-			verboselog(space->machine(), 3, "vii_io_w: I2C Command = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&state->m_io_regs[offset]);
-			vii_do_i2c(space->machine());
+			verboselog(machine(), 3, "vii_io_w: I2C Command = %04x (%04x)\n", data, mem_mask);
+			COMBINE_DATA(&m_io_regs[offset]);
+			vii_do_i2c();
 			break;
 
 		case 0x59: // I2C Status / IRQ Acknowledge(?)
-			verboselog(space->machine(), 3, "vii_io_w: I2C Status / Ack = %04x (%04x)\n", data, mem_mask);
-			state->m_io_regs[offset] &= ~data;
+			verboselog(machine(), 3, "vii_io_w: I2C Status / Ack = %04x (%04x)\n", data, mem_mask);
+			m_io_regs[offset] &= ~data;
 			break;
 
 		case 0x100: // DMA Source (L)
 		case 0x101: // DMA Source (H)
 		case 0x103: // DMA Destination
-			COMBINE_DATA(&state->m_io_regs[offset]);
+			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 
 		case 0x102: // DMA Length
-			spg_do_dma(space->machine(), data);
+			spg_do_dma(data);
 			break;
 
 		default:
-			verboselog(space->machine(), 3, "vii_io_w: Unknown register %04x = %04x (%04x)\n", 0x3d00 + offset, data, mem_mask);
-			COMBINE_DATA(&state->m_io_regs[offset]);
+			verboselog(machine(), 3, "vii_io_w: Unknown register %04x = %04x (%04x)\n", 0x3d00 + offset, data, mem_mask);
+			COMBINE_DATA(&m_io_regs[offset]);
 			break;
 	}
 }
 
 /*
-static WRITE16_HANDLER( vii_rowscroll_w )
+WRITE16_MEMBER( vii_state::vii_rowscroll_w )
 {
     switch(offset)
     {
         default:
-            verboselog(space->machine(), 0, "vii_rowscroll_w: %04x = %04x (%04x)\n", 0x2900 + offset, data, mem_mask);
+            verboselog(machine(), 0, "vii_rowscroll_w: %04x = %04x (%04x)\n", 0x2900 + offset, data, mem_mask);
             break;
     }
 }
 
-static WRITE16_HANDLER( vii_spriteram_w )
+WRITE16_MEMBER( vii_state::vii_spriteram_w )
 {
     switch(offset)
     {
         default:
-            verboselog(space->machine(), 0, "vii_spriteram_w: %04x = %04x (%04x)\n", 0x2c00 + offset, data, mem_mask);
+            verboselog(machine(), 0, "vii_spriteram_w: %04x = %04x (%04x)\n", 0x2c00 + offset, data, mem_mask);
             break;
     }
 }
 */
 
-static ADDRESS_MAP_START( vii_mem, AS_PROGRAM, 16 )
-	AM_RANGE( 0x000000, 0x004fff ) AM_RAM AM_BASE_MEMBER(vii_state,m_ram)
+static ADDRESS_MAP_START( vii_mem, AS_PROGRAM, 16, vii_state )
+	AM_RANGE( 0x000000, 0x004fff ) AM_RAM AM_BASE(m_p_ram)
 	AM_RANGE( 0x005000, 0x0051ff ) AM_READWRITE(vii_video_r, vii_video_w)
-	AM_RANGE( 0x005200, 0x0055ff ) AM_RAM AM_BASE_MEMBER(vii_state,m_rowscroll)
-	AM_RANGE( 0x005600, 0x0057ff ) AM_RAM AM_BASE_MEMBER(vii_state,m_palette)
-	AM_RANGE( 0x005800, 0x005fff ) AM_RAM AM_BASE_MEMBER(vii_state,m_spriteram)
+	AM_RANGE( 0x005200, 0x0055ff ) AM_RAM AM_BASE(m_p_rowscroll)
+	AM_RANGE( 0x005600, 0x0057ff ) AM_RAM AM_BASE(m_p_palette)
+	AM_RANGE( 0x005800, 0x005fff ) AM_RAM AM_BASE(m_p_spriteram)
 	AM_RANGE( 0x006000, 0x006fff ) AM_READWRITE(vii_audio_r, vii_audio_w)
 	AM_RANGE( 0x007000, 0x007fff ) AM_READWRITE(vii_io_r,    vii_io_w)
-	AM_RANGE( 0x008000, 0x7fffff ) AM_ROM AM_BASE_MEMBER(vii_state,m_cart)
+	AM_RANGE( 0x008000, 0x7fffff ) AM_ROM AM_BASE(m_p_cart)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vii )
@@ -843,7 +846,7 @@ static INPUT_PORTS_START( vii )
 		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("Button A")
 		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Button B")
 		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("Button C")
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )		 PORT_PLAYER(1) PORT_NAME("Button D")
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("Button D")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( batman )
@@ -855,7 +858,7 @@ static INPUT_PORTS_START( batman )
 		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
 		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Menu")
 		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("B Button")
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )		 PORT_PLAYER(1) PORT_NAME("X Button")
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("X Button")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vsmile )
@@ -867,7 +870,7 @@ static INPUT_PORTS_START( vsmile )
 		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
 		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Menu")
 		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("B Button")
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )		 PORT_PLAYER(1) PORT_NAME("X Button")
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("X Button")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( walle )
@@ -898,7 +901,7 @@ static DEVICE_IMAGE_LOAD( vii_cart )
 		memcpy(cart, image.get_software_region("rom"), filesize);
 	}
 
-	memcpy(state->m_cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
+	memcpy(state->m_p_cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
 
 	if( cart[0x3cd808] == 0x99 &&
 		cart[0x3cd809] == 0x99 &&
@@ -933,7 +936,7 @@ static DEVICE_IMAGE_LOAD( vsmile_cart )
 		int filesize = image.get_software_region_length("rom");
 		memcpy(cart, image.get_software_region("rom"), filesize);
 	}
-	memcpy(state->m_cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
+	memcpy(state->m_p_cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
 	return IMAGE_INIT_PASS;
 }
 
@@ -963,8 +966,9 @@ static MACHINE_START( vii )
 	state->m_controller_input[7] = 0;
 
 	UINT8 *rom = machine.region( "cart" )->base();
-	if (rom) { // to prevent batman crash
-		memcpy(state->m_cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
+	if (rom)
+	{ // to prevent batman crash
+		memcpy(state->m_p_cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
 	}
 
 	state->m_video_regs[0x36] = 0xffff;
@@ -1002,8 +1006,8 @@ static INTERRUPT_GEN( vii_vblank )
 
 	state->m_uart_rx_count = 0;
 
-	VII_VIDEO_IRQ_STATUS = VII_VIDEO_IRQ_ENABLE & 1;
-	if(VII_VIDEO_IRQ_STATUS)
+	state->VII_VIDEO_IRQ_STATUS = state->VII_VIDEO_IRQ_ENABLE & 1;
+	if(state->VII_VIDEO_IRQ_STATUS)
 	{
 		verboselog(device->machine(), 0, "Video IRQ\n");
 		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ0_LINE, ASSERT_LINE);
@@ -1021,7 +1025,7 @@ static INTERRUPT_GEN( vii_vblank )
 
 	//if(state->m_io_regs[0x22] & state->m_io_regs[0x22] & 0x2100)
 	// For now trigger always if any enabled
-	if(VII_CTLR_IRQ_ENABLE)
+	if(state->VII_CTLR_IRQ_ENABLE)
 	{
 		verboselog(device->machine(), 0, "UART, ADC IRQ\n");
 		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ3_LINE, ASSERT_LINE);
@@ -1105,7 +1109,7 @@ MACHINE_CONFIG_END
 
 static const i2cmem_interface i2cmem_interface =
 {
-       I2CMEM_SLAVE_ADDRESS, 0, 0x200
+	I2CMEM_SLAVE_ADDRESS, 0, 0x200
 };
 
 static MACHINE_CONFIG_START( batman, vii_state )
@@ -1186,10 +1190,12 @@ ROM_END
 ROM_START( walle )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 	ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, BAD_DUMP CRC(bd554cba) SHA1(6cd06a036ab12e7b0e1fd8003db873b0bb783868) )
+	// This is another dump, seems to be better, you can move around the playfield for example.
+	//ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, CRC(6bc90b16) SHA1(184d72de059057aae7800da510fcf05ed1da9ec9))
 ROM_END
 
-/*    YEAR  NAME     PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                                              FULLNAME      FLAGS */
-CONS( 2004, batmantv, 0,        0,        batman,   batman,   batman,   "JAKKS Pacific Inc / HotGen Ltd",                "The Batman", GAME_NO_SOUND )
-CONS( 2005, vsmile,  0,        0,        vsmile,   vsmile,   vsmile,   "V-Tech",                                            "V-Smile",    GAME_NO_SOUND | GAME_NOT_WORKING )
-CONS( 2007, vii,     0,        0,        vii,      vii,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",        GAME_NO_SOUND )
-CONS( 2008, walle,  0,        0,        batman,   walle,   walle,   "JAKKS Pacific Inc",                                            "Wall-E",    GAME_NO_SOUND | GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                                              FULLNAME      FLAGS */
+CONS( 2004, batmantv, vii,      0,        batman,   batman,   batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman", GAME_NO_SOUND )
+CONS( 2005, vsmile,   vii,      0,        vsmile,   vsmile,   vsmile,   "V-Tech",                                            "V-Smile",    GAME_NO_SOUND | GAME_NOT_WORKING )
+CONS( 2007, vii,      0,        0,        vii,      vii,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",        GAME_NO_SOUND )
+CONS( 2008, walle,    vii,      0,        batman,   walle,    walle,    "JAKKS Pacific Inc",                                 "Wall-E",     GAME_NO_SOUND | GAME_NOT_WORKING )
