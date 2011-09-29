@@ -302,6 +302,7 @@ WRITE16_MEMBER( st_state::dma_mode_w )
 		m_fdc_sectors = 0;
 		m_fdc_fifo_sel = 0;
 		m_fdc_fifo_msb = 0;
+		m_fdc_fifo_index = 0;
 	}
 
 	m_fdc_mode = data;
