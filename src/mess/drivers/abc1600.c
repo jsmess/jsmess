@@ -10,8 +10,7 @@
 
     TODO:
 
-    - keyboard
-        - "Bad command" on first enter after boot
+	- login root fails with incorrect password
     - floppy
         - internal floppy is really drive 2, but wd17xx.c doesn't like having NULL drives
     - BUS0I/0X/1/2
