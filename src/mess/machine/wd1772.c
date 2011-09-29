@@ -900,11 +900,13 @@ void wd1772_t::live_run(attotime limit)
 				sector = data;
 			set_drq();
 			if(cur_live.bit_counter == 16*6) {
-				live_delay(IDLE);
+				// Already synchronous
+				cur_live.state = IDLE;
 				return;
 			}
 				
 			cur_live.state = READ_ID_BLOCK_TO_DMA;
+			checkpoint();
 			break;
 
 		case READ_SECTOR_DATA: {
@@ -933,6 +935,7 @@ void wd1772_t::live_run(attotime limit)
 			data = cur_live.data_reg;
 			set_drq();
 			cur_live.state = READ_SECTOR_DATA;
+			checkpoint();
 			break;
 
 		case READ_TRACK_DATA: {
@@ -962,6 +965,7 @@ void wd1772_t::live_run(attotime limit)
 			data = cur_live.data_reg;
 			set_drq();
 			cur_live.state = READ_TRACK_DATA;
+			checkpoint();
 			break;
 
 		default:
