@@ -1067,16 +1067,14 @@ static MACHINE_CONFIG_START( vii, vii_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_VIDEO_START( vii )
 	MCFG_SCREEN_UPDATE( vii )
-
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_CARTSLOT_ADD( "cart" )
 	MCFG_CARTSLOT_EXTENSION_LIST( "bin" )
 	MCFG_CARTSLOT_LOAD( vii_cart )
 	MCFG_CARTSLOT_INTERFACE("vii_cart")
-
-	MCFG_VIDEO_START( vii )
 
 	MCFG_SOFTWARE_LIST_ADD("vii_cart","vii")
 MACHINE_CONFIG_END
@@ -1095,16 +1093,14 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_VIDEO_START( vii )
 	MCFG_SCREEN_UPDATE( vii )
-
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_CARTSLOT_ADD( "cart" )
 	MCFG_CARTSLOT_EXTENSION_LIST( "bin" )
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_LOAD( vsmile_cart )
-
-	MCFG_VIDEO_START( vii )
 MACHINE_CONFIG_END
 
 static const i2cmem_interface i2cmem_interface =
@@ -1128,11 +1124,9 @@ static MACHINE_CONFIG_START( batman, vii_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE( vii )
-
-	MCFG_PALETTE_LENGTH(32768)
-
 	MCFG_VIDEO_START( vii )
+	MCFG_SCREEN_UPDATE( vii )
+	MCFG_PALETTE_LENGTH(32768)
 MACHINE_CONFIG_END
 
 static DRIVER_INIT( vii )
@@ -1164,7 +1158,7 @@ static DRIVER_INIT( walle )
 	vii_state *state = machine.driver_data<vii_state>();
 
 	state->m_spg243_mode = SPG243_BATMAN;
-	state->m_centered_coordinates = 1;
+	state->m_centered_coordinates = 0;
 }
 
 ROM_START( vii )
@@ -1190,7 +1184,7 @@ ROM_END
 ROM_START( walle )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 	ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, BAD_DUMP CRC(bd554cba) SHA1(6cd06a036ab12e7b0e1fd8003db873b0bb783868) )
-	// This is another dump, seems to be better, you can move around the playfield for example.
+	// Alternate dump, we need to decide which one is correct.
 	//ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, CRC(6bc90b16) SHA1(184d72de059057aae7800da510fcf05ed1da9ec9))
 ROM_END
 
@@ -1198,4 +1192,4 @@ ROM_END
 CONS( 2004, batmantv, vii,      0,        batman,   batman,   batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman", GAME_NO_SOUND )
 CONS( 2005, vsmile,   vii,      0,        vsmile,   vsmile,   vsmile,   "V-Tech",                                            "V-Smile",    GAME_NO_SOUND | GAME_NOT_WORKING )
 CONS( 2007, vii,      0,        0,        vii,      vii,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",        GAME_NO_SOUND )
-CONS( 2008, walle,    vii,      0,        batman,   walle,    walle,    "JAKKS Pacific Inc",                                 "Wall-E",     GAME_NO_SOUND | GAME_NOT_WORKING )
+CONS( 2008, walle,    vii,      0,        batman,   walle,    walle,    "JAKKS Pacific Inc",                                 "Wall-E",     GAME_NO_SOUND )
