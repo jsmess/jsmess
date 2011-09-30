@@ -66,52 +66,52 @@ The code printed on the PCB has four major parts:
 
 Code 1
 ======
-BSC: "Broadcast Satellaview-X Cassette." On BS-X slotted cartridges that were "Made in Japan."
-EA: "Electronic Arts." On standard cartridges that were manufactured by EA.
-MAXI: "Maxis." On standard cartridges that were "Assembled in Mexico."
-MJSC: "Majesco." On standard cartridges that were "Assembled in Mexico."
-SHVC: "Super Home Video Computer." On standard cartridges that were "Made in Japan" or "Made in Mexico."
-SNSP: "Super Nintendo System PAL." On standard cartridges that were "Assembled in Japan."
-WEI: "Williams Entertainment Inc." On standard cartridges that were "Assembled in Mexico."
+BSC  : "Broadcast Satellaview-X Cassette." On BS-X slotted cartridges that were "Made in Japan."
+EA   : "Electronic Arts." On standard cartridges that were manufactured by EA.
+MAXI : "Maxis." On standard cartridges that were "Assembled in Mexico."
+MJSC : "Majesco." On standard cartridges that were "Assembled in Mexico."
+SHVC : "Super Home Video Computer." On standard cartridges that were "Made in Japan" or "Made in Mexico."
+SNSP : "Super Nintendo System PAL." On standard cartridges that were "Assembled in Japan."
+WEI  : "Williams Entertainment Inc." On standard cartridges that were "Assembled in Mexico."
 
 Code 2
 ======
-1***: 1 ROM chip (2Mb, 4Mb, 8Mb, 16Mb, 24 Mb or 32Mb)
-Y***: 2 ROM chips, one is  4Mb (usually in the first slot)
-2***: 2 ROM chips, one is  8Mb (usually in the first slot)
-B***: 2 ROM chips, one is 16Mb (usually in the first slot)
-L***: 2 ROM chips, one is 32Mb (usually in the first slot)
-3***: 3 ROM chips
+1*** : 1 ROM chip (2Mb, 4Mb, 8Mb, 16Mb, 24 Mb or 32Mb)
+Y*** : 2 ROM chips, one is  4Mb (usually in the first slot)
+2*** : 2 ROM chips, one is  8Mb (usually in the first slot)
+B*** : 2 ROM chips, one is 16Mb (usually in the first slot)
+L*** : 2 ROM chips, one is 32Mb (usually in the first slot)
+3*** : 3 ROM chips
 4****: 4 ROM chips
 8****: 8 ROM chips
 
-*A***:  Commercial board with no special chip (LoROM)
-*B***:  Commercial board with "DSP-1," "DSP-2," "DSP-3," or "DSP-4" special chip (LoROM)
-*C***:  Commercial board with "Mario Chip 1" a.k.a. "Super FX" special chip (LoROM)
-*CA***: Commercial board with "GSU1" a.k.a. "Super FX" special chip (LoROM)
-*CB***: Commercial board with "GSU2" a.k.a. "Super FX2" special chip (LoROM)
+*A*** : Commercial board with no special chip (LoROM)
+*B*** : Commercial board with "DSP-1," "DSP-2," "DSP-3," or "DSP-4" special chip (LoROM)
+*C*** : Commercial board with "Mario Chip 1" a.k.a. "Super FX" special chip (LoROM)
+*CA***: Commercial board with "GSU-1" a.k.a. "Super FX" special chip (LoROM)
+*CB***: Commercial board with "GSU-2" a.k.a. "Super FX2" special chip (LoROM)
 *DC***: Commercial board with "C4" special chip (LoROM)
 *DE***: Commercial board with "ST018" special chip (LoROM)
 *DH***: Commercial board with "SPC7110" special chip (HiROM)
 *DS***: Commercial board with "ST010" or "ST011" special chip (LoROM)
-*E***:  Commercial board with "OBC1" special chip (LoROM)
-*J***:  Commercial board with no special chip (HiROM)
-*K***:  Commercial board with "DSP-1," "DSP-2," "DSP-3," or "DSP-4" special chip (HiROM)
-*L***:  Commercial board with "SA-1" special chip (LoROM)
-*N***:  Commercial board with "S-DD1" special chip (LoROM)
-*P***:  Evaluation board with no special chip (LoROM)
+*E*** : Commercial board with "OBC1" special chip (LoROM)
+*J*** : Commercial board with no special chip (HiROM)
+*K*** : Commercial board with "DSP-1", "DSB-1 B", "DSP-2", "DSP-3", or "DSP-4" special chip (HiROM)
+*L*** : Commercial board with "SA-1" special chip (LoROM)
+*N*** : Commercial board with "S-DD1" special chip (LoROM)
+*P*** : Evaluation board with no special chip (LoROM)
 *PV***: Evaluation board with no special chip (HiROM)
-*Q***:  Evaluation board with "DSP-1," "DSP-2," "DSP-3," or "DSP-4" special chip (LoROM)
-*QW***: Evaluation board with "DSP-1," "DSP-2," "DSP-3," or "DSP-4" special chip (HiROM)
+*Q*** : Evaluation board with "DSP-1", "DSP-2", "DSP-3", or "DSP-4", special chip (LoROM)
+*QW***: Evaluation board with "DSP-1", "DSP-2", "DSP-3", or "DSP-4", special chip (HiROM)
 *RA***: Evaluation board with "GSU1" or "GSU1A" a.k.a. "Super FX" special chip (LoROM)
 *RB***: Evaluation board with "GSU2" a.k.a. "Super FX2" special chip (LoROM)
-*X***:  ?
+*X*** :  ?
 
-**0*:  No SRAM chip
-**1*:  1 SRAM chip (16Kb)
-**2*:  1 SRAM chip (32Kb)
-**3*:  1 SRAM chip (64Kb)
-**4*:  1 SRAM chip (128Kb)
+**0* :  No SRAM chip
+**1* : 1 SRAM chip (16Kb)
+**2* : 1 SRAM chip (32Kb)
+**3* : 1 SRAM chip (64Kb)
+**4* : 1 SRAM chip (128Kb)
 **5**: 1 SRAM chips (256Kb)
 **6**: 1 SRAM chips (512Kb)
 **7**: 1 SRAM chips (1Mb)
@@ -133,18 +133,18 @@ Code 3
 Two digits (01, 02, 03, 10, 20, 30...): PCB revision
 SP1: Service Pack 1
 
-Code 4 (Only on "EA," "MAXI," and "WEI" PCBs.)
+Code 4 (This suffix only appears on "EA," "MAXI," and "WEI" PCBs.)
 ======
-1: ?
-2: ?
+-1: PCB revision 1
+-2: PCB revision 2
 
 Miscellaneous Codes
 ===================
-BSMC-AF-1: On "Broadcast Satellaview-X" media cartridge.
-BSMC-CR-1: On "Broadcast Satellaview-X" media cartridge.
+BSMC-AF-1  : On "Broadcast Satellaview-X" media cartridge.
+BSMC-CR-1  : On "Broadcast Satellaview-X" media cartridge.
 GPC-RAMC-S1: Game Processing Cassette
-SGB-N-10: On "Super Game Boy" interface cartridge.
-SGB-R-10: On "Super Game Boy" interface cartridge.
+SGB-N-10   : On "Super Game Boy" interface cartridge.
+SGB-R-10   : On "Super Game Boy" interface cartridge.
 SHVC-MMSA-1: On "Nintendo Power" flash cartridge.
 SHVC-SGB2-1: On "Super Game Boy 2" interface cartridge.
 -->
@@ -152,29 +152,29 @@ SHVC-SGB2-1: On "Super Game Boy 2" interface cartridge.
 <!--
 Cartridges labels (W.I.P)
 Front sticker:
--JPN:        Japan
--USA:        USA
--EUR:        Europe
--AUS:        Australia
--CAN:        Canada
--ESP:        Spain
--ESP/SESP:   Spain, translated to Spanish
--FAH:        France and Holland
--FAH/SFRA:   France and Holland, translated to French
--FRA:        France
--FRA/SFRA:   France, translated to French
--FRG:        Germany, Austria and Switzerland
--FRG/SFRG:   Germany, translated to German
--HKG:        Hong Kong
--HOL:        Holland
--ITA:        Italy
--ITA/SITA:   Italy, translated to Italian
--KOR:        Korea
--LTN:        Latin America
--NOE:        Nintendo of Europe (usually found in Germany)
--NOE/SFRG:   Nintendo of Europe (usually found in Germany), translated to German
--SCN:        Scandinavia
--UKV:        United Kingdom
+-JPN        : Japan
+-USA        : USA
+-EUR        : Europe
+-AUS        : Australia
+-CAN        : Canada
+-ESP        : Spain
+-ESP/SESP   : Spain, translated to Spanish
+-FAH        : France and Holland
+-FAH/SFRA   : France and Holland, translated to French
+-FRA        : France
+-FRA/SFRA   : France, translated to French
+-FRG        : Germany, Austria and Switzerland
+-FRG/SFRG   : Germany, translated to German
+-HKG        : Hong Kong
+-HOL        : Holland
+-ITA        : Italy
+-ITA/SITA   : Italy, translated to Italian
+-KOR        : Korea
+-LTN        : Latin America
+-NOE        : Nintendo of Europe (usually found in Germany)
+-NOE/SFRG   : Nintendo of Europe (usually found in Germany), translated to German
+-SCN        : Scandinavia
+-UKV        : United Kingdom
 
 Back sticker:
 901121              : Japan (first batch)
@@ -232,6 +232,27 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="3jigen" cloneof="ballz3d">
+		<!-- Serial: SHVC-ABZJ-JPN - Release Date: 1995-04-28 - Alt. Title: 3次元格闘ボールス -->
+		<description>3-jigen Kakutou Ballz (Jpn)</description>
+		<year>1995</year>
+		<publisher>Media Rings</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1 B" />
+			<feature name="pcb" value="SHVC-1K0N-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 µPD77C25" /> <!-- DSP1 B -->
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 74HCU04" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-abzj-0.u1" size="1048576" crc="f0810694" sha1="0caca71401b96b3ab42ec89e9bcf7af82b1bd3d4" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="7thsaga">
 		<!-- Serial: SNS-EL-USA - Release Date: 1993-09 -->
 		<description>The 7th Saga (USA)</description>
@@ -258,6 +279,7 @@ The software list will be divided in four categories:
 <!-- wip-a -->
 	<software name="aaahhrmu" cloneof="aaahhrm">
 		<!-- Serial: SNS-ANNE-USA - Release Date: 1995-11 -->
+		<!-- sns-p-anne-0 is a Majesco re-release -->
 		<description>Aaahh!!! Real Monsters (USA)</description>
 		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
@@ -295,6 +317,28 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="acmeanimu" cloneof="acmeanim">
+		<!-- Serial: SNS-ACME-USA - Release Date: 1994-11 -->
+		<description>ACME Animation Factory (USA)</description>
+		<year>1994</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A5M-11" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 256K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-acme-0.u1" size="1048576" crc="0944a5c3" sha1="0c739de2095a9bd310bc19d28e7566faf894c543" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="actraisrj" cloneof="actraisr">
 		<!-- Serial: SHVC-AR - Release Date: 1990-12-16 - Alt. Title: アクトレイザー -->
 		<description>ActRaiser (Jpn)</description>
@@ -307,8 +351,8 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U374LS139 " />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
-			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="901121" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-ar-0.u1" size="1048576" crc="bee9b30c" sha1="f031fc983a2eed4d69e223b256ece5f037fb5d5d" offset="0x000000" />
 			</dataarea>
@@ -326,7 +370,7 @@ The software list will be divided in four categories:
 			<feature name="pcb" value="SHVC-1A3B-11" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
@@ -379,6 +423,23 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="addfamvu" cloneof="addfamv">
+		<!-- Serial: M/SNS-VY-USA - Release Date: 1995-02 -->
+		<description>Addams Family Values (USA)</description>
+		<year>1995</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-vy-0.u1" size="2097152" crc="98b07db8" sha1="24848e53e32cc16a30acce48d40ce09c37b669c4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="addamfam">
 		<!-- Serial: SNSP-AF-NOE -->
 		<description>The Addams Family (Euro)</description>
@@ -413,6 +474,43 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="kidkleet">
+		<!-- Serial: SNS-YK-USA - Release Date: 1994-08 -->
+		<description>The Adventures of Kid Kleets (USA)</description>
+		<year>1994</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A0N-11" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1572864">
+				<rom name="sns-yk-0 p0.u1" size="1048576" crc="c5309baa" sha1="9af770a79f96ccb89205439a9904cfc4b4b41235" offset="0x000000" />
+				<rom name="sns-yk-0 p1.u2" size="524288"  crc="f3299a08" sha1="fa21a0ce9e6206d2532decbb544234a19127193a" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aerou" cloneof="aero">
+		<!-- Serial: SNS-XB-USA - Release Date: 1993-10 -->
+		<description>Aero the Acro-Bat (USA)</description>
+		<year>1993</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-xb-0.u1" size="1048576" crc="919f23cb" sha1="4d7dc1c4dc0c0756412a83eb5e5c1ac104c67831" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aero2">
 		<!-- Serial: SNSP-AE2P-FAH -->
 		<description>Aero the Acro-Bat 2 (Euro)</description>
@@ -426,6 +524,23 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="2097152">
 				<rom name="spal-ae2p-0.u1" size="2097152" crc="242b8181" sha1="1597e2cfdfdb0ab4671c4f3549208a5b11d52a8a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aero2u" cloneof="aero2">
+		<!-- Serial: SNS-AE2E-USA - Release Date: 1994-11 -->
+		<description>Aero the Acro-Bat 2 (USA)</description>
+		<year>1994</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-ae2e-0.u1" size="2097152" crc="8c05ed51" sha1="2ddbff8f227024806ca456c0ffe96def2713a9aa" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -589,6 +704,46 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="arcadeacu" cloneof="arcadeac">
+		<!-- Serial: SNS-AW7E-USA - Release Date: 1997-08 -->
+		<description>Arcade's Greatest Hits - The Atari Collection 1 (USA)</description>
+		<year>1997</year>
+		<publisher>Midway</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="MAXI-1A0N-30-2" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="524288">
+				<!-- There is no revision suffix in this ROM -->
+				<rom name="sns-aw7e.u1" size="524288" crc="02394f36" sha1="5ed17711300ab1c82791931e910620d2497fc0cf" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aretha">
+		<!-- Serial: SHVC-YJ - Release Date: 1993-11-26 - Alt. Title: アレサ - Notes: Also re-released through Nintendo Power -->
+		<description>Aretha (Jpn)</description>
+		<year>1993</year>
+		<publisher>Yanoman Games</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-yj-0.u1" size="2097152" crc="395bade3" sha1="af4960f2eec19ea7910a268bf8fad266518dbcfa" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aofu" cloneof="aof">
 		<!-- Serial: SNS-RW-USA - Release Date: 1993-12 -->
 		<description>Art of Fighting (USA)</description>
@@ -659,6 +814,23 @@ The software list will be divided in four categories:
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="axelayj" cloneof="axelay">
+		<!-- Serial: SHVC-AX - Release Date: 1992-09-11 - Alt. Title: アクスレイ - Notes: Also re-released through Nintendo Power -->
+		<description>Axelay (Jpn)</description>
+		<year>1992</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-02" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-ax-0.u1" size="1048576" crc="b0a02734" sha1="15562f13c405fc401dc461cb5e0e917af8a9f7e4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
 <!-- wip-b -->
 	<software name="bahamut">
 		<!-- Serial: SHVC-AXBJ-JPN - Release Date: 1996-02-09 - Alt. Title: バハムート ラグーン -->
@@ -724,6 +896,27 @@ The software list will be divided in four categories:
 				<rom name="shvc-aaij-0.u1" size="2097152" crc="5613f172" sha1="5670308f143087f1ca6e19978e3fe1e776cdf249" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballz3d">
+		<!-- Serial: SNS-ABZE-USA - Release Date: 1994-11 -->
+		<description>Ballz 3D (USA)</description>
+		<year>1994</year>
+		<publisher>Accolade</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1 B" />
+			<feature name="pcb" value="SHVC-1K0N-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 µPD77C25" /> <!-- DSP1 B -->
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 74HCU04" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-abze-0.u1" size="1048576" crc="1c058b7d" sha1="236a466af4e05061b06d48bae637bb29f86672ad" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -798,6 +991,45 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="SNSP-ESP" />
 			<dataarea name="rom" size="1048576">
 				<rom name="spal-bt-0.u1" size="1048576" crc="11e5bc5e" sha1="d514520660de9939d7d30de9219ed9bcf21f7a15" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlclshu" cloneof="batlclsh">
+		<!-- Serial: SNS-BT-USA - Release Date: 1992-10 -->
+		<description>Battle Clash (USA)</description>
+		<year>1992</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-02" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="SNS-USA/CAN" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-bt-0.u1" size="1048576" crc="59c00310" sha1="ab007aa2f0b56770b94fd3c7dc0ea161377c6db2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlsocr">
+		<!-- Serial: SHVC-B8 - Release Date: 1992-12-11 - Alt. Title: バトルサッカー フィールドの覇者 -->
+		<description>Battle Soccer - Field no Hasha (Jpn)</description>
+		<year>1992</year>
+		<publisher>Banpresto</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3B-01" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-b8-0.u1" size="1048576" crc="c54ae0f9" sha1="09614be9cb31f26d02780e25a6217e73f0899084" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -980,6 +1212,20 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="billlaim">
+		<!-- Serial: SNS-CB-USA - Release Date: 1991-11 -->
+		<description>Bill Laimbeer's Combat Basketball (USA)</description>
+		<year>1991</year>
+		<publisher>Hudson</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="bill laimbeer's combat basketball (usa).sfc" size="524288" crc="468d8cdd" sha1="c4229e655a621c25e28b46bf72cb0a70a4911877" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blackhwk">
 		<!-- Serial: SNSP-6Z-NOE -->
 		<description>Blackhawk (Euro)</description>
@@ -1006,8 +1252,8 @@ The software list will be divided in four categories:
 			<feature name="pcb" value="SHVC-1A0N-02" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-NOE" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-bl-0.u1" size="1048576" crc="ad2effc3" sha1="b59e45c1b885fb67c9e0964e3daccc69d809ed63" offset="0x000000" />
 			</dataarea>
@@ -1623,7 +1869,7 @@ The software list will be divided in four categories:
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-8X-NOE, SNSP-FAH" />
+			<feature name="cart_back_label" value="SNSP-NOE, SNSP-FAH" />
 			<dataarea name="rom" size="4194304">
 				<rom name="spal-8x-0 p0.u1" size="2097152" crc="d6086f47" sha1="afcef57cf7d80a2617e6f4c743fcca0fa544b732" offset="0x000000" />
 				<rom name="spal-8x-0 p3.u2" size="2097152" crc="d2abfe31" sha1="8bb81bc18d0c0a060c62af403b1e03d963835393" offset="0x200000" />
@@ -1691,6 +1937,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="4194304">
@@ -1713,6 +1960,7 @@ The software list will be divided in four categories:
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
 			<dataarea name="rom" size="4194304">
@@ -1874,7 +2122,7 @@ The software list will be divided in four categories:
 		<year>1993</year>
 		<publisher>Enix</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-2A3M-01" /> <!-- also found with SHVC-2A3M-20 pcb -->
+			<feature name="pcb" value="SHVC-2A3M-01" /> <!-- also found with SHVC-2A3M-10 pcb -->
 			<feature name="u1" value="U1 P0" />
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 64K SRAM" />
@@ -1938,9 +2186,31 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="dquest6">
+	<software name="dquest6a">
 		<!-- Serial: SHVC-AQ6J-JPN - Release Date: 1995-12-09 - Alt. Title: ドラゴンクエストVI 幻の大地 -->
 		<description>Dragon Quest VI - Maboroshi no Daichi (Jpn)</description>
+		<year>1995</year>
+		<publisher>Enix</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shvc-aq6j-0.u1" size="4194304" crc="33304519" sha1="3e699dc7e064d6ac84b1981aa150fdf1672b5456" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dquest6">
+		<!-- Serial: SHVC-AQ6J-JPN - Release Date: 1995-12-09 - Alt. Title: ドラゴンクエストVI 幻の大地 -->
+		<description>Dragon Quest VI - Maboroshi no Daichi (Jpn, Alt)</description>
 		<year>1995</year>
 		<publisher>Enix</publisher>
 		<part name="cart" interface="snes_cart">
@@ -1962,22 +2232,22 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="dquest6a">
-		<!-- Serial: SHVC-AQ6J-JPN - Release Date: 1995-12-09 - Alt. Title: ドラゴンクエストVI 幻の大地 -->
-		<description>Dragon Quest VI - Maboroshi no Daichi (Jpn, Alt)</description>
-		<year>1995</year>
-		<publisher>Enix</publisher>
+	<software name="drakkhenj" cloneof="drakkhen">
+		<!-- Serial: SHVC-DK - Release Date: 1991-05-24 - Alt. Title: ドラッケン -->
+		<description>Drakkhen (Jpn)</description>
+		<year>1991</year>
+		<publisher>Kemco</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="pcb" value="SHVC-1A3B-10" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
-			<dataarea name="rom" size="4194304">
-				<rom name="shvc-aq6j-0.u1" size="4194304" crc="33304519" sha1="3e699dc7e064d6ac84b1981aa150fdf1672b5456" offset="0x000000" />
+			<feature name="cart_back_label" value="901121" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-dk-0.u1" size="1048576" crc="b0a016a2" sha1="5d886f282655968b547f780e23ca77b7c0502512" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -2179,7 +2449,7 @@ The software list will be divided in four categories:
 			<feature name="pcb" value="SHVC-1A3B-13" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
@@ -2449,6 +2719,7 @@ The software list will be divided in four categories:
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 LS00" />
 			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2621440">
@@ -2467,7 +2738,7 @@ The software list will be divided in four categories:
 			<feature name="pcb" value="SHVC-1A3B-13" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
@@ -2489,7 +2760,7 @@ The software list will be divided in four categories:
 			<feature name="pcb" value="SHVC-1A3B-12" /> <!-- also found with SHVC-1A3B-13 pcb -->
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
@@ -2511,7 +2782,7 @@ The software list will be divided in four categories:
 			<feature name="pcb" value="SHVC-1A3B-13" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
@@ -2558,7 +2829,7 @@ The software list will be divided in four categories:
 			<feature name="pcb" value="SHVC-1A3B-11" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
@@ -2581,7 +2852,7 @@ The software list will be divided in four categories:
 			<feature name="pcb" value="SHVC-1A3B-11" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
@@ -2603,7 +2874,7 @@ The software list will be divided in four categories:
 			<feature name="pcb" value="SHVC-1A3B-11" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
@@ -2625,7 +2896,7 @@ The software list will be divided in four categories:
 			<feature name="pcb" value="SHVC-1J3B-01" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
@@ -2787,6 +3058,52 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="firembmn1" cloneof="firembmn">
+		<!-- Serial: SHVC-EM - Release Date: 1994-01-21 - Alt. Title: ファイアーエムブレム 紋章の謎 -->
+		<description>Fire Emblem - Monshou no Nazo (Jpn)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BA3M-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-em-0 p0.u1" size="2097152" crc="ca6a796c" sha1="0f0b04a704ef3f307ff6803b291bf9ad1f348303" offset="0x000000" />
+				<rom name="shvc-em-0 p1.u2" size="1048576" crc="02e0390c" sha1="c3cc7e0d9c963737d070f58b65094872973dc75d" offset="0x200000" /> <!-- should be p3 instead of p1 -->
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firembsk">
+		<!-- Serial: SHVC-A32J-JPN - Release Date: 1996-05-14 - Alt. Title: ファイアーエムブレム 聖戦の系譜 -->
+		<description>Fire Emblem - Seisen no Keifu (Jpn)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shvc-a32j-0.u1" size="4194304" crc="dc0d8cf9" sha1="90f0bdeaf0151899f96281258fcb30899fbd0d44" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="firstsam">
 		<!-- Serial: SNSP-FK-UKV -->
 		<description>First Samurai (Euro)</description>
@@ -2893,7 +3210,7 @@ The software list will be divided in four categories:
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-1A1B-05" /> <!-- -NOE found with SHVC-1A1B-06 PCB -->
+			<feature name="pcb" value="SHVC-1A1B-05" /> <!-- A -NOE cart has the SHVC-1A1B-06 PCB -->
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
@@ -2937,7 +3254,7 @@ The software list will be divided in four categories:
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-1A1B-01" /> <!-- also found with SHVC-1A1B-02 pcb -->
+			<feature name="pcb" value="SHVC-1A1B-01" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
@@ -2947,7 +3264,7 @@ The software list will be divided in four categories:
 			<feature name="cart_back_label" value="901121" />
 <!--
 The revision A of the cartridge has the same ROM as the initial release.
-			<feature name="pcb" value="SHVC-1A1B-03" />
+			<feature name="pcb" value="SHVC-1A1B-02" /> - also found with SHVC-1A1B-03 pcb >
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
@@ -3057,6 +3374,28 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-jo-0.u1" size="1048576" crc="58752baf" sha1="45baf328efa1e573aef81b2a936207f8979206a4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hanjhero">
+		<!-- Serial: SHVC-HH - Release Date: 1992-12-19 - Alt. Title: 半熟英雄 ああ、世界よ半熟なれ…！！ -->
+		<description>Hanjuku Hero - Ah, Sekai yo Hanjuku Nare...!! (Jpn)</description>
+		<year>1992</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-13" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-hh-0.u1" size="1048576" crc="d191ad46" sha1="4edad4a8a8e3ab6117171c48ce2a332757ed3e2f" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -3172,7 +3511,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="u3" value="U3 SA1" />
 			<feature name="u4" value="U4 MM1026A" />
 			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_back_label" value="" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="4194304">
 				<rom name="shvc-akfj-0.u1" size="4194304" crc="151bd470" sha1="2f2ff2c75eafa705363feb435a88d2c914d301cf" offset="0x000000" />
 			</dataarea>
@@ -3341,7 +3680,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="pcb" value="SHVC-1A3B-13" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
@@ -3366,8 +3705,9 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="" />
+			<feature name="cart_back_label" value="SNSP-UKV" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-8s-1.u1" size="524288" crc="6ff2d97e" sha1="1b7e843210b1939b1032f829d33c2f27600049ca" offset="0x000000" />
 			</dataarea>
@@ -3762,6 +4102,8 @@ The revision A of the cartridge has the same ROM as the initial release.
 
 	<software name="kengrwin">
 		<!-- Serial: SNS-A9GE-USA - Release Date: 1996-06 -->
+		<!-- Serial: M/DIS-SNS-A9GE-USA (not for resale, demo game only) -->
+		<!-- The demo ROM matches the retail cart. -->
 		<description>Ken Griffey Jr.'s Winning Run (USA)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -3773,7 +4115,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="" />
+			<feature name="cart_back_label" value="M/SNS-USA/CAN-1" />
 			<dataarea name="rom" size="4194304">
 				<rom name="sns-a9ge-0.u1" size="4194304" crc="e9b4bd73" sha1="ca78faf0dcafcbbc7a114cf9f9f5a5d0f1f289f7" offset="0x000000" />
 			</dataarea>
@@ -3826,9 +4168,33 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="u1" value="U1 MASKROM" />
 			<feature name="u2" value="U2 CIC" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="" />
+			<feature name="cart_back_label" value="SNSP-NOE" />
 			<dataarea name="rom" size="2097152">
 				<rom name="spal-ei-0.u1" size="2097152" crc="78f0820b" sha1="e65eaa67dbc227fead5ecc15e23771c29050eecd" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kirbybow" cloneof="kirbydc">
+		<!-- Serial: SHVC-CG - Release Date: 1994-09-21 - Alt. Title: カービィボウル -->
+		<description>Kirby Bowl (Jpn)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A3M-11" /> <!-- also found with SHVC-2A3M-20 pcd -->
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1310720">
+				<rom name="shvc-cg-0 p0.u1" size="1048576" crc="f47d1a34" sha1="8b6349303b253879d6d0d1a3967e2b5fb5ed4cdd" offset="0x000000" />
+				<rom name="shvc-cg-0 p1.u2" size="262144"  crc="4c8fb325" sha1="d71437920fdf1ddae266699a836d25b374a66ec1" offset="0x100000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4013,7 +4379,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="pcb" value="SHVC-1A3B-13" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
@@ -4035,7 +4401,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="pcb" value="SHVC-1A3B-13" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
@@ -4057,7 +4423,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="pcb" value="SHVC-1A3B-12" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
@@ -4433,7 +4799,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 	</software>
 
 	<software name="mariopic">
-		<!-- Serial: SHVC-ACXJ-JPN - Release Date: 1995-09-14 - Alt. Title: マリオのスーパーピクロス -->
+		<!-- Serial: SHVC-ACXJ-JPN / G739139 - Release Date: 1995-09-14 - Alt. Title: マリオのスーパーピクロス -->
 		<description>Mario no Super Picross (Jpn)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -4445,7 +4811,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_back_label" value="" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-acxj-0.u1" size="1048576" crc="f64c5aa0" sha1="c4200b9886b16c148b32d2c75d02f2a875d997cc" offset="0x000000" />
 			</dataarea>
@@ -4455,7 +4821,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 	</software>
 
 	<software name="mariopnt">
-		<!-- Serial: SNSP-MP-NOE -->
+		<!-- Serial: SNSP-MP-NOE, SNSP-MP-FAH -->
 		<description>Mario Paint (Euro)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -4467,7 +4833,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-NOE" />
+			<feature name="cart_back_label" value="SNSP-NOE, SNSP-FAH" />
 			<dataarea name="rom" size="1048576">
 				<rom name="spal-mp-0.u1" size="1048576" crc="266b220e" sha1="6d93da7773b2c121bc4e7a3edc38f29f546455e2" offset="0x000000" />
 			</dataarea>
@@ -4476,8 +4842,79 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
+	<software name="mariopntu" cloneof="mariopnt">
+		<!-- Serial: SHVC-MP - Release Date: 1992-07-14 (Jpn), 1992-08 (USA) - Alt. Title: マリオペイント -->
+		<description>Mario Paint (Jpn, USA)</description>
+		<year>1992</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A5M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 256K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+<!--
+Japanese cart
+			<feature name="pcb" value="SHVC-1A5B-04" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 256K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+-->
+			<dataarea name="rom" size="1048576">
+				<!-- both Japan and US versions have a SHVC prefix in their ROM -->
+				<rom name="shvc-mp-0.u1" size="1048576" crc="38c9626c" sha1="d027c03eb2faefa07640ec828b2a46f601f7b15f" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mariowar">
+		<!-- Serial: SHVC-WE - Release Date: 1993-08-27 - Alt. Title: マリオとワリオ -->
+		<description>Mario to Wario (Jpn)</description>
+		<year>1993</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-we-0.u1" size="1048576" crc="c6695e34" sha1="68b307fa7fdfd91a190fa0148178473aa2406b41" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mariowara" cloneof="mariowar">
+		<!-- Serial: SHVC-WE - Release Date: 1993-08-27 - Alt. Title: マリオとワリオ -->
+		<description>Mario to Wario (Jpn, Alt)</description>
+		<year>1993</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-YA0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-we-0 p0.u1" size="524288" crc="a4fc9c65" sha1="e7846245f391a720dce5ca3ef4b6d0088d011a14" offset="0x000000" />
+				<rom name="shvc-we-0 p1.u2" size="524288" crc="50002710" sha1="a861bef859876d829b9a94fa398036b2d880ebe2" offset="0x080000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="megamnx">
-		<!-- Serial: SNSP-RX-UKV -->
+		<!-- Serial: SNSP-RX-FAH, SNSP-RX-UKV -->
 		<description>Mega Man X (Euro)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
@@ -4488,7 +4925,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-UKV" />
+			<feature name="cart_back_label" value="SNSP-FAH, SNSP-UKV" />
 			<dataarea name="rom" size="1572864">
 				<rom name="spal-rx-0 p0.u1" size="1048576" crc="331442f6" sha1="6d8d0c07ce1c60276838f16c725cfd0fa8268b42" offset="0x000000" />
 				<rom name="spal-rx-0 p1.u2" size="524288"  crc="af9ee767" sha1="e17d7579d8a28e721997948ae17983ffb8f762a6" offset="0x100000" />
@@ -4651,7 +5088,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="pcb" value="MAXI-1A0N-30" /> <!-- Majesco Re-release -->
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="cart_revision" value="" /> <!-- Majesco carts don't have a revision stamp -->
+			<feature name="cart_revision" value="none" /> <!-- Majesco carts don't have a revision stamp -->
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -4745,11 +5182,36 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 LS00" />
 			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
 			<dataarea name="rom" size="3145728">
 				<rom name="spal-28-1 p0.u1" size="2097152" crc="9d88cd58" sha1="d11abe52d154dfcfad5ca286955cc260fd139cf8" offset="0x000000" />
 				<rom name="spal-28-1 p3.u2" size="1048576" crc="89203e3e" sha1="35211aa2b99a8721be8d4c66979fe4f196c85b30" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mother2" cloneof="earthbnd">
+		<!-- Serial: SHVC-MB / G723109 - Release Date: 1994-08-27 - Alt. Title: マザー2 ギーグの逆襲 -->
+		<description>Mother 2 - Gyiyg no Gyakushuu (Jpn)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ3M-10" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-mb-0 p0.u1" size="2097152" crc="3ce05d1f" sha1="1302e58fbfd54962c6a18eb42d5bb9f0838c9816" offset="0x000000" />
+				<rom name="shvc-mb-0 p3.u2" size="1048576" crc="f407f4e2" sha1="a0853a1fd20c3b97caf16912b99281ed2dc33db7" offset="0x200000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4787,6 +5249,28 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="4194304">
 				<rom name="shvc-aeaj-0.u1" size="4194304" crc="feb80589" sha1="ba80e259616529f907425bcc553a1a0959f0d7f4" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mquestg" cloneof="mquest">
+		<!-- Serial: SNSP-MQ-NOE/SFRG -->
+		<description>Mystic Quest Legend (Ger)</description>
+		<year>1992</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-NOE" />
+			<dataarea name="rom" size="524288">
+				<rom name="sfrg-mq-0.u1" size="524288" crc="f21760df" sha1="bd190854c0f725160ed6f6b0669e3cdd2308ccca" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -4851,6 +5335,30 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
+	<software name="nbaliv95">
+		<!-- Serial: SNSP-ANBP-FAH -->
+		<description>NBA Live 95 (Euro)</description>
+		<year>1994</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A3M-11" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64KSRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-FAH" />
+			<dataarea name="rom" size="1572864">
+				<rom name="spal-anbp-0 p0.u1" size="1048576" crc="410c73a5" sha1="9876cbca667be81fd514655b25ca80d0cc685ee9" offset="0x000000" />
+				<rom name="spal-anbp-0 p1.u2" size="524288"  crc="3945e27a" sha1="513b019f84625d40ff55a30791f331c8cb4c8d4e" offset="0x100000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nbaliv97u" cloneof="nbaliv97">
 		<!-- Serial: SNS-A7LE-USA - Release Date: 1996-12 -->
 		<description>NBA Live 97 (USA)</description>
@@ -4867,6 +5375,52 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nba 97 b1.u1" size="2097152" crc="5115b8e5" sha1="6255287751bc9679b9500ac9be06cda6640d1dcc" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n3dgaugu">
+		<!-- Serial: SHVC-GA - Release Date: 1991-04-05 - Alt. Title: 遥かなるオーガスタ -->
+		<description>New 3D Golf Simulation - Harukanaru Augusta (Jpn, Rev. B)</description>
+		<year>1991</year>
+		<publisher>T&amp;E Soft</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-12" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="B" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="901121" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-ga-1.u1" size="1048576" crc="d7e41218" sha1="c399dfaca26154e635345efdd24e5c4ce36110a7" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n3dgaugua" cloneof="n3dgaugu">
+		<!-- Serial: SHVC-GA - Release Date: 1991-04-05 - Alt. Title: 遥かなるオーガスタ -->
+		<description>New 3D Golf Simulation - Harukanaru Augusta (Jpn, Rev. 0A)</description>
+		<year>1991</year>
+		<publisher>T&amp;E Soft</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-01" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="none or A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-ga-0.u1" size="1048576" crc="b4fd7aff" sha1="eb553b77418dedba25fc4d5dddcb04f424b0f6a9" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -4937,6 +5491,28 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
+	<software name="nhl96">
+		<!-- Serial: SNSP-A6HP-EUR -->
+		<description>NHL '96 (Euro)</description>
+		<year>1995</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-EUR" />
+			<dataarea name="rom" size="2097152">
+				<rom name="spal-a6hp-0.u1" size="2097152" crc="e883f2de" sha1="5ef3b01137d7605c3ab8800867887e62efe363c7" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nhl97">
 		<!-- Serial: SNSP-AH7P-EUR -->
 		<description>NHL '97 (Euro, Rev. A)</description>
@@ -4949,6 +5525,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
 			<dataarea name="rom" size="2097152">
@@ -5114,6 +5691,23 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
+	<software name="panepon" cloneof="tetrisat">
+		<!-- Serial: SHVC-AYLJ-JPN - Release Date: 1995-10-27 - Alt. Title: パネルでポン -->
+		<description>Panel de Pon (Jpn)</description>
+		<year>1995</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-aylj-0.u1" size="1048576" crc="14d70786" sha1="ead855d774c9943f7ffb5b4f429b2dd07fb6f606" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="parodius">
 		<!-- Serial: SNSP-PD-FAH -->
 		<description>Parodius - Non-Sense Fantasy (Euro)</description>
@@ -5257,6 +5851,26 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<dataarea name="rom" size="1572864">
 				<rom name="sns-29-0 p0.u1" size="1048576" crc="a5ee2a81" sha1="54fab38a8e98280cabdeb2b6ae5ae312e7144a3c" offset="0x000000" />
 				<rom name="sns-29-0 p1.u2" size="524288"  crc="eae507e1" sha1="713d82ac479ba83e1f63d064644e396decfa3c56" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="populus2j" cloneof="populus2">
+		<!-- Serial: SHVC-PL - Release Date: 1993-01-22 - Alt. Title: ポピュラスII TRIALS OF THE OLYMPIAN GODS -->
+		<description>Populous II - Trials of the Olympian Gods (Jpn)</description>
+		<year>1993</year>
+		<publisher>Imagineer</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1310720">
+				<rom name="shvc-pl-0 p0.u1" size="1048576" crc="6feb075a" sha1="85f7696c45140665ce76308377bc4081583adda7" offset="0x000000" />
+				<rom name="shvc-pl-0 p1.u2" size="262144"  crc="c60ac4ce" sha1="7e5b2dbdcec9b23dd62a04c235fbe34bbf22cd03" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5573,7 +6187,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="pcb" value="SHVC-1A3B-12" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
@@ -5596,7 +6210,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="pcb" value="SHVC-1A3B-12" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
@@ -6027,14 +6641,14 @@ The revision A of the cartridge has the same ROM as the initial release.
 
 	<software name="seikndn2" cloneof="mana">
 		<!-- Serial: SHVC-K2 - Release Date: 1993-08-06 - Alt. Title: 聖剣伝説2 -->
-		<description>Seiken Densetsu 2 (Jpn)</description>
+		<description>  Densetsu 2 (Jpn)</description>
 		<year>1993</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1J3B-01" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
@@ -6360,7 +6974,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="pcb" value="SHVC-1A3B-12" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
@@ -6409,6 +7023,28 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-at-0.u1" size="1048576" crc="11202781" sha1="a5f8b381c3abe29ddb6c5513fb14a905227a6984" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speedyup1" cloneof="speedy">
+		<description>Speedy Gonzales in Los Gatos Bandidos (USA, Earlier Prototype)</description>
+		<year>1994</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2Q5B-03" />
+			<feature name="u1" value="U1 4/2/1M EPROM(J)" />
+			<feature name="u2" value="U2 4/2/1M EPROM(J)" />
+			<feature name="u3" value="U3 256/64K SSRAM" />
+			<feature name="u4" value="U4 D77C25/P25" /> <!-- empty slot -->
+			<feature name="u5" value="U5 74F138" />
+			<feature name="u6" value="U6 74HCU04N" />
+			<feature name="u7" value="U7 CIC" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="eprom(j).u1" size="524288" crc="88a1b7d5" sha1="f0bf2258ee6653bafe2d106e15d4a98be7ee80f2" offset="0x000000" />
+				<rom name="eprom(j).u2" size="524288" crc="d0a6bf51" sha1="811bde6a959c1f4f79938f4b8ec3acd3b4b95938" offset="0x080000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6781,6 +7417,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="u3" value="U3 P2" />
 			<feature name="u4" value="U4 LS139" />
 			<feature name="u5" value="U5 CIC" />
+			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-NOE" />
 			<dataarea name="rom" size="2621440">
@@ -6964,7 +7601,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="enhancement" value="DSP1" />
 			<feature name="pcb" value="SHVC-1K0N-01" />
 			<feature name="u1" value="U1 MASK ROM" />
-			<feature name="u2" value="U2 uPD77C25" /> <!-- DSP1 -->
+			<feature name="u2" value="U2 µPD77C25" /> <!-- DSP1 -->
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 74HCU04" />
 			<feature name="u5" value="U5 CIC" />
@@ -7150,9 +7787,9 @@ The revision A of the cartridge has the same ROM as the initial release.
 	</software>
 
 	<software name="sgboy">
+		<!-- Serial: SNSP-A-SG(FAH) in Europe -->
 		<!-- Serial: SNS-A-SG in USA - Release Date: 1994-04 -->
-		<!-- Serial: ??? in Japan -->
-		<!-- Serial: ??? in Europe -->
+		<!-- Serial: No serial in Japan - Release Date: 1994-06-14 -->
 		<description>Super Game Boy (World, Rev. B)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -7165,7 +7802,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="u5" value="U5 SYS-SGB" />
 			<feature name="battery" value="none" />
 			<feature name="cart_revision" value="B" />
-			<feature name="cart_model" value="SNS-027" /> <!-- SHVC-027 in Japan, SNSP-027 in Europe -->
+			<feature name="cart_model" value="SNSP-027 in Europe, SNS-027 in the USA, SHVC-027 in Japan" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="262144">
 				<rom name="sys-sgb-2.u5" size="262144" crc="8a4a174f" sha1="973e10840db683cf3faf61bd443090786b3a9f04" offset="0x000000" />
@@ -7293,6 +7930,28 @@ The revision A of the cartridge has the same ROM as the initial release.
 				<rom name="shvc-al2j-0 p1.u2" size="262144" crc="018cbd87" sha1="e29f59ac56b49c16e9dc6f18cd957b552041187f" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skeiba">
+		<!-- Serial: SHVC-KB - Release Date: 1993-08-10 - Alt. Title: スーパー競馬 -->
+		<description>Super Keiba (Jpn)</description>
+		<year>1993</year>
+		<publisher>I'Max</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-kb-0.u1" size="1048576" crc="41f92e6f" sha1="1993cf9d25569fdf6bdb4f1f8229de09eadaeada" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -7474,7 +8133,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="enhancement" value="DSP1 B" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 16K SRAM" />
-			<feature name="u3" value="U3 uPD77C25" /> <!-- DSP1 B -->
+			<feature name="u3" value="U3 µPD77C25" /> <!-- DSP1 B -->
 			<feature name="u4" value="U4 MAD-2" />
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" />
@@ -7499,7 +8158,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="pcb" value="SHVC-1K1B-01" />
 			<feature name="u1" value="U1 MASKROM(N)" />
 			<feature name="u2" value="U2 16K SRAM" />
-			<feature name="u3" value="U3 uPD77C25" /> <!-- DSP1 -->
+			<feature name="u3" value="U3 µPD77C25" /> <!-- DSP1 -->
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 74HCU04" />
 			<feature name="u6" value="U6 CIC" />
@@ -7524,7 +8183,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="pcb" value="SHVC-1K1B-01" />
 			<feature name="u1" value="U1 MASKROM(N)" />
 			<feature name="u2" value="U2 16K SRAM" />
-			<feature name="u3" value="U3 uPD77C25" /> <!-- DSP1 -->
+			<feature name="u3" value="U3 µPD77C25" /> <!-- DSP1 -->
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 74HCU04" />
 			<feature name="u6" value="U6 CIC" />
@@ -7692,7 +8351,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 	</software>
 
 	<software name="smetroid">
-		<!-- Serial: SNSP-RI-NOE -->
+		<!-- Serial: SNSP-RI-NOE, SNSP-RI-FAH -->
 		<description>Super Metroid (Euro)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -7705,7 +8364,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-NOE" />
+			<feature name="cart_back_label" value="SNSP-NOE, SNSP-FAH" />
 			<dataarea name="rom" size="3145728">
 				<rom name="spal-ri-0 p0.u1" size="2097152" crc="696b0bae" sha1="f331c55312f228aae679101ab64342b671033f53" offset="0x000000" />
 				<rom name="spal-ri-0 p3.u2" size="1048576" crc="854a9f45" sha1="3d8fa28830b393f2001f095e05d08f79f8797182" offset="0x200000" />
@@ -7736,7 +8395,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 				<rom name="shvc-ri-0 p1.u1" size="1048576" crc="4b2dd591" sha1="f5b9ae30295d0a3cdbff72b952d6ca1a5c6e482e" offset="0x000000" />
 				<rom name="shvc-ri-0 p2.u2" size="1048576" crc="02c26fc2" sha1="a44746ef476e6b3c3c2314540143fc215a9579f7" offset="0x100000" />
 				<rom name="shvc-ri-0 p3.u3" size="1048576" crc="8aa6669e" sha1="1145f87d123cf3901c6811b91398b37c2c2a7d7d" offset="0x200000" />
-				<!-- shvc prefix in both USA and JPN cartridges -->
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -7759,11 +8417,50 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="cart_model" value="SHVC-006 (Japan), SNS-006 (USA)" />
 			<feature name="cart_back_label" value="920214 (Japan)" />
 			<dataarea name="rom" size="3145728">
+				<!-- Note: Both US and JPN cartridges have the SHVC prefix in their ROMs. -->
 				<rom name="shvc-ri-0 p0.u1" size="2097152" crc="307bc318" sha1="3872f7f576aa847e3e9903f0904a4e0d15137ff0" offset="0x000000" />
 				<rom name="shvc-ri-0 p3.u2" size="1048576" crc="8aa6669e" sha1="1145f87d123cf3901c6811b91398b37c2c2a7d7d" offset="0x200000" />
-				<!-- Note: Both US and JPN cartridges have the SHVC prefix in their ROMs. -->
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smomodx">
+		<!-- Serial: SHVC-AH6J-JPN - Release Date: 1995-12-08 - Alt. Title: スーパー桃太郎電鉄 デラックス -->
+		<description>Super Momotarou Dentetsu DX (Jpn)</description>
+		<year>1995</year>
+		<publisher>Hudson</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-ah6j-0.u1" size="2097152" crc="1c0c3d81" sha1="f4b17de2d326707dda139d3507c50538da04edda" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suppachi">
+		<!-- Serial: SHVC-ADXJ-JPN - Release Date: 1995-04-28 - Alt. Title: スーパーパチンコ大戦 -->
+		<description>Super Pachinko Taisen (Jpn)</description>
+		<year>1995</year>
+		<publisher>Banpresto</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="524288">
+				<rom name="shvc-adxj-0.u1" size="524288" crc="ed959cc9" sha1="68ca21f2e49916ce72ec58ddeb9cb89b63608e27" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7886,16 +8583,16 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 	</software>
 
 	<software name="ssoccer">
-		<!-- Serial: SNSP-FS-FAH -->
+		<!-- Serial: SNSP-FS-EUR, SNSP-FS-FAH -->
 		<description>Super Soccer (Euro)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-1A0N-02" />
+			<feature name="pcb" value="SHVC-1A0N-02" /> <!-- also found with SHVC-1A0N-30 pcb (-EUR cart) -->
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-FAH" />
+			<feature name="cart_back_label" value="SNSP-EUR, SNSP-FAH" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-fs-0.u1" size="524288" crc="442c47cb" sha1="6eb6dd6da1e8eefad24c30b59ededbd671b9db2c" offset="0x000000" />
 			</dataarea>
@@ -7928,6 +8625,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="pcb" value="MAXI-1A0N-30-2" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -7945,6 +8643,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
 			<dataarea name="rom" size="2097152">
@@ -7982,6 +8681,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
 			<dataarea name="rom" size="1048576">
@@ -8105,6 +8805,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="pcb" value="SHVC-1A0N-02" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-NOE" />
 			<dataarea name="rom" size="524288">
@@ -8275,7 +8976,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="pcb" value="SHVC-1A3B-13" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
@@ -8413,7 +9114,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-FAH" />
+			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="4194304">
 				<rom name="spal-aqtf-0.u1" size="4194304" crc="614a7090" sha1="4f8a5771cb11757a31a026e5892b9434a3a405cb" offset="0x000000" />
 			</dataarea>
@@ -8547,7 +9248,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 	</software>
 
 	<software name="ttoonbbl">
-		<!-- Serial: SNSP-TA-FAH, SNSP-TA-NOE -->
+		<!-- Serial: SNSP-TA-NOE, SNSP-TA-FAH -->
 		<description>Tiny Toon Adventures - Buster Busts Loose! (Euro)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -8556,9 +9257,44 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-FAH, SNSP-NOE" />
+			<feature name="cart_back_label" value="SNSP-NOE, SNSP-FAH" />
 			<dataarea name="rom" size="1048576">
 				<rom name="spal-ta-0.u1" size="1048576" crc="38cd6bb0" sha1="6748bcf849410d3b4797499447e76e51eba6d6a2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttoonadv" cloneof="ttoonbbl">
+		<!-- Serial: SHVC-TA - Release Date: 1992-12-18 - Alt. Title: タイニートゥーン アドベンチャーズ -->
+		<description>Tiny Toon Adventures (Jpn, Rev. A)</description>
+		<year>1992</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-ta-1.u1" size="1048576" crc="8f0d2c90" sha1="4aad2f83fc05e44baf050cafeff3e35069712305" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttoonadva" cloneof="ttoonbbl">
+		<!-- Serial: SHVC-TA - Release Date: 1992-12-18 - Alt. Title: タイニートゥーン アドベンチャーズ -->
+		<description>Tiny Toon Adventures (Jpn)</description>
+		<year>1992</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-ta-0.u1" size="1048576" crc="854fac00" sha1="388c11e761fe4cae2ba8cdcc1c518159b2a2db8c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8734,7 +9470,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="pcb" value="SHVC-1A3B-13" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
@@ -9085,6 +9821,28 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
+	<software name="wcstrikr">
+		<!-- Serial: SNSP-5W-NOE -->
+		<description>World Cup Striker (Euro)</description>
+		<year>1994</year>
+		<publisher>GameTek</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-11" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-NOE" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spal-5w-0.u1" size="1048576" crc="6d16f5e7" sha1="3e199976050b0e6f53b8529409671354948d450f" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wh">
 		<!-- Serial: SNSP-WZ-NOE -->
 		<description>World Heroes (Euro)</description>
@@ -9209,8 +9967,8 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="cart_model" value="SHVC-006 (Japan), SNS-006 (USA)" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
-				<rom name="sns-xz-0.u1" size="524288" crc="99627bb0" sha1="b25fddc4a239051b07b996f685fbce8e8354fea0" offset="0x000000" />
 				<!-- Both US and JPN cartridges have the prefix SNS on their ROM. -->
+				<rom name="sns-xz-0.u1" size="524288" crc="99627bb0" sha1="b25fddc4a239051b07b996f685fbce8e8354fea0" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9231,6 +9989,23 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="xandra" cloneof="whirlo">
+		<!-- Serial: SHVC-SH - Release Date: 1992-07-23 - Alt. Title: サンドラの大冒険 ワルキューレとの出逢い - Notes: Also re-released through Nintendo Power -->
+		<description>Xandra no Daibouken - Valkyrie to no Deai (Jpn)</description>
+		<year>1992</year>
+		<publisher>Namco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-02" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-sh-0.u1" size="1048576" crc="56ec4655" sha1="b774ef60f88820a719a0af591eb4ff0feccc57c3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
 <!-- wip-y -->
 	<software name="ys3">
 		<!-- Serial: SNS-YS-USA - Release Date: 1992-01 -->
@@ -9241,7 +10016,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="pcb" value="SHVC-1A3B-12" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
@@ -9254,6 +10029,73 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 <!-- wip-z -->
+	<software name="zelda3ja" cloneof="zelda3">
+		<!-- Serial: SHVC-ZL - Release Date: 1991-11-21 - Alt. Title: ゼルダの伝説 神々のトライフォース - Notes: Also re-released through Nintendo Power -->
+		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn, Rev. A)</description>
+		<year>1991</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-12" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="901121" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-zl-1.u1" size="1048576" crc="4400d798" sha1="52f470c80157f6843839c39e3bf52afbb42fb957" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zelda3j" cloneof="zelda3">
+		<!-- Serial: SHVC-ZL - Release Date: 1991-11-21 - Alt. Title: ゼルダの伝説 神々のトライフォース - Notes: Also re-released through Nintendo Power -->
+		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn, Rev. B)</description>
+		<year>1991</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-13" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="B" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-zl-2.u1" size="1048576" crc="b28b2f77" sha1="6d9fa9006c160a0c81db913bcd0ea3e7cc249bc9" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zelda3jb" cloneof="zelda3">
+		<!-- Serial: SHVC-ZL - Release Date: 1991-11-21 - Alt. Title: ゼルダの伝説 神々のトライフォース - Notes: Also re-released through Nintendo Power -->
+		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn)</description>
+		<year>1991</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-12" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="901121" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-zl-0.u1" size="1048576" crc="3322effc" sha1="e7e852f0159ce612e3911164878a9b08b3cb9060" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
 
 <!-- End of perfect dumps -->
 
@@ -9330,7 +10172,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="u3" value="U3 SA1" />
 			<feature name="u4" value="U4 MM1026AF" />
 			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_back_label" value="" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
 			<dataarea name="rom" size="4194304">
 				<rom name="shvc-akfj-2.u1" size="4194304" crc="1f35f230" sha1="9ae2db3bcb2699394937bc007cd6835609b7e18f" offset="0x000000" />
 			</dataarea>
@@ -9409,6 +10251,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="pcb" value="SHVC-1A0N-10" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH" />
 			<dataarea name="rom" size="1048576">
@@ -9710,7 +10553,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="pcb" value="SHVC-1A3B-13" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3" /> <!-- Not printed: 74LS139 -->
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
@@ -9817,18 +10660,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 
 
 <!-- List of bad dumps -->
-
-	<software name="3jigen">
-		<!-- Serial: SHVC-ABZJ - Release Date: 1995-04-28 - Alt. Title: 3次元格闘ボールス -->
-		<description>3-jigen Kakutou Ballz (Jpn)</description>
-		<year>1995</year>
-		<publisher>Media Rings</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="3-jigen kakutou ballz (japan) [b].sfc" size="1048576" crc="f0810694" sha1="0caca71401b96b3ab42ec89e9bcf7af82b1bd3d4" offset="0x000000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
 
 	<software name="batman">
 		<description>Batman (USA, Prototype)</description>
@@ -10297,20 +11128,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="acmeanimu" cloneof="acmeanim">
-		<!-- Serial:  - Release Date: 1994-11 -->
-		<description>ACME Animation Factory (USA)</description>
-		<year>1994</year>
-		<publisher>Sunsoft</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="acme animation factory (usa).sfc" size="1048576" crc="0944a5c3" sha1="0c739de2095a9bd310bc19d28e7566faf894c543" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="acrobatm">
 		<!-- Serial: SHVC-2T - Release Date: 1992-09-11 - Alt. Title: アクロバットミッション -->
 		<description>Acrobat Mission (Jpn)</description>
@@ -10393,18 +11210,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="addams family values (europe) (en,fr,de).sfc" size="2097152" crc="ae38adb6" sha1="1f4de5b9ff27ca58a451e5cbcc43ef0ab1efd015" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="addfamvu" cloneof="addfamv">
-		<!-- Serial:  - Release Date: 1995-02 -->
-		<description>Addams Family Values (USA)</description>
-		<year>1995</year>
-		<publisher>Ocean</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="addams family values (usa) (en,fr,de).sfc" size="2097152" crc="98b07db8" sha1="24848e53e32cc16a30acce48d40ce09c37b669c4" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10501,18 +11306,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="kidkleet">
-		<!-- Serial:  - Release Date: 1994-08 -->
-		<description>The Adventures of Kid Kleets (USA)</description>
-		<year>1994</year>
-		<publisher>Ocean</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1310720">
-				<rom name="adventures of kid kleets, the (usa) (en,fr,es).sfc" size="1310720" crc="1664ae48" sha1="ab1bc78dc622e746262f6cf7b4d248449fbc9509" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="adverb">
 		<!-- Serial:  - Release Date: 1993-06 -->
 		<description>The Adventures of Rocky and Bullwinkle and Friends (USA)</description>
@@ -10583,32 +11376,8 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="aerou" cloneof="aero">
-		<!-- Serial:  - Release Date: 1993-10 -->
-		<description>Aero the Acro-Bat (USA)</description>
-		<year>1993</year>
-		<publisher>Sunsoft</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="aero the acro-bat (usa).sfc" size="1048576" crc="919f23cb" sha1="4d7dc1c4dc0c0756412a83eb5e5c1ac104c67831" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="aero2u" cloneof="aero2">
-		<!-- Serial:  - Release Date: 1994-11 -->
-		<description>Aero the Acro-Bat 2 (USA)</description>
-		<year>1994</year>
-		<publisher>Sunsoft</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="aero the acro-bat 2 (usa).sfc" size="2097152" crc="8c05ed51" sha1="2ddbff8f227024806ca456c0ffe96def2713a9aa" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="aerobiz">
-		<!-- Serial:  - Release Date: 1993-02 -->
+		<!-- Serial: SNS-AL-USA - Release Date: 1993-02 -->
 		<description>Aerobiz (USA)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -11228,18 +11997,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="arcadeghu" cloneof="arcadegh">
-		<!-- Serial:  - Release Date: 1996-10 -->
-		<description>Arcade's Greatest Hits (USA)</description>
-		<year>1996</year>
-		<publisher>Midway</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="arcade's greatest hits (usa).sfc" size="524288" crc="471b12b0" sha1="d6219e7078f58ffccba64c24fc7fa1fc06bdfb30" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="arcadeac">
 		<description>Arcade's Greatest Hits - The Atari Collection 1 (Euro)</description>
 		<year>1998</year>
@@ -11247,18 +12004,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="arcade's greatest hits - the atari collection 1 (europe).sfc" size="524288" crc="d562233e" sha1="a2d55e5d9fa13a90da776ba48b008b6ac7f9724d" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="arcadeacu" cloneof="arcadeac">
-		<!-- Serial:  - Release Date: 1997-08 -->
-		<description>Arcade's Greatest Hits - The Atari Collection 1 (USA)</description>
-		<year>1997</year>
-		<publisher>Midway</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="arcade's greatest hits - the atari collection 1 (usa).sfc" size="524288" crc="02394f36" sha1="5ed17711300ab1c82791931e910620d2497fc0cf" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11360,20 +12105,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="aretha">
-		<!-- Serial: SHVC-YJ - Release Date: 1993-11-26 - Alt. Title: アレサ - Notes: Also re-released through Nintendo Power -->
-		<description>Aretha (Jpn)</description>
-		<year>1993</year>
-		<publisher>Yanoman Games</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="aretha (japan).sfc" size="2097152" crc="395bade3" sha1="af4960f2eec19ea7910a268bf8fad266518dbcfa" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="aretha2p1" cloneof="aretha2">
 		<description>Aretha II - Ariel no Fushigi na Tabi (Jpn, Prototype)</description>
 		<year>1994</year>
@@ -11438,7 +12169,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 	</software>
 
 	<software name="arkanoidu" cloneof="arkanoid">
-		<!-- Serial:  - Release Date: 1997-11 -->
+		<!-- Serial: SNS-A6-USA - Release Date: 1997-11 -->
 		<description>Arkanoid - Doh It Again (USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
@@ -11536,18 +12267,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="axelayj" cloneof="axelay">
-		<!-- Serial: SHVC-AX - Release Date: 1992-09-11 - Alt. Title: アクスレイ - Notes: Also re-released through Nintendo Power -->
-		<description>Axelay (Jpn)</description>
-		<year>1992</year>
-		<publisher>Konami</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="axelay (japan).sfc" size="1048576" crc="b0a02734" sha1="15562f13c405fc401dc461cb5e0e917af8a9f7e4" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="axelayus" cloneof="axelay">
 		<description>Axelay (USA, Sample)</description>
 		<year>1992</year>
@@ -11583,7 +12302,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 	</software>
 
 	<software name="bobu" cloneof="bob">
-		<!-- Serial:  - Release Date: 1993-06 -->
+		<!-- Serial: SNS-B4-USA - Release Date: 1993-06 -->
 		<description>B.O.B. (USA)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
@@ -11630,19 +12349,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 				<rom name="ball bullet gun (japan).sfc" size="1572864" crc="c1e2bb56" sha1="03d23158c196e84368374e153b97c3ef2d1a8166" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ballz3d">
-		<!-- Serial:  - Release Date: 1994-11 -->
-		<description>Ballz 3D (USA)</description>
-		<year>1994</year>
-		<publisher>Accolade</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="DSP1 B" />
-			<dataarea name="rom" size="1048576">
-				<rom name="ballz 3d (usa).sfc" size="1048576" crc="1c058b7d" sha1="236a466af4e05061b06d48bae637bb29f86672ad" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11732,7 +12438,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 	</software>
 
 	<software name="blackbas">
-		<!-- Serial:  - Release Date: 1994-11 -->
+		<!-- Serial: SNS-AB2E-USA - Release Date: 1994-11 -->
 		<description>Bassin's Black Bass (USA)</description>
 		<year>1994</year>
 		<publisher>Hot-B</publisher>
@@ -11815,7 +12521,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 	</software>
 
 	<software name="batblaz">
-		<!-- Serial:  - Release Date: 1993-12 -->
+		<!-- Serial: SNS-BZ-USA - Release Date: 1993-12 -->
 		<description>Battle Blaze (USA)</description>
 		<year>1993</year>
 		<publisher>American Sammy</publisher>
@@ -11834,18 +12540,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="battle cars (usa).sfc" size="1048576" crc="46043454" sha1="9135ddb50d303cb08b8d6ed5d2533eada4b09f20" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="batlclshu" cloneof="batlclsh">
-		<!-- Serial:  - Release Date: 1992-10 -->
-		<description>Battle Clash (USA)</description>
-		<year>1992</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="battle clash (usa).sfc" size="1048576" crc="59c00310" sha1="ab007aa2f0b56770b94fd3c7dc0ea161377c6db2" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11984,20 +12678,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="battle robot retsuden (japan).sfc" size="3145728" crc="b72bf1f2" sha1="229289e40479648c63b1e6b81aab7bdb583926cd" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="batlsocr">
-		<!-- Serial: SHVC-B8 - Release Date: 1992-12-11 - Alt. Title: バトルサッカー フィールドの覇者 -->
-		<description>Battle Soccer - Field no Hasha (Jpn)</description>
-		<year>1992</year>
-		<publisher>Banpresto</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="battle soccer - field no hasha (japan).sfc" size="1048576" crc="c54ae0f9" sha1="09614be9cb31f26d02780e25a6217e73f0899084" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -12389,20 +13069,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="billlaim">
-		<!-- Serial:  - Release Date: 1991-11 -->
-		<description>Bill Laimbeer's Combat Basketball (USA)</description>
-		<year>1991</year>
-		<publisher>Hudson</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="bill laimbeer's combat basketball (usa).sfc" size="524288" crc="468d8cdd" sha1="c4229e655a621c25e28b46bf72cb0a70a4911877" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="billwlsh">
 		<!-- Serial:  - Release Date: 1994-02 -->
 		<description>Bill Walsh College Football (USA)</description>
@@ -12451,7 +13117,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 	</software>
 
 	<software name="biometalu" cloneof="biometal">
-		<!-- Serial:  - Release Date: 1993-11 -->
+		<!-- Serial: SNS-BV-USA - Release Date: 1993-11 -->
 		<description>Bio Metal (USA)</description>
 		<year>1993</year>
 		<publisher>Activision</publisher>
@@ -16383,20 +17049,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="drakkhenj" cloneof="drakkhen">
-		<!-- Serial: SHVC-DK - Release Date: 1991-05-24 - Alt. Title: ドラッケン -->
-		<description>Drakkhen (Jpn)</description>
-		<year>1991</year>
-		<publisher>Kemco</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="drakkhen (japan).sfc" size="1048576" crc="b0a016a2" sha1="5d886f282655968b547f780e23ca77b7c0502512" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="drakkhenu" cloneof="drakkhen">
 		<!-- Serial:  - Release Date: 1991-09 -->
 		<description>Drakkhen (USA)</description>
@@ -17792,34 +18444,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="fire emblem - monshou no nazo (japan) (rev 1).sfc" size="3145728" crc="a427b7e6" sha1="b0b03831d9104e3c5df551d50ebc275a1692149e" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="firembmn1" cloneof="firembmn">
-		<!-- Serial: SHVC-EM - Release Date: 1994-01-21 - Alt. Title: ファイアーエムブレム 紋章の謎 -->
-		<description>Fire Emblem - Monshou no Nazo (Jpn)</description>
-		<year>1994</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="fire emblem - monshou no nazo (japan).sfc" size="3145728" crc="25d214f4" sha1="3ee8cbe6638da64f1d91df9b81b1478498a5999f" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="firembsk">
-		<!-- Serial: SHVC-A32J - Release Date: 1996-05-14 - Alt. Title: ファイアーエムブレム 聖戦の系譜 -->
-		<description>Fire Emblem - Seisen no Keifu (Jpn)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="fire emblem - seisen no keifu (japan).sfc" size="4194304" crc="dc0d8cf9" sha1="90f0bdeaf0151899f96281258fcb30899fbd0d44" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -19879,20 +20503,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
 				<rom name="hanguk pro yagu (korea).sfc" size="1572864" crc="a21fb1d5" sha1="1e6b3ebdb5227626f4226ff9eef166294ffe063c" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hanjhero">
-		<!-- Serial: SHVC-HH - Release Date: 1992-12-19 - Alt. Title: 半熟英雄 ああ、世界よ半熟なれ…！！ -->
-		<description>Hanjuku Hero - Ah, Sekai yo Hanjuku Nare...!! (Jpn)</description>
-		<year>1992</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="hanjuku hero - ah, sekai yo hanjuku nare...!! (japan).sfc" size="1048576" crc="d191ad46" sha1="4edad4a8a8e3ab6117171c48ce2a332757ed3e2f" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -23675,20 +24285,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="kirbybow" cloneof="kirbydc">
-		<!-- Serial: SHVC-CG - Release Date: 1994-09-21 - Alt. Title: カービィボウル -->
-		<description>Kirby Bowl (Jpn)</description>
-		<year>1994</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1310720">
-				<rom name="kirby bowl (japan).sfc" size="1310720" crc="2a24fc9b" sha1="147a113711758d4d42618d4bed809bed69b85d34" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kirbykk">
 		<!-- Serial: SHVC-BKKJ - Release Date: 1998-02-01 / 1999-06-25 - Alt. Title: カービィのきらきらきっす -->
 		<description>Kirby no Kirakira Kids (Jpn)</description>
@@ -25550,32 +26146,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="mariopntu" cloneof="mariopnt">
-		<!-- Serial: SHVC-MP - Release Date: 1992-07-14 (Jpn), 1992-08 (USA) - Alt. Title: マリオペイント -->
-		<description>Mario Paint (Jpn, USA)</description>
-		<year>1992</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mario paint (japan, usa).sfc" size="1048576" crc="38c9626c" sha1="d027c03eb2faefa07640ec828b2a46f601f7b15f" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mariowar">
-		<!-- Serial: SHVC-WE - Release Date: 1993-08-27 - Alt. Title: マリオとワリオ -->
-		<description>Mario to Wario (Jpn)</description>
-		<year>1993</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mario to wario (japan).sfc" size="1048576" crc="c6695e34" sha1="68b307fa7fdfd91a190fa0148178473aa2406b41" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mariolet">
 		<!-- Serial:  - Release Date: 1994-10 -->
 		<description>Mario's Early Years! - Fun with Letters (USA)</description>
@@ -26930,20 +27500,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="mother2" cloneof="earthbnd">
-		<!-- Serial: SHVC-MB - Release Date: 1994-08-27 - Alt. Title: マザー2 ギーグの逆襲 -->
-		<description>Mother 2 - Gyiyg no Gyakushuu (Jpn)</description>
-		<year>1994</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="mother 2 - gyiyg no gyakushuu (japan).sfc" size="3145728" crc="2019fabe" sha1="8738cff9e38a8b86ae30bfe0e5fbcb2828c2b16e" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="motoko">
 		<!-- Serial: SHVC-WK - Release Date: 1993-09-01 - Alt. Title: もと子ちゃんのワンダーキッチン -->
 		<description>Motoko-chan no Wonder Kitchen (Jpn)</description>
@@ -27234,19 +27790,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mystic quest legend (france).sfc" size="524288" crc="f997debc" sha1="6c2bcb3be5ad46cc96fd35b50446931fc046a167" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mquestg" cloneof="mquest">
-		<description>Mystic Quest Legend (Ger)</description>
-		<year>1992</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mystic quest legend (germany).sfc" size="524288" crc="f21760df" sha1="bd190854c0f725160ed6f6b0669e3cdd2308ccca" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -27556,19 +28099,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="nbaliv95">
-		<description>NBA Live 95 (Euro)</description>
-		<year>1994</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="nba live 95 (europe).sfc" size="1572864" crc="56fdbb8c" sha1="04210f5b2b1ab4cc1ec00eacd60252132d9d42e1" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="nbaliv95j" cloneof="nbaliv95">
 		<!-- Serial: SHVC-ANBJ - Release Date: 1994-12-16 -->
 		<description>NBA Live 95 (Jpn)</description>
@@ -27835,34 +28365,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="n3dgaugu">
-		<!-- Serial: SHVC-GA - Release Date: 1991-04-05 - Alt. Title: 遥かなるオーガスタ -->
-		<description>New 3D Golf Simulation - Harukanaru Augusta (Jpn, Rev. A)</description>
-		<year>1991</year>
-		<publisher>T&amp;E Soft</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="new 3d golf simulation - harukanaru augusta (japan) (rev 1).sfc" size="1048576" crc="d7e41218" sha1="c399dfaca26154e635345efdd24e5c4ce36110a7" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="n3dgaugua" cloneof="n3dgaugu">
-		<!-- Serial: SHVC-GA - Release Date: 1991-04-05 - Alt. Title: 遥かなるオーガスタ -->
-		<description>New 3D Golf Simulation - Harukanaru Augusta (Jpn)</description>
-		<year>1991</year>
-		<publisher>T&amp;E Soft</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="new 3d golf simulation - harukanaru augusta (japan).sfc" size="1048576" crc="b4fd7aff" sha1="eb553b77418dedba25fc4d5dddcb04f424b0f6a9" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="n3dgpebb" cloneof="truepebl">
 		<!-- Serial: SHVC-GB - Release Date: 1992-04-10 - Alt. Title: ペブルビーチの波濤 -->
 		<description>New 3D Golf Simulation - Pebble Beach no Hatou (Jpn)</description>
@@ -28121,19 +28623,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="nhl '94 (usa).sfc" size="1048576" crc="42212a77" sha1="10dcd21be9c5542e82b0b94473bf5ff569b36cf5" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nhl96">
-		<description>NHL '96 (Euro)</description>
-		<year>1995</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="nhl '96 (europe).sfc" size="1572864" crc="148b2734" sha1="ca45c193bc908740fffcd1d3fd39f2840342cd50" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -29600,18 +30089,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="panepon" cloneof="tetrisat">
-		<!-- Serial: SHVC-AYLJ - Release Date: 1995-10-27 - Alt. Title: パネルでポン -->
-		<description>Panel de Pon (Jpn)</description>
-		<year>1995</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="panel de pon (japan).sfc" size="1048576" crc="14d70786" sha1="ead855d774c9943f7ffb5b4f429b2dd07fb6f606" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="panicnak">
 		<!-- Serial: SHVC-ANAJ - Release Date: 1994-11-18 - Alt. Title: パニック イン なかよしワールト -->
 		<description>Panic in Nakayoshi World (Jpn)</description>
@@ -30747,18 +31224,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="populous ii - trials of the olympian gods (germany).sfc" size="1048576" crc="c5dae9b9" sha1="38a0fd0aee434b504551d4f9d2dbefd7014c7263" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="populus2j" cloneof="populus2">
-		<!-- Serial: SHVC-PL - Release Date: 1993-01-22 - Alt. Title: ポピュラスII TRIALS OF THE OLYMPIAN GODS -->
-		<description>Populous II - Trials of the Olympian Gods (Jpn)</description>
-		<year>1993</year>
-		<publisher>Imagineer</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1310720">
-				<rom name="populous ii - trials of the olympian gods (japan).sfc" size="1310720" crc="0a0235c0" sha1="2821ad1b9af311b39aeae8eb129786146e11ad0e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35096,17 +35561,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="speedyup1" cloneof="speedy">
-		<description>Speedy Gonzales in Los Gatos Bandidos (USA, Earlier Prototype)</description>
-		<year>1994</year>
-		<publisher>Sunsoft</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="speedy.sfc" size="1048576" crc="9dde5cea" sha1="07b2527c58e3ea07a61c52948b771d5750536454" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="speedyup" cloneof="speedy">
 		<description>Speedy Gonzales in Los Gatos Bandidos (USA, Prototype)</description>
 		<year>1995</year>
@@ -37920,20 +38374,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="skeiba">
-		<!-- Serial: SHVC-KB - Release Date: 1993-08-10 - Alt. Title: スーパー競馬 -->
-		<description>Super Keiba (Jpn)</description>
-		<year>1993</year>
-		<publisher>I'Max</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="super keiba (japan).sfc" size="1048576" crc="41f92e6f" sha1="1993cf9d25569fdf6bdb4f1f8229de09eadaeada" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="skeiba2">
 		<!-- Serial: SHVC-AKBJ - Release Date: 1995-05-19 - Alt. Title: スーパー競馬2 -->
 		<description>Super Keiba 2 (Jpn)</description>
@@ -38421,20 +38861,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="smomodx">
-		<!-- Serial: SHVC-AH6J - Release Date: 1995-12-08 - Alt. Title: スーパー桃太郎電鉄 デラックス -->
-		<description>Super Momotarou Dentetsu DX (Jpn)</description>
-		<year>1995</year>
-		<publisher>Hudson</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="super momotarou dentetsu dx (japan).sfc" size="2097152" crc="1c0c3d81" sha1="f4b17de2d326707dda139d3507c50538da04edda" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="smomo2">
 		<!-- Serial: SHVC-H4 - Release Date: 1992-08-07 - Alt. Title: スーパー桃太郎電鉄II - Notes: Also re-released through Nintendo Power -->
 		<description>Super Momotarou Dentetsu II (Jpn)</description>
@@ -38778,18 +39204,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 				<rom name="super pachi-slot mahjong (japan).sfc" size="1048576" crc="2051315b" sha1="fcb3ad9d6a41db54bdfe8806ab5b776cf098ab2d" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="suppachi">
-		<!-- Serial: SHVC-ADXJ - Release Date: 1995-04-28 - Alt. Title: スーパーパチンコ大戦 -->
-		<description>Super Pachinko Taisen (Jpn)</description>
-		<year>1995</year>
-		<publisher>Banpresto</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="super pachinko taisen (japan).sfc" size="524288" crc="ed959cc9" sha1="68ca21f2e49916ce72ec58ddeb9cb89b63608e27" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -41542,30 +41956,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="ttoonadv">
-		<!-- Serial: SHVC-TA - Release Date: 1992-12-18 - Alt. Title: タイニートゥーン アドベンチャーズ -->
-		<description>Tiny Toon Adventures (Jpn, Rev. A)</description>
-		<year>1992</year>
-		<publisher>Konami</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="tiny toon adventures (japan) (rev 1).sfc" size="1048576" crc="8f0d2c90" sha1="4aad2f83fc05e44baf050cafeff3e35069712305" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ttoonadva" cloneof="ttoonadv">
-		<!-- Serial: SHVC-TA - Release Date: 1992-12-18 - Alt. Title: タイニートゥーン アドベンチャーズ -->
-		<description>Tiny Toon Adventures (Jpn)</description>
-		<year>1992</year>
-		<publisher>Konami</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="tiny toon adventures (japan).sfc" size="1048576" crc="854fac00" sha1="388c11e761fe4cae2ba8cdcc1c518159b2a2db8c" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ttoonbbls" cloneof="ttoonbbl">
 		<description>Tiny Toon Adventures - Buster Busts Loose! (Spa)</description>
 		<year>1993</year>
@@ -44186,19 +44576,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="wcstrikr">
-		<description>World Cup Striker (Euro)</description>
-		<year>1994</year>
-		<publisher>GameTek</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="world cup striker (europe) (en,fr,de).sfc" size="1048576" crc="6d16f5e7" sha1="3e199976050b0e6f53b8529409671354948d450f" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wcstrikrj" cloneof="wcstrikr">
 		<!-- Serial: SHVC-5W - Release Date: 1994-06-17 - Alt. Title: ワールドカップストライ カー -->
 		<description>World Cup Striker (Jpn)</description>
@@ -44581,18 +44958,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 				<rom name="xak - the art of visual stage (japan).sfc" size="1572864" crc="557b8db1" sha1="fbefe349d80654f55d976c7e8282ec3d958d142c" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="xandra" cloneof="whirlo">
-		<!-- Serial: SHVC-SH - Release Date: 1992-07-23 - Alt. Title: サンドラの大冒険 ワルキューレとの出逢い - Notes: Also re-released through Nintendo Power -->
-		<description>Xandra no Daibouken - Valkyrie to no Deai (Jpn)</description>
-		<year>1992</year>
-		<publisher>Namco</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="xandra no daibouken - valkyrie to no deai (japan).sfc" size="1048576" crc="56ec4655" sha1="b774ef60f88820a719a0af591eb4ff0feccc57c3" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -45116,48 +45481,6 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 				<rom name="zan iii spirits (japan).sfc" size="1572864" crc="9826771b" sha1="28997ef8dd8640ed33e0676e363c6fca96d37548" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zelda3ja" cloneof="zelda3">
-		<!-- Serial: SHVC-ZL - Release Date: 1991-11-21 - Alt. Title: ゼルダの伝説 神々のトライフォース - Notes: Also re-released through Nintendo Power -->
-		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn, Rev. A)</description>
-		<year>1991</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="zelda no densetsu - kamigami no triforce (japan) (rev 1).sfc" size="1048576" crc="4400d798" sha1="52f470c80157f6843839c39e3bf52afbb42fb957" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zelda3j" cloneof="zelda3">
-		<!-- Serial: SHVC-ZL - Release Date: 1991-11-21 - Alt. Title: ゼルダの伝説 神々のトライフォース - Notes: Also re-released through Nintendo Power -->
-		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn, Rev. B)</description>
-		<year>1991</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="zelda no densetsu - kamigami no triforce (japan) (rev 2).sfc" size="1048576" crc="b28b2f77" sha1="6d9fa9006c160a0c81db913bcd0ea3e7cc249bc9" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zelda3jb" cloneof="zelda3">
-		<!-- Serial: SHVC-ZL - Release Date: 1991-11-21 - Alt. Title: ゼルダの伝説 神々のトライフォース - Notes: Also re-released through Nintendo Power -->
-		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn)</description>
-		<year>1991</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="zelda no densetsu - kamigami no triforce (japan).sfc" size="1048576" crc="3322effc" sha1="e7e852f0159ce612e3911164878a9b08b3cb9060" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
