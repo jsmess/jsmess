@@ -166,6 +166,38 @@ PORT_CONFSETTING ( 0x20, "'MU' TMSCP tapes, including TK50, TU81") \
 
 /* Input ports */
 static INPUT_PORTS_START( pdp11 )
+    PORT_START("S1")
+	PORT_DIPNAME( 0x01, 0x01, "S1-1" )
+	PORT_DIPSETTING(    0x00, "Direct boot" )
+	PORT_DIPSETTING(    0x01, "Console mode" )
+	PORT_DIPNAME( 0x02, 0x02, "S1-2 Boot")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_START("S1_2")
+	PORT_DIPNAME( 0x80, 0x00, "S1-3" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "S1-4" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "S1-5" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "S1-6" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "S1-7" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "S1-8" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "S1-9" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "S1-10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_START( "CONSPROM" )
 	PORT_CONFNAME ( 0x01, 0, "Console PROM" )
 	PORT_CONFSETTING ( 0x00, "11/04/05/34/35/40/45/50/55" )
@@ -235,18 +267,27 @@ static MACHINE_RESET(pdp11ub2)
 	UINT8* user1 = machine.region("consproms")->base() + input_port_read(machine,"CONSPROM") * 0x0400;
 	UINT8* maincpu = machine.region("maincpu")->base();
 
-	//0165000 EA00
+	//0165000
 	load9312prom(maincpu + 0165000,user1,0x100);
-	cpu_set_reg(machine.device("maincpu"), T11_PC, 0165020);	 // diag*/
-	//cpu_set_reg(machine.device("maincpu"), T11_PC, 0165144);    // no-diag
 	
-	//0173000 F600	
+	UINT8 s1 = input_port_read(machine,"S1");
+	
+	if (s1 & 0x02) { // if boot enabled
+		UINT16 addr = 0173000;
+		if (s1 & 1) {
+			addr = 0165000;
+		}
+		addr += input_port_read(machine,"S1_2") * 2;
+		cpu_set_reg(machine.device("maincpu"), T11_PC, addr);
+	}
+	
+	//0173000
 	load9312prom(maincpu + 0173000,machine.region("devproms")->base() + input_port_read(machine,"DEVPROM1") * 0x0200,0x080);
-	//0173200 F680
+	//0173200
 	load9312prom(maincpu + 0173200,machine.region("devproms")->base() + input_port_read(machine,"DEVPROM2") * 0x0200,0x080);
-	//0173400 F700
+	//0173400
 	load9312prom(maincpu + 0173400,machine.region("devproms")->base() + input_port_read(machine,"DEVPROM3") * 0x0200,0x080);
-	//0173600 F780
+	//0173600
 	load9312prom(maincpu + 0173600,machine.region("devproms")->base() + input_port_read(machine,"DEVPROM4") * 0x0200,0x080);
 	
 }
