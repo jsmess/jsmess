@@ -28,9 +28,7 @@
 		PDP-11/44 — Replacement for the 11/45 and 11/70 that supported optional cache
 				memory and floating-point processor, and included a sophisticated serial 
 				console interface and support for 4 MB of physical memory. The design 
-				team was managed by John Sofio. This was the last PDP-11 processor to 
-				be constructed using discrete logic gates; later models were all 
-				microprogrammed.
+				team was managed by John Sofio. 
 		PDP-11/24 — First VLSI PDP-11 for Unibus, using the "Fonz-11" (F11) chip set 
 				with a Unibus adapter.
 		PDP-11/84 — Using the VLSI "Jaws-11" (J11) chip set with a Unibus adapter.
@@ -62,6 +60,8 @@
 		Quickware QED-993 — High performance PDP-11/93 processor upgrade board.
 		DECserver 500 and 550 LAT terminal servers DSRVS-BA using the KDJ11-SB chipset
 
+		All PDP-11's execept the first one (11/15 and 11/20) are microprogrammed.
+		
         23/02/2009 Skeleton driver.
 
 ****************************************************************************/
