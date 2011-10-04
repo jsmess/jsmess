@@ -61,19 +61,27 @@ void st_state::toggle_dma_fifo()
 
 void st_state::flush_dma_fifo()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-
 	if (m_fdc_fifo_empty[m_fdc_fifo_sel]) return;
 
-	for (int i = 0; i < 8; i++)
-	{
-		UINT16 data = m_fdc_fifo[m_fdc_fifo_sel][i];
+	if (m_fdc_dmabytes) {
+		address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+		for (int i = 0; i < 8; i++) {
+			UINT16 data = m_fdc_fifo[m_fdc_fifo_sel][i];
 
-		if (LOG) logerror("Flushing DMA FIFO %u data %04x to address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
+			if (LOG) logerror("Flushing DMA FIFO %u data %04x to address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
 
-		program->write_word(m_dma_base, data);
-		m_dma_base += 2;
-	}
+			program->write_word(m_dma_base, data);
+			m_dma_base += 2;
+		}
+		m_fdc_dmabytes -= 16;
+		if (!m_fdc_dmabytes) {
+			m_fdc_sectors--;
+
+			if (m_fdc_sectors)
+				m_fdc_dmabytes = DMA_SECTOR_SIZE;
+		}
+	} else
+		m_dma_error = 0;
 
 	m_fdc_fifo_empty[m_fdc_fifo_sel] = 1;
 }
@@ -85,17 +93,25 @@ void st_state::flush_dma_fifo()
 
 void st_state::fill_dma_fifo()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	if (m_fdc_dmabytes) {
+		address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+		for (int i = 0; i < 8; i++) {
+			UINT16 data = program->read_word(m_dma_base);
 
-	for (int i = 0; i < 8; i++)
-	{
-		UINT16 data = program->read_word(m_dma_base);
+			if (LOG) logerror("Filling DMA FIFO %u with data %04x from memory address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
 
-		if (LOG) logerror("Filling DMA FIFO %u with data %04x from memory address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
+			m_fdc_fifo[m_fdc_fifo_sel][i] = data;
+			m_dma_base += 2;
+		}
+		m_fdc_dmabytes -= 16;
+		if (!m_fdc_dmabytes) {
+			m_fdc_sectors--;
 
-		m_fdc_fifo[m_fdc_fifo_sel][i] = data;
-		m_dma_base += 2;
-	}
+			if (m_fdc_sectors)
+				m_fdc_dmabytes = DMA_SECTOR_SIZE;
+		}
+	} else
+		m_dma_error = 0;
 
 	m_fdc_fifo_empty[m_fdc_fifo_sel] = 0;
 }
@@ -107,8 +123,6 @@ void st_state::fill_dma_fifo()
 
 void st_state::fdc_dma_transfer()
 {
-	if (!m_fdc_dmabytes) return;
-
 	if (m_fdc_mode & DMA_MODE_READ_WRITE)
 	{
 		UINT16 data = m_fdc_fifo[m_fdc_fifo_sel][m_fdc_fifo_index];
@@ -174,18 +188,6 @@ void st_state::fdc_dma_transfer()
 		{
 			flush_dma_fifo();
 			toggle_dma_fifo();
-		}
-	}
-
-	m_fdc_dmabytes--;
-
-	if (m_fdc_dmabytes == 0)
-	{
-		m_fdc_sectors--;
-
-		if (m_fdc_sectors)
-		{
-			m_fdc_dmabytes = DMA_SECTOR_SIZE;
 		}
 	}
 }
@@ -2097,9 +2099,7 @@ void st_state::fdc_intrq_w(bool state)
 void st_state::fdc_drq_w(bool state)
 {
 	if (state && (!(m_fdc_mode & DMA_MODE_ENABLED)) && (m_fdc_mode & DMA_MODE_FDC_HDC_ACK))
-	{
 		fdc_dma_transfer();
-	}
 }
 
 

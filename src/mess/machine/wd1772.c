@@ -116,7 +116,6 @@ void wd1772_t::command_end()
 	status &= ~S_BUSY;
 	intrq = true;
 	motor_timeout = 0;
-	//  fprintf(stderr, "%s: command status %02x\n", ttsn().cstr(), status);
 	if(!intrq_cb.isnull())
 		intrq_cb(intrq);
 }
@@ -283,15 +282,20 @@ void wd1772_t::read_sector_continue()
 			return;
 
 		case SPINUP_DONE:
-			sub_state = SCAN_ID;
-			counter = 0;
-			live_start(SEARCH_ADDRESS_MARK);
+			if(command & 4) {
+				sub_state = SETTLE_WAIT;
+				delay_cycles(t_gen, 120000);
+			} else {
+				sub_state = SCAN_ID;
+				counter = 0;
+				live_start(SEARCH_ADDRESS_MARK);
+			}
+			return;
+
+		case SETTLE_WAIT:
 			return;
 
 		case SCAN_ID:
-			if(cur_live.state != IDLE)
-				return;
-
 			if(cur_live.idbuf[0] != track || cur_live.idbuf[2] != sector) {
 				live_start(SEARCH_ADDRESS_MARK);
 				return;
@@ -360,6 +364,9 @@ void wd1772_t::read_track_continue()
 			sub_state = WAIT_INDEX;
 			return;
 
+		case SETTLE_WAIT:
+			return;
+
 		case WAIT_INDEX:
 			return;
 
@@ -369,6 +376,67 @@ void wd1772_t::read_track_continue()
 			return;
 
 		case TRACK_DONE:
+			command_end();
+			return;
+
+		default:
+			logerror("%s: read track unknown sub-state %d\n", ttsn().cstr(), sub_state);
+			return;
+		}
+	}
+}
+
+void wd1772_t::read_id_start()
+{
+	main_state = READ_ID;
+	status = (status & ~(S_WP|S_DDM|S_LOST|S_RNF)) | S_BUSY;
+	drop_drq();
+	sub_state = SPINUP;
+	status_type_1 = false;
+	read_id_continue();
+}
+
+void wd1772_t::read_id_continue()
+{
+	for(;;) {
+		switch(sub_state) {
+		case SPINUP:
+			if(!(status & S_MON)) {
+				spinup();
+				return;
+			}
+			sub_state = SPINUP_DONE;
+			break;
+
+		case SPINUP_WAIT:
+			return;
+
+		case SPINUP_DONE:
+			if(command & 4) {
+				sub_state = SETTLE_WAIT;
+				delay_cycles(t_gen, 120000);
+			} else {
+				sub_state = SCAN_ID;
+				counter = 0;
+				live_start(SEARCH_ADDRESS_MARK);
+			}
+			return;
+
+		case SETTLE_WAIT:
+			return;
+
+		case SETTLE_DONE:
+			sub_state = SCAN_ID;
+			counter = 0;
+			live_start(SEARCH_ADDRESS_MARK);
+			return;
+
+		case SCAN_ID:
+			command_end();
+			return;
+
+		case SCAN_ID_FAILED:
+			status |= S_RNF;
 			command_end();
 			return;
 
@@ -412,6 +480,9 @@ void wd1772_t::general_continue()
 	case READ_TRACK:
 		read_track_continue();
 		break;
+	case READ_ID:
+		read_id_continue();
+		break;
 	default:
 		logerror("%s: general_continue on unknown main-state %d\n", ttsn().cstr(), main_state);
 		break;
@@ -424,6 +495,10 @@ void wd1772_t::do_generic()
 	case IDLE:
 	case SCAN_ID:
 	case SECTOR_READ:
+		break;
+
+	case SETTLE_WAIT:
+		sub_state = SETTLE_DONE;
 		break;
 
 	case SEEK_WAIT_STEP_TIME:
@@ -460,6 +535,7 @@ void wd1772_t::do_cmd_w()
 	case 0x40: case 0x50: logerror("wd1772: step +\n"); last_dir = 0; seek_start(STEP); break;
 	case 0x60: case 0x70: logerror("wd1772: step -\n"); last_dir = 1; seek_start(STEP); break;
 	case 0x80: case 0x90: logerror("wd1772: read sector%s %d, %d\n", command & 0x10 ? " multiple" : "", track, sector); read_sector_start(); break;
+	case 0xc0: logerror("wd1772: read id\n"); read_id_start(); break;
 	case 0xd0: logerror("wd1772: interrupt\n"); interrupt_start(); break;
 	case 0xe0: logerror("wd1772: read track %d\n", track); read_track_start(); break;
 
@@ -646,6 +722,8 @@ void wd1772_t::index_callback(floppy_image_device *floppy, int state)
 		break;
 
 	case SPINUP_DONE:
+	case SETTLE_WAIT:
+	case SETTLE_DONE:
 	case SEEK_MOVE:
 	case SEEK_WAIT_STEP_TIME:
 	case SEEK_WAIT_STEP_TIME_DONE:
@@ -855,12 +933,12 @@ void wd1772_t::live_run(attotime limit)
 				break;
 
 			case 0xfe: // ID
-				if(sub_state == SCAN_ID) {
-					cur_live.state = READ_ID_BLOCK_TO_LOCAL;
+				if(main_state == READ_ID) {
+					cur_live.state = READ_ID_BLOCK_TO_DMA;
 					break;
 				}
-				if(sub_state == READ_ID) {
-					cur_live.state = READ_ID_BLOCK_TO_DMA;
+				if(sub_state == SCAN_ID) {
+					cur_live.state = READ_ID_BLOCK_TO_LOCAL;
 					break;
 				}
 
@@ -899,6 +977,7 @@ void wd1772_t::live_run(attotime limit)
 			if(cur_live.bit_counter == 16)
 				sector = data;
 			set_drq();
+
 			if(cur_live.bit_counter == 16*6) {
 				// Already synchronous
 				cur_live.state = IDLE;
