@@ -22,30 +22,6 @@
 #define LOG(x) do { if (AVIGO_VIDEO_DEBUG) logerror x; } while (0)
 
 
-static const gfx_layout pointerlayout =
-{
-	8, 8,
-	1,
-	2,
-	{0, 64},
-	{0, 1, 2, 3, 4, 5, 6, 7},
-	{0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8},
-	8 * 8
-};
-
-static const UINT8 pointermask[] =
-{
-	0x00, 0x70, 0x60, 0x50, 0x08, 0x04, 0x00, 0x00,		/* blackmask */
-	0xf0, 0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00	/* whitemask */
-};
-
-void avigo_vh_set_stylus_marker_position(running_machine &machine, int x, int y)
-{
-	avigo_state *state = machine.driver_data<avigo_state>();
-	state->m_stylus_x = x;
-	state->m_stylus_y = y;
-}
-
 READ8_HANDLER(avigo_vid_memory_r)
 {
 	avigo_state *state = space->machine().driver_data<avigo_state>();
@@ -98,9 +74,6 @@ VIDEO_START( avigo )
 
 	/* allocate video memory */
 	state->m_video_memory = auto_alloc_array_clear(machine, UINT8, ((AVIGO_SCREEN_WIDTH>>3)*AVIGO_SCREEN_HEIGHT+1));
-	machine.gfx[0] = gfx_element_alloc(machine, &pointerlayout, pointermask, machine.total_colors() / 16, 0);
-
-	machine.gfx[0]->total_colors = 3;
 }
 
 /* Initialise the palette */
@@ -124,7 +97,6 @@ SCREEN_UPDATE( avigo )
 	int y;
 	int b;
 	int x;
-	rectangle r;
 
 	/* draw avigo display */
 	for (y=0; y<AVIGO_SCREEN_HEIGHT; y++)
@@ -153,13 +125,6 @@ SCREEN_UPDATE( avigo )
 		}
 	}
 
-	r.min_x = 0;
-	r.max_x = AVIGO_SCREEN_WIDTH;
-	r.min_y = 0;
-	r.max_y = AVIGO_SCREEN_HEIGHT;
-
-	/* draw stylus marker */
-	drawgfx_transpen (bitmap, &r, screen->machine().gfx[0], 0, 0, 0, 0, state->m_stylus_x, state->m_stylus_y, 0);
 #if 0
 	{
 
