@@ -45,6 +45,7 @@
 #include "machine/ins8250.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
+#include "rendlay.h"
 
 /*
     bit 7:                      ?? high priority. When it occurs, clear this bit.
@@ -166,8 +167,6 @@ static TIMER_DEVICE_CALLBACK(avigo_dummy_timer_callback)
 	int i;
 	int current_input_port_data[4];
 	int changed;
-	int nx,ny;
-	int dx, dy;
 	static const char *const linenames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
 
 	for (i = 0; i < 4; i++)
@@ -176,25 +175,6 @@ static TIMER_DEVICE_CALLBACK(avigo_dummy_timer_callback)
 	}
 
 	changed = current_input_port_data[3]^state->m_previous_input_port_data[3];
-
-	if ((changed & 0x01)!=0)
-	{
-		if ((current_input_port_data[3] & 0x01)!=0)
-		{
-			/* pen pressed to screen */
-
-			logerror("pen pressed interrupt\n");
-			state->m_stylus_press_x = state->m_stylus_marker_x;
-			state->m_stylus_press_y = state->m_stylus_marker_y;
-			/* set pen interrupt */
-			state->m_irq |= (1<<6);
-		}
-		else
-		{
-			state->m_stylus_press_x = 0;
-			state->m_stylus_press_y = 0;
-		}
-	}
 
 	if ((changed & 0x02)!=0)
 	{
@@ -210,24 +190,6 @@ static TIMER_DEVICE_CALLBACK(avigo_dummy_timer_callback)
 		state->m_previous_input_port_data[i] = current_input_port_data[i];
 	}
 
-	nx = input_port_read(timer.machine(), "POSX");
-	if (nx>=0x800) nx-=0x1000;
-	else if (nx<=-0x800) nx+=0x1000;
-
-	dx = nx - state->m_ox;
-	state->m_ox = nx;
-
-	ny = input_port_read(timer.machine(), "POSY");
-	if (ny>=0x800) ny-=0x1000;
-	else if (ny<=-0x800) ny+=0x1000;
-
-	dy = ny - state->m_oy;
-	state->m_oy = ny;
-
-	state->m_stylus_marker_x +=dx;
-	state->m_stylus_marker_y +=dy;
-
-	avigo_vh_set_stylus_marker_position(timer.machine(), state->m_stylus_marker_x, state->m_stylus_marker_y);
 #if 0
 	/* not sure if keyboard generates an interrupt, or if something
     is plugged in for synchronisation! */
@@ -397,12 +359,6 @@ static MACHINE_RESET( avigo )
 	/* initialize flash contents */
 	memcpy(state->m_flashes[0]->space()->get_read_ptr(0), machine.region("maincpu")->base()+0x10000, 0x100000);
 	memcpy(state->m_flashes[1]->space()->get_read_ptr(0), machine.region("maincpu")->base()+0x110000, 0x100000);
-
-	state->m_stylus_marker_x = AVIGO_SCREEN_WIDTH>>1;
-	state->m_stylus_marker_y = AVIGO_SCREEN_HEIGHT>>1;
-	state->m_stylus_press_x = 0;
-	state->m_stylus_press_y = 0;
-	avigo_vh_set_stylus_marker_position(machine, state->m_stylus_marker_x, state->m_stylus_marker_y);
 
 	/* initialise settings for port data */
 	for (i = 0; i < 4; i++)
@@ -593,18 +549,14 @@ static WRITE8_HANDLER(avigo_ad_control_status_w)
 		if ((data & 0x08)!=0)
 		{
 			logerror("a/d select x coordinate\n");
-			logerror("x coord: %d\n",state->m_stylus_press_x);
+			logerror("x coord: %d\n", input_port_read(space->machine(), "POSX"));
 
 			/* on screen range 0x060->0x03a0 */
-			/* 832 is on-screen range */
-			/* 5.2 a/d units per pixel */
-
-			if (state->m_stylus_press_x!=0)
+			if (input_port_read(space->machine(), "LINE3") & 0x01)
 			{
 				/* this might not be totally accurate because hitable screen
                 area may include the border around the screen! */
-				state->m_ad_value = ((int)(state->m_stylus_press_x * 5.2f))+0x060;
-				state->m_ad_value &= 0x03fc;
+				state->m_ad_value = input_port_read(space->machine(), "POSX");
 			}
 			else
 			{
@@ -612,7 +564,6 @@ static WRITE8_HANDLER(avigo_ad_control_status_w)
 			}
 
 			logerror("ad value: %d\n",state->m_ad_value);
-			state->m_stylus_press_x = 0;
 
 		}
 		else
@@ -627,17 +578,12 @@ static WRITE8_HANDLER(avigo_ad_control_status_w)
 			/* assumption 0x044->0x0350 is screen area and
             0x0350->0x036a is panel at bottom */
 
-			/* 780 is therefore on-screen range */
-			/* 3.25 a/d units per pixel */
-			/* a/d unit * a/d range = total height */
-			/* 3.25 * 1024.00 = 315.07 */
-
 			logerror("a/d select y coordinate\n");
-			logerror("y coord: %d\n",state->m_stylus_press_y);
+			logerror("y coord: %d\n", input_port_read(space->machine(), "POSY"));
 
-			if (state->m_stylus_press_y!=0)
+			if (input_port_read(space->machine(), "LINE3") & 0x01)
 			{
-				state->m_ad_value = 1024 - (((state->m_stylus_press_y)*3.25f) + 0x040);
+				state->m_ad_value = input_port_read(space->machine(), "POSY");
 			}
 			else
 			{
@@ -645,7 +591,6 @@ static WRITE8_HANDLER(avigo_ad_control_status_w)
 			}
 
 			logerror("ad value: %d\n",state->m_ad_value);
-			state->m_stylus_press_y = 0;
 		}
 	}
 
@@ -817,6 +762,15 @@ static ADDRESS_MAP_START( avigo_io, AS_IO, 8)
 ADDRESS_MAP_END
 
 
+static INPUT_CHANGED( pen_irq )
+{
+	avigo_state *state = field.machine().driver_data<avigo_state>();
+
+	logerror("pen pressed interrupt\n");
+	state->m_irq |= (1<<6);
+
+	avigo_refresh_ints(field.machine());
+}
 
 static INPUT_PORTS_START(avigo)
 	PORT_START("LINE0")
@@ -836,17 +790,15 @@ static INPUT_PORTS_START(avigo)
 	PORT_BIT(0x0fe, 0xfe, IPT_UNUSED)
 
 	PORT_START("LINE3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pen/Stylus pressed") PORT_CODE(KEYCODE_Q) PORT_CODE(JOYCODE_BUTTON1)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pen/Stylus pressed") PORT_CODE(KEYCODE_ENTER) PORT_CODE(MOUSECODE_BUTTON1)  PORT_CHANGED( pen_irq, NULL )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?? Causes a NMI") PORT_CODE(KEYCODE_W) PORT_CODE(JOYCODE_BUTTON2)
 
 	/* these two ports are used to emulate the position of the pen/stylus on the screen */
-	/* a cursor is drawn to indicate the position, so when a click is done, it will occur in the correct place */
-	/* To be converted to crosshair code? */
 	PORT_START("POSX") /* Mouse - X AXIS */
-	PORT_BIT(0xfff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT(0x3ff, 0x060, IPT_LIGHTGUN_X) PORT_SENSITIVITY(100) PORT_CROSSHAIR(X, 1, 0, 0) PORT_MINMAX(0x060, 0x3a0) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 	PORT_START("POSY") /* Mouse - Y AXIS */
-	PORT_BIT(0xfff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT(0x3ff, 0x044, IPT_LIGHTGUN_Y) PORT_SENSITIVITY(100) PORT_CROSSHAIR(Y, 1, 0, 0) PORT_MINMAX(0x044, 0x350) PORT_INVERT PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 /* F4 Character Displayer */
@@ -929,7 +881,6 @@ static const gfx_layout avigo_6_by_8 =
 };
 
 static GFXDECODE_START( avigo )
-	GFXDECODE_ENTRY( "maincpu", 0x00000, avigo_charlayout, 0, 3 )
 	GFXDECODE_ENTRY( "maincpu", 0x18992, avigo_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0x1c020, avigo_8_by_14, 0, 1 )
 	GFXDECODE_ENTRY( "maincpu", 0x1c020, avigo_16_by_15, 0, 1 )
@@ -938,6 +889,24 @@ static GFXDECODE_START( avigo )
 	GFXDECODE_ENTRY( "maincpu", 0x2e020, avigo_6_by_8, 0, 1 )
 GFXDECODE_END
 
+
+static TIMER_DEVICE_CALLBACK( avigo_scan_timer )
+{
+	avigo_state *state = timer.machine().driver_data<avigo_state>();
+
+	state->m_irq |= (1<<1);
+
+	avigo_refresh_ints(timer.machine());
+}
+
+static TIMER_DEVICE_CALLBACK( avigo_1hz_timer )
+{
+	avigo_state *state = timer.machine().driver_data<avigo_state>();
+
+	state->m_irq |= (1<<4);
+
+	avigo_refresh_ints(timer.machine());
+}
 
 static MACHINE_CONFIG_START( avigo, avigo_state )
 	/* basic machine hardware */
@@ -956,8 +925,9 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_SIZE(AVIGO_SCREEN_WIDTH, AVIGO_SCREEN_HEIGHT)
+	MCFG_SCREEN_VISIBLE_AREA(0, AVIGO_SCREEN_WIDTH-1, 0, AVIGO_SCREEN_HEIGHT-1)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_UPDATE( avigo )
 
 	MCFG_GFXDECODE(avigo)
@@ -982,6 +952,12 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
+
+	// IRQ 1 is used for scan the pen and for cursor blinking
+	MCFG_TIMER_ADD_PERIODIC("scan_timer", avigo_scan_timer, attotime::from_hz(50))
+
+	// IRQ 4 is generated every second, used for auto power off
+	MCFG_TIMER_ADD_PERIODIC("1hz_timer", avigo_1hz_timer, attotime::from_hz(1))
 
 	/* a timer used to check status of pen */
 	/* an interrupt is generated when the pen is pressed to the screen */
