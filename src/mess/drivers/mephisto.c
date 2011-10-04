@@ -2,11 +2,6 @@
  Mephisto 4 + 5 Chess Computer
  2007 Dirk V.
 
-******************************************************************************/
-
-/*
-
-
 CPU 65C02 P4
 Clock 4.9152 MHz
 NMI CLK 600 Hz
@@ -50,10 +45,7 @@ $3000 // Chess Board
 $4000-7FFF Opening Modul HG550
 $8000-$FFF ROM
 
-
-*/
-
-/*  Mephisto 4 Turbo Kit 18mhz - (mm4tk)
+Mephisto 4 Turbo Kit 18mhz - (mm4tk)
     This is a replacement rom combining the turbo kit initial rom with the original MM IV.
     The Turbo Kit powers up to it's tiny rom, copies itself to ram, banks in normal rom,
     copies that to faster SRAM, then patches the checksum and the LED blink delays.
@@ -64,8 +56,12 @@ $8000-$FFF ROM
     blinks the LEDs a little slower.
 
     -- Cowering (2011)
-*/
 
+'rebel5' driver broke somewhere between 0.141 and 0.142 and is now marked as NOT_WORKING
+
+***********************************************************************************************/
+
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -79,36 +75,42 @@ class mephisto_state : public driver_device
 {
 public:
 	mephisto_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_beep(*this, BEEPER_TAG)
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_beep;
+	DECLARE_WRITE8_MEMBER(write_lcd);
+	DECLARE_WRITE8_MEMBER(mephisto_NMI);
+	DECLARE_READ8_MEMBER(read_keys);
+	DECLARE_WRITE8_MEMBER(write_led);
+	DECLARE_WRITE8_MEMBER(write_led_mm2);
 	UINT8 m_lcd_shift_counter;
 	UINT8 m_led_status;
-	UINT8 *m_ram;
+	//UINT8 *m_p_ram;
 	UINT8 m_led7;
 	UINT8 m_allowNMI;
 };
 
 
-static WRITE8_HANDLER ( write_lcd )
+WRITE8_MEMBER( mephisto_state::write_lcd )
 {
-	mephisto_state *state = space->machine().driver_data<mephisto_state>();
-	if (state->m_led7 == 0) output_set_digit_value(state->m_lcd_shift_counter,data);	// 0x109 MM IV // 0x040 MM V
+	if (m_led7 == 0) output_set_digit_value(m_lcd_shift_counter,data);	// 0x109 MM IV // 0x040 MM V
 
-	//output_set_digit_value(state->m_lcd_shift_counter,data ^ state->m_ram[0x165]);    // 0x109 MM IV // 0x040 MM V
-	state->m_lcd_shift_counter--;
-	state->m_lcd_shift_counter &= 3;
+	//output_set_digit_value(m_lcd_shift_counter,data ^ m_p_ram[0x165]);    // 0x109 MM IV // 0x040 MM V
+	m_lcd_shift_counter--;
+	m_lcd_shift_counter &= 3;
 }
 
-static WRITE8_HANDLER ( mephisto_NMI )
+WRITE8_MEMBER( mephisto_state::mephisto_NMI )
 {
-
-	mephisto_state *state = space->machine().driver_data<mephisto_state>();
-	state->m_allowNMI = 1;
+	m_allowNMI = 1;
 }
 
-static READ8_HANDLER(read_keys)
+READ8_MEMBER( mephisto_state::read_keys )
 {
-	mephisto_state *state = space->machine().driver_data<mephisto_state>();
 	UINT8 data;
 	static const char *const keynames[2][8] =
 			{
@@ -117,82 +119,76 @@ static READ8_HANDLER(read_keys)
 			};
 
 	data = 0xff;
-	if (((state->m_led_status & 0x80) == 0x00))
-		data=input_port_read(space->machine(), keynames[0][offset]);
+	if (((m_led_status & 0x80) == 0x00))
+		data=input_port_read(machine(), keynames[0][offset]);
 	else
-		data=input_port_read(space->machine(), keynames[1][offset]);
+		data=input_port_read(machine(), keynames[1][offset]);
 
-	logerror("Keyboard Port = %s Data = %d\n  ", ((state->m_led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
+	logerror("Keyboard Port = %s Data = %d\n  ", ((m_led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
 	return data | 0x7f;
 }
 
-static WRITE8_HANDLER ( write_led )
+WRITE8_MEMBER( mephisto_state::write_led )
 {
-	mephisto_state *state = space->machine().driver_data<mephisto_state>();
 	UINT8 LED_offset=100;
 	data &= 0x80;
 
-	if (data==0)state->m_led_status &= 255-(1<<offset) ; else state->m_led_status|=1<<offset;
-	if (offset<6)output_set_led_value(LED_offset+offset, state->m_led_status&1<<offset?1:0);
-	if (offset==7) state->m_led7=data& 0x80 ? 0x00 :0xff;
+	if (data==0)m_led_status &= 255-(1<<offset) ; else m_led_status|=1<<offset;
+	if (offset<6)output_set_led_value(LED_offset+offset, m_led_status&1<<offset?1:0);
+	if (offset==7) m_led7=data& 0x80 ? 0x00 :0xff;
 	logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
-static WRITE8_HANDLER ( write_led_mm2 )
+WRITE8_MEMBER( mephisto_state::write_led_mm2 )
 {
-	mephisto_state *state = space->machine().driver_data<mephisto_state>();
-
 	UINT8 LED_offset=100;
 	data &= 0x80;
 
 	if (data==0)
-		state->m_led_status &= 255-(1<<offset);
+		m_led_status &= 255-(1<<offset);
 	else
-		state->m_led_status|=1<<offset;
+		m_led_status|=1<<offset;
 
 	if (offset<6)
-		output_set_led_value(LED_offset+offset, state->m_led_status&1<<offset?1:0);
+		output_set_led_value(LED_offset+offset, m_led_status&1<<offset?1:0);
 
 	if (offset==7)
-		state->m_led7= data & 0x80 ? 0xff :0x00;	//MM2
-
+		m_led7= BIT(data, 7) ? 0xff :0x00;	//MM2
 }
 
-static ADDRESS_MAP_START(rebel5_mem , AS_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x1fff) AM_RAM						// AM_BASE_MEMBER(mephisto_state, m_ram)//
-	AM_RANGE( 0x5000, 0x5000) AM_WRITE( write_lcd )
-	AM_RANGE( 0x3000, 0x3007) AM_READ( read_keys )			// Rebel 5.0
-	AM_RANGE( 0x2000, 0x2007) AM_WRITE( write_led )			// Status LEDs+ buzzer
-	AM_RANGE( 0x3000, 0x4000) AM_READ( mboard_read_board_8 )		// Chessboard
-	AM_RANGE( 0x6000, 0x6000) AM_WRITE ( mboard_write_LED_8)		// Chessboard
-	AM_RANGE( 0x7000, 0x7000) AM_WRITE ( mboard_write_board_8 )	// Chessboard
+static ADDRESS_MAP_START( rebel5_mem, AS_PROGRAM, 8, mephisto_state )
+	AM_RANGE( 0x0000, 0x1fff) AM_RAM						// AM_BASE(m_p_ram)
+	AM_RANGE( 0x2000, 0x2007) AM_WRITE(write_led)			// Status LEDs+ buzzer
+	AM_RANGE( 0x3000, 0x3007) AM_READ(read_keys)			// Rebel 5.0
+	AM_RANGE( 0x3000, 0x4000) AM_READ_LEGACY(mboard_read_board_8)		// Chessboard
+	AM_RANGE( 0x5000, 0x5000) AM_WRITE(write_lcd)
+	AM_RANGE( 0x6000, 0x6000) AM_WRITE_LEGACY(mboard_write_LED_8)		// Chessboard
+	AM_RANGE( 0x7000, 0x7000) AM_WRITE_LEGACY(mboard_write_board_8)	// Chessboard
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(mephisto_mem , AS_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(mephisto_state, m_ram )//
-	AM_RANGE( 0x2000, 0x2000) AM_WRITE( write_lcd )
-	AM_RANGE( 0x2c00, 0x2c07) AM_READ( read_keys )
-	AM_RANGE( 0x3400, 0x3407) AM_WRITE( write_led )			// Status LEDs+ buzzer
-	AM_RANGE( 0x2400, 0x2407) AM_WRITE ( mboard_write_LED_8 )		// Chessboard
-	AM_RANGE( 0x2800, 0x2800) AM_WRITE ( mboard_write_board_8)		// Chessboard
-	AM_RANGE( 0x3800, 0x3800) AM_WRITE ( mephisto_NMI )			// NMI enable
-	AM_RANGE( 0x3000, 0x3000) AM_READ( mboard_read_board_8 )		// Chessboard
+static ADDRESS_MAP_START( mephisto_mem, AS_PROGRAM, 8, mephisto_state )
+	AM_RANGE( 0x0000, 0x1fff) AM_RAM //AM_BASE(m_p_ram)
+	AM_RANGE( 0x2000, 0x2000) AM_WRITE(write_lcd)
+	AM_RANGE( 0x2400, 0x2407) AM_WRITE_LEGACY(mboard_write_LED_8)		// Chessboard
+	AM_RANGE( 0x2800, 0x2800) AM_WRITE_LEGACY(mboard_write_board_8)		// Chessboard
+	AM_RANGE( 0x2c00, 0x2c07) AM_READ(read_keys)
+	AM_RANGE( 0x3000, 0x3000) AM_READ_LEGACY(mboard_read_board_8)		// Chessboard
+	AM_RANGE( 0x3400, 0x3407) AM_WRITE(write_led)			// Status LEDs+ buzzer
+	AM_RANGE( 0x3800, 0x3800) AM_WRITE(mephisto_NMI)			// NMI enable
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM						// Opening Library
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mm2_mem , AS_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(mephisto_state, m_ram )
-	AM_RANGE( 0x2800, 0x2800) AM_WRITE( write_lcd )
-	AM_RANGE( 0x1800, 0x1807) AM_READ( read_keys )
-	AM_RANGE( 0x1000, 0x1007) AM_WRITE( write_led_mm2 )		//Status LEDs
-
-	AM_RANGE( 0x3000, 0x3000) AM_WRITE ( mboard_write_LED_8 )		//Chessboard
-	AM_RANGE( 0x3800, 0x3800) AM_WRITE ( mboard_write_board_8)		//Chessboard
-	AM_RANGE( 0x2000, 0x2000) AM_READ( mboard_read_board_8 )		//Chessboard
-
+static ADDRESS_MAP_START( mm2_mem, AS_PROGRAM, 8, mephisto_state )
+	AM_RANGE( 0x0000, 0x0fff) AM_RAM //AM_BASE(m_p_ram)
+	AM_RANGE( 0x1000, 0x1007) AM_WRITE(write_led_mm2)		//Status LEDs
+	AM_RANGE( 0x1800, 0x1807) AM_READ(read_keys)
+	AM_RANGE( 0x2000, 0x2000) AM_READ_LEGACY(mboard_read_board_8)		//Chessboard
+	AM_RANGE( 0x2800, 0x2800) AM_WRITE(write_lcd)
+	AM_RANGE( 0x3000, 0x3000) AM_WRITE_LEGACY(mboard_write_LED_8)		//Chessboard
+	AM_RANGE( 0x3800, 0x3800) AM_WRITE_LEGACY(mboard_write_board_8)		//Chessboard
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM						// Opening Library ?
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -293,7 +289,6 @@ static INPUT_PORTS_START( board )
 	PORT_START("B_BUTTONS")
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
 	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD)
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mephisto )
@@ -332,31 +327,29 @@ static INPUT_PORTS_START( mephisto )
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D 4") PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4)
 
 	PORT_INCLUDE( board )
-
 INPUT_PORTS_END
 
 
 static TIMER_DEVICE_CALLBACK( update_nmi )
 {
 	mephisto_state *state = timer.machine().driver_data<mephisto_state>();
-	device_t *speaker = timer.machine().device(BEEPER_TAG);
-	if (state->m_allowNMI) {
+	if (state->m_allowNMI)
+	{
 		state->m_allowNMI = 0;
 		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI,PULSE_LINE);
 	}
-	beep_set_state(speaker,state->m_led_status&64?1:0);
+	beep_set_state(state->m_beep, state->m_led_status&64?1:0);
 }
 
 static TIMER_DEVICE_CALLBACK( update_irq )		//only mm2
 {
 	mephisto_state *state = timer.machine().driver_data<mephisto_state>();
-	device_t *speaker = timer.machine().device(BEEPER_TAG);
-
 	cputag_set_input_line(timer.machine(), "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
 	cputag_set_input_line(timer.machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 
-	beep_set_state(speaker,state->m_led_status&64?1:0);
+	beep_set_state(state->m_beep, state->m_led_status&64?1:0);
 }
+
 static MACHINE_START( mephisto )
 {
 	mephisto_state *state = machine.driver_data<mephisto_state>();
@@ -507,11 +500,9 @@ static DRIVER_INIT( mephisto )
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME                            FLAGS */
 
 CONS( 1984, mm2,        mm4,	0,      mm2,        mephisto,   mephisto,   "Hegener & Glaser", "Mephisto MM2 Schachcomputer",     GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-CONS( 1986, rebel5,     mm4,	0,      rebel5,     mephisto,   mephisto,   "Hegener & Glaser", "Mephisto Rebel 5 Schachcomputer", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+CONS( 1986, rebel5,     mm4,	0,      rebel5,     mephisto,   mephisto,   "Hegener & Glaser", "Mephisto Rebel 5 Schachcomputer", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING )
 CONS( 1987, mm4,        0,      0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schachcomputer",       GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 CONS( 1987, mm4tk,      mm4,    0,      mm4tk,      mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schachcomputer Turbo Kit + HG440",       GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 CONS( 1990, mm5,        mm4,	0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schachcomputer",     GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 CONS( 1990, mm50,       mm4,	0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.0 Schachcomputer",     GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 CONS( 1990, mm5tk,      mm4,    0,      mm4tk,      mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schachcomputer Turbo Kit + HG550",       GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-
-
