@@ -105,6 +105,9 @@ private:
 		SPINUP_WAIT,
 		SPINUP_DONE,
 
+		SETTLE_WAIT,
+		SETTLE_DONE,
+
 		SEEK_MOVE,
 		SEEK_WAIT_STEP_TIME,
 		SEEK_WAIT_STEP_TIME_DONE,
@@ -215,6 +218,9 @@ private:
 
 	void read_track_start();
 	void read_track_continue();
+
+	void read_id_start();
+	void read_id_continue();
 
 	void interrupt_start();
 
