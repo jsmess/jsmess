@@ -71,10 +71,12 @@ static MACHINE_CONFIG_START( sc1, sc1_state )
 MACHINE_CONFIG_END
 
 /* ROM definition */
-ROM_START( sc1 )			/* These are different bios versions */
+ROM_START( sc1 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "sc1.rom", 0x0000, 0x1000, CRC(26965b23) SHA1(01568911446eda9f05ec136df53da147b7c6f2bf))
-	ROM_LOAD( "sc1-v2.bin", 0x0000, 0x1000, CRC(1f122a85) SHA1(d60f89f8b59d04f4cecd6e3ecfe0a24152462a36))
+	ROM_SYSTEM_BIOS(0, "v1", "V1") // dont know what version it is
+	ROMX_LOAD( "sc1.rom", 0x0000, 0x1000, CRC(26965b23) SHA1(01568911446eda9f05ec136df53da147b7c6f2bf), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "v2", "V2")
+	ROMX_LOAD( "sc1-v2.bin", 0x0000, 0x1000, CRC(1f122a85) SHA1(d60f89f8b59d04f4cecd6e3ecfe0a24152462a36), ROM_BIOS(2))
 ROM_END
 
 /* Driver */
