@@ -47,6 +47,11 @@
 #include "machine/ram.h"
 #include "rendlay.h"
 
+
+#define AVIGO_LOG 0
+#define LOG(x) do { if (AVIGO_LOG) logerror x; } while (0)
+
+
 /*
     bit 7:                      ?? high priority. When it occurs, clear this bit.
     bit 6: pen int
@@ -318,7 +323,7 @@ static void avigo_refresh_memory(running_machine &machine)
 static WRITE_LINE_DEVICE_HANDLER( avigo_com_interrupt )
 {
 	avigo_state *drvstate = device->machine().driver_data<avigo_state>();
-	logerror("com int\r\n");
+	LOG(("com int\r\n"));
 
 	drvstate->m_irq &= ~(1<<3);
 
@@ -481,7 +486,7 @@ static  READ8_HANDLER(avigo_ram_bank_h_r)
 static WRITE8_HANDLER(avigo_rom_bank_l_w)
 {
 	avigo_state *state = space->machine().driver_data<avigo_state>();
-	logerror("rom bank l w: %04x\n", data);
+	LOG(("rom bank l w: %04x\n", data));
 
         state->m_rom_bank_l = data & 0x03f;
 
@@ -491,7 +496,7 @@ static WRITE8_HANDLER(avigo_rom_bank_l_w)
 static WRITE8_HANDLER(avigo_rom_bank_h_w)
 {
 	avigo_state *state = space->machine().driver_data<avigo_state>();
-	logerror("rom bank h w: %04x\n", data);
+	LOG(("rom bank h w: %04x\n", data));
 
 
         /* 000 = flash 0
@@ -512,7 +517,7 @@ static WRITE8_HANDLER(avigo_rom_bank_h_w)
 static WRITE8_HANDLER(avigo_ram_bank_l_w)
 {
 	avigo_state *state = space->machine().driver_data<avigo_state>();
-	logerror("ram bank l w: %04x\n", data);
+	LOG(("ram bank l w: %04x\n", data));
 
         state->m_ram_bank_l = data & 0x03f;
 
@@ -522,7 +527,7 @@ static WRITE8_HANDLER(avigo_ram_bank_l_w)
 static WRITE8_HANDLER(avigo_ram_bank_h_w)
 {
 	avigo_state *state = space->machine().driver_data<avigo_state>();
-	logerror("ram bank h w: %04x\n", data);
+	LOG(("ram bank h w: %04x\n", data));
 
 	state->m_ram_bank_h = data;
 
@@ -532,7 +537,7 @@ static WRITE8_HANDLER(avigo_ram_bank_h_w)
 static  READ8_HANDLER(avigo_ad_control_status_r)
 {
 	avigo_state *state = space->machine().driver_data<avigo_state>();
-	logerror("avigo ad control read %02x\n", (int) state->m_ad_control_status);
+	LOG(("avigo ad control read %02x\n", (int) state->m_ad_control_status));
 	return state->m_ad_control_status;
 }
 
@@ -540,7 +545,7 @@ static  READ8_HANDLER(avigo_ad_control_status_r)
 static WRITE8_HANDLER(avigo_ad_control_status_w)
 {
 	avigo_state *state = space->machine().driver_data<avigo_state>();
-	logerror("avigo ad control w %02x\n",data);
+	LOG(("avigo ad control w %02x\n",data));
 
 	if ((data & 0x070)==0x070)
 	{
@@ -548,8 +553,8 @@ static WRITE8_HANDLER(avigo_ad_control_status_w)
 		/* when 6,5,4 = 1 */
 		if ((data & 0x08)!=0)
 		{
-			logerror("a/d select x coordinate\n");
-			logerror("x coord: %d\n", input_port_read(space->machine(), "POSX"));
+			LOG(("a/d select x coordinate\n"));
+			LOG(("x coord: %d\n", input_port_read(space->machine(), "POSX")));
 
 			/* on screen range 0x060->0x03a0 */
 			if (input_port_read(space->machine(), "LINE3") & 0x01)
@@ -563,7 +568,7 @@ static WRITE8_HANDLER(avigo_ad_control_status_w)
 				state->m_ad_value = 0;
 			}
 
-			logerror("ad value: %d\n",state->m_ad_value);
+			LOG(("ad value: %d\n",state->m_ad_value));
 
 		}
 		else
@@ -578,8 +583,8 @@ static WRITE8_HANDLER(avigo_ad_control_status_w)
 			/* assumption 0x044->0x0350 is screen area and
             0x0350->0x036a is panel at bottom */
 
-			logerror("a/d select y coordinate\n");
-			logerror("y coord: %d\n", input_port_read(space->machine(), "POSY"));
+			LOG(("a/d select y coordinate\n"));
+			LOG(("y coord: %d\n", input_port_read(space->machine(), "POSY")));
 
 			if (input_port_read(space->machine(), "LINE3") & 0x01)
 			{
@@ -590,7 +595,7 @@ static WRITE8_HANDLER(avigo_ad_control_status_w)
 				state->m_ad_value = 0;
 			}
 
-			logerror("ad value: %d\n",state->m_ad_value);
+			LOG(("ad value: %d\n",state->m_ad_value));
 		}
 	}
 
@@ -621,7 +626,7 @@ static  READ8_HANDLER(avigo_ad_data_r)
 			/* bit 0 must be 0, bit 1 must be 0 */
 			/* bit 3 must be 1. bit 2 can have any value */
 
-			logerror("a/d read upper 4 bits\n");
+			LOG(("a/d read upper 4 bits\n"));
 			data = ((state->m_ad_value>>6) & 0x0f)<<4;
 			data |= 8;
 		}
@@ -633,7 +638,7 @@ static  READ8_HANDLER(avigo_ad_data_r)
 			/* lower 6 bits of 10-bit A/D number in bits 7-2 of data */
 			/* bit 0 must be 1, bit 1 must be 0 */
 
-			logerror("a/d lower 6-bits\n");
+			LOG(("a/d lower 6-bits\n"));
 			data = ((state->m_ad_value & 0x03f)<<2);
 			data |= 1;
 		}
@@ -695,7 +700,7 @@ static  READ8_HANDLER(avigo_ad_data_r)
 
 	/* 1111x00 */
 
-	logerror("avigo ad read %02x\n",data);
+	LOG(("avigo ad read %02x\n",data));
 
 	return data;
 }
@@ -718,11 +723,6 @@ static WRITE8_HANDLER(avigo_speaker_w)
 	}
 }
 
-static  READ8_HANDLER(avigo_unmapped_r)
-{
-	logerror("read unmapped port\n");
-	return 0x0ff;
-}
 
 /* port 0x04:
 
@@ -739,11 +739,9 @@ static  READ8_HANDLER(avigo_04_r)
 
 
 static ADDRESS_MAP_START( avigo_io, AS_IO, 8)
+	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
-	AM_RANGE(0x000, 0x000) AM_READ( avigo_unmapped_r)
 	AM_RANGE(0x001, 0x001) AM_READWRITE( avigo_key_data_read_r, avigo_set_key_line_w )
-	AM_RANGE(0x002, 0x002) AM_READ( avigo_unmapped_r)
 	AM_RANGE(0x003, 0x003) AM_READWRITE( avigo_irq_r, avigo_irq_w )
 	AM_RANGE(0x004, 0x004) AM_READ( avigo_04_r)
 	AM_RANGE(0x005, 0x005) AM_READWRITE( avigo_rom_bank_l_r, avigo_rom_bank_l_w )
@@ -751,14 +749,10 @@ static ADDRESS_MAP_START( avigo_io, AS_IO, 8)
 	AM_RANGE(0x007, 0x007) AM_READWRITE( avigo_ram_bank_l_r, avigo_ram_bank_l_w )
 	AM_RANGE(0x008, 0x008) AM_READWRITE( avigo_ram_bank_h_r, avigo_ram_bank_h_w )
 	AM_RANGE(0x009, 0x009) AM_READWRITE( avigo_ad_control_status_r, avigo_ad_control_status_w )
-	AM_RANGE(0x00a, 0x00f) AM_READ( avigo_unmapped_r)
 	AM_RANGE(0x010, 0x01f) AM_DEVREADWRITE_MODERN("rtc", rp5c01_device, read, write)
-	AM_RANGE(0x020, 0x02c) AM_READ( avigo_unmapped_r)
 	AM_RANGE(0x028, 0x028) AM_WRITE( avigo_speaker_w)
 	AM_RANGE(0x02d, 0x02d) AM_READ( avigo_ad_data_r)
-	AM_RANGE(0x02e, 0x02f) AM_READ( avigo_unmapped_r)
 	AM_RANGE(0x030, 0x037) AM_DEVREADWRITE("ns16550", ins8250_r, ins8250_w )
-	AM_RANGE(0x038, 0x0ff) AM_READ( avigo_unmapped_r)
 ADDRESS_MAP_END
 
 
@@ -766,7 +760,7 @@ static INPUT_CHANGED( pen_irq )
 {
 	avigo_state *state = field.machine().driver_data<avigo_state>();
 
-	logerror("pen pressed interrupt\n");
+	LOG(("pen pressed interrupt\n"));
 	state->m_irq |= (1<<6);
 
 	avigo_refresh_ints(field.machine());
