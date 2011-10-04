@@ -67,6 +67,8 @@ public:
 	UINT8 m_lcd_char;
 	UINT8 m_led7;
 	UINT8 m_latch_data;
+	UINT8 convert_imputmask(UINT8 input);
+	int get_first_cleared_bit(UINT8 data);
 };
 
 static const int value[4] = {0x80,0x81,0x00,0x01};
@@ -79,10 +81,11 @@ static const hd44780_interface polgar_display =
 	NULL	// custom display layout
 };
 
-static UINT8 convert_imputmask(UINT8 input)
+UINT8 polgar_state::convert_imputmask(UINT8 input)
 {
 	input^=0xff;
-	switch (input) {
+	switch (input)
+	{
 		case 0x01:
 			return 0x80;
 		case 0x02:
@@ -101,10 +104,10 @@ static UINT8 convert_imputmask(UINT8 input)
 			return 0x01;
 		default:
 			return 0x00;
-		}
+	}
 }
 
-static int get_first_cleared_bit(UINT8 data)
+int polgar_state::get_first_cleared_bit(UINT8 data)
 {
 	int i;
 
