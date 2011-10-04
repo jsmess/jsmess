@@ -134,7 +134,7 @@ PORT_CONFSETTING ( 0x00, "'DL' BOOT prom for RL11 controller") \
 PORT_CONFSETTING ( 0x01, "'DM' BOOT prom for RK06/07 controller") \
 PORT_CONFSETTING ( 0x02, "'DX' BOOT prom for RX01 compatible controller") \
 PORT_CONFSETTING ( 0x03, "'DP/DB' BOOT prom for RP02/03,RP04/5/6 RM02/3 controller") \
-PORT_CONFSETTING ( 0x04, "'DK/DT' BOOT prom for RRK03/05,TU55/56 controllers") \
+PORT_CONFSETTING ( 0x04, "'DK/DT' BOOT prom for RK03/05,TU55/56 controllers") \
 PORT_CONFSETTING ( 0x05, "'MM' BOOT prom for TU16/E16 TM02/3 controllers") \
 PORT_CONFSETTING ( 0x06, "'MT' BOOT prom for TU10/TS03 controller") \
 PORT_CONFSETTING ( 0x07, "'DS' BOOT prom for RS03/RS04 controller") \
@@ -212,7 +212,7 @@ static INPUT_PORTS_START( pdp11 )
 	PORT_CONFNAME ( 0x2f, 0x0d, "Device 3 PROM" )
 	M9312_PORT_CONFSETTING	
 	PORT_START( "DEVPROM4" )
-	PORT_CONFNAME ( 0x2f, 0x08, "Device 4 PROM" )
+	PORT_CONFNAME ( 0x2f, 0x04, "Device 4 PROM" )
 	M9312_PORT_CONFSETTING	
 INPUT_PORTS_END
 
@@ -363,7 +363,7 @@ ROM_START( pdp11ub2 )
 	ROM_LOAD( "23-752a9.bin", 0x0200, 0x0200, CRC(6cf1f859) SHA1(7c876eda2f0d74d6f5d876256c28dbd56c405ca7)) // M9312 'DM' BOOT prom for RK06/07 controller 
 	ROM_LOAD( "23-753a9.bin", 0x0400, 0x0200, CRC(f4c4b40c) SHA1(a0bdb922c722d439f35ba8149a8f657ffcc8fb54)) // M9312 'DX' BOOT prom for RX01 compatible controller 
 	ROM_LOAD( "23-755a9.bin", 0x0600, 0x0200, CRC(ed06b35c) SHA1(d972c6a743d73ce9244d2bcfdd40eea2bb22e717)) // M9312 'DP/DB' BOOT prom for RP02/03,RP04/5/6 RM02/3 controller 
-	ROM_LOAD( "23-756a9.bin", 0x0800, 0x0200, CRC(12271ab2) SHA1(f0ff42a8fd839dd75d6c1a25cc82d0933fd09dbc)) // M9312 'DK/DT' BOOT prom for RRK03/05,TU55/56 controllers 
+	ROM_LOAD( "23-756a9.bin", 0x0800, 0x0200, CRC(12271ab2) SHA1(f0ff42a8fd839dd75d6c1a25cc82d0933fd09dbc)) // M9312 'DK/DT' BOOT prom for RK03/05,TU55/56 controllers 
 	ROM_LOAD( "23-757a9.bin", 0x0a00, 0x0200, CRC(af251aab) SHA1(4d760ec3f6ff5f4e2cafcb44b275183872b69cb6)) // M9312 'MM' BOOT prom for TU16/E16 TM02/3 controllers 
 	ROM_LOAD( "23-758a9.bin", 0x0c00, 0x0200, CRC(b71e8878) SHA1(f45c47c702c94a70c36732c12173ce60d0be1a11)) // M9312 'MT' BOOT prom for TU10/TS03 controller 
 	ROM_LOAD( "23-759a9.bin", 0x0e00, 0x0200, CRC(29a93448) SHA1(0b549170c6a3f49c1587adb6cc691786111c0dd3)) // M9312 'DS' BOOT prom for RS03/RS04 controller 
