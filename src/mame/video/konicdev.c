@@ -3684,14 +3684,14 @@ void k053245_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle *
 		{
 			int sx, sy, zw, zh;
 
-			sy = oy + ((zoomy * y + (1 << 11)) >> 12);
+			sy = oy + ((zoomy * y + (1 << 11)) >> 12) - 1;
 			zh = (oy + ((zoomy * (y + 1) + (1 << 11)) >> 12)) - sy;
 
 			for (x = 0; x < w; x++)
 			{
 				int c, fx, fy;
 
-				sx = ox + ((zoomx * x + (1 << 11)) >> 12);
+				sx = ox + ((zoomx * x + (1 << 11)) >> 12) - 1;
 				zw = (ox + ((zoomx * (x+1) + (1 << 11)) >> 12)) - sx;
 				c = code;
 				if (mirrorx)
@@ -7154,12 +7154,6 @@ void k056832_tilemap_draw( device_t *device, bitmap_t *bitmap, const rectangle *
 
 	corr -= k056832->layer_offs[layer][0];
 
-	if (scrollmode == 0 && (flags & K056832_DRAW_FLAG_FORCE_XYSCROLL))
-	{
-		scrollmode = 3;
-		flags &= ~K056832_DRAW_FLAG_FORCE_XYSCROLL;
-	}
-
 	switch( scrollmode )
 	{
 		case 0: // linescroll
@@ -7169,7 +7163,6 @@ void k056832_tilemap_draw( device_t *device, bitmap_t *bitmap, const rectangle *
 			sdat_adv = 2;
 		break;
 		case 2: // rowscroll
-
 			p_scroll_data = &k056832->videoram[scrollbank << 12] + (k056832->lsram_page[layer][1] >> 1);
 			line_height = 8;
 			sdat_wrapmask = 0x3ff;
@@ -7310,6 +7303,7 @@ void k056832_tilemap_draw( device_t *device, bitmap_t *bitmap, const rectangle *
 				continue;
 
 			tmap = k056832->tilemap[pageIndex];
+
 			tilemap_set_scrolly(tmap, 0, ay);
 
 			last_dx = 0x100000;
@@ -7455,12 +7449,6 @@ void k056832_tilemap_draw_dj( device_t *device, bitmap_t *bitmap, const rectangl
 		corr = 0;
 
 	corr -= k056832->layer_offs[layer][0];
-
-	if (scrollmode == 0 && (flags & K056832_DRAW_FLAG_FORCE_XYSCROLL))
-	{
-		scrollmode = 3;
-		flags &= ~K056832_DRAW_FLAG_FORCE_XYSCROLL;
-	}
 
 	switch( scrollmode )
 	{
