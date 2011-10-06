@@ -876,7 +876,11 @@ pyuuta	// 1982 Tomy Pyuuta
 geneve	// 1987? Myarc Geneve 9640
 ti99_4p   // 1996 SNUG 99/4P (a.k.a. SGCPU)
 
-avigo	 //
+avigo		 // 1997 Avigo
+avigo_de	 // 1997 Avigo (German)
+avigo_fr	 // 1997 Avigo (French)
+avigo_es	 // 1997 Avigo (Spanish)
+avigo_it	 // 1997 Avigo (Italian)
 
 // Texas Instruments Calculators
 ti73	  // 1990 TI-73
