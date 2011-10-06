@@ -568,16 +568,16 @@ static DEVICE_START( mapper8 )
 	static const char *const list[6] = { SRAMNAME, ROM0NAME, ROM1NAME, ROM1ANAME, DRAMNAME, INTSNAME };
 	while (!done)
 	{
-		device_t *dev = NULL;
+		void *dev = NULL;
 		if (cons[i].name==NULL)
 			done = TRUE;
 		else
 		{
-			for (long j=1; (j < 7) && (dev == NULL); j++)
+			for (long long j=1; (j < 7) && (dev == NULL); j++)
 			{
 				// Pseudo devices are enumerated as 1 ... 6 (see MAP8_SRAM etc.)
 				if (strcmp(cons[i].name, list[j-1])==0)
-					dev = device->machine().device(cons[i].name);
+					dev = (void *)j;
 			}
 			if (dev==NULL)
 				// Real devices use their address to be accessed
@@ -587,11 +587,11 @@ static DEVICE_START( mapper8 )
 			{
 				if (cons[i].mode != 3)
 				{
-					mapper_mount_logical_device(device, dev, cons[i].mode, cons[i].stop, (UINT16)cons[i].address_mask, (UINT16)cons[i].select_pattern, (UINT16)cons[i].write_select, cons[i].read, cons[i].write);
+					mapper_mount_logical_device(device, (device_t*)dev, cons[i].mode, cons[i].stop, (UINT16)cons[i].address_mask, (UINT16)cons[i].select_pattern, (UINT16)cons[i].write_select, cons[i].read, cons[i].write);
 				}
 				else
 				{
-					mapper_mount_physical_device(device, dev, cons[i].stop, cons[i].address_mask, cons[i].select_pattern, cons[i].read, cons[i].write);
+					mapper_mount_physical_device(device, (device_t*)dev, cons[i].stop, cons[i].address_mask, cons[i].select_pattern, cons[i].read, cons[i].write);
 				}
 			}
 			else
