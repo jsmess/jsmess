@@ -52,8 +52,6 @@ public:
 	required_device<device_t> m_ds1;
 	DECLARE_WRITE_LINE_MEMBER(sod_led);
 	DECLARE_READ_LINE_MEMBER(sid_line);
-	UINT8 *m_p_chargen;
-	UINT8 *m_p_videoram;
 	virtual void machine_reset();
 };
 

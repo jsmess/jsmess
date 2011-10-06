@@ -494,7 +494,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( milano, polgar )
 	/* basic machine hardware */
-	// MCFG_IMPORT_FROM( polgar )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(milano_mem)
 
