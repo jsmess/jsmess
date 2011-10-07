@@ -727,22 +727,22 @@ void intv_stic_screenrefresh(running_machine &machine)
 /* very rudimentary support for the tms9927 character generator IC */
 
 
- READ8_HANDLER( intvkbd_tms9927_r )
+ READ8_MEMBER( intv_state::intvkbd_tms9927_r )
 {
-	intv_state *state = space->machine().driver_data<intv_state>();
+	//intv_state *state = space->machine().driver_data<intv_state>();
 	UINT8 rv;
 	switch (offset)
 	{
 		case 8:
-			rv = state->m_tms9927_cursor_row;
+			rv = m_tms9927_cursor_row;
 			break;
 		case 9:
 			/* note: this is 1-based */
-			rv = state->m_tms9927_cursor_col;
+			rv = m_tms9927_cursor_col;
 			break;
 		case 11:
-			state->m_tms9927_last_row = (state->m_tms9927_last_row + 1) % state->m_tms9927_num_rows;
-			rv = state->m_tms9927_last_row;
+			m_tms9927_last_row = (m_tms9927_last_row + 1) % m_tms9927_num_rows;
+			rv = m_tms9927_last_row;
 			break;
 		default:
 			rv = 0;
@@ -750,26 +750,26 @@ void intv_stic_screenrefresh(running_machine &machine)
 	return rv;
 }
 
-WRITE8_HANDLER( intvkbd_tms9927_w )
+WRITE8_MEMBER( intv_state::intvkbd_tms9927_w )
 {
-	intv_state *state = space->machine().driver_data<intv_state>();
+	//intv_state *state = space->machine().driver_data<intv_state>();
 	switch (offset)
 	{
 		case 3:
-			state->m_tms9927_num_rows = (data & 0x3f) + 1;
+			m_tms9927_num_rows = (data & 0x3f) + 1;
 			break;
 		case 6:
-			state->m_tms9927_last_row = data;
+			m_tms9927_last_row = data;
 			break;
 		case 11:
-			state->m_tms9927_last_row = (state->m_tms9927_last_row + 1) % state->m_tms9927_num_rows;
+			m_tms9927_last_row = (m_tms9927_last_row + 1) % m_tms9927_num_rows;
 			break;
 		case 12:
 			/* note: this is 1-based */
-			state->m_tms9927_cursor_col = data;
+			m_tms9927_cursor_col = data;
 			break;
 		case 13:
-			state->m_tms9927_cursor_row = data;
+			m_tms9927_cursor_row = data;
 			break;
 	}
 }

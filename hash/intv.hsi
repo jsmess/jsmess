@@ -275,7 +275,7 @@
 	</hash>
 	<hash crc32="3825c25b" name="Land Battle (Mattel)">
 		<year>1982</year>
-		<extrainfo>0 84 0 0 0 212 0</extrainfo>
+		<extrainfo>0 84 0 0 0 209 0</extrainfo>
 	</hash>
 	<hash crc32="604611c0" name="Las Vegas Blackjack and Poker (Mattel)">
 		<year>1979</year>
@@ -614,7 +614,7 @@
 	</hash>
 	<hash crc32="095638c0" name="Triple Challenge (Intv Corp)">
 		<year>1986</year>
-		<extrainfo>0 84 148 193 210 0 0</extrainfo>
+		<extrainfo>0 84 148 0 0 209 0</extrainfo>
 	</hash>
 	<hash crc32="ca447bbd" name="TRON - Deadly Discs (Mattel)">
 		<year>1981</year>
@@ -646,7 +646,7 @@
 	</hash>
 	<hash crc32="752fd927" name="USCF Chess (Mattel)">
 		<year>1981</year>
-		<extrainfo>0 84 0 0 0 212 0</extrainfo>
+		<extrainfo>0 84 0 0 0 209 0</extrainfo>
 	</hash>
 	<hash crc32="f9e0789e" name="Utopia (Mattel)">
 		<year>1981</year>
