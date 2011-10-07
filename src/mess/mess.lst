@@ -1288,6 +1288,7 @@ rs128	 // 1984 Memotech RS 128
 // Mattel
 intvkbd   // 1981 - Mattel Intellivision Keyboard Component
 // (Test marketed, later recalled)
+intvecs   // 1983 - Mattel Intellivision ECS
 aquarius  // 1983 Aquarius
 aquarius_qd  // 1983 Aquarius w/ Quick Disk
 //  aquariu2  // 1984 Aquarius II

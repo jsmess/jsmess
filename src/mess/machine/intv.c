@@ -10,42 +10,38 @@
 
 
 
-WRITE16_HANDLER ( intvkbd_dualport16_w )
+WRITE16_MEMBER( intv_state::intvkbd_dualport16_w )
 {
-	intv_state *state = space->machine().driver_data<intv_state>();
 	unsigned char *RAM;
 
-	COMBINE_DATA(&state->m_intvkbd_dualport_ram[offset]);
+	COMBINE_DATA(&m_intvkbd_dualport_ram[offset]);
 
 	/* copy the LSB over to the 6502 OP RAM, in case they are opcodes */
-	RAM	 = space->machine().region("keyboard")->base();
+	RAM	 = machine().region("keyboard")->base();
 	RAM[offset] = (UINT8) (data >> 0);
 }
 
-READ8_HANDLER ( intvkbd_dualport8_lsb_r )
+READ8_MEMBER( intv_state::intvkbd_dualport8_lsb_r )
 {
-	intv_state *state = space->machine().driver_data<intv_state>();
-	return (UINT8) (state->m_intvkbd_dualport_ram[offset] >> 0);
+	return (UINT8) (m_intvkbd_dualport_ram[offset] >> 0);
 }
 
-WRITE8_HANDLER ( intvkbd_dualport8_lsb_w )
+WRITE8_MEMBER( intv_state::intvkbd_dualport8_lsb_w )
 {
-	intv_state *state = space->machine().driver_data<intv_state>();
 	unsigned char *RAM;
 
-	state->m_intvkbd_dualport_ram[offset] &= ~0x00FF;
-	state->m_intvkbd_dualport_ram[offset] |= ((UINT16) data) << 0;
+	m_intvkbd_dualport_ram[offset] &= ~0x00FF;
+	m_intvkbd_dualport_ram[offset] |= ((UINT16) data) << 0;
 
 	/* copy over to the 6502 OP RAM, in case they are opcodes */
-	RAM	 = space->machine().region("keyboard")->base();
+	RAM	 = machine().region("keyboard")->base();
 	RAM[offset] = data;
 }
 
 
 
-READ8_HANDLER ( intvkbd_dualport8_msb_r )
+READ8_MEMBER( intv_state::intvkbd_dualport8_msb_r )
 {
-	intv_state *state = space->machine().driver_data<intv_state>();
 	unsigned char rv;
 
 	if (offset < 0x100)
@@ -53,38 +49,38 @@ READ8_HANDLER ( intvkbd_dualport8_msb_r )
 		switch (offset)
 		{
 			case 0x000:
-				rv = input_port_read(space->machine(), "TEST") & 0x80;
+				rv = input_port_read(machine(), "TEST") & 0x80;
 				logerror("TAPE: Read %02x from 0x40%02x - XOR Data?\n",rv,offset);
 				break;
 			case 0x001:
-				rv = (input_port_read(space->machine(), "TEST") & 0x40) << 1;
+				rv = (input_port_read(machine(), "TEST") & 0x40) << 1;
 				logerror("TAPE: Read %02x from 0x40%02x - Sense 1?\n",rv,offset);
 				break;
 			case 0x002:
-				rv = (input_port_read(space->machine(), "TEST") & 0x20) << 2;
+				rv = (input_port_read(machine(), "TEST") & 0x20) << 2;
 				logerror("TAPE: Read %02x from 0x40%02x - Sense 2?\n",rv,offset);
 				break;
 			case 0x003:
-				rv = (input_port_read(space->machine(), "TEST") & 0x10) << 3;
+				rv = (input_port_read(machine(), "TEST") & 0x10) << 3;
 				logerror("TAPE: Read %02x from 0x40%02x - Tape Present\n",rv,offset);
 				break;
 			case 0x004:
-				rv = (input_port_read(space->machine(), "TEST") & 0x08) << 4;
+				rv = (input_port_read(machine(), "TEST") & 0x08) << 4;
 				logerror("TAPE: Read %02x from 0x40%02x - Comp (339/1)\n",rv,offset);
 				break;
 			case 0x005:
-				rv = (input_port_read(space->machine(), "TEST") & 0x04) << 5;
+				rv = (input_port_read(machine(), "TEST") & 0x04) << 5;
 				logerror("TAPE: Read %02x from 0x40%02x - Clocked Comp (339/13)\n",rv,offset);
 				break;
 			case 0x006:
-				if (state->m_sr1_int_pending)
+				if (m_sr1_int_pending)
 					rv = 0x00;
 				else
 					rv = 0x80;
 				logerror("TAPE: Read %02x from 0x40%02x - SR1 Int Pending\n",rv,offset);
 				break;
 			case 0x007:
-				if (state->m_tape_int_pending)
+				if (m_tape_int_pending)
 					rv = 0x00;
 				else
 					rv = 0x80;
@@ -92,36 +88,36 @@ READ8_HANDLER ( intvkbd_dualport8_msb_r )
 				break;
 			case 0x060:	/* Keyboard Read */
 				rv = 0xff;
-				if (state->m_intvkbd_keyboard_col == 0)
-					rv = input_port_read(space->machine(), "ROW0");
-				if (state->m_intvkbd_keyboard_col == 1)
-					rv = input_port_read(space->machine(), "ROW1");
-				if (state->m_intvkbd_keyboard_col == 2)
-					rv = input_port_read(space->machine(), "ROW2");
-				if (state->m_intvkbd_keyboard_col == 3)
-					rv = input_port_read(space->machine(), "ROW3");
-				if (state->m_intvkbd_keyboard_col == 4)
-					rv = input_port_read(space->machine(), "ROW4");
-				if (state->m_intvkbd_keyboard_col == 5)
-					rv = input_port_read(space->machine(), "ROW5");
-				if (state->m_intvkbd_keyboard_col == 6)
-					rv = input_port_read(space->machine(), "ROW6");
-				if (state->m_intvkbd_keyboard_col == 7)
-					rv = input_port_read(space->machine(), "ROW7");
-				if (state->m_intvkbd_keyboard_col == 8)
-					rv = input_port_read(space->machine(), "ROW8");
-				if (state->m_intvkbd_keyboard_col == 9)
-					rv = input_port_read(space->machine(), "ROW9");
+				if (m_intvkbd_keyboard_col == 0)
+					rv = input_port_read(machine(), "ROW0");
+				if (m_intvkbd_keyboard_col == 1)
+					rv = input_port_read(machine(), "ROW1");
+				if (m_intvkbd_keyboard_col == 2)
+					rv = input_port_read(machine(), "ROW2");
+				if (m_intvkbd_keyboard_col == 3)
+					rv = input_port_read(machine(), "ROW3");
+				if (m_intvkbd_keyboard_col == 4)
+					rv = input_port_read(machine(), "ROW4");
+				if (m_intvkbd_keyboard_col == 5)
+					rv = input_port_read(machine(), "ROW5");
+				if (m_intvkbd_keyboard_col == 6)
+					rv = input_port_read(machine(), "ROW6");
+				if (m_intvkbd_keyboard_col == 7)
+					rv = input_port_read(machine(), "ROW7");
+				if (m_intvkbd_keyboard_col == 8)
+					rv = input_port_read(machine(), "ROW8");
+				if (m_intvkbd_keyboard_col == 9)
+					rv = input_port_read(machine(), "ROW9");
 				break;
 			case 0x80:
 				rv = 0x00;
 				logerror("TAPE: Read %02x from 0x40%02x, clear tape int pending\n",rv,offset);
-				state->m_tape_int_pending = 0;
+				m_tape_int_pending = 0;
 				break;
 			case 0xa0:
 				rv = 0x00;
 				logerror("TAPE: Read %02x from 0x40%02x, clear SR1 int pending\n",rv,offset);
-				state->m_sr1_int_pending = 0;
+				m_sr1_int_pending = 0;
 				break;
 			case 0xc0:
 			case 0xc1:
@@ -143,14 +139,14 @@ READ8_HANDLER ( intvkbd_dualport8_msb_r )
 				rv = intvkbd_tms9927_r(space, offset-0xc0);
 				break;
 			default:
-				rv = (state->m_intvkbd_dualport_ram[offset]&0x0300)>>8;
+				rv = (m_intvkbd_dualport_ram[offset]&0x0300)>>8;
 				logerror("Unknown read %02x from 0x40%02x\n",rv,offset);
 				break;
 		}
 		return rv;
 	}
 	else
-		return (state->m_intvkbd_dualport_ram[offset]&0x0300)>>8;
+		return (m_intvkbd_dualport_ram[offset]&0x0300)>>8;
 }
 
 static const char *const tape_motor_mode_desc[8] =
@@ -159,9 +155,8 @@ static const char *const tape_motor_mode_desc[8] =
 	"EJECT", "PLAY/RECORD", "REWIND", "FF"
 };
 
-WRITE8_HANDLER ( intvkbd_dualport8_msb_w )
+WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 {
-	intv_state *state = space->machine().driver_data<intv_state>();
 	unsigned int mask;
 
 	if (offset < 0x100)
@@ -169,39 +164,39 @@ WRITE8_HANDLER ( intvkbd_dualport8_msb_w )
 		switch (offset)
 		{
 			case 0x020:
-				state->m_tape_motor_mode &= 3;
+				m_tape_motor_mode &= 3;
 				if (data & 1)
-					state->m_tape_motor_mode |= 4;
-				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[state->m_tape_motor_mode]);
+					m_tape_motor_mode |= 4;
+				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
 				break;
 			case 0x021:
-				state->m_tape_motor_mode &= 5;
+				m_tape_motor_mode &= 5;
 				if (data & 1)
-					state->m_tape_motor_mode |= 2;
-				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[state->m_tape_motor_mode]);
+					m_tape_motor_mode |= 2;
+				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
 				break;
 			case 0x022:
-				state->m_tape_motor_mode &= 6;
+				m_tape_motor_mode &= 6;
 				if (data & 1)
-					state->m_tape_motor_mode |= 1;
-				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[state->m_tape_motor_mode]);
+					m_tape_motor_mode |= 1;
+				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
 				break;
 			case 0x023:
 			case 0x024:
 			case 0x025:
 			case 0x026:
 			case 0x027:
-				state->m_tape_unknown_write[offset - 0x23] = (data & 1);
+				m_tape_unknown_write[offset - 0x23] = (data & 1);
 				break;
 			case 0x040:
-				state->m_tape_unknown_write[5] = (data & 1);
+				m_tape_unknown_write[5] = (data & 1);
 				break;
 			case 0x041:
 				if (data & 1)
 					logerror("TAPE: Tape Interrupts Enabled\n");
 				else
 					logerror("TAPE: Tape Interrupts Disabled\n");
-				state->m_tape_interrupts_enabled = (data & 1);
+				m_tape_interrupts_enabled = (data & 1);
 				break;
 			case 0x042:
 				if (data & 1)
@@ -211,33 +206,33 @@ WRITE8_HANDLER ( intvkbd_dualport8_msb_w )
 				break;
 			case 0x043:
 				if (data & 0x01)
-					state->m_intvkbd_text_blanked = 0;
+					m_intvkbd_text_blanked = 0;
 				else
-					state->m_intvkbd_text_blanked = 1;
+					m_intvkbd_text_blanked = 1;
 				break;
 			case 0x044:
-				state->m_intvkbd_keyboard_col &= 0x0e;
-				state->m_intvkbd_keyboard_col |= (data&0x01);
+				m_intvkbd_keyboard_col &= 0x0e;
+				m_intvkbd_keyboard_col |= (data&0x01);
 				break;
 			case 0x045:
-				state->m_intvkbd_keyboard_col &= 0x0d;
-				state->m_intvkbd_keyboard_col |= ((data&0x01)<<1);
+				m_intvkbd_keyboard_col &= 0x0d;
+				m_intvkbd_keyboard_col |= ((data&0x01)<<1);
 				break;
 			case 0x046:
-				state->m_intvkbd_keyboard_col &= 0x0b;
-				state->m_intvkbd_keyboard_col |= ((data&0x01)<<2);
+				m_intvkbd_keyboard_col &= 0x0b;
+				m_intvkbd_keyboard_col |= ((data&0x01)<<2);
 				break;
 			case 0x047:
-				state->m_intvkbd_keyboard_col &= 0x07;
-				state->m_intvkbd_keyboard_col |= ((data&0x01)<<3);
+				m_intvkbd_keyboard_col &= 0x07;
+				m_intvkbd_keyboard_col |= ((data&0x01)<<3);
 				break;
 			case 0x80:
 				logerror("TAPE: Write to 0x40%02x, clear tape int pending\n",offset);
-				state->m_tape_int_pending = 0;
+				m_tape_int_pending = 0;
 				break;
 			case 0xa0:
 				logerror("TAPE: Write to 0x40%02x, clear SR1 int pending\n",offset);
-				state->m_sr1_int_pending = 0;
+				m_sr1_int_pending = 0;
 				break;
 			case 0xc0:
 			case 0xc1:
@@ -259,70 +254,144 @@ WRITE8_HANDLER ( intvkbd_dualport8_msb_w )
 				intvkbd_tms9927_w(space, offset-0xc0, data);
 				break;
 			default:
-				logerror("%04X: Unknown write %02x to 0x40%02x\n",cpu_get_pc(&space->device()),data,offset);
+				logerror("%04X: Unknown write %02x to 0x40%02x\n",cpu_get_pc(&space.device()),data,offset);
 				break;
 		}
 	}
 	else
 	{
-		mask = state->m_intvkbd_dualport_ram[offset] & 0x00ff;
-		state->m_intvkbd_dualport_ram[offset] = mask | ((data<<8)&0x0300);
+		mask = m_intvkbd_dualport_ram[offset] & 0x00ff;
+		m_intvkbd_dualport_ram[offset] = mask | ((data<<8)&0x0300);
 	}
 }
 
-READ16_HANDLER( intv_gram_r )
+READ16_MEMBER( intv_state::intv_gram_r )
 {
-	intv_state *state = space->machine().driver_data<intv_state>();
 	//logerror("read: %d = GRAM(%d)\n",state->m_gram[offset],offset);
-	if (state->m_bus_copy_mode || !state->m_stic_handshake)
+	if (m_bus_copy_mode || !m_stic_handshake)
 	{
-	return (int)state->m_gram[offset];
+	return (int)m_gram[offset];
 	}
 	else {return offset;}
 
 }
 
-WRITE16_HANDLER( intv_gram_w )
+WRITE16_MEMBER( intv_state::intv_gram_w )
 {
-	intv_state *state = space->machine().driver_data<intv_state>();
-    data &= 0xFF;
-	if(state->m_bus_copy_mode || !state->m_stic_handshake)
+	data &= 0xFF;
+	if(m_bus_copy_mode || !m_stic_handshake)
 	{
-	state->m_gram[offset] = data;
-	state->m_gramdirtybytes[offset] = 1;
-    state->m_gramdirty = 1;
+		m_gram[offset] = data;
+		m_gramdirtybytes[offset] = 1;
+   	m_gramdirty = 1;
    }
 }
 
 
-READ16_HANDLER( intv_ram8_r )
+READ16_MEMBER( intv_state::intv_ram8_r )
 {
-	intv_state *state = space->machine().driver_data<intv_state>();
 	//logerror("%x = ram8_r(%x)\n",state->m_ram8[offset],offset);
-	return (int)state->m_ram8[offset];
+	return (int)m_ram8[offset];
 }
 
-WRITE16_HANDLER( intv_ram8_w )
+WRITE16_MEMBER( intv_state::intv_ram8_w )
 {
-	intv_state *state = space->machine().driver_data<intv_state>();
 	//logerror("ram8_w(%x) = %x\n",offset,data);
-	state->m_ram8[offset] = data&0xff;
+	m_ram8[offset] = data&0xff;
 }
 
-
-READ16_HANDLER( intv_ram16_r )
+READ16_MEMBER( intv_state::intv_ecs_ram8_r )
 {
-	intv_state *state = space->machine().driver_data<intv_state>();
+	return (int)m_ecs_ram8[offset];
+}
+
+WRITE16_MEMBER( intv_state::intv_ecs_ram8_w )
+{
+	m_ecs_ram8[offset] = data&0xff;
+}
+
+READ16_MEMBER( intv_state::intv_cart_ram8_r )
+{
+	return (int)m_cart_ram8[offset];
+}
+WRITE16_MEMBER( intv_state::intv_cart_ram8_w )
+{
+	m_cart_ram8[offset] = data&0xff;
+}
+
+READ16_MEMBER( intv_state::intv_ram16_r )
+{
 	//logerror("%x = ram16_r(%x)\n",state->m_ram16[offset],offset);
-	return (int)state->m_ram16[offset];
+	return (int)m_ram16[offset];
 }
 
-WRITE16_HANDLER( intv_ram16_w )
+WRITE16_MEMBER( intv_state::intv_ram16_w )
 {
-	intv_state *state = space->machine().driver_data<intv_state>();
 	//logerror("%g: WRITING TO GRAM offset = %d\n",machine.time(),offset);
 	//logerror("ram16_w(%x) = %x\n",offset,data);
-	state->m_ram16[offset] = data&0xffff;
+	m_ram16[offset] = data&0xffff;
+}
+
+// ECS and Wsmlb bank switching register handlers
+WRITE16_MEMBER( intv_state::ecs_bank1_page_select )
+{
+	if (offset == 0xFFF)
+	{
+		if (data == 0x2A50)
+		{
+			memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base() + (0x2000 << 1));
+		}
+		else if (data == 0x2A51)
+		{
+			memory_set_bankptr(machine(), "bank1", machine().region("ecs_rom")->base() + (0x2000 << 1));
+		}
+	}
+}
+
+WRITE16_MEMBER( intv_state::ecs_bank2_page_select )
+{
+	if (offset == 0xFFF)
+	{
+		if (data == 0x7A50)
+		{
+			memory_set_bankptr(machine(), "bank2", machine().region("ecs_rom")->base() + (0x7000 << 1)); // ECS ROM at 0x7000 is on page 1
+		}
+		else if (data == 0x7A51 )
+		{
+			memory_set_bankptr(machine(), "bank2", machine().region("maincpu")->base() + (0x7000 << 1));
+		}
+	}
+}
+
+WRITE16_MEMBER( intv_state::ecs_bank3_page_select )
+{
+	if (offset == 0xFFF)
+	{
+		if (data == 0xEA50)
+		{
+			memory_set_bankptr(machine(), "bank3", machine().region("maincpu")->base() + (0xE000 << 1));
+		}
+		else if (data == 0xEA51)
+		{
+			memory_set_bankptr(machine(), "bank3", machine().region("ecs_rom")->base() + (0xE000 << 1));
+		}
+	}
+}
+
+WRITE16_MEMBER( intv_state::wsmlb_bank_page_select )
+{
+		logerror("offset %x data %x\n",offset,data);
+	if (offset == 0xFFF)
+	{
+		if (data == 0xFA50)
+		{
+			memory_set_bankptr(machine(), "bank4", machine().region("maincpu")->base() + (0xF000 << 1));
+		}
+		else if (data == 0xFA51)
+		{
+			memory_set_bankptr(machine(), "bank4", machine().region("ecs_rom")->base() + (0xF000 << 1));
+		}
+	}
 }
 
 static int intv_load_rom_file(device_image_interface &image)
@@ -341,6 +410,8 @@ static int intv_load_rom_file(device_image_interface &image)
 	UINT8 low_byte;
 
 	UINT8 *memory = image.device().machine().region("maincpu")->base();
+	intv_state *state = image.device().machine().driver_data<intv_state>();
+	address_space *program = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	const char *filetype = image.filetype();
 
 	/* if it is in .rom format, we enter here */
@@ -431,19 +502,23 @@ static int intv_load_rom_file(device_image_interface &image)
 
 			if (ram)
 			{
-				logerror("RAM banks not yet implemented! \n");
+				start = (( ram & 0xf0 ) >> 4) * 0x1000;
+				size = ( ram & 0x0f ) * 0x800;
+				
+				program->install_readwrite_handler(start, start + size, 
+					read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), state), 
+					write16_delegate( FUNC( intv_state::intv_cart_ram8_w ), state));
 			}
 			/* For now intellivoice always active
             if (extra & INTELLIVOICE_MASK)
             {
                 // tbd
             }
-            */
+         */
 
 			if (extra & ECS_MASK)
 			{
-				logerror("ECS support is only partial\n");
-				logerror("(even with the intvkbd driver)! \n");
+				logerror("Requires ECS Module\n");
 			}
 
 			for (j = 0; j < 4; j++)
@@ -473,6 +548,7 @@ static int intv_load_rom_file(device_image_interface &image)
 
 DEVICE_IMAGE_LOAD( intv_cart )
 {
+	
 	if (image.software_entry() == NULL)
 		return intv_load_rom_file(image);
 	else
@@ -480,6 +556,9 @@ DEVICE_IMAGE_LOAD( intv_cart )
 		UINT16 offset[] = {0x4800, 0x5000, 0x6000, 0x7000, 0x9000, 0xa000, 0xc000, 0xd000, 0xf000};
 		const char* region_name[] = {"4800", "5000", "6000", "7000", "9000", "A000", "C000", "D000", "F000"};
 		UINT8 *memory = image.device().machine().region("maincpu")->base();
+		intv_state *state = image.device().machine().driver_data<intv_state>();
+		address_space *program = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+
 		UINT32 size=0;
 		UINT16 address;
 		UINT8 *region;
@@ -497,6 +576,36 @@ DEVICE_IMAGE_LOAD( intv_cart )
 				}
 			}
 		}
+		// deal with wsmlb paged rom
+		
+		UINT8 *ecs_rom_region = image.device().machine().region("ecs_rom")->base();
+		size = image.get_software_region_length("F000_bank1");
+		if (size && ecs_rom_region) // only load if ecs is plugged in (should probably be done a different way)
+		{
+			region = image.get_software_region("F000_bank1");
+			for (int j = 0; j < (size>>1); j++)
+			{
+				ecs_rom_region[((address + j) << 1) + 1] = region[2*j];
+				ecs_rom_region[(address + j) << 1] = region[2*j+1];
+			}
+		}
+		
+		// Cartridge 8bit ram support
+		size = image.get_software_region_length("D000_RAM8");
+		if (size)
+		{
+			program->install_readwrite_handler(0xD000, 0xD000 + size, 
+				read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), state), 
+				write16_delegate( FUNC( intv_state::intv_cart_ram8_w ), state));
+		}
+		
+		size = image.get_software_region_length("8800_RAM8");
+		if (size)
+		{
+			program->install_readwrite_handler(0x8800, 0x8800 + size, 
+				read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), state), 
+				write16_delegate( FUNC( intv_state::intv_cart_ram8_w ), state));
+		}
 		return IMAGE_INIT_PASS;
 	}
 }
@@ -510,6 +619,25 @@ DRIVER_INIT( intv )
 /* Set Reset and INTR/INTRM Vector */
 MACHINE_RESET( intv )
 {
+	device_set_input_line_vector(machine.device("maincpu"), CP1610_RESET, 0x1000);
+
+	/* These are actually the same vector, and INTR is unused */
+	device_set_input_line_vector(machine.device("maincpu"), CP1610_INT_INTRM, 0x1004);
+	device_set_input_line_vector(machine.device("maincpu"), CP1610_INT_INTR,  0x1004);
+
+	/* Set initial PC */
+	cpu_set_reg(machine.device("maincpu"), CP1610_R7, 0x1000);
+	
+	return;
+}
+
+MACHINE_RESET( intvecs )
+{
+	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + (0x2000 << 1));
+	memory_set_bankptr(machine, "bank2", machine.region("ecs_rom")->base() + (0x7000 << 1));
+	memory_set_bankptr(machine, "bank3", machine.region("maincpu")->base() + (0xE000 << 1));
+	memory_set_bankptr(machine, "bank4", machine.region("maincpu")->base() + (0xF000 << 1));	
+	
 	device_set_input_line_vector(machine.device("maincpu"), CP1610_RESET, 0x1000);
 
 	/* These are actually the same vector, and INTR is unused */
@@ -569,25 +697,25 @@ INTERRUPT_GEN( intv_interrupt )
 	intv_stic_screenrefresh(device->machine());
 }
 
-/* hand 0 == left, 1 == right */
+/* hand 0 == left, 1 == right, 2 == ECS hand controller 1, 3 == ECS hand controller 2 */
 UINT8 intv_control_r(address_space *space, int hand)
 {
-	static const char* const keypad_name[] = { "KEYPAD1", "KEYPAD2" };
+	static const char* const keypad_name[] = { "KEYPAD1", "KEYPAD2", "KEYPAD3", "KEYPAD4" };
 	static const UINT8 keypad_table[] =
 	{
 		0xFF, 0x3F, 0x9F, 0x5F, 0xD7, 0xB7, 0x77, 0xDB,
 		0xBB, 0x7B, 0xDD, 0xBD, 0x7D, 0xDE, 0xBE, 0x7E
 	};
 
-	static const char* const disc_name[] = { "DISC1", "DISC2" };
+	static const char* const disc_name[] = { "DISC1", "DISC2", "DISC3", "DISC4" };
 	static const UINT8 disc_table[] =
 	{
 		0xF3, 0xE3, 0xE7, 0xF7, 0xF6, 0xE6, 0xEE, 0xFE,
 		0xFC, 0xEC, 0xED, 0xFD, 0xF9, 0xE9, 0xEB, 0xFB
 	};
 
-	static const char* const discx_name[] = { "DISCX1", "DISCX2" };
-	static const char* const discy_name[] = { "DISCY1", "DISCY2" };
+	static const char* const discx_name[] = { "DISCX1", "DISCX2", "DISCX3", "DISCX4" };
+	static const char* const discy_name[] = { "DISCY1", "DISCY2", "DISKY3", "DISCY4" };
 	static const UINT8 discyx_table[5][5] =
 	{
 		{ 0xE3, 0xF3, 0xFB, 0xEB, 0xE9 },
@@ -635,14 +763,64 @@ UINT8 intv_control_r(address_space *space, int hand)
 	return rv;
 }
 
-READ8_HANDLER( intv_left_control_r )
+READ8_MEMBER( intv_state::intv_left_control_r )
 {
-	return intv_control_r(space, 0);
+	return intv_control_r(&space, 0);
 }
 
-READ8_HANDLER( intv_right_control_r )
+READ8_MEMBER( intv_state::intv_right_control_r )
 {
-	return intv_control_r(space, 1);
+	return intv_control_r(&space, 1);
+}
+
+READ8_MEMBER( intv_state::intv_ecs_porta_r )
+{
+	if (input_port_read(machine(), "ECS_CNTRLSEL") == 0)
+		return intv_control_r(&space, 2);
+	else
+		return 0xff; // not sure what to return here, maybe it should be last output?
+}
+
+READ8_MEMBER( intv_state::intv_ecs_portb_r )
+{
+	switch (input_port_read(machine(), "ECS_CNTRLSEL"))
+	{
+		case 0x00: // hand controller
+		{
+			return intv_control_r(&space, 3);
+		}
+		case 0x01: // synthesizer keyboard
+		{
+			static const char* const ecs_synth_rows[] = { "ECS_SYNTH_ROW0", "ECS_SYNTH_ROW1", "ECS_SYNTH_ROW2", "ECS_SYNTH_ROW3", "ECS_SYNTH_ROW4", "ECS_SYNTH_ROW5", "ECS_SYNTH_ROW6" };
+			UINT8 rv = 0xFF;
+			// return correct result if more than one bit of 0xFE is set
+			for (int i=0; i<7; i++)
+			{
+			if (m_ecs_psg_porta & (1<<i))
+				rv &= input_port_read(machine(), ecs_synth_rows[i]);
+			}
+			return rv;
+		}
+		case 0x02: // ecs keyboard
+		{
+			static const char* const ecs_keyboard_rows[] = { "ECS_ROW0", "ECS_ROW1", "ECS_ROW2", "ECS_ROW3", "ECS_ROW4", "ECS_ROW5", "ECS_ROW6" };
+			UINT8 rv = 0xFF;
+			// return correct result if more than one bit of 0xFE is set
+			for (int i=0; i<7; i++)
+			{
+			if (m_ecs_psg_porta & (1<<i))
+				rv &= input_port_read(machine(), ecs_keyboard_rows[i]);
+			}
+			return rv;
+		}
+		default:
+			return 0xff;
+	}
+}
+	
+WRITE8_MEMBER( intv_state::intv_ecs_porta_w )
+{
+	m_ecs_psg_porta = (~data) & 0xFF;
 }
 
 /* Intellivision console + keyboard component */

@@ -31,8 +31,35 @@ class intv_state : public driver_device
 {
 public:
 	intv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_intellivoice(*this, "sp0256_speech"),
+	m_sound(*this, "ay8914.1"),
+	m_ecs_sound(*this, "ay8914.2")
+		 { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_intellivoice;
+	required_device<device_t> m_sound;
+	optional_device<device_t> m_ecs_sound;	
+	
+
+	
+	DECLARE_READ16_MEMBER(intv_stic_r);
+	DECLARE_WRITE16_MEMBER(intv_stic_w);
+	DECLARE_READ16_MEMBER(intv_gram_r);
+	DECLARE_WRITE16_MEMBER(intv_gram_w);
+	DECLARE_READ16_MEMBER(intv_ram8_r);
+	DECLARE_WRITE16_MEMBER(intv_ram8_w);
+	DECLARE_READ16_MEMBER(intv_ram16_r);
+	DECLARE_WRITE16_MEMBER(intv_ram16_w);
+
+	DECLARE_READ16_MEMBER(intv_cart_ram8_r);
+	DECLARE_WRITE16_MEMBER(intv_cart_ram8_w);
+	
+	DECLARE_READ8_MEMBER( intv_right_control_r );
+	DECLARE_READ8_MEMBER( intv_left_control_r );
+	
 	UINT8 *m_videoram;
 	intv_sprite_type m_sprite[STIC_MOBS];
 	UINT8 m_sprite_buffers[STIC_MOBS][STIC_CARD_WIDTH*2][STIC_CARD_HEIGHT*4*2*2];
@@ -54,27 +81,47 @@ public:
 	UINT16 m_ram16[0x160];
 	int m_x_scale;
 	int m_y_scale;
-	int m_intvkbd_text_blanked;
-	UINT16 *m_intvkbd_dualport_ram;
-	int m_intvkbd_keyboard_col;
-	int m_tape_int_pending;
 	int m_sr1_int_pending;
-	int m_tape_interrupts_enabled;
-	int m_tape_unknown_write[6];
-	int m_tape_motor_mode;
 	UINT8 m_ram8[256];
+	UINT8 m_cart_ram8[2048];
+	
+	// ecs
+	DECLARE_WRITE16_MEMBER(ecs_bank1_page_select);
+	DECLARE_WRITE16_MEMBER(ecs_bank2_page_select);
+	DECLARE_WRITE16_MEMBER(ecs_bank3_page_select);
+	DECLARE_WRITE16_MEMBER(wsmlb_bank_page_select);
+	DECLARE_READ16_MEMBER(intv_ecs_ram8_r);
+	DECLARE_WRITE16_MEMBER(intv_ecs_ram8_w);
+	
+	DECLARE_READ8_MEMBER( intv_ecs_porta_r );
+	DECLARE_WRITE8_MEMBER( intv_ecs_porta_w );
+	DECLARE_READ8_MEMBER( intv_ecs_portb_r );
+	
+	UINT8 m_ecs_ram8[2048];
+	UINT8 m_ecs_psg_porta;
+	
+	// Keyboard Component
+	DECLARE_READ8_MEMBER(intvkbd_tms9927_r);
+	DECLARE_WRITE8_MEMBER(intvkbd_tms9927_w);
+	DECLARE_WRITE16_MEMBER( intvkbd_dualport16_w );
+	DECLARE_READ8_MEMBER( intvkbd_dualport8_lsb_r );
+	DECLARE_WRITE8_MEMBER( intvkbd_dualport8_lsb_w );
+	DECLARE_READ8_MEMBER( intvkbd_dualport8_msb_r );
+	DECLARE_WRITE8_MEMBER( intvkbd_dualport8_msb_w );
+	
 	UINT8 m_tms9927_num_rows;
 	UINT8 m_tms9927_cursor_col;
 	UINT8 m_tms9927_cursor_row;
 	UINT8 m_tms9927_last_row;
+	
+	int m_intvkbd_text_blanked;
+	UINT16 *m_intvkbd_dualport_ram;
+	int m_intvkbd_keyboard_col;
+	int m_tape_int_pending;
+	int m_tape_interrupts_enabled;
+	int m_tape_unknown_write[6];
+	int m_tape_motor_mode;
 };
-
-
-/*----------- defined in video/stic.c -----------*/
-
-READ16_HANDLER( intv_stic_r );
-WRITE16_HANDLER( intv_stic_w );
-
 
 /*----------- defined in video/intv.c -----------*/
 
@@ -82,10 +129,6 @@ extern VIDEO_START( intv );
 extern SCREEN_UPDATE( intvkbd );
 
 void intv_stic_screenrefresh(running_machine &machine);
-
-READ8_HANDLER ( intvkbd_tms9927_r );
-WRITE8_HANDLER ( intvkbd_tms9927_w );
-
 
 /*----------- defined in machine/intv.c -----------*/
 
@@ -97,25 +140,11 @@ DEVICE_IMAGE_LOAD( intv_cart );
 extern MACHINE_RESET( intv );
 extern INTERRUPT_GEN( intv_interrupt );
 
-READ16_HANDLER( intv_gram_r );
-WRITE16_HANDLER( intv_gram_w );
-READ16_HANDLER( intv_ram8_r );
-WRITE16_HANDLER( intv_ram8_w );
-READ16_HANDLER( intv_ram16_r );
-WRITE16_HANDLER( intv_ram16_w );
-
-READ8_HANDLER( intv_right_control_r );
-READ8_HANDLER( intv_left_control_r );
+// ECS
+extern MACHINE_RESET( intvecs );
 
 /* for the console + keyboard component... */
 
 DEVICE_IMAGE_LOAD( intvkbd_cart );
-
-WRITE16_HANDLER ( intvkbd_dualport16_w );
-READ8_HANDLER ( intvkbd_dualport8_lsb_r );
-WRITE8_HANDLER ( intvkbd_dualport8_lsb_w );
-READ8_HANDLER ( intvkbd_dualport8_msb_r );
-WRITE8_HANDLER ( intvkbd_dualport8_msb_w );
-
 
 #endif /* INTV_H_ */

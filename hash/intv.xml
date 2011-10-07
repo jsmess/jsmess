@@ -332,7 +332,7 @@
 			<dataarea name="5000" size="0x4000">
 					<rom name="ro-3-9505-359 + ro-3-9506-011.50" size="0x4000" crc="752fd927" sha1="4ccf494f9664d5b9e05237d1bc2eee8a7830f067" offset="0000"/>
 			</dataarea>
-			<dataarea name="ram" size="0x2000">
+			<dataarea name="D000_RAM8" size="0x400">
 			</dataarea>
 		</part>
 	</software>
@@ -1514,7 +1514,7 @@
 			<dataarea name="9000" size="0x4000">
 					<rom name="triple challenge.90" size="0x4000" crc="52ad0eda" sha1="cfe303f4942e8f1fe64510ac74839e47b5d2d8dc" offset="0000"/>
 			</dataarea>
-			<dataarea name="ram" size="0x2000">
+			<dataarea name="D000_RAM8" size="0x400">
 			</dataarea>
 		</part>
 	</software>
@@ -1791,7 +1791,7 @@
 	</software>
 
 	<software name="factory" supported="no">
-		<description>Game Factory (</description>
+		<description>Game Factory (unreleased)</description>
 		<year>1983</year>
 		<publisher>Mattel Electronics</publisher>
 		<info name="usage" value="Requires ECS and Keyboard"/>
@@ -1808,7 +1808,7 @@
 			<dataarea name="F000" size="0x2000">
 					<rom name="game factory.f0" size="0x2000" crc="7a8585e8" sha1="691ece0f6426ea5ada71f8615ca6eed24bef4578" offset="0000"/>
 			</dataarea>
-			<dataarea name="8800_RAM" size="0x800">
+			<dataarea name="8800_RAM8" size="0x800">
 			</dataarea>
 		</part>
 	</software>
@@ -1901,6 +1901,8 @@
 			<dataarea name="5000" size="0x4000">
 					<rom name="land battle.50" size="0x4000" crc="3825c25b" sha1="97073f31a8c9b5b04e773fcb145c4235a4712ff7" offset="0000"/>
 			</dataarea>
+			<dataarea name="D000_RAM8" size="0x800">
+			</dataarea>			
 		</part>
 	</software>
 	
