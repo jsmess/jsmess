@@ -25637,7 +25637,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 	</software>
-	</software>
 
 	<software name="redcliffa" cloneof="redcliff">
 		<description>The Battle of Red Cliffs - Romance of the Three Kingdoms (Fixed?)</description>
