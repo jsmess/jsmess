@@ -15579,6 +15579,17 @@
 	</software>
 
 	<software name="kimposs">
+		<description>Disney's Kim Possible (Euro, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>THQ</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="kim possible (europe) (en,fr,de,es) (rev 1).bin" size="8388608" crc="48428c2a" sha1="1df47750be1b14faed828fae3719cd18d3bf47fb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kimpossa" cloneof="kimposs">
 		<description>Disney's Kim Possible (Euro)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
@@ -17033,6 +17044,17 @@
 	</software>
 
 	<software name="lilostch">
+		<description>Disney's Lilo &amp; Stitch (Euro, Rev. 1)</description>
+		<year>2002</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="lilo &amp; stitch (europe) (en,fr,de,es,it,nl) (rev 1).bin" size="8388608" crc="e7bc4ef1" sha1="a4e86401593c1763fdd70c6e1f7b4ccec7101db7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lilostcha" cloneof="lilostch">
 		<description>Disney's Lilo &amp; Stitch (Euro)</description>
 		<year>2002</year>
 		<publisher>Ubi Soft</publisher>
@@ -18592,6 +18614,18 @@
 		</part>
 	</software>
 
+	<software name="medabmtbs" cloneof="medabmtb">
+		<description>Medabots - Metabee Version (Spa)</description>
+		<year>2003</year>
+		<publisher>Natsume</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-64K" />
+			<dataarea name="rom" size="8388608">
+				<rom name="medabots - metabee version (spain).bin" size="8388608" crc="7e907ec8" sha1="fee2d1db994e1a13fc2bc9943198136192412185" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="medabmtbu" cloneof="medabmtb">
 		<description>Medabots - Metabee Version (USA)</description>
 		<year>2003</year>
@@ -18612,6 +18646,18 @@
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
 				<rom name="medabots - rokusho version (europe) [b].bin" size="8388608" crc="a519feb5" sha1="fc44b80f3e71effc33d8e05a74888cb885c32eb0" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="medabrkss" cloneof="medabrks">
+		<description>Medabots - Rokusho Version (Spa)</description>
+		<year>2003</year>
+		<publisher>Natsume</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-64K" />
+			<dataarea name="rom" size="8388608">
+				<rom name="medabots - rokusho version (spain).bin" size="8388608" crc="046d86c4" sha1="90fe7f2927c592aabc9b33d0df00d92046c5cb92" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -31061,6 +31107,17 @@
 	</software>
 
 	<software name="treaspln">
+		<description>Disney's Treasure Planet (Euro, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="treasure planet (europe) (en,fr,de,es,it,nl) (rev 1).bin" size="8388608" crc="794b2602" sha1="c703edaee8a2bad09c2298e2c92a14d459fe664a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="treasplna" cloneof="treaspln">
 		<description>Disney's Treasure Planet (Euro)</description>
 		<year>2003</year>
 		<publisher>Ubi Soft</publisher>

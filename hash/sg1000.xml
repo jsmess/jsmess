@@ -73,14 +73,24 @@ R-049 法櫃奇兵 / Fǎ guì qíbīng -> C-49 Pitfall II [2 taiwanese ROM varia
 R-050 企鵝 / Qì'é -> C-50 Doki Doki Penguin Land [dumped]
 R-051 救難小英雄 / Jiùnàn xiǎo yīngxióng -> C-51 Drol [dumped]
 R-052 ?? maybe 賽馬 / Sàimǎ -> OM-G005 Challenge Derby [WANTED]
-R-052 ?? maybe 打漁 -> C-52 Chack'n Pop
 R-053 比利大盜 / Bǐ lì dà dào -> C-53 Bank Panic [dumped]
 R-054 摩天大樓 / Mótiān dàlóu -> C-54 Rock n' Bolt [dumped]
 R-055 諜對諜 / Dié duì dié -> C-55 Elevator Action [dumped]
-R-056 倉庫番 -> C-56 Sokoban
-R-062 摩托飛車 -> ?? maybe is the same as B-026 (i.e. Zippy Race)
-R-065 忍者公主 -> C-65 Ninja Princess
-R-066 超級坦克 -> C-66 Super Tank
+R-056 倉庫番 -> C-56 Sokoban [dumped]
+R-057 尋寶二代 / Xún bǎo èr dài -> C-57 Championship Lode Runner [dumped]
+R-058 青蜂俠 / Qīng fēng xiá -> C-58 H.E.R.O. [dumped]
+R-059 超人 / Chāorén -> C-61 Bomb Jack [2 taiwanese ROM variations dumped]
+R-060 打漁 / Dǎ yú -> C-52 Chack'n Pop [dumped]
+R-061 曲棍球 / Qūgùnqiú -> C-59 Champion Ice Hockey [dumped]
+R-062 摩托飛車 / Mótuō Fēichē -> C-60 Hang-On II [dumped]
+R-063 ??
+R-064 ??
+R-065 忍者公主 / Rěnzhě gōngzhǔ -> C-65 Ninja Princess [dumped]
+R-066 超級坦克 / Chāojí tǎnkè -> C-66 Super Tank [dumped]
+R-067 劍道 / Jiàndào ->  C-67 Champion Kendou [dumped]
+R-068 頑皮鬼 / Wánpí guǐ -> C-64 C_So! [dumped]
+R-069 花式撞球 / Huā shì zhuàngqiú -> C-71 Champion Billiards [dumped]
+R-070 桃太郎 / Táotàiláng -> C-69 Wonder Boy [dumped]
 
 R-103 功夫 -> Gōngfu (Yie Ar Kung-Fu conversion from MSX1)
 R-108 乒乓球 -> Pīngpāng qiú (Konami Ping Pong conversion from MSX1)
@@ -173,6 +183,54 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="bombjackk1" cloneof="bombjack">
+		<!-- Alt Title: 범짹 ~ Beom Jjaek -->
+		<description>Bomb Jack (Kor)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="bomb jack [english logo] (kr).bin" size="32768" crc="0c69d837" sha1="835d0ea1c0cf1723ae95ba60ea0a929780ebaf71" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombjackk2" cloneof="bombjack">
+		<!-- Alt Title: 범짹 ~ Beom Jjaek -->
+		<description>Beom Jjaek (Kor)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="bomb jack [korean logo] (kr).bin" size="32768" crc="b0c7b310" sha1="b6b36a0280344214bdb8d9184244e21e9fb7371f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombjackt1" cloneof="bombjack">
+		<!-- Serial: R-059 - Alt Title: 超人 ~ Chāorén -->
+		<description>Bomb Jack (Tw)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="bomb jack [english logo] (tw).bin" size="32768" crc="cda3a335" sha1="8d7b786283e5b42e34432ecf1b3744eae00575de" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombjackt2" cloneof="bombjack">
+		<!-- Serial: R-059 - Alt Title: 超人 ~ Chāorén -->
+		<description>Chaoren (Tw)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="bomb jack [chinese logo] (tw).bin" size="32768" crc="deb213fe" sha1="ac94ddc1839dcd2ade443da0e8667e643b11f3e7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bordrlin">
 		<!-- Serial: G-1001 - Alt Title: ボーダーライン -->
 		<description>Borderline (Euro, Jpn)</description>
@@ -205,6 +263,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="chack'n pop (japan).bin" size="32768" crc="d37bda49" sha1="08b5c1135f9678465ece6a886c948ce091637372" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dayu" cloneof="chackn">
+		<!-- Serial: R-060 - Alt Title: Dǎ yú ~ 打漁 -->
+		<description>Da Yu (Tw)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="chack'n pop (tw).bin" size="32768" crc="d81a72ce" sha1="75855a3148a57b102c15a436e7e4ffd1ab4808c3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -280,6 +350,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="champion billiards (japan).bin" size="32768" crc="62b21e31" sha1="f517e6a6123643a5e7e5fff6b413139afa412d8e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champbilt" cloneof="champbil">
+		<!-- Serial: R-069 - Alt Title: 花式撞球 ~ Huā shì zhuàngqiú -->
+		<description>Hua Shi Zhuangqiu (Tw)</description>
+		<year>1986?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="champion billiards (tw).bin" size="32768" crc="56d85bd4" sha1="37dc5e7b3ebc3a3b0480b16d27bc394d57aac697" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -380,6 +462,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="champicet" cloneof="champice">
+		<!-- Serial: R-061 - Alt Title: 曲棍球 ~ Qūgùnqiú -->
+		<description>Qugunqiu (Tw)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="champion ice hockey (tw).bin" size="32768" crc="c6e5192f" sha1="a316058604eb47b547986fec8ef18c6017694746" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="champken">
 		<!-- Serial: C-67 - Alt Title: チャンピオン剣道 -->
 		<description>Champion Kendou (Jpn)</description>
@@ -388,6 +482,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="champion kendou (japan).bin" size="32768" crc="10cdebce" sha1="8565fc398d0206100da785d10e008f7f6a3c225e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champkent" cloneof="champken">
+		<!-- Serial: R-067 - Alt Title: 劍道 ~ Jiàndào -->
+		<description>Jiandao (Tw)</description>
+		<year>1986?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="champion kendou (tw).bin" size="32768" crc="a5f61363" sha1="621cf09649e9244714fa01652b066cd1a477279e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -501,6 +607,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="cloderunt" cloneof="cloderun">
+		<!-- Serial: R-057 - Alt Title: 尋寶二代 ~ Xún bǎo èr dài -->
+		<description>Xun Bao Er Dai (Tw)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="championship lode runner (tw).bin" size="32768" crc="ec95ebcb" sha1="321e2c97645dd9af3e52c66b5db06304250d1bf2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="congo">
 		<!-- Serial: G-1007 - Alt Title: コンゴ・ボンゴ -->
 		<description>Congo Bongo (Euro, Jpn, v1)</description>
@@ -559,6 +677,19 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="csot" cloneof="cso">
+		<!-- Serial: R-068 - Alt Title: 頑皮鬼 ~ Wánpí guǐ -->
+		<description>Wanpi Gui (Tw)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="c_so! (tw).bin" size="32768" crc="82c4e3e5" sha1="7101c42289815d7e0d04b523f8f0e833f2f089b3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="dokidoki">
 		<!-- Serial: C-50 - Alt Title: ドキドキペンギンランド -->
@@ -885,6 +1016,30 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="hangon2t1" cloneof="hangon2">
+		<!-- Alt Title: 摩托飛車 ~ Mótuō Fēichē -->
+		<description>Hang-On II (Tw)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="hang-on ii [english logo] (tw).bin" size="32768" crc="cabd451b" sha1="1e25fc699baa715710f3f6375dbcb107bfc044f5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangon2t2" cloneof="hangon2">
+		<!-- Alt Title: 摩托飛車 ~ Mótuō Fēichē -->
+		<description>Motuo Feiche (Tw)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="hang-on ii [chinese logo] (tw).bin" size="32768" crc="e98a111e" sha1="154669944d899faa1db1cea3fecce9eb162eb3fd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hero">
 		<!-- Serial: C-58 - Alt Title: ヒーロー -->
 		<description>H.E.R.O. (Jpn)</description>
@@ -893,6 +1048,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="h.e.r.o. (japan).bin" size="32768" crc="4587de6e" sha1="19acb69b7b64da5083349d8bc40a47beacc88c41" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="herot" cloneof="hero">
+		<!-- Serial: R-058 - Alt Title: 青蜂俠 ~ Qīng fēng xiá -->
+		<description>Qing Feng Xia (Tw)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="h.e.r.o. (tw).bin" size="32768" crc="83958998" sha1="3b2d3dfe948a734c3d18b504c89c61b7b1f3d81b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1028,6 +1195,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="loderunk" cloneof="loderun">
+		<!-- Alt Title: Lode Runner I (cart label) -->
+		<description>Lode Runner (Kor)</description>
+		<year>1984?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="lode runner (kr).bin" size="32768" crc="e68bc7d6" sha1="23f22b407df4ae8d7931051eb229efd862bea5f7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="loderunt" cloneof="loderun">
 		<!-- Serial: B-031 - Alt Title: Xún bǎo jì ~ 尋寶記 -->
 		<description>Lode Runner (Tw)</description>
@@ -1134,6 +1313,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="ninja princess (japan).bin" size="32768" crc="3b912408" sha1="f142bb823cebc4e31488e7a9a94644af24186d99" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjapt" cloneof="ninjap">
+		<!-- Serial: R-065 - Alt Title: 忍者公主 ~ Rěnzhě gōngzhǔ -->
+		<description>Renzhe Gongzhu (Tw)</description>
+		<year>1986?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="ninja princess (tw).bin" size="32768" crc="464d144b" sha1="dac76d52c9d88f7b6bf71fc897669d7e6440d143" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1628,6 +1819,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="soukobant" cloneof="soukoban">
+		<!-- Serial: R-056 - Alt Title: 搬倉庫 ~ Bān cāngkù -->
+		<description>Soukoban (Tw)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="soukoban (tw).bin" size="32768" crc="a2c3fc97" sha1="4216770efbaf49f832ff7a78fbc9cd2c8300f52c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spacearm">
 		<!-- Serial: OM-G007 - Alt Title: スペースアーマー -->
 		<description>Space Armor (Jpn, v20, OMV)</description>
@@ -1805,6 +2008,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="supertnkt" cloneof="supertnk">
+		<!-- Serial: R-066 - Alt Title: 超級坦克 ~ Chāojí tǎnkè -->
+		<description>Chaoji Tanke (Tw)</description>
+		<year>1986?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="super tank (tw).bin" size="32768" crc="d0c3df3f" sha1="0d014fc9db775b62ff55196b85b8e91c5e3249f3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="terebioe">
 		<!-- Serial: GB-800 - Alt Title: テレビおえかき - Notes: This game used a tablet as controller, directly connected to the cart itself -->
 		<description>Terebi Oekaki (Jpn)</description>
@@ -1837,6 +2052,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="wonder boy (japan).bin" size="32768" crc="160535c5" sha1="4a54933135cdff546fd79cbc61a38355f7335f3f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wboyt" cloneof="wboy">
+		<!-- Serial: R-070 - Alt Title: 桃太郎 ~ Táotàiláng -->
+		<description>Taotailang (Tw)</description>
+		<year>1986?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="wonder boy [v1] (tw).bin" size="32768" crc="953fc2b2" sha1="8f261b955162c179fe4c936ece767bbf25c4888c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
