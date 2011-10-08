@@ -2046,6 +2046,18 @@
 		</part>
 	</software>
 
+	<!-- Alt. Title: 갤럭시안 -->
+	<software name="galaxian">
+		<description>Galaxian (Kor)</description>
+		<year>199?</year>
+		<publisher>HiCom</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="galaxian [kr].bin" size="32768" crc="577ec227" sha1="eed656762c78b13f715a2b3c7fd4e8d2565a6684" offset="000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Serial: 29001 -->
 	<software name="galaxyf">
 		<description>Galaxy Force (Euro, Bra)</description>
@@ -2896,6 +2908,18 @@
 		</part>
 	</software>
 
+	<!-- Alt. Title: 마성전설 II ~ Maseong Jeonseol II -->
+	<software name="knightm2">
+		<description>Knightmare II: The Maze of Galious (Kor)</description>
+		<year>199?</year>
+		<publisher>Zemina?</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="knightmare ii - the maze of galious [kr].bin" size="131072" crc="f89af3cc" sha1="b716266e936b7cd0a6e29785ae3e7686e1b35793" offset="000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Serial: MK-27056-50, 026.280 -->
 	<software name="krusty">
 		<description>Krusty's Fun House (Euro, Bra)</description>
@@ -3458,6 +3482,28 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="my hero (usa, europe).bin" size="32768" crc="62f0c23d" sha1="7583c5fb1963c070b7bda72b447cc3fd611ddf1a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbajam">
+		<description>NBA Jam (Euro, Prototype)</description>
+		<year>1994</year>
+		<publisher>Acclaim</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="nba jam [proto].bin" size="524288" crc="332a847d" sha1="690addaea2b5f9b8d1c8788540ec7f695b396ff8" offset="000000" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supgolf" cloneof="golfaman">
+		<description>Super Golf (Prototype)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="super golf [proto].bin" size="262144" crc="7f7b568d" sha1="ebe733ea693fa46edde43260fdb963cab71317e1" offset="000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5120,6 +5166,100 @@
 		</part>
 	</software>
 
+	<!-- Serial: G-2101 - Alt. Title: 슈퍼알카노이드 -->
+	<software name="superark" cloneof="woodypop">
+		<description>Super Arkanoid (Kor)</description>
+		<year>1989</year>
+		<publisher>HiCom</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="woody pop (super arkanoid) (kr).bin" size="32768" crc="c9dd4e5f" sha1="704d263fa53f152b34c6d01fdc11d17a5f17d78b" offset="000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprbskt">
+		<description>Super Basketball (USA, CES Demo)</description>
+		<year>1989?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="super basketball (usa) (sample).bin" size="65536" crc="0dbf3b4a" sha1="616b95baad61086f08d8688c2bf06838b902ac75" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Alt. Title: 슈퍼바이오맨 I -->
+	<software name="sbioman1">
+		<description>Super Bioman 1 (Kor)</description>
+		<year>1992</year>
+		<publisher>HiCom</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="super bioman 1.bin" size="65536" crc="a66d26cf" sha1="31605352efae3432a7fbea245ae00c53ab30ec18" offset="000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Alt. Title: 수퍼보이 I -->
+	<software name="sboy1">
+		<description>Super Boy I (Kor)</description>
+		<year>1989</year>
+		<publisher>Zemina</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="49152">
+				<rom name="super boy 1.bin" size="49152" crc="bf5a994a" sha1="f0e6a20c72f0fb0feb1681217eeec3b69950e897" offset="000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Alt. Title: 수퍼보이 II -->
+	<software name="sboy2">
+		<description>Super Boy II (Kor)</description>
+		<year>1989</year>
+		<publisher>Zemina</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="super boy ii (kor).bin" size="49152" crc="67c2f0ff" sha1="f0c239e4cf90cd4c699889792f811717670ac85c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sboy3">
+		<description>Super Boy 3 (Kor)</description>
+		<year>1991</year>
+		<publisher>Zemina</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="super boy 3.bin" size="131072" crc="9195c34c" sha1="5d65a308bb9ec8c4b4ce334b18d699b1f53227ef" offset="000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Alt. Title: 수퍼보이 IV -->
+	<software name="sboy4">
+		<description>Super Boy 4 (Kor)</description>
+		<year>1992</year>
+		<publisher>Zemina</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="super boy 4 (kor).bin" size="262144" crc="b995b4f0" sha1="9b4be448b81f96391ef9667b1923abc53a9c59d9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Serial: 27017-50 -->
+	<software name="suprkick">
+		<description>Super Kick Off (Euro, Bra)</description>
+		<year>1991</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="super kick off (europe) (en,fr,de,es,it,nl,pt,sv).bin" size="262144" crc="406aa0c2" sha1="4116e4a742e3209ca5db9887cd92219d15cf3c9a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Serial: MK-27059-50 -->
 	<software name="superoff">
 		<description>Super Off Road (Euro)</description>
@@ -5152,51 +5292,6 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="super tennis (usa, europe).bin" size="32768" crc="914514e3" sha1="67787f3f29a5b5e74b5f6a636428da4517a0f992" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="suprbskt">
-		<description>Super Basketball (USA, CES Demo)</description>
-		<year>1989?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="65536">
-				<rom name="super basketball (usa) (sample).bin" size="65536" crc="0dbf3b4a" sha1="616b95baad61086f08d8688c2bf06838b902ac75" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sboy2">
-		<description>Super Boy II (Kor)</description>
-		<year>1989</year>
-		<publisher>Zemina</publisher>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="65536">
-				<rom name="super boy ii (kor).bin" size="49152" crc="67c2f0ff" sha1="f0c239e4cf90cd4c699889792f811717670ac85c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sboy4">
-		<description>Super Boy 4 (Kor)</description>
-		<year>1992</year>
-		<publisher>Zemina</publisher>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="super boy 4 (kor).bin" size="262144" crc="b995b4f0" sha1="9b4be448b81f96391ef9667b1923abc53a9c59d9" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Serial: 27017-50 -->
-	<software name="suprkick">
-		<description>Super Kick Off (Euro, Bra)</description>
-		<year>1991</year>
-		<publisher>U.S. Gold</publisher>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="super kick off (europe) (en,fr,de,es,it,nl,pt,sv).bin" size="262144" crc="406aa0c2" sha1="4116e4a742e3209ca5db9887cd92219d15cf3c9a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
