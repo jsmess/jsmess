@@ -48,7 +48,6 @@
     TOM & JERRY								JAPAN
     VALIS III								JAPAN		we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
     WONDER MIDI								JAPAN
-    WORLD CHAMPIONSHIP SOCCER II			PAL
     WORLD CUP SOCCER						JAPAN/USA	we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
     WORLD OF ILLUSION						JAPAN		we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
 -->
@@ -2914,6 +2913,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="battletoads (world).bin" size="524288" crc="d10e103a" sha1="5ef3c29b6bdd04d24552ab200d0530f647afdb08" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beastbal">
+		<description>Beastball (Prototype)</description>
+		<year>199?</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1030368">
+				<rom name="beast ball.bin" size="1030368" crc="6a176576" sha1="6af4e13dede08ed75b3e307538276134b3a297b2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -23442,6 +23452,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="wcs2">
+		<description>World Championship Soccer II (Euro)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="world championship soccer ii (europe).bin" size="1048576" crc="6065774d" sha1="5f5a31a3e8e3b56aa0a3acdb8049246160679a8f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcs2u">
 		<description>World Championship Soccer II (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
