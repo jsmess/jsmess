@@ -462,6 +462,83 @@ static INPUT_PORTS_START( pccga )
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pcega )
+	PORT_START("IN0") /* IN0 */
+	PORT_BIT ( 0xf0, 0xf0,	 IPT_UNUSED )
+	PORT_BIT ( 0x08, 0x08,	 IPT_VBLANK )
+	PORT_BIT ( 0x07, 0x07,	 IPT_UNUSED )
+
+	PORT_START("DSW0") /* IN1 */
+	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
+	PORT_DIPSETTING(	0x00, "1" )
+	PORT_DIPSETTING(	0x40, "2" )
+	PORT_DIPSETTING(	0x80, "3" )
+	PORT_DIPSETTING(	0xc0, "4" )
+	PORT_DIPNAME( 0x00, 0x20, "Graphics adapter")
+	PORT_DIPSETTING(	0x00, "EGA/VGA" )
+	PORT_DIPSETTING(	0x10, "Color 40x25" )
+	PORT_DIPSETTING(	0x20, "Color 80x25" )
+	PORT_DIPSETTING(	0x30, "Monochrome" )
+	PORT_DIPNAME( 0x0c, 0x0c, "RAM banks")
+	PORT_DIPSETTING(	0x00, "1 - 16  64 256K" )
+	PORT_DIPSETTING(	0x04, "2 - 32 128 512K" )
+	PORT_DIPSETTING(	0x08, "3 - 48 192 576K" )
+	PORT_DIPSETTING(	0x0c, "4 - 64 256 640K" )
+	PORT_DIPNAME( 0x02, 0x00, "80387 installed")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x01, 0x01, "Floppy installed")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
+
+	PORT_START("DSW1") /* IN2 */
+	PORT_DIPNAME( 0x80, 0x80, "COM1: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, "COM2: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x00, "COM3: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x00, "COM4: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, "LPT1: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x00, "LPT2: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x00, "LPT3: enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x01, 0x00, "Game port enable")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+
+	PORT_START("DSW2") /* IN3 */
+	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
+	PORT_DIPSETTING(	0x80, "COM1" )
+	PORT_DIPSETTING(	0x40, "COM2" )
+	PORT_DIPSETTING(	0x20, "COM3" )
+	PORT_DIPSETTING(	0x10, "COM4" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x04, "HDC2 (CA00:0 port 324-327)")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
+	PORT_BIT( 0x02, 0x02,	IPT_UNUSED ) /* no turbo switch */
+	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
+
+	PORT_INCLUDE( kb_keytronic_pc )
+	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
+	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( europc )
 	PORT_START("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,	 IPT_UNUSED )
@@ -1175,6 +1252,54 @@ static MACHINE_CONFIG_START( iskr1031, pc_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_START( iskr3104, pc_state )
+	/* basic machine hardware */
+	MCFG_CPU_PC(pc16, pc16, I8086, 4772720, pc_frame_interrupt)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	MCFG_MACHINE_START(pc)
+	MCFG_MACHINE_RESET(pc)
+
+	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+
+	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
+
+	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+
+	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
+
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+
+	/* video hardware */
+	MCFG_FRAGMENT_ADD( pcvideo_ega )
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	/* keyboard */
+	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
+
+	/* printer */
+	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
+	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
+	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+
+	MCFG_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_interface)
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("640K")
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_START( poisk2, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, pc16, I8086, 4772720, pc_frame_interrupt)
@@ -1708,9 +1833,9 @@ ROM_START( iskr3104 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROMX_LOAD( "198.bin", 0xfc000, 0x2000, CRC(bcfd8e41) SHA1(e21ddf78839aa51fa5feb23f511ff5e2da31b433),ROM_SKIP(1))
 	ROMX_LOAD( "199.bin", 0xfc001, 0x2000, CRC(2da5fe79) SHA1(14d5dccc141a0b3367f7f8a7188306fdf03c2b6c),ROM_SKIP(1))
-	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
-	// need proper rom dump for this machine
-	ROM_LOAD( "iskra-1031_font.bin", 0x0000, 0x2000, CRC(f4d62e80) SHA1(ad7e81a0c9abc224671422bbcf6f6262da92b510))
+	// EGA card from Iskra-3104
+	ROMX_LOAD( "143-03.bin", 0xc0001, 0x2000, CRC(d0706345) SHA1(e04bb40d944426a4ae2e3a614d3f4953d7132ede),ROM_SKIP(1))
+    ROMX_LOAD( "143-02.bin", 0xc0000, 0x2000, CRC(c8c18ebb) SHA1(fd6dac76d43ab8b582e70f1d5cc931d679036fb9),ROM_SKIP(1))
 ROM_END
 
 ROM_START( poisk1 )
@@ -1848,7 +1973,7 @@ COMP ( 1989,	t1000tl2,	ibm5150,	 0, t1000_286,	tandy1t,	t1000hx,    "Tandy Radio
 
 COMP ( 1989,	iskr1031,   ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-1031" , GAME_NOT_WORKING)
 COMP ( 1989,	iskr1030m,  ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-1030M" , GAME_NOT_WORKING)
-COMP ( 19??,	iskr3104,   ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-3104" , GAME_NOT_WORKING)
+COMP ( 19??,	iskr3104,   ibm5150,	0,	iskr3104,	pcega,	pccga,	"<unknown>",  "Iskra-3104" , GAME_NOT_WORKING)
 COMP ( 1987,	ec1840,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1840" , GAME_NOT_WORKING)
 COMP ( 1987,	ec1841,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1841" , GAME_NOT_WORKING)
 COMP ( 1989,	ec1845,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1845" , GAME_NOT_WORKING)
