@@ -4323,18 +4323,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<!-- // [!] -->
-	<software name="chess">
-		<description>Chess</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="chess (unl).bin" size="524288" crc="47380edd" sha1="42e56fc5543dcb40da73447b582c84c4ff50a825" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="chester">
 		<description>Chester Cheetah - Too Cool to Fool (USA)</description>
 		<year>1992</year>
@@ -6279,17 +6267,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="ikazuse! koi no doki doki penguin land md (jpn) (gnk).bin" size="262144" crc="22736650" sha1="e64e4c127158db366e95e8c3cc6b4d5906ad78ec" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="domino">
-		<description>Domino</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="domino (unl).bin" size="1048576" crc="a64409be" sha1="7000ea86d91bbb5642425b6a6f577fab9e2b3a51" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -9264,17 +9241,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="herc2">
-		<description>Hercules 2</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="hercules 2 (unl).bin" size="2097152" crc="292623db" sha1="7104a37f588f291b85eb8f62685cb1111373572c" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="herzog">
 		<description>Herzog Zwei (Euro, USA)</description>
 		<year>1990</year>
@@ -9727,17 +9693,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="ronaldinho 98 (pirate).bin" size="2097152" crc="dd27c84e" sha1="183ba7d8fe6bcddf0b7738c9ef2aa163725eb261" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="iraqwar">
-		<description>Iraq War 2003</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="iraq war 2003 (unl).bin" size="1048576" crc="49dd6f52" sha1="cc8b69debd68ba7c6d72d47d4c33530a1e7ef07c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -23462,7 +23417,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wcs2u">
+	<software name="wcs2u" cloneof="wcs2">
 		<description>World Championship Soccer II (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -25379,6 +25334,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="bugslifea" cloneof="bugslife">
+		<description>A Bug's Life (Alt?)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="bug's life (unl).bin" size="1048576" crc="ed1c1a67" sha1="ba3ef79c582c399cb6c908cbd53e32127be2f813" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chinf3">
 		<description>Chinese Fighter III (Chi)</description>
 		<year>199?</year>
@@ -25498,6 +25464,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb_type" value="LIONK3" />
 			<dataarea name="rom" size="20971520">
 				<rom name="shi zi wang 3 - the lion king 3 (chi) (unl).bin" size="2097152" crc="c004219d" sha1="54ffd355b0805741f58329fa38ed3d9f8f7c80ca" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkin3a" cloneof="lionkin3">
+		<description>Shi Zi Wang 3 - The Lion King 3 (Alt?)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="20971520">
+				<rom name="lion king 3 (unl).bin" size="2097152" crc="8e0555e4" sha1="dc34164d74d9b6542adef6838250793d023cd942" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -25657,6 +25634,19 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb_type" value="REDCLIFF" />
 			<dataarea name="rom" size="20971520">
 				<rom name="the battle of red cliffs - romance of the three kingdoms (unl).bin" size="2097157" crc="44463492" sha1="244334583fde808a56059c0b0eef77742c18274d" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+	</software>
+
+	<software name="redcliffa" cloneof="redcliff">
+		<description>The Battle of Red Cliffs - Romance of the Three Kingdoms (Fixed?)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="REDCLIFF" />
+			<dataarea name="rom" size="2097152">
+				<rom name="the battle of red cliffs (unl).bin" size="2097152" crc="63eca090" sha1="648c04365610084d76c9a2b1b0b07031ca84897d" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -25926,13 +25916,25 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="deathcal">
-		<description>Death Caliber (Rus)</description>
+	<software name="avatar" cloneof="jimpow">
+		<!-- Alt. Title: Аватар -->
+		<description>Avatar (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="death caliber.bin" size="4194304" crc="3cd2c797" sha1="414bce2fa385642fccaa4653339dae44f1913505" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="1114112">
+				<rom name="avatar.bin" size="1114112" crc="d33e0ada" sha1="a44730b0640168201c9d40bd145d208beff423c7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess">
+		<description>Chess</description>
+		<year>1998</year>
+		<publisher>BSComp</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="chess (unl).bin" size="524288" crc="47380edd" sha1="42e56fc5543dcb40da73447b582c84c4ff50a825" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -25959,13 +25961,126 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="cstrike" cloneof="lethalen">
+		<description>Counter Strike (Rus)</description>
+		<year>199?</year>
+		<publisher>Glorysun</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="counter strike.bin" size="2097152" crc="9e7b83ba" sha1="bcee7c42f6b836af9fb60c9a7bd1d0f7d1ba6bcd" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crash" cloneof="zerokami">
+		<description>Crash Bandicoot (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="crash bandicoot.bin" size="4194304" crc="e06bd944" sha1="bfd7271b76c1ce6a4f8b7f6e610a63cc88ae6627" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deathcal">
+		<description>Death Caliber (Rus)</description>
+		<year>199?</year>
+		<publisher>Tomsoft</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="death caliber.bin" size="4194304" crc="3cd2c797" sha1="414bce2fa385642fccaa4653339dae44f1913505" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="deerhunt">
 		<description>Deer Hunter (Rus)</description>
+		<year>199?</year>
+		<publisher>Tomsoft</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="deer hunter.bin" size="1048576" crc="da11978b" sha1="866fb68f8398da233835d198dbfea52bae387818" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Does this come from a real cart? or is it a fan hack? -->
+	<software name="diablo" cloneof="fatallab">
+		<description>Diablo (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="deer hunter.bin" size="1048576" crc="da11978b" sha1="866fb68f8398da233835d198dbfea52bae387818" offset="000000" loadflag="load16_word_swap" />
+				<rom name="diablo.bin" size="1048576" crc="bd642da0" sha1="affbf9d8d420c7121afca229c2296a0779e842e1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="domino">
+	<!-- Alt. Title: Домино -->
+		<description>Domino</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="domino (unl).bin" size="1048576" crc="a64409be" sha1="7000ea86d91bbb5642425b6a6f577fab9e2b3a51" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifa2k2" cloneof="wcs2">
+		<description>FIFA World Cup 2002 (Rus)</description>
+		<year>199?</year>
+		<publisher>Glorysun</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="fifa world cup 2002 (unl).bin" size="1048576" crc="852bff8e" sha1="f9dd9b940e2c684c3d3c9371d5bd7f3607d641d1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifa2k3" cloneof="fifa95">
+		<description>FIFA 2003 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="fifa 2003 (unl).bin" size="2097152" crc="419bcb02" sha1="8dc04a0f137323ec95d6c7dfa9cb03fa572bdc51" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifa2k10" cloneof="fifa">
+		<description>FIFA World Cup - South Africa 2010 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="fifa 2010 (unl).bin" size="4194304" crc="851e8411" sha1="0d23f4e9e7abb12e882743554ab19d7704e00456" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fastfur5" cloneof="combatca">
+	<!-- Alt. Title: Форсаж 5 Быстрая -->
+		<description>Forsazh 5 Bystraya ~ Fast and the Furious 5 Quick (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1093632">
+				<rom name="fast and the furious 5 (unl).bin" size="1093632" crc="29f4d87a" sha1="1d87c8bed3181e3924c7fd732852b9efa8d9c59d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gt5" cloneof="funcar">
+		<description>Gran Turismo 5 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1220816">
+				<rom name="gran turismo 5 (unl).bin" size="1220816" crc="d4392181" sha1="a047a2677add823c4dd7563a8e24e4a3d093f822" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -25977,6 +26092,457 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="harry potter.bin" size="2097152" crc="a184fc76" sha1="e7d8b985243bd5bbd00c68b89060d0a37bf61870" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpotter2" cloneof="globglad">
+		<description>Harry Potter and the Chamber of Secrets (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="harry potter 2.bin" size="1048576" crc="1684479f" sha1="e30deb5e9fb2c0e7f63bb1e9855379c1d61eb0b3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="herc2">
+		<description>Hercules 2</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="hercules 2 (unl).bin" size="2097152" crc="292623db" sha1="7104a37f588f291b85eb8f62685cb1111373572c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iceage" cloneof="awepossm">
+		<description>Ice Age (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="ice age.bin" size="4194304" crc="3a585408" sha1="4a96e44a8863ad18a2734d6221e7259dd6e55f0b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iceage3" cloneof="chuckrck">
+		<description>Ice Age 3 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1077536">
+				<rom name="ice age 3 (unl).bin" size="1077536" crc="58fcffb3" sha1="30d9afdc25517f6b1782a153753f5d2b81ae9d0b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iceage4" cloneof="chuckrck">
+		<description>Ice Age 4 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1107488">
+				<rom name="ice age 4 (unl).bin" size="1107488" crc="92e86cfc" sha1="11c55fe1adeec0e4e39d3f16a8c2acb7b0e21e07" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="incredib" cloneof="tick">
+		<description>The Incredibles (Rus)</description>
+		<year>199?</year>
+		<publisher>Glorysun</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="the incredibles (unl).bin" size="2097152" crc="31f7af7c" sha1="a8cadfda87e466809670218106b1c308e88a964a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iraqwar">
+		<description>Iraq War 2003</description>
+		<year>199?</year>
+		<publisher>Tomsoft</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="iraq war 2003 (unl).bin" size="1048576" crc="49dd6f52" sha1="cc8b69debd68ba7c6d72d47d4c33530a1e7ef07c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kolobok">
+	<!-- Alt. Title: Колобок - Пирамида -->
+	<!-- This is an homebrew port of "Uwol - Quest For Money" for ZX Spectrum -->
+	<!-- Apparently it got burned to real carts and sold in Russia -->
+		<description>Kolobok ~ Pyramid (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="kolobok.bin" size="131072" crc="c4c55bab" sha1="366074924c36a466f566c76772d7bd491137384e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kfpanda2" cloneof="brutal">
+		<description>Kung Fu Panda 2 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="kung fu panda 2 (unl).bin" size="4194304" crc="a08c3b25" sha1="7248bfbaadac607e307d2e323d8e91de4f16ecee" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kuzyamd" cloneof="chukrck2">
+	<!-- Alt. Title: Кузя - В мире динозавров (A.k.a. Agent Hugo - In the world of dinosaurs) -->
+		<description>Kuzya - V Mire Dinozavrov (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="agent hugo - in the world of dinosaurs (unl).bin" size="2097152" crc="bd0ebe1c" sha1="4fca2e9d85534cc33e580ff83c5e7e8a71b35d62" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kuzyaeo" cloneof="chukrck2">
+	<!-- Alt. Title: Кузя - Экология в опасности (A.k.a. Agent Hugo - Environment at risk) -->
+		<description>Kuzya - Ekologiya V Opasnosti (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="agent hugo - environment at risk (unl).bin" size="2097152" crc="be32d65b" sha1="5f2d9ee7945c50c64b9664148befcb2f6ed48d54" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lotr" cloneof="strmlord">
+		<description>Lord of the Rings (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="lord of the rings (unl).bin" size="524288" crc="e2a2342a" sha1="a91ed84344ebf685f9a13d28b6a2053279e1f61a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madagopp" cloneof="magichat">
+		<description>Madagascar - Operatsiya Pingvin (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="madagascar.bin" size="1048576" crc="6d28ace5" sha1="a2c4508a735dcfefc419022d9f25bd4804499fa7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madagsc3" cloneof="dinotale">
+		<description>Madagascar 3 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="madagascar 3 (unl).bin" size="1048576" crc="0bd6d0a5" sha1="a7bf74633cab1bbb82ce63056331773723ae85f6" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mafia" cloneof="dicktr">
+		<description>Mafia (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mafia (unl).bin" size="1048576" crc="ede60834" sha1="a2f04a4c87f9e08442d3117e8ea0e94a6b8189f0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mgs" cloneof="crkdown">
+		<description>Metal Gear Solid (Rus)</description>
+		<year>199?</year>
+		<publisher>Glorysun</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="metal gear solid (unl).bin" size="524288" crc="b38191eb" sha1="531e696dc003491811b0611b11ae8baea36f6035" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmprfe">
+		<description>Mighty Morphin Power Rangers - The Fighting Edition (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="mighty morphin power ranger - the fighting edition (unl).bin" size="2097152" crc="b53ff16c" sha1="9443e7879133d891abebe9b01302e8e6e96360e4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="narnia3" cloneof="galahad">
+		<description>Narnia 3 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1220032">
+				<rom name="narnia 3 (unl).bin" size="1220032" crc="ab69bcd3" sha1="1e6a329d4d2e9ea7f94138ef1c96cb573e34e87c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="naruto" cloneof="3ninja">
+		<description>Naruto (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="naruto (unl).bin" size="4194304" crc="b29b3503" sha1="b96bb0e0505f735fc2e0d64a102b1b6b50132058" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nba2k" cloneof="nbaact95">
+		<description>NBA 2000 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="nba 2000 (unl).bin" size="2097152" crc="2cef6950" sha1="c9727ca783d730d4ee35ef18023c55a0b8d101e2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nba2k5" cloneof="nbaact95">
+		<description>NBA 2005 (Rus)</description>
+		<year>199?</year>
+		<publisher>Glorysun</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="nba 2005 (unl).bin" size="2097152" crc="e8610238" sha1="5820c8db66cdf74fd926d529e469133666babb46" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nfsu" cloneof="turboout">
+		<description>Need for Speed Undercover (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="need for speed undercover (unl).bin" size="1048576" crc="be1b8e93" sha1="d467ba9dcc4ec5b17288ce3987def5e6db56b9da" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nhlpa2k3" cloneof="nhl98">
+		<description>NHLPA 2003 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="nhlpa 2003 (unl).bin" size="2097152" crc="4591571b" sha1="4e6dd50d0f671b89c4ce3f7d1a63ecb68208dc8e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pircarib" cloneof="unchartd">
+		<description>Pirates of the Caribbean (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pirates of the caribbean (unl).bin" size="2097152" crc="48da0bf4" sha1="854609211eaf0769c4c0ccb45efd0be98feee8f9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pircari2">
+		<description>Piraty Karibskogo Morya - Na Strannyh Beregah ~ Pirates of the Caribbean - On Stranger Tides (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pirates of the caribbean - on stranger tides (unl).bin" size="1048576" crc="63c90c7c" sha1="115b7b2c932b5f41a9b554f00403354a720937e8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rhl2k7" cloneof="nhlpah">
+    <!-- Alt. Title: РХЛ 2007 -->
+		<description>RHL 2007 (Rus)</description>
+		<year>199?</year>
+		<publisher>NewGame</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="655360">
+				<rom name="rhl 2000 (unl).bin" size="655360" crc="bb7a978b" sha1="d8688cf613a3ee493a86d8a975ef0f5769fa0e45" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrek" cloneof="yogibear">
+		<description>Shrek (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="shrek (unl).bin" size="1048576" crc="561e84b9" sha1="78f481140c53b480c0c50abe4756b67564a41a15" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrek2" cloneof="ottifa">
+		<description>Shrek 2 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="shrek 2 (unl).bin" size="1048576" crc="0ccd3651" sha1="1f3c162b33ad1969000d660a2066e9f0c54a107f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="huntsea3" cloneof="rolo">
+	<!-- Alt. Title: Сезон охоты 3 -->
+		<description>Sezon Ohoty 3 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="593184">
+				<rom name="hunting season 3 (unl).bin" size="593184" crc="b433878c" sha1="6eb88d71562415364c11b8dac1eb6fee24a53b95" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snezkoro" cloneof="globglad">
+	<!-- Alt. Title: Снежная королева -->
+		<description>Snezhnaya Koroleva (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="snow queen (unl).bin" size="2097152" crc="e6c07946" sha1="69dfe717498179d82d14749db642305d12f213fc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwars" cloneof="elimdown">
+		<description>Star Wars (Rus)</description>
+		<year>199?</year>
+		<publisher>Glorysun</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="star wars (unl).bin" size="1048576" crc="94af8d44" sha1="54a2515b9f35b494afcdd77972898049e8b8df2e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starjedi" cloneof="wolfchld">
+		<description>Star Wars Jedi (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1220816">
+				<rom name="star wars jedi (unl).bin" size="1220816" crc="48c5bf60" sha1="2720d3ca0fcdc4cca64654169c04b6ecf79c9fa8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smbbc">
+		<description>Super Mario Bros. + Battle City (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mario &amp; battle city (unl).bin" size="524288" crc="568f7994" sha1="e6dc15766e10e7ee616c81eacd88c3a36406794f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srobowrs" cloneof="trgearth">
+		<description>Super Robot Wars (Rus)</description>
+		<year>199?</year>
+		<publisher>Glorysun</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="super robot wars (unl).bin" size="524288" crc="cfae2614" sha1="36d9b5a70d596a1010eab79e15453d73c4ed5396" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="t3ag" cloneof="t2ag">
+		<description>T3 - The Arcade Game (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="t3 - the arcade game (unl).bin" size="1048576" crc="d2b5ef77" sha1="75d2c0821b94897b86b7cd19c0f179b476298f86" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars2" cloneof="cproam">
+	<!-- Alt. Title: Тачки 2 -->
+		<description>Tachki 2 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="cars 2 (unl).bin" size="2097152" crc="4fd4d967" sha1="625602a6167ea6ed608c791e8e04f7ec4d45a99a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tank2011">
+	<!-- Alt. Title: Танки 2011 -->
+		<description>Tanki 2011 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tank 2011 (unl).bin" size="524288" crc="03739820" sha1="8682718f2c2ad80eaf7d62e977d6827490d8e906" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttoon3">
+		<description>Tiny Toon Adventures 3 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="tiny toon adventures 3 (unl).bin" size="1048576" crc="d65d83d4" sha1="47b1ad463389d709fb49c7cef8fd033a6f95a301" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transf3" cloneof="mazinwar">
+		<description>Transformers 3 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1117472">
+				<rom name="transformers 3 (unl).bin" size="1117472" crc="8632246d" sha1="e1e5f66329bffedc245a31db50cefd575fecd16b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winx3d" cloneof="valis3">
+	<!-- Alt. Title: Winx 3D Волшебное приключение -->
+		<description>Winx 3D Volshebnoe Priklyuchenie (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1221584">
+				<rom name="winx 3d (unl).bin" size="1221584" crc="933cecc9" sha1="db00b0a52b858501aedea357c28239b4423cf03a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
