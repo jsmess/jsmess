@@ -25,6 +25,20 @@
             - 128k ram
             - stylus pen
             - touch-pad screen
+
+        Flash:
+            The following flash ID are checked by Avigo OS, if the returned
+            ID is different the PDA doesn't boot.
+
+            Maker ID    Device ID   Description
+            0xb0        0x21        Sharp LH28F004
+            0x89        0xa6        Sharp LH28F008
+            0x89        0xaa        Sharp LH28F016
+            0xb0        0x88        Sharp LH28F032
+            0x01        0xa4        AMD AM29F040
+            0x01        0xd5        AMD AM29F080
+            0x01        0xad        AMD AM29F016
+
         TODO:
                 Dissassemble the rom a bit and find out exactly
                 how memory paging works!
@@ -939,9 +953,9 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
 
 	/* flash ROMs */
-	MCFG_INTEL_E28F008SA_ADD("flash0")
-	MCFG_INTEL_E28F008SA_ADD("flash1")
-	MCFG_INTEL_E28F008SA_ADD("flash2")
+	MCFG_AMD_29F080_ADD("flash0")
+	MCFG_AMD_29F080_ADD("flash1")
+	MCFG_AMD_29F080_ADD("flash2")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
