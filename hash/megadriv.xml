@@ -25468,17 +25468,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="lionkin3a" cloneof="lionkin3">
-		<description>Shi Zi Wang 3 - The Lion King 3 (Alt?)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="20971520">
-				<rom name="lion king 3 (unl).bin" size="2097152" crc="8e0555e4" sha1="dc34164d74d9b6542adef6838250793d023cd942" offset="00000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="majian">
 		<description>Ma Jiang Qing Ren - Ji Ma Jiang Zhi (Chi)</description>
 		<year>199?</year>
@@ -25842,6 +25831,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb_type" value="LIONK3" />
 			<dataarea name="rom" size="20971520">
 				<rom name="lion_king_3.bin" size="2097152" crc="87e86943" sha1="0ef55dc45536963c8748192a4cb4864a87b03102" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkin3b" cloneof="lionkin3">
+		<description>The Lion King 3 (Alt 2?)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="20971520">
+				<rom name="lion king 3 (unl).bin" size="2097152" crc="8e0555e4" sha1="dc34164d74d9b6542adef6838250793d023cd942" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
