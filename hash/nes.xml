@@ -35117,6 +35117,21 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="magickdmupo" cloneof="magickdm">
+		<description>Adventures In The Magic Kingdom (USA, Prototype Earlier)</description>
+		<year>1992</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="adventures in the magic kingdom (proto).chr" size="131072" crc="54cace66" sha1="ea826394d28df9e77d6e32ac12a03fde1d03e10b" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="adventures in the magic kingdom (proto).prg" size="131072" crc="f603d364" sha1="32ee6bb11aad34b751be6d3652faacbd2ec2678a" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="drfrankn">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>The Adventures of Dr. Franken (USA, Prototype)</description>
@@ -38551,6 +38566,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="janggun">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Janggun ui Adeul (Kor)</description>
+		<year>1992</year>
+		<publisher>Innovation Tech</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="DAOU-306" />
+			<dataarea name="chr" size="524288">
+				<rom name="janggun ui adeul (kor).chr" size="524288" crc="8725fea4" sha1="90db962884514639674c7b79bb3dfcb84ad4338e" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="janggun ui adeul (kor).prg" size="131072" crc="93a1aec9" sha1="9de739e5466413eb59a26e01b5693f7d055584ac" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jangou">
 		<!-- Serial:  - Release Date: 1990-08-30 - Alternative Title:  -->
 		<description>Jangou (Jpn)</description>
@@ -39054,6 +39085,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="little magic (japan).prg" size="131072" crc="9894f766" sha1="9b09eea2a64e3dad3d441c026e929645a090b372" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mermaidjp" cloneof="mermaid">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Little Mermaid: Ningyo Hime (Jpn, Prototype)</description>
+		<year>1991</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-UNROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="little mermaid - ningyo hime (prototype).prg" size="131072" crc="ebb5e666" sha1="4dff40a24173c73291fe89072e5fad895d1518b4" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -49515,6 +49562,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="kangtww">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Kang Ti Wu Wang (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-AOROM" />
+			<dataarea name="prg" size="262144">
+				<rom name="kang ti wu wang (ch) [!].prg" size="262144" crc="fce4f585" sha1="f56d9e055315091c65826e47c2f6c92a0e5b2aa7" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2socdanc">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Super 2 in 1 (Asia, Hacked)</description>
@@ -51385,6 +51448,22 @@ from the NEStopia source, hence they would require confirmation. -->
 			<feature name="pcb" value="NES-AOROM" />
 			<dataarea name="prg" size="524288">
 				<rom name="hot dance 2000 (unl).prg" size="524288" crc="c267e473" sha1="5e421bf414d78dbb3a5a649ba70c2c926ac921f4" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jdszs">
+		<!-- Serial: ES-1117 - Release Date:  - Alternative Title:  -->
+		<description>Ji Dou Sheng Zhan Shi (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-A" />
+			<dataarea name="prg" size="524288">
+				<rom name="ji dou sheng zhan shi (es-1117) (c).prg" size="524288" crc="bff7c60c" sha1="6b2df23fb3c21742993a9d0fd1e6584d26657e7f" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -56323,6 +56402,23 @@ Games by A.Tchudov (from Ulyanovsk)
 		</part>
 	</software>
 
+	<software name="morskoya" cloneof="morskoy">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Morskoy Boy (Rus, Alt?)</description>
+		<year>1996</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="32768">
+				<rom name="morskoy boy (russian) (a).chr" size="32768" crc="91f1c836" sha1="802bb631707112dbb8b6aeb6d7fd34015a31a9e2" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="morskoy boy (russian) (a).prg" size="32768" crc="75ed62ba" sha1="1d28e0ebe4596088b1e0ee951e683c042201e52c" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="balda">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Balda (Rus)</description>
@@ -57561,6 +57657,22 @@ Other
 		</part>
 	</software>
 
+	<software name="turtlen5" cloneof="toxiccrs">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Turtle Ninja 5 (Toxic Crusaders pirate)</description>
+		<year>199?</year>
+		<publisher>Kaiser</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="ninja turtle 5 (unl).chr" size="131072" crc="3a02c92f" sha1="6f845ccc91a63ceacad51658128fffe056784e9b" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="ninja turtle 5 (unl).prg" size="131072" crc="d063309d" sha1="b92884de5d4cff6ab7f59ca6b415118f4fa36f24" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="panicrsth" cloneof="panicrst">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Panic Restaurant (Pirate)</description>
@@ -58503,6 +58615,23 @@ Other
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="super contra 2 (as) [p1][g-135].prg" size="131072" crc="a7c6bd80" sha1="f8851c2f50a4e5ad73e6a2f09c309626233167bf" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scontra2r" cloneof="probot">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Super Contra II (Rus, Contra pirate)</description>
+		<year>19??</year>
+		<publisher>Mars</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="super contra 2 (r).prg" size="131072" crc="5871d9b8" sha1="54ddd0a79806575569c5bd22a1283abace756be2" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -60583,6 +60712,23 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- FIXME: Mapper hardware for this cart is MMC3 with bit 0 of address line moved to bit 1, so it can't be played as mapper 4 -->
+	<software name="sf6b" cloneof="sf6">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Street Fighter VI  16 People (Asia, 16 characters, Alt)</description>
+		<year>1993</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="street fighter vi 16 peoples (unl) [!].chr" size="262144" crc="4a9153a9" sha1="b74a042c77666033b29d949b9c51f1e475b23fe9" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="street fighter vi 16 peoples (unl) [!].prg" size="131072" crc="f7b93e43" sha1="462780b4cbb84364a107b1b37a6a5278eefc6cbf" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sf6a" cloneof="sf6">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Street Fighter VI 12 Peoples (Asia)</description>
@@ -61281,6 +61427,38 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="1997-in-1 [p1].prg" size="131072" crc="933e718b" sha1="b0ce8fb970a6c65f75c305d16c1964e6e78cac6c" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_2jm2">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>2 in 1 (J-M2)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<dataarea name="chr" size="524288">
+				<rom name="2-in-1 j-m2 (unl)[!].chr" size="524288" crc="5ddcc731" sha1="cc2555380f2dfb46a73b64d9e1e4fec2ab3d3892" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="2-in-1 j-m2 (unl)[!].prg" size="524288" crc="a84c92c3" sha1="218dd43a52199401a8bb6dee523b54380e3ee113" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_2kin5">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>2 in 1 (King005)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
+			<dataarea name="chr" size="524288">
+				<rom name="2-in-1 king005 (unl)[!].chr" size="524288" crc="559ec915" sha1="3301376fc480db7383a3ea520be041534426287d" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="2-in-1 king005 (unl)[!].prg" size="524288" crc="2fd09d85" sha1="022bfe5c309e65d882919e711cc5fe05ee1cb6c8" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
