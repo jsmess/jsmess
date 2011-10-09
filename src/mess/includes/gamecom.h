@@ -219,6 +219,7 @@ public:
 	DECLARE_READ8_MEMBER( gamecom_pio_r );
 	DECLARE_WRITE8_MEMBER( gamecom_internal_w );
 	DECLARE_WRITE8_MEMBER( gamecom_pio_w );
+	UINT8 *m_p_nvram;
 	UINT8 *m_p_ram;
 	UINT8 *m_p_videoram;
 	UINT8 *m_cartridge1;

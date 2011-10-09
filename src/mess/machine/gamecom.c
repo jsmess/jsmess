@@ -401,14 +401,14 @@ void gamecom_handle_dma( device_t *device, int cycles )
 	case 0x04:
 		/* Extend RAM->VRAM */
 		state->m_dma.source_width = 64;
-		state->m_dma.source_bank = &state->m_p_videoram[0x4000];
+		state->m_dma.source_bank = &state->m_p_nvram[0x0000];
 		state->m_dma.dest_bank = &state->m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x06:
 		/* VRAM->Extend RAM */
 		state->m_dma.source_bank = &state->m_p_videoram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
 		state->m_dma.dest_width = 64;
-		state->m_dma.dest_bank = &state->m_p_videoram[0x4000];
+		state->m_dma.dest_bank = &state->m_p_nvram[0x0000];
 		break;
 	}
 	state->m_dma.source_current = state->m_dma.source_width * state->m_dma.source_y;
