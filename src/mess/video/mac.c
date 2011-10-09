@@ -38,8 +38,6 @@ VIDEO_START( mac )
 {
 }
 
-
-
 #define MAC_MAIN_SCREEN_BUF_OFFSET	0x5900
 #define MAC_ALT_SCREEN_BUF_OFFSET	0xD900
 
@@ -216,7 +214,7 @@ VIDEO_RESET(macrbv)
 		case 1:	// 15" portrait display
 			visarea.max_x = 640-1;
 			visarea.max_y = 870-1;
-		    	htotal = 832;
+	    	htotal = 832;
 			vtotal = 918;
 			framerate = 75.0;
 			break;
@@ -224,7 +222,7 @@ VIDEO_RESET(macrbv)
 		case 2: // 12" RGB
 			visarea.max_x = 512-1;
 			visarea.max_y = 384-1;
-		    	htotal = 640;
+	    	htotal = 640;
 			vtotal = 407;
 			framerate = 60.15;
 			break;
@@ -233,7 +231,7 @@ VIDEO_RESET(macrbv)
 		default:
 			visarea.max_x = 640-1;
 			visarea.max_y = 480-1;
-		    	htotal = 800;
+	    	htotal = 800;
 			vtotal = 525;
 			framerate = 59.94;
 			break;
@@ -476,6 +474,10 @@ SCREEN_UPDATE( macrbvvram )
 				return 0;
 			}
 			break;
+
+		case RBV_TYPE_DAFB:
+			mode = 0;
+			break;
 	}
 
 	switch (mode)
@@ -502,6 +504,28 @@ SCREEN_UPDATE( macrbvvram )
 						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<5)&0x80)];
 						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<6)&0x80)];
 						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<7)&0x80)];
+					}
+				}
+			}
+			else if (mac->m_rbv_type == RBV_TYPE_DAFB)
+			{
+				vram8 += 0x1000;
+
+				for (y = 0; y < 480; y++)
+				{
+					scanline = BITMAP_ADDR32(bitmap, y, 0);
+					for (x = 0; x < 640; x+=8)
+					{
+						pixels = vram8[(y * 256 * 4) + ((x/8)^3)];
+
+						*scanline++ = mac->m_rbv_palette[(pixels>>7)&1];
+						*scanline++ = mac->m_rbv_palette[(pixels>>6)&1];
+						*scanline++ = mac->m_rbv_palette[(pixels>>5)&1];
+						*scanline++ = mac->m_rbv_palette[(pixels>>4)&1];
+						*scanline++ = mac->m_rbv_palette[(pixels>>3)&1];
+						*scanline++ = mac->m_rbv_palette[(pixels>>2)&1];
+						*scanline++ = mac->m_rbv_palette[(pixels>>1)&1];
+						*scanline++ = mac->m_rbv_palette[(pixels&1)];
 					}
 				}
 			}
@@ -604,5 +628,170 @@ SCREEN_UPDATE( macrbvvram )
 	}
 
 	return 0;
+}
+
+// DAFB: video for Quadra 700/900
+
+static void dafb_recalc_ints(mac_state *mac)
+{
+	if (mac->m_dafb_int_status != 0)
+	{
+		mac->nubus_slot_interrupt(0xf, ASSERT_LINE);
+	}
+	else
+	{
+		mac->nubus_slot_interrupt(0xf, CLEAR_LINE);
+	}
+}
+
+static TIMER_CALLBACK(dafb_vbl_tick)
+{
+	mac_state *mac = machine.driver_data<mac_state>();
+
+	mac->m_dafb_int_status |= 1;
+	dafb_recalc_ints(mac);
+
+	mac->m_vbl_timer->adjust(mac->m_screen->time_until_pos(480, 0), 0);
+}
+
+static TIMER_CALLBACK(dafb_cursor_tick)
+{
+	mac_state *mac = machine.driver_data<mac_state>();
+
+	mac->m_dafb_int_status |= 4;
+	dafb_recalc_ints(mac);
+
+	mac->m_cursor_timer->adjust(mac->m_screen->time_until_pos(mac->m_cursor_line, 0), 0);
+}
+
+VIDEO_START( macdafb )
+{
+	mac_state *mac = machine.driver_data<mac_state>();
+
+	mac->m_vbl_timer = machine.scheduler().timer_alloc(FUNC(dafb_vbl_tick)); 
+	mac->m_cursor_timer = machine.scheduler().timer_alloc(FUNC(dafb_cursor_tick)); 
+
+	mac->m_vbl_timer->adjust(attotime::never);
+	mac->m_cursor_timer->adjust(attotime::never);
+}
+
+VIDEO_RESET(macdafb)
+{
+	mac_state *mac = machine.driver_data<mac_state>();
+
+	mac->m_rbv_count = 0;
+	mac->m_rbv_clutoffs = 0;
+	mac->m_rbv_montype = 6;
+	mac->m_rbv_vbltime = 0;
+	mac->m_dafb_int_status = 0;
+	mac->m_rbv_type = RBV_TYPE_DAFB;
+
+	memset(mac->m_rbv_palette, 0, sizeof(mac->m_rbv_palette));
+}
+
+READ32_MEMBER(mac_state::dafb_r)
+{
+//	if (offset != 0x108/4) printf("DAFB: Read @ %x (mask %x PC=%x)\n", offset*4, mem_mask, cpu_get_pc(m_maincpu));
+
+	switch (offset<<2)
+	{
+		case 0x1c:	// monitor sense
+			return 1;	// 640x480
+			break;
+
+		case 0x108:	// IRQ/VBL status
+			return m_dafb_int_status;
+			break;
+
+		case 0x10c: // clear cursor scanline int
+			m_dafb_int_status &= ~4;
+			dafb_recalc_ints(this);
+			break;
+
+		case 0x114: // clear VBL int
+			m_dafb_int_status &= ~1;
+			dafb_recalc_ints(this);
+			break;
+	}
+	return 0;
+}
+
+WRITE32_MEMBER(mac_state::dafb_w)
+{
+//	printf("DAFB: Write %08x @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
+
+	switch (offset<<2)
+	{
+		case 0x104:
+			if (data & 1)	// VBL enable
+			{
+				m_vbl_timer->adjust(m_screen->time_until_pos(480, 0), 0);
+			}
+			else
+			{
+				m_vbl_timer->adjust(attotime::never);
+				m_dafb_int_status &= ~1;
+				dafb_recalc_ints(this);
+			}
+
+			if (data & 2)	// aux scanline interrupt enable
+			{
+				fatalerror("DAFB: Aux scanline interrupt enable not supported!\n");
+			}
+
+			if (data & 4)	// cursor scanline interrupt enable
+			{
+				m_cursor_timer->adjust(m_screen->time_until_pos(m_cursor_line, 0), 0);
+			}
+			else
+			{
+				m_cursor_timer->adjust(attotime::never);
+				m_dafb_int_status &= ~4;
+				dafb_recalc_ints(this);
+			}
+			break;
+
+		case 0x10c: // clear cursor scanline int
+			m_dafb_int_status &= ~4;
+			dafb_recalc_ints(this);
+			break;
+
+		case 0x114: // clear VBL int
+			m_dafb_int_status &= ~1;
+			dafb_recalc_ints(this);
+			break;
+	}
+}
+
+READ32_MEMBER(mac_state::dafb_dac_r)
+{
+//	printf("DAFB: Read DAC @ %x (mask %x PC=%x)\n", offset*4, mem_mask, cpu_get_pc(m_maincpu));
+
+	return 0;
+}
+
+WRITE32_MEMBER(mac_state::dafb_dac_w)
+{
+//	printf("DAFB: Write %08x to DAC @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
+
+	switch (offset<<2)
+	{
+		case 0:
+			m_rbv_clutoffs = data & 0xff;
+			m_rbv_count = 0;
+			break;
+
+		case 0x10:
+			m_rbv_colors[m_rbv_count++] = data&0xff;
+
+			if (m_rbv_count == 3)
+			{
+				palette_set_color(space.machine(), m_rbv_clutoffs, MAKE_RGB(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
+				m_rbv_palette[m_rbv_clutoffs] = MAKE_RGB(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
+				m_rbv_clutoffs++;
+				m_rbv_count = 0;
+			}
+			break;
+	}
 }
 

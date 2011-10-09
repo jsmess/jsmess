@@ -16,6 +16,8 @@
 #include "machine/nubus.h"
 #include "sound/awacs.h"
 
+#define MAC_SCREEN_NAME "screen"
+
 /* for Egret and CUDA streaming MCU commands, command types */
 typedef enum
 {
@@ -30,7 +32,8 @@ enum
 {
 	RBV_TYPE_RBV = 0,
 	RBV_TYPE_V8,
-	RBV_TYPE_SONORA
+	RBV_TYPE_SONORA,
+    RBV_TYPE_DAFB
 };
 
 /* tells which model is being emulated (set by macxxx_init) */
@@ -145,6 +148,7 @@ DRIVER_INIT(macpb160);
 DRIVER_INIT(maciivx);
 DRIVER_INIT(maciifx);
 DRIVER_INIT(macpbduo210);
+DRIVER_INIT(macquadra700);
 
 NVRAM_HANDLER( mac );
 
@@ -162,9 +166,11 @@ PALETTE_INIT( macgsc );
 VIDEO_START( macrbv );
 VIDEO_START( macv8 );
 VIDEO_START( macsonora );
+VIDEO_START( macdafb );
 SCREEN_UPDATE( macrbv );
 SCREEN_UPDATE( macrbvvram );
 VIDEO_RESET(macrbv);
+VIDEO_RESET(macdafb);
 VIDEO_RESET(maceagle);
 VIDEO_RESET(macsonora);
 
@@ -191,7 +197,8 @@ public:
 		m_asc(*this, "asc"),
         m_awacs(*this, "awacs"),
         m_egret(*this, "egret"),
-		m_ram(*this, RAM_TAG)
+		m_ram(*this, RAM_TAG),
+        m_screen(*this, MAC_SCREEN_NAME)
 	 { }
 
 	required_device<cpu_device> m_maincpu;
@@ -201,6 +208,7 @@ public:
 	optional_device<awacs_device> m_awacs;
     optional_device<egret_device> m_egret;
 	required_device<device_t> m_ram;
+    optional_device<screen_device> m_screen;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -278,7 +286,7 @@ public:
 
 	// Portable/PB100 Power Manager IC comms (chapter 4, "Guide to the Macintosh Family Hardware", second edition)
 	UINT8 m_pm_data_send, m_pm_data_recv, m_pm_ack, m_pm_req, m_pm_cmd[32], m_pm_out[32], m_pm_dptr, m_pm_sptr, m_pm_slen, m_pm_state;
-    UINT8 m_pmu_int_status, m_pmu_last_adb_command;
+    UINT8 m_pmu_int_status, m_pmu_last_adb_command, m_pmu_poll;
 	emu_timer *m_pmu_send_timer;
 
 	// 60.15 Hz timer for RBV/V8/Sonora/Eagle/VASP/etc.
@@ -289,6 +297,9 @@ public:
 	UINT32 m_rbv_colors[3], m_rbv_count, m_rbv_clutoffs, m_rbv_immed10wr;
 	UINT32 m_rbv_palette[256];
 	UINT8 m_sonora_vctl[8];
+    emu_timer *m_vbl_timer, *m_cursor_timer;
+    UINT16 m_cursor_line;
+    UINT16 m_dafb_int_status;
 
     // this is shared among all video setups with vram
 	UINT32 *m_vram;
@@ -363,6 +374,14 @@ public:
 
     DECLARE_READ8_MEMBER(mac_gsc_r);
     DECLARE_WRITE8_MEMBER(mac_gsc_w);
+
+    DECLARE_READ8_MEMBER(mac_5396_r);
+    DECLARE_WRITE8_MEMBER(mac_5396_w);
+
+    DECLARE_READ32_MEMBER(dafb_r);
+    DECLARE_WRITE32_MEMBER(dafb_w);
+    DECLARE_READ32_MEMBER(dafb_dac_r);
+    DECLARE_WRITE32_MEMBER(dafb_dac_w);
 
     DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
     DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
