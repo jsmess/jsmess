@@ -26061,6 +26061,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="nemo" cloneof="jpond">
+		<description>Finding Nemo (Rus)</description>
+		<year>199?</year>
+		<publisher>Glorysun</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="655360">
+				<rom name="finding nemo.bin" size="655360" crc="89b92f66" sha1="8b686c66e0abfbf233c9014d17fd0bbcb240bf91" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fastfur5" cloneof="combatca">
 	<!-- Alt. Title: Форсаж 5 Быстрая -->
 		<description>Forsazh 5 Bystraya ~ Fast and the Furious 5 Quick (Rus)</description>
