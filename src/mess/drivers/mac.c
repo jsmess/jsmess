@@ -44,6 +44,7 @@
 #include "cpu/m6805/m6805.h"
 #include "machine/6522via.h"
 #include "machine/ncr5380.h"
+#include "machine/am53cf96.h"
 #include "machine/applefdc.h"
 #include "devices/sonydriv.h"
 #include "imagedev/harddriv.h"
@@ -552,6 +553,16 @@ WRITE8_MEMBER(mac_state::mac_gsc_w)
 {
 }
 
+READ8_MEMBER(mac_state::mac_5396_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(mac_state::mac_5396_w)
+{
+//	printf("%02x to 5396 @ %x\n", data, offset);
+}
+
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
@@ -738,7 +749,7 @@ static ADDRESS_MAP_START(macpb165c_map, AS_PROGRAM, 32, mac_state )
     AM_RANGE(0xfcff0000, 0xfcffffff) AM_ROM AM_REGION("bootrom", 0xf0000)
 ADDRESS_MAP_END
 */
-#if 0
+
 static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
@@ -747,15 +758,17 @@ static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
 // 50008000 = Ethernet MAC ID PROM
 // 5000a000 = Sonic (DP83932) ethernet
 // 5000f000 = SCSI cf96, 5000f402 = SCSI #2 cf96
+	AM_RANGE(0x5000f000, 0x5000f3ff) AM_READWRITE8(mac_5396_r, mac_5396_w, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x5000c000, 0x5000dfff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x5001e000, 0x5001ffff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x5001e000, 0x5001ffff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00f00000)
 
 	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
 	// f9800000 = VDAC / DAFB
 	AM_RANGE(0xf9000000, 0xf91fffff) AM_RAM	AM_BASE(m_vram)
+	AM_RANGE(0xf9800000, 0xf98001ff) AM_READWRITE(dafb_r, dafb_w)
+	AM_RANGE(0xf9800200, 0xf980023f) AM_READWRITE(dafb_dac_r, dafb_dac_w)
 ADDRESS_MAP_END
-#endif
 
 static ADDRESS_MAP_START(pwrmac_map, AS_PROGRAM, 64, mac_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	// 8 MB standard
@@ -871,7 +884,7 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP(mac512ke_map)
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.15)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -949,7 +962,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C15M)
 	MCFG_CPU_PROGRAM_MAP(macprtb_map)
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.15)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -1092,14 +1105,14 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 
 	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
-	MCFG_CPU_VBLANK_INT("screen", mac_rbv_vbl)
+	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
 
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(macv8)
 	MCFG_VIDEO_RESET(macrbv)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 	MCFG_SCREEN_SIZE(1024,768)
@@ -1130,7 +1143,7 @@ static MACHINE_CONFIG_DERIVED( maclc2, maclc )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
-	MCFG_CPU_VBLANK_INT("screen", mac_rbv_vbl)
+	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1141,12 +1154,12 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
-	MCFG_CPU_VBLANK_INT("screen", mac_rbv_vbl)
+	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
 
 	MCFG_VIDEO_START(macsonora)
 	MCFG_VIDEO_RESET(macsonora)
 
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
 	MCFG_SCREEN_UPDATE(macrbvvram)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1162,12 +1175,12 @@ static MACHINE_CONFIG_DERIVED( maciivx, maclc )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C32M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
-	MCFG_CPU_VBLANK_INT("screen", mac_rbv_vbl)
+	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
 
 	MCFG_VIDEO_START(macv8)
 	MCFG_VIDEO_RESET(macrbv)
 
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
 	MCFG_SCREEN_UPDATE(macrbvvram)
 
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
@@ -1184,12 +1197,12 @@ static MACHINE_CONFIG_DERIVED( maciivi, maclc )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
-	MCFG_CPU_VBLANK_INT("screen", mac_rbv_vbl)
+	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
 
 	MCFG_VIDEO_START(macv8)
 	MCFG_VIDEO_RESET(macrbv)
 
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
 	MCFG_SCREEN_UPDATE(macrbvvram)
 
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
@@ -1225,7 +1238,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 
     /* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.15)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1275,7 +1288,7 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 
     /* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.15)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1345,7 +1358,7 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 
     /* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.15)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1414,7 +1427,7 @@ static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 	MCFG_VIDEO_START(macv8)
 	MCFG_VIDEO_RESET(maceagle)
 
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
 	MCFG_SCREEN_SIZE(MAC_H_TOTAL, MAC_V_TOTAL)
 	MCFG_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
 	MCFG_SCREEN_UPDATE(macrbv)
@@ -1432,7 +1445,7 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
-	MCFG_CPU_VBLANK_INT("screen", mac_rbv_vbl)
+	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
 
 	MCFG_PALETTE_LENGTH(256)
 
@@ -1444,7 +1457,7 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 	MCFG_VIDEO_START(macrbv)
 	MCFG_VIDEO_RESET(macrbv)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 	MCFG_SCREEN_SIZE(640, 870)
@@ -1461,7 +1474,7 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
-	MCFG_CPU_VBLANK_INT("screen", mac_rbv_vbl)
+	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
 
 	MCFG_PALETTE_LENGTH(256)
 
@@ -1476,7 +1489,7 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_VIDEO_START(macrbv)
 	MCFG_VIDEO_RESET(macrbv)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 	MCFG_SCREEN_SIZE(640, 870)
@@ -1498,7 +1511,7 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_CPU_PROGRAM_MAP(pwrmac_map)
 
     /* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1541,18 +1554,26 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_RAM_DEFAULT_SIZE("8M")
 	MCFG_RAM_EXTRA_OPTIONS("16M,32M,64M,128M")
 MACHINE_CONFIG_END
-#if 0
-static MACHINE_CONFIG_START( macqd700, mac_state )
 
+static MACHINE_CONFIG_START( macqd700, mac_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(quadra700_map)
+
+	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(macrbvvram)
+
+	MCFG_VIDEO_START(macdafb)
+	MCFG_VIDEO_RESET(macdafb)
 
 	MCFG_PALETTE_LENGTH(256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, mac_asc_irq)
+	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_EASC, mac_asc_irq)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1561,14 +1582,8 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 
 	/* devices */
 	MCFG_NUBUS_BUS_ADD("nubus", "maincpu", nubus_intf)
-	MCFG_NUBUS_SLOT_ADD("nubus","nb9", mac_nubus_cards, "cb264", NULL)
-	MCFG_NUBUS_SLOT_ADD("nubus","nba", mac_nubus_cards, NULL, NULL)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbb", mac_nubus_cards, NULL, NULL)
-	MCFG_NUBUS_SLOT_ADD("nubus","nbc", mac_nubus_cards, NULL, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL, NULL)
-
-	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1585,9 +1600,9 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,32M,64M,96M,128M,160M,192M,256M")
+	MCFG_RAM_EXTRA_OPTIONS("8M,20M,36M,68M")	// QD700 has 4M on board and can take 4M, 8M, 16M, or 32M SIMMs
 MACHINE_CONFIG_END
-#endif
+
 static INPUT_PORTS_START( macplus )
 	PORT_START("MOUSE0") /* Mouse - button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
@@ -2016,12 +2031,12 @@ ROM_START( macpb170 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) )
 ROM_END
-#if 0
+
 ROM_START( macqd700 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) )
 ROM_END
-#endif
+
 ROM_START( macpb160 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "e33b2724.rom", 0x000000, 0x100000, CRC(536c60f4) SHA1(c0510682ae6d973652d7e17f3c3b27629c47afac) )
@@ -2059,7 +2074,7 @@ COMP( 1990, maciisi,  0,		0,	maciisi,  maciici,  maciisi,	  "Apple Computer", "M
 COMP( 1991, macpb100, 0,        0,  macprtb,  macadb,   macprtb,	  "Apple Computer", "Macintosh PowerBook 100", GAME_NOT_WORKING )
 COMP( 1991, macpb140, 0,        0,  macpb140, macadb,   macpb140,	  "Apple Computer", "Macintosh PowerBook 140", GAME_NOT_WORKING )
 COMP( 1991, macpb170, macpb140, 0,  macpb170, macadb,   macpb140,	  "Apple Computer", "Macintosh PowerBook 170", GAME_NOT_WORKING )
-//COMP( 1991, macqd700, macpb140, 0,  macqd700, macadb,   macquadra700, "Apple Computer", "Macintosh Quadra 700", GAME_NOT_WORKING )
+COMP( 1991, macqd700, macpb140, 0,  macqd700, macadb,   macquadra700, "Apple Computer", "Macintosh Quadra 700", GAME_NOT_WORKING )
 COMP( 1991, macclas2, 0,		0,	macclas2, macadb,   macclassic2,  "Apple Computer", "Macintosh Classic II",  GAME_NOT_WORKING )
 COMP( 1991, maclc2,   0,		0,	maclc2,   maciici,  maclc2,	      "Apple Computer", "Macintosh LC II",  GAME_NOT_WORKING )
 COMP( 1992, macpb145, macpb140, 0,  macpb145, macadb,   macpb140,	  "Apple Computer", "Macintosh PowerBook 145", GAME_NOT_WORKING )

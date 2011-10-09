@@ -60,8 +60,8 @@
         - Call the RTC timer
 
      Egret version spotting:
-     341S0850 - 0x???? (?.??) - LC, LC II
-     341S0851 - 0x0101 (1.01) - Classic II, IIsi, IIvx, LC III (probably also IIvi?)
+     341S0850 - 0x???? (1.01, earlier) - LC, LC II
+     341S0851 - 0x0101 (1.01, later) - Classic II, IIsi, IIvx/IIvi, LC III
      344S0100 - 0x0100 (1.00) - Some (early production?) IIsi
 
      Cuda version spotting:
@@ -88,18 +88,21 @@
 #include "machine/applefdc.h"
 #include "devices/sonydriv.h"
 #include "machine/ncr5380.h"
+#include "machine/am53cf96.h"
 #include "sound/asc.h"
 #include "includes/mac.h"
 #include "debug/debugcpu.h"
 #include "machine/ram.h"
 #include "debugger.h"
 
-#define ADB_IS_BITBANG	((mac->m_model == MODEL_MAC_SE || mac->m_model == MODEL_MAC_CLASSIC) || (mac->m_model >= MODEL_MAC_II && mac->m_model <= MODEL_MAC_IICI) || (mac->m_model == MODEL_MAC_SE30))
-#define ADB_IS_BITBANG_CLASS	((m_model == MODEL_MAC_SE || m_model == MODEL_MAC_CLASSIC) || (m_model >= MODEL_MAC_II && m_model <= MODEL_MAC_IICI) || (m_model == MODEL_MAC_SE30))
+#define ADB_IS_BITBANG	((mac->m_model == MODEL_MAC_SE || mac->m_model == MODEL_MAC_CLASSIC) || (mac->m_model >= MODEL_MAC_II && mac->m_model <= MODEL_MAC_IICI) || (mac->m_model == MODEL_MAC_SE30) || (mac->m_model == MODEL_MAC_QUADRA_700))
+#define ADB_IS_BITBANG_CLASS	((m_model == MODEL_MAC_SE || m_model == MODEL_MAC_CLASSIC) || (m_model >= MODEL_MAC_II && m_model <= MODEL_MAC_IICI) || (m_model == MODEL_MAC_SE30) || (m_model == MODEL_MAC_QUADRA_700))
 #define ADB_IS_EGRET	(mac->m_model >= MODEL_MAC_LC && mac->m_model <= MODEL_MAC_CLASSIC_II) || ((mac->m_model >= MODEL_MAC_IISI) && (mac->m_model <= MODEL_MAC_IIVI))
 #define ADB_IS_PM	((mac->m_model >= MODEL_MAC_PORTABLE && mac->m_model <= MODEL_MAC_PB100) || (mac->m_model >= MODEL_MAC_PB140 && mac->m_model <= MODEL_MAC_PBDUO_270c))
 #define ADB_IS_PM_VIA1	(mac->m_model >= MODEL_MAC_PORTABLE && mac->m_model <= MODEL_MAC_PB100)
 #define ADB_IS_PM_VIA2	(mac->m_model >= MODEL_MAC_PB140 && mac->m_model <= MODEL_MAC_PBDUO_270c)
+#define ADB_IS_PM_VIA1_CLASS	(m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100)
+#define ADB_IS_PM_VIA2_CLASS	(m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c)
 #define ADB_IS_PM_CLASS	((m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100) || (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c))
 
 #define AUDIO_IS_CLASSIC (mac->m_model <= MODEL_MAC_CLASSIC)
@@ -125,6 +128,7 @@
 
 #define LOG_ADB			0
 #define LOG_ADB_MCU_CMD		0
+#define LOG_ADB_TALK_LISTEN 0
 
 // ADB states
 #define ADB_STATE_NEW_COMMAND	(0)
@@ -1078,13 +1082,13 @@ WRITE16_MEMBER ( mac_state::macii_scsi_w )
 
 void mac_scsi_irq(running_machine &machine, int state)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
+/*	mac_state *mac = machine.driver_data<mac_state>();
 
 	if ((mac->m_scsiirq_enable) && ((mac->m_model == MODEL_MAC_SE) || (mac->m_model == MODEL_MAC_CLASSIC)))
 	{
 		mac->m_scsi_interrupt = state;
 		mac->field_interrupts();
-	}
+	}*/
 }
 
 /* *************************************************************************
@@ -1531,7 +1535,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	result = applefdc_r(fdc, (offset >> 8));
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, cpu_get_pc(&space.device()));
+		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, cpu_get_pc(m_maincpu));
 
 	return (result << 8) | result;
 }
@@ -1541,7 +1545,7 @@ WRITE16_MEMBER ( mac_state::mac_iwm_w )
 	device_t *fdc = space.machine().device("fdc");
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, cpu_get_pc(&space.device()));
+		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, cpu_get_pc(m_maincpu));
 
 	if (ACCESSING_BITS_0_7)
 		applefdc_w(fdc, (offset >> 8), data & 0xff);
@@ -1769,7 +1773,7 @@ void mac_state::adb_talk()
 				switch (reg)
 				{
 					case ADB_CMD_RESET:
-						#if LOG_ADB
+						#if LOG_ADB || LOG_ADB_TALK_LISTEN
 						printf("ADB RESET: reg %x address %x\n", reg, addr);
 						#endif
 						m_adb_direction = 0;
@@ -1777,7 +1781,7 @@ void mac_state::adb_talk()
 						break;
 
 					case ADB_CMD_FLUSH:
-						#if LOG_ADB
+						#if LOG_ADB || LOG_ADB_TALK_LISTEN
 						printf("ADB FLUSH: reg %x address %x\n", reg, addr);
 						#endif
 
@@ -1791,7 +1795,7 @@ void mac_state::adb_talk()
 				break;
 
 			case 2:	// listen
-				#if LOG_ADB
+				#if LOG_ADB || LOG_ADB_TALK_LISTEN
 				printf("ADB LISTEN: reg %x address %x\n", reg, addr);
 				#endif
 
@@ -1802,7 +1806,7 @@ void mac_state::adb_talk()
 				break;
 
 			case 3: // talk
-				#if LOG_ADB
+				#if LOG_ADB || LOG_ADB_TALK_LISTEN
 				printf("ADB TALK: reg %x address %x\n", reg, addr);
 				#endif
 
@@ -1814,7 +1818,7 @@ void mac_state::adb_talk()
 				{
 					UINT8 mouseX, mouseY;
 
-					#if LOG_ADB
+					#if LOG_ADB || LOG_ADB_TALK_LISTEN
 					printf("Talking to mouse, register %x\n", reg);
 					#endif
 
@@ -1852,7 +1856,7 @@ void mac_state::adb_talk()
 				}
 				else if (addr == m_adb_keybaddr)
 				{
-					#if LOG_ADB
+					#if LOG_ADB || LOG_ADB_TALK_LISTEN
 					printf("Talking to keyboard, register %x\n", reg);
 					#endif
 
@@ -1897,8 +1901,8 @@ void mac_state::adb_talk()
 				}
 				else
 				{
-					#if LOG_ADB
-					printf("ADB: talking to unconnected device\n");
+					#if LOG_ADB || LOG_ADB_TALK_LISTEN
+					printf("ADB: talking to unconnected device %d (K %d M %d)\n", addr, m_adb_keybaddr, m_adb_mouseaddr);
 					#endif
 					m_adb_buffer[0] = m_adb_buffer[1] = 0;
 					m_adb_datasize = 0;
@@ -1910,7 +1914,7 @@ void mac_state::adb_talk()
 	}
 	else
 	{
-		#if LOG_ADB
+		#if LOG_ADB || LOG_ADB_TALK_LISTEN
 		printf("Got LISTEN data %x for device %x reg %x\n", m_adb_command, m_adb_listenaddr, m_adb_listenreg);
 		#endif
 
@@ -1918,7 +1922,7 @@ void mac_state::adb_talk()
 		{
 			if ((m_adb_listenreg == 3) && (m_adb_command > 0) && (m_adb_command < 16))
 			{
-				#if LOG_ADB
+				#if LOG_ADB || LOG_ADB_TALK_LISTEN
 				printf("MOUSE: moving to address %x\n", m_adb_command);
 				#endif
 				m_adb_mouseaddr = m_adb_command&0x0f;
@@ -1928,7 +1932,7 @@ void mac_state::adb_talk()
 		{
 			if ((m_adb_listenreg == 3) && (m_adb_command > 0) && (m_adb_command < 16))
 			{
-				#if LOG_ADB
+				#if LOG_ADB || LOG_ADB_TALK_LISTEN
 				printf("KEYBOARD: moving to address %x\n", m_adb_command);
 				#endif
 				m_adb_keybaddr = m_adb_command&0x0f;
@@ -2118,43 +2122,41 @@ static void pmu_exec(mac_state *mac)
 			break;
 
 		case 0x20:	// send ADB command (PMU must issue an IRQ on completion)
-			#if 0
-			printf("PMU: Send ADB %02x %02x cmd %02x flag %02x data %02x\n",
-				   mac->m_pm_cmd[0],
-				   mac->m_pm_cmd[1],
-				   mac->m_pm_cmd[2],
-				   mac->m_pm_cmd[3],
-				   mac->m_pm_cmd[4]);
+			#if 1
+			printf("PMU: Send ADB %02x %02x cmd %02x flag %02x data %02x %02x\n",
+				   mac->m_pm_cmd[0],	// 0x20
+				   mac->m_pm_cmd[1],	// ???
+				   mac->m_pm_cmd[2],	// adb flags (2 for autopoll active, 3 to reset bus?) 
+				   mac->m_pm_cmd[3],	// length of ADB data
+				   mac->m_pm_cmd[4],	// adb data
+				   mac->m_pm_cmd[5]);
 			#endif
 
-			if (((mac->m_pm_cmd[2] == 0xfc) || (mac->m_pm_cmd[2] == 0x2c)) && (mac->m_pm_cmd[3] == 4))
+			mac->m_pm_state = 10;
+			mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
+			if (ADB_IS_PM_VIA1)
 			{
-//              printf("PMU: request to poll ADB, returning nothing\n");
-				mac->m_pm_slen = 0;
-				mac->m_pmu_int_status = 0;
+				mac->m_pmu_int_status = 0x1;
+			}
+			else if (ADB_IS_PM_VIA2)
+			{
+				mac->m_pmu_int_status = 0x10;
 			}
 			else
 			{
-				mac->m_pm_state = 10;
-				mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-				if (ADB_IS_PM_VIA1)
-				{
-					mac->m_pmu_int_status = 0x1;
-				}
-				else if (ADB_IS_PM_VIA2)
-				{
-					mac->m_pmu_int_status = 0x10;
-				}
-				else
-				{
-					fatalerror("mac: unknown ADB PMU type\n");
-				}
-				mac->m_pmu_last_adb_command = mac->m_pm_cmd[2];
+				fatalerror("mac: unknown ADB PMU type\n");
 			}
-
+			mac->m_pmu_last_adb_command = mac->m_pm_cmd[2];
 			mac->m_adb_command = mac->m_pm_cmd[2];
 			mac->m_adb_waiting_cmd = 1;
 			mac->adb_talk();
+
+			if ((mac->m_pm_cmd[2] & 0xf) == 0xb)	// LISTEN register 3 (remap)
+			{
+				mac->m_adb_waiting_cmd = 0;
+				mac->m_adb_command = mac->m_pm_cmd[5];
+				mac->adb_talk();
+			}
 			break;
 
 		case 0x21:	// turn ADB auto-poll off (does this need a reply?)
@@ -2165,7 +2167,7 @@ static void pmu_exec(mac_state *mac)
 			{
 				mac->m_pm_out[0] = mac->m_pm_out[1] = 3 + mac->m_adb_datasize;
 				mac->m_pm_out[2] = 0;
-				mac->m_pm_out[3] = 0;
+				mac->m_pm_out[3] = mac->m_pmu_last_adb_command;
 				mac->m_pm_out[4] = mac->m_adb_datasize;
 				for (int i = 0; i < mac->m_adb_datasize; i++)
 				{
@@ -2177,11 +2179,17 @@ static void pmu_exec(mac_state *mac)
 			{
 				mac->m_pm_out[0] = mac->m_pm_out[1] = 4;
 				mac->m_pm_out[2] = 0;
-				mac->m_pm_out[3] = 0;
+				mac->m_pm_out[3] = mac->m_pmu_last_adb_command;
 				mac->m_pm_out[4] = 1;	// length of following data
 				mac->m_pm_out[5] = 0;
 				mac->m_pm_slen = 6;
 			}
+			printf("ADB packet: ");
+			for (int i = 0; i < mac->m_pm_slen; i++)
+			{
+				printf("%02x ", mac->m_pm_out[i]);
+			}
+			printf("\n");
 			mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1000)));
 			break;
 
@@ -2287,12 +2295,34 @@ static void pmu_exec(mac_state *mac)
 			{
 				if ((mac->m_pmu_int_status&0xf0) == 0x10)
 				{
-					mac->m_pm_out[0] = mac->m_pm_out[1] = 2;
-					mac->m_pm_out[2] = mac->m_pmu_int_status; // ADB status in low nibble
-					mac->m_pm_out[3] = mac->m_pmu_last_adb_command;		  // ADB command that was sent OR 0x80 for extra error-ness
-					mac->m_pm_out[4] = 0;							  // return data
-					mac->m_pm_slen = 4;
-					mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1500)));
+					if (mac->m_adb_datasize > 0)
+					{
+						mac->m_pm_out[0] = mac->m_pm_out[1] = 2 + mac->m_adb_datasize;
+						mac->m_pm_out[2] = mac->m_pmu_int_status; // ADB status in low nibble
+						mac->m_pm_out[3] = mac->m_pmu_last_adb_command;		  // ADB command that was sent
+						for (int i = 0; i < mac->m_adb_datasize; i++)
+						{
+							mac->m_pm_out[4+i] = mac->m_adb_buffer[i];
+						}
+						mac->m_pm_slen = 4 + mac->m_adb_datasize;
+						mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1500)));
+
+						printf("ADB packet: ");
+						for (int i = 0; i < mac->m_pm_slen; i++)
+						{
+							printf("%02x ", mac->m_pm_out[i]);
+						}
+						printf("\n");
+					}
+					else
+					{
+						mac->m_pm_out[0] = mac->m_pm_out[1] = 2;
+						mac->m_pm_out[2] = mac->m_pmu_int_status; // ADB status in low nibble
+						mac->m_pm_out[3] = mac->m_pmu_last_adb_command;		  // ADB command that was sent OR 0x80 for extra error-ness
+						mac->m_pm_out[4] = 0;							  // return data
+						mac->m_pm_slen = 4;
+						mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1500)));
+					}
 				}
 				else
 				{
@@ -2356,7 +2386,7 @@ static void pmu_exec(mac_state *mac)
 
 void mac_state::adb_vblank()
 {
-	if (m_adb_state == ADB_STATE_IDLE) //|| (ADB_IS_PM_CLASS))
+	if ((m_adb_state == ADB_STATE_IDLE) || ((ADB_IS_PM_CLASS) && (m_pmu_poll)))
 	{
 		if (this->adb_pollmouse())
 		{
@@ -2377,7 +2407,14 @@ void mac_state::adb_vblank()
 				this->adb_talk();
 				m_pm_state = 10;
 				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
-				m_pmu_int_status = 0x1;
+				if (ADB_IS_PM_VIA1_CLASS)
+				{
+					m_pmu_int_status = 0x1;
+				}
+				else if (ADB_IS_PM_VIA2_CLASS)
+				{
+					m_pmu_int_status = 0x10;
+				}
 			}
 			else
 			{
@@ -2432,6 +2469,7 @@ void mac_state::adb_reset()
 	m_adb_waiting_cmd = 0;
 	m_adb_streaming = MCU_STREAMING_NONE;
 	m_adb_state = 0;
+	m_pmu_poll = 0;
 	if (ADB_IS_BITBANG_CLASS)
 	{
 		m_adb_state = ADB_STATE_NOTINIT;
@@ -2799,6 +2837,8 @@ WRITE16_MEMBER ( mac_state::mac_via_w )
 	if (LOG_VIA)
 		logerror("mac_via_w: offset=0x%02x data=0x%08x\n", offset, data);
 
+	if (ACCESSING_BITS_0_7)
+		m_via1->write(space, offset, data & 0xff);
 	if (ACCESSING_BITS_8_15)
 		m_via1->write(space, offset, (data >> 8) & 0xff);
 
@@ -2824,7 +2864,7 @@ READ16_MEMBER ( mac_state::mac_via2_r )
 
 	data = m_via2->read(space, offset);
 
-  if (LOG_VIA)
+	if (LOG_VIA)
 		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, cpu_get_pc(space.machine().device("maincpu")));
 
 	return (data & 0xff) | (data << 8);
@@ -2835,9 +2875,11 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 	offset >>= 8;
 	offset &= 0x0f;
 
-  if (LOG_VIA)
-		logerror("mac_via2_w: offset=%x data=0x%08x (PC=%x)\n", offset, data, cpu_get_pc(space.machine().device("maincpu")));
+	if (LOG_VIA)
+		logerror("mac_via2_w: offset=%x data=0x%08x mask=%x (PC=%x)\n", offset, data, mem_mask, cpu_get_pc(space.machine().device("maincpu")));
 
+	if (ACCESSING_BITS_0_7)
+		m_via2->write(space, offset, data & 0xff);
 	if (ACCESSING_BITS_8_15)
 		m_via2->write(space, offset, (data >> 8) & 0xff);
 }
@@ -2845,16 +2887,20 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 
 static READ8_DEVICE_HANDLER(mac_via2_in_a)
 {
-	UINT8 result = 0xc0;
+	UINT8 result;
 	mac_state *mac = device->machine().driver_data<mac_state>();
 
 	if (ADB_IS_PM_VIA2)
 	{
 		result = mac->m_pm_data_recv;
 	}
+	else if ((mac->m_model == MODEL_MAC_QUADRA_700) || (mac->m_model == MODEL_MAC_QUADRA_900) || (mac->m_model == MODEL_MAC_QUADRA_950))
+	{
+		result = 0x80 | mac->m_nubus_irq_state;                                                                                                    
+	}
 	else
 	{
-		result |= mac->m_nubus_irq_state;
+		result = 0xc0 | mac->m_nubus_irq_state;
 	}
 
 	return result;
@@ -3242,7 +3288,7 @@ static void mac_driver_init(running_machine &machine, model_t model)
 
 	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) ||
 	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((mac->m_model >= MODEL_MAC_II) && (mac->m_model <= MODEL_MAC_SE30)) ||
-	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100) || (model == MODEL_MAC_PB140) || (model == MODEL_MAC_PB160) || (model == MODEL_MAC_PBDUO_210))
+	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100) || (model == MODEL_MAC_PB140) || (model == MODEL_MAC_PB160) || (model == MODEL_MAC_PBDUO_210) || (mac->m_model >= MODEL_MAC_QUADRA_700 && mac->m_model <= MODEL_MAC_QUADRA_800))
 	{
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(overlay_opbaseoverride), &machine));
 	}
@@ -3288,6 +3334,31 @@ MAC_DRIVER_INIT(maciivx, MODEL_MAC_IIVX)
 MAC_DRIVER_INIT(maciifx, MODEL_MAC_IIFX)
 MAC_DRIVER_INIT(macpbduo210, MODEL_MAC_PBDUO_210)
 
+static void scsi96_irq(running_machine &machine)
+{
+}
+
+static const SCSIConfigTable dev_table =
+{
+	2,                                      /* 2 SCSI devices */
+	{
+	 { SCSI_ID_6, "harddisk1", SCSI_DEVICE_HARDDISK },  /* SCSI ID 6, using disk1, and it's a harddisk */
+	 { SCSI_ID_5, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 5, using disk2, and it's a harddisk */
+	}
+};
+
+static const struct AM53CF96interface scsi_intf =
+{
+	&dev_table,		/* SCSI device table */
+	&scsi96_irq,   	/* command completion IRQ */
+};
+
+DRIVER_INIT(macquadra700)
+{
+	mac_driver_init(machine, MODEL_MAC_QUADRA_700);
+	am53cf96_init(machine, &scsi_intf);
+}
+
 // make the appletalk init fail instead of hanging on the II FDHD/IIx/IIcx/SE30 ROM
 static void patch_appletalk_iix(running_machine &machine)
 {
@@ -3318,8 +3389,15 @@ DRIVER_INIT(maciix)
 
 void mac_state::nubus_slot_interrupt(UINT8 slot, UINT32 state)
 {
-	static const UINT8 masks[6] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20 };
+	static const UINT8 masks[8] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80 };
 	mac_state *mac = machine().driver_data<mac_state>();
+	UINT8 mask = 0x3f;
+
+	// quadra 700/900/950 use the top 2 bits of the interrupt register for ethernet and video
+	if ((mac->m_model == MODEL_MAC_QUADRA_700) || (mac->m_model == MODEL_MAC_QUADRA_900) || (mac->m_model == MODEL_MAC_QUADRA_950))
+	{
+		mask = 0xff;
+	}
 
 	slot -= 9;
 
@@ -3334,14 +3412,13 @@ void mac_state::nubus_slot_interrupt(UINT8 slot, UINT32 state)
 
 	if (mac->m_model != MODEL_MAC_IIFX)
 	{
-		if ((mac->m_nubus_irq_state & 0x3f) != 0x3f)
+		if ((mac->m_nubus_irq_state & mask) != mask)
 		{
 			// HACK: sometimes we miss an ack (possible misbehavior in the VIA?)
 			if (m_via2->read_ca1() == 0)
 			{
 				m_via2->write_ca1(1);
 			}
-
 			m_via2->write_ca1(0);
 		}
 		else
@@ -3376,7 +3453,7 @@ void mac_state::vblank_irq()
 	}
 
 	/* signal VBlank on CA1 input on the VIA */
-	if ((m_model < MODEL_MAC_II) || (m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160))
+	if ((m_model < MODEL_MAC_II) || (m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160) || (m_model == MODEL_MAC_QUADRA_700))
 	{
 		ca1_data ^= 1;
 		m_via1->write_ca1(ca1_data);
