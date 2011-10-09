@@ -460,7 +460,7 @@
 	</software>
 
 	<software name="advisln2">
-		<!-- Serial: NES-V7 (AUS/SCN/ESP) - Release Date: 1992 -->
+		<!-- Serial: NES-V7 (AUS/SCN/ESP/NOE) - Release Date: 1992 -->
 		<description>The Adventure Island II (Euro)</description>
 		<year>1992</year>
 		<publisher>Hudson Soft</publisher>
@@ -751,7 +751,7 @@
 	</software>
 
 	<software name="radgrav">
-		<!-- Serial: NES-2A-EEC - Release Date: 1991-05-30 -->
+		<!-- Serial: NES-2A (EEC/ESP) - Release Date: 1991-05-30 -->
 		<description>The Adventures of Rad Gravity (Euro)</description>
 		<year>1991</year>
 		<publisher>Activision</publisher>
@@ -848,6 +848,26 @@
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airfortr">
+		<!-- Serial: NES-AI (EEC/AUS) - Release Date: 1989 -->
+		<description>Air Fortress (Euro)</description>
+		<year>1989</year>
+		<publisher>HAL Laboratory</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SJROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-ai-0 prg" size="131072" crc="991cbdf2" sha1="90c08d541f02c1dc84ea8b2662c8e13fdc01fabd" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="nes-ai-0 chr" size="32768" crc="3eebd9c5" sha1="b251da152c56053bf9d8e87d63ef8192ae391245" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -1135,7 +1155,7 @@
 	</software>
 
 	<software name="alien3" supported="partial">
-		<!-- Serial: NES-X3 (FRA/NOE) - Release Date: 1993 -->
+		<!-- Serial: NES-X3 (FRA/NOE) - Release Date: 1993-03-03 -->
 		<description>Alien³ (Euro)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
@@ -1215,6 +1235,26 @@
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ameridai">
+		<!-- Serial: HCT-AQ (002) - Release Date: 1988-10-28 - Alternative Title: アメリカ大統領選挙 -->
+		<description>America Daitouryou Senkyo (Jpn)</description>
+		<year>1988</year>
+		<publisher>Hector</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SKROM" />
+			<feature name="mmc1_type" value="MMC1A" />
+			<dataarea name="prg" size="131072">
+				<rom name="hct-aq-0 prg" size="131072" crc="7831b2ff" sha1="84aa44d3db0495a1a5cf6c24a16508ffe4999829" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="hct-aq-0 chr" size="131072" crc="719d68d2" sha1="2582e6b2195bdf70e5334cf10cb5f4c65a97b9a9" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -1604,6 +1644,23 @@
 		</part>
 	</software>
 
+	<software name="aso" cloneof="alphamis">
+		<!-- Serial: SFX-AO - Release Date: 1986-09-03 - Alternative Title: エー エス オー -->
+		<description>ASO: Armored Scrum Object (Jpn)</description>
+		<year>1986</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-CNROM" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="0.prg" size="32768" crc="72c39b9e" sha1="0927702c291072e5367795e46a61675672630ce1" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="0.chr" size="32768" crc="a2f0d57c" sha1="f6d5c8ab5c3822b1658d020497715c85b6a20b56" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="astrofng">
 		<!-- Serial: WAV-E1-01 - Release Date: 1990-10-26 - Alternative Title: アストロファング -->
 		<description>Astro Fang: Super Machine (Jpn)</description>
@@ -1967,7 +2024,7 @@
 	</software>
 
 	<software name="baddudes">
-		<!-- Serial: NES-55-ESP - Release Date: 1990 -->
+		<!-- Serial: NES-55 (ESP/FRA) - Release Date: 1990 -->
 		<description>Bad Dudes vs. Dragon Ninja (Euro)</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
@@ -2011,6 +2068,23 @@
 			<feature name="peripheral" value="powerglove" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-bv-0 prg" size="131072" crc="1ae7b933" sha1="76d29c013cc6b09aa71875b9a458ffe92ff885f1" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gatein">
+		<!-- Serial: KAC-3F - Release Date: 1990-05-25 - Alternative Title: ゲートイン 馬券必勝学 -->
+		<description>Baken Hisshou Gaku - Gate In (Jpn)</description>
+		<year>1990</year>
+		<publisher>KAC</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SGROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="262144">
+				<rom name="kac-3f-0 prg" size="262144" crc="27c16011" sha1="780ed4c78f02001b364026649b42ef7d9104588b" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -2178,7 +2252,7 @@
 		<publisher>Victor Ongaku Sangyou</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="horizontal" />	<!-- Also found as vertical -->
 			<dataarea name="prg" size="32768">
 				<rom name="vfr-b1-0 prg" size="32768" crc="9cf17fab" sha1="73f05a931ad15639979907bc3ac4300138a7000e" offset="00000" />
 			</dataarea>
@@ -2883,6 +2957,26 @@
 		</part>
 	</software>
 
+	<software name="battlest">
+		<!-- Serial: YZW-9Y - Release Date: 1991-12-26 - Alternative Title: バトルストーム -->
+		<description>Battle Storm (Jpn)</description>
+		<year>1991</year>
+		<publisher>Yonezawa</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SKROM" />
+			<feature name="mmc1_type" value="MMC1B3" />
+			<dataarea name="prg" size="131072">
+				<rom name="yzw-9y-0 prg" size="131072" crc="88739adf" sha1="8c6dda76e8c93a48c4c101d867605cd4b222b816" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="yzw-9y-0 chr" size="131072" crc="f957a5e7" sha1="062857f1ee12b7a05a307a7678c2580d0c0d68e6" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batltank">
 		<!-- Serial: NES-9B-USA - Release Date: 1990-09 - Alternative Title: Garry Kitchen's Battle Tank (on the game box) -->
 		<description>Battle Tank (USA)</description>
@@ -3402,7 +3496,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
-			<feature name="mmc1_type" value="MMC1B3" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-a8-0 prg" size="131072" crc="629e060b" sha1="c373f24633614b4f28f9ecd0f3064333d23d44e4" offset="00000" />
 			</dataarea>
@@ -3801,6 +3895,23 @@
 		</part>
 	</software>
 
+	<software name="bluesb">
+		<!-- Serial: NES-4Z-FRG - Release Date: 1992 -->
+		<description>The Blues Brothers (Euro)</description>
+		<year>1992</year>
+		<publisher>Titus</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-4z-0 prg" size="131072" crc="e4776a2b" sha1="e0c970fc9c2cf42afba958b056e2dd5f99097ed8" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bluesbu" cloneof="bluesb">
 		<!-- Serial: NES-4Z-USA - Release Date: 1992-09 -->
 		<description>The Blues Brothers (USA)</description>
@@ -4016,7 +4127,7 @@
 	</software>
 
 	<software name="bdash">
-		<!-- Serial: NES-XB-ESP - Release Date: 1991-11-01 -->
+		<!-- Serial: NES-XB (ESP/FRG) - Release Date: 1991-11-01 -->
 		<description>Boulder Dash (Euro)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
@@ -4050,8 +4161,25 @@
 	</software>
 
 	<software name="boynblob">
-		<!-- Serial: NES-B5 (FRA/NOE) - Release Date: 1991-09-03 -->
+		<!-- Serial: NES-B5 (FRA/NOE/GBR) - Release Date: 1991-09-03 -->
 		<description>David Crane's A Boy and His Blob: Trouble on Blobolonia (Euro, Rev. A)</description>
+		<year>1991</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" /> <!-- also found with NES-SLRROM pcb -->
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="nes-b5-0 prg" size="131072" crc="ad50e497" sha1="33637a033cdf33c62742bac19d5e1d65ba0ab3f6" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="pal-b5-1 chr" size="131072" crc="35287d7b" sha1="53c0cad363daafd4f82a3da5ab7089bfe5b369da" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boynbloba" cloneof="boynblob">
+		<!-- Serial: NES-B5 (EEC/NOE) - Release Date: 1991-09-03 -->
+		<description>David Crane's A Boy and His Blob: Trouble on Blobolonia (Euro)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -4061,7 +4189,7 @@
 				<rom name="nes-b5-0 prg" size="131072" crc="ad50e497" sha1="33637a033cdf33c62742bac19d5e1d65ba0ab3f6" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="pal-b5-1 chr" size="131072" crc="35287d7b" sha1="53c0cad363daafd4f82a3da5ab7089bfe5b369da" offset="00000" />
+				<rom name="pal-b5-0 chr" size="131072" crc="10c97b29" sha1="2145f9584cdc3c34d795c39c8357515a37fd214f" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4263,7 +4391,7 @@
 	</software>
 
 	<software name="bugsbb">
-		<!-- Serial: NES-H8 (NOE/ESP) - Release Date: 1992-06-13 -->
+		<!-- Serial: NES-H8 (NOE/ESP/FRG) - Release Date: 1992-06-13 -->
 		<description>The Bugs Bunny Blowout (Euro)</description>
 		<year>1992</year>
 		<publisher>Kemco</publisher>
@@ -4598,7 +4726,7 @@
 	</software>
 
 	<software name="captplan">
-		<!-- Serial: NES-5C-SCN - Release Date: 1992-08-20 -->
+		<!-- Serial: NES-5C (NOE/SCN) - Release Date: 1992-08-20 -->
 		<description>Captain Planet and the Planeteers (Euro)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
@@ -4692,6 +4820,23 @@
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="tcf-t6-0 chr" size="131072" crc="c38aef75" sha1="4f69cd893d66502bff27ff1d40c7b45639fc4b78" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="casinod">
+		<!-- Serial: YZW-KD - Release Date: 1993-03-19 - Alternative Title: カジノ・ダービー -->
+		<description>Casino Derby (Jpn)</description>
+		<year>1993</year>
+		<publisher>Yonezawa</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SGROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="yzw-kd-0 prg" size="131072" crc="e44001d8" sha1="a7800f88af4d5c8be68dc194acaee60c6e82d3c6" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -5231,6 +5376,40 @@
 		</part>
 	</software>
 
+	<software name="chiyonof">
+		<!-- Serial: FAC-EJ - Release Date: 1990-12-07 - Alternative Title: 千代の富士の大銀杏 -->
+		<description>Chiyonofuji no Ooichou (Jpn)</description>
+		<year>1990</year>
+		<publisher>Face</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TLROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="131072">
+				<rom name="fac-ej-0 prg" size="131072" crc="0e8cfd62" sha1="757b697b3db5bcc1dcf19b9f29686abfeaf758cd" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="fac-ej-0 chr" size="131072" crc="d6a96267" sha1="8fd2e7a79970cb5a922875e8bee8cf00147ed14c" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chipndl2">
+		<!-- Serial: NES-DV (SCN/NOE) - Release Date: 1994-09-29 -->
+		<description>Disney's Chip 'n Dale Rescue Rangers 2 (Euro)</description>
+		<year>1994</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-dv-0 prg" size="131072" crc="cce5a91f" sha1="ad0d9add5985884eb5826235c5d000a83d3806ca" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="pal-dv-0 chr" size="131072" crc="a0c30578" sha1="c49107f8280c56fc3ac72d4e8c80e20b4ed4ad58" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chipndl2u" cloneof="chipndl2">
 		<!-- Serial: NES-DV-USA - Release Date: 1994-01 -->
 		<description>Disney's Chip 'n Dale Rescue Rangers 2 (USA)</description>
@@ -5272,7 +5451,7 @@
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
-			<feature name="mmc1_type" value="MMC1B3" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-ru-0 prg" size="131072" crc="ac7a54cc" sha1="2190b1f557cbce57b23910e3fcf929c102094c25" offset="00000" />
 			</dataarea>
@@ -5422,6 +5601,23 @@
 		</part>
 	</software>
 
+	<software name="chuugoks">
+		<!-- Serial: SAN-CQ - Release Date: 1988-11-29 - Alternative Title: 中国占星術 -->
+		<description>Chuugoku Senseijutsu (Jpn)</description>
+		<year>1988</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="san-cq-0 prg" size="131072" crc="f64cb545" sha1="01c683a1e83220a9b976a541aaa9b4b5b8febcfd" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="circuscp">
 		<!-- Serial: NES-M7-USA - Release Date: 1990-07 -->
 		<description>Circus Caper (USA)</description>
@@ -5488,6 +5684,23 @@
 			</dataarea>
 			<dataarea name="chr" size="16384">
 				<rom name="chr-jf-05" size="16384" crc="cd06f259" sha1="162a603a71f8950bd1999060e1fa53090350f465" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="citycon">
+		<!-- Serial: NES-CI-ESP - Release Date: ? -->
+		<description>City Connection (Euro)</description>
+		<year>1988?</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-CNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="pal-ci-0 prg" size="32768" crc="bbb3de0a" sha1="aa247c87bdfa04b95921679608043b9dbd37feec" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="nes-ci-0 chr" size="32768" crc="ead78010" sha1="0529254f8a8733a69c7d136c6b8cbd6edef129a1" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5732,6 +5945,26 @@
 		</part>
 	</software>
 
+	<software name="conflictj" cloneof="conflict">
+		<!-- Serial: VIC-C3 - Release Date: 1989-12-01 - Alternative Title: コンフリクト -->
+		<description>Conflict (Jpn)</description>
+		<year>1989</year>
+		<publisher>Vic Tokai</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SKROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="vic-c3-0 prg" size="131072" crc="6a10add2" sha1="2fa75f7db7d581f332603db5c4ddeaa4f8707c22" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="vic-c3-0 chr" size="131072" crc="2fc28bea" sha1="0849f013bf9fef57f62f48a9b5705a191a3f9384" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crystalp">
 		<!-- Serial: NES-7M-USA - Release Date: 1990-11 -->
 		<description>Conquest of the Crystal Palace (USA)</description>
@@ -5827,12 +6060,13 @@
 	</software>
 
 	<software name="corvetz1">
-		<!-- Serial: NES-ZJ-ESP - Release Date: 1990 - Alternative Title:  -->
+		<!-- Serial: NES-ZJ (ESP/NOE) - Release Date: 1990 -->
 		<description>Corvette ZR-1 Challenge (Euro)</description>
 		<year>1990</year>
 		<publisher>Milton Bradley</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-zj-0 prg" size="131072" crc="07637ee4" sha1="56d7d5a44dd9a05073117d641c9709dabcca4930" offset="00000" />
 			</dataarea>
@@ -5910,6 +6144,23 @@
 			</dataarea>
 			<dataarea name="chr" size="262144">
 				<rom name="nes-9c-0 chr" size="262144" crc="8e7e135c" sha1="236792ad5707cc97f5ba64ceac4f36fd05f30664" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crackout">
+		<!-- Serial: NES-37-NOE - Release Date: 1991 -->
+		<description>CrackOut (Euro)</description>
+		<year>1991</year>
+		<publisher>Palcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-37-0 prg" size="131072" crc="81af4af9" sha1="aba26002dff0d265bc2ac27a2689924b4fe0ed81" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -6414,7 +6665,7 @@
 	</software>
 
 	<software name="daysthnd">
-		<!-- Serial: NES-YH-EEC - Release Date: 1991-04-25 -->
+		<!-- Serial: NES-YH (EEC/ESP) - Release Date: 1991-04-25 -->
 		<description>Days of Thunder (Euro)</description>
 		<year>1991</year>
 		<publisher>Mindscape</publisher>
@@ -7031,6 +7282,22 @@
 		</part>
 	</software>
 
+	<software name="dondoko2" supported="partial">
+		<!-- Serial: TFC-DDII-5900-41 - Release Date: 1992-01-31 - Alternative Title: ドンドコドン２ -->
+		<description>Don Doko Don 2 (Jpn)</description>
+		<year>1992</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="TAITO-TC0190FMC+PAL16R4" />
+			<dataarea name="prg" size="131072">
+				<rom name="d11-01" size="131072" crc="49c84b4e" sha1="ea1d369fd6ce689db1456752b1dc90fe2a4138da" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="d11-02" size="262144" crc="2e7215d0" sha1="b05fd4821fdba6b07daf8afcfb656886a6a5995e" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="donaldck" cloneof="snoopy">
 		<!-- Serial: KSC-WS - Release Date: 1988-09-22 - Alternative Title: ドナルドダック -->
 		<description>Donald Duck (Jpn)</description>
@@ -7120,7 +7387,7 @@
 	</software>
 
 	<software name="dkongcl">
-		<!-- Serial: NES-DJ-USA / NES-DJ (GBR/EEC/NOE/ESP) - Release Date: 1988-10 (USA), 1989-08 (Eur) -->
+		<!-- Serial: NES-DJ-USA / NES-DJ (GBR/EEC/NOE/ESP/UKV) - Release Date: 1988-10 (USA), 1989-08 (Eur) -->
 		<description>Donkey Kong Classics (Euro, USA)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
@@ -7433,13 +7700,13 @@
 	</software>
 
 	<software name="ddragon3">
-		<!-- Serial: NES-3W (SCN/ESP) - Release Date: 1994-11-24 -->
+		<!-- Serial: NES-3W (SCN/ESP/UKV) - Release Date: 1994-11-24 -->
 		<description>Double Dragon III: The Sacred Stones (Euro)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
-			<feature name="mmc3_type" value="MMC3C" />
+			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-3w-0 prg" size="131072" crc="c7198f2d" sha1="e8fcd54dde8468c39f52b57926cf5224da787fad" offset="00000" />
 			</dataarea>
@@ -7484,7 +7751,7 @@
 	</software>
 
 	<software name="ddribble">
-		<!-- Serial: NES-DW-EEC - Release Date: 1989-12-13 -->
+		<!-- Serial: NES-DW (EEC/FRG) - Release Date: 1989-12-13 -->
 		<description>Double Dribble (Euro)</description>
 		<year>1989</year>
 		<publisher>Konami</publisher>
@@ -7697,7 +7964,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-GNROM" />
-			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="vertical" />   <!-- Also found horizontal -->
 			<dataarea name="prg" size="131072">
 				<rom name="pal-b8-1 prg" size="131072" crc="e2ab39a2" sha1="2338059ab6dc540e59283edee65714bcd94ac188" offset="00000" />
 			</dataarea>
@@ -8110,6 +8377,23 @@
 		</part>
 	</software>
 
+	<software name="drgnunit" cloneof="castldrg">
+		<!-- Serial: ATH-ZX - Release Date: 1990-02-27 - Alternative Title: ドラゴンユニット -->
+		<description>Dragon Unit (Jpn)</description>
+		<year>1990</year>
+		<publisher>Athena</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="ath-zx-0 prg" size="131072" crc="804f898a" sha1="77b73614354ba2484da87345cf194a2844edb3e5" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dwarra" cloneof="dwarr">
 		<!-- Serial: NES-DQ-USA - Release Date: 1989-08 -->
 		<description>Dragon Warrior (USA)</description>
@@ -8301,6 +8585,23 @@
 		</part>
 	</software>
 
+	<software name="dropzone">
+		<!-- Serial: NES-D5-NOE - Release Date: 1992 -->
+		<description>Dropzone (Euro)</description>
+		<year>1992</year>
+		<publisher>Mindscape</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-CNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="pal-d5-0 prg" size="32768" crc="d21da4f7" sha1="6eef8b3df065617359dc60a302e0bc9c0cc167cc" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="pal-d5-0 chr" size="32768" crc="9e831a2f" sha1="e578afa5a4025a598991977537464b7057b4b184" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="duckhunt">
 		<!-- Serial: HVC-DH / NES-DH-USA / NES-DH (EEC/ESP) - Release Date: 1984-04-21 (JPN), 1985-10 (USA) - Alternative Title: ダックハント -->
 		<description>Duck Hunt (World)</description>
@@ -8406,7 +8707,7 @@
 	</software>
 
 	<software name="ducktale">
-		<!-- Serial: NES-UK (EEC/FRG/SCN) - Release Date: 1990-12-14 -->
+		<!-- Serial: NES-UK (EEC/FRG/SCN/NOE) - Release Date: 1990-12-14 -->
 		<description>Disney's DuckTales (Euro)</description>
 		<year>1990</year>
 		<publisher>Capcom</publisher>
@@ -8515,7 +8816,7 @@
 	</software>
 
 	<software name="dynabl">
-		<!-- Serial: NES-49-ESP - Release Date: 1991 -->
+		<!-- Serial: NES-49 (ESP/FRG) - Release Date: 1991 -->
 		<description>Dynablaster (Euro)</description>
 		<year>1991</year>
 		<publisher>Hudson Soft</publisher>
@@ -9052,23 +9353,6 @@
 		</part>
 	</software>
 
-	<software name="f15sei" cloneof="f15se">
-		<!-- Serial: NES-8F-ITA - Release Date: 1993-02-18 -->
-		<description>F-15 Strike Eagle (Ita)</description>
-		<year>1993</year>
-		<publisher>Microprose</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<feature name="mmc3_type" value="MMC3C" />
-			<dataarea name="prg" size="262144">
-				<rom name="ita-8f-0 prg" size="262144" crc="68ad57ab" sha1="ee7e9ce18f7b5742424b21bcbe819d4f918a40e1" offset="00000" />
-			</dataarea>
-			<dataarea name="chr" size="262144">
-				<rom name="ita-8f-0 chr" size="262144" crc="727f8bc3" sha1="4d07e4d97b6dc084552e751f56817201d33da278" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="f15se">
 		<!-- Serial: NES-8F-UKV - Release Date: 1992-12-13 -->
 		<description>F-15 Strike Eagle (Euro)</description>
@@ -9099,6 +9383,40 @@
 			</dataarea>
 			<dataarea name="chr" size="262144">
 				<rom name="fra-8f-0 chr" size="262144" crc="7293cecc" sha1="2c00422e93865043693c630c21e6953d28504d11" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f15seg" cloneof="f15se">
+		<!-- Serial: NES-8F-FRG - Release Date: 1993-02-18 -->
+		<description>F-15 Strike Eagle (Ger)</description>
+		<year>1993</year>
+		<publisher>Microprose</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="262144">
+				<rom name="frg-8f-0 prg" size="262144" crc="57c2e712" sha1="abc63b7d51ed5b8baf35d6b9861877c022b4c350" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="frg-8f-0 chr" size="262144" crc="74e93832" sha1="212a8bf5974fab938d8102797d6c8943b17b2579" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f15sei" cloneof="f15se">
+		<!-- Serial: NES-8F-ITA - Release Date: 1993-02-18 -->
+		<description>F-15 Strike Eagle (Ita)</description>
+		<year>1993</year>
+		<publisher>Microprose</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="262144">
+				<rom name="ita-8f-0 prg" size="262144" crc="68ad57ab" sha1="ee7e9ce18f7b5742424b21bcbe819d4f918a40e1" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="ita-8f-0 chr" size="262144" crc="727f8bc3" sha1="4d07e4d97b6dc084552e751f56817201d33da278" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9657,6 +9975,24 @@
 		</part>
 	</software>
 
+	<software name="train8ft">
+		<!-- Serial: FT-08 - Release Date: 1987-12-01 - Alternative Title: ファミリートレーナー⑧ 突撃!風雲たけし城 -->
+		<description>Family Trainer 8 - Totsugeki! Fuuun Takeshi-Jou (Jpn)</description>
+		<year>1987</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BANDAI-CNROM" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="ftrainer" />
+			<dataarea name="prg" size="32768">
+				<rom name="ba-takeshi-prg" size="32768" crc="59794f2d" sha1="06f424509451b30682362b7bc6c23d02d34ee930" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="ba-takeshi-chr" size="32768" crc="5b5a3616" sha1="9d1cf8467526eec2f89f7d82df71b467b38e19ab" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="train9f2" supported="partial">
 		<!-- Serial: FT-09 - Release Date: 1988-12-20 - Alternative Title: ファミリートレーナー⑨ 風雲たけし城二 -->
 		<description>Family Trainer 9: Totsugeki! Fuun Takeshijou 2 (Jpn)</description>
@@ -9971,7 +10307,7 @@
 	</software>
 
 	<software name="faxanadu">
-		<!-- Serial: NES-FX (EEC/FRA/ESP) - Release Date: 1990-12-28 -->
+		<!-- Serial: NES-FX (EEC/NOE/FRA/ESP/UKV) - Release Date: 1990-12-28 -->
 		<description>Faxanadu (Euro)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
@@ -10045,18 +10381,35 @@
 	</software>
 
 	<software name="ferrari">
-		<!-- Serial: NES-FG (AUS/NOE) - Release Date: 1992 -->
+		<!-- Serial: NES-FG (AUS/NOE/FRA) - Release Date: 1992 -->
 		<description>Ferrari Grand Prix Challenge (Euro)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
-			<feature name="mmc1_type" value="MMC1B3" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-fg-0 prg" size="131072" crc="8b73fb1b" sha1="55be4dc9077933c5a8b32356790b87b7a8245332" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-fg-0 chr" size="131072" crc="13d6708e" sha1="4ce95bebc9755f5b841898dc29c740495b7c6706" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ferrarij" cloneof="ferrari">
+		<!-- Serial: CDS-FS - Release Date: 1992-11-13 - Alternative Title: フェラーリ グランプリチャレンジ -->
+		<description>Ferrari Grand Prix Challenge (Jpn)</description>
+		<year>1992</year>
+		<publisher>Coconuts Japan</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SLROM" />
+			<feature name="mmc1_type" value="MMC1B3" />
+			<dataarea name="prg" size="131072">
+				<rom name="cds-fs-0 prg" size="131072" crc="1995ac4e" sha1="58e42bdbe4cd1254328f5efb67281728fca3cf1f" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="cds-fs-0 chr" size="131072" crc="ed6c25bc" sha1="ff45bcf21ed1492810bfb766a3b02c5cbb9fdb21" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10956,7 +11309,7 @@
 	</software>
 
 	<software name="galaxy5k">
-		<!-- Serial: NES-Y5-ESP - Release Date: 1992-12 -->
+		<!-- Serial: NES-Y5 (ESP/NOE) - Release Date: 1992-12 -->
 		<description>Galaxy 5000: Racing in the 51st Century (Euro)</description>
 		<year>1992</year>
 		<publisher>Activision</publisher>
@@ -11708,7 +12061,7 @@
 	</software>
 
 	<software name="goal">
-		<!-- Serial: NES-JG (UKV/ESP) - Release Date: 1991-05-09 -->
+		<!-- Serial: NES-JG (UKV/ESP/FRA) - Release Date: 1991-05-09 -->
 		<description>Goal! (Euro)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
@@ -11725,7 +12078,7 @@
 	</software>
 
 	<software name="goal2">
-		<!-- Serial: NES-GT-ESP - Release Date: 1992-11-15 -->
+		<!-- Serial: NES-GT (ESP/FRA) - Release Date: 1992-11-15 - Alt. Title: Eric Cantona Football Challenge Goal! 2 (French box and label) -->
 		<description>Goal! 2 (Euro)</description>
 		<year>1992</year>
 		<publisher>Jaleco</publisher>
@@ -11792,6 +12145,23 @@
 		</part>
 	</software>
 
+	<software name="godzilla">
+		<!-- Serial: NES-GZ-FRA - Release Date: 1990 -->
+		<description>Godzilla - Monster of Monsters! (Euro)</description>
+		<year>1990</year>
+		<publisher>Toho</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-gz-0 prg" size="131072" crc="d76a57bf" sha1="b3e772dd74b4431c56b92968ad253fe1623c730e" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nes-gz-0 chr" size="131072" crc="e5c2bc99" sha1="8e29244861a1a32c9d58bb4f6ecb2905e2556beb" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="godzillau" cloneof="godzilla">
 		<!-- Serial: NES-GZ-USA - Release Date: 1989-10 -->
 		<description>Godzilla: Monster of Monsters! (USA)</description>
@@ -11846,7 +12216,7 @@
 	</software>
 
 	<software name="golf">
-		<!-- Serial: NES-GF (EEC/ESP) - Release Date: 1986-11-15 -->
+		<!-- Serial: NES-GF (EEC/ESP/FRA) - Release Date: 1986-11-15 -->
 		<description>Golf (Euro, Rev. M)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
@@ -11960,6 +12330,23 @@
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="vic-g3-0 chr" size="131072" crc="ee14e27b" sha1="692164b41df16e024b2125763ae84005ea9a9527" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="g13icar" cloneof="g13mafat">
+		<!-- Serial: VIC-M4 - Release Date: 1990-07-27 - Alternative Title: ゴルゴ13　第二章　イカロスの謎 -->
+		<description>Golgo 13: Dai 2 Shou: Icarus no Nazo (Jpn)</description>
+		<year>1990</year>
+		<publisher>Vic Tokai</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TLROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="131072">
+				<rom name="vic-m4-0 prg" size="131072" crc="cfd0cc7b" sha1="3c8e4c7be0540ce95dae55db4998481dadc4231e" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="vic-m4-0 chr" size="131072" crc="76839850" sha1="c57c2a90fe328f5003df21752866b558e92847db" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -12154,7 +12541,7 @@
 	</software>
 
 	<software name="gradius">
-		<!-- Serial: NES-GR-EEC - Release Date: 1988-11-30 -->
+		<!-- Serial: NES-GR (EEC/NOE) - Release Date: 1988-11-30 -->
 		<description>Gradius (Euro)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
@@ -12224,6 +12611,23 @@
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="vis-5e-0 chr" size="131072" crc="80746717" sha1="7eb3ac4d25749b7d15f639dc5f225fcc5de6e1f3" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greattnk" cloneof="irontank">
+		<!-- Serial: SFX-TV - Release Date: 1988-07-01 - Alternative Title: グレートタンク -->
+		<description>Great Tank (Jpn)</description>
+		<year>1988</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SLROM" />
+			<feature name="mmc1_type" value="MMC1A" />
+			<dataarea name="prg" size="131072">
+				<rom name="sfx-tv-0 prg" size="131072" crc="3ecaa6a3" sha1="69d203f52ba1eb95c5a3b6cede728dbcdfd8d928" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="sfx-tv-0 chr" size="131072" crc="2c46d759" sha1="6308ffa4d918873a5396bee4fc4faf165b85adf8" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -12363,6 +12767,23 @@
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gwar">
+		<!-- Serial: NES-GW-AUS - Release Date: 1989 -->
+		<description>Guerrilla War (Euro)</description>
+		<year>1989</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-gw-0 prg" size="131072" crc="aecdbe24" sha1="16326f34efb3cbf5b8fd7076b06a7d9965a1fbc0" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nes-gw-0 chr" size="131072" crc="de1b8ea3" sha1="67b5841d31f916410ce627cb1e1f2c566dbdbfd5" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -12510,7 +12931,7 @@
 	</software>
 
 	<software name="gunsmoke">
-		<!-- Serial: NES-GK-EEC - Release Date: 1989-02-23 -->
+		<!-- Serial: NES-GK (EEC/UKV) - Release Date: 1989-02-23 -->
 		<description>Gun.Smoke (Euro)</description>
 		<year>1989</year>
 		<publisher>Capcom</publisher>
@@ -12544,7 +12965,7 @@
 	</software>
 
 	<software name="gyromite" supported="partial">
-		<!-- Serial: HVC-GY / NES-GY-USA - Release Date: 1985-08-13 (JPN), 1985-10 (USA), 1986? (Euro)  - Alternative Title: ジャイロ -->
+		<!-- Serial: HVC-GY / NES-GY-USA / NES-GY-FRA - Release Date: 1985-08-13 (JPN), 1985-10 (USA), 1985 (Euro)  - Alternative Title: ジャイロ -->
 		<description>Gyromite (Euro, USA) ~ Gyro (Jpn)</description>
 		<year>1985</year>
 		<publisher>Nintendo</publisher>
@@ -12597,9 +13018,9 @@
 	</software>
 
 	<software name="hammerh">
-		<!-- Serial: NES-59-ESP - Release Date: 1994-06-23 -->
+		<!-- Serial: NES-59 (ESP/FRG) - Release Date: 1992 -->
 		<description>Hammerin' Harry (Euro)</description>
-		<year>1994</year>
+		<year>1992</year>
 		<publisher>Irem</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -12889,6 +13310,26 @@
 		</part>
 	</software>
 
+	<software name="herolancj" cloneof="herolanc">
+		<!-- Serial: PNF-LQ (R68V5929) - Release Date: 1991-03-08 - Alternative Title: ＡＤ＆Ｄ ヒーロー オブ ランス -->
+		<description>Advanced Dungeons &amp; Dragons: Heroes of the Lance (Jpn)</description>
+		<year>1991</year>
+		<publisher>Pony Canyon</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SKROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="pnf-lq-0 prg" size="131072" crc="929c7b2f" sha1="6d8ad05923f392dd39cbcf47d1c697677da6c718" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="pnf-lq-0 chr" size="131072" crc="32876b98" sha1="4060faab27b193cbd88bbf882aa72dee7a456664" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hinotori">
 		<!-- Serial: KON-RC817 - Release Date: 1987-01-04 - Alternative Title: 火の鳥鳳凰編 我王の冒険 -->
 		<description>Hi no Tori: Houou-hen: Gaou no Bouken (Jpn)</description>
@@ -12944,7 +13385,7 @@
 	</software>
 
 	<software name="highsped" supported="partial">
-		<!-- Serial: NES-8H-FRA - Release Date: 1994-04-28 -->
+		<!-- Serial: NES-8H (FRA/FRG) - Release Date: 1994-04-28 -->
 		<description>High Speed (Euro)</description>
 		<year>1994</year>
 		<publisher>Tradewest</publisher>
@@ -13385,6 +13826,23 @@
 		</part>
 	</software>
 
+	<software name="homea2">
+		<!-- Serial: NES-HM-NOE - Release Date: 1992 -->
+		<description>Home Alone 2 - Lost In New York (Euro)</description>
+		<year>1992</year>
+		<publisher>T*HQ</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-hm-0 prg" size="131072" crc="1bc65714" sha1="88226bed22293ffefd486b3fe236b1a828d8f683" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nes-hm-0 chr" size="131072" crc="91ad1577" sha1="b4ba1b5aa2299b3a7ec6a54e3731a71eb13420fc" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="homea2u" cloneof="homea2">
 		<!-- Serial: NES-HM-USA - Release Date: 1992-10 -->
 		<description>Home Alone 2: Lost in New York (USA)</description>
@@ -13475,6 +13933,23 @@
 		</part>
 	</software>
 
+	<software name="hook">
+		<!-- Serial: NES-7Q-NOE - Release Date: 1992 -->
+		<description>Hook (Euro)</description>
+		<year>1992</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-7q-0 prg" size="131072" crc="80638505" sha1="a3b6115cf1e344cd64940d7c6b9c88407f05b472" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nes-7q-0 chr" size="131072" crc="9c1762a5" sha1="643171e03a6cd3c58ef415c58b5c5b9514647652" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hooku" cloneof="hook">
 		<!-- Serial: NES-7Q-USA - Release Date: 1992-04 -->
 		<description>Hook (USA)</description>
@@ -13488,6 +13963,23 @@
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-7q-0 chr" size="131072" crc="9c1762a5" sha1="643171e03a6cd3c58ef415c58b5c5b9514647652" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hoops">
+		<!-- Serial: NES-2B-AUS - Release Date: 1989 -->
+		<description>Hoops (Euro)</description>
+		<year>1989</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-2b-0 prg" size="131072" crc="67392913" sha1="fd3648b4ba162b665d6aa28a0bc12af8860ce488" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nes-2b-0 chr" size="131072" crc="4ba913d0" sha1="2724a1eed2a995337e974e40d7b140795df0ea7c" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -13630,6 +14122,23 @@
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-y4-0 chr" size="131072" crc="391ac219" sha1="d7c71807acb79450f2c03901ac112c0abbe3686e" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="huntred">
+		<!-- Serial: NES-7H (FRA/FRG) - Release Date: 1991 - Alternative Title: A la poursuite de l'Octobre Rouge (French box and label), Jagd Auf Roter Oktober (German box and label) -->
+		<description>The Hunt For Red October (Euro)</description>
+		<year>1991</year>
+		<publisher>Hi Tech Expressions</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-7h-0 prg" size="131072" crc="407b7eeb" sha1="0765b8029241f6542ef3fff530dd5cf8d30d4aa8" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="pal-7h-0 chr" size="131072" crc="ac1d75f0" sha1="68a5b41399d0c6983ede26f69ded06e467fd0605" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -14306,6 +14815,26 @@
 		</part>
 	</software>
 
+	<software name="indora">
+		<!-- Serial: KSC-IN - Release Date: 1987-10-20 - Alternative Title: インドラの光 -->
+		<description>Indora no Hikari (Jpn)</description>
+		<year>1987</year>
+		<publisher>Kotobuki System</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SNROM" />
+			<feature name="mmc1_type" value="MMC1" />
+			<dataarea name="prg" size="131072">
+				<rom name="ksc-in-0 prg" size="131072" crc="174f860a" sha1="00dd4cfb090d608fbe667b4ccc9263831fafb978" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="infiltrt">
 		<!-- Serial: NES-IF-USA - Release Date: 1990-01 -->
 		<description>Infiltrator (USA)</description>
@@ -14335,6 +14864,40 @@
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="c52-02" size="131072" crc="8a351a69" sha1="0da0a80c7bb01f9a6eba38050113543a5a50ae48" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intcrick">
+		<!-- Serial: NES-CC-AUS - Release Date: 1992 -->
+		<description>International Cricket (Aus)</description>
+		<year>1992</year>
+		<publisher>Laser Beam</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B3" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-cc-0 prg" size="131072" crc="2640de27" sha1="4034d9e4e89b72ab1545e3aef325b59f61fa961c" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="pal-cc-0 chr" size="131072" crc="8ddb599e" sha1="1560daea710d2dedac32579c15a5051dd0a60acd" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="irontank">
+		<!-- Serial: NES-IT-AUS - Release Date: 1988 -->
+		<description>Iron Tank: The Invasion of Normandy (Euro)</description>
+		<year>1988</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-it-0 prg" size="131072" crc="969d8687" sha1="689ed0fc97902645bd06fecb0df6a80bae36a797" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nes-it-0 chr" size="131072" crc="c61175cc" sha1="bebc127b3cad2ff0448a0c48119c817c1ac98d29" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -14451,7 +15014,7 @@
 	</software>
 
 	<software name="isolatwr">
-		<!-- Serial: NES-W6-ESP - Release Date: 1991 -->
+		<!-- Serial: NES-W6 (ESP/UKV) - Release Date: 1991 -->
 		<description>Isolated Warrior (Euro)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
@@ -14502,6 +15065,26 @@
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jlwinnin">
+		<!-- Serial: HVC-W3 - Release Date: 1994-05-27 - Alternative Title: Ｊリーグウイニングゴール -->
+		<description>J.League Winning Goal (Jpn)</description>
+		<year>1994</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TKROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="131072">
+				<rom name="hvc-w3-0 prg" size="131072" crc="12bba335" sha1="6d7794704a460f1c89040f26f1c8fe4b4f352ac7" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="hvc-w3-0 chr" size="131072" crc="bd6cf7ca" sha1="1ea8a3a343662a6d8655bfbe44bce1d5e72bb178" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -14592,7 +15175,7 @@
 	</software>
 
 	<software name="jchan">
-		<!-- Serial: NES-V5-ESP - Release Date: 1991-09-02 -->
+		<!-- Serial: NES-V5 (ESP/UKV) - Release Date: 1991-09-02 -->
 		<description>Jackie Chan's Action Kung-Fu (Euro)</description>
 		<year>1991</year>
 		<publisher>Hudson Soft</publisher>
@@ -14656,6 +15239,23 @@
 			</dataarea>
 			<dataarea name="chr" size="32768">
 				<rom name="jf09-chr" size="32768" crc="957c94ae" sha1="c620b7b3e9031d9e736ff0f473d98074a7c25e4b" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jbjr">
+		<!-- Serial: NES-JB-NOE - Release Date: 1992 -->
+		<description>James Bond Jr (Euro)</description>
+		<year>1992</year>
+		<publisher>T*HQ</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-jb-0 prg" size="131072" crc="7e036525" sha1="dde643f669851a25f1207a71a0f11b3eb5b6a934" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nes-jb-0 chr" size="131072" crc="07cd3eb3" sha1="c13641d0b70d4418ffcc27368837608e48419dbe" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -15718,7 +16318,7 @@
 	</software>
 
 	<software name="kickoff">
-		<!-- Serial: NES-54 (SCN/ESP) - Release Date: 1992-07-22 -->
+		<!-- Serial: NES-54 (SCN/ESP/UKV) - Release Date: 1992-07-22 -->
 		<description>Kick Off (Euro)</description>
 		<year>1992</year>
 		<publisher>Imagineering</publisher>
@@ -15730,6 +16330,23 @@
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kickle">
+		<!-- Serial: NES-QC-NOE - Release Date: 1990 -->
+		<description>Kickle Cubicle (Euro)</description>
+		<year>1990</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-qc-0 prg" size="131072" crc="df411cf0" sha1="a0aae437f9b3de8734e62287591a65d094246734" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="pal-qc-0 chr" size="131072" crc="a30639bd" sha1="cd4413d340f71554a8700028deabc9d33e48bf8e" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -15752,7 +16369,7 @@
 	</software>
 
 	<software name="kidicars1" cloneof="kidicars">
-		<!-- Serial: NES-KI (USA/CAN) / NES-KI-EEC - Release Date: 1987-07 (USA), 1987 (Euro) -->
+		<!-- Serial: NES-KI (USA/CAN) / NES-KI-EEC - Release Date: 1987-07 (USA), 1987-02-15 (Euro) -->
 		<description>Kid Icarus (Euro, USA)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
@@ -15772,9 +16389,9 @@
 	</software>
 
 	<software name="kidicars">
-		<!-- Serial: NES-KI-ESP - Release Date: 1987? -->
+		<!-- Serial: NES-KI(EEC/ESP) - Release Date: 1987-02-15 -->
 		<description>Kid Icarus (Euro, Rev. A)</description>
-		<year>1987?</year>
+		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SNROM" />
@@ -16444,6 +17061,23 @@
 		</part>
 	</software>
 
+	<software name="krustyfh">
+		<!-- Serial: NES-KF-AUS - Release Date: 1992 -->
+		<description>Krusty's Fun House (Euro)</description>
+		<year>1992</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="262144">
+				<rom name="pal-kf-0 prg" size="262144" crc="278db9e3" sha1="906a3b1b99d05274660a77a88713128cd6a60732" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nes-kf-0 chr" size="131072" crc="fce8e0ea" sha1="808f74e9124f273aab7adf5f31c2d5893b06323e" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="krustyfhu" cloneof="krustyfh">
 		<!-- Serial: NES-KF-USA - Release Date: 1992-09 -->
 		<description>Krusty's Fun House (USA)</description>
@@ -16516,7 +17150,7 @@
 	</software>
 
 	<software name="kungfu">
-		<!-- Serial: NES-SX (EEC/ESP) - Release Date: 1987-04-15 -->
+		<!-- Serial: NES-SX (EEC/ESP/NOE) - Release Date: 1987-04-15 -->
 		<description>Kung Fu (Euro)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
@@ -16787,6 +17421,31 @@
 		</part>
 	</software>
 
+	<software name="emperorj" cloneof="emperor" supported="no">
+		<!-- Serial: KOE-QV - Release Date: 1991-05-23 - Alternative Title: ランペルール -->
+		<description>L'Empereur (Jpn)</description>
+		<year>1991</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-ETROM" />
+			<dataarea name="prg" size="262144">
+				<rom name="koe-qv-0 prg" size="262144" crc="57e3218b" sha1="8d21b6d59c15c61b00038e73e281b42b566ddcf5" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="koe-qv-0 chr" size="131072" crc="508a2acc" sha1="e8cb6d9d887452d50265231b633c651bf4cb0893" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+			<!-- 1k Internal RAM in the MMC5 chip (ExRAM) -->
+			<dataarea name="mapper_ram" size="1024">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="labyrint">
 		<!-- Serial: GTS-LA - Release Date: 1987-01-07 - Alternative Title: ラビリンス 魔王の迷宮 -->
 		<description>Labyrinth (Jpn)</description>
@@ -17043,7 +17702,7 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SNROM" />
-			<feature name="mmc1_type" value="MMC1A" />
+			<feature name="mmc1_type" value="MMC1" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-zl-0 prg" size="131072" crc="ed7f5555" sha1="6322960a969e008cc63bf14879d98412096bc795" offset="00000" />
 			</dataarea>
@@ -17063,7 +17722,7 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SNROM" />
-			<feature name="mmc1_type" value="MMC1B3" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-zl-1 prg" size="131072" crc="d44b412e" sha1="4af52c8aaeab49a2e74131f076bea6d2cedba687" offset="00000" />
 			</dataarea>
@@ -17251,7 +17910,7 @@
 	</software>
 
 	<software name="lionking">
-		<!-- Serial: NES-KL (SCN/NOE/ITA) - Release Date: 1994 - Alternative Title: Disney's Der König der Löwen, Disney's Il Re Leone -->
+		<!-- Serial: NES-KL (SCN/NOE/ITA/ESP) - Release Date: 1994 - Alternative Title: Disney's Der König der Löwen, Disney's Il Re Leone, Disney's El Rey Leon -->
 		<description>Disney's The Lion King (Euro)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
@@ -17591,6 +18250,23 @@
 		</part>
 	</software>
 
+	<software name="lunarpol">
+		<!-- Serial: NES-LP-FRA - Release Date: 1991 -->
+		<description>Lunar Pool (Euro)</description>
+		<year>1991</year>
+		<publisher>FCI</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="pal-lp-0 prg" size="32768" crc="ace8052d" sha1="7ca1888232170558b120aeb98fe1b1a129e5ef22" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="pal-lp-0 chr" size="8192" crc="1fff032b" sha1="2e6cea1d1388f00bfdaf55b712f9bba0d93b941e" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lunarpolu" cloneof="lunarpol">
 		<!-- Serial: NES-LP-USA - Release Date: 1987-10 -->
 		<description>Lunar Pool (USA)</description>
@@ -17897,6 +18573,7 @@
 		<publisher>Culture Brain</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-as-0 prg" size="131072" crc="a848a2b1" sha1="99cf2da5d51a149e19cbdbf0d6d946fd02afc735" offset="00000" />
 			</dataarea>
@@ -18096,6 +18773,26 @@
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mjtaisen">
+		<!-- Serial: NBF-8J (12) - Release Date: 1992-05-20 - Alternative Title: 麻雀大戦 -->
+		<description>Mahjong Taisen (Jpn)</description>
+		<year>1992</year>
+		<publisher>Nihon Bussan</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TKROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="262144">
+				<rom name="nbf-8j-0 prg" size="262144" crc="f55cdef2" sha1="b33fe15fdf232026c42d81c6d49c90c6fd506a5e" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nbf-8j-0 chr" size="131072" crc="e37a1d57" sha1="219eab0df558f5fbdc5d884808eed2e94b41f7da" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -19313,6 +20010,25 @@
 		</part>
 	</software>
 
+	<software name="mezatopg">
+		<!-- Serial: JF-41 - Release Date: 1993-03-05 - Alternative Title: めざせ！トッププロ グリーンに賭ける夢 -->
+		<description>Mezase Top Pro - Green Ni Kakeru Yume (Jpn)</description>
+		<year>1993</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="JALECO-JF-40" />
+			<dataarea name="prg" size="262144">
+				<rom name="0.prg" size="262144" crc="6701a19f" sha1="42e473b6e6244d336524e08a396eb2d44697f3f5" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="0.chr" size="131072" crc="482e9eff" sha1="c2750a5a5f1fb87351cd78e2aacdfaf14d542151" offset="00000"  />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="andretti">
 		<!-- Serial: NES-W4-USA - Release Date: 1990-06 -->
 		<description>Michael Andretti's World GP (USA)</description>
@@ -19631,7 +20347,7 @@
 	</software>
 
 	<software name="tysonpo1" cloneof="tysonpo">
-		<!-- Serial: NES-PT-EEC - Release Date: 1987-12-15 -->
+		<!-- Serial: NES-PT (EEC/ESP) - Release Date: 1987-12-15 -->
 		<description>Mike Tyson's Punch-Out!! (Euro)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
@@ -19878,7 +20594,7 @@
 		<publisher>Palcom</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
-			<feature name="mmc3_type" value="MMC3C" />
+			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="prg" size="131072">
 				<rom name="fra-u4-0 prg" size="131072" crc="14e25645" sha1="3e035931a543c0ed96a6a42c435b012bde9b15c3" offset="00000" />
 			</dataarea>
@@ -19889,7 +20605,7 @@
 	</software>
 
 	<software name="misimpos">
-		<!-- Serial: NES-U4-SCN - Release Date: 1991-11-28 -->
+		<!-- Serial: NES-U4 (SCN/NOE) - Release Date: 1991-11-28 -->
 		<description>Mission: Impossible (Euro)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
@@ -20005,6 +20721,23 @@
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="jf20-c" size="131072" crc="a24f139b" sha1="6b6f6be1375da4ee179942d9b64244f164e1e4b3" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moejudo">
+		<!-- Serial: JF-28 - Release Date: 1990-06-29 - Alternative Title: 燃えろ！！ 柔道うぉり・ーず -->
+		<description>Moero!! Juudou Warriors (Jpn)</description>
+		<year>1990</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="JALECO-JF-17" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="0.prg" size="131072" crc="aa6e1a35" sha1="915008e4331b94c44d586e73748be3486b9a087f" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="0.chr" size="131072" crc="6bd848f1" sha1="92cc939ffdc1400fd02062496a6819ce0eec903a" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -20251,6 +20984,23 @@
 		</part>
 	</software>
 
+	<software name="monstpok">
+		<!-- Serial: NES-1Y-NOE - Release Date: 1992 -->
+		<description>Monster In My Pocket (Euro)</description>
+		<year>1992</year>
+		<publisher>Palcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-1y-0 prg" size="131072" crc="c1cd15dd" sha1="5c80b6c731efb783e34df63c29fcf902f483206b" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="pal-1y-0 chr" size="131072" crc="3558dac8" sha1="ebd268abd565a8da0ecd8e39734b1292d31908ee" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="monstpoku" cloneof="monstpok">
 		<!-- Serial: NES-1Y-USA - Release Date: 1992-01 -->
 		<description>Monster In My Pocket (USA)</description>
@@ -20264,6 +21014,26 @@
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-1y-0 chr" size="131072" crc="bc9e30bc" sha1="4c5797de404e20fbad6dc863b08c3d5e4fdd623a" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monstmkr">
+		<!-- Serial: SFL-7N - Release Date: 1991-12-20 - Alternative Title: モンスターメーカー ７つの秘宝 -->
+		<description>Monster Maker - 7 Tsu no Hihou (Jpn)</description>
+		<year>1991</year>
+		<publisher>Sofel</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SNROM" />
+			<feature name="mmc1_type" value="MMC1B3" />
+			<dataarea name="prg" size="262144">
+				<rom name="sfl-7n-0 prg" size="262144" crc="fb1c0551" sha1="68f558cff6d8aa33bf5584597bc7e79bba0f09bd" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -20877,8 +21647,8 @@
 	</software>
 
 	<software name="nghostb2">
-		<!-- Serial: NES-QD-AUS - Release Date: 1990 -->
-		<description>New Ghostbusters II (Aus)</description>
+		<!-- Serial: NES-QD (AUS/FRA) - Release Date: 1990 -->
+		<description>New Ghostbusters II (Euro)</description>
 		<year>1990</year>
 		<publisher>HAL Laboratory</publisher>
 		<part name="cart" interface="nes_cart">
@@ -20889,6 +21659,23 @@
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="pal-qd-0 chr" size="131072" crc="3fed9a67" sha1="17a37d2af2751e6f8ffce6756ff35783c47ec5f3" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nghostb2j" cloneof="nghostb2">
+		<!-- Serial: HAL-QD - Release Date: 1990-12-26 - Alternative Title: ＮＥＷ ゴーストバスターズⅡ -->
+		<description>New Ghostbusters II (Jpn)</description>
+		<year>1990</year>
+		<publisher>HAL Kenkyuujo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="hal-qd-0 prg" size="131072" crc="76e85ada" sha1="b8d874d0916657423440516c145ce7bc15d4fe9d" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="hal-qd-0 chr" size="131072" crc="3fed9a67" sha1="17a37d2af2751e6f8ffce6756ff35783c47ec5f3" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21295,6 +22082,41 @@
 		</part>
 	</software>
 
+	<software name="nintenwca" cloneof="nintenwc">
+		<!-- Serial: NES-XZ (NOE) - Release Date: 1990-12-04 -->
+		<description>Nintendo World Cup (Euro, Rev. A)</description>
+		<year>1990</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-xz-1 prg" size="131072" crc="db2f988d" sha1="04fc1ff75e9ee768d7df052331ca9377bf3d043a" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nes-xz-0 chr" size="131072" crc="92477d53" sha1="33225bd5ee72f92761fdce931c93dd54e6885bd4" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nintenwcb" cloneof="nintenwc">
+		<!-- Serial: NES-XZ (FRA/NOE/SCN) - Release Date: 1990-12-04 -->
+		<description>Nintendo World Cup (Euro)</description>
+		<year>1990</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<feature name="peripheral" value="4p_adapter" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-xz-0 prg" size="131072" crc="725b0234" sha1="14968edafa080a967e7415384a4b83aca7465c1f" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nes-xz-0 chr" size="131072" crc="92477d53" sha1="33225bd5ee72f92761fdce931c93dd54e6885bd4" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nintenwcu" cloneof="nintenwc">
 		<!-- Serial: NES-XZ-USA - Release Date: 1990-12 -->
 		<description>Nintendo World Cup (USA)</description>
@@ -21306,24 +22128,6 @@
 			<feature name="peripheral" value="4p_adapter" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-xz-0 prg" size="131072" crc="de8c89ab" sha1="17b1a56755b43634f4e0b4c927d68265e1ee0656" offset="00000" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-xz-0 chr" size="131072" crc="92477d53" sha1="33225bd5ee72f92761fdce931c93dd54e6885bd4" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nintenwca" cloneof="nintenwc">
-		<!-- Serial: NES-XZ (FRA/NOE/SCN) - Release Date: 1990-12-04 -->
-		<description>Nintendo World Cup (Euro)</description>
-		<year>1990</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<feature name="mmc3_type" value="MMC3B" />
-			<feature name="peripheral" value="4p_adapter" />
-			<dataarea name="prg" size="131072">
-				<rom name="pal-xz-0 prg" size="131072" crc="725b0234" sha1="14968edafa080a967e7415384a4b83aca7465c1f" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-xz-0 chr" size="131072" crc="92477d53" sha1="33225bd5ee72f92761fdce931c93dd54e6885bd4" offset="00000" />
@@ -21543,6 +22347,26 @@
 		</part>
 	</software>
 
+	<software name="northnsj" cloneof="northns">
+		<!-- Serial: KSC-N5 - Release Date: 1990-09-21 - Alternative Title: ノース＆サウスわくわく南北戦争 -->
+		<description>North &amp; South - Wakuwaku Nanboku Sensou (Jpn)</description>
+		<year>1990</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TSROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="131072">
+				<rom name="ksc-n5-0 prg" size="131072" crc="68e8a520" sha1="9393668fdb5b1b8870d3b580344dad31297a688e" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="ksc-n5-0 chr" size="131072" crc="d1ea387e" sha1="68453a115131db78cbde463285fc774ecb00398a" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nutsmilk">
 		<!-- Serial: HFC-NM - Release Date: 1984-07-28 - Alternative Title: ナッツ＆ミルク -->
 		<description>Nuts &amp; Milk (Jpn)</description>
@@ -21632,6 +22456,23 @@
 		</part>
 	</software>
 
+	<software name="oishinbo">
+		<!-- Serial: SHI-OS - Release Date: 1989-07-25 - Alternative Title: 美味しんぼ 究極のメニュー三本勝負 -->
+		<description>Oishinbo (Jpn)</description>
+		<year>1989</year>
+		<publisher>Shinsei</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SL1ROM" />
+			<feature name="mmc1_type" value="MMC1A" />
+			<dataarea name="prg" size="131072">
+				<rom name="shi-os-0 prg" size="131072" crc="335cfba6" sha1="c524376c835f9b345b3598f9c8e6abb887352812" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="shi-os-0 chr" size="131072" crc="f0267441" sha1="888906c7077e9fe9802ae9d8b595b5ccc5e4f184" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="onyanko">
 		<!-- Serial: PNF-OT (R49V5901) - Release Date: 1985-11-21 - Alternative Title: おにゃんこTOWN -->
 		<description>Onyanko Town (Jpn)</description>
@@ -21703,13 +22544,13 @@
 	</software>
 
 	<software name="opwolf">
-		<!-- Serial: NES-OW (AUS/ESP) - Release Date: 1992 -->
+		<!-- Serial: NES-OW (AUS/ESP/UKV) - Release Date: 1992 -->
 		<description>Operation Wolf: Take no Prisoners (Euro)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
-			<feature name="mmc1_type" value="MMC1B3" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-ow-0 prg" size="131072" crc="54c34223" sha1="3cfb33ae21278b4f03cb6e531e7a4d84cd1a5e25" offset="00000" />
@@ -21886,12 +22727,12 @@
 	</software>
 
 	<software name="pow">
-		<!-- Serial: NES-EW-ESP - Release Date: 1991-11-29 -->
+		<!-- Serial: NES-EW (ESP/ITA) - Release Date: 1991-11-29 -->
 		<description>P.O.W.: Prisoners of War (Euro)</description>
 		<year>1991</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
+			<feature name="pcb" value="NES-SLROM" /> <!-- also found with NES-SLRROM pcb -->
 			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-ew-0 prg" size="131072" crc="a2033526" sha1="573481a0ede58335aaab49d1b2164bba5687dc5f" offset="00000" />
@@ -22126,6 +22967,23 @@
 		</part>
 	</software>
 
+	<software name="pachid2">
+		<!-- Serial: CDS-82 - Release Date: 1992-07-10 - Alternative Title: パチンコ大作戦２ -->
+		<description>Pachinko Daisakusen 2 (Jpn)</description>
+		<year>1992</year>
+		<publisher>Coconuts Japan</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="cds-82-0 prg" size="131072" crc="1644c162" sha1="17f1a1ec7456291122aaeb5431cd4c1c11fe29e3" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="cds-82-0 chr" size="131072" crc="b1aacee2" sha1="0b06ba1ba63a4e166a9678a151b78cbd6259fc53" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pachiok2">
 		<!-- Serial: CDS-P2 - Release Date: 1989-01-30 - Alternative Title: パチ夫くん２ -->
 		<description>Pachio-kun 2 (Jpn)</description>
@@ -22163,6 +23021,26 @@
 		</part>
 	</software>
 
+	<software name="pachikn4">
+		<!-- Serial: CDS-84 - Release Date: 1991-11-22 - Alternative Title: パチ夫くん４ -->
+		<description>Pachio-Kun 4 (Jpn)</description>
+		<year>1991</year>
+		<publisher>Coconuts Japan</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TNROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="524288">
+				<rom name="cds-84-0 prg" size="524288" crc="e08c8a60" sha1="baf3a4e0423a86e53234e806843149ef7d0974a9" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="palamedsj" cloneof="palameds">
 		<!-- Serial: GAM-JI-07 - Release Date: 1990-07-06 - Alternative Title: パラメデス -->
 		<description>Palamedes (Jpn)</description>
@@ -22193,6 +23071,23 @@
 			</dataarea>
 			<dataarea name="chr" size="32768">
 				<rom name="nes-ji-0 chr" size="32768" crc="2cd6479b" sha1="fef31c5e8bab87c31683beef40b05c478c197c51" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="palamed2">
+		<!-- Serial: GAM-Z5-08 - Release Date: 1991-05-17 - Alternative Title: パラメデスⅡ -->
+		<description>Palamedes 2 - Star Twinkles (Jpn)</description>
+		<year>1991</year>
+		<publisher>Hot-B</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SEROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="32768">
+				<rom name="0.prg" size="32768" crc="1e9ebb00" sha1="7d9de52a22db7f4e61e5ddd20e84dde048506154" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="0.chr" size="32768" crc="30c91974" sha1="19be6822b41a7121c6d8f18d724ed6e880bdf19c" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -22374,6 +23269,23 @@
 		</part>
 	</software>
 
+	<software name="peepart">
+		<!-- Serial: SAN-P6 - Release Date: 1990-08-10 - Alternative Title: ピーパータイム -->
+		<description>Peepar Time (Jpn)</description>
+		<year>1990</year>
+		<publisher>Sanritsu Denki</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-CNROM" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="0.prg" size="32768" crc="c1cf4948" sha1="92153e11b34752a1084d8c81ee5966df837c0beb" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="16384">
+				<rom name="0.chr" size="16384" crc="63ca952f" sha1="1eecf9ce19fedf5b16bc55f89ee2caabc3e98e39" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="penguinw">
 		<!-- Serial: HSP-03 - Release Date: 1985-12-25 - Alternative Title: ぺんぎんくんＷＡＲＳ -->
 		<description>Penguin-kun Wars (Jpn)</description>
@@ -22496,7 +23408,7 @@
 	</software>
 
 	<software name="pinbot" supported="partial">
-		<!-- Serial: NES-IO (EEC/ESP) - Release Date: 1990 -->
+		<!-- Serial: NES-IO (EEC/NOE/FRA/ESP) - Release Date: 1990 -->
 		<description>Pin-Bot (Euro)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
@@ -22554,7 +23466,7 @@
 	</software>
 
 	<software name="pinball">
-		<!-- Serial: NES-PN (EEC/ESP) - Release Date: 1986-01-09 -->
+		<!-- Serial: NES-PN (EEC/NOE/ESP) - Release Date: 1986-01-09 -->
 		<description>Pinball (Euro, Rev. A)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
@@ -22760,6 +23672,26 @@
 		</part>
 	</software>
 
+	<software name="poolradj" cloneof="poolrad">
+		<!-- Serial: PNF-QA (R98V5938) - Release Date: 1991-06-28 - Alternative Title: ＡＤ＆Ｄ プール オブ レイディアンス -->
+		<description>Advanced Dungeons &amp; Dragons: Pool of Radiance (Jpn)</description>
+		<year>1991</year>
+		<publisher>Pony Canyon</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TKROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="524288">
+				<rom name="pnf-qa-0 prg" size="524288" crc="a6819195" sha1="1f23708665cc9801c99e24b590b40528ca1d2cc1" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="pnf-qa-0 chr" size="131072" crc="a750f6d9" sha1="d7053b832c79b8ed4a8d8ab28b7650d65e0dcf52" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pooyan">
 		<!-- Serial: HFC-PO - Release Date: 1985-09-20 - Alternative Title: プーヤン -->
 		<description>Pooyan (Jpn)</description>
@@ -22867,7 +23799,7 @@
 	</software>
 
 	<software name="powblade">
-		<!-- Serial: NES-7T-SCN - Release Date: 1992-01-23 -->
+		<!-- Serial: NES-7T (FRG/SCN) - Release Date: 1992-01-23 -->
 		<description>Power Blade (Euro)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
@@ -22984,6 +23916,43 @@
 		</part>
 	</software>
 
+	<software name="presidnt">
+		<!-- Serial: GAM-B3-06 - Release Date: 1990-03-02 - Alternative Title: プレジデントの選択 -->
+		<description>President no Sentaku (Jpn)</description>
+		<year>1990</year>
+		<publisher>Hot-B</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SNROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="262144">
+				<rom name="gam-b3-0 prg" size="262144" crc="4640ebe0" sha1="0ef017518fd8b00f68fe0d094be2e1c8706c99e3" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppersia">
+		<!-- Serial: NES-PA-SCN - Release Date: 1993-04-29 -->
+		<description>Prince of Persia (Euro)</description>
+		<year>1993</year>
+		<publisher>Mindscape</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-pa-0 prg" size="131072" crc="b7f39933" sha1="ec6ba3a7d118783df5ae9f1d0323b38a3348f333" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ppersiau" cloneof="ppersia">
 		<!-- Serial: NES-PA-USA - Release Date: 1992-11 -->
 		<description>Prince of Persia (USA)</description>
@@ -23018,16 +23987,16 @@
 		</part>
 	</software>
 
-	<software name="ppersia">
-		<!-- Serial: NES-PA-SCN - Release Date: 1993-04-29 -->
-		<description>Prince of Persia (Euro)</description>
+	<software name="ppersiag" cloneof="ppersia">
+		<!-- Serial: NES-PA-NOE - Release Date: 1993-04-29 -->
+		<description>Prince of Persia (Ger)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="pal-pa-0 prg" size="131072" crc="b7f39933" sha1="ec6ba3a7d118783df5ae9f1d0323b38a3348f333" offset="00000" />
+				<rom name="frg-pa-0 prg" size="131072" crc="60aa9ae0" sha1="1b33af3acb40acf6fb3d8709246278249579d019" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -23259,7 +24228,7 @@
 	</software>
 
 	<software name="punchout">
-		<!-- Serial: NES-QP-EEC - Release Date: 1991-03-01 -->
+		<!-- Serial: NES-QP (EEC/ESP) - Release Date: 1991-03-01 -->
 		<description>Punch-Out!! (Euro)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
@@ -23304,6 +24273,23 @@
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzslot">
+		<!-- Serial: SAC-1P - Release Date: 1992-02-28 - Alternative Title: パズロット -->
+		<description>Puzslot (Jpn)</description>
+		<year>1992</year>
+		<publisher>Sammy</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="sac-1p-0 prg" size="131072" crc="6611497f" sha1="ebc3c2e31f2732be5c2ab37bc5df79806d49e2ea" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="sac-1p-0 chr" size="131072" crc="c74b723b" sha1="14e66179cd007b1f7dd51b42eef4e0922a2bd242" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23848,6 +24834,26 @@
 		</part>
 	</software>
 
+	<software name="radia">
+		<!-- Serial: TCF-8R - Release Date: 1991-11-15 - Alternative Title: ラディア戦記 黎明篇 -->
+		<description>Radia Senki: Reimei Hen (Jpn)</description>
+		<year>1991</year>
+		<publisher>Tecmo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TKROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="262144">
+				<rom name="tcf-8r-0 prg" size="262144" crc="8b59bac3" sha1="b9ce8d520a64f5321ad6e68e4ab1581c7b676001" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="tcf-8r-0 chr" size="131072" crc="9a7f42b6" sha1="6d702122003ab7320a71ae4d88103992224ea7ba" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="raid2020">
 		<!-- Serial: CDR-RD-81003 - Release Date: 1989 -->
 		<description>Raid 2020 (USA)</description>
@@ -24054,6 +25060,23 @@
 		</part>
 	</software>
 
+	<software name="rampart">
+		<!-- Serial: NES-73-NOE - Release Date: 1992 -->
+		<description>Rampart (Euro)</description>
+		<year>1992</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-73-0 prg" size="131072" crc="28edfad4" sha1="8015776a5e316721913d2db996325ffbd5a67370" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nes-73-0 chr" size="131072" crc="94a07125" sha1="50403e0f89e14368f687f09995cd1e3eed08cc9c" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rampartj" cloneof="rampart">
 		<!-- Serial: KDS-73 - Release Date: 1991-11-29 - Alternative Title: ランパート -->
 		<description>Rampart (Jpn)</description>
@@ -24207,6 +25230,23 @@
 		</part>
 	</software>
 
+	<software name="ripple">
+		<!-- Serial: TEC-RI - Release Date: 1988-01-23 - Alternative Title: リップルアイランド -->
+		<description>Ripple Island (Jpn)</description>
+		<year>1988</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SGROM" />
+			<feature name="mmc1_type" value="MMC1A" />
+			<dataarea name="prg" size="131072">
+				<rom name="tec-ri-0 prg" size="131072" crc="a38857eb" sha1="7704d094c6b2d1affcf84d9856548e5f17b041c4" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rcr" cloneof="streetgn">
 		<!-- Serial: NES-DN-USA - Release Date: 1990-01 -->
 		<description>River City Ransom (USA)</description>
@@ -24243,7 +25283,7 @@
 	</software>
 
 	<software name="roadfght">
-		<!-- Serial: NES-39-SCN - Release Date: 1992-06-18 -->
+		<!-- Serial: NES-39 (NOE/SCN/AUS) - Release Date: 1992-06-18 -->
 		<description>Road Fighter (Euro)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
@@ -24272,6 +25312,23 @@
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="335008-1012 rrchr" size="131072" crc="d2117b17" sha1="8be3748c77e01ca51fcfa43d50a1369505660111" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadblst">
+		<!-- Serial: NES-VE-NOE - Release Date: 1990 -->
+		<description>Roadblasters (Euro)</description>
+		<year>1990</year>
+		<publisher>Mindscape</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="nes-ve-0 prg" size="131072" crc="18d63ebf" sha1="512d9e65e7a5708c7dd6442841f93660a44f495f" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nes-ve-0 chr" size="131072" crc="d19b16fc" sha1="70be06e704b6f51a540b987adc07549030aa1879" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -24498,13 +25555,13 @@
 	</software>
 
 	<software name="robocop2">
-		<!-- Serial: NES-2C-ESP - Release Date: 1992-05-16 -->
+		<!-- Serial: NES-2C (ESP/AUS) - Release Date: 1992-05-16 -->
 		<description>RoboCop 2 (Euro)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
-			<feature name="mmc1_type" value="MMC1B3" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-2c-0 prg" size="131072" crc="40c9e3ee" sha1="9129b9f39c210fbbbf0c2c51d8e7c8ebea115d9a" offset="00000" />
 			</dataarea>
@@ -24582,57 +25639,6 @@
 		</part>
 	</software>
 
-	<software name="rockman2" cloneof="megaman2">
-		<!-- Serial: CAP-XR - Release Date: 1988-12-24 - Alternative Title: ロックマン２ Ｄｒ．ワイリーの謎 -->
-		<description>Rockman 2: Dr. Wily no Nazo (Jpn)</description>
-		<year>1988</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="HVC-SGROM" />
-			<feature name="mmc1_type" value="MMC1B2" />
-			<dataarea name="prg" size="262144">
-				<rom name="cap-xr-0 prg" size="262144" crc="6150517c" sha1="3e9dc769e1b63e73834786ec7fe9ede7e706c72f" offset="00000" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rockman3" cloneof="megaman3">
-		<!-- Serial: CAP-XU - Release Date: 1990-09-28 - Alternative Title: ロックマン３ Ｄｒ．ワイリーの最後！？ -->
-		<description>Rockman 3: Dr. Wily no Saigo!? (Jpn)</description>
-		<year>1990</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="HVC-TLROM" />
-			<feature name="mmc3_type" value="MMC3B" />
-			<dataarea name="prg" size="262144">
-				<rom name="cap-xu-0 prg" size="262144" crc="1d2e5018" sha1="62aa604980ad4d67478ade7d132cfa706c566f0d" offset="00000" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="cap-xu-0 chr" size="131072" crc="36f3ce63" sha1="dd21bbfa287bbf96ff7ebca02c842d86efb47560" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rockman5" cloneof="megaman5">
-		<!-- Serial: CAP-5V - Release Date: 1992-12-04 - Alternative Title: ロックマン５ ブルースの罠！？ -->
-		<description>Rockman 5: Blues no Wana!? (Jpn)</description>
-		<year>1992</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="HVC-TLROM" />
-			<feature name="mmc3_type" value="MMC3C" />
-			<dataarea name="prg" size="262144">
-				<rom name="cap-5v-0 prg" size="262144" crc="05cf9eb0" sha1="ec48a4b51456dffccd5306acd2cbf414ffd2064e" offset="00000" />
-			</dataarea>
-			<dataarea name="chr" size="262144">
-				<rom name="cap-5v-0 chr" size="262144" crc="482c358d" sha1="4852d864677655202f90f0fbc4c8710c1590da0f" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="rocktrng">
 		<!-- Serial: NES-2R-USA - Release Date: 1990-06 -->
 		<description>Rocket Ranger (USA)</description>
@@ -24701,6 +25707,57 @@
 		</part>
 	</software>
 
+	<software name="rockman" cloneof="megaman">
+		<!-- Serial: CAP-RX - Release Date: 1987-12-17 - Alternative Title: ロックマン -->
+		<description>Rockman (Jpn)</description>
+		<year>1987</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="cap-rx-0 prg" size="131072" crc="d31dc910" sha1="ea93f3f2fd561c1cee59ad51cfcb10f3dd83766f" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockman2" cloneof="megaman2">
+		<!-- Serial: CAP-XR - Release Date: 1988-12-24 - Alternative Title: ロックマン２ Ｄｒ．ワイリーの謎 -->
+		<description>Rockman 2: Dr. Wily no Nazo (Jpn)</description>
+		<year>1988</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SGROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="262144">
+				<rom name="cap-xr-0 prg" size="262144" crc="6150517c" sha1="3e9dc769e1b63e73834786ec7fe9ede7e706c72f" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockman3" cloneof="megaman3">
+		<!-- Serial: CAP-XU - Release Date: 1990-09-28 - Alternative Title: ロックマン３ Ｄｒ．ワイリーの最後！？ -->
+		<description>Rockman 3: Dr. Wily no Saigo!? (Jpn)</description>
+		<year>1990</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TLROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="262144">
+				<rom name="cap-xu-0 prg" size="262144" crc="1d2e5018" sha1="62aa604980ad4d67478ade7d132cfa706c566f0d" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="cap-xu-0 chr" size="131072" crc="36f3ce63" sha1="dd21bbfa287bbf96ff7ebca02c842d86efb47560" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rockman4" cloneof="megaman4">
 		<!-- Serial: CAP-4V - Release Date: 1991-12-06 - Alternative Title: ロックマン４ 新たなる野望！！ -->
 		<description>Rockman 4: Aratanaru Yabou!! (Jpn)</description>
@@ -24708,9 +25765,43 @@
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TGROM" />
-			<feature name="mmc3_type" value="MMC3C" />
+			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="prg" size="524288">
 				<rom name="cap-4v-0 prg" size="524288" crc="f161a5d8" sha1="83f5ea60d6e6489ec0e5af4b938d2d1c8fd24dd5" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockman5" cloneof="megaman5">
+		<!-- Serial: CAP-5V - Release Date: 1992-12-04 - Alternative Title: ロックマン５ ブルースの罠！？ -->
+		<description>Rockman 5: Blues no Wana!? (Jpn)</description>
+		<year>1992</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TLROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="262144">
+				<rom name="cap-5v-0 prg" size="262144" crc="05cf9eb0" sha1="ec48a4b51456dffccd5306acd2cbf414ffd2064e" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="cap-5v-0 chr" size="262144" crc="482c358d" sha1="4852d864677655202f90f0fbc4c8710c1590da0f" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockman6" cloneof="megaman6">
+		<!-- Serial: CAP-6V - Release Date: 1993-11-05 - Alternative Title: ロックマン６ 史上最大の戦い！！ -->
+		<description>Rockman 6 - Shijou Saidai no Tatakai!! (Jpn)</description>
+		<year>1993</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TGROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="524288">
+				<rom name="cap-6v-0 prg" size="524288" crc="2d664d99" sha1="47336976a531fab2592af636a630a290eb036d18" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -25003,6 +26094,28 @@
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="403315dd" sha1="c2d47c36fe8dfc3d9ba051a47503bd7d1b102b04" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="royalbld" cloneof="gemfire" supported="no">
+		<!-- Serial: KOE-IU - Release Date: 1991-08-29 - Alternative Title: ロイヤルブラッド -->
+		<description>Royal Blood (Jpn)</description>
+		<year>1991</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-EKROM" />
+			<dataarea name="prg" size="262144">
+				<rom name="koe-iu-0 prg" size="262144" crc="57f33f70" sha1="b67183da893639745d72a4d99f4d0c0f60fdc136" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="koe-iu-0 chr" size="262144" crc="44b22b3d" sha1="bfdb1a89f403b7deea2e29addf1d18e745442771" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+			<!-- 1k Internal RAM in the MMC5 chip (ExRAM) -->
+			<dataarea name="mapper_ram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -25988,6 +27101,26 @@
 		</part>
 	</software>
 
+	<software name="shancara">
+		<!-- Serial: IGS-SV - Release Date: 1992-06-26 - Alternative Title: 陰謀の惑星シャンカラ -->
+		<description>Seiryaku Simulation: Inbou no Wakusei: Shancara (Jpn)</description>
+		<year>1992</year>
+		<publisher>IGS</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TKROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="131072">
+				<rom name="igs-sv-0 prg" size="131072" crc="009da4c0" sha1="8e89cfe34a3d182daf8a4c03f9438f3ca2437e5f" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="igs-sv-0 chr" size="131072" crc="b79a163e" sha1="588b42b7ec1495c589bcfa2eac4fc28148820db7" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sekiryu">
 		<!-- Serial: TEC-AJ - Release Date: 1989-02-10 - Alternative Title: 赤龍王 -->
 		<description>Sekiryuuou (Jpn)</description>
@@ -26151,7 +27284,7 @@
 		<publisher>Tecmo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
-			<feature name="mmc3_type" value="MMC3C" />
+			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-67-0 prg" size="131072" crc="687e25d6" sha1="4dea3395f734522b2c4f2ae48359274134653125" offset="00000" />
 			</dataarea>
@@ -26188,6 +27321,26 @@
 			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-3s-0 prg" size="131072" crc="591364c9" sha1="456b6d249652eb2016fb564eef7da9fd27222a1b" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nes-3s-0 chr" size="131072" crc="05414dd9" sha1="893c82b8f9d4561e94e567005352f8817e04077c" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shadowgt">
+		<!-- Serial: NES-3S-HOL - Release Date: 1991-05-30 -->
+		<description>Shadowgate (Euro)</description>
+		<year>1991</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TKROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-3s-0 prg" size="131072" crc="0adb2c4c" sha1="bc70c6b2a6ff59bd1cec81b8df3160b7109d8924" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-3s-0 chr" size="131072" crc="05414dd9" sha1="893c82b8f9d4561e94e567005352f8817e04077c" offset="00000" />
@@ -26310,7 +27463,7 @@
 	</software>
 
 	<software name="shatterh">
-		<!-- Serial: NES-9H (SCN/ESP) - Release Date: 1992-11-19 -->
+		<!-- Serial: NES-9H (NOE/SCN/ESP) - Release Date: 1992-11-19 -->
 		<description>Shatterhand (Euro)</description>
 		<year>1992</year>
 		<publisher>Jaleco</publisher>
@@ -26336,6 +27489,23 @@
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="tcc-sh-0 prg" size="131072" crc="2bb6a0f8" sha1="1fb87e6a35ec7f9a7e6d193469f64a9016daa4c1" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shikinjo">
+		<!-- Serial: TDF-96 - Release Date: 1991-04-26 - Alternative Title: 紫禁城 -->
+		<description>Shikinjou (Jpn)</description>
+		<year>1991</year>
+		<publisher>Toei Animation</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SGROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="tdf-96-0 prg" size="131072" crc="9b53f848" sha1="023d9bd756f1224df111c4120e6b7596563869a4" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -26798,13 +27968,13 @@
 	</software>
 
 	<software name="bartvssm">
-		<!-- Serial: NES-Q5 (FRA/SCN/ESP) - Release Date: 1991-11-15 -->
+		<!-- Serial: NES-Q5 (FRA/SCN/ESP/UKV) - Release Date: 1991-11-15 -->
 		<description>The Simpsons: Bart vs. The Space Mutants (Euro)</description>
 		<year>1991</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
-			<feature name="mmc1_type" value="MMC1B3" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-q5-0 prg" size="131072" crc="bb2e87aa" sha1="236cd92a36eeed1949956fcb7b9b4b1c27af1006" offset="00000" />
 			</dataarea>
@@ -26915,7 +28085,7 @@
 	</software>
 
 	<software name="skatedie">
-		<!-- Serial: NES-DI (EEC/ESP) - Release Date: 1990-08-17 -->
+		<!-- Serial: NES-DI (EEC/ESP/GPS) - Release Date: 1990-08-17 -->
 		<description>Skate or Die! (Euro)</description>
 		<year>1990</year>
 		<publisher>Palcom</publisher>
@@ -27452,6 +28622,22 @@
 			<feature name="pcb" value="NES-ANROM" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-lx-0 prg" size="131072" crc="edcf1b71" sha1="db8a165b40542394c6f13914f4722743cd5ab511" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="solsticej" cloneof="solstice">
+		<!-- Serial: ESF-E3 (ESPG-33) - Release Date: 1990-07-20 - Alternative Title: ソルスティス 三次元迷宮の狂獣 -->
+		<description>Solstice (Jpn)</description>
+		<year>1990</year>
+		<publisher>Epic / Sony Records</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-AMROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="esf-e3-0 prg" size="131072" crc="a91460b8" sha1="758c9ec51d442db2c02c4fb37a9aaa37cc8f6b05" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -28231,7 +29417,7 @@
 	</software>
 
 	<software name="esb">
-		<!-- Serial: NES-EK-NOE - Release Date: 1992-07-18 -->
+		<!-- Serial: NES-EK (NOE/ESP) - Release Date: 1992-07-18 -->
 		<description>Star Wars: The Empire Strikes Back (Euro)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
@@ -28267,7 +29453,7 @@
 	</software>
 
 	<software name="startrpc">
-		<!-- Serial: NES-OC (NOE/SCN) - Release Date: 1992-08-20 -->
+		<!-- Serial: NES-OC (NOE/FRG/SCN) - Release Date: 1992-08-20 -->
 		<description>StarTropics (Euro)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -28320,9 +29506,9 @@
 	</software>
 
 	<software name="stealth">
-		<!-- Serial: NES-LH (EEC/SCN/ESP) - Release Date: 1990 -->
+		<!-- Serial: NES-LH (EEC/SCN/ESP) - Release Date: 1991-05-30 -->
 		<description>Stealth ATF (Euro)</description>
-		<year>1990</year>
+		<year>1991</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" /> <!-- also found with NES-SLRROM pcb -->
@@ -28332,6 +29518,26 @@
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-lh-0 chr" size="131072" crc="bba9a33d" sha1="4eb2f19e79dfa9d8d655bfa4d8c696161a7db62f" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sted">
+		<!-- Serial: KAC-3E - Release Date: 1990-07-27 - Alternative Title: ＳＴＥＤ 遺跡惑星の野望 -->
+		<description>STED: Iseki Wakusei no Yabou (Jpn)</description>
+		<year>1990</year>
+		<publisher>KAC</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SKROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="kac-3e-0 prg" size="131072" crc="33159eac" sha1="0b76f18297a4af950e767ce0cc645157fefaad56" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="kac-3e-0 chr" size="131072" crc="38b7b503" sha1="c7d9d42147c20b7bb2e53b937309e393795860de" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -28406,7 +29612,7 @@
 	</software>
 
 	<software name="streetgn">
-		<!-- Serial: NES-ST-SCN - Release Date: 1992-05-27 -->
+		<!-- Serial: NES-ST (SCN/UKV) - Release Date: 1992-05-27 -->
 		<description>Street Gangs (Euro)</description>
 		<year>1992</year>
 		<publisher>Infogrames</publisher>
@@ -28993,7 +30199,7 @@
 	</software>
 
 	<software name="smb3">
-		<!-- Serial: NES-UM (GBR/FRG/SCN/ESP) - Release Date: 1991-08-29 -->
+		<!-- Serial: NES-UM (GBR/FRG/NOE/SCN/ESP) - Release Date: 1991-08-29 -->
 		<description>Super Mario Bros. 3 (Euro)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
@@ -29173,7 +30379,7 @@
 	</software>
 
 	<software name="spikvbal">
-		<!-- Serial: NES-VJ (NOE/SCN/ESP) - Release Date: 1991-03-21 -->
+		<!-- Serial: NES-VJ (NOE/SCN/ESP/UKV) - Release Date: 1991-03-21 -->
 		<description>Super Spike V'Ball (Euro)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
@@ -29505,7 +30711,7 @@
 	</software>
 
 	<software name="swordsrp">
-		<!-- Serial: NES-WP (AUS/SCN) - Release Date: 1993 -->
+		<!-- Serial: NES-WP (AUS/SCN/UKV/NOE) - Release Date: 1993-04-11 -->
 		<description>Swords and Serpents (Euro)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -29589,7 +30795,7 @@
 	</software>
 
 	<software name="t2judge">
-		<!-- Serial: NES-62 (SCN/ESP) - Release Date: 1992-05-09 -->
+		<!-- Serial: NES-62 (NOE/SCN/ESP) - Release Date: 1992-05-09 -->
 		<description>T2: Terminator 2: Judgment Day (Euro)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
@@ -30384,7 +31590,7 @@
 	</software>
 
 	<software name="tmnt">
-		<!-- Serial: NES-88 (EEC/SCN) - Release Date: 1990-08-17 -->
+		<!-- Serial: NES-88 (EEC/SCN/GPS) - Release Date: 1990-08-17 -->
 		<description>Teenage Mutant Hero Turtles (Euro)</description>
 		<year>1990</year>
 		<publisher>Palcom</publisher>
@@ -30803,18 +32009,38 @@
 	</software>
 
 	<software name="tetris">
-		<!-- Serial: NES-EI (EEC/ESP) - Release Date: 1990-02-23 -->
+		<!-- Serial: NES-EI (EEC/ESP/FRA) - Release Date: 1990-02-23 -->
 		<description>Tetris (Euro)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SEROM" />
-			<feature name="mmc1_type" value="MMC1B3" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="32768">
 				<rom name="pal-ei-0 prg" size="32768" crc="d3dea841" sha1="677fecd986cdc9bce65533d04b1bd90728045393" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="16384">
 				<rom name="nes-ei-0 chr" size="16384" crc="251af21c" sha1="e3ee7056aba68ddb2770ece06127790fe9a57b74" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris2">
+		<!-- Serial: NES-TS-UKV - Release Date: 1993 -->
+		<description>Tetris 2 (Euro)</description>
+		<year>1993</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TSROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-ts-0 prg" size="131072" crc="cd8b279f" sha1="30375817dd08d97517aa88035973f72d4e8a27d9" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="pal-ts-0 chr" size="131072" crc="9c4db593" sha1="ac16761a9e3dfd10384ef680283ea9c3fabe9b53" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -30875,6 +32101,23 @@
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetsudo">
+		<!-- Serial: DBF-RW - Release Date: 1987-12-01 - Alternative Title: 鉄道王 -->
+		<description>Tetsudou Ou - Famicom Boardgame (Jpn)</description>
+		<year>1987</year>
+		<publisher>dB-SOFT</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-CNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="0.prg" size="32768" crc="7fc66782" sha1="639b42f3295e9b59512d70e7313a525bbe69d09f" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="0.chr" size="32768" crc="35c0996e" sha1="e03c056a7b4e732a3cee1c63c968ed075798bc30" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -31081,7 +32324,7 @@
 	</software>
 
 	<software name="timelord">
-		<!-- Serial: NES-LZ-ESP - Release Date: 1991 - Alternative Title:  -->
+		<!-- Serial: NES-LZ (NOE/ESP) - Release Date: 1991 -->
 		<description>Time Lord (Euro)</description>
 		<year>1991</year>
 		<publisher>Milton Bradley</publisher>
@@ -31183,13 +32426,13 @@
 	</software>
 
 	<software name="ttoonadv">
-		<!-- Serial: NES-NI (NOE/SCN) - Release Date: 1993-01-26 -->
+		<!-- Serial: NES-NI (NOE/SCN) - Release Date: 1992-10-22 -->
 		<description>Tiny Toon Adventures (Euro)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
-			<feature name="mmc3_type" value="MMC3C" />
+			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-ni-0 prg" size="131072" crc="d3c7f83b" sha1="42d3c102d7ce9b90f03237f0a56f028d55831c4b" offset="00000" />
 			</dataarea>
@@ -31602,7 +32845,7 @@
 	</software>
 
 	<software name="topgun2">
-		<!-- Serial: NES-OG (SCN/ESP) - Release Date: 1991-10-24 -->
+		<!-- Serial: NES-OG (SCN/ESP/UKV) - Release Date: 1991-10-24 -->
 		<description>Top Gun: The Second Mission (Euro)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
@@ -31759,6 +33002,23 @@
 		</part>
 	</software>
 
+	<software name="touhoukr">
+		<!-- Serial: NAT-N1 - Release Date: 1988-11-10 - Alternative Title: 東方見文録 -->
+		<description>Touhou Kenbun Roku (Jpn)</description>
+		<year>1988</year>
+		<publisher>Natsume</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SLROM" />
+			<feature name="mmc1_type" value="MMC1A" />
+			<dataarea name="prg" size="131072">
+				<rom name="nat-n1-0 prg" size="131072" crc="8cea87c5" sha1="605dc0cea4a47fdb80a291239a14ea6504e1effd" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nat-n1-0 chr" size="131072" crc="50c58415" sha1="89658f81d997a4837c7047ad9d4e52055eb83061" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tokoclub">
 		<!-- Serial: JF-37 - Release Date: 1992-07-24 - Alternative Title: 闘魂倶楽部 -->
 		<description>Toukon Club (Jpn)</description>
@@ -31878,7 +33138,7 @@
 	</software>
 
 	<software name="trackbar">
-		<!-- Serial: NES-9I (SCN/ESP) - Release Date: 1992-02-20 -->
+		<!-- Serial: NES-9I (AUS/SCN/ESP) - Release Date: 1992-02-20 -->
 		<description>Track &amp; Field in Barcelona (Euro)</description>
 		<year>1992</year>
 		<publisher>Kemco</publisher>
@@ -32144,7 +33404,7 @@
 	</software>
 
 	<software name="ufouria">
-		<!-- Serial: NES-6U (NOE/SCN) - Release Date: 1992-11-19 -->
+		<!-- Serial: NES-6U (NOE/SCN/ESP) - Release Date: 1992-11-19 -->
 		<description>U-four-ia: The Saga (Euro)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
@@ -32579,6 +33839,22 @@
 		</part>
 	</software>
 
+	<software name="usaiceh" cloneof="prohocky">
+		<!-- Serial: JF-40 - Release Date: 1993-03-06 - Alternative Title: ＵＳＡアイスホッケーinＦＣ -->
+		<description>USA Ice Hockey In FC (Jpn)</description>
+		<year>1993</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="JALECO-JF-37" />
+			<dataarea name="prg" size="131072">
+				<rom name="0.prg" size="131072" crc="b89764a2" sha1="424b31a241c8876ceefcefc9f9a61931370cccc1" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="0.chr" size="131072" crc="07731c55" sha1="46a40978751326126ee66fbaac618fc29a161cb7" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="valis">
 		<!-- Serial: GTS-VA - Release Date: 1987-08-21 - Alternative Title: 夢幻戦士 ヴァリス -->
 		<description>Valis: The Fantastic Soldier (Jpn)</description>
@@ -32609,6 +33885,23 @@
 			</dataarea>
 			<dataarea name="chr" size="32768">
 				<rom name="namcot wb chr" size="32768" crc="e7193a27" sha1="5c3efd5fcc29377f7ba380a1c967777be02cf43e" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vegascon">
+		<!-- Serial: SEI-1B - Release Date: 1989-11-24 - Alternative Title: ベガスコネクション カジノより愛をこめて -->
+		<description>Vegas Connection - Casino Kara Ai O Komete (Jpn)</description>
+		<year>1989</year>
+		<publisher>Sigma Shouji</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SNROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="262144">
+				<rom name="sei-1b-0 prg" size="262144" crc="57e9b21c" sha1="1cdc08894f9cce3bf0550cc271390379ec0cf5e6" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -32809,6 +34102,23 @@
 		</part>
 	</software>
 
+	<software name="wwfking">
+		<!-- Serial: NES-K6-NOE - Release Date: 1993 -->
+		<description>WWF King of the Ring (Euro)</description>
+		<year>1993</year>
+		<publisher>LJN</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-k6-0 prg" size="131072" crc="d11c5d60" sha1="eaf5a20b6f6d2c84a889bbf2ff857dd5ece35bb0" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="pal-k6-0 chr" size="262144" crc="c9e43815" sha1="0328415d8556d7733ad926fb17e9248aef5ee3f5" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wwfkingu" cloneof="wwfking">
 		<!-- Serial: NES-K6-USA - Release Date: 1993-11 -->
 		<description>WWF King of the Ring (USA)</description>
@@ -32875,7 +34185,7 @@
 	</software>
 
 	<software name="wrestlmc">
-		<!-- Serial: NES-W9-UKV - Release Date: 1991-12-20 -->
+		<!-- Serial: NES-W9 (UKV/NOE) - Release Date: 1991-12-20 -->
 		<description>WWF WrestleMania Challenge (Euro)</description>
 		<year>1991</year>
 		<publisher>LJN</publisher>
@@ -32887,6 +34197,23 @@
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwfsteel">
+		<!-- Serial: NES-WS-NOE - Release Date: 1992 -->
+		<description>WWF Wrestlemania: Steel Cage Challenge (Euro)</description>
+		<year>1992</year>
+		<publisher>LJN</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-ws-0 prg" size="131072" crc="449e6557" sha1="7c8ede2e39d39f03e27d1888cb015b8e186d172e" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="pal-ws-0 chr" size="262144" crc="d58ba61c" sha1="8df1e393c354fdf95a75e2edc2586fcaae8bb95f" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -33421,6 +34748,23 @@
 		</part>
 	</software>
 
+	<software name="wilyrock">
+		<!-- Serial: CAP-BE - Release Date: 1993-01-15 - Alternative Title: ワイリー＆ライトのロックボード ザッツパラダイス -->
+		<description>Wily &amp; Light no Rockboard: That's Paradise (Jpn)</description>
+		<year>1993</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TGROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="262144">
+				<rom name="cap-be-0 prg" size="262144" crc="23f4b48f" sha1="6b25180c4f73928fd7ba773d41635d32a20fdf3d" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="willowj" cloneof="willow">
 		<!-- Serial: CAP-WI - Release Date: 1989-07-18 - Alternative Title: ウィロー -->
 		<description>Willow (Jpn)</description>
@@ -33456,13 +34800,13 @@
 	</software>
 
 	<software name="willow">
-		<!-- Serial: NES-WI (FRG/SCN/ESP) - Release Date: 1993-04-11 -->
+		<!-- Serial: NES-WI (FRG/SCN/ESP) - Release Date: 1991-11-28 -->
 		<description>Willow (Euro)</description>
 		<year>1991</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
-			<feature name="mmc1_type" value="MMC1B3" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-wi-0 prg" size="131072" crc="8777d399" sha1="aab665bb7c6e6c0b4d8cecec7f70cb9554b37017" offset="00000" />
 			</dataarea>
@@ -34071,6 +35415,26 @@
 		</part>
 	</software>
 
+	<software name="yamaskzs">
+		<!-- Serial: HCT-QZ (008) - Release Date: 1990-11-02 - Alternative Title: 山村美紗サスペンス 京都財テク殺人事件 -->
+		<description>Yamamura Misa Suspense - Kyouto Zaiteku Satsujin Jiken (Jpn)</description>
+		<year>1990</year>
+		<publisher>Hector</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TKROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="131072">
+				<rom name="hct-qz-0 prg" size="131072" crc="57c12c17" sha1="8d056f7104e88b9108565c47cf87abb242969e23" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="hct-qz-0 chr" size="131072" crc="bd284093" sha1="e229f6a795073a92e846e3bfd5f3bdbe4d92d9d6" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="yieara" cloneof="yiear">
 		<!-- Serial: KON-RC802 - Release Date: 1985-04-22 - Alternative Title: イーアルカンフー -->
 		<description>Yie Ar Kung Fu (Jpn, v1.2)</description>
@@ -34435,6 +35799,23 @@
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zenninja">
+		<!-- Serial: NES-ZN-NOE - Release Date: 1993 -->
+		<description>Zen: Intergalactic Ninja (Euro)</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="131072">
+				<rom name="pal-zn-0 prg" size="131072" crc="ba8e7edd" sha1="9ee8cf897139d8e43a5572e53215821cbd3660b9" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="pal-zn-0 chr" size="131072" crc="33d36075" sha1="b94811de07b01c5a1a2f51576148e3f0b97ecb05" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35055,22 +36436,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="herolancj" cloneof="herolanc">
-		<!-- Serial:  - Release Date: 1991-03-08 - Alternative Title:  -->
-		<description>Advanced Dungeons &amp; Dragons: Heroes of the Lance (Jpn)</description>
-		<year>1991</year>
-		<publisher>Pony Canyon</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="advanced dungeons &amp; dragons - heroes of the lance (japan).chr" size="131072" crc="32876b98" sha1="4060faab27b193cbd88bbf882aa72dee7a456664" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="advanced dungeons &amp; dragons - heroes of the lance (japan).prg" size="131072" crc="929c7b2f" sha1="6d8ad05923f392dd39cbcf47d1c697677da6c718" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="herolancp" cloneof="herolanc">
 		<description>Advanced Dungeons &amp; Dragons - Heroes of the Lance (USA, Prototype)</description>
 		<year>1991</year>
@@ -35082,22 +36447,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="advanced dungeons &amp; dragons - heroes of the lance (usa) (beta).prg" size="131072" crc="21598f85" sha1="dfc0865bf8b684c6d4bf68dfc4a6147f85add7f3" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="poolradj" cloneof="poolrad">
-		<!-- Serial:  - Release Date: 1991-06-28 - Alternative Title:  -->
-		<description>Advanced Dungeons &amp; Dragons: Pool of Radiance (Jpn)</description>
-		<year>1991</year>
-		<publisher>Pony Canyon</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="advanced dungeons &amp; dragons - pool of radiance (japan).chr" size="131072" crc="a750f6d9" sha1="d7053b832c79b8ed4a8d8ab28b7650d65e0dcf52" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="524288">
-				<rom name="advanced dungeons &amp; dragons - pool of radiance (japan).prg" size="524288" crc="a6819195" sha1="1f23708665cc9801c99e24b590b40528ca1d2cc1" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -35161,22 +36510,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="ai sensei no oshiete - watashi no hoshi (japan).prg" size="262144" crc="fd3fc292" sha1="6320145a0a1d6f00dc30ea1d6c1209d16be86d51" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="airfortr">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Air Fortress (Euro)</description>
-		<year>1989?</year>
-		<publisher>HAL Laboratory</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="air fortress (europe).prg" size="131072" crc="991cbdf2" sha1="90c08d541f02c1dc84ea8b2662c8e13fdc01fabd" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="32768">
-				<rom name="nes-ai-0 chr" size="32768" crc="3eebd9c5" sha1="b251da152c56053bf9d8e87d63ef8192ae391245" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35260,22 +36593,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="alien syndrome (japan).prg" size="131072" crc="e77268ec" sha1="e574a0d3e498b8e67494f7a26104c59e9330e402" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ameridai">
-		<!-- Serial:  - Release Date: 1988-10-28 - Alternative Title:  -->
-		<description>America Daitouryou Senkyo (Jpn)</description>
-		<year>1988</year>
-		<publisher>Hector</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="america daitouryou senkyo (japan).chr" size="131072" crc="719d68d2" sha1="2582e6b2195bdf70e5334cf10cb5f4c65a97b9a9" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="america daitouryou senkyo (japan).prg" size="131072" crc="7831b2ff" sha1="84aa44d3db0495a1a5cf6c24a16508ffe4999829" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -35365,22 +36682,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="aso" cloneof="alphamis">
-		<!-- Serial:  - Release Date: 1986-09-03 - Alternative Title:  -->
-		<description>ASO - Armored Scrum Object (Jpn)</description>
-		<year>1986</year>
-		<publisher>SNK</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-CNROM" />
-			<dataarea name="chr" size="32768">
-				<rom name="aso - armored scrum object (japan).chr" size="32768" crc="a2f0d57c" sha1="f6d5c8ab5c3822b1658d020497715c85b6a20b56" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="aso - armored scrum object (japan).prg" size="32768" crc="72c39b9e" sha1="0927702c291072e5367795e46a61675672630ce1" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="astyanaxup" cloneof="astyanax">
 		<description>Astyanax (USA, Prototype)</description>
 		<year>1990</year>
@@ -35392,22 +36693,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="astyanax (usa) (beta).prg" size="131072" crc="9b45711e" sha1="fb01c1ed2adba6cd0082984a33b9c0f8f8283795" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gatein">
-		<!-- Serial:  - Release Date: 1990-05-25 - Alternative Title:  -->
-		<description>Baken Hisshou Gaku - Gate In (Jpn)</description>
-		<year>1990</year>
-		<publisher>KAC</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="262144">
-				<rom name="baken hisshou gaku - gate in (japan).prg" size="262144" crc="27c16011" sha1="780ed4c78f02001b364026649b42ef7d9104588b" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -35616,22 +36901,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="battlest">
-		<!-- Serial:  - Release Date: 1991-12-26 - Alternative Title:  -->
-		<description>Battle Storm (Jpn)</description>
-		<year>1991</year>
-		<publisher>Yonezawa</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="battle storm (japan).chr" size="131072" crc="f957a5e7" sha1="062857f1ee12b7a05a307a7678c2580d0c0d68e6" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="battle storm (japan).prg" size="131072" crc="88739adf" sha1="8c6dda76e8c93a48c4c101d867605cd4b222b816" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="btoadsdd">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Battletoads &amp; Double Dragon: The Ultimate Team (Euro)</description>
@@ -35780,39 +37049,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="blue marlin, the (japan).prg" size="131072" crc="d24de7f9" sha1="ed477871260db08d399c9107579454b5bc9a9521" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bluesb">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>The Blues Brothers (Euro)</description>
-		<year>1992?</year>
-		<publisher>Titus</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-UNROM" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="131072">
-				<rom name="blues brothers, the (europe).prg" size="131072" crc="e4776a2b" sha1="e0c970fc9c2cf42afba958b056e2dd5f99097ed8" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="boynbloba" cloneof="boynblob">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>David Crane's A Boy and His Blob: Trouble on Blobolonia (Euro)</description>
-		<year>1991</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="nes-b5-0 prg" size="131072" crc="ad50e497" sha1="33637a033cdf33c62742bac19d5e1d65ba0ab3f6" offset="00000" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="boy and his blob, a - trouble on blobolonia (europe).chr" size="131072" crc="10c97b29" sha1="2145f9584cdc3c34d795c39c8357515a37fd214f" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -36029,22 +37265,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="casinod">
-		<!-- Serial:  - Release Date: 1993-03-19 - Alternative Title:  -->
-		<description>Casino Derby (Jpn)</description>
-		<year>1993</year>
-		<publisher>Yonezawa</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="casino derby (japan).prg" size="131072" crc="e44001d8" sha1="a7800f88af4d5c8be68dc194acaee60c6e82d3c6" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="chaoswld">
 		<!-- Serial:  - Release Date: 1991-10-25 - Alternative Title:  -->
 		<description>Chaos World (Jpn)</description>
@@ -36141,22 +37361,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="chipndl2">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Disney's Chip 'n Dale Rescue Rangers 2 (Euro)</description>
-		<year>1994</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="chip 'n dale rescue rangers 2 (europe).prg" size="131072" crc="cce5a91f" sha1="ad0d9add5985884eb5826235c5d000a83d3806ca" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-dv-0 chr" size="131072" crc="a0c30578" sha1="c49107f8280c56fc3ac72d4e8c80e20b4ed4ad58" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="chipndl2up" cloneof="chipndl2">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Disney's Chip 'n Dale Rescue Rangers 2 (USA, Prototype)</description>
@@ -36221,22 +37425,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="chiyonof">
-		<!-- Serial:  - Release Date: 1990-12-07 - Alternative Title:  -->
-		<description>Chiyonofuji no Ooichou (Jpn)</description>
-		<year>1990</year>
-		<publisher>Face</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="chiyonofuji no ooichou (japan).chr" size="131072" crc="d6a96267" sha1="8fd2e7a79970cb5a922875e8bee8cf00147ed14c" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="chiyonofuji no ooichou (japan).prg" size="131072" crc="0e8cfd62" sha1="757b697b3db5bcc1dcf19b9f29686abfeaf758cd" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="choplift">
 		<!-- Serial: JF-08 - Release Date: 1986-06-26 - Alternative Title: チョップリフター -->
 		<description>Choplifter (Jpn, Rev. 1)</description>
@@ -36266,40 +37454,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="choujin sentai - jetman (japan).prg" size="131072" crc="4ba8fcb6" sha1="aceeec662e83b7d31ac2a8a2e70992ade147159c" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chuugoks">
-		<!-- Serial:  - Release Date: 1988-11-29 - Alternative Title:  -->
-		<description>Chuugoku Senseijutsu (Jpn)</description>
-		<year>1988</year>
-		<publisher>Jaleco</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-UNROM" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="prg" size="131072">
-				<rom name="chuugoku senseijutsu (japan).prg" size="131072" crc="f64cb545" sha1="01c683a1e83220a9b976a541aaa9b4b5b8febcfd" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="citycon">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>City Connection (Euro)</description>
-		<year>1988?</year>
-		<publisher>Jaleco</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-CNROM" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="32768">
-				<rom name="city connection (europe).prg" size="32768" crc="bbb3de0a" sha1="aa247c87bdfa04b95921679608043b9dbd37feec" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="32768">
-				<rom name="nes-ci-0 chr" size="32768" crc="ead78010" sha1="0529254f8a8733a69c7d136c6b8cbd6edef129a1" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -36336,22 +37490,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="conflictj" cloneof="conflict">
-		<!-- Serial:  - Release Date: 1989-12-01 - Alternative Title:  -->
-		<description>Conflict (Jpn)</description>
-		<year>1989</year>
-		<publisher>Vic Tokai</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="conflict (japan).chr" size="131072" crc="2fc28bea" sha1="0849f013bf9fef57f62f48a9b5705a191a3f9384" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="conflict (japan).prg" size="131072" crc="6a10add2" sha1="2fa75f7db7d581f332603db5c4ddeaa4f8707c22" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cosmic">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Cosmic Spacehead (Euro)</description>
@@ -36381,23 +37519,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="cosmo police galivan (japan).prg" size="131072" crc="720fff06" sha1="03d6d18ea4e7d3ac087dc51e7aba4ca4730714cf" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crackout">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Crackout (Euro)</description>
-		<year>1991</year>
-		<publisher>Palcom</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-UNROM" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="prg" size="131072">
-				<rom name="crackout (europe).prg" size="131072" crc="81af4af9" sha1="aba26002dff0d265bc2ac27a2689924b4fe0ed81" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -36765,22 +37886,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="dondoko2" supported="partial">
-		<!-- Serial:  - Release Date: 1992-01-31 - Alternative Title:  -->
-		<description>Don Doko Don 2 (Jpn)</description>
-		<year>1992</year>
-		<publisher>Taito</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="TAITO-TC0190FMC+PAL16R4" />
-			<dataarea name="chr" size="262144">
-				<rom name="don doko don 2 (japan).chr" size="262144" crc="2e7215d0" sha1="b05fd4821fdba6b07daf8afcfb656886a6a5995e" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="don doko don 2 (japan).prg" size="131072" crc="49c84b4e" sha1="ea1d369fd6ce689db1456752b1dc90fe2a4138da" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dkongjrj" cloneof="dkongjr">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Donkey Kong Jr. (Jpn)</description>
@@ -36930,23 +38035,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="drgnunit" cloneof="castldrg">
-		<!-- Serial:  - Release Date: 1990-02-27 - Alternative Title:  -->
-		<description>Dragon Unit (Jpn)</description>
-		<year>1990</year>
-		<publisher>Athena</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-UNROM" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="131072">
-				<rom name="dragon unit (japan).prg" size="131072" crc="804f898a" sha1="77b73614354ba2484da87345cf194a2844edb3e5" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="drgnwarsj" cloneof="drgnwars">
 		<!-- Serial:  - Release Date: 1991-08-09 - Alternative Title:  -->
 		<description>Dragon Wars (Jpn)</description>
@@ -37008,23 +38096,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dropzone">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Dropzone (Euro)</description>
-		<year>1992</year>
-		<publisher>Mindscape</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-CNROM" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="32768">
-				<rom name="dropzone (europe).chr" size="32768" crc="9e831a2f" sha1="e578afa5a4025a598991977537464b7057b4b184" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="dropzone (europe).prg" size="32768" crc="d21da4f7" sha1="6eef8b3df065617359dc60a302e0bc9c0cc167cc" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -37155,28 +38226,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="emperorj" cloneof="emperor" supported="no">
-		<!-- Serial:  - Release Date: 1991-05-23 - Alternative Title:  -->
-		<description>L'Empereur (Jpn)</description>
-		<year>1991</year>
-		<publisher>Koei</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-EKROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="empereur, l' (japan).chr" size="131072" crc="508a2acc" sha1="e8cb6d9d887452d50265231b633c651bf4cb0893" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="empereur, l' (japan).prg" size="262144" crc="57e3218b" sha1="8d21b6d59c15c61b00038e73e281b42b566ddcf5" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
-			</dataarea>
-			<!-- 1k Internal RAM in the MMC5 chip (ExRAM) -->
-			<dataarea name="mapper_ram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -37436,23 +38485,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="train8ft">
-		<!-- Serial:  - Release Date: 1987-12-01 - Alternative Title:  -->
-		<description>Family Trainer 8 - Totsugeki! Fuuun Takeshi-Jou (Jpn)</description>
-		<year>1987</year>
-		<publisher>Bandai</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-CNROM" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="32768">
-				<rom name="family trainer 8 - totsugeki! fuuun takeshi-jou (japan).chr" size="32768" crc="5b5a3616" sha1="9d1cf8467526eec2f89f7d82df71b467b38e19ab" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="family trainer 8 - totsugeki! fuuun takeshi-jou (japan).prg" size="32768" crc="59794f2d" sha1="06f424509451b30682362b7bc6c23d02d34ee930" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="fcgenjin" cloneof="bonkadv">
 		<!-- Serial:  - Release Date: 1993-07-30 - Alternative Title:  -->
 		<description>FC Genjin - Freakthoropus Computerus (Jpn)</description>
@@ -37465,22 +38497,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="fc genjin - freakthoropus computerus (japan).prg" size="262144" crc="3272bc3c" sha1="6c6989f8db72556d309aa92b49479616d1eb4478" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ferrarij" cloneof="ferrari">
-		<!-- Serial:  - Release Date: 1992-11-13 - Alternative Title:  -->
-		<description>Ferrari Grand Prix Challenge (Jpn)</description>
-		<year>1992</year>
-		<publisher>Coconuts Japan</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="ferrari (japan).chr" size="131072" crc="ed6c25bc" sha1="ff45bcf21ed1492810bfb766a3b02c5cbb9fdb21" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="ferrari (japan).prg" size="131072" crc="1995ac4e" sha1="58e42bdbe4cd1254328f5efb67281728fca3cf1f" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -37779,38 +38795,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="godzilla">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Godzilla - Monster of Monsters! (Euro)</description>
-		<year>1989</year>
-		<publisher>Toho</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="godzilla - monster of monsters! (europe).prg" size="131072" crc="d76a57bf" sha1="b3e772dd74b4431c56b92968ad253fe1623c730e" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-gz-0 chr" size="131072" crc="e5c2bc99" sha1="8e29244861a1a32c9d58bb4f6ecb2905e2556beb" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="g13icar" cloneof="g13mafat">
-		<!-- Serial:  - Release Date: 1990-07-27 - Alternative Title:  -->
-		<description>Golgo 13 - Icarus no Nazo (Jpn)</description>
-		<year>1990</year>
-		<publisher>Vic Tokai</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="golgo 13 - the riddle of icarus (japan).chr" size="131072" crc="76839850" sha1="c57c2a90fe328f5003df21752866b558e92847db" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="golgo 13 - the riddle of icarus (japan).prg" size="131072" crc="cfd0cc7b" sha1="3c8e4c7be0540ce95dae55db4998481dadc4231e" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="goonies2jp" cloneof="goonies2">
 		<description>Goonies II: Fratelli Saigo no Chousen (Jpn, Prototype)</description>
 		<year>1987</year>
@@ -37909,22 +38893,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="greattnk" cloneof="irontank">
-		<!-- Serial:  - Release Date: 1988-07-01 - Alternative Title:  -->
-		<description>Great Tank (Jpn)</description>
-		<year>1988</year>
-		<publisher>SNK</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="great tank (japan).chr" size="131072" crc="2c46d759" sha1="6308ffa4d918873a5396bee4fc4faf165b85adf8" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="great tank (japan).prg" size="131072" crc="3ecaa6a3" sha1="69d203f52ba1eb95c5a3b6cede728dbcdfd8d928" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gremlin2p" cloneof="gremlin2">
 		<description>Gremlins 2: The New Batch (Euro, Prototype)</description>
 		<year>1991</year>
@@ -37936,22 +38904,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="chr" size="262144">
 				<rom name="nes-2z-0 chr" size="262144" crc="59c28b7f" sha1="3092317b658340b566b696cdc3b3a21eb377d290" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gwar">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Guerrilla War (Euro)</description>
-		<year>1989?</year>
-		<publisher>SNK</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="guerrilla war (europe).prg" size="131072" crc="aecdbe24" sha1="16326f34efb3cbf5b8fd7076b06a7d9965a1fbc0" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-gw-0 chr" size="131072" crc="de1b8ea3" sha1="67b5841d31f916410ce627cb1e1f2c566dbdbfd5" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38085,22 +39037,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="homea2">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Home Alone 2 - Lost In New York (Euro)</description>
-		<year>1992</year>
-		<publisher>T*HQ</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="home alone 2 - lost in new york (europe).prg" size="131072" crc="1bc65714" sha1="88226bed22293ffefd486b3fe236b1a828d8f683" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-hm-0 chr" size="131072" crc="91ad1577" sha1="b4ba1b5aa2299b3a7ec6a54e3731a71eb13420fc" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="homern90">
 		<!-- Serial:  - Release Date: 1990-07-24 - Alternative Title:  -->
 		<description>Home Run Nighter '90 - The Pennant League (Jpn)</description>
@@ -38117,22 +39053,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="hook">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Hook (Euro)</description>
-		<year>1992</year>
-		<publisher>Ocean</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="hook (europe).prg" size="131072" crc="80638505" sha1="a3b6115cf1e344cd64940d7c6b9c88407f05b472" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-7q-0 chr" size="131072" crc="9c1762a5" sha1="643171e03a6cd3c58ef415c58b5c5b9514647652" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hookj" cloneof="hook">
 		<!-- Serial:  - Release Date: 1992-03-27 - Alternative Title:  -->
 		<description>Hook (Jpn)</description>
@@ -38145,22 +39065,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="hook (japan).prg" size="131072" crc="db511963" sha1="1149d6413bcd2a68c7255311bec853546237a8e9" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hoops">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Hoops (Euro)</description>
-		<year>1989</year>
-		<publisher>Jaleco</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="hoops (europe).prg" size="131072" crc="67392913" sha1="fd3648b4ba162b665d6aa28a0bc12af8860ce488" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-2b-0 chr" size="131072" crc="4ba913d0" sha1="2724a1eed2a995337e974e40d7b140795df0ea7c" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38209,22 +39113,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="hudson's adventure island ii (usa) (beta).prg" size="131072" crc="5b89a2df" sha1="1a8a043c726dfc625fcbff5a3e90a2ded4ad46bf" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="huntred">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>The Hunt For Red October (Euro)</description>
-		<year>1991</year>
-		<publisher>Hi Tech Expressions</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="hunt for red october, the (europe).chr" size="131072" crc="ac1d75f0" sha1="68a5b41399d0c6983ede26f69ded06e467fd0605" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="hunt for red october, the (europe).prg" size="131072" crc="407b7eeb" sha1="0765b8029241f6542ef3fff530dd5cf8d30d4aa8" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -38455,22 +39343,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="indora">
-		<!-- Serial: 1987-10-20 - Release Date:  - Alternative Title:  -->
-		<description>Indora no Hikari (Jpn)</description>
-		<year>1987</year>
-		<publisher>Kotobuki System</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="indora no hikari (japan).prg" size="131072" crc="174f860a" sha1="00dd4cfb090d608fbe667b4ccc9263831fafb978" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="intcrickp" cloneof="intcrick">
 		<description>International Cricket (Australia, Prototype)</description>
 		<year>1992</year>
@@ -38482,38 +39354,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="international cricket (australia) (beta).prg" size="131072" crc="9db6a3ed" sha1="1f8ffef26eaaa4080ef35e8e3e2013067c1f5940" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="intcrick">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>International Cricket (Australia)</description>
-		<year>1992</year>
-		<publisher>Laser Beam</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="international cricket (australia).chr" size="131072" crc="8ddb599e" sha1="1560daea710d2dedac32579c15a5051dd0a60acd" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="international cricket (australia).prg" size="131072" crc="2640de27" sha1="4034d9e4e89b72ab1545e3aef325b59f61fa961c" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="irontank">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Iron Tank: The Invasion of Normandy (Euro)</description>
-		<year>1988</year>
-		<publisher>SNK</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="iron tank - the invasion of normandy (europe).prg" size="131072" crc="969d8687" sha1="689ed0fc97902645bd06fecb0df6a80bae36a797" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-it-0 chr" size="131072" crc="c61175cc" sha1="bebc127b3cad2ff0448a0c48119c817c1ac98d29" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38530,38 +39370,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="j.league fighting soccer - the king of ace strikers (japan).prg" size="131072" crc="1f2f4861" sha1="74000b4f3363527f7023202211632974157097e6" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jlwinnin">
-		<!-- Serial:  - Release Date: 1994-05-27 - Alternative Title:  -->
-		<description>J.League Winning Goal (Jpn)</description>
-		<year>1994</year>
-		<publisher>EAV</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="j.league winning goal (japan).chr" size="131072" crc="bd6cf7ca" sha1="1ea8a3a343662a6d8655bfbe44bce1d5e72bb178" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="j.league winning goal (japan).prg" size="131072" crc="12bba335" sha1="6d7794704a460f1c89040f26f1c8fe4b4f352ac7" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jbjr">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>James Bond Jr (Euro)</description>
-		<year>1992?</year>
-		<publisher>T*HQ</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="james bond jr (europe).prg" size="131072" crc="7e036525" sha1="dde643f669851a25f1207a71a0f11b3eb5b6a934" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-jb-0 chr" size="131072" crc="07cd3eb3" sha1="c13641d0b70d4418ffcc27368837608e48419dbe" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38863,22 +39671,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="kickle">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Kickle Cubicle (Euro)</description>
-		<year>1990?</year>
-		<publisher>Irem?</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="kickle cubicle (europe).chr" size="131072" crc="a30639bd" sha1="cd4413d340f71554a8700028deabc9d33e48bf8e" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="kickle cubicle (europe).prg" size="131072" crc="df411cf0" sha1="a0aae437f9b3de8734e62287591a65d094246734" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kingeyc" cloneof="kingey">
 		<!-- Serial: WT-KK-6 - Release Date: 1991 -->
 		<description>The King of Kings: The Early Years (USA, v1.1)</description>
@@ -38955,22 +39747,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="chr" size="32768">
 				<rom name="krazy kreat chr bded" size="32768" crc="98c888e0" sha1="afb8ca33519e1b5729ee0c4c212495bbcda78e72" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="krustyfh">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Krusty's Fun House (Euro)</description>
-		<year>1992</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="prg" size="262144">
-				<rom name="krusty's fun house (europe).prg" size="262144" crc="278db9e3" sha1="906a3b1b99d05274660a77a88713128cd6a60732" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-kf-0 chr" size="131072" crc="fce8e0ea" sha1="808f74e9124f273aab7adf5f31c2d5893b06323e" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -39057,22 +39833,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="lipple">
-		<!-- Serial:  - Release Date: 1988-01-23 - Alternative Title:  -->
-		<description>Lipple Island (Jpn)</description>
-		<year>1988</year>
-		<publisher>Sunsoft</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="lipple island (japan).prg" size="131072" crc="a38857eb" sha1="7704d094c6b2d1affcf84d9856548e5f17b041c4" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="lilmagic">
 		<!-- Serial:  - Release Date: 1990-09-14 - Alternative Title:  -->
 		<description>Little Magic (Jpn)</description>
@@ -39101,24 +39861,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lunarpol">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Lunar Pool (Euro)</description>
-		<year>1987</year>
-		<publisher>FCI</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-NROM-128" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="8192">
-				<rom name="lunar pool (europe).chr" size="8192" crc="1fff032b" sha1="2e6cea1d1388f00bfdaf55b712f9bba0d93b941e" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="lunar pool (europe).prg" size="16384" crc="dea0d843" sha1="56ed0c47d49b7a41d0ae58fcde39c574000f04c7" offset="00000" status="baddump" />
-				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -39240,22 +39982,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mjtaisen">
-		<!-- Serial:  - Release Date: 1992-05-20 - Alternative Title:  -->
-		<description>Mahjong Taisen (Jpn)</description>
-		<year>1992</year>
-		<publisher>Nihon Bussan</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="mahjong taisen (japan).chr" size="131072" crc="e37a1d57" sha1="219eab0df558f5fbdc5d884808eed2e94b41f7da" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="mahjong taisen (japan).prg" size="262144" crc="f55cdef2" sha1="b33fe15fdf232026c42d81c6d49c90c6fd506a5e" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -39561,23 +40287,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="mezatopg">
-		<!-- Serial:  - Release Date: 1993-03-05 - Alternative Title:  -->
-		<description>Mezase Top Pro - Green Ni Kakeru Yume (Jpn)</description>
-		<year>1993</year>
-		<publisher>Jaleco</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="JALECO-JF-41" /> <!-- Board type to be confirmed (but the game runs on Mapper 18 hw) -->
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="131072">
-				<rom name="mezase top pro - green ni kakeru yume (japan).chr" size="131072" crc="482e9eff" sha1="c2750a5a5f1fb87351cd78e2aacdfaf14d542151" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="mezase top pro - green ni kakeru yume (japan).prg" size="262144" crc="6701a19f" sha1="42e473b6e6244d336524e08a396eb2d44697f3f5" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mickeydb" cloneof="kidklown">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Mickey Mouse - Dream Balloon (USA, Prototype)</description>
@@ -39728,23 +40437,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="moejudo">
-		<!-- Serial:  - Release Date: 1990-06-29 - Alternative Title:  -->
-		<description>Moero!! Juudou Warriors (Jpn)</description>
-		<year>1990</year>
-		<publisher>Jaleco</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="JALECO-JF-28" /> <!-- Board type to be confirmed (but the game runs on Mapper 72 hw) -->
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="131072">
-				<rom name="moero!! juudou warriors (japan).chr" size="131072" crc="6bd848f1" sha1="92cc939ffdc1400fd02062496a6819ce0eec903a" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="moero!! juudou warriors (japan).prg" size="131072" crc="aa6e1a35" sha1="915008e4331b94c44d586e73748be3486b9a087f" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="moesoccr" cloneof="goal">
 		<!-- Serial:  - Release Date: 1988-12-23 - Alternative Title:  -->
 		<description>Moero!! Pro Soccer (Jpn)</description>
@@ -39823,38 +40515,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="262144">
 				<rom name="monopoly (japan).prg" size="262144" crc="86759c0f" sha1="e065a0a51bc01a85dc96492501086a13bf803a3a" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="monstpok">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Monster In My Pocket (Euro)</description>
-		<year>1992</year>
-		<publisher>Konami</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="monster in my pocket (europe).chr" size="131072" crc="3558dac8" sha1="ebd268abd565a8da0ecd8e39734b1292d31908ee" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="monster in my pocket (europe).prg" size="131072" crc="c1cd15dd" sha1="5c80b6c731efb783e34df63c29fcf902f483206b" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="monstmkr">
-		<!-- Serial:  - Release Date: 1991-12-20 - Alternative Title:  -->
-		<description>Monster Maker - 7 Tsu no Hihou (Jpn)</description>
-		<year>1991</year>
-		<publisher>Sofel</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="262144">
-				<rom name="monster maker - 7 tsu no hihou (japan).prg" size="262144" crc="fb1c0551" sha1="68f558cff6d8aa33bf5584597bc7e79bba0f09bd" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -39991,22 +40651,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="nekketsu! street basket - ganbare dunk heroes (japan).prg" size="131072" crc="4fb460cd" sha1="6eb0f56092da328bf280de4cf6e02baad905b93f" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nghostb2j" cloneof="nghostb2">
-		<!-- Serial:  - Release Date: 1990-12-26 - Alternative Title:  -->
-		<description>New Ghostbusters II (Jpn)</description>
-		<year>1990</year>
-		<publisher>HAL Kenkyuujo</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="new ghostbusters ii (japan).prg" size="131072" crc="76e85ada" sha1="b8d874d0916657423440516c145ce7bc15d4fe9d" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="pal-qd-0 chr" size="131072" crc="3fed9a67" sha1="17a37d2af2751e6f8ffce6756ff35783c47ec5f3" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40182,22 +40826,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="northnsj" cloneof="northns">
-		<!-- Serial:  - Release Date: 1990-09-28 - Alternative Title:  -->
-		<description>North &amp; South - Wakuwaku Nanboku Sensou (Jpn)</description>
-		<year>1990</year>
-		<publisher>Kemco</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="north &amp; south - wakuwaku nanboku sensou (japan).chr" size="131072" crc="d1ea387e" sha1="68453a115131db78cbde463285fc774ecb00398a" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="north &amp; south - wakuwaku nanboku sensou (japan).prg" size="131072" crc="68e8a520" sha1="9393668fdb5b1b8870d3b580344dad31297a688e" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="oekahira">
 		<!-- Serial:  - Release Date: 1991-03-26 - Alternative Title:  -->
 		<description>Oeka Kids - Anpanman no Hiragana Daisuki (Jpn)</description>
@@ -40210,23 +40838,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 32k VRAM on cartridge -->
 			<dataarea name="vram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="oishinbo">
-		<!-- Serial:  - Release Date: 1989-07-25 - Alternative Title:  -->
-		<description>Oishinbo (Jpn)</description>
-		<year>1989</year>
-		<publisher>Bandai</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="131072">
-				<rom name="oishinbo (japan).chr" size="131072" crc="f0267441" sha1="888906c7077e9fe9802ae9d8b595b5ccc5e4f184" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="oishinbo (japan).prg" size="131072" crc="335cfba6" sha1="c524376c835f9b345b3598f9c8e6abb887352812" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -40297,38 +40908,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="pachid2">
-		<!-- Serial:  - Release Date: 1992-07-10 - Alternative Title:  -->
-		<description>Pachinko Daisakusen 2 (Jpn)</description>
-		<year>1991</year>
-		<publisher>Coconuts Japan</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="pachinko daisakusen 2 (japan).chr" size="131072" crc="b1aacee2" sha1="0b06ba1ba63a4e166a9678a151b78cbd6259fc53" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="pachinko daisakusen 2 (japan).prg" size="131072" crc="1644c162" sha1="17f1a1ec7456291122aaeb5431cd4c1c11fe29e3" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pachikn4">
-		<!-- Serial:  - Release Date: 1991-11-22 - Alternative Title:  -->
-		<description>Pachio-Kun 4 (Jpn)</description>
-		<year>1991</year>
-		<publisher>Coconuts Japan</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="prg" size="524288">
-				<rom name="pachio-kun 4 (japan).prg" size="524288" crc="e08c8a60" sha1="baf3a4e0423a86e53234e806843149ef7d0974a9" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pachikn5">
 		<!-- Serial:  - Release Date: 1993-06-11 - Alternative Title:  -->
 		<description>Pachio-Kun 5 (Jpn)</description>
@@ -40341,22 +40920,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="pachio-kun 5 (japan).prg" size="262144" crc="9525fa38" sha1="20b5b83fac09a42bbc7e2b5f3deb9835fa14b650" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="palamed2">
-		<!-- Serial:  - Release Date: 1991-05-17 - Alternative Title:  -->
-		<description>Palamedes 2 - Star Twinkles (Jpn)</description>
-		<year>1991</year>
-		<publisher>Hot-B</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="32768">
-				<rom name="palamedes 2 - star twinkles (japan).chr" size="32768" crc="30c91974" sha1="19be6822b41a7121c6d8f18d724ed6e880bdf19c" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="palamedes 2 - star twinkles (japan).prg" size="32768" crc="1e9ebb00" sha1="7d9de52a22db7f4e61e5ddd20e84dde048506154" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -40442,22 +41005,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="peepart">
-		<!-- Serial:  - Release Date: 1990-08-10 - Alternative Title:  -->
-		<description>Peepar Time (Jpn)</description>
-		<year>1990</year>
-		<publisher>Sanritsu Denki</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-CNROM" />
-			<dataarea name="chr" size="16384">
-				<rom name="peepar time (japan).chr" size="16384" crc="63ca952f" sha1="1eecf9ce19fedf5b16bc55f89ee2caabc3e98e39" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="peepar time (japan).prg" size="32768" crc="c1cf4948" sha1="92153e11b34752a1084d8c81ee5966df837c0beb" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pescator">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Pescatore (Jpn, Prototype)</description>
@@ -40523,39 +41070,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="presidnt">
-		<!-- Serial:  - Release Date: 1990-03-02 - Alternative Title:  -->
-		<description>President no Sentaku (Jpn)</description>
-		<year>1990</year>
-		<publisher>Hot-B</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="262144">
-				<rom name="president no sentaku (japan).prg" size="262144" crc="4640ebe0" sha1="0ef017518fd8b00f68fe0d094be2e1c8706c99e3" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ppersiag" cloneof="ppersia">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Prince of Persia (Ger)</description>
-		<year>1993</year>
-		<publisher>Mindscape</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-UNROM" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="131072">
-				<rom name="prince of persia (germany).prg" size="131072" crc="60aa9ae0" sha1="1b33af3acb40acf6fb3d8709246278249579d019" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="printomtp" cloneof="printomt">
 		<description>Princess Tomato In Salad Kingdom (USA, Prototype)</description>
 		<year>1991</year>
@@ -40616,22 +41130,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="puzslot">
-		<!-- Serial:  - Release Date: 1992-02-28 - Alternative Title:  -->
-		<description>Puzslot (Jpn)</description>
-		<year>1992</year>
-		<publisher>Sammy</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="puzslot (japan).chr" size="131072" crc="c74b723b" sha1="14e66179cd007b1f7dd51b42eef4e0922a2bd242" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="puzslot (japan).prg" size="131072" crc="6611497f" sha1="ebc3c2e31f2732be5c2ab37bc5df79806d49e2ea" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -40771,38 +41269,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="radia">
-		<!-- Serial:  - Release Date: 1991-11-15 - Alternative Title:  -->
-		<description>Radia Senki - Reimei Hen (Jpn)</description>
-		<year>1991</year>
-		<publisher>Tecmo</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="radia senki - reimei hen (japan).chr" size="131072" crc="9a7f42b6" sha1="6d702122003ab7320a71ae4d88103992224ea7ba" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="radia senki - reimei hen (japan).prg" size="262144" crc="8b59bac3" sha1="b9ce8d520a64f5321ad6e68e4ab1581c7b676001" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rampart">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Rampart (Euro)</description>
-		<year>1992?</year>
-		<publisher>Jaleco</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="rampart (europe).prg" size="131072" crc="28edfad4" sha1="8015776a5e316721913d2db996325ffbd5a67370" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-73-0 chr" size="131072" crc="94a07125" sha1="50403e0f89e14368f687f09995cd1e3eed08cc9c" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="redarmr2" cloneof="gargoyl2">
 		<!-- Serial:  - Release Date: 1992-07-17 - Alternative Title:  -->
 		<description>Red Arremar 2 (Jpn)</description>
@@ -40830,22 +41296,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-hz-0 chr" size="131072" crc="31ed51a8" sha1="024475acd8706f6228c2bf28496c8f9ea1864da1" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="roadblst">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Roadblasters (Euro)</description>
-		<year>1990</year>
-		<publisher>Mindscape</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="roadblasters (europe).prg" size="131072" crc="18d63ebf" sha1="512d9e65e7a5708c7dd6442841f93660a44f495f" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-ve-0 chr" size="131072" crc="d19b16fc" sha1="70be06e704b6f51a540b987adc07549030aa1879" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40913,39 +41363,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="rockman" cloneof="megaman">
-		<!-- Serial:  - Release Date: 1987-12-17 - Alternative Title:  -->
-		<description>Rockman (Jpn)</description>
-		<year>1987</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-UNROM" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="131072">
-				<rom name="rockman (japan).prg" size="131072" crc="d31dc910" sha1="ea93f3f2fd561c1cee59ad51cfcb10f3dd83766f" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rockman6" cloneof="megaman6">
-		<!-- Serial:  - Release Date: 1993-11-05 - Alternative Title:  -->
-		<description>Rockman 6 - Shijou Saidai no Tatakai!! (Jpn)</description>
-		<year>1993</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="prg" size="524288">
-				<rom name="rockman 6 - shijou saidai no tatakai!! (japan).prg" size="524288" crc="2d664d99" sha1="47336976a531fab2592af636a630a290eb036d18" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="rodlandj" cloneof="rodland">
 		<!-- Serial:  - Release Date: 1992-12-11 - Alternative Title:  -->
 		<description>Rod Land (Jpn)</description>
@@ -40992,28 +41409,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="rollerball (japan).prg" size="131072" crc="bf3bb6d5" sha1="398d7047508113d0656bd484d0116941723470b5" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="royalbld" cloneof="gemfire" supported="no">
-		<!-- Serial:  - Release Date: 1991-08-29 - Alternative Title:  -->
-		<description>Royal Blood (Jpn)</description>
-		<year>1991</year>
-		<publisher>Koei</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-EKROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="royal blood (japan).chr" size="262144" crc="44b22b3d" sha1="bfdb1a89f403b7deea2e29addf1d18e745442771" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="royal blood (japan).prg" size="262144" crc="57f33f70" sha1="b67183da893639745d72a4d99f4d0c0f60fdc136" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
-			</dataarea>
-			<!-- 1k Internal RAM in the MMC5 chip (ExRAM) -->
-			<dataarea name="mapper_ram" size="1024">
 			</dataarea>
 		</part>
 	</software>
@@ -41200,22 +41595,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="shancara">
-		<!-- Serial:  - Release Date: 1992-06-26 - Alternative Title:  -->
-		<description>Seiryaku Simulation - Inbou no Wakusei - Shancara (Jpn)</description>
-		<year>1992</year>
-		<publisher>IGS</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="seiryaku simulation - inbou no wakusei - shancara (japan).chr" size="131072" crc="b79a163e" sha1="588b42b7ec1495c589bcfa2eac4fc28148820db7" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="seiryaku simulation - inbou no wakusei - shancara (japan).prg" size="131072" crc="009da4c0" sha1="8e89cfe34a3d182daf8a4c03f9438f3ca2437e5f" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="shadowbr">
 		<!-- Serial:  - Release Date: 1991-03-21 - Alternative Title:  -->
 		<description>Shadow Brain (Jpn)</description>
@@ -41228,25 +41607,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="shadow brain (japan).prg" size="131072" crc="90597545" sha1="28de67cfc1db82612554705e1aacfed2be8ce821" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shadowgt">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Shadowgate (Euro)</description>
-		<year>1991</year>
-		<publisher>Kemco</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="shadowgate (europe).prg" size="131072" crc="0adb2c4c" sha1="bc70c6b2a6ff59bd1cec81b8df3160b7109d8924" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-3s-0 chr" size="131072" crc="05414dd9" sha1="893c82b8f9d4561e94e567005352f8817e04077c" offset="00000" />
-			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -41314,22 +41674,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="shatterhand (usa) (beta).prg" size="131072" crc="b44bd89f" sha1="f1419a21e20ecf87d2f2fec511f41653abd921d8" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shikinjo">
-		<!-- Serial:  - Release Date: 1991-04-26 - Alternative Title:  -->
-		<description>Shikinjou (Jpn, Bad Dump)</description>
-		<year>1991</year>
-		<publisher>Toei Animation</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="shikinjou (japan) [b].prg" size="131072" crc="bc1fbd7b" sha1="a1b6e11d5e7d7c4a3e1b574899bfd13ae9c90d5b" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -41461,22 +41805,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="pal-k2-0 chr" size="131072" crc="37737783" sha1="d0589bc7806c870ef78dcbe3a24ee71db328f670" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="solsticej" cloneof="solstice">
-		<!-- Serial:  - Release Date: 1990-07-20 - Alternative Title:  -->
-		<description>Solstice (Jpn)</description>
-		<year>1990</year>
-		<publisher>Epic / Sony Records</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-ANROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="solstice (japan).prg" size="131072" crc="a91460b8" sha1="758c9ec51d442db2c02c4fb37a9aaa37cc8f6b05" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -41707,22 +42035,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="star wars - the empire strikes back (usa) (beta).prg" size="262144" crc="9a4946c8" sha1="f24ef07a92790459ea593b465ebf1a65a884e532" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sted">
-		<!-- Serial:  - Release Date: 1990-07-27 - Alternative Title:  -->
-		<description>Sted - Iseki Wakusei no Yabou (Jpn)</description>
-		<year>1990</year>
-		<publisher>KAC</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="sted - iseki wakusei no yabou (japan).chr" size="131072" crc="38b7b503" sha1="c7d9d42147c20b7bb2e53b937309e393795860de" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="sted - iseki wakusei no yabou (japan).prg" size="131072" crc="33159eac" sha1="0b76f18297a4af950e767ce0cc645157fefaad56" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -42220,22 +42532,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="tetris2">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Tetris 2 (Euro)</description>
-		<year>1993</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="tetris 2 (europe).chr" size="131072" crc="9c4db593" sha1="ac16761a9e3dfd10384ef680283ea9c3fabe9b53" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="tetris 2 (europe).prg" size="131072" crc="cd8b279f" sha1="30375817dd08d97517aa88035973f72d4e8a27d9" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tetr2bmb">
 		<!-- Serial: BPS-52 - Release Date: 1991-12-13 - Alternative Title: テトリス２＋ボンブリス -->
 		<description>Tetris 2 + BomBliss (Jpn, Rev. A)</description>
@@ -42251,23 +42547,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tetsudo">
-		<!-- Serial:  - Release Date: 1987-12-01 - Alternative Title:  -->
-		<description>Tetsudou Ou - Famicom Boardgame (Jpn)</description>
-		<year>1987</year>
-		<publisher>dB-SOFT</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-CNROM" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="32768">
-				<rom name="tetsudou ou - famicom boardgame (japan).chr" size="32768" crc="4612714f" sha1="011e48d1e6c621a3a4b4d850f531da53d675d24b" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="tetsudou ou - famicom boardgame (japan).prg" size="32768" crc="7fc66782" sha1="639b42f3295e9b59512d70e7313a525bbe69d09f" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -42396,22 +42675,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="touhoukr">
-		<!-- Serial:  - Release Date: 1988-11-10 - Alternative Title:  -->
-		<description>Touhou Kenbun Roku (Jpn)</description>
-		<year>1988</year>
-		<publisher>Natsume</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="touhou kenbun roku (japan).chr" size="131072" crc="50c58415" sha1="89658f81d997a4837c7047ad9d4e52055eb83061" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="touhou kenbun roku (japan).prg" size="131072" crc="8cea87c5" sha1="605dc0cea4a47fdb80a291239a14ea6504e1effd" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -42637,22 +42900,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="usaiceh" cloneof="prohocky">
-		<!-- Serial:  - Release Date: 1993-03-06 - Alternative Title:  -->
-		<description>USA Ice Hockey In FC (Jpn)</description>
-		<year>1993</year>
-		<publisher>Jaleco</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="JALECO-JF-23" />
-			<dataarea name="prg" size="131072">
-				<rom name="usa ice hockey in fc (japan).prg" size="131072" crc="b89764a2" sha1="424b31a241c8876ceefcefc9f9a61931370cccc1" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-s5-0 chr" size="131072" crc="07731c55" sha1="46a40978751326126ee66fbaac618fc29a161cb7" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ushio">
 		<!-- Serial:  - Release Date: 1993-07-09 - Alternative Title:  -->
 		<description>Ushio To Tora - Shinen no Daiyou (Jpn)</description>
@@ -42681,22 +42928,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="utsurun desu (japan).prg" size="131072" crc="6bbd9f11" sha1="5fb6a8e8d49f1e92310b73c3c600851bfa01b1e0" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="vegascon">
-		<!-- Serial:  - Release Date: 1989-11-24 - Alternative Title:  -->
-		<description>Vegas Connection - Casino Kara Ai O Komete (Jpn)</description>
-		<year>1989</year>
-		<publisher>Sigma Shouji</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="262144">
-				<rom name="vegas connection - casino kara ai o komete (japan).prg" size="262144" crc="57e9b21c" sha1="1cdc08894f9cce3bf0550cc271390379ec0cf5e6" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -42745,22 +42976,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="white lion densetsu (japan).prg" size="131072" crc="0cb8d92d" sha1="a54d0af5121ed7512fb538845ba4b5f829c8ef61" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wilyrock">
-		<!-- Serial:  - Release Date: 1993-01-15 - Alternative Title:  -->
-		<description>Wily &amp; Light no Rockboard - That's Paradise (Jpn)</description>
-		<year>1993</year>
-		<publisher>Capcom</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="prg" size="262144">
-				<rom name="wily &amp; light no rockboard - that's paradise (japan).prg" size="262144" crc="23f4b48f" sha1="6b25180c4f73928fd7ba773d41635d32a20fdf3d" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -42831,22 +43046,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="wwfking">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>WWF King of the Ring (Euro)</description>
-		<year>1993?</year>
-		<publisher>LJN</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="wwf king of the ring (europe).chr" size="262144" crc="c9e43815" sha1="0328415d8556d7733ad926fb17e9248aef5ee3f5" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="wwf king of the ring (europe).prg" size="131072" crc="d11c5d60" sha1="eaf5a20b6f6d2c84a889bbf2ff857dd5ece35bb0" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wrestlmcj" cloneof="wrestlmc">
 		<!-- Serial:  - Release Date: 1992-03-27 - Alternative Title:  -->
 		<description>WWF Wrestlemania Challenge (Jpn)</description>
@@ -42860,22 +43059,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wwfsteel">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>WWF Wrestlemania Steel Cage Challenge (Euro)</description>
-		<year>1992?</year>
-		<publisher>LJN</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="wwf wrestlemania steel cage challenge (europe).chr" size="262144" crc="d58ba61c" sha1="8df1e393c354fdf95a75e2edc2586fcaae8bb95f" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="wwf wrestlemania steel cage challenge (europe).prg" size="131072" crc="449e6557" sha1="7c8ede2e39d39f03e27d1888cb015b8e186d172e" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -42896,22 +43079,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="yamaskzs">
-		<!-- Serial:  - Release Date: 1990-11-02 - Alternative Title:  -->
-		<description>Yamamura Misa Suspense - Kyouto Zaiteku Satsujin Jiken (Jpn)</description>
-		<year>1990</year>
-		<publisher>Hector</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="yamamura misa suspense - kyouto zaiteku satsujin jiken (japan).chr" size="131072" crc="bd284093" sha1="e229f6a795073a92e846e3bfd5f3bdbe4d92d9d6" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="yamamura misa suspense - kyouto zaiteku satsujin jiken (japan).prg" size="131072" crc="57c12c17" sha1="8d056f7104e88b9108565c47cf87abb242969e23" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="yumepeng">
 		<!-- Serial:  - Release Date: 1991-01-25 - Alternative Title:  -->
 		<description>Yume Penguin Monogatari (Jpn)</description>
@@ -42924,22 +43091,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="yume penguin monogatari (japan).prg" size="131072" crc="14a77e98" sha1="45bcd98eadb7dd3a772e2141f8b611c1db5a1eb2" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zenninja">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Zen: Intergalactic Ninja (Euro)</description>
-		<year>1993?</year>
-		<publisher>Konami</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="zen - intergalactic ninja (europe).chr" size="131072" crc="33d36075" sha1="b94811de07b01c5a1a2f51576148e3f0b97ecb05" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="zen - intergalactic ninja (europe).prg" size="131072" crc="ba8e7edd" sha1="9ee8cf897139d8e43a5572e53215821cbd3660b9" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
