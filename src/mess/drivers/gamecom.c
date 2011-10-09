@@ -16,7 +16,6 @@ Todo:
 ***************************************************************************/
 #define ADDRESS_MAP_MODERN
 
-#include "emu.h"
 #include "includes/gamecom.h"
 
 static ADDRESS_MAP_START(gamecom_mem_map, AS_PROGRAM, 8, gamecom_state)
@@ -152,5 +151,3 @@ ROM_END
 
 /*    YEAR  NAME     PARENT COMPAT MACHINE  INPUT    INIT    COMPANY  FULLNAME */
 CONS( 1997, gamecom, 0,     0,     gamecom, gamecom, gamecom,"Tiger", "Game.com", GAME_NOT_WORKING | GAME_NO_SOUND)
-
-

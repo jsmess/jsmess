@@ -11,6 +11,7 @@
 #ifndef GAMECOM_H_
 #define GAMECOM_H_
 
+#include "emu.h"
 #include "cpu/sm8500/sm8500.h"
 #include "imagedev/cartslot.h"
 #include "rendlay.h"
@@ -218,6 +219,7 @@ public:
 	DECLARE_READ8_MEMBER( gamecom_pio_r );
 	DECLARE_WRITE8_MEMBER( gamecom_internal_w );
 	DECLARE_WRITE8_MEMBER( gamecom_pio_w );
+	UINT8 *m_p_ram;
 	UINT8 *m_p_videoram;
 	UINT8 *m_cartridge1;
 	UINT8 *m_cartridge2;
