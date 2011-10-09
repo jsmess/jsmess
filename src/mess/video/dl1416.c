@@ -8,7 +8,7 @@
  * with Memory/Decoder/Driver
  *
  * Notes:
- *   - Currently supports the DL1416T.
+ *   - Currently supports the DL1416T and by virtue of it being nearly the same, the DL1414.
  *   - Partial support for DL1416B is available, it just needs the right
  *     character set and MAME core support for its display.
  *   - Cursor support is implemented but not tested, as the AIM65 does not
@@ -17,11 +17,13 @@
  * Todo:
  *   - Is the DL1416A identical to the DL1416T? If not, we need to add
  *     support for it.
+ *   - Add proper support for DL1414 (pretty much DL1416T without the cursor)
  *
  * Changes:
  *   - 2007-07-30: Initial version.  [Dirk Best]
  *   - 2008-02-25: Converted to the new device interface.  [Dirk Best]
  *   - 2008-12-18: Cleanups.  [Dirk Best]
+ *   - 2011-10-08: Changed the ram to store character rather than segment data. [Lord Nightmare]
  *
  *
  * We use the following order for the segments:
@@ -152,7 +154,9 @@ static DEVICE_RESET( dl1416 )
 	for (i = 0; i < 4; i++)
 	{
 		chip->digit_ram[i] = device->machine().rand()&0x3F;
-		chip->cursor_state[i] = ((device->machine().rand()&0xFF) >= 0x80) ? CURSOR_ON : CURSOR_OFF;
+		// TODO: only enable the following line if the device actually has a cursor (DL1416T and DL1416B), if DL1414 then cursor is always 0!
+		//chip->cursor_state[i] = ((device->machine().rand()&0xFF) >= 0x80) ? CURSOR_ON : CURSOR_OFF;
+		chip->cursor_state[i] = CURSOR_OFF;
 		pattern = dl1416t_segments[chip->digit_ram[i]];
 
 		/* If cursor for this digit position is enabled and segment is not */
