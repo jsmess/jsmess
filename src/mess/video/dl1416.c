@@ -46,9 +46,11 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SEG_UNDEF  (-1)
+#define SEG_UNDEF  (-2)
 #define SEG_BLANK  (0)
 #define SEG_CURSOR (0xffff)
+#define CURSOR_ON  (1)
+#define CURSOR_OFF (0)
 
 /* character set DL1416T */
 static const int dl1416t_segments[128] = {
@@ -98,7 +100,8 @@ struct _dl1416_state
 	int chip_enable;
 	int cursor_enable;
 
-	UINT16 cursor_ram[4];
+	UINT16 digit_ram[4]; // holds the digit code for each position
+	UINT8 cursor_state[4]; // holds the cursor state for each position, 0=off, 1=on
 };
 
 
@@ -131,23 +134,40 @@ static DEVICE_START( dl1416 )
 	state_save_register_item(device->machine(), "dl1416", device->tag(), 0, dl1416->chip_enable);
 	state_save_register_item(device->machine(), "dl1416", device->tag(), 0, dl1416->cursor_enable);
 	state_save_register_item(device->machine(), "dl1416", device->tag(), 0, dl1416->write_enable);
-	state_save_register_item_array(device->machine(), "dl1416", device->tag(), 0, dl1416->cursor_ram);
+	state_save_register_item_array(device->machine(), "dl1416", device->tag(), 0, dl1416->digit_ram);
 }
 
 
 static DEVICE_RESET( dl1416 )
 {
-	int i;
+	int i, pattern;
 	dl1416_state *chip = get_safe_token(device);
-
+	const dl1416_interface *intf = (const dl1416_interface *)downcast<const legacy_device_base *>(device)->inline_config();
 	/* disable all lines */
 	chip->chip_enable = FALSE;
 	chip->write_enable = FALSE;
 	chip->cursor_enable = FALSE;
 
-	/* randomize cursor memory */
+	/* randomize digit and cursor memory */
 	for (i = 0; i < 4; i++)
-		chip->cursor_ram[i] = device->machine().rand();
+	{
+		chip->digit_ram[i] = device->machine().rand()&0x3F;
+		chip->cursor_state[i] = ((device->machine().rand()&0xFF) >= 0x80) ? CURSOR_ON : CURSOR_OFF;
+		pattern = dl1416t_segments[chip->digit_ram[i]];
+
+		/* If cursor for this digit position is enabled and segment is not */
+		/* undefined, replace digit with cursor */
+		if ((chip->cursor_state[i] == CURSOR_ON) && (pattern != SEG_UNDEF))
+			pattern = SEG_CURSOR;
+
+		/* Undefined characters are replaced by blanks */
+		if (pattern == SEG_UNDEF)
+			pattern = SEG_BLANK;
+
+		/* Call update function */
+		if (intf->update)
+			intf->update(device, i, pattern);
+	}
 }
 
 
@@ -211,65 +231,89 @@ WRITE8_DEVICE_HANDLER( dl1416_data_w )
 	/* Only try to update the data if we are enabled and write is enabled */
 	if (chip->chip_enable && chip->write_enable)
 	{
-		int i, digit;
+		/* fprintf(stderr,"DL1416 Write: Cursor: %d, Offset: %d, Data: %02X\n (%c)", chip->cursor_enable, offset, data, data); */
+		int i, pattern, previous_state;
 
-		if (chip->cursor_enable)
+		if (chip->cursor_enable) /* cursor enable is set */
 		{
 			switch (intf->type)
 			{
-			case DL1416B:
+			case DL1416B: /* DL1416B uses offset to decide cursor pos to change and D0 to hold new state */
 
 				/* The cursor will be set if D0 is high and the original */
 				/* character restored otherwise */
-				digit = data & 1 ? SEG_CURSOR : chip->cursor_ram[offset];
+				previous_state = chip->cursor_state[offset];
+				chip->cursor_state[offset] = data & 1 ? CURSOR_ON : CURSOR_OFF;
 
-				/* Call update function */
-				if (intf->update)
-					intf->update(device, offset, digit);
+				if (previous_state != chip->cursor_state[offset])
+				{
+					pattern = dl1416t_segments[chip->digit_ram[offset]];
 
+					/* If cursor for this digit position is enabled and segment is not */
+					/* undefined, replace digit with cursor */
+					if ((chip->cursor_state[offset] == CURSOR_ON) && (pattern != SEG_UNDEF))
+						pattern = SEG_CURSOR;
+
+					/* Undefined characters are replaced by blanks */
+					if (pattern == SEG_UNDEF)
+						pattern = SEG_BLANK;
+
+					/* Call update function */
+					if (intf->update)
+						intf->update(device, offset, pattern);
+				}
 				break;
 
-			case DL1416T:
+			case DL1416T: /* DL1416T uses a bitmap of 4 data bits D0,D1,D2,D3 to decide cursor pos to change and new state */
 
 				for (i = 0; i < 4; i++)
 				{
-					/* Save old digit */
-					int previous_digit = chip->cursor_ram[i];
+					/* The cursor will be set if D0-D3 is high and the original */
+					/* character at the appropriate position restored otherwise */
+					previous_state = chip->cursor_state[i];
+					chip->cursor_state[i] = data & (1<<i) ? CURSOR_ON : CURSOR_OFF;
 
-					/* Either set the cursor or restore the original character */
-					digit = data & (1<<i) ? SEG_CURSOR : chip->cursor_ram[i];
+					if (previous_state != chip->cursor_state[i])
+					{
+						pattern = dl1416t_segments[chip->digit_ram[i]];
 
-					/* Call update function if we changed something */
-					if (previous_digit != digit)
+						/* If cursor for this digit position is enabled and segment is not */
+						/* undefined, replace digit with cursor */
+						if ((chip->cursor_state[i] == CURSOR_ON) && (pattern != SEG_UNDEF))
+							pattern = SEG_CURSOR;
+
+						/* Undefined characters are replaced by blanks */
+						if (pattern == SEG_UNDEF)
+							pattern = SEG_BLANK;
+
+						/* Call update function */
 						if (intf->update)
-							intf->update(device, i, digit);
+							intf->update(device, i, pattern);
+					}
 				}
 				break;
 			}
 		}
-		else
+		else /* cursor enable is not set, so standard write */
 		{
-			/* On the DL1416T, a digit can only be changed if there is no */
-			/* previously stored cursor, or overriden by an undefined */
-			/* character (blank) */
-			if ((intf->type != DL1416T) || (
-				(chip->cursor_ram[offset] != SEG_CURSOR) ||
-				(dl1416t_segments[data] == SEG_UNDEF)))
-			{
-				/* Load data */
-				digit = dl1416t_segments[data];
+			/* Save written value */
+			chip->digit_ram[offset] = data&0x3f;
 
-				/* Undefined characters are replaced by blanks */
-				if (digit == SEG_UNDEF)
-					digit = SEG_BLANK;
+			/* Load segment pattern from ROM */
+			pattern = dl1416t_segments[data]; /** TODO: handle DL1416T vs DL1416B vs DL1414 here */
 
-				/* Save value */
-				chip->cursor_ram[offset] = digit;
+			/* If cursor for this digit position is enabled and segment is not */
+			/* undefined, replace digit with cursor */
+			if ((chip->cursor_state[offset] == CURSOR_ON) && (pattern != SEG_UNDEF))
+				pattern = SEG_CURSOR;
 
-				/* Call update function */
-				if (intf->update)
-					intf->update(device, offset, digit);
-			}
+			/* Undefined characters are replaced by blanks */
+			if (pattern == SEG_UNDEF)
+				pattern = SEG_BLANK;
+
+			/* Call update function */
+			if (intf->update)
+				intf->update(device, offset, pattern);
 		}
 	}
 }
