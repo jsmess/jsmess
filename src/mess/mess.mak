@@ -664,6 +664,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_VIDEO)/nubus_spec8.o \
 	$(MESS_VIDEO)/nubus_radiustpd.o \
 	$(MESS_MACHINE)/nubus_asntmc3b.o \
+	$(MESS_VIDEO)/nubus_wsportrait.o \
 
 $(MESSOBJ)/applied.a:			\
 	$(MESS_VIDEO)/mbee.o		\
