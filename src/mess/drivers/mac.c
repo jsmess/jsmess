@@ -62,6 +62,7 @@
 #include "video/nubus_spec8.h"
 //#include "video/nubus_thundergx.h"
 #include "video/nubus_radiustpd.h"
+#include "video/nubus_wsportrait.h"
 #include "machine/nubus_asntmc3b.h"
 #include "includes/mac.h"
 
@@ -847,6 +848,7 @@ static SLOT_INTERFACE_START(mac_nubus_cards)
 //  SLOT_INTERFACE("thundergx", NUBUS_THUNDERGX)        /* Radius Thunder GX (not yet) */
 	SLOT_INTERFACE("radiustpd", NUBUS_RADIUSTPD)		/* Radius Two Page Display */
 	SLOT_INTERFACE("asmc3b", NUBUS_ASNTMC3B)	/* Asante MC3B Ethernet card */
+	SLOT_INTERFACE("portrait", NUBUS_WSPORTRAIT)	/* Apple Macintosh II Portrait video card */
 SLOT_INTERFACE_END
 
 /***************************************************************************
