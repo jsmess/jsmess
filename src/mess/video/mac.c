@@ -668,8 +668,8 @@ VIDEO_START( macdafb )
 {
 	mac_state *mac = machine.driver_data<mac_state>();
 
-	mac->m_vbl_timer = machine.scheduler().timer_alloc(FUNC(dafb_vbl_tick)); 
-	mac->m_cursor_timer = machine.scheduler().timer_alloc(FUNC(dafb_cursor_tick)); 
+	mac->m_vbl_timer = machine.scheduler().timer_alloc(FUNC(dafb_vbl_tick));
+	mac->m_cursor_timer = machine.scheduler().timer_alloc(FUNC(dafb_cursor_tick));
 
 	mac->m_vbl_timer->adjust(attotime::never);
 	mac->m_cursor_timer->adjust(attotime::never);
@@ -691,7 +691,7 @@ VIDEO_RESET(macdafb)
 
 READ32_MEMBER(mac_state::dafb_r)
 {
-//	if (offset != 0x108/4) printf("DAFB: Read @ %x (mask %x PC=%x)\n", offset*4, mem_mask, cpu_get_pc(m_maincpu));
+//  if (offset != 0x108/4) printf("DAFB: Read @ %x (mask %x PC=%x)\n", offset*4, mem_mask, cpu_get_pc(m_maincpu));
 
 	switch (offset<<2)
 	{
@@ -718,7 +718,7 @@ READ32_MEMBER(mac_state::dafb_r)
 
 WRITE32_MEMBER(mac_state::dafb_w)
 {
-//	printf("DAFB: Write %08x @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
+//  printf("DAFB: Write %08x @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
 
 	switch (offset<<2)
 	{
@@ -765,14 +765,14 @@ WRITE32_MEMBER(mac_state::dafb_w)
 
 READ32_MEMBER(mac_state::dafb_dac_r)
 {
-//	printf("DAFB: Read DAC @ %x (mask %x PC=%x)\n", offset*4, mem_mask, cpu_get_pc(m_maincpu));
+//  printf("DAFB: Read DAC @ %x (mask %x PC=%x)\n", offset*4, mem_mask, cpu_get_pc(m_maincpu));
 
 	return 0;
 }
 
 WRITE32_MEMBER(mac_state::dafb_dac_w)
 {
-//	printf("DAFB: Write %08x to DAC @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
+//  printf("DAFB: Write %08x to DAC @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
 
 	switch (offset<<2)
 	{

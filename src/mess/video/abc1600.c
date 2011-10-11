@@ -720,7 +720,7 @@ inline void abc1600_state::load_mta_x()
 inline void abc1600_state::load_xy_reg()
 {
 	if (L_P) return;
-	
+
 	UINT16 sum = m_xto + m_xsize;
 
 	m_xto = sum & 0x3ff;
@@ -949,7 +949,7 @@ void abc1600_state::mover()
 	while (m_rmc);
 
 	load_xy_reg();
-	
+
 	m_amm = 0;
 }
 
@@ -997,7 +997,7 @@ inline UINT16 abc1600_state::get_crtca(UINT16 ma, UINT8 ra, UINT8 column)
 void abc1600_state::crtc_update_row(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	if (y > 0x3ff) return;
-	
+
 	int x = HFP;
 
 	for (int column = 0; column < x_count; column += 2)

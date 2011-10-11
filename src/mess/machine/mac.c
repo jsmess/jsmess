@@ -1082,13 +1082,13 @@ WRITE16_MEMBER ( mac_state::macii_scsi_w )
 
 void mac_scsi_irq(running_machine &machine, int state)
 {
-/*	mac_state *mac = machine.driver_data<mac_state>();
+/*  mac_state *mac = machine.driver_data<mac_state>();
 
-	if ((mac->m_scsiirq_enable) && ((mac->m_model == MODEL_MAC_SE) || (mac->m_model == MODEL_MAC_CLASSIC)))
-	{
-		mac->m_scsi_interrupt = state;
-		mac->field_interrupts();
-	}*/
+    if ((mac->m_scsiirq_enable) && ((mac->m_model == MODEL_MAC_SE) || (mac->m_model == MODEL_MAC_CLASSIC)))
+    {
+        mac->m_scsi_interrupt = state;
+        mac->field_interrupts();
+    }*/
 }
 
 /* *************************************************************************
@@ -2126,7 +2126,7 @@ static void pmu_exec(mac_state *mac)
 			printf("PMU: Send ADB %02x %02x cmd %02x flag %02x data %02x %02x\n",
 				   mac->m_pm_cmd[0],	// 0x20
 				   mac->m_pm_cmd[1],	// ???
-				   mac->m_pm_cmd[2],	// adb flags (2 for autopoll active, 3 to reset bus?) 
+				   mac->m_pm_cmd[2],	// adb flags (2 for autopoll active, 3 to reset bus?)
 				   mac->m_pm_cmd[3],	// length of ADB data
 				   mac->m_pm_cmd[4],	// adb data
 				   mac->m_pm_cmd[5]);
@@ -2896,7 +2896,7 @@ static READ8_DEVICE_HANDLER(mac_via2_in_a)
 	}
 	else if ((mac->m_model == MODEL_MAC_QUADRA_700) || (mac->m_model == MODEL_MAC_QUADRA_900) || (mac->m_model == MODEL_MAC_QUADRA_950))
 	{
-		result = 0x80 | mac->m_nubus_irq_state;                                                                                                    
+		result = 0x80 | mac->m_nubus_irq_state;
 	}
 	else
 	{
@@ -3350,7 +3350,7 @@ static const SCSIConfigTable dev_table =
 static const struct AM53CF96interface scsi_intf =
 {
 	&dev_table,		/* SCSI device table */
-	&scsi96_irq,   	/* command completion IRQ */
+	&scsi96_irq,	/* command completion IRQ */
 };
 
 DRIVER_INIT(macquadra700)

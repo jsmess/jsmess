@@ -28,6 +28,7 @@
 #include "sh4regs.h"
 #include "sh4comn.h"
 #include "sh3comn.h"
+#include "sh4tmu.h"
 
 #ifndef USE_SH4DRC
 
@@ -1708,13 +1709,15 @@ INLINE void TRAPA(sh4_state *sh4, UINT32 i)
 {
 	UINT32 imm = i & 0xff;
 
+	/* << 2 according to docs, but this doesn't seem to work any better? */
+
 	if (sh4->cpu_type == CPU_TYPE_SH4)
 	{
-		sh4->m[SH3_TRA] = imm;
+		sh4->m[TRA] = imm << 2;
 	}
 	else /* SH3 */
 	{
-		sh4->m_sh3internal_upper[SH3_TRA] = imm;
+		sh4->m_sh3internal_upper[SH3_TRA_ADDR] = imm << 2;
 	}
 
 
@@ -1733,11 +1736,11 @@ INLINE void TRAPA(sh4_state *sh4, UINT32 i)
 
 	if (sh4->cpu_type == CPU_TYPE_SH4)
 	{
-		sh4->m[SH3_EXPEVT] = 0x00000160;
+		sh4->m[EXPEVT] = 0x00000160;
 	}
 	else /* SH3 */
 	{
-		sh4->m_sh3internal_upper[SH3_EXPEVT] = 0x00000160;
+		sh4->m_sh3internal_upper[SH3_EXPEVT_ADDR] = 0x00000160;
 	}
 
 	sh4->pc = sh4->vbr + 0x00000100;
@@ -2095,7 +2098,7 @@ INLINE void PREFM(sh4_state *sh4, UINT32 n)
 			else
 			{
 				if (sh4->cpu_type == CPU_TYPE_SH4)
-				{	
+				{
 					dest |= (sh4->m[QACR1] & 0x1C) << 24;
 				}
 				else
@@ -3282,16 +3285,6 @@ static CPU_RESET( common_sh4_reset )
 
 	sh4->rtc_timer->adjust(attotime::from_hz(128));
 
-	if (sh4->cpu_type == CPU_TYPE_SH4)
-	{
-		sh4->m[RCR2] = 0x09;
-		sh4->m[TCOR0] = 0xffffffff;
-		sh4->m[TCNT0] = 0xffffffff;
-		sh4->m[TCOR1] = 0xffffffff;
-		sh4->m[TCNT1] = 0xffffffff;
-		sh4->m[TCOR2] = 0xffffffff;
-		sh4->m[TCNT2] = 0xffffffff;
-	}
 
 	sh4->pc = 0xa0000000;
 	sh4->r[15] = RL(sh4,4);
@@ -3316,21 +3309,35 @@ static CPU_RESET( common_sh4_reset )
 static CPU_RESET( sh3 )
 {
 	sh4_state *sh4 = get_safe_token(device);
-	
+
 	CPU_RESET_CALL(common_sh4_reset);
 
 	sh4->cpu_type = CPU_TYPE_SH3;
-	
+
+	sh4->SH4_TCOR0 = 0xffffffff;
+	sh4->SH4_TCNT0 = 0xffffffff;
+	sh4->SH4_TCOR1 = 0xffffffff;
+	sh4->SH4_TCNT1 = 0xffffffff;
+	sh4->SH4_TCOR2 = 0xffffffff;
+	sh4->SH4_TCNT2 = 0xffffffff;
+
 }
 
 static CPU_RESET( sh4 )
 {
 	sh4_state *sh4 = get_safe_token(device);
-	
+
 	CPU_RESET_CALL(common_sh4_reset);
 
 	sh4->cpu_type = CPU_TYPE_SH4;
-	
+
+	sh4->m[RCR2] = 0x09;
+	sh4->SH4_TCOR0 = 0xffffffff;
+	sh4->SH4_TCNT0 = 0xffffffff;
+	sh4->SH4_TCOR1 = 0xffffffff;
+	sh4->SH4_TCNT1 = 0xffffffff;
+	sh4->SH4_TCOR2 = 0xffffffff;
+	sh4->SH4_TCNT2 = 0xffffffff;
 }
 
 /* Execute cycles - returns number of cycles actually run */
@@ -3532,6 +3539,25 @@ static CPU_INIT( sh4 )
 	device->save_item(NAME(sh4->dbr));
 	device->save_item(NAME(sh4->exception_priority));
 	device->save_item(NAME(sh4->exception_requesting));
+
+	device->save_item(NAME(sh4->SH4_TSTR));
+	device->save_item(NAME(sh4->SH4_TCNT0));
+	device->save_item(NAME(sh4->SH4_TCNT1));
+	device->save_item(NAME(sh4->SH4_TCNT2));
+	device->save_item(NAME(sh4->SH4_TCR0));
+	device->save_item(NAME(sh4->SH4_TCR1));
+	device->save_item(NAME(sh4->SH4_TCR2));
+	device->save_item(NAME(sh4->SH4_TCOR0));
+	device->save_item(NAME(sh4->SH4_TCOR1));
+	device->save_item(NAME(sh4->SH4_TCOR2));
+	device->save_item(NAME(sh4->SH4_TOCR));
+	device->save_item(NAME(sh4->SH4_TCPR2));
+
+	device->save_item(NAME(sh4->SH4_IPRA));
+
+	device->save_item(NAME(sh4->SH4_IPRC));
+
+
 
 }
 

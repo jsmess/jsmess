@@ -29,8 +29,8 @@ public:
 
 WRITE8_MEMBER( sc1_state::sc1_fc_w )
 {
-//	if (BIT(data, 3))
-//		speaker_level_w(m_speaker, BIT(data, 1));
+//  if (BIT(data, 3))
+//      speaker_level_w(m_speaker, BIT(data, 1));
 }
 
 WRITE8_MEMBER( sc1_state::sc1v2_07_w )

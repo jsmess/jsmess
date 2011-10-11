@@ -561,7 +561,7 @@ READ8_MEMBER(mac_state::mac_5396_r)
 
 WRITE8_MEMBER(mac_state::mac_5396_w)
 {
-//	printf("%02x to 5396 @ %x\n", data, offset);
+//  printf("%02x to 5396 @ %x\n", data, offset);
 }
 
 /***************************************************************************

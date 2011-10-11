@@ -10,7 +10,7 @@
 
     TODO:
 
-	- login root fails with incorrect password
+    - login root fails with incorrect password
     - floppy
         - internal floppy is really drive 2, but wd17xx.c doesn't like having NULL drives
     - BUS0I/0X/1/2
@@ -1325,7 +1325,7 @@ READ8_MEMBER( abc1600_state::cio_pb_r )
 
 	data |= !m_sysscc << 5;
 	data |= !m_sysfs << 6;
-	
+
 	// floppy interrupt
 	data |= wd17xx_intrq_r(m_fdc) << 7;
 
@@ -1489,7 +1489,7 @@ static IRQ_CALLBACK( abc1600_int_ack )
 	case M68K_IRQ_2:
 		data = state->m_cio->intack_r();
 		break;
-		
+
 	case M68K_IRQ_5:
 		data = state->m_dart->m1_r();
 		break;

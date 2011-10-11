@@ -983,7 +983,7 @@ void wd1772_t::live_run(attotime limit)
 				cur_live.state = IDLE;
 				return;
 			}
-				
+
 			cur_live.state = READ_ID_BLOCK_TO_DMA;
 			checkpoint();
 			break;
@@ -1036,7 +1036,7 @@ void wd1772_t::live_run(attotime limit)
 				live_delay(READ_TRACK_DATA_BYTE);
 				return;
 			}
-				
+
 			break;
 		}
 

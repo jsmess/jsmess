@@ -12,26 +12,226 @@
 #include "sh4regs.h"
 #include "sh4comn.h"
 #include "sh3comn.h"
+#include "sh4tmu.h"
+#include "sh4dmac.h"
 
-static const int tcnt_div[8] = { 4, 16, 64, 256, 1024, 1, 1, 1 };
 static const int rtcnt_div[8] = { 0, 4, 16, 64, 256, 1024, 2048, 4096 };
 static const int daysmonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-static const int dmasize[8] = { 8, 1, 2, 4, 32, 0, 0, 0 };
-static const UINT32 exception_priority_default[] = { EXPPRI(1,1,0,0), EXPPRI(1,2,0,1), EXPPRI(1,1,0,2), EXPPRI(1,3,0,3), EXPPRI(1,4,0,4),
-	EXPPRI(2,0,0,5), EXPPRI(2,1,0,6), EXPPRI(2,2,0,7), EXPPRI(2,3,0,8), EXPPRI(2,4,0,9), EXPPRI(2,4,0,10), EXPPRI(2,4,0,11), EXPPRI(2,4,0,12),
-	EXPPRI(2,5,0,13), EXPPRI(2,5,0,14), EXPPRI(2,6,0,15), EXPPRI(2,6,0,16), EXPPRI(2,7,0,17), EXPPRI(2,7,0,18), EXPPRI(2,8,0,19),
-	EXPPRI(2,9,0,20), EXPPRI(2,4,0,21), EXPPRI(2,10,0,22), EXPPRI(3,0,16,SH4_INTC_NMI) };
-static const int exception_codes[] = { 0x000, 0x020, 0x000, 0x140, 0x140, 0x1E0, 0x0E0, 0x040, 0x0A0, 0x180, 0x1A0, 0x800, 0x820, 0x0E0,
-	0x100, 0x040, 0x060, 0x0A0, 0x0C0, 0x120, 0x080, 0x160, 0x1E0, 0x1C0, 0x200, 0x220, 0x240, 0x260, 0x280, 0x2A0, 0x2C0, 0x2E0, 0x300,
-	0x320, 0x340, 0x360, 0x380, 0x3A0, 0x3C0, 0x240, 0x2A0, 0x300, 0x360, 0x600, 0x620, 0x640, 0x660, 0x680, 0x6A0, 0x780, 0x7A0, 0x7C0,
-	0x7E0, 0x6C0, 0xB00, 0xB80, 0x400, 0x420, 0x440, 0x460, 0x480, 0x4A0, 0x4C0, 0x4E0, 0x500, 0x520, 0x540, 0x700, 0x720, 0x740, 0x760,
-	0x560, 0x580, 0x5A0 };
 
-/* SH3 INTEVT2 uses a different table */
 
-static const UINT16 tcnt[] = { TCNT0, TCNT1, TCNT2 };
-static const UINT16 tcor[] = { TCOR0, TCOR1, TCOR2 };
-static const UINT16 tcr[] = { TCR0, TCR1, TCR2 };
+
+static const UINT32 exception_priority_default[] = {
+	EXPPRI(1,1,0,0),			 /* Power-on Reset */
+	EXPPRI(1,2,0,1),			 /* Manual Reset */
+	EXPPRI(1,1,0,2),			 /* H-UDI Reset */
+	EXPPRI(1,3,0,3),			 /* Inst TLB Multiple Hit */
+	EXPPRI(1,4,0,4),			 /* Data TLB Multiple Hit */
+
+	EXPPRI(2,0,0,5),			/* User break Before Instruction */
+	EXPPRI(2,1,0,6),			/* Inst Address Error */
+	EXPPRI(2,2,0,7),			/* Inst TLB Miss */
+	EXPPRI(2,3,0,8),			/* Inst TLB Protection Violation */
+	EXPPRI(2,4,0,9),			/* Illegal Instruction */
+	EXPPRI(2,4,0,10),			/* Slot Illegal Instruction */
+	EXPPRI(2,4,0,11),			/* FPU Disable */
+	EXPPRI(2,4,0,12),			/* Slot FPU Disable */
+	EXPPRI(2,5,0,13),			/* Data Address Error (Read) */
+	EXPPRI(2,5,0,14),			/* Data Address Error (Write) */
+	EXPPRI(2,6,0,15),			/* Data TBL Miss Read */
+	EXPPRI(2,6,0,16),			/* Data TBL Miss Write */
+	EXPPRI(2,7,0,17),			/* Data TBL Protection Violation Read */
+	EXPPRI(2,7,0,18),			/* Data TBL Protection Violation Write */
+	EXPPRI(2,8,0,19),			/* FPU Exception */
+	EXPPRI(2,9,0,20),			/* Initial Page Write exception */
+
+	EXPPRI(2,4,0,21),			/* Unconditional TRAP */
+	EXPPRI(2,10,0,22),			/* User break After Instruction */
+
+	EXPPRI(3,0,16,SH4_INTC_NMI)	/* NMI */
+	/* This is copied to a table, and the IRQ priorities filled in later */
+};
+
+static const int exception_codes[] =
+
+{ 0x000, /* Power-on Reset */
+  0x020, /* Manual Reset */
+  0x000, /* H-UDI Reset */
+  0x140, /* Inst TLB Multiple Hit */
+  0x140, /* Data TLB Multiple Hit */
+
+  0x1E0, /* User break Before Instruction */
+  0x0E0, /* Inst Address Error */
+  0x040, /* Inst TLB Miss */
+  0x0A0, /* Inst TLB Protection Violation */
+  0x180, /* Illegal Instruction */
+  0x1A0, /* Slot Illegal Instruction */
+  0x800, /* FPU Disable */
+  0x820, /* Slot FPU Disable */
+  0x0E0, /* Data Address Error (Read) */
+  0x100, /* Data Address Error (Write) */
+  0x040, /* Data TBL Miss Read */
+  0x060, /* Data TBL Miss Write */
+  0x0A0, /* Data TBL Protection Violation Read */
+  0x0C0, /* Data TBL Protection Violation Write */
+  0x120, /* FPU Exception */
+  0x080, /* Initial Page Write exception */
+
+  0x160, /* Unconditional TRAP */
+  0x1E0, /* User break After Instruction */
+
+  0x1C0, /* NMI */     /* SH4_INTC_NMI=23 represents this location in this list.. */
+
+  0x200, /* EX Irq 0 */
+  0x220, /*        1 */
+  0x240, /*        2 */
+  0x260, /*        3 */
+  0x280, /*        4 */
+  0x2A0, /*        5 */
+  0x2C0, /*        6 */
+  0x2E0, /*        7 */
+  0x300, /*        8 */
+  0x320, /*        9 */
+  0x340, /*        A */
+  0x360, /*        B */
+  0x380, /*        C */
+  0x3A0, /*        D */
+  0x3C0, /*        E */
+
+  0x240, /* SH4_INTC_IRL0 */
+  0x2A0, /* SH4_INTC_IRL1 */
+  0x300, /* SH4_INTC_IRL2 */
+  0x360, /* SH4_INTC_IRL3 */
+
+  0x600, /* HUDI */
+  0x620, /* SH4_INTC_GPOI */
+  0x640, /* SH4_INTC_DMTE0 */
+  0x660, /* SH4_INTC_DMTE1 */
+  0x680, /* SH4_INTC_DMTE2 */
+  0x6A0, /* SH4_INTC_DMTE3 */
+
+  0x780, /* SH4_INTC_DMTE4 */
+  0x7A0, /* SH4_INTC_DMTE5 */
+  0x7C0, /* SH4_INTC_DMTE6 */
+  0x7E0, /* SH4_INTC_DMTE7 */
+
+  0x6C0, /* SH4_INTC_DMAE */
+
+  0xB00, /* SH4_INTC_TUNI3 */
+  0xB80, /* SH4_INTC_TUNI4 */
+  0x400, /* SH4_INTC_TUNI0 */
+  0x420, /* SH4_INTC_TUNI1 */
+  0x440, /* SH4_INTC_TUNI2 */
+  0x460, /* SH4_INTC_TICPI2 */
+  0x480, /* SH4_INTC_ATI */
+  0x4A0, /* SH4_INTC_PRI */
+  0x4C0, /* SH4_INTC_CUI */
+  0x4E0, /* SH4_INTC_SCI1ERI */
+  0x500, /* SH4_INTC_SCI1RXI */
+  0x520, /* SH4_INTC_SCI1TXI */
+  0x540, /* SH4_INTC_SCI1TEI */
+
+  0x700, /* SH4_INTC_SCIFERI */
+  0x720, /* SH4_INTC_SCIFRXI */
+  0x740, /* SH4_INTC_SCIFBRI */
+  0x760, /* SH4_INTC_SCIFTXI */
+  0x560, /* SH4_INTC_ITI */
+  0x580, /* SH4_INTC_RCMI */
+  0x5A0 /* SH4_INTC_ROVI */
+};
+
+/* SH3 INTEVT2 uses a different table - values of -1 aren't filled in yet, some may not exist on the sh3. */
+/* The above table should differ too, some things depend on the interrupt level rather than beign fixed values */
+
+static const int sh3_intevt2_exception_codes[] =
+
+{ 0x000, /* Power-on Reset */
+  -1, /* Manual Reset */
+  -1, /* H-UDI Reset */
+  -1, /* Inst TLB Multiple Hit */
+  -1, /* Data TLB Multiple Hit */
+
+  -1, /* User break Before Instruction */
+  -1, /* Inst Address Error */
+  -1, /* Inst TLB Miss */
+  -1, /* Inst TLB Protection Violation */
+  -1, /* Illegal Instruction */
+  -1, /* Slot Illegal Instruction */
+  -1, /* FPU Disable */
+  -1, /* Slot FPU Disable */
+  -1, /* Data Address Error (Read) */
+  -1, /* Data Address Error (Write) */
+  -1, /* Data TBL Miss Read */
+  -1, /* Data TBL Miss Write */
+  -1, /* Data TBL Protection Violation Read */
+  -1, /* Data TBL Protection Violation Write */
+  -1, /* FPU Exception */
+  -1, /* Initial Page Write exception */
+
+  -1, /* Unconditional TRAP */
+  -1, /* User break After Instruction */
+
+  -1, /* NMI */     /* SH4_INTC_NMI=23 represents this location in this list.. */
+
+  -1, /* EX Irq 0 */
+  -1, /*        1 */
+  -1, /*        2 */
+  -1, /*        3 */
+  -1, /*        4 */
+  -1, /*        5 */
+  -1, /*        6 */
+  -1, /*        7 */
+  -1, /*        8 */
+  -1, /*        9 */
+  -1, /*        A */
+  -1, /*        B */
+  -1, /*        C */
+  -1, /*        D */
+  -1, /*        E */
+
+  0x600, /* SH4_INTC_IRL0 */
+  0x620, /* SH4_INTC_IRL1 */
+  0x640, /* SH4_INTC_IRL2 */
+  0x660, /* SH4_INTC_IRL3 */
+    /* todo: SH3 should have lines 4+5 too? */
+
+  -1, /* HUDI */
+  -1, /* SH4_INTC_GPOI */
+  -1, /* SH4_INTC_DMTE0 */
+  -1, /* SH4_INTC_DMTE1 */
+  -1, /* SH4_INTC_DMTE2 */
+  -1, /* SH4_INTC_DMTE3 */
+
+  -1, /* SH4_INTC_DMTE4 */
+  -1, /* SH4_INTC_DMTE5 */
+  -1, /* SH4_INTC_DMTE6 */
+  -1, /* SH4_INTC_DMTE7 */
+
+  -1, /* SH4_INTC_DMAE */
+
+  -1, /* SH4_INTC_TUNI3 */
+  -1, /* SH4_INTC_TUNI4 */
+  0x400, /* SH4_INTC_TUNI0 */
+  0x420, /* SH4_INTC_TUNI1 */
+  0x440, /* SH4_INTC_TUNI2 */
+  0x460, /* SH4_INTC_TICPI2 */
+  -1, /* SH4_INTC_ATI */
+  -1, /* SH4_INTC_PRI */
+  -1, /* SH4_INTC_CUI */
+  -1, /* SH4_INTC_SCI1ERI */
+  -1, /* SH4_INTC_SCI1RXI */
+  -1, /* SH4_INTC_SCI1TXI */
+  -1, /* SH4_INTC_SCI1TEI */
+
+  -1, /* SH4_INTC_SCIFERI */
+  -1, /* SH4_INTC_SCIFRXI */
+  -1, /* SH4_INTC_SCIFBRI */
+  -1, /* SH4_INTC_SCIFTXI */
+  -1, /* SH4_INTC_ITI */
+  -1, /* SH4_INTC_RCMI */
+  -1 /* SH4_INTC_ROVI */
+};
+
+
 
 void sh4_change_register_bank(sh4_state *sh4, int to)
 {
@@ -123,18 +323,25 @@ void sh4_exception_recompute(sh4_state *sh4) // checks if there is any interrupt
 	for (a=0;a <= SH4_INTC_ROVI;a++)
 	{
 		if (sh4->exception_requesting[a])
-			if ((((int)sh4->exception_priority[a] >> 8) & 255) > z)
+		{
+			int pri = (((int)sh4->exception_priority[a] >> 8) & 255);
+			//logerror("pri is %02x z is %02x\n",pri,z);
+			if (pri > z)
 			{
+				//logerror("will test\n");
 				sh4->test_irq = 1; // will check for exception at end of instructions
 				break;
 			}
+		}
 	}
 }
 
 void sh4_exception_request(sh4_state *sh4, int exception) // start requesting an exception
 {
+	//logerror("sh4_exception_request a\n");
 	if (!sh4->exception_requesting[exception])
 	{
+		//logerror("sh4_exception_request b\n");
 		sh4->exception_requesting[exception] = 1;
 		sh4->pending_irq++;
 		sh4_exception_recompute(sh4);
@@ -166,7 +373,7 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 
 
 	if (sh4->cpu_type == CPU_TYPE_SH4)
-	{	
+	{
 		if (exception < SH4_INTC_NMI)
 			return; // Not yet supported
 		if (exception == SH4_INTC_NMI) {
@@ -208,26 +415,25 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 		}
 		else
 		{
-			
+
 			if (sh4->sr & BL)
 				return;
 			if (((sh4->exception_priority[exception] >> 8) & 255) <= ((sh4->sr >> 4) & 15))
 				return;
-			
-				
+
+
 			vector = 0x600;
-			int callbackval = 0;
 
 			if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
-				callbackval = sh4->irq_callback(sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
+				sh4->irq_callback(sh4->device, SH4_INTC_IRL0-exception+SH4_IRL0);
 			else
-				callbackval = sh4->irq_callback(sh4->device, SH4_IRL3+1);
+				sh4->irq_callback(sh4->device, SH4_IRL3+1);
 
-			// we should put the value here based on a table, like the regular exception codes! (values are different tho)
-			//printf("exception %04x\n", exception);
-			//sh4->m_sh3internal_lower[INTEVT2] = sh3_intevt2_exception_codes[exception];
-			sh4->m_sh3internal_lower[INTEVT2] = callbackval;
-			sh4->m_sh3internal_upper[SH3_EXPEVT] = exception_codes[exception];
+			if (sh3_intevt2_exception_codes[exception]==-1)
+				fatalerror("sh3_intevt2_exception_codes unpopulated for exception %02x\n", exception);
+
+			sh4->m_sh3internal_lower[INTEVT2] = sh3_intevt2_exception_codes[exception];
+			sh4->m_sh3internal_upper[SH3_EXPEVT_ADDR] = exception_codes[exception];
 
 
 			LOG(("SH-3 '%s' interrupt exception #%d after [%s]\n", sh4->device->tag(), exception, message));
@@ -256,6 +462,7 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 	if(sh4->sleep_mode == 1) { sh4->sleep_mode = 2; }
 }
 
+
 static UINT32 compute_ticks_refresh_timer(emu_timer *timer, int hertz, int base, int divisor)
 {
 	// elapsed:total = x : ticks
@@ -281,35 +488,6 @@ UINT32 ticks;
 	sh4->refresh_timer_base = sh4->m[RTCNT];
 }
 
-/*-------------------------------------------------
-    sh4_scale_up_mame_time - multiply a attotime by
-    a (constant+1) where 0 <= constant < 2^32
--------------------------------------------------*/
-
-INLINE attotime sh4_scale_up_mame_time(attotime _time1, UINT32 factor1)
-{
-	return _time1 * factor1 + _time1;
-}
-
-static UINT32 compute_ticks_timer(emu_timer *timer, int hertz, int divisor)
-{
-	double ret;
-
-	ret=((timer->remaining().as_double() * (double)hertz) / (double)divisor) - 1;
-	return (UINT32)ret;
-}
-
-static void sh4_timer_recompute(sh4_state *sh4, int which)
-{
-	double ticks;
-
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("sh4_timer_recompute uses sh4->m[] with SH3\n");
-
-
-	ticks = sh4->m[tcnt[which]];
-	sh4->timer[which]->adjust(sh4_scale_up_mame_time(attotime::from_hz(sh4->pm_clock) * tcnt_div[sh4->m[tcr[which]] & 7], ticks), which);
-}
 
 static TIMER_CALLBACK( sh4_refresh_timer_callback )
 {
@@ -448,297 +626,12 @@ static TIMER_CALLBACK( sh4_rtc_timer_callback )
 	}
 }
 
-static TIMER_CALLBACK( sh4_timer_callback )
-{
-	static const UINT16 tuni[] = { SH4_INTC_TUNI0, SH4_INTC_TUNI1, SH4_INTC_TUNI2 };
-	sh4_state *sh4 = (sh4_state *)ptr;
-	int which = param;
-	int idx = tcr[which];
-
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("sh4_timer_callback uses sh4->m[] with SH3\n");
-
-	sh4->m[tcnt[which]] = sh4->m[tcor[which]];
-	sh4_timer_recompute(sh4, which);
-	sh4->m[idx] = sh4->m[idx] | 0x100;
-	if (sh4->m[idx] & 0x20)
-		sh4_exception_request(sh4, tuni[which]);
-}
-
-static TIMER_CALLBACK( sh4_dmac_callback )
-{
-	sh4_state *sh4 = (sh4_state *)ptr;
-	int channel = param;
-
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("sh4_dmac_callback uses sh4->m[] with SH3\n");
-
-	LOG(("SH4 '%s': DMA %d complete\n", sh4->device->tag(), channel));
-	sh4->dma_timer_active[channel] = 0;
-	switch (channel)
-	{
-	case 0:
-		sh4->m[DMATCR0] = 0;
-		sh4->m[CHCR0] |= CHCR_TE;
-		if (sh4->m[CHCR0] & CHCR_IE)
-			sh4_exception_request(sh4, SH4_INTC_DMTE0);
-		break;
-	case 1:
-		sh4->m[DMATCR1] = 0;
-		sh4->m[CHCR1] |= CHCR_TE;
-		if (sh4->m[CHCR1] & CHCR_IE)
-			sh4_exception_request(sh4, SH4_INTC_DMTE1);
-		break;
-	case 2:
-		sh4->m[DMATCR2] = 0;
-		sh4->m[CHCR2] |= CHCR_TE;
-		if (sh4->m[CHCR2] & CHCR_IE)
-			sh4_exception_request(sh4, SH4_INTC_DMTE2);
-		break;
-	case 3:
-		sh4->m[DMATCR3] = 0;
-		sh4->m[CHCR3] |= CHCR_TE;
-		if (sh4->m[CHCR3] & CHCR_IE)
-			sh4_exception_request(sh4, SH4_INTC_DMTE3);
-		break;
-	}
-}
-
-static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 chcr, UINT32 *sar, UINT32 *dar, UINT32 *dmatcr)
-{
-	int incs, incd, size;
-	UINT32 src, dst, count;
-
-	incd = (chcr & CHCR_DM) >> 14;
-	incs = (chcr & CHCR_SM) >> 12;
-	size = dmasize[(chcr & CHCR_TS) >> 4];
-	if(incd == 3 || incs == 3)
-	{
-		logerror("SH4: DMA: bad increment values (%d, %d, %d, %04x)\n", incd, incs, size, chcr);
-		return 0;
-	}
-	src   = *sar;
-	dst   = *dar;
-	count = *dmatcr;
-	if (!count)
-		count = 0x1000000;
-
-	LOG(("SH4: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", channel, src, dst, count, chcr, incs, incd, size));
-
-	if (timermode == 1) // timer actvated after a time based on the number of words to transfer
-	{
-		sh4->dma_timer_active[channel] = 1;
-		sh4->dma_timer[channel]->adjust(sh4->device->cycles_to_attotime(2*count+1), channel);
-	}
-	else if (timermode == 2) // timer activated immediately
-	{
-		sh4->dma_timer_active[channel] = 1;
-		sh4->dma_timer[channel]->adjust(attotime::zero, channel);
-	}
-
-	src &= AM;
-	dst &= AM;
-
-	switch(size)
-	{
-	case 1: // 8 bit
-		for(;count > 0; count --)
-		{
-			if(incs == 2)
-				src --;
-			if(incd == 2)
-				dst --;
-			sh4->program->write_byte(dst, sh4->program->read_byte(src));
-			if(incs == 1)
-				src ++;
-			if(incd == 1)
-				dst ++;
-		}
-		break;
-	case 2: // 16 bit
-		src &= ~1;
-		dst &= ~1;
-		for(;count > 0; count --)
-		{
-			if(incs == 2)
-				src -= 2;
-			if(incd == 2)
-				dst -= 2;
-			sh4->program->write_word(dst, sh4->program->read_word(src));
-			if(incs == 1)
-				src += 2;
-			if(incd == 1)
-				dst += 2;
-		}
-		break;
-	case 8: // 64 bit
-		src &= ~7;
-		dst &= ~7;
-		for(;count > 0; count --)
-		{
-			if(incs == 2)
-				src -= 8;
-			if(incd == 2)
-				dst -= 8;
-			sh4->program->write_qword(dst, sh4->program->read_qword(src));
-			if(incs == 1)
-				src += 8;
-			if(incd == 1)
-				dst += 8;
-
-		}
-		break;
-	case 4: // 32 bit
-		src &= ~3;
-		dst &= ~3;
-		for(;count > 0; count --)
-		{
-			if(incs == 2)
-				src -= 4;
-			if(incd == 2)
-				dst -= 4;
-			sh4->program->write_dword(dst, sh4->program->read_dword(src));
-			if(incs == 1)
-				src += 4;
-			if(incd == 1)
-				dst += 4;
-
-		}
-		break;
-	case 32:
-		src &= ~31;
-		dst &= ~31;
-		for(;count > 0; count --)
-		{
-			if(incs == 2)
-				src -= 32;
-			if(incd == 2)
-				dst -= 32;
-			sh4->program->write_qword(dst, sh4->program->read_qword(src));
-			sh4->program->write_qword(dst+8, sh4->program->read_qword(src+8));
-			sh4->program->write_qword(dst+16, sh4->program->read_qword(src+16));
-			sh4->program->write_qword(dst+24, sh4->program->read_qword(src+24));
-			if(incs == 1)
-				src += 32;
-			if(incd == 1)
-				dst += 32;
-		}
-		break;
-	}
-	*sar    = (*sar & !AM) | src;
-	*dar    = (*dar & !AM) | dst;
-	*dmatcr = count;
-	return 1;
-}
-
-static int sh4_dma_transfer_device(sh4_state *sh4, int channel, UINT32 chcr, UINT32 *sar, UINT32 *dar, UINT32 *dmatcr)
-{
-	int incs, incd, size, mod;
-	UINT32 src, dst, count;
-
-	incd = (chcr & CHCR_DM) >> 14;
-	incs = (chcr & CHCR_SM) >> 12;
-	size = dmasize[(chcr & CHCR_TS) >> 4];
-	mod = ((chcr & CHCR_RS) >> 8);
-	if (incd == 3 || incs == 3)
-	{
-		logerror("SH4: DMA: bad increment values (%d, %d, %d, %04x)\n", incd, incs, size, chcr);
-		return 0;
-	}
-	src   = *sar;
-	dst   = *dar;
-	count = *dmatcr;
-	if (!count)
-		count = 0x1000000;
-
-	LOG(("SH4: DMA %d start device<->memory %x, %x, %x, %04x, %d, %d, %d\n", channel, src, dst, count, chcr, incs, incd, size));
-
-	sh4->dma_timer_active[channel] = 1;
-
-	src &= AM;
-	dst &= AM;
-
-	// remember parameters
-	sh4->dma_source[channel]=src;
-	sh4->dma_destination[channel]=dst;
-	sh4->dma_count[channel]=count;
-	sh4->dma_wordsize[channel]=size;
-	sh4->dma_source_increment[channel]=incs;
-	sh4->dma_destination_increment[channel]=incd;
-	sh4->dma_mode[channel]=mod;
-
-	// inform device its ready to transfer
-	sh4->io->write_dword(SH4_IOPORT_DMA, channel | (mod << 16));
-	return 1;
-}
-
-static void sh4_dmac_check(sh4_state *sh4, int channel)
-{
-UINT32 dmatcr, chcr, sar, dar;
-
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("sh4_dmac_check uses sh4->m[] with SH3\n");
-
-	switch (channel)
-	{
-	case 0:
-		sar = sh4->m[SAR0];
-		dar = sh4->m[DAR0];
-		chcr = sh4->m[CHCR0];
-		dmatcr = sh4->m[DMATCR0];
-		break;
-	case 1:
-		sar = sh4->m[SAR1];
-		dar = sh4->m[DAR1];
-		chcr = sh4->m[CHCR1];
-		dmatcr = sh4->m[DMATCR1];
-		break;
-	case 2:
-		sar = sh4->m[SAR2];
-		dar = sh4->m[DAR2];
-		chcr = sh4->m[CHCR2];
-		dmatcr = sh4->m[DMATCR2];
-		break;
-	case 3:
-		sar = sh4->m[SAR3];
-		dar = sh4->m[DAR3];
-		chcr = sh4->m[CHCR3];
-		dmatcr = sh4->m[DMATCR3];
-		break;
-	default:
-		return;
-	}
-	if (chcr & sh4->m[DMAOR] & DMAOR_DME)
-	{
-		if ((((chcr & CHCR_RS) >> 8) < 2) || (((chcr & CHCR_RS) >> 8) > 6))
-			return;
-		if (!sh4->dma_timer_active[channel] && !(chcr & CHCR_TE) && !(sh4->m[DMAOR] & (DMAOR_AE | DMAOR_NMIF)))
-		{
-			if (((chcr & CHCR_RS) >> 8) > 3)
-				sh4_dma_transfer(sh4, channel, 1, chcr, &sar, &dar, &dmatcr);
-			else if ((sh4->m[DMAOR] & DMAOR_DDT) == 0)
-				sh4_dma_transfer_device(sh4, channel, chcr, &sar, &dar, &dmatcr); // tell device we are ready to transfer
-		}
-	}
-	else
-	{
-		if (sh4->dma_timer_active[channel])
-		{
-			logerror("SH4: DMA %d cancelled in-flight but all data transferred", channel);
-			sh4->dma_timer[channel]->adjust(attotime::never, channel);
-			sh4->dma_timer_active[channel] = 0;
-		}
-	}
-}
 
 static void sh4_dmac_nmi(sh4_state *sh4) // manage dma when nmi gets asserted
 {
-int s;
+	int s;
 
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("sh4_dmac_nmi uses sh4->m[] with SH3\n");
-
-	sh4->m[DMAOR] |= DMAOR_NMIF;
+	sh4->SH4_DMAOR |= DMAOR_NMIF;
 	for (s = 0;s < 4;s++)
 	{
 		if (sh4->dma_timer_active[s])
@@ -749,6 +642,30 @@ int s;
 		}
 	}
 }
+
+void sh4_handler_ipra_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask)
+{
+	COMBINE_DATA(&sh4->SH4_IPRA);
+	/* 15 - 12 TMU0 */
+	/* 11 -  8 TMU1 */
+	/*  7 -  4 TMU2 */
+	/*  3 -  0 RTC  */
+	sh4->exception_priority[SH4_INTC_ATI]     = INTPRI(sh4->SH4_IPRA & 0x000f, SH4_INTC_ATI);
+	sh4->exception_priority[SH4_INTC_PRI]     = INTPRI(sh4->SH4_IPRA & 0x000f, SH4_INTC_PRI);
+	sh4->exception_priority[SH4_INTC_CUI]     = INTPRI(sh4->SH4_IPRA & 0x000f, SH4_INTC_CUI);
+
+	sh4->exception_priority[SH4_INTC_TUNI2]  = INTPRI((sh4->SH4_IPRA & 0x00f0) >> 4, SH4_INTC_TUNI2);
+	sh4->exception_priority[SH4_INTC_TICPI2] = INTPRI((sh4->SH4_IPRA & 0x00f0) >> 4, SH4_INTC_TICPI2);
+
+	sh4->exception_priority[SH4_INTC_TUNI1]  = INTPRI((sh4->SH4_IPRA & 0x0f00) >> 8, SH4_INTC_TUNI1);
+
+	sh4->exception_priority[SH4_INTC_TUNI0]  = INTPRI((sh4->SH4_IPRA & 0xf000) >> 12, SH4_INTC_TUNI0);
+
+	logerror("setting priorities TMU0 %01x TMU1 %01x TMU2 %01x RTC %01x\n", (sh4->SH4_IPRA & 0xf000)>>12, (sh4->SH4_IPRA & 0x0f00)>>8, (sh4->SH4_IPRA & 0x00f0)>>4, (sh4->SH4_IPRA & 0x000f)>>0);
+
+	sh4_exception_recompute(sh4);
+}
+
 
 WRITE32_HANDLER( sh4_internal_w )
 {
@@ -858,106 +775,28 @@ WRITE32_HANDLER( sh4_internal_w )
 		}
 		break;
 
-		// TMU
-	case TSTR:
-		if (old & 1)
-			sh4->m[TCNT0] = compute_ticks_timer(sh4->timer[0], sh4->pm_clock, tcnt_div[sh4->m[TCR0] & 7]);
-		if ((sh4->m[TSTR] & 1) == 0) {
-			sh4->timer[0]->adjust(attotime::never);
-		} else
-			sh4_timer_recompute(sh4, 0);
-
-		if (old & 2)
-			sh4->m[TCNT1] = compute_ticks_timer(sh4->timer[1], sh4->pm_clock, tcnt_div[sh4->m[TCR1] & 7]);
-		if ((sh4->m[TSTR] & 2) == 0) {
-			sh4->timer[1]->adjust(attotime::never);
-		} else
-			sh4_timer_recompute(sh4, 1);
-
-		if (old & 4)
-			sh4->m[TCNT2] = compute_ticks_timer(sh4->timer[2], sh4->pm_clock, tcnt_div[sh4->m[TCR2] & 7]);
-		if ((sh4->m[TSTR] & 4) == 0) {
-			sh4->timer[2]->adjust(attotime::never);
-		} else
-			sh4_timer_recompute(sh4, 2);
-		break;
-
-	case TCR0:
-		if (sh4->m[TSTR] & 1)
-		{
-			sh4->m[TCNT0] = compute_ticks_timer(sh4->timer[0], sh4->pm_clock, tcnt_div[old & 7]);
-			sh4_timer_recompute(sh4, 0);
-		}
-		if (!(sh4->m[TCR0] & 0x20) || !(sh4->m[TCR0] & 0x100))
-			sh4_exception_unrequest(sh4, SH4_INTC_TUNI0);
-		break;
-	case TCR1:
-		if (sh4->m[TSTR] & 2)
-		{
-			sh4->m[TCNT1] = compute_ticks_timer(sh4->timer[1], sh4->pm_clock, tcnt_div[old & 7]);
-			sh4_timer_recompute(sh4, 1);
-		}
-		if (!(sh4->m[TCR1] & 0x20) || !(sh4->m[TCR1] & 0x100))
-			sh4_exception_unrequest(sh4, SH4_INTC_TUNI1);
-		break;
-	case TCR2:
-		if (sh4->m[TSTR] & 4)
-		{
-			sh4->m[TCNT2] = compute_ticks_timer(sh4->timer[2], sh4->pm_clock, tcnt_div[old & 7]);
-			sh4_timer_recompute(sh4, 2);
-		}
-		if (!(sh4->m[TCR2] & 0x20) || !(sh4->m[TCR2] & 0x100))
-			sh4_exception_unrequest(sh4, SH4_INTC_TUNI2);
-		break;
-
-	case TCOR0:
-		if (sh4->m[TSTR] & 1)
-		{
-			sh4->m[TCNT0] = compute_ticks_timer(sh4->timer[0], sh4->pm_clock, tcnt_div[sh4->m[TCR0] & 7]);
-			sh4_timer_recompute(sh4, 0);
-		}
-		break;
-	case TCNT0:
-		if (sh4->m[TSTR] & 1)
-			sh4_timer_recompute(sh4, 0);
-		break;
-	case TCOR1:
-		if (sh4->m[TSTR] & 2)
-		{
-			sh4->m[TCNT1] = compute_ticks_timer(sh4->timer[1], sh4->pm_clock, tcnt_div[sh4->m[TCR1] & 7]);
-			sh4_timer_recompute(sh4, 1);
-		}
-		break;
-	case TCNT1:
-		if (sh4->m[TSTR] & 2)
-			sh4_timer_recompute(sh4, 1);
-		break;
-	case TCOR2:
-		if (sh4->m[TSTR] & 4)
-		{
-			sh4->m[TCNT2] = compute_ticks_timer(sh4->timer[2], sh4->pm_clock, tcnt_div[sh4->m[TCR2] & 7]);
-			sh4_timer_recompute(sh4, 2);
-		}
-		break;
-	case TCNT2:
-		if (sh4->m[TSTR] & 4)
-			sh4_timer_recompute(sh4, 2);
-		break;
-
-		// INTC
+/*********************************************************************************************************************
+        TMU (Timer Unit)
+*********************************************************************************************************************/
+	case SH4_TSTR_ADDR:	sh4_handle_tstr_addr_w(sh4,data,mem_mask);   break;
+	case SH4_TCR0_ADDR:	sh4_handle_tcr0_addr_w(sh4,data,mem_mask);   break;
+	case SH4_TCR1_ADDR: sh4_handle_tcr1_addr_w(sh4,data,mem_mask);   break;
+	case SH4_TCR2_ADDR: sh4_handle_tcr2_addr_w(sh4,data,mem_mask);   break;
+	case SH4_TCOR0_ADDR: sh4_handle_tcor0_addr_w(sh4,data,mem_mask); break;
+	case SH4_TCNT0_ADDR: sh4_handle_tcnt0_addr_w(sh4,data,mem_mask); break;
+	case SH4_TCOR1_ADDR: sh4_handle_tcor1_addr_w(sh4,data,mem_mask); break;
+	case SH4_TCNT1_ADDR: sh4_handle_tcnt1_addr_w(sh4,data,mem_mask); break;
+	case SH4_TCOR2_ADDR: sh4_handle_tcor2_addr_w(sh4,data,mem_mask); break;
+	case SH4_TCNT2_ADDR: sh4_handle_tcnt2_addr_w(sh4,data,mem_mask); break;
+	case SH4_TOCR_ADDR: sh4_handle_tocr_addr_w(sh4,data,mem_mask);   break; // not supported
+	case SH4_TCPR2_ADDR: sh4_handle_tcpr2_addr_w(sh4,data,mem_mask); break; // not supported
+/*********************************************************************************************************************
+        INTC (Interrupt Controller)
+*********************************************************************************************************************/
 	case ICR:
 		sh4->m[ICR] = (sh4->m[ICR] & 0x7fff) | (old & 0x8000);
 		break;
-	case IPRA:
-		sh4->exception_priority[SH4_INTC_ATI] = INTPRI(sh4->m[IPRA] & 0x000f, SH4_INTC_ATI);
-		sh4->exception_priority[SH4_INTC_PRI] = INTPRI(sh4->m[IPRA] & 0x000f, SH4_INTC_PRI);
-		sh4->exception_priority[SH4_INTC_CUI] = INTPRI(sh4->m[IPRA] & 0x000f, SH4_INTC_CUI);
-		sh4->exception_priority[SH4_INTC_TUNI2] = INTPRI((sh4->m[IPRA] & 0x00f0) >> 4, SH4_INTC_TUNI2);
-		sh4->exception_priority[SH4_INTC_TICPI2] = INTPRI((sh4->m[IPRA] & 0x00f0) >> 4, SH4_INTC_TICPI2);
-		sh4->exception_priority[SH4_INTC_TUNI1] = INTPRI((sh4->m[IPRA] & 0x0f00) >> 8, SH4_INTC_TUNI1);
-		sh4->exception_priority[SH4_INTC_TUNI0] = INTPRI((sh4->m[IPRA] & 0xf000) >> 12, SH4_INTC_TUNI0);
-		sh4_exception_recompute(sh4);
-		break;
+	case IPRA: sh4_handler_ipra_w(sh4, data, mem_mask); break;
 	case IPRB:
 		sh4->exception_priority[SH4_INTC_SCI1ERI] = INTPRI((sh4->m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1ERI);
 		sh4->exception_priority[SH4_INTC_SCI1RXI] = INTPRI((sh4->m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1RXI);
@@ -982,50 +821,35 @@ WRITE32_HANDLER( sh4_internal_w )
 		sh4->exception_priority[SH4_INTC_GPOI] = INTPRI((sh4->m[IPRC] & 0xf000) >> 12, SH4_INTC_GPOI);
 		sh4_exception_recompute(sh4);
 		break;
-
-		// DMA
-	case SAR0:
-	case SAR1:
-	case SAR2:
-	case SAR3:
-	case DAR0:
-	case DAR1:
-	case DAR2:
-	case DAR3:
-	case DMATCR0:
-	case DMATCR1:
-	case DMATCR2:
-	case DMATCR3:
-		break;
-	case CHCR0:
-		sh4_dmac_check(sh4, 0);
-		break;
-	case CHCR1:
-		sh4_dmac_check(sh4, 1);
-		break;
-	case CHCR2:
-		sh4_dmac_check(sh4, 2);
-		break;
-	case CHCR3:
-		sh4_dmac_check(sh4, 3);
-		break;
-	case DMAOR:
-		if ((sh4->m[DMAOR] & DMAOR_AE) && (~old & DMAOR_AE))
-			sh4->m[DMAOR] &= ~DMAOR_AE;
-		if ((sh4->m[DMAOR] & DMAOR_NMIF) && (~old & DMAOR_NMIF))
-			sh4->m[DMAOR] &= ~DMAOR_NMIF;
-		sh4_dmac_check(sh4, 0);
-		sh4_dmac_check(sh4, 1);
-		sh4_dmac_check(sh4, 2);
-		sh4_dmac_check(sh4, 3);
-		break;
-
-		// Store Queues
+/*********************************************************************************************************************
+        DMAC (DMA Controller)
+*********************************************************************************************************************/
+	case SH4_SAR0_ADDR: sh4_handle_sar0_addr_w(sh4,data,mem_mask);   break;
+	case SH4_SAR1_ADDR: sh4_handle_sar1_addr_w(sh4,data,mem_mask);   break;
+	case SH4_SAR2_ADDR: sh4_handle_sar2_addr_w(sh4,data,mem_mask);   break;
+	case SH4_SAR3_ADDR: sh4_handle_sar3_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DAR0_ADDR: sh4_handle_dar0_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DAR1_ADDR: sh4_handle_dar1_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DAR2_ADDR: sh4_handle_dar2_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DAR3_ADDR: sh4_handle_dar3_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DMATCR0_ADDR: sh4_handle_dmatcr0_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DMATCR1_ADDR: sh4_handle_dmatcr1_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DMATCR2_ADDR: sh4_handle_dmatcr2_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DMATCR3_ADDR: sh4_handle_dmatcr3_addr_w(sh4,data,mem_mask);   break;
+	case SH4_CHCR0_ADDR: sh4_handle_chcr0_addr_w(sh4,data,mem_mask);   break;
+	case SH4_CHCR1_ADDR: sh4_handle_chcr1_addr_w(sh4,data,mem_mask);   break;
+	case SH4_CHCR2_ADDR: sh4_handle_chcr2_addr_w(sh4,data,mem_mask);   break;
+	case SH4_CHCR3_ADDR: sh4_handle_chcr3_addr_w(sh4,data,mem_mask);   break;
+	case SH4_DMAOR_ADDR: sh4_handle_dmaor_addr_w(sh4,data,mem_mask);   break;
+/*********************************************************************************************************************
+        Store Queues
+*********************************************************************************************************************/
 	case QACR0:
 	case QACR1:
 		break;
-
-		// I/O ports
+/*********************************************************************************************************************
+        I/O
+*********************************************************************************************************************/
 	case PCTRA:
 		sh4->ioport16_pullup = 0;
 		sh4->ioport16_direction = 0;
@@ -1105,26 +929,52 @@ READ32_HANDLER( sh4_internal_r )
 			return sh4->m[RTCNT];
 		break;
 
-	case TCNT0:
-		if (sh4->m[TSTR] & 1)
-			return compute_ticks_timer(sh4->timer[0], sh4->pm_clock, tcnt_div[sh4->m[TCR0] & 7]);
-		else
-			return sh4->m[TCNT0];
-		break;
-	case TCNT1:
-		if (sh4->m[TSTR] & 2)
-			return compute_ticks_timer(sh4->timer[1], sh4->pm_clock, tcnt_div[sh4->m[TCR1] & 7]);
-		else
-			return sh4->m[TCNT1];
-		break;
-	case TCNT2:
-		if (sh4->m[TSTR] & 4)
-			return compute_ticks_timer(sh4->timer[2], sh4->pm_clock, tcnt_div[sh4->m[TCR2] & 7]);
-		else
-			return sh4->m[TCNT2];
-		break;
+/*********************************************************************************************************************
+        INTC (Interrupt Controller)
+*********************************************************************************************************************/
 
-		// I/O ports
+	case IPRA:
+		return sh4->SH4_IPRA;
+
+/*********************************************************************************************************************
+        TMU (Timer Unit)
+*********************************************************************************************************************/
+	case SH4_TSTR_ADDR:  return sh4_handle_tstr_addr_r(sh4, mem_mask);
+	case SH4_TCR0_ADDR:  return sh4_handle_tcr0_addr_r(sh4, mem_mask);
+	case SH4_TCR1_ADDR:  return sh4_handle_tcr1_addr_r(sh4, mem_mask);
+	case SH4_TCR2_ADDR:  return sh4_handle_tcr2_addr_r(sh4, mem_mask);
+	case SH4_TCNT0_ADDR: return sh4_handle_tcnt0_addr_r(sh4, mem_mask);
+	case SH4_TCNT1_ADDR: return sh4_handle_tcnt1_addr_r(sh4, mem_mask);
+	case SH4_TCNT2_ADDR: return sh4_handle_tcnt2_addr_r(sh4, mem_mask);
+	case SH4_TCOR0_ADDR: return sh4_handle_tcor0_addr_r(sh4, mem_mask);
+	case SH4_TCOR1_ADDR: return sh4_handle_tcor1_addr_r(sh4, mem_mask);
+	case SH4_TCOR2_ADDR: return sh4_handle_tcor2_addr_r(sh4, mem_mask);
+	case SH4_TOCR_ADDR:  return sh4_handle_tocr_addr_r(sh4, mem_mask); // not supported
+	case SH4_TCPR2_ADDR: return sh4_handle_tcpr2_addr_r(sh4, mem_mask); // not supported
+/*********************************************************************************************************************
+        DMAC (DMA Controller)
+*********************************************************************************************************************/
+	case SH4_SAR0_ADDR: return sh4_handle_sar0_addr_r(sh4,mem_mask);
+	case SH4_SAR1_ADDR: return sh4_handle_sar1_addr_r(sh4,mem_mask);
+	case SH4_SAR2_ADDR: return sh4_handle_sar2_addr_r(sh4,mem_mask);
+	case SH4_SAR3_ADDR: return sh4_handle_sar3_addr_r(sh4,mem_mask);
+	case SH4_DAR0_ADDR: return sh4_handle_dar0_addr_r(sh4,mem_mask);
+	case SH4_DAR1_ADDR: return sh4_handle_dar1_addr_r(sh4,mem_mask);
+	case SH4_DAR2_ADDR: return sh4_handle_dar2_addr_r(sh4,mem_mask);
+	case SH4_DAR3_ADDR: return sh4_handle_dar3_addr_r(sh4,mem_mask);
+	case SH4_DMATCR0_ADDR: return sh4_handle_dmatcr0_addr_r(sh4,mem_mask);
+	case SH4_DMATCR1_ADDR: return sh4_handle_dmatcr1_addr_r(sh4,mem_mask);
+	case SH4_DMATCR2_ADDR: return sh4_handle_dmatcr2_addr_r(sh4,mem_mask);
+	case SH4_DMATCR3_ADDR: return sh4_handle_dmatcr3_addr_r(sh4,mem_mask);
+	case SH4_CHCR0_ADDR: return sh4_handle_chcr0_addr_r(sh4,mem_mask);
+	case SH4_CHCR1_ADDR: return sh4_handle_chcr1_addr_r(sh4,mem_mask);
+	case SH4_CHCR2_ADDR: return sh4_handle_chcr2_addr_r(sh4,mem_mask);
+	case SH4_CHCR3_ADDR: return sh4_handle_chcr3_addr_r(sh4,mem_mask);
+	case SH4_DMAOR_ADDR: return sh4_handle_dmaor_addr_r(sh4,mem_mask);
+/*********************************************************************************************************************
+        I/O Ports
+*********************************************************************************************************************/
+
 	case PDTRA:
 		if (sh4->m[BCR2] & 1)
 			return (sh4->io->read_dword(SH4_IOPORT_16) & ~sh4->ioport16_direction) | (sh4->m[PDTRA] & sh4->ioport16_direction);
@@ -1212,7 +1062,7 @@ void sh4_set_irq_line(sh4_state *sh4, int irqline, int state) // set state of ex
 		else
 		{
 			//if (irqline > SH4_IRL3)
-			//	return;
+			//  return;
 			if (sh4->irq_line_state[irqline] == state)
 				return;
 			sh4->irq_line_state[irqline] = state;
@@ -1376,270 +1226,6 @@ void sh4_common_init(device_t *device)
 	sh4->rtc_timer->adjust(attotime::never);
 
 	sh4->m = auto_alloc_array(device->machine(), UINT32, 16384);
-}
-
-// called by drivers to transfer data in a cpu<->device dma. 'device' must be a SH4 cpu
-int sh4_dma_data(device_t *device, struct sh4_device_dma *s)
-{
-	UINT32 pos, len, siz;
-	int channel = s->channel;
-	void *data = s->buffer;
-
-	sh4_state *sh4 = get_safe_token(device);
-
-	if (!sh4->dma_timer_active[channel])
-		return 0;
-
-	if (sh4->dma_mode[channel] == 2)
-	{
-		// device receives data
-		len = sh4->dma_count[channel];
-		if (s->length < len)
-			len = s->length;
-		siz = sh4->dma_wordsize[channel];
-		for (pos = 0;pos < len;pos++) {
-			switch (siz)
-			{
-			case 8:
-				if (sh4->dma_source_increment[channel] == 2)
-					sh4->dma_source[channel] -= 8;
-				*(UINT64 *)data = sh4->program->read_qword(sh4->dma_source[channel] & ~7);
-				if (sh4->dma_source_increment[channel] == 1)
-					sh4->dma_source[channel] += 8;
-				break;
-			case 1:
-				if (sh4->dma_source_increment[channel] == 2)
-					sh4->dma_source[channel]--;
-				*(UINT8 *)data = sh4->program->read_byte(sh4->dma_source[channel]);
-				if (sh4->dma_source_increment[channel] == 1)
-					sh4->dma_source[channel]++;
-				break;
-			case 2:
-				if (sh4->dma_source_increment[channel] == 2)
-					sh4->dma_source[channel] -= 2;
-				*(UINT16 *)data = sh4->program->read_word(sh4->dma_source[channel] & ~1);
-				if (sh4->dma_source_increment[channel] == 1)
-					sh4->dma_source[channel] += 2;
-				break;
-			case 4:
-				if (sh4->dma_source_increment[channel] == 2)
-					sh4->dma_source[channel] -= 4;
-				*(UINT32 *)data = sh4->program->read_dword(sh4->dma_source[channel] & ~3);
-				if (sh4->dma_source_increment[channel] == 1)
-					sh4->dma_source[channel] += 4;
-				break;
-			case 32:
-				if (sh4->dma_source_increment[channel] == 2)
-					sh4->dma_source[channel] -= 32;
-				*(UINT64 *)data = sh4->program->read_qword(sh4->dma_source[channel] & ~31);
-				*((UINT64 *)data+1) = sh4->program->read_qword((sh4->dma_source[channel] & ~31)+8);
-				*((UINT64 *)data+2) = sh4->program->read_qword((sh4->dma_source[channel] & ~31)+16);
-				*((UINT64 *)data+3) = sh4->program->read_qword((sh4->dma_source[channel] & ~31)+24);
-				if (sh4->dma_source_increment[channel] == 1)
-					sh4->dma_source[channel] += 32;
-				break;
-			}
-			sh4->dma_count[channel]--;
-		}
-		if (sh4->dma_count[channel] == 0) // all data transferred ?
-		{
-			sh4->dma_timer[channel]->adjust(attotime::zero, channel);
-			return 2;
-		}
-		return 1;
-	}
-	else if (sh4->dma_mode[channel] == 3)
-	{
-		// device sends data
-		len = sh4->dma_count[channel];
-		if (s->length < len)
-			len = s->length;
-		siz = sh4->dma_wordsize[channel];
-		for (pos = 0;pos < len;pos++) {
-			switch (siz)
-			{
-			case 8:
-				if (sh4->dma_destination_increment[channel] == 2)
-					sh4->dma_destination[channel]-=8;
-				sh4->program->write_qword(sh4->dma_destination[channel] & ~7, *(UINT64 *)data);
-				if (sh4->dma_destination_increment[channel] == 1)
-					sh4->dma_destination[channel]+=8;
-				break;
-			case 1:
-				if (sh4->dma_destination_increment[channel] == 2)
-					sh4->dma_destination[channel]--;
-				sh4->program->write_byte(sh4->dma_destination[channel], *(UINT8 *)data);
-				if (sh4->dma_destination_increment[channel] == 1)
-					sh4->dma_destination[channel]++;
-				break;
-			case 2:
-				if (sh4->dma_destination_increment[channel] == 2)
-					sh4->dma_destination[channel]-=2;
-				sh4->program->write_word(sh4->dma_destination[channel] & ~1, *(UINT16 *)data);
-				if (sh4->dma_destination_increment[channel] == 1)
-					sh4->dma_destination[channel]+=2;
-				break;
-			case 4:
-				if (sh4->dma_destination_increment[channel] == 2)
-					sh4->dma_destination[channel]-=4;
-				sh4->program->write_dword(sh4->dma_destination[channel] & ~3, *(UINT32 *)data);
-				if (sh4->dma_destination_increment[channel] == 1)
-					sh4->dma_destination[channel]+=4;
-				break;
-			case 32:
-				if (sh4->dma_destination_increment[channel] == 2)
-					sh4->dma_destination[channel]-=32;
-				sh4->program->write_qword(sh4->dma_destination[channel] & ~31, *(UINT64 *)data);
-				sh4->program->write_qword((sh4->dma_destination[channel] & ~31)+8, *((UINT64 *)data+1));
-				sh4->program->write_qword((sh4->dma_destination[channel] & ~31)+16, *((UINT64 *)data+2));
-				sh4->program->write_qword((sh4->dma_destination[channel] & ~31)+24, *((UINT64 *)data+3));
-				if (sh4->dma_destination_increment[channel] == 1)
-					sh4->dma_destination[channel]+=32;
-				break;
-			}
-			sh4->dma_count[channel]--;
-		}
-
-		if (sh4->dma_count[channel] == 0) // all data transferred ?
-		{
-			sh4->dma_timer[channel]->adjust(attotime::zero, channel);
-			return 2;
-		}
-		return 1;
-	}
-	else
-		return 0;
-}
-
-// called by drivers to transfer data in a DDT dma. 'device' must be a SH4 cpu
-void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
-{
-	sh4_state *sh4 = get_safe_token(device);
-	UINT32 chcr;
-	UINT32 *p32bits;
-	UINT64 *p32bytes;
-	UINT32 pos,len,siz;
-
-	if (sh4->cpu_type != CPU_TYPE_SH4)
-		fatalerror("sh4_dma_ddt uses sh4->m[] with SH3\n");
-
-	if (sh4->dma_timer_active[s->channel])
-		return;
-	if (s->mode >= 0) {
-		switch (s->channel)
-		{
-		case 0:
-			if (s->mode & 1)
-				s->source = sh4->m[SAR0];
-			if (s->mode & 2)
-				sh4->m[SAR0] = s->source;
-			if (s->mode & 4)
-				s->destination = sh4->m[DAR0];
-			if (s->mode & 8)
-				sh4->m[DAR0] = s->destination;
-			break;
-		case 1:
-			if (s->mode & 1)
-				s->source = sh4->m[SAR1];
-			if (s->mode & 2)
-				sh4->m[SAR1] = s->source;
-			if (s->mode & 4)
-				s->destination = sh4->m[DAR1];
-			if (s->mode & 8)
-				sh4->m[DAR1] = s->destination;
-			break;
-		case 2:
-			if (s->mode & 1)
-				s->source = sh4->m[SAR2];
-			if (s->mode & 2)
-				sh4->m[SAR2] = s->source;
-			if (s->mode & 4)
-				s->destination = sh4->m[DAR2];
-			if (s->mode & 8)
-				sh4->m[DAR2] = s->destination;
-			break;
-		case 3:
-		default:
-			if (s->mode & 1)
-				s->source = sh4->m[SAR3];
-			if (s->mode & 2)
-				sh4->m[SAR3] = s->source;
-			if (s->mode & 4)
-				s->destination = sh4->m[DAR3];
-			if (s->mode & 8)
-				sh4->m[DAR3] = s->destination;
-			break;
-		}
-		switch (s->channel)
-		{
-		case 0:
-			chcr = sh4->m[CHCR0];
-			len = sh4->m[DMATCR0];
-			break;
-		case 1:
-			chcr = sh4->m[CHCR1];
-			len = sh4->m[DMATCR1];
-			break;
-		case 2:
-			chcr = sh4->m[CHCR2];
-			len = sh4->m[DMATCR2];
-			break;
-		case 3:
-		default:
-			chcr = sh4->m[CHCR3];
-			len = sh4->m[DMATCR3];
-			break;
-		}
-		if ((s->direction) == 0) {
-			chcr = (chcr & 0xffff3fff) | ((s->mode & 0x30) << 10);
-		} else {
-			chcr = (chcr & 0xffffcfff) | ((s->mode & 0x30) << 8);
-		}
-		siz = dmasize[(chcr >> 4) & 7];
-		if (siz && (s->size))
-			if ((len * siz) != (s->length * s->size))
-				return;
-		sh4_dma_transfer(sh4, s->channel, 0, chcr, &s->source, &s->destination, &len);
-	} else {
-		if (s->size == 4) {
-			if ((s->direction) == 0) {
-				len = s->length;
-				p32bits = (UINT32 *)(s->buffer);
-				for (pos = 0;pos < len;pos++) {
-					*p32bits = sh4->program->read_dword(s->source);
-					p32bits++;
-					s->source = s->source + 4;
-				}
-			} else {
-				len = s->length;
-				p32bits = (UINT32 *)(s->buffer);
-				for (pos = 0;pos < len;pos++) {
-					sh4->program->write_dword(s->destination, *p32bits);
-					p32bits++;
-					s->destination = s->destination + 4;
-				}
-			}
-		}
-		if (s->size == 32) {
-			if ((s->direction) == 0) {
-				len = s->length * 4;
-				p32bytes = (UINT64 *)(s->buffer);
-				for (pos = 0;pos < len;pos++) {
-					*p32bytes = sh4->program->read_qword(s->source);
-					p32bytes++;
-					s->destination = s->destination + 8;
-				}
-			} else {
-				len = s->length * 4;
-				p32bytes = (UINT64 *)(s->buffer);
-				for (pos = 0;pos < len;pos++) {
-					sh4->program->write_qword(s->destination, *p32bytes);
-					p32bytes++;
-					s->destination = s->destination + 8;
-				}
-			}
-		}
-	}
 }
 
 UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address)

@@ -222,7 +222,7 @@ static const saa5050_interface p2000t_saa5050_intf =
 	"screen",
 	0,	/* starting gfxnum */
 	40, 24 - 1, 80,  /* x, y, size */
-	0 	/* rev y order */
+	0	/* rev y order */
 };
 
 /* Machine definition */
