@@ -4,22 +4,16 @@
 
         More data at :
                 http://www.nostalcomp.cz/pdfka/savia84.pdf
+                http://www.nostalcomp.cz/savia.php
 
         05/02/2011 Skeleton driver.
+        11/10/2011 Found a new rom. Working [Robbbert]
 
-        According to the schematic, the rom is at 0000-03FF (no mirrors),
-        and the RAM is at 1800-1FFF (no mirrors). However the first thing
-        the rom does is to jump to 2061, which would cause an instant crash.
-        Perhaps it is a bad dump? It doesn't do anything sensible at the
-        moment.
-
-        All photos of this computer are of it pulled apart. There are no
-        photos of it running. I assume all the LEDs are red ones. The LEDs
+	I assume all the LEDs are red ones. The LEDs
         down the left side I assume to be bit 0 through 7 in that order.
 
         ToDo:
         - Make better artwork
-        - It should run but bad rom suspected
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -28,6 +22,8 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "savia84.lh"
+
+#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class savia84_state : public driver_device
 {
@@ -47,12 +43,14 @@ public:
 	UINT8 m_kbd;
 	UINT8 m_segment;
 	UINT8 m_digit;
+	UINT8 m_digit_last;
+	virtual void machine_reset();
 };
 
 static ADDRESS_MAP_START(savia84_mem, AS_PROGRAM, 8, savia84_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff) // A15 not connected at the cPU
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_MIRROR(0x2000) AM_WRITENOP // see notes above
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -116,14 +114,16 @@ static INPUT_PORTS_START( savia84 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(savia84)
+MACHINE_RESET_MEMBER( savia84_state )
 {
+	m_digit_last = 0;
 }
 
 WRITE8_MEMBER( savia84_state::savia84_8255_porta_w ) // OUT F8 - output segments on the selected digit
 {
 	m_segment = ~data & 0x7f;
-	if (m_digit) output_set_digit_value(m_digit, m_segment);
+	if (m_digit && (m_digit != m_digit_last)) output_set_digit_value(m_digit, m_segment);
+	m_digit_last = m_digit;
 }
 
 WRITE8_MEMBER( savia84_state::savia84_8255_portb_w ) // OUT F9 - light the 8 leds down the left side
@@ -132,7 +132,7 @@ WRITE8_MEMBER( savia84_state::savia84_8255_portb_w ) // OUT F9 - light the 8 led
 	for (int i = 0; i < 8; i++)
 	{
 		sprintf(ledname,"led%d",i);
-		output_set_value(ledname, BIT(data, i));
+		output_set_value(ledname, !BIT(data, i));
 	}
 }
 
@@ -145,8 +145,6 @@ WRITE8_MEMBER( savia84_state::savia84_8255_portc_w ) // OUT FA - set keyboard sc
 	else
 	if ((m_kbd > 1) && (m_kbd < 9))
 		m_digit = m_kbd;
-
-	if (m_digit) output_set_digit_value(m_digit, m_segment);
 }
 
 READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
@@ -178,8 +176,6 @@ static MACHINE_CONFIG_START( savia84, savia84_state )
 	MCFG_CPU_PROGRAM_MAP(savia84_mem)
 	MCFG_CPU_IO_MAP(savia84_io)
 
-	MCFG_MACHINE_RESET(savia84)
-
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_savia84)
 
@@ -190,10 +186,13 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( savia84 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD("savia84_1kb.bin", 0x0000, 0x0400, CRC(23a5c15e) SHA1(7e769ed8960d8c591a25cfe4effffcca3077c94b)) // 2758 ROM - 1KB
+	ROM_LOAD("savia84.bin", 0x0000, 0x0800, CRC(fa8f1fcf) SHA1(b08404469ed988d96c0413416b6a66f3e5b997a3))
+
+	// Note - the below is a bad dump and does not work
+	//ROM_LOAD("savia84_1kb.bin", 0x0000, 0x0400, CRC(23a5c15e) SHA1(7e769ed8960d8c591a25cfe4effffcca3077c94b))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY     FULLNAME       FLAGS */
-COMP( 1984, savia84,  0,       0,    savia84,   savia84, 0,     "<unknown>", "Savia 84", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1984, savia84,  0,       0,    savia84,   savia84, 0,     "<unknown>", "Savia 84", GAME_NO_SOUND_HW)
