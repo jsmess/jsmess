@@ -283,7 +283,7 @@ WRITE16_MEMBER( intv_state::intv_gram_w )
 	{
 		m_gram[offset] = data;
 		m_gramdirtybytes[offset] = 1;
-   	m_gramdirty = 1;
+	m_gramdirty = 1;
    }
 }
 
@@ -504,9 +504,9 @@ static int intv_load_rom_file(device_image_interface &image)
 			{
 				start = (( ram & 0xf0 ) >> 4) * 0x1000;
 				size = ( ram & 0x0f ) * 0x800;
-				
-				program->install_readwrite_handler(start, start + size, 
-					read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), state), 
+
+				program->install_readwrite_handler(start, start + size,
+					read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), state),
 					write16_delegate( FUNC( intv_state::intv_cart_ram8_w ), state));
 			}
 			/* For now intellivoice always active
@@ -548,7 +548,7 @@ static int intv_load_rom_file(device_image_interface &image)
 
 DEVICE_IMAGE_LOAD( intv_cart )
 {
-	
+
 	if (image.software_entry() == NULL)
 		return intv_load_rom_file(image);
 	else
@@ -577,7 +577,7 @@ DEVICE_IMAGE_LOAD( intv_cart )
 			}
 		}
 		// deal with wsmlb paged rom
-		
+
 		UINT8 *ecs_rom_region = image.device().machine().region("ecs_rom")->base();
 		size = image.get_software_region_length("F000_bank1");
 		if (size && ecs_rom_region) // only load if ecs is plugged in (should probably be done a different way)
@@ -589,21 +589,21 @@ DEVICE_IMAGE_LOAD( intv_cart )
 				ecs_rom_region[(address + j) << 1] = region[2*j+1];
 			}
 		}
-		
+
 		// Cartridge 8bit ram support
 		size = image.get_software_region_length("D000_RAM8");
 		if (size)
 		{
-			program->install_readwrite_handler(0xD000, 0xD000 + size, 
-				read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), state), 
+			program->install_readwrite_handler(0xD000, 0xD000 + size,
+				read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), state),
 				write16_delegate( FUNC( intv_state::intv_cart_ram8_w ), state));
 		}
-		
+
 		size = image.get_software_region_length("8800_RAM8");
 		if (size)
 		{
-			program->install_readwrite_handler(0x8800, 0x8800 + size, 
-				read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), state), 
+			program->install_readwrite_handler(0x8800, 0x8800 + size,
+				read16_delegate( FUNC( intv_state::intv_cart_ram8_r ), state),
 				write16_delegate( FUNC( intv_state::intv_cart_ram8_w ), state));
 		}
 		return IMAGE_INIT_PASS;
@@ -627,7 +627,7 @@ MACHINE_RESET( intv )
 
 	/* Set initial PC */
 	cpu_set_reg(machine.device("maincpu"), CP1610_R7, 0x1000);
-	
+
 	return;
 }
 
@@ -636,8 +636,8 @@ MACHINE_RESET( intvecs )
 	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + (0x2000 << 1));
 	memory_set_bankptr(machine, "bank2", machine.region("ecs_rom")->base() + (0x7000 << 1));
 	memory_set_bankptr(machine, "bank3", machine.region("maincpu")->base() + (0xE000 << 1));
-	memory_set_bankptr(machine, "bank4", machine.region("maincpu")->base() + (0xF000 << 1));	
-	
+	memory_set_bankptr(machine, "bank4", machine.region("maincpu")->base() + (0xF000 << 1));
+
 	device_set_input_line_vector(machine.device("maincpu"), CP1610_RESET, 0x1000);
 
 	/* These are actually the same vector, and INTR is unused */
@@ -817,7 +817,7 @@ READ8_MEMBER( intv_state::intv_ecs_portb_r )
 			return 0xff;
 	}
 }
-	
+
 WRITE8_MEMBER( intv_state::intv_ecs_porta_w )
 {
 	m_ecs_psg_porta = (~data) & 0xFF;

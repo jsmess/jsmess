@@ -1624,6 +1624,7 @@ youjyudn		// (c) 1986 (Japan)
 vigilant		// (c) 1988 (World)
 vigilant1		// (c) 1988 (World)
 vigilantu		// (c) 1988 (US)
+vigilantu2		// (c) 1988 (US)
 vigilantj		// (c) 1988 (Japan)
 kikcubic		// (c) 1988 (Japan)
 kikcubicb		// bootleg
@@ -2132,6 +2133,7 @@ scin			// C09 (c) 1991 Taito Corporation Japan (Negro Torino hack)
 bshark			// C34 (c) 1989 Taito America Corporation (US)
 bsharkj			// C34 (c) 1989 Taito Corporation (Japan)
 aquajack		// B77 (c) 1990 Taito Corporation Japan (World)
+aquajacku		// B77 (c) 1990 Taito America Corporation (US)
 aquajackj		// B77 (c) 1990 Taito Corporation (Japan)
 spacegun		// C57 (c) 1990 Taito Corporation Japan (World)
 dblaxle			// C78 (c) 1991 Taito America Corporation (US)
@@ -7344,6 +7346,7 @@ nbajamte		// (c) 1994 Midway
 nbajamt1		// (c) 1994 Midway
 nbajamt2		// (c) 1994 Midway
 nbajamt3		// (c) 1994 Midway
+nbajamtn		// (c) 1995 Midway
 revx			// (c) 1994 Midway
 mk3				// (c) 1994 Midway
 mk3r20			// (c) 1994 Midway
@@ -7386,6 +7389,7 @@ invasnv4		// (c) 1999 Midway (v4.0)
 crusnexo		// (c) 1999 Midway (v2.4) Latest offical release
 crusnexoa		// (c) 1999 Midway (v2.0)
 crusnexob		// (c) 1999 Midway (v1.6)
+crusnexoc		// (c) 1999 Midway (v1.0)
 thegrid			// (c) 2001 Midway (v1.2) Latest offical release
 thegrida		// (c) 2001 Midway (v1.1)
 
@@ -7733,7 +7737,8 @@ cruisin			// (c) 1985 Jaleco/Kitkorp
 momoko			// (c) 1986 Jaleco
 argus			// (c) 1986 Jaleco
 valtric			// (c) 1986 Jaleco
-butasan			// (c) 1987 Jaleco
+butasan			// (c) 1987 Jaleco - english subtitled
+butasanj		// (c) 1987 Jaleco
 psychic5		// (c) 1987 Jaleco
 psychic5a		// (c) 1987 Jaleco
 bombsa			// (c) 1988 Jaleco
@@ -10304,6 +10309,7 @@ fortecar
 jackpool		// (c) 1997 Electronic Projects
 murogem			// ???
 murogema		// ???
+murogemb		// ???
 murogmbl		// ???
 lasvegas		// hack
 quizmstr		// (c) 1985 Coinmaster
@@ -11372,10 +11378,10 @@ g4u5		//
 g4u6		//
 g4u7		//
 gamt1		// Gaminator 1
-gamt1a		// 
+gamt1a		//
 gamt1b		//
 gamt4		// Gaminator 4
-gamt4a		// 
+gamt4a		//
 gamt4b		//
 gamt4c		//
 gamt4d		//
@@ -11571,33 +11577,33 @@ rasce		//
 atronic		//
 atronica	//
 
-atlantca 	// Atlantica
-atlantcaa 	//
-baboshka 	// Baboshka 
-cfblue 		// Crazy Fruits Blue
-cfbluea 	// 
-cfgreen 	// Crazy Fruits Green 
-chicken 	// Chicken 
-aclown 		// Clown 
-goldglen 	// Golden Glenn 
-iccash 		// I C Cash 
-shpinxii 	// Sphinx II 
-bearnec 	// Bear Necessities 
-beachpt 	// Beach Patrol 
-beetleup 	// Beetles Unplugged 
-abigchs 	// Big Cheese 
-bigblue 	// Big Blue 
-castaway 	// Castaway
-castawaya 	// 
-dncsprt 	// Dancing Spirit 
-drmmake 	// Dream Maker 
-goldcity 	// Gold City 
-jumpjkpt 	// Jumping Jackpots 
-mushmagi 	// Mushroom Magic 
-santam 		// Santa Maria 
-splmastr 	// Spell Master 
-tajmah 		// Tajmahal 
-3wishrd     // Three Wishes Red 
+atlantca	// Atlantica
+atlantcaa	//
+baboshka	// Baboshka
+cfblue		// Crazy Fruits Blue
+cfbluea 	//
+cfgreen 	// Crazy Fruits Green
+chicken 	// Chicken
+aclown		// Clown
+goldglen	// Golden Glenn
+iccash		// I C Cash
+shpinxii	// Sphinx II
+bearnec 	// Bear Necessities
+beachpt 	// Beach Patrol
+beetleup	// Beetles Unplugged
+abigchs 	// Big Cheese
+bigblue 	// Big Blue
+castaway	// Castaway
+castawaya	//
+dncsprt 	// Dancing Spirit
+drmmake 	// Dream Maker
+goldcity	// Gold City
+jumpjkpt	// Jumping Jackpots
+mushmagi	// Mushroom Magic
+santam		// Santa Maria
+splmastr	// Spell Master
+tajmah		// Tajmahal
+3wishrd     // Three Wishes Red
 
 
 // WMS (Russian)
@@ -11610,23 +11616,23 @@ btippers    // Big Tippers (Russia)
 wmsboom     // Boom (Russia)
 cashcrop    // Cash Crop (Russia)
 filthyr 	// Filthy Rich (Russia)
-hottop 		// Hot Toppings (Russia)
-inwinner 	// In Winner (Russia)
-jptparty 	// Jackpot Party (Russia)
+hottop		// Hot Toppings (Russia)
+inwinner	// In Winner (Russia)
+jptparty	// Jackpot Party (Russia)
 leprgld 	// Leprecorns Gold (Russia)
 lol 		// Life of Luxury (Russia)
 lovewin 	// Love To Win (Russia)
-mtburn 		// Money To Burn (Russia)
+mtburn		// Money To Burn (Russia)
 otchart 	// Off The Charts (Russia)
 perfect 	// Perfect Game (Russia)
-reelemin 	// Reel 'Em In (Russia)
-sonoth 		// Sum Of Nothing (Russia)
+reelemin	// Reel 'Em In (Russia)
+sonoth		// Sum Of Nothing (Russia)
 swingin 	// Swingin' Green (Russia)
 wmstopb 	// Top Banana (Russia)
-wdun 		// Who Dunnit (Russia)
-winbid 		// Winning Bid (Russia)
-wldstrek 	// Wild Streak (Russia)
-yukongld 	// Yukon Gold (Russia)
+wdun		// Who Dunnit (Russia)
+winbid		// Winning Bid (Russia)
+wldstrek	// Wild Streak (Russia)
+yukongld	// Yukon Gold (Russia)
 
 // Extrema (Russian)
 
@@ -12468,7 +12474,7 @@ sc4cfg		// Crazy Fruits Gold (Bellfruit)
 sc4cfga		//
 sc4cfgb		//
 sc4cfgc		//
-sc4cfgd		// 
+sc4cfgd		//
 sc4cfge		//
 sc4cfgf		//
 sc4cfgg		//
@@ -14017,7 +14023,7 @@ sc4onupa	//
 sc4pglcl	// Pharaoh's Gold Club (Bellfruit)
 sc4pglcla	//
 sc4pglclb	//
-sc4pglclc	// 
+sc4pglclc	//
 sc4pglcld	//
 sc4pglcle	//
 sc4pglclf	//

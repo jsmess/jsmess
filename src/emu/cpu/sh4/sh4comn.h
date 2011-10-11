@@ -78,9 +78,52 @@ typedef struct
 	address_space *program;
 	direct_read_data *direct;
 	address_space *io;
-	
+
 	// sh4 internal
 	UINT32	*m;
+
+	// timer regs handled manually for reuse
+	UINT32 SH4_TSTR;
+	UINT32 SH4_TCNT0;
+	UINT32 SH4_TCNT1;
+	UINT32 SH4_TCNT2;
+	UINT32 SH4_TCR0;
+	UINT32 SH4_TCR1;
+	UINT32 SH4_TCR2;
+	UINT32 SH4_TCOR0;
+	UINT32 SH4_TCOR1;
+	UINT32 SH4_TCOR2;
+	UINT32 SH4_TOCR;
+	UINT32 SH4_TCPR2;
+
+	// INTC regs
+	UINT32 SH4_IPRA;
+
+	UINT32 SH4_IPRC;
+
+	// DMAC regs
+	UINT32 SH4_SAR0;
+	UINT32 SH4_SAR1;
+	UINT32 SH4_SAR2;
+	UINT32 SH4_SAR3;
+
+	UINT32 SH4_DAR0;
+	UINT32 SH4_DAR1;
+	UINT32 SH4_DAR2;
+	UINT32 SH4_DAR3;
+
+	UINT32 SH4_CHCR0;
+	UINT32 SH4_CHCR1;
+	UINT32 SH4_CHCR2;
+	UINT32 SH4_CHCR3;
+
+	UINT32 SH4_DMATCR0;
+	UINT32 SH4_DMATCR1;
+	UINT32 SH4_DMATCR2;
+	UINT32 SH4_DMATCR3;
+
+	UINT32 SH4_DMAOR;
+
 
 	// sh3 internal
 	UINT32  m_sh3internal_upper[0x3000/4];
@@ -275,6 +318,7 @@ void sh4_swap_fp_couples(sh4_state *sh4);
 #endif
 void sh4_common_init(device_t *device);
 UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address);
+void sh4_handler_ipra_w(sh4_state *sh4, UINT32 data, UINT32 mem_mask);
 
 READ64_HANDLER( sh4_tlb_r );
 WRITE64_HANDLER( sh4_tlb_w );

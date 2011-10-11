@@ -100,7 +100,7 @@ WRITE8_MEMBER( unior_state::unior_60_w )
 		ctrl++;
 	}
 }
-		
+
 static ADDRESS_MAP_START( unior_mem, AS_PROGRAM, 8, unior_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xf7af) AM_RAM

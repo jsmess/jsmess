@@ -3,12 +3,12 @@
   Apple model 820-5037-C "Macintosh II Portrait Video Card"
   PCB is marked "Workstation/Portrait Card"
   640x870, 1, 2 or 4bpp grayscale
- 
+
   Fs0900e0 = DAC control
   Fs0900e4 = DAC data
-  Fs0A0000 = enable / ack VBL IRQ 
+  Fs0A0000 = enable / ack VBL IRQ
   Fs0A0004 = disable VBL IRQ
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -32,7 +32,7 @@ MACHINE_CONFIG_END
 
 ROM_START( wsportrait )
 	ROM_REGION(0x1000, WSPORTRAIT_ROM_REGION, 0)
-	ROM_LOAD( "341-0732.bin", 0x000000, 0x001000, CRC(ddc35b78) SHA1(ce2bf2374bb994c17962dba8f3d11bc1260e2644) ) 
+	ROM_LOAD( "341-0732.bin", 0x000000, 0x001000, CRC(ddc35b78) SHA1(ce2bf2374bb994c17962dba8f3d11bc1260e2644) )
 ROM_END
 
 //**************************************************************************
@@ -223,12 +223,12 @@ static SCREEN_UPDATE( wsportrait )
 WRITE32_MEMBER( nubus_wsportrait_device::wsportrait_w )
 {
 	data ^= 0xffffffff;
-//	if (offset != 0x8000) printf("wsportrait: Write %08x @ %x, mask %08x\n", data, offset, mem_mask);
+//  if (offset != 0x8000) printf("wsportrait: Write %08x @ %x, mask %08x\n", data, offset, mem_mask);
 
 	switch (offset)
 	{
 		case 1:			// mode control
-//			printf("%08x to mode 1\n", data);
+//          printf("%08x to mode 1\n", data);
 			switch (data & 0xff000000)
 			{
 				case 0x20000000:
@@ -258,7 +258,7 @@ WRITE32_MEMBER( nubus_wsportrait_device::wsportrait_w )
 
 			if (m_count == 3)
 			{
-//				printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], cpu_get_pc(&space.device()) );
+//              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], cpu_get_pc(&space.device()) );
 				m_palette[m_clutoffs] = MAKE_RGB(m_colors[2], m_colors[2], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)
@@ -282,11 +282,11 @@ WRITE32_MEMBER( nubus_wsportrait_device::wsportrait_w )
 
 READ32_MEMBER( nubus_wsportrait_device::wsportrait_r )
 {
-//	printf("wsportrait: Read @ %x, mask %08x\n", offset, mem_mask);
+//  printf("wsportrait: Read @ %x, mask %08x\n", offset, mem_mask);
 
 	/*
-	  monitor types
-	 
+      monitor types
+
       0x0 = invalid
       0x2 = invalid
       0x4 = color: 640x870 1bpp, 640x480 2bpp and 4bpp
@@ -295,7 +295,7 @@ READ32_MEMBER( nubus_wsportrait_device::wsportrait_r )
       0xa = invalid
       0xc = 640x480 grayscale
       0xe = same as 0x6
-	*/
+    */
 
 	switch (offset)
 	{

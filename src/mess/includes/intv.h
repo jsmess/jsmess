@@ -41,10 +41,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_intellivoice;
 	required_device<device_t> m_sound;
-	optional_device<device_t> m_ecs_sound;	
-	
+	optional_device<device_t> m_ecs_sound;
 
-	
+
+
 	DECLARE_READ16_MEMBER(intv_stic_r);
 	DECLARE_WRITE16_MEMBER(intv_stic_w);
 	DECLARE_READ16_MEMBER(intv_gram_r);
@@ -56,10 +56,10 @@ public:
 
 	DECLARE_READ16_MEMBER(intv_cart_ram8_r);
 	DECLARE_WRITE16_MEMBER(intv_cart_ram8_w);
-	
+
 	DECLARE_READ8_MEMBER( intv_right_control_r );
 	DECLARE_READ8_MEMBER( intv_left_control_r );
-	
+
 	UINT8 *m_videoram;
 	intv_sprite_type m_sprite[STIC_MOBS];
 	UINT8 m_sprite_buffers[STIC_MOBS][STIC_CARD_WIDTH*2][STIC_CARD_HEIGHT*4*2*2];
@@ -84,7 +84,7 @@ public:
 	int m_sr1_int_pending;
 	UINT8 m_ram8[256];
 	UINT8 m_cart_ram8[2048];
-	
+
 	// ecs
 	DECLARE_WRITE16_MEMBER(ecs_bank1_page_select);
 	DECLARE_WRITE16_MEMBER(ecs_bank2_page_select);
@@ -92,14 +92,14 @@ public:
 	DECLARE_WRITE16_MEMBER(wsmlb_bank_page_select);
 	DECLARE_READ16_MEMBER(intv_ecs_ram8_r);
 	DECLARE_WRITE16_MEMBER(intv_ecs_ram8_w);
-	
+
 	DECLARE_READ8_MEMBER( intv_ecs_porta_r );
 	DECLARE_WRITE8_MEMBER( intv_ecs_porta_w );
 	DECLARE_READ8_MEMBER( intv_ecs_portb_r );
-	
+
 	UINT8 m_ecs_ram8[2048];
 	UINT8 m_ecs_psg_porta;
-	
+
 	// Keyboard Component
 	DECLARE_READ8_MEMBER(intvkbd_tms9927_r);
 	DECLARE_WRITE8_MEMBER(intvkbd_tms9927_w);
@@ -108,12 +108,12 @@ public:
 	DECLARE_WRITE8_MEMBER( intvkbd_dualport8_lsb_w );
 	DECLARE_READ8_MEMBER( intvkbd_dualport8_msb_r );
 	DECLARE_WRITE8_MEMBER( intvkbd_dualport8_msb_w );
-	
+
 	UINT8 m_tms9927_num_rows;
 	UINT8 m_tms9927_cursor_col;
 	UINT8 m_tms9927_cursor_row;
 	UINT8 m_tms9927_last_row;
-	
+
 	int m_intvkbd_text_blanked;
 	UINT16 *m_intvkbd_dualport_ram;
 	int m_intvkbd_keyboard_col;

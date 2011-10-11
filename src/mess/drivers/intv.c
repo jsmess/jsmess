@@ -138,11 +138,11 @@ static const sp0256_interface intellivoice_sp0256 =
 /*
 static const cassette_interface ecs_cassette_interface =
 {
-	cassette_default_formats,
-	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED),
-	NULL,
-	NULL
+    cassette_default_formats,
+    NULL,
+    (cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED),
+    NULL,
+    NULL
 };
 */
 
@@ -181,7 +181,7 @@ static GFXDECODE_START( intvkbd )
 GFXDECODE_END
 
 static INPUT_PORTS_START( intv )
-	
+
 	PORT_START("KEYPAD1")	/* Left Player Controller Starts Here */
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Left/1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Left/2") PORT_CODE(KEYCODE_2_PAD)
@@ -369,7 +369,7 @@ static INPUT_PORTS_START( intv_ecs_synth )
 ECS Synthesizer Layout:
  FF\FE  Bit 7   Bit 6   Bit 5   Bit 4   Bit 3   Bit 2   Bit 1   Bit 0
  Bit 0  G2      Gb2     F2      E2      Eb2     D2      Db2     C2
- Bit 1  Eb3     D3      Db3     C3      B2      Bb2     A2      Ab2 
+ Bit 1  Eb3     D3      Db3     C3      B2      Bb2     A2      Ab2
  Bit 2  B3      Bb3     A3      Ab3     G3      Gb3     F3      E3
  Bit 3  G4      Gb4     F4      E4      Eb4     D4      Db4     C4
  Bit 4  Eb5     D5      Db5     C5      B4      Bb4     A4      Ab4
@@ -491,8 +491,8 @@ static INPUT_PORTS_START( intv_ecs_pads )
 	PORT_START("DISCY3")
 	PORT_BIT( 0xff, 0x50, IPT_AD_STICK_Y ) PORT_NAME("P3/Y") PORT_MINMAX(0x00,0x9f) PORT_SENSITIVITY(100) PORT_KEYDELTA(0x50) PORT_PLAYER(3) PORT_CONDITION("OPTIONS",0x04,PORTCOND_EQUALS,0x04) PORT_CONDITION("ECS_CNTRLSEL",0x0f,PORTCOND_EQUALS,0x00)
 
-// Second ECS Hand Controller 
-	PORT_START("KEYPAD4")	
+// Second ECS Hand Controller
+	PORT_START("KEYPAD4")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P4/1") PORT_CONDITION("ECS_CNTRLSEL",0x0f,PORTCOND_EQUALS,0x00)
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P4/2") PORT_CONDITION("ECS_CNTRLSEL",0x0f,PORTCOND_EQUALS,0x00)
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P4/3") PORT_CONDITION("ECS_CNTRLSEL",0x0f,PORTCOND_EQUALS,0x00)
@@ -548,7 +548,7 @@ static INPUT_PORTS_START( intvecs )
 	PORT_CONFNAME( 0x08, 0x00, "ECS_P4 Disc" )
 	PORT_CONFSETTING(	 0x00, "Digital" )
 	PORT_CONFSETTING(	 0x08, "Analog" )
-	
+
 	PORT_START("ECS_CNTRLSEL")
 	PORT_CONFNAME( 0x0F, 0x02, "ECS Controller")
 	PORT_CONFSETTING(  0x00, "Gamepads" )
@@ -846,7 +846,7 @@ static MACHINE_CONFIG_DERIVED( intvecs, intv )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(intvecs_mem)
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ecs","intvecs")
-	
+
 	MCFG_SOUND_ADD("ay8914.2", AY8914, XTAL_3_579545MHz/2)
 	MCFG_SOUND_CONFIG(intv_ay8914_ecs_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
@@ -927,7 +927,7 @@ ROM_START(intvecs) // the intv1 exec rom should properly be two roms, one ro-3-9
 	ROM_REGION( 0x10000<<1, "sp0256_speech", 0 )
 	/* SP0256-012 Speech chip w/2KiB mask rom */
 	ROM_LOAD( "sp0256-012.bin",   0x1000, 0x0800, CRC(0de7579d) SHA1(618563e512ff5665183664f52270fa9606c9d289) )
-	
+
 	ROM_REGION( 0x10000<<1, "ecs_rom", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "ecs_rom.bin", 0x2000<<1, 0x2000, CRC(ea790a06) SHA1(b7ccb38b881d7f8426cd6f1f8a7aabbd31784fc5))
 	ROM_CONTINUE( 0x7000<<1, 0x2000 )

@@ -4,18 +4,22 @@
  * todo:
  *
  * - emulate slave dsp!
- * - fog (not even hooked yet up on not-super)
- * - polygon seaming (fix those small gaps between polygons)
- * - missing/wrong sided textures (eg. ridgerac race start, propcycl scoreboard)
+ * - fog (should be per-z, not per-poly, and not even hooked yet up on non-super)
+ * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
+ * - tokyowar tanks are not shootable, same for timecris helicopter,
+ *   there's still a very small hitbox but almost impossible to hit
+ *   (is this related to video board? or cpu?)
+ * - window clipping (acedrvrw, victlapw)
+ * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
+ *   (probably a bug in rgbint, not here?)
  * - spot
  *
  * - spritelayer:
- *   + xy offset
- *   + clipping to window (eg. timecris)
- *   + 1-pixel x-offset error on left side of aquajet/alpinr2b
+ *   + y-clipping (eg. timecris)
  *   + eliminate garbage in airco22b
- *   + some wrong snow sprites in alpinr2b
- *   + some missing sprites in cycbrcycc (most easy to spot is the missing city picture at titlescreen)
+ *   + find out which reg/bit controls y_lowres (only used in cybrcycc?)
+ *   + timecris shattered glass is supposed to fade out (happens just before the titlescreen shows)
+ *   + timecris last part of photos attract mode, sprites should be hidden
  *
  * - lots of smaller issues
  *
@@ -127,29 +131,29 @@ UpdateVideoMixer( running_machine &machine )
 00824000: ffffff00 00000000 1800187f 00800000 0080007f 0f000000 0000037f 00010007 // trans poly(2)
 00824000: ffffff00 00000000 1800187f 00000000 0000007f 0f800000 0000037f 00010007 // trans text
 
-	00,01,02		polygon fade rgb
-	03
-	04
-	05,06,07		world fog rgb
-	08,09,0a		background color
-	0b
-	0c
-	0d				spot related?
-	0e
-	0f
-	10
-	11				global polygon alpha factor
-	12,13			textlayer alpha pen comparison
-	14				textlayer alpha pen mask?
-	15				textlayer alpha factor
-	16,17,18		global fade rgb
-	19				global fade factor
-	1a				fade target flags
-	1b				textlayer palette base?
-	1c
-	1d
-	1e
-	1f				layer enable
+    00,01,02        polygon fade rgb
+    03
+    04
+    05,06,07        world fog rgb
+    08,09,0a        background color
+    0b
+    0c
+    0d              spot related?
+    0e
+    0f
+    10
+    11              global polygon alpha factor
+    12,13           textlayer alpha pen comparison
+    14              textlayer alpha pen mask?
+    15              textlayer alpha factor
+    16,17,18        global fade rgb
+    19              global fade factor
+    1a              fade target flags
+    1b              textlayer palette base?
+    1c
+    1d
+    1e
+    1f              layer enable
 */
 		mixer.rPolyFadeColor    = nthbyte( state->m_gamma, 0x00 );
 		mixer.gPolyFadeColor    = nthbyte( state->m_gamma, 0x01 );
@@ -176,22 +180,22 @@ UpdateVideoMixer( running_machine &machine )
 90020180: ff713700 00000000 00000000 00000000
 90020200: ff100000 00000000 00000000 00000000
 
-	00,01			display flags
-	02
-	03
-	04
-	05
-	06
-	07				textlayer palette base?
-	08,09,0a		textlayer pen c shadow rgb
-	0b,0c,0d		textlayer pen d shadow rgb
-	0e,0f,10		textlayer pen e shadow rgb
-	11,12			global fade factor red
-	13,14			global fade factor green
-	15,16			global fade factor blue
+    00,01           display flags
+    02
+    03
+    04
+    05
+    06
+    07              textlayer palette base?
+    08,09,0a        textlayer pen c shadow rgb
+    0b,0c,0d        textlayer pen d shadow rgb
+    0e,0f,10        textlayer pen e shadow rgb
+    11,12           global fade factor red
+    13,14           global fade factor green
+    15,16           global fade factor blue
 
-	100,180,200		world fog rgb (not implemented)
-	101,181,201		specific fog rgb? (not implemented)
+    100,180,200     world fog rgb (not implemented)
+    101,181,201     specific fog rgb? (not implemented)
 */
 		mixer.flags             = nthbyte( state->m_gamma, 0x00 )*256 + nthbyte( state->m_gamma, 0x01 );
 		mixer.rPolyFadeColor    = nthbyte( state->m_gamma, 0x11 )*256 + nthbyte( state->m_gamma, 0x12 ); // 0x0100 = 1.0
@@ -247,6 +251,18 @@ poly3d_Clip( float vx, float vy, float vw, float vh )
 }
 
 static void
+sprite_Clip( int miny, int maxy )
+{
+	// cx/cy not used, and only set y-clipping
+	mClip.scissor.min_y = miny;
+	mClip.scissor.max_y = maxy;
+	if( mClip.scissor.min_y<0 )   mClip.scissor.min_y = 0;
+	if( mClip.scissor.max_y>479 ) mClip.scissor.max_y = 479;
+	mClip.scissor.min_x = 0;
+	mClip.scissor.max_x = 639;
+}
+
+static void
 poly3d_NoClip( void )
 {
 	mClip.cx = 640/2;
@@ -254,7 +270,7 @@ poly3d_NoClip( void )
 	mClip.scissor.min_x = 0;
 	mClip.scissor.max_x = 639;
 	mClip.scissor.min_y = 0;
-	mClip.scissor.max_x = 479;
+	mClip.scissor.max_y = 479;
 }
 
 typedef struct
@@ -265,20 +281,6 @@ typedef struct
 } Poly3dVertex;
 
 #define MIN_Z (10.0f)
-
-typedef struct
-{
-	float x,y;
-	float u,v,i,z;
-} vertex;
-
-typedef struct
-{
-	float x;
-	float u,v,i,z;
-} edge;
-
-#define SWAP(A,B) { const void *temp = A; A = B; B = temp; }
 
 
 INLINE unsigned texel( namcos22_state *state, unsigned x, unsigned y )
@@ -312,11 +314,15 @@ struct _poly_extra_data
 	const UINT8 *source;
 	int alpha;
 	int line_modulo;
+	int flipx;
+	int flipy;
 };
 
 
 static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	namcos22_state *state = extra->machine->driver_data<namcos22_state>();
 	float z = extent->param[0].start;
 	float u = extent->param[1].start;
 	float v = extent->param[2].start;
@@ -326,8 +332,6 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 	float dv = extent->param[2].dpdx;
 	float di = extent->param[3].dpdx;
 	bitmap_t *destmap = (bitmap_t *)destbase;
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	namcos22_state *state = extra->machine->driver_data<namcos22_state>();
 	int bn = extra->bn * 0x1000;
 	const pen_t *pens = extra->pens;
 	int fogFactor = 0xff - extra->fogFactor;
@@ -363,6 +367,8 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 		int pen = texel(state, (int)(u*ooz), bn+(int)(v*ooz));
 		int shade = i*ooz;
 		rgbint rgb;
+
+		// pen = 0x55; // debug: disable textures
 
 		rgb_to_rgbint(&rgb, pens[pen>>penshift&penmask]);
 		rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
@@ -516,10 +522,10 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 
 static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	int y_index = extent->param[1].start;
-	float x_index = extent->param[0].start;
-	float dx = extent->param[0].dpdx;
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	int y_index = extent->param[1].start - extra->flipy;
+	float x_index = extent->param[0].start - extra->flipx;
+	float dx = extent->param[0].dpdx;
 	bitmap_t *destmap = (bitmap_t *)destbase;
 	const pen_t *pal = extra->pens;
 	int prioverchar = extra->prioverchar;
@@ -564,14 +570,14 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 
 static void
 mydrawgfxzoom(
-	bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
-	UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
+	bitmap_t *dest_bmp, const gfx_element *gfx, UINT32 code,
+	UINT32 color, int flipx, int flipy, int sx, int sy,
 	int scalex, int scaley, int z, int prioverchar, int alpha )
 {
 	namcos22_state *state = gfx->machine().driver_data<namcos22_state>();
 	int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
 	int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
-	if (sprite_screen_width && sprite_screen_height && gfx)
+	if (sprite_screen_width && sprite_screen_height)
 	{
 		float fsx = sx;
 		float fsy = sy;
@@ -588,31 +594,33 @@ mydrawgfxzoom(
 
 		extra->machine = &gfx->machine();
 		extra->alpha = alpha;
-		extra->prioverchar = 2 | (prioverchar != 0);
+		extra->prioverchar = 2 | prioverchar;
 		extra->line_modulo = gfx->line_modulo;
+		extra->flipx = flipx;
+		extra->flipy = flipy;
 		extra->pens = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color&0x7f)];
 		extra->priority_bitmap = gfx->machine().priority_bitmap;
 		extra->source = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 		vert[0].x = fsx;
 		vert[0].y = fsy;
-		vert[0].p[0] = flipx ? fwidth : 0;
-		vert[0].p[1] = flipy ? fheight : 0;
+		vert[0].p[0] = 0;
+		vert[0].p[1] = 0;
 		vert[1].x = fsx + fsw;
 		vert[1].y = fsy;
-		vert[1].p[0] = flipx ? 0 : fwidth;
-		vert[1].p[1] = flipy ? fheight : 0;
+		vert[1].p[0] = fwidth;
+		vert[1].p[1] = 0;
 		vert[2].x = fsx + fsw;
 		vert[2].y = fsy + fsh;
-		vert[2].p[0] = flipx ? 0 : fwidth;
-		vert[2].p[1] = flipy ? 0 : fheight;
+		vert[2].p[0] = fwidth;
+		vert[2].p[1] = fheight;
 		vert[3].x = fsx;
 		vert[3].y = fsy + fsh;
-		vert[3].p[0] = flipx ? fwidth : 0;
-		vert[3].p[1] = flipy ? 0 : fheight;
+		vert[3].p[0] = 0;
+		vert[3].p[1] = fheight;
 
 		// global fade
-		if (mixer.flags&1)
+		if (mixer.flags&2)
 		{
 			extra->fadeFactor = mixer.fadeFactor;
 			rgb_comp_to_rgbint(&extra->fadeColor, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
@@ -631,7 +639,7 @@ mydrawgfxzoom(
 			}
 		}
 
-		poly_render_triangle_fan(state->m_poly, dest_bmp, clip, renderscanline_sprite, 2, 4, &vert[0]);
+		poly_render_triangle_fan(state->m_poly, dest_bmp, &mClip.scissor, renderscanline_sprite, 2, 4, vert);
 	}
 } /* mydrawgfxzoom */
 
@@ -679,34 +687,11 @@ ApplyGamma( running_machine &machine, bitmap_t *bitmap )
 	}
 } /* ApplyGamma */
 
-static void
-poly3d_Draw3dSprite( bitmap_t *bitmap, const gfx_element *gfx, int tileNumber, int color, int sx, int sy, int width, int height, int translucency, int zc, UINT32 pri )
-{
-	int flipx = 0;
-	int flipy = 0;
-	rectangle clip;
-	clip.min_x = 0;
-	clip.min_y = 0;
-	clip.max_x = 640-1;
-	clip.max_y = 480-1;
-	mydrawgfxzoom(
-		bitmap,
-		&clip,
-		gfx,
-		tileNumber,
-		color,
-		flipx, flipy,
-		sx, sy,
-		(width<<16)/32,
-		(height<<16)/32,
-		zc, pri, 0xff - translucency );
-}
 
 #define DSP_FIXED_TO_FLOAT( X ) (((INT16)(X))/(float)0x7fff)
 #define SPRITERAM_SIZE (0x9b0000-0x980000)
 #define CGRAM_SIZE 0x1e000
 #define NUM_CG_CHARS ((CGRAM_SIZE*8)/(64*16)) /* 0x3c0 */
-
 
 /* modal rendering properties */
 static void
@@ -817,6 +802,7 @@ struct SceneNode
 			int linkType;
 			int numcols, numrows;
 			int xpos, ypos;
+			int cy_min, cy_max;
 			int sizex, sizey;
 			int translucency;
 			int cz;
@@ -853,10 +839,11 @@ static struct SceneNode *
 NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type )
 {
 	struct SceneNode *node = &mSceneRoot;
-	int i;
+	struct SceneNode *prev = NULL;
+	int i, hash = 0;
 	for( i=0; i<24; i+=RADIX_BITS )
 	{
-		int hash = (zsortvalue24>>20)&RADIX_MASK;
+		hash = (zsortvalue24>>20)&RADIX_MASK;
 		struct SceneNode *next = node->data.nonleaf.next[hash];
 		if( !next )
 		{ /* lazily allocate tree node for this radix */
@@ -864,6 +851,7 @@ NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type 
 			next->type = eSCENENODE_NONLEAF;
 			node->data.nonleaf.next[hash] = next;
 		}
+		prev = node;
 		node = next;
 		zsortvalue24 <<= RADIX_BITS;
 	}
@@ -877,18 +865,8 @@ NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type 
 	{
 		struct SceneNode *leaf = MallocSceneNode(machine);
 		leaf->type = type;
-#if 0
-		leaf->nextInBucket = node->nextInBucket;
-		node->nextInBucket = leaf;
-#else
-		/* stable insertion sort */
-		leaf->nextInBucket = NULL;
-		while( node->nextInBucket )
-		{
-			node = node->nextInBucket;
-		}
-		node->nextInBucket = leaf;
-#endif
+		leaf->nextInBucket = node;
+		prev->data.nonleaf.next[hash] = leaf;
 		return leaf;
 	}
 } /* NewSceneNode */
@@ -913,18 +891,20 @@ static void RenderSprite(running_machine &machine, bitmap_t *bitmap, struct Scen
 			{
 				code += nthword( &state->m_spriteram[0x800/4], i+node->data.sprite.linkType*4 );
 			}
-			poly3d_Draw3dSprite(
+			mydrawgfxzoom(
 					bitmap,
 					machine.gfx[GFX_SPRITE],
 					code,
 					node->data.sprite.color,
+					node->data.sprite.flipx,
+					node->data.sprite.flipy,
 					node->data.sprite.xpos+col*node->data.sprite.sizex,
 					node->data.sprite.ypos+row*node->data.sprite.sizey,
-					node->data.sprite.sizex,
-					node->data.sprite.sizey,
-					node->data.sprite.translucency,
+					(node->data.sprite.sizex<<16)/32,
+					(node->data.sprite.sizey<<16)/32,
 					node->data.sprite.cz,
-					node->data.sprite.pri );
+					node->data.sprite.pri,
+					0xff - node->data.sprite.translucency );
 		i++;
 		} /* next col */
 	} /* next row */
@@ -968,8 +948,10 @@ static void RenderSceneHelper(running_machine &machine, bitmap_t *bitmap, struct
 					break;
 
 				case eSCENENODE_SPRITE:
-					poly3d_NoClip();
-					RenderSprite(machine, bitmap,node );
+					sprite_Clip(
+						node->data.sprite.cy_min,
+						node->data.sprite.cy_max );
+					RenderSprite(machine, bitmap, node );
 					break;
 
 				default:
@@ -1133,6 +1115,8 @@ void
 namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
+	int polys_enabled = state->m_mbSuperSystem22 ? nthbyte(state->m_gamma,0x1f)&1 : 1;
+	if (!polys_enabled) return;
    /**
     * word#0:
     *    x--------------- end-of-display-list marker
@@ -1260,20 +1244,24 @@ DrawSpritesHelper(
 	const UINT32 *pSource,
 	const UINT32 *pPal,
 	int num_sprites,
+	int enable,
 	int deltax,
-	int deltay )
+	int deltay,
+	UINT32 clip,
+	int y_lowres )
 {
-	int i;
-	num_sprites--;
-	pSource += num_sprites*4;
-	pPal += num_sprites*2;
+	// set y-clipping
+	INT16 cy_min = -deltay + (INT16)(clip>>16);
+	INT16 cy_max = -deltay + (INT16)(clip&0xffff);
 
-	for( i=num_sprites; i>=0; i-- )
+	int i;
+
+	for( i=0; i<num_sprites; i++ )
 	{
 		/* attrs:
         xxxx.x---.----.----.----.----.----.---- always 0?
         ----.-xxx.----.----.----.----.----.---- enable mask?
-        ----.----.xxxx.xxxx.----.----.----.---- linktype?
+        ----.----.xxxx.xxxx.----.----.----.---- linktype
         ----.----.----.----.xxxx.xx--.----.---- always 0?
         ----.----.----.----.----.--x-.----.---- right justify
         ----.----.----.----.----.---x.----.---- bottom justify
@@ -1283,13 +1271,13 @@ DrawSpritesHelper(
         ----.----.----.----.----.----.----.-xxx numrows
         */
 		UINT32 attrs = pSource[2];
-		if( (attrs&0x04000000)==0 )
+		if( (attrs&enable)==0 )
 		{
 			/* sprite is not hidden */
 			INT32 zcoord = pPal[0];
 			int color = pPal[1]>>16;
 			int cz = pPal[1]&0xffff;
-			int pri = ((pPal[1] & 0xffff) == 0x00fe); // ? priority over textlayer, trusted by testmode and timecris (not cz&0x80 or color&0x80 or in attrs)
+			int pri = ((pPal[1] & 0xffff) == 0x00fe); // priority over textlayer, trusted by testmode and timecris (not cz&0x80 or color&0x80 or in attrs)
 			UINT32 xypos = pSource[0];
 			UINT32 size = pSource[1];
 			UINT32 code = pSource[3];
@@ -1297,12 +1285,10 @@ DrawSpritesHelper(
 			int ypos = (xypos&0xffff)-deltay;
 			int sizex = size>>16;
 			int sizey = size&0xffff;
-			int zoomx = (1<<(16-5))*sizex;
-			int zoomy = (1<<(16-5))*sizey;
-			int flipy = attrs&0x8;
+			int flipy = attrs>>3&0x1;
 			int numrows = attrs&0x7;
 			int linkType = (attrs&0x00ff0000)>>16;
-			int flipx = (attrs>>4)&0x8;
+			int flipx = (attrs>>7)&0x1;
 			int numcols = (attrs>>4)&0x7;
 			int tile = code>>16;
 			int translucency = (code&0xff00)>>8;
@@ -1310,25 +1296,31 @@ DrawSpritesHelper(
 			if (numrows == 0) numrows = 8;
 			if (numcols == 0) numcols = 8;
 
+			/* right justify */
+			if (attrs & 0x0200)
+				xpos -= sizex*numcols-1;
+
+			/* bottom justify */
+			if (attrs & 0x0100)
+				ypos -= sizey*numrows-1;
+
 			if (flipy)
 			{
-				ypos += sizey*(numrows-1);
+				ypos += sizey*numrows-1;
 				sizey = -sizey;
 			}
 
 			if (flipx)
 			{
-				xpos += sizex*(numcols-1);
+				xpos += sizex*numcols-1;
 				sizex = -sizex;
 			}
 
-			/* right justify */
-			if (attrs & 0x0200)
-				xpos -= ((zoomx*numcols)>>(16-5))-1;
-
-			/* bottom justify */
-			if (attrs & 0x0100)
-				ypos -= ((zoomy*numrows)>>(16-5))-1;
+			if (y_lowres)
+			{
+				sizey *= 2;
+				ypos *= 2;
+			}
 
 			if (sizex && sizey)
 			{
@@ -1342,6 +1334,8 @@ DrawSpritesHelper(
 				node->data.sprite.linkType = linkType;
 				node->data.sprite.xpos = xpos;
 				node->data.sprite.ypos = ypos;
+				node->data.sprite.cy_min = cy_min;
+				node->data.sprite.cy_max = cy_max;
 				node->data.sprite.sizex = sizex;
 				node->data.sprite.sizey = sizey;
 				node->data.sprite.translucency = translucency;
@@ -1350,8 +1344,8 @@ DrawSpritesHelper(
 				node->data.sprite.pri = pri;
 			}
 		} /* visible sprite */
-		pSource -= 4;
-		pPal -= 2;
+		pSource += 4;
+		pPal += 2;
 	}
 } /* DrawSpritesHelper */
 
@@ -1386,56 +1380,22 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 	else popmessage("[S] shows spite/vics regs");
 #endif
 /*
-// time crisis:
-00980000: 00060000 000b0053 03000200 03000000
-00980010: 00200020 028004ff 032a0509 00000000
-00980200: 000007ff 000007ff 000007ff 032a0509
-00980210: 000007ff 000007ff 000007ff 000007ff
-00980220: 000007ff 000007ff 000007ff 000007ff
-00980230: 000007ff 000007ff 05000500 050a050a
-
-// prop normal
-00980000: 00060000 00040053 03000200 03000000
-00980010: 00200020 028004ff 032a0509 00000000
-00980200: 028004ff 032a0509 028004ff 032a0509
-00980210: 028004ff 032a0509 028004ff 032a0509
-00980220: 028004ff 032a0509 028004ff 032a0509
-00980230: 028004ff 032a0509 028004ff 032a0509
-
-//alpine normal / prop test (-48,-43)
-00980000: 00060000 00000000 02ff0000 000007ff
-00980010: 00200020 000002ff 000007ff 00000000
-00980200: 000007ff 000007ff 000007ff 000007ff
-00980210: 000007ff 000007ff 000007ff 000007ff
-00980220: 000007ff 000007ff 000007ff 000007ff
-00980230: 000007ff 000007ff 000007ff 000007ff
-
-
         0x980000:   00060000 00010000 02ff0000 000007ff
-                    ^^^^                                7 = disable
-                             ^^^^                       num sprites
-                                      ^^^^              probably deltax related
-                                               ^^^^     definitely deltay related!
+                    ^^^^                                 enable bits, 7 = disable
+                        ^^^^                             base
+                             ^^^^                        base + num sprites
+                                 ^^^^     ^^^^           deltax
+                                               ^^^^      deltay
 
-        0x980010:   00200020 000002ff 000007ff 00000000
-                    ^^^^^^^^                            character size?
-                             ^^^^                       delta xpos?
-                                      ^^^^              delta ypos?
+        0x980010:   00200020 028004ff 032a0509 00000000
+                    ^^^^^^^^                             character size?
+                             ^^^^^^^^                    window-x related?
+                                      ^^^^^^^^           window-y related?
 
-        0x980200:   000007ff 000007ff       delta xpos, delta ypos?
-        0x980208:   000007ff 000007ff
-        0x980210:   000007ff 000007ff
-        0x980218:   000007ff 000007ff
-        0x980220:   000007ff 000007ff
-        0x980228:   000007ff 000007ff
-        0x980230:   000007ff 000007ff
-        0x980238:   000007ff 000007ff
-
-        //time crisis
-        00980200:  000007ff 000007ff 000007ff 032a0509
-        00980210:  000007ff 000007ff 000007ff 000007ff
-        00980220:  000007ff 000007ff 000007ff 000007ff
-        00980230:  000007ff 000007ff 05000500 050a050a
+        0x980200:   000007ff 000007ff 000007ff 032a0509  y-clipping related
+        0x980210:   000007ff 000007ff 000007ff 000007ff
+        0x980220:   000007ff 000007ff 000007ff 000007ff
+        0x980230:   000007ff 000007ff 000007ff 000007ff
 
         0x980400:   hzoom table
         0x980600:   vzoom table
@@ -1456,65 +1416,37 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
         ...
     */
 
-	// xy offs, prelim!
-	int deltax=spriteram32[5]>>16; // usually 0x280
-	int deltay=spriteram32[6]>>16; // usually 0x32a
+	// y-clipping, disabled for now
+	UINT32 clipy_minmax = spriteram32[0x20c/4]; // works in timecris, but problems in aquajet and tokyowar
+	clipy_minmax = 0x000007ff;
 
-	if (deltax == 0 || deltay == 0)
-	switch (state->m_gametype)
+	// y-resolution, where is this bit?
+	// the only game that uses y_lowres is cybrcycc, and unfortunately doesn't have a video test in service mode
+	int y_lowres = 0;
+	if (state->m_gametype == NAMCOS22_CYBER_CYCLES)
 	{
-		case NAMCOS22_AQUA_JET:
-			deltax = 0x07f;
-			deltay = 0x0fe; // spriteram32[3]>>16(0x0d6) + default(0x02a) is 0x100, close to 0x0fe
-			break;
-
-		case NAMCOS22_CYBER_CYCLES:
-			// approx (not enough testdata)
-			deltax = 0x280;
-			deltay = 0x400; // is spriteram32[3]>>16
-			break;
-
-		case NAMCOS22_TOKYO_WARS:
-			// approx (not enough testdata)
-			deltax = 190;
-			deltay = 0x10e; // spriteram32[3]>>16(0x0e6) is 0x10 more than aquajet
-			break;
-
-		default:
-			// accurate in testmode
-			deltax = 0x02e;
-			deltay = 0x02a;
-			break;
+		y_lowres = 1;
 	}
 
-	// previous xy implementation
-#if 0
-	deltax=spriteram32[5]>>16;
-	deltay=spriteram32[6]>>16;
-	/* HACK for Tokyo Wars */
-	if (deltax == 0 && deltay == 0)
-	{
-		deltax = 190;
-		deltay = 250;
-	}
+	int deltax = (spriteram32[1]&0xffff) + (spriteram32[2]&0xffff) + 0x2d;
+	int deltay = (spriteram32[3]>>16) + (0x2a >> y_lowres);
 
-	if( spriteram32[0x14/4] == 0x000002ff &&
-	spriteram32[0x18/4] == 0x000007ff )
-	{ /* HACK (fixes alpine racer and self test) */
-		deltax = 48;
-		deltay = 43;
-	}
-#endif
-
-	int enable = spriteram32[0]>>16&7;
-	int base = spriteram32[0] & 0xffff;
+	int base = spriteram32[0] & 0xffff; // alpinesa/alpinr2b
 	int num_sprites = (spriteram32[1]>>16) - base;
-	num_sprites += (~enable & 1); // alpinr2b! (+1 in all other games, though airco22b expects +0?)
+
+	/* 'enable' bits function:
+        bit 0:      affects spritecount by 1? (alpinr2b)
+        bit 1:      ???
+        bit 2:      per-sprite enable mask? (cybrcycc)
+        all bits set means off (aquajet) */
+	int enable = spriteram32[0]>>16&7;
+	num_sprites += (~enable & 1);
+
 	if( num_sprites > 0 && num_sprites < 0x400 && enable != 7 )
 	{
 		pSource = &spriteram32[0x04000/4 + base*4];
 		pPal    = &spriteram32[0x20000/4 + base*2];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, deltax, deltay );
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, clipy_minmax, y_lowres );
 	}
 
 	/* VICS RAM provides two additional banks (also many unknown regs here) */
@@ -1522,6 +1454,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
     0x940000 -x------       sprite chip busy
     0x940018 xxxx----       clr.w   $940018.l
 
+    0x940030 xxxxxxxx       0x0600000 - enable bits?
     0x940034 xxxxxxxx       0x3070b0f
 
     0x940040 xxxxxxxx       sprite attribute size
@@ -1531,20 +1464,22 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 
     0x940060..0x94007c      set#2
     */
-	num_sprites = state->m_vics_control[0x60/4] >> 4 & 0x1ff;
-	if( num_sprites > 0 )
-	{
-		pSource = &state->m_vics_data[(state->m_vics_control[0x68/4]&0xffff)/4];
-		pPal    = &state->m_vics_data[(state->m_vics_control[0x78/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, deltax, deltay );
-	}
+    enable = 4; // placeholder
 
-	num_sprites = state->m_vics_control[0x40/4] >> 4 & 0x1ff;
+	num_sprites = state->m_vics_control[0x40/4] >> 4 & 0x1ff; // no +1
 	if( num_sprites > 0 )
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x58/4]&0xffff)/4];
-		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, deltax, deltay );
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, clipy_minmax, y_lowres );
+	}
+
+	num_sprites = state->m_vics_control[0x60/4] >> 4 & 0x1ff; // no +1
+	if( num_sprites > 0 )
+	{
+		pSource = &state->m_vics_data[(state->m_vics_control[0x68/4]&0xffff)/4];
+		pPal    = &state->m_vics_data[(state->m_vics_control[0x78/4]&0xffff)/4];
+		DrawSpritesHelper( machine, bitmap, cliprect, pSource, pPal, num_sprites, (enable&4)<<24, deltax, deltay, clipy_minmax, y_lowres );
 	}
 } /* DrawSprites */
 
@@ -1627,18 +1562,18 @@ READ32_HANDLER( namcos22_tilemapattr_r )
 WRITE32_HANDLER( namcos22_tilemapattr_w )
 {
 	/*
-	0.hiword	R/W		x offset
-	0.loword	R/W		y offset, bit 9 for interlacing?(cybrcomm, tokyowar)
-	1.hiword	R/W		??? always 0x006e?
-	1.loword	?		unused?
-	2.hiword	R/W		posirq scanline, not hooked up yet
-	2.loword	R		assume current scanline
-	3.hiword	?		unused?
-	3.loword	R		???
-	*/
+    0.hiword    R/W     x offset
+    0.loword    R/W     y offset, bit 9 for interlacing?(cybrcomm, tokyowar)
+    1.hiword    R/W     ??? always 0x006e?
+    1.loword    ?       unused?
+    2.hiword    R/W     posirq scanline, not hooked up yet
+    2.loword    R       assume current scanline
+    3.hiword    ?       unused?
+    3.loword    R       ???
+    */
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	COMBINE_DATA( &state->m_tilemapattr[offset] );
-//	popmessage("%08x\n%08x\n%08x\n%08x\n",state->m_tilemapattr[0],state->m_tilemapattr[1],state->m_tilemapattr[2],state->m_tilemapattr[3]);
+//  popmessage("%08x\n%08x\n%08x\n%08x\n",state->m_tilemapattr[0],state->m_tilemapattr[1],state->m_tilemapattr[2],state->m_tilemapattr[3]);
 }
 
 static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int prival )
@@ -1757,10 +1692,10 @@ static void namcos22_mix_textlayer( running_machine &machine, bitmap_t *bitmap, 
 static void DrawCharacterLayer(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	int scroll_x = state->m_tilemapattr[0]>>16;
+	int scroll_x = (state->m_tilemapattr[0]>>16) - 0x35c;
 	int scroll_y = state->m_tilemapattr[0]&0xffff;
 
-	tilemap_set_scrollx( state->m_bgtilemap,0, (scroll_x-0x35c) & 0x3ff );
+	tilemap_set_scrollx( state->m_bgtilemap,0, scroll_x & 0x3ff );
 	tilemap_set_scrolly( state->m_bgtilemap,0, scroll_y & 0x3ff );
 	tilemap_set_palette_offset( state->m_bgtilemap, mixer.palBase*256 );
 
@@ -2505,9 +2440,9 @@ SCREEN_UPDATE( namcos22s )
 	// layers
 	UINT8 layer = nthbyte(state->m_gamma,0x1f);
 	if (layer&4) DrawCharacterLayer(screen->machine(), bitmap, cliprect);
-	if (layer&1) DrawPolygons(screen->machine(), bitmap);
 	if (layer&2) DrawSprites(screen->machine(), bitmap, cliprect);
-	if (layer&3) RenderScene(screen->machine(), bitmap );
+	if (layer&1) DrawPolygons(screen->machine(), bitmap);
+	RenderScene(screen->machine(), bitmap );
 	if (layer&4) namcos22s_mix_textlayer(screen->machine(), bitmap, cliprect, 6);
 	ApplyGamma(screen->machine(), bitmap);
 
