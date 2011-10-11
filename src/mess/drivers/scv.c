@@ -4,6 +4,7 @@
 
 
 ***************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "devcb.h"
@@ -12,40 +13,39 @@
 #include "audio/upd1771.h"
 
 
-static WRITE8_HANDLER( scv_porta_w );
-static READ8_HANDLER( scv_portb_r );
-static READ8_HANDLER( scv_portc_r );
-static WRITE8_HANDLER( scv_portc_w );
-static WRITE8_HANDLER( scv_cart_ram_w );
-static WRITE8_HANDLER( scv_cart_ram2_w );
-
-
 class scv_state : public driver_device
 {
 public:
 	scv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT8	*m_vram;
-	UINT8	m_porta;
-	UINT8	m_portc;
-	emu_timer	*m_vb_timer;
-	UINT8	*m_cart_rom;
-	UINT32	m_cart_rom_size;
-	UINT8	*m_cart_ram;
-	UINT32	m_cart_ram_size;
-	bool	m_cart_ram_enabled;
+	DECLARE_WRITE8_MEMBER(scv_porta_w);
+	DECLARE_READ8_MEMBER(scv_portb_r);
+	DECLARE_READ8_MEMBER(scv_portc_r);
+	DECLARE_WRITE8_MEMBER(scv_portc_w);
+	DECLARE_WRITE8_MEMBER(scv_cart_ram_w);
+	DECLARE_WRITE8_MEMBER(scv_cart_ram2_w);
+	DECLARE_WRITE_LINE_MEMBER(scv_upd1771_ack_w);
+	UINT8 *m_p_videoram;
+	UINT8 m_porta;
+	UINT8 m_portc;
+	emu_timer *m_vb_timer;
+	UINT8 *m_cart_rom;
+	UINT32 m_cart_rom_size;
+	UINT8 *m_cart_ram;
+	UINT32 m_cart_ram_size;
+	bool m_cart_ram_enabled;
 };
 
 
 
 
-static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8, scv_state )
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM		/* BIOS */
 
-	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_BASE_MEMBER(scv_state, m_vram )	/* VRAM + 4 registers */
+	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_BASE(m_p_videoram )	/* VRAM + 4 registers */
 
-	AM_RANGE( 0x3600, 0x3600 ) AM_DEVWRITE( "upd1771c", upd1771_w )
+	AM_RANGE( 0x3600, 0x3600 ) AM_DEVWRITE_LEGACY( "upd1771c", upd1771_w )
 
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("bank0")
 	AM_RANGE( 0xa000, 0xbfff ) AM_ROMBANK("bank1")
@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( scv_io, AS_IO, 8 )
+static ADDRESS_MAP_START( scv_io, AS_IO, 8, scv_state )
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE( scv_porta_w )
 	AM_RANGE( 0x01, 0x01 ) AM_READ( scv_portb_r )
 	AM_RANGE( 0x02, 0x02 ) AM_READWRITE( scv_portc_r, scv_portc_w )
@@ -149,80 +149,70 @@ static INPUT_PORTS_START( scv )
 INPUT_PORTS_END
 
 
-static WRITE8_HANDLER( scv_cart_ram_w )
+WRITE8_MEMBER( scv_state::scv_cart_ram_w )
 {
-	scv_state *state = space->machine().driver_data<scv_state>();
-
 	/* Check if cartridge ram is enabled */
-	if ( state->m_cart_ram_enabled )
-	{
-		state->m_cart_ram[offset] = data;
-	}
+	if ( m_cart_ram_enabled )
+		m_cart_ram[offset] = data;
 }
 
 
-static WRITE8_HANDLER( scv_cart_ram2_w )
+WRITE8_MEMBER( scv_state::scv_cart_ram2_w )
 {
-	scv_state *state = space->machine().driver_data<scv_state>();
-
 	/* Check if cartridge ram is enabled */
-	if ( state->m_cart_ram_enabled )
+	if ( m_cart_ram_enabled )
 	{
-		if ( state->m_cart_ram_size > 0x1000 )
+		if ( m_cart_ram_size > 0x1000 )
 			offset += 0x1000;
 
-		state->m_cart_ram[offset] = data;
+		m_cart_ram[offset] = data;
 	}
 }
 
 
-static WRITE8_HANDLER( scv_porta_w )
+WRITE8_MEMBER( scv_state::scv_porta_w )
 {
-	scv_state *state = space->machine().driver_data<scv_state>();
-
-	state->m_porta = data;
+	m_porta = data;
 }
 
 
-static READ8_HANDLER( scv_portb_r )
+READ8_MEMBER( scv_state::scv_portb_r )
 {
-	scv_state *state = space->machine().driver_data<scv_state>();
 	UINT8 data = 0xff;
 
-	if ( ! ( state->m_porta & 0x01 ) )
-		data &= input_port_read( space->machine(), "PA0" );
+	if ( ! ( m_porta & 0x01 ) )
+		data &= input_port_read( machine(), "PA0" );
 
-	if ( ! ( state->m_porta & 0x02 ) )
-		data &= input_port_read( space->machine(), "PA1" );
+	if ( ! ( m_porta & 0x02 ) )
+		data &= input_port_read( machine(), "PA1" );
 
-	if ( ! ( state->m_porta & 0x04 ) )
-		data &= input_port_read( space->machine(), "PA2" );
+	if ( ! ( m_porta & 0x04 ) )
+		data &= input_port_read( machine(), "PA2" );
 
-	if ( ! ( state->m_porta & 0x08 ) )
-		data &= input_port_read( space->machine(), "PA3" );
+	if ( ! ( m_porta & 0x08 ) )
+		data &= input_port_read( machine(), "PA3" );
 
-	if ( ! ( state->m_porta & 0x10 ) )
-		data &= input_port_read( space->machine(), "PA4" );
+	if ( ! ( m_porta & 0x10 ) )
+		data &= input_port_read( machine(), "PA4" );
 
-	if ( ! ( state->m_porta & 0x20 ) )
-		data &= input_port_read( space->machine(), "PA5" );
+	if ( ! ( m_porta & 0x20 ) )
+		data &= input_port_read( machine(), "PA5" );
 
-	if ( ! ( state->m_porta & 0x40 ) )
-		data &= input_port_read( space->machine(), "PA6" );
+	if ( ! ( m_porta & 0x40 ) )
+		data &= input_port_read( machine(), "PA6" );
 
-	if ( ! ( state->m_porta & 0x80 ) )
-		data &= input_port_read( space->machine(), "PA7" );
+	if ( ! ( m_porta & 0x80 ) )
+		data &= input_port_read( machine(), "PA7" );
 
 	return data;
 }
 
 
-static READ8_HANDLER( scv_portc_r )
+READ8_MEMBER( scv_state::scv_portc_r )
 {
-	scv_state *state = space->machine().driver_data<scv_state>();
-	UINT8 data = state->m_portc;
+	UINT8 data = m_portc;
 
-	data = ( data & 0xfe ) | ( input_port_read( space->machine(), "PC0" ) & 0x01 );
+	data = ( data & 0xfe ) | ( input_port_read( machine(), "PC0" ) & 0x01 );
 
 	return data;
 }
@@ -299,15 +289,13 @@ static void scv_set_banks( running_machine &machine )
 }
 
 
-static WRITE8_HANDLER( scv_portc_w )
+WRITE8_MEMBER( scv_state::scv_portc_w )
 {
-	scv_state *state = space->machine().driver_data<scv_state>();
+	//logerror("%04x: scv_portc_w: data = 0x%02x\n", cpu_get_pc(machine().device("maincpu")), data );
+	m_portc = data;
 
-	//logerror("%04x: scv_portc_w: data = 0x%02x\n", cpu_get_pc(space->machine().device("maincpu")), data );
-	state->m_portc = data;
-
-	scv_set_banks( space->machine() );
-	upd1771_pcm_w( space->machine().device( "upd1771c" ), state->m_portc & 0x08 );
+	scv_set_banks( machine() );
+	upd1771_pcm_w( machine().device( "upd1771c" ), m_portc & 0x08 );
 }
 
 
@@ -455,10 +443,10 @@ INLINE void draw_sprite( scv_state *state, bitmap_t *bitmap, UINT8 x, UINT8 y, U
 	y += clip_y * 2;
 	for ( j = clip_y * 4; j < 32; j += 4 )
 	{
-		UINT8 pat0 = state->m_vram[ tile_idx * 32 + j + 0 ];
-		UINT8 pat1 = state->m_vram[ tile_idx * 32 + j + 1 ];
-		UINT8 pat2 = state->m_vram[ tile_idx * 32 + j + 2 ];
-		UINT8 pat3 = state->m_vram[ tile_idx * 32 + j + 3 ];
+		UINT8 pat0 = state->m_p_videoram[ tile_idx * 32 + j + 0 ];
+		UINT8 pat1 = state->m_p_videoram[ tile_idx * 32 + j + 1 ];
+		UINT8 pat2 = state->m_p_videoram[ tile_idx * 32 + j + 2 ];
+		UINT8 pat3 = state->m_p_videoram[ tile_idx * 32 + j + 3 ];
 
 		if ( ( top && j < 16 ) || ( bottom && j >= 16 ) )
 		{
@@ -562,12 +550,12 @@ static SCREEN_UPDATE( scv )
 {
 	scv_state *state = screen->machine().driver_data<scv_state>();
 	int x, y;
-	UINT8 fg = state->m_vram[0x1403] >> 4;
-	UINT8 bg = state->m_vram[0x1403] & 0x0f;
-	UINT8 gr_fg = state->m_vram[0x1401] >> 4;
-	UINT8 gr_bg = state->m_vram[0x1401] & 0x0f;
-	int clip_x = ( state->m_vram[0x1402] & 0x0f ) * 2;
-	int clip_y = state->m_vram[0x1402] >> 4;
+	UINT8 fg = state->m_p_videoram[0x1403] >> 4;
+	UINT8 bg = state->m_p_videoram[0x1403] & 0x0f;
+	UINT8 gr_fg = state->m_p_videoram[0x1401] >> 4;
+	UINT8 gr_bg = state->m_p_videoram[0x1401] & 0x0f;
+	int clip_x = ( state->m_p_videoram[0x1402] & 0x0f ) * 2;
+	int clip_y = state->m_p_videoram[0x1402] >> 4;
 
 	/* Clear the screen */
 	bitmap_fill( bitmap, cliprect, gr_bg );
@@ -578,19 +566,19 @@ static SCREEN_UPDATE( scv )
 		int text_y = 0;
 
 		if ( y < clip_y )
-			text_y = ( state->m_vram[0x1400] & 0x80 ) ? 0 : 1;
+			text_y = ( state->m_p_videoram[0x1400] & 0x80 ) ? 0 : 1;
 		else
-			text_y = ( state->m_vram[0x1400] & 0x80 ) ? 1 : 0;
+			text_y = ( state->m_p_videoram[0x1400] & 0x80 ) ? 1 : 0;
 
 		for ( x = 0; x < 32; x++ )
 		{
 			int text_x = 0;
-			UINT8 d = state->m_vram[ 0x1000 + y * 32 + x ];
+			UINT8 d = state->m_p_videoram[ 0x1000 + y * 32 + x ];
 
 			if ( x < clip_x )
-				text_x = ( state->m_vram[0x1400] & 0x40 ) ? 0 : 1;
+				text_x = ( state->m_p_videoram[0x1400] & 0x40 ) ? 0 : 1;
 			else
-				text_x = ( state->m_vram[0x1400] & 0x40 ) ? 1 : 0;
+				text_x = ( state->m_p_videoram[0x1400] & 0x40 ) ? 1 : 0;
 
 			if ( text_x && text_y )
 			{
@@ -600,7 +588,7 @@ static SCREEN_UPDATE( scv )
 			}
 			else
 			{
-				switch ( state->m_vram[0x1400] & 0x03 )
+				switch ( state->m_p_videoram[0x1400] & 0x03 )
 				{
 				case 0x01:		/* Semi graphics mode */
 					draw_semi_graph( bitmap, x * 8    , y * 16     , d & 0x80, gr_fg );
@@ -624,20 +612,20 @@ static SCREEN_UPDATE( scv )
 	}
 
 	/* Draw sprites if enabled */
-	if ( state->m_vram[0x1400] & 0x10 )
+	if ( state->m_p_videoram[0x1400] & 0x10 )
 	{
 		int i;
 
 		for ( i = 0; i < 128; i++ )
 		{
-			UINT8 spr_y = state->m_vram[ 0x1200 + i * 4 ] & 0xfe;
-			UINT8 y_32 = state->m_vram[ 0x1200 + i * 4 ] & 0x01;		/* Xx32 sprite */
-			UINT8 clip = state->m_vram[ 0x1201 + i * 4 ] >> 4;
-			UINT8 col = state->m_vram[ 0x1201 + i * 4 ] & 0x0f;
-			UINT8 spr_x = state->m_vram[ 0x1202 + i * 4 ] & 0xfe;
-			UINT8 x_32 = state->m_vram[ 0x1202 + i * 4 ] & 0x01;		/* 32xX sprite */
-			UINT8 tile_idx = state->m_vram[ 0x1203 + i * 4 ] & 0x7f;
-			UINT8 half = state->m_vram[ 0x1203 + i * 4] & 0x80;
+			UINT8 spr_y = state->m_p_videoram[ 0x1200 + i * 4 ] & 0xfe;
+			UINT8 y_32 = state->m_p_videoram[ 0x1200 + i * 4 ] & 0x01;		/* Xx32 sprite */
+			UINT8 clip = state->m_p_videoram[ 0x1201 + i * 4 ] >> 4;
+			UINT8 col = state->m_p_videoram[ 0x1201 + i * 4 ] & 0x0f;
+			UINT8 spr_x = state->m_p_videoram[ 0x1202 + i * 4 ] & 0xfe;
+			UINT8 x_32 = state->m_p_videoram[ 0x1202 + i * 4 ] & 0x01;		/* 32xX sprite */
+			UINT8 tile_idx = state->m_p_videoram[ 0x1203 + i * 4 ] & 0x7f;
+			UINT8 half = state->m_p_videoram[ 0x1203 + i * 4] & 0x80;
 			UINT8 left = 1;
 			UINT8 right = 1;
 			UINT8 top = 1;
@@ -681,7 +669,7 @@ static SCREEN_UPDATE( scv )
 			}
 
 			/* Check if 2 color sprites are enabled */
-			if ( ( state->m_vram[0x1400] & 0x20 ) && ( i & 0x20 ) )
+			if ( ( state->m_p_videoram[0x1400] & 0x20 ) && ( i & 0x20 ) )
 			{
 				/* 2 color sprite handling */
 				draw_sprite( state, bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip );
@@ -698,17 +686,14 @@ static SCREEN_UPDATE( scv )
 				/* regular sprite handling */
 				draw_sprite( state, bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip );
 				if ( x_32 )
-				{
 					draw_sprite( state, bitmap, spr_x + 16, spr_y, tile_idx + 8, col, 1, 1, top, bottom, clip );
-				}
+
 				if ( y_32 )
 				{
 					clip &= 0x07;
 					draw_sprite( state, bitmap, spr_x, spr_y + 16, tile_idx + 1, col, left, right, 1, 1, clip );
 					if ( x_32 )
-					{
 						draw_sprite( state, bitmap, spr_x + 16, spr_y + 16, tile_idx + 9, col, 1, 1, 1, 1, clip );
-					}
 				}
 			}
 		}
@@ -718,9 +703,9 @@ static SCREEN_UPDATE( scv )
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( scv_upd1771_ack_w )
+WRITE_LINE_MEMBER( scv_state::scv_upd1771_ack_w )
 {
-	cputag_set_input_line(device->machine(), "maincpu", UPD7810_INTF1, (state) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", UPD7810_INTF1, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -760,7 +745,7 @@ GFXDECODE_END
 
 
 static const UPD7810_CONFIG scv_cpu_config = { TYPE_7801, NULL };
-static const upd1771_interface scv_upd1771c_config = { DEVCB_LINE( scv_upd1771_ack_w ) };
+static const upd1771_interface scv_upd1771c_config = { DEVCB_DRIVER_LINE_MEMBER( scv_state, scv_upd1771_ack_w ) };
 
 
 static MACHINE_CONFIG_START( scv, scv_state )
