@@ -1404,6 +1404,7 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, UINT
 	}
 
 	if(transition_count & 1) {
+		splice_pos = splice_pos % track_size;
 		int pos = splice_pos;
 		while((trackbuf[pos] & floppy_image::MG_MASK) != MG_0 && (trackbuf[pos] & floppy_image::MG_MASK) != MG_1) {
 			pos++;
