@@ -1,4 +1,96 @@
-﻿0.143u6
+﻿0.143u7
+
+New System Drivers Supported:
+-----------------------------
+- SITCOM [Robbbert]
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+- Unior [Robbbert]
+- Avigo [Sandro Ronco]
+- Savia84 [Robbbert]
+
+Skeleton drivers:
+-----------------
+(none)
+
+
+System Driver Changes:
+----------------------
+- atarist: Palette registers then to show the unused bits as 1, 
+  causing line-f exceptions when you run on them [O. Galibert]
+- atarist: Add some bus errors in appropriate places 
+  (there are still a bunch of them missing though) [O. Galibert]
+- Fix the Intellivision II memory map so the second chunk of 
+  executive rom actually appears in the cpu address space. oops. 
+  Should fix a bunch of games which are supposed to work on intv2 
+  not working. [Lord Nightmare]
+- atarist: Be even more brutal with the resync [O. Galibert]
+- atarist: Hook up the joystick correctly [O. Galibert]
+- atarist: If the 6850 and the 6301 are not in perfect sync, 
+  there is going to be byte loss [O. Galibert]
+- vii - modernised; BATMANTV connected X key, game is 
+  now playable; WALLE added details of alternate dump. [Robbbert]
+- walle - fixed graphics problem, game now playable [Robbbert]
+- atarist, wd1772: Finish implementing read ids, correct 
+  DMA byte counting, Chase HQ works [O. Galibert]
+- Fix incorrect masking of register writes on ay-3-8914,
+  fixes wrong envelope amplitude on games which use hardware 
+  enveloping on Intellivision/2 (Thunder Castle, etc) [Huygens]
+- intv: Changed driver to use modern memory map [Huygens]
+  Added cart ram support (used in Chess, Triple Challenge, 
+  Land Battle, Game Factory)
+  Added ECS and ECS controller support (extra hand 
+  controllers, keyboard, piano)
+- intv: turned down ay-8914 volume to inprove 
+  intellivoice / console volume balance [Huygens]
+- iskr3104: Added roms of EGA graphics card [temaperm]
+- mac: Preliminary (not bootable) Quadra 700 support, i
+  ncluding on-board video. [R. Belmont]
+- mac: Add Macintosh II Portrait Video Card 
+  (640x870 b&w) [Breiztiger, R. Belmont]
+- abc1600: System now boots into ABCenix, but there is 
+  no support for hard disk yet so it's unusable. [Curt Coder]
+
+Software Lists:
+----------------
+- intv.xml: serial numbers, usage info, and a bunch of new 
+  rom entries [k1w1]
+- snes.xml: over 200 cart profiles added. [MESSfan]
+- snes.xml: Added about 40 cart profiles, which makes the total 
+  number of cart profiles cross the 500 milestone, thanks to all 
+  people involved. [MESSfan, JohnDie, Zidanax]
+- lisa.xml: Added new softlist items [Kaylee]
+- coleco.xml - Added Castelo game [Anna Wu]
+- intvecs.xml: Split out the ecs games into their own softlist [Huygens]
+- sms.xml: added some recent dumps [Kaylee]
+- snes.xml: added a new proto and verified an old one [MESSfan]
+- softlist: misc addition of recent dumps (courtesy of Team Carrot, 
+  SMS Power, SegaAge and NoIntro guys) [Fabio Priuli]
+- nes.xml: included confirmed dumps, redumps and label info verified 
+  in the past year, courtesy of bootgod, Kinopio and the other 
+  guys at NES cart db. [Fabio Priuli]
+
+Source Changes:
+----------------
+- wd1772: Add read track support and some misc fixes [O. Galibert]
+- Fix for cursor handling in dl1416 [Lord Nightmare]
+- wd1772: Add read ids support [O. Galibert]
+- Store the character codes and cursor states in ram and use
+  the lookup rom to decode on display (as the real chip does
+  according to the datasheet) rather than storing the segment
+  contents in ram. This makes the DL1416 device act more like
+  the real chip, where on power-up you see random but
+  recognizable characters, rather than random gibberish.
+  Note there's a lot of code duplication to check cursor
+  state and invalid/blank crap which can probably either go
+  behind a define or be its own function, or into the display
+  wrapper function itself. [Lord Nightmare]
+- To see mouse pointer in games with clickable artwork use
+  -nohc option from command line (windows only) [Robbbert,hap]
+- ipf_dsk: Reverse engineering, it's what we do [O. Galibert]
+
+0.143u6
 
 New System Drivers Supported:
 -----------------------------
