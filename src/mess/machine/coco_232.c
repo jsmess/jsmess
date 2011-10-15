@@ -41,7 +41,8 @@ const device_type COCO_232 = &device_creator<coco_232_device>;
 coco_232_device::coco_232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
       : device_t(mconfig, COCO_232, "CoCo RS-232 PAK", tag, owner, clock),
 		device_cococart_interface( mconfig, *this ),
-		device_slot_card_interface(mconfig, *this)
+		device_slot_card_interface(mconfig, *this),
+	    m_uart(*this, UART_TAG)
 {
 }
 
@@ -51,7 +52,6 @@ coco_232_device::coco_232_device(const machine_config &mconfig, const char *tag,
 
 void coco_232_device::device_start()
 {
-	m_uart = subdevice<acia6551_device>(UART_TAG);
 }
 
 //-------------------------------------------------
