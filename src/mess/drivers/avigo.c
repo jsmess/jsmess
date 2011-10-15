@@ -370,14 +370,12 @@ static MACHINE_RESET( avigo )
 
 	memset(state->m_banked_opbase, 0, sizeof(state->m_banked_opbase));
 
-	/* keep machine pointers to flash devices */
-	state->m_flashes[0] = machine.device<intelfsh8_device>("flash0");
-	state->m_flashes[1] = machine.device<intelfsh8_device>("flash1");
-	state->m_flashes[2] = machine.device<intelfsh8_device>("flash2");
-
-	/* initialize flash contents */
-	memcpy(state->m_flashes[0]->space()->get_read_ptr(0), machine.region("bios")->base() + 0x000000, 0x100000);
-	memcpy(state->m_flashes[1]->space()->get_read_ptr(0), machine.region("bios")->base() + 0x100000, 0x100000);
+	/* if is a cold start initialize flash contents */
+	if (!state->m_warm_start)
+	{
+		memcpy(state->m_flashes[0]->space()->get_read_ptr(0), machine.region("bios")->base() + 0x000000, 0x100000);
+		memcpy(state->m_flashes[1]->space()->get_read_ptr(0), machine.region("bios")->base() + 0x100000, 0x100000);
+	}
 
 	/* initialise settings for port data */
 	for (i = 0; i < 4; i++)
@@ -393,9 +391,6 @@ static MACHINE_RESET( avigo )
 	state->m_flash_at_0x4000 = 0;
 	state->m_flash_at_0x8000 = 0;
 
-	/* clear */
-	memset(ram_get_ptr(machine.device(RAM_TAG)), 0, 128*1024);
-
 	addr = (unsigned char *)state->m_flashes[0]->space()->get_read_ptr(0);
 	avigo_setbank(machine, 0, addr, FUNC(avigo_flash_0x0000_read_handler), FUNC(avigo_flash_0x0000_write_handler));
 
@@ -407,6 +402,12 @@ static MACHINE_RESET( avigo )
 
 static MACHINE_START( avigo )
 {
+	avigo_state *state = machine.driver_data<avigo_state>();
+
+	/* keep machine pointers to flash devices */
+	state->m_flashes[0] = machine.device<intelfsh8_device>("flash0");
+	state->m_flashes[1] = machine.device<intelfsh8_device>("flash1");
+	state->m_flashes[2] = machine.device<intelfsh8_device>("flash2");
 }
 
 static ADDRESS_MAP_START( avigo_mem , AS_PROGRAM, 8)
@@ -422,7 +423,7 @@ static  READ8_HANDLER(avigo_key_data_read_r)
 	avigo_state *state = space->machine().driver_data<avigo_state>();
 	UINT8 data;
 
-	data = 0x007;
+	data = 0x0f;
 
 	if (!(state->m_key_line & 0x01))
 	{
@@ -439,9 +440,11 @@ static  READ8_HANDLER(avigo_key_data_read_r)
 		data &= input_port_read(space->machine(), "LINE2");
 	}
 
+	/* bit 3 is cold/warm start  */
+	data &= ((state->m_warm_start<<3) ^ 0xff);
+
 	/* if bit 5 is clear shows synchronisation logo! */
-	/* bit 3 must be set, otherwise there is an infinite loop in startup */
-	data |= (1<<3) | (1<<5);
+	data |= (1<<5);
 
 	return data;
 }
@@ -454,6 +457,8 @@ static WRITE8_HANDLER(avigo_set_key_line_w)
 	avigo_state *state = space->machine().driver_data<avigo_state>();
 	/* 5, 101, read back 3 */
 	state->m_key_line = data;
+
+	state->m_warm_start = BIT(data, 3);
 }
 
 static  READ8_HANDLER(avigo_irq_r)
@@ -792,6 +797,18 @@ static INPUT_CHANGED( avigo_kb_irq )
 	}
 }
 
+static INPUT_CHANGED( avigo_power_down_irq )
+{
+	avigo_state *state = field.machine().driver_data<avigo_state>();
+
+	if(newval)
+	{
+		state->m_irq |= (1<<7);
+
+		avigo_refresh_ints(field.machine());
+	}
+}
+
 static INPUT_PORTS_START(avigo)
 	PORT_START("LINE0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PAGE UP")		PORT_CODE(KEYCODE_PGUP)	PORT_CHANGED( avigo_kb_irq, NULL )
@@ -812,6 +829,7 @@ static INPUT_PORTS_START(avigo)
 	PORT_START("LINE3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Pen/Stylus pressed") PORT_CODE(KEYCODE_ENTER) PORT_CODE(MOUSECODE_BUTTON1)  PORT_CHANGED( pen_irq, NULL )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("?? Causes a NMI") PORT_CODE(KEYCODE_W) PORT_CODE(JOYCODE_BUTTON2)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Power Down")		 PORT_CODE(KEYCODE_Q) PORT_CHANGED( avigo_power_down_irq, NULL )
 
 	/* these two ports are used to emulate the position of the pen/stylus on the screen */
 	PORT_START("POSX") /* Mouse - X AXIS */
@@ -928,6 +946,31 @@ static TIMER_DEVICE_CALLBACK( avigo_1hz_timer )
 	avigo_refresh_ints(timer.machine());
 }
 
+static NVRAM_HANDLER(avigo)
+{
+	avigo_state *state = machine.driver_data<avigo_state>();
+	UINT8 *ram_base = (UINT8*)ram_get_ptr(machine.device(RAM_TAG));
+	UINT32 ram_size = ram_get_size(machine.device(RAM_TAG));
+
+	if (read_or_write)
+	{
+		file->write(ram_base, ram_size);
+	}
+	else
+	{
+		if (file)
+		{
+			file->read(ram_base, ram_size);
+			state->m_warm_start = 1;
+		}
+		else
+		{
+			memset(ram_base, 0, ram_size);
+			state->m_warm_start = 0;
+		}
+	}
+}
+
 static MACHINE_CONFIG_START( avigo, avigo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
@@ -972,6 +1015,8 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
+
+	MCFG_NVRAM_HANDLER(avigo)
 
 	// IRQ 1 is used for scan the pen and for cursor blinking
 	MCFG_TIMER_ADD_PERIODIC("scan_timer", avigo_scan_timer, attotime::from_hz(50))
