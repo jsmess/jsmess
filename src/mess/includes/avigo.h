@@ -39,6 +39,8 @@ public:
 	unsigned int m_ad_value;
 	UINT8 *m_video_memory;
 	UINT8 m_screen_column;
+	
+	UINT8 m_warm_start;
 };
 
 
