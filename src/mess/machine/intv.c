@@ -560,7 +560,7 @@ DEVICE_IMAGE_LOAD( intv_cart )
 		address_space *program = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		UINT32 size=0;
-		UINT16 address;
+		UINT16 address = 0;
 		UINT8 *region;
 		for(int i = 0; i < 9; i++)
 		{
