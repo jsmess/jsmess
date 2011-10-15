@@ -303,7 +303,7 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 				}
 				else
 				{
-					logerror("%s Unmapped write to virtual I/O %06x : %02x\n", offset, data);
+					logerror("%s Unmapped write to virtual I/O %06x : %02x\n", machine().describe_context(), offset, data);
 				}
 				break;
 
@@ -1483,21 +1483,45 @@ static ABC99_INTERFACE( abc99_intf )
 
 
 //-------------------------------------------------
-//  ABCBUS_INTERFACE( abcbus_intf )
+//  ABC1600BUS_INTERFACE( abcbus_intf )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( abc1600_abcbus_cards )
+static SLOT_INTERFACE_START( abc1600bus_cards )
 //	SLOT_INTERFACE("4105", LUXOR_4105) // SASI interface
 //	SLOT_INTERFACE("4077", LUXOR_4077) // Winchester controller
 SLOT_INTERFACE_END
 
+static ABC1600BUS_INTERFACE( bus0i_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
-static ABCBUS_INTERFACE( abcbus_intf )
+static ABC1600BUS_INTERFACE( bus0x_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL
+};
+
+static ABC1600BUS_INTERFACE( bus1_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static ABC1600BUS_INTERFACE( bus2_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(Z8410AB1_2_TAG, z80dma_device, rdy_w)
 };
 
 
@@ -1620,11 +1644,10 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_ABC99_ADD(abc99_intf)
 	MCFG_S1410_ADD()
 
-	MCFG_ABCBUS_ADD(MC68008P8_TAG, abcbus_intf)
-	MCFG_ABCBUS_SLOT_ADD( 1, "bus0i", abc1600_abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 2, "bus0x", abc1600_abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 3, "bus1", abc1600_abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 4, "bus2", abc1600_abcbus_cards, NULL, NULL)
+	MCFG_ABC1600BUS_SLOT_ADD("bus0i", bus0i_intf, abc1600bus_cards, NULL, NULL)
+	MCFG_ABC1600BUS_SLOT_ADD("bus0x", bus0x_intf, abc1600bus_cards, NULL, NULL)
+	MCFG_ABC1600BUS_SLOT_ADD("bus1", bus1_intf, abc1600bus_cards, NULL, NULL)
+	MCFG_ABC1600BUS_SLOT_ADD("bus2", bus2_intf, abc1600bus_cards, NULL, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

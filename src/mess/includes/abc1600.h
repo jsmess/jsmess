@@ -13,7 +13,7 @@
 #include "machine/ram.h"
 #include "machine/8530scc.h"
 #include "machine/abc99.h"
-#include "machine/abcbus.h"
+#include "machine/abc1600_bus.h"
 #include "machine/e0516.h"
 #include "machine/nmc9306.h"
 #include "machine/s1410.h"
