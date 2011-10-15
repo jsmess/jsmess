@@ -424,20 +424,19 @@ static  READ8_HANDLER(avigo_key_data_read_r)
 
 	data = 0x007;
 
-	if (state->m_key_line & 0x01)
+	if (!(state->m_key_line & 0x01))
 	{
 		data &= input_port_read(space->machine(), "LINE0");
 	}
 
-	if (state->m_key_line & 0x02)
+	if (!(state->m_key_line & 0x02))
 	{
 		data &= input_port_read(space->machine(), "LINE1");
 	}
 
-	if (state->m_key_line & 0x04)
+	if (!(state->m_key_line & 0x04))
 	{
 		data &= input_port_read(space->machine(), "LINE2");
-
 	}
 
 	/* if bit 5 is clear shows synchronisation logo! */
@@ -466,7 +465,7 @@ static  READ8_HANDLER(avigo_irq_r)
 static WRITE8_HANDLER(avigo_irq_w)
 {
 	avigo_state *state = space->machine().driver_data<avigo_state>();
-	state->m_irq &= ~data;
+	state->m_irq &= data;
 
 	avigo_refresh_ints(space->machine());
 }
@@ -780,26 +779,39 @@ static INPUT_CHANGED( pen_irq )
 	avigo_refresh_ints(field.machine());
 }
 
+static INPUT_CHANGED( avigo_kb_irq )
+{
+	avigo_state *state = field.machine().driver_data<avigo_state>();
+
+	LOG(("key pressed interrupt\n"));
+	if (!newval)
+	{
+		state->m_irq |= (1<<2);
+
+		avigo_refresh_ints(field.machine());
+	}
+}
+
 static INPUT_PORTS_START(avigo)
 	PORT_START("LINE0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PAGE UP") PORT_CODE(KEYCODE_PGUP)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PAGE DOWN") PORT_CODE(KEYCODE_PGDN)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LIGHT") PORT_CODE(KEYCODE_L)
-	PORT_BIT(0xf8, 0xf8, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PAGE UP")		PORT_CODE(KEYCODE_PGUP)	PORT_CHANGED( avigo_kb_irq, NULL )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PAGE DOWN")	PORT_CODE(KEYCODE_PGDN)	PORT_CHANGED( avigo_kb_irq, NULL )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("LIGHT")		PORT_CODE(KEYCODE_L)	PORT_CHANGED( avigo_kb_irq, NULL )
+	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("LINE1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TO DO") PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ADDRESS") PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SCHEDULE") PORT_CODE(KEYCODE_S)
-	PORT_BIT(0xf8, 0xf8, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("TO DO")		PORT_CODE(KEYCODE_T)	PORT_CHANGED( avigo_kb_irq, NULL )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("ADDRESS")		PORT_CODE(KEYCODE_A)	PORT_CHANGED( avigo_kb_irq, NULL )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("SCHEDULE")		PORT_CODE(KEYCODE_S)	PORT_CHANGED( avigo_kb_irq, NULL )
+	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("LINE2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MEMO") PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x0fe, 0xfe, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("MEMO") 		PORT_CODE(KEYCODE_M)	PORT_CHANGED( avigo_kb_irq, NULL )
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("LINE3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pen/Stylus pressed") PORT_CODE(KEYCODE_ENTER) PORT_CODE(MOUSECODE_BUTTON1)  PORT_CHANGED( pen_irq, NULL )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?? Causes a NMI") PORT_CODE(KEYCODE_W) PORT_CODE(JOYCODE_BUTTON2)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Pen/Stylus pressed") PORT_CODE(KEYCODE_ENTER) PORT_CODE(MOUSECODE_BUTTON1)  PORT_CHANGED( pen_irq, NULL )
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("?? Causes a NMI") PORT_CODE(KEYCODE_W) PORT_CODE(JOYCODE_BUTTON2)
 
 	/* these two ports are used to emulate the position of the pen/stylus on the screen */
 	PORT_START("POSX") /* Mouse - X AXIS */
