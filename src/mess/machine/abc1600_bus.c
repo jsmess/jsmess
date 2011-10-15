@@ -94,6 +94,8 @@ void abc1600bus_slot_device::device_config_complete()
 
 void abc1600bus_slot_device::device_start()
 {
+	m_card = dynamic_cast<device_abc1600bus_card_interface *>(get_card_device());
+
 	// resolve callbacks
 	m_out_int_func.resolve(m_out_int_cb, *this);
 	m_out_pren_func.resolve(m_out_pren_cb, *this);
@@ -110,7 +112,7 @@ void abc1600bus_slot_device::device_start()
 //  cs_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600bus_slot_device::cs_w )
+void abc1600bus_slot_device::cs_w(UINT8 data)
 {
 	if (m_card != NULL)
 	{
@@ -120,18 +122,32 @@ WRITE8_MEMBER( abc1600bus_slot_device::cs_w )
 
 
 //-------------------------------------------------
-//  rst_r -
+//  csb_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600bus_slot_device::rst_r )
+READ_LINE_MEMBER( abc1600bus_slot_device::csb_r )
+{
+	int data = 1;
+	
+	if (m_card != NULL)
+	{
+		data = m_card->abc1600bus_csb();
+	}
+	
+	return data;
+}
+
+
+//-------------------------------------------------
+//  brst_w - reset
+//-------------------------------------------------
+
+void abc1600bus_slot_device::brst_w()
 {
 	if (m_card != NULL)
 	{
-		m_card->abc1600bus_rst(0);
-		m_card->abc1600bus_rst(1);
+		m_card->abc1600bus_brst();
 	}
-
-	return 0xff;
 }
 
 
@@ -139,7 +155,7 @@ READ8_MEMBER( abc1600bus_slot_device::rst_r )
 //  inp_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600bus_slot_device::inp_r )
+UINT8 abc1600bus_slot_device::inp_r()
 {
 	UINT8 data = 0xff;
 
@@ -153,10 +169,10 @@ READ8_MEMBER( abc1600bus_slot_device::inp_r )
 
 
 //-------------------------------------------------
-//  utp_w -
+//  out_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600bus_slot_device::out_w )
+void abc1600bus_slot_device::out_w(UINT8 data)
 {
 	if (m_card != NULL)
 	{
@@ -169,7 +185,7 @@ WRITE8_MEMBER( abc1600bus_slot_device::out_w )
 //  stat_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600bus_slot_device::stat_r )
+UINT8 abc1600bus_slot_device::stat_r()
 {
 	UINT8 data = 0xff;
 
@@ -186,7 +202,7 @@ READ8_MEMBER( abc1600bus_slot_device::stat_r )
 //  stat_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600bus_slot_device::ops_r )
+UINT8 abc1600bus_slot_device::ops_r()
 {
 	UINT8 data = 0xff;
 
@@ -203,11 +219,11 @@ READ8_MEMBER( abc1600bus_slot_device::ops_r )
 //  c1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600bus_slot_device::c1_w )
+void abc1600bus_slot_device::c1_w()
 {
 	if (m_card != NULL)
 	{
-		m_card->abc1600bus_c1(data);
+		m_card->abc1600bus_c1();
 	}
 }
 
@@ -216,11 +232,11 @@ WRITE8_MEMBER( abc1600bus_slot_device::c1_w )
 //  c2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600bus_slot_device::c2_w )
+void abc1600bus_slot_device::c2_w()
 {
 	if (m_card != NULL)
 	{
-		m_card->abc1600bus_c2(data);
+		m_card->abc1600bus_c2();
 	}
 }
 
@@ -229,11 +245,11 @@ WRITE8_MEMBER( abc1600bus_slot_device::c2_w )
 //  c3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600bus_slot_device::c3_w )
+void abc1600bus_slot_device::c3_w()
 {
 	if (m_card != NULL)
 	{
-		m_card->abc1600bus_c3(data);
+		m_card->abc1600bus_c3();
 	}
 }
 
@@ -242,12 +258,97 @@ WRITE8_MEMBER( abc1600bus_slot_device::c3_w )
 //  c4_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600bus_slot_device::c4_w )
+void abc1600bus_slot_device::c4_w()
 {
 	if (m_card != NULL)
 	{
-		m_card->abc1600bus_c4(data);
+		m_card->abc1600bus_c4();
 	}
+}
+
+
+//-------------------------------------------------
+//  exp_r -
+//-------------------------------------------------
+
+UINT8 abc1600bus_slot_device::exp_r()
+{
+	UINT8 data = 0xff;
+
+	if (m_card != NULL)
+	{
+		data &= m_card->abc1600bus_exp();
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  xcsb2_r -
+//-------------------------------------------------
+
+READ_LINE_MEMBER( abc1600bus_slot_device::xcsb2_r )
+{
+	int data = 1;
+	
+	if (m_card != NULL)
+	{
+		data = m_card->abc1600bus_xcsb2();
+	}
+	
+	return data;
+}
+
+
+//-------------------------------------------------
+//  xcsb3_r -
+//-------------------------------------------------
+
+READ_LINE_MEMBER( abc1600bus_slot_device::xcsb3_r )
+{
+	int data = 1;
+	
+	if (m_card != NULL)
+	{
+		data = m_card->abc1600bus_xcsb3();
+	}
+	
+	return data;
+}
+
+
+//-------------------------------------------------
+//  xcsb4_r -
+//-------------------------------------------------
+
+READ_LINE_MEMBER( abc1600bus_slot_device::xcsb4_r )
+{
+	int data = 1;
+	
+	if (m_card != NULL)
+	{
+		data = m_card->abc1600bus_xcsb4();
+	}
+	
+	return data;
+}
+
+
+//-------------------------------------------------
+//  xcsb5_r -
+//-------------------------------------------------
+
+READ_LINE_MEMBER( abc1600bus_slot_device::xcsb5_r )
+{
+	int data = 1;
+	
+	if (m_card != NULL)
+	{
+		data = m_card->abc1600bus_xcsb5();
+	}
+	
+	return data;
 }
 
 
