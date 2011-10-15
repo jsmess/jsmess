@@ -99,12 +99,12 @@ struct abc1600bus_interface
 
 // ======================> device_abc1600bus_card_interface
 
-class abc1600bus_device;
+class abc1600bus_slot_device;
 
 // class representing interface-specific live abc1600bus card
 class device_abc1600bus_card_interface : public device_interface
 {
-	friend class abc1600bus_device;
+	friend class abc1600bus_slot_device;
 
 public:
 	// construction/destruction
@@ -116,24 +116,25 @@ public:
 	virtual int abc1600bus_csb() = 0;
 
 	// optional operation overrides
-	virtual void abc1600bus_rst(int state) { };
+	virtual void abc1600bus_brst() { };
 	virtual UINT8 abc1600bus_inp() { return 0xff; };
 	virtual void abc1600bus_out(UINT8 data) { };
 	virtual UINT8 abc1600bus_stat() { return 0xff; };
 	virtual UINT8 abc1600bus_ops() { return 0xff; };
-	virtual void abc1600bus_c1(UINT8 data) { };
-	virtual void abc1600bus_c2(UINT8 data) { };
-	virtual void abc1600bus_c3(UINT8 data) { };
-	virtual void abc1600bus_c4(UINT8 data) { };
+	virtual void abc1600bus_c1() { };
+	virtual void abc1600bus_c2() { };
+	virtual void abc1600bus_c3() { };
+	virtual void abc1600bus_c4() { };
 	virtual void abc1600bus_tren(int state) { };
 	virtual void abc1600bus_prac(int state) { };
+	virtual UINT8 abc1600bus_exp() { return 0xff; };
 	virtual int abc1600bus_xcsb2() { return 1; };
 	virtual int abc1600bus_xcsb3() { return 1; };
 	virtual int abc1600bus_xcsb4() { return 1; };
 	virtual int abc1600bus_xcsb5() { return 1; };
 
 public:
-	abc1600bus_device  *m_abc1600bus;
+	abc1600bus_slot_device  *m_bus;
 };
 
 
@@ -151,16 +152,22 @@ public:
 	virtual void device_start();
 	virtual void device_config_complete();
 
-	DECLARE_WRITE8_MEMBER( cs_w );
-	DECLARE_READ8_MEMBER( rst_r );
-	DECLARE_READ8_MEMBER( inp_r );
-	DECLARE_WRITE8_MEMBER( out_w );
-	DECLARE_READ8_MEMBER( stat_r );
-	DECLARE_READ8_MEMBER( ops_r );
-	DECLARE_WRITE8_MEMBER( c1_w );
-	DECLARE_WRITE8_MEMBER( c2_w );
-	DECLARE_WRITE8_MEMBER( c3_w );
-	DECLARE_WRITE8_MEMBER( c4_w );
+	void cs_w(UINT8 data);
+	DECLARE_READ_LINE_MEMBER( csb_r );
+	void brst_w();
+	UINT8 inp_r();
+	void out_w(UINT8 data);
+	UINT8 stat_r();
+	UINT8 ops_r();
+	void c1_w();
+	void c2_w();
+	void c3_w();
+	void c4_w();
+	UINT8 exp_r();
+	DECLARE_READ_LINE_MEMBER( xcsb2_r );
+	DECLARE_READ_LINE_MEMBER( xcsb3_r );
+	DECLARE_READ_LINE_MEMBER( xcsb4_r );
+	DECLARE_READ_LINE_MEMBER( xcsb5_r );
 	DECLARE_WRITE_LINE_MEMBER( tren_w );
 	DECLARE_WRITE_LINE_MEMBER( prac_w );
 

@@ -13,9 +13,9 @@
     - floppy
         - internal floppy is really drive 2, but wd17xx.c doesn't like having NULL drives
     - BUS0I/0X/1/2
-		- how to determine which bus is accessed?
     - short/long reset (RSTBUT)
     - CIO
+		- optimize timers!
         - vectored interrupts with status
         - port A bit mode, OR-PEVM, interrupt when bit=1
         - port B bit mode, OR-PEVM, interrupt when bit=1
@@ -27,6 +27,7 @@
 		- 4105 sasi interface card
 		- sasi interface
 		- Xebec S1410 card
+		- necd5126a HDD (http://stason.org/TULARC/pc/hard-drives-hdd/nec/D5126-20MB-5-25-HH-MFM-ST506.html)
 
 */
 
@@ -40,10 +41,12 @@
 
 #define LOG 0
 
+
 // MAC
 #define A0			BIT(offset, 0)
 #define A1			BIT(offset, 1)
 #define A2			BIT(offset, 2)
+#define A4			BIT(offset, 4)
 #define A7			BIT(offset, 7)
 #define A8			BIT(offset, 8)
 #define X11			BIT(offset, 11)
@@ -241,25 +244,97 @@ UINT8 abc1600_state::read_io(offs_t offset)
 	}
 	else
 	{
-		// BUS0I, BUS0X, BUS1, BUS2
+		// card select pulse
 		UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
-
-		switch ((offset >> 1) & 0x07)
+		
+		m_bus0i->cs_w(cs);
+		m_bus0x->cs_w(cs);
+		m_bus1->cs_w(cs);
+		m_bus2->cs_w(cs);
+		
+		// card select b?
+		m_csb = m_bus0i->csb_r();
+		m_csb |= m_bus2->csb_r() << 1;
+		m_csb |= m_bus0x->csb_r() << 2;
+		m_csb |= m_bus1->csb_r() << 3;
+		m_csb |= m_bus0x->xcsb2_r() << 4;
+		m_csb |= m_bus0x->xcsb3_r() << 5;
+		m_csb |= m_bus0x->xcsb4_r() << 6;
+		m_csb |= m_bus0x->xcsb5_r() << 7;
+		
+		m_bus0 = !((m_csb & 0xf5) == 0xf5);
+		
+		if (X11)
 		{
-		case 0: // INP
-			logerror("%s INP %02x\n", machine().describe_context(), cs);
-			break;
-
-		case 1: // STAT
-			logerror("%s STAT %02x\n", machine().describe_context(), cs);
-			break;
-
-		case 2: // OPS
-			logerror("%s OPS %02x\n", machine().describe_context(), cs);
-			break;
+			if (A4)
+			{
+				// EXP
+				logerror("%s EXP %02x\n", machine().describe_context(), cs);
+				
+				data = m_bus0x->exp_r();
+			}
+			else
+			{
+				// RCSB
+				logerror("%s RCSB %02x\n", machine().describe_context(), cs);
+				
+				data = m_csb;
+			}
+		}
+		else
+		{
+			data = 0xff;
 			
-		default:
-			logerror("%s Unmapped read from virtual I/O %06x\n", machine().describe_context(), offset);
+			switch ((offset >> 1) & 0x07)
+			{
+			case 0: // INP
+				logerror("%s INP %02x\n", machine().describe_context(), cs);
+		
+				if (m_bus0)
+				{
+					data &= m_bus0i->inp_r();
+					data &= m_bus0x->inp_r();
+				}
+				else
+				{
+					data &= m_bus1->inp_r();
+					data &= m_bus2->inp_r();
+				}
+				break;
+
+			case 1: // STAT
+				logerror("%s STAT %02x\n", machine().describe_context(), cs);
+		
+				if (m_bus0)
+				{
+					data &= m_bus0i->stat_r();
+					data &= m_bus0x->stat_r();
+				}
+				else
+				{
+					data &= m_bus1->stat_r();
+					data &= m_bus2->stat_r();
+				}
+				break;
+
+			case 2: // OPS
+				logerror("%s OPS %02x\n", machine().describe_context(), cs);
+		
+				if (m_bus0)
+				{
+					data &= m_bus0i->ops_r();
+					data &= m_bus0x->ops_r();
+				}
+				else
+				{
+					data &= m_bus1->ops_r();
+					data &= m_bus2->ops_r();
+				}
+				break;
+				
+			default:
+				logerror("%s Unmapped read from virtual I/O %06x\n", machine().describe_context(), offset);
+			}
 		}
 	}
 
@@ -363,27 +438,87 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 	else
 	{
 		UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
-
+		
+		m_bus0i->cs_w(cs);
+		m_bus0x->cs_w(cs);
+		m_bus1->cs_w(cs);
+		m_bus2->cs_w(cs);
+		
 		switch ((offset >> 1) & 0x07)
 		{
 		case 0: // OUT
 			logerror("%s OUT %02x %02x\n", machine().describe_context(), cs, data);
+		
+			if (m_bus0)
+			{
+				m_bus0i->out_w(data);
+				m_bus0x->out_w(data);
+			}
+			else
+			{
+				m_bus1->out_w(data);
+				m_bus2->out_w(data);
+			}
 			break;
 
 		case 2: // C1
 			logerror("%s C1 %02x\n", machine().describe_context(), cs);
+		
+			if (m_bus0)
+			{
+				m_bus0i->c1_w();
+				m_bus0x->c1_w();
+			}
+			else
+			{
+				m_bus1->c1_w();
+				m_bus2->c1_w();
+			}			
 			break;
 
 		case 3: // C2
 			logerror("%s C2 %02x\n", machine().describe_context(), cs);
+		
+			if (m_bus0)
+			{
+				m_bus0i->c2_w();
+				m_bus0x->c2_w();
+			}
+			else
+			{
+				m_bus1->c2_w();
+				m_bus2->c2_w();
+			}			
 			break;
 
 		case 4: // C3
 			logerror("%s C3 %02x\n", machine().describe_context(), cs);
+		
+			if (m_bus0)
+			{
+				m_bus0i->c3_w();
+				m_bus0x->c3_w();
+			}
+			else
+			{
+				m_bus1->c3_w();
+				m_bus2->c3_w();
+			}			
 			break;
 
 		case 5: // C4
 			logerror("%s C4 %02x\n", machine().describe_context(), cs);
+		
+			if (m_bus0)
+			{
+				m_bus0i->c4_w();
+				m_bus0x->c4_w();
+			}
+			else
+			{
+				m_bus1->c4_w();
+				m_bus2->c4_w();
+			}			
 			break;
 			
 		default:
@@ -1313,7 +1448,7 @@ READ8_MEMBER( abc1600_state::cio_pa_r )
 
     */
 
-	return 0;
+	return 0; // TODO return interrupt levels if some software actually reads this port
 }
 
 READ8_MEMBER( abc1600_state::cio_pb_r )
@@ -1487,39 +1622,39 @@ static ABC99_INTERFACE( abc99_intf )
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( abc1600bus_cards )
-//	SLOT_INTERFACE("4105", LUXOR_4105) // SASI interface
+	SLOT_INTERFACE("4105", LUXOR_4105) // SASI interface
 //	SLOT_INTERFACE("4077", LUXOR_4077) // Winchester controller
 SLOT_INTERFACE_END
 
 static ABC1600BUS_INTERFACE( bus0i_intf )
 {
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa7_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
 static ABC1600BUS_INTERFACE( bus0x_intf )
 {
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa6_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa5_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa4_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa3_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa2_w)
 };
 
 static ABC1600BUS_INTERFACE( bus1_intf )
 {
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa1_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
 static ABC1600BUS_INTERFACE( bus2_intf )
 {
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa0_w),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(Z8410AB1_2_TAG, z80dma_device, rdy_w)
 };
@@ -1578,6 +1713,8 @@ void abc1600_state::machine_start()
 	save_item(NAME(m_cause));
 	save_item(NAME(m_partst));
 	save_item(NAME(m_cs7));
+	save_item(NAME(m_bus0));
+	save_item(NAME(m_csb));
 	save_item(NAME(m_atce));
 	save_item(NAME(m_btce));
 }
@@ -1647,7 +1784,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_ABC1600BUS_SLOT_ADD("bus0i", bus0i_intf, abc1600bus_cards, NULL, NULL)
 	MCFG_ABC1600BUS_SLOT_ADD("bus0x", bus0x_intf, abc1600bus_cards, NULL, NULL)
 	MCFG_ABC1600BUS_SLOT_ADD("bus1", bus1_intf, abc1600bus_cards, NULL, NULL)
-	MCFG_ABC1600BUS_SLOT_ADD("bus2", bus2_intf, abc1600bus_cards, NULL, NULL)
+	MCFG_ABC1600BUS_SLOT_ADD("bus2", bus2_intf, abc1600bus_cards, "4105", NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
