@@ -31,7 +31,7 @@ protected:
 		virtual DECLARE_WRITE8_MEMBER(write);
 private:
         // internal state
-		acia6551_device *m_uart;
+		required_device<acia6551_device> m_uart;
 };
 
 
