@@ -88,9 +88,29 @@
 		</part>
 	</software>
 
-	<!-- F009 - Gambling Lord -->
+	<!-- F009 -->
+		<software name="gamblord">
+		<description>Gambling Lord</description>
+		<year>199?</year>
+		<publisher>?</publisher>
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="16006.bin" size="2097152" crc="ac4fa721" sha1="0fda223817f0b50f0ce9687076d29df3d1b86960" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-	<!-- F010 - Magical Pool -->
+	<!-- F010 -->
+		<software name="magipool">
+		<description>Magical Pool</description>
+		<year>199?</year>
+		<publisher>?</publisher>
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="08004.bin" size="2097152" crc="aed4e4f8" sha1="6be79db9006c46ea21f5dbe1add755ce2e413796" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- F011 -->
 	<software name="boomzoo">
