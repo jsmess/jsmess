@@ -116,6 +116,11 @@ void luxor_4105_device::device_reset()
 	init_scsibus(m_sasibus);
 	
 	m_cs = 0;
+	m_data = 0;
+	m_dma = 0;
+	
+	set_scsi_line(m_sasibus, SCSI_LINE_RESET, 0);
+	set_scsi_line(m_sasibus, SCSI_LINE_RESET, 1);
 }
 
 
@@ -169,7 +174,7 @@ UINT8 luxor_4105_device::abc1600bus_stat()
 			bit		description
 			
 			0		?
-			1		?
+			1		BSY
 			2		?
 			3		?
 			4		
@@ -178,11 +183,15 @@ UINT8 luxor_4105_device::abc1600bus_stat()
 			7		
 			
 		*/
-
-		data = get_scsi_line(m_sasibus, SCSI_LINE_CD);
-		data |= get_scsi_line(m_sasibus, SCSI_LINE_IO) << 1;
-		data |= get_scsi_line(m_sasibus, SCSI_LINE_MSG) << 2;
-		data |= get_scsi_line(m_sasibus, SCSI_LINE_REQ) << 3;
+		
+		data = !get_scsi_line(m_sasibus, SCSI_LINE_BSY) << 1;
+		
+		/*
+		data = !get_scsi_line(m_sasibus, SCSI_LINE_CD);
+		data |= !get_scsi_line(m_sasibus, SCSI_LINE_IO) << 1;
+		data |= !get_scsi_line(m_sasibus, SCSI_LINE_MSG) << 2;
+		data |= !get_scsi_line(m_sasibus, SCSI_LINE_REQ) << 3;
+		*/
 	}
 	
 	return data;
@@ -234,7 +243,7 @@ void luxor_4105_device::abc1600bus_c1(UINT8 data)
 {
 	if (m_cs)
 	{
-		set_scsi_line(m_sasibus, SCSI_LINE_SEL, 1);
+		set_scsi_line(m_sasibus, SCSI_LINE_SEL, BIT(data, 0));
 	}
 }
 
@@ -247,8 +256,11 @@ void luxor_4105_device::abc1600bus_c3(UINT8 data)
 {
 	if (m_cs)
 	{
-		// TODO clear data register (3D) and DMA register (3E), and send reset signal
+		m_data = 0;
 		m_dma = 0;
+		
+		set_scsi_line(m_sasibus, SCSI_LINE_RESET, 0);
+		set_scsi_line(m_sasibus, SCSI_LINE_RESET, 1);
 	}
 }
 
