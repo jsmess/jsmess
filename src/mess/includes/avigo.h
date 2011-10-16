@@ -7,7 +7,13 @@
 #ifndef AVIGO_H_
 #define AVIGO_H_
 
+#include "cpu/z80/z80.h"
+#include "machine/rp5c01.h"
+#include "machine/ins8250.h"
 #include "machine/intelfsh.h"
+#include "sound/speaker.h"
+#include "machine/ram.h"
+#include "rendlay.h"
 
 #define AVIGO_NUM_COLOURS 2
 
@@ -19,38 +25,80 @@ class avigo_state : public driver_device
 {
 public:
 	avigo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
+		  m_ram(*this, RAM_TAG),
+		  m_speaker(*this, SPEAKER_TAG)
+		{ }
 
-	UINT8 m_key_line;
-	UINT8 m_irq;
-	UINT8 m_speaker_data;
-	unsigned long m_ram_bank_l;
-	unsigned long m_ram_bank_h;
-	unsigned long m_rom_bank_l;
-	unsigned long m_rom_bank_h;
-	unsigned long m_ad_control_status;
-	intelfsh8_device *m_flashes[3];
-	int m_flash_at_0x4000;
-	int m_flash_at_0x8000;
-	void *m_banked_opbase[4];
-	int m_previous_input_port_data[4];
-	int m_ox;
-	int m_oy;
-	unsigned int m_ad_value;
-	UINT8 *m_video_memory;
-	UINT8 m_screen_column;
-	
-	UINT8 m_warm_start;
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_ram;
+	required_device<device_t> m_speaker;
+
+	// defined in drivers/avigo.c
+	virtual void machine_start();
+	virtual void machine_reset();
+	void refresh_memory(UINT8 bank, UINT8 chip_select);
+	void refresh_ints();
+
+	DECLARE_WRITE_LINE_MEMBER( tc8521_alarm_int );
+	DECLARE_WRITE_LINE_MEMBER( com_interrupt );
+
+	DECLARE_READ8_MEMBER(flash_0x0000_read_handler);
+	DECLARE_WRITE8_MEMBER(flash_0x0000_write_handler);
+	DECLARE_READ8_MEMBER(flash_0x4000_read_handler);
+	DECLARE_WRITE8_MEMBER(flash_0x4000_write_handler);
+	DECLARE_READ8_MEMBER(flash_0x8000_read_handler);
+	DECLARE_WRITE8_MEMBER(flash_0x8000_write_handler);
+
+	DECLARE_READ8_MEMBER(key_data_read_r);
+	DECLARE_WRITE8_MEMBER(set_key_line_w);
+	DECLARE_READ8_MEMBER(irq_r);
+	DECLARE_WRITE8_MEMBER(irq_w);
+	DECLARE_READ8_MEMBER(bank1_r);
+	DECLARE_READ8_MEMBER(bank2_r);
+	DECLARE_WRITE8_MEMBER(bank1_w);
+	DECLARE_WRITE8_MEMBER(bank2_w);
+	DECLARE_READ8_MEMBER(ad_control_status_r);
+	DECLARE_WRITE8_MEMBER(ad_control_status_w);
+	DECLARE_READ8_MEMBER(ad_data_r);
+	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_READ8_MEMBER(port_04_r);
+
+	INPUT_CHANGED_MEMBER(pen_irq);
+	INPUT_CHANGED_MEMBER(kb_irq);
+	INPUT_CHANGED_MEMBER(power_down_irq);
+
+	// defined in video/avigo.c
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	DECLARE_READ8_MEMBER(vid_memory_r);
+	DECLARE_WRITE8_MEMBER(vid_memory_w);
+
+	// driver state
+	UINT8				m_key_line;
+	UINT8				m_irq;
+	UINT8				m_speaker_data;
+	UINT8				m_bank2_l;
+	UINT8				m_bank2_h;
+	UINT8				m_bank1_l;
+	UINT8				m_bank1_h;
+	unsigned long		m_ad_control_status;
+	intelfsh8_device *	m_flashes[3];
+	int 				m_flash_at_0x4000;
+	int 				m_flash_at_0x8000;
+	int 				m_ox;
+	int 				m_oy;
+	unsigned int		m_ad_value;
+	UINT8 *				m_video_memory;
+	UINT8				m_screen_column;
+	UINT8				m_warm_start;
+	UINT8 * 			m_ram_base;
 };
 
 
 /*----------- defined in video/avigo.c -----------*/
 
-extern  READ8_HANDLER(avigo_vid_memory_r);
-extern WRITE8_HANDLER(avigo_vid_memory_w);
-
-extern VIDEO_START( avigo );
-extern SCREEN_UPDATE( avigo );
 extern PALETTE_INIT( avigo );
 
 
