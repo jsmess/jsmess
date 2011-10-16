@@ -9,8 +9,8 @@
         05/02/2011 Skeleton driver.
         11/10/2011 Found a new rom. Working [Robbbert]
 
-	I assume all the LEDs are red ones. The LEDs
-        down the left side I assume to be bit 0 through 7 in that order.
+        I assume all the LEDs are red ones. The LEDs down the
+        left side I assume to be bit 0 through 7 in that order.
 
         ToDo:
         - Make better artwork
@@ -49,7 +49,7 @@ public:
 
 static ADDRESS_MAP_START(savia84_mem, AS_PROGRAM, 8, savia84_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff) // A15 not connected at the cPU
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff) // A15 not connected at the CPU
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 ADDRESS_MAP_END
