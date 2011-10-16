@@ -219,11 +219,11 @@ UINT8 abc1600bus_slot_device::ops_r()
 //  c1_w -
 //-------------------------------------------------
 
-void abc1600bus_slot_device::c1_w()
+void abc1600bus_slot_device::c1_w(UINT8 data)
 {
 	if (m_card != NULL)
 	{
-		m_card->abc1600bus_c1();
+		m_card->abc1600bus_c1(data);
 	}
 }
 
@@ -232,11 +232,11 @@ void abc1600bus_slot_device::c1_w()
 //  c2_w -
 //-------------------------------------------------
 
-void abc1600bus_slot_device::c2_w()
+void abc1600bus_slot_device::c2_w(UINT8 data)
 {
 	if (m_card != NULL)
 	{
-		m_card->abc1600bus_c2();
+		m_card->abc1600bus_c2(data);
 	}
 }
 
@@ -245,11 +245,11 @@ void abc1600bus_slot_device::c2_w()
 //  c3_w -
 //-------------------------------------------------
 
-void abc1600bus_slot_device::c3_w()
+void abc1600bus_slot_device::c3_w(UINT8 data)
 {
 	if (m_card != NULL)
 	{
-		m_card->abc1600bus_c3();
+		m_card->abc1600bus_c3(data);
 	}
 }
 
@@ -258,11 +258,11 @@ void abc1600bus_slot_device::c3_w()
 //  c4_w -
 //-------------------------------------------------
 
-void abc1600bus_slot_device::c4_w()
+void abc1600bus_slot_device::c4_w(UINT8 data)
 {
 	if (m_card != NULL)
 	{
-		m_card->abc1600bus_c4();
+		m_card->abc1600bus_c4(data);
 	}
 }
 

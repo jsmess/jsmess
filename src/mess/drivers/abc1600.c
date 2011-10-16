@@ -28,6 +28,7 @@
 		- sasi interface
 		- Xebec S1410 card
 		- necd5126a HDD (http://stason.org/TULARC/pc/hard-drives-hdd/nec/D5126-20MB-5-25-HH-MFM-ST506.html)
+			chdman -createblankhd necd5126a.chd 615 4 17 512
 
 */
 
@@ -269,16 +270,16 @@ UINT8 abc1600_state::read_io(offs_t offset)
 			if (A4)
 			{
 				// EXP
-				logerror("%s EXP %02x\n", machine().describe_context(), cs);
-				
 				data = m_bus0x->exp_r();
+
+				logerror("%s EXP %02x: %02x\n", machine().describe_context(), cs, data);
 			}
 			else
 			{
 				// RCSB
-				logerror("%s RCSB %02x\n", machine().describe_context(), cs);
-				
 				data = m_csb;
+
+				logerror("%s RCSB %02x\n", machine().describe_context(), data);
 			}
 		}
 		else
@@ -288,8 +289,6 @@ UINT8 abc1600_state::read_io(offs_t offset)
 			switch ((offset >> 1) & 0x07)
 			{
 			case 0: // INP
-				logerror("%s INP %02x\n", machine().describe_context(), cs);
-		
 				if (m_bus0)
 				{
 					data &= m_bus0i->inp_r();
@@ -300,11 +299,11 @@ UINT8 abc1600_state::read_io(offs_t offset)
 					data &= m_bus1->inp_r();
 					data &= m_bus2->inp_r();
 				}
+
+				logerror("%s INP %02x: %02x\n", machine().describe_context(), cs, data);
 				break;
 
 			case 1: // STAT
-				logerror("%s STAT %02x\n", machine().describe_context(), cs);
-		
 				if (m_bus0)
 				{
 					data &= m_bus0i->stat_r();
@@ -315,11 +314,11 @@ UINT8 abc1600_state::read_io(offs_t offset)
 					data &= m_bus1->stat_r();
 					data &= m_bus2->stat_r();
 				}
+
+				logerror("%s STAT %02x: %02x\n", machine().describe_context(), cs, data);
 				break;
 
 			case 2: // OPS
-				logerror("%s OPS %02x\n", machine().describe_context(), cs);
-		
 				if (m_bus0)
 				{
 					data &= m_bus0i->ops_r();
@@ -330,6 +329,8 @@ UINT8 abc1600_state::read_io(offs_t offset)
 					data &= m_bus1->ops_r();
 					data &= m_bus2->ops_r();
 				}
+
+				logerror("%s OPS %02x: %02x\n", machine().describe_context(), cs, data);
 				break;
 				
 			default:
@@ -447,7 +448,7 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 		switch ((offset >> 1) & 0x07)
 		{
 		case 0: // OUT
-			logerror("%s OUT %02x %02x\n", machine().describe_context(), cs, data);
+			logerror("%s OUT %02x: %02x\n", machine().describe_context(), cs, data);
 		
 			if (m_bus0)
 			{
@@ -462,62 +463,62 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 			break;
 
 		case 2: // C1
-			logerror("%s C1 %02x\n", machine().describe_context(), cs);
+			logerror("%s C1 %02x: %02x\n", machine().describe_context(), cs, data);
 		
 			if (m_bus0)
 			{
-				m_bus0i->c1_w();
-				m_bus0x->c1_w();
+				m_bus0i->c1_w(data);
+				m_bus0x->c1_w(data);
 			}
 			else
 			{
-				m_bus1->c1_w();
-				m_bus2->c1_w();
+				m_bus1->c1_w(data);
+				m_bus2->c1_w(data);
 			}			
 			break;
 
 		case 3: // C2
-			logerror("%s C2 %02x\n", machine().describe_context(), cs);
+			logerror("%s C2 %02x: %02x\n", machine().describe_context(), cs, data);
 		
 			if (m_bus0)
 			{
-				m_bus0i->c2_w();
-				m_bus0x->c2_w();
+				m_bus0i->c2_w(data);
+				m_bus0x->c2_w(data);
 			}
 			else
 			{
-				m_bus1->c2_w();
-				m_bus2->c2_w();
+				m_bus1->c2_w(data);
+				m_bus2->c2_w(data);
 			}			
 			break;
 
 		case 4: // C3
-			logerror("%s C3 %02x\n", machine().describe_context(), cs);
+			logerror("%s C3 %02x: %02x\n", machine().describe_context(), cs, data);
 		
 			if (m_bus0)
 			{
-				m_bus0i->c3_w();
-				m_bus0x->c3_w();
+				m_bus0i->c3_w(data);
+				m_bus0x->c3_w(data);
 			}
 			else
 			{
-				m_bus1->c3_w();
-				m_bus2->c3_w();
+				m_bus1->c3_w(data);
+				m_bus2->c3_w(data);
 			}			
 			break;
 
 		case 5: // C4
-			logerror("%s C4 %02x\n", machine().describe_context(), cs);
+			logerror("%s C4 %02x: %02x\n", machine().describe_context(), cs, data);
 		
 			if (m_bus0)
 			{
-				m_bus0i->c4_w();
-				m_bus0x->c4_w();
+				m_bus0i->c4_w(data);
+				m_bus0x->c4_w(data);
 			}
 			else
 			{
-				m_bus1->c4_w();
-				m_bus2->c4_w();
+				m_bus1->c4_w(data);
+				m_bus2->c4_w(data);
 			}			
 			break;
 			
