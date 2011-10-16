@@ -78,7 +78,6 @@ public:
 	// driver state
 	UINT8				m_key_line;
 	UINT8				m_irq;
-	UINT8				m_speaker_data;
 	UINT8				m_bank2_l;
 	UINT8				m_bank2_h;
 	UINT8				m_bank1_l;
