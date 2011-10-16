@@ -13,15 +13,27 @@
 
 
         MEMORY MAP:
-                0x0000-0x03fff: flash 0 block 0
-                0x4000-0x07fff: flash x block y
-                0x8000-0x0bfff: ram block x, screen buffer, or flash x block y
-                0xc000-0x0ffff: ram block 0
+			0x0000-0x03fff: flash 0 block 0
+			0x4000-0x07fff: bank 1
+			0x8000-0x0bfff: bank 2
+			0xc000-0x0ffff: ram block 0
+
+		Bankswitch:
+			Bank 1 is controlled by ports 5 and 6, port 5 is the bank select
+			and port 6 is the chip select, the known chip select are:
+			- 0: flash 0
+			- 1: RAM
+			- 3: flash 1
+			- 5: flash 2 (optional)
+			- 6: VideoRAM
+			- 7: flash 0
+
+			Bank 2 have the same behavior but is controlled by ports 7 and 8
 
         Hardware:
             - Z80 CPU
             - 16c500c UART
-            -  amd29f080 flash-file memory x 3 (3mb)
+            - amd29f080 flash-file memory x 3 (3mb)
             - 128k ram
             - stylus pen
             - touch-pad screen
@@ -40,8 +52,12 @@
             0x01        0xad        AMD AM29F016
 
         TODO:
-                Dissassemble the rom a bit and find out exactly
-                how memory paging works!
+			- Found a way to emulate the touchscreen panel out of the screen
+    		  area (the six buttons at the bottom)
+			- Sketch doesn't work, something is wrong with the pen irq
+			- Alarm doesn't work
+			- Added the facility to load app file into flash memory
+			- Serial communications and IR port.
 
             I don't have any documentation on the hardware, so a lot of this
             driver has been written using educated guesswork and a lot of help
