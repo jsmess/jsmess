@@ -60,6 +60,7 @@ private:
 	required_device<device_t> m_sasibus;
 
 	int m_cs;
+	UINT8 m_data;
 	UINT8 m_dma;
 };
 
