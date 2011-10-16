@@ -540,17 +540,8 @@ READ8_MEMBER(avigo_state::ad_data_r)
 
 WRITE8_MEMBER(avigo_state::speaker_w)
 {
-//  UINT8 previous_speaker;
-
-//  previous_speaker = m_speaker_data;
-	m_speaker_data = data;
-
-	/* changed state? */
-	if (((data^m_speaker_data) & (1<<3))!=0)
-	{
-		/* DAC output state */
-		speaker_level_w(m_speaker,(data>>3) & 0x01);
-	}
+	/* Speaker output state */
+	speaker_level_w(m_speaker, BIT(data, 3));
 }
 
 
