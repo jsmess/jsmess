@@ -7,6 +7,7 @@
 
 #include "emu.h"
 #include "abc1600_bus.h"
+#include "machine/scsibus.h"
 
 
 
@@ -36,6 +37,7 @@ public:
     luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
 protected:
@@ -50,12 +52,15 @@ protected:
 	virtual UINT8 abc1600bus_inp();
 	virtual void abc1600bus_out(UINT8 data);
 	virtual UINT8 abc1600bus_stat();
-	virtual void abc1600bus_c1();
-	virtual void abc1600bus_c3();
-	virtual void abc1600bus_c4();
+	virtual void abc1600bus_c1(UINT8 data);
+	virtual void abc1600bus_c3(UINT8 data);
+	virtual void abc1600bus_c4(UINT8 data);
 	
 private:
+	required_device<device_t> m_sasibus;
+
 	int m_cs;
+	UINT8 m_dma;
 };
 
 
