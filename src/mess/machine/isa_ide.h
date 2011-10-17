@@ -14,8 +14,7 @@
 
 class isa16_ide_device :
 		public device_t,
-		public device_isa16_card_interface,
-		public device_slot_card_interface
+		public device_isa16_card_interface
 {
 public:
 		// construction/destruction

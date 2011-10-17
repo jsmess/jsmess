@@ -28,7 +28,7 @@ const device_type ABC1600BUS_SLOT = &device_creator<abc1600bus_slot_device>;
 //-------------------------------------------------
 
 device_abc1600bus_card_interface::device_abc1600bus_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_slot_card_interface(mconfig, device)
 {
 }
 

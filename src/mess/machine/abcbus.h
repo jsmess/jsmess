@@ -199,7 +199,7 @@ extern const device_type ABCBUS;
 // ======================> device_abcbus_card_interface
 
 // class representing interface-specific live abcbus card
-class device_abcbus_card_interface : public device_interface
+class device_abcbus_card_interface : public device_slot_card_interface
 {
 	friend class abcbus_device;
 

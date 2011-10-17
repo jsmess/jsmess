@@ -68,16 +68,14 @@ const rom_entry *nubus_radiustpd_device::device_rom_region() const
 
 nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, NUBUS_RADIUSTPD, "Radius Two Page Display video card", tag, owner, clock),
-		device_nubus_card_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_rtpd";
 }
 
 nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, type, name, tag, owner, clock),
-		device_nubus_card_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_rtpd";
 }

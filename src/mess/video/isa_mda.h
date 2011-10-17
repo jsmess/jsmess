@@ -15,8 +15,7 @@
 
 class isa8_mda_device :
 		public device_t,
-		public device_isa8_card_interface,
-		public device_slot_card_interface
+		public device_isa8_card_interface
 {
 public:
 		friend class isa8_hercules_device;

@@ -143,7 +143,7 @@ extern const device_type ECBBUS;
 // ======================> device_ecbbus_card_interface
 
 // class representing interface-specific live ecbbus card
-class device_ecbbus_card_interface : public device_interface
+class device_ecbbus_card_interface : public device_slot_card_interface
 {
 	friend class ecbbus_device;
 

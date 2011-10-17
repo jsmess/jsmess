@@ -26,8 +26,7 @@
 // ======================> comx_thm_device
 
 class comx_thm_device : public device_t,
-					    public device_comx_expansion_card_interface,
-					    public device_slot_card_interface
+					    public device_comx_expansion_card_interface
 {
 public:
 	// construction/destruction

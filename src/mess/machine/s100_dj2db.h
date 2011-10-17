@@ -30,8 +30,7 @@
 // ======================> s100_dj2db_device
 
 class s100_dj2db_device : public device_t,
-						  public device_s100_card_interface,
-						  public device_slot_card_interface
+						  public device_s100_card_interface
 {
 public:
 	// construction/destruction

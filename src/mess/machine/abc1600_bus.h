@@ -102,7 +102,7 @@ struct abc1600bus_interface
 class abc1600bus_slot_device;
 
 // class representing interface-specific live abc1600bus card
-class device_abc1600bus_card_interface : public device_interface
+class device_abc1600bus_card_interface : public device_slot_card_interface
 {
 	friend class abc1600bus_slot_device;
 

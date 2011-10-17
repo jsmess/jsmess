@@ -14,8 +14,7 @@
 
 class coco_orch90_device :
 		public device_t,
-		public device_cococart_interface,
-		public device_slot_card_interface
+		public device_cococart_interface
 {
 public:
 		// construction/destruction

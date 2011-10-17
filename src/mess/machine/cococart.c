@@ -350,7 +350,7 @@ const char * cococart_slot_device::get_default_card(const device_list &devlist, 
 //-------------------------------------------------
 
 device_cococart_interface::device_cococart_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_slot_card_interface(mconfig, device)
 {
 }
 

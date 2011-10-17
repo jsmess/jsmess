@@ -230,7 +230,6 @@ void comx_eb_device::set_ef4(const char *tag, int state)
 comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_EB, "COMX-35E Expansion Box", tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
-	device_slot_card_interface(mconfig, *this),
 	m_select(0)
 {
 }

@@ -305,7 +305,7 @@ void s100_device::terminal_transmit_w(UINT8 data)
 //-------------------------------------------------
 
 device_s100_card_interface::device_s100_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_slot_card_interface(mconfig, device)
 {
 }
 

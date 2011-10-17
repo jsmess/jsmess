@@ -204,8 +204,7 @@ ioport_constructor s100_mm65k16s_device::device_input_ports() const
 
 s100_mm65k16s_device::s100_mm65k16s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, S100_MM65K16S, "MM65K16S", tag, owner, clock),
-	device_s100_card_interface(mconfig, *this),
-	device_slot_card_interface(mconfig, *this)
+	device_s100_card_interface(mconfig, *this)
 {
 }
 

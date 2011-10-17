@@ -24,8 +24,7 @@
 // ======================> s100_mm65k16s_device
 
 class s100_mm65k16s_device : public device_t,
-							 public device_s100_card_interface,
-							 public device_slot_card_interface
+							 public device_s100_card_interface
 {
 public:
 	// construction/destruction

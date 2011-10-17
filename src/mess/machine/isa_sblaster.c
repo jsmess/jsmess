@@ -104,8 +104,7 @@ machine_config_constructor isa8_sblaster_device::device_mconfig_additions() cons
 
 isa8_sblaster_device::isa8_sblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, ISA8_SOUND_BLASTER_1_0, "ISA8_SOUND_BLASTER_1_0", tag, owner, clock),
-		device_isa8_card_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this)
+		device_isa8_card_interface(mconfig, *this)
 {
 }
 

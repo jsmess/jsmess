@@ -71,8 +71,7 @@ const rom_entry *abc_uni800_device::device_rom_region() const
 
 abc_uni800_device::abc_uni800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, ABC_UNI800, "UNI-800", tag, owner, clock),
-	  device_abcbus_card_interface(mconfig, *this),
-	  device_slot_card_interface(mconfig, *this)
+	  device_abcbus_card_interface(mconfig, *this)
 {
 }
 

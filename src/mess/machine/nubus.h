@@ -133,7 +133,7 @@ extern const device_type NUBUS;
 // ======================> device_nubus_card_interface
 
 // class representing interface-specific live nubus card
-class device_nubus_card_interface : public device_interface
+class device_nubus_card_interface : public device_slot_card_interface
 {
 	friend class nubus_device;
 public:

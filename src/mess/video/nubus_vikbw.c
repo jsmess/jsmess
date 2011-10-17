@@ -68,16 +68,14 @@ const rom_entry *nubus_vikbw_device::device_rom_region() const
 
 nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, NUBUS_VIKBW, "Moniterm Viking video card", tag, owner, clock),
-		device_nubus_card_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_vikbw";
 }
 
 nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, type, name, tag, owner, clock),
-		device_nubus_card_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_vikbw";
 }

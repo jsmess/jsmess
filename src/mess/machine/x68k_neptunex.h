@@ -18,8 +18,7 @@
 #define NEPTUNE_IRQ_VECTOR 0xf9
 
 class x68k_neptune_device : public device_t,
-							public device_x68k_expansion_card_interface,
-							public device_slot_card_interface
+							public device_x68k_expansion_card_interface
 {
 public:
 	// construction/destruction

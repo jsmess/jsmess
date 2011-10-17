@@ -45,8 +45,7 @@ const rom_entry *comx_thm_device::device_rom_region() const
 
 comx_thm_device::comx_thm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_THM, "COMX-35 Thermal Printer Card", tag, owner, clock),
-	device_comx_expansion_card_interface(mconfig, *this),
-	device_slot_card_interface(mconfig, *this)
+	device_comx_expansion_card_interface(mconfig, *this)
 {
 }
 

@@ -58,7 +58,6 @@ const rom_entry *c64_standard_cartridge_device::device_rom_region() const
 c64_standard_cartridge_device::c64_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_STD, "Standard cartridge", tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
-	device_slot_card_interface(mconfig, *this),
 	m_game(1),
 	m_exrom(0)
 {

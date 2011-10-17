@@ -28,7 +28,7 @@ const device_type C64_EXPANSION_SLOT = &device_creator<c64_expansion_slot_device
 //-------------------------------------------------
 
 device_c64_expansion_card_interface::device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_slot_card_interface(mconfig,device)
 {
 }
 

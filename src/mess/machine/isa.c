@@ -318,7 +318,7 @@ void isa8_device::eop_w(int state)
 //-------------------------------------------------
 
 device_isa8_card_interface::device_isa8_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device),
+	: device_slot_card_interface(mconfig, device),
 	  m_isa(NULL),
 	  m_isa_tag(NULL)
 {

@@ -126,8 +126,7 @@ const device_type COCO_MULTIPAK = &device_creator<coco_multipak_device>;
 //-------------------------------------------------
 coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
       : device_t(mconfig, COCO_MULTIPAK, "CoCo Multi-Pak Interface", tag, owner, clock),
-		device_cococart_interface( mconfig, *this ),
-		device_slot_card_interface(mconfig, *this)
+		device_cococart_interface( mconfig, *this )
 {
 }
 

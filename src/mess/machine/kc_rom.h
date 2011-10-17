@@ -14,8 +14,7 @@
 
 class kc_8k_device :
 		public device_t,
-		public device_kcexp_interface,
-		public device_slot_card_interface
+		public device_kcexp_interface
 {
 public:
 	// construction/destruction

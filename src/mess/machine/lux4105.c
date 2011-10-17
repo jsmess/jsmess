@@ -92,7 +92,6 @@ ioport_constructor luxor_4105_device::device_input_ports() const
 luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, LUXOR_4105, "Luxor 4105", tag, owner, clock),
 	  device_abc1600bus_card_interface(mconfig, *this),
-	  device_slot_card_interface(mconfig, *this),
 	  m_sasibus(*this, SASIBUS_TAG)
 {
 }

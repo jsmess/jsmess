@@ -29,8 +29,7 @@
 // ======================> luxor_4105_device
 
 class luxor_4105_device :  public device_t,
-						   public device_abc1600bus_card_interface,
-						   public device_slot_card_interface
+						   public device_abc1600bus_card_interface
 {
 public:
     // construction/destruction

@@ -42,15 +42,13 @@ const device_type KC_M036 = &device_creator<kc_m036_device>;
 
 kc_m011_device::kc_m011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
       : device_t(mconfig, KC_M011, "M011", tag, owner, clock),
-		device_kcexp_interface( mconfig, *this ),
-		device_slot_card_interface(mconfig, *this)
+		device_kcexp_interface( mconfig, *this )
 {
 }
 
 kc_m011_device::kc_m011_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
       : device_t(mconfig, type, name, tag, owner, clock),
-		device_kcexp_interface( mconfig, *this ),
-		device_slot_card_interface(mconfig, *this)
+		device_kcexp_interface( mconfig, *this )
 {
 }
 

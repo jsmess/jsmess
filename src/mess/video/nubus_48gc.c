@@ -79,8 +79,7 @@ const rom_entry *nubus_824gc_device::device_rom_region() const
 
 jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, type, name, tag, owner, clock),
-		device_nubus_card_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this)
 {
 }
 
