@@ -46,8 +46,7 @@
 #include "sound/sp0256.h"
 
 class cpc_ssa1_device : public device_t,
-					    public device_cpc_expansion_card_interface,
-					    public device_slot_card_interface
+					    public device_cpc_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -79,8 +78,7 @@ private:
 };
 
 class cpc_dkspeech_device : public device_t,
-							public device_cpc_expansion_card_interface,
-							public device_slot_card_interface
+							public device_cpc_expansion_card_interface
 {
 public:
 	// construction/destruction

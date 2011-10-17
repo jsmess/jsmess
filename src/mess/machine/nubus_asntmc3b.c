@@ -69,7 +69,6 @@ const rom_entry *nubus_asntm3b_device::device_rom_region() const
 nubus_asntm3b_device::nubus_asntm3b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, NUBUS_ASNTMC3B, "Asante MC3B Ethernet card", tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this),
 		m_dp83902(*this, ASNTMC3B_DP83902)
 {
 	m_shortname = "nb_amc3b";
@@ -78,7 +77,6 @@ nubus_asntm3b_device::nubus_asntm3b_device(const machine_config &mconfig, const 
 nubus_asntm3b_device::nubus_asntm3b_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, type, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this),
 		m_dp83902(*this, ASNTMC3B_DP83902)
 {
 	m_shortname = "nb_amc3b";

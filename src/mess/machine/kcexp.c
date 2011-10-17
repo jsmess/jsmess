@@ -70,7 +70,7 @@ const device_type KCCART_SLOT = &device_creator<kccart_slot_device>;
 //-------------------------------------------------
 
 device_kcexp_interface::device_kcexp_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_slot_card_interface(mconfig, device)
 {
 }
 

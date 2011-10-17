@@ -362,7 +362,6 @@ ioport_constructor luxor_55_21046_device::device_input_ports() const
 luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, LUXOR_55_21046, "Luxor 55 21046", tag, owner, clock),
 	  device_abcbus_card_interface(mconfig, *this),
-	  device_slot_card_interface(mconfig, *this),
 	  m_maincpu(*this, Z80_TAG),
 	  m_dma(*this, Z80DMA_TAG),
 	  m_fdc(*this, SAB1793_TAG),

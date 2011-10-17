@@ -207,7 +207,7 @@ extern const device_type ISA8;
 // ======================> device_isa8_card_interface
 
 // class representing interface-specific live isa8 card
-class device_isa8_card_interface : public device_interface
+class device_isa8_card_interface : public device_slot_card_interface
 {
 	friend class isa8_device;
 public:

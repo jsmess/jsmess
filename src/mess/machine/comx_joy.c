@@ -60,8 +60,7 @@ ioport_constructor comx_joy_device::device_input_ports() const
 
 comx_joy_device::comx_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_JOY, "COMX JoyCard", tag, owner, clock),
-	device_comx_expansion_card_interface(mconfig, *this),
-	device_slot_card_interface(mconfig, *this)
+	device_comx_expansion_card_interface(mconfig, *this)
 {
 }
 

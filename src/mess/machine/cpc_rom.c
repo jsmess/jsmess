@@ -36,8 +36,7 @@ machine_config_constructor cpc_rom_device::device_mconfig_additions() const
 
 cpc_rom_device::cpc_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CPC_ROM, "ROM Box", tag, owner, clock),
-	device_cpc_expansion_card_interface(mconfig, *this),
-	device_slot_card_interface(mconfig, *this)
+	device_cpc_expansion_card_interface(mconfig, *this)
 {
 }
 

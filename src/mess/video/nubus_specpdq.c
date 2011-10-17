@@ -83,16 +83,14 @@ const rom_entry *nubus_specpdq_device::device_rom_region() const
 
 nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, NUBUS_SPECPDQ, "SuperMac Spectrum PDQ video card", tag, owner, clock),
-		device_nubus_card_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_spdq";
 }
 
 nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, type, name, tag, owner, clock),
-		device_nubus_card_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_spdq";
 }

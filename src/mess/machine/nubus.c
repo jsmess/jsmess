@@ -273,7 +273,7 @@ WRITE_LINE_MEMBER( nubus_device::irqe_w ) { m_out_irqe_func(state); }
 //-------------------------------------------------
 
 device_nubus_card_interface::device_nubus_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device),
+	: device_slot_card_interface(mconfig, device),
 	  m_nubus(NULL),
 	  m_nubus_tag(NULL)
 {

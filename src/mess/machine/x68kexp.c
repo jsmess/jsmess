@@ -19,7 +19,7 @@ const device_type X68K_EXPANSION_SLOT = &device_creator<x68k_expansion_slot_devi
 
 
 device_x68k_expansion_card_interface::device_x68k_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_slot_card_interface(mconfig, device)
 {
 }
 

@@ -24,8 +24,7 @@
 // ======================> grip_device
 
 class grip_device :	public device_t,
-					public device_ecbbus_card_interface,
-					public device_slot_card_interface
+					public device_ecbbus_card_interface					
 {
 public:
 	// construction/destruction

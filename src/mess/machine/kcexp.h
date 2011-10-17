@@ -25,7 +25,7 @@ struct kcexp_interface
 
 // ======================> device_kcexp_interface
 
-class device_kcexp_interface : public device_interface
+class device_kcexp_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction

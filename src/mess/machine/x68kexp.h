@@ -100,7 +100,7 @@ struct x68k_expansion_slot_interface
 // ======================> device_x68k_expansion_card_interface
 
 // class representing interface-specific live x68k_expansion card
-class device_x68k_expansion_card_interface : public device_interface
+class device_x68k_expansion_card_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction

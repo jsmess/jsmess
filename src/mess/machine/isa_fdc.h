@@ -19,8 +19,7 @@
 
 class isa8_fdc_device :
 		public device_t,
-		public device_isa8_card_interface,
-		public device_slot_card_interface
+		public device_isa8_card_interface
 {
 public:
         // construction/destruction

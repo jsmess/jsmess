@@ -24,7 +24,7 @@ const device_type CPC_EXPANSION_SLOT = &device_creator<cpc_expansion_slot_device
 
 
 device_cpc_expansion_card_interface::device_cpc_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_slot_card_interface(mconfig,device)
 {
 }
 

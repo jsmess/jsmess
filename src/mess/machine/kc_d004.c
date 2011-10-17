@@ -132,7 +132,6 @@ const device_type KC_D004 = &device_creator<kc_d004_device>;
 kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
       : device_t(mconfig, KC_D004, "D004", tag, owner, clock),
 		device_kcexp_interface( mconfig, *this ),
-		device_slot_card_interface(mconfig, *this),
 		m_cpu(*this, Z80_TAG),
 		m_fdc(*this, UPD765_TAG)
 {

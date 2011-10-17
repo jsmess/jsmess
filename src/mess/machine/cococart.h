@@ -130,7 +130,7 @@ extern const device_type COCOCART_SLOT;
 
 // ======================> device_cococart_interface
 
-class device_cococart_interface : public device_interface
+class device_cococart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction

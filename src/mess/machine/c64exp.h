@@ -84,7 +84,7 @@ struct c64_expansion_slot_interface
 // ======================> device_c64_expansion_card_interface
 
 // class representing interface-specific live c64_expansion card
-class device_c64_expansion_card_interface : public device_interface
+class device_c64_expansion_card_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction

@@ -239,7 +239,7 @@ extern const device_type S100;
 // ======================> device_s100_card_interface
 
 // class representing interface-specific live s100 card
-class device_s100_card_interface : public device_interface
+class device_s100_card_interface : public device_slot_card_interface
 {
 	friend class s100_device;
 

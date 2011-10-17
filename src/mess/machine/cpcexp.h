@@ -80,7 +80,7 @@ struct cpc_expansion_slot_interface
 // ======================> device_cpc_expansion_card_interface
 
 // class representing interface-specific live cpc_expansion card
-class device_cpc_expansion_card_interface : public device_interface
+class device_cpc_expansion_card_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction

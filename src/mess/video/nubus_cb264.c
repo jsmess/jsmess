@@ -72,16 +72,14 @@ const rom_entry *nubus_cb264_device::device_rom_region() const
 
 nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, NUBUS_CB264, "RasterOps ColorBoard 264 video card", tag, owner, clock),
-		device_nubus_card_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_cb264";
 }
 
 nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, type, name, tag, owner, clock),
-		device_nubus_card_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this)
+		device_nubus_card_interface(mconfig, *this)
 {
 	m_shortname = "nb_cb264";
 }

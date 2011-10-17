@@ -58,8 +58,7 @@ machine_config_constructor isa16_ide_device::device_mconfig_additions() const
 
 isa16_ide_device::isa16_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
       : device_t(mconfig, ISA16_IDE, "ISA16_IDE", tag, owner, clock),
-		device_isa16_card_interface( mconfig, *this ),
-		device_slot_card_interface(mconfig, *this)
+		device_isa16_card_interface( mconfig, *this )
 {
 }
 

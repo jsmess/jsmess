@@ -15,8 +15,7 @@
 
 class nubus_asntm3b_device :
 		public device_t,
-		public device_nubus_card_interface,
-		public device_slot_card_interface
+		public device_nubus_card_interface
 {
 public:
         // construction/destruction

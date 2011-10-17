@@ -159,16 +159,14 @@ const rom_entry *isa8_mda_device::device_rom_region() const
 
 isa8_mda_device::isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, ISA8_MDA, "ISA8_MDA", tag, owner, clock),
-		device_isa8_card_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this)
+		device_isa8_card_interface(mconfig, *this)
 {
 	m_shortname = "mda";
 }
 
 isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, type, name, tag, owner, clock),
-		device_isa8_card_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this)
+		device_isa8_card_interface(mconfig, *this)
 {
 	m_shortname = "mda";
 }

@@ -184,15 +184,13 @@ const device_type COCO_FDC = &device_creator<coco_fdc_device>;
 //-------------------------------------------------
 coco_fdc_device::coco_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  device_cococart_interface( mconfig, *this ),
-	  device_slot_card_interface(mconfig, *this)
+	  device_cococart_interface( mconfig, *this )
 {
 }
 
 coco_fdc_device::coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
       : device_t(mconfig, COCO_FDC, "CoCo FDC", tag, owner, clock),
-		device_cococart_interface( mconfig, *this ),
-		device_slot_card_interface(mconfig, *this)
+		device_cococart_interface( mconfig, *this )
 {
 }
 

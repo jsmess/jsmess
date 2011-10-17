@@ -166,7 +166,6 @@ inline void comx_fd_device::update_ef4()
 comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_FD, "COMX FD", tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
-	device_slot_card_interface(mconfig, *this),
 	m_fdc(*this, WD1770_TAG),
 	m_floppy0(*this, FLOPPY_0),
 	m_floppy1(*this, FLOPPY_1),
