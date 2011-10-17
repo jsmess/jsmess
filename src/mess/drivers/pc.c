@@ -593,6 +593,7 @@ static INPUT_PORTS_START( europc )
 
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
+	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bondwell )
@@ -1562,7 +1563,7 @@ ROM_START( bw230 )
 ROM_END
 
 ROM_START( zdsupers )
-    ROM_REGION(0x100000,"maincpu", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "v31d", "v3.1d" )
 	ROMX_LOAD( "z184m v3.1d.10d", 0xf8000, 0x8000, CRC(44012c3b) SHA1(f2f28979798874386ca8ba3dd3ead24ae7c2aeb4), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v29e", "v2.9e" )
@@ -1593,7 +1594,7 @@ ROM_START( ibmpcjx )
 	ROM_REGION(0x100000,"maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "5601jda", "5601jda" )
 	ROMX_LOAD("5601jda.bin", 0xf0000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6), ROM_BIOS(1))
-    ROMX_LOAD("basicjx.rom",   0xe8000, 0x08000, NO_DUMP, ROM_BIOS(1)) // boot fails due of this.
+	ROMX_LOAD("basicjx.rom",   0xe8000, 0x08000, NO_DUMP, ROM_BIOS(1)) // boot fails due of this.
 	ROM_SYSTEM_BIOS( 1, "unk", "unk" )
 	ROMX_LOAD("ipljx.rom", 0xe0000, 0x20000, CRC(36a7b2de) SHA1(777db50c617725e149bca9b18cf51ce78f6dc548), ROM_BIOS(2))
 
@@ -1690,13 +1691,13 @@ ROM_END
 
 
 ROM_START( t1000tx )
-    ROM_REGION(0x100000,"maincpu", 0)
+	ROM_REGION(0x100000,"maincpu", 0)
 	/* There might be a second 32KB rom, but it seems to work fine with just this one */
-    ROM_LOAD("t1000tx.bin", 0xf8000, 0x8000, CRC(9b34765c) SHA1(0b07e87f6843393f7d4ca4634b832b0c0bec304e))
+	ROM_LOAD("t1000tx.bin", 0xf8000, 0x8000, CRC(9b34765c) SHA1(0b07e87f6843393f7d4ca4634b832b0c0bec304e))
 
-    ROM_REGION(0x08000,"gfx1", 0)
+	ROM_REGION(0x08000,"gfx1", 0)
     // expects 8x9 charset!
-    ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
 ROM_END
 
 
@@ -1835,7 +1836,7 @@ ROM_START( iskr3104 )
 	ROMX_LOAD( "199.bin", 0xfc001, 0x2000, CRC(2da5fe79) SHA1(14d5dccc141a0b3367f7f8a7188306fdf03c2b6c),ROM_SKIP(1))
 	// EGA card from Iskra-3104
 	ROMX_LOAD( "143-03.bin", 0xc0001, 0x2000, CRC(d0706345) SHA1(e04bb40d944426a4ae2e3a614d3f4953d7132ede),ROM_SKIP(1))
-    ROMX_LOAD( "143-02.bin", 0xc0000, 0x2000, CRC(c8c18ebb) SHA1(fd6dac76d43ab8b582e70f1d5cc931d679036fb9),ROM_SKIP(1))
+	ROMX_LOAD( "143-02.bin", 0xc0000, 0x2000, CRC(c8c18ebb) SHA1(fd6dac76d43ab8b582e70f1d5cc931d679036fb9),ROM_SKIP(1))
 ROM_END
 
 ROM_START( poisk1 )
@@ -1899,7 +1900,7 @@ ROM_END
 
 ROM_START( mc1502 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
-    ROM_LOAD( "basic.rom",		  0xe8000, 0x8000, CRC(173d69fa) SHA1(003f872e12f00800e22ab6bbc009d36bfde67b9d))
+	ROM_LOAD( "basic.rom",		  0xe8000, 0x8000, CRC(173d69fa) SHA1(003f872e12f00800e22ab6bbc009d36bfde67b9d))
 	ROM_SYSTEM_BIOS(0, "v50", "v5.0")
 	ROMX_LOAD( "monitor_5_0.rom",  0xfc000, 0x4000, CRC(9e97c6a0) SHA1(16a304e8de69ec4d8b92acda6bf28454c361a24f),ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v52", "v5.2")
@@ -1912,8 +1913,8 @@ ROM_END
 
 ROM_START( m24 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
-    ROMX_LOAD("olivetti_m24_version_1.43_high.bin",0xfc001, 0x2000, CRC(04e697ba) SHA1(1066dcc849e6289b5ac6372c84a590e456d497a6), ROM_SKIP(1))
-    ROMX_LOAD("olivetti_m24_version_1.43_low.bin", 0xfc000, 0x2000, CRC(ff7e0f10) SHA1(13423011a9bae3f3193e8c199f98a496cab48c0f), ROM_SKIP(1))
+	ROMX_LOAD("olivetti_m24_version_1.43_high.bin",0xfc001, 0x2000, CRC(04e697ba) SHA1(1066dcc849e6289b5ac6372c84a590e456d497a6), ROM_SKIP(1))
+	ROMX_LOAD("olivetti_m24_version_1.43_low.bin", 0xfc000, 0x2000, CRC(ff7e0f10) SHA1(13423011a9bae3f3193e8c199f98a496cab48c0f), ROM_SKIP(1))
 
 	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
 	ROM_REGION(0x2000,"gfx1", 0)
@@ -1940,9 +1941,9 @@ ROM_START( ibm5550 )
 ROM_END
 
 ROM_START( pc7000 )
-    ROM_REGION16_LE(0x100000,"maincpu", 0)
-    ROMX_LOAD( "mitsubishi-m5l27128k-1.bin", 0xf8000, 0x4000, CRC(9683957f) SHA1(4569eab6d88eb1bba0d553d1358e593c326978aa), ROM_SKIP(1))
-    ROMX_LOAD( "mitsubishi-m5l27128k-2.bin", 0xf8001, 0x4000, CRC(99b229a4) SHA1(5800c8bafed26873d8cfcc79a05f93a780a31c91), ROM_SKIP(1))
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROMX_LOAD( "mitsubishi-m5l27128k-1.bin", 0xf8000, 0x4000, CRC(9683957f) SHA1(4569eab6d88eb1bba0d553d1358e593c326978aa), ROM_SKIP(1))
+	ROMX_LOAD( "mitsubishi-m5l27128k-2.bin", 0xf8001, 0x4000, CRC(99b229a4) SHA1(5800c8bafed26873d8cfcc79a05f93a780a31c91), ROM_SKIP(1))
 
 	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
 	ROM_REGION(0x2000,"gfx1", 0)
@@ -1955,39 +1956,39 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR     NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1984,	dgone,      ibm5150,	0,	pccga,  	pccga,		pccga,	"Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
-COMP(  1985,	bw230,      ibm5150,	0,	pccga,		bondwell,   bondwell,   "Bondwell Holding",  "BW230 (PRO28 Series)", 0 )
-COMP(  1988,	europc,     ibm5150,	0,	europc, 	europc,		europc,     "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
+/*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY            FULLNAME */
+COMP( 1984, dgone,      ibm5150,    0,          pccga,      pccga,      pccga,      "Data General", "Data General/One" , GAME_NOT_WORKING)/* CGA, 2x 3.5" disk drives */
+COMP( 1985, bw230,      ibm5150,    0,          pccga,      bondwell,   bondwell,   "Bondwell Holding", "BW230 (PRO28 Series)", 0 )
+COMP( 1988, europc,     ibm5150,    0,          europc,     europc,     europc,     "Schneider Rdf. AG", "EURO PC", GAME_NOT_WORKING)
 
 // pcjr (better graphics, better sound)
-COMP(  1983,	ibmpcjr,    ibm5150,	0,	ibmpcjr,	tandy1t,	pcjr,       "International Business Machines",  "IBM PC Jr", GAME_IMPERFECT_COLORS )
-COMP(  1985,	ibmpcjx,    ibm5150,	0,	ibmpcjx,    tandy1t,	pcjr,       "International Business Machines",  "IBM PC JX", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING)
+COMP( 1983, ibmpcjr,    ibm5150,    0,          ibmpcjr,    tandy1t,    pcjr,       "International Business Machines", "IBM PC Jr", GAME_IMPERFECT_COLORS )
+COMP( 1985, ibmpcjx,    ibm5150,    0,          ibmpcjx,    tandy1t,    pcjr,       "International Business Machines", "IBM PC JX", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING)
 
 // tandy 1000
-COMP(  1987,	t1000hx,    ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000 HX", 0)
-COMP(  1987,	t1000sx,    ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000 SX", GAME_NOT_WORKING)
-COMP(  1987,	t1000tx,    ibm5150,	0,	t1000_286,  tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000 TX", 0)
-COMP(  1989,	t1000rl,    ibm5150,	0,	t1000_16,   tandy1t,    t1000hx,    "Tandy Radio Shack",  "Tandy 1000 RL", 0)
-COMP ( 1989,	t1000tl2,	ibm5150,	 0, t1000_286,	tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000 TL/2", 0)
+COMP( 1987, t1000hx,    ibm5150,    0,          t1000hx,    tandy1t,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 HX", 0)
+COMP( 1987, t1000sx,    ibm5150,    0,          t1000hx,    tandy1t,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 SX", GAME_NOT_WORKING)
+COMP( 1987, t1000tx,    ibm5150,    0,          t1000_286,  tandy1t,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 TX", 0)
+COMP( 1989, t1000rl,    ibm5150,    0,          t1000_16,   tandy1t,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 RL", 0)
+COMP( 1989, t1000tl2,   ibm5150,    0,          t1000_286,  tandy1t,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 TL/2", 0)
 
-COMP ( 1989,	iskr1031,   ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-1031" , GAME_NOT_WORKING)
-COMP ( 1989,	iskr1030m,  ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-1030M" , GAME_NOT_WORKING)
-COMP ( 19??,	iskr3104,   ibm5150,	0,	iskr3104,	pcega,	pccga,	"<unknown>",  "Iskra-3104" , GAME_NOT_WORKING)
-COMP ( 1987,	ec1840,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1840" , GAME_NOT_WORKING)
-COMP ( 1987,	ec1841,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1841" , GAME_NOT_WORKING)
-COMP ( 1989,	ec1845,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1845" , GAME_NOT_WORKING)
-COMP ( 1989,	mk88,       ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "MK-88" , GAME_NOT_WORKING)
-COMP ( 1990,	poisk1,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Poisk-1" , GAME_NOT_WORKING)
-COMP ( 1991,	poisk2,     ibm5150,	0,	poisk2,		pccga,	pccga,	"<unknown>",  "Poisk-2" , GAME_NOT_WORKING)
-COMP ( 1990,	mc1702,     ibm5150,	0,	pccga,		pccga,	pccga,	"<unknown>",  "Elektronika MC-1702" , GAME_NOT_WORKING)
-COMP ( 19??,	mc1502,     ibm5150,	0,	mc1502,		pccga,	pccga,	"<unknown>",  "Elektronika MC-1502" , GAME_NOT_WORKING)
+COMP( 1989, iskr1031,   ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "Iskra-1031", GAME_NOT_WORKING)
+COMP( 1989, iskr1030m,  ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "Iskra-1030M", GAME_NOT_WORKING)
+COMP( 19??, iskr3104,   ibm5150,    0,          iskr3104,   pcega,      pccga,      "<unknown>", "Iskra-3104", GAME_NOT_WORKING)
+COMP( 1987, ec1840,     ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "EC-1840", GAME_NOT_WORKING)
+COMP( 1987, ec1841,     ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "EC-1841", GAME_NOT_WORKING)
+COMP( 1989, ec1845,     ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "EC-1845", GAME_NOT_WORKING)
+COMP( 1989, mk88,       ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "MK-88", GAME_NOT_WORKING)
+COMP( 1990, poisk1,     ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "Poisk-1", GAME_NOT_WORKING)
+COMP( 1991, poisk2,     ibm5150,    0,          poisk2,     pccga,      pccga,      "<unknown>", "Poisk-2", GAME_NOT_WORKING)
+COMP( 1990, mc1702,     ibm5150,    0,          pccga,      pccga,      pccga,      "<unknown>", "Elektronika MC-1702", GAME_NOT_WORKING)
+COMP( 19??, mc1502,     ibm5150,    0,          mc1502,     pccga,      pccga,      "<unknown>", "Elektronika MC-1502", GAME_NOT_WORKING)
 
-COMP(  1987,	zdsupers,   ibm5150,	0,	zenith,		pccga,	pccga,	"Zenith Data Systems",  "SuperSport" , 0)
+COMP( 1987, zdsupers,   ibm5150,    0,          zenith,     pccga,      pccga,      "Zenith Data Systems", "SuperSport", 0)
 
-COMP ( 1983,	m24,        ibm5150,	0,	olivetti,	pccga,	pccga,	"Olivetti",  "M24" , GAME_NOT_WORKING)
-COMP ( 1987,	m240,       ibm5150,	0,	olivetti,	pccga,	pccga,	"Olivetti",  "M240" , GAME_NOT_WORKING)
+COMP( 1983, m24,        ibm5150,    0,          olivetti,   pccga,      pccga,      "Olivetti", "M24", GAME_NOT_WORKING)
+COMP( 1987, m240,       ibm5150,    0,          olivetti,   pccga,      pccga,      "Olivetti", "M240", GAME_NOT_WORKING)
 
-COMP ( 1983,	ibm5550,    ibm5150,	0,	ibm5550,	pccga,	pccga,	"IBM",  "5550" , GAME_NOT_WORKING)
+COMP( 1983, ibm5550,    ibm5150,    0,          ibm5550,    pccga,      pccga,      "International Business Machines", "IBM 5550", GAME_NOT_WORKING)
 
-COMP(  1985,	pc7000,      ibm5150,	0,	pccga,  	pccga,		pccga,	"Sharp",  "PC-7000" , GAME_NOT_WORKING)
+COMP( 1985, pc7000,     ibm5150,    0,          pccga,      pccga,      pccga,      "Sharp", "PC-7000", GAME_NOT_WORKING)
