@@ -357,7 +357,8 @@ static const isa16bus_interface isabus_intf =
 	DEVCB_DEVICE_LINE("dma8237_2", i8237_dreq3_w),
 };
 
-static SLOT_INTERFACE_START(pc_isa8_cards)
+static SLOT_INTERFACE_START(pc_isa16_cards)
+	// ISA 8 bit
 	SLOT_INTERFACE("mda", ISA8_MDA)
 	SLOT_INTERFACE("com", ISA8_COM)
 	SLOT_INTERFACE("comat", ISA8_COM_AT)
@@ -368,9 +369,7 @@ static SLOT_INTERFACE_START(pc_isa8_cards)
 	SLOT_INTERFACE("gblaster", ISA8_GAME_BLASTER)
 	SLOT_INTERFACE("sblaster", ISA8_SOUND_BLASTER_1_0)
 	SLOT_INTERFACE("ne1000", NE1000)
-SLOT_INTERFACE_END
-
-static SLOT_INTERFACE_START(pc_isa16_cards)
+	// ISA 16 bit
 	SLOT_INTERFACE("ide", ISA16_IDE)
 	SLOT_INTERFACE("ne2000", NE2000)
 SLOT_INTERFACE_END
@@ -409,9 +408,9 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 
 	MCFG_FRAGMENT_ADD( at_motherboard )
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
-	MCFG_ISA8_SLOT_ADD("isabus","isa1", pc_isa8_cards, "fdc", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
-	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "comat", NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_ega )
 
@@ -446,9 +445,9 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_FRAGMENT_ADD( at_motherboard )
 
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
-	MCFG_ISA8_SLOT_ADD("isabus","isa1", pc_isa8_cards, "fdc", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
-	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "comat", NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 
@@ -468,9 +467,9 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	MCFG_FRAGMENT_ADD( at_motherboard )
 
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
-	MCFG_ISA8_SLOT_ADD("isabus", "isa1", pc_isa8_cards, "fdc", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
-	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "comat", NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
@@ -490,9 +489,9 @@ static MACHINE_CONFIG_START( neat, at_state )
 	MCFG_FRAGMENT_ADD( at_motherboard )
 
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
-	MCFG_ISA8_SLOT_ADD("isabus", "isa1", pc_isa8_cards, "fdc", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus", "isa1", pc_isa16_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus", "isa2", pc_isa16_cards, "ide", NULL)
-	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus", "isa3", pc_isa16_cards, "comat", NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 
@@ -513,9 +512,9 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_FRAGMENT_ADD( at_motherboard )
 
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
-	MCFG_ISA8_SLOT_ADD("isabus", "isa1", pc_isa8_cards, "fdc", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
-	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "comat", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, "ne2000", NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
@@ -535,9 +534,9 @@ static MACHINE_CONFIG_START( xb42639, at_state )
 	MCFG_FRAGMENT_ADD( at_motherboard )
 
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
-	MCFG_ISA8_SLOT_ADD("isabus", "isa1", pc_isa8_cards, "fdc", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
-	MCFG_ISA8_SLOT_ADD("isabus","isa3", pc_isa8_cards, "comat", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "comat", NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
