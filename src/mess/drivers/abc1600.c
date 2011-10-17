@@ -26,6 +26,7 @@
     - hard disk
 		- 4105 sasi interface card
 		- sasi interface
+			- implement command 0x08 READ (legacy)
 		- Xebec S1410 card
 		- necd5126a HDD (http://stason.org/TULARC/pc/hard-drives-hdd/nec/D5126-20MB-5-25-HH-MFM-ST506.html)
 			chdman -createblankhd necd5126a.chd 615 4 17 512
@@ -586,7 +587,7 @@ offs_t abc1600_state::translate_address(offs_t offset, int *nonx, int *wp)
 
 	if (PAGE_NONX)
 	{
-		logerror("Bus error %06x : %06x\n", offset, virtual_offset);
+		//logerror("Bus error %06x : %06x\n", offset, virtual_offset);
 		//m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		//m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
