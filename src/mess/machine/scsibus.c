@@ -32,6 +32,14 @@ struct _scsibus_t
 {
 	SCSIInstance            *devices[8];
 	const SCSIBus_interface *interface;
+	
+	devcb_resolved_write_line out_bsy_func;
+	devcb_resolved_write_line out_sel_func;
+	devcb_resolved_write_line out_cd_func;
+	devcb_resolved_write_line out_io_func;
+	devcb_resolved_write_line out_msg_func;
+	devcb_resolved_write_line out_req_func;
+	devcb_resolved_write_line out_rst_func;
 
 	UINT8       linestate;
 	UINT8       last_id;
@@ -732,6 +740,17 @@ static void scsi_out_line_change_now(device_t *device, UINT8 line, UINT8 state)
 
     if(bus->interface->line_change_cb!=NULL)
         bus->interface->line_change_cb(device,line,state);
+	
+	switch (line)
+	{
+	case SCSI_LINE_BSY: bus->out_bsy_func(state); break;
+	case SCSI_LINE_SEL: bus->out_sel_func(state); break;
+	case SCSI_LINE_CD: bus->out_cd_func(state); break;
+	case SCSI_LINE_IO: bus->out_io_func(state); break;
+	case SCSI_LINE_MSG: bus->out_msg_func(state); break;
+	case SCSI_LINE_REQ: bus->out_req_func(state); break;
+	case SCSI_LINE_RESET: bus->out_rst_func(state); break;
+	}
 }
 
 static void scsi_out_line_req(device_t *device, UINT8 state)
@@ -904,6 +923,14 @@ static DEVICE_START( scsibus )
     bus->interface = (const SCSIBus_interface*)device->static_config();
 
 	memset(bus->devices, 0, sizeof(bus->devices));
+	
+	bus->out_bsy_func.resolve(bus->interface->out_bsy_func, *device);
+	bus->out_sel_func.resolve(bus->interface->out_sel_func, *device);
+	bus->out_cd_func.resolve(bus->interface->out_cd_func, *device);
+	bus->out_io_func.resolve(bus->interface->out_io_func, *device);
+	bus->out_msg_func.resolve(bus->interface->out_msg_func, *device);
+	bus->out_req_func.resolve(bus->interface->out_req_func, *device);
+	bus->out_rst_func.resolve(bus->interface->out_rst_func, *device);
 
     // Flag not initialised
     bus->initialised=0;

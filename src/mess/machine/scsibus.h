@@ -158,6 +158,14 @@ struct _SCSIBus_interface
 {
     const SCSIConfigTable *scsidevs;		/* SCSI devices */
     void (*line_change_cb)(device_t *device, UINT8 line, UINT8 state);
+
+	devcb_write_line out_bsy_func;
+	devcb_write_line out_sel_func;
+	devcb_write_line out_cd_func;
+	devcb_write_line out_io_func;
+	devcb_write_line out_msg_func;
+	devcb_write_line out_req_func;
+	devcb_write_line out_rst_func;
 };
 
 /* SCSI Bus read/write */
