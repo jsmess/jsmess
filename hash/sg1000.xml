@@ -68,7 +68,7 @@ R-044 黑白棋 / Hēibái qí -> G-1044 Othello [dumped]
 W-045 太空侵略戰 / Tàikōng qīnlüè zhàn -> G-1045 Space Invaders [dumped]
 R-046 精武門 / Jīng wǔmén -> C-46 Dragon Wang [2 taiwanese ROM variations dumped]
 R-047 火狐狸 / Huǒ húlí -> C-47 Zoom 909 [dumped]
-R-048 飛狼 / Fēi láng -> C-48 Choplifter [2 taiwanese ROM variations dumped]
+R-048 飛狼 / Fēi láng -> C-48 Choplifter [3 taiwanese ROM variations dumped]
 R-049 法櫃奇兵 / Fǎ guì qíbīng -> C-49 Pitfall II [2 taiwanese ROM variations dumped]
 R-050 企鵝 / Qì'é -> C-50 Doki Doki Penguin Land [dumped]
 R-051 救難小英雄 / Jiùnàn xiǎo yīngxióng -> C-51 Drol [dumped]
@@ -92,8 +92,12 @@ R-068 頑皮鬼 / Wánpí guǐ -> C-64 C_So! [dumped]
 R-069 花式撞球 / Huā shì zhuàngqiú -> C-71 Champion Billiards [dumped]
 R-070 桃太郎 / Táotàiláng -> C-69 Wonder Boy [dumped]
 
-R-103 功夫 -> Gōngfu (Yie Ar Kung-Fu conversion from MSX1)
-R-108 乒乓球 -> Pīngpāng qiú (Konami Ping Pong conversion from MSX1)
+R-101 奧運二代 / Àoyùn èr dài -> Hyper Sports 2 conversion from MSX1
+R-102 魔鬼樹 / Móguǐ shù -> Magical Tree conversion from MSX1
+R-103 功夫 / Gōngfu -> Yie Ar Kung-Fu conversion from MSX1
+R-104 娃娃歷險 / Wáwá lìxiǎn -> Cabbage Patch Kids conversion from MSX1
+R-108 乒乓球 / Pīngpāng qiú -> Konami Ping Pong conversion from MSX1
+R-112 馬戲團 / Mǎxì tuán -> Circus Charlie conversion from MSX1
 
 
 Some alternate Aaronix taiwanese carts with generic label contain a regular JP build
@@ -239,6 +243,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="borderline (japan, europe).bin" size="16384" crc="0b4bca74" sha1="b967340fa91d960f86548f15e6d25a8e7e2c5043" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cabkids">
+		<!-- Serial: R-104 - Alt Title: 娃娃歷險 ~ Wáwá lìxiǎn -->
+		<description>Cabbage Patch Kids (Tw)</description>
+		<year>198?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="cabbage patch kids (tw).bin" size="32768" crc="9d91ab78" sha1="5c011f37f4fcbaa72167293a9917bb6af0e30b55" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -584,13 +600,26 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="feilanga" cloneof="choplift">
 		<!-- Serial: R-048 - Alt Title: Fēi láng ~ 飛狼 -->
-		<description>Fei Lang (Tw, Alt)</description>
+		<description>Fei Lang ~ Choplifter (Tw, Alt)</description>
 		<!-- This version has the English title screen after the Chinese title -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="choplifter [english logo] (tw).bin" size="32768" crc="7c603987" sha1="61d1afe62b2be0da26d8a185828387063dd4b06e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chopliftt" cloneof="choplift">
+		<!-- Serial: R-048 - Alt Title: Fēi láng ~ 飛狼 (cart) -->
+		<description>Choplifter (Tw)</description>
+		<!-- This version has the no Chinese title -->
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="choplifter [no logo] (tw).bin" size="32768" crc="825e1aae" sha1="daf36c050b0e507d2f2470050299a648716c9158" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -615,6 +644,30 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="championship lode runner (tw).bin" size="32768" crc="ec95ebcb" sha1="321e2c97645dd9af3e52c66b5db06304250d1bf2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccharlie">
+		<!-- Serial: R-112 - Alt Title: 馬戲團 ~ Mǎxì tuán -->
+		<description>Maxi Tuan ~ Circus Charlie (Tw)</description>
+		<year>198?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="circus charlie (tw).bin" size="32768" crc="3404fce4" sha1="67ec5859d293d9236d21b71e63580b6a53b90244" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccharliek" cloneof="ccharlie">
+		<!-- Serial:  - Alt Title:  -->
+		<description>Circus Charlie (Kor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="circus charlie (kr).bin" size="32768" crc="7f7f009d" sha1="34899ad454a56826d53028bef8fed7f5d2c6a78a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -980,6 +1033,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="gulkavek" cloneof="gulkave">
+		<!-- Serial:  - Alt Title:  -->
+		<description>Gulkave (Kor)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="gulkave (kr).bin" size="32768" crc="ddcb708b" sha1="deabfe970bb450e51909c181430e7de2bd1b1a9e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="guzzler">
 		<!-- Serial: OM-G002 - Release Date: 1983-11-30 - Alt Title: ガズラー -->
 		<description>Guzzler (Jpn, OMV)</description>
@@ -1148,6 +1213,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="hypersp2">
+		<!-- Serial: R-101 - Alt Title: 奧運二代 ~ Àoyùn èr dài -->
+		<description>Hyper Sports 2 (Tw)</description>
+		<year>198?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="hyper sports 2 (tw).bin" size="32768" crc="b0234e12" sha1="33072bafc25b83577886e91a75d0b6439a80374c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jb007">
 		<!-- Serial: OM-G008 - Alt Title: ダブルオーセブン ジェームス・ボンド -->
 		<description>007 James Bond (Jpn, v2.7, OMV)</description>
@@ -1215,6 +1292,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="lode runner (tw).bin" size="32768" crc="d953bdb7" sha1="fb226a489e5a47eb0182a067fa1031ec944ab455" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magtree">
+		<!-- Serial: R-102 - Alt Title: Móguǐ shù ~ 魔鬼樹 -->
+		<description>Magical Tree (Tw)</description>
+		<year>198?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="magical tree (tw).bin" size="32768" crc="b3a8291a" sha1="2aecbc9429060ee3adfc865369f67f53408a5881" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2004,6 +2093,18 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="super tank (japan).bin" size="32768" crc="084cc13e" sha1="58d7d51b91b763d812376d56643a4f8a331e826b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supertnkk" cloneof="supertnk">
+		<!-- Serial:  - Alt Title:  -->
+		<description>Super Tank (Kor)</description>
+		<year>1986?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="super tank (kr).bin" size="32768" crc="4c48b7ac" sha1="0a49de909b07b69a24b5c02ad08446e2cd1787d2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -13306,6 +13306,18 @@ Undumped Pirates:
 		</part>
 	</software>
 
+	<software name="sewingos">
+		<!-- Serial: DMG-BRAE-USA - Release Date:  - Notes: bundled with Singer IZEK Sewing Machine -->
+		<description>Singer Sewing Machine Operation Software (USA)</description>
+		<year>2000</year>
+		<publisher>Natsume</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="sewing machine operation software (usa) (en,fr,es).bin" size="1048576" crc="e42fd7c4" sha1="a05a67f2d29bf29c56c9533c172da02ee0ad26b1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="smurfsni">
 		<!-- Serial: CGB-ASNE? - Release Date:  - Notes: GBC only -->
 		<description>The Smurfs Nightmare (Euro)</description>
