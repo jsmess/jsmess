@@ -26524,7 +26524,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="ttoon3">
-		<description>Tiny Toon Adventures 3 (Rus)</description>
+	<!-- Serial: MT-601 -->
+		<description>Tiny Toon Adventures 3 (Tw)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
