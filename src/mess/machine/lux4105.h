@@ -61,6 +61,8 @@ protected:
 	virtual void abc1600bus_c4(UINT8 data);
 	
 private:
+	inline void update_trrq_int();
+		
 	abc1600bus_slot_device *m_slot;
 
 	required_device<device_t> m_sasibus;

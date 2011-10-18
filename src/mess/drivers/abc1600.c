@@ -255,16 +255,16 @@ UINT8 abc1600_state::read_io(offs_t offset)
 		m_bus2->cs_w(cs);
 		
 		// card select b?
-		m_csb = m_bus0i->csb_r();
-		m_csb |= m_bus2->csb_r() << 1;
-		m_csb |= m_bus0x->csb_r() << 2;
-		m_csb |= m_bus1->csb_r() << 3;
-		m_csb |= m_bus0x->xcsb2_r() << 4;
-		m_csb |= m_bus0x->xcsb3_r() << 5;
-		m_csb |= m_bus0x->xcsb4_r() << 6;
-		m_csb |= m_bus0x->xcsb5_r() << 7;
+		m_csb = m_bus2->csb_r();
+		m_csb |= m_bus1->csb_r() << 1;
+		m_csb |= m_bus0x->xcsb2_r() << 2;
+		m_csb |= m_bus0x->xcsb3_r() << 3;
+		m_csb |= m_bus0x->xcsb4_r() << 4;
+		m_csb |= m_bus0x->xcsb5_r() << 5;
+		m_csb |= m_bus0x->csb_r() << 6;
+		m_csb |= m_bus0i->csb_r() << 7;
 		
-		m_bus0 = !((m_csb & 0xf5) == 0xf5);
+		m_bus0 = !((m_csb & 0xfc) == 0xfc);
 		
 		if (X11)
 		{
@@ -278,7 +278,44 @@ UINT8 abc1600_state::read_io(offs_t offset)
 			else
 			{
 				// RCSB
-				data = m_csb;
+				if (m_bus0)
+				{
+					/*
+						
+						bit		description
+						
+						0		1
+						1		1
+						2		LXCSB2*
+						3		LXCSB3*
+						4		LXCSB4*
+						5		LXCSB5*
+						6		LCSB*-0
+						7		LCSB*-0I
+						
+					*/
+					
+					data = (m_csb & 0xfc) | 0x03;
+				}
+				else
+				{
+					/*
+						
+						bit		description
+						
+						0		LCSB*-2
+						1		LCSB*-1
+						2		1
+						3		1
+						4		1
+						5		1
+						6		1
+						7		1
+						
+					*/
+
+					data = 0xfc | (m_csb & 0x03);
+				}
 
 				logerror("%s RCSB %02x\n", machine().describe_context(), data);
 			}
@@ -1657,7 +1694,7 @@ static ABC1600BUS_INTERFACE( bus1_intf )
 static ABC1600BUS_INTERFACE( bus2_intf )
 {
 	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa0_w),
-	DEVCB_NULL,
+	DEVCB_NULL, // DEVCB_DEVICE_LINE_MEMBER(Z8410AB1_2_TAG, z80dma_device, iei_w) inverted
 	DEVCB_DEVICE_LINE_MEMBER(Z8410AB1_2_TAG, z80dma_device, rdy_w)
 };
 

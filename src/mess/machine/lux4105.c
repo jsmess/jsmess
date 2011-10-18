@@ -45,6 +45,8 @@ WRITE_LINE_MEMBER( luxor_4105_device::sasi_io_w )
 	}
 	
 	m_io = state;
+	
+	update_trrq_int();
 }
 
 WRITE_LINE_MEMBER( luxor_4105_device::sasi_req_w )
@@ -54,17 +56,7 @@ WRITE_LINE_MEMBER( luxor_4105_device::sasi_req_w )
 		set_scsi_line(m_sasibus, SCSI_LINE_ACK, 1);
 	}
 
-	if (BIT(m_dma, 6))
-	{
-		m_slot->trrq_w(state);
-	}
-	else
-	{
-		if (BIT(m_dma, 7))
-		{
-			m_slot->int_w(state ? CLEAR_LINE : ASSERT_LINE);
-		}
-	}
+	update_trrq_int();
 }
 
 static const SCSIBus_interface sasi_intf =
@@ -121,6 +113,27 @@ ioport_constructor luxor_4105_device::device_input_ports() const
 }
 
 
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+inline void luxor_4105_device::update_trrq_int()
+{
+	int cd = get_scsi_line(m_sasibus, SCSI_LINE_CD);
+	int req = get_scsi_line(m_sasibus, SCSI_LINE_REQ);
+	int trrq = !(cd & !req);
+
+	if (BIT(m_dma, 5))
+	{
+		m_slot->int_w(trrq ? CLEAR_LINE : ASSERT_LINE);
+	}
+
+	if (BIT(m_dma, 6))
+	{
+		m_slot->trrq_w(trrq);
+	}
+}
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -163,6 +176,8 @@ void luxor_4105_device::device_reset()
 	
 	set_scsi_line(m_sasibus, SCSI_LINE_RESET, 0);
 	set_scsi_line(m_sasibus, SCSI_LINE_RESET, 1);
+	
+	m_slot->trrq_w(1);
 }
 
 
@@ -221,7 +236,7 @@ UINT8 luxor_4105_device::abc1600bus_stat()
 			3		?
 			4		
 			5		
-			6		
+			6		? (tested at 014D9A, after command 08 sent and 1 byte read from SASI, should be 1)
 			7		
 			
 		*/
@@ -229,6 +244,7 @@ UINT8 luxor_4105_device::abc1600bus_stat()
 		data = !get_scsi_line(m_sasibus, SCSI_LINE_BSY);
 		data |= !get_scsi_line(m_sasibus, SCSI_LINE_REQ) << 2;
 		data |= !get_scsi_line(m_sasibus, SCSI_LINE_CD) << 3;
+		data |= !get_scsi_line(m_sasibus, SCSI_LINE_IO) << 6;
 		/*
 		data |= !get_scsi_line(m_sasibus, SCSI_LINE_IO) << 1;
 		data |= !get_scsi_line(m_sasibus, SCSI_LINE_MSG) << 3;
@@ -338,12 +354,14 @@ void luxor_4105_device::abc1600bus_c4(UINT8 data)
 			2
 			3
 			4
-			5		interrupts?
-			6		DMA/CPU mode
-			7		interrupts?
+			5		byte interrupt enable?
+			6		DMA/CPU mode (1=DMA, 0=CPU)?
+			7		error interrupt enable?
 			
 		*/
 
 		m_dma = data;
+
+		update_trrq_int();
 	}
 }
