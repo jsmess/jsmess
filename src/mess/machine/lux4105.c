@@ -49,13 +49,21 @@ WRITE_LINE_MEMBER( luxor_4105_device::sasi_io_w )
 
 WRITE_LINE_MEMBER( luxor_4105_device::sasi_req_w )
 {
+	if (state)
+	{
+		set_scsi_line(m_sasibus, SCSI_LINE_ACK, 1);
+	}
+
 	if (BIT(m_dma, 6))
 	{
 		m_slot->trrq_w(state);
 	}
 	else
 	{
-		m_slot->int_w(state ? CLEAR_LINE : ASSERT_LINE);
+		if (BIT(m_dma, 7))
+		{
+			m_slot->int_w(state ? CLEAR_LINE : ASSERT_LINE);
+		}
 	}
 }
 
@@ -248,6 +256,11 @@ UINT8 luxor_4105_device::abc1600bus_inp()
 		else
 		{
 			data = scsi_data_r(m_sasibus);
+
+			if (!get_scsi_line(m_sasibus, SCSI_LINE_REQ))
+			{
+				set_scsi_line(m_sasibus, SCSI_LINE_ACK, 0);
+			}	
 		}
 	}
 	
@@ -271,7 +284,7 @@ void luxor_4105_device::abc1600bus_out(UINT8 data)
 		
 			if (!get_scsi_line(m_sasibus, SCSI_LINE_REQ))
 			{
-				set_scsi_line(m_sasibus, SCSI_LINE_ACK, 1);
+				set_scsi_line(m_sasibus, SCSI_LINE_ACK, 0);
 			}	
 		}
 	}
