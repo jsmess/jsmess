@@ -33,7 +33,7 @@
 #define MC68008P8_TAG		"3f"
 #define Z8410AB1_0_TAG		"5g"
 #define Z8410AB1_1_TAG		"7g"
-#define Z8410AB1_2_TAG		"8g"
+#define Z8410AB1_2_TAG		"9g"
 #define Z8470AB1_TAG		"17b"
 #define Z8530B1_TAG			"2a"
 #define Z8536B1_TAG			"15b"
