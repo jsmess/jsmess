@@ -3327,7 +3327,7 @@
 
 	<software name="darkman">
 		<!-- Serial: DMG-DN? - Release Date:  -->
-		<description>Darkman (USA)</description>
+		<description>Darkman (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="gameboy_cart">
