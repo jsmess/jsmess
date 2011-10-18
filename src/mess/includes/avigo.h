@@ -65,9 +65,10 @@ public:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_READ8_MEMBER(port_04_r);
 
-	INPUT_CHANGED_MEMBER(pen_irq);
-	INPUT_CHANGED_MEMBER(kb_irq);
-	INPUT_CHANGED_MEMBER(power_down_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(pen_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(pen_move_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(power_down_irq);
 
 	// defined in video/avigo.c
 	virtual void video_start();
@@ -86,8 +87,6 @@ public:
 	intelfsh8_device *	m_flashes[3];
 	int 				m_flash_at_0x4000;
 	int 				m_flash_at_0x8000;
-	int 				m_ox;
-	int 				m_oy;
 	unsigned int		m_ad_value;
 	UINT8 *				m_video_memory;
 	UINT8				m_screen_column;

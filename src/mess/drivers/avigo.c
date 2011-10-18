@@ -54,9 +54,8 @@
         TODO:
 			- Found a way to emulate the touchscreen panel out of the screen
     		  area (the six buttons at the bottom)
-			- Sketch doesn't work, something is wrong with the pen irq
 			- Alarm doesn't work
-			- Added the facility to load app file into flash memory
+			- Add the facility to load app file into flash memory
 			- Serial communications and IR port.
 
             I don't have any documentation on the hardware, so a lot of this
@@ -579,9 +578,23 @@ INPUT_CHANGED_MEMBER( avigo_state::pen_irq )
 {
 	LOG(("pen pressed interrupt\n"));
 
+	// an irq is generated when the pen is pressed down on the screen
+	// or lifted up from the screen
 	m_irq |= (1<<6);
 
 	refresh_ints();
+}
+
+INPUT_CHANGED_MEMBER( avigo_state::pen_move_irq )
+{
+	// an irq is generated when the pen is down on the screen and is being moved
+	if (input_port_read(machine(), "LINE3") & 0x01)
+	{
+		LOG(("pen move interrupt\n"));
+		m_irq |= (1<<6);
+
+		refresh_ints();
+	}
 }
 
 INPUT_CHANGED_MEMBER( avigo_state::kb_irq )
@@ -630,10 +643,10 @@ static INPUT_PORTS_START(avigo)
 
 	/* these two ports are used to emulate the position of the pen/stylus on the screen */
 	PORT_START("POSX") /* Mouse - X AXIS */
-	PORT_BIT(0x3ff, 0x060, IPT_LIGHTGUN_X) PORT_SENSITIVITY(100) PORT_CROSSHAIR(X, 1, 0, 0) PORT_MINMAX(0x060, 0x3a0) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT(0x3ff, 0x060, IPT_LIGHTGUN_X) PORT_SENSITIVITY(100) PORT_CROSSHAIR(X, 1, 0, 0) PORT_MINMAX(0x060, 0x3a0) PORT_KEYDELTA(10) PORT_PLAYER(1)				PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, pen_move_irq, NULL )
 
 	PORT_START("POSY") /* Mouse - Y AXIS */
-	PORT_BIT(0x3ff, 0x044, IPT_LIGHTGUN_Y) PORT_SENSITIVITY(100) PORT_CROSSHAIR(Y, 1, 0, 0) PORT_MINMAX(0x044, 0x350) PORT_INVERT PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT(0x3ff, 0x044, IPT_LIGHTGUN_Y) PORT_SENSITIVITY(100) PORT_CROSSHAIR(Y, 1, 0, 0) PORT_MINMAX(0x044, 0x350) PORT_INVERT PORT_KEYDELTA(10) PORT_PLAYER(1)	PORT_CHANGED_MEMBER( DEVICE_SELF, avigo_state, pen_move_irq, NULL )
 INPUT_PORTS_END
 
 /* F4 Character Displayer */
