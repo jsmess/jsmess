@@ -1490,6 +1490,8 @@ static TIMER_CALLBACK( supracan_hbl_callback )
 {
 	supracan_state *state = machine.driver_data<supracan_state>();
 
+	device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+
 	state->m_hbl_timer->adjust(attotime::never);
 }
 
