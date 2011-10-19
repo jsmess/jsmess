@@ -127,10 +127,18 @@ inline void luxor_4105_device::update_trrq_int()
 	{
 		m_slot->int_w(trrq ? CLEAR_LINE : ASSERT_LINE);
 	}
+	else
+	{
+		m_slot->int_w(CLEAR_LINE);
+	}	
 
 	if (BIT(m_dma, 6))
 	{
 		m_slot->trrq_w(trrq);
+	}
+	else
+	{
+		m_slot->trrq_w(1);
 	}
 }
 
@@ -159,6 +167,12 @@ luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *
 void luxor_4105_device::device_start()
 {
 	m_slot = dynamic_cast<abc1600bus_slot_device *>(owner());
+
+	// state saving
+	save_item(NAME(m_cs));
+	save_item(NAME(m_io));
+	save_item(NAME(m_data));
+	save_item(NAME(m_dma));
 }
 
 

@@ -53,7 +53,15 @@ device_abc1600bus_card_interface::~device_abc1600bus_card_interface()
 
 abc1600bus_slot_device::abc1600bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, ABC1600BUS_SLOT, "ABC 1600 bus slot", tag, owner, clock),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this),
+		m_int(CLEAR_LINE),
+		m_pren(1),
+		m_trrq(1),
+		m_nmi(CLEAR_LINE),
+		m_xint2(CLEAR_LINE),
+		m_xint3(CLEAR_LINE),
+		m_xint4(CLEAR_LINE),
+		m_xint5(CLEAR_LINE)
 {
 }
 
@@ -105,6 +113,16 @@ void abc1600bus_slot_device::device_start()
 	m_out_xint3_func.resolve(m_out_xint3_cb, *this);
 	m_out_xint4_func.resolve(m_out_xint4_cb, *this);
 	m_out_xint5_func.resolve(m_out_xint5_cb, *this);
+	
+	// state saving
+	save_item(NAME(m_int));
+	save_item(NAME(m_pren));
+	save_item(NAME(m_trrq));
+	save_item(NAME(m_nmi));
+	save_item(NAME(m_xint2));
+	save_item(NAME(m_xint3));
+	save_item(NAME(m_xint4));
+	save_item(NAME(m_xint5));
 }
 
 
@@ -384,6 +402,7 @@ WRITE_LINE_MEMBER( abc1600bus_slot_device::prac_w )
 
 WRITE_LINE_MEMBER( abc1600bus_slot_device::int_w )
 {
+	m_int = state;
 	m_out_int_func(state);
 }
 
@@ -394,6 +413,7 @@ WRITE_LINE_MEMBER( abc1600bus_slot_device::int_w )
 
 WRITE_LINE_MEMBER( abc1600bus_slot_device::pren_w )
 {
+	m_pren = state;
 	m_out_pren_func(state);
 }
 
@@ -404,6 +424,7 @@ WRITE_LINE_MEMBER( abc1600bus_slot_device::pren_w )
 
 WRITE_LINE_MEMBER( abc1600bus_slot_device::trrq_w )
 {
+	m_trrq = state;
 	m_out_trrq_func(state);
 }
 
@@ -414,6 +435,7 @@ WRITE_LINE_MEMBER( abc1600bus_slot_device::trrq_w )
 
 WRITE_LINE_MEMBER( abc1600bus_slot_device::nmi_w )
 {
+	m_nmi = state;
 	m_out_nmi_func(state);
 }
 
@@ -424,6 +446,7 @@ WRITE_LINE_MEMBER( abc1600bus_slot_device::nmi_w )
 
 WRITE_LINE_MEMBER( abc1600bus_slot_device::xint2_w )
 {
+	m_xint2 = state;
 	m_out_xint2_func(state);
 }
 
@@ -434,6 +457,7 @@ WRITE_LINE_MEMBER( abc1600bus_slot_device::xint2_w )
 
 WRITE_LINE_MEMBER( abc1600bus_slot_device::xint3_w )
 {
+	m_xint3 = state;
 	m_out_xint3_func(state);
 }
 
@@ -444,6 +468,7 @@ WRITE_LINE_MEMBER( abc1600bus_slot_device::xint3_w )
 
 WRITE_LINE_MEMBER( abc1600bus_slot_device::xint4_w )
 {
+	m_xint4 = state;
 	m_out_xint4_func(state);
 }
 
@@ -454,5 +479,86 @@ WRITE_LINE_MEMBER( abc1600bus_slot_device::xint4_w )
 
 WRITE_LINE_MEMBER( abc1600bus_slot_device::xint5_w )
 {
+	m_xint5 = state;
 	m_out_xint5_func(state);
+}
+
+
+//-------------------------------------------------
+//  int_r - interrupt request
+//-------------------------------------------------
+
+READ_LINE_MEMBER( abc1600bus_slot_device::int_r )
+{
+	return m_int;
+}
+
+
+//-------------------------------------------------
+//  pren_r - peripheral enable
+//-------------------------------------------------
+
+READ_LINE_MEMBER( abc1600bus_slot_device::pren_r )
+{
+	return m_pren;
+}
+
+
+//-------------------------------------------------
+//  trrq_r - transfer request
+//-------------------------------------------------
+
+READ_LINE_MEMBER( abc1600bus_slot_device::trrq_r )
+{
+	return m_trrq;
+}
+
+
+//-------------------------------------------------
+//  nmi_r - non-maskable interrupt
+//-------------------------------------------------
+
+READ_LINE_MEMBER( abc1600bus_slot_device::nmi_r )
+{
+	return m_nmi;
+}
+
+
+//-------------------------------------------------
+//  xint2_r - expansion interrupt
+//-------------------------------------------------
+
+READ_LINE_MEMBER( abc1600bus_slot_device::xint2_r )
+{
+	return m_xint2;
+}
+
+
+//-------------------------------------------------
+//  xint3_r - expansion interrupt
+//-------------------------------------------------
+
+READ_LINE_MEMBER( abc1600bus_slot_device::xint3_r )
+{
+	return m_xint3;
+}
+
+
+//-------------------------------------------------
+//  xint4_r - expansion interrupt
+//-------------------------------------------------
+
+READ_LINE_MEMBER( abc1600bus_slot_device::xint4_r )
+{
+	return m_xint4;
+}
+
+
+//-------------------------------------------------
+//  xint5_r - expansion interrupt
+//-------------------------------------------------
+
+READ_LINE_MEMBER( abc1600bus_slot_device::xint5_r )
+{
+	return m_xint5;
 }

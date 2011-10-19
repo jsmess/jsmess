@@ -1039,7 +1039,9 @@ inline void abc1600_state::update_drdy0()
 	else
 	{
 		// BUS0I/BUS0X
-		m_dma0->rdy_w(1);
+		int trrq0 = m_bus0i->trrq_r() & m_bus0x->trrq_r();
+		
+		m_dma0->rdy_w(trrq0);
 	}
 }
 
@@ -1058,7 +1060,7 @@ inline void abc1600_state::update_drdy1()
 	else
 	{
 		// BUS1
-		m_dma1->rdy_w(1);
+		m_dma1->rdy_w(m_bus1->trrq_r());
 	}
 }
 
@@ -1269,14 +1271,21 @@ WRITE8_MEMBER( abc1600_state::spec_contr_reg_w )
 
 	case 6: // SYSSCC
 		m_sysscc = state;
+		
+		m_cio->pb5_w(!state);
+		m_bus1->pren_w(!state);
+		
 		update_drdy1();
-		m_cio->pb5_w(!m_sysscc);
 		break;
 
 	case 7: // SYSFS
 		m_sysfs = state;
+
+		m_cio->pb6_w(!state);
+		m_bus0i->pren_w(!state);
+		m_bus0x->pren_w(!state);
+
 		update_drdy0();
-		m_cio->pb6_w(!m_sysfs);
 		break;
 	}
 }
@@ -1487,7 +1496,18 @@ READ8_MEMBER( abc1600_state::cio_pa_r )
 
     */
 
-	return 0; // TODO return interrupt levels if some software actually reads this port
+	UINT8 data = 0;
+	
+	data |= m_bus2->int_r();
+	data |= m_bus1->int_r() << 1;
+	data |= m_bus0x->xint2_r() << 2;
+	data |= m_bus0x->xint3_r() << 3;
+	data |= m_bus0x->xint4_r() << 4;
+	data |= m_bus0x->xint5_r() << 5;
+	data |= m_bus0x->int_r() << 6;
+	data |= m_bus0i->int_r() << 7;
+	
+	return data;
 }
 
 READ8_MEMBER( abc1600_state::cio_pb_r )
