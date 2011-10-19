@@ -114,10 +114,10 @@ static Z80PIO_INTERFACE( bbcbc_z80pio_intf )
 {
 	DEVCB_NULL,	/* int callback */
 	DEVCB_NULL,	/* port a read */
-	DEVCB_NULL,	/* port b read */
 	DEVCB_NULL,	/* port a write */
-	DEVCB_NULL,	/* port b write */
 	DEVCB_NULL,	/* ready a */
+	DEVCB_NULL,	/* port b read */
+	DEVCB_NULL,	/* port b write */
 	DEVCB_NULL	/* ready b */
 };
 
