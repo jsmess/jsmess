@@ -1738,6 +1738,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/alesis.o	\
 	$(MESS_DRIVERS)/amico2k.o	\
 	$(MESS_DRIVERS)/applix.o	\
+	$(MESS_DRIVERS)/babbage.o	\
 	$(MESS_DRIVERS)/beehive.o	\
 	$(MESS_DRIVERS)/bob85.o		\
 	$(MESS_DRIVERS)/busicom.o	\
@@ -1862,6 +1863,7 @@ $(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
 $(MESS_DRIVERS)/aim65_40.o:	$(MESS_LAYOUT)/aim65_40.lh
 $(MESS_DRIVERS)/amico2k.o:	$(MESS_LAYOUT)/amico2k.lh
+$(MESS_DRIVERS)/babbage.o:	$(MESS_LAYOUT)/babbage.lh
 $(MESS_DRIVERS)/beta.o:		$(MESS_LAYOUT)/beta.lh
 $(MESS_DRIVERS)/bob85.o:	$(MESS_LAYOUT)/bob85.lh
 $(MAME_DRIVERS)/cdi.o:		$(MAME_LAYOUT)/cdi.lh
