@@ -179,6 +179,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( xint3_w );
 	DECLARE_WRITE_LINE_MEMBER( xint4_w );
 	DECLARE_WRITE_LINE_MEMBER( xint5_w );
+
+	DECLARE_READ_LINE_MEMBER( int_r );
+	DECLARE_READ_LINE_MEMBER( pren_r );
+	DECLARE_READ_LINE_MEMBER( trrq_r );
+	DECLARE_READ_LINE_MEMBER( nmi_r );
+	DECLARE_READ_LINE_MEMBER( xint2_r );
+	DECLARE_READ_LINE_MEMBER( xint3_r );
+	DECLARE_READ_LINE_MEMBER( xint4_r );
+	DECLARE_READ_LINE_MEMBER( xint5_r );
 	
 private:
 	devcb_resolved_write_line	m_out_int_func;
@@ -191,6 +200,15 @@ private:
 	devcb_resolved_write_line	m_out_xint5_func;
 	
 	device_abc1600bus_card_interface *m_card;
+	
+	int m_int;
+	int m_pren;
+	int m_trrq;
+	int m_nmi;
+	int m_xint2;
+	int m_xint3;
+	int m_xint4;
+	int m_xint5;
 };
 
 
