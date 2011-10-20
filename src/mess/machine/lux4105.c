@@ -285,12 +285,15 @@ UINT8 luxor_4105_device::abc1600bus_inp()
 		}
 		else
 		{
-			data = scsi_data_r(m_sasibus);
-
-			if (!get_scsi_line(m_sasibus, SCSI_LINE_REQ))
+			if (!get_scsi_line(m_sasibus, SCSI_LINE_IO))
 			{
-				set_scsi_line(m_sasibus, SCSI_LINE_ACK, 0);
-			}	
+				data = scsi_data_r(m_sasibus);
+
+				if (!get_scsi_line(m_sasibus, SCSI_LINE_REQ))
+				{
+					set_scsi_line(m_sasibus, SCSI_LINE_ACK, 0);
+				}
+			}
 		}
 	}
 	

@@ -3,33 +3,54 @@
     Luxor ABC 1600
 
     Skeleton driver
+*/
 
+/*
+
+	How to create HDD image:
+	------------------------
+	chdman -createblankhd necd5126a.chd 615 4 17 512
+
+	How to format HDD:
+	------------------
+	mf(2,0)
+	mf(2,0)
+	abcenix
+	sas/format/format
+	sa(40,0)
+	y
+	5
+	necd5126a
+	
+	How to install OS:
+	------------------
+	mf(2,0)
+	mf(2,0)
+	abcenix
+	loadsys1
+	<enter>
+	<enter>
+	
 */
 
 /*
 
     TODO:
 
+	- segment/page RAM addresses are not correctly decoded, "sas/format/format" can't find the SASI interface because of this
+		forcetask0 1 t0 0 t1 0 t2 0 t3 0
+		sega19 0 task 0
+		sega 000 segd 00 pga 008 pgd 4058 virtual 02c730 (should be 004730)
+		
     - floppy
         - internal floppy is really drive 2, but wd17xx.c doesn't like having NULL drives
-    - BUS0I/0X/1/2
     - short/long reset (RSTBUT)
     - CIO
 		- optimize timers!
-        - vectored interrupts with status
-        - port A bit mode, OR-PEVM, interrupt when bit=1
-        - port B bit mode, OR-PEVM, interrupt when bit=1
-        - port C, open drain output bit PC1 (RTC, NVRAM)
-        - counter 1 disabled
-        - counter 2 enabled, TC=000d, IE=0, output to PB0
-        - counter 3 enabled, TC=9c40, IE=1
+        - port C, open drain output bit PC1 (RTC/NVRAM data)
     - hard disk
-		- 4105 sasi interface card
-		- sasi interface
-			- implement command 0x08 READ (legacy)
-		- Xebec S1410 card
-		- necd5126a HDD (http://stason.org/TULARC/pc/hard-drives-hdd/nec/D5126-20MB-5-25-HH-MFM-ST506.html)
-			chdman -createblankhd necd5126a.chd 615 4 17 512
+		- 4105 SASI interface card
+		- SASI interface (scsibus.c)
 
 */
 
@@ -41,7 +62,7 @@
 //  CONSTANTS / MACROS
 //**************************************************************************
 
-#define LOG 0
+#define LOG 1
 
 
 // MAC
@@ -621,7 +642,7 @@ offs_t abc1600_state::translate_address(offs_t offset, int *nonx, int *wp)
 	UINT16 page_data = m_page_ram[pga];
 
 	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
-
+	
 	if (PAGE_NONX)
 	{
 		//logerror("Bus error %06x : %06x\n", offset, virtual_offset);
@@ -690,27 +711,20 @@ UINT8 abc1600_state::read_supervisor_memory(offs_t offset)
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 data = 0;
 
-	if (!A19)
+	if (!A2 & !A1)
 	{
-		data = read_user_memory(offset);
+		// _EP
+		data = page_r(*program, offset);
 	}
-	else
+	else if (!A2 & A1 & A0)
 	{
-		if (!A2 & !A1)
-		{
-			// _EP
-			data = page_r(*program, offset);
-		}
-		else if (!A2 & A1 & A0)
-		{
-			// _ES
-			data = segment_r(*program, offset);
-		}
-		else if (A2 & A1 & A0)
-		{
-			// _CAUSE
-			data = cause_r(*program, offset);
-		}
+		// _ES
+		data = segment_r(*program, offset);
+	}
+	else if (A2 & A1 & A0)
+	{
+		// _CAUSE
+		data = cause_r(*program, offset);
 	}
 
 	return data;
@@ -725,27 +739,20 @@ void abc1600_state::write_supervisor_memory(offs_t offset, UINT8 data)
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
-	if (!A19)
+	if (!A2 & !A1)
 	{
-		write_user_memory(offset, data);
+		// _WEP
+		page_w(*program, offset, data);
 	}
-	else
+	else if (!A2 & A1 & A0)
 	{
-		if (!A2 & !A1)
-		{
-			// _WEP
-			page_w(*program, offset, data);
-		}
-		else if (!A2 & A1 & A0)
-		{
-			// _WES
-			segment_w(*program, offset, data);
-		}
-		else if (A2 & !A1 & A0)
-		{
-			// W(C)
-			task_w(*program, offset, data);
-		}
+		// _WES
+		segment_w(*program, offset, data);
+	}
+	else if (A2 & !A1 & A0)
+	{
+		// W(C)
+		task_w(*program, offset, data);
 	}
 }
 
@@ -780,7 +787,7 @@ READ8_MEMBER( abc1600_state::mac_r )
 		UINT8 *rom = machine().region(MC68008P8_TAG)->base();
 		data = rom[offset & 0x3fff];
 	}
-	else if (!m_ifc2 && !FC1)
+	else if (A19 && !m_ifc2 && !FC1)
 	{
 		data = read_supervisor_memory(offset);
 	}
@@ -801,7 +808,7 @@ WRITE8_MEMBER( abc1600_state::mac_w )
 {
 	int fc = get_fc();
 
-	if (!m_ifc2 && !FC1)
+	if (A19 && !m_ifc2 && !FC1)
 	{
 		write_supervisor_memory(offset, data);
 	}
@@ -1697,7 +1704,7 @@ static ABC1600BUS_INTERFACE( bus0x_intf )
 	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa6_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_CPU_INPUT_LINE(MC68008P8_TAG, M68K_IRQ_7),
 	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa5_w),
 	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa4_w),
 	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa3_w),
@@ -1713,7 +1720,7 @@ static ABC1600BUS_INTERFACE( bus1_intf )
 
 static ABC1600BUS_INTERFACE( bus2_intf )
 {
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa0_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa0_w), // really inverted but ASSERT_LINE takes care of that
 	DEVCB_NULL, // DEVCB_DEVICE_LINE_MEMBER(Z8410AB1_2_TAG, z80dma_device, iei_w) inverted
 	DEVCB_DEVICE_LINE_MEMBER(Z8410AB1_2_TAG, z80dma_device, rdy_w)
 };
@@ -1757,7 +1764,7 @@ void abc1600_state::machine_start()
 	// interrupt callback
 	device_set_irq_callback(m_maincpu, abc1600_int_ack);
 
-	// fill segment RAM with non-zero values or no boot
+	// HACK fill segment RAM with non-zero values or no boot
 	memset(m_segment_ram, 0xcd, 0x400);
 
 	// state saving
