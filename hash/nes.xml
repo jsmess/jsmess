@@ -20146,9 +20146,9 @@
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- not used yet -->
+			<!-- partial dump by ElBarto, the PIC is protected so the dump is not correct. anyway we don't emulate the CIC yet... -->
 			<dataarea name="cic" size="1072">
-				<rom name="pic16c54-hs.u3" size="1072" crc="2f3ca3ed" sha1="57ea36bff124bf226d83a487d5d6a13a47f7b78e" offset="00000" />
+				<rom name="pic16c54-hs.u3" size="1072" crc="2f3ca3ed" sha1="57ea36bff124bf226d83a487d5d6a13a47f7b78e" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -43592,7 +43592,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	<software name="hidchess">
 		<!-- Serial: TC-002 - Release Date: 1989 -->
 		<!--  Um Chi (Glommy Chess, Joy Van) in GoodNES, check title -->
-		<description>Hidden Chinese Chess (Tw)</description>
+		<description>An Qi ~ Hidden Chinese Chess (Tw)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44691,7 +44691,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="bingo75a" cloneof="bingo75">
-		<!-- Serial: SA-007 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: SA-007 - Release Date:  - Alternative Title: 75宾果 -->
 		<description>75 Bin Guo (Tw, FC cart)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -45051,7 +45051,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="tai16mj2">
-		<!-- Serial: SA-025 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: SA-025 - Release Date:  - Alternative Title: 台湾麻将二代 -->
 		<description>Taiwan Mahjong 2 (Asia)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -45394,7 +45394,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="chikbik">
-		<!-- Serial: CN-20 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: CN-20 - Release Date:  - Alternative Title: 三国志－赤壁之战 ? ~ SanGuoZhi - ChiBi Zhi Zhan ? -->
 		<description>Chik Bik Ji Jin - Saam Gwok Ji (Asia)</description>
 		<year>19??</year>
 		<publisher>NTDEC</publisher>
@@ -45410,7 +45410,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="sanguoz">
-		<!-- Serial: CN-21 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: CN-21 - Release Date:  - Alternative Title: 三国志－群雄争霸 -->
 		<description>San Guo Zhi - Qun Xiong Zheng Ba (Tw)</description>
 		<year>199?</year>
 		<publisher>Asder</publisher>
@@ -45443,7 +45443,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="cobramis">
-		<!-- Serial: CN-27 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: CN-27 - Release Date:  - Alternative Title: 眼镜蛇任务 ~ Yang Jing She Ren Wu -->
 		<description>Cobra Mission (Asia)</description>
 		<year>19??</year>
 		<publisher>NTDEC</publisher>
@@ -45459,7 +45459,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="zhenbxyj">
-		<!-- Serial: CN-28 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: CN-28 - Release Date:  - Alternative Title: 西游记真本 -->
 		<description>Zhen Ben Xi You Ji (Asia)</description>
 		<year>1994</year>
 		<publisher>NTDEC</publisher>
@@ -45475,7 +45475,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="huangdi">
-		<!-- Serial: CN-29 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: CN-29 - Release Date:  - Alternative Title: 黄帝－涿鹿之战 -->
 		<description>Huang Di (Tw)</description>
 		<year>199?</year>
 		<publisher>NTDEC</publisher>
@@ -45509,7 +45509,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="creatom">
-		<!-- Serial: MGC-003 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: MGC-003 - Release Date:  - Alternative Title: 智力方块 -->
 		<description>Creatom (Tw)</description>
 		<year>199?</year>
 		<publisher>TXC Corp</publisher>
@@ -45611,7 +45611,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="thundwar">
-		<!-- Serial: MGC-017 - Release Date:  - Alternative Title: Hong Tian Zhi Zu? -->
+		<!-- Serial: MGC-017 - Release Date:  - Alternative Title: 轰天至尊? ~ Hong Tian Zhi Zu? -->
 		<description>Thunder Warrior (Tw)</description>
 		<year>199?</year>
 		<publisher>Micro Genius</publisher>
@@ -45647,11 +45647,26 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 <!-- Waixing ES-**** and clones -->
 
 <!-- ES-1001 San Guo Zhi - Ying Jie Zhan - Chinese translation and slight hack of Destiny of an Emperor, see below -->
-<!-- ES-1002 San Guo Zhi III -->
+
+	<software name="sanguo" cloneof="sangochu" supported="no">
+		<!-- Serial: ES-1002 - Release Date:  - Alternative Title: 三国志Ⅲ ~ San Guo Zhi III -->
+		<description>San Guo Zhi - Zhong Yuan Ba Zhe (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-SGZ" />
+			<dataarea name="chr" size="131072">
+				<rom name="san guo zhi (ch).chr" size="131072" crc="faf43717" sha1="ceed8bc9c4017dfd967b52700629afc21fee5f12" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="san guo zhi (ch).prg" size="262144" crc="d03b3051" sha1="78bb9c5f509dd20d493fdb4458c0bf70afb4ec8e" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="dafuweng" supported="partial">
-		<!-- Serial: ES-1004 - Release Date:  - Alternative Title:  -->
-		<description>Da Fu Weng - Super Rich (Chi)</description>
+		<!-- Serial: ES-1004 - Release Date:  - Alternative Title: 超级大富翁 -->
+		<description>Chao Ji Da Fu Weng - Super Rich (Chi)</description>
 		<year>199?</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45665,7 +45680,69 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- ES-1005 Bao Xiao San Guo -->
+	<software name="bxtg">
+		<!-- Serial: ES-1005 - Release Date:  - Alternative Title: 爆笑三国 -->
+		<description>Bao Xiao Tien Guo (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-PS2" />
+			<dataarea name="prg" size="1048576">
+				<rom name="bao xiao tien guo (explosion sangokushi) (ch).prg" size="1048576" crc="021cc811" sha1="fdb8bd4665ba817cfbe24ec054f7e8807bf922bc" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bxtga" cloneof="bxtg">
+		<!-- Serial: ES-1005 - Release Date:  - Alternative Title:  -->
+		<description>Bao Xiao Tien Guo (Chi, Alt)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-PS2" />
+			<dataarea name="prg" size="1048576">
+				<rom name="bao xiao tien guo (explosion sangokushi) (ch) [a1].prg" size="1048576" crc="ce102393" sha1="7f5f6b3ec9ddc262129cecfaccc3bb1bb4d1ba3a" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="waixngz2">
+		<!-- Serial: ES-1006? - Release Date:  - Alternative Title: 外星战士2 -->
+		<description>Wai Xing Zhan Shi 2 (Chi, Traditional)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-PS2" />
+			<dataarea name="prg" size="1048576">
+				<rom name="[es-1006] wai xing zhan shi 2 (c).prg" size="1048576" crc="abe469ad" sha1="dd0f70ab20c4f8590807b7a304e2e3d77b07899a" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="waixngz2a" cloneof="waixngz2">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Wai Xing Zhan Shi 2 (Chi, Simplified, Hacked)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-PS2" />
+			<dataarea name="prg" size="1048576">
+				<rom name="wai xing zhan shi 2 (ch) (simp).prg" size="1048576" crc="64f9db18" sha1="f20b425ce894112f1e8b8ce6cc0dd0bd21cde306" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="mhzx4" supported="partial">
 		<!-- Serial: ES-1006 - Release Date:  - Alternative Title: 梦幻之星Ⅳ (Phantasy Star IV) -->
@@ -45789,7 +45866,21 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- ES-1017 Mo Yu Ying Xiong Chuan (Demon Heroes. aka Hero on Devil Lands) -->
+	<software name="herodevl">
+		<!-- Serial: ES-1017 - Release Date:  - Alternative Title: 魔域英雄传 -->
+		<description>Mo Yu Ying Xiong Chuan ~ Hero on Devil Lands (Chi, Hacked)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="hero on devil lands (ch).chr" size="262144" crc="9e632b30" sha1="b33ad524f5b02ac78fe563abab2cbe2e09ed10c7" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="hero on devil lands (ch).prg" size="262144" crc="3b8b8b3a" sha1="33a984f4b34653667216c1ff7ea94c38ad0572a1" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="smjsj" supported="partial">
 		<!-- Serial: ES-1018 - Release Date:  - Alternative Title: 神密金三角 -->
@@ -45840,7 +45931,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="zjshiji" supported="partial">
-		<!-- Serial: ES-1025 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: ES-1025 - Release Date:  - Alternative Title: 拯救世纪 -->
 		<description>Zheng Jiu Shi Ji (Chi)</description>
 		<year>199?</year>
 		<publisher>Waixing</publisher>
@@ -45920,6 +46011,25 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="jafy">
+		<!-- Serial: ES-1045 - Release Date:  - Alternative Title: 甲A -->
+		<description>Jia A Fung Yun (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-A" />
+			<dataarea name="chr" size="262144">
+				<rom name="jia a fung yun (ch).chr" size="262144" crc="38e14fa2" sha1="b45087973ba8c07018b855062882134d25e71f4f" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="jia a fung yun (ch).prg" size="524288" crc="78fb3ed6" sha1="ec0a2baf8d20c6aa1c2928db28bbf5eebe0c6f96" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dquest4c" cloneof="dwarr" supported="no">
 		<!-- Serial: ES-1047 - Release Date:  - Alternative Title: 勇者斗恶龙Ⅳ - Notes: AKA Dragon Quest IV -->
 		<description>Yong Zhe Dou E Long IV (Chi, Decrypted)</description>
@@ -45987,7 +46097,21 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- ES-1051 Sui Tang Yan Yi (Story of Sui and Tang Dynasty) -->
+	<software name="styy">
+		<!-- Serial: ES-1051 - Release Date:  - Alternative Title: 隋唐演义 (Story of Sui and Tang Dynasty) -->
+		<description>Sui Tang Yan Yi (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="[es-1051] sui tang yan yi (c).chr" size="262144" crc="501b2f00" sha1="a6ad94567f9054f88334299467f78bb91d9487c7" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="[es-1051] sui tang yan yi (c).prg" size="262144" crc="d30fe122" sha1="d9bc01be5511bf37a74ec783151afd289a48e9b0" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- ES-1052 Yang Jia Xiang (Yang's Troops), see below between the smynes decrypted entries -->
 
@@ -46022,6 +46146,38 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xiakeq">
+		<!-- Serial: ES-1058 - Release Date:  - Alternative Title: 侠客情-荊軻刺秦王 -->
+		<description>Xia Ke Qing - Jing He Ci Qin Wang (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="xia ke qing - jing he ci qin wang (ch).chr" size="262144" crc="f5d7a1c6" sha1="d1e74259aa1d74a63d3cbca99f107cc20e93732f" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="xia ke qing - jing he ci qin wang (ch).prg" size="262144" crc="53bfaaab" sha1="8259a7bbe45aaf65483464533afe21e007ef9d9e" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="napolwar" supported="no">
+		<!-- Serial: ES-1060 - Release Date:  - Alternative Title: 帝国风暴 -->
+		<description>Di Guo Feng Bao - Napoleon's War (Asia)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="napoleon's war (unl).chr" size="262144" crc="493c01ed" sha1="eb0ba3328151c4691de54d1f008156b5223d0b79" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="napoleon's war (unl).prg" size="262144" crc="004a9702" sha1="ec4daeda9513641776569f5852f667755712a5b1" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -46099,7 +46255,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 <!-- ES-1074 Chu Liu Xiang -->
-<!-- ES-1076 Doraemon (Ji Qi Mao Xiao Ding Dang, literally Machine Cat Small Ding Dong, two different Chinese names for Doraemon. Also called "Socat" on some cartridge labels -->
+
+	<software name="doraemnc">
+		<!-- Serial: ES-1076 - Release Date:  - Alternative Title: 机器猫小叮当 ~ jīqì māo xiǎo dīngdāng -->
+		<description>Doraemon (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="doraemon (ch).chr" size="262144" crc="a2979804" sha1="1f057d3172846a3ce79a70e03fb7b142ef035948" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="doraemon (ch).prg" size="262144" crc="04c70041" sha1="3bde63c590a40657568d36ec0f85c494f3fff539" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="dquest8" supported="partial">
 		<!-- Serial: ES-1077 - Release Date:  - Alternative Title: 勇者斗恶龙Ⅷ -->
@@ -46117,9 +46288,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="gelandy">
-		<!-- Serial: ES-1078 - Release Date:  - Alternative Title:  -->
-		<description>Ge Lan Di Ya (Chi)</description>
+	<software name="grandia" supported="no">
+		<!-- Serial: ES-1078 - Release Date:  - Alternative Title: 格兰蒂亚 -->
+		<description>Grandia (Chi)</description>
 		<year>199?</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -46133,9 +46304,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="gelandya" cloneof="gelandy">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Ge Lan Di Ya (Chi, Alt)</description>
+	<software name="grandiaa" cloneof="grandia" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title: 格兰蒂亚 -->
+		<description>Grandia (Chi, Alt)</description>
 		<year>199?</year>
 		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
@@ -46149,9 +46320,55 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- ES-1079 Xiao Ao Jiang Hu (Swordsman/The Smiling, Proud Wanderer) -->
+	<software name="xiaoajw">
+		<!-- Serial: ES-1079 - Release Date:  - Alternative Title: 笑傲江湖 -->
+		<description>Xiao Ao Jiang Hu (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-PS2" />
+			<dataarea name="prg" size="1048576">
+				<rom name="xiao au jiang wu (ch).prg" size="1048576" crc="b051c67b" sha1="951bdeb32f483119783731d67f5fd2690e5eff08" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanguo2" cloneof="sangok2h" supported="no">
+		<!-- Serial: ES-1084 - Release Date:  - Alternative Title: 三国志Ⅱ中文 -->
+		<description>San Guo Zhi II - Zhong Wen (Chi, Hacked)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-FFV" />
+			<dataarea name="prg" size="1048576">
+				<rom name="san guo zhi ii (199x)(waixing)(cn)[p].prg" size="1048576" crc="0b1e9726" sha1="130422bc8a79c306396e54eb770d1ec6918ebaaf" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 <!-- ES-1087 Shui Hu Shen Shou -->
-<!-- ES-1090 Pokemon Diamond (Kou Dai Jing Ling - Zuan Shi, aka Kou Dai Zuan Shi Zhi Chong Wu Xiao Jing Ling 2) -->
+
+	<software name="pokeszs">
+		<!-- Serial: ES-1090 - Release Date:  - Alternative Title: 口袋妖怪钻石 (Pokemon Diamond) -->
+		<description>KouDai YaoGuai - ZuanShi Ban (Asia)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-FFV" />
+			<dataarea name="prg" size="1048576">
+				<rom name="koudai yaoguai - zuanshi ban (unl) (waixing).prg" size="1048576" crc="e7aeb114" sha1="8770036f5520ce0960e068c3eb572cbc39e45d4f" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="commands" supported="no">
 		<!-- Serial: ES-1092 - Release Date:  - Alternative Title: 盟军赶死队 ? (méng jūn gǎn sǐ duì)? -->
@@ -46228,6 +46445,57 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb" value="UNKNOWN" />	<!-- Chinese dump uses Mapper 162 (new), I will probably use WAIXING-ES-1097 for the time being -->
 			<dataarea name="prg" size="1048576">
 				<rom name="xiyouji houzhuan (unl) (waixing).prg" size="1048576" crc="1c098942" sha1="a6a0a3dc8438558fa5da3af8d3349aa8cf080404" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lingjihf" supported="no">
+		<!-- Serial: ES-1099 - Release Date:  - Alternative Title: 灵界护法 -->
+		<description>Ling Jie Hu Fa - Shock (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="ling jie hu fa (c) [p1].chr" size="262144" crc="5a975f30" sha1="56a4f5cf6430459b4818f43c4f6a4581cf5b3563" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="ling jie hu fa (c) [p1].prg" size="262144" crc="24eb62df" sha1="389c814d9e08d72f1c1e173070f514c15c0acf11" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zhentian" supported="no">
+		<!-- Serial: ES-1102 - Release Date:  - Alternative Title: 真田十勇士 -->
+		<description>Zhen Tian Shi Yongshi (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-SH2" />
+			<dataarea name="chr" size="262144">
+				<rom name="sanada juu yuushi (es-1102)(ch).chr" size="262144" crc="c83b1bae" sha1="6bd372f45f6d7edc625097f48ec5377d9233d949" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="sanada juu yuushi (es-1102)(ch).prg" size="262144" crc="71911a5c" sha1="16da71f3f544aa41a3c85b13b6b6fc04b9f15f46" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dquest5" cloneof="dwarr2">
+		<!-- Serial: ES-1106 - Release Date:  - Alternative Title: 勇者斗恶龙Ⅴ -->
+		<description>Yong Zhe Dou E Long V (Chi, Decrypted)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="262144">
+				<rom name="yong zhe dou e long - dragon quest 5 [decrypted].prg" size="262144" crc="d3a269dc" sha1="ff645f86382012c203b21b42ecb5c34df6fe191e" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -46347,6 +46615,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+
+	<software name="ymzpearl">
+		<!-- Serial:  - Release Date:  - Alternative Title: 夜明珠 -->
+		<description>Ye Ming Zhu - Pearl (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="ye ming zhu (c).chr" size="262144" crc="b3c10965" sha1="bd797089ede61e3984bc5540549d398ed7eb338e" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="ye ming zhu (c).prg" size="131072" crc="0c537be3" sha1="97666ae8f856fe14b7a691c17272614f1d7fea49" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- Nanjing -->
 
@@ -47667,7 +47951,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 <!-- nointro -->
 	<!-- same as Mahjong World by Sachen -->
 	<software name="mjsamit">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 麻雀世界 歌舞伎町篇 -->
 		<description>Mahjan Samit Kabukicho Hen (Asia)</description>
 		<year>19??</year>
 		<publisher>Hacker International</publisher>
@@ -47855,7 +48139,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 <!-- FIXME: How much VRAM & WRAM should WAIXING-A, B, C, D, E, F, G, H boards have? -->
 
 	<software name="csjyx" cloneof="watarug">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 创世纪英雄 -->
 		<description>Chuang Shi Ji Ying Xiong (Chi)</description>
 		<year>199?</year>
 		<publisher>Waixing</publisher>
@@ -47871,7 +48155,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="columbusc" cloneof="columbus">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial: ES-1103 - Release Date:  - Alternative Title: 哥伦布传 -->
 		<description>Columbus Chuan (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -47906,7 +48190,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="di4cijqr" cloneof="sdgndgs4">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial: ES-1012 - Release Date:  - Alternative Title: 第四次机器人大战 -->
 		<description>Di 4 Ci - Ji Qi Ren Dai Zhan (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -47941,7 +48225,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="dbzgaidnc" cloneof="dbzgaidn">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial: ES-1096? - Release Date:  - Alternative Title: 七龙珠Z外传-赛亚人灭绝计划 ~ qī lóng zhū Z wàizhuàn-sài yǎ rén mièjué jìhuà -->
 		<description>Dragon Ball Z Gaiden: Saiyajin Zetsumetsu Keikaku (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -47960,7 +48244,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="dbz2c" cloneof="dbz2">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial: ES-1094 - Release Date:  - Alternative Title: 激战弗利萨之孙悟饭 -->
 		<description>Dragon Ball Z II: Gekishin Freeza!! (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -47995,7 +48279,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="hdsj1" cloneof="chaoswld">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial: ES-1115 - Release Date:  - Alternative Title:  -->
 		<description>Hun Dun Shi Jie (Chi, Beta?)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48014,7 +48298,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="hdsj" cloneof="chaoswld">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial: ES-1115 - Release Date:  - Alternative Title: 混沌世界 -->
 		<description>Hun Dun Shi Jie (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48033,7 +48317,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="lzyx" cloneof="hanjukuh" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 龙珠英雄 -->
 		<description>Long Zhu Ying Xiong (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48065,7 +48349,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="modaosym" cloneof="lilmagic">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 魔道士阴谋 -->
 		<description>Mo Dao Shi Yin Mou (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48081,7 +48365,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="mmaker" cloneof="monstmkr">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 怪物制造者1 -->
 		<description>Monster Maker 1 (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48097,7 +48381,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="mmaker2" cloneof="monstmkr">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 怪物制造者2 -->
 		<description>Monster Maker 2 (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48112,24 +48396,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="sanguo" cloneof="sangochu" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>San Guo Zhi - Zhong Yuan Ba Zhe (Chi)</description>
-		<year>19??</year>
-		<publisher>Waixing</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="WAIXING-SGZ" />
-			<dataarea name="chr" size="131072">
-				<rom name="san guo zhi (ch).chr" size="131072" crc="faf43717" sha1="ceed8bc9c4017dfd967b52700629afc21fee5f12" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="san guo zhi (ch).prg" size="262144" crc="d03b3051" sha1="78bb9c5f509dd20d493fdb4458c0bf70afb4ec8e" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sanguo2a" cloneof="sangok2h">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 三国志Ⅱ中文加强版 -->
 		<description>San Guo Zhi 2 - Ba Wang Da Lu - Zhong Wen Jia Qiang Ban (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48140,22 +48408,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="san guo zhi 2 (ch).prg" size="524288" crc="e80d8741" sha1="ef674f6f7b4ac1a91cab73075f75e2366fa783a8" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sanguo2" cloneof="sangok2h" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>San Guo Zhi 2 - Ba Wang Da Lu (Chi)</description>
-		<year>19??</year>
-		<publisher>Waixing</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="WAIXING-FFV" />
-			<dataarea name="prg" size="1048576">
-				<rom name="san guo zhi ii (199x)(waixing)(cn)[p].prg" size="1048576" crc="0b1e9726" sha1="130422bc8a79c306396e54eb770d1ec6918ebaaf" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -48212,8 +48464,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="firembc" cloneof="firemb" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Sheng Huo Hui Zhang (Chi)</description>
+		<!-- Serial: ES-1053 - Release Date:  - Alternative Title: 圣火徽章Ⅱ代 -->
+		<description>Sheng Huo Hui Zhang II Dai (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -48250,7 +48502,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="godslayrc" cloneof="crystal" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial: ES-1112 - Release Date:  - Alternative Title: 天神之剑 -->
 		<description>Tian Shen Zhi Jian (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48268,7 +48520,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="tszy1" cloneof="ctsuba2">
+	<software name="tszya" cloneof="ctsuba2">
 		<!-- Serial:  - Release Date:  - Alternative Title: 天使之翼 -->
 		<description>Tian Shi Zhi Yi (Chi, Alt)</description>
 		<year>19??</year>
@@ -48287,7 +48539,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="tszy2" cloneof="ctsuba2">
+	<software name="tszyb" cloneof="ctsuba2">
 		<!-- Serial:  - Release Date:  - Alternative Title: 天使之翼 -->
 		<description>Tian Shi Zhi Yi (Chi, Alt 2)</description>
 		<year>19??</year>
@@ -48306,18 +48558,18 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="tszy3" cloneof="ctsuba2">
-		<!-- Serial:  - Release Date:  - Alternative Title: 天使之翼 -->
+	<software name="tszyc" cloneof="ctsuba2">
+		<!-- Serial: ES-1095? - Release Date:  - Alternative Title: 天使之翼 -->
 		<description>Tian Shi Zhi Yi (Chi, Alt 3)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="WAIXING-E" />
 			<dataarea name="chr" size="262144">
-				<rom name="captain tsubasa vol. ii - super striker (ch) [a3].chr" size="262144" crc="d143c644" sha1="28fa0442cbbd053e242f98ef9e343452b00f9047" offset="00000" status="baddump" />
+				<rom name="[es-1095] tian shi zhi yi (c).chr" size="262144" crc="8bba0d40" sha1="7ef1463a62841b27f6d4446659f5bb4e5aa64d0c" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="captain tsubasa vol. ii - super striker (ch) [a3].prg" size="524288" crc="1a13ba25" sha1="b7256ad224f696eccf78423cd67ef9c1c1cfa72f" offset="00000" status="baddump" />
+				<rom name="[es-1095] tian shi zhi yi (c).prg" size="524288" crc="06f2ecf4" sha1="7bf4171d33e4c760bc2669e6cb932ea20743a010" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -48344,8 +48596,27 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="tszy2" cloneof="ctsuba2">
+		<!-- Serial: ES-1095? - Release Date:  - Alternative Title: 天使之翼Ⅱ -->
+		<description>Tian Shi Zhi Yi II (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-E" />
+			<dataarea name="chr" size="262144">
+				<rom name="[es-1095] tian shi zhi yi ii (c).chr" size="262144" crc="d143c644" sha1="28fa0442cbbd053e242f98ef9e343452b00f9047" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="[es-1095] tian shi zhi yi ii (c).prg" size="524288" crc="1a13ba25" sha1="b7256ad224f696eccf78423cd67ef9c1c1cfa72f" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="yinhesd" cloneof="ffant" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 银河时代 -->
 		<description>Yin He Shi Dai (Chi, Decrypted)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48361,7 +48632,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="dquest2c" cloneof="dwarr2">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 勇者斗恶龙Ⅱ -->
 		<description>Yong Zhe Dou E Long II (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48376,24 +48647,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="dquest5" cloneof="dwarr2">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Yong Zhe Dou E Long V (Chi, Decrypted)</description>
-		<year>19??</year>
-		<publisher>Waixing</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="prg" size="262144">
-				<rom name="yong zhe dou e long - dragon quest 5 [decrypted].prg" size="262144" crc="d3a269dc" sha1="ff645f86382012c203b21b42ecb5c34df6fe191e" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dquest7" cloneof="dwarr4">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 勇者斗恶龙Ⅶ -->
 		<description>Yong Zhe Dou E Long 7 (Chi, Decrypted)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48409,7 +48664,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="spacegen" cloneof="ffant2" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 宇宙战将 -->
 		<description>Yu Zhou Zhan Jiang - Space General (Chi, Decrypted)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48425,7 +48680,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="spacegena" cloneof="ffant2">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 宇宙战将 -->
 		<description>Yu Zhou Zhan Jiang - Space General (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -48441,7 +48696,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="zqxja" cloneof="ctsuba2">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial: ES-1095? - Release Date:  - Alternative Title: 足球小将 -->
 		<description>Zu Qiu Xiao Jiang (Chi, Fixed)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48460,7 +48715,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="zqxj" cloneof="ctsuba2" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial: ES-1095? - Release Date:  - Alternative Title: 足球小将 -->
 		<description>Zu Qiu Xiao Jiang (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48495,7 +48750,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="ffant3c" cloneof="ffant3">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 最终幻想Ⅲ -->
 		<description>Zui Zhong Huan Xian III (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -48619,6 +48874,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb" value="WAIXING-F" />
 			<dataarea name="prg" size="655360">
 				<rom name="tenchi wo kurau ii - shokatsu koumei den (j) [t+chi][a1].prg" size="655360" crc="ad730af3" sha1="92cc033c1255f119b3a566edca10140c014fa479" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tstd3" cloneof="tenchik2" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title: 吞Ⅲ -->
+		<description>Tun Shi Tian Di III (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing?</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-F" />
+			<dataarea name="prg" size="1048576">
+				<rom name="tun shi tian di iii (c).prg" size="1048576" crc="19b9e732" sha1="c782b77412c55f57f171b16bb13f001ead0c2ac1" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -48896,8 +49167,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="cjwq" cloneof="superigo">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Chao Ji Wei Qi (Chi)</description>
+		<!-- Serial:  - Release Date:  - Alternative Title: 超一流烟山杯围棋 ~ Chāoyīliú yān shān bēi wéiqí -->
+		<description>Chao Ji Liu Yan Shan Bei Wei Qi (Chi)</description>
 		<year>19??</year>
 		<publisher>Yanshan RuanJian</publisher>
 		<part name="cart" interface="nes_cart">
@@ -49383,7 +49654,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 				<rom name="the hulk (unl).chr" size="131072" crc="a0e3cc3d" sha1="b67397a8aaa846ded170074137318ac936abfbfe" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="the hulk (unl).prg" size="131072" crc="365ef319" sha1="ee4409c4f6947e75944c3267b40bbca4271a29e0" offset="00000" status="baddump" />
+				<rom name="the hulk (unl).prg" size="131072" crc="52d39fd1" sha1="598058e187318e6414b3df886e11ea508209d7ed" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -50064,18 +50335,36 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="dknife">
-		<description>Dragon Knife (Chi)</description>
+	<software name="tulongd">
+		<!-- Serial:  - Release Date:  - Alternative Title: 屠龙刀 (Dragon Knife) -->
+		<description>Tu Long Dao (Chi)</description>
 		<year>198?</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="HVC-TBROM" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="dragon knife (chi).chr" size="262144" crc="990f8fea" sha1="5af1ddf12a5e630425e2db38135c32176780e8c7" offset="00000" />
+			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="dragon knife (chi).prg" size="262144" crc="077f6a0f" sha1="dd2da92cbd245dd5b68817673dd07e0e233a41c4" offset="00000" />
 			</dataarea>
-			<dataarea name="chr" size="262144">
-				<rom name="dragon knife (chi).chr" size="262144" crc="990f8fea" sha1="5af1ddf12a5e630425e2db38135c32176780e8c7" offset="00000" />
+		</part>
+	</software>
+
+<!-- Does it come from an original cart or has it been ripped from mc_20asd (ASDER 20-in-1)?? -->
+	<software name="dreamfgt">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Dream Fighter (Asia)</description>
+		<year>19??</year>
+		<publisher>Asder</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-CNROM" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="chr" size="32768">
+				<rom name="dream fighter (unl).chr" size="32768" crc="3ab47f3a" sha1="45d3be8b964e323cd7d619c8e338b6aaf7a72670" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="dream fighter (unl).prg" size="32768" crc="891aa448" sha1="55f5985f420bace951480534e0ba4981fe348b8f" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -50511,8 +50800,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 <!-- nointro -->
 	<software name="jwest" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title: Xi Tian Qu Jing? -->
-		<description>Journey To The West (Asia)</description>
+		<!-- Serial:  - Release Date:  - Alternative Title: 西天取经 -->
+		<description>Xi Tian Qu Jing - Journey To The West (Asia)</description>
 		<year>19??</year>
 		<publisher>Micro Genius</publisher>
 		<part name="cart" interface="nes_cart">
@@ -50633,22 +50922,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb" value="WAIXING-FFV" />
 			<dataarea name="prg" size="1048576">
 				<rom name="koudai jingling - pocket monster - shuijing (unl) (mars).prg" size="1048576" crc="228559a7" sha1="8b64515ad7838a6309a00a5e2c0861e6ed2c6d45" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokeszs">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>KouDai YaoGuai - ZuanShi Ban (Asia)</description>
-		<year>19??</year>
-		<publisher>Waixing</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="WAIXING-FFV" />
-			<dataarea name="prg" size="1048576">
-				<rom name="koudai yaoguai - zuanshi ban (unl) (waixing).prg" size="1048576" crc="e7aeb114" sha1="8770036f5520ce0960e068c3eb572cbc39e45d4f" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -50970,6 +51243,24 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+<!-- Does it come from an original cart or has it been ripped from mc_20asd (ASDER 20-in-1)?? -->
+	<software name="porter">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Porter (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-CNROM" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="chr" size="8192">
+				<rom name="porter (asia) (unl).chr" size="8192" crc="3defa642" sha1="2f764b91ff59a67ec46dfd6911c0118c4ae7fe02" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="porter (asia) (unl).prg" size="32768" crc="46ee6543" sha1="cc95a0bfbd2804aa0c9f21847edcbbcc136a830b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pjoy84">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>PowerJoy 84 in 1 (PJ-008)</description>
@@ -51086,8 +51377,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="shisnmj2">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Shisen Mahjian 2 (Asia)</description>
+		<!-- Serial:  - Release Date:  - Alternative Title: 三国春秋 -->
+		<description>San Guo Chun Qiu ~ Shisen Mahjian 2 (Asia)</description>
 		<year>1996</year>
 		<publisher>N.T</publisher>
 		<part name="cart" interface="nes_cart">
@@ -51186,8 +51477,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="scontra7">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Super Contra 7 (Asia)</description>
+		<!-- Serial:  - Release Date:  - Alternative Title: 超级战魂 -->
+		<description>Chao Ji Zhan Hun - Super Contra 7 (Asia)</description>
 		<year>1996</year>
 		<publisher>E.S.C.</publisher>
 		<part name="cart" interface="nes_cart">
@@ -51793,43 +52084,11 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="bxtg">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Bao Xiao Tien Guo (Chi, Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="WAIXING-PS2" />
-			<dataarea name="prg" size="1048576">
-				<rom name="bao xiao tien guo (explosion sangokushi) (ch) [a1].prg" size="1048576" crc="ce102393" sha1="7f5f6b3ec9ddc262129cecfaccc3bb1bb4d1ba3a" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bxtga" cloneof="bxtg">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Bao Xiao Tien Guo (Chi)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="WAIXING-PS2" />
-			<dataarea name="prg" size="1048576">
-				<rom name="bao xiao tien guo (explosion sangokushi) (ch).prg" size="1048576" crc="021cc811" sha1="fdb8bd4665ba817cfbe24ec054f7e8807bf922bc" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="biohazrd">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 生化危机 -->
 		<description>Bio Hazard (Asia)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="WAIXING-PS2" />
 			<dataarea name="prg" size="1048576">
@@ -51905,9 +52164,9 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="demomonk">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Demogorgon Monk (Chi)</description>
+	<software name="moshenfs">
+		<!-- Serial:  - Release Date:  - Alternative Title: 魔神法师 (Demogorgon Monk?) -->
+		<description>Mo Shen Fa Shi (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -51921,6 +52180,21 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
+	<software name="dstorm" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Desert Storm (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-OneBus" />
+			<dataarea name="chr" size="524288">
+				<rom name="desert storm (unl).chr" size="524288" crc="7606b1d3" sha1="0ab78a85b04ee4b9c67dad7dd86a48b28e79f20f" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="desert storm (unl).prg" size="131072" crc="cb846b1d" sha1="a3a2edbccd0911cd975710fa44e365a9bc8f80a4" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
 	<software name="dianmali">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Dian Shi Ma Li (Chi)</description>
@@ -51937,11 +52211,11 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="digitdrg">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Digital Dragon (Chi)</description>
+	<software name="smzd4">
+		<!-- Serial:  - Release Date:  - Alternative Title: 数码暴龙4水晶版 -->
+		<description>Shu Ma Bao Long 4 - Shui Jing Ban (Chi)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="WAIXING-FFV" />
 			<dataarea name="prg" size="1048576">
@@ -51949,22 +52223,6 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="doraemnc">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Doraemon (Chi)</description>
-		<year>19??</year>
-		<publisher>Waixing</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="doraemon (ch).chr" size="262144" crc="a2979804" sha1="1f057d3172846a3ce79a70e03fb7b142ef035948" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="doraemon (ch).prg" size="262144" crc="04c70041" sha1="3bde63c590a40657568d36ec0f85c494f3fff539" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -52052,7 +52310,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="eurosens">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 欧陆之战 -->
 		<description>Europe Sensen (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -52153,22 +52411,6 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="herodevl">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Hero on Devil Lands (Chi)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="hero on devil lands (ch).chr" size="262144" crc="9e632b30" sha1="b33ad524f5b02ac78fe563abab2cbe2e09ed10c7" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="hero on devil lands (ch).prg" size="262144" crc="3b8b8b3a" sha1="33a984f4b34653667216c1ff7ea94c38ad0572a1" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hotdance">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Hot Dance 2000 (Asia)</description>
@@ -52186,7 +52428,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="montcrst">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 基督山恩仇记 -->
 		<description>Ji Du Shan En Chou Ji - Le Comte De Monte-Cristo (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -52197,25 +52439,6 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="ji du shan en chou ji - le comte de monte-cristo (ch).prg" size="262144" crc="23eaad18" sha1="5ce0315224ab67b21fd0ee3b3f4f5b38b5788444" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jafy">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Jia A Fung Yun (Chi)</description>
-		<year>19??</year>
-		<publisher>Waixing</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="WAIXING-A" />
-			<dataarea name="chr" size="262144">
-				<rom name="jia a fung yun (ch).chr" size="262144" crc="38e14fa2" sha1="b45087973ba8c07018b855062882134d25e71f4f" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="524288">
-				<rom name="jia a fung yun (ch).prg" size="524288" crc="78fb3ed6" sha1="ec0a2baf8d20c6aa1c2928db28bbf5eebe0c6f96" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -52318,7 +52541,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="lyxz">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 绿野仙踪 -->
 		<description>Lu Ye Xian Zong (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -52333,9 +52556,9 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="mmheroes" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>M&amp;M Heroes (Asia)</description>
+	<software name="mofamen" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title: 魔法门-英雄无敌 ~ mófǎ mén-yīngxióng wúdí -->
+		<description>Mo Fa Men - Ying Xiong Wu Di (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52515,11 +52738,11 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="mythstrg">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Myth Struggle (Chi)</description>
+	<software name="fengsged">
+		<!-- Serial:  - Release Date:  - Alternative Title: 封神榜格斗版 (Myth Struggle) -->
+		<description>Feng Shen Bang Gedou Ban (Chi)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="WAIXING-SEC" />
 			<dataarea name="chr" size="262144">
@@ -52527,22 +52750,6 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="myth struggle (ch).prg" size="262144" crc="2fae5d6f" sha1="3c5074afea77801a0201fea57e2abdee3a2870d3" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="napolwar" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Napoleon's War (Asia)</description>
-		<year>19??</year>
-		<publisher>Waixing</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="napoleon's war (unl).chr" size="262144" crc="493c01ed" sha1="eb0ba3328151c4691de54d1f008156b5223d0b79" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="napoleon's war (unl).prg" size="262144" crc="004a9702" sha1="ec4daeda9513641776569f5852f667755712a5b1" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -52580,9 +52787,9 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="pinuocao">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Pi Nuo Cao De Fu Su (Chi)</description>
+	<software name="pinoc">
+		<!-- Serial:  - Release Date:  - Alternative Title: 匹诺槽的复苏 -->
+		<description>Pinocchio De Fu Su (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52597,7 +52804,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="pokered">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 口袋妖怪红 -->
 		<description>Pocket Monsters Red (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -52713,7 +52920,7 @@ from the NEStopia source, hence they would require confirmation. -->
 
 <!-- which game is this?!? pirating MGC-001?!? -->
 	<software name="qiwanga" cloneof="qiwang">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 棋王 -->
 		<description>Qi Wang - Chinese Chess (Chi, Alt)</description>
 		<year>19??</year>
 		<publisher>TXC Corp.</publisher>
@@ -52745,9 +52952,9 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="shangtyc" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Shanghai Tycoon (Asia)</description>
+	<software name="dafuwen2" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title: 大富翁2-上海大亨 (Shanghai Tycoon) -->
+		<description>Da Fu Weng 2 - Shanghai Da Heng (Asia)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52929,22 +53136,6 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="suitang">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Suitang (Chi)</description>
-		<year>19??</year>
-		<publisher>Waixing</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="suitang (ch).chr" size="262144" crc="501b2f00" sha1="a6ad94567f9054f88334299467f78bb91d9487c7" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="suitang (ch).prg" size="262144" crc="d30fe122" sha1="d9bc01be5511bf37a74ec783151afd289a48e9b0" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sdkong">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Super Donkey Kong (Asia)</description>
@@ -53108,7 +53299,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="waixngzs1" cloneof="waixngzs">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 外星战士 -->
 		<description>Wai Xing Zhan Shi (Chi, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -53124,7 +53315,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="waixngzs">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 外星战士 -->
 		<description>Wai Xing Zhan Shi (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -53132,38 +53323,6 @@ from the NEStopia source, hence they would require confirmation. -->
 			<feature name="pcb" value="WAIXING-ZS" />
 			<dataarea name="prg" size="524288">
 				<rom name="wai xing zhan shi (ch).prg" size="524288" crc="a63c6793" sha1="9bdff9a19265d84979f43f0f6e925a735ddeb38b" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="waixngz2">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Wai Xing Zhan Shi 2 (Chi, Simplified, Hacked)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="WAIXING-PS2" />
-			<dataarea name="prg" size="1048576">
-				<rom name="wai xing zhan shi 2 (ch) (simp).prg" size="1048576" crc="64f9db18" sha1="f20b425ce894112f1e8b8ce6cc0dd0bd21cde306" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="waixngz2a" cloneof="waixngz2">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Wai Xing Zhan Shi 2 (Chi, Traditional)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="WAIXING-PS2" />
-			<dataarea name="prg" size="1048576">
-				<rom name="wai xing zhan shi 2 (ch) (trad).prg" size="1048576" crc="abe469ad" sha1="dd0f70ab20c4f8590807b7a304e2e3d77b07899a" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -53183,38 +53342,6 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="wisdom boy (ch).prg" size="32768" crc="1b5693c8" sha1="1261f685633064f8a34ae5c41817405e916e1748" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="xiakeq">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Xia Ke Qing - Jing He Ci Qin Wang (Chi)</description>
-		<year>19??</year>
-		<publisher>Waixing</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="262144">
-				<rom name="xia ke qing - jing he ci qin wang (ch).chr" size="262144" crc="f5d7a1c6" sha1="d1e74259aa1d74a63d3cbca99f107cc20e93732f" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="xia ke qing - jing he ci qin wang (ch).prg" size="262144" crc="53bfaaab" sha1="8259a7bbe45aaf65483464533afe21e007ef9d9e" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="xiaoajw">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Xiao Au Jiang Wu (Chi)</description>
-		<year>19??</year>
-		<publisher>Waixing</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="WAIXING-PS2" />
-			<dataarea name="prg" size="1048576">
-				<rom name="xiao au jiang wu (ch).prg" size="1048576" crc="b051c67b" sha1="951bdeb32f483119783731d67f5fd2690e5eff08" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -53285,7 +53412,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="zhongg1" cloneof="zhongg">
-		<!-- Serial:  - Release Date:  - Alternative Title: Chinese Chess -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 中国象棋 ~ Chinese Chess -->
 		<description>Zhong Guo Xiang Qi (Chi, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -53302,7 +53429,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="zhongg2" cloneof="zhongg">
-		<!-- Serial:  - Release Date:  - Alternative Title: Chinese Chess -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 中国象棋 ~ Chinese Chess -->
 		<description>Zhong Guo Xiang Qi (Chi, Alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -53319,7 +53446,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="zhongg">
-		<!-- Serial:  - Release Date:  - Alternative Title: Chinese Chess -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 中国象棋 ~ Chinese Chess -->
 		<description>Zhong Guo Xiang Qi (Asia)</description>
 		<year>19??</year>
 		<publisher>Micro Genius</publisher>
@@ -53335,7 +53462,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="zhongg3" cloneof="zhongg">
-		<!-- Serial:  - Release Date:  - Alternative Title: Chinese Chess -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 中国象棋 ~ Chinese Chess -->
 		<description>Zhong Guo Xiang Qi (Asia, Alt)</description>
 		<year>19??</year>
 		<publisher>Micro Genius</publisher>
@@ -60186,9 +60313,9 @@ We include them here as reference if they should coincide with later revisions o
 These have been ripped from SmyNES and decrypted (by CaH4e3?), but it would
 be better to redump them properly. -->
 
-	<software name="bingkuan">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Bing Kuang Ji Dan Zi - Flighty Chicken (Asia, Decrypted)</description>
+	<software name="fengkuan">
+		<!-- Serial:  - Release Date:  - Alternative Title: 疯狂鸡蛋仔 -->
+		<description>Feng Kuang Ji Dan Zi - Flighty Chicken (Asia, Decrypted)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -60203,7 +60330,7 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="chuhanzb" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 楚汉争霸 -->
 		<description>Chu Han Zheng Ba - The War Between Chu &amp; Han (Asia, Decrypted)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -60385,7 +60512,7 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="yangjiaj" supported="no">
-		<!-- Serial: ES-1052 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: ES-1052 - Release Date:  - Alternative Title: 杨家将 -->
 		<description>Yang Jia Jiang - Yang's Troops (Asia, Decrypted)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -60401,7 +60528,7 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="zhanguoq">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 战国群雄传 -->
 		<description>Zhan Guo Qun Xiong Zhuan (Asia, Decrypted)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -61117,7 +61244,7 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="samsho3">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 侍魂III -->
 		<description>Samurai Shodown III (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -61325,7 +61452,7 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="sf5t60">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 60人街霸 -->
 		<description>Street Fighter V Turbo 60 (Asia)</description>
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -61641,7 +61768,7 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="yuyufc" cloneof="yuyuf">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 幽游白书 魔界最强列传 -->
 		<description>Yuu Yuu Hakusho Final - Makai Saikyou Retsuden (Asia, Chinese, Hacked)</description>
 		<year>1996</year>
 		<publisher>N.T</publisher>
@@ -61657,7 +61784,7 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="yuyuf">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 幽游白书 魔界最强列传 -->
 		<description>Yuu Yuu Hakusho Final - Makai Saikyou Retsuden (Asia, English)</description>
 		<year>1996</year>
 		<publisher>N.T</publisher>
@@ -64376,6 +64503,19 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
+<!-- The following iNES roms are ripped from mc_dgear, so we don't include them (crc is from headerless file):
+	* Deformable	[b0716cc2]
+	* Fish Story	[9334de5b]
+	* Goblet Tower	[d1b91f24]
+	* Island	[fb9496cc]
+	* Mirror Devil World	[2ec1bed7]
+	* Police vs Thief	[02bc030e]
+	* Rabbit Village	[2a561f41]
+	* Road Worker	[44a6ca07]
+	* Super Hero	[c46eda12]
+	* Vigilant	[c042b605]
+ -->
+
 	<software name="mc_aa2">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>100 in 1 Arcade Action II (AT-103)</description>
@@ -64391,6 +64531,21 @@ that the real dumps might surface -->
 			</dataarea>
 		</part>
 	</software>
+
+<!-- The following iNES roms are ripped from mc_aa2, so we don't include them (crc is from headerless file):
+	* Bitha	[10522c7b]
+	* Caesar Captain	[4dd2e5ad]
+	* GolGotha	[c1578175]
+	* Happy Angel Land	[1d90849b]
+	* Hassle	[c44d4faa]
+	* Hell Fire	[b4912d58]
+	* Racing	[72e229fe]
+	* Sea War 2000	[d49342cc]
+	* Space War	[22c50f32]
+	* Tnt	[d7fab3d7]
+	* Van-1	[a4928409]
+	* X-Plan	[77da46e1]
+ -->
 
 </softwarelist>
 
