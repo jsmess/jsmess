@@ -5,7 +5,6 @@
     http://homepage3.nifty.com/takeda-toshiya/babbage/index.html
 
     ToDo:
-    - Keyboard not working - uses IM2 and it isn't causing an IRQ yet.
     - Move the 8 LEDs to be under the numbers
 
 ***************************************************************************/
@@ -28,36 +27,28 @@ public:
 	babbage_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_pio_1(*this, "z80pio1"),
-	m_pio_2(*this, "z80pio2"),
+	m_pio_1(*this, "z80pio_1"),
+	m_pio_2(*this, "z80pio_2"),
 	m_ctc(*this, "z80ctc")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_pio_1;
-	required_device<device_t> m_pio_2;
-	required_device<device_t> m_ctc;
-	DECLARE_READ8_MEMBER( pio2_a_r );
-	DECLARE_WRITE8_MEMBER( pio1_b_w );
-	DECLARE_WRITE8_MEMBER( pio2_b_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
+	required_device<z80pio_device> m_pio_1;
+	required_device<z80pio_device> m_pio_2;
+	required_device<z80ctc_device> m_ctc;
+	DECLARE_READ8_MEMBER(pio2_a_r);
+	DECLARE_WRITE8_MEMBER(pio1_b_w);
+	DECLARE_WRITE8_MEMBER(pio2_b_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	UINT8 m_segment;
-	UINT8 m_digit;
 	UINT8 m_key;
+	UINT8 m_prev_key;
 	bool m_step;
 	virtual void machine_reset();
 	virtual void machine_start();
 };
-
-
-/***************************************************************************
-
-    Keyboard
-
-***************************************************************************/
-
 
 
 
@@ -92,8 +83,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( babbage_io, AS_IO, 8, babbage_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("z80pio1", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("z80pio2", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("z80pio_2", z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
 
 
@@ -111,28 +102,28 @@ static INPUT_PORTS_START( babbage )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INC") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("GO") PORT_CODE(KEYCODE_ENTER)
 
 	PORT_START("X1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DA") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("AD") PORT_CODE(KEYCODE_MINUS)
 
 	PORT_START("X2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("AD") PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DA") PORT_CODE(KEYCODE_EQUALS)
 
 	PORT_START("X3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("GO") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INC") PORT_CODE(KEYCODE_UP)
 INPUT_PORTS_END
 
 /* Z80-CTC Interface */
@@ -184,13 +175,13 @@ static Z80PIO_INTERFACE( babbage_z80pio1_intf )
 	DEVCB_NULL	/* ready b */
 };
 
-READ8_MEMBER( babbage_state::pio2_a_r)
+READ8_MEMBER( babbage_state::pio2_a_r )
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE); // release interrupt
 	return m_key;
 }
 
-WRITE8_MEMBER( babbage_state::pio2_b_w)
+WRITE8_MEMBER( babbage_state::pio2_b_w )
 {
 	if (BIT(data, 7))
 		m_step = 0;
@@ -201,10 +192,7 @@ WRITE8_MEMBER( babbage_state::pio2_b_w)
 		m_step++;
 	}
 	else
-	{
-		m_digit = data;
-		output_set_digit_value(m_digit, m_segment);
-	}
+		output_set_digit_value(data, m_segment);
 }
 
 static Z80PIO_INTERFACE( babbage_z80pio2_intf )
@@ -220,8 +208,8 @@ static Z80PIO_INTERFACE( babbage_z80pio2_intf )
 
 static const z80_daisy_config babbage_daisy_chain[] =
 {// need to check the order
-	{ "z80pio1" },
-	{ "z80pio2" },
+	{ "z80pio_1" },
+	{ "z80pio_2" },
 	{ "z80ctc" },
 	{ NULL }
 };
@@ -232,7 +220,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 
 	UINT8 i, j, inp;
 	char kbdrow[6];
-	state->m_key = 0xff;
+	UINT8 data = 0xff;
 
 	for (i = 0; i < 4; i++)
 	{
@@ -241,12 +229,23 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 
 		for (j = 0; j < 5; j++)
 			if (BIT(inp, j))
-				state->m_key = (j << 2) | i;
+				data = (j << 2) | i;
 	}
 
-	if (state->m_key < 0xff)
-		//cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
-		z80pio_pb_w(state->m_pio_2, 1, state->m_key); // initiate an interrupt
+	/* make sure only one keystroke */
+	if (data != state->m_prev_key)
+		state->m_prev_key = data;
+	else
+		data = 0xff;
+
+	/* while key is down, activate strobe. When key released, deactivate strobe which causes an interrupt */
+	if (data < 0xff)
+	{
+		state->m_key = data;
+		state->m_pio_2->strobe(0, 0);
+	}
+	else
+		state->m_pio_2->strobe(0, 1);
 }
 
 
@@ -268,10 +267,10 @@ static MACHINE_CONFIG_START( babbage, babbage_state )
 
 	/* Devices */
 	MCFG_Z80CTC_ADD( "z80ctc", MAIN_CLOCK, babbage_ctc_intf)
-	MCFG_Z80PIO_ADD( "z80pio1", MAIN_CLOCK, babbage_z80pio1_intf )
-	MCFG_Z80PIO_ADD( "z80pio2", MAIN_CLOCK, babbage_z80pio2_intf )
+	MCFG_Z80PIO_ADD( "z80pio_1", MAIN_CLOCK, babbage_z80pio1_intf )
+	MCFG_Z80PIO_ADD( "z80pio_2", MAIN_CLOCK, babbage_z80pio2_intf )
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(25))
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(30))
 MACHINE_CONFIG_END
 
 
@@ -288,4 +287,4 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT       COMPANY           FULLNAME */
-COMP( 1986, babbage,  0,      0,      babbage,    babbage, 0,   "Mr Takafumi Aihara",  "Babbage-2nd" , GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1986, babbage,  0,      0,      babbage,    babbage, 0,   "Mr Takafumi Aihara",  "Babbage-2nd" , GAME_NO_SOUND_HW )
