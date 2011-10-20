@@ -1215,4 +1215,539 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
+	
+		
+	<software name="bckgmmn">
+		<description>Backgammon</description>
+		<year>1979</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2617" />
+		<info name="programmer" value="Craig Nelson"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="backgammon.a26" size="4096" crc="a3d119c6" sha1="bda9fbd4c75c2c70ab0a6a639a0a839d0397b536" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bckgmmnp" cloneof="bckgmmn">
+		<description>Backgammon (PAL)</description>
+		<year>1979</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2617P" />
+		<info name="programmer" value="Craig Nelson"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="backgammon (pal).a26" size="4096" crc="e2a7ffa6" sha1="9b1da7fbd0bf6fcadf1b60c11eeb31b6a61a03c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="bankheis">
+		<description>Bank Heist</description>
+		<year>1983</year>
+		<publisher>20th Century Fox</publisher>
+		<info name="serial" value="11012 " />
+		<info name="programmer" value="	Bill Aspromonte"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bank heist.a26" size="4096" crc="7aa79d1e" sha1="80d4020575b14e130f28146bf45921e001f9f649" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="bankheisp" cloneof="bankheis">
+	<!-- Not 100% sure about this one's Official name Good2600 say it's the Alttitle, Atariage say it's not dumped and Atarimania Say it's Bank Heist. Both Atariage and Atarimania say there is no game named Skull Island-->
+		<description>Bank Heist (PAL)</description>
+		<year>1983</year>
+		<publisher>Hi-Score</publisher>
+		<info name="programmer" value="	Bill Aspromonte"/>
+		<info name="alttitle" value="Skull Island" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bank heist (pal).a26" size="4096" crc="47d4b652" sha1="07a6adc78299d981cfdf2d96e708b1f8e4f7fb4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barnstrmp" cloneof="barnstrm">
+		<description>Barnstorming (Activision)(PAL)</description>
+		<year>1982</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="EAX-013" />
+		<info name="programmer" value="Steve Cartwright"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="barnstorming (pal).a26" size="4096" crc="f866dbf7" sha1="0e146b4081ae08d7a527bd0e7abd23bb1d42dffb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="barnstrm">
+		<description>Barnstorming (Activision)</description>
+		<year>1982</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="AX-013" />
+		<info name="programmer" value="Steve Cartwright"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="barnstorming.a26" size="4096" crc="4a005181" sha1="372663097b419ced64f44ef743fe8d0af4317f46" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="barnstrmc" cloneof="barnstrm">
+		<description>Barnstorming (CCE)</description>
+		<year>1982</year>
+		<publisher>CCE</publisher>
+		<info name="programmer" value="Steve Cartwright"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="barnstorming (cce).a26" size="4096" crc="281736d6" sha1="72f0bd35b49e4a35f6e51df6ec8ea579b5a673eb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="baseatak">
+		<description>Base Attack (PAL)</description>
+		<year>1983</year>
+		<publisher>HomeVision</publisher>
+		<info name="serial" value="VCS 83113" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="base attack.a26" size="4096" crc="81f1e5dd" sha1="4e2ccb0afe236a76193ad500bab57abb82632a5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="baseball">
+		<description>Baseball (Atari)</description>
+		<year>1978</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2623" />
+		<info name="programmer" value="Bob Whitehead"/>
+		<info name="alttitle" value="Home Run" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="baseball.a26" size="4096" crc="1195a6fd" sha1="ef4dbf9d84eb1fff3c8ceef10ace8bf1f305354f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="baseballp"  cloneof="baseball">
+		<description>Baseball (PAL)</description>
+		<year>1978</year>
+		<publisher>Telegames</publisher>
+		<info name="serial" value="CX2623" />
+		<info name="alttitle" value="Super Challenge Baseball (PAL)" />
+		<info name="programmer" value="Bob Whitehead"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="baseball (pal).a26" size="4096" crc="b248547e" sha1="2ae3bf2295020192aca587aa5a4f2426543fbf80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="scbasbal"><!-- cloneof="baseball" not so sure about it-->
+		<description>Super Challenge Baseball (Mattel)</description>
+		<year>1978</year>
+		<publisher>Mattel</publisher>
+		<info name="programmer" value="David Rolfe"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="super challenge baseball (mattel).a26" size="4096" crc="f7e88ec2" sha1="dfce4d6436f91d8d385f8b01f0d8e3488400407b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="scbasball" cloneof="scbasbal"><!-- cloneof="baseball" not so sure about it-->
+		<description>Super Challenge Baseball (JYTEC)</description>
+		<year>1978</year>
+		<publisher>Jone Yuan Telephonic Enterprise Co</publisher>
+		<info name="programmer" value="David Rolfe"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="super challenge baseball (jytec).a26" size="4096" crc="4c3a91f1" sha1="68b31e9cf626f0291dbcf038447fbf878bb7b37e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="basmath">
+		<description>Basic Math</description>
+		<year>1977</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2661" />
+		<info name="alttitle" value="Fun with Numbers" />
+		<info name="programmer" value="Gary Palmer"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="basic math.a26" size="2048" crc="d48ebac0" sha1="5cc4010eb2858afe8ce77f53a89d37c7584e15b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="basmathp"  cloneof="basmath">
+		<description>Basic Math (PAL)</description>
+		<year>1978</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2661" />
+		<info name="alttitle" value="Fun with Numbers" />
+		<info name="programmer" value="Gary Palmer"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="basic math (pal).a26" size="2048" crc="5456cdca" sha1="ebdc9fc929a6ef47daea8ab539b769a244243a1a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="basprog">
+		<description>BASIC Programming</description>
+		<year>1978</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2623" />
+		<info name="programmer" value="Warren Robinett"/>
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="keypad" />
+			<dataarea name="rom" size="4096">
+				<rom name="basic programming.a26" size="4096" crc="26a3c844" sha1="6c56fad688b2e9bb783f8a5a2360c80ad2338e47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="basprogr"  cloneof="basprog">
+		<description>BASIC Programming (PAL)</description>
+		<year>1978</year>
+		<publisher>Telegames</publisher>
+		<info name="serial" value="CX2620" />
+		<info name="programmer" value="Warren Robinett"/>
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="keypad" />
+			<dataarea name="rom" size="4096">
+				<rom name="basic programming (pal).a26" size="4096" crc="c207f43e" sha1="ff4da01319153a2bde2d2cb1bb1dd900ae105e9a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="baskball">
+		<description>Basketball</description>
+		<year>1978</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2624" />
+		<info name="programmer" value="Alan Miller"/>
+		<info name="alttitle" value="Home Run" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="basketball.a26" size="2048" crc="711a2340" sha1="9375c5c5298e81b37224dbde9bc5af151181ca27" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="baskballp"  cloneof="baskball">
+		<description>Basketball (PAL)</description>
+		<year>1978</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2624P" />
+		<info name="alttitle" value="Super Challenge Baseball (PAL)" />
+		<info name="programmer" value="Alan Miller"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="basketball (pal).a26" size="2048" crc="b31d49f0" sha1="bffe99454cb055552e5d612f0dba25470137328d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="batlzone">
+		<description>Battlezone</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2681" />
+		<info name="programmer" value="Michael Feinstein"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="battlezone.a26" size="8192" crc="9155dd1d" sha1="e4134a3b4a065c856802bc935c12fa7e9868110a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="batlzonep" cloneof="batlzone">
+		<description>Battlezone (PAL)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2681P" />
+		<info name="programmer" value="Michael Feinstein"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="battlezone (pal).a26" size="8192" crc="5cc921f6" sha1="d33a367fc4890bea8c2d9a7283d84720b20cabf8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="batlzonp1" cloneof="batlzone">
+		<description>Battlezone (Prototype, 19830502)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2681" />
+		<info name="programmer" value="Michael Feinstein"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="battlezone (proto).a26" size="8192" crc="c1e6d7cf" sha1="fafd522e36a4888dfc2a40b1d5879ee8a33d7931" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="batlzonp2"  cloneof="batlzone">
+		<description>Battlezone (Prototype, 19830512)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2681" />
+		<info name="programmer" value="Michael Feinstein"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="battlezone (proto 19830512).a26" size="8192" crc="63f31af6" sha1="3e226d8ffa975b937d808f73f79b3f052c3b067e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="beamridr">
+		<description>Beamrider</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="AZ-037-04" />
+		<info name="programmer" value="Dave Rolfe"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="beamrider.a26" size="8192" crc="1618565b" sha1="47619edb352f7f955f811cbb03a00746c8e099b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="beamridrp" cloneof="beamridr">
+		<description>Beamrider (PAL)</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="EAZ-037-04" />
+		<info name="programmer" value="Dave Rolfe"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="beamrider (pal).a26" size="8192" crc="6ed2e636" sha1="0ae5d0f01e63e053baba4bdaaed8a82e59334aaf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="beanbopp">
+		<description>Beany Bopper (20th Century Fox)</description>
+		<year>1983</year>
+		<publisher>20th Century Fox</publisher>
+		<info name="serial" value="11002" />
+		<info name="programmer" value="Grady Ward"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="beany bopper (20th century fox).a26" size="4096" crc="b722bc8f" sha1="fad0c97331a525a4aeba67987552ba324629a7a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="beanboppr" cloneof="beanbopp">
+		<description>Beany Bopper (CCE)</description>
+		<year>1983</year>
+		<publisher>CCE</publisher>
+		<info name="serial" value="C-835" />
+		<info name="programmer" value="Grady Ward"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="beany bopper (cce).a26" size="4096" crc="624c9345" sha1="73d55cf63ccabf881148e71dfdbd7d4445889f80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="beatem">
+		<description>Beat'Em and Eat'Em (Mystique)</description>
+		<year>1982</year>
+		<publisher>Mystique</publisher>
+		<info name="serial" value="1003" />
+		<info name="programmer" value="Joel H. Martin"/>
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="paddles" />
+			<dataarea name="rom" size="4096">
+				<rom name="beat'em and eat'em (mystique).a26" size="4096" crc="c90d4f84" sha1="e2c29d0a73a4575028b62dca745476a17f07c8f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="beatemd" cloneof="beatem">
+		<description>Beat'Em and Eat'Em (Dynacom)</description>
+		<year>1982</year>
+		<publisher>Dynacom</publisher>
+		<info name="programmer" value="Joel H. Martin"/>
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="paddles" />
+			<dataarea name="rom" size="4096">
+				<rom name="beat'em and eat'em (dynacom).a26" size="4096" crc="e4f66058" sha1="8e8e334fa481698d0adb7f9cb7852e49ac462eb9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="beatemp" cloneof="beatem">
+		<description>Beat'Em and Eat'Em (Mystique)(PAL)</description>
+		<year>1982</year>
+		<publisher>Mystique</publisher>
+		<info name="programmer" value="Joel H. Martin"/>
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="paddles" />
+			<dataarea name="rom" size="4096">
+				<rom name="beat'em and eat'em (mystique)(pal).a26" size="4096" crc="461c9f2c" sha1="8b7d6a0c5e14c52ddb18e7be7c84f45abef94bc0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="beatems" cloneof="beatem">
+		<description>Beat'Em and Eat'Em (Mystique, SuperCharger)</description>
+		<year>1982</year>
+		<publisher>Mystique</publisher>
+		<info name="serial" value="1003" />
+		<info name="programmer" value="Joel H. Martin"/>
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="paddles" />
+			<dataarea name="rom" size="4096">
+				<rom name="beat'em and eat'em (mystique)(supercharger).a26" size="4096" crc="19632ee0" sha1="5295de93efea7266f913c0db28bda2a8790ffc1e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="beatemsp" cloneof="beatem">
+		<description>Beat'Em and Eat'Em (Mystique, SuperCharger)(PAL)</description>
+		<year>1982</year>
+		<publisher>Mystique</publisher>
+		<info name="serial" value="1003" />
+		<info name="programmer" value="Joel H. Martin"/>
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="paddles" />
+			<dataarea name="rom" size="4096">
+				<rom name="beat'em and eat'em (mystique, supercharger)(pal).a26" size="4096" crc="d0f94c29" sha1="fd67c0844925e3030d3a1e4a61b9894beb9bd11c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="bernstin">
+		<description>Berenstain Bears</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
+		<info name="serial" value="2658" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="berenstain bears.a26" size="8192" crc="29d28baf" sha1="c3afd7909b72b49ca7d4485465b622d5e55f8913" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="bermuda">
+		<description>Bermuda (Rainbow Vision)</description>
+		<year>1983</year>
+		<publisher>Rainbow Vision</publisher>
+		<info name="serial" value="SS-009" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="beremuda (rv).a26" size="4096" crc="5e5ff905" sha1="bd0989a2ba74d2b0543e5c7c88c31f524aa9ef11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="bermudst" cloneof="bermuda">
+		<description>Bermuda (Starsoft)</description>
+		<year>1983</year>
+		<publisher>Starsoft</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bermuda (star).a26" size="4096" crc="b8553453" sha1="275cc126481bdc747e1e61e48f52250062da9752" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bermtria">
+		<description>Bermuda Triangle (Data Age)</description>
+		<year>1982</year>
+		<publisher>Data Age</publisher>
+		<info name="serial" value="112-007" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bermuda triangle (da).a26" size="4096" crc="0fcb5b94" sha1="fcad0e5130de24f06b98fb86a7c3214841ca42e2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bermtriag" cloneof="bermtria">
+		<description>Bermuda Triangle (Gameworld) (PAL)</description>
+		<year>1983</year>
+		<publisher>Starsoft</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bermuda triangle (gameworld).a26" size="4096" crc="a8c0aec9" sha1="9a566ae9354fc94da9fe7a53db49dba57f53c260" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berzerk">
+		<description>Berzerk</description>
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2650" />
+		<info name="programmer" value="Dan Hitchens"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bezerk.a26" size="4096" crc="2e8b4b5f" sha1="08bcbc8954473e8f0242b881315b0af4466998ae" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bezerkp" cloneof="berzerk">
+		<description>Bezerk (PAL)</description>
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2650" />
+		<info name="programmer" value="Dan Hitchens"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bezerk (pal).a26" size="4096" crc="d7f66624" sha1="afb983a2f881a017b2cfb593b0d32742093612dd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bezerkc" cloneof="berzerk">
+		<description>Bezerk (CCE)</description>
+		<year>1982</year>
+		<publisher>CCE</publisher>
+		<info name="serial" value="CX2650" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bezerk (cce).a26" size="4096" crc="f973d708" sha1="6bffbbe1207662de89c7ea02c1fcd004071fb9e4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bibi">
+		<description>Bi! Bi!</description>
+		<year>1983</year>
+		<publisher>Starsoft</publisher>
+		<info name="serial" value="SS-013" />
+		<info name="alttitle" value="Ungeheuer der Tiefe" /> 
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bezerk (cce).a26" size="4096" crc="9c3a516b" sha1="d2bcc767b170b0fc0a2a0903f4337a821623abb4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="bbecatch">
+		<description>Big Bird's Egg Catch</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26104" />
+		<info name="programmer" value="Christopher H. Omarzu"/>
+		<part name="cart" interface="a2600_cart"> 
+			<feature name="peripheral" value="Kid's Controller" />
+			<dataarea name="rom" size="8192">
+				<rom name="big bird's egg catch.a26" size="8192" crc="96dc9a9c" sha1="5e4517db83c061926130ab65975e3b83d9401cc9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
