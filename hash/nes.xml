@@ -50451,13 +50451,13 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 <!-- FIXME: which board should use this game?? -->
-	<software name="ejim2c" cloneof="ejim2">
+	<software name="ejim2c" cloneof="ejim2" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Earthworm Jim 2 (Asia, Alt 3)</description>
 		<year>19??</year>
 		<publisher>SuperGame</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" />
+			<feature name="pcb" value="BMC-GOLDENCARD-6IN1" /> <!-- Header says mapper 217, but the game does not work -->
 			<dataarea name="chr" size="262144">
 				<rom name="earthworm jim 2 (unl) (supergame).chr" size="262144" crc="66c57a10" sha1="0f6a5f2c75037a2213629ea45d79dcd0acacf48f" offset="00000" status="baddump" />
 			</dataarea>
@@ -50554,7 +50554,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-<!-- were these two below ever released on real carts? -->
+<!-- was this ever released on real carts? -->
 	<software name="famikan">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Famikan (Japan, Unl)</description>
@@ -50568,23 +50568,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="famikan (japan) (unl).prg" size="16384" crc="b3b5e13b" sha1="55cfdda77c8dc1b6341e8bcb8eaa0f07184b16bd" offset="00000" status="baddump" />
-				<rom size="16384" offset="0x4000" loadflag="reload" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ff8k" supported="partial">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Fighter F8000</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-NROM-128" />
-			<dataarea name="chr" size="8192">
-				<rom name="fighter_f8000.chr" size="8192" crc="6f65fdae" sha1="0de891368236fcef0e03eb98b75436a7d1653327" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="fighter_f8000.prg" size="16384" crc="de27a826" sha1="6693612d42b4a33cc1147014b536e7c7f9e2d947" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
@@ -50618,6 +50601,24 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="final fight 3 chinese.prg" size="262144" crc="08409215" sha1="07d6f8665df02dd11864f2efe51b3fa0e9c165f8" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Does it come from an original cart or has it been ripped from sunday (Sunday Funday)?? -->
+	<software name="fishfall">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Fish Fall (Asia)</description>
+		<year>19??</year>
+		<publisher>Color Dreams</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="COLORDREAMS-74*377" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="65536">
+				<rom name="fish fall (unl).chr" size="65536" crc="efe20af3" sha1="232c94e5fcea32c8bbd75c3a873d22dea5a9ea83" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="fish fall (unl).prg" size="65536" crc="177989fe" sha1="4950fc00564e8740e9c78ba43e9521928e16854f" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -50783,7 +50784,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="jgscs">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: ZhanGuo SiChuanSheng ? -->
 		<description>Jin Gwok Sei Chuen Saang (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -51132,7 +51133,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="pandawrl">
 		<!-- Serial: Ripped from XB-F812 9-in-1 multicart - Release Date:  - Alternative Title:  -->
-		<description>Panda World (Asia, Ripped from multicart)</description>
+		<description>Panda World (Asia, Ripped from multicart XB-F812)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -51460,6 +51461,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="alpski" cloneof="skiing">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Alps Skiing (Chi)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="alps skiing (c).chr" size="131072" crc="05913e34" sha1="ff073c690732da2fa29c42b364e0610054585965" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="alps skiing (c).prg" size="131072" crc="b56e9748" sha1="f3d9bff186edd37198b6d4318ac9074f9d829092" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sk5" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title: Super Sonic 5 (on cart label) -->
 		<description>Sonic &amp; Knuckles 5</description>
@@ -51704,6 +51721,23 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<dataarea name="prg" size="65536">	<!-- CHECK THIS -->
 				<rom name="tin choi ma lei (ch) [u].prg0" size="32768" crc="ddf910b2" sha1="3977f975b2db0fba6cce8621d7d49a2b86ff2c43" offset="00000" status="baddump" />
 				<rom name="tin choi ma lei (ch) [u].prg1" size="2048" crc="2ee84bd0" sha1="51239bdc89ee3f1b7c9b17a63bff1fc20a36b244" offset="0x08000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tinchomla" cloneof="tinchoml" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tin Choi Ma Lei (Chi, Alt)</description>
+		<year>19??</year>
+		<publisher>JMH MTV Corp?</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BTL-MARIO1-MALEE2" />
+			<dataarea name="chr" size="8192">
+				<rom name="genius merio bros. (tin choi ma lei).chr" size="8192" crc="da934ea9" sha1="ee09df7a90c2a39cce87fdcdfa6e65aed01767ff" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">	<!-- CHECK THIS -->
+				<rom name="genius merio bros. (tin choi ma lei).prg0" size="32768" crc="ddf910b2" sha1="3977f975b2db0fba6cce8621d7d49a2b86ff2c43" offset="00000" status="baddump" />
+				<rom name="genius merio bros. (tin choi ma lei).prg1" size="2048" crc="2ee84bd0" sha1="51239bdc89ee3f1b7c9b17a63bff1fc20a36b244" offset="0x08000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -52411,6 +52445,22 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
+	<software name="happybiq">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Happy Biqi III - World Fighter (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="happy biqi iii (ch).chr" size="262144" crc="672a6032" sha1="e36c89485316c946e39656aaba4e9e12a09f4437" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="happy biqi iii (ch).prg" size="262144" crc="ac5c3a2a" sha1="a751a848653849a69bda304baa8de99c6af9869d" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hotdance">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Hot Dance 2000 (Asia)</description>
@@ -52557,7 +52607,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="mofamen" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title: 魔法门-英雄无敌 ~ mófǎ mén-yīngxióng wúdí -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 魔法门-英雄无敌 ~ mófǎ mén-yīngxióng wúdí (Heroes of Might &amp; Magic?) -->
 		<description>Mo Fa Men - Ying Xiong Wu Di (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -52990,6 +53040,23 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
+	<software name="shuiguli">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Shui Guo Li (Chi)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-CNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="32768">
+				<rom name="shui guo li (ch).chr" size="32768" crc="5762eaab" sha1="91fb840ab8346b31d2f517cd933231ead48d3360" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="shui guo li (ch).prg" size="32768" crc="c87b7dbe" sha1="9a3089d6ae5b2985317e6bef92e16b1727949702" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shuiguli1" cloneof="shuiguli">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Shui Guo Li (Chi, Alt)</description>
@@ -53007,19 +53074,19 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="shuiguli">
+	<software name="shuiguli2" cloneof="shuiguli">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Shui Guo Li (Chi)</description>
+		<description>Shui Guo Li (Chi, Alt 2)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Bit Corp.</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
-				<rom name="shui guo li (ch).chr" size="32768" crc="5762eaab" sha1="91fb840ab8346b31d2f517cd933231ead48d3360" offset="00000" status="baddump" />
+				<rom name="shui guo li (bit corp) (c).chr" size="32768" crc="5762eaab" sha1="91fb840ab8346b31d2f517cd933231ead48d3360" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="shui guo li (ch).prg" size="32768" crc="c87b7dbe" sha1="9a3089d6ae5b2985317e6bef92e16b1727949702" offset="00000" status="baddump" />
+				<rom name="shui guo li (bit corp) (c).prg" size="32768" crc="ad2f4a2c" sha1="e4370002f326b9b39d18b5cd73a2b981a45ea29d" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -53260,6 +53327,22 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="super wonderful mario 5 (ch).prg" size="131072" crc="4a3a48a5" sha1="3ad880bf08a8a446ddd93c6500640bcbbd424ac1" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twxmz">
+		<!-- Serial:  - Release Date:  - Alternative Title: 天王降魔传 -->
+		<description>Tian Wang Xiang Mo Zhuan (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tian wang xiang mo zhuan (c).chr" size="262144" crc="70327804" sha1="67db8c49dd1601002adaf9ec1ab65eaabb892206" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="tian wang xiang mo zhuan (c).prg" size="262144" crc="72d817f9" sha1="10c9abf1236ec49cd7a08a200a7db18ddd6e7345" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -62234,6 +62317,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- JP Ronny (Unl) [headerless crc: a9c69118] has been ripped from this multicart -->
 	<software name="mc_20asd">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>ASDER 20 in 1</description>
