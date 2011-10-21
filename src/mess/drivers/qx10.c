@@ -1026,8 +1026,10 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( qx10 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "qx10boot.bin", 0x0000, 0x0800, BAD_DUMP CRC(f8dfcba5) SHA1(a7608f8aa7da355dcaf257ee28b66ded8974ce3a))
-
+	ROM_SYSTEM_BIOS(0, "v006", "v0.06")
+    ROMX_LOAD( "ipl006.bin", 0x0000, 0x0800, CRC(3155056a) SHA1(67cc0ae5055d472aa42eb40cddff6da69ffc6553), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "v003", "v0.03")
+    ROMX_LOAD( "ipl003.bin", 0x0000, 0x0800, CRC(3cbc4008) SHA1(cc8c7d1aa0cca8f9753d40698b2dc6802fd5f890), ROM_BIOS(2))
 	/* This is probably the i8039 program ROM for the Q10MF Multifont card, and the actual font ROMs are missing (6 * HM43128) */
 	/* The first part of this rom looks like code for an embedded controller?
         From 8300 on, looks like a characters generator */
@@ -1039,47 +1041,7 @@ ROM_START( qx10 )
 	ROM_LOAD( "qge.2e",   0x0000, 0x1000, BAD_DUMP CRC(eb31a2d5) SHA1(6dc581bf2854a07ae93b23b6dfc9c7abd3c0569e))
 ROM_END
 
-ROM_START( qc10 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF ) /* already patched? */
-	ROM_LOAD( "ipl.rom", 0x0000, 0x0800, CRC(73e8b3cd) SHA1(be9a84a5a27b387798d2b94d3b5fe547b4b4620d))
-
-	/* This is probably the i8039 program ROM for the Q10MF Multifont card, and the actual font ROMs are missing (6 * HM43128) */
-	/* The first part of this rom looks like code for an embedded controller?
-        From 8300 on, looks like a characters generator */
-	ROM_REGION( 0x800, "i8039", 0 )
-	ROM_LOAD( "m12020a.3e", 0x0000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132)) //mfont.rom
-
-	ROM_REGION( 0x1000, "chargen", 0 )
-//  ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(04a6da6d) SHA1(ef9743476f6fb30ca9209cf700e985a7f85066bb)) //this one contains normal characters
-	ROM_LOAD( "qge.2e",   0x0000, 0x1000, BAD_DUMP CRC(eb31a2d5) SHA1(6dc581bf2854a07ae93b23b6dfc9c7abd3c0569e))
-ROM_END
-
-
 /* Driver */
 
-static DRIVER_INIT(qx10)
-{
-	// patch boot rom
-	UINT8 *bootrom = machine.region("maincpu")->base();
-	bootrom[0x250] = 0x00; /* nop */
-	bootrom[0x251] = 0x00; /* nop */
-	bootrom[0x252] = 0x00; /* nop */
-	bootrom[0x253] = 0x00; /* nop */
-	bootrom[0x254] = 0x00; /* nop */
-	bootrom[0x255] = 0x00; /* nop */
-	bootrom[0x256] = 0x00; /* nop */
-	bootrom[0x257] = 0x00; /* nop */
-	bootrom[0x258] = 0x00; /* nop */
-	bootrom[0x259] = 0x00; /* nop */
-	bootrom[0x25a] = 0x00; /* nop */
-	bootrom[0x25b] = 0x00; /* nop */
-	bootrom[0x25c] = 0x00; /* nop */
-	bootrom[0x25d] = 0x00; /* nop */
-	bootrom[0x25e] = 0x3e; /* ld a,11 */
-	bootrom[0x25f] = 0x11;
-
-}
-
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, qx10,  0,       0,	qx10,	qx10,	 qx10,		  "Epson",   "QX-10",		GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1983, qc10,  qx10,    0,	qx10,	qx10,	 0, 		  "Epson",   "QC-10 (Japan)",		GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1983, qx10,  0,       0,	qx10,	qx10,	 0,		  "Epson",   "QX-10",		GAME_NOT_WORKING | GAME_NO_SOUND )
