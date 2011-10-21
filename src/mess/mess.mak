@@ -1747,6 +1747,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/cd2650.o	\
 	$(MESS_DRIVERS)/codata.o	\
 	$(MESS_DRIVERS)/cosmicos.o	\
+	$(MESS_DRIVERS)/cvicny.o	\
 	$(MESS_DRIVERS)/czk80.o		\
 	$(MESS_DRIVERS)/d6800.o		\
 	$(MESS_DRIVERS)/d6809.o		\
@@ -1868,6 +1869,7 @@ $(MESS_DRIVERS)/beta.o:		$(MESS_LAYOUT)/beta.lh
 $(MESS_DRIVERS)/bob85.o:	$(MESS_LAYOUT)/bob85.lh
 $(MAME_DRIVERS)/cdi.o:		$(MAME_LAYOUT)/cdi.lh
 $(MESS_DRIVERS)/chessmst.o:	$(MESS_LAYOUT)/chessmst.lh
+$(MESS_DRIVERS)/cvicny.o:	$(MESS_LAYOUT)/cvicny.lh
 $(MESS_DRIVERS)/coco.o:		$(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/cosmicos.o:	$(MESS_LAYOUT)/cosmicos.lh
 $(MESS_DRIVERS)/c80.o:		$(MESS_LAYOUT)/c80.lh
