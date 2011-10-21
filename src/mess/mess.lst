@@ -874,6 +874,7 @@ ti99_8e   // 1983 TI-99/8 with 50Hz video
 // TI 99 clones
 tutor	  // 1983? Tomy Tutor
 pyuuta	// 1982 Tomy Pyuuta
+pyuutajr	// 1982 Tomy Pyuuta Jr.
 geneve	// 1987? Myarc Geneve 9640
 ti99_4p   // 1996 SNUG 99/4P (a.k.a. SGCPU)
 
@@ -922,6 +923,7 @@ pc8801ma
 pc8801ma2
 pc8801mc
 pc88va
+pc88va2
 
 pc100
 

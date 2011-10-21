@@ -1679,7 +1679,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 MACHINE_CONFIG_END
 
 
-ROM_START( pc88va )
+ROM_START( pc88va2 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x100000, "fdccpu", ROMREGION_ERASEFF )
@@ -1707,6 +1707,36 @@ ROM_START( pc88va )
 	ROM_REGION( 0x40000, "gvram", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( pc88va )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x100000, "fdccpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "vasubsys.rom", 0x0000, 0x2000, CRC(08962850) SHA1(a9375aa480f85e1422a0e1385acb0ea170c5c2e0) )
+
+	ROM_REGION( 0x100000, "rom00", ROMREGION_ERASEFF ) // 0xe0000 - 0xeffff
+	ROM_LOAD( "varom00.rom", 0x00000, 0x80000, CRC(8a853b00) SHA1(1266ba969959ff25433ecc900a2caced26ef1a9e))
+	ROM_LOAD( "varom08.rom", 0x80000, 0x20000, CRC(154803cc) SHA1(7e6591cd465cbb35d6d3446c5a83b46d30fafe95))
+
+	ROM_REGION( 0x20000, "rom10", 0 ) // 0xf0000 - 0xfffff
+	ROM_LOAD( "varom1.rom", 0x00000, 0x20000, CRC(0783b16a) SHA1(54536dc03238b4668c8bb76337efade001ec7826))
+
+	/* No idea of the proper size: it has never been dumped */
+	ROM_REGION( 0x2000, "audiocpu", 0)
+	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "kanji", ROMREGION_ERASEFF )
+	ROM_LOAD( "vafont.rom", 0x0000, 0x50000, CRC(faf7c466) SHA1(196b3d5b7407cb4f286ffe5c1e34ebb1f6905a8c)) // should be splitted
+	ROM_REGION( 0x80000, "dictionary", 0 )
+	ROM_LOAD( "vadic.rom",  0x0000, 0x80000, CRC(f913c605) SHA1(5ba1f3578d0aaacdaf7194a80e6d520c81ae55fb))
+
+	ROM_REGION( 0x10000, "tvram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x40000, "gvram", ROMREGION_ERASE00 )
+ROM_END
+  
+  
+  
+  
 COMP( 1987, pc88va,         0,		0,     pc88va,   pc88va,  0,    "Nippon Electronic Company",  "PC-88VA", GAME_NOT_WORKING | GAME_NO_SOUND)
-//COMP( 1988, pc88va2,      pc88va, 0,     pc88va,   pc88va,  0,    "Nippon Electronic Company",  "PC-88VA2", GAME_NOT_WORKING )
+COMP( 1988, pc88va2,        pc88va, 0,     pc88va,   pc88va,  0,    "Nippon Electronic Company",  "PC-88VA2", GAME_NOT_WORKING | GAME_NO_SOUND )
 //COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88va,  0,    "Nippon Electronic Company",  "PC-88VA3", GAME_NOT_WORKING )
