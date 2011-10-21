@@ -15589,6 +15589,18 @@
 		</part>
 	</software>
 
+	<software name="sf2a" cloneof="sf2">
+		<!-- Serial: DMG-ASFE-USA - Release Date:  - Notes: SGB enhanced -->
+		<description>Street Fighter II (USA)</description>
+		<year>1995</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="street fighter ii (usa).bin" size="524288" crc="0b29830a" sha1="05711638648654e75ca6a563411daec3251c2ef0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sracerj" cloneof="sracer">
 		<!-- Serial: DMG-ASRJ - Release Date: 1996-09-27 - Alt. Title: ストリートレーサー - Notes: SGB enhanced -->
 		<description>Street Racer (Jpn)</description>
