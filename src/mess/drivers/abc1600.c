@@ -1690,30 +1690,39 @@ static ABC99_INTERFACE( abc99_intf )
 static SLOT_INTERFACE_START( abc1600bus_cards )
 	SLOT_INTERFACE("4105", LUXOR_4105) // SASI interface
 //	SLOT_INTERFACE("4077", LUXOR_4077) // Winchester controller
+//	SLOT_INTERFACE("4004", LUXOR_4004) // ICOM I/O (Z80, Z80PIO, Z80SIO/2, Z80CTC, 2 Z80DMAs, 2 PROMs, 64KB RAM)
 SLOT_INTERFACE_END
 
 static ABC1600BUS_INTERFACE( bus0i_intf )
 {
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa7_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa7_w), // really inverted but ASSERT_LINE takes care of that
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
+WRITE_LINE_MEMBER( abc1600_state::nmi_w )
+{
+	if (state == ASSERT_LINE)
+	{
+		m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
+	}
+}
+
 static ABC1600BUS_INTERFACE( bus0x_intf )
 {
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa6_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa6_w), // really inverted but ASSERT_LINE takes care of that
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE(MC68008P8_TAG, M68K_IRQ_7),
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa5_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa4_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa3_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa2_w)
+	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, nmi_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa2_w), // really inverted but ASSERT_LINE takes care of that
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa3_w), // really inverted but ASSERT_LINE takes care of that
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa4_w), // really inverted but ASSERT_LINE takes care of that
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa5_w) // really inverted but ASSERT_LINE takes care of that
 };
 
 static ABC1600BUS_INTERFACE( bus1_intf )
 {
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa1_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pa1_w), // really inverted but ASSERT_LINE takes care of that
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1738,7 +1747,7 @@ static ABC1600BUS_INTERFACE( bus2_intf )
 static IRQ_CALLBACK( abc1600_int_ack )
 {
 	abc1600_state *state = device->machine().driver_data<abc1600_state>();
-	UINT8 data = 0;
+	int data = 0;
 
 	switch (irqline)
 	{
@@ -1748,6 +1757,12 @@ static IRQ_CALLBACK( abc1600_int_ack )
 
 	case M68K_IRQ_5:
 		data = state->m_dart->m1_r();
+		break;
+		
+	case M68K_IRQ_7:
+		state->m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
+		
+		data = M68K_INT_ACK_AUTOVECTOR;
 		break;
 	}
 
@@ -1810,6 +1825,9 @@ void abc1600_state::machine_reset()
 	// disable display
 	m_clocks_disabled = 1;
 	m_endisp = 0;
+	
+	// clear NMI
+	m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
 }
 
 

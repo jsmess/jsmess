@@ -143,6 +143,8 @@ public:
 	DECLARE_WRITE8_MEMBER( cio_pb_w );
 	DECLARE_READ8_MEMBER( cio_pc_r );
 	DECLARE_WRITE8_MEMBER( cio_pc_w );
+	
+	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 
 	int get_current_task(offs_t offset);
 	offs_t get_segment_address(offs_t offset);
