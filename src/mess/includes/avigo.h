@@ -53,6 +53,7 @@ public:
 
 	DECLARE_READ8_MEMBER(key_data_read_r);
 	DECLARE_WRITE8_MEMBER(set_key_line_w);
+	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_READ8_MEMBER(irq_r);
 	DECLARE_WRITE8_MEMBER(irq_w);
 	DECLARE_READ8_MEMBER(bank1_r);
@@ -79,15 +80,16 @@ public:
 	// driver state
 	UINT8				m_key_line;
 	UINT8				m_irq;
+	UINT8				m_port2;
 	UINT8				m_bank2_l;
 	UINT8				m_bank2_h;
 	UINT8				m_bank1_l;
 	UINT8				m_bank1_h;
-	unsigned long		m_ad_control_status;
+	UINT8				m_ad_control_status;
 	intelfsh8_device *	m_flashes[3];
 	int 				m_flash_at_0x4000;
 	int 				m_flash_at_0x8000;
-	unsigned int		m_ad_value;
+	UINT16				m_ad_value;
 	UINT8 *				m_video_memory;
 	UINT8				m_screen_column;
 	UINT8				m_warm_start;
