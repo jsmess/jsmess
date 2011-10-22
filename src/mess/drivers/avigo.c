@@ -328,6 +328,19 @@ WRITE8_MEMBER(avigo_state::irq_w)
 	refresh_ints();
 }
 
+WRITE8_MEMBER(avigo_state::port2_w)
+{
+	/*
+		bit 4     LCD backlight on/off
+		bit 5-6   source select for a/d converter
+    */
+
+	if ((m_port2 ^ data) & 0x10)
+		popmessage("Backlight %s", data & 0x10 ? "on" : "off");
+
+	m_port2 = data;
+}
+
 READ8_MEMBER(avigo_state::bank1_r)
 {
 	return offset ? m_bank1_h: m_bank1_l;
@@ -381,56 +394,72 @@ WRITE8_MEMBER(avigo_state::ad_control_status_w)
 {
 	LOG(("avigo ad control w %02x\n",data));
 
-	if ((data & 0x070)==0x070)
+	switch (m_port2 & 0x60)
 	{
-		/* bit 3 appears to select between 1 = x coord, 0 = y coord */
-		/* when 6,5,4 = 1 */
-		if ((data & 0x08)!=0)
-		{
-			LOG(("a/d select x coordinate\n"));
-			LOG(("x coord: %d\n", input_port_read(machine(), "POSX")));
+		case 0x20:
+			// read main battery status valid range 0x000-0x3ff
+			LOG(("a/d main battery status\n"));
 
-			/* on screen range 0x060->0x03a0 */
-			if (input_port_read(machine(), "LINE3") & 0x01)
+			m_ad_value = 0x3ff;
+			break;
+		case 0x40:
+			// read backup battery status valid range 0x000-0x3ff
+			LOG(("a/d backup battery status\n"));
+
+			m_ad_value = 0x3ff;
+			break;
+		case 0x60:
+			if ((data & 0x070)==0x070)
 			{
-				/* this might not be totally accurate because hitable screen
-                area may include the border around the screen! */
-				m_ad_value = input_port_read(machine(), "POSX");
+				/* bit 3 appears to select between 1 = x coord, 0 = y coord */
+				/* when 6,5,4 = 1 */
+				if ((data & 0x08)!=0)
+				{
+					LOG(("a/d select x coordinate\n"));
+					LOG(("x coord: %d\n", input_port_read(machine(), "POSX")));
+
+					/* on screen range 0x060->0x03a0 */
+					if (input_port_read(machine(), "LINE3") & 0x01)
+					{
+						/* this might not be totally accurate because hitable screen
+						area may include the border around the screen! */
+						m_ad_value = input_port_read(machine(), "POSX");
+					}
+					else
+					{
+						m_ad_value = 0;
+					}
+
+					LOG(("ad value: %d\n",m_ad_value));
+
+				}
+				else
+				{
+					/* in the avigo rom, the y coordinate is inverted! */
+					/* therefore a low value would be near the bottom of the display,
+					and a high value at the top */
+
+					/* total valid range 0x044->0x03a6 */
+					/* 0x0350 is also checked */
+
+					/* assumption 0x044->0x0350 is screen area and
+					0x0350->0x03a6 is panel at bottom */
+
+					LOG(("a/d select y coordinate\n"));
+					LOG(("y coord: %d\n", input_port_read(machine(), "POSY")));
+
+					if (input_port_read(machine(), "LINE3") & 0x01)
+					{
+						m_ad_value = input_port_read(machine(), "POSY");
+					}
+					else
+					{
+						m_ad_value = 0;
+					}
+
+					LOG(("ad value: %d\n",m_ad_value));
+				}
 			}
-			else
-			{
-				m_ad_value = 0;
-			}
-
-			LOG(("ad value: %d\n",m_ad_value));
-
-		}
-		else
-		{
-			/* in the avigo rom, the y coordinate is inverted! */
-			/* therefore a low value would be near the bottom of the display,
-            and a high value at the top */
-
-			/* total valid range 0x044->0x036a */
-			/* 0x0350 is also checked */
-
-			/* assumption 0x044->0x0350 is screen area and
-            0x0350->0x036a is panel at bottom */
-
-			LOG(("a/d select y coordinate\n"));
-			LOG(("y coord: %d\n", input_port_read(machine(), "POSY")));
-
-			if (input_port_read(machine(), "LINE3") & 0x01)
-			{
-				m_ad_value = input_port_read(machine(), "POSY");
-			}
-			else
-			{
-				m_ad_value = 0;
-			}
-
-			LOG(("ad value: %d\n",m_ad_value));
-		}
 	}
 
 	/* bit 0: 1 if a/d complete, 0 if a/d not complete */
@@ -450,6 +479,7 @@ READ8_MEMBER(avigo_state::ad_data_r)
 	{
 		/* x1110xxx */
 		/* read upper 4 bits of 10 bit A/D number */
+		case 0x060:
 		case 0x070:
 		case 0x078:
 		{
@@ -464,6 +494,7 @@ READ8_MEMBER(avigo_state::ad_data_r)
 		break;
 
 		/* x0111xxx */
+		case 0x020:
 		case 0x038:
 		{
 			/* lower 6 bits of 10-bit A/D number in bits 7-2 of data */
@@ -562,6 +593,7 @@ static ADDRESS_MAP_START( avigo_io, AS_IO, 8, avigo_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x001, 0x001) AM_READWRITE( key_data_read_r, set_key_line_w )
+	AM_RANGE(0x002, 0x002) AM_WRITE( port2_w )
 	AM_RANGE(0x003, 0x003) AM_READWRITE( irq_r, irq_w )
 	AM_RANGE(0x004, 0x004) AM_READ( port_04_r )
 	AM_RANGE(0x005, 0x006) AM_READWRITE( bank1_r, bank1_w )
