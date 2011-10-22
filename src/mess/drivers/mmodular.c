@@ -1554,7 +1554,7 @@ static MACHINE_CONFIG_FRAGMENT ( chess_common )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( polgar, driver_device )
+static MACHINE_CONFIG_START( polgar, polgar_state )
 	MCFG_CPU_ADD("maincpu",M65C02,4915200)
 	MCFG_CPU_PROGRAM_MAP(polgar_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
