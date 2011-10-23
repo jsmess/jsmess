@@ -2539,7 +2539,7 @@ static TIMER_CALLBACK(x1_rtc_increment)
 	if((state->m_rtc.hour & 0x0f) >= 0x0a)				{ state->m_rtc.hour+=0x10; state->m_rtc.hour&=0xf0; }
 	if((state->m_rtc.hour & 0xff) >= 0x24)				{ state->m_rtc.day++; state->m_rtc.wday++; state->m_rtc.hour = 0; }
 	if((state->m_rtc.wday & 0x0f) >= 0x07)				{ state->m_rtc.wday = 0; }
-	if((state->m_rtc.day & 0x0f) >= 0x0a)					{ state->m_rtc.day+=0x10; state->m_rtc.day&=0xf0; }
+	if((state->m_rtc.day & 0x0f) >= 0x0a)				{ state->m_rtc.day+=0x10; state->m_rtc.day&=0xf0; }
 	/* FIXME: very crude leap year support (i.e. it treats the RTC to be with a 2000-2099 timeline), dunno how the real x1 supports this,
        maybe it just have a 1980-1999 timeline since year 0x00 shows as a XX on display */
 	if(((state->m_rtc.year % 4) == 0) && state->m_rtc.month == 2)
