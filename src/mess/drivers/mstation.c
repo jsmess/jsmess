@@ -2,7 +2,7 @@
 
     CIDCO MailStation
 
-    22/10/2011 Skeleton driver.
+    22/10/2011 Preliminary driver by Sandro Ronco
 
     Hardware:
         - Z80 CPU
@@ -13,7 +13,11 @@
         - RCV336ACFW 33.6kbps modem
 
     TODO:
-    - Everything
+    - SST-28SF040 flash
+    - RCV336ACFW modem
+    - Add similar models (Mivo 100/150/200/250/350)
+    - New Mail led
+    - NVRAM
 
     More info:
       http://www.fybertech.net/mailstation/info.php
@@ -78,6 +82,8 @@ public:
 	DECLARE_READ8_MEMBER( irq_r );
 	DECLARE_WRITE8_MEMBER( irq_w );
 	void refresh_ints();
+
+	DECLARE_WRITE_LINE_MEMBER( rtc_irq );
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -201,6 +207,7 @@ void mstation_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 			active_flash = -1;
 			break;
 		default:
+			logerror("Unknown chip %02x mapped at %04x - %04x\n", chip_select, bank * 0x4000, bank * 0x4000 + 0x3fff);
 			program->unmap_readwrite(bank * 0x4000, bank * 0x4000 + 0x3fff);
 			active_flash = -1;
 			break;
@@ -325,9 +332,9 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( mstation )
 	PORT_START( "LINE0" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("Home")	PORT_CODE( KEYCODE_HOME )	PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("End")	PORT_CODE( KEYCODE_END )	PORT_CHAR(UCHAR_MAMEKEY(END))
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("Main Menu")	PORT_CODE( KEYCODE_HOME )	PORT_CHAR(UCHAR_MAMEKEY(HOME))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("Back")	PORT_CODE( KEYCODE_DEL )	PORT_CHAR(UCHAR_MAMEKEY(END))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("Print")	PORT_CODE( KEYCODE_F6 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("F1")		PORT_CODE( KEYCODE_F1 )		PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("F2")		PORT_CODE( KEYCODE_F2 )		PORT_CHAR(UCHAR_MAMEKEY(F2))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("F3")		PORT_CODE( KEYCODE_F3 )		PORT_CHAR(UCHAR_MAMEKEY(F3))
@@ -335,13 +342,13 @@ static INPUT_PORTS_START( mstation )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("F5")		PORT_CODE( KEYCODE_F5 )		PORT_CHAR(UCHAR_MAMEKEY(F5))
 
 	PORT_START( "LINE1" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("Print")		PORT_CODE( KEYCODE_F6 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("Back")		PORT_CODE( KEYCODE_F7 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("Main")		PORT_CODE( KEYCODE_F8 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_CODE( KEYCODE_BACKSLASH2 )	PORT_CHAR('@')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_CODE( KEYCODE_END )	PORT_CHAR('@')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("A-A Size")		PORT_CODE( KEYCODE_F7 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("Check Spelling")	PORT_CODE( KEYCODE_F8 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("Get E-Mail")		PORT_CODE( KEYCODE_F9 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_NAME("PG Up")		PORT_CODE( KEYCODE_PGUP )	PORT_CHAR(UCHAR_MAMEKEY(PGUP))
 
 	PORT_START( "LINE2" )
@@ -430,7 +437,7 @@ void mstation_state::machine_start()
 	m_flashes[0] = machine().device<intelfsh8_device>("flash0");
 	m_flashes[1] = machine().device<intelfsh8_device>("flash1");
 
-	// allocate the vireoram
+	// allocate the videoram
 	m_vram = (UINT8*)machine().region_alloc( "vram", 9600, 1, ENDIANNESS_LITTLE )->base();
 	m_ram_base = (UINT8*)ram_get_ptr(machine().device(RAM_TAG));
 
@@ -452,6 +459,16 @@ void mstation_state::machine_reset()
 	refresh_memory(2, m_bank2[1]);
 }
 
+WRITE_LINE_MEMBER( mstation_state::rtc_irq )
+{
+	if (state)
+		m_irq |= (1<<5);
+	else
+		m_irq &=~(1<<5);
+
+	refresh_ints();
+}
+
 static TIMER_DEVICE_CALLBACK( mstation_1hz_timer )
 {
 	mstation_state *state = timer.machine().driver_data<mstation_state>();
@@ -470,10 +487,15 @@ static TIMER_DEVICE_CALLBACK( mstation_kb_timer )
 	state->refresh_ints();
 }
 
+static PALETTE_INIT( mstation )
+{
+	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
+	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
+}
 
 static RP5C01_INTERFACE( rtc_intf )
 {
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(mstation_state, rtc_irq)
 };
 
 static MACHINE_CONFIG_START( mstation, mstation_state )
@@ -491,7 +513,7 @@ static MACHINE_CONFIG_START( mstation, mstation_state )
     MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 128-1)
 
     MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT(mstation)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_AMD_29F080_ADD("flash0")
