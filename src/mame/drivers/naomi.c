@@ -2871,14 +2871,14 @@ Region byte encoding is as follows:
 /* default EEPROM values, same works for all games */
 #define NAOMI_DEFAULT_EEPROM \
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
-	ROM_LOAD16_WORD("eeprom-naomi-main-default.bin", 0x0000, 0x0080, CRC(fea29cbb) SHA1(4099f1747aafa07db34f6e072cd9bfaa83bae10e) ) \
+	ROM_LOAD16_WORD("main_eeprom.bin", 0x0000, 0x0080, CRC(fea29cbb) SHA1(4099f1747aafa07db34f6e072cd9bfaa83bae10e) ) \
 	ROM_REGION( 0x84, "naomibd_eeprom", 0 ) \
-	ROM_LOAD("eeprom-naomi-x76f100-default.bin", 0x0000, 0x0084, CRC(3ea24b6a) SHA1(3a730ebcf56e0060fef6b1b02eb2eb7cfb7e61dc) )
+	ROM_LOAD("x76f100_eeprom.bin", 0x0000, 0x0084, CRC(3ea24b6a) SHA1(3a730ebcf56e0060fef6b1b02eb2eb7cfb7e61dc) )
 
 /* Version without the default x76f100 eeprom */
 #define NAOMI_DEFAULT_EEPROM_NO_BD	\
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
-	ROM_LOAD16_WORD("eeprom-naomi-main-default.bin", 0x0000, 0x0080, CRC(fea29cbb) SHA1(4099f1747aafa07db34f6e072cd9bfaa83bae10e) )
+	ROM_LOAD16_WORD("main_eeprom.bin", 0x0000, 0x0080, CRC(fea29cbb) SHA1(4099f1747aafa07db34f6e072cd9bfaa83bae10e) )
 
 ROM_START( naomi )
 	NAOMI_BIOS
@@ -5861,7 +5861,7 @@ ROM_START( azumanga )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0018", 0, SHA1(3e40ca7d43173fe7048d199fdc127b9411e10360) )
 
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	//PIC16C622A (317-5091-JPN)
 	//(sticker 253-5509-5091J)
 	ROM_LOAD("317-5091-jpn.data", 0x00, 0x50, CRC(ca589c79) SHA1(ac44bfdfc8db2f9dbe4d563205719524bf43a674) )
@@ -6603,7 +6603,7 @@ ROM_START( initdv2jo )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0026", 0, SHA1(253acede106b7fbf49e24458e7fda868720e9549) )
 
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("gds-0026.rom", 0x00, 0x50, NO_DUMP) // file on GD-ROM is BFK.BIN , _NOT_ BEM.BIN which is for Initial D : Arcade Stage (Japan)
 ROM_END
 
@@ -6639,7 +6639,7 @@ ROM_START( initdv3jb )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0032b", 0, SHA1(568411aa72ca308a03a6b5b61c79833464b88bc6) )
 
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("gds-0032_pic", 0x00, 0x50, NO_DUMP ) // PIC was missing
 ROM_END
 

@@ -61,6 +61,7 @@
   * Saloon (French, encrypted),                       unknown,            199?.
   * Fun World Quiz (Austrian),                        Funworld,           198?.
   * Witch Royal (Export version 2.1),                 Video Klein,        199?.
+  * Novo Play Multi Card / Club Card,                 Admiral/Novomatic,  1986.
 
 ***********************************************************************************
 
@@ -346,6 +347,32 @@
 
   If the game has credits loaded, the bookkeeping mode will start
   as soon as the current game ends.
+
+
+  * Novo Play Multi Card / Club Card
+
+  This game needs a default NVRAM to work. There is a special ROM that need to be
+  placed into the program socket, then turn ON the board till the OK message appear.
+  After this operation, just switch the special ROM with the regular program.
+  The board now is ready to operate.
+
+  To program the game, enter the service mode (Key 9), and then keep pressed both
+  HOLD2 & HOLD4 at least for 5 seconds....
+
+  You can see:
+
+     C1        C2          REMOTE         IN-MAX/IN-MIN         CONT
+
+  (Coin A)  (Coin B)  (Remote credits)  (Bet Max & Minimum)  (Difficult)
+
+
+  C2:     Coin B, from 1-20... Selectable through HOLD1.
+  REMOTE: Remote Credits, from 10-100... Selectable through HOLD3.
+  IN-MAX: Maximum Bet allowed. From 1-40. selectable through HOLD4.
+  IN_MIN: Minimum Bet allowed. From 1-5. selectable through HOLD4, keeping COLLECT pressed.
+  CONT:   Earnings control... From 1-4, selectable through HOLD5. 4 is the highest payment.
+
+  Press DEAL/DRAW to exit the mode.
 
 
 ***********************************************************************************
@@ -722,6 +749,13 @@
   - Reworked the button-lamps layout to get the hold buttons
      more centered.
 
+  [2011/10/20]
+  - Added 'Novo Play Multi Card / Club Card' from Admiral/Novomatic.
+     Seems a derivated game from Royal Vegas...
+  - Added proper button-lamps support and layout.
+  - Added default NVRAM, necessary to boot.
+  - Added technical notes.
+
 
   *** TO DO ***
 
@@ -749,8 +783,10 @@
 #include "machine/nvram.h"
 #include "jollycrd.lh"
 #include "bigdeal.lh"
+#include "novoplay.lh"
 #include "royalcrd.lh"
 #include "includes/funworld.h"
+
 
 /**********************
 * Read/Write Handlers *
@@ -758,24 +794,43 @@
 
 static WRITE8_DEVICE_HANDLER(funworld_lamp_a_w)
 {
+/*  - bits -
+    7654 3210
+    ---- ---x   Credit In counter.
+    ---- --x-   HOLD1 & HOLD3 lamps (inverted).
+    ---- -x--   Credit Out counter.
+    ---- x---   HOLD2 lamp (inverted).
+    ---x ----   Unknown (inverted).
+    --x- ----   CANCEL / COLLECT (inverted).
+    -x-- ----   Hopper Motor (inverted).
+    x--- ----   HOLD4 lamp.
+*/
+	output_set_lamp_value(0, 1-((data >> 1) & 1));	/* Hold1 (inverted) */
+	output_set_lamp_value(2, 1-((data >> 1) & 1));	/* Hold3 (inverted, see pinouts) */
 
-	output_set_lamp_value(0, 1-((data >> 1) & 1));	/* button hold1 and */
-	output_set_lamp_value(2, 1-((data >> 1) & 1));	/* hold3 (see pinouts) */
+	output_set_lamp_value(1, 1-((data >> 3) & 1));	/* Hold2 / Low (inverted) */
+	output_set_lamp_value(3, (data >> 7) & 1);		/* Hold4 / High */
+	output_set_lamp_value(5, 1-((data >> 5) & 1));	/* Cancel / Collect (inverted) */
 
-	output_set_lamp_value(1, 1-((data >> 3) & 1));	/* button hold2/low */
-	output_set_lamp_value(3, (data >> 7) & 1);		/* button hold4/high */
-	output_set_lamp_value(5, 1-((data >> 5) & 1));	/* button 6 (collect/cancel) */
+	coin_counter_w(device->machine(), 0, data & 0x01);	/* Credit In counter */
+	coin_counter_w(device->machine(), 7, data & 0x04);	/* Credit Out counter, mapped as coin 8 */
 
-	coin_counter_w(device->machine(), 0, data & 0x01);	/* credit in counter */
-	coin_counter_w(device->machine(), 7, data & 0x04);	/* credit out counter, mapped as coin 8 */
+	output_set_lamp_value(7, 1-((data >> 6) & 1));		/* Hopper Motor (inverted) */
 
-//  popmessage("Lamps A: %02X", data);
+//  popmessage("Lamps A: %02X", (data ^ 0xff));
 }
 
 static WRITE8_DEVICE_HANDLER(funworld_lamp_b_w)
 {
-	output_set_lamp_value(4, (data >> 0) & 1);		/* button hold5/bet */
-	output_set_lamp_value(6, (data >> 1) & 1);		/* button 7 (start/play) */
+/*  - bits -
+    7654 3210
+    ---- ---x   HOLD5 lamp.
+    ---- --x-   DEAL/DRAW lamp.
+    ---- -x--   Unknown (inverted).
+    xxxx x---   Unknown.
+*/
+	output_set_lamp_value(4, (data >> 0) & 1);		/* Hold5 / Bet */
+	output_set_lamp_value(6, (data >> 1) & 1);		/* Start / Deal / Draw */
 
 //  popmessage("Lamps B: %02X", data);
 }
@@ -2054,6 +2109,64 @@ static INPUT_PORTS_START( witchryl )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( novoplay )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Cancel / Collect (D-UP) / Autohold")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Deal/Draw / Double")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Bet / Half")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Service 1 / Test")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Service 2 / Select")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / High")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Low")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hopper Switch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Collect (Payout)")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, "5 Credits / Coin" )
+	PORT_DIPSETTING(    0x08, "10 Credits / Coin" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Game Type" )			PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, "Multi Card (without Jokers)" )
+	PORT_DIPSETTING(    0x00, "Club Card (with Jokers)" )
+	PORT_DIPNAME( 0x40, 0x40, "Allow Autohold" )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x00, "Payout Mode" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "Hopper" )
+	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
+INPUT_PORTS_END
+
 
 /*************************
 *    Graphics Layouts    *
@@ -2102,6 +2215,34 @@ static const pia6821_interface pia0_intf =
          |05 PA3    /RS0 36|- 10 ROM(PRG)            |05 PA3    /RS0 36|- 10 ROM(PRG)
          |06 PA4    /RS1 35|- 09 ROM(PRG)            |06 PA4    /RS1 35|- 23 AY(SOUND)
          |07 PA5  /RESET 34|- 09 GAL/PAL             |07 PA5  /RESET 34|- 37 AY(SOUND)
+         |08 PA6      D0 33|                         |08 PA6      D0 33|
+         |09 PA7      D1 32|                         |09 PA7      D1 32|
+         |10 PB0      D2 31|                         |10 PB0      D2 31|
+         |11 PB1      D3 30|                         |11 PB1      D3 30|
+         |12 PB2      D4 29|                         |12 PB2      D4 29|
+         |13 PB3      D5 28|                         |13 PB3      D5 28|
+         |14 PB4      D6 27|                         |14 PB4      D6 27|
+         |15 PB5      D7 26|                         |15 PB5      D7 26|
+         |16 PB6       E 25|                         |16 PB6       E 25|
+         |17 PB7     CS1 24|                         |17 PB7     CS1 24|
+    GND -|18 CB1    /CS2 23|                    N/C -|18 CB1    /CS2 23|
+    GND -|19 CB2     CS0 22|                    N/C -|19 CB2     CS0 22|
+         |20 VCC     R/W 21|                         |20 VCC     R/W 21|
+         '-----------------'                         '-----------------'
+
+
+    Novo Play Multi Card
+    --------------------
+
+                PIA 0                                       PIA 1
+         .--------u--------.                         .--------u--------.
+         |01 VSS     CA1 40|- GND                    |01 VSS     CA1 40|- GND
+         |02 PA0     CA2 39|- GND                    |02 PA0     CA2 39|- N/C
+         |03 PA1   /IRQA 38|- 65C02 (-IRQ)           |03 PA1   /IRQA 38|- 65C02 (-IRQ)
+         |04 PA2   /IRQB 37|- N/C                    |04 PA2   /IRQB 37|- N/C
+         |05 PA3    /RS0 36|- A0                     |05 PA3    /RS0 36|- A0
+         |06 PA4    /RS1 35|- A1                     |06 PA4    /RS1 35|- A1
+         |07 PA5  /RESET 34|- 65C02 (-RST)           |07 PA5  /RESET 34|- 65C02 (-RST)
          |08 PA6      D0 33|                         |08 PA6      D0 33|
          |09 PA7      D1 32|                         |09 PA7      D1 32|
          |10 PB0      D2 31|                         |10 PB0      D2 31|
@@ -4154,6 +4295,32 @@ ROM_START( witchryl )
 ROM_END
 
 
+/*
+  Admiral Club Card (Novo Play)
+  Novomatic, 1986.
+
+  Hardware Funworld/Impera/TAB...
+  Seems close to Royal Vegas Joker Card.
+
+*/
+
+ROM_START( novoplay )	/* Similar to Royal Vegas Joker Card */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "np1_run.bin", 0x8000, 0x8000, CRC(4078d695) SHA1(d0e39064250733968044aec216040fe62fecc880) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "np1_ch2.bin", 0x0000, 0x8000, CRC(188d6fad) SHA1(3bc9bab24d8c7beed0c5f491c19a004ca7d719a1) )
+	ROM_LOAD( "np1_ch1.bin", 0x8000, 0x8000, CRC(fdc3bd67) SHA1(0ec2d5e0b1937849934f98e253e18887af0331e8) )
+
+	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_LOAD( "novoplay_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
+
+	ROM_REGION( 0x0200, "proms", 0 )	/* PLD address the 2nd half */
+	ROM_LOAD( "np1_27s29.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
+ROM_END
+
+
+
 /**************************
 *  Driver Initialization  *
 **************************/
@@ -4502,3 +4669,4 @@ GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  soccernw, ROT0, "bootleg"
 GAME(  198?, saloon,    0,        saloon,   saloon,    saloon,   ROT0, "<unknown>",       "Saloon (French, encrypted)",                      GAME_NOT_WORKING )
 GAME(  198?, funquiz,   0,        funquiz,  funquiz,   0,        ROT0, "Funworld / " O_UMLAUT "hlinger", "Fun World Quiz (Austrian)",        0 )
 GAMEL( 199?, witchryl,  0,        witchryl, witchryl,  0,        ROT0, "Video Klein",     "Witch Royal (Export version 2.1)",                0,                       layout_jollycrd )
+GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  0,        ROT0, "Admiral/Novomatic", "Novo Play Multi Card / Club Card",              0,                       layout_novoplay )
