@@ -39,14 +39,14 @@ class mc10_state : public driver_device
 public:
 	mc10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_mc6847(*this, "mc6847"),
-		  m_ef9345(*this, "ef9345"),
-		  m_dac(*this, "dac"),
-		  m_ram(*this, RAM_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_printer(*this, "printer")
-		{ }
+	m_maincpu(*this, "maincpu"),
+	m_mc6847(*this, "mc6847"),
+	m_ef9345(*this, "ef9345"),
+	m_dac(*this, "dac"),
+	m_ram(*this, RAM_TAG),
+	m_cassette(*this, CASSETTE_TAG),
+	m_printer(*this, "printer")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<device_t> m_mc6847;
@@ -70,6 +70,7 @@ public:
 
 	DECLARE_READ8_MEMBER( mc10_bfff_r );
 	DECLARE_WRITE8_MEMBER( mc10_bfff_w );
+	DECLARE_READ8_MEMBER( alice90_bfff_r );
 	DECLARE_WRITE8_MEMBER( alice32_bfff_w );
 	DECLARE_READ8_MEMBER( mc10_port1_r );
 	DECLARE_WRITE8_MEMBER( mc10_port1_w );
@@ -95,6 +96,29 @@ READ8_MEMBER( mc10_state::mc10_bfff_r )
 	if (!BIT(m_keyboard_strobe, 5)) result &= input_port_read(machine(), "pb5");
 	if (!BIT(m_keyboard_strobe, 6)) result &= input_port_read(machine(), "pb6");
 	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(machine(), "pb7");
+
+	return result;
+}
+
+READ8_MEMBER( mc10_state::alice90_bfff_r )
+{
+	UINT8 result = 0xff;
+
+	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(machine(), "pb7");
+	else
+	if (!BIT(m_keyboard_strobe, 6)) result &= input_port_read(machine(), "pb6");
+	else
+	if (!BIT(m_keyboard_strobe, 5)) result &= input_port_read(machine(), "pb5");
+	else
+	if (!BIT(m_keyboard_strobe, 4)) result &= input_port_read(machine(), "pb4");
+	else
+	if (!BIT(m_keyboard_strobe, 3)) result &= input_port_read(machine(), "pb3");
+	else
+	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(machine(), "pb2");
+	else
+	if (!BIT(m_keyboard_strobe, 1)) result &= input_port_read(machine(), "pb1");
+	else
+	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(machine(), "pb0");
 
 	return result;
 }
@@ -285,7 +309,7 @@ static ADDRESS_MAP_START( alice90_mem, AS_PROGRAM, 8 , mc10_state)
 	AM_RANGE(0x0100, 0x2fff) AM_NOP /* unused */
 	AM_RANGE(0x3000, 0xafff) AM_RAMBANK("bank1")	/* 32k internal ram */
 	AM_RANGE(0xbf20, 0xbf29) AM_DEVREADWRITE("ef9345", ef9345_device, data_r, data_w)
-	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(mc10_bfff_r, alice32_bfff_w)
+	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(alice90_bfff_r, alice32_bfff_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */
 ADDRESS_MAP_END
 
@@ -584,7 +608,7 @@ static MACHINE_CONFIG_DERIVED( alice90, alice32 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(alice90_mem)
 
-    MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 
 	/* Software lists */
