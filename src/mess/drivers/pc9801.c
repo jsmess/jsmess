@@ -237,6 +237,7 @@
 #include "machine/pic8259.h"
 #include "machine/upd765.h"
 #include "machine/upd1990a.h"
+#include "machine/i8251.h"
 #include "sound/beep.h"
 #include "sound/2203intf.h"
 #include "video/upd7220.h"
@@ -244,6 +245,7 @@
 #include "machine/ram.h"
 
 #define UPD1990A_TAG "upd1990a"
+#define UPD8251_TAG  "upd8251"
 
 class pc9801_state : public driver_device
 {
@@ -251,11 +253,13 @@ public:
 	pc9801_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_rtc(*this, UPD1990A_TAG),
+		  m_sio(*this, UPD8251_TAG),
 		  m_hgdc1(*this, "upd7220_chr"),
 		  m_hgdc2(*this, "upd7220_btm")
 	{ }
 
 	required_device<upd1990a_device> m_rtc;
+	required_device<i8251_device> m_sio;
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
 
@@ -932,6 +936,8 @@ static WRITE8_HANDLER( pc9801_a0_w )
 
 static READ8_HANDLER( pc9801_fdc_2hd_r )
 {
+	pc9801_state *state = space->machine().driver_data<pc9801_state>();
+
 	if((offset & 1) == 0)
 	{
 		switch(offset & 6)
@@ -943,6 +949,11 @@ static READ8_HANDLER( pc9801_fdc_2hd_r )
 	}
 	else
 	{
+		switch((offset & 6) + 1)
+		{
+			case 1: return state->m_sio->data_r(*space, 0);
+			case 3: return state->m_sio->status_r(*space, 0);
+		}
 		printf("Read to undefined port [%02x]\n",offset+0x90);
 		return 0xff;
 	}
@@ -977,6 +988,11 @@ static WRITE8_HANDLER( pc9801_fdc_2hd_w )
 	}
 	else
 	{
+		switch((offset & 6) + 1)
+		{
+			case 1: state->m_sio->data_w(*space, 0, data); return;
+			case 3: state->m_sio->control_w(*space, 0, data); return;
+		}
 		printf("Write to undefined port [%02x] <- %02x\n",offset+0x90,data);
 	}
 }
@@ -2305,6 +2321,19 @@ static UPD1990A_INTERFACE( pc9801_upd1990a_intf )
 	DEVCB_NULL
 };
 
+static const i8251_interface pc9801_uart_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 /****************************************
 *
 * Init emulation status
@@ -2426,6 +2455,8 @@ static INTERRUPT_GEN(pc9801_vrtc_irq)
 	}
 }
 
+
+
 static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I8086, 5000000) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9801_map)
@@ -2443,6 +2474,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc9801_upd1990a_intf)
+	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
 	MCFG_UPD765A_ADD("upd765_2hd", upd765_2hd_intf)
 	MCFG_UPD765A_ADD("upd765_2dd", upd765_2dd_intf)
@@ -2504,6 +2536,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
+	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
 	MCFG_UPD765A_ADD("upd765_2hd", pc9801rs_upd765_intf)
 	//"upd765_2dd"
@@ -2563,6 +2596,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
+	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
 	MCFG_UPD765A_ADD("upd765_2hd", pc9801rs_upd765_intf)
 	//"upd765_2dd"
