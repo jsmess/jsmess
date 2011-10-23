@@ -45,6 +45,9 @@ public:
 	UINT8 *m_ram_base;
 	int m_flash_at_0x4000;
 	int m_flash_at_0x8000;
+	UINT8 *m_vram;
+	UINT8 m_screen_column;
+	UINT8 m_port2;
 
 	DECLARE_READ8_MEMBER( flash_0x0000_read_handler );
 	DECLARE_WRITE8_MEMBER( flash_0x0000_write_handler );
@@ -53,11 +56,21 @@ public:
 	DECLARE_READ8_MEMBER( flash_0x8000_read_handler );
 	DECLARE_WRITE8_MEMBER( flash_0x8000_write_handler );
 
+	void lcd_w(UINT16 offset, int column, UINT8 data);
+	UINT8 lcd_r(UINT16 offset, int column);
+	DECLARE_READ8_MEMBER( lcd_right_r );
+	DECLARE_WRITE8_MEMBER( lcd_right_w );
+	DECLARE_READ8_MEMBER( lcd_left_r );
+	DECLARE_WRITE8_MEMBER( lcd_left_w );
+
 	void refresh_memory(UINT8 bank, UINT8 chip_select);
 	DECLARE_READ8_MEMBER( bank1_r );
 	DECLARE_WRITE8_MEMBER( bank1_w );
 	DECLARE_READ8_MEMBER( bank2_r );
 	DECLARE_WRITE8_MEMBER( bank2_w );
+
+	DECLARE_READ8_MEMBER( battery_status_r );
+	DECLARE_WRITE8_MEMBER( port2_w );
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -76,7 +89,10 @@ WRITE8_MEMBER( mstation_state::flash_0x0000_write_handler )
 
 READ8_MEMBER( mstation_state::flash_0x4000_read_handler )
 {
-	return m_flashes[m_flash_at_0x4000]->read(((m_bank1[0] & 0x3f)<<14) | offset);
+	if (m_flash_at_0x4000 == 1)
+		return 0x00;	//TODO: read from SST-28SF040
+	else
+		return m_flashes[m_flash_at_0x4000]->read(((m_bank1[0] & 0x3f)<<14) | offset);
 }
 
 WRITE8_MEMBER( mstation_state::flash_0x4000_write_handler )
@@ -94,8 +110,48 @@ WRITE8_MEMBER( mstation_state::flash_0x8000_write_handler )
 	m_flashes[m_flash_at_0x8000]->write(((m_bank2[0] & 0x3f)<<14) | offset, data);
 }
 
+
+//***************************************************************************
+//  video hardware emulation
+//***************************************************************************/
+
+void mstation_state::lcd_w(UINT16 offset, int column, UINT8 data)
+{
+	if (m_port2 & 0x08)
+		m_vram[(column * 240) + (offset % 240)] = data;
+	else
+		m_screen_column = data % 20;
+}
+
+UINT8 mstation_state::lcd_r(UINT16 offset, int column)
+{
+	if (m_port2 & 0x08)
+		return m_vram[(column * 240) + (offset % 240)];
+	else
+		return m_screen_column % 20;
+}
+
+READ8_MEMBER ( mstation_state::lcd_left_r )  {	return lcd_r(offset, m_screen_column);	}
+WRITE8_MEMBER( mstation_state::lcd_left_w )  {	lcd_w(offset, m_screen_column, data);	}
+READ8_MEMBER ( mstation_state::lcd_right_r ) {	return lcd_r(offset, m_screen_column + 20);	}
+WRITE8_MEMBER( mstation_state::lcd_right_w ) {	lcd_w(offset, m_screen_column + 20, data);	}
+
 bool mstation_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
+	for (int x=0; x<40; x++)
+		for (int y=0; y<128; y++)
+		{
+			UINT8 data = m_vram[56 + y + x * 240];
+
+			for (int b=0; b<8; b++)
+			{
+				// columns are inverted (right to left)
+				int col = ((x < 20) ? 19 : 59) - x;
+
+				*BITMAP_ADDR16(&bitmap, y, col*8 + b)= BIT(data, 0);
+				data >>= 1;
+			}
+		}
 	return 0;
 }
 
@@ -127,6 +183,14 @@ void mstation_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 			sprintf(bank_tag,"bank%d", bank);
 			memory_set_bankptr(machine(), bank_tag, m_ram_base + (((bank == 1 ? m_bank1[0] : m_bank2[0]) & 0x07)<<14));
 			program->install_readwrite_bank (bank * 0x4000, bank * 0x4000 + 0x3fff, bank_tag);
+			active_flash = -1;
+			break;
+		case 2:	// left LCD panel
+			program->install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, 0, 0, read8_delegate(FUNC(mstation_state::lcd_left_r), this), write8_delegate(FUNC(mstation_state::lcd_left_w), this));
+			active_flash = -1;
+			break;
+		case 4:	// right LCD panel
+			program->install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, 0, 0, read8_delegate(FUNC(mstation_state::lcd_right_r), this), write8_delegate(FUNC(mstation_state::lcd_right_w), this));
 			active_flash = -1;
 			break;
 		default:
@@ -161,6 +225,22 @@ WRITE8_MEMBER( mstation_state::bank2_w )
 }
 
 
+
+WRITE8_MEMBER( mstation_state::port2_w )
+{
+	m_port2 = data;
+}
+
+READ8_MEMBER( mstation_state::battery_status_r )
+{
+	/*
+      bit 0-6 - unknown
+      bit 7   - battery status
+    */
+	return 0x80;
+}
+
+
 static ADDRESS_MAP_START(mstation_mem, AS_PROGRAM, 8, mstation_state)
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(flash_0x0000_read_handler, flash_0x0000_write_handler)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_BANK("bank1")		// bank 1
@@ -170,8 +250,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mstation_io , AS_IO, 8, mstation_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE(port2_w)
 	AM_RANGE( 0x05, 0x06 ) AM_READWRITE(bank1_r, bank1_w)
 	AM_RANGE( 0x07, 0x08 ) AM_READWRITE(bank2_r, bank2_w)
+	AM_RANGE( 0x09, 0x09 ) AM_READ(battery_status_r)
 	AM_RANGE( 0x10, 0x1f ) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
 ADDRESS_MAP_END
 
@@ -185,6 +267,8 @@ void mstation_state::machine_start()
 	m_flashes[0] = machine().device<intelfsh8_device>("flash0");
 	m_flashes[1] = machine().device<intelfsh8_device>("flash1");
 
+	// allocate the vireoram
+	m_vram = (UINT8*)machine().region_alloc( "vram", 9600, 1, ENDIANNESS_LITTLE )->base();
 	m_ram_base = (UINT8*)ram_get_ptr(machine().device(RAM_TAG));
 
 	// map firsh RAM bank at 0xc000-0xffff
@@ -198,6 +282,7 @@ void mstation_state::machine_reset()
 	m_flash_at_0x8000 = 0;
 	m_bank1[0] =  m_bank1[1] = 0;
 	m_bank2[0] =  m_bank2[1] = 0;
+	memset(m_vram, 0, 9600);
 
 	// reset banks
 	refresh_memory(1, m_bank1[1]);
