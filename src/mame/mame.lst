@@ -102,6 +102,7 @@ ponpoko			// (c) 1982 Sigma Ent. Inc.
 ponpokov		// (c) 1982 Sigma Ent. Inc. + Venture Line license
 lizwiz			// (c) 1985 Techstar + "Sunn presents"
 alibaba			// (c) 1982 Sega
+alibabab		// Mustafa" and 40 Thieves (Ali Baba bootleg)
 dremshpr		// (c) 1982 Sanritsu
 vanvan			// (c) 1983 Sanritsu
 vanvank			// (c) 1983 Karateco (bootleg?)
@@ -613,13 +614,14 @@ mhhonban		// (c) 199?
 musobana		// (c) 1995
 niyanpai		// (c) 1996
 
-jyunai			// (c) 1998
+junai			// (c) 1998
 csplayh5		// (c) 1998
+junai2			// (c) 1998
 mjmania			// (c) 1999
 bikiniko		// (c) 1999
 thenanpa		// (c) 1999
-cspureh7		// (c) 1999
-fudol			// (c) 2000
+csplayh7		// (c) 1999
+fuudol			// (c) 2000
 
 // "Phoenix hardware" (and variations) games
 safarir			// Shin Nihon Kikaku (SNK)
@@ -2109,6 +2111,7 @@ silentdu		// ??? (c) 1992 Taito Corporation Japan (World)
 silentdj		// ??? (c) 1992 Taito Corporation (Japan)
 ryujin			// ??? (c) 1993 Taito Corporation (Japan)
 qzshowby		// D72 (c) 1993 Taito Corporation (Japan)
+realpunc		// D76 (c) 1994 Taito Corporation (Japan)
 pbobble			// ??? (c) 1994 Taito Corporation (Japan)
 spacedx			// D89 (c) 1994 Taito Corporation (US)
 spacedxj		// D89 (c) 1994 Taito Corporation (Japan)
@@ -2147,13 +2150,15 @@ ainferno		// C45 (c) 1990 Taito America Corporation (US)
 mlanding		// ??? (c) 1990 Taito America Corporation (US)
 
 // enhanced Z-System hardware games
-gunbustr		// D27 (c) 1992 Taito Corporation (Japan)
+gunbustr		// D27 (c) 1992 Taito Corporation Japan (World)
+gunbustru		// D27 (c) 1992 Taito America Corporation (US)
+gunbustrj		// D27 (c) 1992 Taito Corporation (Japan)
 superchs		// D46 (c) 1992 Taito America Corporation (US)
 groundfx		// D51 (c) 1992 Taito Coporation
 undrfire		// D67 (c) 1993 Taito Coporation Japan (World)
-undrfireu		// D67 (c) 1993  Taito America Corporation (US)
+undrfireu		// D67 (c) 1993 Taito America Corporation (US)
 undrfirej		// D67 (c) 1993 Taito Coporation (Japan)
-cbombers
+cbombers		// D83 (c) 1993 Taito Coporation Japan (World)
 
 // Taito F2 games
 finalb			// 1989.?? B82 (c) 1988 Taito Corporation Japan (World)
@@ -2559,6 +2564,7 @@ espradejo		// (c) 1998 Atlus/Cave (Japan)
 uopoko			// (c) 1998 Cave + Jaleco license
 uopokoj			// (c) 1998 Cave + Jaleco license
 guwange			// (c) 1999 Atlus/Cave
+guwanges		// (c) 1999 Atlus/Cave
 gaia			// (c) 1999 Noise Factory
 theroes			// (c) 2001 Primetek Investments
 korokoro		// (c) 1999 Takumi
@@ -2576,9 +2582,12 @@ futariblk		// (c) 2006 Cave
 ibara			// (c) 2006 Cave
 ibarablk		// (c) 2006 Cave
 ibarablka		// (c) 2006 Cave
+pinkswts		// (c) 2006 Cave
+pinkswtsa		// (c) 2006 Cave
+pinkswtsb		// (c) 2006 Cave
 deathsml		// (c) 2007 Cave
 mmpork			// (c) 2007 Cave
-mmmbnk			// (c) 2007 Cave
+mmmbanc			// (c) 2007 Cave
 
 // Kyugo games
 // Kyugo only made four games: Repulse, Flash Gal, SRD Mission and Air Wolf.
@@ -3842,6 +3851,7 @@ headonb			// 163-167/192-193 (c) Gremlin
 headons			// Sidam bootleg
 headonsa		// Sidam bootleg
 supcrash		// bootleg
+hocrash			// bootleg
 headon2			// ???-??? (c) 1979 Sega
 headon2s		// Sidam bootleg
 car2			// bootleg
@@ -4042,6 +4052,8 @@ bingoc			// (c) 1989 Sega
 // BP Multicards // (c) 2002 Sega
 // BP Splash     // (c) 2002 Sega
 // Bingo Planet  // (c) 1997 Sega
+
+segajw
 
 // Enduro Racer / Space Harrier / Hang On
 enduror			// (c) 1985 (FD1089B, decrypted)
@@ -6044,7 +6056,8 @@ popn5			// GCA04 (c) 2000
 popn7			// not sure, doesn't boot yet (c) 2001
 
 // PowerPC based Konami games
-bujutsu         // G?645 (c)1997
+bujutsu			// G?645 (c)1997
+racjamdx		// G?676 (c)1997
 fiveside		// GX479 (c)1995
 thunderh		// GX680 (c)1996 Euro EAA
 thunderhu		// GX680 (c)1996 USA UAA
@@ -6152,6 +6165,7 @@ tank8d			// ??????           1976/04 [6800]
 cball			// ?????? prototype 1976/?? [6800]
 copsnrob		// 005625           1976/07 [6502]
 flyball			// 005629           1976/07 [6502]
+flyball1		// 005629           1976/07 [6502]
 sprint2			// 005922           1976/11 [6502]
 sprint2a		// 005922           1976/11 [6502]
 sprint4			// 008716           1977/12 [6502]
@@ -6544,6 +6558,7 @@ cyberbalt1		// 136073           (c) 1989
 
 badlands		// 136074           (c) 1989
 badlandsb		// bootleg
+badlandsb2		// bootleg set 2
 klax			// 136075           (c) 1989
 klax2			// 136075           (c) 1989
 klax3			// 136075           (c) 1989
@@ -6736,6 +6751,7 @@ maglordh		// 0005 (c) 1990 Alpha Denshi Co.
 ridhero			// 0006 (c) 1990 SNK
 ridheroh		// 0006 (c) 1990 SNK
 alpham2			// 0007 (c) 1991 SNK
+alpham2p		// 0007 (c) 1991 SNK (prototype)
 				// 0008 Sunshine (prototype) 1990 SNK
 ncombat			// 0009 (c) 1990 Alpha Denshi Co.
 ncombath		// 0009 (c) 1990 Alpha Denshi Co.
@@ -6751,6 +6767,7 @@ sengoku			// 0017 (c) 1991 SNK
 sengokuh		// 0017 (c) 1991 SNK
 burningf		// 0018 (c) 1991 SNK
 burningfh		// 0018 (c) 1991 SNK
+burningfp		// 0018 (c) 1991 SNK (prototype)
 lbowling		// 0019 (c) 1990 SNK
 gpilots			// 0020 (c) 1991 SNK
 gpilotsh		// 0020 (c) 1991 SNK
@@ -6876,7 +6893,8 @@ kizuna			// 0216 (c) 1996 SNK
 ninjamas		// 0217 (c) 1996 ADK / SNK
 ragnagrd		// 0218 (c) 1996 Saurus
 pgoal			// 0219 (c) 1996 Saurus
-				// 0220 (c) 1996 Saurus - Choutetsu Brikin'ger - Iron clad (undumped protoype)
+ironclad		// 0220 (c) 1996 Saurus - Choutetsu Brikin'ger - Iron clad (protoype)
+ironclado		// 0220 (c) 1996 Saurus - Choutetsu Brikin'ger - Iron clad (protoype, older)
 magdrop2		// 0221 (c) 1996 Data East Corporation
 samsho4			// 0222 (c) 1996 SNK
 samsho4k		// Censored Korean release of samsho4
@@ -8198,6 +8216,7 @@ mj4simai		// (c) 1996 Maboroshi Ware
 myangel			// (c) 1996 Namco
 myangel2		// (c) 1997 Namco
 pzlbowl			// (c) 1999 Nihon System / Moss
+namcostr		// (c) 2000 Namco
 penbros			// (c) 2000 Subsino
 deerhunt		// (c) 2000 Sammy USA Corporation
 deerhunta		// (c) 2000 Sammy USA Corporation
@@ -8888,6 +8907,9 @@ ddpdojb			// (c) 2002 Cave
 ddpdojblk		// (c) 2002 Cave
 espgal			// (c) 2003 Cave
 orleg2			// (c) 2007
+
+// IGS PC based HW
+speeddrv		// (c) 2004
 
 // Spirit Tech. Corp.
 dunhuang		// (c) 1995
@@ -10273,6 +10295,7 @@ soccernw		// 199? bootleg
 saloon			// 199? unknown
 funquiz			// (c) 198? Funworld
 witchryl		// (c) 199? Video Klein
+novoplay		// (c) 1986 Novomatic
 photoply
 
 // Sandii'
@@ -10412,11 +10435,13 @@ witchcda		// 1991, Unknown
 witchcdb		// 1991, Unknown
 witchcdc		// 1991, Unknown
 witchcdd		// (c) 1994, TV Game Elektronik - Proma
+witchcde		// (c) 1991, Video Klein
 witchcdf		// (c) 1991, PlayMan
 witchcdg		// (c) 199?, Falcon
 witchcdh		// (c) 1994, TV Game Elektronik - Proma
 witchcdi		// (c) 1994, TV Game Elektronik - Proma
 witchgme		// (c) 1991 Video Klein
+witchcdk		// (c) 1991, Video Klein
 witchjol		// 1994, Unknown
 wldwitch		// 1994, Video Klein
 falcnwld		// 1991, TVG
@@ -11972,7 +11997,6 @@ sc2bbar7	// Big Bar 7 (Concept)
 sc2flutr	// Flutter (Concept)
 sc2sghst	// Super Ghost (Concept)
 sc2smnud	// Super Multi Nudge (Concept)
-sc2paw		// Pull-a-Win (Concept)
 sc2scshx	// Super Cash X (Concept)
 sc2scshxgman // Gamesman hardware
 sc2scshxstar // Starpoint hardware
@@ -16687,10 +16711,71 @@ m1casroyp
 m1casroy1
 m1chain		// Chain Reaction (Maygay)
 m1clbfvr	// Club Fever (Maygay)
+m1clbfvrp
 m1cluedo	// Cluedo (Maygay)
+m1cluedop
+m1cluedo5
+m1cluedo5p
+m1cluedoi
+m1cluedoip
+m1cluedon
+m1cluedonp
+m1cluedob2	//These are BwB builds
+m1cluedob2p //
+m1cluedob2h //
+m1cluedob1  //
+m1cluedob1p //
+m1cluedob1h //
+m1cluedo4
+m1cluedo4p
+m1cluedo3
+m1cluedo3p
+m1cluedo3h
+m1cluedo1
+m1cluedo1p
+m1cluedo1h
 m1cluecb	// Cluedo Club (Maygay)
-m1cluesh	// Cluedo Showcase (Maygay)
+m1cluecbp
+m1cluecb2
+m1cluecb2p
+m1cluecb1
+m1cluecb1p
+m1cluesh	// Super Cluedo Showcase (Maygay)
+m1clueshp
+m1cluesho
+m1clueshop
 m1cluess	// Cluedo Super Sleuth (Maygay)
+m1cluessh
+m1cluessp
+m1cluessa
+m1cluessap
+m1cluessb
+m1cluessbp
+m1cluessc
+m1cluesscp
+m1cluessd
+m1cluessdp
+m1cluesse
+m1cluessep
+m1cluessf
+m1cluessfp
+m1cluessg
+m1cluessi
+m1cluessj
+m1cluessk
+m1cluessl
+m1cluesslp
+m1cluessm
+m1cluessmp
+m1cluessn
+m1cluesso
+m1cluessop
+m1cluessq
+m1cluessqp
+m1cluessr
+m1cluessrp
+m1cluesss
+m1cluesssp
 m1coderd	// Code Red Club (Maygay)
 m1coro		// Coronation Street (Maygay)
 m1cororr	// Coronation Street - Rovers Return (Maygay)
@@ -16805,6 +16890,7 @@ m1topstr	// Top Strike (Maygay - Bwb)
 m1sirich	// Strike It Rich
 m1gskill	// Greek Skill
 m1luxor		// Luxor Casino
+m1atunk
 
 // Maygay MV1 hardware
 
@@ -17545,8 +17631,9 @@ m4xtrm		// X-treme (Bwb)
 
 /* Concept */
 m4rhfevc	// Red Hot Fever (Concept)
-m4spnwnc	// Spin-A-Win (Concept)
 m4nudgwc	// Nudge a Win (Concept)
+m4pulwnc	// Pull-a-Win (Concept)
+m4spnwnc	// Spin-A-Win (Concept)
 
 /* Empire */
 
@@ -17898,7 +17985,6 @@ m4jok2k
 m4mjp
 m4milrou
 m4kingg
-m4bddunk
 
 
 // MPU4 + Video board
@@ -20464,3 +20550,7 @@ strike
 
 umipoker
 saiyukip
+
+tmspoker
+tonton
+kas89

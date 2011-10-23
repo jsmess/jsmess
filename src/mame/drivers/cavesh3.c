@@ -1,18 +1,133 @@
-/* Cave SH3 ( CAVE CV1000-B ) */
-/* skeleton placeholder driver */
-
 /*
+
+Cave SH3 hardware
+
+
+PCB CV1000-B / CV1000-D
++--------------------------------------------+
+|                                            |
+|                                            |
+|                                            |
+|                 VOL                        |
+|                                            |
++-+        +-----+ +-----+       X3          |
+  |        | U24 | | U23 |                   |
++-+        +-----+ +-----+    +------+       |
+|                             |Yamaha|       |
+|            U25*    U26*     |YMZ770|       |
+|                             |      |       |
+|J  D5                        +------+       |
+|A  D2                                       |
+|M  D3                    +-----+ +-----+    |
+|M  D4         P2*        | U7  | | U6  |    |
+|A  D1                    +-----+ +-----+    |
+|          +-------+                         |
+|C         |P4 JTAG|                         |
+|o         +-------+       +-------+         |
+|n                         |Altera |  +--+   |
+|n          D6             |Cyclone|  |  |   |
+|e     X1      S1          |       |  |U1|   |
+|c    S3 +---------+       +-------+  |  |   |
+|t       |         |                  +--+   |
+|e       | Hitachi |                         |
+|r       |         |     S2                  |
+|        |   SH3   |   +-----------------+   |
+|        |         |   |       P3        |   |
+|        +---------+   +-----------------+   |
++-+    X2                                    |
+  |       +--+  +--+    +---+  U27           |
++-+       |  |  |  |    |U13|                |
+|+-+      |U2|  |U4|    +---+                |
+||P|      |  |  |  |                 __      |
+||8| U12* +--+  +--+     U10        /  \     |
+|+-+                               |C126|    |
+|     P5* P7*                       \__/     |
++--------------------------------------------+
+
+* Denotes not populated
+
+  CPU: Hitachi 6417709S SH3 clocked at 102.4MHz (12.800MHz * 8)
+Sound: Yamaha YMZ770C-F clocked at 16.384MHz
+Other: Altera Cyclone EP1C12 FPGA
+       Altera EPM7032 (MAX 7000 Series, Stamped "CA011") at U13
+
+OSC:
+ X1 12.800MHz (SH3 clock derived from this)
+ X2 32.768kHz (Used by the RTC)
+ X3 16.384MHz (Yamaha YMZ770C-F clock)
+
+Memory:
+ U6 (SDRAM)  MT46V16M16 ? 4 MBit x 16 x 4 banks, RAM (256 MBit)
+ U7 (SDRAM)  MT46V16M16 ? 4 MBit x 16 x 4 banks, RAM (256 MBit)
+ U1 (SDRAM)  MT48LC2M32 ? 512K x 32 x 4 banks, (64 MBit) for CV1000-B
+ U1 (SDRAM)  IS42S32400 - 1024K x 32 x 4 banks, (128 MBit) for CV1000-D
+
+Roms:
+      U4 (FLASH)  29LV160BB 16M-Bit CMOS 3.0V, Boot device, FPGA bit file, main program code for CV1000-B
+      U4 (FLASH)  S29JL032H 32M-Bit CMOS 3.0V, Boot device, FPGA bit file, main program code for CV1000-D
+      U2 (FLASH)  K9F1G08U0M 128M x 8 Bit / 64M x 16 Bit NAND. Graphics data.
+ U23-U24 (FLASH)  MBM 29DL321, 32M-Bit CMOS 3.0V. Sound data.
+ U25-U26 (FLASH)  MBM 29DL321, not populated
+
+Battery:
+ C126 CR2450, Powers the RTC (Real Time Clock) U10. Look at the garden clock in Ibara. NOT present on CV1000-D
+
+Dipswitches & Push Buttons:
+ S1 (DIL SWITCH) Half Pitch DIL Switch x 1, function unknown
+ S2 (DIL SWITCH) Half Pitch DIL Switch x 4, SW1=Setup, other switches unknown
+ S3 (MICRO PUSH BUTTON) Test switch, same as on the JAMMA connector
+.
+Connectors:
+ P2 (IDC CONNECTOR 20 PIN) function unknown, P2 is not always mounted
+ P4 (IDC CONNECTOR 14 PIN) JTAG connector
+ P8 (IDC CONNECTOR 10 PIN) Advanced User Debugger
+ P3 (CONNECTOR) Most likely an expansion port, P3 is not always mounted
+ P5 (CONNECTOR) D9 serial connector. Used for the mahjong Touchscreen titles.  Also mounted on early Mushihimesama PCB's
+ P7 (CONNECTOR) Network port pinout. Never seen mounted on any PCB.
+
+Misc:
+   U27 (SUPERVISOR) MAX 690S 3.0V Microprocessor Supervisory Circuit.
+   U10 (RTC & EEPROM) RTC 9701, Serial RTC Module with EEPROM 4 kbit (256x16 bit), controlled by Altera EPM7032 U13.
+   U12 (RS-232 TRANCEIVER) MAX 3244E RS-232 Tranceiver, only mounted when P5 is mounted.
+ D1-D6 (LED) Status LED's. D6 lights up at power on then shuts off, D2 indicates coinage.
+
+Note: * The Altera EPM7032 has been seen stamped "CA017" for at least one DeathSmiles, there are other revisions.
+      * Actual flash ROMs will vary by manufacturer but will be compatible with flash ROM listed.
+      * The CV1000-D revision PCB has double the RAM at U1, double the ROM at U4 and no battery.
+        The CV1000-D is used for Dodonpachi Daifukkatsu and later games. Commonly referred to as SH3B PCB.
+
+Information by The Sheep, rtw, Ex-Cyber, BrianT & Guru
+
+------------------------------------------------------
+
+ To enter service mode in most cases hold down 0 (Service 2) for a few seconds
+  (I believe it's the test button on the PCB)
+ Some games also use the test dipswitch as an alternative method.
+
 ToDo:
 
-Eeprom
-NAND/Flash Writing and Saving! (DeathSmiles uses it for Unlock data)
 Improve Blending precision?
+ - I'm not sure what precision the original HW mixes with, source data is 555 RGB with 1 bit transparency (16-bits)
+   and the real VRAM is also clearly in this format.  The Alpha values supplied however are 8bpp, and the 'Tint'
+   values use 0x20 for 'normal' (not 0x1f)
+
+Overall screen brightness / contrast (see test mode)
+ - Could convert ram back to 16-bit and use a palette lookup at the final blit.. probably easiest / quickest.
+
 Sound
-Why does mmmbnk write to 0 on startup, is it related to the broken GFX you see?
-What is mmpork checking when it reports 'ERROR'
-General SH3 cleanups, verify dividers and such
-Speedups? (without breaking overall timing)
-Solid White BG on DS title screen? Lack of BG / GFX clear in MMP boot/test mode?
+ - Chip is completely unemulated
+
+Touchscreen
+ - Used for mmmbanc, needs SH3 serial support.
+
+Remaining Video issues
+ - mmpork startup screen flicker - the FOR USE IN JAPAN screen doesn't appear on the real PCB until after the graphics are fully loaded, it still displays 'please wait' until that point.
+ - is the use of the 'scroll' registers 100% correct? (related to above?)
+ - Sometimes the 'sprites' in mushisam lag by a frame vs the 'backgrounds' is this a timing problem, does the real game do it?
+
+Speedups
+ - Blitter is already tightly optimized
+ - Need SH3 recompiler?
 
 */
 
@@ -20,100 +135,229 @@ Solid White BG on DS title screen? Lack of BG / GFX clear in MMP boot/test mode?
 #include "cpu/sh4/sh4.h"
 #include "cpu/sh4/sh3comn.h"
 #include "profiler.h"
+#include "machine/rtc9701.h"
+#include "sound/ymz770.h"
+
+static UINT64* cavesh3_ram;
+//static UINT64* cavesh3_ram_copy;
+static UINT16* cavesh3_ram16;
+static UINT16* cavesh3_ram16_copy = 0;
+
+
+
 
 class cavesh3_state : public driver_device
 {
 public:
 	cavesh3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+
+	UINT8* flashregion;
+	UINT8* flashwritemap;
+
+	osd_work_queue *	queue;					/* work queue */
+	osd_work_item * blitter_request;
+
+	// blit timing
+	emu_timer *cavesh3_blitter_delay_timer;
+	int blitter_busy;
 };
 
 /***************************************************************************
                                 Video Hardware
 ***************************************************************************/
 
-UINT16* cavesh3_ram16;
-
+UINT8 cavesh3_colrtable[0x20][0x40];
+UINT8 cavesh3_colrtable_rev[0x20][0x40];
+UINT8 cavesh3_colrtable_add[0x20][0x20];
 struct _clr_t
 {
-	INT8 r,g,b;
+	UINT8 b,g,r,t;
 };
+
+
+
 typedef struct _clr_t clr_t;
 
-// r5g5b5 ro clr_t
-INLINE void pen_to_clr(UINT16 pen, clr_t *clr)
+union colour_t
 {
-	clr->r = (pen >> 10) & 0x1f;
-	clr->g = (pen >>  5) & 0x1f;
-	clr->b = (pen      ) & 0x1f;
+	clr_t trgb;
+	UINT32 u32;
+};
+
+// r5g5b5 ro clr_t
+
+
+
+INLINE void pen_to_clr(UINT32 pen, clr_t *clr)
+{
+// --t- ---- rrrr r--- gggg g--- bbbb b---  format
+	clr->r = (pen >> (16+3));// & 0x1f;
+	clr->g = (pen >>  (8+3));// & 0x1f;
+	clr->b = (pen >>   3);// & 0x1f;
+
+// --t- ---- ---r rrrr ---g gggg ---b bbbb  format
+//  clr->r = (pen >> 16) & 0x1f;
+//  clr->g = (pen >> 8) & 0x1f;
+//  clr->b = (pen >> 0) & 0x1f;
+
 }
+
 
 // convert separate r,g,b biases (0..80..ff) to clr_t (-1f..0..1f)
 INLINE void tint_to_clr(UINT8 r, UINT8 g, UINT8 b, clr_t *clr)
 {
-	clr->r	=	(r - 0x80) / 4;
-	clr->g	=	(g - 0x80) / 4;
-	clr->b	=	(b - 0x80) / 4;
-
-	if (clr->r < -0x1f)	clr->r = -0x1f;
-	if (clr->g < -0x1f)	clr->g = -0x1f;
-	if (clr->b < -0x1f)	clr->b = -0x1f;
+	clr->r	=	r>>2;
+	clr->g	=	g>>2;
+	clr->b	=	b>>2;
 }
 
-// convert alpha factor (0..ff) to clr_t (0..1f)
-INLINE void alpha_to_clr(UINT8 alpha, clr_t *clr)
+#if 0
+INLINE void clamp_clr(clr_t *clr)
 {
-	clr->r	=	alpha / 8;
-	clr->g	=	alpha / 8;
-	clr->b	=	alpha / 8;
+	if (clr->r > 0x1f) clr->r = 0x1f;
+	if (clr->g > 0x1f) clr->g = 0x1f;
+	if (clr->b > 0x1f) clr->b = 0x1f;
 }
-
-// clamp to 0..1f
-INLINE INT8 clamp(INT8 comp)
-{
-	if (comp > 0x1f)	return 0x1f;
-	else if (comp < 0)	return 0;
-	else				return comp;
-}
+#endif
 
 // clr_t to r5g5b5
-INLINE UINT16 clr_to_pen(const clr_t *clr)
+INLINE UINT32 clr_to_pen(const clr_t *clr)
 {
-	return (clr->r << 10) | (clr->g << 5) | clr->b;
-//return 0x8000 | (clr->r << 10) | (clr->g << 5) | clr->b;
+
+// --t- ---- rrrr r--- gggg g--- bbbb b---  format
+	return (clr->r << (16+3)) | (clr->g << (8+3)) | (clr->b << 3);
+
+// --t- ---- ---r rrrr ---g gggg ---b bbbb  format
+//  return (clr->r << (16)) | (clr->g << (8)) | (clr->b);
 }
 
 // add clrs
-INLINE void clr_add(const clr_t *clr0, const clr_t *clr1, clr_t *clr)
+
+
+INLINE void clr_add_with_clr_mul_fixed(clr_t *clr, const clr_t *clr0, const UINT8 mulfixed_val, const clr_t *mulfixed_clr0)
 {
-	clr->r = clamp(clr0->r + clr1->r);
-	clr->g = clamp(clr0->g + clr1->g);
-	clr->b = clamp(clr0->b + clr1->b);
+	clr->r = cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(mulfixed_clr0->r)][mulfixed_val]];
+	clr->g = cavesh3_colrtable_add[clr0->g][cavesh3_colrtable[(mulfixed_clr0->g)][mulfixed_val]];
+	clr->b = cavesh3_colrtable_add[clr0->b][cavesh3_colrtable[(mulfixed_clr0->b)][mulfixed_val]];
+}
+
+INLINE void clr_add_with_clr_mul_3param(clr_t *clr, const clr_t *clr0, const clr_t *clr1, const clr_t *clr2)
+{
+	clr->r = cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(clr2->r)][(clr1->r)]];
+	clr->g = cavesh3_colrtable_add[clr0->g][cavesh3_colrtable[(clr2->g)][(clr1->g)]];
+	clr->b = cavesh3_colrtable_add[clr0->b][cavesh3_colrtable[(clr2->b)][(clr1->b)]];
+}
+
+INLINE void clr_add_with_clr_square(clr_t *clr, const clr_t *clr0, const clr_t *clr1)
+{
+	clr->r = cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(clr1->r)][(clr1->r)]];
+	clr->g = cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(clr1->g)][(clr1->g)]];
+	clr->b = cavesh3_colrtable_add[clr0->r][cavesh3_colrtable[(clr1->b)][(clr1->b)]];
+}
+
+INLINE void clr_add_with_clr_mul_fixed_rev(clr_t *clr, const clr_t *clr0, const UINT8 val, const clr_t *clr1)
+{
+	clr->r =  cavesh3_colrtable_add[clr0->r][cavesh3_colrtable_rev[val][(clr1->r)]];
+	clr->g =  cavesh3_colrtable_add[clr0->g][cavesh3_colrtable_rev[val][(clr1->g)]];
+	clr->b =  cavesh3_colrtable_add[clr0->b][cavesh3_colrtable_rev[val][(clr1->b)]];
+}
+
+INLINE void clr_add_with_clr_mul_rev_3param(clr_t *clr, const clr_t *clr0, const clr_t *clr1, const clr_t *clr2)
+{
+	clr->r =  cavesh3_colrtable_add[clr0->r][cavesh3_colrtable_rev[(clr2->r)][(clr1->r)]];
+	clr->g =  cavesh3_colrtable_add[clr0->g][cavesh3_colrtable_rev[(clr2->g)][(clr1->g)]];
+	clr->b =  cavesh3_colrtable_add[clr0->b][cavesh3_colrtable_rev[(clr2->b)][(clr1->b)]];
+}
+
+INLINE void clr_add_with_clr_mul_rev_square(clr_t *clr, const clr_t *clr0, const clr_t *clr1)
+{
+	clr->r =  cavesh3_colrtable_add[clr0->r][cavesh3_colrtable_rev[(clr1->r)][(clr1->r)]];
+	clr->g =  cavesh3_colrtable_add[clr0->g][cavesh3_colrtable_rev[(clr1->g)][(clr1->g)]];
+	clr->b =  cavesh3_colrtable_add[clr0->b][cavesh3_colrtable_rev[(clr1->b)][(clr1->b)]];
+}
+
+
+INLINE void clr_add(clr_t *clr, const clr_t *clr0, const clr_t *clr1)
+{
+/*
+    clr->r = clr0->r + clr1->r;
+    clr->g = clr0->g + clr1->g;
+    clr->b = clr0->b + clr1->b;
+*/
+	// use pre-clamped lookup table
+	clr->r =  cavesh3_colrtable_add[clr0->r][clr1->r];
+	clr->g =  cavesh3_colrtable_add[clr0->g][clr1->g];
+	clr->b =  cavesh3_colrtable_add[clr0->b][clr1->b];
+
 }
 
 // multiply clrs
-INLINE void clr_mul(const clr_t *clr0, const clr_t *clr1, clr_t *clr)
+INLINE void clr_mul(clr_t *clr0, const clr_t *clr1)
 {
-	clr->r = clamp(clr0->r * clr1->r / 0x1f);
-	clr->g = clamp(clr0->g * clr1->g / 0x1f);
-	clr->b = clamp(clr0->b * clr1->b / 0x1f);
+	clr0->r = cavesh3_colrtable[(clr0->r)][(clr1->r)];
+	clr0->g = cavesh3_colrtable[(clr0->g)][(clr1->g)];
+	clr0->b = cavesh3_colrtable[(clr0->b)][(clr1->b)];
 }
 
-INLINE char mode_name(UINT8 mode)
+INLINE void clr_square(clr_t *clr0, const clr_t *clr1)
 {
-	switch( mode )
-	{
-		case 0:	return 'A';	// +alpha
-		case 1:	return 'S';	// +source
-		case 2:	return 'D';	// +dest
-		case 3:	return '*';	// *
-		case 4:	return 'a';	// -alpha
-		case 5:	return 's';	// -source
-		case 6:	return 'd';	// -dest
-		case 7:	return '-';	// *
-	}
-	return '?';
+	clr0->r = cavesh3_colrtable[(clr1->r)][(clr1->r)];
+	clr0->g = cavesh3_colrtable[(clr1->g)][(clr1->g)];
+	clr0->b = cavesh3_colrtable[(clr1->b)][(clr1->b)];
 }
+
+INLINE void clr_mul_3param(clr_t *clr0, const clr_t *clr1, const clr_t *clr2)
+{
+	clr0->r = cavesh3_colrtable[(clr2->r)][(clr1->r)];
+	clr0->g = cavesh3_colrtable[(clr2->g)][(clr1->g)];
+	clr0->b = cavesh3_colrtable[(clr2->b)][(clr1->b)];
+}
+
+INLINE void clr_mul_rev(clr_t *clr0, const clr_t *clr1)
+{
+	clr0->r = cavesh3_colrtable_rev[(clr0->r)][(clr1->r)];
+	clr0->g = cavesh3_colrtable_rev[(clr0->g)][(clr1->g)];
+	clr0->b = cavesh3_colrtable_rev[(clr0->b)][(clr1->b)];
+}
+
+INLINE void clr_mul_rev_square(clr_t *clr0, const clr_t *clr1)
+{
+	clr0->r = cavesh3_colrtable_rev[(clr1->r)][(clr1->r)];
+	clr0->g = cavesh3_colrtable_rev[(clr1->g)][(clr1->g)];
+	clr0->b = cavesh3_colrtable_rev[(clr1->b)][(clr1->b)];
+}
+
+
+INLINE void clr_mul_rev_3param(clr_t *clr0, const clr_t *clr1, const clr_t *clr2)
+{
+	clr0->r = cavesh3_colrtable_rev[(clr2->r)][(clr1->r)];
+	clr0->g = cavesh3_colrtable_rev[(clr2->g)][(clr1->g)];
+	clr0->b = cavesh3_colrtable_rev[(clr2->b)][(clr1->b)];
+}
+
+INLINE void clr_mul_fixed(clr_t *clr, const UINT8 val, const clr_t *clr0)
+{
+	clr->r = cavesh3_colrtable[val][(clr0->r)];
+	clr->g = cavesh3_colrtable[val][(clr0->g)];
+	clr->b = cavesh3_colrtable[val][(clr0->b)];
+}
+
+INLINE void clr_mul_fixed_rev(clr_t *clr, const UINT8 val, const clr_t *clr0)
+{
+	clr->r = cavesh3_colrtable_rev[val][(clr0->r)];
+	clr->g = cavesh3_colrtable_rev[val][(clr0->g)];
+	clr->b = cavesh3_colrtable_rev[val][(clr0->b)];
+}
+
+INLINE void clr_copy(clr_t *clr, const clr_t *clr0)
+{
+	clr->r = clr0->r;
+	clr->g = clr0->g;
+	clr->b = clr0->b;
+}
+
+
 
 // (1|s|d) * s_factor * s + (1|s|d) * d_factor * d
 // 0: +alpha
@@ -124,228 +368,4685 @@ INLINE char mode_name(UINT8 mode)
 // 5: -source
 // 6: -dest
 // 7: *
-INLINE void cavesh_clr_select(const clr_t *s_clr, const clr_t *d_clr, const clr_t *a_clr, UINT8 mode, clr_t *clr)
-{
-	switch( mode )
-	{
-		case 0:	// +alpha
-			clr->r = a_clr->r;
-			clr->g = a_clr->g;
-			clr->b = a_clr->b;
-			return;
 
-		case 1:	// +source
-			clr->r = s_clr->r;
-			clr->g = s_clr->g;
-			clr->b = s_clr->b;
-			return;
-
-		case 2:	// +dest
-			clr->r = d_clr->r;
-			clr->g = d_clr->g;
-			clr->b = d_clr->b;
-			return;
-
-		case 3:	// *
-			clr->r = 0x1f;
-			clr->g = 0x1f;
-			clr->b = 0x1f;
-			return;
-
-		case 4:	// -alpha
-			clr->r = a_clr->r^0x1f;
-			clr->g = a_clr->g^0x1f;
-			clr->b = a_clr->b^0x1f;
-			return;
-
-		case 5:	// -source
-			clr->r = s_clr->r^0x1f;
-			clr->g = s_clr->g^0x1f;
-			clr->b = s_clr->b^0x1f;
-			return;
-
-		case 6:	// -dest
-			clr->r = d_clr->r^0x1f;
-			clr->g = d_clr->g^0x1f;
-			clr->b = d_clr->b^0x1f;
-			return;
-
-		default:
-		case 7:	// *
-			clr->r = 0x1f;
-			clr->g = 0x1f;
-			clr->b = 0x1f;
-			return;
-	}
-}
 
 
 static UINT32 cavesh_gfx_addr;
 static UINT32 cavesh_gfx_scroll_0_x, cavesh_gfx_scroll_0_y;
 static UINT32 cavesh_gfx_scroll_1_x, cavesh_gfx_scroll_1_y;
 
+static UINT32 cavesh_gfx_addr_shadowcopy;
+static UINT32 cavesh_gfx_scroll_0_x_shadowcopy, cavesh_gfx_scroll_0_y_shadowcopy;
+static UINT32 cavesh_gfx_scroll_1_x_shadowcopy, cavesh_gfx_scroll_1_y_shadowcopy;
+
+static UINT64 cave_blit_delay;
+
+
 static int cavesh_gfx_size;
-static bitmap_t *cavesh_bitmaps[1];
+static bitmap_t *cavesh_bitmaps;
 
 static VIDEO_START( cavesh3 )
 {
 	cavesh_gfx_size	= 0x2000 * 0x1000;
-	cavesh_bitmaps[0]	=	auto_bitmap_alloc(machine, 0x2000, 0x1000, BITMAP_FORMAT_INDEXED16);
-}
-
-INLINE UINT32 GFX_OFFSET( UINT32 x0, UINT32 y0, UINT32 x, UINT32 y )
-{
-	// correct
-	return	((x0 + x) & 0x1fff) +
-			((y0 + y) & 0x0fff) * 0x2000;
-}
-
-INLINE void draw_sprite(
-	bitmap_t *bitmap, const rectangle *clip, UINT16 *gfx, int gfx_size,
-
-	int src_p,int src_x,int src_y, int dst_x,int dst_y, int dimx,int dimy, int flipx,int flipy,
-
-	int blend, clr_t *s_alpha_clr, int s_mode, clr_t *d_alpha_clr, int d_mode,
-
-	int tint, clr_t *tint_clr
-)
-{
-
-	//logerror("draw sprite %04x %04x - %04x %04x\n", dst_x, dst_y, dimx, dimy);
-
-	int x,y, xf,yf;
-	clr_t s_clr, d_clr, clr0, clr1;
-	UINT16 pen;
-	UINT16 *bmp;
-
-	if (flipx)	{	xf = -1;	src_x += (dimx-1);	}
-	else		{	xf = +1;						}
-
-	if (flipy)	{	yf = -1;	src_y += (dimy-1);	}
-	else		{	yf = +1;						}
-
-	int starty = 0;
-
-	if (dst_y < clip->min_y)
-		starty = clip->min_y - dst_y;
-
-	for (y = starty; y < dimy; y++)
-	{
-		if ((dst_y + y) > clip->max_y)
-			return;
-
-		bmp = BITMAP_ADDR16(bitmap, dst_y + y, 0);
-
-		int startx = 0;
-
-		if (dst_x < clip->min_x)
-			startx = clip->min_x - dst_x;
-
-		for (x = startx; x < dimx; x++)
-		{
-			if ((dst_x + x) > clip->max_x)
-				break;
-
-			pen = gfx[GFX_OFFSET(src_x,src_y, xf * x, yf * y) & (gfx_size-1)];
-
-			if ((tint) ||(pen & 0x8000)) // (tint) not quite right but improves deathsml
-			{
-				// convert source to clr
-				pen_to_clr(pen, &s_clr);
-
-				// apply clr bias to source
-//              if (tint)
-					clr_add(&s_clr, tint_clr, &s_clr);
-
-				if (blend)
-				{
-					// convert destination to clr
-					pen_to_clr(bmp[dst_x + x], &d_clr);
-
-					// transform source
-					cavesh_clr_select(&s_clr, &d_clr, s_alpha_clr, s_mode, &clr0);
-					clr_mul(&clr0, &s_clr, &clr0);
-
-					// transform destination
-					cavesh_clr_select(&s_clr, &d_clr, d_alpha_clr, d_mode, &clr1);
-					clr_mul(&clr1, &d_clr, &clr1);
-
-					// blend (add) into source
-					clr_add(&clr0, &clr1, &s_clr);
-				}
-
-				// write result
-				bmp[dst_x + x] = clr_to_pen(&s_clr)|(pen&0x8000);
-			}
-
-		}
-	}
+	cavesh_bitmaps	=	auto_bitmap_alloc(machine, 0x2000, 0x1000, BITMAP_FORMAT_RGB32);
 }
 
 
 
-INLINE UINT16 READ_NEXT_WORD(address_space &space, offs_t *addr)
+#define TRANSPARENT 1
+
+#define FUNCNAME draw_sprite_notint_plain
+#include "csh3blit.c"
+#undef FUNCNAME
+
+
+#define BLENDED
+
+#define _SMODE 0
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_s0_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_s1_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_s2_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_s3_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_s4_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_s5_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_s6_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_s7_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///////
+
+
+#define _SMODE 0
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_s0_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_s1_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_s2_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_s3_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_s4_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_s5_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_s6_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_s7_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+////
+
+
+#define _SMODE 0
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_s0_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_s1_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_s2_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_s3_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_s4_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_s5_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_s6_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_s7_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_s0_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_s1_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_s2_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_s3_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_s4_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_s5_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_s6_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_s7_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_s0_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_s1_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_s2_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_s3_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_s4_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_s5_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_s6_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_s7_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_s0_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_s1_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_s2_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_s3_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_s4_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_s5_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_s6_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_s7_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_s0_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_s1_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_s2_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_s3_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_s4_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_s5_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_s6_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_s7_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_s0_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_s1_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_s2_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_s3_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_s4_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_s5_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_s6_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_s7_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#undef BLENDED
+
+#undef TRANSPARENT
+
+
+#define TRANSPARENT 0
+
+#define FUNCNAME draw_sprite_notint_opaque_plain
+#include "csh3blit.c"
+#undef FUNCNAME
+
+
+#define BLENDED
+
+#define _SMODE 0
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_opaque_s0_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_opaque_s1_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_opaque_s2_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_opaque_s3_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_opaque_s4_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_opaque_s5_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_opaque_s6_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_opaque_s7_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///////
+
+
+#define _SMODE 0
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_opaque_s0_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_opaque_s1_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_opaque_s2_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_opaque_s3_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_opaque_s4_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_opaque_s5_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_opaque_s6_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_opaque_s7_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+////
+
+
+#define _SMODE 0
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_opaque_s0_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_opaque_s1_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_opaque_s2_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_opaque_s3_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_opaque_s4_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_opaque_s5_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_opaque_s6_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_opaque_s7_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_opaque_s0_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_opaque_s1_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_opaque_s2_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_opaque_s3_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_opaque_s4_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_opaque_s5_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_opaque_s6_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_opaque_s7_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_opaque_s0_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_opaque_s1_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_opaque_s2_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_opaque_s3_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_opaque_s4_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_opaque_s5_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_opaque_s6_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_opaque_s7_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_opaque_s0_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_opaque_s1_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_opaque_s2_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_opaque_s3_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_opaque_s4_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_opaque_s5_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_opaque_s6_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_opaque_s7_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_opaque_s0_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_opaque_s1_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_opaque_s2_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_opaque_s3_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_opaque_s4_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_opaque_s5_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_opaque_s6_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_opaque_s7_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_opaque_s0_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_opaque_s1_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_opaque_s2_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_opaque_s3_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_opaque_s4_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_opaque_s5_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_opaque_s6_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_opaque_s7_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#undef BLENDED
+
+#undef TRANSPARENT
+
+// flipped X cases
+
+#define FLIPX 1
+#define TRANSPARENT 1
+
+#define FUNCNAME draw_sprite_notint_flipx_plain
+#include "csh3blit.c"
+#undef FUNCNAME
+
+
+#define BLENDED
+
+#define _SMODE 0
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_s0_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_s1_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_s2_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_s3_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_s4_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_s5_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_s6_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_s7_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///////
+
+
+#define _SMODE 0
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_s0_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_s1_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_s2_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_s3_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_s4_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_s5_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_s6_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_s7_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+////
+
+
+#define _SMODE 0
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_s0_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_s1_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_s2_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_s3_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_s4_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_s5_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_s6_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_s7_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_s0_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_s1_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_s2_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_s3_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_s4_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_s5_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_s6_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_s7_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_s0_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_s1_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_s2_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_s3_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_s4_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_s5_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_s6_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_s7_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_s0_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_s1_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_s2_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_s3_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_s4_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_s5_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_s6_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_s7_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_s0_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_s1_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_s2_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_s3_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_s4_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_s5_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_s6_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_s7_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_s0_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_s1_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_s2_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_s3_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_s4_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_s5_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_s6_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_s7_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#undef BLENDED
+
+#undef TRANSPARENT
+
+
+#define TRANSPARENT 0
+
+#define FUNCNAME draw_sprite_notint_flipx_opaque_plain
+#include "csh3blit.c"
+#undef FUNCNAME
+
+
+#define BLENDED
+
+#define _SMODE 0
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s0_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s1_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s2_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s3_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s4_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s5_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s6_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 0
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s7_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///////
+
+
+#define _SMODE 0
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s0_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s1_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s2_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s3_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s4_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s5_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s6_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 1
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s7_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+////
+
+
+#define _SMODE 0
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s0_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s1_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s2_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s3_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s4_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s5_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s6_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 2
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s7_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s0_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s1_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s2_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s3_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s4_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s5_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s6_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 3
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s7_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s0_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s1_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s2_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s3_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s4_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s5_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s6_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 4
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s7_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s0_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s1_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s2_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s3_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s4_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s5_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s6_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 5
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s7_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s0_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s1_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s2_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s3_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s4_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s5_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s6_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 6
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s7_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s0_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s1_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s2_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s3_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s4_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s5_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s6_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 7
+#define FUNCNAME draw_sprite_notint_flipx_opaque_s7_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#undef BLENDED
+
+#undef TRANSPARENT
+#undef FLIPX
+
+// really simple cases
+
+#define REALLY_SIMPLE
+
+#define TRANSPARENT 1
+#define FUNCNAME draw_sprite_notint_simple
+#include "csh3blit.c"
+#undef FUNCNAME
+
+#define FLIPX
+#define FUNCNAME draw_sprite_notint_flipx_simple
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef FLIPX
+#undef TRANSPARENT
+
+#define TRANSPARENT 0
+#define FUNCNAME draw_sprite_notint_opaque_simple
+#include "csh3blit.c"
+#undef FUNCNAME
+
+#define FLIPX
+#define FUNCNAME draw_sprite_notint_flipx_opaque_simple
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef FLIPX
+#undef TRANSPARENT
+#undef REALLY_SIMPLE
+
+
+////////// TINT
+
+#define TINT
+
+
+#define TRANSPARENT 1
+
+#define FUNCNAME draw_sprite_plain
+#include "csh3blit.c"
+#undef FUNCNAME
+
+
+#define BLENDED
+
+#define _SMODE 0
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s0_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s1_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s2_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s3_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s4_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s5_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s6_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 0
+#define FUNCNAME draw_sprite_s7_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///////
+
+
+#define _SMODE 0
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s0_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s1_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s2_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s3_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s4_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s5_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s6_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 1
+#define FUNCNAME draw_sprite_s7_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+////
+
+
+#define _SMODE 0
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s0_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s1_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s2_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s3_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s4_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s5_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s6_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 2
+#define FUNCNAME draw_sprite_s7_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s0_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s1_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s2_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s3_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s4_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s5_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s6_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 3
+#define FUNCNAME draw_sprite_s7_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s0_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s1_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s2_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s3_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s4_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s5_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s6_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 4
+#define FUNCNAME draw_sprite_s7_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s0_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s1_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s2_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s3_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s4_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s5_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s6_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 5
+#define FUNCNAME draw_sprite_s7_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s0_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s1_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s2_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s3_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s4_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s5_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s6_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 6
+#define FUNCNAME draw_sprite_s7_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s0_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s1_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s2_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s3_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s4_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s5_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s6_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 7
+#define FUNCNAME draw_sprite_s7_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#undef BLENDED
+
+#undef TRANSPARENT
+
+
+#define TRANSPARENT 0
+
+#define FUNCNAME draw_sprite_opaque_plain
+#include "csh3blit.c"
+#undef FUNCNAME
+
+
+#define BLENDED
+
+#define _SMODE 0
+#define _DMODE 0
+#define FUNCNAME draw_sprite_opaque_s0_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 0
+#define FUNCNAME draw_sprite_opaque_s1_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 0
+#define FUNCNAME draw_sprite_opaque_s2_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 0
+#define FUNCNAME draw_sprite_opaque_s3_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 0
+#define FUNCNAME draw_sprite_opaque_s4_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 0
+#define FUNCNAME draw_sprite_opaque_s5_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 0
+#define FUNCNAME draw_sprite_opaque_s6_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 0
+#define FUNCNAME draw_sprite_opaque_s7_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///////
+
+
+#define _SMODE 0
+#define _DMODE 1
+#define FUNCNAME draw_sprite_opaque_s0_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 1
+#define FUNCNAME draw_sprite_opaque_s1_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 1
+#define FUNCNAME draw_sprite_opaque_s2_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 1
+#define FUNCNAME draw_sprite_opaque_s3_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 1
+#define FUNCNAME draw_sprite_opaque_s4_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 1
+#define FUNCNAME draw_sprite_opaque_s5_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 1
+#define FUNCNAME draw_sprite_opaque_s6_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 1
+#define FUNCNAME draw_sprite_opaque_s7_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+////
+
+
+#define _SMODE 0
+#define _DMODE 2
+#define FUNCNAME draw_sprite_opaque_s0_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 2
+#define FUNCNAME draw_sprite_opaque_s1_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 2
+#define FUNCNAME draw_sprite_opaque_s2_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 2
+#define FUNCNAME draw_sprite_opaque_s3_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 2
+#define FUNCNAME draw_sprite_opaque_s4_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 2
+#define FUNCNAME draw_sprite_opaque_s5_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 2
+#define FUNCNAME draw_sprite_opaque_s6_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 2
+#define FUNCNAME draw_sprite_opaque_s7_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 3
+#define FUNCNAME draw_sprite_opaque_s0_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 3
+#define FUNCNAME draw_sprite_opaque_s1_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 3
+#define FUNCNAME draw_sprite_opaque_s2_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 3
+#define FUNCNAME draw_sprite_opaque_s3_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 3
+#define FUNCNAME draw_sprite_opaque_s4_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 3
+#define FUNCNAME draw_sprite_opaque_s5_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 3
+#define FUNCNAME draw_sprite_opaque_s6_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 3
+#define FUNCNAME draw_sprite_opaque_s7_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 4
+#define FUNCNAME draw_sprite_opaque_s0_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 4
+#define FUNCNAME draw_sprite_opaque_s1_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 4
+#define FUNCNAME draw_sprite_opaque_s2_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 4
+#define FUNCNAME draw_sprite_opaque_s3_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 4
+#define FUNCNAME draw_sprite_opaque_s4_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 4
+#define FUNCNAME draw_sprite_opaque_s5_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 4
+#define FUNCNAME draw_sprite_opaque_s6_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 4
+#define FUNCNAME draw_sprite_opaque_s7_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 5
+#define FUNCNAME draw_sprite_opaque_s0_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 5
+#define FUNCNAME draw_sprite_opaque_s1_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 5
+#define FUNCNAME draw_sprite_opaque_s2_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 5
+#define FUNCNAME draw_sprite_opaque_s3_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 5
+#define FUNCNAME draw_sprite_opaque_s4_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 5
+#define FUNCNAME draw_sprite_opaque_s5_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 5
+#define FUNCNAME draw_sprite_opaque_s6_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 5
+#define FUNCNAME draw_sprite_opaque_s7_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 6
+#define FUNCNAME draw_sprite_opaque_s0_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 6
+#define FUNCNAME draw_sprite_opaque_s1_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 6
+#define FUNCNAME draw_sprite_opaque_s2_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 6
+#define FUNCNAME draw_sprite_opaque_s3_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 6
+#define FUNCNAME draw_sprite_opaque_s4_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 6
+#define FUNCNAME draw_sprite_opaque_s5_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 6
+#define FUNCNAME draw_sprite_opaque_s6_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 6
+#define FUNCNAME draw_sprite_opaque_s7_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 7
+#define FUNCNAME draw_sprite_opaque_s0_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 7
+#define FUNCNAME draw_sprite_opaque_s1_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 7
+#define FUNCNAME draw_sprite_opaque_s2_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 7
+#define FUNCNAME draw_sprite_opaque_s3_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 7
+#define FUNCNAME draw_sprite_opaque_s4_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 7
+#define FUNCNAME draw_sprite_opaque_s5_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 7
+#define FUNCNAME draw_sprite_opaque_s6_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 7
+#define FUNCNAME draw_sprite_opaque_s7_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#undef BLENDED
+
+#undef TRANSPARENT
+
+// flipped X cases
+
+#define FLIPX 1
+#define TRANSPARENT 1
+
+#define FUNCNAME draw_sprite_flipx_plain
+#include "csh3blit.c"
+#undef FUNCNAME
+
+
+#define BLENDED
+
+#define _SMODE 0
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s0_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s1_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s2_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s3_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s4_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s5_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s6_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_s7_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///////
+
+
+#define _SMODE 0
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s0_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s1_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s2_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s3_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s4_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s5_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s6_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_s7_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+////
+
+
+#define _SMODE 0
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s0_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s1_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s2_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s3_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s4_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s5_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s6_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_s7_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s0_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s1_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s2_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s3_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s4_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s5_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s6_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_s7_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s0_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s1_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s2_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s3_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s4_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s5_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s6_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_s7_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s0_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s1_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s2_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s3_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s4_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s5_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s6_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_s7_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s0_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s1_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s2_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s3_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s4_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s5_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s6_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_s7_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s0_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s1_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s2_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s3_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s4_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s5_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s6_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_s7_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#undef BLENDED
+
+#undef TRANSPARENT
+
+
+#define TRANSPARENT 0
+
+#define FUNCNAME draw_sprite_flipx_opaque_plain
+#include "csh3blit.c"
+#undef FUNCNAME
+
+
+#define BLENDED
+
+#define _SMODE 0
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 0
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d0
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///////
+
+
+#define _SMODE 0
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 1
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d1
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+////
+
+
+#define _SMODE 0
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 2
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d2
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 3
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d3
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 4
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d4
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 5
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d5
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+#define _SMODE 0
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 6
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d6
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+///
+
+
+#define _SMODE 0
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s0_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 1
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s1_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 2
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s2_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 3
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s3_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 4
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s4_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 5
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s5_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 6
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s6_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#define _SMODE 7
+#define _DMODE 7
+#define FUNCNAME draw_sprite_flipx_opaque_s7_d7
+#include "csh3blit.c"
+#undef FUNCNAME
+#undef _SMODE
+#undef _DMODE
+
+#undef BLENDED
+
+#undef TRANSPARENT
+#undef FLIPX
+
+#undef TINT
+
+
+INLINE UINT16 READ_NEXT_WORD(offs_t *addr)
 {
 //  UINT16 data = space.read_word(*addr); // going through the memory system is 'more correct' but noticably slower
-	UINT16 data =  cavesh3_ram16[((*addr&(0x7fffff))>>1)^3]; // this probably needs to be made endian safe tho
+	UINT16 data =  cavesh3_ram16_copy[((*addr&(0x7fffff))>>1)^3]; // this probably needs to be made endian safe tho
 	*addr += 2;
 
 //  printf("data %04x\n", data);
 	return data;
 }
 
-INLINE void cavesh_gfx_copy(address_space &space, offs_t *addr)
+INLINE UINT16 COPY_NEXT_WORD(address_space &space, offs_t *addr)
 {
-	UINT32 x,y, dst_p,dst_x,dst_y, dimx,dimy;
-	UINT16 *dst;
+//  UINT16 data = space.read_word(*addr); // going through the memory system is 'more correct' but noticably slower
+	UINT16 data =  cavesh3_ram16[((*addr&(0x7fffff))>>1)^3]; // this probably needs to be made endian safe tho
+	cavesh3_ram16_copy[((*addr&(0x7fffff))>>1)^3] = data;
 
-	// 0x20000000
-	READ_NEXT_WORD(space, addr);
-	READ_NEXT_WORD(space, addr);
+	*addr += 2;
 
-	// 0x99999999
-	READ_NEXT_WORD(space, addr);
-	READ_NEXT_WORD(space, addr);
+//  printf("data %04x\n", data);
+	return data;
+}
 
-	dst_x = READ_NEXT_WORD(space, addr);
-	dst_y = READ_NEXT_WORD(space, addr);
 
-	dst_p = 0;
-	dst_x &= 0x1fff;
-	dst_y &= 0x0fff;
+INLINE void cavesh_gfx_upload_shadow_copy(address_space &space, offs_t *addr)
+{
+	UINT32 x,y, dimx,dimy;
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
 
-	dimx = (READ_NEXT_WORD(space, addr) & 0x1fff) + 1;
-	dimy = (READ_NEXT_WORD(space, addr) & 0x0fff) + 1;
-
-	logerror("GFX COPY: DST %02X,%02X,%03X DIM %02X,%03X\n", dst_p,dst_x,dst_y, dimx,dimy);
+	dimx = (COPY_NEXT_WORD(space, addr) & 0x1fff) + 1;
+	dimy = (COPY_NEXT_WORD(space, addr) & 0x0fff) + 1;
 
 	for (y = 0; y < dimy; y++)
 	{
-		dst = BITMAP_ADDR16(cavesh_bitmaps[0], dst_y + y, 0);
-
 		for (x = 0; x < dimx; x++)
 		{
-			 dst[dst_x + x] = READ_NEXT_WORD(space, addr);
+			COPY_NEXT_WORD(space, addr);
 		}
 	}
 }
 
-INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
+INLINE void cavesh_gfx_upload(offs_t *addr)
 {
-	int	x,y, dimx,dimy, flipx,flipy, src_p;
-	int tint,blend, s_alpha,s_mode, d_alpha,d_mode;
-	clr_t tint_clr, s_alpha_clr, d_alpha_clr;
+	UINT32 x,y, dst_p,dst_x_start,dst_y_start, dimx,dimy;
+	UINT32 *dst;
 
-	UINT16 attr		=	READ_NEXT_WORD(space, addr);
-	UINT16 alpha	=	READ_NEXT_WORD(space, addr);
-	UINT16 src_x	=	READ_NEXT_WORD(space, addr);
-	UINT16 src_y	=	READ_NEXT_WORD(space, addr);
-	UINT16 dst_x	=	READ_NEXT_WORD(space, addr);
-	UINT16 dst_y	=	READ_NEXT_WORD(space, addr);
-	UINT16 w		=	READ_NEXT_WORD(space, addr);
-	UINT16 h		=	READ_NEXT_WORD(space, addr);
-	UINT16 tint_r	=	READ_NEXT_WORD(space, addr);
-	UINT16 tint_gb	=	READ_NEXT_WORD(space, addr);
+	// 0x20000000
+	READ_NEXT_WORD(addr);
+	READ_NEXT_WORD(addr);
+
+	// 0x99999999
+	READ_NEXT_WORD(addr);
+	READ_NEXT_WORD(addr);
+
+	dst_x_start = READ_NEXT_WORD(addr);
+	dst_y_start = READ_NEXT_WORD(addr);
+
+	dst_p = 0;
+	dst_x_start &= 0x1fff;
+	dst_y_start &= 0x0fff;
+
+	dimx = (READ_NEXT_WORD(addr) & 0x1fff) + 1;
+	dimy = (READ_NEXT_WORD(addr) & 0x0fff) + 1;
+
+	logerror("GFX COPY: DST %02X,%02X,%03X DIM %02X,%03X\n", dst_p,dst_x_start,dst_y_start, dimx,dimy);
+
+	for (y = 0; y < dimy; y++)
+	{
+		dst = BITMAP_ADDR32(cavesh_bitmaps, dst_y_start + y, 0);
+		dst += dst_x_start;
+
+		for (x = 0; x < dimx; x++)
+		{
+			UINT16 pendat = READ_NEXT_WORD(addr);
+			// real hw would upload the gfxword directly, but our VRAM is 32-bit, so convert it.
+			//dst[dst_x_start + x] = pendat;
+			*dst++ = ((pendat&0x8000)<<14) | ((pendat&0x7c00)<<9) | ((pendat&0x03e0)<<6) | ((pendat&0x001f)<<3);  // --t- ---- rrrr r--- gggg g--- bbbb b---  format
+			//dst[dst_x_start + x] = ((pendat&0x8000)<<14) | ((pendat&0x7c00)<<6) | ((pendat&0x03e0)<<3) | ((pendat&0x001f)<<0);  // --t- ---- ---r rrrr ---g gggg ---b bbbb  format
+
+
+		}
+	}
+}
+
+#define draw_params cavesh_bitmaps, &cavesh_bitmaps->cliprect, BITMAP_ADDR32(cavesh_bitmaps, 0,0),src_x,src_y, x,y, dimx,dimy, flipy, s_alpha, d_alpha, &tint_clr
+
+typedef const void (*caveblitfunction)(bitmap_t *,
+					 const rectangle *,
+					 UINT32 *, /* gfx */
+					 int , /* src_x */
+					 int , /* src_y */
+					 int , /* dst_x_start */
+					 int , /* dst_y_start */
+					 int , /* dimx */
+					 int , /* dimy */
+					 int , /* flipy */
+					 const UINT8 , /* s_alpha */
+					 const UINT8 , /* d_alpha */
+					 //int , /* tint */
+					 clr_t * );
+
+caveblitfunction cave_blit_funcs[] =
+{
+
+	draw_sprite_s0_d0, draw_sprite_s1_d0, draw_sprite_s2_d0, draw_sprite_s3_d0, draw_sprite_s4_d0, draw_sprite_s5_d0, draw_sprite_s6_d0, draw_sprite_s7_d0,
+	draw_sprite_s0_d1, draw_sprite_s1_d1, draw_sprite_s2_d1, draw_sprite_s3_d1, draw_sprite_s4_d1, draw_sprite_s5_d1, draw_sprite_s6_d1, draw_sprite_s7_d1,
+	draw_sprite_s0_d2, draw_sprite_s1_d2, draw_sprite_s2_d2, draw_sprite_s3_d2, draw_sprite_s4_d2, draw_sprite_s5_d2, draw_sprite_s6_d2, draw_sprite_s7_d2,
+	draw_sprite_s0_d3, draw_sprite_s1_d3, draw_sprite_s2_d3, draw_sprite_s3_d3, draw_sprite_s4_d3, draw_sprite_s5_d3, draw_sprite_s6_d3, draw_sprite_s7_d3,
+	draw_sprite_s0_d4, draw_sprite_s1_d4, draw_sprite_s2_d4, draw_sprite_s3_d4, draw_sprite_s4_d4, draw_sprite_s5_d4, draw_sprite_s6_d4, draw_sprite_s7_d4,
+	draw_sprite_s0_d5, draw_sprite_s1_d5, draw_sprite_s2_d5, draw_sprite_s3_d5, draw_sprite_s4_d5, draw_sprite_s5_d5, draw_sprite_s6_d5, draw_sprite_s7_d5,
+	draw_sprite_s0_d6, draw_sprite_s1_d6, draw_sprite_s2_d6, draw_sprite_s3_d6, draw_sprite_s4_d6, draw_sprite_s5_d6, draw_sprite_s6_d6, draw_sprite_s7_d6,
+	draw_sprite_s0_d7, draw_sprite_s1_d7, draw_sprite_s2_d7, draw_sprite_s3_d7, draw_sprite_s4_d7, draw_sprite_s5_d7, draw_sprite_s6_d7, draw_sprite_s7_d7,
+};
+
+caveblitfunction cave_opaque_blit_funcs[] =
+{
+
+	draw_sprite_opaque_s0_d0, draw_sprite_opaque_s1_d0, draw_sprite_opaque_s2_d0, draw_sprite_opaque_s3_d0, draw_sprite_opaque_s4_d0, draw_sprite_opaque_s5_d0, draw_sprite_opaque_s6_d0, draw_sprite_opaque_s7_d0,
+	draw_sprite_opaque_s0_d1, draw_sprite_opaque_s1_d1, draw_sprite_opaque_s2_d1, draw_sprite_opaque_s3_d1, draw_sprite_opaque_s4_d1, draw_sprite_opaque_s5_d1, draw_sprite_opaque_s6_d1, draw_sprite_opaque_s7_d1,
+	draw_sprite_opaque_s0_d2, draw_sprite_opaque_s1_d2, draw_sprite_opaque_s2_d2, draw_sprite_opaque_s3_d2, draw_sprite_opaque_s4_d2, draw_sprite_opaque_s5_d2, draw_sprite_opaque_s6_d2, draw_sprite_opaque_s7_d2,
+	draw_sprite_opaque_s0_d3, draw_sprite_opaque_s1_d3, draw_sprite_opaque_s2_d3, draw_sprite_opaque_s3_d3, draw_sprite_opaque_s4_d3, draw_sprite_opaque_s5_d3, draw_sprite_opaque_s6_d3, draw_sprite_opaque_s7_d3,
+	draw_sprite_opaque_s0_d4, draw_sprite_opaque_s1_d4, draw_sprite_opaque_s2_d4, draw_sprite_opaque_s3_d4, draw_sprite_opaque_s4_d4, draw_sprite_opaque_s5_d4, draw_sprite_opaque_s6_d4, draw_sprite_opaque_s7_d4,
+	draw_sprite_opaque_s0_d5, draw_sprite_opaque_s1_d5, draw_sprite_opaque_s2_d5, draw_sprite_opaque_s3_d5, draw_sprite_opaque_s4_d5, draw_sprite_opaque_s5_d5, draw_sprite_opaque_s6_d5, draw_sprite_opaque_s7_d5,
+	draw_sprite_opaque_s0_d6, draw_sprite_opaque_s1_d6, draw_sprite_opaque_s2_d6, draw_sprite_opaque_s3_d6, draw_sprite_opaque_s4_d6, draw_sprite_opaque_s5_d6, draw_sprite_opaque_s6_d6, draw_sprite_opaque_s7_d6,
+	draw_sprite_opaque_s0_d7, draw_sprite_opaque_s1_d7, draw_sprite_opaque_s2_d7, draw_sprite_opaque_s3_d7, draw_sprite_opaque_s4_d7, draw_sprite_opaque_s5_d7, draw_sprite_opaque_s6_d7, draw_sprite_opaque_s7_d7,
+};
+
+caveblitfunction cave_flipx_blit_funcs[] =
+{
+
+	draw_sprite_flipx_s0_d0, draw_sprite_flipx_s1_d0, draw_sprite_flipx_s2_d0, draw_sprite_flipx_s3_d0, draw_sprite_flipx_s4_d0, draw_sprite_flipx_s5_d0, draw_sprite_flipx_s6_d0, draw_sprite_flipx_s7_d0,
+	draw_sprite_flipx_s0_d1, draw_sprite_flipx_s1_d1, draw_sprite_flipx_s2_d1, draw_sprite_flipx_s3_d1, draw_sprite_flipx_s4_d1, draw_sprite_flipx_s5_d1, draw_sprite_flipx_s6_d1, draw_sprite_flipx_s7_d1,
+	draw_sprite_flipx_s0_d2, draw_sprite_flipx_s1_d2, draw_sprite_flipx_s2_d2, draw_sprite_flipx_s3_d2, draw_sprite_flipx_s4_d2, draw_sprite_flipx_s5_d2, draw_sprite_flipx_s6_d2, draw_sprite_flipx_s7_d2,
+	draw_sprite_flipx_s0_d3, draw_sprite_flipx_s1_d3, draw_sprite_flipx_s2_d3, draw_sprite_flipx_s3_d3, draw_sprite_flipx_s4_d3, draw_sprite_flipx_s5_d3, draw_sprite_flipx_s6_d3, draw_sprite_flipx_s7_d3,
+	draw_sprite_flipx_s0_d4, draw_sprite_flipx_s1_d4, draw_sprite_flipx_s2_d4, draw_sprite_flipx_s3_d4, draw_sprite_flipx_s4_d4, draw_sprite_flipx_s5_d4, draw_sprite_flipx_s6_d4, draw_sprite_flipx_s7_d4,
+	draw_sprite_flipx_s0_d5, draw_sprite_flipx_s1_d5, draw_sprite_flipx_s2_d5, draw_sprite_flipx_s3_d5, draw_sprite_flipx_s4_d5, draw_sprite_flipx_s5_d5, draw_sprite_flipx_s6_d5, draw_sprite_flipx_s7_d5,
+	draw_sprite_flipx_s0_d6, draw_sprite_flipx_s1_d6, draw_sprite_flipx_s2_d6, draw_sprite_flipx_s3_d6, draw_sprite_flipx_s4_d6, draw_sprite_flipx_s5_d6, draw_sprite_flipx_s6_d6, draw_sprite_flipx_s7_d6,
+	draw_sprite_flipx_s0_d7, draw_sprite_flipx_s1_d7, draw_sprite_flipx_s2_d7, draw_sprite_flipx_s3_d7, draw_sprite_flipx_s4_d7, draw_sprite_flipx_s5_d7, draw_sprite_flipx_s6_d7, draw_sprite_flipx_s7_d7,
+};
+
+caveblitfunction cave_flipx_opaque_blit_funcs[] =
+{
+
+	draw_sprite_flipx_opaque_s0_d0, draw_sprite_flipx_opaque_s1_d0, draw_sprite_flipx_opaque_s2_d0, draw_sprite_flipx_opaque_s3_d0, draw_sprite_flipx_opaque_s4_d0, draw_sprite_flipx_opaque_s5_d0, draw_sprite_flipx_opaque_s6_d0, draw_sprite_flipx_opaque_s7_d0,
+	draw_sprite_flipx_opaque_s0_d1, draw_sprite_flipx_opaque_s1_d1, draw_sprite_flipx_opaque_s2_d1, draw_sprite_flipx_opaque_s3_d1, draw_sprite_flipx_opaque_s4_d1, draw_sprite_flipx_opaque_s5_d1, draw_sprite_flipx_opaque_s6_d1, draw_sprite_flipx_opaque_s7_d1,
+	draw_sprite_flipx_opaque_s0_d2, draw_sprite_flipx_opaque_s1_d2, draw_sprite_flipx_opaque_s2_d2, draw_sprite_flipx_opaque_s3_d2, draw_sprite_flipx_opaque_s4_d2, draw_sprite_flipx_opaque_s5_d2, draw_sprite_flipx_opaque_s6_d2, draw_sprite_flipx_opaque_s7_d2,
+	draw_sprite_flipx_opaque_s0_d3, draw_sprite_flipx_opaque_s1_d3, draw_sprite_flipx_opaque_s2_d3, draw_sprite_flipx_opaque_s3_d3, draw_sprite_flipx_opaque_s4_d3, draw_sprite_flipx_opaque_s5_d3, draw_sprite_flipx_opaque_s6_d3, draw_sprite_flipx_opaque_s7_d3,
+	draw_sprite_flipx_opaque_s0_d4, draw_sprite_flipx_opaque_s1_d4, draw_sprite_flipx_opaque_s2_d4, draw_sprite_flipx_opaque_s3_d4, draw_sprite_flipx_opaque_s4_d4, draw_sprite_flipx_opaque_s5_d4, draw_sprite_flipx_opaque_s6_d4, draw_sprite_flipx_opaque_s7_d4,
+	draw_sprite_flipx_opaque_s0_d5, draw_sprite_flipx_opaque_s1_d5, draw_sprite_flipx_opaque_s2_d5, draw_sprite_flipx_opaque_s3_d5, draw_sprite_flipx_opaque_s4_d5, draw_sprite_flipx_opaque_s5_d5, draw_sprite_flipx_opaque_s6_d5, draw_sprite_flipx_opaque_s7_d5,
+	draw_sprite_flipx_opaque_s0_d6, draw_sprite_flipx_opaque_s1_d6, draw_sprite_flipx_opaque_s2_d6, draw_sprite_flipx_opaque_s3_d6, draw_sprite_flipx_opaque_s4_d6, draw_sprite_flipx_opaque_s5_d6, draw_sprite_flipx_opaque_s6_d6, draw_sprite_flipx_opaque_s7_d6,
+	draw_sprite_flipx_opaque_s0_d7, draw_sprite_flipx_opaque_s1_d7, draw_sprite_flipx_opaque_s2_d7, draw_sprite_flipx_opaque_s3_d7, draw_sprite_flipx_opaque_s4_d7, draw_sprite_flipx_opaque_s5_d7, draw_sprite_flipx_opaque_s6_d7, draw_sprite_flipx_opaque_s7_d7,
+};
+
+
+
+caveblitfunction cave_notint_blit_funcs[] =
+{
+
+	draw_sprite_notint_s0_d0, draw_sprite_notint_s1_d0, draw_sprite_notint_s2_d0, draw_sprite_notint_s3_d0, draw_sprite_notint_s4_d0, draw_sprite_notint_s5_d0, draw_sprite_notint_s6_d0, draw_sprite_notint_s7_d0,
+	draw_sprite_notint_s0_d1, draw_sprite_notint_s1_d1, draw_sprite_notint_s2_d1, draw_sprite_notint_s3_d1, draw_sprite_notint_s4_d1, draw_sprite_notint_s5_d1, draw_sprite_notint_s6_d1, draw_sprite_notint_s7_d1,
+	draw_sprite_notint_s0_d2, draw_sprite_notint_s1_d2, draw_sprite_notint_s2_d2, draw_sprite_notint_s3_d2, draw_sprite_notint_s4_d2, draw_sprite_notint_s5_d2, draw_sprite_notint_s6_d2, draw_sprite_notint_s7_d2,
+	draw_sprite_notint_s0_d3, draw_sprite_notint_s1_d3, draw_sprite_notint_s2_d3, draw_sprite_notint_s3_d3, draw_sprite_notint_s4_d3, draw_sprite_notint_s5_d3, draw_sprite_notint_s6_d3, draw_sprite_notint_s7_d3,
+	draw_sprite_notint_s0_d4, draw_sprite_notint_s1_d4, draw_sprite_notint_s2_d4, draw_sprite_notint_s3_d4, draw_sprite_notint_s4_d4, draw_sprite_notint_s5_d4, draw_sprite_notint_s6_d4, draw_sprite_notint_s7_d4,
+	draw_sprite_notint_s0_d5, draw_sprite_notint_s1_d5, draw_sprite_notint_s2_d5, draw_sprite_notint_s3_d5, draw_sprite_notint_s4_d5, draw_sprite_notint_s5_d5, draw_sprite_notint_s6_d5, draw_sprite_notint_s7_d5,
+	draw_sprite_notint_s0_d6, draw_sprite_notint_s1_d6, draw_sprite_notint_s2_d6, draw_sprite_notint_s3_d6, draw_sprite_notint_s4_d6, draw_sprite_notint_s5_d6, draw_sprite_notint_s6_d6, draw_sprite_notint_s7_d6,
+	draw_sprite_notint_s0_d7, draw_sprite_notint_s1_d7, draw_sprite_notint_s2_d7, draw_sprite_notint_s3_d7, draw_sprite_notint_s4_d7, draw_sprite_notint_s5_d7, draw_sprite_notint_s6_d7, draw_sprite_notint_s7_d7,
+};
+
+caveblitfunction cave_notint_opaque_blit_funcs[] =
+{
+
+	draw_sprite_notint_opaque_s0_d0, draw_sprite_notint_opaque_s1_d0, draw_sprite_notint_opaque_s2_d0, draw_sprite_notint_opaque_s3_d0, draw_sprite_notint_opaque_s4_d0, draw_sprite_notint_opaque_s5_d0, draw_sprite_notint_opaque_s6_d0, draw_sprite_notint_opaque_s7_d0,
+	draw_sprite_notint_opaque_s0_d1, draw_sprite_notint_opaque_s1_d1, draw_sprite_notint_opaque_s2_d1, draw_sprite_notint_opaque_s3_d1, draw_sprite_notint_opaque_s4_d1, draw_sprite_notint_opaque_s5_d1, draw_sprite_notint_opaque_s6_d1, draw_sprite_notint_opaque_s7_d1,
+	draw_sprite_notint_opaque_s0_d2, draw_sprite_notint_opaque_s1_d2, draw_sprite_notint_opaque_s2_d2, draw_sprite_notint_opaque_s3_d2, draw_sprite_notint_opaque_s4_d2, draw_sprite_notint_opaque_s5_d2, draw_sprite_notint_opaque_s6_d2, draw_sprite_notint_opaque_s7_d2,
+	draw_sprite_notint_opaque_s0_d3, draw_sprite_notint_opaque_s1_d3, draw_sprite_notint_opaque_s2_d3, draw_sprite_notint_opaque_s3_d3, draw_sprite_notint_opaque_s4_d3, draw_sprite_notint_opaque_s5_d3, draw_sprite_notint_opaque_s6_d3, draw_sprite_notint_opaque_s7_d3,
+	draw_sprite_notint_opaque_s0_d4, draw_sprite_notint_opaque_s1_d4, draw_sprite_notint_opaque_s2_d4, draw_sprite_notint_opaque_s3_d4, draw_sprite_notint_opaque_s4_d4, draw_sprite_notint_opaque_s5_d4, draw_sprite_notint_opaque_s6_d4, draw_sprite_notint_opaque_s7_d4,
+	draw_sprite_notint_opaque_s0_d5, draw_sprite_notint_opaque_s1_d5, draw_sprite_notint_opaque_s2_d5, draw_sprite_notint_opaque_s3_d5, draw_sprite_notint_opaque_s4_d5, draw_sprite_notint_opaque_s5_d5, draw_sprite_notint_opaque_s6_d5, draw_sprite_notint_opaque_s7_d5,
+	draw_sprite_notint_opaque_s0_d6, draw_sprite_notint_opaque_s1_d6, draw_sprite_notint_opaque_s2_d6, draw_sprite_notint_opaque_s3_d6, draw_sprite_notint_opaque_s4_d6, draw_sprite_notint_opaque_s5_d6, draw_sprite_notint_opaque_s6_d6, draw_sprite_notint_opaque_s7_d6,
+	draw_sprite_notint_opaque_s0_d7, draw_sprite_notint_opaque_s1_d7, draw_sprite_notint_opaque_s2_d7, draw_sprite_notint_opaque_s3_d7, draw_sprite_notint_opaque_s4_d7, draw_sprite_notint_opaque_s5_d7, draw_sprite_notint_opaque_s6_d7, draw_sprite_notint_opaque_s7_d7,
+};
+
+caveblitfunction cave_notint_flipx_blit_funcs[] =
+{
+
+	draw_sprite_notint_flipx_s0_d0, draw_sprite_notint_flipx_s1_d0, draw_sprite_notint_flipx_s2_d0, draw_sprite_notint_flipx_s3_d0, draw_sprite_notint_flipx_s4_d0, draw_sprite_notint_flipx_s5_d0, draw_sprite_notint_flipx_s6_d0, draw_sprite_notint_flipx_s7_d0,
+	draw_sprite_notint_flipx_s0_d1, draw_sprite_notint_flipx_s1_d1, draw_sprite_notint_flipx_s2_d1, draw_sprite_notint_flipx_s3_d1, draw_sprite_notint_flipx_s4_d1, draw_sprite_notint_flipx_s5_d1, draw_sprite_notint_flipx_s6_d1, draw_sprite_notint_flipx_s7_d1,
+	draw_sprite_notint_flipx_s0_d2, draw_sprite_notint_flipx_s1_d2, draw_sprite_notint_flipx_s2_d2, draw_sprite_notint_flipx_s3_d2, draw_sprite_notint_flipx_s4_d2, draw_sprite_notint_flipx_s5_d2, draw_sprite_notint_flipx_s6_d2, draw_sprite_notint_flipx_s7_d2,
+	draw_sprite_notint_flipx_s0_d3, draw_sprite_notint_flipx_s1_d3, draw_sprite_notint_flipx_s2_d3, draw_sprite_notint_flipx_s3_d3, draw_sprite_notint_flipx_s4_d3, draw_sprite_notint_flipx_s5_d3, draw_sprite_notint_flipx_s6_d3, draw_sprite_notint_flipx_s7_d3,
+	draw_sprite_notint_flipx_s0_d4, draw_sprite_notint_flipx_s1_d4, draw_sprite_notint_flipx_s2_d4, draw_sprite_notint_flipx_s3_d4, draw_sprite_notint_flipx_s4_d4, draw_sprite_notint_flipx_s5_d4, draw_sprite_notint_flipx_s6_d4, draw_sprite_notint_flipx_s7_d4,
+	draw_sprite_notint_flipx_s0_d5, draw_sprite_notint_flipx_s1_d5, draw_sprite_notint_flipx_s2_d5, draw_sprite_notint_flipx_s3_d5, draw_sprite_notint_flipx_s4_d5, draw_sprite_notint_flipx_s5_d5, draw_sprite_notint_flipx_s6_d5, draw_sprite_notint_flipx_s7_d5,
+	draw_sprite_notint_flipx_s0_d6, draw_sprite_notint_flipx_s1_d6, draw_sprite_notint_flipx_s2_d6, draw_sprite_notint_flipx_s3_d6, draw_sprite_notint_flipx_s4_d6, draw_sprite_notint_flipx_s5_d6, draw_sprite_notint_flipx_s6_d6, draw_sprite_notint_flipx_s7_d6,
+	draw_sprite_notint_flipx_s0_d7, draw_sprite_notint_flipx_s1_d7, draw_sprite_notint_flipx_s2_d7, draw_sprite_notint_flipx_s3_d7, draw_sprite_notint_flipx_s4_d7, draw_sprite_notint_flipx_s5_d7, draw_sprite_notint_flipx_s6_d7, draw_sprite_notint_flipx_s7_d7,
+};
+
+caveblitfunction cave_notint_flipx_opaque_blit_funcs[] =
+{
+
+	draw_sprite_notint_flipx_opaque_s0_d0, draw_sprite_notint_flipx_opaque_s1_d0, draw_sprite_notint_flipx_opaque_s2_d0, draw_sprite_notint_flipx_opaque_s3_d0, draw_sprite_notint_flipx_opaque_s4_d0, draw_sprite_notint_flipx_opaque_s5_d0, draw_sprite_notint_flipx_opaque_s6_d0, draw_sprite_notint_flipx_opaque_s7_d0,
+	draw_sprite_notint_flipx_opaque_s0_d1, draw_sprite_notint_flipx_opaque_s1_d1, draw_sprite_notint_flipx_opaque_s2_d1, draw_sprite_notint_flipx_opaque_s3_d1, draw_sprite_notint_flipx_opaque_s4_d1, draw_sprite_notint_flipx_opaque_s5_d1, draw_sprite_notint_flipx_opaque_s6_d1, draw_sprite_notint_flipx_opaque_s7_d1,
+	draw_sprite_notint_flipx_opaque_s0_d2, draw_sprite_notint_flipx_opaque_s1_d2, draw_sprite_notint_flipx_opaque_s2_d2, draw_sprite_notint_flipx_opaque_s3_d2, draw_sprite_notint_flipx_opaque_s4_d2, draw_sprite_notint_flipx_opaque_s5_d2, draw_sprite_notint_flipx_opaque_s6_d2, draw_sprite_notint_flipx_opaque_s7_d2,
+	draw_sprite_notint_flipx_opaque_s0_d3, draw_sprite_notint_flipx_opaque_s1_d3, draw_sprite_notint_flipx_opaque_s2_d3, draw_sprite_notint_flipx_opaque_s3_d3, draw_sprite_notint_flipx_opaque_s4_d3, draw_sprite_notint_flipx_opaque_s5_d3, draw_sprite_notint_flipx_opaque_s6_d3, draw_sprite_notint_flipx_opaque_s7_d3,
+	draw_sprite_notint_flipx_opaque_s0_d4, draw_sprite_notint_flipx_opaque_s1_d4, draw_sprite_notint_flipx_opaque_s2_d4, draw_sprite_notint_flipx_opaque_s3_d4, draw_sprite_notint_flipx_opaque_s4_d4, draw_sprite_notint_flipx_opaque_s5_d4, draw_sprite_notint_flipx_opaque_s6_d4, draw_sprite_notint_flipx_opaque_s7_d4,
+	draw_sprite_notint_flipx_opaque_s0_d5, draw_sprite_notint_flipx_opaque_s1_d5, draw_sprite_notint_flipx_opaque_s2_d5, draw_sprite_notint_flipx_opaque_s3_d5, draw_sprite_notint_flipx_opaque_s4_d5, draw_sprite_notint_flipx_opaque_s5_d5, draw_sprite_notint_flipx_opaque_s6_d5, draw_sprite_notint_flipx_opaque_s7_d5,
+	draw_sprite_notint_flipx_opaque_s0_d6, draw_sprite_notint_flipx_opaque_s1_d6, draw_sprite_notint_flipx_opaque_s2_d6, draw_sprite_notint_flipx_opaque_s3_d6, draw_sprite_notint_flipx_opaque_s4_d6, draw_sprite_notint_flipx_opaque_s5_d6, draw_sprite_notint_flipx_opaque_s6_d6, draw_sprite_notint_flipx_opaque_s7_d6,
+	draw_sprite_notint_flipx_opaque_s0_d7, draw_sprite_notint_flipx_opaque_s1_d7, draw_sprite_notint_flipx_opaque_s2_d7, draw_sprite_notint_flipx_opaque_s3_d7, draw_sprite_notint_flipx_opaque_s4_d7, draw_sprite_notint_flipx_opaque_s5_d7, draw_sprite_notint_flipx_opaque_s6_d7, draw_sprite_notint_flipx_opaque_s7_d7,
+};
+
+
+
+INLINE void cavesh_gfx_draw_shadow_copy(address_space &space, offs_t *addr, int cliptype)
+{
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr); // UINT16 dst_x_start  =   COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr); // UINT16 dst_y_start  =   COPY_NEXT_WORD(space, addr);
+	UINT16 w		=	COPY_NEXT_WORD(space, addr);
+	UINT16 h		=	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+	COPY_NEXT_WORD(space, addr);
+
+
+
+	// todo, calcualte clipping.
+	cave_blit_delay += w*h;
+
+}
+
+
+
+INLINE void cavesh_gfx_draw(offs_t *addr)
+{
+	int	x,y, dimx,dimy, flipx,flipy;//, src_p;
+	int trans,blend, s_mode, d_mode;
+	clr_t tint_clr;
+	int tinted = 0;
+
+	UINT16 attr		=	READ_NEXT_WORD(addr);
+	UINT16 alpha	=	READ_NEXT_WORD(addr);
+	UINT16 src_x	=	READ_NEXT_WORD(addr);
+	UINT16 src_y	=	READ_NEXT_WORD(addr);
+	UINT16 dst_x_start	=	READ_NEXT_WORD(addr);
+	UINT16 dst_y_start	=	READ_NEXT_WORD(addr);
+	UINT16 w		=	READ_NEXT_WORD(addr);
+	UINT16 h		=	READ_NEXT_WORD(addr);
+	UINT16 tint_r	=	READ_NEXT_WORD(addr);
+	UINT16 tint_gb	=	READ_NEXT_WORD(addr);
 
 	// 0: +alpha
 	// 1: +source
@@ -359,60 +5060,206 @@ INLINE void cavesh_gfx_draw(address_space &space, offs_t *addr)
 	d_mode	=	 attr & 0x0007;
 	s_mode	=	(attr & 0x0070) >> 4;
 
-	tint	=	 !(attr & 0x0100);
+	trans	=	 attr & 0x0100;
 	blend	=	   attr & 0x0200;
 
 	flipy	=	 attr & 0x0400;
 	flipx	=	 attr & 0x0800;
 
-	d_alpha	=	 alpha & 0x00ff;
-	s_alpha	=	(alpha & 0xff00) >> 8;
+	const UINT8 d_alpha	=	((alpha & 0x00ff)       )>>3;
+	const UINT8 s_alpha	=	((alpha & 0xff00) >> 8  )>>3;
 
-	src_p	=	0;
+//  src_p   =   0;
 	src_x	=	src_x & 0x1fff;
 	src_y	=	src_y & 0x0fff;
 
 
-	x		=	(dst_x & 0x7fff) - (dst_x & 0x8000);
-	y		=	(dst_y & 0x7fff) - (dst_y & 0x8000);
+	x		=	(dst_x_start & 0x7fff) - (dst_x_start & 0x8000);
+	y		=	(dst_y_start & 0x7fff) - (dst_y_start & 0x8000);
 
 	dimx	=	(w & 0x1fff) + 1;
 	dimy	=	(h & 0x0fff) + 1;
 
 	// convert parameters to clr
 
+
 	tint_to_clr(tint_r & 0x00ff, (tint_gb >>  8) & 0xff, tint_gb & 0xff, &tint_clr);
 
-	alpha_to_clr(s_alpha, &s_alpha_clr);
-	alpha_to_clr(d_alpha, &d_alpha_clr);
+	/* interestingly this gets set to 0x20 for 'normal' not 0x1f */
 
-	// draw
-	draw_sprite(
-		cavesh_bitmaps[0], &cavesh_bitmaps[0]->cliprect, BITMAP_ADDR16(cavesh_bitmaps[0], 0,0),cavesh_gfx_size,
-		src_p,src_x,src_y, x,y, dimx,dimy, flipx,flipy,
-		blend, &s_alpha_clr, s_mode, &d_alpha_clr, d_mode,
-		tint, &tint_clr
-	);
+	if (tint_clr.r!=0x20)
+		tinted = 1;
+
+	if (tint_clr.g!=0x20)
+		tinted = 1;
+
+	if (tint_clr.b!=0x20)
+		tinted = 1;
+
+
+	// surprisingly frequent, need to verify if it produces a worthwhile speedup tho.
+	if ((s_mode==0 && s_alpha==0x1f) && (d_mode==4 && d_alpha==0x1f))
+		blend = 0;
+
+	if (tinted)
+	{
+		if (!flipx)
+		{
+			if (trans)
+			{
+				if (!blend)
+				{
+					draw_sprite_plain(draw_params);
+				}
+				else
+				{
+					cave_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+				}
+			}
+			else
+			{
+			if (!blend)
+				{
+					draw_sprite_opaque_plain(draw_params);
+				}
+				else
+				{
+					cave_opaque_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+				}
+			}
+		}
+		else // flipx
+		{
+			if (trans)
+			{
+				if (!blend)
+				{
+					draw_sprite_flipx_plain(draw_params);
+				}
+				else
+				{
+					cave_flipx_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+				}
+			}
+			else
+			{
+			if (!blend)
+				{
+					draw_sprite_flipx_opaque_plain(draw_params);
+				}
+				else
+				{
+					cave_flipx_opaque_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+				}
+			}
+		}
+	}
+	else
+	{
+
+		if (blend==0 && tinted==0)
+		{
+			if (!flipx)
+			{
+				if (trans)
+				{
+					draw_sprite_notint_simple(draw_params);
+				}
+				else
+				{
+					draw_sprite_notint_opaque_simple(draw_params);
+				}
+			}
+			else
+			{
+				if (trans)
+				{
+					draw_sprite_notint_flipx_simple(draw_params);
+				}
+				else
+				{
+					draw_sprite_notint_flipx_opaque_simple(draw_params);
+				}
+
+			}
+
+			return;
+		}
+
+
+
+		//printf("smode %d dmode %d\n", s_mode, d_mode);
+
+		if (!flipx)
+		{
+			if (trans)
+			{
+				if (!blend)
+				{
+					draw_sprite_notint_plain(draw_params);
+				}
+				else
+				{
+					cave_notint_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+				}
+			}
+			else
+			{
+			if (!blend)
+				{
+					draw_sprite_notint_opaque_plain(draw_params);
+				}
+				else
+				{
+					cave_notint_opaque_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+				}
+			}
+		}
+		else // flipx
+		{
+			if (trans)
+			{
+				if (!blend)
+				{
+					draw_sprite_notint_flipx_plain(draw_params);
+				}
+				else
+				{
+					cave_notint_flipx_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+				}
+			}
+			else
+			{
+			if (!blend)
+				{
+					draw_sprite_notint_flipx_opaque_plain(draw_params);
+				}
+				else
+				{
+					cave_notint_flipx_opaque_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+				}
+			}
+		}
+	}
+
+
 
 }
 
-// Death Smiles has bad text with wrong clip sizes, must clip to screen size.
-static void cavesh_gfx_exec(address_space &space)
+
+static void cavesh_gfx_create_shadow_copy(address_space &space)
 {
-	UINT16 layer = 0;
-
 	offs_t addr = cavesh_gfx_addr & 0x1fffffff;
+	UINT16 cliptype = 0;
 
-//  logerror("GFX EXEC: %08X\n", addr);
-
-	cavesh_bitmaps[0]->cliprect.min_x = cavesh_gfx_scroll_1_x;
-	cavesh_bitmaps[0]->cliprect.min_y = cavesh_gfx_scroll_1_y;
-	cavesh_bitmaps[0]->cliprect.max_x = cavesh_bitmaps[0]->cliprect.min_x + 320-1;
-	cavesh_bitmaps[0]->cliprect.max_y = cavesh_bitmaps[0]->cliprect.min_y + 240-1;
+	cavesh_bitmaps->cliprect.min_x = cavesh_gfx_scroll_1_x_shadowcopy;
+	cavesh_bitmaps->cliprect.min_y = cavesh_gfx_scroll_1_y_shadowcopy;
+	cavesh_bitmaps->cliprect.max_x = cavesh_bitmaps->cliprect.min_x + 320-1;
+	cavesh_bitmaps->cliprect.max_y = cavesh_bitmaps->cliprect.min_y + 240-1;
 
 	while (1)
 	{
-		UINT16 data = READ_NEXT_WORD(space, &addr);
+		UINT16 data = COPY_NEXT_WORD(space, &addr);
 
 		switch( data & 0xf000 )
 		{
@@ -421,33 +5268,96 @@ static void cavesh_gfx_exec(address_space &space)
 				return;
 
 			case 0xc000:
-				data = READ_NEXT_WORD(space, &addr);
-				layer = data ? 1 : 0;
+				data = COPY_NEXT_WORD(space, &addr);
 
-				if (layer)
+				cliptype = data ? 1 : 0;
+
+				if (cliptype)
 				{
-					cavesh_bitmaps[0]->cliprect.min_x = cavesh_gfx_scroll_1_x;
-					cavesh_bitmaps[0]->cliprect.min_y = cavesh_gfx_scroll_1_y;
-					cavesh_bitmaps[0]->cliprect.max_x = cavesh_bitmaps[0]->cliprect.min_x + 320-1;
-					cavesh_bitmaps[0]->cliprect.max_y = cavesh_bitmaps[0]->cliprect.min_y + 240-1;
+					cavesh_bitmaps->cliprect.min_x = cavesh_gfx_scroll_1_x_shadowcopy;
+					cavesh_bitmaps->cliprect.min_y = cavesh_gfx_scroll_1_y_shadowcopy;
+					cavesh_bitmaps->cliprect.max_x = cavesh_bitmaps->cliprect.min_x + 320-1;
+					cavesh_bitmaps->cliprect.max_y = cavesh_bitmaps->cliprect.min_y + 240-1;
 				}
 				else
 				{
-					cavesh_bitmaps[0]->cliprect.min_x = 0;
-					cavesh_bitmaps[0]->cliprect.min_y = 0;
-					cavesh_bitmaps[0]->cliprect.max_x = 0x2000-1;
-					cavesh_bitmaps[0]->cliprect.max_y = 0x1000-1;
+					cavesh_bitmaps->cliprect.min_x = 0;
+					cavesh_bitmaps->cliprect.min_y = 0;
+					cavesh_bitmaps->cliprect.max_x = 0x2000-1;
+					cavesh_bitmaps->cliprect.max_y = 0x1000-1;
+				}
+
+				break;
+
+			case 0x2000:
+				addr -= 2;
+				cavesh_gfx_upload_shadow_copy(space, &addr);
+				break;
+
+			case 0x1000:
+				addr -= 2;
+				cavesh_gfx_draw_shadow_copy(space, &addr, cliptype);
+				break;
+
+			default:
+				popmessage("GFX op = %04X", data);
+				return;
+		}
+	}
+}
+
+// Death Smiles has bad text with wrong clip sizes, must clip to screen size.
+static void cavesh_gfx_exec(void)
+{
+	UINT16 cliptype = 0;
+
+	offs_t addr = cavesh_gfx_addr_shadowcopy & 0x1fffffff;
+
+//  logerror("GFX EXEC: %08X\n", addr);
+
+	cavesh_bitmaps->cliprect.min_x = cavesh_gfx_scroll_1_x_shadowcopy;
+	cavesh_bitmaps->cliprect.min_y = cavesh_gfx_scroll_1_y_shadowcopy;
+	cavesh_bitmaps->cliprect.max_x = cavesh_bitmaps->cliprect.min_x + 320-1;
+	cavesh_bitmaps->cliprect.max_y = cavesh_bitmaps->cliprect.min_y + 240-1;
+
+	while (1)
+	{
+		UINT16 data = READ_NEXT_WORD(&addr);
+
+		switch( data & 0xf000 )
+		{
+			case 0x0000:
+			case 0xf000:
+				return;
+
+			case 0xc000:
+				data = READ_NEXT_WORD(&addr);
+				cliptype = data ? 1 : 0;
+
+				if (cliptype)
+				{
+					cavesh_bitmaps->cliprect.min_x = cavesh_gfx_scroll_1_x_shadowcopy;
+					cavesh_bitmaps->cliprect.min_y = cavesh_gfx_scroll_1_y_shadowcopy;
+					cavesh_bitmaps->cliprect.max_x = cavesh_bitmaps->cliprect.min_x + 320-1;
+					cavesh_bitmaps->cliprect.max_y = cavesh_bitmaps->cliprect.min_y + 240-1;
+				}
+				else
+				{
+					cavesh_bitmaps->cliprect.min_x = 0;
+					cavesh_bitmaps->cliprect.min_y = 0;
+					cavesh_bitmaps->cliprect.max_x = 0x2000-1;
+					cavesh_bitmaps->cliprect.max_y = 0x1000-1;
 				}
 				break;
 
 			case 0x2000:
 				addr -= 2;
-				cavesh_gfx_copy(space, &addr);
+				cavesh_gfx_upload(&addr);
 				break;
 
 			case 0x1000:
 				addr -= 2;
-				cavesh_gfx_draw(space, &addr);
+				cavesh_gfx_draw(&addr);
 				break;
 
 			default:
@@ -458,20 +5368,66 @@ static void cavesh_gfx_exec(address_space &space)
 }
 
 
+static void *blit_request_callback(void *param, int threadid)
+{
+	cavesh_gfx_exec();
+//  printf("blah\n");
+	return NULL;
+}
+
+
+
 static READ32_HANDLER( cavesh_gfx_ready_r )
 {
-	return 0x00000010;
+	// ideally we want a recompiler for the CPU before we attempt to do this
+	// otherwise the games get stuck in more loops waiting for the blitter and we'd
+	// have to add even more idle skips all over the place ;-)
+
+//  cavesh3_state *state = space->machine().driver_data<cavesh3_state>();
+//  int pc = cpu_get_pc(&space->device());
+// if we're waiting for the blitter.. spin otherwise it becomes CPU intensive again
+/// if ( pc == 0xc0512d0 ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // espgal2
+//  if (state->blitter_busy) return 0x00000000;
+//  else
+		return 0x00000010;
 }
 
 static WRITE32_HANDLER( cavesh_gfx_exec_w )
 {
+	cavesh3_state *state = space->machine().driver_data<cavesh3_state>();
+
 	if ( ACCESSING_BITS_0_7 )
 	{
 		if (data & 1)
 		{
-			g_profiler.start(PROFILER_USER1);
-			cavesh_gfx_exec(*space);
-			g_profiler.stop();
+			//g_profiler.start(PROFILER_USER1);
+			// make sure we've not already got a request running
+			if (state->blitter_request)
+			{
+				int result;
+				do
+				{
+					result = osd_work_item_wait(state->blitter_request, 1000);
+				} while (result==0);
+				osd_work_item_release(state->blitter_request);
+			}
+
+			cave_blit_delay = 0;
+			cavesh_gfx_create_shadow_copy(*space); // create a copy of the blit list so we can safely thread it.
+
+			if (cave_blit_delay)
+			{
+				state->blitter_busy = 1;
+				state->cavesh3_blitter_delay_timer->adjust(attotime::from_nsec(cave_blit_delay*8)); // NOT accurate timing (currently ignored anyway)
+			}
+
+			cavesh_gfx_addr_shadowcopy = cavesh_gfx_addr;
+			cavesh_gfx_scroll_0_x_shadowcopy =  cavesh_gfx_scroll_0_x;
+			cavesh_gfx_scroll_0_y_shadowcopy = cavesh_gfx_scroll_0_y;
+			cavesh_gfx_scroll_1_x_shadowcopy = cavesh_gfx_scroll_1_x;
+			cavesh_gfx_scroll_1_y_shadowcopy = cavesh_gfx_scroll_1_y;
+			state->blitter_request = osd_work_item_queue(state->queue, blit_request_callback, 0, 0);
+			//g_profiler.stop();
 		}
 	}
 }
@@ -480,19 +5436,33 @@ static WRITE32_HANDLER( cavesh_gfx_exec_w )
 
 static SCREEN_UPDATE( cavesh3 )
 {
+
+	cavesh3_state *state = screen->machine().driver_data<cavesh3_state>();
+
+	if (state->blitter_request)
+	{
+		int result;
+		do
+		{
+			result = osd_work_item_wait(state->blitter_request, 1000);
+		} while (result==0);
+		osd_work_item_release(state->blitter_request);
+	}
+
+
 	int scroll_0_x, scroll_0_y;
-	//int scroll_1_x, scroll_1_y;
+//  int scroll_1_x, scroll_1_y;
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 	scroll_0_x = -cavesh_gfx_scroll_0_x;
 	scroll_0_y = -cavesh_gfx_scroll_0_y;
-	//scroll_1_x = -cavesh_gfx_scroll_1_x;
-	//scroll_1_y = -cavesh_gfx_scroll_1_y;
+//  scroll_1_x = -cavesh_gfx_scroll_1_x;
+//  scroll_1_y = -cavesh_gfx_scroll_1_y;
 
-	//logerror("SCREEN UPDATE\n");
+	//printf("SCREEN UPDATE\n %d %d %d %d\n", scroll_0_x, scroll_0_y, scroll_1_x, scroll_1_y);
 
-	copyscrollbitmap_trans(bitmap, cavesh_bitmaps[0], 1,&scroll_0_x, 1,&scroll_0_y, cliprect, 0x8000);
+	copyscrollbitmap(bitmap, cavesh_bitmaps, 1,&scroll_0_x, 1,&scroll_0_y, cliprect);
 
 	return 0;
 }
@@ -553,22 +5523,6 @@ static WRITE32_HANDLER( cavesh3_blitter_w )
 	}
 }
 
-
-
-static READ64_HANDLER( ymz2770c_z_r )
-{
-	UINT64 ret = space->machine().rand();
-
-	return ret ^ (ret<<32);
-}
-
-static WRITE64_HANDLER( ymz2770c_z_w )
-{
-
-}
-
-
-
 // FLASH
 
 #define FLASH_PAGE_SIZE	(2048+64)
@@ -614,9 +5568,9 @@ static void flash_hard_reset(running_machine &machine)
 
 static WRITE8_HANDLER( flash_enab_w )
 {
-	logerror("%08x FLASH: enab = %02X\n", cpu_get_pc(&space->device()), data);
-	//flash_enab = data;
-	flash_enab = 1; // todo, why does it get turned off again instantly?
+	//logerror("%08x FLASH: enab = %02X\n", cpu_get_pc(&space->device()), data);
+	flash_enab = data;
+	//flash_enab = 1; // todo, why does it get turned off again instantly?
 }
 
 static void flash_change_state(running_machine &machine, flash_state_t state)
@@ -629,15 +5583,17 @@ static void flash_change_state(running_machine &machine, flash_state_t state)
 	flash_read_seq = 0;
 	flash_addr_seq = 0;
 
-	logerror("flash_change_state - FLASH: state = %s\n", flash_state_name[state]);
+	//logerror("flash_change_state - FLASH: state = %s\n", flash_state_name[state]);
 }
 
 static WRITE8_HANDLER( flash_cmd_w )
 {
+	cavesh3_state *state = space->machine().driver_data<cavesh3_state>();
+
 	if (!flash_enab)
 		return;
 
-	logerror("%08x FLASH: cmd = %02X (prev = %02X)\n", cpu_get_pc(&space->device()), data, flash_cmd_prev);
+	//logerror("%08x FLASH: cmd = %02X (prev = %02X)\n", cpu_get_pc(&space->device()), data, flash_cmd_prev);
 
 	if (flash_cmd_prev == -1)
 	{
@@ -659,10 +5615,8 @@ static WRITE8_HANDLER( flash_cmd_w )
 
 			case 0x80:	// PAGE / CACHE PROGRAM
 				flash_addr_seq = 0;
-				flash_page_addr = 0;// flash_col;
-				//flash_page_index = flash_row;
-
-
+				// this actually seems to be set with the next 2 writes?
+				flash_page_addr = 0;
 				break;
 
 			case 0x90:	// READ ID
@@ -675,7 +5629,7 @@ static WRITE8_HANDLER( flash_cmd_w )
 
 			default:
 			{
-				logerror("%08x FLASH: unknown cmd1 = %02X\n", cpu_get_pc(&space->device()), data);
+				//logerror("%08x FLASH: unknown cmd1 = %02X\n", cpu_get_pc(&space->device()), data);
 			}
 		}
 	}
@@ -686,51 +5640,50 @@ static WRITE8_HANDLER( flash_cmd_w )
 			case 0x00:	// READ
 				if (data == 0x30)
 				{
-					UINT8 *region = space->machine().region( "game" )->base();
 
-					memcpy(flash_page_data, region + flash_row * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
+
+					memcpy(flash_page_data, state->flashregion + flash_row * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
 					flash_page_addr = flash_col;
 					flash_page_index = flash_row;
 
 					flash_change_state( space->machine(), STATE_READ );
 
-					logerror("%08x FLASH: caching page = %04X\n", cpu_get_pc(&space->device()), flash_row);
+					//logerror("%08x FLASH: caching page = %04X\n", cpu_get_pc(&space->device()), flash_row);
 				}
 				break;
 
 			case 0x60: // BLOCK ERASE
 				if (data==0xd0)
 				{
-
-					 flash_change_state( space->machine(), STATE_BLOCK_ERASE );
-					 //logerror("%08x FLASH: caching page = %04X\n", cpu_get_pc(&space->device()), flash_row);
+					flash_change_state( space->machine(), STATE_BLOCK_ERASE );
+					state->flashwritemap[flash_col] |= 1;
+					memset(state->flashregion + flash_col * FLASH_PAGE_SIZE, 0xff, FLASH_PAGE_SIZE);
+					//logerror("erased block %04x (%08x - %08x)\n", flash_col, flash_col * FLASH_PAGE_SIZE,  ((flash_col+1) * FLASH_PAGE_SIZE)-1);
 				}
 				else
 				{
-					logerror("unexpected 2nd command after BLOCK ERASE\n");
+					//logerror("unexpected 2nd command after BLOCK ERASE\n");
 				}
 				break;
 			case 0x80:
 				if (data==0x10)
 				{
-				//  UINT8 *region = space->machine().region( "game" )->base();
 					flash_change_state( space->machine(), STATE_PAGE_PROGRAM );
-					flash_page_addr = flash_col;
-					flash_page_index = flash_row;
-					// don't do this until it's verified as OK
-					//memcpy(region + flash_row * FLASH_PAGE_SIZE, flash_page_data, FLASH_PAGE_SIZE);
+					state->flashwritemap[flash_row] |= (memcmp(state->flashregion + flash_row * FLASH_PAGE_SIZE, flash_page_data, FLASH_PAGE_SIZE) != 0);
+					memcpy(state->flashregion + flash_row * FLASH_PAGE_SIZE, flash_page_data, FLASH_PAGE_SIZE);
+					//logerror("re-written block %04x (%08x - %08x)\n", flash_row, flash_row * FLASH_PAGE_SIZE,  ((flash_row+1) * FLASH_PAGE_SIZE)-1);
 
 				}
 				else
 				{
-					logerror("unexpected 2nd command after SPAGE PROGRAM\n");
+					//logerror("unexpected 2nd command after SPAGE PROGRAM\n");
 				}
 				break;
 
 
 			default:
 			{
-				logerror("%08x FLASH: unknown cmd2 = %02X (cmd1 = %02X)\n", cpu_get_pc(&space->device()), data, flash_cmd_prev);
+				//logerror("%08x FLASH: unknown cmd2 = %02X (cmd1 = %02X)\n", cpu_get_pc(&space->device()), data, flash_cmd_prev);
 			}
 		}
 	}
@@ -741,7 +5694,7 @@ static WRITE8_HANDLER( flash_data_w ) // death smiles
 	if (!flash_enab)
 		return;
 
-	logerror("flash data write %04x\n", flash_page_addr);
+	//logerror("flash data write %04x\n", flash_page_addr);
 	flash_page_data[flash_page_addr] = data;
 	flash_page_addr++;
 }
@@ -751,7 +5704,7 @@ static WRITE8_HANDLER( flash_addr_w )
 	if (!flash_enab)
 		return;
 
-	logerror("%08x FLASH: addr = %02X (seq = %02X)\n", cpu_get_pc(&space->device()), data, flash_addr_seq);
+	//logerror("%08x FLASH: addr = %02X (seq = %02X)\n", cpu_get_pc(&space->device()), data, flash_addr_seq);
 
 	switch( flash_addr_seq++ )
 	{
@@ -774,7 +5727,7 @@ static WRITE8_HANDLER( flash_addr_w )
 static READ8_HANDLER( flash_io_r )
 {
 	UINT8 data = 0x00;
-	UINT32 old;
+//  UINT32 old;
 
 	if (!flash_enab)
 		return 0xff;
@@ -782,7 +5735,7 @@ static READ8_HANDLER( flash_io_r )
 	switch (flash_state)
 	{
 		case STATE_READ_ID:
-			old = flash_read_seq;
+			//old = flash_read_seq;
 
 			switch( flash_read_seq++ )
 			{
@@ -801,14 +5754,14 @@ static READ8_HANDLER( flash_io_r )
 					break;
 			}
 
-			logerror("%08x FLASH: read %02X from id(%02X)\n", cpu_get_pc(&space->device()), data, old);
+			//logerror("%08x FLASH: read %02X from id(%02X)\n", cpu_get_pc(&space->device()), data, old);
 			break;
 
 		case STATE_READ:
 			if (flash_page_addr > FLASH_PAGE_SIZE-1)
 				flash_page_addr = FLASH_PAGE_SIZE-1;
 
-			old = flash_page_addr;
+			//old = flash_page_addr;
 
 			data = flash_page_data[flash_page_addr++];
 
@@ -818,7 +5771,7 @@ static READ8_HANDLER( flash_io_r )
 		case STATE_READ_STATUS:
 			// bit 7 = writeable, bit 6 = ready, bit 5 = ready/true ready, bit 1 = fail(N-1), bit 0 = fail
 			data = 0xe0;
-			logerror("%08x FLASH: read status %02X\n", cpu_get_pc(&space->device()), data);
+			//logerror("%08x FLASH: read status %02X\n", cpu_get_pc(&space->device()), data);
 			break;
 
 		default:
@@ -839,8 +5792,7 @@ static READ8_HANDLER( flash_ready_r )
 
 static READ64_HANDLER( ibara_flash_port_e_r )
 {
-	return	((flash_ready_r(space, offset) ? 0x20 : 0x00)) |
-			input_port_read(space->machine(), "PORT_E");
+	return	((flash_ready_r(space, offset) ? 0x20 : 0x00)) | 0xdf;
 }
 
 
@@ -894,27 +5846,45 @@ static WRITE8_HANDLER( ibara_flash_io_w )
 // if this code returns bad values it has gfx corruption.  the ibarablka set doesn't do this?!
 static READ8_HANDLER( serial_rtc_eeprom_r )
 {
+	rtc9701_device* dev = space->machine().device<rtc9701_device>("eeprom");
+
 	switch (offset)
 	{
-		default:
-			return 0;
-		//logerror("unknown serial_rtc_eeprom_r access offset %02x\n", offset);
+
+
 		case 1:
-			return 0xfe;
+
+
+		//  return 0xfe | (input_port_read(space->machine(), "EEPROMIN") & 0x1);
+			return 0xfe | dev->read_bit();
+
+
+		default:
+		//logerror("%08x unknown serial_rtc_eeprom_r access offset %02x\n", cpu_get_pc(&space->device()), offset);
+			return 0;
+
 	}
 }
+
+
+
 
 static WRITE8_HANDLER( serial_rtc_eeprom_w )
 {
 	switch (offset)
 	{
 		case 0x01:
+//      logerror("serial_rtc_eeprom_w access offset %02x data %02x\n",offset, data);
+
+		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+
 		// data & 0x00010000 = DATA
 		// data & 0x00020000 = CLK
 		// data & 0x00040000 = CE
 		break;
 
 		case 0x03:
+			//logerror("flashenable serial_rtc_eeprom_w access offset %02x data %02x\n",offset, data);
 			flash_enab_w(space,offset,data);
 			return;
 
@@ -925,24 +5895,25 @@ static WRITE8_HANDLER( serial_rtc_eeprom_w )
 
 }
 
-static UINT64*cavesh3_ram;
+
 
 static WRITE64_HANDLER( cavesh3_nop_write )
 {
 
 }
 
+
 static ADDRESS_MAP_START( cavesh3_map, AS_PROGRAM, 64 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(cavesh3_nop_write) // mmmbnk writes here on startup for some reason..
-	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(cavesh3_nop_write) // mmmbanc writes here on startup for some reason..
+
 
 	/*       0x04000000, 0x07ffffff  SH3 Internal Regs (including ports) */
 
-	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM AM_BASE(&cavesh3_ram)//  AM_SHARE("mainram")// work RAM
-	AM_RANGE(0x0c800000, 0x0cffffff) AM_RAM// AM_SHARE("mainram") // mirror of above on type B boards, extra ram on type D
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_BASE(&cavesh3_ram)//  AM_SHARE("mainram")// work RAM
+//  AM_RANGE(0x0c800000, 0x0cffffff) AM_RAM// AM_SHARE("mainram") // mirror of above on type B boards, extra ram on type D
 
 	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(ibara_flash_io_r, ibara_flash_io_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x10400000, 0x10400007) AM_READWRITE(ymz2770c_z_r, ymz2770c_z_w)
+	AM_RANGE(0x10400000, 0x10400007) AM_DEVREADWRITE8_MODERN("ymz770", ymz770_device, read, write, U64(0xffffffffffffffff))
 	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE8(serial_rtc_eeprom_r, serial_rtc_eeprom_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x18000000, 0x18000057) AM_READWRITE32(cavesh3_blitter_r, cavesh3_blitter_w, U64(0xffffffffffffffff))
 
@@ -986,7 +5957,7 @@ static INPUT_PORTS_START( cavesh3 )
 
 	PORT_START("PORT_C")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )	// Service coin
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	// Test button copied here
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	// Test button copied here
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1  )	// IMPLEMENT COIN ERROR!
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
@@ -1003,10 +5974,6 @@ static INPUT_PORTS_START( cavesh3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(1)
 
-	PORT_START("PORT_E")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	// FLASH ready
-	PORT_BIT( 0xdf, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-
 	PORT_START("PORT_F")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE2 )	// Test Push Button
 	PORT_BIT( 0xfd, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -1021,13 +5988,23 @@ static INPUT_PORTS_START( cavesh3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(2)
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, set_clock_line)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, set_cs_line)
+
+	PORT_START( "EEPROMIN" )
+//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", rtc9701_device, read_bit)
+
 INPUT_PORTS_END
 
 
-// apparently correct (but where is the OSC?)
+
 #define CAVE_CPU_CLOCK 12800000 * 8
 
 // none of this is verified for cave sh3
+// (the sh3 is different to the sh4 anyway, should be changed)
 static const struct sh4_config sh4cpu_config = {
 	0, // md2 (clock divders)
 	0, // md1 (clock divders)
@@ -1041,6 +6018,10 @@ static const struct sh4_config sh4cpu_config = {
 	CAVE_CPU_CLOCK
 };
 
+// 1166666 pixels per frame
+// 1 frame is 0.01666666666666666666666666666667 seconds
+// 1 frame is 16.666666666666666666666666666667 milliseconds
+// 1 frame is 16666666.666666666666666666666667 nanoseconds
 
 
 
@@ -1049,18 +6030,108 @@ static INTERRUPT_GEN(cavesh3_interrupt)
 	device_set_input_line(device, 2, HOLD_LINE);
 }
 
+
+static TIMER_CALLBACK( cavesh3_blitter_delay_callback )
+{
+	cavesh3_state *state = machine.driver_data<cavesh3_state>();
+
+	state->blitter_busy = 0;
+}
+
+static MACHINE_START( cavesh3 )
+{
+	size_t size = machine.region( "game" )->bytes();
+	cavesh3_state *state = machine.driver_data<cavesh3_state>();
+
+	state->flashwritemap = auto_alloc_array(machine, UINT8, size / FLASH_PAGE_SIZE);
+	memset(state->flashwritemap, 0, size / FLASH_PAGE_SIZE);
+
+	cavesh3_ram16_copy = auto_alloc_array(machine, UINT16, 0x10000000);
+
+	state->cavesh3_blitter_delay_timer = machine.scheduler().timer_alloc(FUNC(cavesh3_blitter_delay_callback));
+	state->cavesh3_blitter_delay_timer->adjust(attotime::never);
+
+
+	state->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
+}
+
 static MACHINE_RESET( cavesh3 )
 {
+	cavesh3_state *state = machine.driver_data<cavesh3_state>();
+
 	flash_enab = 0;
 	flash_hard_reset(machine);
 	cavesh3_ram16 = (UINT16*)cavesh3_ram;
+
+	state->flashregion = machine.region( "game" )->base();
+
+
+	// cache table to avoid divides in blit code, also pre-clamped
+	int x,y;
+	for (y=0;y<0x40;y++)
+	{
+		for (x=0;x<0x20;x++)
+		{
+			cavesh3_colrtable[x][y] = (x*y) / 0x1f;
+			if (cavesh3_colrtable[x][y]>0x1f) cavesh3_colrtable[x][y] = 0x1f;
+
+			cavesh3_colrtable_rev[x^0x1f][y] = (x*y) / 0x1f;
+			if (cavesh3_colrtable_rev[x^0x1f][y]>0x1f) cavesh3_colrtable_rev[x^0x1f][y] = 0x1f;
+		}
+	}
+
+	// preclamped add table
+	for (y=0;y<0x20;y++)
+	{
+		for (x=0;x<0x20;x++)
+		{
+			cavesh3_colrtable_add[x][y] = (x+y);
+			if (cavesh3_colrtable_add[x][y]>0x1f) cavesh3_colrtable_add[x][y] = 0x1f;
+		}
+	}
+
+	state->blitter_busy = 0;
 }
 
-static PALETTE_INIT( cavesh_RRRRR_GGGGG_BBBBB )
+
+static NVRAM_HANDLER( cavesh3 )
 {
-	int i;
-	for (i = 0; i < 0x10000; i++)
-		palette_set_color(machine, i, MAKE_RGB(pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0)));
+	/* Yes we have to crawl through the entire ~128MB flash because some games
+       (eg. Deathsmiles) save data there on top of to the actual EEPROM */
+	UINT8 *region = machine.region( "game" )->base();
+	size_t size = machine.region( "game" )->bytes();
+	cavesh3_state *state = machine.driver_data<cavesh3_state>();
+	if (size % FLASH_PAGE_SIZE) return; // region size must be multiple of flash page size
+	size /= FLASH_PAGE_SIZE;
+
+	if (read_or_write)
+	{
+		UINT32 page = 0;
+		while (page < size)
+		{
+			if (state->flashwritemap[page])
+			{
+				file->write(&page, 4);
+				file->write(region + page * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
+			}
+			page++;
+		}
+		file->write(&page, 4);
+	}
+	else
+	{
+		if (file)
+		{
+			UINT32 page;
+			file->read(&page, 4);
+			while (page < size)
+			{
+				state->flashwritemap[page] = 1;
+				file->read(region + page * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
+				file->read(&page, 4);
+			}
+		}
+	}
 }
 
 
@@ -1072,202 +6143,263 @@ static MACHINE_CONFIG_START( cavesh3, cavesh3_state )
 	MCFG_CPU_IO_MAP(cavesh3_port)
 	MCFG_CPU_VBLANK_INT("screen", cavesh3_interrupt)
 
+	MCFG_RTC9701_ADD("eeprom", XTAL_32_768kHz)
+	MCFG_NVRAM_HANDLER(cavesh3)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
 
-	MCFG_PALETTE_INIT(cavesh_RRRRR_GGGGG_BBBBB)
 	MCFG_PALETTE_LENGTH(0x10000)
 
 
 	MCFG_SCREEN_UPDATE(cavesh3)
+	MCFG_MACHINE_START(cavesh3)
 	MCFG_MACHINE_RESET(cavesh3)
 
 	MCFG_VIDEO_START(cavesh3)
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+    MCFG_YMZ770_ADD("ymz770", 16384000)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /**************************************************
 
-All roms are flash roms with no lables, so keep the
+All roms are flash roms with no labels, so keep the
  version numbers attached to the roms that differ
+ - roms which differ have also been prefixed with
+   the MAME set names to aid readability and prevent
+   accidental misloading of sets with the wrong
+   CRCs which causes issues with the speedups.
 
 **************************************************/
 
 ROM_START( mushisam )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("u4", 0x000000, 0x200000, CRC(0b5b30b2) SHA1(35fd1bb1561c30b311b4325bc8f4628f2fccd20b) ) /* (2004/10/12 MASTER VER.) */
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP("mushisam_u4", 0x000000, 0x200000, CRC(0b5b30b2) SHA1(35fd1bb1561c30b311b4325bc8f4628f2fccd20b) ) /* (2004/10/12 MASTER VER.) */
+	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD("u2", 0x000000, 0x8400000, CRC(b1f826dc) SHA1(c287bd9f571d0df03d7fcbcf3c57c74ce564ab05) ) /* (2004/10/12 MASTER VER.) */
+	ROM_LOAD("mushisam_u2", 0x000000, 0x8400000, CRC(b1f826dc) SHA1(c287bd9f571d0df03d7fcbcf3c57c74ce564ab05) ) /* (2004/10/12 MASTER VER.) */
 
-	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(138e2050) SHA1(9e86489a4e65af5efb5495adf6d4b3e01d5b2816) )
 	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(e3d05c9f) SHA1(130c3d62317da1729c85bd178bd51500edd73ada) )
 ROM_END
 
 ROM_START( mushisama )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("u4", 0x000000, 0x200000, CRC(9f1c7f51) SHA1(f82ae72ec03687904ca7516887080be92365a5f3) ) /* (2004/10/12 MASTER VER) */
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP("mushisama_u4", 0x000000, 0x200000, CRC(9f1c7f51) SHA1(f82ae72ec03687904ca7516887080be92365a5f3) ) /* (2004/10/12 MASTER VER) */
+	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD("u2", 0x000000, 0x8400000, CRC(2cd13810) SHA1(40e45e201b60e63a060b68d4cc767eb64cfb99c2) ) /* (2004/10/12 MASTER VER) */
+	ROM_LOAD("mushisama_u2", 0x000000, 0x8400000, CRC(2cd13810) SHA1(40e45e201b60e63a060b68d4cc767eb64cfb99c2) ) /* (2004/10/12 MASTER VER) */
 
-	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(138e2050) SHA1(9e86489a4e65af5efb5495adf6d4b3e01d5b2816) )
 	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(e3d05c9f) SHA1(130c3d62317da1729c85bd178bd51500edd73ada) )
 ROM_END
 
 ROM_START( espgal2 )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(09c908bb) SHA1(7d6031fd3542b3e1d296ff218feb40502fd78694) ) /* (2005/11/14 MASTER VER) */
+	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(222f58c7) SHA1(d47a5085a1debd9cb8c61d88cd39e4f5036d1797) ) /* (2005/11/14 MASTER VER) */
 
-	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(b9a10c22) SHA1(4561f95c6018c9716077224bfe9660e61fb84681) )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(c76b1ec4) SHA1(b98a53d41a995d968e0432ed824b0b06d93dcea8) )
 ROM_END
 
 ROM_START( mushitam )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u4", 0x000000, 0x200000, CRC(4a23e6c8) SHA1(d44c287bb88e6d413a8d35d75bc1b4928ad52cdf) ) /* (2005/09/09 MASTER VER) */
+	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD("u2", 0x000000, 0x8400000, CRC(3f93ff82) SHA1(6f6c250aa7134016ffb288d056bc937ea311f538) ) /* (2005/09/09 MASTER VER) */
 
-	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(701a912a) SHA1(85c198946fb693d99928ea2595c84ba4d9dc8157) )
 	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(6feeb9a1) SHA1(992711c80e660c32f97b343c2ce8184fddd7364e) )
 ROM_END
 
 ROM_START( futari15 )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("u4", 0x000000, 0x200000, CRC(e8c5f128) SHA1(45fb8066fdbecb83fdc2e14555c460d0c652cd5f) ) /* (2006/12/8.MAST VER. 1.54.) */
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP("futari15_u4", 0x000000, 0x200000, CRC(e8c5f128) SHA1(45fb8066fdbecb83fdc2e14555c460d0c652cd5f) ) /* (2006/12/8.MAST VER. 1.54.) */
+	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD("u2", 0x000000, 0x8400000, CRC(b9eae1fc) SHA1(410f8e7cfcbfd271b41fb4f8d049a13a3191a1f9) ) /* (2006/12/8.MAST VER. 1.54.) */
+	ROM_LOAD("futari15_u2", 0x000000, 0x8400000, CRC(b9eae1fc) SHA1(410f8e7cfcbfd271b41fb4f8d049a13a3191a1f9) ) /* (2006/12/8.MAST VER. 1.54.) */
 
-	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
 	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(c631a766) SHA1(8bb6934a2f5b8a9841c3dcf85192b1743773dd8b) )
 ROM_END
 
 ROM_START( futari15a )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP("u4", 0x000000, 0x200000, CRC(a609cf89) SHA1(56752fae9f42fa852af8ee2eae79e25ec7f17953) ) /* (2006/12/8 MAST VER 1.54) */
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP("futari15a_u4", 0x000000, 0x200000, CRC(a609cf89) SHA1(56752fae9f42fa852af8ee2eae79e25ec7f17953) ) /* (2006/12/8 MAST VER 1.54) */
+	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD("u2", 0x000000, 0x8400000, CRC(b9d815f9) SHA1(6b6f668b0bbb087ffac65e4f0d8bd9d5b28eeb28) ) /* (2006/12/8 MAST VER 1.54) */
+	ROM_LOAD("futari15a_u2", 0x000000, 0x8400000, CRC(b9d815f9) SHA1(6b6f668b0bbb087ffac65e4f0d8bd9d5b28eeb28) ) /* (2006/12/8 MAST VER 1.54) */
 
-	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
 	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(c631a766) SHA1(8bb6934a2f5b8a9841c3dcf85192b1743773dd8b) )
 ROM_END
 
 ROM_START( futari10 )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(b127dca7) SHA1(e1f518bc72fc1cdf69aefa89eafa4edaf4e84778) ) /* (2006/10/23 MASTER VER.) */
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "futari10_u4", 0x000000, 0x200000, CRC(b127dca7) SHA1(e1f518bc72fc1cdf69aefa89eafa4edaf4e84778) ) /* (2006/10/23 MASTER VER.) */
+	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(78ffcd0c) SHA1(0e2937edec15ce3f5741b72ebd3bbaaefffb556e) ) /* (2006/10/23 MASTER VER.) */
+	ROM_LOAD( "futari10_u2", 0x000000, 0x8400000, CRC(78ffcd0c) SHA1(0e2937edec15ce3f5741b72ebd3bbaaefffb556e) ) /* (2006/10/23 MASTER VER.) */
 
-	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(c631a766) SHA1(8bb6934a2f5b8a9841c3dcf85192b1743773dd8b) )
 ROM_END
 
 ROM_START( futariblk )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(6db13c62) SHA1(6a53ce7f70b754936ccbb3a4674d4b2f03979644) ) /* (2007/12/11 BLACK LABEL VER) */
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "futariblk_u4", 0x000000, 0x200000, CRC(6db13c62) SHA1(6a53ce7f70b754936ccbb3a4674d4b2f03979644) ) /* (2007/12/11 BLACK LABEL VER) */
+	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(08c6fd62) SHA1(e1fc386b2b0e41906c724287cbf82304297e0150) ) /* (2007/12/11 BLACK LABEL VER) */
+	ROM_LOAD( "futariblk_u2", 0x000000, 0x8400000, CRC(08c6fd62) SHA1(e1fc386b2b0e41906c724287cbf82304297e0150) ) /* (2007/12/11 BLACK LABEL VER) */
 
-	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(39f1e1f4) SHA1(53d12f59a56df35c705408c76e6e02118da656f1) )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(c631a766) SHA1(8bb6934a2f5b8a9841c3dcf85192b1743773dd8b) )
 ROM_END
 
 ROM_START( ibara )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(8e6c155d) SHA1(38ac2107dc7824836e2b4e04c7180d5ae43c9b79) ) /* (2005/03/22 MASTER VER..) */
+	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(55840976) SHA1(4982bdce84f9603adfed7a618f18bc80359ab81e) ) /* (2005/03/22 MASTER VER..) */
 
-	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(ee5e585d) SHA1(7eeba4ee693060e927f8c46b16e39227c6a62392) )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(f0aa3cb6) SHA1(f9d137cd879e718811b2d21a0af2a9c6b7dca2f9) )
 ROM_END
 
 ROM_START( ibarablk )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(ee1f1f77) SHA1(ac276f3955aa4dde2544af4912819a7ae6bcf8dd) ) /* (2006/02/06. MASTER VER.) */
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "ibarablk_u4", 0x000000, 0x200000, CRC(ee1f1f77) SHA1(ac276f3955aa4dde2544af4912819a7ae6bcf8dd) ) /* (2006/02/06. MASTER VER.) */
+	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(5e46be44) SHA1(bed5f1bf452f2cac58747ecabec3c4392566a3a7) ) /* (2006/02/06. MASTER VER.) */
+	ROM_LOAD( "ibarablk_u2", 0x000000, 0x8400000, CRC(5e46be44) SHA1(bed5f1bf452f2cac58747ecabec3c4392566a3a7) ) /* (2006/02/06. MASTER VER.) */
 
-	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(a436bb22) SHA1(0556e771cc02638bf8814315ba671c2d442594f1) ) /* (2006/02/06 MASTER VER.) */
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(d11ab6b6) SHA1(2132191cbe847e2560423e4545c969f21f8ff825) ) /* (2006/02/06 MASTER VER.) */
 ROM_END
 
 ROM_START( ibarablka )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(a9d43839) SHA1(507696e616608c05893c7ac2814b3365e9cb0720) ) /* (2006/02/06 MASTER VER.) */
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "ibarablka_u4", 0x000000, 0x200000, CRC(a9d43839) SHA1(507696e616608c05893c7ac2814b3365e9cb0720) ) /* (2006/02/06 MASTER VER.) */
+	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(33400d96) SHA1(09c22b5431ac3726bf88c56efd970f56793f825a) ) /* (2006/02/06 MASTER VER.) */
+	ROM_LOAD( "ibarablka_u2", 0x000000, 0x8400000, CRC(33400d96) SHA1(09c22b5431ac3726bf88c56efd970f56793f825a) ) /* (2006/02/06 MASTER VER.) */
 
-	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(a436bb22) SHA1(0556e771cc02638bf8814315ba671c2d442594f1) ) /* (2006/02/06 MASTER VER.) */
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(d11ab6b6) SHA1(2132191cbe847e2560423e4545c969f21f8ff825) ) /* (2006/02/06 MASTER VER.) */
 ROM_END
 
 ROM_START( deathsml )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(1a7b98bf) SHA1(07798a4a846e5802756396b34df47d106895c1f1) ) /* (2007/10/09 MASTER VER) */
+	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(d45b0698) SHA1(7077b9445f5ed4749c7f683191ccd312180fac38) ) /* (2007/10/09 MASTER VER) */
 
-	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(aab718c8) SHA1(0e636c46d06151abd6f73232bc479dafcafe5327) )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(83881d84) SHA1(6e2294b247dfcbf0ced155dc45c706f29052775d) )
 ROM_END
 
 ROM_START( mmpork )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x200000, CRC(d06cfa42) SHA1(5707feb4b3e5265daf5926f38c38612b24106f1f) ) /* (2007/ 4/17 MASTER VER.) */
+	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(1ee961b8) SHA1(81a2eba704ac1cf7fc44fa7c6a3f50e3570c104f) ) /* (2007/ 4/17 MASTER VER.) */
 
-	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4a4b36df) SHA1(5db5ce6fa47e5ca3263d4bd19315890c6d29df66) )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(ce83d07b) SHA1(a5947467c8f5b7c4b0ad8e32df2ee29b787e355f) )
 ROM_END
 
-ROM_START( mmmbnk )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
+ROM_START( mmmbanc )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u4", 0x0000, 0x200000, CRC(5589d8c6) SHA1(43fbdb0effe2bc0e7135698757b6ee50200aecde) ) /* (2007/06/05 MASTER VER.) */
+	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "u2", 0x0000, 0x8400000, CRC(f3b50c30) SHA1(962327798081b292b2d3fd3b7845c0197f9f2d8a) ) /* (2007/06/05 MASTER VER.) */
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(f3b50c30) SHA1(962327798081b292b2d3fd3b7845c0197f9f2d8a) ) /* (2007/06/05 MASTER VER.) */
 
-	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4caaa1bf) SHA1(9b92c13eac05601da4d9bb3eb727c156974e9f0c) )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(8e3a51ba) SHA1(e34cf9acb13c3d8ca6cd1306b060b1d429872abd) )
 ROM_END
 
+ROM_START( pinkswts )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "pinkswts_u4", 0x0000, 0x200000, CRC(5d812c9e) SHA1(db821ec3892fd150513749d64a8b60bf147f3275) ) /* (2006/04/06 MASTER VER....) */
+	ROM_RELOAD(0x200000,0x200000)
 
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD( "pinkswts_u2", 0x000000, 0x8400000, CRC(92d3243a) SHA1(e9d20c62f642fb2f62ef83ed5caeee6b3f67fef9) ) /* (2006/04/06 MASTER VER....) */
 
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4b82d250) SHA1(ee98dbc3f791efb6d58f3945bcb2044667ae7978) )
+	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(e93f0627) SHA1(6f5ec0ade87f7fc42a58a8f125557a4d1f3f187d) )
+ROM_END
+
+ROM_START( pinkswtsa )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "pnkswtsa_u4", 0x0000, 0x200000, CRC(ee3339b2) SHA1(995988d370731a7074b49ce8752525dadf06a954) ) /* (2006/04/06 MASTER VER...) */
+	ROM_RELOAD(0x200000,0x200000)
+
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD( "pnkswtsa_u2", 0x000000, 0x8400000, CRC(829a862e) SHA1(8c0ee2a0eb33b68869252fd68aed74820a904287) ) /* (2006/04/06 MASTER VER...) */
+
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4b82d250) SHA1(ee98dbc3f791efb6d58f3945bcb2044667ae7978) )
+	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(e93f0627) SHA1(6f5ec0ade87f7fc42a58a8f125557a4d1f3f187d) )
+ROM_END
+
+ROM_START( pinkswtsb )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "pnkswtsb_u4", 0x0000, 0x200000, CRC(68bcc009) SHA1(2fef544b93c61161a37365f868b431d8262e4b21) ) /* (2006/04/06 MASTER VER.) */
+	ROM_RELOAD(0x200000,0x200000)
+
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD( "pnkswtsb_u2", 0x000000, 0x8400000, CRC(a5666ed9) SHA1(682e06c84990225bc6bb0c9f38b5f46c4e36b430) ) /* (2006/04/06 MASTER VER.) */
+
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4b82d250) SHA1(ee98dbc3f791efb6d58f3945bcb2044667ae7978) )
+	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(e93f0627) SHA1(6f5ec0ade87f7fc42a58a8f125557a4d1f3f187d) )
+ROM_END
 
 static READ64_HANDLER( mushisam_speedup_r )
 {
@@ -1300,9 +6432,9 @@ static READ64_HANDLER( espgal2_speedup_r )
 	int pc = cpu_get_pc(&space->device());
 
 	if ( pc == 0xc05177a ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // espgal2
-	if ( pc == 0xc05176a ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // futari15 / futari15a / futari10 / futariblk / ibarablk / ibarablka / mmpork
+	if ( pc == 0xc05176a ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // futari15 / futari15a / futari10 / futariblk / ibarablk / ibarablka / mmpork / mmmbanc
 	if ( pc == 0xc0519a2 ) device_spin_until_time(&space->device(), attotime::from_usec(10)); // deathsml
-	//else printf("read %08x\n", cpu_get_pc(&space->device()));
+//  else printf("read %08x\n", cpu_get_pc(&space->device()));
 	return cavesh3_ram[0x002310/8];
 }
 
@@ -1312,34 +6444,23 @@ DRIVER_INIT( espgal2 )
 }
 
 
-
-/*
-espgal2 c002310
-futari15 c002310
-futari15a c002310
-futari10 c002310
-futariblk c002310
-ibarablk c002310
-ibarablka c002310
-deathsml c002310
-mmpork c002310
-*/
-
-
-GAME( 2004, mushisam,  0,          cavesh3,    cavesh3,  mushisam,  ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                           GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2004, mushisama, mushisam,   cavesh3,    cavesh3,  mushisama, ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER)",                            GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2005, espgal2,   0,          cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "EspGaluda II (2005/11/14 MASTER VER)",                              GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2005, mushitam,  0,          cavesh3,    cavesh3,  mushisam, ROT0, "Cave", "Mushihime Tama (2005/09/09 MASTER VER)",                            GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, futari15,  0,          cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",       GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, futari15a, futari15,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",         GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, futari10,  futari15,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",            GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2007, futariblk, futari15,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Mushihime Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",    GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibara,     0,          cavesh3,    cavesh3,  mushisam, ROT270, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                   GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibarablk,  0,          cavesh3,    cavesh3,  0, ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",                GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2006, ibarablka, ibarablk,   cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2007, deathsml,  0,          cavesh3,    cavesh3,  espgal2, ROT0, "Cave", "Death Smiles (2007/10/09 MASTER VER)",                              GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2007, mmpork,    0,          cavesh3,    cavesh3,  espgal2, ROT270, "Cave", "Muchi Muchi Pork (2007/ 4/17 MASTER VER.)",                         GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2007, mmmbnk,    0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Medal Mahjong Moukari Bancho no Kiban (2007/06/05 MASTER VER.)",   GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2004, mushisam,   0,        cavesh3, cavesh3, mushisam,  ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                           0 )
+GAME( 2004, mushisama,  mushisam, cavesh3, cavesh3, mushisama, ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER)",                            0 )
+GAME( 2005, espgal2,    0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "EspGaluda II (2005/11/14 MASTER VER)",                              0 )
+GAME( 2005, ibara,      0,        cavesh3, cavesh3, mushisam,  ROT270, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                   0 )
+GAME( 2006, ibarablk,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",                0 )
+GAME( 2006, ibarablka,  ibarablk, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 0 )
+GAME( 2005, mushitam,   0,        cavesh3, cavesh3, mushisam,  ROT0,   "Cave", "Mushihime Tama (2005/09/09 MASTER VER)",                            0 )
+GAME( 2006, futari15,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",       0 )
+GAME( 2006, futari15a,  futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",         0 )
+GAME( 2006, futari10,   futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",            0 )
+GAME( 2007, futariblk,  futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",    0 )
+GAME( 2006, pinkswts,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets - Ibara Sorekara (2006/04/06 MASTER VER....)",          0 )
+GAME( 2006, pinkswtsa,  pinkswts, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets - Ibara Sorekara (2006/04/06 MASTER VER...)",           0 )
+GAME( 2006, pinkswtsb,  pinkswts, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets - Ibara Sorekara (2006/04/06 MASTER VER.)",             0 )
+GAME( 2007, deathsml,   0,        cavesh3, cavesh3, espgal2,   ROT0,   "Cave", "Death Smiles (2007/10/09 MASTER VER)",                              0 )
+GAME( 2007, mmpork,     0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Muchi Muchi Pork (2007/ 4/17 MASTER VER.)",                         0 )
+GAME( 2007, mmmbanc,    0,        cavesh3, cavesh3, espgal2,   ROT0,   "Cave", "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",             GAME_NOT_WORKING )
 
 /*
 
@@ -1364,9 +6485,9 @@ IBARA BLACK LABEL
   "2006/02/06. MASTER VER."
 
 PINK SWEETS
-* "2006/04/06 MASTER VER."
-* "2006/04/06 MASTER VER..."
-* "2006/04/06 MASTER VER...."
+  "2006/04/06 MASTER VER."
+  "2006/04/06 MASTER VER..."
+  "2006/04/06 MASTER VER...."
 * "2006/05/18 MASTER VER."
 * "2006/xx/xx MASTER VER"
 
@@ -1387,7 +6508,7 @@ MUCHI MUCHI PORK
   "2007/ 4/17 MASTER VER."
 * 2 "period" ver, location of the periods unknown
 
-MEDAL MAHJONG MOKUARI BANCHO NO KIBAN
+MEDAL MAHJONG MOKUARI BANCHO
   "2007/06/05 MASTER VER."
 
 DEATH SMILES
@@ -1401,6 +6522,8 @@ DODONPACHI FUKKATSU 1.0
 
 DODONPACHI FUKKATSU 1.5
 * "2008/06/23 MASTER VER 1.5"
+
+--- Titles below are too new to emulate, but included for documentation ---
 
 DODONPACHI DAIFUKKATSU BLACK LABEL
 * "2010/1/18 BLACK LABEL"

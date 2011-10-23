@@ -152,13 +152,9 @@ lethal enforcers has 2 sprite rendering chips working in parallel mixing
 data together to give 6bpp.. we cheat by using a custom function in
 konamiic.c and a fixed 6bpp decode.
 
-japanese version scroll / mirror / guns not set up correctly
+mirror not set up correctly
 
-guns might be slightly off center
-
-'external' rowscroll hooked up forcing xylinescroll for tilemap #3
-
-maybe some priority issues / sprite placement issues..
+maybe some sprite placement issues
 
 ***************************************************************************/
 
@@ -180,15 +176,6 @@ static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIG
 /* a = 1, 2 = player # */
 #define GUNX( a ) (( ( input_port_read(space->machine(), gunnames[2 * (a - 1)]) * 287 ) / 0xff ) + 16)
 #define GUNY( a ) (( ( input_port_read(space->machine(), gunnames[2 * (a - 1) + 1]) * 223 ) / 0xff ) + 10)
-
-
-/* Default Eeprom for the parent.. otherwise it will always complain first boot */
-/* its easy to init but this saves me a bit of time.. */
-static const UINT8 lethalen_default_eeprom[48] = {
-	0x02, 0x1E, 0x00, 0x00, 0x39, 0x31, 0x39, 0x31, 0x55, 0x45, 0x77, 0x00, 0x00, 0x00, 0x00, 0x01,
-	0x02, 0x01, 0x00, 0x03, 0x05, 0x01, 0x01, 0x02, 0x28, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
-};
 
 static const eeprom_interface eeprom_intf =
 {
@@ -444,18 +431,18 @@ static READ8_HANDLER( guns_r )
 		case 0:
 			return GUNX(1) >> 1;
 		case 1:
-			if ((240 - GUNY(1)) == 7)
+			if ((GUNY(1)<=0x0b) || (GUNY(1)>=0xe8))
 				return 0;
 			else
-				return (240 - GUNY(1));
+				return (232 - GUNY(1));
 			break;
 		case 2:
 			return GUNX(2) >> 1;
 		case 3:
-			if ((240 - GUNY(2)) == 7)
+			if ((GUNY(2)<=0x0b) || (GUNY(2)>=0xe8))
 				return 0;
 			else
-				return (240 - GUNY(2));
+				return (232 - GUNY(2));
 			break;
 	}
 
@@ -675,7 +662,6 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_MACHINE_RESET(lethalen)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
-	MCFG_EEPROM_DATA(lethalen_default_eeprom, 48)
 
 	MCFG_GFXDECODE(lethal)
 
@@ -950,5 +936,5 @@ GAME( 1992, lethalenua, lethalen, lethalen, lethalen, lethalen, ORIENTATION_FLIP
 GAME( 1992, lethalenux, lethalen, lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver unknown, US, 08/06/92 15:11, hacked/proto?)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // writes UA to eeprom but earlier than suspected UAA set, might be a proto, might be hacked, fails rom test, definitely a good dump, another identical set was found in Italy
 GAME( 1992, lethaleneab,lethalen, lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAB, 10/14/92 19:53)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // writes EC to eeprom?!
 GAME( 1992, lethaleneae,lethalen, lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAE, 11/19/92 16:24)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // writes EE to eeprom
-// different mirror / display setup, shoot off the top of the screen to reload..
+// different mirror / display setup
 GAME( 1992, lethalenj,  lethalen, lethalej, lethalej, lethalen, ORIENTATION_FLIP_X, "Konami", "Lethal Enforcers (ver JAD, 12/04/92 17:16)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // writes JC to eeprom?!
