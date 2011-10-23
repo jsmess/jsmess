@@ -17,11 +17,18 @@ The cpu speed could be adjusted by using a potentiometer, the range being
 We emulate the original version. Later enhancements included more RAM, speech
 synthesis and various attachments, however I have no information on these.
 
+Pasting:
+        0-F : as is
+        + (inc) : ^
+        - (dec) : V
+        AD : -
+        GO : X
+
 Keys:
 0 to 9, A to F are on the key of the same name.
-AD (input an address) is the J key.
-+ and - (increment / decrement address) are the - and = keys.
-GO (execute program at current address) is the Enter key.
+AD (input an address) is the '-' key.
++ and - (increment / decrement address) are the up and down-arrow keys.
+GO (execute program at current address) is the X key.
 SHIFT - later monitor versions utilised an extra shift button. Hold
         it down and press another key (use Left Shift).
 
@@ -31,10 +38,10 @@ Each key causes a beep to be heard. You may need to press more than once
 to get it to register.
 
 Inbuilt games - press the following sequence of keys:
-- Welcome: RESET D 1 + 0 2 AD 0 2 7 0 GO GO
-- Nim: RESET AD 3 E 0 GO GO
-- Invaders: RESET AD 3 2 0 GO GO
-- Luna Lander: RESET AD 4 9 0 GO GO
+- Welcome: RESET D 1 + 0 2 AD 0 2 7 0 GO GO (Paste: D1^02 -0270XX)
+- Nim: RESET AD 3 E 0 GO GO (Paste: -3E0XX)
+- Invaders: RESET AD 3 2 0 GO GO (Paste: -320XX)
+- Luna Lander: RESET AD 4 9 0 GO GO (Paste: -490XX)
 
 Thanks to Chris Schwartz who dumped his ROM for me way back in the old days.
 It's only taken 25 years to get around to emulating it...
@@ -322,28 +329,28 @@ static INPUT_PORTS_START( tec1 )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)	PORT_CHAR('4')
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)	PORT_CHAR('8')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)	PORT_CHAR('C')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+") PORT_CODE(KEYCODE_EQUALS)	PORT_CHAR('=')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+") PORT_CODE(KEYCODE_UP)	PORT_CHAR('^')
 
 	PORT_START("LINE1") /* KEY ROW 1 */
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)	PORT_CHAR('1')
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)	PORT_CHAR('5')
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)	PORT_CHAR('9')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)	PORT_CHAR('D')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)	PORT_CHAR('-')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_DOWN)	PORT_CHAR('V')
 
 	PORT_START("LINE2") /* KEY ROW 2 */
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)	PORT_CHAR('2')
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)	PORT_CHAR('6')
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)	PORT_CHAR('A')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)	PORT_CHAR('E')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("GO") PORT_CODE(KEYCODE_ENTER)	PORT_CHAR(13)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("GO") PORT_CODE(KEYCODE_X)	PORT_CHAR('X')
 
 	PORT_START("LINE3") /* KEY ROW 3 */
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)	PORT_CHAR('3')
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)	PORT_CHAR('7')
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)	PORT_CHAR('B')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)	PORT_CHAR('F')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("AD") PORT_CODE(KEYCODE_J)	PORT_CHAR('J')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("AD") PORT_CODE(KEYCODE_MINUS)	PORT_CHAR('-')
 
 	PORT_START("SHIFT")
 	PORT_BIT(0x1f, IP_ACTIVE_HIGH, IPT_UNUSED)

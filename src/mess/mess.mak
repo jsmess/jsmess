@@ -1772,7 +1772,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/mes.o		\
 	$(MESS_DRIVERS)/microdec.o	\
 	$(MESS_DRIVERS)/micronic.o	\
-	$(MESS_DRIVERS)/mikrolab.o	\
 	$(MESS_DRIVERS)/mk14.o		\
 	$(MESS_DRIVERS)/mmd1.o		\
 	$(MESS_DRIVERS)/mod8.o		\

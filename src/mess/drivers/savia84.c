@@ -1,19 +1,28 @@
 /***************************************************************************
 
-        Savia 84
+    Savia 84
 
-        More data at :
-                http://www.nostalcomp.cz/pdfka/savia84.pdf
-                http://www.nostalcomp.cz/savia.php
+    More data at :
+        http://www.nostalcomp.cz/pdfka/savia84.pdf
+        http://www.nostalcomp.cz/savia.php
 
-        05/02/2011 Skeleton driver.
-        11/10/2011 Found a new rom. Working [Robbbert]
+    05/02/2011 Skeleton driver.
+    11/10/2011 Found a new rom. Working [Robbbert]
 
-        I assume all the LEDs are red ones. The LEDs down the
-        left side I assume to be bit 0 through 7 in that order.
+    I assume all the LEDs are red ones. The LEDs down the
+    left side I assume to be bit 0 through 7 in that order.
 
-        ToDo:
-        - Make better artwork
+    Pasting:
+        0-F : as is
+        DA : ^
+        AD : -
+        GO : X
+
+    Here is a test program. Copy the text and Paste into the emulator.
+    -1800^3E^55^D3^F9^76^XX1800^
+
+    ToDo:
+    - Make better artwork
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -92,7 +101,7 @@ static INPUT_PORTS_START( savia84 )
 
 	PORT_START("X5")
 	PORT_BIT( 0x8F, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("AD") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("AD") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 
@@ -108,7 +117,7 @@ static INPUT_PORTS_START( savia84 )
 
 	PORT_START("X8")
 	PORT_BIT( 0x8F, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DA") PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DA") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 INPUT_PORTS_END
@@ -194,5 +203,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY     FULLNAME       FLAGS */
-COMP( 1984, savia84,  0,       0,    savia84,   savia84, 0,     "<unknown>", "Savia 84", GAME_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
+COMP( 1984, savia84,  0,       0,    savia84,   savia84, 0,     "JT Hyan", "Savia 84", GAME_NO_SOUND_HW)
