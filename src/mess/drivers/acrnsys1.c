@@ -11,17 +11,28 @@
 
 http://speleotrove.com/acorn/
 
-m   (modify) Memory display and modification    l   (load) Reads a block of bytes from tape
-g   (go) Run program starting at an address     r   (return) Resume after a breakpoint
-p   (point) Inserts or removes breakpoint   ^   (up) Increment displayed address
-s   (store) Writes a block of bytes to tape     v   (down) Decrement displayed address
+-   (modify) Memory display and modification    l   (load) Reads a block of bytes from tape
+X   (go) Run program starting at an address     r   (return) Resume after a breakpoint
+p   (point) Inserts or removes breakpoint       (up) Increment displayed address
+s   (store) Writes a block of bytes to tape     (down) Decrement displayed address
+
+Pasting:
+        0-F : as is
+        (inc) : ^
+        (dec) : V
+        M (memory) : -
+        G (Go) : X
+
+Test Paste:
+        -0100^11^22^33^44^55^66^77^88^99^-0100^
+        Now press up-arrow to confirm the data has been entered.
 
 ToDo:
 - Artwork
 - Cassette
 
-Example usage: Turn on. Press M. Mode letter will show 'A'. Type in an address
-               (example FE00). Press M (or any command key). Contents will show
+Example usage: Turn on. Press -. Mode letter will show 'A'. Type in an address
+               (example FE00). Press - (or any command key). Contents will show
                on the right. Use Up & Down keys to cycle through addresses.
 
 Note that left-most digit is not wired up, and therefore will always be blank.
@@ -117,13 +128,13 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( acrnsys1 )
 	PORT_START("X0")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('M')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT(0xc7, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X1")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 	PORT_BIT(0xc7, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -153,13 +164,13 @@ static INPUT_PORTS_START( acrnsys1 )
 
 	PORT_START("X6")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)   PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
 	PORT_BIT(0xc7, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X7")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR('V')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
 	PORT_BIT(0xc7, IP_ACTIVE_LOW, IPT_UNUSED)
 

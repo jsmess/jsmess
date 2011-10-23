@@ -1,21 +1,32 @@
 /***************************************************************************
 
-        CVICNY8080 - Practice-z80 - a homebrew from Czechoslavakia.
+    CVICNY8080 - Practice-z80 - a homebrew from Czechoslavakia.
 
-        More data at :
+    More data at :
                 http://www.nostalcomp.cz/cvicny8080.php
 
-        21/OCT/2011 New working driver. [Robbbert]
+    21/OCT/2011 New working driver. [Robbbert]
 
-        Keys:
+    Keys:
         0-9,A-F : hexadecimal numbers
         ADR : enter an address to work with. After the 4 digits are entered,
               the data at that address shows, and you can modify the data.
         + (inc) : Enter the data into memory, and increment the address by 1.
         GO : execute the program located at the current address.
 
-        ToDo:
+    Pasting:
+        0-F : as is
+        + (inc) : ^
+        ADR : -
+        GO : X
+
+    Test Paste:
+        11^22^33^44^55^66^77^88^99^-0800
+        Now press up-arrow to confirm the data has been entered.
+
+    ToDo:
 	- When ADR is pressed, sometimes a segment stays alight. Bug?
+        - Blank the display if digits aren't being refreshed
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -100,9 +111,9 @@ static INPUT_PORTS_START( cvicny )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 
 	PORT_START("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("+") PORT_CODE(KEYCODE_UP)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ADR") PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("+") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ADR") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X5")
