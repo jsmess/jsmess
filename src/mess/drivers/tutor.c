@@ -155,7 +155,16 @@ FFFC
                                 NMI vector (*)
 FFFF
 
-*/
+
+
+PYUUTAJR
+********
+
+This is a handheld unit with 12 'chiclet' buttons. The keyboard has E800, EA00, EC00, EE00 scanned,
+although 2 of these rows have no keys. TUTOR carts will run, however since most of them ask for
+A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
+
+*********************************************************************************************************/
 
 #define ADDRESS_MAP_MODERN
 
@@ -180,9 +189,9 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cass;
-	required_device<device_t> m_printer;
-	DECLARE_READ8_MEMBER(read_keyboard);
+	optional_device<cassette_image_device> m_cass;
+	optional_device<device_t> m_printer;
+	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(tutor_mapper_r);
 	DECLARE_WRITE8_MEMBER(tutor_mapper_w);
 	DECLARE_READ8_MEMBER(tutor_cassette_r);
@@ -273,7 +282,7 @@ static MACHINE_RESET(tutor)
     mapped to both a keyboard key and a joystick switch.
 */
 
-READ8_MEMBER( tutor_state::read_keyboard )
+READ8_MEMBER( tutor_state::key_r )
 {
 	char port[12];
 	UINT8 value;
@@ -290,6 +299,7 @@ READ8_MEMBER( tutor_state::read_keyboard )
 
 	return value;
 }
+
 
 static DEVICE_IMAGE_LOAD( tutor_cart )
 {
@@ -552,7 +562,22 @@ static ADDRESS_MAP_START(tutor_memmap, AS_PROGRAM, 8, tutor_state)
 	AM_RANGE(0xe800, 0xe8ff) AM_READWRITE(tutor_printer_r, tutor_printer_w)	/*printer*/
 	AM_RANGE(0xee00, 0xeeff) AM_READNOP AM_WRITE( tutor_cassette_w)		/*cassette interface*/
 
-	AM_RANGE(0xf000, 0xffff) AM_NOP	/*free for expansion (and internal processor RAM)*/
+	AM_RANGE(0xf000, 0xffff) AM_NOP /*free for expansion (and internal processor RAM)*/
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(pyuutajr_mem, AS_PROGRAM, 8, tutor_state)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM	/*system ROM*/
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP /*BASIC ROM & cartridge ROM*/
+	AM_RANGE(0xc000, 0xdfff) AM_NOP	/*free for expansion, or cartridge ROM?*/
+	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)	/*VDP data*/
+	AM_RANGE(0xe002, 0xe002) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)/*VDP status*/
+	AM_RANGE(0xe100, 0xe1ff) AM_READWRITE(tutor_mapper_r, tutor_mapper_w)	/*cartridge mapper*/
+	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE_LEGACY("sn76489a", sn76496_w)	/*sound chip*/
+	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("LINE0")
+	AM_RANGE(0xea00, 0xea00) AM_READ_PORT("LINE1")
+	AM_RANGE(0xec00, 0xec00) AM_READ_PORT("LINE2")
+	AM_RANGE(0xee00, 0xee00) AM_READ_PORT("LINE3")
+	AM_RANGE(0xf000, 0xffff) AM_NOP /*free for expansion (and internal processor RAM)*/
 ADDRESS_MAP_END
 
 /*
@@ -566,7 +591,7 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START(tutor_io, AS_IO, 8, tutor_state)
-	AM_RANGE(0xec0, 0xec7) AM_READ(read_keyboard)			/*keyboard interface*/
+	AM_RANGE(0xec0, 0xec7) AM_READ(key_r)				/*keyboard interface*/
 	AM_RANGE(0xed0, 0xed0) AM_READ(tutor_cassette_r)		/*cassette interface*/
 ADDRESS_MAP_END
 
@@ -680,6 +705,35 @@ static INPUT_PORTS_START(tutor)
 		PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
+// Unit only has 12 buttons. LINE0 & 3 are scanned with the others, but have nothing connected?
+static INPUT_PORTS_START(pyuutajr)
+	PORT_START("LINE0")
+		PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("LINE1")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PALLET") PORT_CODE(KEYCODE_P)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MODE") PORT_CODE(KEYCODE_M)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MONITOR") PORT_CODE(KEYCODE_Q)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
+
+	PORT_START("LINE2")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_COMMA)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_STOP)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT)
+
+	PORT_START("LINE3")
+		PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
 
 static const struct tms9995reset_param tutor_processor_config =
 {
@@ -731,6 +785,12 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tutor")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( pyuutajr, tutor )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pyuutajr_mem)
+	//MCFG_DEVICE_REMOVE("printer")
+	//MCFG_DEVICE_REMOVE(CASSETTE_TAG)
+MACHINE_CONFIG_END
 
 /*
   ROM loading
@@ -755,7 +815,7 @@ ROM_START(pyuutajr)
 	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(2ca37e62) SHA1(eebdc5c37d3b532edd5e5ca65eb785269ebd1ac0))      /* system ROM */
 ROM_END  
   
-/*   YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY     FULLNAME */
-COMP(1983?,  tutor,  0,          0,      tutor,      tutor,  tutor,  "Tomy",   "Tomy Tutor" , 0)
-COMP(1982,   pyuuta, tutor,      0,      tutor,      tutor,  pyuuta, "Tomy",   "Tomy Pyuuta" , 0)
-COMP(1983,   pyuutajr, tutor,      0,      tutor,      tutor,  pyuuta, "Tomy",   "Tomy Pyuuta Jr." , 0)
+/*   YEAR    NAME      PARENT      COMPAT  MACHINE     INPUT      INIT    COMPANY     FULLNAME */
+COMP(1983?,  tutor,    0,          0,      tutor,      tutor,     tutor,  "Tomy",   "Tomy Tutor" , 0)
+COMP(1982,   pyuuta,   tutor,      0,      tutor,      tutor,     pyuuta, "Tomy",   "Tomy Pyuuta" , 0)
+COMP(1983,   pyuutajr, tutor,      0,      pyuutajr,   pyuutajr,  pyuuta, "Tomy",   "Tomy Pyuuta Jr." , 0)
