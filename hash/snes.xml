@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
@@ -1958,6 +1958,51 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="wozz">
+		<!-- Serial: SHVC-AWOJ-JPN - Release Date: 1995-08-04 - Alt. Title: 超魔法大陸 ウォス-->
+		<description>Chou Mahou Tairiku Wozz (Jpn)</description>
+		<year>1995</year>
+		<publisher>Bullet Proof Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-awoj-0.u1" size="3145728" crc="b3258f38" sha1="5abc7f3ab0b705028f9a7d101a68b31e36c4d11c" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xardionj" cloneof="xardion">
+		<!-- Serial: SHVC-XA - Release Date: 1992-03-20 - Alt. Title: 超攻合神 サーディオン -->
+		<description>Choukou Gasshin Xardion (Jpn)</description>
+		<year>1992</year>
+		<publisher>Asmik</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-12" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="901121" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-xa-0.u1" size="1048576" crc="d5f808ca" sha1="4036190d0c9dbf49e46bd1b4c0164088934e734d" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chomakai" cloneof="sgng">
 		<!-- Serial: SHVC-CM - Release Date: 1991-10-04 - Alt. Title: 超魔界村 - Notes: Also re-released through Nintendo Power -->
 		<description>Chou Makaimura (Jpn)</description>
@@ -2477,6 +2522,51 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="derbyjoc">
+		<!-- Serial: SHVC-JQ - Release Date: 1994-03-18 - Alt. Title: ダービージョッキー 騎手王への道 -->
+		<description>Derby Jockey - Kishu Ou e no Michi (Jpn, Rev. A)</description>
+		<year>1994</year>
+		<publisher>Asmik</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-jq-1.u1" size="1048576" crc="8516c373" sha1="4c2c387b4212b9298d4b8bdb3e7a010d28e13303" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="derbyjoca" cloneof="derbyjoc">
+		<!-- Serial: SHVC-JQ - Release Date: 1994-03-18 - Alt. Title: ダービージョッキー 騎手王への道 -->
+		<description>Derby Jockey - Kishu Ou e no Michi (Jpn)</description>
+		<year>1994</year>
+		<publisher>Asmik</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-jq-0.u1" size="1048576" crc="7d6c9203" sha1="1fc2c443a69de7279217e87c25519edd7598b1b0" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dstall96" supported="no">
 		<!-- Serial: SHVC-ZDBJ-JPN - Release Date: 1996-03-15 - Alt. Title: ダービースタリオン96 -->
         <!-- This requires BSX emulation -->
@@ -2662,6 +2752,47 @@ The software list will be divided in four categories:
 				<rom name="spal-af9p-0.u1" size="524288" crc="9dbc2330" sha1="d2940767de799fcd7a2ee0995f072930475ab88f" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dokap321">
+		<!-- Serial: SHVC-AIXJ-JPN - Release Date: 1994-12-02 - Alt. Title: ドカポン3・2・1 ～嵐を呼ぶ友情～ -->
+		<description>Dokapon 3-2-1 - Arashi o Yobu Yuujou (Jpn)</description>
+		<year>1994</year>
+		<publisher>Asmik</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A3M-11" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64KSRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1572864">
+				<rom name="shvc-aixj-0 p0.u1" size="1048576" crc="9602b7fd" sha1="b666999cb6b037e2c50822210594bceb38b2a466" offset="0x000000" />
+				<rom name="shvc-aixj-0 p1.u2" size="524288"  crc="9d957d74" sha1="c70399d5fc894067af6b9298e8f508d63dd702d7" offset="0x100000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dokapong">
+		<!-- Serial: SHVC-AGNJ-JPN - Release Date: 1995-12-01 - Alt. Title: ドカポン外伝 炎のオーディション -->
+		<description>Dokapon Gaiden - Honoo no Audition (Jpn)</description>
+		<year>1995</year>
+		<publisher>Asmik</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-agnj-0.u1" size="1048576" crc="a1684b6c" sha1="8a3c4a376a93555454421b6b660fe8ef9190b270" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3123,6 +3254,28 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="dknight4">
+		<!-- Serial: SHVC-A87J-JPN - Release Date: 1996-12-27 - Alt. Title: ドラゴンナイトIV -->
+		<description>Dragon Knight 4 (Jpn)</description>
+		<year>1996</year>
+		<publisher>Banpresto</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-a87j-0.u1" size="3145728" crc="52fc7228" sha1="cfb5d2ce3eab576dae49f570284b75c1a8c0465d" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dquest12">
 		<!-- Serial: SHVC-DQ - Release Date: 1993-12-18 - Alt. Title: ドラゴンクエストI・II -->
 		<description>Dragon Quest I &amp; II (Jpn)</description>
@@ -3299,6 +3452,56 @@ The software list will be divided in four categories:
 			<dataarea name="rom" size="1572864">
 				<rom name="shvc-adbj-0 p0.u1" size="1048576" crc="05fba6d7" sha1="3e7df6e137e99fe4d65a27547cc151a2a61ee2be" offset="0x000000" />
 				<rom name="shvc-adbj-0 p1.u2" size="524288"  crc="f53bad6f" sha1="c3abed64af949a01a3651fdace7075b5bab5d1cf" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shotok94">
+		<!-- Serial: SHVC-94 - Release Date: 1994-05-27 - Alt. Title: ドリフトキング 土屋圭市＆坂東正明 首都高バトル'94 -->
+		<description>Drift King Shutokou Battle '94 - Tsuchiya Keiichi &amp; Bandou Masaaki (Jpn)</description>
+		<year>1994</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1 B" />
+			<feature name="pcb" value="SHVC-2K3X-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 µPD77C25" /> <!-- DSP1 B -->
+			<feature name="u5" value="U5 MAD-2" />
+			<feature name="u6" value="U6 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1572864">
+				<rom name="shvc-94-0 p0.u1" size="1048576" crc="90566da4" sha1="caccd2e6da2f8fae5613dc57eaad86628234c8a3" offset="0x000000" />
+				<rom name="shvc-94-0 p1.u2" size="524288"  crc="d5ff46b6" sha1="517047d2fdcaa7a95d808fc2a801d85f8c0ca35f" offset="0x100000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shotoku2">
+		<!-- Serial: SHVC-ASXJ-JPN - Release Date: 1995-02-24 - Alt. Title: ドリフトキング 土屋圭市&坂東正明 首都高バトル2 -->
+		<description>Drift King Shutokou Battle 2 - Tsuchiya Keiichi &amp; Bandou Masaaki (Jpn)</description>
+		<year>1995</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1 B" />
+			<feature name="pcb" value="SHVC-2K3X-10" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U6 64K SRAM" />
+			<feature name="u4" value="U4 µPD77C25" /> <!-- DSP1 B -->
+			<feature name="u5" value="U5 MAD-2" />
+			<feature name="u6" value="U6 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1572864">
+				<rom name="shvc-asxj-0 p0.u1" size="1048576" crc="8e2bb7e3" sha1="3b1484c6a506b0303a84a304c7bb3d8f828fcf1e" offset="0x000000" />
+				<rom name="shvc-asxj-0 p1.u2" size="524288"  crc="d4ca6b1f" sha1="c27bb03500d861a01acb9c17d1179603c19c1019" offset="0x100000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -3640,6 +3843,23 @@ The software list will be divided in four categories:
 				<rom name="sns-6p-0.u1" size="1048576" crc="b3da1b1d" sha1="199d607f2abacb10f229f173616e414f473c4778" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f15strik" cloneof="sstrike">
+		<!-- Serial: SHVC-EG - Release Date: 1993-11-26 - Alt. Title: F-15 スパーストライクイーグル -->
+		<description>F-15 Super Strike Eagle (Jpn)</description>
+		<year>1993</year>
+		<publisher>Asmik</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" /> <!-- also found with SHVC-1A0N-20 pcb -->
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-eg-0.u1" size="1048576" crc="f0202e26" sha1="40b6dd3958edc0e39c9c40ebee7675419b9b2fa6" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4411,6 +4631,30 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
+	<software name="frontmss1" cloneof="frontmss">
+		<!-- Serial: SHVC-AZGJ-JPN - Release Date: 1996-02-23 - Alt. Title: フロントミッションシリーズ ガンハザード -->
+		<description>Front Mission Series - Gun Hazard (Jpn, Alt)</description>
+		<year>1996</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ3M-20" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 MAD-1" /> 
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-azgj-0 p0.u1" size="2097152" crc="c70ebd8c" sha1="5da32ee0e2e341a5a92100c7791867353af176ca" offset="0x000000" />
+				<rom name="shvc-azgj-0 p3.u2" size="1048576" crc="8c6b928d" sha1="9017c9d299f4a6358d75e6a78abebcc2fbd8d1d5" offset="0x200000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fzero">
 		<description>F-Zero (Euro)</description>
 		<!-- Serial: SNSP-FZ-NOE, SNSP-FZ-FAH -->
@@ -4643,6 +4887,66 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-oy-0.u1" size="1048576" crc="73453c46" sha1="12345619eaa14ce4418bb6ee66c0364814c5082f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garoua" cloneof="fatfur">
+		<!-- Serial: SHVC-GN - Release Date: 1992-11-27 - Alt. Title: 餓狼伝説 宿命の闘い -->
+		<description>Garou Densetsu - Shukumei no Tatakai (Jpn)</description>
+		<year>1992</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1572864">
+				<rom name="shvc-gn-0 p0.u1" size="1048576" crc="fa07c79f" sha1="c6a12c9fd3d680e2ae4a6068af54d65cc7d4f89d" offset="0x000000" />
+				<rom name="shvc-gn-0 p1.u2" size="524288"  crc="e7e9f5bd" sha1="f25d5cdda32e206b4885ed4b8124a959140bdca9" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garou2a" cloneof="fatfur2">
+		<!-- Serial: SHVC-DJ - Release Date: 1993-11-26 - Alt. Title: 餓狼伝説2 ―新たなる闘い― -->
+		<description>Garou Densetsu 2 - Aratanaru Tatakai (Jpn)</description>
+		<year>1993</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="2621440">
+				<rom name="shvc-dj-0 p0.u1" size="2097152" crc="990509fd" sha1="9ebeae6fdddbe81fd8d4909b4a354da0e5f4f997" offset="0x000000" />
+				<rom name="shvc-dj-0 p3.u2" size="524288"  crc="503af723" sha1="47ddb90cf019d2eb8ae551e9b9f08f1e1398bea4" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garousp" cloneof="fatfursp">
+		<!-- Serial: SHVC-3R - Release Date: 1994-07-29 - Alt. Title: 餓狼伝説 スペシャル -->
+		<description>Garou Densetsu Special (Jpn)</description>
+		<year>1994</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shvc-3r-0 p0.u1" size="2097152" crc="ffb079df" sha1="05beacf964c455a61e606a1f61f96268ec3e3d29" offset="0x000000" />
+				<rom name="shvc-3r-0 p1.u2" size="2097152" crc="55a88fb0" sha1="922261efbd9004c36a8c227d3f6bf5a4c248214f" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4945,6 +5249,23 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
+	<software name="hattric2">
+		<!-- Serial: SHVC-2Y - Release Date: 1994-07-29 - Alt. Title: ハットトリックヒーロー2 -->
+		<description>Hat Trick Hero 2 (Jpn)</description>
+		<year>1994</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-2y-0.u1" size="1048576" crc="19e67dff" sha1="826806420c11d0b5adccac50adff89057157786c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hayashog">
 		<!-- Serial: SHVC-2M - Release Date: 1993-06-18 - Alt. Title: 早指し 二段 森田将棋 -->
 		<description>Hayazashi Nidan Morita Shougi (Jpn)</description>
@@ -5222,6 +5543,23 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 <!-- wip-i -->
+	<software name="ikariyou" cloneof="oplogicb">
+		<!-- Serial: SHVC-IY - Release Date: 1993-04-23 - Alt. Title: 怒りの要塞 -->
+		<description>Ikari no Yousai (Jpn)</description>
+		<year>1993</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-iy-0.u1" size="1048576" crc="4d5329f2" sha1="a7806a49890598c32b490c4a348ea52dea3869c2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="illgaia" cloneof="illtime">
 		<!-- Serial: SNS-JG-USA - Release Date: 1994-09 -->
 		<description>Illusion of Gaia (USA)</description>
@@ -5710,7 +6048,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
 			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_back_label" value="" /> <!-- to do -->
+			<feature name="cart_back_label" value="901121" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-br-0.u1" size="1048576" crc="c157978c" sha1="d79896f4ad042961a6b0111cee2f6e425c253059" offset="0x000000" />
 			</dataarea>
@@ -6268,6 +6606,28 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
+	<software name="dokapon4">
+		<!-- Serial: SHVC-IX - Release Date: 1993-12-10 - Alt. Title: 決戦！ドカポン王国IV ～伝説の勇者たち～ - Notes: Also re-released through Nintendo Power -->
+		<description>Kessen! Dokapon Oukoku IV - Densetsu no Yuusha-tachi (Jpn)</description>
+		<year>1993</year>
+		<publisher>Asmik</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-ix-0.u1" size="1048576" crc="9ba1f895" sha1="45c4de22174f01135628d8b61eff0de672bc7d30" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gndmxdim">
 		<!-- Serial: SHVC-78 - Release Date: 1995-02-10 - Alt. Title: 機動戦士ガンダム クロス・ディメン ション0079 -->
 		<description>Kidou Senshi Gundam - Cross Dimension 0079 (Jpn)</description>
@@ -6381,6 +6741,43 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="cart_back_label" value="SNSP-NOE" />
 			<dataarea name="rom" size="2097152">
 				<rom name="spal-ei-0.u1" size="2097152" crc="78f0820b" sha1="e65eaa67dbc227fead5ecc15e23771c29050eecd" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kotmj" cloneof="kotm">
+		<!-- Serial: SHVC-KM - Release Date: 1992-07-31 - Alt. Title: キング・オブ・ザ・モンスターズ -->
+		<description>King of the Monsters (Jpn)</description>
+		<year>1992</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-02" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-km-0.u1" size="1048576" crc="825b9607" sha1="38fa840c1129293232e2857fd82cab09956fc03c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kotm2j" cloneof="kotm2">
+		<!-- Serial: SHVC-KT - Release Date: 1993-12-22 - Alt. Title: キング・オブ・ザ・モンスターズ2 -->
+		<description>King of the Monsters 2 - The Next Thing (Jpn)</description>
+		<year>1993</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2J0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-kt-0 p0.u1" size="1048576" crc="35c9d55f" sha1="662a564e646fdb2575359dda07fa1e6d575368f4" offset="0x000000" />
+				<rom name="shvc-kt-0 p1.u2" size="1048576" crc="621195a8" sha1="26ea104fb12dc98fac92c12a4f88589d54e8f4a7" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6840,6 +7237,28 @@ The revision A of the cartridge has the same ROM as the initial release.
 				<rom name="spal-l2-0.u1" size="2097152" crc="290107a1" sha1="fda84c807739021e40f5d20a65995a3bb6ffd371" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lennus2">
+		<!-- Serial: SHVC-ALNJ-JPN - Release Date: 1996-07-26 - Alt. Title: レナスII -->
+		<description>Lennus II - Fuuin no Shito (Jpn)</description>
+		<year>1996</year>
+		<publisher>Asmik</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shvc-alnj-0.u1" size="4194304" crc="c68be22a" sha1="3cdec34bf2652b278ed482d3f425efff2aa64e7e" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -7440,6 +7859,23 @@ Japanese cart
 		</part>
 	</software>
 
+	<software name="megaloj" cloneof="megalo">
+		<!-- Serial: SHVC-MZ - Release Date: 1993-07-23 - Alt. Title: メガロマニア ～時空大戦略～ -->
+		<description>Mega lo Mania - Jikuu Daisenryaku (Jpn)</description>
+		<year>1993</year>
+		<publisher>Imagineer</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-mz-0.u1" size="1048576" crc="f23bc69e" sha1="dc3474067ccadf7ff9b980b414d2d45b538aee9a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="metalcom">
 		<!-- Serial: SNSP-KD-ESP -->
 		<description>Metal Combat - Falcon's Revenge (Euro)</description>
@@ -7551,6 +7987,26 @@ Japanese cart
 			<dataarea name="rom" size="1572864">
 				<rom name="shvc-4c-0 p0.u1" size="1048576" crc="ccd3d5d1" sha1="263c9f26fd33edb7bf7f65f64b92a0403bd22657" offset="0x000000" />
 				<rom name="shvc-4c-0 p1.u2" size="524288"  crc="9c56f79d" sha1="0fee9f9ae4fe2ccb47e7b457647682582ad45603" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="militia" cloneof="metalmar">
+		<!-- Serial: SHVC-NG - Release Date: 1994-11-18 - Alt. Title: ミリティア -->
+		<description>Militia (Jpn)</description>
+		<year>1994</year>
+		<publisher>Namco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A0N-11" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1572864">
+				<rom name="shvc-ng-0 p0.u1" size="1048576" crc="b5db9f07" sha1="eff7756de3f27736dfaa6dcca391299e6d178424" offset="0x000000" />
+				<rom name="shvc-ng-0 p1.u2" size="524288"  crc="e48532c0" sha1="26b7931429a25271471e6f417e53fb7c728c9682" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8497,6 +8953,28 @@ Japanese cart
 		</part>
 	</software>
 
+	<software name="oozumous">
+		<!-- Serial: SHVC-OZ - Release Date: 1992-12-11 - Alt. Title: 大相撲魂 -->
+		<description>Oozumou Spirits (Jpn)</description>
+		<year>1992</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-13" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-oz-0.u1" size="1048576" crc="f78b76e9" sha1="a38d39d6f1e71878c53523fb9d1177210c453be1" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="oplogicb">
 		<!-- Serial: SNSP-IY-NOE -->
 		<description>Operation Logic Bomb (Euro)</description>
@@ -8778,14 +9256,14 @@ Japanese cart
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="DSP1" />
-			<feature name="pcb" value="SHVC-1B0N-01" />
+			<feature name="pcb" value="SHVC-1B0N-01" /> <!-- also found with SHVC-1B0N-03 pcb -->
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2" /> <!-- Not printed: DSP1 -->
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 74HCU04" />
 			<feature name="u5" value="U5 CIC" />
 			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_back_label" value="901121" />
+			<feature name="cart_back_label" value="901121" /> <!-- also found with 920414 (-03 pcb) -->
 			<dataarea name="rom" size="524288">
 				<rom name="shvc-pw-0.u1" size="524288" crc="77871727" sha1="76832034269723dc0aa7b9019faa5e8f39181e9d" offset="0x000000" />
 			</dataarea>
@@ -9022,6 +9500,23 @@ Japanese cart
 		</part>
 	</software>
 
+	<software name="powermonj" cloneof="powermon">
+		<!-- Serial: SHVC-PM - Release Date: 1993-03-26 - Alt. Titles: パワーモンガー～魔将の謀略～ -->
+		<description>PowerMonger - Mashou no Bouryaku (Jpn)</description>
+		<year>1993</year>
+		<publisher>Imagineer</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-pm-0.u1" size="1048576" crc="3e14376b" sha1="79ab6cb1a0cc37ba2bd1f5cf080b2e0489c8a05d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ppersia">
 		<!-- Serial: SNSP-PR-NOE -->
 		<description>Prince of Persia (Euro)</description>
@@ -9187,6 +9682,23 @@ Japanese cart
 				<rom name="shvc-aimj-0 p1.u2" size="524288"  crc="a4350418" sha1="bcccd03b5e35eeef7b90121ae74a060100f3eb6e" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="resarcan">
+		<!-- Serial: SHVC-ARAJ-JPN - Release Date: 1995-04-14 - Alt. Title: レース アルカーナディアーナ・レイ 占 いの迷宮 -->
+		<description>Res Arcana - Diana Ray - Uranai no Meikyuu (Jpn)</description>
+		<year>1995</year>
+		<publisher>Coconuts Japan Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-araj-0.u1" size="1048576" crc="e7637817" sha1="8f36123939cac334ffa3b6ef4b4b98239549ee38" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9700,6 +10212,26 @@ Japanese cart
 		</part>
 	</software>
 
+	<software name="samspir" cloneof="samsho">
+		<!-- Serial: SHVC-A7SJ-JPN - Release Date: 1994-09-22 - Alt. Title: サムライスピリッツ -->
+		<description>Samurai Spirits (Jpn)</description>
+		<year>1994</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shvc-a7sj-0 p0.u1" size="2097152" crc="e3a622dc" sha1="ea7728dc2cc0694155084c97f20539fc42f75cc0" offset="0x000000" />
+				<rom name="shvc-a7sj-0 p1.u2" size="2097152" crc="653f29b3" sha1="8109475be5cc166c24e2713e6dafb8f0c14f4cfd" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sangoku3a" cloneof="roman3k3">
 		<!-- Serial: SHVC-S3 - Release Date: 1992-11-08 - Alt. Title: 三国志III -->
 		<description>Sangokushi III (Jpn)</description>
@@ -9745,6 +10277,30 @@ Japanese cart
 				<rom name="shvc-as4j-0 p3.u2" size="1048576" crc="e0e4f9ed" sha1="c4702bb00142b82b7f32650d16527193ecdcc2ae" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanspo">
+		<!-- Serial: SHVC-IO - Release Date: 1994-12-22 - Alt. Title: サンスポ フィッシング 渓流王 -->
+		<description>Sanspo Fishing - Keiryuu Ou (Jpn)</description>
+		<year>1994</year>
+		<publisher>Imagineer</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A1M-10" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 16K SRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1310720">
+				<rom name="shvc-io-0 p0.u1" size="1048576" crc="52298dee" sha1="2bb75bf9643b5826663e6c2c4ebbb0f65b342052" offset="0x000000" />
+				<rom name="shvc-io-0 p1.u2" size="262144"  crc="bbc1452b" sha1="8954b650c26435d3cc0182b9b1cf777df96e8de4" offset="0x100000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -9846,7 +10402,7 @@ Japanese cart
 			<feature name="u6" value="U6 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_back_label" value="" /> <!-- to do -->
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-x2-0.u1" size="1048576" crc="4dc3d903" sha1="a504b74d1e256f97bc05a7dd836a2457ae6f525e" offset="0x000000" />
 			</dataarea>
@@ -10278,6 +10834,23 @@ Japanese cart
 		</part>
 	</software>
 
+	<software name="yuuenchi">
+		<!-- Serial: SHVC-AS - Release Date: 1992-12-22 - Alt. Title: 少年アシベ ゴマちゃんのゆうえんち大冒険 -->
+		<description>Shounen Ashibe - Goma-chan no Yuuenchi Daibouken (Jpn)</description>
+		<year>1992</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="524288">
+				<rom name="shvc-as-0.u1" size="524288" crc="d01ab6a8" sha1="078c359681a39c0e2b8261f053ea9e85f68d5202" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shounin">
 		<!-- Serial: SHVC-AYQJ-JPN - Release Date: 1995-12-15 - Alt. Title: 商人よ、大志を抱け!! -->
 		<description>Shounin yo, Taishi o Idake!! (Jpn)</description>
@@ -10693,6 +11266,23 @@ Japanese cart
 		</part>
 	</software>
 
+	<software name="spacebaz" cloneof="batlclsh">
+		<!-- Serial: SHVC-BT - Release Date: 1993-06-21 - Alt. Title: スペースバズーカ  -->
+		<description>Space Bazooka (Jpn)</description>
+		<year>1993</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-bt-0.u1" size="1048576" crc="f2dd3be4" sha1="422df5740fed48974bca584c3cced0b65c6efffe" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spaceinvj" cloneof="spaceinv">
 		<!-- Serial: SHVC-IC - Release Date: 1994-03-25 - Alt. Title: スペースインベーダー ザ・オリジ ナルゲーム -->
 		<description>Space Invaders - The Original Game (Jpn)</description>
@@ -10779,6 +11369,28 @@ Japanese cart
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-mn-0.u1" size="1048576" crc="ae878ccb" sha1="1365a9dc47e8150f171098691478d557be740c1a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="standrew">
+		<!-- Serial: SHVC-ASAJ-JPN - Release Date: 1995-09-15 - Alt. Title: セント・アンドリュース~栄光と歴史のオールトコース~ -->
+		<description>St. Andrews - Eikou to Rekishi no Old Course (Jpn)</description>
+		<year>1995</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-asaj-0.u1" size="2097152" crc="fefa00ea" sha1="caa18f371ae35f1c9c9a5e6c2d4dae9057cc74a9" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -11333,6 +11945,33 @@ Japanese cart
 		</part>
 	</software>
 <!-- wip-sup -->
+	<software name="super3db" cloneof="baselod2">
+		<!-- Serial: SHVC-3D - Release Date: 1993-10-01 - Alt. Title: スーパー3Dベースボール -->
+		<description>Super 3D Baseball (Jpn)</description>
+		<year>1993</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1 A" />
+			<feature name="pcb" value="SHVC-1B3B-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 µPD77C25 " /> <!-- DSP1 A -->
+			<feature name="u5" value="U5 74LS139" />
+			<feature name="u6" value="U6 74HCU04" />
+			<feature name="u7" value="U7 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1572864">
+				<rom name="shvc-3d-0 p0.u1" size="1048576" crc="2a5b2522" sha1="55cf51865a2c7c0c4132404fca563167c336be8d" offset="0x000000" />
+				<rom name="shvc-3d-0 p1.u2" size="524288"  crc="bb1afba8" sha1="e52b4a6f30171d1c42910e5ab2137f2ac1e1c838" offset="0x100000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="airdiver">
 		<!-- Serial: SNSP-AZ-UKV -->
 		<description>Super Air Diver (Euro)</description>
@@ -11350,6 +11989,50 @@ Japanese cart
 			<feature name="cart_back_label" value="SNSP-UKV" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-az-0.u1" size="524288" crc="0b57c764" sha1="f70567b9dc858bdb66d73d539390b7f74f00ff8a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airdiverj" cloneof="airdiver">
+		<!-- Serial: SHVC-AZ - Release Date: 1993-07-16 - Alt. Title: スーパーエアダイバー -->
+		<description>Super Air Diver (Jpn)</description>
+		<year>1993</year>
+		<publisher>Asmik</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1 A" />
+			<feature name="pcb" value="SHVC-1K0N-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 µPD77C25" /> <!-- DSP1 A -->
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 74HCU04" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="524288">
+				<rom name="shvc-az-0.u1" size="524288" crc="971e74ba" sha1="ffb81b82ea027673cbfc26f6ebd9f05c2d60d6c8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airdivr2">
+		<!-- Serial: SHVC-AADJ-JPN - Release Date: 1995-03-03 - Alt. Title: スーパーエアダイバー2 -->
+		<description>Super Air Diver 2 (Jpn)</description>
+		<year>1995</year>
+		<publisher>Asmik</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="enhancement" value="DSP1 B" />
+			<feature name="pcb" value="SHVC-2K0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 µPD77C25" /> <!-- DSP1 B -->
+			<feature name="u4" value="U4 74LS139" />
+			<feature name="u5" value="U5 74HCU04" />
+			<feature name="u6" value="U6 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1310720">
+				<rom name="shvc-aadj-0 p0.u1" size="1048576" crc="cff65a3d" sha1="1e36d1e57d8e62cc85425c6a330afbd1e68d4ede" offset="0x000000" />
+				<rom name="shvc-aadj-0 p1.u2" size="262144"  crc="f8583eb1" sha1="162d9de84509c33a86ac2a5f2605ce1308774be6" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11520,6 +12203,31 @@ Japanese cart
 		</part>
 	</software>
 
+	<software name="sbomblis">
+		<!-- Serial: SHVC-ABOJ-JPN - Release Date: 1995-03-17 - Alt. Title: スーパーボンブリス -->
+		<description>Super Bombliss (Jpn)</description>
+		<year>1995</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A1M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="524288">
+				<rom name="shvc-aboj-0.u1" size="524288" crc="1d123be6" sha1="15dfdd61cb12f636eae9fbbf4102b734b6ed58bb" offset="0x000000" />  
+<!--    this dump is corrut (but has a good checksum)
+				<rom name="shvc-aboj-0.u1" size="524288" crc="84f95868" sha1="44bc21575b3d072a1e52f5e912c58c0ea2eab9f1" offset="0x000000" />
+-->
+			</dataarea>
+			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scvania4">
 		<!-- Serial: SNSP-AD-NOE, SNSP-AD-FAH -->
 		<description>Super Castlevania IV (Euro)</description>
@@ -11584,6 +12292,28 @@ Japanese cart
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="2097152">
 				<rom name="shvc-cu-0.u1" size="2097152" crc="77dafbb6" sha1="c05f88ddd689f4a0dbad6880d29413973777c48a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supercup" cloneof="sgoal">
+		<!-- Serial: SHVC-SU - Release Date: 1992-04-24 - Alt. Title: スーパーカップサッカー -->
+		<description>Super Cup Soccer (Jpn)</description>
+		<year>1992</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-12" /> <!-- also found with SHVC-1A3B-13 pcb -->
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-su-0.u1" size="1048576" crc="14a03974" sha1="f6feea0f042834c86ec11a350ab06daaac69cb81" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -12426,7 +13156,7 @@ Japanese cart
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_back_label" value="" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1310720">
 				<rom name="shvc-lg-1.u1" size="1048576" crc="977f7a3e" sha1="fe56add7a600f87408792b5a258a5d25f5cf96df" offset="0x000000" />
 				<rom name="shvc-lg-1.u2" size="262144"  crc="8929b402" sha1="c783c4756aaa002d794b96e353327361bd6f3019" offset="0x100000" />
@@ -12450,7 +13180,7 @@ Japanese cart
 			<feature name="u5" value="U5 CIC" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_back_label" value="" />
+			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1310720">
 				<rom name="shvc-lg-0.u1" size="1048576" crc="2f528111" sha1="3f6bf35e5e0ea8feb8ab7969faf3772c8782f4d3" offset="0x000000" />
 				<rom name="shvc-lg-0.u2" size="262144"  crc="8929b402" sha1="c783c4756aaa002d794b96e353327361bd6f3019" offset="0x100000" />
@@ -12477,9 +13207,31 @@ Japanese cart
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1310720">
 				<rom name="shvc-al2j-0 p0.u1" size="1048576" crc="d060dc70" sha1="cc9b02314ab8164d33cb858ca8dbe9718fd0624a" offset="0x000000" />
-				<rom name="shvc-al2j-0 p1.u2" size="262144" crc="018cbd87" sha1="e29f59ac56b49c16e9dc6f18cd957b552041187f" offset="0x100000" />
+				<rom name="shvc-al2j-0 p1.u2" size="262144"  crc="018cbd87" sha1="e29f59ac56b49c16e9dc6f18cd957b552041187f" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sjinsei3">
+		<!-- Serial: SHVC-A3XJ-JPN - Release Date: 1996-11-29 - Alt. Title: スーパー人生ゲーム3 -->
+		<description>Super Jinsei Game 3 (Jpn)</description>
+		<year>1996</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-a3xj-0.u1" size="2097152" crc="688382b6" sha1="861aaed1a8179d65c6bec306098b7502219a203d" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -12550,6 +13302,23 @@ Japanese cart
 				<rom name="shvc-9h-0 p1.u2" size="524288"  crc="711df2fc" sha1="788e19ee975b888c4c73a2a510f8cf4ed0b39e0f" offset="0x100000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sloopz">
+		<!-- Serial: SHVC-2E - Release Date: 1994-03-04 - Alt. Title: スーパーループス -->
+		<description>Super Loopz (Jpn)</description>
+		<year>1994</year>
+		<publisher>Imagineer</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="524288">
+				<rom name="shvc-2e-0.u1" size="524288" crc="49601821" sha1="26ea349aefa5926dc94b493284ece8052a86b7a8" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -12789,7 +13558,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 
 	<software name="smkart">
 		<!-- Serial: SNSP-MK-EUR -->
-		<!-- Revision A uses an upgraded DSP (DSP1B) -->
+		<!-- Revision A uses an upgraded DSP (DSP1 B) -->
 		<description>Super Mario Kart (Euro, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -12840,7 +13609,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 
 	<software name="smkartja" cloneof="smkart">
 		<!-- Serial: SHVC-MK - Release Date: 1992-08-27 - Alt. Title: スーパーマリオカート -->
-		<!-- Revision A uses an upgraded DSP (DSP1B) -->
+		<!-- Revision A uses an upgraded DSP (DSP1 B) -->
 		<description>Super Mario Kart (Jpn, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -13398,6 +14167,28 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
+	<software name="superoku">
+		<!-- Serial: SHVC-ABGJ-JPN - Release Date: 1995-11-24 - Alt. Title: スーパー 億万長者ゲーム -->
+		<description>Super Okumanchouja Game (Jpn)</description>
+		<year>1995</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-abgj-0.u1" size="1048576" crc="4998a9d6" sha1="a29958db07c3bf3f9731da75844a0835f21b34e7" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="superozu">
 		<!-- Serial: SHVC-OK - Release Date: 1992-12-18 - Alt. Title: スーパー大相撲 熱戦大一番 - Notes: Also re-released through Nintendo Power -->
 		<description>Super Oozumou - Nessen Ooichiban (Jpn)</description>
@@ -13576,6 +14367,23 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 			<feature name="cart_back_label" value="SNSP-NOE" />
 			<dataarea name="rom" size="1048576">
 				<rom name="spal-cs-0.u1" size="1048576" crc="420bd975" sha1="a0f16ed356cf99de2e1b72fb289c9c7fce8f2ab3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spbaseb" cloneof="baselod">
+		<!-- Serial: SHVC-SP - Release Date: 1991-05-17 - Alt. Title: スーパープロフェッショナルベースボール -->
+		<description>Super Professional Baseball (Jpn)</description>
+		<year>1991</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="901121" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-sp-0.u1" size="1048576" crc="ea0bfa66" sha1="bfd3bc23d9bf143ceaf859e830067fd49ea17b0a" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -14099,6 +14907,72 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="stetris2g" cloneof="stetris2">
+		<!-- Serial: SHVC-5T - Release Date: 1994-01-21 - Alt. Title: スーパーテトリス2+ボンブリス 限定版 -->
+		<description>Super Tetris 2 + Bombliss Genteiban (Jpn)</description>
+		<year>1994</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A1M-01" />
+			<feature name="u1" value="U1 MASKROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-5t-0.u1" size="1048576" crc="c709b922" sha1="26f1be182eeb3d86b276269cc8fec8f1bc6dbf83" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stetris2a" cloneof="stetris2">
+		<!-- Serial: SHVC-T2 - Release Date: 1992-12-18 - Alt. Title: スーパーテトリス2＋ボンブリス -->
+		<description>Super Tetris 2 + Bombliss (Jpn)</description>
+		<year>1992</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A1B-06" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-t2-0.u1" size="1048576" crc="8ae5e443" sha1="3ac3c616dfe4d36496303b38275d15d7aceb8572" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stetris3">
+		<!-- Serial: SHVC-AT3J-JPN - Release Date: 1994-12-16 - Alt. Title: スーパーテトリス3 -->
+		<description>Super Tetris 3 (Jpn)</description>
+		<year>1994</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A1M-11" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-at3j-0.u1" size="1048576" crc="329024c7" sha1="2f808a4f0db77a54895f5d2b68517331cd8e8855" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stroll">
 		<!-- Serial: SNSP-5L-FAH -->
 		<description>Super Troll Islands (Euro)</description>
@@ -14298,6 +15172,28 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="taikyogo">
+		<!-- Serial: SHVC-IA - Release Date: 1993-05-14 - Alt. Title: 対局囲碁ゴライアス -->
+		<description>Taikyoku Igo - Goliath (Jpn)</description>
+		<year>1993</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A5B-04" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 256K SRAM" />
+			<feature name="u3" value="U3 74LS139" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-ia-0.u1" size="1048576" crc="01afec9c" sha1="8f3641977e2cbc93f851e5931fc3e3c440da109e" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="takameij" cloneof="advisl">
 		<!-- Serial: SHVC-H2 - Release Date: 1992-01-11 - Alt. Title: 高橋名人の大冒険島 -->
 		<description>Takahashi Meijin no Daiboukenjima (Jpn)</description>
@@ -14311,6 +15207,50 @@ Alternate board (XL-1)
 			<feature name="cart_back_label" value="901121" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-h2-0.u1" size="1048576" crc="37c0ae76" sha1="090742859b1f8ca6077bee80855b53ffda4c0fa1" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="takedasc" cloneof="sgoal2">
+		<!-- Serial: SHVC-JV - Release Date: 1993-11-26 - Alt. Title: 武田修宏のスーパーカップサッカー -->
+		<description>Takeda Nobuhiro no Super Cup Soccer (Jpn)</description>
+		<year>1993</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A1M-01" />
+			<feature name="u1" value="U1 MASKROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="524288">
+				<rom name="shvc-jv-0.u1" size="524288" crc="1bb2a0a4" sha1="c598ca9e5c27b9ccee2d04a6bad3379bdfe47043" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="takedasl">
+		<!-- Serial: SHVC-ATKJ-JPN - Release Date: 1994-11-25 - Alt. Title: 武田修宏のスーパーリーグサッカー -->
+		<description>Takeda Nobuhiro no Super League Soccer (Jpn)</description>
+		<year>1994</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A1M-11" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-atkj-0.u1" size="1048576" crc="383face4" sha1="d0d5ede3df819b25b17223f740563468c3a842b5" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -14972,6 +15912,28 @@ Alternate board (XL-1)
 			<dataarea name="rom" size="1572864">
 				<rom name="shvc-qc-0 p0.u1" size="1048576" crc="78b75f24" sha1="181cfd9d35c5dde8ff08923f0a2a0132ce9eb8ec" offset="0x000000" />
 				<rom name="shvc-qc-0 p1.u2" size="524288"  crc="01898322" sha1="ebb21166115d850ca7d06531ffe9286ba950c12d" offset="0x100000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tougeden">
+		<!-- Serial: SHVC-ACQJ-JPN - Release Date: 1996-03-15 - Alt. Title: 峠・伝説 最速バトル -->
+		<description>Touge Densetsu - Saisoku Battle (Jpn)</description>
+		<year>1996</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="3145728">
+				<rom name="shvc-acqj-0.u1" size="3145728" crc="03fd7ad4" sha1="d72c79911eb1ed54a22010ed29a37748bc3334cd" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -16218,6 +17180,28 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="garou" cloneof="fatfur">
+		<!-- Serial: SHVC-GN - Release Date: 1992-11-27 - Alt. Title: 餓狼伝説 宿命の闘い -->
+		<!-- Y~K -->
+		<description>Garou Densetsu - Shukumei no Tatakai (Jpn, Rev. A)</description>
+		<year>1992</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A0N-10" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1572864">
+				<rom name="shvc-gn-1 p0.u1" size="1048576" crc="7296a468" sha1="2e0262fb9e41e7eee0ccf7bbbcc30f66a0a10b7f" offset="0x000000" />
+				<rom name="shvc-gn-1 p1.u2" size="524288"  crc="7379b893" sha1="159a759e5a6186cdaea187bcf4903dfaa9fdbf6c" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="haoutryu">
 		<!-- Serial: SHVC-UR - Release Date: 1994-12-22 - Alt. Title: 覇王大系リューナイト ロードオブパラディン -->
 		<!-- Y~K -->
@@ -16706,6 +17690,30 @@ Alternate board (XL-1)
 				<rom name="shvc-sd-1.u1" size="1048576" crc="3ba3c38b" sha1="b04dd59194287123382d99581988bd395a497035" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stetris2">
+		<!-- Serial: SHVC-T2 - Release Date: 1992-12-18 - Alt. Title: スーパーテトリス2＋ボンブリス -->
+		<!-- Y~K -->
+		<description>Super Tetris 2 + Bombliss (Jpn, Rev. A)</description>
+		<year>1992</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A1M-11" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shvc-t2-1.u1" size="1048576" crc="4ae93c10" sha1="5fa25d027940907b769578d7bf85a9d5ba94911a" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -20688,20 +21696,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wozz">
-		<!-- Serial: SHVC-AWOJ - Release Date: 1995-08-04 - Alt. Title: 超魔法大陸 ウォス-->
-		<description>Chou Mahou Tairiku Wozz (Jpn)</description>
-		<year>1995</year>
-		<publisher>Bullet Proof Software</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="chou mahou tairiku wozz (japan).sfc" size="3145728" crc="b3258f38" sha1="5abc7f3ab0b705028f9a7d101a68b31e36c4d11c" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="chodorap" cloneof="mcfang">
 		<description>Chou Makai Taisen! Dorabocchan (Jpn, Prototype 19921221)</description>
 		<year>1993</year>
@@ -20737,20 +21731,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="choujikuu yousai macross - scrambled valkyrie (japan).sfc" size="1048576" crc="a5db02e9" sha1="459a727aeeb013cd1b63f54d4a2355c2f0a1999f" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="xardionj" cloneof="xardion">
-		<!-- Serial: SHVC-XA - Release Date: 1992-03-20 - Alt. Title: 超攻合神 サーディオン -->
-		<description>Choukou Gasshin Xardion (Jpn)</description>
-		<year>1992</year>
-		<publisher>Asmik</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="choukou gasshin xardion (japan).sfc" size="1048576" crc="d5f808ca" sha1="4036190d0c9dbf49e46bd1b4c0164088934e734d" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -21819,34 +22799,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="derbyjoc">
-		<!-- Serial: SHVC-JQ - Release Date: 1994-03-18 - Alt. Title: ダービージョッキー 騎手王への道 -->
-		<description>Derby Jockey - Kishu Ou e no Michi (Jpn, Rev. A)</description>
-		<year>1994</year>
-		<publisher>Asmik</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="derby jockey - kishu ou e no michi (japan) (rev 1).sfc" size="1048576" crc="8516c373" sha1="4c2c387b4212b9298d4b8bdb3e7a010d28e13303" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="derbyjoca" cloneof="derbyjoc">
-		<!-- Serial: SHVC-JQ - Release Date: 1994-03-18 - Alt. Title: ダービージョッキー 騎手王への道 -->
-		<description>Derby Jockey - Kishu Ou e no Michi (Jpn)</description>
-		<year>1994</year>
-		<publisher>Asmik</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="derby jockey - kishu ou e no michi (japan).sfc" size="1048576" crc="7d6c9203" sha1="1fc2c443a69de7279217e87c25519edd7598b1b0" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="derbyjo2" supported="no">
 		<!-- Serial: SHVC-A2DJ - Release Date: 1995-09-29 - Alt. Title: ダービージョッキー2 -->
 		<description>Derby Jockey 2 (Jpn)</description>
@@ -22086,32 +23038,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="do-re-mi fantasy - milon no dokidoki daibouken (japan).sfc" size="2097152" crc="9f2c2633" sha1="e56ebbcd0a2db7bf58e2209adb96f589f0100702" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dokap321">
-		<!-- Serial: SHVC-AIXJ - Release Date: 1994-12-02 - Alt. Title: ドカポン3・2・1 ～嵐を呼ぶ友情～ -->
-		<description>Dokapon 3-2-1 - Arashi o Yobu Yuujou (Jpn)</description>
-		<year>1994</year>
-		<publisher>Asmik</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="dokapon 3-2-1 - arashi o yobu yuujou (japan).sfc" size="1572864" crc="fc353400" sha1="9343ca8d3161dea847e0369a4a91cd7f8dc2d3ae" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dokapong">
-		<!-- Serial: SHVC-AGNJ - Release Date: 1995-12-01 - Alt. Title: ドカポン外伝 炎のオーディション -->
-		<description>Dokapon Gaiden - Honoo no Audition (Jpn)</description>
-		<year>1995</year>
-		<publisher>Asmik</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="dokapon gaiden - honoo no audition (japan).sfc" size="1048576" crc="a1684b6c" sha1="8a3c4a376a93555454421b6b660fe8ef9190b270" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -22535,20 +23461,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="dknight4">
-		<!-- Serial: SHVC-A87J - Release Date: 1996-12-27 - Alt. Title: ドラゴンナイトIV -->
-		<description>Dragon Knight 4 (Jpn)</description>
-		<year>1996</year>
-		<publisher>Banpresto</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="dragon knight 4 (japan).sfc" size="3145728" crc="52fc7228" sha1="cfb5d2ce3eab576dae49f570284b75c1a8c0465d" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dslayernp" cloneof="dslayer">
 		<description>Dragon Slayer - Eiyuu Densetsu (Jpn, Rev. A, NP)</description>
 		<year>1992?</year>
@@ -22734,36 +23646,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="dream tv (usa).sfc" size="524288" crc="ab5a9e40" sha1="2ec99d3997677116caa8277544d4bb12d6f74b80" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shotok94">
-		<!-- Serial: SHVC-94 - Release Date: 1994-05-27 - Alt. Title: ドリフトキング 土屋圭市＆坂東正明 首都高バトル'94 -->
-		<description>Drift King Shutokou Battle '94 - Tsuchiya Keiichi &amp; Bandou Masaaki (Jpn)</description>
-		<year>1994</year>
-		<publisher>Bullet-Proof Software</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="DSP1" />
-			<dataarea name="rom" size="1572864">
-				<rom name="drift king shutokou battle '94 - tsuchiya keiichi &amp; bandou masaaki (japan).sfc" size="1572864" crc="33ce298f" sha1="719599ce4acbc1b790cb09506183bc2a9121671f" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shotoku2">
-		<!-- Serial: SHVC-ASXJ - Release Date: 1995-02-24 - Alt. Title: ドリフトキング 土屋圭市&坂東正明 首都高バトル2 -->
-		<description>Drift King Shutokou Battle 2 - Tsuchiya Keiichi &amp; Bandou Masaaki (Jpn)</description>
-		<year>1995</year>
-		<publisher>Bullet-Proof Software</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="DSP1" />
-			<dataarea name="rom" size="1572864">
-				<rom name="drift king shutokou battle 2 - tsuchiya keiichi &amp; bandou masaaki (japan).sfc" size="1572864" crc="87aab79a" sha1="8d510935b6bf3a1ac42ef3501dca3477cc4cab5c" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -23447,18 +24329,6 @@ Alternate board (XL-1)
 				<rom name="f-1 grand prix - part iii (japan).sfc" size="2097152" crc="9b68248e" sha1="c09698565a0b0b897dfbe18a2a3823fb5148d2df" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="f15strik" cloneof="sstrike">
-		<!-- Serial: SHVC-EG - Release Date: 1993-11-26 - Alt. Title: F-15 スパーストライクイーグル -->
-		<description>F-15 Super Strike Eagle (Jpn)</description>
-		<year>1993</year>
-		<publisher>Asmik</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="f-15 super strike eagle (japan).sfc" size="1048576" crc="f0202e26" sha1="40b6dd3958edc0e39c9c40ebee7675419b9b2fa6" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -24846,30 +25716,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="garou" cloneof="fatfur">
-		<!-- Serial: SHVC-GN - Release Date: 1992-11-27 - Alt. Title: 餓狼伝説 宿命の闘い -->
-		<description>Garou Densetsu - Shukumei no Tatakai (Jpn, Rev. A)</description>
-		<year>1992</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="garou densetsu - shukumei no tatakai (japan) (rev 1).sfc" size="1572864" crc="ae4dfed0" sha1="eb22af75cfee35c3e252a282637668460a51ea85" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="garoua" cloneof="fatfur">
-		<!-- Serial: SHVC-GN - Release Date: 1992-11-27 - Alt. Title: 餓狼伝説 宿命の闘い -->
-		<description>Garou Densetsu - Shukumei no Tatakai (Jpn)</description>
-		<year>1992</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="garou densetsu - shukumei no tatakai (japan).sfc" size="1572864" crc="0d549e3e" sha1="266cf528e9203bd8a5182a034f4955ca32ec4756" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="garou2" cloneof="fatfur2">
 		<!-- Serial: SHVC-DJ - Release Date: 1993-11-26 - Alt. Title: 餓狼伝説2 ―新たなる闘い― -->
 		<description>Garou Densetsu 2 - Aratanaru Tatakai (Jpn, Rev. A)</description>
@@ -24878,30 +25724,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2621440">
 				<rom name="garou densetsu 2 - aratanaru tatakai (japan) (rev 1).sfc" size="2621440" crc="3ee1b2d2" sha1="41025faa34b903b96f7819355628d07f6d7d90ee" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="garou2a" cloneof="fatfur2">
-		<!-- Serial: SHVC-DJ - Release Date: 1993-11-26 - Alt. Title: 餓狼伝説2 ―新たなる闘い― -->
-		<description>Garou Densetsu 2 - Aratanaru Tatakai (Jpn)</description>
-		<year>1993</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2621440">
-				<rom name="garou densetsu 2 - aratanaru tatakai (japan).sfc" size="2621440" crc="fbf3abdf" sha1="987ef1cb60592b0469dc2df5364f372848515b37" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="garousp" cloneof="fatfursp">
-		<!-- Serial: SHVC-3R - Release Date: 1994-07-29 - Alt. Title: 餓狼伝説 スペシャル -->
-		<description>Garou Densetsu Special (Jpn)</description>
-		<year>1994</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="garou densetsu special (japan).sfc" size="4194304" crc="c1f68c7a" sha1="acd38fadc1b1919ac33d04fa0077ae0bd11f8562" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25950,18 +26772,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="hattric2">
-		<!-- Serial: SHVC-2Y - Release Date: 1994-07-29 - Alt. Title: ハットトリックヒーロー2 -->
-		<description>Hat Trick Hero 2 (Jpn)</description>
-		<year>1994</year>
-		<publisher>Taito</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="hat trick hero 2 (japan).sfc" size="1048576" crc="19e67dff" sha1="826806420c11d0b5adccac50adff89057157786c" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hatayama">
 		<!-- Serial: SHVC-EB - Release Date: 1993-10-29 - Alt. Title: はた山ハッチのパロ野球ニュース！実名版 -->
 		<description>Hatayama Hatch no Pro Yakyuu News! - Jitsumei Ban (Jpn)</description>
@@ -26898,18 +27708,6 @@ Alternate board (XL-1)
 				<rom name="ihatov monogatari (japan).sfc" size="1048576" crc="c588cd17" sha1="43983938960d0547b4a5585d04e7336d931fb79e" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ikariyou" cloneof="oplogicb">
-		<!-- Serial: SHVC-IY - Release Date: 1993-04-23 - Alt. Title: 怒りの要塞 -->
-		<description>Ikari no Yousai (Jpn)</description>
-		<year>1993</year>
-		<publisher>Jaleco</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="ikari no yousai (japan).sfc" size="1048576" crc="4d5329f2" sha1="a7806a49890598c32b490c4a348ea52dea3869c2" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28732,20 +29530,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="dokapon4">
-		<!-- Serial: SHVC-IX - Release Date: 1993-12-10 - Alt. Title: 決戦！ドカポン王国IV ～伝説の勇者たち～ - Notes: Also re-released through Nintendo Power -->
-		<description>Kessen! Dokapon Oukoku IV - Densetsu no Yuusha-tachi (Jpn)</description>
-		<year>1993</year>
-		<publisher>Asmik</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="kessen! dokapon oukoku iv - densetsu no yuusha-tachi (japan).sfc" size="1048576" crc="9ba1f895" sha1="45c4de22174f01135628d8b61eff0de672bc7d30" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="keeganpm">
 		<description>Kevin Keegan's Player Manager (Euro)</description>
 		<year>1993</year>
@@ -29073,18 +29857,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="kotmj" cloneof="kotm">
-		<!-- Serial: SHVC-KM - Release Date: 1992-07-31 - Alt. Title: キング・オブ・ザ・モンスターズ -->
-		<description>King of the Monsters (Jpn)</description>
-		<year>1992</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="king of the monsters (japan).sfc" size="1048576" crc="825b9607" sha1="38fa840c1129293232e2857fd82cab09956fc03c" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kotmu" cloneof="kotm">
 		<!-- Serial:  - Release Date: 1992-10 -->
 		<description>King of the Monsters (USA)</description>
@@ -29105,18 +29877,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="king of the monsters 2 (usa).sfc" size="2097152" crc="0b677a37" sha1="27494e5feb4fd0a6bb407a58b68f8b98fa07810b" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kotm2j" cloneof="kotm2">
-		<!-- Serial: SHVC-KT - Release Date: 1993-12-22 - Alt. Title: キング・オブ・ザ・モンスターズ2 -->
-		<description>King of the Monsters 2 - The Next Thing (Jpn)</description>
-		<year>1993</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="king of the monsters 2 - the next thing (japan).sfc" size="2097152" crc="b41aeccc" sha1="d861c76d138ab1f6aa37fd28909effca152a5e2c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -29953,20 +30713,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
 				<rom name="lennus - kodai kikai no kioku (japan).sfc" size="1572864" crc="b9d3911e" sha1="f06d078e1b7289f990fe9701eb34092577a38cfd" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lennus2">
-		<!-- Serial: SHVC-ALNJ - Release Date: 1996-07-26 - Alt. Title: レナスII -->
-		<description>Lennus II - Fuuin no Shito (Jpn)</description>
-		<year>1996</year>
-		<publisher>Asmik</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="lennus ii - fuuin no shito (japan).sfc" size="4194304" crc="c68be22a" sha1="3cdec34bf2652b278ed482d3f425efff2aa64e7e" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -31314,18 +32060,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="megaloj" cloneof="megalo">
-		<!-- Serial: SHVC-MZ - Release Date: 1993-07-23 - Alt. Title: メガロマニア ～時空大戦略～ -->
-		<description>Mega lo Mania - Jikuu Daisenryaku (Jpn)</description>
-		<year>1993</year>
-		<publisher>Imagineer</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mega lo mania - jikuu daisenryaku (japan).sfc" size="1048576" crc="f23bc69e" sha1="dc3474067ccadf7ff9b980b414d2d45b538aee9a" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="megaman7">
 		<description>Mega Man 7 (Euro)</description>
 		<year>1995</year>
@@ -31881,18 +32615,6 @@ Alternate board (XL-1)
 				<rom name="milandra (japan).sfc" size="3145728" crc="67b5fb22" sha1="3e383e4d0b1f998900bf9829bc518ba6abfe5297" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="militia" cloneof="metalmar">
-		<!-- Serial: SHVC-NG - Release Date: 1994-11-18 - Alt. Title: ミリティア -->
-		<description>Militia (Jpn)</description>
-		<year>1994</year>
-		<publisher>Namco</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="militia (japan).sfc" size="1572864" crc="96717f64" sha1="5e8579a473865a8047a84e92035276cd709f638f" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -33856,20 +34578,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="oozumous">
-		<!-- Serial: SHVC-OZ - Release Date: 1992-12-11 - Alt. Title: 大相撲魂 -->
-		<description>Oozumou Spirits (Jpn)</description>
-		<year>1992</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="oozumou spirits (japan).sfc" size="1048576" crc="f78b76e9" sha1="a38d39d6f1e71878c53523fb9d1177210c453be1" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="opeurope">
 		<!-- Serial:  - Release Date: 1994-06 -->
 		<description>Operation Europe - Path to Victory 1939-45 (USA)</description>
@@ -35736,18 +36444,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="powermonj" cloneof="powermon">
-		<!-- Serial: SHVC-PM - Release Date: 1993-03-26 - Alt. Titles: パワーモンガー～魔将の謀略～ -->
-		<description>PowerMonger - Mashou no Bouryaku (Jpn)</description>
-		<year>1993</year>
-		<publisher>Imagineer</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="powermonger - mashou no bouryaku (japan).sfc" size="1048576" crc="3e14376b" sha1="79ab6cb1a0cc37ba2bd1f5cf080b2e0489c8a05d" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="prehiman">
 		<!-- Serial:  - Release Date:  -->
 		<description>Prehistorik Man (Euro)</description>
@@ -36611,18 +37307,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="resarcan">
-		<!-- Serial: SHVC-ARAJ - Release Date: 1995-04-14 - Alt. Title: レース アルカーナディアーナ・レイ 占 いの迷宮 -->
-		<description>Res Arcana - Diana Ray - Uranai no Meikyuu (Jpn)</description>
-		<year>1995</year>
-		<publisher>Coconuts Japan Entertainment</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="res arcana - diana ray - uranai no meikyuu (japan).sfc" size="1048576" crc="e7637817" sha1="8f36123939cac334ffa3b6ef4b4b98239549ee38" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="returndd" cloneof="sddragon">
 		<!-- Serial: SHVC-WD - Release Date: 1992-10-16 - Alt. Title: リターン・オブ・双截龍 -->
 		<description>Return of Double Dragon (Jpn)</description>
@@ -37373,18 +38057,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="samspir" cloneof="samsho">
-		<!-- Serial: SHVC-A7SJ - Release Date: 1994-09-22 - Alt. Title: サムライスピリッツ -->
-		<description>Samurai Spirits (Jpn)</description>
-		<year>1994</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="samurai spirits (japan).sfc" size="4194304" crc="7d3d39f9" sha1="8e9cf18cca9cd641fcfad36608d3e0d89ba32d0a" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sangoku">
 		<!-- Serial: SHVC-A3AJ - Release Date: 1995-12-28 - Alt. Title: 三國志 英傑伝 -->
 		<description>Sangokushi Eiketsuden (Jpn)</description>
@@ -37486,20 +38158,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="sanrio world smash ball! (japan).sfc" size="262144" crc="0e318416" sha1="f182eb75f21e46e516cbb6e6bef0324724bc0f04" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sanspo">
-		<!-- Serial: SHVC-IO - Release Date: 1994-12-22 - Alt. Title: サンスポ フィッシング 渓流王 -->
-		<description>Sanspo Fishing - Keiryuu Ou (Jpn)</description>
-		<year>1994</year>
-		<publisher>Imagineer</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1310720">
-				<rom name="sanspo fishing - keiryuu ou (japan).sfc" size="1310720" crc="c7eeb640" sha1="9eca7c9007a0b4b1e3078a84f111cb5226e61b99" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -38584,18 +39242,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="yuuenchi">
-		<!-- Serial: SHVC-AS - Release Date: 1992-12-22 - Alt. Title: 少年アシベ ゴマちゃんのゆうえんち大冒険 -->
-		<description>Shounen Ashibe - Goma-chan no Yuuenchi Daibouken (Jpn)</description>
-		<year>1992</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="shounen ashibe - goma-chan no yuuenchi daibouken (japan).sfc" size="524288" crc="d01ab6a8" sha1="078c359681a39c0e2b8261f053ea9e85f68d5202" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ninjasas">
 		<!-- Serial: SHVC-EO - Release Date: 1994-10-28 - Alt. Title: 少年忍者サスケ -->
 		<description>Shounen Ninja Sasuke (Jpn)</description>
@@ -39312,18 +39958,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="spacebaz" cloneof="batlclsh">
-		<!-- Serial: SHVC-BT - Release Date: 1993-06-21 - Alt. Title: スペースバズーカ  -->
-		<description>Space Bazooka (Jpn)</description>
-		<year>1993</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="space bazooka (japan).sfc" size="1048576" crc="f2dd3be4" sha1="422df5740fed48974bca584c3cced0b65c6efffe" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="spacefoo">
 		<!-- Serial:  - Release Date: 1992-06 -->
 		<description>Space Football - One on One (USA)</description>
@@ -39716,20 +40350,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
 				<rom name="sprinter monogatari - mezase!! ikkakusenkin (japan).sfc" size="1572864" crc="411f4d0a" sha1="84d3155fe541939e99b5052b684379c2a17ffdaa" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="standrew">
-		<!-- Serial: SHVC-ASAJ - Release Date: 1995-09-15 - Alt. Title: セント・アンドリュース~栄光と歴史のオールトコース~ -->
-		<description>St. Andrews - Eikou to Rekishi no Old Course (Jpn)</description>
-		<year>1995</year>
-		<publisher>Epoch</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="st. andrews - eikou to rekishi no old course (japan).sfc" size="1572864" crc="ceaaadc2" sha1="c4ea6f2599c3ac6ce499403c30bc5f81e2f92224" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -40231,21 +40851,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="super3db" cloneof="baselod2">
-		<!-- Serial: SHVC-3D - Release Date: 1993-10-01 - Alt. Title: スーパー3Dベースボール -->
-		<description>Super 3D Baseball (Jpn)</description>
-		<year>1993</year>
-		<publisher>Jaleco</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="DSP1" />
-			<dataarea name="rom" size="1572864">
-				<rom name="super 3d baseball (japan).sfc" size="1572864" crc="304123c2" sha1="124ee1ee5bae9268095037abd7d51045de6ac55e" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="super4wd" cloneof="suprbaja">
 		<!-- Serial: SHVC-R8 - Release Date: 1994-06-17 - Alt. Title: スーパー4WD ザ・バハ-->
 		<description>Super 4WD - The Baja (Jpn)</description>
@@ -40316,32 +40921,6 @@ Alternate board (XL-1)
 				<rom name="super adventure island ii (usa).sfc" size="1572864" crc="52fe16fd" sha1="06776efd3cc3997513f90fbe2507939a1c61bb87" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="airdiverj" cloneof="airdiver">
-		<!-- Serial: SHVC-AZ - Release Date: 1993-07-16 - Alt. Title: スーパーエアダイバー -->
-		<description>Super Air Diver (Jpn)</description>
-		<year>1993</year>
-		<publisher>Asmik</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="DSP1" />
-			<dataarea name="rom" size="524288">
-				<rom name="super air diver (japan).sfc" size="524288" crc="971e74ba" sha1="ffb81b82ea027673cbfc26f6ebd9f05c2d60d6c8" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="airdivr2">
-		<!-- Serial: SHVC-AADJ - Release Date: 1995-03-03 - Alt. Title: スーパーエアダイバー2 -->
-		<description>Super Air Diver 2 (Jpn)</description>
-		<year>1995</year>
-		<publisher>Asmik</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="DSP1" />
-			<dataarea name="rom" size="1310720">
-				<rom name="super air diver 2 (japan).sfc" size="1310720" crc="a6ad6b0f" sha1="acaec55441b7d894d33540d905e47e5fb0dacbcc" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40811,20 +41390,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sbomblis">
-		<!-- Serial: SHVC-ABOJ - Release Date: 1995-03-17 - Alt. Title: スーパーボンブリス -->
-		<description>Super Bombliss (Jpn)</description>
-		<year>1995</year>
-		<publisher>Bullet-Proof Software</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="super bombliss (japan).sfc" size="524288" crc="84f95868" sha1="44bc21575b3d072a1e52f5e912c58c0ea2eab9f1" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sbonk" cloneof="superbc">
 		<!-- Serial:  - Release Date: 1994-11 -->
 		<description>Super Bonk (USA)</description>
@@ -41073,20 +41638,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="super copa (brazil) (es,pt).sfc" size="1048576" crc="49e53877" sha1="92a3ce60b79d4409ae51048cf3ce0e84828e178d" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="supercup" cloneof="sgoal">
-		<!-- Serial: SHVC-SU - Release Date: 1992-04-24 - Alt. Title: スーパーカップサッカー -->
-		<description>Super Cup Soccer (Jpn)</description>
-		<year>1992</year>
-		<publisher>Jaleco</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="super cup soccer (japan).sfc" size="1048576" crc="14a03974" sha1="f6feea0f042834c86ec11a350ab06daaac69cb81" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -41815,20 +42366,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sjinsei3">
-		<!-- Serial: SHVC-A3XJ - Release Date: 1996-11-29 - Alt. Title: スーパー人生ゲーム3 -->
-		<description>Super Jinsei Game 3 (Jpn)</description>
-		<year>1996</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="super jinsei game 3 (japan).sfc" size="2097152" crc="688382b6" sha1="861aaed1a8179d65c6bec306098b7502219a203d" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="skeiba2">
 		<!-- Serial: SHVC-AKBJ - Release Date: 1995-05-19 - Alt. Title: スーパー競馬2 -->
 		<description>Super Keiba 2 (Jpn)</description>
@@ -41947,18 +42484,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="super linearball (japan).sfc" size="524288" crc="689ac35c" sha1="73cd9170c5935e3367da84956ca59aa4f851c671" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sloopz">
-		<!-- Serial: SHVC-2E - Release Date: 1994-03-04 - Alt. Title: スーパーループス -->
-		<description>Super Loopz (Jpn)</description>
-		<year>1994</year>
-		<publisher>Imagineer</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="super loopz (japan).sfc" size="524288" crc="49601821" sha1="26ea349aefa5926dc94b493284ece8052a86b7a8" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -42367,20 +42892,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="superoku">
-		<!-- Serial: SHVC-ABGJ - Release Date: 1995-11-24 - Alt. Title: スーパー 億万長者ゲーム -->
-		<description>Super Okumanchouja Game (Jpn)</description>
-		<year>1995</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="super okumanchouja game (japan).sfc" size="1048576" crc="4998a9d6" sha1="a29958db07c3bf3f9731da75844a0835f21b34e7" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="suppslot">
 		<!-- Serial: SHVC-QU - Release Date: 1994-04-29 - Alt. Title: スーパーパチスロマージャ ン -->
 		<description>Super Pachi-Slot Mahjong (Jpn)</description>
@@ -42488,18 +42999,6 @@ Alternate board (XL-1)
 				<rom name="super power league 2 (japan) (rev 1).sfc" size="2097152" crc="9e6a60e9" sha1="57f594c3745c6de11ac6cdfe45317249fb4aad12" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spbaseb" cloneof="baselod">
-		<!-- Serial: SHVC-SP - Release Date: 1991-05-17 - Alt. Title: スーパープロフェッショナルベースボール -->
-		<description>Super Professional Baseball (Jpn)</description>
-		<year>1991</year>
-		<publisher>Jaleco</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="super professional baseball (japan).sfc" size="1048576" crc="ea0bfa66" sha1="bfd3bc23d9bf143ceaf859e830067fd49ea17b0a" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -43075,62 +43574,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="stetris2g" cloneof="stetris2">
-		<!-- Serial: SHVC-5T - Release Date: 1994-01-21 - Alt. Title: スーパーテトリス2+ボンブリス 限定版 -->
-		<description>Super Tetris 2 + Bombliss Genteiban (Jpn)</description>
-		<year>1994</year>
-		<publisher>Bullet-Proof Software</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="super tetris 2 + bombliss (japan) (genteiban).sfc" size="1048576" crc="c709b922" sha1="26f1be182eeb3d86b276269cc8fec8f1bc6dbf83" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="stetris2">
-		<!-- Serial: SHVC-T2 - Release Date: 1992-12-18 - Alt. Title: スーパーテトリス2＋ボンブリス -->
-		<description>Super Tetris 2 + Bombliss (Jpn, Rev. A)</description>
-		<year>1992</year>
-		<publisher>Bullet-Proof Software</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="super tetris 2 + bombliss (japan) (rev 1).sfc" size="1048576" crc="4ae93c10" sha1="5fa25d027940907b769578d7bf85a9d5ba94911a" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="stetris2a" cloneof="stetris2">
-		<!-- Serial: SHVC-T2 - Release Date: 1992-12-18 - Alt. Title: スーパーテトリス2＋ボンブリス -->
-		<description>Super Tetris 2 + Bombliss (Jpn)</description>
-		<year>1992</year>
-		<publisher>Bullet-Proof Software</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="super tetris 2 + bombliss (japan).sfc" size="1048576" crc="8ae5e443" sha1="3ac3c616dfe4d36496303b38275d15d7aceb8572" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="stetris3">
-		<!-- Serial: SHVC-AT3J - Release Date: 1994-12-16 - Alt. Title: スーパーテトリス3 -->
-		<description>Super Tetris 3 (Jpn)</description>
-		<year>1994</year>
-		<publisher>Bullet-Proof Software</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="super tetris 3 (japan).sfc" size="1048576" crc="329024c7" sha1="2f808a4f0db77a54895f5d2b68517331cd8e8855" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="strollup" cloneof="stroll">
 		<description>Super Troll Islands (USA, Prototype)</description>
 		<year>1994</year>
@@ -43481,7 +43924,7 @@ Alternate board (XL-1)
 		<year>1993</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="DSP1" />
+			<feature name="enhancement" value="DSP1 A" />
 			<feature name="pcb" value="SHVC-1K1B-01" />
 			<feature name="u1" value="U1 MASKROM(N)" />
 			<feature name="u2" value="U2 16K SRAM" />
@@ -43793,20 +44236,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="taikyogo">
-		<!-- Serial: SHVC-IA - Release Date: 1993-05-14 - Alt. Title: 対局囲碁ゴライアス -->
-		<description>Taikyoku Igo - Goliath (Jpn)</description>
-		<year>1993</year>
-		<publisher>Bullet-Proof Software</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="taikyoku igo - goliath (japan).sfc" size="1048576" crc="01afec9c" sha1="8f3641977e2cbc93f851e5931fc3e3c440da109e" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="taikyoid" supported="no">
 		<!-- Serial: SHVC-AIIJ - Release Date: 1995-12-29 - Alt. Title: 対局囲碁 韋駄天 -->
 		<description>Taikyoku Igo - Idaten (Jpn)</description>
@@ -43857,34 +44286,6 @@ Alternate board (XL-1)
 				<rom name="take yutaka gi memory (japan).sfc" size="3145728" crc="21a9925d" sha1="b4aa96a3b8d32e2d453a7a6f58c9da9310d7c823" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="takedasc" cloneof="sgoal2">
-		<!-- Serial: SHVC-JV - Release Date: 1993-11-26 - Alt. Title: 武田修宏のスーパーカップサッカー -->
-		<description>Takeda Nobuhiro no Super Cup Soccer (Jpn)</description>
-		<year>1993</year>
-		<publisher>Jaleco</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="takeda nobuhiro no super cup soccer (japan).sfc" size="524288" crc="1bb2a0a4" sha1="c598ca9e5c27b9ccee2d04a6bad3379bdfe47043" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="takedasl">
-		<!-- Serial: SHVC-ATKJ - Release Date: 1994-11-25 - Alt. Title: 武田修宏のスーパーリーグサッカー -->
-		<description>Takeda Nobuhiro no Super League Soccer (Jpn)</description>
-		<year>1994</year>
-		<publisher>Jaleco</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="takeda nobuhiro no super league soccer (japan).sfc" size="1048576" crc="383face4" sha1="d0d5ede3df819b25b17223f740563468c3a842b5" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -45172,21 +45573,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="tottemo! lucky man - lucky cookie roulette de totsugeki!! (japan).sfc" size="1048576" crc="8488759e" sha1="15f3a610fd47707639e96ffad06abd35457d9a32" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tougeden">
-		<!-- Serial: SHVC-ACQJ - Release Date: 1996-03-15 - Alt. Title: 峠・伝説 最速バトル -->
-		<description>Touge Densetsu - Saisoku Battle (Jpn)</description>
-		<year>1996</year>
-		<publisher>Bullet-Proof Software</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="DSP1" />
-			<dataarea name="rom" size="3145728">
-				<rom name="touge densetsu - saisoku battle (japan).sfc" size="3145728" crc="03fd7ad4" sha1="d72c79911eb1ed54a22010ed29a37748bc3334cd" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
