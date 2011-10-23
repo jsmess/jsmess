@@ -1819,7 +1819,7 @@ ROM_END
 
 ROM_START(finalchs)
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("finalchs.bin", 0x8000, 0x8000, CRC(88d55c0f) SHA1(e86d088ec3ac68deaf90f6b3b97e3e31b1515913))
+	ROM_LOAD("finalchs.bin", 0x8000, 0x8000, CRC(c8e72dff) SHA1(f422b19a806cef4fadd580caefaaf8c32b644098))
 ROM_END
 
 ROM_START(megaiv)
