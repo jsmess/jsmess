@@ -1720,15 +1720,6 @@ static MACHINE_CONFIG_START( gen32, driver_device )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gen32_oc, gen32 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_33_333MHz * 2 )
-	MCFG_DEVICE_REMOVE("int_timer")
-	MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq6, attotime::from_hz(500))
-
-
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_START( bpl32, driver_device )
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_24_576MHz)
 	MCFG_CPU_PROGRAM_MAP(bpl32_mem)
@@ -1855,15 +1846,6 @@ ROM_START(sexpertc)
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 ROM_END
 
-ROM_START(sexper36)
-	ROM_REGION(0x18000,"maincpu",0)
-	ROM_LOAD("se_lo_v36.bin", 0x0000, 0x8000, CRC(5a29105e) SHA1(be37bb29b530dbba847a5e8d27d81b36525e47f7))
-	ROM_LOAD("se_hi1_v36.bin", 0x8000, 0x8000, CRC(0085c2c4) SHA1(d84bf4afb022575db09dd9dc12e9b330acce35fa))
-	ROM_LOAD("se_hi0_v36.bin", 0x10000, 0x8000, CRC(2d085064) SHA1(76162322aa7d23a5c07e8356d0bbbb33816419af))
-	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
-	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
-ROM_END
-
 ROM_START( lyon16 )
     ROM_REGION16_BE( 0x20000, "maincpu", 0 )
     ROM_LOAD16_BYTE("lyon16ev.bin", 0x00000, 0x10000,CRC(497BD41A) SHA1(3FFEFEEAC694F49997C10D248EC6A7AA932898A4))
@@ -1949,15 +1931,6 @@ ROM_START( gen32_41 )
 
 ROM_END
 
-ROM_START( gen32_oc )
-    ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-    ROM_LOAD("gen32_41.bin", 0x00000, 0x40000,CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c))
-
-    ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
-	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
-
-ROM_END
-
 ROM_START( berlinp )
     ROM_REGION32_BE( 0x40000, "maincpu", 0 )
     ROM_LOAD("berlinp.bin", 0x00000, 0x40000,CRC(82FBAF6E) SHA1(729B7CEF3DFAECC4594A6178FC4BA6015AFA6202))
@@ -2015,7 +1988,6 @@ static DRIVER_INIT( polgar )
 //CONS(  1989, montec4,   0,      0,      monteciv,   monteciv,   0,   "Hegener & Glaser", "Mephisto Monte Carlo IV",GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
   CONS(  1989, sfortec,     sfortea,      0,      sfortea,     sfortea,   0,   "Novag", "Novag Super Forte C Chess Computer",GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
   CONS(  1989, sexpertc,     sfortea,      0,      sfortea,    sfortea,   0,   "Novag", "Novag Super Expert C Chess Computer",GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
-  CONS(  1989, sexper36,     sfortea,      0,      sfortea,    sfortea,   0,   "Novag", "Novag Super Expert C Chess Computer V3.6",GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
   CONS(  1990, lyon16,van16,  0,    alm16,    van16,   0,   "Hegener & Glaser Muenchen",  "Mephisto Lyon 68000",GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
   CONS(  1990, lyon32, van16,  0,    alm32,     van32,   0,   "Hegener & Glaser Muenchen",  "Mephisto Lyon 68020",GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
   CONS(  1990, monteciv,   0,    0,      monteciv,   monteciv,   0,   "Hegener & Glaser", "Mephisto Monte Carlo IV LE Schachcomputer",GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
@@ -2025,7 +1997,6 @@ static DRIVER_INIT( polgar )
   CONS(  1992, risc,0,  0,    risc,    van16,   0,   "Saitek",  "RISC2500",GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING )
   CONS(  1993, gen32,    van16,  0,  gen32,     gen32,   0,   "Hegener & Glaser Muenchen",  "Mephisto Genius030 V4.00",GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
   CONS(  1993, gen32_41, van16,  0,   gen32,     gen32,   0,   "Hegener & Glaser Muenchen",  "Mephisto Genius030 V4.01",GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-  CONS(  1993, gen32_oc, van16,  0,  gen32_oc,     gen32,   0,   "Hegener & Glaser Muenchen",  "Mephisto Genius030 V4.01OC",GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_UNOFFICIAL )
   CONS(  1994, berlinp, van16, 0,    bpl32,     bpl32,   0,   "Hegener & Glaser Muenchen",  "Mephisto Berlin Pro 68020",GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
   CONS(  1996, bpl32, van16, 0,    bpl32,     bpl32,   0,   "Hegener & Glaser Muenchen",  "Mephisto Berlin Pro London Upgrade V5.00",GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
   CONS(  1996, lond020, van16,  0,    van32,   van32,   0,   "Hegener & Glaser Muenchen",  "Mephisto London 68020 32 Bit",GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
