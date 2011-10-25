@@ -230,6 +230,14 @@ static int detect_geometry( smartmedia_t *sm, UINT8 id1, UINT8 id2)
 			}
 		}
 		break;
+		case 0x98 :
+		{
+			switch (id2)
+			{
+				case 0x75 : sm->page_data_size = 0x0200; sm->num_pages = 0x10000; sm->page_total_size = 0x0210; sm->log2_pages_per_block = 0; result = 1; break;
+			}
+		}
+		break;
 	}
 
 	return result;
@@ -248,7 +256,7 @@ static DEVICE_IMAGE_LOAD( smartmedia_format_2 )
 		return IMAGE_INIT_FAIL;
 	}
 
-	if (custom_header.data1[0] != 0xEC)
+	if ((custom_header.data1[0] != 0xEC) && (custom_header.data1[0] != 0x98))
 	{
 		return IMAGE_INIT_FAIL;
 	}
