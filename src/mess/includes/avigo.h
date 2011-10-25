@@ -13,12 +13,12 @@
 #include "machine/intelfsh.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
-#include "rendlay.h"
 
 #define AVIGO_NUM_COLOURS 2
 
 #define AVIGO_SCREEN_WIDTH        160
 #define AVIGO_SCREEN_HEIGHT       240
+#define AVIGO_PANEL_HEIGHT        26
 
 
 class avigo_state : public driver_device
