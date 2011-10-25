@@ -1136,6 +1136,8 @@ $(MESSOBJ)/magnavox.a:			\
 $(MESSOBJ)/mattel.a:			\
 	$(MESS_DRIVERS)/aquarius.o	\
 	$(MESS_VIDEO)/aquarius.o	\
+	$(MESS_DRIVERS)/juicebox.o	\
+	$(MESS_MACHINE)/s3c44b0.o	\
 
 $(MESSOBJ)/matsushi.a:			\
 	$(MESS_DRIVERS)/jr100.o		\
