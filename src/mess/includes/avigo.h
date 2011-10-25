@@ -13,6 +13,7 @@
 #include "machine/intelfsh.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
+#include "imagedev/snapquik.h"
 
 #define AVIGO_NUM_COLOURS 2
 
