@@ -1,4 +1,59 @@
-﻿0.143u7
+﻿0.143u8
+
+New System Drivers Supported:
+-----------------------------
+- Babbage-2nd [Robbbert]
+- Tomy Pyuuta Jr. [Anonymous source, Robbbert]
+- CVICNY (Practice-z80) [Robbbert]
+- Novag Super Forte A/B/C Chess Computer [Cowering]
+- Novag Expert B Chess Computer [Cowering]
+- Novag Super Expert C Chess Computer [Cowering]
+- Novag Diablo 68000 Chess Computer [Cowering]
+- Mephisto Almeria 68000/68020 [Cowering]
+- Mephisto Academy Schachcomputer [Cowering]
+- Mephisto Mega IV Schachcomputer [Cowering]
+- Mephisto Milano Schachcomputer [Cowering]
+- Mephisto Lyon 68000/68020 [Cowering]
+- Mephisto Monte Carlo IV LE Schachcomputer [Cowering]
+- Mephisto Vancouver 68000/68020 [Cowering]
+- Mephisto Genius030 [Cowering]
+- Mephisto Berlin Pro 68020 [Cowering]
+- Mephisto Berlin Pro London Upgrade V5.00 [Cowering]
+- Mephisto London 68020 32 Bit [Cowering]
+- Mephisto Genius030 London Upgrade V5.00 [Cowering]
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- CIDCO MailStation [Sandro Ronco]
+- Epson PC-486MU [Anonymous source]
+
+System Driver Changes:
+----------------------
+- avigo: Added NVRAM and warm start. [Sandro Ronco]
+- supracan: added INT3 [ElBarto]
+- hx20: New rom dumps provided [Pontus "Frigolit" Rodling,F.J. Kraan]
+- qx10: Added proper rom dumps [F.J. Kraan]
+- alice90: proper rom dump [Daniel Coulom]
+- geneve: Improved emulation of wait states; timing is now accurate (with only few exceptions) [Michael Zapf]
+
+Software Lists:
+----------------
+- snes.xml: Redumped and profiled arround 150 cartridges. [MESSfan]
+- snes.xml: Added a proper dump of SNES tester service [Lord Nightmare]
+- supracan.xml: Added 2 new dumps [CaH4e3]
+- nes.xml: added Micro Machine (Euro) dump, courtesy of ElBarto [Fabio Priuli]
+- nes.xml: added new chinese dumps from TSZoneFC, and info from PCG boards  [Fabio Priuli]
+- a2600.xml: Additional dumps added [Kaylee]
+
+Source Changes:
+----------------
+(none)
+
+0.143u7
 
 New System Drivers Supported:
 -----------------------------
