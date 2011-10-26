@@ -14,6 +14,17 @@
 
     http://www.computerhistory.it/index.php?option=com_content&task=view&id=85&Itemid=117
 
+    Pasting:
+        0-F : as is
+        ^ (inc) : ^
+        AD : -
+        DA : =
+        GO : X
+
+    Test Paste:
+        =11^22^33^44^55^66^77^88^99^-0000
+        Now press up-arrow to confirm the data has been entered.
+
 ****************************************************************************/
 
 #define ADDRESS_MAP_MODERN
@@ -78,10 +89,10 @@ static INPUT_PORTS_START( amico2k )
 
 	PORT_START("Q2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PC") PORT_CODE(KEYCODE_P)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RUN") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DA") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("AD") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RUN") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DA") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("AD") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -190,8 +201,8 @@ static I8255_INTERFACE( ppi_intf )
 	DEVCB_DRIVER_MEMBER(amico2k_state, ppi_pa_w),	// Port A write
 	DEVCB_DRIVER_MEMBER(amico2k_state, ppi_pb_r),	// Port B read
 	DEVCB_DRIVER_MEMBER(amico2k_state, ppi_pb_w),	// Port B write
-	DEVCB_NULL,							// Port C read
-	DEVCB_NULL							// Port C write
+	DEVCB_NULL,					// Port C read
+	DEVCB_NULL					// Port C write
 };
 
 void amico2k_state::machine_start()
@@ -230,5 +241,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT MACHINE INPUT   INIT   COMPANY  FULLNAME                 FLAGS */
-COMP( 1978, amico2k,    0,    0,     amico2k,    amico2k,    0,     "A.S.EL.",   "Amico 2000",            GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME      PARENT  COMPAT MACHINE     INPUT       INIT     COMPANY   FULLNAME         FLAGS */
+COMP( 1978, amico2k,  0,      0,     amico2k,    amico2k,    0,     "A.S.E.L.", "Amico 2000", GAME_NO_SOUND_HW)
