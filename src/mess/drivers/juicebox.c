@@ -311,6 +311,9 @@ static MACHINE_CONFIG_START( juicebox, juicebox_state )
 	MCFG_S3C44B0_ADD("s3c44b0", 10000000, juicebox_s3c44b0_intf)
 	
 	MCFG_SMARTMEDIA_ADD("smartmedia")
+	MCFG_SMARTMEDIA_INTERFACE("smartmedia")
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","juicebox")	
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( juicebox )

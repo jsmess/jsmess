@@ -118,6 +118,9 @@ struct _smartmedia_t
 	int mode_3065;
 };
 
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
 INLINE smartmedia_t *get_safe_token(device_t *device)
 {
@@ -125,6 +128,13 @@ INLINE smartmedia_t *get_safe_token(device_t *device)
 	assert(device->type() == SMARTMEDIA);
 
 	return (smartmedia_t *)downcast<legacy_device_base *>(device)->token();
+}
+
+INLINE const smartmedia_cartslot_config *get_config(const device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == SMARTMEDIA);
+	return (const smartmedia_cartslot_config *) downcast<const legacy_device_base *>(device)->inline_config();
 }
 
 
@@ -630,12 +640,20 @@ static DEVICE_RESET(smartmedia)
 	sm->accumulated_status = 0;
 }
 
+/*-------------------------------------------------
+    DEVICE_IMAGE_SOFTLIST_LOAD(smartmedia)
+-------------------------------------------------*/
+static DEVICE_IMAGE_SOFTLIST_LOAD(smartmedia)
+{
+	return image.load_software(swlist, swname, start_entry);
+}
+
 DEVICE_GET_INFO( smartmedia )
 {
 	switch ( state )
 	{
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(smartmedia_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = sizeof(smartmedia_cartslot_config); break;
 		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_MEMCARD;                                      break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                               break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                               break;
@@ -648,6 +666,13 @@ DEVICE_GET_INFO( smartmedia )
 		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "SmartMedia Flash ROM");	                         break;
 		case DEVINFO_STR_SOURCE_FILE:		        strcpy(info->s, __FILE__);                                        break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "smc");                                           break;
+		case DEVINFO_FCT_IMAGE_SOFTLIST_LOAD:		info->f = (genf *) DEVICE_IMAGE_SOFTLIST_LOAD_NAME(smartmedia);	break;		
+		case DEVINFO_STR_IMAGE_INTERFACE:
+			if ( device && downcast<const legacy_image_device_base *>(device)->inline_config() && get_config(device)->interface )
+			{
+				strcpy(info->s, get_config(device)->interface );
+			}
+			break;		
 	}
 }
 
