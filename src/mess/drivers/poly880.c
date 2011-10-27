@@ -6,6 +6,22 @@
 
     http://www.kc85-museum.de/books/poly880/index.html
 
+After starting this driver, the screen may be blank. Press F2 until
+something appears (most likely 'Go'). Then it can be used, or pasted to.
+
+To see it say POLY-880, start the system, press F2, F1, F2.
+
+Pasting:
+        0-F : as is
+        EXEC : ^
+        BACK : V
+        MEM : -
+        GO : X
+
+Test Paste:
+        -4000^11^22^33^44^55^66^77^88^99^-4000
+        Now press up-arrow to confirm the data has been entered.
+
 ****************************************************************************/
 
 #include "includes/poly880.h"
@@ -75,14 +91,14 @@ static INPUT_CHANGED( trigger_nmi )
 
 static INPUT_PORTS_START( poly880 )
 	PORT_START("KI1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("EXEC") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BACK") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REG") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("EXEC") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BACK") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DOWN) PORT_CHAR('V')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REG") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FCT") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("STEP") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MEM") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MEM") PORT_CODE(KEYCODE_M) PORT_CHAR('-')
 
 	PORT_START("KI2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
@@ -263,9 +279,9 @@ static const cassette_interface poly880_cassette_interface =
 
 static MACHINE_CONFIG_START( poly880, poly880_state )
 	/* basic machine hardware */
-    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_3728MHz/8)
-    MCFG_CPU_PROGRAM_MAP(poly880_mem)
-    MCFG_CPU_IO_MAP(poly880_io)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_3728MHz/8)
+	MCFG_CPU_PROGRAM_MAP(poly880_mem)
+	MCFG_CPU_IO_MAP(poly880_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_poly880 )
@@ -293,4 +309,4 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME                FLAGS */
-COMP( 1983, poly880,	0,		0,		poly880,	poly880,	0,		"VEB Polytechnik",	"Poly-Computer 880",	GAME_SUPPORTS_SAVE | GAME_NO_SOUND)
+COMP( 1983, poly880,    0,      0,      poly880,    poly880,    0,   "VEB Polytechnik", "Poly-Computer 880", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW)
