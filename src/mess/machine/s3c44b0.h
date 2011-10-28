@@ -127,7 +127,7 @@ void s3c44b0_request_eint( device_t *device, UINT32 number);
 #define S3C44B0_F_ISPR    (0x38 / 4)
 #define S3C44B0_F_ISPC    (0x3C / 4)
 
-/* ZDMA */
+/* ZDMA & BDMA */
 
 #define S3C44B0_BASE_ZDMA_0 0x01E80000
 #define S3C44B0_BASE_ZDMA_1 0x01E80020
