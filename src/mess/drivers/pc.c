@@ -74,7 +74,6 @@ video HW too.
 #include "video/pc_cga.h"
 #include "video/pc_aga.h"
 #include "video/pc_t1t.h"
-#include "video/pc_ega.h"
 
 #include "machine/pc_fdc.h"
 #include "machine/pc_joy.h"

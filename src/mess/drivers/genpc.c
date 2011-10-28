@@ -16,7 +16,7 @@
 
 #include "video/ibm_vga.h"
 #include "video/pc_cga.h"
-#include "video/pc_ega.h"
+#include "video/isa_ega.h"
 #include "video/isa_mda.h"
 
 #include "machine/ram.h"

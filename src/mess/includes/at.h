@@ -24,7 +24,7 @@
 #include "machine/pit8253.h"
 #include "video/pc_vga.h"
 #include "video/pc_cga.h"
-#include "video/pc_ega.h"
+#include "video/isa_ega.h"
 
 #include "machine/idectrl.h"
 #include "machine/at_keybc.h"
