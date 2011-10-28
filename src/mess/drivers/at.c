@@ -360,6 +360,7 @@ static const isa16bus_interface isabus_intf =
 static SLOT_INTERFACE_START(pc_isa16_cards)
 	// ISA 8 bit
 	SLOT_INTERFACE("mda", ISA8_MDA)
+	SLOT_INTERFACE("ega", ISA8_EGA)
 	SLOT_INTERFACE("com", ISA8_COM)
 	SLOT_INTERFACE("comat", ISA8_COM_AT)
 	SLOT_INTERFACE("fdc", ISA8_FDC)
@@ -409,11 +410,10 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 
 	MCFG_FRAGMENT_ADD( at_motherboard )
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
-	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "fdc", NULL)
-	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
-	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "comat", NULL)
-
-	MCFG_FRAGMENT_ADD( pcvideo_ega )
+	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "ega", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "fdc", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "ide", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, "comat", NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5170")
@@ -671,10 +671,6 @@ ROM_START( ibm5170 )
 //  ROMX_LOAD("atdiage.bin", 0xf8000, 0x4000, CRC(e8855d0c) SHA1(c9d53e61c08da0a64f43d691bf6cadae5393843a), ROM_SKIP(1) | ROM_BIOS(3))
 //  ROMX_LOAD("atdiago.bin", 0xf8001, 0x4000, CRC(606fa71d) SHA1(165e45bae7ae2da274f1e645c763c5bfcbde027b), ROM_SKIP(1) | ROM_BIOS(3))
 
-	/* This region holds the original EGA Video bios */
-	ROM_REGION(0x4000, "user1", 0)
-	ROM_LOAD("6277356.u44", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b))
-
 	/* Mainboard PALS */
 	ROM_REGION( 0x2000, "pals", 0 )
 	ROM_LOAD("1501824_717750.mmipal14l4.u87.jed", 0x0000, 0x02E7, CRC(3C819A27) SHA1(D2F4889E628DBBEF50B7F48CB1D1A313232BACC8)) /* MMI 1501824 717750 // (C)1983 IBM(M) */
@@ -710,10 +706,6 @@ ROM_START( ibm5170a )
 	ROM_SYSTEM_BIOS( 1, "3270at", "IBM 3270 PC/AT 5281 11/15/85") /* pretty much just a part string and checksum change from the 5170 rev3 */
 	ROMX_LOAD("62x0820.u27", 0xf0000, 0x8000, CRC(e9cc3761) SHA1(ff9373c1a1f34a32fb6acdabc189c61b01acf9aa), ROM_SKIP(1) | ROM_BIOS(2)) /* T 62X0820-U27 8714HAK // TMM23256P-6746 // (C)IBM CORP 1981,-1985 */
 	ROMX_LOAD("62x0821.u47", 0xf0001, 0x8000, CRC(b5978ccb) SHA1(2a1aeb9ae3cd7e60fc4c383ca026208b82156810), ROM_SKIP(1) | ROM_BIOS(2)) /* T 62X0821-U47 8715HAK // TMM23256P-6747 // (C)IBM CORP 1981,-1985 */
-
-	/* This region holds the original EGA Video bios */
-	ROM_REGION(0x4000, "user1", 0)
-	ROM_LOAD("6277356.u44", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b))
 
 	/* Mainboard PALS */
 	ROM_REGION( 0x2000, "pals", 0 )
@@ -1262,8 +1254,8 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT       INIT    COMPANY     FULLNAME */
-COMP ( 1984, ibm5170,  0,       ibm5150, ibm5170,   atcga,      atega,  "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
-COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,      atega,  "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
+COMP ( 1984, ibm5170,  0,       ibm5150, ibm5170,   atcga,      atcga,  "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
+COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,      atcga,  "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
 COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,      atcga,  "International Business Machines",  "IBM PC/XT-286 5162", GAME_NOT_WORKING )
 COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,      atvga,  "International Business Machines",  "IBM PS/2 Model 30-286", GAME_NOT_WORKING )
 COMP ( 1989, i8555081, ibm5170, 0,       at386,     atvga,      atvga,  "International Business Machines",  "IBM PS/2 Model 55SX", GAME_NOT_WORKING )

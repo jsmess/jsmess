@@ -733,7 +733,8 @@ static void common_start(device_t *device, int device_type)
 		crtc_ega->hpixels_per_column = crtc_ega->intf->hpixels_per_column;
 
 		/* get the screen device */
-		crtc_ega->screen = downcast<screen_device *>(device->machine().device(crtc_ega->intf->screen_tag));
+		astring tempstring;
+		crtc_ega->screen = downcast<screen_device *>(device->machine().device(device->owner()->subtag(tempstring,crtc_ega->intf->screen_tag)));
 		assert(crtc_ega->screen != NULL);
 
 		/* create the timers */

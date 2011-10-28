@@ -157,7 +157,6 @@ extern const i8237_interface at_dma8237_2_config;
 
 
 DRIVER_INIT( atcga );
-DRIVER_INIT( atega );
 DRIVER_INIT( atvga );
 
 MACHINE_START( at );
