@@ -1,4 +1,32 @@
-﻿0.143u8
+﻿0.143u9
+
+New System Drivers Supported:
+-----------------------------
+- Juicebox [Tim Schuerewegen]
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+System Driver Changes:
+----------------------
+(none)
+
+Software Lists:
+----------------
+- ngpc.xml: added nine protos [Brian Hargrove]
+- juicebox.xml: Created softlist [Anna Wu]
+
+Source Changes:
+----------------
+- Made smartmed device capable of handling softlist items [Miodrag Milanovic]
+- Added 3com Etherlink II 3c503 card emulation [Carl]
+
+0.143u8
 
 New System Drivers Supported:
 -----------------------------
