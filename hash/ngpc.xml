@@ -446,6 +446,17 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		</part>
 	</software>
 
+	<software name="fatfuryd" cloneof="fatfury">
+		<description>Pocket Fighting Series - Garou Densetsu First Contact ~ Fatal Fury F-Contact (World, Demo)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="fatal fury f-contact (world) (en,ja) (demo).bin" size="2097152" crc="e7e5d6e8" sha1="d33da5587a27344221a4f925867047addaafa97c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Id: NeoP00970 - Developer: SNK - Releases: 2000-06-08 (JPN) - Alt Title: ガンバレねおぽけくん(仮) -->
 	<software name="ganbaren">
 	<!-- NGPC only -->
@@ -525,13 +536,25 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		</part>
 	</software>
 
-	<software name="kofr2p" cloneof="kofr2">
-		<description>Pocket Fighting Series - King of Fighters R-2 (World, Prototype)</description>
+	<software name="kofr2d" cloneof="kofr2">
+		<description>Pocket Fighting Series - King of Fighters R-2 (World, Demo)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="king of fighters r-2 (world) (en,ja) (beta).bin" size="2097152" crc="e3ae79c0" sha1="6d138c34f3dc3c7f1b943c1f57f885007edfb12a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kofr2d2" cloneof="kofr2">
+    <!-- This has a Version 2 on the cart label, but it probably refers to Demo Version 2, rather than KOFR2 Version 2, given the title screen is unchanged -->
+		<description>Pocket Fighting Series - King of Fighters R-2 (World, Demo Version 2)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="king of fighters r-2 version 2 (world) (en,ja) (demo).bin" size="2097152" crc="76544c97" sha1="6b4414ebc99c72cc6c79aa7a01c38378b9ccd058" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -603,13 +626,13 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		</part>
 	</software>
 
-	<software name="magdropjt" cloneof="magdrop">
-		<description>Magical Drop Pocket Taikenban (Jpn)</description>
+	<software name="magdropjd" cloneof="magdrop">
+		<description>Magical Drop Pocket (Demo)</description>
 		<year>1999</year>
 		<publisher>Data East</publisher>
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="magical drop pocket taikenban (japan).bin" size="1048576" crc="8d4bda47" sha1="6d01298497ec1776b8d27123eff866c1cf25b744" offset="000000" />
+				<rom name="magical drop pocket (japan) (demo).bin" size="1048576" crc="d76f1a47" sha1="8e8da9345c37800d6f78619b096b65ee88dfe30d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -689,6 +712,17 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="metal slug - 2nd mission (world) (en,ja).bin" size="4194304" crc="ac549144" sha1="9c1a829d4678dd9c51fdfe30c76b7f9670311bfb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslug2ndd" cloneof="mslug2nd">
+		<description>Metal Slug - 2nd Mission (Demo)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="metal slug - 2nd mission (world) (en,ja) (demo).bin" size="2097152" crc="8b1647d4" sha1="099a835930209a6ec15b7e9092c086b6e7a4ad9e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
