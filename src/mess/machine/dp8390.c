@@ -333,11 +333,11 @@ READ16_MEMBER(dp8390_device::dp8390_r) {
 					data = m_8019regs.intr;
 					break;
 				default:
-					logerror("rtl8019: invalid read page %01X reg %02X\n", m_regs.cr & 0xc0, offset & 0x0f);
+					logerror("rtl8019: invalid read page %01X reg %02X\n", (m_regs.cr & 0xc0) >> 6, offset & 0x0f);
 					return 0;
 			}
 		} else {
-			logerror("dp8390: invalid read page %01X reg %02X\n", m_regs.cr & 0xc0, offset & 0x0f);
+			logerror("dp8390: invalid read page %01X reg %02X\n", (m_regs.cr & 0xc0) >> 6, offset & 0x0f);
 			return 0;
 		}
 	}
@@ -468,11 +468,11 @@ WRITE16_MEMBER(dp8390_device::dp8390_w) {
 					break;
 				// XXX: rest of the regs
 				default:
-					logerror("rtl8019: invalid write page %01X reg %02X data %04X\n", m_regs.cr & 0xc0, offset & 0x0f, data);
+					logerror("rtl8019: invalid write page %01X reg %02X data %04X\n", (m_regs.cr & 0xc0) >> 6, offset & 0x0f, data);
 					return;
 			}
 		} else {
-			logerror("dp8390: invalid write page %01X reg %02X data %04X\n", m_regs.cr & 0xc0, offset & 0x0f, data);
+			logerror("dp8390: invalid write page %01X reg %02X data %04X\n", (m_regs.cr & 0xc0) >> 6, offset & 0x0f, data);
 			return;
 		}
 	}

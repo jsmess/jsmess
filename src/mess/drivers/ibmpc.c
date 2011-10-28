@@ -263,6 +263,8 @@ XT U44 IBM.bin: IBM 5160 PC/XT Bank-selection decoding ROM (256x4 bit). Not mapp
 #include "machine/isa_gblaster.h"
 #include "machine/isa_hdc.h"
 #include "machine/isa_sblaster.h"
+#include "machine/3c503.h"
+#include "machine/ne1000.h"
 
 #include "machine/kb_keytro.h"
 #include "video/pc_cga.h"
@@ -322,6 +324,8 @@ static SLOT_INTERFACE_START(ibm_isa8_cards)
 	SLOT_INTERFACE("adlib", ISA8_ADLIB)
 	SLOT_INTERFACE("gblaster", ISA8_GAME_BLASTER)
 	SLOT_INTERFACE("sblaster", ISA8_SOUND_BLASTER_1_0)
+	SLOT_INTERFACE("ne1000", NE1000)
+	SLOT_INTERFACE("3c503", EL2_3C503)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( ibm5150, ibmpc_state )
