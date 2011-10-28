@@ -1626,7 +1626,7 @@ static void s3c44b0_iis_start( device_t *device)
 	mclk = s3c44b0_get_mclk( device);
 	prescaler = BITS( s3c44b0->iis.regs.iispsr, 3, 0);
 	freq = (double)mclk / div[prescaler];
-	hz = freq / 256;
+	hz = freq / 256 * 2;
 	verboselog( device->machine(), 5, "IIS mclk %d prescaler %d freq %f hz %f\n", mclk, prescaler, freq, hz);
 	s3c44b0->iis.timer->adjust( attotime::from_hz( hz), 0, attotime::from_hz( hz));
 }
@@ -1704,6 +1704,68 @@ static TIMER_CALLBACK( s3c44b0_iis_timer_exp )
 
 /* ZDMA */
 
+static void s3c44b0_zdma_trigger( device_t *device, int ch)
+{
+	s3c44b0_t *s3c44b0 = get_token( device);
+	s3c44b0_dma_t *dma = &s3c44b0->zdma[ch];
+	UINT32 saddr, daddr;
+	int dal, dst, opt, das, cnt;
+	verboselog( device->machine(), 5, "s3c44b0_zdma_trigger %d\n", ch);
+	dst = BITS( dma->regs.dcsrc, 31, 30);
+	dal = BITS( dma->regs.dcsrc, 29, 28);
+	saddr = BITS( dma->regs.dcsrc, 27, 0);
+	verboselog( device->machine(), 5, "dst %d dal %d saddr %08X\n", dst, dal, saddr);
+	opt = BITS( dma->regs.dcdst, 31, 30);
+	das = BITS( dma->regs.dcdst, 29, 28);
+	daddr = BITS( dma->regs.dcdst, 27, 0);
+	verboselog( device->machine(), 5, "opt %d das %d daddr %08X\n", opt, das, daddr);
+	cnt = BITS( dma->regs.dccnt, 19, 0);
+	verboselog( device->machine(), 5, "icnt %08X\n", cnt);
+	while (cnt > 0)
+	{
+		verboselog( device->machine(), 9, "[%08X] -> [%08X]\n", saddr, daddr);
+		switch (dst)
+		{
+			case 0 : s3c44b0->space->write_byte( daddr, s3c44b0->space->read_byte( saddr)); break;
+			case 1 : s3c44b0->space->write_word( daddr, s3c44b0->space->read_word( saddr)); break;
+			case 2 : s3c44b0->space->write_dword( daddr, s3c44b0->space->read_dword( saddr)); break;
+		}
+		switch (dal)
+		{
+			case 1 : saddr += (1 << dst); break;
+			case 2 : saddr -= (1 << dst); break;
+		}
+		switch (das)
+		{
+			case 1 : daddr += (1 << dst); break;
+			case 2 : daddr -= (1 << dst); break;
+		}
+		cnt -= (1 << dst);
+	}
+	dma->regs.dcsrc = CLR_BITS( dma->regs.dcsrc, 27, 0) | saddr;
+	dma->regs.dcdst = CLR_BITS( dma->regs.dcdst, 27, 0) | daddr;
+	dma->regs.dccnt = CLR_BITS( dma->regs.dcdst, 19, 0) | cnt;
+	if (cnt == 0)
+	{
+		if ((dma->regs.dccnt & (1 << 23)) != 0)
+		{
+			const int ch_int[] = { S3C44B0_INT_ZDMA0, S3C44B0_INT_ZDMA1 };
+			s3c44b0_request_irq( device, ch_int[ch]);
+		}
+	}
+}
+
+static void s3c44b0_zdma_start( device_t *device, int ch)
+{
+	s3c44b0_t *s3c44b0 = get_token( device);
+	s3c44b0_dma_t *dma = &s3c44b0->zdma[ch];
+	verboselog( device->machine(), 5, "ZDMA %d start\n", ch);
+	dma->regs.dcsrc = dma->regs.disrc;
+	dma->regs.dcdst = dma->regs.didst;
+	dma->regs.dccnt = dma->regs.dicnt;
+	s3c44b0_zdma_trigger( device, ch);
+}
+
 static UINT32 s3c44b0_zdma_r( device_t *device, int ch, UINT32 offset)
 {
 	s3c44b0_t *s3c44b0 = get_token( device);
@@ -1714,7 +1776,23 @@ static UINT32 s3c44b0_zdma_r( device_t *device, int ch, UINT32 offset)
 static void s3c44b0_zdma_w( device_t *device, int ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
 {
 	s3c44b0_t *s3c44b0 = get_token( device);
+	UINT32 old_value = ((UINT32*)&s3c44b0->zdma[ch].regs)[offset];
 	COMBINE_DATA(&((UINT32*)&s3c44b0->zdma[ch].regs)[offset]);
+	switch (offset)
+	{
+		case S3C44B0_DCON :
+		{
+			if ((old_value & 3) != (data & 3))
+			{
+				switch (data & 3)
+				{
+					case 1 : s3c44b0_zdma_start( device, ch); break;
+				}
+			}
+			s3c44b0->zdma[ch].regs.dcon &= ~3; // "After writing 01,10,11, CMD bit is cleared automatically"
+		}
+		break;
+	}
 }
 
 static READ32_DEVICE_HANDLER( s3c44b0_zdma_0_r )

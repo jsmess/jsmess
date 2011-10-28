@@ -13,6 +13,8 @@
 #include "sound/dac.h"
 #include "rendlay.h"
 
+//#define JUICEBOX_TEST_MENU
+
 #define VERBOSE_LEVEL ( 0 )
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ...)
@@ -48,6 +50,9 @@ public:
 	device_t *s3c44b0;
 	smc_t smc;
 	device_t *dac;
+	#if defined(JUICEBOX_TEST_MENU)
+	int port_g_read_count;
+	#endif
 };
 
 /***************************************************************************
@@ -159,10 +164,14 @@ static UINT32 s3c44b0_gpio_port_r( device_t *device, int port)
 		break;
 		case S3C44B0_GPIO_PORT_G :
 		{
-//			static int xxx = 0;
 			data = 0x0000009F;
 			data = (data & ~0x1F) | (input_port_read( device->machine(), "PORTG") & 0x1F);
-//			if (xxx++ < 1) data = 0x00000095; // TEST MENU
+			#if defined(JUICEBOX_TEST_MENU)
+			if (juicebox->port_g_read_count++ < 1)
+			{
+				data = 0x00000095; // PLAY + REVERSE
+			}
+			#endif
 		}
 		break;
 	}
@@ -212,17 +221,9 @@ static WRITE32_HANDLER( juicebox_nand_w )
 
 // I2S
 
-#if 0
-static FILE *file_iis = NULL;
-#endif
-
 static WRITE16_DEVICE_HANDLER( s3c44b0_i2s_data_w )
 {
 	juicebox_state *juicebox = device->machine().driver_data<juicebox_state>();
-#if 0
-	if (!file_iis) file_iis = fopen( "iis.bin", "wb");
-	fwrite( &data, 2, 1, file_iis);
-#endif
 	dac_signed_data_16_w( juicebox->dac, data ^ 0x8000);
 }
 
@@ -258,7 +259,7 @@ static MACHINE_RESET( juicebox )
 static ADDRESS_MAP_START( juicebox_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x007fffff) AM_ROM
 	AM_RANGE(0x04000000, 0x04ffffff) AM_READWRITE( juicebox_nand_r, juicebox_nand_w )
-	AM_RANGE(0x0c000000, 0x0c1fffff) AM_RAM
+	AM_RANGE(0x0c000000, 0x0c1fffff) AM_RAM AM_MIRROR(0x00600000)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -333,6 +334,8 @@ ROM_START( juicebox )
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "juicebox", "juicebox" )
 	ROMX_LOAD( "juicebox.rom", 0, 0x800000, CRC(ac731197) SHA1(8278891c3531b3b6b5fec2a97a3ef6f0de1ac81d), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "newboot", "newboot" )
+	ROMX_LOAD( "newboot.rom", 0, 0x1A0800, CRC(443f48b7) SHA1(38f0dc07b5cf02b972a851aa9e87f5d93d03f629), ROM_BIOS(2) )
 ROM_END
 
-COMP(2004, juicebox, 0, 0, juicebox, juicebox, juicebox, "Mattel", "Juice Box", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP(2004, juicebox, 0, 0, juicebox, juicebox, juicebox, "Mattel", "Juice Box", GAME_IMPERFECT_GRAPHICS)
