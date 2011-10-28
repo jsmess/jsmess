@@ -25,6 +25,7 @@ Source Changes:
 ----------------
 - Made smartmed device capable of handling softlist items [Miodrag Milanovic]
 - Added 3com Etherlink II 3c503 card emulation [Carl]
+- Unified paste facility for trainer computers [Robbbert]
 
 0.143u8
 
