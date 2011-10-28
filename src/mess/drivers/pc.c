@@ -536,6 +536,7 @@ static INPUT_PORTS_START( pcega )
 	PORT_INCLUDE( kb_keytronic_pc )
 	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
+	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
 
@@ -1276,8 +1277,8 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_ega )
-
+//	MCFG_FRAGMENT_ADD( pcvideo_ega ) // Put this back after ISA are added to this driver
+	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
@@ -1837,6 +1838,8 @@ ROM_START( iskr3104 )
 	// EGA card from Iskra-3104
 	ROMX_LOAD( "143-03.bin", 0xc0001, 0x2000, CRC(d0706345) SHA1(e04bb40d944426a4ae2e3a614d3f4953d7132ede),ROM_SKIP(1))
 	ROMX_LOAD( "143-02.bin", 0xc0000, 0x2000, CRC(c8c18ebb) SHA1(fd6dac76d43ab8b582e70f1d5cc931d679036fb9),ROM_SKIP(1))
+	
+	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
 ROM_END
 
 ROM_START( poisk1 )

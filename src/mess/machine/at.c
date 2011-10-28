@@ -337,24 +337,6 @@ DRIVER_INIT( atcga )
 	init_at_common(machine);
 }
 
-
-DRIVER_INIT( atega )
-{
-	UINT8	*dst = machine.region( "maincpu" )->base() + 0xc0000;
-	UINT8	*src = machine.region( "user1" )->base() + 0x3fff;
-	int		i;
-
-	init_at_common(machine);
-
-	/* Perform the EGA bios address line swaps */
-	for( i = 0; i < 0x4000; i++ )
-	{
-		*dst++ = *src--;
-	}
-}
-
-
-
 DRIVER_INIT( atvga)
 {
 	init_at_common(machine);
