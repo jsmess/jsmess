@@ -3,7 +3,7 @@
 
  IC marked as Z1 is probably protection device
  mapped in memory region f800-fbff
- (simil. to the one used in Parallel Turn)
+ (similar to the one used in Parallel Turn)
 
  Reads form this device depends on previous
  writes (adr, data), address and previous
@@ -14,11 +14,26 @@
 
  Tomasz Slanina analog [at] op.pl
 
+============================================
+
+DASM notes:
+
+0x100: check if test mode bit is active.
+0x3ae8: ?
+0x3aec: tests 0xfc00 work ram ONLY, resets if fails
+0x3afe: fill 0xfc00-0xffff to zero
+0x20dc: writes ROM 0x3146 to prot RAM 0xf800-0xfbff
+0x20e9: reads from 0xfa47, A = (n & 0x8) | 0x80 then HL = 0x0200 | A
+0x2cef: unknown, reads from 0x02** to 0x2d00, fancy ROM checksum?
+...
+0x0577
+
 ********************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
+#include "video/mc6845.h"
+#include "machine/pit8253.h"
 
 class laserbas_state : public driver_device
 {
@@ -53,12 +68,12 @@ static SCREEN_UPDATE(laserbas)
 		for(x = 0; x < 128; x++)
 		{
 			if (state->m_vram2[y * 128 + x] & 0xf)
-				*BITMAP_ADDR16(bitmap, y, x * 2) = (state->m_vram2[y * 128 + x] & 0xf) + 16;
+				*BITMAP_ADDR16(bitmap, y, x * 2) = (state->m_vram2[y * 128 + x] & 0xf);
 			else
 				*BITMAP_ADDR16(bitmap, y, x * 2) = (state->m_vram1[y * 128 + x] & 0xf) + 16;
 
 			if (state->m_vram2[y * 128 + x] >> 4)
-				*BITMAP_ADDR16(bitmap, y, x * 2 + 1) = (state->m_vram2[y * 128 + x] >> 4) + 16;
+				*BITMAP_ADDR16(bitmap, y, x * 2 + 1) = (state->m_vram2[y * 128 + x] >> 4);
 			else
 				*BITMAP_ADDR16(bitmap, y, x * 2 + 1) = (state->m_vram1[y * 128 + x] >> 4) + 16;
 		}
@@ -85,6 +100,7 @@ static WRITE8_HANDLER(vram_w)
 		state->m_vram2[offset] = data;
 }
 
+#if 0
 static READ8_HANDLER( read_unk )
 {
 	laserbas_state *state = space->machine().driver_data<laserbas_state>();
@@ -92,18 +108,15 @@ static READ8_HANDLER( read_unk )
 	state->m_count ^= 0x80;
 	return state->m_count | 0x7f;
 }
-
-static WRITE8_HANDLER(palette_w)
-{
-	palette_set_color_rgb(space->machine(), offset, pal3bit(data >> 5), pal3bit(data >> 2), pal2bit(data));
-}
+#endif
 
 static WRITE8_HANDLER(vrambank_w)
 {
 	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
-	if ((offset & 0xf1) == 0x10)
-		state->m_vrambank = data & 0x40;
+	/* either bit 2 or 3 controls flip screen */
+
+	state->m_vrambank = data & 0x40;
 }
 
 static ADDRESS_MAP_START( laserbas_memory, AS_PROGRAM, 8 )
@@ -116,41 +129,88 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( laserbas_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_WRITE(vrambank_w)
-	AM_RANGE(0x20, 0x20) AM_READ(read_unk) AM_WRITENOP//write = ram/rom bank ? at fc00-f800 ?
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(vrambank_w)
+	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN1") // DSW + something else?
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
-	AM_RANGE(0x80, 0x9f) AM_WRITE(palette_w)
+	AM_RANGE(0x22, 0x22) AM_READ_PORT("IN2")
+//  AM_RANGE(0x23, 0x23) AM_WRITE(test_w) bit 2 presumably is a mux for 0x20?
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("pit0", pit8253_r, pit8253_w)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("pit1", pit8253_r, pit8253_w)
+	AM_RANGE(0x80, 0x9f) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( laserbas )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x00, "0-0" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "0-1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "0-2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_DIPNAME( 0x010, 0x10, "0-3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x020, 0x20, "Test Mode" )
+	PORT_DIPNAME( 0x01, 0x01, "0-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "0-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_DIPNAME( 0x10, 0x10, "0-3" ) // another coin chute
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Test Mode" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
-INPUT_PORTS_END
 
-static INTERRUPT_GEN( laserbas_interrupt )
-{
-	if(device->machine().primary_screen->vblank())
-		device_set_input_line(device, 0, HOLD_LINE);
-	else
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-}
+	PORT_START("IN1") // DSW
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 static MACHINE_START( laserbas )
 {
@@ -168,12 +228,74 @@ static MACHINE_RESET( laserbas )
 	state->m_count = 0;
 }
 
+static const mc6845_interface mc6845_intf =
+{
+	"screen",	/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	DEVCB_NULL,	/* callback for display state changes */
+	DEVCB_NULL,	/* callback for cursor state changes */
+	DEVCB_NULL,	/* HSYNC callback */
+	DEVCB_NULL,	/* VSYNC callback */
+	NULL		/* update address callback */
+};
+
+
+/* TODO: clocks aren't known */
+static const struct pit8253_config laserbas_pit8253_intf_0 =
+{
+	{
+		{
+			31250,
+			DEVCB_NULL,
+			DEVCB_NULL
+		},
+		{
+			31250,
+			DEVCB_NULL,
+			DEVCB_NULL
+		},
+		{
+			31250,
+			DEVCB_NULL,
+			DEVCB_NULL
+		}
+	}
+};
+
+static const struct pit8253_config laserbas_pit8253_intf_1 =
+{
+	{
+		{
+			31250,
+			DEVCB_NULL,
+			DEVCB_NULL
+		},
+		{
+			31250,
+			DEVCB_NULL,
+			DEVCB_NULL
+		},
+		{
+			31250,
+			DEVCB_NULL,
+			DEVCB_NULL
+		}
+	}
+};
+
 static MACHINE_CONFIG_START( laserbas, laserbas_state )
 
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(laserbas_memory)
 	MCFG_CPU_IO_MAP(laserbas_io)
-	MCFG_CPU_VBLANK_INT_HACK(laserbas_interrupt,2)
+	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+
+	MCFG_PIT8253_ADD("pit0", laserbas_pit8253_intf_0)
+	MCFG_PIT8253_ADD("pit1", laserbas_pit8253_intf_1)
+
 
 	MCFG_MACHINE_START(laserbas)
 	MCFG_MACHINE_RESET(laserbas)
@@ -185,6 +307,8 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE(laserbas)
+
+	MCFG_MC6845_ADD("crtc", H46505, 3000000/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
 	MCFG_PALETTE_LENGTH(32)
 	MCFG_VIDEO_START(laserbas)
