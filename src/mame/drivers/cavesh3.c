@@ -1,7 +1,27 @@
 /*
 
-Cave SH3 hardware
+Cave CV1000 hardware
 
+Games by Cave ID number:
+
+CA011  Mushihime-Sama
+CA012  Ibara
+CA012B Ibara Kuro Black Label
+CA013  Espgaluda II
+CA014  Pink Sweets: Ibara Sorekara
+CA015  Mushihime-Sama Futari
+CA015B Mushihime-Sama Futari Black Label
+CA016  Muchi Muchi Pork!
+CA017  Deathsmiles
+CA017B Deathsmiles Black Label
+CA019  Do-Don-Pachi Dai-Fukkatsu
+CA019B Do-Don-Pachi Dai-Fukkatsu Black Label
+CA021  Akai Katana
+
+CMDL01 Medal Mahjong Moukari Bancho
+
+Note: CA018 - Deathsmiles II: Makai no Merry Christmas on unknown custom platform
+      CA020 - Do-Don-Pachi Dai-ou-jou Tamashii on PGM2 platform
 
 PCB CV1000-B / CV1000-D
 +--------------------------------------------+
@@ -49,7 +69,7 @@ PCB CV1000-B / CV1000-D
   CPU: Hitachi 6417709S SH3 clocked at 102.4MHz (12.800MHz * 8)
 Sound: Yamaha YMZ770C-F clocked at 16.384MHz
 Other: Altera Cyclone EP1C12 FPGA
-       Altera EPM7032 (MAX 7000 Series, Stamped "CA011") at U13
+       Altera EPM7032 (MAX 7000 Series) at U13
 
 OSC:
  X1 12.800MHz (SH3 clock derived from this)
@@ -82,7 +102,7 @@ Connectors:
  P4 (IDC CONNECTOR 14 PIN) JTAG connector
  P8 (IDC CONNECTOR 10 PIN) Advanced User Debugger
  P3 (CONNECTOR) Most likely an expansion port, P3 is not always mounted
- P5 (CONNECTOR) D9 serial connector. Used for the mahjong Touchscreen titles.  Also mounted on early Mushihimesama PCB's
+ P5 (CONNECTOR) D9 serial connector. Used for the mahjong Touchscreen titles.  Also mounted on early Mushihime-Sama PCB's
  P7 (CONNECTOR) Network port pinout. Never seen mounted on any PCB.
 
 Misc:
@@ -91,7 +111,7 @@ Misc:
    U12 (RS-232 TRANCEIVER) MAX 3244E RS-232 Tranceiver, only mounted when P5 is mounted.
  D1-D6 (LED) Status LED's. D6 lights up at power on then shuts off, D2 indicates coinage.
 
-Note: * The Altera EPM7032 has been seen stamped "CA017" for at least one DeathSmiles, there are other revisions.
+Note: * The Altera EPM7032 usually stamped / labeled with the Cave game ID number as listed above.
       * Actual flash ROMs will vary by manufacturer but will be compatible with flash ROM listed.
       * The CV1000-D revision PCB has double the RAM at U1, double the ROM at U4 and no battery.
         The CV1000-D is used for Dodonpachi Daifukkatsu and later games. Commonly referred to as SH3B PCB.
@@ -113,9 +133,6 @@ Improve Blending precision?
 
 Overall screen brightness / contrast (see test mode)
  - Could convert ram back to 16-bit and use a palette lookup at the final blit.. probably easiest / quickest.
-
-Sound
- - Chip is completely unemulated
 
 Touchscreen
  - Used for mmmbanc, needs SH3 serial support.
@@ -6297,7 +6314,7 @@ ROM_START( ibara )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(f0aa3cb6) SHA1(f9d137cd879e718811b2d21a0af2a9c6b7dca2f9) )
 ROM_END
 
-ROM_START( ibarablk )
+ROM_START( ibarablk ) /* Title screen shows (c) 2005 despite the 2006 "master" date */
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "ibarablk_u4", 0x000000, 0x200000, CRC(ee1f1f77) SHA1(ac276f3955aa4dde2544af4912819a7ae6bcf8dd) ) /* (2006/02/06. MASTER VER.) */
 	ROM_RELOAD(0x200000,0x200000)
@@ -6310,7 +6327,7 @@ ROM_START( ibarablk )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(d11ab6b6) SHA1(2132191cbe847e2560423e4545c969f21f8ff825) ) /* (2006/02/06 MASTER VER.) */
 ROM_END
 
-ROM_START( ibarablka )
+ROM_START( ibarablka ) /* Title screen shows (c) 2005 despite the 2006 "master" date */
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "ibarablka_u4", 0x000000, 0x200000, CRC(a9d43839) SHA1(507696e616608c05893c7ac2814b3365e9cb0720) ) /* (2006/02/06 MASTER VER.) */
 	ROM_RELOAD(0x200000,0x200000)
@@ -6444,95 +6461,107 @@ DRIVER_INIT( espgal2 )
 }
 
 
-GAME( 2004, mushisam,   0,        cavesh3, cavesh3, mushisam,  ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER.)",                           0 )
-GAME( 2004, mushisama,  mushisam, cavesh3, cavesh3, mushisama, ROT270, "Cave", "Mushihime Sama (2004/10/12 MASTER VER)",                            0 )
-GAME( 2005, espgal2,    0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "EspGaluda II (2005/11/14 MASTER VER)",                              0 )
-GAME( 2005, ibara,      0,        cavesh3, cavesh3, mushisam,  ROT270, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                   0 )
-GAME( 2006, ibarablk,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06. MASTER VER.)",                0 )
-GAME( 2006, ibarablka,  ibarablk, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Kuro - Black Label (2006/02/06 MASTER VER.)",                 0 )
-GAME( 2005, mushitam,   0,        cavesh3, cavesh3, mushisam,  ROT0,   "Cave", "Mushihime Tama (2005/09/09 MASTER VER)",                            0 )
-GAME( 2006, futari15,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",       0 )
-GAME( 2006, futari15a,  futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",         0 )
-GAME( 2006, futari10,   futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",            0 )
-GAME( 2007, futariblk,  futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",    0 )
-GAME( 2006, pinkswts,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets - Ibara Sorekara (2006/04/06 MASTER VER....)",          0 )
-GAME( 2006, pinkswtsa,  pinkswts, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets - Ibara Sorekara (2006/04/06 MASTER VER...)",           0 )
-GAME( 2006, pinkswtsb,  pinkswts, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets - Ibara Sorekara (2006/04/06 MASTER VER.)",             0 )
-GAME( 2007, deathsml,   0,        cavesh3, cavesh3, espgal2,   ROT0,   "Cave", "Death Smiles (2007/10/09 MASTER VER)",                              0 )
-GAME( 2007, mmpork,     0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Muchi Muchi Pork (2007/ 4/17 MASTER VER.)",                         0 )
-GAME( 2007, mmmbanc,    0,        cavesh3, cavesh3, espgal2,   ROT0,   "Cave", "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",             GAME_NOT_WORKING )
+GAME( 2004, mushisam,   0,        cavesh3, cavesh3, mushisam,  ROT270, "Cave", "Mushihime-Sama (2004/10/12 MASTER VER.)",                          0 )
+GAME( 2004, mushisama,  mushisam, cavesh3, cavesh3, mushisama, ROT270, "Cave", "Mushihime-Sama (2004/10/12 MASTER VER)",                           0 )
+GAME( 2005, espgal2,    0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Espgaluda II (2005/11/14 MASTER VER)",                             0 )
+GAME( 2005, ibara,      0,        cavesh3, cavesh3, mushisam,  ROT270, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                  0 )
+GAME( 2006, ibarablk,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Kuro Black Label (2006/02/06. MASTER VER.)",                 0 )
+GAME( 2006, ibarablka,  ibarablk, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Ibara Kuro Black Label (2006/02/06 MASTER VER.)",                  0 )
+GAME( 2005, mushitam,   0,        cavesh3, cavesh3, mushisam,  ROT0,   "Cave", "Puzzle! Mushihime-Tama (2005/09/09 MASTER VER)",                   0 )
+GAME( 2006, futari15,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",      0 )
+GAME( 2006, futari15a,  futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",        0 )
+GAME( 2006, futari10,   futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",           0 )
+GAME( 2007, futariblk,  futari15, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",   0 )
+GAME( 2006, pinkswts,   0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER....)",          0 )
+GAME( 2006, pinkswtsa,  pinkswts, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER...)",           0 )
+GAME( 2006, pinkswtsb,  pinkswts, cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER.)",             0 )
+GAME( 2007, deathsml,   0,        cavesh3, cavesh3, espgal2,   ROT0,   "Cave", "Deathsmiles (2007/10/09 MASTER VER)",                              0 )
+GAME( 2007, mmpork,     0,        cavesh3, cavesh3, espgal2,   ROT270, "Cave", "Muchi Muchi Pork! (2007/ 4/17 MASTER VER.)",                       0 )
+GAME( 2007, mmmbanc,    0,        cavesh3, cavesh3, espgal2,   ROT0,   "Cave", "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",            GAME_NOT_WORKING )
 
 /*
 
 Known versions of games on this hardware (* denotes undumped):
 
-MUSHIHIME SAMA
+Mushihime-Sama
   "2004/10/12 MASTER VER"  - broken
   "2004/10/12 MASTER VER." - fixed 1
 * "2004/10/12.MASTER VER." - fixed 2
 
-MUSHIHIME TAMA
+Puzzle! Mushihime-Tama
   "2005/09/09 MASTER VER"
 
-ESPGALUDA II
+Espgaluda II
   "2005/11/14 MASTER VER"
 
-IBARA
+Ibara
   "2005/03/22 MASTER VER.."
 
-IBARA BLACK LABEL
+Ibara Kuro Black Label
   "2006/02/06 MASTER VER."
   "2006/02/06. MASTER VER."
 
-PINK SWEETS
+Pink Sweets: Ibara Sorkara
   "2006/04/06 MASTER VER."
   "2006/04/06 MASTER VER..."
   "2006/04/06 MASTER VER...."
-* "2006/05/18 MASTER VER."
+* "2006/05/18 MASTER VER."    - Removes infinite lives trick, fixes some bugs
 * "2006/xx/xx MASTER VER"
+  "2006/xx/xx MASTER VER."
 
-MUSHIHIME SAMA FUTARI 1.0
+Mushihime-Sama Futari 1.0
 * "2006/10/23 MASTER VER"  - Ultra unlockable
   "2006/10/23 MASTER VER." - Ultra unlockable
 * "2006/10/23.MASTER VER." - Cannot unlock ultra
 
-MUSHIHIME SAMA FUTARI 1.5
+Mushihime-Sama Futari 1.5
   "2006/12/8 MASTER VER 1.54"
-  "2006/12/8.MASTER VER.1.54."
+  "2006/12/8.MASTER VER. 1.54."
 
-MUSHIHIME SAMA FUTARI BLACK LABEL
+Mushihime-Sama Futari Black Label
   "2007/12/11 BLACK LABEL VER"
 * "2009/11/17 INTERNATIONAL BL"  ("Another Ver" on title screen)
 
-MUCHI MUCHI PORK
+Muchi Muchi Pork!
   "2007/ 4/17 MASTER VER."
-* 2 "period" ver, location of the periods unknown
+* "2007/ 4/17 MASTER VER.."
 
-MEDAL MAHJONG MOKUARI BANCHO
+Medal Mahjong Moukari Bancho
   "2007/06/05 MASTER VER."
 
-DEATH SMILES
+Deathsmiles
   "2007/10/09 MASTER VER"
 
-DEATH SMILES MEGA BLACK LABEL
+Deathsmiles Mega Black Label
 * "2008/10/06 MEGABLACK LABEL VER"
 
-DODONPACHI FUKKATSU 1.0
+Do-Don-Pachi Dai-Fukkatsu 1.0
 * "2008/05/16 MASTER VER"
 
-DODONPACHI FUKKATSU 1.5
+Do-Don-Pachi Dai-Fukkatsu 1.5
 * "2008/06/23 MASTER VER 1.5"
 
---- Titles below are too new to emulate, but included for documentation ---
-
-DODONPACHI DAIFUKKATSU BLACK LABEL
+Do-Don-Pachi Dai-Fukkatsu Black label
 * "2010/1/18 BLACK LABEL"
 
-AKAI KATANA
+Akai Katana
 * "2010/ 8/13 MASTER VER."
 *  Home/Limited version, unknown date line, different gameplay from regular version, doesn't accept coins - permanent freeplay
 
-MUSHIHIMESAMA 1.5 MATSURI VERSION
+Mushihime-Sama 1.5 Matsuri Version
 * 2011/5/23 CAVEMATSURI VER 1.5
+
+
+--- Titles below are known versions from Cave's fan festivals and are likely in house only versions. Dates are the Cave festival shown ---
+
+Shown     Title                                                   Notes
+-----------------------------------------------------------------------------------------------------------------------
+12/28/06  Mushihime-Sama VER 1.5 ~Blus Label~                     No Maniac mode.
+12/28/06  Mushihime-Sama Futari VER 1.5 ~Red Label~               3 PCBs were given away to top scorers.
+12/28/06  Mushihime-Sama Futari VER 1.01
+12/30/07  Muchi Muchi Pork! Dai Cave Festival ~Special Version~   Includes Pink Sweets bosses at the end of each stage.
+12/30/07  Deathsmiles: Dai Cave Festival ~Special Version~        Inclueds a rank 99 difficulty. Prototype for DSMBL.
+08/15/08  Do-Don-Pachi Dai-Fukkatsu VER 1.5 ~Special~             Power-style only.
+10/20/10  Do-Don-Pachi Dai-Fukkatsu VER 1.51
 
 */
