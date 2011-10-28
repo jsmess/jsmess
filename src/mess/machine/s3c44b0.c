@@ -110,6 +110,7 @@ static void s3c44b0_lcd_dma_reload( device_t *device)
 	lcd->offsize = BITS( lcd->regs.lcdsaddr3, 19, 9);
 	lcd->pagewidth_cur = 0;
 	lcd->pagewidth_max = BITS( lcd->regs.lcdsaddr3, 8, 0);
+	lcd->bswp = BIT( lcd->regs.lcdsaddr2, 29); // note: juicebox changes bswp when video playback starts
 //	verboselog( device->machine(), 3, "LCD - vramaddr %08X %08X offsize %08X pagewidth %08X\n", lcd->vramaddr_cur, lcd->vramaddr_max, lcd->offsize, lcd->pagewidth_max);
 }
 
@@ -117,7 +118,6 @@ static void s3c44b0_lcd_dma_init( device_t *device)
 {
 	s3c44b0_lcd_t *lcd = &(get_token( device)->lcd);
 	lcd->modesel = BITS( lcd->regs.lcdsaddr1, 28, 27);
-	lcd->bswp = BIT( lcd->regs.lcdsaddr2, 29);
 //	verboselog( device->machine(), 3, "LCD - modesel %d bswp %d\n", lcd->modesel, lcd->bswp);
 	s3c44b0_lcd_dma_reload( device);
 }
@@ -130,9 +130,8 @@ static void s3c44b0_lcd_dma_read( device_t *device, int count, UINT8 *data)
 	vram = (UINT8 *)s3c44b0->space->get_read_ptr( lcd->vramaddr_cur);
 	for (int i = 0; i < count / 2; i++)
 	{
-		if (lcd->bswp == 0) // not good
+		if (lcd->bswp == 0)
 		{
-/*
 			if ((lcd->vramaddr_cur & 2) == 0)
 			{
 				data[0] = *(vram + 3);
@@ -143,12 +142,8 @@ static void s3c44b0_lcd_dma_read( device_t *device, int count, UINT8 *data)
 				data[0] = *(vram - 1);
 				data[1] = *(vram - 2);
 			}
-*/
-			data[0] = *(vram + 0);
-			data[1] = *(vram + 1);
-
 		}
-		else // good
+		else
 		{
 			data[0] = *(vram + 0);
 			data[1] = *(vram + 1);
