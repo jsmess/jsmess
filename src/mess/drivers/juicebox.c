@@ -338,4 +338,4 @@ ROM_START( juicebox )
 	ROMX_LOAD( "newboot.rom", 0, 0x1A0800, CRC(443f48b7) SHA1(38f0dc07b5cf02b972a851aa9e87f5d93d03f629), ROM_BIOS(2) )
 ROM_END
 
-COMP(2004, juicebox, 0, 0, juicebox, juicebox, juicebox, "Mattel", "Juice Box", GAME_IMPERFECT_GRAPHICS)
+COMP(2004, juicebox, 0, 0, juicebox, juicebox, juicebox, "Mattel", "Juice Box", 0)
