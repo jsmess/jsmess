@@ -60664,7 +60664,7 @@ be better to redump them properly. -->
 	<software name="xingjiws">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Xing Ji Wu Shi - Super Fighter (Asia, Decrypted)</description>
-		<year>19??</year>
+		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
