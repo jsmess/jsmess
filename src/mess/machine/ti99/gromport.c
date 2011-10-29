@@ -1738,16 +1738,17 @@ READ8Z_DEVICE_HANDLER(gromportg_rz)
 	cartridge_t *cartridge;
 	ti99_multicart_state *cartslots = get_safe_token(device);
 
-	// Set the cart slot. Note that the port must be adjusted for 16-bit
-	// systems, i.e. it should be shifted left by 1.
+	// Set the cart slot. Bit pattern:
 	// 1001 1wbb bbbb bbr0
 
 	cartridge_slot_set(device, (UINT8)((offset>>2) & 0x00ff));
 
 	// Handle the GRAM Kracker
 	// BTW, the GK does not have a readable address counter, but the console
-	// GROMs will keep our addess counter up to date. That is
+	// GROMs will keep our address counter up to date. That is
 	// exactly what happens in the real machine.
+	// (The console GROMs are not accessed here but directly via the datamux
+	// so we can just return without doing anything)
 	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine(), "CARTSLOT")==CART_GK))
 	{
 		if ((offset & 0x0002)==0) cartridge_gram_kracker_readg(device, value);
@@ -1910,6 +1911,7 @@ static void cartridge_gram_kracker_readg(device_t *cartsys, UINT8 *value)
 		{
 			// Loader off
 			// GRAM 1. Only return a value if switch 3 is in GRAM12 position.
+			// Otherwise, the console GROM 1 will respond (at another location)
 			if (get_gk_switch(cartsys, 3)==GK_GRAM12)
 				*value = (gromkrackerbox->ram_ptr)[gromkrackerbox->grom_address];
 		}
@@ -1991,11 +1993,11 @@ static void cartridge_gram_kracker_writeg(device_t *cartsys, int offset, UINT8 d
 		if (get_gk_switch(cartsys, 4) != GK_WP)
 		{
 			// Write protection off
-			if (   (((gromkrackerbox->grom_address & 0xe000)==0x0000) && get_gk_switch(cartsys, 2)==GK_GRAM0)
-				|| (((gromkrackerbox->grom_address & 0xe000)==0x2000) && get_gk_switch(cartsys, 3)==GK_GRAM12 && (get_gk_switch(cartsys, 5)==GK_LDOFF))
-				|| (((gromkrackerbox->grom_address & 0xe000)==0x4000) && get_gk_switch(cartsys, 3)==GK_GRAM12)
-				|| (((gromkrackerbox->grom_address & 0xe000)==0x6000) && get_gk_switch(cartsys, 1)==GK_NORMAL && (cartslots->gk_guest_slot==-1))
-				|| (((gromkrackerbox->grom_address & 0x8000)==0x8000) && get_gk_switch(cartsys, 1)==GK_NORMAL && (cartslots->gk_guest_slot==-1)))
+			if (   ((gromkrackerbox->grom_address & 0xe000)==0x0000 && get_gk_switch(cartsys, 2)==GK_GRAM0 && get_gk_switch(cartsys, 4)!=GK_WP)
+				|| ((gromkrackerbox->grom_address & 0xe000)==0x2000 && get_gk_switch(cartsys, 3)==GK_GRAM12 && get_gk_switch(cartsys, 5)==GK_LDOFF)
+				|| ((gromkrackerbox->grom_address & 0xe000)==0x4000 && get_gk_switch(cartsys, 3)==GK_GRAM12)
+				|| ((gromkrackerbox->grom_address & 0xe000)==0x6000 && get_gk_switch(cartsys, 1)==GK_NORMAL && cartslots->gk_guest_slot==-1)
+				|| ((gromkrackerbox->grom_address & 0x8000)==0x8000 && get_gk_switch(cartsys, 1)==GK_NORMAL && cartslots->gk_guest_slot==-1))
 			{
 				(gromkrackerbox->ram_ptr)[gromkrackerbox->grom_address] = data;
 			}
@@ -2039,24 +2041,24 @@ static READ8Z_DEVICE_HANDLER( ti99_cart_gk_rz )
 		if (get_gk_switch(device, 1)==GK_OFF) return;
 		if (get_gk_switch(device, 4)==GK_BANK1)
 		{
-			*value = (gromkrackerbox->ram_ptr)[offset+0x10000];
+			*value = (gromkrackerbox->ram_ptr)[offset+0x10000 - 0x6000];
 		}
 		else
 		{
 			if (get_gk_switch(device, 4)==GK_BANK2)
 			{
-				*value = (gromkrackerbox->ram_ptr)[offset+0x12000];
+				*value = (gromkrackerbox->ram_ptr)[offset+0x12000 - 0x6000];
 			}
 			else
 			{
 				// Write protection on; auto-bank
 				if (gromkrackerbox->ram_page==0)
 				{
-					*value = (gromkrackerbox->ram_ptr)[offset+0x10000];
+					*value = (gromkrackerbox->ram_ptr)[offset+0x10000 - 0x6000];
 				}
 				else
 				{
-					*value = (gromkrackerbox->ram_ptr)[offset+0x12000];
+					*value = (gromkrackerbox->ram_ptr)[offset+0x12000 - 0x6000];
 				}
 			}
 		}
@@ -2094,13 +2096,13 @@ static WRITE8_DEVICE_HANDLER( ti99_cart_gk_w )
 
 		if (get_gk_switch(device, 4)==GK_BANK1)
 		{
-			(gromkrackerbox->ram_ptr)[offset + 0x10000] = data;
+			(gromkrackerbox->ram_ptr)[offset + 0x10000 - 0x6000] = data;
 		}
 		else
 		{
 			if (get_gk_switch(device, 4)==GK_BANK2)
 			{
-				(gromkrackerbox->ram_ptr)[offset + 0x12000] = data;
+				(gromkrackerbox->ram_ptr)[offset + 0x12000 - 0x6000] = data;
 			}
 			else
 			{
