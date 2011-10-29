@@ -18046,6 +18046,30 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="nhl97ua" cloneof="nhl97">
+		<!-- Serial: M/SNS-AH7E-USA - Release Date: 1996-10 -->
+		<!-- badinsults -->
+		<description>NHL '97 (USA, Rev. A)</description>
+		<year>1996</year>
+		<publisher>Black Pearl</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-ah7e-1.u1" size="2097152" crc="ebf09f2b" sha1="426b3355e098c2bda6c6f4c144b1c63f512621c2" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mjkiwame">
 		<!-- Serial: SHVC-ZZ - Release Date: 1993-06-11 - Alt. Title: プロ麻雀 極 -->
 		<!-- badinsults -->
