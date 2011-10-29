@@ -1966,47 +1966,49 @@ static void cartridge_gram_kracker_writeg(device_t *cartsys, int offset, UINT8 d
 {
 	// gk_slot is the slot where the GK module is plugged in
 	// gk_guest_slot is the slot where the cartridge is plugged in
-	cartridge_t *gromkrackerbox;
+	cartridge_t *gramkrackerbox;
 	ti99_multicart_state *cartslots = get_safe_token(cartsys);
 
 	// This is only called when there is really a GK module
-	gromkrackerbox = &cartslots->cartridge[cartslots->gk_slot];
+	gramkrackerbox = &cartslots->cartridge[cartslots->gk_slot];
 
 	if ((offset & 0x0002)==0x0002)
 	{
 		// Set address
-		if (gromkrackerbox->waddr_LSB)
+		if (gramkrackerbox->waddr_LSB)
 		{
 			/* Accept low byte (2nd write) */
-			gromkrackerbox->grom_address = (gromkrackerbox->grom_address & 0xff00) | data;
-			gromkrackerbox->waddr_LSB = FALSE;
+			gramkrackerbox->grom_address = (gramkrackerbox->grom_address & 0xff00) | data;
+			gramkrackerbox->waddr_LSB = FALSE;
 		}
 		else
 		{
 			/* Accept high byte (1st write) */
-			gromkrackerbox->grom_address = ((data<<8) & 0xff00) | (gromkrackerbox->grom_address & 0x00ff);
-			gromkrackerbox->waddr_LSB = TRUE;
+			gramkrackerbox->grom_address = ((data<<8) & 0xff00) | (gramkrackerbox->grom_address & 0x00ff);
+			gramkrackerbox->waddr_LSB = TRUE;
 		}
 	}
 	else
 	{
-		if (get_gk_switch(cartsys, 4) != GK_WP)
+		// According to manual:
+		// Writing to GRAM 0: switch 2 set to GRAM 0 + Write protect switch (4) in 1 or 2 position
+		// Writing to GRAM 1: switch 3 set to GRAM 1-2 + Loader off (5); write prot has no effect
+		// Writing to GRAM 2: switch 1 set to GRAM 1-2 (write prot has no effect)
+		// Writing to GRAM 3-7: switch set to GK_NORMAL, no cartridge inserted
+		// GK_NORMAL switch has no effect on GRAM 0-2
+		if (((gramkrackerbox->grom_address & 0xe000)==0x0000 && get_gk_switch(cartsys, 2)==GK_GRAM0 && get_gk_switch(cartsys, 4)!=GK_WP)
+			|| ((gramkrackerbox->grom_address & 0xe000)==0x2000 && get_gk_switch(cartsys, 3)==GK_GRAM12 && get_gk_switch(cartsys, 5)==GK_LDOFF)
+			|| ((gramkrackerbox->grom_address & 0xe000)==0x4000 && get_gk_switch(cartsys, 3)==GK_GRAM12)
+			|| ((gramkrackerbox->grom_address & 0xe000)==0x6000 && get_gk_switch(cartsys, 1)==GK_NORMAL && cartslots->gk_guest_slot==-1)
+			|| ((gramkrackerbox->grom_address & 0x8000)==0x8000 && get_gk_switch(cartsys, 1)==GK_NORMAL && cartslots->gk_guest_slot==-1))
 		{
-			// Write protection off
-			if (   ((gromkrackerbox->grom_address & 0xe000)==0x0000 && get_gk_switch(cartsys, 2)==GK_GRAM0 && get_gk_switch(cartsys, 4)!=GK_WP)
-				|| ((gromkrackerbox->grom_address & 0xe000)==0x2000 && get_gk_switch(cartsys, 3)==GK_GRAM12 && get_gk_switch(cartsys, 5)==GK_LDOFF)
-				|| ((gromkrackerbox->grom_address & 0xe000)==0x4000 && get_gk_switch(cartsys, 3)==GK_GRAM12)
-				|| ((gromkrackerbox->grom_address & 0xe000)==0x6000 && get_gk_switch(cartsys, 1)==GK_NORMAL && cartslots->gk_guest_slot==-1)
-				|| ((gromkrackerbox->grom_address & 0x8000)==0x8000 && get_gk_switch(cartsys, 1)==GK_NORMAL && cartslots->gk_guest_slot==-1))
-			{
-				(gromkrackerbox->ram_ptr)[gromkrackerbox->grom_address] = data;
-			}
+			(gramkrackerbox->ram_ptr)[gramkrackerbox->grom_address] = data;
 		}
 		// The GK GROM emulation does not wrap at 8K boundaries.
-		gromkrackerbox->grom_address = (gromkrackerbox->grom_address+1) & 0xffff;
+		gramkrackerbox->grom_address = (gramkrackerbox->grom_address+1) & 0xffff;
 
 		/* Reset the write address flipflop. */
-		gromkrackerbox->waddr_LSB = FALSE;
+		gramkrackerbox->waddr_LSB = FALSE;
 	}
 }
 
