@@ -15,6 +15,7 @@
 #include "machine/ctronics.h"
 #include "machine/ins8250.h"
 #include "machine/isa.h"
+#include "machine/isa_wdxt_gen.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"

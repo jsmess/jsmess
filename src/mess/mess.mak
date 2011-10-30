@@ -619,6 +619,7 @@ $(MESSOBJ)/amstrad.a:			\
 	$(MESS_MACHINE)/pc1512kb.o	\
 	$(MESS_VIDEO)/pc1512.o		\
 	$(MESS_VIDEO)/pc1640.o		\
+	$(MESS_MACHINE)/isa_wdxt_gen.o	\
 	$(MESS_VIDEO)/nc.o			\
 	$(MESS_DRIVERS)/nc.o		\
 	$(MESS_MACHINE)/nc.o		\
