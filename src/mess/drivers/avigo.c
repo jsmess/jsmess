@@ -52,10 +52,9 @@
             0x01        0xad        AMD AM29F016
 
         TODO:
-			- Found a way to emulate the touchscreen panel out of the screen
+			- Found a better way to emulate the touchscreen panel out of the screen
     		  area (the six buttons at the bottom)
 			- Alarm doesn't work
-			- Load app files causes the NVRAM corruption.
 			- Serial communications and IR port.
 
             I don't have any documentation on the hardware, so a lot of this
@@ -818,10 +817,16 @@ static QUICKLOAD_LOAD(avigo)
 {
 	avigo_state *state = image.device().machine().driver_data<avigo_state>();
 	address_space* flash1 = state->m_flashes[1]->memory().space(0);
+	const char *systemname = image.device().machine().system().name;
+	UINT32 first_app_page = (0x50000>>14);
 	int app_page;
+	
+	// german and spanish language are 4 pages bigger than other
+	if ( strcmp( systemname, "avigo_de" ) == 0 || strcmp( systemname, "avigo_es" ) == 0 )
+		first_app_page += 4;
 
 	// search the first empty page
-	for (app_page = (0x60000>>14) + 1; app_page<0x40; app_page++)
+	for (app_page = first_app_page + 1; app_page<0x40; app_page++)
 	{
 		bool empty_page = true;
 
@@ -847,7 +852,7 @@ static QUICKLOAD_LOAD(avigo)
 		image.fread((UINT8*)state->m_flashes[1]->space()->get_read_ptr(app_page<<14), image.length());
 
 		// update the application ID
-		flash1->write_byte((app_page<<14) + 0x1a5, 0x80 + (app_page - 0x18));
+		flash1->write_byte((app_page<<14) + 0x1a5, 0x80 + (app_page - (first_app_page>>14)));
 
 		// reset the CPU for allow at the Avigo OS to recognize the installed app
 		state->m_warm_start = 1;
