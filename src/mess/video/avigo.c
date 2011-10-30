@@ -42,7 +42,7 @@ WRITE8_MEMBER(avigo_state::vid_memory_w)
 	if (!offset)
 	{
 		/* select column to read/write */
-		m_screen_column = data;
+		m_screen_column = data % (AVIGO_SCREEN_WIDTH>>3);
 
 		LOG(("vid mem column write: %02x\n",data));
 
