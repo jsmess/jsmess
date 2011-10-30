@@ -27,7 +27,7 @@ READ8_MEMBER(avigo_state::vid_memory_r)
 	if (!offset)
 		return m_screen_column;
 
-	if ((offset<0x0100) || (offset>=0x01f0))
+	if ((offset<0x0100) || (offset>=0x01f0) || (m_screen_column >= (AVIGO_SCREEN_WIDTH>>3)))
 	{
 		LOG(("vid mem read: %04x\n", offset));
 		return 0;
@@ -42,7 +42,7 @@ WRITE8_MEMBER(avigo_state::vid_memory_w)
 	if (!offset)
 	{
 		/* select column to read/write */
-		m_screen_column = data % (AVIGO_SCREEN_WIDTH>>3);
+		m_screen_column = data;
 
 		LOG(("vid mem column write: %02x\n",data));
 
@@ -53,7 +53,7 @@ WRITE8_MEMBER(avigo_state::vid_memory_w)
 		return;
 	}
 
-	if ((offset<0x0100) || (offset>=0x01f0))
+	if ((offset<0x0100) || (offset>=0x01f0) || (m_screen_column >= (AVIGO_SCREEN_WIDTH>>3)))
 	{
 		LOG(("vid mem write: %04x %02x\n", offset, data));
 		return;
