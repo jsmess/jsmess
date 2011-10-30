@@ -492,6 +492,8 @@ static const nes_pcb pcb_list[] =
 	{ "KAISER-KS7058",    KAISER_KS7058 },
 	{ "KAISER-KS202",     KAISER_KS202 },// mapper 56
 	{ "KAISER-KS7022",    KAISER_KS7022 },// mapper 175
+	{ "UNL-KS7012",       UNSUPPORTED_BOARD /*KAISER_KS7012*/ },	// used in Zanac (FDS Conversion) (support missing atm)
+	{ "UNL-KS7013B",      UNSUPPORTED_BOARD },	// used in Highway Star (FDS Conversion) (support missing atm)
 	{ "UNL-KS7017",       KAISER_KS7017 },
 	{ "UNL-KS7032",       KAISER_KS7032 }, //  mapper 142
 	{ "RCM-GS2015",       RCM_GS2015 },
@@ -520,6 +522,7 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-KOF96",        UNL_KOF96 },
 	{ "UNL-SUPERFIGHTER3", UNL_SUPERFIGHTER3 },
 	{ "UNL-8237",         UNL_8237 },
+	{ "UNL-8237A",        UNSUPPORTED_BOARD },
 	{ "UNL-AX5705",       UNL_AX5705 },
 	{ "UNL-CC-21",        UNL_CC21 },
 	{ "UNL-KOF97",        UNL_KOF97 },
@@ -528,6 +531,7 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-OneBus",       UNSUPPORTED_BOARD },
 	{ "UNL-FS304",        UNSUPPORTED_BOARD },	// used in Zelda 3 by Waixing (support missing atm)
 	{ "UNL-43272",        UNSUPPORTED_BOARD },	// used in Gaau Hok Gwong Cheung (support missing atm)
+	{ "UNL-LH10",         UNSUPPORTED_BOARD },	// used in Fuuun Shaolin Kyo (FDS Conversion) (support missing atm)
 //
 	{ "BTL-SMB2A",         BTL_SMB2A },
 	{ "BTL-MARIOBABY",     BTL_MARIOBABY },
@@ -603,6 +607,7 @@ static const nes_pcb pcb_list[] =
 	{ "BMC-70IN1B",          UNSUPPORTED_BOARD },	// mapper 236?
 	{ "BMC-SUPERHIK-KOF",    UNSUPPORTED_BOARD },// mapper 251
 	{ "BMC-POWERJOY",        BMC_PJOY84 },
+	{ "BMC-POWERFUL-255",    UNSUPPORTED_BOARD },	// mapper 63?
 // are there dumps of games with these boards?
 	{ "BMC-13IN1JY110",   UNSUPPORTED_BOARD }, //  [mentioned in FCEUMM source - we need more info]
 	{ "BMC-GK-192",       UNSUPPORTED_BOARD }, //  [mentioned in FCEUMM source - we need more info]
