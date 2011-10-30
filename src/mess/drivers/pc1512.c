@@ -1146,6 +1146,7 @@ static const centronics_interface centronics_intf =
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( pc1512_isa8_cards )
+	SLOT_INTERFACE("wdxt_gen", WDXT_GEN)
 SLOT_INTERFACE_END
 
 static const isa8bus_interface isabus_intf =
@@ -1385,7 +1386,7 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 
 	// ISA8 bus
 	MCFG_ISA8_BUS_ADD("isa", I8086_TAG, isabus_intf)
-	MCFG_ISA8_SLOT_ADD("isa", "isa1", pc1512_isa8_cards, NULL, NULL)
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", pc1512_isa8_cards, "wdxt_gen", NULL)
 	MCFG_ISA8_SLOT_ADD("isa", "isa2", pc1512_isa8_cards, NULL, NULL)
 	MCFG_ISA8_SLOT_ADD("isa", "isa3", pc1512_isa8_cards, NULL, NULL)
 
@@ -1463,9 +1464,6 @@ ROM_START( pc1640 )
 
 	ROM_REGION16_LE( 0x8000, "iga", 0)
 	ROM_LOAD( "40100.ic913", 0x0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33) ) // 8736 E
-
-	ROM_REGION16_LE( 0x2000, "hdc", 0)
-	ROM_LOAD( "3.u13", 0x0000, 0x2000, CRC(fbcb5f91) SHA1(8c22bd664177eb6126f3011eda8c5655fffe0ef2) ) // Toshiba TMM2464AP, Tandon TM262 HDD
 ROM_END
 
 

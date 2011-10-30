@@ -1,6 +1,11 @@
-/*
+/**********************************************************************
 
-*/
+    Amstrad PC1512 Keyboard emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
 
 #include "pc1512kb.h"
 
