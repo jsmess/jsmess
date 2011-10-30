@@ -77,6 +77,20 @@ a 0 is passed. The KIM-1 software measures the time it takes for the signal to
 change from 1 to 0.
 
 
+
+Pasting:
+        0-F : as is
+        + (inc) : ^
+        AD : -
+        DA : =
+        GO : X
+
+(note: DA only works when addressing RAM)
+
+Test Paste:
+        =11^22^33^44^55^66^77^88^99^-0000
+        Now press up-arrow to confirm the data has been entered.
+
 ******************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -94,10 +108,12 @@ class kim1_state : public driver_device
 public:
 	kim1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_riot2(*this, "miot_u2")
+	m_riot2(*this, "miot_u2"),
+	m_cass(*this, CASSETTE_TAG)
 	{ }
 
 	required_device<device_t> m_riot2;
+	required_device<cassette_image_device> m_cass;
 	DECLARE_READ8_MEMBER(kim1_u2_read_a);
 	DECLARE_WRITE8_MEMBER(kim1_u2_write_a);
 	DECLARE_READ8_MEMBER(kim1_u2_read_b);
@@ -133,39 +149,39 @@ static INPUT_CHANGED( kim1_reset )
 static INPUT_PORTS_START( kim1 )
 	PORT_START("LINE0")			/* IN0 keys row 0 */
 	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
-	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("0.6: 0") PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("0.5: 1") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x10, 0x10, IPT_KEYBOARD ) PORT_NAME("0.4: 2") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x08, 0x08, IPT_KEYBOARD ) PORT_NAME("0.3: 3") PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x04, 0x04, IPT_KEYBOARD ) PORT_NAME("0.2: 4") PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x02, 0x02, IPT_KEYBOARD ) PORT_NAME("0.1: 5") PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x01, 0x01, IPT_KEYBOARD ) PORT_NAME("0.0: 6") PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0x10, 0x10, IPT_KEYBOARD ) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x08, 0x08, IPT_KEYBOARD ) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x04, 0x04, IPT_KEYBOARD ) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT( 0x02, 0x02, IPT_KEYBOARD ) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT( 0x01, 0x01, IPT_KEYBOARD ) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
 
 	PORT_START("LINE1")			/* IN1 keys row 1 */
 	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
-	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("1.6: 7") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("1.5: 8") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x10, 0x10, IPT_KEYBOARD ) PORT_NAME("1.4: 9") PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x08, 0x08, IPT_KEYBOARD ) PORT_NAME("1.3: A") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x04, 0x04, IPT_KEYBOARD ) PORT_NAME("1.2: B") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x02, 0x02, IPT_KEYBOARD ) PORT_NAME("1.1: C") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x01, 0x01, IPT_KEYBOARD ) PORT_NAME("1.0: D") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT( 0x10, 0x10, IPT_KEYBOARD ) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x08, 0x08, IPT_KEYBOARD ) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x04, 0x04, IPT_KEYBOARD ) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x02, 0x02, IPT_KEYBOARD ) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x01, 0x01, IPT_KEYBOARD ) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 
 	PORT_START("LINE2")			/* IN2 keys row 2 */
 	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
-	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("2.6: E") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("2.5: F") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, 0x10, IPT_KEYBOARD ) PORT_NAME("2.4: AD (F1)") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x08, 0x08, IPT_KEYBOARD ) PORT_NAME("2.3: DA (F2)") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x04, 0x04, IPT_KEYBOARD ) PORT_NAME("2.2: +  (CR)") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x02, 0x02, IPT_KEYBOARD ) PORT_NAME("2.1: GO (F5)") PORT_CODE(KEYCODE_F5)
-	PORT_BIT( 0x01, 0x01, IPT_KEYBOARD ) PORT_NAME("2.0: PC (F6)") PORT_CODE(KEYCODE_F6)
+	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x10, 0x10, IPT_KEYBOARD ) PORT_NAME("AD") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+	PORT_BIT( 0x08, 0x08, IPT_KEYBOARD ) PORT_NAME("DA") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=')
+	PORT_BIT( 0x04, 0x04, IPT_KEYBOARD ) PORT_NAME("+") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
+	PORT_BIT( 0x02, 0x02, IPT_KEYBOARD ) PORT_NAME("GO") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT( 0x01, 0x01, IPT_KEYBOARD ) PORT_NAME("PC") PORT_CODE(KEYCODE_F6)
 
 	PORT_START("LINE3")			/* IN3 STEP and RESET keys, MODE switch */
 	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
-	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("sw1: ST (F7)") PORT_CODE(KEYCODE_F7)
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RS (F3)") PORT_CODE(KEYCODE_F3) PORT_CHANGED(kim1_reset, NULL)
-	PORT_DIPNAME(0x10, 0x10, "sw3: SS (NumLock)") PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE
+	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("sw1: ST") PORT_CODE(KEYCODE_F7)
+	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RS") PORT_CODE(KEYCODE_F3) PORT_CHANGED(kim1_reset, NULL)
+	PORT_DIPNAME(0x10, 0x10, "sw3: SS") PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE
 	PORT_DIPSETTING( 0x00, "single step")
 	PORT_DIPSETTING( 0x10, "run")
 	PORT_BIT( 0x08, 0x00, IPT_UNUSED )
@@ -177,7 +193,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( kim1_state::kim1_u2_read_a )
 {
-	UINT8	data = 0xff;
+	UINT8 data = 0xff;
 
 	switch( ( m_u2_port_b >> 1 ) & 0x0f )
 	{
@@ -223,10 +239,8 @@ WRITE8_MEMBER( kim1_state::kim1_u2_write_b )
 	m_u2_port_b = data;
 
 	if ( data & 0x20 )
-	{
 		/* cassette write/speaker update */
-		machine().device<cassette_image_device>(CASSETTE_TAG)->output(( data & 0x80 ) ? -1.0 : 1.0 );
-	}
+		m_cass->output(( data & 0x80 ) ? -1.0 : 1.0 );
 
 	/* Set IRQ when bit 7 is cleared */
 }
@@ -252,7 +266,7 @@ static MOS6530_INTERFACE( kim1_u3_mos6530_interface )
 static TIMER_DEVICE_CALLBACK( kim1_cassette_input )
 {
 	kim1_state *state = timer.machine().driver_data<kim1_state>();
-	double tap_val = (timer.machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+	double tap_val = state->m_cass->input();
 
 	if ( tap_val <= 0 )
 	{
@@ -264,16 +278,14 @@ static TIMER_DEVICE_CALLBACK( kim1_cassette_input )
 	}
 
 	if ( tap_val > 0 )
-	{
 		state->m_cassette_high_count++;
-	}
 }
 
 
 static TIMER_DEVICE_CALLBACK( kim1_update_leds )
 {
 	kim1_state *state = timer.machine().driver_data<kim1_state>();
-	int i;
+	UINT8 i;
 
 	for ( i = 0; i < 6; i++ )
 	{
@@ -297,13 +309,10 @@ static MACHINE_START( kim1 )
 static MACHINE_RESET( kim1 )
 {
 	kim1_state *state = machine.driver_data<kim1_state>();
-	int i;
-
+	UINT8 i;
 
 	for ( i = 0; i < 6; i++ )
-	{
 		state->m_led_time[i] = 0;
-	}
 
 	state->m_311_output = 0;
 	state->m_cassette_high_count = 0;
@@ -329,20 +338,18 @@ static MACHINE_CONFIG_START( kim1, kim1_state )
 	MCFG_MACHINE_START( kim1 )
 	MCFG_MACHINE_RESET( kim1 )
 
-	MCFG_MOS6530_ADD( "miot_u2", 1000000, kim1_u2_mos6530_interface )
-	MCFG_MOS6530_ADD( "miot_u3", 1000000, kim1_u3_mos6530_interface )
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, kim1_cassette_interface )
-
 	/* video */
 	MCFG_DEFAULT_LAYOUT( layout_kim1 )
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* Devices */
+	MCFG_MOS6530_ADD( "miot_u2", 1000000, kim1_u2_mos6530_interface )
+	MCFG_MOS6530_ADD( "miot_u3", 1000000, kim1_u3_mos6530_interface )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, kim1_cassette_interface )
 	MCFG_TIMER_ADD_PERIODIC("led_timer", kim1_update_leds, attotime::from_hz(60))
 	MCFG_TIMER_ADD_PERIODIC("cassette_timer", kim1_cassette_input, attotime::from_hz(44100))
 MACHINE_CONFIG_END
