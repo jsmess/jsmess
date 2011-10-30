@@ -278,7 +278,7 @@ static SCREEN_UPDATE( tk80bs )
 	return 0;
 }
 
-/* Address lines 1&2 are swapped at the 8255 chip */
+/* A0 and A1 are swapped at the 8255 chip */
 READ8_MEMBER( tk80bs_state::ppi_custom_r )
 {
 	switch(offset)
