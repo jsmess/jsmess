@@ -11,11 +11,11 @@
         DA : =
         GO : X
 
-    Here is a test program. Copy the text and Paste into the emulator.
-    =3E^=0F^=D3^=13^=3E^=07^=D3^=13^=3E^=55^=D3^=12^=76^-1000X
+    Here is a test program to turn on the LEDs.
+    Copy the text and Paste into the emulator.
+    =3E^=0F^=D3^=13^=3E^=07^=D3^=13^=3E^=00^=D3^=12^=76^-1000X
 
     ToDo:
-    - Move the 8 LEDs to be under the numbers (bit 7 on the left side)
     - Blank the display if digits aren't being refreshed
 
 ***************************************************************************/
