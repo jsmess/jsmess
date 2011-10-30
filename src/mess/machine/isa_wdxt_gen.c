@@ -7,6 +7,43 @@
 
 **********************************************************************/
 
+/*
+
+PCB Layout
+----------
+
+ASSY 61-000222-00
+
+|-------------------------------------------|
+|	CN2		CN1								|
+|	CN3		7406				TMM2016		|
+|			LS38	LS14					|
+| MC3486									|
+|				WD1015			WD11C00		|
+|			33.04MHz						|
+| MC3487									|
+|				WD2010			LS244		|
+|	WD10C20									|
+|				LS260	LS13		ROM		|
+|											|
+|---|									|---|
+	|-----------------------------------|
+
+Notes:
+    All IC's shown.
+
+    ROM		- Toshiba TMM2464AP 8Kx8 ROM "3"
+	TMM2016	- Toshiba TMM2016BP-10 2Kx8 SRAM
+	WD1015	- Western Digital WD1015-PL Buffer Manager Control Processor
+	WD11C00	- Western Digital WD11C00L-JT 17-02 PC/XT Host Interface Logic Device
+	WD10C20	- Western Digital WD10C20B-PH 05-05 Self-Adjusting Data Separator
+	WD2010	- Western Digital WD2010A-PL 05-02 Winchester Disk Controller
+	CN1		- 2x17 pin PCB header, control
+	CN2		- 2x10 pin PCB header, drive 0 data
+	CN3		- 2x10 pin PCB header, drive 1 data
+
+*/
+
 #include "machine/isa_wdxt_gen.h"
 
 
@@ -29,7 +66,7 @@ const device_type WDXT_GEN = &device_creator<wdxt_gen_device>;
 
 ROM_START( wdxt_gen )
 	ROM_REGION( 0x2000, "hdc", 0 )
-	ROM_LOAD( "3.u13", 0x0000, 0x2000, CRC(fbcb5f91) SHA1(8c22bd664177eb6126f3011eda8c5655fffe0ef2) ) // Toshiba TMM2464AP
+	ROM_LOAD( "3.u13", 0x0000, 0x2000, CRC(fbcb5f91) SHA1(8c22bd664177eb6126f3011eda8c5655fffe0ef2) )
 ROM_END
 
 
