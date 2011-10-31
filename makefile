@@ -75,7 +75,7 @@ else
 UNAME = $(shell uname -a)
 
 ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
-TARGETOS = unix
+TARGETOS = linux
 endif
 ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
 TARGETOS = solaris
