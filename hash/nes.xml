@@ -49376,10 +49376,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-256" />
 			<dataarea name="chr" size="8192">
-				<rom name="multiplication" size="8192" crc="fbeefede" sha1="e91ae0a9fe56075b2db8349b7c2d1f73368a6ebe" offset="00000" status="baddump" />
+				<rom name="multiplication.chr" size="8192" crc="fbeefede" sha1="e91ae0a9fe56075b2db8349b7c2d1f73368a6ebe" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="multiplication" size="32768" crc="95267359" sha1="e6d626f2b793fcfa311c74df74c36c8adc318985" offset="00000" status="baddump" />
+				<rom name="multiplication.prg" size="32768" crc="95267359" sha1="e6d626f2b793fcfa311c74df74c36c8adc318985" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -49805,6 +49805,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 
 <!-- OTHER TAIWANESE ~ CHINESE ~ ASIAN PIRATES-->
+
+	<software name="2dkjb" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>2 in 1 - Donkey Kong &amp; Jungle Book</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-N625092" /> <!-- Mapper 221 -->
+			<dataarea name="chr" size="262144">
+				<rom name="2-in-1 donkey kong + jungle book (unl).chr" size="262144" crc="52ea0000" sha1="7d437a553c7498e637c231dd1df51e73defc0905" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="2-in-1 donkey kong + jungle book (unl).prg" size="262144" crc="5d6844da" sha1="9ac420debc8b77d8b0e8bff73889bd28f4f3a651" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="2fkal" supported="partial">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
@@ -63150,6 +63166,38 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_4b">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>4 in 1 (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-64IN1" />
+			<dataarea name="chr" size="32768">
+				<rom name="4-in-1 (001-90 tank tdg &amp; 004-small mario jhf).chr" size="32768" crc="14ff35e6" sha1="278b38b3493c93c3a1f36ad3f00495203b32fc36" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="4-in-1 (001-90 tank tdg &amp; 004-small mario jhf).prg" size="65536" crc="478e9e8a" sha1="9f57094ecb761e799e9e339ecb82c5fc2b50649a" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4c" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>4 in 1 (Alt 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNKNOWN" /> <!-- Header says mapper 60 (not supported yet) -->
+			<dataarea name="chr" size="32768">
+				<rom name="4-in-1 (bomberman+f-1 race+circus charlie+star force).chr" size="32768" crc="2abfe1d5" sha1="db148e7158a97b96e4f74f11b1cf31b5e9bb1e11" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="4-in-1 (bomberman+f-1 race+circus charlie+star force).prg" size="65536" crc="4729d5b8" sha1="0717d41866f1fd7251835f05c619bb7dca967251" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_4c20" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>4 in 1 (411120-C)</description>
@@ -63202,6 +63250,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- The UNIF file contained separate PRG banks -->
 	<software name="mc_4ck1" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>4 in 1 1993 (CK-001)</description>
@@ -63210,7 +63259,12 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BMC-8157" />
 			<dataarea name="prg" size="524288">
-				<rom name="4-in-1 1993 (ck-001)[u][!].prg" size="524288" crc="4ae9ee7d" sha1="40c7e4da72269c2eea052bbca82d038678245649" offset="00000" status="baddump" />
+				<!-- whole image -->
+				<!--rom name="4-in-1 1993 (ck-001)[u][!].prg" size="524288" crc="4ae9ee7d" sha1="40c7e4da72269c2eea052bbca82d038678245649" offset="00000" status="baddump" /-->
+				<rom name="4-in-1 1993 (ck-001)[u][!].prg0" size="131072" crc="038ff909" sha1="b8f225b6b932a568e5fb7a24e7899f7d499d931e" offset="00000" status="baddump" />
+				<rom name="4-in-1 1993 (ck-001)[u][!].prg1" size="131072" crc="1fe6ac0b" sha1="cb6578c2ba1444df1d8ba6aab9561a9abcf785ac" offset="00000" status="baddump" />
+				<rom name="4-in-1 1993 (ck-001)[u][!].prg2" size="131072" crc="63052e95" sha1="1531d700c9ed0053505d1826f1b217a44b7d8467" offset="00000" status="baddump" />
+				<rom name="4-in-1 1993 (ck-001)[u][!].prg3" size="131072" crc="2b5db515" sha1="0c7db5d601c6599f00a86dcffe1e7689460d8184" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -63630,6 +63684,38 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_66">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>66 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-SUPERHIK-300IN1" />
+			<dataarea name="chr" size="32768">
+				<rom name="66-in1 (1-duck hunt 1 & 66-sky destroyer 25).chr" size="32768" crc="8d6e3303" sha1="f051f1198d37ee869eebaa912f634953859f228e" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="66-in1 (1-duck hunt 1 & 66-sky destroyer 25).prg" size="65536" crc="38fd3dc5" sha1="830e6e33764091fe258fb44d5486e0f50088f1ed" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_68" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>68 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-GKA" /> <!-- Mapper 57? -->
+			<dataarea name="chr" size="65536">
+				<rom name="68-in-1 (1-f1 race meq & 68-maross dli).chr" size="65536" crc="26c744ee" sha1="01af2b2fe5ba33b2de26e6b4fea6f40eddeda3fc" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="68-in-1 (1-f1 race meq & 68-maross dli).prg" size="131072" crc="2805fbef" sha1="0aef4649d603d986219cd29ecf28f66e56a68917" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_68gs">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>68 in 1 (HKX5268)</description>
@@ -63674,6 +63760,22 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="7-in-1 [p1][u][!].prg" size="524288" crc="f821eb8b" sha1="f0a2a6459953f6a2bd628de6ee16813954562ad1" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_7a">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>7 in 1 (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-36IN1" />
+			<dataarea name="chr" size="32768">
+				<rom name="7-in-1 (1-dig dug & 7-kung fu 3).chr" size="32768" crc="7f616fb2" sha1="8180eaeeeb364edaba7209a84b9afe5c23327b16" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="7-in-1 (1-dig dug & 7-kung fu 3).prg" size="65536" crc="53272359" sha1="9064fc9b697724d83ad108bf7ca29108e542d004" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -63902,6 +64004,38 @@ be better to redump them properly. -->
 				<dipvalue name="8-in-1" value="0" default="yes"/>
 				<dipvalue name="4-in-1" value="1"/>
 			</dipswitch>
+		</part>
+	</software>
+
+	<software name="mc_80" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>80 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-64IN1" />
+			<dataarea name="chr" size="65536">
+				<rom name="80-in-1 (1-f1 race & 80-save princess gib).chr" size="65536" crc="41254b58" sha1="e0ff7fc863bbe32924dd323bb52ef59c74c59910" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="80-in-1 (1-f1 race & 80-save princess gib).prg" size="131072" crc="e0321d47" sha1="c66c7637f3267a16765527eb8e41563c3b0349fb" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_83">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>83 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-SUPERHIK-300IN1" />
+			<dataarea name="chr" size="65536">
+				<rom name="83-in-1 (01-bomber man & 83-final d k 3).chr" size="65536" crc="071ca7fd" sha1="6797153243c97a33272c7065e367c02afe1004ca" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="83-in-1 (01-bomber man & 83-final d k 3).prg" size="131072" crc="27b750c0" sha1="1b7d4111e1b9f883e7eb98ea04385fcca09f6fb8" offset="00000" status="baddump" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -64353,6 +64487,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- The UNIF file contained separate PRG/CHR banks -->
 	<software name="mc_s24" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Super 24 in 1</description>
@@ -64361,10 +64496,21 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BMC-SUPER24IN1SC03" />
 			<dataarea name="chr" size="2097152">
-				<rom name="super 24-in-1 [u][p1].chr" size="2097152" crc="5cba7311" sha1="67c9bfecc51d2db94a8349aa003f0cecf9760ca3" offset="00000" status="baddump" />
+				<!-- whole image -->
+				<!--rom name="super 24-in-1 [u][p1].chr" size="2097152" crc="5cba7311" sha1="67c9bfecc51d2db94a8349aa003f0cecf9760ca3" offset="00000" status="baddump" /-->
+				<rom name="super 24-in-1 [u][p1].chr0" size="524288" crc="e8d9a7c6" sha1="8b9d7e465f9d4c67d182e7fd9d928b8d54e9c124" offset="00000" status="baddump" />
+				<rom name="super 24-in-1 [u][p1].chr1" size="524288" crc="34dd0da5" sha1="94abcd9f55d8d8405ee60dd4f56901085ae1d7be" offset="00000" status="baddump" />
+				<rom name="super 24-in-1 [u][p1].chr2" size="524288" crc="8feb348d" sha1="0e06754084941b724324fff3276e21eebdcb9a14" offset="00000" status="baddump" />
+				<rom name="super 24-in-1 [u][p1].chr3" size="524288" crc="5c1d64ff" sha1="f2662c98129630cbe134d38a990c81717ab05186" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="2621440">
-				<rom name="super 24-in-1 [u][p1].prg" size="2621440" crc="7b766bc1" sha1="de1effb82aba548165ae70844733445c7584fdb7" offset="00000" status="baddump" />
+				<!-- whole image -->
+				<!--rom name="super 24-in-1 [u][p1].prg" size="2621440" crc="7b766bc1" sha1="de1effb82aba548165ae70844733445c7584fdb7" offset="00000" status="baddump" /-->
+				<rom name="super 24-in-1 [u][p1].prg0" size="524288" crc="6476086a" sha1="316e099ed759c1c4442de8a2723e4a5f58857188" offset="00000" status="baddump" />
+				<rom name="super 24-in-1 [u][p1].prg1" size="524288" crc="e3526d8b" sha1="38d6b94e1cbb1272188acf8ca383fc6069c35867" offset="00000" status="baddump" />
+				<rom name="super 24-in-1 [u][p1].prg2" size="524288" crc="c6286aa6" sha1="7903e75b97155fd38226016c8bd43e5b89d61452" offset="00000" status="baddump" />
+				<rom name="super 24-in-1 [u][p1].prg3" size="524288" crc="93fd4c1a" sha1="fc7c7f7c6466e7596ea1a4718df93fa3b044edb8" offset="00000" status="baddump" />
+				<rom name="super 24-in-1 [u][p1].prg4" size="524288" crc="6476086a" sha1="316e099ed759c1c4442de8a2723e4a5f58857188" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -64797,6 +64943,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- The UNIF file contained separate PRG banks  -->
 	<software name="mc_16sv" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Super 128k - 16 in 1</description>
@@ -64805,7 +64952,13 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BMC-SUPERVISION16IN1" />
 			<dataarea name="prg" size="2129920">
-				<rom name="supervision 16-in-1 [p1].prg" size="2129920" crc="7e449555" sha1="265d9503a0a6ffdadc7391b2709d8d487928a9ff" offset="00000" status="baddump" />
+				<!-- whole image -->
+				<!--rom name="supervision 16-in-1 [p1].prg" size="2129920" crc="7e449555" sha1="265d9503a0a6ffdadc7391b2709d8d487928a9ff" offset="00000" status="baddump" /-->
+				<rom name="supervision 16-in-1 [p1].prg4" size="32768" crc="63794e25" sha1="e3a175a6783a7f519811965eb44c994601b05d2b" offset="0x000000" status="baddump" />
+				<rom name="supervision 16-in-1 [p1].prg0" size="524288" crc="1e8de863" sha1="52434b87cfbbd5add2a563bccc8c6731470e11c0" offset="0x008000" status="baddump" />
+				<rom name="supervision 16-in-1 [p1].prg1" size="524288" crc="d8cb825e" sha1="ffa0628854f7a6728c979c36175c280c3887691e" offset="0x088000" status="baddump" />
+				<rom name="supervision 16-in-1 [p1].prg2" size="524288" crc="3ca3ee9c" sha1="c5a469cd699f560a6413684c4e89cb4553f2a578" offset="0x108000" status="baddump" />
+				<rom name="supervision 16-in-1 [p1].prg3" size="524288" crc="da167280" sha1="e9a03a46e1f96384f4d587e597ae1ef23df3f59f" offset="0x188000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -65197,4 +65350,3 @@ that the real dumps might surface -->
  -->
 
 </softwarelist>
-
