@@ -1772,6 +1772,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/iq151.o		\
 	$(MESS_DRIVERS)/indiana.o	\
 	$(MESS_DRIVERS)/instruct.o	\
+	$(MESS_DRIVERS)/mbc200.o	\
 	$(MESS_DRIVERS)/mccpm.o		\
 	$(MESS_DRIVERS)/mes.o		\
 	$(MESS_DRIVERS)/microdec.o	\
