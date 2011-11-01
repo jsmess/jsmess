@@ -599,7 +599,6 @@ $(MESSOBJ)/act.a:				\
 	$(MESS_DRIVERS)/victor9k.o	\
 
 $(MESSOBJ)/amiga.a:				\
-	$(MESS_MACHINE)/amigafdc.o	\
 	$(MESS_MACHINE)/amigacrt.o	\
 	$(MESS_MACHINE)/amigacd.o	\
 	$(MESS_MACHINE)/amigakbd.o	\
