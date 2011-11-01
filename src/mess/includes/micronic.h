@@ -52,8 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER( rtc_address_w );
 	DECLARE_READ8_MEMBER( rtc_data_r );
 	DECLARE_WRITE8_MEMBER( rtc_data_w );
-
-	void set_146818_periodic_irq(UINT8 data);
+	DECLARE_WRITE_LINE_MEMBER( mc146818_irq );
 
 	UINT8 *m_ram_base;
 	UINT8 m_banks_num;
@@ -61,12 +60,6 @@ public:
 	UINT8 m_lcd_contrast;
 	bool m_lcd_backlight;
 	UINT8 m_status_flag;
-
-	// rtc-146818
-	UINT8 m_rtc_address;
-	UINT8 m_periodic_irq;
-	UINT8 m_irq_flags;
-	emu_timer *m_rtc_periodic_irq;
 };
 
 #endif
