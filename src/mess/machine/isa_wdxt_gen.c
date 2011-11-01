@@ -71,7 +71,7 @@ const device_type WDXT_GEN = &device_creator<wdxt_gen_device>;
 
 ROM_START( wdxt_gen )
 	ROM_REGION( 0x800, WD1015_TAG, 0 )
-	ROM_LOAD( "wd1015-pl-54-02.u6", 0x000, 0x800, NO_DUMP )
+	ROM_LOAD( "wd1015-pl-54-02.u6", 0x000, 0x800, CRC(116e0608) SHA1(bcbd6b39c5a7e16e3bae9372b53d54d6761ba6bc) )
 
 	ROM_REGION( 0x2000, "hdc", 0 )
 	ROM_LOAD( "3.u13", 0x0000, 0x2000, CRC(fbcb5f91) SHA1(8c22bd664177eb6126f3011eda8c5655fffe0ef2) )
