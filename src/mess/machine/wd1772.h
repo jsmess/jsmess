@@ -146,7 +146,7 @@ private:
 		UINT8 phase_add, phase_sub, freq_add, freq_sub;
 		attotime ctime;
 
-		attotime delays[38];
+		attotime delays[42];
 
 		void set_clock(attotime period);
 		void reset(attotime when);

@@ -823,7 +823,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	/* uart */
 	MCFG_I8251_ADD(IC_I060, default_i8251_interface)
 
-	MCFG_WD1772x_ADD(IC_I042, 8000000)
+	MCFG_WD1772x_ADD(IC_I042, XTAL_X002)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_525_DD, 42, 1, einstein_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_525_DD, 42, 1, einstein_state::floppy_formats)
