@@ -109,9 +109,44 @@ ADDRESS_MAP_END
 //  WD11C00_17_INTERFACE( host_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( wdxt_gen_device::irq5_w )
+{
+	m_isa->irq5_w(state);
+}
+
+WRITE_LINE_MEMBER( wdxt_gen_device::drq3_w )
+{
+	m_isa->drq3_w(state);
+}
+
+WRITE_LINE_MEMBER( wdxt_gen_device::mr_w )
+{
+	if (state == ASSERT_LINE)
+	{
+		device_reset();
+	}
+}
+
+READ8_MEMBER( wdxt_gen_device::rd322_r )
+{
+	return 0xff;
+}
+
 static WD11C00_17_INTERFACE( host_intf )
 {
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, irq5_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, drq3_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, mr_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, rd322_r)
+};
+
+
+//-------------------------------------------------
+//  WD11C00_17_INTERFACE( hdc_intf )
+//-------------------------------------------------
+
+static WD2010_INTERFACE( hdc_intf )
+{
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -128,7 +163,7 @@ static MACHINE_CONFIG_FRAGMENT( wdxt_gen )
 	MCFG_CPU_IO_MAP(wd1015_io)
 
 	MCFG_WD11C00_17_ADD(WD11C00_17_TAG, 5000000, host_intf)
-	MCFG_WD2010_ADD(WD2010A_TAG)
+	MCFG_WD2010_ADD(WD2010A_TAG, 5000000, hdc_intf)
 	
 	MCFG_HARDDISK_ADD("harddisk0")
 	MCFG_HARDDISK_ADD("harddisk1")
@@ -182,4 +217,34 @@ void wdxt_gen_device::device_start()
 
 void wdxt_gen_device::device_reset()
 {
+}
+
+
+//-------------------------------------------------
+//  dack_r -
+//-------------------------------------------------
+
+UINT8 wdxt_gen_device::dack_r(int line)
+{
+	return m_host->dack_r();
+}
+
+
+//-------------------------------------------------
+//  dack_w -
+//-------------------------------------------------
+
+void wdxt_gen_device::dack_w(int line, UINT8 data)
+{
+	m_host->dack_w(data);
+}
+
+
+//-------------------------------------------------
+//  have_dack -
+//-------------------------------------------------
+
+bool wdxt_gen_device::have_dack(int line)
+{
+	return (line == 3) ? TRUE : FALSE;
 }

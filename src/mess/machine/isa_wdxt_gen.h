@@ -46,13 +46,24 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
-
+	
+	// not really public
+	DECLARE_WRITE_LINE_MEMBER( irq5_w );
+	DECLARE_WRITE_LINE_MEMBER( drq3_w );
+	DECLARE_WRITE_LINE_MEMBER( mr_w );
+	DECLARE_READ8_MEMBER( rd322_r );
+	
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "wdxt_gen"; }
-
+	
+	// device_isa8_card_interface
+	virtual UINT8 dack_r(int line);
+	virtual void dack_w(int line, UINT8 data);
+	virtual bool have_dack(int line);	
+	
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<wd11c00_17_device> m_host;

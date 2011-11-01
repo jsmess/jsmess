@@ -26,6 +26,7 @@
     MCFG_DEVICE_ADD(_tag, WD11C00_17, _clock) \
 	MCFG_DEVICE_CONFIG(_config)
 
+	
 #define WD11C00_17_INTERFACE(_name) \
 	const wd11c00_17_interface (_name) =
 
@@ -57,15 +58,16 @@ public:
 	
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( dack_r );
-	DECLARE_WRITE8_MEMBER( dack_w );
+	
+	UINT8 dack_r();
+	void dack_w(UINT8 data);
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
     virtual void device_config_complete();
-	
+
 private:
 	devcb_resolved_write_line	m_out_irq5_func;
 	devcb_resolved_write_line	m_out_drq3_func;
