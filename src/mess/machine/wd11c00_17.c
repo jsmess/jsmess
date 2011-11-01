@@ -15,6 +15,18 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
+// status register
+#define STATUS_IRQ		0x20
+#define STATUS_DRQ		0x10
+#define STATUS_BUSY		0x08
+#define STATUS_C_D		0x04
+#define STATUS_I_O		0x02
+#define STATUS_REQ		0x01
+
+
+// mask register
+#define MASK_IRQ		0x02
+#define MASK_DMA		0x01
 
 
 
@@ -93,7 +105,25 @@ void wd11c00_17_device::device_reset()
 
 READ8_MEMBER( wd11c00_17_device::read )
 {
-	return 0;
+	UINT8 data = 0;
+	
+	switch (offset)
+	{
+	case 0: // Read Data, Board to Host
+		break;
+
+	case 1: // Read Board Hardware Status
+		data = m_in_rd322_func(0);
+		break;
+
+	case 2: // Read Drive Configuration Information
+		break;
+
+	case 3: // Not Used
+		break;
+	}
+	
+	return data;
 }
 
 
@@ -103,6 +133,22 @@ READ8_MEMBER( wd11c00_17_device::read )
 
 WRITE8_MEMBER( wd11c00_17_device::write )
 {
+	switch (offset)
+	{
+	case 0: // Write Data, Host to Board
+		break;
+
+	case 1: // Board Software Reset
+		m_out_mr_func(ASSERT_LINE);
+		m_out_mr_func(CLEAR_LINE);
+		break;
+
+	case 2:	// Board Select
+		break;
+
+	case 3: // Set/Reset DMA, IRQ Masks
+		break;
+	}
 }
 
 
@@ -110,7 +156,7 @@ WRITE8_MEMBER( wd11c00_17_device::write )
 //  dack_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wd11c00_17_device::dack_r )
+UINT8 wd11c00_17_device::dack_r()
 {
 	return 0;
 }
@@ -120,6 +166,6 @@ READ8_MEMBER( wd11c00_17_device::dack_r )
 //  dack_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wd11c00_17_device::dack_w )
+void wd11c00_17_device::dack_w(UINT8 data)
 {
 }
