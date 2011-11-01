@@ -11,7 +11,6 @@
     TODO:
     - IR I/O port
     - LCD contrast and backlight
-    - Periodic IRQ handling should be done into MC146818 device
 
     NOTE:
     The display shows "TESTING..." for about 2 min before showing the information screen
@@ -146,30 +145,14 @@ WRITE8_MEMBER( micronic_state::kp_matrix_w )
 
 WRITE8_MEMBER( micronic_state::beep_w )
 {
-	UINT16 frequency = 0;
-
-	switch(data)
+	UINT16 frequency[16] =
 	{
-		case 0x00:		frequency = 0;		break;
-		case 0x01:		frequency = 4000;	break;
-		case 0x02:		frequency = 2000;	break;
-		case 0x03:		frequency = 1333;	break;
-		case 0x04:		frequency = 1000;	break;
-		case 0x05:		frequency = 800;	break;
-		case 0x06:		frequency = 667;	break;
-		case 0x07:		frequency = 571;	break;
-		case 0x08:		frequency = 500;	break;
-		case 0x09:		frequency = 444;	break;
-		case 0x0a:		frequency = 400;	break;
-		case 0x0b:		frequency = 364;	break;
-		case 0x0c:		frequency = 333;	break;
-		case 0x0d:		frequency = 308;	break;
-		case 0x0e:		frequency = 286;	break;
-		case 0x0f:		frequency = 267;	break;
-	}
+		  0, 4000, 2000, 1333, 1000, 800, 667, 571,
+		500,  444,  400,  364,  333, 308, 286, 267
+	};
 
-	beep_set_frequency(m_beep, frequency);
-	beep_set_state(m_beep, (data) ? 1 : 0);
+	beep_set_frequency(m_beep, frequency[data & 0x0f]);
+	beep_set_state(m_beep, (data & 0x0f) ? 1 : 0);
 }
 
 READ8_MEMBER( micronic_state::irq_flag_r )
@@ -206,78 +189,19 @@ WRITE8_MEMBER( micronic_state::port_2c_w )
     RTC-146818
 ***************************************************************************/
 
-void micronic_state::set_146818_periodic_irq(UINT8 data)
-{
-	attotime timer_per = attotime::from_seconds(0);
-
-	switch(data & 0xf)
-	{
-		case 0:		timer_per = attotime::from_nsec(0);					break;
-		case 1:		timer_per = attotime::from_nsec((data & 0x20) ? 30517 : 3906250);	break;
-		case 2:		timer_per = attotime::from_nsec((data & 0x20) ? 61035 : 7812500);	break;
-		case 3:		timer_per = attotime::from_nsec(122070);			break;
-		case 4:		timer_per = attotime::from_nsec(244141);			break;
-		case 5:		timer_per = attotime::from_nsec(488281);			break;
-		case 6:		timer_per = attotime::from_nsec(976562);			break;
-		case 7:		timer_per = attotime::from_nsec(1953125);			break;
-		case 8:		timer_per = attotime::from_nsec(3906250);			break;
-		case 9:		timer_per = attotime::from_nsec(7812500);			break;
-		case 10:	timer_per = attotime::from_usec(15625);				break;
-		case 11:	timer_per = attotime::from_usec(31250);				break;
-		case 12:	timer_per = attotime::from_usec(62500);				break;
-		case 13:	timer_per = attotime::from_usec(62500);				break;
-		case 14:	timer_per = attotime::from_msec(250);				break;
-		case 15:	timer_per = attotime::from_msec(500);				break;
-	}
-
-	m_rtc_periodic_irq->adjust(timer_per, 0, timer_per);
-}
-
 WRITE8_MEMBER( micronic_state::rtc_address_w )
 {
-	m_rtc_address = data;
 	m_rtc->write(space, 0, data);
 }
 
 READ8_MEMBER( micronic_state::rtc_data_r )
 {
-	UINT8 data = 0;
-
-	switch(m_rtc_address & 0x3f)
-	{
-		case 0x0c:
-			data = m_irq_flags | m_rtc->read(space, 1);
-			m_irq_flags = 0;
-			break;
-		default:
-			data = m_rtc->read(space, 1);
-	}
-
-	return data;
+	return m_rtc->read(space, 1);
 }
 
 WRITE8_MEMBER( micronic_state::rtc_data_w )
 {
 	m_rtc->write(space, 1, data);
-
-	switch(m_rtc_address & 0x3f)
-	{
-		case 0x0a:
-			set_146818_periodic_irq(data);
-			break;
-		case 0x0b:
-			m_periodic_irq = (data & 0x40) ? 1 : 0;
-	}
-}
-
-static TIMER_CALLBACK( rtc_per_irq )
-{
-	micronic_state *state = machine.driver_data<micronic_state>();
-
-	if (state->m_periodic_irq)
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
-
-	state->m_irq_flags = (state->m_periodic_irq<<7) | 0x40;
 }
 
 /***************************************************************************
@@ -380,18 +304,8 @@ static NVRAM_HANDLER( micronic )
 	{
 		if (file)
 		{
-			UINT8 reg_a = 0, reg_b = 0;
-
 			file->read(state->m_ram_base, 0x8000);
 			file->read(ram_get_ptr(state->m_ram), ram_get_size(state->m_ram));
-
-			// reload register A and B for restore the periodic irq state
-			file->seek(0x4000a, SEEK_SET);
-			file->read(&reg_a, 0x01);
-			file->read(&reg_b, 0x01);
-
-			state->set_146818_periodic_irq(reg_a);
-			state->m_periodic_irq = (reg_b & 0x40) ? 1 : 0;
 			state->m_status_flag = 0x01;
 		}
 		else
@@ -429,8 +343,6 @@ void micronic_state::machine_start()
 	m_banks_num = (ram_get_size(m_ram)>>15) + 1;
 	memory_configure_bank(machine(), "bank1", 0x02, m_banks_num - 1, ram_get_ptr(m_ram), 0x8000);
 
-	m_rtc_periodic_irq = machine().scheduler().timer_alloc(FUNC(rtc_per_irq));
-
 	/* register for state saving */
 //  state_save_register_global(machine(), state->);
 }
@@ -440,6 +352,17 @@ void micronic_state::machine_reset()
 	memory_set_bank(machine(), "bank1", 0);
 	m_maincpu->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
 }
+
+
+WRITE_LINE_MEMBER( micronic_state::mc146818_irq )
+{
+	device_set_input_line(m_maincpu, 0, !state ? HOLD_LINE : CLEAR_LINE);
+}
+
+const struct mc146818_interface micronic_mc146818_config =
+{
+	DEVCB_DRIVER_LINE_MEMBER(micronic_state, mc146818_irq)
+};
 
 static MACHINE_CONFIG_START( micronic, micronic_state )
 	/* basic machine hardware */
@@ -472,7 +395,7 @@ static MACHINE_CONFIG_START( micronic, micronic_state )
 
 	MCFG_NVRAM_HANDLER(micronic)
 
-	MCFG_MC146818_ADD( MC146818_TAG, MC146818_IGNORE_CENTURY )
+	MCFG_MC146818_IRQ_ADD( MC146818_TAG, MC146818_IGNORE_CENTURY, micronic_mc146818_config )
 MACHINE_CONFIG_END
 
 /* ROM definition */
