@@ -247,7 +247,7 @@ INPUT_PORTS_END
 static READ8_DEVICE_HANDLER( a1200_cia_0_portA_r )
 {
 	UINT8 ret = input_port_read(device->machine(), "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
-	ret |= device->machine().device<amiga_fdc>("fdc")->status_r();
+	ret |= device->machine().device<amiga_fdc>("fdc")->ciaapra_r();
 	return ret;
 }
 
@@ -275,7 +275,7 @@ static const mos6526_interface a1200_cia_1_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,									/* port A */
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("fdc", amiga_fdc, control_w)			/* port B */
+	DEVCB_DEVICE_MEMBER("fdc", amiga_fdc, ciaaprb_w)			/* port B */
 };
 
 
@@ -315,7 +315,10 @@ static MACHINE_CONFIG_START( a1200n, ami1200_state )
 	MCFG_MOS8520_ADD("cia_0", AMIGA_68EC020_NTSC_CLOCK / 10, a1200_cia_0_intf)
 	MCFG_MOS8520_ADD("cia_1", AMIGA_68EC020_NTSC_CLOCK / 10, a1200_cia_1_intf)
 
-	MCFG_AMIGA_FDC_ADD("fdc")
+	/* fdc */
+	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68EC020_NTSC_CLOCK/2)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_35_DD, 82, 2, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_35_DD, 82, 2, amiga_fdc::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a1200p, a1200n )
@@ -337,6 +340,10 @@ static MACHINE_CONFIG_DERIVED( a1200p, a1200n )
 	MCFG_DEVICE_CLOCK(A1200PAL_XTAL_X1/20)
 	MCFG_DEVICE_MODIFY("cia_1")
 	MCFG_DEVICE_CLOCK(A1200PAL_XTAL_X1/20)
+
+	/* fdc */
+	MCFG_DEVICE_MODIFY("fdc")
+	MCFG_DEVICE_CLOCK(A1200PAL_XTAL_X1/4)
 MACHINE_CONFIG_END
 
 
@@ -368,24 +375,6 @@ ROM_END
 
 /***************************************************************************************************/
 
-// these come directly from amiga.c
-
-static UINT16 a1200_read_dskbytr(running_machine &machine)
-{
-	return machine.device<amiga_fdc>("fdc")->get_byte();
-}
-
-static void a1200_write_dsklen(running_machine &machine, UINT16 data)
-{
-	cd32_state *state = machine.driver_data<cd32_state>();
-	if ( data & 0x8000 )
-	{
-		if ( CUSTOM_REG(REG_DSKLEN) & 0x8000 )
-			machine.device<amiga_fdc>("fdc")->setup_dma();
-	}
-}
-
-
 static DRIVER_INIT( a1200 )
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
@@ -394,7 +383,6 @@ static DRIVER_INIT( a1200 )
 		AGA_CHIP_RAM_MASK,
 		NULL, NULL,			/* joy0dat_r & joy1dat_r */
 		cd32_potgo_w,		/* potgo_w */
-		a1200_read_dskbytr, a1200_write_dsklen, /* dskbytr_r & dsklen_w */
 		NULL,				/* serdat_w */
 		NULL,				/* scanline0_callback */
 		NULL,				/* reset_callback */
