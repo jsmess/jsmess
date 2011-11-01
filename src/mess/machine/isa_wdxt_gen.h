@@ -24,6 +24,8 @@
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/isa.h"
+#include "machine/wd11c00_17.h"
+#include "machine/wd2010.h"
 #include "imagedev/harddriv.h"
 
 
@@ -50,6 +52,11 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "wdxt_gen"; }
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<wd11c00_17_device> m_host;
+	required_device<wd2010_device> m_hdc;
 };
 
 
