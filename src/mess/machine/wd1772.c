@@ -778,7 +778,7 @@ void wd1772_t::live_start(int state)
 	cur_live.data_separator_phase = false;
 	cur_live.data_reg = 0;
 	cur_live.pll.reset(cur_live.tm);
-	cur_live.pll.set_clock(attotime::from_usec(2));
+	cur_live.pll.set_clock(clocks_to_attotime(1));
 	checkpoint_live = cur_live;
 
 	live_run();
@@ -1076,14 +1076,14 @@ void wd1772_t::drop_drq()
 
 void wd1772_t::pll_t::set_clock(attotime period)
 {
-	for(int i=0; i<38; i++)
-		delays[i] = period*(i+1)/14;
+	for(int i=0; i<42; i++)
+		delays[i] = period*(i+1);
 }
 
 void wd1772_t::pll_t::reset(attotime when)
 {
 	counter = 0;
-	increment = 146;
+	increment = 128;
 	transition_time = 0xffff;
 	history = 0x80;
 	slot = 0;
@@ -1113,15 +1113,15 @@ int wd1772_t::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, att
 		if(slot < 8) {
 			UINT8 mask = 1 << slot;
 			if(phase_add & mask)
-				counter += 258;
+				counter += 226;
 			else if(phase_sub & mask)
-				counter += 34;
+				counter += 30;
 			else
 				counter += increment;
 
-			if((freq_add & mask) && increment < 159)
+			if((freq_add & mask) && increment < 140)
 				increment++;
-			else if((freq_sub & mask) && increment > 134)
+			else if((freq_sub & mask) && increment > 117)
 				increment--;
 		} else
 			counter += increment;
