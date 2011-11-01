@@ -169,6 +169,7 @@ enum
 	XTAL_32_22MHz		= 32220000,		/* Typically used on 90's Data East PCBs */
 	XTAL_32_5304MHz 	= 32530400,		/* Seta 2 */
 	XTAL_33MHz  		= 33000000,		/* Sega Model 3 video board */
+	XTAL_33_04MHz  		= 33040000,		/* Western Digital WDXT-GEN */
 	XTAL_33_333MHz  	= 33333000,		/* Sega Model 3 CPU board, Vegas */
 	XTAL_33_8688MHz 	= 33868800,		/* Usually used to drive 90's Yamaha OPL/FM chips with /2 divider */
 	XTAL_36MHz  		= 36000000,		/* Sega Model 1 video board */

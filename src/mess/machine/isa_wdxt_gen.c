@@ -34,10 +34,10 @@ Notes:
 
     ROM		- Toshiba TMM2464AP 8Kx8 ROM "3"
 	TMM2016	- Toshiba TMM2016BP-10 2Kx8 SRAM
-	WD1015	- Western Digital WD1015-PL Buffer Manager Control Processor
-	WD11C00	- Western Digital WD11C00L-JT 17-02 PC/XT Host Interface Logic Device
-	WD10C20	- Western Digital WD10C20B-PH 05-05 Self-Adjusting Data Separator
-	WD2010	- Western Digital WD2010A-PL 05-02 Winchester Disk Controller
+	WD1015	- Western Digital WD1015-PL-54-02 Buffer Manager Control Processor
+	WD11C00	- Western Digital WD11C00L-JT-17-02 PC/XT Host Interface Logic Device
+	WD10C20	- Western Digital WD10C20B-PH-05-05 Self-Adjusting Data Separator
+	WD2010	- Western Digital WD2010A-PL-05-02 Winchester Disk Controller
 	CN1		- 2x17 pin PCB header, control
 	CN2		- 2x10 pin PCB header, drive 0 data
 	CN3		- 2x10 pin PCB header, drive 1 data
@@ -47,9 +47,12 @@ Notes:
 #include "machine/isa_wdxt_gen.h"
 
 
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
+
+#define WD1015_TAG		"u6"
 
 
 
@@ -65,6 +68,9 @@ const device_type WDXT_GEN = &device_creator<wdxt_gen_device>;
 //-------------------------------------------------
 
 ROM_START( wdxt_gen )
+	ROM_REGION( 0x800, WD1015_TAG, 0 )
+	ROM_LOAD( "wd1015-pl-54-02.u6", 0x000, 0x800, NO_DUMP )
+
 	ROM_REGION( 0x2000, "hdc", 0 )
 	ROM_LOAD( "3.u13", 0x0000, 0x2000, CRC(fbcb5f91) SHA1(8c22bd664177eb6126f3011eda8c5655fffe0ef2) )
 ROM_END
@@ -81,10 +87,31 @@ const rom_entry *wdxt_gen_device::device_rom_region() const
 
 
 //-------------------------------------------------
+//  ADDRESS_MAP( wd1015_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( wd1015_mem, AS_PROGRAM, 8, wdxt_gen_device )
+	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION(WD1015_TAG, 0)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( wd1015_io )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( wd1015_io, AS_IO, 8, wdxt_gen_device )
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
 //  MACHINE_DRIVER( wdxt_gen )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( wdxt_gen )
+	MCFG_CPU_ADD(WD1015_TAG, I8048, 33040000/10) // ?
+	MCFG_CPU_PROGRAM_MAP(wd1015_mem)
+	MCFG_CPU_IO_MAP(wd1015_io)
+
 	MCFG_HARDDISK_ADD("harddisk0")
 	MCFG_HARDDISK_ADD("harddisk1")
 MACHINE_CONFIG_END
