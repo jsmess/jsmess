@@ -7,7 +7,47 @@
     Emulates the video hardware for compact Macintosh series (original
     Macintosh (128k, 512k, 512ke), Macintosh Plus, Macintosh SE, Macintosh
     Classic)
+ 
+    Also emulates on-board video for systems with the
+    RBV, V8, Sonora, and DAFB chips.
+ 
+    ----------------------------------------------------------------------
+    Monitor sense codes
+ 
+    Apple assigns 3 pins for monitor IDs.  These allow 8 possible codes:
+ 
+    000 - color 2-Page Display (21")
+    001 - monochrome Full Page display (15")
+    010 - color 512x384 (12")
+    011 - monochrome 2 Page display (21")
+    100 - NTSC
+    101 - color Full Page display (15")
+    110 - High-Resolution Color (13" 640x480) or use "type 6" extended codes
+    111 - No monitor connected or use "type 7" extended codes
+ 
+    For extended codes, you drive one of the 3 pins at a time and read the 2
+    undriven pins.  See http://support.apple.com/kb/TA21618?viewlocale=en_US
+    for details.
+ 
+Extended codes:
+ 
+					Sense 2 Low  Sense 1 Low   Sense 0 Low
+					1 & 0        2 & 0         2 & 1      
 
+Multiple Scan 14"    00 		  00		   11
+Multiple Scan 16"    00 		  10		   11
+Multiple Scan 21"    10 		  00		   11
+PAL Encoder 		 00 		  00		   00
+NTSC Encoder		 01 		  01		   00
+VGA/Super VGA   	 01 		  01		   11
+RGB 16" 			 10 		  11		   01
+PAL Monitor 		 11 		  00		   00
+RGB 19" 			 11 		  10		   10
+Radius color TPD	 11           00           01   (TPD = Two Page Display)
+Radius mono TPD      11           01           00 
+Apple TPD            11           01           01 
+Apple color FPD      01           11           10   (FPD = Full Page Display) 
+ 
 ***************************************************************************/
 
 #define ADDRESS_MAP_MODERN
@@ -474,10 +514,6 @@ SCREEN_UPDATE( macrbvvram )
 				return 0;
 			}
 			break;
-
-		case RBV_TYPE_DAFB:
-			mode = 0;
-			break;
 	}
 
 	switch (mode)
@@ -504,28 +540,6 @@ SCREEN_UPDATE( macrbvvram )
 						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<5)&0x80)];
 						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<6)&0x80)];
 						*scanline++ = mac->m_rbv_palette[0x7f|((pixels<<7)&0x80)];
-					}
-				}
-			}
-			else if (mac->m_rbv_type == RBV_TYPE_DAFB)
-			{
-				vram8 += 0x1000;
-
-				for (y = 0; y < 480; y++)
-				{
-					scanline = BITMAP_ADDR32(bitmap, y, 0);
-					for (x = 0; x < 640; x+=8)
-					{
-						pixels = vram8[(y * 256 * 4) + ((x/8)^3)];
-
-						*scanline++ = mac->m_rbv_palette[(pixels>>7)&1];
-						*scanline++ = mac->m_rbv_palette[(pixels>>6)&1];
-						*scanline++ = mac->m_rbv_palette[(pixels>>5)&1];
-						*scanline++ = mac->m_rbv_palette[(pixels>>4)&1];
-						*scanline++ = mac->m_rbv_palette[(pixels>>3)&1];
-						*scanline++ = mac->m_rbv_palette[(pixels>>2)&1];
-						*scanline++ = mac->m_rbv_palette[(pixels>>1)&1];
-						*scanline++ = mac->m_rbv_palette[(pixels&1)];
 					}
 				}
 			}
@@ -685,6 +699,9 @@ VIDEO_RESET(macdafb)
 	mac->m_rbv_vbltime = 0;
 	mac->m_dafb_int_status = 0;
 	mac->m_rbv_type = RBV_TYPE_DAFB;
+	mac->m_dafb_mode = 0;
+	mac->m_dafb_base = 0x1000;
+	mac->m_dafb_stride = 256*4;
 
 	memset(mac->m_rbv_palette, 0, sizeof(mac->m_rbv_palette));
 }
@@ -695,8 +712,16 @@ READ32_MEMBER(mac_state::dafb_r)
 
 	switch (offset<<2)
 	{
-		case 0x1c:	// monitor sense
-			return 1;	// 640x480
+		case 0x1c:	// inverse of monitor sense
+			return 7;	// 21" color 2-page
+			break;
+
+		case 0x24: // SCSI 539x #1 status
+			return m_dafb_scsi1_drq<<9;
+			break;
+
+		case 0x28: // SCSI 539x #2 status
+			return m_dafb_scsi2_drq<<9;
 			break;
 
 		case 0x108:	// IRQ/VBL status
@@ -718,10 +743,27 @@ READ32_MEMBER(mac_state::dafb_r)
 
 WRITE32_MEMBER(mac_state::dafb_w)
 {
-//  printf("DAFB: Write %08x @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
+//	if (offset != 0x10c/4) printf("DAFB: Write %08x @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
 
 	switch (offset<<2)
 	{
+		case 0:	// bits 20-9 of base
+			m_dafb_base &= 0x1ff;
+			m_dafb_base |= (data & 0xffff) << 9;
+//			printf("DAFB baseH: %x\n", m_dafb_base);
+			break;
+
+		case 4:	// bits 8-5 of base
+			m_dafb_base &= ~0x1ff;
+			m_dafb_base |= (data & 0xf) << 5;
+//			printf("DAFB baseL: %x\n", m_dafb_base);
+			break;
+
+		case 8:
+			m_dafb_stride = data<<2;	// stride in DWORDs
+//			printf("DAFB stride: %x %x\n", m_dafb_stride, data);
+			break;
+
 		case 0x104:
 			if (data & 1)	// VBL enable
 			{
@@ -772,7 +814,7 @@ READ32_MEMBER(mac_state::dafb_dac_r)
 
 WRITE32_MEMBER(mac_state::dafb_dac_w)
 {
-//  printf("DAFB: Write %08x to DAC @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
+//	if ((offset > 0) && (offset != 0x10/4)) printf("DAFB: Write %08x to DAC @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
 
 	switch (offset<<2)
 	{
@@ -792,6 +834,146 @@ WRITE32_MEMBER(mac_state::dafb_dac_w)
 				m_rbv_count = 0;
 			}
 			break;
+
+		case 0x20:
+			printf("%x to DAFB mode\n", data);
+			switch (data & 0x9f)
+			{
+				case 0x80:
+					m_dafb_mode = 0;	// 1bpp
+					break;
+
+				case 0x88:
+					m_dafb_mode = 1;	// 2bpp
+					break;
+
+				case 0x90:
+					m_dafb_mode = 2;	// 4bpp
+					break;
+
+				case 0x98:
+					m_dafb_mode = 3;	// 8bpp
+					break;
+
+				case 0x9c:
+					m_dafb_mode = 4;	// 24bpp
+					break;
+			}
+			break;
 	}
+}
+
+SCREEN_UPDATE( macdafb )
+{
+	UINT32 *scanline;
+	int x, y;
+	mac_state *mac = screen->machine().driver_data<mac_state>();
+
+	switch (mac->m_dafb_mode)
+	{
+		case 0:	// 1bpp
+		{
+			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 pixels;
+			vram8 += mac->m_dafb_base;
+
+			for (y = 0; y < 870; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				for (x = 0; x < 1152; x+=8)
+				{
+					pixels = vram8[(y * mac->m_dafb_stride) + ((x/8)^3)];
+
+					*scanline++ = mac->m_rbv_palette[(pixels>>7)&1];
+					*scanline++ = mac->m_rbv_palette[(pixels>>6)&1];
+					*scanline++ = mac->m_rbv_palette[(pixels>>5)&1];
+					*scanline++ = mac->m_rbv_palette[(pixels>>4)&1];
+					*scanline++ = mac->m_rbv_palette[(pixels>>3)&1];
+					*scanline++ = mac->m_rbv_palette[(pixels>>2)&1];
+					*scanline++ = mac->m_rbv_palette[(pixels>>1)&1];
+					*scanline++ = mac->m_rbv_palette[(pixels&1)];
+				}
+			}
+		}
+		break;
+
+		case 1:	// 2bpp
+		{
+			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 pixels;
+			vram8 += mac->m_dafb_base;
+
+			for (y = 0; y < 870; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				for (x = 0; x < 1152/4; x++)
+				{
+					pixels = vram8[(y * mac->m_dafb_stride) + (BYTE4_XOR_BE(x))];
+
+					*scanline++ = mac->m_rbv_palette[((pixels>>6)&3)];
+					*scanline++ = mac->m_rbv_palette[((pixels>>4)&3)];
+					*scanline++ = mac->m_rbv_palette[((pixels>>2)&3)];
+					*scanline++ = mac->m_rbv_palette[(pixels&3)];
+				}
+			}
+		}
+		break;
+
+		case 2: // 4bpp
+		{
+			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 pixels;
+			vram8 += mac->m_dafb_base;
+
+			for (y = 0; y < 870; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+
+				for (x = 0; x < 1152/2; x++)
+				{
+					pixels = vram8[(y * mac->m_dafb_stride) + (BYTE4_XOR_BE(x))];
+
+					*scanline++ = mac->m_rbv_palette[(pixels>>4)];
+					*scanline++ = mac->m_rbv_palette[(pixels&0xf)];
+				}
+			}
+		}
+		break;
+
+		case 3: // 8bpp
+		{
+			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 pixels;
+			vram8 += mac->m_dafb_base;
+
+			for (y = 0; y < 870; y++)
+			{
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+
+				for (x = 0; x < 1152; x++)
+				{
+					pixels = vram8[(y * mac->m_dafb_stride) + (BYTE4_XOR_BE(x))];
+					*scanline++ = mac->m_rbv_palette[pixels];
+				}
+			}
+		}
+		break;
+
+		case 4: // 24 bpp
+			for (y = 0; y < 480; y++)
+			{
+				UINT32 *base;
+
+				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				base = (UINT32 *)&mac->m_vram[(y * (mac->m_dafb_stride/4)) + (mac->m_dafb_base/4)];
+				for (x = 0; x < 640; x++)
+				{
+					*scanline++ = *base++;
+				}
+			}
+			break;
+	}
+
+	return 0;
 }
 

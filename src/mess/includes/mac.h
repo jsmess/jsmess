@@ -14,9 +14,12 @@
 #include "machine/ram.h"
 #include "machine/egret.h"
 #include "machine/nubus.h"
+#include "machine/ncr539x.h"
 #include "sound/awacs.h"
 
 #define MAC_SCREEN_NAME "screen"
+#define MAC_539X_1_TAG "539x_1"
+#define MAC_539X_2_TAG "539x_2"
 
 /* for Egret and CUDA streaming MCU commands, command types */
 typedef enum
@@ -155,24 +158,27 @@ NVRAM_HANDLER( mac );
 /*----------- defined in video/mac.c -----------*/
 
 VIDEO_START( mac );
+VIDEO_START( macrbv );
+VIDEO_START( macv8 );
+VIDEO_START( macsonora );
+VIDEO_START( macdafb );
+
+VIDEO_RESET(macrbv);
+VIDEO_RESET(macdafb);
+VIDEO_RESET(maceagle);
+VIDEO_RESET(macsonora);
+
 SCREEN_UPDATE( mac );
 SCREEN_UPDATE( macse30 );
 SCREEN_UPDATE( macprtb );
 SCREEN_UPDATE( macpb140 );
 SCREEN_UPDATE( macpb160 );
-PALETTE_INIT( mac );
-PALETTE_INIT( macgsc );
-
-VIDEO_START( macrbv );
-VIDEO_START( macv8 );
-VIDEO_START( macsonora );
-VIDEO_START( macdafb );
 SCREEN_UPDATE( macrbv );
 SCREEN_UPDATE( macrbvvram );
-VIDEO_RESET(macrbv);
-VIDEO_RESET(macdafb);
-VIDEO_RESET(maceagle);
-VIDEO_RESET(macsonora);
+SCREEN_UPDATE( macdafb );
+
+PALETTE_INIT( mac );
+PALETTE_INIT( macgsc );
 
 /*----------- defined in audio/mac.c -----------*/
 
@@ -198,7 +204,9 @@ public:
         m_awacs(*this, "awacs"),
         m_egret(*this, "egret"),
 		m_ram(*this, RAM_TAG),
-        m_screen(*this, MAC_SCREEN_NAME)
+        m_screen(*this, MAC_SCREEN_NAME),
+        m_539x_1(*this, MAC_539X_1_TAG),
+        m_539x_2(*this, MAC_539X_2_TAG)
 	 { }
 
 	required_device<cpu_device> m_maincpu;
@@ -209,6 +217,8 @@ public:
     optional_device<egret_device> m_egret;
 	required_device<device_t> m_ram;
     optional_device<screen_device> m_screen;
+    optional_device<ncr539x_device> m_539x_1;
+    optional_device<ncr539x_device> m_539x_2;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -300,7 +310,10 @@ public:
     emu_timer *m_vbl_timer, *m_cursor_timer;
     UINT16 m_cursor_line;
     UINT16 m_dafb_int_status;
-
+    int m_dafb_scsi1_drq, m_dafb_scsi2_drq;
+    UINT8 m_dafb_mode;
+    UINT32 m_dafb_base, m_dafb_stride;
+             
     // this is shared among all video setups with vram
 	UINT32 *m_vram;
 
@@ -389,6 +402,9 @@ public:
     DECLARE_WRITE_LINE_MEMBER(nubus_irq_c_w);
     DECLARE_WRITE_LINE_MEMBER(nubus_irq_d_w);
     DECLARE_WRITE_LINE_MEMBER(nubus_irq_e_w);
+
+    DECLARE_WRITE_LINE_MEMBER(irq_539x_1_w);
+    DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
 
 private:
 	int has_adb();
