@@ -52,6 +52,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq3_w );
 	DECLARE_WRITE_LINE_MEMBER( mr_w );
 	DECLARE_READ8_MEMBER( rd322_r );
+	DECLARE_READ8_MEMBER( wd1015_p1_r );
+	DECLARE_WRITE8_MEMBER( wd1015_p2_w );
 	
 protected:
 	// device-level overrides

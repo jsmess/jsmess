@@ -61,6 +61,12 @@ public:
 	
 	UINT8 dack_r();
 	void dack_w(UINT8 data);
+	
+	DECLARE_WRITE_LINE_MEMBER( ireq_w );
+	DECLARE_WRITE_LINE_MEMBER( io_w );
+	DECLARE_WRITE_LINE_MEMBER( cd_w );
+	DECLARE_WRITE_LINE_MEMBER( busy_w );
+	DECLARE_WRITE_LINE_MEMBER( clct_w );
 
 protected:
 	// device-level overrides
@@ -69,10 +75,23 @@ protected:
     virtual void device_config_complete();
 
 private:
+	inline void check_interrupt();
+	inline void increment_address();
+	inline UINT8 read_data();
+	inline void write_data(UINT8 data);
+	inline void software_reset();
+
 	devcb_resolved_write_line	m_out_irq5_func;
 	devcb_resolved_write_line	m_out_drq3_func;
 	devcb_resolved_write_line	m_out_mr_func;
-	devcb_resolved_read8		m_in_rd322_func;	
+	devcb_resolved_read8		m_in_rd322_func;
+	
+	int m_select;
+	UINT8 m_status;
+	UINT8 m_mask;
+
+	UINT8 m_ram[0x800];
+	offs_t m_ra;
 };
 
 

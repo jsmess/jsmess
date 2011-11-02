@@ -102,6 +102,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( wd1015_io, AS_IO, 8, wdxt_gen_device )
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(wd1015_p1_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(wd1015_p2_w)
 ADDRESS_MAP_END
 
 
@@ -207,7 +209,7 @@ void wdxt_gen_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
-	//m_isa->install_device(this, 0x0320, 0x0323, 0, 0, FUNC(pc_HDC_r), FUNC(pc_HDC_w) );
+	m_isa->install_device(0x0320, 0x0323, 0, 0, read8_delegate(FUNC(wd11c00_17_device::read), (wd11c00_17_device*)m_host), write8_delegate(FUNC(wd11c00_17_device::write), (wd11c00_17_device*)m_host));
 }
 
 
@@ -247,4 +249,52 @@ void wdxt_gen_device::dack_w(int line, UINT8 data)
 bool wdxt_gen_device::have_dack(int line)
 {
 	return (line == 3) ? TRUE : FALSE;
+}
+
+
+//-------------------------------------------------
+//  wd1015_p1_r -
+//-------------------------------------------------
+
+READ8_MEMBER( wdxt_gen_device::wd1015_p1_r )
+{
+	/*
+
+        bit     description
+
+        P10     INTHD
+        P11     HD/_FD
+        P12     TR00
+        P13     SBEF
+        P14     TST31
+        P15     MOM
+        P16     STEP (output)
+        P17     DIR (output)
+
+    */
+	
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  wd1015_p2_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( wdxt_gen_device::wd1015_p2_w )
+{
+	/*
+
+        bit     description
+
+        P20		TST21
+        P21		TST22
+        P22		TST23
+        P23		TST24
+        P24     _FMO
+        P25     BRDY
+        P26     CORRD
+        P27     ERR
+
+    */
 }
