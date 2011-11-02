@@ -284,6 +284,14 @@ ROM_START( kontur )
 	ROM_LOAD( "kontur.fnt", 0x0000, 0x2000, CRC(14d33790) SHA1(6d5fcb214805c5fc44ef98a97219158ff7826ac0))
 ROM_END
 
+ROM_START( bk8t )
+	ROM_REGION( 0x16000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "kor1.bin", 0x10000, 0x2000, CRC(f1e16ddc) SHA1(e3a10c9ce3f333928eb0d5f9b84e159e41fae6ca))
+	ROM_LOAD( "kor2.bin", 0x12000, 0x2000, CRC(d4431d97) SHA1(08f79785846369d410a4183f0d60b856d6d70199))
+	ROM_LOAD( "kor3.bin", 0x14000, 0x2000, CRC(74781903) SHA1(caaa638afe80eb83fc30b07dd6d1e40b66ddc6d1))
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "kor4.bin", 0x0000,  0x2000, CRC(d164bada) SHA1(c334e50fd31b1f42c7668b89772487971a6875cb))
+ROM_END
 
 /* Driver */
 
@@ -291,3 +299,4 @@ ROM_END
 COMP( 1987, korvet,  0, 	 0,	pk8020, 	pk8020, 	0,       "<unknown>", "PK8020 Korvet",	 0)
 COMP( 1987, neiva,   korvet,	 0,	pk8020, 	pk8020, 	0,       "<unknown>", "PK8020 Neiva",	 0)
 COMP( 1987, kontur,  korvet,	 0,	pk8020, 	pk8020, 	0,       "<unknown>", "PK8020 Kontur",	 0)
+COMP( 1987, bk8t,  	 korvet,	 0,	pk8020, 	pk8020, 	0,       "<unknown>", "BK-8T",	 0)
