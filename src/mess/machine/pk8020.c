@@ -1,6 +1,7 @@
 /***************************************************************************
 
         PK-8020 driver by Miodrag Milanovic
+			based on work of Sergey Erokhin from pk8020.narod.ru
 
         18/07/2008 Preliminary driver.
 
