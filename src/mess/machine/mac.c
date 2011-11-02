@@ -21,10 +21,10 @@
          - PowerBook 100        68k (16 MHz)    SWIM    ADB-PMU    PMU      640x400 B&W
          - Mac II               020             IWM     MacII ADB  ext      NuBus card
          - Mac IIx              030             SWIM    MacII ADB  ext      NuBus card
-         - Mac IIfx             030             SWIM    ADB-IOP    ext      NuBus card
+         - Mac IIfx             030             SWIM    IOP ADB    ext      NuBus card
          - Mac SE/30            030             SWIM    MacII ADB  ext      Internal fake NuBus card
          - Mac IIcx             030             SWIM    MacII ADB  ext      NuBus card
-         - Mac IIci             030             SWIM    Egret ADB  ext      Internal "RBV" type
+         - Mac IIci             030             SWIM    MacII ADB  ext      Internal "RBV" type
          - Mac IIsi             030             SWIM    Egret ADB  n/a      Internal "RBV" type
          - PowerBook 140/145(B) 030 (16/25 MHz) SWIM    ADB-PMU    PMU      640x400 B&W (passive matrix)
          - PowerBook 170        030 (25 MHz)    SWIM    ADB-PMU    PMU      640x400 B&W (active matrix)
@@ -32,8 +32,11 @@
          - Mac LC               020             SWIM    Egret ADB  n/a      Internal "V8" type
          - Mac LC II            030             SWIM    Egret ADB  n/a      Internal "V8" type
          - Mac LC III           030             SWIM    Egret ADB  n/a      Internal "Sonora" type
-         - Mac Classic II       030             SWIM    Egret ADB  n/a      Internal "Eagle" type
-
+         - Mac Classic II       030             SWIM    Egret ADB  n/a      Internal "Eagle" type (V8 clone)
+         - Mac Color Classic    030             SWIM    Cuda ADB   n/a      Internal "Spice" type (V8 clone)
+    	 - Mac Quadra 700		040 (25 MHz)	SWIM II	MacII ADB  ext  	Internal "DAFB" type
+    	 - Mac Quadra 900		040 (33 MHz)	SWIM II	IOP ADB    ext  	Internal "DAFB" type
+ 
     Notes:
         - The Mac Plus boot code seems to check to see the extent of ROM
           mirroring to determine if SCSI is available.  If the ROM is mirrored,
@@ -47,12 +50,12 @@
         - There are 5 known kinds of host-side ADB hardware:
           * "Mac II ADB" used in the SE, II, IIx, IIcx, SE/30, IIci, Quadra 610, Quadra 650, Quadra 700,
              Quadra 800, Centris 610 and Centris 650.  This is a bit-banger using the VIA and a simple PIC.
-          * "ADB-PMU" used in the Mac Portable and all 680x0-based PowerBooks.
-          * "ADB-EGRET" used in the IIsi, IIvi, IIvx, Classic II, LC, LC II, LC III, Performa 460,
+          * "PMU ADB" used in the Mac Portable and all 680x0-based PowerBooks.
+          * "Egret ADB" used in the IIsi, IIvi, IIvx, Classic II, LC, LC II, LC III, Performa 460,
              and Performa 600.  This is a 68HC05 with a different internal ROM than CUDA.
-          * "ADB-IOP" (ADB driven by a 6502 coprocessor, similar to Lisa) used in the IIfx,
+          * "IOP ADB" (ADB driven by a 6502 coprocessor, similar to Lisa) used in the IIfx,
             Quadra 900, and Quadra 950.
-          * "ADB-CUDA" (Apple's CUDA chip, which is a 68HC05 MCU) used in the Color Classic, LC 520,
+          * "Cuda ADB" (Apple's CUDA chip, which is a 68HC05 MCU) used in the Color Classic, LC 520,
             LC 55x, LC 57x, LC 58x, Quadra 630, Quadra 660AV, Quadra 840AV, PowerMac 6100/7100/8100,
             IIci, and PowerMac 5200.
 
@@ -88,7 +91,6 @@
 #include "machine/applefdc.h"
 #include "devices/sonydriv.h"
 #include "machine/ncr5380.h"
-#include "machine/am53cf96.h"
 #include "sound/asc.h"
 #include "includes/mac.h"
 #include "debug/debugcpu.h"
@@ -534,6 +536,10 @@ void mac_state::set_memory_overlay(int overlay)
 			mac_install_memory(machine(), 0x00000000, 0x3fffffff, memory_size, memory_data, is_rom, "bank1");
 		}
 		else if ((m_model == MODEL_MAC_LC_III) || (m_model == MODEL_MAC_LC_III_PLUS))	// up to 36 MB
+		{
+			mac_install_memory(machine(), 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
+		}
+		else if (m_model == MODEL_MAC_QUADRA_700)
 		{
 			mac_install_memory(machine(), 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
@@ -1089,6 +1095,20 @@ void mac_scsi_irq(running_machine &machine, int state)
         mac->m_scsi_interrupt = state;
         mac->field_interrupts();
     }*/
+}
+
+WRITE_LINE_MEMBER(mac_state::irq_539x_1_w)
+{
+	if (state)	// make sure a CB1 transition occurs
+	{
+		m_via2->write_cb2(0);
+		m_via2->write_cb2(1);
+	}
+}
+
+WRITE_LINE_MEMBER(mac_state::drq_539x_1_w)
+{
+	m_dafb_scsi1_drq = state;
 }
 
 /* *************************************************************************
@@ -3333,31 +3353,7 @@ MAC_DRIVER_INIT(macpb160, MODEL_MAC_PB160)
 MAC_DRIVER_INIT(maciivx, MODEL_MAC_IIVX)
 MAC_DRIVER_INIT(maciifx, MODEL_MAC_IIFX)
 MAC_DRIVER_INIT(macpbduo210, MODEL_MAC_PBDUO_210)
-
-static void scsi96_irq(running_machine &machine)
-{
-}
-
-static const SCSIConfigTable dev_table =
-{
-	2,                                      /* 2 SCSI devices */
-	{
-	 { SCSI_ID_6, "harddisk1", SCSI_DEVICE_HARDDISK },  /* SCSI ID 6, using disk1, and it's a harddisk */
-	 { SCSI_ID_5, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 5, using disk2, and it's a harddisk */
-	}
-};
-
-static const struct AM53CF96interface scsi_intf =
-{
-	&dev_table,		/* SCSI device table */
-	&scsi96_irq,	/* command completion IRQ */
-};
-
-DRIVER_INIT(macquadra700)
-{
-	mac_driver_init(machine, MODEL_MAC_QUADRA_700);
-	am53cf96_init(machine, &scsi_intf);
-}
+MAC_DRIVER_INIT(macquadra700, MODEL_MAC_QUADRA_700)
 
 // make the appletalk init fail instead of hanging on the II FDHD/IIx/IIcx/SE30 ROM
 static void patch_appletalk_iix(running_machine &machine)
@@ -3410,7 +3406,7 @@ void mac_state::nubus_slot_interrupt(UINT8 slot, UINT32 state)
 		mac->m_nubus_irq_state |= masks[slot];
 	}
 
-	if (mac->m_model != MODEL_MAC_IIFX)
+	if ((mac->m_model != MODEL_MAC_IIFX) && (mac->m_model != MODEL_MAC_IICI) && (mac->m_model != MODEL_MAC_IISI))
 	{
 		if ((mac->m_nubus_irq_state & mask) != mask)
 		{
@@ -3425,6 +3421,13 @@ void mac_state::nubus_slot_interrupt(UINT8 slot, UINT32 state)
 		{
 			m_via2->write_ca1(1);
 		}
+	}
+
+	if ((mac->m_model == MODEL_MAC_IICI) || (mac->m_model == MODEL_MAC_IISI) || (mac->m_model == MODEL_MAC_IIVX) || (mac->m_model == MODEL_MAC_IIVI))
+	{
+		mac->m_rbv_regs[2] &= ~0x38;
+		mac->m_rbv_regs[2] |= (mac->m_nubus_irq_state & 0x38);
+		mac->rbv_recalc_irqs();
 	}
 }
 

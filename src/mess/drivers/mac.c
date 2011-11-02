@@ -44,7 +44,6 @@
 #include "cpu/m6805/m6805.h"
 #include "machine/6522via.h"
 #include "machine/ncr5380.h"
-#include "machine/am53cf96.h"
 #include "machine/applefdc.h"
 #include "devices/sonydriv.h"
 #include "imagedev/harddriv.h"
@@ -201,7 +200,6 @@ void mac_state::rbv_recalc_irqs()
 	UINT8 slot_irqs = (~m_rbv_regs[2]) & 0x78;
 	slot_irqs &= (m_rbv_regs[0x12] & 0x78);
 
-//  printf("slot_irqs = %02x\n", slot_irqs);
 	if (slot_irqs)
 	{
 		m_rbv_regs[3] |= 2;	// any slot
@@ -556,12 +554,28 @@ WRITE8_MEMBER(mac_state::mac_gsc_w)
 
 READ8_MEMBER(mac_state::mac_5396_r)
 {
+	if (offset < 0x100)
+	{
+		return m_539x_1->read(space, offset>>4);
+	}
+	else	// pseudo-DMA: read from the FIFO
+	{
+		return m_539x_1->read(space, 2);
+	}
+
 	return 0;
 }
 
 WRITE8_MEMBER(mac_state::mac_5396_w)
 {
-//  printf("%02x to 5396 @ %x\n", data, offset);
+	if (offset < 0x100)
+	{
+		m_539x_1->write(space, offset>>4, data);
+	}
+	else	// pseudo-DMA: write to the FIFO
+	{
+		m_539x_1->write(space, 2, data);                                                                                             
+	}
 }
 
 /***************************************************************************
@@ -754,17 +768,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
-	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50002000, 0x50003fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00fc0000)
+	AM_RANGE(0x50002000, 0x50003fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff) AM_MIRROR(0x00fc0000)
 // 50008000 = Ethernet MAC ID PROM
 // 5000a000 = Sonic (DP83932) ethernet
 // 5000f000 = SCSI cf96, 5000f402 = SCSI #2 cf96
-	AM_RANGE(0x5000f000, 0x5000f3ff) AM_READWRITE8(mac_5396_r, mac_5396_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x5000c000, 0x5000dfff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x5001e000, 0x5001ffff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x5000f000, 0x5000f3ff) AM_READWRITE8(mac_5396_r, mac_5396_w, 0xffffffff) AM_MIRROR(0x00fc0000)
+	AM_RANGE(0x5000c000, 0x5000dfff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff) AM_MIRROR(0x00fc0000)
+	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00fc0000)
+	AM_RANGE(0x5001e000, 0x5001ffff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00fc0000)
 
-	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00fc0000)
 	// f9800000 = VDAC / DAFB
 	AM_RANGE(0xf9000000, 0xf91fffff) AM_RAM	AM_BASE(m_vram)
 	AM_RANGE(0xf9800000, 0xf98001ff) AM_READWRITE(dafb_r, dafb_w)
@@ -826,6 +840,13 @@ static const struct NCR5380interface macplus_5380intf =
 	mac_scsi_irq	// IRQ (unconnected on the Mac Plus)
 };
 
+static const struct NCR539Xinterface mac_539x_intf =
+{
+	&dev_table,	// SCSI device table
+	DEVCB_DRIVER_LINE_MEMBER(mac_state, irq_539x_1_w),
+	DEVCB_DRIVER_LINE_MEMBER(mac_state, drq_539x_1_w)
+};
+
 static const struct nbbus_interface nubus_intf =
 {
 	// interrupt lines
@@ -854,19 +875,6 @@ SLOT_INTERFACE_END
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
-static const floppy_interface mac128512_floppy_interface = //SONY_FLOPPY_ALLOW400K
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_3_5_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
-	NULL,
-	NULL
-};
-
 
 static const floppy_interface mac_floppy_interface =
 {
@@ -913,7 +921,7 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 
 	/* devices */
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac128512_floppy_interface)
+	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
 	MCFG_SCC8530_ADD("scc", C7M)
 	MCFG_SCC8530_IRQ(mac_scc_irq)
@@ -994,7 +1002,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac128512_floppy_interface)
+	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
 	MCFG_SCC8530_ADD("scc", C7M)
 	MCFG_SCC8530_IRQ(mac_scc_irq)
@@ -1564,9 +1572,11 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE(macrbvvram)
+	MCFG_SCREEN_REFRESH_RATE(75.08)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
+	MCFG_SCREEN_SIZE(1152, 870)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
+	MCFG_SCREEN_UPDATE(macdafb)
 
 	MCFG_VIDEO_START(macdafb)
 	MCFG_VIDEO_RESET(macdafb)
@@ -1596,13 +1606,15 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", C7M/10, mac_via6522_2_intf)
 
+	MCFG_NCR539X_ADD(MAC_539X_1_TAG, C7M, mac_539x_intf)
+
 	MCFG_HARDDISK_ADD( "harddisk1" )
 	MCFG_HARDDISK_ADD( "harddisk2" )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,20M,36M,68M")	// QD700 has 4M on board and can take 4M, 8M, 16M, or 32M SIMMs
+	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,64M,68M,72M,80M,96M,128M")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( macplus )
