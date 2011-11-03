@@ -412,8 +412,8 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
 	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "ega", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "fdc", NULL)
-	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "ide", NULL)
-	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, "comat", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "comat", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, "ide", NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5170")
