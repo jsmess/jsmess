@@ -62,7 +62,7 @@
             from an existing emulation written by Hans Pufal. Hans's emulator
             is also written from educated guesswork.
 
-        Kevin Thacker [MESS driver]
+        MESS Driver by Kevin Thacker and Sandro Ronco
 
  ******************************************************************************/
 
@@ -1007,9 +1007,9 @@ ROM_START(avigo_it)
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY   FULLNAME */
-COMP(1997,	avigo,  	0,  		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA",         	GAME_NOT_WORKING)
-COMP(1997,	avigo_de,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (German)",	GAME_NOT_WORKING)
-COMP(1997,	avigo_fr,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (French)",	GAME_NOT_WORKING)
-COMP(1997,	avigo_es,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (Spanish)",	GAME_NOT_WORKING)
-COMP(1997,	avigo_it,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (Italian)",	GAME_NOT_WORKING)
+COMP(1997,	avigo,  	0,  		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA",         	0)
+COMP(1997,	avigo_de,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (German)",	0)
+COMP(1997,	avigo_fr,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (French)",	0)
+COMP(1997,	avigo_es,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (Spanish)",	0)
+COMP(1997,	avigo_it,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (Italian)",	0)
 
