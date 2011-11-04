@@ -15598,6 +15598,8 @@ Undumped Pirates:
 	</software>
 
 	<software name="vip">
+		<!-- The US box of V.I.P usually contains the european cart. This was also shown on a youtube unboxing video with a sealed copy. Therefore the dump is labeled USA + Europe. 
+		But recently it was discovered some boxes also contain a real US shaped cart (see vipu below). -->
 		<!-- Serial: CGB-BVIE / CGB-BVIP - Release Date:  - Notes: GBC only -->
 		<description>VIP (Euro, USA)</description>
 		<year>2001</year>
@@ -15605,6 +15607,18 @@ Undumped Pirates:
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="vip (usa, europe) (en,fr,de,es,it).bin" size="1048576" crc="dbdd6d85" sha1="4da103b9a5c9e9649b26876fcbd70555bd8fd042" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vipu" cloneof="vip">
+		<!-- Serial: CGB-BVIE - Release Date:  - Notes: GBC only -->
+		<description>VIP (USA)</description>
+		<year>2001</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="vip (usa) (en,fr,de,es,it).bin" size="1048576" crc="436c87d4" sha1="3ecff5c68e457ee34c42af6349f9ab2a6845b5de" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
