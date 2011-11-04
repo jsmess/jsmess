@@ -373,6 +373,7 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 
 	MCFG_CPU_ADD("keyboard", M6502, XTAL_1MHz) /* 1 MHz? */
 	MCFG_CPU_PROGRAM_MAP(keyboard_mem)
+	MCFG_DEVICE_DISABLE()
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.997)
