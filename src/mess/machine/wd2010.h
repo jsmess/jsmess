@@ -54,6 +54,9 @@ class wd2010_device :	public device_t,
 public:
 	// construction/destruction
 	wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
 protected:
 	// device-level overrides
@@ -65,6 +68,10 @@ private:
 	devcb_resolved_write_line	m_out_intrq_func;
 	devcb_resolved_write_line	m_out_bdrq_func;
 	devcb_resolved_write_line	m_out_bcr_func;
+	
+	UINT8 m_status;
+	UINT8 m_error;
+	UINT8 m_task_file[8];
 };
 
 
