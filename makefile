@@ -39,6 +39,7 @@ endif
 # src/osd/$(OSD)/$(OSD).mak
 #-------------------------------------------------
 
+OSD = osdmini
 ifndef OSD
 ifeq ($(OS),Windows_NT)
 OSD = windows
@@ -187,11 +188,11 @@ endif
 # uncomment the force the universal DRC to always use the C backend
 # you may need to do this if your target architecture does not have
 # a native backend
-# FORCE_DRC_C_BACKEND = 1
+FORCE_DRC_C_BACKEND = 1
 
 # uncomment next line to build using unix-style libsdl on Mac OS X
 # (vs. the native framework port).  Normal users should not enable this.
-# MACOSX_USE_LIBSDL = 1
+MACOSX_USE_LIBSDL = 1
 
 
 
@@ -201,7 +202,7 @@ endif
 #-------------------------------------------------
 
 # uncomment next line if you are building for a 64-bit target
-# PTR64 = 1
+PTR64 = 0
 
 # uncomment next line if you are building for a big-endian target
 # BIGENDIAN = 1
@@ -235,7 +236,7 @@ BUILD_JPEGLIB = 1
 # MAP = 1
 
 # uncomment next line to generate verbose build information
-# VERBOSE = 1
+VERBOSE = 1
 
 # specify optimization level or leave commented to use the default
 # (default is OPTIMIZE = 3 normally, or OPTIMIZE = 0 with symbols)
@@ -304,9 +305,13 @@ BUILD_EXE = $(EXE)
 endif
 
 # compiler, linker and utilities
-AR = @ar
-CC = @gcc
-LD = @g++
+AR=/Users/devesine/Source/personal/jsmess/emscripten/tools/emmaken.py 
+CXX=/Users/devesine/Source/personal/jsmess/emscripten/tools/emmakenxx.py 
+LD=/Users/devesine/Source/personal/jsmess/emscripten/tools/emmakenxx.py 
+CC=/Users/devesine/Source/personal/jsmess/emscripten/tools/emmaken.py 
+#AR = @ar
+#CC = @gcc
+#LD = @g++
 MD = -mkdir$(EXE)
 RM = @rm -f
 OBJDUMP = @objdump
@@ -449,7 +454,7 @@ CFLAGS = $(CCOMFLAGS) $(CPPONLYFLAGS)
 
 # we compile C-only to C89 standard with GNU extensions
 # we compile C++ code to C++98 standard with GNU extensions
-CONLYFLAGS += -std=gnu89
+CONLYFLAGS += -std=gnu90
 CPPONLYFLAGS += -x c++ -std=gnu++98
 COBJFLAGS += -x objective-c++
 
@@ -487,13 +492,25 @@ endif
 # add a basic set of warnings
 CCOMFLAGS += \
 	-Wall \
-	-Wcast-align \
-	-Wundef \
-	-Wformat-security \
+	-Wno-format-security \
 	-Wwrite-strings \
 	-Wno-sign-compare \
-	-Wno-conversion
+	-Wno-conversion \
+	-Wno-tautological-compare \
+	-Wno-missing-declarations \
+	-Wno-parentheses-equality \
+	-Wno-deprecated \
+	-Wno-constant-logical-operand \
+	-Wno-unused-function \
+	-Wno-shift-count-overflow \
+	-Wno-array-bounds \
+	-Wno-self-assign \
+	-Wno-sizeof-pointer-memaccess
 
+CCOMFLAGS += -DSDLMAME_NOASM
+
+#	-Wcast-align \
+#	-Wundef \
 # warnings only applicable to C compiles
 CONLYFLAGS += \
 	-Wpointer-arith \
