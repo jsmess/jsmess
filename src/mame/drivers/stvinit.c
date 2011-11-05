@@ -1,6 +1,6 @@
 /* ST-V Inits and SpeedUp Hacks */
 /* stvinit.c */
-
+#if 0
 /*
 to be honest i think some of these cause more problems than they're worth ...
 */
@@ -76,6 +76,7 @@ static const UINT8 stv_default_eeprom[128] = {
 
 */
 
+/*
 void install_stvbios_speedups(running_machine &machine)
 {
 	// flushes 0 & 1 on both CPUs are for the BIOS speedups
@@ -85,6 +86,7 @@ void install_stvbios_speedups(running_machine &machine)
 	sh2drc_add_pcflush(machine.device("slave"), 0x60154b2);
 	sh2drc_add_pcflush(machine.device("slave"), 0x6013aee);
 }
+*/
 
 DRIVER_INIT(shienryu)
 {
@@ -621,3 +623,4 @@ DRIVER_INIT(nameclv3)
 
 	DRIVER_INIT_CALL(stv);
 }
+#endif

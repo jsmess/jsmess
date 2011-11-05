@@ -55,7 +55,8 @@ typedef struct stat64 sdl_stat;
 #define sdl_stat_fn stat64
 #endif
 
-#define HAS_DT_XXX defined(SDLMAME_LINUX) || defined(SDLMAME_BSD) || defined(SDLMAME_DARWIN)
+// #define HAS_DT_XXX defined(SDLMAME_LINUX) || defined(SDLMAME_BSD) || defined(SDLMAME_DARWIN)
+#define HAS_DT_XXX 0
 
 struct _osd_directory
 {
