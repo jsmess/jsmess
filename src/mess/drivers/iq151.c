@@ -47,14 +47,16 @@ ToDo:
 #include "machine/pic8259.h"
 #include "machine/i8255.h"
 #include "sound/speaker.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
-#include "machine/upd765.h"
-#include "formats/basicdsk.h"
 
+// cartridge slot
+#include "machine/iq151cart.h"
+#include "machine/iq151_rom.h"
+#include "machine/iq151_disc2.h"
+#include "video/iq151_video32.h"
+#include "video/iq151_video64.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
 #define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 
@@ -66,14 +68,12 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_pic(*this, "pic8259"),
 		  m_speaker(*this, SPEAKER_TAG),
-		  m_fdc(*this, "fdc"),
 		  m_cassette(*this, CASSETTE_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_pic;
 	required_device<device_t> m_speaker;
-	required_device<device_t> m_fdc;
 	required_device<cassette_image_device> m_cassette;
 
 	DECLARE_READ8_MEMBER(keyboard_row_r);
@@ -82,19 +82,17 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
 	DECLARE_WRITE8_MEMBER(boot_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(pic_set_int_line);
-	UINT8 *m_p_videoram;
-	UINT8 m_vblank_irq_state;
-	const UINT8 *m_p_chargen;
-	UINT8 m_width;
-	UINT8 m_cassette_clk;
-	UINT8 m_cassette_data;
+	DECLARE_READ8_MEMBER(cartslot_r);
+	DECLARE_WRITE8_MEMBER(cartslot_w);
+	DECLARE_READ8_MEMBER(cartslot_io_r);
+	DECLARE_WRITE8_MEMBER(cartslot_io_w);
 	virtual void machine_reset();
-	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
-	// AMOS
-	UINT8 *m_amos_banks[4];
-	DECLARE_WRITE8_MEMBER(amos_bankswitch_w);
+	UINT8 m_vblank_irq_state;
+	UINT8 m_cassette_clk;
+	UINT8 m_cassette_data;
+	iq151cart_slot_device * m_carts[5];
 };
 
 READ8_MEMBER(iq151_state::keyboard_row_r)
@@ -158,13 +156,50 @@ WRITE8_MEMBER(iq151_state::boot_bank_w)
 	memory_set_bank(machine(), "boot", data & 1);
 }
 
+
+//**************************************************************************
+//  Cartridge slot emulation
+//**************************************************************************
+
+READ8_MEMBER(iq151_state::cartslot_r)
+{
+	UINT8 data = 0xff;
+
+	for (int i=0; i<5; i++)
+		m_carts[i]->read(offset, data);
+
+	return data;
+}
+
+WRITE8_MEMBER(iq151_state::cartslot_w)
+{
+	for (int i=0; i<5; i++)
+		m_carts[i]->write(offset, data);
+}
+
+READ8_MEMBER(iq151_state::cartslot_io_r)
+{
+	UINT8 data = 0xff;
+
+	for (int i=0; i<5; i++)
+		m_carts[i]->io_read(offset, data);
+
+	return data;
+}
+
+WRITE8_MEMBER(iq151_state::cartslot_io_w)
+{
+	for (int i=0; i<5; i++)
+		m_carts[i]->io_write(offset, data);
+}
+
 static ADDRESS_MAP_START(iq151_mem, AS_PROGRAM, 8, iq151_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("boot")
 	AM_RANGE( 0x0800, 0x7fff ) AM_RAM
-	AM_RANGE( 0xe000, 0xe7ff ) AM_ROM AM_REGION("disc2", 0)
-	AM_RANGE( 0xe800, 0xefff ) AM_RAM AM_BASE(m_p_videoram)		// on Video 32/64 cartridge
 	AM_RANGE( 0xf000, 0xffff ) AM_ROM
+
+	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(cartslot_r, cartslot_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(iq151_io, AS_IO, 8, iq151_state)
@@ -173,9 +208,8 @@ static ADDRESS_MAP_START(iq151_io, AS_IO, 8, iq151_state)
 	AM_RANGE( 0x80, 0x80 ) AM_WRITE(boot_bank_w)
 	AM_RANGE( 0x84, 0x87 ) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE( 0x88, 0x89 ) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w )
-	AM_RANGE( 0xaa, 0xaa ) AM_DEVREAD_LEGACY("fdc", upd765_status_r)
-	AM_RANGE( 0xab, 0xab ) AM_DEVREADWRITE_LEGACY("fdc", upd765_data_r, upd765_data_w)
-	AM_RANGE( 0xfc, 0xff ) AM_READ_PORT("FE")
+
+	AM_RANGE( 0x00, 0xff ) AM_READWRITE(cartslot_io_r, cartslot_io_w)
 ADDRESS_MAP_END
 
 
@@ -275,11 +309,6 @@ static INPUT_PORTS_START( iq151 )
 
 	PORT_START("BREAK")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_ESC)   PORT_CHANGED(iq151_break, 0)  PORT_CHAR(UCHAR_MAMEKEY(ESC))
-
-	PORT_START("FE")
-	PORT_DIPNAME( 0xff, 0xff, "Screen Width")
-	PORT_DIPSETTING(    0xfe, "64")
-	PORT_DIPSETTING(    0xff, "32")
 INPUT_PORTS_END
 
 
@@ -320,145 +349,32 @@ DRIVER_INIT( iq151 )
 	memory_configure_bank(machine, "boot", 0, 1, RAM + 0xf800, 0);
 	memory_configure_bank(machine, "boot", 1, 1, RAM + 0x0000, 0);
 
-	memset(state->m_amos_banks, 0, sizeof(state->m_amos_banks));
-
 	device_set_irq_callback(state->m_maincpu, iq151_irq_callback);
+
+	// keep machine pointers to slots
+	state->m_carts[0] = machine.device<iq151cart_slot_device>("slot1");
+	state->m_carts[1] = machine.device<iq151cart_slot_device>("slot2");
+	state->m_carts[2] = machine.device<iq151cart_slot_device>("slot3");
+	state->m_carts[3] = machine.device<iq151cart_slot_device>("slot4");
+	state->m_carts[4] = machine.device<iq151cart_slot_device>("slot5");
 }
 
 MACHINE_RESET_MEMBER( iq151_state )
 {
-	m_width = input_port_read(machine(), "FE") == 0xff ? 32 : 64;
-	machine().primary_screen->set_visible_area(0, (m_width == 32 ? 32*8 : 64*6)-1, 0, 32*8-1);
 	memory_set_bank(machine(), "boot", 0);
 
 	m_vblank_irq_state = 0;
 }
 
-VIDEO_START_MEMBER( iq151_state )
-{
-	m_p_chargen = machine().region("chargen")->base();
-	m_width = 32;
-}
-
-// Note that the screen width is controlled by the port FE dipswitch, however there
-// is a software setting at memory [001F]. Poking this can cause strange things to
-// happen.
+// this machine don't have a built-in video controller, but uses external cartridge
 SCREEN_UPDATE_MEMBER( iq151_state )
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,x;
-	UINT16 chrstart = (m_width == 32) ? 0x800 : 0; // choose which charrom to use
-	UINT16 ma = (m_width == 32) ? 0x400 : 0; // start of videoram
+	bitmap_fill(&bitmap, &cliprect, 0);
 
-	for (y = 0; y < 32; y++)
-	{
-		for (ra = 0; ra < 8; ra++)
-		{
-			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 0);
+	for (int i=0; i<5; i++)
+		m_carts[i]->video_update(bitmap, cliprect);
 
-			for (x = ma; x < ma + m_width; x++)
-			{
-				chr = m_p_videoram[x];
-				if (chrstart > 0) chr &= 0x7f; // 32chr rom only has 128 characters
-
-				gfx = m_p_chargen[chrstart | (chr<<3) | ra ];
-
-				// in Video 32, chars above 0x7f have colors inverted
-				if (m_width == 32 && m_p_videoram[x] > 0x7f)
-					gfx = ~gfx;
-
-				/* Display a scanline of a character */
-				if (m_width == 32)
-				{
-					// bit 7 and 6 are ignored in Video 64 mode
-					*p++ = BIT(gfx, 7);
-					*p++ = BIT(gfx, 6);
-				}
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
-			}
-		}
-		ma+=m_width;
-	}
 	return 0;
-}
-
-
-//**************************************************************************
-//  IQ151 cartridges management
-//**************************************************************************
-
-WRITE8_MEMBER(iq151_state::amos_bankswitch_w)
-{
-	address_space *prog_space = m_maincpu->memory().space(AS_PROGRAM);
-
-	if (m_amos_banks[data & 3] != NULL)
-		prog_space->install_rom(0x8000, 0xbfff, m_amos_banks[data & 3]);
-	else
-		prog_space->unmap_readwrite(0x8000, 0xbfff);
-}
-
-
-static DEVICE_IMAGE_LOAD( iq151_cart )
-{
-	iq151_state *state = image.device().machine().driver_data<iq151_state>();
-
-	if (image.software_entry() != NULL)
-	{
-		// get the cartridge type
-		const char *cart_type = image.get_feature("cart_type");
-		address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
-
-		if (!strcmp(cart_type, "BASIC6"))
-		{
-			// BASIC6 cartridge
-			space->install_rom(0xc800, 0xe7ff, image.get_software_region("rom"));
-
-			return IMAGE_INIT_PASS;
-		}
-		else if (!strcmp(cart_type, "BASICG"))
-		{
-			// BASIC-G cartridge
-			space->install_rom(0xb000, 0xbfff, image.get_software_region("rom_a"));
-			space->install_rom(0xc800, 0xe7ff, image.get_software_region("rom_b"));
-			return IMAGE_INIT_PASS;
-		}
-		else if (!strncmp(cart_type, "AMOS", 4))
-		{
-			// AMOS cartridges
-
-			switch ((const char)cart_type[4])
-			{
-			case '0':	// Pascal cartridge
-				state->m_amos_banks[0] = (UINT8*)image.get_software_region("rom");
-				space->install_rom(0x8000, 0xbfff, state->m_amos_banks[0]);
-				break;
-			case '1':	// Pascal 1 cartridge
-				state->m_amos_banks[1] = (UINT8*)image.get_software_region("rom");
-				break;
-			case '2':	// Assembler cartridge
-				state->m_amos_banks[2] = (UINT8*)image.get_software_region("rom");
-				break;
-			}
-
-			// install AMOS bankswitch handler
-			address_space *io = state->m_maincpu->memory().space(AS_IO);
-			io->install_write_handler(0xec, 0xef, write8_delegate(FUNC(iq151_state::amos_bankswitch_w), state));
-
-			return IMAGE_INIT_PASS;
-		}
-		else
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unknown cartridge type");
-			return IMAGE_INIT_FAIL;
-		}
-	}
-
-	return IMAGE_INIT_FAIL;
 }
 
 /* F4 Character Displayer */
@@ -510,37 +426,6 @@ static I8255_INTERFACE( iq151_ppi8255_intf )
 	DEVCB_DRIVER_MEMBER(iq151_state, ppi_portc_w)
 };
 
-static LEGACY_FLOPPY_OPTIONS_START( iq151 )
-	LEGACY_FLOPPY_OPTION( iq151_disk, "iqd", "IQ-151 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([77])
-		SECTORS([26])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface iq151_floppy_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_8_SSSD,
-	LEGACY_FLOPPY_OPTIONS_NAME(iq151),
-	"floppy_8",
-	NULL
-};
-
-static const upd765_interface iq151_fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL,
-	UPD765_RDY_PIN_NOT_CONNECTED,
-	{ NULL, FLOPPY_0, FLOPPY_1, NULL }
-};
-
 static const cassette_interface iq151_cassette_interface =
 {
 	cassette_default_formats,
@@ -549,6 +434,27 @@ static const cassette_interface iq151_cassette_interface =
 	"iq151_cass",
 	NULL
 };
+
+static const iq151cart_interface iq151_cart_interface =
+{
+	DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w),
+	DEVCB_DEVICE_LINE("pic8259", pic8259_ir1_w),
+	DEVCB_DEVICE_LINE("pic8259", pic8259_ir2_w),
+	DEVCB_DEVICE_LINE("pic8259", pic8259_ir3_w),
+	DEVCB_DEVICE_LINE("pic8259", pic8259_ir4_w),
+	DEVCB_NULL
+};
+
+static SLOT_INTERFACE_START(iq151_cart)
+	SLOT_INTERFACE("video32", IQ151_VIDEO32)			// video32
+	SLOT_INTERFACE("video64", IQ151_VIDEO64)			// video64
+	SLOT_INTERFACE("disc2"  , IQ151_DISC2)				// Disc 2
+	SLOT_INTERFACE("basic6" , IQ151_BASIC6)				// BASIC6
+	SLOT_INTERFACE("basicg" , IQ151_BASICG)				// BASICG
+	SLOT_INTERFACE("amos1"  , IQ151_AMOS1)				// AMOS cart 1
+	SLOT_INTERFACE("amos2"  , IQ151_AMOS2)				// AMOS cart 2
+	SLOT_INTERFACE("amos3"  , IQ151_AMOS3)				// AMOS cart 3
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( iq151, iq151_state )
 	/* basic machine hardware */
@@ -562,8 +468,8 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(64*6, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
 	MCFG_GFXDECODE(iq151)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
@@ -577,40 +483,15 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 
 	MCFG_I8255_ADD("ppi8255", iq151_ppi8255_intf)
 
-	MCFG_UPD72065_ADD("fdc", iq151_fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(iq151_floppy_intf)
-
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, iq151_cassette_interface )
 	MCFG_TIMER_ADD_PERIODIC("cassette_timer", cassette_timer, attotime::from_hz(2000))
 
 	/* cartridge */
-	// On real hardware only 4 slots are available, because one
-	// slot is always used for the Video 32/64 cartridge.
-	MCFG_CARTSLOT_ADD("cart1")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(iq151_cart)
-	MCFG_CARTSLOT_INTERFACE("iq151_cart")
-	MCFG_CARTSLOT_ADD("cart2")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(iq151_cart)
-	MCFG_CARTSLOT_INTERFACE("iq151_cart")
-	MCFG_CARTSLOT_ADD("cart3")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(iq151_cart)
-	MCFG_CARTSLOT_INTERFACE("iq151_cart")
-	MCFG_CARTSLOT_ADD("cart4")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(iq151_cart)
-	MCFG_CARTSLOT_INTERFACE("iq151_cart")
-	MCFG_CARTSLOT_ADD("cart5")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(iq151_cart)
-	MCFG_CARTSLOT_INTERFACE("iq151_cart")
+	MCFG_IQ151_CARTRIDGE_ADD("slot1", iq151_cart_interface, iq151_cart, NULL, NULL)
+	MCFG_IQ151_CARTRIDGE_ADD("slot2", iq151_cart_interface, iq151_cart, NULL, NULL)
+	MCFG_IQ151_CARTRIDGE_ADD("slot3", iq151_cart_interface, iq151_cart, NULL, NULL)
+	MCFG_IQ151_CARTRIDGE_ADD("slot4", iq151_cart_interface, iq151_cart, NULL, NULL)
+	MCFG_IQ151_CARTRIDGE_ADD("slot5", iq151_cart_interface, iq151_cart, "video32", NULL)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq151_cart")
@@ -633,9 +514,6 @@ ROM_START( iq151 )
 	ROM_REGION( 0x0c00, "chargen", ROMREGION_INVERT )
 	ROM_LOAD( "iq151_video64font.rom", 0x0000, 0x0800, CRC(cb6f43c0) SHA1(4b2c1d41838d569228f61568c1a16a8d68b3dadf))
 	ROM_LOAD( "iq151_video32font.rom", 0x0800, 0x0400, CRC(395567a7) SHA1(18800543daf4daed3f048193c6ae923b4b0e87db))
-
-	ROM_REGION( 0x0800, "disc2", 0 )
-	ROM_LOAD( "iq151_disc2_12_5_1987_v4_0.rom", 0x0000, 0x0800, CRC(b189b170) SHA1(3e2ca80934177e7a32d0905f5a0ad14072f9dabf))
 ROM_END
 
 /* Driver */

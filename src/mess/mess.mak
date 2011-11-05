@@ -418,6 +418,7 @@ DRVLIBS += \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/wavemate.a \
 	$(MESSOBJ)/xerox.a \
+	$(MESSOBJ)/zpa.a \
 	$(MESSOBJ)/zvt.a \
 	$(MESSOBJ)/shared.a \
 
@@ -1732,6 +1733,14 @@ $(MESSOBJ)/xerox.a:				\
 	$(MESS_DRIVERS)/xerox820.o	\
 	$(MESS_DRIVERS)/bigbord2.o	\
 
+$(MESSOBJ)/zpa.a:				\
+	$(MESS_DRIVERS)/iq151.o		\
+	$(MESS_MACHINE)/iq151cart.o	\
+	$(MESS_MACHINE)/iq151_rom.o	\
+	$(MESS_MACHINE)/iq151_disc2.o	\
+	$(MESS_VIDEO)/iq151_video32.o	\
+	$(MESS_VIDEO)/iq151_video64.o	\
+
 $(MESSOBJ)/zvt.a:				\
 	$(MESS_DRIVERS)/pp01.o		\
 	$(MESS_MACHINE)/pp01.o		\
@@ -1770,7 +1779,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/horizon.o	\
 	$(MESS_DRIVERS)/ht68k.o		\
 	$(MESS_DRIVERS)/if800.o		\
-	$(MESS_DRIVERS)/iq151.o		\
 	$(MESS_DRIVERS)/indiana.o	\
 	$(MESS_DRIVERS)/instruct.o	\
 	$(MESS_DRIVERS)/mbc200.o	\
