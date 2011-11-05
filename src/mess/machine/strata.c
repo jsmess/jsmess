@@ -278,7 +278,7 @@ static int strataflash_r(device_t *device, offs_t offset, bus_width_t bus_width)
 			case 1:	// chip ID
 				return 0x15;	// 64 Mbit
 			default:
-				if (((offset && BYTE_ADDRESS_MASK) >> 1) == 2)
+				if (((offset & BYTE_ADDRESS_MASK) >> 1) == 2)
 				{	// block lock config
 					return READ_BLOCKLOCK(strata, offset >> BLOCK_ADDRESS_SHIFT);
 				}
@@ -298,7 +298,7 @@ static int strataflash_r(device_t *device, offs_t offset, bus_width_t bus_width)
 		case 0x01:	// chip ID
 			return 0x15;	// 64 Mbit
 		default:
-			if (((offset && BYTE_ADDRESS_MASK) >> 1) == 2)
+			if (((offset & BYTE_ADDRESS_MASK) >> 1) == 2)
 			{	// block lock config
 				return READ_BLOCKLOCK(strata, offset >> BLOCK_ADDRESS_SHIFT);
 			}
