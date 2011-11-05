@@ -52,7 +52,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq3_w );
 	DECLARE_WRITE_LINE_MEMBER( mr_w );
 	DECLARE_READ8_MEMBER( rd322_r );
+	DECLARE_READ8_MEMBER( ram_r );
+	DECLARE_WRITE8_MEMBER( ram_w );
+
+	DECLARE_READ8_MEMBER( wd1015_ram_r );
+	DECLARE_WRITE8_MEMBER( wd1015_ram_w );
+	DECLARE_READ8_MEMBER( wd1015_hdc_r );
+	DECLARE_WRITE8_MEMBER( wd1015_hdc_w );
+	DECLARE_WRITE8_MEMBER( wd1015_hdc_addr_w );
+	DECLARE_READ8_MEMBER( wd1015_t0_r );
 	DECLARE_READ8_MEMBER( wd1015_p1_r );
+	DECLARE_WRITE8_MEMBER( wd1015_p1_w );
 	DECLARE_WRITE8_MEMBER( wd1015_p2_w );
 	
 protected:
@@ -70,6 +80,10 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<wd11c00_17_device> m_host;
 	required_device<wd2010_device> m_hdc;
+	
+	UINT8 m_ram[0x800];
+
+	UINT8 m_hdc_addr;
 };
 
 

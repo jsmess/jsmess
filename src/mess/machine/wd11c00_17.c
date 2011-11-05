@@ -15,6 +15,9 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
+#define LOG 1
+
+
 // status register
 #define STATUS_IRQ		0x20
 #define STATUS_DRQ		0x10
@@ -56,7 +59,10 @@ void wd11c00_17_device::device_config_complete()
 		memset(&m_out_irq5_cb, 0, sizeof(m_out_irq5_cb));
 		memset(&m_out_drq3_cb, 0, sizeof(m_out_drq3_cb));
 		memset(&m_out_mr_cb, 0, sizeof(m_out_mr_cb));
+		memset(&m_out_busy_cb, 0, sizeof(m_out_busy_cb));
 		memset(&m_in_rd322_cb, 0, sizeof(m_in_rd322_cb));
+		memset(&m_in_ram_cb, 0, sizeof(m_in_ram_cb));
+		memset(&m_out_ram_cb, 0, sizeof(m_out_ram_cb));
 	}
 }
 
@@ -74,9 +80,11 @@ inline void wd11c00_17_device::check_interrupt()
 {
 	int irq = ((m_status & STATUS_IRQ) && (m_mask & MASK_IRQ)) ? ASSERT_LINE : CLEAR_LINE;
 	int drq = ((m_status & STATUS_DRQ) && (m_mask & MASK_DMA)) ? ASSERT_LINE : CLEAR_LINE;
+	int busy = (m_status & STATUS_BUSY) ? ASSERT_LINE : CLEAR_LINE;
 	
 	m_out_irq5_func(irq);
 	m_out_drq3_func(drq);
+	m_out_busy_func(busy);
 }
 
 	
@@ -105,9 +113,9 @@ inline UINT8 wd11c00_17_device::read_data()
 {
 	UINT8 data = 0;
 	
-	if (m_select)
+	if (m_status & STATUS_BUSY)
 	{
-		data = m_ram[m_ra & 0x3ff];
+		data = m_in_ram_func(m_ra & 0x3ff);
 		
 		increment_address();
 	}
@@ -122,9 +130,9 @@ inline UINT8 wd11c00_17_device::read_data()
 
 inline void wd11c00_17_device::write_data(UINT8 data)
 {
-	if (m_select)
+	if (m_status & STATUS_BUSY)
 	{
-		m_ram[m_ra & 0x3ff] = data;
+		m_out_ram_func(m_ra & 0x3ff, data);
 		
 		increment_address();
 	}
@@ -141,6 +149,18 @@ inline void wd11c00_17_device::software_reset()
 	m_out_mr_func(CLEAR_LINE);
 	
 	device_reset();
+}
+
+
+//-------------------------------------------------
+//  select -
+//-------------------------------------------------
+
+inline void wd11c00_17_device::select()
+{
+	m_status |= STATUS_BUSY;
+	
+	check_interrupt();
 }
 
 
@@ -170,7 +190,10 @@ void wd11c00_17_device::device_start()
 	m_out_irq5_func.resolve(m_out_irq5_cb, *this);
 	m_out_drq3_func.resolve(m_out_drq3_cb, *this);
 	m_out_mr_func.resolve(m_out_mr_cb, *this);
+	m_out_busy_func.resolve(m_out_busy_cb, *this);
 	m_in_rd322_func.resolve(m_in_rd322_cb, *this);
+	m_in_ram_func.resolve(m_in_ram_cb, *this);
+	m_out_ram_func.resolve(m_out_ram_cb, *this);
 }
 
 
@@ -180,9 +203,11 @@ void wd11c00_17_device::device_start()
 
 void wd11c00_17_device::device_reset()
 {
-	m_select = 0;
+	m_status &= ~(STATUS_IRQ | STATUS_DRQ | STATUS_BUSY);
 	m_mask = 0;
 	m_ra = 0;
+	
+	check_interrupt();
 }
 
 
@@ -225,18 +250,22 @@ WRITE8_MEMBER( wd11c00_17_device::write )
 	switch (offset)
 	{
 	case 0: // Write Data, Host to Board
+		if (LOG) logerror("%s WD11C00-17 '%s' Write Data %02x\n", machine().describe_context(), tag(), data);
 		write_data(data);
 		break;
 
 	case 1: // Board Software Reset
+		if (LOG) logerror("%s WD11C00-17 '%s' Software Reset\n", machine().describe_context(), tag());
 		software_reset();
 		break;
 
 	case 2:	// Board Select
-		m_select = 1;
+		if (LOG) logerror("%s WD11C00-17 '%s' Select\n", machine().describe_context(), tag());
+		select();
 		break;
 
 	case 3: // Set/Reset DMA, IRQ Masks
+		if (LOG) logerror("%s WD11C00-17 '%s' Mask IRQ %u DMA %u\n", machine().describe_context(), tag(), BIT(data, 1), BIT(data, 0));
 		m_mask = data;
 		check_interrupt();
 		break;
@@ -261,6 +290,20 @@ UINT8 wd11c00_17_device::dack_r()
 void wd11c00_17_device::dack_w(UINT8 data)
 {
 	write_data(data);
+}
+
+
+//-------------------------------------------------
+//  ra_r -
+//-------------------------------------------------
+
+offs_t wd11c00_17_device::ra_r()
+{
+	offs_t ra = m_ra;
+	
+	increment_address();
+	
+	return ra;
 }
 
 
@@ -291,16 +334,6 @@ WRITE_LINE_MEMBER( wd11c00_17_device::io_w )
 WRITE_LINE_MEMBER( wd11c00_17_device::cd_w )
 {
 	if (state) m_status |= STATUS_C_D; else m_status &= ~STATUS_C_D;
-}
-
-
-//-------------------------------------------------
-//  busy_w -
-//-------------------------------------------------
-	
-WRITE_LINE_MEMBER( wd11c00_17_device::busy_w )
-{
-	if (state) m_status |= STATUS_BUSY; else m_status &= ~STATUS_BUSY;
 }
 
 
