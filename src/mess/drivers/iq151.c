@@ -53,6 +53,7 @@ ToDo:
 #include "machine/iq151cart.h"
 #include "machine/iq151_rom.h"
 #include "machine/iq151_disc2.h"
+#include "video/iq151_grafik.h"
 #include "video/iq151_video32.h"
 #include "video/iq151_video64.h"
 
@@ -448,6 +449,7 @@ static const iq151cart_interface iq151_cart_interface =
 static SLOT_INTERFACE_START(iq151_cart)
 	SLOT_INTERFACE("video32", IQ151_VIDEO32)			// video32
 	SLOT_INTERFACE("video64", IQ151_VIDEO64)			// video64
+	SLOT_INTERFACE("grafik" , IQ151_GRAFIK)				// Grafik
 	SLOT_INTERFACE("disc2"  , IQ151_DISC2)				// Disc 2
 	SLOT_INTERFACE("basic6" , IQ151_BASIC6)				// BASIC6
 	SLOT_INTERFACE("basicg" , IQ151_BASICG)				// BASICG
