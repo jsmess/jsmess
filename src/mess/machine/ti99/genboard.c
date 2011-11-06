@@ -255,7 +255,7 @@ static const UINT8 keyboard_mf1_code[0xe] =
 
 static void poll_keyboard(device_t *device);
 static void poll_mouse(device_t *device);
-static void read_key_if_possible(genboard_state *board);
+static void signal_when_key_available(genboard_state *board);
 static UINT8 get_recent_key(device_t *device);
 
 static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
@@ -473,7 +473,7 @@ READ8_DEVICE_HANDLER( geneve_r )
 			do_wait(device, 1);
 			return value;
 		}
-		if (offset == 0xf118)
+		if ((offset & 0xfff8) == 0xf118)
 		{
 			// key
 			value = get_recent_key(device);
@@ -499,7 +499,7 @@ READ8_DEVICE_HANDLER( geneve_r )
 			do_wait(device, 1);
 			return value;
 		}
-		if (offset == 0x8008)
+		if ((offset & 0xfff8)== 0x8008)
 		{
 			// key
 			value = get_recent_key(device);
@@ -971,7 +971,7 @@ WRITE8_DEVICE_HANDLER ( geneve_cru_w )
 			rising_edge = (!board->keyboard_clock && (data!=0));
 			board->keyboard_clock = (data!=0);
 			if (rising_edge)
-				read_key_if_possible(board);
+				signal_when_key_available(board);
 			break;
 		case 9:
 			rising_edge = (!board->keep_keybuf && (data!=0));
@@ -979,7 +979,7 @@ WRITE8_DEVICE_HANDLER ( geneve_cru_w )
 			board->keep_keybuf = (data!=0);
 
 			if (rising_edge)
-				read_key_if_possible(board);
+				signal_when_key_available(board);
 			else
 			{
 				if (falling_edge)
@@ -990,7 +990,7 @@ WRITE8_DEVICE_HANDLER ( geneve_cru_w )
 						board->keyQueueLen--;
 					}
 					/* clear keyboard interrupt */
-					tms9901_set_single_int(board->tms9901, 8, 0);
+					tms9901_set_single_int(board->tms9901, 8, CLEAR_LINE);
 					board->keyInBuf = false;
 				}
 			}
@@ -1061,13 +1061,13 @@ UINT8 get_recent_key(device_t *device)
 		return 0;
 }
 
-static void read_key_if_possible(genboard_state *board)
+static void signal_when_key_available(genboard_state *board)
 {
 	// if keyboard reset is not asserted, and key clock is enabled, and key
 	// buffer clear is disabled, and key queue is not empty. */
 	if ((!board->keyReset) && (board->keyboard_clock) && (board->keep_keybuf) && (board->keyQueueLen != 0))
 	{
-		tms9901_set_single_int(board->tms9901, 8, 1);
+		tms9901_set_single_int(board->tms9901, 8, ASSERT_LINE);
 		board->keyInBuf = true;
 	}
 }
@@ -1251,7 +1251,7 @@ static void poll_keyboard(device_t *device)
 							keycode |= 0x80;
 						post_in_keyQueue(board, keycode);
 					}
-					read_key_if_possible(board);
+					signal_when_key_available(board);
 				}
 			}
 		}
@@ -1281,7 +1281,7 @@ static void poll_keyboard(device_t *device)
 		{
 			post_in_keyQueue(board, board->keyAutoRepeatKey);
 		}
-		read_key_if_possible(board);
+		signal_when_key_available(board);
 		board->keyAutoRepeatTimer = KEYAUTOREPEATRATE;
 	}
 }
