@@ -1,0 +1,17 @@
+/.cdtproject
+/.cproject
+/.project
+/.settings
+/cfg
+/folders
+/ini
+/nvram
+/obj
+/*.exe
+/*.dll
+/*.ini
+/mess.chm
+/*.map
+/snap
+/*.pdb
+/*.sym
