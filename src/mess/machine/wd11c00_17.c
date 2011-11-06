@@ -60,9 +60,13 @@ void wd11c00_17_device::device_config_complete()
 		memset(&m_out_drq3_cb, 0, sizeof(m_out_drq3_cb));
 		memset(&m_out_mr_cb, 0, sizeof(m_out_mr_cb));
 		memset(&m_out_busy_cb, 0, sizeof(m_out_busy_cb));
+		memset(&m_out_req_cb, 0, sizeof(m_out_req_cb));
+		memset(&m_out_ra3_cb, 0, sizeof(m_out_ra3_cb));
 		memset(&m_in_rd322_cb, 0, sizeof(m_in_rd322_cb));
-		memset(&m_in_ram_cb, 0, sizeof(m_in_ram_cb));
-		memset(&m_out_ram_cb, 0, sizeof(m_out_ram_cb));
+		memset(&m_in_ramcs_cb, 0, sizeof(m_in_ramcs_cb));
+		memset(&m_out_ramwr_cb, 0, sizeof(m_out_ramwr_cb));
+		memset(&m_in_cs1010_cb, 0, sizeof(m_in_cs1010_cb));
+		memset(&m_out_cs1010_cb, 0, sizeof(m_out_cs1010_cb));
 	}
 }
 
@@ -81,19 +85,23 @@ inline void wd11c00_17_device::check_interrupt()
 	int irq = ((m_status & STATUS_IRQ) && (m_mask & MASK_IRQ)) ? ASSERT_LINE : CLEAR_LINE;
 	int drq = ((m_status & STATUS_DRQ) && (m_mask & MASK_DMA)) ? ASSERT_LINE : CLEAR_LINE;
 	int busy = (m_status & STATUS_BUSY) ? ASSERT_LINE : CLEAR_LINE;
+	int req = (m_status & STATUS_REQ) ? ASSERT_LINE : CLEAR_LINE;
 	
 	m_out_irq5_func(irq);
 	m_out_drq3_func(drq);
 	m_out_busy_func(busy);
+	m_out_req_func(req);
 }
 
-	
+
 //-------------------------------------------------
 //  increment_address -
 //-------------------------------------------------
 
 inline void wd11c00_17_device::increment_address()
 {
+	int old_ra3 = BIT(m_ra, 1);
+	
 	m_ra++;
 	
 	if (BIT(m_ra, 10))
@@ -101,6 +109,13 @@ inline void wd11c00_17_device::increment_address()
 		m_status &= ~STATUS_DRQ;
 		
 		check_interrupt();
+	}
+	
+	int ra3 = BIT(m_ra, 1);
+	
+	if (old_ra3 != ra3)
+	{
+		m_out_ra3_func(ra3 ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -115,7 +130,7 @@ inline UINT8 wd11c00_17_device::read_data()
 	
 	if (m_status & STATUS_BUSY)
 	{
-		data = m_in_ram_func(m_ra & 0x3ff);
+		data = m_in_ramcs_func(m_ra & 0x3ff);
 		
 		increment_address();
 	}
@@ -132,7 +147,7 @@ inline void wd11c00_17_device::write_data(UINT8 data)
 {
 	if (m_status & STATUS_BUSY)
 	{
-		m_out_ram_func(m_ra & 0x3ff, data);
+		m_out_ramwr_func(m_ra & 0x3ff, data);
 		
 		increment_address();
 	}
@@ -158,7 +173,7 @@ inline void wd11c00_17_device::software_reset()
 
 inline void wd11c00_17_device::select()
 {
-	m_status |= STATUS_BUSY;
+	m_status |= STATUS_BUSY | STATUS_C_D | STATUS_REQ;
 	
 	check_interrupt();
 }
@@ -191,9 +206,13 @@ void wd11c00_17_device::device_start()
 	m_out_drq3_func.resolve(m_out_drq3_cb, *this);
 	m_out_mr_func.resolve(m_out_mr_cb, *this);
 	m_out_busy_func.resolve(m_out_busy_cb, *this);
+	m_out_req_func.resolve(m_out_req_cb, *this);
+	m_out_ra3_func.resolve(m_out_ra3_cb, *this);
 	m_in_rd322_func.resolve(m_in_rd322_cb, *this);
-	m_in_ram_func.resolve(m_in_ram_cb, *this);
-	m_out_ram_func.resolve(m_out_ram_cb, *this);
+	m_in_ramcs_func.resolve(m_in_ramcs_cb, *this);
+	m_out_ramwr_func.resolve(m_out_ramwr_cb, *this);
+	m_in_cs1010_func.resolve(m_in_cs1010_cb, *this);
+	m_out_cs1010_func.resolve(m_out_cs1010_cb, *this);
 }
 
 
@@ -212,10 +231,10 @@ void wd11c00_17_device::device_reset()
 
 
 //-------------------------------------------------
-//  read -
+//  io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wd11c00_17_device::read )
+READ8_MEMBER( wd11c00_17_device::io_r )
 {
 	UINT8 data = 0xff;
 	
@@ -242,15 +261,15 @@ READ8_MEMBER( wd11c00_17_device::read )
 
 
 //-------------------------------------------------
-//  write -
+//  io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wd11c00_17_device::write )
+WRITE8_MEMBER( wd11c00_17_device::io_w )
 {
 	switch (offset)
 	{
 	case 0: // Write Data, Host to Board
-		if (LOG) logerror("%s WD11C00-17 '%s' Write Data %02x\n", machine().describe_context(), tag(), data);
+		if (LOG) logerror("%s WD11C00-17 '%s' Write Data %03x:%02x\n", machine().describe_context(), tag(), m_ra, data);
 		write_data(data);
 		break;
 
@@ -294,16 +313,48 @@ void wd11c00_17_device::dack_w(UINT8 data)
 
 
 //-------------------------------------------------
-//  ra_r -
+//  read -
 //-------------------------------------------------
 
-offs_t wd11c00_17_device::ra_r()
+READ8_MEMBER( wd11c00_17_device::read )
 {
-	offs_t ra = m_ra;
+	UINT8 data = 0;
 	
-	increment_address();
+	switch (offset)
+	{
+	case 0x00:
+		data = read_data();
+		break;
+		
+	case 0x20:
+		data = m_in_cs1010_func(m_ra >> 8);
+		break;
+	}
 	
-	return ra;
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write -
+//-------------------------------------------------
+
+WRITE8_MEMBER( wd11c00_17_device::write )
+{
+	switch (offset)
+	{
+	case 0x00:
+		write_data(data);
+		break;
+		
+	case 0x20:
+		m_out_cs1010_func(m_ra >> 8, data);
+		break;
+		
+	case 0x60:
+		m_ra = ((data & 0x07) << 8) | (m_ra & 0xff);
+		break;
+	}
 }
 
 
@@ -313,6 +364,8 @@ offs_t wd11c00_17_device::ra_r()
 
 WRITE_LINE_MEMBER( wd11c00_17_device::ireq_w )
 {
+	if (LOG) logerror("%s WD11C00-17 '%s' IREQ %u\n", machine().describe_context(), tag(), state);
+	
 	if (state) m_status |= STATUS_REQ; else m_status &= ~STATUS_REQ;
 }
 
@@ -323,6 +376,8 @@ WRITE_LINE_MEMBER( wd11c00_17_device::ireq_w )
 	
 WRITE_LINE_MEMBER( wd11c00_17_device::io_w )
 {
+	if (LOG) logerror("%s WD11C00-17 '%s' I/O %u\n", machine().describe_context(), tag(), state);
+
 	if (state) m_status |= STATUS_I_O; else m_status &= ~STATUS_I_O;
 }
 
@@ -333,6 +388,8 @@ WRITE_LINE_MEMBER( wd11c00_17_device::io_w )
 	
 WRITE_LINE_MEMBER( wd11c00_17_device::cd_w )
 {
+	if (LOG) logerror("%s WD11C00-17 '%s' C/D %u\n", machine().describe_context(), tag(), state);
+	
 	if (state) m_status |= STATUS_C_D; else m_status &= ~STATUS_C_D;
 }
 
@@ -343,5 +400,10 @@ WRITE_LINE_MEMBER( wd11c00_17_device::cd_w )
 	
 WRITE_LINE_MEMBER( wd11c00_17_device::clct_w )
 {
-	m_ra &= 0xff00;
+	if (LOG) logerror("%s WD11C00-17 '%s' CLCT %u\n", machine().describe_context(), tag(), state);
+	
+	if (state)
+	{
+		m_ra &= 0xff00;
+	}
 }

@@ -102,9 +102,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( wd1015_io, AS_IO, 8, wdxt_gen_device )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(wd1015_ram_r, wd1015_ram_w)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(wd1015_hdc_r, wd1015_hdc_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(wd1015_hdc_addr_w)
+	AM_RANGE(0x00, 0xff) AM_DEVREADWRITE(WD11C00_17_TAG, wd11c00_17_device, read, write)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(wd1015_t0_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(wd1015_p1_r, wd1015_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(wd1015_p2_w)
@@ -153,22 +151,28 @@ static WD11C00_17_INTERFACE( host_intf )
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, irq5_w),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, drq3_w),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, mr_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_CPU_INPUT_LINE(WD1015_TAG, MCS48_INPUT_IRQ),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, rd322_r),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, ram_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, ram_w)
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, ram_w),
+	DEVCB_DEVICE_MEMBER(WD2010A_TAG, wd2010_device, read),
+	DEVCB_DEVICE_MEMBER(WD2010A_TAG, wd2010_device, write)
 };
 
 
 //-------------------------------------------------
-//  WD11C00_17_INTERFACE( hdc_intf )
+//  WD2010_INTERFACE( hdc_intf )
 //-------------------------------------------------
 
 static WD2010_INTERFACE( hdc_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DEVICE_LINE_MEMBER(WD11C00_17_TAG, wd11c00_17_device, clct_w),
+	DEVCB_DEVICE_MEMBER(WD11C00_17_TAG, wd11c00_17_device, read),
+	DEVCB_DEVICE_MEMBER(WD11C00_17_TAG, wd11c00_17_device, write)
 };
 
 
@@ -177,7 +181,7 @@ static WD2010_INTERFACE( hdc_intf )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( wdxt_gen )
-	MCFG_CPU_ADD(WD1015_TAG, I8048, 33040000/10) // ?
+	MCFG_CPU_ADD(WD1015_TAG, I8048, 5000000)
 	MCFG_CPU_PROGRAM_MAP(wd1015_mem)
 	MCFG_CPU_IO_MAP(wd1015_io)
 
@@ -226,7 +230,7 @@ void wdxt_gen_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
-	m_isa->install_device(0x0320, 0x0323, 0, 0, read8_delegate(FUNC(wd11c00_17_device::read), (wd11c00_17_device*)m_host), write8_delegate(FUNC(wd11c00_17_device::write), (wd11c00_17_device*)m_host));
+	m_isa->install_device(0x0320, 0x0323, 0, 0, read8_delegate(FUNC(wd11c00_17_device::io_r), (wd11c00_17_device*)m_host), write8_delegate(FUNC(wd11c00_17_device::io_w), (wd11c00_17_device*)m_host));
 }
 
 
@@ -236,6 +240,8 @@ void wdxt_gen_device::device_start()
 
 void wdxt_gen_device::device_reset()
 {
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 
@@ -270,66 +276,12 @@ bool wdxt_gen_device::have_dack(int line)
 
 
 //-------------------------------------------------
-//  wd1015_ram_r -
-//-------------------------------------------------
-
-READ8_MEMBER( wdxt_gen_device::wd1015_ram_r )
-{
-	offs_t ra = m_host->ra_r();
-	
-	return m_ram[ra];
-}
-
-
-//-------------------------------------------------
-//  wd1015_ram_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( wdxt_gen_device::wd1015_ram_w )
-{
-	offs_t ra = m_host->ra_r();
-	
-	m_ram[ra] = data;
-}
-
-
-//-------------------------------------------------
-//  wd1015_hdc_r -
-//-------------------------------------------------
-
-READ8_MEMBER( wdxt_gen_device::wd1015_hdc_r )
-{
-	return m_hdc->read(space, m_hdc_addr);
-}
-
-
-//-------------------------------------------------
-//  wd1015_hdc_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( wdxt_gen_device::wd1015_hdc_w )
-{
-	m_hdc->write(space, m_hdc_addr, data);
-}
-
-
-//-------------------------------------------------
-//  wd1015_hdc_addr_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( wdxt_gen_device::wd1015_hdc_addr_w )
-{
-	m_hdc_addr = data & 0x07;
-}
-
-
-//-------------------------------------------------
 //  wd1015_t0_r -
 //-------------------------------------------------
 
 READ8_MEMBER( wdxt_gen_device::wd1015_t0_r )
 {
-	return 0;
+	return 0; // TODO
 }
 
 
@@ -378,6 +330,8 @@ WRITE8_MEMBER( wdxt_gen_device::wd1015_p1_w )
         P17     
 
     */
+
+	logerror("P1 %02x\n", data);
 }
 
 
@@ -394,11 +348,15 @@ WRITE8_MEMBER( wdxt_gen_device::wd1015_p2_w )
         P20		
         P21		
         P22		
-        P23		
-        P24     
+        P23		C/D ?
+        P24     CLCT
         P25     
         P26     
         P27     
 
     */
+	
+	logerror("P2 %02x\n", data);
+	
+	m_host->clct_w(BIT(data, 4));
 }
