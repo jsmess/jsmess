@@ -285,14 +285,19 @@ void wd1772_t::read_sector_continue()
 			if(command & 4) {
 				sub_state = SETTLE_WAIT;
 				delay_cycles(t_gen, 120000);
+				return;
 			} else {
-				sub_state = SCAN_ID;
-				counter = 0;
-				live_start(SEARCH_ADDRESS_MARK);
+				sub_state = SETTLE_DONE;
+				break;
 			}
-			return;
 
 		case SETTLE_WAIT:
+			return;
+
+		case SETTLE_DONE:
+			sub_state = SCAN_ID;
+			counter = 0;
+			live_start(SEARCH_ADDRESS_MARK);
 			return;
 
 		case SCAN_ID:
@@ -361,10 +366,21 @@ void wd1772_t::read_track_continue()
 			return;
 
 		case SPINUP_DONE:
-			sub_state = WAIT_INDEX;
-			return;
+			if(command & 4) {
+				sub_state = SETTLE_WAIT;
+				delay_cycles(t_gen, 120000);
+				return;
+
+			} else {
+				sub_state = SETTLE_DONE;
+				break;
+			}
 
 		case SETTLE_WAIT:
+			return;
+
+		case SETTLE_DONE:
+			sub_state = WAIT_INDEX;
 			return;
 
 		case WAIT_INDEX:
@@ -373,6 +389,7 @@ void wd1772_t::read_track_continue()
 		case WAIT_INDEX_DONE:
 			sub_state = TRACK_DONE;
 			live_start(READ_TRACK_DATA);
+			cur_live.pll.start_writing(machine().time());
 			return;
 
 		case TRACK_DONE:
@@ -415,12 +432,11 @@ void wd1772_t::read_id_continue()
 			if(command & 4) {
 				sub_state = SETTLE_WAIT;
 				delay_cycles(t_gen, 120000);
+				return;
 			} else {
-				sub_state = SCAN_ID;
-				counter = 0;
-				live_start(SEARCH_ADDRESS_MARK);
+				sub_state = SETTLE_DONE;
+				break;
 			}
-			return;
 
 		case SETTLE_WAIT:
 			return;
@@ -441,7 +457,166 @@ void wd1772_t::read_id_continue()
 			return;
 
 		default:
-			logerror("%s: read track unknown sub-state %d\n", ttsn().cstr(), sub_state);
+			logerror("%s: read id unknown sub-state %d\n", ttsn().cstr(), sub_state);
+			return;
+		}
+	}
+}
+
+void wd1772_t::write_track_start()
+{
+	main_state = WRITE_TRACK;
+	status = (status & ~(S_WP|S_DDM|S_LOST|S_RNF)) | S_BUSY;
+	drop_drq();
+	sub_state = SPINUP;
+	status_type_1 = false;
+	write_track_continue();
+}
+
+void wd1772_t::write_track_continue()
+{
+	for(;;) {
+		switch(sub_state) {
+		case SPINUP:
+			if(!(status & S_MON)) {
+				spinup();
+				return;
+			}
+			sub_state = SPINUP_DONE;
+			break;
+
+		case SPINUP_WAIT:
+			return;
+
+		case SPINUP_DONE:
+			if(command & 4) {
+				sub_state = SETTLE_WAIT;
+				delay_cycles(t_gen, 120000);
+				return;
+			} else {
+				sub_state = SETTLE_DONE;
+				break;
+			}
+
+		case SETTLE_WAIT:
+			return;
+
+		case SETTLE_DONE:
+			set_drq();
+			sub_state = DATA_LOAD_WAIT;
+			delay_cycles(t_gen, 768);
+			return;
+
+		case DATA_LOAD_WAIT:
+			return;
+
+		case DATA_LOAD_WAIT_DONE:
+			if(drq) {
+				status |= S_LOST;
+				command_end();
+				return;
+			}
+			sub_state = WAIT_INDEX;
+			break;
+
+		case WAIT_INDEX:
+			return;
+
+		case WAIT_INDEX_DONE:
+			sub_state = TRACK_DONE;
+			live_start(WRITE_TRACK_DATA);
+			return;
+
+		case TRACK_DONE:
+			command_end();
+			return;
+
+		default:
+			logerror("%s: write track unknown sub-state %d\n", ttsn().cstr(), sub_state);
+			return;
+		}
+	}
+}
+
+
+void wd1772_t::write_sector_start()
+{
+	main_state = WRITE_SECTOR;
+	status = (status & ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM)) | S_BUSY;
+	drop_drq();
+	sub_state = SPINUP;
+	status_type_1 = false;
+	write_sector_continue();
+}
+
+void wd1772_t::write_sector_continue()
+{
+	static int size_codes[4] = { 128, 256, 512, 1024 };
+
+	for(;;) {
+		switch(sub_state) {
+		case SPINUP:
+			if(!(status & S_MON)) {
+				spinup();
+				return;
+			}
+			sub_state = SPINUP_DONE;
+			break;
+
+		case SPINUP_WAIT:
+			return;
+
+		case SPINUP_DONE:
+			if(command & 4) {
+				sub_state = SETTLE_WAIT;
+				delay_cycles(t_gen, 120000);
+				return;
+			} else {
+				sub_state = SETTLE_DONE;
+				break;
+			}
+
+		case SETTLE_WAIT:
+			return;
+
+		case SETTLE_DONE:
+			sub_state = SCAN_ID;
+			counter = 0;
+			live_start(SEARCH_ADDRESS_MARK);
+			return;
+
+		case SCAN_ID:
+			if(cur_live.idbuf[0] != track || cur_live.idbuf[2] != sector) {
+				live_start(SEARCH_ADDRESS_MARK);
+				return;
+			}
+			if(cur_live.crc) {
+				status |= S_CRC;
+				live_start(SEARCH_ADDRESS_MARK);
+				return;
+			}
+			sector_size = size_codes[cur_live.idbuf[3] & 3];
+			sub_state = SECTOR_WRITE;
+			live_start(WRITE_SECTOR_PRE);
+			return;
+
+		case SCAN_ID_FAILED:
+			status |= S_RNF;
+			command_end();
+			return;
+
+		case SECTOR_WRITE:
+			if(command & 0x10) {
+				sector++;
+				sub_state = SPINUP_DONE;
+			} else {
+				command_end();
+				return;
+			}
+			break;
+
+		default:
+			logerror("%s: write sector unknown sub-state %d\n", ttsn().cstr(), sub_state);
 			return;
 		}
 	}
@@ -465,7 +640,8 @@ void wd1772_t::general_continue()
 {
 	if(cur_live.state != IDLE) {
 		live_run();
-		return;
+		if(cur_live.state != IDLE)
+			return;
 	}
 
 	switch(main_state) {
@@ -482,6 +658,12 @@ void wd1772_t::general_continue()
 		break;
 	case READ_ID:
 		read_id_continue();
+		break;
+	case WRITE_TRACK:
+		write_track_continue();
+		break;
+	case WRITE_SECTOR:
+		write_sector_continue();
 		break;
 	default:
 		logerror("%s: general_continue on unknown main-state %d\n", ttsn().cstr(), main_state);
@@ -507,6 +689,10 @@ void wd1772_t::do_generic()
 
 	case SEEK_WAIT_STABILIZATION_TIME:
 		sub_state = SEEK_WAIT_STABILIZATION_TIME_DONE;
+		break;
+
+	case DATA_LOAD_WAIT:
+		sub_state = DATA_LOAD_WAIT_DONE;
 		break;
 
 	default:
@@ -535,13 +721,11 @@ void wd1772_t::do_cmd_w()
 	case 0x40: case 0x50: logerror("wd1772: step +\n"); last_dir = 0; seek_start(STEP); break;
 	case 0x60: case 0x70: logerror("wd1772: step -\n"); last_dir = 1; seek_start(STEP); break;
 	case 0x80: case 0x90: logerror("wd1772: read sector%s %d, %d\n", command & 0x10 ? " multiple" : "", track, sector); read_sector_start(); break;
+	case 0xa0: case 0xb0: logerror("wd1772: write sector%s %d, %d\n", command & 0x10 ? " multiple" : "", track, sector); write_sector_start(); break;
 	case 0xc0: logerror("wd1772: read id\n"); read_id_start(); break;
 	case 0xd0: logerror("wd1772: interrupt\n"); interrupt_start(); break;
 	case 0xe0: logerror("wd1772: read track %d\n", track); read_track_start(); break;
-
-	default:
-		logerror("%s: Unhandled command %02x\n", ttsn().cstr(), command);
-		break;
+	case 0xf0: logerror("wd1772: write track %d\n", track); write_track_start(); break;
 	}
 }
 
@@ -724,6 +908,8 @@ void wd1772_t::index_callback(floppy_image_device *floppy, int state)
 	case SPINUP_DONE:
 	case SETTLE_WAIT:
 	case SETTLE_DONE:
+	case DATA_LOAD_WAIT:
+	case DATA_LOAD_WAIT_DONE:
 	case SEEK_MOVE:
 	case SEEK_WAIT_STEP_TIME:
 	case SEEK_WAIT_STEP_TIME_DONE:
@@ -733,6 +919,7 @@ void wd1772_t::index_callback(floppy_image_device *floppy, int state)
 	case WAIT_INDEX_DONE:
 	case SCAN_ID_FAILED:
 	case SECTOR_READ:
+	case SECTOR_WRITE:
 		break;
 
 	case SCAN_ID:
@@ -777,6 +964,9 @@ void wd1772_t::live_start(int state)
 	cur_live.bit_counter = 0;
 	cur_live.data_separator_phase = false;
 	cur_live.data_reg = 0;
+	cur_live.previous_type = live_info::PT_NONE;
+	cur_live.data_bit_context = false;
+	cur_live.byte_counter = 0;
 	cur_live.pll.reset(cur_live.tm);
 	cur_live.pll.set_clock(clocks_to_attotime(1));
 	checkpoint_live = cur_live;
@@ -786,6 +976,7 @@ void wd1772_t::live_start(int state)
 
 void wd1772_t::checkpoint()
 {
+	cur_live.pll.commit(floppy, cur_live.tm);
 	checkpoint_live = cur_live;
 }
 
@@ -807,12 +998,16 @@ void wd1772_t::live_sync()
 			//          fprintf(stderr, "%s: Rolling back and replaying (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
 			rollback();
 			live_run(machine().time());
+			cur_live.pll.commit(floppy, cur_live.tm);
 		} else {
 			//          fprintf(stderr, "%s: Committing (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
+			cur_live.pll.commit(floppy, cur_live.tm);
 			if(cur_live.next_state != -1)
 				cur_live.state = cur_live.next_state;
-			if(cur_live.state == IDLE)
+			if(cur_live.state == IDLE) {
+				cur_live.pll.stop_writing(floppy, cur_live.tm);
 				cur_live.tm = attotime::never;
+			}
 		}
 		cur_live.next_state = -1;
 		checkpoint();
@@ -821,6 +1016,12 @@ void wd1772_t::live_sync()
 
 void wd1772_t::live_abort()
 {
+	if(cur_live.tm > machine().time()) {
+		rollback();
+		live_run(machine().time());
+	}
+
+	cur_live.pll.stop_writing(floppy, cur_live.tm);
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
@@ -842,6 +1043,46 @@ bool wd1772_t::read_one_bit(attotime limit)
 	}
 	cur_live.data_separator_phase = !cur_live.data_separator_phase;
 	return false;
+}
+
+bool wd1772_t::write_one_bit(attotime limit)
+{
+	bool bit = cur_live.shift_reg & 0x8000;
+	if(cur_live.pll.write_next_bit(bit, cur_live.tm, floppy, limit))
+		return true;
+	if(cur_live.bit_counter & 1) {
+		if((cur_live.crc ^ (bit ? 0x8000 : 0x0000)) & 0x8000)
+			cur_live.crc = (cur_live.crc << 1) ^ 0x1021;
+		else
+			cur_live.crc = cur_live.crc << 1;
+	}
+	cur_live.shift_reg = cur_live.shift_reg << 1;
+	cur_live.bit_counter--;
+	return false;
+}
+
+void wd1772_t::live_write_raw(UINT16 raw)
+{
+	//	logerror("write %04x %04x\n", raw, cur_live.crc);
+	cur_live.shift_reg = raw;
+	cur_live.data_bit_context = raw & 1;
+}
+
+void wd1772_t::live_write_mfm(UINT8 mfm)
+{
+	bool context = cur_live.data_bit_context;
+	UINT16 raw = 0;
+	for(int i=0; i<8; i++) {
+		bool bit = mfm & (0x80 >> i);
+		if(!(bit || context))
+			raw |= 0x8000 >> (2*i);
+		if(bit)
+			raw |= 0x4000 >> (2*i);
+		context = bit;
+	}
+	cur_live.shift_reg = raw;
+	cur_live.data_bit_context = context;
+	//	logerror("write %02x   %04x %04x\n", mfm, cur_live.crc, raw);
 }
 
 void wd1772_t::live_run(attotime limit)
@@ -1047,6 +1288,146 @@ void wd1772_t::live_run(attotime limit)
 			checkpoint();
 			break;
 
+		case WRITE_TRACK_DATA:
+			if(drq) {
+				status |= S_LOST;
+				data = 0;
+			}
+			switch(data) {
+			case 0xf5:
+				if(cur_live.previous_type != live_info::PT_SYNC)
+					cur_live.crc = 0xffff;
+				live_write_raw(0x4489);
+				cur_live.previous_type = live_info::PT_SYNC;
+				break;
+			case 0xf6:
+				cur_live.previous_type = live_info::PT_NONE;
+				live_write_raw(0x5224);
+				break;
+			case 0xf7:
+				if(cur_live.previous_type == live_info::PT_CRC_2) {
+					cur_live.previous_type = live_info::PT_NONE;
+					live_write_mfm(0xf7);
+				} else {
+					cur_live.previous_type = live_info::PT_CRC_1;
+					live_write_mfm(cur_live.crc >> 8);
+				}
+				break;
+			default:
+				cur_live.previous_type = live_info::PT_NONE;
+				live_write_mfm(data);
+				break;
+			}
+			set_drq();
+			cur_live.state = WRITE_BYTE;
+			cur_live.bit_counter = 16;
+			checkpoint();
+			break;
+
+		case WRITE_BYTE:
+			if(write_one_bit(limit))
+				return;
+			if(cur_live.bit_counter == 0) {
+				live_delay(WRITE_BYTE_DONE);
+				return;
+			}
+			break;
+
+		case WRITE_BYTE_DONE:
+			switch(sub_state) {
+			case TRACK_DONE:
+				if(cur_live.previous_type == live_info::PT_CRC_1) {
+					cur_live.previous_type = live_info::PT_CRC_2;
+					live_write_mfm(cur_live.crc >> 8);
+					cur_live.state = WRITE_BYTE;
+					cur_live.bit_counter = 16;
+					checkpoint();
+				} else
+					cur_live.state = WRITE_TRACK_DATA;
+				break;
+
+			case SECTOR_WRITE:
+				cur_live.state = WRITE_BYTE;
+				cur_live.bit_counter = 16;
+				cur_live.byte_counter++;
+				if(cur_live.byte_counter <= 11)
+					live_write_mfm(0x00);
+				else if(cur_live.byte_counter == 12) {
+					cur_live.crc = 0xffff;
+					live_write_raw(0x4489);
+				} else if(cur_live.byte_counter <= 14)
+					live_write_raw(0x4489);
+				else if(cur_live.byte_counter == 15)
+					live_write_mfm(command & 1 ? 0xf8 : 0xfb);
+				else if(cur_live.byte_counter <= sector_size + 16-2) {
+					if(drq) {
+						status |= S_LOST;
+						data = 0;
+					}
+					live_write_mfm(data);
+					set_drq();
+				} else if(cur_live.byte_counter == sector_size + 16-1) {
+					if(drq) {
+						status |= S_LOST;
+						data = 0;
+					}
+					live_write_mfm(data);
+				} else if(cur_live.byte_counter <= sector_size + 16+1)
+					live_write_mfm(cur_live.crc >> 8);
+				else if(cur_live.byte_counter == sector_size + 16+2)
+					// Is that correct?  It seems required (try ST formatting)
+					live_write_mfm(0xff);
+				else {
+					cur_live.pll.stop_writing(floppy, cur_live.tm);
+					cur_live.state = IDLE;
+					return;
+				}
+
+				checkpoint();
+				break;
+
+			default:
+				logerror("%s: Unknown sub state %d in WRITE_BYTE_DONE\n", tts(cur_live.tm).cstr(), sub_state);
+				live_abort();
+				return;
+			}
+			break;
+
+		case WRITE_SECTOR_PRE:
+			if(read_one_bit(limit))
+				return;
+			if(cur_live.bit_counter != 16)
+				break;
+			live_delay(WRITE_SECTOR_PRE_BYTE);
+			return;
+
+		case WRITE_SECTOR_PRE_BYTE:
+			cur_live.state = WRITE_SECTOR_PRE;
+			cur_live.byte_counter++;
+			cur_live.bit_counter = 0;
+			switch(cur_live.byte_counter) {
+			case 2:
+				set_drq();
+				checkpoint();
+				break;
+			case 11:
+				if(drq) {
+					status |= S_LOST;
+					cur_live.state = IDLE;
+					return;
+				}
+				break;
+			case 22:
+				cur_live.state = WRITE_BYTE;
+				cur_live.bit_counter = 16;
+				cur_live.byte_counter = 0;
+				cur_live.data_bit_context = cur_live.data_reg & 1;
+				cur_live.pll.start_writing(cur_live.tm);
+				live_write_mfm(0x00);
+				break;
+			}
+			break;
+
 		default:
 			logerror("%s: Unknown live state %d\n", tts(cur_live.tm).cstr(), cur_live.state);
 			return;
@@ -1092,6 +1473,8 @@ void wd1772_t::pll_t::reset(attotime when)
 	phase_sub = 0x00;
 	freq_add  = 0x00;
 	freq_sub  = 0x00;
+	write_position = 0;
+	write_start_time = attotime::never;
 }
 
 int wd1772_t::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit)
@@ -1131,7 +1514,7 @@ int wd1772_t::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, att
 		if(counter & 0x800)
 			break;
 	}
-	//  fprintf(stderr, "first transition, time=%03x, inc=%3d\n", transition_time, increment);
+	//	fprintf(stderr, "first transition, time=%03x, inc=%3d\n", transition_time, increment);
 	int bit = transition_time != 0xffff;
 
 	if(transition_time != 0xffff) {
@@ -1172,4 +1555,57 @@ int wd1772_t::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, att
 	slot = 0;
 
 	return bit;
+}
+
+void wd1772_t::pll_t::start_writing(attotime tm)
+{
+	write_start_time = tm;
+	write_position = 0;
+}
+
+void wd1772_t::pll_t::stop_writing(floppy_image_device *floppy, attotime tm)
+{
+	commit(floppy, tm);
+	write_start_time = attotime::never;
+}
+
+bool wd1772_t::pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit)
+{
+	if(write_start_time == attotime::never) {
+		write_start_time = ctime;
+		write_position = 0;
+	}
+
+	for(;;) {
+		attotime etime = ctime+delays[slot];
+		if(etime > limit)
+			return true;
+		UINT16 pre_counter = counter;
+		counter += increment;
+		if(bit && !(pre_counter & 0x400) && (counter & 0x400))
+			if(write_position < ARRAY_LENGTH(write_buffer))
+				write_buffer[write_position++] = etime;
+		slot++;
+		tm = etime;
+		if(counter & 0x800)
+			break;
+	}
+
+	counter &= 0x7ff;
+
+	ctime = tm;
+	slot = 0;
+
+	return false;
+}
+
+void wd1772_t::pll_t::commit(floppy_image_device *floppy, attotime tm)
+{
+	if(write_start_time == attotime::never || tm == write_start_time)
+		return;
+
+	if(floppy)
+		floppy->write_flux(write_start_time, tm, write_position, write_buffer);
+	write_start_time = tm;
+	write_position = 0;
 }

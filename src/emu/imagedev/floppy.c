@@ -279,7 +279,7 @@ void floppy_image_device::stp_w(int state)
 	}
 }
 
-int floppy_image_device::find_position(int position, const UINT32 *buf, int buf_size)
+int floppy_image_device::find_index(UINT32 position, const UINT32 *buf, int buf_size)
 {
 	int spos = (buf_size >> 1)-1;
 	int step;
@@ -298,6 +298,21 @@ int floppy_image_device::find_position(int position, const UINT32 *buf, int buf_
 	}
 }
 
+UINT32 floppy_image_device::find_position(attotime &base, attotime when)
+{
+	base = revolution_start_time;
+	UINT32 revc = revolution_count;
+	attotime delta = when - base;
+
+	while(delta >= rev_time) {
+		delta -= rev_time;
+		base += rev_time;
+		revc++;
+	}
+
+	return (delta*(rpm/300)).as_ticks(1000000000);
+}
+
 attotime floppy_image_device::get_next_transition(attotime from_when)
 {
 	if(!image || mon)
@@ -307,24 +322,16 @@ attotime floppy_image_device::get_next_transition(attotime from_when)
 	if(cells <= 1)
 		return attotime::never;
 
-	attotime base = revolution_start_time;
-	UINT32 revc = revolution_count;
-	attotime delta = from_when - base;
-
-	while(delta >= rev_time) {
-		delta -= rev_time;
-		base += rev_time;
-		revc++;
-	}
-	int position = (delta*(rpm/300)).as_ticks(1000000000);
+	attotime base;
+	UINT32 position = find_position(base, from_when);
 
 	const UINT32 *buf = image->get_buffer(cyl, ss);
-	int index = find_position(position, buf, cells);
+	int index = find_index(position, buf, cells);
 
 	if(index == -1)
 		return attotime::never;
 
-	int next_position;
+	UINT32 next_position;
 	if(index < cells-1)
 		next_position = buf[index+1] & floppy_image::TIME_MASK;
 	else if((buf[index]^buf[0]) & floppy_image::MG_MASK)
@@ -332,5 +339,164 @@ attotime floppy_image_device::get_next_transition(attotime from_when)
 	else
 		next_position = 200000000 + (buf[1] & floppy_image::TIME_MASK);
 
+
 	return base + attotime::from_nsec(next_position*(300/rpm));
+}
+
+void floppy_image_device::write_flux(attotime start, attotime end, int transition_count, const attotime *transitions)
+{
+	attotime base;
+	int start_pos = find_position(base, start);
+	int end_pos   = find_position(base, end);
+
+	int *trans_pos = transition_count ? global_alloc_array(int, transition_count) : 0;
+	for(int i=0; i != transition_count; i++)
+		trans_pos[i] = find_position(base, transitions[i]);
+
+#if 0
+	logerror("write %d-%d\n ", start_pos, end_pos);
+	for(int i=0; i != transition_count; i++)
+		logerror(" %d", trans_pos[i]);
+	logerror("\n");
+#endif
+
+	int cells = image->get_track_size(cyl, ss);
+	UINT32 *buf = image->get_buffer(cyl, ss);
+
+	int index;
+	if(cells)
+		index = find_index(start_pos, buf, cells);
+	else {
+		index = 0;
+		buf[cells++] = floppy_image::MG_N | 200000000;
+	}
+
+	if(index && (buf[index] & floppy_image::TIME_MASK) == start_pos)
+		index--;
+
+	UINT32 cur_mg = buf[index] & floppy_image::MG_MASK;
+	if(cur_mg == floppy_image::MG_N || cur_mg == floppy_image::MG_D)
+		cur_mg = floppy_image::MG_A;
+
+	UINT32 pos = start_pos;
+	int ti = 0;
+	while(pos != end_pos) {
+		UINT32 next_pos;
+		if(ti != transition_count)
+			next_pos = trans_pos[ti++];
+		else
+			next_pos = end_pos;
+		if(next_pos > pos)
+			write_zone(buf, cells, index, pos, next_pos, cur_mg);
+		else {
+			write_zone(buf, cells, index, pos, 200000000, cur_mg);
+			write_zone(buf, cells, index, 0, next_pos, cur_mg);
+		}
+		pos = next_pos;
+		cur_mg = cur_mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
+	}
+
+	image->set_track_size(cyl, ss, cells);
+
+	if(trans_pos)
+		global_free(trans_pos);
+}
+
+void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32 spos, UINT32 epos, UINT32 mg)
+{
+	while(spos < epos) {
+		while(index != cells-1 && (buf[index+1] & floppy_image::TIME_MASK) <= spos)
+			index++;
+	
+		UINT32 ref_start = buf[index] & floppy_image::TIME_MASK;
+		UINT32 ref_end   = index == cells-1 ? 200000000 : buf[index+1] & floppy_image::TIME_MASK;
+		UINT32 ref_mg    = buf[index] & floppy_image::MG_MASK;
+
+		// Can't overwrite a damaged zone
+		if(ref_mg == floppy_image::MG_D) {
+			spos = ref_end;
+			continue;
+		}
+
+		// If the zone is of the type we want, we don't need to touch it
+		if(ref_mg == mg) {
+			spos = ref_end;
+			continue;
+		}
+
+		//  Check the overlaps, act accordingly
+		if(spos == ref_start) {
+			if(epos >= ref_end) {
+				// Full overlap, that cell is dead, we need to see which ones we can extend
+				UINT32 prev_mg = index != 0       ? buf[index-1] & floppy_image::MG_MASK : ~0;
+				UINT32 next_mg = index != cells-1 ? buf[index+1] & floppy_image::MG_MASK : ~0;
+				if(prev_mg == mg) {
+					if(next_mg == mg) {
+						// Both match, merge all three in one
+						memmove(buf+index, buf+index+2, (cells-index-2)*sizeof(UINT32));
+						cells -= 2;
+						index--;
+
+					} else {
+						// Previous matches, drop the current cell
+						memmove(buf+index, buf+index+1, (cells-index-1)*sizeof(UINT32));
+						cells --;
+					}
+
+				} else {
+					if(next_mg == mg) {
+						// Following matches, extend it
+						memmove(buf+index, buf+index+1, (cells-index-1)*sizeof(UINT32));
+						cells --;
+						buf[index] = mg | spos;
+					} else {
+						// None match, convert the current cell
+						buf[index] = mg | spos;
+						index++;
+					}
+				}
+				spos = ref_end;				
+
+			} else {
+				// Overlap at the start only
+				// Check if we can just extend the previous cell
+				if(index != 0 && (buf[index-1] & floppy_image::MG_MASK) == mg)
+					buf[index] = ref_mg | epos;
+				else {
+					// Otherwise we need to insert a new cell
+					if(index != cells-1)
+						memmove(buf+index+1, buf+index, (cells-index)*sizeof(UINT32));
+					cells++;
+					buf[index] = mg | spos;
+					buf[index+1] = ref_mg | epos;
+				}
+				spos = epos;
+			}
+
+		} else {
+			if(epos >= ref_end) {
+				// Overlap at the end only
+				// If we can't just extend the following cell, we need to insert a new one
+				if(index == cells-1 || (buf[index+1] & floppy_image::MG_MASK) != mg) {
+					if(index != cells-1)
+						memmove(buf+index+2, buf+index+1, (cells-index-1)*sizeof(UINT32));
+					cells++;
+				}
+				buf[index+1] = mg | spos;
+				index++;
+				spos = ref_end;
+
+			} else {
+				// Full inclusion
+				// We need to split the zone in 3
+				if(index != cells-1)
+					memmove(buf+index+3, buf+index+1, (cells-index-1)*sizeof(UINT32));
+				cells += 2;
+				buf[index+1] = mg | spos;
+				buf[index+2] = ref_mg | epos;
+				spos = epos;
+			}
+		}
+	
+	}
 }

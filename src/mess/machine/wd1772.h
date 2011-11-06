@@ -98,6 +98,8 @@ private:
 		READ_SECTOR,
 		READ_TRACK,
 		READ_ID,
+		WRITE_TRACK,
+		WRITE_SECTOR,
 
 		// Sub states
 
@@ -107,6 +109,9 @@ private:
 
 		SETTLE_WAIT,
 		SETTLE_DONE,
+
+		DATA_LOAD_WAIT,
+		DATA_LOAD_WAIT_DONE,
 
 		SEEK_MOVE,
 		SEEK_WAIT_STEP_TIME,
@@ -122,6 +127,7 @@ private:
 		SCAN_ID_FAILED,
 
 		SECTOR_READ,
+		SECTOR_WRITE,
 		TRACK_DONE,
 
 		// Live states
@@ -135,6 +141,11 @@ private:
 		READ_SECTOR_DATA_BYTE,
 		READ_TRACK_DATA,
 		READ_TRACK_DATA_BYTE,
+		WRITE_TRACK_DATA,
+		WRITE_BYTE,
+		WRITE_BYTE_DONE,
+		WRITE_SECTOR_PRE,
+		WRITE_SECTOR_PRE_BYTE,
 	};
 
 	struct pll_t {
@@ -148,18 +159,28 @@ private:
 
 		attotime delays[42];
 
+		attotime write_start_time;
+		attotime write_buffer[32];
+		int write_position;
+
 		void set_clock(attotime period);
 		void reset(attotime when);
 		int get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit);
+		bool write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit);
+		void start_writing(attotime tm);
+		void commit(floppy_image_device *floppy, attotime tm);
+		void stop_writing(floppy_image_device *floppy, attotime tm);
 	};
 
 	struct live_info {
+		enum { PT_NONE, PT_SYNC, PT_CRC_1, PT_CRC_2 };
+
 		attotime tm;
 		int state, next_state;
 		UINT16 shift_reg;
 		UINT16 crc;
-		int bit_counter;
-		bool data_separator_phase;
+		int bit_counter, byte_counter, previous_type;
+		bool data_separator_phase, data_bit_context;
 		UINT8 data_reg;
 		UINT8 idbuf[6];
 		pll_t pll;
@@ -222,6 +243,12 @@ private:
 	void read_id_start();
 	void read_id_continue();
 
+	void write_track_start();
+	void write_track_continue();
+
+	void write_sector_start();
+	void write_sector_continue();
+
 	void interrupt_start();
 
 	void general_continue();
@@ -239,6 +266,11 @@ private:
 	void live_sync();
 	void live_run(attotime limit = attotime::never);
 	bool read_one_bit(attotime limit);
+	bool write_one_bit(attotime limit);
+
+	void live_write_raw(UINT16 raw);
+	void live_write_mfm(UINT8 mfm);
+
 	void drop_drq();
 	void set_drq();
 };

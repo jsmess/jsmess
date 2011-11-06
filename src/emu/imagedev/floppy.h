@@ -46,11 +46,11 @@ public:
 
 	virtual iodevice_t image_type() const { return IO_FLOPPY; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
+	virtual bool is_readable()  const { return true; }
+	virtual bool is_writeable() const { return true; }
+	virtual bool is_creatable() const { return true; }
+	virtual bool must_be_loaded() const { return false; }
+	virtual bool is_reset_on_load() const { return false; }
 	virtual const char *file_extensions() const { return extension_list; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
@@ -77,6 +77,7 @@ public:
 	void index_resync();
 	attotime time_next_index();
 	attotime get_next_transition(attotime from_when);
+	void write_flux(attotime start, attotime end, int transition_count, const attotime *transitions);
 
 protected:
 	// device-level overrides
@@ -120,7 +121,9 @@ protected:
 	unload_cb cur_unload_cb;
 	index_pulse_cb cur_index_pulse_cb;
 
-	int find_position(int position, const UINT32 *buf, int buf_size);
+	UINT32 find_position(attotime &base, attotime when);
+	int find_index(UINT32 position, const UINT32 *buf, int buf_size);
+	void write_zone(UINT32 *buf, int &cells, int &index, UINT32 spos, UINT32 epos, UINT32 mg);
 };
 
 // device type definition
