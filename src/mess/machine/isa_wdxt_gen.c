@@ -102,7 +102,11 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( wd1015_io, AS_IO, 8, wdxt_gen_device )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(wd1015_p1_r)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(wd1015_ram_r, wd1015_ram_w)
+	AM_RANGE(0x20, 0x20) AM_READWRITE(wd1015_hdc_r, wd1015_hdc_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(wd1015_hdc_addr_w)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(wd1015_t0_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(wd1015_p1_r, wd1015_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(wd1015_p2_w)
 ADDRESS_MAP_END
 
@@ -134,12 +138,25 @@ READ8_MEMBER( wdxt_gen_device::rd322_r )
 	return 0xff;
 }
 
+READ8_MEMBER( wdxt_gen_device::ram_r )
+{
+	return m_ram[offset];
+}
+
+WRITE8_MEMBER( wdxt_gen_device::ram_w )
+{
+	m_ram[offset] = data;
+}
+
 static WD11C00_17_INTERFACE( host_intf )
 {
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, irq5_w),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, drq3_w),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, mr_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, rd322_r)
+	DEVCB_CPU_INPUT_LINE(WD1015_TAG, MCS48_INPUT_IRQ),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, rd322_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, ram_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, ram_w)
 };
 
 
@@ -253,6 +270,70 @@ bool wdxt_gen_device::have_dack(int line)
 
 
 //-------------------------------------------------
+//  wd1015_ram_r -
+//-------------------------------------------------
+
+READ8_MEMBER( wdxt_gen_device::wd1015_ram_r )
+{
+	offs_t ra = m_host->ra_r();
+	
+	return m_ram[ra];
+}
+
+
+//-------------------------------------------------
+//  wd1015_ram_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( wdxt_gen_device::wd1015_ram_w )
+{
+	offs_t ra = m_host->ra_r();
+	
+	m_ram[ra] = data;
+}
+
+
+//-------------------------------------------------
+//  wd1015_hdc_r -
+//-------------------------------------------------
+
+READ8_MEMBER( wdxt_gen_device::wd1015_hdc_r )
+{
+	return m_hdc->read(space, m_hdc_addr);
+}
+
+
+//-------------------------------------------------
+//  wd1015_hdc_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( wdxt_gen_device::wd1015_hdc_w )
+{
+	m_hdc->write(space, m_hdc_addr, data);
+}
+
+
+//-------------------------------------------------
+//  wd1015_hdc_addr_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( wdxt_gen_device::wd1015_hdc_addr_w )
+{
+	m_hdc_addr = data & 0x07;
+}
+
+
+//-------------------------------------------------
+//  wd1015_t0_r -
+//-------------------------------------------------
+
+READ8_MEMBER( wdxt_gen_device::wd1015_t0_r )
+{
+	return 0;
+}
+
+
+//-------------------------------------------------
 //  wd1015_p1_r -
 //-------------------------------------------------
 
@@ -262,18 +343,41 @@ READ8_MEMBER( wdxt_gen_device::wd1015_p1_r )
 
         bit     description
 
-        P10     INTHD
-        P11     HD/_FD
-        P12     TR00
-        P13     SBEF
-        P14     TST31
-        P15     MOM
-        P16     STEP (output)
-        P17     DIR (output)
+        P10     
+        P11     
+        P12     
+        P13     
+        P14     
+        P15     
+        P16     
+        P17     
 
     */
 	
 	return 0;
+}
+
+
+//-------------------------------------------------
+//  wd1015_p1_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( wdxt_gen_device::wd1015_p1_w )
+{
+	/*
+
+        bit     description
+
+        P10     
+        P11     
+        P12     
+        P13     
+        P14     
+        P15     
+        P16     
+        P17     
+
+    */
 }
 
 
@@ -287,14 +391,14 @@ WRITE8_MEMBER( wdxt_gen_device::wd1015_p2_w )
 
         bit     description
 
-        P20		TST21
-        P21		TST22
-        P22		TST23
-        P23		TST24
-        P24     _FMO
-        P25     BRDY
-        P26     CORRD
-        P27     ERR
+        P20		
+        P21		
+        P22		
+        P23		
+        P24     
+        P25     
+        P26     
+        P27     
 
     */
 }
