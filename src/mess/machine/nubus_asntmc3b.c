@@ -1,42 +1,49 @@
 /***************************************************************************
 
-  Asante MC3B NuBus Ethernet card
+  Asante MC3NB NuBus Ethernet card (DP83902)
+  Apple NuBus Ethernet Card (DP8390)
 
-  Based on National Semiconductor DP83902 "ST-NIC"
+  Based on National Semiconductor DP8390 family chips
 
-  Fs*D0000 - 64k RAM buffer (used as DP83902 DMA target)
-  Fs*E0000 - DP83902 registers
+  FssD0000 - 64k RAM buffer (used as DP83902 DMA target)
+  FssE0000 - DP83902 registers
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "machine/nubus_asntmc3b.h"
 
-#define ASNTMC3B_ROM_REGION  "asntm3b_rom"
-#define ASNTMC3B_DP83902  "dp83902"
+#define MAC8390_ROM_REGION  "asntm3b_rom"
+#define MAC8390_839X  "dp83902"
 
 static const dp8390_interface dp8390_interface =
 {
-	DEVCB_LINE_MEMBER(nubus_asntm3b_device, dp_irq_w),
+	DEVCB_LINE_MEMBER(nubus_mac8390_device, dp_irq_w),
 	DEVCB_NULL,
-	DEVCB_MEMBER(nubus_asntm3b_device, dp_mem_read),
-	DEVCB_MEMBER(nubus_asntm3b_device, dp_mem_write)
+	DEVCB_MEMBER(nubus_mac8390_device, dp_mem_read),
+	DEVCB_MEMBER(nubus_mac8390_device, dp_mem_write)
 };
 
 MACHINE_CONFIG_FRAGMENT( asntm3b )
-	MCFG_DP8390D_ADD(ASNTMC3B_DP83902, dp8390_interface)
+	MCFG_DP8390D_ADD(MAC8390_839X, dp8390_interface)
 MACHINE_CONFIG_END
 
-ROM_START( asntm3b )
-	ROM_REGION(0x4000, ASNTMC3B_ROM_REGION, 0)
+ROM_START( asntm3nb )
+	ROM_REGION(0x4000, MAC8390_ROM_REGION, 0)
 	ROM_LOAD( "asante_mc3b.bin", 0x000000, 0x004000, CRC(4f86d451) SHA1(d0a41df667e6b51fbc63f9251d593f4fc49104ba) )
+ROM_END
+
+ROM_START( appleenet )
+	ROM_REGION(0x4000, MAC8390_ROM_REGION, 0)
+    ROM_LOAD( "aenet1",       0x000000, 0x004000, CRC(e3ae8c26) SHA1(01ddc15ee84b17128203cb812f29bac6b20fd642) ) 
 ROM_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_ASNTMC3B = &device_creator<nubus_asntm3b_device>;
+const device_type NUBUS_ASNTMC3NB = &device_creator<nubus_asntmc3nb_device>;
+const device_type NUBUS_APPLEENET = &device_creator<nubus_appleenet_device>;
 
 
 //-------------------------------------------------
@@ -44,7 +51,7 @@ const device_type NUBUS_ASNTMC3B = &device_creator<nubus_asntm3b_device>;
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor nubus_asntm3b_device::device_mconfig_additions() const
+machine_config_constructor nubus_mac8390_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( asntm3b );
 }
@@ -53,9 +60,14 @@ machine_config_constructor nubus_asntm3b_device::device_mconfig_additions() cons
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *nubus_asntm3b_device::device_rom_region() const
+const rom_entry *nubus_mac8390_device::device_rom_region() const
 {
-	return ROM_NAME( asntm3b );
+	return ROM_NAME( asntm3nb );
+}
+
+const rom_entry *nubus_appleenet_device::device_rom_region() const
+{
+	return ROM_NAME( appleenet );
 }
 
 //**************************************************************************
@@ -63,30 +75,33 @@ const rom_entry *nubus_asntm3b_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  nubus_asntm3b_device - constructor
+//  nubus_mac8390_device - constructor
 //-------------------------------------------------
 
-nubus_asntm3b_device::nubus_asntm3b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, NUBUS_ASNTMC3B, "Asante MC3B Ethernet card", tag, owner, clock),
+nubus_mac8390_device::nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, NUBUS_ASNTMC3NB, name, tag, owner, clock),
 		device_nubus_card_interface(mconfig, *this),
-		m_dp83902(*this, ASNTMC3B_DP83902)
+		m_dp83902(*this, MAC8390_839X)
+{
+}
+
+nubus_asntmc3nb_device::nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        nubus_mac8390_device(mconfig, NUBUS_ASNTMC3NB, "Asante MC3NB Ethernet card", tag, owner, clock)
 {
 	m_shortname = "nb_amc3b";
 }
 
-nubus_asntm3b_device::nubus_asntm3b_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, type, name, tag, owner, clock),
-		device_nubus_card_interface(mconfig, *this),
-		m_dp83902(*this, ASNTMC3B_DP83902)
+nubus_appleenet_device::nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        nubus_mac8390_device(mconfig, NUBUS_APPLEENET, "Apple NuBus Ethernet card", tag, owner, clock)
 {
-	m_shortname = "nb_amc3b";
+	m_shortname = "nb_aenet";
 }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void nubus_asntm3b_device::device_start()
+void nubus_mac8390_device::device_start()
 {
 	UINT32 slotspace;
 	char mac[7];
@@ -99,41 +114,43 @@ void nubus_asntm3b_device::device_start()
 
 	// set_nubus_device makes m_slot valid
 	set_nubus_device();
-	install_declaration_rom(this, ASNTMC3B_ROM_REGION, true);
+	install_declaration_rom(this, MAC8390_ROM_REGION, true);
 
 	slotspace = get_slotspace();
 
-//  printf("[ASNTMC3B %p] slotspace = %x\n", this, slotspace);
+//  printf("[ASNTMC3NB %p] slotspace = %x\n", this, slotspace);
 
-	m_nubus->install_device(slotspace+0xd0000, slotspace+0xdffff, read8_delegate(FUNC(nubus_asntm3b_device::asntm3b_ram_r), this), write8_delegate(FUNC(nubus_asntm3b_device::asntm3b_ram_w), this));
-	m_nubus->install_device(slotspace+0xbd0000, slotspace+0xbdffff, read8_delegate(FUNC(nubus_asntm3b_device::asntm3b_ram_r), this), write8_delegate(FUNC(nubus_asntm3b_device::asntm3b_ram_w), this));
-	m_nubus->install_device(slotspace+0xe0000, slotspace+0xe003f, read32_delegate(FUNC(nubus_asntm3b_device::en_r), this), write32_delegate(FUNC(nubus_asntm3b_device::en_w), this));
-	m_nubus->install_device(slotspace+0xbe0000, slotspace+0xbe003f, read32_delegate(FUNC(nubus_asntm3b_device::en_r), this), write32_delegate(FUNC(nubus_asntm3b_device::en_w), this));
+    // TODO: move 24-bit mirroring down into nubus.c
+    UINT32 ofs_24bit = m_slot<<20;
+	m_nubus->install_device(slotspace+0xd0000, slotspace+0xdffff, read8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_r), this), write8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_w), this));
+	m_nubus->install_device(slotspace+0xe0000, slotspace+0xe003f, read32_delegate(FUNC(nubus_mac8390_device::en_r), this), write32_delegate(FUNC(nubus_mac8390_device::en_w), this));
+	m_nubus->install_device(slotspace+0xd0000+ofs_24bit, slotspace+0xdffff+ofs_24bit, read8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_r), this), write8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_w), this));
+	m_nubus->install_device(slotspace+0xe0000+ofs_24bit, slotspace+0xe003f+ofs_24bit, read32_delegate(FUNC(nubus_mac8390_device::en_r), this), write32_delegate(FUNC(nubus_mac8390_device::en_w), this));
 }
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void nubus_asntm3b_device::device_reset()
+void nubus_mac8390_device::device_reset()
 {
     m_dp83902->dp8390_reset(0);
     m_dp83902->dp8390_cs(0);
 }
 
-WRITE8_MEMBER( nubus_asntm3b_device::asntm3b_ram_w )
+WRITE8_MEMBER( nubus_mac8390_device::asntm3b_ram_w )
 {
-//    printf("MC3B: CPU wrote %02x to RAM @ %x\n", data, offset);
+//    printf("MC3NB: CPU wrote %02x to RAM @ %x\n", data, offset);
     m_ram[offset] = data;
 }
 
-READ8_MEMBER( nubus_asntm3b_device::asntm3b_ram_r )
+READ8_MEMBER( nubus_mac8390_device::asntm3b_ram_r )
 {
-//    printf("MC3B: CPU read %02x @ RAM %x\n", m_ram[offset], offset);
+//    printf("MC3NB: CPU read %02x @ RAM %x\n", m_ram[offset], offset);
     return m_ram[offset];
 }
 
-WRITE32_MEMBER( nubus_asntm3b_device::en_w )
+WRITE32_MEMBER( nubus_mac8390_device::en_w )
 {
     if (mem_mask == 0xff000000)
     {
@@ -148,11 +165,11 @@ WRITE32_MEMBER( nubus_asntm3b_device::en_w )
     }
     else
     {
-        fatalerror("asntm3b: write %08x to DP83902 @ %x with unhandled mask %08x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
+        fatalerror("asntmc3nb: write %08x to DP83902 @ %x with unhandled mask %08x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
     }
 }
 
-READ32_MEMBER( nubus_asntm3b_device::en_r )
+READ32_MEMBER( nubus_mac8390_device::en_r )
 {
     if (mem_mask == 0xff000000)
     {
@@ -166,13 +183,13 @@ READ32_MEMBER( nubus_asntm3b_device::en_r )
     }
     else
     {
-        fatalerror("asntm3b: read DP83902 @ %x with unhandled mask %08x (PC=%x)\n", offset, mem_mask, cpu_get_pc(&space.device()));
+        fatalerror("asntmc3nb: read DP83902 @ %x with unhandled mask %08x (PC=%x)\n", offset, mem_mask, cpu_get_pc(&space.device()));
     }
 
     return 0;
 }
 
-WRITE_LINE_MEMBER( nubus_asntm3b_device::dp_irq_w )
+WRITE_LINE_MEMBER( nubus_mac8390_device::dp_irq_w )
 {
     if (state)
     {
@@ -184,14 +201,14 @@ WRITE_LINE_MEMBER( nubus_asntm3b_device::dp_irq_w )
     }
 }
 
-READ8_MEMBER( nubus_asntm3b_device::dp_mem_read )
+READ8_MEMBER( nubus_mac8390_device::dp_mem_read )
 {
-//    printf("MC3B: 8390 read RAM @ %x = %02x\n", offset, m_ram[offset]);
+//    printf("MC3NB: 8390 read RAM @ %x = %02x\n", offset, m_ram[offset]);
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER( nubus_asntm3b_device::dp_mem_write )
+WRITE8_MEMBER( nubus_mac8390_device::dp_mem_write )
 {
-//    printf("MC3B: 8390 wrote %02x to RAM @ %x\n", data, offset);
+//    printf("MC3NB: 8390 wrote %02x to RAM @ %x\n", data, offset);
 	m_ram[offset] = data;
 }
