@@ -495,7 +495,8 @@ CCOMFLAGS += \
 	-Wno-shift-count-overflow \
 	-Wno-array-bounds \
 	-Wno-self-assign \
-	-Wno-sizeof-pointer-memaccess
+	-Wno-sizeof-pointer-memaccess \
+	-Wno-overloaded-virtual
 
 CCOMFLAGS += -DSDLMAME_NOASM
 
