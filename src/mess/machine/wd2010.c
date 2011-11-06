@@ -116,6 +116,8 @@ void wd2010_device::device_config_complete()
 		memset(&m_out_intrq_cb, 0, sizeof(m_out_intrq_cb));
 		memset(&m_out_bdrq_cb, 0, sizeof(m_out_bdrq_cb));
 		memset(&m_out_bcr_cb, 0, sizeof(m_out_bcr_cb));
+		memset(&m_in_bcs_cb, 0, sizeof(m_in_bcs_cb));
+		memset(&m_out_bcs_cb, 0, sizeof(m_out_bcs_cb));
 	}
 }
 
@@ -145,6 +147,8 @@ void wd2010_device::device_start()
 	m_out_intrq_func.resolve(m_out_intrq_cb, *this);
 	m_out_bdrq_func.resolve(m_out_bdrq_cb, *this);
 	m_out_bcr_func.resolve(m_out_bcr_cb, *this);
+	m_in_bcs_func.resolve(m_in_bcs_cb, *this);
+	m_out_bcs_func.resolve(m_out_bcs_cb, *this);
 }
 
 

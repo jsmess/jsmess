@@ -44,9 +44,13 @@ struct wd11c00_17_interface
 	devcb_write_line	m_out_drq3_cb;
 	devcb_write_line	m_out_mr_cb;
 	devcb_write_line	m_out_busy_cb;
+	devcb_write_line	m_out_req_cb;
+	devcb_write_line	m_out_ra3_cb;
 	devcb_read8			m_in_rd322_cb;
-	devcb_read8			m_in_ram_cb;
-	devcb_write8		m_out_ram_cb;
+	devcb_read8			m_in_ramcs_cb;
+	devcb_write8		m_out_ramwr_cb;
+	devcb_read8			m_in_cs1010_cb;
+	devcb_write8		m_out_cs1010_cb;
 };
 
 
@@ -59,13 +63,14 @@ public:
 	// construction/destruction
 	wd11c00_17_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( io_r );
+	DECLARE_WRITE8_MEMBER( io_w );
 	
 	UINT8 dack_r();
 	void dack_w(UINT8 data);
 	
-	offs_t ra_r();
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 	
 	DECLARE_WRITE_LINE_MEMBER( ireq_w );
 	DECLARE_WRITE_LINE_MEMBER( io_w );
@@ -90,9 +95,13 @@ private:
 	devcb_resolved_write_line	m_out_drq3_func;
 	devcb_resolved_write_line	m_out_mr_func;
 	devcb_resolved_write_line	m_out_busy_func;
+	devcb_resolved_write_line	m_out_req_func;
+	devcb_resolved_write_line	m_out_ra3_func;
 	devcb_resolved_read8		m_in_rd322_func;
-	devcb_resolved_read8		m_in_ram_func;
-	devcb_resolved_write8		m_out_ram_func;
+	devcb_resolved_read8		m_in_ramcs_func;
+	devcb_resolved_write8		m_out_ramwr_func;
+	devcb_resolved_read8		m_in_cs1010_func;
+	devcb_resolved_write8		m_out_cs1010_func;
 	
 	UINT8 m_status;
 	UINT8 m_mask;
