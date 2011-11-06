@@ -118,29 +118,33 @@ void nubus_asntm3b_device::device_start()
 void nubus_asntm3b_device::device_reset()
 {
     m_dp83902->dp8390_reset(0);
-    m_dp83902->dp8390_cs(0);    // clear CS, we don't access RAM that way
+    m_dp83902->dp8390_cs(0);
 }
 
 WRITE8_MEMBER( nubus_asntm3b_device::asntm3b_ram_w )
 {
-	m_ram[offset] = data;
+//    printf("MC3B: CPU wrote %02x to RAM @ %x\n", data, offset);
+    m_ram[offset] = data;
 }
 
 READ8_MEMBER( nubus_asntm3b_device::asntm3b_ram_r )
 {
-	return m_ram[offset];
+//    printf("MC3B: CPU read %02x @ RAM %x\n", m_ram[offset], offset);
+    return m_ram[offset];
 }
 
 WRITE32_MEMBER( nubus_asntm3b_device::en_w )
 {
     if (mem_mask == 0xff000000)
     {
+//        printf("%02x to 8390 @ %x\n", data>>24, 0xf-offset);
         m_dp83902->dp8390_w(space, 0xf-offset, data>>24);
     }
     else if (mem_mask == 0xffff0000)
     {
-        m_dp83902->dp8390_w(space, 0xf-offset, data>>24);
-        m_dp83902->dp8390_w(space, 0xf-(offset+1), (data>>16)&0xff);    // todo: is this correct?  or are 16-bit accesses to RAM (cs=1)?
+        m_dp83902->dp8390_cs(1);
+        m_dp83902->dp8390_w(space, 0xf-offset, data>>16);
+        m_dp83902->dp8390_cs(0);
     }
     else
     {
@@ -156,7 +160,9 @@ READ32_MEMBER( nubus_asntm3b_device::en_r )
     }
     else if (mem_mask == 0xffff0000)
     {
-        return ((m_dp83902->dp8390_r(space, 0xf-offset)<<24)||(m_dp83902->dp8390_r(space, 0xf-(offset+1))<<16));
+        m_dp83902->dp8390_cs(1);
+        return (m_dp83902->dp8390_r(space, 0xf-offset)<<16);
+        m_dp83902->dp8390_cs(0);
     }
     else
     {
@@ -180,26 +186,12 @@ WRITE_LINE_MEMBER( nubus_asntm3b_device::dp_irq_w )
 
 READ8_MEMBER( nubus_asntm3b_device::dp_mem_read )
 {
-	if(offset < 32)
-    {
-        return m_prom[offset>>1];
-    }
-
-    if((offset < (16*1024)) || (offset >= ((16+64)*1024)))
-    {
-		logerror("asntmc3b: invalid memory read %04X\n", offset);
-		return 0xff;
-	}
-	return m_ram[offset - (16*1024)];
+//    printf("MC3B: 8390 read RAM @ %x = %02x\n", offset, m_ram[offset]);
+	return m_ram[offset];
 }
 
 WRITE8_MEMBER( nubus_asntm3b_device::dp_mem_write )
 {
-	if((offset < (16*1024)) || (offset >= ((16+64)*1024)))
-    {
-		logerror("asntmc3b: invalid memory write %04X\n", offset);
-		return;
-	}
-	m_ram[offset - (16*1024)] = data;
+//    printf("MC3B: 8390 wrote %02x to RAM @ %x\n", data, offset);
+	m_ram[offset] = data;
 }
-
