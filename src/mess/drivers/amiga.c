@@ -413,7 +413,7 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 	/* fdc */
 	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68000_NTSC_CLOCK)
 	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_35_DD, 82, 2, amiga_fdc::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_35_DD, 82, 2, amiga_fdc::floppy_formats)
+//	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_35_DD, 82, 2, amiga_fdc::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a1000n, ntsc )
