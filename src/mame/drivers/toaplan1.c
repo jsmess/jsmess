@@ -60,8 +60,8 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
   - Region read from DSWB (port 0x50 in CPU1) then stored at 0x8004 (CPU1 shared RAM) =
     0x180008.w (CPU0 shared RAM) then stored at 0x0804f4.w .
   - Coinage relies on bits 4 and 5 of the region (code at 0x0ccc in CPU1) :
-      * ..10.... : TOAPLAN_COINAGE_WORLD     (tables at 0x0c35 (COIN1) and 0x0c3d (COIN2) in CPU1)
-      *  else    : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0c25 (COIN1 AND COIN2) in CPU1)
+      * ..10.... : TOAPLAN_COINAGE_WORLD (tables at 0x0c35 (COIN1) and 0x0c3d (COIN2) in CPU1)
+      *  else    : TOAPLAN_COINAGE_JAPAN (table at 0x0c25 (COIN1 AND COIN2) in CPU1)
   - Title screen relies on bits 4 and 5 of the region (code at 0x00220e) :
       * ..00.... : "Dash Yarou"
       *  else    : "Rally Bike"
@@ -93,10 +93,10 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
   - Region read from Territory Jumper (port 0x70 in CPU1) then stored at 0x8005 (CPU1 shared RAM) =
     0x18000a.w (CPU0 shared RAM) then stored at 0x081b7c.w .
   - Coinage relies on bits 0 and 1 of the region (code at 0x0ccc in CPU1) :
-      * ......00 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0d21 (COIN1 AND COIN2) in CPU1)
-      * ......01 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0d29 (COIN1 AND COIN2) in CPU1)
-      * ......10 : TOAPLAN_COINAGE_WORLD     (tables at 0x0d31 (COIN1) and 0x0d39 (COIN2) in CPU1)
-      * ......11 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0d21 (COIN1 AND COIN2) in CPU1)
+      * ......00 : TOAPLAN_COINAGE_JAPAN (table at 0x0d21 (COIN1 AND COIN2) in CPU1)
+      * ......01 : TOAPLAN_COINAGE_JAPAN (table at 0x0d29 (COIN1 AND COIN2) in CPU1)
+      * ......10 : TOAPLAN_COINAGE_WORLD (tables at 0x0d31 (COIN1) and 0x0d39 (COIN2) in CPU1)
+      * ......11 : TOAPLAN_COINAGE_JAPAN (table at 0x0d21 (COIN1 AND COIN2) in CPU1)
   - Title screen relies on bits 0 to 2 of the region (code at 0x002c58) :
       * .....000 : "Tatsujin"
       *     else : "Truxton"
@@ -138,9 +138,9 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
   - Region read from Territory Jumper (port 0x70 in CPU1) then stored at 0x8005 (CPU1 shared RAM) =
     0x44000a.w (CPU0 shared RAM) then stored at 0x081810.w .
   - Coinage relies on bits 0 and 1 of the region (code at 0x0c59 in CPU1) :
-      * ......00 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0cae (COIN1 AND COIN2) in CPU1)
-      * ......01 : TOAPLAN_COINAGE_JAPAN_OLD (table at 0x0cb6 (COIN1 AND COIN2) in CPU1)
-      * ......1. : TOAPLAN_COINAGE_WORLD     (tables at 0x0cbe (COIN1) and 0x0cb6 (COIN2) in CPU1)
+      * ......00 : TOAPLAN_COINAGE_JAPAN (table at 0x0cae (COIN1 AND COIN2) in CPU1)
+      * ......01 : TOAPLAN_COINAGE_JAPAN (table at 0x0cb6 (COIN1 AND COIN2) in CPU1)
+      * ......1. : TOAPLAN_COINAGE_WORLD (tables at 0x0cbe (COIN1) and 0x0cb6 (COIN2) in CPU1)
   - Notice screen relies on bit 0 of the region (code at 0x000564) :
       * .......0 : "FOR USE IN JAPAN ONLY"
       * .......1 : "FOR USE IN U.S.A. ONLY"
@@ -230,7 +230,7 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
   - Region read from Territory Jumper (0x440011.b).
   - Coinage relies on bits 0 to 3 of the region :
       * ....0010 : TOAPLAN_COINAGE_WORLD
-      *     else : TOAPLAN_COINAGE_JAPAN_OLD
+      *     else : TOAPLAN_COINAGE_JAPAN
     This a guess based on the "test mode" (code at 0x01a804) because of the missing Z180 CPU.
   - Notice screen relies on bits 0 to 3 of the region (code at 0x018bf2 - table at 0x019736) :
       * ....0000 : "JAPAN ONLY"
@@ -560,7 +560,6 @@ static ADDRESS_MAP_START( rallybik_sound_io_map, AS_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
-	AM_RANGE(0x70, 0x70) AM_READ_PORT("TJUMP")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( truxton_sound_io_map, AS_IO, 8 )
@@ -736,15 +735,12 @@ static INPUT_PORTS_START( rallybik )
 	PORT_DIPSETTING(    0x10, DEF_STR( USA ) )              /* Taito America Corp. */
 	PORT_DIPSETTING(    0x30, "USA (Romstar license)" )     /* Taito America Corp. */
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )            /* Taito Corporation */
-	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
+	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switch Settings" )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )   /* not on race 1 */
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-
-	PORT_START("TJUMP")       /* Territory Jumper Block (not present ? this port isn't even read) */
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	/* P1 : in 0x00 (CPU1) -> 0x8006 (CPU1 shared RAM) = 0x18000c.w (CPU0 shared RAM) */
 	/* P2 : in 0x10 (CPU1) -> 0x8007 (CPU1 shared RAM) = 0x18000e.w (CPU0 shared RAM) */
@@ -779,7 +775,7 @@ static INPUT_PORTS_START( truxton )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
+	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switch Settings" )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
@@ -790,13 +786,13 @@ static INPUT_PORTS_START( truxton )
 	PORT_START("TJUMP")       /* Territory Jumper Block - see notes */
 	PORT_DIPNAME( 0x07, 0x02, "Territory" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )           /* Taito Corporation */       /* TOAPLAN_COINAGE_WORLD */
-//  PORT_DIPSETTING(    0x03, DEF_STR( Europe ) )           /* Taito Corporation */       /* TOAPLAN_COINAGE_JAPAN_OLD */
+//  PORT_DIPSETTING(    0x03, DEF_STR( Europe ) )           /* Taito Corporation */       /* TOAPLAN_COINAGE_JAPAN */
 //  PORT_DIPSETTING(    0x06, DEF_STR( Europe ) )           /* Taito America Corp. */     /* TOAPLAN_COINAGE_WORLD */
-//  PORT_DIPSETTING(    0x07, DEF_STR( Europe ) )           /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
-	PORT_DIPSETTING(    0x04, DEF_STR( USA ) )              /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
-//  PORT_DIPSETTING(    0x05, DEF_STR( USA ) )              /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
-	PORT_DIPSETTING(    0x01, "USA (Romstar license)" )     /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
-	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )            /* Taito Corporation */       /* TOAPLAN_COINAGE_JAPAN_OLD */
+//  PORT_DIPSETTING(    0x07, DEF_STR( Europe ) )           /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN */
+	PORT_DIPSETTING(    0x04, DEF_STR( USA ) )              /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN */
+//  PORT_DIPSETTING(    0x05, DEF_STR( USA ) )              /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN */
+	PORT_DIPSETTING(    0x01, "USA (Romstar license)" )     /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN */
+	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )            /* Taito Corporation */       /* TOAPLAN_COINAGE_JAPAN */
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -1248,13 +1244,13 @@ static INPUT_PORTS_START( outzone )
 	TOAPLAN1_SYSTEM_INPUTS
 
 	PORT_START("TJUMP")		/* Territory Jumper Block */
-	PORT_DIPNAME( 0x0f, 0x02, "Territory" )
+	PORT_DIPNAME( 0x0f, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x01, "US" )
+	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
-	PORT_DIPSETTING(    0x03, "Hong Kong" )
-	PORT_DIPSETTING(    0x04, "Korea" )
-	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
 	PORT_DIPSETTING(    0x06, "Taiwan (Spacy Co License)" )
 	PORT_DIPSETTING(    0x07, "US (Romstar License)" )
 	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading License)" )
@@ -1272,31 +1268,31 @@ static INPUT_PORTS_START( outzoneb )
 	PORT_INCLUDE( outzone )
 
 	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
-	PORT_DIPNAME( 0x07, 0x02, "Territory" )
+	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x01, "US" )
+	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
-	PORT_DIPSETTING(    0x03, "Hong Kong" )
-	PORT_DIPSETTING(    0x04, "Korea" )
-	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
 	PORT_DIPSETTING(    0x06, "No Warning Screen" )
 	PORT_DIPSETTING(    0x07, "No Warning Screen" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) ) // doesn't seem to matter on this set
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) ) // doesn't seem to matter on this set
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( outzonec )
 	PORT_INCLUDE( outzone )
 
 	PORT_MODIFY("TJUMP")		/* Territory Jumper Block */
-	PORT_DIPNAME( 0x0f, 0x02, "Territory" )
+	PORT_DIPNAME( 0x0f, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x01, "US" )
+	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
-	PORT_DIPSETTING(    0x03, "Hong Kong" )
-	PORT_DIPSETTING(    0x04, "Korea" )
-	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
 	PORT_DIPSETTING(    0x06, "Taiwan (Spacy Co License)" )
 	PORT_DIPSETTING(    0x07, "US (Romstar License)" )
 	PORT_DIPSETTING(    0x08, "Hong Kong & China (Honest Trading License)" )
@@ -1341,16 +1337,16 @@ static INPUT_PORTS_START( vimana )
 
 	/* 0x440011.b */
 	PORT_START("TJUMP")       /* Territory Jumper Block - see notes */
-	PORT_DIPNAME( 0x0f, 0x02, "Territory" )
+	PORT_DIPNAME( 0x0f, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
 //  PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )
 //  PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )
-	PORT_DIPSETTING(    0x04, "Korea" )
-	PORT_DIPSETTING(    0x03, "Hong Kong" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
 	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading license)" )
-	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
 	PORT_DIPSETTING(    0x06, "Taiwan (Spacy license)" )
 //  PORT_DIPSETTING(    0x09, "???" )
 //  PORT_DIPSETTING(    0x0a, "???" )
@@ -1380,16 +1376,16 @@ static INPUT_PORTS_START( vimanan )
 
 	/* 0x440011.b */
 	PORT_MODIFY("TJUMP")      /* Territory Jumper Block - see notes */
-	PORT_DIPNAME( 0x0f, 0x02, "Territory" )
+	PORT_DIPNAME( 0x0f, 0x02, DEF_STR( Region ) )
 	PORT_DIPSETTING(    0x02, "Europe (Nova Apparate license)" )
 	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
 //  PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )        /* "ending" text in English */
 //  PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )        /* "ending" text in English */
-	PORT_DIPSETTING(    0x04, "Korea" )
-	PORT_DIPSETTING(    0x03, "Hong Kong" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
 	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading license)" )
-	PORT_DIPSETTING(    0x05, "Taiwan" )
+	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
 	PORT_DIPSETTING(    0x06, "Taiwan (Spacy license)" )
 //  PORT_DIPSETTING(    0x09, "???" )
 //  PORT_DIPSETTING(    0x0a, "???" )
@@ -1415,7 +1411,7 @@ static INPUT_PORTS_START( vimana1 )
 
 	/* 0x440011.b */
 	PORT_MODIFY("TJUMP")      /* Territory Jumper Block - see notes */
-	PORT_DIPNAME( 0x0f, 0x00, "Territory" )
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Region ) )
 //  PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
 //  PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 //  PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
@@ -1732,7 +1728,7 @@ static MACHINE_CONFIG_START( samesame, toaplan1_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(57.59)		/* verified on pcb */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)	/* 512x320 active */
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)

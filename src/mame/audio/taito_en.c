@@ -3,11 +3,16 @@
 #include "taito_en.h"
 
 static int counter,vector_reg,imr_status;
-static UINT16 es5510_dsp_ram[0x200];
+static UINT16   es5510_dsp_ram[0x200];
 static UINT32	es5510_gpr[0xc0];
+static UINT32   es5510_dram[1<<24];
+static UINT32   es5510_dol_latch;
+static UINT32   es5510_dil_latch;
+static UINT32   es5510_dadr_latch;
 static UINT32	es5510_gpr_latch;
+static UINT8    es5510_ram_sel;
 static int timer_mode,m68681_imr;
-static UINT32 *f3_shared_ram;
+static UINT32   *f3_shared_ram;
 
 //static int es_tmp=1;
 
@@ -59,22 +64,33 @@ static WRITE16_HANDLER( f3_es5505_bank_w )
 	es5505_voice_bank_w(space->machine().device("ensoniq"),offset,data<<20);
 }
 
-static WRITE16_HANDLER( f3_volume_w )
+static WRITE8_HANDLER( f3_volume_w )
 {
-//  static UINT16 channel[8],last_l,last_r;
-//  static int latch;
+	static UINT8 latch,ch[8];
 
-//  if (offset==0) latch=(data>>8)&0x7;
-//  if (offset==1) channel[latch]=data>>8;
+	if(offset == 0)
+		latch = data & 0x7;
+	else
+	{
+		ch[latch] = data;
+		if((latch & 6) == 6)
+		{
+			double ch_vol;
 
-//      if (channel[7]!=last_l) mixer_set_volume(0, (int)((float)channel[7]*1.58)); /* Left master volume */
-//      if (channel[6]!=last_r) mixer_set_volume(1, (int)((float)channel[6]*1.58)); /* Right master volume */
-//  last_l=channel[7];
-//  last_r=channel[6];
+			ch_vol = (double)(ch[latch] & 0x3f);
+			ch_vol/= 63.0;
+			ch_vol*= 100.0;
+			/* Left/Right panning trusted with Arabian Magic Sound Test menu. */
+			es5505_set_channel_volume(space->machine().device("ensoniq"),(latch & 1) ^ 1,ch_vol);
+		}
+	}
+
+	//popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",ch[0],ch[1],ch[2],ch[3],ch[4],ch[5],ch[6],ch[7]);
 
 	/* Channel 5 - Left Aux?  Always set to volume, but never used for panning */
 	/* Channel 4 - Right Aux?  Always set to volume, but never used for panning */
 	/* Channels 0, 1, 2, 3 - Unused */
+
 }
 
 static TIMER_DEVICE_CALLBACK( taito_en_timer_callback )
@@ -189,6 +205,13 @@ static READ16_HANDLER(es5510_dsp_r)
 
 //if (offset<7 && es5510_dsp_ram[0]!=0xff) return space->machine().rand()%0xffff;
 
+	switch(offset)
+	{
+		case 0x09: return (es5510_dil_latch >> 16) & 0xff;
+		case 0x0a: return (es5510_dil_latch >> 8) & 0xff;
+		case 0x0b: return (es5510_dil_latch >> 0) & 0xff; //TODO: docs says that this always returns 0
+	}
+
 	if (offset==0x12) return 0;
 
 //  if (offset>4)
@@ -207,10 +230,36 @@ static WRITE16_HANDLER(es5510_dsp_w)
 	COMBINE_DATA(&es5510_dsp_ram[offset]);
 
 	switch (offset) {
-		case 0x00: es5510_gpr_latch=(es5510_gpr_latch&0x00ffff)|((data&0xff)<<16);
-		case 0x01: es5510_gpr_latch=(es5510_gpr_latch&0xff00ff)|((data&0xff)<< 8);
-		case 0x02: es5510_gpr_latch=(es5510_gpr_latch&0xffff00)|((data&0xff)<< 0);
-		case 0x03: break;
+		case 0x00: es5510_gpr_latch=(es5510_gpr_latch&0x00ffff)|((data&0xff)<<16); break;
+		case 0x01: es5510_gpr_latch=(es5510_gpr_latch&0xff00ff)|((data&0xff)<< 8); break;
+		case 0x02: es5510_gpr_latch=(es5510_gpr_latch&0xffff00)|((data&0xff)<< 0); break;
+
+		/* 0x03 to 0x08 INSTR Register */
+		/* 0x09 to 0x0b DIL Register (r/o) */
+
+		case 0x0c: es5510_dol_latch=(es5510_dol_latch&0x00ffff)|((data&0xff)<<16); break;
+		case 0x0d: es5510_dol_latch=(es5510_dol_latch&0xff00ff)|((data&0xff)<< 8); break;
+		case 0x0e: es5510_dol_latch=(es5510_dol_latch&0xffff00)|((data&0xff)<< 0); break; //TODO: docs says that this always returns 0xff
+
+		case 0x0f:
+			es5510_dadr_latch=(es5510_dadr_latch&0x00ffff)|((data&0xff)<<16);
+			if(es5510_ram_sel)
+				es5510_dil_latch = es5510_dram[es5510_dadr_latch];
+			else
+				es5510_dram[es5510_dadr_latch] = es5510_dol_latch;
+			break;
+
+		case 0x10: es5510_dadr_latch=(es5510_dadr_latch&0xff00ff)|((data&0xff)<< 8); break;
+		case 0x11: es5510_dadr_latch=(es5510_dadr_latch&0xffff00)|((data&0xff)<< 0); break;
+
+		/* 0x12 Host Control */
+
+		case 0x14: es5510_ram_sel = data & 0x80; /* bit 6 is i/o select, everything else is undefined */break;
+
+		/* 0x16 Program Counter (test purpose, r/o?) */
+		/* 0x17 Internal Refresh counter (test purpose) */
+		/* 0x18 Host Serial Control */
+		/* 0x1f Halt enable (w) / Frame Counter (r) */
 
 		case 0x80: /* Read select - GPR + INSTR */
 	//      logerror("ES5510:  Read GPR/INSTR %06x (%06x)\n",data,es5510_gpr[data]);
@@ -245,7 +294,7 @@ static ADDRESS_MAP_START( f3_sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
 	AM_RANGE(0x280000, 0x28001f) AM_READWRITE(f3_68681_r, f3_68681_w)
 	AM_RANGE(0x300000, 0x30003f) AM_WRITE(f3_es5505_bank_w)
-	AM_RANGE(0x340000, 0x340003) AM_WRITE(f3_volume_w) /* 8 channel volume control */
+	AM_RANGE(0x340000, 0x340003) AM_WRITE8(f3_volume_w,0xff00) /* 8 channel volume control */
 	AM_RANGE(0xc00000, 0xc1ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc20000, 0xc3ffff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc40000, 0xc7ffff) AM_ROMBANK("bank3")

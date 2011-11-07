@@ -9,17 +9,17 @@ Supported games:
 
     Toaplan Board Number:   TP-009
     Taito Game Number:      B25
-        Wardners Forest (World)
+        Wardner         (World)
         Pyros           (USA)
-        Wardna no Mori  (Japan)
+        Wardner no Mori (Japan)
 
 Notes:
-        Basically the same video and machine hardware as Flying shark,
+        Basically the same video and machine hardware as Flying Shark,
           except for the Main CPU which is a Z80 here.
         See twincobr.c machine and video drivers to complete the
           hardware setup.
         To enter the "test mode", press START1 when the grid is displayed.
-        Press F1 (initially P1 button 3) on startup to skip some video RAM tests
+        Press 0 (actually P1 button 3) on startup to skip some video RAM tests
         (code at 0x6d25 in 'wardner', 0x6d2f in 'wardnerj' or 0x6d2c in 'pyros').
 
 **************************** Memory & I/O Maps *****************************
@@ -28,8 +28,8 @@ Z80:(0)  Main CPU
 7000-7fff Main RAM
 8000-ffff Level and scenery ROMS. This is banked with the following
 8000-8fff Sprite RAM
-a000-adff Pallette RAM
-ae00-afff Spare unused, but tested Pallette RAM
+a000-adff Palette RAM
+ae00-afff Spare unused, but tested Palette RAM
 c000-c7ff Sound RAM - shared with C000-C7FF in Z80(1) RAM
 
 in:
@@ -275,25 +275,6 @@ ADDRESS_MAP_END
 
 /* verified from Z80 code */
 static INPUT_PORTS_START( wardner_generic )
-	PORT_START("DSWA")
-	TOAPLAN_MACHINE_COCKTAIL
-	TOAPLAN_COINAGE_WORLD
-
-	PORT_START("DSWB")
-	TOAPLAN_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x13ce ('wardner') or 0x13de ('wardnerj') */
-	PORT_DIPSETTING(	0x00, "30k 80k 50k+" )
-	PORT_DIPSETTING(	0x04, "50k 100k 50k+" )
-	PORT_DIPSETTING(	0x08, "30k Only" )
-	PORT_DIPSETTING(	0x0c, "50k Only" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x30, "1" )
-	PORT_DIPSETTING(	0x00, "3" )
-	PORT_DIPSETTING(	0x10, "4" )
-	PORT_DIPSETTING(	0x20, "5" )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_HIGH )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
-
 	PORT_START("P1")
 	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )                         /* buttons 3 & 4 named "SHOTC" and "SHOTD" in "test mode" */
 
@@ -303,12 +284,31 @@ static INPUT_PORTS_START( wardner_generic )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )            /* "TEST" in "test mode" - no effect outside */
+	TOAPLAN_TEST_SWITCH( 0x04, IP_ACTIVE_HIGH )             /* "TEST" in "test mode" */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )            /* "V-BLANKING" in "test mode" */
+
+	PORT_START("DSWA")
+	TOAPLAN_MACHINE_COCKTAIL_LOC(SW1)
+	TOAPLAN_COINAGE_WORLD_LOC(SW1)
+
+	PORT_START("DSWB")
+	TOAPLAN_DIFFICULTY_LOC(SW2)
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4")	/* table at 0x13ce ('wardner') or 0x13de ('wardnerj') */
+	PORT_DIPSETTING(	0x00, "30k 80k 50k+" )
+	PORT_DIPSETTING(	0x04, "50k 100k 50k+" )
+	PORT_DIPSETTING(	0x08, "30k Only" )
+	PORT_DIPSETTING(	0x0c, "50k Only" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!5,!6")
+	PORT_DIPSETTING(	0x30, "1" )
+	PORT_DIPSETTING(	0x00, "3" )
+	PORT_DIPSETTING(	0x10, "4" )
+	PORT_DIPSETTING(	0x20, "5" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_HIGH, "SW2:!7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW2:!8" )
 INPUT_PORTS_END
 
 /* verified from Z80 code */
@@ -316,7 +316,8 @@ static INPUT_PORTS_START( wardner )
 	PORT_INCLUDE( wardner_generic )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Skip Video RAM Tests") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Skip Video RAM Tests") PORT_CODE(KEYCODE_0)
+	/* actually player 1 button 3 - not used in gameplay */
 	/* code at 0x6d25 ('wardner'), 0x6d2f ('wardnerj') or 0x6d2c ('pyros') */
 INPUT_PORTS_END
 
@@ -325,7 +326,7 @@ static INPUT_PORTS_START( wardnerj )
 	PORT_INCLUDE( wardner )
 
 	PORT_MODIFY("DSWA")
-	TOAPLAN_COINAGE_JAPAN_OLD
+	TOAPLAN_COINAGE_JAPAN_LOC(SW1)
 INPUT_PORTS_END
 
 /* verified from Z80 code */
@@ -333,12 +334,12 @@ static INPUT_PORTS_START( pyros )
 	PORT_INCLUDE( wardnerj )
 
 	PORT_MODIFY("DSWB")
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x13ce */
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4")	/* table at 0x13ce */
 	PORT_DIPSETTING(	0x00, "30k 80k 50k+" )
 	PORT_DIPSETTING(	0x04, "50k 100k 50k+" )
 	PORT_DIPSETTING(	0x08, "50k Only" )
 	PORT_DIPSETTING(	0x0c, "100k Only" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   /* additional code at 0x6037 */
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:!7")   /* additional code at 0x6037 */
 	PORT_DIPSETTING(	0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END

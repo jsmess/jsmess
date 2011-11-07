@@ -74,7 +74,11 @@ public:
 	UINT32 *m_vics_control;
 	UINT32 *m_czattr;
 	UINT32 *m_tilemapattr;
-	int m_mbSpotlightEnable;
+	int m_chipselect;
+	int m_spot_enable;
+	int m_spot_read_address;
+	int m_spot_write_address;
+	UINT16 *m_spotram;
 	UINT32 *m_czram;
 	UINT16 *m_banked_czram[4];
 	UINT8 *m_recalc_czram[4];
@@ -118,13 +122,17 @@ WRITE32_HANDLER( namcos22_cgram_w );
 READ32_HANDLER( namcos22s_czram_r );
 WRITE32_HANDLER( namcos22s_czram_w );
 
-WRITE32_HANDLER(namcos22_port800000_w);
+READ32_HANDLER( namcos22s_spotram_r );
+WRITE32_HANDLER( namcos22s_spotram_w );
 
 READ32_HANDLER( namcos22_paletteram_r );
 WRITE32_HANDLER( namcos22_paletteram_w );
 
 READ32_HANDLER( namcos22_textram_r );
 WRITE32_HANDLER( namcos22_textram_w );
+
+READ32_HANDLER( namcos22s_vics_control_r );
+WRITE32_HANDLER( namcos22s_vics_control_w );
 
 READ32_HANDLER( namcos22_gamma_r );
 WRITE32_HANDLER( namcos22_gamma_w );

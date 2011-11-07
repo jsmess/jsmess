@@ -2443,60 +2443,6 @@ static WRITE32_HANDLER( namcos22_mcuram_w )
 	COMBINE_DATA(&state->m_shareram[offset]);
 }
 
-/**
- * I don't know how "SPOT RAM" affects the display, yet.
- * I believe it's to support a "spotlight" effect, orthogonal to the polygon layer.
- * It isn't directly memory mapped, but rather ports are used to populate and poll it.
- *
- * See Time Crisis "SPOT RAM" self test for sample use.
- */
-#define SPOTRAM_SIZE (320*4)
-
-static struct
-{
-	int portR; /* next address for read */
-	int portW; /* next address for write */
-	UINT16 *RAM;//[SPOTRAM_SIZE];
-} mSpotRAM;
-
-static READ32_HANDLER( spotram_r )
-{ /* 0x860004: read */
-	if( offset==1 )
-	{
-		if( mSpotRAM.portR>=SPOTRAM_SIZE )
-		{
-			mSpotRAM.portR = 0;
-		}
-		return mSpotRAM.RAM[mSpotRAM.portR++]<<16;
-	}
-	return 0;
-} /* spotram_r */
-
-static WRITE32_HANDLER( spotram_w )
-{ /**
-   * 0x860000: set read and write address (TRUSTED by Tokyo Wars POST)
-   * 0x860002: append data
-   *
-   * 0x860006: enable
-   */
-	if( offset==0 )
-	{
-		if( !ACCESSING_BITS_16_31 )
-		{
-			if( mSpotRAM.portW>=SPOTRAM_SIZE )
-			{
-				mSpotRAM.portW = 0;
-			}
-			mSpotRAM.RAM[mSpotRAM.portW++] = data;
-		}
-		else
-		{
-			mSpotRAM.portR = (data>>19)*3;
-			mSpotRAM.portW = (data>>19)*3;
-		}
-	}
-} /* spotram_w */
-
 static READ32_HANDLER( namcos22_gun_r )
 {
 	int xpos = input_port_read_safe(space->machine(), "LIGHTX", 0) * 640 / 0xff;
@@ -2565,6 +2511,21 @@ static WRITE32_HANDLER( namcos22s_nvmem_w )
 	COMBINE_DATA(&state->m_nvmem[offset]);
 }
 
+static WRITE32_HANDLER( namcos22s_chipselect_w )
+{
+	// assume that this register is for chip enable/disable
+	// it's written many times during boot-up, and most games don't touch it afterwards (last value usually 0038 or 0838)
+	// 8000: spot related (set in dirtdash night driving)
+	// 4000: spot related (set in dirtdash and testmode)
+	// 0800: fade related?
+	// other bits: no clue
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	if (ACCESSING_BITS_16_23)
+		state->m_chipselect = data >> 16;
+	else if (ACCESSING_BITS_24_31)
+		state->m_chipselect = data >> 24;
+}
+
 /* Namco Super System 22 */
 static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
@@ -2577,18 +2538,18 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x450008, 0x45000b) AM_READWRITE(namcos22_portbit_r, namcos22_portbit_w)
 	AM_RANGE(0x460000, 0x463fff) AM_RAM_WRITE(namcos22s_nvmem_w) AM_BASE_SIZE_MEMBER(namcos22_state, m_nvmem, m_nvmem_size)
 	AM_RANGE(0x700000, 0x70001f) AM_READWRITE(namcos22_system_controller_r, namcos22s_system_controller_w) AM_BASE_MEMBER(namcos22_state, m_system_controller)
-	AM_RANGE(0x800000, 0x800003) AM_WRITE(namcos22_port800000_w) /* (C304 C399)  40380000 during SPOT test */
+	AM_RANGE(0x800000, 0x800003) AM_WRITE(namcos22s_chipselect_w)
 	AM_RANGE(0x810000, 0x81000f) AM_RAM AM_BASE_MEMBER(namcos22_state, m_czattr)
 	AM_RANGE(0x810200, 0x8103ff) AM_READWRITE(namcos22s_czram_r, namcos22s_czram_w)
 	AM_RANGE(0x820000, 0x8202ff) AM_WRITENOP /* leftover of old (non-super) video mixer device */
 	AM_RANGE(0x824000, 0x8243ff) AM_READWRITE(namcos22_gamma_r, namcos22_gamma_w) AM_BASE_MEMBER(namcos22_state, m_gamma)
 	AM_RANGE(0x828000, 0x83ffff) AM_READWRITE(namcos22_paletteram_r, namcos22_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x860000, 0x860007) AM_READWRITE(spotram_r, spotram_w)
+	AM_RANGE(0x860000, 0x860007) AM_READWRITE(namcos22s_spotram_r, namcos22s_spotram_w)
 	AM_RANGE(0x880000, 0x89dfff) AM_READWRITE(namcos22_cgram_r, namcos22_cgram_w) AM_BASE_MEMBER(namcos22_state, m_cgram)
 	AM_RANGE(0x89e000, 0x89ffff) AM_READWRITE(namcos22_textram_r, namcos22_textram_w) AM_BASE_MEMBER(namcos22_state, m_textram)
 	AM_RANGE(0x8a0000, 0x8a000f) AM_READWRITE(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_BASE_MEMBER(namcos22_state, m_tilemapattr)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_MEMBER(namcos22_state, m_vics_data)
-	AM_RANGE(0x940000, 0x94007f) AM_RAM AM_BASE_MEMBER(namcos22_state, m_vics_control)
+	AM_RANGE(0x940000, 0x94007f) AM_READWRITE(namcos22s_vics_control_r, namcos22s_vics_control_w) AM_BASE_MEMBER(namcos22_state, m_vics_control)
 	AM_RANGE(0x980000, 0x9affff) AM_RAM AM_BASE_MEMBER(namcos22_state, m_spriteram) /* C374 */
 	AM_RANGE(0xa04000, 0xa0bfff) AM_READWRITE(namcos22_mcuram_r, namcos22_mcuram_w) AM_BASE_MEMBER(namcos22_state, m_shareram) /* COM RAM */
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(namcos22_dspram_r, namcos22_dspram_w) AM_BASE_MEMBER(namcos22_state, m_polygonram)
@@ -3419,7 +3380,7 @@ ROM_START( alpinerc )
 	ROM_LOAD( "ar1wavea.2l", 0, 0x200000, CRC(dbf64562) SHA1(454fd7d5b860f0e5557d8900393be95d6c992ad1) )
 
 	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "alpinerc_defaults.nv", 0x0000, 0x4000, CRC(46c06e51) SHA1(df3a16fe3a0858b14c51d48539d9ab3eb3a213de) )
+	ROM_LOAD( "alpiner_defaults.nv", 0x0000, 0x4000, CRC(46c06e51) SHA1(df3a16fe3a0858b14c51d48539d9ab3eb3a213de) )
 ROM_END
 
 ROM_START( alpinerd )
@@ -3478,7 +3439,7 @@ ROM_START( alpinerd )
 	ROM_LOAD( "ar1wavea.2l", 0, 0x200000, CRC(dbf64562) SHA1(454fd7d5b860f0e5557d8900393be95d6c992ad1) )
 
 	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "alpinerd_defaults.nv", 0x0000, 0x4000, CRC(46c06e51) SHA1(df3a16fe3a0858b14c51d48539d9ab3eb3a213de) )
+	ROM_LOAD( "alpiner_defaults.nv", 0x0000, 0x4000, CRC(46c06e51) SHA1(df3a16fe3a0858b14c51d48539d9ab3eb3a213de) )
 ROM_END
 
 ROM_START( alpinr2b )
@@ -3535,7 +3496,7 @@ ROM_START( alpinr2b )
 	ROM_LOAD( "ars2waveb.1l", 0x800000, 0x400000, CRC(deab4ad1) SHA1(580ad88d516280baaf6cc92b2e07cdc0cfc486f3) )
 
 	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "alpinr2b_defaults.nv", 0x0000, 0x4000, CRC(1d660b8b) SHA1(e6047ad2d61fa55e8f054813f5c705fd7d145a73) )
+	ROM_LOAD( "alpiner2_defaults.nv", 0x0000, 0x4000, CRC(1d660b8b) SHA1(e6047ad2d61fa55e8f054813f5c705fd7d145a73) )
 ROM_END
 
 ROM_START( alpinr2a )
@@ -3592,7 +3553,7 @@ ROM_START( alpinr2a )
 	ROM_LOAD( "ars2waveb.1l", 0x800000, 0x400000, CRC(deab4ad1) SHA1(580ad88d516280baaf6cc92b2e07cdc0cfc486f3) )
 
 	ROM_REGION( 0x4000, "nvram", 0 ) // default eeprom
-	ROM_LOAD( "alpinr2a_defaults.nv", 0x0000, 0x4000, CRC(1d660b8b) SHA1(e6047ad2d61fa55e8f054813f5c705fd7d145a73) )
+	ROM_LOAD( "alpiner2_defaults.nv", 0x0000, 0x4000, CRC(1d660b8b) SHA1(e6047ad2d61fa55e8f054813f5c705fd7d145a73) )
 ROM_END
 
 ROM_START( alpinesa )
@@ -4978,6 +4939,8 @@ static INPUT_PORTS_START( dirtdash )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	DRIVING_ANALOG_PORTS
+	PORT_MODIFY("STEER") // default is too sensitive
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(3) PORT_NAME("Steering Wheel")
 INPUT_PORTS_END /* Dirt Dash */
 
 static INPUT_PORTS_START( tokyowar )
@@ -5543,21 +5506,16 @@ static void namcos22_init( running_machine &machine, int game_type )
 	state->m_su_82 = 0;
 	state->m_irq_state = 0;
 	state->m_p4 = 0;
+	state->m_old_coin_state = 0;
+	state->m_credits1 = state->m_credits2 = 0;
 
 	state->m_mpPointRAM = auto_alloc_array(machine, UINT32, 0x20000);
-}
-
-static void namcos22s_init( running_machine &machine, int game_type )
-{
-	namcos22_init(machine, game_type);
-
-	mSpotRAM.RAM = auto_alloc_array(machine, UINT16, SPOTRAM_SIZE);
 }
 
 static void alpine_init_common( running_machine &machine, int game_type )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22s_init(machine, game_type);
+	namcos22_init(machine, game_type);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(alpineracer_mcu_adc_r));
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_write_handler(M37710_PORT5, M37710_PORT5, FUNC(alpine_mcu_port5_w));
@@ -5601,8 +5559,9 @@ static DRIVER_INIT( alpinesa )
 
 static DRIVER_INIT( airco22 )
 {
-	namcos22s_init(machine, NAMCOS22_AIR_COMBAT22);
+	namcos22_init(machine, NAMCOS22_AIR_COMBAT22);
 
+	// S22-BIOS ver1.20 namco all rights reserved 94/12/21
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(airco22_mcu_adc_r));
 }
 
@@ -5625,7 +5584,7 @@ static DRIVER_INIT( propcycl )
 //   pROM[0x22296/4] &= 0xffff0000;
 //   pROM[0x22296/4] |= 0x00004e75;
 
-	namcos22s_init(machine, NAMCOS22_PROP_CYCLE);
+	namcos22_init(machine, NAMCOS22_PROP_CYCLE);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(propcycle_mcu_adc_r));
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_write_handler(M37710_PORT5, M37710_PORT5, FUNC(propcycle_mcu_port5_w));
@@ -5640,8 +5599,6 @@ static DRIVER_INIT( ridgeraj )
 	install_c74_speedup(machine);
 
 	state->m_keycus_id = 0x0172;
-	state->m_old_coin_state = 0;
-	state->m_credits1 = state->m_credits2 = 0;
 }
 
 static DRIVER_INIT( ridger2j )
@@ -5652,8 +5609,6 @@ static DRIVER_INIT( ridger2j )
 	install_c74_speedup(machine);
 
 	state->m_keycus_id = 0x0172;
-	state->m_old_coin_state = 0;
-	state->m_credits1 = state->m_credits2 = 0;
 }
 
 static DRIVER_INIT( acedrvr )
@@ -5664,8 +5619,6 @@ static DRIVER_INIT( acedrvr )
 	install_c74_speedup(machine);
 
 	state->m_keycus_id = 0x0173;
-	state->m_old_coin_state = 0;
-	state->m_credits1 = state->m_credits2 = 0;
 }
 
 static DRIVER_INIT( victlap )
@@ -5676,19 +5629,13 @@ static DRIVER_INIT( victlap )
 	install_c74_speedup(machine);
 
 	state->m_keycus_id = 0x0188;
-	state->m_old_coin_state = 0;
-	state->m_credits1 = state->m_credits2 = 0;
 }
 
 static DRIVER_INIT( raveracw )
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22_init(machine, NAMCOS22_RAVE_RACER);
 
 	install_c74_speedup(machine);
-
-	state->m_old_coin_state = 0;
-	state->m_credits1 = state->m_credits2 = 0;
 }
 
 static DRIVER_INIT( cybrcomm )
@@ -5699,14 +5646,12 @@ static DRIVER_INIT( cybrcomm )
 	install_c74_speedup(machine);
 
 	state->m_keycus_id = 0x0185;
-	state->m_old_coin_state = 0;
-	state->m_credits1 = state->m_credits2 = 0;
 }
 
 static DRIVER_INIT( cybrcyc )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22s_init(machine, NAMCOS22_CYBER_CYCLES);
+	namcos22_init(machine, NAMCOS22_CYBER_CYCLES);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(cybrcycc_mcu_adc_r));
 	install_130_speedup(machine);
@@ -5716,7 +5661,7 @@ static DRIVER_INIT( cybrcyc )
 
 static DRIVER_INIT( timecris )
 {
-	namcos22s_init(machine, NAMCOS22_TIME_CRISIS);
+	namcos22_init(machine, NAMCOS22_TIME_CRISIS);
 
 	install_130_speedup(machine);
 }
@@ -5724,26 +5669,29 @@ static DRIVER_INIT( timecris )
 static DRIVER_INIT( tokyowar )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22s_init(machine, NAMCOS22_TOKYO_WARS);
+	namcos22_init(machine, NAMCOS22_TOKYO_WARS);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(tokyowar_mcu_adc_r));
+	install_141_speedup(machine);
 
 	state->m_keycus_id = 0x01a8;
 }
 
 static DRIVER_INIT( aquajet )
 {
-	namcos22s_init(machine, NAMCOS22_AQUA_JET);
+	namcos22_init(machine, NAMCOS22_AQUA_JET);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(aquajet_mcu_adc_r));
+	install_141_speedup(machine);
 }
 
 static DRIVER_INIT( dirtdash )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	namcos22s_init(machine, NAMCOS22_DIRT_DASH);
+	namcos22_init(machine, NAMCOS22_DIRT_DASH);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(cybrcycc_mcu_adc_r));
+	install_141_speedup(machine);
 
 	state->m_keycus_id = 0x01a2;
 }
@@ -5772,7 +5720,7 @@ GAME( 1994, alpinerd, 0,         namcos22s, alpiner,  alpiner,  ROT0, "Namco", "
 GAME( 1994, alpinerc, alpinerd,  namcos22s, alpiner,  alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, airco22b, 0,         namcos22s, airco22,  airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)"    , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // boots but missing sprite clear DMA?
 GAME( 1995, cybrcycc, 0,         namcos22s, cybrcycc, cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 95/04/04
-GAME( 1995, dirtdash, 0,         namcos22s, dirtdash, dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2)"                      , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 95/12/20 20:01:56. locks up, dsp comms/slave dsp? - romdump looks fine
+GAME( 1995, dirtdash, 0,         namcos22s, dirtdash, dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2)"                      , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
 GAME( 1995, timecris, 0,         namcos22s, timecris, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
 GAME( 1995, timecrisa,timecris,  namcos22s, timecris, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
 GAME( 1996, propcycl, 0,         namcos22s, propcycl, propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A)"               , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13

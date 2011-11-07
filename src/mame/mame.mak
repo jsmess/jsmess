@@ -1675,7 +1675,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/carrera.o \
 	$(DRIVERS)/castle.o \
 	$(DRIVERS)/cave.o $(VIDEO)/cave.o \
-	$(DRIVERS)/cavesh3.o \
 	$(DRIVERS)/cb2001.o \
 	$(DRIVERS)/cdi.o $(VIDEO)/mcd212.o $(MACHINE)/cdi070.o $(MACHINE)/cdislave.o $(MACHINE)/cdicdic.o \
 	$(DRIVERS)/cesclass.o \
@@ -1714,6 +1713,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
 	$(DRIVERS)/funkball.o \
 	$(DRIVERS)/galaxi.o \
+	$(DRIVERS)/galgame.o \
 	$(DRIVERS)/gamecstl.o \
 	$(DRIVERS)/gei.o \
 	$(DRIVERS)/globalfr.o \
@@ -1773,6 +1773,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/neoprint.o \
 	$(DRIVERS)/neptunp2.o \
 	$(DRIVERS)/news.o $(VIDEO)/news.o \
+	$(DRIVERS)/nexus3d.o \
 	$(DRIVERS)/norautp.o  $(AUDIO)/norautp.o \
 	$(DRIVERS)/nsmpoker.o \
 	$(DRIVERS)/oneshot.o $(VIDEO)/oneshot.o \

@@ -554,14 +554,20 @@ enum
 	INPUT_STRING_USA,
 	INPUT_STRING_Europe,
 	INPUT_STRING_Asia,
+	INPUT_STRING_China,
+	INPUT_STRING_Hong_Kong,
+	INPUT_STRING_Korea,
+	INPUT_STRING_Southeast_Asia,
+	INPUT_STRING_Taiwan,
 	INPUT_STRING_World,
-	INPUT_STRING_Hispanic,
 	INPUT_STRING_Language,
 	INPUT_STRING_English,
 	INPUT_STRING_Japanese,
-	INPUT_STRING_German,
+	INPUT_STRING_Chinese,
 	INPUT_STRING_French,
+	INPUT_STRING_German,
 	INPUT_STRING_Italian,
+	INPUT_STRING_Korean,
 	INPUT_STRING_Spanish,
 	INPUT_STRING_Very_Easy,
 	INPUT_STRING_Easiest,
@@ -577,8 +583,6 @@ enum
 	INPUT_STRING_Very_Hard,
 	INPUT_STRING_Medium_Difficult,
 	INPUT_STRING_Difficult,
-	INPUT_STRING_More_Difficult,
-	INPUT_STRING_Most_Difficult,
 	INPUT_STRING_Very_Difficult,
 	INPUT_STRING_Very_Low,
 	INPUT_STRING_Low,
@@ -950,7 +954,7 @@ typedef void (*ioport_constructor)(device_t &owner, ioport_list &portlist, astri
 
 /* start of table */
 #define INPUT_PORTS_START(_name) \
-void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, astring &errorbuf) \
+ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, astring &errorbuf) \
 { \
 	astring fulltag; \
 	input_setting_config *cursetting = NULL; \
