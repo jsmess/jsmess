@@ -353,13 +353,6 @@ void floppy_image_device::write_flux(attotime start, attotime end, int transitio
 	for(int i=0; i != transition_count; i++)
 		trans_pos[i] = find_position(base, transitions[i]);
 
-#if 0
-	logerror("write %d-%d\n ", start_pos, end_pos);
-	for(int i=0; i != transition_count; i++)
-		logerror(" %d", trans_pos[i]);
-	logerror("\n");
-#endif
-
 	int cells = image->get_track_size(cyl, ss);
 	UINT32 *buf = image->get_buffer(cyl, ss);
 
