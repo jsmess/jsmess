@@ -64,6 +64,10 @@ Supported games:
 
     SET NOTES:
 
+    ghox     - The ghoxj set displays an English title screen when the jumpers are set for Japan/Taito,
+	           and fails to display the "Winners Don't Use Drugs" logo when set for USA/Taito (either
+	           Taito America or Taito Japan).
+
     dogyuun  - In the location test version, if you are hit while you have a bomb, the bomb explodes
                automatically and saves you from dying. In the final released version, the bomb explodes
                but you die anyway.
@@ -354,6 +358,7 @@ To Do / Unknowns:
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "includes/toaplan2.h"
+#include "includes/toaplipt.h"
 
 
 /***************************************************************************
@@ -442,79 +447,14 @@ static DRIVER_INIT( vfive )
 
 static DRIVER_INIT( pipibibsbl )
 {
-	int A;
-	int oldword, newword;
-	UINT16 *pipibibi_68k_rom = (UINT16 *)(machine.region("maincpu")->base());
+	UINT16 *ROM = (UINT16 *)(machine.region("maincpu")->base());
 
-	// unscramble the 68K ROM data
-
-	for (A = 0; A < (0x040000/2); A+=4)
+	for (int i = 0; i < (0x040000/2); i += 4)
 	{
-		newword = 0;
-		oldword = pipibibi_68k_rom[A];
-		newword |= ((oldword & 0x0001) << 9);
-		newword |= ((oldword & 0x0002) << 14);
-		newword |= ((oldword & 0x0004) << 8);
-		newword |= ((oldword & 0x0018) << 1);
-		newword |= ((oldword & 0x0020) << 9);
-		newword |= ((oldword & 0x0040) << 7);
-		newword |= ((oldword & 0x0080) << 5);
-		newword |= ((oldword & 0x0100) << 3);
-		newword |= ((oldword & 0x0200) >> 1);
-		newword |= ((oldword & 0x0400) >> 8);
-		newword |= ((oldword & 0x0800) >> 10);
-		newword |= ((oldword & 0x1000) >> 12);
-		newword |= ((oldword & 0x6000) >> 7);
-		newword |= ((oldword & 0x8000) >> 12);
-		pipibibi_68k_rom[A] = newword;
-
-		newword = 0;
-		oldword = pipibibi_68k_rom[A+1];
-		newword |= ((oldword & 0x0001) << 8);
-		newword |= ((oldword & 0x0002) << 12);
-		newword |= ((oldword & 0x0004) << 5);
-		newword |= ((oldword & 0x0008) << 11);
-		newword |= ((oldword & 0x0010) << 2);
-		newword |= ((oldword & 0x0020) << 10);
-		newword |= ((oldword & 0x0040) >> 1);
-		newword |= ((oldword & 0x0080) >> 7);
-		newword |= ((oldword & 0x0100) >> 4);
-		newword |= ((oldword & 0x0200) << 0);
-		newword |= ((oldword & 0x0400) >> 7);
-		newword |= ((oldword & 0x0800) >> 1);
-		newword |= ((oldword & 0x1000) >> 10);
-		newword |= ((oldword & 0x2000) >> 2);
-		newword |= ((oldword & 0x4000) >> 13);
-		newword |= ((oldword & 0x8000) >> 3);
-		pipibibi_68k_rom[A+1] = newword;
-
-		newword = 0;
-		oldword = pipibibi_68k_rom[A+2];
-		newword |= ((oldword & 0x000f) << 4);
-		newword |= ((oldword & 0x00f0) >> 4);
-		newword |= ((oldword & 0x0100) << 3);
-		newword |= ((oldword & 0x0200) << 1);
-		newword |= ((oldword & 0x0400) >> 1);
-		newword |= ((oldword & 0x0800) >> 3);
-		newword |= ((oldword & 0x1000) << 3);
-		newword |= ((oldword & 0x2000) << 1);
-		newword |= ((oldword & 0x4000) >> 1);
-		newword |= ((oldword & 0x8000) >> 3);
-		pipibibi_68k_rom[A+2] = newword;
-
-		newword = 0;
-		oldword = pipibibi_68k_rom[A+3];
-		newword |= ((oldword & 0x000f) << 4);
-		newword |= ((oldword & 0x00f0) >> 4);
-		newword |= ((oldword & 0x0100) << 7);
-		newword |= ((oldword & 0x0200) << 5);
-		newword |= ((oldword & 0x0400) << 3);
-		newword |= ((oldword & 0x0800) << 1);
-		newword |= ((oldword & 0x1000) >> 1);
-		newword |= ((oldword & 0x2000) >> 3);
-		newword |= ((oldword & 0x4000) >> 5);
-		newword |= ((oldword & 0x8000) >> 7);
-		pipibibi_68k_rom[A+3] = newword;
+		ROM[i+0] = BITSWAP16(ROM[i+0],0x1,0x5,0x6,0x7,0x8,0x2,0x0,0x9,0xe,0xd,0x4,0x3,0xf,0xa,0xb,0xc);
+		ROM[i+1] = BITSWAP16(ROM[i+1],0x5,0x3,0x1,0xf,0xd,0xb,0x9,0x0,0x2,0x4,0x6,0x8,0xa,0xc,0xe,0x7);
+		ROM[i+2] = BITSWAP16(ROM[i+2],0xc,0xd,0xe,0xf,0x8,0x9,0xa,0xb,0x3,0x2,0x1,0x0,0x7,0x6,0x5,0x4);
+		ROM[i+3] = BITSWAP16(ROM[i+3],0x8,0x9,0xa,0xb,0xc,0xd,0xe,0xf,0x3,0x2,0x1,0x0,0x7,0x6,0x5,0x4);
 	}
 }
 
@@ -1612,193 +1552,199 @@ ADDRESS_MAP_END
 
 /*****************************************************************************
     Input Port definitions
-    Service input of the TOAPLAN2_SYSTEM_INPUTS is used as a Pause type input.
-    If you press then release the following buttons, the following occurs:
-    Service & P2 start            : The game will pause.
-    P1 start                      : The game will continue.
-    Service & P1 start & P2 start : The game will play in slow motion.
+    The following commands are available when the Invulnerability dipswitch
+    is set (or, in some games, also when the JAMMA Test switch is pressed):
+
+    P2 start                 : pause
+    P1 start                 : resume
+    Hold P1 start & P2 start : slow motion
+
+    In bgaregga, batrider and bbakraid, the commands are different:
+
+    Tap P1 start             : pause/resume
+    Hold P1 start            : slow motion
+
+    Additional per-game test features are as follows:
+
+    truxton2 - While playing in invulnerable mode, press button 3 to suicide.
+
+    fixeight - While playing in invulnerable mode, press button 3 to suicide
+               (player 1 and player 2 only)
+
+    batsugun - While playing in invulnerable mode, press the following buttons
+               to stage skip:
+
+               P2 button 3 & P2 button 1 : Skip to end of stage 1
+               P2 button 3 & P2 button 2 : Skip to end of stage 2
+               P2 button 3               : Skip to end of stage 3
+
+   sstriker - While playing in invulnerable mode as player 2, press
+   /kingdmgp  P2 button 3 to skip to the end of the current stage.
+
+   bgaregga - Press and hold P1 button 1, P1 button 2 and P1 button 3 while
+              powering on in service mode to enter the special service mode.
+              "OPTIONS" and "PLAY DATAS" are added to the menu, and the
+              dipswitch display will show the region jumpers (normally hidden).
+              Choose "GAME MODE" from the special service mode to enter the
+              special game mode. In the special game mode, you can use pause
+              and slow motion even when not playing in invulnerable mode.
+
+   batrider - While playing in invulnerable mode, press P1 Start and P2 Start
+              to skip directly to the ending scene.
+
+   batrider - Press and hold P1 button 1, P1 button 2 and P1 button 3 while
+   /bbakraid  powering on in service mode to enter the special service mode.
+              You can change the game's region by pressing left/right.
+              Choose "GAME MODE" from the special service mode to enter the
+              special game mode. In the special game mode, you can use pause
+              and slow motion even when not playing in invulnerable mode.
+              While the game is paused in special mode, press button 3 to
+              display debugging information.
+
 *****************************************************************************/
 
 
-#define TOAPLAN2_COINAGE( mask, value)																				\
-	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:5,6")								\
-	PORT_DIPSETTING(		0x0030, DEF_STR( 4C_1C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_EQUALS,value)		\
-	PORT_DIPSETTING(		0x0020, DEF_STR( 3C_1C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_EQUALS,value)		\
-	PORT_DIPSETTING(		0x0010, DEF_STR( 2C_1C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_EQUALS,value)		\
-	PORT_DIPSETTING(		0x0020, DEF_STR( 2C_1C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_NOTEQUALS,value)	\
-	PORT_DIPSETTING(		0x0000, DEF_STR( 1C_1C ) )																\
-	PORT_DIPSETTING(		0x0030, DEF_STR( 2C_3C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_NOTEQUALS,value)	\
-	PORT_DIPSETTING(		0x0010, DEF_STR( 1C_2C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_NOTEQUALS,value)	\
-	PORT_DIPNAME( 0x00c0,	0x0000, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:7,8")								\
-	PORT_DIPSETTING(		0x0080, DEF_STR( 2C_1C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_NOTEQUALS,value)	\
-	PORT_DIPSETTING(		0x0000, DEF_STR( 1C_1C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_NOTEQUALS,value)	\
-	PORT_DIPSETTING(		0x00c0, DEF_STR( 2C_3C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_NOTEQUALS,value)	\
-	PORT_DIPSETTING(		0x0040, DEF_STR( 1C_2C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_NOTEQUALS,value)	\
-	PORT_DIPSETTING(		0x0000, DEF_STR( 1C_2C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_EQUALS,value)		\
-	PORT_DIPSETTING(		0x0040, DEF_STR( 1C_3C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_EQUALS,value)		\
-	PORT_DIPSETTING(		0x0080, DEF_STR( 1C_4C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_EQUALS,value)		\
-	PORT_DIPSETTING(		0x00c0, DEF_STR( 1C_6C ) )		PORT_CONDITION("JMPR",mask,PORTCOND_EQUALS,value)
 
-
-
-static INPUT_PORTS_START( toaplan2 )
+static INPUT_PORTS_START( toaplan2_2b )
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
+	TOAPLAN_JOY_UDLR_2_BUTTONS( 2 )
 
 	PORT_START("SYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	TOAPLAN_TEST_SWITCH( 0x04, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(		0x0001, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002,	0x0000, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(		0x0002, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(0x0004, IP_ACTIVE_HIGH, "SW1:3")
-	PORT_DIPNAME( 0x0008,	0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(		0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
+	TOAPLAN_MACHINE_NO_COCKTAIL_LOC(SW1)
+	// Coinage on bit mask 0x00f0
 	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Modified below
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x0003,	0x0000, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(		0x0003, DEF_STR( Hardest ) )
-	PORT_DIPSETTING(		0x0002, DEF_STR( Hard ) )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
-	PORT_DIPSETTING(		0x0001, DEF_STR( Easy ) )
+	TOAPLAN_DIFFICULTY_LOC(SW2)
 	// Per-game features on bit mask 0x00fc
 	PORT_BIT( 0x00fc, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Modified below
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
+INPUT_PORTS_END
 
-	PORT_START("JMPR")	// Region jumper block
-	// Region settings on bit mask 0x000f or 0x00f0
-	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Modified below
-	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Modified below
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
+
+static INPUT_PORTS_START( toaplan2_3b )
+	PORT_INCLUDE( toaplan2_2b )
+
+	PORT_MODIFY("IN1")
+	TOAPLAN_JOY_UDLR_3_BUTTONS( 1 )
+
+	PORT_MODIFY("IN2")
+	TOAPLAN_JOY_UDLR_3_BUTTONS( 2 )
 INPUT_PORTS_END
 
 
 
 static INPUT_PORTS_START( tekipaki )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_2b )
 
 	PORT_MODIFY("DSWA")
 	// Various features on bit mask 0x000f - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x000f, 0x0002 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x0f, 0x02, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
-	PORT_DIPNAME( 0x0004,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW2:3")
+	// "Stop Mode" corresponds to "Invulnerability" in the other games
+	// (i.e. it enables pause and slow motion)
+	PORT_DIPNAME( 0x0004,	0x0000, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW2:!3")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0004, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x0008,	0x0000, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW2:!4")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x0010,	0x0000, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW2:!5")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x0020,	0x0000, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW2:!6")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040,	0x0000, "Game Mode" )			PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(		0x0040, "Stop" )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
-	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0040,	0x0000, "Stop Mode (Cheat)" )	PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0080, DEF_STR( On ) )
 
-	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x000f,	0x0002, DEF_STR( Region ) )
+	PORT_START("JMPR")
+	PORT_DIPNAME( 0x000f,	0x0002, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
 	PORT_DIPSETTING(		0x0002, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x0007, "USA (Romstar)" )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x000f, "Japan (Distributed by Tecmo)" )
-	PORT_DIPSETTING(		0x0004, "Korea" )
-	PORT_DIPSETTING(		0x0003, "Hong Kong" )
+	PORT_DIPSETTING(		0x0003, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(		0x0004, DEF_STR( Korea ) )
+	PORT_DIPSETTING(		0x0005, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(		0x0006, "Taiwan (Spacy Co., Ltd." )
+	PORT_DIPSETTING(		0x0007, "USA (Romstar, Inc.)" )
 	PORT_DIPSETTING(		0x0008, "Hong Kong (Honest Trading Co.)" )
-	PORT_DIPSETTING(		0x0005, "Taiwan" )
-	PORT_DIPSETTING(		0x0006, "Taiwan (Spacy Co. Ltd)" )
+//	PORT_DIPSETTING(		0x0009, DEF_STR( Japan ) )	// English title screen
+//	PORT_DIPSETTING(		0x000a, DEF_STR( Japan ) )
+//	PORT_DIPSETTING(		0x000b, DEF_STR( Japan ) )
+//	PORT_DIPSETTING(		0x000c, DEF_STR( Japan ) )
+//	PORT_DIPSETTING(		0x000d, DEF_STR( Japan ) )
+//	PORT_DIPSETTING(		0x000e, DEF_STR( Japan ) )
+	PORT_DIPSETTING(		0x000f, "Japan (Distributed by Tecmo)" )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(c2map_r, NULL)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( ghox )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_2b )
 
 	PORT_MODIFY("DSWA")
 	// Various features on bit mask 0x000f - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x80000, 0x80000 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x80000, 0x80000, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
-	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
+	// "Debug Mode" corresponds to "Invulnerability" in the other games
+	// (i.e. it enables pause and slow motion)
+	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "100k only" )
 	PORT_DIPSETTING(		0x0004, "100k and 300k" )
 	PORT_DIPSETTING(		0x0000, "100k and every 200k" )
-	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(		0x0030, "1" )
 	PORT_DIPSETTING(		0x0020, "2" )
 	PORT_DIPSETTING(		0x0000, "3" )
 	PORT_DIPSETTING(		0x0010, "5" )
-	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Debug Mode (Cheat)" )	PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0080, DEF_STR( On ) )
 
-	PORT_MODIFY("JMPR")
+	PORT_START("JMPR")
 	// Bit Mask 0x80000 is used here to signify European Coinage for MAME purposes - not read on the real board!
-	PORT_DIPNAME( 0x8000f,	0x80002, DEF_STR( Region ) )
+	PORT_DIPNAME( 0x8000f,	0x80002, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1,FAKE:!1")
 	PORT_DIPSETTING(		0x80002, DEF_STR( Europe ) )
-	PORT_DIPSETTING(		0x8000a, "Europe (Nova Apparate GMBH & Co)" )
-	PORT_DIPSETTING(		0x8000d, "Europe (Taito Corporation Japan)" )
 	PORT_DIPSETTING(		0x00001, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x00009, "USA (Romstar)" )
+	PORT_DIPSETTING(		0x00000, DEF_STR( Japan ) )
+	PORT_DIPSETTING(		0x00003, "Hong Kong (Honest Trading Co.)" )
+	PORT_DIPSETTING(		0x00004, DEF_STR( Korea ) )
+	PORT_DIPSETTING(		0x00005, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(		0x80006, "Spain & Portugal (APM Electronics S.A.)" )
+	PORT_DIPSETTING(		0x80007, "Italy (Star Electronica SRL)" )
+	PORT_DIPSETTING(		0x80008, "UK (JP Leisure Limited)" )
+	PORT_DIPSETTING(		0x00009, "USA (Romstar, Inc.)" )
+	PORT_DIPSETTING(		0x8000a, "Europe (Nova Apparate GMBH & Co.)" )
 	PORT_DIPSETTING(		0x0000b, "USA (Taito America Corporation)" )
 	PORT_DIPSETTING(		0x0000c, "USA (Taito Corporation Japan)" )
-	PORT_DIPSETTING(		0x00000, DEF_STR( Japan ) )
-//  PORT_DIPSETTING(        0x0000e, "Japan (Taito Corporation)" )
-	PORT_DIPSETTING(		0x00004, "Korea" )
-	PORT_DIPSETTING(		0x00003, "Hong Kong (Honest Trading Co.)" )
-	PORT_DIPSETTING(		0x00005, "Taiwan" )
-	PORT_DIPSETTING(		0x80006, "Spain & Portugal (APM Electronics SA)" )
-	PORT_DIPSETTING(		0x80007, "Italy (Star Electronica SRL)" )
-	PORT_DIPSETTING(		0x80008, "UK (JP Leisure Ltd)" )
+	PORT_DIPSETTING(		0x8000d, "Europe (Taito Corporation Japan)" )
+//	PORT_DIPSETTING(		0x0000e, "Japan (Licensed to [blank])" )	// English title screen
+	PORT_DIPSETTING(        0x0000f, "Japan (Taito Corporation)" )
 
 	PORT_START("PAD1")		/* Paddle 1 (left-right)  read at $100000 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
@@ -1811,61 +1757,54 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( dogyuun )
-	PORT_INCLUDE( toaplan2 )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
-
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_INCLUDE( toaplan2_3b )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Free_Play) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Free_Play) )		PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( On ) )
 	// Various features on bit mask 0x000e - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x8000, 0x8000 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x8000, 0x8000, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
-	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "400k only" )
 	PORT_DIPSETTING(		0x0000, "200k only" )
 	PORT_DIPSETTING(		0x0004, "200k, 400k and 600k" )
-	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(		0x0030, "1" )
 	PORT_DIPSETTING(		0x0020, "2" )
 	PORT_DIPSETTING(		0x0000, "3" )
 	PORT_DIPSETTING(		0x0010, "5" )
-	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability (Cheat)" )			PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
-	PORT_MODIFY("JMPR")
+	PORT_START("JMPR")
 	// Bit Mask 0x8000 is used here to signify European Coinage for MAME purposes - not read on the real board!
 	// "No speedups": all speedup items in game are replaced with bombs
-	PORT_DIPNAME( 0x80f0,	0x8030, DEF_STR( Region ) )
+	PORT_DIPNAME( 0x80f0,	0x8030, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1,FAKE:!1")
 	PORT_DIPSETTING(		0x8030, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0010, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x0020, "USA (Atari Games Corp license)" )
+	PORT_DIPSETTING(		0x0020, "USA (Atari Games Corp.)" )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0040, "Hong Kong (Charterfield license); no speedups" )
-	PORT_DIPSETTING(		0x0050, "Korea (Unite Trading license); no speedups" )
+	PORT_DIPSETTING(		0x0040, "Hong Kong (Charterfield); no speedups" )
+	PORT_DIPSETTING(		0x0050, "Korea (Unite Trading); no speedups" )
 	PORT_DIPSETTING(		0x0060, "Taiwan; no speedups" )
 	PORT_DIPSETTING(		0x0070, "USA; no speedups" )
-	PORT_DIPSETTING(		0x0080, "Southeast Asia (Charterfield license); no speedups" )
-	PORT_DIPSETTING(		0x0090, "Hong Kong (Charterfield license)" )
-	PORT_DIPSETTING(		0x00a0, "Korea (Unite Trading license)" )
-	PORT_DIPSETTING(		0x00b0, "Taiwan" )
-	PORT_DIPSETTING(		0x00c0, "USA (Atari Games Corp license); no speedups" )
-	PORT_DIPSETTING(		0x00d0, "Southeast Asia (Charterfield license)" )
+	PORT_DIPSETTING(		0x0080, "Southeast Asia (Charterfield); no speedups" )
+	PORT_DIPSETTING(		0x0090, "Hong Kong (Charterfield)" )
+	PORT_DIPSETTING(		0x00a0, "Korea (Unite Trading)" )
+	PORT_DIPSETTING(		0x00b0, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(		0x00c0, "USA (Atari Games Corp.); no speedups" )
+	PORT_DIPSETTING(		0x00d0, "Southeast Asia (Charterfield)" )
 	PORT_DIPSETTING(		0x80e0, "Europe; no speedups" )
-	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp license)" )
+	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp.)" )
 INPUT_PORTS_END
 
 
@@ -1873,28 +1812,27 @@ static INPUT_PORTS_START( dogyuuna )
 	PORT_INCLUDE( dogyuun )
 
 	PORT_MODIFY("DSWA")
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x00f0, 0x0030 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0xf0, 0x30, SW1 )
 
 	PORT_MODIFY("JMPR")
 	// "No speedups": all speedup items in game are replaced with bombs
-	PORT_DIPNAME( 0x00f0,	0x0030, DEF_STR( Region ) )
+	PORT_DIPNAME( 0x00f0,	0x0030, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
 	PORT_DIPSETTING(		0x0030, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0010, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x0020, "USA (Atari Games Corp license)" )
+	PORT_DIPSETTING(		0x0020, "USA (Atari Games Corp.)" )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0040, "Hong Kong (Charterfield license); no speedups" )
-	PORT_DIPSETTING(		0x0050, "Korea (Unite Trading license); no speedups" )
+	PORT_DIPSETTING(		0x0040, "Hong Kong (Charterfield); no speedups" )
+	PORT_DIPSETTING(		0x0050, "Korea (Unite Trading); no speedups" )
 	PORT_DIPSETTING(		0x0060, "Taiwan; no speedups" )
-	PORT_DIPSETTING(		0x0070, "Taiwan (??????? license); no speedups" )
-	PORT_DIPSETTING(		0x0080, "Southeast Asia (Charterfield license); no speedups" )
-	PORT_DIPSETTING(		0x0090, "Hong Kong (Charterfield license)" )
-	PORT_DIPSETTING(		0x00a0, "Korea (Unite Trading license)" )
-	PORT_DIPSETTING(		0x00b0, "Taiwan" )
-	PORT_DIPSETTING(		0x00c0, "Taiwan (??????? license)" )
-	PORT_DIPSETTING(		0x00d0, "Southeast Asia (Charterfield license)" )
+//	PORT_DIPSETTING(		0x0070, "Taiwan (Licensed to ???????); no speedups" )
+	PORT_DIPSETTING(		0x0080, "Southeast Asia (Charterfield); no speedups" )
+	PORT_DIPSETTING(		0x0090, "Hong Kong (Charterfield)" )
+	PORT_DIPSETTING(		0x00a0, "Korea (Unite Trading)" )
+	PORT_DIPSETTING(		0x00b0, DEF_STR( Taiwan ) )
+//	PORT_DIPSETTING(		0x00c0, "Taiwan (Licensed to ???????)" )
+	PORT_DIPSETTING(		0x00d0, "Southeast Asia (Charterfield)" )
 //  PORT_DIPSETTING(        0x00e0, DEF_STR( Unused ) )
-	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp license)" )
+	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp.)" )
 INPUT_PORTS_END
 
 
@@ -1902,75 +1840,67 @@ static INPUT_PORTS_START( dogyuunt )
 	PORT_INCLUDE( dogyuun )
 
 	PORT_MODIFY("DSWA")
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x00f0, 0x0020 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0xf0, 0x20, SW1 )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x00f0,	0x0020, DEF_STR( Region ) )
+	PORT_DIPNAME( 0x00f0,	0x0020, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
 	PORT_DIPSETTING(		0x0020, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0010, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0030, "Hong Kong" )
-	PORT_DIPSETTING(		0x0040, "Korea" )
-	PORT_DIPSETTING(		0x0050, "Taiwan" )
-	PORT_DIPSETTING(		0x0060, "Southeast Asia (Charterfield license)" )
-	PORT_DIPSETTING(		0x0070, "USA (Romstar license)" )
-	PORT_DIPSETTING(		0x0080, "Hong Kong (Honest Trading Co. license)" )
-	PORT_DIPSETTING(		0x0090, "Korea (JC Trading Corp license)" )
-	PORT_DIPSETTING(		0x00a0, "USA (Fabtek license)" )
+	PORT_DIPSETTING(		0x0030, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(		0x0040, DEF_STR( Korea ) )
+	PORT_DIPSETTING(		0x0050, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(		0x0060, "Southeast Asia (Charterfield)" )
+	PORT_DIPSETTING(		0x0070, "USA (Romstar, Inc.)" )
+	PORT_DIPSETTING(		0x0080, "Hong Kong (Honest Trading Co.)" )
+	PORT_DIPSETTING(		0x0090, "Korea (JC Trading Corp.)" )
+	PORT_DIPSETTING(		0x00a0, "USA (Fabtek)" )
 //  PORT_DIPSETTING(        0x00b0, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(        0x00c0, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(        0x00d0, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(        0x00e0, DEF_STR( Unused ) )
-	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp license)" )
+	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp.)" )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( kbash )
-	PORT_INCLUDE( toaplan2 )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
-
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_INCLUDE( toaplan2_3b )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x0001,	0x0000, "Continue Mode" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0001, "Discount" )
 	// Various features on bit mask 0x000e - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x0070, 0x0020 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x70, 0x20, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
-	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "200k only" )
 	PORT_DIPSETTING(		0x0004, "100k only" )
 	PORT_DIPSETTING(		0x0000, "100k and 400k" )
-	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(		0x0030, "1" )
 	PORT_DIPSETTING(		0x0000, "2" )
 	PORT_DIPSETTING(		0x0020, "3" )
 	PORT_DIPSETTING(		0x0010, "4" )
-	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability (Cheat)" )			PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
-	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x00f0,	0x0020, DEF_STR( Region ) )
-	PORT_DIPSETTING(		0x0020, "Europe, USA (Atari Games license)" )	// European coinage
-	PORT_DIPSETTING(		0x0010, "USA, Europe (Atari Games license)" )
+	PORT_START("JMPR")
+	PORT_DIPNAME( 0x00f0,	0x0020, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
+	PORT_DIPSETTING(		0x0020, "Europe, USA (Atari Games)" )	// European coinage
+	PORT_DIPSETTING(		0x0010, "USA, Europe (Atari Games)" )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0030, "Korea" )
-	PORT_DIPSETTING(		0x0040, "Hong Kong" )
-	PORT_DIPSETTING(		0x0050, "Taiwan" )
-	PORT_DIPSETTING(		0x0060, "Southeast Asia" )	// Service Mode wrongly shows European coinage
+	PORT_DIPSETTING(		0x0030, DEF_STR( Korea ) )
+	PORT_DIPSETTING(		0x0040, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(		0x0050, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(		0x0060, DEF_STR( Southeast_Asia ) )	// Service Mode wrongly shows European coinage
 //  PORT_DIPSETTING(        0x0070, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(        0x0080, DEF_STR( Unused ) )
 	PORT_DIPSETTING(		0x0090, DEF_STR( USA ) )
@@ -1987,125 +1917,122 @@ static INPUT_PORTS_START( kbash2 )
 	PORT_INCLUDE( kbash )
 
 	PORT_MODIFY("DSWA")
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x0007, 0x0002 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x07, 0x02, SW1 )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x000f,	0x0006, DEF_STR( Region ) )
-	PORT_DIPSETTING(		0x0000, "Japan (Taito Corp license)" )
+	PORT_DIPNAME( 0x000f,	0x0006, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
+	PORT_DIPSETTING(		0x0000, "Japan (Taito Corp.)" )
 //  PORT_DIPSETTING(        0x0001, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(        0x0002, DEF_STR( Unused ) ) // European coinage
-	PORT_DIPSETTING(		0x0003, "Korea (Unite Trading license)" )
-	PORT_DIPSETTING(		0x0004, "Hong Kong" )
-	PORT_DIPSETTING(		0x0005, "Taiwan" )
-	PORT_DIPSETTING(		0x0006, "Southeast Asia (Charterfield license)" )	// Service Mode wrongly shows European coinage
+	PORT_DIPSETTING(		0x0003, "Korea (Unite Trading)" )
+	PORT_DIPSETTING(		0x0004, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(		0x0005, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(		0x0006, "Southeast Asia (Charterfield)" )	// Service Mode wrongly shows European coinage
 //  PORT_DIPSETTING(        0x0007, DEF_STR( Unused ) )
 	PORT_DIPSETTING(		0x0008, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(        0x0009, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(        0x000a, DEF_STR( Unused ) ) // European coinage
-	PORT_DIPSETTING(		0x000b, "Korea" )
-//  PORT_DIPSETTING(        0x000c, "Hong Kong" )
-//  PORT_DIPSETTING(        0x000d, "Taiwan" )
-	PORT_DIPSETTING(		0x000e, "Southeast Asia" )	// Service Mode wrongly shows European coinage
+	PORT_DIPSETTING(		0x000b, DEF_STR( Korea ) )
+//  PORT_DIPSETTING(        0x000c, DEF_STR( Hong_Kong ) )
+//  PORT_DIPSETTING(        0x000d, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(		0x000e, DEF_STR( Southeast_Asia ) )	// Service Mode wrongly shows European coinage
 //  PORT_DIPSETTING(        0x000f, DEF_STR( Unused ) )
 	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( truxton2 )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_3b )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Speedup (Cheat)")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fast Scrolling (Cheat)")
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x0001,	0x0000, "Rapid Fire" )				PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0001,	0x0000, "Rapid Fire" )				PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
 	// Various features on bit mask 0x000e - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x000f, 0x0002 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x0f, 0x02, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
-	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(		0x000c, "200k only" )
 	PORT_DIPSETTING(		0x0008, "100k only" )
 	PORT_DIPSETTING(		0x0004, "100k and 250k" )
 	PORT_DIPSETTING(		0x0000, "70k and 200k" )
-	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(		0x0030, "2" )
 	PORT_DIPSETTING(		0x0000, "3" )
 	PORT_DIPSETTING(		0x0020, "4" )
 	PORT_DIPSETTING(		0x0010, "5" )
-	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability (Cheat)" )	PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
-	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x000f,	0x0002, DEF_STR( Region ) )
+	PORT_START("JMPR")
+	PORT_DIPNAME( 0x000f,	0x0002, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
 	PORT_DIPSETTING(		0x0002, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0003, "Hong Kong" )
-	PORT_DIPSETTING(		0x0004, "Korea" )
-	PORT_DIPSETTING(		0x0005, "Taiwan" )
-	PORT_DIPSETTING(		0x0006, "Southeast Asia (Charterfield license)" )
-	PORT_DIPSETTING(		0x0007, "USA (Romstar license)" )
-	PORT_DIPSETTING(		0x0008, "Hong Kong (Honest Trading Co. license)" )
-	PORT_DIPSETTING(		0x0009, "Korea (JC Trading Corp license)" )
-	PORT_DIPSETTING(		0x000a, "USA (Fabtek license)" )
+	PORT_DIPSETTING(		0x0003, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(		0x0004, DEF_STR( Korea ) )
+	PORT_DIPSETTING(		0x0005, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(		0x0006, "Southeast Asia (Charterfield)" )
+	PORT_DIPSETTING(		0x0007, "USA (Romstar, Inc.)" )
+	PORT_DIPSETTING(		0x0008, "Hong Kong (Honest Trading Co.)" )
+	PORT_DIPSETTING(		0x0009, "Korea (JC Trading Corp.)" )
+	PORT_DIPSETTING(		0x000a, "USA (Fabtek)" )
 //  PORT_DIPSETTING(        0x000b, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(        0x000c, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(        0x000d, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(        0x000e, DEF_STR( Unused ) )
-	PORT_DIPSETTING(		0x000f, "Japan (Taito Corp license)" )
+	PORT_DIPSETTING(		0x000f, "Japan (Taito Corp.)" )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( pipibibs )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_2b )
 
 	PORT_MODIFY("DSWA")
 	// Various features on bit mask 0x000f - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x0006, 0x0006 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x06, 0x06, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
-	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "200k only" )
 	PORT_DIPSETTING(		0x0000, "200k and every 300k" )
 	PORT_DIPSETTING(		0x0004, "150k and every 200k" )
-	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(		0x0030, "1" )
 	PORT_DIPSETTING(		0x0020, "2" )
 	PORT_DIPSETTING(		0x0000, "3" )
 	PORT_DIPSETTING(		0x0010, "5" )
-	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability (Cheat)" )	PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0080, DEF_STR( On ) )
 
-	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x0008,	0x0000, "Nudity" )
+	PORT_START("JMPR")
+	PORT_DIPNAME( 0x0008,	0x0000, "Nudity" )			PORT_DIPLOCATION("JP:!1")
 	PORT_DIPSETTING(		0x0008, DEF_STR( Low ) )
 	PORT_DIPSETTING(		0x0000, "High, but censored" )
-	PORT_DIPNAME( 0x0007,	0x0006, DEF_STR( Region ) )
+	PORT_DIPNAME( 0x0007,	0x0006, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2")
 	PORT_DIPSETTING(		0x0006, DEF_STR( Europe ) )
-	PORT_DIPSETTING(		0x0007, "Europe (Nova Apparate GMBH & Co)" )
 	PORT_DIPSETTING(		0x0004, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x0005, "USA (Romstar)" )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( Asia ) )
 	PORT_DIPSETTING(		0x0002, "Hong Kong (Honest Trading Co.)" )
-	PORT_DIPSETTING(		0x0003, "Taiwan" )
+	PORT_DIPSETTING(		0x0003, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(		0x0005, "USA (Romstar, Inc.)" )
+	PORT_DIPSETTING(		0x0007, "Europe (Nova Apparate GMBH & Co.)" )
 INPUT_PORTS_END
 
 
@@ -2121,28 +2048,29 @@ static INPUT_PORTS_START( pipibibsbl )
 	PORT_INCLUDE( pipibibs )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x0002,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:2")	// This video HW doesn't support flip screen
+	PORT_DIPNAME( 0x0002,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:!2")	// This video HW doesn't support flip screen
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0002, DEF_STR( On ) )
 	// Various features on bit mask 0x000d - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x80000, 0x80000 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x80000, 0x80000, SW1 )
 
 	PORT_MODIFY("JMPR")
 	// Bit Mask 0x80000 is used here to signify European Coinage for MAME purposes - not read on the real board!
-	PORT_DIPNAME( 0x80007,	0x00007, DEF_STR( Region ) )
+	PORT_DIPNAME( 0x80007,	0x00007, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,FAKE:!1")
 	PORT_DIPSETTING(		0x00002, DEF_STR( World ) )
 //  PORT_DIPSETTING(        0x00003, DEF_STR( World ) )
-	PORT_DIPSETTING(		0x00007, "World (Ryouta Kikaku)" )
 	PORT_DIPSETTING(		0x80005, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x00004, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x00000, "Japan (Ryouta Kikaku)" )
 	PORT_DIPSETTING(		0x00001, "Hong Kong (Honest Trading Co.)" )
-	PORT_DIPSETTING(		0x80006, "Spain & Portugal (APM Electronics SA)" )
+	PORT_DIPSETTING(		0x80006, "Spain & Portugal (APM Electronics S.A.)" )
+	PORT_DIPSETTING(		0x00007, "World (Ryouta Kikaku)" )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( fixeight )
+	// The Suicide buttons are technically P1 and P2 Button 3, but we hook
+	// them up as IPT_OTHER so each player has the same number of buttons.
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
@@ -2150,7 +2078,7 @@ static INPUT_PORTS_START( fixeight )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Suicide (Cheat)")
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
@@ -2161,7 +2089,7 @@ static INPUT_PORTS_START( fixeight )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Suicide (Cheat)")
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
@@ -2196,7 +2124,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( fixeightbl )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_2b )
 
 	PORT_MODIFY("SYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -2214,87 +2142,85 @@ static INPUT_PORTS_START( fixeightbl )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x0001,	0x0000, "Maximum Players" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0001,	0x0000, "Maximum Players" )		PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0000, "2" )
 	PORT_DIPSETTING(		0x0001, "3" )
-	PORT_DIPNAME( 0x0002,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:2")	// This video HW doesn't support flip screen
+	PORT_DIPNAME( 0x0002,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:!2")	// This video HW doesn't support flip screen
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0002, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004,	0x0004, "Shooting Style" )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x0004,	0x0004, "Shooting Style" )		PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(		0x0004, "Semi-Auto" )
 	PORT_DIPSETTING(		0x0000, "Full-Auto" )
 	// Various features on bit mask 0x0008 - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x00ff, 0x00ff )
+	TOAPLAN_COINAGE_JAPAN_LOC(SW1)
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
-	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0000, "500k and every 500k" )
 	PORT_DIPSETTING(		0x0008, "300k only" )
 	PORT_DIPSETTING(		0x0004, "300k and every 300k" )
-	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(		0x0030, "1" )
 	PORT_DIPSETTING(		0x0020, "2" )
 	PORT_DIPSETTING(		0x0000, "3" )
 	PORT_DIPSETTING(		0x0010, "5" )
-	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability (Cheat)" )	PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( grindstm )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_2b )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( Cocktail ) )
 	// Various features on bit mask 0x000e - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x00e0, 0x0080 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0xe0, 0x80, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
-	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "200k only" )
 	PORT_DIPSETTING(		0x0000, "300k and 800k" )
 	PORT_DIPSETTING(		0x0004, "300k and every 800k" )
-	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(		0x0030, "1" )
 	PORT_DIPSETTING(		0x0020, "2" )
 	PORT_DIPSETTING(		0x0000, "3" )
 	PORT_DIPSETTING(		0x0010, "5" )
-	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability (Cheat)" )			PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
-	PORT_MODIFY("JMPR")
+	PORT_START("JMPR")
 	// Code in many places in game tests if region is >= 0xC. Effects on gameplay?
-	PORT_DIPNAME( 0x00f0,	0x0090, DEF_STR( Region ) )
+	PORT_DIPNAME( 0x00f0,	0x0090, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
 	PORT_DIPSETTING(		0x0090, DEF_STR( Europe ) )
 //  PORT_DIPSETTING(        0x0080, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x00b0, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x00a0, "USA (American Sammy Corporation license)" )
-	PORT_DIPSETTING(		0x0070, "Southeast Asia" )
-	PORT_DIPSETTING(		0x0060, "Southeast Asia (Charterfield license)" )
-	PORT_DIPSETTING(		0x0050, "Taiwan" )
-	PORT_DIPSETTING(		0x0040, "Taiwan (Anomoto International Inc license)" )
-	PORT_DIPSETTING(		0x0030, "Hong Kong" )
-	PORT_DIPSETTING(		0x0020, "Hong Kong (Charterfield license)" )
-	PORT_DIPSETTING(		0x0010, "Korea" )
-	PORT_DIPSETTING(		0x0000, "Korea (Unite Trading license)" )
+	PORT_DIPSETTING(		0x00a0, "USA (American Sammy Corporation)" )
+	PORT_DIPSETTING(		0x0070, DEF_STR( Southeast_Asia ) )
+	PORT_DIPSETTING(		0x0060, "Southeast Asia (Charterfield)" )
+	PORT_DIPSETTING(		0x0050, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(		0x0040, "Taiwan (Anomoto International Inc.)" )
+	PORT_DIPSETTING(		0x0030, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(		0x0020, "Hong Kong (Charterfield)" )
+	PORT_DIPSETTING(		0x0010, DEF_STR( Korea ) )
+	PORT_DIPSETTING(		0x0000, "Korea (Unite Trading)" )
 	PORT_DIPSETTING(		0x00d0, "USA; different?" )
-	PORT_DIPSETTING(		0x00c0, "USA (American Sammy Corporation license); different?" )
+	PORT_DIPSETTING(		0x00c0, "USA (American Sammy Corporation); different?" )
 	PORT_DIPSETTING(		0x00e0, "Korea; different?" )
 //  PORT_DIPSETTING(        0x00f0, "Korea; different?" )
 INPUT_PORTS_END
@@ -2305,19 +2231,19 @@ static INPUT_PORTS_START( grindstma )
 
 	PORT_MODIFY("JMPR")
 	// Code in many places in game tests if region is >= 0xC. Effects on gameplay?
-	PORT_DIPNAME( 0x00f0,	0x0090, DEF_STR( Region ) )
+	PORT_DIPNAME( 0x00f0,	0x0090, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
 	PORT_DIPSETTING(		0x0090, DEF_STR( Europe ) )
 //  PORT_DIPSETTING(        0x0080, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x00b0, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x00a0, "USA (Atari Games Corp license)" )
-	PORT_DIPSETTING(		0x0070, "Southeast Asia" )
-	PORT_DIPSETTING(		0x0060, "Southeast Asia (Charterfield license)" )
-	PORT_DIPSETTING(		0x0050, "Taiwan" )
-//  PORT_DIPSETTING(        0x0040, "Taiwan" )
-	PORT_DIPSETTING(		0x0030, "Hong Kong" )
-	PORT_DIPSETTING(		0x0020, "Hong Kong (Charterfield license)" )
-	PORT_DIPSETTING(		0x0010, "Korea" )
-	PORT_DIPSETTING(		0x0000, "Korea (Unite Trading license)" )
+	PORT_DIPSETTING(		0x00a0, "USA (Atari Games Corp.)" )
+	PORT_DIPSETTING(		0x0070, DEF_STR( Southeast_Asia ) )
+	PORT_DIPSETTING(		0x0060, "Southeast Asia (Charterfield)" )
+	PORT_DIPSETTING(		0x0050, DEF_STR( Taiwan ) )
+//  PORT_DIPSETTING(        0x0040, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(		0x0030, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(		0x0020, "Hong Kong (Charterfield)" )
+	PORT_DIPSETTING(		0x0010, DEF_STR( Korea ) )
+	PORT_DIPSETTING(		0x0000, "Korea (Unite Trading)" )
 	PORT_DIPSETTING(		0x00c0, "Korea; different?" )
 //  PORT_DIPSETTING(        0x00d0, "Korea; different?" )
 //  PORT_DIPSETTING(        0x00e0, "Korea; different?" )
@@ -2328,86 +2254,82 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vfive )
 	PORT_INCLUDE( grindstm )
 
+	PORT_MODIFY("DSWA")
+	TOAPLAN_COINAGE_JAPAN_LOC(SW1)
+
 	PORT_MODIFY("JMPR")
 	// Region is forced to Japan in this set.
 	// Code at $9238 tests bit 7.
 	// (Actually bit 3, but the V25 shifts the jumper byte before storing it in shared RAM)
 	// Runs twice near end of stage 1, once when each of the two boss tanks appears. Effect?
-	PORT_DIPNAME( 0x0070,	0x0000, "Copyright" )
+	// Also, if bit 7 is set and bits 6-5 are clear, service mode wrongly shows European coinage
+	// (due to code left in from Grind Stormer: see code at $210A4 and lookup table at $211FA)
+	PORT_DIPNAME( 0x0030,	0x0000, "Copyright" )			PORT_DIPLOCATION("JP:!4,!3")
 	PORT_DIPSETTING(		0x0000, "All Rights Reserved" )
 //  PORT_DIPSETTING(        0x0010, "All Rights Reserved" )
 //  PORT_DIPSETTING(        0x0020, "All Rights Reserved" )
-	PORT_DIPSETTING(		0x0030, "Licensed to Taito Corp" )
-	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(		0x0030, "Licensed to Taito Corp." )
+	PORT_DIPNAME( 0x0040,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("JP:!2")
+	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Unknown ) )	PORT_DIPLOCATION("JP:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0080, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( batsugun )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_3b )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x0001,	0x0000, "Continue Mode" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0001, "Discount" )
 	// Various features on bit mask 0x000e - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x00ff, 0x00ff )	// European coinage shown in Service Mode but not actually used
+	TOAPLAN_COINAGE_JAPAN_LOC(SW1)	// European coinage shown in Service Mode but not actually used
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
-	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "1500k only" )
 	PORT_DIPSETTING(		0x0000, "1000k only" )
 	PORT_DIPSETTING(		0x0004, "500k and every 600k" )
-	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(		0x0030, "1" )
 	PORT_DIPSETTING(		0x0020, "2" )
 	PORT_DIPSETTING(		0x0000, "3" )
 	PORT_DIPSETTING(		0x0010, "5" )
-	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability (Cheat)" )			PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
-	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x00f0,	0x0090, DEF_STR( Region ) )
+	PORT_START("JMPR")
+	PORT_DIPNAME( 0x00f0,	0x0090, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2,!1")
 	PORT_DIPSETTING(		0x0090, DEF_STR( Europe ) )
-	PORT_DIPSETTING(		0x0080, "Europe (Taito Corp license)" )
+	PORT_DIPSETTING(		0x0080, "Europe (Taito Corp.)" )
 	PORT_DIPSETTING(		0x00b0, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x00a0, "USA (Taito Corp license)" )
+	PORT_DIPSETTING(		0x00a0, "USA (Taito Corp.)" )
 	PORT_DIPSETTING(		0x00f0, DEF_STR( Japan ) )
 //  PORT_DIPSETTING(        0x00e0, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x00d0, "Japan (Taito Corp license)" )
-//  PORT_DIPSETTING(        0x00c0, "Japan (Taito Corp license)" )
-	PORT_DIPSETTING(		0x0070, "Southeast Asia" )
-	PORT_DIPSETTING(		0x0060, "Southeast Asia (Taito Corp license)" )
-	PORT_DIPSETTING(		0x0050, "Taiwan" )
-	PORT_DIPSETTING(		0x0040, "Taiwan (Taito Corp license)" )
-	PORT_DIPSETTING(		0x0030, "Hong Kong" )
-	PORT_DIPSETTING(		0x0020, "Hong Kong (Taito Corp license)" )
-	PORT_DIPSETTING(		0x0010, "Korea" )
-	PORT_DIPSETTING(		0x0000, "Korea (Unite Trading license)" )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START(batsugunsp)
-	PORT_INCLUDE( batsugun )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)	// Full auto fire (not shown in Service Mode)
-
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)	// Full auto fire (not shown in Service Mode)
+	PORT_DIPSETTING(		0x00d0, "Japan (Taito Corp.)" )
+//  PORT_DIPSETTING(        0x00c0, "Japan (Taito Corp.)" )
+	PORT_DIPSETTING(		0x0070, DEF_STR( Southeast_Asia ) )
+	PORT_DIPSETTING(		0x0060, "Southeast Asia (Taito Corp.)" )
+	PORT_DIPSETTING(		0x0050, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(		0x0040, "Taiwan (Taito Corp.)" )
+	PORT_DIPSETTING(		0x0030, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(		0x0020, "Hong Kong (Taito Corp.)" )
+	PORT_DIPSETTING(		0x0010, DEF_STR( Korea ) )
+	PORT_DIPSETTING(		0x0000, "Korea (Unite Trading)" )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( snowbro2 )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_2b )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3) PORT_8WAY
@@ -2418,7 +2340,6 @@ static INPUT_PORTS_START( snowbro2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START3 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(4) PORT_8WAY
@@ -2429,95 +2350,92 @@ static INPUT_PORTS_START( snowbro2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START4 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x0001,	0x0000, "Continue Mode" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Continue_Price ) )	PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0001, "Discount" )
 	// Various features on bit mask 0x000e - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x1c00, 0x0800 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x1c00, 0x0800, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
-	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "200k only" )
 	PORT_DIPSETTING(		0x0000, "100k only" )
 	PORT_DIPSETTING(		0x0004, "100k and every 500k" )
-	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(		0x0030, "1" )
 	PORT_DIPSETTING(		0x0020, "2" )
 	PORT_DIPSETTING(		0x0000, "3" )
 	PORT_DIPSETTING(		0x0010, "4" )
-	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability" )		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability (Cheat)" )		PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080,	0x0000, "Maximum Players" )		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0080,	0x0000, "Maximum Players" )		PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(		0x0080, "2" )
 	PORT_DIPSETTING(		0x0000, "4" )
 
-	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x2000,	0x0000, "Show All Rights Reserved" )
+	PORT_START("JMPR")
+	PORT_DIPNAME( 0x2000,	0x0000, "Show All Rights Reserved" )	PORT_DIPLOCATION("JP:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x2000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x1c00,	0x0800, DEF_STR( Region ) )
+	PORT_DIPNAME( 0x1c00,	0x0800, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!4,!3,!2")
 	PORT_DIPSETTING(		0x0800, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0400, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0c00, "Korea" )
-	PORT_DIPSETTING(		0x1000, "Hong Kong" )
-	PORT_DIPSETTING(		0x1400, "Taiwan" )
-	PORT_DIPSETTING(		0x1800, "Southeast Asia" )
+	PORT_DIPSETTING(		0x0c00, DEF_STR( Korea ) )
+	PORT_DIPSETTING(		0x1000, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(		0x1400, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(		0x1800, DEF_STR( Southeast_Asia ) )
 //  PORT_DIPSETTING(        0x1c00, DEF_STR( Unused ) )
 	PORT_BIT( 0xc3ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( sstriker )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( toaplan2_3b )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( On ) )
 	// Various features on bit mask 0x000e - see above
-	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
-	TOAPLAN2_COINAGE( 0x000e, 0x0004 )
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x0e, 0x04, SW1 )
 
 	PORT_MODIFY("DSWB")
 	// Difficulty on bit mask 0x0003 - see above
-	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "200k only" )
 	PORT_DIPSETTING(		0x0000, "Every 300k" )
 	PORT_DIPSETTING(		0x0004, "200k and 500k" )
-	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(		0x0030, "1" )
 	PORT_DIPSETTING(		0x0020, "2" )
 	PORT_DIPSETTING(		0x0000, "3" )
 	PORT_DIPSETTING(		0x0010, "5" )
-	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability (Cheat)" )	PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
-	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x0001,	0x0001, "FBI Logo" )
+	PORT_START("JMPR")
+	PORT_DIPNAME( 0x0001,	0x0001, "FBI Logo" )		PORT_DIPLOCATION("JP:!4")
 	PORT_DIPSETTING(		0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x000e,	0x0004, DEF_STR( Region ) )
+	PORT_DIPNAME( 0x000e,	0x0004, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!3,!2,!1")
 	PORT_DIPSETTING(		0x0004, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0002, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0006, "Southeast Asia" )
-	PORT_DIPSETTING(		0x0008, "China" )
-	PORT_DIPSETTING(		0x000a, "Korea" )
-	PORT_DIPSETTING(		0x000c, "Hong Kong" )
-	PORT_DIPSETTING(		0x000e, "Taiwan" )
+	PORT_DIPSETTING(		0x0006, DEF_STR( Southeast_Asia ) )
+	PORT_DIPSETTING(		0x0008, DEF_STR( China ) )
+	PORT_DIPSETTING(		0x000a, DEF_STR( Korea ) )
+	PORT_DIPSETTING(		0x000c, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(		0x000e, DEF_STR( Taiwan ) )
 INPUT_PORTS_END
 
 
@@ -2525,15 +2443,15 @@ static INPUT_PORTS_START( sstrikera )
 	PORT_INCLUDE( sstriker )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x000e,	0x0004, DEF_STR( Region ) )
+	PORT_DIPNAME( 0x000e,	0x0004, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!3,!2,!1")
 	PORT_DIPSETTING(		0x0004, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0002, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0006, "Southeast Asia" )
-	PORT_DIPSETTING(		0x0008, "China" )
-	PORT_DIPSETTING(		0x000a, "Korea (Unite Trading license)" )
-	PORT_DIPSETTING(		0x000c, "Hong Kong" )
-	PORT_DIPSETTING(		0x000e, "Taiwan" )
+	PORT_DIPSETTING(		0x0006, DEF_STR( Southeast_Asia ) )
+	PORT_DIPSETTING(		0x0008, DEF_STR( China ) )
+	PORT_DIPSETTING(		0x000a, "Korea (Unite Trading)" )
+	PORT_DIPSETTING(		0x000c, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(		0x000e, DEF_STR( Taiwan ) )
 INPUT_PORTS_END
 
 
@@ -2552,20 +2470,19 @@ static INPUT_PORTS_START( kingdmgp )
 	// The code and lookup tables pertaining to the jumpers are almost identical to sstriker.
 	// However, this set apparently lacks (reachable) code to display the FBI logo,
 	// even though the logo itself is present in the gfx ROMs.
-
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Unused ) )	PORT_DIPLOCATION("JP:!4")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( On ) )
-	PORT_DIPNAME( 0x000e,	0x0004, DEF_STR( Region ) )
+	PORT_DIPNAME( 0x000e,	0x0004, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!3,!2,!1")
 	PORT_DIPSETTING(		0x0004, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0002, DEF_STR( USA ) )
 //  PORT_DIPSETTING(        0x0000, DEF_STR( Japan ) )  // Corrupt title screen and text - use shippumd
-	PORT_DIPSETTING(		0x0006, "Southeast Asia" )
-	PORT_DIPSETTING(		0x0008, "China" )
+	PORT_DIPSETTING(		0x0006, DEF_STR( Southeast_Asia ) )
+	PORT_DIPSETTING(		0x0008, DEF_STR( China ) )
 	PORT_DIPSETTING(		0x000a, "Korea (Unite Trading license)" )
-	PORT_DIPSETTING(		0x000c, "Hong Kong" )
-	PORT_DIPSETTING(		0x000e, "Taiwan" )
+	PORT_DIPSETTING(		0x000c, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(		0x000e, DEF_STR( Taiwan ) )
 INPUT_PORTS_END
 
 
@@ -2604,7 +2521,7 @@ static INPUT_PORTS_START( bgaregga )
 	PORT_START("SYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SERVICE2 )
+	TOAPLAN_TEST_SWITCH( 0x04, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
@@ -2613,11 +2530,11 @@ static INPUT_PORTS_START( bgaregga )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("DSWA")
-	PORT_SERVICE_DIPLOC(0x0001, IP_ACTIVE_HIGH, "SW1:1")
-	PORT_DIPNAME( 0x0002,	0x0000, "Credits to Start" )	PORT_DIPLOCATION("SW1:2")
+	PORT_SERVICE_DIPLOC(0x0001, IP_ACTIVE_HIGH, "SW1:!1")
+	PORT_DIPNAME( 0x0002,	0x0000, "Credits to Start" )	PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(		0x0000, "1" )
 	PORT_DIPSETTING(		0x0002, "2" )
-	PORT_DIPNAME( 0x001c,	0x0000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPNAME( 0x001c,	0x0000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!3,!4,!5")
 	PORT_DIPSETTING(		0x0018, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(		0x0014, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(		0x0010, DEF_STR( 2C_1C ) )
@@ -2626,7 +2543,7 @@ static INPUT_PORTS_START( bgaregga )
 	PORT_DIPSETTING(		0x0008, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(		0x000c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(		0x001c, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x00e0,	0x0000, DEF_STR( Coin_B ) )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_NOTEQUALS, 0x001c)	PORT_DIPLOCATION("SW1:6,7,8")
+	PORT_DIPNAME( 0x00e0,	0x0000, DEF_STR( Coin_B ) )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_NOTEQUALS, 0x001c)	PORT_DIPLOCATION("SW1:!6,!7,!8")
 	PORT_DIPSETTING(		0x00c0, DEF_STR( 4C_1C ) )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x00a0, DEF_STR( 3C_1C ) )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0080, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
@@ -2636,29 +2553,29 @@ static INPUT_PORTS_START( bgaregga )
 	PORT_DIPSETTING(		0x0040, DEF_STR( 1C_3C ) )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0060, DEF_STR( 1C_4C ) )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	// When Coin_A is set to Free_Play, Coin_A becomes Coin_A and Coin_B, and the following dips occur
-	PORT_DIPNAME( 0x0020,	0x0000, "Joystick Mode" )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0020,	0x0000, "Joystick Mode" )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(		0x0000, "90 degrees ACW" )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0020, DEF_STR( Normal ) )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)
-	PORT_DIPNAME( 0x0040,	0x0000, "Effect" )				PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Effect" )				PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )			PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)
-	PORT_DIPNAME( 0x0080,	0x0000, "Music" )				PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080,	0x0000, "Music" )				PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0080, DEF_STR( On ) )			PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x0003,	0x0000, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(		0x0003, DEF_STR( Hardest ) )
-	PORT_DIPSETTING(		0x0002, DEF_STR( Hard ) )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x0003,	0x0000, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:!1,!2")
 	PORT_DIPSETTING(		0x0001, DEF_STR( Easy ) )
-	PORT_DIPNAME( 0x0004,	0x0000, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(		0x0002, DEF_STR( Hard ) )
+	PORT_DIPSETTING(		0x0003, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x0004,	0x0000, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW2:!3")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0004, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008,	0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x0008,	0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:!4")
 	PORT_DIPSETTING(		0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0070,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5,6,7")
+	PORT_DIPNAME( 0x0070,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:!5,!6,!7")
 	PORT_DIPSETTING(		0x0030, "1" )
 	PORT_DIPSETTING(		0x0020, "2" )
 	PORT_DIPSETTING(		0x0000, "3" )
@@ -2667,22 +2584,22 @@ static INPUT_PORTS_START( bgaregga )
 	PORT_DIPSETTING(		0x0050, "6" )
 	PORT_DIPSETTING(		0x0060, DEF_STR( Infinite ) )
 	PORT_DIPSETTING(		0x0070, "Invulnerability (Cheat)" )
-	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(		0x0000, DEF_STR( None ) )		PORT_CONDITION("JMPR",0x0003,PORTCOND_NOTEQUALS,0x0000)	// Non-Japan
 	PORT_DIPSETTING(		0x0080, "Every 2000k" )			PORT_CONDITION("JMPR",0x0003,PORTCOND_NOTEQUALS,0x0000)	// Non-Japan
 	PORT_DIPSETTING(		0x0080, "1000k and 2000k" )		PORT_CONDITION("JMPR",0x0003,PORTCOND_EQUALS,0x0000)	// Japan
 	PORT_DIPSETTING(		0x0000, "Every 1000k" )			PORT_CONDITION("JMPR",0x0003,PORTCOND_EQUALS,0x0000)	// Japan
 
 	PORT_START("JMPR")
-	PORT_DIPNAME( 0x0008,	0x0000, "Stage Edit" )
+	PORT_DIPNAME( 0x0008,	0x0000, "Stage Edit" )	PORT_DIPLOCATION("SW3:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004,	0x0000, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x0004,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW3:!2")
 	PORT_DIPSETTING(		0x0004, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0003,	0x0001, DEF_STR( Region ) )
-	PORT_DIPSETTING(		0x0001, "Europe (German Tuning license)" )
-	PORT_DIPSETTING(		0x0002, "USA (Fabtek license)" )
+	PORT_DIPNAME( 0x0003,	0x0001, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!2,!1")
+	PORT_DIPSETTING(		0x0001, "Europe (Tuning)" )
+	PORT_DIPSETTING(		0x0002, "USA (Fabtek)" )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(		0x0003, DEF_STR( Asia ) )
 INPUT_PORTS_END
@@ -2692,12 +2609,12 @@ static INPUT_PORTS_START( bgareggahk )
 	PORT_INCLUDE( bgaregga )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x0003,	0x0003, DEF_STR( Region ) )
-	PORT_DIPSETTING(		0x0001, "Austria (German Tuning license)" )
+	PORT_DIPNAME( 0x0003,	0x0003, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!2,!1")
+	PORT_DIPSETTING(		0x0001, "Austria (Tuning)" )
 	// These two settings end up reporting ROM-0 as BAD
-//  PORT_DIPSETTING(        0x0002, "USA (Fabtek license)" )
+//  PORT_DIPSETTING(        0x0002, "USA (Fabtek)" )
 //  PORT_DIPSETTING(        0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0003, "Hong Kong (Metrotainment license)" )
+	PORT_DIPSETTING(		0x0003, "Hong Kong (Metrotainment)" )
 INPUT_PORTS_END
 
 
@@ -2705,12 +2622,12 @@ static INPUT_PORTS_START( bgareggatw )
 	PORT_INCLUDE( bgaregga )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x0003,	0x0003, DEF_STR( Region ) )
-	PORT_DIPSETTING(		0x0001, "Germany (German Tuning license)" )
+	PORT_DIPNAME( 0x0003,	0x0003, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!2,!1")
+	PORT_DIPSETTING(		0x0001, "Germany (Tuning)" )
 	// These two settings end up reporting ROM-0 as BAD
-//  PORT_DIPSETTING(        0x0002, "USA (Fabtek license)" )
+//  PORT_DIPSETTING(        0x0002, "USA (Fabtek)" )
 //  PORT_DIPSETTING(        0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0003, "Taiwan (Liang Hwa license)" )
+	PORT_DIPSETTING(		0x0003, "Taiwan (Liang Hwa)" )
 INPUT_PORTS_END
 
 
@@ -2718,12 +2635,12 @@ static INPUT_PORTS_START( bgareggacn )
 	PORT_INCLUDE( bgaregga )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x0003,	0x0003, DEF_STR( Region ) )
-	PORT_DIPSETTING(		0x0001, "Denmark (German Tuning license)" )
+	PORT_DIPNAME( 0x0003,	0x0003, DEF_STR( Region ) )	PORT_DIPLOCATION("JP:!2,!1")
+	PORT_DIPSETTING(		0x0001, "Denmark (Tuning)" )
 	// These two settings end up reporting ROM-0 as BAD
-//  PORT_DIPSETTING(        0x0002, "USA (Fabtek license)" )
+//  PORT_DIPSETTING(        0x0002, "USA (Fabtek)" )
 //  PORT_DIPSETTING(        0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0003, "China" )
+	PORT_DIPSETTING(		0x0003, DEF_STR( China ) )
 INPUT_PORTS_END
 
 
@@ -2746,14 +2663,14 @@ static INPUT_PORTS_START( batrider )
 	PORT_BIT( 0x8080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")		// DSWA and DSWB
-	PORT_SERVICE_DIPLOC(0x0001, IP_ACTIVE_HIGH, "SW1:1")
-	PORT_DIPNAME( 0x0002,	0x0000, "Credits to Start" )	PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)	PORT_DIPLOCATION("SW1:2")
+	PORT_SERVICE_DIPLOC(0x0001, IP_ACTIVE_HIGH, "SW1:!1")
+	PORT_DIPNAME( 0x0002,	0x0000, "Credits to Start" )	PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)	PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(		0x0000, "1" )					PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0002, "2" )					PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
-	PORT_DIPNAME( 0x0002,	0x0000, "Joystick Mode" )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x0002,	0x0000, "Joystick Mode" )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)		PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0002, "90 degrees ACW" )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
-	PORT_DIPNAME( 0x001c,	0x0000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPNAME( 0x001c,	0x0000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!3,!4,!5")
 	PORT_DIPSETTING(		0x0018, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(		0x0014, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(		0x0010, DEF_STR( 2C_1C ) )
@@ -2762,7 +2679,7 @@ static INPUT_PORTS_START( batrider )
 	PORT_DIPSETTING(		0x0008, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(		0x000c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(		0x001c, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x00e0,	0x0000, DEF_STR( Coin_B ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)	PORT_DIPLOCATION("SW1:6,7,8")
+	PORT_DIPNAME( 0x00e0,	0x0000, DEF_STR( Coin_B ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)	PORT_DIPLOCATION("SW1:!6,!7,!8")
 	PORT_DIPSETTING(		0x00c0, DEF_STR( 4C_1C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x00a0, DEF_STR( 3C_1C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0080, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
@@ -2772,68 +2689,68 @@ static INPUT_PORTS_START( batrider )
 	PORT_DIPSETTING(		0x0040, DEF_STR( 1C_3C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0060, DEF_STR( 1C_4C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	// When Coin_A is set to Free_Play, Coin_A becomes Coin_A and Coin_B, and the following dips occur
-	PORT_DIPNAME( 0x0020,	0x0000, "Hit Score" )			PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0020,	0x0000, "Hit Score" )			PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0020, DEF_STR( On ) )			PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
-	PORT_DIPNAME( 0x0040,	0x0000, "Sound Effect" )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Sound Effect" )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )			PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
-	PORT_DIPNAME( 0x0080,	0x0000, "Music" )				PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080,	0x0000, "Music" )				PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0080, DEF_STR( On ) )			PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
-	PORT_DIPNAME( 0x0300,	0x0000, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(		0x0300, DEF_STR( Hardest ) )
-	PORT_DIPSETTING(		0x0200, DEF_STR( Hard ) )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x0300,	0x0000, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:!1,!2")
 	PORT_DIPSETTING(		0x0100, DEF_STR( Easy ) )
-	PORT_DIPNAME( 0x0c00,	0x0000, "Timer" )				PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(		0x0200, DEF_STR( Hard ) )
+	PORT_DIPSETTING(		0x0300, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x0c00,	0x0000, "Timer" )				PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(		0x0c00, DEF_STR( Highest ) )
 	PORT_DIPSETTING(		0x0800, DEF_STR( High ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0400, DEF_STR( Low ) )
-	PORT_DIPNAME( 0x3000,	0x0000, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x3000,	0x0000, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(		0x3000, "1" )
 	PORT_DIPSETTING(		0x2000, "2" )
 	PORT_DIPSETTING(		0x0000, "3" )
 	PORT_DIPSETTING(		0x1000, "4" )
-	PORT_DIPNAME( 0xc000,	0x0000, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc000,	0x0000, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:!7,!8")
 	PORT_DIPSETTING(		0xc000, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x8000, "Every 2000k" )
 	PORT_DIPSETTING(		0x0000, "Every 1500k" )
 	PORT_DIPSETTING(		0x4000, "Every 1000k" )
 
 	PORT_START("SYS-DSW")	// Coin/System and DSWC
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )	// Service
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SERVICE2 )	// Test
+	TOAPLAN_TEST_SWITCH( 0x0004, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x0100,	0x0000, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x0100,	0x0000, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0100, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200,	0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x0200,	0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW3:!2")
 	PORT_DIPSETTING(		0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400,	0x0000, "Stage Edit" )				PORT_DIPLOCATION("SW3:3")
+	PORT_DIPNAME( 0x0400,	0x0000, "Stage Edit" )				PORT_DIPLOCATION("SW3:!3")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW3:4")
+	PORT_DIPNAME( 0x0800,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW3:!4")
 	PORT_DIPSETTING(		0x0800, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x1000,	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW3:5")
+	PORT_DIPNAME( 0x1000,	0x0000, "Invulnerability (Cheat)" )			PORT_DIPLOCATION("SW3:!5")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x1000, DEF_STR( On ) )
 	// These dips are shown only when Coin_A is set to Free_Play, but they work in normal play mode too
-	PORT_DIPNAME( 0x2000,	0x0000, "Guest Players" )			PORT_DIPLOCATION("SW3:6")
+	PORT_DIPNAME( 0x2000,	0x0000, "Guest Players" )			PORT_DIPLOCATION("SW3:!6")
 	PORT_DIPSETTING(		0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000,	0x0000, "Player Select" )			PORT_DIPLOCATION("SW3:7")
+	PORT_DIPNAME( 0x4000,	0x0000, "Player Select" )			PORT_DIPLOCATION("SW3:!7")
 	PORT_DIPSETTING(		0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000,	0x0000, "Special Course" )			PORT_DIPLOCATION("SW3:8")
+	PORT_DIPNAME( 0x8000,	0x0000, "Special Course" )			PORT_DIPLOCATION("SW3:!8")
 	PORT_DIPSETTING(		0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2844,13 +2761,13 @@ static INPUT_PORTS_START( batriderj )
 
 	PORT_MODIFY("SYS-DSW")	// Coin/System and DSWC
 	// These dips are shown only when Coin_A is set to Free_Play, but they work in normal play mode too
-	PORT_DIPNAME( 0x2000,	0x0000, "Guest Players" )			PORT_DIPLOCATION("SW3:6")
+	PORT_DIPNAME( 0x2000,	0x0000, "Guest Players" )			PORT_DIPLOCATION("SW3:!6")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x2000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000,	0x0000, "Player Select" )			PORT_DIPLOCATION("SW3:7")
+	PORT_DIPNAME( 0x4000,	0x0000, "Player Select" )			PORT_DIPLOCATION("SW3:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000,	0x0000, "Special Course" )			PORT_DIPLOCATION("SW3:8")
+	PORT_DIPNAME( 0x8000,	0x0000, "Special Course" )			PORT_DIPLOCATION("SW3:!8")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x8000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2875,14 +2792,14 @@ static INPUT_PORTS_START( bbakraid )
 	PORT_BIT( 0x8080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")		// DSWA and DSWB
-	PORT_SERVICE_DIPLOC(0x0001, IP_ACTIVE_HIGH, "SW1:1")
-	PORT_DIPNAME( 0x0002,	0x0000, "Credits to Start" )	PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)	PORT_DIPLOCATION("SW1:2")
+	PORT_SERVICE_DIPLOC(0x0001, IP_ACTIVE_HIGH, "SW1:!1")
+	PORT_DIPNAME( 0x0002,	0x0000, "Credits to Start" )	PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)	PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(		0x0000, "1" )					PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0002, "2" )					PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
-	PORT_DIPNAME( 0x0002,	0x0000, "Joystick Mode" )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x0002,	0x0000, "Joystick Mode" )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)		PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0002, "90 degrees ACW" )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
-	PORT_DIPNAME( 0x001c,	0x0000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPNAME( 0x001c,	0x0000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!3,!4,!5")
 	PORT_DIPSETTING(		0x0018, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(		0x0014, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(		0x0010, DEF_STR( 2C_1C ) )
@@ -2891,7 +2808,7 @@ static INPUT_PORTS_START( bbakraid )
 	PORT_DIPSETTING(		0x0008, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(		0x000c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(		0x001c, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x00e0,	0x0000, DEF_STR( Coin_B ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)	PORT_DIPLOCATION("SW1:6,7,8")
+	PORT_DIPNAME( 0x00e0,	0x0000, DEF_STR( Coin_B ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)	PORT_DIPLOCATION("SW1:!6,!7,!8")
 	PORT_DIPSETTING(		0x00c0, DEF_STR( 4C_1C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x00a0, DEF_STR( 3C_1C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0080, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
@@ -2901,67 +2818,67 @@ static INPUT_PORTS_START( bbakraid )
 	PORT_DIPSETTING(		0x0040, DEF_STR( 1C_3C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0060, DEF_STR( 1C_4C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	// When Coin_A is set to Free_Play, Coin_A becomes Coin_A and Coin_B, and the following dips occur
-	PORT_DIPNAME( 0x0020,	0x0000, "Hit Score" )			PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0020,	0x0000, "Hit Score" )			PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0020, DEF_STR( On ) )			PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
-	PORT_DIPNAME( 0x0040,	0x0000, "Sound Effect" )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x0040,	0x0000, "Sound Effect" )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )			PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
-	PORT_DIPNAME( 0x0080,	0x0000, "Music" )				PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080,	0x0000, "Music" )				PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0080, DEF_STR( On ) )			PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
-	PORT_DIPNAME( 0x0300,	0x0000, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(		0x0300, DEF_STR( Hardest ) )
-	PORT_DIPSETTING(		0x0200, DEF_STR( Hard ) )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x0300,	0x0000, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:!1,!2")
 	PORT_DIPSETTING(		0x0100, DEF_STR( Easy ) )
-	PORT_DIPNAME( 0x0c00,	0x0000, "Timer" )				PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(		0x0200, DEF_STR( Hard ) )
+	PORT_DIPSETTING(		0x0300, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x0c00,	0x0000, "Timer" )				PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(		0x0c00, DEF_STR( Highest ) )
 	PORT_DIPSETTING(		0x0800, DEF_STR( High ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0400, DEF_STR( Low ) )
-	PORT_DIPNAME( 0x3000,	0x0000, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x3000,	0x0000, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(		0x3000, "1" )
 	PORT_DIPSETTING(		0x2000, "2" )
 	PORT_DIPSETTING(		0x0000, "3" )
 	PORT_DIPSETTING(		0x1000, "4" )
-	PORT_DIPNAME( 0xc000,	0x0000, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc000,	0x0000, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:!7,!8")
 	PORT_DIPSETTING(		0xc000, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x8000, "Every 4000k" )
 	PORT_DIPSETTING(		0x4000, "Every 3000k" )
 	PORT_DIPSETTING(		0x0000, "Every 2000k" )
 
 	PORT_START("SYS-DSW")	// Coin/System and DSW-3
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )	// Service
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SERVICE2 )	// Test
+	TOAPLAN_TEST_SWITCH( 0x04, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_DIPNAME( 0x0100,	0x0000, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
+	PORT_DIPNAME( 0x0100,	0x0000, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:!1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0100, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200,	0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x0200,	0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW3:!2")
 	PORT_DIPSETTING(		0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400,	0x0000, "Stage Edit" )				PORT_DIPLOCATION("SW3:3")
+	PORT_DIPNAME( 0x0400,	0x0000, "Stage Edit" )				PORT_DIPLOCATION("SW3:!3")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW3:4")
+	PORT_DIPNAME( 0x0800,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW3:!4")
 	PORT_DIPSETTING(		0x0800, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x1000,	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW3:5")
+	PORT_DIPNAME( 0x1000,	0x0000, "Invulnerability (Cheat)" )			PORT_DIPLOCATION("SW3:!5")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000,	0x0000, "Save Scores" )				PORT_DIPLOCATION("SW3:6")
+	PORT_DIPNAME( 0x2000,	0x0000, "Save Scores" )				PORT_DIPLOCATION("SW3:!6")
 	PORT_DIPSETTING(		0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000,	0x0000, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW3:7")
+	PORT_DIPNAME( 0x4000,	0x0000, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW3:!7")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000,	0x0000, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW3:8")
+	PORT_DIPNAME( 0x8000,	0x0000, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW3:!8")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x8000, DEF_STR( On ) )
 
@@ -5212,7 +5129,7 @@ GAME( 1993, vfive,      grindstm, vfive,    vfive,      vfive,   ROT270, "Toapla
 
 GAME( 1993, batsugun,   0,        batsugun, batsugun,   dogyuun, ROT270, "Toaplan", "Batsugun", GAME_SUPPORTS_SAVE )
 GAME( 1993, batsuguna,  batsugun, batsugun, batsugun,   dogyuun, ROT270, "Toaplan", "Batsugun (older set)", GAME_SUPPORTS_SAVE )
-GAME( 1993, batsugunsp, batsugun, batsugun, batsugunsp, dogyuun, ROT270, "Toaplan", "Batsugun - Special Version", GAME_SUPPORTS_SAVE )
+GAME( 1993, batsugunsp, batsugun, batsugun, batsugun,   dogyuun, ROT270, "Toaplan", "Batsugun - Special Version", GAME_SUPPORTS_SAVE )
 
 GAME( 1994, snowbro2,   0,        snowbro2, snowbro2,   0,       ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
 

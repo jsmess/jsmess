@@ -4,14 +4,24 @@
  * todo (ordered by importance):
  *
  * - emulate slave dsp!
- * - emulate spot
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
  * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit
  *       (is this related to dsp? or cpu?)
- * - eliminate sprite garbage in airco22b: find out how/where vics num_sprites is determined exactly, or is it linktable related?
- * - window clipping (acedrvrw, victlapw)
- * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
- *       (probably a bug in rgbint, not here?)
+ * - find out how/where vics num_sprites is determined exactly, it causes major sprite problems in airco22b
+ *       dirtdash would have this issue too, if not for the current workaround
+ * - improve ss22 fogging:
+ *       + scene changes too rapidly sometimes, eg. dirtdash snow level finish (see attract), or aquajet going down the waterfall
+ *       + 100% fog if you start dirtdash at the hill level
+ * - improve ss22 lighting, eg. mountains in alpinr2b selection screen
+ * - improve ss22 spot:
+ *       + dirtdash spotlight is opaque for a short time when exiting the jungle level
+ *       + dirtdash speedometer has wrong colors when in the jungle level
+ *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level (possibly just a game bug)
+ * - window clipping is wrong in acedrvrw, victlapw
+ * - ridgerac waving flag title screen is missing, just an empty beach scenery instead
+ * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
+ * - dirtdash polys are broken at the start section of the mountain level
+ * - alpinr2b skiier selection screen should have mirrored models (easiest to see with cursor on the red pants guy)
  * - propcycl scoreboard sprite part should fade out in attract mode and just before game over, fader or fog related?
  * - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
  *       czram contents is rather odd here and partly cleared (probably the cause?):
@@ -20,6 +30,8 @@
  *        $1000-$19ff   - $00, huh!? (it's specifically cleared, memsetting czram at boot does not fix the issue)
  *        $1a00-$0dff   - $77
  *        $1e00-$1fff   - $78
+ * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
+ *       (probably a bug in rgbint, not here?)
  *
  * - lots of smaller issues
  *
@@ -118,7 +130,7 @@ static struct
 	int gFadeColor;
 	int bFadeColor;
 	int fadeFactor;
-	int spot_translucency;
+	int spot_limit;
 	int poly_translucency;
 	int palBase;
 } mixer;
@@ -168,8 +180,8 @@ UpdateVideoMixer( running_machine &machine )
     08,09,0a        background color
     0b
     0c
-    0d              spot related?
-    0e
+    0d              spot factor limit value
+    0e              enable spot factor limit
     0f
     10
     11              global polygon alpha factor
@@ -179,7 +191,7 @@ UpdateVideoMixer( running_machine &machine )
     16,17,18        global fade rgb
     19              global fade factor
     1a              fade target flags
-    1b              textlayer palette base?
+    1b              textlayer palette base
     1c
     1d
     1e
@@ -191,6 +203,7 @@ UpdateVideoMixer( running_machine &machine )
 		mixer.rFogColor         = nthbyte( state->m_gamma, 0x05 );
 		mixer.gFogColor         = nthbyte( state->m_gamma, 0x06 );
 		mixer.bFogColor         = nthbyte( state->m_gamma, 0x07 );
+		mixer.spot_limit        = nthbyte( state->m_gamma, 0x0d );
 		mixer.poly_translucency = nthbyte( state->m_gamma, 0x11 );
 		mixer.rFadeColor        = nthbyte( state->m_gamma, 0x16 );
 		mixer.gFadeColor        = nthbyte( state->m_gamma, 0x17 );
@@ -198,6 +211,11 @@ UpdateVideoMixer( running_machine &machine )
 		mixer.fadeFactor        = nthbyte( state->m_gamma, 0x19 );
 		mixer.flags             = nthbyte( state->m_gamma, 0x1a );
 		mixer.palBase           = nthbyte( state->m_gamma, 0x1b ) & 0x7f;
+
+		// put spot-specific flags into high word
+		mixer.flags |= state->m_spot_enable << 16;
+		mixer.flags |= (nthbyte(state->m_gamma, 0x0e) & 1) << 17;
+		mixer.flags |= (state->m_chipselect & 0xc000) << 4;
 	}
 	else
 	{
@@ -624,7 +642,7 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_t *bitmap, int text
 
         */
 
-		/*  czattr:
+		/*  czattr: - assumed that it's write-only
                0    2    4    6    8    a    c    e
             ^^^^ ^^^^ ^^^^ ^^^^                        cz offset, signed16 per cztype 0,1,2,3
                                 ^^^^                   flags, nybble per cztype 3,2,1,0 - 4 probably means enable
@@ -1391,12 +1409,10 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
     */
 	UINT32 zsortvalue24 = ((pSource[1]&0xfff)<<12)|(pSource[0]&0xfff);
 	struct SceneNode *node = NewSceneNode(machine, zsortvalue24, eSCENENODE_QUAD3D);
-	int i;
-	node->data.quad3d.cz_adjust = state->m_cz_adjust;
-	node->data.quad3d.flags = (pSource[3]<<6&0x1fff00) | (~pSource[3]&3);
-	node->data.quad3d.color = (pSource[2]&0xff00)>>8;
+	int i, cztype = pSource[3]&3;
 	if( state->m_mbSuperSystem22 )
 	{
+		cztype ^= 3; // ? not sure, but this makes testmode look like on a pcb (only 1 pcb checked)
 		node->data.quad3d.cmode       = (pSource[2]&0x00f0)>>4;
 		node->data.quad3d.textureBank = (pSource[2]&0x000f);
 	}
@@ -1405,6 +1421,9 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 		node->data.quad3d.cmode       = (pSource[0+4]&0xf000)>>12;
 		node->data.quad3d.textureBank = (pSource[1+4]&0xf000)>>12;
 	}
+	node->data.quad3d.cz_adjust = state->m_cz_adjust;
+	node->data.quad3d.flags = (pSource[3]<<6&0x1fff00) | cztype;
+	node->data.quad3d.color = (pSource[2]&0xff00)>>8;
 	pSource += 4;
 	for( i=0; i<4; i++ )
 	{
@@ -1698,21 +1717,27 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 
 	/* VICS RAM provides two additional banks (also many unknown regs here) */
 	/*
-    0x940000 -x------       sprite chip busy
+    0x940000 -x------       sprite chip busy?
     0x940018 xxxx----       clr.w   $940018.l
 
     0x940030 xxxxxxxx       0x0600000 - enable bits?
     0x940034 xxxxxxxx       0x3070b0f
 
-    0x940040 xxxxxxxx       sprite attribute size
-    0x940048 xxxxxxxx       sprite attribute list baseaddr
-    0x940050 xxxxxxxx       sprite color size
-    0x940058 xxxxxxxx       sprite color list baseaddr
+    0x940040 xxxxxxxx       sprite attribute size             high bit means busy?
+    0x940048 xxxxxxxx       sprite attribute list baseaddr    high bit means busy?
+    0x940050 xxxxxxxx       sprite color size                 high bit means busy?
+    0x940058 xxxxxxxx       sprite color list baseaddr        high bit means busy?
 
     0x940060..0x94007c      set#2
     */
 
+	// where do the games store the number of sprites to be processed by vics???
+	// the current default implementation (using spritelist size) is clearly wrong and causes problems in dirtdash and airco22b
 	num_sprites = state->m_vics_control[0x40/4] >> 4 & 0x1ff; // no +1
+
+	// dirtdash sprite list starts at xxx4, number of sprites is stored in xxx0, it doesn't use set#2
+	if (state->m_gametype == NAMCOS22_DIRT_DASH) num_sprites = (state->m_vics_data[(state->m_vics_control[0x48/4]&0x4000)/4] & 0xff) + 1;
+
 	if( num_sprites > 0 )
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4];
@@ -1728,6 +1753,38 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
 		DrawSpritesHelper( machine, bitmap, cliprect, spriteram32, pSource, pPal, num_sprites, deltax, deltay, y_lowres );
 	}
 } /* DrawSprites */
+
+READ32_HANDLER( namcos22s_vics_control_r )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	UINT32 ret = state->m_vics_control[offset];
+
+	switch (offset*4)
+	{
+		// reg 0, status register?
+		// high byte is read in timecris and lower half is expected to be 0
+		case 0x00:
+			ret = 0;
+			break;
+
+		// sprite attr/color size regs: high bit is busy/ready?
+		// dirtdash reads these and waits for it to become 0
+		case 0x40: case 0x50: case 0x60: case 0x70:
+			ret &= 0x7fffffff;
+			break;
+
+		default:
+			break;
+	}
+	return ret;
+}
+
+WRITE32_HANDLER( namcos22s_vics_control_w )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	COMBINE_DATA(&state->m_vics_control[offset]);
+}
+
 
 static void UpdatePalette(running_machine &machine)
 {
@@ -1785,12 +1842,13 @@ READ32_HANDLER( namcos22_tilemapattr_r )
 	{
 		case 2:
 		{
-			UINT16 lo,hi = state->m_tilemapattr[offset] & 0xffff0000;
+			UINT16 lo,hi = (state->m_tilemapattr[offset] & 0xffff0000) >> 16;
 			// assume current scanline, 0x1ff if in vblank (used in alpinesa)
 			// or maybe relative to posirq?
 			if (space->machine().primary_screen->vblank()) lo = 0x1ff;
 			else lo = space->machine().primary_screen->vpos() >> 1;
-			return hi|lo;
+			// dirtdash has slowdowns if high bit is clear, why??
+			return hi<<16 | lo | 0x8000;
 		}
 
 		case 3:
@@ -1822,6 +1880,83 @@ WRITE32_HANDLER( namcos22_tilemapattr_w )
 //  popmessage("%08x\n%08x\n%08x\n%08x\n",state->m_tilemapattr[0],state->m_tilemapattr[1],state->m_tilemapattr[2],state->m_tilemapattr[3]);
 }
 
+
+/**
+ * Spot RAM affects how the text layer is blended with the scene, it is not yet known exactly how.
+ * It isn't directly memory mapped, but rather ports are used to populate and poll it.
+ *
+ * See Time Crisis "SPOT RAM" self test for sample use, maybe also used in-game, but where?
+ * It is also used in Dirt Dash night section. Other games don't seem to use it.
+ *
+ * 0x860000: set read and write address (TRUSTED by Tokyo Wars POST)
+ * 0x860002: write data
+ * 0x860004: read data
+ * 0x860006: enable
+*/
+
+// tokyowar and timecris test ram 000-4ff, but the only practically usable part seems to be 000-3ff
+#define SPOTRAM_SIZE (0x800)
+
+/*
+RAM looks like it is a 256 * 4 words table
+testmode:
+ offs: 0000 0001 0002 0003 - 03f4 03f5 03f6 03f7 03f8 03f9 03fa 03fb 03fc 03fd 03fe 03ff
+ data: 00fe 00fe 00fe 00fe - 0001 0001 0001 0001 0000 0000 0000 0000 ffff ffff ffff ffff
+
+is the high byte of each word used? it's usually 00, and in dirtdash always 02
+
+low byte of each word:
+ byte 0 looks like a blend factor
+ bytes 1,2,3 a secondary brightness factor per rgb channel(?)
+
+*/
+
+READ32_HANDLER( namcos22s_spotram_r )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	if (offset == 1)
+	{
+		// read
+		if (state->m_spot_read_address >= SPOTRAM_SIZE)
+		{
+			state->m_spot_read_address = 0;
+		}
+		return state->m_spotram[state->m_spot_read_address++] << 16;
+	}
+	return 0;
+}
+
+WRITE32_HANDLER( namcos22s_spotram_w )
+{
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	if (offset == 0)
+	{
+		if (ACCESSING_BITS_16_31)
+		{
+			// set address
+			state->m_spot_read_address  = data>>(16+1);
+			state->m_spot_write_address = data>>(16+1);
+		}
+		else
+		{
+			// write
+			if (state->m_spot_write_address >= SPOTRAM_SIZE)
+			{
+				state->m_spot_write_address = 0;
+			}
+			state->m_spotram[state->m_spot_write_address++] = data;
+		}
+	}
+	else
+	{
+		if (ACCESSING_BITS_0_15)
+		{
+			// enable
+			state->m_spot_enable = data & 1;
+		}
+	}
+}
+
 static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int prival )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
@@ -1831,15 +1966,21 @@ static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap,
 	UINT8 *pri;
 	int x,y;
 
-	// prepare fader and alpha
+	// prepare alpha
 	UINT8 alpha_check12 = nthbyte(state->m_gamma, 0x12);
 	UINT8 alpha_check13 = nthbyte(state->m_gamma, 0x13);
-	UINT8 alpha_mask = nthbyte(state->m_gamma, 0x14);
-	UINT8 alpha_factor = nthbyte(state->m_gamma, 0x15);
+	UINT8 alpha_mask    = nthbyte(state->m_gamma, 0x14);
+	UINT8 alpha_factor  = nthbyte(state->m_gamma, 0x15);
+
+	// prepare spot
+	int spot_flags = mixer.flags >> 16;
+	bool spot_enabled = spot_flags&1 && spot_flags&0xc;
+	int spot_limit = (spot_flags&2) ? mixer.spot_limit : 0xff;
+
+	// prepare fader
 	bool fade_enabled = mixer.flags&2 && mixer.fadeFactor;
 	int fade_factor = 0xff - mixer.fadeFactor;
 	rgbint fade_color;
-
 	rgb_comp_to_rgbint(&fade_color, mixer.rFadeColor, mixer.gFadeColor, mixer.bFadeColor);
 
 	// mix textlayer with poly/sprites
@@ -1866,6 +2007,29 @@ static void namcos22s_mix_textlayer( running_machine &machine, bitmap_t *bitmap,
 						rgb_to_rgbint(&mix, dest[x]);
 						rgbint_blend(&rgb, &mix, 0xff - alpha_factor);
 					}
+				}
+
+				// apply spot
+				if (spot_enabled)
+				{
+					UINT8 pen = src[x]&0xff;
+					rgbint mix;
+					rgb_to_rgbint(&mix, dest[x]);
+					if (spot_flags & 8)
+					{
+						// mix with per-channel brightness
+						rgbint shade;
+						rgb_comp_to_rgbint(&shade,
+							(0xff - (state->m_spotram[pen<<2|1] & 0xff)) << 2,
+							(0xff - (state->m_spotram[pen<<2|2] & 0xff)) << 2,
+							(0xff - (state->m_spotram[pen<<2|3] & 0xff)) << 2
+						);
+						rgbint_scale_channel_and_clamp(&mix, &shade);
+					}
+
+					int spot_factor = 0xff - (state->m_spotram[pen<<2] & 0xff);
+					if (spot_factor < spot_limit)
+						rgbint_blend(&rgb, &mix, spot_factor);
 				}
 
 				if (fade_enabled)
@@ -2629,6 +2793,10 @@ VIDEO_START( namcos22s )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	state->m_mbSuperSystem22 = 1;
 
+	// init spotram
+	state->m_spotram = auto_alloc_array(machine, UINT16, SPOTRAM_SIZE);
+	memset(state->m_spotram, 0, SPOTRAM_SIZE*2);
+
 	// init czram tables
 	int table;
 	for (table=0; table<4; table++)
@@ -2680,6 +2848,7 @@ SCREEN_UPDATE( namcos22s )
 		{
 			address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
+			if (1) // czram
 			{
 				int i,bank;
 				for( bank=0; bank<4; bank++ )
@@ -2691,6 +2860,18 @@ SCREEN_UPDATE( namcos22s )
 					}
 					fprintf( f, "\n" );
 				}
+				fprintf( f, "\n" );
+			}
+
+			if (0) // spotram
+			{
+				int i;
+				fprintf(f, "spotram:\n");
+				for (i=0; i<256; i++)
+				{
+					fprintf(f, "%02X: %04X %04X %04X %04X\n", i, state->m_spotram[i*4+0], state->m_spotram[i*4+1], state->m_spotram[i*4+2], state->m_spotram[i*4+3]);
+				}
+				fprintf(f, "\n");
 			}
 
 			Dump(space, f,0x810000, 0x81000f, "cz attr" );
@@ -2803,60 +2984,3 @@ WRITE16_HANDLER( namcos22_dspram16_w )
 	}
 	state->m_polygonram[offset] = (hi<<16)|lo;
 } /* namcos22_dspram16_w */
-
-/**
- * 4038 spot enable?
- * 0828 pre-initialization
- * 0838 post-initialization
- **********************************************
- * upload:
- *   #bits data
- *    0010 FEC0
- *    0010 FF10
- *    0004 0004
- *    0004 000E
- *    0003 0007
- *    0002 0002
- *    0002 0003
- *    0001 0001
- *    0001 0001
- *    0001 0000
- *    0001 0001
- *    0001 0001
- *    0001 0000
- *    0001 0000
- *    0001 0000
- *    0001 0001
- **********************************************
- *    0008 00EA // 0x0ff
- *    000A 0364 // 0x3ff
- *    000A 027F // 0x3ff
- *    0003 0005 // 0x007
- *    0001 0001 // 0x001
- *    0001 0001 // 0x001
- *    0001 0001 // 0x001
- **********************************************
- * SPOT TABLE test:
- 03F282: 13FC 0000 0082 4011        move.b  #$0, $824011.l
- 03F28A: 13FC 0000 0082 4015        move.b  #$0, $824015.l
- 03F292: 13FC 0080 0082 400D        move.b  #$80, $82400d.l
- 03F29A: 13FC 0001 0082 400E        move.b  #$1, $82400e.l
- 03F2A2: 13FC 0001 0082 4021        move.b  #$1, $824021.l
- 03F2AA: 33FC 4038 0080 0000        move.w  #$4038, $800000.l
- 03F2B2: 06B9 0000 0001 00E0 AB08   addi.l  #$1, $e0ab08.l
-*/
-WRITE32_HANDLER(namcos22_port800000_w)
-{
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	/* 00000011011111110000100011111111001001111110111110110001 */
-	UINT16 word = data>>16;
-	logerror( "%x: C304/C399: 0x%04x\n", cpu_get_previouspc(&space->device()), word );
-	if( word == 0x4038 )
-	{
-		state->m_mbSpotlightEnable = 1;
-	}
-	else
-	{
-		state->m_mbSpotlightEnable = 0;
-	}
-} /* namcos22_port800000_w */
