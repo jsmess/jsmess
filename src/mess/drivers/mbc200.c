@@ -17,7 +17,7 @@
 		TODO:
 		- Master-Slave hand-shaking thru PPI8255 doesn't work properly
 		  (checks if bit 7 is high on master side, you appaently can't do
-		   that with current core(s))
+		   that with current core(s)), kludged to work for now.
 
         31/10/2011 Skeleton driver.
 
@@ -40,6 +40,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_6845(*this, "crtc"),
 		m_fdc(*this, "fdc"),
+		m_ppi(*this, "ppi8255_2"),
 		m_floppy0(*this, FLOPPY_0),
 		m_floppy1(*this, FLOPPY_1)
 	{ }
@@ -48,13 +49,16 @@ public:
 
 	required_device<mc6845_device> m_6845;
 	required_device<device_t> m_fdc;
+	required_device<i8255_device> m_ppi;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
 
 	DECLARE_READ8_MEMBER(from_master_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_READ8_MEMBER(ppi_hs_r);
 
-	UINT8 m_hs;
+	UINT8 m_hs_bit;
+	UINT8 m_comm_latch;
 	UINT8 *m_vram;
 
 };
@@ -66,12 +70,18 @@ static ADDRESS_MAP_START(mbc200_mem, AS_PROGRAM, 8, mbc200_state)
 	AM_RANGE( 0x1000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
+READ8_MEMBER( mbc200_state::ppi_hs_r )
+{
+	return (m_ppi->read(space, 2) & 0x7f) | m_hs_bit;
+}
+
 static ADDRESS_MAP_START( mbc200_io , AS_IO, 8, mbc200_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE("i8251_1", i8251_device, data_r, data_w)
 	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("i8251_1", i8251_device, status_r, control_w)
 	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE_LEGACY("fdc", wd17xx_r, wd17xx_w)
+	AM_RANGE(0xea, 0xea) AM_READ(ppi_hs_r)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0xec, 0xec) AM_DEVREADWRITE("i8251_2", i8251_device, data_r, data_w)
 	AM_RANGE(0xed, 0xed) AM_DEVREADWRITE("i8251_2", i8251_device, status_r, control_w)
@@ -90,8 +100,9 @@ READ8_MEMBER(mbc200_state::from_master_r)
 {
 	UINT8 tmp;
 	machine().scheduler().synchronize(); // force resync
-	tmp = m_hs;
-	m_hs = 0;
+	tmp = m_comm_latch;
+	m_comm_latch = 0;
+	m_hs_bit |= 0x80;
 	return tmp;
 }
 
@@ -101,7 +112,7 @@ static ADDRESS_MAP_START( mbc200_sub_io , AS_IO, 8, mbc200_state)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xb0, 0xb0) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xb1, 0xb1) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-//	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)
+//	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0xd0, 0xd0) AM_READ(from_master_r)
 ADDRESS_MAP_END
 
@@ -140,7 +151,32 @@ static VIDEO_START( mbc200 )
 
 static SCREEN_UPDATE( mbc200 )
 {
-	/* TODO: video emulation is annoyingly twiddled ... */
+	mbc200_state *state = screen->machine().driver_data<mbc200_state>();
+	int x,y,xi,yi;
+	int count;
+
+	count = 0;
+
+	for(y=0;y<100;y++)
+	{
+		for(x=0;x<80;x++)
+		{
+			for(yi=0;yi<4;yi++)
+			{
+				for(xi=0;xi<8;xi++)
+				{
+					UINT8 dot;
+					dot = (state->m_vram[count] >> (7-xi)) & 1;
+
+					if(y*4+yi < 400 && x*8+xi < 640) /* TODO: safety check */
+						*BITMAP_ADDR16(bitmap, y*4+yi, x*8+xi) = screen->machine().pens[dot];
+				}
+
+				count++;
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -159,7 +195,8 @@ WRITE8_MEMBER( mbc200_state::porta_w )
 {
 	machine().scheduler().synchronize(); // force resync
 	printf("A %02x %c\n",data,data);
-	m_hs = data; // to slave CPU
+	m_comm_latch = data; // to slave CPU
+	m_hs_bit &= ~0x80;
 }
 
 static I8255_INTERFACE( mbc200_ppi8255_interface_2 )
