@@ -89,21 +89,13 @@ const rom_entry *wdxt_gen_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( wd1015_mem )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( wd1015_mem, AS_PROGRAM, 8, wdxt_gen_device )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION(WD1015_TAG, 0)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
 //  ADDRESS_MAP( wd1015_io )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( wd1015_io, AS_IO, 8, wdxt_gen_device )
 	AM_RANGE(0x00, 0xff) AM_DEVREADWRITE(WD11C00_17_TAG, wd11c00_17_device, read, write)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(wd1015_t0_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(wd1015_t1_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(wd1015_p1_r, wd1015_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(wd1015_p2_w)
 ADDRESS_MAP_END
@@ -181,8 +173,7 @@ static WD2010_INTERFACE( hdc_intf )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( wdxt_gen )
-	MCFG_CPU_ADD(WD1015_TAG, I8048, 5000000)
-	MCFG_CPU_PROGRAM_MAP(wd1015_mem)
+	MCFG_CPU_ADD(WD1015_TAG, I8049, 5000000)
 	MCFG_CPU_IO_MAP(wd1015_io)
 
 	MCFG_WD11C00_17_ADD(WD11C00_17_TAG, 5000000, host_intf)
@@ -281,6 +272,16 @@ bool wdxt_gen_device::have_dack(int line)
 
 READ8_MEMBER( wdxt_gen_device::wd1015_t0_r )
 {
+	return m_host->busy_r();
+}
+
+
+//-------------------------------------------------
+//  wd1015_t1_r -
+//-------------------------------------------------
+
+READ8_MEMBER( wdxt_gen_device::wd1015_t1_r )
+{
 	return 0; // TODO
 }
 
@@ -320,18 +321,18 @@ WRITE8_MEMBER( wdxt_gen_device::wd1015_p1_w )
 
         bit     description
 
-        P10     
-        P11     
-        P12     
-        P13     
-        P14     
+        P10     HSEL0
+        P11     HSEL1
+        P12     HSEL2
+        P13     DSEL0
+        P14     DSEL1
         P15     
-        P16     
+        P16     STEP?
         P17     
 
     */
 
-	logerror("P1 %02x\n", data);
+	logerror("%s P1 %02x\n", machine().describe_context(), data);
 }
 
 
@@ -356,7 +357,7 @@ WRITE8_MEMBER( wdxt_gen_device::wd1015_p2_w )
 
     */
 	
-	logerror("P2 %02x\n", data);
+	logerror("%s P2 %02x\n", machine().describe_context(), data);
 	
 	m_host->clct_w(BIT(data, 4));
 }

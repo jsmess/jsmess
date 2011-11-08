@@ -77,6 +77,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cd_w );
 	DECLARE_WRITE_LINE_MEMBER( clct_w );
 
+	DECLARE_READ_LINE_MEMBER( busy_r );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
