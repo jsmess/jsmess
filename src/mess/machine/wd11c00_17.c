@@ -84,7 +84,7 @@ inline void wd11c00_17_device::check_interrupt()
 {
 	int irq = ((m_status & STATUS_IRQ) && (m_mask & MASK_IRQ)) ? ASSERT_LINE : CLEAR_LINE;
 	int drq = ((m_status & STATUS_DRQ) && (m_mask & MASK_DMA)) ? ASSERT_LINE : CLEAR_LINE;
-	int busy = (m_status & STATUS_BUSY) ? ASSERT_LINE : CLEAR_LINE;
+	int busy = (m_status & STATUS_BUSY) ? 0 : 1;
 	int req = (m_status & STATUS_REQ) ? ASSERT_LINE : CLEAR_LINE;
 	
 	m_out_irq5_func(irq);
@@ -323,7 +323,9 @@ READ8_MEMBER( wd11c00_17_device::read )
 	switch (offset)
 	{
 	case 0x00:
+		if (LOG) logerror("%s WD11C00-17 '%s' Read RAM %03x:", machine().describe_context(), tag(), m_ra);
 		data = read_data();
+		if (LOG) logerror("%02x\n", data);
 		break;
 		
 	case 0x20:
@@ -344,6 +346,7 @@ WRITE8_MEMBER( wd11c00_17_device::write )
 	switch (offset)
 	{
 	case 0x00:
+		if (LOG) logerror("%s WD11C00-17 '%s' Write RAM %03x:%02x\n", machine().describe_context(), tag(), m_ra, data);
 		write_data(data);
 		break;
 		
@@ -352,6 +355,7 @@ WRITE8_MEMBER( wd11c00_17_device::write )
 		break;
 		
 	case 0x60:
+		if (LOG) logerror("%s WD11C00-17 '%s' RA %01x\n", machine().describe_context(), tag(), data & 0x07);
 		m_ra = ((data & 0x07) << 8) | (m_ra & 0xff);
 		break;
 	}
@@ -406,4 +410,14 @@ WRITE_LINE_MEMBER( wd11c00_17_device::clct_w )
 	{
 		m_ra &= 0xff00;
 	}
+}
+
+
+//-------------------------------------------------
+//  busy_r -
+//-------------------------------------------------
+	
+READ_LINE_MEMBER( wd11c00_17_device::busy_r )
+{
+	return (m_status & STATUS_BUSY) ? 0 : 1;
 }
