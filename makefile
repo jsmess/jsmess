@@ -224,7 +224,7 @@ BUILD_JPEGLIB = 1
 
 # specify symbols level or leave commented to use the default
 # (default is SYMLEVEL = 2 normally; use 1 if you only need backtrace)
-# SYMLEVEL = 2
+SYMLEVEL = 2
 
 # uncomment next line to dump the symbols to a .sym file
 # DUMPSYM = 1
@@ -240,7 +240,7 @@ VERBOSE = 1
 
 # specify optimization level or leave commented to use the default
 # (default is OPTIMIZE = 3 normally, or OPTIMIZE = 0 with symbols)
-# OPTIMIZE = 3
+OPTIMIZE = 3
 
 
 ###########################################################################
@@ -454,7 +454,7 @@ CFLAGS = $(CCOMFLAGS) $(CPPONLYFLAGS)
 
 # we compile C-only to C89 standard with GNU extensions
 # we compile C++ code to C++98 standard with GNU extensions
-CONLYFLAGS += -std=gnu90
+CONLYFLAGS += -std=c90
 CPPONLYFLAGS += -x c++ -std=gnu++98
 COBJFLAGS += -x objective-c++
 
@@ -509,6 +509,7 @@ CCOMFLAGS += \
 	-Wno-overloaded-virtual
 
 CCOMFLAGS += -DSDLMAME_NOASM
+CCOMFLAGS += -DNOASM
 
 #	-Wcast-align \
 #	-Wundef \
