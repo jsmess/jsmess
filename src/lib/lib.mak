@@ -87,86 +87,9 @@ $(LIBOBJ)/expat/%.o: $(LIBSRC)/expat/%.c | $(OSPREBUILD)
 
 FORMATSOBJS = \
 	$(LIBOBJ)/formats/cassimg.o 	\
-	$(LIBOBJ)/formats/flopimg.o		\
 	$(LIBOBJ)/formats/imageutl.o	\
 	$(LIBOBJ)/formats/ioprocs.o		\
-	$(LIBOBJ)/formats/basicdsk.o	\
-	$(LIBOBJ)/formats/a26_cas.o		\
-	$(LIBOBJ)/formats/ace_tap.o		\
-	$(LIBOBJ)/formats/adam_cas.o	\
-	$(LIBOBJ)/formats/ami_dsk.o		\
-	$(LIBOBJ)/formats/ap2_dsk.o		\
-	$(LIBOBJ)/formats/apf_apt.o		\
-	$(LIBOBJ)/formats/apridisk.o	\
-	$(LIBOBJ)/formats/ap_dsk35.o	\
-	$(LIBOBJ)/formats/atari_dsk.o	\
-	$(LIBOBJ)/formats/atarist_dsk.o	\
-	$(LIBOBJ)/formats/atom_tap.o	\
-	$(LIBOBJ)/formats/cbm_tap.o		\
-	$(LIBOBJ)/formats/cgen_cas.o	\
-	$(LIBOBJ)/formats/coco_cas.o	\
-	$(LIBOBJ)/formats/coco_dsk.o	\
-	$(LIBOBJ)/formats/comx35_dsk.o	\
-	$(LIBOBJ)/formats/coupedsk.o	\
-	$(LIBOBJ)/formats/cpis_dsk.o	\
-	$(LIBOBJ)/formats/cqm_dsk.o		\
-	$(LIBOBJ)/formats/csw_cas.o		\
-	$(LIBOBJ)/formats/d64_dsk.o		\
-	$(LIBOBJ)/formats/d81_dsk.o		\
-	$(LIBOBJ)/formats/d88_dsk.o		\
-	$(LIBOBJ)/formats/dfi_dsk.o		\
-	$(LIBOBJ)/formats/dim_dsk.o		\
-	$(LIBOBJ)/formats/dsk_dsk.o		\
-	$(LIBOBJ)/formats/fdi_dsk.o		\
-	$(LIBOBJ)/formats/fm7_cas.o		\
-	$(LIBOBJ)/formats/fmsx_cas.o	\
-	$(LIBOBJ)/formats/g64_dsk.o		\
-	$(LIBOBJ)/formats/gtp_cas.o		\
-	$(LIBOBJ)/formats/hect_dsk.o	\
-	$(LIBOBJ)/formats/hect_tap.o	\
-	$(LIBOBJ)/formats/imd_dsk.o		\
-	$(LIBOBJ)/formats/ipf_dsk.o		\
-	$(LIBOBJ)/formats/kc_cas.o		\
-	$(LIBOBJ)/formats/kim1_cas.o	\
-	$(LIBOBJ)/formats/lviv_lvt.o	\
-	$(LIBOBJ)/formats/msx_dsk.o		\
-	$(LIBOBJ)/formats/mfi_dsk.o		\
-	$(LIBOBJ)/formats/mz_cas.o		\
-	$(LIBOBJ)/formats/nes_dsk.o		\
-	$(LIBOBJ)/formats/orao_cas.o	\
-	$(LIBOBJ)/formats/oric_dsk.o	\
-	$(LIBOBJ)/formats/oric_tap.o	\
-	$(LIBOBJ)/formats/p6001_cas.o	\
-	$(LIBOBJ)/formats/pasti_dsk.o	\
-	$(LIBOBJ)/formats/pc_dsk.o		\
-	$(LIBOBJ)/formats/pmd_cas.o		\
-	$(LIBOBJ)/formats/primoptp.o	\
-	$(LIBOBJ)/formats/rk_cas.o		\
-	$(LIBOBJ)/formats/smx_dsk.o		\
-	$(LIBOBJ)/formats/sorc_dsk.o	\
-	$(LIBOBJ)/formats/sord_cas.o	\
-	$(LIBOBJ)/formats/st_dsk.o		\
-	$(LIBOBJ)/formats/svi_cas.o		\
-	$(LIBOBJ)/formats/svi_dsk.o		\
-	$(LIBOBJ)/formats/td0_dsk.o		\
-	$(LIBOBJ)/formats/thom_cas.o	\
-	$(LIBOBJ)/formats/thom_dsk.o	\
-	$(LIBOBJ)/formats/ti99_dsk.o	\
-	$(LIBOBJ)/formats/trd_dsk.o		\
-	$(LIBOBJ)/formats/trs_cas.o		\
-	$(LIBOBJ)/formats/trs_dsk.o		\
-	$(LIBOBJ)/formats/tzx_cas.o		\
-	$(LIBOBJ)/formats/uef_cas.o		\
-	$(LIBOBJ)/formats/vg5k_cas.o	\
-	$(LIBOBJ)/formats/vt_cas.o		\
-	$(LIBOBJ)/formats/vt_dsk.o		\
-	$(LIBOBJ)/formats/vtech1_dsk.o	\
 	$(LIBOBJ)/formats/wavfile.o		\
-	$(LIBOBJ)/formats/x07_cas.o		\
-	$(LIBOBJ)/formats/x1_tap.o		\
-	$(LIBOBJ)/formats/z80ne_dsk.o	\
-	$(LIBOBJ)/formats/zx81_p.o		\
-	$(LIBOBJ)/formats/hxcmfm_dsk.o	\
 
 $(OBJ)/libformats.a: $(FORMATSOBJS)
 
