@@ -82,15 +82,50 @@ void wd11c00_17_device::device_config_complete()
 
 inline void wd11c00_17_device::check_interrupt()
 {
-	int irq = ((m_status & STATUS_IRQ) && (m_mask & MASK_IRQ)) ? ASSERT_LINE : CLEAR_LINE;
-	int drq = ((m_status & STATUS_DRQ) && (m_mask & MASK_DMA)) ? ASSERT_LINE : CLEAR_LINE;
-	int busy = (m_status & STATUS_BUSY) ? 0 : 1;
-	int req = (m_status & STATUS_REQ) ? ASSERT_LINE : CLEAR_LINE;
+	if (BIT(m_ra, 10))
+	{
+		m_status &= ~STATUS_DRQ;
+	}
 	
-	m_out_irq5_func(irq);
-	m_out_drq3_func(drq);
-	m_out_busy_func(busy);
-	m_out_req_func(req);
+	int ra3 = BIT(m_ra, 3);
+	
+	if (m_ra3 != ra3)
+	{
+		m_out_ra3_func(ra3 ? ASSERT_LINE : CLEAR_LINE);
+		m_ra3 = ra3;
+	}
+	
+	int irq5 = ((m_status & STATUS_IRQ) && (m_mask & MASK_IRQ)) ? ASSERT_LINE : CLEAR_LINE;
+	
+	if (m_irq5 != irq5)
+	{
+		m_out_irq5_func(irq5);
+		m_irq5 = irq5;
+	}
+	
+	int drq3 = ((m_status & STATUS_DRQ) && (m_mask & MASK_DMA)) ? ASSERT_LINE : CLEAR_LINE;
+	
+	if (m_drq3 != drq3)
+	{
+		m_out_drq3_func(drq3);
+		m_drq3 = drq3;
+	}
+	
+	int busy = (m_status & STATUS_BUSY) ? 0 : 1;
+	
+	if (m_busy != busy)
+	{
+		m_out_busy_func(busy);
+		m_busy = busy;
+	}
+	
+	int req = (m_status & STATUS_REQ) ? 1 : 0;
+	
+	if (m_req != req) 
+	{
+		m_out_req_func(req);
+		m_req = req;
+	}
 }
 
 
@@ -100,23 +135,8 @@ inline void wd11c00_17_device::check_interrupt()
 
 inline void wd11c00_17_device::increment_address()
 {
-	int old_ra3 = BIT(m_ra, 1);
-	
 	m_ra++;
-	
-	if (BIT(m_ra, 10))
-	{
-		m_status &= ~STATUS_DRQ;
-		
-		check_interrupt();
-	}
-	
-	int ra3 = BIT(m_ra, 1);
-	
-	if (old_ra3 != ra3)
-	{
-		m_out_ra3_func(ra3 ? ASSERT_LINE : CLEAR_LINE);
-	}
+	check_interrupt();
 }
 
 
@@ -130,7 +150,7 @@ inline UINT8 wd11c00_17_device::read_data()
 	
 	if (m_status & STATUS_BUSY)
 	{
-		data = m_in_ramcs_func(m_ra & 0x3ff);
+		data = m_in_ramcs_func(m_ra & 0x7ff);
 		
 		increment_address();
 	}
@@ -147,7 +167,7 @@ inline void wd11c00_17_device::write_data(UINT8 data)
 {
 	if (m_status & STATUS_BUSY)
 	{
-		m_out_ramwr_func(m_ra & 0x3ff, data);
+		m_out_ramwr_func(m_ra & 0x7ff, data);
 		
 		increment_address();
 	}
@@ -190,7 +210,12 @@ inline void wd11c00_17_device::select()
 
 wd11c00_17_device::wd11c00_17_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, WD11C00_17, "Western Digital WD11C00-17", tag, owner, clock),
-	  m_status(0)
+	  m_status(0),
+	  m_irq5(CLEAR_LINE),
+	  m_drq3(CLEAR_LINE),
+	  m_busy(1),
+	  m_req(0),
+	  m_ra3(0)
 {
 }
 
@@ -241,11 +266,14 @@ READ8_MEMBER( wd11c00_17_device::io_r )
 	switch (offset)
 	{
 	case 0: // Read Data, Board to Host
+		if (LOG) logerror("%s WD11C00-17 '%s' Read Data %03x:", machine().describe_context(), tag(), m_ra);
 		data = read_data();
+		if (LOG) logerror("%02x\n", data);
 		break;
 
 	case 1: // Read Board Hardware Status
 		data = m_status;
+		check_interrupt();
 		break;
 
 	case 2: // Read Drive Configuration Information
@@ -280,6 +308,7 @@ WRITE8_MEMBER( wd11c00_17_device::io_w )
 
 	case 2:	// Board Select
 		if (LOG) logerror("%s WD11C00-17 '%s' Select\n", machine().describe_context(), tag());
+		increment_address(); // HACK
 		select();
 		break;
 
@@ -348,6 +377,7 @@ WRITE8_MEMBER( wd11c00_17_device::write )
 	case 0x00:
 		if (LOG) logerror("%s WD11C00-17 '%s' Write RAM %03x:%02x\n", machine().describe_context(), tag(), m_ra, data);
 		write_data(data);
+		if (m_ra > 0x400) m_ecc_not_0 = 0; // HACK
 		break;
 		
 	case 0x20:
@@ -355,8 +385,9 @@ WRITE8_MEMBER( wd11c00_17_device::write )
 		break;
 		
 	case 0x60:
-		if (LOG) logerror("%s WD11C00-17 '%s' RA %01x\n", machine().describe_context(), tag(), data & 0x07);
-		m_ra = ((data & 0x07) << 8) | (m_ra & 0xff);
+		m_ra = (data & 0x07) << 8;
+		if (LOG) logerror("%s WD11C00-17 '%s' RA %03x\n", machine().describe_context(), tag(), m_ra);
+		check_interrupt();
 		break;
 	}
 }
@@ -370,7 +401,12 @@ WRITE_LINE_MEMBER( wd11c00_17_device::ireq_w )
 {
 	if (LOG) logerror("%s WD11C00-17 '%s' IREQ %u\n", machine().describe_context(), tag(), state);
 	
-	if (state) m_status |= STATUS_REQ; else m_status &= ~STATUS_REQ;
+	if ((m_status & STATUS_BUSY) && state)
+	{
+		m_status |= STATUS_IRQ;
+		m_status &= ~STATUS_BUSY;
+		check_interrupt();
+	}
 }
 
 
@@ -409,7 +445,21 @@ WRITE_LINE_MEMBER( wd11c00_17_device::clct_w )
 	if (state)
 	{
 		m_ra &= 0xff00;
+		check_interrupt();
 	}
+}
+
+
+//-------------------------------------------------
+//  mode_w -
+//-------------------------------------------------
+	
+WRITE_LINE_MEMBER( wd11c00_17_device::mode_w )
+{
+	if (LOG) logerror("%s WD11C00-17 '%s' MODE %u\n", machine().describe_context(), tag(), state);
+
+	m_mode = state;
+	m_ecc_not_0 = state; // HACK
 }
 
 
@@ -420,4 +470,14 @@ WRITE_LINE_MEMBER( wd11c00_17_device::clct_w )
 READ_LINE_MEMBER( wd11c00_17_device::busy_r )
 {
 	return (m_status & STATUS_BUSY) ? 0 : 1;
+}
+
+
+//-------------------------------------------------
+//  ecc_not_0_r -
+//-------------------------------------------------
+	
+READ_LINE_MEMBER( wd11c00_17_device::ecc_not_0_r )
+{
+	return m_ecc_not_0;
 }
