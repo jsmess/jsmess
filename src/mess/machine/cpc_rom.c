@@ -6,13 +6,24 @@
 
 #include "emu.h"
 #include "machine/cpc_rom.h"
+#include "includes/amstrad.h"
 
 const device_type CPC_ROM = &device_creator<cpc_rom_device>;
 
+#define ADDRESS_MAP_MODERN
 
 //**************************************************************************
 //  DEVICE CONFIG INTERFACE
 //**************************************************************************
+
+CPC_EXPANSION_INTERFACE(sub_exp_intf)
+{
+	DEVCB_NULL,//LINE_MEMBER(cpc_expansion_slot_device,irq_w),
+	DEVCB_NULL,//LINE_MEMBER(cpc_expansion_slot_device,nmi_w),
+	DEVCB_NULL,  // RESET
+	DEVCB_LINE(cpc_romdis),  // ROMDIS
+	DEVCB_LINE(cpc_romen)  // /ROMEN
+};
 
 // device machine config
 static MACHINE_CONFIG_FRAGMENT( cpc_rom )
@@ -22,6 +33,10 @@ static MACHINE_CONFIG_FRAGMENT( cpc_rom )
 	MCFG_ROMSLOT_ADD("rom4")
 	MCFG_ROMSLOT_ADD("rom5")
 	MCFG_ROMSLOT_ADD("rom6")
+
+	// pass-through
+	MCFG_CPC_EXPANSION_SLOT_ADD("exp",sub_exp_intf,cpc_exp_cards,NULL,NULL)
+
 MACHINE_CONFIG_END
 
 
@@ -63,7 +78,7 @@ void cpc_rom_device::device_reset()
 const device_type ROMSLOT = &device_creator<rom_image_device>;
 
 //-------------------------------------------------
-//  printer_image_device - constructor
+//  rom_image_device - constructor
 //-------------------------------------------------
 
 rom_image_device::rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -74,7 +89,7 @@ rom_image_device::rom_image_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
-//  printer_image_device - destructor
+//  rom_image_device - destructor
 //-------------------------------------------------
 
 rom_image_device::~rom_image_device()

@@ -5,8 +5,11 @@
  *
  */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpc_ssa1.h"
+#include "includes/amstrad.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -15,81 +18,88 @@
 const device_type CPC_SSA1 = &device_creator<cpc_ssa1_device>;
 const device_type CPC_DKSPEECH = &device_creator<cpc_dkspeech_device>;
 
+CPC_EXPANSION_INTERFACE(sub_exp_intf)
+{
+	DEVCB_LINE_MEMBER(cpc_expansion_slot_device,irq_w),
+	DEVCB_LINE_MEMBER(cpc_expansion_slot_device,nmi_w),
+	DEVCB_NULL,  // RESET
+	DEVCB_LINE(cpc_romdis),  // ROMDIS
+	DEVCB_LINE(cpc_romen)  // /ROMEN
+};
+
 //-------------------------------------------------
 //  device I/O handlers
 //-------------------------------------------------
 
-static READ8_DEVICE_HANDLER(ssa1_r)
+READ8_MEMBER(cpc_ssa1_device::ssa1_r)
 {
 	UINT8 ret = 0xff;
-	cpc_ssa1_device* ssa1 = device->machine().device<cpc_ssa1_device>("exp:ssa1");
 
-	if(ssa1->get_sby() == 0)
+	if(get_sby() == 0)
 		ret &= ~0x80;
 
-	if(ssa1->get_lrq() != 0)
+	if(get_lrq() != 0)
 		ret &= ~0x40;
 
 	return ret;
 }
 
-static WRITE8_DEVICE_HANDLER(ssa1_w)
+WRITE8_MEMBER(cpc_ssa1_device::ssa1_w)
 {
-	sp0256_ALD_w(device,0,data);
+	sp0256_ALD_w(m_sp0256_device,0,data);
 }
 
-static READ8_DEVICE_HANDLER(dkspeech_r)
+READ8_MEMBER(cpc_dkspeech_device::dkspeech_r)
 {
 	UINT8 ret = 0xff;
-	cpc_dkspeech_device* dkspeech = device->machine().device<cpc_dkspeech_device>("exp:dkspeech");
 
 	// SBY is not connected
 
-	if(dkspeech->get_lrq() != 0)
+	if(get_lrq() != 0)
 		ret &= ~0x80;
 
 	return ret;
 }
 
-static WRITE8_DEVICE_HANDLER(dkspeech_w)
+WRITE8_MEMBER(cpc_dkspeech_device::dkspeech_w)
 {
-	sp0256_ALD_w(device,0,data & 0x3f);
+	sp0256_ALD_w(m_sp0256_device,0,data & 0x3f);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(ssa1_lrq_cb)
 {
-	cpc_ssa1_device* ssa1 = device->machine().device<cpc_ssa1_device>("exp:ssa1");
+	cpc_ssa1_device* ssa1 = dynamic_cast<cpc_ssa1_device*>(device->owner());
 	ssa1->set_lrq(state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(ssa1_sby_cb)
 {
-	cpc_ssa1_device* ssa1 = device->machine().device<cpc_ssa1_device>("exp:ssa1");
+	cpc_ssa1_device* ssa1 = dynamic_cast<cpc_ssa1_device*>(device->owner());
 	ssa1->set_sby(state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(dk_lrq_cb)
 {
-	cpc_dkspeech_device* dkspeech = device->machine().device<cpc_dkspeech_device>("exp:dkspeech");
-	dkspeech->set_lrq(state);
+	cpc_dkspeech_device* dk = dynamic_cast<cpc_dkspeech_device*>(device->owner());
+	dk->set_lrq(state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(dk_sby_cb)
 {
-	cpc_dkspeech_device* dkspeech = device->machine().device<cpc_dkspeech_device>("exp:dkspeech");
-	dkspeech->set_sby(state);
+	cpc_dkspeech_device* dk = dynamic_cast<cpc_dkspeech_device*>(device->owner());
+	dk->set_sby(state);
 }
 
 static sp0256_interface sp0256_intf =
 {
-		DEVCB_LINE(ssa1_lrq_cb),
-		DEVCB_LINE(ssa1_sby_cb)
+	DEVCB_DEVICE_LINE("sp0256",ssa1_lrq_cb),
+	DEVCB_DEVICE_LINE("sp0256",ssa1_sby_cb)
 };
 
 static sp0256_interface sp0256_dk_intf =
 {
-		DEVCB_LINE(dk_lrq_cb),
-		DEVCB_LINE(dk_sby_cb)
+	DEVCB_DEVICE_LINE("sp0256",dk_lrq_cb),
+	DEVCB_DEVICE_LINE("sp0256",dk_sby_cb)
 };
 
 //-------------------------------------------------
@@ -102,10 +112,10 @@ ROM_START( cpc_ssa1 )
 	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 ROM_END
 
+// Available in ROM and cassette versions.  For now, we'll let the user choose to load the software via ROM (using a ROM box slot device) or cassette.
 ROM_START( cpc_dkspeech )
 	ROM_REGION( 0x10000, "sp0256", 0 )
 	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
-	// TODO: Add expansion ROM
 ROM_END
 
 //-------------------------------------------------
@@ -127,14 +137,22 @@ static MACHINE_CONFIG_FRAGMENT( cpc_ssa1 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sp0256",SP0256,XTAL_3_12MHz)
 	MCFG_SOUND_CONFIG(sp0256_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	// pass-through
+	MCFG_CPC_EXPANSION_SLOT_ADD("exp",sub_exp_intf,cpcplus_exp_cards,NULL,NULL)
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( cpc_dkspeech )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sp0256",SP0256,XTAL_4MHz)  // uses the CPC's clock from pin 50 of the expansion port
 	MCFG_SOUND_CONFIG(sp0256_dk_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	// pass-through
+	MCFG_CPC_EXPANSION_SLOT_ADD("exp",sub_exp_intf,cpcplus_exp_cards,NULL,NULL)
+
 MACHINE_CONFIG_END
 
 machine_config_constructor cpc_ssa1_device::device_mconfig_additions() const
@@ -154,14 +172,16 @@ machine_config_constructor cpc_dkspeech_device::device_mconfig_additions() const
 cpc_ssa1_device::cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CPC_SSA1, "SSA-1", tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this),
-	m_lrq(1)
+	m_lrq(1),
+	m_sp0256_device(*this,"sp0256")
 {
 }
 
 cpc_dkspeech_device::cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CPC_DKSPEECH, "DK'T Speech", tag, owner, clock),
+	device_t(mconfig, CPC_DKSPEECH, "DK'Tronics Speech Synthesiser", tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this),
-	m_lrq(1)
+	m_lrq(1),
+	m_sp0256_device(*this,"sp0256")
 {
 }
 
@@ -177,10 +197,10 @@ void cpc_ssa1_device::device_start()
 
 	m_rom = subregion("sp0256")->base();
 
-	m_sp0256_device = subdevice("sp0256");
+//	m_sp0256_device = subdevice("sp0256");
 
-	space->install_legacy_readwrite_handler(*m_sp0256_device,0xfaee,0xfaee,0,0,FUNC(ssa1_r),FUNC(ssa1_w));
-	space->install_legacy_readwrite_handler(*m_sp0256_device,0xfbee,0xfbee,0,0,FUNC(ssa1_r),FUNC(ssa1_w));
+	space->install_readwrite_handler(0xfaee,0xfaee,0,0,read8_delegate(FUNC(cpc_ssa1_device::ssa1_r),this),write8_delegate(FUNC(cpc_ssa1_device::ssa1_w),this));
+	space->install_readwrite_handler(0xfbee,0xfbee,0,0,read8_delegate(FUNC(cpc_ssa1_device::ssa1_r),this),write8_delegate(FUNC(cpc_ssa1_device::ssa1_w),this));
 }
 
 void cpc_dkspeech_device::device_start()
@@ -191,9 +211,9 @@ void cpc_dkspeech_device::device_start()
 
 	m_rom = subregion("sp0256")->base();
 
-	m_sp0256_device = subdevice("sp0256");
+//	m_sp0256_device = subdevice("sp0256");
 
-	space->install_legacy_readwrite_handler(*m_sp0256_device,0xfbfe,0xfbfe,0,0,FUNC(dkspeech_r),FUNC(dkspeech_w));
+	space->install_readwrite_handler(0xfbfe,0xfbfe,0,0,read8_delegate(FUNC(cpc_dkspeech_device::dkspeech_r),this),write8_delegate(FUNC(cpc_dkspeech_device::dkspeech_w),this));
 }
 
 //-------------------------------------------------

@@ -108,10 +108,6 @@ Some bugs left :
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
-#include "machine/cpcexp.h"
-#include "machine/cpc_ssa1.h"
-#include "machine/cpc_rom.h"
-#include "machine/mface2.h"
 
 #include "machine/ram.h"
 
@@ -862,7 +858,7 @@ static const floppy_interface aleste_floppy_interface =
 	NULL
 };
 
-static CPC_EXPANSION_INTERFACE(cpc_exp_intf)
+CPC_EXPANSION_INTERFACE(cpc_exp_intf)
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", 0),
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
@@ -870,19 +866,6 @@ static CPC_EXPANSION_INTERFACE(cpc_exp_intf)
 	DEVCB_LINE(cpc_romdis),  // ROMDIS
 	DEVCB_LINE(cpc_romen)  // /ROMEN
 };
-
-static SLOT_INTERFACE_START(cpc_exp_cards)
-	SLOT_INTERFACE("ssa1", CPC_SSA1)
-	SLOT_INTERFACE("dkspeech", CPC_DKSPEECH)
-	SLOT_INTERFACE("rom", CPC_ROM)
-	SLOT_INTERFACE("multiface2", CPC_MFACE2)
-SLOT_INTERFACE_END
-
-static SLOT_INTERFACE_START(cpcplus_exp_cards)
-	SLOT_INTERFACE("ssa1", CPC_SSA1)
-	SLOT_INTERFACE("dkspeech", CPC_DKSPEECH)
-	SLOT_INTERFACE("rom", CPC_ROM)
-SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
 	MCFG_CARTSLOT_ADD("cart")

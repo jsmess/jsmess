@@ -41,6 +41,8 @@
 #ifndef CPC_SSA1_H_
 #define CPC_SSA1_H_
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "machine/cpcexp.h"
 #include "sound/sp0256.h"
@@ -61,6 +63,9 @@ public:
 	void set_sby(UINT8 state) { m_sby = state; }
 	UINT8 get_sby() { return m_sby; }
 
+	DECLARE_READ8_MEMBER(ssa1_r);
+	DECLARE_WRITE8_MEMBER(ssa1_w);
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -74,7 +79,7 @@ private:
 	UINT8 m_lrq;
 	UINT8 m_sby;
 
-	device_t* m_sp0256_device;
+	required_device<device_t> m_sp0256_device;
 };
 
 class cpc_dkspeech_device : public device_t,
@@ -93,6 +98,9 @@ public:
 	void set_sby(UINT8 state) { m_sby = state; }
 	UINT8 get_sby() { return m_sby; }
 
+	DECLARE_READ8_MEMBER(dkspeech_r);
+	DECLARE_WRITE8_MEMBER(dkspeech_w);
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -106,9 +114,8 @@ private:
 	UINT8 m_lrq;
 	UINT8 m_sby;
 
-	device_t* m_sp0256_device;
+	required_device<device_t> m_sp0256_device;
 };
-
 
 // device type definition
 extern const device_type CPC_SSA1;
