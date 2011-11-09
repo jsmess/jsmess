@@ -163,6 +163,7 @@ public:
 
 protected:
 	virtual void device_start();
+	virtual void device_config_complete();
 
 private:
 	const floppy_format_type *formats;
