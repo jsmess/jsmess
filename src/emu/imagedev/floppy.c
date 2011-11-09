@@ -166,7 +166,6 @@ bool floppy_image_device::call_load()
 	io.file = (device_image_interface *)this;
 	io.procs = &image_ioprocs;
 	io.filler = 0xff;
-	fprintf(stderr, "Loading\n");
 	int best = 0;
 	floppy_image_format_t *best_format = 0;
 	for(floppy_image_format_t *format = fif_list; format; format = format->next) {
