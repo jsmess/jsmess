@@ -9,15 +9,46 @@
 #include "formats/imageutl.h"
 
 // device type definition
-const device_type FLOPPY = &device_creator<floppy_image_device>;
+const device_type FLOPPY_CONNECTOR = &device_creator<floppy_connector>;
+const device_type FLOPPY_35_DD = &device_creator<floppy_35_dd>;
+const device_type FLOPPY_35_HD = &device_creator<floppy_35_hd>;
+const device_type FLOPPY_525_DD = &device_creator<floppy_525_dd>;
+
+floppy_connector::floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, FLOPPY_CONNECTOR, "Floppy drive connector abstraction", tag, owner, clock),
+	device_slot_interface(mconfig, *this)
+{
+}
+
+floppy_connector::~floppy_connector()
+{
+}
+
+void floppy_connector::set_formats(const floppy_format_type *_formats)
+{
+	formats = _formats;
+}
+
+void floppy_connector::device_start()
+{
+	floppy_image_device *dev = dynamic_cast<floppy_image_device *>(get_card_device());
+	if(dev)
+		dev->set_formats(formats);
+}
+
+floppy_image_device *floppy_connector::get_device()
+{
+	return dynamic_cast<floppy_image_device *>(get_card_device());
+}
 
 //-------------------------------------------------
 //  floppy_image_device - constructor
 //-------------------------------------------------
 
-floppy_image_device::floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, FLOPPY, "Floppy drive", tag, owner, clock),
+floppy_image_device::floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, type, name, tag, owner, clock),
 	  device_image_interface(mconfig, *this),
+	  device_slot_card_interface(mconfig, *this),
 	  image(NULL)
 {
 }
@@ -45,12 +76,8 @@ void floppy_image_device::setup_index_pulse_cb(index_pulse_cb cb)
 	cur_index_pulse_cb = cb;
 }
 
-void floppy_image_device::set_info(int _type, int _tracks, int _sides, const floppy_format_type *formats)
+void floppy_image_device::set_formats(const floppy_format_type *formats)
 {
-	type = _type;
-	tracks = _tracks;
-	sides = _sides;
-
 	image_device_format **formatptr;
     image_device_format *format;
     formatptr = &m_formatlist;
@@ -103,15 +130,15 @@ void floppy_image_device::set_rpm(float _rpm)
 
 void floppy_image_device::device_start()
 {
+	rpm = 0;
+	setup_limits();
+
 	idx = 0;
 
 	/* motor off */
 	mon = 1;
 	/* set write protect on */
 	wpt = 0;
-
-	rpm = 0;
-	set_rpm(300);
 
 	cyl = 0;
 	ss  = 1;
@@ -139,7 +166,7 @@ bool floppy_image_device::call_load()
 	io.file = (device_image_interface *)this;
 	io.procs = &image_ioprocs;
 	io.filler = 0xff;
-
+	fprintf(stderr, "Loading\n");
 	int best = 0;
 	floppy_image_format_t *best_format = 0;
 	for(floppy_image_format_t *format = fif_list; format; format = format->next) {
@@ -492,4 +519,53 @@ void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32
 		}
 	
 	}
+}
+
+floppy_35_dd::floppy_35_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, FLOPPY_35_DD, "3.5\" double density floppy drive", tag, owner, clock)
+{
+}
+
+floppy_35_dd::~floppy_35_dd()
+{
+}
+
+void floppy_35_dd::setup_limits()
+{
+	tracks = 84;
+	sides = 2;
+	set_rpm(300);
+}
+
+floppy_35_hd::floppy_35_hd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, FLOPPY_35_HD, "3.5\" high density floppy drive", tag, owner, clock)
+{
+}
+
+floppy_35_hd::~floppy_35_hd()
+{
+}
+
+void floppy_35_hd::setup_limits()
+{
+	tracks = 84;
+	sides = 2;
+	set_rpm(300);
+}
+
+
+floppy_525_dd::floppy_525_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, FLOPPY_525_DD, "3.5\" high density floppy drive", tag, owner, clock)
+{
+}
+
+floppy_525_dd::~floppy_525_dd()
+{
+}
+
+void floppy_525_dd::setup_limits()
+{
+	tracks = 42;
+	sides = 1;
+	set_rpm(300);
 }

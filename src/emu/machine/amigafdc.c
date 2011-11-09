@@ -29,10 +29,15 @@ amiga_fdc::amiga_fdc(const machine_config &mconfig, const char *tag, device_t *o
 
 void amiga_fdc::device_start()
 {
-	floppy_devices[0] = machine().device<floppy_image_device>("fd0");
-	floppy_devices[1] = machine().device<floppy_image_device>("fd1");
-	floppy_devices[2] = machine().device<floppy_image_device>("fd2");
-	floppy_devices[3] = machine().device<floppy_image_device>("fd3");
+	static const char *names[] = { "fd0", "fd1", "fd2", "fd3" };
+	for(int i=0; i != 4; i++) {
+		floppy_connector *con = machine().device<floppy_connector>(names[i]);
+		if(con)
+			floppy_devices[i] = con->get_device();
+		else
+			floppy_devices[i] = 0;
+	}
+
 	floppy = 0;
 
 	t_gen = timer_alloc(0);

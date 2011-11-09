@@ -1718,9 +1718,9 @@ WRITE8_MEMBER( st_state::psg_pa_w )
 	// drive select
 	floppy_image_device *floppy = 0;
 	if (!BIT(data, 1))
-		floppy = machine().device<floppy_image_device>("fd0");
+		floppy = floppy_devices[0];
 	else if(!BIT(data, 2))
-		floppy = machine().device<floppy_image_device>("fd1");
+		floppy = floppy_devices[0];
 
 	// side select
 	if(floppy)
@@ -1773,9 +1773,9 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 	// drive select
 	floppy_image_device *floppy = 0;
 	if (!BIT(data, 1))
-		floppy = machine().device<floppy_image_device>("fd0");
+		floppy = floppy_devices[0];
 	else if(!BIT(data, 2))
-		floppy = machine().device<floppy_image_device>("fd1");
+		floppy = floppy_devices[1];
 
 	// side select
 	if(floppy)
@@ -2239,8 +2239,15 @@ void st_state::machine_start()
 	// register for state saving
 	state_save();
 
-	machine().device<floppy_image_device>("fd0")->set_rpm(300);
-	machine().device<floppy_image_device>("fd1")->set_rpm(300);
+	static const char *names[] = { "fd0", "fd1" };
+	for(int i=0; i != 1; i++) {
+		floppy_connector *con = machine().device<floppy_connector>(names[i]);
+		if(con)
+			floppy_devices[i] = con->get_device();
+		else
+			floppy_devices[i] = 0;
+	}
+
 	m_fdc->setup_drq_cb(wd1772_t::line_cb(FUNC(st_state::fdc_drq_w), this));
 	m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(st_state::fdc_intrq_w), this));
 }
@@ -2331,6 +2338,10 @@ const floppy_format_type st_state::floppy_formats[] = {
 	NULL
 };
 
+static SLOT_INTERFACE_START( atari_floppies )
+	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
+SLOT_INTERFACE_END
+
 //**************************************************************************
 //  MACHINE CONFIGURATION
 //**************************************************************************
@@ -2367,8 +2378,10 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
+
+	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
+
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 
@@ -2418,8 +2431,8 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
@@ -2478,8 +2491,8 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, atariste_mfp_intf)
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 
@@ -2548,8 +2561,8 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 	MCFG_MC68901_ADD(MC68901_TAG, U517/8, stbook_mfp_intf)
 	MCFG_WD1772x_ADD(WD1772_TAG, U517/2)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_35_DD, 82, 2, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 

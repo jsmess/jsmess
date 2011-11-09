@@ -359,6 +359,9 @@ static const tpi6525_interface cdtv_tpi_intf =
 	DEVCB_NULL
 };
 
+static SLOT_INTERFACE_START( amiga_floppies )
+	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( amiga_cartslot )
 	MCFG_CARTSLOT_ADD("cart")
@@ -412,8 +415,10 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 
 	/* fdc */
 	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68000_NTSC_CLOCK)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_35_DD, 82, 2, amiga_fdc::floppy_formats)
-//	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_35_DD, 82, 2, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", amiga_floppies, "35dd", 0, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", amiga_floppies, 0,      0, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd2", amiga_floppies, 0,      0, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd3", amiga_floppies, 0,      0, amiga_fdc::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a1000n, ntsc )

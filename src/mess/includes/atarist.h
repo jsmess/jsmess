@@ -270,6 +270,8 @@ public:
 	emu_timer *m_glue_timer;
 	emu_timer *m_shifter_timer;
 
+	floppy_image_device *floppy_devices[2];
+
 	static const floppy_format_type floppy_formats[];
 };
 

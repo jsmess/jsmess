@@ -249,11 +249,15 @@ static WRITE8_DEVICE_HANDLER( einstein_drsel_w )
 		logerror("%s: einstein_drsel_w %02x\n", device->machine().describe_context(), data);
 
 	/* bit 0 to 3 select the drive */
+	static const char *names[] = { "fd0", "fd1", "fd2", "fd3" };
 	floppy_image_device *floppy = 0;
-	if (BIT(data, 0)) floppy = device->machine().device<floppy_image_device>("fd0");
-	if (BIT(data, 1)) floppy = device->machine().device<floppy_image_device>("fd1");
-	if (BIT(data, 2)) floppy = device->machine().device<floppy_image_device>("fd2");
-	if (BIT(data, 3)) floppy = device->machine().device<floppy_image_device>("fd3");
+	for(int i=0; i<4; i++) {
+		if(BIT(data, i)) {
+			floppy_connector *con = device->machine().device<floppy_connector>(names[i]);
+			if(con)
+				floppy = con->get_device();
+		}
+	}
 
 	/* double sided drive connected? */
 	if (input_port_read(device->machine(), "config") & data)
@@ -430,10 +434,6 @@ static SCREEN_UPDATE( einstein )
 
 static MACHINE_START( einstein )
 {
-	machine.device<floppy_image_device>("fd0")->set_rpm(300);
-	machine.device<floppy_image_device>("fd1")->set_rpm(300);
-	machine.device<floppy_image_device>("fd2")->set_rpm(300);
-	machine.device<floppy_image_device>("fd3")->set_rpm(300);
 }
 
 static MACHINE_RESET( einstein )
@@ -780,6 +780,9 @@ static GFXDECODE_START( einstei2 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, einstei2_charlayout, 16, 1 )
 GFXDECODE_END
 
+static SLOT_INTERFACE_START( einstein_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( einstein, einstein_state )
 	/* basic machine hardware */
@@ -825,10 +828,10 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 
 	MCFG_WD1772x_ADD(IC_I042, XTAL_X002)
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", floppy_image_device::TYPE_525_DD, 42, 1, einstein_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", floppy_image_device::TYPE_525_DD, 42, 1, einstein_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd2", floppy_image_device::TYPE_525_DD, 42, 1, einstein_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd3", floppy_image_device::TYPE_525_DD, 42, 1, einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd2", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd3", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","einstein")
