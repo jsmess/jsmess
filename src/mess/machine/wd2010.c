@@ -118,6 +118,14 @@ void wd2010_device::device_config_complete()
 		memset(&m_out_bcr_cb, 0, sizeof(m_out_bcr_cb));
 		memset(&m_in_bcs_cb, 0, sizeof(m_in_bcs_cb));
 		memset(&m_out_bcs_cb, 0, sizeof(m_out_bcs_cb));
+		memset(&m_out_dirin_cb, 0, sizeof(m_out_dirin_cb));
+		memset(&m_out_step_cb, 0, sizeof(m_out_step_cb));
+		memset(&m_out_rwc_cb, 0, sizeof(m_out_rwc_cb));
+		memset(&m_in_drdy_cb, 0, sizeof(m_in_drdy_cb));
+		memset(&m_in_index_cb, 0, sizeof(m_in_index_cb));
+		memset(&m_in_wf_cb, 0, sizeof(m_in_wf_cb));
+		memset(&m_in_tk000_cb, 0, sizeof(m_in_tk000_cb));
+		memset(&m_in_sc_cb, 0, sizeof(m_in_sc_cb));
 	}
 }
 
@@ -151,6 +159,14 @@ void wd2010_device::device_start()
 	m_out_bcr_func.resolve(m_out_bcr_cb, *this);
 	m_in_bcs_func.resolve(m_in_bcs_cb, *this);
 	m_out_bcs_func.resolve(m_out_bcs_cb, *this);
+	m_out_dirin_func.resolve(m_out_dirin_cb, *this);
+	m_out_step_func.resolve(m_out_step_cb, *this);
+	m_out_rwc_func.resolve(m_out_rwc_cb, *this);
+	m_in_drdy_func.resolve(m_in_drdy_cb, *this);
+	m_in_index_func.resolve(m_in_index_cb, *this);
+	m_in_wf_func.resolve(m_in_wf_cb, *this);
+	m_in_tk000_func.resolve(m_in_tk000_cb, *this);
+	m_in_sc_func.resolve(m_in_sc_cb, *this);
 }
 
 
@@ -234,10 +250,12 @@ WRITE8_MEMBER( wd2010_device::write )
 		if (data == COMMAND_COMPUTE_CORRECTION)
 		{
 			if (LOG) logerror("%s WD2010 '%s' COMPUTE CORRECTION\n", machine().describe_context(), tag());
+			compute_correction(data);
 		}
 		else if ((data & COMMAND_SET_PARAMETER_MASK) == COMMAND_SET_PARAMETER)
 		{
 			if (LOG) logerror("%s WD2010 '%s' SET PARAMETER\n", machine().describe_context(), tag());
+			set_parameter(data);
 		}
 		else
 		{
@@ -245,29 +263,164 @@ WRITE8_MEMBER( wd2010_device::write )
 			{
 			case COMMAND_RESTORE:
 				if (LOG) logerror("%s WD2010 '%s' RESTORE\n", machine().describe_context(), tag());
+				restore(data);
 				break;
 				
 			case COMMAND_SEEK:
 				if (LOG) logerror("%s WD2010 '%s' SEEK\n", machine().describe_context(), tag());
+				seek(data);
 				break;
 				
 			case COMMAND_READ_SECTOR:
 				if (LOG) logerror("%s WD2010 '%s' READ SECTOR\n", machine().describe_context(), tag());
+				read_sector(data);
 				break;
 				
 			case COMMAND_WRITE_SECTOR:
 				if (LOG) logerror("%s WD2010 '%s' WRITE SECTOR\n", machine().describe_context(), tag());
+				write_sector(data);
 				break;
 				
 			case COMMAND_SCAN_ID:
 				if (LOG) logerror("%s WD2010 '%s' SCAN ID\n", machine().describe_context(), tag());
+				scan_id(data);
 				break;
 				
 			case COMMAND_WRITE_FORMAT:
 				if (LOG) logerror("%s WD2010 '%s' WRITE FORMAT\n", machine().describe_context(), tag());
+				format(data);
 				break;
 			}
 		}
 		break;
 	}
+}
+
+
+//-------------------------------------------------
+//  compute_correction -
+//-------------------------------------------------
+
+void wd2010_device::compute_correction(UINT8 data)
+{
+}
+
+
+//-------------------------------------------------
+//  set_parameter -
+//-------------------------------------------------
+
+void wd2010_device::set_parameter(UINT8 data)
+{
+}
+
+
+//-------------------------------------------------
+//  restore -
+//-------------------------------------------------
+
+void wd2010_device::restore(UINT8 data)
+{
+	// reset INTRQ, errors, set BUSY, CIP
+	m_out_intrq_func(CLEAR_LINE);
+	m_error = 0;
+	m_status = STATUS_BSY | STATUS_CIP;
+	
+	// reset RWC, set direction=OUT, store step rate
+	m_out_rwc_func(0);
+	m_out_dirin_func(0);
+
+	int step_pulses = 0;
+	
+	while (step_pulses < 2048)
+	{
+		while (!m_in_sc_func())
+		{
+			// drive not ready or write fault?
+			if (!m_in_drdy_func() || m_in_wf_func())
+			{
+				// pulse BCR, set AC, INTRQ, reset BSY, CIP
+				m_out_bcr_func(0);
+				m_out_bcr_func(1);
+				m_error = ERROR_AC;
+				m_status = (m_in_drdy_func() << 6) | (m_in_wf_func() << 5) | STATUS_ERR;
+				m_out_intrq_func(ASSERT_LINE);
+				return;
+			}
+		}
+		
+		if (m_in_tk000_func())
+		{
+			// pulse BCR, set INTRQ, reset BSY, CIP
+			m_out_bcr_func(0);
+			m_out_bcr_func(1);
+			m_status &= ~(STATUS_BSY | STATUS_CIP);
+			m_out_intrq_func(ASSERT_LINE);
+			return;
+		}
+		
+		if (step_pulses == 2047)
+		{
+			// set TK000 error
+			m_error = ERROR_TK;
+			m_status |= STATUS_ERR;
+			
+			// pulse BCR, set INTRQ, reset BSY, CIP
+			m_out_bcr_func(0);
+			m_out_bcr_func(1);
+			m_status &= ~(STATUS_BSY | STATUS_CIP);
+			m_out_intrq_func(ASSERT_LINE);
+			return;
+		}
+		
+		// issue a step pulse
+		m_out_step_func(1);
+		m_out_step_func(0);
+		step_pulses++;
+	}
+}
+
+
+//-------------------------------------------------
+//  seek -
+//-------------------------------------------------
+
+void wd2010_device::seek(UINT8 data)
+{
+}
+
+
+//-------------------------------------------------
+//  read_sector -
+//-------------------------------------------------
+
+void wd2010_device::read_sector(UINT8 data)
+{
+}
+
+
+//-------------------------------------------------
+//  write_sector -
+//-------------------------------------------------
+
+void wd2010_device::write_sector(UINT8 data)
+{
+}
+
+
+//-------------------------------------------------
+//  scan_id -
+//-------------------------------------------------
+
+void wd2010_device::scan_id(UINT8 data)
+{
+}
+
+
+//-------------------------------------------------
+//  format -
+//-------------------------------------------------
+
+void wd2010_device::format(UINT8 data)
+{
 }
