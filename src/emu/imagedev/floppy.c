@@ -31,6 +31,10 @@ void floppy_connector::set_formats(const floppy_format_type *_formats)
 
 void floppy_connector::device_start()
 {
+}
+
+void floppy_connector::device_config_complete()
+{
 	floppy_image_device *dev = dynamic_cast<floppy_image_device *>(get_card_device());
 	if(dev)
 		dev->set_formats(formats);
