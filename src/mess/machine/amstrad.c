@@ -2760,6 +2760,31 @@ static const UINT8 amstrad_cycle_table_ex[256]=
 	 8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0
 };
 
+/* traverses the daisy-chain of expansion devices, looking for the specified device */
+static device_t* get_expansion_device(running_machine &machine, const char* tag)
+{
+	cpc_expansion_slot_device* exp_port = machine.device<cpc_expansion_slot_device>("exp");
+
+	while(exp_port != NULL)
+	{
+		device_t* temp;
+
+		// first, check if this expansion port has the device we want attached
+		temp = exp_port->subdevice("rom");
+		if(temp != NULL)
+			return temp;
+
+		// if it's not what we're looking for, then check the expansion port on this expansion device. if it exists.
+		temp = dynamic_cast<device_t*>(exp_port->get_card_device());
+		if(temp == NULL)
+			return NULL; // no device attached
+		exp_port = temp->subdevice<cpc_expansion_slot_device>("exp");
+		if(exp_port == NULL)
+			return NULL;  // we're at the end of the chain
+	}
+	return NULL;
+}
+
 static void amstrad_common_init(running_machine &machine)
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
@@ -2802,13 +2827,13 @@ static void amstrad_common_init(running_machine &machine)
 	space->install_write_bank(0xe000, 0xffff, "bank16");
 
 	/* Set up ROMs, if we have an expansion device connected */
-	romexp = space->machine().device("exp:rom");
+	romexp = get_expansion_device(machine,"rom");
 	if(romexp)
 	{
 		for(x=0;x<6;x++)
 		{
-			sprintf(str,"exp:rom:rom%i",x+1);
-			romimage = space->machine().device<rom_image_device>(str);
+			sprintf(str,"rom%i",x+1);
+			romimage = romexp->subdevice<rom_image_device>(str);
 			if(romimage->base() != NULL)
 			{
 				state->m_Amstrad_ROM_Table[x+1] = romimage->base();
@@ -2843,7 +2868,6 @@ static void amstrad_common_init(running_machine &machine)
 	/* Juergen is a cool dude! */
 	device_set_irq_callback(machine.device("maincpu"), amstrad_cpu_acknowledge_int);
 }
-
 
 static TIMER_CALLBACK( cb_set_resolution )
 {

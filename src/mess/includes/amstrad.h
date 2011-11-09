@@ -10,6 +10,10 @@
 #include "machine/upd765.h"
 #include "video/mc6845.h"
 #include "imagedev/snapquik.h"
+#include "machine/cpcexp.h"
+#include "machine/cpc_ssa1.h"
+#include "machine/cpc_rom.h"
+#include "machine/mface2.h"
 
 /****************************
  * Gate Array data (CPC) -
@@ -159,5 +163,18 @@ PALETTE_INIT( amstrad_cpc_green );		/* For CPC464, CPC664, and CPC6128 */
 PALETTE_INIT( kccomp );					/* For KC Compact */
 PALETTE_INIT( amstrad_plus );			/* For CPC464+ and CPC6128+ */
 PALETTE_INIT( aleste );					/* For aleste */
+
+SLOT_INTERFACE_START(cpc_exp_cards)
+	SLOT_INTERFACE("ssa1", CPC_SSA1)
+	SLOT_INTERFACE("dkspeech", CPC_DKSPEECH)
+	SLOT_INTERFACE("rom", CPC_ROM)
+	SLOT_INTERFACE("multiface2", CPC_MFACE2)
+SLOT_INTERFACE_END
+
+SLOT_INTERFACE_START(cpcplus_exp_cards)
+	SLOT_INTERFACE("ssa1", CPC_SSA1)
+	SLOT_INTERFACE("dkspeech", CPC_DKSPEECH)
+	SLOT_INTERFACE("rom", CPC_ROM)
+SLOT_INTERFACE_END
 
 #endif /* AMSTRAD_H_ */
