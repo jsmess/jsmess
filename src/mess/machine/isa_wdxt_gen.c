@@ -164,7 +164,15 @@ static WD2010_INTERFACE( hdc_intf )
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(WD11C00_17_TAG, wd11c00_17_device, clct_w),
 	DEVCB_DEVICE_MEMBER(WD11C00_17_TAG, wd11c00_17_device, read),
-	DEVCB_DEVICE_MEMBER(WD11C00_17_TAG, wd11c00_17_device, write)
+	DEVCB_DEVICE_MEMBER(WD11C00_17_TAG, wd11c00_17_device, write),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE_VCC,
+	DEVCB_LINE_VCC,
+	DEVCB_LINE_VCC,
+	DEVCB_LINE_VCC,
+	DEVCB_LINE_VCC
 };
 
 
@@ -307,7 +315,11 @@ READ8_MEMBER( wdxt_gen_device::wd1015_p1_r )
 
     */
 	
-	return 0;
+	UINT8 data = 0;
+	
+	logerror("%s P1 read %02x\n", machine().describe_context(), data);
+	
+	return data;
 }
 
 
@@ -359,7 +371,7 @@ READ8_MEMBER( wdxt_gen_device::wd1015_p2_r )
 
     */
 	
-	UINT8 data = 0;
+	UINT8 data = 0x40;
 	
 	data |= m_host->ecc_not_0_r() << 7;
 

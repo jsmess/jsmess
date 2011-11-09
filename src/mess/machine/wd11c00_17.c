@@ -193,7 +193,7 @@ inline void wd11c00_17_device::software_reset()
 
 inline void wd11c00_17_device::select()
 {
-	m_status |= STATUS_BUSY | STATUS_C_D | STATUS_REQ;
+	m_status = STATUS_BUSY | STATUS_C_D | STATUS_REQ;
 	
 	check_interrupt();
 }
@@ -401,12 +401,24 @@ WRITE_LINE_MEMBER( wd11c00_17_device::ireq_w )
 {
 	if (LOG) logerror("%s WD11C00-17 '%s' IREQ %u\n", machine().describe_context(), tag(), state);
 	
-	if ((m_status & STATUS_BUSY) && state)
+	if (state) m_status |= STATUS_REQ; else m_status &= ~STATUS_REQ;
+
+	if (m_status & STATUS_BUSY)
 	{
-		m_status |= STATUS_IRQ;
-		m_status &= ~STATUS_BUSY;
-		check_interrupt();
+		if (state)
+		{
+			m_status |= STATUS_IRQ | STATUS_I_O;
+		}
+		else
+		{
+			if (m_status & STATUS_I_O)
+			{
+				m_status &= ~(STATUS_BUSY | STATUS_I_O);
+			}
+		}
 	}
+
+	check_interrupt();
 }
 
 

@@ -45,6 +45,14 @@ struct wd2010_interface
 	devcb_write_line	m_out_bcr_cb;
 	devcb_read8			m_in_bcs_cb;
 	devcb_write8		m_out_bcs_cb;
+	devcb_write_line	m_out_dirin_cb;
+	devcb_write_line	m_out_step_cb;
+	devcb_write_line	m_out_rwc_cb;
+	devcb_read_line		m_in_drdy_cb;
+	devcb_read_line		m_in_index_cb;
+	devcb_read_line		m_in_wf_cb;
+	devcb_read_line		m_in_tk000_cb;
+	devcb_read_line		m_in_sc_cb;
 };
 
 
@@ -67,11 +75,28 @@ protected:
     virtual void device_config_complete();
 
 private:
+	void compute_correction(UINT8 data);
+	void set_parameter(UINT8 data);
+	void restore(UINT8 data);
+	void seek(UINT8 data);
+	void read_sector(UINT8 data);
+	void write_sector(UINT8 data);
+	void scan_id(UINT8 data);
+	void format(UINT8 data);
+
 	devcb_resolved_write_line	m_out_intrq_func;
 	devcb_resolved_write_line	m_out_bdrq_func;
 	devcb_resolved_write_line	m_out_bcr_func;
 	devcb_resolved_read8		m_in_bcs_func;
 	devcb_resolved_write8		m_out_bcs_func;
+	devcb_resolved_write_line	m_out_dirin_func;
+	devcb_resolved_write_line	m_out_step_func;
+	devcb_resolved_write_line	m_out_rwc_func;
+	devcb_resolved_read_line	m_in_drdy_func;
+	devcb_resolved_read_line	m_in_index_func;
+	devcb_resolved_read_line	m_in_wf_func;
+	devcb_resolved_read_line	m_in_tk000_func;
+	devcb_resolved_read_line	m_in_sc_func;
 	
 	UINT8 m_status;
 	UINT8 m_error;
