@@ -48,6 +48,8 @@ void wd1772_t::device_reset()
 	status_type_1 = true;
 	last_dir = 1;
 	cur_live.tm = attotime::never;
+	intrq = false;
+	drq = false;
 }
 
 void wd1772_t::set_floppy(floppy_image_device *_floppy)
