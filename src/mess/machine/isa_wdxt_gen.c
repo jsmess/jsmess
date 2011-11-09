@@ -97,7 +97,7 @@ static ADDRESS_MAP_START( wd1015_io, AS_IO, 8, wdxt_gen_device )
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(wd1015_t0_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(wd1015_t1_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(wd1015_p1_r, wd1015_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(wd1015_p2_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(wd1015_p2_r, wd1015_p2_w)
 ADDRESS_MAP_END
 
 
@@ -324,15 +324,48 @@ WRITE8_MEMBER( wdxt_gen_device::wd1015_p1_w )
         P10     HSEL0
         P11     HSEL1
         P12     HSEL2
-        P13     DSEL0
-        P14     DSEL1
+        P13     _DSEL0
+        P14     _DSEL1
         P15     
-        P16     STEP?
-        P17     
+        P16     IREQ
+        P17     _DIRIN
 
     */
 
 	logerror("%s P1 %02x\n", machine().describe_context(), data);
+	
+	m_host->ireq_w(BIT(data, 6));
+}
+
+
+//-------------------------------------------------
+//  wd1015_p2_r -
+//-------------------------------------------------
+
+READ8_MEMBER( wdxt_gen_device::wd1015_p2_r )
+{
+	/*
+
+        bit     description
+
+        P20		
+        P21		
+        P22		
+        P23		
+        P24     
+        P25     
+        P26     TK000
+        P27     ECC NOT 0
+
+    */
+	
+	UINT8 data = 0;
+	
+	data |= m_host->ecc_not_0_r() << 7;
+
+	logerror("%s P2 read %02x\n", machine().describe_context(), data);
+	
+	return data;
 }
 
 
@@ -346,12 +379,12 @@ WRITE8_MEMBER( wdxt_gen_device::wd1015_p2_w )
 
         bit     description
 
-        P20		
-        P21		
-        P22		
-        P23		C/D ?
-        P24     CLCT
-        P25     
+        P20		STEP
+        P21		?
+        P22		MODE?
+        P23		?
+        P24     ?
+        P25     ?
         P26     
         P27     
 
@@ -359,5 +392,5 @@ WRITE8_MEMBER( wdxt_gen_device::wd1015_p2_w )
 	
 	logerror("%s P2 %02x\n", machine().describe_context(), data);
 	
-	m_host->clct_w(BIT(data, 4));
+	m_host->mode_w(BIT(data, 2));
 }

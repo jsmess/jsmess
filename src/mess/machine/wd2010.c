@@ -132,7 +132,9 @@ void wd2010_device::device_config_complete()
 //-------------------------------------------------
 
 wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, WD2010, "Western Digital WD2010", tag, owner, clock)
+    : device_t(mconfig, WD2010, "Western Digital WD2010", tag, owner, clock),
+	m_status(0),
+	m_error(0)
 {
 }
 
@@ -174,9 +176,10 @@ READ8_MEMBER( wd2010_device::read )
 	case TASK_FILE_ERROR:
 		data = m_error;
 		break;
-			
+		
 	case TASK_FILE_STATUS:
-		data = m_status;
+		m_out_intrq_func(CLEAR_LINE);
+		data = m_status | STATUS_RDY | STATUS_SC;
 		break;
 		
 	default:

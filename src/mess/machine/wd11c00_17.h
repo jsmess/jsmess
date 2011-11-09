@@ -76,8 +76,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( io_w );
 	DECLARE_WRITE_LINE_MEMBER( cd_w );
 	DECLARE_WRITE_LINE_MEMBER( clct_w );
+	DECLARE_WRITE_LINE_MEMBER( mode_w );
 
 	DECLARE_READ_LINE_MEMBER( busy_r );
+	DECLARE_READ_LINE_MEMBER( ecc_not_0_r );
 
 protected:
 	// device-level overrides
@@ -109,6 +111,15 @@ private:
 	UINT8 m_mask;
 
 	offs_t m_ra;
+	
+	int m_mode;
+	int m_ecc_not_0;
+	
+	int m_irq5;
+	int m_drq3;
+	int m_busy;
+	int m_req;
+	int m_ra3;
 };
 
 
