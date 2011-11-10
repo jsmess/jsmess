@@ -29,6 +29,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "iq151_disc2"; }
 
 	// iq151cart_interface overrides
@@ -40,6 +41,7 @@ private:
 
 	required_device<device_t>	m_fdc;
 	UINT8 *		m_rom;
+	bool 		m_rom_enabled;
 };
 
 
