@@ -1876,6 +1876,7 @@ $(MESS_MACHINE)/egret.o:	$(MESSSRC)/machine/egret.c\
 #-------------------------------------------------
 
 $(MESS_DRIVERS)/4004clk.o:	$(MESS_LAYOUT)/4004clk.lh
+$(MESS_VIDEO)/abc1600.o:	$(MESS_LAYOUT)/abc1600.lh
 $(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
 $(MESS_DRIVERS)/aim65_40.o:	$(MESS_LAYOUT)/aim65_40.lh
