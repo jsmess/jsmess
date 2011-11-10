@@ -19,6 +19,21 @@ ROM_START( iq151_video64 )
 	ROM_REGION(0x0800, "videoram", ROMREGION_ERASE)
 ROM_END
 
+
+/* F4 Character Displayer */
+static const gfx_layout iq151_video64_charlayout =
+{
+	6, 8,					/* 6 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -47,6 +62,8 @@ void iq151_video64_device::device_start()
 {
 	m_videoram = (UINT8*)subregion("videoram")->base();
 	m_chargen = (UINT8*)subregion("chargen")->base();
+
+	machine().gfx[0] = gfx_element_alloc(machine(), &iq151_video64_charlayout, m_chargen, 1, 0);
 }
 
 //-------------------------------------------------

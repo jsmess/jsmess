@@ -84,6 +84,15 @@ void iq151_disc2_device::device_start()
 }
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void iq151_disc2_device::device_reset()
+{
+	m_rom_enabled = false;
+}
+
+//-------------------------------------------------
 //  device_mconfig_additions
 //-------------------------------------------------
 
@@ -109,7 +118,7 @@ const rom_entry *iq151_disc2_device::device_rom_region() const
 void iq151_disc2_device::read(offs_t offset, UINT8 &data)
 {
 	// interal ROM is mapped at 0xe000-0xe7ff
-	if (offset >= 0xe000 && offset < 0xe800)
+	if (offset >= 0xe000 && offset < 0xe800 && m_rom_enabled)
 		data = m_rom[offset & 0x7ff];
 }
 
@@ -134,5 +143,7 @@ void iq151_disc2_device::io_write(offs_t offset, UINT8 data)
 {
 	if (offset == 0xab)
 		upd765_data_w(m_fdc, 0, data);
+	else if (offset == 0xac)
+		m_rom_enabled = (data == 0x01);
 }
 

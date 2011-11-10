@@ -53,6 +53,7 @@ ToDo:
 #include "machine/iq151cart.h"
 #include "machine/iq151_rom.h"
 #include "machine/iq151_disc2.h"
+#include "machine/iq151_staper.h"
 #include "video/iq151_grafik.h"
 #include "video/iq151_video32.h"
 #include "video/iq151_video64.h"
@@ -378,37 +379,6 @@ SCREEN_UPDATE_MEMBER( iq151_state )
 	return 0;
 }
 
-/* F4 Character Displayer */
-static const gfx_layout iq151_32_charlayout =
-{
-	8, 8,					/* 8 x 8 characters */
-	128,					/* 128 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
-};
-
-static const gfx_layout iq151_64_charlayout =
-{
-	6, 8,					/* 6 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
-};
-
-static GFXDECODE_START( iq151 )
-	GFXDECODE_ENTRY( "chargen", 0x0800, iq151_32_charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, iq151_64_charlayout, 0, 1 )
-GFXDECODE_END
 
 const struct pic8259_interface iq151_pic8259_config =
 {
@@ -451,6 +421,7 @@ static SLOT_INTERFACE_START(iq151_cart)
 	SLOT_INTERFACE("video64", IQ151_VIDEO64)			// video64
 	SLOT_INTERFACE("grafik" , IQ151_GRAFIK)				// Grafik
 	SLOT_INTERFACE("disc2"  , IQ151_DISC2)				// Disc 2
+	SLOT_INTERFACE("staper" , IQ151_STAPER)				// STAPER
 	SLOT_INTERFACE("basic6" , IQ151_BASIC6)				// BASIC6
 	SLOT_INTERFACE("basicg" , IQ151_BASICG)				// BASICG
 	SLOT_INTERFACE("amos1"  , IQ151_AMOS1)				// AMOS cart 1
@@ -472,7 +443,6 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
-	MCFG_GFXDECODE(iq151)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
 
@@ -512,10 +482,6 @@ ROM_START( iq151 )
 	ROMX_LOAD( "iq151_monitor_cpm.rom", 0xf000, 0x1000, CRC(26f57013) SHA1(4df396edc375dd2dd3c82c4d2affb4f5451066f1),ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 3, "cpmold", "CPM (old)" )
 	ROMX_LOAD( "iq151_monitor_cpm_old.rom", 0xf000, 0x1000, CRC(6743e1b7) SHA1(ae4f3b1ba2511a1f91c4e8afdfc0e5aeb0fb3a42),ROM_BIOS(4))
-
-	ROM_REGION( 0x0c00, "chargen", ROMREGION_INVERT )
-	ROM_LOAD( "iq151_video64font.rom", 0x0000, 0x0800, CRC(cb6f43c0) SHA1(4b2c1d41838d569228f61568c1a16a8d68b3dadf))
-	ROM_LOAD( "iq151_video32font.rom", 0x0800, 0x0400, CRC(395567a7) SHA1(18800543daf4daed3f048193c6ae923b4b0e87db))
 ROM_END
 
 /* Driver */
