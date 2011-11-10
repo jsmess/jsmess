@@ -92,6 +92,7 @@ public:
 	int m_sign_AB;
 	int m_sign_CD;
 	UINT32 m_palette[0x10];
+	int m_rotate0;
 	int m_rotate;
 	device_t *m_audio;
 	SUZY m_suzy;
@@ -109,7 +110,7 @@ public:
 /*----------- defined in machine/lynx.c -----------*/
 
 MACHINE_START( lynx );
-
+MACHINE_RESET( lynx );
 
 READ8_HANDLER( lynx_memory_config_r );
 WRITE8_HANDLER( lynx_memory_config_w );
