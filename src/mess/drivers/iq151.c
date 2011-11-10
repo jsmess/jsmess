@@ -53,6 +53,8 @@ ToDo:
 #include "machine/iq151cart.h"
 #include "machine/iq151_rom.h"
 #include "machine/iq151_disc2.h"
+#include "machine/iq151_minigraf.h"
+#include "machine/iq151_ms151a.h"
 #include "machine/iq151_staper.h"
 #include "video/iq151_grafik.h"
 #include "video/iq151_video32.h"
@@ -421,6 +423,8 @@ static SLOT_INTERFACE_START(iq151_cart)
 	SLOT_INTERFACE("video64", IQ151_VIDEO64)			// video64
 	SLOT_INTERFACE("grafik" , IQ151_GRAFIK)				// Grafik
 	SLOT_INTERFACE("disc2"  , IQ151_DISC2)				// Disc 2
+	SLOT_INTERFACE("minigraf" , IQ151_MINIGRAF)			// Aritma Minigraf 0507
+	SLOT_INTERFACE("ms151a" , IQ151_MS151A)				// MS151A XY Plotter
 	SLOT_INTERFACE("staper" , IQ151_STAPER)				// STAPER
 	SLOT_INTERFACE("basic6" , IQ151_BASIC6)				// BASIC6
 	SLOT_INTERFACE("basicg" , IQ151_BASICG)				// BASICG
