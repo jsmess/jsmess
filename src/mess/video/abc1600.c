@@ -1,12 +1,5 @@
-/*
-
-    TODO:
-
-    - landscape/portrait mode
-
-*/
-
 #include "includes/abc1600.h"
+#include "abc1600.lh"
 
 
 
@@ -198,7 +191,7 @@ READ8_MEMBER( abc1600_state::iord0_r )
 	UINT8 data = 0;
 
 	// monitor orientation (portrait/landscape)
-//  data |= 0x02;
+	data |= machine().render().first_target()->view() << 1;
 
 	// vertical sync
 	data |= m_crtc->vsync_r() << 6;
@@ -1122,6 +1115,8 @@ bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 //-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT( abc1600_video )
+	MCFG_DEFAULT_LAYOUT(layout_abc1600)
+
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(60)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
