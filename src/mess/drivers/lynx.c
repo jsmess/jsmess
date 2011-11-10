@@ -11,6 +11,7 @@
 #include "includes/lynx.h"
 
 #include "imagedev/snapquik.h"
+#include "lynx.lh"
 
 static QUICKLOAD_LOAD( lynx );
 
@@ -61,6 +62,7 @@ static MACHINE_CONFIG_START( lynx, lynx_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( lynx )
+	MCFG_MACHINE_RESET( lynx )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -71,6 +73,7 @@ static MACHINE_CONFIG_START( lynx, lynx_state )
 	MCFG_SCREEN_SIZE(160, 160)
 	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 102-1)
 	MCFG_SCREEN_UPDATE( generic_bitmapped )
+	MCFG_DEFAULT_LAYOUT(layout_lynx)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 	MCFG_PALETTE_INIT( lynx )
