@@ -131,6 +131,7 @@ void isa8_device::device_config_complete()
     	memset(&m_out_drq2_cb, 0, sizeof(m_out_drq2_cb));
     	memset(&m_out_drq3_cb, 0, sizeof(m_out_drq3_cb));
 	}
+	m_maincpu = mconfig().devicelist().find(m_cputag);
 }
 
 //**************************************************************************
@@ -155,8 +156,7 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 //-------------------------------------------------
 
 void isa8_device::device_start()
-{
-	m_maincpu = machine().device(m_cputag);
+{	
 	// resolve callbacks
 	m_out_irq2_func.resolve(m_out_irq2_cb, *this);
 	m_out_irq3_func.resolve(m_out_irq3_cb, *this);
@@ -184,7 +184,6 @@ void isa8_device::add_isa_card(device_isa8_card_interface *card)
 
 void isa8_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name)
 {
-	m_maincpu = machine().device(m_cputag);
 	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
@@ -205,7 +204,6 @@ void isa8_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t
 
 void isa8_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
 {
-	m_maincpu = machine().device(m_cputag);
 	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
@@ -226,7 +224,6 @@ void isa8_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t m
 
 void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
-	m_maincpu = machine().device(m_cputag);
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	space->install_readwrite_bank(start, end, mask, mirror, tag );
 	memory_set_bankptr(machine(), tag, data);
@@ -234,14 +231,12 @@ void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mir
 
 void isa8_device::unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror)
 {
-	m_maincpu = machine().device(m_cputag);
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	space->unmap_readwrite(start, end, mask, mirror);
 }
 
 void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region)
 {
-	m_maincpu = machine().device(m_cputag);
 	astring tempstring;
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	space->install_read_bank(start, end, mask, mirror, tag);
@@ -251,7 +246,6 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t ma
 
 void isa8_device::unmap_rom(offs_t start, offs_t end, offs_t mask, offs_t mirror)
 {
-	m_maincpu = machine().device(m_cputag);
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	space->unmap_read(start, end, mask, mirror);
 }
@@ -422,6 +416,7 @@ void isa16_device::device_config_complete()
     	memset(&m_out_drq6_cb, 0, sizeof(m_out_drq6_cb));
     	memset(&m_out_drq7_cb, 0, sizeof(m_out_drq7_cb));
 	}
+	m_maincpu = mconfig().devicelist().find(m_cputag);
 }
 
 //-------------------------------------------------
@@ -447,7 +442,6 @@ void isa16_device::device_start()
 
 void isa16_device::install16_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_device_func rhandler, const char* rhandler_name, write16_device_func whandler, const char *whandler_name)
 {
-	m_maincpu = machine().device(m_cputag);
 	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
@@ -465,7 +459,6 @@ void isa16_device::install16_device(device_t *dev, offs_t start, offs_t end, off
 
 void isa16_device::install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler)
 {
-	m_maincpu = machine().device(m_cputag);
 	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
