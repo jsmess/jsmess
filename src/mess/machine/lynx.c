@@ -1182,12 +1182,12 @@ static void lynx_draw_lines(running_machine &machine, int newline)
 		{
 			for ( ; state->m_line_y < yend; state->m_line_y++)
 			{
-				line = BITMAP_ADDR16(machine.generic.tmpbitmap, state->m_line_y, 0);
+				line = BITMAP_ADDR16(machine.generic.tmpbitmap, 0, state->m_line_y);
 				for (x = 160 - 2; x >= 0; j++, x -= 2)
 				{
 					byte = lynx_read_vram(state, j);
-					line[x + 1] = state->m_palette[(byte >> 4) & 0x0f];
-					line[x + 0] = state->m_palette[(byte >> 0) & 0x0f];
+					line[h*(x + 1)] = state->m_palette[(byte >> 4) & 0x0f];
+					line[h*x + 0] = state->m_palette[(byte >> 0) & 0x0f];
 				}
 			}
 		}
@@ -1195,12 +1195,12 @@ static void lynx_draw_lines(running_machine &machine, int newline)
 		{
 			for ( ; state->m_line_y < yend; state->m_line_y++)
 			{
-				line = BITMAP_ADDR16(machine.generic.tmpbitmap, 102 - 1 - state->m_line_y, 0);
+				line = BITMAP_ADDR16(machine.generic.tmpbitmap, 0, 102 - 1 - state->m_line_y);
 				for (x = 0; x < 160; j++, x += 2)
 				{
 					byte = lynx_read_vram(state, j);
-					line[x + 0] = state->m_palette[(byte >> 4) & 0x0f];
-					line[x + 1] = state->m_palette[(byte >> 0) & 0x0f];
+					line[h*x + 0] = state->m_palette[(byte >> 4) & 0x0f];
+					line[h*(x + 1)] = state->m_palette[(byte >> 0) & 0x0f];
 				}
 			}
 		}
@@ -1243,6 +1243,7 @@ static void lynx_draw_lines(running_machine &machine, int newline)
 			state->m_width = w;
 			state->m_height = h;
 			machine.primary_screen->set_visible_area(0, w - 1, 0, h - 1);
+			logerror("Visible area %d by %d \n", w-1, h-1);
 		}
 	}
 }
@@ -1890,6 +1891,10 @@ void lynx_crc_keyword(device_image_interface &image)
 
 static DEVICE_IMAGE_LOAD( lynx_cart )
 {
+	/* Lynx carts have 19 address lines, the upper 8 used for bank select. The lower
+	11 bits are used to address data within the selected bank. Valid bank sizes are 256,
+	512, 1024 or 2048 bytes. Commercial roms use all 256 banks.*/
+	
 	lynx_state *state = image.device().machine().driver_data<lynx_state>();
 	UINT8 *rom = image.device().machine().region("user1")->base();
 	UINT32 size;
@@ -1949,25 +1954,23 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 	else
 	{
 		size = image.get_software_region_length("rom");
+      if (size > 0xffff) // 64,128,256,512k cartridges
+      	state->m_granularity = size >> 8;
+      else
+      	state->m_granularity = 0x400; // Homebrew roms not using all 256 banks (T-Tris) (none currently in softlist)
 
-		/* here we assume images to be in .lnx format and to have an header.
-         we should eventually remove them, though! */
-		memcpy(header, image.get_software_region("rom"), 0x40);
-
-		/* Check the image */
-		if (lynx_verify_cart((char*)header, LYNX_CART) == IMAGE_VERIFY_FAIL)
-			return IMAGE_INIT_FAIL;
-
-		/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
-         it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
-         implement this as well */
-		state->m_granularity = header[4] | (header[5] << 8);
-
-		logerror ("%s %dkb cartridge with %dbyte granularity from %s\n",
-				  header + 10, size / 1024, state->m_granularity, header + 42);
-
-		size -= 0x40;
-		memcpy(rom, image.get_software_region("rom") + 0x40, size);
+		memcpy(rom, image.get_software_region("rom"), size);
+		
+		const char *rotate = image.get_feature("rotation");
+		state->m_rotate0 = 0;
+		if (rotate)
+		{
+			if(strcmp(rotate, "RIGHT") == 0)
+				state->m_rotate0 = 1;
+			else if (strcmp(rotate, "LEFT") == 0)
+				state->m_rotate0 = 2;
+		}
+		
 	}
 
 	return IMAGE_INIT_PASS;
