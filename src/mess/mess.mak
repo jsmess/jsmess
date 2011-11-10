@@ -1738,6 +1738,8 @@ $(MESSOBJ)/zpa.a:				\
 	$(MESS_MACHINE)/iq151cart.o	\
 	$(MESS_MACHINE)/iq151_rom.o	\
 	$(MESS_MACHINE)/iq151_disc2.o	\
+	$(MESS_MACHINE)/iq151_minigraf.o	\
+	$(MESS_MACHINE)/iq151_ms151a.o	\
 	$(MESS_MACHINE)/iq151_staper.o	\
 	$(MESS_VIDEO)/iq151_grafik.o	\
 	$(MESS_VIDEO)/iq151_video32.o	\
