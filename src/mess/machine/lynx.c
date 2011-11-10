@@ -8,7 +8,7 @@
 #include "hashfile.h"
 #include "imagedev/cartslot.h"
 #include "hash.h"
-
+#include "rendutil.h"
 
 
 
@@ -1864,28 +1864,20 @@ int lynx_verify_cart (char *header, int kind)
 	return IMAGE_VERIFY_PASS;
 }
 
-INTERRUPT_GEN( lynx_frame_int )
-{
-	lynx_state *state = device->machine().driver_data<lynx_state>();
-	state->m_rotate = state->m_rotate0;
-	if ((input_port_read(device->machine(), "ROTATION") & 0x03) != 0x03)
-		state->m_rotate=input_port_read(device->machine(), "ROTATION") & 0x03;
-}
-
 void lynx_crc_keyword(device_image_interface &image)
 {
-	lynx_state *state = image.device().machine().driver_data<lynx_state>();
 	const char *info = NULL;
 
 	info = hashfile_extrainfo(image);
-
-	state->m_rotate0 = 0;
+	
+	render_target *target = image.device().machine().render().first_target();
+	target->set_orientation(ROT0);
 	if (info)
 	{
 		if(strcmp(info, "ROTATE90DEGREE") == 0)
-			state->m_rotate0 = 1;
+			target->set_orientation(ROT90);
 		else if (strcmp(info, "ROTATE270DEGREE") == 0)
-			state->m_rotate0 = 2;
+			target->set_orientation(ROT270);
 	}
 }
 
@@ -1962,18 +1954,39 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 		memcpy(rom, image.get_software_region("rom"), size);
 		
 		const char *rotate = image.get_feature("rotation");
-		state->m_rotate0 = 0;
+		render_target *target = image.device().machine().render().first_target();		
+		int tmpint = ROT0;
 		if (rotate)
 		{
-			if(strcmp(rotate, "RIGHT") == 0)
-				state->m_rotate0 = 1;
-			else if (strcmp(rotate, "LEFT") == 0)
-				state->m_rotate0 = 2;
+			if(strcmp(rotate, "RIGHT") == 0) {
+				tmpint = ROT90;
+			}
+			else if (strcmp(rotate, "LEFT") == 0) {
+				tmpint = ROT270;
+			}
 		}
-		
+		target->set_orientation(tmpint);
+
+		// apply the opposite orientation to the UI
+		if (target->is_ui_target())
+		{
+			render_container::user_settings settings;
+			render_container &ui_container = image.device().machine().render().ui_container();
+
+			ui_container.get_user_settings(settings);
+			settings.m_orientation = orientation_add(orientation_reverse(tmpint), settings.m_orientation);
+			ui_container.set_user_settings(settings);
+		}
+
 	}
 
 	return IMAGE_INIT_PASS;
+}
+
+static DEVICE_IMAGE_UNLOAD( lynx_cart )
+{
+	render_target *target = image.device().machine().render().first_target();
+	target->set_orientation(ROT0);
 }
 
 MACHINE_CONFIG_FRAGMENT(lynx_cartslot)
@@ -1982,6 +1995,7 @@ MACHINE_CONFIG_FRAGMENT(lynx_cartslot)
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("lynx_cart")
 	MCFG_CARTSLOT_LOAD(lynx_cart)
+	MCFG_CARTSLOT_UNLOAD(lynx_cart)
 	MCFG_CARTSLOT_PARTIALHASH(lynx_partialhash)
 
 	/* Software lists */
