@@ -40,8 +40,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="a.p.b. - all points bulletin (euro, usa).lnx" size="262208" crc="68a0acab" sha1="4abef1bc702319d4347d839ac8513193164a08a0" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="a.p.b. - all points bulletin (euro, usa).bin" size="262144" crc="f6fb48fb" sha1="c2bf00de769895cbed03c056eb9c8fa1a7ea59ef" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -52,8 +52,8 @@ Known undumped prototypes:
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="alien vs predator (usa) (prototype).lnx" size="262208" crc="d6843e8e" sha1="860a73b9484c78330d3502a70bb807d699d540dc" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="alien vs predator (usa) (prototype).bin" size="262144" crc="540e9bb7" sha1="27427ed186d034d71e100cbff5d0072a717af9e0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -64,8 +64,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="awesome golf (euro, usa).lnx" size="262208" crc="2b90e818" sha1="c40ac4cc9a4aade0f7eab4283eed46d5882b35a8" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="awesome golf (euro, usa).bin" size="262144" crc="0483cd2a" sha1="74441b96ce5bf2be68945fbe93bda259f97816b7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -76,8 +76,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="baseball heroes (euro, usa).lnx" size="262208" crc="bb5de237" sha1="167ff323c8ea65416c9e34589bd1b4fd08f3bfda" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="baseball heroes (euro, usa).bin" size="262144" crc="3943c116" sha1="b30a1fe12dc3e69e1a179a5e4d1799d93996fc24" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -88,8 +88,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="basketbrawl (euro, usa).lnx" size="131136" crc="207fd124" sha1="54a8dc7a41af244fc835dd46fac98c21c3b97823" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="basketbrawl (euro, usa).bin" size="131072" crc="4161bb4a" sha1="46ae8e1504e2944525d535280a3ed32e0873788a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -100,8 +100,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="batman returns (euro, usa).lnx" size="262208" crc="68cd6dcb" sha1="45df55597bae86b9184861d64d1a1d770f1e8c40" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="batman returns (euro, usa).bin" size="262144" crc="277f82c2" sha1="2e25b17a221d4d9598811fbf84ab0da3016f26e4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -112,8 +112,8 @@ Known undumped prototypes:
 		<year>1993</year>
 		<publisher>Beyond Games</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="battle wheels (euro, usa).lnx" size="131136" crc="fd5ae3db" sha1="42f8a53fdba03358a65e82db81067e8e9aaba30b" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="battle wheels (euro, usa).bin" size="131072" crc="779faece" sha1="4577550d20a22cb685d51b411396d5085a852be6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -124,8 +124,8 @@ Known undumped prototypes:
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="battlezone 2000 (euro, usa).lnx" size="262208" crc="414bda9a" sha1="7edfa01096a61f681dd4bf217ab1f0281c3b33b0" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="battlezone 2000 (euro, usa).bin" size="262144" crc="30fee726" sha1="fb50ddee638aa316c7eae6d50961e3b69b112c4f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -136,8 +136,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="bill &amp; ted's excellent adventure (euro, usa).lnx" size="262208" crc="c91aff8a" sha1="f322d28a6311d84edc36b35083acc07a0ba4660a" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="bill &amp; ted's excellent adventure (euro, usa).bin" size="262144" crc="143a313e" sha1="f09ce08d93a479feaceceb79eb48b337aff49fae" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -148,8 +148,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="block out (euro, usa).lnx" size="131136" crc="c96e5bc6" sha1="2efb86ed51e676a6e59cce3b40e56f408fe84605" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="block out (euro, usa).bin" size="131072" crc="3cd75df3" sha1="ae177cf76953b7e0a56b03096bb5c9c9c9051177" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -160,8 +160,8 @@ Known undumped prototypes:
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="blue lightning (usa) (demo).lnx" size="131136" crc="0bd1b69c" sha1="d95653027c1956085a01541e3164ea637b52f100" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="blue lightning (usa) (demo).bin" size="131072" crc="bfe36525" sha1="57ece74ac94d65d86a960a44d9896e17b816bbde" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -172,8 +172,8 @@ Known undumped prototypes:
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="blue lightning (euro, usa).lnx" size="131136" crc="35af173c" sha1="fd4dfa7b8822229c0e0c5b0f6cde608f8f94bb65" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="blue lightning (euro, usa).bin" size="131072" crc="daf587b1" sha1="be08076586f76db368db1769380dcbb6de2a6513" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -184,8 +184,8 @@ Known undumped prototypes:
 		<year>1994</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="bubble trouble (euro, usa).lnx" size="262208" crc="96df6fa0" sha1="b5c4824271e4a86052d65e0dfeb01b0ada1f3600" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="bubble trouble (euro, usa).bin" size="262144" crc="333daece" sha1="cb9f78ffb02216979a03abb66301e4d3a8f01bfe" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -196,8 +196,8 @@ Known undumped prototypes:
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="california games (euro, usa).lnx" size="131136" crc="2918ea2e" sha1="9c89db856a1b85afdb0334d2bc5d9dffa1d3cca2" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="california games (euro, usa).bin" size="131072" crc="a08f0b59" sha1="f13e010102ca527a9c393acb52bb949a1ba93e3e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -208,8 +208,9 @@ Known undumped prototypes:
 		<year>199?</year>
 		<publisher>Shadowsoft</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="centipede (usa) (prototype).lnx" size="131136" crc="70cc4ae8" sha1="9954707eeba52904533cef59e5aae6e196434534" offset="000000" />
+			<feature name="rotation" value="LEFT" />
+			<dataarea name="rom" size="131072">
+				<rom name="centipede (usa) (prototype).bin" size="131072" crc="97501709" sha1="59a5185203e3550b1cad7b28489915bc8de80851" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -220,8 +221,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="checkered flag (euro, usa).lnx" size="262208" crc="6687f846" sha1="848694715135979c022561ef9e4da58b8a67c4f3" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="checkered flag (euro, usa).bin" size="262144" crc="19c5a7a5" sha1="f115bb5f98992d98c8d11b1daa68bb1961b59660" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -232,8 +233,8 @@ Known undumped prototypes:
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="chip's challenge (euro, usa).lnx" size="131136" crc="f45f784a" sha1="92af2d566c6bbf626a21dbfa41af16d73e0a774d" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="chip's challenge (euro, usa).bin" size="131072" crc="6a5f53ed" sha1="6a90e6627086e13d99bacbcaafea7ab2f6aba8a0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -244,8 +245,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="crystal mines ii (euro, usa).lnx" size="131136" crc="ecf9e1f7" sha1="4131dad8bf6056539c6002f5dfcd2e16fb831973" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="crystal mines ii (euro, usa).bin" size="131072" crc="aec474c8" sha1="3364bde38508c5c4fed5575295cc80c6f72edebe" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -256,8 +257,8 @@ Known undumped prototypes:
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="daemonsgate (usa) (prototype).lnx" size="262208" crc="9e6b7645" sha1="9e9bece7b410f909c661aaff44815b09d3d6b5aa" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="daemonsgate (usa) (prototype).bin" size="262144" crc="99729395" sha1="5a3a21eb5de37367d294e057f70a1f325bf23c4a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -268,8 +269,8 @@ Known undumped prototypes:
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="desert strike - return to the gulf (euro, usa).lnx" size="262208" crc="2eaae973" sha1="1e529493866d6485074233458b40c4e7b0f032ef" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="desert strike - return to the gulf (euro, usa).bin" size="262144" crc="b9ac1fe5" sha1="3149d8ba5661fd61dc94d518a0cb6d7b3a8f319f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -280,8 +281,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="dinolympics (euro, usa).lnx" size="262208" crc="0ed9eb06" sha1="8af3a298ddb7ba235b54891c221ef53a2c89e9db" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="dinolympics (euro, usa).bin" size="262144" crc="50386cfa" sha1="0dad2286934c6a317407db066f00233c27f54bbe" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -292,8 +293,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="dirty larry - renegade cop (euro, usa).lnx" size="262208" crc="c6017733" sha1="c1d62142fc5094252637dbc6a2355e41d0425fc2" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="dirty larry - renegade cop (euro, usa).bin" size="262144" crc="d565fbb7" sha1="ca856dc880663d7f105ae5aa2ff160b9fc209f92" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -304,8 +305,8 @@ Known undumped prototypes:
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="double dragon (euro, usa).lnx" size="262208" crc="bcb2e75a" sha1="1227eb28e6bad3c30b38d3dbfa9f929d836300c5" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="double dragon (euro, usa).bin" size="262144" crc="fbfc0f05" sha1="7fc3663bec878b138cfc51f14154823f9701c9e7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -316,8 +317,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="dracula the undead (euro, usa).lnx" size="262208" crc="0f4b4071" sha1="824f245004a778613c85d40c9a2785a8cefe4181" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="dracula the undead (euro, usa).bin" size="262144" crc="33bb74c7" sha1="8f393f0fa8ce832e6298db72f539ce4b961700e2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -328,8 +329,8 @@ Known undumped prototypes:
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="electrocop (euro, usa).lnx" size="131136" crc="765d742d" sha1="c06e983638b4466322a15a367cdaeb56fc2486e6" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="electrocop (euro, usa).bin" size="131072" crc="bd97116b" sha1="5bd6614bc98a882ec2f465278fe4f1ed6a4e972b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -340,8 +341,8 @@ Known undumped prototypes:
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="european soccer challenge (euro, usa).lnx" size="131136" crc="d714546d" sha1="c3b6ed0e72aa6fcfab0ac72ce682fdd304314dff" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="european soccer challenge (euro, usa).bin" size="131072" crc="f83397f9" sha1="f1d0390a36055ef2b7cb5f7ce44f622a63d82e80" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -352,8 +353,8 @@ Known undumped prototypes:
 		<year>199?</year>
 		<publisher>NuFX</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="eye of the beholder (usa) (prototype).lnx" size="131136" crc="a0010717" sha1="6c37e1f220e73ff784b90c81846cebe4db0ab3bc" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="eye of the beholder (usa) (prototype).bin" size="131072" crc="6bceaa9c" sha1="65c0517a59e0e93bad91245ee8085b3483428707" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -364,8 +365,8 @@ Known undumped prototypes:
 		<year>199?</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="fat bobby (euro, usa).lnx" size="262208" crc="e2f4da44" sha1="c7230ae604bec950522eb13aa549c3b1c603cebf" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="fat bobby (euro, usa).bin" size="262144" crc="9034ee27" sha1="766ed1a28528535338e176559a145afaffacf3ef" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -376,8 +377,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="fidelity ultimate chess challenge, the (euro, usa).lnx" size="131136" crc="96643baa" sha1="051f95a0c5b60e8c517b8df08f449110ed2bca68" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="fidelity ultimate chess challenge, the (euro, usa).bin" size="131072" crc="7e4b5945" sha1="f6afa50f161fffe5975cf5688a9314b8039d940f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -388,8 +389,8 @@ Known undumped prototypes:
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="gates of zendocon, the (euro, usa).lnx" size="131136" crc="d852dba7" sha1="d89985e2e692b335e3eb1e2a269ac2a2e4b3c8ad" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="gates of zendocon, the (euro, usa).bin" size="131072" crc="494cc568" sha1="4eb4d3eb29231b2e36d8ef6ede64a568f469c5fe" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -400,8 +401,9 @@ Known undumped prototypes:
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="gauntlet - the third encounter (euro, usa).lnx" size="131136" crc="8e0908e5" sha1="7cf7d08b52784e13d8278d249dcd8975d3714da4" offset="000000" />
+			<feature name="rotation" value="RIGHT" />
+			<dataarea name="rom" size="131072">
+				<rom name="gauntlet - the third encounter (euro, usa).bin" size="131072" crc="7f0ec7ad" sha1="41d27f0717a93d05a9d3d1110f571f791d330f55" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -412,8 +414,8 @@ Known undumped prototypes:
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="gordo 106 - the mutated lab monkey (euro, usa).lnx" size="262208" crc="0671acea" sha1="46fd69c68cb0929a2d21ecc5225390b7425ae3f4" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="gordo 106 - the mutated lab monkey (euro, usa).bin" size="262144" crc="d20a85fc" sha1="298163cf4355d0e8aaba264cd7dcd828b1fc6bec" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -424,8 +426,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="hard drivin' (euro, usa).lnx" size="131136" crc="9add0861" sha1="afe1a2b3ed37596378b2d40f54e1635bf15c5600" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="hard drivin' (euro, usa).bin" size="131072" crc="6df63834" sha1="6d33abd50d46f900e8762d6e64b51e647ea98b07" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -436,8 +438,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="hockey (euro, usa).lnx" size="262208" crc="0904a4d9" sha1="2f2d74cfba54360e7f5555d182a9e9e7f74287e8" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="hockey (euro, usa).bin" size="262144" crc="e8b45707" sha1="707af2b63c75b777ec519b63f0b8e86565356357" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -448,8 +450,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="hydra (euro, usa).lnx" size="262208" crc="8980a322" sha1="5ceb3ad748cd42e181067a191e2b0dccc0325057" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="hydra (euro, usa).bin" size="262144" crc="e3041c6c" sha1="fc0c7cabf3a2ee821f7441b71d19d52205f97721" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -460,8 +462,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="ishido - the way of stones (euro, usa).lnx" size="131136" crc="59c0c5f3" sha1="e43cbd787dc8291c954ebf41a5a5c5a389d9980c" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="ishido - the way of stones (euro, usa).bin" size="131072" crc="5cf8bbf0" sha1="78c295af3a57b5bd7d7e1d13ab13ad67885c4e89" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -472,8 +474,8 @@ Known undumped prototypes:
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="524352">
-				<rom name="jimmy connors' tennis (euro, usa).lnx" size="524352" crc="fdd6536d" sha1="eb53241c8cac2456684c4b1fe86aa8c90e765d91" offset="000000" />
+			<dataarea name="rom" size="524288">
+				<rom name="jimmy connors' tennis (euro, usa).bin" size="524288" crc="2455b6cf" sha1="d9c4220653b2dfbd6b26c0a0c81c40cb3108ee85" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -484,8 +486,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Williams Entertainment</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="joust (euro, usa).lnx" size="131136" crc="66b1eb4a" sha1="4279730d1c80284acb410e7d95a05dec8f08902a" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="joust (euro, usa).bin" size="131072" crc="5dba792a" sha1="ead01f532bcaf535065dfd66b26d04b484d0066e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -496,8 +498,9 @@ Known undumped prototypes:
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="klax (euro, usa).lnx" size="262208" crc="ec53a878" sha1="66a04e14e07367a59fb979b25915008ac1602233" offset="000000" />
+			<feature name="rotation" value="RIGHT" />
+			<dataarea name="rom" size="262144">
+				<rom name="klax (euro, usa).bin" size="262144" crc="a53649f1" sha1="a1d2dc0771f4a30e539ab3261a21cc71adc71550" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -508,8 +511,8 @@ Known undumped prototypes:
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="krazy ace - miniature golf (euro, usa).lnx" size="262208" crc="96c5d9b9" sha1="8ddb2fc5898110f4069a47f91016d4ad3d014ac7" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="krazy ace - miniature golf (euro, usa).bin" size="262144" crc="bed5ba2b" sha1="20e9011c922f06d9c8823f15c71e005ac2268295" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -520,8 +523,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="kung food (euro, usa).lnx" size="262208" crc="3529d2d7" sha1="ba5f63f558f818d4cf69173c9b00f1b0247a9282" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="kung food (euro, usa).bin" size="262144" crc="cd1bd405" sha1="ae1bd18b30dd9ae67472c4c532f4d65d23324555" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -532,8 +535,8 @@ Known undumped prototypes:
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="lemmings (euro, usa).lnx" size="262208" crc="a77b6b64" sha1="e61c173116eacecf90d0296c03d8c216be57400c" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="lemmings (euro, usa).bin" size="262144" crc="39b9b8cc" sha1="4d430b1aacf207a631f81b2089688b82267d0394" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -544,8 +547,8 @@ Known undumped prototypes:
 		<year>1999</year>
 		<publisher>Songbird Productions</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="lexis (euro, usa).lnx" size="262208" crc="57bd4b4c" sha1="86c0bf4dd546426b844b628cd8f847f3e5e2107b" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="lexis (euro, usa).bin" size="262144" crc="0271b6e9" sha1="b973cee4a58dbae5ab2d540b38db90aae78ba323" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -556,8 +559,8 @@ Known undumped prototypes:
 		<year>2004</year>
 		<publisher>Songbird Productions</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="loopz (usa) (prototype).lnx" size="262208" crc="93281104" sha1="fa7ce862c1ea15af4ffcf15e0cccc2a8a84b8e6d" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="loopz (usa) (prototype).bin" size="262144" crc="b1c25ef1" sha1="b43b0841a5d315d8e515ceaece29875ba6f9afbb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -568,8 +571,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="lynx casino (euro, usa).lnx" size="262208" crc="5539baf4" sha1="a5fb943e2eeece25bc3aaf1e9f6ae5c030672193" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="lynx casino (euro, usa).bin" size="262144" crc="1091a268" sha1="4b82a9bc02330c9213c2bbd74d547d520c4e6fa3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -580,8 +583,8 @@ Known undumped prototypes:
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="malibu bikini volleyball (euro, usa).lnx" size="262208" crc="aba3e776" sha1="f47f2aed04ba18152347aa2e0858b56c374c5f71" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="malibu bikini volleyball (euro, usa).bin" size="262144" crc="aba6da3d" sha1="9c3d8037d347c0ff23d941eff8b575a4f2f051da" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -592,8 +595,8 @@ Known undumped prototypes:
 		<year>1993</year>
 		<publisher>Digital Image</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="marlboro go! (euro) (prototype).lnx" size="262208" crc="8d484e65" sha1="3d0ee922c3572c9a861fc250082e659e6ebd4c8c" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="marlboro go! (euro) (prototype).bin" size="262144" crc="c3fa0d4d" sha1="26b18b706359b093d0b1bbca4dba9cd2d73e0372" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -604,8 +607,8 @@ Known undumped prototypes:
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="ms. pac-man (euro, usa).lnx" size="131136" crc="fd071dd6" sha1="26687ae97c5014e681f2ea44f401b314ad61c540" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="ms. pac-man (euro, usa).bin" size="131072" crc="7de3783a" sha1="ff644034cd840f8c13b643c44ec2c685290e0326" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -616,8 +619,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="nfl football (euro, usa).lnx" size="262208" crc="c398359e" sha1="22735fcd59eb028a4041027a369602b0bd968eb5" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="nfl football (euro, usa).bin" size="262144" crc="006fd398" sha1="caea445bddcf75bcbe13920718279220d1acb869" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -628,8 +631,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="ninja gaiden (euro, usa).lnx" size="262208" crc="5adf25f0" sha1="e751c35cce6e2e126ce7ccbd32b148dd6e248809" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="ninja gaiden (euro, usa).bin" size="262144" crc="22d47d51" sha1="a40b5dabff9c2f6114fdbc587c72312704d7fabb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -640,8 +643,8 @@ Known undumped prototypes:
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="524352">
-				<rom name="ninja gaiden iii - the ancient ship of doom (euro, usa).lnx" size="524352" crc="cd2ffbcc" sha1="70f4115a92e3fdc4c93339ac801976a7697397ba" offset="000000" />
+			<dataarea name="rom" size="524288">
+				<rom name="ninja gaiden iii - the ancient ship of doom (euro, usa).bin" size="524288" crc="f3e3f811" sha1="37861cc3025d9addbace8d07c8f65961cba29eaa" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -652,8 +655,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="pac-land (euro, usa).lnx" size="131136" crc="5b57126a" sha1="ca4f651c9955b756a88d3e7714f033c592fa0f6a" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="pac-land (euro, usa).bin" size="131072" crc="aa50dd22" sha1="58b57835703e3145a54e1c0ada38c9218bf4cd3d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -664,8 +667,8 @@ Known undumped prototypes:
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="paperboy (euro, usa).lnx" size="131136" crc="d6a4c70b" sha1="7b5150cc095c554b0578bdd9a20caec0a7921547" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="paperboy (euro, usa).bin" size="131072" crc="4cdfbd57" sha1="537bae2c336dc9925f10505d4040965ca7434f5d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -676,8 +679,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="pinball jam (euro, usa).lnx" size="262208" crc="8863c28d" sha1="1f1695acbecf39cf6fd7afa71ce5f5e0ec80934d" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="pinball jam (euro, usa).bin" size="262144" crc="14d38ca7" sha1="d9f911dc35a6b70ba38569d47c96da25ffc7f40e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -688,8 +691,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="524352">
-				<rom name="pit fighter - the ultimate competition (euro, usa).lnx" size="524352" crc="cbaf54f3" sha1="d87b768ec219ba468e050d4a6c71ef59854adb28" offset="000000" />
+			<dataarea name="rom" size="524288">
+				<rom name="pit fighter - the ultimate competition (euro, usa).bin" size="524288" crc="2393135f" sha1="30f8c7acf41a988578768b251e88b636462752cb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -700,8 +703,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="power factor (euro, usa).lnx" size="262208" crc="5db41679" sha1="858855f42fd24c692859f43df261dbc0e19f0819" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="power factor (euro, usa).bin" size="262144" crc="99c42034" sha1="1ad5386f43f60d848a40ee1237e5bd153faea23f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -712,8 +715,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="qix (euro, usa).lnx" size="131136" crc="5651e1a8" sha1="ab9545de5b867c930afed570668d03b1ee41a9dd" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="qix (euro, usa).bin" size="131072" crc="b9881423" sha1="30b8369ea396347d4847990691d880c313aacae7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -724,8 +727,9 @@ Known undumped prototypes:
 		<year>1997</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="raiden (usa) (v3.0).lnx" size="262208" crc="2702ba4f" sha1="752a58e02787afc145f5245aec3577ad4bff954e" offset="000000" />
+		<feature name="rotation" value="LEFT" />
+			<dataarea name="rom" size="262144">
+				<rom name="raiden (usa) (v3.0).bin" size="262144" crc="bcd10c3a" sha1="df48f69a7257a40844812e5b0bda9efdf093b7f6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -736,8 +740,8 @@ Known undumped prototypes:
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="rampage (euro, usa).lnx" size="262208" crc="490033c9" sha1="52a0bf6aa79be75c7f97e4f2998469fb8f1c1596" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="rampage (euro, usa).bin" size="262144" crc="b10b7c8e" sha1="771dbf246386da37670324d34066671f3f43ac0e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -748,8 +752,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="rampart (euro, usa).lnx" size="262208" crc="adab7883" sha1="d024992d0032bce698273e81d7276fba9a19f75f" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="rampart (euro, usa).bin" size="262144" crc="139f301d" sha1="3c3a0729bb4ddecf5e5fd2d9ced4671d2e0e702e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -760,8 +764,8 @@ Known undumped prototypes:
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="road riot 4wd (usa) (prototype).lnx" size="262208" crc="3bebb6d1" sha1="e6102b29727fd76177efd64c26f40dd6beee6888" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="road riot 4wd (usa) (prototype).bin" size="262144" crc="69959a3b" sha1="63978dfd86782acc101266d7bab8677e32d7ea8f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -772,8 +776,8 @@ Known undumped prototypes:
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="roadblasters (euro, usa).lnx" size="262208" crc="47f69051" sha1="bc005446fb9e96848823e8baa722c6a7761783e1" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="roadblasters (euro, usa).bin" size="262144" crc="6867e80c" sha1="20233381f12a48bc61b2c4b7a8f602a2c8ebc8ba" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -784,8 +788,8 @@ Known undumped prototypes:
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="robo-squash (euro, usa).lnx" size="131136" crc="aeed3e7e" sha1="a5a3204508207929b4b4e29d112b1653bb679b91" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="robo-squash (euro, usa).bin" size="131072" crc="d1dff2b2" sha1="144e4aa67babc8f3e24c5547f8664c3c6cff8601" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -796,8 +800,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Williams Entertainment</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="robotron 2084 (euro, usa).lnx" size="131136" crc="28c789c8" sha1="ffc7e5a8d1b9226642e09b91d50cc30534e3c609" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="robotron 2084 (euro, usa).bin" size="131072" crc="7a6049b5" sha1="04048aa47c0ff99647608d4d1ccf48ba881a0f89" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -808,8 +812,8 @@ Known undumped prototypes:
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="rygar - legendary warrior (euro, usa).lnx" size="262208" crc="1dfca564" sha1="24e14920178e3481f161783b73efca0a1594c8cf" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="rygar - legendary warrior (euro, usa).bin" size="262144" crc="67e5bdba" sha1="8743769af583af681fd1d96aadb533d26b1b510d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -820,8 +824,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="s.t.u.n. runner (euro, usa).lnx" size="262208" crc="4b3bf84f" sha1="3ccd01902f07ab06f9c815ac75a4865a82e78599" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="s.t.u.n. runner (euro, usa).bin" size="262144" crc="8595c40b" sha1="aa570dbbf4682da3297286fc69617c3c9aca2f18" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -832,8 +836,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="scrapyard dog (euro, usa).lnx" size="262208" crc="ca0d1bda" sha1="112e6433deca07dd49e2adf1a436cacfe94af7d6" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="scrapyard dog (euro, usa).bin" size="262144" crc="be166f3b" sha1="df57cd7f119fa6af8f9b24942f0f12314b301075" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -844,8 +848,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="shadow of the beast (euro, usa).lnx" size="262208" crc="d43a8430" sha1="f4bda927017465cfd417d5ad8a62fa095cc3a101" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="shadow of the beast (euro, usa).bin" size="262144" crc="eb78baa3" sha1="8b891b5dafba71740294c8dc818717d3b00be3a5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -856,8 +860,8 @@ Known undumped prototypes:
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="shanghai (euro, usa).lnx" size="131136" crc="78ba01fd" sha1="dbc5749a30d05c3fbb7e247d80405dd026bc8add" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="shanghai (euro, usa).bin" size="131072" crc="192bcd04" sha1="9e67e05545934a7d375597b0e8c469468c5748a4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -868,8 +872,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="steel talons (euro, usa).lnx" size="262208" crc="ab814832" sha1="2d3536b3c5f3b8aa9dd5d952dbd43beac3043f6f" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="steel talons (euro, usa).bin" size="262144" crc="5b2308ed" sha1="773946365ecf3c862cfa21167750140e4b1adad2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -880,8 +884,8 @@ Known undumped prototypes:
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="super asteroids, missile command (euro, usa).lnx" size="131136" crc="7d8a25d1" sha1="3b36e4e256ceabfd8ef8f86731d01bc191f7d5a7" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="super asteroids, missile command (euro, usa).bin" size="131072" crc="2da7e2a8" sha1="d15c7382346cae6296e83ef494a8aec3adaf949c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -892,8 +896,8 @@ Known undumped prototypes:
 		<year>1993</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="super off-road (euro, usa).lnx" size="262208" crc="c51b7a2f" sha1="825540819ec2dfee70b6d189f13c6c07c39d387d" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="super off-road (euro, usa).bin" size="262144" crc="690caeb0" sha1="9bf10edfedde85467f159afb48d02f1ca43be8f4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -904,8 +908,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="super skweek (euro, usa).lnx" size="262208" crc="11b712f6" sha1="a6185962f6106bad3b20abe5bd724c6ea8c7ba34" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="super skweek (euro, usa).bin" size="262144" crc="dfa61571" sha1="d6c18bf5e625cbac7434ef0d600ad0da667f24cd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -916,8 +920,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="switchblade ii (euro, usa).lnx" size="262208" crc="63144491" sha1="01fb0609e292d84de23adee31be44605e9d0503c" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="switchblade ii (euro, usa).bin" size="262144" crc="13657705" sha1="256d55e8e9478c53e340321c858df6710a9f69a6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -928,8 +932,8 @@ Known undumped prototypes:
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="todd's adventures in slime world (euro, usa).lnx" size="131136" crc="39bf3c25" sha1="a1914219cc572c8e41becd61839abac72e811260" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="todd's adventures in slime world (euro, usa).bin" size="131072" crc="ae267e29" sha1="2b9c665456d17726ea57fd06ce2754a14382dc99" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -940,8 +944,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="toki (euro, usa).lnx" size="262208" crc="52b94a6c" sha1="9a01844c003e7755bd3b219f028fd2bd9eee1640" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="toki (euro, usa).bin" size="262144" crc="156a4a4c" sha1="242fee76ea2ae263511df5d8bd3f7b0ddc81757d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -952,8 +956,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="tournament cyberball 2072 (euro, usa).lnx" size="262208" crc="70d0c9bf" sha1="e2d5f95b046ec0950cf872413202ec504dbf5338" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="tournament cyberball 2072 (euro, usa).bin" size="262144" crc="0590a9e3" sha1="e63cc54e34840a4e3c1aa5bbce4e406895e44534" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -964,8 +968,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="turbo sub (euro, usa).lnx" size="131136" crc="5247b5f3" sha1="b56ea80870a19ac3436a66c80447a2aa0ff49d83" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="turbo sub (euro, usa).bin" size="131072" crc="a4b924d6" sha1="1186b3216830c5bbeac6b39aab1039eef27f0785" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -976,8 +980,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="viking child (euro, usa).lnx" size="262208" crc="45969eb0" sha1="2a0a1e303da1d8fc2ea1c59a16398946787614a6" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="viking child (euro, usa).bin" size="262144" crc="8d56828b" sha1="47c32e4d816dde797b6bba2019f2e296bdad02dd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -988,8 +992,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="warbirds (euro, usa).lnx" size="131136" crc="a6ae2301" sha1="340e76e14d0d1b961d2c2d2b1b7146381dda3a48" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="warbirds (euro, usa).bin" size="131072" crc="b946ba49" sha1="2c376581ac20fb5de8538b51820e1f007cca8260" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1000,8 +1004,8 @@ Known undumped prototypes:
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="world class soccer (euro, usa).lnx" size="262208" crc="9d929f2c" sha1="cc2e2a4cefbaa3ec6961a4e23b2f37262f9816c8" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="world class soccer (euro, usa).bin" size="262144" crc="91233794" sha1="40100a0db681b4efca4a491c88bf76a19105336f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1012,8 +1016,8 @@ Known undumped prototypes:
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="xenophobe (euro, usa).lnx" size="131136" crc="922a9dd0" sha1="1f8a8e144d8ea19cfb2ec2f198060ba933b94849" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="xenophobe (euro, usa).bin" size="131072" crc="9bed736d" sha1="a1b4f7a4697310cafea1271bd4b41eeafae60ffa" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1024,8 +1028,8 @@ Known undumped prototypes:
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="xybots (euro, usa).lnx" size="262208" crc="cac9a246" sha1="c3c117db6060d2b99d914e96284d4c2da723d033" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="xybots (euro, usa).bin" size="262144" crc="89e2a595" sha1="5ff3c39a6919db6d2270bb22e80e7680550c47ba" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1036,8 +1040,8 @@ Known undumped prototypes:
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="zarlor mercenary (euro, usa).lnx" size="131136" crc="35bc4ff9" sha1="24397a46e45ae34d7b06b222c56f950976ab44b6" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="zarlor mercenary (euro, usa).bin" size="131072" crc="cb27199d" sha1="7005cdfa0a2e4a9611266ce50493cbb32351e069" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1048,8 +1052,8 @@ Known undumped prototypes:
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="dragnet (1995).lnx" size="262208" crc="7cdc4f1b" sha1="1333d7f43134d01cc6c62cfe66778b6fc7471dac" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="dragnet (1995).bin" size="262144" crc="5598a4c9" sha1="fc802b8b6a62312e6f68065881d0e4f23a967451" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1060,56 +1064,8 @@ Known undumped prototypes:
 		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="conquest of zow (1996).lnx" size="262208" crc="9ccfdcd0" sha1="41af0a1d8e4aa67b162394abf770e4a812f59a9f" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tres">
-		<description>T-RES (title unknown) (199x) [b1]</description>
-		<!-- Serial: N/A -->
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="131136">
-				<rom name="t-res (title unknown) (199x) [b1].lnx" size="131136" crc="dd0fe131" sha1="a8d97587a5749d19158d1749ee998c520b7c71fe" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tetris1">
-		<description>Tetris (1996) [b1]</description>
-		<!-- Serial: N/A -->
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="tetris (1996) [b1].lnx" size="262208" crc="f8218bb3" sha1="3b8c1b399307cdb1103cbe6ae5d53f25e07a12c9" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tetris2">
-		<description>Tetris (1996) [b2]</description>
-		<!-- Serial: N/A -->
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262175">
-				<rom name="tetris (1996) [b2].lnx" size="262175" crc="8c803b33" sha1="df431f2748f54bdd6b77380712b04fc0dea609c0" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tetris3">
-		<description>Tetris (1996) [b3]</description>
-		<!-- Serial: N/A -->
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="tetris (1996) [b3].lnx" size="262208" crc="22bfcedf" sha1="a3c8fbb6ecbe989f589313e3a708f1dd674a8f46" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="conquest of zow (1996).bin" size="262144" crc="b02821fa" sha1="87b683653dfe76af02a1920582b6362ee11a3715" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1120,8 +1076,8 @@ Known undumped prototypes:
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="lynx ii production test program v0.02 (usa) (prototype).lnx" size="262208" crc="93acf1dc" sha1="d56925c596d47b17a4e778ba5d5475da447872d4" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="lynx ii production test program v0.02 (usa) (prototype).bin" size="262144" crc="28ada019" sha1="c0d35fcfac44437cf3d6d56e6f8cea0dcb12a296" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
