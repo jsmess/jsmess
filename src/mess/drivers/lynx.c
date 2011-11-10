@@ -38,13 +38,6 @@ static INPUT_PORTS_START( lynx )
 	PORT_START("PAUSE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_3)
 	// power on and power off buttons
-
-	PORT_START("ROTATION")
-	PORT_CONFNAME ( 0x03, 0x03, "90 Degree Rotation" )
-	PORT_CONFSETTING(	  0x00, DEF_STR( None ) )
-	PORT_CONFSETTING(	  0x01, "Clockwise" )
-	PORT_CONFSETTING(	  0x02, "Counterclockwise" )
-	PORT_CONFSETTING(	  0x03, "Crcfile" )
 INPUT_PORTS_END
 
 static PALETTE_INIT( lynx )
@@ -65,7 +58,6 @@ static MACHINE_CONFIG_START( lynx, lynx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MCFG_CPU_PROGRAM_MAP(lynx_mem)
-	MCFG_CPU_VBLANK_INT("screen", lynx_frame_int)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( lynx )
