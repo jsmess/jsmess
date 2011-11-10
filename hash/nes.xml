@@ -37187,6 +37187,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="bugtris">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>BugTris (Kor)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-NROM-256" />
+			<dataarea name="chr" size="8192">
+				<rom name="bugtris (kor)(unl).chr" size="8192" crc="5725a190" sha1="820d7adec614a94376f842a7bb7d1bcc8b5317f0" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="bugtris (kor)(unl).prg" size="32768" crc="1e034eae" sha1="03cef1cd9ab6482cf45d2a36a0ac2e37936ec758" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="business">
 		<!-- Serial:  - Release Date: 1991-01-2 - Alternative Title:  -->
 		<description>Business Wars (Jpn)</description>
@@ -45926,7 +45942,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 <!-- ES-1011 Sou Fei Ya De Fu Su - Chinese translation of Fire Emblem Gaiden, see below -->
 
-	<software name="firembgca" cloneof="firembg" supported="no">
+	<software name="firembgcb" cloneof="firembg" supported="no">
 		<!-- Serial: ES-1011 - Release Date:  - Alternative Title: 索菲亚复苏 -->
 		<description>Sheng Huo Hui Zhang - Suo Fei Ya De Fu Su (Chi)</description>
 		<year>199?</year>
@@ -45945,7 +45961,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="firembgcb" cloneof="firembg" supported="no">
+	<software name="firembgcc" cloneof="firembg" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Sheng Huo Hui Zhang - Suo Fei Ya De Fu Su (Chi, Alt)</description>
 		<year>199?</year>
@@ -48644,9 +48660,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="firembgc" cloneof="firembg" supported="no">
+<!-- These two got dumped by TSZone? They came together and one with a [fix] tag... -->
+	<software name="firembgca" cloneof="firembg" supported="no">
 		<!-- Serial: ES-1011 - Release Date:  - Alternative Title: 索菲亚复苏 -->
-		<description>Sheng Huo Hui Zhang - Suo Fei Ya Fusou (Chi)</description>
+		<description>Sheng Huo Hui Zhang - Suo Fei Ya Fusou (Chi, Fixed?)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -48656,6 +48673,25 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="fire emblem gaiden (ch).prg" size="524288" crc="ee88b6b6" sha1="64d57b052811379e9043804ff18afbec9fb22fae" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firembgc" cloneof="firembg" supported="no">
+		<!-- Serial: ES-1011 - Release Date:  - Alternative Title: 索菲亚复苏 -->
+		<description>Sheng Huo Hui Zhang - Suo Fei Ya Fusou (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-SH2" />
+			<dataarea name="chr" size="131072">
+				<rom name="fire emblem gaiden (c).chr" size="131072" crc="e2a69192" sha1="bb39f84f87b33c81d0c91208dd256d34d29b30ff" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="fire emblem gaiden (c).prg" size="524288" crc="ab2e685f" sha1="320686c7955ea6abc3123ad68cf6975e989ddfd7" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -58339,6 +58375,26 @@ Other
 		</part>
 	</software>
 
+<!-- This needs more investigations: is it ripped from a multicart? was it from a standalone cart?  does it really use mapper 0 
+(and if so why the invalid code)?  is it the same fancy bros of a lot of multicarts (where the game have the wrong mirroring, 
+resulting in tons of glitches? -->
+	<software name="fancybro" cloneof="smb" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Fancy Bros. (Super Mario Bros. pirate)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="8192">
+				<rom name="fancy bros (unl).chr" size="8192" crc="33b3bebd" sha1="9e4e974db73043dc26cbd8a832c77f8767be5568" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="fancy bros (unl).prg" size="32768" crc="4f17e986" sha1="9de0d7726b751a7a74842c8cc865d8a339785272" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="felixjer" cloneof="ttoonadv">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Felix vs Jerry (Tiny Toon Adventures pirate)</description>
@@ -62718,7 +62774,24 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_110">
+<!-- According to Cah4e3 this dumps has corrupted chunks of PRG. Investigate... -->
+	<software name="mc_110a" cloneof="mc_110">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>110 in 1 (Bad?)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-110IN1" />
+			<dataarea name="chr" size="1048576">
+				<rom name="110-in-1 [p1].chr" size="1048576" crc="122d2157" sha1="46f495db08201250de51f7a4ac3ab7b09089b7b9" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="2097152">
+				<rom name="110-in-1 [p1].prg" size="2097152" crc="78fcf4fa" sha1="763741abc3d6f6e9cf90a8ae6d337e26853f478b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_110" supported="partial">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>110 in 1</description>
 		<year>19??</year>
@@ -62729,7 +62802,7 @@ be better to redump them properly. -->
 				<rom name="110-in-1 [p1].chr" size="1048576" crc="122d2157" sha1="46f495db08201250de51f7a4ac3ab7b09089b7b9" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="2097152">
-				<rom name="110-in-1 [p1].prg" size="2097152" crc="78fcf4fa" sha1="763741abc3d6f6e9cf90a8ae6d337e26853f478b" offset="00000" status="baddump" />
+				<rom name="110-in-1 [p1].prg" size="2097152" crc="8763c67e" sha1="322ce15684ec4620eb6a3dc1f085d341b8089541" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -63462,6 +63535,54 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_4fk26" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>4 in 1 (FK23C8026)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-FK23C" />
+			<dataarea name="chr" size="1048576">
+				<rom name="4-in-1 (fk23c8026) [p1][!].chr" size="1048576" crc="879c76f9" sha1="6e50c9901c47f8f5917a7141e08456b56b06314a" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="1048576">
+				<rom name="4-in-1 (fk23c8026) [p1][!].prg" size="1048576" crc="2ab4faec" sha1="09ac5f9cb8ec11bef48d9b67725888ab9204c3d3" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4fk45" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>4 in 1 (FK23C8045)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-FK23C" />
+			<dataarea name="chr" size="1048576">
+				<rom name="4-in-1 (fk23c8045) [p1][!].chr" size="1048576" crc="b0c61532" sha1="855551304ca2dad32b15de075b52350c4d822207" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="1048576">
+				<rom name="4-in-1 (fk23c8045) [p1][!].prg" size="1048576" crc="70daa872" sha1="50c2d4c328a3dfc260219e23dcd33eb30563d39f" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4fk56" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>4 in 1 (FK23C8056)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-FK23C" />
+			<dataarea name="chr" size="1048576">
+				<rom name="4-in-1 (fk23c8056) [p1][!].chr" size="1048576" crc="10f93195" sha1="fc3e2cf8a814c388e4e83bc27cb65708d2cb5809" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="1048576">
+				<rom name="4-in-1 (fk23c8056) [p1][!].prg" size="1048576" crc="147a9a99" sha1="b86e8dde65f064400896b165abcc6a89342a45dc" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_4fk78" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>4 in 1 (FK23C8078)</description>
@@ -63478,7 +63599,23 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_4fk44" supported="no">
+	<software name="mc_4fk79" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>4 in 1 (FK23C8079)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-FK23C" />
+			<dataarea name="chr" size="1048576">
+				<rom name="4-in-1 (fk23c8079) [p1][!].chr" size="1048576" crc="01deb116" sha1="7d9cf76ef370522a7a410aeffc9b6c7129f72c4d" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="1048576">
+				<rom name="4-in-1 (fk23c8079) [p1][!].prg" size="1048576" crc="5b46b05b" sha1="427364494e3d2312497affe959364671c17c6096" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4f244" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>4 in 1 (FK23C8244)</description>
 		<year>19??</year>
@@ -65187,6 +65324,22 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="super hik 4-in-1 [p1].prg" size="524288" crc="4450e871" sha1="565394e866dee3643211f46f7f260acc104903f0" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_sh4b">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>1997 Super HIK 4 in 1 (JY-052)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="JYCOMPANY-A" />
+			<dataarea name="chr" size="524288">
+				<rom name="1997 super hik 4-in-1 (jy-052) [p1].chr" size="524288" crc="802efc47" sha1="857018c2f70fc558c02eeadb1f2bb7a51222eb54" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="1997 super hik 4-in-1 (jy-052) [p1].prg" size="524288" crc="a8b1f53c" sha1="dedfd6341b04f14de03d79cbc50a762d020ce437" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
