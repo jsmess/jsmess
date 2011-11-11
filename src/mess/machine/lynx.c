@@ -1148,7 +1148,6 @@ DISPCTL EQU $FD92       ; set to $D by INITMIKEY
 static void lynx_draw_lines(running_machine &machine, int newline)
 {
 	lynx_state *state = machine.driver_data<lynx_state>();
-	int h,w;
 	int x, yend;
 	UINT16 j; // clipping needed!
 	UINT8 byte;
@@ -1173,76 +1172,30 @@ static void lynx_draw_lines(running_machine &machine, int newline)
 	if (state->m_mikey.data[0x92] & 0x02)
 		j -= 160 * 102 / 2 - 1;
 
-	/* rotation */
-	if (state->m_rotate & 0x03)
+	if (state->m_mikey.data[0x92] & 0x02)
 	{
-		h = 160; w = 102;
-		if (((state->m_rotate == 1) && (state->m_mikey.data[0x92] & 0x02)) || ((state->m_rotate == 2) && !(state->m_mikey.data[0x92] & 0x02)))
+		for ( ; state->m_line_y < yend; state->m_line_y++)
 		{
-			for ( ; state->m_line_y < yend; state->m_line_y++)
+			line = BITMAP_ADDR16(machine.generic.tmpbitmap, 102 - 1 - state->m_line_y, 0);
+			for (x = 160 - 2; x >= 0; j++, x -= 2)
 			{
-				line = BITMAP_ADDR16(machine.generic.tmpbitmap, 0, state->m_line_y);
-				for (x = 160 - 2; x >= 0; j++, x -= 2)
-				{
-					byte = lynx_read_vram(state, j);
-					line[h*(x + 1)] = state->m_palette[(byte >> 4) & 0x0f];
-					line[h*x + 0] = state->m_palette[(byte >> 0) & 0x0f];
-				}
-			}
-		}
-		else
-		{
-			for ( ; state->m_line_y < yend; state->m_line_y++)
-			{
-				line = BITMAP_ADDR16(machine.generic.tmpbitmap, 0, 102 - 1 - state->m_line_y);
-				for (x = 0; x < 160; j++, x += 2)
-				{
-					byte = lynx_read_vram(state, j);
-					line[h*x + 0] = state->m_palette[(byte >> 4) & 0x0f];
-					line[h*(x + 1)] = state->m_palette[(byte >> 0) & 0x0f];
-				}
+				byte = lynx_read_vram(state, j);
+				line[x + 1] = state->m_palette[(byte >> 4) & 0x0f];
+				line[x + 0] = state->m_palette[(byte >> 0) & 0x0f];
 			}
 		}
 	}
 	else
 	{
-		w = 160; h = 102;
-		if (state->m_mikey.data[0x92] & 0x02)
+		for ( ; state->m_line_y < yend; state->m_line_y++)
 		{
-			for ( ; state->m_line_y < yend; state->m_line_y++)
+			line = BITMAP_ADDR16(machine.generic.tmpbitmap, state->m_line_y, 0);
+			for (x = 0; x < 160; j++, x += 2)
 			{
-				line = BITMAP_ADDR16(machine.generic.tmpbitmap, 102 - 1 - state->m_line_y, 0);
-				for (x = 160 - 2; x >= 0; j++, x -= 2)
-				{
-					byte = lynx_read_vram(state, j);
-					line[x + 1] = state->m_palette[(byte >> 4) & 0x0f];
-					line[x + 0] = state->m_palette[(byte >> 0) & 0x0f];
-				}
+				byte = lynx_read_vram(state, j);
+				line[x + 0] = state->m_palette[(byte >> 4) & 0x0f];
+				line[x + 1] = state->m_palette[(byte >> 0) & 0x0f];
 			}
-		}
-		else
-		{
-			for ( ; state->m_line_y < yend; state->m_line_y++)
-			{
-				line = BITMAP_ADDR16(machine.generic.tmpbitmap, state->m_line_y, 0);
-				for (x = 0; x < 160; j++, x += 2)
-				{
-					byte = lynx_read_vram(state, j);
-					line[x + 0] = state->m_palette[(byte >> 4) & 0x0f];
-					line[x + 1] = state->m_palette[(byte >> 0) & 0x0f];
-				}
-			}
-		}
-	}
-	if (newline == -1)
-	{
-		state->m_line_y = 0;
-		if ((w != state->m_width) || (h != state->m_height))
-		{
-			state->m_width = w;
-			state->m_height = h;
-			machine.primary_screen->set_visible_area(0, w - 1, 0, h - 1);
-			logerror("Visible area %d by %d \n", w-1, h-1);
 		}
 	}
 }
@@ -1807,8 +1760,6 @@ MACHINE_START( lynx )
 	memory_configure_bank(machine, "bank4", 1, 1, state->m_mem_fffa, 0);
 
 	state->m_audio = machine.device("custom");
-	state->m_height = -1;
-	state->m_width = -1;
 
 	memset(&state->m_suzy, 0, sizeof(state->m_suzy));
 
@@ -1822,7 +1773,7 @@ MACHINE_RESET( lynx )
 {
 	lynx_state *state = machine.driver_data<lynx_state>();
 	render_target *target = machine.render().first_target();
-	target->set_view(state->m_rotate0);
+	target->set_view(state->m_rotate);
 }
 
 /****************************************
@@ -1875,13 +1826,13 @@ void lynx_crc_keyword(device_image_interface &image)
 
 	info = hashfile_extrainfo(image);
 	
-	state->m_rotate0 = 0;
+	state->m_rotate = 0;
 	if (info)
 	{
 		if(strcmp(info, "ROTATE90DEGREE") == 0)
-			state->m_rotate0 = 1;
+			state->m_rotate = 1;
 		else if (strcmp(info, "ROTATE270DEGREE") == 0)
-			state->m_rotate0 = 2;
+			state->m_rotate = 2;
 	}
 }
 
@@ -1958,14 +1909,14 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 		memcpy(rom, image.get_software_region("rom"), size);
 		
 		const char *rotate = image.get_feature("rotation");
-		state->m_rotate0 = 0;
+		state->m_rotate = 0;
 		if (rotate)
 		{
 			if(strcmp(rotate, "RIGHT") == 0) {
-				state->m_rotate0 = 1;
+				state->m_rotate = 1;
 			}
 			else if (strcmp(rotate, "LEFT") == 0) {
-				state->m_rotate0 = 2;
+				state->m_rotate = 2;
 			}
 		}
 
