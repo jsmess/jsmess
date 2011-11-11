@@ -44,6 +44,9 @@ public:
 	attotime irq_synctime, irq_vsynctime;
 	timer_device *irq_timer;
 	timer_device *irq_timer_clear;
+	//timer_device *irq_frc;
+	timer_device *frc_cnt_timer;
+	UINT8 frc_mode;
 
 	UINT16 *shared_ram;
 	UINT8 (segas24_state::*io_r)(UINT8 port);
@@ -64,6 +67,10 @@ public:
 	DECLARE_WRITE16_MEMBER( fdc_ctrl_w );
 	DECLARE_READ16_MEMBER(  curbank_r );
 	DECLARE_WRITE16_MEMBER( curbank_w );
+	DECLARE_READ8_MEMBER(  frc_mode_r );
+	DECLARE_WRITE8_MEMBER( frc_mode_w );
+	DECLARE_READ8_MEMBER(  frc_r );
+	DECLARE_WRITE8_MEMBER( frc_w );
 	DECLARE_READ16_MEMBER(  mlatch_r );
 	DECLARE_WRITE16_MEMBER( mlatch_w );
 	DECLARE_READ16_MEMBER(  hotrod3_ctrl_r );
