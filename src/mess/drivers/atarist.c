@@ -1720,7 +1720,7 @@ WRITE8_MEMBER( st_state::psg_pa_w )
 	if (!BIT(data, 1))
 		floppy = floppy_devices[0];
 	else if(!BIT(data, 2))
-		floppy = floppy_devices[0];
+		floppy = floppy_devices[1];
 
 	// side select
 	if(floppy)
@@ -2240,7 +2240,7 @@ void st_state::machine_start()
 	state_save();
 
 	static const char *names[] = { "fd0", "fd1" };
-	for(int i=0; i != 1; i++) {
+	for(int i=0; i != 2; i++) {
 		floppy_connector *con = machine().device<floppy_connector>(names[i]);
 		if(con)
 			floppy_devices[i] = con->get_device();
