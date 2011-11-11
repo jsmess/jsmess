@@ -1913,6 +1913,7 @@ $(MESS_DRIVERS)/junior.o:	$(MESS_LAYOUT)/junior.lh
 $(MESS_DRIVERS)/lc80.o:		$(MESS_LAYOUT)/lc80.lh
 $(MESS_DRIVERS)/lynx.o:		$(MESS_LAYOUT)/lynx.lh
 $(MESS_DRIVERS)/lx800.o:	$(MESS_LAYOUT)/lx800.lh
+$(MESS_DRIVERS)/mac.o:		$(MESS_LAYOUT)/mac.lh
 $(MESS_DRIVERS)/mekd2.o:	$(MESS_LAYOUT)/mekd2.lh
 $(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
 $(MESS_DRIVERS)/mikrolab.o:	$(MESS_LAYOUT)/mikrolab.lh

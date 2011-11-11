@@ -64,6 +64,7 @@
 #include "video/nubus_wsportrait.h"
 #include "machine/nubus_asntmc3b.h"
 #include "includes/mac.h"
+#include "mac.lh"
 
 #define C7M	(7833600)
 #define C15M	(C7M*2)
@@ -1474,6 +1475,7 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 	MCFG_SCREEN_SIZE(640, 870)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE(macrbv)
+	MCFG_DEFAULT_LAYOUT(layout_mac)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
