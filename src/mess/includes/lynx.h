@@ -92,7 +92,6 @@ public:
 	int m_sign_AB;
 	int m_sign_CD;
 	UINT32 m_palette[0x10];
-	int m_rotate0;
 	int m_rotate;
 	device_t *m_audio;
 	SUZY m_suzy;
@@ -100,8 +99,6 @@ public:
 	UINT8 m_memory_config;
 	UINT8 m_sprite_collide;
 	MIKEY m_mikey;
-	int m_height;
-	int m_width;
 	LYNX_TIMER m_timer[NR_LYNX_TIMERS];
 	UART m_uart;
 };
