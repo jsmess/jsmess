@@ -233,6 +233,7 @@ VIDEO_RESET(macrbv)
 	rectangle visarea;
 	int htotal, vtotal;
 	double framerate;
+	int view;
 
 	memset(mac->m_rbv_regs, 0, sizeof(mac->m_rbv_regs));
 
@@ -247,7 +248,7 @@ VIDEO_RESET(macrbv)
 
 	visarea.min_x = 0;
 	visarea.min_y = 0;
-
+	view = 0;
 	mac->m_rbv_montype = input_port_read_safe(machine, "MONTYPE", 2);
 	switch (mac->m_rbv_montype)
 	{
@@ -257,6 +258,7 @@ VIDEO_RESET(macrbv)
 	    	htotal = 832;
 			vtotal = 918;
 			framerate = 75.0;
+			view = 1;
 			break;
 
 		case 2: // 12" RGB
@@ -278,7 +280,9 @@ VIDEO_RESET(macrbv)
 	}
 
 //      printf("RBV reset: monitor is %dx%d @ %f Hz\n", visarea.max_x+1, visarea.max_y+1, framerate);
-	machine.primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
+	machine.primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));	
+	render_target *target = machine.render().first_target();
+	target->set_view(view);	
 }
 
 VIDEO_RESET(macsonora)
