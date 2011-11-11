@@ -178,6 +178,7 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
 #include "machine/6526cia.h"
 
 #include "machine/cbmipt.h"
+#include "machine/c1541.h"
 #include "machine/c1571.h"
 #include "machine/c1581.h"
 #include "video/vic6567.h"
@@ -658,19 +659,26 @@ static const m6502_interface c128_m8502_interface =
 	DEVCB_HANDLER(c128_m6510_port_write)	/* port_write_func */
 };
 
-static CBM_IEC_DAISY( c128_iec_bus )
-{
-	{ C1571_TAG },
-	{ NULL }
-};
+static SLOT_INTERFACE_START( c128dcr_iec_devices )
+	SLOT_INTERFACE("c1571cr", C1571CR)
+SLOT_INTERFACE_END
 
-static CBM_IEC_DAISY( c128d81_iec_bus )
-{
-	{ C1581_TAG },
-	{ NULL }
-};
+static SLOT_INTERFACE_START( c128d81_iec_devices )
+	SLOT_INTERFACE("c1563", C1563)
+SLOT_INTERFACE_END
 
-static CBM_IEC_INTERFACE( c128_iec_intf )
+static SLOT_INTERFACE_START( cbm_iec_devices )
+	SLOT_INTERFACE("c1540", C1540)
+	SLOT_INTERFACE("c1541", C1541)
+	SLOT_INTERFACE("c1541c", C1541C)
+	SLOT_INTERFACE("c1541ii", C1541II)
+	SLOT_INTERFACE("oc118", OC118)
+	SLOT_INTERFACE("c1570", C1570)
+	SLOT_INTERFACE("c1571", C1571)
+	SLOT_INTERFACE("c1581", C1581)
+SLOT_INTERFACE_END
+
+static CBM_IEC_INTERFACE( cbm_iec_intf )
 {
 	DEVCB_DEVICE_LINE("cia_0", c128_iec_srq_w),
 	DEVCB_NULL,
@@ -743,7 +751,7 @@ static const vdc8563_interface c128_vdc8563_intf = {
  *
  *************************************/
 
-static MACHINE_CONFIG_START( c128, c128_state )
+static MACHINE_CONFIG_START( common, c128_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, VIC6567_CLOCK)
 	MCFG_CPU_PROGRAM_MAP( c128_z80_mem)
@@ -794,33 +802,46 @@ static MACHINE_CONFIG_START( c128, c128_state )
 	MCFG_MOS6526R1_ADD("cia_0", VIC6567_CLOCK, c128_ntsc_cia0)
 	MCFG_MOS6526R1_ADD("cia_1", VIC6567_CLOCK, c128_ntsc_cia1)
 
-	/* floppy from serial bus */
-	MCFG_CBM_IEC_CONFIG_ADD(c128_iec_bus, c128_iec_intf)
-	MCFG_C1571_ADD(C1571_TAG, 8)
-
 	MCFG_FRAGMENT_ADD(c64_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("c64_disk_list", "c64_flop")
 	MCFG_SOFTWARE_LIST_ADD("c128_disk_list", "c128_flop")
 MACHINE_CONFIG_END
 
-
-static MACHINE_CONFIG_DERIVED( c128d, c128 )
+static MACHINE_CONFIG_DERIVED( c128, common )
+	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, "c1571", NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c128dcr, c128 )
-	MCFG_DEVICE_REMOVE(C1571_TAG)
-	MCFG_C1571CR_ADD(C1571_TAG, 8)
+static MACHINE_CONFIG_DERIVED( c128d, common )
+	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, "c1571", NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c128d81, c128 )
-
-	MCFG_CBM_IEC_REMOVE()
-	MCFG_DEVICE_REMOVE(C1571_TAG)
-
-	MCFG_CBM_IEC_CONFIG_ADD(c128d81_iec_bus, c128_iec_intf)
-	MCFG_C1563_ADD(C1581_TAG, 8)
+static MACHINE_CONFIG_DERIVED( c128dcr, common )
+	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, c128dcr_iec_devices, "c1571cr", NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( c128d81, common )
+	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, c128d81_iec_devices, "c1563", NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c128pal, c128 )
 	MCFG_CPU_MODIFY("maincpu")
@@ -851,8 +872,30 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( c128dpal, c128pal )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c128dcrp, c128pal )
+static MACHINE_CONFIG_DERIVED( c128dcrp, c128dcr )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK( VIC6569_CLOCK)
+	MCFG_CPU_MODIFY("m8502")
+	MCFG_CPU_CLOCK( VIC6569_CLOCK)
+	MCFG_CPU_CONFIG( c128_m8502_interface )
 
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
+	MCFG_SCREEN_SIZE(VIC6569_COLUMNS * 2, VIC6569_LINES)
+	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
+
+	MCFG_DEVICE_REMOVE("vic2e")
+	MCFG_VIC2_ADD("vic2e", c128_vic2_pal_intf)
+
+	/* sound hardware */
+	MCFG_SOUND_REPLACE("sid6581", SID6581, VIC6569_CLOCK)
+	MCFG_SOUND_CONFIG(c128_sound_interface)
+
+	/* cia */
+	MCFG_DEVICE_REMOVE("cia_0")
+	MCFG_DEVICE_REMOVE("cia_1")
+	MCFG_MOS6526R1_ADD("cia_0", VIC6569_CLOCK, c128_pal_cia0)
+	MCFG_MOS6526R1_ADD("cia_1", VIC6569_CLOCK, c128_pal_cia1)
 MACHINE_CONFIG_END
 
 

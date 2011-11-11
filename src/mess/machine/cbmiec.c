@@ -211,6 +211,8 @@ static const char *const SIGNAL_NAME[] = { "SRQ", "ATN", "CLK", "DATA", "RESET" 
 //**************************************************************************
 
 const device_type CBM_IEC = &device_creator<cbm_iec_device>;
+const device_type CBM_IEC_SLOT = &device_creator<cbm_iec_slot_device>;
+
 
 
 //**************************************************************************
@@ -222,7 +224,7 @@ const device_type CBM_IEC = &device_creator<cbm_iec_device>;
 //-------------------------------------------------
 
 device_cbm_iec_interface::device_cbm_iec_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_slot_card_interface(mconfig, device)
 {
 }
 
@@ -238,9 +240,57 @@ device_cbm_iec_interface::~device_cbm_iec_interface()
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
+//-------------------------------------------------
+//  cbm_iec_slot_device - constructor
+//-------------------------------------------------
+
+cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, CBM_IEC_SLOT, "CBM IEC slot", tag, owner, clock),
+		device_slot_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  static_set_slot - 
+//-------------------------------------------------
+
+void cbm_iec_slot_device::static_set_slot(device_t &device, int address)
+{
+	cbm_iec_slot_device &cbm_iec_card = dynamic_cast<cbm_iec_slot_device &>(device);
+	cbm_iec_card.m_address = address;
+}
+
+
+//-------------------------------------------------
+//  get_address - 
+//-------------------------------------------------
+
+int cbm_iec_slot_device::get_address()
+{
+	return m_address;
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void cbm_iec_slot_device::device_start()
+{
+	m_bus = machine().device<cbm_iec_device>(CBM_IEC_TAG);
+	device_cbm_iec_interface *dev = dynamic_cast<device_cbm_iec_interface *>(get_card_device());
+	if (dev) m_bus->add_device(get_card_device());
+}
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -251,17 +301,19 @@ device_cbm_iec_interface::~device_cbm_iec_interface()
 void cbm_iec_device::device_config_complete()
 {
 	// inherit a copy of the static data
-	const cbm_iec_config *intf = reinterpret_cast<const cbm_iec_config *>(static_config());
+	const cbm_iec_interface *intf = reinterpret_cast<const cbm_iec_interface *>(static_config());
 	if (intf != NULL)
-		*static_cast<cbm_iec_config *>(this) = *intf;
+		*static_cast<cbm_iec_interface *>(this) = *intf;
 
 	// or initialize to defaults if none provided
 	else
 	{
-		fatalerror("Daisy chain not provided!");
+		memset(&m_out_srq_cb, 0, sizeof(m_out_srq_cb));
+		memset(&m_out_atn_cb, 0, sizeof(m_out_atn_cb));
+		memset(&m_out_clk_cb, 0, sizeof(m_out_clk_cb));
+		memset(&m_out_data_cb, 0, sizeof(m_out_data_cb));
+		memset(&m_out_reset_cb, 0, sizeof(m_out_reset_cb));
 	}
-
-	m_daisy = intf;
 }
 
 
@@ -278,45 +330,74 @@ inline void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 {
 	bool changed = false;
 
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	if (device == this)
 	{
-		if (!strcmp(daisy->m_device->tag(), device->tag()))
+		if (m_line[signal] != state)
 		{
-			if (daisy->m_line[signal] != state)
+			if (LOG) logerror("CBM IEC: '%s' %s %u\n", tag(), SIGNAL_NAME[signal], state);
+			m_line[signal] = state;
+			changed = true;
+		}
+	}
+	else
+	{
+		daisy_entry *entry = m_device_list.first();
+		
+		while (entry)
+		{
+			if (!strcmp(entry->m_device->tag(), device->tag()))
 			{
-				if (LOG) logerror("CBM IEC: '%s' %s %u\n", device->tag(), SIGNAL_NAME[signal], state);
-				daisy->m_line[signal] = state;
-				changed = true;
+				if (entry->m_line[signal] != state)
+				{
+					if (LOG) logerror("CBM IEC: '%s' %s %u\n", device->tag(), SIGNAL_NAME[signal], state);
+					entry->m_line[signal] = state;
+					changed = true;
+				}
 			}
+			
+			entry = entry->next();
 		}
 	}
 
 	if (changed)
 	{
-		for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+		switch (signal)
+		{
+		case SRQ:	m_out_srq_func(state);	break;
+		case ATN:	m_out_atn_func(state);	break;
+		case CLK:	m_out_clk_func(state);	break;
+		case DATA:	m_out_data_func(state);	break;
+		case RESET:	m_out_reset_func(state);break;
+		}
+
+		daisy_entry *entry = m_device_list.first();
+		
+		while (entry)
 		{
 			switch (signal)
 			{
 			case SRQ:
-				daisy->m_interface->cbm_iec_srq(state);
+				entry->m_interface->cbm_iec_srq(state);
 				break;
 
 			case ATN:
-				daisy->m_interface->cbm_iec_atn(state);
+				entry->m_interface->cbm_iec_atn(state);
 				break;
 
 			case CLK:
-				daisy->m_interface->cbm_iec_clk(state);
+				entry->m_interface->cbm_iec_clk(state);
 				break;
 
 			case DATA:
-				daisy->m_interface->cbm_iec_data(state);
+				entry->m_interface->cbm_iec_data(state);
 				break;
 
 			case RESET:
-				daisy->m_interface->cbm_iec_reset(state);
+				entry->m_interface->cbm_iec_reset(state);
 				break;
 			}
+			
+			entry = entry->next();
 		}
 
 		if (LOG) logerror("CBM IEC: SRQ %u ATN %u CLK %u DATA %u RESET %u\n", get_signal(SRQ),get_signal(ATN),get_signal(CLK),get_signal(DATA),get_signal(RESET));
@@ -330,17 +411,24 @@ inline void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 
 inline int cbm_iec_device::get_signal(int signal)
 {
-	int state = 1;
+	int state = m_line[signal];
 
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	if (state)
 	{
-		if (!daisy->m_line[signal])
+		daisy_entry *entry = m_device_list.first();
+		
+		while (entry)
 		{
-			state = 0;
-			break;
+			if (!entry->m_line[signal])
+			{
+				state = 0;
+				break;
+			}
+			
+			entry = entry->next();
 		}
 	}
-
+	
 	return state;
 }
 
@@ -355,9 +443,12 @@ inline int cbm_iec_device::get_signal(int signal)
 //-------------------------------------------------
 
 cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, CBM_IEC, "CBM_IEC", tag, owner, clock),
-	m_stub(NULL)
+    : device_t(mconfig, CBM_IEC, "CBM IEC bus", tag, owner, clock)
 {
+	for (int i = 0; i < SIGNAL_COUNT; i++)
+	{
+		m_line[i] = 1;
+	}
 }
 
 
@@ -367,31 +458,23 @@ cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, d
 
 void cbm_iec_device::device_start()
 {
-	m_stub = machine().device<cbm_iec_stub_device>(CBM_IEC_STUB_TAG);
-	const cbm_iec_config *daisy = m_daisy;
-	// create a linked list of devices
-	daisy_entry **tailptr = &m_daisy_list;
-	for ( ; daisy->m_tag != NULL; daisy++)
-	{
-		// find the device
-		device_t *target = machine().device(daisy->m_tag);
-		if (target == NULL)
-			fatalerror("Unable to locate device '%s'", daisy->m_tag);
+	// resolve callbacks
+    m_out_srq_func.resolve(m_out_srq_cb, *this);
+    m_out_atn_func.resolve(m_out_atn_cb, *this);
+    m_out_clk_func.resolve(m_out_clk_cb, *this);
+    m_out_data_func.resolve(m_out_data_cb, *this);
+    m_out_reset_func.resolve(m_out_reset_cb, *this);
+}
 
-		// make sure it has an interface
-		device_cbm_iec_interface *intf;
-		if (!target->interface(intf))
-			fatalerror("Device '%s' does not implement the CBM IEC interface!", daisy->m_tag);
 
-		// append to the end
-		*tailptr = auto_alloc(machine(), daisy_entry(target));
-		tailptr = &(*tailptr)->m_next;
-	}
+//-------------------------------------------------
+//  add_device -
+//-------------------------------------------------
 
-	// append driver stub to the end
-	device_t *target = machine().device(CBM_IEC_STUB_TAG);
-	*tailptr = auto_alloc(machine(), daisy_entry(target));
-	tailptr = &(*tailptr)->m_next;
+void cbm_iec_device::add_device(device_t *target)
+{
+	daisy_entry *entry = auto_alloc(machine(), daisy_entry(target));
+	m_device_list.append(*entry);
 }
 
 
@@ -469,7 +552,7 @@ READ_LINE_MEMBER( cbm_iec_device::reset_r )
 
 WRITE_LINE_MEMBER( cbm_iec_device::srq_w )
 {
-	set_signal(m_stub, SRQ, state);
+	set_signal(this, SRQ, state);
 }
 
 
@@ -479,7 +562,7 @@ WRITE_LINE_MEMBER( cbm_iec_device::srq_w )
 
 WRITE_LINE_MEMBER( cbm_iec_device::atn_w )
 {
-	set_signal(m_stub, ATN, state);
+	set_signal(this, ATN, state);
 }
 
 
@@ -489,7 +572,7 @@ WRITE_LINE_MEMBER( cbm_iec_device::atn_w )
 
 WRITE_LINE_MEMBER( cbm_iec_device::clk_w )
 {
-	set_signal(m_stub, CLK, state);
+	set_signal(this, CLK, state);
 }
 
 
@@ -499,7 +582,7 @@ WRITE_LINE_MEMBER( cbm_iec_device::clk_w )
 
 WRITE_LINE_MEMBER( cbm_iec_device::data_w )
 {
-	set_signal(m_stub, DATA, state);
+	set_signal(this, DATA, state);
 }
 
 
@@ -509,7 +592,7 @@ WRITE_LINE_MEMBER( cbm_iec_device::data_w )
 
 WRITE_LINE_MEMBER( cbm_iec_device::reset_w )
 {
-	set_signal(m_stub, RESET, state);
+	set_signal(this, RESET, state);
 }
 
 

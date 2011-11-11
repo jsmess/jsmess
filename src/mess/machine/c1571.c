@@ -77,20 +77,6 @@ void base_c1571_device::device_config_complete()
 
 
 //-------------------------------------------------
-//  static_set_config - configuration helper
-//-------------------------------------------------
-
-void base_c1571_device::static_set_config(device_t &device, int address)
-{
-	base_c1571_device &c1571 = downcast<base_c1571_device &>(device);
-
-	assert((address > 7) && (address < 12));
-
-	c1571.m_address = address - 8;
-}
-
-
-//-------------------------------------------------
 //  ROM( c1570 )
 //-------------------------------------------------
 
@@ -154,7 +140,7 @@ static ADDRESS_MAP_START( c1571_mem, AS_PROGRAM, 8, base_c1571_device )
 	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x03f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE_LEGACY(WD1770_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x3ff0) AM_DEVREADWRITE_LEGACY(M6526_TAG, mos6526_r, mos6526_w)
-	AM_RANGE(0x8000, 0xffff) // AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -694,7 +680,6 @@ base_c1571_device::base_c1571_device(const machine_config &mconfig, device_type 
 	  m_fdc(*this, WD1770_TAG),
 	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
-	  m_bus(NULL),
 	  m_1_2mhz(0),
 	  m_data_out(1),
 	  m_ser_dir(0),
@@ -739,6 +724,10 @@ c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, d
 void base_c1571_device::device_start()
 {
 	m_bus = machine().device<cbm_iec_device>(CBM_IEC_TAG);
+
+	// get bus address
+	cbm_iec_slot_device *slot = downcast<cbm_iec_slot_device*>(owner());
+	m_address = slot->get_address() - 8;
 
 	// map ROM
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);

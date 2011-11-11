@@ -122,6 +122,8 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 #include "includes/c16.h"
 #include "machine/c1541.h"
 #include "machine/c1551.h"
+#include "machine/c1571.h"
+#include "machine/c1581.h"
 #include "machine/cbmiec.h"
 #include "machine/cbmipt.h"
 #include "sound/sid6581.h"
@@ -417,15 +419,24 @@ static const m6502_interface c16_m7501_interface =
 	DEVCB_HANDLER(c16_m7501_port_write)	/* port_write_func */
 };
 
-static CBM_IEC_DAISY( c16_iec_no_drives )
-{
-	{ NULL }
-};
+static SLOT_INTERFACE_START( cbm_iec_devices )
+	SLOT_INTERFACE("c1540", C1540)
+	SLOT_INTERFACE("c1541", C1541)
+	SLOT_INTERFACE("c1541c", C1541C)
+	SLOT_INTERFACE("c1541ii", C1541II)
+	SLOT_INTERFACE("oc118", OC118)
+	SLOT_INTERFACE("c1570", C1570)
+	SLOT_INTERFACE("c1571", C1571)
+	SLOT_INTERFACE("c1581", C1581)
+SLOT_INTERFACE_END
 
-static CBM_IEC_DAISY( c16_iec_1541 )
+static CBM_IEC_INTERFACE( cbm_iec_intf )
 {
-	{ C1541_TAG },
-	{ NULL }
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static SCREEN_UPDATE( c16 )
@@ -460,7 +471,6 @@ static MACHINE_START( c16 )
 }
 
 static MACHINE_CONFIG_START( c16, c16_state )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M7501, XTAL_17_73447MHz/20)
 	MCFG_CPU_PROGRAM_MAP(c16_map)
@@ -496,10 +506,17 @@ static MACHINE_CONFIG_START( c16, c16_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
 
 	MCFG_FRAGMENT_ADD(c16_cartslot)
+
+	MCFG_C1551_ADD(C1551_TAG, 8)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "plus4_flop")
 
 	/* IEC serial bus */
-	MCFG_CBM_IEC_ADD(c16_iec_no_drives)
+	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -507,35 +524,7 @@ static MACHINE_CONFIG_START( c16, c16_state )
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_CONFIG_END
 
-
-static MACHINE_CONFIG_DERIVED( c16c, c16 )
-
-	MCFG_C1551_ADD(C1551_TAG, 8)
-
-#ifdef CPU_SYNC
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-#else
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-#endif
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( c16v, c16 )
-
-	/* floppy from serial bus */
-	MCFG_CBM_IEC_REMOVE()
-	MCFG_CBM_IEC_ADD(c16_iec_1541)
-	MCFG_C1541_ADD(C1541_TAG, 8)
-#ifdef CPU_SYNC
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-#else
-	MCFG_QUANTUM_TIME(attotime::from_hz(300000))
-#endif
-MACHINE_CONFIG_END
-
-
 static MACHINE_CONFIG_DERIVED( plus4, c16 )
-
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( XTAL_14_31818MHz/16 )
 	MCFG_CPU_PROGRAM_MAP(plus4_map)
@@ -552,38 +541,6 @@ static MACHINE_CONFIG_DERIVED( plus4, c16 )
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( plus4c, plus4 )
-
-	MCFG_C1551_ADD(C1551_TAG, 8)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-#ifdef CPU_SYNC
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-#else
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
-#endif
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( plus4v, plus4 )
-
-	/* floppy from serial bus */
-	MCFG_CBM_IEC_REMOVE()
-	MCFG_CBM_IEC_ADD(c16_iec_1541)
-	MCFG_C1541_ADD(C1541_TAG, 8)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-#ifdef CPU_SYNC
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-#else
-	MCFG_QUANTUM_TIME(attotime::from_hz(300000))
-#endif
-MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_DERIVED( c364, plus4 )
 	MCFG_SCREEN_MODIFY("screen")
@@ -698,17 +655,11 @@ ROM_END
 /*    YEAR  NAME  PARENT COMPAT MACHINE     INPUT      INIT      COMPANY                         FULLNAME            FLAGS */
 
 COMP( 1984, c16,      0,     0,  c16,       c16,       c16,      "Commodore Business Machines",  "Commodore 16 (PAL)", 0)
-COMP( 1984, c16c,     c16,   0,  c16c,      c16,       c16,      "Commodore Business Machines",  "Commodore 16 (PAL, 1551)", 0 )
-COMP( 1984, c16v,     c16,   0,  c16v,      c16,       c16,      "Commodore Business Machines",  "Commodore 16 (PAL, VC1541)", 0)
 COMP( 1984, c16hun,   c16,   0,  c16,       c16,       c16,      "Commodore Business Machines",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
 
 COMP( 1984, c116,     c16,   0,  c16,       c16,       c16,      "Commodore Business Machines",  "Commodore 116 (PAL)", 0)
-COMP( 1984, c116c,    c16,   0,  c16c,      c16,       c16,      "Commodore Business Machines",  "Commodore 116 (PAL, 1551)", 0 )
-COMP( 1984, c116v,    c16,   0,  c16v,      c16,       c16,      "Commodore Business Machines",  "Commodore 116 (PAL, VC1541)", 0 )
 
 COMP( 1984, plus4,    c16,   0,  plus4,     plus4,     plus4,    "Commodore Business Machines",  "Commodore Plus/4 (NTSC)", 0)
-COMP( 1984, plus4c,   c16,   0,  plus4c,    plus4,     plus4,    "Commodore Business Machines",  "Commodore Plus/4 (NTSC, 1551)", 0 )
-COMP( 1984, plus4v,   c16,   0,  plus4v,    plus4,     plus4,    "Commodore Business Machines",  "Commodore Plus/4 (NTSC, VC1541)", 0)
 
 COMP( 1984, c232,     c16,   0,  c16,       c16,       c16,      "Commodore Business Machines",  "Commodore 232 (Prototype)", 0)
 COMP( 1984, c264,     c16,   0,  c264,      plus4,     plus4,    "Commodore Business Machines",  "Commodore 264 (Prototype)", 0)

@@ -578,15 +578,9 @@ cbm720se  // Commodore CBM 720 (Sweden / Finland)
 p500	  // Commodore P500 (proto, a.k.a. C128-40, PET-II)
 
 c16	   // Commodore 16
-c16c	  // Commodore 16  c1551
-c16v	  // Commodore 16  vc1541
 c16hun	// Commodore 16 Novotrade (Hungarian Character Set)
 c116	  // Commodore 116
-c116c	 // Commodore 116  c1551
-c116v	 // Commodore 116  vc1541
 plus4	 // Commodore +4
-plus4c	// Commodore +4  c1551
-plus4v	// Commodore +4  vc1541
 c232	  // Commodore 232 - Prototype
 c264	  // Commodore 264 - Prototype
 c364	  // Commodore V364 - Prototype

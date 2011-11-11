@@ -33,21 +33,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_C1581_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C1581, 0) \
-	base_c1581_device::static_set_config(*device, _address);
-
-
-#define MCFG_C1563_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C1563, 0) \
-	base_c1581_device::static_set_config(*device, _address);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -67,12 +52,10 @@ public:
 		TYPE_1581
 	};
 
-	// inline configuration helpers
-	static void static_set_config(device_t &device, int address);
-
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( cnt_w );
 	DECLARE_WRITE_LINE_MEMBER( sp_w );

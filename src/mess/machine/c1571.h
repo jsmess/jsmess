@@ -36,26 +36,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_C1570_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C1570, 0) \
-	base_c1571_device::static_set_config(*device, _address);
-
-
-#define MCFG_C1571_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C1571, 0) \
-	base_c1571_device::static_set_config(*device, _address);
-
-
-#define MCFG_C1571CR_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C1571CR, 0) \
-	base_c1571_device::static_set_config(*device, _address);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -74,9 +54,6 @@ public:
 
     // construction/destruction
     base_c1571_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
-
-	// inline configuration helpers
-	static void static_set_config(device_t &device, int address);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
