@@ -166,6 +166,11 @@ void wd1772_t::seek_continue()
 				floppy->dir_w(last_dir);
 				floppy->stp_w(0);
 				floppy->stp_w(1);
+
+				// When stepping with update, the track register is updated before seeking.
+				// Important for the sam coupe format code.
+				if(main_state == STEP && (command & 0x10))
+					track += last_dir ? -1 : 1;					
 			}
 			counter++;
 			sub_state = SEEK_WAIT_STEP_TIME;
@@ -191,15 +196,8 @@ void wd1772_t::seek_continue()
 			}
 
 			if(done || counter == 255) {
-				switch(main_state) {
-				case RESTORE:
+				if(main_state == RESTORE)
 					track = 0;
-					break;
-				case STEP:
-					if(command & 0x10)
-						track += last_dir ? -1 : 1;
-					break;
-				}
 
 				if(command & 0x04) {
 					sub_state = SEEK_WAIT_STABILIZATION_TIME;
@@ -1295,6 +1293,7 @@ void wd1772_t::live_run(attotime limit)
 				status |= S_LOST;
 				data = 0;
 			}
+
 			switch(data) {
 			case 0xf5:
 				if(cur_live.previous_type != live_info::PT_SYNC)

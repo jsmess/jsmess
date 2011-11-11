@@ -34,7 +34,7 @@
 
 /* components */
 #include "cpu/z80/z80.h"
-#include "machine/wd17xx.h"
+#include "machine/wd1772.h"
 #include "machine/msm6242.h"
 #include "machine/ctronics.h"
 #include "sound/saa1099.h"
@@ -45,6 +45,7 @@
 #include "formats/tzx_cas.h"
 #include "imagedev/flopdrv.h"
 #include "formats/coupedsk.h"
+#include "formats/mfi_dsk.h"
 #include "machine/ram.h"
 
 /***************************************************************************
@@ -61,19 +62,23 @@
 
 static READ8_HANDLER( samcoupe_disk_r )
 {
-	device_t *fdc = space->machine().device("wd1772");
+	wd1772_t *fdc = space->machine().device<wd1772_t>("wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
-	wd17xx_set_drive(fdc, (offset >> 4) & 1);
-	wd17xx_set_side(fdc, (offset >> 2) & 1);
+	floppy_connector *con = space->machine().device<floppy_connector>(BIT(offset, 4) ? "fd1" : "fd0");
+	floppy_image_device *floppy = con ? con->get_device() : 0;
+
+	if(floppy)
+		floppy->ss_w(BIT(offset, 2));
+	fdc->set_floppy(floppy);
 
 	/* bit 1 and 2 select the controller register */
 	switch (offset & 0x03)
 	{
-	case 0: return wd17xx_status_r(fdc, 0);
-	case 1: return wd17xx_track_r(fdc, 0);
-	case 2: return wd17xx_sector_r(fdc, 0);
-	case 3: return wd17xx_data_r(fdc, 0);
+	case 0: return fdc->status_r();
+	case 1: return fdc->track_r();
+	case 2: return fdc->sector_r();
+	case 3: return fdc->data_r();
 	}
 
 	return 0xff;
@@ -81,19 +86,23 @@ static READ8_HANDLER( samcoupe_disk_r )
 
 static WRITE8_HANDLER( samcoupe_disk_w )
 {
-	device_t *fdc = space->machine().device("wd1772");
+	wd1772_t *fdc = space->machine().device<wd1772_t>("wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
-	wd17xx_set_drive(fdc, (offset >> 4) & 1);
-	wd17xx_set_side(fdc, (offset >> 2) & 1);
+	floppy_connector *con = space->machine().device<floppy_connector>(BIT(offset, 4) ? "fd1" : "fd0");
+	floppy_image_device *floppy = con ? con->get_device() : 0;
+
+	if(floppy)
+		floppy->ss_w(BIT(offset, 2));
+	fdc->set_floppy(floppy);
 
 	/* bit 1 and 2 select the controller register */
 	switch (offset & 0x03)
 	{
-	case 0: wd17xx_command_w(fdc, 0, data); break;
-	case 1: wd17xx_track_w(fdc, 0, data);   break;
-	case 2: wd17xx_sector_w(fdc, 0, data);  break;
-	case 3: wd17xx_data_w(fdc, 0, data);    break;
+	case 0: fdc->cmd_w(data);     break;
+	case 1: fdc->track_w(data);   break;
+	case 2: fdc->sector_w(data);  break;
+	case 3: fdc->data_w(data);    break;
 	}
 }
 
@@ -509,56 +518,14 @@ static const cassette_interface samcoupe_cassette_interface =
 };
 
 
-static LEGACY_FLOPPY_OPTIONS_START( samcoupe )
-	LEGACY_FLOPPY_OPTION
-	(
-		coupe_mgt, "mgt,dsk,sad", "SAM Coupe MGT disk image", coupe_mgt_identify, coupe_mgt_construct, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS(9-[10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1])
-	)
-	LEGACY_FLOPPY_OPTION
-	(
-		coupe_sad, "sad,dsk", "SAM Coupe SAD disk image", coupe_sad_identify, coupe_sad_construct, NULL,
-		HEADS(1-[2]-255)
-		TRACKS(1-[80]-255)
-		SECTORS(1-[10]-255)
-		SECTOR_LENGTH(64/128/256/[512]/1024/2048/4096)
-		FIRST_SECTOR_ID([1])
-	)
-	LEGACY_FLOPPY_OPTION
-	(
-		coupe_sdf, "sdf,dsk,sad", "SAM Coupe SDF disk image", coupe_sdf_identify, coupe_sdf_construct, NULL,
-		HEADS(1-[2])
-		TRACKS(1-[80]-83)
-		SECTORS(1-[10]-12)
-		SECTOR_LENGTH(128/256/[512]/1024)
-		FIRST_SECTOR_ID([1])
-	)
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface samcoupe_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(samcoupe),
-	NULL,
+static const floppy_format_type samcoupe_floppy_formats[] = {
+	FLOPPY_MGT_FORMAT, FLOPPY_MFI_FORMAT,
 	NULL
 };
 
-static const wd17xx_interface samcoupe_wd17xx_intf =
-{
-	DEVCB_LINE_GND,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
+static SLOT_INTERFACE_START( samcoupe_floppies )
+	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	/* basic machine hardware */
@@ -585,8 +552,10 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_CENTRONICS_ADD("lpt1", standard_centronics)
 	MCFG_CENTRONICS_ADD("lpt2", standard_centronics)
 	MCFG_MSM6242_ADD("sambus_clock")
-	MCFG_WD1772_ADD("wd1772", samcoupe_wd17xx_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, samcoupe_cassette_interface)
+	MCFG_WD1772x_ADD("wd1772", SAMCOUPE_XTAL_X1/3)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", samcoupe_floppies, "35dd", 0, samcoupe_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", samcoupe_floppies, "35dd", 0, samcoupe_floppy_formats)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -595,7 +564,6 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_SOUND_ADD("saa1099", SAA1099, SAMCOUPE_XTAL_X1/3) /* 8 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(samcoupe_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
