@@ -388,7 +388,7 @@ static CUSTOM_INPUT( multiplexed_controller_r )
 	return input_port_read_safe(field.machine(), cntrl[port][state->m_controller_select & 0x01], 0x00);
 }
 
-#if 0 // this needs to be added dynamically somehow
+#if 1 // this needs to be added dynamically somehow
 static CUSTOM_INPUT( mahjong_controller_r )
 {
 	neogeo_state *state = field.machine().driver_data<neogeo_state>();
