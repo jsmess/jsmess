@@ -247,9 +247,16 @@ static const cassette_interface primo_cassette_interface =
 	NULL
 };
 
-static CBM_IEC_DAISY( cbm_iec_daisy )
+static SLOT_INTERFACE_START( cbm_iec_devices )
+SLOT_INTERFACE_END
+
+static CBM_IEC_INTERFACE( cbm_iec_intf )
 {
-	{ NULL}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( primoa32, primo_state )
@@ -289,7 +296,7 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 	/* floppy from serial bus */
 	/* for some reason machine/primo.c sets up the serial bus
     but no floppy drive has been apparently added... incomplete driver? */
-	MCFG_CBM_IEC_ADD(cbm_iec_daisy)
+	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart1")

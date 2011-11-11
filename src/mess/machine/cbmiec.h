@@ -21,7 +21,6 @@
 //**************************************************************************
 
 #define CBM_IEC_TAG			"iec_bus"
-#define CBM_IEC_STUB_TAG	"iec_stub"
 
 
 
@@ -29,31 +28,19 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_CBM_IEC_ADD(_daisy) \
-    MCFG_DEVICE_ADD(CBM_IEC_STUB_TAG, CBM_IEC_STUB, 0) \
-	MCFG_DEVICE_CONFIG(default_cbm_iec_stub_interface) \
-	MCFG_DEVICE_ADD(CBM_IEC_TAG, CBM_IEC, 0) \
-	MCFG_DEVICE_CONFIG(_daisy)
-
-
-#define MCFG_CBM_IEC_CONFIG_ADD(_daisy, _config) \
-    MCFG_DEVICE_ADD(CBM_IEC_STUB_TAG, CBM_IEC_STUB, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_ADD(CBM_IEC_TAG, CBM_IEC, 0) \
-	MCFG_DEVICE_CONFIG(_daisy)
-
-
-#define MCFG_CBM_IEC_REMOVE() \
-	MCFG_DEVICE_REMOVE(CBM_IEC_STUB_TAG) \
-	MCFG_DEVICE_REMOVE(CBM_IEC_TAG)
-
-
-#define CBM_IEC_DAISY(_name) \
-	const cbm_iec_config (_name)[] =
+#define MCFG_CBM_IEC_BUS_ADD(_config) \
+    MCFG_DEVICE_ADD(CBM_IEC_TAG, CBM_IEC, 0) \
+    MCFG_DEVICE_CONFIG(_config)
 
 
 #define CBM_IEC_INTERFACE(_name) \
-	const cbm_iec_stub_interface (_name) =
+	const cbm_iec_interface (_name) =
+
+
+#define MCFG_CBM_IEC_SLOT_ADD(_tag, _num, _slot_intf, _def_slot, _def_inp) \
+    MCFG_DEVICE_ADD(_tag, CBM_IEC_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
+	cbm_iec_slot_device::static_set_slot(*device, _num);
 
 
 
@@ -61,43 +48,31 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> cbm_iec_config
+// ======================> cbm_iec_interface
 
-struct cbm_iec_config
+struct cbm_iec_interface
 {
-	const char *m_tag;
-};
-
-
-// ======================> device_cbm_iec_interface
-
-class device_cbm_iec_interface : public device_interface
-{
-public:
-	// construction/destruction
-	device_cbm_iec_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_cbm_iec_interface();
-
-	// optional operation overrides
-	virtual void cbm_iec_atn(int state) { };
-	virtual void cbm_iec_clk(int state) { };
-	virtual void cbm_iec_data(int state) { };
-	virtual void cbm_iec_srq(int state) { };
-	virtual void cbm_iec_reset(int state) { };
+	devcb_write_line	m_out_srq_cb;
+	devcb_write_line	m_out_atn_cb;
+	devcb_write_line	m_out_clk_cb;
+	devcb_write_line	m_out_data_cb;
+	devcb_write_line	m_out_reset_cb;
 };
 
 
 // ======================> cbm_iec_device
 
-class cbm_iec_stub_device;
+class device_cbm_iec_interface;
 
-class cbm_iec_device :  public device_t,
-						public cbm_iec_config
+class cbm_iec_device : public device_t,
+					   public cbm_iec_interface
 {
 public:
-    // construction/destruction
-    cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	void add_device(device_t *target);
+	
 	// reads for both host and peripherals
 	DECLARE_READ_LINE_MEMBER( srq_r );
 	DECLARE_READ_LINE_MEMBER( atn_r );
@@ -118,7 +93,7 @@ public:
 	void clk_w(device_t *device, int state);
 	void data_w(device_t *device, int state);
 	void reset_w(device_t *device, int state);
-
+	
 protected:
 	enum
 	{
@@ -132,13 +107,13 @@ protected:
 
 	// device-level overrides
     virtual void device_start();
-    // device_config overrides
     virtual void device_config_complete();
-
+	
 	class daisy_entry
 	{
 	public:
 		daisy_entry(device_t *device);
+		daisy_entry *next() const { return m_next; }
 
 		daisy_entry *				m_next;			// next device
 		device_t *					m_device;		// associated device
@@ -147,65 +122,74 @@ protected:
 		int m_line[SIGNAL_COUNT];
 	};
 
-	daisy_entry *			m_daisy_list;	// head of the daisy chain
-
-private:
-	inline void set_signal(device_t *device, int signal, int state);
-	inline int get_signal(int signal);
-
-	cbm_iec_stub_device *m_stub;
-
-	const cbm_iec_config *m_daisy;
-};
-
-
-// ======================> cbm_iec_stub_interface
-
-struct cbm_iec_stub_interface
-{
-	devcb_write_line	m_out_srq_cb;
-	devcb_write_line	m_out_atn_cb;
-	devcb_write_line	m_out_clk_cb;
-	devcb_write_line	m_out_data_cb;
-	devcb_write_line	m_out_reset_cb;
-};
-
-const cbm_iec_stub_interface default_cbm_iec_stub_interface = { DEVCB_NULL, };
-
-// ======================> cbm_iec_stub_device
-
-class cbm_iec_stub_device :  public device_t,
-							 public device_cbm_iec_interface,
-							 public cbm_iec_stub_interface
-{
-public:
-    // construction/destruction
-    cbm_iec_stub_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-    // device-level overrides
-    virtual void device_start();
-    virtual void device_config_complete();
-
-	// device_cbm_iec_interface overrides
-	void cbm_iec_atn(int state);
-	void cbm_iec_clk(int state);
-	void cbm_iec_data(int state);
-	void cbm_iec_srq(int state);
-	void cbm_iec_reset(int state);
-
+	simple_list<daisy_entry> m_device_list;
+	
 private:
 	devcb_resolved_write_line	m_out_atn_func;
 	devcb_resolved_write_line	m_out_clk_func;
 	devcb_resolved_write_line	m_out_data_func;
 	devcb_resolved_write_line	m_out_srq_func;
 	devcb_resolved_write_line	m_out_reset_func;
+
+	inline void set_signal(device_t *device, int signal, int state);
+	inline int get_signal(int signal);
+
+	int m_line[SIGNAL_COUNT];
+};
+
+
+// ======================> cbm_iec_slot_device
+
+class cbm_iec_slot_device : public device_t,
+							public device_slot_interface
+{
+public:
+	// construction/destruction
+	cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// device-level overrides
+	virtual void device_start();
+
+    // inline configuration
+    static void static_set_slot(device_t &device, int address);
+	int get_address();
+
+private:
+	// configuration
+	int m_address;
+	cbm_iec_device  *m_bus;
+};
+
+
+// ======================> device_cbm_iec_interface
+
+class device_cbm_iec_interface : public device_slot_card_interface
+{
+	friend class cbm_iec_device;
+
+public:
+	// construction/destruction
+	device_cbm_iec_interface(const machine_config &mconfig, device_t &device);
+	virtual ~device_cbm_iec_interface();
+
+	device_cbm_iec_interface *next() const { return m_next; }
+	
+	// optional operation overrides
+	virtual void cbm_iec_atn(int state) { };
+	virtual void cbm_iec_clk(int state) { };
+	virtual void cbm_iec_data(int state) { };
+	virtual void cbm_iec_srq(int state) { };
+	virtual void cbm_iec_reset(int state) { };
+
+	cbm_iec_device  *m_bus;
+	device_cbm_iec_interface *m_next;
 };
 
 
 // device type definition
 extern const device_type CBM_IEC;
-extern const device_type CBM_IEC_STUB;
+extern const device_type CBM_IEC_SLOT;
+
 
 
 #endif

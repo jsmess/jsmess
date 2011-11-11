@@ -460,8 +460,8 @@ static void c64_bankswitch( running_machine &machine, int reset )
 	loram  = (data & 1) ? 1 : 0;
 	hiram  = (data & 2) ? 1 : 0;
 	charen = (data & 4) ? 1 : 0;
-	logerror("Bankswitch mode || charen, state->m_ultimax\n");
-	logerror("%d, %d, %d, %d  ||   %d,      %d  \n", loram, hiram, state->m_game, state->m_exrom, charen, ultimax_mode);
+	//logerror("Bankswitch mode || charen, state->m_ultimax\n");
+	//logerror("%d, %d, %d, %d  ||   %d,      %d  \n", loram, hiram, state->m_game, state->m_exrom, charen, ultimax_mode);
 
 	if (ultimax_mode)
 	{

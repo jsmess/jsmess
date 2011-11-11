@@ -79,6 +79,8 @@ block of RAM instead of 8.
 #include "machine/ram.h"
 #include "machine/6522via.h"
 #include "machine/c1541.h"
+#include "machine/c1571.h"
+#include "machine/c1581.h"
 #include "machine/c2031.h"
 #include "machine/cbmiec.h"
 #include "machine/ieee488.h"
@@ -432,11 +434,16 @@ static TIMER_DEVICE_CALLBACK( cassette_tick )
 
 /* IEC Serial Bus */
 
-static CBM_IEC_DAISY( cbm_iec_daisy )
-{
-	{ C1541_TAG },
-	{ NULL }
-};
+static SLOT_INTERFACE_START( cbm_iec_devices )
+	SLOT_INTERFACE("c1540", C1540)
+	SLOT_INTERFACE("c1541", C1541)
+	SLOT_INTERFACE("c1541c", C1541C)
+	SLOT_INTERFACE("c1541ii", C1541II)
+	SLOT_INTERFACE("oc118", OC118)
+	SLOT_INTERFACE("c1570", C1570)
+	SLOT_INTERFACE("c1571", C1571)
+	SLOT_INTERFACE("c1581", C1581)
+SLOT_INTERFACE_END
 
 static CBM_IEC_INTERFACE( cbm_iec_intf )
 {
@@ -689,8 +696,13 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 
 	MCFG_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface )
-	MCFG_CBM_IEC_CONFIG_ADD(cbm_iec_daisy, cbm_iec_intf)
-	MCFG_C1541_ADD(C1541_TAG, 8)
+
+	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, "c1541", NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
 #ifdef INCLUDE_VIC1112
     MCFG_VIC1112_ADD(ieee488_daisy)
     MCFG_C2031_ADD(C2031_TAG, 9)

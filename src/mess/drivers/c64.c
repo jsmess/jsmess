@@ -341,6 +341,8 @@ C64DTV TODO:
 #include "formats/cbm_snqk.h"
 #include "machine/cbmiec.h"
 #include "machine/c1541.h"
+#include "machine/c1571.h"
+#include "machine/c1581.h"
 #include "machine/c2040.h"
 #include "machine/interpod.h"
 #include "machine/c64exp.h"
@@ -557,27 +559,30 @@ static const m6502_interface c64_m6510_interface =
 	DEVCB_HANDLER(c64_m6510_port_write)
 };
 
-static CBM_IEC_DAISY( cbm_iec_null_daisy )
+static SLOT_INTERFACE_START( sx1541_iec_devices )
+	SLOT_INTERFACE("sx1541", SX1541)
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START( cbm_iec_devices )
+	SLOT_INTERFACE("c1540", C1540)
+	SLOT_INTERFACE("c1541", C1541)
+	SLOT_INTERFACE("c1541c", C1541C)
+	SLOT_INTERFACE("c1541ii", C1541II)
+	SLOT_INTERFACE("oc118", OC118)
+	SLOT_INTERFACE("c1570", C1570)
+	SLOT_INTERFACE("c1571", C1571)
+	SLOT_INTERFACE("c1581", C1581)
+SLOT_INTERFACE_END
+
+static CBM_IEC_INTERFACE( cbm_iec_intf )
 {
-	{ NULL }
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
-static CBM_IEC_DAISY( cbm_iec_daisy )
-{
-	{ C1541_TAG },
-#ifdef INCLUDE_INTERPOD
-	{ INTERPOD_TAG },
-#endif
-	{ NULL }
-};
-
-#ifdef INCLUDE_INTERPOD
-static IEEE488_DAISY( ieee488_daisy )
-{
-	{ C4040_TAG },
-	{ NULL}
-};
-#endif
 
 /*************************************
  *
@@ -706,6 +711,55 @@ SLOT_INTERFACE_END
  *
  *************************************/
 
+static MACHINE_CONFIG_START( ultimax, c64_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M6510, VIC6567_CLOCK)
+	MCFG_CPU_PROGRAM_MAP( ultimax_mem)
+	MCFG_CPU_CONFIG( c64_m6510_interface )
+	MCFG_CPU_VBLANK_INT("screen", c64_frame_interrupt)
+	//MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	MCFG_MACHINE_START( c64 )
+	MCFG_MACHINE_RESET( c64 )
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
+	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
+	MCFG_SCREEN_UPDATE( c64 )
+
+	MCFG_PALETTE_INIT( c64 )
+	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(c64_palette) / 3)
+
+	MCFG_VIC2_ADD("vic2", ultimax_vic2_intf)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sid6581", SID6581, VIC6567_CLOCK)
+	MCFG_SOUND_CONFIG(c64_sound_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* quickload */
+	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
+
+	/* cassette */
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
+
+	/* cia */
+	MCFG_MOS6526R1_ADD("cia_0", VIC6567_CLOCK, c64_ntsc_cia0)
+	MCFG_MOS6526R1_ADD("cia_1", VIC6567_CLOCK, c64_ntsc_cia1)
+	
+	MCFG_FRAGMENT_ADD(ultimax_cartslot)
+
+	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( c64, c64_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6510, VIC6567_CLOCK)
@@ -751,9 +805,13 @@ static MACHINE_CONFIG_START( c64, c64_state )
 	MCFG_MOS6526R1_ADD("cia_1", VIC6567_CLOCK, c64_ntsc_cia1)
 
 	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD(cbm_iec_daisy)
-	MCFG_C1541_ADD(C1541_TAG, 8)
-
+	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, "c1541", NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
+	
 	MCFG_FRAGMENT_ADD(c64_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
 
@@ -804,65 +862,113 @@ static MACHINE_CONFIG_START( c64pal, c64_state )
 	MCFG_MOS6526R1_ADD("cia_1", VIC6569_CLOCK, c64_pal_cia1)
 
 	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD(cbm_iec_daisy)
-	MCFG_C1541_ADD(C1541_TAG, 8)
-#ifdef INCLUDE_INTERPOD
-	MCFG_INTERPOD_ADD(ieee488_daisy)
-	MCFG_C4040_ADD(C4040_TAG, 9)
-#endif
-
+	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, "c1541", NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
+	
 	MCFG_FRAGMENT_ADD(c64_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
 
 	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ultimax, c64 )
-	MCFG_CPU_REPLACE( "maincpu", M6510, VIC6567_CLOCK)
-	MCFG_CPU_PROGRAM_MAP( ultimax_mem)
-	MCFG_CPU_CONFIG( c64_m6510_interface )
-
-	MCFG_SOUND_REPLACE("sid6581", SID6581, VIC6567_CLOCK)
-	MCFG_SOUND_CONFIG(c64_sound_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
-	MCFG_DEVICE_REMOVE("vic2")
-	MCFG_VIC2_ADD("vic2", ultimax_vic2_intf)
-
-	MCFG_CBM_IEC_REMOVE()
-	MCFG_DEVICE_REMOVE(C1541_TAG)
-	MCFG_DEVICE_REMOVE("cart1")
-	MCFG_DEVICE_REMOVE("cart2")
-
-	MCFG_FRAGMENT_ADD(ultimax_cartslot)
-MACHINE_CONFIG_END
-
-
 static MACHINE_CONFIG_DERIVED( pet64, c64 )
 	MCFG_PALETTE_INIT( pet64 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c64gs, c64pal )
-	MCFG_DEVICE_REMOVE( "dac" )
-	MCFG_DEVICE_REMOVE( CASSETTE_TAG )
-	MCFG_DEVICE_REMOVE( "quickload" )
-	MCFG_CBM_IEC_REMOVE()
-	MCFG_DEVICE_REMOVE(C1541_TAG)
-	MCFG_CBM_IEC_ADD(cbm_iec_null_daisy)
+static MACHINE_CONFIG_START( c64gs, c64_state )
+	MCFG_CPU_ADD( "maincpu", M6510, VIC6569_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(c64_mem)
+	MCFG_CPU_CONFIG( c64_m6510_interface )
+	MCFG_CPU_VBLANK_INT("screen", c64_frame_interrupt)
+	// MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6569_HRETRACERATE)
+	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+
+	MCFG_MACHINE_START( c64 )
+	MCFG_MACHINE_RESET( c64 )
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) /* 2500 not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)
+	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
+	MCFG_SCREEN_UPDATE( c64 )
+
+	MCFG_PALETTE_INIT( c64 )
+	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(c64_palette) / 3)
+
+	MCFG_VIC2_ADD("vic2", c64_vic2_pal_intf)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sid6581", SID6581, VIC6569_CLOCK)
+	MCFG_SOUND_CONFIG(c64_sound_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* cia */
+	MCFG_MOS6526R1_ADD("cia_0", VIC6569_CLOCK, c64_pal_cia0)
+	MCFG_MOS6526R1_ADD("cia_1", VIC6569_CLOCK, c64_pal_cia1)
+	
+	MCFG_FRAGMENT_ADD(c64_cartslot)
+
+	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( sx64, c64_state )
+	MCFG_CPU_ADD( "maincpu", M6510, VIC6569_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(c64_mem)
+	MCFG_CPU_CONFIG( c64_m6510_interface )
+	MCFG_CPU_VBLANK_INT("screen", c64_frame_interrupt)
+	// MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6569_HRETRACERATE)
+	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
-static MACHINE_CONFIG_DERIVED( sx64, c64pal )
-	MCFG_DEVICE_REMOVE( C1541_TAG )
-	MCFG_SX1541_ADD(C1541_TAG, 8)
+	MCFG_MACHINE_START( c64 )
+	MCFG_MACHINE_RESET( c64 )
 
-	MCFG_DEVICE_REMOVE( "dac" )
-	MCFG_DEVICE_REMOVE( CASSETTE_TAG )
-#ifdef CPU_SYNC
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-#else
-	MCFG_QUANTUM_TIME(attotime::from_hz(180000))
-#endif
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) /* 2500 not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)
+	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
+	MCFG_SCREEN_UPDATE( c64 )
+
+	MCFG_PALETTE_INIT( c64 )
+	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(c64_palette) / 3)
+
+	MCFG_VIC2_ADD("vic2", c64_vic2_pal_intf)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sid6581", SID6581, VIC6569_CLOCK)
+	MCFG_SOUND_CONFIG(c64_sound_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* quickload */
+	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
+
+	/* cia */
+	MCFG_MOS6526R1_ADD("cia_0", VIC6569_CLOCK, c64_pal_cia0)
+	MCFG_MOS6526R1_ADD("cia_1", VIC6569_CLOCK, c64_pal_cia1)
+
+	/* floppy from serial bus */
+	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, sx1541_iec_devices, "sx1541", NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
+	
+	MCFG_FRAGMENT_ADD(c64_cartslot)
+	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
+
+	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
 

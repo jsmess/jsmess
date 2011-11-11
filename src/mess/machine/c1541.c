@@ -167,20 +167,27 @@ const device_type C1541II = &device_creator<c1541ii_device>;
 const device_type SX1541 = &device_creator<sx1541_device>;
 const device_type OC118 = &device_creator<oc118_device>;
 
+
 c1540_device::c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:c1541_device(mconfig, C1540, "C1540", tag, owner, clock) { m_variant = TYPE_1540; }
 
+	
 c1541c_device::c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:c1541_device(mconfig, C1541C, "C1541C", tag, owner, clock) { m_variant = TYPE_1541C; }
 
+	
 c1541ii_device::c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:c1541_device(mconfig, C1541II, "C1541II", tag, owner, clock) { m_variant = TYPE_1541II; }
 
+	
 sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:c1541_device(mconfig, SX1541, "SX1541", tag, owner, clock) { m_variant = TYPE_SX1541; }
 
+	
 oc118_device::oc118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:c1541_device(mconfig, OC118, "OC118", tag, owner, clock) { m_variant = TYPE_OC118; }
+	
+	
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
@@ -216,20 +223,6 @@ void c1541_device::device_config_complete()
 		m_shortname = "oc118";
 		break;
 	}
-}
-
-
-//-------------------------------------------------
-//  static_set_config - configuration helper
-//-------------------------------------------------
-
-void c1541_device::static_set_config(device_t &device, int address)
-{
-	c1541_device &c1541 = downcast<c1541_device &>(device);
-
-	assert((address > 7) && (address < 12));
-
-	c1541.m_address = address - 8;
 }
 
 
@@ -346,7 +339,7 @@ static ADDRESS_MAP_START( c1541_mem, AS_PROGRAM, 8, c1541_device )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
-	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) // AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION(M6502_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -733,13 +726,13 @@ c1541_device::c1541_device(const machine_config &mconfig, const char *tag, devic
 	  m_via1(*this, M6522_1_TAG),
 	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
-	  m_bus(NULL),
 	  m_data_out(1),
 	  m_via0_irq(0),
 	  m_via1_irq(0)
 {
 	m_variant = TYPE_1541;
 }
+
 
 c1541_device::c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, type, name, tag, owner, clock),
@@ -749,12 +742,12 @@ c1541_device::c1541_device(const machine_config &mconfig, device_type type, cons
 	  m_via1(*this, M6522_1_TAG),
 	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
-	  m_bus(NULL),
 	  m_data_out(1),
 	  m_via0_irq(0),
 	  m_via1_irq(0)
 {
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -764,9 +757,9 @@ void c1541_device::device_start()
 {
     m_bus = machine().device<cbm_iec_device>(CBM_IEC_TAG);
 
-	// map ROM
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	program->install_rom(0x8000, 0xbfff, 0, 0x4000, subregion(M6502_TAG)->base());
+	// get bus address
+	cbm_iec_slot_device *slot = downcast<cbm_iec_slot_device*>(owner());
+	m_address = slot->get_address() - 8;
 
 	// install image callbacks
 	floppy_install_unload_proc(m_image, c1541_device::on_disk_change);
