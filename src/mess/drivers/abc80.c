@@ -464,14 +464,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc80_io, AS_IO, 8, abc80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x17)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_device, inp_r, utp_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_device, stat_r, cs_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE(ABCBUS_TAG, abcbus_device, c1_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE(ABCBUS_TAG, abcbus_device, c2_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE(ABCBUS_TAG, abcbus_device, c3_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(ABCBUS_TAG, abcbus_device, c4_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, utp_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, stat_r, cs_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c1_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c2_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c3_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c4_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE_PORT("SN76477")
-	AM_RANGE(0x07, 0x07) AM_DEVREAD(ABCBUS_TAG, abcbus_device, rst_r)
+	AM_RANGE(0x07, 0x07) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_device, rst_r)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
 
@@ -740,12 +740,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_ABC830_ADD()
 
 	// ABC bus
-	MCFG_ABCBUS_ADD(Z80_TAG, abcbus_intf)
-	MCFG_ABCBUS_SLOT_ADD( 1, "abc1", abc80_abcbus_cards, "slow", NULL)
-	MCFG_ABCBUS_SLOT_ADD( 2, "abc2", abc80_abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 3, "abc3", abc80_abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 4, "abc4", abc80_abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD( 5, "abc5", abc80_abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abc80_abcbus_cards, "slow", NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
