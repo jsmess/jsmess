@@ -1474,14 +1474,13 @@ $(MESSOBJ)/sinclair.a:			\
 	$(MESS_VIDEO)/zx8301.o		\
 	$(MESS_MACHINE)/zx8302.o	\
 
-$(MESSOBJ)/neocd.a:				\
-	$(MESS_DRIVERS)/neocd.o		\
-	$(EMU_MACHINE)/neogeo.o		\
-	$(EMU_VIDEO)/neogeo.o		\
-	$(EMU_MACHINE)/pd4990a.o	\
 
 $(MESSOBJ)/snk.a:				\
 	$(MESS_DRIVERS)/ng_aes.o	\
+	$(MAME_MACHINE)/neocrypt.o	\
+	$(MAME_MACHINE)/neoprot.o	\
+	$(MAME_MACHINE)/neoboot.o	\
+	$(MAME_DRIVERS)/neogeo.o	\
 	$(MESS_DRIVERS)/ngp.o		\
 	$(MESS_VIDEO)/k1ge.o		\
 
