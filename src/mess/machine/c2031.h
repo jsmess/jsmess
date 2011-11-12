@@ -74,7 +74,6 @@ protected:
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
 	required_device<device_t> m_image;
-	ieee488_device *m_bus;
 
 	// IEEE-488 bus
 	int m_nrfd_out;				// not ready for data
@@ -84,8 +83,6 @@ protected:
 	// interrupts
 	int m_via0_irq;				// VIA #0 interrupt request
 	int m_via1_irq;				// VIA #1 interrupt request
-
-	int m_address;
 };
 
 

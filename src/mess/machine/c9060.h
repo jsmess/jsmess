@@ -79,10 +79,8 @@ private:
 	required_device<riot6532_device> m_riot0;
 	required_device<riot6532_device> m_riot1;
 	required_device<via6522_device> m_via;
-	ieee488_device *m_bus;
 
 	// IEEE-488 bus
-	int m_address;						// bus address
 	int m_rfdo;							// not ready for data output
 	int m_daco;							// not data accepted output
 	int m_atna;							// attention acknowledge

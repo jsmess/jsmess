@@ -85,7 +85,7 @@ static ADDRESS_MAP_START( c9060_main_mem, AS_PROGRAM, 8, base_c9060_device )
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0xc000, 0xffff) // AM_ROM
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( c9060_hdc_mem, AS_PROGRAM, 8, base_c9060_device )
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x1800, 0x1fff) // AM_ROM 6530
+	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION(M6504_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -506,18 +506,6 @@ c9090_device::c9090_device(const machine_config &mconfig, const char *tag, devic
 
 void base_c9060_device::device_start()
 {
-    m_bus = owner()->owner()->subdevice<ieee488_device>(IEEE488_TAG);
-
-	// get bus address
-	ieee488_slot_device *slot = downcast<ieee488_slot_device*>(owner());
-	m_address = slot->get_address() - 8;
-
-	address_space *main = m_maincpu->memory().space(AS_PROGRAM);
-	address_space *hdc = m_hdccpu->memory().space(AS_PROGRAM);
-
-	main->install_rom(0xc000, 0xffff, subregion(M6502_TAG)->base());
-	hdc->install_rom(0x1800, 0x1fff, subregion(M6504_TAG)->base());
-
 	// state saving
 	save_item(NAME(m_rfdo));
 	save_item(NAME(m_daco));

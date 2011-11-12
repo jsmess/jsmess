@@ -83,24 +83,14 @@ void ieee488_slot_device::static_set_slot(device_t &device, int address)
 
 
 //-------------------------------------------------
-//  get_address - 
-//-------------------------------------------------
-
-int ieee488_slot_device::get_address()
-{
-	return m_address;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void ieee488_slot_device::device_start()
 {
-	m_bus = owner()->subdevice<ieee488_device>(IEEE488_TAG);
+	ieee488_device* bus = owner()->subdevice<ieee488_device>(IEEE488_TAG);
 	device_ieee488_interface *dev = dynamic_cast<device_ieee488_interface *>(get_card_device());
-	if (dev) m_bus->add_device(get_card_device());
+	if (dev) bus->add_device(get_card_device(), m_address);
 }
 
 
@@ -366,9 +356,13 @@ void ieee488_device::device_start()
 //  add_device -
 //-------------------------------------------------
 
-void ieee488_device::add_device(device_t *target)
+void ieee488_device::add_device(device_t *target, int address)
 {
 	daisy_entry *entry = auto_alloc(machine(), daisy_entry(target));
+		
+	entry->m_interface->m_bus = this;
+	entry->m_interface->m_address = address;
+
 	m_device_list.append(*entry);
 }
 

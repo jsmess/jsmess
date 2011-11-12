@@ -71,7 +71,7 @@ public:
 	// construction/destruction
 	cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void add_device(device_t *target);
+	void add_device(device_t *target, int address);
 	
 	// reads for both host and peripherals
 	DECLARE_READ_LINE_MEMBER( srq_r );
@@ -152,7 +152,6 @@ public:
 
     // inline configuration
     static void static_set_slot(device_t &device, int address);
-	int get_address();
 
 private:
 	// configuration
@@ -173,6 +172,7 @@ public:
 	virtual ~device_cbm_iec_interface();
 
 	device_cbm_iec_interface *next() const { return m_next; }
+	device_cbm_iec_interface *m_next;
 	
 	// optional operation overrides
 	virtual void cbm_iec_atn(int state) { };
@@ -182,7 +182,7 @@ public:
 	virtual void cbm_iec_reset(int state) { };
 
 	cbm_iec_device  *m_bus;
-	device_cbm_iec_interface *m_next;
+	int m_address;
 };
 
 

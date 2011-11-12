@@ -123,11 +123,10 @@ ROM_START( c2040 ) // schematic 320806
 
 	ROM_REGION( 0x400, M6504_TAG, 0 )
 	// RIOT DOS 1
-	//ROM_LOAD( "901466-02.uk3", 0x000, 0x400, BAD_DUMP /* parsed in from disassembly */ CRC(e1c86c43) SHA1(d8209c66fde3f2937688ba934ba968678a9d2ebb) )
-	ROM_LOAD( "901466-02.uk3", 0x000, 0x400, NO_DUMP)
+	ROM_LOAD( "901466-02.uk3", 0x000, 0x400, NO_DUMP )// BAD_DUMP CRC(e1c86c43) SHA1(d8209c66fde3f2937688ba934ba968678a9d2ebb) ) // parsed in from disassembly
 
 	ROM_REGION( 0x800, "gcr", 0)
-	ROM_LOAD( "901467.uk6",    0x2400, 0x0800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
+	ROM_LOAD( "901467.uk6",    0x000, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
 ROM_END
 
 
@@ -476,7 +475,7 @@ READ8_MEMBER( base_c2040_device::riot1_pb_r )
 	UINT8 data = 0;
 
 	// device number selection
-	data |= m_address;
+	data |= m_address - 8;
 
 	// data accepted in
 	data |= m_bus->ndac_r() << 6;
@@ -1531,12 +1530,6 @@ sfd1001_device::sfd1001_device(const machine_config &mconfig, const char *tag, d
 
 void base_c2040_device::device_start()
 {
-    m_bus = owner()->owner()->subdevice<ieee488_device>(IEEE488_TAG);
-
-	// get bus address
-	ieee488_slot_device *slot = downcast<ieee488_slot_device*>(owner());
-	m_address = slot->get_address() - 8;
-
 	m_bit_timer = timer_alloc();
 
 	switch (m_variant)

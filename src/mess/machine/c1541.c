@@ -388,7 +388,7 @@ READ8_MEMBER( c1541_device::via0_pb_r )
 	data |= !m_bus->clk_r() << 2;
 
 	// serial bus address
-	data |= m_address << 5;
+	data |= (m_address - 8) << 5;
 
 	// attention in
 	data |= !m_bus->atn_r() << 7;
@@ -755,12 +755,6 @@ c1541_device::c1541_device(const machine_config &mconfig, device_type type, cons
 
 void c1541_device::device_start()
 {
-    m_bus = machine().device<cbm_iec_device>(CBM_IEC_TAG);
-
-	// get bus address
-	cbm_iec_slot_device *slot = downcast<cbm_iec_slot_device*>(owner());
-	m_address = slot->get_address() - 8;
-
 	// install image callbacks
 	floppy_install_unload_proc(m_image, c1541_device::on_disk_change);
 	floppy_install_load_proc(m_image, c1541_device::on_disk_change);

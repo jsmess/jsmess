@@ -75,7 +75,7 @@ public:
 	// construction/destruction
 	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void add_device(device_t *target);
+	void add_device(device_t *target, int address);
 	
 	// reads for both host and peripherals
 	UINT8 dio_r();
@@ -180,12 +180,10 @@ public:
 
     // inline configuration
     static void static_set_slot(device_t &device, int address);
-	int get_address();
 
 private:
 	// configuration
 	int m_address;
-	ieee488_device  *m_bus;
 };
 
 
@@ -201,6 +199,7 @@ public:
 	virtual ~device_ieee488_interface();
 
 	device_ieee488_interface *next() const { return m_next; }
+	device_ieee488_interface *m_next;
 	
 	// optional operation overrides
 	virtual void ieee488_eoi(int state) { };
@@ -213,7 +212,7 @@ public:
 	virtual void ieee488_ren(int state) { };
 	
 	ieee488_device  *m_bus;
-	device_ieee488_interface *m_next;
+	int m_address;
 };
 
 

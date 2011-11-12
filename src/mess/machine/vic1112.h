@@ -64,8 +64,6 @@ public:
     // construction/destruction
     vic1112_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_WRITE_LINE_MEMBER( srq_w );
-
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
 	DECLARE_READ8_MEMBER( via0_pb_r );

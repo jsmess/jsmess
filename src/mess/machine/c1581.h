@@ -83,7 +83,6 @@ protected:
 	required_device<mos6526_device> m_cia;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_image;
-	cbm_iec_device *m_bus;
 
 	int m_data_out;				// serial data out
 	int m_atn_ack;				// attention acknowledge
@@ -91,7 +90,6 @@ protected:
 	int m_sp_out;				// fast serial data out
 	int m_cnt_out;				// fast serial clock out
 
-    int m_address;
 	int m_variant;
 };
 
