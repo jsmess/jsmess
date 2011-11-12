@@ -558,6 +558,7 @@ LDFLAGSEMULATOR += -Wl,-Map,$(FULLNAME).map
 endif
 
 
+LDFLAGS += -static-libstdc++
 
 #-------------------------------------------------
 # define the standard object directory; other
