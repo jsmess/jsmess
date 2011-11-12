@@ -179,6 +179,24 @@ UINT8 get_scsi_lines(device_t *device);
 UINT8 get_scsi_line(device_t *device, UINT8 lineno);
 void set_scsi_line(device_t *device, UINT8 line, UINT8 state);
 
+READ_LINE_DEVICE_HANDLER( scsi_bsy_r );
+READ_LINE_DEVICE_HANDLER( scsi_sel_r );
+READ_LINE_DEVICE_HANDLER( scsi_cd_r );
+READ_LINE_DEVICE_HANDLER( scsi_io_r );
+READ_LINE_DEVICE_HANDLER( scsi_msg_r );
+READ_LINE_DEVICE_HANDLER( scsi_req_r );
+READ_LINE_DEVICE_HANDLER( scsi_ack_r );
+READ_LINE_DEVICE_HANDLER( scsi_rst_r );
+
+WRITE_LINE_DEVICE_HANDLER( scsi_bsy_w );
+WRITE_LINE_DEVICE_HANDLER( scsi_sel_w );
+WRITE_LINE_DEVICE_HANDLER( scsi_cd_w );
+WRITE_LINE_DEVICE_HANDLER( scsi_io_w );
+WRITE_LINE_DEVICE_HANDLER( scsi_msg_w );
+WRITE_LINE_DEVICE_HANDLER( scsi_req_w );
+WRITE_LINE_DEVICE_HANDLER( scsi_ack_w );
+WRITE_LINE_DEVICE_HANDLER( scsi_rst_w );
+
 /* Get current bus phase */
 
 UINT8 get_scsi_phase(device_t *device);

@@ -22,6 +22,8 @@
 #define M6504_TAG		"4a"
 #define M6522_TAG		"4b"
 
+#define SASIBUS_TAG		"sasi"
+
 
 
 //**************************************************************************
@@ -103,6 +105,32 @@ static ADDRESS_MAP_START( c9060_hdc_mem, AS_PROGRAM, 8, base_c9060_device )
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
 	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION(M6504_TAG, 0)
 ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  SCSIBus_interface sasi_intf
+//-------------------------------------------------
+
+static const SCSIConfigTable sasi_dev_table =
+{
+	1,
+	{
+		{ SCSI_ID_0, "harddisk0", SCSI_DEVICE_HARDDISK }
+	}
+};
+
+static const SCSIBus_interface sasi_intf =
+{
+    &sasi_dev_table,
+    NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 
 //-------------------------------------------------
@@ -339,8 +367,8 @@ READ8_MEMBER( base_c9060_device::via_pb_r )
 
         bit     description
 
-        PB0     SEL
-        PB1     RST
+        PB0     
+        PB1     
         PB2     C/D
         PB3     BUSY
         PB4     J14
@@ -350,7 +378,14 @@ READ8_MEMBER( base_c9060_device::via_pb_r )
 
     */
 
-	return 0;
+	UINT8 data = 0;
+	
+	data |= scsi_cd_r(m_sasibus) << 2;
+	data |= scsi_bsy_r(m_sasibus) << 3;
+	data |= scsi_io_r(m_sasibus) << 6;
+	data |= scsi_msg_r(m_sasibus) << 7;
+	
+	return data;
 }
 
 WRITE8_MEMBER( base_c9060_device::via_pb_w )
@@ -361,14 +396,17 @@ WRITE8_MEMBER( base_c9060_device::via_pb_w )
 
         PB0     SEL
         PB1     RST
-        PB2     C/D
-        PB3     BUSY
-        PB4     J14
-        PB5     J14
-        PB6     I/O
-        PB7     MSG
+        PB2     
+        PB3     
+        PB4     
+        PB5     
+        PB6     
+        PB7     
 
     */
+	
+	scsi_sel_w(m_sasibus, BIT(data, 0));
+	scsi_rst_w(m_sasibus, BIT(data, 1));
 }
 
 static const via6522_interface via_intf =
@@ -409,17 +447,8 @@ static MACHINE_CONFIG_FRAGMENT( c9060 )
 
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
 
-	// Tandon TM602S
-MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c9090 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_FRAGMENT( c9090 )
-	MCFG_FRAGMENT_ADD(c9060)
-	// Tandon TM603S
+	MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
+	MCFG_HARDDISK_ADD("harddisk0")
 MACHINE_CONFIG_END
 
 
@@ -430,15 +459,7 @@ MACHINE_CONFIG_END
 
 machine_config_constructor base_c9060_device::device_mconfig_additions() const
 {
-	switch (m_variant)
-	{
-	default:
-	case TYPE_9060:
-		return MACHINE_CONFIG_NAME( c9060 );
-
-	case TYPE_9090:
-		return MACHINE_CONFIG_NAME( c9090 );
-	}
+	return MACHINE_CONFIG_NAME( c9060 );
 }
 
 
@@ -479,6 +500,7 @@ base_c9060_device::base_c9060_device(const machine_config &mconfig, device_type 
 	  m_riot0(*this, M6532_0_TAG),
 	  m_riot1(*this, M6532_1_TAG),
 	  m_via(*this, M6522_TAG),
+	  m_sasibus(*this, SASIBUS_TAG),
 	  m_variant(variant)
 {
 }

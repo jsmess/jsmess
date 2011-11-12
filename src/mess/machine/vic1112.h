@@ -82,7 +82,7 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete();
+    virtual void device_config_complete() { m_shortname = "vic1112"; }
 
 private:
 	required_device<via6522_device> m_via0;
