@@ -39,17 +39,30 @@ void vic1112_device::device_config_complete()
 
 
 //-------------------------------------------------
-//  IEEE488_INTERFACE( vic1112_ieee488_intf )
+//  IEEE488_INTERFACE( ieee488_intf )
 //-------------------------------------------------
 
-IEEE488_INTERFACE( vic1112_ieee488_intf )
+static SLOT_INTERFACE_START( cbm_ieee488_devices )
+	SLOT_INTERFACE("c2040", C2040)
+	SLOT_INTERFACE("c3040", C3040)
+	SLOT_INTERFACE("c4040", C4040)
+	SLOT_INTERFACE("c8050", C8050)
+	SLOT_INTERFACE("c8250", C8250)
+	SLOT_INTERFACE("sfd1001", SFD1001)
+	SLOT_INTERFACE("c2031", C2031)
+	SLOT_INTERFACE("c8280", C8280)
+	SLOT_INTERFACE("c9060", C9060)
+	SLOT_INTERFACE("c9090", C9090)
+SLOT_INTERFACE_END
+
+IEEE488_INTERFACE( ieee488_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(VIC1112_TAG, vic1112_device, srq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vic1112_device, srq_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -274,6 +287,12 @@ static const via6522_interface via1_intf =
 static MACHINE_CONFIG_FRAGMENT( vic1112 )
 	MCFG_VIA6522_ADD(M6522_0_TAG, 0, via0_intf)
 	MCFG_VIA6522_ADD(M6522_1_TAG, 0, via1_intf)
+
+	MCFG_IEEE488_BUS_ADD(ieee488_intf)
+	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, NULL, NULL)
+	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, NULL, NULL)
+	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, NULL, NULL)
+	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, NULL, NULL)
 MACHINE_CONFIG_END
 
 
@@ -301,7 +320,7 @@ vic1112_device::vic1112_device(const machine_config &mconfig, const char *tag, d
     : device_t(mconfig, VIC1112, "VIC1112", tag, owner, clock),
 	  m_via0(*this, M6522_0_TAG),
 	  m_via1(*this, M6522_1_TAG),
-	  m_bus(*this->owner(), IEEE488_TAG)
+	  m_bus(*this, IEEE488_TAG)
 {
 }
 

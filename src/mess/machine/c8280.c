@@ -28,6 +28,7 @@
 
 const device_type C8280 = &device_creator<c8280_device>;
 
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
@@ -37,20 +38,6 @@ const device_type C8280 = &device_creator<c8280_device>;
 void c8280_device::device_config_complete()
 {
 	m_shortname = "c8280";
-}
-
-
-//-------------------------------------------------
-//  static_set_config - configuration helper
-//-------------------------------------------------
-
-void c8280_device::static_set_config(device_t &device, int address)
-{
-	c8280_device &c8280 = downcast<c8280_device &>(device);
-
-	assert((address > 7) && (address < 12));
-
-	c8280.m_address = address - 8;
 }
 
 
@@ -197,8 +184,7 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 	  m_riot0(*this, M6532_0_TAG),
 	  m_riot1(*this, M6532_1_TAG),
 	  m_image0(*this, FLOPPY_0),
-	  m_image1(*this, FLOPPY_1),
-	  m_bus(*this->owner(), IEEE488_TAG)
+	  m_image1(*this, FLOPPY_1)
 {
 }
 
@@ -209,6 +195,12 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 
 void c8280_device::device_start()
 {
+    m_bus = owner()->owner()->subdevice<ieee488_device>(IEEE488_TAG);
+
+	// get bus address
+	ieee488_slot_device *slot = downcast<ieee488_slot_device*>(owner());
+	m_address = slot->get_address() - 8;
+
 	address_space *main = m_maincpu->memory().space(AS_PROGRAM);
 	address_space *fdc = m_fdccpu->memory().space(AS_PROGRAM);
 

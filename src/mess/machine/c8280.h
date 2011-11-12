@@ -23,24 +23,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define C8280_TAG			"c8280"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_C8280_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C8280, 0) \
-	c8280_device::static_set_config(*device, _address);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -52,9 +34,6 @@ class c8280_device :  public device_t,
 public:
     // construction/destruction
     c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// inline configuration helpers
-	static void static_set_config(device_t &device, int address);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -77,7 +56,7 @@ protected:
 	required_device<riot6532_device> m_riot1;
 	required_device<device_t> m_image0;
 	required_device<device_t> m_image1;
-	required_device<ieee488_device> m_bus;
+	ieee488_device *m_bus;
 
 	int m_address;
 };

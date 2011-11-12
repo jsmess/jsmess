@@ -881,11 +881,6 @@ static const floppy_interface victor9k_floppy_interface =
 
 /* IEEE-488 Interface */
 
-static IEEE488_DAISY( ieee488_daisy )
-{
-	{ NULL }
-};
-
 static IEEE488_INTERFACE( ieee488_intf )
 {
 	DEVCB_NULL,
@@ -953,7 +948,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_IEEE488_CONFIG_ADD(ieee488_daisy, ieee488_intf)
+	MCFG_IEEE488_BUS_ADD(ieee488_intf)
 	MCFG_PIC8259_ADD(I8259A_TAG, pic_intf)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_30MHz/30, mpsc_intf)

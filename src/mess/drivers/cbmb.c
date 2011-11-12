@@ -106,7 +106,10 @@ Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction
 #include "includes/cbm.h"
 #include "includes/cbmb.h"
 #include "machine/ieee488.h"
+#include "machine/c2031.h"
 #include "machine/c2040.h"
+#include "machine/c8280.h"
+#include "machine/c9060.h"
 #include "machine/cbmipt.h"
 #include "video/vic6567.h"
 #include "video/mc6845.h"
@@ -411,10 +414,29 @@ static const tpi6525_interface cbmb_tpi_1_intf =
 	DEVCB_NULL
 };
 
-static IEEE488_DAISY( ieee488_daisy )
+static SLOT_INTERFACE_START( cbm_ieee488_devices )
+	SLOT_INTERFACE("c2040", C2040)
+	SLOT_INTERFACE("c3040", C3040)
+	SLOT_INTERFACE("c4040", C4040)
+	SLOT_INTERFACE("c8050", C8050)
+	SLOT_INTERFACE("c8250", C8250)
+	SLOT_INTERFACE("sfd1001", SFD1001)
+	SLOT_INTERFACE("c2031", C2031)
+	SLOT_INTERFACE("c8280", C8280)
+	SLOT_INTERFACE("c9060", C9060)
+	SLOT_INTERFACE("c9090", C9090)
+SLOT_INTERFACE_END
+
+static IEEE488_INTERFACE( ieee488_intf )
 {
-	{ "drive" },
-	{ NULL}
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( cbm600, cbmb_state )
@@ -457,8 +479,11 @@ static MACHINE_CONFIG_START( cbm600, cbmb_state )
 	MCFG_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
 
 	/* IEEE bus */
-	MCFG_IEEE488_ADD(ieee488_daisy)
-	MCFG_C8250_ADD("drive", 8)
+	MCFG_IEEE488_BUS_ADD(ieee488_intf)
+	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, "c8250", NULL)
+	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, NULL, NULL)
+	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, NULL, NULL)
+	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, NULL, NULL)
 
 	MCFG_FRAGMENT_ADD(cbmb_cartslot)
 MACHINE_CONFIG_END
@@ -533,8 +558,11 @@ static MACHINE_CONFIG_START( p500, cbmb_state )
 	MCFG_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
 
 	/* IEEE bus */
-	MCFG_IEEE488_ADD(ieee488_daisy)
-	MCFG_C8250_ADD("drive", 8)
+	MCFG_IEEE488_BUS_ADD(ieee488_intf)
+	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, "c8250", NULL)
+	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, NULL, NULL)
+	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, NULL, NULL)
+	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, NULL, NULL)
 
 	MCFG_FRAGMENT_ADD(cbmb_cartslot)
 MACHINE_CONFIG_END

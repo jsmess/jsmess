@@ -9,7 +9,6 @@
 **********************************************************************/
 
 #include "ieee488.h"
-#include "machine/devhelpr.h"
 
 
 
@@ -29,6 +28,8 @@ static const char *const SIGNAL_NAME[] = { "EOI", "DAV", "NRFD", "NDAC", "IFC", 
 //**************************************************************************
 
 const device_type IEEE488 = &device_creator<ieee488_device>;
+const device_type IEEE488_SLOT = &device_creator<ieee488_slot_device>;
+
 
 
 //**************************************************************************
@@ -40,7 +41,7 @@ const device_type IEEE488 = &device_creator<ieee488_device>;
 //-------------------------------------------------
 
 device_ieee488_interface::device_ieee488_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_slot_card_interface(mconfig, device)
 {
 }
 
@@ -53,6 +54,61 @@ device_ieee488_interface::~device_ieee488_interface()
 {
 }
 
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  ieee488_slot_device - constructor
+//-------------------------------------------------
+
+ieee488_slot_device::ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, IEEE488_SLOT, "IEEE-488 slot", tag, owner, clock),
+		device_slot_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  static_set_slot - 
+//-------------------------------------------------
+
+void ieee488_slot_device::static_set_slot(device_t &device, int address)
+{
+	ieee488_slot_device &ieee488_card = dynamic_cast<ieee488_slot_device &>(device);
+	ieee488_card.m_address = address;
+}
+
+
+//-------------------------------------------------
+//  get_address - 
+//-------------------------------------------------
+
+int ieee488_slot_device::get_address()
+{
+	return m_address;
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ieee488_slot_device::device_start()
+{
+	m_bus = owner()->subdevice<ieee488_device>(IEEE488_TAG);
+	device_ieee488_interface *dev = dynamic_cast<device_ieee488_interface *>(get_card_device());
+	if (dev) m_bus->add_device(get_card_device());
+}
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
@@ -62,17 +118,22 @@ device_ieee488_interface::~device_ieee488_interface()
 void ieee488_device::device_config_complete()
 {
 	// inherit a copy of the static data
-	const ieee488_config *intf = reinterpret_cast<const ieee488_config *>(static_config());
+	const ieee488_interface *intf = reinterpret_cast<const ieee488_interface *>(static_config());
 	if (intf != NULL)
-		*static_cast<ieee488_config *>(this) = *intf;
+		*static_cast<ieee488_interface *>(this) = *intf;
 
 	// or initialize to defaults if none provided
 	else
 	{
-		fatalerror("Daisy chain not provided!");
+		memset(&m_out_eoi_cb, 0, sizeof(m_out_eoi_cb));
+		memset(&m_out_dav_cb, 0, sizeof(m_out_dav_cb));
+		memset(&m_out_nrfd_cb, 0, sizeof(m_out_nrfd_cb));
+		memset(&m_out_ndac_cb, 0, sizeof(m_out_ndac_cb));
+		memset(&m_out_ifc_cb, 0, sizeof(m_out_ifc_cb));
+		memset(&m_out_srq_cb, 0, sizeof(m_out_srq_cb));
+		memset(&m_out_atn_cb, 0, sizeof(m_out_atn_cb));
+		memset(&m_out_ren_cb, 0, sizeof(m_out_ren_cb));
 	}
-
-	m_daisy = intf;
 }
 
 
@@ -89,60 +150,92 @@ inline void ieee488_device::set_signal(device_t *device, int signal, int state)
 {
 	bool changed = false;
 
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	if (device == this)
 	{
-		if (!strcmp(daisy->m_device->tag(), device->tag()))
+		if (m_line[signal] != state)
 		{
-			if (daisy->m_line[signal] != state)
+			if (LOG) logerror("%s IEEE488: '%s' %s %u\n", machine().describe_context(), tag(), SIGNAL_NAME[signal], state);
+			m_line[signal] = state;
+			changed = true;
+		}
+	}
+	else
+	{
+		daisy_entry *entry = m_device_list.first();
+		
+		while (entry)
+		{
+			if (!strcmp(entry->m_device->tag(), device->tag()))
 			{
-				if (LOG) logerror("IEEE488: '%s' %s %u\n", device->tag(), SIGNAL_NAME[signal], state);
-				daisy->m_line[signal] = state;
-				changed = true;
+				if (entry->m_line[signal] != state)
+				{
+					if (LOG) logerror("%s IEEE488: '%s' %s %u\n", machine().describe_context(), device->tag(), SIGNAL_NAME[signal], state);
+					entry->m_line[signal] = state;
+					changed = true;
+				}
 			}
+			
+			entry = entry->next();
 		}
 	}
 
 	if (changed)
 	{
-		for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+		switch (signal)
+		{
+		case EOI:	m_out_eoi_func(state);	break;
+		case DAV:	m_out_dav_func(state);	break;
+		case NRFD:	m_out_nrfd_func(state);	break;
+		case NDAC:	m_out_ndac_func(state);	break;
+		case IFC:	m_out_ifc_func(state);	break;
+		case SRQ:	m_out_srq_func(state);	break;
+		case ATN:	m_out_atn_func(state);	break;
+		case REN:	m_out_ren_func(state);	break;
+		}
+
+		daisy_entry *entry = m_device_list.first();
+		
+		while (entry)
 		{
 			switch (signal)
 			{
 			case EOI:
-				daisy->m_interface->ieee488_eoi(state);
+				entry->m_interface->ieee488_eoi(state);
 				break;
 
 			case DAV:
-				daisy->m_interface->ieee488_dav(state);
+				entry->m_interface->ieee488_dav(state);
 				break;
 
 			case NRFD:
-				daisy->m_interface->ieee488_nrfd(state);
+				entry->m_interface->ieee488_nrfd(state);
 				break;
 
 			case NDAC:
-				daisy->m_interface->ieee488_ndac(state);
+				entry->m_interface->ieee488_ndac(state);
 				break;
 
 			case IFC:
-				daisy->m_interface->ieee488_ifc(state);
+				entry->m_interface->ieee488_ifc(state);
 				break;
 
 			case SRQ:
-				daisy->m_interface->ieee488_srq(state);
+				entry->m_interface->ieee488_srq(state);
 				break;
 
 			case ATN:
-				daisy->m_interface->ieee488_atn(state);
+				entry->m_interface->ieee488_atn(state);
 				break;
 
 			case REN:
-				daisy->m_interface->ieee488_ren(state);
+				entry->m_interface->ieee488_ren(state);
 				break;
 			}
+
+			entry = entry->next();
 		}
 
-		if (LOG) logerror("IEEE-488: EOI %u DAV %u NRFD %u NDAC %u IFC %u SRQ %u ATN %u REN %u DIO %02x\n",
+		if (LOG) logerror("IEEE488: EOI %u DAV %u NRFD %u NDAC %u IFC %u SRQ %u ATN %u REN %u DIO %02x\n",
 			get_signal(EOI), get_signal(DAV), get_signal(NRFD), get_signal(NDAC),
 			get_signal(IFC), get_signal(SRQ), get_signal(ATN), get_signal(REN), get_data());
 	}
@@ -155,17 +248,24 @@ inline void ieee488_device::set_signal(device_t *device, int signal, int state)
 
 inline int ieee488_device::get_signal(int signal)
 {
-	int state = 1;
+	int state = m_line[signal];
 
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	if (state)
 	{
-		if (!daisy->m_line[signal])
+		daisy_entry *entry = m_device_list.first();
+		
+		while (entry)
 		{
-			state = 0;
-			break;
+			if (!entry->m_line[signal])
+			{
+				state = 0;
+				break;
+			}
+			
+			entry = entry->next();
 		}
 	}
-
+	
 	return state;
 }
 
@@ -176,15 +276,28 @@ inline int ieee488_device::get_signal(int signal)
 
 inline void ieee488_device::set_data(device_t *device, UINT8 data)
 {
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	if (device == this)
 	{
-		if (!strcmp(daisy->m_device->tag(), device->tag()))
+		if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), tag(), data);
+		
+		m_dio = data;
+	}
+	else
+	{	
+		daisy_entry *entry = m_device_list.first();
+		
+		while (entry)
 		{
-			if (daisy->m_dio != data)
+			if (!strcmp(entry->m_device->tag(), device->tag()))
 			{
-				if (LOG) logerror("IEEE488: '%s' DIO %02x\n", device->tag(), data);
-				daisy->m_dio = data;
+				if (entry->m_dio != data)
+				{
+					if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), device->tag(), data);
+					entry->m_dio = data;
+				}
 			}
+			
+			entry = entry->next();
 		}
 	}
 }
@@ -196,13 +309,17 @@ inline void ieee488_device::set_data(device_t *device, UINT8 data)
 
 inline UINT8 ieee488_device::get_data()
 {
-	UINT8 data = 0xff;
+	UINT8 data = m_dio;
 
-	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
+	daisy_entry *entry = m_device_list.first();
+	
+	while (entry)
 	{
-		data &= daisy->m_dio;
+		data &= entry->m_dio;
+			
+		entry = entry->next();
 	}
-
+		
 	return data;
 }
 
@@ -217,9 +334,13 @@ inline UINT8 ieee488_device::get_data()
 //-------------------------------------------------
 
 ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, IEEE488, "IEEE488", tag, owner, clock),
-	  m_stub(*(this->owner()), IEEE488_STUB_TAG)
+    : device_t(mconfig, IEEE488, "IEEE488 bus", tag, owner, clock),
+	  m_dio(0xff)
 {
+	for (int i = 0; i < SIGNAL_COUNT; i++)
+	{
+		m_line[i] = 1;
+	}
 }
 
 
@@ -229,31 +350,26 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 
 void ieee488_device::device_start()
 {
-	const ieee488_config *daisy = m_daisy;
+	// resolve callbacks
+    m_out_eoi_func.resolve(m_out_eoi_cb, *this);
+    m_out_dav_func.resolve(m_out_dav_cb, *this);
+    m_out_nrfd_func.resolve(m_out_nrfd_cb, *this);
+    m_out_ndac_func.resolve(m_out_ndac_cb, *this);
+    m_out_ifc_func.resolve(m_out_ifc_cb, *this);
+    m_out_srq_func.resolve(m_out_srq_cb, *this);
+    m_out_atn_func.resolve(m_out_atn_cb, *this);
+    m_out_ren_func.resolve(m_out_ren_cb, *this);
+}
 
-	// create a linked list of devices
-	daisy_entry **tailptr = &m_daisy_list;
-	for ( ; daisy->m_tag != NULL; daisy++)
-	{
-		// find the device
-		device_t *target = machine().device(daisy->m_tag);
-		if (target == NULL)
-			fatalerror("Unable to locate device '%s'", daisy->m_tag);
 
-		// make sure it has an interface
-		device_ieee488_interface *intf;
-		if (!target->interface(intf))
-			fatalerror("Device '%s' does not implement the CBM IEC interface!", daisy->m_tag);
+//-------------------------------------------------
+//  add_device -
+//-------------------------------------------------
 
-		// append to the end
-		*tailptr = auto_alloc(machine(), daisy_entry(target));
-		tailptr = &(*tailptr)->m_next;
-	}
-
-	// append driver stub to the end
-	device_t *target = machine().device(IEEE488_STUB_TAG);
-	*tailptr = auto_alloc(machine(), daisy_entry(target));
-	tailptr = &(*tailptr)->m_next;
+void ieee488_device::add_device(device_t *target)
+{
+	daisy_entry *entry = auto_alloc(machine(), daisy_entry(target));
+	m_device_list.append(*entry);
 }
 
 
@@ -382,7 +498,7 @@ READ_LINE_MEMBER( ieee488_device::ren_r )
 
 void ieee488_device::dio_w(UINT8 data)
 {
-	return set_data(m_stub, data);
+	return set_data(this, data);
 }
 
 
@@ -392,7 +508,7 @@ void ieee488_device::dio_w(UINT8 data)
 
 WRITE8_MEMBER( ieee488_device::dio_w )
 {
-	return set_data(m_stub, data);
+	return set_data(this, data);
 }
 
 
@@ -402,7 +518,7 @@ WRITE8_MEMBER( ieee488_device::dio_w )
 
 WRITE_LINE_MEMBER( ieee488_device::eoi_w )
 {
-	set_signal(m_stub, EOI, state);
+	set_signal(this, EOI, state);
 }
 
 
@@ -412,7 +528,7 @@ WRITE_LINE_MEMBER( ieee488_device::eoi_w )
 
 WRITE_LINE_MEMBER( ieee488_device::dav_w )
 {
-	set_signal(m_stub, DAV, state);
+	set_signal(this, DAV, state);
 }
 
 
@@ -422,7 +538,7 @@ WRITE_LINE_MEMBER( ieee488_device::dav_w )
 
 WRITE_LINE_MEMBER( ieee488_device::nrfd_w )
 {
-	set_signal(m_stub, NRFD, state);
+	set_signal(this, NRFD, state);
 }
 
 
@@ -432,7 +548,7 @@ WRITE_LINE_MEMBER( ieee488_device::nrfd_w )
 
 WRITE_LINE_MEMBER( ieee488_device::ndac_w )
 {
-	set_signal(m_stub, NDAC, state);
+	set_signal(this, NDAC, state);
 }
 
 
@@ -442,7 +558,7 @@ WRITE_LINE_MEMBER( ieee488_device::ndac_w )
 
 WRITE_LINE_MEMBER( ieee488_device::ifc_w )
 {
-	set_signal(m_stub, IFC, state);
+	set_signal(this, IFC, state);
 }
 
 
@@ -452,7 +568,7 @@ WRITE_LINE_MEMBER( ieee488_device::ifc_w )
 
 WRITE_LINE_MEMBER( ieee488_device::srq_w )
 {
-	set_signal(m_stub, SRQ, state);
+	set_signal(this, SRQ, state);
 }
 
 
@@ -462,7 +578,7 @@ WRITE_LINE_MEMBER( ieee488_device::srq_w )
 
 WRITE_LINE_MEMBER( ieee488_device::atn_w )
 {
-	set_signal(m_stub, ATN, state);
+	set_signal(this, ATN, state);
 }
 
 
@@ -472,7 +588,7 @@ WRITE_LINE_MEMBER( ieee488_device::atn_w )
 
 WRITE_LINE_MEMBER( ieee488_device::ren_w )
 {
-	set_signal(m_stub, REN, state);
+	set_signal(this, REN, state);
 }
 
 

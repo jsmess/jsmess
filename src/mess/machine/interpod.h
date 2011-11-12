@@ -10,6 +10,10 @@
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
 #include "machine/6850acia.h"
+#include "machine/c2031.h"
+#include "machine/c2040.h"
+#include "machine/c8280.h"
+#include "machine/c9060.h"
 #include "machine/cbmiec.h"
 #include "machine/ieee488.h"
 
@@ -27,9 +31,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_INTERPOD_ADD(_daisy) \
-    MCFG_DEVICE_ADD(INTERPOD_TAG, INTERPOD, 0) \
-	MCFG_IEEE488_CONFIG_ADD(_daisy, interpod_ieee488_intf)
+#define MCFG_INTERPOD_ADD() \
+    MCFG_DEVICE_ADD(INTERPOD_TAG, INTERPOD, 0)
 
 
 
@@ -67,10 +70,6 @@ protected:
 
 // device type definition
 extern const device_type INTERPOD;
-
-
-// IEEE-488 interface
-extern const ieee488_stub_interface interpod_ieee488_intf;
 
 
 

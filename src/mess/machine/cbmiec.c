@@ -400,7 +400,8 @@ inline void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 			entry = entry->next();
 		}
 
-		if (LOG) logerror("CBM IEC: SRQ %u ATN %u CLK %u DATA %u RESET %u\n", get_signal(SRQ),get_signal(ATN),get_signal(CLK),get_signal(DATA),get_signal(RESET));
+		if (LOG) logerror("CBM IEC: SRQ %u ATN %u CLK %u DATA %u RESET %u\n", 
+			get_signal(SRQ), get_signal(ATN), get_signal(CLK), get_signal(DATA), get_signal(RESET));
 	}
 }
 

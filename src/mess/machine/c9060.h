@@ -24,30 +24,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define C9060_TAG			"c9060"
-#define C9090_TAG			"c9090"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_C9060_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C9060, 0) \
-	base_c9060_device::static_set_config(*device, _address);
-
-
-#define MCFG_C9090_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C9090, 0) \
-	base_c9060_device::static_set_config(*device, _address);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -67,9 +43,6 @@ public:
 
 	// construction/destruction
     base_c9060_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
-
-	// inline configuration helpers
-	static void static_set_config(device_t &device, int address);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -106,7 +79,7 @@ private:
 	required_device<riot6532_device> m_riot0;
 	required_device<riot6532_device> m_riot1;
 	required_device<via6522_device> m_via;
-	required_device<ieee488_device> m_bus;
+	ieee488_device *m_bus;
 
 	// IEEE-488 bus
 	int m_address;						// bus address
