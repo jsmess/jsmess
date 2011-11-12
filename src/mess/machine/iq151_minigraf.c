@@ -7,6 +7,19 @@
 #include "emu.h"
 #include "iq151_minigraf.h"
 
+#include "emuopts.h"
+#include "png.h"
+
+// paper is A4 (297x210mm)
+#define PAPER_HEIGHT	(210*8)
+#define PAPER_WIDTH		(297*8)
+
+// usable area is 187.5x262.5mm step is 0.125mm
+#define PAPER_MAX_X			2100
+#define PAPER_MAX_Y			1500
+
+// dump the m_paper bitmap into a png
+#define DUMP_PAPER_INTO_PNG		0
 
 /***************************************************************************
     IMPLEMENTATION
@@ -45,6 +58,34 @@ iq151_minigraf_device::iq151_minigraf_device(const machine_config &mconfig, cons
 void iq151_minigraf_device::device_start()
 {
 	m_rom = (UINT8*)subregion("minigraf")->base();
+
+	// allocate a bitmap for represent the paper
+	m_paper = auto_bitmap_alloc(machine(), PAPER_WIDTH, PAPER_HEIGHT, BITMAP_FORMAT_INDEXED16);
+	bitmap_fill(m_paper, NULL , 0);
+
+	m_pen = 0;
+	m_posx = m_posy = 0;
+}
+
+//-------------------------------------------------
+//  device_stop - clean up anything that needs to
+//  happen before the running_machine goes away
+//-------------------------------------------------
+
+void iq151_minigraf_device::device_stop()
+{
+#if DUMP_PAPER_INTO_PNG
+	emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	file_error filerr = file.open("iq151_minigraf.png");
+
+	if (filerr == FILERR_NONE)
+	{
+		static const rgb_t png_palette[] = { RGB_WHITE, RGB_BLACK };
+
+		// save the paper into a png
+		png_write_bitmap(file, NULL, m_paper, 2, png_palette);
+	}
+#endif
 }
 
 //-------------------------------------------------
@@ -75,6 +116,50 @@ void iq151_minigraf_device::io_write(offs_t offset, UINT8 data)
 {
 	if (offset >= 0xf0 && offset < 0xf4)
 	{
-		// Plotter control lines
+		/*
+            Plotter control lines
+
+            ---- -xxx   horizontal step
+            --xx x---   vertical step
+            -x-- ----   ???
+            x--- ----   pen up/down
+        */
+
+		plotter_update(data);
 	}
+}
+
+
+//**************************************************************************
+//  Aritma MINIGRAF 0507
+//**************************************************************************
+
+inline int iq151_minigraf_device::get_direction(UINT8 old_val, UINT8 new_val)
+{
+	if (new_val == 0 && old_val == 7)	return +1;
+	if (new_val == 7 && old_val == 0)	return -1;
+
+	return (new_val - old_val);
+}
+
+void iq151_minigraf_device::plotter_update(UINT8 control)
+{
+	// update pen and paper positions
+	m_posx += get_direction(m_control & 7, control & 7);
+	m_posy += get_direction((m_control>>3) & 7, (control>>3) & 7);
+
+	// bit 7 is pen up/down
+	m_pen = BIT(control, 7);
+
+	// clamp within range
+	m_posx = MAX(m_posx, 0);
+	m_posx = MIN(m_posx, PAPER_MAX_X);
+	m_posy = MAX(m_posy, 0);
+	m_posy = MIN(m_posy, PAPER_MAX_Y);
+
+	// if pen is down draws a point
+	if (m_pen)
+		*BITMAP_ADDR16(m_paper, ((PAPER_HEIGHT-PAPER_MAX_Y)/2) + PAPER_MAX_Y - m_posy, ((PAPER_WIDTH-PAPER_MAX_X)/2) + m_posx) = 1;
+
+	m_control = control;
 }
