@@ -185,6 +185,11 @@ UINT8 scsi_data_r(device_t *device)
     return result;
 }
 
+READ8_DEVICE_HANDLER( scsi_data_r )
+{
+	return scsi_data_r(device);
+}
+
 void scsi_data_w(device_t *device, UINT8 data)
 {
     scsibus_t   *bus = get_token(device);
@@ -238,6 +243,11 @@ void scsi_data_w(device_t *device, UINT8 data)
                 scsibus_write_data(bus);
             break;
     }
+}
+
+WRITE8_DEVICE_HANDLER( scsi_data_w )
+{
+	scsi_data_w(device, data);
 }
 
 /* Get/Set lines */

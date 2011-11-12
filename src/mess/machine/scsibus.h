@@ -173,6 +173,9 @@ struct _SCSIBus_interface
 UINT8 scsi_data_r(device_t *device);
 void scsi_data_w(device_t *device, UINT8 data);
 
+READ8_DEVICE_HANDLER( scsi_data_r );
+WRITE8_DEVICE_HANDLER( scsi_data_w );
+
 /* Get/Set lines */
 
 UINT8 get_scsi_lines(device_t *device);

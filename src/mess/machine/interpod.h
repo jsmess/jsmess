@@ -13,7 +13,7 @@
 #include "machine/c2031.h"
 #include "machine/c2040.h"
 #include "machine/c8280.h"
-#include "machine/c9060.h"
+#include "machine/d9060.h"
 #include "machine/cbmiec.h"
 #include "machine/ieee488.h"
 
