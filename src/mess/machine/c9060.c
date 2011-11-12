@@ -42,7 +42,17 @@ const device_type C9090 = &device_creator<c9090_device>;
 
 void base_c9060_device::device_config_complete()
 {
-	m_shortname = "c9060";
+	switch (m_variant)
+	{
+	default:
+	case TYPE_9060:
+		m_shortname = "c9060";
+		break;
+
+	case TYPE_9090:
+		m_shortname = "c9090";
+		break;
+	}
 }
 
 
