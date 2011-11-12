@@ -696,7 +696,7 @@ static const i8251_interface usart_intf =
 
 
 //-------------------------------------------------
-//  IEEE488_DAISY( ieee488_daisy )
+//  IEEE488_INTERFACE( ieee488_intf )
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( vixen_state::srq_w )
@@ -710,11 +710,6 @@ WRITE_LINE_MEMBER( vixen_state::atn_w )
 	m_atn = state;
 	update_interrupt();
 }
-
-static IEEE488_DAISY( ieee488_daisy )
-{
-	{ NULL }
-};
 
 static IEEE488_INTERFACE( ieee488_intf )
 {
@@ -869,7 +864,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_I8251_ADD(P8251A_TAG, usart_intf)
 	MCFG_FD1797_ADD(FDC1797_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(vixen_floppy_interface)
-	MCFG_IEEE488_CONFIG_ADD(ieee488_daisy, ieee488_intf)
+	MCFG_IEEE488_BUS_ADD(ieee488_intf)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","vixen")

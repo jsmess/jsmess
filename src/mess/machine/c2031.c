@@ -36,6 +36,7 @@ enum
 
 const device_type C2031 = &device_creator<c2031_device>;
 
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
@@ -45,20 +46,6 @@ const device_type C2031 = &device_creator<c2031_device>;
 void c2031_device::device_config_complete()
 {
 	m_shortname = "c2031";
-}
-
-
-//-------------------------------------------------
-//  static_set_config - configuration helper
-//-------------------------------------------------
-
-void c2031_device::static_set_config(device_t &device, int address)
-{
-	c2031_device &c2031 = downcast<c2031_device &>(device);
-
-	assert((address > 7) && (address < 12));
-
-	c2031.m_address = address;
 }
 
 
@@ -476,7 +463,6 @@ c2031_device::c2031_device(const machine_config &mconfig, const char *tag, devic
 	  m_via1(*this, M6522_1_TAG),
 	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
-	  m_bus(*this->owner(), IEEE488_TAG),
 	  m_nrfd_out(1),
 	  m_ndac_out(1),
 	  m_atna(1),
@@ -492,6 +478,12 @@ c2031_device::c2031_device(const machine_config &mconfig, const char *tag, devic
 
 void c2031_device::device_start()
 {
+    m_bus = owner()->owner()->subdevice<ieee488_device>(IEEE488_TAG);
+
+	// get bus address
+	ieee488_slot_device *slot = downcast<ieee488_slot_device*>(owner());
+	m_address = slot->get_address() - 8;
+
 	// map ROM
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	program->install_rom(0x8000, 0xbfff, 0, 0x4000, subregion(M6502_TAG)->base());

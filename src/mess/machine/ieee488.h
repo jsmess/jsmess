@@ -22,7 +22,6 @@
 //**************************************************************************
 
 #define IEEE488_TAG			"ieee_bus"
-#define IEEE488_STUB_TAG	"ieee_stub"
 
 
 
@@ -30,31 +29,19 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_IEEE488_ADD(_daisy) \
-    MCFG_DEVICE_ADD(IEEE488_STUB_TAG, IEEE488_STUB, 0) \
-	MCFG_DEVICE_CONFIG(default_ieee488_stub_interface) \
-	MCFG_DEVICE_ADD(IEEE488_TAG, IEEE488, 0) \
-	MCFG_DEVICE_CONFIG(_daisy)
-
-
-#define MCFG_IEEE488_CONFIG_ADD(_daisy, _config) \
-    MCFG_DEVICE_ADD(IEEE488_STUB_TAG, IEEE488_STUB, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_ADD(IEEE488_TAG, IEEE488, 0) \
-	MCFG_DEVICE_CONFIG(_daisy)
-
-
-#define MCFG_IEEE488_REMOVE() \
-	MCFG_DEVICE_REMOVE(IEEE488_STUB_TAG) \
-	MCFG_DEVICE_REMOVE(IEEE488_TAG)
-
-
-#define IEEE488_DAISY(_name) \
-	const ieee488_config (_name)[] =
+#define MCFG_IEEE488_BUS_ADD(_config) \
+    MCFG_DEVICE_ADD(IEEE488_TAG, IEEE488, 0) \
+    MCFG_DEVICE_CONFIG(_config)
 
 
 #define IEEE488_INTERFACE(_name) \
-	const ieee488_stub_interface (_name) =
+	const ieee488_interface (_name) =
+
+
+#define MCFG_IEEE488_SLOT_ADD(_tag, _num, _slot_intf, _def_slot, _def_inp) \
+    MCFG_DEVICE_ADD(_tag, IEEE488_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp) \
+	ieee488_slot_device::static_set_slot(*device, _num);
 
 
 
@@ -62,45 +49,34 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> ieee488_config
+// ======================> ieee488_interface
 
-struct ieee488_config
+struct ieee488_interface
 {
-	const char *m_tag;
+	devcb_write_line	m_out_eoi_cb;
+	devcb_write_line	m_out_dav_cb;
+	devcb_write_line	m_out_nrfd_cb;
+	devcb_write_line	m_out_ndac_cb;
+	devcb_write_line	m_out_ifc_cb;
+	devcb_write_line	m_out_srq_cb;
+	devcb_write_line	m_out_atn_cb;
+	devcb_write_line	m_out_ren_cb;
 };
 
-// ======================> device_ieee488_interface
-
-class device_ieee488_interface : public device_interface
-{
-public:
-	// construction/destruction
-	device_ieee488_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_ieee488_interface();
-
-	// optional operation overrides
-	virtual void ieee488_eoi(int state) { };
-	virtual void ieee488_dav(int state) { };
-	virtual void ieee488_nrfd(int state) { };
-	virtual void ieee488_ndac(int state) { };
-	virtual void ieee488_ifc(int state) { };
-	virtual void ieee488_srq(int state) { };
-	virtual void ieee488_atn(int state) { };
-	virtual void ieee488_ren(int state) { };
-};
 
 // ======================> ieee488_device
 
-class ieee488_stub_device;
+class device_ieee488_interface;
 
-class ieee488_device :  public device_t,
-						public ieee488_config
+class ieee488_device : public device_t,
+					   public ieee488_interface
 {
-
 public:
-    // construction/destruction
-    ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	void add_device(device_t *target);
+	
 	// reads for both host and peripherals
 	UINT8 dio_r();
 	READ8_MEMBER( dio_r );
@@ -135,7 +111,7 @@ public:
 	void srq_w(device_t *device, int state);
 	void atn_w(device_t *device, int state);
 	void ren_w(device_t *device, int state);
-
+	
 protected:
 	enum
 	{
@@ -149,15 +125,16 @@ protected:
 		REN,
 		SIGNAL_COUNT
 	};
-
+	
 	// device-level overrides
     virtual void device_start();
     virtual void device_config_complete();
-
+	
 	class daisy_entry
 	{
 	public:
 		daisy_entry(device_t *device);
+		daisy_entry *next() const { return m_next; }
 
 		daisy_entry *				m_next;			// next device
 		device_t *					m_device;		// associated device
@@ -167,62 +144,8 @@ protected:
 		UINT8 m_dio;
 	};
 
-	daisy_entry *			m_daisy_list;	// head of the daisy chain
-
-private:
-	inline void set_signal(device_t *device, int signal, int state);
-	inline int get_signal(int signal);
-	inline void set_data(device_t *device, UINT8 data);
-	inline UINT8 get_data();
-
-	required_device<ieee488_stub_device> m_stub;
-
-	const ieee488_config *m_daisy;
-};
-
-
-// ======================> ieee488_stub_interface
-
-struct ieee488_stub_interface
-{
-	devcb_write_line	m_out_eoi_cb;
-	devcb_write_line	m_out_dav_cb;
-	devcb_write_line	m_out_nrfd_cb;
-	devcb_write_line	m_out_ndac_cb;
-	devcb_write_line	m_out_ifc_cb;
-	devcb_write_line	m_out_srq_cb;
-	devcb_write_line	m_out_atn_cb;
-	devcb_write_line	m_out_ren_cb;
-};
-
-const ieee488_stub_interface default_ieee488_stub_interface = { DEVCB_NULL, };
-
-
-// ======================> ieee488_stub_device
-
-class ieee488_stub_device :  public device_t,
-							 public ieee488_stub_interface,
-							 public device_ieee488_interface
-{
-public:
-	// construction/destruction
-    ieee488_stub_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-    // device-level overrides
-    virtual void device_start();
-    virtual void device_config_complete();
-
-	// device_ieee488_interface overrides
-	void ieee488_eoi(int state);
-	void ieee488_dav(int state);
-	void ieee488_nrfd(int state);
-	void ieee488_ndac(int state);
-	void ieee488_ifc(int state);
-	void ieee488_srq(int state);
-	void ieee488_atn(int state);
-	void ieee488_ren(int state);
-
+	simple_list<daisy_entry> m_device_list;
+	
 private:
 	devcb_resolved_write_line	m_out_eoi_func;
 	devcb_resolved_write_line	m_out_dav_func;
@@ -232,12 +155,72 @@ private:
 	devcb_resolved_write_line	m_out_srq_func;
 	devcb_resolved_write_line	m_out_atn_func;
 	devcb_resolved_write_line	m_out_ren_func;
+	
+	inline void set_signal(device_t *device, int signal, int state);
+	inline int get_signal(int signal);
+	inline void set_data(device_t *device, UINT8 data);
+	inline UINT8 get_data();
+
+	int m_line[SIGNAL_COUNT];
+	UINT8 m_dio;
+};
+
+
+// ======================> ieee488_slot_device
+
+class ieee488_slot_device : public device_t,
+							public device_slot_interface
+{
+public:
+	// construction/destruction
+	ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// device-level overrides
+	virtual void device_start();
+
+    // inline configuration
+    static void static_set_slot(device_t &device, int address);
+	int get_address();
+
+private:
+	// configuration
+	int m_address;
+	ieee488_device  *m_bus;
+};
+
+
+// ======================> device_ieee488_interface
+
+class device_ieee488_interface : public device_slot_card_interface
+{
+	friend class ieee488_device;
+
+public:
+	// construction/destruction
+	device_ieee488_interface(const machine_config &mconfig, device_t &device);
+	virtual ~device_ieee488_interface();
+
+	device_ieee488_interface *next() const { return m_next; }
+	
+	// optional operation overrides
+	virtual void ieee488_eoi(int state) { };
+	virtual void ieee488_dav(int state) { };
+	virtual void ieee488_nrfd(int state) { };
+	virtual void ieee488_ndac(int state) { };
+	virtual void ieee488_ifc(int state) { };
+	virtual void ieee488_srq(int state) { };
+	virtual void ieee488_atn(int state) { };
+	virtual void ieee488_ren(int state) { };
+	
+	ieee488_device  *m_bus;
+	device_ieee488_interface *m_next;
 };
 
 
 // device type definition
 extern const device_type IEEE488;
-extern const device_type IEEE488_STUB;
+extern const device_type IEEE488_SLOT;
+
 
 
 #endif

@@ -27,54 +27,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define C2040_TAG			"c2040"
-#define C3040_TAG			"c3040"
-#define C4040_TAG			"c4040"
-#define C8050_TAG			"c8050"
-#define C8250_TAG			"c8250"
-#define SFD1001_TAG			"sfd1001"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_C2040_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C2040, 0) \
-	base_c2040_device::static_set_config(*device, _address);
-
-
-#define MCFG_C3040_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C3040, 0) \
-	base_c2040_device::static_set_config(*device, _address);
-
-
-#define MCFG_C4040_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C4040, 0) \
-	base_c2040_device::static_set_config(*device, _address);
-
-
-#define MCFG_C8050_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C8050, 0) \
-	base_c2040_device::static_set_config(*device, _address);
-
-
-#define MCFG_C8250_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C8250, 0) \
-	base_c2040_device::static_set_config(*device, _address);
-
-
-#define MCFG_SFD1001_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, SFD1001, 0) \
-	base_c2040_device::static_set_config(*device, _address);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -122,9 +74,6 @@ public:
 	DECLARE_READ8_MEMBER( c8050_miot_pb_r );
 	DECLARE_WRITE8_MEMBER( c8050_miot_pb_w );
 
-	// inline configuration helpers
-	static void static_set_config(device_t &device, int address);
-
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -156,7 +105,7 @@ protected:
 	required_device<via6522_device> m_via;
 	required_device<device_t> m_image0;
 	optional_device<device_t> m_image1;
-	required_device<ieee488_device> m_bus;
+	ieee488_device *m_bus;
 
 	struct {
 		// motors

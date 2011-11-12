@@ -45,20 +45,6 @@ void base_c9060_device::device_config_complete()
 
 
 //-------------------------------------------------
-//  static_set_config - configuration helper
-//-------------------------------------------------
-
-void base_c9060_device::static_set_config(device_t &device, int address)
-{
-	base_c9060_device &c9060 = downcast<base_c9060_device &>(device);
-
-	assert((address > 7) && (address < 12));
-
-	c9060.m_address = address - 8;
-}
-
-
-//-------------------------------------------------
 //  ROM( c9060 )
 //-------------------------------------------------
 
@@ -493,7 +479,6 @@ base_c9060_device::base_c9060_device(const machine_config &mconfig, device_type 
 	  m_riot0(*this, M6532_0_TAG),
 	  m_riot1(*this, M6532_1_TAG),
 	  m_via(*this, M6522_TAG),
-	  m_bus(*this->owner(), IEEE488_TAG),
 	  m_variant(variant)
 {
 }
@@ -521,6 +506,12 @@ c9090_device::c9090_device(const machine_config &mconfig, const char *tag, devic
 
 void base_c9060_device::device_start()
 {
+    m_bus = owner()->owner()->subdevice<ieee488_device>(IEEE488_TAG);
+
+	// get bus address
+	ieee488_slot_device *slot = downcast<ieee488_slot_device*>(owner());
+	m_address = slot->get_address() - 8;
+
 	address_space *main = m_maincpu->memory().space(AS_PROGRAM);
 	address_space *hdc = m_hdccpu->memory().space(AS_PROGRAM);
 

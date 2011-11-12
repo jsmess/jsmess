@@ -454,17 +454,6 @@ static CBM_IEC_INTERFACE( cbm_iec_intf )
 	DEVCB_NULL
 };
 
-/* IEEE-488 Bus */
-
-#ifdef INCLUDE_VIC1112
-static IEEE488_DAISY( ieee488_daisy )
-{
-	{ C2031_TAG },
-	{ NULL}
-};
-
-#endif
-
 /* MOS6560 Interface */
 
 #define VC20ADDR2MOS6560ADDR(a) (((a) > 0x8000) ? ((a) & 0x1fff) : ((a) | 0x2000))
@@ -704,8 +693,7 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
 #ifdef INCLUDE_VIC1112
-    MCFG_VIC1112_ADD(ieee488_daisy)
-    MCFG_C2031_ADD(C2031_TAG, 9)
+    MCFG_VIC1112_ADD()
 #endif
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("20,40,60,70,a0,b0")

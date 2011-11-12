@@ -26,24 +26,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define C2031_TAG			"c2031"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_C2031_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C2031, 0) \
-	c2031_device::static_set_config(*device, _address);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -70,12 +52,11 @@ public:
 	DECLARE_READ8_MEMBER( via1_pb_r );
 	DECLARE_WRITE8_MEMBER( via1_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
-	// inline configuration helpers
-	static void static_set_config(device_t &device, int address);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+
 protected:
     // device-level overrides
     virtual void device_start();
@@ -93,7 +74,7 @@ protected:
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
 	required_device<device_t> m_image;
-	required_device<ieee488_device> m_bus;
+	ieee488_device *m_bus;
 
 	// IEEE-488 bus
 	int m_nrfd_out;				// not ready for data
@@ -101,8 +82,8 @@ protected:
 	int m_atna;					// attention acknowledge
 
 	// interrupts
-	int m_via0_irq;							// VIA #0 interrupt request
-	int m_via1_irq;							// VIA #1 interrupt request
+	int m_via0_irq;				// VIA #0 interrupt request
+	int m_via1_irq;				// VIA #1 interrupt request
 
 	int m_address;
 };
