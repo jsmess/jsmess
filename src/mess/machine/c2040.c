@@ -88,8 +88,11 @@ void base_c2040_device::device_config_complete()
 	{
 	default:
 	case TYPE_2040:
-	case TYPE_3040:
 		m_shortname = "c2040";
+		break;
+
+	case TYPE_3040:
+		m_shortname = "c3040";
 		break;
 
 	case TYPE_4040:
