@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    Commodore VIC-1112 IEEE-488 Interface Cartridge emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
 #include "vic1112.h"
 
 
@@ -16,17 +25,6 @@
 //**************************************************************************
 
 const device_type VIC1112 = &device_creator<vic1112_device>;
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void vic1112_device::device_config_complete()
-{
-	m_shortname = "vic1112";
-}
 
 
 //-------------------------------------------------

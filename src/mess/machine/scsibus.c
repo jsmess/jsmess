@@ -271,6 +271,15 @@ UINT8 get_scsi_line(device_t *device, UINT8 lineno)
     return result;
 }
 
+READ_LINE_DEVICE_HANDLER( scsi_bsy_r ) { return get_scsi_line(device, SCSI_LINE_BSY); }
+READ_LINE_DEVICE_HANDLER( scsi_sel_r ) { return get_scsi_line(device, SCSI_LINE_SEL); }
+READ_LINE_DEVICE_HANDLER( scsi_cd_r ) { return get_scsi_line(device, SCSI_LINE_CD); }
+READ_LINE_DEVICE_HANDLER( scsi_io_r ) { return get_scsi_line(device, SCSI_LINE_IO); }
+READ_LINE_DEVICE_HANDLER( scsi_msg_r ) { return get_scsi_line(device, SCSI_LINE_MSG); }
+READ_LINE_DEVICE_HANDLER( scsi_req_r ) { return get_scsi_line(device, SCSI_LINE_REQ); }
+READ_LINE_DEVICE_HANDLER( scsi_ack_r ) { return get_scsi_line(device, SCSI_LINE_RESET); }
+READ_LINE_DEVICE_HANDLER( scsi_rst_r ) { return get_scsi_line(device, SCSI_LINE_ACK); }
+
 void set_scsi_line(device_t *device, UINT8 line, UINT8 state)
 {
     scsibus_t   *bus = get_token(device);
@@ -288,6 +297,15 @@ void set_scsi_line(device_t *device, UINT8 line, UINT8 state)
             set_scsi_line_now(device,line,state);
     }
 }
+
+WRITE_LINE_DEVICE_HANDLER( scsi_bsy_w ) { return set_scsi_line(device, SCSI_LINE_BSY, state); }
+WRITE_LINE_DEVICE_HANDLER( scsi_sel_w ) { return set_scsi_line(device, SCSI_LINE_SEL, state); }
+WRITE_LINE_DEVICE_HANDLER( scsi_cd_w ) { return set_scsi_line(device, SCSI_LINE_CD, state); }
+WRITE_LINE_DEVICE_HANDLER( scsi_io_w ) { return set_scsi_line(device, SCSI_LINE_IO, state); }
+WRITE_LINE_DEVICE_HANDLER( scsi_msg_w ) { return set_scsi_line(device, SCSI_LINE_MSG, state); }
+WRITE_LINE_DEVICE_HANDLER( scsi_req_w ) { return set_scsi_line(device, SCSI_LINE_REQ, state); }
+WRITE_LINE_DEVICE_HANDLER( scsi_ack_w ) { return set_scsi_line(device, SCSI_LINE_RESET, state); }
+WRITE_LINE_DEVICE_HANDLER( scsi_rst_w ) { return set_scsi_line(device, SCSI_LINE_ACK, state); }
 
 static void set_scsi_line_now(device_t *device, UINT8 line, UINT8 state)
 {

@@ -5,6 +5,14 @@
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
+**********************************************************************
+	
+	C9060: Tandon TM602S
+	chdman -createblankhd d9060.chd 153 4 32 256
+	
+	C9090: Tandon TM603S
+	chdman -createblankhd d9090.chd 153 6 32 256
+	
 **********************************************************************/
 
 #pragma once
@@ -16,10 +24,11 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/harddriv.h"
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
 #include "machine/ieee488.h"
+#include "machine/scsibus.h"
 
 
 
@@ -79,6 +88,7 @@ private:
 	required_device<riot6532_device> m_riot0;
 	required_device<riot6532_device> m_riot1;
 	required_device<via6522_device> m_via;
+	required_device<device_t> m_sasibus;
 
 	// IEEE-488 bus
 	int m_rfdo;							// not ready for data output
