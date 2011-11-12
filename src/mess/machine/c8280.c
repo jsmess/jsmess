@@ -70,7 +70,7 @@ const rom_entry *c8280_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( c8280_main_mem, AS_PROGRAM, 8, c8280_device )
-	AM_RANGE(0xc000, 0xffff) // AM_ROM
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6502_DOS_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -80,7 +80,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c8280_fdc_mem, AS_PROGRAM, 8, c8280_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x1c00, 0x1fff) // AM_ROM 6530
+	AM_RANGE(0x1c00, 0x1fff) AM_ROM AM_REGION(M6502_FDC_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -195,17 +195,6 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 
 void c8280_device::device_start()
 {
-    m_bus = owner()->owner()->subdevice<ieee488_device>(IEEE488_TAG);
-
-	// get bus address
-	ieee488_slot_device *slot = downcast<ieee488_slot_device*>(owner());
-	m_address = slot->get_address() - 8;
-
-	address_space *main = m_maincpu->memory().space(AS_PROGRAM);
-	address_space *fdc = m_fdccpu->memory().space(AS_PROGRAM);
-
-	main->install_rom(0xc000, 0xffff, subregion(M6502_DOS_TAG)->base());
-	fdc->install_rom(0x1800, 0x1fff, subregion(M6502_FDC_TAG)->base());
 }
 
 

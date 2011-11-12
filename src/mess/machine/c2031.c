@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( c2031_mem, AS_PROGRAM, 8, c2031_device )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
-	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) // AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION(M6502_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -478,17 +478,7 @@ c2031_device::c2031_device(const machine_config &mconfig, const char *tag, devic
 
 void c2031_device::device_start()
 {
-    m_bus = owner()->owner()->subdevice<ieee488_device>(IEEE488_TAG);
-
-	// get bus address
-	ieee488_slot_device *slot = downcast<ieee488_slot_device*>(owner());
-	m_address = slot->get_address() - 8;
-
-	// map ROM
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	program->install_rom(0x8000, 0xbfff, 0, 0x4000, subregion(M6502_TAG)->base());
-
-	// install image callbacks
+ 	// install image callbacks
 	floppy_install_unload_proc(m_image, c2031_device::on_disk_change);
 	floppy_install_load_proc(m_image, c2031_device::on_disk_change);
 

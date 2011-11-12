@@ -93,7 +93,6 @@ protected:
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
 	required_device<device_t> m_image;
-	cbm_iec_device *m_bus;
 
 	// IEC bus
 	int m_data_out;							// serial data out
@@ -102,7 +101,6 @@ protected:
 	int m_via0_irq;							// VIA #0 interrupt request
 	int m_via1_irq;							// VIA #1 interrupt request
 
-	int m_address;
 	int m_variant;
 };
 

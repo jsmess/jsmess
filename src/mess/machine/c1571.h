@@ -101,13 +101,11 @@ protected:
 	required_device<device_t> m_fdc;
 	required_device<c64h156_device> m_ga;
 	required_device<device_t> m_image;
-	cbm_iec_device *m_bus;
 
 	// signals
 	int m_1_2mhz;							// clock speed
 
 	// IEC bus
-    int m_address;							// serial address
 	int m_data_out;							// serial data out
 	int m_ser_dir;							// fast serial direction
 	int m_sp_out;							// fast serial data out

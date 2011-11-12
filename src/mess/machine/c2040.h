@@ -105,7 +105,6 @@ protected:
 	required_device<via6522_device> m_via;
 	required_device<device_t> m_image0;
 	optional_device<device_t> m_image1;
-	ieee488_device *m_bus;
 
 	struct {
 		// motors
@@ -126,7 +125,6 @@ protected:
 	int m_side;							// selected side
 
 	// IEEE-488 bus
-	int m_address;						// bus address
 	int m_rfdo;							// not ready for data output
 	int m_daco;							// not data accepted output
 	int m_atna;							// attention acknowledge

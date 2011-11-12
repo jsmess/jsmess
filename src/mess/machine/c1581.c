@@ -156,7 +156,7 @@ READ8_MEMBER( base_c1581_device::cia_pa_r )
 	data |= !(floppy_drive_get_flag_state(m_image, FLOPPY_DRIVE_READY) == FLOPPY_DRIVE_READY) << 1;
 
 	// device number
-	data |= m_address << 3;
+	data |= (m_address - 8) << 3;
 
 	// disk change
 	data |= floppy_dskchg_r(m_image) << 7;
@@ -426,12 +426,6 @@ c1581_device::c1581_device(const machine_config &mconfig, const char *tag, devic
 
 void base_c1581_device::device_start()
 {
-	m_bus = machine().device<cbm_iec_device>(CBM_IEC_TAG);
-
-	// get bus address
-	cbm_iec_slot_device *slot = downcast<cbm_iec_slot_device*>(owner());
-	m_address = slot->get_address() - 8;
-
 	// state saving
 	save_item(NAME(m_data_out));
 	save_item(NAME(m_atn_ack));

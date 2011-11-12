@@ -56,9 +56,6 @@ protected:
 	required_device<riot6532_device> m_riot1;
 	required_device<device_t> m_image0;
 	required_device<device_t> m_image1;
-	ieee488_device *m_bus;
-
-	int m_address;
 };
 
 

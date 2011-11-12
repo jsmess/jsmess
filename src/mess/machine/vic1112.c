@@ -1,12 +1,3 @@
-/*
-
-    TODO:
-
-    - add IEEE488 bus here, not in the driver
-    - SRQ IN -> VIA1 CB1
-
-*/
-
 #include "vic1112.h"
 
 
@@ -62,7 +53,7 @@ IEEE488_INTERFACE( ieee488_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vic1112_device, srq_w),
+	DEVCB_DEVICE_LINE_MEMBER(M6522_1_TAG, via6522_device, write_cb1),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -354,14 +345,4 @@ void vic1112_device::device_reset()
 {
 	m_bus->ifc_w(0);
 	m_bus->ifc_w(1);
-}
-
-
-//-------------------------------------------------
-//  srq_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( vic1112_device::srq_w )
-{
-	m_via1->write_cb1(state);
 }
