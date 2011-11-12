@@ -7,6 +7,19 @@
 #include "emu.h"
 #include "iq151_ms151a.h"
 
+#include "emuopts.h"
+#include "png.h"
+
+// paper is A4 (210x297mm)
+#define PAPER_HEIGHT	(210*10)
+#define PAPER_WIDTH		(297*10)
+
+// usable area is 175x250mm step is 0.1mm
+#define PAPER_MAX_X			(250*10)
+#define PAPER_MAX_Y			(175*10)
+
+// dump the m_paper bitmap into a png
+#define DUMP_PAPER_INTO_PNG		0
 
 /***************************************************************************
     IMPLEMENTATION
@@ -44,6 +57,34 @@ iq151_ms151a_device::iq151_ms151a_device(const machine_config &mconfig, const ch
 void iq151_ms151a_device::device_start()
 {
 	m_rom = (UINT8*)subregion("ms151a")->base();
+
+	// allocate a bitmap for represent the paper
+	m_paper = auto_bitmap_alloc(machine(), PAPER_WIDTH, PAPER_HEIGHT, BITMAP_FORMAT_INDEXED16);
+	bitmap_fill(m_paper, NULL , 0);
+
+	m_pen = 0;
+	m_posx = m_posy = 0;
+}
+
+//-------------------------------------------------
+//  device_stop - clean up anything that needs to
+//  happen before the running_machine goes away
+//-------------------------------------------------
+
+void iq151_ms151a_device::device_stop()
+{
+#if DUMP_PAPER_INTO_PNG
+	emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	file_error filerr = file.open("iq151_ms151a.png");
+
+	if (filerr == FILERR_NONE)
+	{
+		static const rgb_t png_palette[] = { RGB_WHITE, RGB_BLACK };
+
+		// save the paper into a png
+		png_write_bitmap(file, NULL, m_paper, 2, png_palette);
+	}
+#endif
 }
 
 //-------------------------------------------------
@@ -72,7 +113,8 @@ void iq151_ms151a_device::read(offs_t offset, UINT8 &data)
 
 void iq151_ms151a_device::io_read(offs_t offset, UINT8 &data)
 {
-
+	if (offset == 0xc4)
+		data = plotter_status();
 }
 
 //-------------------------------------------------
@@ -81,5 +123,43 @@ void iq151_ms151a_device::io_read(offs_t offset, UINT8 &data)
 
 void iq151_ms151a_device::io_write(offs_t offset, UINT8 data)
 {
+	if (offset >= 0xc0 && offset <= 0xc4)
+		plotter_update(offset - 0xc0, data);
+}
 
+
+//**************************************************************************
+//  XY 4130/4131
+//**************************************************************************
+
+UINT8 iq151_ms151a_device::plotter_status()
+{
+	/*
+        bit 7 - plotter READY line
+    */
+
+	return 0x80;
+}
+
+void iq151_ms151a_device::plotter_update(UINT8 offset, UINT8 data)
+{
+	// update pen and paper positions
+	switch (offset)
+	{
+		case 0:		m_posx++;				break;
+		case 1:		m_posx--;				break;
+		case 2:		m_posy++;				break;
+		case 3:		m_posy--;				break;
+		case 4:		m_pen = data & 0x01;	break;
+	}
+
+	// clamp within range
+	m_posx = MAX(m_posx, 0);
+	m_posx = MIN(m_posx, PAPER_MAX_X);
+	m_posy = MAX(m_posy, 0);
+	m_posy = MIN(m_posy, PAPER_MAX_Y);
+
+	// if pen is down draws a point
+	if (m_pen)
+		*BITMAP_ADDR16(m_paper, ((PAPER_HEIGHT-PAPER_MAX_Y)/2) + PAPER_MAX_Y - m_posy, ((PAPER_WIDTH-PAPER_MAX_X)/2) + m_posx) = 1;
 }

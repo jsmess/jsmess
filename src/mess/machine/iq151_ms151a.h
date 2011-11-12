@@ -26,6 +26,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_stop();
 	virtual void device_config_complete() { m_shortname = "iq151_ms151a"; }
 
 	// iq151cart_interface overrides
@@ -33,9 +34,18 @@ protected:
 	virtual void io_read(offs_t offset, UINT8 &data);
 	virtual void io_write(offs_t offset, UINT8 data);
 
+	// XY 4130/4131
+	UINT8 plotter_status();
+	void plotter_update(UINT8 offset, UINT8 data);
+
 private:
 
 	UINT8 *		m_rom;
+	INT32		m_posx;
+	INT32		m_posy;
+	UINT8		m_pen;
+
+	bitmap_t *	m_paper;
 };
 
 
