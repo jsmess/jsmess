@@ -391,7 +391,7 @@ normal keyboards?
 #include "machine/c2031.h"
 #include "machine/c2040.h"
 #include "machine/c8280.h"
-#include "machine/c9060.h"
+#include "machine/d9060.h"
 
 /* devices config */
 #include "includes/cbm.h"
@@ -656,8 +656,8 @@ static SLOT_INTERFACE_START( cbm_ieee488_devices )
 	SLOT_INTERFACE("sfd1001", SFD1001)
 	SLOT_INTERFACE("c2031", C2031)
 	SLOT_INTERFACE("c8280", C8280)
-	SLOT_INTERFACE("c9060", C9060)
-	SLOT_INTERFACE("c9090", C9090)
+	SLOT_INTERFACE("d9060", D9060)
+	SLOT_INTERFACE("d9090", D9090)
 SLOT_INTERFACE_END
 
 static IEEE488_INTERFACE( ieee488_intf )

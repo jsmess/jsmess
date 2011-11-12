@@ -1,24 +1,24 @@
 /**********************************************************************
 
-    Commodore 9060/9090 Hard Disk Drive emulation
+    Commodore D9060/D9090 Hard Disk Drive emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
 	
-	C9060: Tandon TM602S
+	D9060: Tandon TM602S
 	chdman -createblankhd d9060.chd 153 4 32 256
 	
-	C9090: Tandon TM603S
+	D9090: Tandon TM603S
 	chdman -createblankhd d9090.chd 153 6 32 256
 	
 **********************************************************************/
 
 #pragma once
 
-#ifndef __C9060__
-#define __C9060__
+#ifndef __D9060__
+#define __D9060__
 
 #define ADDRESS_MAP_MODERN
 
@@ -37,10 +37,10 @@
 //**************************************************************************
 
 
-// ======================> base_c9060_device
+// ======================> base_d9060_device
 
-class base_c9060_device :  public device_t,
-					  public device_ieee488_interface
+class base_d9060_device :  public device_t,
+						   public device_ieee488_interface
 {
 
 public:
@@ -51,7 +51,7 @@ public:
 	};
 
 	// construction/destruction
-    base_c9060_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+    base_d9060_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -68,12 +68,14 @@ public:
 	DECLARE_READ8_MEMBER( via_pb_r );
 	DECLARE_WRITE8_MEMBER( via_pa_w );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
+	DECLARE_READ_LINE_MEMBER( req_r );
+	DECLARE_WRITE_LINE_MEMBER( ack_w );
+	DECLARE_WRITE_LINE_MEMBER( enable_w );
 
 protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
     virtual void device_config_complete();
 
 	// device_ieee488_interface overrides
@@ -99,29 +101,29 @@ private:
 };
 
 
-// ======================> c9060_device
+// ======================> d9060_device
 
-class c9060_device :  public base_c9060_device
+class d9060_device :  public base_d9060_device
 {
 public:
     // construction/destruction
-    c9060_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    d9060_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
-// ======================> c9090_device
+// ======================> d9090_device
 
-class c9090_device :  public base_c9060_device
+class d9090_device :  public base_d9060_device
 {
 public:
     // construction/destruction
-    c9090_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    d9090_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 // device type definition
-extern const device_type C9060;
-extern const device_type C9090;
+extern const device_type D9060;
+extern const device_type D9090;
 
 
 
