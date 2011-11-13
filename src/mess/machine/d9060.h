@@ -58,15 +58,15 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// not really public
+	DECLARE_WRITE_LINE_MEMBER( req_w );
 	DECLARE_READ8_MEMBER( dio_r );
 	DECLARE_WRITE8_MEMBER( dio_w );
 	DECLARE_READ8_MEMBER( riot1_pa_r );
 	DECLARE_WRITE8_MEMBER( riot1_pa_w );
 	DECLARE_READ8_MEMBER( riot1_pb_r );
 	DECLARE_WRITE8_MEMBER( riot1_pb_w );
-	DECLARE_READ8_MEMBER( via_pa_r );
 	DECLARE_READ8_MEMBER( via_pb_r );
-	DECLARE_WRITE8_MEMBER( via_pa_w );
+	DECLARE_WRITE8_MEMBER( db_w );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
 	DECLARE_READ_LINE_MEMBER( req_r );
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
@@ -84,6 +84,7 @@ protected:
 
 private:
 	inline void update_ieee_signals();
+	inline void update_sasi_signals();
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_hdccpu;
@@ -97,6 +98,9 @@ private:
 	int m_daco;							// not data accepted output
 	int m_atna;							// attention acknowledge
 
+	UINT8 m_db;
+	int m_enable;
+	
 	int m_variant;
 };
 

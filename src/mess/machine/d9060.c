@@ -136,6 +136,11 @@ static const SCSIConfigTable sasi_dev_table =
 	}
 };
 
+WRITE_LINE_MEMBER( base_d9060_device::req_w )
+{
+	m_via->write_ca1(!state);
+}
+
 static const SCSIBus_interface sasi_intf =
 {
     &sasi_dev_table,
@@ -145,7 +150,7 @@ static const SCSIBus_interface sasi_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(M6522_TAG, via6522_device, write_ca1),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, req_w),
 	DEVCB_NULL
 };
 
@@ -378,6 +383,13 @@ READ8_MEMBER( base_d9060_device::via_pb_r )
 	return data;
 }
 
+WRITE8_MEMBER( base_d9060_device::db_w )
+{
+	m_db = data;
+	
+	update_sasi_signals();
+}
+
 WRITE8_MEMBER( base_d9060_device::via_pb_w )
 {
 	/*
@@ -397,6 +409,8 @@ WRITE8_MEMBER( base_d9060_device::via_pb_w )
 	
 	scsi_sel_w(m_sasibus, !BIT(data, 0));
 	scsi_rst_w(m_sasibus, !BIT(data, 1));
+
+	update_sasi_signals();
 }
 
 READ_LINE_MEMBER( base_d9060_device::req_r )
@@ -406,11 +420,14 @@ READ_LINE_MEMBER( base_d9060_device::req_r )
 
 WRITE_LINE_MEMBER( base_d9060_device::ack_w )
 {
-	scsi_ack_w(m_sasibus, !state);
+	scsi_ack_w(m_sasibus, state);
 }
 
 WRITE_LINE_MEMBER( base_d9060_device::enable_w )
 {
+	m_enable = state;
+	
+	update_sasi_signals();
 }
 
 static const via6522_interface via_intf =
@@ -422,7 +439,7 @@ static const via6522_interface via_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_HANDLER(SASIBUS_TAG, scsi_data_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, db_w),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, via_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -452,7 +469,7 @@ static MACHINE_CONFIG_FRAGMENT( d9060 )
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_4MHz/4, via_intf)
 
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
-	MCFG_HARDDISK_ADD("harddisk0")
+	//MCFG_HARDDISK_ADD("harddisk0")
 MACHINE_CONFIG_END
 
 
@@ -487,6 +504,21 @@ inline void base_d9060_device::update_ieee_signals()
 }
 
 
+//-------------------------------------------------
+//  update_sasi_signals -
+//-------------------------------------------------
+
+inline void base_d9060_device::update_sasi_signals()
+{
+	int io = !scsi_io_r(m_sasibus);
+	
+	if (!(io & m_enable))
+	{
+		scsi_data_w(m_sasibus, m_db);
+	}
+}
+
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -508,6 +540,8 @@ base_d9060_device::base_d9060_device(const machine_config &mconfig, device_type 
 	  m_rfdo(1),
 	  m_daco(1),
 	  m_atna(1),
+	  m_db(0xff),
+	  m_enable(0),
 	  m_variant(variant)
 {
 }
@@ -548,6 +582,8 @@ void base_d9060_device::device_start()
 
 void base_d9060_device::device_reset()
 {
+	init_scsibus(m_sasibus);
+
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, CLEAR_LINE);
 
