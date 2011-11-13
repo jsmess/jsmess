@@ -181,7 +181,7 @@ UINT8 scsi_data_r(device_t *device)
             break;
     }
 
-    LOG(2,"scsi_data_r : phase=%s, data_idx=%d, cmd_idx=%d\n",phasenames[bus->phase],bus->data_idx,bus->cmd_idx);
+    LOG(2,"scsi_data_r : %02x phase=%s, data_idx=%d, cmd_idx=%d\n",result,phasenames[bus->phase],bus->data_idx,bus->cmd_idx);
     return result;
 }
 
@@ -314,8 +314,8 @@ WRITE_LINE_DEVICE_HANDLER( scsi_cd_w ) { return set_scsi_line(device, SCSI_LINE_
 WRITE_LINE_DEVICE_HANDLER( scsi_io_w ) { return set_scsi_line(device, SCSI_LINE_IO, state); }
 WRITE_LINE_DEVICE_HANDLER( scsi_msg_w ) { return set_scsi_line(device, SCSI_LINE_MSG, state); }
 WRITE_LINE_DEVICE_HANDLER( scsi_req_w ) { return set_scsi_line(device, SCSI_LINE_REQ, state); }
-WRITE_LINE_DEVICE_HANDLER( scsi_ack_w ) { return set_scsi_line(device, SCSI_LINE_RESET, state); }
-WRITE_LINE_DEVICE_HANDLER( scsi_rst_w ) { return set_scsi_line(device, SCSI_LINE_ACK, state); }
+WRITE_LINE_DEVICE_HANDLER( scsi_ack_w ) { return set_scsi_line(device, SCSI_LINE_ACK, state); }
+WRITE_LINE_DEVICE_HANDLER( scsi_rst_w ) { return set_scsi_line(device, SCSI_LINE_RESET, state); }
 
 static void set_scsi_line_now(device_t *device, UINT8 line, UINT8 state)
 {
