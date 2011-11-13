@@ -6613,7 +6613,6 @@ The revision A of the cartridge has the same ROM as the initial release.
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="4194304">
 			<feature name="pcb" value="SHVC-1A3M-30" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
@@ -6622,6 +6621,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="G741812 SHVC-JPN-1" />
+			<dataarea name="rom" size="4194304">
 				<rom name="shvc-ajxj-0.u1" size="4194304" crc="94c1d85c" sha1="e24b1dcf8e60ebfdb5b0c1d4fe20756ad53f4d61" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
@@ -9388,7 +9388,6 @@ Japanese cart
 		<year>1992</year>
 		<publisher>T&amp;E Soft</publisher>
 		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
 			<feature name="pcb" value="SHVC-1A3B-12" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
@@ -9397,6 +9396,7 @@ Japanese cart
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
 				<rom name="shvc-gb-0.u1" size="1048576" crc="e8a7d379" sha1="45d7108b793aaa3b45e8e76fa8dd7fb84557fcf0" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
@@ -14006,7 +14006,6 @@ Japanese cart
 		<year>1994</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
 			<feature name="pcb" value="SHVC-1A3M-21" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
@@ -14015,6 +14014,7 @@ Japanese cart
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1048576">
 				<rom name="shvc-23-0.u1" size="1048576" crc="dc82850e" sha1="d3b66d5b49d2257d146a0d126e98861a7d364974" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
