@@ -114,8 +114,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( d9060_hdc_mem, AS_PROGRAM, 8, base_d9060_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
-	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x300) AM_RAM
+	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x380) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
@@ -216,11 +216,11 @@ READ8_MEMBER( base_d9060_device::riot1_pa_r )
 
         bit     description
 
-        PA0     ATNA
-        PA1     DACO
-        PA2     RFDO
-        PA3     EOIO
-        PA4     DAVO
+        PA0     
+        PA1     
+        PA2     
+        PA3     
+        PA4     
         PA5     EOII
         PA6     DAVI
         PA7     _ATN
@@ -252,9 +252,9 @@ WRITE8_MEMBER( base_d9060_device::riot1_pa_w )
         PA2     RFDO
         PA3     EOIO
         PA4     DAVO
-        PA5     EOII
-        PA6     DAVI
-        PA7     _ATN
+        PA5     
+        PA6     
+        PA7     
 
     */
 
@@ -358,7 +358,7 @@ READ8_MEMBER( base_d9060_device::via_pb_r )
         PB1     
         PB2     C/D
         PB3     BUSY
-        PB4     J14
+        PB4     J14 (1=9060, 0=9090)
         PB5     J13
         PB6     I/O
         PB7     MSG
@@ -371,6 +371,9 @@ READ8_MEMBER( base_d9060_device::via_pb_r )
 	data |= !scsi_bsy_r(m_sasibus) << 3;
 	data |= !scsi_io_r(m_sasibus) << 6;
 	data |= !scsi_msg_r(m_sasibus) << 7;
+	
+	// drive type
+	data |= (m_variant == TYPE_9060) << 4;
 	
 	return data;
 }
@@ -502,6 +505,9 @@ base_d9060_device::base_d9060_device(const machine_config &mconfig, device_type 
 	  m_riot1(*this, M6532_1_TAG),
 	  m_via(*this, M6522_TAG),
 	  m_sasibus(*this, SASIBUS_TAG),
+	  m_rfdo(1),
+	  m_daco(1),
+	  m_atna(1),
 	  m_variant(variant)
 {
 }
