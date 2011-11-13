@@ -39,6 +39,14 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
+	// not really public
+	DECLARE_READ8_MEMBER( dio_r );
+	DECLARE_WRITE8_MEMBER( dio_w );
+	DECLARE_READ8_MEMBER( riot1_pa_r );
+	DECLARE_WRITE8_MEMBER( riot1_pa_w );
+	DECLARE_READ8_MEMBER( riot1_pb_r );
+	DECLARE_WRITE8_MEMBER( riot1_pb_w );
+	
 protected:
     // device-level overrides
     virtual void device_start();
@@ -50,12 +58,20 @@ protected:
 	void ieee488_atn(int state);
 	void ieee488_ifc(int state);
 
+private:
+	inline void update_ieee_signals();
+	
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdccpu;
 	required_device<riot6532_device> m_riot0;
 	required_device<riot6532_device> m_riot1;
 	required_device<device_t> m_image0;
 	required_device<device_t> m_image1;
+
+	// IEEE-488 bus
+	int m_rfdo;							// not ready for data output
+	int m_daco;							// not data accepted output
+	int m_atna;							// attention acknowledge
 };
 
 

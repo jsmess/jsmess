@@ -109,6 +109,15 @@
     INLINE FUNCTIONS
 ***************************************************************************/
 
+inline void via6522_device::set_irq_line(int state)
+{
+	if (m_irq != state)
+	{
+		m_irq_func(state);
+		m_irq = state;
+	}
+}
+
 attotime via6522_device::cycles_to_time(int c)
 {
 	return attotime::from_hz(clock()) * c;
@@ -150,7 +159,8 @@ const device_type VIA6522 = &device_creator<via6522_device>;
 //-------------------------------------------------
 
 via6522_device::via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock)
+    : device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock),
+	  m_irq(CLEAR_LINE)
 {
 
 }
@@ -248,6 +258,7 @@ void via6522_device::device_start()
     save_item(NAME(m_acr));
     save_item(NAME(m_ier));
     save_item(NAME(m_ifr));
+	save_item(NAME(m_irq));
     save_item(NAME(m_t1_active));
     save_item(NAME(m_t2_active));
     save_item(NAME(m_shift_counter));
@@ -304,7 +315,7 @@ void via6522_device::set_int(int data)
 	if (m_ier & m_ifr)
     {
 		m_ifr |= INT_ANY;
-		m_irq_func(ASSERT_LINE);
+		set_irq_line(ASSERT_LINE);
     }
 }
 
@@ -328,7 +339,7 @@ void via6522_device::clear_int(int data)
     }
 	else
 	{
-		m_irq_func(CLEAR_LINE);
+		set_irq_line(CLEAR_LINE);
 	}
 }
 
@@ -902,7 +913,7 @@ WRITE8_MEMBER( via6522_device::write )
 			if (((m_ifr & m_ier) & 0x7f) == 0)
 			{
 				m_ifr &= ~INT_ANY;
-				m_irq_func(CLEAR_LINE);
+				set_irq_line(CLEAR_LINE);
 			}
 		}
 		else
@@ -910,7 +921,7 @@ WRITE8_MEMBER( via6522_device::write )
 			if ((m_ier & m_ifr) & 0x7f)
 			{
 				m_ifr |= INT_ANY;
-				m_irq_func(ASSERT_LINE);
+				set_irq_line(ASSERT_LINE);
 			}
 		}
 		break;
