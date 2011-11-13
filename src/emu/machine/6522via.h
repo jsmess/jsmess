@@ -119,6 +119,7 @@ private:
 	static const device_timer_id TIMER_SHIFT = 0;
 	static const device_timer_id TIMER_T1 = 1;
 	static const device_timer_id TIMER_T2 = 2;
+	static const device_timer_id TIMER_CA2 = 3;
 
     attotime cycles_to_time(int c);
     UINT32 time_to_cycles(attotime t);
@@ -179,6 +180,7 @@ private:
     emu_timer *m_t2;
     attotime m_time2;
     UINT8 m_t2_active;
+	emu_timer *m_ca2_timer;
 
     emu_timer *m_shift_timer;
     UINT8 m_shift_counter;
