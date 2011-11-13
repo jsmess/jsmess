@@ -296,6 +296,22 @@ static int scc_getareg(device_t *device)
 	#if LOG_SCC
 	printf("SCC: port A reg %d read 0x%02x\n", scc->reg, scc->channel[0].reg_val[scc->reg]);
 	#endif
+
+	if (scc->reg == 0)
+	{
+		UINT8 rv = 0;
+
+		sccChan *ourCh = &scc->channel[0];
+
+		rv |= (ourCh->txUnderrun) ? 0x40 : 0;
+		rv |= (ourCh->syncHunt) ? 0x10 : 0;
+		
+		return rv;
+	}
+	else if (scc->reg == 10)
+	{
+		return 0;
+	}
 	return scc->channel[0].reg_val[scc->reg];
 }
 
@@ -313,12 +329,28 @@ static int scc_getbreg(device_t *device)
 	printf("SCC: port B reg %i read 0x%02x\n", scc->reg, scc->channel[1].reg_val[scc->reg]);
 	#endif
 
-	if (scc->reg == 2)
+	if (scc->reg == 0)
+	{
+		UINT8 rv = 0;
+
+		sccChan *ourCh = &scc->channel[1];
+
+		rv |= (ourCh->txUnderrun) ? 0x40 : 0;
+		rv |= (ourCh->syncHunt) ? 0x10 : 0;
+		rv |= (1 << 2);
+				
+		return rv;
+	}
+	else if (scc->reg == 2)
 	{
 		/* HACK! but lets the Mac Plus mouse move again.  Needs further investigation. */
 		scc_acknowledge(device);
 
 		return scc->status;
+	}
+	else if (scc->reg == 10)
+	{
+		return 0;
 	}
 
 	return scc->channel[1].reg_val[scc->reg];
@@ -566,7 +598,7 @@ WRITE8_DEVICE_HANDLER(scc8530_w)
 
 	offset &= 3;
 
-//  printf("SCC: mode %d data %x offset %d\n", scc->mode, data, offset);
+//	printf(" mode %d data %x offset %d  \n", scc->mode, data, offset);
 
 	switch(offset)
 	{

@@ -2135,14 +2135,14 @@ static void pmu_exec(mac_state *mac)
 	mac->m_pm_slen = 0;	// and send length
 	mac->m_pm_dptr = 0;	// and receive pointer
 
-	printf("PMU: Command %02x\n", mac->m_pm_cmd[0]);
+//	printf("PMU: Command %02x\n", mac->m_pm_cmd[0]);
 	switch (mac->m_pm_cmd[0])
 	{
 		case 0x10:	// subsystem power and clock ctrl
 			break;
 
 		case 0x20:	// send ADB command (PMU must issue an IRQ on completion)
-			#if 1
+			#if 0
 			printf("PMU: Send ADB %02x %02x cmd %02x flag %02x data %02x %02x\n",
 				   mac->m_pm_cmd[0],	// 0x20
 				   mac->m_pm_cmd[1],	// ???
@@ -2204,12 +2204,12 @@ static void pmu_exec(mac_state *mac)
 				mac->m_pm_out[5] = 0;
 				mac->m_pm_slen = 6;
 			}
-			printf("ADB packet: ");
+/*			printf("ADB packet: ");
 			for (int i = 0; i < mac->m_pm_slen; i++)
 			{
 				printf("%02x ", mac->m_pm_out[i]);
 			}
-			printf("\n");
+			printf("\n");*/
 			mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1000)));
 			break;
 
@@ -2327,12 +2327,12 @@ static void pmu_exec(mac_state *mac)
 						mac->m_pm_slen = 4 + mac->m_adb_datasize;
 						mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1500)));
 
-						printf("ADB packet: ");
+/*						printf("ADB packet: ");
 						for (int i = 0; i < mac->m_pm_slen; i++)
 						{
 							printf("%02x ", mac->m_pm_out[i]);
 						}
-						printf("\n");
+						printf("\n");*/
 					}
 					else
 					{
@@ -2376,9 +2376,10 @@ static void pmu_exec(mac_state *mac)
 				int i;
 
 				mac->m_pm_out[0] = mac->m_pm_out[1] = mac->m_pm_cmd[4];
-//              printf("PMU read at %x\n", mac->m_pm_cmd[2] | (mac->m_pm_cmd[3]<<8));
+//				printf("PMU read at %x\n", mac->m_pm_cmd[2] | (mac->m_pm_cmd[3]<<8));
 
 				// note: read at 0xEE00 0 = target disk mode, 0xff = normal bootup
+				// (actually 0x00EE, the 50753 IN register?  would make more sense)
 
 				for (i = 0; i < mac->m_pm_cmd[4]; i++)
 				{
@@ -3354,34 +3355,9 @@ MAC_DRIVER_INIT(maciivx, MODEL_MAC_IIVX)
 MAC_DRIVER_INIT(maciifx, MODEL_MAC_IIFX)
 MAC_DRIVER_INIT(macpbduo210, MODEL_MAC_PBDUO_210)
 MAC_DRIVER_INIT(macquadra700, MODEL_MAC_QUADRA_700)
-
-// make the appletalk init fail instead of hanging on the II FDHD/IIx/IIcx/SE30 ROM
-static void patch_appletalk_iix(running_machine &machine)
-{
-	UINT32 *ROM = (UINT32 *)machine.region("bootrom")->base();
-
-	ROM[0x2cc94/4] = 0x6bbe709e;	// bmi 82cc54 moveq #-$62, d0
-	ROM[0x370c/4] = 0x4e714e71;	// nop nop - disable ROM checksum
-	ROM[0x3710/4] = 0x4e714ed6;	// nop jmp (a6) - disable ROM checksum
-}
-
-DRIVER_INIT(maciicx)
-{
-	patch_appletalk_iix(machine);
-	mac_driver_init(machine, MODEL_MAC_IICX);
-}
-
-DRIVER_INIT(maciifdhd)
-{
-	patch_appletalk_iix(machine);
-	mac_driver_init(machine, MODEL_MAC_II_FDHD);
-}
-
-DRIVER_INIT(maciix)
-{
-	patch_appletalk_iix(machine);
-	mac_driver_init(machine, MODEL_MAC_IIX);
-}
+MAC_DRIVER_INIT(maciicx, MODEL_MAC_IICX)
+MAC_DRIVER_INIT(maciifdhd, MODEL_MAC_II_FDHD)
+MAC_DRIVER_INIT(maciix, MODEL_MAC_IIX);
 
 void mac_state::nubus_slot_interrupt(UINT8 slot, UINT32 state)
 {
