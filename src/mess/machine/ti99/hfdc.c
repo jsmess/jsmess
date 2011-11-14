@@ -25,6 +25,9 @@
 #define CLK_ADDR	0x0fe0
 #define RAM_ADDR	0x1000
 
+#define VERBOSE 1
+#define LOG logerror
+
 typedef ti99_pebcard_config ti99_hfdc_config;
 
 typedef struct _ti99_hfdc_state
@@ -115,7 +118,7 @@ static void set_geometry(device_t *drive, floppy_type_t type)
 	if (drive!=NULL)
 		floppy_drive_set_geometry(drive, type);
 	else
-		logerror("ti99/HFDC: Drive not found\n");
+		if (VERBOSE>0) LOG("ti99: HFDC: Drive not found\n");
 }
 
 static void set_all_geometries(device_t *device, floppy_type_t type)
@@ -261,7 +264,7 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			break;
 
 		default:
-			 logerror("ti99/HFDC: Attempt to set undefined CRU bit %d\n", bit);
+			if (VERBOSE>1) LOG("ti99: HFDC: Attempt to set undefined CRU bit %d\n", bit);
 		}
 	}
 }
@@ -296,7 +299,7 @@ static READ8Z_DEVICE_HANDLER( data_r )
 				// Tape: 4fc0...4fcf
 				if ((offset & 0x1ff0)==TAPE_ADDR)
 				{
-					logerror("ti99/HFDC: Tape support not available (access to address %04x)\n", offset);
+					if (VERBOSE>0) LOG("ti99: HFDC: Tape support not available (access to address %04x)\n", offset);
 					return;
 				}
 
@@ -346,7 +349,7 @@ static WRITE8_DEVICE_HANDLER( data_w )
 		// Tape: 4fc0...4fcf
 		if ((offset & 0x1ff0)==TAPE_ADDR)
 		{
-			logerror("ti99/HFDC: Tape support not available (access to address %04x)\n", offset);
+			if (VERBOSE>0) LOG("ti99: HFDC: Tape support not available (access to address %04x)\n", offset);
 			return;
 		}
 
@@ -408,7 +411,7 @@ static WRITE8_DEVICE_HANDLER( auxbus_out )
 	switch (offset)
 	{
 	case INPUT_STATUS:
-		logerror("ti99/HFDC: Invalid operation: S0=S1=0, but tried to write (expected: read drive status)\n");
+		if (VERBOSE>1) LOG("ti99: HFDC: Invalid operation: S0=S1=0, but tried to write (expected: read drive status)\n");
 		break;
 
 	case OUTPUT_DMA_ADDR:
@@ -462,7 +465,7 @@ static device_t *current_floppy(device_t *controller)
 
 	if (disk_unit<0)
 	{
-		logerror("No unit selected\n");
+		if (VERBOSE>1) LOG("ti99: HFDC: No unit selected\n");
 		return NULL;
 	}
 
@@ -688,7 +691,7 @@ static DEVICE_RESET( ti99_hfdc )
 		if (input_port_read(device->machine(), "MODE")==GENMOD)
 		{
 			// GenMod card modification
-			logerror("HFDC: Configuring for GenMod\n");
+			if (VERBOSE>0) LOG("ti99: HFDC: Configuring for GenMod\n");
 			card->select_mask = 0x1fe000;
 			card->select_value = 0x174000;
 		}
@@ -723,7 +726,7 @@ static DEVICE_RESET( ti99_hfdc )
 			}
 			else
 			{
-				logerror("hfdc: Image %s is null\n", flopname[i]);
+				if (VERBOSE>0) LOG("ti99: HFDC: Image %s is null\n", flopname[i]);
 			}
 		}
 
