@@ -127,9 +127,13 @@ READ8Z_DEVICE_HANDLER( ti99grom_rz )
 
 	if (offset & 2)
 	{
-		// All GROMs answer the address read request
+		// At least GROM 0 should answer the address read request
 		// (important if GROM simulators do not serve the request but rely on
 		// the console GROMs) so we don't check the ident
+		// Note that we prevent cartridge GROMs to answer if they are not
+		// accessed
+		if (((grom->address >> 13)&0x07)!=grom->ident && (grom->ident!=0))
+			return;
 
 		/* When reading, reset the hi/lo flag byte for writing. */
 		/* TODO: Verify this with a real machine. */
