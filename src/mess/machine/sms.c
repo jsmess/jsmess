@@ -5,7 +5,6 @@
 #include "video/smsvdp.h"
 #include "sound/2413intf.h"
 #include "imagedev/cartslot.h"
-#include "hashfile.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
@@ -1478,7 +1477,6 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	if (image.software_entry() == NULL)
 	{
 		size = image.length();
-		extrainfo = hashfile_extrainfo(image);
 	}
 	else
 		size = image.get_software_region_length("rom");
