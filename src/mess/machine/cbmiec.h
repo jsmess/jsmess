@@ -72,7 +72,7 @@ public:
 	cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void add_device(device_t *target, int address);
-	
+
 	// reads for both host and peripherals
 	DECLARE_READ_LINE_MEMBER( srq_r );
 	DECLARE_READ_LINE_MEMBER( atn_r );
@@ -93,7 +93,7 @@ public:
 	void clk_w(device_t *device, int state);
 	void data_w(device_t *device, int state);
 	void reset_w(device_t *device, int state);
-	
+
 protected:
 	enum
 	{
@@ -108,7 +108,7 @@ protected:
 	// device-level overrides
     virtual void device_start();
     virtual void device_config_complete();
-	
+
 	class daisy_entry
 	{
 	public:
@@ -123,7 +123,7 @@ protected:
 	};
 
 	simple_list<daisy_entry> m_device_list;
-	
+
 private:
 	devcb_resolved_write_line	m_out_atn_func;
 	devcb_resolved_write_line	m_out_clk_func;
@@ -173,7 +173,7 @@ public:
 
 	device_cbm_iec_interface *next() const { return m_next; }
 	device_cbm_iec_interface *m_next;
-	
+
 	// optional operation overrides
 	virtual void cbm_iec_atn(int state) { };
 	virtual void cbm_iec_clk(int state) { };

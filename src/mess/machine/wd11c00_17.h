@@ -26,7 +26,7 @@
     MCFG_DEVICE_ADD(_tag, WD11C00_17, _clock) \
 	MCFG_DEVICE_CONFIG(_config)
 
-	
+
 #define WD11C00_17_INTERFACE(_name) \
 	const wd11c00_17_interface (_name) =
 
@@ -62,16 +62,16 @@ class wd11c00_17_device :	public device_t,
 public:
 	// construction/destruction
 	wd11c00_17_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
-	
+
 	UINT8 dack_r();
 	void dack_w(UINT8 data);
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	
+
 	DECLARE_WRITE_LINE_MEMBER( ireq_w );
 	DECLARE_WRITE_LINE_MEMBER( io_w );
 	DECLARE_WRITE_LINE_MEMBER( cd_w );
@@ -106,15 +106,15 @@ private:
 	devcb_resolved_write8		m_out_ramwr_func;
 	devcb_resolved_read8		m_in_cs1010_func;
 	devcb_resolved_write8		m_out_cs1010_func;
-	
+
 	UINT8 m_status;
 	UINT8 m_mask;
 
 	offs_t m_ra;
-	
+
 	int m_mode;
 	int m_ecc_not_0;
-	
+
 	int m_irq5;
 	int m_drq3;
 	int m_busy;

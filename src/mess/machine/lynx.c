@@ -1766,7 +1766,7 @@ MACHINE_START( lynx )
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lynx_reset),&machine));
 
 	for (i = 0; i < NR_LYNX_TIMERS; i++)
-		lynx_timer_init(machine, i);	
+		lynx_timer_init(machine, i);
 }
 
 MACHINE_RESET( lynx )
@@ -1825,7 +1825,7 @@ void lynx_crc_keyword(device_image_interface &image)
 	const char *info = NULL;
 
 	info = hashfile_extrainfo(image);
-	
+
 	state->m_rotate = 0;
 	if (info)
 	{
@@ -1839,9 +1839,9 @@ void lynx_crc_keyword(device_image_interface &image)
 static DEVICE_IMAGE_LOAD( lynx_cart )
 {
 	/* Lynx carts have 19 address lines, the upper 8 used for bank select. The lower
-	11 bits are used to address data within the selected bank. Valid bank sizes are 256,
-	512, 1024 or 2048 bytes. Commercial roms use all 256 banks.*/
-	
+    11 bits are used to address data within the selected bank. Valid bank sizes are 256,
+    512, 1024 or 2048 bytes. Commercial roms use all 256 banks.*/
+
 	lynx_state *state = image.device().machine().driver_data<lynx_state>();
 	UINT8 *rom = image.device().machine().region("user1")->base();
 	UINT32 size;
@@ -1902,12 +1902,12 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 	{
 		size = image.get_software_region_length("rom");
       if (size > 0xffff) // 64,128,256,512k cartridges
-      	state->m_granularity = size >> 8;
+    	state->m_granularity = size >> 8;
       else
-      	state->m_granularity = 0x400; // Homebrew roms not using all 256 banks (T-Tris) (none currently in softlist)
+    	state->m_granularity = 0x400; // Homebrew roms not using all 256 banks (T-Tris) (none currently in softlist)
 
 		memcpy(rom, image.get_software_region("rom"), size);
-		
+
 		const char *rotate = image.get_feature("rotation");
 		state->m_rotate = 0;
 		if (rotate)

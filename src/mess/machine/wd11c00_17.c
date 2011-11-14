@@ -86,42 +86,42 @@ inline void wd11c00_17_device::check_interrupt()
 	{
 		m_status &= ~STATUS_DRQ;
 	}
-	
+
 	int ra3 = BIT(m_ra, 3);
-	
+
 	if (m_ra3 != ra3)
 	{
 		m_out_ra3_func(ra3 ? ASSERT_LINE : CLEAR_LINE);
 		m_ra3 = ra3;
 	}
-	
+
 	int irq5 = ((m_status & STATUS_IRQ) && (m_mask & MASK_IRQ)) ? ASSERT_LINE : CLEAR_LINE;
-	
+
 	if (m_irq5 != irq5)
 	{
 		m_out_irq5_func(irq5);
 		m_irq5 = irq5;
 	}
-	
+
 	int drq3 = ((m_status & STATUS_DRQ) && (m_mask & MASK_DMA)) ? ASSERT_LINE : CLEAR_LINE;
-	
+
 	if (m_drq3 != drq3)
 	{
 		m_out_drq3_func(drq3);
 		m_drq3 = drq3;
 	}
-	
+
 	int busy = (m_status & STATUS_BUSY) ? 0 : 1;
-	
+
 	if (m_busy != busy)
 	{
 		m_out_busy_func(busy);
 		m_busy = busy;
 	}
-	
+
 	int req = (m_status & STATUS_REQ) ? 1 : 0;
-	
-	if (m_req != req) 
+
+	if (m_req != req)
 	{
 		m_out_req_func(req);
 		m_req = req;
@@ -147,11 +147,11 @@ inline void wd11c00_17_device::increment_address()
 inline UINT8 wd11c00_17_device::read_data()
 {
 	UINT8 data = 0;
-	
+
 	if (m_status & STATUS_BUSY)
 	{
 		data = m_in_ramcs_func(m_ra & 0x7ff);
-		
+
 		increment_address();
 	}
 
@@ -168,7 +168,7 @@ inline void wd11c00_17_device::write_data(UINT8 data)
 	if (m_status & STATUS_BUSY)
 	{
 		m_out_ramwr_func(m_ra & 0x7ff, data);
-		
+
 		increment_address();
 	}
 }
@@ -182,7 +182,7 @@ inline void wd11c00_17_device::software_reset()
 {
 	m_out_mr_func(ASSERT_LINE);
 	m_out_mr_func(CLEAR_LINE);
-	
+
 	device_reset();
 }
 
@@ -194,7 +194,7 @@ inline void wd11c00_17_device::software_reset()
 inline void wd11c00_17_device::select()
 {
 	m_status = STATUS_BUSY | STATUS_C_D | STATUS_REQ;
-	
+
 	check_interrupt();
 }
 
@@ -250,7 +250,7 @@ void wd11c00_17_device::device_reset()
 	m_status &= ~(STATUS_IRQ | STATUS_DRQ | STATUS_BUSY);
 	m_mask = 0;
 	m_ra = 0;
-	
+
 	check_interrupt();
 }
 
@@ -262,7 +262,7 @@ void wd11c00_17_device::device_reset()
 READ8_MEMBER( wd11c00_17_device::io_r )
 {
 	UINT8 data = 0xff;
-	
+
 	switch (offset)
 	{
 	case 0: // Read Data, Board to Host
@@ -283,7 +283,7 @@ READ8_MEMBER( wd11c00_17_device::io_r )
 	case 3: // Not Used
 		break;
 	}
-	
+
 	return data;
 }
 
@@ -348,7 +348,7 @@ void wd11c00_17_device::dack_w(UINT8 data)
 READ8_MEMBER( wd11c00_17_device::read )
 {
 	UINT8 data = 0;
-	
+
 	switch (offset)
 	{
 	case 0x00:
@@ -356,12 +356,12 @@ READ8_MEMBER( wd11c00_17_device::read )
 		data = read_data();
 		if (LOG) logerror("%02x\n", data);
 		break;
-		
+
 	case 0x20:
 		data = m_in_cs1010_func(m_ra >> 8);
 		break;
 	}
-	
+
 	return data;
 }
 
@@ -379,11 +379,11 @@ WRITE8_MEMBER( wd11c00_17_device::write )
 		write_data(data);
 		if (m_ra > 0x400) m_ecc_not_0 = 0; // HACK
 		break;
-		
+
 	case 0x20:
 		m_out_cs1010_func(m_ra >> 8, data);
 		break;
-		
+
 	case 0x60:
 		m_ra = (data & 0x07) << 8;
 		if (LOG) logerror("%s WD11C00-17 '%s' RA %03x\n", machine().describe_context(), tag(), m_ra);
@@ -400,7 +400,7 @@ WRITE8_MEMBER( wd11c00_17_device::write )
 WRITE_LINE_MEMBER( wd11c00_17_device::ireq_w )
 {
 	if (LOG) logerror("%s WD11C00-17 '%s' IREQ %u\n", machine().describe_context(), tag(), state);
-	
+
 	if (state) m_status |= STATUS_REQ; else m_status &= ~STATUS_REQ;
 
 	if (m_status & STATUS_BUSY)
@@ -425,7 +425,7 @@ WRITE_LINE_MEMBER( wd11c00_17_device::ireq_w )
 //-------------------------------------------------
 //  io_w -
 //-------------------------------------------------
-	
+
 WRITE_LINE_MEMBER( wd11c00_17_device::io_w )
 {
 	if (LOG) logerror("%s WD11C00-17 '%s' I/O %u\n", machine().describe_context(), tag(), state);
@@ -437,11 +437,11 @@ WRITE_LINE_MEMBER( wd11c00_17_device::io_w )
 //-------------------------------------------------
 //  cd_w -
 //-------------------------------------------------
-	
+
 WRITE_LINE_MEMBER( wd11c00_17_device::cd_w )
 {
 	if (LOG) logerror("%s WD11C00-17 '%s' C/D %u\n", machine().describe_context(), tag(), state);
-	
+
 	if (state) m_status |= STATUS_C_D; else m_status &= ~STATUS_C_D;
 }
 
@@ -449,11 +449,11 @@ WRITE_LINE_MEMBER( wd11c00_17_device::cd_w )
 //-------------------------------------------------
 //  clct_w -
 //-------------------------------------------------
-	
+
 WRITE_LINE_MEMBER( wd11c00_17_device::clct_w )
 {
 	if (LOG) logerror("%s WD11C00-17 '%s' CLCT %u\n", machine().describe_context(), tag(), state);
-	
+
 	if (state)
 	{
 		m_ra &= 0xff00;
@@ -465,7 +465,7 @@ WRITE_LINE_MEMBER( wd11c00_17_device::clct_w )
 //-------------------------------------------------
 //  mode_w -
 //-------------------------------------------------
-	
+
 WRITE_LINE_MEMBER( wd11c00_17_device::mode_w )
 {
 	if (LOG) logerror("%s WD11C00-17 '%s' MODE %u\n", machine().describe_context(), tag(), state);
@@ -478,7 +478,7 @@ WRITE_LINE_MEMBER( wd11c00_17_device::mode_w )
 //-------------------------------------------------
 //  busy_r -
 //-------------------------------------------------
-	
+
 READ_LINE_MEMBER( wd11c00_17_device::busy_r )
 {
 	return (m_status & STATUS_BUSY) ? 0 : 1;
@@ -488,7 +488,7 @@ READ_LINE_MEMBER( wd11c00_17_device::busy_r )
 //-------------------------------------------------
 //  ecc_not_0_r -
 //-------------------------------------------------
-	
+
 READ_LINE_MEMBER( wd11c00_17_device::ecc_not_0_r )
 {
 	return m_ecc_not_0;

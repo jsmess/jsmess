@@ -6,13 +6,13 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
-	
-	D9060: Tandon TM602S
-	chdman -createblankhd d9060.chd 153 4 32 256
-	
-	D9090: Tandon TM603S
-	chdman -createblankhd d9090.chd 153 6 32 256
-	
+
+    D9060: Tandon TM602S
+    chdman -createblankhd d9060.chd 153 4 32 256
+
+    D9090: Tandon TM603S
+    chdman -createblankhd d9090.chd 153 6 32 256
+
 **********************************************************************/
 
 #pragma once
@@ -95,10 +95,10 @@ private:
 	int m_rfdo;							// not ready for data output
 	int m_daco;							// not data accepted output
 	int m_atna;							// attention acknowledge
-	
+
 	// SASI bus
 	int m_enable;
-	
+
 	int m_variant;
 };
 

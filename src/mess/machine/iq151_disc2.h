@@ -41,7 +41,7 @@ private:
 
 	required_device<device_t>	m_fdc;
 	UINT8 *		m_rom;
-	bool 		m_rom_enabled;
+	bool		m_rom_enabled;
 };
 
 

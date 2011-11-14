@@ -49,13 +49,13 @@ private:
 class nubus_asntmc3nb_device : public nubus_mac8390_device
 {
 public:
-    nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock); 
+    nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class nubus_appleenet_device : public nubus_mac8390_device
 {
 public:
-    nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock); 
+    nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
     virtual const rom_entry *device_rom_region() const;
 };
 

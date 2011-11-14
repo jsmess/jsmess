@@ -45,16 +45,16 @@
          load LCD rom inside the LCD driver
 
  TODO2:  (these worked before .140 core)
- 		 LCD off by a couple of pixels in artwork now
- 		 no longer see the custom white hand when selecting chess pieces
- 		 parent/clone for artwork so there are not multiple copies of chessboard+pieces
+         LCD off by a couple of pixels in artwork now
+         no longer see the custom white hand when selecting chess pieces
+         parent/clone for artwork so there are not multiple copies of chessboard+pieces
 
 
  TODO3:  Oct 2011 - commented out all ACIA functions until they are ported to new device
 
  Undocumented buttons: holding ENTER and LEFT cursor on cold boot runs diagnostics on modular 680x0 boards
-					   holding UP and RIGHT cursor will clear the Battery Backed RAM on modular 680x0 boards
-					   holding CLEAR clears Battery Backed RAM on the Berlin (Pro) 68020
+                       holding UP and RIGHT cursor will clear the Battery Backed RAM on modular 680x0 boards
+                       holding CLEAR clears Battery Backed RAM on the Berlin (Pro) 68020
 ******************************************************************************/
 
 /******************************************************************************
@@ -239,7 +239,7 @@ static READ8_HANDLER ( read_1ff1_sfortea )
 	data = input_port_read(space->machine(),  "BUTTONS_SFOR1");
 	logerror("1ff0 data %02x\n",data);
 	return 0;
-//	return data;
+//  return data;
 }
 
 static READ8_HANDLER ( read_1ff0_sfortea )
@@ -248,14 +248,14 @@ static READ8_HANDLER ( read_1ff0_sfortea )
 	data = input_port_read(space->machine(),  "BUTTONS_SFOR2");
 	logerror("1ff0 data %02x\n",data);
 	return 0;
-//	return data;
+//  return data;
 
-//	static UINT8 temp = 0;
-//	temp++;
-//	logerror("read 1ff0 %02x\n",temp);
-//	printf("read 1ff0 %02x\n",temp);
+//  static UINT8 temp = 0;
+//  temp++;
+//  logerror("read 1ff0 %02x\n",temp);
+//  printf("read 1ff0 %02x\n",temp);
 
-//	return (0x00);
+//  return (0x00);
 }
 
 
@@ -264,7 +264,7 @@ static WRITE8_HANDLER ( write_latch_sfortea )
 {
 	sfortea_latch = data;
 	logerror("latch data %02x\n",data);
-//	printf("latch data %02x\n",data);
+//  printf("latch data %02x\n",data);
 
 }
 
@@ -309,28 +309,28 @@ static WRITE8_HANDLER ( write_LCD_academy )
 	}
 }
 
-//	AM_RANGE( 0x3a0000,0x3a0000 ) AM_READ(diablo68_write_LCD)
-//	AM_RANGE( 0x3c0000,0x3c0000 ) AM_READ(diablo68_reg_select)
+//  AM_RANGE( 0x3a0000,0x3a0000 ) AM_READ(diablo68_write_LCD)
+//  AM_RANGE( 0x3c0000,0x3c0000 ) AM_READ(diablo68_reg_select)
 
 /*static WRITE16_HANDLER ( diablo68_aciawrite )
 {
-//	device_t *acia = space->machine().device("acia65c51");
-//	acia_6551_w(acia, offset & 0x03, data >> 8);
-//	printf("ACIA write data %04x offset %02x\n",data,offset);
-	logerror("ACIA write data %04x offset %02x\n",data,offset);
+//  device_t *acia = space->machine().device("acia65c51");
+//  acia_6551_w(acia, offset & 0x03, data >> 8);
+//  printf("ACIA write data %04x offset %02x\n",data,offset);
+    logerror("ACIA write data %04x offset %02x\n",data,offset);
 }
 
 static READ16_HANDLER ( diablo68_aciaread )
 {
-//	device_t *acia = space->machine().device("acia65c51");
-	UINT16 result;
-//	result = acia_6551_r(acia, offset & 0x03);
-//	logerror("ACIA read offset %02x\n",offset);
-//	printf("ACIA read offset %02x\n",offset);
+//  device_t *acia = space->machine().device("acia65c51");
+    UINT16 result;
+//  result = acia_6551_r(acia, offset & 0x03);
+//  logerror("ACIA read offset %02x\n",offset);
+//  printf("ACIA read offset %02x\n",offset);
 
-	result <<= 8;
+    result <<= 8;
 
-	return result;
+    return result;
 }
 */
 
@@ -352,12 +352,12 @@ static WRITE16_HANDLER ( diablo68_write_LCD )
 			if ((data & 0x7f) >= 0x40) data -= 56;  // adjust for 16x1 display as 2 sets of 8
 		}
 		hd44780->control_write(*space, 128, data);
-//		logerror("Control %02x\n", data);
-//		printf("Control %02x\n", data);
+//      logerror("Control %02x\n", data);
+//      printf("Control %02x\n", data);
 	} else {
 		hd44780->data_write(*space, 128, data);
-//		printf("LCDdata %04x [%c]\n", data,data);
-//		logerror("LCDdata %04x [%c]\n", data,data);
+//      printf("LCDdata %04x [%c]\n", data,data);
+//      logerror("LCDdata %04x [%c]\n", data,data);
 	}
 
 	//logerror("LCD Status  Data = %d\n",data);
@@ -368,7 +368,7 @@ static WRITE8_HANDLER ( milano_write_LED )
 {
 	UINT8 LED_offset = 100;
 	if (data == 0xff)	output_set_led_value(LED_offset+offset,1);
-	else  				output_set_led_value(LED_offset+offset,0);
+	else				output_set_led_value(LED_offset+offset,0);
 
 	//logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
@@ -379,9 +379,9 @@ if (BIT(data,7)) beep_set_state(space->machine().device("beep"),1); else beep_se
 output_set_led_value(102,BIT(data,1)?1:0);
 output_set_led_value(107,BIT(data,6)?1:0);
 
-//	logerror("LEDs  FUNC = %02x found = %d\n",data,found);
+//  logerror("LEDs  FUNC = %02x found = %d\n",data,found);
 	logerror("LED mask %d\n",data);
-//	printf("LED mask %d\n",data);
+//  printf("LED mask %d\n",data);
 
 }
 
@@ -395,19 +395,19 @@ int found = 0;
 static int pr[4] = { -1,-1,-1,-1 };
 static int new1 = 0,start = 0,z = 0,i2;
 if (data == 0xf8) {
-	if (start == 0) {
-		start = 1;
-		z = 0;
-	}
+    if (start == 0) {
+        start = 1;
+        z = 0;
+    }
 }
 if (start == 1) {
-	new1 = 0;
-	pr[z] = r[z];
-	r[z] = data;
-	for (i2 = 0; i2 < 4; i2++) if(pr[i2] != r[i2]) new1 = 1;
-	z++;
-	if(z == 4) z = 0;
-	if (new1) printf("[%02x] [%02x] [%02x] [%02x]\n",r[0],r[1],r[2],r[3]);
+    new1 = 0;
+    pr[z] = r[z];
+    r[z] = data;
+    for (i2 = 0; i2 < 4; i2++) if(pr[i2] != r[i2]) new1 = 1;
+    z++;
+    if(z == 4) z = 0;
+    if (new1) printf("[%02x] [%02x] [%02x] [%02x]\n",r[0],r[1],r[2],r[3]);
 }
 */
 
@@ -437,10 +437,10 @@ if ((data & 0xa1) == 0xa1) {
 
 if (BIT(data,7)) beep_set_state(space->machine().device("beep"),1); else beep_set_state(space->machine().device("beep"),0);
 if (BIT(data,1)) beep_set_state(space->machine().device("beep"),1); else beep_set_state(space->machine().device("beep"),0);
-//	logerror("LEDs  FUNC = %02x found = %d\n",data,found);
+//  logerror("LEDs  FUNC = %02x found = %d\n",data,found);
 	if (!found) {
 		logerror("unknown LED mask %d\n",data);
-//		printf("unknown LED mask %d\n",data);
+//      printf("unknown LED mask %d\n",data);
 	}
 }
 
@@ -678,7 +678,7 @@ static READ32_HANDLER(read_keys_BPL32)
 		}
 	}
 
-//	logerror("Keyboard Port = %s Data = %d Offset = %d tmp %d line %02x\n", keynames[0][line], data, offset,tmp,line);
+//  logerror("Keyboard Port = %s Data = %d Offset = %d tmp %d line %02x\n", keynames[0][line], data, offset,tmp,line);
 	return data;
 }
 
@@ -689,7 +689,7 @@ static WRITE8_HANDLER(beep_academy)
 
 static WRITE8_HANDLER(megaiv_IO)
 {
-//	if (BIT(data,0)) beep_set_state(space->machine->device("beep"),1); else beep_set_state(space->machine->device("beep"),0);
+//  if (BIT(data,0)) beep_set_state(space->machine->device("beep"),1); else beep_set_state(space->machine->device("beep"),0);
 	logerror("$2400 = %02x\n",data);
 	latch2400 = data;
 }
@@ -734,33 +734,33 @@ static READ8_HANDLER(read_keys_board_monteciv)
 // FIXME : unlike polgar, academy shares port IO for keys and board, and I just can't seem to get the board latched right (H7 and H8 are always flashing) -- Cow
 static READ8_HANDLER(read_keys_board_academy)
 {
-//	static int startup = 0;
+//  static int startup = 0;
 	polgar_state *state = space->machine().driver_data<polgar_state>();
 	UINT8 data = 0;
-//	UINT8 tmp = 0xff, line = 0;
-//	static const char *const board_lines[8] =
-//			{ "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
+//  UINT8 tmp = 0xff, line = 0;
+//  static const char *const board_lines[8] =
+//          { "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 
 	if (state->latch_data == 0xff) {
 		data = input_port_read(space->machine(),  "BUTTONS_ACAD");
 	} else {
-//		if (state->latch_data & 0x7f) {
+//      if (state->latch_data & 0x7f) {
 		data = mboard_read_board_8(space,0);
-//		data = milano_read_board(space,0);
+//      data = milano_read_board(space,0);
 
-//			logerror("ReadingBoard %02x\n",state->latch_data);
-//			line = get_first_cleared_bit(state->latch_data);
-//			tmp = input_port_read(space->machine,  board_lines[line]);
-//			mboard_write_board_8(space,0, state->latch_data);
-//			data = mboard_read_board_8(space,0);
-//			logerror("BoardRead Port Offset = %d data %02x Latch %02x\n", offset,data,state->latch_data);
-//			printf  ("BoardRead Port Offset = %d data %02x Latch %02x\n", offset,data,state->latch_data);
-//		} else {
-//			logerror("no keys or board\n");
-//		}
+//          logerror("ReadingBoard %02x\n",state->latch_data);
+//          line = get_first_cleared_bit(state->latch_data);
+//          tmp = input_port_read(space->machine,  board_lines[line]);
+//          mboard_write_board_8(space,0, state->latch_data);
+//          data = mboard_read_board_8(space,0);
+//          logerror("BoardRead Port Offset = %d data %02x Latch %02x\n", offset,data,state->latch_data);
+//          printf  ("BoardRead Port Offset = %d data %02x Latch %02x\n", offset,data,state->latch_data);
+//      } else {
+//          logerror("no keys or board\n");
+//      }
 	}
-//	logerror("Keyboard Port Offset = %d tmp %d Latch %d\n", offset,tmp,state->latch_data);
-//	logerror("Keyboard Port = %s Data = %d Offset = %d tmp %d line %02x\n", keynames[0][line], data, offset,tmp,line);
+//  logerror("Keyboard Port Offset = %d tmp %d Latch %d\n", offset,tmp,state->latch_data);
+//  logerror("Keyboard Port = %s Data = %d Offset = %d tmp %d line %02x\n", keynames[0][line], data, offset,tmp,line);
 	return data;
 }
 
@@ -824,10 +824,10 @@ static READ16_HANDLER( read_buttons_van16 )
 static WRITE32_HANDLER( write_LCD_data_32 )
 {
 
-//	printf("Write LCD Data Latch %08x o: %08x\n",data,offset);
+//  printf("Write LCD Data Latch %08x o: %08x\n",data,offset);
 	logerror("Write LCD Data Latch %08x o: %08x\n",data,offset);
 	lcd32_char = data>>24;
-//	cpu_adjust_icount(space->cpu,-5000);
+//  cpu_adjust_icount(space->cpu,-5000);
 
 }
 
@@ -852,14 +852,14 @@ static void write_IOenable(unsigned char data,address_space *space) {
 			// MAME core does not appear to have this opcode timed right.
 			// This also allows 'fake' clocks to test ELO at impossibly high speeds on real hardware
 			// The original programmer says RAM is 2x as fast as the ROM on the 030 machines, maybe waitstates can be put in MAME core someday
-//			cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));
+//          cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));
 			if (BIT(data,0)) {
 				logerror("Write LCD_DATA [%02x] [%c]\n",lcd32_char,lcd32_char);
-//				printf("Write LCD_DATA [%02x] [%c]\n",lcd32_char,lcd32_char);
+//              printf("Write LCD_DATA [%02x] [%c]\n",lcd32_char,lcd32_char);
 				hd44780->data_write(*space, 128, lcd32_char);
 			} else {
 				logerror("Write LCD_CTRL [%02x] [%c]\n",lcd32_char,lcd32_char);
-//				printf("Write LCD_CTRL [%02x] [%c]\n",lcd32_char,lcd32_char);
+//              printf("Write LCD_CTRL [%02x] [%c]\n",lcd32_char,lcd32_char);
 				hd44780->control_write(*space, 128, lcd32_char);
 			}
 		}
@@ -1023,7 +1023,7 @@ static MACHINE_START( sfortea )
 
 static MACHINE_START( finalchs )
 {
-//	timer_pulse(machine, ATTOTIME_IN_HZ(1), NULL, 0, cause_M6502_irq);
+//  timer_pulse(machine, ATTOTIME_IN_HZ(1), NULL, 0, cause_M6502_irq);
 }
 
 static MACHINE_START( diablo68 )
@@ -1113,14 +1113,14 @@ static ADDRESS_MAP_START(polgar_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x2c00, 0x2c07 ) AM_READ ( read_keys)
 	AM_RANGE( 0x2004, 0x2004 ) AM_WRITE ( write_polgar_IO )	// LCD Instr. Reg + Beeper
 	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE ( write_LCD_polgar )	        // LCD Char Reg.
- 	AM_RANGE( 0x4000, 0xffff ) AM_ROM
+	AM_RANGE( 0x4000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sfortea_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fef ) AM_RAM
 	AM_RANGE( 0x1ff6, 0x1ff6 ) AM_WRITE ( write_latch_sfortea)	// IO control
 	AM_RANGE( 0x1ff7, 0x1ff7 ) AM_WRITE ( write_lcd_IO_sfortea)	// LCD Char Reg.
-//	AM_RANGE( 0x1ffc, 0x1fff ) AM_DEVREADWRITE("acia65c51", acia_6551_r,acia_6551_w)
+//  AM_RANGE( 0x1ffc, 0x1fff ) AM_DEVREADWRITE("acia65c51", acia_6551_r,acia_6551_w)
 	AM_RANGE( 0x1ff1, 0x1ff1 ) AM_READ ( read_1ff1_sfortea )
 	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_READ ( read_1ff0_sfortea )
 	AM_RANGE( 0x2000, 0xffff ) AM_ROM
@@ -1239,9 +1239,9 @@ static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16)
 	AM_RANGE( 0xf00000 , 0xf00009 )  AM_READ     ( read_buttons_van16 )
 	AM_RANGE( 0xd80000 , 0xd80001 )  AM_WRITE    ( write_LCD_data )
 	AM_RANGE( 0xd80008 , 0xd80009 )  AM_WRITE    ( write_IOenables )
-//	AM_RANGE( 0xe80004 , 0xe80005 )  AM_WRITE    ( write_unknown2 )
-//	AM_RANGE( 0xe80002 , 0xe80003 )  AM_READ     ( read_unknown1 )
-//	AM_RANGE( 0xe80006 , 0xe80007 )  AM_READ     ( read_unknown3 )
+//  AM_RANGE( 0xe80004 , 0xe80005 )  AM_WRITE    ( write_unknown2 )
+//  AM_RANGE( 0xe80002 , 0xe80003 )  AM_READ     ( read_unknown1 )
+//  AM_RANGE( 0xe80006 , 0xe80007 )  AM_READ     ( read_unknown3 )
 
 
 	AM_RANGE( 0x400000, 0x47ffff )  AM_RAM      /* 512KB */
@@ -1267,7 +1267,7 @@ static ADDRESS_MAP_START(finalchs_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_WRITE(io7ff8_write)
 	AM_RANGE( 0x6000, 0x6000 ) AM_READ(io6000_read)
 	AM_RANGE( 0x6000, 0x6000 ) AM_WRITE(io6000_write)
- 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
+	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(academy_mem , AS_PROGRAM, 8)
@@ -1300,33 +1300,33 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(megaiv_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-///	AM_RANGE( 0x2400, 0x2400 ) AM_READ ( read_keys_board_monteciv )
-	AM_RANGE( 0x6800, 0x6800 ) AM_WRITE ( academy_write_board )	// 2800	// Chessboard
-///	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE ( mboard_write_LED_8 )		// Chessboard
-///	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE ( academy_write_LED )			// Status LEDs
-	AM_RANGE( 0x4400, 0x4400 ) AM_WRITE ( megaiv_write_LED )	// 2400		// Select Keyline
+/// AM_RANGE( 0x2400, 0x2400 ) AM_READ ( read_keys_board_monteciv )
+	AM_RANGE( 0x6800, 0x6800 ) AM_WRITE ( academy_write_board )	// 2800 // Chessboard
+/// AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE ( mboard_write_LED_8 )      // Chessboard
+/// AM_RANGE( 0x3400, 0x3400 ) AM_WRITE ( academy_write_LED )           // Status LEDs
+	AM_RANGE( 0x4400, 0x4400 ) AM_WRITE ( megaiv_write_LED )	// 2400     // Select Keyline
 	AM_RANGE( 0x7000, 0x7001 ) AM_WRITE ( megaiv_IO )			// Select Keyline
-///	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE ( beep_academy )
+/// AM_RANGE( 0x3002, 0x3002 ) AM_WRITE ( beep_academy )
 	AM_RANGE( 0x4000, 0x4007 ) AM_READ ( read_keys_megaiv ) // 3000-7 fixio
 	AM_RANGE( 0x2c04, 0x2c04 ) AM_WRITE ( monteciv_write_LCD ) // 2c04
 	AM_RANGE( 0x2c05, 0x2c05 ) AM_WRITE ( monteciv_3005 ) // 2c05
 	AM_RANGE( 0x2c07, 0x2c07 ) AM_WRITE ( monteciv_3007 ) // 2c07
 	AM_RANGE( 0x2c06, 0x2c06 ) AM_WRITE ( monteciv_3006 ) // 2c06
-///	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE ( academy_inhibitNMI )
+/// AM_RANGE( 0x2000, 0x2000 ) AM_WRITE ( academy_inhibitNMI )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(diablo68_mem , AS_PROGRAM, 16)
 	AM_RANGE( 0x00000000, 0x0000ffff ) AM_ROM // OS
-//	AM_RANGE( 0x00200000, 0x0020ffff ) AM_ROM AM_REGION("maincpu", 0)
+//  AM_RANGE( 0x00200000, 0x0020ffff ) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE( 0x00ff0000, 0x00ff7fff ) AM_ROM AM_REGION("maincpu",10000) // Opening Book
-//	AM_RANGE( 0x00300000, 0x00300007 ) AM_READ(diablo68_aciaread)
-//	AM_RANGE( 0x00300000, 0x00300007 ) AM_READ(diablo68_aciawrite)
-//	AM_RANGE( 0x00300002, 0x00300003 ) AM_READ(diablo68_flags)
+//  AM_RANGE( 0x00300000, 0x00300007 ) AM_READ(diablo68_aciaread)
+//  AM_RANGE( 0x00300000, 0x00300007 ) AM_READ(diablo68_aciawrite)
+//  AM_RANGE( 0x00300002, 0x00300003 ) AM_READ(diablo68_flags)
 	AM_RANGE( 0x003a0000, 0x003a0001 ) AM_WRITE(diablo68_write_LCD)
 	AM_RANGE( 0x003c0000, 0x003c0001 ) AM_WRITE(diablo68_reg_select)
- 	AM_RANGE( 0x00280000, 0x0028ffff ) AM_RAM  // hash tables
- 	AM_RANGE( 0x00ff8000, 0x00ffffff ) AM_RAM
+	AM_RANGE( 0x00280000, 0x0028ffff ) AM_RAM  // hash tables
+	AM_RANGE( 0x00ff8000, 0x00ffffff ) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -1350,8 +1350,8 @@ static INPUT_PORTS_START( polgar )
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(" ENT") PORT_CODE(KEYCODE_F7)
 	PORT_START("KEY1_7") //Port $2c07
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(" CL") PORT_CODE(KEYCODE_F8)
-//	PORT_START("KEY1_8")
-//	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(" A") PORT_CODE(KEYCODE_1)
+//  PORT_START("KEY1_8")
+//  PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(" A") PORT_CODE(KEYCODE_1)
 
 	PORT_INCLUDE( chessboard )
 
@@ -1378,15 +1378,15 @@ static INPUT_PORTS_START( sfortea )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RST1") PORT_CODE(KEYCODE_F7)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RST2") PORT_CODE(KEYCODE_F8)
 
-/*	PORT_START("BUTTONS_SFOR3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("ENT") PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("CL") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("UP") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("DOWN") PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("LEFT") PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RIGHT") PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RST1") PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RST2") PORT_CODE(KEYCODE_8)
+/*  PORT_START("BUTTONS_SFOR3")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("ENT") PORT_CODE(KEYCODE_1)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("CL") PORT_CODE(KEYCODE_2)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("UP") PORT_CODE(KEYCODE_3)
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("DOWN") PORT_CODE(KEYCODE_4)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("LEFT") PORT_CODE(KEYCODE_5)
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RIGHT") PORT_CODE(KEYCODE_6)
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RST1") PORT_CODE(KEYCODE_7)
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_NAME("RST2") PORT_CODE(KEYCODE_8)
 */
 
 	PORT_INCLUDE( chessboard )
@@ -1424,8 +1424,8 @@ static INPUT_PORTS_START( megaiv )
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(" ENT") PORT_CODE(KEYCODE_F7)
 	PORT_START("KEY1_7") //Port $2c07
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(" CL") PORT_CODE(KEYCODE_F8)
-//	PORT_START("KEY1_8")
-//	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(" A") PORT_CODE(KEYCODE_1)
+//  PORT_START("KEY1_8")
+//  PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(" A") PORT_CODE(KEYCODE_1)
 
 	PORT_INCLUDE( chessboard )
 
@@ -1577,7 +1577,7 @@ static MACHINE_CONFIG_START( sfortea, driver_device )
 	MCFG_FRAGMENT_ADD( chess_common )
 
 	/* acia */
-//	MCFG_ACIA6551_ADD("acia65c51")
+//  MCFG_ACIA6551_ADD("acia65c51")
 
 	MCFG_TIMER_ADD_PERIODIC("irq_timer", cause_M6502_irq, attotime::from_hz(600))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(60))
@@ -1653,7 +1653,7 @@ static MACHINE_CONFIG_START( diablo68, driver_device )
 	MCFG_FRAGMENT_ADD( chess_common )
 
 	/* acia */
-//	MCFG_ACIA6551_ADD("acia65c51")
+//  MCFG_ACIA6551_ADD("acia65c51")
 
 	MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq2, attotime::from_hz(60))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(30))
@@ -1668,7 +1668,7 @@ static MACHINE_CONFIG_START( van16, driver_device )
 	MCFG_MACHINE_START(van16)
 	MCFG_MACHINE_RESET(van16)
 	MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq6, attotime::from_hz(600))  // chess clock right, diags wrong
-//	MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq6, attotime::from_hz(587))  // vv
+//  MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq6, attotime::from_hz(587))  // vv
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(120))
 	MCFG_FRAGMENT_ADD( chess_common )
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1701,7 +1701,7 @@ static MACHINE_CONFIG_START( risc, driver_device )
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(120))
 
 	MCFG_FRAGMENT_ADD( chess_common )
-//	MCFG_NVRAM_ADD_0FILL("nvram")
+//  MCFG_NVRAM_ADD_0FILL("nvram")
 
 MACHINE_CONFIG_END
 
@@ -1711,7 +1711,7 @@ static MACHINE_CONFIG_START( gen32, driver_device )
 	MCFG_MACHINE_START(van32)
 	MCFG_MACHINE_RESET(van16)
 	MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq6, attotime::from_hz(375))
-//	MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq6, attotime::from_hz(368.64))
+//  MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq6, attotime::from_hz(368.64))
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(120))
 
 	MCFG_FRAGMENT_ADD( chess_common )
@@ -1898,7 +1898,7 @@ ROM_START( van16 )
     ROM_LOAD16_BYTE("va16odd.bin" , 0x00001, 0x20000,CRC(585F3BDD) SHA1(90BB94A12D3153A91E3760020E1EA2A9EAA7EC0A))
 
     ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
-   	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
+	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 ROM_END
 

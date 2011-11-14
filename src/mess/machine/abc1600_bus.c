@@ -92,7 +92,7 @@ void abc1600bus_slot_device::device_config_complete()
     	memset(&m_out_xint3_cb, 0, sizeof(m_out_xint3_cb));
     	memset(&m_out_xint4_cb, 0, sizeof(m_out_xint4_cb));
     	memset(&m_out_xint5_cb, 0, sizeof(m_out_xint5_cb));
- 	}
+	}
 }
 
 
@@ -113,7 +113,7 @@ void abc1600bus_slot_device::device_start()
 	m_out_xint3_func.resolve(m_out_xint3_cb, *this);
 	m_out_xint4_func.resolve(m_out_xint4_cb, *this);
 	m_out_xint5_func.resolve(m_out_xint5_cb, *this);
-	
+
 	// state saving
 	save_item(NAME(m_int));
 	save_item(NAME(m_pren));
@@ -146,12 +146,12 @@ void abc1600bus_slot_device::cs_w(UINT8 data)
 READ_LINE_MEMBER( abc1600bus_slot_device::csb_r )
 {
 	int data = 1;
-	
+
 	if (m_card != NULL)
 	{
 		data = m_card->abc1600bus_csb();
 	}
-	
+
 	return data;
 }
 
@@ -309,12 +309,12 @@ UINT8 abc1600bus_slot_device::exp_r()
 READ_LINE_MEMBER( abc1600bus_slot_device::xcsb2_r )
 {
 	int data = 1;
-	
+
 	if (m_card != NULL)
 	{
 		data = m_card->abc1600bus_xcsb2();
 	}
-	
+
 	return data;
 }
 
@@ -326,12 +326,12 @@ READ_LINE_MEMBER( abc1600bus_slot_device::xcsb2_r )
 READ_LINE_MEMBER( abc1600bus_slot_device::xcsb3_r )
 {
 	int data = 1;
-	
+
 	if (m_card != NULL)
 	{
 		data = m_card->abc1600bus_xcsb3();
 	}
-	
+
 	return data;
 }
 
@@ -343,12 +343,12 @@ READ_LINE_MEMBER( abc1600bus_slot_device::xcsb3_r )
 READ_LINE_MEMBER( abc1600bus_slot_device::xcsb4_r )
 {
 	int data = 1;
-	
+
 	if (m_card != NULL)
 	{
 		data = m_card->abc1600bus_xcsb4();
 	}
-	
+
 	return data;
 }
 
@@ -360,12 +360,12 @@ READ_LINE_MEMBER( abc1600bus_slot_device::xcsb4_r )
 READ_LINE_MEMBER( abc1600bus_slot_device::xcsb5_r )
 {
 	int data = 1;
-	
+
 	if (m_card != NULL)
 	{
 		data = m_card->abc1600bus_xcsb5();
 	}
-	
+
 	return data;
 }
 

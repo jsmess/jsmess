@@ -15,32 +15,32 @@ PCB Layout
 ASSY 61-000222-00
 
 |-------------------------------------------|
-|	CN2		CN1								|
-|	CN3		7406				TMM2016		|
-|			LS38	LS14					|
-| MC3486									|
-|				WD1015			WD11C00		|
-|			33.04MHz						|
-| MC3487									|
-|				WD2010			LS244		|
-|	WD10C20									|
-|				LS260	LS13		ROM		|
-|											|
-|---|									|---|
-	|-----------------------------------|
+|   CN2     CN1                             |
+|   CN3     7406                TMM2016     |
+|           LS38    LS14                    |
+| MC3486                                    |
+|               WD1015          WD11C00     |
+|           33.04MHz                        |
+| MC3487                                    |
+|               WD2010          LS244       |
+|   WD10C20                                 |
+|               LS260   LS13        ROM     |
+|                                           |
+|---|                                   |---|
+    |-----------------------------------|
 
 Notes:
     All IC's shown.
 
-    ROM		- Toshiba TMM2464AP 8Kx8 ROM "3"
-	TMM2016	- Toshiba TMM2016BP-10 2Kx8 SRAM
-	WD1015	- Western Digital WD1015-PL-54-02 Buffer Manager Control Processor
-	WD11C00	- Western Digital WD11C00L-JT-17-02 PC/XT Host Interface Logic Device
-	WD10C20	- Western Digital WD10C20B-PH-05-05 Self-Adjusting Data Separator
-	WD2010	- Western Digital WD2010A-PL-05-02 Winchester Disk Controller
-	CN1		- 2x17 pin PCB header, control
-	CN2		- 2x10 pin PCB header, drive 0 data
-	CN3		- 2x10 pin PCB header, drive 1 data
+    ROM     - Toshiba TMM2464AP 8Kx8 ROM "3"
+    TMM2016 - Toshiba TMM2016BP-10 2Kx8 SRAM
+    WD1015  - Western Digital WD1015-PL-54-02 Buffer Manager Control Processor
+    WD11C00 - Western Digital WD11C00L-JT-17-02 PC/XT Host Interface Logic Device
+    WD10C20 - Western Digital WD10C20B-PH-05-05 Self-Adjusting Data Separator
+    WD2010  - Western Digital WD2010A-PL-05-02 Winchester Disk Controller
+    CN1     - 2x17 pin PCB header, control
+    CN2     - 2x10 pin PCB header, drive 0 data
+    CN3     - 2x10 pin PCB header, drive 1 data
 
 */
 
@@ -186,7 +186,7 @@ static MACHINE_CONFIG_FRAGMENT( wdxt_gen )
 
 	MCFG_WD11C00_17_ADD(WD11C00_17_TAG, 5000000, host_intf)
 	MCFG_WD2010_ADD(WD2010A_TAG, 5000000, hdc_intf)
-	
+
 	MCFG_HARDDISK_ADD("harddisk0")
 	MCFG_HARDDISK_ADD("harddisk1")
 MACHINE_CONFIG_END
@@ -304,21 +304,21 @@ READ8_MEMBER( wdxt_gen_device::wd1015_p1_r )
 
         bit     description
 
-        P10     
-        P11     
-        P12     
-        P13     
-        P14     
-        P15     
-        P16     
-        P17     
+        P10
+        P11
+        P12
+        P13
+        P14
+        P15
+        P16
+        P17
 
     */
-	
+
 	UINT8 data = 0;
-	
+
 	logerror("%s P1 read %02x\n", machine().describe_context(), data);
-	
+
 	return data;
 }
 
@@ -338,14 +338,14 @@ WRITE8_MEMBER( wdxt_gen_device::wd1015_p1_w )
         P12     HSEL2
         P13     _DSEL0
         P14     _DSEL1
-        P15     
+        P15
         P16     IREQ
         P17     _DIRIN
 
     */
 
 	logerror("%s P1 %02x\n", machine().describe_context(), data);
-	
+
 	m_host->ireq_w(BIT(data, 6));
 }
 
@@ -360,23 +360,23 @@ READ8_MEMBER( wdxt_gen_device::wd1015_p2_r )
 
         bit     description
 
-        P20		
-        P21		
-        P22		
-        P23		
-        P24     
-        P25     
+        P20
+        P21
+        P22
+        P23
+        P24
+        P25
         P26     TK000
         P27     ECC NOT 0
 
     */
-	
+
 	UINT8 data = 0x40;
-	
+
 	data |= m_host->ecc_not_0_r() << 7;
 
 	logerror("%s P2 read %02x\n", machine().describe_context(), data);
-	
+
 	return data;
 }
 
@@ -391,18 +391,18 @@ WRITE8_MEMBER( wdxt_gen_device::wd1015_p2_w )
 
         bit     description
 
-        P20		STEP
-        P21		?
-        P22		MODE?
-        P23		?
+        P20     STEP
+        P21     ?
+        P22     MODE?
+        P23     ?
         P24     ?
         P25     ?
-        P26     
-        P27     
+        P26
+        P27
 
     */
-	
+
 	logerror("%s P2 %02x\n", machine().describe_context(), data);
-	
+
 	m_host->mode_w(BIT(data, 2));
 }

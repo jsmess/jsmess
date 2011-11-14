@@ -575,7 +575,7 @@ WRITE8_MEMBER(mac_state::mac_5396_w)
 	}
 	else	// pseudo-DMA: write to the FIFO
 	{
-		m_539x_1->write(space, 2, data);                                                                                             
+		m_539x_1->write(space, 2, data);
 	}
 }
 

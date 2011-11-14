@@ -26,7 +26,7 @@
     MCFG_DEVICE_ADD(_tag, WD2010, _clock) \
 	MCFG_DEVICE_CONFIG(_config)
 
-	
+
 #define WD2010_INTERFACE(_name) \
 	const wd2010_interface (_name) =
 
@@ -64,7 +64,7 @@ class wd2010_device :	public device_t,
 public:
 	// construction/destruction
 	wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -97,7 +97,7 @@ private:
 	devcb_resolved_read_line	m_in_wf_func;
 	devcb_resolved_read_line	m_in_tk000_func;
 	devcb_resolved_read_line	m_in_sc_func;
-	
+
 	UINT8 m_status;
 	UINT8 m_error;
 	UINT8 m_task_file[8];

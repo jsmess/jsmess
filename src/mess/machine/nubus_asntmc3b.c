@@ -35,7 +35,7 @@ ROM_END
 
 ROM_START( appleenet )
 	ROM_REGION(0x4000, MAC8390_ROM_REGION, 0)
-    ROM_LOAD( "aenet1",       0x000000, 0x004000, CRC(e3ae8c26) SHA1(01ddc15ee84b17128203cb812f29bac6b20fd642) ) 
+    ROM_LOAD( "aenet1",       0x000000, 0x004000, CRC(e3ae8c26) SHA1(01ddc15ee84b17128203cb812f29bac6b20fd642) )
 ROM_END
 
 //**************************************************************************

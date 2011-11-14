@@ -36,10 +36,10 @@ protected:
         // device-level overrides
         virtual void device_start();
         virtual void device_reset();
-		
+
 public:
 		device_t *m_crtc_ega;
-		
+
 		void install_banks();
 		void change_mode();
 		void pc_ega8_3X0_w(UINT8 offset, UINT8 data);
@@ -60,7 +60,7 @@ public:
 		UINT8	m_feature_control;
 
 		/* Attribute registers AR00 - AR14
-		*/
+        */
 		struct {
 			UINT8	index;
 			UINT8	data[32];
@@ -68,14 +68,14 @@ public:
 		} m_attribute;
 
 		/* Sequencer registers SR00 - SR04
-		*/
+        */
 		struct {
 			UINT8	index;
 			UINT8	data[8];
 		} m_sequencer;
 
 		/* Graphics controller registers GR00 - GR08
-		*/
+        */
 		struct {
 			UINT8	index;
 			UINT8	data[16];

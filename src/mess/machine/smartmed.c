@@ -666,13 +666,13 @@ DEVICE_GET_INFO( smartmedia )
 		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "SmartMedia Flash ROM");	                         break;
 		case DEVINFO_STR_SOURCE_FILE:		        strcpy(info->s, __FILE__);                                        break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "smc");                                           break;
-		case DEVINFO_FCT_IMAGE_SOFTLIST_LOAD:		info->f = (genf *) DEVICE_IMAGE_SOFTLIST_LOAD_NAME(smartmedia);	break;		
+		case DEVINFO_FCT_IMAGE_SOFTLIST_LOAD:		info->f = (genf *) DEVICE_IMAGE_SOFTLIST_LOAD_NAME(smartmedia);	break;
 		case DEVINFO_STR_IMAGE_INTERFACE:
 			if ( device && downcast<const legacy_image_device_base *>(device)->inline_config() && get_config(device)->interface )
 			{
 				strcpy(info->s, get_config(device)->interface );
 			}
-			break;		
+			break;
 	}
 }
 

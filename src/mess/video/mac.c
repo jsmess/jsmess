@@ -7,15 +7,15 @@
     Emulates the video hardware for compact Macintosh series (original
     Macintosh (128k, 512k, 512ke), Macintosh Plus, Macintosh SE, Macintosh
     Classic)
- 
+
     Also emulates on-board video for systems with the
     RBV, V8, Sonora, and DAFB chips.
- 
+
     ----------------------------------------------------------------------
     Monitor sense codes
- 
+
     Apple assigns 3 pins for monitor IDs.  These allow 8 possible codes:
- 
+
     000 - color 2-Page Display (21")
     001 - monochrome Full Page display (15")
     010 - color 512x384 (12")
@@ -24,30 +24,30 @@
     101 - color Full Page display (15")
     110 - High-Resolution Color (13" 640x480) or use "type 6" extended codes
     111 - No monitor connected or use "type 7" extended codes
- 
+
     For extended codes, you drive one of the 3 pins at a time and read the 2
     undriven pins.  See http://support.apple.com/kb/TA21618?viewlocale=en_US
     for details.
- 
-Extended codes:
- 
-					Sense 2 Low  Sense 1 Low   Sense 0 Low
-					1 & 0        2 & 0         2 & 1      
 
-Multiple Scan 14"    00 		  00		   11
-Multiple Scan 16"    00 		  10		   11
-Multiple Scan 21"    10 		  00		   11
-PAL Encoder 		 00 		  00		   00
-NTSC Encoder		 01 		  01		   00
-VGA/Super VGA   	 01 		  01		   11
-RGB 16" 			 10 		  11		   01
-PAL Monitor 		 11 		  00		   00
-RGB 19" 			 11 		  10		   10
-Radius color TPD	 11           00           01   (TPD = Two Page Display)
-Radius mono TPD      11           01           00 
-Apple TPD            11           01           01 
-Apple color FPD      01           11           10   (FPD = Full Page Display) 
- 
+Extended codes:
+
+                    Sense 2 Low  Sense 1 Low   Sense 0 Low
+                    1 & 0        2 & 0         2 & 1
+
+Multiple Scan 14"    00           00           11
+Multiple Scan 16"    00           10           11
+Multiple Scan 21"    10           00           11
+PAL Encoder          00           00           00
+NTSC Encoder         01           01           00
+VGA/Super VGA        01           01           11
+RGB 16"              10           11           01
+PAL Monitor          11           00           00
+RGB 19"              11           10           10
+Radius color TPD     11           00           01   (TPD = Two Page Display)
+Radius mono TPD      11           01           00
+Apple TPD            11           01           01
+Apple color FPD      01           11           10   (FPD = Full Page Display)
+
 ***************************************************************************/
 
 #define ADDRESS_MAP_MODERN
@@ -280,9 +280,9 @@ VIDEO_RESET(macrbv)
 	}
 
 //      printf("RBV reset: monitor is %dx%d @ %f Hz\n", visarea.max_x+1, visarea.max_y+1, framerate);
-	machine.primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));	
+	machine.primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
 	render_target *target = machine.render().first_target();
-	target->set_view(view);	
+	target->set_view(view);
 }
 
 VIDEO_RESET(macsonora)
@@ -747,25 +747,25 @@ READ32_MEMBER(mac_state::dafb_r)
 
 WRITE32_MEMBER(mac_state::dafb_w)
 {
-//	if (offset != 0x10c/4) printf("DAFB: Write %08x @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
+//  if (offset != 0x10c/4) printf("DAFB: Write %08x @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
 
 	switch (offset<<2)
 	{
 		case 0:	// bits 20-9 of base
 			m_dafb_base &= 0x1ff;
 			m_dafb_base |= (data & 0xffff) << 9;
-//			printf("DAFB baseH: %x\n", m_dafb_base);
+//          printf("DAFB baseH: %x\n", m_dafb_base);
 			break;
 
 		case 4:	// bits 8-5 of base
 			m_dafb_base &= ~0x1ff;
 			m_dafb_base |= (data & 0xf) << 5;
-//			printf("DAFB baseL: %x\n", m_dafb_base);
+//          printf("DAFB baseL: %x\n", m_dafb_base);
 			break;
 
 		case 8:
 			m_dafb_stride = data<<2;	// stride in DWORDs
-//			printf("DAFB stride: %x %x\n", m_dafb_stride, data);
+//          printf("DAFB stride: %x %x\n", m_dafb_stride, data);
 			break;
 
 		case 0x104:
@@ -818,7 +818,7 @@ READ32_MEMBER(mac_state::dafb_dac_r)
 
 WRITE32_MEMBER(mac_state::dafb_dac_w)
 {
-//	if ((offset > 0) && (offset != 0x10/4)) printf("DAFB: Write %08x to DAC @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
+//  if ((offset > 0) && (offset != 0x10/4)) printf("DAFB: Write %08x to DAC @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
 
 	switch (offset<<2)
 	{

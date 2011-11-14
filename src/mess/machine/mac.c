@@ -34,9 +34,9 @@
          - Mac LC III           030             SWIM    Egret ADB  n/a      Internal "Sonora" type
          - Mac Classic II       030             SWIM    Egret ADB  n/a      Internal "Eagle" type (V8 clone)
          - Mac Color Classic    030             SWIM    Cuda ADB   n/a      Internal "Spice" type (V8 clone)
-    	 - Mac Quadra 700		040 (25 MHz)	SWIM II	MacII ADB  ext  	Internal "DAFB" type
-    	 - Mac Quadra 900		040 (33 MHz)	SWIM II	IOP ADB    ext  	Internal "DAFB" type
- 
+         - Mac Quadra 700       040 (25 MHz)    SWIM II MacII ADB  ext      Internal "DAFB" type
+         - Mac Quadra 900       040 (33 MHz)    SWIM II IOP ADB    ext      Internal "DAFB" type
+
     Notes:
         - The Mac Plus boot code seems to check to see the extent of ROM
           mirroring to determine if SCSI is available.  If the ROM is mirrored,
@@ -2135,7 +2135,7 @@ static void pmu_exec(mac_state *mac)
 	mac->m_pm_slen = 0;	// and send length
 	mac->m_pm_dptr = 0;	// and receive pointer
 
-//	printf("PMU: Command %02x\n", mac->m_pm_cmd[0]);
+//  printf("PMU: Command %02x\n", mac->m_pm_cmd[0]);
 	switch (mac->m_pm_cmd[0])
 	{
 		case 0x10:	// subsystem power and clock ctrl
@@ -2204,12 +2204,12 @@ static void pmu_exec(mac_state *mac)
 				mac->m_pm_out[5] = 0;
 				mac->m_pm_slen = 6;
 			}
-/*			printf("ADB packet: ");
-			for (int i = 0; i < mac->m_pm_slen; i++)
-			{
-				printf("%02x ", mac->m_pm_out[i]);
-			}
-			printf("\n");*/
+/*          printf("ADB packet: ");
+            for (int i = 0; i < mac->m_pm_slen; i++)
+            {
+                printf("%02x ", mac->m_pm_out[i]);
+            }
+            printf("\n");*/
 			mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1000)));
 			break;
 
@@ -2327,12 +2327,12 @@ static void pmu_exec(mac_state *mac)
 						mac->m_pm_slen = 4 + mac->m_adb_datasize;
 						mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1500)));
 
-/*						printf("ADB packet: ");
-						for (int i = 0; i < mac->m_pm_slen; i++)
-						{
-							printf("%02x ", mac->m_pm_out[i]);
-						}
-						printf("\n");*/
+/*                      printf("ADB packet: ");
+                        for (int i = 0; i < mac->m_pm_slen; i++)
+                        {
+                            printf("%02x ", mac->m_pm_out[i]);
+                        }
+                        printf("\n");*/
 					}
 					else
 					{
@@ -2376,7 +2376,7 @@ static void pmu_exec(mac_state *mac)
 				int i;
 
 				mac->m_pm_out[0] = mac->m_pm_out[1] = mac->m_pm_cmd[4];
-//				printf("PMU read at %x\n", mac->m_pm_cmd[2] | (mac->m_pm_cmd[3]<<8));
+//              printf("PMU read at %x\n", mac->m_pm_cmd[2] | (mac->m_pm_cmd[3]<<8));
 
 				// note: read at 0xEE00 0 = target disk mode, 0xff = normal bootup
 				// (actually 0x00EE, the 50753 IN register?  would make more sense)

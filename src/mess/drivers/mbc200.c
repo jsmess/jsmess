@@ -2,22 +2,22 @@
 
         Sanyo MBC-200
 
-		Machine MBC-1200 is identicaly but sold outside of Japan
+        Machine MBC-1200 is identicaly but sold outside of Japan
 
-		16 x HM6116P-3 2K x 8 SRAM soldered onboard (so 32k ram)
-		4 x HM6116P-3 2K x 8 SRAM socketed (so 8k ram)
-		4 x MB83256 32K x 8 socketed (128k ram)
-		Dual 5.25" floppies.
+        16 x HM6116P-3 2K x 8 SRAM soldered onboard (so 32k ram)
+        4 x HM6116P-3 2K x 8 SRAM socketed (so 8k ram)
+        4 x MB83256 32K x 8 socketed (128k ram)
+        Dual 5.25" floppies.
 
-		On back side:
-			- keyboard DIN connector
-			- Centronics printer port
-			- RS-232C 25pin connector
+        On back side:
+            - keyboard DIN connector
+            - Centronics printer port
+            - RS-232C 25pin connector
 
-		TODO:
-		- Master-Slave hand-shaking thru PPI8255 doesn't work properly
-		  (checks if bit 7 is high on master side, you appaently can't do
-		   that with current core(s)), kludged to work for now.
+        TODO:
+        - Master-Slave hand-shaking thru PPI8255 doesn't work properly
+          (checks if bit 7 is high on master side, you appaently can't do
+           that with current core(s)), kludged to work for now.
 
         31/10/2011 Skeleton driver.
 
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( mbc200_sub_io , AS_IO, 8, mbc200_state)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xb0, 0xb0) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xb1, 0xb1) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-//	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
+//  AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0xd0, 0xd0) AM_READ(from_master_r)
 ADDRESS_MAP_END
 
@@ -290,5 +290,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, mbc200,  0,       0, 	mbc200, 	mbc200, 	 0,	 "Sanyo",   "MBC-200",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, mbc200,  0,       0,	mbc200, 	mbc200, 	 0,	 "Sanyo",   "MBC-200",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

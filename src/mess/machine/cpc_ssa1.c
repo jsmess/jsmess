@@ -197,7 +197,7 @@ void cpc_ssa1_device::device_start()
 
 	m_rom = subregion("sp0256")->base();
 
-//	m_sp0256_device = subdevice("sp0256");
+//  m_sp0256_device = subdevice("sp0256");
 
 	space->install_readwrite_handler(0xfaee,0xfaee,0,0,read8_delegate(FUNC(cpc_ssa1_device::ssa1_r),this),write8_delegate(FUNC(cpc_ssa1_device::ssa1_w),this));
 	space->install_readwrite_handler(0xfbee,0xfbee,0,0,read8_delegate(FUNC(cpc_ssa1_device::ssa1_r),this),write8_delegate(FUNC(cpc_ssa1_device::ssa1_w),this));
@@ -211,7 +211,7 @@ void cpc_dkspeech_device::device_start()
 
 	m_rom = subregion("sp0256")->base();
 
-//	m_sp0256_device = subdevice("sp0256");
+//  m_sp0256_device = subdevice("sp0256");
 
 	space->install_readwrite_handler(0xfbfe,0xfbfe,0,0,read8_delegate(FUNC(cpc_dkspeech_device::dkspeech_r),this),write8_delegate(FUNC(cpc_dkspeech_device::dkspeech_w),this));
 }

@@ -143,7 +143,7 @@ public:
 	DECLARE_WRITE8_MEMBER( cio_pb_w );
 	DECLARE_READ8_MEMBER( cio_pc_r );
 	DECLARE_WRITE8_MEMBER( cio_pc_w );
-	
+
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 
 	int get_current_task(offs_t offset);
@@ -207,7 +207,7 @@ public:
 	// peripherals
 	int m_cs7;					// card select address bit 7
 	int m_bus0;					// BUS 0 selected
-	UINT8 m_csb;				// card select 
+	UINT8 m_csb;				// card select
 	int m_atce;					// V.24 channel A external clock enable
 	int m_btce;					// V.24 channel B external clock enable
 

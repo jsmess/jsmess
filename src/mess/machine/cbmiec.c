@@ -255,7 +255,7 @@ cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, const ch
 
 
 //-------------------------------------------------
-//  static_set_slot - 
+//  static_set_slot -
 //-------------------------------------------------
 
 void cbm_iec_slot_device::static_set_slot(device_t &device, int address)
@@ -332,7 +332,7 @@ inline void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 	else
 	{
 		daisy_entry *entry = m_device_list.first();
-		
+
 		while (entry)
 		{
 			if (!strcmp(entry->m_device->tag(), device->tag()))
@@ -344,7 +344,7 @@ inline void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 					changed = true;
 				}
 			}
-			
+
 			entry = entry->next();
 		}
 	}
@@ -361,7 +361,7 @@ inline void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 		}
 
 		daisy_entry *entry = m_device_list.first();
-		
+
 		while (entry)
 		{
 			switch (signal)
@@ -386,11 +386,11 @@ inline void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 				entry->m_interface->cbm_iec_reset(state);
 				break;
 			}
-			
+
 			entry = entry->next();
 		}
 
-		if (LOG) logerror("CBM IEC: SRQ %u ATN %u CLK %u DATA %u RESET %u\n", 
+		if (LOG) logerror("CBM IEC: SRQ %u ATN %u CLK %u DATA %u RESET %u\n",
 			get_signal(SRQ), get_signal(ATN), get_signal(CLK), get_signal(DATA), get_signal(RESET));
 	}
 }
@@ -407,7 +407,7 @@ inline int cbm_iec_device::get_signal(int signal)
 	if (state)
 	{
 		daisy_entry *entry = m_device_list.first();
-		
+
 		while (entry)
 		{
 			if (!entry->m_line[signal])
@@ -415,11 +415,11 @@ inline int cbm_iec_device::get_signal(int signal)
 				state = 0;
 				break;
 			}
-			
+
 			entry = entry->next();
 		}
 	}
-	
+
 	return state;
 }
 
@@ -465,7 +465,7 @@ void cbm_iec_device::device_start()
 void cbm_iec_device::add_device(device_t *target, int address)
 {
 	daisy_entry *entry = auto_alloc(machine(), daisy_entry(target));
-		
+
 	entry->m_interface->m_bus = this;
 	entry->m_interface->m_address = address;
 

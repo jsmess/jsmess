@@ -86,7 +86,7 @@ void el2_3c503_device::eop_w(int state) {
 	if((m_regs.streg & 0x08) && (state == ASSERT_LINE)) {
 		m_regs.streg |= 0x10;
 		m_regs.streg &= ~0x08;
-		if(!(m_regs.gacfr & 0x40)) set_irq(ASSERT_LINE); 
+		if(!(m_regs.gacfr & 0x40)) set_irq(ASSERT_LINE);
 	}
 }
 
@@ -261,7 +261,7 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_hiport_w) {
 		return;
 	case 11:
 		// vptr requires access to system memory address bus and so isn't currently emulatable
-		// it enables mmio to be set to rom on soft reset in case the machine is remote booted 
+		// it enables mmio to be set to rom on soft reset in case the machine is remote booted
 		m_regs.vptr = (data << 12) | (m_regs.vptr & 0xfff);
 		return;
 	case 12:

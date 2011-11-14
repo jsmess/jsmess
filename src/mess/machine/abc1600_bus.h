@@ -14,9 +14,9 @@
                 0 V     ---   *  4  *   --- 0 V
                 INT*    ---   *  5  *   --- 0 V
                 D7      ---   *  6  *   --- 0 V
-                D6      ---   *  7  *   --- 
-                D5      ---   *  8  *   --- 
-                D4      ---   *  9  *   --- 
+                D6      ---   *  7  *   ---
+                D5      ---   *  8  *   ---
+                D4      ---   *  9  *   ---
                 D3      ---   * 10  *   --- XINT*5^
                 D2      ---   * 11  *   --- XINT*4^
                 D1      ---   * 12  *   --- XINT*3^
@@ -25,9 +25,9 @@
                 BRST*   ---   * 15  *   --- XCSB*3^
                 STAT*   ---   * 16  *   --- XCSB*4^
                 INP*    ---   * 17  *   --- XCSB*5^
-                C4*     ---   * 18  *   --- 
-                C3*     ---   * 19  *   --- 
-                C2*     ---   * 20  *   --- 
+                C4*     ---   * 18  *   ---
+                C3*     ---   * 19  *   ---
+                C2*     ---   * 20  *   ---
                 C1*     ---   * 21  *   --- EXP*^
                 OUT*    ---   * 22  *   --- BUSEN*^
                 CS*     ---   * 23  *   --- DSTB*
@@ -41,8 +41,8 @@
                 +5 V    ---   * 31  *   --- +5 V
                 +12 V   ---   * 32  *   --- +12 V
 
-					^ only connected on BUS0X
-				
+                    ^ only connected on BUS0X
+
 **********************************************************************/
 
 #pragma once
@@ -188,7 +188,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( xint3_r );
 	DECLARE_READ_LINE_MEMBER( xint4_r );
 	DECLARE_READ_LINE_MEMBER( xint5_r );
-	
+
 private:
 	devcb_resolved_write_line	m_out_int_func;
 	devcb_resolved_write_line	m_out_pren_func;
@@ -198,9 +198,9 @@ private:
 	devcb_resolved_write_line	m_out_xint3_func;
 	devcb_resolved_write_line	m_out_xint4_func;
 	devcb_resolved_write_line	m_out_xint5_func;
-	
+
 	device_abc1600bus_card_interface *m_card;
-	
+
 	int m_int;
 	int m_pren;
 	int m_trrq;

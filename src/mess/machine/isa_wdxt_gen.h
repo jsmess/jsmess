@@ -7,10 +7,10 @@
 
 **********************************************************************
 
-	Emulated here is the variant supplied with Amstrad PC1512/1640,
-	which has a custom BIOS and is coupled with a Tandom TM262 HDD.
-	
-	chdman -createblankhd tandon_tm262.chd 615 4 17 512
+    Emulated here is the variant supplied with Amstrad PC1512/1640,
+    which has a custom BIOS and is coupled with a Tandom TM262 HDD.
+
+    chdman -createblankhd tandon_tm262.chd 615 4 17 512
 
 **********************************************************************/
 
@@ -46,7 +46,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
-	
+
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( irq5_w );
 	DECLARE_WRITE_LINE_MEMBER( drq3_w );
@@ -60,23 +60,23 @@ public:
 	DECLARE_WRITE8_MEMBER( wd1015_p1_w );
 	DECLARE_READ8_MEMBER( wd1015_p2_r );
 	DECLARE_WRITE8_MEMBER( wd1015_p2_w );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "wdxt_gen"; }
-	
+
 	// device_isa8_card_interface
 	virtual UINT8 dack_r(int line);
 	virtual void dack_w(int line, UINT8 data);
-	virtual bool have_dack(int line);	
-	
+	virtual bool have_dack(int line);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<wd11c00_17_device> m_host;
 	required_device<wd2010_device> m_hdc;
-	
+
 	UINT8 m_ram[0x800];
 
 	UINT8 m_hdc_addr;

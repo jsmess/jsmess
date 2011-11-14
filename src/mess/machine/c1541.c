@@ -171,23 +171,23 @@ const device_type OC118 = &device_creator<oc118_device>;
 c1540_device::c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:c1541_device(mconfig, C1540, "C1540", tag, owner, clock) { m_variant = TYPE_1540; }
 
-	
+
 c1541c_device::c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:c1541_device(mconfig, C1541C, "C1541C", tag, owner, clock) { m_variant = TYPE_1541C; }
 
-	
+
 c1541ii_device::c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:c1541_device(mconfig, C1541II, "C1541II", tag, owner, clock) { m_variant = TYPE_1541II; }
 
-	
+
 sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:c1541_device(mconfig, SX1541, "SX1541", tag, owner, clock) { m_variant = TYPE_SX1541; }
 
-	
+
 oc118_device::oc118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:c1541_device(mconfig, OC118, "OC118", tag, owner, clock) { m_variant = TYPE_OC118; }
-	
-	
+
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is

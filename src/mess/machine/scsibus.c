@@ -32,7 +32,7 @@ struct _scsibus_t
 {
 	SCSIInstance            *devices[8];
 	const SCSIBus_interface *interface;
-	
+
 	devcb_resolved_write_line out_bsy_func;
 	devcb_resolved_write_line out_sel_func;
 	devcb_resolved_write_line out_cd_func;
@@ -768,7 +768,7 @@ static void scsi_out_line_change_now(device_t *device, UINT8 line, UINT8 state)
 
     if(bus->interface->line_change_cb!=NULL)
         bus->interface->line_change_cb(device,line,state);
-	
+
 	switch (line)
 	{
 	case SCSI_LINE_BSY: bus->out_bsy_func(state); break;
@@ -951,7 +951,7 @@ static DEVICE_START( scsibus )
     bus->interface = (const SCSIBus_interface*)device->static_config();
 
 	memset(bus->devices, 0, sizeof(bus->devices));
-	
+
 	bus->out_bsy_func.resolve(bus->interface->out_bsy_func, *device);
 	bus->out_sel_func.resolve(bus->interface->out_sel_func, *device);
 	bus->out_cd_func.resolve(bus->interface->out_cd_func, *device);

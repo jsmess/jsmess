@@ -9,10 +9,10 @@
 
 /*
 
-	TODO:
-	
-	- scsihd.c wants the harddisk device to be at the driver level
-	- scsihd.c/scsibus.c have a fixed block size of 512
+    TODO:
+
+    - scsihd.c wants the harddisk device to be at the driver level
+    - scsihd.c/scsibus.c have a fixed block size of 512
 
 */
 
@@ -230,11 +230,11 @@ READ8_MEMBER( base_d9060_device::riot1_pa_r )
 
         bit     description
 
-        PA0     
-        PA1     
-        PA2     
-        PA3     
-        PA4     
+        PA0
+        PA1
+        PA2
+        PA3
+        PA4
         PA5     EOII
         PA6     DAVI
         PA7     _ATN
@@ -266,9 +266,9 @@ WRITE8_MEMBER( base_d9060_device::riot1_pa_w )
         PA2     RFDO
         PA3     EOIO
         PA4     DAVO
-        PA5     
-        PA6     
-        PA7     
+        PA5
+        PA6
+        PA7
 
     */
 
@@ -296,12 +296,12 @@ READ8_MEMBER( base_d9060_device::riot1_pb_r )
 
         bit     description
 
-        PB0		device #
-        PB1		device #
-        PB2		device #
+        PB0     device #
+        PB1     device #
+        PB2     device #
         PB3
-        PB4     
-        PB5     
+        PB4
+        PB5
         PB6     DACI
         PB7     RFDI
 
@@ -311,7 +311,7 @@ READ8_MEMBER( base_d9060_device::riot1_pb_r )
 
 	// device number selection
 	data |= m_address - 8;
-	
+
 	// data accepted in
 	data |= m_bus->ndac_r() << 6;
 
@@ -333,17 +333,17 @@ WRITE8_MEMBER( base_d9060_device::riot1_pb_w )
         PB3
         PB4     DRIVE RDY
         PB5     PWR ON AND NO ERRORS
-        PB6     
-        PB7     
+        PB6
+        PB7
 
     */
 
 	// ready led
 	output_set_led_value(LED_READY, BIT(data, 4));
-	
+
 	// power led
 	output_set_led_value(LED_POWER, BIT(data, 5));
-	
+
 	// error led
 	output_set_led_value(LED_ERROR, !BIT(data, 5));
 }
@@ -368,8 +368,8 @@ READ8_MEMBER( base_d9060_device::via_pb_r )
 
         bit     description
 
-        PB0     
-        PB1     
+        PB0
+        PB1
         PB2     C/D
         PB3     BUSY
         PB4     J14 (1=9060, 0=9090)
@@ -380,15 +380,15 @@ READ8_MEMBER( base_d9060_device::via_pb_r )
     */
 
 	UINT8 data = 0;
-	
+
 	data |= !scsi_cd_r(m_sasibus) << 2;
 	data |= !scsi_bsy_r(m_sasibus) << 3;
 	data |= !scsi_io_r(m_sasibus) << 6;
 	data |= !scsi_msg_r(m_sasibus) << 7;
-	
+
 	// drive type
 	data |= (m_variant == TYPE_9060) << 4;
-	
+
 	return data;
 }
 
@@ -400,15 +400,15 @@ WRITE8_MEMBER( base_d9060_device::via_pb_w )
 
         PB0     SEL
         PB1     RST
-        PB2     
-        PB3     
-        PB4     
-        PB5     
-        PB6     
-        PB7     
+        PB2
+        PB3
+        PB4
+        PB5
+        PB6
+        PB7
 
     */
-	
+
 	scsi_sel_w(m_sasibus, !BIT(data, 0));
 	scsi_rst_w(m_sasibus, !BIT(data, 1));
 }
