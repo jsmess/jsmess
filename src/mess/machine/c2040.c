@@ -10,8 +10,8 @@
 /*
 
     TODO:
-	
-	- 8050/8250 only work when debugger is active!?
+
+    - 8050/8250 only work when debugger is active!?
 
     - 2040 DOS 1 FDC rom (jumps to 104d while getting block header)
 

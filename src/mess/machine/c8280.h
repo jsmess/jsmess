@@ -46,7 +46,7 @@ public:
 	DECLARE_WRITE8_MEMBER( riot1_pa_w );
 	DECLARE_READ8_MEMBER( riot1_pb_r );
 	DECLARE_WRITE8_MEMBER( riot1_pb_w );
-	
+
 protected:
     // device-level overrides
     virtual void device_start();
@@ -60,7 +60,7 @@ protected:
 
 private:
 	inline void update_ieee_signals();
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdccpu;
 	required_device<riot6532_device> m_riot0;

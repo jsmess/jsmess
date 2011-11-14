@@ -76,7 +76,7 @@ public:
 	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void add_device(device_t *target, int address);
-	
+
 	// reads for both host and peripherals
 	UINT8 dio_r();
 	READ8_MEMBER( dio_r );
@@ -111,7 +111,7 @@ public:
 	void srq_w(device_t *device, int state);
 	void atn_w(device_t *device, int state);
 	void ren_w(device_t *device, int state);
-	
+
 protected:
 	enum
 	{
@@ -125,11 +125,11 @@ protected:
 		REN,
 		SIGNAL_COUNT
 	};
-	
+
 	// device-level overrides
     virtual void device_start();
     virtual void device_config_complete();
-	
+
 	class daisy_entry
 	{
 	public:
@@ -145,7 +145,7 @@ protected:
 	};
 
 	simple_list<daisy_entry> m_device_list;
-	
+
 private:
 	devcb_resolved_write_line	m_out_eoi_func;
 	devcb_resolved_write_line	m_out_dav_func;
@@ -155,7 +155,7 @@ private:
 	devcb_resolved_write_line	m_out_srq_func;
 	devcb_resolved_write_line	m_out_atn_func;
 	devcb_resolved_write_line	m_out_ren_func;
-	
+
 	inline void set_signal(device_t *device, int signal, int state);
 	inline int get_signal(int signal);
 	inline void set_data(device_t *device, UINT8 data);
@@ -200,7 +200,7 @@ public:
 
 	device_ieee488_interface *next() const { return m_next; }
 	device_ieee488_interface *m_next;
-	
+
 	// optional operation overrides
 	virtual void ieee488_eoi(int state) { };
 	virtual void ieee488_dav(int state) { };
@@ -210,7 +210,7 @@ public:
 	virtual void ieee488_srq(int state) { };
 	virtual void ieee488_atn(int state) { };
 	virtual void ieee488_ren(int state) { };
-	
+
 	ieee488_device  *m_bus;
 	int m_address;
 };

@@ -51,7 +51,7 @@ enum
 	((m_task_file[TASK_FILE_SDH_REGISTER] >> 3) & 0x03)
 
 static const int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
-		
+
 #define SECTOR_SIZE \
 	SECTOR_SIZES[(m_task_file[TASK_FILE_SDH_REGISTER] >> 5) & 0x03]
 
@@ -186,23 +186,23 @@ void wd2010_device::device_reset()
 READ8_MEMBER( wd2010_device::read )
 {
 	UINT8 data = 0;
-	
+
 	switch (offset)
 	{
 	case TASK_FILE_ERROR:
 		data = m_error;
 		break;
-		
+
 	case TASK_FILE_STATUS:
 		m_out_intrq_func(CLEAR_LINE);
 		data = m_status | STATUS_RDY | STATUS_SC;
 		break;
-		
+
 	default:
 		data = m_task_file[offset];
 		break;
 	}
-	
+
 	return data;
 }
 
@@ -214,29 +214,29 @@ READ8_MEMBER( wd2010_device::read )
 WRITE8_MEMBER( wd2010_device::write )
 {
 	m_task_file[offset] = data;
-	
+
 	switch (offset)
 	{
 	case TASK_FILE_WRITE_PRECOMP_CYLINDER:
 		if (LOG) logerror("%s WD2010 '%s' Write Precomp Cylinder: %u\n", machine().describe_context(), tag(), WRITE_PRECOMP_CYLINDER);
 		break;
-		
+
 	case TASK_FILE_SECTOR_COUNT:
 		if (LOG) logerror("%s WD2010 '%s' Sector Count: %u\n", machine().describe_context(), tag(), SECTOR_COUNT);
 		break;
-		
+
 	case TASK_FILE_SECTOR_NUMBER:
 		if (LOG) logerror("%s WD2010 '%s' Sector Number: %u\n", machine().describe_context(), tag(), SECTOR_NUMBER);
 		break;
-		
+
 	case TASK_FILE_CYLINDER_LOW:
 		if (LOG) logerror("%s WD2010 '%s' Cylinder Low: %u\n", machine().describe_context(), tag(), CYLINDER);
 		break;
-		
+
 	case TASK_FILE_CYLINDER_HIGH:
 		if (LOG) logerror("%s WD2010 '%s' Cylinder Low: %u\n", machine().describe_context(), tag(), CYLINDER);
 		break;
-		
+
 	case TASK_FILE_SDH_REGISTER:
 		if (LOG)
 		{
@@ -245,7 +245,7 @@ WRITE8_MEMBER( wd2010_device::write )
 			logerror("%s WD2010 '%s' Sector Size: %u\n", machine().describe_context(), tag(), SECTOR_SIZE);
 		}
 		break;
-		
+
 	case TASK_FILE_COMMAND:
 		if (data == COMMAND_COMPUTE_CORRECTION)
 		{
@@ -265,27 +265,27 @@ WRITE8_MEMBER( wd2010_device::write )
 				if (LOG) logerror("%s WD2010 '%s' RESTORE\n", machine().describe_context(), tag());
 				restore(data);
 				break;
-				
+
 			case COMMAND_SEEK:
 				if (LOG) logerror("%s WD2010 '%s' SEEK\n", machine().describe_context(), tag());
 				seek(data);
 				break;
-				
+
 			case COMMAND_READ_SECTOR:
 				if (LOG) logerror("%s WD2010 '%s' READ SECTOR\n", machine().describe_context(), tag());
 				read_sector(data);
 				break;
-				
+
 			case COMMAND_WRITE_SECTOR:
 				if (LOG) logerror("%s WD2010 '%s' WRITE SECTOR\n", machine().describe_context(), tag());
 				write_sector(data);
 				break;
-				
+
 			case COMMAND_SCAN_ID:
 				if (LOG) logerror("%s WD2010 '%s' SCAN ID\n", machine().describe_context(), tag());
 				scan_id(data);
 				break;
-				
+
 			case COMMAND_WRITE_FORMAT:
 				if (LOG) logerror("%s WD2010 '%s' WRITE FORMAT\n", machine().describe_context(), tag());
 				format(data);
@@ -325,13 +325,13 @@ void wd2010_device::restore(UINT8 data)
 	m_out_intrq_func(CLEAR_LINE);
 	m_error = 0;
 	m_status = STATUS_BSY | STATUS_CIP;
-	
+
 	// reset RWC, set direction=OUT, store step rate
 	m_out_rwc_func(0);
 	m_out_dirin_func(0);
 
 	int step_pulses = 0;
-	
+
 	while (step_pulses < 2048)
 	{
 		while (!m_in_sc_func())
@@ -348,7 +348,7 @@ void wd2010_device::restore(UINT8 data)
 				return;
 			}
 		}
-		
+
 		if (m_in_tk000_func())
 		{
 			// pulse BCR, set INTRQ, reset BSY, CIP
@@ -358,13 +358,13 @@ void wd2010_device::restore(UINT8 data)
 			m_out_intrq_func(ASSERT_LINE);
 			return;
 		}
-		
+
 		if (step_pulses == 2047)
 		{
 			// set TK000 error
 			m_error = ERROR_TK;
 			m_status |= STATUS_ERR;
-			
+
 			// pulse BCR, set INTRQ, reset BSY, CIP
 			m_out_bcr_func(0);
 			m_out_bcr_func(1);
@@ -372,7 +372,7 @@ void wd2010_device::restore(UINT8 data)
 			m_out_intrq_func(ASSERT_LINE);
 			return;
 		}
-		
+
 		// issue a step pulse
 		m_out_step_func(1);
 		m_out_step_func(0);

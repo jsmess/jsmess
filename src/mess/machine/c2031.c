@@ -478,7 +478,7 @@ c2031_device::c2031_device(const machine_config &mconfig, const char *tag, devic
 
 void c2031_device::device_start()
 {
- 	// install image callbacks
+	// install image callbacks
 	floppy_install_unload_proc(m_image, c2031_device::on_disk_change);
 	floppy_install_load_proc(m_image, c2031_device::on_disk_change);
 

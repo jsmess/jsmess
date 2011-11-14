@@ -111,14 +111,14 @@ static void s3c44b0_lcd_dma_reload( device_t *device)
 	lcd->pagewidth_cur = 0;
 	lcd->pagewidth_max = BITS( lcd->regs.lcdsaddr3, 8, 0);
 	lcd->bswp = BIT( lcd->regs.lcdsaddr2, 29); // note: juicebox changes bswp when video playback starts
-//	verboselog( device->machine(), 3, "LCD - vramaddr %08X %08X offsize %08X pagewidth %08X\n", lcd->vramaddr_cur, lcd->vramaddr_max, lcd->offsize, lcd->pagewidth_max);
+//  verboselog( device->machine(), 3, "LCD - vramaddr %08X %08X offsize %08X pagewidth %08X\n", lcd->vramaddr_cur, lcd->vramaddr_max, lcd->offsize, lcd->pagewidth_max);
 }
 
 static void s3c44b0_lcd_dma_init( device_t *device)
 {
 	s3c44b0_lcd_t *lcd = &(get_token( device)->lcd);
 	lcd->modesel = BITS( lcd->regs.lcdsaddr1, 28, 27);
-//	verboselog( device->machine(), 3, "LCD - modesel %d bswp %d\n", lcd->modesel, lcd->bswp);
+//  verboselog( device->machine(), 3, "LCD - modesel %d bswp %d\n", lcd->modesel, lcd->bswp);
 	s3c44b0_lcd_dma_reload( device);
 }
 
@@ -282,9 +282,9 @@ static TIMER_CALLBACK( s3c44b0_lcd_timer_exp )
 	verboselog( machine, 3, "LCD - (2) vramaddr %08X vpos %d hpos %d\n", lcd->vramaddr_cur, lcd->vpos, lcd->hpos);
 	if (lcd->vpos < vpos)
 	{
-//		verboselog( machine, 3, "LCD - (1) frame_time %f\n", attotime_to_double( lcd->frame_time));
+//      verboselog( machine, 3, "LCD - (1) frame_time %f\n", attotime_to_double( lcd->frame_time));
 		lcd->frame_time = machine.time() + s3c44b0_time_until_pos( device, lcd->vpos_min, lcd->hpos_min);
-//		verboselog( machine, 3, "LCD - (2) frame_time %f\n", attotime_to_double( lcd->frame_time));
+//      verboselog( machine, 3, "LCD - (2) frame_time %f\n", attotime_to_double( lcd->frame_time));
 	}
 	lcd->timer->adjust( s3c44b0_time_until_pos( device, lcd->vpos, lcd->hpos), 0);
 }
@@ -346,7 +346,7 @@ static READ32_DEVICE_HANDLER( s3c44b0_lcd_r )
 		}
 		break;
 	}
-//	verboselog( device->machine(), 9, "(LCD) %08X -> %08X\n", S3C44B0_BASE_LCD + (offset << 2), data);
+//  verboselog( device->machine(), 9, "(LCD) %08X -> %08X\n", S3C44B0_BASE_LCD + (offset << 2), data);
 	return data;
 }
 
@@ -398,9 +398,9 @@ static void s3c44b0_lcd_configure( device_t *device)
 	lcd->frame_period = HZ_TO_ATTOSECONDS( lcd->framerate);
 	lcd->scantime = lcd->frame_period / lcd->vpos_end;
 	lcd->pixeltime = lcd->frame_period / (lcd->vpos_end * lcd->hpos_end);
-//	printf( "frame_period %f\n", attotime( 0, lcd->frame_period).as_double());
-//	printf( "scantime %f\n", attotime( 0, lcd->scantime).as_double());
-//	printf( "pixeltime %f\n", attotime( 0, lcd->pixeltime).as_double());
+//  printf( "frame_period %f\n", attotime( 0, lcd->frame_period).as_double());
+//  printf( "scantime %f\n", attotime( 0, lcd->scantime).as_double());
+//  printf( "pixeltime %f\n", attotime( 0, lcd->pixeltime).as_double());
 }
 
 static void s3c44b0_lcd_start( device_t *device)
@@ -442,7 +442,7 @@ static WRITE32_DEVICE_HANDLER( s3c44b0_lcd_w )
 {
 	s3c44b0_lcd_t *lcd = &(get_token( device)->lcd);
 	UINT32 old_value = ((UINT32*)&lcd->regs)[offset];
-//	verboselog( device->machine(), 9, "(LCD) %08X <- %08X\n", S3C44B0_BASE_LCD + (offset << 2), data);
+//  verboselog( device->machine(), 9, "(LCD) %08X <- %08X\n", S3C44B0_BASE_LCD + (offset << 2), data);
 	COMBINE_DATA(&((UINT32*)&lcd->regs)[offset]);
 	switch (offset)
 	{
@@ -1541,14 +1541,14 @@ static void s3c44b0_sio_start( device_t *device)
 	hz = freq / 1; //s3c44b0->wdt.regs.wtcnt;
 	verboselog( device->machine(), 5, "SIO mclk %d prescaler %d freq %f hz %f\n", mclk, prescaler, freq, hz);
 	s3c44b0->sio.timer->adjust( attotime::from_hz( hz), 0);
-//	printf( "SIO transmit %02X (%c)\n", s3c44b0->sio.regs.siodat, ((s3c44b0->sio.regs.siodat >= 32) && (s3c44b0->sio.regs.siodat < 128)) ? (char)s3c44b0->sio.regs.siodat : '?');
+//  printf( "SIO transmit %02X (%c)\n", s3c44b0->sio.regs.siodat, ((s3c44b0->sio.regs.siodat >= 32) && (s3c44b0->sio.regs.siodat < 128)) ? (char)s3c44b0->sio.regs.siodat : '?');
 }
 
 static void s3c44b0_sio_stop( device_t *device)
 {
 	s3c44b0_t *s3c44b0 = get_token( device);
 	verboselog( device->machine(), 1, "SIO stop\n");
-//	s3c44b0->wdt.regs.wtcnt = s3c44b0_wdt_calc_current_count( device);
+//  s3c44b0->wdt.regs.wtcnt = s3c44b0_wdt_calc_current_count( device);
 	s3c44b0->sio.timer->adjust( attotime::never, 0);
 }
 
@@ -1874,8 +1874,8 @@ static void s3c44b0_bdma_trigger( device_t *device, int ch)
 
 static void s3c44b0_bdma_request_iis( device_t *device)
 {
-//	s3c44b0_t *s3c44b0 = get_token( device);
-//	s3c44b0_dma_regs_t *regs = &s3c24xx->bdma[0].regs;
+//  s3c44b0_t *s3c44b0 = get_token( device);
+//  s3c44b0_dma_regs_t *regs = &s3c24xx->bdma[0].regs;
 	verboselog( device->machine(), 5, "s3c44b0_bdma_request_iis\n");
 	s3c44b0_bdma_trigger( device, 0);
 }
@@ -1967,8 +1967,8 @@ static WRITE32_DEVICE_HANDLER( s3c44b0_bdma_1_w )
 
 static TIMER_CALLBACK( s3c44b0_bdma_timer_exp )
 {
-//	device_t *device = (device_t *)ptr;
-//	s3c44b0_t *s3c44b0 = get_token( device);
+//  device_t *device = (device_t *)ptr;
+//  s3c44b0_t *s3c44b0 = get_token( device);
 	int ch = param;
 	verboselog( machine, 2, "BDMA %d timer callback\n", ch);
 }

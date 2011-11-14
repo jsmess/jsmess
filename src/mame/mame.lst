@@ -4751,6 +4751,7 @@ naomigd			// 2001.?? Naomi GD-ROM Bios
 hod2bios		// 1998.11 The House of the Dead 2 (BIOS)
 hotd2			// 1998.11 The House of the Dead 2
 hotd2o			// 1998.11 The House of the Dead 2 (original)
+hotd2p			// 1998.11 The House of the Dead 2 (prototype)
 dybbnao			// 1998.12 Dynamite Baseball NAOMI
 crzytaxi		// 1999.02 Crazy Taxi
 pstone			// 1999.02 Power Stone
@@ -4785,6 +4786,7 @@ alpiltdx		// 1999.?? Airline Pilots Deluxe (Rev B)
 				// 1999.?? Pocket Shooting
 spawn			// 1999.?? Spawn In the Demon's Hand
 18wheelr		// 2000.01 18 Wheeler Deluxe (Rev A)
+18wheels		// 2000.01 18 Wheeler (Rev A)
 doa2m			// 2000.01 Dead or Alive 2 Millennium
 totd			// 2000.01 The Typing of the Dead (Rev A)
 				// 2000.02 Touch de UNO! 2
@@ -4838,7 +4840,8 @@ gunsur2			// 2001.07 Gun Survivor 2 Biohazard Code: Veronica
 spkrbtl			// 2001.07 Spikers Battle
 cvs2gd			// 2001.08 Capcom Vs. SNK 2 Millionaire Fighting 2001 (Rev A)
 wrungp			// 2001.08 Wave Runner GP
-alienfnt		// 2001.09 Alien Front
+alienfnt		// 2001.09 Alien Front (Rev T)
+alienfnta		// 2001.09 Alien Front (Rev A)
 hmgeo			// 2001.09 Heavy Metal Geomatrix (Rev A)
 gundmxgd		// 2001.09 Mobile Suit Gundam: Federation Vs. Zeon DX
 derbyoc2		// 2001.10 Derby Owners Club II (Rev B)
@@ -4918,7 +4921,7 @@ asndynmt		// 2007.07 Dynamite Deka EX - Asian dynamite
 ausfache		// 2008.02 Akatsuki Denkou Senki Ausf.Achse
 illvelo			// 2008.06 Illvelo (Illmatic Envelope)
 				// 2008.07 Mamoru-kun wa Norowarete Shimatta!
-				// 2008.09 Melty Blood Actress Again
+mbaa			// 2008.09 Melty Blood Actress Again
 				// 2008.12 Melty Blood Actress Again ver.A
 				// 2009.06 Radirgy Noah
 				// 2009.?? Project Cerberus (planned to be released in 2009)
@@ -6031,7 +6034,6 @@ popn7			// not sure, doesn't boot yet (c) 2001
 
 // PowerPC based Konami games
 bujutsu			// G?645 (c)1997
-racjamdx		// G?676 (c)1997
 fiveside		// GX479 (c)1995
 thunderh		// GX680 (c)1996 Euro EAA
 thunderhu		// GX680 (c)1996 USA UAA
@@ -6052,7 +6054,7 @@ sscope2			// GX931 (c)2000
 racingj			// GX676 (c)1998
 racingj2		// GX888 (c)1999 (EAE)
 racingj2j		// GX888 (c)1999 (JAE)
-racjamdx        // G?676 (c)1997 Japan JAA
+racjamdx		// G?676 (c)1997 Japan JAA
 thrilld			// GX713 (c)1998 Japan JAE
 thrilldb		// GX713 (c)1998 Japan JAB
 thrilldae		// GX713 (c)1998 Europe EAA
@@ -17053,7 +17055,7 @@ ep_heybc	// Hey Big Spender Club (Global)
 ep_hispr	// Hi Spirits (Global)
 ep_hiscl	// Hi Spirits Club (Global)
 ep_spirt	// High Spirits (Global)
-ep_smoke	// Holy Smoke (Impulse)
+ep_smoke	// Holy Smoke! (Impulse)
 ep_hur		// Hurricane (Global)
 ep_ifern	// Inferno (Impulse)
 ep_kopcl	// Knockout Punch Club (Global)
@@ -17509,7 +17511,7 @@ m4twilgt	// Twilight (Barcrest)
 m4twintm	// Twin Timer (Barcrest)
 m4twist		// Twist Again (Barcrest)
 m4univ		// Universe (Barcrest)
-m4uuaw		// Up Up & Away (Barcrest)
+m4uuaw		// Up Up and Away (Barcrest)
 m4vegast	// Vegas Strip (Barcrest)
 m4vegastg	//
 m4vivaes	// Viva Espana (Barcrest)
@@ -17690,7 +17692,7 @@ m4jne		// The Jackpot's Not Enough (Empire?)
 /* MDM */
 
 m42punlm	// 2p Unlimited (Mdm)
-m4bigapl	// Big Apple (Mdm)
+m4bigapl	// The Big Apple (Mdm)
 m4bigapla	//
 m4bigaplb	//
 m4bigaplc	//

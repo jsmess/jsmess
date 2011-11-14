@@ -31,7 +31,7 @@ static const SCSIConfigTable sasi_dev_table =
 
 WRITE_LINE_MEMBER( luxor_4105_device::sasi_bsy_w )
 {
-	if (!state) 
+	if (!state)
 	{
 		scsi_sel_w(m_sasibus, 1);
 	}
@@ -43,9 +43,9 @@ WRITE_LINE_MEMBER( luxor_4105_device::sasi_io_w )
 	{
 		scsi_data_w(m_sasibus, m_data);
 	}
-	
+
 	m_io = state;
-	
+
 	update_trrq_int();
 }
 
@@ -130,7 +130,7 @@ inline void luxor_4105_device::update_trrq_int()
 	else
 	{
 		m_slot->int_w(CLEAR_LINE);
-	}	
+	}
 
 	if (BIT(m_dma, 6))
 	{
@@ -183,14 +183,14 @@ void luxor_4105_device::device_start()
 void luxor_4105_device::device_reset()
 {
 	init_scsibus(m_sasibus);
-	
+
 	m_cs = 0;
 	m_data = 0;
 	m_dma = 0;
-	
+
 	scsi_rst_w(m_sasibus, 0);
 	scsi_rst_w(m_sasibus, 1);
-	
+
 	m_slot->trrq_w(1);
 }
 
@@ -241,26 +241,26 @@ UINT8 luxor_4105_device::abc1600bus_stat()
 	if (m_cs)
 	{
 		/*
-			
-			bit		description
-			
-			0		?
-			1		?
-			2		?
-			3		?
-			4		
-			5		
-			6		? (tested at 014D9A, after command 08 sent and 1 byte read from SASI, should be 1)
-			7		
-			
-		*/
-		
+
+            bit     description
+
+            0       ?
+            1       ?
+            2       ?
+            3       ?
+            4
+            5
+            6       ? (tested at 014D9A, after command 08 sent and 1 byte read from SASI, should be 1)
+            7
+
+        */
+
 		data = !scsi_bsy_r(m_sasibus);
 		data |= !scsi_req_r(m_sasibus) << 2;
 		data |= !scsi_cd_r(m_sasibus) << 3;
 		data |= !scsi_io_r(m_sasibus) << 6;
 	}
-	
+
 	return data;
 }
 
@@ -272,7 +272,7 @@ UINT8 luxor_4105_device::abc1600bus_stat()
 UINT8 luxor_4105_device::abc1600bus_inp()
 {
 	UINT8 data = 0xff;
-	
+
 	if (m_cs)
 	{
 		if (scsi_bsy_r(m_sasibus))
@@ -292,7 +292,7 @@ UINT8 luxor_4105_device::abc1600bus_inp()
 			}
 		}
 	}
-	
+
 	return data;
 }
 
@@ -306,11 +306,11 @@ void luxor_4105_device::abc1600bus_out(UINT8 data)
 	if (m_cs)
 	{
 		m_data = data;
-		
+
 		if (scsi_io_r(m_sasibus))
 		{
 			scsi_data_w(m_sasibus, m_data);
-		
+
 			if (!scsi_req_r(m_sasibus))
 			{
 				scsi_ack_w(m_sasibus, 0);
@@ -343,7 +343,7 @@ void luxor_4105_device::abc1600bus_c3(UINT8 data)
 	{
 		m_data = 0;
 		m_dma = 0;
-		
+
 		scsi_rst_w(m_sasibus, 0);
 		scsi_rst_w(m_sasibus, 1);
 	}
@@ -359,19 +359,19 @@ void luxor_4105_device::abc1600bus_c4(UINT8 data)
 	if (m_cs)
 	{
 		/*
-			
-			bit		description
-			
-			0
-			1
-			2
-			3
-			4
-			5		byte interrupt enable?
-			6		DMA/CPU mode (1=DMA, 0=CPU)?
-			7		error interrupt enable?
-			
-		*/
+
+            bit     description
+
+            0
+            1
+            2
+            3
+            4
+            5       byte interrupt enable?
+            6       DMA/CPU mode (1=DMA, 0=CPU)?
+            7       error interrupt enable?
+
+        */
 
 		m_dma = data;
 

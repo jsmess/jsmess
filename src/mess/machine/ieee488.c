@@ -72,7 +72,7 @@ ieee488_slot_device::ieee488_slot_device(const machine_config &mconfig, const ch
 
 
 //-------------------------------------------------
-//  static_set_slot - 
+//  static_set_slot -
 //-------------------------------------------------
 
 void ieee488_slot_device::static_set_slot(device_t &device, int address)
@@ -152,7 +152,7 @@ inline void ieee488_device::set_signal(device_t *device, int signal, int state)
 	else
 	{
 		daisy_entry *entry = m_device_list.first();
-		
+
 		while (entry)
 		{
 			if (!strcmp(entry->m_device->tag(), device->tag()))
@@ -164,7 +164,7 @@ inline void ieee488_device::set_signal(device_t *device, int signal, int state)
 					changed = true;
 				}
 			}
-			
+
 			entry = entry->next();
 		}
 	}
@@ -184,7 +184,7 @@ inline void ieee488_device::set_signal(device_t *device, int signal, int state)
 		}
 
 		daisy_entry *entry = m_device_list.first();
-		
+
 		while (entry)
 		{
 			switch (signal)
@@ -243,7 +243,7 @@ inline int ieee488_device::get_signal(int signal)
 	if (state)
 	{
 		daisy_entry *entry = m_device_list.first();
-		
+
 		while (entry)
 		{
 			if (!entry->m_line[signal])
@@ -251,11 +251,11 @@ inline int ieee488_device::get_signal(int signal)
 				state = 0;
 				break;
 			}
-			
+
 			entry = entry->next();
 		}
 	}
-	
+
 	return state;
 }
 
@@ -269,13 +269,13 @@ inline void ieee488_device::set_data(device_t *device, UINT8 data)
 	if (device == this)
 	{
 		if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), tag(), data);
-		
+
 		m_dio = data;
 	}
 	else
-	{	
+	{
 		daisy_entry *entry = m_device_list.first();
-		
+
 		while (entry)
 		{
 			if (!strcmp(entry->m_device->tag(), device->tag()))
@@ -286,7 +286,7 @@ inline void ieee488_device::set_data(device_t *device, UINT8 data)
 					entry->m_dio = data;
 				}
 			}
-			
+
 			entry = entry->next();
 		}
 	}
@@ -302,14 +302,14 @@ inline UINT8 ieee488_device::get_data()
 	UINT8 data = m_dio;
 
 	daisy_entry *entry = m_device_list.first();
-	
+
 	while (entry)
 	{
 		data &= entry->m_dio;
-			
+
 		entry = entry->next();
 	}
-		
+
 	return data;
 }
 
@@ -359,7 +359,7 @@ void ieee488_device::device_start()
 void ieee488_device::add_device(device_t *target, int address)
 {
 	daisy_entry *entry = auto_alloc(machine(), daisy_entry(target));
-		
+
 	entry->m_interface->m_bus = this;
 	entry->m_interface->m_address = address;
 

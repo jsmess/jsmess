@@ -1,8 +1,8 @@
 /*******************************************************************************
 
-	Mattel Juice Box
+    Mattel Juice Box
 
-	(C) 2011 Tim Schuerewegen
+    (C) 2011 Tim Schuerewegen
 
 *******************************************************************************/
 
@@ -82,7 +82,7 @@ static UINT8 smc_read( running_machine &machine)
 	device_t *smartmedia = machine.device( "smartmedia");
 	UINT8 data;
 	if (smartmedia_present( smartmedia))
-	{	
+	{
 		data = smartmedia_data_r( smartmedia);
 	}
 	else
@@ -99,7 +99,7 @@ static void smc_write( running_machine &machine, UINT8 data)
 	device_t *smartmedia = machine.device( "smartmedia");
 	verboselog( machine, 5, "smc_write %08X\n", data);
 	if (smartmedia_present( smartmedia))
-	{	
+	{
 		if (state->smc.cmd_latch)
 		{
 			verboselog( machine, 5, "smartmedia_command_w %08X\n", data);
@@ -181,7 +181,7 @@ static UINT32 s3c44b0_gpio_port_r( device_t *device, int port)
 		}
 		break;
 	}
-//	data = ((rand() & 0xFF) << 24) | ((rand() & 0xFF) << 16) | ((rand() & 0xFF) << 8) | ((rand() & 0xFF) << 0);
+//  data = ((rand() & 0xFF) << 24) | ((rand() & 0xFF) << 16) | ((rand() & 0xFF) << 8) | ((rand() & 0xFF) << 0);
 	return data;
 }
 
@@ -316,11 +316,11 @@ static MACHINE_CONFIG_START( juicebox, juicebox_state )
 	MCFG_MACHINE_RESET(juicebox)
 
 	MCFG_S3C44B0_ADD("s3c44b0", 10000000, juicebox_s3c44b0_intf)
-	
+
 	MCFG_SMARTMEDIA_ADD("smartmedia")
 	MCFG_SMARTMEDIA_INTERFACE("smartmedia")
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","juicebox")	
+	MCFG_SOFTWARE_LIST_ADD("cart_list","juicebox")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( juicebox )

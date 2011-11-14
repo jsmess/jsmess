@@ -305,7 +305,7 @@ static int scc_getareg(device_t *device)
 
 		rv |= (ourCh->txUnderrun) ? 0x40 : 0;
 		rv |= (ourCh->syncHunt) ? 0x10 : 0;
-		
+
 		return rv;
 	}
 	else if (scc->reg == 10)
@@ -338,7 +338,7 @@ static int scc_getbreg(device_t *device)
 		rv |= (ourCh->txUnderrun) ? 0x40 : 0;
 		rv |= (ourCh->syncHunt) ? 0x10 : 0;
 		rv |= (1 << 2);
-				
+
 		return rv;
 	}
 	else if (scc->reg == 2)
@@ -598,7 +598,7 @@ WRITE8_DEVICE_HANDLER(scc8530_w)
 
 	offset &= 3;
 
-//	printf(" mode %d data %x offset %d  \n", scc->mode, data, offset);
+//  printf(" mode %d data %x offset %d  \n", scc->mode, data, offset);
 
 	switch(offset)
 	{

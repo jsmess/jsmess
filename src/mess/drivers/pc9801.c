@@ -24,9 +24,9 @@
       setted to off
     - fix CPU for some clones;
 
-	TODO: (PC-486MU)
-	- Dies on ARTIC check;
-	- Presumably one ROM is undumped?
+    TODO: (PC-486MU)
+    - Dies on ARTIC check;
+    - Presumably one ROM is undumped?
 
 ========================================================================================
 

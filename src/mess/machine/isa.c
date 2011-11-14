@@ -156,7 +156,7 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 //-------------------------------------------------
 
 void isa8_device::device_start()
-{	
+{
 	// resolve callbacks
 	m_out_irq2_func.resolve(m_out_irq2_cb, *this);
 	m_out_irq3_func.resolve(m_out_irq3_cb, *this);

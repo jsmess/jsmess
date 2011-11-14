@@ -1,7 +1,7 @@
 /***************************************************************************
 
         PK-8020 driver by Miodrag Milanovic
-			based on work of Sergey Erokhin from pk8020.narod.ru
+            based on work of Sergey Erokhin from pk8020.narod.ru
 
         18/07/2008 Preliminary driver.
 
@@ -300,4 +300,4 @@ ROM_END
 COMP( 1987, korvet,  0, 	 0,	pk8020, 	pk8020, 	0,       "<unknown>", "PK8020 Korvet",	 0)
 COMP( 1987, neiva,   korvet,	 0,	pk8020, 	pk8020, 	0,       "<unknown>", "PK8020 Neiva",	 0)
 COMP( 1987, kontur,  korvet,	 0,	pk8020, 	pk8020, 	0,       "<unknown>", "PK8020 Kontur",	 0)
-COMP( 1987, bk8t,  	 korvet,	 0,	pk8020, 	pk8020, 	0,       "<unknown>", "BK-8T",	 0)
+COMP( 1987, bk8t,	 korvet,	 0,	pk8020, 	pk8020, 	0,       "<unknown>", "BK-8T",	 0)

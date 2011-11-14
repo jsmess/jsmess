@@ -813,8 +813,8 @@ ROM_START(pyuutajr)
 	/*CPU memory space*/
 	ROM_REGION(0x14000,"maincpu",0)
 	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(2ca37e62) SHA1(eebdc5c37d3b532edd5e5ca65eb785269ebd1ac0))      /* system ROM */
-ROM_END  
-  
+ROM_END
+
 /*   YEAR    NAME      PARENT      COMPAT  MACHINE     INPUT      INIT    COMPANY     FULLNAME */
 COMP(1983?,  tutor,    0,          0,      tutor,      tutor,     tutor,  "Tomy",   "Tomy Tutor" , 0)
 COMP(1982,   pyuuta,   tutor,      0,      tutor,      tutor,     pyuuta, "Tomy",   "Tomy Pyuuta" , 0)

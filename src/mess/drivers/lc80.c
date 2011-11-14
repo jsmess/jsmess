@@ -7,7 +7,7 @@
     When first started, the screen is blank. Wait about 8 seconds for
     it to introduce itself, then you may use it or paste to it.
     The decimal points indicate which side of the display you will
-    be updating. 
+    be updating.
 
     Pasting:
         0-F : as is

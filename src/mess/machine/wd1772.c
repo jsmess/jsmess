@@ -170,7 +170,7 @@ void wd1772_t::seek_continue()
 				// When stepping with update, the track register is updated before seeking.
 				// Important for the sam coupe format code.
 				if(main_state == STEP && (command & 0x10))
-					track += last_dir ? -1 : 1;					
+					track += last_dir ? -1 : 1;
 			}
 			counter++;
 			sub_state = SEEK_WAIT_STEP_TIME;
@@ -1063,7 +1063,7 @@ bool wd1772_t::write_one_bit(attotime limit)
 
 void wd1772_t::live_write_raw(UINT16 raw)
 {
-	//	logerror("write %04x %04x\n", raw, cur_live.crc);
+	//  logerror("write %04x %04x\n", raw, cur_live.crc);
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = raw & 1;
 }
@@ -1082,7 +1082,7 @@ void wd1772_t::live_write_mfm(UINT8 mfm)
 	}
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = context;
-	//	logerror("write %02x   %04x %04x\n", mfm, cur_live.crc, raw);
+	//  logerror("write %02x   %04x %04x\n", mfm, cur_live.crc, raw);
 }
 
 void wd1772_t::live_run(attotime limit)
@@ -1515,7 +1515,7 @@ int wd1772_t::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, att
 		if(counter & 0x800)
 			break;
 	}
-	//	fprintf(stderr, "first transition, time=%03x, inc=%3d\n", transition_time, increment);
+	//  fprintf(stderr, "first transition, time=%03x, inc=%3d\n", transition_time, increment);
 	int bit = transition_time != 0xffff;
 
 	if(transition_time != 0xffff) {

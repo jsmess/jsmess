@@ -7,50 +7,50 @@
 
 /*
 
-	How to create HDD image:
-	------------------------
-	chdman -createblankhd necd5126a.chd 615 4 17 512
+    How to create HDD image:
+    ------------------------
+    chdman -createblankhd necd5126a.chd 615 4 17 512
 
-	How to format HDD:
-	------------------
-	mf(2,0)
-	mf(2,0)
-	abcenix
-	sas/format/format
-	sa(40,0)
-	y
-	5
-	necd5126a
-	
-	How to install OS:
-	------------------
-	mf(2,0)
-	mf(2,0)
-	abcenix
-	loadsys1
-	<enter>
-	<enter>
-	
+    How to format HDD:
+    ------------------
+    mf(2,0)
+    mf(2,0)
+    abcenix
+    sas/format/format
+    sa(40,0)
+    y
+    5
+    necd5126a
+
+    How to install OS:
+    ------------------
+    mf(2,0)
+    mf(2,0)
+    abcenix
+    loadsys1
+    <enter>
+    <enter>
+
 */
 
 /*
 
     TODO:
 
-	- segment/page RAM addresses are not correctly decoded, "sas/format/format" can't find the SASI interface because of this
-		forcetask0 1 t0 0 t1 0 t2 0 t3 0
-		sega19 0 task 0
-		sega 000 segd 00 pga 008 pgd 4058 virtual 02c730 (should be 004730)
-		
+    - segment/page RAM addresses are not correctly decoded, "sas/format/format" can't find the SASI interface because of this
+        forcetask0 1 t0 0 t1 0 t2 0 t3 0
+        sega19 0 task 0
+        sega 000 segd 00 pga 008 pgd 4058 virtual 02c730 (should be 004730)
+
     - floppy
         - internal floppy is really drive 2, but wd17xx.c doesn't like having NULL drives
     - short/long reset (RSTBUT)
     - CIO
-		- optimize timers!
+        - optimize timers!
         - port C, open drain output bit PC1 (RTC/NVRAM data)
     - hard disk
-		- 4105 SASI interface card
-		- SASI interface (scsibus.c)
+        - 4105 SASI interface card
+        - SASI interface (scsibus.c)
 
 */
 
@@ -269,12 +269,12 @@ UINT8 abc1600_state::read_io(offs_t offset)
 	{
 		// card select pulse
 		UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
-		
+
 		m_bus0i->cs_w(cs);
 		m_bus0x->cs_w(cs);
 		m_bus1->cs_w(cs);
 		m_bus2->cs_w(cs);
-		
+
 		// card select b?
 		m_csb = m_bus2->csb_r();
 		m_csb |= m_bus1->csb_r() << 1;
@@ -284,9 +284,9 @@ UINT8 abc1600_state::read_io(offs_t offset)
 		m_csb |= m_bus0x->xcsb5_r() << 5;
 		m_csb |= m_bus0x->csb_r() << 6;
 		m_csb |= m_bus0i->csb_r() << 7;
-		
+
 		m_bus0 = !((m_csb & 0xfc) == 0xfc);
-		
+
 		if (X11)
 		{
 			if (A4)
@@ -302,38 +302,38 @@ UINT8 abc1600_state::read_io(offs_t offset)
 				if (m_bus0)
 				{
 					/*
-						
-						bit		description
-						
-						0		1
-						1		1
-						2		LXCSB2*
-						3		LXCSB3*
-						4		LXCSB4*
-						5		LXCSB5*
-						6		LCSB*-0
-						7		LCSB*-0I
-						
-					*/
-					
+
+                        bit     description
+
+                        0       1
+                        1       1
+                        2       LXCSB2*
+                        3       LXCSB3*
+                        4       LXCSB4*
+                        5       LXCSB5*
+                        6       LCSB*-0
+                        7       LCSB*-0I
+
+                    */
+
 					data = (m_csb & 0xfc) | 0x03;
 				}
 				else
 				{
 					/*
-						
-						bit		description
-						
-						0		LCSB*-2
-						1		LCSB*-1
-						2		1
-						3		1
-						4		1
-						5		1
-						6		1
-						7		1
-						
-					*/
+
+                        bit     description
+
+                        0       LCSB*-2
+                        1       LCSB*-1
+                        2       1
+                        3       1
+                        4       1
+                        5       1
+                        6       1
+                        7       1
+
+                    */
 
 					data = 0xfc | (m_csb & 0x03);
 				}
@@ -344,7 +344,7 @@ UINT8 abc1600_state::read_io(offs_t offset)
 		else
 		{
 			data = 0xff;
-			
+
 			switch ((offset >> 1) & 0x07)
 			{
 			case 0: // INP
@@ -391,7 +391,7 @@ UINT8 abc1600_state::read_io(offs_t offset)
 
 				logerror("%s OPS %02x: %02x\n", machine().describe_context(), cs, data);
 				break;
-				
+
 			default:
 				logerror("%s Unmapped read from virtual I/O %06x\n", machine().describe_context(), offset);
 			}
@@ -498,17 +498,17 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 	else
 	{
 		UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
-		
+
 		m_bus0i->cs_w(cs);
 		m_bus0x->cs_w(cs);
 		m_bus1->cs_w(cs);
 		m_bus2->cs_w(cs);
-		
+
 		switch ((offset >> 1) & 0x07)
 		{
 		case 0: // OUT
 			logerror("%s OUT %02x: %02x\n", machine().describe_context(), cs, data);
-		
+
 			if (m_bus0)
 			{
 				m_bus0i->out_w(data);
@@ -523,7 +523,7 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 
 		case 2: // C1
 			logerror("%s C1 %02x: %02x\n", machine().describe_context(), cs, data);
-		
+
 			if (m_bus0)
 			{
 				m_bus0i->c1_w(data);
@@ -533,12 +533,12 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 			{
 				m_bus1->c1_w(data);
 				m_bus2->c1_w(data);
-			}			
+			}
 			break;
 
 		case 3: // C2
 			logerror("%s C2 %02x: %02x\n", machine().describe_context(), cs, data);
-		
+
 			if (m_bus0)
 			{
 				m_bus0i->c2_w(data);
@@ -548,12 +548,12 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 			{
 				m_bus1->c2_w(data);
 				m_bus2->c2_w(data);
-			}			
+			}
 			break;
 
 		case 4: // C3
 			logerror("%s C3 %02x: %02x\n", machine().describe_context(), cs, data);
-		
+
 			if (m_bus0)
 			{
 				m_bus0i->c3_w(data);
@@ -563,12 +563,12 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 			{
 				m_bus1->c3_w(data);
 				m_bus2->c3_w(data);
-			}			
+			}
 			break;
 
 		case 5: // C4
 			logerror("%s C4 %02x: %02x\n", machine().describe_context(), cs, data);
-		
+
 			if (m_bus0)
 			{
 				m_bus0i->c4_w(data);
@@ -578,9 +578,9 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 			{
 				m_bus1->c4_w(data);
 				m_bus2->c4_w(data);
-			}			
+			}
 			break;
-			
+
 		default:
 			logerror("%s Unmapped write %02x to virtual I/O %06x\n", machine().describe_context(), data, offset);
 		}
@@ -642,7 +642,7 @@ offs_t abc1600_state::translate_address(offs_t offset, int *nonx, int *wp)
 	UINT16 page_data = m_page_ram[pga];
 
 	offs_t virtual_offset = ((page_data & 0x3ff) << 11) | (offset & 0x7ff);
-	
+
 	if (PAGE_NONX)
 	{
 		//logerror("Bus error %06x : %06x\n", offset, virtual_offset);
@@ -1047,7 +1047,7 @@ inline void abc1600_state::update_drdy0()
 	{
 		// BUS0I/BUS0X
 		int trrq0 = m_bus0i->trrq_r() & m_bus0x->trrq_r();
-		
+
 		m_dma0->rdy_w(trrq0);
 	}
 }
@@ -1278,10 +1278,10 @@ WRITE8_MEMBER( abc1600_state::spec_contr_reg_w )
 
 	case 6: // SYSSCC
 		m_sysscc = state;
-		
+
 		m_cio->pb5_w(!state);
 		m_bus1->pren_w(!state);
-		
+
 		update_drdy1();
 		break;
 
@@ -1504,7 +1504,7 @@ READ8_MEMBER( abc1600_state::cio_pa_r )
     */
 
 	UINT8 data = 0;
-	
+
 	data |= m_bus2->int_r();
 	data |= m_bus1->int_r() << 1;
 	data |= m_bus0x->xint2_r() << 2;
@@ -1513,7 +1513,7 @@ READ8_MEMBER( abc1600_state::cio_pa_r )
 	data |= m_bus0x->xint5_r() << 5;
 	data |= m_bus0x->int_r() << 6;
 	data |= m_bus0i->int_r() << 7;
-	
+
 	return data;
 }
 
@@ -1689,8 +1689,8 @@ static ABC99_INTERFACE( abc99_intf )
 
 static SLOT_INTERFACE_START( abc1600bus_cards )
 	SLOT_INTERFACE("4105", LUXOR_4105) // SASI interface
-//	SLOT_INTERFACE("4077", LUXOR_4077) // Winchester controller
-//	SLOT_INTERFACE("4004", LUXOR_4004) // ICOM I/O (Z80, Z80PIO, Z80SIO/2, Z80CTC, 2 Z80DMAs, 2 PROMs, 64KB RAM)
+//  SLOT_INTERFACE("4077", LUXOR_4077) // Winchester controller
+//  SLOT_INTERFACE("4004", LUXOR_4004) // ICOM I/O (Z80, Z80PIO, Z80SIO/2, Z80CTC, 2 Z80DMAs, 2 PROMs, 64KB RAM)
 SLOT_INTERFACE_END
 
 static ABC1600BUS_INTERFACE( bus0i_intf )
@@ -1758,10 +1758,10 @@ static IRQ_CALLBACK( abc1600_int_ack )
 	case M68K_IRQ_5:
 		data = state->m_dart->m1_r();
 		break;
-		
+
 	case M68K_IRQ_7:
 		state->m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
-		
+
 		data = M68K_INT_ACK_AUTOVECTOR;
 		break;
 	}
@@ -1825,7 +1825,7 @@ void abc1600_state::machine_reset()
 	// disable display
 	m_clocks_disabled = 1;
 	m_endisp = 0;
-	
+
 	// clear NMI
 	m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
 }

@@ -313,7 +313,7 @@ public:
     int m_dafb_scsi1_drq, m_dafb_scsi2_drq;
     UINT8 m_dafb_mode;
     UINT32 m_dafb_base, m_dafb_stride;
-             
+
     // this is shared among all video setups with vram
 	UINT32 *m_vram;
 

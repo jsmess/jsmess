@@ -565,11 +565,11 @@ void isa8_ega_device::device_start()
 	m_videoram = auto_alloc_array(machine(), UINT8, 256*1024);
 
 	m_crtc_ega = subdevice(EGA_CRTC_NAME);
-	
+
 	m_isa->install_rom(this, 0xc0000, 0xc3fff, 0, 0, "ega", "user2");
 	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_w), this));
 	m_isa->install_device(0x3c0, 0x3cf, 0, 0, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_w), this));
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_w), this));	
+	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_w), this));
 }
 
 //-------------------------------------------------
@@ -577,7 +577,7 @@ void isa8_ega_device::device_start()
 //-------------------------------------------------
 
 void isa8_ega_device::device_reset()
-{	
+{
 	m_feature_control = 0;
 
 	memset(&m_attribute,0,sizeof(m_attribute));
@@ -588,7 +588,7 @@ void isa8_ega_device::device_reset()
 	m_vsync = 0;
 	m_vblank = 0;
 	m_display_enable = 0;
-	
+
 	install_banks();
 
 	m_update_row = NULL;
@@ -656,7 +656,7 @@ void isa8_ega_device::install_banks()
 		m_isa->unmap_bank(0xb8000, 0xbffff,0,0);
 	}
 }
-	
+
 static SCREEN_UPDATE( pc_ega )
 {
 	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(screen->owner());

@@ -38,11 +38,11 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
-	
+
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( sasi_bsy_w );
 	DECLARE_WRITE_LINE_MEMBER( sasi_io_w );
-	DECLARE_WRITE_LINE_MEMBER( sasi_req_w );	
+	DECLARE_WRITE_LINE_MEMBER( sasi_req_w );
 
 protected:
     // device-level overrides
@@ -59,10 +59,10 @@ protected:
 	virtual void abc1600bus_c1(UINT8 data);
 	virtual void abc1600bus_c3(UINT8 data);
 	virtual void abc1600bus_c4(UINT8 data);
-	
+
 private:
 	inline void update_trrq_int();
-		
+
 	abc1600bus_slot_device *m_slot;
 
 	required_device<device_t> m_sasibus;

@@ -170,11 +170,11 @@ READ8_MEMBER( c8280_device::riot1_pa_r )
 
         bit     description
 
-        PA0     
-        PA1     
-        PA2     
-        PA3     
-        PA4     
+        PA0
+        PA1
+        PA2
+        PA3
+        PA4
         PA5     EOII
         PA6     DAVI
         PA7     _ATN
@@ -206,9 +206,9 @@ WRITE8_MEMBER( c8280_device::riot1_pa_w )
         PA2     RFDO
         PA3     EOIO
         PA4     DAVO
-        PA5     
-        PA6     
-        PA7     
+        PA5
+        PA6
+        PA7
 
     */
 
@@ -239,9 +239,9 @@ READ8_MEMBER( c8280_device::riot1_pb_r )
         PB0     DEVICE NUMBER SELECTION
         PB1     DEVICE NUMBER SELECTION
         PB2     DEVICE NUMBER SELECTION
-        PB3     
-        PB4     
-        PB5     
+        PB3
+        PB4
+        PB5
         PB6     DACI
         PB7     RFDI
 
@@ -267,14 +267,14 @@ WRITE8_MEMBER( c8280_device::riot1_pb_w )
 
         bit     description
 
-        PB0     
-        PB1     
-        PB2     
+        PB0
+        PB1
+        PB2
         PB3     ACT LED 1
         PB4     ACT LED 0
         PB5     ERR LED
-        PB6     
-        PB7     
+        PB6
+        PB7
 
     */
 
