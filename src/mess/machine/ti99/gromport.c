@@ -16,6 +16,9 @@ typedef UINT8	(*read8z_device_func)  (ATTR_UNUSED device_t *device, ATTR_UNUSED 
    the first 16 banks. */
 #define NUMBER_OF_CARTRIDGE_SLOTS 8
 
+#define VERBOSE 2
+#define LOG logerror
+
 typedef int assmfct(device_t *);
 
 DECLARE_LEGACY_CART_SLOT_DEVICE(TI99_CARTRIDGE_PCB_NONE, ti99_cartridge_pcb_none);
@@ -112,15 +115,6 @@ typedef struct _ti99_multicart_state
 	/* GK support. */
 	int		gk_slot;
 	int		gk_guest_slot;
-
-	/* Legacy support. */
-	// Counts the number of slots which currently contain legacy format
-	// cartridge images.
-	int legacy_slots;
-
-	// Counts the number of slots which currently contain new format
-	// cartridge images.
-	int multi_slots;
 
 	/* Used to cache the switch settings. */
 	UINT8 gk_switch[8];
@@ -223,19 +217,14 @@ static int get_gk_switch(device_t *cartsys, int number)
 	return cartslots->gk_switch[number];
 }
 
-static int in_legacy_mode(device_t *device)
-{
-	ti99_multicart_state *cartslots = get_safe_token(device);
-	return ((cartslots->legacy_slots>0) && (cartslots->multi_slots==0));
-}
-
 /*
     Activates a slot in the multi-cartridge extender.
 */
 static void cartridge_slot_set(device_t *cartsys, UINT8 slotnumber)
 {
 	ti99_multicart_state *cartslots = get_safe_token(cartsys);
-//  if (cartslots->active_slot != slotnumber) printf("Setting cartslot to %d\n", slotnumber);
+	if (VERBOSE>2)
+		if (cartslots->active_slot != slotnumber) LOG("ti99: gromport: Setting cartslot to %d\n", slotnumber);
 	if (cartslots->fixed_slot==AUTO)
 		cartslots->active_slot = slotnumber;
 	else
@@ -302,6 +291,8 @@ static cartridge_t *assemble_common(device_t *cartslot)
 	int slotnumber = get_index_from_tagname(cartslot)-1;
 	assert(slotnumber>=0 && slotnumber<NUMBER_OF_CARTRIDGE_SLOTS);
 
+	if (VERBOSE>1) LOG("ti99: gromport: mounting cartridge in slot %d\n", slotnumber);
+
 	/* There is a cartridge in this slot, check the maximum slot number. */
 	if (cartslots->next_free_slot <= slotnumber)
 	{
@@ -326,7 +317,6 @@ static cartridge_t *assemble_common(device_t *cartslot)
 	{
 		cartridge->rom_ptr = (UINT8 *)socketcont;
 		cartridge->rom_size = reslength;
-//      printf("set rom ptr = %lx, romlength = %04x, data = %02x %02x\n", cartridge->rom_ptr, cartridge->rom_size, cartridge->rom_ptr[0], cartridge->rom_ptr[1]);
 	}
 
 	socketcont = cartslot_get_socket(cartslot, "rom2_socket");
@@ -376,8 +366,7 @@ static void set_pointers(device_t *pcb, int index)
 
 /*****************************************************************************
   Cartridge type: None
-    This PCB device is just a pseudo device; the legacy mode is handled
-    by dedicated functions.
+    This PCB device is just a pseudo device
 ******************************************************************************/
 static DEVICE_START(ti99_pcb_none)
 {
@@ -416,7 +405,7 @@ static READ8Z_DEVICE_HANDLER( read_cart_std )
 
 static WRITE8_DEVICE_HANDLER( write_cart_std )
 {
-	logerror("Write access to cartridge ROM at address %04x ignored\n", offset);
+	if (VERBOSE>1) LOG("ti99: gromport: Write access to cartridge ROM at address %04x ignored\n", offset);
 }
 
 /*
@@ -529,12 +518,12 @@ static int assemble_paged(device_t *image)
 	cart = assemble_common(image);
 	if (cart->rom_ptr==NULL)
 	{
-		logerror("Missing ROM for paged cartridge");
+		if (VERBOSE>1) LOG("ti99: gromport: Missing ROM for paged cartridge");
 		return IMAGE_INIT_FAIL;
 	}
 	if (cart->rom2_ptr==NULL)
 	{
-		logerror("Missing second ROM for paged cartridge");
+		if (VERBOSE>1) LOG("ti99: gromport: Missing second ROM for paged cartridge");
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -579,13 +568,13 @@ static WRITE8_DEVICE_HANDLER( write_cart_minimem )
 
 	if ((offset & 0x1000)==0x0000)
 	{
-		logerror("Write access to cartridge ROM at address %04x ignored", offset);
+		if (VERBOSE>1) LOG("ti99: gromport: Write access to cartridge ROM at address %04x ignored", offset);
 	}
 	else
 	{
 		if (cartridge->ram_ptr==NULL)
 		{
-			logerror("No cartridge RAM at address %04x", offset);
+			if (VERBOSE>1) LOG("ti99: gromport: No cartridge RAM at address %04x", offset);
 			/* TODO: Check for consistency with the GROM memory handling. */
 		}
 		else
@@ -602,19 +591,19 @@ static int assemble_minimem(device_t *image)
 	cart = assemble_common(image);
 	if (cart->grom_size==0)
 	{
-		logerror("Missing GROM for Mini Memory");
+		if (VERBOSE>1) LOG("ti99: gromport: Missing GROM for Mini Memory");
 		// should not fail here because there may be variations of
 		// cartridges which do not use all parts
 //      return IMAGE_INIT_FAIL;
 	}
 	if (cart->rom_size==0)
 	{
-		logerror("Missing ROM for Mini Memory");
+		if (VERBOSE>1) LOG("ti99: gromport: Missing ROM for Mini Memory");
 //      return IMAGE_INIT_FAIL;
 	}
 	if (cart->ram_size==0)
 	{
-		logerror("Missing RAM for Mini Memory");
+		if (VERBOSE>1) LOG("ti99: gromport: Missing RAM for Mini Memory");
 //      return IMAGE_INIT_FAIL;
 	}
 
@@ -674,7 +663,7 @@ static READ8Z_DEVICE_HANDLER( read_cart_cru )
 	// BNKS1   LDCR  R1,0        Switch Banks
 	//         SRL   R0,1        Restore Bank Number (optional)
 	//         RT
-	logerror("Superspace: CRU accessed at %04x\n", offset);
+	if (VERBOSE>1) LOG("ti99: gromport: Superspace: CRU accessed at %04x\n", offset);
 	if ((offset & 1) == 0 || offset > 7)
 		*value = 0;
 
@@ -689,7 +678,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_cru )
 	cartridge_t *cartridge = pcb->cartridge;
 	// data is bit
 	// offset is address
-	logerror("Superspace: CRU accessed at %04x\n", offset);
+	if (VERBOSE>1) LOG("ti99: gromport: Superspace: CRU accessed at %04x\n", offset);
 	if (offset < 8)
 	{
 		if (data != 0)
@@ -731,7 +720,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_super )
 
 	if (cartridge->ram_ptr==NULL)
 	{
-		logerror("No cartridge RAM at address %04x", offset);
+		if (VERBOSE>1) LOG("ti99: gromport: No cartridge RAM at address %04x", offset);
 	}
 	else
 	{
@@ -747,7 +736,7 @@ static int assemble_super(device_t *image)
 	cart = assemble_common(image);
 	if (cart->ram_size==0)
 	{
-		logerror("Missing RAM for SuperSpace");
+		if (VERBOSE>1) LOG("ti99: gromport: Missing RAM for SuperSpace");
 		return IMAGE_INIT_FAIL;
 	}
 	return IMAGE_INIT_PASS;
@@ -925,7 +914,7 @@ static int assemble_paged379i(device_t *image)
 	cart = assemble_common(image);
 	if (cart->rom_ptr==NULL)
 	{
-		logerror("Missing ROM for paged cartridge");
+		if (VERBOSE>1) LOG("ti99: gromport: Missing ROM for paged cartridge");
 		return IMAGE_INIT_FAIL;
 	}
 	set_paged379i_bank(cart, 15);
@@ -1032,7 +1021,7 @@ static int assemble_pagedcru(device_t *image)
 	cart = assemble_common(image);
 	if (cart->rom_ptr==NULL)
 	{
-		logerror("Missing ROM for pagedcru cartridge");
+		if (VERBOSE>1) LOG("ti99: gromport: Missing ROM for pagedcru cartridge");
 		return IMAGE_INIT_FAIL;
 	}
 	cart->rom_page = 0;
@@ -1065,13 +1054,13 @@ static int assemble_gramkracker(device_t *image)
 
 	if (cart->grom_ptr==NULL)
 	{
-		logerror("Missing loader GROM for GRAM Kracker system");
+		if (VERBOSE>1) LOG("ti99: gromport: Missing loader GROM for GRAM Kracker system");
 		return IMAGE_INIT_FAIL;
 	}
 
 	if (cart->ram_size < 81920)
 	{
-		logerror("Missing or insufficient RAM for GRAM Kracker system");
+		if (VERBOSE>1) LOG("ti99: gromport: Missing or insufficient RAM for GRAM Kracker system");
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -1482,7 +1471,7 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 		// otherwise one cannot make use of multicart handling within such a
 		// custom LOAD function.
 		multicart_open_error me = multicart_open(image.device().machine().options(), image.filename(), image.device().machine().system().name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
-
+		if (VERBOSE>1) LOG("ti99: gromport: opened %s as cartridge\n", image.filename());
 		// Now that we have loaded the image files, let the PCB put them all
 		// together. This means we put the images in a structure which allows
 		// for a quick access by the memory handlers. Every PCB defines an
@@ -2027,11 +2016,6 @@ static READ8Z_DEVICE_HANDLER( ti99_cart_gk_rz )
 	if (cartslots->gk_guest_slot != -1)
 	{
 		gkguestcart = &cartslots->cartridge[cartslots->gk_guest_slot];
-		// Legacy mode is not supported with the GK
-		if (in_legacy_mode(device))
-		{
-			return;
-		}
 		//      printf("accessing cartridge in slot %d\n", slot);
 		ti99_pcb_t *pcbdef = get_safe_pcb_token(gkguestcart->pcb);
 		//      printf("address=%lx, offset=%lx\n", pcbdef, offset);
@@ -2082,12 +2066,6 @@ static WRITE8_DEVICE_HANDLER( ti99_cart_gk_w )
 	if (cartslots->gk_guest_slot != -1)
 	{
 		gkguestcart = &cartslots->cartridge[cartslots->gk_guest_slot];
-		// Legacy mode is not supported with the GK
-		if (in_legacy_mode(device))
-		{
-			return;
-		}
-
 		ti99_pcb_t *pcbdef = get_safe_pcb_token(gkguestcart->pcb);
 			(*pcbdef->write)(gkguestcart->pcb, offset, data);
 	}
@@ -2152,7 +2130,7 @@ static WRITE8_DEVICE_HANDLER( ti99_cart_cru_gk_w )
 
 /*****************************************************************************/
 #define TI99_CARTRIDGE_SLOT(p)  MCFG_MULTICARTSLOT_ADD(p) \
-	MCFG_MULTICARTSLOT_EXTENSION_LIST("rpk,bin") \
+	MCFG_MULTICARTSLOT_EXTENSION_LIST("rpk") \
 	MCFG_MULTICARTSLOT_PCBTYPE(0, "none", TI99_CARTRIDGE_PCB_NONE) \
 	MCFG_MULTICARTSLOT_PCBTYPE(1, "standard", TI99_CARTRIDGE_PCB_STD) \
 	MCFG_MULTICARTSLOT_PCBTYPE(2, "paged", TI99_CARTRIDGE_PCB_PAGED) \

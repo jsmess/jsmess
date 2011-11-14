@@ -1605,7 +1605,7 @@ static void format_floppy_track(device_t *device, int flags)
 		buffer[index++] = curr_sect;
 		buffer[index++] = curr_size;
 
-		if (j==0) 
+		if (j==0)
 			if (VERBOSE>6) LOG("current_floppy=%s, format track %d, head %d\n",  current_floppy->tag(), curr_cyl, curr_head);
 
 		/* Calculate CRC16 (5 bytes for ID) */
