@@ -1,4 +1,69 @@
-﻿0.143u9
+﻿0.144
+
+New System Drivers Supported:
+-----------------------------
+- Sanyo MBC-200 [Matt Dawson,Angelo Salese,Miodrag Milanovic]
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+- Juicebox [Tim Schuerewegen]
+- Avigo [Sandro Ronco]
+
+Skeleton drivers:
+-----------------
+- BK-8T Terminal [DATAsoft]
+
+System Driver Changes:
+----------------------
+- ti99: Fixed GROM address counter handling and GRAMKracker's 
+	wrong RAM pointer [Michael Zapf] 
+- ti99: Fixed GRAMKracker's write protection [Michael Zapf]
+- pc1512: Added a dump of the WD1015 MCU. [John Elliott]
+- mac: Further improvements to Quadra 700; System 7.5.0 (and probably 7.1) 
+	will boot, but system remains NOT_WORKING due to many known flaws.
+	Fixed slot interrupts on IIci so 4-head operation is possible. [R. Belmont]
+- iq151: Added slot interface and moved video32/video64/disc2 
+	emulation into slots. [Sandro Ronco]
+- iq151: Added emulation of Grafik module. [Sandro Ronco]
+- amiga: a number of games seem to get confused when there's two drives 
+	(they wait for a index pulse on the second) [O. Galibert]
+- mac: Fixed name of Asante MC3NB card, added Apple NuBus Ethernet Card 
+	which the Asante is a perfect clone of, fixed 24-bit mirroring so 
+	ethernet cards work in all slots [R. Belmont]
+- amstrad: Added support for ROMbox, SSA-1 speech synth and DK'Tronics speech
+  synth to be used in a daisy-chain of expansion devices.  [Barry Rodewald]
+- samcoupe: Hook up the new wd1772, format support incomplete though [O. Galibert]
+- abc1600: Added portrait/landscape layouts. [Curt Coder]
+- abc800: Refactored the ABC bus to single-slot (as it really is). [Curt Coder]
+- aes: cleanup of code, and made aes use neogeo softlist from MAME [David Haywood]
+- mac: fix SCC so AppleTalk check fails gracefully instead of locking up;
+	removed ROM patch on II/IIx/IIcx since it's no longer necessary [R. Belmont]
+
+Software Lists:
+----------------
+- snes.xml: new dump added, NHL '97 Revision A [badinsults]
+- snes.xml: redumped and profiled arround 100 cartridges [MESSfan]
+- lynx.xml: stripped headers of dumps, removed bad dumps, added auto-rotate code [Huygens]
+- astrocde.xml: fix errors and add several new or previously missing dumps [ranger_lennier]
+
+Source Changes:
+----------------
+- amigafdc: Upgrade and fixes [O. Galibert]
+- wd1772: Adapt the pll to a 8MHz frequency [O. Galibert]
+- ipf: Describe the remaining fields [O. Galibert, SPS]
+- floppy,wd1772: First stab at write support, in-memory only for now [O. Galibert]
+- ipf: weak bits are usually badly-written/not written zones [O. Galibert]
+- floppy: Slot-ize the floppies so that you can choose 
+	how many are connected [O. Galibert, R. Belmont]
+- ami_dsk: ADF write support [O. Galibert]
+- refactored the Commodore IEC bus to use slots. You can now connect up 
+	to 4 IEC floppy drives of your choice (1540/1541/1571/1581) to 
+	a VIC-20, C64, C128, C16, Plus-4, or C65. [Curt Coder]
+- refactored the IEEE-488 bus to use slots. You can now connect up 
+	to 4 IEEE-488 floppy drives of your choice (C2040/C3040/C4040/
+	C8050/C8250/SFD1001) to a Commodore PET or CBMB. [Curt Coder]
+
+0.143u9
 
 New System Drivers Supported:
 -----------------------------
