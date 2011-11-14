@@ -3,8 +3,8 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <title>mess:howto</title>
 <meta name="generator" content="DokuWiki Darcs --">
-<meta name="robots" content="index,follow">
-<meta name="date" content="2011-03-10T03:52:39+0100">
+<meta name="robots" content="noindex,nofollow">
+<meta name="date" content="2011-11-14T16:37:44+0100">
 <meta name="keywords" content="mess,howto">
 </head>
 <body>
@@ -24,12 +24,50 @@ important aspects of the <acronym title="Multi Emulator Super System">MESS</acro
 </p>
 
 </div>
-<!-- SECTION "MESS User's Manual" [1-348] -->
+
+<h5><a name="shortcuts" id="shortcuts">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#getting_started" title="mess:howto ↵" class="wikilink1">Getting Started</a> </td><td class="col1"> <a href="#consoles_emulation" title="mess:howto ↵" class="wikilink1">Consoles Emulation</a> </td><td class="col2"> <a href="#internal_ui_options" title="mess:howto ↵" class="wikilink1">Internal UI Options</a> </td><td class="col3"> <a href="#controller_options" title="mess:howto ↵" class="wikilink1">Controller Options</a> </td><td class="col4"> <a href="#system_specific_options" title="mess:howto ↵" class="wikilink1">System Specific Options</a> </td>
+	</tr>
+	<tr class="row1">
+		<td class="col0"> <a href="#common_issues" title="mess:howto ↵" class="wikilink1">Common Issues</a> </td><td class="col1"> <a href="#computers_emulation" title="mess:howto ↵" class="wikilink1">Computers Emulation</a> </td><td class="col2"> <a href="#new_ui_options" title="mess:howto ↵" class="wikilink1">New UI Options</a> </td><td class="col3"> <a href="#cheat_options" title="mess:howto ↵" class="wikilink1">Cheat Options</a> </td><td class="col4"> <a href="#mess_tools" title="mess:howto ↵" class="wikilink1">MESS Tools</a> </td>
+	</tr>
+	<tr class="row2">
+		<td class="col0"> <a href="#folder_files" title="mess:howto ↵" class="wikilink1">Folder &amp; Files</a> </td><td class="col1"> <a href="#chess_computers_emulation" title="mess:howto ↵" class="wikilink1">Chess Computers Emulation</a> </td><td class="col2"> <a href="#gui_options" title="mess:howto ↵" class="wikilink1">GUI Options</a> </td><td class="col3"> <a href="#save_options" title="mess:howto ↵" class="wikilink1">Save Options</a> </td><td class="col4"> <a href="#mess_error_messages" title="mess:howto ↵" class="wikilink1">MESS Error Messages</a> </td>
+	</tr>
+	<tr class="row3">
+		<td class="col0"> <a href="#command_line_options" title="mess:howto ↵" class="wikilink1">Command Line Options</a> </td><td class="col1"> <a href="#calculators_emulation" title="mess:howto ↵" class="wikilink1">Calculators Emulation</a> </td><td class="col2"> <a href="#video_options1" title="mess:howto ↵" class="wikilink1">Video Options</a> </td><td class="col3"> <a href="#snapshot_options" title="mess:howto ↵" class="wikilink1">Snapshot Options</a> </td><td class="col4"> </td>
+	</tr>
+	<tr class="row4">
+		<td class="col0"> <a href="#software_lists" title="mess:howto ↵" class="wikilink1">Software Lists</a> </td><td class="col1"> <a href="#media_emulation" title="mess:howto ↵" class="wikilink1">Media Emulation</a> </td><td class="col2"> <a href="#sound_options" title="mess:howto ↵" class="wikilink1">Sound Options</a> </td><td class="col3"> <a href="#recording_options" title="mess:howto ↵" class="wikilink1">Recording Options</a> </td><td class="col4"> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "MESS User's Manual" [1-1329] -->
 <h1><a name="getting_started" id="getting_started">Getting Started</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "Getting Started" [349-379] -->
+
+<h5><a name="shortcuts1" id="shortcuts1">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#mess_-_an_introduction" title="mess:howto ↵" class="wikilink1">MESS - An Introduction</a> </td><td class="col1"> <a href="#supported_os" title="mess:howto ↵" class="wikilink1">Supported OS</a> </td><td class="col2"> <a href="#using_mess" title="mess:howto ↵" class="wikilink1">Using MESS</a> </td><td class="col3"> <a href="#pause_mess" title="mess:howto ↵" class="wikilink1">Pause MESS</a> </td><td class="col4"> <a href="#quit_mess" title="mess:howto ↵" class="wikilink1">Quit MESS</a> </td>
+	</tr>
+	<tr class="row1">
+		<td class="col0"> <a href="#purpose_of_mess" title="mess:howto ↵" class="wikilink1">Purpose of MESS</a> </td><td class="col1"> <a href="#installing_mess" title="mess:howto ↵" class="wikilink1">Installing MESS</a> </td><td class="col2"> <a href="#compiling_mess" title="mess:howto ↵" class="wikilink1">Compiling MESS</a> </td><td class="col3"> <a href="#access_mess_internal_ui" title="mess:howto ↵" class="wikilink1">Access MESS Internal UI</a> </td><td class="col4"> <a href="#frontends" title="mess:howto ↵" class="wikilink1">Frontends</a> </td>
+	</tr>
+	<tr class="row2">
+		<td class="col0"> <a href="#systems_emulated_by_mess" title="mess:howto ↵" class="wikilink1">Systems Emulated by MESS</a> </td><td class="col1"> <a href="#requirements" title="mess:howto ↵" class="wikilink1">Requirements</a> </td><td class="col2"> <a href="#start_mess" title="mess:howto ↵" class="wikilink1">Start MESS</a> </td><td class="col3"> <a href="#access_mess_internal_new_ui" title="mess:howto ↵" class="wikilink1">Access MESS Internal New UI</a> </td><td class="col4"> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "Getting Started" [1330-1935] -->
 <h2><a name="mess_-_an_introduction" id="mess_-_an_introduction">MESS - An Introduction</a></h2>
 <div class="level2">
 
@@ -46,11 +84,11 @@ side-effect, <acronym title="Multi Emulator Super System">MESS</acronym> allows 
 </p>
 
 <p>
-<acronym title="Multi Emulator Super System">MESS</acronym> can currently emulate over 450 individual systems from the last 5 decades.
+<acronym title="Multi Emulator Super System">MESS</acronym> can currently emulate over 550 individual systems from the last 5 decades.
 </p>
 
 </div>
-<!-- SECTION "MESS - An Introduction" [380-1164] -->
+<!-- SECTION "MESS - An Introduction" [1936-2720] -->
 <h2><a name="purpose_of_mess" id="purpose_of_mess">Purpose of MESS</a></h2>
 <div class="level2">
 
@@ -60,19 +98,19 @@ The primary purpose of <acronym title="Multi Emulator Super System">MESS</acrony
 </p>
 
 </div>
-<!-- SECTION "Purpose of MESS" [1165-1751] -->
+<!-- SECTION "Purpose of MESS" [2721-3307] -->
 <h2><a name="systems_emulated_by_mess" id="systems_emulated_by_mess">Systems Emulated by MESS</a></h2>
 <div class="level2">
 
 <p>
 
-<a href="http://mess.redump.net/mess:drivers" class="wikilink1" title="mess:drivers">MESS wiki pages</a>
- contain a complete list of the systems currently emulated, divided per 
-source drivers. As you will notice, being supported does not always mean
- that the status of the emulation is perfect. You may want 
+<a href="http://mess.redump.net/supported_systems" class="wikilink1" title="supported_systems">MESS wiki pages</a>
+ contain a complete list of the systems currently emulated. As you will 
+notice, being supported does not always mean that the status of the 
+emulation is perfect. You may want 
 </p>
 <ol>
-<li class="level1"><div class="li"> to check the status of the emulation in the wiki pages of each system, accessible from <a href="http://mess.redump.net/mess:drivers" class="wikilink1" title="mess:drivers">this page</a> (e.g. for Myarc Geneve, from the page for <a href="http://mess.redump.net/mess:drivers:geneve" class="wikilink1" title="mess:drivers:geneve">geneve.c driver</a> you can reach the pages for both <a href="http://mess.redump.net/mess:drivers:geneve:geneve" class="wikilink1" title="mess:drivers:geneve:geneve">geneve</a> and <a href="http://mess.redump.net/mess:drivers:geneve:genmod" class="wikilink1" title="mess:drivers:geneve:genmod">genmod</a>), </div>
+<li class="level1"><div class="li"> to check the status of the emulation in the wiki pages of each system, accessible from the <a href="http://mess.redump.net/mess:drivers" class="wikilink1" title="mess:drivers">drivers page</a> (e.g. for Myarc Geneve, from the page for <a href="http://mess.redump.net/mess:drivers:geneve" class="wikilink1" title="mess:drivers:geneve">geneve.c driver</a> you can reach the pages for both <a href="http://mess.redump.net/mess:drivers:geneve:geneve" class="wikilink1" title="mess:drivers:geneve:geneve">geneve</a> and <a href="http://mess.redump.net/mess:drivers:geneve:genmod" class="wikilink1" title="mess:drivers:geneve:genmod">genmod</a>), </div>
 </li>
 <li class="level1"><div class="li"> to read the corresponding <a href="http://mess.redump.net/sysinfo" class="wikilink1" title="sysinfo">sysinfo.dat</a> entry in order to better understand which issues you may encounter while running a system in <acronym title="Multi Emulator Super System">MESS</acronym> (again, for Myarc Geneve you have to check <a href="http://mess.redump.net/sysinfo:geneve" class="wikilink1" title="sysinfo:geneve">this entry</a>). </div>
 </li>
@@ -93,7 +131,7 @@ at the <a href="http://www.mess.org/contacts.php" class="urlextern" title="http:
 </p>
 
 </div>
-<!-- SECTION "Systems Emulated by MESS" [1752-3155] -->
+<!-- SECTION "Systems Emulated by MESS" [3308-4695] -->
 <h2><a name="supported_os" id="supported_os">Supported OS</a></h2>
 <div class="level2">
 
@@ -108,7 +146,7 @@ both 32-bit and 64-bit executable can be built with no difficulties.
 </p>
 
 </div>
-<!-- SECTION "Supported OS" [3156-3510] -->
+<!-- SECTION "Supported OS" [4696-5050] -->
 <h2><a name="installing_mess" id="installing_mess">Installing MESS</a></h2>
 <div class="level2">
 
@@ -122,8 +160,7 @@ both 32-bit and 64-bit executable can be built with no difficulties.
 You simply have to download the latest binary archive available at <a href="http://www.mess.org/download.php" class="urlextern" title="http://www.mess.org/download.php" rel="nofollow">this page</a>
  and to extract its content to a folder. You will end up with many files
  (below you find explanations about some of these), and in particular 
-with mess.exe and messgui.exe. The former is the command line version of
- <acronym title="Multi Emulator Super System">MESS</acronym>, the latter is the <acronym title="Graphical User Interface">GUI</acronym> version of <acronym title="Multi Emulator Super System">MESS</acronym>. The installation procedure ends here. Easy, isn't it?
+with mess.exe and messui.exe. The former is the command line version of <acronym title="Multi Emulator Super System">MESS</acronym>, the latter is the <acronym title="Graphical User Interface">GUI</acronym> version of <acronym title="Multi Emulator Super System">MESS</acronym>. The installation procedure ends here. Easy, isn't it?
 </p>
 
 </div>
@@ -140,91 +177,53 @@ compile the source code by yourself. In the latter case, see <a href="#compiling
 </p>
 
 </div>
-<!-- SECTION "Installing MESS" [3511-4327] -->
-<h2><a name="compiling_mess" id="compiling_mess">Compiling MESS</a></h2>
-<div class="level2">
-
-</div>
-
-<h4><a name="mess_messui_windows" id="mess_messui_windows">MESS / MESSUI (Windows)</a></h4>
-<div class="level4">
-
-<p>
-
-Compiling <acronym title="Multi Emulator Super System">MESS</acronym> 
-for Windows requires the MinGW toolkit, a variant of GCC. MinGW comes 
-with a variant of GDB for debugging. Downloads of those tools can be 
-found on the <a href="http://mess.redump.net/build_tools" class="wikilink1" title="build_tools">build tools page</a>. Notice also that the same tools are used to compile <acronym title="Multiple Arcade Machine Emulator">MAME</acronym>. Hence, you can download them from the correspondent <a href="http://mamedev.org/tools/" class="urlextern" title="http://mamedev.org/tools/" rel="nofollow">MAME build tools page</a> as well.
-</p>
-
-<p>
-Then, you need the <acronym title="Multi Emulator Super System">MESS</acronym> source, of course. You can either take the whole tree from the svn repository (see <a href="http://www.mess.org/download.php" class="urlextern" title="http://www.mess.org/download.php" rel="nofollow">this page</a>), or download latest stable source (see again <a href="http://www.mess.org/download.php" class="urlextern" title="http://www.mess.org/download.php" rel="nofollow">this page</a>) and add to it the corresponding version of the <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> source. The svn is however the recommended choice, because of the frequent updates.
-</p>
-
-<p>
-Alternatively, you can use Visual C to compile <acronym title="Multi Emulator Super System">MESS</acronym>.
- Indeed, if you add MSVC_BUILD=1 at the compile command, the build will 
-use Visual C instead of MinGW. Note that MinGW is still required, as GNU
- make is used rather than nmake. Using the Microsoft compilers allows to
- use the Visual C debugger to debug <acronym title="Multi Emulator Super System">MESS</acronym>, but one does not get the full benefits of the IDE.
-</p>
-
-<p>
-You can also read our <a href="http://mess.redump.net/compiling_mess" class="wikilink1" title="compiling_mess">Compile wiki page</a>.
-</p>
-
-</div>
-
-<h4><a name="sdl_mess_windows_nix_mac_osx_other_os" id="sdl_mess_windows_nix_mac_osx_other_os">(SDL)MESS (Windows / *nix / Mac OSX / Other OS)</a></h4>
-<div class="level4">
-
-<p>
-
-Starting from version 0.137, the SDL component of <acronym title="Multiple Arcade Machine Emulator">MAME</acronym>/<acronym title="Multi Emulator Super System">MESS</acronym> are included in the official source. 
-</p>
-
-<p>
-Therefore, to compile <acronym title="Multi Emulator Super System">MESS</acronym> you only need to download the source from <a href="http://www.mess.org/download.php" class="urlextern" title="http://www.mess.org/download.php" rel="nofollow">this page</a> (and to add the <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> source), or to checkout the svn repository (see <a href="http://www.mess.org/download.php" class="urlextern" title="http://www.mess.org/download.php" rel="nofollow">this page</a> for instructions about svn). 
-</p>
-
-<p>
-Required packages and instructions about compiling (SDL)<acronym title="Multi Emulator Super System">MESS</acronym> are the same used to compile (SDL)<acronym title="Multiple Arcade Machine Emulator">MAME</acronym> and can be found following the links at <a href="http://www.bannister.org/forums/ubbthreads.php?ubb=showflat&amp;Number=35138#Post35138" class="urlextern" title="http://www.bannister.org/forums/ubbthreads.php?ubb=showflat&amp;Number=35138#Post35138" rel="nofollow">this thread</a>.
- In general, you only need a compatible version of GCC (sometimes latest
- bleeding edge versions may cause compile issues), the SDL libraries and
- the <acronym title="Multi Emulator Super System">MESS</acronym> &amp; <acronym title="Multiple Arcade Machine Emulator">MAME</acronym>
- sources: the makefile has been written so that typing “make 
-TARGET=mess” is enough to correctly compile the proper version for your 
-setup (except if you want SDL in windows, in which case you also need to
- add “OSD=sdl”).
-</p>
-
-<p>
-You can also read our <a href="http://mess.redump.net/compiling_mess" class="wikilink1" title="compiling_mess">Compile wiki page</a>.
-</p>
-
-</div>
-<!-- SECTION "Compiling MESS" [4328-6676] -->
+<!-- SECTION "Installing MESS" [5051-5866] -->
 <h2><a name="requirements" id="requirements">Requirements</a></h2>
 <div class="level2">
 
 <p>
 
-<acronym title="Multi Emulator Super System">MESS</acronym> is written in fairly generic C, and has been ported to numerous platforms. Over time, as computer hardware has evolved, the <acronym title="Multi Emulator Super System">MESS</acronym> code has evolved as well to take advantage of the greater processing power and hardware capabilities offered.
+<acronym title="Multi Emulator Super System">MESS</acronym> is written 
+in fairly generic C/C++, and has been ported to numerous platforms. Over
+ time, as computer hardware has evolved, the <acronym title="Multi Emulator Super System">MESS</acronym> code has evolved as well to take advantage of the greater processing power and hardware capabilities offered.
+</p>
+
+<p>
 The official <acronym title="Multi Emulator Super System">MESS</acronym> binaries are compiled and designed to run on a standard Windows-based system. The minimum requirements are:
-Any MMX-capable AMD or Intel processor (Pentium III or later recommended for current versions)
-Windows 98 or later (Windows 2000 or later preferred)
-DirectX 5.0 or later (included with all versions of Windows 98 or later)
-A DirectDraw or Direct3D capable graphics card
-Any DirectSound capable sound card
+</p>
+<ul>
+<li class="level1"><div class="li"> Any MMX-capable AMD or Intel processor (Pentium III or later recommended for current versions)</div>
+</li>
+<li class="level1"><div class="li"> Windows 98 or later (Windows 2000 or later preferred)</div>
+</li>
+<li class="level1"><div class="li"> DirectX 5.0 or later (included with all versions of Windows 98 or later)</div>
+</li>
+<li class="level1"><div class="li"> A DirectDraw or Direct3D capable graphics card</div>
+</li>
+<li class="level1"><div class="li"> Any DirectSound capable sound card</div>
+</li>
+</ul>
+
+<p>
+
 Of course, the minimum requirements are just that: minimal. You may not get optimal performance from such a system, but <acronym title="Multi Emulator Super System">MESS</acronym> should run. Modern versions of <acronym title="Multi Emulator Super System">MESS</acronym> require more power than older versions, so if you have a less-capable PC, you may find that using an older version of <acronym title="Multi Emulator Super System">MESS</acronym> may get you better performance, at the cost of lowered accuracy and fewer supported systems.
+</p>
+
+<p>
 As of <acronym title="Multi Emulator Super System">MESS</acronym> 0.106 and later, <acronym title="Multi Emulator Super System">MESS</acronym>
  will take advantage of 3D hardware for compositing artwork and scaling 
 the games to full screen. To make use of this, you should have a modern 
 Direct3D 8-capable video card with at least 16MB of video RAM.
+</p>
+
+<p>
 Around the same time, <acronym title="Multi Emulator Super System">MESS</acronym>
  added minimal multi-processor support, if you use the -mt flag. This 
 means that some of the video processing can be done on a second CPU core
  if it is available. To take advantage of this, you should run <acronym title="Multi Emulator Super System">MESS</acronym> on a dual core (or greater) system.
+</p>
+
+<p>
 Keep in mind that even on the fastest computers available, <acronym title="Multi Emulator Super System">MESS</acronym>
  is still incapable of playing some systems at full speed. The goal of 
 the project isn't to make all system run speedy on your system; the goal
@@ -258,17 +257,48 @@ software) copyrighted material.
 </p>
 
 </div>
-<!-- SECTION "Requirements" [6677-9246] -->
+<!-- SECTION "Requirements" [5867-8465] -->
 <h2><a name="using_mess" id="using_mess">Using MESS</a></h2>
 <div class="level2">
 
 <p>
 
-If you are a new <acronym title="Multi Emulator Super System">MESS</acronym> user, you could find this emulator a bit complex at first. However, <acronym title="Multi Emulator Super System">MESS</acronym> shares most of its core components with <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> (and its Windows <acronym title="Graphical User Interface">GUI</acronym> with MAMEUI). Therefore, any guide for <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> would fit perfectly for <acronym title="Multi Emulator Super System">MESS</acronym> as well, giving you directions about what you have to do when you start using <acronym title="Multi Emulator Super System">MESS</acronym>. 
+If you are a new <acronym title="Multi Emulator Super System">MESS</acronym> user, you could find this emulator a bit complex at first. The basic usage, from command line, is
+</p>
+<pre class="code">mess.exe &lt;system&gt; &lt;media&gt; &lt;software&gt; &lt;options&gt;</pre>
+
+<p>
+where
+</p>
+<ul>
+<li class="level1"><div class="li"> &lt;system&gt; is the shortname of the system you want to emulate (e.g. <code>nes</code>, <code>c64</code>, etc.)</div>
+</li>
+<li class="level1"><div class="li"> &lt;media&gt; is the switch for the media you want to load (if it's a cartridge, try <code>-cart</code> or <code>-cart1</code>; if it's a floppy disk, try <code>-flop</code> or <code>-flop1</code>; if it's a CD-ROM, try <code>-cdrom</code>)</div>
+</li>
+<li class="level1"><div class="li"> &lt;software&gt; is the program / 
+game you want to load (and it can be given either as the fullpath to the
+ file to load, or as the shortname of the file in our <a href="#software_lists" title="mess:howto ↵" class="wikilink1">software lists</a>)</div>
+</li>
+<li class="level1"><div class="li"> &lt;options&gt; is any additional <a href="#command_line_options" title="mess:howto ↵" class="wikilink1">command line option</a> for controllers, video, sound, etc.</div>
+</li>
+</ul>
+
+<p>
+
+Remember that if you type a &lt;system&gt; name which does not correspond to any emulated system, <acronym title="Multi Emulator Super System">MESS</acronym>
+ will suggest you some possible choices which are close to what you 
+typed; and if you don't know which &lt;media&gt; switch are available, 
+you can always launch
+</p>
+<pre class="code">mess.exe &lt;system&gt; -listmedia</pre>
+
+<p>
+
+If you don't know what &lt;options&gt; are available, you have many possibilities. First of all, you can check the <a href="#command_line_options" title="mess:howto ↵" class="wikilink1">command line options</a> section of this Manual. Moreover, since <acronym title="Multi Emulator Super System">MESS</acronym> shares most of its core components with <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> (and its Windows <acronym title="Graphical User Interface">GUI</acronym> with MAMEUI), any guide for <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> would fit perfectly for <acronym title="Multi Emulator Super System">MESS</acronym> as well, giving you directions about <acronym title="Multi Emulator Super System">MESS</acronym> options. 
 </p>
 
 <p>
-Also, keep in mind the following command line options: <code>help</code>, <code>showusage</code> (or briefly <code>su</code>), <code>showconfig</code> (or briefly <code>sc</code>) and <code>createconfig</code> (or briefly <code>cc</code>).
+Alternatively, you should keep in mind the following command line options, which might be very useful in this context: <code>help</code>, <code>showusage</code> (or briefly <code>su</code>), <code>showconfig</code> (or briefly <code>sc</code>) and <code>createconfig</code> (or briefly <code>cc</code>).
 </p>
 
 <p>
@@ -277,9 +307,9 @@ If you launch at command line
 <pre class="code">mess.exe -help</pre>
 
 <p>
-you will be explained what <acronym title="Multi Emulator Super System">MESS</acronym> is the basic structure of <acronym title="Multi Emulator Super System">MESS</acronym> launching options, i.e.
+you will be explained what <acronym title="Multi Emulator Super System">MESS</acronym> is the basic structure of <acronym title="Multi Emulator Super System">MESS</acronym> launching options, i.e. as explained above
 </p>
-<pre class="code">mess.exe &lt;system&gt; &lt;device&gt; &lt;software&gt; &lt;options&gt;</pre>
+<pre class="code">mess.exe &lt;system&gt; &lt;media&gt; &lt;software&gt; &lt;options&gt;</pre>
 
 <p>
 
@@ -361,7 +391,148 @@ default values.
 </p>
 
 </div>
-<!-- SECTION "Using MESS" [9247-12551] -->
+<!-- SECTION "Using MESS" [8466-12970] -->
+<h2><a name="compiling_mess" id="compiling_mess">Compiling MESS</a></h2>
+<div class="level2">
+
+</div>
+
+<h4><a name="mess_messui_windows" id="mess_messui_windows">MESS / MESSUI (Windows)</a></h4>
+<div class="level4">
+
+<p>
+
+Compiling <acronym title="Multi Emulator Super System">MESS</acronym> 
+for Windows requires the MinGW toolkit, a variant of GCC. MinGW comes 
+with a variant of GDB for debugging. Downloads of those tools can be 
+found on the <a href="http://mess.redump.net/build_tools" class="wikilink1" title="build_tools">build tools page</a>. Notice also that the same tools are used to compile <acronym title="Multiple Arcade Machine Emulator">MAME</acronym>. Hence, you can download them from the correspondent <a href="http://mamedev.org/tools/" class="urlextern" title="http://mamedev.org/tools/" rel="nofollow">MAME build tools page</a> as well.
+</p>
+
+<p>
+Then, you need the <acronym title="Multi Emulator Super System">MESS</acronym> source, of course. You can either take the whole tree from the svn repository (see <a href="http://www.mess.org/download.php" class="urlextern" title="http://www.mess.org/download.php" rel="nofollow">this page</a>), or download latest stable source (see again <a href="http://www.mess.org/download.php" class="urlextern" title="http://www.mess.org/download.php" rel="nofollow">this page</a>) and add to it the corresponding version of the <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> source. The svn is however the recommended choice, because of the frequent updates.
+</p>
+
+<p>
+Once you have both sources, to compile the command line version of <acronym title="Multi Emulator Super System">MESS</acronym> is enough to open a command prompt and type (assuming MinGW has been correctly installed as explained at <a href="http://mamedev.org/tools/" class="urlextern" title="http://mamedev.org/tools/" rel="nofollow">MAME build tools page</a>)
+</p>
+<pre class="code">make TARGET=mess</pre>
+
+<p>
+Please notice the capital letters for <code>TARGET</code>: if you use <code>target=mess</code> it won't work.
+</p>
+
+<p>
+Other possible compile options are the following
+</p>
+<pre class="code">DEBUG=1
+SYMBOLS=1</pre>
+
+<p>
+The former enables stricter validation inside the emulator and some 
+additional logging (but notice that the basic debugger is compiled even 
+without this option, and it is hence available in <strong>all</strong> builds). The latter enables symbols in the compile, to make easier the debugging of crashes through <code>gdb</code>.
+</p>
+
+<p>
+Alternatively, you can use Visual C to compile <acronym title="Multi Emulator Super System">MESS</acronym>.
+ Indeed, if you add MSVC_BUILD=1 at the compile command, the build will 
+use Visual C instead of MinGW. Note that MinGW is still required, as GNU
+ make is used rather than nmake. Using the Microsoft compilers allows to
+ use the Visual C debugger to debug <acronym title="Multi Emulator Super System">MESS</acronym>, but one does not get the full benefits of the IDE.
+</p>
+
+<p>
+If you want to compile MESSUI, then you need to type
+</p>
+<pre class="code">make TARGET=mess OSD=winui</pre>
+
+<p>
+This also compiles the alternative Internal New UI (which can then be enabled the <code>-menu</code> option).
+</p>
+
+<p>
+Finally, if you want to compile the Tools (e.g. chdman, imgtool and castool), then you need to type
+</p>
+<pre class="code">make TARGET=mess tools</pre>
+
+<p>
+(if you forget the “TARGET=mess” part you will end up only compiling the <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> tools).
+</p>
+
+<p>
+You can also read our <a href="http://mess.redump.net/compiling_mess" class="wikilink1" title="compiling_mess">Compile wiki page</a>.
+</p>
+
+</div>
+
+<h4><a name="sdl_mess_windows_nix_mac_osx_other_os" id="sdl_mess_windows_nix_mac_osx_other_os">(SDL)MESS (Windows / *nix / Mac OSX / Other OS)</a></h4>
+<div class="level4">
+
+<p>
+
+Starting from version 0.137, the SDL component of <acronym title="Multiple Arcade Machine Emulator">MAME</acronym>/<acronym title="Multi Emulator Super System">MESS</acronym> are included in the official source. 
+</p>
+
+<p>
+Therefore, to compile <acronym title="Multi Emulator Super System">MESS</acronym> you only need to download the source from <a href="http://www.mess.org/download.php" class="urlextern" title="http://www.mess.org/download.php" rel="nofollow">this page</a> (and to add the <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> source), or to checkout the svn repository (see <a href="http://www.mess.org/download.php" class="urlextern" title="http://www.mess.org/download.php" rel="nofollow">this page</a> for instructions about svn). 
+</p>
+
+<p>
+Required packages and instructions about compiling (SDL)<acronym title="Multi Emulator Super System">MESS</acronym> are the same used to compile (SDL)<acronym title="Multiple Arcade Machine Emulator">MAME</acronym> and can be found following the links at <a href="http://www.bannister.org/forums/ubbthreads.php?ubb=showflat&amp;Number=35138#Post35138" class="urlextern" title="http://www.bannister.org/forums/ubbthreads.php?ubb=showflat&amp;Number=35138#Post35138" rel="nofollow">this thread</a>.
+ In general, you only need a compatible version of GCC (sometimes latest
+ bleeding edge versions may cause compile issues), the SDL libraries and
+ the <acronym title="Multi Emulator Super System">MESS</acronym> &amp; <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> sources: the makefile has been written so that typing 
+</p>
+<pre class="code">make TARGET=mess</pre>
+
+<p>
+is enough to correctly compile the right version for your setup, by automatically choosing the appropriate <acronym title="Operating System">OS</acronym> and selecting between 32-bit and 64-bit architecture.
+The only case which require and additional option is if you want an SDL build in Windows. In this case, you have to type
+</p>
+<pre class="code">make TARGET=mess OSD=sdl</pre>
+
+<p>
+
+Notice that, if you are using MacOSX 10.6, the default settings is to 
+compile a 32-bit executable. At your own risk, you might try to compile <acronym title="Multi Emulator Super System">MESS</acronym> in 64-bit too by typing
+</p>
+<pre class="code">make TARGET=mess PTR64=1</pre>
+
+<p>
+This is not officially endorsed, but it produces a slightly faster executable and there have been no issues reported so far.
+</p>
+
+<p>
+Please notice the capital letters for <code>TARGET</code>: if you use <code>target=mess</code> it won't work.
+</p>
+
+<p>
+Other possible compile options are the following
+</p>
+<pre class="code">DEBUG=1
+SYMBOLS=1</pre>
+
+<p>
+The former enables stricter validation inside the emulator and some 
+additional logging (but notice that the basic debugger is compiled even 
+without this option, and it is hence available in <strong>all</strong> builds). The latter enables symbols in the compile, to make easier the debugging of crashes through <code>gdb</code>.
+</p>
+
+<p>
+Finally, if you want to compile the Tools (e.g. chdman, imgtool and castool), then you need to type
+</p>
+<pre class="code">make TARGET=mess tools</pre>
+
+<p>
+(if you forget the “TARGET=mess” part you will end up only compiling the <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> tools).
+</p>
+
+<p>
+You can also read our <a href="http://mess.redump.net/compiling_mess" class="wikilink1" title="compiling_mess">Compile wiki page</a>.
+</p>
+
+</div>
+<!-- SECTION "Compiling MESS" [12971-17611] -->
 <h2><a name="start_mess" id="start_mess">Start MESS</a></h2>
 <div class="level2">
 
@@ -374,7 +545,7 @@ where you can set up basically every possible option for <acronym title="Multi E
 </p>
 
 </div>
-<!-- SECTION "Start MESS" [12552-13079] -->
+<!-- SECTION "Start MESS" [17612-18139] -->
 <h2><a name="pause_mess" id="pause_mess">Pause MESS</a></h2>
 <div class="level2">
 
@@ -393,7 +564,7 @@ See <a href="#key_functions" title="mess:howto ↵" class="wikilink1">Key Functi
 </p>
 
 </div>
-<!-- SECTION "Pause MESS" [13080-13781] -->
+<!-- SECTION "Pause MESS" [18140-18841] -->
 <h2><a name="access_mess_internal_ui" id="access_mess_internal_ui">Access MESS Internal UI</a></h2>
 <div class="level2">
 
@@ -413,13 +584,13 @@ See <a href="#key_functions" title="mess:howto ↵" class="wikilink1">Key Functi
 </p>
 
 </div>
-<!-- SECTION "Access MESS Internal UI" [13782-14483] -->
+<!-- SECTION "Access MESS Internal UI" [18842-19543] -->
 <h2><a name="access_mess_internal_new_ui" id="access_mess_internal_new_ui">Access MESS Internal New UI</a></h2>
 <div class="level2">
 
 <p>
 
-If you use <acronym title="Multi Emulator Super System">MESS</acronym> in Windows and you have chosen the -newui option (see below for a complete description of <a href="#ui_options" title="mess:howto ↵" class="wikilink1">this option</a> and of the <a href="#new_ui_options" title="mess:howto ↵" class="wikilink1">New UI Options</a>
+If you use MESSUI in Windows and you have chosen the -menu option (see below for a complete description of <a href="#ui_options" title="mess:howto ↵" class="wikilink1">this option</a> and of the <a href="#new_ui_options" title="mess:howto ↵" class="wikilink1">New UI Options</a>
  available), you will have a quite familiar menu bar on the top of your 
 screen. You can easily select options by clicking on them with the 
 mouse. 
@@ -430,7 +601,7 @@ Notice that this New UI could be removed in future, because of the progresses of
 </p>
 
 </div>
-<!-- SECTION "Access MESS Internal New UI" [14484-15078] -->
+<!-- SECTION "Access MESS Internal New UI" [19544-20139] -->
 <h2><a name="quit_mess" id="quit_mess">Quit MESS</a></h2>
 <div class="level2">
 
@@ -454,13 +625,13 @@ See <a href="#key_functions" title="mess:howto ↵" class="wikilink1">Key Functi
 </p>
 
 </div>
-<!-- SECTION "Quit MESS" [15079-15827] -->
+<!-- SECTION "Quit MESS" [20140-20888] -->
 <h2><a name="frontends" id="frontends">Frontends</a></h2>
 <div class="level2">
 
 <p>
 
-If you don't like using <acronym title="Multi Emulator Super System">MESS</acronym> from command line or if you are using <acronym title="Multi Emulator Super System">MESS</acronym> on Windows but you don't like MESSUI's appearance, you may want to use <acronym title="Multi Emulator Super System">MESS</acronym> in conjunction with a frontend. Various frontends currently support <acronym title="Multi Emulator Super System">MESS</acronym>. In alphabetical order:
+If you don't like using <acronym title="Multi Emulator Super System">MESS</acronym> from command line, you may want to use <acronym title="Multi Emulator Super System">MESS</acronym> in conjunction with a frontend. Various frontends currently support <acronym title="Multi Emulator Super System">MESS</acronym>. In alphabetical order:
 
 </p>
 <ul>
@@ -468,13 +639,21 @@ If you don't like using <acronym title="Multi Emulator Super System">MESS</acron
 </li>
 <li class="level1"><div class="li"> <a href="http://gelide.sourceforge.net/" class="urlextern" title="http://gelide.sourceforge.net/" rel="nofollow">Gelide</a> - Linux</div>
 </li>
+<li class="level1"><div class="li"> <a href="http://bobz38.free.fr/gnomess/index.php" class="urlextern" title="http://bobz38.free.fr/gnomess/index.php" rel="nofollow">GNOMESS</a> - Linux</div>
+</li>
+<li class="level1"><div class="li"> <a href="http://www.hyperspin-fe.com/" class="urlextern" title="http://www.hyperspin-fe.com/" rel="nofollow">HyperSpin</a> - Windows - <a href="http://www.hyperspin-fe.com/index.php?option=com_content&amp;view=article&amp;id=104&amp;Itemid=116" class="urlextern" title="http://www.hyperspin-fe.com/index.php?option=com_content&amp;view=article&amp;id=104&amp;Itemid=116" rel="nofollow">Atari 5200 tutorial</a></div>
+</li>
 <li class="level1"><div class="li"> <a href="http://sourceforge.net/projects/kxmame/" class="urlextern" title="http://sourceforge.net/projects/kxmame/" rel="nofollow">kxmame</a> - Linux</div>
 </li>
 <li class="level1"><div class="li"> <a href="http://mameicons.free.fr/mame32p/" class="urlextern" title="http://mameicons.free.fr/mame32p/" rel="nofollow">MAME Plus! GUI</a> - Windows, Linux and Mac <acronym title="Operating System">OS</acronym> X supported</div>
 </li>
+<li class="level1"><div class="li"> <a href="https://sites.google.com/site/meagrefrontend/home" class="urlextern" title="https://sites.google.com/site/meagrefrontend/home" rel="nofollow">MEAGRE</a> - Windows only</div>
+</li>
 <li class="level1"><div class="li"> <a href="http://eadmaster.altervista.org/pub/prj/cliapps.htm#mess" class="urlextern" title="http://eadmaster.altervista.org/pub/prj/cliapps.htm#mess" rel="nofollow">MESS auto-launcher</a> - Windows and *nix (command-line only)</div>
 </li>
 <li class="level1"><div class="li"> <a href="http://macmess.org/" class="urlextern" title="http://macmess.org/" rel="nofollow">MessMenu</a> - Mac <acronym title="Operating System">OS</acronym> X only</div>
+</li>
+<li class="level1"><div class="li"> <a href="http://messui.the-chronicles.org/" class="urlextern" title="http://messui.the-chronicles.org/" rel="nofollow">MESSUI</a> - Windows only (formerly part of the official project)</div>
 </li>
 <li class="level1"><div class="li"> <a href="http://mameload.mameworld.info/" class="urlextern" title="http://mameload.mameworld.info/" rel="nofollow">ML TNG</a> - Windows only</div>
 </li>
@@ -483,6 +662,8 @@ If you don't like using <acronym title="Multi Emulator Super System">MESS</acron
 <li class="level1"><div class="li"> <a href="http://qmc2.arcadehits.net/" class="urlextern" title="http://qmc2.arcadehits.net/" rel="nofollow">QMC2</a> - Windows, Linux and Mac <acronym title="Operating System">OS</acronym> X supported</div>
 </li>
 <li class="level1"><div class="li"> <a href="http://www.anti-particle.com/wahcade.shtml" class="urlextern" title="http://www.anti-particle.com/wahcade.shtml" rel="nofollow">Wah!Cade</a> - Linux</div>
+</li>
+<li class="level1"><div class="li"> <a href="http://sourceforge.net/projects/xlbmessui/" class="urlextern" title="http://sourceforge.net/projects/xlbmessui/" rel="nofollow">xlbmessui</a> - Linux</div>
 </li>
 <li class="level1"><div class="li"> <a href="http://code.google.com/p/xmessgui/" class="urlextern" title="http://code.google.com/p/xmessgui/" rel="nofollow">xMess GUI</a> - cross-platform</div>
 </li>
@@ -494,12 +675,28 @@ Please refer to their home pages and support forums for more information about t
 </p>
 
 </div>
-<!-- SECTION "Frontends" [15828-17040] -->
+<!-- SECTION "Frontends" [20889-22512] -->
 <h1><a name="common_issues" id="common_issues">Common Issues</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "Common Issues" [17041-17069] -->
+
+<h5><a name="shortcuts2" id="shortcuts2">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#bios_handling" title="mess:howto ↵" class="wikilink1">BIOS Handling</a> </td><td class="col1"> <a href="#run_systems_with_software" title="mess:howto ↵" class="wikilink1">Run Systems with Software</a> </td><td class="col2"> <a href="#i_found_an_issue" title="mess:howto ↵" class="wikilink1">I Found an Issue!</a> </td>
+	</tr>
+	<tr class="row1">
+		<td class="col0"> <a href="#software_handling" title="mess:howto ↵" class="wikilink1">Software Handling</a> </td><td class="col1"> <a href="#reset_a_system" title="mess:howto ↵" class="wikilink1">Reset a System</a> </td><td class="col2"> <a href="#key_functions" title="mess:howto ↵" class="wikilink1">Key Functions</a> </td>
+	</tr>
+	<tr class="row2">
+		<td class="col0"> <a href="#start_a_system" title="mess:howto ↵" class="wikilink1">Start a System</a> </td><td class="col1"> <a href="#change_system" title="mess:howto ↵" class="wikilink1">Change System</a> </td><td class="col2"> <a href="#tips" title="mess:howto ↵" class="wikilink1">Tips</a> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "Common Issues" [22513-22904] -->
 <h2><a name="bios_handling" id="bios_handling">BIOS Handling</a></h2>
 <div class="level2">
 
@@ -534,16 +731,28 @@ correct.
 </p>
 
 </div>
-<!-- SECTION "BIOS Handling" [17070-18579] -->
+<!-- SECTION "BIOS Handling" [22905-24414] -->
 <h2><a name="software_handling" id="software_handling">Software Handling</a></h2>
 <div class="level2">
 
 <p>
 
-There exists no hardcoded software locations in <acronym title="Multi Emulator Super System">MESS</acronym>. If you are running <acronym title="Multi Emulator Super System">MESS</acronym> from command line, you simply have to specify the full path to the software. If you are using <acronym title="Multi Emulator Super System">MESS</acronym> <acronym title="Graphical User Interface">GUI</acronym>
- on Windows, you can easily set up software folders for each emulated 
-system and then choose the software image you want in the file picker 
-window.
+There exists no hardcoded software locations in <acronym title="Multi Emulator Super System">MESS</acronym> and you can configure <acronym title="Multi Emulator Super System">MESS</acronym> to launch software from any directory you want.
+</p>
+
+<p>
+If you are running <acronym title="Multi Emulator Super System">MESS</acronym>
+ from command line, you simply have to specify the full path to the 
+software. E.g. to launch a Sharp X1 floppy disk that you have in 
+“E:\sharp x1\disk.d88”, you just have to type
+</p>
+<pre class="code">mess.exe x1 -flop1 "E:\sharp x1\disk.d88"</pre>
+
+<p>
+Notice the quote around the path, to properly handle the space in the folder name.
+</p>
+
+<p>
 While running <acronym title="Multi Emulator Super System">MESS</acronym>, you can also change software by entering the Internal UI (press <kbd>Tab</kbd>), choosing <code>File Manager</code>,
  selecting the device you want to use (Cartslots, Cassettes, Floppy 
 Disks, Cdroms, etc.) and browsing your folders until you find the 
@@ -551,42 +760,42 @@ desired software image.
 </p>
 
 <p>
-The remainder of this section is for those who prefer to use the <acronym title="Graphical User Interface">GUI</acronym>.
+<strong>Tips</strong> - In the <code>File Manager</code>, the navigation
+ through folders filled of hundreds of files can be made a lot faster, 
+if you know a couple of features of the Internal UI! First of all, <kbd>PgUp</kbd>, <kbd>PgDn</kbd>, <kbd>Home</kbd> and <kbd>End</kbd> are fully supported and allow for faster scroll of the list of filenames. Moreover, as of <acronym title="Multi Emulator Super System">MESS</acronym>
+ 0.142, you can type the beginning of a filename, and the File Manager 
+will scroll until the file with the closest name. Adding the fact that 
+you can click with the mouse of the file to start it, finding the file 
+you want to launch has never been so easy!
 </p>
 
 <p>
-Select from the menu, Options, Directories. From the dropdown list 
-choose Software. Click Insert or Browse. Navigate to the root of your 
-software folder and click ok.
+If you are using MESSUI on Windows, you can also easily set up some 
+software folders for each emulated system and then select the software 
+image you want in the file picker window.
+Namely, select from the menu <code>Options</code> and then <code>Directories</code>. From the drop-down list choose <code>Software</code> and click on <code>Insert</code> or on <code>Browse</code>. Navigate to the root of your software folder, click ok and you are done.
 </p>
 
 <p>
-On the right you can see a section for software selection. It has two 
-tabs, “Picker” and “Device View”. The Device View shows the available 
-devices, any software that is currently loaded, and a selection box 
-where you may Mount, Create or Unmount an image.
+Now, on the right you can see a section for software selection: two tabs are available, “Picker” and “Device View”. 
 </p>
-
-<p>
-The Picker lists all compatible software that it can find for the selected system.
-</p>
-
-<p>
-For these views to work properly, you need to configure the system's 
-software path. Right-click on a system, choose Properties, then 
-Software. Click Insert, browse to the location of the software and click
- ok. Click ok to exit the Properties. The “Picker” will now list all the
- software, including subdirectories.
-</p>
+<ul>
+<li class="level1"><div class="li"> The Device View shows the available 
+media with the software that is currently loaded, and a selection box 
+where you may Mount, Create or Unmount an image.</div>
+</li>
+<li class="level1"><div class="li"> The Picker lists every compatible software that is contained in the selected software directory, including subdirectories.</div>
+</li>
+</ul>
 
 </div>
-<!-- SECTION "Software Handling" [18580-20120] -->
+<!-- SECTION "Software Handling" [24415-26611] -->
 <h2><a name="start_a_system" id="start_a_system">Start a System</a></h2>
 <div class="level2">
 
 <p>
 
-If you are running <acronym title="Multi Emulator Super System">MESS</acronym> <acronym title="Graphical User Interface">GUI</acronym> on Windows, you just need to double click on the desired system. If you are running <acronym title="Multi Emulator Super System">MESS</acronym> from command line, you have to type
+If you are running <acronym title="Multi Emulator Super System">MESS</acronym> from command line, you have to type
 
 </p>
 <pre class="code">mess.exe &lt;system&gt;</pre>
@@ -601,15 +810,18 @@ While running <acronym title="Multi Emulator Super System">MESS</acronym>, you c
 </p>
 
 <p>
+If you are running MESSUI on Windows, you just need to double click on the desired system. 
+</p>
+
+<p>
 Notice that some systems require a software image to run (e.g. some 
 consoles which cannot work without a cartridge image inserted). These 
 systems also gives errors when you try to start them from the Internal 
 UI.
-
 </p>
 
 </div>
-<!-- SECTION "Start a System" [20121-20849] -->
+<!-- SECTION "Start a System" [26612-27341] -->
 <h2><a name="run_systems_with_software" id="run_systems_with_software">Run Systems with Software</a></h2>
 <div class="level2">
 
@@ -638,7 +850,7 @@ start also without any software mounted. As an example, running
 
 <p>
 
-would prompt you to the BASIC “ready” screen. Different systems supports in <acronym title="Multi Emulator Super System">MESS</acronym> different types of images and different devices. You can check supported devices and file extensions by using the <code>-listmedia</code> option (also described <a href="#emulated_devices_options" title="mess:howto ↵" class="wikilink1">here</a>). E.g.
+would prompt you to the BASIC “ready” screen. Different systems supports in <acronym title="Multi Emulator Super System">MESS</acronym> different types of images and different media. You can check supported media devices and file extensions by using the <code>-listmedia</code> option (also described <a href="#emulated_media_options" title="mess:howto ↵" class="wikilink1">here</a>). E.g.
 
 </p>
 <pre class="code">mess.exe apple2gs -listmedia</pre>
@@ -652,8 +864,8 @@ for specific Apple ||gs emulation or
 
 <p>
 
-for a list of all supported devices and file extensions for each system.
- You can always change the software you have loaded in a device by 
+for a list of all supported media and file extensions for each system. 
+You can always change the software you have loaded in a device by 
 entering the Internal UI (pressing <kbd>Tab</kbd>) and selecting “File Manager” (see <a href="#internal_ui_options" title="mess:howto ↵" class="wikilink1">below</a>).
 </p>
 
@@ -674,7 +886,7 @@ lists “snes.xml”. You can find more details about this new option in the
 </p>
 
 </div>
-<!-- SECTION "Run Systems with Software" [20850-22812] -->
+<!-- SECTION "Run Systems with Software" [27342-29304] -->
 <h2><a name="reset_a_system" id="reset_a_system">Reset a System</a></h2>
 <div class="level2">
 
@@ -688,7 +900,7 @@ functionality that could be available by pressing a specific key (check <a href=
 </p>
 
 </div>
-<!-- SECTION "Reset a System" [22813-23539] -->
+<!-- SECTION "Reset a System" [29305-30031] -->
 <h2><a name="change_system" id="change_system">Change System</a></h2>
 <div class="level2">
 
@@ -699,7 +911,7 @@ Alternatively, you can enter the Internal UI (by pressing <kbd>Tab</kbd>) and ch
 </p>
 
 </div>
-<!-- SECTION "Change System" [23540-23814] -->
+<!-- SECTION "Change System" [30032-30306] -->
 <h2><a name="i_found_an_issue" id="i_found_an_issue">I Found an Issue!</a></h2>
 <div class="level2">
 
@@ -730,7 +942,26 @@ additional information about the problem (e.g. if you're trying to run a
  cart format which is unsupported) and should be added to a bug report, 
 if possible.</div>
 </li>
-<li class="level1"><div class="li"> Ask for suggestions on the <a href="http://www.bannister.org/forums/ubbthreads.php?ubb=postlist&amp;Board=1&amp;page=1" class="urlextern" title="http://www.bannister.org/forums/ubbthreads.php?ubb=postlist&amp;Board=1&amp;page=1" rel="nofollow">MESS message board</a></div>
+<li class="level1"><div class="li"> If the problem is a crash, and you can compile the emulator by your own, then you might help us by compiling <acronym title="Multi Emulator Super System">MESS</acronym> with symbols enabled, i.e. with <code>SYMBOLS=1</code> (see the <a href="#compiling_mess" title="mess:howto ↵" class="wikilink1">compiling section</a>
+ of this manual), and by adding with your report a backtrace of the 
+crash; such a backtrace can be obtained with “gdb” by following these 
+steps:</div>
+<ul>
+<li class="level2"><div class="li"> open a command prompt / bash / terminal and move to the folder where <acronym title="Multi Emulator Super System">MESS</acronym> is</div>
+</li>
+<li class="level2"><div class="li"> launch <code>gdb mess.exe</code></div>
+</li>
+<li class="level2"><div class="li"> type <code>run -window -other_necessary_options</code>
+ (where ”-other_necessary_options” is any other parameter you need to 
+reproduce the bug, e.g. the system, the media and the software names)</div>
+</li>
+<li class="level2"><div class="li"> play until the crash happens</div>
+</li>
+<li class="level2"><div class="li"> type <code>bt</code> or <code>bt full</code> to obtain a backtrace of the crash</div>
+</li>
+</ul>
+</li>
+<li class="level1"><div class="li"> Alternatively, don't hesitate to ask for suggestions on the <a href="http://www.bannister.org/forums/ubbthreads.php?ubb=postlist&amp;Board=1&amp;page=1" class="urlextern" title="http://www.bannister.org/forums/ubbthreads.php?ubb=postlist&amp;Board=1&amp;page=1" rel="nofollow">MESS message board</a></div>
 </li>
 </ul>
 
@@ -740,7 +971,7 @@ If you can provide fixes or addition of missing components, please follow the su
 </p>
 
 </div>
-<!-- SECTION "I Found an Issue!" [23815-25075] -->
+<!-- SECTION "I Found an Issue!" [30307-32362] -->
 <h2><a name="key_functions" id="key_functions">Key Functions</a></h2>
 <div class="level2">
 
@@ -819,7 +1050,7 @@ For more information about loading/saving a game and about saving snapshot in <a
 </p>
 
 </div>
-<!-- SECTION "Key Functions" [25076-27370] -->
+<!-- SECTION "Key Functions" [32363-34657] -->
 <h2><a name="tips" id="tips">Tips</a></h2>
 <div class="level2">
 
@@ -837,7 +1068,16 @@ again the Internal UI which allows you to configure Inputs, Video and
 Sound options by simply clicking on them with your mouse (a complete 
 description of the available options can be found below…)</div>
 </li>
-<li class="level1"><div class="li"> For many calculator and chess computers, <acronym title="Multi Emulator Super System">MESS</acronym> provides an artwork which depicts the original aspect of the emulated machine (see also the <a href="#artwork_folder" title="mess:howto ↵" class="wikilink1">Artwork</a> section. In the <code>Video options</code>
+<li class="level1"><div class="li"> In the <code>File Manager</code> and in the <code>Software List</code>
+ menu, the navigation through folders filled of hundreds of files can be
+ made a lot faster, if you know a couple of features of the Internal UI!
+ First of all, <kbd>PgUp</kbd>, <kbd>PgDn</kbd>, <kbd>Home</kbd> and <kbd>End</kbd> are fully supported and allow for faster scroll of the list of filenames. Moreover, as of <acronym title="Multi Emulator Super System">MESS</acronym>
+ 0.142, you can type the beginning of a filename, and the File Manager 
+will scroll until the file with the closest name. Adding the fact that 
+you can click with the mouse of the file to start it, finding the file 
+you want to launch has never been so easy!</div>
+</li>
+<li class="level1"><div class="li"> For many calculator and chess computers, <acronym title="Multi Emulator Super System">MESS</acronym> provides an artwork which depicts the original aspect of the emulated machine (see also the <a href="#artwork_folder" title="mess:howto ↵" class="wikilink1">Artwork</a> section). In the <code>Video options</code>
  menu of the UI, you can turn it on or off. When the artwork is used, 
 you can also click with the mouse on the keys that you see to produce 
 the expected effect on the emulated machine rather than using keyboard 
@@ -852,15 +1092,45 @@ quite tedious. This is why <acronym title="Multi Emulator Super System">MESS</ac
  copy from a file! Simply select the program / command you want to 
 enter, copy it (e.g. by using <kbd>Ctrl</kbd>+<kbd>C</kbd> on Windows) and paste it in <acronym title="Multi Emulator Super System">MESS</acronym> by pressing <kbd>Shift</kbd>+<kbd>ScrLock</kbd> (this is the default key sequence, but you can remap it to any key you want entering the Internal UI, choosing <code>Inputs (general)</code> and then <code>User Interface</code>).</div>
 </li>
+<li class="level1"><div class="li"> <acronym title="Multi Emulator Super System">MESS</acronym>
+ can load zipped BIOSes based on their CRC checksum. Hence, if you have a
+ correct BIOS zipped in the roms/ folder, the names of the single files 
+are not really important. However, if you keep your BIOS unzipped, <acronym title="Multi Emulator Super System">MESS</acronym> cannot load the files by CRC and you need the BIOS files to be named in a very precise way. If you keep receiving a <code>missing files</code>
+ error message and you think you have already the required files 
+unzipped in a subfolder of the roms/ folder, check if their names are 
+correct.</div>
+</li>
 </ul>
 
 </div>
-<!-- SECTION "Tips" [27371-29335] -->
+<!-- SECTION "Tips" [34658-37759] -->
 <h1><a name="folder_files" id="folder_files">Folder &amp; Files</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "Folder & Files" [29336-29365] -->
+
+<h5><a name="shortcuts3" id="shortcuts3">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#mess.ini" title="mess:howto ↵" class="wikilink1">mess.ini</a> </td><td class="col1"> <a href="#ini_folder" title="mess:howto ↵" class="wikilink1">ini/ Folder</a> </td><td class="col2"> <a href="#tools_folder" title="mess:howto ↵" class="wikilink1">tools/ Folder</a> </td>
+	</tr>
+	<tr class="row1">
+		<td class="col0"> <a href="#roms_folder" title="mess:howto ↵" class="wikilink1">roms/ Folder</a> </td><td class="col1"> <a href="#ctrlr_folder" title="mess:howto ↵" class="wikilink1">ctrlr/ Folder</a> </td><td class="col2"> <a href="#effects_files" title="mess:howto ↵" class="wikilink1">Effects Files</a> </td>
+	</tr>
+	<tr class="row2">
+		<td class="col0"> <a href="#nvram_folder_.nv_files" title="mess:howto ↵" class="wikilink1">nvram/ Folder &amp; .nv Files</a> </td><td class="col1"> <a href="#hash_folder" title="mess:howto ↵" class="wikilink1">hash/ Folder</a> </td><td class="col2"> <a href="#font_files" title="mess:howto ↵" class="wikilink1">Font Files</a> </td>
+	</tr>
+	<tr class="row3">
+		<td class="col0"> <a href="#cfg_folder_.cfg_files" title="mess:howto ↵" class="wikilink1">cfg/ Folder &amp; .cfg Files</a> </td><td class="col1"> <a href="#memcard_folder" title="mess:howto ↵" class="wikilink1">memcard/ Folder</a> </td><td class="col2"> </td>
+	</tr>
+	<tr class="row4">
+		<td class="col0"> <a href="#artwork_folder" title="mess:howto ↵" class="wikilink1">artwork/ Folder</a> </td><td class="col1"> <a href="#snap_folder" title="mess:howto ↵" class="wikilink1">snap/ Folder</a> </td><td class="col2"> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "Folder & Files" [37760-38289] -->
 <h2><a name="mess.ini" id="mess.ini">mess.ini</a></h2>
 <div class="level2">
 
@@ -899,7 +1169,7 @@ Save your changes. Then, copy your new mess.ini to the ini folder.
 </p>
 
 </div>
-<!-- SECTION "mess.ini" [29366-30463] -->
+<!-- SECTION "mess.ini" [38290-39387] -->
 <h2><a name="roms_folder" id="roms_folder">roms/ Folder</a></h2>
 <div class="level2">
 
@@ -918,7 +1188,7 @@ On the other hand, software can be put in any directory you want, as long as the
 <pre class="code">mess.exe snes -cart "C:\here_are_my_games\foo.smc"</pre>
 
 </div>
-<!-- SECTION "roms/ Folder" [30464-31155] -->
+<!-- SECTION "roms/ Folder" [39388-40079] -->
 <h2><a name="nvram_folder_.nv_files" id="nvram_folder_.nv_files">nvram/ Folder &amp; .nv Files</a></h2>
 <div class="level2">
 
@@ -937,7 +1207,7 @@ the original systems. For other kind of saving you have to refer to <a href="#sa
 </p>
 
 </div>
-<!-- SECTION "nvram/ Folder & .nv Files" [31156-31880] -->
+<!-- SECTION "nvram/ Folder & .nv Files" [40080-40804] -->
 <h2><a name="cfg_folder_.cfg_files" id="cfg_folder_.cfg_files">cfg/ Folder &amp; .cfg Files</a></h2>
 <div class="level2">
 
@@ -951,7 +1221,7 @@ default.cfg (the latter for changes in the <code>Input (general)</code> menu).
 </p>
 
 </div>
-<!-- SECTION "cfg/ Folder & .cfg Files" [31881-32459] -->
+<!-- SECTION "cfg/ Folder & .cfg Files" [40805-41383] -->
 <h2><a name="artwork_folder" id="artwork_folder">artwork/ Folder</a></h2>
 <div class="level2">
 
@@ -970,7 +1240,7 @@ system!
 </p>
 
 </div>
-<!-- SECTION "artwork/ Folder" [32460-33017] -->
+<!-- SECTION "artwork/ Folder" [41384-41941] -->
 <h2><a name="ini_folder" id="ini_folder">ini/ Folder</a></h2>
 <div class="level2">
 
@@ -994,7 +1264,7 @@ time.
 </p>
 
 </div>
-<!-- SECTION "ini/ Folder" [33018-33720] -->
+<!-- SECTION "ini/ Folder" [41942-42644] -->
 <h2><a name="ctrlr_folder" id="ctrlr_folder">ctrlr/ Folder</a></h2>
 <div class="level2">
 
@@ -1004,7 +1274,7 @@ time.
 </p>
 
 </div>
-<!-- SECTION "ctrlr/ Folder" [33721-33764] -->
+<!-- SECTION "ctrlr/ Folder" [42645-42688] -->
 <h2><a name="hash_folder" id="hash_folder">hash/ Folder</a></h2>
 <div class="level2">
 
@@ -1030,7 +1300,7 @@ if you want to.
 </p>
 
 </div>
-<!-- SECTION "hash/ Folder" [33765-34636] -->
+<!-- SECTION "hash/ Folder" [42689-43560] -->
 <h2><a name="memcard_folder" id="memcard_folder">memcard/ Folder</a></h2>
 <div class="level2">
 
@@ -1039,7 +1309,7 @@ if you want to.
 </p>
 
 </div>
-<!-- SECTION "memcard/ Folder" [34637-34684] -->
+<!-- SECTION "memcard/ Folder" [43561-43608] -->
 <h2><a name="snap_folder" id="snap_folder">snap/ Folder</a></h2>
 <div class="level2">
 
@@ -1049,7 +1319,7 @@ In this folder, <acronym title="Multi Emulator Super System">MESS</acronym> save
 </p>
 
 </div>
-<!-- SECTION "snap/ Folder" [34685-34937] -->
+<!-- SECTION "snap/ Folder" [43609-43861] -->
 <h2><a name="tools_folder" id="tools_folder">tools/ Folder</a></h2>
 <div class="level2">
 
@@ -1058,7 +1328,7 @@ In this folder, <acronym title="Multi Emulator Super System">MESS</acronym> save
 </p>
 
 </div>
-<!-- SECTION "tools/ Folder" [34938-34983] -->
+<!-- SECTION "tools/ Folder" [43862-43907] -->
 <h2><a name="effects_files" id="effects_files">Effects Files</a></h2>
 <div class="level2">
 
@@ -1082,7 +1352,7 @@ which will force <acronym title="Multi Emulator Super System">MESS</acronym> to 
 </p>
 
 </div>
-<!-- SECTION "Effects Files" [34984-35898] -->
+<!-- SECTION "Effects Files" [43908-44822] -->
 <h2><a name="font_files" id="font_files">Font Files</a></h2>
 <div class="level2">
 
@@ -1096,12 +1366,34 @@ Some ready-to-use font sets in .bdf format can be found at <a href="http://mrdo.
 </p>
 
 </div>
-<!-- SECTION "Font Files" [35899-36357] -->
+<!-- SECTION "Font Files" [44823-45281] -->
 <h1><a name="command_line_options" id="command_line_options">Command Line Options</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "Command Line Options" [36358-36394] -->
+
+<h5><a name="shortcuts4" id="shortcuts4">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#overview" title="mess:howto ↵" class="wikilink1">Overview</a> </td><td class="col1"> <a href="#performance_options" title="mess:howto ↵" class="wikilink1">Performance Options</a> </td><td class="col2"> <a href="#emulated_ram_size_options" title="mess:howto ↵" class="wikilink1">Emulated RAM Size Options</a> </td>
+	</tr>
+	<tr class="row1">
+		<td class="col0"> <a href="#creating_mess.ini" title="mess:howto ↵" class="wikilink1">Creating mess.ini</a> </td><td class="col1"> <a href="#frameskipping" title="mess:howto ↵" class="wikilink1">Frameskipping</a> </td><td class="col2"> <a href="#emulated_media_options" title="mess:howto ↵" class="wikilink1">Emulated Media Options</a> </td>
+	</tr>
+	<tr class="row2">
+		<td class="col0"> <a href="#getting_started1" title="mess:howto ↵" class="wikilink1">Getting Started</a> </td><td class="col1"> <a href="#debugging_options" title="mess:howto ↵" class="wikilink1">Debugging Options</a> </td><td class="col2"> <a href="#ui_options" title="mess:howto ↵" class="wikilink1">UI Options</a> </td>
+	</tr>
+	<tr class="row3">
+		<td class="col0"> <a href="#rom_verification_options" title="mess:howto ↵" class="wikilink1">ROM Verification Options</a> </td><td class="col1"> <a href="#system_bios_options" title="mess:howto ↵" class="wikilink1">System BIOS Options</a> </td><td class="col2"> </td>
+	</tr>
+	<tr class="row4">
+		<td class="col0"> <a href="#directories_options" title="mess:howto ↵" class="wikilink1">Directories Options</a> </td><td class="col1"> <a href="#emulated_keyboard_options" title="mess:howto ↵" class="wikilink1">Emulated Keyboard Options</a> </td><td class="col2"> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "Command Line Options" [45282-45932] -->
 <h2><a name="overview" id="overview">Overview</a></h2>
 <div class="level2">
 
@@ -1140,7 +1432,7 @@ command line options, you can see the <a href="http://mess.redump.net/mess:usage
 </p>
 
 </div>
-<!-- SECTION "Overview" [36395-38268] -->
+<!-- SECTION "Overview" [45933-47806] -->
 <h2><a name="creating_mess.ini" id="creating_mess.ini">Creating mess.ini</a></h2>
 <div class="level2">
 
@@ -1154,7 +1446,7 @@ Check the <a href="http://mess.redump.net/mess:mess.ini" class="wikilink1" title
 </p>
 
 </div>
-<!-- SECTION "Creating mess.ini" [38269-38752] -->
+<!-- SECTION "Creating mess.ini" [47807-48290] -->
 <h2><a name="getting_started1" id="getting_started1">Getting Started</a></h2>
 <div class="level2">
 
@@ -1168,7 +1460,7 @@ Alternatively, you can simply launch <acronym title="Multi Emulator Super System
 </p>
 
 </div>
-<!-- SECTION "Getting Started" [38753-39152] -->
+<!-- SECTION "Getting Started" [48291-48690] -->
 <h2><a name="rom_verification_options" id="rom_verification_options">ROM Verification Options</a></h2>
 <div class="level2">
 
@@ -1241,7 +1533,7 @@ If you don't specify any system after the <code>-verifyroms</code> option, <acro
 </p>
 
 </div>
-<!-- SECTION "ROM Verification Options" [39153-40893] -->
+<!-- SECTION "ROM Verification Options" [48691-50431] -->
 <h2><a name="directories_options" id="directories_options">Directories Options</a></h2>
 <div class="level2">
 
@@ -1283,7 +1575,7 @@ Check also <a href="http://mess.toseciso.org/mess:mess.ini#core_search_path_opti
 </p>
 
 </div>
-<!-- SECTION "Directories Options" [40894-42399] -->
+<!-- SECTION "Directories Options" [50432-51937] -->
 <h2><a name="performance_options" id="performance_options">Performance Options</a></h2>
 <div class="level2">
 
@@ -1366,7 +1658,7 @@ quit. This option can be of use for benchmarking and regression testing.
 </p>
 
 </div>
-<!-- SECTION "Performance Options" [42400-43736] -->
+<!-- SECTION "Performance Options" [51938-53274] -->
 <h2><a name="frameskipping" id="frameskipping">Frameskipping</a></h2>
 <div class="level2">
 
@@ -1393,7 +1685,7 @@ Check also <a href="http://mess.toseciso.org/mess:mess.ini#core_performance_opti
 </p>
 
 </div>
-<!-- SECTION "Frameskipping" [43737-44657] -->
+<!-- SECTION "Frameskipping" [53275-54195] -->
 <h2><a name="debugging_options" id="debugging_options">Debugging Options</a></h2>
 <div class="level2">
 
@@ -1431,7 +1723,7 @@ Check also <a href="http://mess.toseciso.org/mess:mess.ini#core_debugging_option
 </p>
 
 </div>
-<!-- SECTION "Debugging Options" [44658-45489] -->
+<!-- SECTION "Debugging Options" [54196-55027] -->
 <h2><a name="system_bios_options" id="system_bios_options">System BIOS Options</a></h2>
 <div class="level2">
 
@@ -1450,7 +1742,7 @@ respectively. Please refer to <a href="http://mess.redump.net/sysinfo" class="wi
 </p>
 
 </div>
-<!-- SECTION "System BIOS Options" [45490-46017] -->
+<!-- SECTION "System BIOS Options" [55028-55555] -->
 <h2><a name="emulated_keyboard_options" id="emulated_keyboard_options">Emulated Keyboard Options</a></h2>
 <div class="level2">
 
@@ -1487,7 +1779,7 @@ See the <a href="#emulated_keyboard" title="mess:howto ↵" class="wikilink1">Em
 </p>
 
 </div>
-<!-- SECTION "Emulated Keyboard Options" [46018-47709] -->
+<!-- SECTION "Emulated Keyboard Options" [55556-57247] -->
 <h2><a name="emulated_ram_size_options" id="emulated_ram_size_options">Emulated RAM Size Options</a></h2>
 <div class="level2">
 
@@ -1501,18 +1793,18 @@ option. Refer to <a href="http://mess.redump.net/sysinfo" class="wikilink1" titl
 </p>
 
 </div>
-<!-- SECTION "Emulated RAM Size Options" [47710-48028] -->
-<h2><a name="emulated_devices_options" id="emulated_devices_options">Emulated Devices Options</a></h2>
+<!-- SECTION "Emulated RAM Size Options" [57248-57566] -->
+<h2><a name="emulated_media_options" id="emulated_media_options">Emulated Media Options</a></h2>
 <div class="level2">
 
 <p>
 
 <acronym title="Multi Emulator Super System">MESS</acronym> supports for
- each system a certain number of devices (tapes, floppy disks, 
-cartridges) and file formats. A list of the available devices and the 
+ each system a certain number of media devices (tapes, floppy disks, 
+cartridges) and file formats. A list of the available media and the 
 correspondent supported file formats can be obtained at command line by 
 using
-<code>-listmedia</code> which lists the available devices of a given system, e.g.
+<code>-listmedia</code> which lists the available media of a given system, e.g.
 
 </p>
 <pre class="code">mess.exe &lt;system&gt; -listmedia</pre>
@@ -1526,23 +1818,23 @@ If you don't specify any system, i.e. if you simply use
 
 <p>
 
-you will obtain a list of each supported system with its corresponding devices and file formats.
+you will obtain a list of each supported system with its corresponding media devices and file formats.
 </p>
 
 <p>
-While usually devices are named in a standard way (e.g. <code>flop1</code> for the first disk drive, <code>flop2</code> for the second one, <code>cass1</code> for the first tape drive, etc.), some systems require specific names to work. Hence, you shall remember to use the <code>-listmedia</code> option if you get an “unknown option” error message. You also may check <a href="http://mess.redump.net/sysinfo" class="wikilink1" title="sysinfo">sysinfo.dat</a> to read a list of supported devices and file formats for each system.
+While usually media are named in a standard way (e.g. <code>flop1</code> for the first disk drive, <code>flop2</code> for the second one, <code>cass1</code> for the first tape drive, etc.), some systems require specific names to work. Hence, you shall remember to use the <code>-listmedia</code> option if you get an “unknown option” error message. You also may check <a href="http://mess.redump.net/sysinfo" class="wikilink1" title="sysinfo">sysinfo.dat</a> to read a list of supported devices and file formats for each system.
 </p>
 
 </div>
-<!-- SECTION "Emulated Devices Options" [48029-49009] -->
+<!-- SECTION "Emulated Media Options" [57567-58551] -->
 <h2><a name="ui_options" id="ui_options">UI Options</a></h2>
 <div class="level2">
 
 <p>
 
-If you are using baseline <acronym title="Multi Emulator Super System">MESS</acronym> on Windows, you can choose between two different User Interface during emulation (in <strong>addition</strong> to the <acronym title="Graphical User Interface">GUI</acronym> that you see when you start messgui.exe). 
+If you are using MESSUI on Windows, you can choose between two different User Interface during emulation (in <strong>addition</strong> to the <acronym title="Graphical User Interface">GUI</acronym> that you see when you start messui.exe). 
 Indeed, in addition to the standard Internal UI, which corresponds to <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> User Interface and it is the only choice for (SDL)<acronym title="Multi Emulator Super System">MESS</acronym>, you can use the New User Interface (whose name was historically given because it was newer than the <acronym title="Multiple Arcade Machine Emulator">MAME</acronym>-based one). 
-You can select which User Interface you want at command line by using the <code>-newui</code> option. 
+You can select which User Interface you want at command line by using the <code>-menu</code> option or from the <acronym title="Graphical User Interface">GUI</acronym>. 
 </p>
 
 <p>
@@ -1550,108 +1842,119 @@ Below, you can find a description of the available options of both the <a href="
 </p>
 
 </div>
-<!-- SECTION "UI Options" [49010-49767] -->
+<!-- SECTION "UI Options" [58552-59316] -->
 <h1><a name="software_lists" id="software_lists">Software Lists</a></h1>
 <div class="level1">
 
-<p>
+</div>
 
-<em> [This section will be later merged into the Sections for the device
- loading (which should be re-organized a bit)… in the meanwhile, it 
-stays here for easier reference]. </em>
-</p>
+<h5><a name="shortcuts5" id="shortcuts5">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#overview1" title="mess:howto ↵" class="wikilink1">Overview</a> </td><td class="col1"> <a href="#usage_from_command_line" title="mess:howto ↵" class="wikilink1">Usage from Command Line</a> </td><td class="col2"> <a href="#additional_usage" title="mess:howto ↵" class="wikilink1">Additional Usage</a> </td>
+	</tr>
+	<tr class="row1">
+		<td class="col0"> <a href="#list_format" title="mess:howto ↵" class="wikilink1">List Format</a> </td><td class="col1"> <a href="#usage_from_internal_ui" title="mess:howto ↵" class="wikilink1">Usage from Internal UI</a> </td><td class="col2"> <a href="#using_software_lists_with_cmpro" title="mess:howto ↵" class="wikilink1">Using Software Lists with cmpro</a> </td>
+	</tr>
+	<tr class="row2">
+		<td class="col0"> <a href="#setting_up_lists" title="mess:howto ↵" class="wikilink1">Setting Up Lists</a> </td><td class="col1"> <a href="#usage_from_new_internal_ui" title="mess:howto ↵" class="wikilink1">Usage from New Internal UI</a> </td><td class="col2"> <a href="#software_sources" title="mess:howto ↵" class="wikilink1">Software Sources</a> </td>
+	</tr>
+	<tr class="row3">
+		<td class="col0"> <a href="#setting_up_software" title="mess:howto ↵" class="wikilink1">Setting Up Software</a> </td><td class="col1"> <a href="#usage_from_messui" title="mess:howto ↵" class="wikilink1">Usage from MESSUI</a> </td><td class="col2"> <a href="#missing_features" title="mess:howto ↵" class="wikilink1">Missing Features</a> </td>
+	</tr>
+</tbody></table>
 
 </div>
-<!-- SECTION "Software Lists" [49768-49975] -->
-<h2><a name="what_are_these_software_lists" id="what_are_these_software_lists">What are these software lists?</a></h2>
+<!-- SECTION "Software Lists" [59317-59922] -->
+<h2><a name="overview1" id="overview1">Overview</a></h2>
 <div class="level2">
 
 <p>
 
 As of 0.138 release, <acronym title="Multi Emulator Super System">MESS</acronym>
- starts to document in xml format the games/programs which have been 
-released for various consoles and home computers, in addition to the 
-systems themselves (which were already documented in the source). At the
- moment, not all the systems are covered; however, the plan is to extend
- the support to most systems, given the high risk for info on obscure 
-and not so obscure systems &amp;amp; software to be lost forever. 
+ has added support for software lists in xml format to document the 
+games &amp; programs which have been released for various consoles and 
+home computers, much like the source already does for the systems 
+themselves and <acronym title="Multiple Arcade Machine Emulator">MAME</acronym>
+ does for the arcade games.
+At the moment, not all the systems are covered, but the plan is to 
+extend the support to most systems, given the high risk for info on 
+obscure and not so obscure systems &amp; software to be lost forever. 
 </p>
 
 <p>
-The chosen (minimal) format contains a <strong>shortname</strong> for each game (like <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> shortnames), a <strong>longer name</strong> (which should match the title screen, or the box screen if no title screen exists), the <strong>release year</strong>, the <strong>publisher name</strong> and the <strong>CRC32/SHA1 checksums</strong>.
- 
-Additional info like alternative titles, development teams, precise 
-release dates, serial numbers, available languages, etc. can be stored 
-externally in datfiles to be displayed by frontends (even if some more 
-optional fields might be eventually added).
+The software lists are stored in the hash/ directory and are released 
+together with the emulation. Hence, you should have them already both if
+ you download the current <acronym title="Multi Emulator Super System">MESS</acronym>
+ release and if you downloaded the latest svn. Alternatively, you can 
+download the various xml lists (or check their content) from our <a href="http://git.redump.net/cgit.cgi/mess/plain/hash/" class="urlextern" title="http://git.redump.net/cgit.cgi/mess/plain/hash/" rel="nofollow">git repository</a>.
+</p>
+
+<p>
+Notice that software lists are an additional documentation effort of <acronym title="Multi Emulator Super System">MESS</acronym>,
+ but they are not going to completely replace fullpath loading. Indeed, 
+we are fully aware that part of the fun when emulating an home computer 
+is the capability for the user to run its own software, and therefore 
+loading by fullpath will always remain available as well.
+</p>
+
+<p>
+<strong>Note</strong>: by mistake, in version 0.142 the lists have been 
+only included in the source pack and not in the exe pack, please get 
+them from the git repository until next version is released
+
 </p>
 
 </div>
-<!-- SECTION "What are these software lists?" [49976-50988] -->
-<h2><a name="where_can_i_find_the_lists" id="where_can_i_find_the_lists">Where can I find the lists?</a></h2>
+<!-- SECTION "Overview" [59923-61331] -->
+<h2><a name="list_format" id="list_format">List Format</a></h2>
 <div class="level2">
 
 <p>
 
-Lists are in the hash/ directory. However, if you are curious about their content, you can check the various lists in our <a href="http://git.redump.net/cgit.cgi/mess/tree/hash/" class="urlextern" title="http://git.redump.net/cgit.cgi/mess/tree/hash/" rel="nofollow">git repository</a>.
+We have chosen a (minimal) format which contains a <strong>shortname</strong> for each game (like <acronym title="Multiple Arcade Machine Emulator">MAME</acronym> shortnames), a <strong>description</strong> (which should match the title screen, or the box screen if no title screen exists), the <strong>release year</strong>, the <strong>publisher name</strong> and the <strong>CRC32/SHA1 checksums</strong>,
+ plus some additional fields that helps either the emulation or the 
+accurate description of the original hardware.
+Additional info strictly concerning the software, like available 
+languages, programmers names, cheats, etc. can be stored externally in 
+datfiles to be displayed by front-ends.
+</p>
+
+<p>
+More info about our software list format can be found in the <a href="http://mess.redump.net/mess:swlist_format" class="wikilink1" title="mess:swlist_format">appropriate Wiki page</a>.
 </p>
 
 </div>
-<!-- SECTION "Where can I find the lists?" [50989-51219] -->
-<h2><a name="where_shall_i_put_the_lists_for_mess_to_find_them" id="where_shall_i_put_the_lists_for_mess_to_find_them">Where shall I put the lists for MESS to find them?</a></h2>
+<!-- SECTION "List Format" [61332-62039] -->
+<h2><a name="setting_up_lists" id="setting_up_lists">Setting Up Lists</a></h2>
 <div class="level2">
 
 <p>
 
-By default, software lists in .xml format are stored in the hash/ directory inside the <acronym title="Multi Emulator Super System">MESS</acronym> directory. You can however decide to store them elsewhere, by adding a different directory as “hashpath” in mess.ini.
+By default, software lists in .xml format are stored in the hash/ directory inside the <acronym title="Multi Emulator Super System">MESS</acronym>
+ directory. You can however decide to store them elsewhere (or in 
+multiple paths), by adding the corresponding directories with the <code>hashpath</code> option.
 </p>
 
 </div>
-<!-- SECTION "Where shall I put the lists for MESS to find them?" [51220-51494] -->
-<h2><a name="where_shall_i_put_the_software_for_mess_to_find_it" id="where_shall_i_put_the_software_for_mess_to_find_it">Where shall I put the software for MESS to find it?</a></h2>
+<!-- SECTION "Setting Up Lists" [62040-62314] -->
+<h2><a name="setting_up_software" id="setting_up_software">Setting Up Software</a></h2>
 <div class="level2">
 
 <p>
 
-Software storage is slightly more complicate than list storage. The basic principles are:
-
+Software storage is slightly more complicate than list storage. The 
+basic principles is that software for each list should be stored in a 
+directory named after the list name and placed inside your roms/ 
+directory. E.g. the Epoch Super Cassette Vision carts, which belong to 
+the scv.xml list, should be stored in a <code>roms/scv/</code> directory and the Sharp X68000 floppies, which belong to the x68k_flop.xml list, should be stored in a <code>roms/x68k_flop/</code> directory.
 </p>
-<ul>
-<li class="level1"><div class="li"> different systems will have their 
-software stored in different directories (so that you can separate e.g. 
-SNES games from MegaDrive ones);</div>
-</li>
-<li class="level1"><div class="li"> different media for a given system 
-will be in different directories as well (so that e.g. C64 tapes will be
- separated from C64 carts and floppies).</div>
-</li>
-</ul>
 
 <p>
-
-In order to reflect these principles, when you load software using software lists <acronym title="Multi Emulator Super System">MESS</acronym> will look for files inside subdirectories of your roms/ directory.
-Namely, <acronym title="Multi Emulator Super System">MESS</acronym> expects to find subfolders named like the software lists: i.e. <acronym title="Multi Emulator Super System">MESS</acronym> will 
-
-</p>
-<ul>
-<li class="level1"><div class="li"> look for Epoch Super Cassette Vision carts inside roms/scv/;</div>
-</li>
-<li class="level1"><div class="li"> look for megadriv, genesis and 
-megadrij carts inside roms/megadriv/ (because all these systems use 
-megadiv.xml which contains a software list with <em>name=“megadriv”</em>);</div>
-</li>
-<li class="level1"><div class="li"> look for IBM PCJr. carts in roms/ibmpcjr_cart/.</div>
-</li>
-</ul>
-
-<p>
-
-As these few examples show, we tried to use for lists either the system 
-name (or the parent name, when multiple systems share the same list); or
- the system name followed by the media type, for systems which support 
-several media type like most home computers (see ibmpcjr example, which 
-uses a ibmpcjr_cart list, in view of a future addition of floppy disks 
-and tapes lists).
+In this way, you can separately store the software of different systems 
+and the different media of each system (e.g. carts separated from disks 
+separated from tapes).
 </p>
 
 <p>
@@ -1665,181 +1968,188 @@ named as the software lists they refer to.
 </p>
 
 <p>
-A full list of supported xml files, with the correspondent names, will be added to <acronym title="Multi Emulator Super System">MESS</acronym> Wiki soon-ish to help users (even if the correct subfolders can also be generated by clrmame, see below).
-</p>
-
-<p>
-Summing up, at the moment, you are allowed to store software in a directory tree like the following one
-
-</p>
-<pre class="code">roms/gameboy/
-roms/megadriv/
-roms/scv/
-rompath_1/ibmpcjr_cart/
-rompath_1/crvision
-rompath_2/wswan</pre>
-
-<p>
-
-as long as your mess.ini contains a “rompath    roms/;rompath_1/;rompath_2/” line.
+Notice that, for helping development, <acronym title="Multi Emulator Super System">MESS</acronym>
+ also looks for list items directly in the roms/ directory. Hence, you 
+can in principle store all your software in the rompath, together with 
+the bios files, even if it is not the recommended setup.
 </p>
 
 </div>
-<!-- SECTION "Where shall I put the software for MESS to find it?" [51495-53763] -->
-<h2><a name="how_can_i_launch_a_game_with_the_new_commands" id="how_can_i_launch_a_game_with_the_new_commands">How can I launch a game with the new commands?</a></h2>
+<!-- SECTION "Setting Up Software" [62315-63632] -->
+<h2><a name="usage_from_command_line" id="usage_from_command_line">Usage from Command Line</a></h2>
 <div class="level2">
 
 <p>
 
 If you have stored the software roms as explained above, and you want to
  launch “Super Mario Land” for the Game Boy (which corresponds to the 
-shortname 'sml'), then you simply have to type
-
+shortname <code>sml</code> in gameboy.xml), then you simply have to type
 </p>
 <pre class="code">mess gameboy -cart sml</pre>
 
 <p>
+and <acronym title="Multi Emulator Super System">MESS</acronym> will load the game. 
+</p>
 
-and <acronym title="Multi Emulator Super System">MESS</acronym> will load the game. Notice that <acronym title="Multi Emulator Super System">MESS</acronym> also allow to load the same game in gbcolor, by using the following command
+<p>
+Notice that if you type the wrong shortname, then a few best match 
+suggestions will be prompted to you, so that you can amend the game 
+name.
+</p>
 
+<p>
+And if you want to launch “Ancient Ys Vanished Omen” for the Fujitsu FM7 (which corresponds to the shortname <code>ys</code> in fm7_disk.xml), you can simply type
+</p>
+<pre class="code">mess fm7 -flop1 ys</pre>
+
+<p>
+or 
+</p>
+<pre class="code">mess fm7 -flop2 ys</pre>
+
+<p>
+depending on which disk drive you want to use. In fact, you can also use
+</p>
+<pre class="code">mess fm7 -flop1 ys -flop2 ys</pre>
+
+<p>
+but in this case you end up mount the first disk of the game in both disk drives.
+</p>
+
+<p>
+If you want to mount different disks in the various drives, you can do 
+that as well! To load e.g. the third disk of the game in the second 
+drive, you have to use the following command
+</p>
+<pre class="code">mess fm7 -flop1 ys -flop2 ys:flop3</pre>
+
+<p>
+where the <code>:flop3</code> part tells <acronym title="Multi Emulator Super System">MESS</acronym>
+ to load the data corresponding to the “flop3” part in the xml file. If 
+you specify a part which does not exist (e.g. because of a typo or 
+because you think a game has more disks than there really are), <acronym title="Multi Emulator Super System">MESS</acronym>
+ will revert to loading the first disk in the drive and you will have to
+ change disk during emulation, through the File Manager in the Internal 
+UI.
+</p>
+
+<p>
+Also, notice that some systems in <acronym title="Multi Emulator Super System">MESS</acronym>
+ support not only their own lists but also some compatible ones. For 
+example, gbcolor supports gameboy.xml as compatible list, in addition to
+ its own gbcolor.xml list of carts. This means that you can load any 
+gameboy game in gbcolor: using the same “Super Mario Land” example 
+above, you can launch <code>sml</code> in the Game Boy Color, by using the following command
 </p>
 <pre class="code">mess gbcolor -cart gameboy:sml</pre>
 
 <p>
-
-where the “gameboy:” part tells <acronym title="Multi Emulator Super System">MESS</acronym>
- that 'sml' belongs to the gameboy list. Similarly, you can load “Legend
- of Zelda Oracle of Ages” for the Game Boy Color (whose shortname is 
-'zeldaage') both in gbcolor with the command
-
+where the <code>gameboy:</code> part tells <acronym title="Multi Emulator Super System">MESS</acronym> that <code>sml</code>
+ belongs to the gameboy.xml list. Similarly, you can load “Legend of 
+Zelda Oracle of Ages” for the Game Boy Color (whose shortname is <code>zeldaage</code>) both in gbcolor with the command
 </p>
 <pre class="code">mess gbcolor -cart zeldaage</pre>
 
 <p>
-
 and in gameboy with the command
-
 </p>
 <pre class="code">mess gameboy -cart gbcolor:zeldaage</pre>
 
 <p>
-
-Of course, <strong>this can only be done for systems which were compatible</strong>,
- i.e. which had the same physical cart interface (this is reflected in 
-the use of the same “interface” parameter in the xml list): current 
-compatible systems are
-
+even in this specific case you will receive a “This Game Can Only Be 
+Played on a Game Boy Color” message, as if you had plugged your “Oracle 
+of Ages” cart inside an old Game Boy console.
 </p>
-<pre class="code">gameboy &lt;-&gt; gbcolor
-pce -&gt; sgx</pre>
 
 <p>
-
-i.e. you can load Game Boy Color games in the Game Boy and viceversa, 
-and you can load PC-Engine games in the Supergrafx. On the other hand, 
-you cannot load a Turbografx 16 game into the PC-Engine emulation, 
-because they were not compatible (US carts were 'encrypted').
+Other examples of compatible lists are <code>wscolor.xml</code> for the Wonderswan, <code>wswan.xml</code> for Wonderswan Color, and <code>pce.xml</code> for SuperGrafx.
 </p>
 
 </div>
-<!-- SECTION "How can I launch a game with the new commands?" [53764-55063] -->
-<h2><a name="can_i_use_the_internal_ui_with_software_lists" id="can_i_use_the_internal_ui_with_software_lists">Can I use the Internal UI with software lists?</a></h2>
+<!-- SECTION "Usage from Command Line" [63633-66169] -->
+<h2><a name="usage_from_internal_ui" id="usage_from_internal_ui">Usage from Internal UI</a></h2>
 <div class="level2">
 
 <p>
 
-<em> in progress </em>
+In addition to support from command line, software lists are completely 
+supported in the File Manager of the Internal UI. Once emulation is 
+running, indeed, you can press <kbd>Tab</kbd> and select the <code>File Manager</code>.
+ Once you have chosen a media device that you want to fill with an 
+image, the File Manager allows you to browse your computer in search of 
+the files to mount. Among available options, the third from top is the 
+option you are looking for: <code>Software List</code>!
+</p>
+
+<p>
+Once you have chosen it, you will be prompted with the available lists 
+for the system you are running and the specific media device you had 
+selected in the File Manager, including any available compatible list. 
+In the examples above, when trying to load a FM7 floppy disk you would 
+find here the “Fujitsu FM-7 Disk Images” and when trying to load a Game 
+Boy cart you would find here both the “Nintendo Game Boy cartridges” and
+ the “Nintendo Game Boy Color cartridges”.
+</p>
+
+<p>
+Select the list you want, and you will access the menu with all the 
+games present in our xml software list. Launching the game you want is 
+now a matter of a click! And if you select a game which is composed of 
+multiple media (e.g. multiple cdroms or multiple floppy disks), you will
+ be prompted with a new submenu which allows you to select among the 
+available parts the one you want to load.
+</p>
+
+<p>
+Notice that by default games are ordered based on their shortname, but 
+you can select the first option at top to display the list of games 
+ordered by their description.
+</p>
+
+<p>
+<strong>Tips</strong> - In the <code>Software List</code> menu, the navigation can be made a lot faster if you know a couple of features of the Internal UI! First of all, <kbd>PgUp</kbd>, <kbd>PgDn</kbd>, <kbd>Home</kbd> and <kbd>End</kbd> are fully supported and allow for faster scroll of the list of filenames. Moreover, as of <acronym title="Multi Emulator Super System">MESS</acronym>
+ 0.142, you can type the beginning of a filename, and the menu will 
+scroll until the file with the closest name (which will be the closest 
+shortname or the closest description, depending on the ordering you have
+ chosen). Adding the fact that you can click with the mouse of the file 
+to start it, finding the file you want to launch has never been so easy!
+</p>
+
+<p>
+<strong>Note</strong> This specific entry of the Manual refers to latest svn builds. Some features have been indeed added after 0.142 got released.
 </p>
 
 </div>
-<!-- SECTION "Can I use the Internal UI with software lists?" [55064-55142] -->
-<h2><a name="can_i_use_newui_with_software_lists" id="can_i_use_newui_with_software_lists">Can I use newui with software lists?</a></h2>
+<!-- SECTION "Usage from Internal UI" [66170-68521] -->
+<h2><a name="usage_from_new_internal_ui" id="usage_from_new_internal_ui">Usage from New Internal UI</a></h2>
 <div class="level2">
 
 <p>
 
-<em> in progress </em>
+Support for software lists in the New Internal UI (available by using MESSUI with the <code>-menu</code> option) has not been added yet.
 </p>
 
 </div>
-<!-- SECTION "Can I use newui with software lists?" [55143-55211] -->
-<h2><a name="can_i_use_messui_with_software_lists" id="can_i_use_messui_with_software_lists">Can I use MESSUI with software lists?</a></h2>
+<!-- SECTION "Usage from New Internal UI" [68522-68690] -->
+<h2><a name="usage_from_messui" id="usage_from_messui">Usage from MESSUI</a></h2>
 <div class="level2">
 
 <p>
 
-<em> in progress </em>
+Support for software lists in MESSUI is currently only partial. If you 
+select a system which supports a software list, then you will see that 
+there is an additional tab for the software entries that can be used to 
+select a game and launch it. However, for systems which have multiple 
+cartslots or multiple floppy drives, you can currently only load the 
+software list item in the first slot (-cart1 or -flop1). If you want to 
+load the item in any other slot you have to launch emulation from 
+command line, or enter the emulation and use the File Manager to add 
+images to the other slots.
 </p>
 
 </div>
-<!-- SECTION "Can I use MESSUI with software lists?" [55212-55281] -->
-<h2><a name="what_if_i_want_to_launch_a_game_which_is_not_recognized_in_the_software_lists" id="what_if_i_want_to_launch_a_game_which_is_not_recognized_in_the_software_lists">What if I want to launch a game which is not recognized in the software lists?</a></h2>
-<div class="level2">
-
-<p>
-
-<acronym title="Multi Emulator Super System">MESS</acronym> still supports the old loading procedure consisting in typing
-
-</p>
-<pre class="code">mess system -cart C:\path\to\my\carts\file.bin</pre>
-
-<p>
-
-or in launching games from MESSUI and newui, so you can simply keep 
-using the old procedure for unrecognized dumps or for your own programs.
-</p>
-
-</div>
-<!-- SECTION "What if I want to launch a game which is not recognized in the software lists?" [55282-55633] -->
-<h2><a name="what_is_the_exact_format_of_the_lists" id="what_is_the_exact_format_of_the_lists">What is the exact format of the lists?</a></h2>
-<div class="level2">
-
-<p>
-
-The chosen (minimal) format is the following
-</p>
-<pre class="code">&lt;software name="shortname" cloneof="parentname" supported="partial"&gt;
-&lt;description&gt;Game Title (Region, vx.x)&lt;/description&gt;
-&lt;year&gt;19??&lt;/year&gt;
-&lt;publisher&gt;Software House&lt;;/publisher&gt;
-&lt;part name="cart" interface="xxx_cart" feature="yyyyy"&gt;
-	&lt;dataarea name="rom" size="131072"&gt;
-		&lt;rom name="romname.bin" size="131072" crc="aaaaaaaa" 
-			sha1="aaaaaaaabbbbbbbbccccccccddddddddeeeeeeee" offset="0" /&gt;
-	&lt;/dataarea&gt;
-&lt;/part&gt;
-&lt;/software&gt;</pre>
-<ul>
-<li class="level1"><div class="li"> The <strong>software</strong> node contains the “shortname” which identifies the software (like in <acronym title="Multiple Arcade Machine Emulator">MAME</acronym>,
- less than 8 chars for parents and less than 16 chars for clones), the 
-“parentname” if this software is a clone, the “support status” (yes if 
-missing, no or partial if the software is known to be not completely 
-working).</div>
-</li>
-<li class="level1"><div class="li"> The <strong>description</strong>, <strong>year</strong> and <strong>publisher</strong> nodes contain info for UIs and frontends.</div>
-</li>
-<li class="level1"><div class="li"> The <strong>part</strong> node(s) 
-represent the actual content of the software: “name” entry should match 
-the media type for this software; the “interface” allows for 
-compatibility across different lists (see the gameboy/gbcolor example 
-above); the “feature” field allow for specifying mappers and other 
-game-specific features which <acronym title="Multi Emulator Super System">MESS</acronym> have to handle when loading this software.</div>
-</li>
-<li class="level1"><div class="li"> Finally, <strong>dataarea</strong> and <strong>rom</strong>
- contain the actual software file specifications (with “size” and 
-“checksums”). Notice that we might well have several “dataarea” in a 
-single “part”, and several “roms” in a single “dataarea”.</div>
-</li>
-</ul>
-
-<p>
-
-Also, as mentioned above, some more optional fields might be eventually added.
-</p>
-
-</div>
-<!-- SECTION "What is the exact format of the lists?" [55634-57267] -->
-<h2><a name="what_else_can_i_use_softlists_for" id="what_else_can_i_use_softlists_for">What else can I use softlists for?</a></h2>
+<!-- SECTION "Usage from MESSUI" [68691-69310] -->
+<h2><a name="additional_usage" id="additional_usage">Additional Usage</a></h2>
 <div class="level2">
 
 <p>
@@ -1863,36 +2173,15 @@ BIOS items) and by its software lists (for cart/floppy/tape items).
 </p>
 
 </div>
-<!-- SECTION "What else can I use softlists for?" [57268-57907] -->
-<h2><a name="how_will_software_lists_be_updated" id="how_will_software_lists_be_updated">How will software lists be updated?</a></h2>
+<!-- SECTION "Additional Usage" [69311-69933] -->
+<h2><a name="using_software_lists_with_cmpro" id="using_software_lists_with_cmpro">Using Software Lists with cmpro</a></h2>
 <div class="level2">
 
 <p>
 
-Well, being external .xml files, any update to current lists will simply
- require to overwrite the old .xml file with the new one, inside the 
-“hash\” directory.
-</p>
-
-</div>
-<!-- SECTION "How will software lists be updated?" [57908-58117] -->
-<h2><a name="how_can_i_contribute_to_software_lists" id="how_can_i_contribute_to_software_lists">How can I contribute to software lists?</a></h2>
-<div class="level2">
-
-<p>
-
-Any contribution (be it a fix or an improvement) can be simply posted in the <a href="http://www.bannister.org/forums/ubbthreads.php?ubb=postlist&amp;Board=1&amp;page=1%22" class="urlextern" title="http://www.bannister.org/forums/ubbthreads.php?ubb=postlist&amp;Board=1&amp;page=1&quot;" rel="nofollow">MESS board</a>.
-</p>
-
-</div>
-<!-- SECTION "How can I contribute to software lists?" [58118-58340] -->
-<h2><a name="can_i_use_clrmame_to_build_a_full_romset_for_mess_or_do_i_need_to_manually_rename_thousands_of_files" id="can_i_use_clrmame_to_build_a_full_romset_for_mess_or_do_i_need_to_manually_rename_thousands_of_files">Can I use clrmame to build a full romset for MESS or do I need to manually rename thousands of files?</a></h2>
-<div class="level2">
-
-<p>
-
-Yes, you can, but software lists are not 100% integrated with clrmame, 
-hence not everything is automated and some work at your end is required.
+Software lists are not 100% integrated with clrmame, hence not 
+everything is automated, but with some work at your end you can 
+successfully use <acronym title="Multi Emulator Super System">MESS</acronym> xml lists with cmpro.
 </p>
 
 </div>
@@ -1904,25 +2193,11 @@ hence not everything is automated and some work at your end is required.
 First of all, let assume you are only interested in a single software 
 list, say the Arcadia one. Since at the moment clrmame cannot directly 
 extract the list info from <acronym title="Multi Emulator Super System">MESS</acronym>,
- you have to manually feed the software list into the rommanager. Two 
-options are available (and they are basically equivalent): either you 
-point clrmame directly to the arcadia.xml file in the “hash/” directory 
-(by selecting “Add DatFile…” in the Profiler window, and browsing your 
-HD until you find the “hash/” directory inside your <acronym title="Multi Emulator Super System">MESS</acronym> directory) or you generate a separate xml file by using
-
-</p>
-<pre class="code">mess arcadia -listsoftware &gt; arc.xml</pre>
-
-<p>
-
-and then point clrmame to the newly generated arc.xml file (again, by 
-selecting “Add DatFile…” in the Profiler window, and browsing your HD 
-until you find the file you wanted). 
-In fact, there is no reason not to directly use the xml lists in the 
-“hash/” directory, but it could be useful to remember that <acronym title="Multi Emulator Super System">MESS</acronym> also allows to export lists with the <code>-listsoftware</code> command. 
-</p>
-
-<p>
+ you have to manually feed the software list into the rommanager, by 
+pointing cmpro directly to the arcadia.xml file in the “hash/” directory
+ (by selecting “Add DatFile…” in the Profiler window, and browsing your 
+HD until you find the “hash/” directory inside your <acronym title="Multi Emulator Super System">MESS</acronym>
+ directory).
 Once you have added the list to clrmame, a new profile will be created 
 and, by loading it, you can finally setup the directory where you want 
 to store your arcadia software, and rebuild any directory containing 
@@ -1986,35 +2261,143 @@ Rebuild procedure.
 <div class="level5">
 
 <p>
-Eventually, we might add better integration between clrmame and <acronym title="Multi Emulator Super System">MESS</acronym> software lists (e.g. clrmame could be able to choose proper batchrun options after simply parsing the <acronym title="Multi Emulator Super System">MESS</acronym> -listxml output), but for the time being the procedure described above should allow everyone to test the new feature.
+Eventually, we hope to add better integration between clrmame and <acronym title="Multi Emulator Super System">MESS</acronym> software lists (e.g. clrmame could be able to choose proper batchrun options after simply parsing the <acronym title="Multi Emulator Super System">MESS</acronym> -listxml output), but for the time being the procedure described above should work for everyone with little effort.
 </p>
 
 </div>
-<!-- SECTION "Can I use clrmame to build a full romset for MESS or do I need to manually rename thousands of files?" [58341-61902] -->
-<h2><a name="are_software_lists_recommended_over_the_good_old_launching_method" id="are_software_lists_recommended_over_the_good_old_launching_method">Are software lists recommended over the good old launching method?</a></h2>
+<!-- SECTION "Using Software Lists with cmpro" [69934-72919] -->
+<h2><a name="software_sources" id="software_sources">Software Sources</a></h2>
 <div class="level2">
 
 <p>
 
-To say the truth, at the moment software lists are not the suggested 
-method for software loading, especially if you usually launch games 
-through a frontend / UI. Indeed, the support for lists through MESSUI 
-and newui is only partial, and no frontend supports them. 
-However, we strongly recommend to use the -romident feature whenever you
- want to report a bug for a system which supports software lists. Adding
- the shortname of the software which exhibit problems to your bug report
- would help to exclude that you are using a bad dump and to confirm that
- the bug is really due to <acronym title="Multi Emulator Super System">MESS</acronym>.
+First of all, you should remember that software which have been released
+ and sold, no matter how old, is still copyrighted material. Therefore, 
+unless the original owner of the rights has released it for public use, 
+it is illegal to download such a software.
+</p>
+
+<p>
+In some countries, it is legal to make a backup copy of a software if 
+you own it. In this case, you can indeed copy your software and use it 
+with our lists. However, in many countries, even backup copies of the 
+software you own is a sort of gray area.
+</p>
+
+<p>
+As a result, we do not distribute any software with <acronym title="Multi Emulator Super System">MESS</acronym> and it is completely up to the user to look for it.
+</p>
+
+<p>
+What we distribute is a series of files containing info about software 
+titles and their checksums. Since our goal is to document <strong>accurately</strong> the original software, it is however of interest to explain where we got these info from.
+</p>
+
+<p>
+Things change a lot depending on the media we are talking about and as such we cover them separately here.
 </p>
 
 </div>
-<!-- SECTION "Are software lists recommended over the good old launching method?" [61903-62570] -->
-<h2><a name="what_is_still_missing_in_software_list_support" id="what_is_still_missing_in_software_list_support">What is still missing in software list support?</a></h2>
+
+<h4><a name="cartridges" id="cartridges">Cartridges</a></h4>
+<div class="level4">
+
+<p>
+
+For carts, we have either relied directly on dumper's info or on 
+collections like the no-intro ones, which currently represent the most 
+up-to-date collection concerning carts for a lot of systems.
+</p>
+
+<p>
+For pirate carts, info come usually or from alternative collections 
+(like GoodTools or TOSEC), or from chinese dumpers and chinese message 
+board members.
+</p>
+
+<p>
+Overall, when you want to verify if the dump you have matches one of our
+ software lists, you have to remember that we try to match the original 
+cart contents as much as possible. Therefore, cart dumps in our lists do
+ not have headers and consist on separate files if it is known that the 
+cart contained more than one chip.
+</p>
+
+<p>
+If you have a file in a different format, you can often recover the 
+files with the expected checksums by following the following steps:
+</p>
+<ol>
+<li class="level1"><div class="li"> open the file with an hex editor, 
+and strip the header (whose size depends on the file format: e.g. the 
+iNES and A78 header is typically 0x10 long).</div>
+</li>
+<li class="level1"><div class="li"> if you have a single file, while the
+ list expect multiple ones, you can try to split the file you have 
+according to the size expected by the list, and check if the resulting 
+part gives you the right files.</div>
+</li>
+</ol>
+
+<p>
+
+Point 1. could help for NES and A7800 mainly (not many other headered 
+format are around), point 2. helps for sure with NES (separate PRG and 
+CHR), with Coleco (most carts contained 8K rom chips only) and with 
+latest additions to the SNES list.
+</p>
+
+<p>
+<strong>Note</strong> - Among current lists, lynx.xml still contains files with header. This is going to be rectified soon, anyway.
+</p>
+
+</div>
+
+<h4><a name="cds" id="cds">CDs</a></h4>
+<div class="level4">
+
+<p>
+
+For CDs, as for carts, we try to rely on the best collections available,
+ which often means redump.org, but not always (e.g. they still haven't 
+found a way to extract properly the content of PCE CDs). Then, we 
+convert the available .bin + .cue files to .chd, following the 
+instructions that you can find <a href="http://guru.mameworld.info/tutorials/dumping_cds_&amp;_hdds/index.html" class="urlextern" title="http://guru.mameworld.info/tutorials/dumping_cds_&amp;_hdds/index.html" rel="nofollow">here</a>.
+</p>
+
+<p>
+This is usually enough to produce the .chd with the checksums expected by the software list.
+</p>
+
+<p>
+Things become a bit messier when the only available rips are in 
+.iso+.mp3 format. In this case, the conversion to .chd usually involve 
+in mounting the image in a program like Daemon Tools and then ripping it
+ as a real CD.
+</p>
+
+</div>
+
+<h4><a name="floppy_disks_tapes" id="floppy_disks_tapes">Floppy Disks &amp; Tapes</a></h4>
+<div class="level4">
+
+<p>
+
+For floppies and tapes the situation is not yet established. We 
+currently use common formats like .imd or .td0 or .d88 (for disks), and 
+.t77 or .tap (for tapes, which got converted internally to .wav at 
+loading time), but we might decide in the future to witch to some better
+ format if a good candidate appears.
+</p>
+
+</div>
+<!-- SECTION "Software Sources" [72920-76531] -->
+<h2><a name="missing_features" id="missing_features">Missing Features</a></h2>
 <div class="level2">
 
 <p>
 
-Well, in fact there are various aspects which still need to be improved.
+There are various aspects which still need to be improved.
 </p>
 
 </div>
@@ -2028,19 +2411,6 @@ and newui, to both display software info of the selected image and to
 handle software consisting of several files. 
 </p>
 
-<p>
-Moreover, we need to show some warnings when the user loads a software 
-item with known problems (either the game requires unemulated features, 
-or the dump is known to be bad).
-</p>
-
-<p>
-Finally, only a few systems have been updated to really exploit all the 
-features which lists allow, like installing per game handlers and 
-decoding routines, and this will need per-system fixes (i.e. it will 
-require some time).
-</p>
-
 </div>
 
 <h5><a name="list_improvements" id="list_improvements">List improvements</a></h5>
@@ -2049,105 +2419,36 @@ require some time).
 <p>
 While lists already contain most of the known software for each systems,
  additional info like year and publisher are often incomplete or 
-missing. And even when present, they still have to be verified against 
-title screens (this especially holds true for larger lists like 
-megadriv.xml, snes.xml, gba.xml, etc. since smaller lists have been 
-mostly fixed already). 
-</p>
-
-<p>
-Also, the “supported” attribute has still to be correctly set for all 
-games. This will require some time, given the size of some of the lists,
- but it is in progress.
+missing. And even when present, they often still have to be verified 
+against title screens.
 </p>
 
 </div>
-<!-- SECTION "What is still missing in software list support?" [62571-63879] -->
-<h2><a name="are_mess_lists_going_to_make_goodtools_no-intro_and_tosec_collections_useless" id="are_mess_lists_going_to_make_goodtools_no-intro_and_tosec_collections_useless">Are MESS lists going to make GoodTools, No-Intro and TOSEC collections useless?</a></h2>
-<div class="level2">
-
-<p>
-
-Well, despite what some <acronym title="Multi Emulator Super System">MESS</acronym>
- supporter might claim, in my opinion we won't replace GoodTools, 
-No-Intro or TOSEC anytime soon. And the simple reason is that we all 
-have different goals, so that different software collections will always
- appeal many users which would not like our software lists. Let me 
-analyze more specifically the various projects (rigorously in 
-alphabetical order):
-
-</p>
-<ul>
-<li class="level1"><div class="li"> GoodTools: Cowering's tools have 
-helped a lot to make order among messy dumps floating in the internet, 
-especially back when console emulation got started. Without GoodTools, 
-we would probably only have tons of file generically named as 
-HEBEREKE.BIN, which could hardly be identified as correct dumps or 
-recognized as faulty and broken files. While often criticized for 
-spreading out bad dumps (when it's actually fault of websites which 
-keeps offering corrupted dumps for download, together with the correct 
-ones, even now that Cow's tools don't show missing bad dumps anymore), 
-GoodTools have many great capabilities and, in particular, they can 
-recognize hacks, translations and demos, making them a <strong>MUST</strong> for people interested in homebrew &amp; romhacking development.</div>
-</li>
-<li class="level1"><div class="li"> No-Intro: No-Intro's work is 
-probably closer to our software lists than any other project, and I have
- to really say thanks to all the “datters” involved in No-Intro for the 
-huge efforts they have done in redumping and in properly documenting 
-console dumps. Without No-Intro, it would have been way harder to create
- a list of confirmed dumps, and in particular it would have been 
-impossible for GBA. However, differently from <acronym title="Multi Emulator Super System">MESS</acronym> software lists, they only focus on Official Releases, making their collection a <strong>MUST</strong>
- for people which are not interested in pirate carts and prefer to have a
- clean collection of all the Jp/Eu/US software ever released for a given
- system.</div>
-</li>
-<li class="level1"><div class="li"> TOSEC: TOSEC collections offer 
-basically the same pros and cons of Good sets, but they cover a huge 
-amount of obscure systems, whose software would have probably got lost 
-without them. Despite the inclusion of bad dumps, TOSEC collections 
-represent a <strong>MUST</strong> for people interested in home 
-computers (e.g. for the comprehensive documentation about demos, which 
-often represented a way more creative world than the official 
-programs/games releases)</div>
-</li>
-</ul>
-
-<p>
-
-Summing up, if people want a collection of software which worked on the 
-real hardware (both officially released, and pirated) and they want to 
-launch it easily from command line <acronym title="Multi Emulator Super System">MESS</acronym>,
- then they will for sure drop other collections in favor of our software
- lists. 
-But if they want collections including demos, translations and hacks 
-(which are often as good as the original software), or if they only want
- a “perfect collection” of the official software, then they will never 
-abandon other collections to use our software lists.
-</p>
-
-<p>
-And it is also for these users, which are not interested in our software lists, that <acronym title="Multi Emulator Super System">MESS</acronym>
- keeps supporting the old loading procedure, through absolute paths, so 
-that files from the different collections can still be easily launched 
-in <acronym title="Multi Emulator Super System">MESS</acronym> <img src="http://mess.redump.net/lib/images/smileys/icon_smile.gif" class="middle" alt=":-)">
-</p>
-
-</div>
-<!-- SECTION "Are MESS lists going to make GoodTools, No-Intro and TOSEC collections useless?" [63880-67040] -->
+<!-- SECTION "Missing Features" [76532-77089] -->
 <h1><a name="consoles_emulation" id="consoles_emulation">Consoles Emulation</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "Consoles Emulation" [67041-67073] -->
+
+<h5><a name="shortcuts6" id="shortcuts6">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#available_emulated_devices_formats_and_media" title="mess:howto ↵" class="wikilink1">Available Emulated Devices, Formats and Media</a> </td><td class="col1"> <a href="#using_memory_cards" title="mess:howto ↵" class="wikilink1">Using Memory Cards</a> </td><td class="col2"> <a href="#emulated_controllers_consoles" title="mess:howto ↵" class="wikilink1">Emulated Controllers (Consoles)</a> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "Consoles Emulation" [77090-77354] -->
 <h2><a name="available_emulated_devices_formats_and_media" id="available_emulated_devices_formats_and_media">Available Emulated Devices, Formats and Media</a></h2>
 <div class="level2">
 
 <p>
 
 For each emulated system, <acronym title="Multi Emulator Super System">MESS</acronym>
- supports a certain number of devices present on the original system, 
-e.g. carts or CD-ROM players, and a certain number of file extensions 
-for each device. 
+ supports a certain number of media devices present on the original 
+system, e.g. carts or CD-ROM players, and a certain number of file 
+extensions for each device. 
 To find out which devices and formats are supported by your favorite 
 system, simply launch
 
@@ -2183,7 +2484,7 @@ Notice that only supported extensions will load successfully.
 </p>
 
 <p>
-In the following, we briefly describe how to use devices in console emulation under <acronym title="Multi Emulator Super System">MESS</acronym>. See also the <a href="#media_emulation" title="mess:howto ↵" class="wikilink1">Media Emulation</a> section of this Manual.
+In the following, we briefly describe how to use media in console emulation under <acronym title="Multi Emulator Super System">MESS</acronym>. See also the <a href="#media_emulation" title="mess:howto ↵" class="wikilink1">Media Emulation</a> section of this Manual.
 </p>
 
 <p>
@@ -2392,7 +2693,7 @@ Notice that the saving procedure can be slow. However, you can speed up emulatio
 </p>
 
 </div>
-<!-- SECTION "Available Emulated Devices, Formats and Media" [67074-74620] -->
+<!-- SECTION "Available Emulated Devices, Formats and Media" [77355-84905] -->
 <h2><a name="using_memory_cards" id="using_memory_cards">Using Memory Cards</a></h2>
 <div class="level2">
 
@@ -2401,7 +2702,7 @@ Notice that the saving procedure can be slow. However, you can speed up emulatio
 </p>
 
 </div>
-<!-- SECTION "Using Memory Cards" [74621-74671] -->
+<!-- SECTION "Using Memory Cards" [84906-84956] -->
 <h2><a name="emulated_controllers_consoles" id="emulated_controllers_consoles">Emulated Controllers (Consoles)</a></h2>
 <div class="level2">
 
@@ -2508,12 +2809,22 @@ You can check <a href="http://mess.redump.net/sysinfo" class="wikilink1" title="
 </p>
 
 </div>
-<!-- SECTION "Emulated Controllers (Consoles)" [74672-77173] -->
+<!-- SECTION "Emulated Controllers (Consoles)" [84957-87458] -->
 <h1><a name="computers_emulation" id="computers_emulation">Computers Emulation</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "Computers Emulation" [77174-77208] -->
+
+<h5><a name="shortcuts7" id="shortcuts7">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#pasting_code_to_emulated_computers" title="mess:howto ↵" class="wikilink1">Pasting Code to Emulated Computers</a> </td><td class="col1"> <a href="#available_emulated_devices_formats_and_media1" title="mess:howto ↵" class="wikilink1">Available Emulated Devices, Formats and Media</a> </td><td class="col2"> <a href="#emulated_ram" title="mess:howto ↵" class="wikilink1">Emulated RAM</a> </td><td class="col3"> <a href="#emulated_keyboard" title="mess:howto ↵" class="wikilink1">Emulated Keyboard</a> </td><td class="col4"> <a href="#other_emulated_controllers_computers" title="mess:howto ↵" class="wikilink1">Other Emulated Controllers (Computers)</a></td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "Computers Emulation" [87459-87846] -->
 <h2><a name="pasting_code_to_emulated_computers" id="pasting_code_to_emulated_computers">Pasting Code to Emulated Computers</a></h2>
 <div class="level2">
 
@@ -2533,16 +2844,16 @@ copied the text (e.g. with <kbd>Ctrl</kbd>+<kbd>C</kbd> in Windows), you simply 
 </p>
 
 </div>
-<!-- SECTION "Pasting Code to Emulated Computers" [77209-77984] -->
+<!-- SECTION "Pasting Code to Emulated Computers" [87847-88622] -->
 <h2><a name="available_emulated_devices_formats_and_media1" id="available_emulated_devices_formats_and_media1">Available Emulated Devices, Formats and Media</a></h2>
 <div class="level2">
 
 <p>
 
 For each emulated system, <acronym title="Multi Emulator Super System">MESS</acronym>
- supports a certain number of devices present on the original system, 
-e.g. carts or floppy drives, and a certain number of file extensions for
- each device. 
+ supports a certain number of media devices present on the original 
+system, e.g. carts or CD-ROM players, and a certain number of file 
+extensions for each device. 
 To find out which devices and formats are supported by your favorite 
 system, simply launch
 </p>
@@ -2849,7 +3160,7 @@ Notice that the saving procedure can be slow. However, you can speed up emulatio
 </p>
 
 </div>
-<!-- SECTION "Available Emulated Devices, Formats and Media" [77985-85995] -->
+<!-- SECTION "Available Emulated Devices, Formats and Media" [88623-96640] -->
 <h2><a name="emulated_ram" id="emulated_ram">Emulated RAM</a></h2>
 <div class="level2">
 
@@ -2858,7 +3169,7 @@ Notice that the saving procedure can be slow. However, you can speed up emulatio
 </p>
 
 </div>
-<!-- SECTION "Emulated RAM" [85996-86267] -->
+<!-- SECTION "Emulated RAM" [96641-96912] -->
 <h2><a name="emulated_keyboard" id="emulated_keyboard">Emulated Keyboard</a></h2>
 <div class="level2">
 
@@ -2879,11 +3190,15 @@ same time a nice interface for configurations.
 this problem is to offer two different emulation modes for the keyboard 
 of each system, Full and Partial, whenever you start the emulation of a 
 computer (this does not apply to console). As said above, you can switch
- between the two using <kbd>ScrLock</kbd> (in (SDL)<acronym title="Multi Emulator Super System">MESS</acronym>, the default key is <kbd>Ins</kbd> and you can change it in <a href="http://mess.redump.net/mess:mess.ini" class="wikilink1" title="mess:mess.ini">mess.ini</a> changing the <code>uimodekey</code> line).
+ between the two using <kbd>ScrLock</kbd> (in (SDL)<acronym title="Multi Emulator Super System">MESS</acronym>, the default key is <kbd>Delete</kbd> and you can change it in <a href="http://mess.redump.net/mess:mess.ini" class="wikilink1" title="mess:mess.ini">mess.ini</a> changing the <code>uimodekey</code> line).
 </p>
 
 <p>
-Below, is a short description of the differences between the two modes.
+(For more information on how to change this <kbd>ScrLock</kbd> to be something else, see: <a href="http://mess.redump.net/faq#for_some_reason_esc_does_not_quit_mess_nor_does_tab_bring_up_the_menu" class="urlextern" title="http://mess.redump.net/faq#for_some_reason_esc_does_not_quit_mess_nor_does_tab_bring_up_the_menu" rel="nofollow">http://mess.redump.net/faq#for_some_reason_esc_does_not_quit_mess_nor_does_tab_bring_up_the_menu</a>)
+</p>
+
+<p>
+Below is a short description of the differences between the two modes.
 </p>
 
 </div>
@@ -3005,7 +3320,7 @@ key is still unmapped, please file a bug report in <a href="http://bugzilla.mess
 </p>
 
 </div>
-<!-- SECTION "Emulated Keyboard" [86268-92034] -->
+<!-- SECTION "Emulated Keyboard" [96913-102870] -->
 <h2><a name="other_emulated_controllers_computers" id="other_emulated_controllers_computers">Other Emulated Controllers (Computers)</a></h2>
 <div class="level2">
 
@@ -3169,7 +3484,7 @@ You can check <a href="http://mess.redump.net/sysinfo" class="wikilink1" title="
 </p>
 
 </div>
-<!-- SECTION "Other Emulated Controllers (Computers)" [92035-96813] -->
+<!-- SECTION "Other Emulated Controllers (Computers)" [102871-107649] -->
 <h1><a name="chess_computers_emulation" id="chess_computers_emulation">Chess Computers Emulation</a></h1>
 <div class="level1">
 
@@ -3182,7 +3497,7 @@ if the emulated Chess Computer comes with an artwork (e.g. mm5), you may
 </p>
 
 </div>
-<!-- SECTION "Chess Computers Emulation" [96814-97111] -->
+<!-- SECTION "Chess Computers Emulation" [107650-107947] -->
 <h2><a name="clickable_artwork" id="clickable_artwork">Clickable Artwork</a></h2>
 <div class="level2">
 
@@ -3195,7 +3510,7 @@ One of the main features of Chess Computer emulation in <acronym title="Multi Em
 </p>
 
 </div>
-<!-- SECTION "Clickable Artwork" [97112-97507] -->
+<!-- SECTION "Clickable Artwork" [107948-108343] -->
 <h1><a name="calculators_emulation" id="calculators_emulation">Calculators Emulation</a></h1>
 <div class="level1">
 
@@ -3208,7 +3523,7 @@ find interesting the following feature.
 </p>
 
 </div>
-<!-- SECTION "Calculators Emulation" [97508-97797] -->
+<!-- SECTION "Calculators Emulation" [108344-108633] -->
 <h2><a name="clickable_artwork1" id="clickable_artwork1">Clickable Artwork</a></h2>
 <div class="level2">
 
@@ -3221,7 +3536,7 @@ One of the main feature of Calculators emulation in <acronym title="Multi Emulat
 </p>
 
 </div>
-<!-- SECTION "Clickable Artwork" [97798-98190] -->
+<!-- SECTION "Clickable Artwork" [108634-109026] -->
 <h1><a name="media_emulation" id="media_emulation">Media Emulation</a></h1>
 <div class="level1">
 
@@ -3235,7 +3550,23 @@ requiring software to be named and stored exactly as expected by the
 </p>
 
 </div>
-<!-- SECTION "Media Emulation" [98191-98529] -->
+
+<h5><a name="shortcuts8" id="shortcuts8">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#tape_emulation" title="mess:howto ↵" class="wikilink1">Tape Emulation</a> </td><td class="col1"> <a href="#quickloads" title="mess:howto ↵" class="wikilink1">Quickloads</a> </td><td class="col2"> <a href="#printer_emulation" title="mess:howto ↵" class="wikilink1">Printer Emulation</a> </td>
+	</tr>
+	<tr class="row1">
+		<td class="col0"> <a href="#cartridge_emulation" title="mess:howto ↵" class="wikilink1">Cartridge Emulation</a> </td><td class="col1"> <a href="#cd-rom_emulation" title="mess:howto ↵" class="wikilink1">CD-ROM Emulation</a> </td><td class="col2"> <a href="#serial_ports" title="mess:howto ↵" class="wikilink1">Serial Ports</a> </td>
+	</tr>
+	<tr class="row2">
+		<td class="col0"> <a href="#floppy_emulation" title="mess:howto ↵" class="wikilink1">Floppy Emulation</a> </td><td class="col1"> <a href="#hard_disk_emulation" title="mess:howto ↵" class="wikilink1">Hard Disk Emulation</a> </td><td class="col2"> <a href="#choosing_bios" title="mess:howto ↵" class="wikilink1">Choosing BIOS</a></td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "Media Emulation" [109027-109738] -->
 <h2><a name="tape_emulation" id="tape_emulation">Tape Emulation</a></h2>
 <div class="level2">
 
@@ -3283,8 +3614,17 @@ machine. At the end, you will find a .wav file in your <acronym title="Multi Emu
 Notice that loading and saving procedures can be slow. However, you can speed up emulation with no bad consequences by pressing <kbd>Ins</kbd> in partial keyboard emulation mode.
 </p>
 
+<p>
+<strong>Tips</strong> - <acronym title="Multi Emulator Super System">MESS</acronym> supports also a faster way to create a new tape file: from command line launch <acronym title="Multi Emulator Super System">MESS</acronym> with a non-existent .wav file 
+</p>
+<pre class="code">mess &lt;system&gt; -cass foo.wav</pre>
+
+<p>
+and the emulator will create an empty tape for you, without any need to enter the File Manager
+</p>
+
 </div>
-<!-- SECTION "Tape Emulation" [98530-100510] -->
+<!-- SECTION "Tape Emulation" [109739-111975] -->
 <h2><a name="cartridge_emulation" id="cartridge_emulation">Cartridge Emulation</a></h2>
 <div class="level2">
 
@@ -3310,10 +3650,11 @@ cartslot.
 
 <p>
 If the original cart supported saving data to internal SRAM, <acronym title="Multi Emulator Super System">MESS</acronym> should save the same data to a nvram file foo.nv inside the folder nvram/&lt;system&gt;/. You can check <a href="http://mess.redump.net/sysinfo" class="wikilink1" title="sysinfo">sysinfo.dat</a> to find if the system you want to emulate currently supports saving to SRAM.
+
 </p>
 
 </div>
-<!-- SECTION "Cartridge Emulation" [100511-101516] -->
+<!-- SECTION "Cartridge Emulation" [111976-112979] -->
 <h2><a name="floppy_emulation" id="floppy_emulation">Floppy Emulation</a></h2>
 <div class="level2">
 
@@ -3345,8 +3686,17 @@ drive.
 <em>- formatting/creating a floppy</em>
 </p>
 
+<p>
+<strong>Tips</strong> - <acronym title="Multi Emulator Super System">MESS</acronym> supports also a faster way to create a new disk file: from command line launch <acronym title="Multi Emulator Super System">MESS</acronym> with a non-existent file in a floppy drive
+</p>
+<pre class="code">mess &lt;system&gt; -flop foo.ext</pre>
+
+<p>
+and the emulator will create an empty disk for you, without any need to enter the File Manager
+</p>
+
 </div>
-<!-- SECTION "Floppy Emulation" [101517-102480] -->
+<!-- SECTION "Floppy Emulation" [112980-114211] -->
 <h2><a name="quickloads" id="quickloads">Quickloads</a></h2>
 <div class="level2">
 
@@ -3383,7 +3733,7 @@ should add support for Save States rather than for Quicksave.
 </p>
 
 </div>
-<!-- SECTION "Quickloads" [102481-103683] -->
+<!-- SECTION "Quickloads" [114212-115414] -->
 <h2><a name="cd-rom_emulation" id="cd-rom_emulation">CD-ROM Emulation</a></h2>
 <div class="level2">
 
@@ -3409,7 +3759,7 @@ CD-ROM drive.
 </p>
 
 </div>
-<!-- SECTION "CD-ROM Emulation" [103684-104529] -->
+<!-- SECTION "CD-ROM Emulation" [115415-116260] -->
 <h2><a name="hard_disk_emulation" id="hard_disk_emulation">Hard Disk Emulation</a></h2>
 <div class="level2">
 
@@ -3420,7 +3770,7 @@ CD-ROM drive.
 </p>
 
 </div>
-<!-- SECTION "Hard Disk Emulation" [104530-104622] -->
+<!-- SECTION "Hard Disk Emulation" [116261-116353] -->
 <h2><a name="printer_emulation" id="printer_emulation">Printer Emulation</a></h2>
 <div class="level2">
 
@@ -3429,7 +3779,7 @@ CD-ROM drive.
 </p>
 
 </div>
-<!-- SECTION "Printer Emulation" [104623-104671] -->
+<!-- SECTION "Printer Emulation" [116354-116402] -->
 <h2><a name="serial_ports" id="serial_ports">Serial Ports</a></h2>
 <div class="level2">
 
@@ -3438,7 +3788,7 @@ CD-ROM drive.
 </p>
 
 </div>
-<!-- SECTION "Serial Ports" [104672-104714] -->
+<!-- SECTION "Serial Ports" [116403-116445] -->
 <h2><a name="choosing_bios" id="choosing_bios">Choosing BIOS</a></h2>
 <div class="level2">
 
@@ -3452,7 +3802,7 @@ At the moment, there is no way to change BIOS while emulation is running.
 </p>
 
 </div>
-<!-- SECTION "Choosing BIOS" [104715-105100] -->
+<!-- SECTION "Choosing BIOS" [116446-116831] -->
 <h1><a name="internal_ui_options" id="internal_ui_options">Internal UI Options</a></h1>
 <div class="level1">
 
@@ -3642,14 +3992,28 @@ Here, you can see which image is currently loaded in each available device.
 
 <p>
 
-Here, you can unmount the image currently loaded in each device and 
-mount a new image in the same device or in a different one. This menu 
-also allows you to create new images for devices which supports image 
-creation and saving (e.g. cassette). You simply have to select the 
-device, and then the “Create” option. You will be asked to type in a 
-filename and then the new image will be created (if there exists already
- a file with the same name, you will be asked if you want to overwrite 
-the old one or to change filename)
+Here, you can mount an image in one of the available media devices, or 
+unmount the image currently loaded and mount a new one in the same media
+ device or in a different one. This menu also allows you to create new 
+images for devices which supports image creation and saving (e.g. 
+cassette). You simply have to select the device, and then the “Create” 
+option. You will be asked to type in a filename and then the new image 
+will be created (if there exists already a file with the same name, you 
+will be asked if you want to overwrite the old one or to change 
+filename).
+</p>
+
+<p>
+Notice that, once you have selected the device you want to modify, the 
+File Manager will allow you to browse every volume and directory of your
+ computer and to select the file you want. Moreover, the File Manager 
+allows you to use <kbd>PgUp</kbd>, <kbd>PgDn</kbd>, <kbd>Home</kbd> and <kbd>End</kbd> for a faster scroll and to input the first letters of the file you look for in order to reach immediately the image you want.
+</p>
+
+<p>
+And if you want to load an image from the available software lists, you 
+can do that as well by selecting the correspondent menu entry (more info
+ on this topic can be found in the <a href="#software_lists" title="mess:howto ↵" class="wikilink1">Software List</a> Section of this Manual).
 </p>
 
 </div>
@@ -3719,7 +4083,7 @@ Here, you exit from the menu to go back to the emulation!
 </p>
 
 </div>
-<!-- SECTION "Internal UI Options" [105101-113000] -->
+<!-- SECTION "Internal UI Options" [116832-125443] -->
 <h1><a name="new_ui_options" id="new_ui_options">New UI Options</a></h1>
 <div class="level1">
 
@@ -3817,12 +4181,22 @@ select mount and a file window will open and let you select the file you
 </p>
 
 </div>
-<!-- SECTION "New UI Options" [113001-114391] -->
+<!-- SECTION "New UI Options" [125444-126834] -->
 <h1><a name="gui_options" id="gui_options">GUI Options</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "GUI Options" [114392-114418] -->
+
+<h5><a name="shortcuts9" id="shortcuts9">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#windows1" title="mess:howto ↵" class="wikilink1">Windows</a> </td><td class="col1"> <a href="#other_operating_systems1" title="mess:howto ↵" class="wikilink1">Other Operating Systems</a> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "GUI Options" [126835-126960] -->
 <h2><a name="windows1" id="windows1">Windows</a></h2>
 <div class="level2">
 
@@ -3969,7 +4343,7 @@ Help and Readme Files
 </p>
 
 </div>
-<!-- SECTION "Windows" [114419-117740] -->
+<!-- SECTION "Windows" [126961-130282] -->
 <h2><a name="other_operating_systems1" id="other_operating_systems1">Other Operating Systems</a></h2>
 <div class="level2">
 
@@ -3979,13 +4353,29 @@ There is no graphical user interface shipped with <acronym title="Multi Emulator
 </p>
 
 </div>
-<!-- SECTION "Other Operating Systems" [117741-117985] -->
+<!-- SECTION "Other Operating Systems" [130283-130527] -->
 <h1><a name="video_options1" id="video_options1">Video Options</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "Video Options" [117986-118014] -->
-<h2><a name="overview1" id="overview1">Overview</a></h2>
+
+<h5><a name="shortcuts10" id="shortcuts10">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#overview2" title="mess:howto ↵" class="wikilink1">Overview</a> </td><td class="col1"> <a href="#video_parameters" title="mess:howto ↵" class="wikilink1">Video Parameters</a> </td><td class="col2"> <a href="#video_modes" title="mess:howto ↵" class="wikilink1">Video Modes</a> </td><td class="col3"> <a href="#vertical_synchronization" title="mess:howto ↵" class="wikilink1">Vertical Synchronization</a> </td>
+	</tr>
+	<tr class="row1">
+		<td class="col0"> <a href="#running_mess_in_a_window" title="mess:howto ↵" class="wikilink1">Running MESS in a Window</a> </td><td class="col1"> <a href="#rotating_screen" title="mess:howto ↵" class="wikilink1">Rotating Screen</a> </td><td class="col2"> <a href="#multiple_windows" title="mess:howto ↵" class="wikilink1">Multiple Windows</a> </td><td class="col3"> <a href="#filters" title="mess:howto ↵" class="wikilink1">Filters</a> </td>
+	</tr>
+	<tr class="row2">
+		<td class="col0"> <a href="#running_mess_in_full_screen" title="mess:howto ↵" class="wikilink1">Running MESS in Full Screen</a> </td><td class="col1"> <a href="#artworks" title="mess:howto ↵" class="wikilink1">Artworks</a> </td><td class="col2"> <a href="#stretching_and_scaling" title="mess:howto ↵" class="wikilink1">Stretching and Scaling</a> </td><td class="col3"> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "Video Options" [130528-131037] -->
+<h2><a name="overview2" id="overview2">Overview</a></h2>
 <div class="level2">
 
 <p>
@@ -3994,7 +4384,7 @@ Here we only analyze a few of the available video options for <acronym title="Mu
 </p>
 
 </div>
-<!-- SECTION "Overview" [118015-118323] -->
+<!-- SECTION "Overview" [131038-131346] -->
 <h2><a name="running_mess_in_a_window" id="running_mess_in_a_window">Running MESS in a Window</a></h2>
 <div class="level2">
 
@@ -4026,7 +4416,7 @@ in <a href="http://mess.redump.net/mess:mess.ini" class="wikilink1" title="mess:
 </p>
 
 </div>
-<!-- SECTION "Running MESS in a Window" [118324-118915] -->
+<!-- SECTION "Running MESS in a Window" [131347-131938] -->
 <h2><a name="running_mess_in_full_screen" id="running_mess_in_full_screen">Running MESS in Full Screen</a></h2>
 <div class="level2">
 
@@ -4043,7 +4433,7 @@ in <a href="http://mess.redump.net/mess:mess.ini" class="wikilink1" title="mess:
 </p>
 
 </div>
-<!-- SECTION "Running MESS in Full Screen" [118916-119148] -->
+<!-- SECTION "Running MESS in Full Screen" [131939-132171] -->
 <h2><a name="video_parameters" id="video_parameters">Video Parameters</a></h2>
 <div class="level2">
 
@@ -4101,7 +4491,7 @@ therefore increasing the overall brightness.
 </p>
 
 </div>
-<!-- SECTION "Video Parameters" [119149-120790] -->
+<!-- SECTION "Video Parameters" [132172-133813] -->
 <h2><a name="rotating_screen" id="rotating_screen">Rotating Screen</a></h2>
 <div class="level2">
 
@@ -4157,7 +4547,7 @@ This option is used to mirror the game screen vertically
 </p>
 
 </div>
-<!-- SECTION "Rotating Screen" [120791-121689] -->
+<!-- SECTION "Rotating Screen" [133814-134712] -->
 <h2><a name="artworks" id="artworks">Artworks</a></h2>
 <div class="level2">
 
@@ -4171,7 +4561,7 @@ This option is used to mirror the game screen vertically
 </p>
 
 </div>
-<!-- SECTION "Artworks" [121690-121864] -->
+<!-- SECTION "Artworks" [134713-134887] -->
 <h2><a name="video_modes" id="video_modes">Video Modes</a></h2>
 <div class="level2">
 
@@ -4221,7 +4611,7 @@ graphics card.
 </p>
 
 </div>
-<!-- SECTION "Video Modes" [121865-123237] -->
+<!-- SECTION "Video Modes" [134888-136260] -->
 <h2><a name="multiple_windows" id="multiple_windows">Multiple Windows</a></h2>
 <div class="level2">
 
@@ -4235,7 +4625,7 @@ At the moment, (SDL)<acronym title="Multi Emulator Super System">MESS</acronym> 
 </p>
 
 </div>
-<!-- SECTION "Multiple Windows" [123238-123562] -->
+<!-- SECTION "Multiple Windows" [136261-136585] -->
 <h2><a name="stretching_and_scaling" id="stretching_and_scaling">Stretching and Scaling</a></h2>
 <div class="level2">
 
@@ -4256,7 +4646,7 @@ Also you can decide to scale the system graphics before displaying it. This can 
 </p>
 
 </div>
-<!-- SECTION "Stretching and Scaling" [123563-124409] -->
+<!-- SECTION "Stretching and Scaling" [136586-137432] -->
 <h2><a name="vertical_synchronization" id="vertical_synchronization">Vertical Synchronization</a></h2>
 <div class="level2">
 
@@ -4266,7 +4656,7 @@ If you suffer from tearing or choppy scrolling, you can try to enable the <code>
 </p>
 
 </div>
-<!-- SECTION "Vertical Synchronization" [124410-124631] -->
+<!-- SECTION "Vertical Synchronization" [137433-137654] -->
 <h2><a name="filters" id="filters">Filters</a></h2>
 <div class="level2">
 
@@ -4281,13 +4671,26 @@ television screens. You can turn the bilinear filter to off with <code>-nofilter
 </p>
 
 </div>
-<!-- SECTION "Filters" [124632-125044] -->
+<!-- SECTION "Filters" [137655-138067] -->
 <h1><a name="sound_options" id="sound_options">Sound Options</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "Sound Options" [125045-125073] -->
-<h2><a name="overview2" id="overview2">Overview</a></h2>
+
+<h5><a name="shortcuts11" id="shortcuts11">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#overview3" title="mess:howto ↵" class="wikilink1">Overview</a> </td><td class="col1"> <a href="#audio_modes" title="mess:howto ↵" class="wikilink1">Audio Modes</a> </td><td class="col2"> <a href="#changing_volume" title="mess:howto ↵" class="wikilink1">Changing Volume</a> </td>
+	</tr>
+	<tr class="row1">
+		<td class="col0"> <a href="#muting_mess" title="mess:howto ↵" class="wikilink1">Muting MESS</a> </td><td class="col1"> <a href="#changing_samplerate" title="mess:howto ↵" class="wikilink1">Changing Samplerate</a> </td><td class="col2"> <a href="#changing_latency" title="mess:howto ↵" class="wikilink1">Changing Latency</a> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "Sound Options" [138068-138332] -->
+<h2><a name="overview3" id="overview3">Overview</a></h2>
 <div class="level2">
 
 <p>
@@ -4296,7 +4699,7 @@ Here we only analyze a few of the available sound options for <acronym title="Mu
 </p>
 
 </div>
-<!-- SECTION "Overview" [125074-125381] -->
+<!-- SECTION "Overview" [138333-138640] -->
 <h2><a name="muting_mess" id="muting_mess">Muting MESS</a></h2>
 <div class="level2">
 
@@ -4306,7 +4709,7 @@ You can easily deactivate sound in <acronym title="Multi Emulator Super System">
 </p>
 
 </div>
-<!-- SECTION "Muting MESS" [125382-125595] -->
+<!-- SECTION "Muting MESS" [138641-138854] -->
 <h2><a name="audio_modes" id="audio_modes">Audio Modes</a></h2>
 <div class="level2">
 
@@ -4316,7 +4719,7 @@ In (SDL)<acronym title="Multi Emulator Super System">MESS</acronym> you can deci
 </p>
 
 </div>
-<!-- SECTION "Audio Modes" [125596-125793] -->
+<!-- SECTION "Audio Modes" [138855-139052] -->
 <h2><a name="changing_samplerate" id="changing_samplerate">Changing Samplerate</a></h2>
 <div class="level2">
 
@@ -4331,7 +4734,7 @@ default 48000, e.g. to 11025, 22050 or 44100, and see if it better suits
 </p>
 
 </div>
-<!-- SECTION "Changing Samplerate" [125794-126188] -->
+<!-- SECTION "Changing Samplerate" [139053-139447] -->
 <h2><a name="changing_volume" id="changing_volume">Changing Volume</a></h2>
 <div class="level2">
 
@@ -4357,7 +4760,7 @@ You can modify the volume also in real time, by pressing <kbd>Tab</kbd> and ente
 </p>
 
 </div>
-<!-- SECTION "Changing Volume" [126189-126749] -->
+<!-- SECTION "Changing Volume" [139448-140008] -->
 <h2><a name="changing_latency" id="changing_latency">Changing Latency</a></h2>
 <div class="level2">
 
@@ -4381,12 +4784,28 @@ Quite often imperfect sound is due to lack of CPU power or issues in the emulati
 </p>
 
 </div>
-<!-- SECTION "Changing Latency" [126750-127393] -->
+<!-- SECTION "Changing Latency" [140009-140652] -->
 <h1><a name="controller_options" id="controller_options">Controller Options</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "Controller Options" [127394-127427] -->
+
+<h5><a name="shortcuts12" id="shortcuts12">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#supported_controllers" title="mess:howto ↵" class="wikilink1">Supported Controllers</a> </td><td class="col1"> <a href="#automatically_enabling_specific_controllers" title="mess:howto ↵" class="wikilink1">Automatically Enabling Specific Controllers</a> </td><td class="col2"> <a href="#keymaps" title="mess:howto ↵" class="wikilink1">Keymaps</a> </td>
+	</tr>
+	<tr class="row1">
+		<td class="col0"> <a href="#using_joysticks_and_mice" title="mess:howto ↵" class="wikilink1">Using Joysticks and Mice</a> </td><td class="col1"> <a href="#joymaps" title="mess:howto ↵" class="wikilink1">Joymaps</a> </td><td class="col2"> </td>
+	</tr>
+	<tr class="row2">
+		<td class="col0"> <a href="#multiple_input_devices" title="mess:howto ↵" class="wikilink1">Multiple Input Devices</a> </td><td class="col1"> <a href="#analog_deadzone" title="mess:howto ↵" class="wikilink1">Analog Deadzone</a> </td><td class="col2"> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "Controller Options" [140653-141054] -->
 <h2><a name="supported_controllers" id="supported_controllers">Supported Controllers</a></h2>
 <div class="level2">
 
@@ -4413,7 +4832,7 @@ A similar situation holds true for (SDL)<acronym title="Multi Emulator Super Sys
 </p>
 
 </div>
-<!-- SECTION "Supported Controllers" [127428-128463] -->
+<!-- SECTION "Supported Controllers" [141055-142090] -->
 <h2><a name="using_joysticks_and_mice" id="using_joysticks_and_mice">Using Joysticks and Mice</a></h2>
 <div class="level2">
 
@@ -4421,7 +4840,7 @@ A similar situation holds true for (SDL)<acronym title="Multi Emulator Super Sys
 
 Once you have a joystick, a mouse or a lightgun recognized by your operating system, you can use it in <acronym title="Multi Emulator Super System">MESS</acronym>
  by simply activating it at start. This can be done in various ways. If 
-you are using messgui.exe in Windows, you can activate Joystick, Mouse 
+you are using messui.exe in Windows, you can activate Joystick, Mouse 
 and Lightgun from the correspondent Input settings. Alternatively, you 
 can use at command line the options <code>-joystick</code>, <code>-mouse</code> and <code>-lightgun</code>, or modify the corresponding configuration options in  <a href="http://mess.redump.net/mess:mess.ini" class="wikilink1" title="mess:mess.ini">mess.ini</a>.
 </p>
@@ -4447,7 +4866,7 @@ your controller.
 </p>
 
 </div>
-<!-- SECTION "Using Joysticks and Mice" [128464-129680] -->
+<!-- SECTION "Using Joysticks and Mice" [142091-143306] -->
 <h2><a name="multiple_input_devices" id="multiple_input_devices">Multiple Input Devices</a></h2>
 <div class="level2">
 
@@ -4457,7 +4876,7 @@ In <acronym title="Multi Emulator Super System">MESS</acronym> you can separate 
 </p>
 
 </div>
-<!-- SECTION "Multiple Input Devices" [129681-129859] -->
+<!-- SECTION "Multiple Input Devices" [143307-143485] -->
 <h2><a name="automatically_enabling_specific_controllers" id="automatically_enabling_specific_controllers">Automatically Enabling Specific Controllers</a></h2>
 <div class="level2">
 
@@ -4488,7 +4907,7 @@ Notice that your settings would be ignored if, in this case, you have no joystic
 </p>
 
 </div>
-<!-- SECTION "Automatically Enabling Specific Controllers" [129860-130555] -->
+<!-- SECTION "Automatically Enabling Specific Controllers" [143486-144181] -->
 <h2><a name="joymaps" id="joymaps">Joymaps</a></h2>
 <div class="level2">
 
@@ -4547,7 +4966,7 @@ up/down mirrors of the first three rows, giving three final rows of <code>1112
 </p>
 
 </div>
-<!-- SECTION "Joymaps" [130556-133529] -->
+<!-- SECTION "Joymaps" [144182-147155] -->
 <h2><a name="analog_deadzone" id="analog_deadzone">Analog Deadzone</a></h2>
 <div class="level2">
 
@@ -4564,7 +4983,7 @@ between 0.0 and 1.0
 </p>
 
 </div>
-<!-- SECTION "Analog Deadzone" [133530-133898] -->
+<!-- SECTION "Analog Deadzone" [147156-147524] -->
 <h2><a name="keymaps" id="keymaps">Keymaps</a></h2>
 <div class="level2">
 
@@ -4580,12 +4999,22 @@ SDL only, for non-US keyboards
 </p>
 
 </div>
-<!-- SECTION "Keymaps" [133899-133970] -->
+<!-- SECTION "Keymaps" [147525-147596] -->
 <h1><a name="cheat_options" id="cheat_options">Cheat Options</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "Cheat Options" [133971-133999] -->
+
+<h5><a name="shortcuts13" id="shortcuts13">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#activate_cheats" title="mess:howto ↵" class="wikilink1">Activate Cheats</a> </td><td class="col1"> <a href="#cheat_format" title="mess:howto ↵" class="wikilink1">Cheat Format</a> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "Cheat Options" [147597-147716] -->
 <h2><a name="activate_cheats" id="activate_cheats">Activate Cheats</a></h2>
 <div class="level2">
 
@@ -4600,7 +5029,7 @@ should be re-added soon.
 </p>
 
 </div>
-<!-- SECTION "Activate Cheats" [134000-134388] -->
+<!-- SECTION "Activate Cheats" [147717-148105] -->
 <h2><a name="cheat_format" id="cheat_format">Cheat Format</a></h2>
 <div class="level2">
 
@@ -4609,12 +5038,22 @@ When re-added, cheats will be in the new xml format <acronym title="Multiple Arc
 </p>
 
 </div>
-<!-- SECTION "Cheat Format" [134389-134542] -->
+<!-- SECTION "Cheat Format" [148106-148259] -->
 <h1><a name="save_options" id="save_options">Save Options</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "Save Options" [134543-134570] -->
+
+<h5><a name="shortcuts14" id="shortcuts14">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#nvram_of_the_emulated_hardware" title="mess:howto ↵" class="wikilink1">NVRAM of the Emulated Hardware</a> </td><td class="col1"> <a href="#mess_save_states" title="mess:howto ↵" class="wikilink1">MESS Save States</a> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "Save Options" [148260-148416] -->
 <h2><a name="nvram_of_the_emulated_hardware" id="nvram_of_the_emulated_hardware">NVRAM of the Emulated Hardware</a></h2>
 <div class="level2">
 
@@ -4631,7 +5070,7 @@ SRAM support is not always perfectly supported. You can check <a href="http://me
 </p>
 
 </div>
-<!-- SECTION "NVRAM of the Emulated Hardware" [134571-135023] -->
+<!-- SECTION "NVRAM of the Emulated Hardware" [148417-148869] -->
 <h2><a name="mess_save_states" id="mess_save_states">MESS Save States</a></h2>
 <div class="level2">
 <pre class="code">-state
@@ -4639,12 +5078,22 @@ SRAM support is not always perfectly supported. You can check <a href="http://me
 
 <em>In progress</em>
 </div>
-<!-- SECTION "MESS Save States" [135024-135095] -->
+<!-- SECTION "MESS Save States" [148870-148941] -->
 <h1><a name="snapshot_options" id="snapshot_options">Snapshot Options</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "Snapshot Options" [135096-135127] -->
+
+<h5><a name="shortcuts15" id="shortcuts15">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#save_a_snapshot" title="mess:howto ↵" class="wikilink1">Save a Snapshot</a> </td><td class="col1"> <a href="#snapshot_naming_options" title="mess:howto ↵" class="wikilink1">Snapshot Naming Options</a> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "Snapshot Options" [148942-149086] -->
 <h2><a name="save_a_snapshot" id="save_a_snapshot">Save a Snapshot</a></h2>
 <div class="level2">
 
@@ -4687,16 +5136,24 @@ in the list. The view used can also be different from the one you've got
 </p>
 
 </div>
-<!-- SECTION "Save a Snapshot" [135128-136868] -->
+<!-- SECTION "Save a Snapshot" [149087-150827] -->
 <h2><a name="snapshot_naming_options" id="snapshot_naming_options">Snapshot Naming Options</a></h2>
 <div class="level2">
 
 <p>
 
-To customize the way snapshots are saved in the snap/ folder, <acronym title="Multi Emulator Super System">MESS</acronym> offers the option <code>-snapname</code>. You can choose various combinations of the parameters 
+To customize the way snapshots are saved in the snap/ folder, <acronym title="Multi Emulator Super System">MESS</acronym> offers the option <code>-snapname</code>. As of <acronym title="Multi Emulator Super System">MESS</acronym> 0.142, you can choose various combinations of the following templates
 </p>
-<pre class="code">''%g'' = systemname 
-''%i'' = index</pre>
+<ul>
+<li class="level1"><div class="li"> <code>/</code> = path separator</div>
+</li>
+<li class="level1"><div class="li"> <code>%g</code> = system name</div>
+</li>
+<li class="level1"><div class="li"> <code>%i</code> = index</div>
+</li>
+<li class="level1"><div class="li"> <code>%d_XXXX</code> = device <code>XXXX</code> (<code>XXXX</code> being the brief name of a media device)</div>
+</li>
+</ul>
 
 <p>
 
@@ -4705,12 +5162,13 @@ As an example,
 <pre class="code">mess.exe adam -snapname %g</pre>
 
 <p>
-will save your first Coleco Agam snap as “adam.png” and then it will overwrite it  when you press again <kbd>F12</kbd>. On the other hand,
+will save your first Coleco Adam snap as “adam.png” inside the snap/ 
+folder, and then it will overwrite it whenever you press again <kbd>F12</kbd>. On the other hand,
 </p>
 <pre class="code">mess.exe adam -snapname %g%i</pre>
 
 <p>
-will save snapshots with progressive names “adam0000.png”, “adam0001.png”, etc. The default setting is
+will save snapshots in the snap/ directory with progressive names “adam0000.png”, “adam0001.png”, etc. The default setting is
 </p>
 <pre class="code">mess.exe adam -snapname %g/%i</pre>
 
@@ -4720,12 +5178,41 @@ which produces a subfolder named adam/ which will contain all snapshots,
 </p>
 
 <p>
-Notice that, at the moment, it is not possible to save a snapshot of the
- game you are emulating with the name of the game itself.
+Moreover, starting from <acronym title="Multi Emulator Super System">MESS</acronym> 0.142, it is possible to use the <code>%d_XXXX</code> template to name snaps after the name of the software file mounted in the media device <code>XXXX</code>.
+ E.g. you can use ”-snapname %d_cart” to use the name of the game  
+mounted in the cartslot, or ”-snapname %d_flop2” to use the name of the 
+program mounted in the second floppy drive, or ”-snapname %d_hard1” to 
+use the name of the hard disk mounted in the first HD drive, etc. 
+Remember that you can find out which media device are supported by each 
+system by using the <code>-listmedia</code> option.
+</p>
+
+<p>
+If you are loading by fullpath, e.g.
+</p>
+<pre class="code">mess.exe nes -cart "Super Mario.nes" -snapname %d_cart</pre>
+
+<p>
+pressing <kbd>F12</kbd> will create a “Super Mario.png” file in the 
+snap/ directory. While if you are loading through software lists, then 
+its shortname will be used, e.g.
+</p>
+<pre class="code">mess.exe nes -cart smb -snapname %d_cart</pre>
+
+<p>
+will result in a “smb.png” file in the snap/ directory.
+</p>
+
+<p>
+Of course, any combination of the <code>%d_xxxx</code> template with the old <code>/</code>, <code>%g</code> and <code>%i</code> templates is supported as well.
+</p>
+
+<p>
+Notice that if you specify an invalid -snapname template, or if you specify an invalid device (like <code>%d_cass</code> for a system without tape support), or if you have no software mounted in the chosen media device, then <acronym title="Multi Emulator Super System">MESS</acronym> will revert to the default template <code>%g/%i</code>.
 </p>
 
 </div>
-<!-- SECTION "Snapshot Naming Options" [136869-137718] -->
+<!-- SECTION "Snapshot Naming Options" [150828-153060] -->
 <h1><a name="recording_options" id="recording_options">Recording Options</a></h1>
 <div class="level1">
 
@@ -4749,12 +5236,23 @@ Notice that, at the moment, it is not possible to save a snapshot of the
 
 Each different recording alternative is controlled by a specific option.
  Recall that you can combine these options. E.g. you can first record a 
-great play as an .inp file and then use the playback function to record 
-an .avi of the play, which can be shared afterwards.
+great play as an .inp file, without any slowdown due to the ongoing 
+recording, and then use the playback function to record an .avi of the 
+play, which can be shared afterwards.
 </p>
 
 </div>
-<!-- SECTION "Recording Options" [137719-138254] -->
+
+<h5><a name="shortcuts16" id="shortcuts16">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#recording_avi_movies" title="mess:howto ↵" class="wikilink1">Recording AVI Movies</a> </td><td class="col1"> <a href="#recording_mng_movies" title="mess:howto ↵" class="wikilink1">Recording MNG Movies</a> </td><td class="col2"> <a href="#recording_wav" title="mess:howto ↵" class="wikilink1">Recording WAV</a> </td><td class="col3"> <a href="#recording_inputs" title="mess:howto ↵" class="wikilink1">Recording Inputs</a> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "Recording Options" [153061-153842] -->
 <h2><a name="recording_avi_movies" id="recording_avi_movies">Recording AVI Movies</a></h2>
 <div class="level2">
 
@@ -4763,7 +5261,8 @@ an .avi of the play, which can be shared afterwards.
 You can record .avi movies of <acronym title="Multi Emulator Super System">MESS</acronym> emulation by using the <code>-aviwrite</code>
  option at command line. The resulting movie will be output in the 
 snapshot folder (snap/ by default) as &lt;system&gt;.avi. Notice that 
-the output is an uncompressed .avi file and can be very large!
+the output is an uncompressed .avi file and can be very large (hundreds 
+of MBs for less than a minute of video, in some cases)!
 </p>
 
 <p>
@@ -4771,7 +5270,7 @@ Also .avi recording is influenced by <code>-snapsize</code> and <code>-snapview<
 </p>
 
 </div>
-<!-- SECTION "Recording AVI Movies" [138255-138633] -->
+<!-- SECTION "Recording AVI Movies" [153843-154286] -->
 <h2><a name="recording_mng_movies" id="recording_mng_movies">Recording MNG Movies</a></h2>
 <div class="level2">
 
@@ -4785,11 +5284,11 @@ combination with the audio recording <code>-wavwrite</code>
 </p>
 
 <p>
-Also, .mng recording is influenced by <code>-snapsize</code> and <code>-snapview</code> options
+Also, .mng recording is influenced by <code>-snapsize</code> and <code>-snapview</code> options, hence take a look to the <a href="#snapshot_options" title="mess:howto ↵" class="wikilink1">Snapshot Options</a> section of this Manual.
 </p>
 
 </div>
-<!-- SECTION "Recording MNG Movies" [138634-139073] -->
+<!-- SECTION "Recording MNG Movies" [154287-154815] -->
 <h2><a name="recording_wav" id="recording_wav">Recording WAV</a></h2>
 <div class="level2">
 
@@ -4799,7 +5298,7 @@ You can record a .wav file of <acronym title="Multi Emulator Super System">MESS<
 </p>
 
 </div>
-<!-- SECTION "Recording WAV" [139074-139290] -->
+<!-- SECTION "Recording WAV" [154816-155032] -->
 <h2><a name="recording_inputs" id="recording_inputs">Recording Inputs</a></h2>
 <div class="level2">
 
@@ -4817,22 +5316,32 @@ resulting .inp recording will be output in inp/ directory as
 </p>
 
 </div>
-<!-- SECTION "Recording Inputs" [139291-139743] -->
+<!-- SECTION "Recording Inputs" [155033-155485] -->
 <h1><a name="system_specific_options" id="system_specific_options">System Specific Options</a></h1>
 <div class="level1">
 
 <p>
 
-Please refer to sysinfo.dat or to the <a href="http://mess.redump.net/sysinfo" class="wikilink1" title="sysinfo">sysinfo</a> section of the <acronym title="Multi Emulator Super System">MESS</acronym> Wiki to find instructions on how to use various devices in <acronym title="Multi Emulator Super System">MESS</acronym> emulated systems.
+Please refer to sysinfo.dat or to the <a href="http://mess.redump.net/sysinfo" class="wikilink1" title="sysinfo">sysinfo</a> section of the <acronym title="Multi Emulator Super System">MESS</acronym> Wiki to find instructions on how to use various media devices in <acronym title="Multi Emulator Super System">MESS</acronym> emulated systems.
 </p>
 
 </div>
-<!-- SECTION "System Specific Options" [139744-139937] -->
+<!-- SECTION "System Specific Options" [155486-155685] -->
 <h1><a name="mess_tools" id="mess_tools">MESS Tools</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "MESS Tools" [139938-139963] -->
+
+<h5><a name="shortcuts17" id="shortcuts17">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#chdman" title="mess:howto ↵" class="wikilink1">chdman</a> </td><td class="col1"> <a href="#casstool" title="mess:howto ↵" class="wikilink1">casstool</a> </td><td class="col2"> <a href="#imgtool" title="mess:howto ↵" class="wikilink1">imgtool</a> </td><td class="col3"> <a href="#wimgtool" title="mess:howto ↵" class="wikilink1">wimgtool</a> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "MESS Tools" [155686-155824] -->
 <h2><a name="chdman" id="chdman">chdman</a></h2>
 <div class="level2">
 
@@ -4841,7 +5350,7 @@ Please refer to sysinfo.dat or to the <a href="http://mess.redump.net/sysinfo" c
 </p>
 
 </div>
-<!-- SECTION "chdman" [139964-140000] -->
+<!-- SECTION "chdman" [155825-155861] -->
 <h2><a name="casstool" id="casstool">casstool</a></h2>
 <div class="level2">
 
@@ -4850,7 +5359,7 @@ Please refer to sysinfo.dat or to the <a href="http://mess.redump.net/sysinfo" c
 </p>
 
 </div>
-<!-- SECTION "casstool" [140001-140039] -->
+<!-- SECTION "casstool" [155862-155900] -->
 <h2><a name="imgtool" id="imgtool">imgtool</a></h2>
 <div class="level2">
 
@@ -4859,7 +5368,7 @@ Please refer to sysinfo.dat or to the <a href="http://mess.redump.net/sysinfo" c
 </p>
 
 </div>
-<!-- SECTION "imgtool" [140040-140077] -->
+<!-- SECTION "imgtool" [155901-155938] -->
 <h2><a name="wimgtool" id="wimgtool">wimgtool</a></h2>
 <div class="level2">
 
@@ -4868,12 +5377,22 @@ Please refer to sysinfo.dat or to the <a href="http://mess.redump.net/sysinfo" c
 </p>
 
 </div>
-<!-- SECTION "wimgtool" [140078-140117] -->
+<!-- SECTION "wimgtool" [155939-155978] -->
 <h1><a name="mess_error_messages" id="mess_error_messages">MESS Error Messages</a></h1>
 <div class="level1">
 
 </div>
-<!-- SECTION "MESS Error Messages" [140118-140152] -->
+
+<h5><a name="shortcuts18" id="shortcuts18">Shortcuts</a></h5>
+<div class="level5">
+<table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0"> <a href="#missing_files" title="mess:howto ↵" class="wikilink1">Missing Files</a> </td><td class="col1"> <a href="#software_not_found" title="mess:howto ↵" class="wikilink1">Software Not Found</a> </td><td class="col2"> <a href="#device_not_found" title="mess:howto ↵" class="wikilink1">Device Not Found</a> </td><td class="col3"> <a href="#wrong_system_name" title="mess:howto ↵" class="wikilink1">Wrong System Name</a> </td>
+	</tr>
+</tbody></table>
+
+</div>
+<!-- SECTION "MESS Error Messages" [155979-156196] -->
 <h2><a name="missing_files" id="missing_files">Missing Files</a></h2>
 <div class="level2">
 
@@ -4891,7 +5410,7 @@ message, you need to find the files which are missing.
 </p>
 
 </div>
-<!-- SECTION "Missing Files" [140153-140337] -->
+<!-- SECTION "Missing Files" [156197-156381] -->
 <h2><a name="software_not_found" id="software_not_found">Software Not Found</a></h2>
 <div class="level2">
 
@@ -4911,7 +5430,7 @@ message, or a similar one, you need to check if you gave the right path for the 
 </p>
 
 </div>
-<!-- SECTION "Software Not Found" [140338-140593] -->
+<!-- SECTION "Software Not Found" [156382-156637] -->
 <h2><a name="device_not_found" id="device_not_found">Device Not Found</a></h2>
 <div class="level2">
 
@@ -4926,7 +5445,7 @@ message, you need to check which device options you have used vs. which device o
 </p>
 
 </div>
-<!-- SECTION "Device Not Found" [140594-140812] -->
+<!-- SECTION "Device Not Found" [156638-156856] -->
 <h2><a name="wrong_system_name" id="wrong_system_name">Wrong System Name</a></h2>
 <div class="level2">
 
@@ -4944,7 +5463,9 @@ message, you need to check what is the correct name of the system you want to ru
 </p>
 
 </div>
-<!-- SECTION "Wrong System Name" [140813-] --></div>
+<!-- SECTION "Wrong System Name" [156857-] -->
+<!-- cachefile /var/www/mess.org/htdocs/data/cache/3/32a0f8527d8e56acc520622f670c6f26.xhtml used -->
+</div>
 
 
 </body></html>
