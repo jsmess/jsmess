@@ -1698,9 +1698,10 @@ WRITE8_DEVICE_HANDLER(gromportg_w)
 		return;
 	}
 
-	if (slot < NUMBER_OF_CARTRIDGE_SLOTS)
+	// We need to send the write request to all attached cartridges
+	for (int j=0; j < NUMBER_OF_CARTRIDGE_SLOTS; j++)
 	{
-		cartridge = &cartslots->cartridge[slot];
+		cartridge = &cartslots->cartridge[j];
 		// Send the request to all mounted GROMs
 		if (cartridge->pcb!=NULL)
 		{
@@ -1762,10 +1763,13 @@ READ8Z_DEVICE_HANDLER(gromportg_rz)
 	if (cartslots->fixed_slot==AUTO && cartslots->next_free_slot==1)
 		slot=0;
 
-	if (slot < NUMBER_OF_CARTRIDGE_SLOTS)
+	// We need to send the read request to all cartriges so that
+	// the internal address counters stay in sync. However, we only respect
+	// the return of the selected cartridge.
+	for (int j=0; j < NUMBER_OF_CARTRIDGE_SLOTS; j++)
 	{
 		// Select the cartridge which the multicart system is currently pointing at
-		cartridge = &cartslots->cartridge[slot];
+		cartridge = &cartslots->cartridge[j];
 		// Send the request to all mounted GROMs on this PCB
 		if (cartridge->pcb!=NULL)
 		{
@@ -1773,7 +1777,14 @@ READ8Z_DEVICE_HANDLER(gromportg_rz)
 			{
 				ti99_pcb_t *pcbdef = get_safe_pcb_token(cartridge->pcb);
 				if (pcbdef->grom[i]!=NULL)
-					ti99grom_rz(pcbdef->grom[i], offset, value);
+				{
+					UINT8 newvalue = *value;
+					ti99grom_rz(pcbdef->grom[i], offset, &newvalue);
+					if (j==slot)
+					{
+						*value = newvalue;
+					}
+				}
 			}
 		}
 	}
