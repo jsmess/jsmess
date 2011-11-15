@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "video/m6847.h"
+#include "video/mc6847.h"
 #include "sound/ay8910.h"
 #include "machine/ctronics.h"
 #include "machine/rescap.h"
@@ -36,7 +36,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_vdg;
+	required_device<mc6847_base_device> m_vdg;
 	optional_device<device_t> m_crtc;
 	required_device<device_t> m_centronics;
 	required_device<cassette_image_device> m_cassette;

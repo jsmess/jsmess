@@ -1,249 +1,248 @@
-/*****************************************************************************
+/***************************************************************************
 
-    includes/coco.h
+    coco.h
 
-    CoCo/Dragon
+    TRS-80 Radio Shack Color Computer Family
 
-****************************************************************************/
+***************************************************************************/
 
-#ifndef __COCO_H__
-#define __COCO_H__
+#pragma once
 
-#include "imagedev/snapquik.h"
+#ifndef __COCO__
+#define __COCO__
+
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
 #include "imagedev/cassette.h"
-#include "machine/wd17xx.h"
-#include "machine/6883sam.h"
+#include "imagedev/bitbngr.h"
 #include "machine/6821pia.h"
 #include "machine/cococart.h"
-#include "imagedev/printer.h"
+#include "machine/coco_vhd.h"
+#include "machine/ram.h"
+#include "sound/dac.h"
+#include "sound/wave.h"
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
 
-#define COCO_CPU_SPEED_HZ		894886	/* 0.894886 MHz */
-#define COCO_FRAMES_PER_SECOND	(COCO_CPU_SPEED_HZ / 57.0 / 263)
-#define COCO_CPU_SPEED			(attotime::from_hz(COCO_CPU_SPEED_HZ))
-#define COCO_TIMER_CMPCARRIER	(COCO_CPU_SPEED * 0.25)
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+INPUT_PORTS_EXTERN( coco_analog_control );
+INPUT_PORTS_EXTERN( coco_cart_autostart );
+
+SLOT_INTERFACE_EXTERN( coco_cart );
+
+/* constants */
+#define JOYSTICK_DELTA			10
+#define JOYSTICK_SENSITIVITY	100
+
+/* devices */
+#define MAINCPU_TAG					"maincpu"
+#define PIA0_TAG					"pia0"
+#define PIA1_TAG					"pia1"
+#define SAM_TAG						"sam"
+#define VDG_TAG						"vdg"
+#define SCREEN_TAG					"screen"
+#define DAC_TAG						"dac"
+#define CARTRIDGE_TAG				"ext"
+#define BITBANGER_TAG				"bitbanger"
+#define VHD_TAG						"vhd"
+
+/* inputs */
+#define CTRL_SEL_TAG				"ctrl_sel"
+#define HIRES_INTF_TAG				"hires_intf"
+#define CART_AUTOSTART_TAG			"cart_autostart"
+#define JOYSTICK_RX_TAG				"joystick_rx"
+#define JOYSTICK_RY_TAG				"joystick_ry"
+#define JOYSTICK_LX_TAG				"joystick_lx"
+#define JOYSTICK_LY_TAG				"joystick_ly"
+#define JOYSTICK_BUTTONS_TAG		"joystick_buttons"
+#define RAT_MOUSE_RX_TAG			"rat_mouse_rx"
+#define RAT_MOUSE_RY_TAG			"rat_mouse_ry"
+#define RAT_MOUSE_LX_TAG			"rat_mouse_lx"
+#define RAT_MOUSE_LY_TAG			"rat_mouse_ly"
+#define RAT_MOUSE_BUTTONS_TAG		"rat_mouse_buttons"
+#define DIECOM_LIGHTGUN_RX_TAG		"dclg_rx"
+#define DIECOM_LIGHTGUN_RY_TAG		"dclg_ry"
+#define DIECOM_LIGHTGUN_LX_TAG		"dclg_lx"
+#define DIECOM_LIGHTGUN_LY_TAG		"dclg_ly"
+#define DIECOM_LIGHTGUN_BUTTONS_TAG	"dclg_triggers"
+
+MACHINE_CONFIG_EXTERN( coco_sound );
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _coco3_scanline_record coco3_scanline_record;
-struct _coco3_scanline_record
-{
-	UINT8 ff98;
-	UINT8 ff99;
-	UINT8 ff9a;
-	UINT8 index;
-
-	UINT8 palette[16];
-
-	UINT8 data[160];
-};
-
-typedef struct _coco3_video coco3_video;
-struct _coco3_video
-{
-	/* Info set up on initialization */
-	UINT32 composite_palette[64];
-	UINT32 rgb_palette[64];
-	UINT8 fontdata[128][8];
-	emu_timer *gime_fs_timer;
-
-	/* CoCo 3 palette status */
-	UINT8 palette_ram[16];
-	UINT32 palette_colors[16];
-
-	/* Incidentals */
-	UINT32 legacy_video;
-	UINT32 top_border_scanlines;
-	UINT32 display_scanlines;
-	UINT32 video_position;
-	UINT8 line_in_row;
-	UINT8 blink;
-	UINT8 dirty[2];
-	UINT8 video_type;
-
-	/* video state; every scanline the video state for the scanline is copied
-     * here and only rendered in SCREEN_UPDATE */
-	coco3_scanline_record scanlines[384];
-};
-
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 class coco_state : public driver_device
 {
 public:
-	coco_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+	coco_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	cococart_slot_device *m_cococart_device;
-	cassette_image_device *m_cassette_device;
-	device_t *m_bitbanger_device;
-	printer_image_device *m_printer_device;
-	device_t *m_dac;
-	device_t *m_sam;
-	pia6821_device *m_pia_0;
-	pia6821_device *m_pia_1;
-	pia6821_device *m_pia_2;
-	UINT8 *m_rom;
-	int m_dclg_state;
-	int m_dclg_output_h;
-	int m_dclg_output_v;
-	int m_dclg_timer;
-	UINT8 (*update_keyboard)(running_machine &machine);
-	emu_timer *m_update_keyboard_timer;
-	emu_timer *m_mux_sel1_timer;
-	emu_timer *m_mux_sel2_timer;
-	UINT8 m_mux_sel1;
-	UINT8 m_mux_sel2;
-	UINT8 m_bitbanger_output_value;
-	UINT8 m_bitbanger_input_value;
-	UINT8 m_dac_value;
-	int m_dgnalpha_just_reset;
-	UINT8 *m_bas_rom_bank;
-	UINT8 *m_bottom_32k;
-	timer_expired_func m_recalc_interrupts;
-	int m_hiresjoy_ca;
-	attotime m_hiresjoy_xtransitiontime;
-	attotime m_hiresjoy_ytransitiontime;
-	int m_dclg_previous_bit;
-	void (*printer_out)(running_machine &machine, int data);
+	required_device<cpu_device> m_maincpu;
+	required_device<pia6821_device> m_pia_0;
+	required_device<pia6821_device> m_pia_1;
+	required_device<device_t> m_dac;
+	required_device<device_t> m_wave;
+	required_device<cococart_slot_device> m_cococart;
+	required_device<ram_device> m_ram;
+	required_device<cassette_image_device> m_cassette;
+	optional_device<bitbanger_device> m_bitbanger;
+	optional_device<coco_vhd_image_device> m_vhd;
+
+	static const pia6821_interface pia0_config;
+	static const pia6821_interface pia1_config;
+	static const cococart_interface cartridge_config;
+	static const bitbanger_config coco_bitbanger_config;
+	static const cassette_interface coco_cassette_interface;
+
+	/* driver update handlers */
+	static INPUT_CHANGED(keyboard_changed);
+	static INPUT_CHANGED(joystick_mode_changed);
+	static void bitbanger_callback(running_machine &machine, UINT8 bit);
+
+	/* IO */
+	virtual DECLARE_READ8_MEMBER( ff00_read );
+	virtual DECLARE_WRITE8_MEMBER( ff00_write );
+	virtual DECLARE_READ8_MEMBER( ff20_read );
+	virtual DECLARE_WRITE8_MEMBER( ff20_write );
+	virtual DECLARE_READ8_MEMBER( ff40_read );
+	virtual DECLARE_WRITE8_MEMBER( ff40_write );
+	DECLARE_READ8_MEMBER( ff60_read );
+	DECLARE_WRITE8_MEMBER( ff60_write );
+
+protected:
+	/* device-level overrides */
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	/* interrupts */
+	virtual bool firq_get_line(void);
+	virtual bool irq_get_line(void);
+	void recalculate_irq(void);
+	void recalculate_firq(void);
+
+	/* changed handlers */
+	virtual void pia1_pa_changed(void);
+	virtual void pia1_pb_changed(void);
+	virtual void bitbanger_changed(bool newvalue);
+
+	/* miscellaneous */
+	virtual void update_keyboard_input(UINT8 value, UINT8 z);
+	virtual void cart_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
+
+	/* PIA0 */
+	DECLARE_WRITE8_MEMBER( pia0_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( pia0_ca2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia0_cb2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
+	DECLARE_WRITE_LINE_MEMBER( pia0_irq_b );
+
+	/* PIA1 */
+	DECLARE_READ8_MEMBER( pia1_pa_r );
+	DECLARE_READ8_MEMBER( pia1_pb_r );
+	DECLARE_WRITE8_MEMBER( pia1_pa_w );
+	DECLARE_WRITE8_MEMBER( pia1_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia1_firq_a );
+	DECLARE_WRITE_LINE_MEMBER( pia1_firq_b );
+
+private:
+	// timer constants
+	static const device_timer_id TIMER_HIRES_JOYSTICK_X = 0;
+	static const device_timer_id TIMER_HIRES_JOYSTICK_Y = 1;
+	static const device_timer_id TIMER_DIECOM_LIGHTGUN = 2;
+
+	typedef enum
+	{
+		SOUNDMUX_SEL1 = 1,
+		SOUNDMUX_SEL2 = 2,
+		SOUNDMUX_ENABLE = 4
+	} soundmux_status_t;
+
+	typedef enum
+	{
+		JOYSTICK_NONE = 0x00,
+		JOYSTICK_NORMAL = 0x01,
+		JOYSTICK_RAT_MOUSE = 0x02,
+		JOYSTICK_DIECOM_LIGHT_GUN = 0x03
+	} joystick_type_t;
+
+	typedef enum
+	{
+		HIRES_NONE = 0x00,
+		HIRES_RIGHT = 0x01,
+		HIRES_RIGHT_COCOMAX3 = 0x02,
+		HIRES_LEFT = 0x03,
+		HIRES_LEFT_COCOMAX3 = 0x04,
+	} hires_type_t;
+
+	typedef struct
+	{
+		const input_port_config *m_input[2][2];
+		const input_port_config *m_buttons;
+
+		UINT8 input(int joystick, int axis) const { return m_input[joystick][axis] ? input_port_read_direct(m_input[joystick][axis]) : 0x00; }
+		UINT8 buttons(void) const { return m_buttons ? input_port_read_direct(m_buttons) : 0x00; }
+	} analog_input_t;
+
+	void analog_port_start(analog_input_t *analog, const char *rx_tag, const char *ry_tag, const char *lx_tag, const char *ly_tag, const char *buttons_tag);
+
+	/* wrappers for configuration */
+	joystick_type_t joystick_type(int index);
+	hires_type_t hires_interface_type(void);
+	bool is_joystick_hires(int joystick_index);
+
+	soundmux_status_t soundmux_status(void);
+	UINT8 sound_value(void);
+	void update_sound(void);
+	bool joyin(void);
+	void poll_joystick(bool *joyin, UINT8 *buttons);
+	void poll_keyboard(void);
+	void poll_hires_joystick(void);
+	void update_cassout(int cassout);
+	void update_prinout(bool prinout);
+	DECLARE_WRITE_LINE_MEMBER( bitbanger_callback );
+	void diecom_lightgun_clock(void);
+
+	/* thin wrappers for PIA output */
+	UINT8 dac_output(void)	{ return m_dac_output; }	/* PA drives the DAC */
+	bool sel1(void)			{ return m_pia_0->ca2_output() ? true : false; }
+	bool sel2(void)			{ return m_pia_0->cb2_output() ? true : false; }
+	bool snden(void)		{ return m_pia_1->cb2_output() ? true : false; }
+
+	/* disassembly override */
+	static offs_t dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+
+	/* input ports */
+	const input_port_config *m_keyboard[7];
+	const input_port_config *m_joystick_type_control;
+	const input_port_config *m_joystick_hires_control;
+	analog_input_t m_joystick;
+	analog_input_t m_rat_mouse;
+	analog_input_t m_diecom_lightgun;
+
+	/* DAC output */
+	UINT8 m_dac_output;
+
+	/* hires interface */
+	emu_timer *m_hiresjoy_transition_timer[2];
+	bool m_hiresjoy_ca;
+
+	/* diecom lightgun */
+	emu_timer *m_diecom_lightgun_timer;
+	bool m_dclg_previous_bit;
+	UINT8 m_dclg_output_h;
+	UINT8 m_dclg_output_v;
+	UINT8 m_dclg_state;
+	UINT16 m_dclg_timer;
 };
 
-class coco3_state : public coco_state
-{
-public:
-	coco3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: coco_state(mconfig, type, tag) { }
-
-	int m_enable_64k;
-	UINT8 m_mmu[16];
-	UINT8 m_interupt_line;
-	emu_timer *m_gime_timer;
-	UINT8 m_gimereg[16];
-	UINT8 m_gime_firq;
-	UINT8 m_gime_irq;
-	coco3_video *m_video;
-};
-
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-/*----------- defined in video/coco.c -----------*/
-
-ATTR_CONST UINT8 coco_get_attributes(running_machine &machine, UINT8 c,int scanline, int pos);
-
-VIDEO_START( dragon );
-VIDEO_START( coco );
-VIDEO_START( coco2b );
-
-
-/*----------- defined in video/coco3.c -----------*/
-
-VIDEO_START( coco3 );
-VIDEO_START( coco3p );
-SCREEN_UPDATE( coco3 );
-WRITE8_HANDLER ( coco3_palette_w );
-UINT32 coco3_get_video_base(running_machine &machine, UINT8 ff9d_mask, UINT8 ff9e_mask);
-void coco3_vh_blink(running_machine &machine);
-
-
-/*----------- defined in machine/coco.c -----------*/
-extern const wd17xx_interface dgnalpha_wd17xx_interface;
-extern const pia6821_interface coco_pia_intf_0;
-extern const pia6821_interface coco_pia_intf_1;
-extern const pia6821_interface coco2_pia_intf_0;
-extern const pia6821_interface coco2_pia_intf_1;
-extern const pia6821_interface coco3_pia_intf_0;
-extern const pia6821_interface coco3_pia_intf_1;
-extern const pia6821_interface dragon32_pia_intf_0;
-extern const pia6821_interface dragon32_pia_intf_1;
-extern const pia6821_interface dragon64_pia_intf_0;
-extern const pia6821_interface dragon64_pia_intf_1;
-extern const pia6821_interface dgnalpha_pia_intf_0;
-extern const pia6821_interface dgnalpha_pia_intf_1;
-extern const pia6821_interface dgnalpha_pia_intf_2;
-extern const sam6883_interface coco_sam_intf;
-extern const sam6883_interface coco3_sam_intf;
-
-MACHINE_START( dragon32 );
-MACHINE_START( dragon64 );
-MACHINE_START( tanodr64 );
-MACHINE_START( dgnalpha );
-MACHINE_RESET( dgnalpha );
-MACHINE_START( coco );
-MACHINE_START( coco2 );
-MACHINE_START( coco3 );
-MACHINE_RESET( coco3 );
-
-INPUT_CHANGED(coco_keyboard_changed);
-INPUT_CHANGED(coco_joystick_mode_changed);
-
-SNAPSHOT_LOAD ( coco_pak );
-SNAPSHOT_LOAD ( coco3_pak );
-QUICKLOAD_LOAD ( coco );
-READ8_HANDLER ( coco3_mmu_r );
-WRITE8_HANDLER ( coco3_mmu_w );
-READ8_HANDLER ( coco3_gime_r );
-WRITE8_HANDLER ( coco3_gime_w );
-offs_t coco3_mmu_translate(running_machine &machine,int bank, int offset);
-WRITE8_DEVICE_HANDLER( coco_pia_1_w );
-void coco3_horizontal_sync_callback(running_machine &machine,int data);
-void coco3_field_sync_callback(running_machine &machine,int data);
-void coco3_gime_field_sync_callback(running_machine &machine);
-
-WRITE_LINE_DEVICE_HANDLER(coco_cart_w);
-WRITE_LINE_DEVICE_HANDLER(coco3_cart_w);
-WRITE_LINE_DEVICE_HANDLER(coco_nmi_w);
-WRITE_LINE_DEVICE_HANDLER(coco_halt_w);
-
-/* Compusense Dragon Plus board */
-READ8_HANDLER ( dgnplus_reg_r );
-WRITE8_HANDLER ( dgnplus_reg_w );
-
-READ8_HANDLER( dgnalpha_mapped_irq_r );
-
-/* Dragon Alpha AY-8912 */
-READ8_HANDLER ( dgnalpha_psg_porta_read );
-WRITE8_HANDLER ( dgnalpha_psg_porta_write );
-
-/* Dragon Alpha WD2797 FDC */
-READ8_HANDLER(dgnalpha_wd2797_r);
-WRITE8_HANDLER(dgnalpha_wd2797_w);
-
-/* Dragon Alpha Modem, just dummy funcs at the mo */
-READ8_HANDLER(dgnalpha_modem_r);
-WRITE8_HANDLER(dgnalpha_modem_w);
-
-#ifdef UNUSED_FUNCTION
-void coco_set_halt_line(running_machine &machine, int halt_line);
-#endif
-
-/* CoCo 3 video vars; controlling key aspects of the emulation */
-struct coco3_video_vars
-{
-	UINT8 m_bordertop_192;
-	UINT8 m_bordertop_199;
-	UINT8 m_bordertop_0;
-	UINT8 m_bordertop_225;
-	unsigned int hs_gime_flip : 1;
-	unsigned int fs_gime_flip : 1;
-	unsigned int hs_pia_flip : 1;
-	unsigned int fs_pia_flip : 1;
-	UINT16 m_rise_scanline;
-	UINT16 m_fall_scanline;
-};
-
-extern const struct coco3_video_vars coco3_vidvars;
-
-/* Setting it bitbanger bit */
-void coco_bitbanger_callback(running_machine &machine, UINT8 bit);
-void coco3_bitbanger_callback(running_machine &machine, UINT8 bit);
-
-#endif /* __COCO_H__ */
+#endif /* __COCO__ */

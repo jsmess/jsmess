@@ -51,7 +51,7 @@ Status 19-09-2011
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "video/m6847.h"
+#include "video/mc6847.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "machine/6821pia.h"
@@ -78,7 +78,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_crtc;
+	required_device<mc6847_base_device> m_crtc;
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_pia0;
 	optional_device<device_t> m_pia1;
@@ -127,15 +127,17 @@ public:
 	UINT8 *m_p_videoram;
 	UINT8 m_apf_ints;
 	void apf_update_ints(UINT8 intnum);
-};
 
+protected:
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+};
 
 
 READ8_MEMBER( apf_state::apf_mc6847_videoram_r )
 {
-	mc6847_css_w(m_crtc, m_mc6847_css && BIT(m_p_videoram[offset + 0x200], 6));
-	mc6847_inv_w(m_crtc, BIT(m_p_videoram[offset + 0x200], 6));
-	mc6847_as_w(m_crtc, BIT(m_p_videoram[offset + 0x200], 7));
+	m_crtc->css_w(m_mc6847_css && BIT(m_p_videoram[offset + 0x200], 6));
+	m_crtc->inv_w(BIT(m_p_videoram[offset + 0x200], 6));
+	m_crtc->as_w(BIT(m_p_videoram[offset + 0x200], 7));
 
 	return m_p_videoram[offset + 0x200];
 }
@@ -145,10 +147,9 @@ WRITE_LINE_MEMBER( apf_state::apf_mc6847_fs_w )
 	apf_update_ints(0x10);
 }
 
-static SCREEN_UPDATE( apf )
+bool apf_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	device_t *mc6847 = screen->machine().device("mc6847");
-	return mc6847_update(mc6847, bitmap, cliprect);
+	return m_crtc->update(&bitmap, &cliprect);
 }
 
 READ8_MEMBER( apf_state::apf_m1000_pia_in_a_func)
@@ -202,8 +203,8 @@ WRITE8_MEMBER( apf_state::apf_m1000_pia_out_a_func)
 WRITE8_MEMBER( apf_state::apf_m1000_pia_out_b_func )
 {
 	/* bit 7..4 video control -- TODO: bit 5 and 4? */
-	mc6847_ag_w(m_crtc, BIT(data, 7));
-	mc6847_gm0_w(m_crtc, BIT(data, 6));
+	m_crtc->ag_w(BIT(data, 7));
+	m_crtc->gm0_w(BIT(data, 6));
 
 	/* bit 3..0 keypad line select */
 	m_pad_data = data;
@@ -232,7 +233,7 @@ void apf_state::apf_update_ints(UINT8 intnum)
 	else
 		m_apf_ints &= ~intnum;
 
-	cputag_set_input_line(machine(), "maincpu", 0, m_apf_ints ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, m_apf_ints ? HOLD_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( apf_state::apf_m1000_irq_a_func )
@@ -691,18 +692,10 @@ static const floppy_interface apfimag_floppy_interface =
 
 static const mc6847_interface apf_mc6847_intf =
 {
+	"screen",
 	DEVCB_DRIVER_MEMBER(apf_state, apf_mc6847_videoram_r),
-	DEVCB_LINE_VCC,
-	DEVCB_LINE_VCC,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(apf_state, apf_mc6847_fs_w),
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(apf_state, apf_mc6847_fs_w)
 };
 
 static MACHINE_CONFIG_START( apf_imagination, apf_state )
@@ -715,13 +708,8 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 	MCFG_MACHINE_START( apf_imagination )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-	MCFG_SCREEN_UPDATE(apf)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(320, 25+192+26)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_SCREEN_MC6847_NTSC_ADD("screen")
+	MCFG_MC6847_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz, apf_mc6847_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -731,7 +719,6 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_MC6847_ADD("mc6847", apf_mc6847_intf)
 	MCFG_PIA6821_ADD( "pia_0", apf_m1000_pia_interface )
 	MCFG_PIA6821_ADD( "pia_1", apf_imagination_pia_interface )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, apf_cassette_interface )

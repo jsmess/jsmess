@@ -40,8 +40,10 @@ public:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	// specific implementation
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8_MEMBER(read) { return read(offset); }
+	DECLARE_WRITE8_MEMBER(write) { write(offset, data); }
+	UINT8 read(offs_t offset);
+	void write(offs_t offset, UINT8 data);
 
 protected:
 	// device-level overrides
@@ -50,9 +52,12 @@ protected:
 
 	void coco_vhd_readwrite(UINT8 data);
 
-	UINT32 m_logical_record_number;
-	UINT32 m_buffer_address;
-	UINT8  m_status;
+private:
+	cpu_device *			m_cpu;
+	address_space *			m_cpu_space;
+	UINT32					m_logical_record_number;
+	UINT32					m_buffer_address;
+	UINT8					m_status;
 };
 
 // device type definition

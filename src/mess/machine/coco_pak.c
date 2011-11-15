@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "coco_pak.h"
+#include "includes/coco.h"
 #include "imagedev/cartslot.h"
 
 #define CARTSLOT_TAG			"cart"
@@ -97,7 +98,7 @@ void coco_pak_device::device_reset()
 	if (m_cart->exists()) {
 		cococart_line_value cart_line;
 
-		cart_line = input_port_read_safe(machine(), "CARTAUTO", 0x01)
+		cart_line = input_port_read_safe(machine(), CART_AUTOSTART_TAG, 0x01)
 			? COCOCART_LINE_VALUE_Q
 			: COCOCART_LINE_VALUE_CLEAR;
 

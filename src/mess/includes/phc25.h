@@ -10,7 +10,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "machine/ctronics.h"
-#include "video/m6847.h"
+#include "video/mc6847.h"
 #include "sound/ay8910.h"
 
 #define SCREEN_TAG		"screen"
@@ -33,7 +33,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_vdg;
+	required_device<mc6847_base_device> m_vdg;
 	required_device<device_t> m_centronics;
 	required_device<cassette_image_device> m_cassette;
 
@@ -43,6 +43,9 @@ public:
 	DECLARE_READ8_MEMBER( port40_r );
 	DECLARE_WRITE8_MEMBER( port40_w );
 	DECLARE_READ8_MEMBER( video_ram_r );
+
+	static UINT8 ntsc_char_rom_r(running_machine &machine, UINT8 ch, int line);
+	static UINT8 pal_char_rom_r(running_machine &machine, UINT8 ch, int line);
 
 	/* video state */
 	UINT8 *m_video_ram;

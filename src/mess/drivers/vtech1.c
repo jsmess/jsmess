@@ -114,7 +114,7 @@ Notes:
 #include "emu.h"
 #include "formats/imageutl.h"
 #include "cpu/z80/z80.h"
-#include "video/m6847.h"
+#include "video/mc6847.h"
 #include "machine/ctronics.h"
 #include "sound/wave.h"
 #include "sound/speaker.h"
@@ -156,13 +156,18 @@ class vtech1_state : public driver_device
 {
 public:
 	vtech1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_mc6847(*this, "mc6847"),
+		  m_speaker(*this, SPEAKER_TAG),
+		  m_cassette(*this, CASSETTE_TAG),
+		  m_printer(*this, "printer")
+	{ }
 
 	/* devices */
-	device_t *m_mc6847;
-	device_t *m_speaker;
-	cassette_image_device *m_cassette;
-	device_t *m_printer;
+	required_device<mc6847_base_device> m_mc6847;
+	optional_device<device_t> m_speaker;
+	optional_device<cassette_image_device> m_cassette;
+	optional_device<device_t> m_printer;
 
 	UINT8 *m_ram;
 	UINT32 m_ram_size;
@@ -182,6 +187,9 @@ public:
 	int m_fdc_write;
 	int m_fdc_offs;
 	int m_fdc_latch;
+
+protected:
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -535,7 +543,7 @@ static READ8_HANDLER( vtech1_keyboard_r )
 	result |= ((vtech1->m_cassette->input()) > 0 ? 1 : 0) << 6;
 
 	/* bit 7, field sync */
-	result |= mc6847_fs_r(vtech1->m_mc6847) << 7;
+	result |= vtech1->m_mc6847->fs_r() << 7;
 
 	return result;
 }
@@ -555,16 +563,16 @@ static WRITE8_HANDLER( vtech1_latch_w )
 	/* bit 1, SHRG mod (if installed) */
 	if (vtech1->m_videoram_size == 0x2000)
 	{
-		mc6847_gm0_w(vtech1->m_mc6847, BIT(data, 1));
-		mc6847_gm2_w(vtech1->m_mc6847, BIT(data, 1));
+		vtech1->m_mc6847->gm0_w(BIT(data, 1));
+		vtech1->m_mc6847->gm2_w(BIT(data, 1));
 	}
 
 	/* bit 2, cassette out */
 	vtech1->m_cassette->output( BIT(data, 2) ? +1.0 : -1.0);
 
 	/* bit 3 and 4, vdc mode control lines */
-	mc6847_ag_w(vtech1->m_mc6847, BIT(data, 3));
-	mc6847_css_w(vtech1->m_mc6847, BIT(data, 4));
+	vtech1->m_mc6847->ag_w(BIT(data, 3));
+	vtech1->m_mc6847->css_w(BIT(data, 4));
 
 	/* bit 0 and 5, speaker */
 	speaker_level_w(vtech1->m_speaker, (BIT(data, 5) << 1) | BIT(data, 0));
@@ -600,16 +608,15 @@ static WRITE8_HANDLER( vtech1_video_bank_w )
 static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
 {
 	vtech1_state *vtech1 = device->machine().driver_data<vtech1_state>();
-	mc6847_inv_w(device, BIT(vtech1->m_videoram[offset], 6));
-	mc6847_as_w(device, BIT(vtech1->m_videoram[offset], 7));
+	vtech1->m_mc6847->inv_w(BIT(vtech1->m_videoram[offset], 6));
+	vtech1->m_mc6847->as_w(BIT(vtech1->m_videoram[offset], 7));
 
 	return vtech1->m_videoram[offset];
 }
 
-static SCREEN_UPDATE( vtech1 )
+bool vtech1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	vtech1_state *vtech1 = screen->machine().driver_data<vtech1_state>();
-	return mc6847_update(vtech1->m_mc6847, bitmap, cliprect);
+	return m_mc6847->update(&bitmap, &cliprect);
 }
 
 
@@ -622,12 +629,6 @@ static DRIVER_INIT( vtech1 )
 	vtech1_state *vtech1 = machine.driver_data<vtech1_state>();
 	address_space *prg = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int id;
-
-	/* find devices */
-	vtech1->m_mc6847 = machine.device("mc6847");
-	vtech1->m_speaker = machine.device(SPEAKER_TAG);
-	vtech1->m_cassette = machine.device<cassette_image_device>(CASSETTE_TAG);
-	vtech1->m_printer = machine.device("printer");
 
 	/* ram */
 	vtech1->m_ram = ram_get_ptr(machine.device(RAM_TAG));
@@ -910,34 +911,39 @@ static const cassette_interface laser_cassette_interface =
 
 static const mc6847_interface vtech1_mc6847_intf =
 {
+	"screen",
 	DEVCB_HANDLER(vtech1_mc6847_videoram_r),
-	DEVCB_LINE_GND,
-	DEVCB_LINE_VCC,
-	DEVCB_LINE_GND,
-	DEVCB_LINE_GND,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_NULL,									/* horz sync */
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),			/* field sync */
+
+	DEVCB_NULL,									/* AG */
+	DEVCB_LINE_GND,								/* GM2 */
+	DEVCB_LINE_VCC,								/* GM1 */
+	DEVCB_LINE_GND,								/* GM0 */
+	DEVCB_NULL,									/* CSS */
+	DEVCB_NULL,									/* AS */
+	DEVCB_LINE_GND,								/* INTEXT */
+	DEVCB_NULL,									/* INV */
+
+	NULL,										/* m_get_char_rom */
+	true										/* m_black_and_white */
 };
 
 static const mc6847_interface vtech1_shrg_mc6847_intf =
 {
+	"screen",
 	DEVCB_HANDLER(vtech1_mc6847_videoram_r),
-	DEVCB_NULL,
-	DEVCB_LINE_VCC,
-	DEVCB_NULL,
-	DEVCB_LINE_GND,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_NULL,									/* horz sync */
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),			/* field sync */
+
+	DEVCB_NULL,									/* AG */
+	DEVCB_NULL,									/* GM2 */
+	DEVCB_LINE_VCC,								/* GM1 */
+	DEVCB_NULL,									/* GM0 */
+	DEVCB_NULL,									/* CSS */
+	DEVCB_NULL,									/* AS */
+	DEVCB_LINE_GND,								/* INTEXT */
+	DEVCB_NULL,									/* INV */
 };
 
 static MACHINE_CONFIG_START( laser110, vtech1_state )
@@ -948,16 +954,8 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	MCFG_CPU_IO_MAP(vtech1_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(320, 25+192+26)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-	MCFG_SCREEN_UPDATE(vtech1)
-
-	MCFG_MC6847_ADD("mc6847", vtech1_mc6847_intf)
-	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
-	MCFG_MC6847_PALETTE(vtech1_palette_mono)
+	MCFG_SCREEN_MC6847_PAL_ADD("screen")
+	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, vtech1_mc6847_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -989,7 +987,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser200, laser110 )
 	MCFG_DEVICE_MODIFY("mc6847")
-	MCFG_MC6847_PALETTE(NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser210, laser200 )
@@ -1017,8 +1014,7 @@ static MACHINE_CONFIG_DERIVED( laser310h, laser310 )
 	MCFG_CPU_IO_MAP(vtech1_shrg_io)
 
 	MCFG_DEVICE_REMOVE("mc6847")
-	MCFG_MC6847_ADD("mc6847", vtech1_shrg_mc6847_intf)
-	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
+	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, vtech1_shrg_mc6847_intf)
 MACHINE_CONFIG_END
 
 

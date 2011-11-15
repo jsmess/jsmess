@@ -14,7 +14,7 @@
 /* Components */
 #include "machine/ay31015.h"
 #include "machine/kr2376.h"
-#include "video/m6847.h"
+#include "video/mc6847.h"
 #include "machine/wd17xx.h"
 
 /* Devices */
@@ -629,17 +629,19 @@ READ8_DEVICE_HANDLER( lx388_mc6847_videoram_r )
 	int d6 = BIT(videoram[offset], 6);
 	int d7 = BIT(videoram[offset], 7);
 
-	mc6847_inv_w(device, d6 && d7);
-	mc6847_as_w(device, !d6 && d7);
-	mc6847_intext_w(device, !d6 && d7);
+	state->m_vdg->inv_w(d6 && d7);
+	state->m_vdg->as_w(!d6 && d7);
+	state->m_vdg->intext_w(!d6 && d7);
 
 	return videoram[offset];
 }
 
-SCREEN_UPDATE( lx388 )
+bool z80ne_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	device_t *mc6847 = screen->machine().device("mc6847");
-	return mc6847_update(mc6847, bitmap, cliprect);
+	if (m_vdg != NULL)
+		return m_vdg->update(&bitmap, &cliprect);
+	else
+		return 0;
 }
 
 READ8_HANDLER(lx388_data_r)
@@ -654,8 +656,8 @@ READ8_HANDLER(lx388_data_r)
 
 READ8_HANDLER( lx388_read_field_sync )
 {
-	device_t *mc6847 = space->machine().device("mc6847");
-	return mc6847_fs_r(mc6847) << 7;
+	z80ne_state *state = space->machine().driver_data<z80ne_state>();
+	return state->m_vdg->fs_r() << 7;
 }
 
 /*

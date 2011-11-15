@@ -21,7 +21,7 @@
 #include "machine/i8255.h"
 #include "machine/i8271.h"
 #include "sound/speaker.h"
-#include "video/m6847.h"
+#include "video/mc6847.h"
 
 #define SY6502_TAG		"ic22"
 #define INS8255_TAG		"ic25"
@@ -52,7 +52,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_vdg;
+	required_device<mc6847_base_device> m_vdg;
 	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_speaker;
