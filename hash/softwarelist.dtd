@@ -14,7 +14,7 @@
 		<!ELEMENT sharedfeat EMPTY>
 			<!ATTLIST sharedfeat name CDATA #REQUIRED>
 			<!ATTLIST sharedfeat value CDATA #IMPLIED>
-		<!ELEMENT part (info*, feature*, dataarea*, diskarea*, dipswitch*)>
+		<!ELEMENT part (feature*, dataarea*, diskarea*, dipswitch*)>
 			<!ATTLIST part name CDATA #REQUIRED>
 			<!ATTLIST part interface CDATA #REQUIRED>
 			<!-- feature is used to store things like pcb-type, mapper type, etc. Specific values depend on the system. -->
