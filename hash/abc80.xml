@@ -22,4 +22,26 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="dosgen">
+		<description>Dosgen</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="fd2">
+			<dataarea name="flop" size="10734">
+				<rom name="fd2_dgen.imd" size="10734" crc="4c6ba75f" sha1="bb009d560089bdc0db2ab86634b4226956a96ac2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kundreg">
+		<description>Kundregister</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="fd2">
+			<dataarea name="flop" size="79143">
+				<rom name="fd2_bifak.imd" size="79143" crc="a741ad5d" sha1="a0cb8cc31a30fcbea258dd5249845819930e60c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
