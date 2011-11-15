@@ -348,7 +348,7 @@ INPUT_PORTS_END
 
 bool atom_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return mc6847_update(m_vdg, &bitmap, &cliprect);
+	return m_vdg->update(&bitmap, &cliprect);
 }
 
 /***************************************************************************
@@ -380,10 +380,10 @@ WRITE8_MEMBER( atom_state::ppi_pa_w )
 	m_keylatch = data & 0x0f;
 
 	/* MC6847 */
-	mc6847_ag_w(m_vdg, BIT(data, 4));
-	mc6847_gm0_w(m_vdg, BIT(data, 5));
-	mc6847_gm1_w(m_vdg, BIT(data, 6));
-	mc6847_gm2_w(m_vdg, BIT(data, 7));
+	m_vdg->ag_w(BIT(data, 4));
+	m_vdg->gm0_w(BIT(data, 5));
+	m_vdg->gm1_w(BIT(data, 6));
+	m_vdg->gm2_w(BIT(data, 7));
 }
 
 READ8_MEMBER( atom_state::ppi_pb_r )
@@ -453,7 +453,7 @@ READ8_MEMBER( atom_state::ppi_pc_r )
 	data |= BIT(input_port_read(machine(), "RPT"), 0) << 6;
 
 	/* MC6847 FS */
-	data |= mc6847_fs_r(m_vdg) << 7;
+	data |= (m_vdg->fs_r() ? 1 : 0) << 7;
 
 	return data;
 }
@@ -483,7 +483,7 @@ WRITE8_MEMBER( atom_state::ppi_pc_w )
 	speaker_level_w(m_speaker, BIT(data, 2));
 
 	/* MC6847 CSS */
-	mc6847_css_w(m_vdg, BIT(data, 3));
+	m_vdg->css_w(BIT(data, 3));
 }
 
 static I8255_INTERFACE( ppi_intf )
@@ -632,27 +632,17 @@ static const cassette_interface atom_cassette_interface =
 
 READ8_MEMBER( atom_state::vdg_videoram_r )
 {
-	mc6847_as_w(m_vdg, BIT(m_video_ram[offset], 6));
-	mc6847_intext_w(m_vdg, BIT(m_video_ram[offset], 6));
-	mc6847_inv_w(m_vdg, BIT(m_video_ram[offset], 7));
+	m_vdg->as_w(BIT(m_video_ram[offset], 6));
+	m_vdg->intext_w(BIT(m_video_ram[offset], 6));
+	m_vdg->inv_w(BIT(m_video_ram[offset], 7));
 
 	return m_video_ram[offset];
 }
 
 static const mc6847_interface vdg_intf =
 {
-	DEVCB_DRIVER_MEMBER(atom_state, vdg_videoram_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	SCREEN_TAG,
+	DEVCB_DRIVER_MEMBER(atom_state, vdg_videoram_r)
 };
 
 /***************************************************************************
@@ -797,14 +787,8 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_CPU_PROGRAM_MAP(atom_mem)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(320, 25+192+26)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-
-	MCFG_MC6847_ADD(MC6847_TAG, vdg_intf)
-	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
+    MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG)
+	MCFG_MC6847_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz, vdg_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

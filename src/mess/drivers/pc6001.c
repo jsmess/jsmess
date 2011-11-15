@@ -125,7 +125,7 @@ irq vector 0x26:                                                                
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
-#include "video/m6847.h"
+#include "video/mc6847.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 

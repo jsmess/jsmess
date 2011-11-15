@@ -65,7 +65,7 @@ READ8_MEMBER( phc25_state::port40_r )
 	UINT8 data = 0;
 
 	/* vertical sync */
-	data |= !mc6847_fs_r(m_vdg) << 4;
+	data |= !m_vdg->fs_r() << 4;
 
 	/* cassette read */
 	data |= ((m_cassette)->input() < +0.3) << 5;
@@ -74,7 +74,7 @@ READ8_MEMBER( phc25_state::port40_r )
 	data |= centronics_busy_r(m_centronics) << 6;
 
 	/* horizontal sync */
-	data |= !mc6847_hs_r(m_vdg) << 7;
+	data |= !m_vdg->hs_r() << 7;
 
 	return data;
 }
@@ -106,10 +106,10 @@ WRITE8_MEMBER( phc25_state::port40_w )
 	centronics_strobe_w(m_centronics, BIT(data, 3));
 
 	/* MC6847 */
-	mc6847_intext_w(m_vdg, BIT(data, 2));
-	mc6847_gm0_w(m_vdg, BIT(data, 5));
-	mc6847_gm1_w(m_vdg, BIT(data, 6));
-	mc6847_ag_w(m_vdg, BIT(data, 7));
+	m_vdg->intext_w(BIT(data, 2));
+	m_vdg->gm0_w(BIT(data, 5));
+	m_vdg->gm1_w(BIT(data, 6));
+	m_vdg->ag_w(BIT(data, 7));
 }
 
 /* Memory Maps */
@@ -264,35 +264,60 @@ READ8_MEMBER( phc25_state::video_ram_r )
 	return m_video_ram[offset & 0x17ff];
 }
 
-static UINT8 pal_char_rom_r(running_machine &machine, UINT8 ch, int line)
+UINT8 phc25_state::pal_char_rom_r(running_machine &machine, UINT8 ch, int line)
 {
 	phc25_state *state = machine.driver_data<phc25_state>();
 
 	return state->m_char_rom[((ch - 2) * 12) + line + 4];
 }
 
-static UINT8 ntsc_char_rom_r(running_machine &machine, UINT8 ch, int line)
+UINT8 phc25_state::ntsc_char_rom_r(running_machine &machine, UINT8 ch, int line)
 {
 	phc25_state *state = machine.driver_data<phc25_state>();
 
 	return state->m_char_rom[(ch * 16) + line];
 }
 
-static const mc6847_interface vdg_intf =
+static const mc6847_interface ntsc_vdg_intf =
 {
+	SCREEN_TAG,
 	DEVCB_DRIVER_MEMBER(phc25_state, video_ram_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL
+
+	DEVCB_NULL,											/* horizontal sync */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		/* field sync */
+
+	DEVCB_NULL,											/* AG */
+	DEVCB_NULL,											/* GM2 */
+	DEVCB_NULL,											/* GM1 */
+	DEVCB_NULL,											/* GM0 */
+	DEVCB_NULL,											/* CSS */
+	DEVCB_NULL,											/* AS */
+	DEVCB_NULL,											/* INTEXT */
+	DEVCB_NULL,											/* INV */
+
+	&phc25_state::ntsc_char_rom_r
 };
+
+static const mc6847_interface pal_vdg_intf =
+{
+	SCREEN_TAG,
+	DEVCB_DRIVER_MEMBER(phc25_state, video_ram_r),
+
+	DEVCB_NULL,											/* horizontal sync */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		/* field sync */
+
+	DEVCB_NULL,											/* AG */
+	DEVCB_NULL,											/* GM2 */
+	DEVCB_NULL,											/* GM1 */
+	DEVCB_NULL,											/* GM0 */
+	DEVCB_NULL,											/* CSS */
+	DEVCB_NULL,											/* AS */
+	DEVCB_NULL,											/* INTEXT */
+	DEVCB_NULL,											/* INV */
+
+	&phc25_state::pal_char_rom_r
+};
+
 
 void phc25_state::video_start()
 {
@@ -302,7 +327,7 @@ void phc25_state::video_start()
 
 bool phc25_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return mc6847_update(m_vdg, &bitmap, &cliprect);
+	return m_vdg->update(&bitmap, &cliprect);
 }
 
 /* AY-3-8910 Interface */
@@ -353,34 +378,14 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pal, phc25 )
     /* video hardware */
-    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MCFG_SCREEN_REFRESH_RATE(M6847_PAL_FRAMES_PER_SECOND)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(320, 25+192+26)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-
-    MCFG_PALETTE_LENGTH(16)
-
-	MCFG_MC6847_ADD(MC6847_TAG, vdg_intf)
-    MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
-	MCFG_MC6847_CHAR_ROM(pal_char_rom_r)
+	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG)
+	MCFG_MC6847_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz, pal_vdg_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ntsc, phc25 )
     /* video hardware */
-    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(320, 25+192+26)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-
-    MCFG_PALETTE_LENGTH(16)
-
-	MCFG_MC6847_ADD(MC6847_TAG, vdg_intf)
-    MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC) // actually M5C6847P-1
-	MCFG_MC6847_CHAR_ROM(ntsc_char_rom_r)
+	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG)
+	MCFG_MC6847_ADD(MC6847_TAG, MC6847_NTSC, XTAL_3_579545MHz, ntsc_vdg_intf)
 MACHINE_CONFIG_END
 
 /* ROMs */

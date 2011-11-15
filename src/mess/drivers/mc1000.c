@@ -108,13 +108,13 @@ WRITE8_MEMBER( mc1000_state::mc6847_attr_w )
     */
 
 	m_mc6847_bank = BIT(data, 0);
-	mc6847_css_w(m_vdg, BIT(data, 1));
-	mc6847_gm0_w(m_vdg, BIT(data, 2));
-	mc6847_gm1_w(m_vdg, BIT(data, 3));
-	mc6847_gm2_w(m_vdg, BIT(data, 4));
-	mc6847_intext_w(m_vdg, BIT(data, 5));
-	mc6847_as_w(m_vdg, BIT(data, 6));
-	mc6847_ag_w(m_vdg, BIT(data, 7));
+	m_vdg->css_w(BIT(data, 1));
+	m_vdg->gm0_w(BIT(data, 2));
+	m_vdg->gm1_w(BIT(data, 3));
+	m_vdg->gm2_w(BIT(data, 4));
+	m_vdg->intext_w(BIT(data, 5));
+	m_vdg->as_w(BIT(data, 6));
+	m_vdg->ag_w(BIT(data, 7));
 
 	bankswitch();
 }
@@ -249,8 +249,6 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_CONFNAME( 0x01, 0x00, "JOYSTICK B (P2) keyboard mapping" )
 	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
-
-	PORT_INCLUDE( m6847_artifacting )
 INPUT_PORTS_END
 
 /* Video */
@@ -267,19 +265,14 @@ WRITE_LINE_MEMBER( mc1000_state::hs_w )
 
 READ8_MEMBER( mc1000_state::videoram_r )
 {
-	mc6847_inv_w(m_vdg, BIT(m_mc6847_video_ram[offset], 7));
+	m_vdg->inv_w(BIT(m_mc6847_video_ram[offset], 7));
 
 	return m_mc6847_video_ram[offset];
 }
 
 bool mc1000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return mc6847_update(m_vdg, &bitmap, &cliprect);
-}
-
-static UINT8 mc1000_get_char_rom(running_machine &machine, UINT8 ch, int line)
-{
-	return ch;
+	return m_vdg->update(&bitmap, &cliprect);
 }
 
 /* AY-3-8910 Interface */
@@ -440,18 +433,10 @@ static const cassette_interface mc1000_cassette_interface =
 
 static const mc6847_interface mc1000_mc6847_intf =
 {
+	SCREEN_TAG,
 	DEVCB_DRIVER_MEMBER(mc1000_state, videoram_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(mc1000_state, fs_w),
 	DEVCB_DRIVER_LINE_MEMBER(mc1000_state, hs_w),
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(mc1000_state, fs_w),
 };
 
 static MACHINE_CONFIG_START( mc1000, mc1000_state )
@@ -470,18 +455,8 @@ static MACHINE_CONFIG_START( mc1000, mc1000_state )
 	MCFG_TIMER_PARAM(ASSERT_LINE)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(320, 25+192+26)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-
-	MCFG_PALETTE_LENGTH(16)
-
-	MCFG_MC6847_ADD(MC6847_TAG, mc1000_mc6847_intf)
-	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
-	MCFG_MC6847_CHAR_ROM(mc1000_get_char_rom)
+    MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG)
+	MCFG_MC6847_ADD(MC6847_TAG, MC6847_NTSC, XTAL_3_579545MHz, mc1000_mc6847_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

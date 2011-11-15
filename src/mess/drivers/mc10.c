@@ -13,7 +13,7 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/dac.h"
-#include "video/m6847.h"
+#include "video/mc6847.h"
 #include "video/ef9345.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
@@ -49,10 +49,10 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<device_t> m_mc6847;
+	required_device<mc6847_base_device> m_mc6847;
 	optional_device<ef9345_device> m_ef9345;
 	required_device<device_t> m_dac;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
 	required_device<printer_image_device> m_printer;
 
@@ -126,12 +126,12 @@ READ8_MEMBER( mc10_state::alice90_bfff_r )
 WRITE8_MEMBER( mc10_state::mc10_bfff_w )
 {
 	/* bit 2 to 6, mc6847 mode lines */
-	mc6847_gm2_w(m_mc6847, BIT(data, 2));
-	mc6847_intext_w(m_mc6847, BIT(data, 2));
-	mc6847_gm1_w(m_mc6847, BIT(data, 3));
-	mc6847_gm0_w(m_mc6847, BIT(data, 4));
-	mc6847_ag_w(m_mc6847, BIT(data, 5));
-	mc6847_css_w(m_mc6847, BIT(data, 6));
+	m_mc6847->gm2_w(BIT(data, 2));
+	m_mc6847->intext_w(BIT(data, 2));
+	m_mc6847->gm1_w(BIT(data, 3));
+	m_mc6847->gm0_w(BIT(data, 4));
+	m_mc6847->ag_w(BIT(data, 5));
+	m_mc6847->css_w(BIT(data, 6));
 
 	/* bit 7, dac output */
 	dac_data_w(m_dac, BIT(data, 7));
@@ -218,8 +218,8 @@ WRITE8_MEMBER( mc10_state::mc10_port2_w )
 
 READ8_MEMBER( mc10_state::mc10_mc6847_videoram_r )
 {
-	mc6847_inv_w(m_mc6847, BIT(m_ram_base[offset], 6));
-	mc6847_as_w(m_mc6847, BIT(m_ram_base[offset], 7));
+	m_mc6847->inv_w(BIT(m_ram_base[offset], 6));
+	m_mc6847->as_w(BIT(m_ram_base[offset], 7));
 
 	return m_ram_base[offset];
 }
@@ -227,7 +227,7 @@ READ8_MEMBER( mc10_state::mc10_mc6847_videoram_r )
 bool mc10_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	if (m_mc6847)		//mc10, alice
-		return mc6847_update(m_mc6847, &bitmap, &cliprect);
+		return m_mc6847->update(&bitmap, &cliprect);
 	else if (m_ef9345)	//alice32
 		m_ef9345->video_update(&bitmap, &cliprect);
 
@@ -254,8 +254,8 @@ static DRIVER_INIT( mc10 )
 	mc10->m_keyboard_strobe = 0x00;
 
 	/* initialize memory */
-	mc10->m_ram_base = ram_get_ptr(mc10->m_ram);
-	mc10->m_ram_size = ram_get_size(mc10->m_ram);
+	mc10->m_ram_base = mc10->m_ram->pointer();
+	mc10->m_ram_size = mc10->m_ram->size();
 	mc10->m_pr_state = PRINTER_WAIT;
 
 	memory_set_bankptr(machine, "bank1", mc10->m_ram_base);
@@ -405,8 +405,6 @@ static INPUT_PORTS_START( mc10 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/  ?  SQR")          PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/')  PORT_CHAR('?')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT")              PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_INCLUDE( m6847_artifacting )
 INPUT_PORTS_END
 
 /* Alice uses an AZERTY keyboard */
@@ -486,8 +484,6 @@ static INPUT_PORTS_START( alice )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";  +  POKE")         PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';')  PORT_CHAR('+')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT")              PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_INCLUDE( m6847_artifacting )
 INPUT_PORTS_END
 
 
@@ -515,18 +511,8 @@ static const cassette_interface alice32_cassette_interface =
 
 static const mc6847_interface mc10_mc6847_intf =
 {
-	DEVCB_DRIVER_MEMBER(mc10_state, mc10_mc6847_videoram_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	"screen",
+	DEVCB_DRIVER_MEMBER(mc10_state, mc10_mc6847_videoram_r)
 };
 
 static MACHINE_CONFIG_START( mc10, mc10_state )
@@ -535,16 +521,10 @@ static MACHINE_CONFIG_START( mc10, mc10_state )
 	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)  /* 0,894886 MHz */
 	MCFG_CPU_PROGRAM_MAP(mc10_mem)
 	MCFG_CPU_IO_MAP(mc10_io)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
 
 	/* video hardware */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(320, 25+192+26)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-
-	MCFG_MC6847_ADD("mc6847", mc10_mc6847_intf)
-	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
+	MCFG_SCREEN_MC6847_NTSC_ADD("screen")
+	MCFG_MC6847_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz, mc10_mc6847_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -11,6 +11,8 @@
 #ifndef Z80NE_H_
 #define Z80NE_H_
 
+#include "video/mc6847.h"
+
 
 /***************************************************************************
     CONSTANTS
@@ -61,8 +63,11 @@ class z80ne_state : public driver_device
 {
 public:
 	z80ne_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_vdg(*this, "mc6847")
+	{}
 
+	optional_device<mc6847_base_device> m_vdg;
 	UINT8 *m_videoram;
 	UINT8 m_lx383_scan_counter;
 	UINT8 m_lx383_key[LX383_KEYS];
@@ -75,6 +80,9 @@ public:
 	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;
 	wd17xx_state_t m_wd17xx_state;
+
+protected:
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 

@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/m6847.h"
+#include "video/mc6847.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "imagedev/cassette.h"
@@ -20,11 +20,22 @@ class spc1000_state : public driver_device
 {
 public:
 	spc1000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_vdg(*this, "mc6847") {}
 
+	required_device<mc6847_base_device> m_vdg;
 	UINT8 m_IPLK;
-	UINT8 *m_video_ram;
 	UINT8 m_GMODE;
+	UINT8 m_video_ram[0x2000];
+
+	static UINT8 get_char_rom(running_machine &machine, UINT8 ch, int line)
+	{
+		spc1000_state *state = machine.driver_data<spc1000_state>();
+		return state->m_video_ram[0x1000+(ch&0x7F)*16+line];
+	}
+
+protected:
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -95,10 +106,10 @@ static WRITE8_DEVICE_HANDLER(spc1000_gmode_w)
 
 	// state->m_GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
 	//  [PS2,PS1] is used to set screen 0/1 pages
-	mc6847_gm1_w(device, BIT(data, 1));
-	mc6847_gm0_w(device, BIT(data, 2));
-	mc6847_ag_w(device, BIT(data, 3));
-	mc6847_css_w(device, BIT(data, 7));
+	state->m_vdg->gm1_w(BIT(data, 1));
+	state->m_vdg->gm0_w(BIT(data, 2));
+	state->m_vdg->ag_w(BIT(data, 3));
+	state->m_vdg->css_w(BIT(data, 7));
 }
 
 static READ8_DEVICE_HANDLER(spc1000_gmode_r)
@@ -240,33 +251,19 @@ static READ8_DEVICE_HANDLER( spc1000_mc6847_videoram_r )
 	//  [PS2,PS1] is used to set screen 0/1 pages
 	if ( !BIT(state->m_GMODE, 3) ) {	// text mode (~A/G set to A)
 		unsigned int page = (BIT(state->m_GMODE, 5) << 1) | BIT(state->m_GMODE, 4);
-		mc6847_inv_w(device, BIT(state->m_video_ram[offset+page*0x200+0x800], 0));
-		mc6847_css_w(device, BIT(state->m_video_ram[offset+page*0x200+0x800], 1));
-		mc6847_as_w(device, BIT(state->m_video_ram[offset+page*0x200+0x800], 2));
-		mc6847_intext_w(device, BIT(state->m_video_ram[offset+page*0x200+0x800], 3));
+		state->m_vdg->inv_w(BIT(state->m_video_ram[offset+page*0x200+0x800], 0));
+		state->m_vdg->css_w(BIT(state->m_video_ram[offset+page*0x200+0x800], 1));
+		state->m_vdg->as_w(BIT(state->m_video_ram[offset+page*0x200+0x800], 2));
+		state->m_vdg->intext_w(BIT(state->m_video_ram[offset+page*0x200+0x800], 3));
 		return state->m_video_ram[offset+page*0x200];
 	} else {	// graphics mode: uses full 6KB of VRAM
 		return state->m_video_ram[offset];
 	}
 }
 
-
-static UINT8 spc1000_get_char_rom(running_machine &machine, UINT8 ch, int line)
+bool spc1000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	spc1000_state *state = machine.driver_data<spc1000_state>();
-	return state->m_video_ram[0x1000+(ch&0x7F)*16+line];
-}
-
-static VIDEO_START( spc1000 )
-{
-	spc1000_state *state = machine.driver_data<spc1000_state>();
-	state->m_video_ram = auto_alloc_array(machine, UINT8, 0x2000);
-}
-
-static SCREEN_UPDATE( spc1000 )
-{
-	device_t *mc6847 = screen->machine().device("mc6847");
-	return mc6847_update(mc6847, bitmap, cliprect);
+	return m_vdg->update(&bitmap, &cliprect);
 }
 
 static const ay8910_interface spc1000_ay_interface =
@@ -287,18 +284,21 @@ static const cassette_interface spc1000_cassette_interface =
 
 static const mc6847_interface spc1000_mc6847_intf =
 {
+	"screen",
 	DEVCB_HANDLER(spc1000_mc6847_videoram_r),	// data fetch
-	DEVCB_LINE_VCC,								// GM2 [hardwired to 1]
-	DEVCB_NULL,									// GM1
-	DEVCB_NULL,									// GM0
-	DEVCB_NULL,									// INVEXT
-	DEVCB_NULL,									// INV
-	DEVCB_NULL,									// ~A/S
-	DEVCB_NULL,									// ~A/G
-	DEVCB_NULL,									// CSS
-	DEVCB_NULL,									// FS (output)
-	DEVCB_NULL,									// HS (output)
-	DEVCB_NULL									// RS (output)
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,					/* AG */
+	DEVCB_LINE_VCC,				/* GM2 */
+	DEVCB_NULL,					/* GM1 */
+	DEVCB_NULL,					/* GM0 */
+	DEVCB_NULL,					/* CSS */
+	DEVCB_NULL,					/* AS */
+	DEVCB_NULL,					/* INTEXT */
+	DEVCB_NULL,					/* INV */
+
+	&spc1000_state::get_char_rom
 };
 
 static MACHINE_CONFIG_START( spc1000, spc1000_state )
@@ -310,18 +310,8 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_MACHINE_RESET(spc1000)
 
     /* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(320, 25+192+26)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-	MCFG_SCREEN_UPDATE(spc1000)
-
-	MCFG_VIDEO_START(spc1000)
-
-	MCFG_MC6847_ADD("mc6847", spc1000_mc6847_intf)
-	MCFG_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
-	MCFG_MC6847_CHAR_ROM(spc1000_get_char_rom)
+    MCFG_SCREEN_MC6847_NTSC_ADD("screen")
+	MCFG_MC6847_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz, spc1000_mc6847_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

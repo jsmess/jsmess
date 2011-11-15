@@ -557,7 +557,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_VIDEO)/dl1416.o		\
 	$(MESS_VIDEO)/hd44780.o		\
 	$(MESS_VIDEO)/hd66421.o		\
-	$(MESS_VIDEO)/m6847.o		\
+	$(MESS_VIDEO)/mc6847.o		\
 	$(MESS_VIDEO)/saa505x.o		\
 	$(MESS_VIDEO)/tms3556.o		\
 	$(MESS_VIDEO)/upd7220.o		\
@@ -1654,24 +1654,29 @@ $(MESSOBJ)/trs.a:				\
 	$(MESS_MACHINE)/6883sam.o	\
 	$(MESS_MACHINE)/ds1315.o	\
 	$(MESS_MACHINE)/coco.o		\
-	$(MESS_VIDEO)/coco.o		\
-	$(MESS_DRIVERS)/coco.o		\
-	$(MESS_VIDEO)/coco3.o		\
-	$(MESS_FORMATS)/cocopak.o	\
-	$(MESS_MACHINE)/coco_vhd.o	\
-	$(MESS_MACHINE)/cococart.o	\
-	$(MESS_MACHINE)/coco_232.o	\
+	$(MESS_MACHINE)/coco12.o		\
+	$(MESS_DRIVERS)/coco12.o		\
+	$(MESS_MACHINE)/coco3.o		\
+	$(MESS_DRIVERS)/coco3.o		\
+	$(MESS_VIDEO)/gime.o			\
+	$(MESS_MACHINE)/dragon.o		\
+	$(MESS_DRIVERS)/dragon.o		\
+	$(MESS_MACHINE)/dgnalpha.o		\
+	$(MESS_DRIVERS)/dgnalpha.o		\
+	$(MESS_FORMATS)/cocopak.o       \
+	$(MESS_MACHINE)/coco_vhd.o      \
+	$(MESS_MACHINE)/cococart.o      \
+	$(MESS_MACHINE)/coco_232.o      \
 	$(MESS_MACHINE)/coco_orch90.o\
-	$(MESS_MACHINE)/coco_pak.o	\
-	$(MESS_MACHINE)/coco_fdc.o	\
-	$(MESS_MACHINE)/coco_multi.o	\
+	$(MESS_MACHINE)/coco_pak.o      \
+	$(MESS_MACHINE)/coco_fdc.o      \
+	$(MESS_MACHINE)/coco_multi.o    \
 	$(MESS_DRIVERS)/mc10.o		\
 	$(MESS_MACHINE)/trs80.o		\
 	$(MESS_VIDEO)/trs80.o		\
 	$(MESS_FORMATS)/trs_cmd.o	\
 	$(MESS_DRIVERS)/trs80.o		\
 	$(MESS_DRIVERS)/trs80m2.o	\
-	$(MESS_VIDEO)/coco6847.o	\
 	$(MESS_DRIVERS)/tandy2k.o	\
 
 $(MESSOBJ)/unisys.a:			\
@@ -1889,6 +1894,7 @@ $(MAME_DRIVERS)/cdi.o:		$(MAME_LAYOUT)/cdi.lh
 $(MESS_DRIVERS)/chessmst.o:	$(MESS_LAYOUT)/chessmst.lh
 $(MESS_DRIVERS)/cvicny.o:	$(MESS_LAYOUT)/cvicny.lh
 $(MESS_DRIVERS)/coco.o:		$(MESS_LAYOUT)/coco3.lh
+$(MESS_DRIVERS)/coco3.o:	$(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/cosmicos.o:	$(MESS_LAYOUT)/cosmicos.lh
 $(MESS_DRIVERS)/c80.o:		$(MESS_LAYOUT)/c80.lh
 $(MESS_DRIVERS)/dectalk.o:	$(MESS_LAYOUT)/dectalk.lh

@@ -96,6 +96,8 @@ void coco_vhd_image_device::device_config_complete()
 	update_names();
 }
 
+
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -103,7 +105,15 @@ void coco_vhd_image_device::device_config_complete()
 void coco_vhd_image_device::device_start()
 {
 	m_status = VHDSTATUS_NO_VHD_ATTACHED;
+	m_cpu = downcast<cpu_device *>(machine().devicelist().find(MAINCPU_TAG));
+	m_cpu_space = m_cpu->space(AS_PROGRAM);
 }
+
+
+
+//-------------------------------------------------
+//  call_load
+//-------------------------------------------------
 
 bool coco_vhd_image_device::call_load()
 {
@@ -113,11 +123,16 @@ bool coco_vhd_image_device::call_load()
 	return IMAGE_INIT_PASS;
 }
 
+
+
+//-------------------------------------------------
+//  coco_vhd_readwrite
+//-------------------------------------------------
+
 void coco_vhd_image_device::coco_vhd_readwrite(UINT8 data)
 {
 	int result;
-	int phyOffset;
-	UINT32 nBA = m_buffer_address;
+	void *ptr;
 	UINT32 bytes_to_read;
 	UINT32 bytes_to_write;
 	UINT64 seek_position;
@@ -160,16 +175,15 @@ void coco_vhd_image_device::coco_vhd_readwrite(UINT8 data)
 		}
 	}
 
-	phyOffset = coco3_mmu_translate(device().machine(), (nBA >> 12 ) / 2, nBA % 8192 );
-
 	switch(data)
 	{
 		case VHDCMD_READ: /* Read sector */
-			memset(&ram_get_ptr(device().machine().device(RAM_TAG))[phyOffset], 0, 256);
+			ptr = m_cpu_space->get_write_ptr(m_buffer_address);
+			memset(ptr, 0, 256);
 			if (total_size > seek_position)
 			{
 				bytes_to_read = (UINT32) MIN((UINT64) 256, total_size - seek_position);
-				result = fread(&ram_get_ptr(device().machine().device(RAM_TAG))[phyOffset], bytes_to_read);
+				result = fread(ptr, bytes_to_read);
 				if (result != bytes_to_read)
 				{
 					m_status = VHDSTATUS_ACCESS_DENIED;
@@ -181,7 +195,8 @@ void coco_vhd_image_device::coco_vhd_readwrite(UINT8 data)
 			break;
 
 		case VHDCMD_WRITE: /* Write Sector */
-			result = fwrite((&ram_get_ptr(device().machine().device(RAM_TAG))[phyOffset]), 256);
+			ptr = m_cpu_space->get_read_ptr(m_buffer_address);
+			result = fwrite(ptr, 256);
 
 			if (result != 256)
 			{
@@ -204,7 +219,7 @@ void coco_vhd_image_device::coco_vhd_readwrite(UINT8 data)
 
 
 
-READ8_MEMBER(coco_vhd_image_device::read)
+UINT8 coco_vhd_image_device::read(offs_t offset)
 {
 	UINT8 result = 0;
 
@@ -221,7 +236,7 @@ READ8_MEMBER(coco_vhd_image_device::read)
 
 
 
-WRITE8_MEMBER(coco_vhd_image_device::write)
+void coco_vhd_image_device::write(offs_t offset, UINT8 data)
 {
 	int pos;
 
