@@ -1117,6 +1117,7 @@ $(MESSOBJ)/luxor.a:				\
 	$(MESS_VIDEO)/abc802.o		\
 	$(MESS_VIDEO)/abc806.o		\
 	$(MESS_MACHINE)/abcbus.o	\
+	$(MESS_MACHINE)/abc_fd2.o	\
 	$(MESS_MACHINE)/abc_uni800.o	\
 	$(MESS_MACHINE)/abc_sio.o	\
 	$(MESS_MACHINE)/abc_slutprov.o	\

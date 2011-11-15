@@ -654,6 +654,7 @@ static const cassette_interface abc80_cassette_interface =
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( abc80_abcbus_cards )
+	SLOT_INTERFACE("fd2", ABC_FD2)
 	SLOT_INTERFACE("slow", LUXOR_55_10828)
 	SLOT_INTERFACE("sio", ABC_SIO)
 SLOT_INTERFACE_END
