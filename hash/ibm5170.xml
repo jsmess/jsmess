@@ -268,19 +268,19 @@
 		<publisher>MicroProse Ltd.</publisher>
 		<info name="version" value="1.2" />
 		<part name="flop1" interface="floppy_5_25">
-			<info name="Disc Code" value="4861A" />
+			<feature name="Disc Code" value="4861A" />
 			<dataarea name="flop" size="1474560">
 				<rom name="diska.img" size="1474560" crc="02ced55a" sha1="0f96038f1552bff33747dea41c0ac6c0a1486ad3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<info name="Disc Code" value="4861B" />
+			<feature name="Disc Code" value="4861B" />
 			<dataarea name="flop" size="1474560">
 				<rom name="diskb.img" size="1474560" crc="e7ff6515" sha1="6378a6d1d461015890f73d0dc5799acd412a3630" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<info name="Disc Code" value="4861C" />
+			<feature name="Disc Code" value="4861C" />
 			<dataarea name="flop" size="1474560">
 				<rom name="diskc.img" size="1474560" crc="9ad130ca" sha1="a3414cb53382402b5cb8908983a0e10dc4542e3e" offset="0" />
 			</dataarea>
