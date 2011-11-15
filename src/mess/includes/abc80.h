@@ -17,6 +17,7 @@
 #include "imagedev/cassette.h"
 #include "machine/abcbus.h"
 #include "machine/abc830.h"
+#include "machine/abc_fd2.h"
 #include "machine/abc_sio.h"
 #include "machine/lux10828.h"
 #include "machine/ram.h"
