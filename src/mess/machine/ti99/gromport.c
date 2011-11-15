@@ -1661,7 +1661,7 @@ WRITE8_DEVICE_HANDLER( gromportr_w )
 */
 WRITE8_DEVICE_HANDLER(gromportg_w)
 {
-	int slot;
+//  int slot;
 	cartridge_t *cartridge;
 	ti99_multicart_state *cartslots = get_safe_token(device);
 
@@ -1669,27 +1669,10 @@ WRITE8_DEVICE_HANDLER(gromportg_w)
 	// 1001 1wbb bbbb bbr0
 
 	cartridge_slot_set(device, (UINT8)((offset>>2) & 0x00ff));
-	slot = cartslots->active_slot;
+//  slot = cartslots->active_slot;
 
-	// The selection mechanism of the console checks the different GROM address
-	// bases, and when it finds different data, it concludes that there is
-	// indeed a multi-cartridge facility. Empty slots return 0 at all
-	// addresses.
-	// Unfortunately, TI's cartridge selection mechanism has an undesirable
-	// side-effect which we work around in this implementation.
-	// When we have only one cartridge we would like to get only the option to
-	// select this cartridge and not an option to switch to the next one (which
-	// would immediately cycle back to cartridge 1). However, the console
-	// routines always show the switch option when any two slots have different
-	// content, and this is the case with only one cartridge (slot 2 will then
-	// be filled with zeros).
-	// So if next_free_slot==1, we have one cartridge in slot 0.
-	// In that case we trick the OS to believe that the addressed
-	// cartridge appears at all locations which causes it to assume a
-	// standard single cartslot.
-
-	if (cartslots->fixed_slot==AUTO && cartslots->next_free_slot==1)
-		slot=0;
+//  if (cartslots->fixed_slot==AUTO && cartslots->next_free_slot==1)
+//      slot=0;
 
 	// Handle the GRAM Kracker
 	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine(), "CARTSLOT")==CART_GK))
@@ -1699,6 +1682,8 @@ WRITE8_DEVICE_HANDLER(gromportg_w)
 	}
 
 	// We need to send the write request to all attached cartridges
+	// so the slot is irrelevant here. (We don't have GRAM cartridges,
+	// anyway, so it's just used for setting the adddress)
 	for (int j=0; j < NUMBER_OF_CARTRIDGE_SLOTS; j++)
 	{
 		cartridge = &cartslots->cartridge[j];
