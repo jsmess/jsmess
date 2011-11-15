@@ -42260,6 +42260,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="supermanjp" cloneof="superman" supported="partial">
+		<!-- Serial:  - Release Date:  - Alternative Title: スーパーマン -->
+		<description>Superman (Jpn, Prototype)</description>
+		<year>1987</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="superman (j) (prototype).chr" size="131072" crc="463c7129" sha1="7c9197977740f4133281be718290f5019fdabcdb" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="superman (j) (prototype).prg" size="131072" crc="26c81632" sha1="39e82c6a61e9b095cebdff84d84ad8998372c3ff" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scontra" cloneof="probot2">
 		<!-- Serial:  - Release Date: 1990-02-02 - Alternative Title:  -->
 		<description>Super Contra (Jpn)</description>
