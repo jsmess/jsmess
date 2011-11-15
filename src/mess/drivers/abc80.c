@@ -176,19 +176,6 @@ Notes:
 
 */
 
-#define ADDRESS_MAP_MODERN
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "imagedev/printer.h"
-#include "machine/abcbus.h"
-#include "machine/abc830.h"
-#include "machine/lux10828.h"
-#include "machine/z80pio.h"
-#include "sound/sn76477.h"
 #include "includes/abc80.h"
 
 
@@ -668,6 +655,7 @@ static const cassette_interface abc80_cassette_interface =
 
 static SLOT_INTERFACE_START( abc80_abcbus_cards )
 	SLOT_INTERFACE("slow", LUXOR_55_10828)
+	SLOT_INTERFACE("sio", ABC_SIO)
 SLOT_INTERFACE_END
 
 

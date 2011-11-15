@@ -7,8 +7,21 @@
 #ifndef __ABC80__
 #define __ABC80__
 
-#include "machine/ram.h"
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/printer.h"
 #include "imagedev/cassette.h"
+#include "machine/abcbus.h"
+#include "machine/abc830.h"
+#include "machine/abc_sio.h"
+#include "machine/lux10828.h"
+#include "machine/ram.h"
+#include "machine/z80pio.h"
+#include "sound/sn76477.h"
 
 #define ABC80_XTAL		11980800.0
 
