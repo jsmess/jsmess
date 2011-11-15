@@ -1662,7 +1662,6 @@ $(MESSOBJ)/trs.a:				\
 	$(MESS_MACHINE)/dragon.o		\
 	$(MESS_DRIVERS)/dragon.o		\
 	$(MESS_MACHINE)/dgnalpha.o		\
-	$(MESS_DRIVERS)/dgnalpha.o		\
 	$(MESS_FORMATS)/cocopak.o       \
 	$(MESS_MACHINE)/coco_vhd.o      \
 	$(MESS_MACHINE)/cococart.o      \
