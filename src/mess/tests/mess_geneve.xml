@@ -1,8 +1,0 @@
-<tests>
-
-<test name="geneve_000" driver="geneve">
-	<wait time="2"/>
-	<checkblank/>
-</test>
-
-</tests>

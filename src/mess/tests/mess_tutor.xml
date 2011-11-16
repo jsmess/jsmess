@@ -1,8 +1,0 @@
-<tests>
-
-<test name="tutor_000" driver="tutor">
-	<wait time="5"/>
-	<checkblank/>
-</test>
-
-</tests>

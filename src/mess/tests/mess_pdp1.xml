@@ -1,7 +1,0 @@
-<tests>
-
-<test name="pdp1_000" driver="pdp1">
-	<wait time="5"/>
-</test>
-
-</tests>

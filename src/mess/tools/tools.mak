@@ -27,20 +27,9 @@ endif
 include $(MESSSRC)/tools/floptool/floptool.mak
 TOOLS += $(FLOPTOOL)
 
-#ifdef BUILD_MESSTEST
-#include $(MESSSRC)/tools/messtest/messtest.mak
-#TOOLS += $(MESSTEST)
-#endif
-
-ifdef BUILD_DAT2HTML
-include $(MESSSRC)/tools/dat2html/dat2html.mak
-TOOLS += $(DAT2HTML)
-endif
-
 # include OS-specific MESS stuff
 # the following expression is true if OSD is windows or winui
 ifeq ($(OSD),$(filter $(OSD),windows winui))
-include $(MESSSRC)/tools/messdocs/messdocs.mak
 
 ifdef BUILD_WIMGTOOL
 include $(MESSSRC)/tools/imgtool/windows/wimgtool.mak
