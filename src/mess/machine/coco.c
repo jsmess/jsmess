@@ -1078,7 +1078,7 @@ READ8_MEMBER( coco_state::ff60_read )
 		result = m_vhd->read(offset - 32);
 	}
 
-	return 0;
+	return result;
 }
 
 
