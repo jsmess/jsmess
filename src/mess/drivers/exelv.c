@@ -515,7 +515,7 @@ void exelv_state::video_start()
 
 void exelv_state::machine_start()
 {
-	UINT8 *rom = machine().region("user1")->base();
+	UINT8 *rom = machine().region("user1")->base() + 0x0200;
 	memory_configure_bank(machine(), "bank1", 0, 1, rom, 0x8000 - 0x200);
 	memory_set_bank(machine(), "bank1", 0);
 	
