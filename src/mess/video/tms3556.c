@@ -14,339 +14,293 @@
 #include "emu.h"
 #include "tms3556.h"
 
-typedef struct
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG 0
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// devices
+const device_type TMS3556 = &device_creator<tms3556_device>;
+
+
+// default address map
+static ADDRESS_MAP_START( tms3556, AS_0, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *tms3556_device::memory_space_config(address_spacenum spacenum) const
 {
-	/* registers */
-	UINT8 controlRegs[8];
-	UINT16 addressRegs[8];
-	UINT16 writePtr;
-	/* register interface */
-	int reg_ptr;
-	int reg_access_phase;
-	int magical_mystery_flag;
-	/* memory */
-	UINT8 *vram;
-	int vram_size;
-	/* scanline counter */
-	int scanline;
-	/* blinking */
-	int blink, blink_count;
-	/* background color for current line */
-	int bg_color;
-	/* current offset in name table */
-	int name_offset;
-	/* c/g flag (mixed mode only) */
-	int cg_flag;
-	/* character line counter (decrements from 10, 0 when we have reached last
-    line of character row) */
-	int char_line_counter;
-	/* double height phase flags (one per horizontal character position) */
-	int dbl_h_phase[40];
-} vdp_t;
-static vdp_t vdp;
+	return (spacenum == AS_0) ? &m_space_config : NULL;
+}
 
-#define TOP_BORDER 1
-#define BOTTOM_BORDER 1
-#define LEFT_BORDER 8
-#define RIGHT_BORDER 8
-#define TOTAL_WIDTH (320 + LEFT_BORDER + RIGHT_BORDER)
-#define TOTAL_HEIGHT (250 + TOP_BORDER + BOTTOM_BORDER)
 
-/* if DOUBLE_WIDTH set, the horizontal resolution is doubled */
-#define DOUBLE_WIDTH 1
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
 
-#define TMS3556_MODE_OFF	0
-#define TMS3556_MODE_TEXT	1
-#define TMS3556_MODE_BITMAP	2
-#define TMS3556_MODE_MIXED	3
+//-------------------------------------------------
+//  readbyte - read a byte at the given address
+//-------------------------------------------------
+
+inline UINT8 tms3556_device::readbyte(offs_t address)
+{
+	return space()->read_byte(address);
+}
+
+
+//-------------------------------------------------
+//  writebyte - write a byte at the given address
+//-------------------------------------------------
+
+inline void tms3556_device::writebyte(offs_t address, UINT8 data)
+{
+	space()->write_byte(address, data);
+}
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  tms3556_device - constructor
+//-------------------------------------------------
+
+tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TMS3556, "Texas Instruments VDP TMS3556", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
+	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(tms3556)),
+	  m_write_ptr(0),
+	  m_reg_ptr(0),
+	  m_reg_access_phase(0),
+	  m_magical_mystery_flag(0),
+	  m_scanline(0)
+{
+	for (int i = 0; i < 8; i++)
+	{
+		m_control_regs[i] = 0;
+		m_address_regs[i] = 0;
+	}
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tms3556_device::device_start()
+{	
+	// register for state saving
+	save_item(NAME(m_control_regs));
+	save_item(NAME(m_address_regs));
+	save_item(NAME(m_write_ptr));
+	save_item(NAME(m_reg_ptr));
+	save_item(NAME(m_reg_access_phase));
+	save_item(NAME(m_magical_mystery_flag));
+	save_item(NAME(m_scanline));
+	save_item(NAME(m_blink));
+	save_item(NAME(m_blink_count));
+	save_item(NAME(m_bg_color));
+	save_item(NAME(m_name_offset));
+	save_item(NAME(m_cg_flag));
+	save_item(NAME(m_char_line_counter));
+	save_item(NAME(m_dbl_h_phase));
+}
+
 
 /*static const char *const tms3556_mode_names[] = { "DISPLAY OFF", "TEXT", "GRAPHIC", "MIXED" };*/
 
-static PALETTE_INIT(tms3556);
 
+//-------------------------------------------------
+//  vram_r - VRAM read
+//-------------------------------------------------
 
-#if 0
-#pragma mark BUS INTERFACE
-#endif
-/*
-    bus interface
-*/
-
-/*
-    tms3556_vram_r
-
-    read a byte from tms3556 VRAM port
-*/
-READ8_HANDLER(tms3556_vram_r)
+READ8_MEMBER( tms3556_device::vram_r )
 {
-	int reply;
+	if (LOG) logerror("TMS3556 VRAM Read: %06x\n", offset);
 
-	if (vdp.magical_mystery_flag)
+	if (m_magical_mystery_flag)
 	{
-		vdp.writePtr = ((vdp.controlRegs[2] << 8) | vdp.controlRegs[1]) + 1;
-		vdp.magical_mystery_flag = 0;
+		m_write_ptr = ((m_control_regs[2] << 8) | m_control_regs[1]) + 1;
+		m_magical_mystery_flag = 0;
 	}
 
-	reply = vdp.vram[vdp.addressRegs[1]];
-	vdp.addressRegs[1] ++;
-
-	return reply;
+	return readbyte(m_address_regs[1]++);
 }
 
-/*
-    tms3556_vram_w
+//-------------------------------------------------
+//  vram_w - VRAM write
+//-------------------------------------------------
 
-    write a byte to tms3556 VRAM port
-*/
-WRITE8_HANDLER(tms3556_vram_w)
+WRITE8_MEMBER( tms3556_device::vram_w )
 {
-	if (vdp.magical_mystery_flag)
+	if (LOG) logerror("TMS3556 VRAM Write: %06x = %02x\n", offset, data);
+
+	if (m_magical_mystery_flag)
 	{
-		vdp.writePtr = (vdp.controlRegs[2] << 8) | vdp.controlRegs[1];
-		vdp.magical_mystery_flag = 0;
+		m_write_ptr = (m_control_regs[2] << 8) | m_control_regs[1];
+		m_magical_mystery_flag = 0;
 	}
 
-	vdp.vram[vdp.writePtr] = data;
-	vdp.writePtr++;
+	writebyte(m_write_ptr++, data);
 }
 
-/*
-    tms3556_reg_r
 
-    read a byte from tms3556 register port
-*/
-READ8_HANDLER(tms3556_reg_r)
+//-------------------------------------------------
+//  reg_r - read from register port
+//-------------------------------------------------
+
+READ8_MEMBER( tms3556_device::reg_r )
 {
+	if (LOG) logerror("TMS3556 Reg Read: %06x\n", offset);
+	
 	int reply = 0;
 
-	if (vdp.reg_ptr < 8)
+	if (m_reg_ptr < 8)
 	{
-		reply = vdp.controlRegs[vdp.reg_ptr];
-		vdp.reg_access_phase = 0;
+		reply = m_control_regs[m_reg_ptr];
+		m_reg_access_phase = 0;
 	}
-	/*else
-    {   // ???
-    }*/
+	else
+    {
+		// ???
+    }
 
 	return reply;
 }
 
-/*
-    tms3556_reg_w
+//-------------------------------------------------
+//  reg_w - write to register port
+//-------------------------------------------------
 
-    write a byte to tms3556 register port
-*/
-WRITE8_HANDLER(tms3556_reg_w)
+WRITE8_MEMBER( tms3556_device::reg_w )
 {
-	if ((vdp.reg_access_phase == 3) && (data))
-		vdp.reg_access_phase = 0;	/* ???????????? */
-	switch (vdp.reg_access_phase)
+	if (LOG) logerror("TMS3556 Reg Write: %06x = %02x\n", offset, data);
+
+	if ((m_reg_access_phase == 3) && (data))
+		m_reg_access_phase = 0;	/* ???????????? */
+
+	switch (m_reg_access_phase)
 	{
 	case 0:
-		vdp.reg_ptr = data & 0x0f;
-		vdp.reg_access_phase = 1;
+		m_reg_ptr = data & 0x0f;
+		m_reg_access_phase = 1;
 		break;
+
 	case 1:
-		if (vdp.reg_ptr < 8)
+		if (m_reg_ptr < 8)
 		{
-			vdp.controlRegs[vdp.reg_ptr] = data;
-			vdp.reg_access_phase = 0;
-			if (vdp.reg_ptr == 2)
-				vdp.magical_mystery_flag = 1;
+			m_control_regs[m_reg_ptr] = data;
+			m_reg_access_phase = 0;
+			if (m_reg_ptr == 2)
+				m_magical_mystery_flag = 1;
 		}
-		else if (vdp.reg_ptr == 9)
+		else if (m_reg_ptr == 9)
 		{	/* I don't understand what is going on, but it is the only way to
             get this to work */
-			vdp.addressRegs[vdp.reg_ptr-8] = ((vdp.controlRegs[2] << 8) | vdp.controlRegs[1]) + 1;
-			vdp.reg_access_phase = 0;
-			vdp.magical_mystery_flag = 0;
+			m_address_regs[m_reg_ptr - 8] = ((m_control_regs[2] << 8) | m_control_regs[1]) + 1;
+			m_reg_access_phase = 0;
+			m_magical_mystery_flag = 0;
 		}
 		else
 		{
-			vdp.addressRegs[vdp.reg_ptr-8] = (vdp.addressRegs[vdp.reg_ptr-8] & 0xff00) | vdp.controlRegs[1];
-			vdp.reg_access_phase = 2;
-			vdp.magical_mystery_flag = 0;
+			m_address_regs[m_reg_ptr - 8] = (m_control_regs[m_reg_ptr - 8] & 0xff00) | m_control_regs[1];
+			m_reg_access_phase = 2;
+			m_magical_mystery_flag = 0;
 		}
 		break;
+
 	case 2:
-		vdp.addressRegs[vdp.reg_ptr-8] = (vdp.addressRegs[vdp.reg_ptr-8] & 0x00ff) | (vdp.controlRegs[2] << 8);
-		if ((vdp.reg_ptr <= 10) || (vdp.reg_ptr == 15))
-			vdp.addressRegs[vdp.reg_ptr-8] ++;
+		m_address_regs[m_reg_ptr - 8] = (m_control_regs[m_reg_ptr - 8] & 0x00ff) | (m_control_regs[2] << 8);
+		if ((m_reg_ptr <= 10) || (m_reg_ptr == 15))
+			m_address_regs[m_reg_ptr - 8]++;
 		else
-			vdp.addressRegs[vdp.reg_ptr-8] += 2;
-		vdp.reg_access_phase = 3;
+			m_address_regs[m_reg_ptr - 8] += 2;
+		m_reg_access_phase = 3;
 		break;
+
 	case 3:
-		vdp.reg_access_phase = 0;
+		m_reg_access_phase = 0;
 		break;
 	}
 }
 
 
-#if 0
-#pragma mark -
-#pragma mark INITIALIZATION CODE
-#endif
-/*
-    initialization code
-*/
-
-/*
-    MCFG_tms3556
-
-    machine struct initialization helper
-*/
-MACHINE_CONFIG_FRAGMENT( tms3556 )
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-#if DOUBLE_WIDTH
-	MCFG_SCREEN_SIZE(TOTAL_WIDTH*2, TOTAL_HEIGHT*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, TOTAL_WIDTH*2-1, 0, TOTAL_HEIGHT*2-1)
-#else
-	MCFG_SCREEN_SIZE(TOTAL_WIDTH, TOTAL_HEIGHT*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, TOTAL_WIDTH-1, 0, TOTAL_HEIGHT*2-1)
-#endif
-	MCFG_SCREEN_UPDATE(generic_bitmapped)
-	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(tms3556)
-
-	MCFG_VIDEO_START(generic_bitmapped)
-MACHINE_CONFIG_END
+//-------------------------------------------------
+//  redraw code
+//-------------------------------------------------
 
 
-/*
-    PALETTE_INIT( tms3556 )
+//-------------------------------------------------
+//  draw_line_empty - draw an empty line (used for 
+//  top and bottom borders, and screen off mode)
+//-------------------------------------------------
 
-    Create our 8-color RGB palette
-*/
-static PALETTE_INIT( tms3556 )
-{
-	int	i, red, green, blue;
-
-	/* create the 8 color palette */
-	for (i=0;i<8;i++)
-	{
-		red = (i & 1) ? 255 : 0;	/* red */
-		green = (i & 2) ? 255 : 0;	/* green */
-		blue = (i & 4) ? 255 : 0;	/* blue */
-		palette_set_color_rgb(machine, i, red, green, blue);
-	}
-}
-
-/*
-    tms3556_init
-
-    tms3556 core init (called at video init time)
-*/
-void tms3556_init(running_machine &machine, int vram_size)
-{
-	memset(&vdp, 0, sizeof (vdp));
-
-	vdp.vram_size = vram_size;
-
-	/* allocate VRAM */
-	vdp.vram = auto_alloc_array(machine, UINT8, 0x10000);
-	memset (vdp.vram, 0, 0x10000);
-	if (vdp.vram_size < 0x10000)
-	{
-		/* set unavailable RAM to 0xff */
-		memset(vdp.vram + vdp.vram_size, 0xff, (0x10000 - vdp.vram_size) );
-	}
-}
-
-/*
-    tms3556_reset
-
-    tms3556 reset (should be called at machine init time)
-*/
-void tms3556_reset(void)
-{
-	int i;
-
-	/* register reset */
-	for (i=0;i<8;i++)
-	{
-		vdp.controlRegs[i] = 0;
-		vdp.addressRegs[i] = 0;
-	}
-	vdp.writePtr = 0;
-	vdp.reg_ptr = 0;
-	vdp.reg_access_phase = 0;
-	vdp.magical_mystery_flag = 0;
-	vdp.scanline = 0;
-}
-
-
-#if 0
-#pragma mark -
-#pragma mark REDRAW CODE
-#endif
-/*
-    redraw code
-*/
-
-/*
-    tms3556_draw_line_empty
-
-    draw an empty line (used for top and bottom borders, and screen off mode)
-*/
-static void tms3556_draw_line_empty(UINT16 *ln)
+void tms3556_device::draw_line_empty(UINT16 *ln)
 {
 	int	i;
 
-	for (i=0; i<TOTAL_WIDTH; i++)
-#if DOUBLE_WIDTH
-		*ln++ = vdp.bg_color;
+	for (i = 0; i < TMS3556_TOTAL_WIDTH; i++)
+#if TMS3556_DOUBLE_WIDTH
+		*ln++ = m_bg_color;
 #endif
-			*ln++ = vdp.bg_color;
+		*ln++ = m_bg_color;
 }
 
-/*
-    tms3556_draw_line_text_common
 
-    draw a line of text (called by tms3556_draw_line_text and
-    tms3556_draw_line_mixed)
-*/
-static void tms3556_draw_line_text_common(UINT16 *ln)
+//-------------------------------------------------
+//  draw_line_text_common - draw a line of text 
+//  (called by draw_line_text and draw_line_mixed)
+//-------------------------------------------------
+
+void tms3556_device::draw_line_text_common(UINT16 *ln)
 {
 	int pattern, x, xx, i, name_offset;
 	UINT16 fg, bg;
-	UINT8 *nametbl, *patterntbl[4];
+	offs_t nametbl_base;
+	offs_t patterntbl_base[4];
 	int name_hi, name_lo;
 	int pattern_ix;
 	int alphanumeric_mode, dbl_w, dbl_h, dbl_w_phase = 0;
 
+	nametbl_base = m_address_regs[2];
+	for (i = 0; i < 4; i++)
+		patterntbl_base[i] = m_address_regs[i + 3];
 
-	nametbl = vdp.vram + vdp.addressRegs[2];
-	for (i=0; i<4; i++)
-		patterntbl[i] = vdp.vram + vdp.addressRegs[i+3];
-
-	for (xx=0; xx<LEFT_BORDER; xx++)
-#if DOUBLE_WIDTH
-		*ln++ = vdp.bg_color;
+	for (xx = 0; xx < TMS3556_LEFT_BORDER; xx++)
+#if TMS3556_DOUBLE_WIDTH
+		*ln++ = m_bg_color;
 #endif
-			*ln++ = vdp.bg_color;
+		*ln++ = m_bg_color;
 
-	name_offset = vdp.name_offset;
+	name_offset = m_name_offset;
 
-	for (x=0;x<40;x++)
+	for (x = 0; x < 40; x++)
 	{
-		name_hi = nametbl[name_offset];
-		name_lo = nametbl[name_offset+1];
+		name_hi = readbyte(nametbl_base + name_offset);
+		name_lo = readbyte(nametbl_base + name_offset + 1);
 		pattern_ix = ((name_hi >> 2) & 2) | ((name_hi >> 4) & 1);
-		alphanumeric_mode = (pattern_ix < 2) || ((pattern_ix == 3) && !(vdp.controlRegs[7] & 0x08));
+		alphanumeric_mode = (pattern_ix < 2) || ((pattern_ix == 3) && !(m_control_regs[7] & 0x08));
 		fg = (name_hi >> 5) & 0x7;
 		if (alphanumeric_mode)
 		{
 			if (name_hi & 4)
 			{	/* inverted color */
 				bg = fg;
-				fg = vdp.bg_color;
+				fg = m_bg_color;
 			}
 			else
-				bg = vdp.bg_color;
+				bg = m_bg_color;
 			dbl_w = name_hi & 0x2;
 			dbl_h = name_hi & 0x1;
 		}
@@ -356,34 +310,34 @@ static void tms3556_draw_line_text_common(UINT16 *ln)
 			dbl_w = 0;
 			dbl_h = 0;
 		}
-		if ((name_lo & 0x80) && vdp.blink)
+		if ((name_lo & 0x80) && m_blink)
 			fg = bg;	/* blink off time */
 		if (! dbl_h)
 		{	/* single height */
-			pattern = patterntbl[pattern_ix][(name_lo & 0x7f) + 128*vdp.char_line_counter];
-			if (vdp.char_line_counter == 0)
-				vdp.dbl_h_phase[x] = 0;
+			pattern = readbyte(patterntbl_base[pattern_ix] + (name_lo & 0x7f) + 128 * m_char_line_counter);
+			if (m_char_line_counter == 0)
+				m_dbl_h_phase[x] = 0;
 		}
 		else
 		{	/* double height */
-			if (! vdp.dbl_h_phase[x])
+			if (! m_dbl_h_phase[x])
 				/* first phase: pattern from upper half */
-				pattern = patterntbl[pattern_ix][(name_lo & 0x7f) + 128*(5+(vdp.char_line_counter>>1))];
+				pattern = readbyte(patterntbl_base[pattern_ix] + (name_lo & 0x7f) + 128 * (5 + (m_char_line_counter >> 1)));
 			else
 				/* second phase: pattern from lower half */
-				pattern = patterntbl[pattern_ix][(name_lo & 0x7f) + 128*(vdp.char_line_counter>>1)];
-			if (vdp.char_line_counter == 0)
-				vdp.dbl_h_phase[x] = ! vdp.dbl_h_phase[x];
+				pattern = readbyte(patterntbl_base[pattern_ix] + (name_lo & 0x7f) + 128 * (m_char_line_counter >> 1));
+			if (m_char_line_counter == 0)
+				m_dbl_h_phase[x] = !m_dbl_h_phase[x];
 		}
-		if (! dbl_w)
+		if (!dbl_w)
 		{	/* single width */
-			for (xx=0;xx<8;xx++)
+			for (xx = 0; xx < 8; xx++)
 			{
 				UINT16 color = (pattern & 0x80) ? fg : bg;
-#if DOUBLE_WIDTH
+#if TMS3556_DOUBLE_WIDTH
 				*ln++ = color;
 #endif
-					*ln++ = color;
+				*ln++ = color;
 				pattern <<= 1;
 			}
 			dbl_w_phase = 0;
@@ -393,13 +347,13 @@ static void tms3556_draw_line_text_common(UINT16 *ln)
 			if (dbl_w_phase)
 				/* second phase: display right half */
 				pattern <<= 4;
-			for (xx=0;xx<4;xx++)
+			for (xx = 0; xx < 4; xx++)
 			{
 				UINT16 color = (pattern & 0x80) ? fg : bg;
-#if DOUBLE_WIDTH
+#if TMS3556_DOUBLE_WIDTH
 				*ln++ = color; *ln++ = color;
 #endif
-					*ln++ = color; *ln++ = color;
+				*ln++ = color; *ln++ = color;
 				pattern <<= 1;
 			}
 			dbl_w_phase = !dbl_w_phase;
@@ -407,232 +361,215 @@ static void tms3556_draw_line_text_common(UINT16 *ln)
 		name_offset += 2;
 	}
 
-	for (xx=0; xx<RIGHT_BORDER; xx++)
-#if DOUBLE_WIDTH
-		*ln++ = vdp.bg_color;
+	for (xx = 0; xx < TMS3556_RIGHT_BORDER; xx++)
+#if TMS3556_DOUBLE_WIDTH
+		*ln++ = m_bg_color;
 #endif
-			*ln++ = vdp.bg_color;
+		*ln++ = m_bg_color;
 
-	if (vdp.char_line_counter == 0)
-		vdp.name_offset = name_offset;
+	if (m_char_line_counter == 0)
+		m_name_offset = name_offset;
 }
 
-/*
-    tms3556_draw_line_bitmap_common
 
-    draw a line of bitmap (called by tms3556_draw_line_bitmap and
-    tms3556_draw_line_mixed)
-*/
-static void tms3556_draw_line_bitmap_common(UINT16 *ln)
+//-------------------------------------------------
+//  draw_line_bitmap_common - draw a line of bitmap 
+//  (called by draw_line_bitmap and draw_line_mixed)
+//-------------------------------------------------
+
+void tms3556_device::draw_line_bitmap_common(UINT16 *ln)
 {
 	int x, xx;
-	UINT8 *nametbl;
+	offs_t nametbl_base;
 	int name_b, name_g, name_r;
 
+	nametbl_base = m_address_regs[2];
 
-	nametbl = vdp.vram + vdp.addressRegs[2];
-
-	for (xx=0; xx<LEFT_BORDER; xx++)
-#if DOUBLE_WIDTH
-		*ln++ = vdp.bg_color;
+	for (xx = 0; xx < TMS3556_LEFT_BORDER; xx++)
+#if TMS3556_DOUBLE_WIDTH
+		*ln++ = m_bg_color;
 #endif
-			*ln++ = vdp.bg_color;
+		*ln++ = m_bg_color;
 
-	for (x=0;x<40;x++)
+	for (x = 0; x < 40; x++)
 	{
-		name_b = nametbl[vdp.name_offset];
-		name_g = nametbl[vdp.name_offset+1];
-		name_r = nametbl[vdp.name_offset+2];
-		for (xx=0;xx<8;xx++)
+		name_b = readbyte(nametbl_base + m_name_offset);
+		name_g = readbyte(nametbl_base + m_name_offset + 1);
+		name_r = readbyte(nametbl_base + m_name_offset + 2);
+		for (xx = 0; xx < 8; xx++)
 		{
 			UINT16 color = ((name_b >> 5) & 0x4) | ((name_g >> 6) & 0x2) | ((name_r >> 7) & 0x1);
-#if DOUBLE_WIDTH
+#if TMS3556_DOUBLE_WIDTH
 			*ln++ = color;
 #endif
-				*ln++ = color;
+			*ln++ = color;
 			name_b <<= 1;
 			name_g <<= 1;
 			name_r <<= 1;
 		}
-		vdp.name_offset += 3;
+		m_name_offset += 3;
 	}
 
-	for (xx=0; xx<RIGHT_BORDER; xx++)
-#if DOUBLE_WIDTH
-		*ln++ = vdp.bg_color;
+	for (xx = 0; xx < TMS3556_RIGHT_BORDER; xx++)
+#if TMS3556_DOUBLE_WIDTH
+		*ln++ = m_bg_color;
 #endif
-			*ln++ = vdp.bg_color;
+		*ln++ = m_bg_color;
 }
 
-/*
-    tms3556_draw_line_text
 
-    draw a line in text mode
-*/
-static void tms3556_draw_line_text(UINT16 *ln)
+//-------------------------------------------------
+//  draw_line_text - draw a line in text mode
+//-------------------------------------------------
+
+void tms3556_device::draw_line_text(UINT16 *ln)
 {
-	if (vdp.char_line_counter == 0)
-		vdp.char_line_counter = 10;
-	vdp.char_line_counter--;
-	tms3556_draw_line_text_common(ln);
+	if (m_char_line_counter == 0)
+		m_char_line_counter = 10;
+	m_char_line_counter--;
+	draw_line_text_common(ln);
 }
 
-/*
-    tms3556_draw_line_bitmap
 
-    draw a line in bitmap mode
-*/
-static void tms3556_draw_line_bitmap(UINT16 *ln)
+//-------------------------------------------------
+//  draw_line_bitmap - draw a line in bitmap mode
+//-------------------------------------------------
+
+void tms3556_device::draw_line_bitmap(UINT16 *ln)
 {
-	UINT8 *nametbl;
-
-
-	tms3556_draw_line_bitmap_common(ln);
-	nametbl = vdp.vram + vdp.addressRegs[2];
-	vdp.bg_color = (nametbl[vdp.name_offset] >> 5) & 0x7;
-	vdp.name_offset += 2;
+	draw_line_bitmap_common(ln);
+	m_bg_color = (readbyte(m_address_regs[2] + m_name_offset) >> 5) & 0x7;
+	m_name_offset += 2;
 }
 
-/*
-    tms3556_draw_line_mixed
 
-    draw a line in mixed mode
-*/
-static void tms3556_draw_line_mixed(UINT16 *ln)
+//-------------------------------------------------
+//  draw_line_mixed - draw a line in mixed mode
+//-------------------------------------------------
+
+void tms3556_device::draw_line_mixed(UINT16 *ln)
 {
-	UINT8 *nametbl;
-
-
-	if (vdp.cg_flag)
+	if (m_cg_flag)
 	{	/* bitmap line */
-		tms3556_draw_line_bitmap_common(ln);
-		nametbl = vdp.vram + vdp.addressRegs[2];
-		vdp.bg_color = (nametbl[vdp.name_offset] >> 5) & 0x7;
-		vdp.cg_flag = (nametbl[vdp.name_offset] >> 4) & 0x1;
-		vdp.name_offset += 2;
+		draw_line_bitmap_common(ln);
+		m_bg_color = (readbyte(m_address_regs[2] + m_name_offset) >> 5) & 0x7;
+		m_cg_flag = (readbyte(m_address_regs[2] + m_name_offset) >> 4) & 0x1;
+		m_name_offset += 2;
 	}
 	else
 	{	/* text line */
-		if (vdp.char_line_counter == 0)
-			vdp.char_line_counter = 10;
-		vdp.char_line_counter--;
-		tms3556_draw_line_text_common(ln);
-		if (vdp.char_line_counter == 0)
+		if (m_char_line_counter == 0)
+			m_char_line_counter = 10;
+		m_char_line_counter--;
+		draw_line_text_common(ln);
+		if (m_char_line_counter == 0)
 		{
-			nametbl = vdp.vram + vdp.addressRegs[2];
-			vdp.bg_color = (nametbl[vdp.name_offset] >> 5) & 0x7;
-			vdp.cg_flag = (nametbl[vdp.name_offset] >> 4) & 0x1;
-			vdp.name_offset += 2;
+			m_bg_color = (readbyte(m_address_regs[2] + m_name_offset) >> 5) & 0x7;
+			m_cg_flag = (readbyte(m_address_regs[2] + m_name_offset) >> 4) & 0x1;
+			m_name_offset += 2;
 		}
 	}
 }
 
-/*
-    tms3556_draw_line
 
-    draw a line.  If non-interlaced mode, duplicate the line.
-*/
-static void tms3556_draw_line(bitmap_t *bmp, int line)
+//-------------------------------------------------
+//  draw_line - draw a line. If non-interlaced mode, 
+//  duplicate the line.
+//-------------------------------------------------
+
+void tms3556_device::draw_line(bitmap_t *bmp, int line)
 {
-	int double_lines;
+	int double_lines = 0;
 	UINT16 *ln, *ln2 = NULL;
 
-	double_lines = 0;
-
-#if 0
-	if ( vdp.controlRegs[4] & 0x?? )
-	{   // interlaced mode
-		ln = BITMAP_ADDR16(bmp, line, vdp.field);
-	}
-	else
-#endif
+//	if (m_control_regs[4] & 0x??)
+//	{   // interlaced mode
+//		ln = BITMAP_ADDR16(bmp, line, m_field);
+//	}
+//	else
 	{	/* non-interlaced mode */
 		ln = BITMAP_ADDR16(bmp, line, 0);
 		ln2 = BITMAP_ADDR16(bmp, line, 1);
 		double_lines = 1;
 	}
 
-	if ((line < TOP_BORDER) || (line >= (TOP_BORDER + 250)))
-	{	/* draw top and bottom borders */
-		tms3556_draw_line_empty(ln);
+	if ((line < TMS3556_TOP_BORDER) || (line >= (TMS3556_TOP_BORDER + 250)))
+	{
+		/* draw top and bottom borders */
+		draw_line_empty(ln);
 	}
 	else
-	{	/* draw useful area */
-		switch (vdp.controlRegs[6] >> 6)
+	{
+		/* draw useful area */
+		switch (m_control_regs[6] >> 6)
 		{
 		case TMS3556_MODE_OFF:
-			tms3556_draw_line_empty(ln);
+			draw_line_empty(ln);
 			break;
 		case TMS3556_MODE_TEXT:
-			tms3556_draw_line_text(ln);
+			draw_line_text(ln);
 			break;
 		case TMS3556_MODE_BITMAP:
-			tms3556_draw_line_bitmap(ln);
+			draw_line_bitmap(ln);
 			break;
 		case TMS3556_MODE_MIXED:
-			tms3556_draw_line_mixed(ln);
+			draw_line_mixed(ln);
 			break;
 		}
 	}
 
 	if (double_lines)
-		memcpy (ln2, ln, TOTAL_WIDTH*(DOUBLE_WIDTH ? 2 : 1) * 2);
+		memcpy (ln2, ln, TMS3556_TOTAL_WIDTH * (TMS3556_DOUBLE_WIDTH ? 2 : 1) * 2);
 }
 
 
-/*
-    tms3556_interrupt_start_vblank
+//-------------------------------------------------
+//  interrupt_start_vblank - Do vblank-time tasks
+//-------------------------------------------------
 
-    Do vblank-time tasks
-*/
-static void tms3556_interrupt_start_vblank(void)
+void tms3556_device::interrupt_start_vblank(void)
 {
-	int i;
-
-
 	/* at every frame, vdp switches fields */
-	//vdp.field = !vdp.field;
+	//m_field = !m_field;
 
 	/* color blinking */
-	if (vdp.blink_count)
-		vdp.blink_count--;
-	if (!vdp.blink_count)
+	if (m_blink_count)
+		m_blink_count--;
+	if (!m_blink_count)
 	{
-		vdp.blink = !vdp.blink;
-		vdp.blink_count = 60;	/*no idea what the real value is*/
+		m_blink = !m_blink;
+		m_blink_count = 60;	/*no idea what the real value is*/
 	}
 	/* reset background color */
-	vdp.bg_color = (vdp.controlRegs[7] >> 5) & 0x7;
+	m_bg_color = (m_control_regs[7] >> 5) & 0x7;
 	/* reset name offset */
-	vdp.name_offset = 0;
+	m_name_offset = 0;
 	/* reset character line counter */
-	vdp.char_line_counter = 0;
+	m_char_line_counter = 0;
 	/* reset c/g flag */
-	vdp.cg_flag = 0;
+	m_cg_flag = 0;
 	/* reset double height phase flags */
-	for (i=0; i<40; i++)
-		vdp.dbl_h_phase[i] = 0;
+	memset(m_dbl_h_phase, 0, sizeof(m_dbl_h_phase));
 }
 
-/*
-    tms3556_interrupt
 
-    scanline handler
-*/
-void tms3556_interrupt(running_machine &machine)
+//-------------------------------------------------
+//  interrupt - scanline handler
+//-------------------------------------------------
+
+void tms3556_device::interrupt(running_machine &machine)
 {
 	/* check for start of vblank */
-	if (vdp.scanline == 310)	/*no idea what the real value is*/
-		tms3556_interrupt_start_vblank();
+	if (m_scanline == 310)	/*no idea what the real value is*/
+		interrupt_start_vblank();
 
 	/* render the current line */
-	if ((vdp.scanline >= 0) && (vdp.scanline < TOTAL_HEIGHT))
+	if ((m_scanline >= 0) && (m_scanline < TMS3556_TOTAL_HEIGHT))
 	{
 		//if (!video_skip_this_frame())
-			tms3556_draw_line(machine.generic.tmpbitmap, vdp.scanline);
+			draw_line(machine.generic.tmpbitmap, m_scanline);
 	}
 
-	if (++vdp.scanline == 313)
-		vdp.scanline = 0;
+	if (++m_scanline == 313)
+		m_scanline = 0;
 }
-

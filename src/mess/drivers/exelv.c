@@ -49,21 +49,51 @@ TODO:
     * everything
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "deprecat.h"
 #include "cpu/tms7000/tms7000.h"
 #include "video/tms3556.h"
 #include "sound/tms5220.h"
 #include "audio/spchroms.h"
-/*#include "imagedev/cartslot.h"
-#include "imagedev/cassette.h"*/
+//#include "imagedev/cartslot.h"
+//#include "imagedev/cassette.h"
 
 
 class exelv_state : public driver_device
 {
 public:
 	exelv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
+		  m_tms3556(*this, "tms3556"),
+		  m_tms5220c(*this, "tms5220c")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<tms3556_device> m_tms3556;
+	required_device<tms5220c_device> m_tms5220c;
+
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	virtual void video_start();
+
+	DECLARE_READ8_MEMBER( mailbox_wx319_r );
+	DECLARE_WRITE8_MEMBER( mailbox_wx318_w );
+	DECLARE_READ8_MEMBER( tms7020_porta_r );
+	DECLARE_WRITE8_MEMBER( tms7020_porta_w );
+	DECLARE_READ8_MEMBER( tms7020_portb_r );
+	DECLARE_WRITE8_MEMBER( tms7020_portb_w );
+	DECLARE_READ8_MEMBER( tms7041_porta_r );
+	DECLARE_WRITE8_MEMBER( tms7041_porta_w );
+	DECLARE_READ8_MEMBER( tms7041_portb_r );
+	DECLARE_WRITE8_MEMBER( tms7041_portb_w );
+	DECLARE_READ8_MEMBER( tms7041_portc_r );
+	DECLARE_WRITE8_MEMBER( tms7041_portc_w );
+	DECLARE_READ8_MEMBER( tms7041_portd_r );
+	DECLARE_WRITE8_MEMBER( tms7041_portd_w );
 
 	/* tms7020 i/o ports */
 	UINT8	m_tms7020_porta;
@@ -81,28 +111,10 @@ public:
 };
 
 
-/*
-    video initialization
-*/
-static VIDEO_START( exelv )
-{
-	VIDEO_START_CALL( generic_bitmapped );
-	tms3556_init(machine, /*0x8000*/0x10000);	/* tms3556 with 32 kb of video RAM */
-}
-
-
-static MACHINE_RESET( exelv )
-{
-	static const spchroms_interface exelv_speech_intf = { "tms5220c" };
-
-	tms3556_reset();
-	spchroms_config( machine, &exelv_speech_intf );
-	memory_set_bankptr( machine, "bank1", machine.region("user1")->base() + 0x0200 );
-}
-
 static INTERRUPT_GEN( exelv_hblank_interrupt )
 {
-	tms3556_interrupt(device->machine());
+	exelv_state *exelv = device->machine().driver_data<exelv_state>();
+	exelv->m_tms3556->interrupt(device->machine());
 }
 
 #ifdef UNUSED_FUNCTION
@@ -191,19 +203,16 @@ static DEVICE_IMAGE_UNLOAD( exelv_cart )
 */
 
 
-static READ8_HANDLER(mailbox_wx319_r)
+READ8_MEMBER(exelv_state::mailbox_wx319_r)
 {
-	exelv_state *state = space->machine().driver_data<exelv_state>();
-	return state->m_wx319;
+	return m_wx319;
 }
 
 
-static WRITE8_HANDLER(mailbox_wx318_w)
+WRITE8_MEMBER(exelv_state::mailbox_wx318_w)
 {
-	exelv_state *state = space->machine().driver_data<exelv_state>();
 	logerror("wx318 write 0x%02x\n", data);
-
-	state->m_wx318 = data;
+	m_wx318 = data;
 }
 
 
@@ -218,21 +227,17 @@ static WRITE8_HANDLER(mailbox_wx318_w)
     A6 -
     A7 -
 */
-static READ8_HANDLER(tms7020_porta_r)
+READ8_MEMBER(exelv_state::tms7020_porta_r)
 {
-	exelv_state *state = space->machine().driver_data<exelv_state>();
 	logerror("tms7020_porta_r\n");
-
-	return ( state->m_tms7041_portb & 0x80 ) ? 0x01 : 0x00;
+	return ( m_tms7041_portb & 0x80 ) ? 0x01 : 0x00;
 }
 
 
-static WRITE8_HANDLER(tms7020_porta_w)
+WRITE8_MEMBER(exelv_state::tms7020_porta_w)
 {
-	exelv_state *state = space->machine().driver_data<exelv_state>();
 	logerror("tms7020_porta_w: data = 0x%02x\n", data);
-
-	state->m_tms7020_porta = data;
+	m_tms7020_porta = data;
 }
 
 
@@ -247,20 +252,17 @@ static WRITE8_HANDLER(tms7020_porta_w)
     B6 -
     B7 -
 */
-static READ8_HANDLER(tms7020_portb_r)
+READ8_MEMBER(exelv_state::tms7020_portb_r)
 {
 	logerror("tms7020_portb_r\n");
-
 	return 0x00;
 }
 
 
-static WRITE8_HANDLER(tms7020_portb_w)
+WRITE8_MEMBER(exelv_state::tms7020_portb_w)
 {
-	exelv_state *state = space->machine().driver_data<exelv_state>();
 	logerror("tms7020_portb_w: data = 0x%02x\n", data);
-
-	state->m_tms7020_portb = data;
+	m_tms7020_portb = data;
 }
 
 
@@ -275,29 +277,25 @@ static WRITE8_HANDLER(tms7020_portb_w)
     A6 - X1 SCLK A9
     A7 - TMS5220 RDY
 */
-static READ8_HANDLER(tms7041_porta_r)
+READ8_MEMBER(exelv_state::tms7041_porta_r)
 {
-	exelv_state *state = space->machine().driver_data<exelv_state>();
-	device_t *tms5220c = space->machine().device( "tms5220c" );
 	UINT8 data = 0x00;
 
 	logerror("tms7041_porta_r\n");
 
-	data |= ( state->m_tms7020_portb & 0x01 ) ? 0x04 : 0x00;
-	data |= tms5220_intq_r( tms5220c ) ? 0x08 : 0x00;
-	data |= ( state->m_tms7020_portb & 0x02 ) ? 0x10 : 0x00;
-	data |= tms5220_readyq_r( tms5220c ) ? 0x80 : 0x00;
+	data |= (m_tms7020_portb & 0x01 ) ? 0x04 : 0x00;
+	data |= tms5220_intq_r(m_tms5220c) ? 0x08 : 0x00;
+	data |= (m_tms7020_portb & 0x02) ? 0x10 : 0x00;
+	data |= tms5220_readyq_r(m_tms5220c) ? 0x80 : 0x00;
 
 	return data;
 }
 
 
-static WRITE8_HANDLER(tms7041_porta_w)
+WRITE8_MEMBER(exelv_state::tms7041_porta_w)
 {
-	exelv_state *state = space->machine().driver_data<exelv_state>();
 	logerror("tms7041_porta_w: data = 0x%02x\n", data);
-
-	state->m_tms7041_porta = data;
+	m_tms7041_porta = data;
 }
 
 
@@ -312,65 +310,54 @@ static WRITE8_HANDLER(tms7041_porta_w)
     B6 - W - REV6 WX319-11
     B7 - W - TMS7020 port A bit 0 (REV3)
 */
-static READ8_HANDLER(tms7041_portb_r)
+READ8_MEMBER(exelv_state::tms7041_portb_r)
 {
-	UINT8 data = 0xFF;
-
+	UINT8 data = 0xff;
 	logerror("tms7041_portb_r\n");
-
 	return data;
 }
 
 
-static WRITE8_HANDLER(tms7041_portb_w)
+WRITE8_MEMBER(exelv_state::tms7041_portb_w)
 {
-	exelv_state *state = space->machine().driver_data<exelv_state>();
-	device_t *tms5220c = space->machine().device( "tms5220c" );
-
 	logerror("tms7041_portb_w: data = 0x%02x\n", data);
 
-	tms5220_wsq_w( tms5220c, ( data & 0x01 ) ? 1 : 0 );
-	tms5220_rsq_w( tms5220c, ( data & 0x02 ) ? 1 : 0 );
+	tms5220_wsq_w(m_tms5220c, (data & 0x01) ? 1 : 0);
+	tms5220_rsq_w(m_tms5220c, (data & 0x02) ? 1 : 0);
 
-	cputag_set_input_line(space->machine(), "maincpu", TMS7000_IRQ1_LINE, ( data & 0x04 ) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, TMS7000_IRQ1_LINE, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* Check for low->high transition on B6 */
-	if ( ! ( state->m_tms7041_portb & 0x40 ) && ( data & 0x40 ) )
+	if (!(m_tms7041_portb & 0x40) && (data & 0x40))
 	{
-		logerror("wx319 write 0x%02x\n", state->m_tms7041_portc);
-		state->m_wx319 = state->m_tms7041_portc;
+		logerror("wx319 write 0x%02x\n", m_tms7041_portc);
+		m_wx319 = m_tms7041_portc;
 	}
 
-	state->m_tms7041_portb = data;
+	m_tms7041_portb = data;
 }
 
 
 /*
     TMS7041 PORT C - connected to mailbox WX318 and WX319 data bits
 */
-static READ8_HANDLER(tms7041_portc_r)
+READ8_MEMBER(exelv_state::tms7041_portc_r)
 {
-	exelv_state *state = space->machine().driver_data<exelv_state>();
-	UINT8 data = 0xFF;
-
+	UINT8 data = 0xff;
 	logerror("tms7041_portc_r\n");
 
 	/* Check if wx318 output is enabled */
-	if ( ! ( state->m_tms7041_portb & 0x20 ) )
-	{
-		data = state->m_wx318;
-	}
+	if (!(m_tms7041_portb & 0x20))
+		data = m_wx318;
 
 	return data;
 }
 
 
-static WRITE8_HANDLER(tms7041_portc_w)
+WRITE8_MEMBER(exelv_state::tms7041_portc_w)
 {
-	exelv_state *state = space->machine().driver_data<exelv_state>();
 	logerror("tms7041_portc_w: data = 0x%02x\n", data);
-
-	state->m_tms7041_portc = data;
+	m_tms7041_portc = data;
 }
 
 
@@ -385,26 +372,20 @@ static WRITE8_HANDLER(tms7041_portc_w)
     D6 - TMS5220 D1
     D7 - TMS5220 D0
 */
-static READ8_HANDLER(tms7041_portd_r)
+READ8_MEMBER(exelv_state::tms7041_portd_r)
 {
-	UINT8 data = 0xFF;
-
+	UINT8 data = 0xff;
 	logerror("tms7041_portd_r\n");
-
 	return data;
 }
 
 
-static WRITE8_HANDLER(tms7041_portd_w)
+WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 {
-	exelv_state *state = space->machine().driver_data<exelv_state>();
-	device_t *tms5220c = space->machine().device( "tms5220c" );
-
 	logerror("tms7041_portd_w: data = 0x%02x\n", data);
 
-	tms5220_data_w( tms5220c, 0, BITSWAP8(data,0,1,2,3,4,5,6,7) );
-
-	state->m_tms7041_portd = data;
+	tms5220_data_w(m_tms5220c, 0, BITSWAP8(data,0,1,2,3,4,5,6,7));
+	m_tms7041_portd = data;
 }
 
 /*
@@ -432,13 +413,13 @@ static WRITE8_HANDLER(tms7041_portd_w)
     @>f800-@>ffff: tms7020/tms7040 internal ROM
 */
 
-static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8, exelv_state)
 	//AM_RANGE(0x0000, 0x007f) AM_READWRITE(tms7000_internal_r, tms7000_internal_w)/* tms7020 internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_NOP
 	//AM_RANGE(0x0100, 0x010b) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)/* tms7020 internal I/O ports */
 	//AM_RANGE(0x010c, 0x01ff) AM_READWRITE(SMH_NOP, SMH_NOP)     /* external I/O ports */
-	AM_RANGE(0x012d, 0x0012d) AM_READWRITE(tms3556_reg_r/*right???*/, tms3556_reg_w)
-	AM_RANGE(0x012e, 0x0012e) AM_READWRITE(tms3556_vram_r/*right???*/, tms3556_vram_w)
+	AM_RANGE(0x012d, 0x0012d) AM_DEVREADWRITE("tms3556", tms3556_device, reg_r/*right???*/, reg_w)
+	AM_RANGE(0x012e, 0x0012e) AM_DEVREADWRITE("tms3556", tms3556_device, vram_r/*right???*/, vram_w)
 	AM_RANGE(0x0130, 0x00130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
 	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK("bank1")								/* system ROM */
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
@@ -448,18 +429,18 @@ static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(tms7020_port, AS_IO, 8)
+static ADDRESS_MAP_START(tms7020_port, AS_IO, 8, exelv_state)
 	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READWRITE(tms7020_porta_r, tms7020_porta_w)
 	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_READWRITE(tms7020_portb_r, tms7020_portb_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(tms7041_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(tms7041_map, AS_PROGRAM, 8, exelv_state)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("tms7041",0x0000)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(tms7041_port, AS_IO, 8)
+static ADDRESS_MAP_START(tms7041_port, AS_IO, 8, exelv_state)
 	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA)	AM_READWRITE(tms7041_porta_r, tms7041_porta_w)
 	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB)	AM_READWRITE(tms7041_portb_r, tms7041_portb_w)
 	AM_RANGE(TMS7000_PORTC, TMS7000_PORTC)	AM_READWRITE(tms7041_portc_r, tms7041_portc_w)
@@ -467,13 +448,13 @@ static ADDRESS_MAP_START(tms7041_port, AS_IO, 8)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(tms7040_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(tms7040_mem, AS_PROGRAM, 8, exelv_state)
 	//AM_RANGE(0x0000, 0x007f) AM_READWRITE(tms7000_internal_r, tms7000_internal_w)/* tms7040 internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_NOP
 	//AM_RANGE(0x0100, 0x010b) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)/* tms7020 internal I/O ports */
 	//AM_RANGE(0x010c, 0x01ff) AM_READWRITE(SMH_NOP, SMH_NOP)     /* external I/O ports */
-	AM_RANGE(0x012d, 0x0012d) AM_READWRITE(tms3556_reg_r/*right???*/, tms3556_reg_w)
-	AM_RANGE(0x012e, 0x0012e) AM_READWRITE(tms3556_vram_r/*right???*/, tms3556_vram_w)
+	AM_RANGE(0x012d, 0x0012d) AM_DEVREADWRITE("tms3556", tms3556_device, reg_r/*right???*/, reg_w)
+	AM_RANGE(0x012e, 0x0012e) AM_DEVREADWRITE("tms3556", tms3556_device, vram_r/*right???*/, vram_w)
 	AM_RANGE(0x0130, 0x00130) AM_READWRITE(mailbox_wx319_r, mailbox_wx318_w)
 	AM_RANGE(0x0200, 0x7fff) AM_ROMBANK("bank1")								/* system ROM */
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
@@ -483,7 +464,7 @@ static ADDRESS_MAP_START(tms7040_mem, AS_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(tms7042_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(tms7042_map, AS_PROGRAM, 8, exelv_state)
 	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION("tms7042",0x0000)
     AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("tms7042",0x0000)		/* Duplicated until a proper dump surfaces */
 ADDRESS_MAP_END
@@ -507,6 +488,54 @@ static const tms5220_interface exl100_tms5220_interface =
 };
 
 
+static PALETTE_INIT( exelv )
+{
+	int	i, red, green, blue;
+	
+	/* create the 8 color palette */
+	for (i = 0; i < 8; i++)
+	{
+		red = (i & 1) ? 255 : 0;	/* red */
+		green = (i & 2) ? 255 : 0;	/* green */
+		blue = (i & 4) ? 255 : 0;	/* blue */
+		palette_set_color_rgb(machine, i, red, green, blue);
+	}
+}
+
+
+/* Video Initialization  */
+
+void exelv_state::video_start()
+{
+	video_start_generic_bitmapped(machine());
+}
+
+
+/* Machine Initialization */
+
+void exelv_state::machine_start()
+{
+	UINT8 *rom = machine().region("user1")->base();
+	memory_configure_bank(machine(), "bank1", 0, 1, rom, 0x8000 - 0x200);
+	memory_set_bank(machine(), "bank1", 0);
+	
+	/* register for state saving */
+	state_save_register_global(machine(), m_tms7020_porta);
+	state_save_register_global(machine(), m_tms7020_portb);
+	state_save_register_global(machine(), m_tms7041_porta);
+	state_save_register_global(machine(), m_tms7041_portb);
+	state_save_register_global(machine(), m_tms7041_portc);
+	state_save_register_global(machine(), m_tms7041_portd);
+	state_save_register_global(machine(), m_wx318);
+	state_save_register_global(machine(), m_wx319);
+}
+
+void exelv_state::machine_reset()
+{
+	static const spchroms_interface exelv_speech_intf = {"tms5220c"};
+	spchroms_config(machine(), &exelv_speech_intf);
+}
+
 static MACHINE_CONFIG_START( exl100, exelv_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS7000_EXL, XTAL_4_9152MHz)	/* TMS7020 */
@@ -521,16 +550,25 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_QUANTUM_PERFECT_CPU("tms7041")
 
-	MCFG_MACHINE_RESET( exelv )
+	MCFG_TMS3556_ADD("tms3556")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(tms3556)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+#if TMS3556_DOUBLE_WIDTH
+	MCFG_SCREEN_SIZE(TMS3556_TOTAL_WIDTH*2, TMS3556_TOTAL_HEIGHT*2)
+	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH*2-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
+#else
+	MCFG_SCREEN_SIZE(TMS3556_TOTAL_WIDTH, TMS3556_TOTAL_HEIGHT*2)
+	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
+#endif
+	MCFG_SCREEN_UPDATE(generic_bitmapped)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(exelv)
 
-	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-
-	MCFG_VIDEO_START(exelv)
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -554,16 +592,25 @@ static MACHINE_CONFIG_START( exeltel, exelv_state )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_QUANTUM_PERFECT_CPU("tms7042")
 
-	MCFG_MACHINE_RESET( exelv )
+	MCFG_TMS3556_ADD("tms3556")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(tms3556)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+#if TMS3556_DOUBLE_WIDTH
+	MCFG_SCREEN_SIZE(TMS3556_TOTAL_WIDTH*2, TMS3556_TOTAL_HEIGHT*2)
+	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH*2-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
+#else
+	MCFG_SCREEN_SIZE(TMS3556_TOTAL_WIDTH, TMS3556_TOTAL_HEIGHT*2)
+	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
+#endif
+	MCFG_SCREEN_UPDATE(generic_bitmapped)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(exelv)
 
-	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-
-	MCFG_VIDEO_START(exelv)
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -610,6 +657,6 @@ ROM_START(exeltel)
 ROM_END
 
 
-/*      YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY         FULLNAME */
-COMP(	1984,	exl100, 0,          0,      exl100,     exelv,  0,		"Exelvision",   "EXL 100" , GAME_NOT_WORKING)
-COMP(	1986,	exeltel,exl100,     0,		exeltel,	exelv,	0,		"Exelvision",	"Exeltel" , GAME_NOT_WORKING)
+/*   YEAR   NAME     PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY         FULLNAME */
+COMP(1984,	exl100,  0,          0,      exl100,     exelv,  0,	     "Exelvision",   "EXL 100",  GAME_NOT_WORKING)
+COMP(1986,	exeltel, exl100,     0,      exeltel,    exelv,  0,	     "Exelvision",   "Exeltel",  GAME_NOT_WORKING)
