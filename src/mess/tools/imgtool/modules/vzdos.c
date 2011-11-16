@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include "imgtool.h"
-#include "imgtoolx.h"
 #include "formats/imageutl.h"
 #include "formats/vt_dsk.h"
 #include "iflopimg.h"

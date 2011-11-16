@@ -10,7 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
-#include "imgtoolx.h"
+#include "imgtool.h"
 
 typedef struct UINT16xE
 {

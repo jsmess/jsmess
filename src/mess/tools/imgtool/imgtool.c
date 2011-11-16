@@ -9,7 +9,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "imgtoolx.h"
+#include "imgtool.h"
 #include "formats/imageutl.h"
 #include "library.h"
 #include "modules.h"
