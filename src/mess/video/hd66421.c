@@ -9,10 +9,12 @@
 #include "emu.h"
 #include "hd66421.h"
 
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
 #define LOG_LEVEL  1
 #define _logerror(level,x)  do { if (LOG_LEVEL > level) logerror x; } while (0)
-
-//#define BRIGHTNESS_DOES_NOT_WORK
 
 #define HD66421_RAM_SIZE  (HD66421_WIDTH * HD66421_HEIGHT / 4) // 2-bits per pixel
 
@@ -56,146 +58,187 @@
 #define LCD_REG_CONTRAST    0x10 // contrast control register
 #define LCD_REG_PLANE       0x11 // plane selection register
 
-typedef struct
-{
-	UINT8 cmd, reg[32];
-	UINT8 *ram;
-	int x, y;
-} HD66421;
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
 
-static HD66421 lcd;
+// devices
+const device_type HD66421 = &device_creator<hd66421_device>;
 
-UINT8 hd66421_reg_idx_r(void)
+
+// default address map
+static ADDRESS_MAP_START( hd66421, AS_0, 8 )
+	AM_RANGE(0x0000, HD66421_RAM_SIZE) AM_RAM
+ADDRESS_MAP_END
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *hd66421_device::memory_space_config(address_spacenum spacenum) const
 {
-	_logerror( 2, ("hd66421_reg_idx_r\n"));
-	return lcd.cmd;
+	return (spacenum == AS_0) ? &m_space_config : NULL;
 }
 
-void hd66421_reg_idx_w(UINT8 data)
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  readbyte - read a byte at the given address
+//-------------------------------------------------
+
+inline UINT8 hd66421_device::readbyte(offs_t address)
 {
-	_logerror( 2, ("hd66421_reg_idx_w (%02X)\n", data));
-	lcd.cmd = data;
+	return space()->read_byte(address);
 }
 
-UINT8 hd66421_reg_dat_r(void)
+
+//-------------------------------------------------
+//  writebyte - write a byte at the given address
+//-------------------------------------------------
+
+inline void hd66421_device::writebyte(offs_t address, UINT8 data)
 {
-	_logerror( 2, ("hd66421_reg_dat_r\n"));
-	return lcd.reg[lcd.cmd];
+	space()->write_byte(address, data);
 }
 
-void hd66421_reg_dat_w(UINT8 data)
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  hd66421_device - constructor
+//-------------------------------------------------
+
+hd66421_device::hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, HD66421, "Hitachi HD66421 LCD Controller", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
+	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(hd66421)),
+	  m_cmd(0),
+	  m_x(0),
+	  m_y(0)
 {
-	_logerror( 2, ("hd66421_reg_dat_w (%02X)\n", data));
-	lcd.reg[lcd.cmd] = data;
-	switch (lcd.cmd)
+	for (int i = 0; i < 32; i++)
+	{
+		m_reg[i] = 0;
+	}
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void hd66421_device::device_start()
+{	
+	// register for state saving
+	save_item(NAME(m_cmd));
+	save_item(NAME(m_reg));
+	save_item(NAME(m_x));
+	save_item(NAME(m_y));
+}
+
+READ8_MEMBER( hd66421_device::reg_idx_r )
+{
+	_logerror( 2, ("reg_idx_r\n"));
+	return m_cmd;
+}
+
+WRITE8_MEMBER( hd66421_device::reg_idx_w )
+{
+	_logerror( 2, ("reg_idx_w (%02X)\n", data));
+	m_cmd = data;
+}
+
+READ8_MEMBER( hd66421_device::reg_dat_r )
+{
+	_logerror( 2, ("reg_dat_r\n"));
+	return m_reg[m_cmd];
+}
+
+WRITE8_MEMBER( hd66421_device::reg_dat_w )
+{
+	_logerror( 2, ("reg_dat_w (%02X)\n", data));
+	m_reg[m_cmd] = data;
+
+	switch (m_cmd)
 	{
 		case LCD_REG_ADDR_X :
-		{
-			lcd.x = data;
-		}
-		break;
+			m_x = data;
+			break;
+
 		case LCD_REG_ADDR_Y :
-		{
-			lcd.y = data;
-		}
-		break;
+			m_y = data;
+			break;
+
 		case LCD_REG_RAM :
 		{
 			UINT8 r1;
-			*(lcd.ram + lcd.y * (HD66421_WIDTH / 4) + lcd.x) = data;
-			r1 = lcd.reg[LCD_REG_CONTROL_2];
+			writebyte(m_y * (HD66421_WIDTH / 4) + m_x, data);
+			r1 = m_reg[LCD_REG_CONTROL_2];
 			if (r1 & 0x02)
-			{
-				lcd.x++;
-			}
+				m_x++;
 			else
+				m_y++;
+
+			if (m_x >= (HD66421_WIDTH / 4))
 			{
-				lcd.y++;
+				m_x = 0;
+				m_y++;
 			}
-			if (lcd.x >= (HD66421_WIDTH / 4))
-			{
-				lcd.x = 0;
-				lcd.y++;
-			}
-			if (lcd.y >= HD66421_HEIGHT)
-			{
-				lcd.y = 0;
-			}
+
+			if (m_y >= HD66421_HEIGHT)
+				m_y = 0;
 		}
 		break;
 	}
 }
 
-INLINE void hd66421_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+void hd66421_device::plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
-	*BITMAP_ADDR16( bitmap, y, x) = (UINT16)color;
+	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
 }
 
-PALETTE_INIT( hd66421 )
-{
-	int i;
-	_logerror( 0, ("palette_init_hd66421\n"));
-	// init palette
-	for (i=0;i<4;i++)
-	{
-		palette_set_color( machine, i, RGB_WHITE);
-		#ifndef BRIGHTNESS_DOES_NOT_WORK
-		palette_set_pen_contrast( machine, i, 1.0 * i / (4 - 1));
-		#endif
-	}
-}
-
-static void hd66421_state_save(running_machine &machine)
-{
-	const char *name = "hd66421";
-	state_save_register_item(machine, name, NULL, 0, lcd.cmd);
-	state_save_register_item_array(machine, name, NULL, 0, lcd.reg);
-	state_save_register_item(machine, name, NULL, 0, lcd.x);
-	state_save_register_item(machine, name, NULL, 0, lcd.y);
-	state_save_register_item_pointer(machine, name, NULL, 0, lcd.ram, HD66421_RAM_SIZE);
-}
-
-VIDEO_START( hd66421 )
-{
-	_logerror( 0, ("video_start_hd66421\n"));
-	memset( &lcd, 0, sizeof( lcd));
-	lcd.ram = auto_alloc_array(machine, UINT8, HD66421_RAM_SIZE);
-	hd66421_state_save(machine);
-}
-
-SCREEN_UPDATE( hd66421 )
+void hd66421_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	pen_t pen[4];
-	int i;
+
 	_logerror( 1, ("video_update_hd66421\n"));
+
 	// update palette
-	for (i=0;i<4;i++)
+	for (int i = 0; i < 4; i++)
 	{
 		double bright;
 		int temp;
-		temp = 31 - (lcd.reg[LCD_REG_COLOR_1+i] - lcd.reg[LCD_REG_CONTRAST] + 0x03);
+		temp = 31 - (m_reg[LCD_REG_COLOR_1 + i] - m_reg[LCD_REG_CONTRAST] + 0x03);
 		if (temp <  0) temp =  0;
 		if (temp > 31) temp = 31;
 		bright = 1.0 * temp / 31;
 		pen[i] = i;
-		#ifdef BRIGHTNESS_DOES_NOT_WORK
-		palette_set_color(screen->machine(), pen[i], 255 * bright, 255 * bright, 255 * bright);
+		#ifdef HD66421_BRIGHTNESS_DOES_NOT_WORK
+		palette_set_color(machine(), pen[i], 255 * bright, 255 * bright, 255 * bright);
 		#else
-		palette_set_pen_contrast(screen->machine(), pen[i], bright);
+		palette_set_pen_contrast(machine(), pen[i], bright);
 		#endif
 	}
+
 	// draw bitmap (bottom to top)
-	if (lcd.reg[0] & LCD_R0_DISP)
+	if (m_reg[0] & LCD_R0_DISP)
 	{
 		int x, y;
 		x = 0;
 		y = HD66421_HEIGHT - 1;
-		for (i=0;i<HD66421_RAM_SIZE;i++)
+
+		for (int i = 0; i < HD66421_RAM_SIZE; i++)
 		{
-			hd66421_plot_pixel( bitmap, x++, y, pen[(lcd.ram[i] >> 6) & 3]);
-			hd66421_plot_pixel( bitmap, x++, y, pen[(lcd.ram[i] >> 4) & 3]);
-			hd66421_plot_pixel( bitmap, x++, y, pen[(lcd.ram[i] >> 2) & 3]);
-			hd66421_plot_pixel( bitmap, x++, y, pen[(lcd.ram[i] >> 0) & 3]);
+			plot_pixel(bitmap, x++, y, pen[(readbyte(i) >> 6) & 3]);
+			plot_pixel(bitmap, x++, y, pen[(readbyte(i) >> 4) & 3]);
+			plot_pixel(bitmap, x++, y, pen[(readbyte(i) >> 2) & 3]);
+			plot_pixel(bitmap, x++, y, pen[(readbyte(i) >> 0) & 3]);
 			if (x >= HD66421_WIDTH)
 			{
 				x = 0;
@@ -210,8 +253,6 @@ SCREEN_UPDATE( hd66421 )
 		rect.max_x = HD66421_WIDTH - 1;
 		rect.min_y = 0;
 		rect.max_y = HD66421_HEIGHT - 1;
-		bitmap_fill( bitmap, &rect, get_white_pen(screen->machine()));
+		bitmap_fill(bitmap, &rect, get_white_pen(machine()));
 	}
-	// flags
-	return 0;
 }

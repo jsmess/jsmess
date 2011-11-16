@@ -405,16 +405,18 @@ static int cybiko_rs232_rx_queue( void)
 
 READ16_HANDLER( cybiko_lcd_r )
 {
+	hd66421_device *hd66421 = space->machine().device<hd66421_device>( "hd66421" );
 	UINT16 data = 0;
-	if (ACCESSING_BITS_8_15) data = data | (hd66421_reg_idx_r() << 8);
-	if (ACCESSING_BITS_0_7) data = data | (hd66421_reg_dat_r() << 0);
+	if (ACCESSING_BITS_8_15) data = data | (hd66421->reg_idx_r(*space, offset) << 8);
+	if (ACCESSING_BITS_0_7) data = data | (hd66421->reg_dat_r(*space, offset) << 0);
 	return data;
 }
 
 WRITE16_HANDLER( cybiko_lcd_w )
 {
-	if (ACCESSING_BITS_8_15) hd66421_reg_idx_w( (data >> 8) & 0xFF);
-	if (ACCESSING_BITS_0_7) hd66421_reg_dat_w( (data >> 0) & 0xFF);
+	hd66421_device *hd66421 = space->machine().device<hd66421_device>( "hd66421" );
+	if (ACCESSING_BITS_8_15) hd66421->reg_idx_w(*space, offset, (data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7) hd66421->reg_dat_w(*space, offset, (data >> 0) & 0xff);
 }
 
 static READ16_HANDLER( cybiko_key_r )
