@@ -1889,7 +1889,7 @@ ATTR_FORCE_INLINE const gime_base_device::pixel_t *gime_base_device::palette_res
 
 ATTR_FORCE_INLINE gime_base_device::pixel_t gime_base_device::palette_resolver::lookup(UINT8 color)
 {
-	assert((color >= 0) && (color <= 63));
+	assert(color <= 63);
 	return m_palette[color];
 }
 
