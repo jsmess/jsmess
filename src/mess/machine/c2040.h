@@ -43,6 +43,7 @@ public:
 		TYPE_4040,
 		TYPE_8050,
 		TYPE_8250,
+		TYPE_8250LP,
 		TYPE_SFD1001
 	};
 
@@ -201,6 +202,16 @@ public:
 };
 
 
+// ======================> c8250lp_device
+
+class c8250lp_device :  public base_c2040_device
+{
+public:
+    // construction/destruction
+    c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
 // ======================> sfd1001_device
 
 class sfd1001_device :  public base_c2040_device
@@ -217,6 +228,7 @@ extern const device_type C3040;
 extern const device_type C4040;
 extern const device_type C8050;
 extern const device_type C8250;
+extern const device_type C8250LP;
 extern const device_type SFD1001;
 
 

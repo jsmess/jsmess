@@ -73,6 +73,7 @@ const device_type C3040 = &device_creator<c3040_device>;
 const device_type C4040 = &device_creator<c4040_device>;
 const device_type C8050 = &device_creator<c8050_device>;
 const device_type C8250 = &device_creator<c8250_device>;
+const device_type C8250LP = &device_creator<c8250lp_device>;
 const device_type SFD1001 = &device_creator<sfd1001_device>;
 
 
@@ -107,6 +108,10 @@ void base_c2040_device::device_config_complete()
 		m_shortname = "c8250";
 		break;
 
+	case TYPE_8250LP:
+		m_shortname = "c8250lp";
+		break;
+
 	case TYPE_SFD1001:
 		m_shortname = "sfd1001";
 		break;
@@ -125,8 +130,10 @@ ROM_START( c2040 ) // schematic 320806
 	ROM_LOAD( "901468-07.uh1", 0x2000, 0x1000, CRC(9b09ae83) SHA1(6a51c7954938439ca8342fc295bda050c06e1791) )
 
 	ROM_REGION( 0x400, M6504_TAG, 0 )
-	// RIOT DOS 1
-	ROM_LOAD( "901466-02.uk3", 0x000, 0x400, NO_DUMP )// BAD_DUMP CRC(e1c86c43) SHA1(d8209c66fde3f2937688ba934ba968678a9d2ebb) ) // parsed in from disassembly
+	// RIOT DOS 1.0
+	ROM_LOAD( "901466-01.uk3", 0x000, 0x400, NO_DUMP )
+	// RIOT DOS 1.2
+	ROM_LOAD( "901466-02.uk3", 0x000, 0x400, NO_DUMP ) // 6530-028 BAD_DUMP CRC(e1c86c43) SHA1(d8209c66fde3f2937688ba934ba968678a9d2ebb) ) // parsed in from disassembly
 
 	ROM_REGION( 0x800, "gcr", 0)
 	ROM_LOAD( "901467.uk6",    0x000, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
@@ -189,14 +196,39 @@ ROM_START( c8050 ) // schematic 8050001
 	ROM_LOAD( "901888-01.uh1", 0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4) )
 
 	ROM_REGION( 0x400, M6504_TAG, 0 )
-	ROM_LOAD_OPTIONAL( "901483-03.uk3", 0x000, 0x400, CRC(9e83fa70) SHA1(e367ea8a5ddbd47f13570088427293138a10784b) )
-	ROM_LOAD_OPTIONAL( "901483-04.uk3", 0x000, 0x400, NO_DUMP )
-	ROM_LOAD_OPTIONAL( "901884-01.uk3", 0x000, 0x400, NO_DUMP )
-	ROM_LOAD_OPTIONAL( "901885-04.uk3", 0x000, 0x400, CRC(bab998c9) SHA1(0dc9a3b60f1b866c63eebd882403532fc59fe57f) )
-	ROM_LOAD( "901869-01.uk3", 0x000, 0x400, CRC(2915327a) SHA1(3a9a80f72ce76e5f5c72513f8ef7553212912ae3) )
+	ROM_LOAD_OPTIONAL( "901483-02.uk3", 0x000, 0x400, NO_DUMP )	// 6530-036
+	ROM_LOAD_OPTIONAL( "901483-03.uk3", 0x000, 0x400, CRC(9e83fa70) SHA1(e367ea8a5ddbd47f13570088427293138a10784b) ) // 6530-038
+	ROM_LOAD_OPTIONAL( "901483-04.uk3", 0x000, 0x400, NO_DUMP ) // 6530-039
+	ROM_LOAD_OPTIONAL( "901884-01.uk3", 0x000, 0x400, NO_DUMP ) // 6530-040
+	ROM_LOAD_OPTIONAL( "901885-01.uk3", 0x000, 0x400, NO_DUMP ) // 6530-044
+	ROM_LOAD_OPTIONAL( "901885-04.uk3", 0x000, 0x400, CRC(bab998c9) SHA1(0dc9a3b60f1b866c63eebd882403532fc59fe57f) ) // 6530-047
+	ROM_LOAD( "901869-01.uk3", 0x000, 0x400, CRC(2915327a) SHA1(3a9a80f72ce76e5f5c72513f8ef7553212912ae3) ) // 6530-048
 
 	ROM_REGION( 0x800, "gcr", 0)
-	ROM_LOAD( "901467.uk6",    0x000, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
+	ROM_LOAD( "901467.uk6", 0x000, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( c8250lp )
+//-------------------------------------------------
+
+ROM_START( c8250lp )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROM_LOAD( "251165-01.ua11",  0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "251166-01.ua13",  0x2000, 0x2000, NO_DUMP )
+	ROM_LOAD_OPTIONAL( "speeddos-c000.ua11", 0x0000, 0x2000, CRC(46cc260f) SHA1(e9838635d6868e35ec9c161b6e5c1ad92a4a241a) )
+	ROM_LOAD_OPTIONAL( "speeddos-e000.ua13", 0x2000, 0x2000, CRC(88cfd505) SHA1(0fb570b180504cd1fcb7d203d8d37ea3d7e72ab4) )
+	ROM_LOAD( "dos-2.7b.bin", 0x0000, 0x4000, CRC(96e3b209) SHA1(9849300be9f2e0143c2ed2564d26a4ba3b27526c) ) // CBM DOS 2.7B from the 8250LP inside 8296D
+
+	ROM_REGION( 0x800, M6504_TAG, 0 )
+	ROM_LOAD( "251256-02", 0x000, 0x400, NO_DUMP ) // 6530-050
+	ROM_LOAD( "251474-01b", 0x000, 0x400, CRC(9e9a9f90) SHA1(39498d7369a31ea7527b5044071acf35a84ea2ac) )
+	ROM_LOAD_OPTIONAL( "speeddos-fdc-f800.bin", 0x000, 0x800, CRC(253e760f) SHA1(3f7892a9bab84b633f45686bbbbe66bc2948c8e5) )
+	ROM_LOAD( "fdc-2.7b.bin", 0x000, 0x800, CRC(13a24482) SHA1(1cfa52d2ed245a95e6369b46a36c6c7aa3929931) ) // CBM DOS 2.7B FDC ROM from the 8250LP inside 8296D
+
+	ROM_REGION( 0x800, "gcr", 0)
+	ROM_LOAD( "251167-01.uc1", 0x000, 0x800, BAD_DUMP CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
 ROM_END
 
 
@@ -237,6 +269,9 @@ const rom_entry *base_c2040_device::device_rom_region() const
 	case TYPE_8050:
 	case TYPE_8250:
 		return ROM_NAME( c8050 );
+
+	case TYPE_8250LP:
+		return ROM_NAME( c8250lp );
 
 	case TYPE_SFD1001:
 		return ROM_NAME( sfd1001 );
@@ -310,6 +345,23 @@ static ADDRESS_MAP_START( c8050_fdc_mem, AS_PROGRAM, 8, base_c2040_device )
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
 	AM_RANGE(0x1c00, 0x1fff) AM_ROM AM_REGION(M6504_TAG, 0)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( c8250lp_fdc_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( c8250lp_fdc_mem, AS_PROGRAM, 8, base_c2040_device )
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
+	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
+	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
+	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE_LEGACY(M6530_TAG, mos6530_r, mos6530_w)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
+	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION(M6504_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -1149,6 +1201,29 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
+//  MACHINE_CONFIG_FRAGMENT( c8250lp )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( c8250lp )
+	// DOS
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
+	MCFG_CPU_PROGRAM_MAP(c8050_main_mem)
+
+	MCFG_RIOT6532_ADD(M6532_0_TAG, XTAL_12MHz/12, riot0_intf)
+	MCFG_RIOT6532_ADD(M6532_1_TAG, XTAL_12MHz/12, riot1_intf)
+
+	// controller
+	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL_12MHz/12)
+	MCFG_CPU_PROGRAM_MAP(c8250lp_fdc_mem)
+
+	MCFG_VIA6522_ADD(M6522_TAG, XTAL_12MHz/12, c8050_via_intf)
+	MCFG_MOS6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
+
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(c8250_floppy_interface)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( sfd1001 )
 //-------------------------------------------------
 
@@ -1193,6 +1268,9 @@ machine_config_constructor base_c2040_device::device_mconfig_additions() const
 
 	case TYPE_8250:
 		return MACHINE_CONFIG_NAME( c8250 );
+
+	case TYPE_8250LP:
+		return MACHINE_CONFIG_NAME( c8250lp );
 
 	case TYPE_SFD1001:
 		return MACHINE_CONFIG_NAME( sfd1001 );
@@ -1517,6 +1595,14 @@ c8050_device::c8050_device(const machine_config &mconfig, const char *tag, devic
 
 c8250_device::c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: base_c2040_device(mconfig, C8250, "C8250", tag, owner, clock, TYPE_8250) { }
+
+
+//-------------------------------------------------
+//  c8250lp_device - constructor
+//-------------------------------------------------
+
+c8250lp_device::c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: base_c2040_device(mconfig, C8250LP, "C8250LP", tag, owner, clock, TYPE_8250LP) { }
 
 
 //-------------------------------------------------
