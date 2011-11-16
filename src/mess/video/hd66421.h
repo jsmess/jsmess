@@ -1,14 +1,22 @@
-/*
+/***************************************************************************
+ 
+  Hitachi HD66421 LCD Controller
 
-    Hitachi HD66421 LCD Controller/Driver
+  (c) 2001-2007 Tim Schuerewegen
 
-    (c) 2001-2007 Tim Schuerewegen
+ ***************************************************************************/
 
-*/
+#pragma once
 
-#ifndef HD66421_H_
-#define HD66421_H_
+#ifndef __HD66421_H__
+#define __HD66421_H__
 
+
+///*************************************************************************
+//  MACROS / CONSTANTS
+///*************************************************************************
+
+//#define HD66421_BRIGHTNESS_DOES_NOT_WORK
 
 #define HD66421_WIDTH   160
 #define HD66421_HEIGHT  100
@@ -16,16 +24,57 @@
 
 /*----------- defined in video/hd66421.c -----------*/
 
-UINT8 hd66421_reg_idx_r(void);
-void hd66421_reg_idx_w(UINT8 data);
+///*************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+///*************************************************************************
 
-UINT8 hd66421_reg_dat_r(void);
-void hd66421_reg_dat_w(UINT8 data);
-
-PALETTE_INIT( hd66421 );
-
-VIDEO_START( hd66421 );
-SCREEN_UPDATE( hd66421 );
+#define MCFG_HD66421_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, HD66421, 0) \
 
 
-#endif /* HD66421_H_ */
+///*************************************************************************
+//  TYPE DEFINITIONS
+///*************************************************************************
+
+// ======================> hd66421_device
+
+class hd66421_device :	public device_t,
+						public device_memory_interface
+{
+public:
+    // construction/destruction
+    hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	DECLARE_READ8_MEMBER( reg_idx_r );
+	DECLARE_WRITE8_MEMBER( reg_idx_w );
+	DECLARE_READ8_MEMBER( reg_dat_r );
+	DECLARE_WRITE8_MEMBER( reg_dat_w );
+	
+	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
+	
+protected:
+    // device-level overrides
+    virtual void device_start();
+	
+	// device_config_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	
+    // address space configurations
+	const address_space_config		m_space_config;
+	
+	inline UINT8 readbyte(offs_t address);
+	inline void writebyte(offs_t address, UINT8 data);
+
+	void plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color);
+	
+private:
+	UINT8 m_cmd, m_reg[32];
+	int m_x, m_y;
+};
+
+
+// device type definition
+extern const device_type HD66421;
+
+
+#endif
