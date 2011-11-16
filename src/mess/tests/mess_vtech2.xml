@@ -1,8 +1,0 @@
-<tests>
-
-<test name="laser350_000" driver="laser350">
-	<wait time="1"/>
-	<checkblank/>
-</test>
-
-</tests>
