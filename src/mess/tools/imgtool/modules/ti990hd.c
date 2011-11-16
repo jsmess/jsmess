@@ -10,7 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
-#include "imgtoolx.h"
+#include "imgtool.h"
 
 /* Max sector length is bytes.  Generally 256, except for a few older disk
 units which use 288-byte-long sectors, and SCSI units which generally use

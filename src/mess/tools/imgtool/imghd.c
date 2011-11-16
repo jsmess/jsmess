@@ -7,9 +7,7 @@
     Raphael Nabet 2003
 */
 
-/*#include "imgtool.h"*/
-#include "imgtoolx.h"
-
+#include "imgtool.h"
 #include "harddisk.h"
 #include "imghd.h"
 

@@ -10,7 +10,6 @@
 #define IFLOPIMG_H
 
 #include "formats/flopimg.h"
-#include "imgtoolx.h"
 #include "library.h"
 
 /***************************************************************************

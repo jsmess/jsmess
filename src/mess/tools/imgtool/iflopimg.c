@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #include "formats/flopimg.h"
-#include "imgtoolx.h"
+#include "imgtool.h"
 #include "library.h"
 #include "iflopimg.h"
 

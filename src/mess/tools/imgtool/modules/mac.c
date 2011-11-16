@@ -94,7 +94,7 @@
 #include <stddef.h>
 
 #include "formats/imageutl.h"
-#include "imgtoolx.h"
+#include "imgtool.h"
 #include "macutil.h"
 #include "iflopimg.h"
 #include "formats/ap_dsk35.h"

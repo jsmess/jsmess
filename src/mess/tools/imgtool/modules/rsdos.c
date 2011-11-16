@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "imgtoolx.h"
+#include "imgtool.h"
 #include "formats/coco_dsk.h"
 #include "iflopimg.h"
 

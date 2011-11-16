@@ -21,7 +21,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
-#include "imgtoolx.h"
+#include "imgtool.h"
 #include "harddisk.h"
 #include "imghd.h"
 
