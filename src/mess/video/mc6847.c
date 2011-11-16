@@ -619,7 +619,7 @@ void mc6847_base_device::record_scanline_res(int scanline)
 void mc6847_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 scanline)
 {
 	// sanity checks
-	assert(scanline >= 0 && scanline < 192);
+	assert(scanline < 192);
 
 	if (m_mode & MODE_AG)
 	{
