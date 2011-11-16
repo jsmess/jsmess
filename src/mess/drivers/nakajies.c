@@ -159,6 +159,40 @@ on reset 0017 is set to 0, pointing to last 20000h bytes of ROM containing the b
 0040 - unknown
        0xff written during boot sequence
 
+Sounds related?
+On boot: 50 = 98, 51 = 06, 52 = 7f
+         52 = ff
+         50 - 26, 51 = 01, 52 = 7f
+         52 = ff
+         (mem check)
+         50 = 98, 51 = 06, 52 = 7f
+         52 = ff
+         50 = 74, 51 = 04, 52 = 7f
+         52 = ff
+         50 = 98, 51 = 06, 52 = 7f
+         52 = ff
+         (menu)
+         (type 1 - medium frequency sound )
+         50 = 5d, 51 = 01, 52 = 7f
+         52 = ff
+         52 = ff
+         52 = ff
+         50 = 00, 51 = 01, 52 = 7f
+         52 = ff
+         (type 2 - simple lower sound)
+         50 = ba, 51 = 02, 52 = 7f
+         52 = ff
+         (type 3 - highest frequency sound)
+         50 = 26, 51 = 01, 52 = 7f
+         52 = ff
+         50 = 06, 51 = 01, 52 = 7f
+         52 = ff
+         50 = e9, 51 = 00, 52 = 7f
+         52 = ff
+         50 = dc, 51 = 00, 52 = 7f
+         52 = ff
+         50 = c4, 51 = 00, 52 = 7f
+         52 = ff
 0050 - counter low?
 0051 - counter high?
 0052 - counter enable/disable?
@@ -241,6 +275,9 @@ disabled). Perhaps power on/off related??
 #include "machine/rp5c01.h"
 #include "sound/speaker.h"
 #include "rendlay.h"
+
+
+#define LOG		0
 
 
 class nakajies_state : public driver_device
@@ -371,7 +408,8 @@ void nakajies_state::nakajies_update_irqs( running_machine &machine )
 	UINT8 irq = m_irq_active; // & m_irq_enabled;
 	UINT8 vector = 0xff;
 
-	logerror("nakajies_update_irqs: irq_enabled = %02x, irq_active = %02x\n", m_irq_enabled, m_irq_active );
+	if (LOG)
+		logerror("nakajies_update_irqs: irq_enabled = %02x, irq_active = %02x\n", m_irq_enabled, m_irq_active );
 
 	/* Assuming irq 0xFF has the highest priority and 0xF8 the lowest */
 	while( vector >= 0xf8 && ! ( irq & 0x01 ) )
