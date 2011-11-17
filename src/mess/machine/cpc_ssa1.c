@@ -20,8 +20,8 @@ const device_type CPC_DKSPEECH = &device_creator<cpc_dkspeech_device>;
 
 CPC_EXPANSION_INTERFACE(sub_exp_intf)
 {
-	DEVCB_LINE_MEMBER(cpc_expansion_slot_device,irq_w),
-	DEVCB_LINE_MEMBER(cpc_expansion_slot_device,nmi_w),
+	DEVCB_LINE(cpc_irq_w),
+	DEVCB_LINE(cpc_nmi_w),
 	DEVCB_NULL,  // RESET
 	DEVCB_LINE(cpc_romdis),  // ROMDIS
 	DEVCB_LINE(cpc_romen)  // /ROMEN
@@ -140,7 +140,7 @@ static MACHINE_CONFIG_FRAGMENT( cpc_ssa1 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// pass-through
-	MCFG_CPC_EXPANSION_SLOT_ADD("exp",sub_exp_intf,cpcplus_exp_cards,NULL,NULL)
+	MCFG_CPC_EXPANSION_SLOT_ADD("exp",sub_exp_intf,cpc_exp_cards,NULL,NULL)
 
 MACHINE_CONFIG_END
 
@@ -151,7 +151,7 @@ static MACHINE_CONFIG_FRAGMENT( cpc_dkspeech )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// pass-through
-	MCFG_CPC_EXPANSION_SLOT_ADD("exp",sub_exp_intf,cpcplus_exp_cards,NULL,NULL)
+	MCFG_CPC_EXPANSION_SLOT_ADD("exp",sub_exp_intf,cpc_exp_cards,NULL,NULL)
 
 MACHINE_CONFIG_END
 

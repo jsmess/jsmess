@@ -133,6 +133,8 @@ WRITE8_DEVICE_HANDLER( amstrad_ppi_portc_w );
 READ8_HANDLER ( amstrad_psg_porta_read );
 
 WRITE_LINE_DEVICE_HANDLER( aleste_interrupt );
+WRITE_LINE_DEVICE_HANDLER( cpc_irq_w );
+WRITE_LINE_DEVICE_HANDLER( cpc_nmi_w );
 WRITE_LINE_DEVICE_HANDLER( cpc_romdis );
 WRITE_LINE_DEVICE_HANDLER( cpc_romen );
 
