@@ -18,8 +18,8 @@ const device_type CPC_ROM = &device_creator<cpc_rom_device>;
 
 CPC_EXPANSION_INTERFACE(sub_exp_intf)
 {
-	DEVCB_NULL,//LINE_MEMBER(cpc_expansion_slot_device,irq_w),
-	DEVCB_NULL,//LINE_MEMBER(cpc_expansion_slot_device,nmi_w),
+	DEVCB_LINE(cpc_irq_w),
+	DEVCB_LINE(cpc_nmi_w),//LINE_MEMBER(cpc_expansion_slot_device,nmi_w),
 	DEVCB_NULL,  // RESET
 	DEVCB_LINE(cpc_romdis),  // ROMDIS
 	DEVCB_LINE(cpc_romen)  // /ROMEN

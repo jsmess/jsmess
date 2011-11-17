@@ -992,7 +992,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_interface)
 
-	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpcplus_exp_cards,NULL,NULL)
+	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL,NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

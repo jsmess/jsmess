@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "machine/mface2.h"
+#include "includes/amstrad.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -13,6 +14,20 @@
 
 const device_type CPC_MFACE2 = &device_creator<cpc_multiface2_device>;
 
+CPC_EXPANSION_INTERFACE(sub_exp_intf)
+{
+	DEVCB_LINE(cpc_irq_w),
+	DEVCB_LINE(cpc_nmi_w),//LINE_MEMBER(cpc_expansion_slot_device,nmi_w),
+	DEVCB_NULL,  // RESET
+	DEVCB_LINE(cpc_romdis),  // ROMDIS
+	DEVCB_LINE(cpc_romen)  // /ROMEN
+};
+
+// device machine config
+static MACHINE_CONFIG_FRAGMENT( cpc_mface2 )
+	// pass-through
+	MCFG_CPC_EXPANSION_SLOT_ADD("exp",sub_exp_intf,cpc_exp_cards,NULL,NULL)
+MACHINE_CONFIG_END
 
 DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_default )
 {
@@ -63,9 +78,12 @@ DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_multiface_directoverride )
 
 int cpc_multiface2_device::multiface_hardware_enabled()
 {
+	astring t = tag();
+
+	t.cat(":multiface");
 	if (m_multiface_ram!=NULL)
 	{
-		if ((input_port_read(machine(), "exp:multiface2:multiface") & 0x01)!=0)
+		if ((input_port_read(machine(), t) & 0x01)!=0)
 		{
 			return 1;
 		}
@@ -85,12 +103,14 @@ It is believed that it is used to make multiface invisible to programs */
 void cpc_multiface2_device::multiface_rethink_memory()
 {
 	unsigned char *multiface_rom;
+	astring t = tag();
 
 	/* multiface hardware enabled? */
 	if (!multiface_hardware_enabled())
 		return;
 
-	multiface_rom = machine().region("exp:multiface2:multiface")->base();
+	t.cat(":multiface");
+	multiface_rom = machine().region(t)->base();
 
 	if ((m_multiface_flags & MULTIFACE_RAM_ROM_ENABLED)!=0 && m_romdis != 0)
 	{
@@ -102,12 +122,20 @@ void cpc_multiface2_device::multiface_rethink_memory()
 	}
 }
 
+machine_config_constructor cpc_multiface2_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( cpc_mface2 );
+}
+
 void cpc_multiface2_device::check_button_state()
 {
+	astring t = tag();
+
 	if(!multiface_hardware_enabled())
 		return;
+	t.cat(":multiface");
 	// TODO: reset button
-	if (input_port_read(machine(), "exp:multiface2:multiface") & 0x02)
+	if (input_port_read(machine(), t) & 0x02)
 	{
 		multiface_stop();
 	}
@@ -139,7 +167,8 @@ void cpc_multiface2_device::multiface_stop()
 		multiface_rethink_memory();
 
 		/* pulse the nmi line */
-		m_slot->nmi_w(PULSE_LINE);
+		m_slot->nmi_w(1);
+		m_slot->nmi_w(0);
 
 		/* initialise 0065 override to monitor calls to 0065 */
 		machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(cpc_multiface2_device::amstrad_multiface_directoverride),this));

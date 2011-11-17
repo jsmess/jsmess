@@ -1101,6 +1101,41 @@ const mc6845_interface amstrad_plus_mc6845_intf =
 	NULL
 };
 
+/* traverses the daisy-chain of expansion devices, looking for the specified device */
+static device_t* get_expansion_device(running_machine &machine, const char* tag)
+{
+	cpc_expansion_slot_device* exp_port = machine.device<cpc_expansion_slot_device>("exp");
+
+	while(exp_port != NULL)
+	{
+		device_t* temp;
+
+		// first, check if this expansion port has the device we want attached
+		temp = exp_port->subdevice(tag);
+		if(temp != NULL)
+			return temp;
+
+		// if it's not what we're looking for, then check the expansion port on this expansion device. if it exists.
+		temp = dynamic_cast<device_t*>(exp_port->get_card_device());
+		if(temp == NULL)
+			return NULL; // no device attached
+		exp_port = temp->subdevice<cpc_expansion_slot_device>("exp");
+		if(exp_port == NULL)
+			return NULL;  // we're at the end of the chain
+	}
+	return NULL;
+}
+
+WRITE_LINE_DEVICE_HANDLER(cpc_irq_w)
+{
+	cputag_set_input_line(device->machine(), "maincpu", 0, state);
+}
+
+WRITE_LINE_DEVICE_HANDLER(cpc_nmi_w)
+{
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, state);
+}
+
 WRITE_LINE_DEVICE_HANDLER(cpc_romdis)
 {
 	amstrad_state *tstate = device->machine().driver_data<amstrad_state>();
@@ -2097,7 +2132,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 		mc6845->set_clock( ( state->m_aleste_mode & 0x02 ) ? ( XTAL_16MHz / 8 ) : ( XTAL_16MHz / 16 ) );
 	}
 
-	mface2 = space->machine().device<cpc_multiface2_device>("exp:multiface2");
+	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(space->machine(),"multiface2"));
 	if(mface2 != NULL)
 	{
 		if(mface2->multiface_io_write(offset, data) != 0)
@@ -2331,7 +2366,7 @@ static void amstrad_rethinkMemory(running_machine &machine)
 	}
 
 	/* multiface hardware enabled? */
-	mface2 = machine.device<cpc_multiface2_device>("exp:multiface2");
+	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine,"multiface2"));
 	if(mface2 != NULL)
 	{
 		if (mface2->multiface_hardware_enabled())
@@ -2355,11 +2390,14 @@ static void kccomp_reset_machine(running_machine &machine)
 
 SCREEN_EOF( amstrad )
 {
-	cpc_multiface2_device* mface2 = machine.device<cpc_multiface2_device>("exp:multiface2");
+	cpc_multiface2_device* mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(screen->machine(),"multiface2"));
+
 	if(mface2 != NULL)
 	{
 		mface2->check_button_state();
 	}
+	else
+		printf("Cannot get multiface2 device\n");
 }
 
 
@@ -2759,31 +2797,6 @@ static const UINT8 amstrad_cycle_table_ex[256]=
 	 8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
 	 8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0
 };
-
-/* traverses the daisy-chain of expansion devices, looking for the specified device */
-static device_t* get_expansion_device(running_machine &machine, const char* tag)
-{
-	cpc_expansion_slot_device* exp_port = machine.device<cpc_expansion_slot_device>("exp");
-
-	while(exp_port != NULL)
-	{
-		device_t* temp;
-
-		// first, check if this expansion port has the device we want attached
-		temp = exp_port->subdevice("rom");
-		if(temp != NULL)
-			return temp;
-
-		// if it's not what we're looking for, then check the expansion port on this expansion device. if it exists.
-		temp = dynamic_cast<device_t*>(exp_port->get_card_device());
-		if(temp == NULL)
-			return NULL; // no device attached
-		exp_port = temp->subdevice<cpc_expansion_slot_device>("exp");
-		if(exp_port == NULL)
-			return NULL;  // we're at the end of the chain
-	}
-	return NULL;
-}
 
 static void amstrad_common_init(running_machine &machine)
 {
