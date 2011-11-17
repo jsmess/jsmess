@@ -516,7 +516,7 @@
 
 	<software name="drseuss">
 		<!-- Dr. Seuss's Fix-Up the Mix-Up Puzzler (1984)(Coleco).bin -->
-		<description>Dr. Seuss&apos;s Fix-Up the Mix-Up Puzzler</description>
+		<description>Dr. Seuss's Fix-Up the Mix-Up Puzzler</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="serial" value="2699" />
@@ -1065,7 +1065,7 @@
 
 	<software name="onlyrock">
 		<!-- It's Only Rock 'n' Roll (1984)(Xonox).bin -->
-		<description>It's Only Rock &apos;n&apos; Roll</description>
+		<description>It's Only Rock 'n' Roll</description>
 		<year>1984</year>
 		<publisher>K-Tel</publisher>
 		<info name="developer" value="Xonox" />
@@ -1695,7 +1695,7 @@
 
 	<software name="wizmath">
 		<!-- Wizard of Id's Wizmath (1984)(Sierra On-Line).bin -->
-		<description>Wizard of Id&apos;s Wizmath</description>
+		<description>Wizard of Id's Wizmath</description>
 		<year>1984</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="serial" value="WML-900" />
@@ -1772,7 +1772,7 @@
 
 	<software name="bnj">
 		<!-- Bump 'n' Jump (1984)(Coleco).bin -->
-		<description>Bump &apos;n&apos; Jump</description>
+		<description>Bump 'n' Jump</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="Data East USA" />
@@ -2391,6 +2391,63 @@
 
 <!-- Prototypes & Demo's -->
 
+	<software name="2010p" cloneof="2010">
+		<description>2010: The Graphic Action Game (Prototype v54)</description>
+		<year>1984</year>
+		<publisher>Coleco / CBS</publisher>
+		<info name="serial" value="2618" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="act2010-54-chip1-11-9-cd7e.bin" size="8192" crc="d8a55441" sha1="373517fa54ea3594468668e2d7b853d66d3b5b96" offset="0x0000" />
+				<rom name="act2010-54-chip2-11-9-e822.bin" size="8192" crc="cbba190e" sha1="d9bdc35b22d88aa902e4b4f40005fd532006939b" offset="0x2000" />
+				<rom name="act2010-54-chip3-11-9-06ca.bin" size="8192" crc="9e13e0a1" sha1="018bd13b509f04a0d4c32c3be2dca60a2b0e0d6d" offset="0x4000" />
+				<rom name="act2010-54-chip4-11-9-e758.bin" size="8192" crc="a3edc192" sha1="db5445a79197bfb95f199d76e822521ec867d426" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2010p1" cloneof="2010">
+		<description>2010: The Graphic Action Game (Prototype v44)</description>
+		<year>1984</year>
+		<publisher>Coleco / CBS</publisher>
+		<info name="serial" value="2618" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="act2010-rv44-chip1.bin" size="8192" crc="d9dc972f" sha1="1a6c9531305c2984429a8a5fa461fdb184f41c3c" offset="0x0000" />
+				<rom name="act2010-rv44-chip2.bin" size="8192" crc="84288fcb" sha1="f4a7f79186e5030f35cad042ab2baa72d18d4aef" offset="0x2000" />
+				<rom name="act2010-rv44-chip3.bin" size="8192" crc="57807547" sha1="25877380bf5ac920f28087efb071cb586692b2c8" offset="0x4000" />
+				<rom name="act2010-rv44-chip4.bin" size="8192" crc="44e900fc" sha1="84a82f8044fe1df44c4f57a53988fd3cf0734200" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ard" supported="no">
+		<description>ADAM Resident Debugger (Prototype Rev20)</description>
+		<year>198?</year>
+		<publisher>Coleco?</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="ardrev20-chip1-10-31-6a1a.bin" size="8192" crc="4667ea7e" sha1="99543b5fc1b85fa1e543f9a8f96681988d96c4cc" offset="0x0000" />
+				<rom name="ardrev20-chip2-10-31-f5f6.bin" size="8192" crc="e6e2dcad" sha1="1ce45aeba3eba6cb8b277d8ba02b98c82f94e59e" offset="0x2000" />
+				<rom name="ardrev20-chip3-10-31-4ede.bin" size="8192" crc="f8dd08eb" sha1="16a6c0c66f5bcb8bb67989c951342e691adfd240" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--software name="adamdev" supported="no">
+		<description>ADAM Dev (Prototype)</description>
+		<year>198?</year>
+		<publisher>Coleco?</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="51c9-chip1-12-6-84.bin" size="8192" crc="148c7b1d" sha1="fd32bd9bc6053b263cfc51267e0ef3f7305df121" offset="0x0000" />
+				<rom name="51c9-chip2-12-6-84.bin" size="8192" crc="4fbea31a" sha1="e17f817f1ab89a8b2c6d8dc2790ffb042da47df3" offset="0x2000" />
+				<rom name="51c9-chip3-12-6-84.bin" size="8192" crc="0b418ba1" sha1="6cc84dd6dbe9e3e4f3be35695d89ef3d6e1c1244" offset="0x4000" />
+				<rom name="51c9-chip4-12-6-84.bin" size="8192" crc="653ff925" sha1="0df057b7b1dcd969411abb1f084cb8354013103a" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software-->
+
 	<software name="bbears">
 		<!-- Berenstain Bears, The (1984)(Coleco)(proto).bin -->
 		<description>The Berenstain Bears (Prototype)</description>
@@ -2417,28 +2474,29 @@
 		</part>
 	</software>
 
-	<software name="cabbage1" cloneof="cabbage">
+	<software name="cabbagep1" cloneof="cabbage">
 		<!-- Cabbage Patch Kids - Adventures in the Park (1984)(OAA)(proto).bin -->
 		<description>Cabbage Patch Kids: Adventure in the Park (Prototype)</description>
 		<year>1984</year>
-		<publisher>OAA</publisher>
+		<publisher>Coleco / CBS</publisher>
+		<info name="developer" value="OAA" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="cabbage1.1" size="8192" crc="e7214974" sha1="f7a5c2e068ba8edba0adea6f876ff17e8ed4ea7d" offset="0x0000" />
-				<rom name="cabbage1.2" size="8192" crc="bf35f649" sha1="956e0a20b46a0fce3aaf3822d7637867f3acc63e" offset="0x2000" />
+				<rom name="cabbagep1.1" size="8192" crc="e7214974" sha1="f7a5c2e068ba8edba0adea6f876ff17e8ed4ea7d" offset="0x0000" />
+				<rom name="cabbagep1.2" size="8192" crc="bf35f649" sha1="956e0a20b46a0fce3aaf3822d7637867f3acc63e" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cabbage2" cloneof="cabbage">
-		<!-- Cabbage Patch Kids - Adventures in the Park (1984-06-30)(OAA)(proto).bin -->
-		<description>Cabbage Patch Kids: Adventure in the Park (Prototype)(Alt)</description>
+	<software name="cabbagep2" cloneof="cabbage">
+		<description>Cabbage Patch Kids: Adventure in the Park (Prototype, Alt)</description>
 		<year>1984</year>
-		<publisher>OAA</publisher>
+		<publisher>Coleco / CBS</publisher>
+		<info name="developer" value="OAA" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="cabbage2.1" size="8192" crc="2b793712" sha1="c37d2b823db6f4dca047a33fbf817f1bf9ea978c" offset="0x0000" />
-				<rom name="cabbage2.2" size="8192" crc="d4ff94a5" sha1="1186ea3cae339c5a4112f6063915d8160dd64dcc" offset="0x2000" />
+				<rom name="cabbage-patch-chip1-6-30.bin" size="8192" crc="2b793712" sha1="c37d2b823db6f4dca047a33fbf817f1bf9ea978c" offset="0x0000" />
+				<rom name="cabbage-patch-chip2-6-30.bin" size="8192" crc="d4ff94a5" sha1="1186ea3cae339c5a4112f6063915d8160dd64dcc" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2458,16 +2516,15 @@
 		</part>
 	</software>
 
-	<software name="draglair">
-		<!-- Dragon's Lair (1984-04-16)(Coleco)(proto).bin -->
-		<description>Dragon's Lair (Prototype)</description>
+	<software name="dlair" supported="no">
+		<description>Dragon's Lair (Prototype, 0416)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="24576">
-				<rom name="draglair.1" size="8192" crc="950950d0" sha1="ef0c45269cfe7b78125be2a2edf3f3781305f740" offset="0x0000" />
-				<rom name="draglair.2" size="8192" crc="8a778f5a" sha1="274944cfe6f4ebfa13a68377ef5716879426b577" offset="0x2000" />
-				<rom name="draglair.3" size="8192" crc="8eec1020" sha1="21b08651f76925baa0ec99b0b5e7dba3a5880c5a" offset="0x4000" />
+				<rom name="dragon80-chip1-4-16-ec4a.bin" size="8192" crc="950950d0" sha1="ef0c45269cfe7b78125be2a2edf3f3781305f740" offset="0x0000" />
+				<rom name="dragon80-chip2-4-16-ec4a.bin" size="8192" crc="8a778f5a" sha1="274944cfe6f4ebfa13a68377ef5716879426b577" offset="0x2000" />
+				<rom name="dragon80-chip3-4-16-ec4a.bin" size="8192" crc="8eec1020" sha1="21b08651f76925baa0ec99b0b5e7dba3a5880c5a" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2526,7 +2583,7 @@
 		</part>
 	</software>
 
-	<software name="monkey1" cloneof="monkey">
+	<software name="monkeyp" cloneof="monkey">
 		<!-- Monkey Academy (1984)(Konami)(proto).bin -->
 		<description>Monkey Academy (Prototype)</description>
 		<year>1984</year>
@@ -2535,6 +2592,19 @@
 			<dataarea name="rom" size="16384">
 				<rom name="monkey1.1" size="8192" crc="3c321d92" sha1="c5ac325949ae9f8f0c498d5f33d9ff4e2a71fc7d" offset="0x0000" />
 				<rom name="monkey1.2" size="8192" crc="d1239a4d" sha1="0b39e72f5f012981f49c5a1550e31ec0ceea348d" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkeyp1" cloneof="monkey">
+		<description>Monkey Academy (Prototype, 0511)</description>
+		<year>1984</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="l12-chip1-5-11-c9c1.bin" size="8192" crc="cb1b7786" sha1="22b0edd4afe820250225eebf707b508fa252080b" offset="0x0000" />
+				<rom name="l12-chip2-5-11-c9c1.bin" size="8192" crc="e9a69d3b" sha1="0ccc593260aef53749e70bbf9f9fd9a96914c64f" offset="0x2000" />
+				<rom name="l12-chip3-5-11-c9c1.bin" size="8192" crc="314c3478" sha1="f644970051b66d6c7bc1e9d5511618c95c534902" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2566,13 +2636,13 @@
 
 	<software name="porkys">
 		<!-- Porky's (1983)(Fox Video Games)(proto).bin -->
-		<description>Porky&apos;s (Prototype)</description>
+		<description>Porky's (Prototype)</description>
 		<year>1983</year>
 		<publisher>Fox Video Games</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="porky&apos;s.1" size="8192" crc="f5aa5a81" sha1="4e677814f7bf4eeb102659886db8776173b559fd" offset="0x0000" />
-				<rom name="porky&apos;s.2" size="8192" crc="6b1f73a3" sha1="977da331293c17eb4448b12d58f577c1abafa8d2" offset="0x2000" />
+				<rom name="porkys.1" size="8192" crc="f5aa5a81" sha1="4e677814f7bf4eeb102659886db8776173b559fd" offset="0x0000" />
+				<rom name="porkys.2" size="8192" crc="6b1f73a3" sha1="977da331293c17eb4448b12d58f577c1abafa8d2" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2601,6 +2671,34 @@
 			<dataarea name="rom" size="16384">
 				<rom name="smurfply.1" size="8192" crc="1397a474" sha1="63bce58d40eb785a4e7a48ddc257fac8e1b61284" offset="0x0000" />
 				<rom name="smurfply.2" size="8192" crc="a51e1410" sha1="9f02ab15d7a8d44fb0d3997adffd61e11ccf0954" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spyhuntp" cloneof="spyhunt">
+		<description>Spy Hunter (Prototype, v22)</description>
+		<year>1984</year>
+		<publisher>Coleco / CBS</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="spyr22-aaad-11-12-chip1.bin"  size="8192" crc="f8fd0e1c" sha1="d1b0fe5a51a0459065518b47e2d72d94e1b6b122" offset="0x0000" />
+				<rom name="spyrv22-7f14-11-12-chip2.bin" size="8192" crc="ff749b25" sha1="1c8071e141670cb22a5d8e0a4ab479c651b2ae21" offset="0x2000" />
+				<rom name="spyrv22-f73b-11-12-chip3.bin" size="8192" crc="a45ff169" sha1="5dbbe12c8a0b2e9cbd1334d67e1c3afff46e482f" offset="0x4000" />
+				<rom name="spyrv22-b3b4-11-12-chip4.bin" size="8192" crc="da895d9c" sha1="b6984670c8554222af1134b9f0720308516cef15" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spyhuntp1" cloneof="spyhunt">
+		<description>Spy Hunter (Prototype, v13)</description>
+		<year>1984</year>
+		<publisher>Coleco / CBS</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="spy13-chip1.bin" size="8192" crc="01d34c94" sha1="5e2a203e08eaf1f93581b74f7eaa31a9fead7680" offset="0x0000" />
+				<rom name="spy13-chip2.bin" size="8192" crc="1aabc54a" sha1="79c8b636847ed38adb998268ba3cc29295bba3d3" offset="0x2000" />
+				<rom name="spy13-chip3.bin" size="8192" crc="bd730c9f" sha1="7ea4c43a3177a3233baaa57b401f985a390f9c35" offset="0x4000" />
+				<rom name="spy13-chip4.bin" size="8192" crc="c85c6303" sha1="64fd7eaeea489768023396f34aeff87e39065e04" offset="0x6000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2634,14 +2732,13 @@
 	</software>
 
 	<software name="sword">
-		<!-- Sword and the Sorcer (1983)(Coleco)(proto).bin -->
-		<description>Sword and the Sorcer (Prototype)</description>
+		<description>Sword and Sorcerer (Prototype)</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="sword.1" size="8192" crc="a1548994" sha1="d079283f6f5e287399d442be8cfc2d82fa8cec15" offset="0x0000" />
-				<rom name="sword.2" size="8192" crc="1d03dfae" sha1="ba6dc0e47ab9418913ca2540e71d8595442372ba" offset="0x2000" />
+				<rom name="sword-chip1-a176.bin" size="8192" crc="a1548994" sha1="d079283f6f5e287399d442be8cfc2d82fa8cec15" offset="0x0000" />
+				<rom name="sword-chip2-d5ba.bin" size="8192" crc="1d03dfae" sha1="ba6dc0e47ab9418913ca2540e71d8595442372ba" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2660,13 +2757,25 @@
 	</software>
 
 	<software name="video1" cloneof="video">
-		<!-- Video Hustler (1984-07-27)(Konami)(proto).bin -->
-		<description>Video Hustler (1984-07-27) (Prototype)</description>
+		<description>Video Hustler (Prototype, 19840727)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="video1.bin" size="8192" crc="841d168f" sha1="5f481ff47762a812c73bb120e60f31ee99fd6b5f" offset="0x0000" />
+				<rom name="hustler-7-27-84-8c61.bin" size="8192" crc="841d168f" sha1="5f481ff47762a812c73bb120e60f31ee99fd6b5f" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wargamesp" cloneof="wargames">
+		<description>War Games (Prototype, 0417)</description>
+		<year>1984</year>
+		<publisher>Coleco / CBS</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="wargams17-chip1-4-17-c44a.bin" size="8192" crc="da4bb2f5" sha1="49284b18d0f620150f150829aceb7140b1233356" offset="0x0000" />
+				<rom name="wargams17-chip2-4-17-c44a.bin" size="8192" crc="4ef201ef" sha1="edd3c53c234e3c48faf1d79b5af58e42c482f52d" offset="0x2000" />
+				<rom name="wargams17-chip3-4-17-c44a.bin" size="8192" crc="2a95379b" sha1="9fe560e99275bd0f32ae11daf03915a4dfd8de6a" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2911,7 +3020,7 @@
 
 	<software name="smurfpnt">
 		<!--Smurf Paint 'n' Play Workshop (1983)(Coleco).bin -->
-		<description>Smurf Paint &apos;n&apos; Play Workshop</description>
+		<description>Smurf Paint 'n' Play Workshop</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="serial" value="2697" />
