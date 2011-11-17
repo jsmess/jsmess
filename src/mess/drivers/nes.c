@@ -550,21 +550,21 @@ MACHINE_CONFIG_END
 
 /* rom regions are just place-holders: they get removed and re-allocated when a cart is loaded */
 ROM_START( nes )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM + program banks */
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM + program banks */
 	ROM_REGION( 0x2000,  "gfx1", ROMREGION_ERASE00 )  /* VROM */
 	ROM_REGION( 0x4000,  "gfx2", ROMREGION_ERASE00 )  /* VRAM */
 	ROM_REGION( 0x800,   "gfx3", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 ROM_START( nespal )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM + program banks */
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM + program banks */
 	ROM_REGION( 0x2000,  "gfx1", ROMREGION_ERASE00 )  /* VROM */
 	ROM_REGION( 0x4000,  "gfx2", ROMREGION_ERASE00 )  /* VRAM */
 	ROM_REGION( 0x800,   "gfx3", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 ROM_START( famicom )
-	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM + program banks */
+	ROM_REGION( 0x1000000, "maincpu", 0 )  /* Main RAM + program banks */
 	ROM_LOAD_OPTIONAL( "disksys.rom", 0xe000, 0x2000, CRC(5e607dcf) SHA1(57fe1bdee955bb48d357e463ccbf129496930b62) )
 
 	ROM_REGION( 0x2000,  "gfx1", ROMREGION_ERASE00 )  /* VROM */
@@ -573,7 +573,7 @@ ROM_START( famicom )
 ROM_END
 
 ROM_START( famitwin )
-	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM + program banks */
+	ROM_REGION( 0x1000000, "maincpu", 0 )  /* Main RAM + program banks */
 	ROM_LOAD_OPTIONAL( "disksyst.rom", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1) )
 
 	ROM_REGION( 0x2000,  "gfx1", ROMREGION_ERASE00 )  /* VROM */
@@ -607,7 +607,7 @@ ROM_START( drpcjr )
 ROM_END
 
 ROM_START( dendy )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM + program banks */
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM + program banks */
 	ROM_REGION( 0x2000,  "gfx1", ROMREGION_ERASE00 )  /* VROM */
 	ROM_REGION( 0x4000,  "gfx2", ROMREGION_ERASE00 )  /* VRAM */
 	ROM_REGION( 0x800,   "gfx3", ROMREGION_ERASE00 )  /* CI RAM */
