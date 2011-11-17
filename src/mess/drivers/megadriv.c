@@ -575,6 +575,7 @@ static MACHINE_RESET( ms_megadriv )
 
 static MACHINE_CONFIG_START( ms_megadriv, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
+	MCFG_NVRAM_HANDLER_CLEAR()
 
 	MCFG_MACHINE_START( ms_megadriv )
 	MCFG_MACHINE_RESET( ms_megadriv )
@@ -584,6 +585,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ms_megadpal, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_pal )
+	MCFG_NVRAM_HANDLER_CLEAR()
 
 	MCFG_MACHINE_START( ms_megadriv )
 	MCFG_MACHINE_RESET( ms_megadriv )
@@ -594,6 +596,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ms_megdsvp, mdsvp_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 	MCFG_FRAGMENT_ADD( md_svp )
+	MCFG_NVRAM_HANDLER_CLEAR()
 
 	MCFG_MACHINE_START( ms_megadriv )
 	MCFG_MACHINE_RESET( ms_megadriv )
@@ -691,8 +694,8 @@ static DRIVER_INIT( mess_32x )
 }
 
 static MACHINE_CONFIG_DERIVED( ms_32x, genesis_32x )
-
 	MCFG_FRAGMENT_ADD( _32x_cartslot )
+	MCFG_NVRAM_HANDLER_CLEAR()
 MACHINE_CONFIG_END
 
 
@@ -1048,6 +1051,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( pico, pico_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
+	MCFG_NVRAM_HANDLER_CLEAR()
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pico_mem)
@@ -1061,6 +1065,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( picopal, pico_state )
 	MCFG_FRAGMENT_ADD( md_pal )
+	MCFG_NVRAM_HANDLER_CLEAR()
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pico_mem)
