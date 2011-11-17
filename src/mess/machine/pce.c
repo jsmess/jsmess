@@ -251,13 +251,11 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	return 0;
 }
 
-#ifdef MESS
 DRIVER_INIT( pce )
 {
 	pce_state *state = machine.driver_data<pce_state>();
 	state->m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
-#endif
 
 DRIVER_INIT( tg16 )
 {
@@ -276,7 +274,6 @@ MACHINE_START( pce )
 	pce_cd_init( machine );
 }
 
-#ifdef MESS
 MACHINE_RESET( pce )
 {
 	pce_state *state = machine.driver_data<pce_state>();
@@ -379,7 +376,7 @@ READ8_HANDLER ( pce_joystick_r )
 
 	return (ret);
 }
-#endif
+
 NVRAM_HANDLER( pce )
 {
 	pce_state *state = machine.driver_data<pce_state>();

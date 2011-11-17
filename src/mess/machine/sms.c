@@ -862,7 +862,6 @@ WRITE8_HANDLER( sms_mapper_w )
 	}
 }
 
-#ifdef MESS
 static WRITE8_HANDLER( sms_korean_zemina_banksw_w )
 {
 	sms_state *state = space->machine().driver_data<sms_state>();
@@ -935,7 +934,6 @@ static WRITE8_HANDLER( sms_codemasters_page1_w )
 		}
 	}
 }
-#endif
 
 static READ8_HANDLER( sms_kor_nobank_r )
 {
@@ -1664,7 +1662,6 @@ static void setup_cart_banks( running_machine &machine )
 	}
 }
 
-#ifdef MESS
 static void setup_banks( running_machine &machine )
 {
 	sms_state *state = machine.driver_data<sms_state>();
@@ -1696,7 +1693,6 @@ static void setup_banks( running_machine &machine )
 		state->m_banking_bios[5] = state->m_BIOS + ((2 < state->m_bios_page_count) ? 0x8000 : 0);
 	}
 }
-#endif
 
 MACHINE_START( sms )
 {
@@ -1721,7 +1717,6 @@ MACHINE_START( sms )
 	machine.scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 }
 
-#ifdef MESS
 MACHINE_RESET( sms )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
@@ -1785,7 +1780,6 @@ MACHINE_RESET( sms )
 
 	state->m_tvdraw_data = 0;
 }
-#endif
 
 READ8_HANDLER( sms_store_cart_select_r )
 {
