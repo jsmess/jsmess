@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE( vce_r, vce_w )
 	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE(C6280_TAG, c6280_r, c6280_w )
 	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE( h6280_timer_r, h6280_timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( mess_pce_joystick_r, mess_pce_joystick_w )
+	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( pce_joystick_r, pce_joystick_w )
 	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE( h6280_irq_status_r, h6280_irq_status_w )
 	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE( pce_cd_intf_r, pce_cd_intf_w )
 ADDRESS_MAP_END
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE( vce_r, vce_w )
 	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE(C6280_TAG, c6280_r, c6280_w )
 	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE( h6280_timer_r, h6280_timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( mess_pce_joystick_r, mess_pce_joystick_w )
+	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( pce_joystick_r, pce_joystick_w )
 	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE( h6280_irq_status_r, h6280_irq_status_w )
 	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE( pce_cd_intf_r, pce_cd_intf_w )
 ADDRESS_MAP_END
@@ -353,7 +353,7 @@ static MACHINE_CONFIG_START( pce_common, pce_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( pce )
-	MCFG_MACHINE_RESET( mess_pce )
+	MCFG_MACHINE_RESET( pce )
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -405,7 +405,7 @@ static MACHINE_CONFIG_START( sgx, pce_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( pce )
-	MCFG_MACHINE_RESET( mess_pce )
+	MCFG_MACHINE_RESET( pce )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -455,6 +455,6 @@ ROM_END
 #define rom_sgx rom_pce
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT    INIT   COMPANY  FULLNAME */
-CONS( 1987, pce,    0,      0,      pce,    pce,     mess_pce,   "Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND)
-CONS( 1989, tg16,   pce,    0,      tg16,   pce,     tg16,		 "Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND)
-CONS( 1989, sgx,    pce,    0,      sgx,    pce,     sgx,		 "Nippon Electronic Company", "SuperGrafx", GAME_IMPERFECT_SOUND)
+CONS( 1987, pce,    0,      0,      pce,    pce,     pce,   "Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND)
+CONS( 1989, tg16,   pce,    0,      tg16,   pce,     tg16,  "Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND)
+CONS( 1989, sgx,    pce,    0,      sgx,    pce,     sgx,   "Nippon Electronic Company", "SuperGrafx", GAME_IMPERFECT_SOUND)

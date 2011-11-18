@@ -164,7 +164,7 @@ apollo80
 d6800		// Dream 6800
 
 // Ensoniq
-enmirage // 1985 Mirage Digital Multi-Sampler
+mirage // 1985 Mirage Digital Multi-Sampler
 esq1	// 1986 ESQ-1 Digital Wave Synthesizer
 
 // Fairchild
@@ -935,7 +935,7 @@ pc9821v20
 pc9821xs
 
 // Cantab
-jupace   // Jupiter Ace
+ace   // Jupiter Ace
 
 // Sord
 m5
@@ -1943,7 +1943,7 @@ cd2650
 pipbug
 elektor
 instruct
-dolphunk
+dolphin
 chaos
 z80dev
 pegasus
@@ -1988,7 +1988,7 @@ casloopy
 fp1100
 fp6000
 tim011
-wmbullet
+bullet
 pc4
 pofo
 homez80

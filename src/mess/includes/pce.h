@@ -124,8 +124,8 @@ public:
 
 DEVICE_IMAGE_LOAD(pce_cart);
 NVRAM_HANDLER( pce );
-WRITE8_HANDLER ( mess_pce_joystick_w );
- READ8_HANDLER ( mess_pce_joystick_r );
+WRITE8_HANDLER ( pce_joystick_w );
+ READ8_HANDLER ( pce_joystick_r );
 
 extern const msm5205_interface pce_cd_msm5205_interface;
 WRITE8_HANDLER( pce_cd_bram_w );
@@ -136,11 +136,11 @@ READ8_HANDLER( pce_cd_acard_r );
 WRITE8_HANDLER( pce_cd_acard_wram_w );
 READ8_HANDLER( pce_cd_acard_wram_r );
 
-DRIVER_INIT( mess_pce );
+DRIVER_INIT( pce );
 DRIVER_INIT( tg16 );
 DRIVER_INIT( sgx );
 MACHINE_START( pce );
-MACHINE_RESET( mess_pce );
+MACHINE_RESET( pce );
 
 
 #endif /* PCE_H_ */

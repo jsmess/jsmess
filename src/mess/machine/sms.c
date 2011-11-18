@@ -1717,7 +1717,7 @@ MACHINE_START( sms )
 	machine.scheduler().timer_set(attotime::zero, FUNC(lightgun_tick));
 }
 
-MACHINE_RESET( segasms )
+MACHINE_RESET( sms )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	sms_state *state = machine.driver_data<sms_state>();
