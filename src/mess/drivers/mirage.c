@@ -251,12 +251,12 @@ MACHINE_CONFIG_END
 static INPUT_PORTS_START( mirage )
 INPUT_PORTS_END
 
-ROM_START( enmirage )
+ROM_START( mirage )
 	ROM_REGION(0x1000, "osrom", 0)
 	ROM_LOAD( "mirage.bin",   0x0000, 0x1000, CRC(9fc7553c) SHA1(ec6ea5613eeafd21d8f3a7431a35a6ff16eed56d) )
 
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE)
 ROM_END
 
-CONS( 1984, enmirage, 0, 0, mirage, mirage, 0, "Ensoniq", "Ensoniq Mirage", GAME_NOT_WORKING )
+CONS( 1984, mirage, 0, 0, mirage, mirage, 0, "Ensoniq", "Mirage", GAME_NOT_WORKING )
 

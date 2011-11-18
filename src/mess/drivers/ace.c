@@ -677,7 +677,7 @@ MACHINE_CONFIG_END
 //  ROM( ace )
 //-------------------------------------------------
 
-ROM_START( jupace )
+ROM_START( ace )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_LOAD( "rom-a.z1", 0x0000, 0x1000, CRC(dc8438a5) SHA1(8fa97eb71e5dd17c7d190c6587ee3840f839347c) )
 	ROM_LOAD( "rom-b.z2", 0x1000, 0x1000, CRC(4009f636) SHA1(98c5d4bcd74bcf014268cf4c00b2007ea5cc21f3) )
@@ -696,4 +696,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT     COMPANY         FULLNAME      FLAGS
-COMP( 1981, jupace,     0,        0,      ace,       ace,      0,   "Jupiter Cantab", "Jupiter Ace" , 0 )
+COMP( 1981, ace,     0,        0,      ace,       ace,      0,   "Jupiter Cantab", "Jupiter Ace" , 0 )
