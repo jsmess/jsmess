@@ -170,8 +170,6 @@ static QUICKLOAD_LOAD( lynx )
 	space->write_byte(0x1fc, start & 0xff);
 	space->write_byte(0x1fd, start >> 8);
 
-	lynx_crc_keyword((device_image_interface&)*image.device().machine().device("quickload"));
-
 	cpu_set_reg(cpu, STATE_GENPC, start);
 
 	return IMAGE_INIT_PASS;
