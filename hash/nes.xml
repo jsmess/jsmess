@@ -91,11 +91,16 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="horizontal" />
+			<feature name="pcb_model" value="NES-NROM-256-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="cart_back_label" value="" />
 			<dataarea name="prg" size="32768">
-				<rom name="nes-ty-0 prg" size="32768" crc="df58fc5a" sha1="7cc69b39ece2168574599d45ab8452edd4f5a3a1" offset="00000" />
+				<rom name="nes-ty-0 prg.u1" size="32768" crc="df58fc5a" sha1="7cc69b39ece2168574599d45ab8452edd4f5a3a1" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
-				<rom name="nes-ty-0 chr" size="8192" crc="2b8336ee" sha1="6b40a3b7ad6214abf9c35bcbf89d9c1da06f47a0" offset="00000" />
+				<rom name="nes-ty-0 chr.u2" size="8192" crc="2b8336ee" sha1="6b40a3b7ad6214abf9c35bcbf89d9c1da06f47a0" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2738,11 +2743,16 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC1" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="262144">
-				<rom name="nes-l2-0 prg" size="262144" crc="f2a6ace1" sha1="77b37fbb4dff83a2ff803e58e261849ee160c964" offset="00000" />
+				<rom name="nes-l2-0 prg.u1" size="262144" crc="f2a6ace1" sha1="77b37fbb4dff83a2ff803e58e261849ee160c964" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="nes-l2-0 chr" size="131072" crc="11683dca" sha1="d4646a114b02b08c93c8e87ac9d79758fa4e40e8" offset="00000" />
+				<rom name="nes-l2-0 chr.u2" size="131072" crc="11683dca" sha1="d4646a114b02b08c93c8e87ac9d79758fa4e40e8" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3106,8 +3116,14 @@
 		<publisher>Tradewest</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-AOROM" />
+			<feature name="pcb_model" value="NES-AOROM-03" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR RAM" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 HC161" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="262144">
-				<rom name="nes-8t-0 prg" size="262144" crc="279710dc" sha1="d85c9ff489672534fbf61a15f8fa56fff489a34b" offset="00000" />
+				<rom name="nes-8t-0 prg.u1" size="262144" crc="279710dc" sha1="d85c9ff489672534fbf61a15f8fa56fff489a34b" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -3662,8 +3678,14 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SGROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="pcb_model" value="NES-SGROM-03" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR RAM" />
+			<feature name="u3" value="U3 MMC1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="262144">
-				<rom name="nes-cm-0 prg" size="262144" crc="d2574720" sha1="c82e29639e2dffa2754149025c6784eb2587b09d" offset="00000" />
+				<rom name="nes-cm-0 prg.u1" size="262144" crc="d2574720" sha1="c82e29639e2dffa2754149025c6784eb2587b09d" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -4439,11 +4461,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SBROM" />
 			<feature name="mmc1_type" value="MMC1B1-H" />
+			<feature name="pcb_model" value="NES-SBROM-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 MMC1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="65536">
-				<rom name="nes-c1-0 prg" size="65536" crc="b10429aa" sha1="43609481c4453fee018abeda7ec832af5bb9c7b8" offset="00000" />
+				<rom name="nes-c1-0 prg.u1" size="65536" crc="b10429aa" sha1="43609481c4453fee018abeda7ec832af5bb9c7b8" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="nes-c1-0 chr" size="32768" crc="c4ce2887" sha1="d928f2b58084aa64aa8310eb05cbd2318c0cd82b" offset="00000" />
+				<rom name="nes-c1-0 chr.u2" size="32768" crc="c4ce2887" sha1="d928f2b58084aa64aa8310eb05cbd2318c0cd82b" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5090,11 +5118,16 @@
 		<publisher>Konami</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-ELROM" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 MMC5" />
+			<feature name="u6" value="U6 CIC" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="262144">
-				<rom name="nes-vn-0 prg" size="262144" crc="95ca9ec7" sha1="91a93f59a92955af2448a2f519ee254ce49c679d" offset="00000" />
+				<rom name="nes-vn-0 prg.u1" size="262144" crc="95ca9ec7" sha1="91a93f59a92955af2448a2f519ee254ce49c679d" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="nes-vn-0 chr" size="131072" crc="1b448e0a" sha1="0ce93c7e536ba5ef3b09d2255af093e95622dee2" offset="00000" />
+				<rom name="nes-vn-0 chr.u2" size="131072" crc="1b448e0a" sha1="0ce93c7e536ba5ef3b09d2255af093e95622dee2" offset="00000" />
 			</dataarea>
 			<!-- 1k Internal RAM in the MMC5 chip (ExRAM) -->
 			<dataarea name="mapper_ram" size="1024">
@@ -5439,11 +5472,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="pcb_model" value="NES-SLROM-06" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC1" />
+			<feature name="cart_back_label" value="NES-USA/CAN-1" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-dv-0 prg" size="131072" crc="2f97d456" sha1="cc9dcddc871036032d9ed6714f30ae8b2986b1f6" offset="00000" />
+				<rom name="nes-dv-0 prg.u1" size="131072" crc="2f97d456" sha1="cc9dcddc871036032d9ed6714f30ae8b2986b1f6" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="nes-dv-0 chr" size="131072" crc="a0c30578" sha1="c49107f8280c56fc3ac72d4e8c80e20b4ed4ad58" offset="00000" />
+				<rom name="nes-dv-0 chr.u2" size="131072" crc="a0c30578" sha1="c49107f8280c56fc3ac72d4e8c80e20b4ed4ad58" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5456,11 +5495,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="pcb_model" value="NES-SLROM-06" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC1" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-ru-0 prg" size="131072" crc="02931525" sha1="28ddca5d299e7894e3c3aa0a193684ca3e384ee9" offset="00000" />
+				<rom name="nes-ru-0 prg.u1" size="131072" crc="02931525" sha1="28ddca5d299e7894e3c3aa0a193684ca3e384ee9" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="nes-ru-0 chr" size="131072" crc="218d4224" sha1="37a729021173bec08a8497ad03fd58379b0fce39" offset="00000" />
+				<rom name="nes-ru-0 chr.u2" size="131072" crc="218d4224" sha1="37a729021173bec08a8497ad03fd58379b0fce39" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6319,11 +6364,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="NES-CNROM-06" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 HC161" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="32768">
-				<rom name="nes-yn-0 prg" size="32768" crc="34d5fc6e" sha1="2b2dacd2dd74a6be31dafad273fa4a34c5785fe7" offset="00000" />
+				<rom name="nes-yn-0 prg.u1" size="32768" crc="34d5fc6e" sha1="2b2dacd2dd74a6be31dafad273fa4a34c5785fe7" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="nes-yn-0 chr" size="32768" crc="89e13d77" sha1="3068209fb2641eab2a71ea71864af41ddeabb0fb" offset="00000" />
+				<rom name="nes-yn-0 chr.u2" size="32768" crc="89e13d77" sha1="3068209fb2641eab2a71ea71864af41ddeabb0fb" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6981,11 +7032,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="NES-CNROM-07" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 HC161" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="32768">
-				<rom name="nes-vw-0 prg" size="32768" crc="86cbc595" sha1="7927ea0047c314f3417dab3f639d40c46dc35ccb" offset="00000" />
+				<rom name="nes-vw-0 prg.u1" size="32768" crc="86cbc595" sha1="7927ea0047c314f3417dab3f639d40c46dc35ccb" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="nes-vw-0 chr" size="32768" crc="9c82f4e4" sha1="2887d4471f1d5bae4f28dd934c5d3ccb4d08ef0d" offset="00000" />
+				<rom name="nes-vw-0 chr.u2" size="32768" crc="9c82f4e4" sha1="2887d4471f1d5bae4f28dd934c5d3ccb4d08ef0d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7609,11 +7666,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="pcb_model" value="NES-SLROM-05" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC1" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-wd-0 prg" size="131072" crc="79149ebf" sha1="91b3b33a4e24d5dd1a5afa480b8c44fac503e926" offset="00000" />
+				<rom name="nes-wd-0 prg.u1" size="131072" crc="79149ebf" sha1="91b3b33a4e24d5dd1a5afa480b8c44fac503e926" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="nes-wd-0 chr" size="131072" crc="5ebe0fd0" sha1="4a948c9784433e051f1015a6b6e985a98b81b80d" offset="00000" />
+				<rom name="nes-wd-0 chr.u2" size="131072" crc="5ebe0fd0" sha1="4a948c9784433e051f1015a6b6e985a98b81b80d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8718,8 +8781,15 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="NES-UNROM-08" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR RAM" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 HC161" />
+			<feature name="u5" value="U5 HC32" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-uk-0 prg" size="131072" crc="efb09075" sha1="6e700e8f72f767918b096f6a5f17f8cd1e2d0866" offset="00000" />
+				<rom name="nes-uk-0 prg.u1" size="131072" crc="efb09075" sha1="6e700e8f72f767918b096f6a5f17f8cd1e2d0866" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -9190,12 +9260,18 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-128" /> <!-- also found with HVC-RROM, NES-NROM-128 pcb -->
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="NES-NROM-128-03" />
+			<!-- Alt pcb_models: NES-NROM-04 -->
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="32768">
-				<rom name="hvc-eb-0 prg" size="16384" crc="3a94fa0b" sha1="6239e91ccefdc017d233cbae388c6568a17ed04b" offset="00000" />
+				<rom name="hvc-eb-0 prg.u1" size="16384" crc="3a94fa0b" sha1="6239e91ccefdc017d233cbae388c6568a17ed04b" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
-				<rom name="hvc-eb-0 chr" size="8192" crc="e5f72401" sha1="a8bf028e1a62677e48e88cf421bb2a8051eb800c" offset="00000" />
+				<rom name="hvc-eb-0 chr.u2" size="8192" crc="e5f72401" sha1="a8bf028e1a62677e48e88cf421bb2a8051eb800c" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9281,11 +9357,16 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="COLORDREAMS-74*377" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="BC6" />
+			<feature name="u1" value="_PRG_" />
+			<feature name="u2" value="_CHR_" />
+			<feature name="u3" value="_LS377_" />
+			<feature name="u4" value="_7660_" />
 			<dataarea name="prg" size="131072">
-				<rom name="journey ver 4.0 prg." size="131072" crc="3ced963a" sha1="1b4152dcd6f75fbcc3e2336f4039dcb19299ae2e" offset="00000" />
+				<rom name="journey ver 4.0 prg.u1" size="131072" crc="3ced963a" sha1="1b4152dcd6f75fbcc3e2336f4039dcb19299ae2e" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="journey ver 4.0 vid." size="131072" crc="ab344905" sha1="fdfa0a231ad714adf966e4a612fa3fe4cce5ab0a" offset="00000" />
+				<rom name="journey ver 4.0 vid.u2" size="131072" crc="ab344905" sha1="fdfa0a231ad714adf966e4a612fa3fe4cce5ab0a" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9298,11 +9379,16 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="COLORDREAMS-74*377" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="BC5" />
+			<feature name="u1" value="_PRG_" />
+			<feature name="u2" value="_CHR_" />
+			<feature name="u3" value="_LS377_" />
+			<feature name="u4" value="_4051_" />
 			<dataarea name="prg" size="131072">
-				<rom name="0.prg" size="131072" crc="653f7cd2" sha1="19f3db18a0b8501b77b9b979667cb686efe5c8ca" offset="00000" />
+				<rom name="0.u1" size="131072" crc="653f7cd2" sha1="19f3db18a0b8501b77b9b979667cb686efe5c8ca" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="journey ver 4.0 vid." size="131072" crc="ab344905" sha1="fdfa0a231ad714adf966e4a612fa3fe4cce5ab0a" offset="00000" />
+				<rom name="journey ver 4.0 vid.u2" size="131072" crc="ab344905" sha1="fdfa0a231ad714adf966e4a612fa3fe4cce5ab0a" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11933,8 +12019,16 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="NES-UN-ROM-07" />
+			<!-- Alt pcb_models: NES-UN-ROM-04 (no back label code) -->
+			<feature name="u1" value="U1 PRG ROM" />
+			<feature name="u2" value="U2 CHR RAM" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 LS161N" />
+			<feature name="u5" value="U5 LS32" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-gg-0 prg" size="131072" crc="b4e4879e" sha1="ca03c76b65f0fe5b1d05149d7e9a97b4d5f44a27" offset="00000" />
+				<rom name="nes-gg-0 prg.u1" size="131072" crc="b4e4879e" sha1="ca03c76b65f0fe5b1d05149d7e9a97b4d5f44a27" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -14372,11 +14466,16 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="NES-NROM-256-03" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="32768">
-				<rom name="nes-hy-0 prg" size="32768" crc="82dff13d" sha1="4edbf555d319dfe1c2a08dc28f484d4344a228ba" offset="00000" />
+				<rom name="nes-hy-0 prg.u1" size="32768" crc="82dff13d" sha1="4edbf555d319dfe1c2a08dc28f484d4344a228ba" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
-				<rom name="nes-hy-0 chr" size="8192" crc="f10fc90a" sha1="1a2a657267de1f5bdf284d1b69ed7d4895dfb281" offset="00000" />
+				<rom name="nes-hy-0 chr.u2" size="8192" crc="f10fc90a" sha1="1a2a657267de1f5bdf284d1b69ed7d4895dfb281" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -14947,8 +15046,14 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-AOROM" />
+			<feature name="pcb_model" value="NES-AOROM-03" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR RAM" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 HC161" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="262144">
-				<rom name="nes-ir-0 prg" size="262144" crc="2328046e" sha1="03130f8464b3f4418427bf124eb15fbaeb86e09d" offset="00000" />
+				<rom name="nes-ir-0 prg.u1" size="262144" crc="2328046e" sha1="03130f8464b3f4418427bf124eb15fbaeb86e09d" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -15025,11 +15130,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
+			<feature name="pcb_model" value="NES-TLROM-03" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC3" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-w6-0 prg" size="131072" crc="ef0c9672" sha1="ec27ee3bd803bb8357e481dd77f2fe0ed3c593cd" offset="00000" />
+				<rom name="nes-w6-0 prg.u1" size="131072" crc="ef0c9672" sha1="ec27ee3bd803bb8357e481dd77f2fe0ed3c593cd" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="nes-w6-0 chr" size="131072" crc="230349c9" sha1="1527860f7c3005bc543696eaa72dd1a2c12a944c" offset="00000" />
+				<rom name="nes-w6-0 chr.u2" size="131072" crc="230349c9" sha1="1527860f7c3005bc543696eaa72dd1a2c12a944c" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17784,8 +17895,15 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="NES-UN-ROM-07" />
+			<feature name="u1" value="PRG ROM" />
+			<feature name="u2" value="CHR RAM" />
+			<feature name="u3" value="CIC" />
+			<feature name="u4" value="LS161N" />
+			<feature name="u5" value="LS32" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-le-0 prg" size="131072" crc="a2194cad" sha1="9035459e43d13fccc244fca0fdaea4ec335b34dc" offset="00000" />
+				<rom name="nes-le-0 prg.u1" size="131072" crc="a2194cad" sha1="9035459e43d13fccc244fca0fdaea4ec335b34dc" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -17971,8 +18089,15 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="NES-UNROM-09" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR RAM" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 HC161" />
+			<feature name="u5" value="U5 HC32" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-3u-0 prg" size="131072" crc="3be244ef" sha1="ea07509f4bdd45603f98126e66bf9f16291e7b4c" offset="00000" />
+				<rom name="nes-3u-0 prg.u1" size="131072" crc="3be244ef" sha1="ea07509f4bdd45603f98126e66bf9f16291e7b4c" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -18971,8 +19096,16 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="pcb_model" value="NES-SNROM-05" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR RAM" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC1" />
+			<feature name="u5" value="U5 W-RAM" />
+			<feature name="battery" value="BATT" />
+			<feature name="cart_back_label" value="NES-ZL871104" />
 			<dataarea name="prg" size="262144">
-				<rom name="nes-jm-0 prg" size="262144" crc="0d9f5bd1" sha1="8a8bbecc77fdf59826257754f357d38a7f825971" offset="00000" />
+				<rom name="nes-jm-0 prg.u1" size="262144" crc="0d9f5bd1" sha1="8a8bbecc77fdf59826257754f357d38a7f825971" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -19497,8 +19630,14 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SGROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="pcb_model" value="NES-SGROM-02" />
+			<feature name="ic1" value="PRG-ROM" />
+			<feature name="ic2" value="CHR-RAM" />
+			<feature name="ic3" value="MMC" />
+			<feature name="ic4" value="CIC" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="262144">
-				<rom name="nes-xr-0 prg" size="262144" crc="0fcfc04d" sha1="2ec08f9341003ded125458df8697ca5ef09d2209" offset="00000" />
+				<rom name="nes-xr-0 prg.ic1" size="262144" crc="0fcfc04d" sha1="2ec08f9341003ded125458df8697ca5ef09d2209" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -19531,11 +19670,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
+			<feature name="pcb_model" value="NES-TLROM-03" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC3" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="262144">
-				<rom name="nes-xu-0 prg" size="262144" crc="6b999aaf" sha1="5cb19c7cccf9dedb73dad69a39b047a24b1be50d" offset="00000" />
+				<rom name="nes-xu-0 prg.u1" size="262144" crc="6b999aaf" sha1="5cb19c7cccf9dedb73dad69a39b047a24b1be50d" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="nes-xu-0 chr" size="131072" crc="4028916e" sha1="f986f72ba5284129620d31c0779ac6d50638e6f1" offset="00000" />
+				<rom name="nes-xu-0 chr.u2" size="131072" crc="4028916e" sha1="f986f72ba5284129620d31c0779ac6d50638e6f1" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -19599,8 +19744,14 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TGROM" />
 			<feature name="mmc3_type" value="MMC3C" />
+			<feature name="pcb_model" value="NES-TGROM-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC3" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="524288">
-				<rom name="nes-4v-1 prg" size="524288" crc="18a2e74f" sha1="c70db279964e0f835427ca0a406d54a45ae7783a" offset="00000" />
+				<rom name="nes-4v-1 prg.u1" size="524288" crc="18a2e74f" sha1="c70db279964e0f835427ca0a406d54a45ae7783a" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -20199,8 +20350,13 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="CAMERICA-ALGN" />
 			<feature name="peripheral" value="aladdin" />
+			<feature name="pcb_model" value="ALGNV1-1" />
+			<feature name="u1_cart" value="U1 PRG" />
+			<feature name="u1_aladdin" value="U1 VRAM" />
+			<feature name="u2_aladdin" value="U2 CIC" />
+			<feature name="u3_aladdin" value="U3 MMC" />
 			<dataarea name="prg" size="262144">
-				<rom name="micro machine mmd27f" size="262144" crc="24ba12dd" sha1="c7fd43041fc139dc8440c95c28a0115dc79e2691" offset="00000" />
+				<rom name="micro machine mmd27f.u1" size="262144" crc="24ba12dd" sha1="c7fd43041fc139dc8440c95c28a0115dc79e2691" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -21353,8 +21509,14 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-AMROM" />
+			<feature name="pcb_model" value="NES-AMROM-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR-RAM" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 HC161" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-nq-0 prg" size="131072" crc="0537322a" sha1="40f7287b34a8b9a5729685a58c65df3078664db8" offset="00000" />
+				<rom name="nes-nq-0 prg.u1" size="131072" crc="0537322a" sha1="40f7287b34a8b9a5729685a58c65df3078664db8" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -21411,11 +21573,17 @@
 			<feature name="pcb" value="NES-TLSROM" />
 			<feature name="mmc3_type" value="MMC3B" />
 			<feature name="peripheral" value="4p_adapter" />
+			<feature name="pcb_model" value="NES-TLSROM-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC3" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-nb-0 prg" size="131072" crc="17f72ec8" sha1="204c1bc2d59b410d87a1728e128e059496673243" offset="00000" />
+				<rom name="nes-nb-0 prg.u1" size="131072" crc="17f72ec8" sha1="204c1bc2d59b410d87a1728e128e059496673243" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="nes-nb-0 chr" size="131072" crc="6e8cae8d" sha1="5a1c0c0d0b60bd09d7bbd33f96ef5fd39b3b3046" offset="00000" />
+				<rom name="nes-nb-0 chr.u2" size="131072" crc="6e8cae8d" sha1="5a1c0c0d0b60bd09d7bbd33f96ef5fd39b3b3046" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23476,12 +23644,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-128" /> <!-- also found with HVC-SROM, NES-NROM-128 -->
 			<feature name="mirroring" value="horizontal" />
+			<feature name="pcb_model" value="NES-NROM-128-04" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="32768">
-				<rom name="hvc-pn-0 prg" size="16384" crc="91d33e3c" sha1="607c5954e5c577ac78db3234987f8fe62f86f068" offset="00000" />
+				<rom name="hvc-pn-0 prg.u1" size="16384" crc="91d33e3c" sha1="607c5954e5c577ac78db3234987f8fe62f86f068" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
-				<rom name="hvc-pn-0 chr" size="8192" crc="f2a53b3d" sha1="0d2a521fd984c76cbf9b3cbd47e68c6ce4c6eeae" offset="00000" />
+				<rom name="hvc-pn-0 chr.u2" size="8192" crc="f2a53b3d" sha1="0d2a521fd984c76cbf9b3cbd47e68c6ce4c6eeae" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -24653,11 +24826,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SEROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="pcb_model" value="NES-SEROM-02 (SCDOROM)" />
+			<feature name="u1" value="U1 PRG-ROM" />
+			<feature name="u2" value="U2 CHR-ROM" />
+			<feature name="u3" value="U3 MMC1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="32768">
-				<rom name="nes-pm-1 prg" size="32768" crc="82cfde25" sha1="4eb9abe896e597f8ecabb4f044d8c4b545a51b11" offset="00000" />
+				<rom name="nes-pm-1 prg.u1" size="32768" crc="82cfde25" sha1="4eb9abe896e597f8ecabb4f044d8c4b545a51b11" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="nes-pm-0 chr" size="32768" crc="83c90d47" sha1="26917e1e016d2be0fa48d766d332779aae12b053" offset="00000" />
+				<rom name="nes-pm-0 chr.u2" size="32768" crc="83c90d47" sha1="26917e1e016d2be0fa48d766d332779aae12b053" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27982,11 +28161,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="pcb_model" value="NES-SLROM-06" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC1" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-q5-0 prg" size="131072" crc="f0df311e" sha1="67009f66696ff08bd912d063a4345f7df4cd7dcf" offset="00000" />
+				<rom name="nes-q5-0 prg.u1" size="131072" crc="f0df311e" sha1="67009f66696ff08bd912d063a4345f7df4cd7dcf" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="nes-q5-0 chr" size="131072" crc="3349cb80" sha1="0f3780b25ba491725a2db93de9d9e3c28d244eab" offset="00000" />
+				<rom name="nes-q5-0 chr.u2" size="131072" crc="3349cb80" sha1="0f3780b25ba491725a2db93de9d9e3c28d244eab" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28524,8 +28709,14 @@
 		<publisher>Tradewest</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-AOROM" />
+			<feature name="pcb_model" value="NES-AOROM-03" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR RAM" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 HC161" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="262144">
-				<rom name="nes-lj-0 prg" size="262144" crc="8111ba08" sha1="caa4d1ab710bd766f8505ef24f5702dac6e988af" offset="00000" />
+				<rom name="nes-lj-0 prg.u1" size="262144" crc="8111ba08" sha1="caa4d1ab710bd766f8505ef24f5702dac6e988af" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -29006,11 +29197,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
+			<feature name="pcb_model" value="NES-CN-ROM-256-05" />
+			<feature name="u1" value="PRG ROM" />
+			<feature name="u2" value="CHR ROM" />
+			<feature name="u3" value="CIC" />
+			<feature name="u4" value="LS161" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="32768">
-				<rom name="nes-hu-0 prg" size="32768" crc="fe2dab28" sha1="768e4267abf1e60353d16b34ecfc4c66f7665d4a" offset="00000" />
+				<rom name="nes-hu-0 prg.u1" size="32768" crc="fe2dab28" sha1="768e4267abf1e60353d16b34ecfc4c66f7665d4a" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="nes-hu-0 chr" size="32768" crc="b87c4d93" sha1="63f93397ff3f48465924b533ac87dde6d86d746a" offset="00000" />
+				<rom name="nes-hu-0 chr.u2" size="32768" crc="b87c4d93" sha1="63f93397ff3f48465924b533ac87dde6d86d746a" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -29481,11 +29678,18 @@
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-HKROM" />
+			<feature name="pcb_model" value="NES-HKROM-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC6" />
+			<feature name="battery" value="BATT" />
+			<feature name="cart_back_label" value="NES-ZL871104" />
 			<dataarea name="prg" size="262144">
-				<rom name="nes-oc-0 prg" size="262144" crc="beb88304" sha1="224d96bf55391c7e9b651eb4d6a8f06faf6e29da" offset="00000" />
+				<rom name="nes-oc-0 prg.u1" size="262144" crc="beb88304" sha1="224d96bf55391c7e9b651eb4d6a8f06faf6e29da" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
-				<rom name="nes-oc-0 chr" size="262144" crc="42236f71" sha1="a6038c0785be19c1215351e5f053272bf231b78f" offset="00000" />
+				<rom name="nes-oc-0 chr.u2" size="262144" crc="42236f71" sha1="a6038c0785be19c1215351e5f053272bf231b78f" offset="00000" />
 			</dataarea>
 			<!-- 1k Internal RAM (battery backed up) in the MMC6 chip -->
 			<dataarea name="mapper_bram" size="1024">
@@ -29966,11 +30170,16 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-256" /> <!-- also found with NES-NROM-256 pcb -->
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="NES-NROM-256-03" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="cart_back_label" value="" />
 			<dataarea name="prg" size="32768">
-				<rom name="hvc-sm-0 prg" size="32768" crc="5cf548d3" sha1="fefa1097449a3a11ebf8c6199e905996c5dc8fbd" offset="00000" />
+				<rom name="hvc-sm-0 prg.u1" size="32768" crc="5cf548d3" sha1="fefa1097449a3a11ebf8c6199e905996c5dc8fbd" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
-				<rom name="hvc-sm-0 chr" size="8192" crc="867b51ad" sha1="394badaf0b0bdd0ea279a1bca89a9d9ddc00b1b5" offset="00000" />
+				<rom name="hvc-sm-0 chr.u2" size="8192" crc="867b51ad" sha1="394badaf0b0bdd0ea279a1bca89a9d9ddc00b1b5" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -30001,11 +30210,17 @@
 			<feature name="pcb" value="NES-MHROM" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="zapper" />
+			<feature name="pcb_model" value="NES-MH" />
+			<feature name="u1" value="U1 512P" />
+			<feature name="u2" value="U2 128C" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 LS161" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="65536">
-				<rom name="nes-mh-0 prg" size="65536" crc="81069812" sha1="a557d61664bc5b4015a07a2d66e0651a86909aac" offset="00000" />
+				<rom name="nes-mh-0 prg.u1" size="65536" crc="81069812" sha1="a557d61664bc5b4015a07a2d66e0651a86909aac" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="16384">
-				<rom name="nes-mh-0 chr" size="16384" crc="7ecda8b3" sha1="a32c0819d1b6a6669dfa8b1aa1490d04d4c86f0a" offset="00000" />
+				<rom name="nes-mh-0 chr.u2" size="16384" crc="7ecda8b3" sha1="a32c0819d1b6a6669dfa8b1aa1490d04d4c86f0a" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -30207,11 +30422,18 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TSROM" />
 			<feature name="mmc3_type" value="MMC3B" />
+			<feature name="pcb_model" value="NES-TSROM-06" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC3" />
+			<feature name="u5" value="U5 W-RAM" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="262144">
-				<rom name="nes-um-0 prg" size="262144" crc="c78d17d3" sha1="7e54f2a2ee6af721cb57ba4dc39c388b06533594" offset="00000" />
+				<rom name="nes-um-0 prg.u1" size="262144" crc="c78d17d3" sha1="7e54f2a2ee6af721cb57ba4dc39c388b06533594" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="nes-um-0 chr" size="131072" crc="c2928c49" sha1="2697d1f21b72a6d8e7d2a2d2c51c9c5550f68b56" offset="00000" />
+				<rom name="nes-um-0 chr.u2" size="131072" crc="c2928c49" sha1="2697d1f21b72a6d8e7d2a2d2c51c9c5550f68b56" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -30227,11 +30449,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TSROM" />
 			<feature name="mmc3_type" value="MMC3B" />
+			<feature name="pcb_model" value="NES-TSROM-07" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC3" />
+			<feature name="u5" value="U5 W-RAM" />
 			<dataarea name="prg" size="262144">
-				<rom name="nes-um-1 prg" size="262144" crc="a0ed7d20" sha1="46a9acfc0b2f7c891a90a104d0ea803f96330ced" offset="00000" />
+				<rom name="nes-um-1 prg.u1" size="262144" crc="a0ed7d20" sha1="46a9acfc0b2f7c891a90a104d0ea803f96330ced" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="nes-um-0 chr" size="131072" crc="c2928c49" sha1="2697d1f21b72a6d8e7d2a2d2c51c9c5550f68b56" offset="00000" />
+				<rom name="nes-um-0 chr.u2" size="131072" crc="c2928c49" sha1="2697d1f21b72a6d8e7d2a2d2c51c9c5550f68b56" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -31705,13 +31933,21 @@
 		<year>1989</year>
 		<publisher>Ultra Games</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="KONAMI-SLROM" /> <!-- also found with NES-SLROM pcb -->
+			<feature name="pcb" value="KONAMI-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="pcb_model" value="351908" />
+			<!-- Alt pcb_models: NES-SLROM-05 (with no U5) -->
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC1" />
+			<feature name="u5" value="U5 HC32" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-u2-0 prg" size="131072" crc="0ccd28d5" sha1="05606cafba838eeb36198b5e5e9d11c3729971b3" offset="00000" /> <!-- alt label rd019n2p -->
+				<rom name="nes-u2-0 prg.u1" size="131072" crc="0ccd28d5" sha1="05606cafba838eeb36198b5e5e9d11c3729971b3" offset="00000" /> <!-- alt label rd019n2p -->
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="nes-u2-0 chr" size="131072" crc="91f01f53" sha1="171ed0792f3ca3f195145000d96b91aa57898773" offset="00000" /> <!-- alt label rd019n0c -->
+				<rom name="nes-u2-0 chr.u2" size="131072" crc="91f01f53" sha1="171ed0792f3ca3f195145000d96b91aa57898773" offset="00000" /> <!-- alt label rd019n0c -->
 			</dataarea>
 		</part>
 	</software>
@@ -32305,11 +32541,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
+			<feature name="pcb_model" value="NES-CN-ROM-256-04" />
+			<feature name="u1" value="PRG ROM" />
+			<feature name="u2" value="CHR ROM" />
+			<feature name="u3" value="CIC" />
+			<feature name="u4" value="LS161" />
+			<feature name="cart_back_label" value="" />
 			<dataarea name="prg" size="32768">
-				<rom name="nes-ti-0 prg" size="32768" crc="ddf29542" sha1="b80b4bf8a0771cd0184af91c583dfa8a8affeca2" offset="00000" />
+				<rom name="nes-ti-0 prg.u1" size="32768" crc="ddf29542" sha1="b80b4bf8a0771cd0184af91c583dfa8a8affeca2" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="nes-ti-0 chr" size="32768" crc="e1daa15c" sha1="3a81d05fed3015eb8fd0ceacefd6fe2445c786fe" offset="00000" />
+				<rom name="nes-ti-0 chr.u2" size="32768" crc="e1daa15c" sha1="3a81d05fed3015eb8fd0ceacefd6fe2445c786fe" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -33237,8 +33479,15 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="NES-UNROM-09" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR RAM" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 HC161" />
+			<feature name="u5" value="U5 HC32" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-4a-0 prg" size="131072" crc="ee6892eb" sha1="29ca7cc398b855472c9d94e7581be8288468382b" offset="00000" />
+				<rom name="nes-4a-0 prg.u1" size="131072" crc="ee6892eb" sha1="29ca7cc398b855472c9d94e7581be8288468382b" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -34026,8 +34275,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CPROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="NES-CPROM-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR-RAM" />
+			<feature name="u3" value="U3 CHR-RAM" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="u5" value="U5 _HC161_" />
+			<feature name="u6" value="U6 _HC08_" />
+			<feature name="u7" value="U7 _HC04_" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="32768">
-				<rom name="nes-v8-0 prg" size="32768" crc="5e66eaea" sha1="3e24edd8c06713b775eaa66f3468f71693a542a9" offset="00000" />
+				<rom name="nes-v8-0 prg.u1" size="32768" crc="5e66eaea" sha1="3e24edd8c06713b775eaa66f3468f71693a542a9" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -34100,11 +34358,16 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="pcb_model" value="NES-NROM-256-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="cart_back_label" value="" />
 			<dataarea name="prg" size="32768">
-				<rom name="nes-vb-0 prg" size="32768" crc="0a2490af" sha1="3cc766a7c760ec394ec43a4414718022cf9d99ce" offset="00000" />
+				<rom name="nes-vb-0 prg.u1" size="32768" crc="0a2490af" sha1="3cc766a7c760ec394ec43a4414718022cf9d99ce" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
-				<rom name="nes-vb-0 chr" size="8192" crc="2415dce2" sha1="fd89b4a542989a89c2d0467257dca57518bfa96b" offset="00000" />
+				<rom name="nes-vb-0 chr.u2" size="8192" crc="2415dce2" sha1="fd89b4a542989a89c2d0467257dca57518bfa96b" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -34183,8 +34446,15 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-ANROM" />
+			<feature name="pcb_model" value="NES-ANROM-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR RAM" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 HC161" />
+			<feature name="u5" value="U5 HC02" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-hn-0 prg" size="131072" crc="37138039" sha1="d55e8202929d922a84122921ef5c9671135b3e77" offset="00000" />
+				<rom name="nes-hn-0 prg.u1" size="131072" crc="37138039" sha1="d55e8202929d922a84122921ef5c9671135b3e77" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -34620,8 +34890,14 @@
 		<publisher>GameTek</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-AOROM" />
+			<feature name="pcb_model" value="NES-AOROM-03" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR RAM" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 HC161" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-y6-0 prg" size="131072" crc="4220c170" sha1="a5c723f5b532623dcecbf5195acdd822f093d1e2" offset="00000" />
+				<rom name="nes-y6-0 prg.u1" size="131072" crc="4220c170" sha1="a5c723f5b532623dcecbf5195acdd822f093d1e2" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -35035,8 +35311,15 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-ANROM" />
+			<feature name="pcb_model" value="NES-ANROM-01" />
+			<feature name="u1" value="PRG" />
+			<feature name="u2" value="CHR-RAM" />
+			<feature name="u3" value="CIC" />
+			<feature name="u4" value="HC161" />
+			<feature name="u5" value="HC02" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-ww-0 prg" size="131072" crc="505f9715" sha1="0305a626acdc6523ff168725c402c6f81ec5b106" offset="00000" />
+				<rom name="nes-ww-0 prg.u1" size="131072" crc="505f9715" sha1="0305a626acdc6523ff168725c402c6f81ec5b106" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -35520,11 +35803,17 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="pcb_model" value="NES-SLROM-06" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 CHR" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 MMC1" />
+			<feature name="cart_back_label" value="REV-A" />
 			<dataarea name="prg" size="131072">
-				<rom name="nes-yc-0 prg" size="131072" crc="4affeee7" sha1="54da2aa7ca56d9b593c8bcabf0bb1d701439013d" offset="00000" />
+				<rom name="nes-yc-0 prg.u1" size="131072" crc="4affeee7" sha1="54da2aa7ca56d9b593c8bcabf0bb1d701439013d" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="nes-yc-0 chr" size="131072" crc="868f7343" sha1="acb6f6eb9e8beb0636c59a999c8f5920ef7786a3" offset="00000" />
+				<rom name="nes-yc-0 chr.u2" size="131072" crc="868f7343" sha1="acb6f6eb9e8beb0636c59a999c8f5920ef7786a3" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
