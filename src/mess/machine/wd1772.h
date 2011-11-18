@@ -4,14 +4,20 @@
 #include "emu.h"
 #include "imagedev/floppy.h"
 
+#define MCFG_WD1770x_ADD(_tag, _clock)	\
+	MCFG_DEVICE_ADD(_tag, WD1770x, _clock)
+
 #define MCFG_WD1772x_ADD(_tag, _clock)	\
 	MCFG_DEVICE_ADD(_tag, WD1772x, _clock)
 
-class wd1772_t : public device_t {
+#define MCFG_WD1773x_ADD(_tag, _clock)	\
+	MCFG_DEVICE_ADD(_tag, WD1773x, _clock)
+
+class wd177x_t : public device_t {
 public:
 	typedef delegate<void (bool state)> line_cb;
 
-	wd1772_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wd177x_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	void dden_w(bool dden);
 	void set_floppy(floppy_image_device *floppy);
@@ -43,6 +49,11 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	virtual bool has_motor() const = 0;
+	virtual bool has_side_check() const;
+	virtual int step_time(int mode) const;
+	virtual int settle_time() const;
 
 private:
 	enum { TM_GEN, TM_CMD, TM_TRACK, TM_SECTOR };
@@ -200,8 +211,6 @@ private:
 		S_MON  = 0x80
 	};
 
-	const static int step_times[4];
-
 	floppy_image_device *floppy;
 
 	emu_timer *t_gen, *t_cmd, *t_track, *t_sector;
@@ -257,6 +266,7 @@ private:
 
 	void spinup();
 	void index_callback(floppy_image_device *floppy, int state);
+	bool sector_matches() const;
 
 	void live_start(int live_state);
 	void live_abort();
@@ -275,6 +285,35 @@ private:
 	void set_drq();
 };
 
+class wd1770_t : public wd177x_t {
+public:
+	wd1770_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual bool has_motor() const;
+};
+
+class wd1772_t : public wd177x_t {
+public:
+	wd1772_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual bool has_motor() const;
+	virtual int step_time(int mode) const;
+	virtual int settle_time() const;
+};
+
+class wd1773_t : public wd177x_t {
+public:
+	wd1773_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual bool has_motor() const;
+	virtual bool has_side_check() const;
+};
+
+extern const device_type WD1770x;
 extern const device_type WD1772x;
+extern const device_type WD1773x;
 
 #endif
