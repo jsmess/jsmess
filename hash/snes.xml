@@ -51606,12 +51606,12 @@ Alternate board (XL-1)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="tamori_no_picross_6-13.bs" size="1048576" crc="c155ecc7" sha1="30260a38b1403c117274f89373094a00cfe0e952" offset="0x000000" />
+				<rom name="tamori_no_picross_6-26.bs" size="1048576" crc="c155ecc7" sha1="30260a38b1403c117274f89373094a00cfe0e952" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="bstamopc1" cloneof="bstamopc1" supported="no">
+	<software name="bstamopc1" cloneof="bstamopc" supported="no">
 		<!-- Serial:  - Release Date:  -->
 		<description>Tamori no Picross (Jpn, 0613)</description>
 		<!-- BS -->
@@ -52141,7 +52141,7 @@ Alternate board (XL-1)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bass tournament 4 (incomplete).bs" size="1048576" crc="9ea79162" sha1="1dcea52ea7e358c9d8b628b6f7f352c8e96daa61" offset="0x000000" status="baddump" />
+				<rom name="bass tournament 4 (incomplete).bs" size="1048576" crc="ccefbd30" sha1="413ee71e3301a958c6998f907460ec95cd20b666" offset="0x000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -52736,7 +52736,7 @@ Alternate board (XL-1)
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="street fighter iii - super version 12 players (unl).sfc" size="2097152" crc="c0b3cc03" sha1="fec468abab9e9cc7d9c12a33172820e9645a2329" offset="0x000000" />
+				<rom name="street fighter iii - super version 12 players (unl).sfc" size="2097152" crc="ddff8ce8" sha1="e111dc69b5eec494044d1159d359decf9b01cb6a" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
