@@ -25,6 +25,7 @@
 
 // standard includes
 
+
 #ifdef SDLMAME_OS2
 #define INCL_DOS
 #include <os2.h>
