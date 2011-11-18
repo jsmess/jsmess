@@ -536,7 +536,7 @@ static ADDRESS_MAP_START( einstein_io, AS_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN(IC_I060, i8251_device, data_r, data_w)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN(IC_I060, i8251_device, status_r, control_w)
 	/* block 3, wd1770 floppy controller */
-	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff04) AM_DEVREADWRITE_MODERN(IC_I042, wd1772_t, read, write)
+	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff04) AM_DEVREADWRITE_MODERN(IC_I042, wd177x_t, read, write)
 	/* block 4, internal controls */
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_READWRITE(einstein_kybintmsk_r, einstein_kybintmsk_w)
 	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_WRITE(einstein_adcintmsk_w)
@@ -826,7 +826,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	/* uart */
 	MCFG_I8251_ADD(IC_I060, default_i8251_interface)
 
-	MCFG_WD1772x_ADD(IC_I042, XTAL_X002)
+	MCFG_WD1770x_ADD(IC_I042, XTAL_X002)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
