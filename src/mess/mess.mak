@@ -7,33 +7,6 @@
 ###########################################################################
 
 
-
-###########################################################################
-#################   BEGIN USER-CONFIGURABLE OPTIONS   #####################
-###########################################################################
-
-# uncomment next line to build imgtool
-BUILD_IMGTOOL = 1
-
-# uncomment next line to build castool
-BUILD_CASTOOL = 1
-
-# uncomment next line to build wimgtool
-BUILD_WIMGTOOL = 1
-
-# uncomment next line to build messtest
-BUILD_MESSTEST = 1
-
-# uncomment next line to build dat2html
-BUILD_DAT2HTML = 1
-
-
-###########################################################################
-##################   END USER-CONFIGURABLE OPTIONS   ######################
-###########################################################################
-
-
-
 # include MESS core defines
 include $(SRC)/mess/messcore.mak
 
@@ -421,11 +394,7 @@ DRVLIBS += \
 	$(MESSOBJ)/zpa.a \
 	$(MESSOBJ)/zvt.a \
 	$(MESSOBJ)/shared.a \
-
-ifeq ($(TARGET),mess)
-DRVLIBS += \
 	$(MESSOBJ)/mame.a
-endif
 
 #-------------------------------------------------
 # the following files are MAME components and

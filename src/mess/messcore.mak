@@ -11,10 +11,6 @@
 # MESS core defines
 #-------------------------------------------------
 
-ifeq ($(TARGET),mess)
-DEFS += -DMESS
-endif
-
 # add some additional include libraries for the mame files
 INCPATH += \
 	-I$(SRC)/mame \
