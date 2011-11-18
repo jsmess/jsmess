@@ -13,13 +13,8 @@
 #
 ###########################################################################
 
-# disable messui for tiny build
-MESSUI = 0
-
 # include MESS core defines
 include $(SRC)/mess/messcore.mak
-include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
-
 
 #-------------------------------------------------
 # Specify all the CPU cores necessary for the
