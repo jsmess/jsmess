@@ -149,7 +149,7 @@ DEVICE_START( sms_cart );
 DEVICE_IMAGE_LOAD( sms_cart );
 
 MACHINE_START( sms );
-MACHINE_RESET( sms );
+MACHINE_RESET( segasms );
 
 READ8_HANDLER( sms_store_cart_select_r );
 WRITE8_HANDLER( sms_store_cart_select_w );

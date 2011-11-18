@@ -164,7 +164,7 @@ apollo80
 d6800		// Dream 6800
 
 // Ensoniq
-mirage // 1985 Mirage Digital Multi-Sampler
+enmirage // 1985 Mirage Digital Multi-Sampler
 esq1	// 1986 ESQ-1 Digital Wave Synthesizer
 
 // Fairchild
@@ -935,7 +935,7 @@ pc9821v20
 pc9821xs
 
 // Cantab
-ace   // Jupiter Ace
+jupace   // Jupiter Ace
 
 // Sord
 m5
@@ -1681,9 +1681,9 @@ prof181x
 
 //***************Games******************************************************
 // Computer Electronic
-mk1	   // Chess Champion MK I
+ccmk1	   // Chess Champion MK I
 // Quelle International
-mk2	   // Chess Champion MK II
+ccmk2	   // Chess Champion MK II
 
 // Novag
 ssystem3  // Chess Champion Super System III / MK III
@@ -1943,7 +1943,7 @@ cd2650
 pipbug
 elektor
 instruct
-dolphin
+dolphunk
 chaos
 z80dev
 pegasus
@@ -1988,7 +1988,7 @@ casloopy
 fp1100
 fp6000
 tim011
-bullet
+wmbullet
 pc4
 pofo
 homez80

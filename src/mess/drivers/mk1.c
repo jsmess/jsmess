@@ -197,7 +197,7 @@ static MACHINE_CONFIG_START( mk1, mk1_state )
 MACHINE_CONFIG_END
 
 
-ROM_START( mk1 )
+ROM_START( ccmk1 )
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("82c210-1", 0x0000, 0x800, CRC(278f7bf3) SHA1(b384c95ba691d52dfdddd35987a71e9746a46170))
 ROM_END
@@ -211,4 +211,4 @@ ROM_END
 
 // seams to be developed by mostek (MK)
 /*    YEAR   NAME  PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                 FULLNAME */
-CONS( 1979,  mk1,  0,      0,      mk1,    mk1,    0,   "Computer Electronic", "Chess Champion MK I", GAME_NO_SOUND_HW )
+CONS( 1979,  ccmk1,  0,      0,      mk1,    mk1,    0,   "Computer Electronic", "Chess Champion MK I", GAME_NO_SOUND_HW )

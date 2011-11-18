@@ -212,7 +212,7 @@ static MACHINE_CONFIG_START( mk2, mk2_state )
 MACHINE_CONFIG_END
 
 
-ROM_START(mk2)
+ROM_START(ccmk2)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("024_1879", 0x0c00, 0x0400, CRC(4f28c443) SHA1(e33f8b7f38e54d7a6e0f0763f2328cc12cb0eade))
 	ROM_LOAD("005_2179", 0x1000, 0x1000, CRC(6f10991b) SHA1(90cdc5a15d9ad813ad20410f21081c6e3e481812)) // chess mate 7.5
@@ -226,5 +226,5 @@ ROM_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY               FULLNAME */
-CONS( 1979, mk2,    0,      0,      mk2,    mk2,    0, "Quelle International", "Chess Champion MK II", 0)
+CONS( 1979, ccmk2,    0,      0,      mk2,    mk2,    0, "Quelle International", "Chess Champion MK II", 0)
 // second design sold (same computer/program?)

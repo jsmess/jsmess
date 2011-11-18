@@ -323,10 +323,6 @@ static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-int atari_input_disabled(running_machine &machine)
-{
-	return 0;
-}
 
 /**************************************************************
  *
