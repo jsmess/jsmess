@@ -2396,8 +2396,6 @@ SCREEN_EOF( amstrad )
 	{
 		mface2->check_button_state();
 	}
-	else
-		printf("Cannot get multiface2 device\n");
 }
 
 
