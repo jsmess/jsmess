@@ -741,7 +741,7 @@ MACHINE_CONFIG_END
 //  ROM( bullet )
 //-------------------------------------------------
 
-ROM_START( bullet )
+ROM_START( wmbullet )
     ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "sr70x.u8", 0x0000, 0x0020, CRC(d54b8a30) SHA1(65ff8753dd63c9dd1899bc9364a016225585d050) )
 ROM_END
@@ -753,5 +753,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME                FLAGS
-COMP( 1982, bullet,		0,			0,		bullet,		bullet,		0,		"Wave Mate",	"Bullet",				GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-//COMP( 1982, bullete,  bullet,     0,      bullet,     bullet,     0,      "Wave Mate",    "Bullet (Revision E)",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1982, wmbullet,		0,			0,		bullet,		bullet,		0,		"Wave Mate",	"Bullet",				GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+//COMP( 1982, wmbullete,  bullet,     0,      bullet,     bullet,     0,      "Wave Mate",    "Bullet (Revision E)",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )

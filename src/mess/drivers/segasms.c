@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( sms_ntsc_base, sms_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(sms)
-	MCFG_MACHINE_RESET(sms)
+	MCFG_MACHINE_RESET(segasms)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -515,7 +515,7 @@ static MACHINE_CONFIG_START( sms_pal_base, sms_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(sms)
-	MCFG_MACHINE_RESET(sms)
+	MCFG_MACHINE_RESET(segasms)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -599,7 +599,7 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(sms)
-	MCFG_MACHINE_RESET(sms)
+	MCFG_MACHINE_RESET(segasms)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
