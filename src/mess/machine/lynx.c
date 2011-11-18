@@ -5,7 +5,6 @@
 #include "emu.h"
 #include "includes/lynx.h"
 #include "cpu/m6502/m6502.h"
-#include "hashfile.h"
 #include "imagedev/cartslot.h"
 #include "hash.h"
 
@@ -1819,23 +1818,6 @@ int lynx_verify_cart (char *header, int kind)
 	return IMAGE_VERIFY_PASS;
 }
 
-void lynx_crc_keyword(device_image_interface &image)
-{
-	lynx_state *state = image.device().machine().driver_data<lynx_state>();
-	const char *info = NULL;
-
-	info = hashfile_extrainfo(image);
-
-	state->m_rotate = 0;
-	if (info)
-	{
-		if(strcmp(info, "ROTATE90DEGREE") == 0)
-			state->m_rotate = 1;
-		else if (strcmp(info, "ROTATE270DEGREE") == 0)
-			state->m_rotate = 2;
-	}
-}
-
 static DEVICE_IMAGE_LOAD( lynx_cart )
 {
 	/* Lynx carts have 19 address lines, the upper 8 used for bank select. The lower
@@ -1895,8 +1877,6 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 
 		if (image.fread( rom, size) != size)
 			return IMAGE_INIT_FAIL;
-
-		lynx_crc_keyword(image);
 	}
 	else
 	{
