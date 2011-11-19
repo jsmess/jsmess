@@ -5,7 +5,7 @@
 <softwarelist name="intvecs" description="Intellivision ecs cartridges">
 		
 	<software name="jetsons">
-		<description>Jetsons, The - Ways With Words</description>
+		<description>The Jetsons - Ways With Words</description>
 		<year>1983</year>
 		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4543"/>

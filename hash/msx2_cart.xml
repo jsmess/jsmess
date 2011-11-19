@@ -15,7 +15,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="eidolon">
 		<!-- アイドロン -->
-		<description>Eidolon, The</description>
+		<description>The Eidolon</description>
 		<year>1985</year>
 		<publisher>Lucasfilm</publisher>
 		<part name="cart" interface="msx_cart">
@@ -416,7 +416,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<software name="cockpit">
 		<!-- ザ・コックピット -->
-		<description>Cockpit, The</description>
+		<description>The Cockpit</description>
 		<year>1987</year>
 		<publisher>Nidecom</publisher>
 		<part name="cart" interface="msx_cart">
