@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="megacd" description="Mega CD (Euro) Software list">
+<softwarelist name="megacd" description="Mega CD (Euro) CD-ROM list">
 
 <!--
   MegaCD currently won't recognize discs, so compatibility is unknown..

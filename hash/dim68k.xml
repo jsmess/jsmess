@@ -7,7 +7,7 @@ CP/M-68K Release 1.03: Disk: 2 (maybe others)
 CP/M-68K Release 1.04: Disks: All (maybe others)
 -->
 
-<softwarelist name="dim68k_flop" description="Dimension 68000 Disks">
+<softwarelist name="dim68k" description="Dimension 68000 Disks">
 
 	<software name="cpm121">
 		<description>CP/M-68K Release 1.21</description>
