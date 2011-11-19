@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="astrocde" description="Bally Professional Arcade cartridges">
+
 	<software name="280zzap">
 		<description>280 Zzzap / Dodgem</description>
 		<year>1978</year>
@@ -13,7 +14,7 @@
 	</software>
 
 	<software name="hardday">
-		<description>A Hard Day's Night (Proto)</description>
+		<description>A Hard Day's Night (Prototype)</description>
 		<year>1986</year>
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -24,7 +25,7 @@
 	</software>
 
 	<software name="adssm">
-		<description>ADS System Monitor (Proto)</description>
+		<description>ADS System Monitor (Prototype)</description>
 <!-- <note>This prototype was found in the collection of Arcadian editor Bob Fabris.</note> -->
 		<year>19??</year>
 		<publisher>Larry Hanson</publisher>
@@ -140,7 +141,7 @@
 	</software>
 
 	<software name="colorbas">
-		<description>Bally Color BASIC (Proto)</description>
+		<description>Bally Color BASIC (Prototype)</description>
 <!-- <note>This prototype comes from the collection of Arcadian editor Bob Fabris. While the name Color BASIC was sometimes used to refer to what eventually became Hot Rod Bally BASIC by Jay Fenton (eventually sold on tape in limited quantities), this appears to be an unrelated modification of Bally BASIC by Larry Hanson. Support for the 300 baud interface isn't fully enabled in this version.</note> -->
 		<year>19??</year>
 		<publisher>Larry Hanson and Bally Mfg. Corp.</publisher>
@@ -244,7 +245,7 @@
 	</software>
 
 	<software name="bowling">
-		<description>Bowling (Proto)</description>
+		<description>Bowling (Prototype)</description>
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -266,7 +267,7 @@
 	</software>
 
 	<software name="buylove">
-		<description>Can't Buy Me Love (Proto)</description>
+		<description>Can't Buy Me Love (Prototype)</description>
 		<year>1986</year>
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -289,7 +290,7 @@
 	</software>
 
 	<software name="checkers">
-		<description>Checkers (Proto)</description>
+		<description>Checkers (Prototype)</description>
 		<year>19??</year>
 		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -336,7 +337,7 @@
 	</software>
 
 	<software name="colbook">
-		<description>Coloring Book (Proto)</description>
+		<description>Coloring Book (Prototype)</description>
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -358,8 +359,8 @@
 		</part>
 	</software>
 
-	<software name="conanp">
-		<description>Conan The Barbarian! (Proto)</description>
+	<software name="conanp" cloneof="conan">
+		<description>Conan The Barbarian! (Prototype)</description>
 		<year>1982</year>
 		<publisher>Astrocade Inc.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -392,8 +393,8 @@
 		</part>
 	</software>
 
-	<software name="cosmicra">
-		<description>Cosmic Raiders (Proto)[a]</description>
+	<software name="cosmicrda" cloneof="cosmicrd">
+		<description>Cosmic Raiders (Proto, Alt)</description>
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -403,8 +404,8 @@
 		</part>
 	</software>
 
-	<software name="cosmica2">
-		<description>Cosmic Raiders (Proto)[a2]</description>
+	<software name="cosmicrdb" cloneof="cosmicrd">
+		<description>Cosmic Raiders (Proto, Alt 2)</description>
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -414,8 +415,8 @@
 		</part>
 	</software>
 
-	<software name="cosmic35">
-		<description>Cosmic Raiders v3.5 (Proto)</description>
+	<software name="cosmicrd35" cloneof="cosmicrd">
+		<description>Cosmic Raiders (Proto v3.5)</description>
 <!-- <note>An identical ROM was dumped from a cart labeled version 2.8.</note> -->
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
@@ -426,8 +427,8 @@
 		</part>
 	</software>
 
-	<software name="cosmic36">
-		<description>Cosmic Raiders v3.6 (Proto)</description>
+	<software name="cosmicrd36" cloneof="cosmicrd">
+		<description>Cosmic Raiders (Proto v3.6)</description>
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -460,7 +461,7 @@
 	</software>
 
 	<software name="eightday">
-		<description>Eight Days A Week (Proto)</description>
+		<description>Eight Days A Week (Prototype)</description>
 		<year>1986</year>
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -470,8 +471,8 @@
 		</part>
 	</software>
 
-	<software name="fawn1">
-		<description>Fawn Dungeon (Proto)[1'st Version]</description>
+	<software name="fawn">
+		<description>Fawn Dungeon (Prototype)</description>
 <!-- <note>Barry McCleave sent two prototype versions of this game to Arcadian editor Bob Fabris, but it was never completed.</note> -->
 		<year>1981</year>
 		<publisher>Barry McCleave</publisher>
@@ -482,8 +483,8 @@
 		</part>
 	</software>
 
-	<software name="fawn2">
-		<description>Fawn Dungeon (Proto)[2'nd Version]</description>
+	<software name="fawna" cloneof="fawn">
+		<description>Fawn Dungeon (Prototype, Alt)</description>
 <!-- <note>Barry McCleave sent two prototype versions of this game to Arcadian editor Bob Fabris, but it was never completed.</note> -->
 		<year>1981</year>
 		<publisher>Barry McCleave</publisher>
@@ -518,7 +519,7 @@
 	</software>
 
 	<software name="ziggyjx">
-		<description>Fun With Vectors - Ziggy (JX label) (Proto)</description>
+		<description>Fun With Vectors - Ziggy (JX label) (Prototype)</description>
 <!-- <note>This demo comes from a collection of old ROMs released by Richard Degler.</note> -->
 		<year>1985</year>
 		<publisher>Richard Degler</publisher>
@@ -530,7 +531,7 @@
 	</software>
 
 	<software name="ziggymo">
-		<description>Fun With Vectors - Ziggy (MO label) (Proto)</description>
+		<description>Fun With Vectors - Ziggy (MO label) (Prototype)</description>
 <!-- <note>This demo comes from a collection of old ROMs released by Richard Degler.</note> -->
 		<year>1985</year>
 		<publisher>Richard Degler</publisher>
@@ -587,7 +588,7 @@
 	</software>
 
 	<software name="feelfine">
-		<description>I Feel Fine (Proto)</description>
+		<description>I Feel Fine (Prototype)</description>
 		<year>1986</year>
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -609,8 +610,8 @@
 		</part>
 	</software>
 
-	<software name="icbmatkp">
-		<description>ICBM Attack (Proto)</description>
+	<software name="icbmatkp" cloneof="icbmatk">
+		<description>ICBM Attack (Prototype)</description>
 		<!-- <note>Designed for Spectre controller.  This prototype actually does have a garbled title screen.  Press the player 2 trigger to start the game.</note> -->
 		<year>1982</year>
 		<publisher>Spectre Systems</publisher>
@@ -622,7 +623,7 @@
 	</software>
 
 	<software name="letitbe">
-		<description>Let It Be (Proto)</description>
+		<description>Let It Be (Prototype)</description>
 		<year>1986</year>
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -724,8 +725,8 @@
 		</part>
 	</software>
 
-	<software name="musicmap">
-		<description>Music Maker v3.7 (Proto)</description>
+	<software name="musicmakp" cloneof="musicmak">
+		<description>Music Maker v3.7 (Prototype)</description>
 		<year>1982</year>
 		<publisher>Astrocade Inc.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -748,7 +749,7 @@
 	</software>
 
 	<software name="pacman">
-		<description>Pac-Man (Proto)</description>
+		<description>Pac-Man (Prototype)</description>
 <!-- <note>This prototype was eventually renamed Muncher and sold through the Arcadian newsletter.</note> -->
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
@@ -784,7 +785,7 @@
 	</software>
 
 	<software name="paperbck">
-		<description>Paperback Writer (Proto)</description>
+		<description>Paperback Writer (Prototype)</description>
 		<year>1986</year>
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -824,7 +825,7 @@
 	</software>
 
 	<software name="rainbow2">
-		<description>Rainbow v2 (Proto)</description>
+		<description>Rainbow v2 (Prototype)</description>
 <!-- <note>This prototype was found in the collection of Arcadian editor Bob Fabris. The first version has not been found.</note> -->
 		<year>19??</year>
 		<publisher>Larry Hanson</publisher>
@@ -881,7 +882,7 @@
 	</software>
 
 	<software name="sheloves">
-		<description>She Loves You (Proto)</description>
+		<description>She Loves You (Prototype)</description>
 		<year>1986</year>
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -930,7 +931,7 @@
 		<description>Soccer</description>
 <!-- <note>An unknown programmer added some options to the Soccer prototype, and it was sold by Mike White.</note> -->
 		<year>1985</year>
-		<publisher>Astrocade Inc. and Unknown Author</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="soccer.bin" size="8192" crc="56d28b62" sha1="12f1f59d79188b41b39fee40dd4f12cc236b4126" offset="0" />
@@ -939,7 +940,7 @@
 	</software>
 
 	<software name="soccerp">
-		<description>Soccer (Proto)</description>
+		<description>Soccer (Prototype)</description>
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -950,7 +951,7 @@
 	</software>
 
 	<software name="soccera">
-		<description>Soccer (Proto)[a]</description>
+		<description>Soccer (Prototype, Alt)</description>
 <!-- <note>Dumped from a cart labeled 'Soccer / Dribbling'.</note> -->
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
@@ -962,7 +963,7 @@
 	</software>
 
 	<software name="soccera2">
-		<description>Soccer (Proto)[a2]</description>
+		<description>Soccer (Prototype, Alt 2)</description>
 <!-- <note>Dumped from a cart labeled 'Soccer 8-5'.</note> -->
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
@@ -974,7 +975,7 @@
 	</software>
 
 	<software name="soccera3">
-		<description>Soccer (Proto)[a3]</description>
+		<description>Soccer (Prototype, Alt 3)</description>
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -985,7 +986,7 @@
 	</software>
 
 	<software name="soccera4">
-		<description>Soccer (Proto)[a4]</description>
+		<description>Soccer (Prototype, Alt 4)</description>
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -995,7 +996,7 @@
 		</part>
 	</software>
 
-	<software name="scnquer">
+	<software name="solarcnq">
 		<description>Solar Conqueror</description>
 		<year>1983</year>
 		<publisher>Astrocade Inc.</publisher>
@@ -1006,8 +1007,8 @@
 		</part>
 	</software>
 
-	<software name="scquer28">
-		<description>Solar Conqueror v2.8 (Proto)</description>
+	<software name="solarcnqp28" cloneof="solarcnq">
+		<description>Solar Conqueror (Prototype v2.8)</description>
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -1017,8 +1018,8 @@
 		</part>
 	</software>
 
-	<software name="scquer39">
-		<description>Solar Conqueror v3.9 (Proto)</description>
+	<software name="solarcnqp39" cloneof="solarcnq">
+		<description>Solar Conqueror (Prototype v3.9)</description>
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -1028,8 +1029,8 @@
 		</part>
 	</software>
 
-	<software name="scquerp">
-		<description>Solar Conqueror (Proto)</description>
+	<software name="solarcnqp" cloneof="solarcnq">
+		<description>Solar Conqueror (Prototype)</description>
 <!-- <note>Dumped from a cart labeled 'Solar Conquer CES Chicago 1982'.</note> -->
 		<year>1982</year>
 		<publisher>Astrocade Inc.</publisher>
@@ -1041,7 +1042,7 @@
 	</software>
 
 	<software name="songs">
-		<description>Songs (Proto)</description>
+		<description>Songs (Prototype)</description>
 		<year>19??</year>
 		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -1051,8 +1052,8 @@
 		</part>
 	</software>
 
-	<software name="songsu">
-		<description>Songs (unfinished) (Proto)</description>
+	<software name="songsu" cloneof="songs">
+		<description>Songs (Prototype, Unfinished)</description>
 <!-- <note>This was dumped from a ROM in Richard Degler's collection.  At some point, it's had data from the Blue RAM Utility added to the end of it.</note> -->
 		<year>19??</year>
 		<publisher>Bally Mfg. Corp.</publisher>
@@ -1166,8 +1167,8 @@
 		</part>
 	</software>
 
-	<software name="wizardp" supported="no">
-		<description>The Incredible Wizard (Proto)</description>
+	<software name="wizardp" cloneof="wizard" supported="no">
+		<description>The Incredible Wizard (Prototype)</description>
 <!-- <note>This was dumped from a working prototype cart, but the cart was sold before it was realized that the dump was bad.</note> -->
 		<year>198?</year>
 		<publisher>Astrocade Inc.</publisher>
@@ -1200,8 +1201,8 @@
 		</part>
 	</software>
 
-	<software name="treasurp">
-		<description>Treasure Cove (Proto)</description>
+	<software name="treasurep" cloneof="treasure">
+		<description>Treasure Cove (Prototype)</description>
 <!-- <note>This prototype was assembled from a very preliminary printout of the source code, and is not in a working state.</note> -->
 		<year>198?</year>
 		<publisher>Esoterica</publisher>
@@ -1213,10 +1214,10 @@
 	</software>
 
 	<software name="vidstory">
-		<description>Video Story Book (Proto)</description>
+		<description>Video Story Book (Prototype)</description>
 		<!-- <note>The origin of this cart is unclear.  A prototype was found in the early 80's, and it was first sold by Mike White in 1985.  It starts with a black screen, but a number of features are available.</note> -->
 		<year>19??</year>
-		<publisher>Unknown Author</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="vidstory.bin" size="8192" crc="2cc8cc3c" sha1="c6688c73175a850865973f5a8423de539497c5f2" offset="0" />
@@ -1236,8 +1237,8 @@
 		</part>
 	</software>
 
-	<software name="viperbp">
-		<description>VIPERSoft BASIC (Proto)</description>
+	<software name="viperbp" cloneof="viperb">
+		<description>VIPERSoft BASIC (Prototype)</description>
 		<!-- <note>Requires RAM expansion (4K Blue RAM isn't enough).  Only partially functional.</note> -->
 		<year>198?</year>
 		<publisher>Alternative Engineering</publisher>
@@ -1261,7 +1262,7 @@
 	</software>
 
 	<software name="yesternv">
-		<description>Yesterday (no vibrato) (Proto)</description>
+		<description>Yesterday (no vibrato) (Prototype)</description>
 <!-- <note>Of all Richard Degler's adaptations of George Moses' Beatles tape programs, only this one was actually sold in limited quantities.  The version sold hadn't had vibrato added yet, though.</note> -->
 		<year>1986</year>
 		<publisher>Richard Degler and George Moses</publisher>
@@ -1273,7 +1274,7 @@
 	</software>
 
 	<software name="yesterv">
-		<description>Yesterday (with vibrato) (Proto)</description>
+		<description>Yesterday (with vibrato) (Prototype)</description>
 		<year>1986</year>
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
