@@ -5,7 +5,7 @@
   Compiled by K1W1.
 -->
 
-<softwarelist name="vic1001" description="Commodore VIC-1001 / VIC-20 cartridges">
+<softwarelist name="vic1001_cart" description="Commodore VIC-1001 / VIC-20 cartridges">
 
 	<software name="worldwar">
 		<description>A World at War (PAL)</description>

@@ -4,7 +4,7 @@
 <!-- FM-7 floppy disk images -->
 <!-- Multi-image games are untested -->
 
-<softwarelist name="fm7_flop" description="Fujitsu FM-7 disk images">
+<softwarelist name="fm7_disk" description="Fujitsu FM-7 disk images">
 
 	<software name="albatros">
 		<description>Albatross</description>
