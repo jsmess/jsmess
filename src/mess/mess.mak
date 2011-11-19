@@ -471,9 +471,8 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_DRIVERS)/saturn.o	\
 	$(MAME_MACHINE)/stvcd.o		\
 	$(MAME_MACHINE)/scudsp.o	\
-	$(MAME_DRIVERS)/stvinit.o	\
 	$(MAME_MACHINE)/stvprot.o	\
-	$(MAME_MACHINE)/smpc.o          \
+	$(MAME_MACHINE)/smpc.o		\
 	$(MAME_VIDEO)/stvvdp1.o		\
 	$(MAME_VIDEO)/stvvdp2.o		\
 	$(MAME_DRIVERS)/cps1.o	\
