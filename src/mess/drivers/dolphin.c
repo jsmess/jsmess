@@ -169,7 +169,7 @@ static MACHINE_CONFIG_START( dolphin, dolphin_state )
 MACHINE_CONFIG_END
 
 /* ROM definition */
-ROM_START( dolphin )
+ROM_START( dolphunk )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "dolphin_mo.rom", 0x0000, 0x0100, CRC(1ac4ac18) SHA1(62a63de6fcd6cd5fcee930d31c73fe603647f06c))
 	ROM_LOAD( "dolphin_moni.rom", 0x0100, 0x0100, NO_DUMP )
@@ -179,5 +179,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1979, dolphin,  0,       0,	dolphin,	dolphin,	 0,   "<unknown>",   "Dolphin",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1979, dolphunk,  0,       0,	dolphin,	dolphin,	 0,   "<unknown>",   "Dolphin",	GAME_NOT_WORKING | GAME_NO_SOUND )
 
