@@ -36,7 +36,7 @@ READ8_MEMBER( comx35_state::mem_r )
 	}
 	else if (offset >= 0x4000 && offset < 0xc000)
 	{
-		data = ram[offset & 0x7fff];
+		data = ram[offset - 0x4000];
 	}
 	else if (offset >= 0xf400 && offset < 0xf800)
 	{
@@ -59,7 +59,7 @@ WRITE8_MEMBER( comx35_state::mem_w )
 
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
-		ram[offset & 0x7fff] = data;
+		ram[offset - 0x4000] = data;
 	}
 	else if (offset >= 0xf400 && offset < 0xf800)
 	{
