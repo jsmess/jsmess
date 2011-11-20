@@ -36,9 +36,9 @@ enum
 
 static void image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count)
 {
-	void *ptr = image.device().machine().firstcpu->memory().space(AS_PROGRAM)->get_write_ptr(addr);
+	UINT8 *ram = ram_get_ptr(image.device().machine().device(RAM_TAG)) + (addr - 0x4000);
 
-	image.fread( ptr, count);
+	image.fread(ram, count);
 }
 
 /*-------------------------------------------------
@@ -83,7 +83,7 @@ QUICKLOAD_LOAD( comx35_comx )
 		{
 			UINT16 start_address, end_address, run_address;
 
-			image.fread( header, 6);
+			image.fread(header, 6);
 
 			start_address = pick_integer_be(header, 0, 2);
 			end_address = pick_integer_be(header, 2, 2);
@@ -169,7 +169,7 @@ QUICKLOAD_LOAD( comx35_comx )
 		{
 			UINT16 start_array, end_array, start_string, array_length;
 
-			image.fread( header, 2);
+			image.fread(header, 2);
 
 			array_length = pick_integer_be(header, 0, 2);
 			start_array = (program->read_byte(0x4295) << 8) | program->read_byte(0x4296);
