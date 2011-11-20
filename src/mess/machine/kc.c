@@ -216,22 +216,43 @@ WRITE8_MEMBER( kc_state::expansion_e000_w ){ expansion_write(space, offset + 0xe
     active when the cassette motor is on.
 */
 
+void kc_state::update_cassette(int state)
+{
+	int astb = (state & m_ardy) ? 0 : 1;
 
-#define KC_CASSETTE_TIMER_FREQUENCY attotime::from_hz(4800)
+	// if state is changed updates the /ASTB line
+	if (m_astb ^ astb)
+	{
+		z80pio_astb_w(m_z80pio, astb);
+		m_astb = astb;
+	}
+}
 
-/* this timer is used to update the cassette */
-/* this is the current state of the cassette motor */
-/* ardy output from pio */
+static TIMER_CALLBACK(kc_cassette_oneshot_timer)
+{
+	kc_state *state = machine.driver_data<kc_state>();
 
+	state->update_cassette(0);
+
+	state->m_cassette_oneshot_timer->reset();
+}
+
+// timer used for polling data from cassette input
+// enabled only when cassette motor is on
 static TIMER_CALLBACK(kc_cassette_timer_callback)
 {
 	kc_state *state = machine.driver_data<kc_state>();
 
-	/* the cassette data is linked to /astb input of the pio. */
+	// read cassette data
 	int bit = (state->m_cassette->input() > 0.0038) ? 1 : 0;
 
-	/* update astb with bit */
-	z80pio_astb_w(state->m_z80pio, bit & state->m_ardy);
+	// generates a pulse when the cassette input changes state
+	if (bit ^ state->m_cassette_in)
+	{
+		state->update_cassette(1);
+		state->m_cassette_in = bit;
+		state->m_cassette_oneshot_timer->adjust(attotime::from_double(TIME_OF_74LS123(RES_K(10), CAP_N(1))));
+	}
 }
 
 void kc_state::cassette_set_motor(int motor_state)
@@ -767,6 +788,7 @@ WRITE_LINE_MEMBER( kc_state::keyboard_cb )
 void kc_state::machine_start()
 {
 	m_cassette_timer = machine().scheduler().timer_alloc(FUNC(kc_cassette_timer_callback));
+	m_cassette_oneshot_timer = machine().scheduler().timer_alloc(FUNC(kc_cassette_oneshot_timer));
 
 	// kc85 has a 50 Hz input to the ctc channel 2 and 3
 	// channel 2 this controls the video colour flash
