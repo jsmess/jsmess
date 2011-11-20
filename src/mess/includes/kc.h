@@ -18,6 +18,7 @@
 #include "machine/z80pio.h"
 #include "machine/ram.h"
 #include "machine/kc_keyb.h"
+#include "machine/rescap.h"
 #include "cpu/z80/z80daisy.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
@@ -43,6 +44,9 @@
 #define KC85_PALETTE_SIZE 24
 #define KC85_SCREEN_WIDTH 320
 #define KC85_SCREEN_HEIGHT 256
+
+// cassette input polling frequency
+#define KC_CASSETTE_TIMER_FREQUENCY attotime::from_hz(44100)
 
 
 class kc_state : public driver_device
@@ -107,6 +111,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( keyboard_cb );
 
 	// cassette
+	void update_cassette(int state);
 	void cassette_set_motor(int motor_state);
 
 	// speaker
@@ -118,7 +123,6 @@ public:
 	// driver state
 	UINT8 *				m_ram_base;
 	int 				m_pio_data[2];
-	emu_timer *			m_cassette_timer;
 	int					m_high_resolution;
 	UINT8				m_ardy;
 	UINT8				m_brdy;
@@ -128,6 +132,12 @@ public:
 	int					m_k0_line;
 	int					m_k1_line;
 	UINT8				m_speaker_level;
+
+	// cassette
+	emu_timer *			m_cassette_timer;
+	emu_timer *			m_cassette_oneshot_timer;
+	int 				m_astb;
+	int 				m_cassette_in;
 
 	kcexp_slot_device *	m_expansions[3];
 };

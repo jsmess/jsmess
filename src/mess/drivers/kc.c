@@ -125,8 +125,8 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	MCFG_CPU_CONFIG(kc85_daisy_chain)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_Z80PIO_ADD( "z80pio", 1379310.344828, kc85_pio_intf )
-	MCFG_Z80CTC_ADD( "z80ctc", 1379310.344828, kc85_ctc_intf )
+	MCFG_Z80PIO_ADD( "z80pio", KC85_3_CLOCK, kc85_pio_intf )
+	MCFG_Z80CTC_ADD( "z80ctc", KC85_3_CLOCK, kc85_ctc_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -178,8 +178,8 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 	MCFG_CPU_CONFIG(kc85_daisy_chain)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_Z80PIO_ADD( "z80pio", 1379310.344828, kc85_pio_intf )
-	MCFG_Z80CTC_ADD( "z80ctc", 1379310.344828, kc85_ctc_intf )
+	MCFG_Z80PIO_ADD( "z80pio", KC85_4_CLOCK, kc85_pio_intf )
+	MCFG_Z80CTC_ADD( "z80ctc", KC85_4_CLOCK, kc85_ctc_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
