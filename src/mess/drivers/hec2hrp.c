@@ -37,9 +37,10 @@
         03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
                 => add the port mapping for keyboard
         20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
+		11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino
 
         don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
-        (and thanks to Daniel!)
+        (and thanks to Daniel!) and Yves site : http://hectorvictor.free.fr/ (thank's too Yves!)
 
     TODO :  Add the cartridge function,
             Add diskette support, (done !)
@@ -60,7 +61,7 @@
   (left)<-                     (right)->
                (down)v
 
- Fire <0> on numpad
+ Fire <²> near <1>
  Pot => INS /SUPPR
 
  Cassette : wav file (1 way, 16 bits, 44100hz)
@@ -80,7 +81,7 @@
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "cpu/z80/z80.h"
-
+#include "formats/hect_dsk.h"
 #include "includes/hec2hrp.h"
 
 /*****************************************************************************/
@@ -171,6 +172,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hec2hrx_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x0f0,0x0ff) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hec2mdhrx_io , AS_IO, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	
+	// Minidisc commands and changing the rom page !*/
+	AM_RANGE(0x000,0x0EF) AM_READWRITE( hector_179x_register_r,hector_179x_register_w)/* 179x registers*/
 	AM_RANGE(0x0f0,0x0ff) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
@@ -272,7 +282,7 @@ static INPUT_PORTS_START( hec2hrp )
 
 	PORT_START("KEY8") /* [1] - port 3000 @ 8  not for the real machine, but to emulate the analog signal of the joystick */
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")				PORT_CODE(KEYCODE_ESC)		PORT_CHAR(27)
-		PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Joy(0) FIRE")		PORT_CODE(KEYCODE_0_PAD)
+		PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Joy(0) FIRE")		PORT_CODE(KEYCODE_TILDE)
 		PORT_BIT(0x04, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Joy(1) FIRE")		PORT_CODE(KEYCODE_PLUS_PAD)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Pot(0)+") PORT_CODE(KEYCODE_INSERT)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Pot(0)-") PORT_CODE(KEYCODE_DEL)
@@ -328,6 +338,33 @@ static MACHINE_START( hec2hrx )
 	hector_init(machine);
 	hector_disc2_init(machine); // Init of the Disc II !
 }
+/*****************************************************************************/
+static MACHINE_START( hec2mdhrx )
+/*****************************************************************************/
+//minidisc
+{
+	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
+	UINT8 *RAM   = machine.region("maincpu"  )->base();	// pointer to mess ram
+
+	// Memory install for bank switching
+	memory_configure_bank(machine, "bank1", HECTOR_BANK_PROG , 1, &RAM[0xc000]   , 0); // Mess ram
+	memory_configure_bank(machine, "bank1", HECTOR_BANK_VIDEO, 1, state->m_hector_videoram_hrx, 0); // Video ram
+
+	// Set bank HECTOR_BANK_PROG as basic bank
+	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
+	//Here the bank 5 is not used for the language switch but for the floppy ROM.....
+	/******************************************************SPECIFIQUE Mini disque ***************************/
+	memory_configure_bank(machine, "bank2", HECTOR_BANK_BASE , 1, &RAM[0x0000]                    , 0); // Rom base page
+	memory_configure_bank(machine, "bank2", HECTOR_BANK_DISC , 1, machine.region("page2")->base() , 0); // Rom page mini disc
+	memory_set_bank(machine, "bank2", HECTOR_BANK_BASE);
+	/******************************************************SPECIFIQUE Mini disque ***************************/
+
+	// As video HR ram is in bank, use extern memory
+	state->m_hector_videoram  = state->m_hector_videoram_hrx;
+
+	hector_init(machine);
+	hector_minidisc_init(machine);
+}
 static MACHINE_RESET(hec2hrx)
 {
 	//Hector Memory
@@ -339,6 +376,16 @@ static MACHINE_RESET(hec2hrx)
 	// Machines init
 	hector_reset(machine, 1, 1);
 	hector_disc2_reset(machine);
+}
+//minidisc
+static MACHINE_RESET(hec2mdhrx)
+{
+	//Hector Memory
+	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
+	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
+
+	// Machines init
+	hector_reset(machine, 1, 0);
 }
 
 /* Cassette definition */
@@ -362,6 +409,31 @@ static DISCRETE_SOUND_START( hec2hrp )
 	DISCRETE_INPUT_LOGIC(NODE_01)
 	DISCRETE_OUTPUT(NODE_01, 5000)
 DISCRETE_SOUND_END
+
+/***********************************************************/
+/********* mini disque interface ***************************/
+/***********************************************************/
+
+const wd17xx_interface hector_wd17xx_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,// treatment for intrq line
+	DEVCB_NULL,// treatment for drq line
+	{FLOPPY_0, NULL, NULL, NULL}		// Only one floppy on the minidisc
+};
+
+const floppy_interface minidisc_floppy_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_3_5_DSDD,  
+	LEGACY_FLOPPY_OPTIONS_NAME(hector_minidisc),
+	NULL,
+	NULL
+};
 
 /******************************************************************************/
 static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
@@ -553,6 +625,56 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 
 MACHINE_CONFIG_END
 /*****************************************************************************/
+static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
+/*****************************************************************************/
+// minidisc
+/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
+	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
+	MCFG_CPU_IO_MAP(hec2mdhrx_io)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
+	MCFG_MACHINE_RESET(hec2mdhrx) 
+	MCFG_MACHINE_START(hec2mdhrx)
+
+	/* Mini Disc */
+	MCFG_FD1793_ADD("wd179x", hector_wd17xx_interface )
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, minidisc_floppy_interface)
+	
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400)) /* 2500 not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 230)
+	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
+	MCFG_SCREEN_UPDATE(hec2hrp)
+
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_VIDEO_START(hec2hrp)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)// Sound level for cassette, as it is in mono => output channel=0
+
+	MCFG_SOUND_ADD("sn76477", SN76477, 0)
+	MCFG_SOUND_CONFIG(hector_sn76477_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
+
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0) // Son 1bit
+	MCFG_SOUND_CONFIG_DISCRETE( hec2hrp )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	// Gestion cassette
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_interface )
+
+	/* printer */
+	MCFG_PRINTER_ADD("printer")
+	
+MACHINE_CONFIG_END
+
+/*****************************************************************************/
 static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 /*****************************************************************************/
 	/* basic machine hardware */
@@ -625,8 +747,7 @@ ROM_START( hec2hrp )
 	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )
 	ROM_REGION( 0x10000, "disc2cpu", ROMREGION_ERASEFF )
 	ROM_REGION( 0x04000, "rom_disc2", ROMREGION_ERASEFF )
-
-	ROM_END
+ROM_END
 
 ROM_START( hec2hrx )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -638,7 +759,18 @@ ROM_START( hec2hrx )
 	ROM_REGION( 0x04000, "rom_disc2", ROMREGION_ERASEFF )
 	ROM_LOAD( "d800k.bin" , 0x0000,0x1000, CRC(831bd584) SHA1(9782ee58f570042608d9d568b2c3fc4c6d87d8b9))
 	ROM_REGION( 0x10000,  "disc2mem", ROMREGION_ERASE00 )
-	ROM_END
+ROM_END
+// minidisc
+ROM_START( hec2mdhrx )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mdic1.bin" , 0x0000,0x2000, CRC(ddda1065) SHA1(e7bba14a72605238d2f8299da029b8320a563254))
+	ROM_LOAD( "mdicmb.bin" , 0x2000,0x2000, CRC(d8090747) SHA1(f2925b68002307562e2ea5e36b740e5458f0f0eb))
+
+	ROM_REGION( 0x4000, "page1", ROMREGION_ERASEFF )  // Page 1 = unused page
+	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )  // Page 2 = minidisc page
+	ROM_LOAD( "mdic3.bin"  , 0x0000,0x2000, CRC(87801816) SHA1(ddf441f40df014b237cdf17430d1989f3a452d04))
+	ROM_LOAD( "mdicmb.bin" , 0x2000,0x2000, CRC(d8090747) SHA1(f2925b68002307562e2ea5e36b740e5458f0f0eb))
+ROM_END
 
 ROM_START( hec2mx80 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -651,7 +783,7 @@ ROM_START( hec2mx80 )
 	ROM_REGION( 0x04000, "rom_disc2", ROMREGION_ERASEFF )
 	ROM_LOAD( "d800k.bin" , 0x0000,0x1000, CRC(831bd584) SHA1(9782ee58f570042608d9d568b2c3fc4c6d87d8b9))
 	ROM_REGION( 0x10000,  "disc2mem", ROMREGION_ERASE00 )
-	ROM_END
+ROM_END
 
 ROM_START( hec2mx40 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -666,7 +798,6 @@ ROM_START( hec2mx40 )
 	ROM_LOAD( "d800k.bin" , 0x0000,0x1000, CRC(831bd584) SHA1(9782ee58f570042608d9d568b2c3fc4c6d87d8b9))
 //  ROM_LOAD( "d200k.bin" , 0x0000,0x4000, CRC(e2801377) SHA1(0926df5b417ecd8013e35c71b76780c5a25c1cbf))
 	ROM_REGION( 0x10000,  "disc2mem", ROMREGION_ERASE00 )
-
 ROM_END
 
 /* Driver */
@@ -676,5 +807,6 @@ COMP(1983,	hec2hrp,	0,		interact,	hec2hrp,	hec2hrp,0,		"Micronique",	"Hector 2HR
 COMP(1980,	victor,		hec2hrp, 0,			hec2hrp,	hec2hrp,0,		"Micronique",	"Victor",			GAME_IMPERFECT_SOUND)
 COMP(1983,	hec2hr,		hec2hrp, 0,			hec2hr,		hec2hrp,0,		 "Micronique",	"Hector 2HR",		GAME_IMPERFECT_SOUND)
 COMP(1984,	hec2hrx,	hec2hrp, 0,			hec2hrx,	hec2hrp,0,		 "Micronique",	"Hector HRX + Disc2",		GAME_IMPERFECT_SOUND)
+COMP(1985,	hec2mdhrx,	hec2hrp, 0,			hec2mdhrx,	hec2hrp,0,		 "Micronique",	"Hector HRX + mini Disc" ,	GAME_IMPERFECT_SOUND)
 COMP(1985,	hec2mx80,	hec2hrp, 0,			hec2mx80,	hec2hrp,0,		 "Micronique",	"Hector MX 80c + Disc2" ,	GAME_IMPERFECT_SOUND)
 COMP(1985,	hec2mx40,	hec2hrp, 0,			hec2mx40,	hec2hrp,0,		 "Micronique",	"Hector MX 40c + Disc2" ,	GAME_IMPERFECT_SOUND)
