@@ -28,15 +28,17 @@
         03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
                 => add the port mapping for keyboard
         20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
+		11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino  (jj.stac @ aliceadsl.fr)
 
             don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
-            (and thank's to Daniel!)
+            (and thank's to Daniel!) and Yves site : http://hectorvictor.free.fr/ (thank's too Yves!)
 
     TODO :  Add the cartridge function,
             Adjust the one shot and A/D timing (sn76477)
 */
 
 #include "machine/upd765.h"
+#include "machine/wd17xx.h"
 
 /* Enum status for high memory bank (c000 - ffff)*/
 enum
@@ -50,6 +52,12 @@ enum
 	HECTORMX_BANK_PAGE0 = 0,			/* first BANK is base rom*/
 	HECTORMX_BANK_PAGE1,				/* second BANK is basic rom */
 	HECTORMX_BANK_PAGE2					/* 3 BANK is monitrix / assemblex rom */
+};
+/* Status for rom memory bank (0000 - 3fff) in Mini Disc machine*/
+enum
+{
+	HECTOR_BANK_BASE = 0,				/* first BANK is normal rom*/
+	HECTOR_BANK_DISC					/* second BANK is extra rom for mini disc use*/
 };
 /* Enum status for low memory bank (00000 - 0fff) for DISC II*/
 enum
@@ -109,6 +117,7 @@ public:
 /*----------- defined in machine/hec2hrp.c -----------*/
 
 /* Protoype of memory Handler*/
+WRITE8_HANDLER( hector_switch_bank_rom_w );
 WRITE8_HANDLER( hector_switch_bank_w );
 READ8_HANDLER( hector_keyboard_r );
 WRITE8_HANDLER( hector_keyboard_w );
@@ -123,12 +132,14 @@ void hector_init( running_machine &machine);
 void hector_reset(running_machine &machine, int hr, int with_D2);
 void hector_disc2_reset( running_machine &machine);
 
+/* Prototype of I/O Handler*/
 READ8_HANDLER( hector_mx_io_port_r );
 WRITE8_HANDLER( hector_mx80_io_port_w );
 WRITE8_HANDLER( hector_mx40_io_port_w );
  READ8_HANDLER( hector_io_8255_r);
 WRITE8_HANDLER( hector_io_8255_w);
-
+ READ8_HANDLER( hector_179x_register_r);
+WRITE8_HANDLER( hector_179x_register_w);
 /*----------- defined in video/hec2video.c -----------*/
 
 void hector_80c(running_machine &machine, bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
@@ -159,6 +170,9 @@ READ8_HANDLER(  hector_disc2_io70_port_r);
 WRITE8_HANDLER( hector_disc2_io70_port_w);
 
 void hector_disc2_init( running_machine &machine);
+void hector_minidisc_init( running_machine &machine);
 
 extern const upd765_interface hector_disc2_upd765_interface;
 extern const floppy_interface    hector_disc2_floppy_interface;
+extern const wd17xx_interface hector_wd17xx_interface;  // Special for minidisc
+extern const floppy_interface minidisc_floppy_interface;
