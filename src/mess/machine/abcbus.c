@@ -229,6 +229,36 @@ WRITE8_MEMBER( abcbus_slot_device::c4_w )
 
 
 //-------------------------------------------------
+//  xmemfl_r -
+//-------------------------------------------------
+
+READ8_MEMBER( abcbus_slot_device::xmemfl_r )
+{
+	UINT8 data = 0xff;
+
+	if (m_card != NULL)
+	{
+		data &= m_card->abcbus_xmemfl();
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  xmemw_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( abcbus_slot_device::xmemw_w )
+{
+	if (m_card != NULL)
+	{
+		m_card->abcbus_xmemw(data);
+	}
+}
+
+
+//-------------------------------------------------
 //  int_w -
 //-------------------------------------------------
 

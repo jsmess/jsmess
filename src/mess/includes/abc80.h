@@ -69,12 +69,14 @@ public:
 		  m_maincpu(*this, Z80_TAG),
 		  m_pio(*this, Z80PIO_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
+		  m_bus(*this, ABCBUS_TAG),
 		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_pio;
 	required_device<cassette_image_device> m_cassette;
+	required_device<abcbus_slot_device> m_bus;
 	required_device<device_t> m_ram;
 
 	virtual void machine_start();
@@ -83,6 +85,9 @@ public:
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
+
+	DECLARE_READ8_MEMBER( mmu_r );
+	DECLARE_WRITE8_MEMBER( mmu_w );
 
 	DECLARE_READ8_MEMBER( pio_pa_r );
 	DECLARE_READ8_MEMBER( pio_pb_r );
@@ -95,11 +100,11 @@ public:
 
 	// video state
 	UINT8 *m_video_ram;
-	UINT8 *m_video_80_ram;
 	UINT8 m_latch;
 	int m_blink;
 
 	// memory regions
+	const UINT8 *m_mmu_rom;			// memory mapping ROM
 	const UINT8 *m_char_rom;		// character generator ROM
 	const UINT8 *m_hsync_prom;		// horizontal sync PROM
 	const UINT8 *m_vsync_prom;		// horizontal sync PROM
