@@ -130,6 +130,8 @@ public:
 	virtual void abcbus_c2(UINT8 data) { };
 	virtual void abcbus_c3(UINT8 data) { };
 	virtual void abcbus_c4(UINT8 data) { };
+	virtual UINT8 abcbus_xmemfl() { return 0xff; };
+	virtual void abcbus_xmemw(UINT8 data) { };
 
 public:
 	abcbus_slot_device  *m_bus;
@@ -155,6 +157,8 @@ public:
 	DECLARE_WRITE8_MEMBER( c2_w );
 	DECLARE_WRITE8_MEMBER( c3_w );
 	DECLARE_WRITE8_MEMBER( c4_w );
+	DECLARE_READ8_MEMBER( xmemfl_r );
+	DECLARE_WRITE8_MEMBER( xmemw_w );
 
 	DECLARE_WRITE_LINE_MEMBER( int_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );

@@ -164,7 +164,6 @@ Notes:
 
     TODO:
 
-    - memory bank switching using ABC80/13 PROM
     - proper keyboard controller emulation
     - get BASIC v1 dump
     - MyAB 80-column card
@@ -177,6 +176,17 @@ Notes:
 */
 
 #include "includes/abc80.h"
+
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define MMU_XM		0x01
+#define MMU_ROM		0x02
+#define MMU_VRAMS	0x04
+#define MMU_RAM		0x08
 
 
 
@@ -377,6 +387,64 @@ static TIMER_DEVICE_CALLBACK( abc80_keyboard_tick )
 
 
 //**************************************************************************
+//  MEMORY MANAGEMENT UNIT
+//**************************************************************************
+
+//-------------------------------------------------
+//  mmu_r -
+//-------------------------------------------------
+
+READ8_MEMBER( abc80_state::mmu_r )
+{
+	UINT8 data = 0xff;
+	UINT8 mmu = m_mmu_rom[0x40 | (offset >> 10)];
+	
+	if (!(mmu & MMU_XM))
+	{
+		data = m_bus->xmemfl_r(space, offset);
+	}
+	else if (!(mmu & MMU_ROM))
+	{
+		data = machine().region(Z80_TAG)->base()[offset & 0x3fff];
+	}
+	else if (mmu & MMU_VRAMS)
+	{
+		data = m_video_ram[offset & 0x3ff];
+	}
+	else if (!(mmu & MMU_RAM))
+	{
+		data = ram_get_ptr(m_ram)[offset & 0x3fff];
+	}
+	
+	return data;
+}
+
+
+//-------------------------------------------------
+//  mmu_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc80_state::mmu_w )
+{
+	UINT8 mmu = m_mmu_rom[0x40 | (offset >> 10)];
+	
+	if (!(mmu & MMU_XM))
+	{
+		m_bus->xmemw_w(space, offset, data);
+	}
+	else if (mmu & MMU_VRAMS)
+	{
+		m_video_ram[offset & 0x3ff] = data;
+	}
+	else if (!(mmu & MMU_RAM))
+	{
+		ram_get_ptr(m_ram)[offset & 0x3fff] = data;
+	}
+}
+
+
+
+//**************************************************************************
 //  SOUND
 //**************************************************************************
 
@@ -434,13 +502,7 @@ WRITE_LINE_DEVICE_HANDLER(port_sn76477_envelope_1_w)
 
 static ADDRESS_MAP_START( abc80_mem, AS_PROGRAM, 8, abc80_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x73ff) AM_ROM
-	AM_RANGE(0x7400, 0x77ff) AM_RAM AM_BASE(m_video_80_ram)
-	AM_RANGE(0x7800, 0x7bff) AM_ROM
-	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE(m_video_ram)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_r, mmu_w)
 ADDRESS_MAP_END
 
 
@@ -680,13 +742,10 @@ static ABCBUS_INTERFACE( abcbus_intf )
 
 void abc80_state::machine_start()
 {
-	/* configure RAM expansion */
-	if (ram_get_size(m_ram) == 16 * 1024)
-	{
-		m_maincpu->memory().space(AS_PROGRAM)->unmap_readwrite(0x8000, 0xbfff);
-	}
+	// find memory regions
+	m_mmu_rom = machine().region("mmu")->base();
 
-	/* register for state saving */
+	// register for state saving
 	state_save_register_global(machine(), m_key_data);
 	state_save_register_global(machine(), m_key_strobe);
 	state_save_register_global(machine(), m_pio_astb);
@@ -734,7 +793,6 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc80")
