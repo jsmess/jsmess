@@ -891,6 +891,14 @@ static const floppy_interface mac_floppy_interface =
 	NULL
 };
 
+static const struct harddisk_interface mac_harddisk_config =
+{
+	NULL,
+	NULL,
+	"mac_hdd",	
+	NULL
+};
+
 static MACHINE_CONFIG_START( mac512ke, mac_state )
 
 	/* basic machine hardware */
@@ -941,14 +949,15 @@ static MACHINE_CONFIG_DERIVED( mac128k, mac512ke )
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
+	
 static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(macplus_map)
 
 	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
 
-	MCFG_HARDDISK_ADD( "harddisk1" )
-	MCFG_HARDDISK_ADD( "harddisk2" )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk1", mac_harddisk_config )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk2", mac_harddisk_config )
 
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_interface)
 
@@ -956,6 +965,9 @@ static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,2560K,4M")
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")	
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( macse, macplus )
@@ -1010,8 +1022,8 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_SCC8530_IRQ(mac_scc_irq)
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_intf)
 
-	MCFG_HARDDISK_ADD( "harddisk1" )
-	MCFG_HARDDISK_ADD( "harddisk2" )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk1", mac_harddisk_config )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk2", mac_harddisk_config )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1056,8 +1068,8 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", C7M/10, mac_via6522_2_intf)
 
-	MCFG_HARDDISK_ADD( "harddisk1" )
-	MCFG_HARDDISK_ADD( "harddisk2" )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk1", mac_harddisk_config )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk2", mac_harddisk_config )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1104,8 +1116,8 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
 
-	MCFG_HARDDISK_ADD( "harddisk1" )
-	MCFG_HARDDISK_ADD( "harddisk2" )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk1", mac_harddisk_config )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk2", mac_harddisk_config )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1284,8 +1296,8 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
 
-	MCFG_HARDDISK_ADD( "harddisk1" )
-	MCFG_HARDDISK_ADD( "harddisk2" )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk1", mac_harddisk_config )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk2", mac_harddisk_config )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1334,8 +1346,8 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
 
-	MCFG_HARDDISK_ADD( "harddisk1" )
-	MCFG_HARDDISK_ADD( "harddisk2" )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk1", mac_harddisk_config )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk2", mac_harddisk_config )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1404,8 +1416,8 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
 
-	MCFG_HARDDISK_ADD( "harddisk1" )
-	MCFG_HARDDISK_ADD( "harddisk2" )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk1", mac_harddisk_config )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk2", mac_harddisk_config )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1559,8 +1571,8 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
 
-	MCFG_HARDDISK_ADD( "harddisk1" )
-	MCFG_HARDDISK_ADD( "harddisk2" )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk1", mac_harddisk_config )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk2", mac_harddisk_config )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1611,8 +1623,8 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 
 	MCFG_NCR539X_ADD(MAC_539X_1_TAG, C7M, mac_539x_intf)
 
-	MCFG_HARDDISK_ADD( "harddisk1" )
-	MCFG_HARDDISK_ADD( "harddisk2" )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk1", mac_harddisk_config )
+	MCFG_HARDDISK_CONFIG_ADD( "harddisk2", mac_harddisk_config )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
