@@ -83,11 +83,15 @@ void init_pcap()
 		mame_printf_verbose("Unable to get network devices: %s\n", errbuf);
 		return;
 	}
-	while(devs->next)
+
+    if (devs)
 	{
-		add_netdev(devs->name, create_pcap);
-		devs = devs->next;
-	}
+    	while(devs->next)
+    	{
+    		add_netdev(devs->name, create_pcap);
+    		devs = devs->next;
+    	}
+    }
 }
 
 #endif  // SDLMAME_WIN32
