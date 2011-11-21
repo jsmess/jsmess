@@ -53,7 +53,7 @@ const device_type ABC_SIO = &device_creator<abc_sio_device>;
 //-------------------------------------------------
 
 ROM_START( abc_sio )
-	ROM_REGION( 0x1000, "sio", 0 )
+	ROM_REGION( 0x1000, "abc80", 0 )
 	ROM_LOAD( "t80 1.3", 0x000, 0x800, CRC(f20ff827) SHA1(a1c4af1c374184a14872d7253d6f9e470603117f) )
 	ROM_LOAD( "syn 1.6", 0x800, 0x800, CRC(7bd96b75) SHA1(d1f9b16530be28b03eeddb3f6ee4fa9e1cc9458e) )
 ROM_END
@@ -177,4 +177,21 @@ void abc_sio_device::device_reset()
 
 void abc_sio_device::abcbus_cs(UINT8 data)
 {
+}
+
+
+//-------------------------------------------------
+//  abcbus_xmemfl -
+//-------------------------------------------------
+
+UINT8 abc_sio_device::abcbus_xmemfl(offs_t offset)
+{
+	UINT8 data = 0xff;
+	
+	if (offset >= 0x4000 && offset < 0x5000) // TODO where is this mapped?
+	{
+		data = subregion("abc80")->base()[offset & 0xfff];
+	}
+	
+	return data;
 }
