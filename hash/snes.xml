@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
@@ -52878,7 +52878,7 @@ Alternate board (XL-1)
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="pokemon stadium (world) (unl).sfc" size="2097152" crc="a8142249" sha1="b9825faf488c2106d46c45ba10b0402a04cd1e4c" offset="0x000000" />
+				<rom name="pokemon stadium (world, cracked) (unl).sfc" size="2097152" crc="a8142249" sha1="b9825faf488c2106d46c45ba10b0402a04cd1e4c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -52904,7 +52904,7 @@ Alternate board (XL-1)
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="tekken 2 (world) (unl).sfc" size="2097152" crc="5ba13729" sha1="ff60b9179154c5fe39b8ddc74724884fd3c8290c" offset="0x000000" />
+				<rom name="tekken 2 (world, cracked) (unl).sfc" size="2097152" crc="5ba13729" sha1="ff60b9179154c5fe39b8ddc74724884fd3c8290c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -52930,7 +52930,7 @@ Alternate board (XL-1)
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="x-men vs. street fighter (world) (unl).sfc" size="2097152" crc="7eedf7da" sha1="58909736b9c56933c2a8f5cae5c99cf6e3774b75" offset="0x000000" />
+				<rom name="x-men vs. street fighter (world, cracked) (unl).sfc" size="2097152" crc="7eedf7da" sha1="58909736b9c56933c2a8f5cae5c99cf6e3774b75" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
