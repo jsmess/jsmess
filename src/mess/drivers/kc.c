@@ -117,6 +117,15 @@ const kc_keyb_interface kc85_keyboard_interface =
 	DEVCB_DRIVER_LINE_MEMBER(kc_state, keyboard_cb)
 };
 
+static const cassette_interface kc_cassette_interface =
+{
+	kc_cassette_formats,
+	NULL,
+	CASSETTE_PLAY,
+	"kc_cass",
+	NULL
+};
+
 static MACHINE_CONFIG_START( kc85_3, kc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, KC85_3_CLOCK)
@@ -152,7 +161,7 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc, "kcc", 2)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, kc_cassette_interface )
 
 	/* cartridge slot */
 	MCFG_KC85_CARTRIDGE_ADD("m1", "m2", kc85_exp_interface, kc85_cart, NULL, NULL)
@@ -205,7 +214,7 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc, "kcc", 2)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, kc_cassette_interface )
 
 	/* cartridge slot */
 	MCFG_KC85_CARTRIDGE_ADD("m1", "m2", kc85_exp_interface, kc85_cart, NULL, NULL)

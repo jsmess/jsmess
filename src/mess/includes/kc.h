@@ -26,6 +26,9 @@
 // Devices
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+	
+// Formats
+#include "formats/kc_cas.h"
 
 // Expansions
 #include "machine/kcexp.h"
@@ -34,9 +37,9 @@
 #include "machine/kc_d002.h"
 #include "machine/kc_d004.h"
 
-
-#define KC85_4_CLOCK 1750000
-#define KC85_3_CLOCK 1750000
+// from service manual
+#define KC85_3_CLOCK 1751938
+#define KC85_4_CLOCK 1773447
 
 #define KC85_4_SCREEN_PIXEL_RAM_SIZE 0x04000
 #define KC85_4_SCREEN_COLOUR_RAM_SIZE 0x04000
