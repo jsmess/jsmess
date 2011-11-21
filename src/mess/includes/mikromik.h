@@ -37,18 +37,21 @@ public:
 		  m_maincpu(*this, I8085A_TAG),
 		  m_iop(*this, I8212_TAG),
 		  m_dmac(*this, I8237_TAG),
+		  m_pit(*this, I8253_TAG),
 		  m_crtc(*this, I8275_TAG),
 		  m_fdc(*this, UPD765_TAG),
 		  m_mpsc(*this, UPD7201_TAG),
 		  m_hgdc(*this, UPD7220_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1)
+		  m_floppy1(*this, FLOPPY_1),
+		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8212_device> m_iop;
 	required_device<device_t> m_dmac;
+	required_device<device_t> m_pit;
 	required_device<device_t> m_crtc;
 	required_device<device_t> m_fdc;
 	required_device<upd7201_device> m_mpsc;
@@ -56,6 +59,7 @@ public:
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
+	required_device<device_t> m_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -63,6 +67,8 @@ public:
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
+	DECLARE_READ8_MEMBER( mmu_r );
+	DECLARE_WRITE8_MEMBER( mmu_w );
 	DECLARE_WRITE8_MEMBER( ls259_w );
 	DECLARE_READ8_MEMBER( kb_r );
 	DECLARE_WRITE_LINE_MEMBER( dma_hrq_changed );
@@ -79,14 +85,17 @@ public:
 
 	void scan_keyboard();
 
+	const UINT8 *m_mmu_rom;
+	int m_a8;
+
 	// keyboard state
 	int m_sense;
 	int m_drive;
 	UINT8 m_keydata;
-	UINT8 *m_key_rom;
+	const UINT8 *m_key_rom;
 
 	// video state
-	UINT8 *m_char_rom;
+	const UINT8 *m_char_rom;
 	int m_llen;
 
 	// serial state
@@ -100,5 +109,12 @@ public:
 	int m_dack3;
 	int m_tc;
 };
+
+
+//----------- defined in video/mikromik.c -----------
+
+MACHINE_CONFIG_EXTERN( mm1m6_video );
+
+
 
 #endif

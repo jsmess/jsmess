@@ -52,59 +52,200 @@
 
 #include "includes/mikromik.h"
 
-/* Read/Write Handlers */
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG 0
+
+#define MMU_IOEN_MEMEN	0x01
+#define MMU_RAMEN		0x02
+#define MMU_CE4			0x08
+#define MMU_CE0			0x10
+#define MMU_CE1			0x20
+#define MMU_CE2			0x40
+#define MMU_CE3			0x80
+
+
+
+//**************************************************************************
+//  MEMORY MANAGEMENT UNIT
+//**************************************************************************
+
+//-------------------------------------------------
+//  mmu_r -
+//-------------------------------------------------
+
+READ8_MEMBER( mm1_state::mmu_r )
+{
+	UINT8 data = 0;
+	UINT8 mmu = m_mmu_rom[(m_a8 << 8) | (offset >> 8)];
+	
+	if (mmu & MMU_IOEN_MEMEN)
+	{
+		switch ((offset >> 4) & 0x07)
+		{
+		case 0:
+			data = i8237_r(m_dmac, offset & 0x0f);
+			break;
+		
+		case 1:
+			data = m_mpsc->cd_ba_r(space, offset & 0x03);
+			break;
+		
+		case 2:
+			data = i8275_r(m_crtc, offset & 0x01);
+			break;
+		
+		case 3:
+			data = pit8253_r(m_pit, offset & 0x03);
+			break;
+		
+		case 4:
+			data = m_iop->data_r(space, 0);
+			break;
+		
+		case 5:
+			if (BIT(offset, 0))
+			{
+				data = upd765_data_r(m_fdc, 0);
+			}
+			else
+			{
+				data = upd765_status_r(m_fdc, 0);
+			}
+			break;
+			
+		case 7:
+			data = m_hgdc->read(space, offset & 0x01);
+			break;
+		}
+	}
+	else
+	{
+		if (mmu & MMU_RAMEN)
+		{
+			data = ram_get_ptr(m_ram)[offset];
+		}
+		else if (!(mmu & MMU_CE0))
+		{
+			data = machine().region(I8085A_TAG)->base()[offset & 0x1fff];
+		}
+		else if (!(mmu & MMU_CE1))
+		{
+			data = machine().region(I8085A_TAG)->base()[0x2000 + (offset & 0x1fff)];
+		}
+	}
+	
+	return data;
+}
+
+
+
+//-------------------------------------------------
+//  mmu_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( mm1_state::mmu_w )
+{
+	UINT8 mmu = m_mmu_rom[(m_a8 << 8) | (offset >> 8)];
+	
+	if (mmu & MMU_IOEN_MEMEN)
+	{
+		switch ((offset >> 4) & 0x07)
+		{
+		case 0:
+			i8237_w(m_dmac, offset & 0x0f, data);
+			break;
+		
+		case 1:
+			m_mpsc->cd_ba_w(space, offset & 0x03, data);
+			break;
+		
+		case 2:
+			i8275_w(m_crtc, offset & 0x01, data);
+			break;
+		
+		case 3:
+			pit8253_w(m_pit, offset & 0x03, data);
+			break;
+		
+		case 4:
+			m_iop->data_w(space, 0, data);
+			break;
+		
+		case 5:
+			if (BIT(offset, 0))
+			{
+				upd765_data_w(m_fdc, 0, data);
+			}
+			break;
+			
+		case 6:
+			ls259_w(space, offset & 0x07, data);
+			break;
+			
+		case 7:
+			m_hgdc->write(space, offset & 0x01, data);
+			break;
+		}
+	}
+	else
+	{
+		if (mmu & MMU_RAMEN)
+		{
+			ram_get_ptr(m_ram)[offset] = data;
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  ls259_w -
+//-------------------------------------------------
 
 WRITE8_MEMBER( mm1_state::ls259_w )
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	int d = BIT(data, 0);
 
 	switch (offset)
 	{
-	case 0: /* IC24 A8 */
-		//logerror("IC24 A8 %u\n", d);
-		memory_set_bank(machine(), "bank1", d);
-
-		if (d)
-		{
-			program->install_readwrite_bank(0x0000, 0x0fff, "bank1");
-		}
-		else
-		{
-			program->install_read_bank(0x0000, 0x0fff, "bank1");
-			program->unmap_write(0x0000, 0x0fff);
-		}
+	case 0: // IC24 A8
+		if (LOG) logerror("IC24 A8 %u\n", d);
+		m_a8 = d;
 		break;
 
-	case 1: /* RECALL */
-		//logerror("RECALL %u\n", d);
+	case 1: // RECALL
+		if (LOG) logerror("RECALL %u\n", d);
 		m_recall = d;
 		upd765_reset_w(m_fdc, d);
 		break;
 
-	case 2: /* _RV28/RX21 */
+	case 2: // _RV28/RX21
 		m_rx21 = d;
 		break;
 
-	case 3: /* _TX21 */
+	case 3: // _TX21
 		m_tx21 = d;
 		break;
 
-	case 4: /* _RCL */
+	case 4: // _RCL
 		m_rcl = d;
 		break;
 
-	case 5: /* _INTC */
+	case 5: // _INTC
 		m_intc = d;
 		break;
 
-	case 6: /* LLEN */
-		//logerror("LLEN %u\n", d);
+	case 6: // LLEN
+		if (LOG) logerror("LLEN %u\n", d);
 		m_llen = d;
 		break;
 
-	case 7: /* MOTOR ON */
-		//logerror("MOTOR %u\n", d);
+	case 7: // MOTOR ON
+		if (LOG) logerror("MOTOR %u\n", d);
 		floppy_mon_w(m_floppy0, !d);
 		floppy_mon_w(m_floppy1, !d);
 		floppy_drive_set_ready_state(m_floppy0, d, 1);
@@ -115,31 +256,99 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 	}
 }
 
-/* Memory Maps */
+
+
+//**************************************************************************
+//  KEYBOARD
+//**************************************************************************
+
+//-------------------------------------------------
+//  scan_keyboard -
+//-------------------------------------------------
+
+void mm1_state::scan_keyboard()
+{
+	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
+
+	UINT8 data = input_port_read(machine(), keynames[m_drive]);
+	UINT8 special = input_port_read(machine(), "SPECIAL");
+	int ctrl = BIT(special, 0);
+	int shift = BIT(special, 2) & BIT(special, 1);
+	UINT8 keydata = 0xff;
+
+	if (!BIT(data, m_sense))
+	{
+		// get key data from PROM
+		keydata = m_key_rom[(ctrl << 8) | (shift << 7) | (m_drive << 3) | (m_sense)];
+	}
+
+	if (m_keydata != keydata)
+	{
+		// latch key data
+		m_keydata = keydata;
+
+		if (keydata != 0xff)
+		{
+			// strobe in key data
+			m_iop->stb_w(1);
+			m_iop->stb_w(0);
+		}
+	}
+
+	if (keydata == 0xff)
+	{
+		// increase scan counters
+		m_sense++;
+
+		if (m_sense == 8)
+		{
+			m_sense = 0;
+			m_drive++;
+
+			if (m_drive == 10)
+			{
+				m_drive = 0;
+			}
+		}
+	}
+
+}
+
+
+//-------------------------------------------------
+//  TIMER_DEVICE_CALLBACK( kbclk_tick )
+//-------------------------------------------------
+
+static TIMER_DEVICE_CALLBACK( kbclk_tick )
+{
+	mm1_state *state = timer.machine().driver_data<mm1_state>();
+
+	state->scan_keyboard();
+}
+
+
+
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
+
+//-------------------------------------------------
+//  ADDRESS_MAP( mm1_map )
+//-------------------------------------------------
 
 static ADDRESS_MAP_START( mm1_map, AS_PROGRAM, 8, mm1_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x1000, 0xfeff) AM_RAM
-	AM_RANGE(0xff00, 0xff0f) AM_MIRROR(0x80) AM_DEVREADWRITE_LEGACY(I8237_TAG, i8237_r, i8237_w)
-	AM_RANGE(0xff10, 0xff13) AM_MIRROR(0x8c) AM_DEVREADWRITE(UPD7201_TAG, upd7201_device, cd_ba_r, cd_ba_w)
-    AM_RANGE(0xff20, 0xff21) AM_MIRROR(0x8e) AM_DEVREADWRITE_LEGACY(I8275_TAG, i8275_r, i8275_w)
-	AM_RANGE(0xff30, 0xff33) AM_MIRROR(0x8c) AM_DEVREADWRITE_LEGACY(I8253_TAG, pit8253_r, pit8253_w)
-	AM_RANGE(0xff40, 0xff40) AM_MIRROR(0x8f) AM_DEVREADWRITE(I8212_TAG, i8212_device, data_r, data_w)
-	AM_RANGE(0xff50, 0xff50) AM_MIRROR(0x8e) AM_DEVREAD_LEGACY(UPD765_TAG, upd765_status_r)
-	AM_RANGE(0xff51, 0xff51) AM_MIRROR(0x8e) AM_DEVREADWRITE_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w)
-	AM_RANGE(0xff60, 0xff67) AM_MIRROR(0x88) AM_WRITE(ls259_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_r, mmu_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mm1m6_map, AS_PROGRAM, 8, mm1_state )
-	AM_IMPORT_FROM(mm1_map)
-	AM_RANGE(0xff70, 0xff71) AM_MIRROR(0x8e) AM_DEVREADWRITE(UPD7220_TAG, upd7220_device, read, write)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mm1_upd7220_map, AS_0, 8, mm1_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE(UPD7220_TAG, upd7220_device, vram_r, vram_w)
-ADDRESS_MAP_END
 
-/* Input Ports */
+//**************************************************************************
+//  INPUT PORTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  INPUT_PORTS( mm1 )
+//-------------------------------------------------
 
 static INPUT_PORTS_START( mm1 )
 	PORT_START("ROW0")
@@ -253,136 +462,44 @@ static INPUT_PORTS_START( mm1 )
 	PORT_CONFSETTING( 0x01, "160/320 KB" )
 INPUT_PORTS_END
 
-/* Video */
 
-static PALETTE_INIT( mm1 )
-{
-	palette_set_color(machine, 0, RGB_BLACK); /* black */
-	palette_set_color_rgb(machine, 1, 0x00, 0xc0, 0x00); /* green */
-	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00); /* bright green */
-}
 
-static I8275_DISPLAY_PIXELS( crtc_display_pixels )
-{
-	mm1_state *state = device->machine().driver_data<mm1_state>();
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
 
-	UINT8 romdata = state->m_char_rom[(charcode << 4) | linecount];
-
-	int d0 = BIT(romdata, 0);
-	int d7 = BIT(romdata, 7);
-	int gpa0 = BIT(gpa, 0);
-	int llen = state->m_llen;
-	int i;
-
-	UINT8 data = (romdata << 1) | (d7 & d0);
-
-	for (i = 0; i < 8; i++)
-	{
-		int qh = BIT(data, i);
-		int video_in = ((((d7 & llen) | !vsp) & !gpa0) & qh) | lten;
-		int compl_in = rvv;
-		int hlt_in = hlgt;
-
-		int color = hlt_in ? 2 : (video_in ^ compl_in);
-
-		*BITMAP_ADDR16(device->machine().generic.tmpbitmap, y, x + i) = color;
-	}
-}
-
-static const i8275_interface crtc_intf =
-{
-	SCREEN_TAG,
-	8,
-	0,
-	DEVCB_DEVICE_LINE(I8237_TAG, i8237_dreq0_w),
-	DEVCB_NULL,
-	crtc_display_pixels
-};
-
-/* TODO */
-static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
-{
-	int i;
-
-	for (i = 0; i < 8; i++)
-	{
-		if (BIT(data, i)) *BITMAP_ADDR16(bitmap, y, x + i) = 1;
-	}
-}
-
-static UPD7220_INTERFACE( hgdc_intf )
-{
-	SCREEN_TAG,
-	hgdc_display_pixels,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-void mm1_state::video_start()
-{
-	// find memory regions
-	m_char_rom = machine().region("chargen")->base();
-
-	VIDEO_START_NAME(generic_bitmapped)(machine());
-}
-
-bool mm1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	/* text */
-	i8275_update(m_crtc, &bitmap, &cliprect);
-	copybitmap(&bitmap, screen.machine().generic.tmpbitmap, 0, 0, 0, 0, &cliprect);
-
-	/* graphics */
-	m_hgdc->update_screen(&bitmap, &cliprect);
-
-	return 0;
-}
-
-static const gfx_layout tiles8x16_layout =
-{
-	8, 16,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
-	   8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16
-};
-
-static GFXDECODE_START( mm1 )
-	GFXDECODE_ENTRY( "chargen", 0, tiles8x16_layout, 0, 0x100 )
-GFXDECODE_END
-
-/* 8212 Interface */
+//-------------------------------------------------
+//  I8212_INTERFACE( iop_intf )
+//-------------------------------------------------
 
 READ8_MEMBER( mm1_state::kb_r )
 {
 	return m_keydata;
 }
 
-static I8212_INTERFACE( mm1_i8212_intf )
+static I8212_INTERFACE( iop_intf )
 {
 	DEVCB_CPU_INPUT_LINE(I8085A_TAG, I8085_RST65_LINE),
 	DEVCB_DRIVER_MEMBER(mm1_state, kb_r),
 	DEVCB_NULL
 };
 
-/* 8237 Interface */
+
+//-------------------------------------------------
+//  I8237_INTERFACE( dmac_intf )
+//-------------------------------------------------
 
 WRITE_LINE_MEMBER( mm1_state::dma_hrq_changed )
 {
 	device_set_input_line(m_maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
-	/* Assert HLDA */
+	// Assert HLDA
 	i8237_hlda_w(m_dmac, state);
 }
 
 READ8_MEMBER( mm1_state::mpsc_dack_r )
 {
-	/* clear data request */
+	// clear data request
 	i8237_dreq2_w(m_dmac, CLEAR_LINE);
 
 	return m_mpsc->dtra_r();
@@ -392,7 +509,7 @@ WRITE8_MEMBER( mm1_state::mpsc_dack_w )
 {
 	m_mpsc->hai_w(data);
 
-	/* clear data request */
+	// clear data request
 	i8237_dreq1_w(m_dmac, CLEAR_LINE);
 }
 
@@ -400,7 +517,7 @@ WRITE_LINE_MEMBER( mm1_state::tc_w )
 {
 	if (!m_dack3)
 	{
-		/* floppy terminal count */
+		// floppy terminal count
 		upd765_tc_w(m_fdc, !state);
 	}
 
@@ -415,7 +532,7 @@ WRITE_LINE_MEMBER( mm1_state::dack3_w )
 
 	if (!m_dack3)
 	{
-		/* floppy terminal count */
+		// floppy terminal count
 		upd765_tc_w(m_fdc, m_tc);
 	}
 }
@@ -423,7 +540,7 @@ WRITE_LINE_MEMBER( mm1_state::dack3_w )
 static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
 static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
 
-static I8237_INTERFACE( mm1_dma8237_intf )
+static I8237_INTERFACE( dmac_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dma_hrq_changed),
 	DEVCB_DRIVER_LINE_MEMBER(mm1_state, tc_w),
@@ -434,18 +551,10 @@ static I8237_INTERFACE( mm1_dma8237_intf )
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(mm1_state, dack3_w) }
 };
 
-/* uPD765 Interface */
 
-static const upd765_interface fdc_intf =
-{
-	DEVCB_CPU_INPUT_LINE(I8085A_TAG, I8085_RST55_LINE),
-	DEVCB_DEVICE_LINE(I8237_TAG, i8237_dreq3_w),
-	NULL,
-	UPD765_RDY_PIN_NOT_CONNECTED,
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
-
-/* 8253 Interface */
+//-------------------------------------------------
+//  pit8253_config pit_intf
+//-------------------------------------------------
 
 WRITE_LINE_MEMBER( mm1_state::itxc_w )
 {
@@ -469,7 +578,7 @@ WRITE_LINE_MEMBER( mm1_state::auxc_w )
 	m_mpsc->rxcb_w(state);
 }
 
-static const struct pit8253_config mm1_pit8253_intf =
+static const struct pit8253_config pit_intf =
 {
 	{
 		{
@@ -488,7 +597,10 @@ static const struct pit8253_config mm1_pit8253_intf =
 	}
 };
 
-/* uPD7201 Interface */
+
+//-------------------------------------------------
+//  UPD7201_INTERFACE( mpsc_intf )
+//-------------------------------------------------
 
 WRITE_LINE_MEMBER( mm1_state::drq2_w )
 {
@@ -508,39 +620,42 @@ WRITE_LINE_MEMBER( mm1_state::drq1_w )
 
 static UPD7201_INTERFACE( mpsc_intf )
 {
-	DEVCB_NULL,					/* interrupt */
+	DEVCB_NULL,					// interrupt
 	{
 		{
-			0,					/* receive clock */
-			0,					/* transmit clock */
-			DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq2_w),	/* receive DRQ */
-			DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq1_w),	/* transmit DRQ */
-			DEVCB_NULL,			/* receive data */
-			DEVCB_NULL,			/* transmit data */
-			DEVCB_NULL,			/* clear to send */
-			DEVCB_NULL,			/* data carrier detect */
-			DEVCB_NULL,			/* ready to send */
-			DEVCB_NULL,			/* data terminal ready */
-			DEVCB_NULL,			/* wait */
-			DEVCB_NULL			/* sync output */
+			0,					// receive clock
+			0,					// transmit clock
+			DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq2_w),	// receive DRQ
+			DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq1_w),	// transmit DRQ
+			DEVCB_NULL,			// receive data
+			DEVCB_NULL,			// transmit data
+			DEVCB_NULL,			// clear to send
+			DEVCB_NULL,			// data carrier detect
+			DEVCB_NULL,			// ready to send
+			DEVCB_NULL,			// data terminal ready
+			DEVCB_NULL,			// wait
+			DEVCB_NULL			// sync output
 		}, {
-			0,					/* receive clock */
-			0,					/* transmit clock */
-			DEVCB_NULL,			/* receive DRQ */
-			DEVCB_NULL,			/* transmit DRQ */
-			DEVCB_NULL,			/* receive data */
-			DEVCB_NULL,			/* transmit data */
-			DEVCB_NULL,			/* clear to send */
-			DEVCB_LINE_GND,		/* data carrier detect */
-			DEVCB_NULL,			/* ready to send */
-			DEVCB_NULL,			/* data terminal ready */
-			DEVCB_NULL,			/* wait */
-			DEVCB_NULL			/* sync output */
+			0,					// receive clock
+			0,					// transmit clock
+			DEVCB_NULL,			// receive DRQ
+			DEVCB_NULL,			// transmit DRQ
+			DEVCB_NULL,			// receive data
+			DEVCB_NULL,			// transmit data
+			DEVCB_NULL,			// clear to send
+			DEVCB_LINE_GND,		// data carrier detect
+			DEVCB_NULL,			// ready to send
+			DEVCB_NULL,			// data terminal ready
+			DEVCB_NULL,			// wait
+			DEVCB_NULL			// sync output
 		}
 	}
 };
 
-/* I8085A Interface */
+
+//-------------------------------------------------
+//  I8085_CONFIG( i8085_intf )
+//-------------------------------------------------
 
 READ_LINE_MEMBER( mm1_state::dsra_r )
 {
@@ -549,76 +664,22 @@ READ_LINE_MEMBER( mm1_state::dsra_r )
 
 static I8085_CONFIG( i8085_intf )
 {
-	DEVCB_NULL,			/* STATUS changed callback */
-	DEVCB_NULL,			/* INTE changed callback */
-	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dsra_r),	/* SID changed callback (I8085A only) */
-	DEVCB_DEVICE_LINE(SPEAKER_TAG, speaker_level_w)	/* SOD changed callback (I8085A only) */
+	DEVCB_NULL,			// STATUS changed callback
+	DEVCB_NULL,			// INTE changed callback
+	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dsra_r),	// SID changed callback (I8085A only)
+	DEVCB_DEVICE_LINE(SPEAKER_TAG, speaker_level_w)	// SOD changed callback (I8085A only)
 };
 
-/* Keyboard */
 
-void mm1_state::scan_keyboard()
-{
-	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
-
-	UINT8 data = input_port_read(machine(), keynames[m_drive]);
-	UINT8 special = input_port_read(machine(), "SPECIAL");
-	int ctrl = BIT(special, 0);
-	int shift = BIT(special, 2) & BIT(special, 1);
-	UINT8 keydata = 0xff;
-
-	if (!BIT(data, m_sense))
-	{
-		/* get key data from PROM */
-		keydata = m_key_rom[(ctrl << 8) | (shift << 7) | (m_drive << 3) | (m_sense)];
-	}
-
-	if (m_keydata != keydata)
-	{
-		/* latch key data */
-		m_keydata = keydata;
-
-		if (keydata != 0xff)
-		{
-			/* strobe in key data */
-			m_iop->stb_w(1);
-			m_iop->stb_w(0);
-		}
-	}
-
-	if (keydata == 0xff)
-	{
-		/* increase scan counters */
-		m_sense++;
-
-		if (m_sense == 8)
-		{
-			m_sense = 0;
-			m_drive++;
-
-			if (m_drive == 10)
-			{
-				m_drive = 0;
-			}
-		}
-	}
-
-}
-
-static TIMER_DEVICE_CALLBACK( kbclk_tick )
-{
-	mm1_state *state = timer.machine().driver_data<mm1_state>();
-
-	state->scan_keyboard();
-}
-
-/* Floppy Configuration */
+//-------------------------------------------------
+//  upd765_interface fdc_intf
+//-------------------------------------------------
 
 static LEGACY_FLOPPY_OPTIONS_START( mm1 )
 	LEGACY_FLOPPY_OPTION( mm1_640kb, "dsk", "Nokia MikroMikko 1 640KB disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([80])
-		SECTORS([8]) /* 3:1 sector skew (1,4,7,2,5,8,3,6) */
+		SECTORS([8]) // 3:1 sector skew (1,4,7,2,5,8,3,6)
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
@@ -646,29 +707,38 @@ static const floppy_interface mm1_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_5_25_DSQD,
 	LEGACY_FLOPPY_OPTIONS_NAME(mm1),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
-/* Machine Initialization */
+static const upd765_interface fdc_intf =
+{
+	DEVCB_CPU_INPUT_LINE(I8085A_TAG, I8085_RST55_LINE),
+	DEVCB_DEVICE_LINE(I8237_TAG, i8237_dreq3_w),
+	NULL,
+	UPD765_RDY_PIN_NOT_CONNECTED,
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+};
+
+
+
+//**************************************************************************
+//  MACHINE INITIALIZATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_START( mm1 )
+//-------------------------------------------------
 
 void mm1_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-
-	/* find memory regions */
+	// find memory regions
+	m_mmu_rom = machine().region("address")->base();
 	m_key_rom = machine().region("keyboard")->base();
 
-	/* setup memory banking */
-	program->install_read_bank(0x0000, 0x0fff, "bank1");
-	program->unmap_write(0x0000, 0x0fff);
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region("bios")->base(), 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, ram_get_ptr(machine().device(RAM_TAG)), 0);
-	memory_set_bank(machine(), "bank1", 0);
-
-	/* register for state saving */
+	// register for state saving
 	state_save_register_global(machine(), m_sense);
 	state_save_register_global(machine(), m_drive);
 	state_save_register_global(machine(), m_llen);
@@ -680,107 +750,110 @@ void mm1_state::machine_start()
 	state_save_register_global(machine(), m_dack3);
 }
 
+
+//-------------------------------------------------
+//  MACHINE_RESET( mm1 )
+//-------------------------------------------------
+
 void mm1_state::machine_reset()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	int i;
 
-	/* reset LS259 */
+	// reset LS259
 	for (i = 0; i < 8; i++) ls259_w(*program, i, 0);
 
-	/* set FDC ready */
+	// set FDC ready
 	if (!input_port_read(machine(), "T5")) upd765_ready_w(m_fdc, 1);
 
-	/* reset FDC */
+	// reset FDC
 	upd765_reset_w(m_fdc, 1);
 	upd765_reset_w(m_fdc, 0);
 }
 
-/* Machine Drivers */
+
+
+//**************************************************************************
+//  MACHINE DRIVERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( mm1 )
+//-------------------------------------------------
 
 static MACHINE_CONFIG_START( mm1, mm1_state )
-	/* basic system hardware */
+	// basic system hardware
 	MCFG_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
 	MCFG_CPU_PROGRAM_MAP(mm1_map)
 	MCFG_CPU_CONFIG(i8085_intf)
 
 	MCFG_TIMER_ADD_PERIODIC("kbclk", kbclk_tick, attotime::from_hz(2500)) //attotime::from_hz(XTAL_6_144MHz/2/8))
 
-	/* video hardware */
-	MCFG_SCREEN_ADD( SCREEN_TAG, RASTER )
-	MCFG_SCREEN_REFRESH_RATE( 50 )
-	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MCFG_SCREEN_SIZE( 800, 400 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 400-1 )
-	//MCFG_SCREEN_RAW_PARAMS(XTAL_18_720MHz, ...)
-
-	MCFG_GFXDECODE(mm1)
-	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT(mm1)
-
-	MCFG_I8275_ADD(I8275_TAG, crtc_intf)
-
-	/* sound hardware */
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* peripheral hardware */
-	MCFG_I8212_ADD(I8212_TAG, mm1_i8212_intf)
-	MCFG_I8237_ADD(I8237_TAG, XTAL_6_144MHz/2, mm1_dma8237_intf)
-	MCFG_PIT8253_ADD(I8253_TAG, mm1_pit8253_intf)
-	MCFG_UPD765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2, */ fdc_intf)
+	// peripheral hardware
+	MCFG_I8212_ADD(I8212_TAG, iop_intf)
+	MCFG_I8237_ADD(I8237_TAG, XTAL_6_144MHz/2, dmac_intf)
+	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
+	MCFG_UPD765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2 */ fdc_intf)
 	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mpsc_intf)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mm1_floppy_interface)
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mm1m6, mm1 )
-	/* basic system hardware */
-	MCFG_CPU_MODIFY(I8085A_TAG)
-	MCFG_CPU_PROGRAM_MAP(mm1m6_map)
 
-	/* video hardware */
-	MCFG_UPD7220_ADD(UPD7220_TAG, XTAL_18_720MHz/8, hgdc_intf, mm1_upd7220_map)
+//-------------------------------------------------
+//  MACHINE_CONFIG( mm1m6 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( mm1m6, mm1 )
+	// video hardware
+	MCFG_FRAGMENT_ADD(mm1m6_video)
 MACHINE_CONFIG_END
 
-/* ROMs */
+
+
+//**************************************************************************
+//  ROMS
+//**************************************************************************
+
+//-------------------------------------------------
+//  ROM( mm1m6 )
+//-------------------------------------------------
 
 ROM_START( mm1m6 )
-	ROM_REGION( 0x4000, "bios", 0 ) /* BIOS */
+	ROM_REGION( 0x4000, I8085A_TAG, 0 ) // BIOS
 	ROM_LOAD( "9081b.ic2", 0x0000, 0x2000, CRC(2955feb3) SHA1(946a6b0b8fb898be3f480c04da33d7aaa781152b) )
-
-	/*
-
-        Address Decoder PROM outputs
-
-        D0      IOEN/_MEMEN
-        D1      RAMEN
-        D2      not connected
-        D3      _CE4
-        D4      _CE0
-        D5      _CE1
-        D6      _CE2
-        D7      _CE3
-
-    */
-	ROM_REGION( 0x200, "address", 0 ) /* address decoder */
+   
+	ROM_REGION( 0x200, "address", 0 ) // address decoder
 	ROM_LOAD( "720793a.ic24", 0x0000, 0x0200, CRC(deea87a6) SHA1(8f19e43252c9a0b1befd02fc9d34fe1437477f3a) )
 
-	ROM_REGION( 0x200, "keyboard", 0 ) /* keyboard encoder */
+	ROM_REGION( 0x200, "keyboard", 0 ) // keyboard encoder
 	ROM_LOAD( "mmi6349-1j.bin", 0x0000, 0x0200, CRC(4ab3bf03) SHA1(925c9ee22db13566416cdbc505c03d4116ff8d5f) )
 
-	ROM_REGION( 0x1000, "chargen", 0 ) /* character generator */
+	ROM_REGION( 0x1000, "chargen", 0 ) // character generator
 	ROM_LOAD( "6807b.ic61", 0x0000, 0x1000, CRC(32b36220) SHA1(8fe7a181badea3f7e656dfaea21ee9e4c9baf0f1) )
 ROM_END
 
+
+//-------------------------------------------------
+//  ROM( mm1m7 )
+//-------------------------------------------------
+
 #define rom_mm1m7 rom_mm1m6
 
-/* System Drivers */
+
+
+//**************************************************************************
+//  SYSTEM DRIVERS
+//**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY           FULLNAME                FLAGS
 COMP( 1981, mm1m6,		0,		0,		mm1m6,		mm1,		0,		"Nokia Data",		"MikroMikko 1 M6",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)

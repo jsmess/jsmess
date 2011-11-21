@@ -1217,6 +1217,7 @@ $(MESSOBJ)/nintendo.a:			\
 
 $(MESSOBJ)/nokia.a:				\
 	$(MESS_DRIVERS)/mikromik.o	\
+	$(MESS_VIDEO)/mikromik.o	\
 
 $(MESSOBJ)/novag.a:				\
 	$(MESS_DRIVERS)/mk1.o		\
