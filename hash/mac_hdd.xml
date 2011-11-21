@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="mac_hdd" description="Mac Harddisk list">
+	<software name="mac608">
+		<description>Mac OS 6.08</description>
+		<year>19??</year>
+		<publisher>Apple</publisher>
+		<part name="hdd" interface="mac_hdd">">
+			<diskarea name="harddriv">
+				<disk name="mac608" sha1="0886de55d3f7d803a59242173b2772e10b3014c3" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+</softwarelist>

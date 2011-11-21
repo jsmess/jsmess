@@ -1039,7 +1039,9 @@ WRITE16_HANDLER(ti990_hdc_w)
 static const struct harddisk_interface ti990_harddisk_config =
 {
 	DEVICE_IMAGE_LOAD_NAME( ti990_hd ),
-	DEVICE_IMAGE_UNLOAD_NAME( ti990_hd )
+	DEVICE_IMAGE_UNLOAD_NAME( ti990_hd ),
+	NULL,
+	NULL
 };
 
 MACHINE_CONFIG_FRAGMENT( ti990_hdc )
