@@ -37,6 +37,7 @@ protected:
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(UINT8 data);
+	virtual UINT8 abcbus_xmemfl(offs_t offset);
 	
 private:
 	required_device<z80ctc_device> m_ctc;

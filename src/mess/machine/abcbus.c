@@ -238,7 +238,7 @@ READ8_MEMBER( abcbus_slot_device::xmemfl_r )
 
 	if (m_card != NULL)
 	{
-		data &= m_card->abcbus_xmemfl();
+		data &= m_card->abcbus_xmemfl(offset);
 	}
 
 	return data;
@@ -253,7 +253,7 @@ WRITE8_MEMBER( abcbus_slot_device::xmemw_w )
 {
 	if (m_card != NULL)
 	{
-		m_card->abcbus_xmemw(data);
+		m_card->abcbus_xmemw(offset, data);
 	}
 }
 

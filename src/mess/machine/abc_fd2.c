@@ -208,3 +208,20 @@ void abc_fd2_device::device_reset()
 void abc_fd2_device::abcbus_cs(UINT8 data)
 {
 }
+
+
+//-------------------------------------------------
+//  abcbus_xmemfl -
+//-------------------------------------------------
+
+UINT8 abc_fd2_device::abcbus_xmemfl(offs_t offset)
+{
+	UINT8 data = 0xff;
+	
+	if (offset >= 0x6000 && offset < 0x6400) // TODO is this mirrored?
+	{
+		data = subregion("abc80")->base()[offset & 0x3ff];
+	}
+	
+	return data;
+}

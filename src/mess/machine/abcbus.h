@@ -130,8 +130,8 @@ public:
 	virtual void abcbus_c2(UINT8 data) { };
 	virtual void abcbus_c3(UINT8 data) { };
 	virtual void abcbus_c4(UINT8 data) { };
-	virtual UINT8 abcbus_xmemfl() { return 0xff; };
-	virtual void abcbus_xmemw(UINT8 data) { };
+	virtual UINT8 abcbus_xmemfl(offs_t offset) { return 0xff; };
+	virtual void abcbus_xmemw(offs_t offset, UINT8 data) { };
 
 public:
 	abcbus_slot_device  *m_bus;
