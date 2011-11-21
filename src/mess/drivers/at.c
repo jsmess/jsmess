@@ -753,6 +753,69 @@ ROM_START( i8530286 )
 	ROM_RELOAD(0xfe0001,0x10000)
 ROM_END
 
+/*
+
+8530-H31 (Model 30/286)
+======================
+  P/N		   Date
+33F5381A EC C01446 1990
+
+*/
+ROM_START( i8530h31 )
+	ROM_REGION(0x1000000,"maincpu", 0)
+	ROM_LOAD( "33f5381a.bin", 0xe0000, 0x20000, CRC(ff57057d) SHA1(d7f1777077a8df43c3c14d175b9709bd3969c4b1))
+ROM_END
+
+/*
+8535-043 (Model 35)
+===================
+  P/N    Checksum     Date
+04G2021    C26C       1991    ODD
+04G2022    9B94       1991    EVEN
+*/
+ROM_START( i8535043 )
+	ROM_REGION(0x1000000,"maincpu", 0)
+	ROM_LOAD16_BYTE( "04g2021.bin", 0xe0001, 0x10000, CRC(4069b2eb) SHA1(9855c84c81d1f07e1da66b1ca45c1c10c0717a90))
+	ROM_RELOAD(0xfe0001, 0x10000)
+	ROM_LOAD16_BYTE( "04g2022.bin", 0xe0000, 0x10000, CRC(35c1af65) SHA1(7d2445cc463969c808fdd78e0a27a03db5dfc698))
+	ROM_RELOAD(0xfe0000, 0x10000)
+ROM_END
+
+/*
+8550-021 (Model 50)
+===================
+ Code     Date       Internal
+90X7420  4/12/87 --> 90X6815
+90X7423  8/12/87 --> 90X6816
+90X7426  8/12/87 --> 90X6817
+90X7429 18/12/87 --> 90X6818
+*/
+ROM_START( i8550021 )
+    ROM_REGION(0x1000000,"maincpu", 0)
+	ROM_LOAD16_BYTE( "90x7423.bin", 0xe0000, 0x8000, CRC(2c1633e0) SHA1(1af7faa526585a7cfb69e71d90a75e1f1c541586))
+	ROM_RELOAD(0xfe0000, 0x8000)
+	ROM_LOAD16_BYTE( "90x7426.bin", 0xe0001, 0x8000, CRC(e7c762ce) SHA1(228f67dc915d84519da7fc1a59b7f9254278f3a0))
+	ROM_RELOAD(0xfe0001, 0x8000)
+	ROM_LOAD16_BYTE( "90x7420.bin", 0xf0001, 0x8000, CRC(19a57cc1) SHA1(5b31ba66cd3690e651a450619a32b7210769945d))
+	ROM_RELOAD(0xff0001, 0x8000)
+	ROM_LOAD16_BYTE( "90x7429.bin", 0xf0000, 0x8000, CRC(6f0120f6) SHA1(e112c291ac3d9f6507c93ac49ad26f9fd2245fd2))
+	ROM_RELOAD(0xff0000, 0x8000)	
+ROM_END
+
+/*
+8550-061 (Model 50Z)
+===================
+                  P/N              Date
+AMI 8935MKN     15F8365    S63512  1988
+AMI 8948MML     15F8366    S63512  1988
+*/
+ROM_START( i8550061 )
+    ROM_REGION(0x1000000,"maincpu", 0)
+	ROM_LOAD16_BYTE( "15f8365.bin", 0xe0001, 0x10000, CRC(35aa3ecf) SHA1(a122531092a9cb08600b276da9c9c3ce385aab7b))
+	ROM_RELOAD(0xfe0001, 0x10000)
+	ROM_LOAD16_BYTE( "15f8366.bin", 0xe0000, 0x10000, CRC(11bf564d) SHA1(0dda6a7ca9294cfaab5bdf4c05973be13b2766fc))
+	ROM_RELOAD(0xfe0000, 0x10000)
+ROM_END
 
 ROM_START( i8555081 )
 	ROM_REGION(0x1000000,"maincpu", 0)
@@ -1257,8 +1320,12 @@ ROM_END
 COMP ( 1984, ibm5170,  0,       ibm5150, ibm5170,   atcga,      atcga,  "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
 COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,      atcga,  "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
 COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,      atcga,  "International Business Machines",  "IBM PC/XT-286 5162", GAME_NOT_WORKING )
+COMP ( 1990, i8530h31, ibm5170, 0,       ps2m30286, atvga,      atvga,  "International Business Machines",  "IBM PS/2 8530-H31 (Model 30/286)", GAME_NOT_WORKING )
 COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,      atvga,  "International Business Machines",  "IBM PS/2 Model 30-286", GAME_NOT_WORKING )
-COMP ( 1989, i8555081, ibm5170, 0,       at386,     atvga,      atvga,  "International Business Machines",  "IBM PS/2 Model 55SX", GAME_NOT_WORKING )
+COMP ( 198?, i8535043, ibm5170, 0,       at386, 	atvga,      atvga,  "International Business Machines",  "IBM PS/2 8535-043 (Model 35)", GAME_NOT_WORKING )
+COMP ( 198?, i8550021, ibm5170, 0,       at386, 	atvga,      atvga,  "International Business Machines",  "IBM PS/2 8550-021 (Model 50)", GAME_NOT_WORKING )
+COMP ( 198?, i8550061, ibm5170, 0,       at386, 	atvga,      atvga,  "International Business Machines",  "IBM PS/2 8550-061 (Model 50Z)", GAME_NOT_WORKING )
+COMP ( 1989, i8555081, ibm5170, 0,       at386,     atvga,      atvga,  "International Business Machines",  "IBM PS/2 8550-081 (Model 55SX)", GAME_NOT_WORKING )
 COMP ( 1987, at,       ibm5170, 0,       ibm5162,   atcga,      atcga,  "<generic>",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,      atvga,  "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,      atvga,  "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )

@@ -678,8 +678,13 @@ m240
 // AT
 ibm5170   // 1984 IBM PC/AT 5170, original 6 MHz model
 ibm5170a  // 1985 IBM PC/AT 5170, enhanced 8 MHz model
-i8530286  // 1988 IBM PS/2 Model 30-286 (VGA)
-i8555081  // 1988 IBM PS/2 Model 55SX (VGA)
+i8530h31  // IBM PS/2 8530-H31 (Model 30/286)
+i8530286  // IBM PS/2 Model 30-286
+i8535043  // IBM PS/2 8535-043 (Model 35)
+i8550021  // IBM PS/2 8550-021 (Model 50)
+i8550061  // IBM PS/2 8550-061 (Model 50Z)
+i8555081  // IBM PS/2 8550-081 (Model 55SX)
+
 at	// 1987 AMI Bios and Diagnostics
 atvga	 // 19?? AT VGA
 neat	  // 1989 New Enhanced AT chipset, AMI BIOS
