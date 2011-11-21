@@ -789,6 +789,12 @@ ROM_END
 90X7423  8/12/87 --> 90X6816
 90X7426  8/12/87 --> 90X6817
 90X7429 18/12/87 --> 90X6818
+
+Same ROMs used by : (According to http://www.ibmmuseum.com/ohlandl/8565/8560.html)
+
+IBM Personal System/2 Model 60 (8560-041 and 8560-071) 
+IBM Personal System/2 Model 65 SX (8565-061 and 8565-121) 
+
 */
 ROM_START( i8550021 )
     ROM_REGION(0x1000000,"maincpu", 0)
@@ -808,12 +814,16 @@ ROM_END
                   P/N              Date
 AMI 8935MKN     15F8365    S63512  1988
 AMI 8948MML     15F8366    S63512  1988
+
+http://ps-2.kev009.com:8081/ohlandl/8550/8550z_Planar.html
+
+
 */
 ROM_START( i8550061 )
     ROM_REGION(0x1000000,"maincpu", 0)
-	ROM_LOAD16_BYTE( "15f8365.bin", 0xe0001, 0x10000, CRC(35aa3ecf) SHA1(a122531092a9cb08600b276da9c9c3ce385aab7b))
+	ROM_LOAD16_BYTE( "15f8365.zm5", 0xe0001, 0x10000, CRC(35aa3ecf) SHA1(a122531092a9cb08600b276da9c9c3ce385aab7b))
 	ROM_RELOAD(0xfe0001, 0x10000)
-	ROM_LOAD16_BYTE( "15f8366.bin", 0xe0000, 0x10000, CRC(11bf564d) SHA1(0dda6a7ca9294cfaab5bdf4c05973be13b2766fc))
+	ROM_LOAD16_BYTE( "15f8366.zm6", 0xe0000, 0x10000, CRC(11bf564d) SHA1(0dda6a7ca9294cfaab5bdf4c05973be13b2766fc))
 	ROM_RELOAD(0xfe0000, 0x10000)
 ROM_END
 
