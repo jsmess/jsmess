@@ -27,6 +27,7 @@
 #include "formats/gtp_cas.h"
 #include "formats/hect_tap.h"
 #include "formats/ace_tap.h"
+#include "formats/kc_cas.h"
 #include "formats/kim1_cas.h"
 #include "formats/lviv_lvt.h"
 #include "formats/mz_cas.h"
@@ -63,6 +64,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"gtp", gtp_cassette_formats               ,"Galaksija"},
 	{"hector", hector_cassette_formats         ,"Hector - k7 : classical, FOR : forth cassette "},
 	{"jupiter", ace_cassette_formats           ,"Jupiter"},
+	{"kc85", kc_cassette_formats               ,"VEB Mikroelektronik KC 85"},
 	{"kim1", kim1_cassette_formats             ,"KIM-1"},
 	{"lviv", lviv_lvt_format                   ,"Lviv"},
 	{"mz", mz700_cassette_formats              ,"Sharp MZ"},
