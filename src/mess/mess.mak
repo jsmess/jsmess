@@ -477,6 +477,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/stvvdp2.o		\
 	$(MAME_DRIVERS)/cps1.o	\
 	$(MAME_VIDEO)/cps1.o	\
+	$(MAME_DRIVERS)/konamim2.o \
 
 #-------------------------------------------------
 # the following files are general components and
@@ -1726,7 +1727,6 @@ $(MESSOBJ)/test.a:				\
 	$(MESS_DRIVERS)/zexall.o	\
 
 $(MESSOBJ)/skeleton.a:			\
-	$(MESS_DRIVERS)/3do_m2.o	\
 	$(MESS_DRIVERS)/alesis.o	\
 	$(MESS_DRIVERS)/amico2k.o	\
 	$(MESS_DRIVERS)/applix.o	\
