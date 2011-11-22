@@ -27,16 +27,19 @@
 ******************************************************************************/
 
 #define ADDRESS_MAP_MODERN
+// port 40 read reads eprom socket pins 11-13, 15-19 (i.e. pin D0 to pin D7)
 
-// port 41 write is unknown
+// port 40 write writes eprom socket pins 11-13, 15-19 (i.e. pin D0 to pin D7)
 
-// port 42 write is unknown
+// port 41 write controls eprom socket pins 10 to 3 (d0 to d8) and SIM pins 7, 20/11, 8/12, 6/27, 23, and 21 (d0 to d5) 
+
+// port 42 write controls eprom socket pins 25(d0), 2(d4), 27(d6)
 
 // port 43 read is status/mode
 #undef PORT43_R_VERBOSE
-// port 43 write is ram banking
+// port 43 write is ram banking and ctl1-7; it also clears overload state
 #undef PORT43_W_VERBOSE
-// port 44 write is vfd serial, as well as power and z80 control
+// port 44 write is vfd serial, as well as power and z80 control and various enables; it also clears powerfail state
 #define PORT44_W_VERBOSE 1
 // port 45 write is speaker control
 #undef PORT45_W_VERBOSE
@@ -44,6 +47,8 @@
 
 // port 46 write is LED control
 #undef PORT46_W_VERBOSE
+
+// port 47 write is tim0-tim7
 
 // collated serial data sent to vfd
 #undef VFD_VERBOSE
@@ -123,14 +128,14 @@ READ8_MEMBER( digel804_state::port_43_r )
 {
 	/* Register 0x43: status/mode register read
      bits 76543210
-          |||||||\- overload state (0 = not overloaded; 1 = overload detected, led on and power disconnected to ic)
-          ||||||\-- unknown, always 1? may be acia related
-          |||||\--- any key pressed on keypad (0 = one or more pressed, 1 = none pressed)
+          |||||||\- overload state (0 = not overloaded; 1 = overload detected, led on and power disconnected to ic, writing to R43 sets this to ok)
+          ||||||\-- debug jumper X5 on the board; reads as 1 unless jumper is present
+          |||||\--- /INT status (any key pressed on keypad (0 = one or more pressed, 1 = none pressed) OR ACIA has thrown an int)
           ||||\---- remote mode selected (0 = selected, 1 = not) \
           |||\----- key mode selected (0 = selected, 1 = not)     > if all 3 of these are 1, unit is going to standby
           ||\------ sim mode selected (0 = selected, 1 = not)    /
-          |\------- power failure status (1 = power has failed, 0 = ok)
-          \-------- chip insert detect state (1 = no chip or cmos chip which ammeter cannot detect; 0 = nmos or detectable chip inserted)
+          |\------- power failure status (1 = power has failed, 0 = ok; writes to R44 set this to ok)
+          \-------- chip insert detect state 'PIN' (1 = no chip or cmos chip which ammeter cannot detect; 0 = nmos or detectable chip inserted)
      after power failure (in key mode):
      0xEE 11101110 when no keypad key pressed
      0xEA 11101010 when keypad key pressed
