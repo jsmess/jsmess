@@ -555,29 +555,29 @@ READ8_HANDLER( sms_count_r )
  Check if the pause button is pressed.
  If the gamegear is in sms mode, check if the start button is pressed.
  */
-void sms_pause_callback( running_machine &machine )
+WRITE_LINE_DEVICE_HANDLER( sms_pause_callback )
 {
-	sms_state *state = machine.driver_data<sms_state>();
+	sms_state *driver_state = device->machine().driver_data<sms_state>();
 
-	if (state->m_is_gamegear && !(state->m_cartridge[state->m_current_cartridge].features & CF_GG_SMS_MODE))
+	if (driver_state->m_is_gamegear && !(driver_state->m_cartridge[driver_state->m_current_cartridge].features & CF_GG_SMS_MODE))
 		return;
 
-	if (!(input_port_read(machine, state->m_is_gamegear ? "START" : "PAUSE") & 0x80))
+	if (!(input_port_read(device->machine(), driver_state->m_is_gamegear ? "START" : "PAUSE") & 0x80))
 	{
-		if (!state->m_paused)
+		if (!driver_state->m_paused)
 		{
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 		}
-		state->m_paused = 1;
+		driver_state->m_paused = 1;
 	}
 	else
 	{
-		state->m_paused = 0;
+		driver_state->m_paused = 0;
 	}
 
 	/* clear Light Phaser latch flags for next frame */
-	state->m_lphaser_1_latch = 0;
-	state->m_lphaser_2_latch = 0;
+	driver_state->m_lphaser_1_latch = 0;
+	driver_state->m_lphaser_2_latch = 0;
 }
 
 READ8_HANDLER( sms_input_port_0_r )
@@ -1840,9 +1840,9 @@ WRITE8_HANDLER( sms_store_control_w )
 	state->m_store_control = data;
 }
 
-void sms_store_int_callback( running_machine &machine, int state )
+WRITE_LINE_DEVICE_HANDLER( sms_store_int_callback )
 {
-	sms_state *driver_state = machine.driver_data<sms_state>();
+	sms_state *driver_state = device->machine().driver_data<sms_state>();
 	device_set_input_line(driver_state->m_store_control & 0x01 ? driver_state->m_control_cpu : driver_state->m_main_cpu, 0, state);
 }
 
