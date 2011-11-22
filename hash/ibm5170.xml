@@ -219,22 +219,22 @@
 		<description>MS-DOS 6.22</description>
 		<year>1994</year>
 		<publisher>Microsoft Corporation</publisher>
-		<part name="disk1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1.img" size="1474560" crc="69d8cfdd" sha1="30b4b2e99b26b0e5e7dbe61b9892e45fe751a3e8" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk2.img" size="1474560" crc="76258952" sha1="1f268c5487f31982848461b9d628ef10b552c849" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk3" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3.img" size="1474560" crc="808b208d" sha1="06de13364e906c4ed69f19627ae0e682eb419078" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk4" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk4.img" size="1474560" crc="21b6d623" sha1="2f096a5d9cd00677de3aca30b01b52b24776c59a" offset="0" />
 			</dataarea>
