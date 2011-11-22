@@ -73,7 +73,7 @@
 				<rom name="anko_a.t77" size="5857184" crc="905A90DA" sha1="CF5B91A356F915A6EE10FD8554DA3F6E7D95427F" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="4009486">
 				<rom name="anko_b.t77" size="4009486" crc="640EE586" sha1="275456A29CD7017F43C66C5C6EABBCFD760355AA" offset="000000" />
 			</dataarea>
@@ -660,7 +660,7 @@
 				<rom name="g2_1.t77" size="445632" crc="852C8110" sha1="A209A1EBDF1D29B12BDDEE153C1E2069BAD8A1C3" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="3139232">
 				<rom name="g2_2.t77" size="3139232" crc="3ECD7879" sha1="499165AC7A0CD429B4F09CC02B6702F673C3258A" offset="000000" />
 			</dataarea>
@@ -795,12 +795,12 @@
 				<rom name="hyd2_1.t77" size="1403954" crc="4B2DC372" sha1="D477B0D6847A08D6154C206F57D2B0D4BE806953" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="2799212">
 				<rom name="hyd2_2.t77" size="2799212" crc="553253F9" sha1="2DFEE19FA7D3D073A8BD6D17B894AE57B55800B4" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass3" interface="fm7_cass">
 			<dataarea name="cass" size="2808106">
 				<rom name="hyd2_3.t77" size="2808106" crc="141DCC48" sha1="19615E591B4BF04B587358918CDD83DB92CEF6E3" offset="000000" />
 			</dataarea>
@@ -816,12 +816,12 @@
 				<rom name="hydlide2_0.t77" size="1080668" crc="47314FEB" sha1="F4000FDCD61BD3D63D0F64F4E96B63CD0823CA1A" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="2808176">
 				<rom name="hydlide2_1.t77" size="2808176" crc="898A7385" sha1="A45CEBF5D8C11C2D72EFD95B35DA01FE711F41B2" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass3" interface="fm7_cass">
 			<dataarea name="cass" size="2812446">
 				<rom name="hydlide2_2.t77" size="2812446" crc="2AD9AAAB" sha1="35E4C337FABE81228B6BA919E4E47C07ED9C913B" offset="000000" />
 			</dataarea>
@@ -1145,12 +1145,12 @@
 				<rom name="nan_a.t77" size="2665584" crc="20E8CF54" sha1="88D768698FCCEFBC03678075309ED6BC8437CB1C" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="2124608">
 				<rom name="nan_c.t77" size="2124608" crc="EB6D20FA" sha1="97AF2DF7B7F04E596E45A4889A5EF47E6616578E" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass3" interface="fm7_cass">
 			<dataarea name="cass" size="1403264">
 				<rom name="a.t77" size="1403264" crc="BFBFC212" sha1="B6A16445886C993E07599ABE73582EBECB2B30AE" offset="000000" />
 			</dataarea>
@@ -1280,12 +1280,12 @@
 				<rom name="portpia1.t77" size="55320" crc="C828949F" sha1="5A45CA2C832EB41122816BED92F76AF0BAC605B7" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="184340">
 				<rom name="portpia2.t77" size="184340" crc="6F37DAE0" sha1="91CF9C2969309C94F95DCE0C7DFE79F693904FED" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass3" interface="fm7_cass">
 			<dataarea name="cass" size="1467646">
 				<rom name="portpia3.t77" size="1467646" crc="0D9FFA8A" sha1="9F31AE89D2F54C9EB8615D73A60156022683E882" offset="000000" />
 			</dataarea>
@@ -1371,17 +1371,17 @@
 				<rom name="raizer1_a.t77" size="3385768" crc="C2D37BBB" sha1="62092C3517445BB1D98AB4FD0F8D7741DEC510CB" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="11572022">
 				<rom name="raizer1-b.t77" size="11572022" crc="E57BE037" sha1="F175A46B9B9BC7E277696106C6046066E48C1A21" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass3" interface="fm7_cass">
 			<dataarea name="cass" size="8048982">
 				<rom name="raizer2-a.t77" size="8048982" crc="D4DBAADB" sha1="39291E3586011238ED874041F13C61AEA6CFA5AF" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass4" interface="fm7_cass">
 			<dataarea name="cass" size="7194616">
 				<rom name="raizer2-b.t77" size="7194616" crc="E03D64BF" sha1="3890C4605C97D03A4B79050B3AB747C4749E7179" offset="000000" />
 			</dataarea>
@@ -1432,7 +1432,7 @@
 				<rom name="riguras1.t77" size="8374364" crc="4BEE872A" sha1="DDAD41626E967E40E8F981F1B92C183CA976E969" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="7266100">
 				<rom name="riguras2.t77" size="7266100" crc="7010B731" sha1="8DAEEB77648FFD25DEA7F536D5B3785B702163F3" offset="000000" />
 			</dataarea>
@@ -1531,7 +1531,7 @@
 				<rom name="sokoban.t77" size="1161332" crc="40D4F9EA" sha1="D962A6B54099160C059B4EE11EFEB9E3002EA89D" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="853574">
 				<rom name="soko_edit.t77" size="853574" crc="32D61E93" sha1="68EAB3DA4F0758C7B9F5F4485DADD0AD43556218" offset="000000" />
 			</dataarea>
@@ -1864,7 +1864,7 @@
 				<rom name="wir2.t77" size="3114060" crc="3E27A3BA" sha1="31401D73BFBBA1E52B5F704DE55AAEEBB87A39BE" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="45960">
 				<rom name="chara.t77" size="45960" crc="90A10946" sha1="D2E9F50EE9ABB04A707C286999ADD53D52FA3BB8" offset="000000" />
 			</dataarea>
@@ -1881,7 +1881,7 @@
 				<rom name="golf.t77" size="8156366" crc="065B7DC1" sha1="F98A36EA743EF60B0AEA6069F583622740F96902" offset="000000" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="fm7_cass">
+		<part name="cass2" interface="fm7_cass">
 			<dataarea name="cass" size="10127064">
 				<rom name="golf2.t77" size="10127064" crc="9E7BEA91" sha1="0BC7DC5603394ABC8D704977B205B4993A3E7A31" offset="000000" />
 			</dataarea>
