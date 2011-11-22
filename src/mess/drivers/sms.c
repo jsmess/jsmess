@@ -353,6 +353,7 @@ static WRITE_LINE_DEVICE_HANDLER( sms_int_callback )
 static const smsvdp_interface _315_5124_intf =
 {
 	MODEL_315_5124,
+	"screen",
 	DEVCB_LINE(sms_int_callback),
 	DEVCB_LINE(sms_pause_callback)
 };
@@ -360,6 +361,7 @@ static const smsvdp_interface _315_5124_intf =
 static const smsvdp_interface _315_5246_intf =
 {
 	MODEL_315_5246,
+	"screen",
 	DEVCB_LINE(sms_int_callback),
 	DEVCB_LINE(sms_pause_callback)
 };
@@ -367,6 +369,7 @@ static const smsvdp_interface _315_5246_intf =
 static const smsvdp_interface _315_5378_intf =
 {
 	MODEL_315_5378,
+	"screen",
 	DEVCB_LINE(sms_int_callback),
 	DEVCB_LINE(sms_pause_callback)
 };
@@ -374,6 +377,7 @@ static const smsvdp_interface _315_5378_intf =
 static const smsvdp_interface sms_store_intf =
 {
 	MODEL_315_5124,
+	"screen",
 	DEVCB_LINE(sms_store_int_callback),
 	DEVCB_LINE(sms_pause_callback)
 };

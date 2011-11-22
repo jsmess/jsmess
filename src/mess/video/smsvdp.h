@@ -48,6 +48,7 @@ typedef struct _smsvdp_interface smsvdp_interface;
 struct _smsvdp_interface
 {
 	UINT32             model;                /* Select model/features for the emulation */
+	const char         *screen_tag;
 	devcb_write_line   int_callback;         /* Interrupt callback function */
 	devcb_write_line   pause_callback;       /* Pause callback function */
 };
