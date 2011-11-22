@@ -1946,9 +1946,3 @@ $(MESS_DRIVERS)/z80ne.o:	$(MESS_LAYOUT)/z80ne.lh   \
 
 include $(MESSSRC)/tools/tools.mak
 
-
-#-------------------------------------------------
-# MESS special OSD rules
-#-------------------------------------------------
-
-include $(MESSSRC)/osd/$(OSD)/$(OSD).mak

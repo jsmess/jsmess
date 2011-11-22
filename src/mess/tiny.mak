@@ -46,9 +46,3 @@ DRVLIBS = \
 	$(MESS_DRIVERS)/coleco.o \
 	$(MESS_MACHINE)/coleco.o \
 
-
-#-------------------------------------------------
-# MESS special OSD rules
-#-------------------------------------------------
-
-include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
