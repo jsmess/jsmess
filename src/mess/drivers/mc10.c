@@ -49,7 +49,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<mc6847_base_device> m_mc6847;
+	optional_device<mc6847_base_device> m_mc6847;
 	optional_device<ef9345_device> m_ef9345;
 	required_device<device_t> m_dac;
 	required_device<ram_device> m_ram;
