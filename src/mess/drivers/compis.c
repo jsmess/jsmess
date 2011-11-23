@@ -101,8 +101,8 @@ static SCREEN_UPDATE( compis )
 
 static SCREEN_UPDATE( compis2 ) // temporary
 {
-	UINT8 *m_p_videoram, *m_p_chargen;
-	m_p_videoram = screen->machine().region("vram")->base();
+	compis_state *state = screen->machine().driver_data<compis_state>();
+	UINT8 *m_p_chargen;
 	m_p_chargen = screen->machine().region("maincpu")->base()+0xca70; //bios0
 	if (m_p_chargen[0x214] != 0x08) m_p_chargen+= 0x10; //bios1
 	UINT8 y,ra,chr,gfx;
@@ -116,7 +116,7 @@ static SCREEN_UPDATE( compis2 ) // temporary
 
 			for (x = ma; x < ma + 240; x+=3)
 			{
-				chr = m_p_videoram[x];
+				chr = state->m_video_ram[x & 0x1ffff];
 
 				if (chr < 0x20)
 					gfx = 0;
@@ -141,7 +141,8 @@ static SCREEN_UPDATE( compis2 ) // temporary
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
-	UINT8 i,gfx = vram[address];
+	compis_state *state = device->machine().driver_data<compis_state>();
+	UINT8 i,gfx = state->m_video_ram[address & 0x1ffff];
 
 	for(i=0; i<8; i++)
 		*BITMAP_ADDR16(bitmap, y, x + i) = BIT((gfx >> i), 0);
@@ -161,9 +162,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 /* TODO: why it writes to ROM region? */
 WRITE8_MEMBER( compis_state::vram_w )
 {
-	UINT8 *vram = machine().region("vram")->base();
-
-	vram[offset] = data;
+	m_video_ram[offset] = data;
 }
 
 static ADDRESS_MAP_START( compis_mem , AS_PROGRAM, 16, compis_state )
@@ -368,14 +367,15 @@ static const floppy_interface compis_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_5_25_DSQD,
 	LEGACY_FLOPPY_OPTIONS_NAME(compis),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, compis_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220", upd7220_device, vram_r, vram_w)
+	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
+	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_BASE(m_video_ram)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( compis, compis_state )
@@ -483,8 +483,6 @@ ROM_START( compis )
 
 	ROM_REGION( 0x800, "i8749", 0 )
 	ROM_LOAD( "cmpkey13.u1", 0x0000, 0x0800, CRC(3f87d138) SHA1(c04e2d325b9c04818bc7c47c3bf32b13862b11ec) )
-
-	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( compis2 )
@@ -501,8 +499,6 @@ ROM_START( compis2 )
 
 	ROM_REGION( 0x800, "i8749", 0 )
 	ROM_LOAD( "cmpkey13.u1", 0x0000, 0x0800, CRC(3f87d138) SHA1(c04e2d325b9c04818bc7c47c3bf32b13862b11ec) )
-
-	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 /*   YEAR   NAME        PARENT  COMPAT MACHINE  INPUT   INIT     COMPANY     FULLNAME */

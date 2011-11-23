@@ -32,6 +32,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT8 *m_video_ram;
 };
 
 SCREEN_UPDATE_MEMBER( mz6500_state )
@@ -46,13 +47,13 @@ SCREEN_UPDATE_MEMBER( mz6500_state )
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
-	//mz6500_state *state = device->machine().driver_data<mz6500_state>();
+	mz6500_state *state = device->machine().driver_data<mz6500_state>();
 	int gfx[3];
 	UINT8 i,pen;
 
-	gfx[0] = vram[address + 0x00000];
-	gfx[1] = vram[address + 0x10000];
-	gfx[2] = vram[address + 0x20000];
+	gfx[0] = state->m_video_ram[address + 0x00000];
+	gfx[1] = state->m_video_ram[address + 0x10000];
+	gfx[2] = state->m_video_ram[address + 0x20000];
 
 	for(i=0; i<8; i++)
 	{
@@ -81,12 +82,12 @@ WRITE8_MEMBER( mz6500_state::fdc_w )
 
 READ8_MEMBER( mz6500_state::mz6500_vram_r )
 {
-	return m_hgdc->vram_r(space, offset);
+	return m_video_ram[offset];
 }
 
 WRITE8_MEMBER( mz6500_state::mz6500_vram_w )
 {
-	m_hgdc->vram_w(space, offset, data);
+	m_video_ram[offset] = data;
 }
 
 static ADDRESS_MAP_START(mz6500_map, AS_PROGRAM, 16, mz6500_state)
@@ -175,7 +176,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 };
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, mz6500_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220", upd7220_device, vram_r, vram_w)
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE(m_video_ram)
 ADDRESS_MAP_END
 
 

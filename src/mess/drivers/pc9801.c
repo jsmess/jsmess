@@ -269,6 +269,9 @@ public:
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	UINT8 *m_video_ram_1;
+	UINT8 *m_video_ram_2;
 	UINT8 *m_char_rom;
 
 	UINT8 m_portb_tmp;
@@ -360,9 +363,9 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		res_x = x + xi;
 		res_y = y;
 
-		pen = ((vram[address + (0x08000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 1 : 0;
-		pen|= ((vram[address + (0x10000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 2 : 0;
-		pen|= ((vram[address + (0x18000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 4 : 0;
+		pen = ((state->m_video_ram_2[address + (0x08000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 1 : 0;
+		pen|= ((state->m_video_ram_2[address + (0x10000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 2 : 0;
+		pen|= ((state->m_video_ram_2[address + (0x18000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 4 : 0;
 
 		if(interlace_on)
 		{
@@ -398,8 +401,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 		tile_addr = addr+(x*(state->m_video_ff[WIDTH40_REG]+1));
 
-		tile = vram[(tile_addr*2) & 0x1fff] & 0x00ff; //TODO: kanji
-		attr = (vram[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
+		tile = state->m_video_ram_1[(tile_addr*2) & 0x1fff] & 0x00ff; //TODO: kanji
+		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
 
 		secret = (attr & 1) ^ 1;
 		//blink = attr & 2;
@@ -886,7 +889,7 @@ static WRITE8_HANDLER( pc9801_a0_w )
 			case 0x04: state->m_vram_disp = data & 1; return;
 			case 0x06:
 				state->m_vram_bank = data & 1;
-				state->m_hgdc2->bank_w(*space, 0,(data & 1) << 2); //TODO: check me
+				//state->m_hgdc2->bank_w(*space, 0,(data & 1) << 2); //TODO: check me
 				return;
 			/* bitmap palette clut write */
 			case 0x08:
@@ -1076,21 +1079,21 @@ static WRITE8_HANDLER( pc9801_tvram_w )
 	if(offset < (0x3fe2) || state->m_video_ff[MEMSW_REG])
 		state->m_tvram[offset] = data;
 
-	state->m_hgdc1->vram_w(*space, offset,data); //TODO: check me
+	state->m_video_ram_1[offset] = data; //TODO: check me
 }
 
 static READ8_HANDLER( pc9801_gvram_r )
 {
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-	return state->m_hgdc2->vram_r(*space, offset+0x8000+state->m_vram_bank*0x20000);
+	return state->m_video_ram_2[offset+0x8000+state->m_vram_bank*0x20000];
 }
 
 static WRITE8_HANDLER( pc9801_gvram_w )
 {
 	pc9801_state *state = space->machine().driver_data<pc9801_state>();
 
-	state->m_hgdc2->vram_w(*space, offset+0x8000+state->m_vram_bank*0x20000, data);
+	state->m_video_ram_2[offset+0x8000+state->m_vram_bank*0x20000] = data;
 }
 
 static READ8_HANDLER( pc9801_opn_r )
@@ -1680,11 +1683,11 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_1_map, AS_0, 8 )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_MODERN("upd7220_chr", upd7220_device, vram_r, vram_w)
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE_MEMBER(pc9801_state, m_video_ram_1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_2_map, AS_0, 8 )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_MODERN("upd7220_btm", upd7220_device, vram_r, vram_w)
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE_MEMBER(pc9801_state, m_video_ram_2)
 ADDRESS_MAP_END
 
 /* keyboard code */

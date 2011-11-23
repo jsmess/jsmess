@@ -207,6 +207,26 @@ void upd7220_device::device_config_complete()
 //**************************************************************************
 
 //-------------------------------------------------
+//  readbyte - read a byte at the given address
+//-------------------------------------------------
+
+inline UINT8 upd7220_device::readbyte(offs_t address)
+{
+	return space()->read_byte(address);
+}
+
+
+//-------------------------------------------------
+//  writebyte - write a byte at the given address
+//-------------------------------------------------
+
+inline void upd7220_device::writebyte(offs_t address, UINT8 data)
+{
+	space()->write_byte(address, data);
+}
+
+
+//-------------------------------------------------
 //  fifo_clear -
 //-------------------------------------------------
 
@@ -510,14 +530,14 @@ inline void upd7220_device::read_vram(UINT8 type, UINT8 mod)
 		switch(type)
 		{
 			case 0:
-				queue(m_vram[m_ead*2], 0);
-				queue(m_vram[m_ead*2+1], 0);
+				queue(readbyte(m_ead*2), 0);
+				queue(readbyte(m_ead*2+1), 0);
 				break;
 			case 2:
-				queue(m_vram[m_ead*2], 0);
+				queue(readbyte(m_ead*2), 0);
 				break;
 			case 3:
-				queue(m_vram[m_ead*2+1], 0);
+				queue(readbyte(m_ead*2+1), 0);
 				break;
 		}
 
@@ -561,7 +581,7 @@ inline void upd7220_device::write_vram(UINT8 type, UINT8 mod)
 
 	//if(result)
 	{
-		//printf("%04x %02x %02x %04x %02x %02x\n",m_vram[m_ead],m_pr[1],m_pr[2],m_mask,type,mod);
+		//printf("%04x %02x %02x %04x %02x %02x\n",readbyte(m_ead),m_pr[1],m_pr[2],m_mask,type,mod);
 		//printf("%04x %02x %02x\n",m_ead,m_figs.m_dir,m_pitch);
 		//printf("%04x %04x %02x %04x\n",m_ead,result,mod,m_figs.m_dc);
 	}
@@ -572,27 +592,27 @@ inline void upd7220_device::write_vram(UINT8 type, UINT8 mod)
 		{
 			case 0x00: //replace
 				if(type == 0 || type == 2)
-					m_vram[m_ead*2+0] = result & 0xff;
+					writebyte(m_ead*2+0, result & 0xff);
 				if(type == 0 || type == 3)
-					m_vram[m_ead*2+1] = result >> 8;
+					writebyte(m_ead*2+1, result >> 8);
 				break;
 			case 0x01: //complement
 				if(type == 0 || type == 2)
-					m_vram[m_ead*2+0] ^= result & 0xff;
+					writebyte(m_ead*2+0, readbyte(m_ead*2+0) ^ (result & 0xff));
 				if(type == 0 || type == 3)
-					m_vram[m_ead*2+1] ^= result >> 8;
+					writebyte(m_ead*2+1, readbyte(m_ead*2+1) ^ (result >> 8));
 				break;
 			case 0x02: //reset to zero
 				if(type == 0 || type == 2)
-					m_vram[m_ead*2+0] &= ~result;
+					writebyte(m_ead*2+0, readbyte(m_ead*2+0) & ~(result & 0xff));
 				if(type == 0 || type == 3)
-					m_vram[m_ead*2+1] &= ~(result >> 8);
+					writebyte(m_ead*2+1, readbyte(m_ead*2+1) & ~(result >> 8));
 				break;
 			case 0x03: //set to one
 				if(type == 0 || type == 2)
-					m_vram[m_ead*2+0] |= result;
+					writebyte(m_ead*2+0, readbyte(m_ead*2+0) | (result & 0xff));
 				if(type == 0 || type == 3)
-					m_vram[m_ead*2+1] |= (result >> 8);
+					writebyte(m_ead*2+1, readbyte(m_ead*2+1) | (result >> 8));
 				break;
 		}
 
@@ -690,7 +710,6 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	  m_lr(0),
 	  m_disp(0),
 	  m_gchr(0),
-	  m_vram_bank(0),
 	  m_bitmap_mod(0),
 	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(upd7220_vram))
 {
@@ -737,7 +756,6 @@ void upd7220_device::device_start()
 
 	// find screen
 	m_screen = machine().device<screen_device>(m_screen_tag);
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x80000);
 
 	// register for state saving
 	save_item(NAME(m_ra));
@@ -844,15 +862,17 @@ void upd7220_device::draw_pixel(int x, int y, UINT16 tile_data)
 	UINT32 addr = (y * m_pitch * 2 + (x >> 3)) & 0x3ffff;
 
 	int dad = x & 0x7;
+	
+	UINT8 data = readbyte(addr);
 
 	if((m_bitmap_mod & 3) == 1)
 	{
-		m_vram[addr + m_vram_bank] ^= ((tile_data) & (0x80 >> (dad)));
+		writebyte(addr, data ^ ((tile_data) & (0x80 >> (dad))));
 	}
 	else
 	{
-		m_vram[addr + m_vram_bank] &= ~(0x80 >> (dad));
-		m_vram[addr + m_vram_bank] |= ((tile_data) & (0x80 >> (dad)));
+		writebyte(addr, data & ~(0x80 >> (dad)));
+		writebyte(addr, data | ((tile_data) & (0x80 >> (dad))));
 	}
 }
 
@@ -1001,8 +1021,8 @@ void upd7220_device::draw_char(int x, int y)
 		{
 			UINT32 addr = ((y+yi) * m_pitch * 2) + ((x+xi) >> 3);
 
-			m_vram[(addr + m_vram_bank) & 0x3ffff] &= ~(1 << (xi & 7));
-			m_vram[(addr + m_vram_bank) & 0x3ffff] |= ((tile_data) & (1 << (xi & 7)));
+			writebyte(addr & 0x3ffff, readbyte(addr & 0x3ffff) & ~(1 << (xi & 7)));
+			writebyte(addr & 0x3ffff, readbyte(addr & 0x3ffff) | ((tile_data) & (1 << (xi & 7))));
 		}
 	}
 
@@ -1538,7 +1558,7 @@ void upd7220_device::update_text(bitmap_t *bitmap, const rectangle *cliprect)
 			addr = sad + (y * m_pitch);
 
 			if (m_draw_text_cb)
-				m_draw_text_cb(this, bitmap, m_vram, addr, y, wd, m_pitch, 0, 0, m_aw * 8 - 1, m_al - 1, m_lr, m_dc, m_ead);
+				m_draw_text_cb(this, bitmap, addr, y, wd, m_pitch, 0, 0, m_aw * 8 - 1, m_al - 1, m_lr, m_dc, m_ead);
 		}
 
 		sy = y + 1;
@@ -1552,15 +1572,12 @@ void upd7220_device::update_text(bitmap_t *bitmap, const rectangle *cliprect)
 
 void upd7220_device::draw_graphics_line(bitmap_t *bitmap, UINT32 addr, int y, int wd)
 {
-	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int sx;
 
 	for (sx = 0; sx < m_pitch * 2; sx++)
 	{
-		UINT16 data = space->direct().read_raw_word(addr & 0x3ffff); //TODO: remove me
-
 		if((sx << 3) < m_aw * 16 && y < m_al)
-			m_display_cb(this, bitmap, y, sx << 3, addr, data, m_vram);
+			m_display_cb(this, bitmap, y, sx << 3, addr);
 
 		if (wd) addr += 2; else addr++;
 	}
@@ -1597,7 +1614,7 @@ void upd7220_device::update_graphics(bitmap_t *bitmap, const rectangle *cliprect
 				addr = (sad & 0x3ffff) + (y * m_pitch);
 
 				if (m_draw_text_cb)
-					m_draw_text_cb(this, bitmap, m_vram, addr, y + tsy, wd, m_pitch, 0, 0, m_aw * 8 - 1, len + bsy - 1, m_lr, m_dc, m_ead);
+					m_draw_text_cb(this, bitmap, addr, y + tsy, wd, m_pitch, 0, 0, m_aw * 8 - 1, len + bsy - 1, m_lr, m_dc, m_ead);
 			}
 		}
 
@@ -1634,19 +1651,4 @@ void upd7220_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 			logerror("uPD7220 '%s' Invalid Display Mode!\n", tag());
 		}
 	}
-}
-
-WRITE8_MEMBER( upd7220_device::bank_w )
-{
-	m_vram_bank = 0x8000 * (data & 7);
-}
-
-READ8_MEMBER( upd7220_device::vram_r )
-{
-	return m_vram[offset];
-}
-
-WRITE8_MEMBER( upd7220_device::vram_w )
-{
-	m_vram[offset] = data;
 }

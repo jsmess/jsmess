@@ -180,6 +180,8 @@ public:
 	void internal_timer_sync(int which);
 	void handle_eoi(int data);
 	void compis_fdc_tc(int state);
+
+	UINT8 *m_video_ram;
 };
 
 
