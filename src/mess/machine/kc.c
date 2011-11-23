@@ -486,7 +486,24 @@ void kc85_4_state::update_0x0c000()
 	}
 	else
 	{
-		kc_state::update_0x0c000();
+		if (m_pio_data[0] & (1<<7))
+		{
+			/* BASIC takes next priority */
+			LOG(("BASIC rom 0x0c000\n"));
+
+			int bank = machine().region("basic")->bytes() == 0x8000 ? (m_port_86_data>>5) & 0x03 : 0;
+
+			memory_set_bankptr(machine(), "bank4", machine().region("basic")->base() + (bank << 13));
+			space->install_read_bank(0xc000, 0xdfff, "bank4");
+			space->unmap_write(0xc000, 0xdfff);
+		}
+		else
+		{
+			LOG(("Module at 0x0c000\n"));
+
+			space->install_read_handler (0xc000, 0xdfff, 0, 0, read8_delegate(FUNC(kc_state::expansion_c000_r), this), 0);
+			space->install_write_handler(0xc000, 0xdfff, 0, 0, write8_delegate(FUNC(kc_state::expansion_c000_w), this), 0);
+		}
 	}
 }
 
@@ -526,17 +543,9 @@ void kc85_4_state::update_0x08000()
 		}
 		else
 		{
-			// kc85_5 224K RAM
-			if ((m_port_84_data & 0x0e) == 0)
-			{
-				ram8_block = ((m_port_84_data)>>4) & 0x01;
-				mem_ptr = m_ram_base + (ram8_block<<14);
-			}
-			else
-			{
-				ram8_block = (((m_port_84_data)>>4) & 0x0f) - 2;
-				mem_ptr = m_ram_base + (ram8_block<<14);
-			}
+			// kc85_5 256K RAM
+			ram8_block = ((m_port_84_data)>>4) & 0x0f;
+			mem_ptr = m_ram_base + (ram8_block<<14);
 		}
 
 		memory_set_bankptr(machine(), "bank3", mem_ptr);
