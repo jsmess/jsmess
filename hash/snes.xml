@@ -30,7 +30,6 @@ Undumped
   - Satellaview BS-X (Japan) - Initial release prior to Rev A
   - Shin Chou Kouki (Japan) (Rev A) 1A77CF3B
   - Shin Megami Tensei II (Japan) (Rev A) 84268A75
-  - Shin Megami Tensei II (Japan) (Rev B) E38228A7
   - Shodai Nekketsu Kouha Kunio-kun (Japan) (Rev A) 5DF55465
   - Super Jinsei Game 2 (Japan) (Rev A)
   - Super Mahjong Taikai (Japan) (Rev B)
@@ -12100,7 +12099,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="shmegmt2">
+	<software name="shmegmt2a" cloneof="shmegmt2">
 		<!-- Serial: SHVC-ZE - Release Date: 1994-03-18 - Alt. Title: 真・女神転生II -->
 		<description>Shin Megami Tensei II (Jpn)</description>
 		<year>1994</year>
@@ -20070,20 +20069,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="shin megami tensei ii (japan) (rev 1).sfc" size="1048576" crc="84268A75" offset="0x000000" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shmegmt2rb" cloneof="shmegmt2">
-		Serial: SHVC-ZE - Release Date: 1994-03-18 - Alt. Title: 真・女神転生II
-		<description>Shin Megami Tensei II (Jpn, Rev. B)</description>
-		<year>1994</year>
-		<publisher>Atlus</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="shin megami tensei ii (japan) (rev 2).sfc" size="1048576" crc="E38228A7" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
@@ -40383,8 +40368,22 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="shmegmt2">
+		<!-- Serial: SHVC-ZE - Release Date: 1994-03-18 - Alt. Title: ??????II -->
+		<description>Shin Megami Tensei II (Jpn, Rev. B)</description>
+		<year>1994</year>
+		<publisher>Atlus</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="shin megami tensei ii (japan) (rev 2).sfc" size="1048576" crc="e38228a7" sha1="84bb8a37b2575762d825d820d76175071bee1ca2" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shmegmif">
-		Serial: SHVC-AMXJ-JPN - Release Date: 1994-10-28 - Alt. Title: 真・女神転生 if...
+		<!-- Serial: SHVC-AMXJ-JPN - Release Date: 1994-10-28 - Alt. Title: 真・女神転生 if... -->
 		<description>Shin Megami Tensei if... (Jpn, Rev. A)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
