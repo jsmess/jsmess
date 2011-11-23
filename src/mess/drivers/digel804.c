@@ -12,16 +12,17 @@
 *  tentatively figure out how flow control from ACIA works (/NMI)?
 *  hook up the speaker/beeper (port 0x45)
 *  hook up vfd controller (done to stderr, no artwork)
-*  hook up leds on front panel (done to stderr)
+*  hook up leds on front panel (done to stderr for now)
 *  hook up r6551 serial and attach terminal for sending to ep804
+*  /nmi is emulated correctly (i.e. its tied to +5v. that was easy!)
 *
 *  TODO:
 *  figure out the rest of the i/o map
 *  figure out why banked ram on 4.x causes glitches/sys errors; it works on 2.2
-*  actually hook up interrupts and nmi
-*  attach terminal to 6551 serial for recieving from ep804
-*  correctly hook up 10937 vfd controller
-*  hook up keypad and mode buttons
+*  actually hook up interrupts: they fire on keypresses and 6551/ACIA receives
+*  attach terminal to 6551/ACIA serial for recieving from ep804
+*  correctly hook up 10937 vfd controller: por is not hooked up
+*  hook up keypad via 74C923 and mode buttons via logic gate mess
 *  artwork
 *
 ******************************************************************************/
@@ -215,12 +216,10 @@ WRITE8_MEMBER( digel804_state::port_44_w )
 
 WRITE8_MEMBER( digel804_state::speaker_w )
 {
-	// it APPEARS all writes here invert the speaker state, at least
+	// all writes to here invert the speaker state, verified from schematics
 #ifdef PORT45_W_VERBOSE
 	logerror("Digel804: port 0x45 speaker had %02x written to it!\n", data);
 #endif
-	if ((data != 0x00) && (data != 0x01) && (data != 0x03))
-		logerror("Digel804: port 0x45 speaker control had unexpected data %02x written to it!\n", data);
 	speaker_state ^= 0xFF;
 	speaker_level_w(m_speaker, speaker_state);
 }
@@ -235,6 +234,7 @@ READ8_MEMBER( digel804_state::keypad_r )
      * F* takes precedence over E*
      * higher numbers take precedence over lower ones
      * this value auto-latches on a key press and remains through multiple reads
+	 * this is done by a 74C923 integrated circuit
     */
 #ifdef PORT46_R_VERBOSE
 	logerror("Digel804: returning 0xF0 for port 46 keypad read\n");
@@ -489,5 +489,5 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
-COMP( 1985, digel804,   0,          0,      digel804,   digel804, digel804,      "Digelec, Inc",   "Digelec 804 EPROM Programmer", GAME_NO_SOUND_HW )
-COMP( 1982, ep804,   digel804,          0,      ep804,   digel804, digel804,      "Wavetek/Digelec, Inc",   "EP804 EPROM Programmer", GAME_NO_SOUND_HW )
+COMP( 1985, digel804,   0,          0,      digel804,   digel804, digel804,      "Digelec, Inc",   "Digelec 804 EPROM Programmer", GAME_NOT_WORKING )
+COMP( 1982, ep804,   digel804,          0,      ep804,   digel804, digel804,      "Wavetek/Digelec, Inc",   "EP804 EPROM Programmer", GAME_NOT_WORKING )
