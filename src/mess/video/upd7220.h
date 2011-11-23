@@ -64,11 +64,11 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef void (*upd7220_display_pixels_func)(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data, UINT8 *vram);
-#define UPD7220_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address, UINT16 data, UINT8 *vram)
+typedef void (*upd7220_display_pixels_func)(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address);
+#define UPD7220_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_t *bitmap, int y, int x, UINT32 address)
 
-typedef void (*upd7220_draw_text_line)(device_t *device, bitmap_t *bitmap, UINT8 *vram, UINT32 addr, int y, int wd, int pitch,int screen_min_x,int screen_min_y,int screen_max_x, int screen_max_y,int lr, int cursor_on, int cursor_addr);
-#define UPD7220_DRAW_TEXT_LINE(name) void name(device_t *device, bitmap_t *bitmap, UINT8 *vram, UINT32 addr, int y, int wd, int pitch,int screen_min_x,int screen_min_y,int screen_max_x, int screen_max_y,int lr, int cursor_on, int cursor_addr)
+typedef void (*upd7220_draw_text_line)(device_t *device, bitmap_t *bitmap, UINT32 addr, int y, int wd, int pitch,int screen_min_x,int screen_min_y,int screen_max_x, int screen_max_y,int lr, int cursor_on, int cursor_addr);
+#define UPD7220_DRAW_TEXT_LINE(name) void name(device_t *device, bitmap_t *bitmap, UINT32 addr, int y, int wd, int pitch,int screen_min_x,int screen_min_y,int screen_max_x, int screen_max_y,int lr, int cursor_on, int cursor_addr)
 
 
 // ======================> upd7220_interface
@@ -120,14 +120,13 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
 
-	inline UINT8 readbyte(offs_t address);
-	inline void writebyte(offs_t address, UINT8 data);
-
 private:
 	static const device_timer_id TIMER_VSYNC = 0;
 	static const device_timer_id TIMER_HSYNC = 1;
 	static const device_timer_id TIMER_BLANK = 2;
 
+	inline UINT8 readbyte(offs_t address);
+	inline void writebyte(offs_t address, UINT8 data);
 	inline void fifo_clear();
 	inline int fifo_param_count();
 	inline void fifo_set_direction(int dir);
@@ -205,6 +204,8 @@ private:
 	int m_disp;						// display zoom factor
 	int m_gchr;						// zoom factor for graphics character writing and area filling
 
+	UINT8 m_bitmap_mod;
+
 	struct {
 		UINT8 m_dir;				// figs param 0: drawing direction
 		UINT8 m_figure_type;		// figs param 1: figure type
@@ -219,11 +220,6 @@ private:
 	emu_timer *m_vsync_timer;		// vertical sync timer
 	emu_timer *m_hsync_timer;		// horizontal sync timer
 	emu_timer *m_blank_timer;		// CRT blanking timer
-
-	UINT8 *m_vram;
-	UINT32 m_vram_bank;
-
-	UINT8 m_bitmap_mod;
 
 	const address_space_config		m_space_config;
 };

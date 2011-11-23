@@ -48,6 +48,8 @@ public:
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	
+	UINT8 *m_video_ram;
 };
 
 /* TODO */
@@ -135,7 +137,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, vt240_state)
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220", upd7220_device, vram_r, vram_w)
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE(m_video_ram)
 ADDRESS_MAP_END
 
 /* Input ports */

@@ -51,6 +51,7 @@ public:
 	DECLARE_WRITE8_MEMBER(a5105_memsel_w);
 	DECLARE_WRITE8_MEMBER(pcg_addr_w);
 	DECLARE_WRITE8_MEMBER(pcg_val_w);
+	UINT8 *m_video_ram;
 	UINT8 *m_char_rom;
 	UINT16 m_pcg_addr;
 	UINT16 m_pcg_internal_addr;
@@ -64,10 +65,12 @@ public:
 /* TODO */
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
+	a5105_state *state = device->machine().driver_data<a5105_state>();
+
 	int xi,gfx;
 	UINT8 pen;
 
-	gfx = vram[address];
+	gfx = state->m_video_ram[address & 0x1ffff];
 
 	for(xi=0;xi<8;xi++)
 	{
@@ -87,8 +90,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 	for( x = 0; x < pitch; x++ )
 	{
-		tile = (vram[(addr+x)*2] & 0xff);
-		color = (vram[(addr+x)*2+1] & 0x0f);
+		tile = (state->m_video_ram[((addr+x)*2) & 0x1ffff] & 0xff);
+		color = (state->m_video_ram[((addr+x)*2+1) & 0x1ffff] & 0x0f);
 
 		for( yi = 0; yi < lr; yi++)
 		{
@@ -425,7 +428,8 @@ static UPD7220_INTERFACE( hgdc_intf )
 };
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, a5105_state)
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("upd7220", upd7220_device, vram_r, vram_w)
+	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
+	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_BASE(m_video_ram)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( a5105, a5105_state )
@@ -465,8 +469,6 @@ ROM_START( a5105 )
 	ROM_LOAD( "k1505_80.rom", 0x8000, 0x2000, CRC(350e4958) SHA1(7e5b587c59676e8549561117ea0b70234f439a94))
 
 	ROM_REGION( 0x800, "pcg", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x40000, "vram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x4000, "gfx2", ROMREGION_ERASEFF )
 	ROM_LOAD( "k5651_40.rom", 0x0000, 0x2000, CRC(f4ad4739) SHA1(9a7bbe6f0d180dd513c7854f441cee986c8d9765))

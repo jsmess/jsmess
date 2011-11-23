@@ -95,6 +95,7 @@ public:
 	const UINT8 *m_key_rom;
 
 	// video state
+	const UINT8 *m_video_ram;
 	const UINT8 *m_char_rom;
 	int m_llen;
 

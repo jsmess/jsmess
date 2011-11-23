@@ -4,6 +4,8 @@
 
 ****************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
@@ -22,6 +24,8 @@ public:
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+
+	UINT8 *m_video_ram;
 };
 
 void if800_state::video_start()
@@ -42,10 +46,12 @@ bool if800_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
+	if800_state *state = device->machine().driver_data<if800_state>();
+
 	int xi,gfx;
 	UINT8 pen;
 
-	gfx = vram[address];
+	gfx = state->m_video_ram[address];
 
 	for(xi=0;xi<8;xi++)
 	{
@@ -55,16 +61,16 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	}
 }
 
-static ADDRESS_MAP_START(if800_map, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(if800_map, AS_PROGRAM, 16, if800_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x0ffff) AM_RAM
 	AM_RANGE(0xfe000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(if800_io, AS_IO, 16)
+static ADDRESS_MAP_START(if800_io, AS_IO, 16, if800_state)
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x0640, 0x065f) dma?
-	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8_MODERN("upd7220", upd7220_device, read, write,0x00ff)
+	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8("upd7220", upd7220_device, read, write,0x00ff)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -90,8 +96,8 @@ static UPD7220_INTERFACE( hgdc_intf )
 	DEVCB_NULL
 };
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 8 )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_MODERN("upd7220", upd7220_device, vram_r, vram_w)
+static ADDRESS_MAP_START( upd7220_map, AS_0, 8, if800_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE(m_video_ram)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( if800, if800_state )

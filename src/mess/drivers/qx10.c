@@ -29,6 +29,8 @@
     AM_RANGE(0xe000,0xffff) RAM
 ****************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/pit8253.h"
@@ -52,13 +54,47 @@ class qx10_state : public driver_device
 public:
 	qx10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-    	  m_hgdc(*this, "upd7220")
+    	  m_dmac1(*this, "8237dma_1"),
+    	  m_rtc(*this, "rtc"),
+    	  m_hgdc(*this, "upd7220"),
+		  m_vram_bank(0)
 		{ }
 
+	required_device<i8237_device> m_dmac1;
+	required_device<mc146818_device> m_rtc;
 	required_device<upd7220_device> m_hgdc;
+
+	virtual void machine_start();
+	virtual void machine_reset();
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	
+	void update_memory_mapping();
+	
+	DECLARE_WRITE8_MEMBER( qx10_18_w );
+	DECLARE_WRITE8_MEMBER( prom_sel_w );
+	DECLARE_WRITE8_MEMBER( cmos_sel_w );
+	DECLARE_WRITE_LINE_MEMBER( qx10_upd765_interrupt );
+	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	DECLARE_WRITE8_MEMBER( fdd_motor_w );
+	DECLARE_READ8_MEMBER( qx10_30_r );
+	DECLARE_READ8_MEMBER( gdc_dack_r );
+	DECLARE_WRITE8_MEMBER( gdc_dack_w );
+	DECLARE_WRITE_LINE_MEMBER( tc_w );
+	DECLARE_READ8_MEMBER( mc146818_data_r );
+	DECLARE_WRITE8_MEMBER( mc146818_data_w );
+	DECLARE_WRITE8_MEMBER( mc146818_offset_w );
+	DECLARE_WRITE_LINE_MEMBER( qx10_pic8259_master_set_int_line );
+	DECLARE_READ8_MEMBER( get_slave_ack );
+	DECLARE_READ8_MEMBER( upd7201_r );
+	DECLARE_WRITE8_MEMBER( upd7201_w );
+	DECLARE_READ8_MEMBER( vram_bank_r );
+	DECLARE_WRITE8_MEMBER( vram_bank_w );
+	DECLARE_READ8_MEMBER( vram_r );
+	DECLARE_WRITE8_MEMBER( vram_w );
+
+	UINT8 *m_video_ram;
 	UINT8 *m_char_rom;
 
 	int		m_mc146818_offset;
@@ -104,13 +140,13 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 	if(state->m_color_mode)
 	{
-		gfx[0] = vram[address + 0x00000];
-		gfx[1] = vram[address + 0x10000];
-		gfx[2] = vram[address + 0x20000];
+		gfx[0] = state->m_video_ram[(address * 2) + 0x00000];
+		gfx[1] = state->m_video_ram[(address * 2) + 0x20000];
+		gfx[2] = state->m_video_ram[(address * 2) + 0x40000];
 	}
 	else
 	{
-		gfx[0] = vram[address];
+		gfx[0] = state->m_video_ram[address];
 		gfx[1] = 0;
 		gfx[2] = 0;
 	}
@@ -138,8 +174,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 	for( x = 0; x < pitch; x++ )
 	{
-		tile = (vram[(addr+x)*2] & 0xff);
-		attr = (vram[(addr+x)*2+1] & 0xff);
+		tile = state->m_video_ram[(addr+x)*2];
+		attr = state->m_video_ram[(addr+x)*2+1];
 
 		color = (state->m_color_mode) ? 1 : (attr & 4) ? 2 : 1; /* TODO: color mode */
 
@@ -181,65 +217,61 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 /*
     Memory
 */
-static void update_memory_mapping(running_machine &machine)
+void qx10_state::update_memory_mapping()
 {
 	int drambank = 0;
-	qx10_state *state = machine.driver_data<qx10_state>();
 
-	if (state->m_membank & 1)
+	if (m_membank & 1)
 	{
 		drambank = 0;
 	}
-	else if (state->m_membank & 2)
+	else if (m_membank & 2)
 	{
 		drambank = 1;
 	}
-	else if (state->m_membank & 4)
+	else if (m_membank & 4)
 	{
 		drambank = 2;
 	}
-	else if (state->m_membank & 8)
+	else if (m_membank & 8)
 	{
 		drambank = 3;
 	}
 
-	if (!state->m_memprom)
+	if (!m_memprom)
 	{
-		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base());
+		memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base());
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)) + drambank*64*1024);
+		memory_set_bankptr(machine(), "bank1", ram_get_ptr(machine().device(RAM_TAG)) + drambank*64*1024);
 	}
-	if (state->m_memcmos)
+	if (m_memcmos)
 	{
-		memory_set_bankptr(machine, "bank2", state->m_cmosram);
+		memory_set_bankptr(machine(), "bank2", m_cmosram);
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + drambank*64*1024 + 32*1024);
+		memory_set_bankptr(machine(), "bank2", ram_get_ptr(machine().device(RAM_TAG)) + drambank*64*1024 + 32*1024);
 	}
 }
 
-static WRITE8_HANDLER(qx10_18_w)
+WRITE8_MEMBER( qx10_state::qx10_18_w )
 {
-	qx10_state *state = space->machine().driver_data<qx10_state>();
-	state->m_membank = (data >> 4) & 0x0f;
-	update_memory_mapping(space->machine());
+	m_membank = (data >> 4) & 0x0f;
+	update_memory_mapping();
 }
 
-static WRITE8_HANDLER(prom_sel_w)
+WRITE8_MEMBER( qx10_state::prom_sel_w )
 {
-	qx10_state *state = space->machine().driver_data<qx10_state>();
-	state->m_memprom = data & 1;
-	update_memory_mapping(space->machine());
+	m_memprom = data & 1;
+	update_memory_mapping();
 }
 
-static WRITE8_HANDLER(cmos_sel_w)
+WRITE8_MEMBER( qx10_state::cmos_sel_w )
 {
-	qx10_state *state = space->machine().driver_data<qx10_state>();
-	state->m_memcmos = data & 1;
-	update_memory_mapping(space->machine());
+	m_memcmos = data & 1;
+	update_memory_mapping();
 }
 
 /*
@@ -259,80 +291,75 @@ static const floppy_interface qx10_floppy_interface =
 	NULL
 };
 
-static WRITE_LINE_DEVICE_HANDLER(qx10_upd765_interrupt)
+WRITE_LINE_MEMBER( qx10_state::qx10_upd765_interrupt )
 {
-	qx10_state *driver_state = device->machine().driver_data<qx10_state>();
-	driver_state->m_fdcint = state;
+	m_fdcint = state;
 
 	//logerror("Interrupt from upd765: %d\n", state);
 	// signal interrupt
-	pic8259_ir6_w(driver_state->m_pic8259_master, state);
+	pic8259_ir6_w(m_pic8259_master, state);
 };
 
-static WRITE_LINE_DEVICE_HANDLER( drq_w )
+WRITE_LINE_MEMBER( qx10_state::drq_w )
 {
-	i8237_dreq0_w(device, !state);
+	i8237_dreq0_w(m_dmac1, !state);
 }
 
 static const struct upd765_interface qx10_upd765_interface =
 {
-	DEVCB_LINE(qx10_upd765_interrupt),
-	DEVCB_DEVICE_LINE("8237dma_1", drq_w),
+	DEVCB_DRIVER_LINE_MEMBER(qx10_state, qx10_upd765_interrupt),
+	DEVCB_DRIVER_LINE_MEMBER(qx10_state, drq_w),
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
-static WRITE8_HANDLER(fdd_motor_w)
+WRITE8_MEMBER( qx10_state::fdd_motor_w )
 {
-	qx10_state *driver_state = space->machine().driver_data<qx10_state>();
-	driver_state->m_fdcmotor = 1;
+	m_fdcmotor = 1;
 
-	floppy_mon_w(floppy_get_device(space->machine(), 0), CLEAR_LINE);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1,1);
+	floppy_mon_w(floppy_get_device(machine(), 0), CLEAR_LINE);
+	floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1,1);
 	// motor off controlled by clock
 };
 
-static READ8_HANDLER(qx10_30_r)
+READ8_MEMBER( qx10_state::qx10_30_r )
 {
-	qx10_state *driver_state = space->machine().driver_data<qx10_state>();
 	floppy_image_legacy *floppy1,*floppy2;
 
-	floppy1 = flopimg_get_image(floppy_get_device(space->machine(), 0));
-	floppy2 = flopimg_get_image(floppy_get_device(space->machine(), 1));
+	floppy1 = flopimg_get_image(floppy_get_device(machine(), 0));
+	floppy2 = flopimg_get_image(floppy_get_device(machine(), 1));
 
-	return driver_state->m_fdcint |
-		   /*driver_state->m_fdcmotor*/ 0 << 1 |
+	return m_fdcint |
+		   /*m_fdcmotor*/ 0 << 1 |
 		   ((floppy1 != NULL) || (floppy2 != NULL) ? 1 : 0) << 3 |
-		   driver_state->m_membank << 4;
+		   m_membank << 4;
 };
 
 /*
     DMA8237
 */
-static WRITE_LINE_DEVICE_HANDLER( dma_hrq_changed )
+WRITE_LINE_DEVICE_HANDLER( dma_hrq_changed )
 {
 	/* Assert HLDA */
 	i8237_hlda_w(device, state);
 }
 
-static READ8_DEVICE_HANDLER( gdc_dack_r )
+READ8_MEMBER( qx10_state::gdc_dack_r )
 {
 	logerror("GDC DACK read\n");
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( gdc_dack_w )
+WRITE8_MEMBER( qx10_state::gdc_dack_w )
 {
 	logerror("GDC DACK write %02x\n", data);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( tc_w )
+WRITE_LINE_MEMBER( qx10_state::tc_w )
 {
-	qx10_state *driver_state = device->machine().driver_data<qx10_state>();
-
 	/* floppy terminal count */
-	upd765_tc_w(driver_state->m_upd765, !state);
+	upd765_tc_w(m_upd765, !state);
 }
 
 /*
@@ -347,11 +374,11 @@ static void memory_write_byte(address_space *space, offs_t address, UINT8 data) 
 static I8237_INTERFACE( qx10_dma8237_1_interface )
 {
 	DEVCB_LINE(dma_hrq_changed),
-	DEVCB_LINE(tc_w),
+	DEVCB_DRIVER_LINE_MEMBER(qx10_state, tc_w),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
-	{ DEVCB_DEVICE_HANDLER("upd765", upd765_dack_r), DEVCB_HANDLER(gdc_dack_r),/*DEVCB_DEVICE_HANDLER("upd7220", upd7220_dack_r)*/ DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DEVICE_HANDLER("upd765", upd765_dack_w), DEVCB_HANDLER(gdc_dack_w),/*DEVCB_DEVICE_HANDLER("upd7220", upd7220_dack_w)*/ DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_DEVICE_HANDLER("upd765", upd765_dack_r), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_r),/*DEVCB_DEVICE_HANDLER("upd7220", upd7220_dack_r)*/ DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_DEVICE_HANDLER("upd765", upd765_dack_w), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_w),/*DEVCB_DEVICE_HANDLER("upd7220", upd7220_dack_w)*/ DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
@@ -389,22 +416,19 @@ static I8255_INTERFACE(qx10_i8255_interface)
 /*
     MC146818
 */
-static READ8_HANDLER(mc146818_data_r)
+READ8_MEMBER( qx10_state::mc146818_data_r )
 {
-	qx10_state *state = space->machine().driver_data<qx10_state>();
-	return space->machine().device<mc146818_device>("rtc")->read(*space, state->m_mc146818_offset);
+	return m_rtc->read(space, m_mc146818_offset);
 };
 
-static WRITE8_HANDLER(mc146818_data_w)
+WRITE8_MEMBER( qx10_state::mc146818_data_w )
 {
-	qx10_state *state = space->machine().driver_data<qx10_state>();
-	space->machine().device<mc146818_device>("rtc")->write(*space, state->m_mc146818_offset, data);
+	m_rtc->write(space, m_mc146818_offset, data);
 };
 
-static WRITE8_HANDLER(mc146818_offset_w)
+WRITE8_MEMBER( qx10_state::mc146818_offset_w )
 {
-	qx10_state *state = space->machine().driver_data<qx10_state>();
-	state->m_mc146818_offset = data;
+	m_mc146818_offset = data;
 };
 
 /*
@@ -492,25 +516,24 @@ static const struct pit8253_config qx10_pit8253_2_config =
     IR6     Floppy controller interrupt
 */
 
-static WRITE_LINE_DEVICE_HANDLER( qx10_pic8259_master_set_int_line )
+WRITE_LINE_MEMBER( qx10_state::qx10_pic8259_master_set_int_line )
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-static READ8_DEVICE_HANDLER( get_slave_ack )
+READ8_MEMBER( qx10_state::get_slave_ack )
 {
-	qx10_state *state = device->machine().driver_data<qx10_state>();
 	if (offset==7) { // IRQ = 7
-		return pic8259_acknowledge(state->m_pic8259_slave);
+		return pic8259_acknowledge(m_pic8259_slave);
 	}
 	return 0x00;
 }
 
 static const struct pic8259_interface qx10_pic8259_master_config =
 {
-	DEVCB_LINE(qx10_pic8259_master_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(qx10_state, qx10_pic8259_master_set_int_line),
 	DEVCB_LINE_VCC,
-	DEVCB_HANDLER(get_slave_ack)
+	DEVCB_DRIVER_MEMBER(qx10_state, get_slave_ack)
 };
 
 /*
@@ -538,40 +561,36 @@ static IRQ_CALLBACK( irq_callback )
 	return pic8259_acknowledge(device->machine().driver_data<qx10_state>()->m_pic8259_master );
 }
 
-static READ8_HANDLER( upd7201_r )
+READ8_MEMBER( qx10_state::upd7201_r )
 {
-	qx10_state *state = space->machine().driver_data<qx10_state>();
-
 	if((offset & 2) == 0)
 	{
-		return state->m_keyb.rx;
+		return m_keyb.rx;
 	}
 	//printf("R [%02x]\n",offset);
 
-	return state->m_rs232c.rx;
+	return m_rs232c.rx;
 }
 
-static WRITE8_HANDLER( upd7201_w )
+WRITE8_MEMBER( qx10_state::upd7201_w )
 {
-	qx10_state *state = space->machine().driver_data<qx10_state>();
-
 	if((offset & 2) == 0) //keyb TX
 	{
 		switch(data & 0xe0)
 		{
 			case 0x00:
-				state->m_keyb.repeat_start_time = 300+(data & 0x1f)*25;
-				printf("keyb Set repeat start time, %d ms\n",state->m_keyb.repeat_start_time);
+				m_keyb.repeat_start_time = 300+(data & 0x1f)*25;
+				printf("keyb Set repeat start time, %d ms\n",m_keyb.repeat_start_time);
 				break;
 			case 0x20:
-				state->m_keyb.repeat_interval = 30+(data & 0x1f)*5;
-				printf("keyb Set repeat interval, %d ms\n",state->m_keyb.repeat_interval);
+				m_keyb.repeat_interval = 30+(data & 0x1f)*5;
+				printf("keyb Set repeat interval, %d ms\n",m_keyb.repeat_interval);
 				break;
 			case 0x40:
-				state->m_keyb.led[(data & 0xe) >> 1] = data & 1;
+				m_keyb.led[(data & 0xe) >> 1] = data & 1;
 				printf("keyb Set led %02x %s\n",((data & 0xe) >> 1),data & 1 ? "on" : "off");
-				state->m_keyb.rx = (data & 0xf) | 0xc0;
-				pic8259_ir4_w(space->machine().device("pic8259_master"), 1);
+				m_keyb.rx = (data & 0xf) | 0xc0;
+				pic8259_ir4_w(machine().device("pic8259_master"), 1);
 				break;
 			case 0x60:
 				printf("keyb Read LED status\n");
@@ -582,16 +601,16 @@ static WRITE8_HANDLER( upd7201_w )
 				// 0xc0 + data
 				break;
 			case 0xa0:
-				state->m_keyb.repeat = data & 1;
+				m_keyb.repeat = data & 1;
 				//printf("keyb repeat flag issued %s\n",data & 1 ? "on" : "off");
 				break;
 			case 0xc0:
-				state->m_keyb.enable = data & 1;
+				m_keyb.enable = data & 1;
 				printf("keyb Enable flag issued %s\n",data & 1 ? "on" : "off");
 				break;
 			case 0xe0:
 				printf("keyb Reset Issued, diagnostic is %s\n",data & 1 ? "on" : "off");
-				state->m_keyb.rx = 0;
+				m_keyb.rx = 0;
 				break;
 		}
 	}
@@ -599,69 +618,60 @@ static WRITE8_HANDLER( upd7201_w )
 	{
 		//printf("RS-232c W %02x\n",data);
 		if(data == 0x01) //cheap, but needed for working inputs in "The QX-10 Diagnostic"
-			state->m_rs232c.rx = 0x04;
+			m_rs232c.rx = 0x04;
 		else if(data == 0x00)
-			state->m_rs232c.rx = 0xfe;
+			m_rs232c.rx = 0xfe;
 		else
-			state->m_rs232c.rx = 0xff;
+			m_rs232c.rx = 0xff;
 	}
 
 }
 
-static READ8_HANDLER( vram_bank_r )
+READ8_MEMBER( qx10_state::vram_bank_r )
 {
-	qx10_state *state = space->machine().driver_data<qx10_state>();
-
-	return state->m_vram_bank;
+	return m_vram_bank;
 }
 
-static WRITE8_HANDLER( vram_bank_w )
+WRITE8_MEMBER( qx10_state::vram_bank_w )
 {
-	qx10_state *state = space->machine().driver_data<qx10_state>();
-
-	if(state->m_color_mode)
+	if(m_color_mode)
 	{
-		state->m_vram_bank = data & 7;
+		m_vram_bank = data & 7;
 		if(data != 1 && data != 2 && data != 4)
 			printf("%02x\n",data);
-
-		if(data & 1)	  { state->m_hgdc->bank_w(*space, 0, 0); } // B
-		else if(data & 2) { state->m_hgdc->bank_w(*space, 0, 2); } // G
-		else if(data & 4) { state->m_hgdc->bank_w(*space, 0, 4); } // R
 	}
 }
 
-
-static ADDRESS_MAP_START(qx10_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(qx10_mem, AS_PROGRAM, 8, qx10_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x8000, 0xdfff ) AM_RAMBANK("bank2")
 	AM_RANGE( 0xe000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qx10_io , AS_IO, 8)
+static ADDRESS_MAP_START( qx10_io , AS_IO, 8, qx10_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit8253_1", pit8253_r, pit8253_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("pit8253_2", pit8253_r, pit8253_w)
-	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("pic8259_master", pic8259_r, pic8259_w)
-	AM_RANGE(0x0c, 0x0d) AM_DEVREADWRITE("pic8259_slave", pic8259_r, pic8259_w)
-	AM_RANGE(0x10, 0x13) AM_READWRITE(upd7201_r,upd7201_w) //AM_DEVREADWRITE_MODERN("upd7201", upd7201_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE_MODERN("i8255", i8255_device, read, write)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("pit8253_1", pit8253_r, pit8253_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("pit8253_2", pit8253_r, pit8253_w)
+	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE_LEGACY("pic8259_master", pic8259_r, pic8259_w)
+	AM_RANGE(0x0c, 0x0d) AM_DEVREADWRITE_LEGACY("pic8259_slave", pic8259_r, pic8259_w)
+	AM_RANGE(0x10, 0x13) AM_READWRITE(upd7201_r, upd7201_w) //AM_DEVREADWRITE("upd7201", upd7201_device, cd_ba_r, cd_ba_w)
+	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("i8255", i8255_device, read, write)
 	AM_RANGE(0x18, 0x1b) AM_READ_PORT("DSW") AM_WRITE(qx10_18_w)
 	AM_RANGE(0x1c, 0x1f) AM_WRITE(prom_sel_w)
 	AM_RANGE(0x20, 0x23) AM_WRITE(cmos_sel_w)
 	AM_RANGE(0x2c, 0x2c) AM_READ_PORT("CONFIG")
 	AM_RANGE(0x2d, 0x2d) AM_READWRITE(vram_bank_r,vram_bank_w)
 	AM_RANGE(0x30, 0x33) AM_READWRITE(qx10_30_r, fdd_motor_w)
-	AM_RANGE(0x34, 0x34) AM_DEVREAD("upd765", upd765_status_r)
-	AM_RANGE(0x35, 0x35) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w)
-	AM_RANGE(0x38, 0x39) AM_DEVREADWRITE_MODERN("upd7220", upd7220_device, read, write)
+	AM_RANGE(0x34, 0x34) AM_DEVREAD_LEGACY("upd765", upd765_status_r)
+	AM_RANGE(0x35, 0x35) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w)
+	AM_RANGE(0x38, 0x39) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
 //  AM_RANGE(0x3a, 0x3a) GDC zoom
 //  AM_RANGE(0x3b, 0x3b) GDC light pen req
 	AM_RANGE(0x3c, 0x3c) AM_READWRITE(mc146818_data_r, mc146818_data_w)
 	AM_RANGE(0x3d, 0x3d) AM_WRITE(mc146818_offset_w)
-	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("8237dma_1", i8237_r, i8237_w)
-	AM_RANGE(0x50, 0x5f) AM_DEVREADWRITE("8237dma_2", i8237_r, i8237_w)
+	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE_LEGACY("8237dma_1", i8237_r, i8237_w)
+	AM_RANGE(0x50, 0x5f) AM_DEVREADWRITE_LEGACY("8237dma_2", i8237_r, i8237_w)
 //  AM_RANGE(0xfc, 0xfd) Multi-Font comms
 ADDRESS_MAP_END
 
@@ -879,50 +889,46 @@ static INPUT_PORTS_START( qx10 )
 INPUT_PORTS_END
 
 
-static MACHINE_START(qx10)
+void qx10_state::machine_start()
 {
-	qx10_state *state = machine.driver_data<qx10_state>();
-
-	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	device_set_irq_callback(machine().device("maincpu"), irq_callback);
 
 	// find devices
-	state->m_pic8259_master = machine.device("pic8259_master");
-	state->m_pic8259_slave = machine.device("pic8259_slave");
-	state->m_dma8237_1 = machine.device("8237dma_1");
-	state->m_upd765 = machine.device("upd765");
+	m_pic8259_master = machine().device("pic8259_master");
+	m_pic8259_slave = machine().device("pic8259_slave");
+	m_dma8237_1 = machine().device("8237dma_1");
+	m_upd765 = machine().device("upd765");
 
 }
 
-static MACHINE_RESET(qx10)
+void qx10_state::machine_reset()
 {
-	qx10_state *state = machine.driver_data<qx10_state>();
+	i8237_dreq0_w(m_dma8237_1, 1);
 
-	i8237_dreq0_w(state->m_dma8237_1, 1);
-
-	state->m_memprom = 0;
-	state->m_memcmos = 0;
-	state->m_membank = 0;
-	update_memory_mapping(machine);
+	m_memprom = 0;
+	m_memcmos = 0;
+	m_membank = 0;
+	update_memory_mapping();
 
 	{
 		int i;
 
 		/* TODO: is there a bit that sets this up? */
-		state->m_color_mode = input_port_read(machine, "CONFIG") & 1;
+		m_color_mode = input_port_read(machine(), "CONFIG") & 1;
 
-		if(state->m_color_mode) //color
+		if(m_color_mode) //color
 		{
 			for ( i = 0; i < 8; i++ )
-				palette_set_color_rgb(machine, i, pal1bit((i >> 2) & 1), pal1bit((i >> 1) & 1), pal1bit((i >> 0) & 1));
+				palette_set_color_rgb(machine(), i, pal1bit((i >> 2) & 1), pal1bit((i >> 1) & 1), pal1bit((i >> 0) & 1));
 		}
 		else //monochrome
 		{
 			for ( i = 0; i < 8; i++ )
-				palette_set_color_rgb(machine, i, pal1bit(0), pal1bit(0), pal1bit(0));
+				palette_set_color_rgb(machine(), i, pal1bit(0), pal1bit(0), pal1bit(0));
 
-			palette_set_color_rgb(machine, 1, 0x00, 0x9f, 0x00);
-			palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00);
-			state->m_vram_bank = 0;
+			palette_set_color_rgb(machine(), 1, 0x00, 0x9f, 0x00);
+			palette_set_color_rgb(machine(), 2, 0x00, 0xff, 0x00);
+			m_vram_bank = 0;
 		}
 	}
 }
@@ -947,6 +953,9 @@ GFXDECODE_END
 
 void qx10_state::video_start()
 {
+	// allocate memory
+	m_video_ram = auto_alloc_array_clear(machine(), UINT8, 0x60000);
+	
 	// find memory regions
 	m_char_rom = machine().region("chargen")->base();
 
@@ -978,8 +987,30 @@ static PALETTE_INIT( gdc )
 	// ...
 }
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 8 )
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE_MODERN("upd7220", upd7220_device, vram_r, vram_w)
+READ8_MEMBER( qx10_state::vram_r )
+{
+	int bank = 0;
+	
+	if (m_vram_bank & 1)	 { bank = 0; } // B
+	else if(m_vram_bank & 2) { bank = 1; } // G
+	else if(m_vram_bank & 4) { bank = 2; } // R
+
+	return m_video_ram[offset + (0x20000 * bank)];
+}
+
+WRITE8_MEMBER( qx10_state::vram_w )
+{
+	int bank = 0;
+	
+	if (m_vram_bank & 1)	 { bank = 0; } // B
+	else if(m_vram_bank & 2) { bank = 1; } // G
+	else if(m_vram_bank & 4) { bank = 2; } // R
+
+	m_video_ram[offset + (0x2000 * bank)] = data;
+}
+
+static ADDRESS_MAP_START( upd7220_map, AS_0, 8, qx10_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
 
@@ -988,9 +1019,6 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
 	MCFG_CPU_PROGRAM_MAP(qx10_mem)
 	MCFG_CPU_IO_MAP(qx10_io)
-
-	MCFG_MACHINE_START(qx10)
-	MCFG_MACHINE_RESET(qx10)
 
 	MCFG_PIT8253_ADD("pit8253_1", qx10_pit8253_1_config)
 	MCFG_PIT8253_ADD("pit8253_2", qx10_pit8253_2_config)
