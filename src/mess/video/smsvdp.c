@@ -1439,7 +1439,7 @@ static DEVICE_START( smsvdp )
 	smsvdp->m_line_buffer = auto_alloc_array(device->machine(), int, 256 * 5);
 
 	smsvdp->m_collision_buffer = auto_alloc_array(device->machine(), UINT8, SMS_X_PIXELS);
-	smsvdp->m_sms_frame_timing = auto_alloc_array(device->machine(), UINT8, 7);
+	smsvdp->m_sms_frame_timing = sms_ntsc_192;
 
 	/* Make temp bitmap for rendering */
 	smsvdp->m_tmpbitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED32);
