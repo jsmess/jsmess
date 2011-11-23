@@ -78,6 +78,7 @@ typedef enum
 #define UPD765_FDD_READY 0x040
 
 #define UPD765_MF	0x40
+#define UPD765_MT	0x80
 
 #define UPD765_RESET 0x080
 
@@ -1234,7 +1235,7 @@ static int upd765_sector_count_complete(device_t *device)
 
 
 	/* multi-track? */
-	if (fdc->upd765_command_bytes[0] & 0x080)
+	if (fdc->upd765_command_bytes[0] & UPD765_MT)
 	{
 		/* it appears that in multi-track mode,
         the EOT parameter of the command is ignored!? -
@@ -1363,46 +1364,38 @@ static int upd765_sector_count_complete(device_t *device)
 static void	upd765_increment_sector(device_t *device)
 {
 	upd765_t *fdc = get_safe_token(device);
+
 	/* multi-track? */
-	if (fdc->upd765_command_bytes[0] & 0x080)
+	if (fdc->upd765_command_bytes[0] & UPD765_MT)
 	{
 		/* reached EOT? */
-		/* if (fdc->upd765_command_bytes[4]==fdc->upd765_command_bytes[6])*/
-		if (upd765_just_read_last_sector_on_track(device))
+		if (fdc->upd765_command_bytes[4] == fdc->upd765_command_bytes[6])
 		{
-			/* reset sector id to 1 */
-			fdc->upd765_command_bytes[4] = 1;
-
-			/* yes */
-			if(fdc->side == 1) {
-				fdc->upd765_command_bytes[3] = 0;
+			if (fdc->side == 1)
+			{
 				fdc->upd765_command_bytes[2]++;
-				return;
 			}
-
-			/* reached EOT */
-			/* change side to 1 */
-			fdc->side = 1;
-			/* set head to 1 for get next sector test */
-			fdc->upd765_command_bytes[3] = 1;
+			
+			fdc->upd765_command_bytes[3] ^= 0x01;
+			fdc->upd765_command_bytes[4] = 1;
+			fdc->side = fdc->upd765_command_bytes[3] & 0x01;
 		}
 		else
 		{
-			/* increment */
 			fdc->upd765_command_bytes[4]++;
 		}
-
 	}
 	else
 	{
-		if (upd765_just_read_last_sector_on_track(device))
+		if (fdc->upd765_command_bytes[4] == fdc->upd765_command_bytes[6])
 		{
-			fdc->upd765_command_bytes[4] = 1;
 			fdc->upd765_command_bytes[2]++;
-			return;
+			fdc->upd765_command_bytes[4] = 1;
 		}
-
-		fdc->upd765_command_bytes[4]++;
+		else
+		{
+			fdc->upd765_command_bytes[4]++;
+		}
 	}
 }
 
