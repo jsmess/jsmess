@@ -23,7 +23,7 @@
 #define SCREEN_TAG		"screen"
 #define I8088_TAG		"8l"
 #define I8048_TAG		"5d"
-#define I8022_TAG		"i8022"
+#define I8021_TAG		"z3"
 #define I8253_TAG		"13h"
 #define I8259A_TAG		"7l"
 #define UPD7201_TAG		"16e"
