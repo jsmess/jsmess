@@ -849,6 +849,35 @@ ROM_START( i8555081 )
 	ROM_RELOAD(0xfe0001, 0x10000)
 ROM_END
 
+/*
+8580-071 (Model 80)
+===================
+                  Code    Date      Internal
+AMI 8924MBW     90X8548   1987  --> 72X7551
+AMI 8924MBL     90X8549   1987  --> 72X7554
+AMI 8924MBG     90X8550   1987  --> 72X7557
+AMI 8921MBK     90X8551   1987  --> 72X7560
+*/
+ROM_START( i8580071 )
+	ROM_REGION(0x1000000,"maincpu", 0)
+	ROM_LOAD( "90x8548.bin", 0xe0000, 0x8000, CRC(1f13eea5) SHA1(0bf53ad86f47db3825a713ea2e4ef23715cc4f79))
+	ROM_LOAD( "90x8549.bin", 0xe0001, 0x8000, CRC(9e0f4a99) SHA1(b8600f04159ed281a57416274390ba9302be541b))
+	ROM_LOAD( "90x8550.bin", 0xf0000, 0x8000, CRC(cb21df96) SHA1(0c2765f6becfa3f9171c4f13f7b74d19c4c9acc2))
+	ROM_LOAD( "90x8551.bin", 0xf0001, 0x8000, CRC(3d7e9868) SHA1(2928fe0e48a573cc2c0c41bd7f7188a54a908229))
+ROM_END
+
+/*
+8580-111 (Model 80)
+===================
+                 Code    Date    Internal
+AMI 8934MDL     15F6637  1987 --> 15F6597
+AMI 8944MDI     15F6639  1987 --> 15F6600
+*/
+ROM_START( i8580111 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "15f6637.bin", 0xe0000, 0x10000, CRC(76c36d1a) SHA1(c68d52a2e5fbd303225ebb006f91869b29ef700a))
+	ROM_LOAD( "15f6639.bin", 0xe0001, 0x10000, CRC(82cf0f7d) SHA1(13bb39225757b89749af70e881af0228673dbe0c))
+ROM_END
 
 ROM_START( at )
 	ROM_REGION(0x1000000,"maincpu", 0)
@@ -1349,6 +1378,8 @@ COMP ( 198?, i8535043, ibm5170, 0,       at386, 	atvga,      atvga,  "Internatio
 COMP ( 198?, i8550021, ibm5170, 0,       at386, 	atvga,      atvga,  "International Business Machines",  "IBM PS/2 8550-021 (Model 50)", GAME_NOT_WORKING )
 COMP ( 198?, i8550061, ibm5170, 0,       at386, 	atvga,      atvga,  "International Business Machines",  "IBM PS/2 8550-061 (Model 50Z)", GAME_NOT_WORKING )
 COMP ( 1989, i8555081, ibm5170, 0,       at386,     atvga,      atvga,  "International Business Machines",  "IBM PS/2 8550-081 (Model 55SX)", GAME_NOT_WORKING )
+COMP ( 198?, i8580071, ibm5170, 0,       at386,     atvga,      atvga,  "International Business Machines",  "IBM PS/2 8580-071 (Model 80)", GAME_NOT_WORKING )
+COMP ( 198?, i8580111, ibm5170, 0,       at386,     atvga,      atvga,  "International Business Machines",  "IBM PS/2 8580-111 (Model 80)", GAME_NOT_WORKING )
 COMP ( 1987, at,       ibm5170, 0,       ibm5162,   atcga,      atcga,  "<generic>",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,      atvga,  "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,      atvga,  "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
