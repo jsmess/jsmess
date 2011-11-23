@@ -1006,11 +1006,12 @@ WRITE8_MEMBER( qx10_state::vram_w )
 	else if(m_vram_bank & 2) { bank = 1; } // G
 	else if(m_vram_bank & 4) { bank = 2; } // R
 
-	m_video_ram[offset + (0x2000 * bank)] = data;
+	m_video_ram[offset + (0x20000 * bank)] = data;
 }
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, qx10_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r, vram_w)
+	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
+	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_BASE(m_video_ram)
 ADDRESS_MAP_END
 
 
