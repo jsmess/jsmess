@@ -3245,6 +3245,18 @@
 		</part>
 	</software>
 
+	<software name="banjokazp" cloneof="banjokaz">
+		<description>Banjo-Kazooie - Grunty's Revenge (Euro, Prototype)</description>
+		<year>2003</year>
+		<publisher>THQ</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-64K" />
+			<dataarea name="rom" size="8337992">
+				<rom name="grunty's revenge debug.bin" size="8337992" crc="106ed779" sha1="f2d3d4f8226c17c5391abcb2a2cbce10c59ab4c7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="banjokazi" cloneof="banjokaz">
 		<description>Banjo-Kazooie - La Vendetta di Grunty (Ita)</description>
 		<year>2003</year>
@@ -3659,6 +3671,17 @@
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="battlebots - design &amp; destroy (usa).bin" size="4194304" crc="8d5ffbca" sha1="635986e584ebdc347c77eb45b1370a1206fbd7d7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btoads">
+		<description>Battletoads (Prototype)</description>
+		<year>200?</year>
+		<publisher>Rare</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="2143184">
+				<rom name="battletoads.bin" size="2143184" crc="31480d89" sha1="4ceebb84a77e4626c01dddd2fbc8446344ebf504" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7413,6 +7436,18 @@
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
 				<rom name="diadroids world - evil teikoku no yabou (japan).bin" size="8388608" crc="a2d6cea6" sha1="4fc0e2240ddd11d4a1f9a80eaff3b945c8f27c8a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diddypil">
+		<description>Diddy Kong Pilot (Prototype)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-4K" />	<!-- or 64K?? or none?? -->
+			<dataarea name="rom" size="12277472">
+				<rom name="diddy kong pilot.bin" size="12277472" crc="057dc388" sha1="0cb385781742c25bf9d4cbeae8e83f7750af48db" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -38589,12 +38589,12 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<publisher>Taito</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TAITO-NROM-256" />
-			<dataarea name="prg" size="32768">
-				<rom name="elevator action (japan, rev a).prg" size="32768" crc="a6de7024" sha1="2070d3241f5f29de74b004c9a6237cec17951f9a" offset="00000" />
-			</dataarea> <!-- real label: elevatoraction -->
 			<dataarea name="chr" size="8192">
 				<rom name="elevator action (japan, rev a).chr" size="8192" crc="fac01d0f" sha1="f4c30bb45e92398088baabab04bc5650066781fc" offset="00000" />
-			</dataarea> <!-- real label: elevatoraction -->
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="elevator action (japan, rev a).prg" size="32768" crc="298587a9" sha1="2070d3241f5f29de74b004c9a6237cec17951f9a" offset="00000" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -47280,6 +47280,25 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="longzz3" supported="partial">
+		<!-- Serial: ES-1130 - Release Date:  - Alternative Title:  -->
+		<description>Long Zhu Z3 Ren Zao Ren Lie Zhuan (Chi, Fixed?)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-G" /> <!-- header says mapper 74, but it's wrong. the mapper is a variant of this (but glitchy sprites -->
+			<dataarea name="chr" size="262144">
+				<rom name="[es-1130] long zhu z3 ren zao ren lie zhuan (c)_fix.chr" size="262144" crc="6df9f2cc" sha1="62e3c83ec5500a717c62deb4b31441a08052a3e3" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="[es-1130] long zhu z3 ren zao ren lie zhuan (c)_fix.prg" size="524288" crc="b9c8bb09" sha1="22a0c8782a78170f7b790717f9e81672b44e1ec9" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="longzg" cloneof="watarug">
 		<!-- Serial: ES-1137 - Release Date:  - Alternative Title: 龙之谷 -->
 		<description>Long Zhi Gu (Chi, Fixed?)</description>
@@ -47397,7 +47416,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="cjjq">
 		<!-- Serial: NJ012 - Release Date:  - Alternative Title: 超级机器人大战Ａ ~ Super Robot Wars A -->
-		<description>Chao Ji Ji Qi Ren Da Zhan A (Chi)</description>
+		<description>Chaoji Ji Qi Ren Da Zhan A (Chi)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -51402,7 +51421,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 <!-- was this ever released on real carts? -->
 	<software name="famikan">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Famikan (Japan, Unl)</description>
+		<description>Famikan (Jpn, Unl)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -51674,6 +51693,27 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="jurassic park - the lost world (unl)[!].prg" size="262144" crc="fc573ae3" sha1="14f02aac7f3eaa1cc0d90a7fce7890e234c2920f" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This was included in the DVD release of a 2008 Japanese TV show describing the creation of a Famicom game
+It was also distributed in form of Famicom carts, whose checksums (according to the developer websit) match this set
+Also available (in form of IPS patches from the dev) some hacks featuring alt. levels: Mondo21 hack, gg version & Meteor version
+We don't include these hacks because they were not burned into real carts nor sold!  -->
+	<software name="mrsplash">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Mr. Splash! (Jpn)</description>
+		<year>2007</year>
+		<publisher>Hiroshi "Polygon" Inukai</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="chr" size="32768">
+				<rom name="mr. splash (japan) (unl).chr" size="32768" crc="5f9319fe" sha1="64e05f9a7ab82511f06cec55c81b74f7210b8d52" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="mr. splash (japan) (unl).prg" size="32768" crc="dea39fa7" sha1="6927f20370214b5a1fdc029a6c63155bdd87de1c" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -60578,7 +60618,7 @@ resulting in tons of glitches? -->
 
 	<software name="93contra" cloneof="probot">
 		<!-- Serial:  - Release Date:  - Alternative Title: Super Contra II (cart label?) / 93超级魂 -->
-		<description>'93 ChaoJi Hun (Chi, Contra pirate)</description>
+		<description>'93 Chaoji Hun (Chi, Contra pirate)</description>
 		<year>1993</year>
 		<publisher>Yanshan RuanJian</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66310,16 +66350,20 @@ that the real dumps might surface -->
 
 <!-- The following iNES roms are ripped from mc_dgear, so we don't include them (crc is from headerless file):
 	* Deformable	[b0716cc2]
+	* Diamond	[a207bd12]
 	* Difference	[3c201dcc]
+	* Escapeway	[0086ea7c]
 	* Fish Story	[9334de5b]
 	* Goblet Tower	[d1b91f24]
 	* Island	[fb9496cc]
 	* Metro Mania [7981c762]
 	* Mirror Devil World	[2ec1bed7]
 	* Police vs Thief	[02bc030e]
+	* Pulveration	[d903b9f2]
 	* Rabbit Village	[2a561f41]
 	* Road Worker	[44a6ca07]
 	* Super Hero	[c46eda12]
+	* Twin Fish	[92324d59]
 	* Vigilant	[c042b605]
 	* Wonder Rabbit	[49fd2867]
  -->
