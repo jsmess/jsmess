@@ -38593,7 +38593,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 				<rom name="elevator action (japan, rev a).chr" size="8192" crc="fac01d0f" sha1="f4c30bb45e92398088baabab04bc5650066781fc" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="elevator action (japan, rev a).prg" size="32768" crc="298587a9" sha1="2070d3241f5f29de74b004c9a6237cec17951f9a" offset="00000" />
+				<rom name="elevator action (japan, rev a).prg" size="32768" crc="298587a9" sha1="f1b529ae293951f079e2f7b75c12fc8b187a1206" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
