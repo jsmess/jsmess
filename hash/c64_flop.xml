@@ -169,13 +169,13 @@
 		<publisher>Ocean</publisher>
 		<info name="video" value="PAL" />
 		<info name="protection" value="ocean" />
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="333744">
 				<rom name="rambo_iii_s1[ocean_1988](pal).g64" size="333744" crc="6f2ea02d" sha1="69ff02b03e4e4b5957b12fba4ea0a4e06172727e" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="333744">
 				<rom name="rambo_iii_s2[ocean_1988](pal).g64" size="333744" crc="82f55d97" sha1="e55bfb001feb2f09c33ec57a1400c659bf1e2e7e" offset="0" />

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="uzebox" description="Uzebox intrnal eprom contents">
+<softwarelist name="uzebox" description="Uzebox internal EPROM contents">
 	<software name="arkanoid">
 		<description>Arkanoid</description>
 		<year>2010</year>
