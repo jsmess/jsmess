@@ -42,17 +42,17 @@ static void tvc_set_mem_page(running_machine &machine, UINT8 data)
 				break;
 		case 0x10 : // RAM selected
 				space->install_readwrite_bank(0x0000, 0x3fff, "bank1");
-				memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(machine.device(RAM_TAG)));
+				memory_set_bankptr(space->machine(), "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
 				break;
 	}
 	// Bank 2 is always RAM
-	memory_set_bankptr(space->machine(), "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0x4000);
+	memory_set_bankptr(space->machine(), "bank2", machine.device<ram_device>(RAM_TAG)->pointer() + 0x4000);
 	if ((data & 0x20)==0) {
 		// Video RAM
-		memory_set_bankptr(space->machine(), "bank3", ram_get_ptr(machine.device(RAM_TAG)) + 0x10000);
+		memory_set_bankptr(space->machine(), "bank3", machine.device<ram_device>(RAM_TAG)->pointer() + 0x10000);
 	} else {
 		// System RAM page 3
-		memory_set_bankptr(space->machine(), "bank3", ram_get_ptr(machine.device(RAM_TAG)) + 0x8000);
+		memory_set_bankptr(space->machine(), "bank3", machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
 	}
 	switch(data & 0xc0) {
 		case 0x00 : // Cart ROM selected
@@ -67,7 +67,7 @@ static void tvc_set_mem_page(running_machine &machine, UINT8 data)
 				break;
 		case 0x80 : // RAM selected
 				space->install_readwrite_bank(0xc000, 0xffff, "bank4");
-				memory_set_bankptr(space->machine(), "bank4", ram_get_ptr(machine.device(RAM_TAG))+0xc000);
+				memory_set_bankptr(space->machine(), "bank4", machine.device<ram_device>(RAM_TAG)->pointer()+0xc000);
 				break;
 		case 0xc0 : // External ROM selected
 				space->install_read_bank(0xc000, 0xffff, "bank4");
@@ -265,7 +265,7 @@ static MACHINE_START(tvc)
 static MACHINE_RESET(tvc)
 {
 	tvc_state *state = machine.driver_data<tvc_state>();
-	memset(ram_get_ptr(machine.device(RAM_TAG)),0,(64+14)*1024);
+	memset(machine.device<ram_device>(RAM_TAG)->pointer(),0,(64+14)*1024);
 	tvc_set_mem_page(machine, 0);
 	state->m_video_mode = 0;
 }

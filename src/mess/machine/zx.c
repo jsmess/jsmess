@@ -46,8 +46,8 @@ DRIVER_INIT( zx )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	space->install_read_bank(0x4000, 0x4000 + ram_get_size(machine.device(RAM_TAG)) - 1, "bank1");
-	space->install_legacy_write_handler(0x4000, 0x4000 + ram_get_size(machine.device(RAM_TAG)) - 1, FUNC(zx_ram_w));
+	space->install_read_bank(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 1, "bank1");
+	space->install_legacy_write_handler(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 1, FUNC(zx_ram_w));
 	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x4000);
 }
 

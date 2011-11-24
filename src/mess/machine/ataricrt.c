@@ -42,9 +42,9 @@ static void a800_setbank(running_machine &machine, int cart_mounted)
 	offs_t ram_top;
 
 	// take care of 0x0000-0x7fff: RAM or NOP
-	ram_top = MIN(ram_get_size(machine.device(RAM_TAG)), 0x8000) - 1;
+	ram_top = MIN(machine.device<ram_device>(RAM_TAG)->size(), 0x8000) - 1;
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, ram_top, "0000");
-	memory_set_bankptr(machine, "0000", ram_get_ptr(machine.device(RAM_TAG)));
+	memory_set_bankptr(machine, "0000", machine.device<ram_device>(RAM_TAG)->pointer());
 
 	// take care of 0x8000-0x9fff: A800 -> either right slot or RAM or NOP, others -> RAM or NOP
 	// is there anything in the right slot?
@@ -56,11 +56,11 @@ static void a800_setbank(running_machine &machine, int cart_mounted)
 	}
 	else if (a800_cart_type != BBSB)
 	{
-		ram_top = MIN(ram_get_size(machine.device(RAM_TAG)), 0xa000) - 1;
+		ram_top = MIN(machine.device<ram_device>(RAM_TAG)->size(), 0xa000) - 1;
 		if (ram_top > 0x8000)
 		{
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x8000, ram_top, "8000");
-			memory_set_bankptr(machine, "8000", ram_get_ptr(machine.device(RAM_TAG)) + 0x8000);
+			memory_set_bankptr(machine, "8000", machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
 		}
 	}
 

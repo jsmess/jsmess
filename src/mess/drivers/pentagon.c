@@ -50,7 +50,7 @@ static void pentagon_update_memory(running_machine &machine)
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	device_t *beta = machine.device(BETA_DISK_TAG);
-	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 	state->m_screen_location = messram + ((state->m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
 	memory_set_bankptr(machine, "bank4", messram + ((state->m_port_7ffd_data & 0x07) * 0x4000));
@@ -103,7 +103,7 @@ ADDRESS_MAP_END
 static MACHINE_RESET( pentagon )
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
-	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 	device_t *beta = machine.device(BETA_DISK_TAG);
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 

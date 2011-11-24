@@ -658,8 +658,8 @@ static void svi318_set_banks(running_machine &machine)
 {
 	svi318_state *state = machine.driver_data<svi318_state>();
 	const UINT8 v = state->m_svi.bank_switch;
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
-	UINT32 ram_size = ram_get_size(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
+	UINT32 ram_size = machine.device<ram_device>(RAM_TAG)->size();
 
 	state->m_svi.bankLow = ( v & 1 ) ? ( ( v & 2 ) ? ( ( v & 8 ) ? SVI_INTERNAL : SVI_EXPRAM3 ) : SVI_EXPRAM2 ) : SVI_CART;
 	state->m_svi.bankHigh1 = ( v & 4 ) ? ( ( v & 16 ) ? SVI_INTERNAL : SVI_EXPRAM3 ) : SVI_EXPRAM2;

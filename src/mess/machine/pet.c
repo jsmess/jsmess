@@ -656,16 +656,16 @@ static void pet_common_driver_init( running_machine &machine )
 	state->m_superpet = 0;
 	state->m_cbm8096 = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, ram_get_size(machine.device(RAM_TAG)) - 1, "bank10");
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, machine.device<ram_device>(RAM_TAG)->size() - 1, "bank10");
 	memory_set_bankptr(machine, "bank10", state->m_memory);
 
-	if (ram_get_size(machine.device(RAM_TAG)) < 0x8000)
+	if (machine.device<ram_device>(RAM_TAG)->size() < 0x8000)
 	{
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(ram_get_size(machine.device(RAM_TAG)), 0x7FFF);
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(machine.device<ram_device>(RAM_TAG)->size(), 0x7FFF);
 	}
 
 	/* 2114 poweron ? 64 x 0xff, 64x 0, and so on */
-	for (i = 0; i < ram_get_size(machine.device(RAM_TAG)); i += 0x40)
+	for (i = 0; i < machine.device<ram_device>(RAM_TAG)->size(); i += 0x40)
 	{
 		memset (state->m_memory + i, i & 0x40 ? 0 : 0xff, 0x40);
 	}
@@ -682,7 +682,7 @@ static void pet_common_driver_init( running_machine &machine )
 DRIVER_INIT( pet2001 )
 {
 	pet_state *state = machine.driver_data<pet_state>();
-	state->m_memory = ram_get_ptr(machine.device(RAM_TAG));
+	state->m_memory = machine.device<ram_device>(RAM_TAG)->pointer();
 	pet_common_driver_init(machine);
 	state->m_pet_basic1 = 1;
 	pet_vh_init(machine);
@@ -691,7 +691,7 @@ DRIVER_INIT( pet2001 )
 DRIVER_INIT( pet )
 {
 	pet_state *state = machine.driver_data<pet_state>();
-	state->m_memory = ram_get_ptr(machine.device(RAM_TAG));
+	state->m_memory = machine.device<ram_device>(RAM_TAG)->pointer();
 	pet_common_driver_init(machine);
 	pet_vh_init(machine);
 }
@@ -711,7 +711,7 @@ DRIVER_INIT( pet80 )
 DRIVER_INIT( superpet )
 {
 	pet_state *state = machine.driver_data<pet_state>();
-	state->m_memory = ram_get_ptr(machine.device(RAM_TAG));
+	state->m_memory = machine.device<ram_device>(RAM_TAG)->pointer();
 	pet_common_driver_init(machine);
 	state->m_superpet = 1;
 

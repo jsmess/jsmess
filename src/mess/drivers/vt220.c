@@ -34,7 +34,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( vt220 )
 {
-	memset(ram_get_ptr(machine.device(RAM_TAG)),0,16*1024);
+	memset(machine.device<ram_device>(RAM_TAG)->pointer(),0,16*1024);
 }
 
 static VIDEO_START( vt220 )

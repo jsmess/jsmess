@@ -515,7 +515,7 @@ ROM_END
 
 static DRIVER_INIT( rx78 )
 {
-	UINT32 ram_size = ram_get_size(machine.device(RAM_TAG));
+	UINT32 ram_size = machine.device<ram_device>(RAM_TAG)->size();
 	address_space *prg = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if(ram_size == 0x4000)

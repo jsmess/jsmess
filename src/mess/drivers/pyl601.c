@@ -343,7 +343,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(pyl601)
 {
 	pyl601_state *state = machine.driver_data<pyl601_state>();
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 	state->m_key_code = 0xff;
 	memory_set_bankptr(machine, "bank1", ram + 0x0000);
 	memory_set_bankptr(machine, "bank2", ram + 0xc000);
@@ -486,7 +486,7 @@ static const mc6845_interface pyl601a_crtc6845_interface =
 
 static DRIVER_INIT(pyl601)
 {
-	memset(ram_get_ptr(machine.device(RAM_TAG)), 0, 64 * 1024);
+	memset(machine.device<ram_device>(RAM_TAG)->pointer(), 0, 64 * 1024);
 }
 
 static INTERRUPT_GEN( pyl601_interrupt )

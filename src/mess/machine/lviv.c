@@ -27,7 +27,7 @@
 static void lviv_update_memory (running_machine &machine)
 {
 	lviv_state *state = machine.driver_data<lviv_state>();
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_ppi_port_outputs[0][2] & 0x02)
 	{
@@ -240,7 +240,7 @@ MACHINE_RESET( lviv )
 
 	space->set_direct_update_handler(direct_update_delegate(FUNC(lviv_directoverride), &machine));
 
-	state->m_video_ram = ram_get_ptr(machine.device(RAM_TAG)) + 0xc000;
+	state->m_video_ram = machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000;
 
 	state->m_startup_mem_map = 1;
 
@@ -257,7 +257,7 @@ MACHINE_RESET( lviv )
 
 	/*machine.scheduler().timer_pulse(TIME_IN_NSEC(200), FUNC(lviv_draw_pixel));*/
 
-	/*memset(ram_get_ptr(machine.device(RAM_TAG)), 0, sizeof(unsigned char)*0xffff);*/
+	/*memset(machine.device<ram_device>(RAM_TAG)->pointer(), 0, sizeof(unsigned char)*0xffff);*/
 }
 
 
@@ -302,8 +302,8 @@ static void lviv_setup_snapshot (running_machine &machine,UINT8 * data)
 	cpu_set_reg(machine.device("maincpu"), I8085_PC, (hi << 8) | lo);
 
 	/* Memory dump */
-	memcpy (ram_get_ptr(machine.device(RAM_TAG)), data+0x0011, 0xc000);
-	memcpy (ram_get_ptr(machine.device(RAM_TAG))+0xc000, data+0x10011, 0x4000);
+	memcpy (machine.device<ram_device>(RAM_TAG)->pointer(), data+0x0011, 0xc000);
+	memcpy (machine.device<ram_device>(RAM_TAG)->pointer()+0xc000, data+0x10011, 0x4000);
 
 	/* Ports */
 	state->m_ppi_port_outputs[0][0] = data[0x14011+0xc0];

@@ -155,7 +155,7 @@ MACHINE_START( dai )
 
 MACHINE_RESET( dai )
 {
-	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
+	memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
 }
 
 /***************************************************************************

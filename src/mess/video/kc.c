@@ -743,7 +743,7 @@ SCREEN_UPDATE( kc85_3 )
 
 #if 0
 	/* colour ram takes up 0x02800 bytes */
-	   unsigned char *pixel_ram = ram_get_ptr(machine.device(RAM_TAG))+0x08000;
+	   unsigned char *pixel_ram = machine.device<ram_device>(RAM_TAG)->pointer()+0x08000;
 	unsigned char *colour_ram = pixel_ram + 0x02800;
 
 	int x,y;

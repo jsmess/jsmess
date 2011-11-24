@@ -137,11 +137,12 @@ void mac_enable_sound(device_t *device, int on)
 void mac_set_sound_buffer(device_t *device, int buffer)
 {
 	mac_sound *token = get_token(device);
+	ram_device *ram = device->machine().device<ram_device>(RAM_TAG);
 
 	if (buffer)
-		token->mac_snd_buf_ptr = (UINT16 *) (ram_get_ptr(device->machine().device(RAM_TAG)) + ram_get_size(device->machine().device(RAM_TAG)) - MAC_MAIN_SND_BUF_OFFSET);
+		token->mac_snd_buf_ptr = (UINT16 *) (ram->pointer() + ram->size() - MAC_MAIN_SND_BUF_OFFSET);
 	else
-		token->mac_snd_buf_ptr = (UINT16 *) (ram_get_ptr(device->machine().device(RAM_TAG)) + ram_get_size(device->machine().device(RAM_TAG)) - MAC_ALT_SND_BUF_OFFSET);
+		token->mac_snd_buf_ptr = (UINT16 *) (ram->pointer() + ram->size() - MAC_ALT_SND_BUF_OFFSET);
 }
 
 

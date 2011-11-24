@@ -23,7 +23,7 @@ static void pp01_video_w(running_machine &machine,UINT8 block,UINT16 offset,UINT
 {
 	pp01_state *state = machine.driver_data<pp01_state>();
 	UINT16 addroffset = part ? 0x1000  : 0x0000;
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (BIT(state->m_video_write_mode,3)) {
 		// Copy mode
@@ -119,7 +119,7 @@ static void pp01_set_memory(running_machine &machine,UINT8 block, UINT8 data)
 					break;
 		}
 
-		memory_set_bankptr(machine, bank, ram_get_ptr(machine.device(RAM_TAG)) + (data & 0x0F)* 0x1000);
+		memory_set_bankptr(machine, bank, machine.device<ram_device>(RAM_TAG)->pointer() + (data & 0x0F)* 0x1000);
 	} else if (data>=0xF8) {
 		space->install_read_bank (startaddr, endaddr, bank);
 		space->unmap_write(startaddr, endaddr);

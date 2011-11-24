@@ -283,17 +283,17 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 		//
 		// Map block, $00-$BF are ram, $FC-$FF are Boot ROM
 		//
-		if ((MapPage*4) < ((ram_get_size(machine.device(RAM_TAG)) / 1024)-1))		// Block is ram
+		if ((MapPage*4) < ((machine.device<ram_device>(RAM_TAG)->size() / 1024)-1))		// Block is ram
 		{
 			if (!is_last_page(Page))
 			{
-				readbank = &ram_get_ptr(machine.device(RAM_TAG))[MapPage*RamPageSize];
+				readbank = &machine.device<ram_device>(RAM_TAG)->pointer()[MapPage*RamPageSize];
 				if(state->m_LogDatWrites)
 					debug_console_printf(machine, "Mapping page %X, pageno=%X, mess_ram)[%X]\n",Page,MapPage,(MapPage*RamPageSize));
 			}
 			else
 			{
-				readbank = &ram_get_ptr(machine.device(RAM_TAG))[(MapPage*RamPageSize)-256];
+				readbank = &machine.device<ram_device>(RAM_TAG)->pointer()[(MapPage*RamPageSize)-256];
 				logerror("Error RAM in Last page !\n");
 			}
 			space_0->install_legacy_write_handler(bank_start, bank_end,bank_info[Page].func,bank_info[Page].name);
@@ -361,7 +361,7 @@ static void SetDefaultTask(running_machine &machine)
 
 	/* Map video ram to base of area it can use, that way we can take the literal RA */
 	/* from the 6845 without having to mask it ! */
-//  videoram=&ram_get_ptr(machine.device(RAM_TAG))[TextVidBasePage*RamPageSize];
+//  videoram=&machine.device<ram_device>(RAM_TAG)->pointer()[TextVidBasePage*RamPageSize];
 }
 
 // Return the value of a page register
@@ -1099,7 +1099,7 @@ static void dgnbeta_reset(running_machine &machine)
 	wd17xx_dden_w(fdc, CLEAR_LINE);
 	wd17xx_set_drive(fdc, 0);
 
-	state->m_videoram = ram_get_ptr(machine.device(RAM_TAG));		/* Point video ram at the start of physical ram */
+	state->m_videoram = machine.device<ram_device>(RAM_TAG)->pointer();		/* Point video ram at the start of physical ram */
 
     wd17xx_reset(fdc);
     state->m_wd2797_written=0;

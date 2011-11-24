@@ -1029,7 +1029,7 @@ VIDEO_START( epnick )
 	ep_state *state = machine.driver_data<ep_state>();
 	state->nick = auto_alloc_clear(machine, NICK_STATE);
 
-	state->nick->videoram = ram_get_ptr(machine.device(RAM_TAG));
+	state->nick->videoram = machine.device<ram_device>(RAM_TAG)->pointer();
 	Nick_Init(state->nick);
 	VIDEO_START_CALL(generic_bitmapped);
 }

@@ -146,7 +146,7 @@ static void partner_bank_switch(running_machine &machine)
 	partner_state *state = machine.driver_data<partner_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine.region("maincpu")->base();
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	space->install_write_bank(0x0000, 0x07ff, "bank1");
 	space->install_write_bank(0x0800, 0x3fff, "bank2");

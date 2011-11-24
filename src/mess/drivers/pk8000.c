@@ -37,7 +37,7 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
 static void pk8000_set_bank(running_machine &machine,UINT8 data)
 {
 	UINT8 *rom = machine.region("maincpu")->base();
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 	UINT8 block1 = data & 3;
 	UINT8 block2 = (data >> 2) & 3;
 	UINT8 block3 = (data >> 4) & 3;

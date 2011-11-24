@@ -107,7 +107,7 @@ MACHINE_START(llc1)
 DRIVER_INIT(llc2)
 {
 	llc_state *state = machine.driver_data<llc_state>();
-	state->m_video_ram = ram_get_ptr(machine.device(RAM_TAG)) + 0xc000;
+	state->m_video_ram = machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000;
 }
 
 MACHINE_RESET( llc2 )
@@ -124,7 +124,7 @@ MACHINE_RESET( llc2 )
 	memory_set_bankptr(machine, "bank3", machine.region("maincpu")->base() + 0x6000);
 
 	space->install_write_bank(0xc000, 0xffff, "bank4");
-	memory_set_bankptr(machine, "bank4", ram_get_ptr(machine.device(RAM_TAG)) + 0xc000);
+	memory_set_bankptr(machine, "bank4", machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000);
 
 }
 

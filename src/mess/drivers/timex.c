@@ -227,7 +227,7 @@ static WRITE8_HANDLER(ts2068_port_ff_w)
 void ts2068_update_memory(running_machine &machine)
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
-	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	unsigned char *ChosenROM, *ExROM;
 	const timex_cart_t *timex_cart = timex_cart_data();
@@ -601,7 +601,7 @@ ADDRESS_MAP_END
 static MACHINE_RESET( tc2048 )
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
-	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	memory_set_bankptr(machine, "bank1", messram);
 	memory_set_bankptr(machine, "bank2", messram);

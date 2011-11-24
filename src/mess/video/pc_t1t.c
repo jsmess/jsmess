@@ -750,8 +750,8 @@ static void pc_pcjr_bank_w(running_machine &machine, int data)
 			dram = ((data & 0x07) << 14);
 			vram = ((data & 0x38) << (14-3));
 		}
-		memory_set_bankptr( machine, "bank14", ram_get_ptr(machine.device(RAM_TAG)) + vram );
-		pcjr.displayram = ram_get_ptr(machine.device(RAM_TAG)) + dram;
+		memory_set_bankptr( machine, "bank14", machine.device<ram_device>(RAM_TAG)->pointer() + vram );
+		pcjr.displayram = machine.device<ram_device>(RAM_TAG)->pointer() + dram;
 		pc_pcjr_mode_switch(machine);
 	}
 }

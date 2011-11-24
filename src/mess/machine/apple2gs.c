@@ -1219,7 +1219,7 @@ static WRITE8_HANDLER( apple2gs_main0400_w )
 {
 	apple2gs_state *state = space->machine().driver_data<apple2gs_state>();
 	offset += 0x000400;
-	ram_get_ptr(space->machine().device(RAM_TAG))[offset] = data;
+	space->machine().device<ram_device>(RAM_TAG)->pointer()[offset] = data;
 
 	if (!(state->m_shadow & 0x01))
 	{
@@ -1231,7 +1231,7 @@ static WRITE8_HANDLER( apple2gs_aux0400_w )
 {
 	apple2gs_state *state = space->machine().driver_data<apple2gs_state>();
 	offset += 0x010400;
-	ram_get_ptr(space->machine().device(RAM_TAG))[offset] = data;
+	space->machine().device<ram_device>(RAM_TAG)->pointer()[offset] = data;
 
 	if (!(state->m_shadow & 0x01))
 	{
@@ -1243,7 +1243,7 @@ static WRITE8_HANDLER( apple2gs_main2000_w )
 {
 	apple2gs_state *state = space->machine().driver_data<apple2gs_state>();
 	offset += 0x002000;
-	ram_get_ptr(space->machine().device(RAM_TAG))[offset] = data;
+	space->machine().device<ram_device>(RAM_TAG)->pointer()[offset] = data;
 
 	if (!(state->m_shadow & 0x02))
 	{
@@ -1255,7 +1255,7 @@ static WRITE8_HANDLER( apple2gs_aux2000_w )
 {
 	apple2gs_state *state = space->machine().driver_data<apple2gs_state>();
 	offset += 0x012000;
-	ram_get_ptr(space->machine().device(RAM_TAG))[offset] = data;
+	space->machine().device<ram_device>(RAM_TAG)->pointer()[offset] = data;
 
 	if (!(state->m_shadow & 0x12) || !(state->m_shadow & 0x08))
 	{
@@ -1267,7 +1267,7 @@ static WRITE8_HANDLER( apple2gs_main4000_w )
 {
 	apple2gs_state *state = space->machine().driver_data<apple2gs_state>();
 	offset += 0x004000;
-	ram_get_ptr(space->machine().device(RAM_TAG))[offset] = data;
+	space->machine().device<ram_device>(RAM_TAG)->pointer()[offset] = data;
 
 	if ((offset >= 0x004000) && (offset <= 0x005FFF))
 	{
@@ -1280,7 +1280,7 @@ static WRITE8_HANDLER( apple2gs_aux4000_w )
 {
 	apple2gs_state *state = space->machine().driver_data<apple2gs_state>();
 	offset += 0x014000;
-	ram_get_ptr(space->machine().device(RAM_TAG))[offset] = data;
+	space->machine().device<ram_device>(RAM_TAG)->pointer()[offset] = data;
 
 	if ((offset >= 0x014000) && (offset <= 0x015FFF))
 	{
@@ -1536,7 +1536,7 @@ static UINT8 apple2gs_xxCxxx_r(running_machine &machine, offs_t address)
 
 	if ((state->m_shadow & 0x40) && ((address & 0xF00000) == 0x000000))	// shadow all banks and C0xx?
 	{
-		result = ram_get_ptr(machine.device(RAM_TAG))[address];
+		result = machine.device<ram_device>(RAM_TAG)->pointer()[address];
 	}
 	else if ((address & 0x000F00) == 0x000000)	// accessing C0xx?
 	{
@@ -1620,7 +1620,7 @@ static void apple2gs_xxCxxx_w(running_machine &machine, offs_t address, UINT8 da
 
 	if ((state->m_shadow & 0x40) && ((address & 0xF00000) == 0x000000))
 	{
-		ram_get_ptr(machine.device(RAM_TAG))[address] = data;
+		machine.device<ram_device>(RAM_TAG)->pointer()[address] = data;
 	}
 	else if ((address & 0x000F00) == 0x000000)
 	{
@@ -1647,7 +1647,7 @@ DIRECT_UPDATE_HANDLER( apple2gs_opbase )
 	{
 		if ((state->m_shadow & 0x40) && ((address & 0xF00000) == 0x000000))
 		{
-			opptr = &ram_get_ptr(machine.device(RAM_TAG))[address];
+			opptr = &machine.device<ram_device>(RAM_TAG)->pointer()[address];
 		}
 		else if ((address & 0x000F00) == 0x000000)
 		{
@@ -1740,7 +1740,7 @@ static void apple2gs_setup_memory(running_machine &machine)
 
 		// ROM 03 hardware: the quoted "1 MB" for a base machine doesn't include banks e0/e1, so map accordingly
 		space->install_readwrite_bank(0x010000, ramsize - 1, "bank1");
-		memory_set_bankptr(machine,"bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x010000);
+		memory_set_bankptr(machine,"bank1", machine.device<ram_device>(RAM_TAG)->pointer() + 0x010000);
 
 		space->install_legacy_read_handler( ramsize, 0xdfffff, FUNC(apple2gs_bank_echo_r));
 		state->m_echo_bank = (ramsize >> 16);
@@ -1751,7 +1751,7 @@ static void apple2gs_setup_memory(running_machine &machine)
 
 		// ROM 00/01 hardware: the quoted "256K" for a base machine *does* include banks e0/e1.
 		space->install_readwrite_bank(0x010000, ramsize - 1 + 0x10000, "bank1");
-		memory_set_bankptr(machine,"bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x010000);
+		memory_set_bankptr(machine,"bank1", machine.device<ram_device>(RAM_TAG)->pointer() + 0x010000);
 
 		space->install_legacy_read_handler( ramsize + 0x10000, 0xdfffff, FUNC(apple2gs_bank_echo_r));
 		state->m_echo_bank = (ramsize+0x10000) >> 16;
@@ -1869,7 +1869,7 @@ MACHINE_START( apple2gscommon )
 	state->m_is_rom3 = true;
 
 	/* save state stuff.  note that the driver takes care of docram. */
-	UINT8* ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 	state_save_register_item_pointer(machine, "APPLE2GS_RAM", NULL, 0, ram, ram_get_size(machine.device(RAM_TAG)));
 
 	state_save_register_item(machine, "NEWVIDEO", NULL, 0, state->m_newvideo);

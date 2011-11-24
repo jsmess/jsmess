@@ -971,8 +971,8 @@ void mess_init_pc_common(running_machine &machine, UINT32 flags, void (*set_keyb
 		init_pc_common(machine, flags, set_keyb_int_func);
 
 	/* MESS managed RAM */
-	if ( ram_get_ptr(machine.device(RAM_TAG)) )
-		memory_set_bankptr( machine, "bank10", ram_get_ptr(machine.device(RAM_TAG)) );
+	if ( machine.device<ram_device>(RAM_TAG)->pointer() )
+		memory_set_bankptr( machine, "bank10", machine.device<ram_device>(RAM_TAG)->pointer() );
 
 	/* serial mouse */
 	//pc_mouse_initialise(machine);

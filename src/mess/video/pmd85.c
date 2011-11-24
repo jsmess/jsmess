@@ -42,7 +42,7 @@ static void pmd85_draw_scanline(running_machine &machine,bitmap_t *bitmap, int p
 	UINT16 *scanline = BITMAP_ADDR16(bitmap, pmd85_scanline, 0);
 
 	/* address of current line in PMD-85 video memory */
-	UINT8* pmd85_video_ram_line = ram_get_ptr(machine.device(RAM_TAG)) + 0xc000 + 0x40*pmd85_scanline;
+	UINT8* pmd85_video_ram_line = machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000 + 0x40*pmd85_scanline;
 
 	for (x=0; x<288; x+=6)
 	{

@@ -1265,7 +1265,7 @@ SCREEN_UPDATE( x68000 )
 //  popmessage("Graphic layer scroll - %i, %i - %i, %i - %i, %i - %i, %i",
 //      state->m_crtc.reg[12],state->m_crtc.reg[13],state->m_crtc.reg[14],state->m_crtc.reg[15],state->m_crtc.reg[16],state->m_crtc.reg[17],state->m_crtc.reg[18],state->m_crtc.reg[19]);
 //  popmessage("IOC IRQ status - %02x",state->m_ioc.irqstatus);
-//  popmessage("RAM: mouse data - %02x %02x %02x %02x",ram_get_ptr(machine.device(RAM_TAG))[0x931],ram_get_ptr(machine.device(RAM_TAG))[0x930],ram_get_ptr(machine.device(RAM_TAG))[0x933],ram_get_ptr(machine.device(RAM_TAG))[0x932]);
+//  popmessage("RAM: mouse data - %02x %02x %02x %02x",machine.device<ram_device>(RAM_TAG)->pointer()[0x931],machine.device<ram_device>(RAM_TAG)->pointer()[0x930],machine.device<ram_device>(RAM_TAG)->pointer()[0x933],machine.device<ram_device>(RAM_TAG)->pointer()[0x932]);
 #endif
 	return 0;
 }

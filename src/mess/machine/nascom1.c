@@ -271,7 +271,7 @@ MACHINE_RESET( nascom1 )
 
 DRIVER_INIT( nascom1 )
 {
-	switch (ram_get_size(machine.device(RAM_TAG)))
+	switch (machine.device<ram_device>(RAM_TAG)->size())
 	{
 	case 1 * 1024:
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
@@ -283,7 +283,7 @@ DRIVER_INIT( nascom1 )
 			0x1400, 0x4fff, "bank1");
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
 			0x5000, 0xafff);
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
+		memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
 		break;
 
 	case 32 * 1024:
@@ -291,13 +291,13 @@ DRIVER_INIT( nascom1 )
 			0x1400, 0x8fff, "bank1");
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
 			0x9000, 0xafff);
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
+		memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
 		break;
 
 	case 40 * 1024:
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(
 			0x1400, 0xafff, "bank1");
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
+		memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
 		break;
 	}
 }

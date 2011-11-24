@@ -103,7 +103,7 @@ static WRITE8_HANDLER(elwro800jr_fdc_control_w)
 static void elwro800jr_mmu_w(running_machine &machine, UINT8 data)
 {
 	UINT8 *prom = machine.region("proms")->base() + 0x200;
-	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 	UINT8 cs;
 	UINT8 ls175;
 	elwro800_state *state = machine.driver_data<elwro800_state>();
@@ -508,7 +508,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(elwro800)
 {
 	elwro800_state *state = machine.driver_data<elwro800_state>();
-	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	state->m_df_on_databus = 0xdf;
 	memset(messram, 0, 64*1024);
