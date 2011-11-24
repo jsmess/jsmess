@@ -643,7 +643,7 @@ void sb2m600_state::machine_start()
 	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(M6502_TAG)->base(), 0);
 	memory_set_bank(machine(), "bank1", 0);
 
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 	case 4*1024:
 		program->install_readwrite_bank(0x0000, 0x0fff, "bank1");
@@ -668,7 +668,7 @@ void c1p_state::machine_start()
 	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(M6502_TAG)->base(), 0);
 	memory_set_bank(machine(), "bank1", 0);
 
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 	case 8*1024:
 		program->install_readwrite_bank(0x0000, 0x1fff, "bank1");

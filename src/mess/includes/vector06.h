@@ -38,7 +38,7 @@ public:
 	required_device<device_t> m_fdc;
 	required_device<i8255_device> m_ppi;
 	required_device<i8255_device> m_ppi2;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	DECLARE_READ8_MEMBER(vector06_8255_portb_r);
 	DECLARE_READ8_MEMBER(vector06_8255_portc_r);
 	DECLARE_WRITE8_MEMBER(vector06_8255_porta_w);

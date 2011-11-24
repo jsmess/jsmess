@@ -128,7 +128,7 @@ void pc8201_state::bankswitch(UINT8 data)
 	switch (ram_bank)
 	{
 	case 0:
-		if (ram_get_size(m_ram) > 16 * 1024)
+		if (m_ram->size() > 16 * 1024)
 		{
 			program->install_readwrite_bank(0x8000, 0xffff, "bank2");
 		}
@@ -144,14 +144,14 @@ void pc8201_state::bankswitch(UINT8 data)
 		break;
 
 	case 2:
-		if (ram_get_size(m_ram) > 32 * 1024)
+		if (m_ram->size() > 32 * 1024)
 			program->install_readwrite_bank(0x8000, 0xffff, "bank2");
 		else
 			program->unmap_readwrite(0x8000, 0xffff);
 		break;
 
 	case 3:
-		if (ram_get_size(m_ram) > 64 * 1024)
+		if (m_ram->size() > 64 * 1024)
 			program->install_readwrite_bank(0x8000, 0xffff, "bank2");
 		else
 			program->unmap_readwrite(0x8000, 0xffff);
@@ -474,7 +474,7 @@ void tandy200_state::bankswitch(UINT8 data)
 		memory_set_bank(machine(), "bank1", rom_bank);
 	}
 
-	if (ram_get_size(m_ram) < ((ram_bank + 1) * 24 * 1024))
+	if (m_ram->size() < ((ram_bank + 1) * 24 * 1024))
 	{
 		/* invalid RAM bank */
 		program->unmap_readwrite(0xa000, 0xffff);
@@ -1126,7 +1126,7 @@ void kc85_state::machine_start()
 	memory_set_bank(machine(), "bank1", 0);
 
 	/* configure RAM banking */
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 	case 16 * 1024:
 		program->unmap_readwrite(0x8000, 0xbfff);
@@ -1138,7 +1138,7 @@ void kc85_state::machine_start()
 		break;
 	}
 
-	memory_configure_bank(machine(), "bank2", 0, 1, ram_get_ptr(m_ram), 0);
+	memory_configure_bank(machine(), "bank2", 0, 1, m_ram->pointer(), 0);
 	memory_set_bank(machine(), "bank2", 0);
 
 	/* register for state saving */
@@ -1150,7 +1150,7 @@ void kc85_state::machine_start()
 
 void pc8201_state::machine_start()
 {
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 
 	/* initialize RTC */
 	m_rtc->cs_w(1);
@@ -1193,7 +1193,7 @@ void trsm100_state::machine_start()
 	memory_set_bank(machine(), "bank1", 0);
 
 	/* configure RAM banking */
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 	case 8 * 1024:
 		program->unmap_readwrite(0x8000, 0xcfff);
@@ -1215,7 +1215,7 @@ void trsm100_state::machine_start()
 		break;
 	}
 
-	memory_configure_bank(machine(), "bank2", 0, 1, ram_get_ptr(m_ram), 0);
+	memory_configure_bank(machine(), "bank2", 0, 1, m_ram->pointer(), 0);
 	memory_set_bank(machine(), "bank2", 0);
 
 	/* register for state saving */
@@ -1234,7 +1234,7 @@ void tandy200_state::machine_start()
 	memory_set_bank(machine(), "bank1", 0);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine(), "bank2", 0, 3, ram_get_ptr(m_ram), 0x6000);
+	memory_configure_bank(machine(), "bank2", 0, 3, m_ram->pointer(), 0x6000);
 	memory_set_bank(machine(), "bank2", 0);
 
 	/* register for state saving */

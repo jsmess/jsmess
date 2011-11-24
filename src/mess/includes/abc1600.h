@@ -90,7 +90,7 @@ public:
 	required_device<e0516_device> m_rtc;
 	required_device<nmc9306_device> m_nvram;
 	required_device<mc6845_device> m_crtc;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy;
 	required_device<abc1600bus_slot_device> m_bus0i;
 	required_device<abc1600bus_slot_device> m_bus0x;

@@ -68,7 +68,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_z80pio;
 	required_device<z80ctc_device> m_z80ctc;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<device_t> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 

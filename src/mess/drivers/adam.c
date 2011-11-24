@@ -250,7 +250,7 @@ enum
 void adam_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 
 	switch (m_mioc & 0x03)
 	{
@@ -271,7 +271,7 @@ void adam_state::bankswitch()
 		break;
 
 	case LO_RAM_EXPANSION:
-		if (ram_get_size(m_ram) > 64 * 1024)
+		if (m_ram->size() > 64 * 1024)
 			program->install_ram(0x0000, 0x7fff, ram + 0x10000);
 		else
 			program->unmap_readwrite(0x0000, 0x7fff);
@@ -300,7 +300,7 @@ void adam_state::bankswitch()
 		}
 		else
 		{
-			if (ram_get_size(m_ram) > 64 * 1024)
+			if (m_ram->size() > 64 * 1024)
 				program->install_ram(0x8000, 0xffff, ram + 0x18000);
 			else
 				program->unmap_readwrite(0x8000, 0xffff);
@@ -1580,7 +1580,7 @@ WRITE_LINE_MEMBER( adam_state::os3_w )
 {
 	if (state && !m_dma)
 	{
-		UINT8 *ram = ram_get_ptr(m_ram);
+		UINT8 *ram = m_ram->pointer();
 
 		if (!m_bwr)
 		{

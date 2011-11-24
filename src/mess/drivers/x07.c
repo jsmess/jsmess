@@ -1071,7 +1071,7 @@ WRITE8_MEMBER( x07_state::x07_io_w )
 			beep_set_state(m_beep, 1);
 			beep_set_frequency(m_beep, 192000 / ((m_regs_w[2] | (m_regs_w[3] << 8)) & 0x0fff));
 
-			m_beep_stop->adjust(attotime::from_msec(ram_get_ptr(m_ram)[0x450] * 0x20));
+			m_beep_stop->adjust(attotime::from_msec(m_ram->pointer()[0x450] * 0x20));
 		}
 		else
 			beep_set_state(m_beep, 0);
@@ -1259,20 +1259,20 @@ static NVRAM_HANDLER( x07 )
 	if (read_or_write)
 	{
 		file->write(state->m_t6834_ram, sizeof(state->m_t6834_ram));
-		file->write(ram_get_ptr(state->m_ram), ram_get_size(state->m_ram));
+		file->write(state->m_ram->pointer(), state->m_ram->size());
 	}
 	else
 	{
 		if (file)
 		{
 			file->read(state->m_t6834_ram, sizeof(state->m_t6834_ram));
-			file->read(ram_get_ptr(state->m_ram), ram_get_size(state->m_ram));
+			file->read(state->m_ram->pointer(), state->m_ram->size());
 			state->m_warm_start = 1;
 		}
 		else
 		{
 			memset(state->m_t6834_ram, 0, sizeof(state->m_t6834_ram));
-			memset(ram_get_ptr(state->m_ram), 0, ram_get_size(state->m_ram));
+			memset(state->m_ram->pointer(), 0, state->m_ram->size());
 
 			for(int i = 0; i < 12; i++)
 				strcpy((char*)state->m_t6834_ram + udk_offset[i], udk_ini[i]);
@@ -1387,7 +1387,7 @@ void x07_state::machine_start()
 
 	/* install RAM */
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	program->install_ram(0x0000, ram_get_size(m_ram) - 1, ram_get_ptr(m_ram));
+	program->install_ram(0x0000, m_ram->size() - 1, m_ram->pointer());
 }
 
 void x07_state::machine_reset()

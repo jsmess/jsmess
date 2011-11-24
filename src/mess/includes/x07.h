@@ -159,7 +159,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<printer_image_device> m_printer;
 	required_device<device_t> m_beep;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 
 	void machine_start();
 	void machine_reset();

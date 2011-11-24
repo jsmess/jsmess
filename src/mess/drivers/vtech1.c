@@ -631,8 +631,8 @@ static DRIVER_INIT( vtech1 )
 	int id;
 
 	/* ram */
-	vtech1->m_ram = ram_get_ptr(machine.device(RAM_TAG));
-	vtech1->m_ram_size = ram_get_size(machine.device(RAM_TAG));
+	vtech1->m_ram = machine.device<ram_device>(RAM_TAG)->pointer();
+	vtech1->m_ram_size = machine.device<ram_device>(RAM_TAG)->size();
 
 	/* setup memory banking */
 	memory_set_bankptr(machine, "bank1", vtech1->m_ram);

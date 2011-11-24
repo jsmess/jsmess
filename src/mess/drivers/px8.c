@@ -76,7 +76,7 @@ enum
 void px8_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 	UINT8 *ipl_rom = machine().region(UPD70008_TAG)->base();
 
 	if (!m_bank0)

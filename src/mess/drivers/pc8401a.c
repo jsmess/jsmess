@@ -134,7 +134,7 @@ void pc8401a_state::bankswitch(UINT8 data)
 		break;
 
 	case 3: /* RAM cartridge */
-		if (ram_get_size(m_ram) > 64)
+		if (m_ram->size() > 64)
 		{
 			program->install_readwrite_bank(0x8000, 0xbfff, "bank3");
 			memory_set_bank(machine(), "bank3", 3); // TODO or 4
@@ -493,7 +493,7 @@ void pc8401a_state::machine_start()
 	/* allocate CRT video RAM */
 	m_crt_ram = auto_alloc_array(machine(), UINT8, PC8401A_CRT_VIDEORAM_SIZE);
 
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 
 	/* set up A0/A1 memory banking */
 	memory_configure_bank(machine(), "bank1", 0, 4, machine().region(Z80_TAG)->base(), 0x8000);

@@ -127,7 +127,7 @@ READ8_MEMBER( mm1_state::mmu_r )
 	{
 		if (mmu & MMU_RAMEN)
 		{
-			data = ram_get_ptr(m_ram)[offset];
+			data = m_ram->pointer()[offset];
 		}
 		else if (!(mmu & MMU_CE0))
 		{
@@ -196,7 +196,7 @@ WRITE8_MEMBER( mm1_state::mmu_w )
 	{
 		if (mmu & MMU_RAMEN)
 		{
-			ram_get_ptr(m_ram)[offset] = data;
+			m_ram->pointer()[offset] = data;
 		}
 	}
 }

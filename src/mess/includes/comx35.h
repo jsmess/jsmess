@@ -56,7 +56,7 @@ public:
 	required_device<cdp1869_device> m_vis;
 	required_device<cdp1871_device> m_kbe;
 	required_device<cassette_image_device> m_cassette;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<comx_expansion_slot_device> m_expansion;
 
 	virtual void machine_start();

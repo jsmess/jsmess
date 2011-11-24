@@ -414,8 +414,8 @@ void mac_state::v8_resize()
 	else
 	{
 		/* RAM */
-		memory_size = ram_get_size(m_ram);
-		memory_data = ram_get_ptr(m_ram);
+		memory_size = m_ram->size();
+		memory_data = m_ram->pointer();
 		is_rom = FALSE;
 	}
 
@@ -492,8 +492,8 @@ void mac_state::set_memory_overlay(int overlay)
 		else
 		{
 			/* RAM */
-			memory_size = ram_get_size(m_ram);
-			memory_data = ram_get_ptr(m_ram);
+			memory_size = m_ram->size();
+			memory_data = m_ram->pointer();
 			is_rom = FALSE;
 		}
 
@@ -3194,7 +3194,7 @@ void mac_state::machine_reset()
 		mac_set_sound_buffer(machine().device("custom"), 1);
 
 		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
-		memset(ram_get_ptr(m_ram), 0, ram_get_size(m_ram));
+		memset(m_ram->pointer(), 0, m_ram->size());
 	}
 
 	m_scsi_interrupt = 0;

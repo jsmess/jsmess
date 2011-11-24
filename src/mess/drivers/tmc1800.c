@@ -168,7 +168,7 @@ WRITE8_MEMBER( nano_state::keylatch_w )
 void tmc2000_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 	UINT8 *rom = machine().region(CDP1802_TAG)->base();
 
 	if (m_roc)
@@ -179,7 +179,7 @@ void tmc2000_state::bankswitch()
 	else
 	{
 		// RAM
-		switch (ram_get_size(m_ram))
+		switch (m_ram->size())
 		{
 		case 4 * 1024:
 			program->install_ram(0x0000, 0x0fff, 0, 0x7000, ram);
@@ -221,7 +221,7 @@ WRITE8_MEMBER( nano_state::bankswitch_w )
 {
 	/* enable RAM */
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 	program->install_ram(0x0000, 0x0fff, 0, 0x7000, ram);
 
 	/* write to CDP1864 tone latch */

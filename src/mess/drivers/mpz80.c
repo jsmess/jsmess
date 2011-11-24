@@ -180,7 +180,7 @@ READ8_MEMBER( mpz80_state::mmu_r )
 	{
 		if (offset < 0x400)
 		{
-			UINT8 *ram = ram_get_ptr(m_ram);
+			UINT8 *ram = m_ram->pointer();
 			data = ram[offset & 0x3ff];
 		}
 		else if (offset == 0x400)
@@ -234,7 +234,7 @@ WRITE8_MEMBER( mpz80_state::mmu_w )
 	{
 		if (offset < 0x400)
 		{
-			UINT8 *ram = ram_get_ptr(m_ram);
+			UINT8 *ram = m_ram->pointer();
 			ram[offset & 0x3ff] = data;
 		}
 		else if (offset == 0x400)

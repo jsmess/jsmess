@@ -492,7 +492,7 @@ READ8_MEMBER( bullet_state::dma_mreq_r )
 		offset |= 0x10000;
 	}
 
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 	UINT8 data = ram[offset];
 
 	if (BIT(m_exdma, 4))
@@ -510,7 +510,7 @@ WRITE8_MEMBER( bullet_state::dma_mreq_w )
 		offset |= 0x10000;
 	}
 
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 	ram[offset] = data;
 
 	if (BIT(m_exdma, 4))
@@ -657,7 +657,7 @@ static const z80_daisy_config daisy_chain[] =
 void bullet_state::machine_start()
 {
 	// setup memory banking
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 
 	memory_configure_bank(machine(), "bank1", 0, 2, ram, 0x10000);
 	memory_configure_bank(machine(), "bank1", 2, 1, machine().region(Z80_TAG)->base(), 0);

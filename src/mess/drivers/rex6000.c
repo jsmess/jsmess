@@ -66,7 +66,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<device_t> m_beep;
 	fujitsu_29dl16x_device *m_flash[4];
 
@@ -450,7 +450,7 @@ void rex6000_state::machine_start()
 	m_flash[2] = machine().device<fujitsu_29dl16x_device>("flash1a");
 	m_flash[3] = machine().device<fujitsu_29dl16x_device>("flash1b");
 
-	m_ram_base = ram_get_ptr(m_ram);
+	m_ram_base = m_ram->pointer();
 	memory_set_bankptr(machine(), "ram", m_ram_base + 0x4000);
 }
 void rex6000_state::machine_reset()
@@ -465,7 +465,7 @@ void rex6000_state::machine_reset()
 	m_banks[1].type = 0x00;
 	m_banks[1].type = 0;
 
-	memset(m_ram_base, 0, ram_get_size(m_ram));
+	memset(m_ram_base, 0, m_ram->size());
 	memset(m_bank, 0, sizeof(m_bank));
 	memset(m_beep_io, 0, sizeof(m_beep_io));
 	memset(m_lcd_base, 0, sizeof(m_lcd_base));

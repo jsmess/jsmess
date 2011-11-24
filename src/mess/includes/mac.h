@@ -215,7 +215,7 @@ public:
 	optional_device<asc_device> m_asc;
 	optional_device<awacs_device> m_awacs;
     optional_device<egret_device> m_egret;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
     optional_device<screen_device> m_screen;
     optional_device<ncr539x_device> m_539x_1;
     optional_device<ncr539x_device> m_539x_2;

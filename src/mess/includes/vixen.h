@@ -41,7 +41,7 @@ public:
 	required_device<i8251_device> m_usart;
 	required_device<device_t> m_discrete;
 	required_device<ieee488_device> m_ieee488;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
 

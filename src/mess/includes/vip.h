@@ -80,7 +80,7 @@ public:
 	required_device<vp595_device> m_vp595;
 	required_device<vp550_device> m_vp550;
 	required_device<vp550_device> m_vp551;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();

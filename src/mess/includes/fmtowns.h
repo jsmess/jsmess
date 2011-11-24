@@ -112,7 +112,7 @@ class towns_state : public driver_device
 	device_t* m_pic_master;
 	device_t* m_pic_slave;
 	device_t* m_pit;
-	device_t* m_messram;
+	ram_device* m_messram;
 	cdrom_image_device* m_cdrom;
 	device_t* m_cdda;
 	device_t* m_speaker;
@@ -122,7 +122,7 @@ class towns_state : public driver_device
 	device_t* m_hd2;
 	device_t* m_hd3;
 	device_t* m_hd4;
-	device_t* m_ram;
+	ram_device* m_ram;
 
 	UINT16 m_ftimer;
 	UINT16 m_freerun_timer;

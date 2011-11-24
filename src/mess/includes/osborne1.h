@@ -37,7 +37,7 @@ public:
 	required_device<pia6821_device> m_pia1;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_beep;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	DECLARE_WRITE8_MEMBER(osborne1_0000_w);
 	DECLARE_WRITE8_MEMBER(osborne1_1000_w);
 	DECLARE_READ8_MEMBER(osborne1_2000_r);

@@ -1181,7 +1181,7 @@ void pc1512_state::machine_start()
 	device_set_irq_callback(m_maincpu, pc1512_irq_callback);
 
 	// set RAM size
-	size_t ram_size = ram_get_size(m_ram);
+	size_t ram_size = m_ram->size();
 
 	if (ram_size < 640 * 1024)
 	{

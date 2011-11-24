@@ -59,7 +59,7 @@ enum
 void xor100_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	int banks = ram_get_size(m_ram) / 0x10000;
+	int banks = m_ram->size() / 0x10000;
 
 	switch (m_mode)
 	{
@@ -535,8 +535,8 @@ static GENERIC_TERMINAL_INTERFACE( xor100_terminal_intf )
 
 void xor100_state::machine_start()
 {
-	int banks = ram_get_size(m_ram) / 0x10000;
-	UINT8 *ram = ram_get_ptr(m_ram);
+	int banks = m_ram->size() / 0x10000;
+	UINT8 *ram = m_ram->pointer();
 	UINT8 *rom = machine().region(Z80_TAG)->base();
 
 	/* setup memory banking */

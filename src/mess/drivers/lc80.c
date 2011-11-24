@@ -319,7 +319,7 @@ void lc80_state::machine_start()
 	program->install_readwrite_bank(0x0800, 0x0fff, "bank2");
 	program->install_readwrite_bank(0x1000, 0x17ff, "bank3");
 
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 	case 1*1024:
 		program->install_readwrite_bank(0x2000, 0x23ff, "bank4");

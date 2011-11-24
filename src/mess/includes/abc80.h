@@ -77,7 +77,7 @@ public:
 	required_device<device_t> m_pio;
 	required_device<cassette_image_device> m_cassette;
 	required_device<abcbus_slot_device> m_bus;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 
 	virtual void machine_start();
 

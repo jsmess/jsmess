@@ -158,7 +158,7 @@ UINT8 abc1600_state::read_ram(offs_t offset)
 	if (offset < 0x100000)
 	{
 		// main RAM
-		UINT8 *ram = ram_get_ptr(m_ram);
+		UINT8 *ram = m_ram->pointer();
 		data = ram[offset];
 	}
 	else if (offset < 0x180000)
@@ -185,7 +185,7 @@ void abc1600_state::write_ram(offs_t offset, UINT8 data)
 	if (offset < 0x100000)
 	{
 		// main RAM
-		UINT8 *ram = ram_get_ptr(m_ram);
+		UINT8 *ram = m_ram->pointer();
 		ram[offset] = data;
 	}
 	else if (offset < 0x180000)

@@ -736,8 +736,8 @@ READ32_MEMBER(towns_state::towns_sys5e8_r)
 		case 0x00:
 			if(ACCESSING_BITS_0_7)
 			{
-				logerror("SYS: read RAM size port (%i)\n",ram_get_size(m_ram));
-				return ram_get_size(m_ram)/1048576;
+				logerror("SYS: read RAM size port (%i)\n",m_ram->size());
+				return m_ram->size()/1048576;
 			}
 			break;
 		case 0x01:
@@ -1099,7 +1099,7 @@ WRITE8_MEMBER( towns_state::towns_cmos8_w )
 READ8_MEMBER( towns_state::towns_cmos_low_r )
 {
 	if(m_towns_mainmem_enable != 0)
-		return ram_get_ptr(m_messram)[offset + 0xd8000];
+		return m_messram->pointer()[offset + 0xd8000];
 
 	return m_nvram[offset];
 }
@@ -1107,7 +1107,7 @@ READ8_MEMBER( towns_state::towns_cmos_low_r )
 WRITE8_MEMBER( towns_state::towns_cmos_low_w )
 {
 	if(m_towns_mainmem_enable != 0)
-		ram_get_ptr(m_messram)[offset+0xd8000] = data;
+		m_messram->pointer()[offset+0xd8000] = data;
 	else
 		m_nvram[offset] = data;
 }
@@ -1130,19 +1130,19 @@ void towns_state::towns_update_video_banks(address_space& space)
 	{
 		ROM = space.machine().region("user")->base();
 
-//      memory_set_bankptr(space.machine(),1,ram_get_ptr(m_messram)+0xc0000);
-//      memory_set_bankptr(space.machine(),2,ram_get_ptr(m_messram)+0xc8000);
-//      memory_set_bankptr(space.machine(),3,ram_get_ptr(m_messram)+0xc9000);
-//      memory_set_bankptr(space.machine(),4,ram_get_ptr(m_messram)+0xca000);
-//      memory_set_bankptr(space.machine(),5,ram_get_ptr(m_messram)+0xca000);
-//      memory_set_bankptr(space.machine(),10,ram_get_ptr(m_messram)+0xca800);
-		memory_set_bankptr(space.machine(),"bank6",ram_get_ptr(m_messram)+0xcb000);
-		memory_set_bankptr(space.machine(),"bank7",ram_get_ptr(m_messram)+0xcb000);
+//      memory_set_bankptr(space.machine(),1,m_messram->pointer()+0xc0000);
+//      memory_set_bankptr(space.machine(),2,m_messram->pointer()+0xc8000);
+//      memory_set_bankptr(space.machine(),3,m_messram->pointer()+0xc9000);
+//      memory_set_bankptr(space.machine(),4,m_messram->pointer()+0xca000);
+//      memory_set_bankptr(space.machine(),5,m_messram->pointer()+0xca000);
+//      memory_set_bankptr(space.machine(),10,m_messram->pointer()+0xca800);
+		memory_set_bankptr(space.machine(),"bank6",m_messram->pointer()+0xcb000);
+		memory_set_bankptr(space.machine(),"bank7",m_messram->pointer()+0xcb000);
 		if(m_towns_system_port & 0x02)
-			memory_set_bankptr(space.machine(),"bank11",ram_get_ptr(m_messram)+0xf8000);
+			memory_set_bankptr(space.machine(),"bank11",m_messram->pointer()+0xf8000);
 		else
 			memory_set_bankptr(space.machine(),"bank11",ROM+0x238000);
-		memory_set_bankptr(space.machine(),"bank12",ram_get_ptr(m_messram)+0xf8000);
+		memory_set_bankptr(space.machine(),"bank12",m_messram->pointer()+0xf8000);
 		return;
 	}
 	else  // enable I/O ports and VRAM
@@ -1161,13 +1161,13 @@ void towns_state::towns_update_video_banks(address_space& space)
 		if(m_towns_ankcg_enable != 0)
 			memory_set_bankptr(space.machine(),"bank6",ROM+0x180000+0x3d800);  // ANK CG 8x16
 		else
-			memory_set_bankptr(space.machine(),"bank6",ram_get_ptr(m_messram)+0xcb000);
-		memory_set_bankptr(space.machine(),"bank7",ram_get_ptr(m_messram)+0xcb000);
+			memory_set_bankptr(space.machine(),"bank6",m_messram->pointer()+0xcb000);
+		memory_set_bankptr(space.machine(),"bank7",m_messram->pointer()+0xcb000);
 		if(m_towns_system_port & 0x02)
-			memory_set_bankptr(space.machine(),"bank11",ram_get_ptr(m_messram)+0xf8000);
+			memory_set_bankptr(space.machine(),"bank11",m_messram->pointer()+0xf8000);
 		else
 			memory_set_bankptr(space.machine(),"bank11",ROM+0x238000);
-		memory_set_bankptr(space.machine(),"bank12",ram_get_ptr(m_messram)+0xf8000);
+		memory_set_bankptr(space.machine(),"bank12",m_messram->pointer()+0xf8000);
 		return;
 	}
 }
@@ -2460,7 +2460,7 @@ void towns_state::machine_reset()
 	m_pic_master = machine().device("pic8259_master");
 	m_pic_slave = machine().device("pic8259_slave");
 	m_pit = machine().device("pit");
-	m_messram = machine().device(RAM_TAG);
+	m_messram = machine().device<ram_device>(RAM_TAG);
 	m_cdrom = machine().device<cdrom_image_device>("cdrom");
 	m_cdda = machine().device("cdda");
 	m_speaker = machine().device(SPEAKER_TAG);
@@ -2470,7 +2470,7 @@ void towns_state::machine_reset()
 	m_hd2 = machine().device("harddisk2");
 	m_hd3 = machine().device("harddisk3");
 	m_hd4 = machine().device("harddisk4");
-	m_ram = machine().device(RAM_TAG);
+	m_ram = machine().device<ram_device>(RAM_TAG);
 	m_ftimer = 0x00;
 	m_nmi_mask = 0x00;
 	m_compat_mode = 0x00;

@@ -47,7 +47,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<device_t> m_beep;
 	required_device<pce220_serial_device> m_serial;
 
@@ -796,7 +796,7 @@ INPUT_PORTS_END
 void pce220_state::machine_start()
 {
 	UINT8 *rom = machine().region("user1")->base();
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 
 	memory_configure_bank(machine(), "bank1", 0, 2, ram + 0x0000, 0x8000);
 	memory_configure_bank(machine(), "bank2", 0, 2, ram + 0x4000, 0x8000);
@@ -809,7 +809,7 @@ void pce220_state::machine_start()
 void pcg850v_state::machine_start()
 {
 	UINT8 *rom = machine().region("user1")->base();
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 
 	memory_configure_bank(machine(), "bank1", 0, 2, ram + 0x0000, 0x8000);
 	memory_configure_bank(machine(), "bank2", 0, 2, ram + 0x4000, 0x8000);
@@ -865,8 +865,8 @@ static TIMER_DEVICE_CALLBACK(pce220_timer_callback)
 static NVRAM_HANDLER(pce220)
 {
 	pce220_state *state = machine.driver_data<pce220_state>();
-	UINT8 *ram_base = (UINT8*)ram_get_ptr(state->m_ram);
-	UINT32 ram_size = ram_get_size(state->m_ram);
+	UINT8 *ram_base = (UINT8*)state->m_ram->pointer();
+	UINT32 ram_size = state->m_ram->size();
 
 	if (read_or_write)
 	{

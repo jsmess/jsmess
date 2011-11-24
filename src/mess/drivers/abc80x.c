@@ -296,7 +296,7 @@ void abc802_state::bankswitch()
 	else
 	{
 		// low RAM selected
-		program->install_ram(0x0000, 0x7fff, ram_get_ptr(m_ram));
+		program->install_ram(0x0000, 0x7fff, m_ram->pointer());
 	}
 }
 
@@ -308,7 +308,7 @@ void abc802_state::bankswitch()
 void abc806_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	UINT32 videoram_mask = ram_get_size(m_ram) - (32 * 1024) - 1;
+	UINT32 videoram_mask = m_ram->size() - (32 * 1024) - 1;
 	int bank;
 	char bank_name[10];
 
@@ -1318,7 +1318,7 @@ void abc802_state::machine_reset()
 void abc806_state::machine_start()
 {
 	UINT8 *mem = machine().region(Z80_TAG)->base();
-	UINT32 videoram_size = ram_get_size(m_ram) - (32 * 1024);
+	UINT32 videoram_size = m_ram->size() - (32 * 1024);
 	int bank;
 	char bank_name[10];
 

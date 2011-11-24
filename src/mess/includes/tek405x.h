@@ -38,7 +38,7 @@ public:
 	required_device<acia6850_device> m_acia;
 	required_device<ieee488_device> m_gpib;
 	required_device<device_t> m_speaker;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 
 	virtual void machine_start();
 
@@ -136,7 +136,7 @@ public:
 	 { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 
 	virtual void machine_start();
 

@@ -32,7 +32,7 @@ void mc1000_state::bankswitch()
 	memory_set_bank(machine(), "bank2", m_mc6845_bank);
 
 	/* extended RAM */
-	if (ram_get_size(m_ram) > 16*1024)
+	if (m_ram->size() > 16*1024)
 	{
 		program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
 	}
@@ -44,7 +44,7 @@ void mc1000_state::bankswitch()
 	/* MC6847 video RAM */
 	if (m_mc6847_bank)
 	{
-		if (ram_get_size(m_ram) > 16*1024)
+		if (m_ram->size() > 16*1024)
 		{
 			program->install_readwrite_bank(0x8000, 0x97ff, "bank4");
 		}
@@ -61,7 +61,7 @@ void mc1000_state::bankswitch()
 	memory_set_bank(machine(), "bank4", m_mc6847_bank);
 
 	/* extended RAM */
-	if (ram_get_size(m_ram) > 16*1024)
+	if (m_ram->size() > 16*1024)
 	{
 		program->install_readwrite_bank(0x9800, 0xbfff, "bank5");
 	}

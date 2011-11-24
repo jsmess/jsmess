@@ -413,7 +413,7 @@ READ8_MEMBER( abc80_state::mmu_r )
 	}
 	else if (!(mmu & MMU_RAM))
 	{
-		data = ram_get_ptr(m_ram)[offset & 0x3fff];
+		data = m_ram->pointer()[offset & 0x3fff];
 	}
 	
 	return data;
@@ -438,7 +438,7 @@ WRITE8_MEMBER( abc80_state::mmu_w )
 	}
 	else if (!(mmu & MMU_RAM))
 	{
-		ram_get_ptr(m_ram)[offset & 0x3fff] = data;
+		m_ram->pointer()[offset & 0x3fff] = data;
 	}
 }
 

@@ -25,7 +25,7 @@
 READ8_MEMBER( comx35_state::mem_r )
 {
 	UINT8 *rom = machine().region(CDP1802_TAG)->base();
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 	int extrom = 1;
 
 	UINT8 data = m_expansion->mrd_r(offset, &extrom);
@@ -53,7 +53,7 @@ READ8_MEMBER( comx35_state::mem_r )
 
 WRITE8_MEMBER( comx35_state::mem_w )
 {
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 
 	m_expansion->mwr_w(offset, data);
 
@@ -463,7 +463,7 @@ void comx35_state::machine_start()
 	m_reset_timer = machine().scheduler().timer_alloc(FUNC(reset_tick));
 
 	// clear the RAM since DOS card will go crazy if RAM is not all zeroes
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 	memset(ram, 0, 0x8000);
 
 	// register for state saving

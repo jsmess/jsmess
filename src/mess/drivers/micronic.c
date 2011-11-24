@@ -298,14 +298,14 @@ static NVRAM_HANDLER( micronic )
 	if (read_or_write)
 	{
 		file->write(state->m_ram_base, 0x8000);
-		file->write(ram_get_ptr(state->m_ram), ram_get_size(state->m_ram));
+		file->write(state->m_ram->pointer(), state->m_ram->size());
 	}
 	else
 	{
 		if (file)
 		{
 			file->read(state->m_ram_base, 0x8000);
-			file->read(ram_get_ptr(state->m_ram), ram_get_size(state->m_ram));
+			file->read(state->m_ram->pointer(), state->m_ram->size());
 			state->m_status_flag = 0x01;
 		}
 		else
@@ -340,8 +340,8 @@ void micronic_state::machine_start()
 	memory_configure_bank(machine(), "bank1", 0x00, 0x02, machine().region(Z80_TAG)->base(), 0x10000);
 
 	/* RAM banks */
-	m_banks_num = (ram_get_size(m_ram)>>15) + 1;
-	memory_configure_bank(machine(), "bank1", 0x02, m_banks_num - 1, ram_get_ptr(m_ram), 0x8000);
+	m_banks_num = (m_ram->size()>>15) + 1;
+	memory_configure_bank(machine(), "bank1", 0x02, m_banks_num - 1, m_ram->pointer(), 0x8000);
 
 	/* register for state saving */
 //  state_save_register_global(machine(), state->);

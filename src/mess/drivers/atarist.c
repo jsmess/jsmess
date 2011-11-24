@@ -2169,7 +2169,7 @@ void st_state::configure_memory()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 	case 256 * 1024:
 		program->unmap_readwrite(0x040000, 0x3fffff);
@@ -2319,7 +2319,7 @@ void stbook_state::machine_start()
 	/* configure RAM banking */
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 	case 1024 * 1024:
 		program->unmap_readwrite(0x100000, 0x3fffff);

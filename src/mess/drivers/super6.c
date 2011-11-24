@@ -31,7 +31,7 @@
 void super6_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 	UINT8 *rom = machine().region(Z80_TAG)->base();
 
 	// power on jump

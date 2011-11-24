@@ -96,7 +96,7 @@ public:
 	required_device<mc68901_device> m_mfp;
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_rs232;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 
 	void machine_start();
 
