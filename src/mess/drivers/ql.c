@@ -304,7 +304,7 @@ READ8_MEMBER( ql_state::trump_card_rom_r )
 {
 	// If we have more than 640K them map extra ram into top 256K
 	// else just map to unmap.
-	if (ram_get_size(m_ram)>(640*1024))
+	if (m_ram->size()>(640*1024))
 		space.install_ram(0x0c0000, 0x0fffff, NULL);
 	else
 		space.unmap_readwrite(0x0c0000, 0x0fffff);
@@ -948,7 +948,7 @@ void ql_state::machine_reset()
 
 	logerror("Configuring RAM\n");
 	// configure RAM
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 		case 128*1024:
 			program->unmap_readwrite(0x040000, 0x0fffff);

@@ -240,7 +240,7 @@ void tmc600_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* configure RAM */
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 	case 8*1024:
 		program->unmap_readwrite(0x8000, 0xbfff);

@@ -358,7 +358,7 @@ static const wd17xx_interface fdc_intf =
 
 void e01_state::machine_start()
 {
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 	UINT8 *rom = machine().region(R65C102_TAG)->base();
 
 	/* setup memory banking */

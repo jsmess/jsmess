@@ -36,7 +36,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_fdc;
 	required_device<mc146818_device> m_rtc;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();

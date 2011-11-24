@@ -258,7 +258,7 @@ void avigo_state::machine_reset()
 
 void avigo_state::machine_start()
 {
-	m_ram_base = (UINT8*)ram_get_ptr(m_ram);
+	m_ram_base = (UINT8*)m_ram->pointer();
 
 	// bank3 always first ram bank
 	memory_set_bankptr(machine(), "bank3", m_ram_base);
@@ -791,7 +791,7 @@ static TIMER_DEVICE_CALLBACK( avigo_1hz_timer )
 static NVRAM_HANDLER(avigo)
 {
 	avigo_state *state = machine.driver_data<avigo_state>();
-	UINT32 ram_size = ram_get_size(state->m_ram);
+	UINT32 ram_size = state->m_ram->size();
 
 	if (read_or_write)
 	{

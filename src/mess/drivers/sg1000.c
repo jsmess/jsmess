@@ -1010,8 +1010,8 @@ void sf7000_state::machine_start()
 {
 	/* configure memory banking */
 	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base(), 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, ram_get_ptr(m_ram), 0);
-	memory_configure_bank(machine(), "bank2", 0, 1, ram_get_ptr(m_ram), 0);
+	memory_configure_bank(machine(), "bank1", 1, 1, m_ram->pointer(), 0);
+	memory_configure_bank(machine(), "bank2", 0, 1, m_ram->pointer(), 0);
 
 	/* register for state saving */
 	state_save_register_global(machine(), m_keylatch);

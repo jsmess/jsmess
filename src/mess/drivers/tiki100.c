@@ -551,7 +551,7 @@ void tiki100_state::machine_start()
 	m_video_ram = auto_alloc_array(machine(), UINT8, TIKI100_VIDEORAM_SIZE);
 
 	/* setup memory banking */
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 
 	memory_configure_bank(machine(), "bank1", BANK_ROM, 1, machine().region(Z80_TAG)->base(), 0);
 	memory_configure_bank(machine(), "bank1", BANK_RAM, 1, ram, 0);

@@ -55,12 +55,12 @@ WRITE8_MEMBER( elf2_state::memory_w )
 		if (MEMORY_PROTECT)
 		{
 			/* latch data from memory */
-			data = ram_get_ptr(m_ram)[offset];
+			data = m_ram->pointer()[offset];
 		}
 		else
 		{
 			/* write latched data to memory */
-			ram_get_ptr(m_ram)[offset] = data;
+			m_ram->pointer()[offset] = data;
 		}
 
 		/* write data to 7 segment displays */
@@ -254,7 +254,7 @@ void elf2_state::machine_start()
 	/* setup memory banking */
 	program->install_read_bank(0x0000, 0x00ff, "bank1");
 	program->install_write_handler(0x0000, 0x00ff, write8_delegate(FUNC(elf2_state::memory_w), this));
-	memory_configure_bank(machine(), "bank1", 0, 1, ram_get_ptr(m_ram), 0);
+	memory_configure_bank(machine(), "bank1", 0, 1, m_ram->pointer(), 0);
 	memory_set_bank(machine(), "bank1", 0);
 
 	/* register for state saving */
@@ -292,12 +292,12 @@ static QUICKLOAD_LOAD( elf )
 
 	int size = image.length();
 
-	if (size > ram_get_size(state->m_ram))
+	if (size > state->m_ram->size())
 	{
 		return IMAGE_INIT_FAIL;
 	}
 
-	image.fread(ram_get_ptr(state->m_ram), size);
+	image.fread(state->m_ram->pointer(), size);
 
 	return IMAGE_INIT_PASS;
 }

@@ -145,8 +145,8 @@ void trs80m2_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine().region(Z80_TAG)->base();
-	UINT8 *ram = ram_get_ptr(m_ram);
-	int last_page = (ram_get_size(m_ram) / 0x8000) - 1;
+	UINT8 *ram = m_ram->pointer();
+	int last_page = (m_ram->size() / 0x8000) - 1;
 
 	if (m_boot_rom)
 	{

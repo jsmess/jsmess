@@ -39,7 +39,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_netcpu;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_ddp0;
 	required_device<cassette_image_device> m_ddp1;
 	required_device<device_t> m_floppy0;

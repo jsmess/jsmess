@@ -258,7 +258,7 @@ static INPUT_CHANGED( clear_data )
 void cosmicos_state::set_ram_mode()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 
 	if (m_ram_disable)
 	{
@@ -508,7 +508,7 @@ void cosmicos_state::machine_start()
 	m_led->rbi_w(1);
 
 	/* setup memory banking */
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 	case 256:
 		program->unmap_readwrite(0x0000, 0xbfff);

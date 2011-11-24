@@ -108,7 +108,7 @@ public:
 	required_device<device_t> m_pic;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_speaker;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	//DECLARE_READ8_MEMBER(pic8259_r);
 	//DECLARE_WRITE8_MEMBER(pic8259_w);
 	//DECLARE_READ8_MEMBER(mbc55x_disk_r);

@@ -782,7 +782,7 @@ void vixen_state::machine_start()
 	device_set_irq_callback(m_maincpu, vixen_int_ack);
 
 	// configure memory banking
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 
 	memory_configure_bank(machine(), "bank1", 0, 1, ram, 0);
 	memory_configure_bank(machine(), "bank1", 1, 1, machine().region(Z8400A_TAG)->base(), 0);

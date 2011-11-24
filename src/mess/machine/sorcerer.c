@@ -414,7 +414,7 @@ MACHINE_START( sorcerer )
 
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	/* configure RAM */
-	switch (ram_get_size(state->m_ram))
+	switch (state->m_ram->size())
 	{
 	case 8*1024:
 		space->unmap_readwrite(0x2000, endmem);
@@ -442,7 +442,7 @@ MACHINE_START( sorcererd )
 
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	/* configure RAM */
-	switch (ram_get_size(state->m_ram))
+	switch (state->m_ram->size())
 	{
 	case 8*1024:
 		space->unmap_readwrite(0x2000, endmem);

@@ -35,7 +35,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<device_t> m_wd2797;
 	required_device<device_t> m_floppy;
 
@@ -63,7 +63,7 @@ public:
 WRITE16_MEMBER( unixpc_state::romlmap_w )
 {
 	if (BIT(data, 15))
-		space.install_ram(0x000000, 0x3fffff, ram_get_ptr(m_ram));
+		space.install_ram(0x000000, 0x3fffff, m_ram->pointer());
 	else
 		space.install_rom(0x000000, 0x3fffff, space.machine().region("bootrom")->base());
 }

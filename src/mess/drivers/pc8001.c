@@ -468,13 +468,13 @@ void pc8001_state::machine_start()
 	i8257_ready_w(m_dma, 1);
 
 	/* setup memory banking */
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 
 	memory_configure_bank(machine(), "bank1", 1, 1, machine().region("n80")->base(), 0);
 	program->install_read_bank(0x0000, 0x5fff, "bank1");
 	program->unmap_write(0x0000, 0x5fff);
 
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 	case 16*1024:
 		memory_configure_bank(machine(), "bank3", 0, 1, ram, 0);

@@ -348,11 +348,11 @@ static void set_ram_size(running_machine &machine)
 {
 	mbc55x_state	*state		= machine.driver_data<mbc55x_state>();
 	address_space	*space		= machine.device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
-	int 			ramsize 	= ram_get_size(state->m_ram);
+	int 			ramsize 	= state->m_ram->size();
 	int 			nobanks		= ramsize / RAM_BANK_SIZE;
 	char			bank[10];
 	int 			bankno;
-	UINT8			*ram		= &ram_get_ptr(state->m_ram)[0];
+	UINT8			*ram		= &state->m_ram->pointer()[0];
 	UINT8			*map_base;
 	int				bank_base;
 

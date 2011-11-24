@@ -42,7 +42,7 @@ public:
 	required_device<dm9368_device> m_led_l;
 	required_device<dm9368_device> m_led_h;
 	required_device<cassette_image_device> m_cassette;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 
 	virtual void machine_start();
 

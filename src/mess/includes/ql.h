@@ -87,7 +87,7 @@ public:
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_mdv1;
 	required_device<device_t> m_mdv2;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<device_t> m_fdc;
 	required_device<printer_image_device> m_printer;
 

@@ -247,9 +247,9 @@ WRITE8_MEMBER( vip_state::bankswitch_w )
 {
 	/* enable RAM */
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 	case 1 * 1024:
 		program->install_ram(0x0000, 0x03ff, 0, 0x7c00, ram);
@@ -578,10 +578,10 @@ static COSMAC_INTERFACE( cosmac_intf )
 
 void vip_state::machine_start()
 {
-	UINT8 *ram = ram_get_ptr(m_ram);
+	UINT8 *ram = m_ram->pointer();
 
 	/* randomize RAM contents */
-	for (UINT16 addr = 0; addr < ram_get_size(m_ram); addr++)
+	for (UINT16 addr = 0; addr < m_ram->size(); addr++)
 	{
 		ram[addr] = machine().rand() & 0xff;
 	}

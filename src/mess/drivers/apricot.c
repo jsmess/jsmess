@@ -43,7 +43,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<device_t> m_sn;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8255_device> m_ppi;
@@ -196,7 +196,7 @@ static SCREEN_UPDATE( apricot )
 static MC6845_UPDATE_ROW( apricot_update_row )
 {
 	apricot_state *state = device->machine().driver_data<apricot_state>();
-	UINT8 *ram = ram_get_ptr(state->m_ram);
+	UINT8 *ram = state->m_ram->pointer();
 	int i, x;
 
 	if (state->m_video_mode)
@@ -257,8 +257,8 @@ static DRIVER_INIT( apricot )
 	apricot_state *state = machine.driver_data<apricot_state>();
 	address_space *prg = state->m_maincpu->memory().space(AS_PROGRAM);
 
-	UINT8 *ram = ram_get_ptr(state->m_ram);
-	UINT32 ram_size = ram_get_size(state->m_ram);
+	UINT8 *ram = state->m_ram->pointer();
+	UINT32 ram_size = state->m_ram->size();
 
 	prg->unmap_readwrite(0x40000, 0xeffff);
 	prg->install_ram(0x00000, ram_size - 1, ram);

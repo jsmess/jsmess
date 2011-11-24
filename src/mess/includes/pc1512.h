@@ -89,7 +89,7 @@ public:
 	required_device<device_t> m_centronics;
 	required_device<device_t> m_speaker;
 	required_device<pc1512_keyboard_device> m_kb;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	optional_device<device_t> m_floppy1;
 

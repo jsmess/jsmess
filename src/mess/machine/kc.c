@@ -535,7 +535,7 @@ void kc85_4_state::update_0x08000()
 
 		/* ram8 block chosen */
 
-		if (ram_get_size(m_ram) == 64 * 1024)
+		if (m_ram->size() == 64 * 1024)
 		{
 			// kc85_4 64K RAM
 			ram8_block = ((m_port_84_data)>>4) & 0x01;
@@ -806,7 +806,7 @@ void kc_state::machine_start()
 	machine().scheduler().timer_pulse(attotime::from_hz(50), FUNC(kc85_50hz_timer_callback), 0, NULL);
 	machine().scheduler().timer_pulse(attotime::from_hz(15625), FUNC(kc85_15khz_timer_callback), 0, NULL);
 
-	m_ram_base = ram_get_ptr(m_ram);
+	m_ram_base = m_ram->pointer();
 
 	m_expansions[0] = machine().device<kcexp_slot_device>("m1");
 	m_expansions[1] = machine().device<kcexp_slot_device>("m2");

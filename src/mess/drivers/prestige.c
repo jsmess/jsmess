@@ -93,7 +93,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 
 	UINT8 m_bank[7];
 	UINT8 m_kb_matrix;
@@ -415,8 +415,8 @@ static IRQ_CALLBACK( prestige_int_ack )
 
 void prestige_state::machine_start()
 {
-	UINT8 *ram = ram_get_ptr(m_ram);
-	memset(ram, 0x00, ram_get_size(m_ram));
+	UINT8 *ram = m_ram->pointer();
+	memset(ram, 0x00, m_ram->size());
 
 	device_set_irq_callback(m_maincpu, prestige_int_ack);
 

@@ -298,7 +298,7 @@ void ob68k1a_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	// configure RAM
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 	case 32*1024:
 		program->unmap_readwrite(0x008000, 0x01ffff);

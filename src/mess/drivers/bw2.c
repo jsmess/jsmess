@@ -57,7 +57,7 @@ void bw2_state::bankswitch(UINT8 data)
 
 	m_bank = data & 0x07;
 
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 	case 64 * 1024:
 		max_ram_bank = BANK_RAM1;
@@ -139,7 +139,7 @@ void bw2_state::ramcard_bankswitch(UINT8 data)
 
 	m_bank = data & 0x07;
 
-	switch (ram_get_size(m_ram))
+	switch (m_ram->size())
 	{
 	case 64 * 1024:
 	case 96 * 1024:
@@ -625,7 +625,7 @@ static const wd17xx_interface fdc_intf =
 void bw2_state::machine_start()
 {
 	/* allocate memory */
-	m_work_ram = auto_alloc_array(machine(), UINT8, ram_get_size(m_ram));
+	m_work_ram = auto_alloc_array(machine(), UINT8, m_ram->size());
 	m_video_ram = auto_alloc_array(machine(), UINT8, BW2_VIDEORAM_SIZE);
 	m_ramcard_ram = auto_alloc_array(machine(), UINT8, BW2_RAMCARD_SIZE);
 
@@ -636,7 +636,7 @@ void bw2_state::machine_start()
 
 	/* register for state saving */
 	state_save_register_global(machine(), m_kb_row);
-	state_save_register_global_pointer(machine(), m_work_ram, ram_get_size(m_ram));
+	state_save_register_global_pointer(machine(), m_work_ram, m_ram->size());
 	state_save_register_global_pointer(machine(), m_ramcard_ram, BW2_RAMCARD_SIZE);
 	state_save_register_global(machine(), m_bank);
 	state_save_register_global(machine(), m_drive);

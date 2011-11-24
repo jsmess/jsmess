@@ -53,7 +53,7 @@ public:
 	required_device<z80pio_device> m_pio;
 	required_device<device_t> m_fdc;
 	required_device<com8116_device> m_brg;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
 

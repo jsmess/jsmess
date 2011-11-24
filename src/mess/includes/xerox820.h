@@ -41,7 +41,7 @@ public:
 	required_device<device_t> m_kbpio;
 	required_device<device_t> m_ctc;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_ram;
+	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
 

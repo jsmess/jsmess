@@ -909,8 +909,8 @@ void victor9k_state::machine_start()
 
 	/* memory banking */
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(m_ram);
-	int ram_size = ram_get_size(m_ram);
+	UINT8 *ram = m_ram->pointer();
+	int ram_size = m_ram->size();
 
 	program->install_ram(0x00000, ram_size - 1, ram);
 }
