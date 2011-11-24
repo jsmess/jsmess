@@ -40375,7 +40375,7 @@ Alternate board (XL-1)
 		<publisher>Atlus</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="shin megami tensei ii (japan) (rev 2).sfc" size="1048576" crc="e38228a7" sha1="84bb8a37b2575762d825d820d76175071bee1ca2" offset="0x000000" />
+				<rom name="shin megami tensei ii (japan) (rev 2).sfc" size="2097152" crc="e38228a7" sha1="84bb8a37b2575762d825d820d76175071bee1ca2" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
