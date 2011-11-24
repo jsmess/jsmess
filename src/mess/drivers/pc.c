@@ -109,6 +109,16 @@ static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( oliv_map, AS_PROGRAM, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00000, 0x9ffff) AM_RAM
+	AM_RANGE(0xa0000, 0xbffff) AM_NOP
+	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
+	AM_RANGE(0xc8000, 0xcffff) AM_ROM
+	AM_RANGE(0xd0000, 0xeffff) AM_NOP
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( mc1502_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
@@ -161,6 +171,10 @@ static ADDRESS_MAP_START(pc8_io, AS_IO, 8)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE("ins8250_2", ins8250_r, ins8250_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,				pc_fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_r, ins8250_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(oliv_io, AS_IO, 8)
+	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc16_io, AS_IO, 16)
@@ -1410,7 +1424,7 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )	
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
@@ -1492,6 +1506,14 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( olivm15, pc_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I8088, 4772720)
+	MCFG_CPU_PROGRAM_MAP(oliv_map)
+	MCFG_CPU_IO_MAP(oliv_io)
+MACHINE_CONFIG_END
+
 
 #if 0
 	//pcjr roms? (incomplete dump, most likely 64 kbyte)
@@ -1952,6 +1974,11 @@ ROM_START( pc7000 )
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
+ROM_START( olivm15 )
+	ROM_REGION(0x100000,"maincpu", 0)
+	ROM_LOAD( "oliv_m15.bin",0xfc000, 0x04000, CRC(bf2ef795) SHA1(02d497131f5ca2c78f2accd38ab0eab6813e3ebf))
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -1990,6 +2017,7 @@ COMP( 1987, zdsupers,   ibm5150,    0,          zenith,     pccga,      pccga,  
 
 COMP( 1983, m24,        ibm5150,    0,          olivetti,   pccga,      pccga,      "Olivetti", "M24", GAME_NOT_WORKING)
 COMP( 1987, m240,       ibm5150,    0,          olivetti,   pccga,      pccga,      "Olivetti", "M240", GAME_NOT_WORKING)
+COMP( 198?, olivm15,    ibm5150,    0,          olivm15,    0,    	    0,     		"Olivetti", "M15", GAME_NOT_WORKING | GAME_NO_SOUND)
 
 COMP( 1983, ibm5550,    ibm5150,    0,          ibm5550,    pccga,      pccga,      "International Business Machines", "IBM 5550", GAME_NOT_WORKING)
 
