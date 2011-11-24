@@ -92,7 +92,7 @@ static void galaxy_setup_snapshot (running_machine &machine, const UINT8 * data,
 			cpu_set_reg(cpu, Z80_I,    data[0x40]);
 			cpu_set_reg(cpu, Z80_R,    (data[0x44] & 0x7f) | (data[0x48] & 0x80));
 
-			memcpy (ram_get_ptr(machine.device(RAM_TAG)), data + 0x084c, (ram_get_size(machine.device(RAM_TAG)) < 0x1800) ? ram_get_size(machine.device(RAM_TAG)) : 0x1800);
+			memcpy (machine.device<ram_device>(RAM_TAG)->pointer(), data + 0x084c, (machine.device<ram_device>(RAM_TAG)->size() < 0x1800) ? machine.device<ram_device>(RAM_TAG)->size() : 0x1800);
 
 			break;
 		case GALAXY_SNAPSHOT_V2_SIZE:
@@ -119,7 +119,7 @@ static void galaxy_setup_snapshot (running_machine &machine, const UINT8 * data,
 			cpu_set_reg(cpu, Z80_I,    data[0x19]);
 			cpu_set_reg(cpu, Z80_R,    data[0x1a]);
 
-			memcpy (ram_get_ptr(machine.device(RAM_TAG)), data + 0x0834, (ram_get_size(machine.device(RAM_TAG)) < 0x1800) ? ram_get_size(machine.device(RAM_TAG)) : 0x1800);
+			memcpy (machine.device<ram_device>(RAM_TAG)->pointer(), data + 0x0834, (machine.device<ram_device>(RAM_TAG)->size() < 0x1800) ? machine.device<ram_device>(RAM_TAG)->size() : 0x1800);
 
 			break;
 	}
@@ -157,12 +157,12 @@ SNAPSHOT_LOAD( galaxy )
 DRIVER_INIT( galaxy )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_readwrite_bank( 0x2800, 0x2800 + ram_get_size(machine.device(RAM_TAG)) - 1, "bank1");
-	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
+	space->install_readwrite_bank( 0x2800, 0x2800 + machine.device<ram_device>(RAM_TAG)->size() - 1, "bank1");
+	memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
 
-	if (ram_get_size(machine.device(RAM_TAG)) < (6 + 48) * 1024)
+	if (machine.device<ram_device>(RAM_TAG)->size() < (6 + 48) * 1024)
 	{
-		space->nop_readwrite( 0x2800 + ram_get_size(machine.device(RAM_TAG)), 0xffff);
+		space->nop_readwrite( 0x2800 + machine.device<ram_device>(RAM_TAG)->size(), 0xffff);
 	}
 }
 

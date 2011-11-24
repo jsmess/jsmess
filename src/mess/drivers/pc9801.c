@@ -2440,7 +2440,7 @@ static MACHINE_RESET(pc9801rs)
 	state->m_rom_bank = 0;
 	state->m_fdc_ctrl = 3;
 
-	state->m_ram_size = ram_get_size(machine.device(RAM_TAG)) - 0xa0000;
+	state->m_ram_size = machine.device<ram_device>(RAM_TAG)->size() - 0xa0000;
 }
 
 static INTERRUPT_GEN(pc9801_vrtc_irq)

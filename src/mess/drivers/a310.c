@@ -103,7 +103,7 @@ static WRITE32_HANDLER( a310_psy_wram_w )
 
 static DRIVER_INIT(a310)
 {
-	UINT32 ram_size = ram_get_size(machine.device(RAM_TAG));
+	UINT32 ram_size = machine.device<ram_device>(RAM_TAG)->size();
 
 	archimedes_memc_physmem = auto_alloc_array(machine, UINT32, 0x01000000);
 

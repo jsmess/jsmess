@@ -360,7 +360,7 @@ static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 
 			mem_bank = mem_bank & state->m_membank_internal_ram_mask;
 
-			addr = ram_get_ptr(machine.device(RAM_TAG)) + (mem_bank<<14);
+			addr = machine.device<ram_device>(RAM_TAG)->pointer() + (mem_bank<<14);
 
 			memory_set_bankptr(machine, bank1, addr);
 			memory_set_bankptr(machine, bank5, addr);
@@ -433,13 +433,13 @@ static void nc_common_restore_memory_from_stream(running_machine &machine)
 	/* get size of memory data stored */
 	state->m_file->read(&stored_size, sizeof(unsigned long));
 
-	if (stored_size > ram_get_size(machine.device(RAM_TAG)))
-		restore_size = ram_get_size(machine.device(RAM_TAG));
+	if (stored_size > machine.device<ram_device>(RAM_TAG)->size())
+		restore_size = machine.device<ram_device>(RAM_TAG)->size();
 	else
 		restore_size = stored_size;
 
 	/* read as much as will fit into memory */
-	state->m_file->read(ram_get_ptr(machine.device(RAM_TAG)), restore_size);
+	state->m_file->read(machine.device<ram_device>(RAM_TAG)->pointer(), restore_size);
 	/* seek over remaining data */
 	state->m_file->seek(SEEK_CUR,stored_size - restore_size);
 }
@@ -448,7 +448,7 @@ static void nc_common_restore_memory_from_stream(running_machine &machine)
 static void nc_common_store_memory_to_stream(running_machine &machine)
 {
 	nc_state *state = machine.driver_data<nc_state>();
-	UINT32 size = ram_get_size(machine.device(RAM_TAG));
+	UINT32 size = machine.device<ram_device>(RAM_TAG)->size();
 	if (!state->m_file)
 		return;
 
@@ -457,7 +457,7 @@ static void nc_common_store_memory_to_stream(running_machine &machine)
 	state->m_file->write(&size, sizeof(UINT32));
 
 	/* write data block */
-	state->m_file->write(ram_get_ptr(machine.device(RAM_TAG)), size);
+	state->m_file->write(machine.device<ram_device>(RAM_TAG)->pointer(), size);
 }
 
 static void nc_common_open_stream_for_reading(running_machine &machine)

@@ -1039,7 +1039,7 @@ MACHINE_START( c65 )
 {
 	c65_state *state = machine.driver_data<c65_state>();
 	/* clear upper memory */
-	memset(ram_get_ptr(machine.device(RAM_TAG)) + 128*1024, 0xff, ram_get_size(machine.device(RAM_TAG)) -  128*1024);
+	memset(machine.device<ram_device>(RAM_TAG)->pointer() + 128*1024, 0xff, machine.device<ram_device>(RAM_TAG)->size() -  128*1024);
 
 //removed   cbm_drive_0_config (SERIAL, 10);
 //removed   cbm_drive_1_config (SERIAL, 11);

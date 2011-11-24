@@ -288,10 +288,10 @@ DRIVER_INIT( sym1 )
 {
 	sym1_state *state = machine.driver_data<sym1_state>();
 	/* wipe expansion memory banks that are not installed */
-	if (ram_get_size(machine.device(RAM_TAG)) < 4*1024)
+	if (machine.device<ram_device>(RAM_TAG)->size() < 4*1024)
 	{
 		machine.device( "maincpu")->memory().space( AS_PROGRAM )->nop_readwrite(
-			ram_get_size(machine.device(RAM_TAG)), 0x0fff);
+			machine.device<ram_device>(RAM_TAG)->size(), 0x0fff);
 	}
 
 	/* allocate a timer to refresh the led display */

@@ -346,8 +346,8 @@ static DRIVER_INIT( vg5k )
 
 	/* install expansion memory*/
 	address_space *program = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
-	UINT16 ram_size = ram_get_size(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
+	UINT16 ram_size = machine.device<ram_device>(RAM_TAG)->size();
 
 	if (ram_size > 0x4000)
 		program->install_ram(0x8000, 0x3fff + ram_size, ram);

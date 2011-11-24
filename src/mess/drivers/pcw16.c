@@ -408,7 +408,7 @@ static void pcw16_set_bank_handlers(running_machine &machine, int bank, PCW16_RA
 static void pcw16_update_bank(running_machine &machine, int bank)
 {
 	pcw16_state *state = machine.driver_data<pcw16_state>();
-	unsigned char *mem_ptr = ram_get_ptr(machine.device(RAM_TAG));
+	unsigned char *mem_ptr = machine.device<ram_device>(RAM_TAG)->pointer();
 	int bank_id = 0;
 	int bank_offs = 0;
 	char bank1[10];
@@ -450,7 +450,7 @@ static void pcw16_update_bank(running_machine &machine, int bank)
 	{
 		bank_offs = 128;
 		/* dram */
-		mem_ptr = ram_get_ptr(machine.device(RAM_TAG));
+		mem_ptr = machine.device<ram_device>(RAM_TAG)->pointer();
 	}
 
 	mem_ptr = mem_ptr + ((bank_id - bank_offs)<<14);

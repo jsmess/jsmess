@@ -170,7 +170,7 @@ MACHINE_RESET ( orion128 )
 	state->m_orion128_video_mode = 0;
 	state->m_orion128_memory_page = -1;
 	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0xf800);
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0xf000);
+	memory_set_bankptr(machine, "bank2", machine.device<ram_device>(RAM_TAG)->pointer() + 0xf000);
 	state->m_orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
 	radio86_init_keyboard(machine);
@@ -288,14 +288,14 @@ static void orionz80_switch_bank(running_machine &machine)
 	space->install_write_bank(0x0000, 0x3fff, "bank1");
 	if ((state->m_orionz80_dispatcher & 0x80)==0)
 	{ // dispatcher on
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x10000 * bank_select + segment_select * 0x4000 );
+		memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer() + 0x10000 * bank_select + segment_select * 0x4000 );
 	}
 	else
 	{ // dispatcher off
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x10000 * state->m_orionz80_memory_page);
+		memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer() + 0x10000 * state->m_orionz80_memory_page);
 	}
 
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0x4000 + 0x10000 * state->m_orionz80_memory_page);
+	memory_set_bankptr(machine, "bank2", machine.device<ram_device>(RAM_TAG)->pointer() + 0x4000 + 0x10000 * state->m_orionz80_memory_page);
 
 	if ((state->m_orionz80_dispatcher & 0x20) == 0)
 	{
@@ -313,16 +313,16 @@ static void orionz80_switch_bank(running_machine &machine)
 		space->unmap_write(0xfc00, 0xfeff);
 		space->install_legacy_write_handler(0xff00, 0xffff, FUNC(orionz80_sound_w));
 
-		memory_set_bankptr(machine, "bank3", ram_get_ptr(machine.device(RAM_TAG)) + 0xf000);
+		memory_set_bankptr(machine, "bank3", machine.device<ram_device>(RAM_TAG)->pointer() + 0xf000);
 		memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() + 0xf800);
 
 	}
 	else
 	{
 		/* if it is full memory access */
-		memory_set_bankptr(machine, "bank3", ram_get_ptr(machine.device(RAM_TAG)) + 0xf000 + 0x10000 * state->m_orionz80_memory_page);
-		memory_set_bankptr(machine, "bank4", ram_get_ptr(machine.device(RAM_TAG)) + 0xf400 + 0x10000 * state->m_orionz80_memory_page);
-		memory_set_bankptr(machine, "bank5", ram_get_ptr(machine.device(RAM_TAG)) + 0xf800 + 0x10000 * state->m_orionz80_memory_page);
+		memory_set_bankptr(machine, "bank3", machine.device<ram_device>(RAM_TAG)->pointer() + 0xf000 + 0x10000 * state->m_orionz80_memory_page);
+		memory_set_bankptr(machine, "bank4", machine.device<ram_device>(RAM_TAG)->pointer() + 0xf400 + 0x10000 * state->m_orionz80_memory_page);
+		memory_set_bankptr(machine, "bank5", machine.device<ram_device>(RAM_TAG)->pointer() + 0xf800 + 0x10000 * state->m_orionz80_memory_page);
 	}
 }
 
@@ -365,8 +365,8 @@ MACHINE_RESET ( orionz80 )
 
 
 	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0xf800);
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0x4000);
-	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine.device(RAM_TAG)) + 0xf000);
+	memory_set_bankptr(machine, "bank2", machine.device<ram_device>(RAM_TAG)->pointer() + 0x4000);
+	memory_set_bankptr(machine, "bank3", machine.device<ram_device>(RAM_TAG)->pointer() + 0xf000);
 	memory_set_bankptr(machine, "bank5", machine.region("maincpu")->base() + 0xf800);
 
 
@@ -431,7 +431,7 @@ static void orionpro_bank_switch(running_machine &machine)
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int page = state->m_orionpro_page & 7; // we have only 8 pages
 	int is128 = (state->m_orionpro_dispatcher & 0x80) ? 1 : 0;
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (is128==1)
 	{

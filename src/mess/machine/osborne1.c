@@ -176,7 +176,7 @@ DIRECT_UPDATE_HANDLER( osborne1_opbase )
 	{
 		if ( ! state->m_bank2_enabled )
 		{
-			direct.explicit_configure(0x2000, 0x2fff, 0x0fff, ram_get_ptr(machine.device(RAM_TAG)) + 0x2000);
+			direct.explicit_configure(0x2000, 0x2fff, 0x0fff, machine.device<ram_device>(RAM_TAG)->pointer() + 0x2000);
 			return ~0;
 		}
 	}
@@ -306,8 +306,8 @@ static TIMER_CALLBACK(osborne1_video_callback)
 
 		for ( x = 0; x < 52; x++ )
 		{
-			chr = ram_get_ptr(machine.device(RAM_TAG))[ 0xF000 + ( (ma+x) & 0xFFF ) ];
-			dim = ram_get_ptr(machine.device(RAM_TAG))[ 0x10000 + ( (ma+x) & 0xFFF ) ] & 0x80;
+			chr = machine.device<ram_device>(RAM_TAG)->pointer()[ 0xF000 + ( (ma+x) & 0xFFF ) ];
+			dim = machine.device<ram_device>(RAM_TAG)->pointer()[ 0x10000 + ( (ma+x) & 0xFFF ) ] & 0x80;
 
 			if ( (chr & 0x80) && (ra == 9) )
 				gfx = 0xFF;
@@ -385,7 +385,7 @@ MACHINE_RESET( osborne1 )
 
 	state->m_p_chargen = machine.region( "chargen" )->base();
 
-	memset( ram_get_ptr(machine.device(RAM_TAG)) + 0x10000, 0xFF, 0x1000 );
+	memset( machine.device<ram_device>(RAM_TAG)->pointer() + 0x10000, 0xFF, 0x1000 );
 
 	for(drive=0;drive<2;drive++)
 		floppy_install_load_proc(floppy_get_device(machine, drive), osborne1_load_proc);

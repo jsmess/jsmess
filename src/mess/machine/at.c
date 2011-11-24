@@ -305,14 +305,14 @@ static void init_at_common(running_machine &machine)
 	if (machine.device("cs4031") == NULL)
 	{
 		/* MESS managed RAM */
-		memory_set_bankptr(machine, "bank10", ram_get_ptr(machine.device(RAM_TAG)));
+		memory_set_bankptr(machine, "bank10", machine.device<ram_device>(RAM_TAG)->pointer());
 
-		if (ram_get_size(machine.device(RAM_TAG)) > 0x0a0000)
+		if (machine.device<ram_device>(RAM_TAG)->size() > 0x0a0000)
 		{
-			offs_t ram_limit = 0x100000 + ram_get_size(machine.device(RAM_TAG)) - 0x0a0000;
+			offs_t ram_limit = 0x100000 + machine.device<ram_device>(RAM_TAG)->size() - 0x0a0000;
 			space->install_read_bank(0x100000,  ram_limit - 1, "bank1");
 			space->install_write_bank(0x100000,  ram_limit - 1, "bank1");
-			memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0xa0000);
+			memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer() + 0xa0000);
 		}
 	}
 

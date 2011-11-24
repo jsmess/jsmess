@@ -1107,9 +1107,9 @@ DRIVER_INIT( bebox )
 	memory_set_bankptr(machine, "bank2", machine.region("user2")->base());
 
 	/* install MESS managed RAM */
-	space_0->install_readwrite_bank(0, ram_get_size(machine.device(RAM_TAG)) - 1, 0, 0x02000000, "bank3");
-	space_1->install_readwrite_bank(0, ram_get_size(machine.device(RAM_TAG)) - 1, 0, 0x02000000, "bank3");
-	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine.device(RAM_TAG)));
+	space_0->install_readwrite_bank(0, machine.device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");
+	space_1->install_readwrite_bank(0, machine.device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");
+	memory_set_bankptr(machine, "bank3", machine.device<ram_device>(RAM_TAG)->pointer());
 
 	kbdc8042_init(machine, &bebox_8042_interface);
 

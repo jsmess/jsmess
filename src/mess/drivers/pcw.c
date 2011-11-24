@@ -254,7 +254,7 @@ static void pcw_update_read_memory_block(running_machine &machine, int block, in
 		space->install_read_bank(block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff,block_name);
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
-	memory_set_bankptr(machine, block_name, ram_get_ptr(machine.device(RAM_TAG)) + ((bank * 0x4000) % ram_get_size(machine.device(RAM_TAG))));
+	memory_set_bankptr(machine, block_name, machine.device<ram_device>(RAM_TAG)->pointer() + ((bank * 0x4000) % machine.device<ram_device>(RAM_TAG)->size()));
 }
 
 
@@ -264,7 +264,7 @@ static void pcw_update_write_memory_block(running_machine &machine, int block, i
 	char block_name[10];
 
 	sprintf(block_name,"bank%d",block+5);
-	memory_set_bankptr(machine, block_name, ram_get_ptr(machine.device(RAM_TAG)) + ((bank * 0x4000) % ram_get_size(machine.device(RAM_TAG))));
+	memory_set_bankptr(machine, block_name, machine.device<ram_device>(RAM_TAG)->pointer() + ((bank * 0x4000) % machine.device<ram_device>(RAM_TAG)->size()));
 //  LOG(("MEM: write block %i -> bank %i\n",block,bank));
 }
 
@@ -1089,9 +1089,9 @@ static MACHINE_RESET( pcw )
 	state->m_boot = 0;   // System starts up in bootstrap mode, disabled until it's possible to emulate it.
 
 	/* copy boot code into RAM - yes, it's skipping a step */
-	memset(ram_get_ptr(machine.device(RAM_TAG)),0x00,ram_get_size(machine.device(RAM_TAG)));
+	memset(machine.device<ram_device>(RAM_TAG)->pointer(),0x00,machine.device<ram_device>(RAM_TAG)->size());
 	for(x=0;x<256;x++)
-		ram_get_ptr(machine.device(RAM_TAG))[x+2] = code[x+0x300];
+		machine.device<ram_device>(RAM_TAG)->pointer()[x+2] = code[x+0x300];
 
 	/* and hack our way past the MCU side of the boot process */
 	code[0x01] = 0x40;

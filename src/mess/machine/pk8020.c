@@ -237,7 +237,7 @@ static void pk8020_set_bank(running_machine &machine,UINT8 data)
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem = machine.region("maincpu")->base();
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	switch(data & 0x1F) {
 		case 0x00 :

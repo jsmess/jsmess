@@ -624,7 +624,7 @@ DRIVER_INIT( spectrum )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	switch (ram_get_size(machine.device(RAM_TAG)))
+	switch (machine.device<ram_device>(RAM_TAG)->size())
 	{
 	    case 48*1024:
 		space->install_ram(0x8000, 0xffff, NULL); // Fall through

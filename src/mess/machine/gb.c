@@ -63,7 +63,7 @@ enum {
 	MBC_UNKNOWN,	/* Unknown mapper                                */
 };
 
-/* ram_get_ptr(machine.device(RAM_TAG)) layout defines */
+/* machine.device<ram_device>(RAM_TAG)->pointer() layout defines */
 #define CGB_START_VRAM_BANKS	0x0000
 #define CGB_START_RAM_BANKS	( 2 * 8 * 1024 )
 
@@ -373,7 +373,7 @@ MACHINE_RESET( gbc )
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ )
 	{
-		state->m_GBC_RAMMap[ii] = ram_get_ptr(machine.device(RAM_TAG)) + CGB_START_RAM_BANKS + ii * 0x1000;
+		state->m_GBC_RAMMap[ii] = machine.device<ram_device>(RAM_TAG)->pointer() + CGB_START_RAM_BANKS + ii * 0x1000;
 		memset (state->m_GBC_RAMMap[ii], 0, 0x1000);
 	}
 }

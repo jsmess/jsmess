@@ -509,7 +509,7 @@ static void amstrad_plus_dma_parse(running_machine &machine, int channel)
 		}
 		return;
 	}
-	command = (ram_get_ptr(machine.device(RAM_TAG))[state->m_asic.dma_addr[channel]+1] << 8) + ram_get_ptr(machine.device(RAM_TAG))[state->m_asic.dma_addr[channel]];
+	command = (machine.device<ram_device>(RAM_TAG)->pointer()[state->m_asic.dma_addr[channel]+1] << 8) + machine.device<ram_device>(RAM_TAG)->pointer()[state->m_asic.dma_addr[channel]];
 //  logerror("DMA #%i: address %04x: command %04x\n",channel,state->m_asic.dma_addr[channel],command);
 	switch (command & 0xf000)
 	{
@@ -617,7 +617,7 @@ INLINE void amstrad_gate_array_get_video_data( running_machine &machine )
 		state->m_gate_array.address = ( ( state->m_gate_array.ma & 0x2000 ) << 2 ) | ( ( state->m_gate_array.ra & 0x06 ) << 11 ) | ( ( state->m_gate_array.ra & 0x01 ) << 14 ) | ( ( state->m_gate_array.ma & 0x7ff ) << 1 );
 	else
 		state->m_gate_array.address = ( ( state->m_gate_array.ma & 0x3000 ) << 2 ) | ( ( state->m_gate_array.ra & 0x07 ) << 11 ) | ( ( state->m_gate_array.ma & 0x3ff ) << 1 );
-	state->m_gate_array.data = ram_get_ptr(machine.device(RAM_TAG))[ state->m_gate_array.address ];
+	state->m_gate_array.data = machine.device<ram_device>(RAM_TAG)->pointer()[ state->m_gate_array.address ];
 	state->m_gate_array.colour = state->m_GateArray_render_colours[ state->m_gate_array.mode_lookup[state->m_gate_array.data] ];
 	state->m_gate_array.colour_ticks = state->m_gate_array.max_colour_ticks;
 	state->m_gate_array.ticks = 0;
@@ -653,7 +653,7 @@ INLINE void amstrad_update_video( running_machine &machine )
 				switch( state->m_gate_array.ticks)
 				{
 				case 8:
-					state->m_gate_array.data = ram_get_ptr(machine.device(RAM_TAG))[ state->m_gate_array.address + 1 ];
+					state->m_gate_array.data = machine.device<ram_device>(RAM_TAG)->pointer()[ state->m_gate_array.address + 1 ];
 					state->m_gate_array.colour = state->m_GateArray_render_colours[ state->m_gate_array.mode_lookup[state->m_gate_array.data] ];
 					break;
 				case 16:
@@ -689,7 +689,7 @@ INLINE void amstrad_plus_gate_array_get_video_data( running_machine &machine )
 		ma += state->m_asic.horiz_disp;
 	}
 	state->m_gate_array.address = ( ( ma & 0x3000 ) << 2 ) | ( ( state->m_gate_array.ra & 0x07 ) << 11 ) | ( ( ma & 0x3ff ) << 1 );
-	state->m_gate_array.data = ram_get_ptr(machine.device(RAM_TAG))[ state->m_gate_array.address ];
+	state->m_gate_array.data = machine.device<ram_device>(RAM_TAG)->pointer()[ state->m_gate_array.address ];
 	caddr = 0x2400 + state->m_gate_array.mode_lookup[state->m_gate_array.data] * 2;
 	state->m_gate_array.colour = state->m_asic.ram[caddr] + ( state->m_asic.ram[caddr+1] << 8 );
 	state->m_gate_array.colour_ticks = state->m_gate_array.max_colour_ticks;
@@ -741,7 +741,7 @@ INLINE void amstrad_plus_update_video( running_machine &machine )
 						{
 							UINT16 caddr;
 
-							state->m_gate_array.data = ram_get_ptr(machine.device(RAM_TAG))[ state->m_gate_array.address + 1 ];
+							state->m_gate_array.data = machine.device<ram_device>(RAM_TAG)->pointer()[ state->m_gate_array.address + 1 ];
 							caddr = 0x2400 + state->m_gate_array.mode_lookup[state->m_gate_array.data] * 2;
 							state->m_gate_array.colour = state->m_asic.ram[caddr] + ( state->m_asic.ram[caddr+1] << 8 );
 						}
@@ -1315,7 +1315,7 @@ static void AmstradCPC_GA_SetRamConfiguration(running_machine &machine)
 		for (i=0;i<4;i++)
 		{
 			BankIndex = RamConfigurations[(ConfigurationIndex << 2) + i];
-			BankAddr = ram_get_ptr(machine.device(RAM_TAG)) + (BankIndex << 14);
+			BankAddr = machine.device<ram_device>(RAM_TAG)->pointer() + (BankIndex << 14);
 			state->m_Aleste_RamBanks[i] = BankAddr;
 			state->m_AmstradCPC_RamBanks[i] = BankAddr;
 		}
@@ -2275,7 +2275,7 @@ static void amstrad_handle_snapshot(running_machine &machine, unsigned char *pSn
 			MemorySize = 64*1024;
 		}
 
-		memcpy(ram_get_ptr(machine.device(RAM_TAG)), &pSnapshot[0x0100], MemorySize);
+		memcpy(machine.device<ram_device>(RAM_TAG)->pointer(), &pSnapshot[0x0100], MemorySize);
 	}
 	amstrad_rethinkMemory(machine);
 }

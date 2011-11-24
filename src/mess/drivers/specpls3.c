@@ -212,7 +212,7 @@ void spectrum_plus3_update_memory(running_machine &machine)
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_port_7ffd_data & 8)
 	{
@@ -355,7 +355,7 @@ ADDRESS_MAP_END
 static MACHINE_RESET( spectrum_plus3 )
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
-	UINT8 *messram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 	memset(messram,0,128*1024);
 
 	MACHINE_RESET_CALL(spectrum);

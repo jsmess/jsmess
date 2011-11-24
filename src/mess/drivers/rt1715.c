@@ -100,8 +100,8 @@ static WRITE8_HANDLER( k7658_data_w )
 
 static MACHINE_START( rt1715 )
 {
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0x0800);
-	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine.device(RAM_TAG)));
+	memory_set_bankptr(machine, "bank2", machine.device<ram_device>(RAM_TAG)->pointer() + 0x0800);
+	memory_set_bankptr(machine, "bank3", machine.device<ram_device>(RAM_TAG)->pointer());
 }
 
 static MACHINE_RESET( rt1715 )

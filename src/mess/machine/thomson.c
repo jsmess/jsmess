@@ -1475,7 +1475,7 @@ MACHINE_START ( to7 )
 {
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8* mem = machine.region("maincpu")->base();
-	UINT8* ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "to7: machine start called\n" ));
 
@@ -1496,11 +1496,11 @@ MACHINE_START ( to7 )
 	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
 	memory_set_bank( machine, THOM_CART_BANK, 0 );
 
-	if ( ram_get_size(machine.device(RAM_TAG)) > 24*1024 )
+	if ( machine.device<ram_device>(RAM_TAG)->size() > 24*1024 )
 	{
 		/* install 16 KB or 16 KB + 8 KB memory extensions */
 		/* BASIC instruction to see free memory: ?FRE(0) */
-		int extram = ram_get_size(machine.device(RAM_TAG)) - 24*1024;
+		int extram = machine.device<ram_device>(RAM_TAG)->size() - 24*1024;
 		space->install_write_bank(0x8000, 0x8000 + extram - 1, THOM_RAM_BANK);
 		space->install_read_bank(0x8000, 0x8000 + extram - 1, THOM_RAM_BANK );
 		memory_configure_bank( machine, THOM_RAM_BANK,  0, 1, ram + 0x6000, extram );
@@ -1581,7 +1581,7 @@ static void to770_update_ram_bank(running_machine &machine)
 	if ( bank != old_ram_bank )
 		LOG_BANK(( "to770_update_ram_bank: RAM bank change %i\n", bank ));
 
-	if ( ram_get_size(machine.device(RAM_TAG)) == 128*1024 || bank < 2 )
+	if ( machine.device<ram_device>(RAM_TAG)->size() == 128*1024 || bank < 2 )
 	{
 		memory_set_bank( machine, THOM_RAM_BANK, bank );
 		space->install_write_bank(0xa000, 0xdfff, THOM_RAM_BANK);
@@ -1731,7 +1731,7 @@ MACHINE_RESET( to770 )
 MACHINE_START ( to770 )
 {
 	UINT8* mem = machine.region("maincpu")->base();
-	UINT8* ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "to770: machine start called\n" ));
 
@@ -2103,7 +2103,7 @@ MACHINE_RESET( mo5 )
 MACHINE_START ( mo5 )
 {
 	UINT8* mem = machine.region("maincpu")->base();
-	UINT8* ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "mo5: machine start called\n" ));
 
@@ -2455,7 +2455,7 @@ static void to9_update_ram_bank (running_machine &machine)
 	if ( old_ram_bank != bank )
 		LOG_BANK(( "to9_update_ram_bank: bank %i selected (pia=$%02X disk=%i)\n", bank, portb & 0xf8, disk ));
 
-	if ( ram_get_size(machine.device(RAM_TAG)) == 192*1024 || bank < 6 )
+	if ( machine.device<ram_device>(RAM_TAG)->size() == 192*1024 || bank < 6 )
 	{
 		memory_set_bank( machine, THOM_RAM_BANK, bank );
 		space->install_write_bank( 0xa000, 0xdfff, THOM_RAM_BANK);
@@ -3067,7 +3067,7 @@ MACHINE_RESET ( to9 )
 MACHINE_START ( to9 )
 {
 	UINT8* mem = machine.region("maincpu")->base();
-	UINT8* ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "to9: machine start called\n" ));
 
@@ -3523,7 +3523,7 @@ static void to8_update_ram_bank (running_machine &machine)
         undistorted space, such as cartridge, page 0 (video), or page 1
     */
 	to8_data_vpage = bank;
-	if ( ram_get_size(machine.device(RAM_TAG)) == 512*1024 || to8_data_vpage < 16 )
+	if ( machine.device<ram_device>(RAM_TAG)->size() == 512*1024 || to8_data_vpage < 16 )
 	{
 		memory_set_bank( machine, TO8_DATA_LO, to8_data_vpage );
 		memory_set_bank( machine, TO8_DATA_HI, to8_data_vpage );
@@ -3565,7 +3565,7 @@ static void to8_update_cart_bank (running_machine &machine)
 		/* RAM space */
 		to8_cart_vpage = to8_reg_cart & 31;
 		bank = 8 + to8_cart_vpage;
-		if ((to8_cart_vpage < 8 || ram_get_size(machine.device(RAM_TAG)) == 512*1024) && (to8_reg_cart & 0x40)) {
+		if ((to8_cart_vpage < 8 || machine.device<ram_device>(RAM_TAG)->size() == 512*1024) && (to8_reg_cart & 0x40)) {
 			if (to8_cart_vpage <= 4) {
 				space->install_legacy_write_handler( 0x0000, 0x3fff, FUNC(to8_vcart_w));
 			} else {
@@ -3603,7 +3603,7 @@ static void to8_update_cart_bank (running_machine &machine)
 		}
 	}
 
-	if ( ram_get_size(machine.device(RAM_TAG)) == 512*1024 || bank < 16 )
+	if ( machine.device<ram_device>(RAM_TAG)->size() == 512*1024 || bank < 16 )
 	{
 		memory_set_bank( machine, THOM_CART_BANK, bank );
 	}
@@ -4061,7 +4061,7 @@ MACHINE_RESET ( to8 )
 MACHINE_START ( to8 )
 {
 	UINT8* mem = machine.region("maincpu")->base();
-	UINT8* ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "to8: machine start called\n" ));
 
@@ -4232,7 +4232,7 @@ MACHINE_RESET ( to9p )
 MACHINE_START ( to9p )
 {
 	UINT8* mem = machine.region("maincpu")->base();
-	UINT8* ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "to9p: machine start called\n" ));
 
@@ -4856,7 +4856,7 @@ MACHINE_RESET ( mo6 )
 MACHINE_START ( mo6 )
 {
 	UINT8* mem = machine.region("maincpu")->base();
-	UINT8* ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "mo6: machine start called\n" ));
 
@@ -5117,7 +5117,7 @@ MACHINE_RESET ( mo5nr )
 MACHINE_START ( mo5nr )
 {
 	UINT8* mem = machine.region("maincpu")->base();
-	UINT8* ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	LOG (( "mo5nr: machine start called\n" ));
 

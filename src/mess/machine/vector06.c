@@ -154,7 +154,7 @@ static TIMER_CALLBACK( reset_check_callback )
 
 	if (BIT(val, 1))
 	{
-		memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)) + 0x0000);
+		memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer() + 0x0000);
 		machine.device("maincpu")->reset();
 	}
 }
@@ -184,9 +184,9 @@ MACHINE_RESET( vector06 )
 	space->install_write_bank(0x8000, 0xffff, "bank4");
 
 	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x10000);
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0x0000);
-	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine.device(RAM_TAG)) + 0x8000);
-	memory_set_bankptr(machine, "bank4", ram_get_ptr(machine.device(RAM_TAG)) + 0x8000);
+	memory_set_bankptr(machine, "bank2", machine.device<ram_device>(RAM_TAG)->pointer() + 0x0000);
+	memory_set_bankptr(machine, "bank3", machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
+	memory_set_bankptr(machine, "bank4", machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
 
 	state->m_keyboard_mask = 0;
 	state->m_color_index = 0;

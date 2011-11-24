@@ -528,7 +528,7 @@ static MACHINE_START( vic20 )
 	state->m_cassette_timer = machine.device<timer_device>(TIMER_C1530_TAG);
 
 	/* memory expansions */
-	switch (ram_get_size(machine.device(RAM_TAG)))
+	switch (machine.device<ram_device>(RAM_TAG)->size())
 	{
 	case 32*1024:
 		program->install_ram(0x6000, 0x7fff, NULL);

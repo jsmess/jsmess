@@ -157,7 +157,7 @@ READ8_HANDLER (specimx_video_color_r )
 static void specimx_set_bank(running_machine &machine, int i,int data)
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	space->install_write_bank(0xc000, 0xffbf, "bank3");
 	space->install_write_bank(0xffc0, 0xffdf, "bank4");
@@ -306,7 +306,7 @@ static void erik_set_bank(running_machine &machine)
 	UINT8 bank3 = ((state->m_RR_register >> 4) & 3);
 	UINT8 bank4 = ((state->m_RR_register >> 6) & 3);
 	UINT8 *mem = machine.region("maincpu")->base();
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	space->install_write_bank(0x0000, 0x3fff, "bank1");

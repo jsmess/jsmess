@@ -29,7 +29,7 @@ static void pmd851_update_memory(running_machine &machine)
 {
 	pmd85_state *state = machine.driver_data<pmd85_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_startup_mem_map)
 	{
@@ -74,7 +74,7 @@ static void pmd852a_update_memory(running_machine &machine)
 {
 	pmd85_state *state = machine.driver_data<pmd85_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_startup_mem_map)
 	{
@@ -112,7 +112,7 @@ static void pmd853_update_memory(running_machine &machine)
 {
 	pmd85_state *state = machine.driver_data<pmd85_state>();
 	UINT8 *mem = machine.region("maincpu")->base();
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_startup_mem_map)
 	{
@@ -150,7 +150,7 @@ static void alfa_update_memory(running_machine &machine)
 {
 	pmd85_state *state = machine.driver_data<pmd85_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_startup_mem_map)
 	{
@@ -184,7 +184,7 @@ static void mato_update_memory(running_machine &machine)
 {
 	pmd85_state *state = machine.driver_data<pmd85_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_startup_mem_map)
 	{
@@ -211,7 +211,7 @@ static void c2717_update_memory(running_machine &machine)
 	pmd85_state *state = machine.driver_data<pmd85_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem = machine.region("maincpu")->base();
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_startup_mem_map)
 	{
@@ -965,7 +965,7 @@ MACHINE_RESET( pmd85 )
 			state->m_ppi_port_outputs[i][j] = 0;
 
 	/* memory initialization */
-	memset(ram_get_ptr(machine.device(RAM_TAG)), 0, sizeof(unsigned char)*0x10000);
+	memset(machine.device<ram_device>(RAM_TAG)->pointer(), 0, sizeof(unsigned char)*0x10000);
 	state->m_pmd853_memory_mapping = 1;
 	state->m_startup_mem_map = 1;
 	state->update_memory(machine);

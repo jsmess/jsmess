@@ -311,7 +311,7 @@ static WRITE_LINE_DEVICE_HANDLER( einstein_serial_receive_clock )
 static void einstein_page_rom(running_machine &machine)
 {
 	einstein_state *einstein = machine.driver_data<einstein_state>();
-	memory_set_bankptr(machine, "bank1", einstein->m_rom_enabled ? machine.region("bios")->base() : ram_get_ptr(machine.device(RAM_TAG)));
+	memory_set_bankptr(machine, "bank1", einstein->m_rom_enabled ? machine.region("bios")->base() : machine.device<ram_device>(RAM_TAG)->pointer());
 }
 
 /* writing to this port is a simple trigger, and switches between RAM and ROM */
@@ -447,8 +447,8 @@ static MACHINE_RESET( einstein )
 	einstein->m_ctc = machine.device(IC_I058);
 
 	/* initialize memory mapping */
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)));
-	memory_set_bankptr(machine, "bank3", ram_get_ptr(machine.device(RAM_TAG)) + 0x8000);
+	memory_set_bankptr(machine, "bank2", machine.device<ram_device>(RAM_TAG)->pointer());
+	memory_set_bankptr(machine, "bank3", machine.device<ram_device>(RAM_TAG)->pointer() + 0x8000);
 	einstein->m_rom_enabled = 1;
 	einstein_page_rom(machine);
 

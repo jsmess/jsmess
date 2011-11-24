@@ -39,7 +39,7 @@ MACHINE_RESET( pecom )
 	space->install_read_bank (0xf000, 0xf7ff, "bank3");
 	space->install_read_bank (0xf800, 0xffff, "bank4");
 	memory_set_bankptr(machine, "bank1", rom + 0x8000);
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(machine.device(RAM_TAG)) + 0x4000);
+	memory_set_bankptr(machine, "bank2", machine.device<ram_device>(RAM_TAG)->pointer() + 0x4000);
 	memory_set_bankptr(machine, "bank3", rom + 0xf000);
 	memory_set_bankptr(machine, "bank4", rom + 0xf800);
 

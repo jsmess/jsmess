@@ -64,7 +64,7 @@ static void ts2068_hires_scanline(running_machine &machine,bitmap_t *bitmap, int
 	scrx=TS2068_LEFT_BORDER;
 	scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
 
-	scr=ram_get_ptr(machine.device(RAM_TAG)) + y*32;
+	scr=machine.device<ram_device>(RAM_TAG)->pointer() + y*32;
 	attr=scr + 0x2000;
 
 	for (x=0;x<32;x++)
@@ -108,7 +108,7 @@ static void ts2068_64col_scanline(running_machine &machine,bitmap_t *bitmap, int
 	scrx=TS2068_LEFT_BORDER;
 	scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
 
-	scr1=ram_get_ptr(machine.device(RAM_TAG)) + y*32;
+	scr1=machine.device<ram_device>(RAM_TAG)->pointer() + y*32;
 	scr2=scr1 + 0x2000;
 
 	for (x=0;x<32;x++)
@@ -144,8 +144,8 @@ static void ts2068_lores_scanline(running_machine &machine,bitmap_t *bitmap, int
 	scrx=TS2068_LEFT_BORDER;
 	scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
 
-	scr = ram_get_ptr(machine.device(RAM_TAG)) + y*32 + screen*0x2000;
-	attr = ram_get_ptr(machine.device(RAM_TAG)) + ((scry>>3)*32) + screen*0x2000 + 0x1800;
+	scr = machine.device<ram_device>(RAM_TAG)->pointer() + y*32 + screen*0x2000;
+	attr = machine.device<ram_device>(RAM_TAG)->pointer() + ((scry>>3)*32) + screen*0x2000 + 0x1800;
 
 	for (x=0;x<32;x++)
 	{

@@ -121,9 +121,9 @@ static MACHINE_START( palm )
 {
 	palm_state *state = machine.driver_data<palm_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_read_bank (0x000000, ram_get_size(machine.device(RAM_TAG)) - 1, ram_get_size(machine.device(RAM_TAG)) - 1, 0, "bank1");
-	space->install_write_bank(0x000000, ram_get_size(machine.device(RAM_TAG)) - 1, ram_get_size(machine.device(RAM_TAG)) - 1, 0, "bank1");
-	memory_set_bankptr(machine, "bank1", ram_get_ptr(machine.device(RAM_TAG)));
+	space->install_read_bank (0x000000, machine.device<ram_device>(RAM_TAG)->size() - 1, machine.device<ram_device>(RAM_TAG)->size() - 1, 0, "bank1");
+	space->install_write_bank(0x000000, machine.device<ram_device>(RAM_TAG)->size() - 1, machine.device<ram_device>(RAM_TAG)->size() - 1, 0, "bank1");
+	memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
 
 	state->save_item(NAME(state->m_port_f_latch));
 	state->save_item(NAME(state->m_spim_data));
@@ -136,8 +136,8 @@ static MACHINE_RESET( palm )
 {
     // Copy boot ROM
 	UINT8* bios = machine.region("bios")->base();
-	memset(ram_get_ptr(machine.device(RAM_TAG)), 0, ram_get_size(machine.device(RAM_TAG)));
-	memcpy(ram_get_ptr(machine.device(RAM_TAG)), bios, 0x20000);
+	memset(machine.device<ram_device>(RAM_TAG)->pointer(), 0, machine.device<ram_device>(RAM_TAG)->size());
+	memcpy(machine.device<ram_device>(RAM_TAG)->pointer(), bios, 0x20000);
 
 	palm_state *state = machine.driver_data<palm_state>();
 	state->m_maincpu->reset();
