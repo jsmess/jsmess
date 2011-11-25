@@ -158,7 +158,7 @@ WRITE8_HANDLER ( orion128_memory_page_w )
 	orion_state *state = space->machine().driver_data<orion_state>();
 	if (data!=state->m_orion128_memory_page )
 	{
-		memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(space->machine().device(RAM_TAG)) + (data & 3) * 0x10000);
+		memory_set_bankptr(space->machine(), "bank1", space->machine().device<ram_device>(RAM_TAG)->pointer() + (data & 3) * 0x10000);
 		state->m_orion128_memory_page = (data & 3);
 	}
 }

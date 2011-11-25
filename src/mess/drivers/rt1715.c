@@ -115,7 +115,7 @@ static WRITE8_HANDLER( rt1715_rom_disable )
 	logerror("%s: rt1715_set_bank %02x\n", space->machine().describe_context(), data);
 
 	/* disable ROM, enable RAM */
-	memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(space->machine().device(RAM_TAG)));
+	memory_set_bankptr(space->machine(), "bank1", space->machine().device<ram_device>(RAM_TAG)->pointer());
 }
 
 /***************************************************************************

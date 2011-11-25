@@ -177,7 +177,7 @@ WRITE8_HANDLER ( lviv_io_w )
 	address_space *cpuspace = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	if (state->m_startup_mem_map)
 	{
-		UINT8 *ram = ram_get_ptr(space->machine().device(RAM_TAG));
+		UINT8 *ram = space->machine().device<ram_device>(RAM_TAG)->pointer();
 
 		state->m_startup_mem_map = 0;
 

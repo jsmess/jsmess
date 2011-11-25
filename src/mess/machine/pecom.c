@@ -78,7 +78,7 @@ WRITE8_HANDLER( pecom_bank_w )
 	address_space *space2 = space->machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 	UINT8 *rom = space->machine().region(CDP1802_TAG)->base();
 	space->machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x3fff, "bank1");
-	memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(space->machine().device(RAM_TAG)) + 0x0000);
+	memory_set_bankptr(space->machine(), "bank1", space->machine().device<ram_device>(RAM_TAG)->pointer() + 0x0000);
 
 	if (data==2)
 	{

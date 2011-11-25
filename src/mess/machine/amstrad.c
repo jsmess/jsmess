@@ -1711,7 +1711,7 @@ static WRITE8_HANDLER( aleste_msx_mapper )
 	int ramptr = (data & 0x1f) * 0x4000;
 	int rampage = data & 0x1f;
 	int function = (data & 0xc0) >> 6;
-	UINT8 *ram = ram_get_ptr(space->machine().device(RAM_TAG));
+	UINT8 *ram = space->machine().device<ram_device>(RAM_TAG)->pointer();
 
 	// It is assumed that functions are all mapped to each port &7cff-&7fff, and b8 and b9 are only used for RAM bank location
 	switch(function)
