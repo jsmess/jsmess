@@ -182,7 +182,7 @@ READ8_HANDLER( mz800_bank_0_r )
 
 			/* ram from 0xa000 to 0xbfff */
 			spc->install_readwrite_bank(0xa000, 0xbfff, "bank5");
-			memory_set_bankptr(space->machine(), "bank5", ram_get_ptr(space->machine().device(RAM_TAG)) + 0xa000);
+			memory_set_bankptr(space->machine(), "bank5", space->machine().device<ram_device>(RAM_TAG)->pointer() + 0xa000);
 		}
 	}
 
@@ -194,7 +194,7 @@ WRITE8_HANDLER( mz700_bank_0_w )
 	address_space *spc = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	spc->install_readwrite_bank(0x0000, 0x0fff, "bank1");
-	memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(space->machine().device(RAM_TAG)));
+	memory_set_bankptr(space->machine(), "bank1", space->machine().device<ram_device>(RAM_TAG)->pointer());
 }
 
 WRITE8_HANDLER( mz800_bank_0_w )
@@ -202,7 +202,7 @@ WRITE8_HANDLER( mz800_bank_0_w )
 	address_space *spc = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	spc->install_readwrite_bank(0x0000, 0x7fff, "bank1");
-	memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(space->machine().device(RAM_TAG)));
+	memory_set_bankptr(space->machine(), "bank1", space->machine().device<ram_device>(RAM_TAG)->pointer());
 }
 
 READ8_HANDLER( mz800_bank_1_r )
@@ -212,19 +212,19 @@ READ8_HANDLER( mz800_bank_1_r )
 
 	/* switch in ram from 0x1000 to 0x1fff */
 	spc->install_readwrite_bank(0x1000, 0x1fff, "bank2");
-	memory_set_bankptr(space->machine(), "bank2", ram_get_ptr(space->machine().device(RAM_TAG)) + 0x1000);
+	memory_set_bankptr(space->machine(), "bank2", space->machine().device<ram_device>(RAM_TAG)->pointer() + 0x1000);
 
 	if (mz->m_mz700_mode)
 	{
 		/* ram from 0xc000 to 0xcfff */
 		spc->install_readwrite_bank(0xc000, 0xcfff, "bank6");
-		memory_set_bankptr(space->machine(), "bank6", ram_get_ptr(space->machine().device(RAM_TAG)) + 0xc000);
+		memory_set_bankptr(space->machine(), "bank6", space->machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000);
 	}
 	else
 	{
 		/* ram from 0x8000 to 0xbfff */
 		spc->install_readwrite_bank(0x8000, 0xbfff, "bank4");
-		memory_set_bankptr(space->machine(), "bank4", ram_get_ptr(space->machine().device(RAM_TAG)) + 0x8000);
+		memory_set_bankptr(space->machine(), "bank4", space->machine().device<ram_device>(RAM_TAG)->pointer() + 0x8000);
 	}
 
 	return 0xff;
@@ -241,7 +241,7 @@ WRITE8_HANDLER( mz700_bank_1_w )
 		if (!mz->m_mz700_ram_lock)
 		{
 			spc->install_readwrite_bank(0xd000, 0xffff, "bank7");
-			memory_set_bankptr(space->machine(), "bank7", ram_get_ptr(space->machine().device(RAM_TAG)) + 0xd000);
+			memory_set_bankptr(space->machine(), "bank7", space->machine().device<ram_device>(RAM_TAG)->pointer() + 0xd000);
 			mz->m_mz700_ram_vram = FALSE;
 		}
 	}
@@ -251,7 +251,7 @@ WRITE8_HANDLER( mz700_bank_1_w )
 		if (!mz->m_mz800_ram_lock)
 		{
 			spc->install_readwrite_bank(0xe000, 0xffff, "bank8");
-			memory_set_bankptr(space->machine(), "bank8", ram_get_ptr(space->machine().device(RAM_TAG)) + 0xe000);
+			memory_set_bankptr(space->machine(), "bank8", space->machine().device<ram_device>(RAM_TAG)->pointer() + 0xe000);
 			mz->m_mz800_ram_monitor = FALSE;
 		}
 	}
@@ -330,7 +330,7 @@ WRITE8_HANDLER( mz700_bank_4_w )
 
 		/* rest is ram is always ram in mz700 mode */
 		spc->install_readwrite_bank(0x1000, 0xcfff, "bank2");
-		memory_set_bankptr(space->machine(), "bank2", ram_get_ptr(space->machine().device(RAM_TAG)) + 0x1000);
+		memory_set_bankptr(space->machine(), "bank2", space->machine().device<ram_device>(RAM_TAG)->pointer() + 0x1000);
 	}
 	else
 	{
@@ -341,7 +341,7 @@ WRITE8_HANDLER( mz700_bank_4_w )
 
 		/* ram from 0x2000 to 0x7fff */
 		spc->install_readwrite_bank(0x2000, 0x7fff, "bank3");
-		memory_set_bankptr(space->machine(), "bank3", ram_get_ptr(space->machine().device(RAM_TAG)));
+		memory_set_bankptr(space->machine(), "bank3", space->machine().device<ram_device>(RAM_TAG)->pointer());
 
 		if (mz->m_hires_mode)
 		{
@@ -357,12 +357,12 @@ WRITE8_HANDLER( mz700_bank_4_w )
 
 			/* ram from 0xa000 to 0xbfff */
 			spc->install_readwrite_bank(0xa000, 0xbfff, "bank5");
-			memory_set_bankptr(space->machine(), "bank5", ram_get_ptr(space->machine().device(RAM_TAG)) + 0xa000);
+			memory_set_bankptr(space->machine(), "bank5", space->machine().device<ram_device>(RAM_TAG)->pointer() + 0xa000);
 		}
 
 		/* ram from 0xc000 to 0xdfff */
 		spc->install_readwrite_bank(0xc000, 0xdfff, "bank6");
-		memory_set_bankptr(space->machine(), "bank6", ram_get_ptr(space->machine().device(RAM_TAG)) + 0xc000);
+		memory_set_bankptr(space->machine(), "bank6", space->machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000);
 
 		/* mz800 monitor rom from 0xe000 to 0xffff */
 		spc->install_read_bank(0xe000, 0xffff, "bank8");

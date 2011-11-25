@@ -70,10 +70,10 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0xfa:
 	case 0xfb:
 		/* additional 64k ram */
-		if (ram_get_size(space->machine().device(RAM_TAG)) == 128*1024)
+		if (space->machine().device<ram_device>(RAM_TAG)->size() == 128*1024)
 		{
 			space->install_readwrite_bank(start, end, page_num);
-			memory_set_bankptr(space->machine(), page_num, ram_get_ptr(space->machine().device(RAM_TAG)) + (index - 0xf4) * 0x4000);
+			memory_set_bankptr(space->machine(), page_num, space->machine().device<ram_device>(RAM_TAG)->pointer() + (index - 0xf4) * 0x4000);
 		}
 		else
 		{
@@ -87,7 +87,7 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0xff:
 		/* basic 64k ram */
 		space->install_readwrite_bank(start, end, page_num);
-		memory_set_bankptr(space->machine(), page_num, ram_get_ptr(space->machine().device(RAM_TAG)) + (index - 0xfc) * 0x4000);
+		memory_set_bankptr(space->machine(), page_num, space->machine().device<ram_device>(RAM_TAG)->pointer() + (index - 0xfc) * 0x4000);
 		break;
 
 	default:

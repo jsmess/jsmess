@@ -50,7 +50,7 @@ static READ8_HANDLER( keyboard_r )
 
 static READ8_HANDLER(sysreg_r)
 {
-	return ram_get_ptr(space->machine().device(RAM_TAG))[offset];
+	return space->machine().device<ram_device>(RAM_TAG)->pointer()[offset];
 }
 static WRITE8_HANDLER(sysreg_w)
 {
@@ -75,14 +75,14 @@ static WRITE8_HANDLER(sysreg_w)
 static READ8_HANDLER(text_r)
 {
 	pk8020_state *state = space->machine().driver_data<pk8020_state>();
-	if (state->m_attr == 3) state->m_text_attr=ram_get_ptr(space->machine().device(RAM_TAG))[0x40400+offset];
-	return ram_get_ptr(space->machine().device(RAM_TAG))[0x40000+offset];
+	if (state->m_attr == 3) state->m_text_attr=space->machine().device<ram_device>(RAM_TAG)->pointer()[0x40400+offset];
+	return space->machine().device<ram_device>(RAM_TAG)->pointer()[0x40000+offset];
 }
 
 static WRITE8_HANDLER(text_w)
 {
 	pk8020_state *state = space->machine().driver_data<pk8020_state>();
-	UINT8 *ram = ram_get_ptr(space->machine().device(RAM_TAG));
+	UINT8 *ram = space->machine().device<ram_device>(RAM_TAG)->pointer();
 	ram[0x40000+offset] = data;
 	switch (state->m_attr) {
 		case 0: break;
@@ -95,7 +95,7 @@ static WRITE8_HANDLER(text_w)
 static READ8_HANDLER(gzu_r)
 {
 	pk8020_state *state = space->machine().driver_data<pk8020_state>();
-	UINT8 *addr = ram_get_ptr(space->machine().device(RAM_TAG)) + 0x10000 + (state->m_video_page_access * 0xC000);
+	UINT8 *addr = space->machine().device<ram_device>(RAM_TAG)->pointer() + 0x10000 + (state->m_video_page_access * 0xC000);
 	UINT8 p0 = addr[offset];
 	UINT8 p1 = addr[offset + 0x4000];
 	UINT8 p2 = addr[offset + 0x8000];
@@ -130,7 +130,7 @@ static READ8_HANDLER(gzu_r)
 static WRITE8_HANDLER(gzu_w)
 {
 	pk8020_state *state = space->machine().driver_data<pk8020_state>();
-	UINT8 *addr = ram_get_ptr(space->machine().device(RAM_TAG)) + 0x10000 + (state->m_video_page_access * 0xC000);
+	UINT8 *addr = space->machine().device<ram_device>(RAM_TAG)->pointer() + 0x10000 + (state->m_video_page_access * 0xC000);
 	UINT8 *plane_0 = addr;
 	UINT8 *plane_1 = addr + 0x4000;
 	UINT8 *plane_2 = addr + 0x8000;

@@ -138,7 +138,7 @@ MACHINE_RESET( special )
 static WRITE8_HANDLER( video_memory_w )
 {
 	special_state *state = space->machine().driver_data<special_state>();
-	ram_get_ptr(space->machine().device(RAM_TAG))[0x9000 + offset] = data;
+	space->machine().device<ram_device>(RAM_TAG)->pointer()[0x9000 + offset] = data;
 	state->m_specimx_colorram[offset]  = state->m_specimx_color;
 }
 

@@ -851,7 +851,7 @@ static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 
 	data&=~0x80;
 	data &= ~0x04;		/* floppy drive installed */
-	if ( ram_get_size(device->machine().device(RAM_TAG)) > 64 * 1024 )	/* more than 64KB ram installed */
+	if ( device->machine().device<ram_device>(RAM_TAG)->size() > 64 * 1024 )	/* more than 64KB ram installed */
 		data &= ~0x08;
 	data = ( data & ~0x01 ) | ( pcjr_keyb.latch ? 0x01: 0x00 );
 	if ( ! ( st->m_ppi_portb & 0x08 ) )

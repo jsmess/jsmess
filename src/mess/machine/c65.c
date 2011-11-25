@@ -645,7 +645,7 @@ static READ8_HANDLER( c65_ram_expansion_r )
 {
 	c65_state *state = space->machine().driver_data<c65_state>();
 	UINT8 data = 0xff;
-	if (ram_get_size(space->machine().device(RAM_TAG)) > (128 * 1024))
+	if (space->machine().device<ram_device>(RAM_TAG)->size() > (128 * 1024))
 		data = state->m_expansion_ram.reg;
 	return data;
 }
@@ -656,16 +656,16 @@ static WRITE8_HANDLER( c65_ram_expansion_w )
 	offs_t expansion_ram_begin;
 	offs_t expansion_ram_end;
 
-	if (ram_get_size(space->machine().device(RAM_TAG)) > (128 * 1024))
+	if (space->machine().device<ram_device>(RAM_TAG)->size() > (128 * 1024))
 	{
 		state->m_expansion_ram.reg = data;
 
 		expansion_ram_begin = 0x80000;
-		expansion_ram_end = 0x80000 + (ram_get_size(space->machine().device(RAM_TAG)) - 128*1024) - 1;
+		expansion_ram_end = 0x80000 + (space->machine().device<ram_device>(RAM_TAG)->size() - 128*1024) - 1;
 
 		if (data == 0x00) {
 			space->install_readwrite_bank(expansion_ram_begin, expansion_ram_end,"bank16");
-			memory_set_bankptr(space->machine(), "bank16", ram_get_ptr(space->machine().device(RAM_TAG)) + 128*1024);
+			memory_set_bankptr(space->machine(), "bank16", space->machine().device<ram_device>(RAM_TAG)->pointer() + 128*1024);
 		} else {
 			space->nop_readwrite(expansion_ram_begin, expansion_ram_end);
 		}

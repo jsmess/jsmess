@@ -1555,7 +1555,7 @@ static READ16_HANDLER( x68k_sram_r )
 //  if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
 //      return 0x0000;
 	if(offset == 0x08/2)
-		return ram_get_size(space->machine().device(RAM_TAG)) >> 16;  // RAM size
+		return space->machine().device<ram_device>(RAM_TAG)->size() >> 16;  // RAM size
 #if 0
 	if(offset == 0x46/2)
 		return 0x0024;
@@ -1571,7 +1571,7 @@ static READ32_HANDLER( x68k_sram32_r )
 {
 	x68k_state *state = space->machine().driver_data<x68k_state>();
 	if(offset == 0x08/4)
-		return (ram_get_size(space->machine().device(RAM_TAG)) & 0xffff0000);  // RAM size
+		return (space->machine().device<ram_device>(RAM_TAG)->size() & 0xffff0000);  // RAM size
 #if 0
 	if(offset == 0x46/2)
 		return 0x0024;

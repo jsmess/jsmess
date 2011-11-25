@@ -292,7 +292,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = ram_get_ptr(device->machine().device(RAM_TAG))[ offset + 0x10000];
+					UINT8 data = device->machine().device<ram_device>(RAM_TAG)->pointer()[ offset + 0x10000];
 					*p++ = state->m_col[(data >> 7)];
 					*p++ = state->m_col[(data >> 6)];
 					*p++ = state->m_col[(data >> 5)];
@@ -307,7 +307,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = ram_get_ptr(device->machine().device(RAM_TAG))[ offset + 0x10000];
+					UINT8 data = device->machine().device<ram_device>(RAM_TAG)->pointer()[ offset + 0x10000];
 					*p++ = state->m_col[BIT(data,7)*2 + BIT(data,3)];
 					*p++ = state->m_col[BIT(data,7)*2 + BIT(data,3)];
 					*p++ = state->m_col[BIT(data,6)*2 + BIT(data,2)];
@@ -322,7 +322,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = ram_get_ptr(device->machine().device(RAM_TAG))[ offset + 0x10000];
+					UINT8 data = device->machine().device<ram_device>(RAM_TAG)->pointer()[ offset + 0x10000];
 					*p++ = state->m_col[(data >> 4) & 0xf];
 					*p++ = state->m_col[(data >> 4) & 0xf];
 					*p++ = state->m_col[(data >> 4) & 0xf];

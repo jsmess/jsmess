@@ -344,7 +344,7 @@ static WRITE8_DEVICE_HANDLER (nanos_port_b_w)
 	if (BIT(data,7)) {
 		memory_set_bankptr(device->machine(), "bank1", device->machine().region("maincpu")->base());
 	} else {
-		memory_set_bankptr(device->machine(), "bank1", ram_get_ptr(device->machine().device(RAM_TAG)));
+		memory_set_bankptr(device->machine(), "bank1", device->machine().device<ram_device>(RAM_TAG)->pointer());
 	}
 }
 
