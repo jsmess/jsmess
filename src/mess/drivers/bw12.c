@@ -647,16 +647,16 @@ void bw12_state::machine_start()
 	memory_configure_bank(machine(), "bank1", 2, 2, m_ram->pointer() + 0x10000, 0x8000);
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_bank);
-	state_save_register_global(machine(), m_pit_out2);
-	state_save_register_global_array(machine(), m_key_data);
-	state_save_register_global(machine(), m_key_sin);
-	state_save_register_global(machine(), m_key_stb);
-	state_save_register_global(machine(), m_key_shift);
-	state_save_register_global(machine(), m_fdc_int);
-	state_save_register_global(machine(), m_motor_on);
-	state_save_register_global(machine(), m_motor0);
-	state_save_register_global(machine(), m_motor1);
+	save_item(NAME(m_bank));
+	save_item(NAME(m_pit_out2));
+	save_item(NAME(m_key_data));
+	save_item(NAME(m_key_sin));
+	save_item(NAME(m_key_stb));
+	save_item(NAME(m_key_shift));
+	save_item(NAME(m_fdc_int));
+	save_item(NAME(m_motor_on));
+	save_item(NAME(m_motor0));
+	save_item(NAME(m_motor1));
 }
 
 void bw12_state::machine_reset()

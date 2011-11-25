@@ -417,18 +417,18 @@ void psion_state::machine_start()
 		memory_set_bank(machine(), "rambank", 0);
 	}
 
-	state_save_register_global(machine(), m_kb_counter);
-	state_save_register_global(machine(), m_enable_nmi);
-	state_save_register_global(machine(), m_tcsr_value);
-	state_save_register_global(machine(), m_stby_pwr);
-	state_save_register_global(machine(), m_pulse);
-	state_save_register_global(machine(), m_rom_bank);
-	state_save_register_global(machine(), m_ram_bank);
-	state_save_register_global(machine(), m_port2_ddr);
-	state_save_register_global(machine(), m_port2);
-	state_save_register_global(machine(), m_port6_ddr);
-	state_save_register_global(machine(), m_port6);
-	state_save_register_global_pointer(machine(), m_paged_ram, m_ram_bank_count * 0x4000);
+	save_item(NAME(m_kb_counter));
+	save_item(NAME(m_enable_nmi));
+	save_item(NAME(m_tcsr_value));
+	save_item(NAME(m_stby_pwr));
+	save_item(NAME(m_pulse));
+	save_item(NAME(m_rom_bank));
+	save_item(NAME(m_ram_bank));
+	save_item(NAME(m_port2_ddr));
+	save_item(NAME(m_port2));
+	save_item(NAME(m_port6_ddr));
+	save_item(NAME(m_port6));
+	save_pointer(NAME(m_paged_ram), m_ram_bank_count * 0x4000);
 }
 
 void psion_state::machine_reset()

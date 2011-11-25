@@ -126,8 +126,8 @@ void v1050_state::video_start()
 	m_attr_ram = auto_alloc_array(machine(), UINT8, V1050_VIDEORAM_SIZE);
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_attr);
-	state_save_register_global_pointer(machine(), m_attr_ram, V1050_VIDEORAM_SIZE);
+	save_item(NAME(m_attr));
+	save_pointer(NAME(m_attr_ram), V1050_VIDEORAM_SIZE);
 }
 
 /* Video Update */

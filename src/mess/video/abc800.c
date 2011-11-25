@@ -96,8 +96,8 @@ void abc800_state::video_start()
 	m_fgctl_prom = machine().region("hru2")->base();
 
 	// register for state saving
-	state_save_register_global(machine(), m_hrs);
-	state_save_register_global(machine(), m_fgctl);
+	save_item(NAME(m_hrs));
+	save_item(NAME(m_fgctl));
 }
 
 

@@ -1135,17 +1135,17 @@ void v1050_state::machine_start()
 	bankswitch();
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_int_mask);
-	state_save_register_global(machine(), m_int_state);
-	state_save_register_global(machine(), m_f_int_enb);
-	state_save_register_global(machine(), m_keylatch);
-	state_save_register_global(machine(), m_keydata);
-	state_save_register_global(machine(), m_keyavail);
-	state_save_register_global(machine(), m_kb_so);
-	state_save_register_global(machine(), m_rxrdy);
-	state_save_register_global(machine(), m_txrdy);
-	state_save_register_global(machine(), m_baud_sel);
-	state_save_register_global(machine(), m_bank);
+	save_item(NAME(m_int_mask));
+	save_item(NAME(m_int_state));
+	save_item(NAME(m_f_int_enb));
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_keydata));
+	save_item(NAME(m_keyavail));
+	save_item(NAME(m_kb_so));
+	save_item(NAME(m_rxrdy));
+	save_item(NAME(m_txrdy));
+	save_item(NAME(m_baud_sel));
+	save_item(NAME(m_bank));
 }
 
 void v1050_state::machine_reset()

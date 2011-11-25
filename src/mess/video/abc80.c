@@ -211,8 +211,8 @@ void abc80_state::video_start()
 	m_attr_prom = machine().region("attr")->base();
 
 	// register for state saving
-	state_save_register_global(machine(), m_blink);
-	state_save_register_global(machine(), m_latch);
+	save_item(NAME(m_blink));
+	save_item(NAME(m_latch));
 }
 
 

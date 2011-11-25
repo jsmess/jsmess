@@ -1142,10 +1142,10 @@ void kc85_state::machine_start()
 	memory_set_bank(machine(), "bank2", 0);
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_bank);
-	state_save_register_global(machine(), m_keylatch);
-	state_save_register_global(machine(), m_buzzer);
-	state_save_register_global(machine(), m_bell);
+	save_item(NAME(m_bank));
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_buzzer));
+	save_item(NAME(m_bell));
 }
 
 void pc8201_state::machine_start()
@@ -1170,11 +1170,11 @@ void pc8201_state::machine_start()
 	bankswitch(0);
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_bank);
-	state_save_register_global(machine(), m_keylatch);
-	state_save_register_global(machine(), m_buzzer);
-	state_save_register_global(machine(), m_bell);
-	state_save_register_global(machine(), m_iosel);
+	save_item(NAME(m_bank));
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_buzzer));
+	save_item(NAME(m_bell));
+	save_item(NAME(m_iosel));
 }
 
 void trsm100_state::machine_start()
@@ -1219,10 +1219,10 @@ void trsm100_state::machine_start()
 	memory_set_bank(machine(), "bank2", 0);
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_bank);
-	state_save_register_global(machine(), m_keylatch);
-	state_save_register_global(machine(), m_buzzer);
-	state_save_register_global(machine(), m_bell);
+	save_item(NAME(m_bank));
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_buzzer));
+	save_item(NAME(m_bell));
 }
 
 void tandy200_state::machine_start()
@@ -1238,11 +1238,11 @@ void tandy200_state::machine_start()
 	memory_set_bank(machine(), "bank2", 0);
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_bank);
-	state_save_register_global(machine(), m_tp);
-	state_save_register_global(machine(), m_keylatch);
-	state_save_register_global(machine(), m_buzzer);
-	state_save_register_global(machine(), m_bell);
+	save_item(NAME(m_bank));
+	save_item(NAME(m_tp));
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_buzzer));
+	save_item(NAME(m_bell));
 }
 
 static const cassette_interface kc85_cassette_interface =

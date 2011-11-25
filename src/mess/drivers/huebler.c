@@ -354,11 +354,11 @@ void amu880_state::machine_start()
 	m_kb_rom = machine().region("keyboard")->base();
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_key_d6);
-	state_save_register_global(machine(), m_key_d7);
-	state_save_register_global(machine(), m_key_a4);
-	state_save_register_global(machine(), m_key_a5);
-	state_save_register_global(machine(), m_key_a8);
+	save_item(NAME(m_key_d6));
+	save_item(NAME(m_key_d7));
+	save_item(NAME(m_key_a4));
+	save_item(NAME(m_key_a5));
+	save_item(NAME(m_key_a8));
 }
 
 /* Machine Driver */

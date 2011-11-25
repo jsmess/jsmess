@@ -120,12 +120,12 @@ void tmc600_state::video_start()
 	m_char_rom = machine().region("chargen")->base();
 
 	// register for state saving
-	state_save_register_global_pointer(machine(), m_color_ram, TMC600_PAGE_RAM_SIZE);
+	save_pointer(NAME(m_color_ram), TMC600_PAGE_RAM_SIZE);
 
-	state_save_register_global(machine(), m_vismac_reg_latch);
-	state_save_register_global(machine(), m_vismac_color_latch);
-	state_save_register_global(machine(), m_vismac_bkg_latch);
-	state_save_register_global(machine(), m_blink);
+	save_item(NAME(m_vismac_reg_latch));
+	save_item(NAME(m_vismac_color_latch));
+	save_item(NAME(m_vismac_bkg_latch));
+	save_item(NAME(m_blink));
 }
 
 static const gfx_layout tmc600_charlayout =

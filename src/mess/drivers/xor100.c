@@ -547,11 +547,11 @@ void xor100_state::machine_start()
 	memory_configure_bank(machine(), "bank3", 1, banks, ram + 0xf800, 0x10000);
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_mode);
-	state_save_register_global(machine(), m_bank);
-	state_save_register_global(machine(), m_fdc_irq);
-	state_save_register_global(machine(), m_fdc_drq);
-	state_save_register_global(machine(), m_fdc_dden);
+	save_item(NAME(m_mode));
+	save_item(NAME(m_bank));
+	save_item(NAME(m_fdc_irq));
+	save_item(NAME(m_fdc_drq));
+	save_item(NAME(m_fdc_dden));
 }
 
 void xor100_state::machine_reset()

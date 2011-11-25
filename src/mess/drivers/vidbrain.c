@@ -430,13 +430,13 @@ void vidbrain_state::machine_start()
 	device_set_irq_callback(m_maincpu, vidbrain_int_ack);
 
 	// register for state saving
-	state_save_register_global(machine(), m_vector);
-	state_save_register_global(machine(), m_int_enable);
-	state_save_register_global(machine(), m_ext_int_latch);
-	state_save_register_global(machine(), m_timer_int_latch);
-	state_save_register_global(machine(), m_keylatch);
-	state_save_register_global(machine(), m_joy_enable);
-	state_save_register_global(machine(), m_sound_clk);
+	save_item(NAME(m_vector));
+	save_item(NAME(m_int_enable));
+	save_item(NAME(m_ext_int_latch));
+	save_item(NAME(m_timer_int_latch));
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_joy_enable));
+	save_item(NAME(m_sound_clk));
 }
 
 

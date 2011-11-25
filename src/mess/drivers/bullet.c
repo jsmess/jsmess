@@ -666,16 +666,16 @@ void bullet_state::machine_start()
 	memory_configure_bank(machine(), "bank4", 0, 1, ram + 0xc000, 0);
 
 	// register for state saving
-	state_save_register_global(machine(), m_segst);
-	state_save_register_global(machine(), m_brom);
-	state_save_register_global(machine(), m_exdma);
-	state_save_register_global(machine(), m_buf);
-	state_save_register_global(machine(), m_fdrdy);
-	state_save_register_global(machine(), m_dartardy);
-	state_save_register_global(machine(), m_dartbrdy);
-	state_save_register_global(machine(), m_winrdy);
-	state_save_register_global(machine(), m_exrdy1);
-	state_save_register_global(machine(), m_exrdy2);
+	save_item(NAME(m_segst));
+	save_item(NAME(m_brom));
+	save_item(NAME(m_exdma));
+	save_item(NAME(m_buf));
+	save_item(NAME(m_fdrdy));
+	save_item(NAME(m_dartardy));
+	save_item(NAME(m_dartbrdy));
+	save_item(NAME(m_winrdy));
+	save_item(NAME(m_exrdy1));
+	save_item(NAME(m_exrdy2));
 }
 
 

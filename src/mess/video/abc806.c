@@ -482,22 +482,22 @@ void abc806_state::video_start()
 	m_color_ram = auto_alloc_array(machine(), UINT8, ABC806_ATTR_RAM_SIZE);
 
 	// register for state saving
-	state_save_register_global_pointer(machine(), m_char_ram, ABC806_CHAR_RAM_SIZE);
-	state_save_register_global_pointer(machine(), m_color_ram, ABC806_ATTR_RAM_SIZE);
-	state_save_register_global_pointer(machine(), m_video_ram, ABC806_VIDEO_RAM_SIZE);
-	state_save_register_global(machine(), m_txoff);
-	state_save_register_global(machine(), m_40);
-	state_save_register_global(machine(), m_flshclk_ctr);
-	state_save_register_global(machine(), m_flshclk);
-	state_save_register_global(machine(), m_attr_data);
-	state_save_register_global(machine(), m_hrs);
-	state_save_register_global_array(machine(), m_hrc);
-	state_save_register_global(machine(), m_sync);
-	state_save_register_global(machine(), m_v50_addr);
-	state_save_register_global(machine(), m_hru2_a8);
-	state_save_register_global(machine(), m_vsync_shift);
-	state_save_register_global(machine(), m_vsync);
-	state_save_register_global(machine(), m_d_vsync);
+	save_pointer(NAME(m_char_ram), ABC806_CHAR_RAM_SIZE);
+	save_pointer(NAME(m_color_ram), ABC806_ATTR_RAM_SIZE);
+	save_pointer(NAME(m_video_ram), ABC806_VIDEO_RAM_SIZE);
+	save_item(NAME(m_txoff));
+	save_item(NAME(m_40));
+	save_item(NAME(m_flshclk_ctr));
+	save_item(NAME(m_flshclk));
+	save_item(NAME(m_attr_data));
+	save_item(NAME(m_hrs));
+	save_item(NAME(m_hrc));
+	save_item(NAME(m_sync));
+	save_item(NAME(m_v50_addr));
+	save_item(NAME(m_hru2_a8));
+	save_item(NAME(m_vsync_shift));
+	save_item(NAME(m_vsync));
+	save_item(NAME(m_d_vsync));
 }
 
 
