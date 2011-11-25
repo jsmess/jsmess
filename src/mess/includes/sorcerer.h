@@ -85,7 +85,6 @@ public:
 MACHINE_START( sorcererd );
 MACHINE_START( sorcerer );
 MACHINE_RESET( sorcerer );
-Z80BIN_EXECUTE( sorcerer );
 SNAPSHOT_LOAD( sorcerer );
 
 #endif /* SORCERER_H_ */

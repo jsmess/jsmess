@@ -143,7 +143,6 @@ MACHINE_RESET( mbee128 );
 MACHINE_RESET( mbee256 );
 MACHINE_RESET( mbeett );
 INTERRUPT_GEN( mbee_interrupt );
-Z80BIN_EXECUTE( mbee );
 QUICKLOAD_LOAD( mbee );
 
 

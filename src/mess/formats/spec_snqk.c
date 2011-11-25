@@ -26,11 +26,46 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "ui.h"
 #include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
 #include "sound/ay8910.h"
 #include "formats/spec_snqk.h"
 
+#define LOAD_REG(_cpu, _reg, _data) \
+        do { \
+          cpu_set_reg(_cpu, _reg, (_data)); \
+        } while (0)
+
+#define EXEC_NA "N/A"
+
+/*-------------------------------------------------
+    log_quickload - logs and displays useful
+    data for the end user
+-------------------------------------------------*/
+
+static void log_quickload(const char *type, UINT32 start, UINT32 length, UINT32 exec, const char *exec_format)
+{
+    astring tempstring;
+
+    logerror("Loading %04X bytes of RAM at %04X\n", length, start);
+
+    tempstring.catprintf("Quickload type: %s   Length: %d bytes\n", type, length);
+    tempstring.catprintf("Start: 0x%04X   End: 0x%04X   Exec: ", start, start + length - 1);
+
+    logerror("Quickload loaded.\n");
+    if (!mame_stricmp(exec_format, EXEC_NA))
+        tempstring.cat("N/A");
+    else
+    {
+        logerror("Execution can resume with ");
+        logerror(exec_format, exec);
+        logerror("\n");
+        tempstring.catprintf(exec_format, exec);
+    }
+
+    ui_popup_time(10, "%s", tempstring.cstr());
+}
 
 /*******************************************************************
  *

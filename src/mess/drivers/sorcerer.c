@@ -157,7 +157,7 @@ NOTES (2011-08-08)
 #define ADDRESS_MAP_MODERN
 
 #include "includes/sorcerer.h"
-
+#include "formats/z80bin.h"
 
 static ADDRESS_MAP_START( sorcerer_mem, AS_PROGRAM, 8, sorcerer_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -453,7 +453,7 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 
 	/* quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", sorcerer, "snp", 2)
-	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", sorcerer, 3)
+	MCFG_QUICKLOAD_ADD("quickload", sorcerer, "bin", 3)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, sorcerer_cassette_interface )
 	MCFG_CASSETTE_ADD( CASSETTE2_TAG, sorcerer_cassette_interface )
