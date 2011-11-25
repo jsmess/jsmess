@@ -1618,25 +1618,25 @@ static M6801_INTERFACE( master6801_intf )
 void adam_state::machine_start()
 {
 	// register for state saving
-	state_save_register_global(machine(), m_mioc);
-	state_save_register_global(machine(), m_game);
-	state_save_register_global(machine(), m_adamnet);
-	state_save_register_global_array(machine(), m_txd);
-	state_save_register_global(machine(), m_rxd);
-	state_save_register_global(machine(), m_reset);
-	state_save_register_global(machine(), m_ba);
-	state_save_register_global(machine(), m_dma);
-	state_save_register_global(machine(), m_bwr);
-	state_save_register_global(machine(), m_data_in);
-	state_save_register_global(machine(), m_data_out);
-	state_save_register_global(machine(), m_key_y);
-	state_save_register_global(machine(), m_joy_mode);
-	state_save_register_global(machine(), m_joy_status0);
-	state_save_register_global(machine(), m_joy_status1);
-	state_save_register_global(machine(), m_vdp_nmi);
-	state_save_register_global(machine(), m_wr0);
-	state_save_register_global(machine(), m_wr1);
-	state_save_register_global(machine(), m_track);
+	save_item(NAME(m_mioc));
+	save_item(NAME(m_game));
+	save_item(NAME(m_adamnet));
+	save_item(NAME(m_txd));
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_reset));
+	save_item(NAME(m_ba));
+	save_item(NAME(m_dma));
+	save_item(NAME(m_bwr));
+	save_item(NAME(m_data_in));
+	save_item(NAME(m_data_out));
+	save_item(NAME(m_key_y));
+	save_item(NAME(m_joy_mode));
+	save_item(NAME(m_joy_status0));
+	save_item(NAME(m_joy_status1));
+	save_item(NAME(m_vdp_nmi));
+	save_item(NAME(m_wr0));
+	save_item(NAME(m_wr1));
+	save_item(NAME(m_track));
 }
 
 

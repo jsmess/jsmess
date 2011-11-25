@@ -333,14 +333,14 @@ static PALETTE_INIT( vidbrain )
 void vidbrain_state::video_start()
 {
 	// register for state saving
-	state_save_register_global_array(machine(), m_vlsi_ram);
-	state_save_register_global(machine(), m_y_int);
-	state_save_register_global(machine(), m_fmod);
-	state_save_register_global(machine(), m_bg);
-	state_save_register_global(machine(), m_cmd);
-	state_save_register_global(machine(), m_freeze_x);
-	state_save_register_global(machine(), m_freeze_y);
-	state_save_register_global(machine(), m_field);
+	save_item(NAME(m_vlsi_ram));
+	save_item(NAME(m_y_int));
+	save_item(NAME(m_fmod));
+	save_item(NAME(m_bg));
+	save_item(NAME(m_cmd));
+	save_item(NAME(m_freeze_x));
+	save_item(NAME(m_freeze_y));
+	save_item(NAME(m_field));
 }
 
 

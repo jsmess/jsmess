@@ -928,12 +928,12 @@ static MICRODRIVE_CONFIG( mdv2_config )
 void ql_state::machine_start()
 {
 	// register for state saving
-	state_save_register_global(machine(), m_keylatch);
-	state_save_register_global(machine(), m_ipl);
-	state_save_register_global(machine(), m_comdata);
-	state_save_register_global(machine(), m_baudx4);
-	state_save_register_global(machine(), m_printer_char);
-	state_save_register_global(machine(), m_disk_io_byte);
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_ipl));
+	save_item(NAME(m_comdata));
+	save_item(NAME(m_baudx4));
+	save_item(NAME(m_printer_char));
+	save_item(NAME(m_disk_io_byte));
 }
 
 void ql_state::machine_reset()

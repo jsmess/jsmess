@@ -858,18 +858,18 @@ void tandy2k_state::machine_start()
 	rom[0x1f17] = 0x90;
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_dma_mux);
-	state_save_register_global(machine(), m_kben);
-	state_save_register_global(machine(), m_keylatch);
-	state_save_register_global(machine(), m_extclk);
-	state_save_register_global(machine(), m_rxrdy);
-	state_save_register_global(machine(), m_txrdy);
-	state_save_register_global(machine(), m_pb_sel);
-	state_save_register_global(machine(), m_vidouts);
-	state_save_register_global(machine(), m_clkspd);
-	state_save_register_global(machine(), m_clkcnt);
-	state_save_register_global(machine(), m_outspkr);
-	state_save_register_global(machine(), m_spkrdata);
+	save_item(NAME(m_dma_mux));
+	save_item(NAME(m_kben));
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_extclk));
+	save_item(NAME(m_rxrdy));
+	save_item(NAME(m_txrdy));
+	save_item(NAME(m_pb_sel));
+	save_item(NAME(m_vidouts));
+	save_item(NAME(m_clkspd));
+	save_item(NAME(m_clkcnt));
+	save_item(NAME(m_outspkr));
+	save_item(NAME(m_spkrdata));
 }
 
 /* Machine Driver */

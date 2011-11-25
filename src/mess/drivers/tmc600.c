@@ -252,7 +252,7 @@ void tmc600_state::machine_start()
 	}
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_keylatch);
+	save_item(NAME(m_keylatch));
 }
 
 /* Machine Drivers */

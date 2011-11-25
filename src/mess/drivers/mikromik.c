@@ -739,15 +739,15 @@ void mm1_state::machine_start()
 	m_key_rom = machine().region("keyboard")->base();
 
 	// register for state saving
-	state_save_register_global(machine(), m_sense);
-	state_save_register_global(machine(), m_drive);
-	state_save_register_global(machine(), m_llen);
-	state_save_register_global(machine(), m_intc);
-	state_save_register_global(machine(), m_rx21);
-	state_save_register_global(machine(), m_tx21);
-	state_save_register_global(machine(), m_rcl);
-	state_save_register_global(machine(), m_recall);
-	state_save_register_global(machine(), m_dack3);
+	save_item(NAME(m_sense));
+	save_item(NAME(m_drive));
+	save_item(NAME(m_llen));
+	save_item(NAME(m_intc));
+	save_item(NAME(m_rx21));
+	save_item(NAME(m_tx21));
+	save_item(NAME(m_rcl));
+	save_item(NAME(m_recall));
+	save_item(NAME(m_dack3));
 }
 
 

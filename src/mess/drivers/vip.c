@@ -599,9 +599,9 @@ void vip_state::machine_start()
 	m_vp551->q_w(0);
 
 	/* register for state saving */
-	state_save_register_global_pointer(machine(), m_colorram, VP590_COLOR_RAM_SIZE);
-	state_save_register_global(machine(), m_color);
-	state_save_register_global(machine(), m_keylatch);
+	save_pointer(NAME(m_colorram), VP590_COLOR_RAM_SIZE);
+	save_item(NAME(m_color));
+	save_item(NAME(m_keylatch));
 }
 
 void vip_state::machine_reset()

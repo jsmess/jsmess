@@ -1115,36 +1115,36 @@ void st_state::video_start()
 	m_glue_timer->adjust(machine().primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/16)); // 500 ns
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_shifter_base);
-	state_save_register_global(machine(), m_shifter_ofs);
-	state_save_register_global(machine(), m_shifter_sync);
-	state_save_register_global(machine(), m_shifter_mode);
-	state_save_register_global_array(machine(), m_shifter_palette);
-	state_save_register_global_array(machine(), m_shifter_rr);
-	state_save_register_global_array(machine(), m_shifter_ir);
-	state_save_register_global(machine(), m_shifter_bitplane);
-	state_save_register_global(machine(), m_shifter_shift);
-	state_save_register_global(machine(), m_shifter_h);
-	state_save_register_global(machine(), m_shifter_v);
-	state_save_register_global(machine(), m_shifter_de);
+	save_item(NAME(m_shifter_base));
+	save_item(NAME(m_shifter_ofs));
+	save_item(NAME(m_shifter_sync));
+	save_item(NAME(m_shifter_mode));
+	save_item(NAME(m_shifter_palette));
+	save_item(NAME(m_shifter_rr));
+	save_item(NAME(m_shifter_ir));
+	save_item(NAME(m_shifter_bitplane));
+	save_item(NAME(m_shifter_shift));
+	save_item(NAME(m_shifter_h));
+	save_item(NAME(m_shifter_v));
+	save_item(NAME(m_shifter_de));
 
-	state_save_register_global_array(machine(), m_blitter_halftone);
-	state_save_register_global(machine(), m_blitter_src_inc_x);
-	state_save_register_global(machine(), m_blitter_src_inc_y);
-	state_save_register_global(machine(), m_blitter_dst_inc_x);
-	state_save_register_global(machine(), m_blitter_dst_inc_y);
-	state_save_register_global(machine(), m_blitter_src);
-	state_save_register_global(machine(), m_blitter_dst);
-	state_save_register_global(machine(), m_blitter_endmask1);
-	state_save_register_global(machine(), m_blitter_endmask2);
-	state_save_register_global(machine(), m_blitter_endmask3);
-	state_save_register_global(machine(), m_blitter_xcount);
-	state_save_register_global(machine(), m_blitter_ycount);
-	state_save_register_global(machine(), m_blitter_xcountl);
-	state_save_register_global(machine(), m_blitter_hop);
-	state_save_register_global(machine(), m_blitter_op);
-	state_save_register_global(machine(), m_blitter_ctrl);
-	state_save_register_global(machine(), m_blitter_skew);
+	save_item(NAME(m_blitter_halftone));
+	save_item(NAME(m_blitter_src_inc_x));
+	save_item(NAME(m_blitter_src_inc_y));
+	save_item(NAME(m_blitter_dst_inc_x));
+	save_item(NAME(m_blitter_dst_inc_y));
+	save_item(NAME(m_blitter_src));
+	save_item(NAME(m_blitter_dst));
+	save_item(NAME(m_blitter_endmask1));
+	save_item(NAME(m_blitter_endmask2));
+	save_item(NAME(m_blitter_endmask3));
+	save_item(NAME(m_blitter_xcount));
+	save_item(NAME(m_blitter_ycount));
+	save_item(NAME(m_blitter_xcountl));
+	save_item(NAME(m_blitter_hop));
+	save_item(NAME(m_blitter_op));
+	save_item(NAME(m_blitter_ctrl));
+	save_item(NAME(m_blitter_skew));
 
 	set_screen_parameters();
 
@@ -1161,8 +1161,8 @@ void ste_state::video_start()
 	st_state::video_start();
 
 	// register for state saving
-	state_save_register_global(machine(), m_shifter_lineofs);
-	state_save_register_global(machine(), m_shifter_pixelofs);
+	save_item(NAME(m_shifter_lineofs));
+	save_item(NAME(m_shifter_pixelofs));
 }
 
 //-------------------------------------------------

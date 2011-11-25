@@ -520,14 +520,14 @@ void exelv_state::machine_start()
 	memory_set_bank(machine(), "bank1", 0);
 	
 	/* register for state saving */
-	state_save_register_global(machine(), m_tms7020_porta);
-	state_save_register_global(machine(), m_tms7020_portb);
-	state_save_register_global(machine(), m_tms7041_porta);
-	state_save_register_global(machine(), m_tms7041_portb);
-	state_save_register_global(machine(), m_tms7041_portc);
-	state_save_register_global(machine(), m_tms7041_portd);
-	state_save_register_global(machine(), m_wx318);
-	state_save_register_global(machine(), m_wx319);
+	save_item(NAME(m_tms7020_porta));
+	save_item(NAME(m_tms7020_portb));
+	save_item(NAME(m_tms7041_porta));
+	save_item(NAME(m_tms7041_portb));
+	save_item(NAME(m_tms7041_portc));
+	save_item(NAME(m_tms7041_portd));
+	save_item(NAME(m_wx318));
+	save_item(NAME(m_wx319));
 }
 
 void exelv_state::machine_reset()

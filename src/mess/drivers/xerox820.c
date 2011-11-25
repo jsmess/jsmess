@@ -706,14 +706,14 @@ void xerox820_state::machine_start()
 	floppy_install_load_proc(m_floppy1, xerox820_load_proc);
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_keydata);
-	state_save_register_global(machine(), m_scroll);
-	state_save_register_global(machine(), m_ncset2);
-	state_save_register_global(machine(), m_vatt);
-	state_save_register_global(machine(), m_fdc_irq);
-	state_save_register_global(machine(), m_fdc_drq);
-	state_save_register_global(machine(), m_8n5);
-	state_save_register_global(machine(), m_dsdd);
+	save_item(NAME(m_keydata));
+	save_item(NAME(m_scroll));
+	save_item(NAME(m_ncset2));
+	save_item(NAME(m_vatt));
+	save_item(NAME(m_fdc_irq));
+	save_item(NAME(m_fdc_drq));
+	save_item(NAME(m_8n5));
+	save_item(NAME(m_dsdd));
 }
 
 void xerox820_state::machine_reset()

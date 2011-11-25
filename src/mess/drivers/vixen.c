@@ -417,10 +417,10 @@ void vixen_state::video_start()
 	m_char_rom = machine().region("chargen")->base();
 
 	// register for state saving
-	state_save_register_global(machine(), m_alt);
-	state_save_register_global(machine(), m_256);
-	state_save_register_global(machine(), m_vsync);
-	state_save_register_global_pointer(machine(), m_video_ram, 0x1000);
+	save_item(NAME(m_alt));
+	save_item(NAME(m_256));
+	save_item(NAME(m_vsync));
+	save_pointer(NAME(m_video_ram), 0x1000);
 }
 
 
@@ -796,11 +796,11 @@ void vixen_state::machine_start()
 	memory_configure_bank(machine(), "bank4", 0, 1, m_video_ram, 0);
 
 	// register for state saving
-	state_save_register_global(machine(), m_reset);
-	state_save_register_global(machine(), m_col);
-	state_save_register_global(machine(), m_cmd_d0);
-	state_save_register_global(machine(), m_cmd_d1);
-	state_save_register_global(machine(), m_fdint);
+	save_item(NAME(m_reset));
+	save_item(NAME(m_col));
+	save_item(NAME(m_cmd_d0));
+	save_item(NAME(m_cmd_d1));
+	save_item(NAME(m_fdint));
 }
 
 

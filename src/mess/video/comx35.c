@@ -106,7 +106,7 @@ void comx35_state::video_start()
 	m_charram = auto_alloc_array(machine(), UINT8, COMX35_CHARRAM_SIZE);
 
 	// register for save state
-	state_save_register_global_pointer(machine(), m_charram, COMX35_CHARRAM_SIZE);
+	save_pointer(NAME(m_charram), COMX35_CHARRAM_SIZE);
 }
 
 bool comx35_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)

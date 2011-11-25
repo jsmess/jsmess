@@ -344,7 +344,7 @@ void micronic_state::machine_start()
 	memory_configure_bank(machine(), "bank1", 0x02, m_banks_num - 1, m_ram->pointer(), 0x8000);
 
 	/* register for state saving */
-//  state_save_register_global(machine(), state->);
+//  save_item(NAME(state->));
 }
 
 void micronic_state::machine_reset()

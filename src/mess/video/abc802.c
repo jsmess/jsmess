@@ -212,9 +212,9 @@ void abc802_state::video_start()
 	m_char_rom = machine().region(MC6845_TAG)->base();
 
 	// register for state saving
-	state_save_register_global(machine(), m_flshclk_ctr);
-	state_save_register_global(machine(), m_flshclk);
-	state_save_register_global(machine(), m_80_40_mux);
+	save_item(NAME(m_flshclk_ctr));
+	save_item(NAME(m_flshclk));
+	save_item(NAME(m_80_40_mux));
 }
 
 
