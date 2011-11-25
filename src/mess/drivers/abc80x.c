@@ -1242,14 +1242,14 @@ void abc800_state::machine_start()
 	m_kb_txd = 1;
 
 	// register for state saving
-	state_save_register_global(machine(), m_fetch_charram);
-	state_save_register_global(machine(), m_kb_row);
-	state_save_register_global(machine(), m_kb_txd);
-	state_save_register_global(machine(), m_kb_clk);
-	state_save_register_global(machine(), m_kb_stb);
-	state_save_register_global(machine(), m_pling);
-	state_save_register_global(machine(), m_sio_rxcb);
-	state_save_register_global(machine(), m_sio_txcb);
+	save_item(NAME(m_fetch_charram));
+	save_item(NAME(m_kb_row));
+	save_item(NAME(m_kb_txd));
+	save_item(NAME(m_kb_clk));
+	save_item(NAME(m_kb_stb));
+	save_item(NAME(m_pling));
+	save_item(NAME(m_sio_rxcb));
+	save_item(NAME(m_sio_txcb));
 }
 
 
@@ -1278,9 +1278,9 @@ void abc800_state::machine_reset()
 void abc802_state::machine_start()
 {
 	// register for state saving
-	state_save_register_global(machine(), m_lrs);
-	state_save_register_global(machine(), m_pling);
-	state_save_register_global(machine(), m_keylatch);
+	save_item(NAME(m_lrs));
+	save_item(NAME(m_pling));
+	save_item(NAME(m_keylatch));
 }
 
 
@@ -1334,11 +1334,11 @@ void abc806_state::machine_start()
 	}
 
 	// register for state saving
-	state_save_register_global(machine(), m_keydtr);
-	state_save_register_global(machine(), m_eme);
-	state_save_register_global(machine(), m_fetch_charram);
-	state_save_register_global_array(machine(), m_map);
-	state_save_register_global(machine(), m_keylatch);
+	save_item(NAME(m_keydtr));
+	save_item(NAME(m_eme));
+	save_item(NAME(m_fetch_charram));
+	save_item(NAME(m_map));
+	save_item(NAME(m_keylatch));
 }
 
 
