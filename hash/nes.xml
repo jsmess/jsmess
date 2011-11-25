@@ -31220,9 +31220,9 @@
 		</part>
 	</software>
 
-	<software name="aztec2" cloneof="tombtres">
+	<software name="asteca2" cloneof="tombtres">
 		<!-- Serial: TKS-G5 - Release Date: 1988-08-03 - Alternative Title: 太陽の神殿 アステカ２ -->
-		<description>Taiyou no Shinden: Aztec 2 (Jpn)</description>
+		<description>Taiyou no Shinden: Asteka II (Jpn)</description>
 		<year>1988</year>
 		<publisher>Tokyo Shoseki</publisher>
 		<part name="cart" interface="nes_cart">
@@ -36902,7 +36902,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Airball (Earlier Prototype)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Tengen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -36919,7 +36919,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Airball (Later Prototype)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Tengen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -50576,7 +50576,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 <!-- nointro -->
-	<software name="3dblocka" cloneof="3dblock" supported="partial">
+	<software name="3dblocka" cloneof="3dblock" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>3-D Block (Asia, Hwang Shinwei)</description>
 		<year>1990</year>
@@ -50627,7 +50627,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="2002pk">
+	<software name="2002pk" supported="partial">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>2002 World Cup PK (Asia)</description>
 		<year>200?</year>
@@ -51521,7 +51521,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="mc_dance">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>FengLi Dance 12 in 1 &amp; 24 in 1(Chi)</description>
+		<description>FengLi Dance 12 in 1 &amp; 24 in 1 (Chi)</description>
 		<year>19??</year>
 		<publisher>FengLi</publisher>
 		<part name="cart" interface="nes_cart">
@@ -57593,7 +57593,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="abm5">
+	<software name="abm5" supported="partial">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>ABM Study Card V5.0 (Chi)</description>
 		<year>19??</year>
@@ -58660,9 +58660,10 @@ Other
 		</part>
 	</software>
 
+<!-- This seems to have infinite lives! -->
 	<software name="1945">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>1945 (Sky Shark pirate)</description>
+		<description>1945 (Sky Shark pirate, Hacked?)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -64915,7 +64916,7 @@ be better to redump them properly. -->
 
 	<software name="mc_76a" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>76 in 1(Alt Games)</description>
+		<description>76 in 1 (Alt Games)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">

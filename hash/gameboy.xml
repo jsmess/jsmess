@@ -13444,7 +13444,7 @@
 
 	<software name="rghostb" cloneof="garfield">
 		<!-- Serial: DMG-G7 - Release Date:  -->
-		<description>The Real Ghostbusters(USA)</description>
+		<description>The Real Ghostbusters (USA)</description>
 		<year>1993</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="gameboy_cart">

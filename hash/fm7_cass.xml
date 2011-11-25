@@ -1181,9 +1181,9 @@
 		</part>
 	</software>
 
-<!-- 信長の野望(初代) -->
+<!-- 信長の野望 (初代) -->
 	<software name="nobu">
-		<description>信長の野望(初代)</description>
+		<description>信長の野望 (初代)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="fm7_cass">

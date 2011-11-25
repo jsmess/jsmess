@@ -23997,7 +23997,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="worldilljp" cloneof="worldill">
-		<description>World of Illusion - Fushigi na Magic Box(Jpn, Prototype)</description>
+		<description>World of Illusion - Fushigi na Magic Box (Jpn, Prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">

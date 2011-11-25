@@ -12,7 +12,7 @@
 		</part>
 	</software>
 
-	<software name="pichubro">
+	<software name="pichubro" supported="partial">
 		<description>Pichu Bros. Mini (Jpn)</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
@@ -122,7 +122,7 @@
 		</part>
 	</software>
 
-	<software name="pparty">
+	<software name="pparty" supported="partial">
 		<description>Pok&#233;mon Party Mini (Euro)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -133,7 +133,7 @@
 		</part>
 	</software>
 
-	<software name="ppartyu" cloneof="pparty">
+	<software name="ppartyu" cloneof="pparty" supported="partial">
 		<description>Pok&#233;mon Party Mini (USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -276,7 +276,7 @@
 		</part>
 	</software>
 
-	<software name="pptslowj">
+	<software name="pptslowj" cloneof="pptbasej">
 		<description>Pok&#233;mon Party Mini - Slowking's Judge (Euro, GameCube)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -287,7 +287,7 @@
 		</part>
 	</software>
 
-	<software name="ppuzzlc">
+	<software name="ppuzzlc" supported="partial">
 		<description>Pok&#233;mon Puzzle Collection (USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -298,7 +298,7 @@
 		</part>
 	</software>
 
-	<software name="ppuzzlc2">
+	<software name="ppuzzlc2" supported="partial">
 		<description>Pok&#233;mon Puzzle Collection Vol. 2 (Jpn)</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
@@ -309,7 +309,7 @@
 		</part>
 	</software>
 
-	<software name="ppuzzlcfp" cloneof="ppuzzlc">
+	<software name="ppuzzlcfp" cloneof="ppuzzlc" supported="partial">
 		<description>Pok&#233;mon Puzzle Collection (Fra, GameCube Preview)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -320,7 +320,7 @@
 		</part>
 	</software>
 
-	<software name="ppuzzlcg" cloneof="ppuzzlc">
+	<software name="ppuzzlcg" cloneof="ppuzzlc" supported="partial">
 		<description>Pok&#233;mon Puzzle Collection (Ger)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -331,7 +331,7 @@
 		</part>
 	</software>
 
-	<software name="ppuzzlcgp" cloneof="ppuzzlc">
+	<software name="ppuzzlcgp" cloneof="ppuzzlc" supported="partial">
 		<description>Pok&#233;mon Puzzle Collection (Ger, GameCube Preview)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -342,7 +342,7 @@
 		</part>
 	</software>
 
-	<software name="ppuzzlcj" cloneof="ppuzzlc">
+	<software name="ppuzzlcj" cloneof="ppuzzlc" supported="partial">
 		<description>Pok&#233;mon Puzzle Collection (Jpn)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -353,7 +353,7 @@
 		</part>
 	</software>
 
-	<software name="ppuzzlcj1" cloneof="ppuzzlc">
+	<software name="ppuzzlcj1" cloneof="ppuzzlc" supported="partial">
 		<description>Pok&#233;mon Puzzle Collection (Jpn, GameCube)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -364,7 +364,7 @@
 		</part>
 	</software>
 
-	<software name="ppuzzlcp" cloneof="ppuzzlc">
+	<software name="ppuzzlcp" cloneof="ppuzzlc" supported="partial">
 		<description>Pok&#233;mon Puzzle Collection (USA, GameCube Preview)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
