@@ -23449,7 +23449,7 @@
 	</software>
 
 	<software name="pollypcku" cloneof="pollypck">
-		<description>Polly Pocket! - Super Splash Island(USA)</description>
+		<description>Polly Pocket! - Super Splash Island (USA)</description>
 		<year>2003</year>
 		<publisher>Vivendi Universal</publisher>
 		<part name="cart" interface="gba_cart">

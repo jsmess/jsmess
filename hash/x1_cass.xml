@@ -361,7 +361,7 @@
 		</part>
 	</software>
 
-	<software name="golfa" cloneof="Golf">
+	<software name="golfa" cloneof="golf">
 		<description>Nintendo no Golf (Alt)</description>
 		<year>19??</year>
 		<publisher>Hudson Soft</publisher>

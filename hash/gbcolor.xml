@@ -12660,7 +12660,7 @@ Undumped Pirates:
 
 	<software name="roxj" cloneof="rox">
 		<!-- Serial: DMG-ARXJ - Release Date: 1999-03-05 - Alt. Title: ロックス 6=Six - Notes: GBC only -->
-		<description>Rox - 6=Six(Jpn)</description>
+		<description>Rox - 6=Six (Jpn)</description>
 		<year>1999</year>
 		<publisher>Altron</publisher>
 		<part name="cart" interface="gameboy_cart">
