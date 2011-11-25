@@ -298,57 +298,6 @@ READ8_MEMBER(sorcerer_state::sorcerer_ff_r)
 	return data;
 }
 
-
-
-/**********************************************************************************************************/
-
-Z80BIN_EXECUTE( sorcerer )
-{
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-
-	if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space->read_byte(0xdffa) != 0xc3))
-		return;					/* can't run a program if the cartridge isn't in */
-
-	/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
-    1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
-    2. If autorunning, jump to C689 (command processor), else jump to C3DD (READY prompt).
-    Important addresses:
-        01D5 = start (load) address of a conventional basic program
-        C858 = an autorun basic program will have this exec address on the tape
-        C3DD = part of basic that displays READY and lets user enter input */
-
-	if ((start_address == 0x1d5) || (execute_address == 0xc858))
-	{
-		UINT8 i;
-		static const UINT8 data[]={
-			0xcd, 0x26, 0xc4,	// CALL C426    ;set up other pointers
-			0x21, 0xd4, 1,		// LD HL,01D4   ;start of program address (used by C689)
-			0x36, 0,		// LD (HL),00   ;make sure dummy end-of-line is there
-			0xc3, 0x89, 0xc6	// JP C689  ;run program
-		};
-
-		for (i = 0; i < ARRAY_LENGTH(data); i++)
-			space->write_byte(0xf01f + i, data[i]);
-
-		if (!autorun)
-			space->write_word(0xf028,0xc3dd);
-
-		/* tell BASIC where program ends */
-		space->write_byte(0x1b7, end_address & 0xff);
-		space->write_byte(0x1b8, (end_address >> 8) & 0xff);
-
-		if ((execute_address != 0xc858) && autorun)
-			space->write_word(0xf028, execute_address);
-
-		cpu_set_reg(machine.device("maincpu"), STATE_GENPC, 0xf01f);
-	}
-	else
-	{
-		if (autorun)
-			cpu_set_reg(machine.device("maincpu"), STATE_GENPC, execute_address);
-	}
-}
-
 /******************************************************************************
  Snapshot Handling
 ******************************************************************************/

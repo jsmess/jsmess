@@ -186,6 +186,8 @@ hardware.
 #include "super80.lh"
 #include "includes/super80.h"
 
+#include "formats/z80bin.h"
+
 #define MASTER_CLOCK			(XTAL_12MHz)
 #define PIXEL_CLOCK			(MASTER_CLOCK/2)
 #define HTOTAL				(384)
@@ -675,7 +677,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* quickload */
-	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", default, 3)
+	MCFG_QUICKLOAD_ADD("quickload", super80, "bin", 3)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, super80_cassette_interface )
@@ -748,7 +750,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
 
 	/* quickload */
-	MCFG_Z80BIN_QUICKLOAD_ADD("quickload", default, 3)
+	MCFG_QUICKLOAD_ADD("quickload", super80, "bin", 3)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, super80_cassette_interface )

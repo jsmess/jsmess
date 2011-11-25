@@ -762,24 +762,6 @@ DRIVER_INIT( mbeett )
 
 ************************************************************/
 
-Z80BIN_EXECUTE( mbee )
-{
-	device_t *cpu = machine.device("maincpu");
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-
-	space->write_word(0xa6, execute_address);			/* fix the EXEC command */
-
-	if (autorun)
-	{
-		space->write_word(0xa2, execute_address);		/* fix warm-start vector to get around some copy-protections */
-		cpu_set_reg(cpu, STATE_GENPC, execute_address);
-	}
-	else
-	{
-		space->write_word(0xa2, 0x8517);
-	}
-}
-
 QUICKLOAD_LOAD( mbee )
 {
 	mbee_state *state = image.device().machine().driver_data<mbee_state>();
