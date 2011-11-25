@@ -55,7 +55,7 @@ static WRITE8_HANDLER(spc1000_iplk_w)
 		memory_set_bankptr(space->machine(), "bank1", mem);
 		memory_set_bankptr(space->machine(), "bank3", mem);
 	} else {
-		UINT8 *ram = ram_get_ptr(space->machine().device(RAM_TAG));
+		UINT8 *ram = space->machine().device<ram_device>(RAM_TAG)->pointer();
 		memory_set_bankptr(space->machine(), "bank1", ram);
 		memory_set_bankptr(space->machine(), "bank3", ram + 0x8000);
 	}
@@ -70,7 +70,7 @@ static READ8_HANDLER(spc1000_iplk_r)
 		memory_set_bankptr(space->machine(), "bank1", mem);
 		memory_set_bankptr(space->machine(), "bank3", mem);
 	} else {
-		UINT8 *ram = ram_get_ptr(space->machine().device(RAM_TAG));
+		UINT8 *ram = space->machine().device<ram_device>(RAM_TAG)->pointer();
 		memory_set_bankptr(space->machine(), "bank1", ram);
 		memory_set_bankptr(space->machine(), "bank3", ram + 0x8000);
 	}
@@ -228,7 +228,7 @@ static MACHINE_RESET(spc1000)
 	spc1000_state *state = machine.driver_data<spc1000_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *mem = machine.region("maincpu")->base();
-	UINT8 *ram = ram_get_ptr(machine.device(RAM_TAG));
+	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	space->install_read_bank(0x0000, 0x7fff, "bank1");
 	space->install_read_bank(0x8000, 0xffff, "bank3");
