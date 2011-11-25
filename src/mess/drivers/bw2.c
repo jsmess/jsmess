@@ -23,6 +23,7 @@
 
     TODO:
 
+    - floppy broken once again
     - modem card
 
 ***************************************************************************/
@@ -572,7 +573,7 @@ bool bw2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 
 static MSM6255_CHAR_RAM_READ( bw2_charram_r )
 {
-	bw2_state *state =  device->machine().driver_data<bw2_state>();
+	bw2_state *state = device->machine().driver_data<bw2_state>();
 
 	return state->m_video_ram[ma & 0x3fff];
 }
@@ -625,24 +626,22 @@ static const wd17xx_interface fdc_intf =
 void bw2_state::machine_start()
 {
 	/* allocate memory */
-	m_work_ram = auto_alloc_array(machine(), UINT8, m_ram->size());
 	m_video_ram = auto_alloc_array(machine(), UINT8, BW2_VIDEORAM_SIZE);
 	m_ramcard_ram = auto_alloc_array(machine(), UINT8, BW2_RAMCARD_SIZE);
 
 	/* memory banking */
-	memory_configure_bank(machine(), "bank1", BANK_RAM1, 1, m_work_ram, 0);
+	memory_configure_bank(machine(), "bank1", BANK_RAM1, 1, m_ram->pointer(), 0);
 	memory_configure_bank(machine(), "bank1", BANK_VRAM, 1, m_video_ram, 0);
 	memory_configure_bank(machine(), "bank1", BANK_ROM, 1, machine().region("ic1")->base(), 0);
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_kb_row);
-	state_save_register_global_pointer(machine(), m_work_ram, m_ram->size());
-	state_save_register_global_pointer(machine(), m_ramcard_ram, BW2_RAMCARD_SIZE);
-	state_save_register_global(machine(), m_bank);
-	state_save_register_global(machine(), m_drive);
-	state_save_register_global(machine(), m_mtron);
-	state_save_register_global(machine(), m_mfdbk);
-	state_save_register_global_pointer(machine(), m_video_ram, BW2_VIDEORAM_SIZE);
+	save_item(NAME(m_kb_row));
+	save_pointer(NAME(m_ramcard_ram), BW2_RAMCARD_SIZE);
+	save_item(NAME(m_bank));
+	save_item(NAME(m_drive));
+	save_item(NAME(m_mtron));
+	save_item(NAME(m_mfdbk));
+	save_pointer(NAME(m_video_ram), BW2_VIDEORAM_SIZE);
 }
 
 void bw2_state::machine_reset()
@@ -654,9 +653,9 @@ void bw2_state::machine_reset()
 		// RAMCARD installed
 
 		memory_configure_bank(machine(), "bank1", BANK_RAMCARD_ROM, 1, machine().region("ramcard")->base(), 0);
-		memory_configure_bank(machine(), "bank1", BANK_RAM3, 2, m_work_ram + 0x8000, 0x8000);
+		memory_configure_bank(machine(), "bank1", BANK_RAM3, 2, m_ram->pointer() + 0x8000, 0x8000);
 		memory_configure_bank(machine(), "bank1", BANK_RAMCARD_RAM, 1, m_ramcard_ram, 0);
-		memory_configure_bank(machine(), "bank1", BANK_RAM6, 1, m_work_ram + 0x18000, 0);
+		memory_configure_bank(machine(), "bank1", BANK_RAM6, 1, m_ram->pointer() + 0x18000, 0);
 
 		io->install_write_handler(0x30, 0x30, 0, 0x0f, write8_delegate(FUNC(bw2_state::ramcard_bank_w), this), 0);
 	}
@@ -664,7 +663,7 @@ void bw2_state::machine_reset()
 	{
 		// no RAMCARD
 
-		memory_configure_bank(machine(), "bank1", BANK_RAM2, 5, m_work_ram + 0x8000, 0x8000);
+		memory_configure_bank(machine(), "bank1", BANK_RAM2, 5, m_ram->pointer() + 0x8000, 0x8000);
 
 		io->unmap_write(0x30, 0x30, 0, 0x0f);
 	}

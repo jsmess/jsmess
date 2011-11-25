@@ -492,6 +492,8 @@ WRITE_LINE_DEVICE_HANDLER(port_sn76477_envelope_1_w)
 	sn76477_envelope_1_w(device,state);
 }
 
+
+
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
@@ -746,9 +748,9 @@ void abc80_state::machine_start()
 	m_mmu_rom = machine().region("mmu")->base();
 
 	// register for state saving
-	state_save_register_global(machine(), m_key_data);
-	state_save_register_global(machine(), m_key_strobe);
-	state_save_register_global(machine(), m_pio_astb);
+	save_item(NAME(m_key_data));
+	save_item(NAME(m_key_strobe));
+	save_item(NAME(m_pio_astb));
 }
 
 
