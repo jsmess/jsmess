@@ -46,7 +46,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define VERBOSE 0
+#define VERBOSE 1
 
 #define VHDSTATUS_OK					0x00
 #define VHDSTATUS_NO_VHD_ATTACHED		0x02
@@ -131,8 +131,7 @@ bool coco_vhd_image_device::call_load()
 
 void coco_vhd_image_device::coco_vhd_readwrite(UINT8 data)
 {
-	int result;
-	void *ptr;
+	int result, i;
 	UINT32 bytes_to_read;
 	UINT32 bytes_to_write;
 	UINT64 seek_position;
@@ -178,12 +177,11 @@ void coco_vhd_image_device::coco_vhd_readwrite(UINT8 data)
 	switch(data)
 	{
 		case VHDCMD_READ: /* Read sector */
-			ptr = m_cpu_space->get_write_ptr(m_buffer_address);
-			memset(ptr, 0, 256);
+			memset(buffer, 0, 256);
 			if (total_size > seek_position)
 			{
 				bytes_to_read = (UINT32) MIN((UINT64) 256, total_size - seek_position);
-				result = fread(ptr, bytes_to_read);
+				result = fread(buffer, bytes_to_read);
 				if (result != bytes_to_read)
 				{
 					m_status = VHDSTATUS_ACCESS_DENIED;
@@ -191,13 +189,20 @@ void coco_vhd_image_device::coco_vhd_readwrite(UINT8 data)
 				}
 			}
 
+			/* write the bytes to memory */
+			for (i = 0; i < 256; i++)
+				m_cpu_space->write_byte(m_buffer_address + i, buffer[i]);
+
 			m_status = VHDSTATUS_OK;
 			break;
 
 		case VHDCMD_WRITE: /* Write Sector */
-			ptr = m_cpu_space->get_read_ptr(m_buffer_address);
-			result = fwrite(ptr, 256);
+			/* read the bytes from memory */
+			for (i = 0; i < 256; i++)
+				buffer[i] = m_cpu_space->read_byte(m_buffer_address + i);
 
+			/* and write to disk */
+			result = fwrite(buffer, 256);
 			if (result != 256)
 			{
 				m_status = VHDSTATUS_ACCESS_DENIED;
