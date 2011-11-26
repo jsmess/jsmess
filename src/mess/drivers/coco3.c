@@ -260,7 +260,8 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, coco_state::coco_cassette_interface)
 	MCFG_BITBANGER_ADD(BITBANGER_TAG, coco_state::coco_bitbanger_config)
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_state::cartridge_config, coco_cart, "fdcv11", NULL)
-	MCFG_COCO_VHD_ADD(VHD_TAG)
+	MCFG_COCO_VHD_ADD(VHD0_TAG)
+	MCFG_COCO_VHD_ADD(VHD1_TAG)
 
 	// video hardware
 	MCFG_DEVICE_ADD(GIME_TAG, GIME_NTSC, XTAL_3_579545MHz)
