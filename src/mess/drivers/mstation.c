@@ -439,7 +439,7 @@ void mstation_state::machine_start()
 
 	// allocate the videoram
 	m_vram = (UINT8*)machine().region_alloc( "vram", 9600, 1, ENDIANNESS_LITTLE )->base();
-	m_ram_base = (UINT8*)ram_get_ptr(machine().device(RAM_TAG));
+	m_ram_base = (UINT8*)machine().device<ram_device>(RAM_TAG)->pointer();
 
 	// map firsh RAM bank at 0xc000-0xffff
 	memory_set_bankptr(machine(), "sysram", m_ram_base);

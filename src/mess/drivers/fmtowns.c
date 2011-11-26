@@ -1151,13 +1151,13 @@ void towns_state::towns_update_video_banks(address_space& space)
 
 //      memory_set_bankptr(space.machine(),1,towns_gfxvram+(towns_vram_rplane*0x8000));
 //      memory_set_bankptr(space.machine(),2,towns_txtvram);
-//      memory_set_bankptr(space.machine(),3,ram_get_ptr(state->m_messram)+0xc9000);
+//      memory_set_bankptr(space.machine(),3,state->m_messram->pointer()+0xc9000);
 //      if(towns_ankcg_enable != 0)
 //          memory_set_bankptr(space.machine(),4,ROM+0x180000+0x3d000);  // ANK CG 8x8
 //      else
 //          memory_set_bankptr(space.machine(),4,towns_txtvram+0x2000);
 //      memory_set_bankptr(space.machine(),5,towns_txtvram+0x2000);
-//      memory_set_bankptr(space.machine(),10,ram_get_ptr(state->m_messram)+0xca800);
+//      memory_set_bankptr(space.machine(),10,state->m_messram->pointer()+0xca800);
 		if(m_towns_ankcg_enable != 0)
 			memory_set_bankptr(space.machine(),"bank6",ROM+0x180000+0x3d800);  // ANK CG 8x16
 		else

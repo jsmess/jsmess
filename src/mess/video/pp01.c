@@ -21,7 +21,7 @@ SCREEN_UPDATE( pp01 )
 	UINT8 code_r,code_g,code_b;
 	UINT8 col;
 	int y, x, b;
-	UINT8 *ram = ram_get_ptr(screen->machine().device(RAM_TAG));
+	UINT8 *ram = screen->machine().device<ram_device>(RAM_TAG)->pointer();
 
 	for (y = 0; y < 256; y++)
 	{

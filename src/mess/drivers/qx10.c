@@ -244,7 +244,7 @@ void qx10_state::update_memory_mapping()
 	}
 	else
 	{
-		memory_set_bankptr(machine(), "bank1", ram_get_ptr(machine().device(RAM_TAG)) + drambank*64*1024);
+		memory_set_bankptr(machine(), "bank1", machine().device<ram_device>(RAM_TAG)->pointer() + drambank*64*1024);
 	}
 	if (m_memcmos)
 	{
@@ -252,7 +252,7 @@ void qx10_state::update_memory_mapping()
 	}
 	else
 	{
-		memory_set_bankptr(machine(), "bank2", ram_get_ptr(machine().device(RAM_TAG)) + drambank*64*1024 + 32*1024);
+		memory_set_bankptr(machine(), "bank2", machine().device<ram_device>(RAM_TAG)->pointer() + drambank*64*1024 + 32*1024);
 	}
 }
 

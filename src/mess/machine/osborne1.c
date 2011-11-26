@@ -23,7 +23,7 @@ WRITE8_MEMBER( osborne1_state::osborne1_0000_w )
 {
 	/* Check whether regular RAM is enabled */
 	if ( ! m_bank2_enabled || ( m_in_irq_handler && m_bankswitch == RAMMODE ) )
-		ram_get_ptr(machine().device(RAM_TAG))[ offset ] = data;
+		machine().device<ram_device>(RAM_TAG)->pointer()[ offset ] = data;
 }
 
 
@@ -31,7 +31,7 @@ WRITE8_MEMBER( osborne1_state::osborne1_1000_w )
 {
 	/* Check whether regular RAM is enabled */
 	if ( ! m_bank2_enabled || ( m_in_irq_handler && m_bankswitch == RAMMODE ) )
-		ram_get_ptr(machine().device(RAM_TAG))[ 0x1000 + offset ] = data;
+		machine().device<ram_device>(RAM_TAG)->pointer()[ 0x1000 + offset ] = data;
 }
 
 
@@ -41,7 +41,7 @@ READ8_MEMBER( osborne1_state::osborne1_2000_r )
 
 	/* Check whether regular RAM is enabled */
 	if ( ! m_bank2_enabled )
-		data = ram_get_ptr(machine().device(RAM_TAG))[ 0x2000 + offset ];
+		data = machine().device<ram_device>(RAM_TAG)->pointer()[ 0x2000 + offset ];
 	else
 	{
 		switch( offset & 0x0F00 )
@@ -85,12 +85,12 @@ WRITE8_MEMBER( osborne1_state::osborne1_2000_w )
 {
 	/* Check whether regular RAM is enabled */
 	if ( ! m_bank2_enabled )
-		ram_get_ptr(machine().device(RAM_TAG))[ 0x2000 + offset ] = data;
+		machine().device<ram_device>(RAM_TAG)->pointer()[ 0x2000 + offset ] = data;
 	else
 	{
 		if ( m_in_irq_handler && m_bankswitch == RAMMODE )
 		{
-			ram_get_ptr(machine().device(RAM_TAG))[ 0x2000 + offset ] = data;
+			machine().device<ram_device>(RAM_TAG)->pointer()[ 0x2000 + offset ] = data;
 		}
 		/* Handle writes to the I/O area */
 		switch( offset & 0x0F00 )
@@ -115,7 +115,7 @@ WRITE8_MEMBER( osborne1_state::osborne1_3000_w )
 {
 	/* Check whether regular RAM is enabled */
 	if ( ! m_bank2_enabled || ( m_in_irq_handler && m_bankswitch == RAMMODE ) )
-		ram_get_ptr(machine().device(RAM_TAG))[ 0x3000 + offset ] = data;
+		machine().device<ram_device>(RAM_TAG)->pointer()[ 0x3000 + offset ] = data;
 }
 
 
@@ -158,11 +158,11 @@ WRITE8_MEMBER( osborne1_state::osborne1_bankswitch_w )
 	}
 	else
 	{
-		memory_set_bankptr(machine(),"bank1", ram_get_ptr(machine().device(RAM_TAG)) );
-		memory_set_bankptr(machine(),"bank2", ram_get_ptr(machine().device(RAM_TAG)) + 0x1000 );
-		memory_set_bankptr(machine(),"bank3", ram_get_ptr(machine().device(RAM_TAG)) + 0x3000 );
+		memory_set_bankptr(machine(),"bank1", machine().device<ram_device>(RAM_TAG)->pointer() );
+		memory_set_bankptr(machine(),"bank2", machine().device<ram_device>(RAM_TAG)->pointer() + 0x1000 );
+		memory_set_bankptr(machine(),"bank3", machine().device<ram_device>(RAM_TAG)->pointer() + 0x3000 );
 	}
-	m_bank4_ptr = ram_get_ptr(machine().device(RAM_TAG)) + ( ( m_bank3_enabled ) ? 0x10000 : 0xF000 );
+	m_bank4_ptr = machine().device<ram_device>(RAM_TAG)->pointer() + ( ( m_bank3_enabled ) ? 0x10000 : 0xF000 );
 	memory_set_bankptr(machine(),"bank4", m_bank4_ptr );
 	m_bankswitch = offset;
 	m_in_irq_handler = 0;

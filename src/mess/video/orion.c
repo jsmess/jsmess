@@ -25,7 +25,7 @@ SCREEN_UPDATE( orion128 )
 	int part1addr = (3-((state->m_orion128_video_page & 3) | orionproshift)) * 0x4000;
 	int part2addr = part1addr + 0x10000;
 	int video_mode = state->m_orion128_video_mode & state->m_video_mode_mask;
-	UINT8 *ram = ram_get_ptr(screen->machine().device(RAM_TAG));
+	UINT8 *ram = screen->machine().device<ram_device>(RAM_TAG)->pointer();
 
 	for (x = 0; x < state->m_orion128_video_width; x++)
 	{

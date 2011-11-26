@@ -90,8 +90,8 @@ SCREEN_UPDATE( mac )
 	int y, x, b;
 	mac_state *state = screen->machine().driver_data<mac_state>();
 
-	video_base = ram_get_size(screen->machine().device(RAM_TAG)) - (state->m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
-	video_ram = (const UINT16 *) (ram_get_ptr(screen->machine().device(RAM_TAG)) + video_base);
+	video_base = ram_get_size(screen->machine().device<ram_device>(RAM_TAG)) - (state->m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	video_ram = (const UINT16 *) (screen->machine().device<ram_device>(RAM_TAG)->pointer() + video_base);
 
 	for (y = 0; y < MAC_V_VIS; y++)
 	{
@@ -383,7 +383,7 @@ SCREEN_UPDATE( macrbv )
 	UINT32 *scanline;
 	int x, y, hres, vres;
 	mac_state *mac = screen->machine().driver_data<mac_state>();
-	UINT8 *vram8 = (UINT8 *)ram_get_ptr(screen->machine().device(RAM_TAG));
+	UINT8 *vram8 = (UINT8 *)screen->machine().device<ram_device>(RAM_TAG)->pointer();
 
 	switch (mac->m_rbv_montype)
 	{

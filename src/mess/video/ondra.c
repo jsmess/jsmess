@@ -31,8 +31,8 @@ SCREEN_UPDATE( ondra )
 		{
 			for (y = 127; y >=0; y--)
 			{
-				code1 = ram_get_ptr(screen->machine().device(RAM_TAG))[0xd700 + Vaddr + 0x80];
-				code2 = ram_get_ptr(screen->machine().device(RAM_TAG))[0xd700 + Vaddr + 0x00];
+				code1 = screen->machine().device<ram_device>(RAM_TAG)->pointer()[0xd700 + Vaddr + 0x80];
+				code2 = screen->machine().device<ram_device>(RAM_TAG)->pointer()[0xd700 + Vaddr + 0x00];
 				for (b = 0; b < 8; b++)
 				{
 					*BITMAP_ADDR16(bitmap, 2*y, x*8+b) =  ((code1 << b) & 0x80) ? 1 : 0;

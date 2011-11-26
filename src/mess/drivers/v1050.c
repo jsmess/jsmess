@@ -1113,7 +1113,7 @@ void v1050_state::machine_start()
 	device_set_irq_callback(m_maincpu, v1050_int_ack);
 
 	/* setup memory banking */
-	UINT8 *ram = ram_get_ptr(machine().device(RAM_TAG));
+	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 	memory_configure_bank(machine(), "bank1", 0, 2, ram, 0x10000);
 	memory_configure_bank(machine(), "bank1", 2, 1, ram + 0x1c000, 0);

@@ -114,12 +114,12 @@ void mpc105_device::update_memory()
 			if ((begin + 0x100000) <= end)
 			{
 				if (LOG_MPC105)
-					logerror("\tbank #%d [%02d]: 0x%08X - 0x%08X [%p-%p]\n", bank, bank + m_bank_base, begin, end, ram_get_ptr(machine().device(RAM_TAG)), ram_get_ptr(machine().device(RAM_TAG)) + (end - begin));
+					logerror("\tbank #%d [%02d]: 0x%08X - 0x%08X [%p-%p]\n", bank, bank + m_bank_base, begin, end, machine().device<ram_device>(RAM_TAG)->pointer(), machine().device<ram_device>(RAM_TAG)->pointer() + (end - begin));
 
 				if (m_bank_base > 0)
 				{
 					sprintf(bank_str,"bank%d",bank + m_bank_base);
-					memory_set_bankptr(machine(), bank_str, ram_get_ptr(machine().device(RAM_TAG)));
+					memory_set_bankptr(machine(), bank_str, machine().device<ram_device>(RAM_TAG)->pointer());
 				}
 			}
 		}

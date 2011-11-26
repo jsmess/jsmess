@@ -75,7 +75,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	/* internal ram */
-	device_t *m_ram;
+	ram_device *m_ram;
 
 	/* gapnit register */
 	UINT8 m_ctrl1;
@@ -475,7 +475,7 @@ static void install_rom_capsule(address_space *space, int size, const char *regi
 
 	/* ram, part 1 */
 	space->install_readwrite_bank(0x0000, 0xdfff - size, "bank1");
-	memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(px4->m_ram));
+	memory_set_bankptr(space->machine(), "bank1", px4->m_ram->pointer());
 
 	/* actual rom data, part 1 */
 	space->install_read_bank(0xe000 - size, 0xffff - size, "bank2");
@@ -492,7 +492,7 @@ static void install_rom_capsule(address_space *space, int size, const char *regi
 
 	/* ram, continued */
 	space->install_readwrite_bank(0xe000, 0xffff, "bank4");
-	memory_set_bankptr(space->machine(), "bank4", ram_get_ptr(px4->m_ram) + 0xe000);
+	memory_set_bankptr(space->machine(), "bank4", px4->m_ram->pointer() + 0xe000);
 }
 
 /* bank register */
@@ -515,13 +515,13 @@ static WRITE8_HANDLER( px4_bankr_w )
 		space_program->nop_write(0x0000, 0x7fff);
 		memory_set_bankptr(space->machine(), "bank1", space->machine().region("os")->base());
 		space_program->install_readwrite_bank(0x8000, 0xffff, "bank2");
-		memory_set_bankptr(space->machine(), "bank2", ram_get_ptr(px4->m_ram) + 0x8000);
+		memory_set_bankptr(space->machine(), "bank2", px4->m_ram->pointer() + 0x8000);
 		break;
 
 	case 0x04:
 		/* memory */
 		space_program->install_readwrite_bank(0x0000, 0xffff, "bank1");
-		memory_set_bankptr(space->machine(), "bank1", ram_get_ptr(px4->m_ram));
+		memory_set_bankptr(space->machine(), "bank1", px4->m_ram->pointer());
 		break;
 
 	case 0x08: install_rom_capsule(space_program, 0x2000, "capsule1"); break;
@@ -1036,7 +1036,7 @@ static SCREEN_UPDATE( px4 )
 		int y, x;
 
 		/* get vram start address */
-		UINT8 *vram = &ram_get_ptr(px4->m_ram)[(px4->m_vadr & 0xf8) << 8];
+		UINT8 *vram = &px4->m_ram->pointer()[(px4->m_vadr & 0xf8) << 8];
 
 		for (y = 0; y < 64; y++)
 		{
@@ -1080,7 +1080,7 @@ static DRIVER_INIT( px4 )
 	px4_state *px4 = machine.driver_data<px4_state>();
 
 	/* find devices */
-	px4->m_ram = machine.device(RAM_TAG);
+	px4->m_ram = machine.device<ram_device>(RAM_TAG);
 
 	/* init 7508 */
 	px4->m_one_sec_int_enabled = TRUE;
@@ -1105,7 +1105,7 @@ static DRIVER_INIT( px4 )
 
 	/* map os rom and last half of memory */
 	memory_set_bankptr(machine, "bank1", machine.region("os")->base());
-	memory_set_bankptr(machine, "bank2", ram_get_ptr(px4->m_ram) + 0x8000);
+	memory_set_bankptr(machine, "bank2", px4->m_ram->pointer() + 0x8000);
 }
 
 static DRIVER_INIT( px4p )

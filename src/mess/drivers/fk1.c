@@ -297,7 +297,7 @@ WRITE8_MEMBER( fk1_state::fk1_intr_w )
 READ8_MEMBER( fk1_state::fk1_bank_ram_r )
 {
 	address_space *space_mem = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(machine().device(RAM_TAG));
+	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 	space_mem->install_write_bank(0x0000, 0x3fff, "bank1");
 	memory_set_bankptr(machine(), "bank1", ram);
@@ -310,7 +310,7 @@ READ8_MEMBER( fk1_state::fk1_bank_rom_r )
 	address_space *space_mem = m_maincpu->memory().space(AS_PROGRAM);
 	space_mem->unmap_write(0x0000, 0x3fff);
 	memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base());
-	memory_set_bankptr(machine(), "bank2", ram_get_ptr(machine().device(RAM_TAG)) + 0x10000);
+	memory_set_bankptr(machine(), "bank2", machine().device<ram_device>(RAM_TAG)->pointer() + 0x10000);
 	return 0;
 }
 
@@ -427,7 +427,7 @@ static TIMER_DEVICE_CALLBACK( vsync_callback )
 MACHINE_RESET_MEMBER( fk1_state )
 {
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *ram = ram_get_ptr(machine().device(RAM_TAG));
+	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 	space->unmap_write(0x0000, 0x3fff);
 	memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base()); // ROM
@@ -442,7 +442,7 @@ SCREEN_UPDATE_MEMBER( fk1_state )
 {
 	UINT8 code;
 	int y, x, b;
-	UINT8 *ram = ram_get_ptr(machine().device(RAM_TAG));
+	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 	for (x = 0; x < 64; x++)
 	{

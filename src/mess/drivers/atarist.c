@@ -725,7 +725,7 @@ void ste_state::dmasound_tick()
 {
 	if (m_dmasnd_samples == 0)
 	{
-		UINT8 *RAM = ram_get_ptr(machine().device(RAM_TAG));
+		UINT8 *RAM = machine().device<ram_device>(RAM_TAG)->pointer();
 
 		for (int i = 0; i < 8; i++)
 		{

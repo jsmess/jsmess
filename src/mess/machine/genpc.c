@@ -631,8 +631,8 @@ void ibm5160_mb_device::device_start()
 	install_device(this,    0x0080, 0x0087, 0, 0, FUNC(pc_page_r), FUNC(pc_page_w) );
 	install_device_write(this,    0x00a0, 0x00a1, 0, 0, FUNC(nmi_enable_w));
 	/* MESS managed RAM */
-	if ( ram_get_ptr(machine().device(RAM_TAG)) )
-		memory_set_bankptr( machine(), "bank10", ram_get_ptr(machine().device(RAM_TAG)) );
+	if ( machine().device<ram_device>(RAM_TAG)->pointer() )
+		memory_set_bankptr( machine(), "bank10", machine().device<ram_device>(RAM_TAG)->pointer() );
 }
 
 IRQ_CALLBACK(ibm5160_mb_device::pc_irq_callback)

@@ -294,7 +294,7 @@ SCREEN_UPDATE_MEMBER( nanos_state )
 			{
 				if (ra < 8)
 				{
-					chr = ram_get_ptr(machine().device(RAM_TAG))[0xf800+ x];
+					chr = machine().device<ram_device>(RAM_TAG)->pointer()[0xf800+ x];
 
 					/* get pattern of pixels for that character scanline */
 					gfx = m_p_chargen[(chr<<3) | ra ];
@@ -457,8 +457,8 @@ MACHINE_RESET_MEMBER(nanos_state)
 	space->install_write_bank(0x1000, 0xffff, "bank2");
 
 	memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base());
-	memory_set_bankptr(machine(), "bank2", ram_get_ptr(machine().device(RAM_TAG)) + 0x1000);
-	memory_set_bankptr(machine(), "bank3", ram_get_ptr(machine().device(RAM_TAG)));
+	memory_set_bankptr(machine(), "bank2", machine().device<ram_device>(RAM_TAG)->pointer() + 0x1000);
+	memory_set_bankptr(machine(), "bank3", machine().device<ram_device>(RAM_TAG)->pointer());
 
 	floppy_mon_w(floppy_get_device(space->machine(), 0), CLEAR_LINE);
 	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1,1);
