@@ -119,10 +119,10 @@ void cs4031_device::static_set_biostag(device_t &device, const char *tag)
 
 void cs4031_device::device_start()
 {
-	device_t *ram_device = machine().device(RAM_TAG);
+	ram_device *ram_dev = machine().device<ram_device>(RAM_TAG);
 
 	// make sure the ram device is already running
-	if (!ram_device->started())
+	if (!ram_dev->started())
 		throw device_missing_dependencies();
 
 	device_t *cpu = machine().device(m_cputag);
@@ -130,8 +130,8 @@ void cs4031_device::device_start()
 	m_isa = machine().region(m_isatag)->base();
 	m_bios = machine().region(m_biostag)->base();
 
-	m_ram = ram_get_ptr(ram_device);
-	UINT32 ram_size = ram_get_size(ram_device);
+	m_ram = ram_dev->pointer();
+	UINT32 ram_size = ram_dev->size();
 
 	// install base memory
 	m_space->install_ram(0x000000, 0x09ffff, m_ram);

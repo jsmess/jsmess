@@ -91,7 +91,7 @@ static INPUT_CHANGED( set_write_protect )  // run when RAM expansion write prote
 {
 	int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
 	address_space *space = field.machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *expram = ram_get_ptr(field.machine().device("ram_tag"));
+	UINT8 *expram = field.machine().device<ram_device>("ram_tag")->pointer();
 
 	get_ram_expansion_settings(space, ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
 
@@ -315,7 +315,7 @@ MACHINE_RESET( astrocde )
 {
     int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
     address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-    UINT8 *expram = ram_get_ptr(machine.device("ram_tag"));
+    UINT8 *expram = machine.device<ram_device>("ram_tag")->pointer();
     space->unmap_readwrite(0x5000, 0xffff);  // unmap any previously installed expansion RAM
 
     get_ram_expansion_settings(space, ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference

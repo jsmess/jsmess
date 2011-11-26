@@ -33,7 +33,7 @@
 typedef struct _tf20_state tf20_state;
 struct _tf20_state
 {
-	device_t *ram;
+	ram_device *ram;
 	device_t *upd765a;
 	upd7201_device *upd7201;
 	device_t *floppy_0;
@@ -76,7 +76,7 @@ static READ8_HANDLER( tf20_rom_disable )
 	address_space *prg = space->device().memory().space(AS_PROGRAM);
 
 	/* switch in ram */
-	prg->install_ram(0x0000, 0x7fff, ram_get_ptr(tf20->ram));
+	prg->install_ram(0x0000, 0x7fff, tf20->ram->pointer());
 
 	return 0xff;
 }
@@ -333,7 +333,7 @@ static DEVICE_START( tf20 )
 	device_set_irq_callback(cpu, tf20_irq_ack);
 
 	/* ram device */
-	tf20->ram = device->subdevice("ram");
+	tf20->ram = device->subdevice<ram_device>("ram");
 
 	/* make sure its already running */
 	if (!tf20->ram->started())
@@ -346,7 +346,7 @@ static DEVICE_START( tf20 )
 	tf20->floppy_1 = device->subdevice(FLOPPY_1);
 
 	/* enable second half of ram */
-	prg->install_ram(0x8000, 0xffff, ram_get_ptr(tf20->ram) + 0x8000);
+	prg->install_ram(0x8000, 0xffff, tf20->ram->pointer() + 0x8000);
 }
 
 static DEVICE_RESET( tf20 )

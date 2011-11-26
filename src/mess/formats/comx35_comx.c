@@ -36,7 +36,7 @@ enum
 
 static void image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count)
 {
-	UINT8 *ram = ram_get_ptr(image.device().machine().device(RAM_TAG)) + (addr - 0x4000);
+	UINT8 *ram = image.device().machine().device<ram_device>(RAM_TAG)->pointer() + (addr - 0x4000);
 
 	image.fread(ram, count);
 }

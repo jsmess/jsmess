@@ -171,11 +171,11 @@ WRITE_LINE_DEVICE_HANDLER(aim65_riot_irq)
 
 MACHINE_START( aim65 )
 {
-	device_t *ram = machine.device(RAM_TAG);
+	ram_device *ram = machine.device<ram_device>(RAM_TAG);
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Init RAM */
-	space->install_ram(0x0000, ram_get_size(ram) - 1, ram_get_ptr(ram));
+	space->install_ram(0x0000, ram->size() - 1, ram->pointer());
 }
 
 

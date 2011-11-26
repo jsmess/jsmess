@@ -36,7 +36,7 @@ public:
 
 	required_device<cpu_device>	m_maincpu;
 	required_device<device_t>	m_mb8877;
-	required_device<device_t>	m_messram;
+	required_device<ram_device>	m_messram;
 	required_device<pia6821_device>	m_pia_0;
 	required_device<pia6821_device>	m_pia_1;
 	required_device<z80dart_device>	m_sio;
@@ -65,7 +65,7 @@ public:
 
 	void set_banks(running_machine &machine)
 	{
-		UINT8 *ram_ptr = ram_get_ptr( m_messram );
+		UINT8 *ram_ptr = m_messram->pointer();
 
 		m_ram_0000 = ram_ptr;
 
