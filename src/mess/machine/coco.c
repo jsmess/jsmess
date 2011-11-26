@@ -89,7 +89,8 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	  m_ram(*this, RAM_TAG),
 	  m_cassette(*this, CASSETTE_TAG),
 	  m_bitbanger(*this, BITBANGER_TAG),
-	  m_vhd(*this, VHD_TAG)
+	  m_vhd_0(*this, VHD0_TAG),
+	  m_vhd_1(*this, VHD1_TAG)
 {
 }
 
@@ -152,6 +153,7 @@ void coco_state::device_start()
 	save_item(NAME(m_dclg_output_v));
 	save_item(NAME(m_dclg_state));
 	save_item(NAME(m_dclg_timer));
+	save_item(NAME(m_vhd_select));
 
 	/* set up disassembly override */
 	if (m_maincpu->debug())
@@ -179,6 +181,7 @@ void coco_state::device_reset()
 	m_dclg_output_v = 0;
 	m_dclg_state = 0;
 	m_dclg_timer = 0;
+	m_vhd_select = 0;
 }
 
 
@@ -1066,6 +1069,22 @@ void coco_state::poll_hires_joystick(void)
  ***************************************************************************/
 
 //-------------------------------------------------
+//  current_vhd
+//-------------------------------------------------
+
+coco_vhd_image_device *coco_state::current_vhd(void)
+{
+	switch(m_vhd_select)
+	{
+		case 0:		return m_vhd_0;
+		case 1:		return m_vhd_1;
+		default:	return NULL;
+	}
+}
+
+
+
+//-------------------------------------------------
 //  ff60_read
 //-------------------------------------------------
 
@@ -1073,9 +1092,9 @@ READ8_MEMBER( coco_state::ff60_read )
 {
 	UINT8 result = 0x00;
 
-	if ((m_vhd != NULL) && (offset >= 32) && (offset <= 37))
+	if ((current_vhd() != NULL) && (offset >= 32) && (offset <= 37))
 	{
-		result = m_vhd->read(offset - 32);
+		result = current_vhd()->read(offset - 32);
 	}
 
 	return result;
@@ -1089,9 +1108,14 @@ READ8_MEMBER( coco_state::ff60_read )
 
 WRITE8_MEMBER( coco_state::ff60_write )
 {
-	if ((m_vhd != NULL) && (offset >= 32) && (offset <= 37))
+	if ((current_vhd() != NULL) && (offset >= 32) && (offset <= 37))
 	{
-		m_vhd->write(offset - 32, data);
+		current_vhd()->write(offset - 32, data);
+	}
+	else if (offset == 38)
+	{
+		/* writes to $FF86 will switch the VHD */
+		m_vhd_select = data;
 	}
 }
 

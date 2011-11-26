@@ -48,7 +48,8 @@ SLOT_INTERFACE_EXTERN( coco_cart );
 #define DAC_TAG						"dac"
 #define CARTRIDGE_TAG				"ext"
 #define BITBANGER_TAG				"bitbanger"
-#define VHD_TAG						"vhd"
+#define VHD0_TAG					"vhd0"
+#define VHD1_TAG					"vhd1"
 
 /* inputs */
 #define CTRL_SEL_TAG				"ctrl_sel"
@@ -92,7 +93,8 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
 	optional_device<bitbanger_device> m_bitbanger;
-	optional_device<coco_vhd_image_device> m_vhd;
+	optional_device<coco_vhd_image_device> m_vhd_0;
+	optional_device<coco_vhd_image_device> m_vhd_1;
 
 	static const pia6821_interface pia0_config;
 	static const pia6821_interface pia1_config;
@@ -218,6 +220,9 @@ private:
 	bool sel2(void)			{ return m_pia_0->cb2_output() ? true : false; }
 	bool snden(void)		{ return m_pia_1->cb2_output() ? true : false; }
 
+	/* VHD selection */
+	coco_vhd_image_device *current_vhd(void);
+
 	/* disassembly override */
 	static offs_t dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
@@ -243,6 +248,9 @@ private:
 	UINT8 m_dclg_output_v;
 	UINT8 m_dclg_state;
 	UINT16 m_dclg_timer;
+
+	/* VHD selection */
+	UINT8 m_vhd_select;
 };
 
 #endif /* __COCO__ */
