@@ -74,7 +74,7 @@ static void bankswitch(running_machine &machine, UINT8 data)
     */
 
 	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
-	device_t *messram = machine.device(RAM_TAG);
+	ram_device *messram = machine.device<ram_device>(RAM_TAG);
 
 //  UINT8 cbm_mode = data >> 7 & 0x01;
 	UINT8 rom_page = data >> 4 & 0x07;
@@ -84,12 +84,12 @@ static void bankswitch(running_machine &machine, UINT8 data)
 	memory_set_bank(machine, "bank2", rom_page);
 
 	/* set ram bank, for invalid pages a nop-handler will be installed */
-	if (ram_page >= ram_get_size(messram)/0x8000)
+	if (ram_page >= messram->size()/0x8000)
 	{
 		program->nop_readwrite(0x4000, 0x7fff);
 		program->nop_readwrite(0x8000, 0xbfff);
 	}
-	else if (ram_page + 1 == ram_get_size(messram)/0x8000)
+	else if (ram_page + 1 == messram->size()/0x8000)
 	{
 		program->nop_readwrite(0x4000, 0x7fff);
 		program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
@@ -376,7 +376,7 @@ SNAPSHOT_LOAD( mtx )
 MACHINE_START( mtx512 )
 {
 	mtx_state *state = machine.driver_data<mtx_state>();
-	device_t *messram = machine.device(RAM_TAG);
+	ram_device *messram = machine.device<ram_device>(RAM_TAG);
 
 	/* find devices */
 	state->m_z80ctc = machine.device(Z80CTC_TAG);
@@ -386,8 +386,8 @@ MACHINE_START( mtx512 )
 	/* configure memory */
 	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
 	memory_configure_bank(machine, "bank2", 0, 8, machine.region("user2")->base(), 0x2000);
-	memory_configure_bank(machine, "bank3", 0, ram_get_size(messram)/0x4000/2, ram_get_ptr(messram), 0x4000);
-	memory_configure_bank(machine, "bank4", 0, ram_get_size(messram)/0x4000/2, ram_get_ptr(messram) + ram_get_size(messram)/2, 0x4000);
+	memory_configure_bank(machine, "bank3", 0, messram->size()/0x4000/2, messram->pointer(), 0x4000);
+	memory_configure_bank(machine, "bank4", 0, messram->size()/0x4000/2, messram->pointer() + messram->size()/2, 0x4000);
 }
 
 /*-------------------------------------------------
