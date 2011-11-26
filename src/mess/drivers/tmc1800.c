@@ -773,7 +773,7 @@ static QUICKLOAD_LOAD( tmc1800 )
 	UINT8 *ptr = image.device().machine().region(CDP1802_TAG)->base();
 	int size = image.length();
 
-	if (size > ram_get_size(image.device().machine().device(RAM_TAG)))
+	if (size > image.device().machine().device<ram_device>(RAM_TAG)->size())
 	{
 		return IMAGE_INIT_FAIL;
 	}

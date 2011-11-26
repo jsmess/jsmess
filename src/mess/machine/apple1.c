@@ -244,7 +244,7 @@ SNAPSHOT_LOAD(apple1)
 
 	end_addr = start_addr + datasize - 1;
 
-	if ((start_addr < 0xE000 && end_addr > ram_get_size(image.device().machine().device(RAM_TAG)) - 1)
+	if ((start_addr < 0xE000 && end_addr > image.device().machine().device<ram_device>(RAM_TAG)->size() - 1)
 		|| end_addr > 0xEFFF)
 	{
 		logerror("apple1 - Snapshot won't fit in this memory configuration;\n"

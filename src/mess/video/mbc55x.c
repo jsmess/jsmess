@@ -91,7 +91,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 {
 	mbc55x_state *mstate = device->machine().driver_data<mbc55x_state>();
 
-	UINT8	*ram	= &ram_get_ptr(mstate->m_ram)[0];
+	UINT8	*ram	= &mstate->m_ram->pointer()[0];
 	UINT8	*red	= &mstate->m_video_mem[RED_PLANE_OFFSET];
 	UINT8	*blue	= &mstate->m_video_mem[BLUE_PLANE_OFFSET];
 	UINT8	*green;

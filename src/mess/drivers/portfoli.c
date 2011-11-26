@@ -769,7 +769,7 @@ void portfolio_state::machine_start()
 	device_set_irq_callback(m_maincpu, portfolio_int_ack);
 
 	/* memory expansions */
-	switch (ram_get_size(machine().device(RAM_TAG)))
+	switch (machine().device<ram_device>(RAM_TAG)->size())
 	{
 	case 128 * 1024:
 		program->unmap_readwrite(0x1f000, 0x9efff);

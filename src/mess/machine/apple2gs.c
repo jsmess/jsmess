@@ -1736,7 +1736,7 @@ static void apple2gs_setup_memory(running_machine &machine)
 	// otherwise nothing works :)
 	if (state->m_is_rom3)
 	{
-		int ramsize = ram_get_size(machine.device(RAM_TAG));
+		int ramsize = machine.device<ram_device>(RAM_TAG)->size();
 
 		// ROM 03 hardware: the quoted "1 MB" for a base machine doesn't include banks e0/e1, so map accordingly
 		space->install_readwrite_bank(0x010000, ramsize - 1, "bank1");
@@ -1747,7 +1747,7 @@ static void apple2gs_setup_memory(running_machine &machine)
 	}
 	else
 	{
-		int ramsize = ram_get_size(machine.device(RAM_TAG))-0x30000;
+		int ramsize = machine.device<ram_device>(RAM_TAG)->size()-0x30000;
 
 		// ROM 00/01 hardware: the quoted "256K" for a base machine *does* include banks e0/e1.
 		space->install_readwrite_bank(0x010000, ramsize - 1 + 0x10000, "bank1");
@@ -1870,7 +1870,7 @@ MACHINE_START( apple2gscommon )
 
 	/* save state stuff.  note that the driver takes care of docram. */
 	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
-	state_save_register_item_pointer(machine, "APPLE2GS_RAM", NULL, 0, ram, ram_get_size(machine.device(RAM_TAG)));
+	state_save_register_item_pointer(machine, "APPLE2GS_RAM", NULL, 0, ram, machine.device<ram_device>(RAM_TAG)->size());
 
 	state_save_register_item(machine, "NEWVIDEO", NULL, 0, state->m_newvideo);
 

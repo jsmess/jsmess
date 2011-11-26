@@ -744,7 +744,7 @@ READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
          * 6-7  The number of floppy disk drives
          */
 		data = input_port_read(this, "DSW0") & 0xF3;
-		switch ( ram_get_size(machine().device(RAM_TAG)) )
+		switch ( machine().device<ram_device>(RAM_TAG)->size() )
 		{
 		case 16 * 1024:
 			data |= 0x00;
@@ -782,7 +782,7 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 		/* read hi nibble of SW2 */
 		data = data & 0xf0;
 
-		switch ( ram_get_size(machine().device(RAM_TAG)) - 64 * 1024 )
+		switch ( machine().device<ram_device>(RAM_TAG)->size() - 64 * 1024 )
 		{
 		case 64 * 1024:		data |= 0x00; break;
 		case 128 * 1024:	data |= 0x02; break;
@@ -800,7 +800,7 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 		case 896 * 1024:	data |= 0x0B; break;
 		case 960 * 1024:	data |= 0x0D; break;
 		}
-		if ( ram_get_size(machine().device(RAM_TAG)) > 960 * 1024 )
+		if ( machine().device<ram_device>(RAM_TAG)->size() > 960 * 1024 )
 			data |= 0x0D;
 
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));

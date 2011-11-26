@@ -2437,7 +2437,7 @@ void towns_state::driver_start()
 	m_towns_cd.read_timer = machine().scheduler().timer_alloc(FUNC(towns_cdrom_read_byte), (void*)machine().device("dma_1"));
 
 	device_set_irq_callback(machine().device("maincpu"), towns_irq_callback);
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x100000,ram_get_size(machine().device(RAM_TAG))-1,0xffffffff,0,NULL);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x100000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,NULL);
 
 }
 

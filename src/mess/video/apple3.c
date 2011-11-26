@@ -97,7 +97,7 @@ static void apple3_video_text40(running_machine &machine,bitmap_t *bitmap)
 	pen_t fg, bg, temp;
 	UINT16 *dest;
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
-	UINT32 ram_size = ram_get_size(machine.device(RAM_TAG));
+	UINT32 ram_size = machine.device<ram_device>(RAM_TAG)->size();
 
 	for (y = 0; y < 24; y++)
 	{
@@ -155,7 +155,7 @@ static void apple3_video_text80(running_machine &machine,bitmap_t *bitmap)
 	pen_t fg, bg;
 	UINT16 *dest;
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
-	UINT32 ram_size = ram_get_size(machine.device(RAM_TAG));
+	UINT32 ram_size = machine.device<ram_device>(RAM_TAG)->size();
 
 	for (y = 0; y < 24; y++)
 	{
