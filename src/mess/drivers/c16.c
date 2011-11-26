@@ -460,7 +460,7 @@ static MACHINE_START( c16 )
 	state->m_maincpu = machine.device<legacy_cpu_device>("maincpu");
 	state->m_ted7360 = machine.device("ted7360");
 	state->m_cassette = machine.device<cassette_image_device>(CASSETTE_TAG);
-	state->m_messram = machine.device(RAM_TAG);
+	state->m_messram = machine.device<ram_device>(RAM_TAG);
 	state->m_sid = machine.device("sid");
 
 	state->save_item(NAME(state->m_old_level));

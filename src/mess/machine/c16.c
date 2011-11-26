@@ -108,7 +108,7 @@ static void c16_bankswitch( running_machine &machine )
 {
 	c16_state *state = machine.driver_data<c16_state>();
 	UINT8 *rom = machine.region("maincpu")->base();
-	memory_set_bankptr(machine, "bank9", ram_get_ptr(state->m_messram));
+	memory_set_bankptr(machine, "bank9", state->m_messram->pointer());
 
 	switch (state->m_lowrom)
 	{
@@ -182,8 +182,8 @@ WRITE8_HANDLER( c16_select_roms )
 WRITE8_HANDLER( c16_switch_to_ram )
 {
 	c16_state *state = space->machine().driver_data<c16_state>();
-	UINT8 *ram = ram_get_ptr(state->m_messram);
-	UINT32 ram_size = ram_get_size(state->m_messram);
+	UINT8 *ram = state->m_messram->pointer();
+	UINT32 ram_size = state->m_messram->size();
 
 	ted7360_rom_switch_w(state->m_ted7360, 0);
 
@@ -338,7 +338,7 @@ READ8_HANDLER( c16_6551_port_r )
 int c16_dma_read( running_machine &machine, int offset )
 {
 	c16_state *state = machine.driver_data<c16_state>();
-	return ram_get_ptr(state->m_messram)[offset % ram_get_size(state->m_messram)];
+	return state->m_messram->pointer()[offset % state->m_messram->size()];
 }
 
 int c16_dma_read_rom( running_machine &machine, int offset )
@@ -379,7 +379,7 @@ int c16_dma_read_rom( running_machine &machine, int offset )
 		}
 	}
 
-	return ram_get_ptr(state->m_messram)[offset % ram_get_size(state->m_messram)];
+	return state->m_messram->pointer()[offset % state->m_messram->size()];
 }
 
 void c16_interrupt( running_machine &machine, int level )
@@ -455,8 +455,8 @@ MACHINE_RESET( c16 )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	c16_state *state = machine.driver_data<c16_state>();
-	UINT8 *ram = ram_get_ptr(state->m_messram);
-	UINT32 ram_size = ram_get_size(state->m_messram);
+	UINT8 *ram = state->m_messram->pointer();
+	UINT32 ram_size = state->m_messram->size();
 
 	memset(state->m_keyline, 0xff, ARRAY_LENGTH(state->m_keyline));
 
@@ -492,7 +492,7 @@ MACHINE_RESET( c16 )
 static WRITE8_HANDLER( c16_sidcart_16k )
 {
 	c16_state *state = space->machine().driver_data<c16_state>();
-	UINT8 *ram = ram_get_ptr(state->m_messram);
+	UINT8 *ram = state->m_messram->pointer();
 
 	ram[0x1400 + offset] = data;
 	ram[0x5400 + offset] = data;
@@ -506,7 +506,7 @@ static WRITE8_HANDLER( c16_sidcart_64k )
 {
 	c16_state *state = space->machine().driver_data<c16_state>();
 
-	ram_get_ptr(state->m_messram)[0xd400 + offset] = data;
+	state->m_messram->pointer()[0xd400 + offset] = data;
 
 	sid6581_w(state->m_sid, offset, data);
 }

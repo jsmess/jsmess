@@ -20,7 +20,7 @@ SCREEN_UPDATE( pk8020 )
 	pk8020_state *state = screen->machine().driver_data<pk8020_state>();
 	int y, x, b, j;
 	UINT8 *gfx = screen->machine().region("gfx1")->base();
-	UINT8 *ram = ram_get_ptr(screen->machine().device(RAM_TAG));
+	UINT8 *ram = screen->machine().device<ram_device>(RAM_TAG)->pointer();
 
 	for (y = 0; y < 16; y++)
 	{

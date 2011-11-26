@@ -20,7 +20,7 @@ SCREEN_UPDATE( vector06 )
 	UINT8 code1,code2,code3,code4;
 	UINT8 col;
 	int y, x, b,draw_y;
-	UINT8 *ram = ram_get_ptr(screen->machine().device(RAM_TAG));
+	UINT8 *ram = screen->machine().device<ram_device>(RAM_TAG)->pointer();
 
 	int width = (state->m_video_mode==0x00) ? 256 : 512;
 	rectangle screen_area = {0,width+64-1,0,256+64-1};

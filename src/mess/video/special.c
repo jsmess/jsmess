@@ -103,7 +103,7 @@ SCREEN_UPDATE( specimx )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = ram_get_ptr(screen->machine().device(RAM_TAG))[0x9000 + y + x*256];
+			code = screen->machine().device<ram_device>(RAM_TAG)->pointer()[0x9000 + y + x*256];
 			color = state->m_specimx_colorram[y + x*256];
 			for (b = 7; b >= 0; b--)
 			{
@@ -146,8 +146,8 @@ SCREEN_UPDATE( erik )
 	UINT8 *erik_video_ram_p1;
 	UINT8 *erik_video_ram_p2;
 
-	erik_video_ram_p1 =  ram_get_ptr(screen->machine().device(RAM_TAG)) + 0x9000;
-	erik_video_ram_p2 =  ram_get_ptr(screen->machine().device(RAM_TAG)) + 0xd000;
+	erik_video_ram_p1 =  screen->machine().device<ram_device>(RAM_TAG)->pointer() + 0x9000;
+	erik_video_ram_p2 =  screen->machine().device<ram_device>(RAM_TAG)->pointer() + 0xd000;
 
 	for (x = 0; x < 48; x++)
 	{

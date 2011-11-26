@@ -22,7 +22,7 @@ SCREEN_UPDATE( b2m )
 	UINT8 code2;
 	UINT8 col;
 	int y, x, b;
-	UINT8 *ram = ram_get_ptr(screen->machine().device(RAM_TAG));
+	UINT8 *ram = screen->machine().device<ram_device>(RAM_TAG)->pointer();
 
 	for (x = 0; x < 48; x++)
 	{
