@@ -759,7 +759,7 @@ static QUICKLOAD_LOAD( vip )
 		chip8_size = image.device().machine().region("chip8x")->bytes();
 	}
 
-	if ((size + chip8_size) > ram_get_size(image.device().machine().device(RAM_TAG)))
+	if ((size + chip8_size) > image.device().machine().device<ram_device>(RAM_TAG)->size())
 	{
 		return IMAGE_INIT_FAIL;
 	}

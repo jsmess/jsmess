@@ -90,7 +90,7 @@ SCREEN_UPDATE( mac )
 	int y, x, b;
 	mac_state *state = screen->machine().driver_data<mac_state>();
 
-	video_base = ram_get_size(screen->machine().device<ram_device>(RAM_TAG)) - (state->m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	video_base = screen->machine().device<ram_device>(RAM_TAG)->size() - (state->m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
 	video_ram = (const UINT16 *) (screen->machine().device<ram_device>(RAM_TAG)->pointer() + video_base);
 
 	for (y = 0; y < MAC_V_VIS; y++)

@@ -198,8 +198,8 @@ void apple2_update_memory(running_machine &machine)
 			else
 			{
 				/* RAM */
-				if (end_r >= ram_get_size(machine.device(RAM_TAG)))
-					end_r = ram_get_size(machine.device(RAM_TAG)) - 1;
+				if (end_r >= machine.device<ram_device>(RAM_TAG)->size())
+					end_r = machine.device<ram_device>(RAM_TAG)->size() - 1;
 				offset = meminfo.read_mem & APPLE2_MEM_MASK;
 				if (end_r >= begin)
 					rbase = &machine.device<ram_device>(RAM_TAG)->pointer()[offset];
@@ -284,8 +284,8 @@ void apple2_update_memory(running_machine &machine)
 			else
 			{
 				/* RAM */
-				if (end_w >= ram_get_size(machine.device(RAM_TAG)))
-					end_w = ram_get_size(machine.device(RAM_TAG)) - 1;
+				if (end_w >= machine.device<ram_device>(RAM_TAG)->size())
+					end_w = machine.device<ram_device>(RAM_TAG)->size() - 1;
 				offset = meminfo.write_mem & APPLE2_MEM_MASK;
 				if (end_w >= begin)
 					wbase = &machine.device<ram_device>(RAM_TAG)->pointer()[offset];
@@ -1042,7 +1042,7 @@ UINT8 apple2_getfloatingbusvalue(running_machine &machine)
 		//CMemory::mState |= CMemory::kVBLBar; // N: VBL' is true // FIX: MESS?
 	}
 
-	return machine.device<ram_device>(RAM_TAG)->pointer()[address % ram_get_size(machine.device(RAM_TAG))]; // FIX: this seems to work, but is it right!?
+	return machine.device<ram_device>(RAM_TAG)->pointer()[address % machine.device<ram_device>(RAM_TAG)->size()]; // FIX: this seems to work, but is it right!?
 }
 
 
@@ -1642,7 +1642,7 @@ void apple2_init_common(running_machine &machine)
 	if (machine.region("maincpu")->bytes() < 0x8000)
 		state->m_a2_mask &= ~VAR_ROMSWITCH;
 
-	if (ram_get_size(machine.device(RAM_TAG)) <= 64*1024)
+	if (machine.device<ram_device>(RAM_TAG)->size() <= 64*1024)
 		state->m_a2_mask &= ~(VAR_RAMRD | VAR_RAMWRT | VAR_80STORE | VAR_ALTZP | VAR_80COL);
 }
 

@@ -31,7 +31,7 @@ SNAPSHOT_LOAD( ace )
 	unsigned char ace_repeat, ace_byte, loop;
 	int done=0, ace_index=0x2000;
 
-	if (ram_get_size(image.device().machine().device(RAM_TAG)) < 16*1024)
+	if (image.device().machine().device<ram_device>(RAM_TAG)->size() < 16*1024)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "At least 16KB RAM expansion required");
 		image.message("At least 16KB RAM expansion required");
