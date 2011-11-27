@@ -571,6 +571,7 @@
 		</part>
 	</software>
 
+<!-- glitches on NTSC -->
 	<software name="bayoubil">
 		<!-- Serial: NES-MU-EEC - Release Date: 1991-01-24 -->
 		<description>The Adventures of Bayou Billy (Euro)</description>
@@ -1115,6 +1116,7 @@
 		</part>
 	</software>
 
+<!-- glitches on NTSC -->
 	<software name="aladdin">
 		<!-- Serial: NES-AJ (FRA/SCN) - Release Date: 1994-12-27 -->
 		<description>Disney's Aladdin (Euro)</description>
@@ -1755,6 +1757,7 @@
 		</part>
 	</software>
 
+<!-- glitches on NTSC -->
 	<software name="asterix">
 		<!-- Serial: NES-AX (UKV/ESP) - Release Date: 1993 -->
 		<description>Astérix (Euro)</description>
@@ -2278,7 +2281,7 @@
 		<publisher>Victor Ongaku Sangyou</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
-			<feature name="mirroring" value="horizontal" />	<!-- Also found as vertical -->
+			<feature name="mirroring" value="vertical" />	<!-- CHECK! Also found as horizontal? does it resume fine after pressing Select when is horizontal? -->
 			<dataarea name="prg" size="32768">
 				<rom name="vfr-b1-0 prg" size="32768" crc="9cf17fab" sha1="73f05a931ad15639979907bc3ac4300138a7000e" offset="00000" />
 			</dataarea>
@@ -2860,7 +2863,8 @@
 		</part>
 	</software>
 
-	<software name="batmanrj">
+<!-- glitches on NTSC -->
+	<software name="batmanrj" supported="partial">
 		<!-- Serial: NES-48 (NOE/SCN/ESP) - Release Date: 1992-08-15 -->
 		<description>Batman: Return of the Joker (Euro)</description>
 		<year>1992</year>
@@ -3131,7 +3135,8 @@
 		</part>
 	</software>
 
-	<software name="btoads">
+<!-- glitches on NTSC -->
+	<software name="btoads" supported="partial">
 		<!-- Serial: NES-8T (SCN/ESP) - Release Date: 1993-02-18 -->
 		<description>Battletoads (Euro)</description>
 		<year>1993</year>
@@ -3355,6 +3360,7 @@
 		</part>
 	</software>
 
+<!-- glitches on NTSC -->
 	<software name="bestof">
 		<!-- Serial: NES-BB-ESP - Release Date: 1993-03-01 -->
 		<description>Best of the Best: Championship Karate (Euro)</description>
@@ -3747,14 +3753,14 @@
 		</part>
 	</software>
 
-	<software name="blackbas">
+	<software name="blackbas" supported="partial">
 		<!-- Serial: NES-BO-USA - Release Date: 1989-09 -->
 		<description>The Black Bass (USA)</description>
 		<year>1989</year>
 		<publisher>Hot-B</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
-			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="horizontal" /> <!-- CHECK! vertical according to bootgod... -->
 			<dataarea name="prg" size="131072">
 				<rom name="nes-bo-0 prg" size="131072" crc="1d0f4d6b" sha1="9c3bcd2bf8224b158b6ff2e47b67cda66cb4ac39" offset="00000" />
 			</dataarea>
@@ -37120,7 +37126,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<publisher>Victor</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="16384">
 				<rom name="banana (japan) (beta).chr" size="16384" crc="7de787cb" sha1="7a149e548aebc0d4ed2b9fee0a8b8fe7173924ef" offset="00000" status="baddump" />
 			</dataarea>
@@ -37285,6 +37291,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+<!-- glitches on NTSC -->
 	<software name="beauty">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Beauty and the Beast (Euro)</description>
@@ -37373,7 +37380,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="blackbs2" cloneof="blackbas">
+	<software name="blackbs2" cloneof="blackbas" supported="partial">
 		<!-- Serial:  - Release Date: 1988-10-01 - Alternative Title:  -->
 		<description>The Black Bass II (Jpn)</description>
 		<year>1988</year>
@@ -46889,6 +46896,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="sanxiawya" cloneof="sanxiawy" 	supported="no">
+		<!-- Serial: ES-1071 - Release Date:  - Alternative Title: 三侠五义 -->
+		<description>San Xia Wu Yi (Chi, Alt?)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-1200IN1" /> <!-- Header says mapper 227, but mirroring issues are present! -->
+			<dataarea name="prg" size="1048576">
+				<rom name="[es-1071] san xia wu yi (c).prg" size="1048576" crc="a76b8d4f" sha1="fb44a1cc74c062dd928d2d811d58517827e420c3" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dongzlgz" supported="no">
 		<!-- Serial: ES-1072 - Release Date:  - Alternative Title: 东周列国志 -->
 		<description>DongZhou Lie GuoZhi (Chi, Decrypted WXN)</description>
@@ -50872,13 +50895,14 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 <!-- nointro & cah4e3 -->
-	<software name="bbcar">
+	<software name="bbcar" supported="partial">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>BB Car (Asia)</description>
 		<year>1991</year>
 		<publisher>Hwang Shinwey?</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-ANROM" />
+			<feature name="pcb" value="NES-CNROM" /> <!-- not correct, there are issues with mirroring (mapper commanded?)! -->
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
 				<rom name="bb car (unknown) (unl).chr" size="8192" crc="01366b4b" sha1="b46dbff5047cf83815b6c134c4843dcf1dc84e92" offset="00000" status="baddump" />
 			</dataarea>
@@ -53006,7 +53030,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	<software name="biohazrd">
 		<!-- Serial:  - Release Date:  - Alternative Title: 生化危机 -->
 		<description>Bio Hazard (Asia)</description>
-		<year>19??</year>
+		<year>2003?</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="WAIXING-PS2" />
@@ -55249,7 +55273,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="16384">
 				<rom name="banana (1987)(fmg)(jp)[h][p][mapper 3].chr" size="16384" crc="940018f3" sha1="036243540ff9b992d0b056fdd10eeb864a91f482" offset="00000" status="baddump" />
 			</dataarea>
@@ -58294,14 +58318,14 @@ Games by A.Tchudov (from Ulyanovsk)
 		</part>
 	</software>
 
-	<software name="morskoya" cloneof="morskoy">
+	<software name="bshipr" cloneof="bship">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Morskoy Boy (Rus, Alt?)</description>
+		<description>Morskoy Boy ~ Battleship (Rus, Battleship pirate)</description>
 		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-NROM-256" />
-			<feature name="mirroring" value="vertical" />
+			<feature name="pcb" value="NES-CNROM" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
 				<rom name="morskoy boy (russian) (a).chr" size="32768" crc="91f1c836" sha1="802bb631707112dbb8b6aeb6d7fd34015a31a9e2" offset="00000" status="baddump" />
 			</dataarea>
@@ -58758,7 +58782,7 @@ Other
 	</software>
 
 <!-- FIXME: which board should use this game?? -->
-	<software name="batman4" cloneof="batmanrj">
+	<software name="batman4" cloneof="batmanrj" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Batman 4 (Batman: Return of the Joker pirate)</description>
 		<year>19??</year>
@@ -58830,6 +58854,7 @@ Other
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
 				<rom name="bomberman collection [p1].chr" size="8192" crc="a775822e" sha1="b0584f9f4172b9e111ae275d8de6644b76372b32" offset="00000" status="baddump" />
 			</dataarea>
