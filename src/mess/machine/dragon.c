@@ -157,18 +157,18 @@ void dragon64_state::pia1_pb_changed(void)
 //  page_rom - Controls rom paging in Dragon 64,
 //  and Dragon Alpha.
 //
-//	On 64, switches between the two versions of the
-//	basic rom mapped in at 0x8000
+//  On 64, switches between the two versions of the
+//  basic rom mapped in at 0x8000
 //
-//	On the alpha switches between the
-//	Boot/Diagnostic rom and the basic rom 
+//  On the alpha switches between the
+//  Boot/Diagnostic rom and the basic rom
 //-------------------------------------------------
 
 void dragon64_state::page_rom(bool romswitch)
 {
 	offs_t offset = romswitch
 		? 0x0000	// This is the 32k mode basic(64)/boot rom(alpha)
-		: 0x8000;	// This is the 64k mode basic(64)/basic rom(alpha) 
+		: 0x8000;	// This is the 64k mode basic(64)/basic rom(alpha)
 	m_sam->set_bank_offset(1, offset);
 	m_sam->set_bank_offset(2, offset);
 	m_sam->set_bank_offset(3, offset);

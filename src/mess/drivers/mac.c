@@ -895,7 +895,7 @@ static const struct harddisk_interface mac_harddisk_config =
 {
 	NULL,
 	NULL,
-	"mac_hdd",	
+	"mac_hdd",
 	NULL
 };
 
@@ -949,7 +949,7 @@ static MACHINE_CONFIG_DERIVED( mac128k, mac512ke )
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
-	
+
 static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(macplus_map)
@@ -967,7 +967,7 @@ static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,2560K,4M")
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")	
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( macse, macplus )

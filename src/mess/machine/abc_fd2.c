@@ -20,12 +20,12 @@ Notes:
     Relevant IC's shown.
 
     ROM0    - AMI 8005SAJ 1Kx8 EPROM
-	ROM1	- Motorola MCM2708C 1Kx8 EPROM
-	Z80     - Zilog Z-80 CPU
-	Z80PIO	- Zilog Z-80A PIO
-	FD1771  - FD1771-B01
-	2114    - National Semiconductor MM2114N 1Kx4 Static RAM
-	CN1     - 2x17 pin PCB header
+    ROM1    - Motorola MCM2708C 1Kx8 EPROM
+    Z80     - Zilog Z-80 CPU
+    Z80PIO  - Zilog Z-80A PIO
+    FD1771  - FD1771-B01
+    2114    - National Semiconductor MM2114N 1Kx4 Static RAM
+    CN1     - 2x17 pin PCB header
 
 */
 
@@ -217,11 +217,11 @@ void abc_fd2_device::abcbus_cs(UINT8 data)
 UINT8 abc_fd2_device::abcbus_xmemfl(offs_t offset)
 {
 	UINT8 data = 0xff;
-	
+
 	if (offset >= 0x6000 && offset < 0x6400) // TODO is this mirrored?
 	{
 		data = subregion("abc80")->base()[offset & 0x3ff];
 	}
-	
+
 	return data;
 }

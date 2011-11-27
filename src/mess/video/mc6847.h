@@ -237,7 +237,7 @@ protected:
 						|	((pixels[(x + 1) * xscale] == c1) ? 0x04 : 0x00)
 						|	((pixels[(x + 2) * xscale] == c1) ? 0x02 : 0x00)
 						|	((pixels[(x + 3) * xscale] == c1) ? 0x01 : 0x00);
-					
+
 					new_line[x + 0] = m_expanded_colors[val * 2 + 0];
 					new_line[x + 1] = m_expanded_colors[val * 2 + 1];
 				}

@@ -62,7 +62,7 @@ Re-implemented Alpha NMI enable/disable, using direct PIA reads, rather than
 keeping track of it in a variable in the driver.
     P.Harvey-Smith, 25-Sep-2006.
 
-***************************************************************************/	
+***************************************************************************/
 
 #include "includes/dgnalpha.h"
 #include "sound/ay8910.h"
@@ -313,7 +313,7 @@ const pia6821_interface dragon_alpha_state::pia2_config =
 
 //-------------------------------------------------
 //  firq_get_line - gets the value of the FIRQ line
-//	passed into the CPU
+//  passed into the CPU
 //-------------------------------------------------
 
 bool dragon_alpha_state::firq_get_line(void)
@@ -389,7 +389,7 @@ const ay8910_interface dragon_alpha_state::ay8912_interface =
 
 //-------------------------------------------------
 //  fdc_intrq_w - The NMI line on the Alpha is gated
-//	through IC16 (early PLD), and is gated by pia2 CA2
+//  through IC16 (early PLD), and is gated by pia2 CA2
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( dragon_alpha_state::fdc_intrq_w )
@@ -416,8 +416,8 @@ WRITE_LINE_MEMBER( dragon_alpha_state::fdc_intrq_w )
 
 //-------------------------------------------------
 //  fdc_drq_w - The DRQ line goes through pia2 CB1,
-//	in exactly the same way as DRQ from DragonDos
-//	does for pia1 CB1
+//  in exactly the same way as DRQ from DragonDos
+//  does for pia1 CB1
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( dragon_alpha_state::fdc_drq_w )

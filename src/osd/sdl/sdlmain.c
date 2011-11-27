@@ -2,7 +2,7 @@
 //
 //  sdlmain.c - main file for SDLMAME.
 //
-//  Copyright (c) 1996-2011, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2012, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -24,7 +24,9 @@
 #endif
 
 // standard includes
-
+#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_OS2)
+#include <unistd.h>
+#endif
 
 #ifdef SDLMAME_OS2
 #define INCL_DOS
@@ -270,8 +272,8 @@ sdl_options::sdl_options()
 {
 	astring ini_path(INI_PATH);
 	add_entries(s_option_entries);
-	ini_path.replace(0, "APP_NAME", emulator_info::get_appname_lower());	
-	set_default_value(SDLOPTION_INIPATH, ini_path.cstr());	
+	ini_path.replace(0, "APP_NAME", emulator_info::get_appname_lower());
+	set_default_value(SDLOPTION_INIPATH, ini_path.cstr());
 }
 
 

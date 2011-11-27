@@ -398,7 +398,7 @@ READ8_MEMBER( abc80_state::mmu_r )
 {
 	UINT8 data = 0xff;
 	UINT8 mmu = m_mmu_rom[0x40 | (offset >> 10)];
-	
+
 	if (!(mmu & MMU_XM))
 	{
 		data = m_bus->xmemfl_r(space, offset);
@@ -415,7 +415,7 @@ READ8_MEMBER( abc80_state::mmu_r )
 	{
 		data = m_ram->pointer()[offset & 0x3fff];
 	}
-	
+
 	return data;
 }
 
@@ -427,7 +427,7 @@ READ8_MEMBER( abc80_state::mmu_r )
 WRITE8_MEMBER( abc80_state::mmu_w )
 {
 	UINT8 mmu = m_mmu_rom[0x40 | (offset >> 10)];
-	
+
 	if (!(mmu & MMU_XM))
 	{
 		m_bus->xmemw_w(space, offset, data);

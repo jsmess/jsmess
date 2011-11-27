@@ -120,7 +120,7 @@ bool coco3_state::irq_get_line(void)
 
 
 //-------------------------------------------------
-//  update_keyboard_input 
+//  update_keyboard_input
 //-------------------------------------------------
 
 void coco3_state::update_keyboard_input(UINT8 value, UINT8 z)
@@ -132,7 +132,7 @@ void coco3_state::update_keyboard_input(UINT8 value, UINT8 z)
 
 
 //-------------------------------------------------
-//  cart_w 
+//  cart_w
 //-------------------------------------------------
 
 void coco3_state::cart_w(bool state)

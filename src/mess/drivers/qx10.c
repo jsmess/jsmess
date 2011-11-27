@@ -69,9 +69,9 @@ public:
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-	
+
 	void update_memory_mapping();
-	
+
 	DECLARE_WRITE8_MEMBER( qx10_18_w );
 	DECLARE_WRITE8_MEMBER( prom_sel_w );
 	DECLARE_WRITE8_MEMBER( cmos_sel_w );
@@ -955,7 +955,7 @@ void qx10_state::video_start()
 {
 	// allocate memory
 	m_video_ram = auto_alloc_array_clear(machine(), UINT8, 0x60000);
-	
+
 	// find memory regions
 	m_char_rom = machine().region("chargen")->base();
 
@@ -990,7 +990,7 @@ static PALETTE_INIT( gdc )
 READ8_MEMBER( qx10_state::vram_r )
 {
 	int bank = 0;
-	
+
 	if (m_vram_bank & 1)	 { bank = 0; } // B
 	else if(m_vram_bank & 2) { bank = 1; } // G
 	else if(m_vram_bank & 4) { bank = 2; } // R
@@ -1001,7 +1001,7 @@ READ8_MEMBER( qx10_state::vram_r )
 WRITE8_MEMBER( qx10_state::vram_w )
 {
 	int bank = 0;
-	
+
 	if (m_vram_bank & 1)	 { bank = 0; } // B
 	else if(m_vram_bank & 2) { bank = 1; } // G
 	else if(m_vram_bank & 4) { bank = 2; } // R

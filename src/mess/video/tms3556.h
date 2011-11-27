@@ -1,7 +1,7 @@
 /***************************************************************************
- 
+
   Texas Instruments TMS3556 Video Display Processor
- 
+
  ***************************************************************************/
 
 
@@ -50,27 +50,27 @@ class tms3556_device :	public device_t,
 public:
     // construction/destruction
     tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_READ8_MEMBER( vram_r );
 	DECLARE_WRITE8_MEMBER( vram_w );
 	DECLARE_READ8_MEMBER( reg_r );
 	DECLARE_WRITE8_MEMBER( reg_w );
 
 	void interrupt(running_machine &machine);
-	
+
 protected:
     // device-level overrides
     virtual void device_start();
-	
+
 	// device_config_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-	
+
     // address space configurations
 	const address_space_config		m_space_config;
-	
+
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);
-	
+
 	void draw_line_empty(UINT16 *ln);
 	void draw_line_text_common(UINT16 *ln);
 	void draw_line_bitmap_common(UINT16 *ln);
@@ -96,7 +96,7 @@ private:
 	int m_bg_color;				// background color for current line
 	int m_name_offset;			// current offset in name table
 	int m_cg_flag;				// c/g flag (mixed mode only)
-	int m_char_line_counter;	// character line counter (decrements from 10, 0 when we have reached 
+	int m_char_line_counter;	// character line counter (decrements from 10, 0 when we have reached
 								// last line of character row)
 	int m_dbl_h_phase[40];		// double height phase flags (one per horizontal character position)
 };

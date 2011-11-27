@@ -132,11 +132,11 @@ mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device
 
 //-------------------------------------------------
 //  setup_timer - sets up a single timer relative
-//	to the clock
+//  to the clock
 //-------------------------------------------------
 
 ATTR_FORCE_INLINE emu_timer *mc6847_friend_device::setup_timer(device_timer_id id, double offset, double period)
-{	
+{
 	emu_timer *timer = timer_alloc(id);
 	timer->adjust(
 		attotime::from_ticks(offset * 4, m_clock * 4),
@@ -496,7 +496,7 @@ mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_typ
 
 //-------------------------------------------------
 //  setup_fixed_mode - sets up a particular video
-//	mode bit with a decb callback
+//  mode bit with a decb callback
 //-------------------------------------------------
 
 void mc6847_base_device::setup_fixed_mode(struct devcb_read_line callback, UINT8 mode)

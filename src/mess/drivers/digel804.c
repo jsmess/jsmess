@@ -32,7 +32,7 @@
 
 // port 40 write writes eprom socket pins 11-13, 15-19 (i.e. pin D0 to pin D7)
 
-// port 41 write controls eprom socket pins 10 to 3 (d0 to d8) and SIM pins 7, 20/11, 8/12, 6/27, 23, and 21 (d0 to d5) 
+// port 41 write controls eprom socket pins 10 to 3 (d0 to d8) and SIM pins 7, 20/11, 8/12, 6/27, 23, and 21 (d0 to d5)
 
 // port 42 write controls eprom socket pins 25(d0), 2(d4), 27(d6)
 
@@ -278,8 +278,8 @@ WRITE8_MEMBER( digel804_state::op43 )
      * bits:76543210
      *      |||||\\\- select ram bank for 4000-bfff area based on these bits
      *      \\\\\---- unknown, always 0?
-	 
-	 * writes to 0x43 ALSO control 
+
+     * writes to 0x43 ALSO control
 
      * all writes to port 43 will reset the overload state unless the ammeter detects the overload is ongoing
      */
@@ -352,7 +352,7 @@ READ8_MEMBER( digel804_state::ip46 ) // keypad read
      * F* takes precedence over E*
      * higher numbers take precedence over lower ones
      * this value auto-latches on a key press and remains through multiple reads
-	 * this is done by a 74C923 integrated circuit
+     * this is done by a 74C923 integrated circuit
     */
 #ifdef PORT46_R_VERBOSE
 	logerror("Digel804: returning %02X for port 46 keypad read\n", m_kbd);

@@ -37,7 +37,7 @@
         03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
                 => add the port mapping for keyboard
         20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
-		11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino
+        11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino
 
         don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
         (and thanks to Daniel!) and Yves site : http://hectorvictor.free.fr/ (thank's too Yves!)
@@ -61,7 +61,7 @@
   (left)<-                     (right)->
                (down)v
 
- Fire <²> near <1>
+ Fire <?> near <1>
  Pot => INS /SUPPR
 
  Cassette : wav file (1 way, 16 bits, 44100hz)
@@ -178,7 +178,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hec2mdhrx_io , AS_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	
+
 	// Minidisc commands and changing the rom page !*/
 	AM_RANGE(0x000,0x0EF) AM_READWRITE( hector_179x_register_r,hector_179x_register_w)/* 179x registers*/
 	AM_RANGE(0x0f0,0x0ff) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
@@ -429,7 +429,7 @@ const floppy_interface minidisc_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_3_5_DSDD,  
+	FLOPPY_STANDARD_3_5_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(hector_minidisc),
 	NULL,
 	NULL
@@ -633,13 +633,13 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_CPU_IO_MAP(hec2mdhrx_io)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,50) //  put on the Z80 irq in Hz
-	MCFG_MACHINE_RESET(hec2mdhrx) 
+	MCFG_MACHINE_RESET(hec2mdhrx)
 	MCFG_MACHINE_START(hec2mdhrx)
 
 	/* Mini Disc */
 	MCFG_FD1793_ADD("wd179x", hector_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, minidisc_floppy_interface)
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -671,7 +671,7 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")
-	
+
 MACHINE_CONFIG_END
 
 /*****************************************************************************/

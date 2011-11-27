@@ -28,7 +28,7 @@
         28/09/2010 add the DISK II support by yo_fr      (jj.stac @ aliceadsl.fr)
                 => Note that actually the DISK II boot (loading CPM : OK) but do not run (don't run the CPM...).
         20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
-		11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino  (jj.stac @ aliceadsl.fr)
+        11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino  (jj.stac @ aliceadsl.fr)
 
     don't forget to keep some information about these machines, see DChector project : http://dchector.free.fr/ made by DanielCoulom
         (and thank's to Daniel!) and Yves site : http://hectorvictor.free.fr/ (thank's too Yves!)
@@ -58,7 +58,7 @@ static void Update_Sound(address_space *space, UINT8 data);
 
 static cassette_image_device *cassette_device_image(running_machine &machine);
 
-/* machine List 
+/* machine List
 hec2hrp
 victor
 hec2hr
@@ -72,22 +72,22 @@ hec2mx40
 static int isHectorWithDisc2(running_machine &machine)
 {
 return ((strncmp(machine.system().name , "hec2hrx"  	, 7)==0) ||
-		(strncmp(machine.system().name , "hec2hmx40" 	, 9)==0) ||
-		(strncmp(machine.system().name , "hec2hmx80" 	, 9)==0));
+		(strncmp(machine.system().name , "hec2hmx40"	, 9)==0) ||
+		(strncmp(machine.system().name , "hec2hmx80"	, 9)==0));
 }
 
 static int isHectorWithMiniDisc(running_machine &machine)
 {
-return ((strncmp(machine.system().name , "hec2mdhrx"  	, 9)==0));
+return ((strncmp(machine.system().name , "hec2mdhrx"	, 9)==0));
 }
 
 static int isHectorHR(running_machine &machine)
 {
-return ((strncmp(machine.system().name , "hec2hr"  		, 6)==0) ||
-		(strncmp(machine.system().name , "hec2mdhrx" 	, 9)==0) ||
-		(strncmp(machine.system().name , "victor" 		, 6)==0) ||
-		(strncmp(machine.system().name , "hec2hmx40" 	, 9)==0) ||
-		(strncmp(machine.system().name , "hec2hmx80" 	, 9)==0));
+return ((strncmp(machine.system().name , "hec2hr"		, 6)==0) ||
+		(strncmp(machine.system().name , "hec2mdhrx"	, 9)==0) ||
+		(strncmp(machine.system().name , "victor"		, 6)==0) ||
+		(strncmp(machine.system().name , "hec2hmx40"	, 9)==0) ||
+		(strncmp(machine.system().name , "hec2hmx80"	, 9)==0));
 }
 
 /* Cassette timer*/
@@ -102,11 +102,11 @@ void hector_minidisc_init(running_machine &machine)
 {
 	device_t *fdc = machine.device("wd179x");
 	//set density
-	wd17xx_dden_w(fdc, 1);// density select => always 1 (0 ça plante !)
-	
+	wd17xx_dden_w(fdc, 1);// density select => always 1 (0 ?a plante !)
+
 	/* FDC Motor Control - Bit 0/1 defines the state of the FDD 0/1 motor */
 	floppy_mon_w(floppy_get_device(machine, 0), 0);	// Moteur floppy A:
-	//floppy_mon_w(floppy_get_device(space->machine(), 1), BIT(data, 7));	// Moteur floppy B:, not implanted on the real machine
+	//floppy_mon_w(floppy_get_device(space->machine(), 1), BIT(data, 7));   // Moteur floppy B:, not implanted on the real machine
 
 	//Set the drive ready !
 	floppy_drive_set_ready_state(floppy_get_device(machine, 0), FLOPPY_DRIVE_READY, 0);// Disc 0 ready !
@@ -163,11 +163,11 @@ switch (offset)
 			{
 			// Rom page bank switching
 			memory_set_bank(space->machine(), "bank2",BIT(data, 5) ? HECTOR_BANK_BASE : HECTOR_BANK_DISC );
-		
+
 			// Set drive number
 			if (BIT(data, 6)) wd17xx_set_drive(fdc, 0);  // Set the correct drive number 0
 			//if (BIT(data, 7)) wd17xx_set_drive(fdc, 1);// Set the correct drive number 1,never here
-		
+
 			// Set side
 			wd17xx_set_side(fdc,BIT(data, 4) ? 1 : 0);// side select
 			}
@@ -243,11 +243,11 @@ READ8_HANDLER( hector_keyboard_r )
 			{
 				memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
 				memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
-				
+
 				//RESET DISC II unit
 				if (isHectorWithDisc2(machine) )
 					hector_disc2_reset(machine);
-					
+
 				/* floppy master reset */
 				if (isHectorWithMiniDisc(machine))
 					wd17xx_mr_w(machine.device("wd179x"), 1);

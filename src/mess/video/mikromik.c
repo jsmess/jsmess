@@ -72,7 +72,7 @@ ADDRESS_MAP_END
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	mm1_state *state = device->machine().driver_data<mm1_state>();
-	
+
 	UINT8 data = state->m_video_ram[address * 2];
 
 	for (int i = 0; i < 8; i++)

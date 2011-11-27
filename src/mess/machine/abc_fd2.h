@@ -42,7 +42,7 @@ protected:
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(UINT8 data);
 	virtual UINT8 abcbus_xmemfl(offs_t offset);
-	
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;

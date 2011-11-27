@@ -29,15 +29,15 @@
 #define SMS_RBORDER_X_PIXELS		(0x0f)		/* 15 pixels */
 #define SMS_TBORDER_START			(3 + 13)
 #define SMS_NTSC_192_TBORDER_Y_PIXELS	(0x1b)		/* 27 lines */
-//#define NTSC_192_BBORDER_Y_PIXELS	(0x18)		/* 24 lines */
+//#define NTSC_192_BBORDER_Y_PIXELS (0x18)      /* 24 lines */
 #define SMS_NTSC_224_TBORDER_Y_PIXELS	(0x0b)		/* 11 lines */
-//#define NTSC_224_BBORDER_Y_PIXELS	(0x08)		/* 8 lines */
-//#define PAL_192_TBORDER_Y_PIXELS	(0x36)		/* 54 lines */
-//#define PAL_192_BBORDER_Y_PIXELS	(0x30)		/* 48 lines */
-//#define PAL_224_TBORDER_Y_PIXELS	(0x26)		/* 38 lines */
-//#define PAL_224_BBORDER_Y_PIXELS	(0x20)		/* 32 lines */
+//#define NTSC_224_BBORDER_Y_PIXELS (0x08)      /* 8 lines */
+//#define PAL_192_TBORDER_Y_PIXELS  (0x36)      /* 54 lines */
+//#define PAL_192_BBORDER_Y_PIXELS  (0x30)      /* 48 lines */
+//#define PAL_224_TBORDER_Y_PIXELS  (0x26)      /* 38 lines */
+//#define PAL_224_BBORDER_Y_PIXELS  (0x20)      /* 32 lines */
 #define SMS_PAL_240_TBORDER_Y_PIXELS	(0x1e)		/* 30 lines */
-//#define PAL_240_BBORDER_Y_PIXELS	(0x18)		/* 24 lines */
+//#define PAL_240_BBORDER_Y_PIXELS  (0x18)      /* 24 lines */
 
 
 /***************************************************************************

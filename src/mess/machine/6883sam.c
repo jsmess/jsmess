@@ -7,7 +7,7 @@
     The Motorola 6883 SAM has 16 bits worth of state, but the state is changed
     by writing into a 32 byte address space; odd bytes set bits and even bytes
     clear bits.  Here is the layout:
- 
+
         31  Set     TY  Map Type            0: RAM/ROM  1: All RAM
         30  Clear   TY  Map Type
         29  Set     M1  Memory Size         00: 4K      10: 64K Dynamic
@@ -41,8 +41,8 @@
          1  Set     V0  VDG Mode
          0  Clear   V0  VDG Mode
 
-	All parts of the SAM are fully emulated except R1/R0 (the changes in the
-	MPU rate are approximated) and M1/M0
+    All parts of the SAM are fully emulated except R1/R0 (the changes in the
+    MPU rate are approximated) and M1/M0
 
 ***************************************************************************/
 
@@ -285,7 +285,7 @@ void sam6883_device::update_bank(int bank, offs_t addrstart, offs_t addrend, off
 
 //-------------------------------------------------
 //  update_cpu_clock - adjusts the speed of the CPU
-//	clock
+//  clock
 //-------------------------------------------------
 
 void sam6883_friend_device::update_cpu_clock(void)

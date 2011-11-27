@@ -1375,7 +1375,7 @@ static void	upd765_increment_sector(device_t *device)
 			{
 				fdc->upd765_command_bytes[2]++;
 			}
-			
+
 			fdc->upd765_command_bytes[3] ^= 0x01;
 			fdc->upd765_command_bytes[4] = 1;
 			fdc->side = fdc->upd765_command_bytes[3] & 0x01;

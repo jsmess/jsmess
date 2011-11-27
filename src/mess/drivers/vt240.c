@@ -48,7 +48,7 @@ public:
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-	
+
 	UINT8 *m_video_ram;
 };
 

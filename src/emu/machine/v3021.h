@@ -1,8 +1,10 @@
 /***************************************************************************
 
-    rtc9701.h
+    v3021.h
 
-    Serial rtc9701s.
+    EM Microelectronic-Marin SA Ultra Low Power 32kHz CMOS RTC (DIP8)
+
+    Serial Real Time Clock
 
 ***************************************************************************/
 
@@ -17,25 +19,13 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_RTC9701_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, rtc9701, XTAL_32_768kHz) \
+#define MCFG_V3021_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, v3021, XTAL_32_768kHz) \
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-
-typedef enum
-{
-	RTC9701_CMD_WAIT = 0,
-	RTC9701_RTC_READ,
-	RTC9701_RTC_WRITE,
-	RTC9701_EEPROM_READ,
-	RTC9701_EEPROM_WRITE,
-	RTC9701_AFTER_WRITE_ENABLE,
-
-} rtc9701_state_t;
 
 typedef struct
 {
@@ -43,21 +33,17 @@ typedef struct
 } rtc_regs_t;
 
 
-// ======================> rtc9701_device
+// ======================> v3021_device
 
-class rtc9701_device :	public device_t,
-						public device_nvram_interface
+class v3021_device :	public device_t
 {
 public:
 	// construction/destruction
-	rtc9701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
+	v3021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
-	DECLARE_WRITE_LINE_MEMBER( write_bit );
-	DECLARE_READ_LINE_MEMBER( read_bit );
-	DECLARE_WRITE_LINE_MEMBER( set_cs_line );
-	DECLARE_WRITE_LINE_MEMBER( set_clock_line );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
 	void timer_callback();
 
 protected:
@@ -66,38 +52,19 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
 	inline UINT8 rtc_read(UINT8 offset);
 	inline void rtc_write(UINT8 offset,UINT8 data);
 
 	static TIMER_CALLBACK( rtc_inc_callback );
 
-	int 					m_latch;
-	int						m_reset_line;
-	int						m_clock_line;
-
-
-	rtc9701_state_t rtc_state;
-	int cmd_stream_pos;
-	int current_cmd;
-
-	int rtc9701_address_pos;
-	int rtc9701_current_address;
-
-	UINT16 rtc9701_current_data;
-	int rtc9701_data_pos;
-
-	UINT16 rtc9701_data[0x100];
+	UINT8 m_cal_mask,m_cal_com,m_cal_cnt,m_cal_val;
 
 	rtc_regs_t m_rtc;
 };
 
 
 // device type definition
-extern const device_type rtc9701;
+extern const device_type v3021;
 
 
 

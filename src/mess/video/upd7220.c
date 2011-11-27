@@ -862,7 +862,7 @@ void upd7220_device::draw_pixel(int x, int y, UINT16 tile_data)
 	UINT32 addr = (y * m_pitch * 2 + (x >> 3)) & 0x3ffff;
 
 	int dad = x & 0x7;
-	
+
 	UINT8 data = readbyte(addr);
 
 	if((m_bitmap_mod & 3) == 1)

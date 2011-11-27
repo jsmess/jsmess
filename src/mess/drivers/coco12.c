@@ -51,9 +51,9 @@ ADDRESS_MAP_END
 //--------------------------------------------------------------------------
 //  INPUT_PORTS( coco_analog_control )
 //
-//	Other CoCo controllers were compatible with the Dragon, even if no
-//	software is known to make use of them We add them here, based on this
-//	compatibility, in case anyone wants to use them in homebrew software
+//  Other CoCo controllers were compatible with the Dragon, even if no
+//  software is known to make use of them We add them here, based on this
+//  compatibility, in case anyone wants to use them in homebrew software
 //--------------------------------------------------------------------------
 
 INPUT_PORTS_START( coco_analog_control )
@@ -117,16 +117,16 @@ INPUT_PORTS_END
 //  INPUT_PORTS( coco_keyboard )
 //-------------------------------------------------
 //
-//	CoCo keyboard
+//  CoCo keyboard
 //
-//	       PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
-//	  PA6: Ent Clr Brk N/c N/c N/c N/c Shift
-//	  PA5: 8   9   :   ;   ,   -   .   /
-//	  PA4: 0   1   2   3   4   5   6   7
-//	  PA3: X   Y   Z   Up  Dwn Lft Rgt Space
-//	  PA2: P   Q   R   S   T   U   V   W
-//	  PA1: H   I   J   K   L   M   N   O
-//	  PA0: @   A   B   C   D   E   F   G
+//         PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
+//    PA6: Ent Clr Brk N/c N/c N/c N/c Shift
+//    PA5: 8   9   :   ;   ,   -   .   /
+//    PA4: 0   1   2   3   4   5   6   7
+//    PA3: X   Y   Z   Up  Dwn Lft Rgt Space
+//    PA2: P   Q   R   S   T   U   V   W
+//    PA1: H   I   J   K   L   M   N   O
+//    PA0: @   A   B   C   D   E   F   G
 //-------------------------------------------------
 
 static INPUT_PORTS_START( coco_keyboard )
@@ -224,7 +224,7 @@ INPUT_PORTS_END
 SLOT_INTERFACE_START( coco_cart )
 	SLOT_INTERFACE("fdc", COCO_FDC)
 	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
-	SLOT_INTERFACE("cp400_fdc", CP400_FDC)	
+	SLOT_INTERFACE("cp400_fdc", CP400_FDC)
 	SLOT_INTERFACE("rs232", COCO_232)
 	SLOT_INTERFACE("orch90", COCO_ORCH90)
 	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)

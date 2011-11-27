@@ -757,7 +757,7 @@ ROM_END
 
 8530-H31 (Model 30/286)
 ======================
-  P/N		   Date
+  P/N          Date
 33F5381A EC C01446 1990
 
 */
@@ -792,8 +792,8 @@ ROM_END
 
 Same ROMs used by : (According to http://www.ibmmuseum.com/ohlandl/8565/8560.html)
 
-IBM Personal System/2 Model 60 (8560-041 and 8560-071) 
-IBM Personal System/2 Model 65 SX (8565-061 and 8565-121) 
+IBM Personal System/2 Model 60 (8560-041 and 8560-071)
+IBM Personal System/2 Model 65 SX (8565-061 and 8565-121)
 
 */
 ROM_START( i8550021 )
@@ -805,7 +805,7 @@ ROM_START( i8550021 )
 	ROM_LOAD16_BYTE( "90x7420.bin", 0xf0001, 0x8000, CRC(19a57cc1) SHA1(5b31ba66cd3690e651a450619a32b7210769945d))
 	ROM_RELOAD(0xff0001, 0x8000)
 	ROM_LOAD16_BYTE( "90x7429.bin", 0xf0000, 0x8000, CRC(6f0120f6) SHA1(e112c291ac3d9f6507c93ac49ad26f9fd2245fd2))
-	ROM_RELOAD(0xff0000, 0x8000)	
+	ROM_RELOAD(0xff0000, 0x8000)
 ROM_END
 
 /*
