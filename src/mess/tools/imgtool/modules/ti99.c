@@ -4875,7 +4875,7 @@ static imgtoolerr_t dsk_image_deletefile(imgtool_partition *partition, const cha
 	dsk_fdr fdr;
 	int i, cluster_index;
 	unsigned cur_AU, cluster_lastfphysrec;
-	int fphysrecs;
+//	int fphysrecs;
 	int parent_ref, is_dir, catalog_index;
 	imgtoolerr_t errorcode;
 	UINT8 buf[256];
@@ -4940,7 +4940,8 @@ static imgtoolerr_t dsk_image_deletefile(imgtool_partition *partition, const cha
 			return IMGTOOLERR_READERROR;
 
 		/* free data AUs */
-		fphysrecs = get_UINT16BE(fdr.fphysrecs);
+//		fphysrecs = 
+            get_UINT16BE(fdr.fphysrecs);
 
 		i = 0;
 		cluster_index = 0;

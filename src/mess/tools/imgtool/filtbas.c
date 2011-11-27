@@ -75,7 +75,7 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 	imgtoolerr_t err;
 	imgtool_stream *mem_stream;
 	UINT8 line_header[4];
-	UINT16 address, line_number;
+	UINT16 line_number; //, address;
 	UINT8 b, shift;
 	int i;
 	int in_string = FALSE;
@@ -104,12 +104,14 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 		/* pluck the address and line number out */
 		if (tokens->be)
 		{
-			address = (UINT16) pick_integer_be(line_header, 0, 2);
+			//address = (UINT16)
+            pick_integer_be(line_header, 0, 2);
 			line_number = (UINT16) pick_integer_be(line_header, 2, 2);
 		}
 		else
 		{
-			address = (UINT16) pick_integer_le(line_header, 0, 2);
+			//address = (UINT16) 
+            pick_integer_le(line_header, 0, 2);
 			line_number = (UINT16) pick_integer_le(line_header, 2, 2);
 		}
 

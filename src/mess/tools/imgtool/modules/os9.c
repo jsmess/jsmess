@@ -626,7 +626,7 @@ static imgtoolerr_t os9_diskimage_open(imgtool_image *image, imgtool_stream *str
 	imgtoolerr_t err;
 	floperr_t ferr;
 	os9_diskinfo *info;
-	UINT32 track_size_in_sectors, attributes, i;
+	UINT32 track_size_in_sectors, i; //, attributes;
 	UINT8 header[256];
 	UINT32 allocation_bitmap_lsns;
 	UINT8 b, mask;
@@ -643,7 +643,8 @@ static imgtoolerr_t os9_diskimage_open(imgtool_image *image, imgtool_stream *str
 	info->cluster_size				= pick_integer_be(header,   6, 2);
 	info->root_dir_lsn				= pick_integer_be(header,   8, 3);
 	info->owner_id					= pick_integer_be(header,  11, 2);
-	attributes						= pick_integer_be(header,  13, 1);
+//	attributes						= 
+    pick_integer_be(header,  13, 1);
 	info->disk_id					= pick_integer_be(header,  14, 2);
 	info->format_flags				= pick_integer_be(header,  16, 1);
 	info->sectors_per_track			= pick_integer_be(header,  17, 2);
