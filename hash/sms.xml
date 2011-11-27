@@ -1087,6 +1087,17 @@
 		</part>
 	</software>
 
+	<software name="chopliftp" cloneof="choplift">
+		<description>Choplifter (USA, Prototype)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="choplifter [proto].bin" size="131072" crc="fd981232" sha1="95d8f826248118afb9265c05c476709731015d12" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Serial: MK-29004-50, 028.040 -->
 	<software name="chuckrck">
 		<description>Chuck Rock (Euro, Bra)</description>
@@ -2598,6 +2609,17 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="hang-on &amp; safari hunt (usa).bin" size="131072" crc="e167a561" sha1="7c741493889788d4511979bcaa3c48708d6240ed" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangonshp" cloneof="hangon">
+		<description>Hang-On &amp; Safari Hunt (USA, Prototype)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="hang-on &amp; safari hunt [proto].bin" size="131072" crc="a120b77f" sha1="7e0b0dc82c2a1d64d26ce525ec498a520d32cfa7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5591,6 +5613,17 @@
 		</part>
 	</software>
 
+	<software name="transbotp" cloneof="transbot">
+		<description>TransBot (USA, Prototype)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="transbot [proto].bin" size="32768" crc="58b99750" sha1="4cd1d5e94b31bb3c3e449bc995890c0a4707bc5f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="treinam">
 		<description>Treinamento Do Mymo (Bra)</description>
 		<year>19??</year>
@@ -6024,6 +6057,17 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="world grand prix (usa).bin" size="131072" crc="7b369892" sha1="feff411732ca2dc17dab6d7868749d79326993d7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="worldgpp" cloneof="worldgp">
+		<description>World Grand Prix (USA, Prototype)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="world grand prix [proto].bin" size="131072" crc="b5a9f824" sha1="9b44f322f8c2f59ebf1372f7911046cc6b3c156c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
