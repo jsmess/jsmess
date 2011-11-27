@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	dragon.c
+    dragon.c
 
-	Dragon
+    Dragon
 
 ***************************************************************************/
 
@@ -118,7 +118,7 @@ INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(dragon_cart)
 	SLOT_INTERFACE("dragon_fdc", DRAGON_FDC)
-	SLOT_INTERFACE("sdtandy_fdc", SDTANDY_FDC)	
+	SLOT_INTERFACE("sdtandy_fdc", SDTANDY_FDC)
 	SLOT_INTERFACE("pak", COCO_PAK)
 SLOT_INTERFACE_END
 
@@ -250,7 +250,7 @@ ROM_END
 ROM_START(tanodr64)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
-	ROM_LOAD("d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))	
+	ROM_LOAD("d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
 ROM_END
 
 ROM_START(dgnalpha)

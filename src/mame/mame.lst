@@ -80,6 +80,7 @@ ctrpllrp		// hack
 eyes			// (c) 1982 Digitrex Techstar + "Rockola presents"
 eyes2			// (c) 1982 Techstar + "Rockola presents"
 eyeszac			// (c) 1982 Zaccaria / bootleg
+birdiy			// (c) 1983 Mama Top
 mrtnt			// (c) 1983 Telko
 gorkans			// (c) 1984 Techstar
 eggor			// (c) 1983 Telko
@@ -1557,6 +1558,8 @@ nstocker		// (c) 1986
 nstocker2		// (c) 1986
 sfootbal		// (c) 1986
 spiker			// (c) 1986
+spiker2                 // (c) 1986
+spiker3                 // (c) 1986
 stompin			// (c) 1986
 rescraid		// (c) 1987
 rescraida		// (c) 1987
@@ -1996,6 +1999,7 @@ ashnojoe		// ??? (c) 1990 Wave / Taito
 
 // Taito multi-screen games
 ninjaw			// B31 (c) 1987 Taito Corporation Japan (World)
+ninjawu			// B31 (c) 1987 Taito America Corporation (US)
 ninjawj			// B31 (c) 1987 Taito Corporation (Japan)
 darius2			// C07 (c) 1989 Taito Corporation (Japan)
 sagaia			// C07 (c) 1989 Taito Corporation Japan (World)
@@ -2847,6 +2851,7 @@ sf2ceea			// 13/03/1992 (c) 1992 (World)
 sf2ceua			// 13/03/1992 (c) 1992 (USA)
 sf2ceub			// 13/05/1992 (c) 1992 (USA)
 sf2ceuc			// 03/08/1992 (c) 1992 (USA)
+sf2ceud			// 03/08/1992 (c) 1992 (USA)
 sf2cej			// 13/05/1992 (c) 1992 (Japan)
 sf2rb			// hack
 sf2rb2			// hack
@@ -2903,6 +2908,7 @@ mbombrdj		// 06/12/1993 (c) 1993 (Japan) (CPS1 + QSound)
 pnickj			// 08/06/1994 (c) 1994 Compile + Capcom license (Japan) not listed on Capcom's site
 qtono2j			// 23/01/1995 (c) 1995 (Japan)
 pang3			// 01/06/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site
+pang3r1			// 11/05/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site
 pang3n			// 11/05/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site
 pang3j			// 11/05/1995 (c) 1995 Mitchell (Japan) not listed on Capcom's site
 megaman			// 06/10/1995 (c) 1995 (USA)
@@ -5151,7 +5157,7 @@ ctisland3		// 16
 				// 17 1981.10 Bobbitto
 cexplore		// 18 1982.02 Explorer
 cdiscon1		// 19 1982.04 Disco No.1
-csweetht		// 19         Sweet Heart 
+csweetht		// 19         Sweet Heart
 ctornado		// 20 1982.05 Tornado
 cmissnx			// 21 1982.04 Mission-X/Zoar
 cptennis		// 22 1982.06 Pro Tennis
@@ -5455,8 +5461,9 @@ nslashers		// MBH (c) 1993 Data East Corporation (Japan)
 				// MBJ ??
 				// MBK ??
 				// MBL ??
-lockload		// MBM (c) 1994 Data East Corporation (US)
+lockload		// MBM (c) 1994 Data East Corporation (World)
 lockloadu		// MBM (c) 1994 Data East Corporation (US)
+gunhard			// MBM (c) 1994 Data East Corporation (Japan)
 joemacr			// MBN (c) 1994
 joemacra		// MBN (c) 1994
 				// MBO ??
@@ -6095,6 +6102,7 @@ mtrap			// (c) 1981
 mtrap3			// (c) 1981
 mtrap4			// (c) 1981
 pepper2			// (c) 1982
+pepper27		// (c) 1982
 hardhat			// (c) 1982
 fax				// (c) 1983
 fax2			// (c) 1983
@@ -7637,7 +7645,8 @@ senkyu			// (c) 1995 Seibu Kaihatsu
 senkyua			// (c) 1995 Seibu Kaihatsu
 batlball		// (c) 1995 Seibu Kaihatsu (Tuning License)
 batlballa		// (c) 1995 Seibu Kaihatsu (Metrotainment License)
-batlballu		// (c) 1995 Seibu Kaihatsu (Metrotainment License)
+batlballe		// (c) 1995 Seibu Kaihatsu (Metrotainment License)
+batlballu		// (c) 1995 Seibu Kaihatsu (Fabtek license)
 
 viprp1			// (c) 1995 Seibu Kaihatsu
 viprp1u			// (c) 1995 Seibu Kaihatsu (Fabtek license)
@@ -8060,7 +8069,8 @@ gp2quiz			// (c) 1993 Kaneko
 gp2se			// (c) 1994 Kaneko
 jchan			// (c) 1995 Kaneko
 jchan2			// (c) 1995 Kaneko
-galpani3		// (c) 1995 Kaneko
+galpani3		// (c) 1995 Kaneko (World)
+galpani3j		// (c) 1995 Kaneko (Japan)
 
 // Kaneko "AX System" games
 berlwall		// (c) 1991 Kaneko
@@ -8168,6 +8178,7 @@ zingzipbl		// bootleg
 atehate			// (C) 1993 Athena
 jjsquawk		// (c) 1993 Athena / Able
 jjsquawkb		// bootleg
+jjsquawkb2		// bootleg
 kamenrid		// (c) 1993 Toei / Banpresto
 madshark		// (c) 1993 Allumer
 msgundam		// (c) 1993 Banpresto
@@ -8420,6 +8431,7 @@ bigtwin			// (c) 1995
 bigtwinb		// (c) 1995
 wbeachvl		// (c) 1995
 wbeachvl2		// (c) 1995
+wbeachvl3		// (c) 1995
 excelsr			// (c) 1995
 hotmind			// (c) 1995
 hrdtimes		// (c) 1994
@@ -9815,6 +9827,7 @@ j7wldwkd		// Wild 'N' Wicked (Jpm)
 j7bullio		// Bullionaire (Ace)
 
 // Other Games
+pucky			// (c) 19?? ???
 vega			// (c) 19?? Olympia?
 astinvad		// (c) 1980 Stern
 kosmokil		// bootleg

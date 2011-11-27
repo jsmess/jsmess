@@ -202,7 +202,7 @@ void abc80_state::video_start()
 {
 	// allocate memory
 	m_video_ram = auto_alloc_array(machine(), UINT8, 0x400);
-	
+
 	// find memory regions
 	m_char_rom = machine().region("chargen")->base();
 	m_hsync_prom = machine().region("hsync")->base();

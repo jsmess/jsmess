@@ -425,96 +425,96 @@ Boot PROM
 Sun-4c Architecture
 
 SPARCstation SLC (Sun-4/20) - 128K x 8
-U1001 		Revision 
+U1001       Revision
 ========================================
-520-2748-01 1.2 Version 3 
-520-2748-02 1.3 
-520-2748-03 1.3 
-520-2748-04 1.4 Version 2 
-595-2250-xx Sun-4/20 Boot PROM Kit 
+520-2748-01 1.2 Version 3
+520-2748-02 1.3
+520-2748-03 1.3
+520-2748-04 1.4 Version 2
+595-2250-xx Sun-4/20 Boot PROM Kit
 
 SPARCstation ELC (Sun-4/25) - 256K x 8
-U0806 		Revision 
+U0806       Revision
 ========================================
-520-3085-01 
-520-3085-02 2.3 Version 95 
-520-3085-03 2.4 Version 96 
-520-3085-04 2.6 Version 102 (not used) 
-520-3085-04 2.9 Version 7 
+520-3085-01
+520-3085-02 2.3 Version 95
+520-3085-03 2.4 Version 96
+520-3085-04 2.6 Version 102 (not used)
+520-3085-04 2.9 Version 7
 
 
 SPARCstation IPC (Sun-4/40) - 256K x 8
-U0902 		Revision 
+U0902       Revision
 ========================================
-525-1085-01  
-525-1085-02  
-525-1085-03 1.6 Version 151 
-525-1191-01 1.7 Version 3 and 2.4 Version 362 
-525-1191-02 1.7 Version 3 and 2.6 Version 411 
-525-1191-03 1.7 Version 3 and 2.9 Version 24 
+525-1085-01
+525-1085-02
+525-1085-03 1.6 Version 151
+525-1191-01 1.7 Version 3 and 2.4 Version 362
+525-1191-02 1.7 Version 3 and 2.6 Version 411
+525-1191-03 1.7 Version 3 and 2.9 Version 24
 
 
 SPARCstation IPX (Sun-4/50) - 256K x 8
-U0501 		Revision 
+U0501       Revision
 ========================================
-525-1177-01 2.1 Version 66 
-525-1177-02 2.2 Version 134 
-525-1177-03 2.3 Version 263 
-525-1177-04 2.4 Version 347 
-525-1177-05 2.6 Version 410 
-525-1177-06 2.9 Version 20 
+525-1177-01 2.1 Version 66
+525-1177-02 2.2 Version 134
+525-1177-03 2.3 Version 263
+525-1177-04 2.4 Version 347
+525-1177-05 2.6 Version 410
+525-1177-06 2.9 Version 20
 
 
 SPARCstation 1 (Sun-4/60) - 128K x 8
-U0837 		Revision 
+U0837       Revision
 ========================================
-525-1043-01 
-525-1043-02 0.1 
-525-1043-03 
-525-1043-04 1.0 
-525-1043-05 1.0 
-525-1043-06 1.0 
-525-1043-07 1.1 
-525-1043-08 1.3 Version 3 
-595-1963-xx Sun-4/60 Boot PROM Kit 
-525-1207-01 2.4 Version 95 
-525-1207-02 2.9 Version 9 (2.x is only available from the spare parts price list) 
-560-1805-xx Sun-4/60 2.4 Boot PROM Kit 
+525-1043-01
+525-1043-02 0.1
+525-1043-03
+525-1043-04 1.0
+525-1043-05 1.0
+525-1043-06 1.0
+525-1043-07 1.1
+525-1043-08 1.3 Version 3
+595-1963-xx Sun-4/60 Boot PROM Kit
+525-1207-01 2.4 Version 95
+525-1207-02 2.9 Version 9 (2.x is only available from the spare parts price list)
+560-1805-xx Sun-4/60 2.4 Boot PROM Kit
 
 
 SPARCstation 1+ (Sun-4/65) - 128K x 8
-U0837 Revision 
+U0837 Revision
 ========================================
-525-1108-01 
-525-1108-02 
-525-1108-03 1.1 Version 13 
-525-1108-04 1.2 
-525-1108-05 1.3 Version 4 
-525-1208-01 2.4 Version 116 
-525-1208-02 2.9 Version 9 (2.x is only available from the spare parts price list) 
-560-1806-xx Sun-4/65 2.4 Boot PROM Kit 
+525-1108-01
+525-1108-02
+525-1108-03 1.1 Version 13
+525-1108-04 1.2
+525-1108-05 1.3 Version 4
+525-1208-01 2.4 Version 116
+525-1208-02 2.9 Version 9 (2.x is only available from the spare parts price list)
+560-1806-xx Sun-4/65 2.4 Boot PROM Kit
 
 
 SPARCstation 2 (Sun-4/75) - 256K x 8
-U0501 		Revision 
+U0501       Revision
 ========================================
-525-1107-01 2.0Beta0 
-525-1107-02 2.0Beta1 
-525-1107-03 2.0 
-525-1107-04 2.0 Version 865 (fails with Weitek Power µp) 
-525-1107-05 2.1 Version 931 (fails with Weitek Power µp) 
-525-1107-06 2.2 Version 947 
-525-1107-07 2.4 Version 990 
-525-1107-08 2.4.1 Version 991 
-525-1107-09 2.6 Version 1118 
-525-1107-10 2.9 Version 16 
-595-2249-xx Sun-4/75 Boot PROM Kit 
+525-1107-01 2.0Beta0
+525-1107-02 2.0Beta1
+525-1107-03 2.0
+525-1107-04 2.0 Version 865 (fails with Weitek Power ?p)
+525-1107-05 2.1 Version 931 (fails with Weitek Power ?p)
+525-1107-06 2.2 Version 947
+525-1107-07 2.4 Version 990
+525-1107-08 2.4.1 Version 991
+525-1107-09 2.6 Version 1118
+525-1107-10 2.9 Version 16
+595-2249-xx Sun-4/75 Boot PROM Kit
 
 */
 
 // Sun 4/300, Cypress Semiconductor CY7C601, Texas Instruments 8847 FPU
 ROM_START( sun4_300 )
-  ROM_REGION32_BE( 0x40000, "user1", ROMREGION_ERASEFF )  
+  ROM_REGION32_BE( 0x40000, "user1", ROMREGION_ERASEFF )
   ROM_LOAD( "1035-09.rom", 0x0000, 0x10000, CRC(4ae2f2ad) SHA1(9c17a80b3ce3efdf18b5eca969f1565ddaad3116))
   ROM_LOAD( "1036-09.rom", 0x0000, 0x10000, CRC(cb3d45a7) SHA1(9d5da09ff87ec52dc99ffabd1003d30811eafdb0))
   ROM_LOAD( "1037-09.rom", 0x0000, 0x10000, CRC(4f005bea) SHA1(db3f6133ea7c497ba440bc797123dde41abea6fd))
@@ -523,46 +523,46 @@ ROM_START( sun4_300 )
   ROM_REGION( 0x10000, "devices", ROMREGION_ERASEFF )
   // CG3 Color frame buffer (cgthree)
   ROM_LOAD( "sunw,501-1415.bin", 0x0000, 0x0800, CRC(d1eb6f4d) SHA1(9bef98b2784b6e70167337bb27cd07952b348b5a))
-  
+
   // BW2 frame buffer (bwtwo)
   ROM_LOAD( "sunw,501-1561.bin", 0x0800, 0x0800, CRC(e37a3314) SHA1(78761bd2369cb0c58ef1344c697a47d3a659d4bc))
-  
-  // TurboGX 8-Bit Color Frame Buffer 
-  ROM_LOAD( "sunw,501-2325.bin", 0x1000, 0x8000, CRC(bbdc45f8) SHA1(e4a51d78e199cd57f2fcb9d45b25dfae2bd537e4))  
+
+  // TurboGX 8-Bit Color Frame Buffer
+  ROM_LOAD( "sunw,501-2325.bin", 0x1000, 0x8000, CRC(bbdc45f8) SHA1(e4a51d78e199cd57f2fcb9d45b25dfae2bd537e4))
 ROM_END
 
 // SPARCstation IPC (Sun 4/40)
-ROM_START( sun4_40 )  
-  ROM_REGION32_BE( 0x40000, "user1", ROMREGION_ERASEFF )  
+ROM_START( sun4_40 )
+  ROM_REGION32_BE( 0x40000, "user1", ROMREGION_ERASEFF )
   ROM_LOAD( "4.40_v2.9.rom", 0x0000, 0x40000, CRC(532fc20d) SHA1(d86d9e958017b3fecdf510d728a3e46a0ce3281d))
 ROM_END
 
 // SPARCstation IPX (Sun 4/50)
-ROM_START( sun4_50 )  
-  ROM_REGION32_BE( 0x40000, "user1", ROMREGION_ERASEFF )  
+ROM_START( sun4_50 )
+  ROM_REGION32_BE( 0x40000, "user1", ROMREGION_ERASEFF )
   ROM_LOAD( "ipx-29.rom", 0x0000, 0x40000, CRC(1910aa65) SHA1(7d8832fea8e299b89e6ec7137fcde497673c14f8))
 ROM_END
 
 // SPARCstation SLC (Sun 4/20)
-ROM_START( sun4_20 )  
+ROM_START( sun4_20 )
   ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )
   ROM_LOAD( "520-2748-04.rom", 0x0000, 0x20000, CRC(e85b3fd8) SHA1(4cbc088f589375e2d5983f481f7d4261a408702e))
 ROM_END
 
 // SPARCstation 1 (Sun 4/60)
-ROM_START( sun4_60 )  
+ROM_START( sun4_60 )
   ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )
   ROM_LOAD( "ss1v29.rom", 0x0000, 0x20000, CRC(e3f103a9) SHA1(5e95835f1090ea94859bd005757f0e7b5e86181b))
 ROM_END
 
 // SPARCstation 2 (Sun 4/75)
-ROM_START( sun4_75 )  
+ROM_START( sun4_75 )
   ROM_REGION32_BE( 0x40000, "user1", ROMREGION_ERASEFF )
   ROM_LOAD( "ss2-29.rom", 0x0000, 0x40000, CRC(d04132b3) SHA1(ef26afafa2800b8e2e5e994b3a76ca17ce1314b1))
 ROM_END
 
 // SPARCstation 10 (Sun S10)
-ROM_START( sun_s10 )  
+ROM_START( sun_s10 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "r225", "Rev 2.2.5")
 	ROMX_LOAD( "ss10_v2.25.rom", 0x0000, 0x80000, CRC(c7a48fd3) SHA1(db13d85b02f181eb7fce4c38b11996ff64116619), ROM_BIOS(1))
@@ -572,8 +572,8 @@ ROM_START( sun_s10 )
 ROM_END
 
 // SPARCstation 20
-ROM_START( sun_s20 )  
-	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )	
+ROM_START( sun_s20 )
+	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "r225", "Rev 2.2.5")
 	ROMX_LOAD( "ss20_v2.25.rom", 0x0000, 0x80000, CRC(b4f5c547) SHA1(ee78312069522094950884d5bcb21f691eb6f31e), ROM_BIOS(1))
 	// SPARCstation 10 and 20

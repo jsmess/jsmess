@@ -157,19 +157,19 @@ QUICKLOAD_LOAD( sorcerer )
 	{
 		/* check to see if autorun is on (I hate how this works) */
 		autorun = input_port_read_safe(image.device().machine(), "CONFIG", 0xFF) & 1;
-	
+
 		address_space *space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space->read_byte(0xdffa) != 0xc3))
 			return IMAGE_INIT_FAIL;		/* can't run a program if the cartridge isn't in */
 
 		/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
-		1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
-		2. If autorunning, jump to C689 (command processor), else jump to C3DD (READY prompt).
-		Important addresses:
-			01D5 = start (load) address of a conventional basic program
-			C858 = an autorun basic program will have this exec address on the tape
-			C3DD = part of basic that displays READY and lets user enter input */
+        1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
+        2. If autorunning, jump to C689 (command processor), else jump to C3DD (READY prompt).
+        Important addresses:
+            01D5 = start (load) address of a conventional basic program
+            C858 = an autorun basic program will have this exec address on the tape
+            C3DD = part of basic that displays READY and lets user enter input */
 
 		if ((start_address == 0x1d5) || (execute_address == 0xc858))
 		{
@@ -201,7 +201,7 @@ QUICKLOAD_LOAD( sorcerer )
 			if (autorun)
 				cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, execute_address);
 		}
-	
+
 	}
 
 	return IMAGE_INIT_PASS;

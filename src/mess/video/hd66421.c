@@ -134,7 +134,7 @@ hd66421_device::hd66421_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 void hd66421_device::device_start()
-{	
+{
 	// register for state saving
 	save_item(NAME(m_cmd));
 	save_item(NAME(m_reg));

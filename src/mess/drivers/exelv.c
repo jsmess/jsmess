@@ -491,7 +491,7 @@ static const tms5220_interface exl100_tms5220_interface =
 static PALETTE_INIT( exelv )
 {
 	int	i, red, green, blue;
-	
+
 	/* create the 8 color palette */
 	for (i = 0; i < 8; i++)
 	{
@@ -518,7 +518,7 @@ void exelv_state::machine_start()
 	UINT8 *rom = machine().region("user1")->base() + 0x0200;
 	memory_configure_bank(machine(), "bank1", 0, 1, rom, 0x8000 - 0x200);
 	memory_set_bank(machine(), "bank1", 0);
-	
+
 	/* register for state saving */
 	save_item(NAME(m_tms7020_porta));
 	save_item(NAME(m_tms7020_portb));

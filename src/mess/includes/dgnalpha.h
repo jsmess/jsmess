@@ -74,7 +74,7 @@ private:
 	/* fdc */
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	
+
 	/* modem */
 	UINT8 modem_r(offs_t offset);
 	void modem_w(offs_t offset, UINT8 data);

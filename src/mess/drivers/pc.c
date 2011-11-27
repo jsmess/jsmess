@@ -1424,7 +1424,7 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )	
+	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
@@ -2017,7 +2017,7 @@ COMP( 1987, zdsupers,   ibm5150,    0,          zenith,     pccga,      pccga,  
 
 COMP( 1983, m24,        ibm5150,    0,          olivetti,   pccga,      pccga,      "Olivetti", "M24", GAME_NOT_WORKING)
 COMP( 1987, m240,       ibm5150,    0,          olivetti,   pccga,      pccga,      "Olivetti", "M240", GAME_NOT_WORKING)
-COMP( 198?, olivm15,    ibm5150,    0,          olivm15,    0,    	    0,     		"Olivetti", "M15", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, olivm15,    ibm5150,    0,          olivm15,    0,  	    0,  		"Olivetti", "M15", GAME_NOT_WORKING | GAME_NO_SOUND)
 
 COMP( 1983, ibm5550,    ibm5150,    0,          ibm5550,    pccga,      pccga,      "International Business Machines", "IBM 5550", GAME_NOT_WORKING)
 

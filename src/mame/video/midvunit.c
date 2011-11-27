@@ -24,7 +24,7 @@
 
 
 midvunit_renderer::midvunit_renderer(midvunit_state &state)
-	: poly_manager(state.machine()),
+	: poly_manager<float, midvunit_object_data, 2, 4000>(state.machine()),
 	  m_state(state) { }
 
 
@@ -54,7 +54,7 @@ VIDEO_START( midvunit )
 {
 	midvunit_state *state = machine.driver_data<midvunit_state>();
 	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_timer_cb));
-	
+
 	state->m_poly = auto_alloc(machine, midvunit_renderer(*state));
 
 	state_save_register_global_array(machine, state->m_video_regs);

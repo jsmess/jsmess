@@ -99,7 +99,7 @@ tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 void tms3556_device::device_start()
-{	
+{
 	// register for state saving
 	save_item(NAME(m_control_regs));
 	save_item(NAME(m_address_regs));
@@ -163,7 +163,7 @@ WRITE8_MEMBER( tms3556_device::vram_w )
 READ8_MEMBER( tms3556_device::reg_r )
 {
 	if (LOG) logerror("TMS3556 Reg Read: %06x\n", offset);
-	
+
 	int reply = 0;
 
 	if (m_reg_ptr < 8)
@@ -242,7 +242,7 @@ WRITE8_MEMBER( tms3556_device::reg_w )
 
 
 //-------------------------------------------------
-//  draw_line_empty - draw an empty line (used for 
+//  draw_line_empty - draw an empty line (used for
 //  top and bottom borders, and screen off mode)
 //-------------------------------------------------
 
@@ -259,7 +259,7 @@ void tms3556_device::draw_line_empty(UINT16 *ln)
 
 
 //-------------------------------------------------
-//  draw_line_text_common - draw a line of text 
+//  draw_line_text_common - draw a line of text
 //  (called by draw_line_text and draw_line_mixed)
 //-------------------------------------------------
 
@@ -373,7 +373,7 @@ void tms3556_device::draw_line_text_common(UINT16 *ln)
 
 
 //-------------------------------------------------
-//  draw_line_bitmap_common - draw a line of bitmap 
+//  draw_line_bitmap_common - draw a line of bitmap
 //  (called by draw_line_bitmap and draw_line_mixed)
 //-------------------------------------------------
 
@@ -473,7 +473,7 @@ void tms3556_device::draw_line_mixed(UINT16 *ln)
 
 
 //-------------------------------------------------
-//  draw_line - draw a line. If non-interlaced mode, 
+//  draw_line - draw a line. If non-interlaced mode,
 //  duplicate the line.
 //-------------------------------------------------
 
@@ -482,11 +482,11 @@ void tms3556_device::draw_line(bitmap_t *bmp, int line)
 	int double_lines = 0;
 	UINT16 *ln, *ln2 = NULL;
 
-//	if (m_control_regs[4] & 0x??)
-//	{   // interlaced mode
-//		ln = BITMAP_ADDR16(bmp, line, m_field);
-//	}
-//	else
+//  if (m_control_regs[4] & 0x??)
+//  {   // interlaced mode
+//      ln = BITMAP_ADDR16(bmp, line, m_field);
+//  }
+//  else
 	{	/* non-interlaced mode */
 		ln = BITMAP_ADDR16(bmp, line, 0);
 		ln2 = BITMAP_ADDR16(bmp, line, 1);

@@ -376,20 +376,20 @@ READ8_MEMBER( coco_state::pia1_pa_r )
 
 //-------------------------------------------------
 //  pia1_pb_r - this handles the reading of the
-//	memory sense switch (PB2) for the CoCo 1 and
-//	serial-in (PB0)
+//  memory sense switch (PB2) for the CoCo 1 and
+//  serial-in (PB0)
 //-------------------------------------------------
 
 READ8_MEMBER( coco_state::pia1_pb_r )
 {
 	UINT32 ram_size = m_ram->size();
 
-	//	For the CoCo 1, the logic has been changed to only select 64K rams
-	//	if there is more than 16K of memory, as the Color Basic 1.0 rom
-	//	can only configure 4K or 16K ram banks (as documented in "Color
-	//	Basic Unreveled"), doing this allows this  allows the coco driver
-	//	to access 32K of ram, and also allows the cocoe driver to access
-	//	the full 64K, as this uses Color Basic 1.2, which can configure 64K rams
+	//  For the CoCo 1, the logic has been changed to only select 64K rams
+	//  if there is more than 16K of memory, as the Color Basic 1.0 rom
+	//  can only configure 4K or 16K ram banks (as documented in "Color
+	//  Basic Unreveled"), doing this allows this  allows the coco driver
+	//  to access 32K of ram, and also allows the cocoe driver to access
+	//  the full 64K, as this uses Color Basic 1.2, which can configure 64K rams
 	bool memory_sense = (ram_size >= 0x4000 && ram_size <= 0x7FFF)
 		|| (ram_size >= 0x8000 && (m_pia_0->b_output() & 0x80));
 
@@ -519,7 +519,7 @@ const pia6821_interface coco_state::pia1_config =
 
 //-------------------------------------------------
 //  irq_get_line - gets the value of the FIRQ line
-//	passed into the CPU
+//  passed into the CPU
 //-------------------------------------------------
 
 bool coco_state::irq_get_line(void)
@@ -545,7 +545,7 @@ void coco_state::recalculate_irq(void)
 
 //-------------------------------------------------
 //  firq_get_line - gets the value of the FIRQ line
-//	passed into the CPU
+//  passed into the CPU
 //-------------------------------------------------
 
 bool coco_state::firq_get_line(void)
@@ -638,7 +638,7 @@ void coco_state::update_sound(void)
 
 //-------------------------------------------------
 //  joystick_type - returns the type of joystick
-//	in the specified port
+//  in the specified port
 //-------------------------------------------------
 
 coco_state::joystick_type_t coco_state::joystick_type(int index)
@@ -823,7 +823,7 @@ void coco_state::poll_keyboard(void)
 
 //-------------------------------------------------
 //  update_keyboard_input - writes to PIA0 PA, but
-//	on the CoCo 3 controls a GIME input
+//  on the CoCo 3 controls a GIME input
 //-------------------------------------------------
 
 void coco_state::update_keyboard_input(UINT8 value, UINT8 z)
@@ -846,7 +846,7 @@ void coco_state::update_cassout(int cassout)
 
 //-------------------------------------------------
 //  diecom_lightgun_clock - called the diecom
-//	lightgun undergoes a high to low transition
+//  lightgun undergoes a high to low transition
 //-------------------------------------------------
 
 void coco_state::diecom_lightgun_clock(void)

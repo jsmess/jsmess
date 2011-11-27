@@ -44,7 +44,7 @@ void coco12_state::configure_sam()
 	UINT32 ram_size = m_ram->size();
 	UINT8 *rom = machine().region(MAINCPU_TAG)->base();
 	UINT8 *cart_rom = cart->get_cart_base();
-	
+
 	m_sam->configure_bank(0, ram, ram_size, false);			// $0000-$7FFF
 	m_sam->configure_bank(1, &rom[0x0000], 0x2000, true);	// $8000-$9FFF
 	m_sam->configure_bank(2, &rom[0x2000], 0x2000, true);	// $A000-$BFFF

@@ -53,16 +53,16 @@ ADDRESS_MAP_END
 //  INPUT_PORTS( coco3_keyboard )
 //-------------------------------------------------
 //
-//	CoCo 3 keyboard
-//	
-//	       PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
-//	  PA6: Ent Clr Brk Alt Ctr F1  F2 Shift
-//	  PA5: 8   9   :   ;   ,   -   .   /
-//	  PA4: 0   1   2   3   4   5   6   7
-//	  PA3: X   Y   Z   Up  Dwn Lft Rgt Space
-//	  PA2: P   Q   R   S   T   U   V   W
-//	  PA1: H   I   J   K   L   M   N   O
-//	  PA0: @   A   B   C   D   E   F   G
+//  CoCo 3 keyboard
+//
+//         PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
+//    PA6: Ent Clr Brk Alt Ctr F1  F2 Shift
+//    PA5: 8   9   :   ;   ,   -   .   /
+//    PA4: 0   1   2   3   4   5   6   7
+//    PA3: X   Y   Z   Up  Dwn Lft Rgt Space
+//    PA2: P   Q   R   S   T   U   V   W
+//    PA1: H   I   J   K   L   M   N   O
+//    PA0: @   A   B   C   D   E   F   G
 //-------------------------------------------------
 
 static INPUT_PORTS_START( coco3_keyboard )

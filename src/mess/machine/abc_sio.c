@@ -20,11 +20,11 @@ Notes:
     Relevant IC's shown.
 
     ROM0    - Hitachi HN462716 2Kx8 EPROM "SYN 1.6"
-	ROM1	- Mitsubishi MB8516 2Kx8 EPROM "T80 1.3"
-	Z80SIO	- Zilog Z-80A SIO/0
-	Z80CTC  - Zilog Z-80A CTC
-	CN1     - DB9 serial connector
-	CN2		- DB25 serial connector
+    ROM1    - Mitsubishi MB8516 2Kx8 EPROM "T80 1.3"
+    Z80SIO  - Zilog Z-80A SIO/0
+    Z80CTC  - Zilog Z-80A CTC
+    CN1     - DB9 serial connector
+    CN2     - DB25 serial connector
 
 */
 
@@ -187,11 +187,11 @@ void abc_sio_device::abcbus_cs(UINT8 data)
 UINT8 abc_sio_device::abcbus_xmemfl(offs_t offset)
 {
 	UINT8 data = 0xff;
-	
+
 	if (offset >= 0x4000 && offset < 0x5000) // TODO where is this mapped?
 	{
 		data = subregion("abc80")->base()[offset & 0xfff];
 	}
-	
+
 	return data;
 }

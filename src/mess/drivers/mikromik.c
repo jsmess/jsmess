@@ -82,7 +82,7 @@ READ8_MEMBER( mm1_state::mmu_r )
 {
 	UINT8 data = 0;
 	UINT8 mmu = m_mmu_rom[(m_a8 << 8) | (offset >> 8)];
-	
+
 	if (mmu & MMU_IOEN_MEMEN)
 	{
 		switch ((offset >> 4) & 0x07)
@@ -90,23 +90,23 @@ READ8_MEMBER( mm1_state::mmu_r )
 		case 0:
 			data = i8237_r(m_dmac, offset & 0x0f);
 			break;
-		
+
 		case 1:
 			data = m_mpsc->cd_ba_r(space, offset & 0x03);
 			break;
-		
+
 		case 2:
 			data = i8275_r(m_crtc, offset & 0x01);
 			break;
-		
+
 		case 3:
 			data = pit8253_r(m_pit, offset & 0x03);
 			break;
-		
+
 		case 4:
 			data = m_iop->data_r(space, 0);
 			break;
-		
+
 		case 5:
 			if (BIT(offset, 0))
 			{
@@ -117,7 +117,7 @@ READ8_MEMBER( mm1_state::mmu_r )
 				data = upd765_status_r(m_fdc, 0);
 			}
 			break;
-			
+
 		case 7:
 			data = m_hgdc->read(space, offset & 0x01);
 			break;
@@ -138,7 +138,7 @@ READ8_MEMBER( mm1_state::mmu_r )
 			data = machine().region(I8085A_TAG)->base()[0x2000 + (offset & 0x1fff)];
 		}
 	}
-	
+
 	return data;
 }
 
@@ -151,7 +151,7 @@ READ8_MEMBER( mm1_state::mmu_r )
 WRITE8_MEMBER( mm1_state::mmu_w )
 {
 	UINT8 mmu = m_mmu_rom[(m_a8 << 8) | (offset >> 8)];
-	
+
 	if (mmu & MMU_IOEN_MEMEN)
 	{
 		switch ((offset >> 4) & 0x07)
@@ -159,34 +159,34 @@ WRITE8_MEMBER( mm1_state::mmu_w )
 		case 0:
 			i8237_w(m_dmac, offset & 0x0f, data);
 			break;
-		
+
 		case 1:
 			m_mpsc->cd_ba_w(space, offset & 0x03, data);
 			break;
-		
+
 		case 2:
 			i8275_w(m_crtc, offset & 0x01, data);
 			break;
-		
+
 		case 3:
 			pit8253_w(m_pit, offset & 0x03, data);
 			break;
-		
+
 		case 4:
 			m_iop->data_w(space, 0, data);
 			break;
-		
+
 		case 5:
 			if (BIT(offset, 0))
 			{
 				upd765_data_w(m_fdc, 0, data);
 			}
 			break;
-			
+
 		case 6:
 			ls259_w(space, offset & 0x07, data);
 			break;
-			
+
 		case 7:
 			m_hgdc->write(space, offset & 0x01, data);
 			break;
@@ -831,7 +831,7 @@ MACHINE_CONFIG_END
 ROM_START( mm1m6 )
 	ROM_REGION( 0x4000, I8085A_TAG, 0 ) // BIOS
 	ROM_LOAD( "9081b.ic2", 0x0000, 0x2000, CRC(2955feb3) SHA1(946a6b0b8fb898be3f480c04da33d7aaa781152b) )
-   
+
 	ROM_REGION( 0x200, "address", 0 ) // address decoder
 	ROM_LOAD( "720793a.ic24", 0x0000, 0x0200, CRC(deea87a6) SHA1(8f19e43252c9a0b1befd02fc9d34fe1437477f3a) )
 

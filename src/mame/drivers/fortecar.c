@@ -9,13 +9,12 @@
   TODO:
 
   - Improve serial EEPROM support.
-  - Fix GFX planes...
-  - RTC
+  - RTC needs its own core.
   - Inputs
 
 
-  Enmglish set: bp 529 do pc=53e
-  Spanish set:  bp 529 do pc=562
+  English set: bp 512 do pc=53e
+  Spanish set: bp 512 do pc=562
 
 -------------------------------------------------------------------------------------------------
 
@@ -61,7 +60,7 @@
   FULL equivalent to MC6845P, UM6845R, EF6845P, HD6845P, etc.
 
   The ST93CS56 and ST93CS57 are 2K bit Electrically Erasable Programmable Memory (EEPROM)
-  fabricated with SGS-THOMSON’s High Endurance Single Polysilicon CMOS technology. The memory
+  fabricated with SGS-THOMSON?s High Endurance Single Polysilicon CMOS technology. The memory
   is accessed through a serial input D and output Q. The 2K bit memory is organized as 128 x 16 bit
   words.The memory is accessed by a set of instructions which include Read, Write, Page Write, Write
   All and instructions used to set the memory protection. A Read instruction loads the address of the
@@ -98,6 +97,7 @@
 #include "machine/eeprom.h"
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"
+#include "machine/v3021.h"
 #include "video/mc6845.h"
 #include "machine/nvram.h"
 #include "video/resnet.h"
@@ -230,7 +230,7 @@ static READ8_DEVICE_HANDLER( ppi0_portc_r )
 static const ppi8255_interface ppi0intf =
 {
 /*  Init with 0x9a... A, B and high C as input
-	Serial Eprom connected to Port C
+    Serial Eprom connected to Port C
 */
 
 	DEVCB_INPUT_PORT("SYSTEM"),	/* Port A read */
@@ -279,7 +279,7 @@ Seems to work properly, but must be checked closely...
 		watchdog_reset(device->machine());
 	}
 
-//	logerror("AY port B write %02x\n",data);
+//  logerror("AY port B write %02x\n",data);
 }
 
 
@@ -312,7 +312,7 @@ static const mc6845_interface mc6845_intf =
 static const eeprom_interface forte_eeprom_intf =
 {/*
     Preliminary interface for NM93CS56N Serial EEPROM.
-	Correct address & data. Using 93C46 similar protocol.
+    Correct address & data. Using 93C46 similar protocol.
 */
 	7,                /* address bits */
 	16,               /* data bits */
@@ -322,82 +322,6 @@ static const eeprom_interface forte_eeprom_intf =
 	"*10000xxxxxx",   /* lock command */
 	"*10011xxxxxx",   /* unlock command */
 };
-
-/* V3021 RTC emulation, stolen from PGM driver, TODO */
-static UINT8 bcd( UINT8 data )
-{
-	return ((data / 10) << 4) | (data % 10);
-}
-
-static READ8_HANDLER( pgm_calendar_r )
-{
-	fortecar_state *state = space->machine().driver_data<fortecar_state>();
-	UINT8 calr = (state->m_cal_val & state->m_cal_mask) ? 1 : 0;
-
-	state->m_cal_mask <<= 1;
-	return calr;
-}
-
-static WRITE8_HANDLER( pgm_calendar_w )
-{
-	fortecar_state *state = space->machine().driver_data<fortecar_state>();
-
-	space->machine().base_datetime(state->m_systime);
-
-	state->m_cal_com <<= 1;
-	state->m_cal_com |= data & 1;
-	++state->m_cal_cnt;
-
-	if (state->m_cal_cnt == 4)
-	{
-		state->m_cal_mask = 1;
-		state->m_cal_val = 1;
-		state->m_cal_cnt = 0;
-
-		switch (state->m_cal_com & 0xf)
-		{
-			case 1: case 3: case 5: case 7: case 9: case 0xb: case 0xd:
-				state->m_cal_val++;
-				break;
-
-			case 0:
-				state->m_cal_val = bcd(state->m_systime.local_time.weekday); //??
-				break;
-
-			case 2:  //Hours
-				state->m_cal_val = bcd(state->m_systime.local_time.hour);
-				break;
-
-			case 4:  //Seconds
-				state->m_cal_val = bcd(state->m_systime.local_time.second);
-				break;
-
-			case 6:  //Month
-				state->m_cal_val = bcd(state->m_systime.local_time.month + 1); //?? not bcd in MVS
-				break;
-
-			case 8:
-				state->m_cal_val = 0; //Controls blinking speed, maybe milliseconds
-				break;
-
-			case 0xa: //Day
-				state->m_cal_val = bcd(state->m_systime.local_time.mday);
-				break;
-
-			case 0xc: //Minute
-				state->m_cal_val = bcd(state->m_systime.local_time.minute);
-				break;
-
-			case 0xe:  //Year
-				state->m_cal_val = bcd(state->m_systime.local_time.year % 100);
-				break;
-
-			case 0xf:  //Load Date
-				space->machine().base_datetime(state->m_systime);
-				break;
-		}
-	}
-}
 
 static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -414,7 +338,7 @@ static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8 )
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("fcppi0", ppi8255_r, ppi8255_w)//M5L8255AP
 //  AM_RANGE(0x80, 0x81) //8251A UART
-	AM_RANGE(0xa0, 0xa0) AM_READWRITE(pgm_calendar_r,pgm_calendar_w) // v3021 RTC, TODO
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE_MODERN("rtc", v3021_device, read, write)
 	AM_RANGE(0xa1, 0xa1) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 /*
@@ -526,7 +450,7 @@ GFXDECODE_END
 
 static MACHINE_RESET(fortecar)
 {
-//	fortecar_state *state = machine.driver_data<fortecar_state>();
+//  fortecar_state *state = machine.driver_data<fortecar_state>();
 
 }
 
@@ -556,6 +480,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_EEPROM_DEFAULT_VALUE(0)
 
 	MCFG_PPI8255_ADD("fcppi0", ppi0intf)
+	MCFG_V3021_ADD("rtc")
 
 	MCFG_GFXDECODE(fortecar)
 	MCFG_PALETTE_LENGTH(0x200)
@@ -583,13 +508,12 @@ ROM_START( fortecar )
 	ROM_LOAD( "fortecar.u40", 0x20000, 0x10000, CRC(9693bb83) SHA1(e3e3bc750c89a1edd1072ce3890b2ce498dec633) )
 
 	/* took from the Spanish version, these are likely to be identical anyway */
-//	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
-//	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, BAD_DUMP CRC(fd5be302) SHA1(862f584aa8073bcefeeb290b99643020413fb7ef) )
-//	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(71f70589) SHA1(020e17617f9545cab6d174c5577c0158922d2186) )
+//  ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+//  ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, BAD_DUMP CRC(fd5be302) SHA1(862f584aa8073bcefeeb290b99643020413fb7ef) )
+//  ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(71f70589) SHA1(020e17617f9545cab6d174c5577c0158922d2186) )
 
 	ROM_REGION( 0x0100,	"eeprom", 0 )	/* default serial EEPROM */
 	ROM_LOAD( "forte_card_93cs56.u13", 0x0000, 0x0100, BAD_DUMP CRC(13180f47) SHA1(bb04ea1eac5e53831aece3cfdf593ae824219c0e) )
-
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "forte_card_82s147.u47", 0x0000, 0x0200, BAD_DUMP CRC(7e631818) SHA1(ac08b0de30260278af3a1c5dee5810d4304cb9ca) )
@@ -606,7 +530,7 @@ ROM_START( fortecrd )
 
 	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
 	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(fd5be302) SHA1(862f584aa8073bcefeeb290b99643020413fb7ef) )
-//	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(71f70589) SHA1(020e17617f9545cab6d174c5577c0158922d2186) )
+//  ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, CRC(71f70589) SHA1(020e17617f9545cab6d174c5577c0158922d2186) )
 
 	ROM_REGION( 0x0100,	"eeprom", 0 )	/* default serial EEPROM */
 	ROM_LOAD( "forte_card_93cs56.u13", 0x0000, 0x0100, CRC(13180f47) SHA1(bb04ea1eac5e53831aece3cfdf593ae824219c0e) )

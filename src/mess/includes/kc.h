@@ -26,7 +26,7 @@
 // Devices
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-	
+
 // Formats
 #include "formats/kc_cas.h"
 
