@@ -828,7 +828,7 @@ static const cassette_interface amstrad_cassette_interface =
 	cdt_cassette_formats,
 	NULL,
 	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
+	"cpc_cass",
 	NULL
 };
 
@@ -841,7 +841,7 @@ static const floppy_interface cpc6128_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_SSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
+	"floppy_3",
 	NULL
 };
 
@@ -920,10 +920,12 @@ static MACHINE_CONFIG_START( amstrad, amstrad_state )
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, amstrad_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","cpc_cass")
 
 	MCFG_UPD765A_ADD("upd765", amstrad_upd765_interface)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(cpc6128_floppy_interface)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
 
 	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL,NULL)
 
