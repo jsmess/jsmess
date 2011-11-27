@@ -95,7 +95,7 @@ NEOP00060 Dokodemo Mahjong
 	</software>
 
 	<!-- Id: NeoP00090 - Developer: Yumekobo - Releases: 1998-10-28 (JPN) - Alt Title: ポケットスポーツシリーズ ポケットテニス -->
-	<software name="ptennis">
+	<software name="ptennis" supported="partial">   <!-- glitched sprites -->
 		<description>Pocket Sports Series - Pocket Tennis (Euro, Jpn)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>

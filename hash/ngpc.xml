@@ -654,7 +654,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<!-- Id: NeoP00630 - Developer: SNK - Releases: 2000-01-20 (JPN) - Alt Title: めざせ！漢字王 -->
-	<software name="mezase">
+	<software name="mezase" supported="no"> <!-- it freezes -->
 	<!-- NGPC only -->
 		<description>Mezase! Kanji Ou (Jpn)</description>
 		<year>2000</year>
@@ -1413,7 +1413,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		</part>
 	</software>
 
-	<software name="snkgals">
+	<software name="snkgals" supported="partial"> <!-- link fails and the game complains -->
 		<description>SNK Gals' Fighters (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
@@ -1426,7 +1426,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<!-- Id: NeoP00650 - Developer: Yumekobo - Releases: 2000-01-27 (JPN) - Alt Title: エス・エヌ・ケイ ギャルズ ファイターズ - Notes: also re-released in "NeoGeo Pocket Best Collection" (Id NeoP00657) -->
-	<software name="snkgalsj" cloneof="snkgals">
+	<software name="snkgalsj" cloneof="snkgals" supported="partial"> <!-- link fails and the game complains -->
 	<!-- NGPC only -->
 		<description>SNK Gals' Fighters (Jpn)</description>
 		<year>2000</year>
@@ -1516,7 +1516,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<!-- Id: NeoP01160 - Developer: SNK - Releases: 2001-09-13 (JPN) - Alt Title: エス・エヌ・ケイ バーサス カプコン カードファイターズ2 Expand Edition -->
-	<software name="svccard2">
+	<software name="svccard2" supported="partial"> <!-- lots of glitches -->
 	<!-- NGPC only -->
 		<description>SNK vs. Capcom - Card Fighters 2 - Expand Edition (Jpn)</description>
 		<year>2001</year>
@@ -1559,7 +1559,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="svccardp" cloneof="svccards">
-		<description>SNK vs. Capcom - Gekitotsu Card Fighters (Jpn, Prototype)</description>
+		<description>SNK vs. Capcom - Gekitotsu Card Fighters (Jpn, Demo)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -1628,8 +1628,8 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<software name="wrestmad">
 		<description>Wrestling Madness (Euro, USA, Prototype)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="wrestling madness (usa, europe) (beta).bin" size="2097152" crc="16b0be9b" sha1="2dd82db967e2bc8c2d8b569a364793d56176a68e" offset="000000" />
